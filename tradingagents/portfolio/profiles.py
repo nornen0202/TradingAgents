@@ -49,6 +49,7 @@ def load_portfolio_profile(path: str | Path, profile_name: str) -> PortfolioProf
 
     return PortfolioProfile(
         name=profile_name,
+        capital_policy_enabled=bool(payload.get("capital_policy_enabled", False)),
         enabled=bool(payload.get("enabled", False)),
         broker=broker,
         broker_environment=str(payload.get("broker_environment", "real")).strip().lower() or "real",

@@ -81,35 +81,62 @@ def test_zero_allocation_explains_buffer_and_one_share_funding_without_extra_buy
 
 
 def test_tiny_risk_reduction_offers_one_share_comparison_not_automatic_round_up():
-    account = snapshot(0, 0, [{"canonical_ticker": "AAA", "quantity": 1, "available_qty": 1}])
+    account = snapshot(
+        0, 0, [{"canonical_ticker": "AAA", "quantity": 1, "available_qty": 1}]
+    )
     account["constraints"]["min_trade_krw"] = 1000
-    r = plan([row(held=True, delta=-15, action="REDUCE_IF_TRIGGERED")], account)["rows"][0]
+    r = plan([row(held=True, delta=-15, action="REDUCE_IF_TRIGGERED")], account)[
+        "rows"
+    ][0]
     assert r["quantity"] == 0
-    assert r["target_quantity"] == .15
+    assert r["target_quantity"] == 0.15
     assert r["zero_reason_code"] == "ALLOCATION_BELOW_ONE_SHARE"
     assert r["minimum_lot_review"] == {
-        "quantity": 1, "holding_fraction": 1, "gross_amount": 100,
-        "currency": "KRW", "allocation_excess_krw": 85,
-        "below_min_trade": True, "requires_reallocation": True, "order_ready": False,
+        "quantity": 1,
+        "holding_fraction": 1,
+        "gross_amount": 100,
+        "currency": "KRW",
+        "allocation_excess_krw": 85,
+        "below_min_trade": True,
+        "requires_reallocation": True,
+        "order_ready": False,
     }
     assert r["estimated_net_cash"] == 0
 
 
 def test_missing_fx_never_fabricates_one_share_risk_comparison():
-    account = snapshot(positions=[{"canonical_ticker": "GLDM", "quantity": 4, "available_qty": 4}])
+    account = snapshot(
+        positions=[{"canonical_ticker": "GLDM", "quantity": 4, "available_qty": 4}]
+    )
     item = row("GLDM", held=True, delta=-100000, action="REDUCE_IF_TRIGGERED", price=80)
-    missing = build_trade_plan({"market":"US", "rows":[item]}, account_snapshot=account, now=NOW)["rows"][0]
+    missing = build_trade_plan(
+        {"market": "US", "rows": [item]}, account_snapshot=account, now=NOW
+    )["rows"][0]
     assert missing["quantity"] is None
     assert missing["minimum_lot_review"] is None
-    fixed = build_trade_plan({"market":"US", "rows":[item]}, account_snapshot=account, fx_krw_per_usd=1342.4, fx_asof="2026-10-02T02:00:00Z", now=NOW)["rows"][0]
+    fixed = build_trade_plan(
+        {"market": "US", "rows": [item]},
+        account_snapshot=account,
+        fx_krw_per_usd=1342.4,
+        fx_asof="2026-10-02T02:00:00Z",
+        now=NOW,
+    )["rows"][0]
     assert fixed["quantity"] == 0
-    assert fixed["target_quantity"] == pytest.approx(100000/(80*1342.4))
-    assert fixed["minimum_lot_review"]["holding_fraction"] == .25
+    assert fixed["target_quantity"] == pytest.approx(100000 / (80 * 1342.4))
+    assert fixed["minimum_lot_review"]["holding_fraction"] == 0.25
 
 
-@pytest.mark.parametrize("asof", [None, "broken", "2026-10-02T04:00:00Z", "2026-10-02T02:00:00"])
+@pytest.mark.parametrize(
+    "asof", [None, "broken", "2026-10-02T04:00:00Z", "2026-10-02T02:00:00"]
+)
 def test_future_or_undated_fx_is_not_used_for_sizing(asof):
-    r = build_trade_plan({"market":"US", "rows":[row(delta=600000)]}, account_snapshot=snapshot(1000000,1000000), fx_krw_per_usd=1400, fx_asof=asof, now=NOW)
+    r = build_trade_plan(
+        {"market": "US", "rows": [row(delta=600000)]},
+        account_snapshot=snapshot(1000000, 1000000),
+        fx_krw_per_usd=1400,
+        fx_asof=asof,
+        now=NOW,
+    )
     assert r["fx_krw_per_usd"] is None
     assert r["rows"][0]["quantity"] is None
 
@@ -513,3 +540,95 @@ def test_known_disabled_order_limit_and_overweight_are_not_presented_as_availabl
     assert result["status"] == "RECHECK"
     assert any("0건" in reason for reason in result["reasons"])
     assert any("비중 상한" in reason for reason in result["reasons"])
+
+
+BALANCED = {
+    "id": "balanced-capital-v1",
+    "enabled": True,
+    "effective_at": "2026-01-01T00:00:00+00:00",
+    "cash_reserve_nav_ratio": 0.2,
+    "cash_reserve_floor_krw": 0,
+}
+
+
+def test_balanced_risk_quantity_is_actionable_and_proceeds_do_not_fund_buys():
+    account = snapshot(
+        0, 0, [{"canonical_ticker": "AAA", "quantity": 1, "available_qty": 1}]
+    )
+    account["account_value_krw"] = 1000
+    account["constraints"]["min_trade_krw"] = 1000
+    result = plan(
+        [row(held=True, delta=-15, action="REDUCE_IF_TRIGGERED"), row("BBB")],
+        account,
+        capital_policy=BALANCED,
+    )
+    sell, buy = result["rows"]
+    assert sell["quantity"] == 1
+    assert sell["quantity_revision"]["full_exit"] is True
+    assert sell["quantity_revision"]["target_shares"] == 0.15
+    assert sell["estimated_fees"] == pytest.approx(0.347)
+    assert sell["estimated_net_cash"] == pytest.approx(99.653)
+    assert sell["constraint_review_required"] is False
+    assert buy["quantity"] == 0
+    assert result["capital_context"]["min_cash_buffer_krw"] == 200
+    assert result["summary"]["buy_budget_used_krw"] == 0
+
+
+@pytest.mark.parametrize(
+    "pending", [None, [{"canonical_ticker": "AAA", "side": "sell", "remaining_qty": 1}]]
+)
+def test_balanced_does_not_round_unknown_or_pending_orders(pending):
+    account = snapshot(
+        positions=[{"canonical_ticker": "AAA", "quantity": 1, "available_qty": 1}]
+    )
+    account.update(account_value_krw=2000, pending_orders=pending)
+    result = plan(
+        [row(held=True, delta=-15, action="REDUCE_IF_TRIGGERED")],
+        account,
+        capital_policy=BALANCED,
+    )["rows"][0]
+    assert result["quantity"] is None
+    assert result["quantity_revision"] is None
+
+
+@pytest.mark.parametrize(
+    "nav, effective", [(None, "2026-01-01T00:00:00Z"), (1000, "2030-01-01T00:00:00Z")]
+)
+def test_balanced_needs_nav_and_effective_policy(nav, effective):
+    account = snapshot(
+        positions=[{"canonical_ticker": "AAA", "quantity": 1, "available_qty": 1}]
+    )
+    account["account_value_krw"] = nav
+    r = plan(
+        [row(held=True, delta=-15, action="REDUCE_IF_TRIGGERED")],
+        account,
+        capital_policy={**BALANCED, "effective_at": effective},
+    )
+    assert r["capital_policy"] is None
+    assert r["rows"][0]["quantity"] == 0
+
+
+def test_explicit_new_integer_quantity_is_not_rounded_twice_at_different_trigger_price():
+    account = snapshot(
+        positions=[{"canonical_ticker": "AAA", "quantity": 4, "available_qty": 4}]
+    )
+    account["account_value_krw"] = 1000
+    item = row(held=True, delta=-200, action="REDUCE_IF_TRIGGERED", price=90)
+    item["portfolio_action"].update(
+        planned_sell_quantity_if_triggered=2, quantity_policy=BALANCED["id"]
+    )
+    r = plan([item], account, capital_policy=BALANCED)["rows"][0]
+    assert r["quantity"] == 2
+    assert r["estimated_gross_high"] == 180
+
+
+def test_soft_profit_rounding_preserves_core():
+    account = snapshot(
+        positions=[{"canonical_ticker": "AAA", "quantity": 1, "available_qty": 1}]
+    )
+    account["account_value_krw"] = 1000
+    item = row(held=True, delta=-80, action="TAKE_PROFIT_IF_TRIGGERED")
+    item["portfolio_action"].update(
+        sell_intent="TAKE_PROFIT", profit_taking_plan={"keep_core_fraction": 0.45}
+    )
+    assert plan([item], account, capital_policy=BALANCED)["rows"][0]["quantity"] == 0

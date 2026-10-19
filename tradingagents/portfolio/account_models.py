@@ -151,6 +151,7 @@ class PortfolioProfile:
     opportunity_capture_max_loss_nav_pct: float = 0.3
     max_pilot_stop_distance_pct: float = 12.0
     soft_prism_conflict_allows_pilot: bool = True
+    capital_policy_enabled: bool = False
 
     def to_dict(self) -> dict[str, Any]:
         return _serialize(self)
@@ -266,6 +267,10 @@ class PortfolioAction:
     external_signal_score_delta: float = 0.0
     external_signal_notes: tuple[str, ...] = tuple()
     buy_matrix: dict[str, Any] | None = None
+
+    planned_sell_quantity_now: int | None = None
+    planned_sell_quantity_if_triggered: int | None = None
+    quantity_policy: str | None = None
 
     def to_dict(self) -> dict[str, Any]:
         return _serialize(self)

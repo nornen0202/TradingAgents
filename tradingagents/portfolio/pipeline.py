@@ -65,6 +65,9 @@ def run_portfolio_pipeline(
     status_path = private_dir / "status.json"
     try:
         snapshot = load_snapshot_for_profile(profile)
+        if profile.capital_policy_enabled:
+            from .capital_policy import apply_snapshot_policy
+            snapshot = apply_snapshot_policy(snapshot, now=datetime.fromisoformat(str(manifest["started_at"]).replace("Z", "+00:00")))
         candidates, candidate_warnings = build_portfolio_candidates(
             snapshot=snapshot,
             run_dir=run_dir,

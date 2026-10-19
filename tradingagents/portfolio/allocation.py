@@ -4,6 +4,7 @@ from typing import Any
 
 from .account_models import AccountSnapshot, PortfolioAction, PortfolioCandidate, PortfolioProfile, PortfolioRecommendation
 from .gates import infer_market_regime
+from .capital_policy import buy_budget, is_risk_reduction, reduction_quantity
 
 
 _STANCE_WEIGHTS = {
@@ -83,6 +84,10 @@ def build_recommendation(
 ) -> tuple[PortfolioRecommendation, list[PortfolioCandidate]]:
     scored = [_score_candidate(candidate, snapshot, batch_metrics, warnings) for candidate in candidates]
     investable_cash_now = max(snapshot.available_cash_krw - snapshot.constraints.min_cash_buffer_krw, 0)
+    capital_policy = snapshot.cash_diagnostics.get("capital_policy") or {}
+    if capital_policy:
+        investable_cash_now = int(buy_budget(snapshot.available_cash_krw, snapshot.buying_power_krw, snapshot.constraints.min_cash_buffer_krw))
+    base_cash_budget = investable_cash_now
     trigger_budget_krw = min(profile.trigger_budget_krw or investable_cash_now, investable_cash_now)
 
     wait_ratio = _ratio(batch_metrics.get("entry_action_distribution"), "WAIT")
@@ -91,7 +96,7 @@ def build_recommendation(
         investable_cash_now = int(investable_cash_now * 0.25)
         trigger_budget_krw = max(
             trigger_budget_krw,
-            int(max(snapshot.available_cash_krw - snapshot.constraints.min_cash_buffer_krw, 0) * 0.50),
+            int(base_cash_budget * 0.50),
         )
     scored = _annotate_relative_candidates(
         candidates=scored,
@@ -135,6 +140,24 @@ def build_recommendation(
             snapshot=snapshot,
         )
 
+        planned_now = planned_triggered = None
+        if capital_policy and current_position and current_position.market_price_krw > 0:
+            remaining = current_position.available_qty
+            core = _fraction_or_none(candidate.profit_taking_plan.get("keep_core_fraction")) or 0
+            for phase in ("now", "triggered"):
+                amount = delta_now if phase == "now" else delta_triggered
+                if amount >= 0:
+                    continue
+                code = candidate.suggested_action_now if phase == "now" else candidate.suggested_action_if_triggered
+                q = reduction_quantity(abs(amount) / current_position.market_price_krw, remaining,
+                    held=current_position.quantity, keep_core=core,
+                    risk_reduction=is_risk_reduction({"sell_intent": candidate.sell_intent}, code))
+                remaining -= q
+                if phase == "now":
+                    planned_now, delta_now = q, -q * current_position.market_price_krw
+                else:
+                    planned_triggered, delta_triggered = q, -q * current_position.market_price_krw
+
         target_now = _weight_after_delta(current_value, delta_now, account_value)
         target_triggered = _weight_after_delta(current_value, delta_triggered, account_value)
         budget_blocked_actionable = _is_budget_blocked_actionable(
@@ -151,6 +174,9 @@ def build_recommendation(
         actions.append(
             PortfolioAction(
                 canonical_ticker=candidate.instrument.canonical_ticker,
+                planned_sell_quantity_now=planned_now,
+                planned_sell_quantity_if_triggered=planned_triggered,
+                quantity_policy=capital_policy.get("id"),
                 display_name=candidate.instrument.display_name,
                 priority=len(actions) + 1,
                 confidence=round(candidate.confidence, 2),
@@ -1329,7 +1355,11 @@ def _apply_execution_constraints(
             elif delta_now > remaining_sleeve:
                 delta_now = min(delta_now, remaining_sleeve)
                 gate_reasons.append("opportunity_capture_sleeve_cap")
-        if 0 < abs(delta_now) < snapshot.constraints.min_trade_krw:
+        risk_integer = bool(action.quantity_policy) and is_risk_reduction(action.to_dict(), action.action_now)
+        if action.quantity_policy and delta_now < 0 and current_position and current_position.market_price_krw > 0:
+            # Hard turnover/order caps cannot leave a fractional executable lot.
+            delta_now = -(abs(delta_now) // current_position.market_price_krw) * current_position.market_price_krw
+        if 0 < abs(delta_now) < snapshot.constraints.min_trade_krw and not (delta_now < 0 and risk_integer):
             delta_now = 0
             gate_reasons.append("min_trade_floor_after_caps")
 
@@ -1345,6 +1375,7 @@ def _apply_execution_constraints(
                     **action.__dict__,
                     "action_now": _normalize_action_value(action.action_now, delta_now),
                     "delta_krw_now": delta_now,
+                    "planned_sell_quantity_now": abs(delta_now) // current_position.market_price_krw if action.planned_sell_quantity_now is not None and current_position and current_position.market_price_krw > 0 else action.planned_sell_quantity_now,
                     "target_weight_now": round(_weight_after_delta(current_value, delta_now, account_value), 4),
                     "gate_reasons": tuple(dict.fromkeys(gate_reasons)),
                 }

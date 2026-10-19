@@ -102,6 +102,9 @@ def simulate_account(
     price_basis: str,
     execution_delay_sessions: int = 0,
     liquidate_at_end: bool = True,
+    cash_reserve_ratio: float | None = None,
+    fixed_cash_reserve_krw: float | None = None,
+    sell_rounding: str = "target_floor",
 ):
     """All-cash, account-sized scenario; no reconstruction of existing tax lots.
 
@@ -112,6 +115,19 @@ def simulate_account(
     are not inferred. All remaining shares are sold at final close if requested.
     """
     validate_prices(prices)
+    custom_cash = cash_reserve_ratio is not None or fixed_cash_reserve_krw is not None
+    if custom_cash and strategy != "balanced_80_20":
+        raise ValueError("Cash policy sensitivity requires balanced rebalance")
+    if cash_reserve_ratio is not None and (
+        not math.isfinite(cash_reserve_ratio) or not 0 <= cash_reserve_ratio <= 1
+    ):
+        raise ValueError("Invalid cash ratio")
+    if fixed_cash_reserve_krw is not None and (
+        not math.isfinite(fixed_cash_reserve_krw) or fixed_cash_reserve_krw < 0
+    ):
+        raise ValueError("Invalid fixed cash reserve")
+    if sell_rounding not in {"target_floor", "legacy_delta_floor"}:
+        raise ValueError("Invalid sell rounding")
     if price_basis != "unadjusted_no_splits":
         raise ValueError("Integer shares require declared unadjusted prices")
     if not {"Adj Close", "Dividends", "Stock Splits"}.issubset(prices.columns):
@@ -228,15 +244,26 @@ def simulate_account(
                 - annual_tax(realized, scenario) / fx_open[n]
             )
             previous_weight = previous_value / previous_nav if previous_nav > 0 else 0.0
+            target_weight = float(signal.weight)
+            if custom_cash:
+                cash_target = max(
+                    (cash_reserve_ratio or 0) * previous_nav,
+                    (fixed_cash_reserve_krw or 0) / fx_open[n],
+                )
+                target_weight = (
+                    max(0.0, 1 - cash_target / previous_nav)
+                    if previous_nav > 0
+                    else 0.0
+                )
             if (
                 strategy != "balanced_80_20"
                 or n == 0
-                or abs(previous_weight - 0.8) >= 0.05
+                or abs(previous_weight - target_weight) >= 0.05
             ):
                 pending.append(
                     (
                         i + execution_delay_sessions,
-                        float(signal.weight),
+                        target_weight,
                         str(signal.signal_date.date()),
                     )
                 )
@@ -248,11 +275,24 @@ def simulate_account(
             equity = cash + shares * op + dividend_receivable - reserve
             target = max(0, math.floor(weight * equity / op))
             delta = target - shares
+            if sell_rounding == "legacy_delta_floor" and delta < 0:
+                delta = -max(0, math.floor(shares - weight * equity / op))
             if delta > 0:
                 per_share = (
                     op * (1 + scenario.slippage_rate) * (1 + scenario.commission_rate)
                 )
-                delta = min(delta, max(0, math.floor((cash - reserve) / per_share)))
+                policy_reserve = (
+                    max(
+                        (cash_reserve_ratio or 0) * equity,
+                        (fixed_cash_reserve_krw or 0) / fx_open[n],
+                    )
+                    if custom_cash
+                    else 0
+                )
+                delta = min(
+                    delta,
+                    max(0, math.floor((cash - reserve - policy_reserve) / per_share)),
+                )
             transact(delta, op, fx_open[n], date, signal_date, "scheduled_rebalance")
         pending = [p for p in pending if p[0] > i]
         cl = float(prices.Close.iloc[i])

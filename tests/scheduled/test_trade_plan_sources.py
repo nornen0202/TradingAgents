@@ -93,6 +93,20 @@ def test_exact_snapshot_preserves_zero_and_fractional_quantity_without_identifie
     assert "SECRET" not in json.dumps(result)
 
 
+@pytest.mark.parametrize("nav", [9676532, None, 0, -1, True, float("nan"), float("inf")])
+def test_nav_is_optional_but_present_values_must_be_positive_finite(source, nav):
+    root, _, snapshot, _, market, save = source
+    snapshot["account_value_krw"] = nav
+    save()
+    result = load_trade_plan_sources(root, market)
+    if nav == 9676532:
+        assert result["account_snapshot"]["account_value_krw"] == nav
+    elif nav is None:
+        assert "account_value_krw" not in result["account_snapshot"]
+    else:
+        assert result["account_snapshot"] is None
+
+
 @pytest.mark.parametrize(
     "state", ["lookup_failed", "malformed", "unknown_ticker", "missing"]
 )

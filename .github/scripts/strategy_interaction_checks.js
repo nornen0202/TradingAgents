@@ -37,6 +37,9 @@
     check(zero.querySelector('.plan-amount').textContent.includes('1주 필요자금 135,000원'), 'One-share funding need is visible without allocating a share');
     check(active().querySelector('.plan-overview').textContent.includes('신규 매수 예산 0원'), 'Cash reserve is reconciled in the overview');
     check(buy.querySelector('.plan-price').textContent.includes('종가 확인'), 'Required price confirmation is visible');
+    check(active().querySelector('.plan-overview').textContent.includes('순자산의 20%'), 'NAV reserve policy is visible');
+    check(sell.querySelector('.plan-quantity').textContent.includes('전량 매도'), 'Integer risk exit exposes whole holding impact');
+    check(sell.querySelector('.plan-quantity').textContent.includes('2.100주 → 3주'), 'Fractional target and actionable quantity remain distinguishable');
     check(unavailable.querySelector('.plan-quantity').textContent.includes('산출 보류'), 'Unavailable quantity is distinct from zero shares');
     check(unavailable.querySelector('.plan-price').textContent.includes('범위 미확정'), 'Unavailable price is not a zero-cost trade');
     check(buy.querySelector('.plan-price').textContent.includes(unit), 'Price range uses ' + market + ' native currency');
