@@ -172,6 +172,20 @@ diagnosis rather than blind retransmission. Failed notification transport does n
 terminate healthy research. A PC/network outage still requires the independent
 observer; it cannot send from an offline host.
 
+The October 19 US evening refreshes exposed a publication-confirmation gap:
+Pages deployed successfully, but the immediate post-push check still saw the
+previous snapshot. The next publication tick rebuilt another completed overlay
+before verifying that delivery, leaving Work handoffs and completion notices
+pending through successive successful deployments. The publisher now checks the
+same immutable site up to seven times, fifteen seconds apart (at most ninety
+seconds of propagation waits), under its existing publication lock. Each check
+still requires the exact live snapshot, report and strategy bytes. It pushes and
+mirrors only once, then completes exact handoffs and notification reconciliation
+only after verification. Exhaustion retains `PAGES_PENDING`; verification errors
+retain the existing failure path and cumulative notification retry limits. Never
+repeat research or a Work ACK to repair this stage. The observed Pages deployment
+took about sixty-five seconds; a sixty-second window would still miss it.
+
 1. Read `AGENTS.md` and the previous local operations receipt. Record the actual
    timezone-aware current time. Use `nornen0202/TradingAgents` and remote `fork`.
    Fetch fresh GitHub data; do not rely on a previous conversation's run status.

@@ -394,3 +394,95 @@ def test_local_mirror_rejects_extra_files_before_any_remote_write(monkeypatch):
     monkeypatch.setattr(mirror, "api", lambda *a, **k: pytest.fail("Remote mutation before validation"))
     with pytest.raises(ValueError, match="file set"):
         mirror.publish(({}, {name: b"{}" for name in mirror.FILES | {"manifest.json", "private.json"}}))
+
+
+@pytest.fixture
+def delayed_publication(tmp_path, monkeypatch):
+    from tradingagents.notifications import local as notifications
+    from tradingagents.scheduled import config, site
+
+    calls = {name: [] for name in ("build", "push", "mirror", "handoff", "reconcile", "sleep")}
+    state = tmp_path / "state"
+    state.mkdir()
+
+    def build(archive, destination, settings):
+        calls["build"].append(destination)
+        (destination / "ai").mkdir(parents=True, exist_ok=True)
+        (destination / "ai/manifest.json").write_text("{}", encoding="utf-8")
+
+    snapshot = SimpleNamespace(create_snapshot=lambda *a, **k: None,
+                               fetch_live_snapshot=lambda *a: {},
+                               should_deploy=lambda *a: (True, "new snapshot"))
+    mirror = SimpleNamespace(FILES=set(), publish=lambda value: calls["mirror"].append(value))
+    modules = {"pages_snapshot": snapshot, "publish_ai_context": mirror,
+               "verify_work_pages_handoff": SimpleNamespace()}
+    monkeypatch.setattr(local, "script", modules.__getitem__)
+    monkeypatch.setattr(config, "load_scheduled_config", lambda *a: SimpleNamespace(site={}))
+    monkeypatch.setattr(site, "build_site", build)
+    monkeypatch.setattr(local, "git_run", lambda *a, **k: "source-revision")
+
+    def push(*args):
+        calls["push"].append(args)
+        return f"commit-{len(calls['push'])}"
+
+    monkeypatch.setattr(local, "push_site", push)
+    monkeypatch.setattr(local, "ensure_branch_pages", lambda *a: None)
+    monkeypatch.setenv("GH_TOKEN", "offline-fixture")
+    monkeypatch.setattr(local, "complete_handoffs", lambda *a: calls["handoff"].append(a[-1].copy()))
+    monkeypatch.setattr(notifications, "reconcile_safely",
+                        lambda *a, **k: calls["reconcile"].append(local.read_json(state / "publication.json", {})))
+    monkeypatch.setattr(local.time, "sleep", calls["sleep"].append)
+    return tmp_path / "archive", state, tmp_path / "work", calls
+
+
+def test_each_changed_generation_finishes_delivery_before_next_producer(monkeypatch, delayed_publication):
+    archive, state, runtime, calls = delayed_publication
+    generations = iter(("first-overlay", "next-overlay"))
+    monkeypatch.setattr(local, "archive_fingerprint", lambda _: next(generations))
+    observations = iter((False, False, False, False, False, True, False, True))
+    monkeypatch.setattr(local, "verify_live", lambda _: next(observations))
+
+    first = local.publish(archive, state, runtime, publication_locked=True)
+    second = local.publish(archive, state, runtime, publication_locked=True)
+
+    assert [first["status"], second["status"]] == ["DELIVERY_VERIFIED", "DELIVERY_VERIFIED"]
+    assert [v["fingerprint"] for v in calls["handoff"]] == ["first-overlay", "next-overlay"]
+    assert [v.get("status") for v in calls["reconcile"]] == [
+        None, "DELIVERY_VERIFIED", "DELIVERY_VERIFIED", "DELIVERY_VERIFIED"]
+    assert len(calls["build"]) == len(calls["push"]) == len(calls["mirror"]) == 2
+    assert calls["sleep"] == [15] * 6
+
+
+def test_unpropagated_snapshot_stays_pending_and_resumes_without_republishing(monkeypatch, delayed_publication):
+    archive, state, runtime, calls = delayed_publication
+    monkeypatch.setattr(local, "archive_fingerprint", lambda _: "same-overlay")
+    probes = []
+    monkeypatch.setattr(local, "verify_live", lambda _: probes.append(False) or False)
+
+    pending = local.publish(archive, state, runtime, publication_locked=True)
+
+    assert pending["status"] == "PAGES_PENDING"
+    assert len(probes) == 7
+    assert calls["sleep"] == [15] * 6
+    assert not calls["handoff"]
+    assert len(calls["reconcile"]) == 1
+    monkeypatch.setattr(local, "verify_live", lambda _: True)
+    delivered = local.publish(archive, state, runtime, publication_locked=True)
+    assert delivered["status"] == "DELIVERY_VERIFIED"
+    assert len(calls["build"]) == len(calls["push"]) == len(calls["mirror"]) == 1
+    assert len(calls["handoff"]) == 1
+
+
+def test_live_verification_errors_keep_existing_failure_path(monkeypatch, delayed_publication):
+    archive, state, runtime, calls = delayed_publication
+    monkeypatch.setattr(local, "archive_fingerprint", lambda _: "same-overlay")
+
+    def broken(_):
+        raise ValueError("snapshot integrity error")
+
+    monkeypatch.setattr(local, "verify_live", broken)
+    with pytest.raises(ValueError, match="snapshot integrity"):
+        local.publish(archive, state, runtime, publication_locked=True)
+    assert local.read_json(state / "publication.json")["status"] == "PAGES_PENDING"
+    assert not calls["handoff"]
+    assert not calls["sleep"]
