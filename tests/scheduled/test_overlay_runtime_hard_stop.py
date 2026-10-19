@@ -51,7 +51,10 @@ checkpoint_timezone = "America/New_York"
             self.target()
 
     monkeypatch.setattr(runner, "Thread", ImmediateThread)
-    monkeypatch.setattr(runner, "fetch_intraday_market_snapshot", lambda ticker, **_kwargs: f"snapshot:{ticker}")
+    def fetch(ticker, **kwargs):
+        assert kwargs["interval"] == "1m"
+        return f"snapshot:{ticker}"
+    monkeypatch.setattr(runner, "fetch_intraday_market_snapshot", fetch)
     monkeypatch.setenv("TRADINGAGENTS_OVERLAY_MAX_WORKERS", "2")
 
     results = runner._fetch_overlay_market_snapshots(
