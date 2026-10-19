@@ -54,6 +54,17 @@ backfilled only within 24 hours; historical overlays are not replayed. New overl
 after bridge activation retain completion notices. Work ACK/handoff success remains
 silent and never substitutes for a producer completion notice.
 
+On October 19, pre-report quote/account refreshes superseded the scheduled
+overlays in the verified public strategy, but their `pre-report-kr-overlay`
+producer label was excluded from the local notification bridge. Only the morning
+full research notice was sent. The bridge now recognizes the exact
+`pre-report-{kr,us}-overlay` labels with `run_mode=overlay_only`, both when queuing
+and in the trusted sender. Successful canonical coverage, exact published
+producer identity and finish time, the publication lane lock, live byte
+verification, retry limits and Telegram deduplication still apply. The message
+describes quote/account refresh completion, never new full research. Older
+superseded refreshes are not replayed, and Work ACK/handoff remains silent.
+
 YouTube and PRISM still collect through GitHub, but their `deploy` jobs are
 intentionally skipped with the local backend. Their successful build alone does
 not prove delivery. The local publisher now queues a separate advisory completion

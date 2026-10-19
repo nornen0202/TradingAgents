@@ -60,6 +60,21 @@ def queue_failure(state, *, stage, source_key, error_type, finished_at):
                          "error_type": error_type, "finished_at": finished_at})
 
 
+def _local_market_producer(manifest):
+    settings = manifest.get("settings") or {}
+    market = str(settings.get("market", "")).lower()
+    label = str(manifest.get("label", ""))
+    if market not in {"kr", "us"}:
+        return False
+    # Work's read-only freshness barrier is a real overlay producer. Its
+    # completion still requires exact published lineage and live verification;
+    # this does not turn a Work ACK into a notification event.
+    return label.startswith("local-scheduler-") or (
+        settings.get("run_mode") == "overlay_only"
+        and label == f"pre-report-{market}-overlay"
+    )
+
+
 def published_strategy_covers(manifest, strategy):
     """Bind a completion to the strategy bytes that verify_live checks.
 
@@ -100,7 +115,7 @@ def queue_completed(archive, state, *, now=None):
         manifest = read(path)
         settings = manifest.get("settings") or {}
         market = str(settings.get("market", "")).lower()
-        if market not in {"kr", "us"} or not str(manifest.get("label", "")).startswith("local-scheduler-"):
+        if not _local_market_producer(manifest):
             continue
         if manifest.get("status") != "success" or (manifest.get("summary") or {}).get("failed_tickers") != 0:
             continue
@@ -206,7 +221,7 @@ def compose(event, archive, state):
             or str(settings.get("market", "")).lower() != event["market"]
             or manifest.get("finished_at") != event["finished_at"]
             or not ((manifest.get("active_universe") or {}).get("coverage") or {}).get("complete")
-            or not str(manifest.get("label", "")).startswith("local-scheduler-")):
+            or not _local_market_producer(manifest)):
         raise NotificationError("Canonical local analysis did not complete successfully.")
     # Verify the actual site again in the credential-owning workflow, not merely
     # the scheduler's earlier push/dispatch receipt.
