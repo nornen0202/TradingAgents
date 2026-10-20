@@ -427,3 +427,42 @@ def test_microstructure_report_shows_external_sources_and_limited_fields():
     assert "| Execution strength | 140 |" in report
     assert "- execution_strength: estimated_from_massive_trades_and_nbbo_quote" in report
     assert "massive.last_nbbo" in report
+
+
+def test_us_actual_response_parts_use_native_evidence_without_supplement(monkeypatch):
+    from datetime import datetime
+    from zoneinfo import ZoneInfo
+    from tradingagents.dataflows.intraday import microstructure as module
+    fixed = datetime(2026, 10, 20, 10, 30, 30, tzinfo=ZoneInfo('America/New_York'))
+    class Clock(datetime):
+        @classmethod
+        def now(cls, tz=None):
+            return fixed.astimezone(tz)
+    monkeypatch.setattr(module, 'datetime', Clock)
+    class Client(FakeKisClient):
+        def overseas_price(self, symbol, **kwargs):
+            return {'output': {'last': '200', 'high': '205', 'low': '195', 'tvol': '10000', 'tamt': '1990000'}}
+        def overseas_time_itemchartprice(self, symbol, **kwargs):
+            return {'output2': [{'xymd': '20261020', 'xhms': '103000', 'last': '200', 'evol': '5000'}]}, {}
+        def overseas_asking_price(self, symbol, **kwargs):
+            return {'output1': {'code': symbol, 'curr': 'USD', 'dymd': '20261020', 'dhms': '233025'},
+                    'output2': {'pbid1': '199', 'pask1': '201', 'vbid1': '700', 'vask1': '300'}}
+        def overseas_quot_inquire_ccnl(self, symbol, **kwargs):
+            return {'output1': {'nrec': '1'}, 'output2': [{'khms': '233023', 'vpow': '81.75', 'mtyp': '2'}]}, {}
+        def fetch_overseas_daily_price_history(self, **kwargs):
+            assert kwargs['end_date'] < fixed.date()
+            return [{'xymd': (fixed.date() - timedelta(days=i)).strftime('%Y%m%d'), 'tvol': '10000'} for i in range(1,21)]
+    class NoFallback:
+        def fetch(self, *args, **kwargs):
+            pytest.fail('Native evidence must not trigger delayed external fallbacks')
+    snapshot = KISMicrostructureProvider(client=Client(), us_daily_volume_fallback=lambda _: None,
+                                        us_supplement_provider=NoFallback()).fetch('AAPL', interval='1m')
+    assert snapshot.execution_strength == 81.75
+    assert snapshot.spread_bps == 100
+    assert snapshot.avg20_daily_volume == 10000
+    assert snapshot.asof == '2026-10-20T10:30:00-04:00'
+    assert snapshot.execution_data_quality == DELAYED_ANALYSIS_ONLY
+    assert snapshot.halt_status['is_clear'] is False
+    for field in ['luld_status', 'reg_sho_status', 'news_halt_status']:
+        assert getattr(snapshot, field)['status'] == 'not_available_by_provider'
+    assert snapshot.missing_reason == {'halt_status': 'halt_status_not_confirmed_by_snapshot'}
