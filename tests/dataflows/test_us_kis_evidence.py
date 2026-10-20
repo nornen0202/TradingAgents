@@ -72,3 +72,9 @@ def test_daily_denominator_locally_filters_dates_and_requires_twenty():
     assert prior_daily_volume(rows + bad, as_of=day) == 1000
     assert prior_daily_volume(rows[:-1] + bad, as_of=day) is None
     assert prior_daily_volume(rows + [{**rows[0], "tvol": "2000"}], as_of=day) is None
+
+
+def test_zero_strength_is_a_verified_value_not_missing_or_a_buy_side_guess():
+    strength, _, _ = dated_strength({"output2": [{"khms": "000520", "vpow": "0", "mtyp": "2"}]},
+                                    book_at=NOW - timedelta(seconds=10), observed_at=NOW)
+    assert strength == 0

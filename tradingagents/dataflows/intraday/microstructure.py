@@ -448,7 +448,7 @@ class KISMicrostructureProvider:
         if orderbook_metrics["spread_bps"] is None and orderbook_metrics["orderbook_imbalance"] is None:
             missing.setdefault("orderbook", "kis_orderbook_fields_unavailable")
 
-        execution_strength = native_strength or _find_float(combined_price, "strn", "STRN", "execution_strength")
+        execution_strength = native_strength if native_strength is not None else _find_float(combined_price, "strn", "STRN", "execution_strength")
         if execution_strength is None:
             execution_strength = _find_float(orderbook_row, "strn", "STRN", "execution_strength")
         if execution_strength is None and supplement is not None:
@@ -479,7 +479,8 @@ class KISMicrostructureProvider:
             halt_status=halt_status,
             source_limit_reasons=source_limit_reasons,
         )
-        asof = _bar_asof(bars, fallback=now_local, timezone_name=market_timezone)
+        bar_asof = _bar_asof(bars, fallback=now_local, timezone_name=market_timezone)
+        asof = bar_asof
         # All consumed original event clocks must survive the downstream TTL.
         # Never hide a future bar behind an older otherwise-valid book.
         if asof <= now_local:
@@ -508,7 +509,7 @@ class KISMicrostructureProvider:
             relative_volume=relative_volume,
             trading_value=trading_value,
             price_change_pct=price_change_pct,
-            bar_timestamp=asof.isoformat(),
+            bar_timestamp=bar_asof.isoformat(),
             provider_timestamp=now_local.isoformat(),
             quote_delay_seconds=max(0, int((now_local - asof).total_seconds())),
             provider_realtime_capable=self.realtime_capable,

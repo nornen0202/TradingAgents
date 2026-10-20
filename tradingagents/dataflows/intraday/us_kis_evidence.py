@@ -44,7 +44,7 @@ def dated_strength(payload, *, book_at, observed_at):
         try:
             at = _clock(book_at.astimezone(KOREA).strftime("%Y%m%d"), row.get("khms"))
             _fresh(at, observed_at)
-            strength = _positive(row.get("vpow"))
+            strength = _positive(row.get("vpow"), allow_zero=True)
         except ValueError:
             continue
         valid.append((at, strength, row))
@@ -80,12 +80,12 @@ def prior_daily_volume(rows, *, as_of):
     return sum(values[day] for day in latest) / 20 if len(latest) == 20 else None
 
 
-def _positive(value):
+def _positive(value, *, allow_zero=False):
     try:
         number = float(value)
     except (TypeError, ValueError):
         raise ValueError("INVALID_VALUE") from None
-    if isinstance(value, bool) or not math.isfinite(number) or number <= 0:
+    if isinstance(value, bool) or not math.isfinite(number) or number < 0 or (number == 0 and not allow_zero):
         raise ValueError("INVALID_VALUE")
     return number
 
