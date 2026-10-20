@@ -673,6 +673,24 @@ run while other Actions executed successfully. The confirmed repair is closing
 the local-backend watchdog coverage gap; the internal cause of GitHub not
 creating those native runs was not established.
 
+## Notification contention with native publication
+
+The native publisher holds `publish.lock` through building, pushing and live
+Pages propagation verification. Market and advisory notification consumers wait
+up to five minutes for that lane, within the notification job's ten-minute
+limit. Once acquired, they read the publication receipt and exact source/packet
+again and verify the actual live bytes while still locked. A pending receipt,
+superseded source, live mismatch or exhausted lock wait never permits a send.
+Advisory queue admission remains nonblocking; the owning publisher can admit it
+after verification. Dispatch acceptance remains distinct from `SENT`.
+
+On October 20, notification run `39355639293` exhausted its previous 30-second
+wait at 10:51:16 KST; the publisher verified delivery at 10:51:18 KST. The
+`PermissionError` nested inside that lock timeout described contention, not
+missing user permissions. Do not reset receipts or reanalyse successful
+research for this failure. Check active ownership, exact current source and
+the cumulative retry budget before a targeted notification retry.
+
 ## Durable receipts and reporting
 
 Store credential-free operations evidence in the canonical main checkout:

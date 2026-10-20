@@ -80,6 +80,50 @@ def test_completed_producer_published_exact_source_sends_once(tmp_path, monkeypa
     assert local.read(state / "notifications/results" / events[0].name)["message_ids"] == [42]
 
 
+@pytest.mark.parametrize("surface", ["youtube", "prism"])
+@pytest.mark.parametrize("published", ["current", "superseded", "pending", "live_mismatch"])
+def test_advisory_waits_for_publisher_then_revalidates(
+        tmp_path, monkeypatch, publication_contention, surface, published):
+    archive, state, _, _, packet, *_ = fixture(tmp_path, monkeypatch, surface)
+    advisory.queue_completed(archive, state, now=NOW)
+    path = next((state / "notifications/events").glob("*.json"))
+    write(state / "publication.json", {"status": "PAGES_PENDING"})
+
+    def finish_publication():
+        write(state / "publication.json", {"status": (
+            "PAGES_PENDING" if published == "pending" else "DELIVERY_VERIFIED")})
+        if published == "superseded":
+            packet["body"]["source"]["run_id"] = "another-run"
+            packet["source_sha256"] = sha256_json(packet["body"])
+            write(state / "site/work/v1" / surface / "latest.json", packet)
+
+    checks = []
+    monkeypatch.setattr(advisory, "verify_packet_live", lambda *_: checks.append(True) or published != "live_mismatch")
+    clock = publication_contention(on_release=finish_publication)
+    if published == "current":
+        assert local.notify(path.stem, archive, state, dry_run=True)["status"] == "DRY_RUN"
+        assert checks == [True]
+    else:
+        with pytest.raises(NotificationError, match="this source"):
+            local.notify(path.stem, archive, state, dry_run=True)
+    assert clock.released and 45 <= clock.elapsed < 46
+    assert not (state / "notifications/results" / path.name).exists()
+
+
+@pytest.mark.parametrize("surface", ["youtube", "prism"])
+def test_busy_advisory_publisher_never_sends_without_lock(
+        tmp_path, monkeypatch, publication_contention, surface):
+    archive, state, *_ = fixture(tmp_path, monkeypatch, surface)
+    advisory.queue_completed(archive, state, now=NOW)
+    path = next((state / "notifications/events").glob("*.json"))
+    monkeypatch.setattr(local, "TelegramBotClient", lambda **_: pytest.fail("must not send without publication lock"))
+    clock = publication_contention(release_after=1000)
+    with pytest.raises(TimeoutError):
+        local.notify(path.stem, archive, state)
+    assert not clock.released and 0 < clock.elapsed <= 300
+    assert not (state / "notifications/results" / path.name).exists()
+
+
 def test_no_signal_prism_completion_queues_once_and_describes_zero_signals(tmp_path, monkeypatch):
     archive, state, manifest, path, *_ = fixture(tmp_path, monkeypatch, "prism")
     manifest.update(summary={"messages": 5, "signals": 0, "warnings": 1},

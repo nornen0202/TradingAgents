@@ -188,7 +188,7 @@ def verify_packet_live(site, surface):
 
 
 def compose(event, archive, state, *, api=None):
-    from .local import REPOSITORY, read, timestamp
+    from .local import PUBLICATION_LOCK_TIMEOUT_SECONDS, REPOSITORY, read, timestamp
     from tradingagents.local_automation import verify_live, PUBLIC_BASE
     api = api or github
     surface = event.get("surface")
@@ -207,7 +207,7 @@ def compose(event, archive, state, *, api=None):
     if (run.get("run_attempt") != attempt or jobs.get("total_count", 0) >= 100
             or not admitted(run, jobs.get("jobs") or [], surface, manifest)):
         raise NotificationError("Advisory producer is not an admitted completed attempt.")
-    with interprocess_file_lock(state / "publish.lock", timeout=30):
+    with interprocess_file_lock(state / "publish.lock", timeout=PUBLICATION_LOCK_TIMEOUT_SECONDS):
         packet = read(state / "site" / "work" / "v1" / surface / "latest.json")
         if (read(state / "publication.json").get("status") != "DELIVERY_VERIFIED"
                 or not packet_covers(packet, surface, manifest) or not verify_live(state / "site")

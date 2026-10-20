@@ -121,6 +121,42 @@ def test_live_verification_holds_the_publication_lane(tmp_path, monkeypatch):
     assert local.notify(key, archive, state, dry_run=True)["status"] == "DRY_RUN"
 
 
+@pytest.mark.parametrize("published", ["current", "superseded", "pending", "live_mismatch"])
+def test_notification_waits_for_publisher_then_revalidates(
+        tmp_path, monkeypatch, publication_contention, published):
+    archive, state, manifest, key = prepared(tmp_path, monkeypatch)
+    write(state / "publication.json", {"status": "PAGES_PENDING"})
+
+    def finish_publication():
+        write(state / "publication.json", {"status": (
+            "PAGES_PENDING" if published == "pending" else "DELIVERY_VERIFIED")})
+        if published == "superseded":
+            published_strategy(state, {**manifest, "run_id": "another-run"})
+
+    checks = []
+    monkeypatch.setattr(automation, "verify_live", lambda _: checks.append(True) or published != "live_mismatch")
+    clock = publication_contention(on_release=finish_publication)
+    if published == "current":
+        assert local.notify(key, archive, state, dry_run=True)["status"] == "DRY_RUN"
+        assert checks == [True]
+    else:
+        with pytest.raises(NotificationError, match="this analysis run"):
+            local.notify(key, archive, state, dry_run=True)
+    assert clock.released and 45 <= clock.elapsed < 46
+    assert not (state / "notifications/results" / f"{key}.json").exists()
+
+
+def test_busy_publisher_times_out_without_telegram_or_receipt(
+        tmp_path, monkeypatch, publication_contention):
+    archive, state, _, key = prepared(tmp_path, monkeypatch)
+    monkeypatch.setattr(local, "TelegramBotClient", lambda **_: pytest.fail("must not send without publication lock"))
+    clock = publication_contention(release_after=1000)
+    with pytest.raises(TimeoutError):
+        local.notify(key, archive, state)
+    assert not clock.released and 0 < clock.elapsed <= 300
+    assert not (state / "notifications/results" / f"{key}.json").exists()
+
+
 @pytest.mark.parametrize("mode", ["full", "overlay_only"])
 def test_completion_message_distinguishes_research_from_quote_refresh(tmp_path, monkeypatch, mode):
     archive, state = tmp_path / "archive", tmp_path / "state"
