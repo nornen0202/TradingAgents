@@ -1,70 +1,15 @@
 # YouTube 검증 델타 · 2026-10-20
 
-기준 2026-10-20T08:29:37.264197+09:00
+신규·수정 0건 — NO_ACTIONABLE_DELTA. 소스 정상, 동일 이벤트 59건 중복 제외.
 
-- 신규 37건·수정 0건, 변경 없는 23건 제외. 소스 정상, 주문 실행 자격 없음.
-- HIGH 소수몽키 quJTDt4JGpU: CRWV·ORCL 신용·차환 검증을 최우선으로 상향. NVDA 노출과 중국 메모리 경쟁을 분리 점검.
-- 삼성전기 009150의 3,605억 원·2027년 연간 공급계약을 회사 원문으로 확인해 개별 수주 연구 우선순위를 상향.
-- 급락·기술적 반등·저평가 주장은 충돌 중. 수급·주가·금리·부도확률 확인 전 확신도나 비중의 수치 변경 보류.
+기준 시각 2026-10-20T09:32:21.637935+09:00. 최근 producer는 2026-10-20 08:12:19 KST 성공이며, 36시간 신선도 기준을 충족합니다. 전송 범위의 가장 오래된 자료부터 최신 자료까지 시각이 파싱 가능하고 순서·미래 시각·72시간 범위를 검증했습니다. 다음 신선도 경계는 2026-10-20T11:00:01+09:00입니다. 경계 이후에는 다시 준비·검증해야 합니다.
 
-수집 실행 youtube_20261020_071834는 08:12:19 KST 성공. producer 36시간, 범위 72시간 기준을 실제 시각에 검증했습니다. 60건 전송·생략 0건·truncation 없음. COMPLETE는 이 packet 전송 범위이며 전체 영상 또는 보유·관심종목 전수 분석을 뜻하지 않습니다. 가장 이른 범위 만료는 2026-10-20 08:30:56 KST이며 이후 재준비가 필요합니다.
+72시간 packet 범위 59건, 전송 59건, 생략 0건, 잘림 없음. 신규 0건·수정 0건·동일 59건입니다. COMPLETE는 packet 전송 범위만 뜻하며 전체 YouTube 또는 보유·관심종목의 완전한 분석을 뜻하지 않습니다.
 
-소수몽키 [quJTDt4JGpU](https://www.youtube.com/watch?v=quJTDt4JGpU)는 USER_PRIMARY/HIGH로 반영합니다. 사실검증 상태는 unverified 그대로입니다. 후속 종합에서 CRWV·ORCL의 차환·담보·만기 연구를 1순위로 올리고, 확인된 악화가 있으면 낙관 thesis의 순위·확신도를 낮추고 기존 위험 한도 안의 크기를 축소 검토합니다. 공포 지표만으로 매수 확신이나 비중을 올리지 않습니다. NVDA를 고객의 신용위험과 동일시하지 않으며 AAPL·TSLA의 중국 메모리 관련 연결은 원문 검증 과제로 둡니다.
+새 검증 대상이 없어 이전 영상·주장을 반복하지 않습니다. balanced_external에 따른 KR·US 순위, thesis 신뢰도, 기존 위험 한도 내 비중, 연구 우선순위의 추가 변경은 없습니다. 신규 근거 없이 과거 검증 결과나 ASR 숫자를 현재 근거로 승격하지 않습니다.
 
-[삼성전기 공식 발표](https://www.samsungsem.com/kr/newsroom/news/view.do?id=10601)는 10월 19일 계약금액 3,605억 원, 공급기간 2027년 1월 1일~12월 31일을 확인합니다. jydV15Xpy7c C6 및 5BK0zpU1Tjg C4의 금액·기간만 보강합니다. 009150의 수주 가시성 연구를 올리되 이익률·해지 조건·고객명과 주가 반등은 확인된 내용으로 확대하지 않습니다.
+허용 액션은 NO_ACTIONABLE_DELTA입니다. 이 packet은 execution_eligible=false이며 시장·계좌·리스크 실행 게이트를 통과시키지 않습니다. 다음 신규 또는 수정 이벤트에서 공식 원자료·증거 ID·발생 및 게시 시각을 확인합니다. 로컬 보고서 발행과 ACK는 외부 전달 영수증이 아니며 Telegram·Pages 전달은 미확인입니다.
 
-[CoreWeave 3월 31일 공식 조달 발표](https://investors.coreweave.com/news/news-details/2026/CoreWeave-Closes-Landmark-8-5-Billion-Financing-Facility-Achieving-First-Investment-Grade-Rated-GPU-backed-Financing/default.aspx)에는 85억 달러 한도, SOFR+2.25% 및 약 5.9% 고정금리 구간이 있습니다. 이는 과거 개별 담보대출 조건으로 현재 유동성의 증거에서 제외합니다. 전체 차입비용이 15%라는 일반화의 한계만 보여주며 10월 무담보채 수익률·부도확률 60%·NVIDIA 지분 12% 주장을 확인하지 않습니다.
+COVERAGE_RECEIPT {"event_id": "youtube:24303a76e4dd3705073924002f25a28e", "status": "COMPLETE", "window_events": 59, "transmitted_events": 59, "truncated": false, "new_events": 0, "revised_events": 0}
 
-packet 집계: supported 1, partially_supported 18, unverified 353, ASR uncertain 49. 집계와 아래 제공된 상세 주장은 범위가 다르므로 누락 상세를 복원하지 않습니다. 4CF8sBZmpvg C1의 10월 15일 하락률은 packet상 supported이나 원 evidence E9~E11이 전송 목록에 있는지·동일 주장인지 재검증 전 확정 수치로 승격하지 않습니다. jydV15Xpy7c C2·5XXojbhVu8A C1·PrLR0If0gVU C2/C3는 지수·유가 일부 지지와 인과·전망을 분리합니다. IX7YpYL2g5c C5의 산술 일치는 예상이익의 검증이 아닙니다. aVPBMeWKUJw의 중국 법인·티커 식별, WLDN의 가격·사업범위도 원문 확인 전 관찰에 한정합니다.
-
-반증과 제외: ywWt2SwvWDE의 CRWV 반등·증권사 상향 내러티브와 HIGH 신용위험 내러티브가 동시에 있어 방향을 확정하지 않습니다. 목표가 139/106 충돌을 수익률 계산에 쓰지 않습니다. 다른 기업 기사·누락 evidence ID·오래된 날짜는 해당 주장의 근거에서 제외합니다. ^KS11에 US가 붙은 시장 태그와 META, AMZN 결합 티커는 데이터 품질 문제로 표시하며 자동 종목 매핑을 하지 않습니다. ASR의 금액·인물·날짜·금리 수치는 실행 근거에서 제외합니다. fhtxYFRAnLM의 인물 인터뷰는 투자 영향에서 제외합니다.
-
-37건 처리 명세입니다. 최근 24시간은 변화, 그 이전 영상은 반복 내러티브 배경으로만 사용했습니다. 아래의 검증 대기는 현재 매매 지시가 아닙니다.
-
-| 이벤트 | 영상 | 판단 |
-|---|---|---|
-| quJTDt4JGpU | [AI인프라 약한 고리 결국 터진다? 극단적 공포 진입, 이번에도 기회일까](https://www.youtube.com/watch?v=quJTDt4JGpU) | HIGH · 신용 리스크 연구 상향 |
-| 5BK0zpU1Tjg | [10월 20일 투자자들이 꼭 알아야 하는 투자 포인트](https://www.youtube.com/watch?v=5BK0zpU1Tjg) | 계약 원문으로 제한 보강 |
-| ywWt2SwvWDE | [JP모건 제이미다이먼 CEO "미국 경기 좋다"…코어위브, 반등 출발 이후 변동성 확대 [월가 뉴스레터]](https://www.youtube.com/watch?v=ywWt2SwvWDE) | 검증 대기 · 실행 반영 보류 |
-| fuakdFOmECw | [2차전지 다음 역대급 상승장 올 수 있다는, '차세대 배터리' 정체](https://www.youtube.com/watch?v=fuakdFOmECw) | 검증 대기 · 실행 반영 보류 |
-| 5NAb0kmo98U | [10월 19일 미국장 열리기 전 꼭 알아야 하는 '미장 시황' 투자 포인트](https://www.youtube.com/watch?v=5NAb0kmo98U) | 검증 대기 · 실행 반영 보류 |
-| zlJjlbNZbpU | [코어위브·네비우스 25% 급락에도 빅테크는 버텼다…AI 클라우드 시장에 벌어진 일ㅣ명민준, 서수진, 송재경 [주린이 구조대]](https://www.youtube.com/watch?v=zlJjlbNZbpU) | 검증 대기 · 실행 반영 보류 |
-| -RE4CcDxPBg | [주식은 하락장에 구매해야 하는 이유](https://www.youtube.com/watch?v=-RE4CcDxPBg) | 검증 대기 · 실행 반영 보류 |
-| dc593erWm2k | [10월 19일 외국인이 한국인 몰래 매수한 종목 정체](https://www.youtube.com/watch?v=dc593erWm2k) | 검증 대기 · 실행 반영 보류 |
-| ze2AY2vMBVE | [[#찐시황]  “외국인 7,500억 매수에 코스피 반등!” 하지만 아직 안심할 때 아니다… 내일 꼭 확인해야 할 ‘이 신호’  ㅣ이권희 대표](https://www.youtube.com/watch?v=ze2AY2vMBVE) | 검증 대기 · 실행 반영 보류 |
-| jydV15Xpy7c | [코어위브에서 시작된 AI 금융위기 공포…2008년과는 다르다고 보는 이유ㅣ명민준, 서수진, 유창희 [주린이 구조대]](https://www.youtube.com/watch?v=jydV15Xpy7c) | 계약 원문으로 제한 보강 |
-| i5H-IjPquog | [[#긴급시황] 대형주 상승 추세가 깨졌다… 이제 하락장을 인정할 때? / 삼성전자·SK하이닉스 반등의 마지막 희망은 ‘이것’ ㅣ황유현 팀장](https://www.youtube.com/watch?v=i5H-IjPquog) | 검증 대기 · 실행 반영 보류 |
-| aVPBMeWKUJw | [삼전닉스 대항마?.. 정작 주가 -32% 폭락중인 창신메모리 근황](https://www.youtube.com/watch?v=aVPBMeWKUJw) | 검증 대기 · 실행 반영 보류 |
-| IX7YpYL2g5c | [하이닉스 100만 원도 깨질까?!](https://www.youtube.com/watch?v=IX7YpYL2g5c) | 검증 대기 · 실행 반영 보류 |
-| z7cEcb6h6QA | [[#긴급인터뷰]  SK하이닉스,삼성전자  이번 주 운명 갈린다… 반도체 대반격 시작할 ‘단 하나의 신호 ㅣ김장열 센터장](https://www.youtube.com/watch?v=z7cEcb6h6QA) | 검증 대기 · 실행 반영 보류 |
-| p02YQqFeBwk | [7월의 데자뷰, 무엇이 같고 다를까?…시장이 진짜 걱정하는 ‘약한 연결고리’ㅣ홍선애, 김병연 NH투자증권 이사 [여의도 인사이트]](https://www.youtube.com/watch?v=p02YQqFeBwk) | 검증 대기 · 실행 반영 보류 |
-| 5XXojbhVu8A | [[10월 19일 마감시황] 급락 뒤집고 상승 마감한 코스피…오늘의 반등이 추세 전환은 아닌 이유ㅣ홍선애, 이권희, 김장열 [클로징벨 라이브]](https://www.youtube.com/watch?v=5XXojbhVu8A) | 검증 대기 · 실행 반영 보류 |
-| NUiMyWpRYCA | [“삼성전자·SK하닉 지금 던지면 헤지펀드만 웃는다?” AI 반도체 숏 베팅 뒤집힐 결정적 신호… 반격 언제 시작되나? / 노근창 대표](https://www.youtube.com/watch?v=NUiMyWpRYCA) | 검증 대기 · 실행 반영 보류 |
-| -2KDihC4s9I | [SK하이닉스, 다시 오를 수 있을까? ‘월가 전설’ 테크 애널리스트가 말하는 전망](https://www.youtube.com/watch?v=-2KDihC4s9I) | 검증 대기 · 실행 반영 보류 |
-| 4CF8sBZmpvg | [지금 '하락장'에서 주식을 담아야 하는 진짜 이유](https://www.youtube.com/watch?v=4CF8sBZmpvg) | 검증 대기 · 실행 반영 보류 |
-| VZNOx1FMOfo | [[#긴급시황] “코스피 드디어 돌아섰다!”  폭락장 공포를 뒤집은 반등의 진짜 이유 / AI 반도체 공포 이제 끝났나? l  박근형 부장](https://www.youtube.com/watch?v=VZNOx1FMOfo) | 검증 대기 · 실행 반영 보류 |
-| bxWsXLL1E8c | [현대차 이틀 연속 양봉! 기술적 반등 어디까지 나올까?ㅣ권다영, 이주연 M인베스트먼트 대표 [2시 마켓워치]](https://www.youtube.com/watch?v=bxWsXLL1E8c) | 검증 대기 · 실행 반영 보류 |
-| mqzQAC_fcxQ | [신용잔고 32조 수급 비상! 지금 필요한 건 '매수'가 아닌 '리스크 관리'ㅣ권다영, 유영화 KB증권 PRIME CLUB 차장 [2시 마켓워치]](https://www.youtube.com/watch?v=mqzQAC_fcxQ) | 검증 대기 · 실행 반영 보류 |
-| vzoLkHo0xkw | [“7월 폭락장과 너무 닮았다!” 메타 실적 발표 전후 증시 대반전 올까? / 삼성전자·SK하이닉스 공포가 과도한 이유   / 이권희 대표](https://www.youtube.com/watch?v=vzoLkHo0xkw) | 검증 대기 · 실행 반영 보류 |
-| fhtxYFRAnLM | [삼백만 기념, 더 피플 "김프로를 털다" [2부] / 김동환 삼프로TV 의장 [더 피플]](https://www.youtube.com/watch?v=fhtxYFRAnLM) | 투자 영향 제외 |
-| 58hTLalw-RM | [10월 19일 우리가 꼭 알고 있어야 할, 저평가 'AI 전력' 소형주](https://www.youtube.com/watch?v=58hTLalw-RM) | 검증 대기 · 실행 반영 보류 |
-| 8kRZms73ieU | [캐시 우드가 주목하는 AI 혁명과 비트코인의 미래 / 김동환, 박지원, 캐시 우드(Cathie Wood) ARK Invest CEO [크립토 PLUS]](https://www.youtube.com/watch?v=8kRZms73ieU) | 검증 대기 · 실행 반영 보류 |
-| P3A3x_pUSEY | [AI 기술주 급락 속 돋보이는 비트코인 방어력 / 김동환, 박지원, 박상혁 디지털애셋 편집장 [크립토 PLUS]](https://www.youtube.com/watch?v=P3A3x_pUSEY) | 검증 대기 · 실행 반영 보류 |
-| PrLR0If0gVU | [협곡을 지나는 시장, 물줄기의 흐름은 '유가'가 만든다 / 이혁진 NH투자증권 주식팀장 [아침N투자]](https://www.youtube.com/watch?v=PrLR0If0gVU) | 검증 대기 · 실행 반영 보류 |
-| lfyyDcPCors | [코어위브 사건에 반도체 주가가 흔들리는 진짜 이유](https://www.youtube.com/watch?v=lfyyDcPCors) | 검증 대기 · 실행 반영 보류 |
-| NQCIVTppirQ | [오히려 지금 기회다? 반도체 눌릴 때 봐야 할 곳 / 권택중 하나증권 더센터필드W 부지점장 [더블 크루]](https://www.youtube.com/watch?v=NQCIVTppirQ) | 검증 대기 · 실행 반영 보류 |
-| RQ6jqlCJgIY | [AI 기둥 무너지면 벌어질 일 / 박준우 하나증권 리서치센터 연구위원 [더블 업]](https://www.youtube.com/watch?v=RQ6jqlCJgIY) | 검증 대기 · 실행 반영 보류 |
-| DzDHvvKcPH4 | [“지금 싸다고 덥석 사지 마세요!” 코스피 극단적 공포 구간… 진짜 바닥 확인할 결정적 신호  / 이주연 대표](https://www.youtube.com/watch?v=DzDHvvKcPH4) | 검증 대기 · 실행 반영 보류 |
-| aEy91Nm7YoY | ["닷컴버블과 똑같은 형태" 코스피 살아남을까? / 이주연 M인베스트먼트 대표 [더블 체크]](https://www.youtube.com/watch?v=aEy91Nm7YoY) | 검증 대기 · 실행 반영 보류 |
-| FPCy7xSHMJ0 | [이번 주 저점 형성 시도 가능? 반도체 급락 이후 주목할 변수 / 박병창 MP파트너스 대표 [마켓 인사이드]](https://www.youtube.com/watch?v=FPCy7xSHMJ0) | 검증 대기 · 실행 반영 보류 |
-| WCvvFRO3I9o | [10월 19일 코스피 오늘 얼마나 떨어질까?!](https://www.youtube.com/watch?v=WCvvFRO3I9o) | 검증 대기 · 실행 반영 보류 |
-| cbetF8o2aWc | [머스크 "중국이 D램 쏟아낼 것"…비싼 메모리에 투정 / "한은, 기준금리 10월 동결, 11월엔 인상 유력 / 권순우 삼프로TV 취재팀장 [뉴스3]](https://www.youtube.com/watch?v=cbetF8o2aWc) | 검증 대기 · 실행 반영 보류 |
-| QrctOAr3X6M | ["AI 끝나지 않았다…진짜 위기는 따로 있다" / 성상현 ABP자산운용 전무 [글로벌 인터뷰]](https://www.youtube.com/watch?v=QrctOAr3X6M) | 검증 대기 · 실행 반영 보류 |
-
-다음 공식 검증: CRWV·ORCL 최신 공시의 만기·현금흐름·담보와 동일 날짜 채권 수익률, NVIDIA 실제 지분·고객 노출, KRX 거래일·현선물 수급, 삼성전기 계약 해지조건·수익성, 중국 메모리 법인 식별·양산 일정입니다. LOW_LABELED 미검증 반복은 연구 우선순위에만 반영하고 독립된 다수 검증으로 세지 않습니다. supported는 MEDIUM, 부분 지지는 LOW_TO_MEDIUM이며 검증되지 않은 결론까지 가중치를 전파하지 않습니다.
-
-시장·계좌·위험 게이트를 유지합니다. 모든 종목은 RESEARCH_ONLY이며 현재 주문·목표가·손절가·비중을 생성하지 않았습니다. 모델 영수증은 CONFIGURED_NOT_RUNTIME_VERIFIED입니다. 로컬 발행·ACK는 Telegram·Pages 전달 영수증이 아닙니다.
-
-COVERAGE_RECEIPT {"event_id":"youtube:1477fedde6d6840f5f8495bb70fa28f2","status":"COMPLETE","window_events":60,"transmitted_events":60,"truncated":false,"new_events":37,"revised_events":0}
-
-MOBILE_HANDOFF {"owner":"external_github_notification_pipeline","status":"PENDING_EXTERNAL_VERIFICATION","work_sent_notification":false}
+MOBILE_HANDOFF {"owner": "external_github_notification_pipeline", "status": "PENDING_EXTERNAL_VERIFICATION", "work_sent_notification": false}
