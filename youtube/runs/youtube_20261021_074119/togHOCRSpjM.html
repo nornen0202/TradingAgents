@@ -1,0 +1,671 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YouTube 투자자용 검증 리포트 - 폭락장, 더 이상 살 돈 없다면.. 지금 뭘 해야 할까?!</title>
+  <style>
+:root {
+  color-scheme: light;
+  --bg: #f7f8fb;
+  --panel: #ffffff;
+  --text: #172033;
+  --muted: #667085;
+  --line: #d9dee8;
+  --accent: #0f766e;
+  --accent-2: #2563eb;
+  --warn: #b45309;
+  --bad: #b42318;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0 56px; }
+a { color: var(--accent-2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.hero { padding: 28px 0 22px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+.hero.compact { padding-top: 12px; }
+.hero h1 { margin: 0; font-size: clamp(28px, 4vw, 44px); line-height: 1.15; letter-spacing: 0; }
+.hero p { max-width: 760px; color: var(--muted); margin: 12px 0 0; }
+.eyebrow { color: var(--accent); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0; margin: 0 0 8px; }
+section { margin: 28px 0; }
+h2, h3, h4, h5 { letter-spacing: 0; line-height: 1.25; }
+.synthesis-callout { padding: clamp(20px, 4vw, 34px); border: 1px solid #6ee7d8; border-radius: 18px; background: linear-gradient(135deg, #ecfdf9 0%, #eff6ff 100%); box-shadow: 0 18px 44px rgba(15, 118, 110, .12); }
+.synthesis-callout.unavailable { border-color: var(--line); background: var(--panel); box-shadow: none; }
+.synthesis-callout h2 { margin: 0; font-size: clamp(24px, 3.2vw, 36px); }
+.synthesis-callout .lead { max-width: 900px; font-size: 17px; color: #334155; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.primary-link, .secondary-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border-radius: 999px; font-weight: 800; }
+.primary-link { color: white; background: var(--accent); }
+.secondary-link { color: var(--accent-2); border: 1px solid #93c5fd; background: white; }
+.primary-link:hover, .secondary-link:hover { text-decoration: none; filter: brightness(.97); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.card, .run { display: flex; flex-direction: column; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; color: var(--text); min-height: 128px; }
+.run { padding: 16px; }
+.card:hover, .run:hover { border-color: var(--accent-2); text-decoration: none; }
+.thumb { display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #e9edf5; border-radius: 8px 8px 0 0; color: var(--muted); font-size: 13px; font-weight: 700; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb-empty span { padding: 0 14px; text-align: center; }
+.card-body { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 16px; }
+.card strong { line-height: 1.35; }
+.source-line { color: #3f4a5f; font-weight: 600; }
+.runs { display: grid; gap: 10px; }
+.badge { display: inline-flex; width: fit-content; border-radius: 999px; padding: 2px 9px; background: #e6f4f1; color: var(--accent); font-size: 12px; font-weight: 700; }
+.status-contradicted, .status-llm_failed { background: #fee4e2; color: var(--bad); }
+.status-unverified, .status-stale { background: #fff4d6; color: var(--warn); }
+small, .muted { color: var(--muted); }
+.topnav { display: flex; gap: 14px; margin-bottom: 16px; font-size: 14px; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px; }
+.stats span { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
+.report { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: min(5vw, 36px); }
+.report-head { border-bottom: 1px solid var(--line); margin-bottom: 24px; padding-bottom: 20px; }
+.report-head h1 { margin: 0; font-size: clamp(24px, 3.5vw, 38px); line-height: 1.2; }
+.meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+.scope-note { padding: 12px 14px; border-left: 4px solid var(--warn); border-radius: 6px; background: #fff7ed; color: #7c2d12; }
+.synthesis-report h2 { margin-top: 34px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.synthesis-report h3 { margin: 24px 0 8px; color: #0f4c5c; }
+.synthesis-report p, .synthesis-report li { overflow-wrap: anywhere; }
+pre { overflow: auto; background: #111827; color: #f9fafb; border-radius: 8px; padding: 14px; }
+code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+details { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 18px; }
+@media (max-width: 640px) {
+  main { width: min(100% - 20px, 1120px); padding-top: 18px; }
+  .report { padding: 18px; }
+  .synthesis-callout { border-radius: 14px; padding: 18px; }
+  .cta-row a { width: 100%; }
+  .mobile-report { border-radius: 12px; }
+}
+</style>
+</head>
+<body>
+  <main>
+<nav class="topnav"><a href="index.html">실행 목록</a><a href="../../index.html">YouTube 홈</a></nav>
+<article class="report">
+  <header class="report-head">
+    <p class="eyebrow">youtube_20261021_074119</p>
+    <h1>폭락장, 더 이상 살 돈 없다면.. 지금 뭘 해야 할까?!</h1>
+    <div class="meta">
+      <span class="badge status-asr_uncertain">asr_uncertain</span>
+      <a href="https://www.youtube.com/watch?v=togHOCRSpjM">원본 영상</a>
+    </div>
+  </header>
+  <h2>폭락장 대응 전략 점검: 생존 논리와 저점 매수 주장을 구분해야</h2>
+<p><strong>분석 대상:</strong> 경제사냥꾼, <a href="https://www.youtube.com/watch?v=togHOCRSpjM">「폭락장, 더 이상 살 돈 없다면.. 지금 뭘 해야 할까?!」</a>, 2026년 10월 20일 게시, 2분 17초. 제공된 증거 묶음 기준 분석이다.</p>
+<h3>1. 핵심 판단</h3>
+<p>영상은 추가 투자금이 부족한 상황에서 <strong>차입 부담 축소, 보유 자산의 실질적 분산, 신규 유입 자금의 투자 시점 분산</strong>을 강조한다. 다만 이러한 관리 제안과 ‘반대매매 집중일에 투자하면 다음 반등을 잡는다’는 성과 주장은 별도로 평가해야 한다.</p>
+<p>전체 검증 결과는 <strong>부분 지지</strong>다. 가장 강한 외부 근거는 ‘7월 31일 반대매매 1,220억 원’이라는 보도상 수치다. 반면 코스피 18% 상승, 15개 투자처로 위험 80% 감소, 3~4회 분할 방식의 우월성은 제공 자료로 확인되지 않았다. 이 영상은 특정 종목의 실적·가치평가 분석보다 포트폴리오 관리 주장에 가깝다.</p>
+<h3>2. 영상 주장과 확인된 사실·근거</h3>
+<p>아래 주장에 붙은 <strong>00:01은 모두 00:01~02:17 단일 자막 청크의 시작점</strong>이다. 개별 발화의 정확한 시각은 제공되지 않았다.</p>
+<p>| 항목 | 영상 주장 | 확인된 사실·근거 및 판정 |</p>
+<p>|---|---|---|</p>
+<p>| 반대매매 규모 | 7월 31일 강제 청산 1,220억 원 | 세 보도에서 같은 금액 확인. 다만 통계는 <strong>위탁매매 미수금 관련 실제 반대매매</strong>이며 모든 강제 청산의 합계는 아니다. 연도는 기사 문맥상 2026년으로 해석된다. <strong>범위를 한정해 지지</strong> |</p>
+<p>| 반도체 집중 | 삼성전자·SK하이닉스를 함께 보유해도 공통 위험이 남음 | 10월 21일 기사에 전날 두 종목의 동반 급락이 서술돼 있다. 장기 상관관계나 동일 하락 원인까지 입증하지는 못한다. <strong>부분 지지</strong> |</p>
+<p>| 담보·순자산 | 자기자금·차입금 각 1,000만 원 사례에서 140%와 순자산 100만 원 미만을 연결 | 두 수치는 같은 경계값이 아니다. 실제 발언의 연결 관계와 증권사 약관은 확인되지 않았다. <strong>자막 불확실</strong> |</p>
+<p>| 시장 상승률 | 코스피가 거의 18% 상승 | 시작일·종료일·기준 지수가 없어 계산 불가. <strong>미검증</strong> |</p>
+<p>| 분산 효과 | 약 15개 독립 투자처로 기대수익률을 유지하며 위험 80% 이상 감소 | 달리오 원문, 위험 정의, 비중·상관관계 가정이 없다. <strong>미검증·수동 확인 필요</strong> |</p>
+<p>| 투자 시점 | 신규 자금을 3~4회로 나눠 반대매매 집중일에 투자 | 횟수의 우월성, 저점 식별 능력, 비용 차감 후 성과 자료가 없다. <strong>효과 미검증</strong> |</p>
+<h4>가장 강한 외부 근거: 반대매매 보도</h4>
+<p><a href="https://news.bizwatch.co.kr/article/market/2026/10/20/0021">비즈워치 10월 20일 기사</a>는 7월 31일 반대매매를 1,220억 원으로 제시하며, 10월 14일과 15일에는 각각 893억 원, 805억 원이었다고 보도했다. <a href="https://www.raonnews.com/news/article.html?no=62048">라온신문</a>과 <a href="https://biz.heraldcorp.com/article/10907480?ref=naver">헤럴드경제</a> 발췌도 7월 31일 수치와 일치한다.</p>
+<p>이는 <strong>미수금 반대매매 급증 사례</strong>를 뒷받침한다. 그러나 세 기사가 같은 금융투자협회 통계를 인용하므로 독립적인 세 번의 측정은 아니다. 협회 원표와 시장별 집계 범위도 미제공이다. 또한 주간 합계는 기사별로 3,134억 원과 3,135억 원으로 달라 원자료 대조가 필요하다. 이러한 차이는 7월 31일 수치의 일치와 구분해야 한다.</p>
+<h4>반도체 동반 하락: 사례는 있으나 정량 검증은 부족</h4>
+<p><a href="https://it.chosun.com/news/articleView.html?idxno=2023092172435">IT조선 10월 21일 기사</a>는 삼성전자와 SK하이닉스의 전날 동반 급락을 언급한다. 이는 영상 게시 다음 날 나온 <strong>사후 확인 자료</strong>다. 두 회사의 가격 조회는 모두 실패했고, 1년·3년 수익률 상관계수와 동반 하락 빈도는 확보되지 않았다.</p>
+<p>제공된 삼성전자 지분 공시와 SK하이닉스 IR 개최 안내는 공통 사업 위험이나 저평가를 직접 입증하지 않는다. 종목 수가 둘이라는 사실과 위험이 충분히 분산됐다는 판단은 구분할 필요가 있다.</p>
+<h3>3. 담보 설명에서 반드시 구분할 숫자</h3>
+<p>부채 1,000만 원이 고정되고 이자·비용을 제외한다는 조건으로 검산하면 다음과 같다.</p>
+<p>| 담보자산 가치 | 부채 | 순자산 | 자산/부채 비율 |</p>
+<p>|---|---:|---:|---:|</p>
+<p>| 2,000만 원 | 1,000만 원 | 1,000만 원 | 200% |</p>
+<p>| 1,400만 원 | 1,000만 원 | 400만 원 | 140% |</p>
+<p>| 1,100만 원 미만 | 1,000만 원 | 100만 원 미만 | 110% 미만 |</p>
+<p>따라서 <strong>140%와 순자산 100만 원 미만은 동일한 기준이 아니다.</strong> 영상이 담보부족 이후 추가 하락을 설명한 것인지, 자동자막이 잘못 연결한 것인지는 원음 확인이 필요하다. 위 표는 조건부 산술이며, 140%가 모든 증권사·상품에 적용된다는 뜻은 아니다. ‘수수료’와 ‘추가담보’ 역시 같은 의미로 처리할 수 없다.</p>
+<h3>4. 긍정적 투자 논리와 반론</h3>
+<h4>긍정적 시나리오 — 검증된 성과가 아닌 조건부 해석</h4>
+<ul>
+<li>차입 부담이 낮아지면 추가 담보와 강제 처분 압력에 대한 노출이 줄어들 수 있다.</li>
+<li>종목 개수보다 실제 위험 요인과 동반 하락 여부를 점검하면 숨은 업종 집중을 파악하는 데 도움이 될 수 있다.</li>
+<li>투자 시점을 나누면 한 시점에 자금이 모두 투입되는 상황을 줄일 수 있다.</li>
+<li>반대매매가 일시적인 수급 충격이고 기업가치 훼손이 제한적이라면, 매도 압력 완화 이후 회복 가능성을 검토할 여지는 있다.</li>
+</ul>
+<p>그러나 제공 자료에는 해당 조건이 현재 충족됐다는 기업 실적·가치평가·전략 성과 증거가 없다.</p>
+<h4>주요 반론</h4>
+<ul>
+<li><strong>반대매매 급증은 저점 확인 신호가 아니다.</strong> 실적 전망 악화나 추가 유동성 압박이 이어지면 가격 하락도 지속될 수 있다.</li>
+<li>업종명이 달라도 스트레스 국면에서 함께 하락하면 기대했던 분산 효과가 나타나지 않을 수 있다.</li>
+<li>분할 방식은 이후 상승이 빠를 경우 현금 보유의 기회비용이 발생한다. 3~4회라는 횟수의 특별한 우월성은 확인되지 않았다.</li>
+<li>무차입이거나 과거 계좌 성과가 좋다는 사실만으로 현재 보유 구성의 적정성이 입증되지는 않는다.</li>
+<li>당일 반대매매 통계가 주문 이후 공개됐다면, 이를 당일 투자 신호로 쓰는 검증에는 미래정보 편향이 생길 수 있다.</li>
+</ul>
+<h3>5. 불확실성과 자료 품질</h3>
+<p>한국어 자동자막의 <code>transcript_quality</code>는 <strong>good, 점수 1.0</strong>이지만, 이는 원음 대조를 거친 의미·숫자 정확도 보증이 아니다. 원음 기반 정확도 측정값도 제공되지 않았다.</p>
+<p>주장 추출 단계의 <code>source_confidence</code>는 0.87~0.96으로 높지만, 이는 외부 사실 검증과 구분해야 한다. 검증 단계에서는 반대매매 수치의 <code>source_confidence</code>가 <strong>0.85</strong>, 반도체 동반 하락은 <strong>0.60</strong>, 달리오 분산 수치와 전략 효과는 <strong>0.00</strong>이다. 0.00은 거짓이라는 뜻이 아니라 직접 관련 근거가 확보되지 않았다는 의미다.</p>
+<p><code>asr_confidence</code>는 담보 설명 <strong>0.35</strong>, 분산 수치·전략 권고 <strong>0.65</strong>, 반대매매 수치 <strong>0.75</strong>다. 모두 정성적 추정치다. 검증 결과의 <code>confidence</code> 역시 <strong>판정 상태에 대한 신뢰도</strong>이지 주장이 사실일 확률은 아니다.</p>
+<p>추가 자료 한계는 다음과 같다.</p>
+<ul>
+<li>코스피 조회값 5,552.74는 단일 스냅샷이며 비교 시작값이 없다. 52주 최저값 0.0은 품질 이상 가능성이 있어 상승률 계산에 사용할 수 없다.</li>
+<li>삼성전자·SK하이닉스 가격, 가치평가 지표와 정렬된 수익률 자료가 없다.</li>
+<li>E4 마이크론 기사는 발췌문이 비어 있고 전략과 직접 관련성이 확인되지 않아 근거에서 제외한다.</li>
+<li>연구계획에 적힌 검색어와 확보 예정 자료는 실제 증거가 아니다.</li>
+</ul>
+<p><strong>별도 미검증 항목:</strong> 달리오의 1982년 실패·전 직원 해고·부친 차입 일화와 현재가치 1,800만 원, 브리지워터 세계 최대 순위, 수정구슬 경구 귀속, 월스트리트 독점 전략이라는 표현은 원문·비교 자료가 없어 수동 확인이 필요하다. Bloomberg·Morningstar 원문은 제공되지 않았으며 해당 폐쇄형 자료를 통한 확인은 불가하다. 회원 전용 추가 설명도 <strong>미검증·수동 확인 필요</strong>이며 내용이나 성과를 추정하지 않는다.</p>
+<h3>6. 단기 체크포인트와 논리 무효화 조건</h3>
+<p>| 관찰 항목 | 구체적으로 확인할 내용 | 영상 논리가 약해지는 조건 |</p>
+<p>|---|---|---|</p>
+<p>| 계좌 담보 여력 | 실제 차입잔액, 담보평가액, 적용 유지비율, 추가담보 납부기한, 반대매매 절차 | 영상의 가정과 실제 계약 조건이 다르거나 추가 하락으로 담보 여력이 소진됨 |</p>
+<p>| 반대매매 추이 | 금융투자협회 원표의 항목·단위·시장 범위·공개 시각, 일별 금액과 미수금 대비 비율 | 반대매매가 줄어도 가격 약세가 지속되거나 큰 청산이 반복됨 |</p>
+<p>| 실질적 분산 | 전체 반도체 비중, 정렬된 1년·3년 일간 수익률 상관계수, 동반 하락 빈도, 최근 급락 구간의 변화 | 재배분 대상도 같은 충격에 동반 하락함 |</p>
+<p>| 코스피 18% 주장 | 시작일·종료일, 가격지수인지 총수익지수인지 확인 후 재계산 | 기간을 특정하지 못하거나 동일 기준 계산이 주장과 불일치함 |</p>
+<p>| 3~4회 분할 효과 | 사전 정의한 규칙을 일시투입·정기 분할 방식과 비교하고 비용·세금·최대낙폭 반영 | 공개 전 통계 사용, 비용 누락, 특정 저점 사후 선택 없이는 우월성이 재현되지 않음 |</p>
+<p>| 보유 근거 | 최신 실적·전망과 기존 보유 가정의 일치 여부 | 기업의 이익·현금흐름 전망이 훼손돼 단순 수급 충격이라는 설명이 성립하지 않음 |</p>
+<h3>결론</h3>
+<p>이 영상에서 활용할 수 있는 핵심은 <strong>자금 부족을 새로운 종목 탐색만의 문제로 보지 않고 담보·집중도·유동성 구조의 문제로 점검한다는 관점</strong>이다. 반면 반대매매 1,220억 원이라는 확인 가능한 보도 수치를 저점 신호나 반등 보장으로 확대해서는 안 된다. 투자자가 관찰할 대상은 유명 투자자의 일화나 분할 횟수보다 실제 계좌 조건, 통계의 정의와 공개 시각, 보유 자산의 동조성, 기업가치 가정의 유지 여부다.</p>
+  <details>
+    <summary>공개 요약 JSON</summary>
+    <pre>{
+  &quot;version&quot;: 4,
+  &quot;video_id&quot;: &quot;togHOCRSpjM&quot;,
+  &quot;title&quot;: &quot;폭락장, 더 이상 살 돈 없다면.. 지금 뭘 해야 할까?!&quot;,
+  &quot;url&quot;: &quot;https://www.youtube.com/watch?v=togHOCRSpjM&quot;,
+  &quot;channel&quot;: &quot;경제사냥꾼&quot;,
+  &quot;channel_id&quot;: &quot;UC7usMJDHmtbs_oegmzQKKMA&quot;,
+  &quot;source_url&quot;: &quot;https://www.youtube.com/@%EA%B2%BD%EC%A0%9C%EC%82%AC%EB%83%A5%EA%BE%BC/shorts&quot;,
+  &quot;thumbnail_url&quot;: &quot;https://i.ytimg.com/vi/togHOCRSpjM/maxresdefault.jpg&quot;,
+  &quot;published_at&quot;: &quot;2026-10-20T09:05:59+00:00&quot;,
+  &quot;status&quot;: &quot;asr_uncertain&quot;,
+  &quot;strategy_source_tier&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_evidence_weight&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_validation_policy&quot;: &quot;STANDARD_REVIEW&quot;,
+  &quot;transcript_status&quot;: &quot;available&quot;,
+  &quot;transcript_source&quot;: &quot;automatic&quot;,
+  &quot;transcript_chars&quot;: 2088,
+  &quot;transcript_quality&quot;: {
+    &quot;status&quot;: &quot;good&quot;,
+    &quot;score&quot;: 1.0,
+    &quot;warnings&quot;: [],
+    &quot;source&quot;: &quot;automatic&quot;,
+    &quot;language&quot;: &quot;Korean&quot;,
+    &quot;model_or_format&quot;: &quot;json3&quot;,
+    &quot;chars&quot;: 2088,
+    &quot;segments&quot;: 100,
+    &quot;duration_seconds&quot;: 137,
+    &quot;repeated_ngram_ratio&quot;: 0.0
+  },
+  &quot;generated_at&quot;: &quot;2026-10-21T07:41:19.962191+09:00&quot;,
+  &quot;llm_status&quot;: &quot;success&quot;,
+  &quot;research_status&quot;: &quot;success&quot;,
+  &quot;claim_verification_status&quot;: &quot;success&quot;,
+  &quot;research_pipeline_version&quot;: 4,
+  &quot;evidence_count&quot;: 4,
+  &quot;claim_status_summary&quot;: {
+    &quot;unverified&quot;: 7,
+    &quot;partially_supported&quot;: 1,
+    &quot;asr_uncertain&quot;: 2,
+    &quot;supported&quot;: 1
+  },
+  &quot;claims&quot;: [
+    {
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;claim_text&quot;: &quot;달리오는 1982년 하락에 베팅했다가 실패해 전 직원을 해고하고 부친에게 현재 가치 약 1,800만 원을 빌렸다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:01&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.75,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;1982년; 현재 가치 약 18,000,000원&quot;,
+        &quot;observed&quot;: &quot;역사적 원문과 현재가치 계산 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;이 일화와 환산액을 검증된 사실이나 투자전략의 효과를 입증하는 근거로 사용하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;claim_text&quot;: &quot;달리오에 따르면 약 15개의 독립적인 투자처로 분산하면 기대수익률을 유지하면서 위험을 80% 이상 줄일 수 있다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:01&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.65,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;약 15개 투자처; 위험 80% 이상 감소&quot;,
+        &quot;observed&quot;: &quot;해당 수치를 대조할 원문·가정 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;15개를 보유한다는 이유만으로 위험 80% 감소나 기대수익률 유지를 전제하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;claim_text&quot;: &quot;삼성전자와 SK하이닉스는 반도체 공통 요인에 노출되어 함께 하락할 수 있으므로 두 종목만으로 업종 위험을 충분히 분산하기 어렵다.&quot;,
+      &quot;status&quot;: &quot;partially_supported&quot;,
+      &quot;confidence&quot;: 0.87,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:01&quot;,
+      &quot;source_confidence&quot;: 0.6,
+      &quot;asr_confidence&quot;: 0.85,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;상관계수 등 정량 수치 없음&quot;,
+        &quot;observed&quot;: &quot;단일 동반 급락 보도; 정렬된 가격 시계열 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;두 종목 보유를 업종 분산으로 간주하지 말고 전체 반도체 비중과 실제 동조성을 확인할 필요가 있다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;claim_text&quot;: &quot;자기자금과 차입금 각 1,000만 원의 투자에서 자기자본 100만 원 미만, 부채 대비 1.4배, 추가 비용 및 개장 직후 강제매도를 연결한다.&quot;,
+      &quot;status&quot;: &quot;asr_uncertain&quot;,
+      &quot;confidence&quot;: 0.98,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:01&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.35,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;자기자금 10,000,000원 + 차입금 10,000,000원; 자기자본 1,000,000원 미만; 부채 대비 1.4배&quot;,
+        &quot;observed&quot;: &quot;조건부 산술: 자산/부채 140%이면 순자산 4,000,000원; 순자산 1,000,000원 미만이면 자산/부채 110% 미만&quot;
+      },
+      &quot;investor_implication&quot;: &quot;불명확한 수치 연결로 반대매매 시점을 계산하지 말고 본인 계좌의 담보 기준과 납부기한을 확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;claim_text&quot;: &quot;7월 31일 강제 청산 규모는 1,220억 원이었다.&quot;,
+      &quot;status&quot;: &quot;supported&quot;,
+      &quot;confidence&quot;: 0.93,
+      &quot;supporting_evidence_ids&quot;: [
+        &quot;E1&quot;,
+        &quot;E2&quot;,
+        &quot;E3&quot;
+      ],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:01&quot;,
+      &quot;source_confidence&quot;: 0.85,
+      &quot;asr_confidence&quot;: 0.75,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;연도 미상 7월 31일; 1,220억 원&quot;,
+        &quot;observed&quot;: &quot;보도상 7월 31일 1,220억 원 = 122,000,000,000원; 문맥상 2026년&quot;
+      },
+      &quot;investor_implication&quot;: &quot;미수금 반대매매 급증 사례로는 인용할 수 있지만 해당 날짜가 저점이었거나 이후 반등을 보장했다는 근거는 아니다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;claim_text&quot;: &quot;코스피가 거의 18% 상승했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:01&quot;,
+      &quot;source_confidence&quot;: 0.1,
+      &quot;asr_confidence&quot;: 0.75,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;거의 +18%; 기간 미상&quot;,
+        &quot;observed&quot;: &quot;단일 스냅샷 5,552.74; 비교 기준값 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;18%를 연초 대비나 특정 저점 대비 수익률로 임의 해석하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;claim_text&quot;: &quot;브리지워터는 세계 최대 헤지펀드다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:01&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.75,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;세계 1위; 지표·기준일 미상&quot;,
+        &quot;observed&quot;: &quot;비교 가능한 운용자산 및 순위 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;검증되지 않은 규모 순위를 전략의 신뢰성이나 성과 근거로 삼지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;claim_text&quot;: &quot;수정구슬에 의존하면 유리 조각을 먹게 된다는 경구는 달리오의 말이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:01&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.75,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;수치 주장 없음&quot;,
+        &quot;observed&quot;: &quot;인용 원문과 귀속 근거 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;예측 의존에 관한 비유와 발언자 귀속을 분리하고 달리오의 직접 인용으로 확정하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;claim_text&quot;: &quot;추가 자금이 없으면 부채를 줄이고 비동조 자산으로 재배분하며, 새 자금은 3~4회로 나눠 반대매매 집중일에 매수하고 무차입 우량 계좌는 유지하라는 권고다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.98,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:01&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.65,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;향후 자금을 3~4회 분할&quot;,
+        &quot;observed&quot;: &quot;해당 횟수의 우월성이나 전략 성과를 검증할 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;일반적 관리 제안과 검증된 초과수익 전략을 구분한다. 특히 3~4회 매수와 반대매매일 매수가 반등 포착을 보장한다고 해석하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C10&quot;,
+      &quot;claim_text&quot;: &quot;소개한 방법은 오직 월스트리트만 사용해 왔으며 일반 투자자는 몰랐다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:01&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.75,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;월스트리트만 사용했다는 절대적 표현&quot;,
+        &quot;observed&quot;: &quot;독점성 입증 자료 및 직접 반례 자료 모두 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;독점적 비법이라는 표현을 전략의 희소성이나 우월성의 근거로 사용하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C11&quot;,
+      &quot;claim_text&quot;: &quot;자동자막의 일부 호칭·담보 설명·입금 표현에 인식 오류 가능성이 있으며 회원 요청 기반 추가 설명의 내용은 제공되지 않았다.&quot;,
+      &quot;status&quot;: &quot;asr_uncertain&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:01&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.35,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;자동자막 품질점수 1.0; 담보 수치 등 의심 표현 존재&quot;,
+        &quot;observed&quot;: &quot;원음 대조 및 표현별 정확도 측정 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;담보 조건과 금액은 원음 확인 전 확정적으로 전달하지 않으며 미제공 회원 자료의 주장이나 성과를 추정하지 않는다.&quot;
+    }
+  ],
+  &quot;entities&quot;: [
+    {
+      &quot;ticker&quot;: &quot;^KS11&quot;,
+      &quot;name&quot;: &quot;주식 포트폴리오·코스피&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;추가 자금이 없을 때는 새로운 종목 매수보다 기존 자금의 재배분이 핵심이라고 주장한다.&quot;,
+        &quot;차입을 줄이고 반도체에 집중된 포트폴리오를 다른 방향으로 움직이는 분야로 분산하라고 권한다.&quot;,
+        &quot;새 월급을 한꺼번에 투자하지 말고 매수 시점을 분산해 강제 청산이 집중되는 날의 저가 매수에 대비하라고 권한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;자기자금 1,000만 원과 차입금 1,000만 원으로 투자한 사례에서 자기자본이 100만 원 미만으로 떨어질 수 있다고 발언한다.&quot;,
+        &quot;강제 청산 설명 중 부채 대비 1.4배라는 기준을 언급하지만 적용 대상과 계산 관계가 불명확하다.&quot;,
+        &quot;7월 31일 강제 청산 규모가 1,220억 원이었다고 주장한다. 연도는 제시하지 않는다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;^KS11&quot;,
+        &quot;as_of&quot;: &quot;2026-10-20T22:48:11.607585+00:00&quot;,
+        &quot;current_price&quot;: 5552.74,
+        &quot;market_cap&quot;: null,
+        &quot;forward_pe&quot;: null,
+        &quot;trailing_pe&quot;: null,
+        &quot;fifty_two_week_high&quot;: 9385.59,
+        &quot;fifty_two_week_low&quot;: 0.0,
+        &quot;average_target_price&quot;: null,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;005930&quot;,
+      &quot;name&quot;: &quot;삼성전자&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;SK하이닉스와 다른 회사이지만 같은 반도체 업종이므로 동일한 이유로 함께 하락할 수 있다는 분산투자 반례로 제시한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [],
+      &quot;verification_notes&quot;: [
+        &quot;시장 데이터 조회 실패: no_usable_market_fields&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;005930&quot;,
+        &quot;as_of&quot;: &quot;2026-10-20T22:48:12.671670+00:00&quot;,
+        &quot;current_price&quot;: null,
+        &quot;market_cap&quot;: null,
+        &quot;forward_pe&quot;: null,
+        &quot;trailing_pe&quot;: null,
+        &quot;fifty_two_week_high&quot;: null,
+        &quot;fifty_two_week_low&quot;: null,
+        &quot;average_target_price&quot;: null,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;unverified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;000660&quot;,
+      &quot;name&quot;: &quot;SK하이닉스&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;삼성전자와 함께 반도체 공통 요인에 노출된 종목의 예시로 언급한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [],
+      &quot;verification_notes&quot;: [
+        &quot;시장 데이터 조회 실패: no_usable_market_fields&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;000660&quot;,
+        &quot;as_of&quot;: &quot;2026-10-20T22:48:15.788696+00:00&quot;,
+        &quot;current_price&quot;: null,
+        &quot;market_cap&quot;: null,
+        &quot;forward_pe&quot;: null,
+        &quot;trailing_pe&quot;: null,
+        &quot;fifty_two_week_high&quot;: null,
+        &quot;fifty_two_week_low&quot;: null,
+        &quot;average_target_price&quot;: null,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;unverified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    }
+  ],
+  &quot;evidence&quot;: [
+    {
+      &quot;evidence_id&quot;: &quot;E1&quot;,
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;title&quot;: &quot;닷새간 3000억 강제청산...증시조정에 거세진 빚투 &#x27;후폭풍&#x27;&quot;,
+      &quot;source_url&quot;: &quot;https://news.bizwatch.co.kr/article/market/2026/10/20/0021&quot;,
+      &quot;publisher&quot;: &quot;Naver News&quot;,
+      &quot;published_at&quot;: &quot;2026-10-20T15:24:00+09:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;20일 금융투자협회에 따르면 지난주(12~16일) 닷새간 위탁매매 미수금 반대매매 금액은 3134억원에... 반대매매 금액은 14일 893억원, 15일 805억원으로 지난 7월31일(1220억원) 이후 가장 컸다. 반대매매가 급증하면서...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E2&quot;,
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;title&quot;: &quot;빚투 반대매매 올해 5조원 넘었다…코스피 급락에 지난주에만 3135억원&quot;,
+      &quot;source_url&quot;: &quot;https://www.raonnews.com/news/article.html?no=62048&quot;,
+      &quot;publisher&quot;: &quot;Naver News&quot;,
+      &quot;published_at&quot;: &quot;2026-10-20T15:18:00+09:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;20일 한국금융투자협회 증시자금추이에 따르면 1월 2일부터 10월 19일까지 위탁매매 미수금 대비 실제... 14일 청산액은 7월 31일(1220억원) 이후 가장 많았고 같은 날 미수금 대비 반대매매 비중도 7.2%로 7월 30일...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E4&quot;,
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;title&quot;: &quot;Micron Stock Rises to Defy 3 Warning Signals&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/m/c9d6ac79-78a8-3511-b9dc-1046e485c8f8/micron-stock-rises-to-defy-3.html&quot;,
+      &quot;publisher&quot;: &quot;Barrons.com&quot;,
+      &quot;published_at&quot;: &quot;2026-10-20T18:14:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    }
+  ],
+  &quot;source_policy&quot;: {
+    &quot;raw_transcript_published&quot;: false,
+    &quot;raw_transcript_in_evidence&quot;: false,
+    &quot;research_pipeline_version&quot;: 4,
+    &quot;closed_source_claims&quot;: &quot;unverified_external_source&quot;,
+    &quot;auto_caption_warning&quot;: true,
+    &quot;local_asr_warning&quot;: false
+  }
+}</pre>
+  </details>
+</article>
+</main>
+  <style>
+.reader-contents { margin: 16px 0; padding: 12px 16px; border: 1px solid var(--line, #64748b); border-radius: 12px; }
+.reader-contents > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-weight: 750; }
+.reader-contents nav { display: grid; gap: 4px; max-height: 45vh; overflow: auto; margin: 8px 0; }
+.reader-contents a { display: block; min-height: 44px; padding: 10px; border-radius: 6px; color: inherit; overflow-wrap: anywhere; }
+.reader-contents a:hover { background: #80808020; }
+.reader-contents .reader-subsection { padding-inline-start: 24px; font-size: .92em; }
+.reader-prose, .report { overflow-wrap: anywhere; line-height: 1.8; }
+.reader-prose p, .reader-prose li { max-width: 85ch; }
+.reader-prose h2, .reader-prose h3, .reader-prose h4, [data-reader-heading] { scroll-margin-top: 100px; line-height: 1.45; }
+.reader-prose h2 { margin-top: 1.8em; padding-bottom: 8px; border-bottom: 1px solid var(--line, #64748b); }
+.reader-prose h3 { margin-top: 1.5em; }
+.reader-prose li { margin: .5em 0; }
+.reader-prose pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.reader-prose blockquote { margin: 16px 0; padding: 4px 16px; border-left: 3px solid var(--accent, #64748b); }
+.reader-table { overflow: auto; max-width: 100%; margin: 16px 0; border: 1px solid var(--line, #64748b); border-radius: 10px; }
+.reader-table table { border-collapse: collapse; width: 100%; margin: 0; font-size: .92rem; }
+.reader-table th, .reader-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line, #64748b); min-width: 110px; max-width: 400px; overflow-wrap: anywhere; white-space: normal; }
+.reader-table th { background: #80808018; }
+.reader-table tr:nth-child(even) { background: #80808008; }
+.reader-search { display: grid; gap: 8px; margin: 16px 0; }
+.reader-search label { font-weight: 700; }
+.reader-search input { box-sizing: border-box; width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line, #64748b); border-radius: 10px; background: var(--panel, #fff); color: var(--text, #132238); font: inherit; }
+.reader-search p { margin: 0; font-size: .86rem; }
+.reader-back { position: fixed; bottom: max(14px, env(safe-area-inset-bottom)); right: 14px; z-index: 30; min-height: 44px; border: 1px solid #778899; border-radius: 99px; padding: 10px 16px; background: #18344a; color: #fff; font: 700 14px system-ui; cursor: pointer; box-shadow: 0 3px 12px #0003; }
+[data-reader-source] { margin-top: 20px; }
+[data-reader-source] > summary { min-height: 44px; cursor: pointer; }
+[data-reader-source] pre { font-size: .85rem; }
+[data-reader-source] pre, .reader-prose { min-width: 0; }
+.reader-contents :focus-visible, .reader-search :focus-visible, .reader-back:focus-visible, .reader-table:focus-visible { outline: 3px solid var(--accent, #008c95); outline-offset: 3px; }
+.reader-search + .grid > [hidden] { display: none !important; }
+@media (max-width: 600px) { .reader-prose { font-size: 1rem; } .reader-contents { padding: 8px 12px; } }
+@media print { .reader-back, .reader-search, .reader-contents, [data-reader-source] { display: none !important; } .reader-table { overflow: visible; } .reader-prose { color: #000; background: #fff; } }
+</style><script>
+(() => {
+  'use strict';
+  let serial = 0;
+  const rendered = new WeakMap();
+  const node = (tag, text) => { const el = document.createElement(tag); if (text != null) el.textContent = text; return el; };
+  function inline(parent, text) {
+    const pattern = /(`[^`]+`|\*\*[^*]+\*\*|\[[^\]]+\]\(https?:\/\/[^\s)]+\))/g;
+    let start = 0;
+    for (const match of String(text).matchAll(pattern)) {
+      parent.append(document.createTextNode(text.slice(start, match.index)));
+      const value = match[0];
+      if (value.startsWith('`')) parent.append(node('code', value.slice(1, -1)));
+      else if (value.startsWith('**')) parent.append(node('strong', value.slice(2, -2)));
+      else {
+        const link = value.match(/^\[([^\]]+)\]\((.+)\)$/);
+        const a = node('a', link[1]); a.href = link[2]; a.rel = 'noopener noreferrer'; parent.append(a);
+      }
+      start = match.index + value.length;
+    }
+    parent.append(document.createTextNode(text.slice(start)));
+  }
+  const cells = line => line.trim().replace(/^\|/, '').replace(/\|$/, '').split(/(?<!\\)\|/).map(v => v.trim().replace(/\\\|/g, '|'));
+  function markdown(source) {
+    const article = node('article'); article.className = 'reader-prose';
+    const lines = source.split(/\r?\n/); let list = null;
+    for (let i = 0; i < lines.length; i += 1) {
+      const line = lines[i], value = line.trim();
+      if (!value) { list = null; continue; }
+      if (/^```/.test(value)) {
+        const code = []; i += 1;
+        while (i < lines.length && !/^```/.test(lines[i].trim())) code.push(lines[i++]);
+        const pre = node('pre'); pre.append(node('code', code.join('\n'))); article.append(pre); list = null; continue;
+      }
+      if (i + 1 < lines.length && value.includes('|') && cells(lines[i + 1]).every(v => /^:?-{3,}:?$/.test(v))) {
+        const table = node('table'), head = node('thead'), body = node('tbody');
+        const row = (values, tag) => { const tr = node('tr'); values.forEach(v => { const cell = node(tag); if (tag === 'th') cell.scope = 'col'; inline(cell, v); tr.append(cell); }); return tr; };
+        head.append(row(cells(line), 'th')); i += 2;
+        while (i < lines.length && lines[i].trim() && lines[i].includes('|')) body.append(row(cells(lines[i++]), 'td'));
+        i -= 1; table.append(head, body); article.append(table); list = null; continue;
+      }
+      const heading = value.match(/^(#{1,6})\s+(.+)$/);
+      if (heading) { const h = node('h' + Math.min(4, heading[1].length + 1)); inline(h, heading[2]); article.append(h); list = null; continue; }
+      const bullet = value.match(/^(?:[-*+] |\d+\. )(.+)$/);
+      if (bullet) {
+        const tag = /^\d/.test(value) ? 'ol' : 'ul';
+        if (!list || list.tagName.toLowerCase() !== tag) { list = node(tag); if (tag === 'ol') list.start = parseInt(value, 10); article.append(list); }
+        const li = node('li'); inline(li, bullet[1]); list.append(li); continue;
+      }
+      list = null;
+      if (/^(---+|\*\*\*+)$/.test(value)) { article.append(node('hr')); continue; }
+      const p = node(value.startsWith('> ') ? 'blockquote' : 'p'); inline(p, value.startsWith('> ') ? value.slice(2) : line); article.append(p);
+    }
+    return article;
+  }
+  function contents(root) {
+    root.querySelectorAll(':scope > .reader-contents').forEach(el => el.remove());
+    const headings = [...root.querySelectorAll('h2,h3,h4')].filter(h => !h.closest('.card,.run-card,.reader-contents,[data-reader-source],[hidden]'));
+    if (headings.length < 2) return;
+    const details = node('details'); details.className = 'reader-contents';
+    details.append(node('summary', '이 리포트 목차 · ' + headings.length + '개 항목'));
+    const nav = node('nav'); nav.setAttribute('aria-label', '리포트 목차');
+    headings.forEach(h => {
+      if (!h.id) h.id = 'reader-section-' + (++serial);
+      h.dataset.readerHeading = ''; h.tabIndex = -1;
+      const a = node('a', h.textContent); a.href = '#' + h.id;
+      if (h.tagName !== 'H2') a.className = 'reader-subsection';
+      a.addEventListener('click', event => {
+        event.preventDefault();
+        for (let ancestor = h.parentElement; ancestor; ancestor = ancestor.parentElement) if (ancestor.tagName === 'DETAILS') ancestor.open = true;
+        h.scrollIntoView({block: 'start'}); h.focus({preventScroll: true});
+      }); nav.append(a);
+    });
+    details.append(nav); root.prepend(details);
+  }
+  function enhance(root) {
+    if (!root) return;
+    root.querySelectorAll('pre[data-report-markdown]').forEach(pre => {
+      const previous = rendered.get(pre);
+      if (previous && previous.source === pre.textContent) return;
+      const article = markdown(pre.textContent);
+      if (previous) previous.article.replaceWith(article);
+      else {
+        const details = node('details'); details.dataset.readerSource = '';
+        details.append(node('summary', 'Markdown 원문 보기'));
+        pre.before(article, details); details.append(pre);
+      }
+      rendered.set(pre, {source: pre.textContent, article});
+    });
+    root.querySelectorAll('table').forEach(table => {
+      if (table.closest('.reader-table,.account-table-wrap,.summary-scroll')) return;
+      const wrap = node('div'); wrap.className = 'reader-table'; wrap.tabIndex = 0;
+      wrap.setAttribute('role', 'region'); wrap.setAttribute('aria-label', '리포트 표 · 가로로 스크롤하여 전체 보기');
+      table.before(wrap); wrap.append(table);
+    });
+    root.querySelectorAll('.grid').forEach(grid => {
+      const cards = [...grid.querySelectorAll(':scope > a.card')];
+      if (cards.length < 2 || grid.dataset.readerSearch) return;
+      grid.dataset.readerSearch = 'true';
+      const box = node('div'); box.className = 'reader-search';
+      const input = node('input'); input.type = 'search'; input.placeholder = '제목 · 종목 · 채널 · 키워드'; input.id = 'report-search-' + (++serial);
+      const label = node('label', '리포트 찾기'); label.htmlFor = input.id;
+      const status = node('p'); status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
+      const update = () => {
+        const terms = input.value.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean); let count = 0;
+        cards.forEach(card => { card.hidden = !terms.every(t => card.textContent.toLocaleLowerCase().includes(t)); if (!card.hidden) count += 1; });
+        status.textContent = cards.length + '개 중 ' + count + '개 표시' + (count ? '' : ' · 검색어를 지우거나 다른 키워드를 입력하세요.');
+      };
+      input.addEventListener('input', update); box.append(label, input, status); grid.before(box); update();
+    });
+    contents(root);
+  }
+  window.TradingAgentsReader = {enhance};
+  const main = document.querySelector('main');
+  if (main && !main.hasAttribute('data-reader-dynamic')) enhance(main);
+  if (main) {
+    const top = node('button', '↑ 맨 위'); top.type = 'button'; top.className = 'reader-back'; top.setAttribute('aria-label', '리포트 맨 위로 이동');
+    top.addEventListener('click', () => { const target = document.querySelector('h1') || main; target.tabIndex = -1; target.scrollIntoView({block: 'start'}); target.focus({preventScroll: true}); });
+    document.body.append(top);
+  }
+})();
+</script>
+</body>
+</html>

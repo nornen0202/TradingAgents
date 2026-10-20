@@ -1,0 +1,350 @@
+{
+  "version": 4,
+  "video_id": "togHOCRSpjM",
+  "title": "폭락장, 더 이상 살 돈 없다면.. 지금 뭘 해야 할까?!",
+  "url": "https://www.youtube.com/watch?v=togHOCRSpjM",
+  "channel": "경제사냥꾼",
+  "channel_id": "UC7usMJDHmtbs_oegmzQKKMA",
+  "source_url": "https://www.youtube.com/@%EA%B2%BD%EC%A0%9C%EC%82%AC%EB%83%A5%EA%BE%BC/shorts",
+  "thumbnail_url": "https://i.ytimg.com/vi/togHOCRSpjM/maxresdefault.jpg",
+  "published_at": "2026-10-20T09:05:59+00:00",
+  "status": "asr_uncertain",
+  "strategy_source_tier": "STANDARD",
+  "strategy_evidence_weight": "STANDARD",
+  "strategy_validation_policy": "STANDARD_REVIEW",
+  "transcript_status": "available",
+  "transcript_source": "automatic",
+  "transcript_chars": 2088,
+  "transcript_quality": {
+    "status": "good",
+    "score": 1.0,
+    "warnings": [],
+    "source": "automatic",
+    "language": "Korean",
+    "model_or_format": "json3",
+    "chars": 2088,
+    "segments": 100,
+    "duration_seconds": 137,
+    "repeated_ngram_ratio": 0.0
+  },
+  "generated_at": "2026-10-21T07:41:19.962191+09:00",
+  "llm_status": "success",
+  "research_status": "success",
+  "claim_verification_status": "success",
+  "research_pipeline_version": 4,
+  "evidence_count": 4,
+  "claim_status_summary": {
+    "unverified": 7,
+    "partially_supported": 1,
+    "asr_uncertain": 2,
+    "supported": 1
+  },
+  "claims": [
+    {
+      "claim_id": "C1",
+      "claim_text": "달리오는 1982년 하락에 베팅했다가 실패해 전 직원을 해고하고 부친에게 현재 가치 약 1,800만 원을 빌렸다.",
+      "status": "unverified",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:01",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.75,
+      "numeric_parse": {
+        "claimed": "1982년; 현재 가치 약 18,000,000원",
+        "observed": "역사적 원문과 현재가치 계산 자료 없음"
+      },
+      "investor_implication": "이 일화와 환산액을 검증된 사실이나 투자전략의 효과를 입증하는 근거로 사용하지 않는다."
+    },
+    {
+      "claim_id": "C2",
+      "claim_text": "달리오에 따르면 약 15개의 독립적인 투자처로 분산하면 기대수익률을 유지하면서 위험을 80% 이상 줄일 수 있다.",
+      "status": "unverified",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:01",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.65,
+      "numeric_parse": {
+        "claimed": "약 15개 투자처; 위험 80% 이상 감소",
+        "observed": "해당 수치를 대조할 원문·가정 없음"
+      },
+      "investor_implication": "15개를 보유한다는 이유만으로 위험 80% 감소나 기대수익률 유지를 전제하지 않는다."
+    },
+    {
+      "claim_id": "C3",
+      "claim_text": "삼성전자와 SK하이닉스는 반도체 공통 요인에 노출되어 함께 하락할 수 있으므로 두 종목만으로 업종 위험을 충분히 분산하기 어렵다.",
+      "status": "partially_supported",
+      "confidence": 0.87,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:01",
+      "source_confidence": 0.6,
+      "asr_confidence": 0.85,
+      "numeric_parse": {
+        "claimed": "상관계수 등 정량 수치 없음",
+        "observed": "단일 동반 급락 보도; 정렬된 가격 시계열 없음"
+      },
+      "investor_implication": "두 종목 보유를 업종 분산으로 간주하지 말고 전체 반도체 비중과 실제 동조성을 확인할 필요가 있다."
+    },
+    {
+      "claim_id": "C4",
+      "claim_text": "자기자금과 차입금 각 1,000만 원의 투자에서 자기자본 100만 원 미만, 부채 대비 1.4배, 추가 비용 및 개장 직후 강제매도를 연결한다.",
+      "status": "asr_uncertain",
+      "confidence": 0.98,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:01",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.35,
+      "numeric_parse": {
+        "claimed": "자기자금 10,000,000원 + 차입금 10,000,000원; 자기자본 1,000,000원 미만; 부채 대비 1.4배",
+        "observed": "조건부 산술: 자산/부채 140%이면 순자산 4,000,000원; 순자산 1,000,000원 미만이면 자산/부채 110% 미만"
+      },
+      "investor_implication": "불명확한 수치 연결로 반대매매 시점을 계산하지 말고 본인 계좌의 담보 기준과 납부기한을 확인해야 한다."
+    },
+    {
+      "claim_id": "C5",
+      "claim_text": "7월 31일 강제 청산 규모는 1,220억 원이었다.",
+      "status": "supported",
+      "confidence": 0.93,
+      "supporting_evidence_ids": [
+        "E1",
+        "E2",
+        "E3"
+      ],
+      "manual_check_required": true,
+      "timestamp": "00:00:01",
+      "source_confidence": 0.85,
+      "asr_confidence": 0.75,
+      "numeric_parse": {
+        "claimed": "연도 미상 7월 31일; 1,220억 원",
+        "observed": "보도상 7월 31일 1,220억 원 = 122,000,000,000원; 문맥상 2026년"
+      },
+      "investor_implication": "미수금 반대매매 급증 사례로는 인용할 수 있지만 해당 날짜가 저점이었거나 이후 반등을 보장했다는 근거는 아니다."
+    },
+    {
+      "claim_id": "C6",
+      "claim_text": "코스피가 거의 18% 상승했다.",
+      "status": "unverified",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:01",
+      "source_confidence": 0.1,
+      "asr_confidence": 0.75,
+      "numeric_parse": {
+        "claimed": "거의 +18%; 기간 미상",
+        "observed": "단일 스냅샷 5,552.74; 비교 기준값 없음"
+      },
+      "investor_implication": "18%를 연초 대비나 특정 저점 대비 수익률로 임의 해석하지 않는다."
+    },
+    {
+      "claim_id": "C7",
+      "claim_text": "브리지워터는 세계 최대 헤지펀드다.",
+      "status": "unverified",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:01",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.75,
+      "numeric_parse": {
+        "claimed": "세계 1위; 지표·기준일 미상",
+        "observed": "비교 가능한 운용자산 및 순위 자료 없음"
+      },
+      "investor_implication": "검증되지 않은 규모 순위를 전략의 신뢰성이나 성과 근거로 삼지 않는다."
+    },
+    {
+      "claim_id": "C8",
+      "claim_text": "수정구슬에 의존하면 유리 조각을 먹게 된다는 경구는 달리오의 말이다.",
+      "status": "unverified",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:01",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.75,
+      "numeric_parse": {
+        "claimed": "수치 주장 없음",
+        "observed": "인용 원문과 귀속 근거 없음"
+      },
+      "investor_implication": "예측 의존에 관한 비유와 발언자 귀속을 분리하고 달리오의 직접 인용으로 확정하지 않는다."
+    },
+    {
+      "claim_id": "C9",
+      "claim_text": "추가 자금이 없으면 부채를 줄이고 비동조 자산으로 재배분하며, 새 자금은 3~4회로 나눠 반대매매 집중일에 매수하고 무차입 우량 계좌는 유지하라는 권고다.",
+      "status": "unverified",
+      "confidence": 0.98,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:01",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.65,
+      "numeric_parse": {
+        "claimed": "향후 자금을 3~4회 분할",
+        "observed": "해당 횟수의 우월성이나 전략 성과를 검증할 자료 없음"
+      },
+      "investor_implication": "일반적 관리 제안과 검증된 초과수익 전략을 구분한다. 특히 3~4회 매수와 반대매매일 매수가 반등 포착을 보장한다고 해석하지 않는다."
+    },
+    {
+      "claim_id": "C10",
+      "claim_text": "소개한 방법은 오직 월스트리트만 사용해 왔으며 일반 투자자는 몰랐다.",
+      "status": "unverified",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:01",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.75,
+      "numeric_parse": {
+        "claimed": "월스트리트만 사용했다는 절대적 표현",
+        "observed": "독점성 입증 자료 및 직접 반례 자료 모두 없음"
+      },
+      "investor_implication": "독점적 비법이라는 표현을 전략의 희소성이나 우월성의 근거로 사용하지 않는다."
+    },
+    {
+      "claim_id": "C11",
+      "claim_text": "자동자막의 일부 호칭·담보 설명·입금 표현에 인식 오류 가능성이 있으며 회원 요청 기반 추가 설명의 내용은 제공되지 않았다.",
+      "status": "asr_uncertain",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:01",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.35,
+      "numeric_parse": {
+        "claimed": "자동자막 품질점수 1.0; 담보 수치 등 의심 표현 존재",
+        "observed": "원음 대조 및 표현별 정확도 측정 없음"
+      },
+      "investor_implication": "담보 조건과 금액은 원음 확인 전 확정적으로 전달하지 않으며 미제공 회원 자료의 주장이나 성과를 추정하지 않는다."
+    }
+  ],
+  "entities": [
+    {
+      "ticker": "^KS11",
+      "name": "주식 포트폴리오·코스피",
+      "status": "unverified",
+      "claims": [
+        "추가 자금이 없을 때는 새로운 종목 매수보다 기존 자금의 재배분이 핵심이라고 주장한다.",
+        "차입을 줄이고 반도체에 집중된 포트폴리오를 다른 방향으로 움직이는 분야로 분산하라고 권한다.",
+        "새 월급을 한꺼번에 투자하지 말고 매수 시점을 분산해 강제 청산이 집중되는 날의 저가 매수에 대비하라고 권한다."
+      ],
+      "numeric_claims": [
+        "자기자금 1,000만 원과 차입금 1,000만 원으로 투자한 사례에서 자기자본이 100만 원 미만으로 떨어질 수 있다고 발언한다.",
+        "강제 청산 설명 중 부채 대비 1.4배라는 기준을 언급하지만 적용 대상과 계산 관계가 불명확하다.",
+        "7월 31일 강제 청산 규모가 1,220억 원이었다고 주장한다. 연도는 제시하지 않는다."
+      ],
+      "verification_notes": [
+        "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+      ],
+      "market_snapshot": {
+        "ticker": "^KS11",
+        "as_of": "2026-10-20T22:48:11.607585+00:00",
+        "current_price": 5552.74,
+        "market_cap": null,
+        "forward_pe": null,
+        "trailing_pe": null,
+        "fifty_two_week_high": 9385.59,
+        "fifty_two_week_low": 0.0,
+        "average_target_price": null,
+        "source": "yfinance",
+        "status": "verified"
+      },
+      "external_context_status": "verified"
+    },
+    {
+      "ticker": "005930",
+      "name": "삼성전자",
+      "status": "unverified",
+      "claims": [
+        "SK하이닉스와 다른 회사이지만 같은 반도체 업종이므로 동일한 이유로 함께 하락할 수 있다는 분산투자 반례로 제시한다."
+      ],
+      "numeric_claims": [],
+      "verification_notes": [
+        "시장 데이터 조회 실패: no_usable_market_fields"
+      ],
+      "market_snapshot": {
+        "ticker": "005930",
+        "as_of": "2026-10-20T22:48:12.671670+00:00",
+        "current_price": null,
+        "market_cap": null,
+        "forward_pe": null,
+        "trailing_pe": null,
+        "fifty_two_week_high": null,
+        "fifty_two_week_low": null,
+        "average_target_price": null,
+        "source": "yfinance",
+        "status": "unverified"
+      },
+      "external_context_status": "verified"
+    },
+    {
+      "ticker": "000660",
+      "name": "SK하이닉스",
+      "status": "unverified",
+      "claims": [
+        "삼성전자와 함께 반도체 공통 요인에 노출된 종목의 예시로 언급한다."
+      ],
+      "numeric_claims": [],
+      "verification_notes": [
+        "시장 데이터 조회 실패: no_usable_market_fields"
+      ],
+      "market_snapshot": {
+        "ticker": "000660",
+        "as_of": "2026-10-20T22:48:15.788696+00:00",
+        "current_price": null,
+        "market_cap": null,
+        "forward_pe": null,
+        "trailing_pe": null,
+        "fifty_two_week_high": null,
+        "fifty_two_week_low": null,
+        "average_target_price": null,
+        "source": "yfinance",
+        "status": "unverified"
+      },
+      "external_context_status": "verified"
+    }
+  ],
+  "evidence": [
+    {
+      "evidence_id": "E1",
+      "claim_id": "C5",
+      "title": "닷새간 3000억 강제청산...증시조정에 거세진 빚투 '후폭풍'",
+      "source_url": "https://news.bizwatch.co.kr/article/market/2026/10/20/0021",
+      "publisher": "Naver News",
+      "published_at": "2026-10-20T15:24:00+09:00",
+      "source_tier": "news",
+      "excerpt": "20일 금융투자협회에 따르면 지난주(12~16일) 닷새간 위탁매매 미수금 반대매매 금액은 3134억원에... 반대매매 금액은 14일 893억원, 15일 805억원으로 지난 7월31일(1220억원) 이후 가장 컸다. 반대매매가 급증하면서..."
+    },
+    {
+      "evidence_id": "E2",
+      "claim_id": "C5",
+      "title": "빚투 반대매매 올해 5조원 넘었다…코스피 급락에 지난주에만 3135억원",
+      "source_url": "https://www.raonnews.com/news/article.html?no=62048",
+      "publisher": "Naver News",
+      "published_at": "2026-10-20T15:18:00+09:00",
+      "source_tier": "news",
+      "excerpt": "20일 한국금융투자협회 증시자금추이에 따르면 1월 2일부터 10월 19일까지 위탁매매 미수금 대비 실제... 14일 청산액은 7월 31일(1220억원) 이후 가장 많았고 같은 날 미수금 대비 반대매매 비중도 7.2%로 7월 30일..."
+    },
+    {
+      "evidence_id": "E4",
+      "claim_id": "C9",
+      "title": "Micron Stock Rises to Defy 3 Warning Signals",
+      "source_url": "https://finance.yahoo.com/m/c9d6ac79-78a8-3511-b9dc-1046e485c8f8/micron-stock-rises-to-defy-3.html",
+      "publisher": "Barrons.com",
+      "published_at": "2026-10-20T18:14:00+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    }
+  ],
+  "source_policy": {
+    "raw_transcript_published": false,
+    "raw_transcript_in_evidence": false,
+    "research_pipeline_version": 4,
+    "closed_source_claims": "unverified_external_source",
+    "auto_caption_warning": true,
+    "local_asr_warning": false
+  }
+}
