@@ -106,3 +106,38 @@ def test_existing_producer_calls_refresh_before_advisory_recovery(tmp_path, monk
     monkeypatch.setattr(refresh, 'refresh_due', lambda *a, **k: [{'target': 'execution-freshness-kr', 'status': 'COMPLETED'}])
     monkeypatch.setattr(local_advisory_recovery, 'recover_due', lambda *a, **k: pytest.fail('freshness gets priority'))
     assert local.run_due(tmp_path, tmp_path, now=AT)[0]['status'] == 'COMPLETED'
+
+
+@pytest.mark.parametrize("status,seconds,expected", [
+    ("COMPLETED", 299.7, "DUE"),
+    ("COMPLETED", 240, "REFRESH_COOLDOWN"),
+    ("FAILED", 299.7, "REFRESH_COOLDOWN"),
+    ("STARTED", 299.7, "REFRESH_COOLDOWN"),
+    ("FAILED", 300, "DUE"),
+    ("COMPLETED", -1, "REFRESH_COOLDOWN"),
+])
+def test_scheduled_launch_jitter_does_not_skip_successful_next_slot(tmp_path, status, seconds, expected):
+    archive, state = tmp_path / "archive", tmp_path / "state"
+    enable(state)
+    started = AT + timedelta(minutes=5, seconds=4.858298)
+    source(archive, started + timedelta(seconds=103))
+    p = state / "execution-refresh/kr.json"
+    p.parent.mkdir()
+    p.write_text(json.dumps({"started_at": started.isoformat(), "session_date": started.date().isoformat(),
+                            "status": status, "consecutive_failures": 0 if status == "COMPLETED" else 1}))
+    result = refresh.refresh_due(archive, state, now=started + timedelta(seconds=seconds),
+                                 dry_run=True, session_resolver=open_kr)
+    assert result[0]["status"] == expected
+
+
+def test_next_slot_still_waits_for_actual_source_age(tmp_path):
+    archive, state = tmp_path / "archive", tmp_path / "state"
+    enable(state)
+    started = AT + timedelta(minutes=4, seconds=50)
+    source(archive, started + timedelta(seconds=30))
+    p = state / "execution-refresh/kr.json"
+    p.parent.mkdir()
+    p.write_text(json.dumps({"started_at": started.isoformat(), "session_date": started.date().isoformat(),
+                            "status": "COMPLETED", "consecutive_failures": 0}))
+    assert refresh.refresh_due(archive, state, now=started + timedelta(seconds=60),
+                               dry_run=True, session_resolver=open_kr) == []

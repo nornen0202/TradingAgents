@@ -49,7 +49,14 @@ def refresh_due(archive, state, *, now, dry_run=False, clock=None, executor=None
         day = now.astimezone(ZoneInfo(zone)).date().isoformat()
         failures = prior.get("consecutive_failures", 0) if prior.get("session_date") == day else 0
         target = f"execution-freshness-{market}"
-        if started and (now - started).total_seconds() < ATTEMPT_INTERVAL_SECONDS:
+        # Windows launches drift by fractions of a second. A successful 09:05:05
+        # must not suppress the next scheduled 09:10:04 tick. Allow one successful
+        # refresh per five-minute UTC slot; failed/in-flight attempts retain the
+        # full elapsed cooldown. The source-age gate above still applies.
+        next_success_slot = (started is not None and prior.get("status") == "COMPLETED"
+            and int(now.timestamp()) // ATTEMPT_INTERVAL_SECONDS
+            > int(started.timestamp()) // ATTEMPT_INTERVAL_SECONDS)
+        if started and (now - started).total_seconds() < ATTEMPT_INTERVAL_SECONDS and not next_success_slot:
             results.append({"target": target, "status": "REFRESH_COOLDOWN"})
             continue
         if not isinstance(failures, int) or isinstance(failures, bool) or failures < 0 or failures >= MAX_CONSECUTIVE_FAILURES:
