@@ -103,7 +103,17 @@ def published_strategy_covers(manifest, strategy):
             and completed.get("finished_at") == finished)
 
 
-def queue_completed(archive, state, *, now=None):
+def queue_completed(archive, state, *, now=None, publication_locked=False):
+    if publication_locked:
+        return _queue_completed_locked(archive, state, now=now)
+    try:
+        with interprocess_file_lock(state / "publish.lock", timeout=0):
+            return _queue_completed_locked(archive, state, now=now)
+    except TimeoutError:
+        return
+
+
+def _queue_completed_locked(archive, state, *, now=None):
     now = now or datetime.now(ZoneInfo("Asia/Seoul"))
     publication = read(state / "publication.json")
     if publication.get("status") != "DELIVERY_VERIFIED":
@@ -144,9 +154,15 @@ def reconcile(state, *, now=None, runner=subprocess.run):
             receipt_path = root / "dispatches" / f"{key}.json"
             receipt = read(receipt_path)
             if result.get("status") in {"SENT", "NOOP"} and result.get("local_event_id") == key:
-                status = "POLICY_SKIPPED" if result.get("reason") == "INCIDENT_COOLDOWN" else "DELIVERY_VERIFIED"
+                status = ("POLICY_SKIPPED" if result.get("reason") in {
+                    "INCIDENT_COOLDOWN", "SUPERSEDED_BY_VERIFIED_PUBLICATION"} else "DELIVERY_VERIFIED")
                 if receipt.get("status") != status:
                     atomic_write_json(receipt_path, {**receipt, "status": status, "result": result})
+                continue
+            if read(path).get("kind") in {"success", "advisory_success"} and read(
+                    state / "publication.json").get("status") != "DELIVERY_VERIFIED":
+                # Preserve attempts while the known prerequisite is pending.
+                # Failure notifications remain independent of Pages health.
                 continue
             if int(receipt.get("attempts", 0)) >= 3:
                 continue
@@ -181,10 +197,7 @@ def reconcile_safely(archive, state, *, publication_locked=False):
     # already queued market completions of their notification dispatch.
     for prepare in (queue_completed, queue_advisory_completed):
         try:
-            if prepare is queue_advisory_completed:
-                prepare(archive, state, publication_locked=publication_locked)
-            else:
-                prepare(archive, state)
+            prepare(archive, state, publication_locked=publication_locked)
         except Exception as exc:
             print(json.dumps({"notification_status": "PENDING", "error_type": type(exc).__name__}))
     try:
@@ -234,9 +247,13 @@ def compose(event, archive, state):
     with interprocess_file_lock(state / "publish.lock", timeout=PUBLICATION_LOCK_TIMEOUT_SECONDS):
         publication = read(state / "publication.json")
         strategy = read(state / "site" / "mobile" / "strategy.json")
-        if (publication.get("status") != "DELIVERY_VERIFIED"
-                or not published_strategy_covers(manifest, strategy)
-                or not verify_live(state / "site")):
+        if publication.get("status") != "DELIVERY_VERIFIED" or not verify_live(state / "site"):
+            raise NotificationError("Local Pages delivery is not verified for this analysis run.")
+        if not published_strategy_covers(manifest, strategy):
+            successor = verified_overlay_successor(manifest, strategy, archive, event["market"])
+            if successor:
+                return "", [], {"conclusion": "skipped", "reason": "SUPERSEDED_BY_VERIFIED_PUBLICATION",
+                                "superseded_by_run_id": successor}
             raise NotificationError("Local Pages delivery is not verified for this analysis run.")
     market = event["market"]
     overlay = settings.get("run_mode", "full") == "overlay_only"
@@ -253,6 +270,35 @@ def compose(event, archive, state):
     return text, buttons, {"conclusion": "success", "run_ids": [run_id], "surfaces": [market]}
 
 
+def verified_overlay_successor(manifest, strategy, archive, market):
+    """Never replay an obsolete refresh; full research notices remain required."""
+    if (manifest.get("settings") or {}).get("run_mode") != "overlay_only":
+        return None
+    current = (strategy.get("markets") or {}).get(market) or {}
+    run_id = current.get("run_id", "")
+    if not re.fullmatch(r"[A-Za-z0-9_-]+", run_id):
+        return None
+    paths = list((archive / "runs").glob(f"*/{run_id}/run.json"))
+    if len(paths) != 1:
+        return None
+    newer = read(paths[0])
+    summary, settings = newer.get("summary") or {}, newer.get("settings") or {}
+    if (newer.get("run_id") != run_id or newer.get("status") != "success"
+            or str(settings.get("market", "")).lower() != market
+            or settings.get("run_mode") != "overlay_only"
+            or summary.get("total_tickers", 0) <= 0
+            or summary.get("successful_tickers") != summary.get("total_tickers")
+            or summary.get("failed_tickers") != 0
+            or not ((newer.get("active_universe") or {}).get("coverage") or {}).get("complete")
+            or not published_strategy_covers(newer, strategy)):
+        return None
+    finished = timestamp(newer.get("finished_at"))
+    if not (timestamp(manifest["finished_at"]) < finished <= datetime.now(timezone.utc)
+            and timestamp(newer.get("started_at")) <= finished):
+        return None
+    return run_id
+
+
 def notify(key, archive, state, *, dry_run=False):
     if not re.fullmatch(r"[0-9a-f]{64}", key):
         raise NotificationError("Invalid local notification identity.")
@@ -264,6 +310,15 @@ def notify(key, archive, state, *, dry_run=False):
     text, buttons, metadata = compose(event, archive, state)
     if dry_run:
         return {"status": "DRY_RUN", "local_event_id": key, "characters": len(text), **metadata}
+    if metadata.get("reason") == "SUPERSEDED_BY_VERIFIED_PUBLICATION":
+        previous = read(state / "notifications" / "results" / f"{key}.json")
+        if previous.get("status") in {"SENT", "NOOP"} and previous.get("local_event_id") == key:
+            return previous
+        result = {"status": "NOOP", "local_event_id": key, "message_ids": [], **metadata,
+                  "workflow_run_id": os.getenv("GITHUB_RUN_ID"),
+                  "verified_at": datetime.now(timezone.utc).isoformat()}
+        atomic_write_json(state / "notifications" / "results" / f"{key}.json", result)
+        return result
     client = TelegramBotClient(bot_token=os.getenv("TELEGRAM_BOT_TOKEN", ""),
                                chat_id=os.getenv("TELEGRAM_NOTIFICATION_CHAT_ID", ""))
     client.ensure_private_chat()

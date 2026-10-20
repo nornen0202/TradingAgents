@@ -140,6 +140,20 @@ and account refresh. A verified strategy data publication does not establish a
 new Work briefing or a newly completed full analysis; overlay notices explicitly
 say that they reuse existing research.
 
+On October 20, a Pages build took 101 seconds, beyond the publisher's bounded
+90-second propagation wait. New completed overlays then replaced the pending
+generation before its delivery receipt was finalized. The publisher now resumes
+the exact committed snapshot and its report/strategy contents before rebuilding
+for newer inputs. A partial local build cannot qualify for that resume, and live
+byte verification remains mandatory. Market notification admission shares the
+publication lock, as advisory admission already does. Pending publication defers
+success dispatches without spending attempts; independent failures still dispatch.
+An already queued overlay superseded by a canonically completed, newer overlay
+in the verified live strategy returns `NOOP/SUPERSEDED_BY_VERIFIED_PUBLICATION`.
+This is a policy skip, never `SENT`. Missing, failed, incomplete, future or unbound
+successors cannot establish it; full research and existing delivery receipts are
+preserved. Resume only the existing bounded notification lane after deployment.
+
 The installed PowerShell launcher also records failures before Python is invoked,
 including a missing analysis runtime or failed source fetch/snapshot preparation.
 It writes the same credential-free, hash-bound outbox with stage `launcher`,

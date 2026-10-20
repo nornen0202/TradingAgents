@@ -368,6 +368,78 @@ def test_notification_transport_failure_does_not_terminate_production(tmp_path, 
     local.reconcile_safely(tmp_path, tmp_path)
 
 
+def test_market_admission_yields_to_publisher_without_blocking_failures(tmp_path, monkeypatch):
+    archive, state = tmp_path / "archive", tmp_path / "state"
+    manifest = completed(archive)
+    write(state / "publication.json", {"status": "DELIVERY_VERIFIED"})
+    published_strategy(state, manifest)
+    calls = []
+    monkeypatch.setattr(local, "reconcile", lambda _: calls.append("existing failures"))
+    with local.interprocess_file_lock(state / "publish.lock", timeout=0):
+        local.reconcile_safely(archive, state)
+        assert not list((state / "notifications/events").glob("*.json"))
+        local.queue_completed(archive, state, now=NOW, publication_locked=True)
+    assert calls == ["existing failures"]
+    assert len(list((state / "notifications/events").glob("*.json"))) == 1
+
+
+def test_pending_publication_preserves_success_retry_budget_but_reports_failure(tmp_path, monkeypatch):
+    _, state, _, success = prepared(tmp_path, monkeypatch)
+    write(state / "publication.json", {"status": "PAGES_PENDING"})
+    failure = local.queue_failure(state, stage="publish", source_key="today", error_type="ValueError",
+                                  finished_at=NOW.isoformat())
+    calls = []
+    local.reconcile(state, now=NOW, runner=lambda args, **kw: calls.append(args) or SimpleNamespace(
+        returncode=0, stdout="[]"))
+    assert not (state / "notifications/dispatches" / f"{success}.json").exists()
+    assert local.read(state / "notifications/dispatches" / f"{failure}.json")["attempts"] == 1
+    assert sum(c[1] == "workflow" for c in calls) == 1
+
+
+@pytest.mark.parametrize("invalid", [None, "full_original", "missing", "failed", "older", "future",
+                                     "wrong_market", "incomplete", "wrong_lineage", "not_live", "pending"])
+def test_only_verified_newer_overlay_can_retire_obsolete_notice(tmp_path, monkeypatch, invalid):
+    archive, state = tmp_path / "archive", tmp_path / "state"
+    old = completed(archive, mode="full" if invalid == "full_original" else "overlay_only")
+    key = local.queue(state, {"kind": "success", "run_id": old["run_id"], "market": "kr",
+                              "finished_at": old["finished_at"]})
+    newer = completed(archive, mode="overlay_only", run_id="20261012T073000_local-freshness-kr-overlay",
+                      started_at=(NOW - timedelta(minutes=45)).isoformat(),
+                      finished_at=(NOW - timedelta(minutes=30)).isoformat())
+    if invalid == "failed": newer["status"] = "failed"
+    if invalid == "older": newer["finished_at"] = (NOW - timedelta(hours=2)).isoformat()
+    if invalid == "future": newer["finished_at"] = (datetime.now(timezone.utc) + timedelta(hours=1)).isoformat()
+    if invalid == "wrong_market": newer["settings"]["market"] = "US"
+    if invalid == "incomplete": newer["active_universe"]["coverage"]["complete"] = False
+    path = archive / "runs/2026" / newer["run_id"] / "run.json"
+    write(path, newer)
+    if invalid == "missing": path.unlink()
+    write(state / "publication.json", {"status": "PAGES_PENDING" if invalid == "pending" else "DELIVERY_VERIFIED"})
+    published_strategy(state, newer)
+    if invalid == "wrong_lineage":
+        payload = local.read(state / "site/mobile/strategy.json")
+        payload["markets"]["kr"]["freshness_receipt"]["producer_run_id"] = "unbound"
+        write(state / "site/mobile/strategy.json", payload)
+    monkeypatch.setattr(automation, "verify_live", lambda _: invalid != "not_live")
+    monkeypatch.setattr(local, "TelegramBotClient", lambda **kw: pytest.fail("Obsolete notice sent"))
+    if invalid:
+        with pytest.raises(NotificationError): local.notify(key, archive, state)
+        assert not (state / "notifications/results" / f"{key}.json").exists()
+    else:
+        result = local.notify(key, archive, state)
+        assert result["status"] == "NOOP" and result["message_ids"] == []
+        assert result["reason"] == "SUPERSEDED_BY_VERIFIED_PUBLICATION"
+        assert result["superseded_by_run_id"] == newer["run_id"]
+        local.reconcile(state, now=NOW, runner=lambda *a, **kw: pytest.fail("Repeated skip dispatch"))
+        assert local.read(state / "notifications/dispatches" / f"{key}.json")["status"] == "POLICY_SKIPPED"
+        # A later policy check must never overwrite an existing SENT receipt.
+        path = state / "notifications/results" / f"{key}.json"
+        write(path, {"status": "SENT", "local_event_id": key, "message_ids": [42]})
+        before = path.read_bytes()
+        assert local.notify(key, archive, state)["status"] == "SENT"
+        assert path.read_bytes() == before
+
+
 def test_workflow_keeps_cloud_path_and_uses_bound_main_local_receipt():
     workflow = yaml.safe_load(Path('.github/workflows/tradingagents-mobile-notifications.yml').read_text(encoding='utf-8'))
     jobs = workflow['jobs']

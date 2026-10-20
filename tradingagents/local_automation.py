@@ -471,10 +471,21 @@ def publish(archive, state, runtime_dir, *, rebuild=False, publication_locked=Fa
     receipt_path = state / "publication.json"
     receipt = read_json(receipt_path, {})
     site = state / "site"
+    # Finish the exact pushed generation before replacing it with newer inputs.
+    # A slow Pages deployment can outlast the bounded propagation wait. The
+    # committed snapshot also guards against a partially overwritten local build.
+    resume_pending = False
+    if receipt.get("status") == "PAGES_PENDING" and receipt.get("commit") and not rebuild:
+        relatives = ("pages-snapshot.json", "mobile/strategy.json",
+                     "work/v1/kr/report/latest.json", "work/v1/us/report/latest.json")
+        if all((site / relative).is_file() for relative in relatives):
+            resume_pending = all(json.loads(git_run([
+                f"--git-dir={state / 'pages.git'}", "show", f"{receipt['commit']}:{relative}"]))
+                == read_json(site / relative) for relative in relatives)
     if receipt.get("fingerprint") == fingerprint and receipt.get("status") == "DELIVERY_VERIFIED" and not rebuild:
         complete_handoffs(site, runtime_dir, receipt)
         return receipt
-    if receipt.get("fingerprint") != fingerprint or not receipt.get("commit") or rebuild:
+    if not resume_pending and (receipt.get("fingerprint") != fingerprint or not receipt.get("commit") or rebuild):
         from tradingagents.scheduled.config import load_scheduled_config
         from tradingagents.scheduled.site import build_site
 
