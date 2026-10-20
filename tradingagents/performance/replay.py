@@ -35,7 +35,16 @@ def replay_action_history(
             conn.row_factory = sqlite3.Row
             if not conn.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='lifecycle_events'").fetchone():
                 continue
-            for row in conn.execute("SELECT * FROM lifecycle_events"):
+            # Project in SQLite before decoding thousands of unrelated payloads.
+            # CASE protects malformed legacy JSON; all clocks/schema/conflict
+            # checks below still run on every selected event.
+            query = "SELECT * FROM lifecycle_events"
+            params = ()
+            if ticker:
+                query += (" WHERE CASE WHEN json_valid(payload_json) THEN "
+                          "upper(json_extract(payload_json, '$.ticker')) = ? ELSE 0 END")
+                params = (ticker.upper(),)
+            for row in conn.execute(query, params):
                 event = dict(row)
                 try:
                     event["payload"] = json.loads(event.pop("payload_json"))

@@ -65,6 +65,25 @@ def test_ticker_projection_preserves_cutoff_and_skips_unrelated_validation(tmp_p
     assert validated == ["A", "A"]
 
 
+def test_ticker_projection_filters_in_sql_before_json_decoding(tmp_path, monkeypatch):
+    from tradingagents.performance import replay
+    path = tmp_path / "events.sqlite"
+    put(path)
+    for i in range(20):
+        put(path, event_id=f"other-{i}", payload={"ticker": "B", "action": "BUY"})
+    with sqlite3.connect(path) as conn:
+        conn.execute("INSERT INTO lifecycle_events SELECT 'bad-legacy', signal_id, intent_id, kind, mode, occurred_at, available_at, confirmed_at, settled_at, 'broken', ingested_at FROM lifecycle_events WHERE event_id='other-0'")
+    original = replay.json.loads
+    decoded = []
+    def loads(value):
+        decoded.append(value)
+        return original(value)
+    monkeypatch.setattr(replay.json, "loads", loads)
+    result = replay_action_history(path, analysis_as_of=T2, ticker="a")
+    assert len(result["events"]) == 1
+    assert len(decoded) == 1
+
+
 @pytest.mark.parametrize("clock,value", [
     ("occurred_at", None), ("available_at", None), ("available_at", "bad"),
     ("available_at", "2026-09-21T10:00:00"), ("confirmed_at", None), ("settled_at", None),

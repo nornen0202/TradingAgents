@@ -307,26 +307,40 @@ class KISMicrostructureProvider:
         session_bounds = _us_session_bounds(now_local)
         session_bars = _us_regular_session_bars(bars, now_local=now_local, bounds=session_bounds, missing=missing)
 
+        from .us_kis_evidence import dated_book, dated_strength, prior_daily_volume
         orderbook = _call_optional(lambda: self._kis.overseas_asking_price(symbol, exchange=exchange), missing, "orderbook")
         orderbook_row = {}
+        book_at = tape_at = None
+        tape_summary = None
+        native_strength = None
         if orderbook:
             raw_source_names.append("kis.overseas_asking_price")
-            orderbook_row = (
-                _first_record(orderbook, "output1")
-                or _first_record(orderbook, "output2")
-                or _first_record(orderbook, "output3")
-            )
+            # output1 is metadata, not the book. Never use volume as a price.
+            if "output2" in orderbook:
+                try:
+                    orderbook_row, book_at = dated_book(orderbook, symbol, datetime.now(ZoneInfo(market_timezone)))
+                except ValueError as exc:
+                    missing["orderbook"] = str(exc)
+            else:
+                orderbook_row = _first_record(orderbook, "output1")
 
         tape_result = _call_optional(
             lambda: self._kis.overseas_quot_inquire_ccnl(symbol, exchange=exchange, today="1"),
-            missing,
-            "trade_tape",
+            missing, "trade_tape",
         )
         tape_rows: list[dict[str, Any]] = []
         if tape_result:
             raw_source_names.append("kis.overseas_quot_inquire_ccnl")
             tape_payload = tape_result[0] if isinstance(tape_result, tuple) else tape_result
-            tape_rows = _records(tape_payload, "output1") or _records(tape_payload, "output")
+            # mtyp identifies a market, not BUY/SELL. Only the broker's vpow
+            # can supply strength here, with a verified original tape clock.
+            if book_at is not None:
+                try:
+                    native_strength, tape_at, tape_summary = dated_strength(
+                        tape_payload, book_at=book_at, observed_at=datetime.now(ZoneInfo(market_timezone)))
+                    tape_rows = _records(tape_payload, "output2")
+                except ValueError as exc:
+                    missing["execution_strength"] = str(exc)
 
         volume_power = _call_optional(lambda: self._kis.overseas_volume_power(exchange=exchange), missing, "volume_power")
         volume_power_rank = {}
@@ -335,8 +349,24 @@ class KISMicrostructureProvider:
             volume_power_payload = volume_power[0] if isinstance(volume_power, tuple) else volume_power
             volume_power_rank = _ranking_for_symbol(volume_power_payload, symbol)
 
+        # When the broker already supplies dated live book and strength, fetch
+        # only the missing historical denominator, avoiding entitlement-failed
+        # SIP, delayed SIP and IEX requests for data we already possess.
+        primary_avg20 = None
+        if book_at is not None and tape_at is not None and hasattr(self._kis, "fetch_overseas_daily_price_history"):
+            daily = _call_optional(
+                lambda: self._kis.fetch_overseas_daily_price_history(
+                    symbol=symbol, exchange_code=exchange,
+                    start_date=now_local.date() - timedelta(days=90),
+                    end_date=now_local.date() - timedelta(days=1)),
+                missing, "daily_volume",
+            ) or []
+            primary_avg20 = prior_daily_volume(daily, as_of=now_local.date())
+            if primary_avg20 is not None:
+                raw_source_names.append("kis.overseas_daily_price_history")
+
         supplement = None
-        if self._us_supplement_provider is not None:
+        if self._us_supplement_provider is not None and primary_avg20 is None:
             supplement = _call_optional(
                 lambda: self._us_supplement_provider.fetch(symbol, now_local=now_local, interval=interval),
                 missing,
@@ -345,7 +375,7 @@ class KISMicrostructureProvider:
             if supplement:
                 raw_source_names.extend(getattr(supplement, "raw_source_names", ()))
 
-        avg20_daily_volume = getattr(supplement, "avg20_daily_volume", None) if supplement is not None else None
+        avg20_daily_volume = primary_avg20 or (getattr(supplement, "avg20_daily_volume", None) if supplement is not None else None)
         if avg20_daily_volume is None:
             avg20_daily_volume = self._us_daily_volume_fallback(symbol)
             if avg20_daily_volume is not None:
@@ -418,11 +448,9 @@ class KISMicrostructureProvider:
         if orderbook_metrics["spread_bps"] is None and orderbook_metrics["orderbook_imbalance"] is None:
             missing.setdefault("orderbook", "kis_orderbook_fields_unavailable")
 
-        execution_strength = _find_float(combined_price, "strn", "STRN", "execution_strength")
+        execution_strength = native_strength if native_strength is not None else _find_float(combined_price, "strn", "STRN", "execution_strength")
         if execution_strength is None:
             execution_strength = _find_float(orderbook_row, "strn", "STRN", "execution_strength")
-        if execution_strength is None:
-            execution_strength = _execution_strength_from_tape(tape_rows)
         if execution_strength is None and supplement is not None:
             execution_strength = getattr(supplement, "execution_strength", None)
             if execution_strength is not None:
@@ -451,11 +479,19 @@ class KISMicrostructureProvider:
             halt_status=halt_status,
             source_limit_reasons=source_limit_reasons,
         )
-        asof = _bar_asof(bars, fallback=now_local, timezone_name=market_timezone)
+        bar_asof = _bar_asof(bars, fallback=now_local, timezone_name=market_timezone)
+        asof = bar_asof
+        # All consumed original event clocks must survive the downstream TTL.
+        # Never hide a future bar behind an older otherwise-valid book.
+        if asof <= now_local:
+            if book_at is not None:
+                asof = min(asof, book_at)
+            if tape_at is not None:
+                asof = min(asof, tape_at)
         source_latency_seconds = max(0, int((now_local - asof).total_seconds()))
         if supplement is not None and getattr(supplement, "source_latency_seconds", None) is not None:
             source_latency_seconds = max(source_latency_seconds, int(supplement.source_latency_seconds))
-        trade_tape_summary = _trade_tape_summary(tape_rows)
+        trade_tape_summary = tape_summary or _trade_tape_summary(tape_rows)
         if not tape_rows and supplement is not None and getattr(supplement, "trade_tape_summary", None):
             trade_tape_summary = supplement.trade_tape_summary
         return IntradayMarketSnapshot(
@@ -473,7 +509,7 @@ class KISMicrostructureProvider:
             relative_volume=relative_volume,
             trading_value=trading_value,
             price_change_pct=price_change_pct,
-            bar_timestamp=asof.isoformat(),
+            bar_timestamp=bar_asof.isoformat(),
             provider_timestamp=now_local.isoformat(),
             quote_delay_seconds=max(0, int((now_local - asof).total_seconds())),
             provider_realtime_capable=self.realtime_capable,
@@ -910,8 +946,8 @@ def _session_progress_fraction(now_local: datetime, *, market: str) -> float:
 
 
 def _orderbook_metrics(row: dict[str, Any]) -> dict[str, float | None]:
-    bid = _find_float(row, "bidp1", "pbid1", "PBID", "bid", "vbid1")
-    ask = _find_float(row, "askp1", "pask1", "PASK", "ask", "vask1")
+    bid = _find_float(row, "bidp1", "pbid1", "PBID", "bid")
+    ask = _find_float(row, "askp1", "pask1", "PASK", "ask")
     spread_bps = None
     if bid is not None and ask is not None and bid > 0 and ask >= bid:
         spread_bps = float((ask - bid) / ((ask + bid) / 2.0) * 10_000.0)
