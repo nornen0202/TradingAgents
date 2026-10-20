@@ -25,6 +25,12 @@
   const summaryRows = () => [...active().querySelectorAll('.strategy-summary tbody tr')];
   const planRow = (ticker) => summaryRows().find((row) => row.dataset.ticker === ticker);
   const checkTradePlan = (market) => {
+    const funded = active().querySelector('.funded-rebalance');
+    check(funded && funded.textContent.includes('매도 → 자금 확보 → 매수'), 'Funded rotation is visible');
+    check(funded.textContent.includes('현재 주문과 별도') && funded.textContent.includes('매수 논지 재심사'), 'Funding does not approve a blocked buy thesis');
+    check(funded.textContent.includes('2,200,000') && funded.textContent.includes('2,000,000'), 'After-buy cash and reserve reconcile visibly');
+    check(funded.querySelectorAll('.funded-leg').length === 2 && !funded.querySelector('img'), 'Sell/buy legs render escaped text');
+    check(planRow('ALPHA').querySelector('.funded-quantity').textContent.includes('별도 교체안 매수 1주'), 'Summary links nonzero funded quantity separately');
     const unit = market === 'kr' ? '원' : '$';
     const buy = planRow('ALPHA');
     const sell = planRow('BETA');
