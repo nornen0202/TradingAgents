@@ -161,6 +161,38 @@ async def probe(websocket_url, page_url):
             if not await evaluate("!document.querySelector('#ticker').options.length && document.querySelector('#paper-health').textContent.includes('휴장·장 종료')"):
                 raise RuntimeError("Empty archive status missing")
             result["empty_catalog_preserves_operations"] = True
+            for catalog_mode in ("pending", "failed"):
+                injected = await call("Page.addScriptToEvaluateOnNewDocument", {"source": '''
+                  window.__catalogMode=MODE;
+                  const originalFetch=window.fetch.bind(window);
+                  window.fetch=(url,...args)=>{
+                    if(String(url).startsWith('/api/tickers')) {
+                      if(window.__catalogMode==='pending')return new Promise(()=>{});
+                      if(window.__catalogMode==='failed')return Promise.resolve(new Response('',{status:503}));
+                    }
+                    return originalFetch(url,...args);
+                  };
+                '''.replace("MODE", json.dumps(catalog_mode))})
+                await call("Page.navigate", {"url": page_url})
+                for _ in range(100):
+                    await asyncio.sleep(.1)
+                    if await evaluate("document.querySelector('#kis-strategy-health')?.textContent.includes('fixture-strategy') && document.querySelector('#paper-health')?.textContent.includes('휴장·장 종료')"):
+                        break
+                else:
+                    raise RuntimeError(f"{catalog_mode} initial catalog hid operational status")
+                if catalog_mode == "failed" and not await evaluate("document.querySelector('#status').textContent.includes('자료를 읽지 못했습니다')"):
+                    raise RuntimeError("Failed catalog did not report its own error")
+                # Controls/retry must already be registered while the first
+                # catalog is pending or failed. No data clock is changed.
+                await evaluate("window.__catalogMode='pass'; document.querySelector('#refresh-catalog').click()")
+                for _ in range(100):
+                    await asyncio.sleep(.1)
+                    if await evaluate("Boolean(window.reviewSnapshot && document.querySelector('#charts canvas'))"):
+                        break
+                else:
+                    raise RuntimeError(f"{catalog_mode} initial catalog disabled retry controls")
+                await call("Page.removeScriptToEvaluateOnNewDocument", {"identifier": injected["identifier"]})
+                result[catalog_mode+"_catalog_preserves_operations_and_retry"] = True
             results.append(result)
     return results
 
