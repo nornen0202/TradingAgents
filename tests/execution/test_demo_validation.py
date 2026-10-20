@@ -1,5 +1,5 @@
 from contextlib import contextmanager
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
 import json
 import sqlite3
 
@@ -314,6 +314,38 @@ def test_domestic_undated_book_is_excluded_without_inventing_date_or_bid_ask():
     assert quote["quote_basis"] == "BAR_ONLY"
     assert "bid" not in quote and "ask" not in quote and "orderbook_date_basis" not in quote
     assert dv._terms("KR", quote, "fill")["limit_price"] == 40005
+
+
+@pytest.mark.parametrize("day,time,valid", [
+    ("20261019", "095900", True), ("", "095900", False),
+    ("20261020", "095900", False), ("bad", "095900", False),
+    ("20261019", "100100", False), ("20261019", "090000", False),
+])
+def test_domestic_strategy_quote_uses_dated_bar_without_book(monkeypatch, day, time, valid):
+    from types import SimpleNamespace
+    from tradingagents.execution import demo_runtime
+    from tradingagents.portfolio.kis import KisClient
+
+    chart, _ = chart_and_book(day=day, time=time)
+    calls = []
+    def fetch(code, **kwargs):
+        calls.append((code, kwargs))
+        return chart
+    client = SimpleNamespace(domestic_time_itemchartprice=fetch,
+                             session=SimpleNamespace(close=lambda: calls.append("closed")))
+    monkeypatch.setattr(KisClient, "from_api_keys", lambda **kwargs: client)
+    if valid:
+        quote = demo_runtime.current_quote("KR", "034020.KS", lambda: NOW)
+        assert quote["quote_basis"] == "BAR_ONLY"
+        assert quote["ticker"] == "034020" and quote["instrument_type"] == "STOCK"
+        assert "bid" not in quote and "ask" not in quote
+        assert dv._at(quote["observed_at"]) == datetime.fromisoformat("2026-10-19T10:00:00+09:00")
+        assert demo_runtime.limit_price(quote, "SELL", "KR") == 40000
+    else:
+        with pytest.raises(ValueError):
+            demo_runtime.current_quote("KR", "034020.KS", lambda: NOW)
+    assert calls[0] == ("034020", {"input_hour": "100000", "include_past_data": "N"})
+    assert calls[-1] == "closed"
 
 
 @pytest.mark.parametrize("date,time", [(None, "230000"), ("bad", "230000"), ("20261020", "230000"),

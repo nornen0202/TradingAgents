@@ -92,7 +92,7 @@ def current_quote(market, ticker, clock):
     try:
         if market == "KR":
             chart = client.domestic_time_itemchartprice(code, input_hour=clock().astimezone(ZoneInfo(ZONES[market])).strftime("%H%M%S"), include_past_data="N")
-            return validation.normalize_validation_quote(market=market, chart=chart, orderbook={}, observed_at=clock(), instrument=config)
+            return validation.normalize_validation_quote(market=market, chart=chart, orderbook=None, observed_at=clock(), instrument=config)
         for venue, exchange in (("NAS", "NASD"), ("NYS", "NYSE"), ("AMS", "AMEX")):
             payload = client.overseas_time_itemchartprice(code, exchange=venue, nmin="1", include_previous="0")
             chart = payload[0] if isinstance(payload, tuple) else payload
