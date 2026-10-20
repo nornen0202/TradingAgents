@@ -233,13 +233,19 @@ async function refreshCatalog() {
 }
 async function start() {
   byId("asof").value = new Date().toISOString();
-  const available=await refreshCatalog();
   byId("load").addEventListener("click",loadSnapshot);
   byId("ticker").addEventListener("change",loadSnapshot);
   byId("asof").addEventListener("input",()=>byId("follow-current").checked=false);
   byId("compile-condition").addEventListener("click",compileCondition);
-  byId("refresh-catalog").addEventListener("click",async()=>{if(byId("follow-current").checked)byId("asof").value=new Date().toISOString();try{if(await refreshCatalog())await loadSnapshot();}catch(error){byId("status").textContent=error.message;}});
+  byId("refresh-catalog").addEventListener("click",async()=>{
+    if(byId("follow-current").checked)byId("asof").value=new Date().toISOString();
+    const version=++requestVersion;
+    const operational=loadOperational(byId("asof").value,version);
+    try{if(await refreshCatalog())await loadSnapshot();}
+    catch(error){if(version===requestVersion)byId("status").textContent=error.message;}
+    finally{await operational;}
+  });
   setInterval(()=>{if(byId("follow-current").checked)byId("refresh-catalog").click();},60000);
-  if (available) await loadSnapshot();
+  byId("refresh-catalog").click();
 }
 start().catch(error=>byId("status").textContent=error.message);
