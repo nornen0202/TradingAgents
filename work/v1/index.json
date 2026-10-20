@@ -4,9 +4,9 @@
     "kr": {
       "schema": "tradingagents.work-context/v1",
       "surface": "kr",
-      "event_id": "kr:ee48d60e0913fc8fe6ec8c97b11a3c3b",
-      "source_sha256": "d1a52377c62f24ed82710f9c1c3b5ca21e4400cde9fcb64afa6e7b2d215faef0",
-      "packet_sha256": "cea44241023ad60762ffb1519c218252505d2a4ba35d95e5023126103b781f71",
+      "event_id": "kr:fed53ff34772687a4510f35eab36fbcf",
+      "source_sha256": "a55353aba394441d1f7b994e73934be4f1c3efec3418e3812525adeb00d6190d",
+      "packet_sha256": "fe471a100693bd71e3414fa0e5b073fa6ee92e78476dd5433807b5b4f0a6b4cf",
       "prompt_contract_version": "market-work-v12-kr",
       "prompt_sha256": "a72e95420df2bdbf27008d2fc88ea82b9aa78c1222a888149cb844d5f0402a46",
       "skill_sha256": "4dffe28b3721557cc2517b5afff2f94045832606e71ff61461df969f6abb53c7",
@@ -14,39 +14,27 @@
       "workflow_contract_sha256": "97fde7add4383c59c23330c927f073c5c281e98221519d9aeab3615f11917f8a",
       "status_url": "https://nornen0202.github.io/TradingAgents/work/v1/kr/status.json",
       "latest_url": "https://nornen0202.github.io/TradingAgents/work/v1/kr/latest.json",
-      "event_url": "https://nornen0202.github.io/TradingAgents/work/v1/kr/events/kr-ee48d60e0913fc8fe6ec8c97b11a3c3b.json",
+      "event_url": "https://nornen0202.github.io/TradingAgents/work/v1/kr/events/kr-fed53ff34772687a4510f35eab36fbcf.json",
       "prompt_url": "https://nornen0202.github.io/TradingAgents/work/v1/prompts/market_kr.md",
       "source_health": "OK",
       "report_mode": "READY",
       "freshness_receipt": {
         "schema": "tradingagents.source-freshness/v1",
-        "producer_run_id": "20261020T100007_local-freshness-kr-overlay",
-        "producer_started_at": "2026-10-20T10:00:07.832525+09:00",
-        "producer_finished_at": "2026-10-20T10:01:43.426546+09:00",
+        "producer_run_id": "20261020T101508_local-freshness-kr-overlay",
+        "producer_started_at": "2026-10-20T10:15:08.075147+09:00",
+        "producer_finished_at": "2026-10-20T10:16:39.223742+09:00",
         "analysis_run_id": "20261020T044511_local-scheduler-kr-full",
         "analysis_lineage_status": "RESOLVED",
         "analysis_completed_at": "2026-10-20T06:50:32.590683+09:00",
         "analysis_trade_date_oldest": "2026-10-19",
         "analysis_trade_date_latest": "2026-10-19",
-        "market_data_oldest_at": "2026-10-20T10:01:00+09:00",
-        "market_data_latest_at": "2026-10-20T10:01:00+09:00",
+        "market_data_oldest_at": "2026-10-20T10:16:00+09:00",
+        "market_data_latest_at": "2026-10-20T10:16:00+09:00",
         "market_data_status": "FRESH",
         "publication_does_not_refresh_inputs": true,
         "execution_max_age_seconds": 600.0,
         "research_market_data_status": "VALID",
         "research_market_data_receipts": [
-          {
-            "ticker": "000660.KS",
-            "research_valid": true,
-            "category": "FRESH_REGULAR_SESSION",
-            "execution_eligible": false
-          },
-          {
-            "ticker": "083450.KQ",
-            "research_valid": true,
-            "category": "FRESH_REGULAR_SESSION",
-            "execution_eligible": false
-          },
           {
             "ticker": "068270.KS",
             "research_valid": true,
@@ -61,12 +49,6 @@
           },
           {
             "ticker": "010140.KS",
-            "research_valid": true,
-            "category": "FRESH_REGULAR_SESSION",
-            "execution_eligible": false
-          },
-          {
-            "ticker": "403870.KQ",
             "research_valid": true,
             "category": "FRESH_REGULAR_SESSION",
             "execution_eligible": false
@@ -90,13 +72,7 @@
             "execution_eligible": false
           },
           {
-            "ticker": "033780.KS",
-            "research_valid": true,
-            "category": "FRESH_REGULAR_SESSION",
-            "execution_eligible": false
-          },
-          {
-            "ticker": "131290.KQ",
+            "ticker": "036460.KS",
             "research_valid": true,
             "category": "FRESH_REGULAR_SESSION",
             "execution_eligible": false
@@ -109,6 +85,12 @@
           },
           {
             "ticker": "042700.KS",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "000660.KS",
             "research_valid": true,
             "category": "FRESH_REGULAR_SESSION",
             "execution_eligible": false
@@ -144,7 +126,25 @@
             "execution_eligible": false
           },
           {
+            "ticker": "403870.KQ",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "083450.KQ",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
+            "execution_eligible": false
+          },
+          {
             "ticker": "373220.KS",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "033780.KS",
             "research_valid": true,
             "category": "FRESH_REGULAR_SESSION",
             "execution_eligible": false
@@ -163,12 +163,6 @@
           },
           {
             "ticker": "105560.KS",
-            "research_valid": true,
-            "category": "FRESH_REGULAR_SESSION",
-            "execution_eligible": false
-          },
-          {
-            "ticker": "036460.KS",
             "research_valid": true,
             "category": "FRESH_REGULAR_SESSION",
             "execution_eligible": false
@@ -193,6 +187,12 @@
           },
           {
             "ticker": "096770.KS",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "131290.KQ",
             "research_valid": true,
             "category": "FRESH_REGULAR_SESSION",
             "execution_eligible": false
