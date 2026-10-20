@@ -144,7 +144,7 @@ def _queue_completed_locked(archive, state, *, now=None):
                       "finished_at": manifest["finished_at"]})
 
 
-def reconcile(state, *, now=None, runner=subprocess.run):
+def reconcile(state, *, now=None, runner=subprocess.run, completions_allowed=True):
     now = now or datetime.now(timezone.utc)
     root = state / "notifications"
     with interprocess_file_lock(root / "dispatch.lock", timeout=0):
@@ -159,8 +159,8 @@ def reconcile(state, *, now=None, runner=subprocess.run):
                 if receipt.get("status") != status:
                     atomic_write_json(receipt_path, {**receipt, "status": status, "result": result})
                 continue
-            if read(path).get("kind") in {"success", "advisory_success"} and read(
-                    state / "publication.json").get("status") != "DELIVERY_VERIFIED":
+            if read(path).get("kind") in {"success", "advisory_success"} and (not completions_allowed or read(
+                    state / "publication.json").get("status") != "DELIVERY_VERIFIED"):
                 # Preserve attempts while the known prerequisite is pending.
                 # Failure notifications remain independent of Pages health.
                 continue
@@ -201,7 +201,16 @@ def reconcile_safely(archive, state, *, publication_locked=False):
         except Exception as exc:
             print(json.dumps({"notification_status": "PENDING", "error_type": type(exc).__name__}))
     try:
-        reconcile(state)
+        if publication_locked:
+            reconcile(state)
+        else:
+            try:
+                with interprocess_file_lock(state / "publish.lock", timeout=0):
+                    reconcile(state)
+            except TimeoutError:
+                # The old verified receipt may remain while its owner rebuilds.
+                # Do not dispatch a completion into that known lock contention.
+                reconcile(state, completions_allowed=False)
     except Exception as exc:
         # Notification transport cannot terminate successful research/publication.
         print(json.dumps({"notification_status": "PENDING", "error_type": type(exc).__name__}))

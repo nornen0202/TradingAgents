@@ -374,7 +374,7 @@ def test_market_admission_yields_to_publisher_without_blocking_failures(tmp_path
     write(state / "publication.json", {"status": "DELIVERY_VERIFIED"})
     published_strategy(state, manifest)
     calls = []
-    monkeypatch.setattr(local, "reconcile", lambda _: calls.append("existing failures"))
+    monkeypatch.setattr(local, "reconcile", lambda _, **kw: calls.append("existing failures"))
     with local.interprocess_file_lock(state / "publish.lock", timeout=0):
         local.reconcile_safely(archive, state)
         assert not list((state / "notifications/events").glob("*.json"))
@@ -391,6 +391,23 @@ def test_pending_publication_preserves_success_retry_budget_but_reports_failure(
     calls = []
     local.reconcile(state, now=NOW, runner=lambda args, **kw: calls.append(args) or SimpleNamespace(
         returncode=0, stdout="[]"))
+    assert not (state / "notifications/dispatches" / f"{success}.json").exists()
+    assert local.read(state / "notifications/dispatches" / f"{failure}.json")["attempts"] == 1
+    assert sum(c[1] == "workflow" for c in calls) == 1
+
+
+def test_busy_rebuild_under_old_verified_receipt_does_not_spend_completion_attempt(tmp_path, monkeypatch):
+    archive, state, _, success = prepared(tmp_path, monkeypatch)
+    failure = local.queue_failure(state, stage="publish", source_key="today", error_type="ValueError",
+                                  finished_at=NOW.isoformat())
+    actual = local.reconcile
+    calls = []
+    def reconcile(destination, **kwargs):
+        return actual(destination, now=NOW, runner=lambda args, **kw: calls.append(args) or SimpleNamespace(
+            returncode=0, stdout="[]"), **kwargs)
+    monkeypatch.setattr(local, "reconcile", reconcile)
+    with local.interprocess_file_lock(state / "publish.lock", timeout=0):
+        local.reconcile_safely(archive, state)
     assert not (state / "notifications/dispatches" / f"{success}.json").exists()
     assert local.read(state / "notifications/dispatches" / f"{failure}.json")["attempts"] == 1
     assert sum(c[1] == "workflow" for c in calls) == 1
