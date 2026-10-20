@@ -2,7 +2,6 @@
 from contextlib import contextmanager
 from datetime import datetime, timedelta
 import json
-from pathlib import Path
 import sqlite3
 from zoneinfo import ZoneInfo
 from urllib.parse import urlsplit
@@ -24,6 +23,33 @@ class Response:
         self.payload = payload
     def json(self):
         return self.payload
+
+
+@pytest.mark.parametrize("market", ["KR", "US"])
+def test_unallocated_recommendation_does_not_block_explicit_order(tmp_path, market):
+    h = Harness(tmp_path, market)
+    other = "000660.KS" if market == "KR" else "MSFT"
+    def add_recommendation(bundle):
+        bundle['strategy_table'].insert(0, {**bundle['strategy_table'][0], 'ticker': other,
+                                          'raw_codes': {'decision_now': 'EXIT_NOW'}})
+    run = h.source(changes=add_recommendation)
+    rows = runtime.candidates(run, market, h.now, (other, h.ticker))
+    assert [(r['ticker'], r['side']) for r in rows] == [(h.ticker, 'BUY')]
+    assert h.calls == []  # Selection cannot submit orders or access the account.
+
+
+@pytest.mark.parametrize("market", ["KR", "US"])
+def test_missing_proposal_never_creates_order_and_duplicate_remains_blocked(tmp_path, market):
+    h = Harness(tmp_path, market)
+    run = h.source()
+    path = run / 'portfolio-private/proposed_orders.json'
+    proposals = json.loads(path.read_text())
+    atomic_write_json(path, {'orders': []})
+    assert runtime.candidates(run, market, h.now, (h.ticker,)) == []
+    atomic_write_json(path, {'orders': proposals['orders'] * 2})
+    with pytest.raises(ValueError, match='AMBIGUOUS_STRATEGY_PROPOSAL'):
+        runtime.candidates(run, market, h.now, (h.ticker,))
+    assert h.calls == []
 
 
 class Harness:
