@@ -1,13 +1,13 @@
 {
   "schema": "tradingagents.work-context/v1",
   "surface": "youtube",
-  "event_id": "youtube:cac4a06aa123e291dbc386f246c01431",
+  "event_id": "youtube:f65eed83fe05cc6582e3c3e888c5932a",
   "prompt_contract_version": "youtube-work-v5",
   "prompt_sha256": "82a87727ec636b928ccb90cfe8cd823d86347e254ed0b204903699e34e35ef0b",
   "skill_sha256": "4dffe28b3721557cc2517b5afff2f94045832606e71ff61461df969f6abb53c7",
   "task_manifest_sha256": "c0992fa275c9961bc91c679030c0b4d9b8b06f3d164226776421f1e354b5c22e",
   "workflow_contract_sha256": "4982d0db0e5a97f3b0f392bdff489a6940be0d2d88e7ea94533edbdb009b4556",
-  "source_sha256": "f1d22e2b295b5c7d0d0952a5ddc34f53058d20df5165a7c3b1f33227fe67151c",
+  "source_sha256": "083cd8ec0a971a75cdb5c77d668a7b92001bd6c01640bca43e70c6ac89597d11",
   "body": {
     "kind": "youtube",
     "source_health": "OK",
@@ -44,12 +44,12 @@
     },
     "coverage": {
       "total_unique_events": 372,
-      "window_events": 56,
+      "window_events": 50,
       "transmitted_events": 24,
       "truncated": true,
-      "oldest_occurred_at": "2026-10-17T08:30:22+00:00",
+      "oldest_occurred_at": "2026-10-17T13:33:36+00:00",
       "newest_occurred_at": "2026-10-19T22:09:09+00:00",
-      "omitted_due_to_packet_budget": 32
+      "omitted_due_to_packet_budget": 26
     },
     "events": [
       {
@@ -366,155 +366,6 @@
               "publisher": "Investor's Business Daily",
               "published_at": "2026-10-18T22:23:15+00:00",
               "source_tier": "market_or_news"
-            }
-          ]
-        }
-      },
-      {
-        "event_key": "R4K0qIgCK9Y",
-        "content_sha256": "d45755ec33a5f53a82b3ee6b2e15af4ab05e53d0e67d1f3a8a8a827196d9c3de",
-        "occurred_at": "2026-10-17T11:15:12+00:00",
-        "relevance": {
-          "tickers": [],
-          "markets": [],
-          "themes": [],
-          "match_basis": "title_and_claim_context"
-        },
-        "strategy_source_tier": "USER_PRIMARY",
-        "strategy_evidence_weight": "HIGH",
-        "summary": {
-          "video_id": "R4K0qIgCK9Y",
-          "title": "부동산 불패의 비밀, 값싼 돈이 끝났다 (박종훈의 지식한방)",
-          "channel": "박종훈의 지식한방",
-          "source_url": "https://www.youtube.com/watch?v=R4K0qIgCK9Y",
-          "published_at": "2026-10-17T11:15:12+00:00",
-          "status": "asr_uncertain",
-          "strategy_source_tier": "USER_PRIMARY",
-          "strategy_evidence_weight": "HIGH",
-          "strategy_validation_policy": "USER_ACCEPTED",
-          "transcript_quality": {
-            "status": "good",
-            "score": 1.0,
-            "warnings": [],
-            "source": "automatic",
-            "language": "Korean",
-            "model_or_format": "json3",
-            "chars": 7458,
-            "segments": 396,
-            "duration_seconds": 1017,
-            "repeated_ngram_ratio": 0.001
-          },
-          "claim_status_summary": {
-            "unverified": 10,
-            "partially_supported": 1,
-            "asr_uncertain": 1
-          },
-          "claims": [
-            {
-              "claim_id": "C1",
-              "claim_text": "서울 88주 연속·누적 17.9% 상승, 강남구 10주 연속 하락, 성북구 연초 대비 14.9% 상승이라는 주장.",
-              "status": "unverified",
-              "confidence": 0.05,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "지역별 상승·하락 수치를 확인된 투자 근거로 사용하지 말고 동일 기관·동일 지수로 재확인해야 한다."
-            },
-            {
-              "claim_id": "C2",
-              "claim_text": "집값 변동 기여도가 기준금리 60.7%, 대출 규제 17.9%, 공급 8.5%이며 금리 영향이 공급보다 크다는 주장.",
-              "status": "partially_supported",
-              "confidence": 0.78,
-              "supporting_evidence_ids": [
-                "E4",
-                "E5",
-                "E6"
-              ],
-              "manual_check_required": true,
-              "investor_implication": "금리 민감도를 점검하는 참고 근거는 있으나 공급 효과를 고정적으로 압도한다고 판단할 수는 없다."
-            },
-            {
-              "claim_id": "C3",
-              "claim_text": "2022년 국고채 10년물 4.6%·4% 초과 7주, 서울 10월 아파트 거래 558건, 연간 실거래가격 22% 하락 및 부양 후 2023년 1월 반등이라는 주장.",
-              "status": "unverified",
-              "confidence": 0.05,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "2022년 사례를 현재 시장의 하락폭이나 반응 속도로 직접 환산할 근거가 없다."
-            },
-            {
-              "claim_id": "C4",
-              "claim_text": "미국은 2006년 정책금리 5.25% 도달 후 15개월 뒤 집값이 하락해 2012년까지 27%, 일부 도시는 50% 넘게 하락했고 2022~2023년에는 5% 하락했다는 주장. 미국의 30년 고정 모기지와 한국의 변동금리 구조로 반응 차이를 설명한다.",
-              "status": "unverified",
-              "confidence": 0.05,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "국가별 대출 구조와 가격지수를 확인하기 전에는 미국 사례로 한국의 하락 시점을 추정하기 어렵다."
-            },
-            {
-              "claim_id": "C5",
-              "claim_text": "2026년 국고채 10년물 최고 약 4.6%, 신규 주담대 약 4.6%, 4% 초과 100일 이상, 혼합형 전환금리 2.7%→4.26%, 가계신용 2,020조원 및 은행 연체율 10년 최고라는 주장.",
-              "status": "unverified",
-              "confidence": 0.05,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "금리 전환에 따른 실제 부담은 개별 계약 조건과 공식 통계를 확인해 평가해야 한다."
-            },
-            {
-              "claim_id": "C6",
-              "claim_text": "2021~2022년 실행된 5년 혼합형 대출의 전환 부담이 2026년 4분기부터 커지고 금리 효과는 5개월, 연체 효과는 15개월 뒤 나타나 2027년 2분기 또는 8월부터 하방 압력이 본격화한다는 전망.",
-              "status": "unverified",
-              "confidence": 0.1,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "날짜 계산과 실제 시장 충격의 발생 시점을 구분하고 전환 규모·재가격 금리·연체율을 확인해야 한다."
-            }
-          ],
-          "entities": [],
-          "evidence": [
-            {
-              "evidence_id": "E1",
-              "claim_id": "C1",
-              "title": "Mexico Negotiations Stall Following Canada Breakdown, Calling Into Question the Future of USMCA",
-              "source_url": "https://finance.yahoo.com/economy/policy/articles/mexico-negotiations-stall-following-canada-221000958.html",
-              "publisher": "Sourcing Journal",
-              "published_at": "2026-10-16T22:10:00+00:00",
-              "source_tier": "market_or_news"
-            },
-            {
-              "evidence_id": "E2",
-              "claim_id": "C1",
-              "title": "General David Petraeus Joins Century CEO Jesse Gary for Fireside Chat on National Security Risks from Foreign Primary Aluminum Supply",
-              "source_url": "https://finance.yahoo.com/economy/policy/articles/general-david-petraeus-joins-century-170500053.html",
-              "publisher": "PR Newswire",
-              "published_at": "2026-10-16T17:05:00+00:00",
-              "source_tier": "market_or_news"
-            },
-            {
-              "evidence_id": "E4",
-              "claim_id": "C2",
-              "title": "[기자수첩]큰 임대주택 늘리면 집값 잡을 수 있나",
-              "source_url": "https://news.bizwatch.co.kr/article/real_estate/2026/02/06/0022",
-              "publisher": "Naver News",
-              "published_at": "2026-02-12T06:50:00+09:00",
-              "source_tier": "web"
-            },
-            {
-              "evidence_id": "E5",
-              "claim_id": "C2",
-              "title": "다시 시작된 ‘부동산 전쟁’ [아침햇발]",
-              "source_url": "https://www.hani.co.kr/arti/opinion/column/1206899.html",
-              "publisher": "Naver News",
-              "published_at": "2025-07-08T16:20:00+09:00",
-              "source_tier": "news"
-            },
-            {
-              "evidence_id": "E7",
-              "claim_id": "C5",
-              "title": "Apple's Market Value Grew From $350 Billion to $5 Trillion During Tim Cook's 15 Years as CEO. Here's What That Growth Curve Means for Apple's Next Chapter Un...",
-              "source_url": "https://finance.yahoo.com/markets/stocks/articles/apples-market-value-grew-350-200700602.html",
-              "publisher": "Motley Fool",
-              "published_at": "2026-10-17T20:07:00+00:00",
-              "source_tier": "news"
             }
           ]
         }
@@ -4140,6 +3991,171 @@
               "source_url": "https://finance.yahoo.com/markets/stocks/articles/bank-america-cut-share-count-222000261.html",
               "publisher": "Motley Fool",
               "published_at": "2026-10-19T22:20:00+00:00",
+              "source_tier": "news"
+            }
+          ]
+        }
+      },
+      {
+        "event_key": "vzoLkHo0xkw",
+        "content_sha256": "4f256c4d4a9565eb5ff80f9e6b55c3ada0048f4b48e313165cd1099a6a50d8b4",
+        "occurred_at": "2026-10-19T05:16:28+00:00",
+        "relevance": {
+          "tickers": [
+            "META, AMZN"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "verified_entities"
+        },
+        "strategy_source_tier": "STANDARD",
+        "strategy_evidence_weight": "STANDARD",
+        "summary": {
+          "video_id": "vzoLkHo0xkw",
+          "title": "“7월 폭락장과 너무 닮았다!” 메타 실적 발표 전후 증시 대반전 올까? / 삼성전자·SK하이닉스 공포가 과도한 이유   | 이권희 대표",
+          "channel": "815Money talk",
+          "source_url": "https://www.youtube.com/watch?v=vzoLkHo0xkw",
+          "published_at": "2026-10-19T05:16:28+00:00",
+          "status": "unverified",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "strategy_validation_policy": "STANDARD_REVIEW",
+          "transcript_quality": {
+            "status": "good",
+            "score": 1.0,
+            "warnings": [],
+            "source": "automatic",
+            "language": "Korean",
+            "model_or_format": "json3",
+            "chars": 14654,
+            "segments": 800,
+            "duration_seconds": 1678,
+            "repeated_ngram_ratio": 0.001
+          },
+          "claim_status_summary": {
+            "unverified": 12
+          },
+          "claims": [
+            {
+              "claim_id": "C1",
+              "claim_text": "엔비디아 -1.4%, 마이크론 -5.6%, SK하이닉스 -6.5%, 반도체지수 7~8거래일 연속 하락 및 외국인 매수와 장중 반등이 나타났다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "장중 반등이나 외국인 매수만으로 바닥 또는 지속적인 추세 전환을 확정할 수 없다."
+            },
+            {
+              "claim_id": "C2",
+              "claim_text": "네오클라우드의 AI 데이터센터 비중은 10% 미만이며 신용불안에 비해 실제 수요 악화는 제한적이고 HBM 수명 연장·소버린 AI 주문 적체가 존재한다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "신용위험이 과장됐다는 판단과 실제 수요의 견조함을 별도로 검증해야 한다."
+            },
+            {
+              "claim_id": "C3",
+              "claim_text": "메타 실적이 이번 주 목요일이며 일정이 앞당겨졌고, 메타·아마존 실적 설명이 7월 말처럼 시장 반전의 계기가 될 수 있다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "실적 발표일과 투자·수요 관련 경영진 설명을 확인하기 전까지 반전 전망을 사실이나 확률이 검증된 예측으로 사용하지 않아야 한다."
+            },
+            {
+              "claim_id": "C4",
+              "claim_text": "코어위브의 핵심 위험은 2026년 만기 채무 차환이고, 네비우스는 2030년 만기인데도 함께 하락한다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "만기 연도만으로 기업 간 신용위험을 비교하지 말고 원금·담보·약정·현금 및 차환 진행 상황을 확인해야 한다."
+            },
+            {
+              "claim_id": "C5",
+              "claim_text": "삼성전자·SK하이닉스에 대한 공포가 과도하며 제시한 가격대에서 매수를 검토할 수 있고, Solidigm 상장 및 주주환원 로드맵 설명이 필요하다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "매수 검토 가격은 출연자의 전략이며 검증된 적정가가 아니다. 상장과 자금 환원 역시 공식 결정 여부를 확인해야 한다."
+            },
+            {
+              "claim_id": "C6",
+              "claim_text": "엘앤씨바이오는 리투오 성장과 미국 진출 기대가 관심의 배경이며 경쟁사 성장 정체와 대비되고 증자·공장 건설도 진행된다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "미국 진출 기대를 허가·출하·매출 실현과 구분하고 성장 비교는 동일 기간·동일 지표로 확인해야 한다."
+            }
+          ],
+          "entities": [
+            {
+              "ticker": "META, AMZN",
+              "name": "메타·아마존",
+              "status": "unverified",
+              "verification_notes": [
+                "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+              ]
+            }
+          ],
+          "evidence": [
+            {
+              "evidence_id": "E1",
+              "claim_id": "C1",
+              "title": "Cleveland-Cliffs Stock Jumps on Bumper 2027 Profit Forecast",
+              "source_url": "https://finance.yahoo.com/m/6a1d52de-b06f-3643-93d5-94f5df8390ff/cleveland-cliffs-stock-jumps.html",
+              "publisher": "The Wall Street Journal",
+              "published_at": "2026-10-19T20:27:11+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E2",
+              "claim_id": "C1",
+              "title": "Intel leads chip stocks higher as investors jump back into AI trade",
+              "source_url": "https://finance.yahoo.com/markets/article/intel-leads-chip-stocks-higher-as-investors-jump-back-into-ai-trade-135726553.html",
+              "publisher": "Yahoo Finance",
+              "published_at": "2026-10-19T20:23:25+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E4",
+              "claim_id": "C2",
+              "title": "Applied Materials, Lam Research, Marvell Technology, Micron, and Semtech Shares Skyrocket, What You Need To Know",
+              "source_url": "https://finance.yahoo.com/markets/stocks/articles/applied-materials-lam-research-marvell-212855831.html",
+              "publisher": "StockStory",
+              "published_at": "2026-10-19T21:28:55+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E5",
+              "claim_id": "C3",
+              "title": "Billionaire David Tepper’s Appaloosa Management Has 31% of its portfolio Invested in These 2 Artificial Intelligence (AI) Stocks",
+              "source_url": "https://finance.yahoo.com/markets/stocks/articles/billionaire-david-tepper-appaloosa-management-220401463.html",
+              "publisher": "Motley Fool",
+              "published_at": "2026-10-19T22:04:01+00:00",
+              "source_tier": "news"
+            },
+            {
+              "evidence_id": "E6",
+              "claim_id": "C3",
+              "title": "Amazon vs. Home Depot: Which Consumer Stock Is a Better Buy in 2026?",
+              "source_url": "https://finance.yahoo.com/markets/stocks/articles/amazon-vs-home-depot-consumer-214414304.html",
+              "publisher": "Motley Fool",
+              "published_at": "2026-10-19T21:44:14+00:00",
+              "source_tier": "news"
+            },
+            {
+              "evidence_id": "E7",
+              "claim_id": "C7",
+              "title": "AI Stocks Rebound. Chip Sector Snaps Historic Losing Streak.",
+              "source_url": "https://finance.yahoo.com/m/8c70db44-a896-3ec6-a8bd-d51d69dca2ac/ai-stocks-rebound.-chip.html",
+              "publisher": "Barrons.com",
+              "published_at": "2026-10-19T20:53:00+00:00",
               "source_tier": "news"
             }
           ]
