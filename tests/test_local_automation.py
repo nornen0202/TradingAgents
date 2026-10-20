@@ -486,3 +486,28 @@ def test_live_verification_errors_keep_existing_failure_path(monkeypatch, delaye
     assert local.read_json(state / "publication.json")["status"] == "PAGES_PENDING"
     assert not calls["handoff"]
     assert not calls["sleep"]
+
+
+@pytest.mark.parametrize("mutated,live", [(False, True), (False, False), (True, True)])
+def test_pending_generation_survives_new_inputs_but_not_partial_build(
+        monkeypatch, delayed_publication, mutated, live):
+    archive, state, runtime, calls = delayed_publication
+    monkeypatch.setattr(local, "archive_fingerprint", lambda _: "newer-overlay")
+    original = {"status": "PAGES_PENDING", "commit": "already-pushed",
+                "fingerprint": "older-overlay", "mirror_verified": True}
+    local.atomic_write_json(state / "publication.json", original)
+    for relative in ("pages-snapshot.json", "mobile/strategy.json",
+                     "work/v1/kr/report/latest.json", "work/v1/us/report/latest.json"):
+        local.atomic_write_json(state / "site" / relative, {"generation": "pushed"})
+    if mutated:
+        local.atomic_write_json(state / "site/mobile/strategy.json", {"generation": "partial-build"})
+    monkeypatch.setattr(local, "git_run", lambda *a, **k: '{"generation":"pushed"}')
+    monkeypatch.setattr(local, "verify_live", lambda _: live)
+    result = local.publish(archive, state, runtime, publication_locked=True)
+    assert result["status"] == ("DELIVERY_VERIFIED" if live else "PAGES_PENDING")
+    assert result["fingerprint"] == ("newer-overlay" if mutated else "older-overlay")
+    assert len(calls["build"]) == len(calls["push"]) == int(mutated)
+    if live:
+        assert calls["handoff"][-1]["commit"] == ("commit-1" if mutated else "already-pushed")
+    else:
+        assert not calls["handoff"] and calls["sleep"] == [15] * 6

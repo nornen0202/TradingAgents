@@ -342,7 +342,7 @@ def test_publisher_owner_can_queue_verified_advisory_without_reentering_lock(tmp
 def test_busy_publisher_does_not_starve_other_notification_dispatch(tmp_path, monkeypatch):
     archive, state, *_ = fixture(tmp_path, monkeypatch)
     calls = []
-    monkeypatch.setattr(local, "reconcile", lambda _: calls.append("existing notification"))
+    monkeypatch.setattr(local, "reconcile", lambda _, **kw: calls.append("existing notification"))
     with local.interprocess_file_lock(state / "publish.lock", timeout=0):
         local.reconcile_safely(archive, state)
     assert calls == ["existing notification"]
