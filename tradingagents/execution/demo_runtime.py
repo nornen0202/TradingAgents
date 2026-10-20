@@ -121,6 +121,10 @@ def candidates(source, market, now, tickers):
             continue
         side = DECISIONS[decision]
         matches = [p for p in proposals if p.get("canonical_ticker") == ticker and str(p.get("side")).upper() == side]
+        # An analysis exit/trim can be informational when no explicit order was
+        # allocated. It must not block unrelated, explicitly proposed orders.
+        if not matches:
+            continue
         if len(matches) != 1 or (ticker, side) in seen:
             raise ValueError("AMBIGUOUS_STRATEGY_PROPOSAL")
         seen.add((ticker, side))
