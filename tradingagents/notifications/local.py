@@ -20,6 +20,9 @@ from .telegram import AtomicNotificationLedger, NotificationError, TelegramBotCl
 REPOSITORY = "nornen0202/TradingAgents"
 WORKFLOW = "tradingagents-mobile-notifications.yml"
 SCHEMA = "tradingagents.local-notification/v1"
+# A publisher can build/push and verify Pages propagation while holding its
+# lane. Leave room for that normal work within notify_local's ten-minute limit.
+PUBLICATION_LOCK_TIMEOUT_SECONDS = 300
 
 
 def read(path):
@@ -228,7 +231,7 @@ def compose(event, archive, state):
     from tradingagents.local_automation import verify_live
     # Share the publisher's lane lock so a rebuild cannot change the site
     # between source-lineage validation and the byte-for-byte live check.
-    with interprocess_file_lock(state / "publish.lock", timeout=30):
+    with interprocess_file_lock(state / "publish.lock", timeout=PUBLICATION_LOCK_TIMEOUT_SECONDS):
         publication = read(state / "publication.json")
         strategy = read(state / "site" / "mobile" / "strategy.json")
         if (publication.get("status") != "DELIVERY_VERIFIED"
