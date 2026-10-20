@@ -481,10 +481,12 @@ class KISMicrostructureProvider:
         )
         asof = _bar_asof(bars, fallback=now_local, timezone_name=market_timezone)
         # All consumed original event clocks must survive the downstream TTL.
-        if book_at is not None:
-            asof = min(asof, book_at)
-        if tape_at is not None:
-            asof = min(asof, tape_at)
+        # Never hide a future bar behind an older otherwise-valid book.
+        if asof <= now_local:
+            if book_at is not None:
+                asof = min(asof, book_at)
+            if tape_at is not None:
+                asof = min(asof, tape_at)
         source_latency_seconds = max(0, int((now_local - asof).total_seconds()))
         if supplement is not None and getattr(supplement, "source_latency_seconds", None) is not None:
             source_latency_seconds = max(source_latency_seconds, int(supplement.source_latency_seconds))

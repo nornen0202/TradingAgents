@@ -429,7 +429,9 @@ def test_microstructure_report_shows_external_sources_and_limited_fields():
     assert "massive.last_nbbo" in report
 
 
-def test_us_actual_response_parts_use_native_evidence_without_supplement(monkeypatch):
+@pytest.mark.parametrize("bar_time,expected_asof", [("103000", "2026-10-20T10:30:00-04:00"),
+                                                   ("103100", "2026-10-20T10:31:00-04:00")])
+def test_us_actual_response_parts_use_native_evidence_without_supplement(monkeypatch, bar_time, expected_asof):
     from datetime import datetime
     from zoneinfo import ZoneInfo
     from tradingagents.dataflows.intraday import microstructure as module
@@ -443,7 +445,7 @@ def test_us_actual_response_parts_use_native_evidence_without_supplement(monkeyp
         def overseas_price(self, symbol, **kwargs):
             return {'output': {'last': '200', 'high': '205', 'low': '195', 'tvol': '10000', 'tamt': '1990000'}}
         def overseas_time_itemchartprice(self, symbol, **kwargs):
-            return {'output2': [{'xymd': '20261020', 'xhms': '103000', 'last': '200', 'evol': '5000'}]}, {}
+            return {'output2': [{'xymd': '20261020', 'xhms': bar_time, 'last': '200', 'evol': '5000'}]}, {}
         def overseas_asking_price(self, symbol, **kwargs):
             return {'output1': {'code': symbol, 'curr': 'USD', 'dymd': '20261020', 'dhms': '233025'},
                     'output2': {'pbid1': '199', 'pask1': '201', 'vbid1': '700', 'vask1': '300'}}
@@ -460,7 +462,7 @@ def test_us_actual_response_parts_use_native_evidence_without_supplement(monkeyp
     assert snapshot.execution_strength == 81.75
     assert snapshot.spread_bps == 100
     assert snapshot.avg20_daily_volume == 10000
-    assert snapshot.asof == '2026-10-20T10:30:00-04:00'
+    assert snapshot.asof == expected_asof
     assert snapshot.execution_data_quality == DELAYED_ANALYSIS_ONLY
     assert snapshot.halt_status['is_clear'] is False
     for field in ['luld_status', 'reg_sho_status', 'news_halt_status']:
