@@ -247,6 +247,35 @@ def partial_target_source(manifests, target, *, window_start, now):
     return None
 
 
+def full_research_session_hold(profile, state, *, now):
+    """Do not occupy the sole producer with research during the other market's session.
+
+    The existing lock and attempt key remain intact. In particular, a KR pre-open
+    full run must not starve the last US execution refreshes while it runs for
+    hours. Use the same verified session resolver as the consumers, not a fixed
+    KST cutoff (DST, holidays and early closes differ).
+    """
+    from tradingagents.execution.refresh_runtime import execution_refresh_enabled
+    from tradingagents.execution.paper_runtime import _runtime_session
+
+    if not execution_refresh_enabled(state):
+        return None
+    other_market = {"kr": "us", "us": "kr"}.get(str(profile).lower())
+    if other_market is None:
+        return "AWAITING_OTHER_MARKET_CALENDAR"
+    try:
+        session = _runtime_session(market=other_market, now_local=now)
+    except Exception:
+        return "AWAITING_OTHER_MARKET_CALENDAR"
+    if not isinstance(session, dict):
+        return "AWAITING_OTHER_MARKET_CALENDAR"
+    if session.get("is_open") is True and session.get("phase") == "regular":
+        return "DEFERRED_FOR_OTHER_MARKET_SESSION"
+    if session.get("is_open") is False and session.get("phase") == "closed":
+        return None
+    return "AWAITING_OTHER_MARKET_CALENDAR"
+
+
 def run_due(archive, state, *, now=None, dry_run=False):
     from tradingagents.scheduled.automation_calendar import automated_market_session_status
     from tradingagents.scheduled.runner import _iter_run_manifests_desc
@@ -292,6 +321,11 @@ def run_due(archive, state, *, now=None, dry_run=False):
         if attempts + manual_attempts >= target.max_failed_attempts or cooling_down:
             decisions.append({"target": target.name, "status": "RETRY_BUDGET_OR_COOLDOWN"})
             continue
+        if target.workflow_file == "daily-codex-analysis.yml":
+            hold = full_research_session_hold(target.inputs["profile"], state, now=now)
+            if hold:
+                decisions.append({"target": target.name, "status": hold})
+                continue
         decisions.append({"target": target.name, "status": "DUE"})
         if dry_run:
             continue
@@ -339,6 +373,9 @@ def run_due(archive, state, *, now=None, dry_run=False):
         decisions.extend(refreshes)
         if refreshes:
             return decisions
+        if any(item["status"] in {"DEFERRED_FOR_OTHER_MARKET_SESSION", "AWAITING_OTHER_MARKET_CALENDAR"}
+               for item in decisions):
+            return decisions  # Do not replace deferred research with another long collector.
         from tradingagents.local_advisory_recovery import recover_due
         decisions.extend(recover_due(archive, state, watchdog=watchdog, targets=targets, now=now, dry_run=dry_run))
     return decisions

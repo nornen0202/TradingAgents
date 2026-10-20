@@ -18,6 +18,16 @@ ATTEMPT_INTERVAL_SECONDS = 300
 MAX_CONSECUTIVE_FAILURES = 3
 
 
+def execution_refresh_enabled(state):
+    """Only the existing explicitly enabled simulation lanes need this producer."""
+    for lane, mode in (("paper", "LOCAL_PAPER_ONLY"), ("kis-strategy", "KIS_DEMO_STRATEGY")):
+        settings = _read(Path(state) / lane / "enabled.json", {})
+        if (isinstance(settings, dict) and settings.get("enabled") is True
+                and settings.get("mode") == mode and settings.get("real_orders_enabled") is False):
+            return True
+    return False
+
+
 def refresh_due(archive, state, *, now, dry_run=False, clock=None, executor=None,
                 session_resolver=None):
     """Caller owns the existing producer lock; no new worker or order lane."""
@@ -26,12 +36,7 @@ def refresh_due(archive, state, *, now, dry_run=False, clock=None, executor=None
     if now is None:
         raise ValueError("Aware refresh clock required")
     clock = clock or (lambda: datetime.now(timezone.utc))
-    enabled = False
-    for lane, mode in (("paper", "LOCAL_PAPER_ONLY"), ("kis-strategy", "KIS_DEMO_STRATEGY")):
-        settings = _read(state / lane / "enabled.json", {})
-        enabled |= (settings.get("enabled") is True and settings.get("mode") == mode
-                    and settings.get("real_orders_enabled") is False)
-    if not enabled:
+    if not execution_refresh_enabled(state):
         return []
     session_resolver = session_resolver or _runtime_session
     results = []
