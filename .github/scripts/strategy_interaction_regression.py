@@ -96,6 +96,26 @@ def fixture() -> dict[str, Any]:
             "summary": {"row_count": 4, "buy_count": 3, "sell_count": 1, "sized_count": 2, "zero_count": 1, "unsized_count": 1, "zero_reason_counts":{"CASH_BUFFER_SHORTFALL": 1}},
             "assumptions": ["입력 계좌 기준 검토 수량", "실제 주문은 직접 확인 후 실행"],
         }
+        item["funded_rebalance"] = {
+            "market": market.upper(), "account_asof": payload["generated_at"],
+            "calculated_at": payload["generated_at"], "status": "CONDITIONAL_FUNDED",
+            "order_ready": False, "reason": "결제 후 자금 연결 검토",
+            "cash_ledger": {
+                "initial_cash_krw": 1000000, "after_sales_cash_krw": 2500000,
+                "after_buys_cash_krw": 2200000, "reserve_krw": 2000000,
+                "reserve_surplus_krw": 200000, "order_count": 2, "turnover_ratio": .2,
+                "sell_fees_and_levy_krw": 5000, "capital_tax_reserve_krw": 10000,
+                "buy_total_krw": 300000,
+            },
+            "sell_legs": [{"ticker": "BETA", "display_name": "BETA", "side": "SELL",
+                           "quantity": 1, "price_low": 99*unit, "price_high": 100*unit,
+                           "currency": currency, "net_funding_krw": 1500000}],
+            "buy_legs": [{"ticker": "ALPHA", "display_name": '<img src=x onerror="alert(1)">',
+                          "side": "BUY", "quantity": 1, "price_low": 99*unit,
+                          "price_high": 101*unit, "currency": currency,
+                          "cash_required_krw": 300000, "conditions": ["원논지 재심사"]}],
+            "conditions": ["실제 체결·결제 확인 후 매수"], "assumptions": ["보수적 세금 충당"],
+        }
     return payload
 
 
