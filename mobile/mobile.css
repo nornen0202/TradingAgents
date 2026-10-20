@@ -194,6 +194,12 @@ dd { margin: 0; text-align: right; overflow-wrap: anywhere; font-size: .88rem; }
 .plan-details[open] { min-width: 0; }
 .plan-overview { margin: 12px 0; padding: 12px; border: 1px solid var(--line); border-radius: 12px; font-size: .8rem; }
 .plan-overview p { margin: 5px 0; overflow-wrap: anywhere; }
+.funded-rebalance { margin: 16px 0 24px; padding: 16px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); overflow-wrap: anywhere; }
+.funded-rebalance h3 { margin-top: 0; }
+.funded-rebalance p { font-size: .85rem; line-height: 1.65; }
+.funded-legs { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 12px; }
+.funded-leg { padding: 12px; border: 1px solid var(--line); border-radius: 10px; min-width: 0; background: var(--panel-2); }
+.funded-leg h4 { margin: 0 0 8px; font-size: .9rem; }
 .plan-lot-review summary { min-height: 44px; display: flex; align-items: center; cursor: pointer; color: var(--accent); }
 .plan-source-note { color: var(--muted); font-size: .76rem; }
 .plan-method { margin: 10px 0; padding: 0 12px; border: 1px solid var(--line); border-radius: 10px; background: rgba(255,255,255,.025); }
