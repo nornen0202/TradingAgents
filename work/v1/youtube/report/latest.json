@@ -1,8 +1,8 @@
 {
   "schema": "tradingagents.work-report/v1",
   "surface": "youtube",
-  "event_id": "youtube:24303a76e4dd3705073924002f25a28e",
-  "source_sha256": "a6ef746038e13c06b641b6f760baa81bce6124744e8dbba8eb9a7d624206c054",
+  "event_id": "youtube:41eeefc4855697645f2cfe549b7abec3",
+  "source_sha256": "65bda5a5017c79182c514d9e5ea2b5c6036a638ed859a4e8b092d42181b892c8",
   "prompt_contract_version": "youtube-work-v5",
   "workflow_contract_sha256": "4982d0db0e5a97f3b0f392bdff489a6940be0d2d88e7ea94533edbdb009b4556",
   "policy": {
@@ -17,29 +17,27 @@
     "external_evidence_may_bypass_execution_gate": false,
     "thesis_is_independent_from_execution_readiness": true
   },
-  "report_markdown": "# YouTube 검증 델타 · 2026-10-20\n\n신규·수정 0건 — NO_ACTIONABLE_DELTA. 소스 정상, 동일 이벤트 59건 중복 제외.\n\n기준 시각 2026-10-20T09:32:21.637935+09:00. 최근 producer는 2026-10-20 08:12:19 KST 성공이며, 36시간 신선도 기준을 충족합니다. 전송 범위의 가장 오래된 자료부터 최신 자료까지 시각이 파싱 가능하고 순서·미래 시각·72시간 범위를 검증했습니다. 다음 신선도 경계는 2026-10-20T11:00:01+09:00입니다. 경계 이후에는 다시 준비·검증해야 합니다.\n\n72시간 packet 범위 59건, 전송 59건, 생략 0건, 잘림 없음. 신규 0건·수정 0건·동일 59건입니다. COMPLETE는 packet 전송 범위만 뜻하며 전체 YouTube 또는 보유·관심종목의 완전한 분석을 뜻하지 않습니다.\n\n새 검증 대상이 없어 이전 영상·주장을 반복하지 않습니다. balanced_external에 따른 KR·US 순위, thesis 신뢰도, 기존 위험 한도 내 비중, 연구 우선순위의 추가 변경은 없습니다. 신규 근거 없이 과거 검증 결과나 ASR 숫자를 현재 근거로 승격하지 않습니다.\n\n허용 액션은 NO_ACTIONABLE_DELTA입니다. 이 packet은 execution_eligible=false이며 시장·계좌·리스크 실행 게이트를 통과시키지 않습니다. 다음 신규 또는 수정 이벤트에서 공식 원자료·증거 ID·발생 및 게시 시각을 확인합니다. 로컬 보고서 발행과 ACK는 외부 전달 영수증이 아니며 Telegram·Pages 전달은 미확인입니다.\n\nCOVERAGE_RECEIPT {\"event_id\": \"youtube:24303a76e4dd3705073924002f25a28e\", \"status\": \"COMPLETE\", \"window_events\": 59, \"transmitted_events\": 59, \"truncated\": false, \"new_events\": 0, \"revised_events\": 0}\n\nMOBILE_HANDOFF {\"owner\": \"external_github_notification_pipeline\", \"status\": \"PENDING_EXTERNAL_VERIFICATION\", \"work_sent_notification\": false}",
+  "report_markdown": "# YouTube 검증 델타 · 2026-10-21\n\n**NO_ACTIONABLE_DELTA — 새 영상·수정 0건. 기존 49건을 중복 제외하여 추가 전략 변화가 없습니다.**\n\n- 소스 정상: 마지막 수집 성공 10월 20일 08:12 KST. 검증 시각 10월 21일 07:35:53 KST, 수집 경과 23.39시간 / 허용 36시간.\n- 72시간 창 49건 중 49건 전송, 생략 0건, 잘림 없음. 신규 0·수정 0·중복 제외 49건. COMPLETE는 패킷 전송 범위이며 모든 주장 검증 완료를 의미하지 않습니다.\n- balanced_external 추가 반영 없음: 새 근거가 없어 KR·US 순위, thesis 확신도, 기존 위험 한도 내 비중, 연구 우선순위를 변경하지 않습니다. 이전 HIGH 근거를 반복 가산하지 않습니다.\n\n최근 24시간의 신규·수정 이벤트가 없으므로 기존 주장을 재검증하거나 관심종목을 새로 만들지 않았습니다. 허용 액션은 NO_ACTIONABLE_DELTA이며 현재 주문 근거로 사용할 수 없습니다. execution_eligible=false를 유지합니다.\n\n소스·범위 시각은 파싱 가능하고 미래·역전이 없으며 현재 36시간/72시간 기준 이내입니다. 범위는 2026-10-18T08:00:01+09:00 ~ 2026-10-20T07:09:09+09:00입니다. 가장 빠른 신선도 경계는 2026-10-21T08:00:01+09:00이며 이후 재검증이 필요합니다.\n\n다음 점검: 새 수집 성공과 신규 video_id/content_sha256 또는 revision이 생기면 공식 원자료·증거 ID를 확인합니다. 누락·만료·실패 소스는 현재 근거에서 제외하며 시장·계좌·위험 실행 관문을 유지합니다.\n\nCOVERAGE_RECEIPT {\"event_id\":\"youtube:41eeefc4855697645f2cfe549b7abec3\",\"status\":\"COMPLETE\",\"window_events\":49,\"transmitted_events\":49,\"truncated\":false,\"new_events\":0,\"revised_events\":0}\n\nMOBILE_HANDOFF {\"owner\":\"external_github_notification_pipeline\",\"status\":\"PENDING_EXTERNAL_VERIFICATION\",\"work_sent_notification\":false}\n\n로컬 보고서의 기록·ACK는 외부 전송 증거가 아닙니다. Telegram·Pages 전달은 외부 영수증 확인 대기입니다.",
   "structured_report": {
+    "schema": "tradingagents.work-report/v1",
     "binding": {
       "surface": "youtube",
-      "event_id": "youtube:24303a76e4dd3705073924002f25a28e",
-      "source_sha256": "a6ef746038e13c06b641b6f760baa81bce6124744e8dbba8eb9a7d624206c054"
+      "event_id": "youtube:41eeefc4855697645f2cfe549b7abec3",
+      "source_sha256": "65bda5a5017c79182c514d9e5ea2b5c6036a638ed859a4e8b092d42181b892c8"
     },
-    "title": "YouTube 검증 델타 · 신규 변경 없음",
-    "generated_at": "2026-10-20T09:32:21.637935+09:00",
-    "as_of": "2026-10-20T09:32:21.637935+09:00",
+    "title": "YouTube 검증 델타: 신규·수정 없음",
+    "generated_at": "2026-10-21T07:35:53.382419+09:00",
+    "as_of": "2026-10-21T07:35:53.382419+09:00",
     "source_health": "OK",
     "report_mode": "NO_ACTIONABLE_DELTA",
-    "summary": [
-      "신규·수정 0건, 동일 이벤트 59건 중복 제외.",
-      "소스 정상; 추가 전략 가중치 변경 없음."
-    ],
+    "summary": "새 영상·수정 0건. 기존 49건을 중복 제외하여 추가 전략 변화가 없습니다.",
     "top_actions": [],
     "strategies": [],
     "coverage_receipt": {
-      "event_id": "youtube:24303a76e4dd3705073924002f25a28e",
+      "event_id": "youtube:41eeefc4855697645f2cfe549b7abec3",
       "status": "COMPLETE",
-      "window_events": 59,
-      "transmitted_events": 59,
+      "window_events": 49,
+      "transmitted_events": 49,
       "truncated": false,
       "new_events": 0,
       "revised_events": 0
@@ -66,19 +64,20 @@
         "stale_after_hours": 36
       },
       "coverage": {
-        "total_unique_events": 386,
-        "window_events": 59,
-        "transmitted_events": 59,
+        "total_unique_events": 372,
+        "window_events": 49,
+        "transmitted_events": 49,
         "truncated": false,
-        "oldest_occurred_at": "2026-10-17T02:00:01+00:00",
+        "oldest_occurred_at": "2026-10-17T23:00:01+00:00",
         "newest_occurred_at": "2026-10-19T22:09:09+00:00"
       },
       "delta": {
         "new_events": 0,
         "revised_events": 0,
-        "unchanged_events": 59,
+        "unchanged_events": 49,
         "delivered_event_keys": []
       },
+      "execution_eligible": false,
       "evidence_policy": {
         "profile": "balanced_external",
         "material_thesis_effects": [
@@ -101,20 +100,18 @@
         "conflicting_signal_must_be_visible": true,
         "may_bypass_market_or_portfolio_execution_gate": false
       },
-      "source_contributions": [],
-      "execution_eligible": false,
-      "freshness_checked_at": "2026-10-20T09:32:21.637935+09:00",
-      "earliest_freshness_boundary": "2026-10-20T02:00:01+00:00",
-      "external_delivery_verified": false,
+      "external_evidence_effect": "새롭거나 수정된 이벤트가 없어 ranking/confidence/position_size_within_existing_risk_limits/research_priority 추가 변화 없음. 기존 HIGH 근거 반복 가산 없음.",
+      "freshness_checked_at": "2026-10-21T07:35:53.382419+09:00",
+      "earliest_freshness_boundary": "2026-10-20T23:00:01+00:00",
       "mobile_handoff": {
         "owner": "external_github_notification_pipeline",
         "status": "PENDING_EXTERNAL_VERIFICATION",
         "work_sent_notification": false
       }
     },
-    "next_checkpoint": "신규·수정 이벤트 또는 신선도 경계 도달 시 로컬 prepare와 원자료 검증"
+    "next_checkpoint": "다음 prepare에서 수집원 신선도와 신규·수정 이벤트를 확인. 만료·누락·실패 시 현재 근거 제외."
   },
-  "report_id": "youtube:d403b891c15cb56856c394dc97d2f171",
-  "report_sha256": "d403b891c15cb56856c394dc97d2f171a8cc6baa5a3c076c4fdc9cbf7d8636d3",
-  "published_at": "2026-10-20T09:32:25.885391+09:00"
+  "report_id": "youtube:87db9e25fa77f6d587a98fd4aaa0823a",
+  "report_sha256": "87db9e25fa77f6d587a98fd4aaa0823a873ef7aced41b96565ed8355dd1e4fff",
+  "published_at": "2026-10-21T07:36:01.688730+09:00"
 }
