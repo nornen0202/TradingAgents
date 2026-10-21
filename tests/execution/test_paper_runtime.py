@@ -23,8 +23,8 @@ def account(at=AT):
             "positions": [], "pending_orders": [], "warnings": []}
 
 
-def source(root, at=AT, *, action="STARTER_NOW"):
-    run = root / "runs/2026/run-fixture"
+def source(root, at=AT, *, action="STARTER_NOW", name="run-fixture"):
+    run = root / "runs/2026" / name
     rows = {"run.json": {"run_id": run.name, "status": "success", "started_at": at.isoformat(), "finished_at": at.isoformat(),
                          "settings": {"market": "KR"}},
             "portfolio-private/account_snapshot.json": account(at),
@@ -78,6 +78,32 @@ def test_real_forward_ticks_queue_fill_restart_and_no_same_signal_twice(tmp_path
     serialized = (state / "kr-status.json").read_text()
     assert "synthetic-private-account" not in serialized
     assert "cash_krw" not in serialized
+
+
+@pytest.mark.parametrize("publication", ["complete", "future", "incomplete"])
+def test_publication_during_account_read_uses_latest_completed_original_evidence(tmp_path, publication):
+    archive, state = tmp_path / "archive", tmp_path / "state"
+    old = source(archive, AT - timedelta(seconds=115))
+    original = {p: p.read_bytes() for p in old.rglob("*.json")}
+    now = [AT]
+    def load_account(_):
+        now[0] += timedelta(seconds=10)
+        newer = source(archive, AT + timedelta(seconds=20 if publication == "future" else 5), name="zz-new-run")
+        if publication == "incomplete":
+            (newer / "decision_bundle_v2.json").unlink()
+        return account(now[0])
+    row = advance_market(archive, state, "kr", now=AT, clock=lambda: now[0],
+        account_loader=load_account, quote_factory=lambda: Quotes(lambda: now[0]), session_resolver=is_open)
+    assert row["broker_orders_sent"] == 0
+    if publication == "complete":
+        assert row["source_run_id"] == "zz-new-run"
+        assert row["source_diagnostics"]["fresh_rows"] == 1
+        assert row["order_counts"]["PENDING"] == 1
+    else:
+        assert row["source_run_id"] == old.name
+        assert row["source_diagnostics"]["fresh_rows"] == 0
+        assert row["order_counts"]["PENDING"] == 0
+    assert all(p.read_bytes() == content for p, content in original.items())
 
 
 @pytest.mark.parametrize("change", ["future", "missing", "naive", "stale", "pending", "incomplete"])

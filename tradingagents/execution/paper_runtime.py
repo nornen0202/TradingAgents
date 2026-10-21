@@ -144,6 +144,10 @@ def advance_market(archive, state, market, *, now=None, clock=None, account_load
         observed = instant(clock())
         if not _account_valid(account, observed):
             return finish("BLOCKED", ("ACCOUNT_NOT_FRESH_COMPLETE_OR_PENDING_ORDERS",), attempted_source_run_id=source.name if source else None)
+        # The producer can publish during the account read. Select against the
+        # current clock before building signals, not the pre-network snapshot.
+        # This does not renew either source's original evidence timestamps.
+        source = _latest_source(archive, market, observed)
         broker = PaperBroker(ledger, limits)
         try:
             scope = hashlib.sha256(str(account.get("account_id", "")).encode()).hexdigest()
