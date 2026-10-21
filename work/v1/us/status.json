@@ -1,9 +1,9 @@
 {
   "schema": "tradingagents.work-context/v1",
   "surface": "us",
-  "event_id": "us:28379ca356128129055250d8861afac2",
-  "source_sha256": "88d773931799850067484bbe459f7cfa19477e4fb9813148a0c42847190077a2",
-  "packet_sha256": "0cd674b8db648f0a86db853d3dec00e31c149b773a33c593cb3efb4f9b240ab1",
+  "event_id": "us:812a43ce9a46a20d7f8a32edbf4f6818",
+  "source_sha256": "92e8c9c757b571be6e2534f4eb62db676daec2d2232e6aa5fe44cb0ed5dd190e",
+  "packet_sha256": "fbe9a4dcd567626e00acb0de405f97915827c2b7f1f98f8994d34978818a1b9c",
   "prompt_contract_version": "market-work-v13-us",
   "prompt_sha256": "281749b3b871d01531e3ceb7377d60bb67ebcaf89d6d8ba3162cb53d38400d7a",
   "skill_sha256": "4dffe28b3721557cc2517b5afff2f94045832606e71ff61461df969f6abb53c7",
@@ -11,22 +11,22 @@
   "workflow_contract_sha256": "8d06ba979f55f01229636b73bdc643c5b21f326cc270c0e8143f3fd7a3204028",
   "status_url": "https://nornen0202.github.io/TradingAgents/work/v1/us/status.json",
   "latest_url": "https://nornen0202.github.io/TradingAgents/work/v1/us/latest.json",
-  "event_url": "https://nornen0202.github.io/TradingAgents/work/v1/us/events/us-28379ca356128129055250d8861afac2.json",
+  "event_url": "https://nornen0202.github.io/TradingAgents/work/v1/us/events/us-812a43ce9a46a20d7f8a32edbf4f6818.json",
   "prompt_url": "https://nornen0202.github.io/TradingAgents/work/v1/prompts/market_us.md",
   "source_health": "OK",
   "report_mode": "CONDITIONAL",
   "freshness_receipt": {
     "schema": "tradingagents.source-freshness/v1",
-    "producer_run_id": "20261021T231435_pre-report-us-overlay",
-    "producer_started_at": "2026-10-21T23:14:35.511586+09:00",
-    "producer_finished_at": "2026-10-21T23:16:56.465753+09:00",
+    "producer_run_id": "20261021T234511_local-freshness-us-overlay",
+    "producer_started_at": "2026-10-21T23:45:11.407617+09:00",
+    "producer_finished_at": "2026-10-21T23:49:49.303060+09:00",
     "analysis_run_id": "20261021T175015_local-scheduler-us-full",
     "analysis_lineage_status": "RESOLVED",
     "analysis_completed_at": "2026-10-21T21:13:33.227411+09:00",
     "analysis_trade_date_oldest": "2026-10-20",
     "analysis_trade_date_latest": "2026-10-20",
-    "market_data_oldest_at": "2026-10-21T10:16:00-04:00",
-    "market_data_latest_at": "2026-10-21T10:16:00-04:00",
+    "market_data_oldest_at": "2026-10-21T10:48:00-04:00",
+    "market_data_latest_at": "2026-10-21T10:48:00-04:00",
     "market_data_status": "FRESH",
     "publication_does_not_refresh_inputs": true,
     "execution_max_age_seconds": 600.0,
@@ -40,6 +40,12 @@
       },
       {
         "ticker": "DELL",
+        "research_valid": true,
+        "category": "FRESH_REGULAR_SESSION",
+        "execution_eligible": false
+      },
+      {
+        "ticker": "GOOGL",
         "research_valid": true,
         "category": "FRESH_REGULAR_SESSION",
         "execution_eligible": false
@@ -111,12 +117,6 @@
         "execution_eligible": false
       },
       {
-        "ticker": "AMT",
-        "research_valid": true,
-        "category": "FRESH_REGULAR_SESSION",
-        "execution_eligible": false
-      },
-      {
         "ticker": "COST",
         "research_valid": true,
         "category": "FRESH_REGULAR_SESSION",
@@ -136,18 +136,6 @@
       },
       {
         "ticker": "BRK-B",
-        "research_valid": true,
-        "category": "FRESH_REGULAR_SESSION",
-        "execution_eligible": false
-      },
-      {
-        "ticker": "SCCO",
-        "research_valid": true,
-        "category": "FRESH_REGULAR_SESSION",
-        "execution_eligible": false
-      },
-      {
-        "ticker": "TXN",
         "research_valid": true,
         "category": "FRESH_REGULAR_SESSION",
         "execution_eligible": false
@@ -177,18 +165,6 @@
         "execution_eligible": false
       },
       {
-        "ticker": "RSP",
-        "research_valid": true,
-        "category": "FRESH_REGULAR_SESSION",
-        "execution_eligible": false
-      },
-      {
-        "ticker": "GOOGL",
-        "research_valid": true,
-        "category": "FRESH_REGULAR_SESSION",
-        "execution_eligible": false
-      },
-      {
         "ticker": "ETN",
         "research_valid": true,
         "category": "FRESH_REGULAR_SESSION",
@@ -201,13 +177,37 @@
         "execution_eligible": false
       },
       {
+        "ticker": "RSP",
+        "research_valid": true,
+        "category": "FRESH_REGULAR_SESSION",
+        "execution_eligible": false
+      },
+      {
         "ticker": "MDT",
         "research_valid": true,
         "category": "FRESH_REGULAR_SESSION",
         "execution_eligible": false
       },
       {
+        "ticker": "TXN",
+        "research_valid": true,
+        "category": "FRESH_REGULAR_SESSION",
+        "execution_eligible": false
+      },
+      {
+        "ticker": "AMT",
+        "research_valid": true,
+        "category": "FRESH_REGULAR_SESSION",
+        "execution_eligible": false
+      },
+      {
         "ticker": "PM",
+        "research_valid": true,
+        "category": "FRESH_REGULAR_SESSION",
+        "execution_eligible": false
+      },
+      {
+        "ticker": "SCCO",
         "research_valid": true,
         "category": "FRESH_REGULAR_SESSION",
         "execution_eligible": false
