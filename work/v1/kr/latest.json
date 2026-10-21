@@ -1,13 +1,13 @@
 {
   "schema": "tradingagents.work-context/v1",
   "surface": "kr",
-  "event_id": "kr:37986083537aa063f3751c46f03ef516",
+  "event_id": "kr:87e46a119694747b7610d523e00bb00d",
   "prompt_contract_version": "market-work-v12-kr",
   "prompt_sha256": "a72e95420df2bdbf27008d2fc88ea82b9aa78c1222a888149cb844d5f0402a46",
   "skill_sha256": "4dffe28b3721557cc2517b5afff2f94045832606e71ff61461df969f6abb53c7",
   "task_manifest_sha256": "c0992fa275c9961bc91c679030c0b4d9b8b06f3d164226776421f1e354b5c22e",
   "workflow_contract_sha256": "97fde7add4383c59c23330c927f073c5c281e98221519d9aeab3615f11917f8a",
-  "source_sha256": "d7629d3ce04f005b588c92296f57895b230c199c4f7434b63e8ef30dd4fd917f",
+  "source_sha256": "92e65fdb3e5a914ea3b682d633090f74278e744afe3377f12e72e223e13cc392",
   "body": {
     "kind": "market",
     "market": "KR",
@@ -2621,12 +2621,12 @@
         "source_health": "OK",
         "coverage": {
           "total_unique_events": 204,
-          "window_events": 7,
-          "transmitted_events": 7,
+          "window_events": 6,
+          "transmitted_events": 6,
           "truncated": false,
-          "oldest_occurred_at": "2026-10-20T19:47:27+00:00",
+          "oldest_occurred_at": "2026-10-20T20:31:28+00:00",
           "newest_occurred_at": "2026-10-20T20:57:26+00:00",
-          "available_events_before_context_cap": 7,
+          "available_events_before_context_cap": 6,
           "context_event_cap": 20,
           "omitted_events": 0,
           "omitted_due_to_context_cap": 0,
@@ -2770,29 +2770,6 @@
               "simulation_only": true,
               "actionability": "research_only"
             }
-          },
-          {
-            "event_key": "stock_ai_agent:16404",
-            "content_sha256": "ec8176d8e60687b269eea3c6091412ee4b18e2465f42230835225fea4665f104",
-            "occurred_at": "2026-10-20T19:47:27+00:00",
-            "relevance": {
-              "tickers": [],
-              "markets": [],
-              "themes": [],
-              "match_basis": "message_context",
-              "matched_tickers": [],
-              "market_match": false,
-              "score": 0
-            },
-            "summary": {
-              "message_id": "16404",
-              "posted_at": "2026-10-20T19:47:27+00:00",
-              "source_url": "https://t.me/stock_ai_agent/16404",
-              "preview": "📌 BTC 데모 첫 진입 체결 · 롱 🕐 10/21 04:46:23 KST 🧾 이번 체결: 0.025 BTC · 82,561.00 USDT • 체결금액(명목): 2,064.03 USDT · 증거금 아님 📦 전체 포지션 • 누적 보유 0 BTC → 0.025 BTC · 관측 기준 • 평단 82,561.00 USDT 💰 계좌 순자산: 9,420.23 USDT • 총 증거금 207.49 US...",
-              "signals": [],
-              "simulation_only": true,
-              "actionability": "research_only"
-            }
           }
         ],
         "execution_eligible": false
@@ -2838,17 +2815,16 @@
               "stock_ai_agent:16408",
               "stock_ai_agent:16407",
               "stock_ai_agent:16406",
-              "stock_ai_agent:16405",
-              "stock_ai_agent:16404"
+              "stock_ai_agent:16405"
             ],
             "coverage": {
               "total_unique_events": 204,
-              "window_events": 7,
-              "transmitted_events": 7,
+              "window_events": 6,
+              "transmitted_events": 6,
               "truncated": false,
-              "oldest_occurred_at": "2026-10-20T19:47:27+00:00",
+              "oldest_occurred_at": "2026-10-20T20:31:28+00:00",
               "newest_occurred_at": "2026-10-20T20:57:26+00:00",
-              "available_events_before_context_cap": 7,
+              "available_events_before_context_cap": 6,
               "context_event_cap": 20,
               "omitted_events": 0,
               "omitted_due_to_context_cap": 0,
