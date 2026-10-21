@@ -74,6 +74,7 @@ def wired(tmp_path, monkeypatch):
 
     def execute(config, **kw):
         assert kw["paper_state_dir"] == tmp_path
+        assert kw["defer_execution_handoff"] is True
         print("Broker collection progress")
         configs.append(config)
         return {"run_id": "refreshed", "status": "success"}
@@ -86,6 +87,7 @@ def wired(tmp_path, monkeypatch):
         return item
 
     monkeypatch.setattr(pre, "execute_scheduled_run", execute)
+    monkeypatch.setattr(pre, "handoff_completed_run", lambda *a, **kw: None)
     monkeypatch.setattr(pre, "build_surface_packet", current_packet)
     return runtime, prepared, configs
 
@@ -105,8 +107,42 @@ def test_refresh_before_prepare_preserves_models_and_does_not_rerun_research(wir
     assert config.llm.deep_model == config.llm.judge_model == "gpt-6.1-sol"
     assert config.llm.codex_deep_reasoning_effort == config.llm.codex_judge_reasoning_effort == "xhigh"
     assert config.execution.execution_session_gate_enabled
+    assert config.execution.execution_lightweight_refresh is True
+    assert config.execution.execution_max_data_age_seconds == 120
+    assert config.execution.execution_llm_summary_model is None
     assert not config.execution.execution_selective_rerun_enabled
     assert len(config.execution.execution_refresh_checkpoints_local) == 1
+    assert prepared[0]["expected_producer_run_id"] == "refreshed"
+    assert prepared[0]["refresh_started_at"].utcoffset() is not None
+
+
+def test_writer_lock_only_covers_collection_not_packet_build_or_event_prepare(wired, tmp_path, monkeypatch):
+    runtime, prepared, configs = wired
+    execute, build, prepare = pre.execute_scheduled_run, pre.build_surface_packet, runtime.prepare
+    phases = []
+    def collect(*args, **kwargs):
+        with pytest.raises(TimeoutError), interprocess_file_lock(tmp_path / "run-due.lock", timeout=0):
+            pytest.fail("another producer must not enter during collection")
+        phases.append("collection_locked")
+        return execute(*args, **kwargs)
+    def build_packet(*args, **kwargs):
+        with interprocess_file_lock(tmp_path / "run-due.lock", timeout=0):
+            phases.append("packet_read_unlocked")
+        return build(*args, **kwargs)
+    def consume(*args, **kwargs):
+        with interprocess_file_lock(tmp_path / "run-due.lock", timeout=0):
+            phases.append("consumer_handoff_unlocked")
+    def allocate(*args, **kwargs):
+        with interprocess_file_lock(tmp_path / "run-due.lock", timeout=0):
+            phases.append("event_prepare_unlocked")
+        return prepare(*args, **kwargs)
+    monkeypatch.setattr(pre, "execute_scheduled_run", collect)
+    monkeypatch.setattr(pre, "handoff_completed_run", consume)
+    monkeypatch.setattr(pre, "build_surface_packet", build_packet)
+    runtime.prepare = allocate
+    result = pre.prepare_market_report(runtime, "us", producer_state_dir=tmp_path)
+    assert result["result"] == "NEW"
+    assert phases == ["collection_locked", "consumer_handoff_unlocked", "packet_read_unlocked", "event_prepare_unlocked"]
 
 
 def test_busy_producer_does_not_start_or_allocate_event(wired, tmp_path):

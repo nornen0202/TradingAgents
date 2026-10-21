@@ -176,7 +176,8 @@ def test_immediate_handoff_consumes_original_signal_once_and_expiry_stays_strict
     assert result["consumers"]["kis_strategy"]["status"] == "EXISTING_CONSUMER_RUNNING"
 
 
-def test_runner_finishes_slow_news_before_price_and_hands_off_only_published_run(tmp_path, monkeypatch):
+@pytest.mark.parametrize("defer_handoff", [False, True])
+def test_runner_finishes_slow_news_before_price_and_hands_off_only_published_run(tmp_path, monkeypatch, defer_handoff):
     from tradingagents.scheduled import runner
     from tradingagents.scheduled.config import load_scheduled_config
     from tests.test_scheduled_run_mode import _fake_overlay_updates
@@ -217,5 +218,9 @@ def test_runner_finishes_slow_news_before_price_and_hands_off_only_published_run
         assert datetime.fromisoformat(manifest["finished_at"]) == clock[0]
     monkeypatch.setattr(delivery, "handoff_completed_run", handoff)
     monkeypatch.setattr(runner, "build_site", lambda *a, **k: events.append("site"))
-    runner.execute_scheduled_run(load_scheduled_config(config_file), run_label="delivery-test")
-    assert events == ["news", "prices", "cached_delta", "handoff", "site"]
+    manifest = runner.execute_scheduled_run(load_scheduled_config(config_file), run_label="delivery-test",
+        defer_execution_handoff=defer_handoff)
+    assert events == ["news", "prices", "cached_delta"] + ([] if defer_handoff else ["handoff"]) + ["site"]
+    if defer_handoff:
+        delivery.handoff_completed_run(tmp_path, manifest)
+        assert events[-1] == "handoff"

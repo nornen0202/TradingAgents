@@ -1,7 +1,8 @@
 """Source clocks for Work consumers. Publication never renews input data."""
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, timedelta
+import math
 from typing import Any
 
 from tradingagents.dataflows.market_policy import (
@@ -10,18 +11,35 @@ from tradingagents.dataflows.market_policy import (
 )
 
 
+def source_execution_max_age(manifest: dict[str, Any]) -> timedelta:
+    """A report may tighten, but never extend, the producer's observation age."""
+    settings = manifest.get("settings") or {}
+    if "execution_max_data_age_seconds" not in settings:
+        return MAX_EXECUTION_AGE  # Legacy manifests use the shared policy.
+    value = settings["execution_max_data_age_seconds"]
+    if isinstance(value, bool):
+        return timedelta(0)
+    try:
+        seconds = float(value)
+    except (TypeError, ValueError, OverflowError):
+        return timedelta(0)
+    if not math.isfinite(seconds) or seconds <= 0:
+        return timedelta(0)
+    return timedelta(seconds=min(seconds, MAX_EXECUTION_AGE.total_seconds()))
+
 
 def source_freshness_receipt(
     manifest: dict[str, Any], bundle: dict[str, Any], *, now: datetime,
     analysis_manifest: dict[str, Any], public: bool,
 ) -> dict[str, Any]:
     rows = [row for row in bundle.get("strategy_table", []) if isinstance(row, dict)]
+    max_age = source_execution_max_age(manifest)
     clocks = [observation_status(row.get("market_data_asof"), as_of=now) for row in rows]
     observations = [aware_datetime(row.get("market_data_asof")) for row in rows]
     valid = [value for value in observations if value is not None and value <= now]
     invalid = sum(clock["status"] in {"MISSING", "INVALID"} for clock in clocks)
     future = sum(clock["status"] == "FUTURE" for clock in clocks)
-    expired = sum(value + MAX_EXECUTION_AGE <= now for value in valid)
+    expired = sum(value + max_age <= now for value in valid)
     state = "MISSING" if not rows or invalid else "INVALID" if future else "STALE" if expired else "FRESH"
     summaries = [item for item in analysis_manifest.get("tickers", []) if isinstance(item, dict)]
     dates = sorted({str(item["trade_date"]) for item in summaries if item.get("trade_date")})
@@ -53,7 +71,7 @@ def source_freshness_receipt(
         "market_data_latest_at": max(valid).isoformat() if valid else None,
         "market_data_status": state,
         "publication_does_not_refresh_inputs": True,
-        "execution_max_age_seconds": MAX_EXECUTION_AGE.total_seconds(),
+        "execution_max_age_seconds": max_age.total_seconds(),
         "research_market_data_status": "VALID" if rows and research_valid == len(rows) else "PARTIAL" if research_valid else "UNVERIFIED",
         "research_market_data_receipts": research_receipts,
         "research_calendar_verified": calendar["verified_session"],

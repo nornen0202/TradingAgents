@@ -17,6 +17,7 @@ from tradingagents.scheduled.automation_calendar import automated_market_session
 from tradingagents.scheduled.market_calendar import market_session_state
 from tradingagents.scheduled.runner import execute_scheduled_run
 from tradingagents.dataflows.market_policy import MAX_EXECUTION_AGE, observation_status
+from tradingagents.execution.delivery import handoff_completed_run
 
 from .freshness import aware_datetime
 from .packet import build_surface_packet, resolve_archive_roots
@@ -107,7 +108,7 @@ def prepare_market_report(runtime, surface: str, *, producer_state_dir: Path,
         atomic_write_json(receipt_path, receipt)
         return dict(receipt)
 
-    # Same lock as the five-minute production lane. Never start a competing
+    # Same lock as the minute production lane. Never start a competing
     # writer, kill a healthy worker, or allocate/acknowledge a Work event on BUSY.
     try:
         config = load_scheduled_config(ROOT / "config" / (
@@ -137,6 +138,8 @@ def prepare_market_report(runtime, surface: str, *, producer_state_dir: Path,
                 run=replace(config.run, run_mode="overlay_only"),
                 storage=replace(config.storage, archive_dir=archive),
                 execution=replace(config.execution, execution_refresh_enabled=True,
+                    execution_lightweight_refresh=True, execution_max_data_age_seconds=120,
+                    execution_llm_summary_model=None,
                     execution_refresh_checkpoints_kst=(), execution_refresh_checkpoints_local=(checkpoint,),
                     execution_session_gate_enabled=True, execution_selective_rerun_enabled=False),
             )
@@ -146,30 +149,36 @@ def prepare_market_report(runtime, surface: str, *, producer_state_dir: Path,
             with (receipt_path.parent / f"{surface}-worker.log").open("a", encoding="utf-8") as log:
                 with redirect_stdout(log), redirect_stderr(log):
                     manifest = execute_scheduled_run(config, run_label=f"pre-report-{surface}-overlay",
-                                                     skip_site_build=True, paper_state_dir=state)
-            now = datetime.now(timezone.utc)
-            packet = build_surface_packet(surface, archive_dir=archive,
-                youtube_archive_dir=youtube_archive_dir, prism_archive_dir=prism_archive_dir, now=now)
-            blockers = freshness_blockers(packet, now=now, started_at=started, run_id=manifest.get("run_id"))
-            session = market_session_state(market=surface.upper(), now_local=now,
-                                           calendar_name=config.execution.execution_session_calendar)
-            if not session.get("is_open"):
-                blockers.append("SESSION_ENDED_DURING_REFRESH")
-            if manifest.get("status") != "success":
-                blockers.append("REFRESH_NOT_SUCCESSFUL")
-            clocks = (packet.get("body", {}).get("current", {}).get("freshness_receipt") or {})
-            safe_clocks = {key: clocks.get(key) for key in (
-                "producer_run_id", "analysis_run_id", "market_data_oldest_at", "market_data_latest_at",
-                "market_data_status", "account_as_of", "account_snapshot_health")}
-            if blockers:
-                return finish(status="FRESH_INPUT_UNAVAILABLE", blockers=blockers, observations=safe_clocks)
-            # Keep the producer lock through prepare so another overlay cannot
-            # replace the verified source between validation and packet sealing.
-            result = runtime.prepare(surface, archive_dir=archive,
-                youtube_archive_dir=youtube_archive_dir, prism_archive_dir=prism_archive_dir, fresh_report=True)
-            saved = finish(status="REFRESHED", observations=safe_clocks,
-                           event_created=result.get("result") in {"NEW", "RESUME"})
-            return {**result, "pre_report_refresh": saved}
+                        skip_site_build=True, paper_state_dir=state, defer_execution_handoff=True)
+        # Completed producer artifacts are immutable. Release writer ownership
+        # before the expensive read-only packet builds and Work state lock.
+        # Runtime.prepare checks the exact run and clocks again before allocation.
+        # Inline consumers may wait on broker/account locks. Keep their normal
+        # guarded handoff, but never hold the producer lock while they finish.
+        handoff_completed_run(archive, manifest, state_root=state)
+        now = datetime.now(timezone.utc)
+        packet = build_surface_packet(surface, archive_dir=archive,
+            youtube_archive_dir=youtube_archive_dir, prism_archive_dir=prism_archive_dir, now=now)
+        now = datetime.now(timezone.utc)
+        blockers = freshness_blockers(packet, now=now, started_at=started, run_id=manifest.get("run_id"))
+        session = market_session_state(market=surface.upper(), now_local=now,
+                                       calendar_name=config.execution.execution_session_calendar)
+        if not session.get("is_open"):
+            blockers.append("SESSION_ENDED_DURING_REFRESH")
+        if manifest.get("status") != "success":
+            blockers.append("REFRESH_NOT_SUCCESSFUL")
+        clocks = (packet.get("body", {}).get("current", {}).get("freshness_receipt") or {})
+        safe_clocks = {key: clocks.get(key) for key in (
+            "producer_run_id", "analysis_run_id", "market_data_oldest_at", "market_data_latest_at",
+            "market_data_status", "account_as_of", "account_snapshot_health")}
+        if blockers:
+            return finish(status="FRESH_INPUT_UNAVAILABLE", blockers=blockers, observations=safe_clocks)
+        result = runtime.prepare(surface, archive_dir=archive,
+            youtube_archive_dir=youtube_archive_dir, prism_archive_dir=prism_archive_dir, fresh_report=True,
+            expected_producer_run_id=manifest.get("run_id"), refresh_started_at=started)
+        saved = finish(status="REFRESHED", observations=safe_clocks,
+                       event_created=result.get("result") in {"NEW", "RESUME"})
+        return {**result, "pre_report_refresh": saved}
     except ProducerBusy:
         return finish(status="BUSY_NO_STATE_ADVANCE", blockers=["PRODUCER_ALREADY_RUNNING"])
     except Exception as exc:
