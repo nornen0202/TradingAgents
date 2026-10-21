@@ -350,7 +350,7 @@ if($env:TA_INTERVAL -ne '5'){$options.PollIntervalMinutes=[int]$env:TA_INTERVAL}
             f'//B //Nologo "{install / HIDDEN_LAUNCHER.name}" "{install / WRAPPER.name}" '
             f'-Command {command} -RepositoryRoot "{repo}" -ArchiveRoot "{archive}"')
         assert action['name'] == f'LocalAutomation-{command}'
-        assert action['multiple'] == 'IgnoreNew'
+        assert action['multiple'] == ('Queue' if command == 'run-due' else 'IgnoreNew')
         assert action['limit'] == 'PT13H'
         timer, logon, *critical = action['triggers']
         assert timer['type'] == 'MSFT_TaskTimeTrigger'

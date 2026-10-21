@@ -10,24 +10,6 @@ import pytest
 
 
 @pytest.mark.skipif(not shutil.which("powershell.exe"), reason="Windows PowerShell required")
-def test_installer_settings_queue_only_producer(tmp_path):
-    installer = (Path(__file__).parents[1] / "tools/install_local_automation.ps1").read_text()
-    # Evaluate only the settings builder. Never run installer registration,
-    # even with mocks: importing ScheduledTasks can replace mock functions.
-    settings = "        $multipleInstances =" + installer.split("        $multipleInstances =", 1)[1].split("        Register-ScheduledTask", 1)[0]
-    probe = tmp_path / "settings-probe.ps1"
-    probe.write_text("$ErrorActionPreference='Stop'\nforeach ($command in @('run-due','publish')) {\n"
-        + settings + "\n@{name=$command;policy=[int]$settings.MultipleInstances;"
-        "hidden=$settings.Hidden} | ConvertTo-Json -Compress\n}\n")
-    result = subprocess.run(["powershell.exe", "-NoProfile", "-NonInteractive", "-File", str(probe)],
-                            capture_output=True, text=True, timeout=30)
-    assert result.returncode == 0, result.stderr
-    rows = {row["name"]: row for row in map(json.loads, result.stdout.splitlines())}
-    assert rows == {"run-due": {"name": "run-due", "policy": 1, "hidden": True},
-                    "publish": {"name": "publish", "policy": 2, "hidden": True}}
-
-
-@pytest.mark.skipif(not shutil.which("powershell.exe"), reason="Windows PowerShell required")
 @pytest.mark.parametrize("case", ["fresh", "expired", "future", "invalid", "changed", "missing_ref", "fetch_failed"])
 def test_shared_source_fetch_receipt_is_bounded_and_fails_closed(tmp_path, case):
     wrapper = (Path(__file__).parents[1] / "tools/run_local_automation.ps1").read_text()
