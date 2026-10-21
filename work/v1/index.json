@@ -238,9 +238,9 @@
     "us": {
       "schema": "tradingagents.work-context/v1",
       "surface": "us",
-      "event_id": "us:48eb48370c7f53c8e275e91033908bad",
-      "source_sha256": "85542f4cd8c72e31816d0c11c3fe5ca12e69894ffdd35eeea4edf0379aab0de4",
-      "packet_sha256": "f0a73be78cb8bbfa8ff8a988ea6399e3a10595abc05bed421dec9e6cd47b4cb9",
+      "event_id": "us:ae0a526124dd22e0143c0d377184404b",
+      "source_sha256": "990280664d97a2242d68fc31285ef4a9d318fafdba1db0d8a11857e1cf656f15",
+      "packet_sha256": "a1e13b7c3a058540b96b631cde1ca937cc244e4093592f772d5aaf8ef51bf983",
       "prompt_contract_version": "market-work-v13-us",
       "prompt_sha256": "281749b3b871d01531e3ceb7377d60bb67ebcaf89d6d8ba3162cb53d38400d7a",
       "skill_sha256": "4dffe28b3721557cc2517b5afff2f94045832606e71ff61461df969f6abb53c7",
@@ -248,22 +248,22 @@
       "workflow_contract_sha256": "8d06ba979f55f01229636b73bdc643c5b21f326cc270c0e8143f3fd7a3204028",
       "status_url": "https://nornen0202.github.io/TradingAgents/work/v1/us/status.json",
       "latest_url": "https://nornen0202.github.io/TradingAgents/work/v1/us/latest.json",
-      "event_url": "https://nornen0202.github.io/TradingAgents/work/v1/us/events/us-48eb48370c7f53c8e275e91033908bad.json",
+      "event_url": "https://nornen0202.github.io/TradingAgents/work/v1/us/events/us-ae0a526124dd22e0143c0d377184404b.json",
       "prompt_url": "https://nornen0202.github.io/TradingAgents/work/v1/prompts/market_us.md",
       "source_health": "OK",
       "report_mode": "CONDITIONAL",
       "freshness_receipt": {
         "schema": "tradingagents.source-freshness/v1",
-        "producer_run_id": "20261021T224509_local-freshness-us-overlay",
-        "producer_started_at": "2026-10-21T22:45:09.619574+09:00",
-        "producer_finished_at": "2026-10-21T22:48:16.495760+09:00",
+        "producer_run_id": "20261021T230057_local-scheduler-us-overlay_only",
+        "producer_started_at": "2026-10-21T23:00:57.248794+09:00",
+        "producer_finished_at": "2026-10-21T23:03:58.796356+09:00",
         "analysis_run_id": "20261021T175015_local-scheduler-us-full",
         "analysis_lineage_status": "RESOLVED",
         "analysis_completed_at": "2026-10-21T21:13:33.227411+09:00",
         "analysis_trade_date_oldest": "2026-10-20",
         "analysis_trade_date_latest": "2026-10-20",
-        "market_data_oldest_at": "2026-10-21T09:47:00-04:00",
-        "market_data_latest_at": "2026-10-21T09:47:00-04:00",
+        "market_data_oldest_at": "2026-10-21T10:03:00-04:00",
+        "market_data_latest_at": "2026-10-21T10:03:00-04:00",
         "market_data_status": "FRESH",
         "publication_does_not_refresh_inputs": true,
         "execution_max_age_seconds": 600.0,
@@ -288,6 +288,12 @@
             "execution_eligible": false
           },
           {
+            "ticker": "AMZN",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
+            "execution_eligible": false
+          },
+          {
             "ticker": "GLDM",
             "research_valid": true,
             "category": "FRESH_REGULAR_SESSION",
@@ -301,18 +307,6 @@
           },
           {
             "ticker": "AAPL",
-            "research_valid": true,
-            "category": "FRESH_REGULAR_SESSION",
-            "execution_eligible": false
-          },
-          {
-            "ticker": "TSM",
-            "research_valid": true,
-            "category": "FRESH_REGULAR_SESSION",
-            "execution_eligible": false
-          },
-          {
-            "ticker": "AMZN",
             "research_valid": true,
             "category": "FRESH_REGULAR_SESSION",
             "execution_eligible": false
@@ -354,12 +348,6 @@
             "execution_eligible": false
           },
           {
-            "ticker": "PG",
-            "research_valid": true,
-            "category": "FRESH_REGULAR_SESSION",
-            "execution_eligible": false
-          },
-          {
             "ticker": "AMT",
             "research_valid": true,
             "category": "FRESH_REGULAR_SESSION",
@@ -367,12 +355,6 @@
           },
           {
             "ticker": "COST",
-            "research_valid": true,
-            "category": "FRESH_REGULAR_SESSION",
-            "execution_eligible": false
-          },
-          {
-            "ticker": "MDT",
             "research_valid": true,
             "category": "FRESH_REGULAR_SESSION",
             "execution_eligible": false
@@ -391,6 +373,12 @@
           },
           {
             "ticker": "BRK-B",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "SCCO",
             "research_valid": true,
             "category": "FRESH_REGULAR_SESSION",
             "execution_eligible": false
@@ -420,6 +408,18 @@
             "execution_eligible": false
           },
           {
+            "ticker": "TSM",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "RSP",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
+            "execution_eligible": false
+          },
+          {
             "ticker": "AVGO",
             "research_valid": true,
             "category": "FRESH_REGULAR_SESSION",
@@ -432,19 +432,19 @@
             "execution_eligible": false
           },
           {
-            "ticker": "RSP",
+            "ticker": "MDT",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "PG",
             "research_valid": true,
             "category": "FRESH_REGULAR_SESSION",
             "execution_eligible": false
           },
           {
             "ticker": "PM",
-            "research_valid": true,
-            "category": "FRESH_REGULAR_SESSION",
-            "execution_eligible": false
-          },
-          {
-            "ticker": "SCCO",
             "research_valid": true,
             "category": "FRESH_REGULAR_SESSION",
             "execution_eligible": false
