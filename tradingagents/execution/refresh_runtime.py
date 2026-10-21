@@ -13,27 +13,9 @@ from tradingagents.charting.bars import instant
 from tradingagents.execution.paper_runtime import _latest_source, _read, _runtime_session
 
 
-REFRESH_AFTER_SECONDS = 60
 ATTEMPT_INTERVAL_SECONDS = 60
 FAILURE_RETRY_SECONDS = 300
 MAX_CONSECUTIVE_FAILURES = 3
-
-
-def _source_observations_fresh(bundle, now):
-    """Publication cannot make an old or unverifiable observation fresh."""
-    if not isinstance(bundle, dict):
-        return False
-    generated = instant(bundle.get("generated_at"))
-    if generated is None or not 0 <= (now - generated).total_seconds() < REFRESH_AFTER_SECONDS:
-        return False
-    rows = bundle.get("strategy_table")
-    if not isinstance(rows, list) or not rows:
-        return False
-    for row in rows:
-        observed = instant(row.get("market_data_asof")) if isinstance(row, dict) else None
-        if observed is None or not 0 <= (now - observed).total_seconds() < REFRESH_AFTER_SECONDS:
-            return False
-    return True
 
 
 def execution_refresh_enabled(state):
@@ -62,9 +44,10 @@ def refresh_due(archive, state, *, now, dry_run=False, clock=None, executor=None
         if not session_resolver(market=market, now_local=now).get("is_open"):
             continue
         source = _latest_source(archive, market, now)
-        bundle = _read(source / "decision_bundle_v2.json", {}) if source else {}
-        if _source_observations_fresh(bundle, now):
-            continue
+        # Collect once per minute even when the previous observation is still
+        # valid. Skipping a 59-second-old source adds another polling interval
+        # AND collection latency, leaving a gap in the 120-second consumer TTL.
+        # Only the attempt receipt controls cadence; source clocks are unchanged.
         path = state / "execution-refresh" / f"{market}.json"
         prior = _read(path, {})
         started = instant(prior.get("started_at"))
@@ -73,7 +56,7 @@ def refresh_due(archive, state, *, now, dry_run=False, clock=None, executor=None
         target = f"execution-freshness-{market}"
         # Windows launches drift by fractions of a second. Allow one successful
         # refresh per minute UTC slot; failed/in-flight attempts retain the
-        # full elapsed cooldown. The source-age gate above still applies.
+        # full elapsed cooldown.
         next_success_slot = (started is not None and prior.get("status") == "COMPLETED"
             and int(now.timestamp()) // ATTEMPT_INTERVAL_SECONDS
             > int(started.timestamp()) // ATTEMPT_INTERVAL_SECONDS)

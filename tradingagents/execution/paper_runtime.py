@@ -159,45 +159,61 @@ def advance_market(archive, state, market, *, now=None, clock=None, account_load
                 return finish("BLOCKED", ("PAPER_ACCOUNT_IDENTITY_CHANGED",))
             # Import is local; the adapter never sends orders or fetches data.
             from tradingagents.execution.archive_paper import build_step
-            step = {"signals": []}
-            bundle_at = None
+            for selection_attempt in range(2):
+                result["blockers"] = []
+                step = {"signals": []}
+                bundle_at = None
+                if source is not None:
+                    source_account, step, selected = build_step(source, observed.isoformat(), limits)
+                    if selected != market:
+                        return finish("BLOCKED", ("SOURCE_MARKET_MISMATCH",))
+                    if (not source_account.get("account_id")
+                            or hashlib.sha256(str(source_account["account_id"]).encode()).hexdigest() != scope):
+                        return finish("BLOCKED", ("SOURCE_ACCOUNT_IDENTITY_MISMATCH",))
+                    bundle_at = instant(_read(source / "decision_bundle_v2.json").get("generated_at"))
+                if bundle_at is None or not 0 <= (observed - bundle_at).total_seconds() < 600:
+                    # Positions still get a genuine new valuation; expired proposals
+                    # never become new orders merely because quotes were refreshed.
+                    step["signals"] = []
+                    result["blockers"].append("SOURCE_EXECUTION_EXPIRED" if source else "NO_RECENT_COMPLETED_SOURCE")
+                if market == "us":
+                    # build_step deliberately sizes only KR. For USD simulation use
+                    # the new independently observed reference rate, with the same
+                    # explicit proposal budgets and unchanged engine limits.
+                    result["fx_basis"] = "BROKER_REFERENCE_RATE; valuation only, no FX trades"
+                    result["simulation_basis"] = "KRW_CASH_SHADOW: cash remains in seed KRW; USD positions revalued at observed broker reference FX; not an exact USD account mirror"
+                held = {r[0] for r in broker.db.execute("SELECT ticker FROM positions WHERE qty>0")}
+                pending = {r[0] for r in broker.db.execute("SELECT ticker FROM orders WHERE status='PENDING'")}
+                tickers = held | pending | {s["ticker"] for s in step["signals"]}
+                provider = (quote_factory or ReadOnlyPaperQuotes)()
+                try:
+                    quotes, quote_blockers = provider.fetch(tickers, market=market,
+                        fx_quote=(account.get("cash_diagnostics") or {}).get("fx_quote"))
+                    result["quote_diagnostics"] = getattr(provider, "diagnostics", {})
+                finally:
+                    provider.close()
+                read_session = session_resolver(market=market, now_local=instant(clock()))
+                at = instant(clock())
+                # A response acquired after the market close cannot open new orders.
+                # Calendar verification may itself perform a read. Use its
+                # completion clock for source selection and the declared close.
+                session_close = instant(read_session.get("session_close"))
+                if not read_session.get("is_open") or (session_close is not None and at >= session_close):
+                    broker.expire_pending(now=at.astimezone(ZoneInfo("Asia/Seoul" if market == "kr" else "America/New_York")).isoformat())
+                    return finish("MARKET_CLOSED", ("SESSION_ENDED_DURING_READ",), **_summary(broker))
+                if not _account_valid(account, at):
+                    return finish("BLOCKED", ("ACCOUNT_EXPIRED_DURING_READ",), **_summary(broker))
+                latest = _latest_source(archive, market, at)
+                if selection_attempt == 0 and latest is not None and latest != source:
+                    # Publication can also happen during quote reads. Rebuild
+                    # the whole step and fetch its complete ticker set once;
+                    # never attach a new source ID to old signals or prices.
+                    source, observed = latest, at
+                    continue
+                break
+            result["source_reselections_after_quotes"] = selection_attempt
             if source is not None:
-                result["source_diagnostics"] = diagnose_source(source, observed)
-                source_account, step, selected = build_step(source, observed.isoformat(), limits)
-                if selected != market:
-                    return finish("BLOCKED", ("SOURCE_MARKET_MISMATCH",))
-                if (not source_account.get("account_id")
-                        or hashlib.sha256(str(source_account["account_id"]).encode()).hexdigest() != scope):
-                    return finish("BLOCKED", ("SOURCE_ACCOUNT_IDENTITY_MISMATCH",))
-                bundle_at = instant(_read(source / "decision_bundle_v2.json").get("generated_at"))
-            if bundle_at is None or not 0 <= (observed - bundle_at).total_seconds() < 600:
-                # Positions still get a genuine new valuation; expired proposals
-                # never become new orders merely because quotes were refreshed.
-                step["signals"] = []
-                result["blockers"].append("SOURCE_EXECUTION_EXPIRED" if source else "NO_RECENT_COMPLETED_SOURCE")
-            if market == "us":
-                # build_step deliberately sizes only KR. For USD simulation use
-                # the new independently observed reference rate, with the same
-                # explicit proposal budgets and unchanged engine limits.
-                result["fx_basis"] = "BROKER_REFERENCE_RATE; valuation only, no FX trades"
-                result["simulation_basis"] = "KRW_CASH_SHADOW: cash remains in seed KRW; USD positions revalued at observed broker reference FX; not an exact USD account mirror"
-            held = {r[0] for r in broker.db.execute("SELECT ticker FROM positions WHERE qty>0")}
-            pending = {r[0] for r in broker.db.execute("SELECT ticker FROM orders WHERE status='PENDING'")}
-            tickers = held | pending | {s["ticker"] for s in step["signals"]}
-            provider = (quote_factory or ReadOnlyPaperQuotes)()
-            try:
-                quotes, quote_blockers = provider.fetch(tickers, market=market,
-                    fx_quote=(account.get("cash_diagnostics") or {}).get("fx_quote"))
-                result["quote_diagnostics"] = getattr(provider, "diagnostics", {})
-            finally:
-                provider.close()
-            at = instant(clock())
-            # A response acquired after the market close cannot open new orders.
-            if not session_resolver(market=market, now_local=at).get("is_open"):
-                broker.expire_pending(now=at.astimezone(ZoneInfo("Asia/Seoul" if market == "kr" else "America/New_York")).isoformat())
-                return finish("MARKET_CLOSED", ("SESSION_ENDED_DURING_READ",), **_summary(broker))
-            if not _account_valid(account, at):
-                return finish("BLOCKED", ("ACCOUNT_EXPIRED_DURING_READ",), **_summary(broker))
+                result["source_diagnostics"] = diagnose_source(source, at)
             signals = []
             if market == "us" and step["signals"]:
                 from tradingagents.execution.sizing import size_paper_order

@@ -49,13 +49,13 @@ def test_expired_source_causes_new_observation_not_renewal_and_uses_existing_con
         session_resolver=open_kr, executor=lambda *a, **k: pytest.fail("no duplicate producer"))[0]["status"] == "REFRESH_COOLDOWN"
 
 
-@pytest.mark.parametrize("age,expected", [(59, False), (60, True), (119, True), (120, True), (600, True)])
-def test_refresh_boundary_is_shorter_than_unchanged_consumer_expiry(tmp_path, age, expected):
+@pytest.mark.parametrize("age", [0, 30, 59, 60, 119, 120, 600])
+def test_each_new_slot_collects_even_if_previous_source_has_not_expired(tmp_path, age):
     archive, state = tmp_path / "archive", tmp_path / "state"
     enable(state)
     source(archive, AT - timedelta(seconds=age))
     result = refresh.refresh_due(archive, state, now=AT, dry_run=True, session_resolver=open_kr)
-    assert bool(result) is expected
+    assert result == [{"target": "execution-freshness-kr", "status": "DUE"}]
     assert not (state / "execution-refresh").exists()
 
 
@@ -132,7 +132,7 @@ def test_scheduled_launch_jitter_does_not_skip_successful_next_slot(tmp_path, st
     assert result[0]["status"] == expected
 
 
-def test_next_slot_still_waits_for_actual_source_age(tmp_path):
+def test_next_slot_does_not_wait_until_source_nears_expiry(tmp_path):
     archive, state = tmp_path / "archive", tmp_path / "state"
     enable(state)
     started = AT + timedelta(minutes=4, seconds=50)
@@ -142,11 +142,11 @@ def test_next_slot_still_waits_for_actual_source_age(tmp_path):
     p.write_text(json.dumps({"started_at": started.isoformat(), "session_date": started.date().isoformat(),
                             "status": "COMPLETED", "consecutive_failures": 0}))
     assert refresh.refresh_due(archive, state, now=started + timedelta(seconds=60),
-                               dry_run=True, session_resolver=open_kr) == []
+                               dry_run=True, session_resolver=open_kr)[0]["status"] == "DUE"
 
 
 @pytest.mark.parametrize("observed,expected", [
-    ((AT - timedelta(seconds=59)).isoformat(), False),
+    ((AT - timedelta(seconds=59)).isoformat(), True),
     ((AT - timedelta(seconds=119)).isoformat(), True),
     ((AT - timedelta(seconds=120)).isoformat(), True),
     ((AT - timedelta(seconds=300)).isoformat(), True),

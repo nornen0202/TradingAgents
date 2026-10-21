@@ -62,7 +62,11 @@ if ($PSCmdlet.ShouldProcess($installedScript, "Install independent local analysi
             # between quarter hours. Preserve that boundary explicitly.
             $triggers += New-ScheduledTaskTrigger -Weekly -WeeksInterval 1 -DaysOfWeek Monday,Tuesday,Wednesday,Thursday,Friday -At ($now.Date.AddHours(17).AddMinutes(50))
         }
-        $settings = New-ScheduledTaskSettingsSet -MultipleInstances IgnoreNew -StartWhenAvailable -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -Hidden -ExecutionTimeLimit (New-TimeSpan -Hours 13)
+        # A producer that completes just after a minute boundary must not lose
+        # the next refresh. Queue retains serial execution and the Python lock;
+        # queued runs evaluate current clocks and the existing attempt cooldown.
+        $multipleInstances = if ($command -eq 'run-due') { 'Queue' } else { 'IgnoreNew' }
+        $settings = New-ScheduledTaskSettingsSet -MultipleInstances $multipleInstances -StartWhenAvailable -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -Hidden -ExecutionTimeLimit (New-TimeSpan -Hours 13)
         Register-ScheduledTask -TaskPath "\TradingAgents\" -TaskName $name -Action $action -Trigger $triggers -Principal $principal -Settings $settings -Force | Out-Null
         if (-not $NoStart) { Start-ScheduledTask -TaskPath "\TradingAgents\" -TaskName $name }
     }
