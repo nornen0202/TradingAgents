@@ -1,40 +1,40 @@
 {
   "schema": "tradingagents.work-context/v1",
   "surface": "us",
-  "event_id": "us:577b7b697bdf95e159131e87936eb88c",
+  "event_id": "us:1d9e77d7a27525e235e3f7c1f6ed39fd",
   "prompt_contract_version": "market-work-v13-us",
   "prompt_sha256": "281749b3b871d01531e3ceb7377d60bb67ebcaf89d6d8ba3162cb53d38400d7a",
   "skill_sha256": "4dffe28b3721557cc2517b5afff2f94045832606e71ff61461df969f6abb53c7",
   "task_manifest_sha256": "c0992fa275c9961bc91c679030c0b4d9b8b06f3d164226776421f1e354b5c22e",
   "workflow_contract_sha256": "8d06ba979f55f01229636b73bdc643c5b21f326cc270c0e8143f3fd7a3204028",
-  "source_sha256": "065dd214dd9096e2413bda8a1f81f659a62f019d60cfe0d2ebc8621acd2bb651",
+  "source_sha256": "602f7b51984c3117efb87d2f6d30cc19e29eca303c9966cf38051fe664128cc5",
   "body": {
     "kind": "market",
     "market": "US",
     "session_id": "US:2026-10-21",
     "source_health": "OK",
     "source": {
-      "run_id": "20261022T033712_local-freshness-us-overlay",
-      "last_run_at": "2026-10-22T03:38:06.641378+09:00",
+      "run_id": "20261022T035111_local-freshness-us-overlay",
+      "last_run_at": "2026-10-22T03:51:51.830806+09:00",
       "status": "success"
     },
     "report_mode": "READY",
     "current": {
-      "run_id": "20261022T033712_local-freshness-us-overlay",
-      "started_at": "2026-10-22T03:37:12.299803+09:00",
+      "run_id": "20261022T035111_local-freshness-us-overlay",
+      "started_at": "2026-10-22T03:51:11.730240+09:00",
       "run_mode": "overlay_only",
       "freshness_receipt": {
         "schema": "tradingagents.source-freshness/v1",
-        "producer_run_id": "20261022T033712_local-freshness-us-overlay",
-        "producer_started_at": "2026-10-22T03:37:12.299803+09:00",
-        "producer_finished_at": "2026-10-22T03:38:06.641378+09:00",
+        "producer_run_id": "20261022T035111_local-freshness-us-overlay",
+        "producer_started_at": "2026-10-22T03:51:11.730240+09:00",
+        "producer_finished_at": "2026-10-22T03:51:51.830806+09:00",
         "analysis_run_id": "20261021T175015_local-scheduler-us-full",
         "analysis_lineage_status": "RESOLVED",
         "analysis_completed_at": "2026-10-21T21:13:33.227411+09:00",
         "analysis_trade_date_oldest": "2026-10-20",
         "analysis_trade_date_latest": "2026-10-20",
-        "market_data_oldest_at": "2026-10-21T14:37:00-04:00",
-        "market_data_latest_at": "2026-10-21T14:37:00-04:00",
+        "market_data_oldest_at": "2026-10-21T14:51:00-04:00",
+        "market_data_latest_at": "2026-10-21T14:51:00-04:00",
         "market_data_status": "FRESH",
         "publication_does_not_refresh_inputs": true,
         "execution_max_age_seconds": 600.0,
@@ -131,12 +131,6 @@
             "execution_eligible": false
           },
           {
-            "ticker": "SCCO",
-            "research_valid": true,
-            "category": "FRESH_REGULAR_SESSION",
-            "execution_eligible": false
-          },
-          {
             "ticker": "TXN",
             "research_valid": true,
             "category": "FRESH_REGULAR_SESSION",
@@ -155,12 +149,6 @@
             "execution_eligible": false
           },
           {
-            "ticker": "ETN",
-            "research_valid": true,
-            "category": "FRESH_REGULAR_SESSION",
-            "execution_eligible": false
-          },
-          {
             "ticker": "AVGO",
             "research_valid": true,
             "category": "FRESH_REGULAR_SESSION",
@@ -173,13 +161,13 @@
             "execution_eligible": false
           },
           {
-            "ticker": "RSP",
+            "ticker": "ETN",
             "research_valid": true,
             "category": "FRESH_REGULAR_SESSION",
             "execution_eligible": false
           },
           {
-            "ticker": "V",
+            "ticker": "RSP",
             "research_valid": true,
             "category": "FRESH_REGULAR_SESSION",
             "execution_eligible": false
@@ -192,6 +180,12 @@
           },
           {
             "ticker": "MA",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "V",
             "research_valid": true,
             "category": "FRESH_REGULAR_SESSION",
             "execution_eligible": false
@@ -216,6 +210,12 @@
           },
           {
             "ticker": "PM",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "SCCO",
             "research_valid": true,
             "category": "FRESH_REGULAR_SESSION",
             "execution_eligible": false
@@ -249,12 +249,12 @@
       "bundle": {
         "artifact_type": "decision_bundle",
         "version": 2,
-        "run_id": "20261022T033712_local-freshness-us-overlay",
+        "run_id": "20261022T035111_local-freshness-us-overlay",
         "market": "US",
-        "generated_at": "2026-10-22T03:38:04.848778+09:00",
-        "analysis_source_run_id": "20261022T033613_local-freshness-us-overlay",
-        "execution_source_run_id": "20261022T033712_local-freshness-us-overlay",
-        "checkpoint": "14:37",
+        "generated_at": "2026-10-22T03:51:51.022044+09:00",
+        "analysis_source_run_id": "20261022T035012_local-freshness-us-overlay",
+        "execution_source_run_id": "20261022T035111_local-freshness-us-overlay",
+        "checkpoint": "14:51",
         "checkpoint_timezone": "America/New_York",
         "quality": {
           "report_mode": "READY",
@@ -269,15 +269,15 @@
           {
             "ticker": "DELL",
             "display_name": "Dell Technologies",
-            "last_price": 484.09,
-            "market_data_asof": "2026-10-21T14:37:00-04:00",
-            "session_vwap": 487.84719505120614,
-            "vwap_distance_pct": -0.7701581743873254,
-            "vwap_position_ko": "VWAP 아래 -0.77%",
-            "relative_volume": 0.5292301734915383,
-            "trading_value": 1409443234.0,
-            "price_change_pct": 4.88,
-            "spread_bps": 8.4688871675697,
+            "last_price": 483.8151,
+            "market_data_asof": "2026-10-21T14:51:00-04:00",
+            "session_vwap": 487.72178570497067,
+            "vwap_distance_pct": -0.8010070124966462,
+            "vwap_position_ko": "VWAP 아래 -0.80%",
+            "relative_volume": 0.5307815661564829,
+            "trading_value": 1477260029.0,
+            "price_change_pct": 4.82,
+            "spread_bps": 8.061265618701853,
             "day_high": 502.0,
             "day_low": 480.52,
             "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
@@ -299,15 +299,15 @@
           {
             "ticker": "GOOGL",
             "display_name": "Alphabet",
-            "last_price": 335.15,
-            "market_data_asof": "2026-10-21T14:37:00-04:00",
-            "session_vwap": 333.4055931020635,
-            "vwap_distance_pct": 0.5232086485731147,
-            "vwap_position_ko": "VWAP 위 +0.52%",
-            "relative_volume": 0.7078673905152103,
-            "trading_value": 4471523457.0,
-            "price_change_pct": -1.51,
-            "spread_bps": 1.193566675617331,
+            "last_price": 333.97,
+            "market_data_asof": "2026-10-21T14:51:00-04:00",
+            "session_vwap": 333.42826587529663,
+            "vwap_distance_pct": 0.16247396521145152,
+            "vwap_position_ko": "VWAP 위 +0.16%",
+            "relative_volume": 0.6903893908566416,
+            "trading_value": 4558682599.0,
+            "price_change_pct": -1.85,
+            "spread_bps": 0.8983515249508965,
             "day_high": 337.27,
             "day_low": 330.38,
             "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
@@ -329,15 +329,15 @@
           {
             "ticker": "LLY",
             "display_name": "Eli Lilly",
-            "last_price": 1273.975,
-            "market_data_asof": "2026-10-21T14:37:00-04:00",
-            "session_vwap": 1269.3747992346055,
-            "vwap_distance_pct": 0.36239893593037475,
+            "last_price": 1274.12,
+            "market_data_asof": "2026-10-21T14:51:00-04:00",
+            "session_vwap": 1269.4984253501784,
+            "vwap_distance_pct": 0.36404729281540593,
             "vwap_position_ko": "VWAP 위 +0.36%",
-            "relative_volume": 0.3655504276216006,
-            "trading_value": 842496748.0,
-            "price_change_pct": -0.75,
-            "spread_bps": 6.911229963324217,
+            "relative_volume": 0.35993454886300663,
+            "trading_value": 867078850.0,
+            "price_change_pct": -0.74,
+            "spread_bps": 5.651047798446177,
             "day_high": 1279.28,
             "day_low": 1261.69,
             "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
@@ -359,15 +359,15 @@
           {
             "ticker": "AAPL",
             "display_name": "Apple",
-            "last_price": 344.745,
-            "market_data_asof": "2026-10-21T14:37:00-04:00",
-            "session_vwap": 342.5316499421609,
-            "vwap_distance_pct": 0.646173881512202,
-            "vwap_position_ko": "VWAP 위 +0.65%",
-            "relative_volume": 0.4694319019598296,
-            "trading_value": 4656588304.0,
-            "price_change_pct": 1.54,
-            "spread_bps": 1.1602947148565186,
+            "last_price": 344.16,
+            "market_data_asof": "2026-10-21T14:51:00-04:00",
+            "session_vwap": 342.5784603867307,
+            "vwap_distance_pct": 0.4616576335488176,
+            "vwap_position_ko": "VWAP 위 +0.46%",
+            "relative_volume": 0.45987773892600314,
+            "trading_value": 4769213573.0,
+            "price_change_pct": 1.37,
+            "spread_bps": 0.5811081732859287,
             "day_high": 345.25,
             "day_low": 338.83,
             "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
@@ -389,18 +389,18 @@
           {
             "ticker": "AMZN",
             "display_name": "Amazon",
-            "last_price": 263.6455,
-            "market_data_asof": "2026-10-21T14:37:00-04:00",
-            "session_vwap": 261.9747928356781,
-            "vwap_distance_pct": 0.6377358471163497,
-            "vwap_position_ko": "VWAP 위 +0.64%",
-            "relative_volume": 0.5019375914346379,
-            "trading_value": 3744374539.0,
-            "price_change_pct": 0.39,
-            "spread_bps": 1.1379369203623464,
+            "last_price": 262.43,
+            "market_data_asof": "2026-10-21T14:51:00-04:00",
+            "session_vwap": 262.0155063856799,
+            "vwap_distance_pct": 0.15819430690868774,
+            "vwap_position_ko": "VWAP 위 +0.16%",
+            "relative_volume": 0.49580728796004553,
+            "trading_value": 3866871482.0,
+            "price_change_pct": -0.08,
+            "spread_bps": 1.1430095441308197,
             "day_high": 264.35,
             "day_low": 259.29,
-            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
+            "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
             "data_status_ko": "현재 세션 데이터 사용 가능",
             "reason_codes_ko": [
               "waiting for trigger"
@@ -419,15 +419,15 @@
           {
             "ticker": "TSM",
             "display_name": "Taiwan Semiconductor Manufacturing",
-            "last_price": 431.435,
-            "market_data_asof": "2026-10-21T14:37:00-04:00",
-            "session_vwap": 428.5919954162958,
-            "vwap_distance_pct": 0.6633359031688713,
-            "vwap_position_ko": "VWAP 위 +0.66%",
-            "relative_volume": 0.4116998547893438,
-            "trading_value": 1506527008.0,
-            "price_change_pct": 1.5,
-            "spread_bps": 3.244796736661252,
+            "last_price": 430.92,
+            "market_data_asof": "2026-10-21T14:51:00-04:00",
+            "session_vwap": 428.7250421483378,
+            "vwap_distance_pct": 0.5119733245959379,
+            "vwap_position_ko": "VWAP 위 +0.51%",
+            "relative_volume": 0.41496409242718074,
+            "trading_value": 1587565830.0,
+            "price_change_pct": 1.37,
+            "spread_bps": 3.944178276858483,
             "day_high": 435.16,
             "day_low": 423.74,
             "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
@@ -449,21 +449,21 @@
           {
             "ticker": "CVX",
             "display_name": "CVX",
-            "last_price": 226.91,
-            "market_data_asof": "2026-10-21T14:37:00-04:00",
-            "session_vwap": 226.20762890163576,
-            "vwap_distance_pct": 0.3104984132386024,
-            "vwap_position_ko": "VWAP 위 +0.31%",
-            "relative_volume": 0.3010039948208393,
-            "trading_value": 401574867.0,
-            "price_change_pct": 0.53,
-            "spread_bps": 1.3222557683408394,
-            "day_high": 227.13,
+            "last_price": 227.555,
+            "market_data_asof": "2026-10-21T14:51:00-04:00",
+            "session_vwap": 226.26949962977372,
+            "vwap_distance_pct": 0.5681279944180107,
+            "vwap_position_ko": "VWAP 위 +0.57%",
+            "relative_volume": 0.31020274988275726,
+            "trading_value": 432705120.0,
+            "price_change_pct": 0.82,
+            "spread_bps": 3.5155563367895977,
+            "day_high": 227.555,
             "day_low": 224.19,
             "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
             "data_status_ko": "현재 세션 데이터 사용 가능",
             "reason_codes_ko": [
-              "waiting for trigger"
+              "relative volume unconfirmed"
             ],
             "quality": {
               "row_mode": "IMMEDIATE",
@@ -479,15 +479,15 @@
           {
             "ticker": "SHEL",
             "display_name": "SHEL",
-            "last_price": 105.115,
-            "market_data_asof": "2026-10-21T14:37:00-04:00",
-            "session_vwap": 105.32397249927838,
-            "vwap_distance_pct": -0.19840924560627915,
-            "vwap_position_ko": "VWAP 아래 -0.20%",
-            "relative_volume": 0.3735498484546564,
-            "trading_value": 211270515.0,
-            "price_change_pct": -0.4,
-            "spread_bps": 1.9031306499187381,
+            "last_price": 105.405,
+            "market_data_asof": "2026-10-21T14:51:00-04:00",
+            "session_vwap": 105.31733254007476,
+            "vwap_distance_pct": 0.0832412460616494,
+            "vwap_position_ko": "VWAP 위 +0.08%",
+            "relative_volume": 0.37133179971543373,
+            "trading_value": 219505544.0,
+            "price_change_pct": -0.13,
+            "spread_bps": 1.8969932656735293,
             "day_high": 105.86,
             "day_low": 104.66,
             "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
@@ -509,15 +509,15 @@
           {
             "ticker": "ABBV",
             "display_name": "ABBV",
-            "last_price": 283.425,
-            "market_data_asof": "2026-10-21T14:37:00-04:00",
-            "session_vwap": 284.3674026084733,
-            "vwap_distance_pct": -0.3314031776598614,
-            "vwap_position_ko": "VWAP 아래 -0.33%",
-            "relative_volume": 0.3437341380467472,
-            "trading_value": 386966024.0,
-            "price_change_pct": -1.96,
-            "spread_bps": 2.116999506033529,
+            "last_price": 283.21,
+            "market_data_asof": "2026-10-21T14:51:00-04:00",
+            "session_vwap": 284.32337199368936,
+            "vwap_distance_pct": -0.39158651850614845,
+            "vwap_position_ko": "VWAP 아래 -0.39%",
+            "relative_volume": 0.3434269051593178,
+            "trading_value": 404050238.0,
+            "price_change_pct": -2.03,
+            "spread_bps": 3.8837008138123337,
             "day_high": 288.9999,
             "day_low": 282.155,
             "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
@@ -540,18 +540,18 @@
           {
             "ticker": "XOM",
             "display_name": "XOM",
-            "last_price": 177.8,
-            "market_data_asof": "2026-10-21T14:37:00-04:00",
-            "session_vwap": 177.4303777653172,
-            "vwap_distance_pct": 0.20831958954159457,
-            "vwap_position_ko": "VWAP 위 +0.21%",
-            "relative_volume": 0.35233131342523766,
-            "trading_value": 566725579.0,
-            "price_change_pct": -0.03,
-            "spread_bps": 1.1249859376747557,
-            "day_high": 178.14,
+            "last_price": 178.29,
+            "market_data_asof": "2026-10-21T14:51:00-04:00",
+            "session_vwap": 177.45730116543754,
+            "vwap_distance_pct": 0.46923898261370667,
+            "vwap_position_ko": "VWAP 위 +0.47%",
+            "relative_volume": 0.3541045238872366,
+            "trading_value": 595454070.0,
+            "price_change_pct": 0.24,
+            "spread_bps": 2.2429068072233074,
+            "day_high": 178.29,
             "day_low": 176.15,
-            "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
+            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
             "data_status_ko": "현재 세션 데이터 사용 가능",
             "reason_codes_ko": [
               "waiting for trigger"
@@ -570,15 +570,15 @@
           {
             "ticker": "COST",
             "display_name": "Costco Wholesale",
-            "last_price": 996.86,
-            "market_data_asof": "2026-10-21T14:37:00-04:00",
-            "session_vwap": 994.1068624768916,
-            "vwap_distance_pct": 0.2769458321863594,
-            "vwap_position_ko": "VWAP 위 +0.28%",
-            "relative_volume": 0.26667141443208003,
-            "trading_value": 479664514.0,
-            "price_change_pct": 0.23,
-            "spread_bps": 1.5047776690991623,
+            "last_price": 996.825,
+            "market_data_asof": "2026-10-21T14:51:00-04:00",
+            "session_vwap": 994.2089104763425,
+            "vwap_distance_pct": 0.26313277783882594,
+            "vwap_position_ko": "VWAP 위 +0.26%",
+            "relative_volume": 0.2650771935198569,
+            "trading_value": 498416811.0,
+            "price_change_pct": 0.22,
+            "spread_bps": 3.3105108720190697,
             "day_high": 997.62,
             "day_low": 988.47,
             "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
@@ -600,15 +600,15 @@
           {
             "ticker": "UNH",
             "display_name": "UNH",
-            "last_price": 417.48,
-            "market_data_asof": "2026-10-21T14:37:00-04:00",
-            "session_vwap": 417.0217830097942,
-            "vwap_distance_pct": 0.10987843054592883,
-            "vwap_position_ko": "VWAP 위 +0.11%",
-            "relative_volume": 0.27993653241297184,
-            "trading_value": 554114358.0,
-            "price_change_pct": -0.42,
-            "spread_bps": 2.6348883166646337,
+            "last_price": 418.01,
+            "market_data_asof": "2026-10-21T14:51:00-04:00",
+            "session_vwap": 417.05630867740587,
+            "vwap_distance_pct": 0.22867207682784052,
+            "vwap_position_ko": "VWAP 위 +0.23%",
+            "relative_volume": 0.2795231920272676,
+            "trading_value": 578382030.0,
+            "price_change_pct": -0.3,
+            "spread_bps": 2.1530327859042138,
             "day_high": 421.47,
             "day_low": 415.0,
             "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
@@ -630,15 +630,15 @@
           {
             "ticker": "SNPS",
             "display_name": "Synopsys",
-            "last_price": 454.67,
-            "market_data_asof": "2026-10-21T14:37:00-04:00",
-            "session_vwap": 455.8514361104418,
-            "vwap_distance_pct": -0.2591713038182841,
-            "vwap_position_ko": "VWAP 아래 -0.26%",
-            "relative_volume": 0.19986457229267696,
-            "trading_value": 191071497.0,
-            "price_change_pct": 1.57,
-            "spread_bps": 7.47564917218249,
+            "last_price": 453.285,
+            "market_data_asof": "2026-10-21T14:51:00-04:00",
+            "session_vwap": 455.7888236340164,
+            "vwap_distance_pct": -0.5493385322732025,
+            "vwap_position_ko": "VWAP 아래 -0.55%",
+            "relative_volume": 0.19753565510710464,
+            "trading_value": 197357928.0,
+            "price_change_pct": 1.27,
+            "spread_bps": 10.588079587064044,
             "day_high": 459.71,
             "day_low": 451.69,
             "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
@@ -659,47 +659,17 @@
             "display_priority": 13
           },
           {
-            "ticker": "SCCO",
-            "display_name": "SCCO",
-            "last_price": 196.51,
-            "market_data_asof": "2026-10-21T14:37:00-04:00",
-            "session_vwap": 196.26784421578637,
-            "vwap_distance_pct": 0.12338026393532431,
-            "vwap_position_ko": "VWAP 위 +0.12%",
-            "relative_volume": 0.8580197562959982,
-            "trading_value": 125528399.0,
-            "price_change_pct": -2.88,
-            "spread_bps": 11.711092441253077,
-            "day_high": 202.46,
-            "day_low": 190.69,
-            "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
-            "data_status_ko": "현재 세션 데이터 사용 가능",
-            "reason_codes_ko": [
-              "relative volume unconfirmed"
-            ],
-            "quality": {
-              "row_mode": "IMMEDIATE",
-              "execution_ready": true,
-              "conditional_strategy_ready": true,
-              "current_execution_promotion": "POSSIBLE",
-              "generated_in_current_run": true,
-              "freshness_class": "LIVE_CHECKPOINT",
-              "execution_eligibility": "LIVE_EXECUTION_READY"
-            },
-            "display_priority": 14
-          },
-          {
             "ticker": "TXN",
             "display_name": "Texas Instruments",
-            "last_price": 287.74,
-            "market_data_asof": "2026-10-21T14:37:00-04:00",
-            "session_vwap": 285.3460950149669,
-            "vwap_distance_pct": 0.8389478695713493,
-            "vwap_position_ko": "VWAP 위 +0.84%",
-            "relative_volume": 0.8200682980041488,
-            "trading_value": 975087244.0,
-            "price_change_pct": 3.59,
-            "spread_bps": 5.907803513404079,
+            "last_price": 286.63,
+            "market_data_asof": "2026-10-21T14:51:00-04:00",
+            "session_vwap": 285.43785480973014,
+            "vwap_distance_pct": 0.41765490112182224,
+            "vwap_position_ko": "VWAP 위 +0.42%",
+            "relative_volume": 0.8198816497219111,
+            "trading_value": 1019278028.0,
+            "price_change_pct": 3.19,
+            "spread_bps": 4.883153121729555,
             "day_high": 289.305,
             "day_low": 277.37,
             "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
@@ -716,20 +686,20 @@
               "freshness_class": "LIVE_CHECKPOINT",
               "execution_eligibility": "LIVE_EXECUTION_READY"
             },
-            "display_priority": 15
+            "display_priority": 14
           },
           {
             "ticker": "MPWR",
             "display_name": "Monolithic Power Systems",
-            "last_price": 1282.7,
-            "market_data_asof": "2026-10-21T14:37:00-04:00",
-            "session_vwap": 1277.2854544506984,
-            "vwap_distance_pct": 0.4239103741794592,
-            "vwap_position_ko": "VWAP 위 +0.42%",
-            "relative_volume": 0.3653117633314378,
-            "trading_value": 245085533.0,
-            "price_change_pct": 2.72,
-            "spread_bps": 5.689412626599315,
+            "last_price": 1279.735,
+            "market_data_asof": "2026-10-21T14:51:00-04:00",
+            "session_vwap": 1277.4619180270681,
+            "vwap_distance_pct": 0.1779373569462228,
+            "vwap_position_ko": "VWAP 위 +0.18%",
+            "relative_volume": 0.3603030996253666,
+            "trading_value": 252678135.0,
+            "price_change_pct": 2.48,
+            "spread_bps": 14.221416515597953,
             "day_high": 1288.265,
             "day_low": 1260.0,
             "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
@@ -746,20 +716,20 @@
               "freshness_class": "LIVE_CHECKPOINT",
               "execution_eligibility": "LIVE_EXECUTION_READY"
             },
-            "display_priority": 16
+            "display_priority": 15
           },
           {
             "ticker": "GEV",
             "display_name": "GE Vernova",
-            "last_price": 929.42,
-            "market_data_asof": "2026-10-21T14:37:00-04:00",
-            "session_vwap": 926.682650341996,
-            "vwap_distance_pct": 0.2953923500125688,
-            "vwap_position_ko": "VWAP 위 +0.30%",
-            "relative_volume": 0.7796373850981538,
-            "trading_value": 1203888645.0,
-            "price_change_pct": 4.39,
-            "spread_bps": 5.056672386803455,
+            "last_price": 926.875,
+            "market_data_asof": "2026-10-21T14:51:00-04:00",
+            "session_vwap": 926.7284544758875,
+            "vwap_distance_pct": 0.015813210806769895,
+            "vwap_position_ko": "VWAP 위 +0.02%",
+            "relative_volume": 0.7607938189711207,
+            "trading_value": 1227987487.0,
+            "price_change_pct": 4.1,
+            "spread_bps": 16.613266880265417,
             "day_high": 935.16,
             "day_low": 914.35,
             "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
@@ -776,22 +746,52 @@
               "freshness_class": "LIVE_CHECKPOINT",
               "execution_eligibility": "LIVE_EXECUTION_READY"
             },
+            "display_priority": 16
+          },
+          {
+            "ticker": "AVGO",
+            "display_name": "Broadcom",
+            "last_price": 337.46,
+            "market_data_asof": "2026-10-21T14:51:00-04:00",
+            "session_vwap": 336.5443446754644,
+            "vwap_distance_pct": 0.272075683048123,
+            "vwap_position_ko": "VWAP 위 +0.27%",
+            "relative_volume": 0.36890372792352005,
+            "trading_value": 2215691521.0,
+            "price_change_pct": 0.92,
+            "spread_bps": 3.2596938851110115,
+            "day_high": 339.24,
+            "day_low": 332.29,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
+            "data_status_ko": "현재 세션 데이터 사용 가능",
+            "reason_codes_ko": [
+              "waiting for trigger"
+            ],
+            "quality": {
+              "row_mode": "IMMEDIATE",
+              "execution_ready": true,
+              "conditional_strategy_ready": true,
+              "current_execution_promotion": "POSSIBLE",
+              "generated_in_current_run": true,
+              "freshness_class": "LIVE_CHECKPOINT",
+              "execution_eligibility": "LIVE_EXECUTION_READY"
+            },
             "display_priority": 17
           },
           {
-            "ticker": "ETN",
-            "display_name": "Eaton",
-            "last_price": 394.8,
-            "market_data_asof": "2026-10-21T14:37:00-04:00",
-            "session_vwap": 392.4004655418512,
-            "vwap_distance_pct": 0.6115014300086097,
-            "vwap_position_ko": "VWAP 위 +0.61%",
-            "relative_volume": 0.3990962314010419,
-            "trading_value": 268038948.0,
-            "price_change_pct": 3.36,
-            "spread_bps": 3.038897893030909,
-            "day_high": 395.86,
-            "day_low": 388.335,
+            "ticker": "NVDA",
+            "display_name": "NVIDIA",
+            "last_price": 221.0306,
+            "market_data_asof": "2026-10-21T14:51:00-04:00",
+            "session_vwap": 220.31428909748513,
+            "vwap_distance_pct": 0.3251313863704475,
+            "vwap_position_ko": "VWAP 위 +0.33%",
+            "relative_volume": 0.4424354290730437,
+            "trading_value": 8318627809.0,
+            "price_change_pct": 2.11,
+            "spread_bps": 0.9048545446311275,
+            "day_high": 222.16,
+            "day_low": 217.66,
             "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
             "data_status_ko": "현재 세션 데이터 사용 가능",
             "reason_codes_ko": [
@@ -809,23 +809,23 @@
             "display_priority": 18
           },
           {
-            "ticker": "AVGO",
-            "display_name": "Broadcom",
-            "last_price": 338.365,
-            "market_data_asof": "2026-10-21T14:37:00-04:00",
-            "session_vwap": 336.50550837325596,
-            "vwap_distance_pct": 0.5525887631775417,
-            "vwap_position_ko": "VWAP 위 +0.55%",
-            "relative_volume": 0.37674163540672945,
-            "trading_value": 2164412179.0,
-            "price_change_pct": 1.19,
-            "spread_bps": 1.1821029611668428,
-            "day_high": 339.24,
-            "day_low": 332.29,
+            "ticker": "ETN",
+            "display_name": "Eaton",
+            "last_price": 393.29,
+            "market_data_asof": "2026-10-21T14:51:00-04:00",
+            "session_vwap": 392.49394849894077,
+            "vwap_distance_pct": 0.2028187960868344,
+            "vwap_position_ko": "VWAP 위 +0.20%",
+            "relative_volume": 0.39738632818230946,
+            "trading_value": 279023163.0,
+            "price_change_pct": 2.96,
+            "spread_bps": 10.93271296543356,
+            "day_high": 395.86,
+            "day_low": 388.335,
             "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
             "data_status_ko": "현재 세션 데이터 사용 가능",
             "reason_codes_ko": [
-              "waiting for trigger"
+              "risk action close confirmation required"
             ],
             "quality": {
               "row_mode": "IMMEDIATE",
@@ -839,77 +839,17 @@
             "display_priority": 19
           },
           {
-            "ticker": "NVDA",
-            "display_name": "NVIDIA",
-            "last_price": 221.72,
-            "market_data_asof": "2026-10-21T14:37:00-04:00",
-            "session_vwap": 220.28554771296356,
-            "vwap_distance_pct": 0.651178573414879,
-            "vwap_position_ko": "VWAP 위 +0.65%",
-            "relative_volume": 0.45132552336289267,
-            "trading_value": 8117816955.0,
-            "price_change_pct": 2.43,
-            "spread_bps": 0.90203860725157,
-            "day_high": 222.16,
-            "day_low": 217.66,
-            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
-            "data_status_ko": "현재 세션 데이터 사용 가능",
-            "reason_codes_ko": [
-              "relative volume unconfirmed"
-            ],
-            "quality": {
-              "row_mode": "IMMEDIATE",
-              "execution_ready": true,
-              "conditional_strategy_ready": true,
-              "current_execution_promotion": "POSSIBLE",
-              "generated_in_current_run": true,
-              "freshness_class": "LIVE_CHECKPOINT",
-              "execution_eligibility": "LIVE_EXECUTION_READY"
-            },
-            "display_priority": 20
-          },
-          {
-            "ticker": "V",
-            "display_name": "V",
-            "last_price": 408.72,
-            "market_data_asof": "2026-10-21T14:37:00-04:00",
-            "session_vwap": 407.8696907127076,
-            "vwap_distance_pct": 0.20847572316702312,
-            "vwap_position_ko": "VWAP 위 +0.21%",
-            "relative_volume": 0.3639714210859578,
-            "trading_value": 677146892.0,
-            "price_change_pct": 0.53,
-            "spread_bps": 0.9786651008030061,
-            "day_high": 409.5299,
-            "day_low": 404.1,
-            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
-            "data_status_ko": "현재 세션 데이터 사용 가능",
-            "reason_codes_ko": [
-              "close confirmation required"
-            ],
-            "quality": {
-              "row_mode": "IMMEDIATE",
-              "execution_ready": true,
-              "conditional_strategy_ready": true,
-              "current_execution_promotion": "POSSIBLE",
-              "generated_in_current_run": true,
-              "freshness_class": "LIVE_CHECKPOINT",
-              "execution_eligibility": "LIVE_EXECUTION_READY"
-            },
-            "display_priority": 21
-          },
-          {
             "ticker": "BRK-B",
             "display_name": "BRK-B",
-            "last_price": 541.7375,
-            "market_data_asof": "2026-10-21T14:37:00-04:00",
-            "session_vwap": 542.1698996609903,
-            "vwap_distance_pct": -0.07975353505620397,
-            "vwap_position_ko": "VWAP 아래 -0.08%",
-            "relative_volume": 0.3936382120217716,
-            "trading_value": 715485923.0,
-            "price_change_pct": 0.36,
-            "spread_bps": 2.3998301658651013,
+            "last_price": 541.895,
+            "market_data_asof": "2026-10-21T14:51:00-04:00",
+            "session_vwap": 542.1645797331056,
+            "vwap_distance_pct": -0.049722859659762086,
+            "vwap_position_ko": "VWAP 아래 -0.05%",
+            "relative_volume": 0.3869357647521873,
+            "trading_value": 735075954.0,
+            "price_change_pct": 0.38,
+            "spread_bps": 4.613439873038135,
             "day_high": 543.34,
             "day_low": 539.25,
             "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
@@ -926,20 +866,20 @@
               "freshness_class": "LIVE_CHECKPOINT",
               "execution_eligibility": "LIVE_EXECUTION_READY"
             },
-            "display_priority": 22
+            "display_priority": 20
           },
           {
             "ticker": "MA",
             "display_name": "MA",
-            "last_price": 623.05,
-            "market_data_asof": "2026-10-21T14:37:00-04:00",
-            "session_vwap": 622.2867188613676,
-            "vwap_distance_pct": 0.12265746889617013,
-            "vwap_position_ko": "VWAP 위 +0.12%",
-            "relative_volume": 0.3063549077756395,
-            "trading_value": 449633891.0,
-            "price_change_pct": 0.42,
-            "spread_bps": 1.7653808809252787,
+            "last_price": 622.65,
+            "market_data_asof": "2026-10-21T14:51:00-04:00",
+            "session_vwap": 622.3089761390723,
+            "vwap_distance_pct": 0.05479976571178824,
+            "vwap_position_ko": "VWAP 위 +0.05%",
+            "relative_volume": 0.3032579883118927,
+            "trading_value": 465226989.0,
+            "price_change_pct": 0.36,
+            "spread_bps": 2.4087679152110044,
             "day_high": 624.6599,
             "day_low": 617.4,
             "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
@@ -956,20 +896,50 @@
               "freshness_class": "LIVE_CHECKPOINT",
               "execution_eligibility": "LIVE_EXECUTION_READY"
             },
-            "display_priority": 23
+            "display_priority": 21
+          },
+          {
+            "ticker": "V",
+            "display_name": "V",
+            "last_price": 408.12,
+            "market_data_asof": "2026-10-21T14:51:00-04:00",
+            "session_vwap": 407.8906652818113,
+            "vwap_distance_pct": 0.05622455665423853,
+            "vwap_position_ko": "VWAP 위 +0.06%",
+            "relative_volume": 0.3614769701446615,
+            "trading_value": 702960812.0,
+            "price_change_pct": 0.38,
+            "spread_bps": 1.9600637020699276,
+            "day_high": 409.5299,
+            "day_low": 404.1,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
+            "data_status_ko": "현재 세션 데이터 사용 가능",
+            "reason_codes_ko": [
+              "돌파 후 안착 실패"
+            ],
+            "quality": {
+              "row_mode": "IMMEDIATE",
+              "execution_ready": true,
+              "conditional_strategy_ready": true,
+              "current_execution_promotion": "POSSIBLE",
+              "generated_in_current_run": true,
+              "freshness_class": "LIVE_CHECKPOINT",
+              "execution_eligibility": "LIVE_EXECUTION_READY"
+            },
+            "display_priority": 22
           },
           {
             "ticker": "MDT",
             "display_name": "MDT",
-            "last_price": 93.48,
-            "market_data_asof": "2026-10-21T14:37:00-04:00",
-            "session_vwap": 93.80528935883171,
-            "vwap_distance_pct": -0.34677080690768136,
-            "vwap_position_ko": "VWAP 아래 -0.35%",
-            "relative_volume": 0.0715448737945677,
-            "trading_value": 183703307.0,
-            "price_change_pct": -1.22,
-            "spread_bps": 2.139495079160892,
+            "last_price": 93.37,
+            "market_data_asof": "2026-10-21T14:51:00-04:00",
+            "session_vwap": 93.78355406644728,
+            "vwap_distance_pct": -0.4409665112011685,
+            "vwap_position_ko": "VWAP 아래 -0.44%",
+            "relative_volume": 0.0725665787329005,
+            "trading_value": 194705162.0,
+            "price_change_pct": -1.33,
+            "spread_bps": 1.0710651743164048,
             "day_high": 95.3,
             "day_low": 93.11,
             "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
@@ -986,22 +956,52 @@
               "freshness_class": "LIVE_CHECKPOINT",
               "execution_eligibility": "LIVE_EXECUTION_READY"
             },
-            "display_priority": 24
+            "display_priority": 23
           },
           {
             "ticker": "PG",
             "display_name": "PG",
-            "last_price": 157.68,
-            "market_data_asof": "2026-10-21T14:37:00-04:00",
-            "session_vwap": 157.95471224128082,
-            "vwap_distance_pct": -0.17391835759934526,
-            "vwap_position_ko": "VWAP 아래 -0.17%",
-            "relative_volume": 0.42632229603911825,
-            "trading_value": 474470051.0,
-            "price_change_pct": -1.03,
-            "spread_bps": 1.9025271902845,
+            "last_price": 157.64,
+            "market_data_asof": "2026-10-21T14:51:00-04:00",
+            "session_vwap": 157.9449887386297,
+            "vwap_distance_pct": -0.19309807868257423,
+            "vwap_position_ko": "VWAP 아래 -0.19%",
+            "relative_volume": 0.4206690500423479,
+            "trading_value": 489345480.0,
+            "price_change_pct": -1.05,
+            "spread_bps": 1.9031306499191891,
             "day_high": 158.6728,
             "day_low": 157.41,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
+            "data_status_ko": "현재 세션 데이터 사용 가능",
+            "reason_codes_ko": [
+              "support zone failed"
+            ],
+            "quality": {
+              "row_mode": "IMMEDIATE",
+              "execution_ready": true,
+              "conditional_strategy_ready": true,
+              "current_execution_promotion": "POSSIBLE",
+              "generated_in_current_run": true,
+              "freshness_class": "LIVE_CHECKPOINT",
+              "execution_eligibility": "LIVE_EXECUTION_READY"
+            },
+            "display_priority": 24
+          },
+          {
+            "ticker": "AMT",
+            "display_name": "AMT",
+            "last_price": 178.28,
+            "market_data_asof": "2026-10-21T14:51:00-04:00",
+            "session_vwap": 180.0633705974878,
+            "vwap_distance_pct": -0.990412759446957,
+            "vwap_position_ko": "VWAP 아래 -0.99%",
+            "relative_volume": 0.2884589180231069,
+            "trading_value": 136570684.0,
+            "price_change_pct": -2.88,
+            "spread_bps": 8.411608019066632,
+            "day_high": 183.78,
+            "day_low": 178.18,
             "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
             "data_status_ko": "현재 세션 데이터 사용 가능",
             "reason_codes_ko": [
@@ -1019,19 +1019,19 @@
             "display_priority": 25
           },
           {
-            "ticker": "AMT",
-            "display_name": "AMT",
-            "last_price": 178.81,
-            "market_data_asof": "2026-10-21T14:37:00-04:00",
-            "session_vwap": 180.12143832461422,
-            "vwap_distance_pct": -0.7280856386738033,
-            "vwap_position_ko": "VWAP 아래 -0.73%",
-            "relative_volume": 0.28996893989607153,
-            "trading_value": 131386341.0,
-            "price_change_pct": -2.59,
-            "spread_bps": 9.504906208939502,
-            "day_high": 183.78,
-            "day_low": 178.715,
+            "ticker": "PM",
+            "display_name": "PM",
+            "last_price": 196.565,
+            "market_data_asof": "2026-10-21T14:51:00-04:00",
+            "session_vwap": 195.99275070583977,
+            "vwap_distance_pct": 0.2919747246259652,
+            "vwap_position_ko": "VWAP 위 +0.29%",
+            "relative_volume": 0.6152828125622501,
+            "trading_value": 452260132.0,
+            "price_change_pct": -1.67,
+            "spread_bps": 4.578638109531372,
+            "day_high": 197.83,
+            "day_low": 184.0,
             "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
             "data_status_ko": "현재 세션 데이터 사용 가능",
             "reason_codes_ko": [
@@ -1049,19 +1049,19 @@
             "display_priority": 26
           },
           {
-            "ticker": "PM",
-            "display_name": "PM",
-            "last_price": 197.16,
-            "market_data_asof": "2026-10-21T14:37:00-04:00",
-            "session_vwap": 195.9738548405955,
-            "vwap_distance_pct": 0.6052568391683222,
-            "vwap_position_ko": "VWAP 위 +0.61%",
-            "relative_volume": 0.626921306060268,
-            "trading_value": 440824177.0,
-            "price_change_pct": -1.37,
-            "spread_bps": 11.664764802839597,
-            "day_high": 197.83,
-            "day_low": 184.0,
+            "ticker": "SCCO",
+            "display_name": "SCCO",
+            "last_price": 195.58,
+            "market_data_asof": "2026-10-21T14:51:00-04:00",
+            "session_vwap": 196.26796988148226,
+            "vwap_distance_pct": -0.35052580504993935,
+            "vwap_position_ko": "VWAP 아래 -0.35%",
+            "relative_volume": 0.846358817388806,
+            "trading_value": 129418118.0,
+            "price_change_pct": -3.34,
+            "spread_bps": 14.325914556152528,
+            "day_high": 202.46,
+            "day_low": 190.69,
             "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
             "data_status_ko": "현재 세션 데이터 사용 가능",
             "reason_codes_ko": [
@@ -1090,7 +1090,7 @@
       "universe_coverage": {
         "status": "COMPLETE",
         "complete": true,
-        "source_run_id": "20261022T033712_local-freshness-us-overlay",
+        "source_run_id": "20261022T035111_local-freshness-us-overlay",
         "ticker_universe_mode": "config_plus_account",
         "expected_watchlist_count": 27,
         "missing_watchlist_count": 0,
@@ -1098,8 +1098,8 @@
       }
     },
     "last_ready": {
-      "run_id": "20261022T033712_local-freshness-us-overlay",
-      "started_at": "2026-10-22T03:37:12.299803+09:00",
+      "run_id": "20261022T035111_local-freshness-us-overlay",
+      "started_at": "2026-10-22T03:51:11.730240+09:00",
       "same_as_current": true,
       "same_session": true,
       "reference_only": false
@@ -2571,632 +2571,18 @@
         "source_health": "OK",
         "coverage": {
           "total_unique_events": 204,
-          "window_events": 20,
-          "transmitted_events": 20,
+          "window_events": 7,
+          "transmitted_events": 7,
           "truncated": false,
-          "oldest_occurred_at": "2026-10-20T18:43:39+00:00",
+          "oldest_occurred_at": "2026-10-20T19:47:27+00:00",
           "newest_occurred_at": "2026-10-20T20:57:26+00:00",
-          "available_events_before_context_cap": 20,
+          "available_events_before_context_cap": 7,
           "context_event_cap": 20,
           "omitted_events": 0,
           "omitted_due_to_context_cap": 0,
           "omitted_before_context_selection": 0
         },
         "events": [
-          {
-            "event_key": "stock_ai_agent:16403",
-            "content_sha256": "a9fa513e4c9525e148f015295839bc7a08c7945af492c280790c9c651fd54ca4",
-            "occurred_at": "2026-10-20T18:51:42+00:00",
-            "relevance": {
-              "tickers": [
-                "FRSH",
-                "BKH",
-                "BP",
-                "HALO",
-                "LLY"
-              ],
-              "markets": [
-                "US"
-              ],
-              "themes": [],
-              "match_basis": "normalized_prism_signals",
-              "matched_tickers": [
-                "LLY"
-              ],
-              "market_match": true,
-              "score": 120
-            },
-            "summary": {
-              "message_id": "16403",
-              "posted_at": "2026-10-20T18:51:42+00:00",
-              "source_url": "https://t.me/stock_ai_agent/16403",
-              "preview": "📊 프리즘 US 시뮬레이터 | 실시간 포트폴리오 (2026-10-21 03:51) 🔸 현재 보유: 5/10개 🔸 사용 비중: 3.89/10 슬롯 (분할 매수·시험매수 반영) ✅ 최고 수익: Freshworks Inc.(FRSH) +7.14% ⚠️ 최저 수익: Black Hills Corporation(BKH) +1.05% 🔸 보유 종목: - Freshworks Inc.(FRSH) [Te...",
-              "signals": [
-                {
-                  "canonical_ticker": "FRSH",
-                  "display_name": "Freshworks Inc.",
-                  "market": "US",
-                  "source_asof": "2026-10-20T18:51:42+00:00",
-                  "signal_action": "HOLD",
-                  "trigger_type": "telegram_portfolio_snapshot",
-                  "trigger_score": 0.45,
-                  "composite_score": 0.45,
-                  "confidence": 0.45,
-                  "warnings": []
-                },
-                {
-                  "canonical_ticker": "BKH",
-                  "display_name": "Black Hills Corporation",
-                  "market": "US",
-                  "source_asof": "2026-10-20T18:51:42+00:00",
-                  "signal_action": "HOLD",
-                  "trigger_type": "telegram_portfolio_snapshot",
-                  "trigger_score": 0.45,
-                  "composite_score": 0.45,
-                  "confidence": 0.45,
-                  "warnings": []
-                },
-                {
-                  "canonical_ticker": "BP",
-                  "display_name": "BP p.l.c.",
-                  "market": "US",
-                  "source_asof": "2026-10-20T18:51:42+00:00",
-                  "signal_action": "HOLD",
-                  "trigger_type": "telegram_portfolio_snapshot",
-                  "trigger_score": 0.45,
-                  "composite_score": 0.45,
-                  "stop_loss_price": 46.08,
-                  "target_price": 58.12,
-                  "confidence": 0.45,
-                  "warnings": [
-                    "multi_ticker_prices_scoped_to_mention_block"
-                  ]
-                },
-                {
-                  "canonical_ticker": "HALO",
-                  "display_name": "Halozyme Therapeutics, Inc.",
-                  "market": "US",
-                  "source_asof": "2026-10-20T18:51:42+00:00",
-                  "signal_action": "HOLD",
-                  "trigger_type": "telegram_portfolio_snapshot",
-                  "trigger_score": 0.45,
-                  "composite_score": 0.45,
-                  "stop_loss_price": 114.69,
-                  "target_price": 141.53,
-                  "confidence": 0.45,
-                  "warnings": [
-                    "multi_ticker_prices_scoped_to_mention_block"
-                  ]
-                },
-                {
-                  "canonical_ticker": "LLY",
-                  "display_name": "Eli Lilly and Company",
-                  "market": "US",
-                  "source_asof": "2026-10-20T18:51:42+00:00",
-                  "signal_action": "HOLD",
-                  "trigger_type": "telegram_portfolio_snapshot",
-                  "trigger_score": 0.45,
-                  "composite_score": 0.45,
-                  "stop_loss_price": 1208.74,
-                  "target_price": 1514.05,
-                  "confidence": 0.45,
-                  "warnings": [
-                    "multi_ticker_prices_scoped_to_mention_block"
-                  ]
-                }
-              ],
-              "simulation_only": true,
-              "actionability": "research_only"
-            }
-          },
-          {
-            "event_key": "stock_ai_agent:16402",
-            "content_sha256": "ccab44931a216dc4e231a332970e8e0900583239bb2b809053b2d68c05a47c84",
-            "occurred_at": "2026-10-20T18:51:40+00:00",
-            "relevance": {
-              "tickers": [
-                "TW"
-              ],
-              "markets": [
-                "US"
-              ],
-              "themes": [],
-              "match_basis": "normalized_prism_signals",
-              "matched_tickers": [],
-              "market_match": true,
-              "score": 20
-            },
-            "summary": {
-              "message_id": "16402",
-              "posted_at": "2026-10-20T18:51:40+00:00",
-              "source_url": "https://t.me/stock_ai_agent/16402",
-              "preview": "⚠️ 매수 보류: Tradeweb Markets Inc.(TW) 현재가: $119.23 매수 점수: 6/10 결정: 미진입 시장 상황: 보통 강세장 산업군: Financial Services 보류 사유: AI 판단: 미진입 — AI 사유: R — 손익비 하한 미달입니다./R floor 미달입니다. 가장 가까운 확정 주요 저항 126.65달러까지 거리의 80%를 적용한 목표가는 125.1...",
-              "signals": [
-                {
-                  "canonical_ticker": "TW",
-                  "display_name": "Tradeweb Markets Inc.",
-                  "market": "US",
-                  "source_asof": "2026-10-20T18:51:40+00:00",
-                  "signal_action": "NO_ENTRY",
-                  "trigger_type": "telegram_buy_skip",
-                  "trigger_score": 0.6,
-                  "composite_score": 0.6,
-                  "stop_loss_price": 110.8839,
-                  "confidence": 0.6,
-                  "warnings": []
-                }
-              ],
-              "simulation_only": false,
-              "actionability": "research_only"
-            }
-          },
-          {
-            "event_key": "stock_ai_agent:16401",
-            "content_sha256": "d2369da9f315979178557c4b9263d3e8826395e421590e299ecf9ade093e566f",
-            "occurred_at": "2026-10-20T18:51:37+00:00",
-            "relevance": {
-              "tickers": [
-                "SLS"
-              ],
-              "markets": [
-                "US"
-              ],
-              "themes": [],
-              "match_basis": "normalized_prism_signals",
-              "matched_tickers": [],
-              "market_match": true,
-              "score": 20
-            },
-            "summary": {
-              "message_id": "16401",
-              "posted_at": "2026-10-20T18:51:37+00:00",
-              "source_url": "https://t.me/stock_ai_agent/16401",
-              "preview": "⚠️ 매수 보류: SELLAS Life Sciences Group, Inc(SLS) 현재가: $11.90 매수 점수: 2/10 결정: 미진입 시장 상황: 보통 강세장 산업군: Healthcare 보류 사유: AI 판단: 미진입 — 현재가 11.90달러가 하향하는 50일선보다 4.1%, 60일선보다 2.3% 낮아 개별 하락 추세 차단 조건에 해당합니다. / 점수 부족 (2/5) — AI...",
-              "signals": [
-                {
-                  "canonical_ticker": "SLS",
-                  "display_name": "SELLAS Life Sciences Group, Inc",
-                  "market": "US",
-                  "source_asof": "2026-10-20T18:51:37+00:00",
-                  "signal_action": "NO_ENTRY",
-                  "trigger_type": "telegram_buy_skip",
-                  "trigger_score": 0.2,
-                  "composite_score": 0.2,
-                  "confidence": 0.2,
-                  "warnings": []
-                }
-              ],
-              "simulation_only": false,
-              "actionability": "research_only"
-            }
-          },
-          {
-            "event_key": "stock_ai_agent:16400",
-            "content_sha256": "6f316b667666d7e8e923c7fddb942918207efa011bd4dd3bc20fef384fd2b4db",
-            "occurred_at": "2026-10-20T18:51:33+00:00",
-            "relevance": {
-              "tickers": [
-                "MRNA"
-              ],
-              "markets": [
-                "US"
-              ],
-              "themes": [],
-              "match_basis": "normalized_prism_signals",
-              "matched_tickers": [],
-              "market_match": true,
-              "score": 20
-            },
-            "summary": {
-              "message_id": "16400",
-              "posted_at": "2026-10-20T18:51:33+00:00",
-              "source_url": "https://t.me/stock_ai_agent/16400",
-              "preview": "⚠️ 매수 보류: Moderna, Inc.(MRNA) 현재가: $241.19 매수 점수: 2/10 결정: 미진입 시장 상황: 보통 강세장 산업군: Healthcare 보류 사유: AI 판단: 미진입 — 수익성과 성장성 두 항목이 미달하여 펀더멘털 게이트를 통과하지 못했습니다. / 점수 부족 (3/5) — AI 사유: 수익성과 성장성 두 항목이 미달하여 펀더멘털 게이트를 통과하지 못했습니...",
-              "signals": [
-                {
-                  "canonical_ticker": "MRNA",
-                  "display_name": "Moderna, Inc.",
-                  "market": "US",
-                  "source_asof": "2026-10-20T18:51:33+00:00",
-                  "signal_action": "NO_ENTRY",
-                  "trigger_type": "telegram_buy_skip",
-                  "trigger_score": 0.2,
-                  "composite_score": 0.2,
-                  "confidence": 0.2,
-                  "warnings": []
-                }
-              ],
-              "simulation_only": false,
-              "actionability": "research_only"
-            }
-          },
-          {
-            "event_key": "stock_ai_agent:16399",
-            "content_sha256": "71f8861d4521fc3481cb26c080181caa0c943f97bdf5bde0381e7548443ae9ba",
-            "occurred_at": "2026-10-20T18:44:45+00:00",
-            "relevance": {
-              "tickers": [
-                "TW"
-              ],
-              "markets": [
-                "US"
-              ],
-              "themes": [],
-              "match_basis": "normalized_prism_signals",
-              "matched_tickers": [],
-              "market_match": true,
-              "score": 20
-            },
-            "summary": {
-              "message_id": "16399",
-              "posted_at": "2026-10-20T18:44:45+00:00",
-              "source_url": "https://t.me/stock_ai_agent/16399",
-              "preview": "📊 Tradeweb Markets Inc. (TW) O'Neil 인사이트 차트의 베이스/피벗/RS 주석을 함께 참고하세요. ※ 보조 참고용 · 투자 권유 아님",
-              "signals": [
-                {
-                  "canonical_ticker": "TW",
-                  "display_name": "Tradeweb Markets Inc.",
-                  "market": "US",
-                  "source_asof": "2026-10-20T18:44:45+00:00",
-                  "signal_action": "WATCH",
-                  "trigger_type": "telegram_oneil_insight",
-                  "trigger_score": 0.45,
-                  "composite_score": 0.45,
-                  "confidence": 0.45,
-                  "warnings": []
-                }
-              ],
-              "simulation_only": false,
-              "actionability": "research_only"
-            }
-          },
-          {
-            "event_key": "stock_ai_agent:16398",
-            "content_sha256": "f87b9f5a5d645ce2892064413cfbc433f7059ecf18c276d63f5f5ae18c78f0f6",
-            "occurred_at": "2026-10-20T18:44:33+00:00",
-            "relevance": {
-              "tickers": [
-                "SLS"
-              ],
-              "markets": [
-                "US"
-              ],
-              "themes": [],
-              "match_basis": "normalized_prism_signals",
-              "matched_tickers": [],
-              "market_match": true,
-              "score": 20
-            },
-            "summary": {
-              "message_id": "16398",
-              "posted_at": "2026-10-20T18:44:33+00:00",
-              "source_url": "https://t.me/stock_ai_agent/16398",
-              "preview": "📊 SELLAS Life Sciences Group, Inc (SLS) O'Neil 인사이트 차트의 베이스/피벗/RS 주석을 함께 참고하세요. ※ 보조 참고용 · 투자 권유 아님",
-              "signals": [
-                {
-                  "canonical_ticker": "SLS",
-                  "display_name": "SELLAS Life Sciences Group, Inc",
-                  "market": "US",
-                  "source_asof": "2026-10-20T18:44:33+00:00",
-                  "signal_action": "WATCH",
-                  "trigger_type": "telegram_oneil_insight",
-                  "trigger_score": 0.45,
-                  "composite_score": 0.45,
-                  "confidence": 0.45,
-                  "warnings": []
-                }
-              ],
-              "simulation_only": false,
-              "actionability": "research_only"
-            }
-          },
-          {
-            "event_key": "stock_ai_agent:16397",
-            "content_sha256": "940090b01811c69f2f3c8df2b1015f732eab273123cf4f6048f405df2271a299",
-            "occurred_at": "2026-10-20T18:44:20+00:00",
-            "relevance": {
-              "tickers": [
-                "MRNA"
-              ],
-              "markets": [
-                "US"
-              ],
-              "themes": [],
-              "match_basis": "normalized_prism_signals",
-              "matched_tickers": [],
-              "market_match": true,
-              "score": 20
-            },
-            "summary": {
-              "message_id": "16397",
-              "posted_at": "2026-10-20T18:44:20+00:00",
-              "source_url": "https://t.me/stock_ai_agent/16397",
-              "preview": "📊 Moderna, Inc. (MRNA) O'Neil 인사이트 차트의 베이스/피벗/RS 주석을 함께 참고하세요. ※ 보조 참고용 · 투자 권유 아님",
-              "signals": [
-                {
-                  "canonical_ticker": "MRNA",
-                  "display_name": "Moderna, Inc.",
-                  "market": "US",
-                  "source_asof": "2026-10-20T18:44:20+00:00",
-                  "signal_action": "WATCH",
-                  "trigger_type": "telegram_oneil_insight",
-                  "trigger_score": 0.45,
-                  "composite_score": 0.45,
-                  "confidence": 0.45,
-                  "warnings": []
-                }
-              ],
-              "simulation_only": false,
-              "actionability": "research_only"
-            }
-          },
-          {
-            "event_key": "stock_ai_agent:16396",
-            "content_sha256": "7ad764ed26634f84e872147d22f340e5bb15d1ff2aa7968fcbc72266503d97fe",
-            "occurred_at": "2026-10-20T18:44:06+00:00",
-            "relevance": {
-              "tickers": [
-                "TW"
-              ],
-              "markets": [
-                "US"
-              ],
-              "themes": [],
-              "match_basis": "normalized_prism_signals",
-              "matched_tickers": [],
-              "market_match": true,
-              "score": 20
-            },
-            "summary": {
-              "message_id": "16396",
-              "posted_at": "2026-10-20T18:44:06+00:00",
-              "source_url": "https://t.me/stock_ai_agent/16396",
-              "preview": "",
-              "signals": [
-                {
-                  "canonical_ticker": "TW",
-                  "display_name": "Tradeweb Markets Inc.",
-                  "market": "US",
-                  "source_asof": "2026-10-20T18:44:06+00:00",
-                  "signal_action": "WATCH",
-                  "trigger_type": "telegram_pdf_report",
-                  "trigger_score": 0.45,
-                  "composite_score": 0.45,
-                  "confidence": 0.45,
-                  "warnings": []
-                }
-              ],
-              "simulation_only": false,
-              "actionability": "research_only"
-            }
-          },
-          {
-            "event_key": "stock_ai_agent:16395",
-            "content_sha256": "cf006ad2d8a5d99bb15428b3a091714bfcdb2167acba8309a4f0c397d5247960",
-            "occurred_at": "2026-10-20T18:44:01+00:00",
-            "relevance": {
-              "tickers": [
-                "SLS",
-                "SNDX",
-                "PRLD"
-              ],
-              "markets": [
-                "US"
-              ],
-              "themes": [],
-              "match_basis": "normalized_prism_signals",
-              "matched_tickers": [],
-              "market_match": true,
-              "score": 20
-            },
-            "summary": {
-              "message_id": "16395",
-              "posted_at": "2026-10-20T18:44:01+00:00",
-              "source_url": "https://t.me/stock_ai_agent/16395",
-              "preview": "",
-              "signals": [
-                {
-                  "canonical_ticker": "SLS",
-                  "display_name": "SELLAS Life Sciences Group,  Inc",
-                  "market": "US",
-                  "source_asof": "2026-10-20T18:44:01+00:00",
-                  "signal_action": "WATCH",
-                  "trigger_type": "telegram_pdf_report",
-                  "trigger_score": 0.45,
-                  "composite_score": 0.45,
-                  "confidence": 0.45,
-                  "warnings": []
-                },
-                {
-                  "canonical_ticker": "SNDX",
-                  "display_name": "경쟁사와 비교하면 — 선정된 비교기업 Syndax Pharmaceuticals",
-                  "market": "US",
-                  "source_asof": "2026-10-20T18:44:01+00:00",
-                  "signal_action": "WATCH",
-                  "trigger_type": "telegram_pdf_report",
-                  "trigger_score": 0.45,
-                  "composite_score": 0.45,
-                  "confidence": 0.45,
-                  "warnings": []
-                },
-                {
-                  "canonical_ticker": "PRLD",
-                  "display_name": "와 Prelude Therapeutics",
-                  "market": "US",
-                  "source_asof": "2026-10-20T18:44:01+00:00",
-                  "signal_action": "WATCH",
-                  "trigger_type": "telegram_pdf_report",
-                  "trigger_score": 0.45,
-                  "composite_score": 0.45,
-                  "confidence": 0.45,
-                  "warnings": []
-                }
-              ],
-              "simulation_only": false,
-              "actionability": "research_only"
-            }
-          },
-          {
-            "event_key": "stock_ai_agent:16394",
-            "content_sha256": "f81f7c7346edf53289137ba0264f3769080b0d6d51aa699f6f4c784bcfabf80e",
-            "occurred_at": "2026-10-20T18:43:55+00:00",
-            "relevance": {
-              "tickers": [
-                "MRNA"
-              ],
-              "markets": [
-                "US"
-              ],
-              "themes": [],
-              "match_basis": "normalized_prism_signals",
-              "matched_tickers": [],
-              "market_match": true,
-              "score": 20
-            },
-            "summary": {
-              "message_id": "16394",
-              "posted_at": "2026-10-20T18:43:55+00:00",
-              "source_url": "https://t.me/stock_ai_agent/16394",
-              "preview": "",
-              "signals": [
-                {
-                  "canonical_ticker": "MRNA",
-                  "display_name": "Moderna,  Inc.",
-                  "market": "US",
-                  "source_asof": "2026-10-20T18:43:55+00:00",
-                  "signal_action": "WATCH",
-                  "trigger_type": "telegram_pdf_report",
-                  "trigger_score": 0.45,
-                  "composite_score": 0.45,
-                  "confidence": 0.45,
-                  "warnings": []
-                }
-              ],
-              "simulation_only": false,
-              "actionability": "research_only"
-            }
-          },
-          {
-            "event_key": "stock_ai_agent:16393",
-            "content_sha256": "65256765a9d527b39898182b12801d7ae85e71a6fa43ac498765b5b3e83249c9",
-            "occurred_at": "2026-10-20T18:43:48+00:00",
-            "relevance": {
-              "tickers": [
-                "TW"
-              ],
-              "markets": [
-                "US"
-              ],
-              "themes": [],
-              "match_basis": "normalized_prism_signals",
-              "matched_tickers": [],
-              "market_match": true,
-              "score": 20
-            },
-            "summary": {
-              "message_id": "16393",
-              "posted_at": "2026-10-20T18:43:48+00:00",
-              "source_url": "https://t.me/stock_ai_agent/16393",
-              "preview": "📊 Tradeweb Markets (TW) 채권·금리·주식 등 금융상품의 전자거래 플랫폼을 운영하며, 거래 수수료와 구독·시장정보 수익을 얻습니다. 💰 거래 현황 (10/20 장중 관측치, 종가 미확정) • 주가 $119.41, 전일 종가 대비 +4.1% • 거래량 약 199만 주로 전일 약 123만 주보다 약 62% 증가. 다만 단일 세션만으로 매수 주체나 상승 지속성을 단정하기는 어...",
-              "signals": [
-                {
-                  "canonical_ticker": "TW",
-                  "display_name": "Tradeweb Markets",
-                  "market": "US",
-                  "source_asof": "2026-10-20T18:43:48+00:00",
-                  "signal_action": "UNKNOWN",
-                  "trigger_type": "telegram_message",
-                  "trigger_score": 0.45,
-                  "composite_score": 0.45,
-                  "confidence": 0.45,
-                  "warnings": []
-                }
-              ],
-              "simulation_only": false,
-              "actionability": "research_only"
-            }
-          },
-          {
-            "event_key": "stock_ai_agent:16392",
-            "content_sha256": "4ed373f929c0f9db25569b82f240ec9f0ed16e0f56f021c6b0f94f918c88a4ee",
-            "occurred_at": "2026-10-20T18:43:43+00:00",
-            "relevance": {
-              "tickers": [
-                "SLS"
-              ],
-              "markets": [
-                "US"
-              ],
-              "themes": [],
-              "match_basis": "normalized_prism_signals",
-              "matched_tickers": [],
-              "market_match": true,
-              "score": 20
-            },
-            "summary": {
-              "message_id": "16392",
-              "posted_at": "2026-10-20T18:43:43+00:00",
-              "source_url": "https://t.me/stock_ai_agent/16392",
-              "preview": "📊 SELLAS Life Sciences Group (SLS) 암 치료제를 개발하는 임상 단계 바이오기업으로, 주요 후보물질은 GPS와 SLS009입니다. 매출은 아직 없으며 기업가치는 임상 진전과 자금 여력에 크게 좌우됩니다. 💵 주가·거래 동향 - 10월 20일 관측가: $11.83 (장중 별도 관측값 $11.87; 확정 종가 아님) - 전일 종가 $10.49 대비 약 +12.8%...",
-              "signals": [
-                {
-                  "canonical_ticker": "SLS",
-                  "display_name": "SELLAS Life Sciences Group",
-                  "market": "US",
-                  "source_asof": "2026-10-20T18:43:43+00:00",
-                  "signal_action": "UNKNOWN",
-                  "trigger_type": "telegram_message",
-                  "trigger_score": 0.45,
-                  "composite_score": 0.45,
-                  "confidence": 0.45,
-                  "warnings": []
-                }
-              ],
-              "simulation_only": false,
-              "actionability": "research_only"
-            }
-          },
-          {
-            "event_key": "stock_ai_agent:16391",
-            "content_sha256": "a04c48f9fe4ce3a02259b68fdf76530d86437b93feaaddbf7a037db5153e00d6",
-            "occurred_at": "2026-10-20T18:43:39+00:00",
-            "relevance": {
-              "tickers": [
-                "MRNA"
-              ],
-              "markets": [
-                "US"
-              ],
-              "themes": [],
-              "match_basis": "normalized_prism_signals",
-              "matched_tickers": [],
-              "market_match": true,
-              "score": 20
-            },
-            "summary": {
-              "message_id": "16391",
-              "posted_at": "2026-10-20T18:43:39+00:00",
-              "source_url": "https://t.me/stock_ai_agent/16391",
-              "preview": "📊 Moderna, Inc. (MRNA) — mRNA 기반 백신·치료제를 개발·판매하는 바이오기업입니다. 코로나19 제품 매출 감소 이후 신규 제품과 파이프라인의 상업화가 실적 회복의 관건입니다. 💰 현재가: $240.80 (2026년 10월 20일 14:36 ET 관측, 확정 종가 아님) 📈 전일 대비: +6.1% (전일 기준 $226.89 대비) 📊 거래량: 8월 급등 때 약 1억...",
-              "signals": [
-                {
-                  "canonical_ticker": "MRNA",
-                  "display_name": "Moderna, Inc.",
-                  "market": "US",
-                  "source_asof": "2026-10-20T18:43:39+00:00",
-                  "signal_action": "UNKNOWN",
-                  "trigger_type": "telegram_message",
-                  "trigger_score": 0.45,
-                  "composite_score": 0.45,
-                  "target_price": 129.22,
-                  "confidence": 0.45,
-                  "warnings": []
-                }
-              ],
-              "simulation_only": false,
-              "actionability": "research_only"
-            }
-          },
           {
             "event_key": "stock_ai_agent:16410",
             "content_sha256": "8db3376f94e682c76959b445238c115a6beee82f07bb90a5b9aba366917c563a",
@@ -3397,19 +2783,6 @@
           "prism": {
             "source_health": "OK",
             "event_keys": [
-              "stock_ai_agent:16403",
-              "stock_ai_agent:16402",
-              "stock_ai_agent:16401",
-              "stock_ai_agent:16400",
-              "stock_ai_agent:16399",
-              "stock_ai_agent:16398",
-              "stock_ai_agent:16397",
-              "stock_ai_agent:16396",
-              "stock_ai_agent:16395",
-              "stock_ai_agent:16394",
-              "stock_ai_agent:16393",
-              "stock_ai_agent:16392",
-              "stock_ai_agent:16391",
               "stock_ai_agent:16410",
               "stock_ai_agent:16409",
               "stock_ai_agent:16408",
@@ -3420,12 +2793,12 @@
             ],
             "coverage": {
               "total_unique_events": 204,
-              "window_events": 20,
-              "transmitted_events": 20,
+              "window_events": 7,
+              "transmitted_events": 7,
               "truncated": false,
-              "oldest_occurred_at": "2026-10-20T18:43:39+00:00",
+              "oldest_occurred_at": "2026-10-20T19:47:27+00:00",
               "newest_occurred_at": "2026-10-20T20:57:26+00:00",
-              "available_events_before_context_cap": 20,
+              "available_events_before_context_cap": 7,
               "context_event_cap": 20,
               "omitted_events": 0,
               "omitted_due_to_context_cap": 0,
@@ -3439,8 +2812,8 @@
       "untrusted_external_context": true,
       "global_mode_cannot_promote_a_row": true,
       "immediate_requires_row_mode": "IMMEDIATE",
-      "market_data_asof": "2026-10-21T14:37:00-04:00",
-      "valid_until": "2026-10-21T14:47:00-04:00",
+      "market_data_asof": "2026-10-21T14:51:00-04:00",
+      "valid_until": "2026-10-21T15:01:00-04:00",
       "expired_at_build": false,
       "decision_ready": true,
       "conditional_strategy_ready": true,
@@ -3518,7 +2891,7 @@
         "usage_available": true
       },
       "overlay": {
-        "source_run_id": "20261022T033712_local-freshness-us-overlay",
+        "source_run_id": "20261022T035111_local-freshness-us-overlay",
         "provider": "codex",
         "requested_models": {
           "quick": "gpt-6.1-sol",
