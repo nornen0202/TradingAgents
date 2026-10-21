@@ -1,13 +1,13 @@
 {
   "schema": "tradingagents.work-context/v1",
   "surface": "prism",
-  "event_id": "prism:6ad1edbf6630e8ba38be31294d639c18",
+  "event_id": "prism:1f7403f877e9a1f48562d0238bb7fe01",
   "prompt_contract_version": "prism-work-v5",
   "prompt_sha256": "2d6e6a207021f5126507994f77ca7850fa9bf42701a32286227ca874c1f535df",
   "skill_sha256": "4dffe28b3721557cc2517b5afff2f94045832606e71ff61461df969f6abb53c7",
   "task_manifest_sha256": "c0992fa275c9961bc91c679030c0b4d9b8b06f3d164226776421f1e354b5c22e",
   "workflow_contract_sha256": "6e9bacf847e1ea3fede5d24780fde443897da2d480119b5ef7dfdc873bb87103",
-  "source_sha256": "535b1deaf0a4325f9844c9e1e28c9fe097f5eb0bfcbcc5310f8c7d042fda8147",
+  "source_sha256": "00e8ce305ba7cbf4743a99f010e0e5a2750c74f39170c401e00e972e22e90746",
   "body": {
     "kind": "prism",
     "source_health": "OK",
@@ -44,10 +44,10 @@
     },
     "coverage": {
       "total_unique_events": 204,
-      "window_events": 21,
-      "transmitted_events": 21,
+      "window_events": 20,
+      "transmitted_events": 20,
       "truncated": false,
-      "oldest_occurred_at": "2026-10-20T18:36:22+00:00",
+      "oldest_occurred_at": "2026-10-20T18:43:39+00:00",
       "newest_occurred_at": "2026-10-20T20:57:26+00:00"
     },
     "events": [
@@ -986,81 +986,6 @@
             "version": "prism-telegram/v3",
             "status": "ARCHIVED_TEXT_RECHECKED",
             "text_chars": 1005,
-            "text_source": "public_metadata",
-            "action_changes": [],
-            "recovered_tickers": []
-          }
-        }
-      },
-      {
-        "event_key": "stock_ai_agent:16390",
-        "content_sha256": "98c8e48c16e37bb8378d15e3c4a4ea97f737fd7c22151d53814f71e145f52634",
-        "occurred_at": "2026-10-20T18:36:22+00:00",
-        "relevance": {
-          "tickers": [
-            "MRNA",
-            "SLS",
-            "TW"
-          ],
-          "markets": [
-            "US"
-          ],
-          "themes": [],
-          "match_basis": "normalized_prism_signals"
-        },
-        "summary": {
-          "channel": "stock_ai_agent",
-          "message_id": "16390",
-          "posted_at": "2026-10-20T18:36:22+00:00",
-          "source_url": "https://t.me/stock_ai_agent/16390",
-          "preview": "🔔 미국주식 오후 프리즘 시그널 얼럿 📅 2026.10.20 오후 분석 포착된 관심종목 🤖 프리즘봇의 가상 포트폴리오 운용 과정을 투명하게 공개합니다. 실제 매수 권유가 아닙니다. 🧭 장기추세: 온건 강세 | 스윙: 횡보·숨고르기 | 실행기준: 온건 강세 | 선정: 탑다운 1종목 + 바텀업 2종목 🧭 오늘 테마 흐름 미국 1,019종목 · 전일 종가 대비 · 테마별 중앙값 📈 강한 테마...",
-          "signals": [
-            {
-              "canonical_ticker": "MRNA",
-              "display_name": "Moderna, Inc.",
-              "market": "US",
-              "source_asof": "2026-10-20T18:36:22+00:00",
-              "signal_action": "WATCH",
-              "trigger_type": "telegram_signal_alert",
-              "trigger_score": 0.99,
-              "composite_score": 0.99,
-              "confidence": 0.99,
-              "warnings": []
-            },
-            {
-              "canonical_ticker": "SLS",
-              "display_name": "SELLAS Life Sciences Group, Inc",
-              "market": "US",
-              "source_asof": "2026-10-20T18:36:22+00:00",
-              "signal_action": "WATCH",
-              "trigger_type": "telegram_signal_alert",
-              "trigger_score": 0.99,
-              "composite_score": 0.99,
-              "confidence": 0.99,
-              "warnings": []
-            },
-            {
-              "canonical_ticker": "TW",
-              "display_name": "Tradeweb Markets Inc.",
-              "market": "US",
-              "source_asof": "2026-10-20T18:36:22+00:00",
-              "signal_action": "WATCH",
-              "trigger_type": "telegram_signal_alert",
-              "trigger_score": 0.61,
-              "composite_score": 0.61,
-              "confidence": 0.61,
-              "warnings": []
-            }
-          ],
-          "signals_total": 3,
-          "signals_transmitted": 3,
-          "signals_truncated": false,
-          "simulation_only": true,
-          "actionability": "research_only",
-          "normalization": {
-            "version": "prism-telegram/v3",
-            "status": "ARCHIVED_TEXT_RECHECKED",
-            "text_chars": 1059,
             "text_source": "public_metadata",
             "action_changes": [],
             "recovered_tickers": []
