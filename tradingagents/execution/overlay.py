@@ -344,6 +344,13 @@ def evaluate_execution_state(
                     reason_codes.append("pilot_window_not_open")
                 reason_codes.extend(microstructure_block_reasons)
 
+    # A crossed watch level is not an entry authorization. In particular, WAIT
+    # with conditional action NONE must not become PILOT_READY/STARTER downstream.
+    if decision_state == DecisionState.ACTIONABLE_NOW and decision_now == DecisionNow.NONE:
+        decision_state = DecisionState.ARMED
+        execution_timing_state = ExecutionTimingState.WAITING
+        reason_codes.append("entry_not_authorized")
+
     if market_session == "post_close" and execution_timing_state == ExecutionTimingState.WAITING and contract.breakout_level is not None:
         decision_state = DecisionState.WAIT
         decision_now = DecisionNow.NONE

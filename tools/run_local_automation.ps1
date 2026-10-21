@@ -13,6 +13,33 @@ $pythonInvoked = $false
 $locationPushed = $false
 $launcherErrorType = 'LocalRuntimeUnavailable'
 
+# Resolve under the existing repository mutex. Four minute workers share this
+# receipt so redundant remote fetches cannot delay a fresh observation past TTL.
+function Resolve-LocalAutomationSourceRevision {
+    param([string] $StateRoot)
+    $receiptPath = Join-Path $StateRoot 'source-fetch.json'
+    $cached = $false
+    $now = [DateTimeOffset]::UtcNow
+    $head = $null
+    try { $head = (& git rev-parse fork/main 2>$null) } catch { $head = $null }
+    if ($LASTEXITCODE -eq 0 -and $head -match '^[0-9a-f]{40}$' -and (Test-Path -LiteralPath $receiptPath)) {
+        try {
+            $receipt = Get-Content -LiteralPath $receiptPath -Raw | ConvertFrom-Json
+            $age = ($now - [DateTimeOffset]::Parse($receipt.checked_at)).TotalSeconds
+            $cached = $receipt.revision -eq $head -and $age -ge 0 -and $age -lt 60
+        } catch { $cached = $false }
+    }
+    if (-not $cached) {
+        & git fetch fork main --quiet
+        if ($LASTEXITCODE -ne 0) { throw 'Could not refresh fork/main.' }
+        $head = (& git rev-parse fork/main).Trim()
+        if ($LASTEXITCODE -ne 0 -or $head -notmatch '^[0-9a-f]{40}$') { throw 'Invalid source revision.' }
+        @{ revision = $head; checked_at = [DateTimeOffset]::UtcNow.ToString('o') } |
+            ConvertTo-Json -Compress | Set-Content -LiteralPath $receiptPath -Encoding UTF8
+    }
+    return $head.Trim()
+}
+
 # Never change the user's checkout or the runner workspaces. Materialize a
 # tracked, immutable main revision for each run; no credentials are copied.
 try {
@@ -35,11 +62,7 @@ try {
     try {
         try { $fetchOwned = $fetchMutex.WaitOne(60000) } catch [Threading.AbandonedMutexException] { $fetchOwned = $true }
         if (-not $fetchOwned) { throw "Source refresh is still active." }
-        & git fetch fork main --quiet
-        if ($LASTEXITCODE -ne 0) { throw "Could not refresh fork/main." }
-        $launcherErrorType = 'SourceRevisionInvalid'
-        $revision = (& git rev-parse fork/main).Trim()
-        if ($revision -notmatch '^[0-9a-f]{40}$') { throw "Invalid source revision." }
+        $revision = Resolve-LocalAutomationSourceRevision -StateRoot $stateRoot
     } finally {
         if ($fetchOwned) { $fetchMutex.ReleaseMutex() }
         $fetchMutex.Dispose()
