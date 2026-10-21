@@ -1,9 +1,9 @@
 {
   "schema": "tradingagents.work-context/v1",
   "surface": "us",
-  "event_id": "us:3a978cd9344537b3bc1114c6909022bb",
-  "source_sha256": "09bed7ca36a470250e635d745ce0cf0b9eae153746bbd7e4f0bb81266d03cba9",
-  "packet_sha256": "dd52b529571211c0eec561b31ad334cdad978329c380c66e95392abdf2b430c2",
+  "event_id": "us:031ff26742368aaa59dee5030f8b5d15",
+  "source_sha256": "7e74c8545b56daa4e0ec8eebb8a6c2389ee50b65d91f097c447e4a5912aca22c",
+  "packet_sha256": "727c60d28e27c2c8a45546af9b9eaa947df506f901c70b38414b2b2ff0b63f73",
   "prompt_contract_version": "market-work-v13-us",
   "prompt_sha256": "281749b3b871d01531e3ceb7377d60bb67ebcaf89d6d8ba3162cb53d38400d7a",
   "skill_sha256": "4dffe28b3721557cc2517b5afff2f94045832606e71ff61461df969f6abb53c7",
@@ -11,22 +11,22 @@
   "workflow_contract_sha256": "8d06ba979f55f01229636b73bdc643c5b21f326cc270c0e8143f3fd7a3204028",
   "status_url": "https://nornen0202.github.io/TradingAgents/work/v1/us/status.json",
   "latest_url": "https://nornen0202.github.io/TradingAgents/work/v1/us/latest.json",
-  "event_url": "https://nornen0202.github.io/TradingAgents/work/v1/us/events/us-3a978cd9344537b3bc1114c6909022bb.json",
+  "event_url": "https://nornen0202.github.io/TradingAgents/work/v1/us/events/us-031ff26742368aaa59dee5030f8b5d15.json",
   "prompt_url": "https://nornen0202.github.io/TradingAgents/work/v1/prompts/market_us.md",
   "source_health": "OK",
   "report_mode": "READY",
   "freshness_receipt": {
     "schema": "tradingagents.source-freshness/v1",
-    "producer_run_id": "20261022T005217_local-freshness-us-overlay",
-    "producer_started_at": "2026-10-22T00:52:17.969483+09:00",
-    "producer_finished_at": "2026-10-22T00:53:28.990311+09:00",
+    "producer_run_id": "20261022T010613_local-freshness-us-overlay",
+    "producer_started_at": "2026-10-22T01:06:13.882354+09:00",
+    "producer_finished_at": "2026-10-22T01:06:59.261723+09:00",
     "analysis_run_id": "20261021T175015_local-scheduler-us-full",
     "analysis_lineage_status": "RESOLVED",
     "analysis_completed_at": "2026-10-21T21:13:33.227411+09:00",
     "analysis_trade_date_oldest": "2026-10-20",
     "analysis_trade_date_latest": "2026-10-20",
-    "market_data_oldest_at": "2026-10-21T11:52:00-04:00",
-    "market_data_latest_at": "2026-10-21T15:52:15+00:00",
+    "market_data_oldest_at": "2026-10-21T16:05:49+00:00",
+    "market_data_latest_at": "2026-10-21T16:05:49+00:00",
     "market_data_status": "FRESH",
     "publication_does_not_refresh_inputs": true,
     "execution_max_age_seconds": 600.0,
@@ -70,12 +70,6 @@
       },
       {
         "ticker": "AMZN",
-        "research_valid": true,
-        "category": "FRESH_REGULAR_SESSION",
-        "execution_eligible": false
-      },
-      {
-        "ticker": "TSM",
         "research_valid": true,
         "category": "FRESH_REGULAR_SESSION",
         "execution_eligible": false
@@ -142,6 +136,12 @@
       },
       {
         "ticker": "GEV",
+        "research_valid": true,
+        "category": "FRESH_REGULAR_SESSION",
+        "execution_eligible": false
+      },
+      {
+        "ticker": "TSM",
         "research_valid": true,
         "category": "FRESH_REGULAR_SESSION",
         "execution_eligible": false
