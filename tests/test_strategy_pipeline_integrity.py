@@ -51,6 +51,60 @@ def test_archived_prism_missing_text_keeps_normalized_signals(tmp_path):
     assert event["summary"]["normalization"]["status"] == "NO_ARCHIVED_TEXT"
 
 
+@pytest.mark.parametrize("text,expected", [
+    ("🏁 BTC 데모 시나리오 종료 · 정산 확인", True),
+    ("🛡 BTC 데모 보호 변경 확인 · 롱", True),
+    ("✂️ BTC 데모 부분 청산 체결 · 롱", True),
+    ("📌 BTC 데모 첫 진입 체결 · 롱", True),
+    ("ETH 데모 시나리오 종료", True),
+    ("프리즘봇의 가상 포트폴리오 운용 과정을 공개합니다.", True),
+    ("프리즘 US 시뮬레이터 | 실시간 포트폴리오", True),
+    ("US Simulation portfolio", True),
+    ("가상현실 제품 데모 공개 · 기업 실적 분석", False),
+    ("📊 Moderna, Inc.(MRNA) 기업 분석", False),
+    ("⚠️ 매수 보류: Tradeweb Markets Inc.(TW)", False),
+    ("", False),
+])
+def test_prism_explicit_virtual_material_stays_research_only(tmp_path, text, expected):
+    historical = json.dumps({"signals": []})
+    signals_path = tmp_path / "signals.json"
+    signals_path.write_text(historical, encoding="utf-8")
+    event = packet._prism_event("channel", {
+        "message_id": "42", "text_preview": text, "signals_path": "signals.json",
+    }, tmp_path)
+    assert event["summary"]["simulation_only"] is expected
+    assert event["summary"]["actionability"] == "research_only"
+    assert signals_path.read_text(encoding="utf-8") == historical
+
+
+def test_prism_simulation_marker_uses_sanitized_text_beyond_preview(tmp_path):
+    text = "미국주식 오후 프리즘 시그널 얼럿\n" + "참고 자료 " * 80
+    metadata_text = text + "\n프리즘봇의 가상 포트폴리오 운용입니다."
+    metadata_path = tmp_path / "metadata.json"
+    original = json.dumps({"text": metadata_text}, ensure_ascii=False)
+    metadata_path.write_text(original, encoding="utf-8")
+    event = packet._prism_event("channel", {
+        "message_id": "42", "text_preview": text[:200],
+        "metadata_path": "metadata.json",
+    }, tmp_path)
+    assert event["summary"]["simulation_only"] is True
+    assert event["summary"]["preview"] == text[:200]
+    assert metadata_path.read_text(encoding="utf-8") == original
+
+
+def test_prism_simulation_classification_rejects_metadata_path_escape(tmp_path):
+    run_dir = tmp_path / "run"
+    run_dir.mkdir()
+    (tmp_path / "private.json").write_text(
+        json.dumps({"text": "가상 포트폴리오"}), encoding="utf-8"
+    )
+    event = packet._prism_event("channel", {
+        "message_id": "42", "text_preview": "TW 기업 분석",
+        "metadata_path": "../private.json",
+    }, run_dir)
+    assert event["summary"]["simulation_only"] is False
+
+
 def test_present_hold_does_not_mean_hold_after_support_failure():
     text = risk_condition_text('HOLD', {'price': 70700, 'level_type': 'SUPPORT', 'confirmation': 'close'}, '보유 유지')
     assert '70,700 이하 하락' in text

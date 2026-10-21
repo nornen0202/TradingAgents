@@ -154,6 +154,16 @@ This is a policy skip, never `SENT`. Missing, failed, incomplete, future or unbo
 successors cannot establish it; full research and existing delivery receipts are
 preserved. Resume only the existing bounded notification lane after deployment.
 
+On October 21, PRISM messages explicitly describing BTC demo trades and a
+virtual portfolio had `simulation_only=false`: the packet builder recognized
+only the Korean simulator stem and English `simulation`, and inspected the
+short preview alone. It now also recognizes explicit virtual-portfolio and
+BTC/ETH demo labels in the sanitized public metadata. Ordinary product demos
+remain distinct. Existing archived messages, signals, pending packets and ACKs
+are immutable; newly built events receive their own content hashes. Research-only
+actionability and market/account/risk gates remain required. A source score or
+virtual fill never proves a real account trade or independent fact verification.
+
 The installed PowerShell launcher also records failures before Python is invoked,
 including a missing analysis runtime or failed source fetch/snapshot preparation.
 It writes the same credential-free, hash-bound outbox with stage `launcher`,
