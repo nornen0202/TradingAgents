@@ -4,9 +4,9 @@
     "kr": {
       "schema": "tradingagents.work-context/v1",
       "surface": "kr",
-      "event_id": "kr:31fe61576b80a031791b9863068e1d8b",
-      "source_sha256": "8a3448de9f287dab776d0f61223e8604daac8a5313905989d0db784c1ea273e2",
-      "packet_sha256": "41a829f68a720cd46b9af2dd08a9fc9457a9d14a60bdbd012545116af3051c01",
+      "event_id": "kr:720579c1230338e4a57352a2cc47e99d",
+      "source_sha256": "07e2374ed379bfa88fa4dd2410a74ac7d1d20c35f858a17be5e622a77f203cc0",
+      "packet_sha256": "0a838c632f111aeec5e5ffec50257af1715b2190befaf451e1fb2fcb7e8c5749",
       "prompt_contract_version": "market-work-v12-kr",
       "prompt_sha256": "a72e95420df2bdbf27008d2fc88ea82b9aa78c1222a888149cb844d5f0402a46",
       "skill_sha256": "4dffe28b3721557cc2517b5afff2f94045832606e71ff61461df969f6abb53c7",
@@ -14,205 +14,205 @@
       "workflow_contract_sha256": "97fde7add4383c59c23330c927f073c5c281e98221519d9aeab3615f11917f8a",
       "status_url": "https://nornen0202.github.io/TradingAgents/work/v1/kr/status.json",
       "latest_url": "https://nornen0202.github.io/TradingAgents/work/v1/kr/latest.json",
-      "event_url": "https://nornen0202.github.io/TradingAgents/work/v1/kr/events/kr-31fe61576b80a031791b9863068e1d8b.json",
+      "event_url": "https://nornen0202.github.io/TradingAgents/work/v1/kr/events/kr-720579c1230338e4a57352a2cc47e99d.json",
       "prompt_url": "https://nornen0202.github.io/TradingAgents/work/v1/prompts/market_kr.md",
-      "source_health": "STALE",
-      "report_mode": "OUTAGE",
+      "source_health": "OK",
+      "report_mode": "CONDITIONAL",
       "freshness_receipt": {
         "schema": "tradingagents.source-freshness/v1",
-        "producer_run_id": "20261021T044513_local-scheduler-kr-full",
-        "producer_started_at": "2026-10-21T04:45:13.141162+09:00",
-        "producer_finished_at": "2026-10-21T07:30:19.484908+09:00",
+        "producer_run_id": "20261021T091009_local-freshness-kr-overlay",
+        "producer_started_at": "2026-10-21T09:10:09.552698+09:00",
+        "producer_finished_at": "2026-10-21T09:12:59.681248+09:00",
         "analysis_run_id": "20261021T044513_local-scheduler-kr-full",
         "analysis_lineage_status": "RESOLVED",
         "analysis_completed_at": "2026-10-21T07:07:20.515277+09:00",
         "analysis_trade_date_oldest": "2026-10-20",
         "analysis_trade_date_latest": "2026-10-20",
-        "market_data_oldest_at": "2026-10-20T20:00:00+09:00",
-        "market_data_latest_at": "2026-10-20T20:00:00+09:00",
-        "market_data_status": "STALE",
+        "market_data_oldest_at": "2026-10-21T09:11:00+09:00",
+        "market_data_latest_at": "2026-10-21T09:12:00+09:00",
+        "market_data_status": "FRESH",
         "publication_does_not_refresh_inputs": true,
         "execution_max_age_seconds": 600.0,
-        "research_market_data_status": "UNVERIFIED",
+        "research_market_data_status": "VALID",
         "research_market_data_receipts": [
           {
-            "ticker": "000660.KS",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
-            "execution_eligible": false
-          },
-          {
-            "ticker": "005930.KS",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
-            "execution_eligible": false
-          },
-          {
-            "ticker": "278470.KS",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
-            "execution_eligible": false
-          },
-          {
-            "ticker": "010120.KS",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
-            "execution_eligible": false
-          },
-          {
-            "ticker": "267260.KS",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
-            "execution_eligible": false
-          },
-          {
-            "ticker": "058470.KQ",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
-            "execution_eligible": false
-          },
-          {
-            "ticker": "035420.KS",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
-            "execution_eligible": false
-          },
-          {
-            "ticker": "042700.KS",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
-            "execution_eligible": false
-          },
-          {
-            "ticker": "353200.KS",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
-            "execution_eligible": false
-          },
-          {
-            "ticker": "034020.KS",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
-            "execution_eligible": false
-          },
-          {
-            "ticker": "010140.KS",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
-            "execution_eligible": false
-          },
-          {
-            "ticker": "403870.KQ",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
-            "execution_eligible": false
-          },
-          {
-            "ticker": "083450.KQ",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
-            "execution_eligible": false
-          },
-          {
             "ticker": "033780.KS",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
             "execution_eligible": false
           },
           {
             "ticker": "396300.KQ",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
-            "execution_eligible": false
-          },
-          {
-            "ticker": "131290.KQ",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
             "execution_eligible": false
           },
           {
             "ticker": "003230.KS",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
-            "execution_eligible": false
-          },
-          {
-            "ticker": "096770.KS",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
             "execution_eligible": false
           },
           {
             "ticker": "090430.KS",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
             "execution_eligible": false
           },
           {
-            "ticker": "051900.KS",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "ticker": "000660.KS",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "267260.KS",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "005930.KS",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "278470.KS",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "042700.KS",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "035420.KS",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "010120.KS",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "353200.KS",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "058470.KQ",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "034020.KS",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "010140.KS",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "403870.KQ",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "083450.KQ",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
             "execution_eligible": false
           },
           {
             "ticker": "000100.KS",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
-            "execution_eligible": false
-          },
-          {
-            "ticker": "036460.KS",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
             "execution_eligible": false
           },
           {
             "ticker": "018880.KS",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
             "execution_eligible": false
           },
           {
-            "ticker": "086790.KS",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
-            "execution_eligible": false
-          },
-          {
-            "ticker": "105560.KS",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
-            "execution_eligible": false
-          },
-          {
-            "ticker": "122350.KQ",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
-            "execution_eligible": false
-          },
-          {
-            "ticker": "373220.KS",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "ticker": "036460.KS",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
             "execution_eligible": false
           },
           {
             "ticker": "011200.KS",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
             "execution_eligible": false
           },
           {
             "ticker": "068270.KS",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
             "execution_eligible": false
           },
           {
             "ticker": "006400.KS",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "131290.KQ",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "096770.KS",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "051900.KS",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "086790.KS",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "122350.KQ",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "105560.KS",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "373220.KS",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
             "execution_eligible": false
           }
         ],
@@ -238,9 +238,9 @@
     "us": {
       "schema": "tradingagents.work-context/v1",
       "surface": "us",
-      "event_id": "us:567ce75bfb0c59df70443e6391a79832",
-      "source_sha256": "11cfa9f14feed5658afdea8f5086b9fe0530e4d6f4c0aebf0b516b287aa373b6",
-      "packet_sha256": "7e8e2eed615ae45f31ef27e4a55388a65df9126704d9e827b22a4fc6ab21461c",
+      "event_id": "us:8145a9ef78d8e8a24a2b20b031bafb30",
+      "source_sha256": "0aad9f06a83d032bdff54cdd6b1f97afd9f61769fdc010619d0adb488e242e45",
+      "packet_sha256": "3ce5bedf56b0f6b734f1f09116f0f12295cb49c5ceb99ec4811642e7d10cf707",
       "prompt_contract_version": "market-work-v13-us",
       "prompt_sha256": "281749b3b871d01531e3ceb7377d60bb67ebcaf89d6d8ba3162cb53d38400d7a",
       "skill_sha256": "4dffe28b3721557cc2517b5afff2f94045832606e71ff61461df969f6abb53c7",
@@ -248,7 +248,7 @@
       "workflow_contract_sha256": "8d06ba979f55f01229636b73bdc643c5b21f326cc270c0e8143f3fd7a3204028",
       "status_url": "https://nornen0202.github.io/TradingAgents/work/v1/us/status.json",
       "latest_url": "https://nornen0202.github.io/TradingAgents/work/v1/us/latest.json",
-      "event_url": "https://nornen0202.github.io/TradingAgents/work/v1/us/events/us-567ce75bfb0c59df70443e6391a79832.json",
+      "event_url": "https://nornen0202.github.io/TradingAgents/work/v1/us/events/us-8145a9ef78d8e8a24a2b20b031bafb30.json",
       "prompt_url": "https://nornen0202.github.io/TradingAgents/work/v1/prompts/market_us.md",
       "source_health": "STALE",
       "report_mode": "OUTAGE",
@@ -472,9 +472,9 @@
     "youtube": {
       "schema": "tradingagents.work-context/v1",
       "surface": "youtube",
-      "event_id": "youtube:46f5c00294301e398dab8cb53afecb68",
-      "source_sha256": "9d7ce281a847824c62e30b70c0d3fb9bb73a6bd37595794c1d935e1bbd5da3f6",
-      "packet_sha256": "a04b1e821b7f8a0a5cf96852334aab286e2cef39ee718e81eb0e695469204e26",
+      "event_id": "youtube:287e4197494154edb642faa82f0e0bc4",
+      "source_sha256": "1f630d7e413d4ed527aa4bc75a225d1d155bb8e2344f86ba83f601c359591616",
+      "packet_sha256": "7c0e91e0c30b6fdadf406d28af112fb48283b0d2aace136825e9e454bff9ef23",
       "prompt_contract_version": "youtube-work-v5",
       "prompt_sha256": "82a87727ec636b928ccb90cfe8cd823d86347e254ed0b204903699e34e35ef0b",
       "skill_sha256": "4dffe28b3721557cc2517b5afff2f94045832606e71ff61461df969f6abb53c7",
@@ -482,7 +482,7 @@
       "workflow_contract_sha256": "4982d0db0e5a97f3b0f392bdff489a6940be0d2d88e7ea94533edbdb009b4556",
       "status_url": "https://nornen0202.github.io/TradingAgents/work/v1/youtube/status.json",
       "latest_url": "https://nornen0202.github.io/TradingAgents/work/v1/youtube/latest.json",
-      "event_url": "https://nornen0202.github.io/TradingAgents/work/v1/youtube/events/youtube-46f5c00294301e398dab8cb53afecb68.json",
+      "event_url": "https://nornen0202.github.io/TradingAgents/work/v1/youtube/events/youtube-287e4197494154edb642faa82f0e0bc4.json",
       "prompt_url": "https://nornen0202.github.io/TradingAgents/work/v1/prompts/youtube.md",
       "source_health": "OK",
       "report_mode": null,
@@ -490,24 +490,24 @@
       "readable_url": "https://nornen0202.github.io/TradingAgents/work/v1/youtube/status.html",
       "integrated_report": {
         "schema": "tradingagents.work-report/v1",
-        "report_id": "youtube:55740901d3ef9f8b38a87db340dbd3ca",
-        "report_sha256": "55740901d3ef9f8b38a87db340dbd3ca1c4b2f9ca9a083363acf6e560c6276cd",
-        "event_id": "youtube:7d703c656c5c58ba90698b674a16eb8e",
-        "source_sha256": "edfe6037094e13add3d8cc77140869991edd3b68374b77b504c2eeaa94b55e15",
-        "published_at": "2026-10-21T08:26:25.695503+09:00",
-        "as_of": "2026-10-21T08:26:24.719966+09:00",
+        "report_id": "youtube:88bb0d4406166c4a990dd5f456fe712e",
+        "report_sha256": "88bb0d4406166c4a990dd5f456fe712eb4c63d453d511cf3cf141a3f86ab4e98",
+        "event_id": "youtube:14350733edfa5cbca80ae0daeb5e7360",
+        "source_sha256": "fcf3e30b065e4e99c75a9d84de278339cdbdaf0abd18a7a7e53e042395193164",
+        "published_at": "2026-10-21T09:07:47.178583+09:00",
+        "as_of": "2026-10-21T08:45:09.767867+09:00",
         "readable_url": "https://nornen0202.github.io/TradingAgents/work/v1/youtube/report/latest.html",
         "markdown_url": "https://nornen0202.github.io/TradingAgents/work/v1/youtube/report/latest.md",
         "latest_url": "https://nornen0202.github.io/TradingAgents/work/v1/youtube/report/latest.json",
-        "event_url": "https://nornen0202.github.io/TradingAgents/work/v1/youtube/report/events/55740901d3ef9f8b38a87db340dbd3ca1c4b2f9ca9a083363acf6e560c6276cd.json"
+        "event_url": "https://nornen0202.github.io/TradingAgents/work/v1/youtube/report/events/88bb0d4406166c4a990dd5f456fe712eb4c63d453d511cf3cf141a3f86ab4e98.json"
       }
     },
     "prism": {
       "schema": "tradingagents.work-context/v1",
       "surface": "prism",
-      "event_id": "prism:86fdc694f3623a534508a60e2f477546",
-      "source_sha256": "2202e1fa704583dec23bf1a93ac6b26f270fe1c82660f05e3f444fb8bd2aaf6b",
-      "packet_sha256": "b10a7594b65ada2e11add6f10cbb988214d5b26dcb3b6c472af919dadd5cf1a3",
+      "event_id": "prism:6706afb103bdcb1174c539812beb20e7",
+      "source_sha256": "75d394ef666a0b8056910382666bab169d137d3a2ca1e756ea707d54e132035e",
+      "packet_sha256": "d75cd76eb13aae73085ce91c7c206b15624a3c40e93ef0bb7423d53c503101a7",
       "prompt_contract_version": "prism-work-v5",
       "prompt_sha256": "2d6e6a207021f5126507994f77ca7850fa9bf42701a32286227ca874c1f535df",
       "skill_sha256": "4dffe28b3721557cc2517b5afff2f94045832606e71ff61461df969f6abb53c7",
@@ -515,24 +515,24 @@
       "workflow_contract_sha256": "6e9bacf847e1ea3fede5d24780fde443897da2d480119b5ef7dfdc873bb87103",
       "status_url": "https://nornen0202.github.io/TradingAgents/work/v1/prism/status.json",
       "latest_url": "https://nornen0202.github.io/TradingAgents/work/v1/prism/latest.json",
-      "event_url": "https://nornen0202.github.io/TradingAgents/work/v1/prism/events/prism-86fdc694f3623a534508a60e2f477546.json",
+      "event_url": "https://nornen0202.github.io/TradingAgents/work/v1/prism/events/prism-6706afb103bdcb1174c539812beb20e7.json",
       "prompt_url": "https://nornen0202.github.io/TradingAgents/work/v1/prompts/prism.md",
-      "source_health": "EMPTY",
+      "source_health": "OK",
       "report_mode": null,
       "freshness_receipt": null,
       "readable_url": "https://nornen0202.github.io/TradingAgents/work/v1/prism/status.html",
       "integrated_report": {
         "schema": "tradingagents.work-report/v1",
-        "report_id": "prism:f379af58987175eff49ac6ac8bae539b",
-        "report_sha256": "f379af58987175eff49ac6ac8bae539b9803787ffbd9236eb7b8e2bedef23a97",
-        "event_id": "prism:9eddd16d7531bf9382818b7b9526d74f",
-        "source_sha256": "cda6779ff73a4bf1941d0f82520165fe34373ae4b464632ba6411bb47b3e9b6c",
-        "published_at": "2026-10-20T08:37:57.060901+09:00",
-        "as_of": "2026-10-19T18:51:20+00:00",
+        "report_id": "prism:d70049e30c34e67f773fcddc91b71caf",
+        "report_sha256": "d70049e30c34e67f773fcddc91b71caf0d4ccf6474dc5373d9b54e589a812fde",
+        "event_id": "prism:56061743d60a18c1b21c1ab33b5efa8d",
+        "source_sha256": "d251ea1173fd66812d153d3512d5e36b21fdd9574462e350785a20b3416aaa3d",
+        "published_at": "2026-10-21T09:10:18.457555+09:00",
+        "as_of": "2026-10-21T09:02:27.059822+09:00",
         "readable_url": "https://nornen0202.github.io/TradingAgents/work/v1/prism/report/latest.html",
         "markdown_url": "https://nornen0202.github.io/TradingAgents/work/v1/prism/report/latest.md",
         "latest_url": "https://nornen0202.github.io/TradingAgents/work/v1/prism/report/latest.json",
-        "event_url": "https://nornen0202.github.io/TradingAgents/work/v1/prism/report/events/f379af58987175eff49ac6ac8bae539b9803787ffbd9236eb7b8e2bedef23a97.json"
+        "event_url": "https://nornen0202.github.io/TradingAgents/work/v1/prism/report/events/d70049e30c34e67f773fcddc91b71caf0d4ccf6474dc5373d9b54e589a812fde.json"
       }
     }
   }

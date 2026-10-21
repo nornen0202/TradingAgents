@@ -1,0 +1,1581 @@
+{
+  "schema": "tradingagents.work-report/v1",
+  "surface": "prism",
+  "event_id": "prism:56061743d60a18c1b21c1ab33b5efa8d",
+  "source_sha256": "d251ea1173fd66812d153d3512d5e36b21fdd9574462e350785a20b3416aaa3d",
+  "prompt_contract_version": "prism-work-v5",
+  "workflow_contract_sha256": "6e9bacf847e1ea3fede5d24780fde443897da2d480119b5ef7dfdc873bb87103",
+  "policy": {
+    "visibility": "investor_safe_no_credentials",
+    "external_evidence_profile": "balanced_external",
+    "external_evidence_may_affect": [
+      "ranking",
+      "confidence",
+      "position_size_within_existing_risk_limits",
+      "research_priority"
+    ],
+    "external_evidence_may_bypass_execution_gate": false,
+    "thesis_is_independent_from_execution_readiness": true
+  },
+  "report_markdown": "# PRISM 델타 · 세 종목 미진입과 가상 운용 자료 구분\n작성 2026-10-21 09:10:18 KST · 수집 완료 2026-10-21 09:02:27 KST · source health **OK**\n\n## 먼저 볼 변화\n1. 수집 21개 메시지·22개 추출 신호가 모두 새 delta다. 24시간 packet은 21/21로 잘리지 않았고 source health는 OK다. 이는 투자 사실의 완전 검증이나 계좌 확인을 뜻하지 않는다.\n2. TW·SLS·MRNA의 관심 알림 뒤에 세 종목 모두 NO_ENTRY가 기록됐다. 높은 점수보다 후속 미진입 사유를 우선해 연구상 즉시 관심도를 낮춘다.\n3. BTC 데모 7건, 주식 가상 포트폴리오 1건, 가상 운용의 관심 알림 1건을 실제 계좌 거래와 분리한다. 일부 원래 simulation flag가 false라도 본문에 명시된 가상 성격을 보존한다.\n4. SNDX·PRLD는 SLS PDF의 비교기업 문맥이다. 독립 추천으로 늘리지 않으며 PDF 본문·차트가 전송되지 않은 한계를 명시한다.\n5. 모든 영향은 연구 전용이다. 과거 장중 시세·다중 종목 가격·불명확한 MRNA target 값을 현재 주문·목표·손절로 재사용하지 않는다.\n\n## 범위·시각·자료의 성격\n원래 24시간 범위 21건, 전송 21건, 생략 0건, 신규 21건·수정 0건·동일 자료 제외 0건이다. 추출 신호는 총 22개다. 모든 메시지 시각과 신호 시각이 수집 완료 이후가 아니며 현재 24시간 범위 안에 있다. 범위 COMPLETE는 전달된 메시지 범위에만 적용한다. 기업 공시·첨부 전체·실시간 시장·계좌가 모두 검증됐다는 뜻이 아니다.\nBTC 데모 7건은 동일 시나리오의 진입·보호 변경·부분 청산·종료다. 원래 simulation_only=false를 숨기거나 고치지 않고, 본문의 데모 문구에 근거해 가상 암호자산으로 별도 분류했다. 부분 청산 가격 손익과 최종 비용 반영 순손익은 중복 합산하지 않는다.\n주식 가상 포트폴리오 1건(16403)은 simulation_only=true다. 관심 알림 16390은 flag가 false지만 본문에 가상 포트폴리오 운용이라고 명시돼 있다. 둘 다 실제 사용자 보유·체결의 증거가 아니다. 나머지 미진입·차트·PDF·기업 설명도 실제 주문을 입증하지 않는 연구 자료다.\n\n## 실제 주식 연구에 반영할 충돌\nTW·SLS·MRNA의 03:36 KST 관심 알림은 WATCH였지만 03:51 KST 후속 메시지는 NO_ENTRY다. TW는 손익비, SLS는 하락 추세·점수, MRNA는 수익성·성장성 조건을 충족하지 못했다는 원문 판단이다. 이를 후속 시장 종합의 연구 우선순위와 즉시 관심도 하향에 반영한다. 현재 시장 thesis나 주문을 바꾸는 것은 아니다.\n원문의 0.99·0.61 등 점수는 해당 봇의 점수이며 독립 사실검증 신뢰도가 아니다. 같은 채널의 본문·PDF·차트 세 건을 세 개의 독립 확인으로 세지 않는다. 원문의 미국 시장 강세 분류도 현재 시장 상태로 승격하지 않는다.\n\n| 식별자 | 연구 액션 | 후속 확인 |\n|---|---|---|\n| BKH | MAINTAIN | 가상 포트폴리오에서 언급된 종목이다. 실제 보유·HOLD 권고로 해석하지 않고 시장 종합에서 시뮬레이터 참고로만 유지한다. |\n| BP | MAINTAIN | 가상 포트폴리오에서 언급된 종목이다. 실제 보유·HOLD 권고로 해석하지 않고 시장 종합에서 시뮬레이터 참고로만 유지한다. |\n| FRSH | MAINTAIN | 가상 포트폴리오에서 언급된 종목이다. 실제 보유·HOLD 권고로 해석하지 않고 시장 종합에서 시뮬레이터 참고로만 유지한다. |\n| HALO | MAINTAIN | 가상 포트폴리오에서 언급된 종목이다. 실제 보유·HOLD 권고로 해석하지 않고 시장 종합에서 시뮬레이터 참고로만 유지한다. |\n| LLY | MAINTAIN | 가상 포트폴리오에서 언급된 종목이다. 실제 보유·HOLD 권고로 해석하지 않고 시장 종합에서 시뮬레이터 참고로만 유지한다. |\n| MRNA | DOWNGRADE_WATCH | 후속 NO_ENTRY의 수익성·성장성 gate 미달을 우선한다. 기대되는 파이프라인이 실적·현금 개선으로 이어지는지 검증하며 원문 가격 역할도 재확인한다. |\n| PRLD | REQUIRES_PRIMARY_VERIFICATION | SLS PDF의 비교기업 언급이다. SLS 가격·목표를 배정하지 않고 독립 연구 근거가 확보될 때까지 식별 참고로 둔다. |\n| SLS | DOWNGRADE_WATCH | 후속 NO_ENTRY의 추세·점수 미달을 보존한다. 임상 기대와 주가 급등을 분리하고 최신 임상 발표·현금 소진·희석 및 추세를 먼저 검증한다. |\n| SNDX | REQUIRES_PRIMARY_VERIFICATION | SLS PDF의 비교기업 언급이다. 독립 종목 신호·매수 후보로 올리지 않으며 원문 역할과 기업 공시를 확인한다. |\n| TW | DOWNGRADE_WATCH | 선행 관심 신호보다 뒤의 NO_ENTRY(손익비 미달)를 우선한다. 즉시 관심도는 낮추고 실적의 현금 전환·인수 실행 위험·시장 조건 검증을 연구 우선 과제로 올린다. |\n\n## 가격·첨부·종목 매핑 한계\n- 10월 20일 미국 장중 관측 가격은 확정 종가·현재 시세가 아니다. 미국 장 종료 후 작성된 이 보고서에서 새 실행 가격으로 사용하지 않는다.\n- BP·HALO·LLY의 다중 종목 가격은 mention block 경고가 있다. 독립 원문 대조와 최신 시세 확인 없이 목표·손절로 옮기지 않는다.\n- MRNA 설명의 추출 target_price는 preview의 과거 관측가와 역할이 불명확하다. 숫자를 수정해 정상처럼 만들지 않고 가격 역할·기간 검증 전 사용을 배제한다.\n- SLS PDF의 SNDX·PRLD는 비교기업 문맥이다. 명시된 ticker를 보존하되 추천 개수로 부풀리거나 SLS 가격을 연결하지 않는다.\n- PDF 본문은 packet에서 빈 preview·NO_ARCHIVED_TEXT다. 차트는 안내문만 전달됐다. 따라서 전체 PDF·이미지의 수치와 도형을 직접 검증했다고 표현하지 않는다.\n\n## 21개 신규 메시지 검토\n\n### 1. stock_ai_agent:16410 · CRYPTO_DEMO\n[원메시지](https://t.me/stock_ai_agent/16410) · 10-21 05:57:26 KST · 원래 simulation_only=false\nBTC 데모 종료·정산 알림이다. 부분 청산과 최종 정산을 중복 합산하지 않는다. 실제 사용자 계좌의 손익이나 주문 완료로 간주하지 않는다.\n\n### 2. stock_ai_agent:16409 · CRYPTO_DEMO\n[원메시지](https://t.me/stock_ai_agent/16409) · 10-21 05:56:27 KST · 원래 simulation_only=false\nBTC 데모 보호 변경이며 남은 수량을 다루는 알림이다. 원래 simulation_only=false여도 본문에 데모라고 명시돼 가상 암호자산 자료로 분류한다.\n\n### 3. stock_ai_agent:16408 · CRYPTO_DEMO\n[원메시지](https://t.me/stock_ai_agent/16408) · 10-21 05:51:28 KST · 원래 simulation_only=false\n앞선 BTC 데모 보호 변경의 후속 상태다. 새 주식 종목 신호나 독립 수익 사례로 세지 않는다.\n\n### 4. stock_ai_agent:16407 · CRYPTO_DEMO\n[원메시지](https://t.me/stock_ai_agent/16407) · 10-21 05:50:28 KST · 원래 simulation_only=false\nBTC 데모의 부분 청산이다. 수수료·펀딩 전 가격 손익과 정산 후 순손익을 구분하며 실제 수익으로 합산하지 않는다.\n\n### 5. stock_ai_agent:16406 · CRYPTO_DEMO\n[원메시지](https://t.me/stock_ai_agent/16406) · 10-21 05:38:28 KST · 원래 simulation_only=false\nBTC 데모의 다른 부분 청산이다. 같은 시나리오의 분할 관측이며 투자 성과의 독립 표본이 아니다.\n\n### 6. stock_ai_agent:16405 · CRYPTO_DEMO\n[원메시지](https://t.me/stock_ai_agent/16405) · 10-21 05:31:28 KST · 원래 simulation_only=false\nBTC 데모 보호 가격·레버리지·가상 자산 상태다. 주식의 목표·손절·크기로 전이하지 않는다.\n\n### 7. stock_ai_agent:16404 · CRYPTO_DEMO\n[원메시지](https://t.me/stock_ai_agent/16404) · 10-21 04:47:27 KST · 원래 simulation_only=false\nBTC 데모 첫 진입이며 이후 부분 청산·종료와 같은 가상 시나리오다. 실제 계좌 매수의 증거가 아니다.\n\n### 8. stock_ai_agent:16403 · VIRTUAL_PORTFOLIO\n[원메시지](https://t.me/stock_ai_agent/16403) · 10-21 03:51:42 KST · 원래 simulation_only=true\nFRSH·BKH·BP·HALO·LLY의 가상 포트폴리오 관측이다. simulation_only=true를 유지하고 HOLD를 사용자 보유 판단으로 바꾸지 않는다. 다중 종목의 목표·손절은 재사용하지 않는다.\n\n### 9. stock_ai_agent:16402 · EQUITY_NO_ENTRY\n[원메시지](https://t.me/stock_ai_agent/16402) · 10-21 03:51:40 KST · 원래 simulation_only=false\nTW의 앞선 관심 신호 뒤에 손익비 하한 미달로 미진입이 기록됐다. 연구 후보의 즉시 관심도를 낮추며 실적·인수·가격 조건을 새 공식 자료로 검증할 우선순위를 올린다.\n\n### 10. stock_ai_agent:16401 · EQUITY_NO_ENTRY\n[원메시지](https://t.me/stock_ai_agent/16401) · 10-21 03:51:37 KST · 원래 simulation_only=false\nSLS는 앞선 높은 점수의 관심 신호 뒤에 하락 추세·점수 부족으로 미진입이 기록됐다. 임상 기대를 진입 허가로 해석하지 않고 최신 임상·현금·추세 확인을 요구한다.\n\n### 11. stock_ai_agent:16400 · EQUITY_NO_ENTRY\n[원메시지](https://t.me/stock_ai_agent/16400) · 10-21 03:51:33 KST · 원래 simulation_only=false\nMRNA는 앞선 관심 신호 뒤에 수익성·성장성 gate 미달로 미진입이 기록됐다. 상승률·점수보다 원문 gate 미달을 우선해 연구상 관심도를 낮춘다.\n\n### 12. stock_ai_agent:16399 · CHART_REFERENCE\n[원메시지](https://t.me/stock_ai_agent/16399) · 10-21 03:44:45 KST · 원래 simulation_only=false\nTW 차트 주석 안내만 전달됐다. 이미지의 베이스·피벗·상대강도를 직접 검증한 것이 아니므로 돌파 확인이나 가격 조건을 새로 생성하지 않는다.\n\n### 13. stock_ai_agent:16398 · CHART_REFERENCE\n[원메시지](https://t.me/stock_ai_agent/16398) · 10-21 03:44:33 KST · 원래 simulation_only=false\nSLS 차트 참고 메시지이며 실제 임상 공시나 매수 신호가 아니다. 뒤따르는 미진입 판단과 함께 본다.\n\n### 14. stock_ai_agent:16397 · CHART_REFERENCE\n[원메시지](https://t.me/stock_ai_agent/16397) · 10-21 03:44:20 KST · 원래 simulation_only=false\nMRNA 차트 참고 자료다. 차트 존재만으로 수익성·성장성 미달을 해소하지 않는다.\n\n### 15. stock_ai_agent:16396 · PDF_REFERENCE\n[원메시지](https://t.me/stock_ai_agent/16396) · 10-21 03:44:06 KST · 원래 simulation_only=false\nTW PDF에서 추출된 WATCH 식별자만 전달됐고 packet 본문은 비어 있다. 전체 PDF를 읽거나 핵심 숫자를 검증했다고 표현하지 않는다.\n\n### 16. stock_ai_agent:16395 · PDF_REFERENCE\n[원메시지](https://t.me/stock_ai_agent/16395) · 10-21 03:44:01 KST · 원래 simulation_only=false\nSLS PDF의 SNDX·PRLD는 표시명에 비교기업 문맥이 포함돼 있다. 세 종목을 독립 추천으로 승격하지 않으며 SLS의 가격·목표를 비교기업에 배정하지 않는다.\n\n### 17. stock_ai_agent:16394 · PDF_REFERENCE\n[원메시지](https://t.me/stock_ai_agent/16394) · 10-21 03:43:55 KST · 원래 simulation_only=false\nMRNA PDF의 WATCH와 식별자만으로 사업 실적·임상·목표가가 검증되지 않는다. 본문 미전송 한계를 보존한다.\n\n### 18. stock_ai_agent:16393 · EQUITY_COMMENTARY\n[원메시지](https://t.me/stock_ai_agent/16393) · 10-21 03:43:48 KST · 원래 simulation_only=false\nTW 전자거래 사업과 과거 장중 가격·거래량에 대한 설명이다. 확정 종가나 기관 순매수 증거로 쓰지 않으며 후속 미진입과 구분한다.\n\n### 19. stock_ai_agent:16392 · EQUITY_COMMENTARY\n[원메시지](https://t.me/stock_ai_agent/16392) · 10-21 03:43:43 KST · 원래 simulation_only=false\nSLS 임상 단계와 과거 장중 상승 설명이다. 당시 관측 가격을 현재 시세로 사용하지 않고 임상·현금·희석 위험을 공식 자료로 확인한다.\n\n### 20. stock_ai_agent:16391 · EQUITY_COMMENTARY\n[원메시지](https://t.me/stock_ai_agent/16391) · 10-21 03:43:39 KST · 원래 simulation_only=false\nMRNA 모멘텀과 사업 회복 설명이다. packet target_price가 preview의 과거 관측가보다 낮아 가격 역할·기간·원문 매핑이 확인될 때까지 목표값 사용을 배제한다.\n\n### 21. stock_ai_agent:16390 · VIRTUAL_SIGNAL_ALERT\n[원메시지](https://t.me/stock_ai_agent/16390) · 10-21 03:36:22 KST · 원래 simulation_only=false\n본문은 가상 포트폴리오 운용 공개라고 명시한다. MRNA·SLS·TW의 WATCH와 높은 점수는 독립 검증 신뢰도나 현재 매수 허가가 아니다. 후속 세 종목 미진입을 함께 전달한다.\n\n## 다음 확인\n다음 범위 확인 기준은 2026-10-22 03:36:22 KST다. 이는 24시간 자료 범위의 만료 확인 시각이며 매매 유효기간이 아니다.\n- TW·SLS·MRNA 최신 공식 공시와 현금·실적/임상 확인\n- 차트와 PDF 본문을 별도 전달받기 전 수치 검증 완료로 처리하지 않기\n- SNDX·PRLD 비교기업 역할과 MRNA 가격 역할 확인\n- 다음 미국 세션에서 최신 시세·계좌·기존 gate 재검증\n\nKR에는 이번 packet의 검증된 종목 신호가 없다. US에는 세 종목 미진입·첨부 누락·가상 운용 구분을 전달한다. 신선한 시세·계좌·기존 위험 gate가 없으므로 모든 행은 RESEARCH_ONLY다. 외부 알림과 공개 페이지 전달은 로컬 publish·ACK 뒤 별도로 확인해야 한다.\n\nCOVERAGE_RECEIPT {\"event_id\":\"prism:56061743d60a18c1b21c1ab33b5efa8d\",\"status\":\"COMPLETE\",\"window_events\":21,\"transmitted_events\":21,\"truncated\":false,\"new_events\":21,\"revised_events\":0}\n\nMOBILE_HANDOFF {\"owner\":\"external_github_notification_pipeline\",\"status\":\"PENDING_EXTERNAL_VERIFICATION\",\"work_sent_notification\":false}",
+  "structured_report": {
+    "binding": {
+      "surface": "prism",
+      "event_id": "prism:56061743d60a18c1b21c1ab33b5efa8d",
+      "source_sha256": "d251ea1173fd66812d153d3512d5e36b21fdd9574462e350785a20b3416aaa3d"
+    },
+    "title": "PRISM 델타 · 세 종목 미진입과 가상 운용 자료 구분",
+    "generated_at": "2026-10-21T09:10:18.200060+09:00",
+    "as_of": "2026-10-21T09:02:27.059822+09:00",
+    "source_health": "OK",
+    "report_mode": "RESEARCH",
+    "summary": [
+      "수집 21개 메시지·22개 추출 신호가 모두 새 delta다. 24시간 packet은 21/21로 잘리지 않았고 source health는 OK다. 이는 투자 사실의 완전 검증이나 계좌 확인을 뜻하지 않는다.",
+      "TW·SLS·MRNA의 관심 알림 뒤에 세 종목 모두 NO_ENTRY가 기록됐다. 높은 점수보다 후속 미진입 사유를 우선해 연구상 즉시 관심도를 낮춘다.",
+      "BTC 데모 7건, 주식 가상 포트폴리오 1건, 가상 운용의 관심 알림 1건을 실제 계좌 거래와 분리한다. 일부 원래 simulation flag가 false라도 본문에 명시된 가상 성격을 보존한다.",
+      "SNDX·PRLD는 SLS PDF의 비교기업 문맥이다. 독립 추천으로 늘리지 않으며 PDF 본문·차트가 전송되지 않은 한계를 명시한다.",
+      "모든 영향은 연구 전용이다. 과거 장중 시세·다중 종목 가격·불명확한 MRNA target 값을 현재 주문·목표·손절로 재사용하지 않는다."
+    ],
+    "top_actions": [
+      {
+        "ticker": "TW",
+        "action": "DOWNGRADE_WATCH",
+        "readiness": "RESEARCH_ONLY",
+        "research_impact": "선행 관심 신호보다 뒤의 NO_ENTRY(손익비 미달)를 우선한다. 즉시 관심도는 낮추고 실적의 현금 전환·인수 실행 위험·시장 조건 검증을 연구 우선 과제로 올린다."
+      },
+      {
+        "ticker": "SLS",
+        "action": "DOWNGRADE_WATCH",
+        "readiness": "RESEARCH_ONLY",
+        "research_impact": "후속 NO_ENTRY의 추세·점수 미달을 보존한다. 임상 기대와 주가 급등을 분리하고 최신 임상 발표·현금 소진·희석 및 추세를 먼저 검증한다."
+      },
+      {
+        "ticker": "MRNA",
+        "action": "DOWNGRADE_WATCH",
+        "readiness": "RESEARCH_ONLY",
+        "research_impact": "후속 NO_ENTRY의 수익성·성장성 gate 미달을 우선한다. 기대되는 파이프라인이 실적·현금 개선으로 이어지는지 검증하며 원문 가격 역할도 재확인한다."
+      }
+    ],
+    "strategies": [
+      {
+        "ticker": "BKH",
+        "action": "MAINTAIN",
+        "research_impact": "가상 포트폴리오에서 언급된 종목이다. 실제 보유·HOLD 권고로 해석하지 않고 시장 종합에서 시뮬레이터 참고로만 유지한다.",
+        "horizon": "다음 공식 공시·동일 시점 시장 검증까지",
+        "position_sizing": "기존 시장 전략과 위험 한도를 유지하고 본 advisory로 비중을 바꾸지 않음",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "execution_eligible": false,
+          "valid_until": null,
+          "required_rechecks": [
+            "NEEDS_LIVE_RECHECK",
+            "최신 시세·계좌·종목 식별·기존 위험 gate 재확인"
+          ]
+        },
+        "source_contributions": [
+          {
+            "surface": "prism",
+            "event_key": "stock_ai_agent:16403",
+            "content_sha256": "a9fa513e4c9525e148f015295839bc7a08c7945af492c280790c9c651fd54ca4",
+            "affected_field": "research_priority",
+            "applied_weight": "LOW_LABELED",
+            "review_classification": "VIRTUAL_PORTFOLIO",
+            "source_actions": [
+              "HOLD"
+            ],
+            "effect_ko": "FRSH·BKH·BP·HALO·LLY의 가상 포트폴리오 관측이다. simulation_only=true를 유지하고 HOLD를 사용자 보유 판단으로 바꾸지 않는다. 다중 종목의 목표·손절은 재사용하지 않는다.",
+            "execution_gate_override": false
+          }
+        ]
+      },
+      {
+        "ticker": "BP",
+        "action": "MAINTAIN",
+        "research_impact": "가상 포트폴리오에서 언급된 종목이다. 실제 보유·HOLD 권고로 해석하지 않고 시장 종합에서 시뮬레이터 참고로만 유지한다.",
+        "horizon": "다음 공식 공시·동일 시점 시장 검증까지",
+        "position_sizing": "기존 시장 전략과 위험 한도를 유지하고 본 advisory로 비중을 바꾸지 않음",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "execution_eligible": false,
+          "valid_until": null,
+          "required_rechecks": [
+            "NEEDS_LIVE_RECHECK",
+            "최신 시세·계좌·종목 식별·기존 위험 gate 재확인"
+          ]
+        },
+        "source_contributions": [
+          {
+            "surface": "prism",
+            "event_key": "stock_ai_agent:16403",
+            "content_sha256": "a9fa513e4c9525e148f015295839bc7a08c7945af492c280790c9c651fd54ca4",
+            "affected_field": "research_priority",
+            "applied_weight": "LOW_LABELED",
+            "review_classification": "VIRTUAL_PORTFOLIO",
+            "source_actions": [
+              "HOLD"
+            ],
+            "effect_ko": "FRSH·BKH·BP·HALO·LLY의 가상 포트폴리오 관측이다. simulation_only=true를 유지하고 HOLD를 사용자 보유 판단으로 바꾸지 않는다. 다중 종목의 목표·손절은 재사용하지 않는다.",
+            "execution_gate_override": false
+          }
+        ]
+      },
+      {
+        "ticker": "FRSH",
+        "action": "MAINTAIN",
+        "research_impact": "가상 포트폴리오에서 언급된 종목이다. 실제 보유·HOLD 권고로 해석하지 않고 시장 종합에서 시뮬레이터 참고로만 유지한다.",
+        "horizon": "다음 공식 공시·동일 시점 시장 검증까지",
+        "position_sizing": "기존 시장 전략과 위험 한도를 유지하고 본 advisory로 비중을 바꾸지 않음",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "execution_eligible": false,
+          "valid_until": null,
+          "required_rechecks": [
+            "NEEDS_LIVE_RECHECK",
+            "최신 시세·계좌·종목 식별·기존 위험 gate 재확인"
+          ]
+        },
+        "source_contributions": [
+          {
+            "surface": "prism",
+            "event_key": "stock_ai_agent:16403",
+            "content_sha256": "a9fa513e4c9525e148f015295839bc7a08c7945af492c280790c9c651fd54ca4",
+            "affected_field": "research_priority",
+            "applied_weight": "LOW_LABELED",
+            "review_classification": "VIRTUAL_PORTFOLIO",
+            "source_actions": [
+              "HOLD"
+            ],
+            "effect_ko": "FRSH·BKH·BP·HALO·LLY의 가상 포트폴리오 관측이다. simulation_only=true를 유지하고 HOLD를 사용자 보유 판단으로 바꾸지 않는다. 다중 종목의 목표·손절은 재사용하지 않는다.",
+            "execution_gate_override": false
+          }
+        ]
+      },
+      {
+        "ticker": "HALO",
+        "action": "MAINTAIN",
+        "research_impact": "가상 포트폴리오에서 언급된 종목이다. 실제 보유·HOLD 권고로 해석하지 않고 시장 종합에서 시뮬레이터 참고로만 유지한다.",
+        "horizon": "다음 공식 공시·동일 시점 시장 검증까지",
+        "position_sizing": "기존 시장 전략과 위험 한도를 유지하고 본 advisory로 비중을 바꾸지 않음",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "execution_eligible": false,
+          "valid_until": null,
+          "required_rechecks": [
+            "NEEDS_LIVE_RECHECK",
+            "최신 시세·계좌·종목 식별·기존 위험 gate 재확인"
+          ]
+        },
+        "source_contributions": [
+          {
+            "surface": "prism",
+            "event_key": "stock_ai_agent:16403",
+            "content_sha256": "a9fa513e4c9525e148f015295839bc7a08c7945af492c280790c9c651fd54ca4",
+            "affected_field": "research_priority",
+            "applied_weight": "LOW_LABELED",
+            "review_classification": "VIRTUAL_PORTFOLIO",
+            "source_actions": [
+              "HOLD"
+            ],
+            "effect_ko": "FRSH·BKH·BP·HALO·LLY의 가상 포트폴리오 관측이다. simulation_only=true를 유지하고 HOLD를 사용자 보유 판단으로 바꾸지 않는다. 다중 종목의 목표·손절은 재사용하지 않는다.",
+            "execution_gate_override": false
+          }
+        ]
+      },
+      {
+        "ticker": "LLY",
+        "action": "MAINTAIN",
+        "research_impact": "가상 포트폴리오에서 언급된 종목이다. 실제 보유·HOLD 권고로 해석하지 않고 시장 종합에서 시뮬레이터 참고로만 유지한다.",
+        "horizon": "다음 공식 공시·동일 시점 시장 검증까지",
+        "position_sizing": "기존 시장 전략과 위험 한도를 유지하고 본 advisory로 비중을 바꾸지 않음",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "execution_eligible": false,
+          "valid_until": null,
+          "required_rechecks": [
+            "NEEDS_LIVE_RECHECK",
+            "최신 시세·계좌·종목 식별·기존 위험 gate 재확인"
+          ]
+        },
+        "source_contributions": [
+          {
+            "surface": "prism",
+            "event_key": "stock_ai_agent:16403",
+            "content_sha256": "a9fa513e4c9525e148f015295839bc7a08c7945af492c280790c9c651fd54ca4",
+            "affected_field": "research_priority",
+            "applied_weight": "LOW_LABELED",
+            "review_classification": "VIRTUAL_PORTFOLIO",
+            "source_actions": [
+              "HOLD"
+            ],
+            "effect_ko": "FRSH·BKH·BP·HALO·LLY의 가상 포트폴리오 관측이다. simulation_only=true를 유지하고 HOLD를 사용자 보유 판단으로 바꾸지 않는다. 다중 종목의 목표·손절은 재사용하지 않는다.",
+            "execution_gate_override": false
+          }
+        ]
+      },
+      {
+        "ticker": "MRNA",
+        "action": "DOWNGRADE_WATCH",
+        "research_impact": "후속 NO_ENTRY의 수익성·성장성 gate 미달을 우선한다. 기대되는 파이프라인이 실적·현금 개선으로 이어지는지 검증하며 원문 가격 역할도 재확인한다.",
+        "horizon": "다음 공식 공시·동일 시점 시장 검증까지",
+        "position_sizing": "기존 시장 전략과 위험 한도를 유지하고 본 advisory로 비중을 바꾸지 않음",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "execution_eligible": false,
+          "valid_until": null,
+          "required_rechecks": [
+            "NEEDS_LIVE_RECHECK",
+            "최신 시세·계좌·종목 식별·기존 위험 gate 재확인"
+          ]
+        },
+        "source_contributions": [
+          {
+            "surface": "prism",
+            "event_key": "stock_ai_agent:16400",
+            "content_sha256": "6f316b667666d7e8e923c7fddb942918207efa011bd4dd3bc20fef384fd2b4db",
+            "affected_field": "research_priority",
+            "applied_weight": "LOW_LABELED",
+            "review_classification": "EQUITY_NO_ENTRY",
+            "source_actions": [
+              "NO_ENTRY"
+            ],
+            "effect_ko": "MRNA는 앞선 관심 신호 뒤에 수익성·성장성 gate 미달로 미진입이 기록됐다. 상승률·점수보다 원문 gate 미달을 우선해 연구상 관심도를 낮춘다.",
+            "execution_gate_override": false
+          },
+          {
+            "surface": "prism",
+            "event_key": "stock_ai_agent:16397",
+            "content_sha256": "940090b01811c69f2f3c8df2b1015f732eab273123cf4f6048f405df2271a299",
+            "affected_field": "research_priority",
+            "applied_weight": "LOW_LABELED",
+            "review_classification": "CHART_REFERENCE",
+            "source_actions": [
+              "WATCH"
+            ],
+            "effect_ko": "MRNA 차트 참고 자료다. 차트 존재만으로 수익성·성장성 미달을 해소하지 않는다.",
+            "execution_gate_override": false
+          },
+          {
+            "surface": "prism",
+            "event_key": "stock_ai_agent:16394",
+            "content_sha256": "f81f7c7346edf53289137ba0264f3769080b0d6d51aa699f6f4c784bcfabf80e",
+            "affected_field": "research_priority",
+            "applied_weight": "LOW_LABELED",
+            "review_classification": "PDF_REFERENCE",
+            "source_actions": [
+              "WATCH"
+            ],
+            "effect_ko": "MRNA PDF의 WATCH와 식별자만으로 사업 실적·임상·목표가가 검증되지 않는다. 본문 미전송 한계를 보존한다.",
+            "execution_gate_override": false
+          },
+          {
+            "surface": "prism",
+            "event_key": "stock_ai_agent:16391",
+            "content_sha256": "a04c48f9fe4ce3a02259b68fdf76530d86437b93feaaddbf7a037db5153e00d6",
+            "affected_field": "research_priority",
+            "applied_weight": "LOW_LABELED",
+            "review_classification": "EQUITY_COMMENTARY",
+            "source_actions": [
+              "UNKNOWN"
+            ],
+            "effect_ko": "MRNA 모멘텀과 사업 회복 설명이다. packet target_price가 preview의 과거 관측가보다 낮아 가격 역할·기간·원문 매핑이 확인될 때까지 목표값 사용을 배제한다.",
+            "execution_gate_override": false
+          },
+          {
+            "surface": "prism",
+            "event_key": "stock_ai_agent:16390",
+            "content_sha256": "a8566a81d570a1c0d9c48edacf25c40d3dfdd68b08ce7c54231e6a9fe01ed71e",
+            "affected_field": "research_priority",
+            "applied_weight": "LOW_LABELED",
+            "review_classification": "VIRTUAL_SIGNAL_ALERT",
+            "source_actions": [
+              "WATCH"
+            ],
+            "effect_ko": "본문은 가상 포트폴리오 운용 공개라고 명시한다. MRNA·SLS·TW의 WATCH와 높은 점수는 독립 검증 신뢰도나 현재 매수 허가가 아니다. 후속 세 종목 미진입을 함께 전달한다.",
+            "execution_gate_override": false
+          }
+        ]
+      },
+      {
+        "ticker": "PRLD",
+        "action": "REQUIRES_PRIMARY_VERIFICATION",
+        "research_impact": "SLS PDF의 비교기업 언급이다. SLS 가격·목표를 배정하지 않고 독립 연구 근거가 확보될 때까지 식별 참고로 둔다.",
+        "horizon": "다음 공식 공시·동일 시점 시장 검증까지",
+        "position_sizing": "기존 시장 전략과 위험 한도를 유지하고 본 advisory로 비중을 바꾸지 않음",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "execution_eligible": false,
+          "valid_until": null,
+          "required_rechecks": [
+            "NEEDS_LIVE_RECHECK",
+            "최신 시세·계좌·종목 식별·기존 위험 gate 재확인"
+          ]
+        },
+        "source_contributions": [
+          {
+            "surface": "prism",
+            "event_key": "stock_ai_agent:16395",
+            "content_sha256": "cf006ad2d8a5d99bb15428b3a091714bfcdb2167acba8309a4f0c397d5247960",
+            "affected_field": "research_priority",
+            "applied_weight": "LOW_LABELED",
+            "review_classification": "PDF_REFERENCE",
+            "source_actions": [
+              "WATCH"
+            ],
+            "effect_ko": "SLS PDF의 SNDX·PRLD는 표시명에 비교기업 문맥이 포함돼 있다. 세 종목을 독립 추천으로 승격하지 않으며 SLS의 가격·목표를 비교기업에 배정하지 않는다.",
+            "execution_gate_override": false
+          }
+        ]
+      },
+      {
+        "ticker": "SLS",
+        "action": "DOWNGRADE_WATCH",
+        "research_impact": "후속 NO_ENTRY의 추세·점수 미달을 보존한다. 임상 기대와 주가 급등을 분리하고 최신 임상 발표·현금 소진·희석 및 추세를 먼저 검증한다.",
+        "horizon": "다음 공식 공시·동일 시점 시장 검증까지",
+        "position_sizing": "기존 시장 전략과 위험 한도를 유지하고 본 advisory로 비중을 바꾸지 않음",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "execution_eligible": false,
+          "valid_until": null,
+          "required_rechecks": [
+            "NEEDS_LIVE_RECHECK",
+            "최신 시세·계좌·종목 식별·기존 위험 gate 재확인"
+          ]
+        },
+        "source_contributions": [
+          {
+            "surface": "prism",
+            "event_key": "stock_ai_agent:16401",
+            "content_sha256": "d2369da9f315979178557c4b9263d3e8826395e421590e299ecf9ade093e566f",
+            "affected_field": "research_priority",
+            "applied_weight": "LOW_LABELED",
+            "review_classification": "EQUITY_NO_ENTRY",
+            "source_actions": [
+              "NO_ENTRY"
+            ],
+            "effect_ko": "SLS는 앞선 높은 점수의 관심 신호 뒤에 하락 추세·점수 부족으로 미진입이 기록됐다. 임상 기대를 진입 허가로 해석하지 않고 최신 임상·현금·추세 확인을 요구한다.",
+            "execution_gate_override": false
+          },
+          {
+            "surface": "prism",
+            "event_key": "stock_ai_agent:16398",
+            "content_sha256": "f87b9f5a5d645ce2892064413cfbc433f7059ecf18c276d63f5f5ae18c78f0f6",
+            "affected_field": "research_priority",
+            "applied_weight": "LOW_LABELED",
+            "review_classification": "CHART_REFERENCE",
+            "source_actions": [
+              "WATCH"
+            ],
+            "effect_ko": "SLS 차트 참고 메시지이며 실제 임상 공시나 매수 신호가 아니다. 뒤따르는 미진입 판단과 함께 본다.",
+            "execution_gate_override": false
+          },
+          {
+            "surface": "prism",
+            "event_key": "stock_ai_agent:16395",
+            "content_sha256": "cf006ad2d8a5d99bb15428b3a091714bfcdb2167acba8309a4f0c397d5247960",
+            "affected_field": "research_priority",
+            "applied_weight": "LOW_LABELED",
+            "review_classification": "PDF_REFERENCE",
+            "source_actions": [
+              "WATCH"
+            ],
+            "effect_ko": "SLS PDF의 SNDX·PRLD는 표시명에 비교기업 문맥이 포함돼 있다. 세 종목을 독립 추천으로 승격하지 않으며 SLS의 가격·목표를 비교기업에 배정하지 않는다.",
+            "execution_gate_override": false
+          },
+          {
+            "surface": "prism",
+            "event_key": "stock_ai_agent:16392",
+            "content_sha256": "4ed373f929c0f9db25569b82f240ec9f0ed16e0f56f021c6b0f94f918c88a4ee",
+            "affected_field": "research_priority",
+            "applied_weight": "LOW_LABELED",
+            "review_classification": "EQUITY_COMMENTARY",
+            "source_actions": [
+              "UNKNOWN"
+            ],
+            "effect_ko": "SLS 임상 단계와 과거 장중 상승 설명이다. 당시 관측 가격을 현재 시세로 사용하지 않고 임상·현금·희석 위험을 공식 자료로 확인한다.",
+            "execution_gate_override": false
+          },
+          {
+            "surface": "prism",
+            "event_key": "stock_ai_agent:16390",
+            "content_sha256": "a8566a81d570a1c0d9c48edacf25c40d3dfdd68b08ce7c54231e6a9fe01ed71e",
+            "affected_field": "research_priority",
+            "applied_weight": "LOW_LABELED",
+            "review_classification": "VIRTUAL_SIGNAL_ALERT",
+            "source_actions": [
+              "WATCH"
+            ],
+            "effect_ko": "본문은 가상 포트폴리오 운용 공개라고 명시한다. MRNA·SLS·TW의 WATCH와 높은 점수는 독립 검증 신뢰도나 현재 매수 허가가 아니다. 후속 세 종목 미진입을 함께 전달한다.",
+            "execution_gate_override": false
+          }
+        ]
+      },
+      {
+        "ticker": "SNDX",
+        "action": "REQUIRES_PRIMARY_VERIFICATION",
+        "research_impact": "SLS PDF의 비교기업 언급이다. 독립 종목 신호·매수 후보로 올리지 않으며 원문 역할과 기업 공시를 확인한다.",
+        "horizon": "다음 공식 공시·동일 시점 시장 검증까지",
+        "position_sizing": "기존 시장 전략과 위험 한도를 유지하고 본 advisory로 비중을 바꾸지 않음",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "execution_eligible": false,
+          "valid_until": null,
+          "required_rechecks": [
+            "NEEDS_LIVE_RECHECK",
+            "최신 시세·계좌·종목 식별·기존 위험 gate 재확인"
+          ]
+        },
+        "source_contributions": [
+          {
+            "surface": "prism",
+            "event_key": "stock_ai_agent:16395",
+            "content_sha256": "cf006ad2d8a5d99bb15428b3a091714bfcdb2167acba8309a4f0c397d5247960",
+            "affected_field": "research_priority",
+            "applied_weight": "LOW_LABELED",
+            "review_classification": "PDF_REFERENCE",
+            "source_actions": [
+              "WATCH"
+            ],
+            "effect_ko": "SLS PDF의 SNDX·PRLD는 표시명에 비교기업 문맥이 포함돼 있다. 세 종목을 독립 추천으로 승격하지 않으며 SLS의 가격·목표를 비교기업에 배정하지 않는다.",
+            "execution_gate_override": false
+          }
+        ]
+      },
+      {
+        "ticker": "TW",
+        "action": "DOWNGRADE_WATCH",
+        "research_impact": "선행 관심 신호보다 뒤의 NO_ENTRY(손익비 미달)를 우선한다. 즉시 관심도는 낮추고 실적의 현금 전환·인수 실행 위험·시장 조건 검증을 연구 우선 과제로 올린다.",
+        "horizon": "다음 공식 공시·동일 시점 시장 검증까지",
+        "position_sizing": "기존 시장 전략과 위험 한도를 유지하고 본 advisory로 비중을 바꾸지 않음",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "execution_eligible": false,
+          "valid_until": null,
+          "required_rechecks": [
+            "NEEDS_LIVE_RECHECK",
+            "최신 시세·계좌·종목 식별·기존 위험 gate 재확인"
+          ]
+        },
+        "source_contributions": [
+          {
+            "surface": "prism",
+            "event_key": "stock_ai_agent:16402",
+            "content_sha256": "ccab44931a216dc4e231a332970e8e0900583239bb2b809053b2d68c05a47c84",
+            "affected_field": "research_priority",
+            "applied_weight": "LOW_LABELED",
+            "review_classification": "EQUITY_NO_ENTRY",
+            "source_actions": [
+              "NO_ENTRY"
+            ],
+            "effect_ko": "TW의 앞선 관심 신호 뒤에 손익비 하한 미달로 미진입이 기록됐다. 연구 후보의 즉시 관심도를 낮추며 실적·인수·가격 조건을 새 공식 자료로 검증할 우선순위를 올린다.",
+            "execution_gate_override": false
+          },
+          {
+            "surface": "prism",
+            "event_key": "stock_ai_agent:16399",
+            "content_sha256": "71f8861d4521fc3481cb26c080181caa0c943f97bdf5bde0381e7548443ae9ba",
+            "affected_field": "research_priority",
+            "applied_weight": "LOW_LABELED",
+            "review_classification": "CHART_REFERENCE",
+            "source_actions": [
+              "WATCH"
+            ],
+            "effect_ko": "TW 차트 주석 안내만 전달됐다. 이미지의 베이스·피벗·상대강도를 직접 검증한 것이 아니므로 돌파 확인이나 가격 조건을 새로 생성하지 않는다.",
+            "execution_gate_override": false
+          },
+          {
+            "surface": "prism",
+            "event_key": "stock_ai_agent:16396",
+            "content_sha256": "7ad764ed26634f84e872147d22f340e5bb15d1ff2aa7968fcbc72266503d97fe",
+            "affected_field": "research_priority",
+            "applied_weight": "LOW_LABELED",
+            "review_classification": "PDF_REFERENCE",
+            "source_actions": [
+              "WATCH"
+            ],
+            "effect_ko": "TW PDF에서 추출된 WATCH 식별자만 전달됐고 packet 본문은 비어 있다. 전체 PDF를 읽거나 핵심 숫자를 검증했다고 표현하지 않는다.",
+            "execution_gate_override": false
+          },
+          {
+            "surface": "prism",
+            "event_key": "stock_ai_agent:16393",
+            "content_sha256": "65256765a9d527b39898182b12801d7ae85e71a6fa43ac498765b5b3e83249c9",
+            "affected_field": "research_priority",
+            "applied_weight": "LOW_LABELED",
+            "review_classification": "EQUITY_COMMENTARY",
+            "source_actions": [
+              "UNKNOWN"
+            ],
+            "effect_ko": "TW 전자거래 사업과 과거 장중 가격·거래량에 대한 설명이다. 확정 종가나 기관 순매수 증거로 쓰지 않으며 후속 미진입과 구분한다.",
+            "execution_gate_override": false
+          },
+          {
+            "surface": "prism",
+            "event_key": "stock_ai_agent:16390",
+            "content_sha256": "a8566a81d570a1c0d9c48edacf25c40d3dfdd68b08ce7c54231e6a9fe01ed71e",
+            "affected_field": "research_priority",
+            "applied_weight": "LOW_LABELED",
+            "review_classification": "VIRTUAL_SIGNAL_ALERT",
+            "source_actions": [
+              "WATCH"
+            ],
+            "effect_ko": "본문은 가상 포트폴리오 운용 공개라고 명시한다. MRNA·SLS·TW의 WATCH와 높은 점수는 독립 검증 신뢰도나 현재 매수 허가가 아니다. 후속 세 종목 미진입을 함께 전달한다.",
+            "execution_gate_override": false
+          }
+        ]
+      }
+    ],
+    "coverage_receipt": {
+      "event_id": "prism:56061743d60a18c1b21c1ab33b5efa8d",
+      "status": "COMPLETE",
+      "window_events": 21,
+      "transmitted_events": 21,
+      "truncated": false,
+      "new_events": 21,
+      "revised_events": 0
+    },
+    "model_receipt": {
+      "schema": "tradingagents.model-provenance/v1",
+      "work_synthesis": {
+        "execution_mode": "local",
+        "requested_model": "gpt-6.1-sol",
+        "requested_reasoning_effort": "medium",
+        "task_id": "tradingagents-work-prism",
+        "verification_status": "CONFIGURED_NOT_RUNTIME_VERIFIED",
+        "observed_model": null,
+        "observed_reasoning_effort": null,
+        "note": "The local task contract is verified; the Work host does not expose a signed per-response model receipt."
+      }
+    },
+    "source_summary": {
+      "source": {
+        "health": "OK",
+        "run_id": "prism_telegram_20261021_090212",
+        "last_run_at": "2026-10-21T09:02:27.059822+09:00",
+        "status": "success",
+        "stale_after_hours": 30
+      },
+      "source_snapshot_sha256": "75d394ef666a0b8056910382666bab169d137d3a2ca1e756ea707d54e132035e",
+      "coverage": {
+        "total_unique_events": 214,
+        "window_events": 21,
+        "transmitted_events": 21,
+        "truncated": false,
+        "oldest_occurred_at": "2026-10-20T18:36:22+00:00",
+        "newest_occurred_at": "2026-10-20T20:57:26+00:00"
+      },
+      "delta": {
+        "new_events": 21,
+        "revised_events": 0,
+        "unchanged_events": 0,
+        "delivered_event_keys": [
+          "stock_ai_agent:16410",
+          "stock_ai_agent:16409",
+          "stock_ai_agent:16408",
+          "stock_ai_agent:16407",
+          "stock_ai_agent:16406",
+          "stock_ai_agent:16405",
+          "stock_ai_agent:16404",
+          "stock_ai_agent:16403",
+          "stock_ai_agent:16402",
+          "stock_ai_agent:16401",
+          "stock_ai_agent:16400",
+          "stock_ai_agent:16399",
+          "stock_ai_agent:16398",
+          "stock_ai_agent:16397",
+          "stock_ai_agent:16396",
+          "stock_ai_agent:16395",
+          "stock_ai_agent:16394",
+          "stock_ai_agent:16393",
+          "stock_ai_agent:16392",
+          "stock_ai_agent:16391",
+          "stock_ai_agent:16390"
+        ]
+      },
+      "evidence_policy": {
+        "profile": "balanced_external",
+        "material_thesis_effects": [
+          "ranking",
+          "confidence",
+          "position_size_within_existing_risk_limits",
+          "research_priority"
+        ],
+        "supported_evidence_weight": "MEDIUM",
+        "partially_supported_evidence_weight": "LOW_TO_MEDIUM",
+        "unverified_evidence_weight": "LOW_LABELED",
+        "user_primary_channels": [
+          "@kpunch",
+          "@sosumonkey"
+        ],
+        "user_primary_source_tier": "USER_PRIMARY",
+        "user_primary_evidence_weight": "HIGH",
+        "user_primary_validation_policy": "USER_ACCEPTED",
+        "matching_multi_source_signal_may_raise_thesis_priority": true,
+        "conflicting_signal_must_be_visible": true,
+        "may_bypass_market_or_portfolio_execution_gate": false
+      },
+      "events_reviewed": 21,
+      "signals_transmitted": 22,
+      "classification_counts": {
+        "CRYPTO_DEMO": 7,
+        "VIRTUAL_PORTFOLIO": 1,
+        "EQUITY_NO_ENTRY": 3,
+        "CHART_REFERENCE": 3,
+        "PDF_REFERENCE": 3,
+        "EQUITY_COMMENTARY": 3,
+        "VIRTUAL_SIGNAL_ALERT": 1
+      },
+      "event_manifest": [
+        {
+          "event_key": "stock_ai_agent:16410",
+          "content_sha256": "a027a94e83f81ce2defad17199af93593c67bc0321c1a8b47591e067497bad43",
+          "occurred_at": "2026-10-20T20:57:26+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16410",
+          "packet_simulation_only": false,
+          "review_classification": "CRYPTO_DEMO",
+          "interpretation_basis": "packet preview와 원래 simulation flag를 함께 검토",
+          "action": "NO_ACTIONABLE_DELTA",
+          "assessment_ko": "BTC 데모 종료·정산 알림이다. 부분 청산과 최종 정산을 중복 합산하지 않는다. 실제 사용자 계좌의 손익이나 주문 완료로 간주하지 않는다.",
+          "relevance": {
+            "tickers": [],
+            "markets": [],
+            "themes": [],
+            "match_basis": "message_context"
+          },
+          "signals": [],
+          "price_fields_adopted": false,
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 259,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          },
+          "execution_gate_override": false
+        },
+        {
+          "event_key": "stock_ai_agent:16409",
+          "content_sha256": "079e0f86894dacd74e38866d522b4fce1bb99bae4b5dc376e3d79a14964cdfda",
+          "occurred_at": "2026-10-20T20:56:27+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16409",
+          "packet_simulation_only": false,
+          "review_classification": "CRYPTO_DEMO",
+          "interpretation_basis": "packet preview와 원래 simulation flag를 함께 검토",
+          "action": "NO_ACTIONABLE_DELTA",
+          "assessment_ko": "BTC 데모 보호 변경이며 남은 수량을 다루는 알림이다. 원래 simulation_only=false여도 본문에 데모라고 명시돼 가상 암호자산 자료로 분류한다.",
+          "relevance": {
+            "tickers": [],
+            "markets": [],
+            "themes": [],
+            "match_basis": "message_context"
+          },
+          "signals": [],
+          "price_fields_adopted": false,
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 612,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          },
+          "execution_gate_override": false
+        },
+        {
+          "event_key": "stock_ai_agent:16408",
+          "content_sha256": "c2448abaf7d47b571b7a2eaa588548a43530d0e0efa7db8cfbb60c3c6f649cb2",
+          "occurred_at": "2026-10-20T20:51:28+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16408",
+          "packet_simulation_only": false,
+          "review_classification": "CRYPTO_DEMO",
+          "interpretation_basis": "packet preview와 원래 simulation flag를 함께 검토",
+          "action": "NO_ACTIONABLE_DELTA",
+          "assessment_ko": "앞선 BTC 데모 보호 변경의 후속 상태다. 새 주식 종목 신호나 독립 수익 사례로 세지 않는다.",
+          "relevance": {
+            "tickers": [],
+            "markets": [],
+            "themes": [],
+            "match_basis": "message_context"
+          },
+          "signals": [],
+          "price_fields_adopted": false,
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 612,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          },
+          "execution_gate_override": false
+        },
+        {
+          "event_key": "stock_ai_agent:16407",
+          "content_sha256": "38bc736d0d9a31e2b0b982651316ab70708e1428e7f29e8a56f1beb54a097bcc",
+          "occurred_at": "2026-10-20T20:50:28+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16407",
+          "packet_simulation_only": false,
+          "review_classification": "CRYPTO_DEMO",
+          "interpretation_basis": "packet preview와 원래 simulation flag를 함께 검토",
+          "action": "NO_ACTIONABLE_DELTA",
+          "assessment_ko": "BTC 데모의 부분 청산이다. 수수료·펀딩 전 가격 손익과 정산 후 순손익을 구분하며 실제 수익으로 합산하지 않는다.",
+          "relevance": {
+            "tickers": [],
+            "markets": [],
+            "themes": [],
+            "match_basis": "message_context"
+          },
+          "signals": [],
+          "price_fields_adopted": false,
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 784,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          },
+          "execution_gate_override": false
+        },
+        {
+          "event_key": "stock_ai_agent:16406",
+          "content_sha256": "48a60dcd9d7cd3cc087b2249ee3d18efab04b062d750eacc40e98c771a8c9a2e",
+          "occurred_at": "2026-10-20T20:38:28+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16406",
+          "packet_simulation_only": false,
+          "review_classification": "CRYPTO_DEMO",
+          "interpretation_basis": "packet preview와 원래 simulation flag를 함께 검토",
+          "action": "NO_ACTIONABLE_DELTA",
+          "assessment_ko": "BTC 데모의 다른 부분 청산이다. 같은 시나리오의 분할 관측이며 투자 성과의 독립 표본이 아니다.",
+          "relevance": {
+            "tickers": [],
+            "markets": [],
+            "themes": [],
+            "match_basis": "message_context"
+          },
+          "signals": [],
+          "price_fields_adopted": false,
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 895,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          },
+          "execution_gate_override": false
+        },
+        {
+          "event_key": "stock_ai_agent:16405",
+          "content_sha256": "749ec111ef8614740d7eeb8d0e0d19e3c6556806aec1fa9f06200b14390365ed",
+          "occurred_at": "2026-10-20T20:31:28+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16405",
+          "packet_simulation_only": false,
+          "review_classification": "CRYPTO_DEMO",
+          "interpretation_basis": "packet preview와 원래 simulation flag를 함께 검토",
+          "action": "NO_ACTIONABLE_DELTA",
+          "assessment_ko": "BTC 데모 보호 가격·레버리지·가상 자산 상태다. 주식의 목표·손절·크기로 전이하지 않는다.",
+          "relevance": {
+            "tickers": [],
+            "markets": [],
+            "themes": [],
+            "match_basis": "message_context"
+          },
+          "signals": [],
+          "price_fields_adopted": false,
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 869,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          },
+          "execution_gate_override": false
+        },
+        {
+          "event_key": "stock_ai_agent:16404",
+          "content_sha256": "8ab5ee71a7d3464657c05229bdfd457c4cbbce2c63bf0e0182726ff2f96249eb",
+          "occurred_at": "2026-10-20T19:47:27+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16404",
+          "packet_simulation_only": false,
+          "review_classification": "CRYPTO_DEMO",
+          "interpretation_basis": "packet preview와 원래 simulation flag를 함께 검토",
+          "action": "NO_ACTIONABLE_DELTA",
+          "assessment_ko": "BTC 데모 첫 진입이며 이후 부분 청산·종료와 같은 가상 시나리오다. 실제 계좌 매수의 증거가 아니다.",
+          "relevance": {
+            "tickers": [],
+            "markets": [],
+            "themes": [],
+            "match_basis": "message_context"
+          },
+          "signals": [],
+          "price_fields_adopted": false,
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 872,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          },
+          "execution_gate_override": false
+        },
+        {
+          "event_key": "stock_ai_agent:16403",
+          "content_sha256": "a9fa513e4c9525e148f015295839bc7a08c7945af492c280790c9c651fd54ca4",
+          "occurred_at": "2026-10-20T18:51:42+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16403",
+          "packet_simulation_only": true,
+          "review_classification": "VIRTUAL_PORTFOLIO",
+          "interpretation_basis": "packet preview와 원래 simulation flag를 함께 검토",
+          "action": "MAINTAIN",
+          "assessment_ko": "FRSH·BKH·BP·HALO·LLY의 가상 포트폴리오 관측이다. simulation_only=true를 유지하고 HOLD를 사용자 보유 판단으로 바꾸지 않는다. 다중 종목의 목표·손절은 재사용하지 않는다.",
+          "relevance": {
+            "tickers": [
+              "FRSH",
+              "BKH",
+              "BP",
+              "HALO",
+              "LLY"
+            ],
+            "markets": [
+              "US"
+            ],
+            "themes": [],
+            "match_basis": "normalized_prism_signals"
+          },
+          "signals": [
+            {
+              "canonical_ticker": "FRSH",
+              "display_name": "Freshworks Inc.",
+              "market": "US",
+              "source_asof": "2026-10-20T18:51:42+00:00",
+              "signal_action": "HOLD",
+              "trigger_type": "telegram_portfolio_snapshot",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            },
+            {
+              "canonical_ticker": "BKH",
+              "display_name": "Black Hills Corporation",
+              "market": "US",
+              "source_asof": "2026-10-20T18:51:42+00:00",
+              "signal_action": "HOLD",
+              "trigger_type": "telegram_portfolio_snapshot",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            },
+            {
+              "canonical_ticker": "BP",
+              "display_name": "BP p.l.c.",
+              "market": "US",
+              "source_asof": "2026-10-20T18:51:42+00:00",
+              "signal_action": "HOLD",
+              "trigger_type": "telegram_portfolio_snapshot",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": [
+                "multi_ticker_prices_scoped_to_mention_block"
+              ]
+            },
+            {
+              "canonical_ticker": "HALO",
+              "display_name": "Halozyme Therapeutics, Inc.",
+              "market": "US",
+              "source_asof": "2026-10-20T18:51:42+00:00",
+              "signal_action": "HOLD",
+              "trigger_type": "telegram_portfolio_snapshot",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": [
+                "multi_ticker_prices_scoped_to_mention_block"
+              ]
+            },
+            {
+              "canonical_ticker": "LLY",
+              "display_name": "Eli Lilly and Company",
+              "market": "US",
+              "source_asof": "2026-10-20T18:51:42+00:00",
+              "signal_action": "HOLD",
+              "trigger_type": "telegram_portfolio_snapshot",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": [
+                "multi_ticker_prices_scoped_to_mention_block"
+              ]
+            }
+          ],
+          "price_fields_adopted": false,
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 1200,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          },
+          "execution_gate_override": false
+        },
+        {
+          "event_key": "stock_ai_agent:16402",
+          "content_sha256": "ccab44931a216dc4e231a332970e8e0900583239bb2b809053b2d68c05a47c84",
+          "occurred_at": "2026-10-20T18:51:40+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16402",
+          "packet_simulation_only": false,
+          "review_classification": "EQUITY_NO_ENTRY",
+          "interpretation_basis": "packet preview와 원래 simulation flag를 함께 검토",
+          "action": "DOWNGRADE_WATCH",
+          "assessment_ko": "TW의 앞선 관심 신호 뒤에 손익비 하한 미달로 미진입이 기록됐다. 연구 후보의 즉시 관심도를 낮추며 실적·인수·가격 조건을 새 공식 자료로 검증할 우선순위를 올린다.",
+          "relevance": {
+            "tickers": [
+              "TW"
+            ],
+            "markets": [
+              "US"
+            ],
+            "themes": [],
+            "match_basis": "normalized_prism_signals"
+          },
+          "signals": [
+            {
+              "canonical_ticker": "TW",
+              "display_name": "Tradeweb Markets Inc.",
+              "market": "US",
+              "source_asof": "2026-10-20T18:51:40+00:00",
+              "signal_action": "NO_ENTRY",
+              "trigger_type": "telegram_buy_skip",
+              "trigger_score": 0.6,
+              "composite_score": 0.6,
+              "confidence": 0.6,
+              "warnings": []
+            }
+          ],
+          "price_fields_adopted": false,
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 885,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          },
+          "execution_gate_override": false
+        },
+        {
+          "event_key": "stock_ai_agent:16401",
+          "content_sha256": "d2369da9f315979178557c4b9263d3e8826395e421590e299ecf9ade093e566f",
+          "occurred_at": "2026-10-20T18:51:37+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16401",
+          "packet_simulation_only": false,
+          "review_classification": "EQUITY_NO_ENTRY",
+          "interpretation_basis": "packet preview와 원래 simulation flag를 함께 검토",
+          "action": "DOWNGRADE_WATCH",
+          "assessment_ko": "SLS는 앞선 높은 점수의 관심 신호 뒤에 하락 추세·점수 부족으로 미진입이 기록됐다. 임상 기대를 진입 허가로 해석하지 않고 최신 임상·현금·추세 확인을 요구한다.",
+          "relevance": {
+            "tickers": [
+              "SLS"
+            ],
+            "markets": [
+              "US"
+            ],
+            "themes": [],
+            "match_basis": "normalized_prism_signals"
+          },
+          "signals": [
+            {
+              "canonical_ticker": "SLS",
+              "display_name": "SELLAS Life Sciences Group, Inc",
+              "market": "US",
+              "source_asof": "2026-10-20T18:51:37+00:00",
+              "signal_action": "NO_ENTRY",
+              "trigger_type": "telegram_buy_skip",
+              "trigger_score": 0.2,
+              "composite_score": 0.2,
+              "confidence": 0.2,
+              "warnings": []
+            }
+          ],
+          "price_fields_adopted": false,
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 907,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          },
+          "execution_gate_override": false
+        },
+        {
+          "event_key": "stock_ai_agent:16400",
+          "content_sha256": "6f316b667666d7e8e923c7fddb942918207efa011bd4dd3bc20fef384fd2b4db",
+          "occurred_at": "2026-10-20T18:51:33+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16400",
+          "packet_simulation_only": false,
+          "review_classification": "EQUITY_NO_ENTRY",
+          "interpretation_basis": "packet preview와 원래 simulation flag를 함께 검토",
+          "action": "DOWNGRADE_WATCH",
+          "assessment_ko": "MRNA는 앞선 관심 신호 뒤에 수익성·성장성 gate 미달로 미진입이 기록됐다. 상승률·점수보다 원문 gate 미달을 우선해 연구상 관심도를 낮춘다.",
+          "relevance": {
+            "tickers": [
+              "MRNA"
+            ],
+            "markets": [
+              "US"
+            ],
+            "themes": [],
+            "match_basis": "normalized_prism_signals"
+          },
+          "signals": [
+            {
+              "canonical_ticker": "MRNA",
+              "display_name": "Moderna, Inc.",
+              "market": "US",
+              "source_asof": "2026-10-20T18:51:33+00:00",
+              "signal_action": "NO_ENTRY",
+              "trigger_type": "telegram_buy_skip",
+              "trigger_score": 0.2,
+              "composite_score": 0.2,
+              "confidence": 0.2,
+              "warnings": []
+            }
+          ],
+          "price_fields_adopted": false,
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 710,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          },
+          "execution_gate_override": false
+        },
+        {
+          "event_key": "stock_ai_agent:16399",
+          "content_sha256": "71f8861d4521fc3481cb26c080181caa0c943f97bdf5bde0381e7548443ae9ba",
+          "occurred_at": "2026-10-20T18:44:45+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16399",
+          "packet_simulation_only": false,
+          "review_classification": "CHART_REFERENCE",
+          "interpretation_basis": "packet preview와 원래 simulation flag를 함께 검토",
+          "action": "REQUIRES_PRIMARY_VERIFICATION",
+          "assessment_ko": "TW 차트 주석 안내만 전달됐다. 이미지의 베이스·피벗·상대강도를 직접 검증한 것이 아니므로 돌파 확인이나 가격 조건을 새로 생성하지 않는다.",
+          "relevance": {
+            "tickers": [
+              "TW"
+            ],
+            "markets": [
+              "US"
+            ],
+            "themes": [],
+            "match_basis": "normalized_prism_signals"
+          },
+          "signals": [
+            {
+              "canonical_ticker": "TW",
+              "display_name": "Tradeweb Markets Inc.",
+              "market": "US",
+              "source_asof": "2026-10-20T18:44:45+00:00",
+              "signal_action": "WATCH",
+              "trigger_type": "telegram_oneil_insight",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            }
+          ],
+          "price_fields_adopted": false,
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 88,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          },
+          "execution_gate_override": false
+        },
+        {
+          "event_key": "stock_ai_agent:16398",
+          "content_sha256": "f87b9f5a5d645ce2892064413cfbc433f7059ecf18c276d63f5f5ae18c78f0f6",
+          "occurred_at": "2026-10-20T18:44:33+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16398",
+          "packet_simulation_only": false,
+          "review_classification": "CHART_REFERENCE",
+          "interpretation_basis": "packet preview와 원래 simulation flag를 함께 검토",
+          "action": "REQUIRES_PRIMARY_VERIFICATION",
+          "assessment_ko": "SLS 차트 참고 메시지이며 실제 임상 공시나 매수 신호가 아니다. 뒤따르는 미진입 판단과 함께 본다.",
+          "relevance": {
+            "tickers": [
+              "SLS"
+            ],
+            "markets": [
+              "US"
+            ],
+            "themes": [],
+            "match_basis": "normalized_prism_signals"
+          },
+          "signals": [
+            {
+              "canonical_ticker": "SLS",
+              "display_name": "SELLAS Life Sciences Group, Inc",
+              "market": "US",
+              "source_asof": "2026-10-20T18:44:33+00:00",
+              "signal_action": "WATCH",
+              "trigger_type": "telegram_oneil_insight",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            }
+          ],
+          "price_fields_adopted": false,
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 99,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          },
+          "execution_gate_override": false
+        },
+        {
+          "event_key": "stock_ai_agent:16397",
+          "content_sha256": "940090b01811c69f2f3c8df2b1015f732eab273123cf4f6048f405df2271a299",
+          "occurred_at": "2026-10-20T18:44:20+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16397",
+          "packet_simulation_only": false,
+          "review_classification": "CHART_REFERENCE",
+          "interpretation_basis": "packet preview와 원래 simulation flag를 함께 검토",
+          "action": "REQUIRES_PRIMARY_VERIFICATION",
+          "assessment_ko": "MRNA 차트 참고 자료다. 차트 존재만으로 수익성·성장성 미달을 해소하지 않는다.",
+          "relevance": {
+            "tickers": [
+              "MRNA"
+            ],
+            "markets": [
+              "US"
+            ],
+            "themes": [],
+            "match_basis": "normalized_prism_signals"
+          },
+          "signals": [
+            {
+              "canonical_ticker": "MRNA",
+              "display_name": "Moderna, Inc.",
+              "market": "US",
+              "source_asof": "2026-10-20T18:44:20+00:00",
+              "signal_action": "WATCH",
+              "trigger_type": "telegram_oneil_insight",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            }
+          ],
+          "price_fields_adopted": false,
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 82,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          },
+          "execution_gate_override": false
+        },
+        {
+          "event_key": "stock_ai_agent:16396",
+          "content_sha256": "7ad764ed26634f84e872147d22f340e5bb15d1ff2aa7968fcbc72266503d97fe",
+          "occurred_at": "2026-10-20T18:44:06+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16396",
+          "packet_simulation_only": false,
+          "review_classification": "PDF_REFERENCE",
+          "interpretation_basis": "packet preview와 원래 simulation flag를 함께 검토",
+          "action": "REQUIRES_PRIMARY_VERIFICATION",
+          "assessment_ko": "TW PDF에서 추출된 WATCH 식별자만 전달됐고 packet 본문은 비어 있다. 전체 PDF를 읽거나 핵심 숫자를 검증했다고 표현하지 않는다.",
+          "relevance": {
+            "tickers": [
+              "TW"
+            ],
+            "markets": [
+              "US"
+            ],
+            "themes": [],
+            "match_basis": "normalized_prism_signals"
+          },
+          "signals": [
+            {
+              "canonical_ticker": "TW",
+              "display_name": "Tradeweb Markets Inc.",
+              "market": "US",
+              "source_asof": "2026-10-20T18:44:06+00:00",
+              "signal_action": "WATCH",
+              "trigger_type": "telegram_pdf_report",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            }
+          ],
+          "price_fields_adopted": false,
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "NO_ARCHIVED_TEXT"
+          },
+          "execution_gate_override": false
+        },
+        {
+          "event_key": "stock_ai_agent:16395",
+          "content_sha256": "cf006ad2d8a5d99bb15428b3a091714bfcdb2167acba8309a4f0c397d5247960",
+          "occurred_at": "2026-10-20T18:44:01+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16395",
+          "packet_simulation_only": false,
+          "review_classification": "PDF_REFERENCE",
+          "interpretation_basis": "packet preview와 원래 simulation flag를 함께 검토",
+          "action": "REQUIRES_PRIMARY_VERIFICATION",
+          "assessment_ko": "SLS PDF의 SNDX·PRLD는 표시명에 비교기업 문맥이 포함돼 있다. 세 종목을 독립 추천으로 승격하지 않으며 SLS의 가격·목표를 비교기업에 배정하지 않는다.",
+          "relevance": {
+            "tickers": [
+              "SLS",
+              "SNDX",
+              "PRLD"
+            ],
+            "markets": [
+              "US"
+            ],
+            "themes": [],
+            "match_basis": "normalized_prism_signals"
+          },
+          "signals": [
+            {
+              "canonical_ticker": "SLS",
+              "display_name": "SELLAS Life Sciences Group,  Inc",
+              "market": "US",
+              "source_asof": "2026-10-20T18:44:01+00:00",
+              "signal_action": "WATCH",
+              "trigger_type": "telegram_pdf_report",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            },
+            {
+              "canonical_ticker": "SNDX",
+              "display_name": "경쟁사와 비교하면 — 선정된 비교기업 Syndax Pharmaceuticals",
+              "market": "US",
+              "source_asof": "2026-10-20T18:44:01+00:00",
+              "signal_action": "WATCH",
+              "trigger_type": "telegram_pdf_report",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            },
+            {
+              "canonical_ticker": "PRLD",
+              "display_name": "와 Prelude Therapeutics",
+              "market": "US",
+              "source_asof": "2026-10-20T18:44:01+00:00",
+              "signal_action": "WATCH",
+              "trigger_type": "telegram_pdf_report",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            }
+          ],
+          "price_fields_adopted": false,
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "NO_ARCHIVED_TEXT"
+          },
+          "execution_gate_override": false
+        },
+        {
+          "event_key": "stock_ai_agent:16394",
+          "content_sha256": "f81f7c7346edf53289137ba0264f3769080b0d6d51aa699f6f4c784bcfabf80e",
+          "occurred_at": "2026-10-20T18:43:55+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16394",
+          "packet_simulation_only": false,
+          "review_classification": "PDF_REFERENCE",
+          "interpretation_basis": "packet preview와 원래 simulation flag를 함께 검토",
+          "action": "REQUIRES_PRIMARY_VERIFICATION",
+          "assessment_ko": "MRNA PDF의 WATCH와 식별자만으로 사업 실적·임상·목표가가 검증되지 않는다. 본문 미전송 한계를 보존한다.",
+          "relevance": {
+            "tickers": [
+              "MRNA"
+            ],
+            "markets": [
+              "US"
+            ],
+            "themes": [],
+            "match_basis": "normalized_prism_signals"
+          },
+          "signals": [
+            {
+              "canonical_ticker": "MRNA",
+              "display_name": "Moderna,  Inc.",
+              "market": "US",
+              "source_asof": "2026-10-20T18:43:55+00:00",
+              "signal_action": "WATCH",
+              "trigger_type": "telegram_pdf_report",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            }
+          ],
+          "price_fields_adopted": false,
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "NO_ARCHIVED_TEXT"
+          },
+          "execution_gate_override": false
+        },
+        {
+          "event_key": "stock_ai_agent:16393",
+          "content_sha256": "65256765a9d527b39898182b12801d7ae85e71a6fa43ac498765b5b3e83249c9",
+          "occurred_at": "2026-10-20T18:43:48+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16393",
+          "packet_simulation_only": false,
+          "review_classification": "EQUITY_COMMENTARY",
+          "interpretation_basis": "packet preview와 원래 simulation flag를 함께 검토",
+          "action": "REQUIRES_PRIMARY_VERIFICATION",
+          "assessment_ko": "TW 전자거래 사업과 과거 장중 가격·거래량에 대한 설명이다. 확정 종가나 기관 순매수 증거로 쓰지 않으며 후속 미진입과 구분한다.",
+          "relevance": {
+            "tickers": [
+              "TW"
+            ],
+            "markets": [
+              "US"
+            ],
+            "themes": [],
+            "match_basis": "normalized_prism_signals"
+          },
+          "signals": [
+            {
+              "canonical_ticker": "TW",
+              "display_name": "Tradeweb Markets",
+              "market": "US",
+              "source_asof": "2026-10-20T18:43:48+00:00",
+              "signal_action": "UNKNOWN",
+              "trigger_type": "telegram_message",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            }
+          ],
+          "price_fields_adopted": false,
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 793,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          },
+          "execution_gate_override": false
+        },
+        {
+          "event_key": "stock_ai_agent:16392",
+          "content_sha256": "4ed373f929c0f9db25569b82f240ec9f0ed16e0f56f021c6b0f94f918c88a4ee",
+          "occurred_at": "2026-10-20T18:43:43+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16392",
+          "packet_simulation_only": false,
+          "review_classification": "EQUITY_COMMENTARY",
+          "interpretation_basis": "packet preview와 원래 simulation flag를 함께 검토",
+          "action": "REQUIRES_PRIMARY_VERIFICATION",
+          "assessment_ko": "SLS 임상 단계와 과거 장중 상승 설명이다. 당시 관측 가격을 현재 시세로 사용하지 않고 임상·현금·희석 위험을 공식 자료로 확인한다.",
+          "relevance": {
+            "tickers": [
+              "SLS"
+            ],
+            "markets": [
+              "US"
+            ],
+            "themes": [],
+            "match_basis": "normalized_prism_signals"
+          },
+          "signals": [
+            {
+              "canonical_ticker": "SLS",
+              "display_name": "SELLAS Life Sciences Group",
+              "market": "US",
+              "source_asof": "2026-10-20T18:43:43+00:00",
+              "signal_action": "UNKNOWN",
+              "trigger_type": "telegram_message",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            }
+          ],
+          "price_fields_adopted": false,
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 893,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          },
+          "execution_gate_override": false
+        },
+        {
+          "event_key": "stock_ai_agent:16391",
+          "content_sha256": "a04c48f9fe4ce3a02259b68fdf76530d86437b93feaaddbf7a037db5153e00d6",
+          "occurred_at": "2026-10-20T18:43:39+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16391",
+          "packet_simulation_only": false,
+          "review_classification": "EQUITY_COMMENTARY",
+          "interpretation_basis": "packet preview와 원래 simulation flag를 함께 검토",
+          "action": "REQUIRES_PRIMARY_VERIFICATION",
+          "assessment_ko": "MRNA 모멘텀과 사업 회복 설명이다. packet target_price가 preview의 과거 관측가보다 낮아 가격 역할·기간·원문 매핑이 확인될 때까지 목표값 사용을 배제한다.",
+          "relevance": {
+            "tickers": [
+              "MRNA"
+            ],
+            "markets": [
+              "US"
+            ],
+            "themes": [],
+            "match_basis": "normalized_prism_signals"
+          },
+          "signals": [
+            {
+              "canonical_ticker": "MRNA",
+              "display_name": "Moderna, Inc.",
+              "market": "US",
+              "source_asof": "2026-10-20T18:43:39+00:00",
+              "signal_action": "UNKNOWN",
+              "trigger_type": "telegram_message",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            }
+          ],
+          "price_fields_adopted": false,
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 1005,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          },
+          "execution_gate_override": false
+        },
+        {
+          "event_key": "stock_ai_agent:16390",
+          "content_sha256": "a8566a81d570a1c0d9c48edacf25c40d3dfdd68b08ce7c54231e6a9fe01ed71e",
+          "occurred_at": "2026-10-20T18:36:22+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16390",
+          "packet_simulation_only": false,
+          "review_classification": "VIRTUAL_SIGNAL_ALERT",
+          "interpretation_basis": "packet preview와 원래 simulation flag를 함께 검토",
+          "action": "REQUIRES_PRIMARY_VERIFICATION",
+          "assessment_ko": "본문은 가상 포트폴리오 운용 공개라고 명시한다. MRNA·SLS·TW의 WATCH와 높은 점수는 독립 검증 신뢰도나 현재 매수 허가가 아니다. 후속 세 종목 미진입을 함께 전달한다.",
+          "relevance": {
+            "tickers": [
+              "MRNA",
+              "SLS",
+              "TW"
+            ],
+            "markets": [
+              "US"
+            ],
+            "themes": [],
+            "match_basis": "normalized_prism_signals"
+          },
+          "signals": [
+            {
+              "canonical_ticker": "MRNA",
+              "display_name": "Moderna, Inc.",
+              "market": "US",
+              "source_asof": "2026-10-20T18:36:22+00:00",
+              "signal_action": "WATCH",
+              "trigger_type": "telegram_signal_alert",
+              "trigger_score": 0.99,
+              "composite_score": 0.99,
+              "confidence": 0.99,
+              "warnings": []
+            },
+            {
+              "canonical_ticker": "SLS",
+              "display_name": "SELLAS Life Sciences Group, Inc",
+              "market": "US",
+              "source_asof": "2026-10-20T18:36:22+00:00",
+              "signal_action": "WATCH",
+              "trigger_type": "telegram_signal_alert",
+              "trigger_score": 0.99,
+              "composite_score": 0.99,
+              "confidence": 0.99,
+              "warnings": []
+            },
+            {
+              "canonical_ticker": "TW",
+              "display_name": "Tradeweb Markets Inc.",
+              "market": "US",
+              "source_asof": "2026-10-20T18:36:22+00:00",
+              "signal_action": "WATCH",
+              "trigger_type": "telegram_signal_alert",
+              "trigger_score": 0.61,
+              "composite_score": 0.61,
+              "confidence": 0.61,
+              "warnings": []
+            }
+          ],
+          "price_fields_adopted": false,
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 1059,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          },
+          "execution_gate_override": false
+        }
+      ],
+      "source_limitations": [
+        "원래 simulation_only flag는 수정하지 않으며 본문 기반 review_classification을 별도 기록",
+        "PDF 전체 본문·차트 이미지는 packet에 포함되지 않아 직접 검토했다고 주장하지 않음",
+        "같은 채널의 알림·차트·PDF·본문은 독립 원자료 여러 개가 아님",
+        "금융 수치와 기업 주장은 이번 보고서에서 독립 검증하지 않았으며 source 주장으로만 유지",
+        "가격 target/stop은 의미·종목 매핑 확인 전 결과의 실행 필드에 복사하지 않음"
+      ],
+      "external_delivery_verified": false
+    },
+    "next_checkpoint": {
+      "at": "2026-10-22T03:36:22+09:00",
+      "meaning": "가장 오래된 현재 delta가 24시간을 넘기기 전 재준비 기준이며 거래 유효기간이 아님",
+      "checks": [
+        "TW·SLS·MRNA 최신 공식 공시와 현금·실적/임상 확인",
+        "차트와 PDF 본문을 별도 전달받기 전 수치 검증 완료로 처리하지 않기",
+        "SNDX·PRLD 비교기업 역할과 MRNA 가격 역할 확인",
+        "다음 미국 세션에서 최신 시세·계좌·기존 gate 재검증"
+      ]
+    },
+    "mobile_handoff": {
+      "owner": "external_github_notification_pipeline",
+      "status": "PENDING_EXTERNAL_VERIFICATION",
+      "work_sent_notification": false
+    }
+  },
+  "report_id": "prism:d70049e30c34e67f773fcddc91b71caf",
+  "report_sha256": "d70049e30c34e67f773fcddc91b71caf0d4ccf6474dc5373d9b54e589a812fde",
+  "published_at": "2026-10-21T09:10:18.457555+09:00"
+}
