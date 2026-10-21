@@ -45,8 +45,15 @@ class WorkRuntime:
         prism_archive_dir: Path | None = None,
         now: datetime | None = None,
         fresh_report: bool = False,
+        expected_producer_run_id: str | None = None,
+        refresh_started_at: datetime | None = None,
     ) -> dict[str, Any]:
         key = surface.lower()
+        guarded_refresh = expected_producer_run_id is not None or refresh_started_at is not None
+        if guarded_refresh and (key not in {"kr", "us"} or not fresh_report
+                or not isinstance(expected_producer_run_id, str) or not expected_producer_run_id.strip()
+                or not isinstance(refresh_started_at, datetime) or refresh_started_at.utcoffset() is None):
+            raise WorkRuntimeError("Fresh report requires an exact producer run and aware refresh start")
         with self.lock("state"):
             source_packet = build_surface_packet(
                 key,
@@ -56,6 +63,20 @@ class WorkRuntime:
                 now=now,
                 public=False,
             )
+            if guarded_refresh:
+                from .pre_report import aware_datetime, freshness_blockers, market_session_state
+                # The producer lock was released before the packet reads. A
+                # newer source or slow read must not advance Work state using
+                # the earlier caller's verification or clock.
+                session = market_session_state(market=key.upper(), now_local=datetime.fromisoformat(_now(now)))
+                effective_now = datetime.fromisoformat(_now(now))
+                blockers = freshness_blockers(source_packet, now=effective_now,
+                    started_at=refresh_started_at, run_id=expected_producer_run_id)
+                close = aware_datetime(session.get("session_close"))
+                if not session.get("is_open") or (close is not None and effective_now >= close):
+                    blockers.append("SESSION_ENDED_DURING_PREPARE")
+                if blockers:
+                    raise WorkRuntimeError("Fresh report source failed revalidation: " + ",".join(blockers))
             state = self._load_state()
             surface_state = state["surfaces"].setdefault(key, {})
             packet, event_hashes, material_noop = _delivery_packet(source_packet, surface_state)

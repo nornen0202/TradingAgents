@@ -282,6 +282,7 @@ def execute_scheduled_run(
     finalize_from_run: str | None = None,
     finalization_source_config: Path | None = None,
     paper_state_dir: Path | None = None,
+    defer_execution_handoff: bool = False,
 ) -> dict[str, Any]:
     tz = ZoneInfo(config.run.timezone)
     started_at = datetime.now(tz)
@@ -297,12 +298,14 @@ def execute_scheduled_run(
                                  run_id=run_id, run_dir=run_dir, resume_from_run=resume_from_run,
                                  finalize_from_run=finalize_from_run,
                                  finalization_source_config=finalization_source_config,
-                                 paper_state_dir=paper_state_dir)
+                                 paper_state_dir=paper_state_dir,
+                                 defer_execution_handoff=defer_execution_handoff)
 
 
 def _execute_run_body(config, *, run_label, skip_site_build, tz, started_at,
                       run_timer_start, run_id, run_dir, resume_from_run=None,
-                      finalize_from_run=None, finalization_source_config=None, paper_state_dir=None):
+                      finalize_from_run=None, finalization_source_config=None, paper_state_dir=None,
+                      defer_execution_handoff=False):
     reset_llm_usage()
 
     run_mode = str(config.run.run_mode or "full").strip().lower()
@@ -862,7 +865,8 @@ def _execute_run_body(config, *, run_label, skip_site_build, tz, started_at,
     # Only the explicitly configured local producer wakes existing opted-in
     # consumers. Their original locks, journals and risk gates remain in force.
     from tradingagents.execution.delivery import handoff_completed_run
-    handoff_completed_run(config.storage.archive_dir, manifest, state_root=paper_state_dir)
+    if not defer_execution_handoff:
+        handoff_completed_run(config.storage.archive_dir, manifest, state_root=paper_state_dir)
     if skip_site_build:
         print("Skipped static site build for this run.", flush=True)
     else:

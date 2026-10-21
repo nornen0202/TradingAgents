@@ -670,7 +670,15 @@ def main():
         return 0
     lane_acquired = False
     try:
-        with interprocess_file_lock(args.state_dir / f"{args.command}.lock", timeout=0):
+        # A short pre-report collection owns this same writer lock. Wait for
+        # its handoff instead of dropping a whole minute of execution refresh.
+        # The producer evaluates current calendars/clocks only after acquisition.
+        lock_timeout = 0
+        if args.command == "run-due" and not args.dry_run:
+            from tradingagents.execution.refresh_runtime import execution_refresh_enabled
+            if execution_refresh_enabled(args.state_dir):
+                lock_timeout = 60
+        with interprocess_file_lock(args.state_dir / f"{args.command}.lock", timeout=lock_timeout):
             lane_acquired = True
             active = drain_actions(args.state_dir, dry_run=args.dry_run)
             if active:
