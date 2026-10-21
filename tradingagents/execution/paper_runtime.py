@@ -236,15 +236,22 @@ def advance_market(archive, state, market, *, now=None, clock=None, account_load
         return finish("ERROR", ("PAPER_TICK_FAILED",), error_type=type(exc).__name__, attempted_source_run_id=source.name if source else None)
 
 
-def tick(archive, state, *, now=None, clock=None, **kwargs):
+def tick(archive, state, *, now=None, clock=None, lock_timeout=0, **kwargs):
     archive, state = Path(archive).resolve(), Path(state).resolve()
     state.mkdir(parents=True, exist_ok=True)
     fixed_now = instant(now) if now is not None else None
     clock = clock or ((lambda: fixed_now) if now is not None else (lambda: datetime.now(timezone.utc)))
-    at = instant(now if now is not None else clock())
-    if at is None:
+    if now is not None and fixed_now is None:
         raise ValueError("Aware now required")
-    with interprocess_file_lock(state / "paper.lock", timeout=0):
+    # Scheduled ticks keep the non-waiting default. The producer handoff may
+    # wait briefly on this same lock, then evaluates current clocks and gates
+    # once; no consumer callback is retried and no stale pre-lock clock is used.
+    with interprocess_file_lock(state / "paper.lock", timeout=lock_timeout):
+        at = instant(clock())
+        if at is None:
+            raise ValueError("Aware now required")
+        if fixed_now is not None and at < fixed_now:
+            raise ValueError("Paper tick clock precedes explicit now")
         enabled = _read(state / "enabled.json", {})
         if enabled.get("mode") != "LOCAL_PAPER_ONLY" or enabled.get("enabled") is not True:
             return {"schema": SCHEMA, "status": "DISABLED", "broker_orders_sent": 0, "real_orders_enabled": False}
