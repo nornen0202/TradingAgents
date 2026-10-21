@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import re
 from collections.abc import Iterable
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -1444,7 +1445,14 @@ def _prism_body(archive_dir: Path, *, now: datetime) -> dict[str, Any]:
 def _prism_event(channel: str, message: dict[str, Any], run_dir: Path) -> dict[str, Any]:
     signals_payload = load_json(_safe_artifact(run_dir, message.get("signals_path")))
     preview = str(message.get("text_preview") or "")[:1200]
-    simulation = "시뮬" in preview or "simulation" in preview.lower()
+    # Public previews may end before the virtual-portfolio disclosure. Use only
+    # the same sanitized metadata admitted by archived signal normalization.
+    metadata = load_json(_safe_artifact(run_dir, message.get("metadata_path")))
+    simulation_text = preview + "\n" + str(metadata.get("text") or "")[:1200]
+    simulation = (
+        any(marker in simulation_text.lower() for marker in ("시뮬", "simulation", "가상 포트폴리오"))
+        or bool(re.search(r"\b(?:BTC|ETH)\s+데모(?:\s|$)", simulation_text, re.IGNORECASE))
+    )
     signals = []
     source_signals = [item for item in (signals_payload.get("signals") or []) if isinstance(item, dict)]
     source_signals, normalization = _normalize_archived_prism_signals(
