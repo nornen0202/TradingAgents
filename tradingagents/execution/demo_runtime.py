@@ -22,6 +22,7 @@ from tradingagents.atomic_io import atomic_write_json, interprocess_file_lock
 from . import demo_validation as validation
 from .archive_paper import build_step
 from .source_diagnostics import diagnose_source
+from .source_handoff import await_completed_source
 from . import demo_strategy_plan
 from .kis_demo import DemoCredentials, KisDemoClient
 from .kis_paper import KisPaperBroker, PaperOrderPolicy, _fresh, _tick
@@ -388,6 +389,33 @@ def advance(archive, root, validation_root, market, *, clock, tickers, broker_fa
                 result["allocation_diagnostics"] = plan_diagnostics
             else:
                 signals = candidates(source, market, at(clock()), tickers) if source else []
+            if not signals and not pending and not issues and not halted and not near_close and result["gate_passed"]:
+                required = (("decision_bundle_v2.json", "portfolio-private/portfolio_candidates.json")
+                            if allocation_mode == demo_strategy_plan.MODE else None)
+                selected, handoff = await_completed_source(archive, root.parent, market, source, clock=clock,
+                    selector=lambda archive, market, now: _latest_source(archive, market, now, required_artifacts=required))
+                if handoff is not None:
+                    result["source_refresh_handoff"] = handoff
+                    session = session_resolver(market=market, now_local=at(clock()))
+                    after_wait = at(clock())
+                    if (session.get("source") != "exchange_calendars" or session.get("is_open") is not True
+                            or session.get("phase") != "regular"
+                            or not at(session["session_open"]) <= after_wait < at(session["session_close"])):
+                        result.update(current)
+                        return finish("BLOCKED", "SESSION_ENDED_DURING_SOURCE_WAIT")
+                    near_close = at(session["session_close"]) - after_wait <= timedelta(minutes=10)
+                    try:
+                        result["gate_passed"] = gate(validation_root, market, after_wait) == scope
+                    except Exception:
+                        result["gate_passed"] = False
+                    source = selected
+                    result["source_diagnostics"] = diagnose_source(source, at(clock()),
+                        include_proposals=allocation_mode != demo_strategy_plan.MODE)
+                    if allocation_mode == demo_strategy_plan.MODE:
+                        signals, plan_diagnostics = demo_strategy_plan.plan(source, market, at(clock()), tickers, current["owned"])
+                        result["allocation_diagnostics"] = plan_diagnostics
+                    else:
+                        signals = candidates(source, market, at(clock()), tickers)
         except Exception:
             signals = []
             issues.append("SOURCE_EVIDENCE_UNVERIFIED")
