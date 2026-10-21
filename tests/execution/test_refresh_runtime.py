@@ -39,15 +39,17 @@ def test_expired_source_causes_new_observation_not_renewal_and_uses_existing_con
     assert config.run.run_mode == "overlay_only"
     assert config.execution.execution_selective_rerun_enabled is False
     assert config.execution.execution_session_gate_enabled is True
+    assert config.execution.execution_lightweight_refresh is True
+    assert config.execution.execution_max_data_age_seconds == 120
     assert config.execution.execution_refresh_checkpoints_local == ("10:00",)
     assert args["paper_state_dir"] == state
     assert config.storage.archive_dir == archive
     assert all(Path(p).read_bytes() == contents for p, contents in originals.items())
-    assert refresh.refresh_due(archive, state, now=AT + timedelta(minutes=1),
+    assert refresh.refresh_due(archive, state, now=AT + timedelta(seconds=30),
         session_resolver=open_kr, executor=lambda *a, **k: pytest.fail("no duplicate producer"))[0]["status"] == "REFRESH_COOLDOWN"
 
 
-@pytest.mark.parametrize("age,expected", [(119, False), (120, True), (600, True)])
+@pytest.mark.parametrize("age,expected", [(59, False), (60, True), (119, True), (120, True), (600, True)])
 def test_refresh_boundary_is_shorter_than_unchanged_consumer_expiry(tmp_path, age, expected):
     archive, state = tmp_path / "archive", tmp_path / "state"
     enable(state)
@@ -110,7 +112,7 @@ def test_existing_producer_calls_refresh_before_advisory_recovery(tmp_path, monk
 
 @pytest.mark.parametrize("status,seconds,expected", [
     ("COMPLETED", 299.7, "DUE"),
-    ("COMPLETED", 240, "REFRESH_COOLDOWN"),
+    ("COMPLETED", 240, "DUE"),
     ("FAILED", 299.7, "REFRESH_COOLDOWN"),
     ("STARTED", 299.7, "REFRESH_COOLDOWN"),
     ("FAILED", 300, "DUE"),
@@ -144,7 +146,8 @@ def test_next_slot_still_waits_for_actual_source_age(tmp_path):
 
 
 @pytest.mark.parametrize("observed,expected", [
-    ((AT - timedelta(seconds=119)).isoformat(), False),
+    ((AT - timedelta(seconds=59)).isoformat(), False),
+    ((AT - timedelta(seconds=119)).isoformat(), True),
     ((AT - timedelta(seconds=120)).isoformat(), True),
     ((AT - timedelta(seconds=300)).isoformat(), True),
     ((AT + timedelta(seconds=1)).isoformat(), True),
@@ -179,7 +182,7 @@ def test_missing_observations_do_not_suppress_refresh(tmp_path, rows):
 
 @pytest.mark.parametrize("prior_status,seconds,expected", [
     ("COMPLETED", 299.7, "DUE"),
-    ("COMPLETED", 240, "REFRESH_COOLDOWN"),
+    ("COMPLETED", 240, "DUE"),
     ("STARTED", 299.7, "REFRESH_COOLDOWN"),
     ("FAILED", 299.7, "REFRESH_COOLDOWN"),
     ("FAILED", 300, "DUE"),

@@ -635,6 +635,8 @@ def main():
         from tradingagents.execution.demo_validation import run_campaign
         try:
             result = run_campaign(args.archive_dir, validation_state, run=True)
+            from tradingagents.execution.demo_roundtrip import run_roundtrip
+            result["roundtrip_validation"] = run_roundtrip(args.archive_dir, validation_state)
         except TimeoutError:
             result = {"status": "VALIDATION_ALREADY_RUNNING", "mode": "KIS_DEMO", "live_orders_enabled": False}
         print(json.dumps(result, ensure_ascii=True))

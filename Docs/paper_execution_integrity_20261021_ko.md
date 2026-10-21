@@ -41,3 +41,34 @@
 - [Nasdaq Trade Halt RSS: 범위·1분 갱신 및 조회 제한](https://www.nasdaqtrader.com/Trader.aspx?id=TradeHaltRSS)
 - [Nasdaq 쿼리별 범위: 여러 날 지속되는 정지의 주의점](https://www.nasdaqtrader.com/snippets/tradehaltaccordion.html)
 - [KIS 해외 현재가상세 필드: 거래가능 여부와 거래정지 상태는 구분](https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/overseas_stock/price_detail/chk_price_detail.py)
+
+## 2026-10-21 미국 정규장 후속 복구
+
+사용자가 관리자 시간 복구를 실행한 뒤 23:27:38 KST의 Windows Time 상태는 leap indicator 0, stratum 4, Cloudflare 동기화였다. 23:36의 독립 NTP 표본 중앙값은 약 +11ms였고 이후 AAPL 실제 날짜 포함 호가도 미래 시각 차단 없이 통과했다. 스크립트는 작은 측정 오차만으로 성공하지 않고 동기화 상태도 검사한다. 선택적인 `-StepClock`은 두 서버 일치와 5초 이내 오차를 확인하며 원래 보정 임계값은 실패 시에도 복원한다. 미래 호가 허용이나 저장 시각 수정은 하지 않는다.
+
+거래정지 상태는 주문 범위를 명시한다. 최신 공식 RSS와 날짜 있는 거래봉으로 LUDP/T5 등 보고된 거래 중단 및 T1/T2 등 뉴스 정지를 검사한다. **실시간 LULD 상·하한 밴드 제공은 아니다.** 해당 밴드는 공급자에서 제공하지 않음을 유지한다. Reg SHO Rule 201은 공매도 가격 제한이고 현재 경로는 매수 또는 실제 매도 가능 보유량 내 매도만 지원하므로 `not_applicable_long_only`로 표시하며 공매도 제한 상태 자체를 clear라고 선언하지 않는다. 모든 종류의 활성 정지, 불명·누락·만료·미래 피드는 계속 차단한다.
+
+BRK-B는 KIS가 요구하는 `BRK/B`로 조회해야 한다. 실제 읽기 조회에서 `BRK-B`, `BRK.B`는 빈 가격, `BRK/B`는 `DNYSBRK/B`와 정상 가격을 반환했다. 명시적인 동일 종목 별칭을 분리하고 거래정지 비교에도 적용했다. 주식 종류 접미사를 잘라 다른 종목을 조회하지 않는다. 수정 후 BRK-B 실제 KIS 호가·체결강도·거래정지 증거의 누락은 없었다.
+
+분석 만료 원인은 120초 소비 유효기간보다 긴 생산 지연과 5분 호출 간격이었다. 실행 전용 갱신은 원래 연구 근거를 보존하고 새로운 시세·거래정지·계좌 데이터를 다시 수집하며, 뉴스 재수집과 종목별 차트 렌더링을 발행 필수 경로에서 제외한다. 정상 연구·정기 보고는 유지한다. 생산자 설치 기본 주기를 1분으로 분리하고 60초부터 실제 관측 갱신을 시작한다. 실패 재시도는 300초·3회 제한을 유지한다. 시세 유효기간은 120초 그대로다.
+
+별도 아카이브의 실제 30종목 검증은 `20261021T234147_lightweight-verification`에서 54.79초에 완료됐다. 발행 시 29종목 시세 나이는 57.65초이며 실행 데이터 검증을 통과했다. 나머지 BRK-B는 위의 별칭 수정 후 독립 실제 조회로 복구를 확인했다. 원래 전략 주문 제안은 비어 있었고 이를 임의의 전략 주문으로 바꾸지 않았다. 미리보기 결과를 운영 체결로 간주하지 않는다.
+
+## 사용자 승인 1주 왕복 모의 체결
+
+`demo_roundtrip`은 기존 연결 검증 및 지속 전략 원장과 분리한다. 명시적인 만료 시각이 있는 활성화 파일이 있을 때만 국내 KODEX 200(069500), 미국 AAPL 각각 1주 BUY 후 같은 수량 SELL을 허용한다. 실계좌 주문은 항상 비활성이다. 현재 모의계좌·현금·매도 가능 보유량, 신선한 원래 시세, 정규장·가격 제한·최대 2주문을 기존 브로커가 재검사한다. 미국 주문에는 추가로 공식 거래정지 검증을 적용한다. 주문 전 준비 기록과 고정 ID를 저장하며 응답 유실 및 준비 후 중단은 재전송하지 않는다. 미체결은 5분 후 취소 요청을 한 번만 한다. 완료 판정은 접수가 아니라 요청·불변 주문 조건·수량 일치·실제 누적 체결 관측 원장을 함께 확인한다. 장 종료 후에도 원장 증거가 있어야 완료를 유지한다.
+
+`user-roundtrip-20261021` 미국 결과:
+
+| 단계 | 수량 | 확인된 체결 대금 | 증권사 체결 보고 수신 시각(KST) |
+|---|---:|---:|---|
+| AAPL 매수 | 1 | USD 340.08 | 2026-10-21 23:39:29 |
+| AAPL 매도 | 1 | USD 339.91 | 2026-10-21 23:40:33 |
+
+비용 전 왕복 손익은 USD -0.17이다. 정확한 거래소 체결 시각·정산·수수료는 확인하지 않았으며 위 시각은 보고 수신 시각이다. 이 검증 거래는 전략 성과가 아니다. 국내는 이 시점 폐장으로 다음 정규장 검증 대기이며 완료로 보고하지 않는다. 승인된 캠페인은 기존 `LocalAutomation-validate-kis`가 이어 수행하고 과거 원장은 초기화하지 않는다.
+
+회귀 검증: 최초 전체 3,895개 통과, 1개 환경 조건 건너뜀, 131개 하위 검사 통과. 이후 BRK-B 별칭·거래정지 별칭·장 종료 후 증거·승인 만료 검사를 추가했다. Windows 서비스·NTP는 모두 Mock으로 검증하며 단위 검사에서 실제 시계나 외부 주문을 변경하지 않는다.
+
+- [Windows Time 보정·원본 설정](https://learn.microsoft.com/en-us/windows-server/networking/windows-time-service/windows-time-service-tools-and-settings)
+- [Nasdaq 정지 사유 코드](https://beta.nasdaqtrader.com/Trader.aspx?id=TradeHaltCodes)
+- [SEC Rule 201 FAQ](https://www.sec.gov/rules-regulations/staff-guidance/trading-markets-frequently-asked-questions-7)

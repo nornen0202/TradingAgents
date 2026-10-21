@@ -14,6 +14,7 @@ from zoneinfo import ZoneInfo
 import requests
 
 from tradingagents.charting.bars import instant
+from .us_symbols import canonical_symbol
 
 URL = "https://www.nasdaqtrader.com/rss.aspx?feed=tradehalts"
 NS = {"n": "http://www.nasdaqtrader.com/"}
@@ -50,7 +51,7 @@ def parse_feed(content, *, observed_at):
     for item in items:
         def field(name):
             return (item.findtext("n:" + name, namespaces=NS) or "").strip()
-        symbol, reason = field("IssueSymbol"), field("ReasonCode")
+        symbol, reason = canonical_symbol(field("IssueSymbol")), field("ReasonCode")
         if not symbol or not reason:
             raise ValueError("HALT_EVENT_IDENTITY_MISSING")
         halted_at = _event(field("HaltDate"), field("HaltTime"))
@@ -72,11 +73,12 @@ def parse_feed(content, *, observed_at):
 
 
 def status_for(feed, symbol, *, analysis_as_of, traded_bars=()):
+    symbol = canonical_symbol(symbol)
     published, observed = feed["published_at"], feed["observed_at"]
     if (analysis_as_of.tzinfo is None or not published <= observed <= analysis_as_of
             or not 0 <= (analysis_as_of - published).total_seconds() < 120):
         raise ValueError("HALT_FEED_STALE_OR_FUTURE")
-    matching = [row for row in feed["events"] if row["symbol"] == symbol]
+    matching = [row for row in feed["events"] if canonical_symbol(row["symbol"]) == symbol]
     # Multiple halts per day are common. The latest halt governs; future
     # resumption announcements do not clear it.
     latest = max(matching, key=lambda row: row["halted_at"], default=None)
@@ -130,3 +132,34 @@ class NasdaqHaltProvider:
 
 # One request per minute across symbols/provider instances in this producer.
 current_halts = NasdaqHaltProvider()
+
+
+def long_only_market_statuses(halt, *, analysis_as_of):
+    """Scope available evidence to the supported long-only limit-order path.
+
+    RSS verifies trading pauses (including LUDP/T5 and news halts), not live
+    LULD price bands. Reg SHO Rule 201 restricts short sales, which both paper
+    brokers forbid by checking broker-reported unreserved sellable holdings.
+    Do not claim that a symbol's short-sale restriction is clear.
+    """
+    reg_sho = {"status": "not_applicable_long_only", "is_clear": None,
+               "source": "SEC_RULE_201_ORDER_SCOPE", "short_sale_status": "unknown",
+               "order_scope": "BUY_OR_VERIFIED_LONG_SELL", "short_sales_supported": False}
+    published, observed, evaluated = (instant(halt.get(k)) for k in ("published_at", "observed_at", "as_of"))
+    verified = (halt.get("source") == "nasdaq.current_trade_halts"
+                and halt.get("basis") == "CURRENT_DAY_HALT_FEED_PLUS_DATED_TRADED_BAR"
+                and published is not None and observed is not None and evaluated is not None
+                and published <= observed <= evaluated <= analysis_as_of
+                and 0 <= (analysis_as_of - published).total_seconds() < 120
+                and halt.get("status") in {"clear", "halted"}
+                and halt.get("is_clear") is (halt.get("status") == "clear"))
+    common = {k: halt.get(k) for k in ("source", "published_at", "observed_at", "as_of", "basis", "symbol", "reason_code")}
+    # Any reported halt blocks both paths, even when its reason is not one of
+    # the common LUDP/T5 or T1/T2 codes. Unknown/absent evidence stays unknown.
+    common.update(status=halt["status"] if verified else "not_available_by_provider",
+                  is_clear=halt["is_clear"] if verified else None,
+                  order_scope="LONG_ONLY_LIMIT_ORDERS")
+    luld = {**common, "scope": "REPORTED_TRADING_PAUSES", "price_bands_available": False,
+            "limitation": "Live LULD bands are not supplied; execution venue enforces price bands."}
+    news = {**common, "scope": "REPORTED_NEWS_AND_OTHER_TRADING_HALTS"}
+    return luld, reg_sho, news

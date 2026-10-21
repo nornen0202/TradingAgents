@@ -298,6 +298,7 @@ def _execute_run_body(config, *, run_label, skip_site_build, tz, started_at,
 
     run_mode = str(config.run.run_mode or "full").strip().lower()
     portfolio_only = run_mode == "portfolio_only"
+    lightweight_refresh = bool(config.execution.execution_lightweight_refresh and run_mode == "overlay_only")
     if run_mode == "overlay_only" and not config.execution.execution_refresh_enabled:
         raise RuntimeError(
             "run_mode=overlay_only requires [execution].enabled=true to refresh execution overlays. "
@@ -482,10 +483,10 @@ def _execute_run_body(config, *, run_label, skip_site_build, tz, started_at,
     # collecting the short-lived price observations, and reuse the same dated
     # evidence in the report delta instead of fetching it a second time.
     news_as_of = datetime.now(tz)
-    news_context = {} if portfolio_only else collect_event_news(
+    news_context = {} if portfolio_only or lightweight_refresh else collect_event_news(
         ticker_summaries=ticker_summaries, analysis_as_of=news_as_of,
     )
-    event_signals = {} if portfolio_only else collect_event_signals(
+    event_signals = {} if portfolio_only or lightweight_refresh else collect_event_signals(
         run_dir=run_dir, ticker_summaries=ticker_summaries,
         analysis_as_of=news_as_of, news_context=news_context,
     )
@@ -2469,6 +2470,7 @@ def _settings_snapshot(config: ScheduledAnalysisConfig) -> dict[str, Any]:
         "ticker_name_overrides_count": len(config.run.ticker_name_overrides),
         "codex_workspace_dir": config.llm.codex_workspace_dir,
         "execution_refresh_enabled": config.execution.execution_refresh_enabled,
+        "execution_lightweight_refresh": config.execution.execution_lightweight_refresh,
         "execution_refresh_checkpoints_kst": list(config.execution.execution_refresh_checkpoints_kst),
         "execution_refresh_checkpoints_local": list(config.execution.execution_refresh_checkpoints_local),
         "execution_checkpoint_timezone": config.execution.execution_checkpoint_timezone,
@@ -5254,8 +5256,9 @@ def _run_execution_overlay_passes(
                 md_path.write_text(md_text, encoding="utf-8")
                 summary["artifacts"]["execution_update_md"] = _relative_to_run(run_dir, md_path)
                 summary["execution_update"] = update_payload
-                _refresh_integrated_review(ticker_dir, summary, run_dir=run_dir,
-                    db_paths=[config.performance.store_path or (config.storage.archive_dir / "performance.sqlite")])
+                if not config.execution.execution_lightweight_refresh:
+                    _refresh_integrated_review(ticker_dir, summary, run_dir=run_dir,
+                        db_paths=[config.performance.store_path or (config.storage.archive_dir / "performance.sqlite")])
                 summary["intraday_snapshot_attempt"] = attempt_payload
                 _append_analysis_intraday_attempt(run_dir=run_dir, ticker_summary=summary, attempt_payload=attempt_payload)
                 updates_by_ticker[ticker] = update_payload
@@ -5315,8 +5318,9 @@ def _run_execution_overlay_passes(
                 )
                 summary["artifacts"]["execution_update_md"] = _relative_to_run(run_dir, md_path)
                 summary["execution_update"] = update_payload
-                _refresh_integrated_review(ticker_dir, summary, run_dir=run_dir,
-                    db_paths=[config.performance.store_path or (config.storage.archive_dir / "performance.sqlite")])
+                if not config.execution.execution_lightweight_refresh:
+                    _refresh_integrated_review(ticker_dir, summary, run_dir=run_dir,
+                        db_paths=[config.performance.store_path or (config.storage.archive_dir / "performance.sqlite")])
                 summary["intraday_snapshot_attempt"] = attempt_payload
                 _append_analysis_intraday_attempt(run_dir=run_dir, ticker_summary=summary, attempt_payload=attempt_payload)
                 updates_by_ticker[ticker] = update_payload

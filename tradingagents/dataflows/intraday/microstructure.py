@@ -14,6 +14,7 @@ from tradingagents.portfolio.instrument_identity import resolve_identity
 from tradingagents.portfolio.kis import KisClient
 from tradingagents.schemas import IntradayMarketSnapshot
 from tradingagents.charting.capture import normalize_kis_bars
+from .us_symbols import canonical_symbol, kis_symbol
 
 
 _DEFAULT_SUPPLEMENT_PROVIDER = object()
@@ -277,15 +278,16 @@ class KISMicrostructureProvider:
     ) -> IntradayMarketSnapshot:
         now_local = datetime.now(ZoneInfo(market_timezone))
         now_utc = now_local.astimezone(timezone.utc)
-        symbol = str(symbol).upper().split(".", 1)[0]
+        symbol = canonical_symbol(symbol)
+        broker_symbol = kis_symbol(symbol)
         missing: dict[str, str] = {}
         raw_source_names: list[str] = []
 
-        exchange, price = self._first_successful_us_price(symbol)
+        exchange, price = self._first_successful_us_price(broker_symbol)
         raw_source_names.append("kis.overseas_price")
         price_row = _price_row_from_payload(price)
 
-        detail = _call_optional(lambda: self._kis.overseas_price_detail(symbol, exchange=exchange), missing, "price_detail")
+        detail = _call_optional(lambda: self._kis.overseas_price_detail(broker_symbol, exchange=exchange), missing, "price_detail")
         detail_row = {}
         if detail:
             raw_source_names.append("kis.overseas_price_detail")
@@ -294,7 +296,7 @@ class KISMicrostructureProvider:
         bars: list[dict[str, Any]] = []
         chart_result = _call_optional(
             lambda: self._kis.overseas_time_itemchartprice(
-                symbol,
+                broker_symbol,
                 exchange=exchange,
                 nmin=str(max(1, _interval_minutes(interval))),
                 include_previous="0",
@@ -314,7 +316,7 @@ class KISMicrostructureProvider:
         session_bars = _us_regular_session_bars(bars, now_local=now_local, bounds=session_bounds, missing=missing)
 
         from .us_kis_evidence import dated_book, dated_strength, prior_daily_volume
-        orderbook = _call_optional(lambda: self._kis.overseas_asking_price(symbol, exchange=exchange), missing, "orderbook")
+        orderbook = _call_optional(lambda: self._kis.overseas_asking_price(broker_symbol, exchange=exchange), missing, "orderbook")
         orderbook_row = {}
         book_at = tape_at = None
         tape_summary = None
@@ -324,14 +326,14 @@ class KISMicrostructureProvider:
             # output1 is metadata, not the book. Never use volume as a price.
             if "output2" in orderbook:
                 try:
-                    orderbook_row, book_at = dated_book(orderbook, symbol, datetime.now(ZoneInfo(market_timezone)))
+                    orderbook_row, book_at = dated_book(orderbook, broker_symbol, datetime.now(ZoneInfo(market_timezone)))
                 except ValueError as exc:
                     missing["orderbook"] = str(exc)
             else:
                 orderbook_row = _first_record(orderbook, "output1")
 
         tape_result = _call_optional(
-            lambda: self._kis.overseas_quot_inquire_ccnl(symbol, exchange=exchange, today="1"),
+            lambda: self._kis.overseas_quot_inquire_ccnl(broker_symbol, exchange=exchange, today="1"),
             missing, "trade_tape",
         )
         tape_rows: list[dict[str, Any]] = []
@@ -353,7 +355,7 @@ class KISMicrostructureProvider:
         if volume_power:
             raw_source_names.append("kis.overseas_volume_power")
             volume_power_payload = volume_power[0] if isinstance(volume_power, tuple) else volume_power
-            volume_power_rank = _ranking_for_symbol(volume_power_payload, symbol)
+            volume_power_rank = _ranking_for_symbol(volume_power_payload, broker_symbol)
 
         # When the broker already supplies dated live book and strength, fetch
         # only the missing historical denominator, avoiding entitlement-failed
@@ -362,7 +364,7 @@ class KISMicrostructureProvider:
         if book_at is not None and tape_at is not None and hasattr(self._kis, "fetch_overseas_daily_price_history"):
             daily = _call_optional(
                 lambda: self._kis.fetch_overseas_daily_price_history(
-                    symbol=symbol, exchange_code=exchange,
+                    symbol=broker_symbol, exchange_code=exchange,
                     start_date=now_local.date() - timedelta(days=90),
                     end_date=now_local.date() - timedelta(days=1)),
                 missing, "daily_volume",
@@ -391,7 +393,7 @@ class KISMicrostructureProvider:
         if avg20_daily_volume is None and hasattr(self._kis, "fetch_overseas_daily_price_history"):
             daily_rows = _call_optional(
                 lambda: self._kis.fetch_overseas_daily_price_history(
-                    symbol=symbol,
+                    symbol=broker_symbol,
                     exchange_code=exchange,
                     start_date=now_local.date() - timedelta(days=60),
                     end_date=now_local.date(),
@@ -486,9 +488,9 @@ class KISMicrostructureProvider:
         now_utc = now_local.astimezone(timezone.utc)
         if not halt_status.get("is_clear"):
             missing.setdefault("halt_status", "halt_status_not_confirmed_by_snapshot")
-        luld_status = _unavailable_us_market_status("luld_status", raw_source_names)
-        reg_sho_status = _unavailable_us_market_status("reg_sho_status", raw_source_names)
-        news_halt_status = _unavailable_us_market_status("news_halt_status", raw_source_names)
+        from .us_halts import long_only_market_statuses
+        luld_status, reg_sho_status, news_halt_status = long_only_market_statuses(
+            halt_status, analysis_as_of=now_utc)
         source_limit_reasons = tuple(getattr(supplement, "pilot_blockers", ()) or ()) if supplement is not None else ()
         quality = _microstructure_quality(
             market="US",

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import replace
 import json
 from datetime import datetime, timezone
 from pathlib import Path
@@ -26,7 +27,8 @@ from tradingagents.schemas import (
 )
 
 
-def test_overlay_writes_microstructure_and_chatgpt_context_artifacts(tmp_path: Path, monkeypatch):
+@pytest.mark.parametrize("lightweight", [False, True])
+def test_overlay_writes_microstructure_and_chatgpt_context_artifacts(tmp_path: Path, monkeypatch, lightweight):
     config_path = tmp_path / "scheduled.toml"
     config_path.write_text(
         f"""
@@ -47,6 +49,10 @@ checkpoint_timezone = "America/New_York"
         encoding="utf-8",
     )
     config = load_scheduled_config(config_path)
+    config = replace(config, execution=replace(config.execution, execution_lightweight_refresh=lightweight))
+    if lightweight:
+        monkeypatch.setattr("tradingagents.scheduled.runner._refresh_integrated_review",
+                            lambda *a, **k: pytest.fail("chart rendering must not delay lightweight publication"))
     run_dir = tmp_path / "archive" / "runs" / "2026" / "run"
     ticker_dir = run_dir / "tickers" / "AAPL"
     ticker_dir.mkdir(parents=True)

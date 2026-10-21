@@ -218,7 +218,7 @@ def normalize_validation_quote(*, market, chart, orderbook, observed_at, instrum
     return result
 
 
-def current_quote(market, clock):
+def current_quote(market, clock, *, require_us_halt=False):
     # This client has read-only endpoints. No real account is queried for sizing.
     from tradingagents.portfolio.kis import KisClient
     client = KisClient.from_api_keys(environment="real")
@@ -230,7 +230,16 @@ def current_quote(market, clock):
             payload = client.overseas_time_itemchartprice("AAPL", exchange="NAS", nmin="1", include_previous="0")
             chart = payload[0] if isinstance(payload, tuple) else payload
             book = client.overseas_asking_price("AAPL", exchange="NAS")
-        return normalize_validation_quote(market=market, chart=chart, orderbook=book, observed_at=clock())
+        quote = normalize_validation_quote(market=market, chart=chart, orderbook=book, observed_at=clock())
+        if market == "US" and require_us_halt:
+            from tradingagents.dataflows.intraday.us_halts import current_halts, long_only_market_statuses
+            bars = normalize_kis_bars(chart["output2"], observed_at=clock(), timezone_name=MARKETS[market]["zone"])
+            halt = current_halts.fetch(MARKETS[market]["ticker"], traded_bars=bars)
+            luld, reg_sho, news = long_only_market_statuses(halt, analysis_as_of=clock())
+            if luld["is_clear"] is not True or news["is_clear"] is not True:
+                raise ValueError("US_TRADING_HALT_NOT_CLEAR")
+            quote.update(halt_status=halt, luld_status=luld, reg_sho_status=reg_sho, news_halt_status=news)
+        return quote
     finally:
         client.session.close()
 
