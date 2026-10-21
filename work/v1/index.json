@@ -238,9 +238,9 @@
     "us": {
       "schema": "tradingagents.work-context/v1",
       "surface": "us",
-      "event_id": "us:90fc6f01471d5442158ca0324bb25c36",
-      "source_sha256": "9f1f2015a92b0f76be69a8264d544416aaf92b47dcc6942c2dbe4b5d005ddd47",
-      "packet_sha256": "8b29271c5af7d818b58d1d343265844214af9232c83c6ad44cad2c966ff9aa82",
+      "event_id": "us:f640b220cf51fc5d131d532c51a8e59a",
+      "source_sha256": "5e3138176a03d4e133cac3b18ad17c310c8db12016b93b58fbc1e5024a96b68a",
+      "packet_sha256": "a6e25f987161e940dec559b001314c9401922a595a8b9366005dbe0d9bb977bb",
       "prompt_contract_version": "market-work-v13-us",
       "prompt_sha256": "281749b3b871d01531e3ceb7377d60bb67ebcaf89d6d8ba3162cb53d38400d7a",
       "skill_sha256": "4dffe28b3721557cc2517b5afff2f94045832606e71ff61461df969f6abb53c7",
@@ -248,22 +248,22 @@
       "workflow_contract_sha256": "8d06ba979f55f01229636b73bdc643c5b21f326cc270c0e8143f3fd7a3204028",
       "status_url": "https://nornen0202.github.io/TradingAgents/work/v1/us/status.json",
       "latest_url": "https://nornen0202.github.io/TradingAgents/work/v1/us/latest.json",
-      "event_url": "https://nornen0202.github.io/TradingAgents/work/v1/us/events/us-90fc6f01471d5442158ca0324bb25c36.json",
+      "event_url": "https://nornen0202.github.io/TradingAgents/work/v1/us/events/us-f640b220cf51fc5d131d532c51a8e59a.json",
       "prompt_url": "https://nornen0202.github.io/TradingAgents/work/v1/prompts/market_us.md",
       "source_health": "OK",
       "report_mode": "READY",
       "freshness_receipt": {
         "schema": "tradingagents.source-freshness/v1",
-        "producer_run_id": "20261022T025110_local-freshness-us-overlay",
-        "producer_started_at": "2026-10-22T02:51:10.656995+09:00",
-        "producer_finished_at": "2026-10-22T02:51:48.760597+09:00",
+        "producer_run_id": "20261022T030611_local-freshness-us-overlay",
+        "producer_started_at": "2026-10-22T03:06:11.795479+09:00",
+        "producer_finished_at": "2026-10-22T03:06:54.512501+09:00",
         "analysis_run_id": "20261021T175015_local-scheduler-us-full",
         "analysis_lineage_status": "RESOLVED",
         "analysis_completed_at": "2026-10-21T21:13:33.227411+09:00",
         "analysis_trade_date_oldest": "2026-10-20",
         "analysis_trade_date_latest": "2026-10-20",
-        "market_data_oldest_at": "2026-10-22T02:50:57+09:00",
-        "market_data_latest_at": "2026-10-21T13:51:00-04:00",
+        "market_data_oldest_at": "2026-10-21T14:06:00-04:00",
+        "market_data_latest_at": "2026-10-21T14:06:00-04:00",
         "market_data_status": "FRESH",
         "publication_does_not_refresh_inputs": true,
         "execution_max_age_seconds": 600.0,
@@ -366,12 +366,6 @@
             "execution_eligible": false
           },
           {
-            "ticker": "TXN",
-            "research_valid": true,
-            "category": "FRESH_REGULAR_SESSION",
-            "execution_eligible": false
-          },
-          {
             "ticker": "MPWR",
             "research_valid": true,
             "category": "FRESH_REGULAR_SESSION",
@@ -427,6 +421,12 @@
           },
           {
             "ticker": "MDT",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "TXN",
             "research_valid": true,
             "category": "FRESH_REGULAR_SESSION",
             "execution_eligible": false
