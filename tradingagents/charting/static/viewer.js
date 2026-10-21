@@ -44,11 +44,12 @@ function renderProfile(series) {
 }
 function renderHealth(health) {
   const labels={MARKET_CLOSED:"휴장·장 종료",WAITING_SOURCE:"새 분석·시세 대기",ACTIVE:"모의 점검 진행",VALUATION_ONLY:"보유 평가만 진행 · 신규 판단 대기",BLOCKED:"조건 차단",ERROR:"점검 오류"};
+  const reasons={CLOCK_SYNC_REVIEW_REQUIRED:"PC 시간 동기화 확인 필요 · 미래 호가 제외",ORDERBOOK_CLOCK_STALE_OR_FUTURE:"호가 시각이 오래됐거나 미래임",SOURCE_EXECUTION_EXPIRED:"실행 원본 유효시간 만료"};
   if(health.status!=="AVAILABLE") { byId("paper-health").replaceChildren(paragraph("이 시점의 모의 운영 상태 기록이 없습니다. 주문·체결 여부를 추정하지 않습니다."));return; }
   byId("paper-health").replaceChildren(paragraph("최근 운영 점검: "+health.checked_at+(health.stale?" · 10분 경과·운영 확인 필요":"")+" · "+(health.enabled?"모의 운용 설정 켜짐":"모의 운용 설정 꺼짐")+" · 실주문 전송 0건"),
     table("시장별 모의 상태",["시장","현재 상태","최근 시세 관측","최근 모의 체결","대기 / 체결 / 거절 / 취소","차단 이유"],Object.entries(health.markets).map(([key,row])=>[
       key.toUpperCase(),(labels[row.status]||row.status)+(row.stale?" · 점검 10분 경과":""),row.last_quote_at||row.last_observation_at||"아직 없음",row.last_fill_at||"아직 없음",
-      ["PENDING","FILLED","REJECTED","CANCELLED"].map(state=>number(row.order_counts[state])).join(" / "),row.blockers.join(", ")||"없음"])),
+      ["PENDING","FILLED","REJECTED","CANCELLED"].map(state=>number(row.order_counts[state])).join(" / "),row.blockers.map(code=>reasons[code]||code).join(", ")||"없음"])),
     paragraph("운영 점검 시각과 실제 시세·체결 시각은 별개입니다. 휴장 중 점검이 성공해도 체결 기록이 새로 생기지 않습니다."));
   if(health.markets.us)byId("paper-health").append(paragraph("원화 현금 모의 포트폴리오 / 미국 주식은 증권사 기준환율 평가 / 실제 달러계좌 수익률과 다름"));
 }
@@ -91,6 +92,7 @@ function renderKisStrategy(payload) {
   const labels={DISABLED:"운용 꺼짐",WAITING_VALIDATION:"정규장 검증 통과 대기",WAITING_SIGNAL:"유효한 새 전략 신호 대기",MARKET_CLOSED:"정규장 대기",BLOCKED:"조건 차단 · 이유 확인",ACTIVE:"전략 모의 운용 중"};
   const reasons={STRATEGY_ACCOUNT_POSITION_UNVERIFIED:"모의계좌 보유 수량과 전략 체결 기록 대조 필요",SOURCE_EVIDENCE_UNVERIFIED:"원래 전략 보고서의 시각·판단 근거 확인 필요",DAILY_ORDER_LIMIT:"오늘의 원주문 시도 한도 도달",NO_STRATEGY_QUANTITY_WITHIN_LIMITS:"모의 보유 수량·주문 한도 내 수량 없음",BUDGET_FX_UNVERIFIED:"전략 예산의 달러 환산 근거 확인 필요",PROPOSAL_QUANTITY_INVALID:"제안 수량 확인 필요",CANDIDATE_EVIDENCE_UNVERIFIED:"후보의 최신 시세·계좌 근거 확인 필요",VALIDATION_REQUIRED:"이 시장의 주문·체결·취소 검증 필요",NO_FRESH_EXECUTABLE_STRATEGY:"유효 시간 내 실행 가능한 새 전략 없음",HALTED:"운영 중지 설정",MARKET_CLOSED:"정규장 대기",SESSION_EDGE:"개장·마감 인접 시간",CALENDAR_UNVERIFIED:"거래일 확인 필요",AMBIGUOUS_ORDER:"미확정 주문 확인 필요",ORDER_REPORT_UNVERIFIED:"주문내역 확인 필요",SUBMISSION_BLOCKED_OR_UNRESOLVED:"주문 조건 차단 또는 응답 확인 필요",VALUATION_UNVERIFIED:"평가 시세 미확인",RUNTIME_EVIDENCE_UNVERIFIED:"전략·시세·계좌 근거 확인 필요",PREVIOUS_SESSION_ORDER_UNRESOLVED:"이전 거래일 미완료 주문 확인 필요"};
   const states={ACKNOWLEDGED:"접수",OPEN:"미체결",PARTIAL:"부분체결",FILLED:"체결 완료",CANCELLED:"취소 완료",REJECTED:"거절",NOT_SENT:"미전송",BLOCKED:"조건 차단",UNKNOWN:"응답 미확정",UNRESOLVED:"대조 필요"};
+  Object.assign(reasons,{SOURCE_EXECUTION_EXPIRED:"실행 원본 유효시간 만료",SOURCE_SIGNALS_EXPIRED_OR_UNDATED:"개별 신호의 시세 시각 만료·미확인",SOURCE_DATA_NOT_EXECUTION_READY:"실행에 필요한 시세·거래상태 자료 미충족",NO_RECENT_COMPLETED_SOURCE:"최근 완료된 분석 원본 없음"});
   const clock=value=>value?new Date(value).toLocaleString("ko-KR",{timeZone:"Asia/Seoul",hour12:false}):"확인 전";
   target.replaceChildren(paragraph("최근 점검: "+clock(payload.checked_at)+(payload.stale?" · 3분 이상 경과·운영 확인 필요":"")+" · 실계좌 자동 주문 비활성"));
   for(const market of ["KR","US"]){
@@ -98,6 +100,9 @@ function renderKisStrategy(payload) {
     const card=document.createElement("article");card.className="panel";
     const title=document.createElement("h3");title.textContent=(market==="KR"?"국내":"미국")+" · "+labels[row.status];card.append(title);
     card.append(paragraph("정규장 연결 검증: "+(row.gate_passed?"통과":"대기")+" · "+(row.blockers||[]).map(code=>reasons[code]||"운영 확인 필요").join(" / ")));
+    const diagnostic=row.source_diagnostics;
+    if(diagnostic?.strategy_rows!==undefined)card.append(paragraph("분석 "+number(diagnostic.strategy_rows)+"종목 · 신선한 실행자료 "+number(diagnostic.execution_ready_rows)+"종목 · 배정 주문 "+number(diagnostic.allocated_orders)+"건"+(diagnostic.status==="NO_ALLOCATED_ORDERS"?" · 조건 확인 대기 또는 주문 미배정":"")));
+    if(diagnostic?.reason_counts?.limited_halt_status)card.append(paragraph("거래정지 상태를 확인하지 못한 종목이 있어 실행이 제한됩니다."));
     const perf=row.performance;
     card.append(paragraph("전략 누적 평가손익(비용 전): "+(perf?.status==="AVAILABLE"?number(perf.gross_pnl)+" "+perf.currency:perf?.status==="NO_FILLS"?"아직 체결 없음":"체결 금액·평가 시세 확인 대기")));
     if(row.performance_history?.length)card.append(table("최근 확인한 성과",["평가 확인 시각 (한국시간)","누적 평가손익 · 비용 전"],row.performance_history.slice(-10).reverse().map(p=>[clock(p.observed_at),number(p.gross_pnl)+" "+p.currency])));

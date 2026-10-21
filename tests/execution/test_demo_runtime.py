@@ -258,7 +258,9 @@ def test_invalid_future_missing_or_unapproved_strategy_cannot_order(h, change):
 
 def test_expired_source_halt_and_foreign_account_never_order(h):
     h.now += timedelta(minutes=3)
-    assert h.tick()["status"] == "WAITING_SIGNAL"
+    expired = h.tick()
+    assert expired["status"] == "BLOCKED"
+    assert "SOURCE_SIGNALS_EXPIRED_OR_UNDATED" in expired["blockers"]
     h.source("fixture-2")
     (h.root / "HALT").touch()
     assert "HALTED" in h.tick()["blockers"]

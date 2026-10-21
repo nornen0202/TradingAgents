@@ -32,6 +32,8 @@ def test_one_share_exception_requires_separate_limit_and_explicit_quantity():
         side="BUY", price_krw=800000, nav_krw=25000000, quantity=1, limits=limits
     )
     assert result.quantity == 1
+    assert size_paper_order(side="SELL", price_krw=0.1, nav_krw=100,
+                            quantity=3, budget_krw=0.3, available_qty=3).quantity == 3
     too_large = size_paper_order(
         side="BUY", price_krw=2000000, nav_krw=25000000, quantity=1, limits=limits
     )
@@ -49,6 +51,14 @@ def test_sellable_quantity_and_costs_bound_order():
         ).quantity
         == 2
     )
+
+
+def test_exact_share_reduction_budget_does_not_pay_fees_before_selling():
+    result = size_paper_order(side="SELL", price_krw=100.25, nav_krw=100000,
+                              quantity=1, budget_krw=100.25, available_qty=1)
+    assert result.quantity == 1
+    assert size_paper_order(side="BUY", price_krw=100.25, nav_krw=100000,
+                            quantity=1, budget_krw=100.25).quantity == 0
     assert (
         size_paper_order(
             side="SELL", price_krw=100, nav_krw=100000, quantity=10

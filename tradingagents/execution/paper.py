@@ -94,6 +94,7 @@ class PaperBroker:
                 status TEXT NOT NULL, reason TEXT NOT NULL, expires_at TEXT NOT NULL,
                 filled_at TEXT, fill_price REAL, cost REAL);
             CREATE TABLE IF NOT EXISTS observations(at TEXT PRIMARY KEY, nav REAL NOT NULL, cash REAL NOT NULL);
+            CREATE TABLE IF NOT EXISTS observation_quality(at TEXT PRIMARY KEY, marks_complete INTEGER NOT NULL);
         """)
         initialize_lifecycle(self.db)
         columns = {row[1] for row in self.db.execute("PRAGMA table_info(orders)")}
@@ -519,6 +520,7 @@ class PaperBroker:
                 ).fetchone()[0]
             )
             self.db.execute("INSERT INTO observations VALUES (?,?,?)", (now, nav, cash))
+            self.db.execute("INSERT INTO observation_quality VALUES (?,?)", (now, int(not missing_marks)))
             self.db.execute("COMMIT")
             return {
                 "mode": "LOCAL_PAPER_ONLY",
@@ -527,6 +529,14 @@ class PaperBroker:
                 "nav_krw": nav,
                 "cash_krw": cash,
                 "marks_complete": not missing_marks,
+                "valuation_performance": {
+                    "status": "INCOMPLETE_MARKS" if missing_marks else "AVAILABLE",
+                    "basis": "SEEDED_HOLDINGS_PLUS_LOCAL_PAPER_TRADES",
+                    "since": self._get("seed_asof"),
+                    "pnl_krw": None if missing_marks else nav - self._get("seed_nav"),
+                    "return_pct": None if missing_marks else (nav / self._get("seed_nav") - 1) * 100,
+                    "strategy_only_return_pct": None,
+                },
                 "peak_nav_krw": self._get("peak_nav", self._get("seed_nav")),
                 "drawdown_fraction": drawdown,
                 "trading_state": "HALTED"

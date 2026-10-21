@@ -21,6 +21,14 @@ from tradingagents.portfolio.kis import KisClient
 KIS_ORDERBOOK_ZONE = ZoneInfo("Asia/Seoul")
 
 
+class QuoteClockError(ValueError):
+    def __init__(self, event_at, observed_at):
+        super().__init__("ORDERBOOK_CLOCK_STALE_OR_FUTURE")
+        self.diagnostic = {"reason": "ORDERBOOK_FUTURE" if event_at > observed_at else "ORDERBOOK_STALE",
+                           "event_at": event_at.isoformat(), "observed_at": observed_at.isoformat(),
+                           "age_seconds": (observed_at - event_at).total_seconds()}
+
+
 def _number(value):
     if isinstance(value, bool):
         raise ValueError("INVALID_PRICE")
@@ -113,7 +121,7 @@ def normalize_quote(*, ticker, market, chart, orderbook, observed_at, fx_quote=N
     except ValueError:
         raise ValueError("ORDERBOOK_CLOCK_INVALID") from None
     if not 0 <= (at - book_at).total_seconds() <= 120:
-        raise ValueError("ORDERBOOK_CLOCK_STALE_OR_FUTURE")
+        raise QuoteClockError(book_at, at)
     price = _number(bar["close"])
     result = {"as_of": quote_at.isoformat(), "observed_at": at.isoformat(),
               "price_krw": price, "session": "regular", "executable": True,
@@ -145,6 +153,7 @@ class ReadOnlyPaperQuotes:
 
     def fetch(self, tickers, *, market, fx_quote=None):
         quotes, blockers = {}, {}
+        self.diagnostics = {}
         for ticker in sorted(set(tickers)):
             try:
                 if market == "kr":
@@ -171,6 +180,8 @@ class ReadOnlyPaperQuotes:
             except ValueError as exc:
                 code = str(exc)
                 blockers[ticker] = code if re.fullmatch(r"[A-Z_]+", code) else "INVALID_BROKER_OBSERVATION"
+                if isinstance(exc, QuoteClockError):
+                    self.diagnostics[ticker] = exc.diagnostic
             except Exception:
                 blockers[ticker] = "BROKER_READ_UNAVAILABLE"
         return quotes, blockers

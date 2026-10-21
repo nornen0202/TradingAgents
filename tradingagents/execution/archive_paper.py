@@ -40,6 +40,8 @@ def build_step(run: Path, now: str, limits: PaperLimits | None = None):
         "REDUCE_NOW": "REDUCE",
         "EXIT_NOW": "SELL",
         "TAKE_PROFIT_NOW": "REDUCE",
+        "TRIM_NOW": "REDUCE",
+        "STOP_LOSS_NOW": "SELL",
     }
     for row in bundle.get("strategy_table", []):
         ticker = row["ticker"]
@@ -73,16 +75,22 @@ def build_step(run: Path, now: str, limits: PaperLimits | None = None):
         )
         if not action:
             continue
-        proposal = next(
-            (
-                p
-                for p in proposals
-                if p.get("canonical_ticker") == ticker
-                and p.get("side", "").upper() == ("BUY" if action == "BUY" else "SELL")
-            ),
-            {},
-        )
+        matches = [
+            p for p in proposals
+            if p.get("canonical_ticker") == ticker
+            and p.get("side", "").upper() == ("BUY" if action == "BUY" else "SELL")
+        ]
+        # A stock-level exit can still require a close confirmation at account
+        # level. No allocated proposal means no order, not a rejected order.
+        if not matches:
+            continue
+        if len(matches) != 1:
+            raise ValueError("AMBIGUOUS_STRATEGY_PROPOSAL")
+        proposal = matches[0]
         qty = proposal.get("estimated_qty")
+        if qty is not None and (not isinstance(qty, (int, float)) or isinstance(qty, bool)
+                                or not math.isfinite(qty) or qty <= 0 or int(qty) != qty):
+            raise ValueError("INVALID_STRATEGY_PROPOSAL_QUANTITY")
         qty = (
             int(qty)
             if isinstance(qty, (int, float))
@@ -101,6 +109,9 @@ def build_step(run: Path, now: str, limits: PaperLimits | None = None):
             {},
         )
         delta = proposal.get("delta_krw_now")
+        if delta is not None and (not isinstance(delta, (int, float)) or isinstance(delta, bool)
+                                  or not math.isfinite(delta) or (delta <= 0 if action == "BUY" else delta >= 0)):
+            raise ValueError("INVALID_STRATEGY_PROPOSAL_BUDGET")
         budget = (
             abs(delta)
             if isinstance(delta, (int, float))
