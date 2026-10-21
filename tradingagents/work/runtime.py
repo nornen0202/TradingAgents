@@ -64,7 +64,9 @@ class WorkRuntime:
                 public=False,
             )
             if guarded_refresh:
-                from .pre_report import aware_datetime, freshness_blockers, market_session_state
+                from .pre_report import (
+                    aware_datetime, freshness_blockers, market_session_state, publish_freshness_blockers,
+                )
                 # The producer lock was released before the packet reads. A
                 # newer source or slow read must not advance Work state using
                 # the earlier caller's verification or clock.
@@ -72,6 +74,7 @@ class WorkRuntime:
                 effective_now = datetime.fromisoformat(_now(now))
                 blockers = freshness_blockers(source_packet, now=effective_now,
                     started_at=refresh_started_at, run_id=expected_producer_run_id)
+                blockers.extend(publish_freshness_blockers(source_packet, now=effective_now))
                 close = aware_datetime(session.get("session_close"))
                 if not session.get("is_open") or (close is not None and effective_now >= close):
                     blockers.append("SESSION_ENDED_DURING_PREPARE")

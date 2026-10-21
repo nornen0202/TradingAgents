@@ -14,6 +14,7 @@ AT = datetime(2026, 10, 21, 14, 0, tzinfo=timezone.utc)
 
 def source_packet():
     return seal_packet("us", body={"kind": "market", "source_health": "OK", "current": {
+        "bundle": {"strategy_table": [{"execution": {"valid_until": (AT + timedelta(seconds=120)).isoformat()}}]},
         "universe_coverage": {"status": "COMPLETE"}, "freshness_receipt": {
             "producer_run_id": "verified-run", "market_data_status": "FRESH",
             "market_data_oldest_at": AT.isoformat(), "market_data_latest_at": AT.isoformat(),
@@ -21,7 +22,8 @@ def source_packet():
             "analysis_lineage_status": "RESOLVED", "analysis_completed_at": AT.isoformat()}}})
 
 
-@pytest.mark.parametrize("case", ["same", "new_source", "missing", "malformed", "future", "expired", "closed"])
+@pytest.mark.parametrize("case", ["same", "new_source", "missing", "malformed", "future", "expired", "closed",
+    "contract_expired", "contract_undated", "no_rows"])
 def test_changed_or_expired_source_never_allocates_or_acknowledges_event(tmp_path, monkeypatch, case):
     packet = source_packet()
     receipt = packet["body"]["current"]["freshness_receipt"]
@@ -30,6 +32,12 @@ def test_changed_or_expired_source_never_allocates_or_acknowledges_event(tmp_pat
     elif case in {"missing", "malformed", "future"}:
         receipt["market_data_oldest_at"] = {"missing": None, "malformed": "bad",
             "future": (AT + timedelta(seconds=1)).isoformat()}[case]
+    elif case == "contract_expired":
+        packet["body"]["current"]["bundle"]["strategy_table"][0]["execution"]["valid_until"] = AT.isoformat()
+    elif case == "contract_undated":
+        packet["body"]["current"]["bundle"]["strategy_table"][0]["execution"]["valid_until"] = None
+    elif case == "no_rows":
+        packet["body"]["current"]["bundle"]["strategy_table"] = []
     packet = seal_packet("us", body=packet["body"])
     original = deepcopy(packet)
     monkeypatch.setattr(work_runtime, "build_surface_packet", lambda *a, **k: packet)
