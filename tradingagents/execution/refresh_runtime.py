@@ -18,6 +18,23 @@ ATTEMPT_INTERVAL_SECONDS = 300
 MAX_CONSECUTIVE_FAILURES = 3
 
 
+def _source_observations_fresh(bundle, now):
+    """Publication cannot make an old or unverifiable observation fresh."""
+    if not isinstance(bundle, dict):
+        return False
+    generated = instant(bundle.get("generated_at"))
+    if generated is None or not 0 <= (now - generated).total_seconds() < REFRESH_AFTER_SECONDS:
+        return False
+    rows = bundle.get("strategy_table")
+    if not isinstance(rows, list) or not rows:
+        return False
+    for row in rows:
+        observed = instant(row.get("market_data_asof")) if isinstance(row, dict) else None
+        if observed is None or not 0 <= (now - observed).total_seconds() < REFRESH_AFTER_SECONDS:
+            return False
+    return True
+
+
 def execution_refresh_enabled(state):
     """Only the existing explicitly enabled simulation lanes need this producer."""
     for lane, mode in (("paper", "LOCAL_PAPER_ONLY"), ("kis-strategy", "KIS_DEMO_STRATEGY")):
@@ -45,8 +62,7 @@ def refresh_due(archive, state, *, now, dry_run=False, clock=None, executor=None
             continue
         source = _latest_source(archive, market, now)
         bundle = _read(source / "decision_bundle_v2.json", {}) if source else {}
-        generated = instant(bundle.get("generated_at"))
-        if generated is not None and 0 <= (now - generated).total_seconds() < REFRESH_AFTER_SECONDS:
+        if _source_observations_fresh(bundle, now):
             continue
         path = state / "execution-refresh" / f"{market}.json"
         prior = _read(path, {})

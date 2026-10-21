@@ -141,3 +141,81 @@ def test_next_slot_still_waits_for_actual_source_age(tmp_path):
                             "status": "COMPLETED", "consecutive_failures": 0}))
     assert refresh.refresh_due(archive, state, now=started + timedelta(seconds=60),
                                dry_run=True, session_resolver=open_kr) == []
+
+
+@pytest.mark.parametrize("observed,expected", [
+    ((AT - timedelta(seconds=119)).isoformat(), False),
+    ((AT - timedelta(seconds=120)).isoformat(), True),
+    ((AT - timedelta(seconds=300)).isoformat(), True),
+    ((AT + timedelta(seconds=1)).isoformat(), True),
+    (None, True), ("bad", True), ("2026-10-19T09:59:00", True),
+])
+def test_recent_publication_does_not_renew_original_quote(tmp_path, observed, expected):
+    archive, state = tmp_path / "archive", tmp_path / "state"
+    enable(state)
+    run = source(archive, AT - timedelta(seconds=30))
+    path = run / "decision_bundle_v2.json"
+    bundle = json.loads(path.read_text())
+    bundle["strategy_table"][0]["market_data_asof"] = observed
+    path.write_text(json.dumps(bundle))
+    originals = {p: p.read_bytes() for p in run.rglob("*.json")}
+    result = refresh.refresh_due(archive, state, now=AT, dry_run=True, session_resolver=open_kr)
+    assert bool(result) is expected
+    assert all(p.read_bytes() == value for p, value in originals.items())
+    assert not (state / "execution-refresh").exists()
+
+
+@pytest.mark.parametrize("rows", [None, [], {}, [None], [{}], [{"market_data_asof": None}]])
+def test_missing_observations_do_not_suppress_refresh(tmp_path, rows):
+    archive, state = tmp_path / "archive", tmp_path / "state"
+    enable(state)
+    run = source(archive, AT - timedelta(seconds=30))
+    path = run / "decision_bundle_v2.json"
+    bundle = json.loads(path.read_text())
+    bundle["strategy_table"] = rows
+    path.write_text(json.dumps(bundle))
+    assert refresh.refresh_due(archive, state, now=AT, dry_run=True, session_resolver=open_kr)[0]["status"] == "DUE"
+
+
+@pytest.mark.parametrize("prior_status,seconds,expected", [
+    ("COMPLETED", 299.7, "DUE"),
+    ("COMPLETED", 240, "REFRESH_COOLDOWN"),
+    ("STARTED", 299.7, "REFRESH_COOLDOWN"),
+    ("FAILED", 299.7, "REFRESH_COOLDOWN"),
+    ("FAILED", 300, "DUE"),
+])
+def test_late_publication_mixed_clocks_keep_original_attempt_limits(tmp_path, prior_status, seconds, expected):
+    archive, state = tmp_path / "archive", tmp_path / "state"
+    enable(state)
+    started = AT + timedelta(seconds=5)
+    now = started + timedelta(seconds=seconds)
+    run = source(archive, now - timedelta(seconds=55))
+    path = run / "decision_bundle_v2.json"
+    bundle = json.loads(path.read_text())
+    # One fresh row cannot hide another expired row, even with no executable signal.
+    bundle["strategy_table"].append({"ticker": "000660.KS", "quality": {"execution_ready": False},
+        "market_data_asof": (now - timedelta(seconds=180)).isoformat()})
+    path.write_text(json.dumps(bundle))
+    receipt = state / "execution-refresh/kr.json"
+    receipt.parent.mkdir()
+    receipt.write_text(json.dumps({"started_at": started.isoformat(), "session_date": started.date().isoformat(),
+        "status": prior_status, "consecutive_failures": 0 if prior_status == "COMPLETED" else 1}))
+    before = receipt.read_bytes()
+    result = refresh.refresh_due(archive, state, now=now, dry_run=True, session_resolver=open_kr)
+    assert result[0]["status"] == expected
+    assert receipt.read_bytes() == before
+
+
+def test_expired_observation_still_respects_failure_budget(tmp_path):
+    archive, state = tmp_path / "archive", tmp_path / "state"
+    enable(state)
+    run = source(archive, AT - timedelta(seconds=30))
+    path = run / "decision_bundle_v2.json"
+    bundle = json.loads(path.read_text())
+    bundle["strategy_table"][0]["market_data_asof"] = (AT - timedelta(seconds=180)).isoformat()
+    path.write_text(json.dumps(bundle))
+    receipt = state / "execution-refresh/kr.json"
+    receipt.parent.mkdir()
+    receipt.write_text(json.dumps({"started_at": (AT - timedelta(minutes=5)).isoformat(),
+        "session_date": AT.date().isoformat(), "status": "FAILED", "consecutive_failures": 3}))
+    assert refresh.refresh_due(archive, state, now=AT, dry_run=True, session_resolver=open_kr)[0]["status"] == "REFRESH_RETRY_LIMIT"
