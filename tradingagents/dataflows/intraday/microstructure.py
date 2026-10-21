@@ -30,10 +30,16 @@ class KISMicrostructureProvider:
         client_factory: Callable[[], Any] | None = None,
         us_daily_volume_fallback: Callable[[str], float | None] | None = None,
         us_supplement_provider: Any = _DEFAULT_SUPPLEMENT_PROVIDER,
+        us_halt_provider: Any = _DEFAULT_SUPPLEMENT_PROVIDER,
     ) -> None:
         self._client = client
         self._client_factory = client_factory or (lambda: KisClient.from_api_keys(environment="real"))
         self._us_daily_volume_fallback = us_daily_volume_fallback or _avg20_daily_volume_from_yfinance
+        if us_halt_provider is _DEFAULT_SUPPLEMENT_PROVIDER:
+            from .us_halts import current_halts
+            self._us_halt_provider = None if client is not None else current_halts
+        else:
+            self._us_halt_provider = us_halt_provider
         if us_supplement_provider is _DEFAULT_SUPPLEMENT_PROVIDER:
             self._us_supplement_provider = (
                 None if client is not None else CompositeUSMicrostructureSupplementProvider.from_api_keys()
@@ -462,7 +468,22 @@ class KISMicrostructureProvider:
             for key, reason in getattr(supplement, "limited_reason", {}).items():
                 missing.setdefault(key, reason)
 
-        halt_status = _status_from_keys(combined_price, ("halt", "trht", "mtyp", "stat"), default_name="unknown")
+        # Market type and generic status fields are not halt evidence.
+        halt_status = _status_from_keys(combined_price, ("halt", "trht"), default_name="unknown")
+        if self._us_halt_provider is not None:
+            try:
+                official_status = self._us_halt_provider.fetch(symbol, traded_bars=normalize_kis_bars(
+                    session_bars, observed_at=now_local, timezone_name=market_timezone))
+                # An explicit broker halt can veto a clear exchange feed.
+                if halt_status.get("status") != "flagged" or not official_status.get("is_clear"):
+                    halt_status = official_status
+                raw_source_names.append("nasdaq.current_trade_halts")
+            except Exception:
+                missing["halt_status"] = "current_halt_feed_unavailable_or_unverified"
+        # This is the actual evaluation clock after source reads, not a new
+        # event timestamp. Each source's original clock remains below.
+        now_local = datetime.now(ZoneInfo(market_timezone))
+        now_utc = now_local.astimezone(timezone.utc)
         if not halt_status.get("is_clear"):
             missing.setdefault("halt_status", "halt_status_not_confirmed_by_snapshot")
         luld_status = _unavailable_us_market_status("luld_status", raw_source_names)
@@ -488,6 +509,8 @@ class KISMicrostructureProvider:
                 asof = min(asof, book_at)
             if tape_at is not None:
                 asof = min(asof, tape_at)
+            if halt_status.get("source") == "nasdaq.current_trade_halts":
+                asof = min(asof, datetime.fromisoformat(halt_status["published_at"]))
         source_latency_seconds = max(0, int((now_local - asof).total_seconds()))
         if supplement is not None and getattr(supplement, "source_latency_seconds", None) is not None:
             source_latency_seconds = max(source_latency_seconds, int(supplement.source_latency_seconds))

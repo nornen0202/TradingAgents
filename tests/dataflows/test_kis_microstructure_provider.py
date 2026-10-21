@@ -434,7 +434,8 @@ def test_microstructure_report_shows_external_sources_and_limited_fields():
     ("103100", "233025", "2026-10-20T10:31:00-04:00"),
     ("103000", "232955", "2026-10-20T23:29:55+09:00"),
 ])
-def test_us_actual_response_parts_use_native_evidence_without_supplement(monkeypatch, bar_time, book_time, expected_asof):
+@pytest.mark.parametrize("halt_feed", ["unavailable", "clear", "halted", "failed"])
+def test_us_actual_response_parts_use_native_evidence_without_supplement(monkeypatch, bar_time, book_time, expected_asof, halt_feed):
     from datetime import datetime
     from zoneinfo import ZoneInfo
     from tradingagents.dataflows.intraday import microstructure as module
@@ -460,15 +461,25 @@ def test_us_actual_response_parts_use_native_evidence_without_supplement(monkeyp
     class NoFallback:
         def fetch(self, *args, **kwargs):
             pytest.fail('Native evidence must not trigger delayed external fallbacks')
+    class Halts:
+        def fetch(self, symbol, **kwargs):
+            if halt_feed == "failed":
+                raise ValueError("HALT_FEED_STALE_OR_FUTURE")
+            return {"status": halt_feed, "is_clear": halt_feed == "clear",
+                    "source": "nasdaq.current_trade_halts", "published_at": fixed.isoformat()}
     snapshot = KISMicrostructureProvider(client=Client(), us_daily_volume_fallback=lambda _: None,
-                                        us_supplement_provider=NoFallback()).fetch('AAPL', interval='1m')
+                                        us_supplement_provider=NoFallback(),
+                                        us_halt_provider=None if halt_feed == "unavailable" else Halts()).fetch('AAPL', interval='1m')
     assert snapshot.execution_strength == 81.75
     assert snapshot.spread_bps == 100
     assert snapshot.avg20_daily_volume == 10000
     assert snapshot.asof == expected_asof
     assert snapshot.bar_timestamp == ('2026-10-20T10:31:00-04:00' if bar_time == '103100' else '2026-10-20T10:30:00-04:00')
-    assert snapshot.execution_data_quality == DELAYED_ANALYSIS_ONLY
-    assert snapshot.halt_status['is_clear'] is False
+    assert (snapshot.execution_data_quality == DELAYED_ANALYSIS_ONLY) == (halt_feed != "clear")
+    assert snapshot.halt_status['is_clear'] == (halt_feed == "clear")
     for field in ['luld_status', 'reg_sho_status', 'news_halt_status']:
         assert getattr(snapshot, field)['status'] == 'not_available_by_provider'
-    assert snapshot.missing_reason == {'halt_status': 'halt_status_not_confirmed_by_snapshot'}
+    if halt_feed == "clear":
+        assert "halt_status" not in snapshot.missing_reason
+    else:
+        assert "halt_status" in snapshot.missing_reason

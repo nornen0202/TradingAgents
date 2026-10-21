@@ -17,6 +17,7 @@ from tradingagents.atomic_io import atomic_write_json, interprocess_file_lock
 from tradingagents.charting.bars import instant
 from tradingagents.execution.paper import PaperBroker, PaperLimits
 from tradingagents.execution.paper_quotes import ReadOnlyPaperQuotes
+from tradingagents.execution.source_diagnostics import diagnose_source
 
 SCHEMA = "tradingagents.paper-runtime/v1"
 
@@ -84,6 +85,7 @@ def _summary(broker):
     counts = {r[0]: r[1] for r in broker.db.execute("SELECT status,count(*) FROM orders GROUP BY status")}
     fill = broker.db.execute("SELECT max(filled_at) FROM orders WHERE status='FILLED'").fetchone()[0]
     return {"order_counts": {k: counts.get(k, 0) for k in ("PENDING", "FILLED", "REJECTED", "CANCELLED")},
+            "rejection_counts": dict(broker.db.execute("SELECT reason,count(*) FROM orders WHERE status='REJECTED' GROUP BY reason")),
             "last_observation_at": broker._get("last_step"), "last_fill_at": fill}
 
 
@@ -155,6 +157,7 @@ def advance_market(archive, state, market, *, now=None, clock=None, account_load
             step = {"signals": []}
             bundle_at = None
             if source is not None:
+                result["source_diagnostics"] = diagnose_source(source, observed)
                 source_account, step, selected = build_step(source, observed.isoformat(), limits)
                 if selected != market:
                     return finish("BLOCKED", ("SOURCE_MARKET_MISMATCH",))
@@ -180,6 +183,7 @@ def advance_market(archive, state, market, *, now=None, clock=None, account_load
             try:
                 quotes, quote_blockers = provider.fetch(tickers, market=market,
                     fx_quote=(account.get("cash_diagnostics") or {}).get("fx_quote"))
+                result["quote_diagnostics"] = getattr(provider, "diagnostics", {})
             finally:
                 provider.close()
             at = instant(clock())
@@ -227,7 +231,11 @@ def advance_market(archive, state, market, *, now=None, clock=None, account_load
             if valid_clocks:
                 result["last_quote_at"] = max(valid_clocks).isoformat()
             blockers = result["blockers"] + sorted(set(quote_blockers.values()))
+            if any(d.get("reason") == "ORDERBOOK_FUTURE" for d in result["quote_diagnostics"].values()):
+                blockers.append("CLOCK_SYNC_REVIEW_REQUIRED")
             state_label = "BLOCKED" if not receipt["marks_complete"] or quote_blockers else "VALUATION_ONLY" if blockers else "ACTIVE"
+            if state_label == "ACTIVE" and not step["signals"] and not pending:
+                state_label = "VALUATION_ONLY"
             return finish(state_label, blockers)
         finally:
             broker.close()

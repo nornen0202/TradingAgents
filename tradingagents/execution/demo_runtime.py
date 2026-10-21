@@ -20,6 +20,7 @@ from zoneinfo import ZoneInfo
 from tradingagents.atomic_io import atomic_write_json, interprocess_file_lock
 from . import demo_validation as validation
 from .archive_paper import build_step
+from .source_diagnostics import diagnose_source
 from .kis_demo import DemoCredentials, KisDemoClient
 from .kis_paper import KisPaperBroker, PaperOrderPolicy, _fresh, _tick
 from .paper_runtime import _latest_source, _runtime_session
@@ -30,7 +31,8 @@ CAPS = {"KR": 100_000, "US": 500}
 ZONES = {"KR": "Asia/Seoul", "US": "America/New_York"}
 TERMINAL = {"FILLED", "CANCELLED", "REJECTED", "NOT_SENT", "BLOCKED"}
 DECISIONS = {"STARTER_NOW": "BUY", "ADD_NOW": "BUY", "BUY_NOW": "BUY",
-             "REDUCE_NOW": "SELL", "EXIT_NOW": "SELL", "TAKE_PROFIT_NOW": "SELL"}
+             "REDUCE_NOW": "SELL", "EXIT_NOW": "SELL", "TAKE_PROFIT_NOW": "SELL",
+             "TRIM_NOW": "SELL", "STOP_LOSS_NOW": "SELL"}
 at = validation._at
 
 
@@ -134,7 +136,8 @@ def candidates(source, market, now, tickers):
             continue
         identity = "strategy-v1:" + market + ":" + hashlib.sha256(f"{source.name}|{ticker}|{side}".encode()).hexdigest()
         signal = {**original, "ticker": ticker[:6] if market == "KR" else ticker, "signal_id": identity,
-                  "decision_now": {"BUY_NOW": "STARTER_NOW", "TAKE_PROFIT_NOW": "REDUCE_NOW"}.get(decision, decision)}
+                  "decision_now": {"BUY_NOW": "STARTER_NOW", "TAKE_PROFIT_NOW": "REDUCE_NOW",
+                                   "TRIM_NOW": "REDUCE_NOW", "STOP_LOSS_NOW": "EXIT_NOW"}.get(decision, decision)}
         rows.append({"id": identity, "ticker": ticker, "side": side, "signal": signal, "proposal": proposal,
                      "fx": (snapshot.get("cash_diagnostics") or {}).get("fx_quote"), "run_id": source.name})
     # Reduce existing strategy risk before allocating cash to a new buy.
@@ -352,6 +355,7 @@ def advance(archive, root, validation_root, market, *, clock, tickers, broker_fa
             issues.append("AMBIGUOUS_ORDER")
         source = _latest_source(archive, market.lower(), at(clock()))
         try:
+            result["source_diagnostics"] = diagnose_source(source, at(clock()))
             signals = candidates(source, market, at(clock()), tickers) if source else []
         except Exception:
             signals = []
@@ -364,7 +368,7 @@ def advance(archive, root, validation_root, market, *, clock, tickers, broker_fa
         if near_close or at(clock()) - at(session["session_open"]) < timedelta(minutes=2):
             issues.append("SESSION_EDGE")
         if not signals:
-            issues.append("NO_FRESH_EXECUTABLE_STRATEGY")
+            issues.extend(result.get("source_diagnostics", {}).get("blockers") or ["NO_FRESH_EXECUTABLE_STRATEGY"])
         today = at(clock()).astimezone(ZoneInfo(ZONES[market])).date()
         attempts_today = sum(at(row[0]).astimezone(ZoneInfo(ZONES[market])).date() == today
                              for row in broker.db.execute("SELECT prepared_at FROM strategy_attempts"))

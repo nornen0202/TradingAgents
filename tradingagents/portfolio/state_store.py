@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import json
+import math
+from decimal import Decimal, ROUND_FLOOR
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -188,10 +190,15 @@ def _build_proposed_orders(snapshot: AccountSnapshot, recommendation: PortfolioR
         if action.delta_krw_now == 0:
             continue
         position = snapshot.find_position(action.canonical_ticker)
-        estimated_price = int(position.market_price_krw if position else 0)
+        estimated_price = position.market_price_krw if position else 0
         qty = None
         if estimated_price > 0:
-            qty = int(abs(action.delta_krw_now) // estimated_price)
+            qty = int((Decimal(str(abs(action.delta_krw_now))) / Decimal(str(estimated_price))).to_integral_value(rounding=ROUND_FLOOR))
+            planned = action.planned_sell_quantity_now
+            if (action.delta_krw_now < 0 and type(planned) is int and planned > 0
+                    and planned <= position.available_qty
+                    and math.isclose(abs(action.delta_krw_now), planned * estimated_price, rel_tol=1e-12, abs_tol=1e-8)):
+                qty = planned
             if qty <= 0:
                 qty = None
         side = "buy" if action.delta_krw_now > 0 else "sell"

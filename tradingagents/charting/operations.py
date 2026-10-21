@@ -121,6 +121,22 @@ def archive_catalog(archive_dir, *, analysis_as_of, only_ticker=None, include_co
 _CODE = re.compile(r"^[A-Za-z0-9_.:-]{1,160}$")
 
 
+def _source_health(raw):
+    if not isinstance(raw, dict):
+        return {}
+    statuses = {"NO_SOURCE", "BLOCKED", "NO_ALLOCATED_ORDERS", "PROPOSALS_AVAILABLE"}
+    result = {"status": raw.get("status") if raw.get("status") in statuses else "BLOCKED"}
+    for key in ("strategy_rows", "fresh_rows", "execution_ready_rows", "allocated_orders"):
+        value = raw.get(key)
+        if type(value) is int and value >= 0:
+            result[key] = value
+    counts = raw.get("reason_counts")
+    result["reason_counts"] = {k: v for k, v in (counts.items() if isinstance(counts, dict) else [])
+                               if isinstance(k, str) and re.fullmatch(r"[A-Za-z0-9_:.-]{1,100}", k)
+                               and type(v) is int and v >= 0}
+    return result
+
+
 def paper_health(path, *, analysis_as_of):
     """Expose status/counters only: never ledger paths, account IDs or balances."""
     cutoff = instant(analysis_as_of)
@@ -155,6 +171,7 @@ def paper_health(path, *, analysis_as_of):
             value = source.get(field)
             view[field] = value if isinstance(value, str) and _CODE.fullmatch(value) else None
         blockers = source.get("blockers")
+        view["source_diagnostics"] = _source_health(source.get("source_diagnostics"))
         view["blockers"] = [value for value in blockers if isinstance(value, str) and _CODE.fullmatch(value)] if isinstance(blockers, list) else []
         counts = source.get("order_counts")
         counts = counts if isinstance(counts, dict) else {}
@@ -288,6 +305,7 @@ def kis_strategy_health(archive_dir, *, analysis_as_of):
         view = {"status": row["status"], "checked_at": observed.isoformat(), "gate_passed": row.get("gate_passed") is True,
                 "blockers": [b for b in (row.get("blockers") if isinstance(row.get("blockers"), list) else []) if isinstance(b, str) and re.fullmatch(r"[A-Z_]{1,80}", b)],
                 "order_counts": {}, "orders": [], "performance": None, "performance_history": []}
+        view["source_diagnostics"] = _source_health(row.get("source_diagnostics"))
         for key, value in (row.get("order_counts") if isinstance(row.get("order_counts"), dict) else {}).items():
             if key in order_states and type(value) is int and value >= 0:
                 view["order_counts"][key] = value

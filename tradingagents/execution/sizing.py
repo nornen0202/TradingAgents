@@ -35,16 +35,20 @@ def size_paper_order(
         return SizeResult(0, "invalid_explicit_budget", share_pct)
     if quantity is None and budget_krw is None:
         return SizeResult(0, "missing_quantity_and_budget", share_pct)
-    # Budget includes a conservative 30bp limit collar plus estimated fees/tax.
+    # Buy cash budget includes a conservative 30bp limit collar and fees.
     unit_cost = price_krw * (1.003 if side == "BUY" else 1.0)
-    budget_unit = unit_cost * (
-        1 + (limits.fee_bps + (limits.sell_tax_bps if side == "SELL" else 0)) / 10000
-    )
+    # A sell allocation is gross exposure to remove. Fees are deducted from
+    # proceeds at fill; adding them here turns an exact one-share exit into 0.
+    budget_unit = unit_cost * (1 + limits.fee_bps / 10000) if side == "BUY" else unit_cost
     requested = (
         quantity if quantity is not None else math.floor(budget_krw / budget_unit)
     )
     if budget_krw is not None:
-        requested = min(requested, math.floor(budget_krw / budget_unit))
+        budget_shares = math.floor(budget_krw / budget_unit)
+        if (side == "SELL" and quantity is not None
+                and math.isclose(budget_krw, quantity * budget_unit, rel_tol=1e-12, abs_tol=1e-8)):
+            budget_shares = quantity
+        requested = min(requested, budget_shares)
     if not requested:
         return SizeResult(0, "explicit_budget_below_one_share", share_pct)
     cap = math.floor(nav_krw * order_nav_limit(limits, side, requested) / unit_cost)
