@@ -50,6 +50,8 @@ def test_overlay_does_not_render_identical_review_again_after_bundle(tmp_path, m
     if lightweight:
         monkeypatch.setattr(runner, 'collect_event_news', lambda **_: pytest.fail('news belongs to scheduled research'))
         monkeypatch.setattr(runner, 'collect_event_signals', lambda **_: pytest.fail('selective rerun is disabled'))
+        monkeypatch.setattr(runner, '_copy_latest_microstructure_artifacts',
+                            lambda **_: pytest.fail('new observations must not scan historical execution data per ticker'))
     monkeypatch.setattr(runner, '_resolve_run_trade_date', lambda **_: '2026-10-16')
     def overlay(**kwargs):
         review = kwargs['run_dir'] / 'tickers/AAPL/investment_review.html'
