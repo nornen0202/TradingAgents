@@ -12,7 +12,7 @@ from typing import Any
 from tradingagents.schemas.decision import explicit_price_range_conflicts
 from tradingagents.dataflows.market_policy import MAX_EXECUTION_AGE
 
-from .freshness import aware_datetime, source_freshness_receipt
+from .freshness import aware_datetime, source_execution_max_age, source_freshness_receipt
 
 
 WORK_SCHEMA = "tradingagents.work-context/v1"
@@ -699,7 +699,8 @@ def _market_body(surface: str, *, roots: dict[str, Path], now: datetime, public:
     # projection. Public compaction deliberately removes the generated
     # execution object; applying freshness afterwards would recreate private
     # action fields inside a Pages recovery packet.
-    _apply_market_row_validity(current["bundle"], now=now)
+    _apply_market_row_validity(current["bundle"], now=now,
+                               max_age=source_execution_max_age(current["manifest"]))
     bundle = (
         _compact_public_market_bundle(current["bundle"], allowed_tickers=public_tickers)
         if public
@@ -755,7 +756,8 @@ def _market_body(surface: str, *, roots: dict[str, Path], now: datetime, public:
         }
     quality = bundle.get("quality") or {}
     mode = str(quality.get("report_mode") or _market_report_mode(bundle)).upper()
-    guardrails = _market_guardrails(surface, bundle, now=now)
+    guardrails = _market_guardrails(surface, bundle, now=now,
+                                   max_age=source_execution_max_age(current["manifest"]))
     market_tickers = [
         row.get("ticker")
         for row in (bundle.get("strategy_table") or [])
@@ -968,6 +970,8 @@ def _compact_public_market_bundle(
                 "execution_eligibility",
                 "data_status",
                 "provider_status",
+                "row_valid_until",
+                "expired_at_build",
             )
             if quality.get(key) is not None
         }
@@ -1013,15 +1017,27 @@ def _compact_public_market_bundle(
     }
 
 
-def _apply_market_row_validity(bundle: dict[str, Any], *, now: datetime) -> None:
+def _apply_market_row_validity(bundle: dict[str, Any], *, now: datetime,
+                               max_age: timedelta = MAX_EXECUTION_AGE) -> None:
     current_now = now.astimezone()
     for row in bundle.get("strategy_table") or []:
         if not isinstance(row, dict):
             continue
         quality = row.get("quality") if isinstance(row.get("quality"), dict) else {}
         parsed = aware_datetime(row.get("market_data_asof"))
-        valid_until = parsed + MAX_EXECUTION_AGE if parsed else None
-        invalid = parsed is None or parsed > current_now
+        valid_until = parsed + min(max_age, MAX_EXECUTION_AGE) if parsed else None
+        invalid = parsed is None or parsed > current_now or max_age <= timedelta(0)
+        original_execution = row.get("execution") if isinstance(row.get("execution"), dict) else {}
+        for container, key in ((quality, "row_valid_until"), (original_execution, "valid_until")):
+            if key not in container:
+                continue
+            declared = aware_datetime(container[key])
+            if declared is None:
+                invalid = True
+                valid_until = None
+                break
+            if valid_until is not None:
+                valid_until = min(valid_until, declared)
         expired = bool(valid_until and valid_until <= current_now.astimezone(valid_until.tzinfo))
         quality["row_valid_until"] = valid_until.isoformat() if valid_until else None
         quality["expired_at_build"] = expired
@@ -1895,7 +1911,8 @@ def _compact_support_event(event: dict[str, Any], *, kind: str) -> dict[str, Any
     return base
 
 
-def _market_guardrails(surface: str, bundle: dict[str, Any], *, now: datetime) -> dict[str, Any]:
+def _market_guardrails(surface: str, bundle: dict[str, Any], *, now: datetime,
+                       max_age: timedelta = MAX_EXECUTION_AGE) -> dict[str, Any]:
     rows = bundle.get("strategy_table") or []
     quality = bundle.get("quality") if isinstance(bundle.get("quality"), dict) else {}
     asofs = [aware_datetime(row.get("market_data_asof")) for row in rows if isinstance(row, dict)]
@@ -1907,8 +1924,12 @@ def _market_guardrails(surface: str, bundle: dict[str, Any], *, now: datetime) -
         if isinstance(row, dict) and (row.get("quality") or {}).get("row_mode") == "IMMEDIATE"
     ]
     actionable_validities = [value for value in actionable_validities if value is not None]
+    row_validities = [aware_datetime((row.get("quality") or {}).get("row_valid_until"))
+                      for row in rows if isinstance(row, dict)]
+    row_validities = [value for value in row_validities if value is not None]
     fallback = min(asofs) if asofs else None
-    valid_datetime = min(actionable_validities) if actionable_validities else (fallback + MAX_EXECUTION_AGE if fallback else None)
+    candidates = actionable_validities or row_validities
+    valid_datetime = min(candidates) if candidates else (fallback + min(max_age, MAX_EXECUTION_AGE) if fallback else None)
     valid_until = valid_datetime.isoformat() if valid_datetime else None
     required = ["실시간 호가와 주문 가능 상태 재확인", "계좌 현금·미체결 주문 재확인"]
     if surface == "kr":
@@ -1921,7 +1942,7 @@ def _market_guardrails(surface: str, bundle: dict[str, Any], *, now: datetime) -
         "immediate_requires_row_mode": "IMMEDIATE",
         "market_data_asof": latest_asof,
         "valid_until": valid_until,
-        "expired_at_build": bool(valid_until and (_datetime(valid_until) or now) < now.astimezone((_datetime(valid_until) or now).tzinfo)),
+        "expired_at_build": bool(valid_datetime is not None and valid_datetime <= now),
         "decision_ready": quality.get("decision_ready") is True,
         "conditional_strategy_ready": quality.get("conditional_strategy_ready") is True,
         "report_mode": quality.get("report_mode") or _market_report_mode(bundle),
