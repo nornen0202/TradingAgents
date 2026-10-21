@@ -1,149 +1,47 @@
 {
   "schema": "tradingagents.work-context/v1",
   "surface": "us",
-  "event_id": "us:34b06ca812d5fc1dafcc906a672abacb",
+  "event_id": "us:f5b7c41de98ae0c022911c7a2451fa16",
   "prompt_contract_version": "market-work-v13-us",
   "prompt_sha256": "281749b3b871d01531e3ceb7377d60bb67ebcaf89d6d8ba3162cb53d38400d7a",
   "skill_sha256": "4dffe28b3721557cc2517b5afff2f94045832606e71ff61461df969f6abb53c7",
   "task_manifest_sha256": "c0992fa275c9961bc91c679030c0b4d9b8b06f3d164226776421f1e354b5c22e",
   "workflow_contract_sha256": "8d06ba979f55f01229636b73bdc643c5b21f326cc270c0e8143f3fd7a3204028",
-  "source_sha256": "298b8ed93b90c5b1f372943ce5e1bfd276a037d70c57d63e40acc1ef2f3ca0a7",
+  "source_sha256": "4b05c18e8407635644dc1031f5319e1616e119a86991d77dcacaee80ded06093",
   "body": {
     "kind": "market",
     "market": "US",
-    "session_id": "US:2026-10-20",
+    "session_id": "US:2026-10-21",
     "source_health": "STALE",
     "source": {
-      "run_id": "20261021T044008_local-freshness-us-overlay",
-      "last_run_at": "2026-10-21T04:42:03.295986+09:00",
+      "run_id": "20261021T175015_local-scheduler-us-full",
+      "last_run_at": "2026-10-21T21:44:56.298321+09:00",
       "status": "success"
     },
     "report_mode": "OUTAGE",
     "current": {
-      "run_id": "20261021T044008_local-freshness-us-overlay",
-      "started_at": "2026-10-21T04:40:08.754994+09:00",
-      "run_mode": "overlay_only",
+      "run_id": "20261021T175015_local-scheduler-us-full",
+      "started_at": "2026-10-21T17:50:15.048545+09:00",
+      "run_mode": "full",
       "freshness_receipt": {
         "schema": "tradingagents.source-freshness/v1",
-        "producer_run_id": "20261021T044008_local-freshness-us-overlay",
-        "producer_started_at": "2026-10-21T04:40:08.754994+09:00",
-        "producer_finished_at": "2026-10-21T04:42:03.295986+09:00",
-        "analysis_run_id": "20261020T175013_local-scheduler-us-full",
+        "producer_run_id": "20261021T175015_local-scheduler-us-full",
+        "producer_started_at": "2026-10-21T17:50:15.048545+09:00",
+        "producer_finished_at": "2026-10-21T21:44:56.298321+09:00",
+        "analysis_run_id": "20261021T175015_local-scheduler-us-full",
         "analysis_lineage_status": "RESOLVED",
-        "analysis_completed_at": "2026-10-20T20:29:59.150766+09:00",
-        "analysis_trade_date_oldest": "2026-10-19",
-        "analysis_trade_date_latest": "2026-10-19",
-        "market_data_oldest_at": "2026-10-20T15:41:00-04:00",
-        "market_data_latest_at": "2026-10-20T15:41:00-04:00",
+        "analysis_completed_at": "2026-10-21T21:13:33.227411+09:00",
+        "analysis_trade_date_oldest": "2026-10-20",
+        "analysis_trade_date_latest": "2026-10-20",
+        "market_data_oldest_at": "2026-10-20T15:55:00-04:00",
+        "market_data_latest_at": "2026-10-21T07:45:00-04:00",
         "market_data_status": "STALE",
         "publication_does_not_refresh_inputs": true,
         "execution_max_age_seconds": 600.0,
         "research_market_data_status": "UNVERIFIED",
         "research_market_data_receipts": [
           {
-            "ticker": "AAPL",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
-            "execution_eligible": false
-          },
-          {
-            "ticker": "AMZN",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
-            "execution_eligible": false
-          },
-          {
-            "ticker": "SGOV",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
-            "execution_eligible": false
-          },
-          {
-            "ticker": "RSP",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
-            "execution_eligible": false
-          },
-          {
-            "ticker": "V",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
-            "execution_eligible": false
-          },
-          {
-            "ticker": "ABBV",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
-            "execution_eligible": false
-          },
-          {
-            "ticker": "COST",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
-            "execution_eligible": false
-          },
-          {
-            "ticker": "MSFT",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
-            "execution_eligible": false
-          },
-          {
-            "ticker": "CVX",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
-            "execution_eligible": false
-          },
-          {
-            "ticker": "MA",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
-            "execution_eligible": false
-          },
-          {
-            "ticker": "AMT",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
-            "execution_eligible": false
-          },
-          {
-            "ticker": "CLF",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
-            "execution_eligible": false
-          },
-          {
-            "ticker": "MDT",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
-            "execution_eligible": false
-          },
-          {
-            "ticker": "PG",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
-            "execution_eligible": false
-          },
-          {
-            "ticker": "SHEL",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
-            "execution_eligible": false
-          },
-          {
-            "ticker": "UNH",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
-            "execution_eligible": false
-          },
-          {
-            "ticker": "PM",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
-            "execution_eligible": false
-          },
-          {
-            "ticker": "XOM",
+            "ticker": "ETN",
             "research_valid": false,
             "category": "UNVERIFIED_RESEARCH_INPUT",
             "execution_eligible": false
@@ -161,19 +59,7 @@
             "execution_eligible": false
           },
           {
-            "ticker": "TSM",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
-            "execution_eligible": false
-          },
-          {
             "ticker": "DELL",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
-            "execution_eligible": false
-          },
-          {
-            "ticker": "ETN",
             "research_valid": false,
             "category": "UNVERIFIED_RESEARCH_INPUT",
             "execution_eligible": false
@@ -191,7 +77,7 @@
             "execution_eligible": false
           },
           {
-            "ticker": "GOOGL",
+            "ticker": "RSP",
             "research_valid": false,
             "category": "UNVERIFIED_RESEARCH_INPUT",
             "execution_eligible": false
@@ -203,7 +89,121 @@
             "execution_eligible": false
           },
           {
-            "ticker": "NVDA",
+            "ticker": "AAPL",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "SGOV",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "AMZN",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "TSM",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "GOOGL",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "MA",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "CVX",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "SHEL",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "ABBV",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "V",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "XOM",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "PG",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "MDT",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "AMT",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "COST",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "UNH",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "SNPS",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "PM",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "BRK-B",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "SCCO",
             "research_valid": false,
             "category": "UNVERIFIED_RESEARCH_INPUT",
             "execution_eligible": false
@@ -215,7 +215,7 @@
             "execution_eligible": false
           },
           {
-            "ticker": "TSLA",
+            "ticker": "NVDA",
             "research_valid": false,
             "category": "UNVERIFIED_RESEARCH_INPUT",
             "execution_eligible": false
@@ -227,852 +227,606 @@
       },
       "latest_attempt": {
         "schema": "tradingagents.analysis-attempt/v1",
-        "run_id": "20261020T175013_local-scheduler-us-full",
+        "run_id": "20261021T175015_local-scheduler-us-full",
         "market": "US",
         "run_mode": "full",
-        "started_at": "2026-10-20T17:50:13.562400+09:00",
+        "started_at": "2026-10-21T17:50:15.048545+09:00",
         "status": "SUCCESS",
-        "heartbeat_at": "2026-10-20T11:56:38.274639+00:00",
-        "finished_at": "2026-10-20T11:56:38.274627+00:00",
+        "heartbeat_at": "2026-10-21T12:44:56.393808+00:00",
+        "finished_at": "2026-10-21T12:44:56.393794+00:00",
         "completed_tickers": 30,
         "error_type": null
       },
       "latest_completed_analysis": {
-        "run_id": "20261020T175013_local-scheduler-us-full",
+        "run_id": "20261021T175015_local-scheduler-us-full",
         "status": "success",
-        "finished_at": "2026-10-20T20:56:38.170784+09:00"
+        "finished_at": "2026-10-21T21:44:56.298321+09:00"
       },
       "analysis_receipt": {
-        "analysis_run_id": "20261020T175013_local-scheduler-us-full",
+        "analysis_run_id": "20261021T175015_local-scheduler-us-full",
         "decisions": {}
       },
       "bundle": {
         "artifact_type": "decision_bundle",
         "version": 2,
-        "run_id": "20261021T044008_local-freshness-us-overlay",
+        "run_id": "20261021T175015_local-scheduler-us-full",
         "market": "US",
-        "generated_at": "2026-10-21T04:42:02.883241+09:00",
-        "analysis_source_run_id": "20261021T043510_local-freshness-us-overlay",
-        "execution_source_run_id": "20261021T044008_local-freshness-us-overlay",
-        "checkpoint": "15:40",
-        "checkpoint_timezone": "America/New_York",
+        "generated_at": "2026-10-21T21:44:23.831806+09:00",
+        "analysis_source_run_id": "20261021T175015_local-scheduler-us-full",
         "quality": {
           "report_mode": "OUTAGE",
           "decision_ready": false,
           "conditional_strategy_ready": false,
-          "quality_label_ko": "장중 조건부 전략 가능, 주문 전 재확인",
+          "quality_label_ko": "연구 자료만 제공, 장중 데이터 대기",
           "fresh_row_ratio": 0.0,
-          "conditional_row_ratio": 1.0,
+          "conditional_row_ratio": 0.0,
           "portfolio_membership_omitted": true
         },
         "strategy_table": [
           {
-            "ticker": "AAPL",
-            "display_name": "Apple",
-            "last_price": 339.21,
-            "market_data_asof": "2026-10-20T15:41:00-04:00",
-            "session_vwap": 340.5496638563371,
-            "vwap_distance_pct": -0.39338281564190725,
-            "vwap_position_ko": "VWAP 아래 -0.39%",
-            "relative_volume": 0.4637148653000584,
-            "trading_value": 5562466694.0,
-            "price_change_pct": -1.09,
-            "spread_bps": 0.5896052592800523,
-            "day_high": 343.06,
-            "day_low": 338.7,
-            "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
+            "ticker": "ETN",
+            "display_name": "Eaton",
+            "last_price": 385.61,
+            "market_data_asof": "2026-10-21T05:10:00-04:00",
+            "session_vwap": 387.56769596199524,
+            "vwap_distance_pct": -0.5051236164396955,
+            "vwap_position_ko": "VWAP 아래 -0.51%",
+            "relative_volume": 0.0038797493408130428,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 비교 지표 미수집",
             "data_status_ko": "시세 유효기간 만료",
-            "reason_codes_ko": [
-              "delayed or invalid market data"
-            ],
+            "reason_codes_ko": [],
             "quality": {
-              "row_mode": "MISSING",
+              "row_mode": "BLOCKED_STALE",
               "execution_ready": false,
               "conditional_strategy_ready": false,
               "current_execution_promotion": "BLOCKED",
-              "generated_in_current_run": true,
-              "freshness_class": "DELAYED_CHECKPOINT",
-              "execution_eligibility": "DELAYED_ANALYSIS_ONLY"
+              "generated_in_current_run": false
             },
             "display_priority": 1
           },
           {
-            "ticker": "AMZN",
-            "display_name": "Amazon",
-            "last_price": 262.39,
-            "market_data_asof": "2026-10-20T15:41:00-04:00",
-            "session_vwap": 263.0273485866737,
-            "vwap_distance_pct": -0.24231266828275144,
-            "vwap_position_ko": "VWAP 아래 -0.24%",
-            "relative_volume": 0.4995286949822801,
-            "trading_value": 4564890399.0,
-            "price_change_pct": -0.02,
-            "spread_bps": 1.5244483402576496,
-            "day_high": 265.3397,
-            "day_low": 260.42,
-            "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
+            "ticker": "MPWR",
+            "display_name": "Monolithic Power Systems",
+            "last_price": 1266.0,
+            "market_data_asof": "2026-10-21T05:30:00-04:00",
+            "session_vwap": 1264.376044568245,
+            "vwap_distance_pct": 0.1284392755408037,
+            "vwap_position_ko": "VWAP 위 +0.13%",
+            "relative_volume": 0.021564129716786576,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 비교 지표 미수집",
             "data_status_ko": "시세 유효기간 만료",
-            "reason_codes_ko": [
-              "delayed or invalid market data"
-            ],
+            "reason_codes_ko": [],
             "quality": {
-              "row_mode": "MISSING",
+              "row_mode": "BLOCKED_STALE",
               "execution_ready": false,
               "conditional_strategy_ready": false,
               "current_execution_promotion": "BLOCKED",
-              "generated_in_current_run": true,
-              "freshness_class": "DELAYED_CHECKPOINT",
-              "execution_eligibility": "DELAYED_ANALYSIS_ONLY"
+              "generated_in_current_run": false
             },
             "display_priority": 2
           },
           {
-            "ticker": "V",
-            "display_name": "V",
-            "last_price": 406.885,
-            "market_data_asof": "2026-10-20T15:41:00-04:00",
-            "session_vwap": 406.84577383493945,
-            "vwap_distance_pct": 0.009641531898152422,
-            "vwap_position_ko": "VWAP 위 +0.01%",
-            "relative_volume": 0.5464289142218328,
-            "trading_value": 1247266682.0,
-            "price_change_pct": 0.98,
-            "spread_bps": 3.9330399940996577,
-            "day_high": 408.585,
-            "day_low": 403.5401,
-            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
+            "ticker": "GEV",
+            "display_name": "GE Vernova",
+            "last_price": 904.982,
+            "market_data_asof": "2026-10-21T05:15:00-04:00",
+            "session_vwap": 906.5550682261209,
+            "vwap_distance_pct": -0.1735215301591042,
+            "vwap_position_ko": "VWAP 아래 -0.17%",
+            "relative_volume": 0.01942348106191486,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 비교 지표 미수집",
             "data_status_ko": "시세 유효기간 만료",
-            "reason_codes_ko": [
-              "delayed or invalid market data"
-            ],
+            "reason_codes_ko": [],
             "quality": {
-              "row_mode": "MISSING",
+              "row_mode": "BLOCKED_STALE",
               "execution_ready": false,
               "conditional_strategy_ready": false,
               "current_execution_promotion": "BLOCKED",
-              "generated_in_current_run": true,
-              "freshness_class": "DELAYED_CHECKPOINT",
-              "execution_eligibility": "DELAYED_ANALYSIS_ONLY"
+              "generated_in_current_run": false
             },
             "display_priority": 3
           },
           {
-            "ticker": "ABBV",
-            "display_name": "ABBV",
-            "last_price": 287.82,
-            "market_data_asof": "2026-10-20T15:41:00-04:00",
-            "session_vwap": 288.7874375264998,
-            "vwap_distance_pct": -0.3349998652247499,
-            "vwap_position_ko": "VWAP 아래 -0.33%",
-            "relative_volume": 0.45420222122395143,
-            "trading_value": 612315715.0,
-            "price_change_pct": 1.82,
-            "spread_bps": 3.1264655307186295,
-            "day_high": 290.98,
-            "day_low": 285.0,
-            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
+            "ticker": "DELL",
+            "display_name": "Dell Technologies",
+            "last_price": 481.73,
+            "market_data_asof": "2026-10-21T04:50:00-04:00",
+            "session_vwap": 485.6149952818049,
+            "vwap_distance_pct": -0.8000155101368756,
+            "vwap_position_ko": "VWAP 아래 -0.80%",
+            "relative_volume": 0.06734786399463712,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 비교 지표 미수집",
             "data_status_ko": "시세 유효기간 만료",
-            "reason_codes_ko": [
-              "delayed or invalid market data"
-            ],
+            "reason_codes_ko": [],
             "quality": {
-              "row_mode": "MISSING",
+              "row_mode": "BLOCKED_STALE",
               "execution_ready": false,
               "conditional_strategy_ready": false,
               "current_execution_promotion": "BLOCKED",
-              "generated_in_current_run": true,
-              "freshness_class": "DELAYED_CHECKPOINT",
-              "execution_eligibility": "DELAYED_ANALYSIS_ONLY"
+              "generated_in_current_run": false
             },
             "display_priority": 4
           },
           {
-            "ticker": "COST",
-            "display_name": "Costco Wholesale",
-            "last_price": 992.36,
-            "market_data_asof": "2026-10-20T15:41:00-04:00",
-            "session_vwap": 996.4761834514069,
-            "vwap_distance_pct": -0.413073941933062,
-            "vwap_position_ko": "VWAP 아래 -0.41%",
-            "relative_volume": 0.4017160307453415,
-            "trading_value": 871373581.0,
-            "price_change_pct": -0.32,
-            "spread_bps": 1.1084184380370277,
-            "day_high": 1003.0,
-            "day_low": 991.19,
-            "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
+            "ticker": "AVGO",
+            "display_name": "Broadcom",
+            "last_price": 337.39,
+            "market_data_asof": "2026-10-21T04:50:00-04:00",
+            "session_vwap": 338.2228050223965,
+            "vwap_distance_pct": -0.2462297071722852,
+            "vwap_position_ko": "VWAP 아래 -0.25%",
+            "relative_volume": 0.03979864547438751,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 비교 지표 미수집",
             "data_status_ko": "시세 유효기간 만료",
-            "reason_codes_ko": [
-              "delayed or invalid market data"
-            ],
+            "reason_codes_ko": [],
             "quality": {
-              "row_mode": "MISSING",
+              "row_mode": "BLOCKED_STALE",
               "execution_ready": false,
               "conditional_strategy_ready": false,
               "current_execution_promotion": "BLOCKED",
-              "generated_in_current_run": true,
-              "freshness_class": "DELAYED_CHECKPOINT",
-              "execution_eligibility": "DELAYED_ANALYSIS_ONLY"
+              "generated_in_current_run": false
             },
             "display_priority": 5
           },
           {
-            "ticker": "MSFT",
-            "display_name": "Microsoft",
-            "last_price": 530.9,
-            "market_data_asof": "2026-10-20T15:41:00-04:00",
-            "session_vwap": 531.2923593835673,
-            "vwap_distance_pct": -0.07384999551329763,
-            "vwap_position_ko": "VWAP 아래 -0.07%",
-            "relative_volume": 0.2833136943681632,
-            "trading_value": 3130735329.0,
-            "price_change_pct": -0.49,
-            "spread_bps": 0.9418235587736427,
-            "day_high": 534.21,
-            "day_low": 525.84,
-            "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
+            "ticker": "LLY",
+            "display_name": "Eli Lilly",
+            "last_price": 1280.0,
+            "market_data_asof": "2026-10-21T05:35:00-04:00",
+            "session_vwap": 1276.3333333333333,
+            "vwap_distance_pct": 0.2872812744842079,
+            "vwap_position_ko": "VWAP 위 +0.29%",
+            "relative_volume": 0.019601079797073217,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 비교 지표 미수집",
             "data_status_ko": "시세 유효기간 만료",
-            "reason_codes_ko": [
-              "delayed or invalid market data"
-            ],
+            "reason_codes_ko": [],
             "quality": {
-              "row_mode": "MISSING",
+              "row_mode": "BLOCKED_STALE",
               "execution_ready": false,
               "conditional_strategy_ready": false,
               "current_execution_promotion": "BLOCKED",
-              "generated_in_current_run": true,
-              "freshness_class": "DELAYED_CHECKPOINT",
-              "execution_eligibility": "DELAYED_ANALYSIS_ONLY"
+              "generated_in_current_run": false
             },
             "display_priority": 6
           },
           {
-            "ticker": "CVX",
-            "display_name": "CVX",
-            "last_price": 225.25,
-            "market_data_asof": "2026-10-20T15:41:00-04:00",
-            "session_vwap": 224.03856295921275,
-            "vwap_distance_pct": 0.5407270180570523,
-            "vwap_position_ko": "VWAP 위 +0.54%",
-            "relative_volume": 0.3505651058740433,
-            "trading_value": 564654696.0,
-            "price_change_pct": 0.39,
-            "spread_bps": 1.3318239328761243,
-            "day_high": 227.16,
-            "day_low": 221.56,
-            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
+            "ticker": "AAPL",
+            "display_name": "Apple",
+            "last_price": 337.2,
+            "market_data_asof": "2026-10-21T04:50:00-04:00",
+            "session_vwap": 337.4153421528505,
+            "vwap_distance_pct": -0.06382109108510337,
+            "vwap_position_ko": "VWAP 아래 -0.06%",
+            "relative_volume": 0.0286075313389897,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 비교 지표 미수집",
             "data_status_ko": "시세 유효기간 만료",
-            "reason_codes_ko": [
-              "delayed or invalid market data"
-            ],
+            "reason_codes_ko": [],
             "quality": {
-              "row_mode": "MISSING",
+              "row_mode": "BLOCKED_STALE",
               "execution_ready": false,
               "conditional_strategy_ready": false,
               "current_execution_promotion": "BLOCKED",
-              "generated_in_current_run": true,
-              "freshness_class": "DELAYED_CHECKPOINT",
-              "execution_eligibility": "DELAYED_ANALYSIS_ONLY"
+              "generated_in_current_run": false
             },
             "display_priority": 7
           },
           {
-            "ticker": "MA",
-            "display_name": "MA",
-            "last_price": 621.495,
-            "market_data_asof": "2026-10-20T15:41:00-04:00",
-            "session_vwap": 621.3124785891476,
-            "vwap_distance_pct": 0.02937674956517977,
-            "vwap_position_ko": "VWAP 위 +0.03%",
-            "relative_volume": 0.37698421504547813,
-            "trading_value": 676495589.0,
-            "price_change_pct": 0.83,
-            "spread_bps": 1.9312165054638069,
-            "day_high": 624.29,
-            "day_low": 616.595,
-            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
+            "ticker": "AMZN",
+            "display_name": "Amazon",
+            "last_price": 262.48,
+            "market_data_asof": "2026-10-21T04:50:00-04:00",
+            "session_vwap": 263.41342195976904,
+            "vwap_distance_pct": -0.3543562635588082,
+            "vwap_position_ko": "VWAP 아래 -0.35%",
+            "relative_volume": 0.038075691554046755,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 비교 지표 미수집",
             "data_status_ko": "시세 유효기간 만료",
-            "reason_codes_ko": [
-              "delayed or invalid market data"
-            ],
+            "reason_codes_ko": [],
             "quality": {
-              "row_mode": "MISSING",
+              "row_mode": "BLOCKED_STALE",
               "execution_ready": false,
               "conditional_strategy_ready": false,
               "current_execution_promotion": "BLOCKED",
-              "generated_in_current_run": true,
-              "freshness_class": "DELAYED_CHECKPOINT",
-              "execution_eligibility": "DELAYED_ANALYSIS_ONLY"
+              "generated_in_current_run": false
             },
             "display_priority": 8
           },
           {
-            "ticker": "AMT",
-            "display_name": "AMT",
-            "last_price": 183.75,
-            "market_data_asof": "2026-10-20T15:41:00-04:00",
-            "session_vwap": 184.40600445105866,
-            "vwap_distance_pct": -0.355739203293004,
-            "vwap_position_ko": "VWAP 아래 -0.36%",
-            "relative_volume": 0.3109234297304434,
-            "trading_value": 177070518.0,
-            "price_change_pct": 0.39,
-            "spread_bps": 5.990143491163734,
-            "day_high": 185.86,
-            "day_low": 182.96,
-            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
+            "ticker": "TSM",
+            "display_name": "Taiwan Semiconductor Manufacturing",
+            "last_price": 428.6632,
+            "market_data_asof": "2026-10-21T06:05:00-04:00",
+            "session_vwap": 429.46035961598994,
+            "vwap_distance_pct": -0.18561890478150378,
+            "vwap_position_ko": "VWAP 아래 -0.19%",
+            "relative_volume": 0.09392878253629774,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 비교 지표 미수집",
             "data_status_ko": "시세 유효기간 만료",
-            "reason_codes_ko": [
-              "delayed or invalid market data"
-            ],
+            "reason_codes_ko": [],
             "quality": {
-              "row_mode": "MISSING",
+              "row_mode": "BLOCKED_STALE",
               "execution_ready": false,
               "conditional_strategy_ready": false,
               "current_execution_promotion": "BLOCKED",
-              "generated_in_current_run": true,
-              "freshness_class": "DELAYED_CHECKPOINT",
-              "execution_eligibility": "DELAYED_ANALYSIS_ONLY"
+              "generated_in_current_run": false
             },
             "display_priority": 9
           },
           {
-            "ticker": "CLF",
-            "display_name": "CLF",
-            "last_price": 13.725,
-            "market_data_asof": "2026-10-20T15:41:00-04:00",
-            "session_vwap": 13.426131615938475,
-            "vwap_distance_pct": 2.2260200675132014,
-            "vwap_position_ko": "VWAP 위 +2.23%",
-            "relative_volume": 1.100306342313095,
-            "trading_value": 305608669.0,
-            "price_change_pct": -2.66,
-            "spread_bps": 7.285974499089097,
-            "day_high": 13.835,
-            "day_low": 12.625,
-            "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
+            "ticker": "GOOGL",
+            "display_name": "Alphabet",
+            "last_price": 339.9512,
+            "market_data_asof": "2026-10-21T05:20:00-04:00",
+            "session_vwap": 340.766663868368,
+            "vwap_distance_pct": -0.2393027120408231,
+            "vwap_position_ko": "VWAP 아래 -0.24%",
+            "relative_volume": 0.05950012960604576,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 비교 지표 미수집",
             "data_status_ko": "시세 유효기간 만료",
-            "reason_codes_ko": [
-              "delayed or invalid market data"
-            ],
+            "reason_codes_ko": [],
             "quality": {
-              "row_mode": "MISSING",
+              "row_mode": "BLOCKED_STALE",
               "execution_ready": false,
               "conditional_strategy_ready": false,
               "current_execution_promotion": "BLOCKED",
-              "generated_in_current_run": true,
-              "freshness_class": "DELAYED_CHECKPOINT",
-              "execution_eligibility": "DELAYED_ANALYSIS_ONLY"
+              "generated_in_current_run": false
             },
             "display_priority": 10
           },
           {
-            "ticker": "MDT",
-            "display_name": "MDT",
-            "last_price": 94.105,
-            "market_data_asof": "2026-10-20T15:41:00-04:00",
-            "session_vwap": 94.10127459317502,
-            "vwap_distance_pct": 0.003958933437497869,
-            "vwap_position_ko": "VWAP 위 +0.00%",
-            "relative_volume": 0.12301017689556479,
-            "trading_value": 382320775.0,
-            "price_change_pct": 1.44,
-            "spread_bps": 1.0626427926258029,
-            "day_high": 94.92,
-            "day_low": 93.42,
-            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
+            "ticker": "MA",
+            "display_name": "MA",
+            "last_price": 620.66,
+            "market_data_asof": "2026-10-21T07:15:00-04:00",
+            "session_vwap": 619.3443640124095,
+            "vwap_distance_pct": 0.21242398640186622,
+            "vwap_position_ko": "VWAP 위 +0.21%",
+            "relative_volume": 0.006470385192921714,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 비교 지표 미수집",
             "data_status_ko": "시세 유효기간 만료",
-            "reason_codes_ko": [
-              "delayed or invalid market data"
-            ],
+            "reason_codes_ko": [],
             "quality": {
-              "row_mode": "MISSING",
+              "row_mode": "BLOCKED_STALE",
               "execution_ready": false,
               "conditional_strategy_ready": false,
               "current_execution_promotion": "BLOCKED",
-              "generated_in_current_run": true,
-              "freshness_class": "DELAYED_CHECKPOINT",
-              "execution_eligibility": "DELAYED_ANALYSIS_ONLY"
+              "generated_in_current_run": false
             },
             "display_priority": 11
           },
           {
-            "ticker": "PG",
-            "display_name": "PG",
-            "last_price": 158.99,
-            "market_data_asof": "2026-10-20T15:41:00-04:00",
-            "session_vwap": 158.5791679807129,
-            "vwap_distance_pct": 0.2590706109248053,
-            "vwap_position_ko": "VWAP 위 +0.26%",
-            "relative_volume": 0.4033916585305796,
-            "trading_value": 531997904.0,
-            "price_change_pct": 0.82,
-            "spread_bps": 1.2579407509912717,
-            "day_high": 159.45,
-            "day_low": 158.06,
-            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
+            "ticker": "CVX",
+            "display_name": "CVX",
+            "last_price": 225.7746,
+            "market_data_asof": "2026-10-21T07:00:00-04:00",
+            "session_vwap": 225.8068535825545,
+            "vwap_distance_pct": -0.014283703989848018,
+            "vwap_position_ko": "VWAP 아래 -0.01%",
+            "relative_volume": 0.00687090641101722,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 비교 지표 미수집",
             "data_status_ko": "시세 유효기간 만료",
-            "reason_codes_ko": [
-              "delayed or invalid market data"
-            ],
+            "reason_codes_ko": [],
             "quality": {
-              "row_mode": "MISSING",
+              "row_mode": "BLOCKED_STALE",
               "execution_ready": false,
               "conditional_strategy_ready": false,
               "current_execution_promotion": "BLOCKED",
-              "generated_in_current_run": true,
-              "freshness_class": "DELAYED_CHECKPOINT",
-              "execution_eligibility": "DELAYED_ANALYSIS_ONLY"
+              "generated_in_current_run": false
             },
             "display_priority": 12
           },
           {
             "ticker": "SHEL",
             "display_name": "SHEL",
-            "last_price": 105.51,
-            "market_data_asof": "2026-10-20T15:41:00-04:00",
-            "session_vwap": 105.23430827044106,
-            "vwap_distance_pct": 0.26197894402502087,
-            "vwap_position_ko": "VWAP 위 +0.26%",
-            "relative_volume": 0.4307699345668817,
-            "trading_value": 295495412.0,
-            "price_change_pct": 0.66,
-            "spread_bps": 0.9476427386879995,
-            "day_high": 106.505,
-            "day_low": 104.315,
-            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
+            "last_price": 105.4259,
+            "market_data_asof": "2026-10-21T07:45:00-04:00",
+            "session_vwap": 105.36440769369045,
+            "vwap_distance_pct": 0.05836155458522896,
+            "vwap_position_ko": "VWAP 위 +0.06%",
+            "relative_volume": 0.08174914605169736,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 비교 지표 미수집",
             "data_status_ko": "시세 유효기간 만료",
-            "reason_codes_ko": [
-              "delayed or invalid market data"
-            ],
+            "reason_codes_ko": [],
             "quality": {
-              "row_mode": "MISSING",
+              "row_mode": "BLOCKED_STALE",
               "execution_ready": false,
               "conditional_strategy_ready": false,
               "current_execution_promotion": "BLOCKED",
-              "generated_in_current_run": true,
-              "freshness_class": "DELAYED_CHECKPOINT",
-              "execution_eligibility": "DELAYED_ANALYSIS_ONLY"
+              "generated_in_current_run": false
             },
             "display_priority": 13
           },
           {
-            "ticker": "UNH",
-            "display_name": "UNH",
-            "last_price": 419.755,
-            "market_data_asof": "2026-10-20T15:41:00-04:00",
-            "session_vwap": 418.7697260964681,
-            "vwap_distance_pct": 0.23527820712256897,
-            "vwap_position_ko": "VWAP 위 +0.24%",
-            "relative_volume": 0.5217625615322843,
-            "trading_value": 1228360068.0,
-            "price_change_pct": 3.16,
-            "spread_bps": 3.3353981035876106,
-            "day_high": 422.4,
-            "day_low": 408.28,
-            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
+            "ticker": "ABBV",
+            "display_name": "ABBV",
+            "last_price": 288.45,
+            "market_data_asof": "2026-10-21T07:10:00-04:00",
+            "session_vwap": 286.4764079147641,
+            "vwap_distance_pct": 0.6889195866429221,
+            "vwap_position_ko": "VWAP 위 +0.69%",
+            "relative_volume": 0.005237768375837385,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 비교 지표 미수집",
             "data_status_ko": "시세 유효기간 만료",
-            "reason_codes_ko": [
-              "delayed or invalid market data"
-            ],
+            "reason_codes_ko": [],
             "quality": {
-              "row_mode": "MISSING",
+              "row_mode": "BLOCKED_STALE",
               "execution_ready": false,
               "conditional_strategy_ready": false,
               "current_execution_promotion": "BLOCKED",
-              "generated_in_current_run": true,
-              "freshness_class": "DELAYED_CHECKPOINT",
-              "execution_eligibility": "DELAYED_ANALYSIS_ONLY"
+              "generated_in_current_run": false
             },
             "display_priority": 14
           },
           {
-            "ticker": "PM",
-            "display_name": "PM",
-            "last_price": 199.79,
-            "market_data_asof": "2026-10-20T15:41:00-04:00",
-            "session_vwap": 200.8311607267101,
-            "vwap_distance_pct": -0.518425887169427,
-            "vwap_position_ko": "VWAP 아래 -0.52%",
-            "relative_volume": 0.36352227359428957,
-            "trading_value": 327615270.0,
-            "price_change_pct": -0.63,
-            "spread_bps": 5.004253615572954,
-            "day_high": 203.03,
-            "day_low": 199.35,
-            "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
+            "ticker": "V",
+            "display_name": "V",
+            "last_price": 406.4,
+            "market_data_asof": "2026-10-21T06:10:00-04:00",
+            "session_vwap": 406.54376498800957,
+            "vwap_distance_pct": -0.03536273345966512,
+            "vwap_position_ko": "VWAP 아래 -0.04%",
+            "relative_volume": 0.005769707462212844,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 비교 지표 미수집",
             "data_status_ko": "시세 유효기간 만료",
-            "reason_codes_ko": [
-              "delayed or invalid market data"
-            ],
+            "reason_codes_ko": [],
             "quality": {
-              "row_mode": "MISSING",
+              "row_mode": "BLOCKED_STALE",
               "execution_ready": false,
               "conditional_strategy_ready": false,
               "current_execution_promotion": "BLOCKED",
-              "generated_in_current_run": true,
-              "freshness_class": "DELAYED_CHECKPOINT",
-              "execution_eligibility": "DELAYED_ANALYSIS_ONLY"
+              "generated_in_current_run": false
             },
             "display_priority": 15
           },
           {
             "ticker": "XOM",
             "display_name": "XOM",
-            "last_price": 177.58,
-            "market_data_asof": "2026-10-20T15:41:00-04:00",
-            "session_vwap": 176.83359251071846,
-            "vwap_distance_pct": 0.42209598226441436,
-            "vwap_position_ko": "VWAP 위 +0.42%",
-            "relative_volume": 0.3965580656603621,
-            "trading_value": 770416748.0,
-            "price_change_pct": -0.39,
-            "spread_bps": 1.126252956414587,
-            "day_high": 180.26,
-            "day_low": 174.915,
-            "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
+            "last_price": 178.5,
+            "market_data_asof": "2026-10-21T06:50:00-04:00",
+            "session_vwap": 178.02719502719503,
+            "vwap_distance_pct": 0.2655801956171544,
+            "vwap_position_ko": "VWAP 위 +0.27%",
+            "relative_volume": 0.0067206046489010655,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 비교 지표 미수집",
             "data_status_ko": "시세 유효기간 만료",
-            "reason_codes_ko": [
-              "delayed or invalid market data"
-            ],
+            "reason_codes_ko": [],
             "quality": {
-              "row_mode": "MISSING",
+              "row_mode": "BLOCKED_STALE",
               "execution_ready": false,
               "conditional_strategy_ready": false,
               "current_execution_promotion": "BLOCKED",
-              "generated_in_current_run": true,
-              "freshness_class": "DELAYED_CHECKPOINT",
-              "execution_eligibility": "DELAYED_ANALYSIS_ONLY"
+              "generated_in_current_run": false
             },
             "display_priority": 16
           },
           {
-            "ticker": "MPWR",
-            "display_name": "Monolithic Power Systems",
-            "last_price": 1253.535,
-            "market_data_asof": "2026-10-20T15:41:00-04:00",
-            "session_vwap": 1259.840594924803,
-            "vwap_distance_pct": -0.5005073618205902,
-            "vwap_position_ko": "VWAP 아래 -0.50%",
-            "relative_volume": 0.3080409525470172,
-            "trading_value": 265214083.0,
-            "price_change_pct": -0.01,
-            "spread_bps": 11.806563811286582,
-            "day_high": 1284.87,
-            "day_low": 1222.2909,
-            "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
+            "ticker": "PG",
+            "display_name": "PG",
+            "last_price": 158.22,
+            "market_data_asof": "2026-10-21T06:35:00-04:00",
+            "session_vwap": 158.22007810705261,
+            "vwap_distance_pct": -4.936608144490151e-05,
+            "vwap_position_ko": "VWAP 아래 -0.00%",
+            "relative_volume": 0.009747815074041195,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 비교 지표 미수집",
             "data_status_ko": "시세 유효기간 만료",
-            "reason_codes_ko": [
-              "delayed or invalid market data"
-            ],
+            "reason_codes_ko": [],
             "quality": {
-              "row_mode": "MISSING",
+              "row_mode": "BLOCKED_STALE",
               "execution_ready": false,
               "conditional_strategy_ready": false,
               "current_execution_promotion": "BLOCKED",
-              "generated_in_current_run": true,
-              "freshness_class": "DELAYED_CHECKPOINT",
-              "execution_eligibility": "DELAYED_ANALYSIS_ONLY"
+              "generated_in_current_run": false
             },
             "display_priority": 17
           },
           {
-            "ticker": "GEV",
-            "display_name": "GE Vernova",
-            "last_price": 889.54,
-            "market_data_asof": "2026-10-20T15:41:00-04:00",
-            "session_vwap": 897.6646805573841,
-            "vwap_distance_pct": -0.9050908132354429,
-            "vwap_position_ko": "VWAP 아래 -0.91%",
-            "relative_volume": 0.5812228713526473,
-            "trading_value": 1043150093.0,
-            "price_change_pct": -2.08,
-            "spread_bps": 4.38426386523432,
-            "day_high": 916.87,
-            "day_low": 877.44,
-            "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
+            "ticker": "MDT",
+            "display_name": "MDT",
+            "last_price": 94.63,
+            "market_data_asof": "2026-10-21T07:15:00-04:00",
+            "session_vwap": 94.47658688865765,
+            "vwap_distance_pct": 0.16238214820687435,
+            "vwap_position_ko": "VWAP 위 +0.16%",
+            "relative_volume": 0.0005540598415010471,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 비교 지표 미수집",
             "data_status_ko": "시세 유효기간 만료",
-            "reason_codes_ko": [
-              "delayed or invalid market data"
-            ],
+            "reason_codes_ko": [],
             "quality": {
-              "row_mode": "MISSING",
+              "row_mode": "BLOCKED_STALE",
               "execution_ready": false,
               "conditional_strategy_ready": false,
               "current_execution_promotion": "BLOCKED",
-              "generated_in_current_run": true,
-              "freshness_class": "DELAYED_CHECKPOINT",
-              "execution_eligibility": "DELAYED_ANALYSIS_ONLY"
+              "generated_in_current_run": false
             },
             "display_priority": 18
           },
           {
-            "ticker": "TSM",
-            "display_name": "Taiwan Semiconductor Manufacturing",
-            "last_price": 425.18,
-            "market_data_asof": "2026-10-20T15:41:00-04:00",
-            "session_vwap": 424.67798490483267,
-            "vwap_distance_pct": 0.11821076510001305,
-            "vwap_position_ko": "VWAP 위 +0.12%",
-            "relative_volume": 0.4766651600135164,
-            "trading_value": 2075567786.0,
-            "price_change_pct": 1.18,
-            "spread_bps": 1.8816888157117273,
-            "day_high": 428.2139,
-            "day_low": 416.12,
-            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
+            "ticker": "AMT",
+            "display_name": "AMT",
+            "last_price": 183.5,
+            "market_data_asof": "2026-10-21T05:00:00-04:00",
+            "session_vwap": 183.95739348370927,
+            "vwap_distance_pct": -0.24864098965925452,
+            "vwap_position_ko": "VWAP 아래 -0.25%",
+            "relative_volume": 0.0025027511298043644,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 비교 지표 미수집",
             "data_status_ko": "시세 유효기간 만료",
-            "reason_codes_ko": [
-              "delayed or invalid market data"
-            ],
+            "reason_codes_ko": [],
             "quality": {
-              "row_mode": "MISSING",
+              "row_mode": "BLOCKED_STALE",
               "execution_ready": false,
               "conditional_strategy_ready": false,
               "current_execution_promotion": "BLOCKED",
-              "generated_in_current_run": true,
-              "freshness_class": "DELAYED_CHECKPOINT",
-              "execution_eligibility": "DELAYED_ANALYSIS_ONLY"
+              "generated_in_current_run": false
             },
             "display_priority": 19
           },
           {
-            "ticker": "DELL",
-            "display_name": "Dell Technologies",
-            "last_price": 462.57,
-            "market_data_asof": "2026-10-20T15:41:00-04:00",
-            "session_vwap": 458.8795767335527,
-            "vwap_distance_pct": 0.8042247799993296,
-            "vwap_position_ko": "VWAP 위 +0.80%",
-            "relative_volume": 0.3629482898238089,
-            "trading_value": 1132664849.0,
-            "price_change_pct": 1.71,
-            "spread_bps": 7.13289887494697,
-            "day_high": 467.5843,
-            "day_low": 439.5,
-            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
+            "ticker": "COST",
+            "display_name": "Costco Wholesale",
+            "last_price": 988.57,
+            "market_data_asof": "2026-10-21T07:20:00-04:00",
+            "session_vwap": 987.2050898203593,
+            "vwap_distance_pct": 0.13826004279304804,
+            "vwap_position_ko": "VWAP 위 +0.14%",
+            "relative_volume": 0.011652818497345202,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 비교 지표 미수집",
             "data_status_ko": "시세 유효기간 만료",
-            "reason_codes_ko": [
-              "delayed or invalid market data"
-            ],
+            "reason_codes_ko": [],
             "quality": {
-              "row_mode": "MISSING",
+              "row_mode": "BLOCKED_STALE",
               "execution_ready": false,
               "conditional_strategy_ready": false,
               "current_execution_promotion": "BLOCKED",
-              "generated_in_current_run": true,
-              "freshness_class": "DELAYED_CHECKPOINT",
-              "execution_eligibility": "DELAYED_ANALYSIS_ONLY"
+              "generated_in_current_run": false
             },
             "display_priority": 20
           },
           {
-            "ticker": "ETN",
-            "display_name": "Eaton",
-            "last_price": 381.93,
-            "market_data_asof": "2026-10-20T15:41:00-04:00",
-            "session_vwap": 381.37829848367574,
-            "vwap_distance_pct": 0.144659913402978,
-            "vwap_position_ko": "VWAP 위 +0.14%",
-            "relative_volume": 0.6923941268745999,
-            "trading_value": 534117256.0,
-            "price_change_pct": -2.44,
-            "spread_bps": 4.189578423671773,
-            "day_high": 388.71,
-            "day_low": 372.79,
-            "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
+            "ticker": "UNH",
+            "display_name": "UNH",
+            "last_price": 417.98,
+            "market_data_asof": "2026-10-21T07:35:00-04:00",
+            "session_vwap": 417.79691049522944,
+            "vwap_distance_pct": 0.043822608585974976,
+            "vwap_position_ko": "VWAP 위 +0.04%",
+            "relative_volume": 0.014636418578097204,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 비교 지표 미수집",
             "data_status_ko": "시세 유효기간 만료",
-            "reason_codes_ko": [
-              "delayed or invalid market data"
-            ],
+            "reason_codes_ko": [],
             "quality": {
-              "row_mode": "MISSING",
+              "row_mode": "BLOCKED_STALE",
               "execution_ready": false,
               "conditional_strategy_ready": false,
               "current_execution_promotion": "BLOCKED",
-              "generated_in_current_run": true,
-              "freshness_class": "DELAYED_CHECKPOINT",
-              "execution_eligibility": "DELAYED_ANALYSIS_ONLY"
+              "generated_in_current_run": false
             },
             "display_priority": 21
           },
           {
-            "ticker": "AVGO",
-            "display_name": "Broadcom",
-            "last_price": 335.1199,
-            "market_data_asof": "2026-10-20T15:41:00-04:00",
-            "session_vwap": 335.76742385700624,
-            "vwap_distance_pct": -0.192848921901978,
-            "vwap_position_ko": "VWAP 아래 -0.19%",
-            "relative_volume": 0.37644732002590214,
-            "trading_value": 2635311254.0,
-            "price_change_pct": 0.16,
-            "spread_bps": 1.1936022917153146,
-            "day_high": 341.09,
-            "day_low": 330.8001,
-            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
+            "ticker": "SNPS",
+            "display_name": "Synopsys",
+            "last_price": 447.325,
+            "market_data_asof": "2026-10-21T04:55:00-04:00",
+            "session_vwap": 449.5478199718706,
+            "vwap_distance_pct": -0.4944568459946397,
+            "vwap_position_ko": "VWAP 아래 -0.49%",
+            "relative_volume": 0.010697893355282932,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 비교 지표 미수집",
             "data_status_ko": "시세 유효기간 만료",
-            "reason_codes_ko": [
-              "delayed or invalid market data"
-            ],
+            "reason_codes_ko": [],
             "quality": {
-              "row_mode": "MISSING",
+              "row_mode": "BLOCKED_STALE",
               "execution_ready": false,
               "conditional_strategy_ready": false,
               "current_execution_promotion": "BLOCKED",
-              "generated_in_current_run": true,
-              "freshness_class": "DELAYED_CHECKPOINT",
-              "execution_eligibility": "DELAYED_ANALYSIS_ONLY"
+              "generated_in_current_run": false
             },
             "display_priority": 22
           },
           {
-            "ticker": "GOOGL",
-            "display_name": "Alphabet",
-            "last_price": 339.15,
-            "market_data_asof": "2026-10-20T15:41:00-04:00",
-            "session_vwap": 342.08926448788395,
-            "vwap_distance_pct": -0.8592098007764504,
-            "vwap_position_ko": "VWAP 아래 -0.86%",
-            "relative_volume": 0.35153722423692135,
-            "trading_value": 2818610970.0,
-            "price_change_pct": -1.46,
-            "spread_bps": 0.8845513113481908,
-            "day_high": 344.77,
-            "day_low": 338.42,
-            "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
+            "ticker": "PM",
+            "display_name": "PM",
+            "last_price": 197.9652,
+            "market_data_asof": "2026-10-21T06:30:00-04:00",
+            "session_vwap": 198.63245436105476,
+            "vwap_distance_pct": -0.33592413848034797,
+            "vwap_position_ko": "VWAP 아래 -0.34%",
+            "relative_volume": 0.010840159923994619,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 비교 지표 미수집",
             "data_status_ko": "시세 유효기간 만료",
-            "reason_codes_ko": [
-              "delayed or invalid market data"
-            ],
+            "reason_codes_ko": [],
             "quality": {
-              "row_mode": "MISSING",
+              "row_mode": "BLOCKED_STALE",
               "execution_ready": false,
               "conditional_strategy_ready": false,
               "current_execution_promotion": "BLOCKED",
-              "generated_in_current_run": true,
-              "freshness_class": "DELAYED_CHECKPOINT",
-              "execution_eligibility": "DELAYED_ANALYSIS_ONLY"
+              "generated_in_current_run": false
             },
             "display_priority": 23
           },
           {
-            "ticker": "LLY",
-            "display_name": "Eli Lilly",
-            "last_price": 1287.76,
-            "market_data_asof": "2026-10-20T15:41:00-04:00",
-            "session_vwap": 1293.668295737293,
-            "vwap_distance_pct": -0.4567087063013897,
-            "vwap_position_ko": "VWAP 아래 -0.46%",
-            "relative_volume": 0.6465311885074171,
-            "trading_value": 1814021788.0,
-            "price_change_pct": 3.82,
-            "spread_bps": 9.164692633296287,
-            "day_high": 1311.75,
-            "day_low": 1260.17,
-            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
+            "ticker": "BRK-B",
+            "display_name": "BRK-B",
+            "last_price": 540.469970703125,
+            "market_data_asof": "2026-10-20T15:55:00-04:00",
+            "session_vwap": 537.9908730051283,
+            "vwap_distance_pct": 0.4608066460586757,
+            "vwap_position_ko": "VWAP 위 +0.46%",
+            "relative_volume": 1.0034361524438584,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 비교 지표 미수집",
             "data_status_ko": "시세 유효기간 만료",
-            "reason_codes_ko": [
-              "delayed or invalid market data"
-            ],
+            "reason_codes_ko": [],
             "quality": {
-              "row_mode": "MISSING",
+              "row_mode": "BLOCKED_STALE",
               "execution_ready": false,
               "conditional_strategy_ready": false,
               "current_execution_promotion": "BLOCKED",
-              "generated_in_current_run": true,
-              "freshness_class": "DELAYED_CHECKPOINT",
-              "execution_eligibility": "DELAYED_ANALYSIS_ONLY"
+              "generated_in_current_run": false
             },
             "display_priority": 24
           },
           {
-            "ticker": "NVDA",
-            "display_name": "NVIDIA",
-            "last_price": 216.39,
-            "market_data_asof": "2026-10-20T15:41:00-04:00",
-            "session_vwap": 216.37254332307455,
-            "vwap_distance_pct": 0.0080678798970224,
-            "vwap_position_ko": "VWAP 위 +0.01%",
-            "relative_volume": 0.4159093614149205,
-            "trading_value": 8946159948.0,
-            "price_change_pct": -0.32,
-            "spread_bps": 0.9242144177453898,
-            "day_high": 218.46,
-            "day_low": 212.77,
-            "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
+            "ticker": "SCCO",
+            "display_name": "SCCO",
+            "last_price": 197.32,
+            "market_data_asof": "2026-10-21T06:00:00-04:00",
+            "session_vwap": 198.56443399921662,
+            "vwap_distance_pct": -0.6267154566167332,
+            "vwap_position_ko": "VWAP 아래 -0.63%",
+            "relative_volume": 0.054035127751900544,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 비교 지표 미수집",
             "data_status_ko": "시세 유효기간 만료",
-            "reason_codes_ko": [
-              "delayed or invalid market data"
-            ],
+            "reason_codes_ko": [],
             "quality": {
-              "row_mode": "MISSING",
+              "row_mode": "BLOCKED_STALE",
               "execution_ready": false,
               "conditional_strategy_ready": false,
               "current_execution_promotion": "BLOCKED",
-              "generated_in_current_run": true,
-              "freshness_class": "DELAYED_CHECKPOINT",
-              "execution_eligibility": "DELAYED_ANALYSIS_ONLY"
+              "generated_in_current_run": false
             },
             "display_priority": 25
           },
           {
             "ticker": "TXN",
             "display_name": "Texas Instruments",
-            "last_price": 280.165,
-            "market_data_asof": "2026-10-20T15:41:00-04:00",
-            "session_vwap": 278.98244492587924,
-            "vwap_distance_pct": 0.4238815365013249,
-            "vwap_position_ko": "VWAP 위 +0.42%",
-            "relative_volume": 0.4513471684020579,
-            "trading_value": 637816329.0,
-            "price_change_pct": 1.45,
-            "spread_bps": 7.138523039582705,
-            "day_high": 282.45,
-            "day_low": 272.01,
-            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
+            "last_price": 278.86,
+            "market_data_asof": "2026-10-21T06:55:00-04:00",
+            "session_vwap": 279.525318287037,
+            "vwap_distance_pct": -0.23801718252720594,
+            "vwap_position_ko": "VWAP 아래 -0.24%",
+            "relative_volume": 0.02617449824543386,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 비교 지표 미수집",
             "data_status_ko": "시세 유효기간 만료",
-            "reason_codes_ko": [
-              "delayed or invalid market data"
-            ],
+            "reason_codes_ko": [],
             "quality": {
-              "row_mode": "MISSING",
+              "row_mode": "BLOCKED_STALE",
               "execution_ready": false,
               "conditional_strategy_ready": false,
               "current_execution_promotion": "BLOCKED",
-              "generated_in_current_run": true,
-              "freshness_class": "DELAYED_CHECKPOINT",
-              "execution_eligibility": "DELAYED_ANALYSIS_ONLY"
+              "generated_in_current_run": false
             },
             "display_priority": 26
           },
           {
-            "ticker": "TSLA",
-            "display_name": "Tesla",
-            "last_price": 375.28,
-            "market_data_asof": "2026-10-20T15:41:00-04:00",
-            "session_vwap": 372.8344244475012,
-            "vwap_distance_pct": 0.655941456082787,
-            "vwap_position_ko": "VWAP 위 +0.66%",
-            "relative_volume": 0.5699467211331599,
-            "trading_value": 7004123050.0,
-            "price_change_pct": 1.96,
-            "spread_bps": 1.0658708164575907,
-            "day_high": 377.59,
-            "day_low": 363.64,
-            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
+            "ticker": "NVDA",
+            "display_name": "NVIDIA",
+            "last_price": 219.4512,
+            "market_data_asof": "2026-10-21T05:45:00-04:00",
+            "session_vwap": 220.12758963934456,
+            "vwap_distance_pct": -0.30727163298919224,
+            "vwap_position_ko": "VWAP 아래 -0.31%",
+            "relative_volume": 0.08287751619548647,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 비교 지표 미수집",
             "data_status_ko": "시세 유효기간 만료",
-            "reason_codes_ko": [
-              "delayed or invalid market data"
-            ],
+            "reason_codes_ko": [],
             "quality": {
-              "row_mode": "MISSING",
+              "row_mode": "BLOCKED_STALE",
               "execution_ready": false,
               "conditional_strategy_ready": false,
               "current_execution_promotion": "BLOCKED",
-              "generated_in_current_run": true,
-              "freshness_class": "DELAYED_CHECKPOINT",
-              "execution_eligibility": "DELAYED_ANALYSIS_ONLY"
+              "generated_in_current_run": false
             },
             "display_priority": 27
           }
@@ -1088,7 +842,7 @@
       "universe_coverage": {
         "status": "COMPLETE",
         "complete": true,
-        "source_run_id": "20261021T044008_local-freshness-us-overlay",
+        "source_run_id": "20261021T175015_local-scheduler-us-full",
         "ticker_universe_mode": "config_plus_account",
         "expected_watchlist_count": 27,
         "missing_watchlist_count": 0,
@@ -1123,18 +877,123 @@
         "source_health": "OK",
         "coverage": {
           "total_unique_events": 400,
-          "window_events": 81,
+          "window_events": 79,
           "transmitted_events": 12,
           "truncated": true,
           "oldest_occurred_at": "2026-10-19T08:00:03+00:00",
           "newest_occurred_at": "2026-10-20T21:56:18+00:00",
           "available_events_before_context_cap": 60,
           "context_event_cap": 12,
-          "omitted_events": 69,
+          "omitted_events": 67,
           "omitted_due_to_context_cap": 48,
-          "omitted_before_context_selection": 21
+          "omitted_before_context_selection": 19
         },
         "events": [
+          {
+            "event_key": "hMaTkoYi-w4",
+            "content_sha256": "00356f07588a6ef431cd3daad0a27c77ef2ac1a0908e5edd0d5fe4bb36c368d6",
+            "occurred_at": "2026-10-20T11:00:21+00:00",
+            "relevance": {
+              "tickers": [
+                "CRWV",
+                "META",
+                "DELL",
+                "CL=F"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "verified_entities",
+              "matched_tickers": [
+                "DELL"
+              ],
+              "market_match": true,
+              "score": 120
+            },
+            "summary": {
+              "video_id": "hMaTkoYi-w4",
+              "title": "글로벌 큰손들은 이미 다른 걸 보고 있다…삼전닉스 호실적에도 외국인 자금이 떠나는 이유ㅣ명민준, 서수진, 유영화 [주린이 구조대]",
+              "channel": "삼프로TV 3PROTV",
+              "source_url": "https://www.youtube.com/watch?v=hMaTkoYi-w4",
+              "claim_status_summary": {
+                "unverified": 9,
+                "asr_uncertain": 1
+              },
+              "claims": [
+                {
+                  "claim_id": "C1",
+                  "claim_text": "코어 인플레이션·금리 부담과 유동성 부족이 반도체 약세를 증폭하고, 반도체 이익의 국내 환전 수요가 원화 강세를 이끈다는 해석이다. 달러/원 1,400·1,500원은 조건부 전망이다.",
+                  "status": "unverified",
+                  "confidence": 0.99,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "유동성 부족과 원화 강세 원인을 확정 사실로 사용하거나 제시 환율을 검증된 가격 목표로 취급할 수 없다."
+                },
+                {
+                  "claim_id": "C2",
+                  "claim_text": "코어위브의 6월 채권 발행금리는 9%, 이후 유통수익률은 15%→14%→13%대였으나 주가는 전저점을 이탈하고 장중 약 3% 하락했다는 주장이다. SK하이닉스 하락과의 연계 및 엔비디아·블랙스톤 관련 설명도 포함한다.",
+                  "status": "unverified",
+                  "confidence": 0.99,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "주식 가격 스냅샷만으로 신용위험의 확대·완화나 구제 필요성을 판단할 수 없다."
+                },
+                {
+                  "claim_id": "C3",
+                  "claim_text": "소프트뱅크가 오픈AI의 주요 자금공급자이고 CDS가 400bp 미만에서 430bp 위로 올라 AI 자금조달 우려 확산 신호가 됐다는 주장이다.",
+                  "status": "unverified",
+                  "confidence": 0.99,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "430bp를 확인된 위험 신호로 인용하거나 AI 자금공급 전반의 신용악화로 일반화할 수 없다."
+                },
+                {
+                  "claim_id": "C4",
+                  "claim_text": "앤트로픽 관련 조달에서 담보 7%·무담보 10% 이상 금리가 언급됐고 데이터센터 IPO가 대부분 취소됐다는 주장이다.",
+                  "status": "unverified",
+                  "confidence": 0.99,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "실제 차입 주체와 거래 조건 확인 전에는 앤트로픽의 조달금리나 데이터센터 금융시장 전반의 상태로 인용하지 않아야 한다."
+                }
+              ],
+              "entities": [
+                {
+                  "ticker": "CRWV",
+                  "name": "코어위브",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                },
+                {
+                  "ticker": "META",
+                  "name": "메타",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                },
+                {
+                  "ticker": "DELL",
+                  "name": "델 테크놀로지스",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                },
+                {
+                  "ticker": "CL=F",
+                  "name": "원유·중동 정세·미국 정치",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                }
+              ]
+            }
+          },
           {
             "event_key": "Jm79OSl03f0",
             "content_sha256": "8fea0b9fbc00fffa9bcb6e88842380051c8c434a464e06985c816b69e72ce9de",
@@ -1158,11 +1017,10 @@
               "match_basis": "verified_entities",
               "matched_tickers": [
                 "AAPL",
-                "NVDA",
-                "TSLA"
+                "NVDA"
               ],
               "market_match": true,
-              "score": 320
+              "score": 220
             },
             "summary": {
               "video_id": "Jm79OSl03f0",
@@ -1307,11 +1165,10 @@
               "match_basis": "verified_entities",
               "matched_tickers": [
                 "AAPL",
-                "AMZN",
-                "TSLA"
+                "AMZN"
               ],
               "market_match": true,
-              "score": 320
+              "score": 220
             },
             "summary": {
               "video_id": "ywWt2SwvWDE",
@@ -1556,111 +1413,6 @@
             }
           },
           {
-            "event_key": "hMaTkoYi-w4",
-            "content_sha256": "00356f07588a6ef431cd3daad0a27c77ef2ac1a0908e5edd0d5fe4bb36c368d6",
-            "occurred_at": "2026-10-20T11:00:21+00:00",
-            "relevance": {
-              "tickers": [
-                "CRWV",
-                "META",
-                "DELL",
-                "CL=F"
-              ],
-              "markets": [
-                "US"
-              ],
-              "themes": [],
-              "match_basis": "verified_entities",
-              "matched_tickers": [
-                "DELL"
-              ],
-              "market_match": true,
-              "score": 120
-            },
-            "summary": {
-              "video_id": "hMaTkoYi-w4",
-              "title": "글로벌 큰손들은 이미 다른 걸 보고 있다…삼전닉스 호실적에도 외국인 자금이 떠나는 이유ㅣ명민준, 서수진, 유영화 [주린이 구조대]",
-              "channel": "삼프로TV 3PROTV",
-              "source_url": "https://www.youtube.com/watch?v=hMaTkoYi-w4",
-              "claim_status_summary": {
-                "unverified": 9,
-                "asr_uncertain": 1
-              },
-              "claims": [
-                {
-                  "claim_id": "C1",
-                  "claim_text": "코어 인플레이션·금리 부담과 유동성 부족이 반도체 약세를 증폭하고, 반도체 이익의 국내 환전 수요가 원화 강세를 이끈다는 해석이다. 달러/원 1,400·1,500원은 조건부 전망이다.",
-                  "status": "unverified",
-                  "confidence": 0.99,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "유동성 부족과 원화 강세 원인을 확정 사실로 사용하거나 제시 환율을 검증된 가격 목표로 취급할 수 없다."
-                },
-                {
-                  "claim_id": "C2",
-                  "claim_text": "코어위브의 6월 채권 발행금리는 9%, 이후 유통수익률은 15%→14%→13%대였으나 주가는 전저점을 이탈하고 장중 약 3% 하락했다는 주장이다. SK하이닉스 하락과의 연계 및 엔비디아·블랙스톤 관련 설명도 포함한다.",
-                  "status": "unverified",
-                  "confidence": 0.99,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "주식 가격 스냅샷만으로 신용위험의 확대·완화나 구제 필요성을 판단할 수 없다."
-                },
-                {
-                  "claim_id": "C3",
-                  "claim_text": "소프트뱅크가 오픈AI의 주요 자금공급자이고 CDS가 400bp 미만에서 430bp 위로 올라 AI 자금조달 우려 확산 신호가 됐다는 주장이다.",
-                  "status": "unverified",
-                  "confidence": 0.99,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "430bp를 확인된 위험 신호로 인용하거나 AI 자금공급 전반의 신용악화로 일반화할 수 없다."
-                },
-                {
-                  "claim_id": "C4",
-                  "claim_text": "앤트로픽 관련 조달에서 담보 7%·무담보 10% 이상 금리가 언급됐고 데이터센터 IPO가 대부분 취소됐다는 주장이다.",
-                  "status": "unverified",
-                  "confidence": 0.99,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "실제 차입 주체와 거래 조건 확인 전에는 앤트로픽의 조달금리나 데이터센터 금융시장 전반의 상태로 인용하지 않아야 한다."
-                }
-              ],
-              "entities": [
-                {
-                  "ticker": "CRWV",
-                  "name": "코어위브",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                },
-                {
-                  "ticker": "META",
-                  "name": "메타",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                },
-                {
-                  "ticker": "DELL",
-                  "name": "델 테크놀로지스",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                },
-                {
-                  "ticker": "CL=F",
-                  "name": "원유·중동 정세·미국 정치",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                }
-              ]
-            }
-          },
-          {
             "event_key": "quJTDt4JGpU",
             "content_sha256": "8ca5c6a58d4354c7de0d0c4f2d2ee6495d723c3a948d37b161b70dfef573e6ef",
             "occurred_at": "2026-10-19T11:01:11+00:00",
@@ -1679,11 +1431,10 @@
               "match_basis": "verified_entities",
               "matched_tickers": [
                 "AAPL",
-                "NVDA",
-                "TSLA"
+                "NVDA"
               ],
               "market_match": true,
-              "score": 320
+              "score": 220
             },
             "summary": {
               "video_id": "quJTDt4JGpU",
@@ -1798,11 +1549,10 @@
               "match_basis": "verified_entities",
               "matched_tickers": [
                 "AAPL",
-                "NVDA",
-                "TSLA"
+                "NVDA"
               ],
               "market_match": true,
-              "score": 320
+              "score": 220
             },
             "summary": {
               "video_id": "-2KDihC4s9I",
@@ -2302,111 +2052,6 @@
             }
           },
           {
-            "event_key": "t5b7yGoPhkc",
-            "content_sha256": "6adbba93648996c47109d990fe9c38f795d0dd374f6106483a019c7b1e5fa558",
-            "occurred_at": "2026-10-20T08:00:39+00:00",
-            "relevance": {
-              "tickers": [
-                "META",
-                "BTC",
-                "TSLA",
-                "RKLB"
-              ],
-              "markets": [
-                "US"
-              ],
-              "themes": [],
-              "match_basis": "verified_entities",
-              "matched_tickers": [
-                "TSLA"
-              ],
-              "market_match": true,
-              "score": 120
-            },
-            "summary": {
-              "video_id": "t5b7yGoPhkc",
-              "title": "\"반도체 폭락, 공포에 팔지 마라\" 캐시 우드가 진단한 메모리 사이클과 한국 반도체 생존법",
-              "channel": "PLUS TV (플러스 TV)",
-              "source_url": "https://www.youtube.com/watch?v=t5b7yGoPhkc",
-              "claim_status_summary": {
-                "unverified": 9,
-                "asr_uncertain": 1
-              },
-              "claims": [
-                {
-                  "claim_id": "C1",
-                  "claim_text": "반도체 상승 사이클은 다년간 이어질 초기 단계이며, 중국의 범용 메모리 경쟁과 HBM·로봇 수요를 구분해야 한다. 한국 제조업의 수직계열화에도 기회가 있다.",
-                  "status": "unverified",
-                  "confidence": 0.1,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "반도체 급락을 매수 기회로 단정할 근거가 부족하다. HBM 실적과 범용 메모리 수익성을 별도로 확인해야 한다."
-                },
-                {
-                  "claim_id": "C2",
-                  "claim_text": "ARK는 9월 9일 메타 약 380억원을 매수하고 알파벳 2,780만달러를 매도했다. 관련 앱은 일일 이용자 200만명과 생산성 부문 28일 1위를 기록했으며, AI 광고의 성장 가능성이 있다.",
-                  "status": "asr_uncertain",
-                  "confidence": 0.05,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "불명확한 앱 지표나 매매금액을 메타 투자 판단의 확정 근거로 사용하지 않아야 한다."
-                },
-                {
-                  "claim_id": "C3",
-                  "claim_text": "USDC의 네트워크 효과와 스테이블코인·AI 에이전트 결제가 온라인 상거래를 확대할 수 있다.",
-                  "status": "unverified",
-                  "confidence": 0.05,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "결제 채택과 토큰 전송량을 구분하고, 성장 전망을 투자 수익 보장으로 해석하지 않아야 한다."
-                },
-                {
-                  "claim_id": "C4",
-                  "claim_text": "비트코인의 2030년 낙관 가격은 150만달러, 기본 가격은 75만달러 이상이며, 금과의 상관계수·공급량·암호자산 시장 규모가 장기 투자 논거로 제시됐다.",
-                  "status": "unverified",
-                  "confidence": 0.1,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "목표가는 검증된 미래 가격이 아니다. 잘못 식별됐을 가능성이 있는 BTC 스냅샷을 수익률 계산에 사용하지 않아야 한다."
-                }
-              ],
-              "entities": [
-                {
-                  "ticker": "META",
-                  "name": "메타·알파벳 관련 ARK 매매 및 AI 광고",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                },
-                {
-                  "ticker": "BTC",
-                  "name": "비트코인",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                },
-                {
-                  "ticker": "TSLA",
-                  "name": "테슬라·SpaceX·TSMC",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                },
-                {
-                  "ticker": "RKLB",
-                  "name": "Rocket Lab",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                }
-              ]
-            }
-          },
-          {
             "event_key": "y2tFw3d_JjM",
             "content_sha256": "2eb49b6de5cdb45e81a6143bb8a444b40b0f622c3e10d665cb0814011156f3e4",
             "occurred_at": "2026-10-20T06:09:44+00:00",
@@ -2514,97 +2159,152 @@
             }
           },
           {
-            "event_key": "aVCebOfGmXk",
-            "content_sha256": "2ef9be19cc7a5ba5374bf3ef34a02e5d0c4cc034504bf681b72bf8f5df3649b3",
-            "occurred_at": "2026-10-20T02:11:09+00:00",
+            "event_key": "RNhBiqwRJf0",
+            "content_sha256": "702721c0e5523c5dc222e69a69e3917e5de101ec864d6576661cddc53c3b8d2b",
+            "occurred_at": "2026-10-20T13:00:38+00:00",
             "relevance": {
               "tickers": [
-                "CRWV",
-                "TSLA",
-                "005930"
+                "^KS11"
               ],
               "markets": [
-                "US",
-                "KR"
+                "US"
               ],
               "themes": [],
               "match_basis": "verified_entities",
-              "matched_tickers": [
-                "TSLA"
-              ],
+              "matched_tickers": [],
               "market_match": true,
-              "score": 120
+              "score": 20
             },
             "summary": {
-              "video_id": "aVCebOfGmXk",
-              "title": "AI 부채 폭탄 터진다더니… 골드만삭스는 코어위브 사라? / 엔비디아·메타가 판 뒤집나  | 이주연 대표",
-              "channel": "815Money talk",
-              "source_url": "https://www.youtube.com/watch?v=aVCebOfGmXk",
+              "video_id": "RNhBiqwRJf0",
+              "title": "10월 20일 외국인이 한국인 몰래 매수한 종목 정체",
+              "channel": "경제사냥꾼",
+              "source_url": "https://www.youtube.com/watch?v=RNhBiqwRJf0",
               "claim_status_summary": {
-                "unverified": 9,
+                "unverified": 8,
+                "asr_uncertain": 4
+              },
+              "claims": [
+                {
+                  "claim_id": "C1",
+                  "claim_text": "10월 20일 코스피 -3.73%, 외국인 코스피 순매도 약 5389억 원, 삼성전자 외국인 순매수 1위, SK스퀘어 2위·약 432억 원, SK하이닉스 순매도 약 3940억 원이라는 주장.",
+                  "status": "unverified",
+                  "confidence": 0.99,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "지수 하락률과 외국인 매매 순위를 검증된 매매 신호로 사용하지 않는다."
+                },
+                {
+                  "claim_id": "C2",
+                  "claim_text": "SK스퀘어는 10월 14일부터 5거래일 연속 외국인 순매수에도 같은 기간 주가가 약 13% 하락했다는 주장.",
+                  "status": "unverified",
+                  "confidence": 0.99,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "연속 순매수와 하락의 동시 발생 자체도 아직 확인되지 않았다."
+                },
+                {
+                  "claim_id": "C3",
+                  "claim_text": "SK스퀘어는 SK텔레콤에서 분사한 지주회사이며 6월 말 핵심 자산인 SK하이닉스 주식 1억 4610만 주, 약 20%를 보유했다는 주장.",
+                  "status": "unverified",
+                  "confidence": 0.99,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "보유지분 가치 계산의 기초 수량과 지분율이 미검증 상태다."
+                },
+                {
+                  "claim_id": "C4",
+                  "claim_text": "지난해 SK스퀘어 수취 배당금의 99.7%가 SK하이닉스에서 발생했다는 주장.",
+                  "status": "unverified",
+                  "confidence": 0.99,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "배당 재원의 집중도를 확인하기 전에는 현금흐름 의존도를 수치로 단정할 수 없다."
+                }
+              ],
+              "entities": [
+                {
+                  "ticker": "^KS11",
+                  "name": "코스피",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "event_key": "It4T14aqScA",
+            "content_sha256": "4b935eca639a4e82072553f2119e4399ba6cd47c16be395de085288435529849",
+            "occurred_at": "2026-10-20T12:00:06+00:00",
+            "relevance": {
+              "tickers": [
+                "CL=F"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "verified_entities",
+              "matched_tickers": [],
+              "market_match": true,
+              "score": 20
+            },
+            "summary": {
+              "video_id": "It4T14aqScA",
+              "title": "7월 저점까지 밀린 반도체…그래도 대세 하락은 아닌 이유ㅣ명민준, 서수진, 이지환 [주린이 구조대]",
+              "channel": "삼프로TV 3PROTV",
+              "source_url": "https://www.youtube.com/watch?v=It4T14aqScA",
+              "claim_status_summary": {
+                "unverified": 10,
                 "asr_uncertain": 1
               },
               "claims": [
                 {
                   "claim_id": "C1",
-                  "claim_text": "나스닥·반도체 지수·한국 ETF와 개별 종목이 제시된 등락률로 반등했으며 국내 반도체 PER이 약 3배라는 주장.",
+                  "claim_text": "10월 6일 이후 반도체가 7월 저점권까지 하락했지만 펀더멘탈 훼손보다 수급 충격이며 대세 하락으로 단정하기 어렵다는 평가다.",
                   "status": "unverified",
                   "confidence": 0.99,
                   "supporting_evidence_ids": [],
                   "manual_check_required": true,
-                  "investor_implication": "반등 강도와 저평가 판단을 투자 근거로 사용하기 전에 동일 거래일의 원시세와 EPS 기준을 확인해야 한다."
+                  "investor_implication": "대세 하락이 아니라는 해석을 저점 확인이나 추가 매수의 검증된 근거로 사용하지 않는다."
                 },
                 {
                   "claim_id": "C2",
-                  "claim_text": "미국 10년물 수익률 5% 초과, WTI 100달러 초과·약 2% 상승과 유럽 재정 불안을 주장하며 미국·이란 협상 진전을 전망한다.",
+                  "claim_text": "외국인의 장 초반 선물 집중 매도가 프로그램 매도와 코스피 약 5% 하락을 유발했지만 장 막판 환매로 포지션이 누적되지 않았다는 주장이다.",
                   "status": "unverified",
                   "confidence": 0.99,
                   "supporting_evidence_ids": [],
                   "manual_check_required": true,
-                  "investor_implication": "금리·원유 수준과 협상 결과를 확인하기 전에는 거시 부담 완화를 확정 시나리오로 반영하기 어렵다."
+                  "investor_implication": "계약 수와 매매 원인이 확인되기 전에는 외국인 환매를 추세 회복 신호로 해석하지 않는다."
                 },
                 {
                   "claim_id": "C3",
-                  "claim_text": "골드만삭스가 코어위브 목표주가를 낮추면서 매수로 상향했고 JP모건이 부채 우려를 과도하다고 평가했으며 주요 투자은행이 AI 수익의 견조함을 확인했다는 주장.",
+                  "claim_text": "헤지펀드 AI 노출 축소는 전면적인 하방 전환보다 레버리지 청산에 가깝고 기존 보유 물량 약 80%가 남아 있다는 해석이다.",
                   "status": "unverified",
                   "confidence": 0.99,
                   "supporting_evidence_ids": [],
                   "manual_check_required": true,
-                  "investor_implication": "은행 이름만으로 매수 논거를 확정하지 말고 보고서별 의견 변경과 전제조건을 확인해야 한다."
+                  "investor_implication": "약 80% 잔존이라는 계산을 추가 청산 여력이 작거나 하방 위험이 제한됐다는 증거로 사용하지 않는다."
                 },
                 {
                   "claim_id": "C4",
-                  "claim_text": "코어위브의 실제 담보조달 비용은 회사채 시장수익률보다 낮고, 장기 GPU 임대와 재임대로 높은 투자수익률을 유지할 수 있다는 주장.",
+                  "claim_text": "삼성전자에 최근 외국인 순매수가 나타났고 코스피 시가총액 비중은 약 26%이며 자사주 매입 종료 후 수급이 개선될 수 있다는 주장이다.",
                   "status": "unverified",
                   "confidence": 0.99,
                   "supporting_evidence_ids": [],
                   "manual_check_required": true,
-                  "investor_implication": "차입 비용과 GPU 잔존가치에 대한 가정이 핵심이므로 계약별 금리·만기와 투자수익률 산식을 확인해야 한다."
+                  "investor_implication": "순매수 지속성과 자기주식 취득 공시를 확인하기 전에는 매집 또는 매입 종료 후 반등을 전제하지 않는다."
                 }
               ],
               "entities": [
                 {
-                  "ticker": "CRWV",
-                  "name": "코어위브",
+                  "ticker": "CL=F",
+                  "name": "유가·미국 금리",
                   "status": "unverified",
                   "verification_notes": [
                     "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                },
-                {
-                  "ticker": "TSLA",
-                  "name": "테슬라",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                },
-                {
-                  "ticker": "005930",
-                  "name": "삼성전자·휴머노이드 로봇 생태계",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "시장 데이터 조회 실패: no_usable_market_fields"
                   ]
                 }
               ]
@@ -3456,31 +3156,31 @@
           "youtube": {
             "source_health": "OK",
             "event_keys": [
+              "hMaTkoYi-w4",
               "Jm79OSl03f0",
               "ywWt2SwvWDE",
               "V2IBqJMkxPE",
-              "hMaTkoYi-w4",
               "quJTDt4JGpU",
               "-2KDihC4s9I",
               "NUiMyWpRYCA",
               "R3snJQfZACo",
               "BqwnPaQ0tXQ",
-              "t5b7yGoPhkc",
               "y2tFw3d_JjM",
-              "aVCebOfGmXk"
+              "RNhBiqwRJf0",
+              "It4T14aqScA"
             ],
             "coverage": {
               "total_unique_events": 400,
-              "window_events": 81,
+              "window_events": 79,
               "transmitted_events": 12,
               "truncated": true,
               "oldest_occurred_at": "2026-10-19T08:00:03+00:00",
               "newest_occurred_at": "2026-10-20T21:56:18+00:00",
               "available_events_before_context_cap": 60,
               "context_event_cap": 12,
-              "omitted_events": 69,
+              "omitted_events": 67,
               "omitted_due_to_context_cap": 48,
-              "omitted_before_context_selection": 21
+              "omitted_before_context_selection": 19
             }
           },
           "prism": {
@@ -3528,8 +3228,8 @@
       "untrusted_external_context": true,
       "global_mode_cannot_promote_a_row": true,
       "immediate_requires_row_mode": "IMMEDIATE",
-      "market_data_asof": "2026-10-20T15:41:00-04:00",
-      "valid_until": "2026-10-20T15:51:00-04:00",
+      "market_data_asof": "2026-10-21T07:45:00-04:00",
+      "valid_until": "2026-10-20T16:05:00-04:00",
       "expired_at_build": true,
       "decision_ready": false,
       "conditional_strategy_ready": false,
@@ -3577,7 +3277,7 @@
         "note": "The local task contract is verified; the Work host does not expose a signed per-response model receipt."
       },
       "market_analysis": {
-        "source_run_id": "20261020T175013_local-scheduler-us-full",
+        "source_run_id": "20261021T175015_local-scheduler-us-full",
         "provider": "codex",
         "requested_models": {
           "quick": "gpt-6.1-sol",
@@ -3595,35 +3295,22 @@
           "judge": "xhigh"
         },
         "verification_status": "RUNTIME_USAGE_OBSERVED",
-        "observed_calls": 723,
+        "observed_calls": 813,
         "observed_models": {
           "gpt-6.1-sol": {
-            "calls": 723,
-            "input_tokens": 19172471,
-            "output_tokens": 1518578,
-            "total_tokens": 20691049
+            "calls": 813,
+            "input_tokens": 20884114,
+            "output_tokens": 1574548,
+            "total_tokens": 22458662
           }
         },
         "usage_available": true
       },
       "overlay": {
-        "source_run_id": "20261021T044008_local-freshness-us-overlay",
-        "provider": "codex",
-        "requested_models": {
-          "quick": "gpt-6.1-sol",
-          "deep": "gpt-6.1-sol",
-          "output": "gpt-6.1-sol",
-          "writer": "gpt-6.1-sol",
-          "judge": "gpt-6.1-sol"
-        },
-        "requested_reasoning_effort": {
-          "default": "medium",
-          "quick": "medium",
-          "deep": "xhigh",
-          "output": "medium",
-          "writer": "medium",
-          "judge": "xhigh"
-        },
+        "source_run_id": "20261021T175015_local-scheduler-us-full",
+        "provider": null,
+        "requested_models": {},
+        "requested_reasoning_effort": {},
         "verification_status": "CONFIGURED_ONLY",
         "observed_calls": 0,
         "observed_models": {},

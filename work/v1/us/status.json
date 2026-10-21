@@ -1,9 +1,9 @@
 {
   "schema": "tradingagents.work-context/v1",
   "surface": "us",
-  "event_id": "us:34b06ca812d5fc1dafcc906a672abacb",
-  "source_sha256": "298b8ed93b90c5b1f372943ce5e1bfd276a037d70c57d63e40acc1ef2f3ca0a7",
-  "packet_sha256": "4ecb6f68116de83e57a18f8f8ac2da384442006b833f0654caef6eabe7eaf235",
+  "event_id": "us:f5b7c41de98ae0c022911c7a2451fa16",
+  "source_sha256": "4b05c18e8407635644dc1031f5319e1616e119a86991d77dcacaee80ded06093",
+  "packet_sha256": "3cc4ab7a64aff483bfe3ecc68211173ad323473593090f6c9d08d081c66d0b12",
   "prompt_contract_version": "market-work-v13-us",
   "prompt_sha256": "281749b3b871d01531e3ceb7377d60bb67ebcaf89d6d8ba3162cb53d38400d7a",
   "skill_sha256": "4dffe28b3721557cc2517b5afff2f94045832606e71ff61461df969f6abb53c7",
@@ -11,131 +11,29 @@
   "workflow_contract_sha256": "8d06ba979f55f01229636b73bdc643c5b21f326cc270c0e8143f3fd7a3204028",
   "status_url": "https://nornen0202.github.io/TradingAgents/work/v1/us/status.json",
   "latest_url": "https://nornen0202.github.io/TradingAgents/work/v1/us/latest.json",
-  "event_url": "https://nornen0202.github.io/TradingAgents/work/v1/us/events/us-34b06ca812d5fc1dafcc906a672abacb.json",
+  "event_url": "https://nornen0202.github.io/TradingAgents/work/v1/us/events/us-f5b7c41de98ae0c022911c7a2451fa16.json",
   "prompt_url": "https://nornen0202.github.io/TradingAgents/work/v1/prompts/market_us.md",
   "source_health": "STALE",
   "report_mode": "OUTAGE",
   "freshness_receipt": {
     "schema": "tradingagents.source-freshness/v1",
-    "producer_run_id": "20261021T044008_local-freshness-us-overlay",
-    "producer_started_at": "2026-10-21T04:40:08.754994+09:00",
-    "producer_finished_at": "2026-10-21T04:42:03.295986+09:00",
-    "analysis_run_id": "20261020T175013_local-scheduler-us-full",
+    "producer_run_id": "20261021T175015_local-scheduler-us-full",
+    "producer_started_at": "2026-10-21T17:50:15.048545+09:00",
+    "producer_finished_at": "2026-10-21T21:44:56.298321+09:00",
+    "analysis_run_id": "20261021T175015_local-scheduler-us-full",
     "analysis_lineage_status": "RESOLVED",
-    "analysis_completed_at": "2026-10-20T20:29:59.150766+09:00",
-    "analysis_trade_date_oldest": "2026-10-19",
-    "analysis_trade_date_latest": "2026-10-19",
-    "market_data_oldest_at": "2026-10-20T15:41:00-04:00",
-    "market_data_latest_at": "2026-10-20T15:41:00-04:00",
+    "analysis_completed_at": "2026-10-21T21:13:33.227411+09:00",
+    "analysis_trade_date_oldest": "2026-10-20",
+    "analysis_trade_date_latest": "2026-10-20",
+    "market_data_oldest_at": "2026-10-20T15:55:00-04:00",
+    "market_data_latest_at": "2026-10-21T07:45:00-04:00",
     "market_data_status": "STALE",
     "publication_does_not_refresh_inputs": true,
     "execution_max_age_seconds": 600.0,
     "research_market_data_status": "UNVERIFIED",
     "research_market_data_receipts": [
       {
-        "ticker": "AAPL",
-        "research_valid": false,
-        "category": "UNVERIFIED_RESEARCH_INPUT",
-        "execution_eligible": false
-      },
-      {
-        "ticker": "AMZN",
-        "research_valid": false,
-        "category": "UNVERIFIED_RESEARCH_INPUT",
-        "execution_eligible": false
-      },
-      {
-        "ticker": "SGOV",
-        "research_valid": false,
-        "category": "UNVERIFIED_RESEARCH_INPUT",
-        "execution_eligible": false
-      },
-      {
-        "ticker": "RSP",
-        "research_valid": false,
-        "category": "UNVERIFIED_RESEARCH_INPUT",
-        "execution_eligible": false
-      },
-      {
-        "ticker": "V",
-        "research_valid": false,
-        "category": "UNVERIFIED_RESEARCH_INPUT",
-        "execution_eligible": false
-      },
-      {
-        "ticker": "ABBV",
-        "research_valid": false,
-        "category": "UNVERIFIED_RESEARCH_INPUT",
-        "execution_eligible": false
-      },
-      {
-        "ticker": "COST",
-        "research_valid": false,
-        "category": "UNVERIFIED_RESEARCH_INPUT",
-        "execution_eligible": false
-      },
-      {
-        "ticker": "MSFT",
-        "research_valid": false,
-        "category": "UNVERIFIED_RESEARCH_INPUT",
-        "execution_eligible": false
-      },
-      {
-        "ticker": "CVX",
-        "research_valid": false,
-        "category": "UNVERIFIED_RESEARCH_INPUT",
-        "execution_eligible": false
-      },
-      {
-        "ticker": "MA",
-        "research_valid": false,
-        "category": "UNVERIFIED_RESEARCH_INPUT",
-        "execution_eligible": false
-      },
-      {
-        "ticker": "AMT",
-        "research_valid": false,
-        "category": "UNVERIFIED_RESEARCH_INPUT",
-        "execution_eligible": false
-      },
-      {
-        "ticker": "CLF",
-        "research_valid": false,
-        "category": "UNVERIFIED_RESEARCH_INPUT",
-        "execution_eligible": false
-      },
-      {
-        "ticker": "MDT",
-        "research_valid": false,
-        "category": "UNVERIFIED_RESEARCH_INPUT",
-        "execution_eligible": false
-      },
-      {
-        "ticker": "PG",
-        "research_valid": false,
-        "category": "UNVERIFIED_RESEARCH_INPUT",
-        "execution_eligible": false
-      },
-      {
-        "ticker": "SHEL",
-        "research_valid": false,
-        "category": "UNVERIFIED_RESEARCH_INPUT",
-        "execution_eligible": false
-      },
-      {
-        "ticker": "UNH",
-        "research_valid": false,
-        "category": "UNVERIFIED_RESEARCH_INPUT",
-        "execution_eligible": false
-      },
-      {
-        "ticker": "PM",
-        "research_valid": false,
-        "category": "UNVERIFIED_RESEARCH_INPUT",
-        "execution_eligible": false
-      },
-      {
-        "ticker": "XOM",
+        "ticker": "ETN",
         "research_valid": false,
         "category": "UNVERIFIED_RESEARCH_INPUT",
         "execution_eligible": false
@@ -153,19 +51,7 @@
         "execution_eligible": false
       },
       {
-        "ticker": "TSM",
-        "research_valid": false,
-        "category": "UNVERIFIED_RESEARCH_INPUT",
-        "execution_eligible": false
-      },
-      {
         "ticker": "DELL",
-        "research_valid": false,
-        "category": "UNVERIFIED_RESEARCH_INPUT",
-        "execution_eligible": false
-      },
-      {
-        "ticker": "ETN",
         "research_valid": false,
         "category": "UNVERIFIED_RESEARCH_INPUT",
         "execution_eligible": false
@@ -183,7 +69,7 @@
         "execution_eligible": false
       },
       {
-        "ticker": "GOOGL",
+        "ticker": "RSP",
         "research_valid": false,
         "category": "UNVERIFIED_RESEARCH_INPUT",
         "execution_eligible": false
@@ -195,7 +81,121 @@
         "execution_eligible": false
       },
       {
-        "ticker": "NVDA",
+        "ticker": "AAPL",
+        "research_valid": false,
+        "category": "UNVERIFIED_RESEARCH_INPUT",
+        "execution_eligible": false
+      },
+      {
+        "ticker": "SGOV",
+        "research_valid": false,
+        "category": "UNVERIFIED_RESEARCH_INPUT",
+        "execution_eligible": false
+      },
+      {
+        "ticker": "AMZN",
+        "research_valid": false,
+        "category": "UNVERIFIED_RESEARCH_INPUT",
+        "execution_eligible": false
+      },
+      {
+        "ticker": "TSM",
+        "research_valid": false,
+        "category": "UNVERIFIED_RESEARCH_INPUT",
+        "execution_eligible": false
+      },
+      {
+        "ticker": "GOOGL",
+        "research_valid": false,
+        "category": "UNVERIFIED_RESEARCH_INPUT",
+        "execution_eligible": false
+      },
+      {
+        "ticker": "MA",
+        "research_valid": false,
+        "category": "UNVERIFIED_RESEARCH_INPUT",
+        "execution_eligible": false
+      },
+      {
+        "ticker": "CVX",
+        "research_valid": false,
+        "category": "UNVERIFIED_RESEARCH_INPUT",
+        "execution_eligible": false
+      },
+      {
+        "ticker": "SHEL",
+        "research_valid": false,
+        "category": "UNVERIFIED_RESEARCH_INPUT",
+        "execution_eligible": false
+      },
+      {
+        "ticker": "ABBV",
+        "research_valid": false,
+        "category": "UNVERIFIED_RESEARCH_INPUT",
+        "execution_eligible": false
+      },
+      {
+        "ticker": "V",
+        "research_valid": false,
+        "category": "UNVERIFIED_RESEARCH_INPUT",
+        "execution_eligible": false
+      },
+      {
+        "ticker": "XOM",
+        "research_valid": false,
+        "category": "UNVERIFIED_RESEARCH_INPUT",
+        "execution_eligible": false
+      },
+      {
+        "ticker": "PG",
+        "research_valid": false,
+        "category": "UNVERIFIED_RESEARCH_INPUT",
+        "execution_eligible": false
+      },
+      {
+        "ticker": "MDT",
+        "research_valid": false,
+        "category": "UNVERIFIED_RESEARCH_INPUT",
+        "execution_eligible": false
+      },
+      {
+        "ticker": "AMT",
+        "research_valid": false,
+        "category": "UNVERIFIED_RESEARCH_INPUT",
+        "execution_eligible": false
+      },
+      {
+        "ticker": "COST",
+        "research_valid": false,
+        "category": "UNVERIFIED_RESEARCH_INPUT",
+        "execution_eligible": false
+      },
+      {
+        "ticker": "UNH",
+        "research_valid": false,
+        "category": "UNVERIFIED_RESEARCH_INPUT",
+        "execution_eligible": false
+      },
+      {
+        "ticker": "SNPS",
+        "research_valid": false,
+        "category": "UNVERIFIED_RESEARCH_INPUT",
+        "execution_eligible": false
+      },
+      {
+        "ticker": "PM",
+        "research_valid": false,
+        "category": "UNVERIFIED_RESEARCH_INPUT",
+        "execution_eligible": false
+      },
+      {
+        "ticker": "BRK-B",
+        "research_valid": false,
+        "category": "UNVERIFIED_RESEARCH_INPUT",
+        "execution_eligible": false
+      },
+      {
+        "ticker": "SCCO",
         "research_valid": false,
         "category": "UNVERIFIED_RESEARCH_INPUT",
         "execution_eligible": false
@@ -207,7 +207,7 @@
         "execution_eligible": false
       },
       {
-        "ticker": "TSLA",
+        "ticker": "NVDA",
         "research_valid": false,
         "category": "UNVERIFIED_RESEARCH_INPUT",
         "execution_eligible": false
