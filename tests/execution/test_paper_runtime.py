@@ -182,6 +182,31 @@ def test_quote_reselection_is_bounded_and_rechecks_account_and_session(tmp_path,
         assert row["order_counts"]["PENDING"] == 0
 
 
+@pytest.mark.parametrize("closed_during_calendar", [False, True])
+def test_calendar_read_completion_clock_selects_new_source_and_respects_close(tmp_path, closed_during_calendar):
+    archive, state = tmp_path / "archive", tmp_path / "state"
+    source(archive, AT - timedelta(seconds=115))
+    now, calls = [AT], []
+    def session(**kwargs):
+        calls.append(kwargs["now_local"])
+        if len(calls) == 2:
+            now[0] += timedelta(seconds=10)
+            source(archive, AT + timedelta(seconds=5), name="zz-new-run")
+        return {"is_open": True, "session_close": (AT + timedelta(seconds=5 if closed_during_calendar else 600)).isoformat()}
+    row = advance_market(archive, state, "kr", now=AT, clock=lambda: now[0],
+        account_loader=lambda _: account(AT), quote_factory=lambda: Quotes(lambda: now[0]),
+        session_resolver=session)
+    if closed_during_calendar:
+        assert row["status"] == "MARKET_CLOSED"
+        assert row["blockers"] == ["SESSION_ENDED_DURING_READ"]
+        assert row["order_counts"]["PENDING"] == 0
+    else:
+        assert row["source_run_id"] == "zz-new-run"
+        assert row["source_reselections_after_quotes"] == 1
+        assert row["source_diagnostics"]["fresh_rows"] == 1
+        assert row["order_counts"]["PENDING"] == 1
+
+
 @pytest.mark.parametrize("change", ["future", "missing", "naive", "stale", "pending", "incomplete"])
 def test_bad_account_never_seeds_or_gets_quotes(tmp_path, change):
     archive, state = tmp_path / "archive", tmp_path / "state"

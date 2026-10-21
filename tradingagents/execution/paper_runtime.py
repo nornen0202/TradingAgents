@@ -192,9 +192,13 @@ def advance_market(archive, state, market, *, now=None, clock=None, account_load
                     result["quote_diagnostics"] = getattr(provider, "diagnostics", {})
                 finally:
                     provider.close()
+                read_session = session_resolver(market=market, now_local=instant(clock()))
                 at = instant(clock())
                 # A response acquired after the market close cannot open new orders.
-                if not session_resolver(market=market, now_local=at).get("is_open"):
+                # Calendar verification may itself perform a read. Use its
+                # completion clock for source selection and the declared close.
+                session_close = instant(read_session.get("session_close"))
+                if not read_session.get("is_open") or (session_close is not None and at >= session_close):
                     broker.expire_pending(now=at.astimezone(ZoneInfo("Asia/Seoul" if market == "kr" else "America/New_York")).isoformat())
                     return finish("MARKET_CLOSED", ("SESSION_ENDED_DURING_READ",), **_summary(broker))
                 if not _account_valid(account, at):
