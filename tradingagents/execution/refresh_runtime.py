@@ -13,8 +13,9 @@ from tradingagents.charting.bars import instant
 from tradingagents.execution.paper_runtime import _latest_source, _read, _runtime_session
 
 
-REFRESH_AFTER_SECONDS = 120
-ATTEMPT_INTERVAL_SECONDS = 300
+REFRESH_AFTER_SECONDS = 60
+ATTEMPT_INTERVAL_SECONDS = 60
+FAILURE_RETRY_SECONDS = 300
 MAX_CONSECUTIVE_FAILURES = 3
 
 
@@ -70,14 +71,14 @@ def refresh_due(archive, state, *, now, dry_run=False, clock=None, executor=None
         day = now.astimezone(ZoneInfo(zone)).date().isoformat()
         failures = prior.get("consecutive_failures", 0) if prior.get("session_date") == day else 0
         target = f"execution-freshness-{market}"
-        # Windows launches drift by fractions of a second. A successful 09:05:05
-        # must not suppress the next scheduled 09:10:04 tick. Allow one successful
-        # refresh per five-minute UTC slot; failed/in-flight attempts retain the
+        # Windows launches drift by fractions of a second. Allow one successful
+        # refresh per minute UTC slot; failed/in-flight attempts retain the
         # full elapsed cooldown. The source-age gate above still applies.
         next_success_slot = (started is not None and prior.get("status") == "COMPLETED"
             and int(now.timestamp()) // ATTEMPT_INTERVAL_SECONDS
             > int(started.timestamp()) // ATTEMPT_INTERVAL_SECONDS)
-        if started and (now - started).total_seconds() < ATTEMPT_INTERVAL_SECONDS and not next_success_slot:
+        cooldown = ATTEMPT_INTERVAL_SECONDS if prior.get("status") == "COMPLETED" else FAILURE_RETRY_SECONDS
+        if started and (now - started).total_seconds() < cooldown and not next_success_slot:
             results.append({"target": target, "status": "REFRESH_COOLDOWN"})
             continue
         if not isinstance(failures, int) or isinstance(failures, bool) or failures < 0 or failures >= MAX_CONSECUTIVE_FAILURES:
@@ -102,7 +103,9 @@ def refresh_due(archive, state, *, now, dry_run=False, clock=None, executor=None
             checkpoint = now.astimezone(ZoneInfo(zone)).strftime("%H:%M")
             config = replace(config, run=replace(config.run, run_mode="overlay_only"),
                 storage=replace(config.storage, archive_dir=archive), execution=replace(config.execution,
-                    execution_refresh_enabled=True, execution_refresh_checkpoints_kst=(),
+                    execution_refresh_enabled=True, execution_lightweight_refresh=True,
+                    execution_max_data_age_seconds=120, execution_llm_summary_model=None,
+                    execution_refresh_checkpoints_kst=(),
                     execution_refresh_checkpoints_local=(checkpoint,), execution_checkpoint_timezone=zone,
                     execution_session_gate_enabled=True, execution_selective_rerun_enabled=False))
             result = (executor or execute_scheduled_run)(config, run_label=f"local-freshness-{market}-overlay",

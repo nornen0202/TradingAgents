@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from dataclasses import replace
 from types import SimpleNamespace
 import json
 
@@ -38,13 +39,17 @@ def test_minute_source_survives_off_grid_delivery_without_retimestamping(tmp_pat
     assert candidates(run, 'US', h.now, (h.ticker,)) == []
 
 
-def test_overlay_does_not_render_identical_review_again_after_bundle(tmp_path, monkeypatch):
+@pytest.mark.parametrize("lightweight", [False, True])
+def test_overlay_does_not_render_identical_review_again_after_bundle(tmp_path, monkeypatch, lightweight):
     _write_full_overlay_baseline(tmp_path, tickers=['AAPL'])
     path = tmp_path / 'config.toml'
     path.write_text('[run]\nmarket="US"\ntickers=["AAPL"]\nrun_mode="overlay_only"\n'
         f'[storage]\narchive_dir="{tmp_path.as_posix()}"\nsite_dir="{(tmp_path / "site").as_posix()}"\n'
         '[execution]\nenabled=true\ncheckpoints_kst=["00:00"]\n', encoding='utf-8')
     monkeypatch.setattr(runner, 'collect_event_news', lambda **_: {})
+    if lightweight:
+        monkeypatch.setattr(runner, 'collect_event_news', lambda **_: pytest.fail('news belongs to scheduled research'))
+        monkeypatch.setattr(runner, 'collect_event_signals', lambda **_: pytest.fail('selective rerun is disabled'))
     monkeypatch.setattr(runner, '_resolve_run_trade_date', lambda **_: '2026-10-16')
     def overlay(**kwargs):
         review = kwargs['run_dir'] / 'tickers/AAPL/investment_review.html'
@@ -53,7 +58,32 @@ def test_overlay_does_not_render_identical_review_again_after_bundle(tmp_path, m
         return _fake_overlay_updates(**kwargs)
     monkeypatch.setattr(runner, '_run_execution_overlay_passes', overlay)
     monkeypatch.setattr(runner, '_refresh_integrated_review', lambda *a, **k: pytest.fail('duplicate review delays execution'))
-    manifest = runner.execute_scheduled_run(load_scheduled_config(path), skip_site_build=True)
+    config = load_scheduled_config(path)
+    config = replace(config, execution=replace(config.execution, execution_lightweight_refresh=lightweight))
+    manifest = runner.execute_scheduled_run(config, skip_site_build=True)
     assert manifest['status'] == 'success'
     run = next(p.parent for p in (tmp_path / 'runs').glob('*/*/run.json') if json.loads(p.read_text(encoding='utf-8'))['run_id'] == manifest['run_id'])
     assert (run / 'tickers/AAPL/investment_review.html').read_text() == 'fresh checkpoint review'
+
+
+@pytest.mark.parametrize('mode', ['full', 'overlay_only'])
+def test_lightweight_cli_only_changes_explicit_overlay(tmp_path, monkeypatch, mode):
+    path = tmp_path / 'config.toml'
+    path.write_text('[run]\nmarket="US"\ntickers=["AAPL"]\n', encoding='utf-8')
+    calls = []
+    def execute(config, **kwargs):
+        calls.append(config)
+        return {'status':'success','run_id':'fixture','summary':{'successful_tickers':1,'failed_tickers':0}}
+    monkeypatch.setattr(runner, 'execute_scheduled_run', execute)
+    args = ['--config', str(path), '--run-mode', mode, '--lightweight-execution-refresh']
+    if mode == 'full':
+        with pytest.raises(SystemExit) as error:
+            runner.main(args)
+        assert error.value.code == 2 and not calls
+    else:
+        assert runner.main(args) == 0
+        settings = calls[0].execution
+        assert settings.execution_lightweight_refresh is True
+        assert settings.execution_refresh_enabled is True
+        assert settings.execution_selective_rerun_enabled is False
+        assert settings.execution_max_data_age_seconds == 120

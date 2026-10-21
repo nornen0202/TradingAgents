@@ -306,6 +306,34 @@ def test_empty_bars_are_not_executable(market):
         dv.normalize_validation_quote(market=market, chart=chart, orderbook=book, observed_at=NOW)
 
 
+@pytest.mark.parametrize("status", ["clear", "halted", "unknown", "expired", "future", "missing"])
+def test_roundtrip_us_quote_requires_fresh_reported_halt_evidence(monkeypatch, status):
+    from types import SimpleNamespace
+    from tradingagents.portfolio.kis import KisClient
+    from tradingagents.dataflows.intraday import us_halts
+    now = datetime.fromisoformat("2026-10-19T10:00:00-04:00")
+    chart, book = chart_and_book("US")
+    client = SimpleNamespace(overseas_time_itemchartprice=lambda *a, **k: chart,
+        overseas_asking_price=lambda *a, **k: book, session=SimpleNamespace(close=lambda: None))
+    monkeypatch.setattr(KisClient, 'from_api_keys', lambda **kwargs: client)
+    def fetch(symbol, *, traded_bars):
+        assert symbol == 'AAPL' and traded_bars
+        published = now + timedelta(seconds=1) if status == 'future' else now - timedelta(seconds=120 if status == 'expired' else 5)
+        return {'status': 'clear' if status in {'clear', 'expired', 'future', 'missing'} else status,
+                'is_clear': status not in {'halted', 'unknown'}, 'source': 'nasdaq.current_trade_halts',
+                'basis': 'CURRENT_DAY_HALT_FEED_PLUS_DATED_TRADED_BAR',
+                'published_at': None if status == 'missing' else published.isoformat(),
+                'observed_at': now.isoformat(), 'as_of': now.isoformat()}
+    monkeypatch.setattr(us_halts.current_halts, 'fetch', fetch)
+    if status == 'clear':
+        quote = dv.current_quote('US', lambda: now, require_us_halt=True)
+        assert quote['luld_status']['price_bands_available'] is False
+        assert quote['reg_sho_status']['short_sales_supported'] is False
+    else:
+        with pytest.raises(ValueError, match='US_TRADING_HALT_NOT_CLEAR'):
+            dv.current_quote('US', lambda: now, require_us_halt=True)
+
+
 def test_domestic_undated_book_is_excluded_without_inventing_date_or_bid_ask():
     chart, book = chart_and_book()
     del book["output1"]["stck_bsop_date"]

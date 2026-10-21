@@ -3,7 +3,8 @@ param(
     [string] $RepositoryRoot = "C:\Projects\TradingAgents",
     [string] $ArchiveRoot = "C:\TradingAgentsData\archive",
     [string] $InstallRoot = "C:\TradingAgentsMaintenance",
-    [ValidateSet(5, 10, 15, 20, 30, 60)][int] $PollIntervalMinutes = 5,
+    [ValidateSet(1, 5, 10, 15, 20, 30, 60)][int] $PollIntervalMinutes = 5,
+    [ValidateSet(1, 5)][int] $ExecutionPollIntervalMinutes = 1,
     [switch] $UpdateScriptsOnly,
     [switch] $NoStart
 )
@@ -45,14 +46,14 @@ if ($PSCmdlet.ShouldProcess($installedScript, "Install independent local analysi
         $hiddenLauncher = Join-Path $InstallRoot 'run_powershell_hidden.vbs'
         $arguments = "//B //Nologo `"$hiddenLauncher`" `"$installedScript`" -Command $command -RepositoryRoot `"$RepositoryRoot`" -ArchiveRoot `"$ArchiveRoot`""
         $action = New-ScheduledTaskAction -Execute (Join-Path $env:SystemRoot 'System32\wscript.exe') -Argument $arguments
-        # Five-minute production ticks retain the 01:00/03:00 and
-        # 10:30/13:30/14:30 overlay boundaries. Offset publishing to avoid
-        # contending for the shared source-fetch lock on every idle tick.
+        # Execution data expires in 120 seconds. Poll its producer every minute;
+        # publication keeps its independent, slower interval.
+        $interval = if ($command -eq 'run-due') { $ExecutionPollIntervalMinutes } else { $PollIntervalMinutes }
         $offset = if ($command -eq 'publish') { 2 } else { 0 }
         $now = [DateTime]::Now
         $anchor = $now.Date.AddMinutes($offset)
-        $nextTick = $anchor.AddMinutes(([Math]::Floor(($now - $anchor).TotalMinutes / $PollIntervalMinutes) + 1) * $PollIntervalMinutes)
-        $trigger = New-ScheduledTaskTrigger -Once -At $nextTick -RepetitionInterval (New-TimeSpan -Minutes $PollIntervalMinutes)
+        $nextTick = $anchor.AddMinutes(([Math]::Floor(($now - $anchor).TotalMinutes / $interval) + 1) * $interval)
+        $trigger = New-ScheduledTaskTrigger -Once -At $nextTick -RepetitionInterval (New-TimeSpan -Minutes $interval)
         $logon = New-ScheduledTaskTrigger -AtLogOn -User $identity
         $logon.Delay = if ($command -eq 'publish') { 'PT2M' } else { 'PT30S' }
         $triggers = @($trigger, $logon)

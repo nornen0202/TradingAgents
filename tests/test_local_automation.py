@@ -216,6 +216,24 @@ def test_producer_lock_does_not_block_publication(tmp_path):
                 pass
 
 
+@pytest.mark.parametrize('enabled', [False, True])
+def test_scheduled_overlay_cannot_starve_enabled_paper_refresh(tmp_path, monkeypatch, enabled):
+    from tradingagents.scheduled import runner
+    item = target()
+    item.workflow_file = 'intraday-overlay-refresh.yml'
+    monkeypatch.setattr(local, 'script', lambda _: SimpleNamespace(due_targets=lambda *a, **k: [item]))
+    monkeypatch.setattr(local, 'local_target_window_start', lambda *a, **k: item.window_start_kst)
+    monkeypatch.setattr(runner, '_iter_run_manifests_desc', lambda _: [])
+    calls = []
+    monkeypatch.setattr(local.subprocess, 'run', lambda args, **kw: calls.append(args) or SimpleNamespace(returncode=0))
+    if enabled:
+        local.atomic_write_json(tmp_path/'paper/enabled.json', {'enabled':True,'mode':'LOCAL_PAPER_ONLY','real_orders_enabled':False})
+    local.run_due(tmp_path/'archive',tmp_path,now=datetime(2026,10,9,12,tzinfo=timezone.utc))
+    assert len(calls) == 1
+    assert ('--lightweight-execution-refresh' in calls[0]) is enabled
+    assert calls[0][calls[0].index('--run-mode')+1] == 'overlay_only'
+
+
 def test_drain_waits_without_cancelling_existing_producer(tmp_path, monkeypatch):
     monkeypatch.setattr(local.subprocess, "check_output", lambda *a, **k: "local\n")
     monkeypatch.setattr(local, "github_active_writers", lambda: [37977141414])

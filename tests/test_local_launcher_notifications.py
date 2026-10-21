@@ -346,9 +346,9 @@ if($env:TA_INTERVAL -ne '5'){$options.PollIntervalMinutes=[int]$env:TA_INTERVAL}
         assert action['limit'] == 'PT13H'
         timer, logon, *critical = action['triggers']
         assert timer['type'] == 'MSFT_TaskTimeTrigger'
-        assert timer['interval'] == f'PT{interval}M'
+        assert timer['interval'] == f'PT{interval if command == "publish" else 1}M'
         tick = datetime.fromisoformat(timer['at'])
-        assert tick.minute % interval == (2 if command == 'publish' else 0)
+        assert tick.minute % (interval if command == 'publish' else 1) == (2 if command == 'publish' else 0)
         assert tick.second == 0
         assert logon['type'] == 'MSFT_TaskLogonTrigger'
         assert logon['delay'] == ('PT2M' if command == 'publish' else 'PT30S')

@@ -135,6 +135,8 @@ class ExecutionSettings:
     execution_selective_rerun_enabled: bool = True
     execution_llm_summary_model: str | None = None
     execution_publish_debug: bool = False
+    # Internal minute refresh: reuse research, omit slow report enrichment.
+    execution_lightweight_refresh: bool = False
 
 
 @dataclass(frozen=True)
