@@ -1,8 +1,9 @@
 """Continuous strategy execution on fixed KIS VTS hosts after proven validation.
 
 No live broker routing, model call, fabricated signal or inferred settlement.
-The existing strategy supplies direction and budget; the demo account supplies
-capacity. Validation probes and local shadow trades are never strategy fills.
+The existing strategy supplies direction; explicit allocation policy and the
+demo account supply size/capacity. Validation probes and local shadow trades
+are never strategy fills.
 """
 from __future__ import annotations
 
@@ -21,6 +22,7 @@ from tradingagents.atomic_io import atomic_write_json, interprocess_file_lock
 from . import demo_validation as validation
 from .archive_paper import build_step
 from .source_diagnostics import diagnose_source
+from . import demo_strategy_plan
 from .kis_demo import DemoCredentials, KisDemoClient
 from .kis_paper import KisPaperBroker, PaperOrderPolicy, _fresh, _tick
 from .paper_runtime import _latest_source, _runtime_session
@@ -101,7 +103,8 @@ def current_quote(market, ticker, clock):
             if not isinstance(chart, dict) or not chart.get("output2"):
                 continue
             book = client.overseas_asking_price(code, exchange=venue)
-            return validation.normalize_validation_quote(market=market, chart=chart, orderbook=book, observed_at=clock(), instrument={**config, "exchange": exchange})
+            quote = validation.normalize_validation_quote(market=market, chart=chart, orderbook=book, observed_at=clock(), instrument={**config, "exchange": exchange})
+            return validation.attach_us_halt_evidence(quote, chart, ticker, clock)
         raise ValueError("QUOTE_UNVERIFIED")
     finally:
         client.session.close()
@@ -152,7 +155,22 @@ def limit_price(quote, side, market):
 
 
 def quantity(candidate, price, account, market, owned, now):
-    """Cap the explicit proposal, never copy real holdings or invent a budget."""
+    """Apply the selected allocation policy using verified demo capacity."""
+    if candidate.get("allocation_mode") == demo_strategy_plan.MODE:
+        _fresh(account, now=now, seconds=120)
+        if account.get("complete") is not True or account.get("environment") != "demo":
+            raise ValueError("STRATEGY_ACCOUNT_UNVERIFIED")
+        suffix = "krw" if market == "KR" else "usd"
+        if candidate["side"] == "BUY":
+            permitted = (account["cash_only_buying_quantity"] >= 1
+                         and account[f"cash_only_buying_power_{suffix}"] >= price * 1.003
+                         and owned.get(candidate["ticker"], 0) == 0)
+        else:
+            position = next((p for p in account["positions"] if p["ticker"] == candidate["signal"]["ticker"]), {})
+            permitted = owned.get(candidate["ticker"], 0) >= 1 and position.get("sellable_quantity", 0) >= 1
+        if not permitted or price > CAPS[market]:
+            raise ValueError("NO_STRATEGY_QUANTITY_WITHIN_LIMITS")
+        return 1
     proposal = candidate["proposal"]
     qty = proposal.get("estimated_qty")
     if qty is not None and (isinstance(qty, bool) or not isinstance(qty, (int, float)) or not math.isfinite(qty) or qty <= 0 or int(qty) != qty):
@@ -185,11 +203,16 @@ def initialize(db):
         id TEXT PRIMARY KEY, ticker TEXT NOT NULL, run_id TEXT NOT NULL,
         prepared_at TEXT NOT NULL, terms TEXT NOT NULL, state TEXT NOT NULL)""")
     db.execute("CREATE TABLE IF NOT EXISTS strategy_valuations(observed_at TEXT PRIMARY KEY, payload TEXT NOT NULL)")
+    db.execute("CREATE TABLE IF NOT EXISTS strategy_source_evidence(id TEXT PRIMARY KEY, evidence TEXT NOT NULL)")
     db.executescript("""
         CREATE TRIGGER IF NOT EXISTS strategy_terms_no_update BEFORE UPDATE OF id,ticker,run_id,prepared_at,terms ON strategy_attempts
             BEGIN SELECT RAISE(ABORT,'Strategy intent terms are immutable'); END;
         CREATE TRIGGER IF NOT EXISTS strategy_attempts_no_delete BEFORE DELETE ON strategy_attempts
             BEGIN SELECT RAISE(ABORT,'Strategy consumption cannot be reset'); END;
+        CREATE TRIGGER IF NOT EXISTS strategy_source_no_update BEFORE UPDATE ON strategy_source_evidence
+            BEGIN SELECT RAISE(ABORT,'Strategy source evidence is immutable'); END;
+        CREATE TRIGGER IF NOT EXISTS strategy_source_no_delete BEFORE DELETE ON strategy_source_evidence
+            BEGIN SELECT RAISE(ABORT,'Strategy source evidence cannot be reset'); END;
     """)
 
 
@@ -282,7 +305,8 @@ def summary(db, now, market, marks=None):
                 "observed_at": now.isoformat(), "mark_times": mark_times}}
 
 
-def advance(archive, root, validation_root, market, *, clock, tickers, broker_factory, quote_loader, account_loader, session_resolver, gate):
+def advance(archive, root, validation_root, market, *, clock, tickers, broker_factory, quote_loader, account_loader, session_resolver, gate,
+            allocation_mode="ARCHIVED_PROPOSALS"):
     now, path = at(clock()), root / f"{market.lower()}-strategy.sqlite"
     result = {"status": "WAITING_VALIDATION", "blockers": [], "gate_passed": False, "orders": [], "order_counts": {}, "performance": None}
     def finish(status, *blockers):
@@ -353,10 +377,17 @@ def advance(archive, root, validation_root, market, *, clock, tickers, broker_fa
                 issues.append("STRATEGY_ACCOUNT_POSITION_UNVERIFIED")
         if broker.db.execute("SELECT 1 FROM requests WHERE status='UNKNOWN'").fetchone() or broker.db.execute("SELECT 1 FROM reconciliation_issues").fetchone():
             issues.append("AMBIGUOUS_ORDER")
-        source = _latest_source(archive, market.lower(), at(clock()))
+        source = (_latest_source(archive, market.lower(), at(clock()),
+                  required_artifacts=("decision_bundle_v2.json", "portfolio-private/portfolio_candidates.json"))
+                  if allocation_mode == demo_strategy_plan.MODE else _latest_source(archive, market.lower(), at(clock())))
         try:
-            result["source_diagnostics"] = diagnose_source(source, at(clock()))
-            signals = candidates(source, market, at(clock()), tickers) if source else []
+            result["source_diagnostics"] = diagnose_source(source, at(clock()),
+                include_proposals=allocation_mode != demo_strategy_plan.MODE)
+            if allocation_mode == demo_strategy_plan.MODE and source:
+                signals, plan_diagnostics = demo_strategy_plan.plan(source, market, at(clock()), tickers, current["owned"])
+                result["allocation_diagnostics"] = plan_diagnostics
+            else:
+                signals = candidates(source, market, at(clock()), tickers) if source else []
         except Exception:
             signals = []
             issues.append("SOURCE_EVIDENCE_UNVERIFIED")
@@ -381,6 +412,14 @@ def advance(archive, root, validation_root, market, *, clock, tickers, broker_fa
             for candidate in signals:
                 if broker.db.execute("SELECT 1 FROM strategy_attempts WHERE id=?", (candidate["id"],)).fetchone():
                     continue
+                if candidate.get("allocation_mode") == demo_strategy_plan.MODE and candidate["side"] == "BUY":
+                    # One new entry per session leaves capacity for a legitimate
+                    # strategy exit under the unchanged three-order broker cap.
+                    if any(at(row[0]).astimezone(ZoneInfo(ZONES[market])).date() == today
+                           and json.loads(row[1])["side"] == "BUY"
+                           for row in broker.db.execute("SELECT prepared_at,terms FROM strategy_attempts")):
+                        issues.append("DAILY_NEW_ENTRY_LIMIT")
+                        continue
                 considered += 1
                 if considered > 3:
                     break
@@ -404,8 +443,14 @@ def advance(archive, root, validation_root, market, *, clock, tickers, broker_fa
                 if at(clock()) >= at(session["session_close"]) - timedelta(minutes=10):
                     issues.append("SESSION_EDGE")
                     break
+                if at(clock()) >= entry_deadline:
+                    issues.append("STRATEGY_SIGNAL_EXPIRED_DURING_PREPARATION")
+                    continue
                 signal = {**candidate["signal"], "valid_until": entry_deadline.isoformat()}
                 broker.db.execute("INSERT INTO strategy_attempts VALUES (?,?,?,?,?,?)", (candidate["id"], candidate["ticker"], candidate["run_id"], at(clock()).isoformat(), json.dumps(terms, sort_keys=True), "PREPARED"))
+                if candidate.get("evidence"):
+                    broker.db.execute("INSERT INTO strategy_source_evidence VALUES (?,?)",
+                                      (candidate["id"], json.dumps(candidate["evidence"], sort_keys=True)))
                 try:
                     broker.submit(intent_id=candidate["id"], **terms, signal=signal, quote=quote, account=account)
                 except Exception:
@@ -441,6 +486,9 @@ def tick(archive, root, validation_root, *, clock=None, broker_factory=None, quo
         except (ValueError, OSError):
             config = {}
         enabled = isinstance(config, dict) and config.get("mode") == MODE and config.get("enabled") is True and config.get("real_orders_enabled") is False
+        allocation_mode = config.get("allocation_mode", "ARCHIVED_PROPOSALS") if isinstance(config, dict) else "ARCHIVED_PROPOSALS"
+        if allocation_mode not in {"ARCHIVED_PROPOSALS", demo_strategy_plan.MODE}:
+            raise ValueError("INVALID_STRATEGY_ALLOCATION_MODE")
         markets = {}
         for market in ZONES:
             if not enabled:
@@ -450,7 +498,7 @@ def tick(archive, root, validation_root, *, clock=None, broker_factory=None, quo
                 markets[market] = advance(archive, root, validation_root, market, clock=clock, tickers=(tickers or universe())[market],
                     broker_factory=broker_factory or broker_context, quote_loader=quote_loader or current_quote,
                     account_loader=account_loader or validation.current_account, session_resolver=session_resolver or _runtime_session,
-                    gate=gate or validation_gate)
+                    gate=gate or validation_gate, allocation_mode=allocation_mode)
             except Exception:
                 markets[market] = {"status": "BLOCKED", "checked_at": at(clock()).isoformat(), "gate_passed": False, "blockers": ["RUNTIME_EVIDENCE_UNVERIFIED"]}
         finished = at(clock())

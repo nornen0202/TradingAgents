@@ -6,11 +6,12 @@ import re
 from tradingagents.charting.bars import instant
 
 
-def diagnose_source(source, now):
+def diagnose_source(source, now, *, include_proposals=True):
     if source is None:
         return {"status": "NO_SOURCE", "blockers": ["NO_RECENT_COMPLETED_SOURCE"]}
     bundle = json.loads((source / "decision_bundle_v2.json").read_text(encoding="utf-8-sig"))
-    proposals = json.loads((source / "portfolio-private/proposed_orders.json").read_text(encoding="utf-8-sig")).get("orders", [])
+    proposals = (json.loads((source / "portfolio-private/proposed_orders.json").read_text(encoding="utf-8-sig")).get("orders", [])
+                 if include_proposals else None)
     generated = instant(bundle.get("generated_at"))
     rows = bundle.get("strategy_table", [])
     reasons = Counter()
@@ -31,7 +32,7 @@ def diagnose_source(source, now):
         blockers.append("SOURCE_SIGNALS_EXPIRED_OR_UNDATED")
     elif rows and not ready:
         blockers.append("SOURCE_DATA_NOT_EXECUTION_READY")
-    return {"status": "BLOCKED" if blockers else "NO_ALLOCATED_ORDERS" if not proposals else "PROPOSALS_AVAILABLE",
+    return {"status": "BLOCKED" if blockers else "EXECUTION_OBSERVATIONS_AVAILABLE" if proposals is None else "NO_ALLOCATED_ORDERS" if not proposals else "PROPOSALS_AVAILABLE",
             "blockers": blockers, "strategy_rows": len(rows), "fresh_rows": fresh,
-            "execution_ready_rows": ready, "allocated_orders": len(proposals),
+            "execution_ready_rows": ready, "allocated_orders": len(proposals) if proposals is not None else None,
             "reason_counts": dict(sorted(reasons.items()))}

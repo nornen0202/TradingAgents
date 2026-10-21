@@ -1,11 +1,57 @@
 """Exercise the installed wrapper's native-process boundary on Windows PowerShell."""
 
 import shutil
+import json
 import subprocess
 import sys
 from pathlib import Path
 
 import pytest
+
+
+@pytest.mark.skipif(not shutil.which("powershell.exe"), reason="Windows PowerShell required")
+@pytest.mark.parametrize("case", ["fresh", "expired", "future", "invalid", "changed", "missing_ref", "fetch_failed"])
+def test_shared_source_fetch_receipt_is_bounded_and_fails_closed(tmp_path, case):
+    wrapper = (Path(__file__).parents[1] / "tools/run_local_automation.ps1").read_text()
+    function = wrapper.split("# Never change the user's checkout", 1)[0].split("function Resolve-LocalAutomationSourceRevision", 1)[1]
+    function = "function Resolve-LocalAutomationSourceRevision" + function
+    root = "'" + str(tmp_path).replace("'", "''") + "'"
+    probe = tmp_path / "probe.ps1"
+    probe.write_text("$ErrorActionPreference='Stop'\n" + function + f"\n$root={root}\n$case='{case}'\n" + r'''
+$script:fetches=0
+$script:reads=0
+$script:fixtureHead='a'*40
+function git {
+    $global:LASTEXITCODE=0
+    if ($args[0] -eq 'fetch') {
+        $script:fetches++
+        if ($case -eq 'fetch_failed') { $global:LASTEXITCODE=1 }
+        return
+    }
+    $script:reads++
+    if ($case -eq 'missing_ref' -and $script:reads -eq 1) { throw 'missing ref' }
+    return $script:fixtureHead
+}
+$age=if ($case -eq 'expired') { -61 } elseif ($case -eq 'future') { 61 } else { -1 }
+$revision=if ($case -eq 'changed') { 'b'*40 } else { $script:fixtureHead }
+$receipt=Join-Path $root 'source-fetch.json'
+if ($case -notin @('missing_ref','fetch_failed')) {
+    @{revision=$revision;checked_at=[DateTimeOffset]::UtcNow.AddSeconds($age).ToString('o')} |
+        ConvertTo-Json | Set-Content -LiteralPath $receipt
+}
+if ($case -eq 'invalid') { Set-Content -LiteralPath $receipt -Value 'broken' }
+$failed=$false
+try { $resolved=Resolve-LocalAutomationSourceRevision -StateRoot $root } catch { $failed=$true }
+@{fetches=$script:fetches;failed=$failed;resolved=$resolved} | ConvertTo-Json -Compress
+''')
+    result = subprocess.run(["powershell.exe", "-NoProfile", "-NonInteractive", "-File", str(probe)],
+                            capture_output=True, text=True, timeout=15)
+    assert result.returncode == 0, result.stderr
+    row = json.loads(result.stdout)
+    assert row["fetches"] == (0 if case == "fresh" else 1)
+    assert row["failed"] is (case == "fetch_failed")
+    if case != "fetch_failed":
+        assert row["resolved"] == "a" * 40
 
 
 @pytest.mark.skipif(not shutil.which("powershell.exe"), reason="Windows PowerShell required")

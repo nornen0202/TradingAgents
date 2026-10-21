@@ -28,7 +28,9 @@ def _read(path, default=None):
     return json.loads(path.read_text(encoding="utf-8-sig"))
 
 
-def _latest_source(archive, market, now):
+def _latest_source(archive, market, now, *, required_artifacts=None):
+    if required_artifacts is None:
+        required_artifacts = ("decision_bundle_v2.json", "portfolio-private/account_snapshot.json", "portfolio-private/proposed_orders.json")
     # Canonical run IDs are validated before becoming a filesystem component.
     for path in sorted((archive / "runs").glob("*/*/run.json"), reverse=True):
         try:
@@ -43,8 +45,7 @@ def _latest_source(archive, market, now):
                 continue
             if path.parent.name != manifest.get("run_id"):
                 continue
-            if all((path.parent / name).is_file() for name in (
-                "decision_bundle_v2.json", "portfolio-private/account_snapshot.json", "portfolio-private/proposed_orders.json")):
+            if all((path.parent / name).is_file() for name in required_artifacts):
                 return path.parent
         except (ValueError, TypeError, AttributeError):
             continue

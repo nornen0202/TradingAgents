@@ -169,7 +169,8 @@ def test_real_wrapper_captures_fetch_failure_before_python(sandbox):
     path, = (repo / ".runtime/local-automation/notifications/events").glob("*.json")
     assert local.read(path)["error_type"] == "SourceFetchFailed"
     calls = (tmp_path / "calls.txt").read_text().splitlines()
-    assert calls[0] == "git fetch fork main --quiet" and calls[1].startswith("gh workflow run ")
+    assert calls[:2] == ["git rev-parse fork/main", "git fetch fork main --quiet"]
+    assert calls[2].startswith("gh workflow run ")
 
 
 def test_concurrent_launchers_share_new_main_revision_without_fetch_race(sandbox):
@@ -214,6 +215,13 @@ class Worker {
     compiled = ps("Add-Type -TypeDefinition $env:TA_TEST_SOURCE -OutputAssembly $env:TA_TEST_EXE -OutputType ConsoleApplication", env)
     assert compiled.returncode == 0, compiled.stderr
     for iteration in range(3):
+        # Each iteration represents the next cache period. Workers within the
+        # period deliberately share a single fetch under the repository mutex.
+        receipt = repo / ".runtime/local-automation/source-fetch.json"
+        if receipt.exists():
+            saved = json.loads(receipt.read_text(encoding="utf-8-sig"))
+            saved["checked_at"] = "2020-01-01T00:00:00Z"
+            receipt.write_text(json.dumps(saved))
         (writer / "tracked.txt").write_text(str(iteration))
         git("commit", "-qam", f"new main {iteration}", cwd=writer)
         git("push", "-q", "fork", "main", cwd=writer)

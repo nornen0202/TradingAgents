@@ -67,6 +67,17 @@ def test_intraday_breakout_actionable_now():
     assert update.decision_state == DecisionState.ACTIONABLE_NOW
 
 
+def test_watch_breakout_without_entry_authorization_never_becomes_actionable():
+    now = datetime.now(timezone.utc)
+    contract = _contract(breakout_confirmation=BreakoutConfirmation.INTRADAY_ABOVE,
+                         action_if_triggered=ActionIfTriggered.NONE)
+    update = evaluate_execution_state(contract, _market(price=101, rvol=1.4, now=now), now=now, max_data_age_seconds=120)
+    assert update.decision_state != DecisionState.ACTIONABLE_NOW
+    assert update.decision_now.value == "NONE"
+    assert update.execution_timing_state.value != "PILOT_READY"
+    assert "entry_not_authorized" in update.reason_codes
+
+
 def test_stale_market_data_degraded():
     now = datetime.now(timezone.utc)
     update = evaluate_execution_state(_contract(), _market(price=101.0, rvol=1.4, age_seconds=600), now=now, max_data_age_seconds=180)
