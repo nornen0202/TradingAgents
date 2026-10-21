@@ -4048,18 +4048,23 @@ def _bootstrap_overlay_inputs_from_latest_run(
             source_ticker_dir=source_analysis.parent, target_ticker_dir=target_ticker_dir,
             source_run_dir=source_run_dir, run_dir=run_dir,
             existing_artifacts=copied_source_artifacts))
-        copied_source_artifacts.update(
-            _copy_latest_microstructure_artifacts(
-                archive_dir=config.storage.archive_dir,
-                run_dir=run_dir,
-                target_ticker_dir=target_ticker_dir,
-                ticker=source_ticker,
-                analysis_source_run_id=source_run_id,
-                existing_artifacts=copied_source_artifacts,
-                max_data_age_seconds=config.execution.execution_max_data_age_seconds,
-                checkpoint_timezone=_execution_checkpoint_timezone(config),
+        # A lightweight refresh fetches new execution evidence immediately.
+        # Searching the entire archive once per ticker for optional historical
+        # fields can take minutes in production and starve the next refresh.
+        # Failure of the new fetch must stay unavailable, not borrow old data.
+        if not config.execution.execution_lightweight_refresh:
+            copied_source_artifacts.update(
+                _copy_latest_microstructure_artifacts(
+                    archive_dir=config.storage.archive_dir,
+                    run_dir=run_dir,
+                    target_ticker_dir=target_ticker_dir,
+                    ticker=source_ticker,
+                    analysis_source_run_id=source_run_id,
+                    existing_artifacts=copied_source_artifacts,
+                    max_data_age_seconds=config.execution.execution_max_data_age_seconds,
+                    checkpoint_timezone=_execution_checkpoint_timezone(config),
+                )
             )
-        )
 
         contract_rel = artifacts.get("execution_contract_json")
         target_contract = target_ticker_dir / "execution_contract.json"

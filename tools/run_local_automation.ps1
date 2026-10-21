@@ -71,6 +71,7 @@ try {
     $env:TRADINGAGENTS_YOUTUBE_ARCHIVE_DIR = Join-Path $ArchiveRoot "youtube-archive"
     $env:TRADINGAGENTS_MARKET_CALENDAR_CACHE_PATH = Join-Path $stateRoot "market-calendar.json"
     $env:TRADINGAGENTS_AUTOMATION_BACKEND = "local"
+    $env:TRADINGAGENTS_SCHEDULED_CONSUMER_STATE_ROOT = $stateRoot
     $runtimeSettingsPath = Join-Path $stateRoot 'runtime-settings.json'
     if (Test-Path -LiteralPath $runtimeSettingsPath) {
         $runtimeSettings = Get-Content -LiteralPath $runtimeSettingsPath -Raw | ConvertFrom-Json
