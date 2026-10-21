@@ -46,7 +46,8 @@ def setup_handoff(tmp_path, monkeypatch):
 def test_handoff_preserves_existing_roots_and_independent_consumers(tmp_path, monkeypatch):
     manifest = setup_handoff(tmp_path, monkeypatch)
     seen = []
-    def paper(archive, root):
+    def paper(archive, root, *, lock_timeout):
+        assert lock_timeout == 15
         seen.append(root)
         raise TimeoutError()
     def strategy(archive, root, validation):
@@ -62,6 +63,23 @@ def test_handoff_preserves_existing_roots_and_independent_consumers(tmp_path, mo
     assert result["real_orders_enabled"] is False
 
 
+def test_handoff_never_retries_a_timed_out_consumer_callback(tmp_path, monkeypatch):
+    manifest = setup_handoff(tmp_path, monkeypatch)
+    attempts = {"paper": 0, "kis": 0}
+    def paper(*args, lock_timeout):
+        assert lock_timeout == 15
+        attempts["paper"] += 1
+        raise TimeoutError("consumer may already have made progress")
+    def strategy(*args):
+        attempts["kis"] += 1
+        raise TimeoutError("unknown broker outcome must not trigger retry")
+    monkeypatch.setattr(paper_runtime, "tick", paper)
+    monkeypatch.setattr(demo_runtime, "tick", strategy)
+    result = delivery.handoff_completed_run(tmp_path / "archive", manifest)
+    assert attempts == {"paper": 1, "kis": 1}
+    assert all(row["status"] == "EXISTING_CONSUMER_RUNNING" for row in result["consumers"].values())
+
+
 @pytest.mark.parametrize("change", ["unset", "failed", "full", "disabled", "live", "malformed"])
 def test_handoff_never_enables_trading(tmp_path, monkeypatch, change):
     manifest = setup_handoff(tmp_path, monkeypatch)
@@ -75,7 +93,7 @@ def test_handoff_never_enables_trading(tmp_path, monkeypatch, change):
         if change == "live": config["real_orders_enabled"] = True
         if change == "malformed": config = []
         atomic_write_json(path, config)
-    monkeypatch.setattr(paper_runtime, "tick", lambda *a: pytest.fail("must remain off"))
+    monkeypatch.setattr(paper_runtime, "tick", lambda *a, **k: pytest.fail("must remain off"))
     monkeypatch.setattr(demo_runtime, "tick", lambda *a: pytest.fail("must remain off"))
     delivery.handoff_completed_run(tmp_path / "archive", manifest)
 
@@ -94,7 +112,7 @@ def test_immediate_handoff_consumes_original_signal_once_and_expiry_stays_strict
                          gate=h.gate,
                          tickers={"KR": (h.ticker,), "US": ("AAPL",)})
     monkeypatch.setattr(demo_runtime, "tick", consume)
-    monkeypatch.setattr(paper_runtime, "tick", lambda *a: {"markets": {}})
+    monkeypatch.setattr(paper_runtime, "tick", lambda *a, **k: {"markets": {}})
     delivery.handoff_completed_run(h.archive, manifest)
     assert len(h.orders) == 1
     delivery.handoff_completed_run(h.archive, manifest)

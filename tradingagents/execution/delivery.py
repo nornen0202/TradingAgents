@@ -12,6 +12,9 @@ from pathlib import Path
 from tradingagents.atomic_io import atomic_write_json
 
 
+PAPER_HANDOFF_LOCK_TIMEOUT_SECONDS = 15
+
+
 def handoff_completed_run(archive, manifest, *, state_root=None):
     configured = state_root or os.getenv("TRADINGAGENTS_LOCAL_PAPER_STATE_DIR")
     if (not configured or manifest.get("status") != "success"
@@ -41,7 +44,8 @@ def handoff_completed_run(archive, manifest, *, state_root=None):
     started = datetime.now(timezone.utc)
     with ThreadPoolExecutor(max_workers=2) as pool:
         paper = pool.submit(consume, "paper", "LOCAL_PAPER_ONLY",
-                            lambda: paper_runtime.tick(archive, root / "paper"))
+                            lambda: paper_runtime.tick(archive, root / "paper",
+                                lock_timeout=PAPER_HANDOFF_LOCK_TIMEOUT_SECONDS))
         strategy = pool.submit(consume, "kis-strategy", "KIS_DEMO_STRATEGY",
                                lambda: demo_runtime.tick(archive, root / "kis-strategy", root / "kis-validation"))
         results = {"paper": paper.result(), "kis_strategy": strategy.result()}
