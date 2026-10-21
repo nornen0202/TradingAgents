@@ -1,0 +1,1091 @@
+{
+  "schema": "tradingagents.work-context/v1",
+  "surface": "prism",
+  "event_id": "prism:31ff83286db488433c55f3de8df16d28",
+  "prompt_contract_version": "prism-work-v5",
+  "prompt_sha256": "2d6e6a207021f5126507994f77ca7850fa9bf42701a32286227ca874c1f535df",
+  "skill_sha256": "4dffe28b3721557cc2517b5afff2f94045832606e71ff61461df969f6abb53c7",
+  "task_manifest_sha256": "c0992fa275c9961bc91c679030c0b4d9b8b06f3d164226776421f1e354b5c22e",
+  "workflow_contract_sha256": "6e9bacf847e1ea3fede5d24780fde443897da2d480119b5ef7dfdc873bb87103",
+  "source_sha256": "02caec18a45ccfbfd9f1b5e3495647548a825a454e6037422c7c55187b224515",
+  "body": {
+    "kind": "prism",
+    "source_health": "OK",
+    "source": {
+      "health": "OK",
+      "run_id": "prism_telegram_20261021_090212",
+      "last_run_at": "2026-10-21T09:02:27.059822+09:00",
+      "status": "success",
+      "stale_after_hours": 30
+    },
+    "window_hours": 24,
+    "execution_eligible": false,
+    "evidence_policy": {
+      "profile": "balanced_external",
+      "material_thesis_effects": [
+        "ranking",
+        "confidence",
+        "position_size_within_existing_risk_limits",
+        "research_priority"
+      ],
+      "supported_evidence_weight": "MEDIUM",
+      "partially_supported_evidence_weight": "LOW_TO_MEDIUM",
+      "unverified_evidence_weight": "LOW_LABELED",
+      "user_primary_channels": [
+        "@kpunch",
+        "@sosumonkey"
+      ],
+      "user_primary_source_tier": "USER_PRIMARY",
+      "user_primary_evidence_weight": "HIGH",
+      "user_primary_validation_policy": "USER_ACCEPTED",
+      "matching_multi_source_signal_may_raise_thesis_priority": true,
+      "conflicting_signal_must_be_visible": true,
+      "may_bypass_market_or_portfolio_execution_gate": false
+    },
+    "coverage": {
+      "total_unique_events": 214,
+      "window_events": 21,
+      "transmitted_events": 21,
+      "truncated": false,
+      "oldest_occurred_at": "2026-10-20T18:36:22+00:00",
+      "newest_occurred_at": "2026-10-20T20:57:26+00:00"
+    },
+    "events": [
+      {
+        "event_key": "stock_ai_agent:16410",
+        "content_sha256": "8db3376f94e682c76959b445238c115a6beee82f07bb90a5b9aba366917c563a",
+        "occurred_at": "2026-10-20T20:57:26+00:00",
+        "relevance": {
+          "tickers": [],
+          "markets": [],
+          "themes": [],
+          "match_basis": "message_context"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "16410",
+          "posted_at": "2026-10-20T20:57:26+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16410",
+          "preview": "🏁 BTC 데모 시나리오 종료 · 정산 확인 🕐 10/21 05:56:42 KST 💵 청산 결과 정리 수량: 0.025 BTC 진입 → 청산: 82,561.00 USDT → 82,757.10 USDT 보유 시간: 70.3분 확정 순손익: 4.08 USDT • 시작 계좌 9,419.96 USDT 대비 +0.04% • 수수료 0.83 USDT · 펀딩 0.00 USDT 반영 💰 종료 후 순...",
+          "signals": [],
+          "signals_total": 0,
+          "signals_transmitted": 0,
+          "signals_truncated": false,
+          "simulation_only": true,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 259,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:16409",
+        "content_sha256": "ec3e5982566ee3e5fe9d778bac0851077b0bb03cfb4d05ddad75308c1ba15307",
+        "occurred_at": "2026-10-20T20:56:27+00:00",
+        "relevance": {
+          "tickers": [],
+          "markets": [],
+          "themes": [],
+          "match_basis": "message_context"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "16409",
+          "posted_at": "2026-10-20T20:56:27+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16409",
+          "preview": "🛡 BTC 데모 보호 변경 확인 · 롱 🕐 10/21 05:56:22 KST 📦 보유량 0.001 BTC · 평단 82,561.00 USDT 💰 계좌 순자산: 9,424.05 USDT • 총 증거금 8.32 USDT(계좌 0.09%) · 10배 · 교차 🛡 손절 SL 82,280.00 USDT · 남은 전량 • 예상 손익: -0.28 USDT · 계좌 -0.00% (1배 -0.34% /...",
+          "signals": [],
+          "signals_total": 0,
+          "signals_transmitted": 0,
+          "signals_truncated": false,
+          "simulation_only": true,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 612,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:16408",
+        "content_sha256": "5dbfee6537de4468c7b01712f3bc39c5c1e632d3ef75609f15074ac778d10219",
+        "occurred_at": "2026-10-20T20:51:28+00:00",
+        "relevance": {
+          "tickers": [],
+          "markets": [],
+          "themes": [],
+          "match_basis": "message_context"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "16408",
+          "posted_at": "2026-10-20T20:51:28+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16408",
+          "preview": "🛡 BTC 데모 보호 변경 확인 · 롱 🕐 10/21 05:51:23 KST 📦 보유량 0.001 BTC · 평단 82,561.00 USDT 💰 계좌 순자산: 9,424.04 USDT • 총 증거금 8.32 USDT(계좌 0.09%) · 10배 · 교차 🛡 손절 SL 82,280.00 USDT · 남은 전량 • 예상 손익: -0.28 USDT · 계좌 -0.00% (1배 -0.34% /...",
+          "signals": [],
+          "signals_total": 0,
+          "signals_transmitted": 0,
+          "signals_truncated": false,
+          "simulation_only": true,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 612,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:16407",
+        "content_sha256": "4bbec3d1299765817dbbfc37d1399fb91f507c1179df35c084fddd64f51c5fc0",
+        "occurred_at": "2026-10-20T20:50:28+00:00",
+        "relevance": {
+          "tickers": [],
+          "markets": [],
+          "themes": [],
+          "match_basis": "message_context"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "16407",
+          "posted_at": "2026-10-20T20:50:28+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16407",
+          "preview": "✂️ BTC 데모 부분 청산 체결 · 롱 🕐 10/21 05:49:40 KST 사유: 부분 익절 🧾 이번 체결: 0.008 BTC · 82,782.70 USDT • 체결금액(명목): 662.26 USDT · 증거금 아님 • 이번 청산 가격손익: +1.77 USDT · 계좌 +0.02% 수수료·펀딩 전 · 확정 순손익 아님 손익·비용 정산 미확정: 확정 수익으로 집계하지 않음 📦 전체 포...",
+          "signals": [],
+          "signals_total": 0,
+          "signals_transmitted": 0,
+          "signals_truncated": false,
+          "simulation_only": true,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 784,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:16406",
+        "content_sha256": "04e01fb51a10896d6949e0f1f1be57f16ebd9febbcdcc83c65a23aea2f4c0790",
+        "occurred_at": "2026-10-20T20:38:28+00:00",
+        "relevance": {
+          "tickers": [],
+          "markets": [],
+          "themes": [],
+          "match_basis": "message_context"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "16406",
+          "posted_at": "2026-10-20T20:38:28+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16406",
+          "preview": "✂️ BTC 데모 부분 청산 체결 · 롱 🕐 10/21 05:37:49 KST 사유: 부분 익절 🧾 이번 체결: 0.016 BTC · 82,742.70 USDT • 체결금액(명목): 1,323.88 USDT · 증거금 아님 • 이번 청산 가격손익: +2.91 USDT · 계좌 +0.03% 수수료·펀딩 전 · 확정 순손익 아님 손익·비용 정산 미확정: 확정 수익으로 집계하지 않음 📦 전체...",
+          "signals": [],
+          "signals_total": 0,
+          "signals_transmitted": 0,
+          "signals_truncated": false,
+          "simulation_only": true,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 895,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:16405",
+        "content_sha256": "569d781025cf865e4ff64187fe09763d7662597efc72df18c00d9538ef7a3351",
+        "occurred_at": "2026-10-20T20:31:28+00:00",
+        "relevance": {
+          "tickers": [],
+          "markets": [],
+          "themes": [],
+          "match_basis": "message_context"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "16405",
+          "posted_at": "2026-10-20T20:31:28+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16405",
+          "preview": "🛡 BTC 데모 보호 변경 확인 · 롱 🕐 10/21 05:31:23 KST 📦 보유량 0.025 BTC · 평단 82,561.00 USDT 💰 계좌 순자산: 9,421.64 USDT • 총 증거금 207.63 USDT(계좌 2.20%) · 10배 · 교차 🛡 손절 SL 82,280.00 USDT · 남은 전량 • 예상 손익: -7.03 USDT · 계좌 -0.07% (1배 -0.34%...",
+          "signals": [],
+          "signals_total": 0,
+          "signals_transmitted": 0,
+          "signals_truncated": false,
+          "simulation_only": true,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 869,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:16404",
+        "content_sha256": "ec8176d8e60687b269eea3c6091412ee4b18e2465f42230835225fea4665f104",
+        "occurred_at": "2026-10-20T19:47:27+00:00",
+        "relevance": {
+          "tickers": [],
+          "markets": [],
+          "themes": [],
+          "match_basis": "message_context"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "16404",
+          "posted_at": "2026-10-20T19:47:27+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16404",
+          "preview": "📌 BTC 데모 첫 진입 체결 · 롱 🕐 10/21 04:46:23 KST 🧾 이번 체결: 0.025 BTC · 82,561.00 USDT • 체결금액(명목): 2,064.03 USDT · 증거금 아님 📦 전체 포지션 • 누적 보유 0 BTC → 0.025 BTC · 관측 기준 • 평단 82,561.00 USDT 💰 계좌 순자산: 9,420.23 USDT • 총 증거금 207.49 US...",
+          "signals": [],
+          "signals_total": 0,
+          "signals_transmitted": 0,
+          "signals_truncated": false,
+          "simulation_only": true,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 872,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:16403",
+        "content_sha256": "a9fa513e4c9525e148f015295839bc7a08c7945af492c280790c9c651fd54ca4",
+        "occurred_at": "2026-10-20T18:51:42+00:00",
+        "relevance": {
+          "tickers": [
+            "FRSH",
+            "BKH",
+            "BP",
+            "HALO",
+            "LLY"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "16403",
+          "posted_at": "2026-10-20T18:51:42+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16403",
+          "preview": "📊 프리즘 US 시뮬레이터 | 실시간 포트폴리오 (2026-10-21 03:51) 🔸 현재 보유: 5/10개 🔸 사용 비중: 3.89/10 슬롯 (분할 매수·시험매수 반영) ✅ 최고 수익: Freshworks Inc.(FRSH) +7.14% ⚠️ 최저 수익: Black Hills Corporation(BKH) +1.05% 🔸 보유 종목: - Freshworks Inc.(FRSH) [Te...",
+          "signals": [
+            {
+              "canonical_ticker": "FRSH",
+              "display_name": "Freshworks Inc.",
+              "market": "US",
+              "source_asof": "2026-10-20T18:51:42+00:00",
+              "signal_action": "HOLD",
+              "trigger_type": "telegram_portfolio_snapshot",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            },
+            {
+              "canonical_ticker": "BKH",
+              "display_name": "Black Hills Corporation",
+              "market": "US",
+              "source_asof": "2026-10-20T18:51:42+00:00",
+              "signal_action": "HOLD",
+              "trigger_type": "telegram_portfolio_snapshot",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            },
+            {
+              "canonical_ticker": "BP",
+              "display_name": "BP p.l.c.",
+              "market": "US",
+              "source_asof": "2026-10-20T18:51:42+00:00",
+              "signal_action": "HOLD",
+              "trigger_type": "telegram_portfolio_snapshot",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "stop_loss_price": 46.08,
+              "target_price": 58.12,
+              "confidence": 0.45,
+              "warnings": [
+                "multi_ticker_prices_scoped_to_mention_block"
+              ]
+            },
+            {
+              "canonical_ticker": "HALO",
+              "display_name": "Halozyme Therapeutics, Inc.",
+              "market": "US",
+              "source_asof": "2026-10-20T18:51:42+00:00",
+              "signal_action": "HOLD",
+              "trigger_type": "telegram_portfolio_snapshot",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "stop_loss_price": 114.69,
+              "target_price": 141.53,
+              "confidence": 0.45,
+              "warnings": [
+                "multi_ticker_prices_scoped_to_mention_block"
+              ]
+            },
+            {
+              "canonical_ticker": "LLY",
+              "display_name": "Eli Lilly and Company",
+              "market": "US",
+              "source_asof": "2026-10-20T18:51:42+00:00",
+              "signal_action": "HOLD",
+              "trigger_type": "telegram_portfolio_snapshot",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "stop_loss_price": 1208.74,
+              "target_price": 1514.05,
+              "confidence": 0.45,
+              "warnings": [
+                "multi_ticker_prices_scoped_to_mention_block"
+              ]
+            }
+          ],
+          "signals_total": 5,
+          "signals_transmitted": 5,
+          "signals_truncated": false,
+          "simulation_only": true,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 1200,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:16402",
+        "content_sha256": "ccab44931a216dc4e231a332970e8e0900583239bb2b809053b2d68c05a47c84",
+        "occurred_at": "2026-10-20T18:51:40+00:00",
+        "relevance": {
+          "tickers": [
+            "TW"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "16402",
+          "posted_at": "2026-10-20T18:51:40+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16402",
+          "preview": "⚠️ 매수 보류: Tradeweb Markets Inc.(TW) 현재가: $119.23 매수 점수: 6/10 결정: 미진입 시장 상황: 보통 강세장 산업군: Financial Services 보류 사유: AI 판단: 미진입 — AI 사유: R — 손익비 하한 미달입니다./R floor 미달입니다. 가장 가까운 확정 주요 저항 126.65달러까지 거리의 80%를 적용한 목표가는 125.1...",
+          "signals": [
+            {
+              "canonical_ticker": "TW",
+              "display_name": "Tradeweb Markets Inc.",
+              "market": "US",
+              "source_asof": "2026-10-20T18:51:40+00:00",
+              "signal_action": "NO_ENTRY",
+              "trigger_type": "telegram_buy_skip",
+              "trigger_score": 0.6,
+              "composite_score": 0.6,
+              "stop_loss_price": 110.8839,
+              "confidence": 0.6,
+              "warnings": []
+            }
+          ],
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 885,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:16401",
+        "content_sha256": "d2369da9f315979178557c4b9263d3e8826395e421590e299ecf9ade093e566f",
+        "occurred_at": "2026-10-20T18:51:37+00:00",
+        "relevance": {
+          "tickers": [
+            "SLS"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "16401",
+          "posted_at": "2026-10-20T18:51:37+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16401",
+          "preview": "⚠️ 매수 보류: SELLAS Life Sciences Group, Inc(SLS) 현재가: $11.90 매수 점수: 2/10 결정: 미진입 시장 상황: 보통 강세장 산업군: Healthcare 보류 사유: AI 판단: 미진입 — 현재가 11.90달러가 하향하는 50일선보다 4.1%, 60일선보다 2.3% 낮아 개별 하락 추세 차단 조건에 해당합니다. / 점수 부족 (2/5) — AI...",
+          "signals": [
+            {
+              "canonical_ticker": "SLS",
+              "display_name": "SELLAS Life Sciences Group, Inc",
+              "market": "US",
+              "source_asof": "2026-10-20T18:51:37+00:00",
+              "signal_action": "NO_ENTRY",
+              "trigger_type": "telegram_buy_skip",
+              "trigger_score": 0.2,
+              "composite_score": 0.2,
+              "confidence": 0.2,
+              "warnings": []
+            }
+          ],
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 907,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:16400",
+        "content_sha256": "6f316b667666d7e8e923c7fddb942918207efa011bd4dd3bc20fef384fd2b4db",
+        "occurred_at": "2026-10-20T18:51:33+00:00",
+        "relevance": {
+          "tickers": [
+            "MRNA"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "16400",
+          "posted_at": "2026-10-20T18:51:33+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16400",
+          "preview": "⚠️ 매수 보류: Moderna, Inc.(MRNA) 현재가: $241.19 매수 점수: 2/10 결정: 미진입 시장 상황: 보통 강세장 산업군: Healthcare 보류 사유: AI 판단: 미진입 — 수익성과 성장성 두 항목이 미달하여 펀더멘털 게이트를 통과하지 못했습니다. / 점수 부족 (3/5) — AI 사유: 수익성과 성장성 두 항목이 미달하여 펀더멘털 게이트를 통과하지 못했습니...",
+          "signals": [
+            {
+              "canonical_ticker": "MRNA",
+              "display_name": "Moderna, Inc.",
+              "market": "US",
+              "source_asof": "2026-10-20T18:51:33+00:00",
+              "signal_action": "NO_ENTRY",
+              "trigger_type": "telegram_buy_skip",
+              "trigger_score": 0.2,
+              "composite_score": 0.2,
+              "confidence": 0.2,
+              "warnings": []
+            }
+          ],
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 710,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:16399",
+        "content_sha256": "71f8861d4521fc3481cb26c080181caa0c943f97bdf5bde0381e7548443ae9ba",
+        "occurred_at": "2026-10-20T18:44:45+00:00",
+        "relevance": {
+          "tickers": [
+            "TW"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "16399",
+          "posted_at": "2026-10-20T18:44:45+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16399",
+          "preview": "📊 Tradeweb Markets Inc. (TW) O'Neil 인사이트 차트의 베이스/피벗/RS 주석을 함께 참고하세요. ※ 보조 참고용 · 투자 권유 아님",
+          "signals": [
+            {
+              "canonical_ticker": "TW",
+              "display_name": "Tradeweb Markets Inc.",
+              "market": "US",
+              "source_asof": "2026-10-20T18:44:45+00:00",
+              "signal_action": "WATCH",
+              "trigger_type": "telegram_oneil_insight",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            }
+          ],
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 88,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:16398",
+        "content_sha256": "f87b9f5a5d645ce2892064413cfbc433f7059ecf18c276d63f5f5ae18c78f0f6",
+        "occurred_at": "2026-10-20T18:44:33+00:00",
+        "relevance": {
+          "tickers": [
+            "SLS"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "16398",
+          "posted_at": "2026-10-20T18:44:33+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16398",
+          "preview": "📊 SELLAS Life Sciences Group, Inc (SLS) O'Neil 인사이트 차트의 베이스/피벗/RS 주석을 함께 참고하세요. ※ 보조 참고용 · 투자 권유 아님",
+          "signals": [
+            {
+              "canonical_ticker": "SLS",
+              "display_name": "SELLAS Life Sciences Group, Inc",
+              "market": "US",
+              "source_asof": "2026-10-20T18:44:33+00:00",
+              "signal_action": "WATCH",
+              "trigger_type": "telegram_oneil_insight",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            }
+          ],
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 99,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:16397",
+        "content_sha256": "940090b01811c69f2f3c8df2b1015f732eab273123cf4f6048f405df2271a299",
+        "occurred_at": "2026-10-20T18:44:20+00:00",
+        "relevance": {
+          "tickers": [
+            "MRNA"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "16397",
+          "posted_at": "2026-10-20T18:44:20+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16397",
+          "preview": "📊 Moderna, Inc. (MRNA) O'Neil 인사이트 차트의 베이스/피벗/RS 주석을 함께 참고하세요. ※ 보조 참고용 · 투자 권유 아님",
+          "signals": [
+            {
+              "canonical_ticker": "MRNA",
+              "display_name": "Moderna, Inc.",
+              "market": "US",
+              "source_asof": "2026-10-20T18:44:20+00:00",
+              "signal_action": "WATCH",
+              "trigger_type": "telegram_oneil_insight",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            }
+          ],
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 82,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:16396",
+        "content_sha256": "7ad764ed26634f84e872147d22f340e5bb15d1ff2aa7968fcbc72266503d97fe",
+        "occurred_at": "2026-10-20T18:44:06+00:00",
+        "relevance": {
+          "tickers": [
+            "TW"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "16396",
+          "posted_at": "2026-10-20T18:44:06+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16396",
+          "preview": "",
+          "signals": [
+            {
+              "canonical_ticker": "TW",
+              "display_name": "Tradeweb Markets Inc.",
+              "market": "US",
+              "source_asof": "2026-10-20T18:44:06+00:00",
+              "signal_action": "WATCH",
+              "trigger_type": "telegram_pdf_report",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            }
+          ],
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "NO_ARCHIVED_TEXT"
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:16395",
+        "content_sha256": "cf006ad2d8a5d99bb15428b3a091714bfcdb2167acba8309a4f0c397d5247960",
+        "occurred_at": "2026-10-20T18:44:01+00:00",
+        "relevance": {
+          "tickers": [
+            "SLS",
+            "SNDX",
+            "PRLD"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "16395",
+          "posted_at": "2026-10-20T18:44:01+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16395",
+          "preview": "",
+          "signals": [
+            {
+              "canonical_ticker": "SLS",
+              "display_name": "SELLAS Life Sciences Group,  Inc",
+              "market": "US",
+              "source_asof": "2026-10-20T18:44:01+00:00",
+              "signal_action": "WATCH",
+              "trigger_type": "telegram_pdf_report",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            },
+            {
+              "canonical_ticker": "SNDX",
+              "display_name": "경쟁사와 비교하면 — 선정된 비교기업 Syndax Pharmaceuticals",
+              "market": "US",
+              "source_asof": "2026-10-20T18:44:01+00:00",
+              "signal_action": "WATCH",
+              "trigger_type": "telegram_pdf_report",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            },
+            {
+              "canonical_ticker": "PRLD",
+              "display_name": "와 Prelude Therapeutics",
+              "market": "US",
+              "source_asof": "2026-10-20T18:44:01+00:00",
+              "signal_action": "WATCH",
+              "trigger_type": "telegram_pdf_report",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            }
+          ],
+          "signals_total": 3,
+          "signals_transmitted": 3,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "NO_ARCHIVED_TEXT"
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:16394",
+        "content_sha256": "f81f7c7346edf53289137ba0264f3769080b0d6d51aa699f6f4c784bcfabf80e",
+        "occurred_at": "2026-10-20T18:43:55+00:00",
+        "relevance": {
+          "tickers": [
+            "MRNA"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "16394",
+          "posted_at": "2026-10-20T18:43:55+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16394",
+          "preview": "",
+          "signals": [
+            {
+              "canonical_ticker": "MRNA",
+              "display_name": "Moderna,  Inc.",
+              "market": "US",
+              "source_asof": "2026-10-20T18:43:55+00:00",
+              "signal_action": "WATCH",
+              "trigger_type": "telegram_pdf_report",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            }
+          ],
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "NO_ARCHIVED_TEXT"
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:16393",
+        "content_sha256": "65256765a9d527b39898182b12801d7ae85e71a6fa43ac498765b5b3e83249c9",
+        "occurred_at": "2026-10-20T18:43:48+00:00",
+        "relevance": {
+          "tickers": [
+            "TW"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "16393",
+          "posted_at": "2026-10-20T18:43:48+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16393",
+          "preview": "📊 Tradeweb Markets (TW) 채권·금리·주식 등 금융상품의 전자거래 플랫폼을 운영하며, 거래 수수료와 구독·시장정보 수익을 얻습니다. 💰 거래 현황 (10/20 장중 관측치, 종가 미확정) • 주가 $119.41, 전일 종가 대비 +4.1% • 거래량 약 199만 주로 전일 약 123만 주보다 약 62% 증가. 다만 단일 세션만으로 매수 주체나 상승 지속성을 단정하기는 어...",
+          "signals": [
+            {
+              "canonical_ticker": "TW",
+              "display_name": "Tradeweb Markets",
+              "market": "US",
+              "source_asof": "2026-10-20T18:43:48+00:00",
+              "signal_action": "UNKNOWN",
+              "trigger_type": "telegram_message",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            }
+          ],
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 793,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:16392",
+        "content_sha256": "4ed373f929c0f9db25569b82f240ec9f0ed16e0f56f021c6b0f94f918c88a4ee",
+        "occurred_at": "2026-10-20T18:43:43+00:00",
+        "relevance": {
+          "tickers": [
+            "SLS"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "16392",
+          "posted_at": "2026-10-20T18:43:43+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16392",
+          "preview": "📊 SELLAS Life Sciences Group (SLS) 암 치료제를 개발하는 임상 단계 바이오기업으로, 주요 후보물질은 GPS와 SLS009입니다. 매출은 아직 없으며 기업가치는 임상 진전과 자금 여력에 크게 좌우됩니다. 💵 주가·거래 동향 - 10월 20일 관측가: $11.83 (장중 별도 관측값 $11.87; 확정 종가 아님) - 전일 종가 $10.49 대비 약 +12.8%...",
+          "signals": [
+            {
+              "canonical_ticker": "SLS",
+              "display_name": "SELLAS Life Sciences Group",
+              "market": "US",
+              "source_asof": "2026-10-20T18:43:43+00:00",
+              "signal_action": "UNKNOWN",
+              "trigger_type": "telegram_message",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            }
+          ],
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 893,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:16391",
+        "content_sha256": "a04c48f9fe4ce3a02259b68fdf76530d86437b93feaaddbf7a037db5153e00d6",
+        "occurred_at": "2026-10-20T18:43:39+00:00",
+        "relevance": {
+          "tickers": [
+            "MRNA"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "16391",
+          "posted_at": "2026-10-20T18:43:39+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16391",
+          "preview": "📊 Moderna, Inc. (MRNA) — mRNA 기반 백신·치료제를 개발·판매하는 바이오기업입니다. 코로나19 제품 매출 감소 이후 신규 제품과 파이프라인의 상업화가 실적 회복의 관건입니다. 💰 현재가: $240.80 (2026년 10월 20일 14:36 ET 관측, 확정 종가 아님) 📈 전일 대비: +6.1% (전일 기준 $226.89 대비) 📊 거래량: 8월 급등 때 약 1억...",
+          "signals": [
+            {
+              "canonical_ticker": "MRNA",
+              "display_name": "Moderna, Inc.",
+              "market": "US",
+              "source_asof": "2026-10-20T18:43:39+00:00",
+              "signal_action": "UNKNOWN",
+              "trigger_type": "telegram_message",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "target_price": 129.22,
+              "confidence": 0.45,
+              "warnings": []
+            }
+          ],
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 1005,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:16390",
+        "content_sha256": "98c8e48c16e37bb8378d15e3c4a4ea97f737fd7c22151d53814f71e145f52634",
+        "occurred_at": "2026-10-20T18:36:22+00:00",
+        "relevance": {
+          "tickers": [
+            "MRNA",
+            "SLS",
+            "TW"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "16390",
+          "posted_at": "2026-10-20T18:36:22+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16390",
+          "preview": "🔔 미국주식 오후 프리즘 시그널 얼럿 📅 2026.10.20 오후 분석 포착된 관심종목 🤖 프리즘봇의 가상 포트폴리오 운용 과정을 투명하게 공개합니다. 실제 매수 권유가 아닙니다. 🧭 장기추세: 온건 강세 | 스윙: 횡보·숨고르기 | 실행기준: 온건 강세 | 선정: 탑다운 1종목 + 바텀업 2종목 🧭 오늘 테마 흐름 미국 1,019종목 · 전일 종가 대비 · 테마별 중앙값 📈 강한 테마...",
+          "signals": [
+            {
+              "canonical_ticker": "MRNA",
+              "display_name": "Moderna, Inc.",
+              "market": "US",
+              "source_asof": "2026-10-20T18:36:22+00:00",
+              "signal_action": "WATCH",
+              "trigger_type": "telegram_signal_alert",
+              "trigger_score": 0.99,
+              "composite_score": 0.99,
+              "confidence": 0.99,
+              "warnings": []
+            },
+            {
+              "canonical_ticker": "SLS",
+              "display_name": "SELLAS Life Sciences Group, Inc",
+              "market": "US",
+              "source_asof": "2026-10-20T18:36:22+00:00",
+              "signal_action": "WATCH",
+              "trigger_type": "telegram_signal_alert",
+              "trigger_score": 0.99,
+              "composite_score": 0.99,
+              "confidence": 0.99,
+              "warnings": []
+            },
+            {
+              "canonical_ticker": "TW",
+              "display_name": "Tradeweb Markets Inc.",
+              "market": "US",
+              "source_asof": "2026-10-20T18:36:22+00:00",
+              "signal_action": "WATCH",
+              "trigger_type": "telegram_signal_alert",
+              "trigger_score": 0.61,
+              "composite_score": 0.61,
+              "confidence": 0.61,
+              "warnings": []
+            }
+          ],
+          "signals_total": 3,
+          "signals_transmitted": 3,
+          "signals_truncated": false,
+          "simulation_only": true,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 1059,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      }
+    ],
+    "guardrails": {
+      "untrusted_content": true,
+      "advisory_only": true,
+      "may_promote_market_execution": false,
+      "multi_ticker_message_prices_require_recheck": true
+    },
+    "model_provenance": {
+      "schema": "tradingagents.model-provenance/v1",
+      "work_synthesis": {
+        "execution_mode": "local",
+        "requested_model": "gpt-6.1-sol",
+        "requested_reasoning_effort": "medium",
+        "task_id": "tradingagents-work-prism",
+        "verification_status": "CONFIGURED_NOT_RUNTIME_VERIFIED",
+        "observed_model": null,
+        "observed_reasoning_effort": null,
+        "note": "The local task contract is verified; the Work host does not expose a signed per-response model receipt."
+      }
+    }
+  }
+}
