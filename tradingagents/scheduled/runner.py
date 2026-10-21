@@ -214,6 +214,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--resume-from-run", help="Recover failed tickers from a completed full run into a new cohort, preserving successful research provenance.")
     parser.add_argument("--finalize-from-run", help="Reuse a fully completed ticker phase after interrupted postprocessing, without running research again.")
     parser.add_argument("--finalization-source-config", type=Path, help="Original config in its immutable Git source snapshot.")
+    parser.add_argument("--lightweight-execution-refresh", action="store_true",
+                        help="Publish newly observed overlay evidence without news recollection or chart rendering.")
     args = parser.parse_args(argv)
     if args.resume_from_run and (args.site_only or args.tickers or args.trade_date):
         parser.error("--resume-from-run cannot be combined with site-only, ticker or trade-date overrides")
@@ -236,6 +238,13 @@ def main(argv: list[str] | None = None) -> int:
         daily_active_ticker_limit=args.daily_active_ticker_limit,
         execution_refresh_enabled=False if args.disable_execution_refresh else None,
     )
+    if args.lightweight_execution_refresh:
+        if config.run.run_mode != "overlay_only" or args.disable_execution_refresh or args.site_only:
+            parser.error("Lightweight execution refresh requires an enabled overlay_only run")
+        config = replace(config, execution=replace(config.execution,
+            execution_refresh_enabled=True, execution_lightweight_refresh=True,
+            execution_max_data_age_seconds=120, execution_llm_summary_model=None,
+            execution_selective_rerun_enabled=False))
 
     if args.site_only:
         manifests = build_site(config.storage.archive_dir, config.storage.site_dir, config.site)

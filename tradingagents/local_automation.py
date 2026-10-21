@@ -282,7 +282,7 @@ def run_due(archive, state, *, now=None, dry_run=False):
 
     now = now or datetime.now(ZoneInfo("Asia/Seoul"))
     watchdog = script("scheduled_actions_watchdog")
-    # Refresh before Work, leaving time for the five-minute launcher tick and
+    # Refresh before Work, leaving time for the minute launcher tick and
     # collection without extending input validity. The first US cloud slot
     # retains its separate New York execution-checkpoint alignment below.
     targets = watchdog.due_targets(
@@ -338,6 +338,13 @@ def run_due(archive, state, *, now=None, dry_run=False):
                 "--label", f"local-scheduler-{profile}-{mode}"]
         if mode == "full":
             args.append("--disable-execution-refresh")
+        else:
+            from tradingagents.execution.refresh_runtime import execution_refresh_enabled
+            if execution_refresh_enabled(state):
+                # Scheduled overlays share the producer lock with between-slot
+                # refreshes: they must not reintroduce multi-minute news/chart
+                # stalls while the explicitly enabled paper lane is operating.
+                args.append("--lightweight-execution-refresh")
         stage = "preflight" if mode == "full" else "analysis"
         exit_code, error_type = 1, "WorkerInterrupted"
         try:
