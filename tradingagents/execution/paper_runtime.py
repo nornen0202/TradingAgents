@@ -18,6 +18,7 @@ from tradingagents.charting.bars import instant
 from tradingagents.execution.paper import PaperBroker, PaperLimits
 from tradingagents.execution.paper_quotes import ReadOnlyPaperQuotes
 from tradingagents.execution.source_diagnostics import diagnose_source
+from tradingagents.execution.source_handoff import await_completed_source
 
 SCHEMA = "tradingagents.paper-runtime/v1"
 
@@ -192,6 +193,19 @@ def advance_market(archive, state, market, *, now=None, clock=None, account_load
                     result["quote_diagnostics"] = getattr(provider, "diagnostics", {})
                 finally:
                     provider.close()
+                before_handoff = instant(clock())
+                has_current_signal = any(s.get("execution_ready") is True
+                    and instant(s.get("valid_until")) is not None
+                    and instant(s["valid_until"]) > before_handoff for s in step["signals"])
+                if selection_attempt == 0 and not has_current_signal and not pending:
+                    # A newly collected source may be only seconds from atomic
+                    # publication. Wait without using expired observations or
+                    # making another provider request; rebuild the whole step
+                    # below if that completed source becomes available.
+                    _, handoff = await_completed_source(archive, state.parent, market, source,
+                        clock=clock, selector=_latest_source)
+                    if handoff is not None:
+                        result["source_refresh_handoff"] = handoff
                 read_session = session_resolver(market=market, now_local=instant(clock()))
                 at = instant(clock())
                 # A response acquired after the market close cannot open new orders.
