@@ -1,6 +1,34 @@
 {
-  "generated_at": "2026-10-22T05:07:06.756609",
+  "generated_at": "2026-10-22T08:10:11.403812",
   "runs": [
+    {
+      "run_id": "20261022T050013_local-scheduler-kr-full",
+      "label": "local-scheduler-kr-full",
+      "started_at": "2026-10-22T05:00:13.794999+09:00",
+      "finished_at": "2026-10-22T07:58:57.759898+09:00",
+      "status": "success",
+      "market": "KR",
+      "run_mode": "full",
+      "settings": {
+        "market": "KR",
+        "run_mode": "full"
+      },
+      "summary": {
+        "total_tickers": 27
+      },
+      "ticker_count": 27,
+      "success_count": 27,
+      "decision_bundle": {
+        "version": 2,
+        "decision_ready": false,
+        "conditional_strategy_ready": false,
+        "quality_label_ko": "연구 자료만 제공, 장중 데이터 대기",
+        "fresh_row_ratio": 0.0,
+        "conditional_row_ratio": 0.0
+      },
+      "published_to_site": true,
+      "run_url": "runs/20261022T050013_local-scheduler-kr-full/index.html"
+    },
     {
       "run_id": "20261022T045909_local-freshness-us-overlay",
       "label": "local-freshness-us-overlay",
@@ -3358,8 +3386,8 @@
         "fresh_row_ratio": 0.9667,
         "conditional_row_ratio": 1.0
       },
-      "published_to_site": true,
-      "run_url": "runs/20261022T025809_local-freshness-us-overlay/index.html"
+      "published_to_site": false,
+      "run_url": null
     },
     {
       "run_id": "20261022T025709_local-freshness-us-overlay",
@@ -7530,8 +7558,8 @@
         "fresh_row_ratio": 0.0,
         "conditional_row_ratio": 0.0
       },
-      "published_to_site": true,
-      "run_url": "runs/20261021T175015_local-scheduler-us-full/index.html"
+      "published_to_site": false,
+      "run_url": null
     },
     {
       "run_id": "20261021T152511_local-freshness-kr-overlay",
@@ -8846,8 +8874,8 @@
         "fresh_row_ratio": 1.0,
         "conditional_row_ratio": 1.0
       },
-      "published_to_site": false,
-      "run_url": null
+      "published_to_site": true,
+      "run_url": "runs/20261021T113009_local-freshness-kr-overlay/index.html"
     },
     {
       "run_id": "20261021T112510_local-freshness-kr-overlay",
