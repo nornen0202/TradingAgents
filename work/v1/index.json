@@ -4,9 +4,9 @@
     "kr": {
       "schema": "tradingagents.work-context/v1",
       "surface": "kr",
-      "event_id": "kr:c72c7b9e1aac8d851f4a0270fc8e8b24",
-      "source_sha256": "b4db63b761bbe93ff171dcf92f7eb868a2c6103099f7a70883d7dc8afd593bba",
-      "packet_sha256": "f99da6a624f416f9878f83c2758387ecda7a08c30443242afb79234d1175ad64",
+      "event_id": "kr:0ce32a43f56d6c7e1a2559702784517f",
+      "source_sha256": "7ec819a8f5aa0a2b874a765d019f6fdad517ace42be14e0ab5ca87a8c6b72cf8",
+      "packet_sha256": "39c7cbe14c3c3b4b0c929e13d5f4cbd41aab8ac4e665d6512480672c1f41229c",
       "prompt_contract_version": "market-work-v12-kr",
       "prompt_sha256": "a72e95420df2bdbf27008d2fc88ea82b9aa78c1222a888149cb844d5f0402a46",
       "skill_sha256": "4dffe28b3721557cc2517b5afff2f94045832606e71ff61461df969f6abb53c7",
@@ -14,22 +14,22 @@
       "workflow_contract_sha256": "97fde7add4383c59c23330c927f073c5c281e98221519d9aeab3615f11917f8a",
       "status_url": "https://nornen0202.github.io/TradingAgents/work/v1/kr/status.json",
       "latest_url": "https://nornen0202.github.io/TradingAgents/work/v1/kr/latest.json",
-      "event_url": "https://nornen0202.github.io/TradingAgents/work/v1/kr/events/kr-c72c7b9e1aac8d851f4a0270fc8e8b24.json",
+      "event_url": "https://nornen0202.github.io/TradingAgents/work/v1/kr/events/kr-0ce32a43f56d6c7e1a2559702784517f.json",
       "prompt_url": "https://nornen0202.github.io/TradingAgents/work/v1/prompts/market_kr.md",
       "source_health": "OK",
       "report_mode": "READY",
       "freshness_receipt": {
         "schema": "tradingagents.source-freshness/v1",
-        "producer_run_id": "20261021T130009_local-freshness-kr-overlay",
-        "producer_started_at": "2026-10-21T13:00:09.473949+09:00",
-        "producer_finished_at": "2026-10-21T13:03:17.978794+09:00",
+        "producer_run_id": "20261021T131509_local-freshness-kr-overlay",
+        "producer_started_at": "2026-10-21T13:15:09.095092+09:00",
+        "producer_finished_at": "2026-10-21T13:18:06.072231+09:00",
         "analysis_run_id": "20261021T044513_local-scheduler-kr-full",
         "analysis_lineage_status": "RESOLVED",
         "analysis_completed_at": "2026-10-21T07:07:20.515277+09:00",
         "analysis_trade_date_oldest": "2026-10-20",
         "analysis_trade_date_latest": "2026-10-20",
-        "market_data_oldest_at": "2026-10-21T13:02:00+09:00",
-        "market_data_latest_at": "2026-10-21T13:02:00+09:00",
+        "market_data_oldest_at": "2026-10-21T13:17:00+09:00",
+        "market_data_latest_at": "2026-10-21T13:17:00+09:00",
         "market_data_status": "FRESH",
         "publication_does_not_refresh_inputs": true,
         "execution_max_age_seconds": 600.0,
@@ -90,6 +90,12 @@
             "execution_eligible": false
           },
           {
+            "ticker": "000660.KS",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
+            "execution_eligible": false
+          },
+          {
             "ticker": "042700.KS",
             "research_valid": true,
             "category": "FRESH_REGULAR_SESSION",
@@ -97,12 +103,6 @@
           },
           {
             "ticker": "010120.KS",
-            "research_valid": true,
-            "category": "FRESH_REGULAR_SESSION",
-            "execution_eligible": false
-          },
-          {
-            "ticker": "353200.KS",
             "research_valid": true,
             "category": "FRESH_REGULAR_SESSION",
             "execution_eligible": false
@@ -126,13 +126,13 @@
             "execution_eligible": false
           },
           {
-            "ticker": "000660.KS",
+            "ticker": "278470.KS",
             "research_valid": true,
             "category": "FRESH_REGULAR_SESSION",
             "execution_eligible": false
           },
           {
-            "ticker": "278470.KS",
+            "ticker": "353200.KS",
             "research_valid": true,
             "category": "FRESH_REGULAR_SESSION",
             "execution_eligible": false
