@@ -24,6 +24,7 @@ from tradingagents.atomic_io import atomic_write_json, interprocess_file_lock
 from tradingagents.scheduled.failure_diagnostics import failure_diagnostics, format_failure_diagnostics
 from tradingagents.scheduled.research_observation import ResearchObservationRecorder
 from tradingagents.scheduled.manifest_discovery import full_manifests_desc
+from tradingagents.scheduled.research_artifact_refs import KEYS as RESEARCH_REFERENCE_KEYS, ResearchArtifactStore
 from tradingagents.charting.capture import ChartCapture
 from tradingagents.agents.utils.instrument_resolver import resolve_instrument
 from cli.stats_handler import StatsCallbackHandler
@@ -3938,6 +3939,8 @@ def _relative_to_run(run_dir: Path, path: Path | None) -> str | None:
 
 
 def _resolve_artifact_source(run_dir: Path, path_value: Any) -> Path:
+    if isinstance(path_value, dict):
+        raise ValueError("Structured research references require explicit verified consumption")
     candidate = Path(str(path_value))
     if candidate.is_absolute():
         return candidate
@@ -4124,6 +4127,9 @@ def _bootstrap_overlay_inputs_from_latest_run(
     if not source_run_id or len(source_started_at) < 4:
         raise RuntimeError("latest-run.json is missing run_id/started_at required for overlay bootstrap.")
     source_run_dir = config.storage.archive_dir / "runs" / source_started_at[:4] / source_run_id
+    research_store = ResearchArtifactStore(config.storage.archive_dir)
+    reference_research = (config.execution.execution_lightweight_refresh
+                          and config.run.run_mode == "overlay_only" and not preserve_thesis_bytes)
     summaries: list[dict[str, Any]] = []
     target_by_identity = {
         _ticker_identity_key(item): str(item).strip().upper()
@@ -4150,7 +4156,7 @@ def _bootstrap_overlay_inputs_from_latest_run(
         target_ticker_dir.mkdir(parents=True, exist_ok=True)
         target_analysis = target_ticker_dir / "analysis.json"
         target_analysis.write_bytes(source_analysis.read_bytes())
-        copied_source_artifacts: dict[str, str] = {}
+        copied_source_artifacts: dict[str, Any] = {}
         for artifact_key in (
             "report_markdown",
             "final_state_json",
@@ -4166,6 +4172,24 @@ def _bootstrap_overlay_inputs_from_latest_run(
             "public_equity_intelligence_json",
             "thesis_tracker_json",
         ):
+            value = artifacts.get(artifact_key)
+            if artifact_key in RESEARCH_REFERENCE_KEYS and value is not None and (
+                    reference_research or isinstance(value, dict)):
+                reference = research_store.make(source_run_dir, source, artifact_key)
+                if reference_research:
+                    copied_source_artifacts[artifact_key] = reference
+                    continue
+                # Ordinary overlays/selective work retain the existing local
+                # artifact contract after verifying the immutable snapshot.
+                raw = research_store.read(reference, key=artifact_key, ticker=source_ticker,
+                                          market=config.run.market)
+                filename = Path(reference["artifact_path"]).name
+                target = (target_ticker_dir / "report" / filename if artifact_key == "report_markdown"
+                          else target_ticker_dir / ("final_state.json" if artifact_key == "final_state_json" else filename))
+                target.parent.mkdir(parents=True, exist_ok=True)
+                target.write_bytes(raw)
+                copied_source_artifacts[artifact_key] = _relative_to_run(run_dir, target)
+                continue
             copied_artifact = _copy_bootstrap_artifact(
                 source_run_dir=source_run_dir,
                 run_dir=run_dir,

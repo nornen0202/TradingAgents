@@ -8,6 +8,7 @@ from typing import Any, Mapping
 from tradingagents.llm_clients import create_llm_client
 from tradingagents.llm_clients.role_config import codex_client_kwargs
 from tradingagents.dataflows.research_evidence import evidence_review_reason, evidence_risk_count
+from tradingagents.scheduled.research_artifact_refs import ResearchArtifactStore
 
 from .account_models import PortfolioCandidate
 from .instrument_identity import resolve_identity
@@ -118,6 +119,7 @@ def _friendly_semantic_warning(code: str, exc: Exception | None = None) -> str:
 
 def _load_context_by_ticker(run_dir: Path, manifest: dict[str, Any]) -> dict[str, dict[str, Any]]:
     loaded: dict[str, dict[str, Any]] = {}
+    reference_store = None
     for ticker_summary in manifest.get("tickers", []):
         if ticker_summary.get("status") != "success":
             continue
@@ -127,17 +129,28 @@ def _load_context_by_ticker(run_dir: Path, manifest: dict[str, Any]) -> dict[str
         if not analysis_json:
             continue
 
-        analysis_path = run_dir / analysis_json
-        final_state_path = (run_dir / final_state_json) if final_state_json else None
+        if isinstance(final_state_json, dict):
+            if reference_store is None:
+                reference_store = ResearchArtifactStore.from_run_dir(run_dir, now=manifest.get("started_at"))
+            analysis_path = reference_store.owner_analysis_path(run_dir, ticker_summary)
+        else:
+            analysis_path = run_dir / analysis_json
+        final_state_path = (run_dir / final_state_json) if final_state_json and not isinstance(final_state_json, dict) else None
         if not analysis_path.exists():
             continue
 
         analysis_payload = json.loads(analysis_path.read_text(encoding="utf-8"))
-        final_state_payload = (
-            json.loads(final_state_path.read_text(encoding="utf-8"))
-            if final_state_path and final_state_path.exists()
-            else {}
-        )
+        if isinstance(final_state_json, dict):
+            settings = manifest.get("settings") or {}
+            final_state_payload = json.loads(reference_store.read_owned(
+                final_state_json, key="final_state_json", run_dir=run_dir, row=ticker_summary, analysis=analysis_payload,
+                market=settings.get("market_scope") or settings.get("market")))
+        else:
+            final_state_payload = (
+                json.loads(final_state_path.read_text(encoding="utf-8"))
+                if final_state_path and final_state_path.exists()
+                else {}
+            )
         try:
             identity = resolve_identity(
                 str(analysis_payload.get("ticker") or ticker_summary.get("ticker") or ""),

@@ -14,6 +14,7 @@ from pathlib import Path
 from typing import Any
 
 from .config import SiteSettings
+from .research_artifact_refs import ResearchArtifactStore
 from tradingagents.dataflows.intraday_market import DELAYED_ANALYSIS_ONLY, REALTIME_EXECUTION_READY, STALE_INVALID_FOR_EXECUTION
 from tradingagents.presentation import (
     present_account_action,
@@ -402,6 +403,8 @@ def _publish_latest_decision_bundles(*, site_dir: Path, manifests: list[dict[str
 
 
 def _resolve_artifact_source(run_dir: Path, path_value: Any) -> Path:
+    if isinstance(path_value, dict):
+        raise ValueError("Structured research references require explicit verified consumption")
     candidate = Path(str(path_value))
     if candidate.is_absolute():
         return candidate
@@ -3176,7 +3179,13 @@ def _render_ticker_page(
     stale_after_seconds = _execution_stale_threshold_seconds(manifest)
     report_html = "<p class='empty'>No report markdown was generated for this ticker.</p>"
     report_relative = (ticker_summary.get("artifacts") or {}).get("report_markdown")
-    if report_relative:
+    if isinstance(report_relative, dict):
+        store = ResearchArtifactStore.from_run_dir(run_dir, now=manifest.get("finished_at"))
+        source_settings = manifest.get("settings") or {}
+        raw = store.read_owned(report_relative, key="report_markdown", run_dir=run_dir, row=ticker_summary,
+                               market=source_settings.get("market_scope") or source_settings.get("market"))
+        report_html = _render_markdown(raw.decode("utf-8"))
+    elif report_relative:
         report_path = _resolve_artifact_source(run_dir, report_relative)
         if report_path.exists():
             report_html = _render_markdown(report_path.read_text(encoding="utf-8"))
