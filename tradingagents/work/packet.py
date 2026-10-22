@@ -644,6 +644,28 @@ def resolve_archive_roots(
     return {"market": primary, "youtube": youtube, "prism": prism}
 
 
+def _revision_membership(archive: Path, manifest: dict[str, Any], *, now: datetime) -> dict[str, Any]:
+    """Recover frozen membership, never current account or coverage authority."""
+    if not manifest.get("research_refresh"):
+        return {}
+    from tradingagents.scheduled.research_refresh import root_baseline, verified_revision
+
+    market = (manifest.get("settings") or {}).get("market")
+    if not verified_revision(archive, manifest, market=market, now=now):
+        return {}
+    plan = manifest["research_refresh"]["plan"]
+    parent = _manifest_for_run_id(archive, plan["parent_run_id"])
+    active = parent.get("active_universe") or {}
+    if not isinstance(active, dict) or "expected_watchlist_tickers" not in active:
+        parent = root_baseline(archive, parent)
+        active = parent.get("active_universe") or {}
+    if not isinstance(active, dict) or "expected_watchlist_tickers" not in active:
+        return {}
+    return {key: active[key] for key in (
+        "expected_holding_tickers", "expected_watchlist_tickers", "scanner_candidates",
+    ) if key in active} | {"source_run_id": parent["run_id"]}
+
+
 def _market_body(surface: str, *, roots: dict[str, Path], now: datetime, public: bool) -> dict[str, Any]:
     sources = _market_sources(roots["market"], surface)
     if not sources:
@@ -683,6 +705,14 @@ def _market_body(surface: str, *, roots: dict[str, Path], now: datetime, public:
         if isinstance(current["manifest"].get("active_universe"), dict)
         else {}
     )
+    membership = {}
+    if "expected_watchlist_tickers" not in active_universe:
+        membership = _revision_membership(roots["market"], current["manifest"], now=now)
+        if membership:
+            active_universe = membership
+            holdings = {_market_ticker_identity(t) for t in membership.get("expected_holding_tickers", [])}
+            for row in current["bundle"].get("strategy_table", []):
+                row["is_held"] = _market_ticker_identity(row.get("ticker")) in holdings
     has_public_universe_contract = (
         "expected_watchlist_tickers" in active_universe
         or "scanner_candidates" in active_universe
@@ -709,6 +739,12 @@ def _market_body(surface: str, *, roots: dict[str, Path], now: datetime, public:
             required_watchlist_tickers=active_universe.get("expected_watchlist_tickers") or [],
         )
     )
+    if public:
+        visible = {_market_ticker_identity(row.get("ticker")) for row in bundle.get("strategy_table", [])}
+        freshness_receipt["research_market_data_receipts"] = [
+            row for row in freshness_receipt.get("research_market_data_receipts", [])
+            if _market_ticker_identity(row.get("ticker")) in visible
+        ]
     current_payload: dict[str, Any] = {
         "run_id": current["manifest"].get("run_id"),
         "started_at": current["manifest"].get("started_at"),
@@ -742,6 +778,12 @@ def _market_body(surface: str, *, roots: dict[str, Path], now: datetime, public:
             if public else recovery
         )
     if not public:
+        if membership:
+            current_payload["universe_membership_reference"] = {
+                "source_run_id": membership["source_run_id"],
+                "status": "REFERENCE_ONLY",
+                "current_account_verified": False,
+            }
         private_overlay = _local_private_overlay(current["run_dir"], current["manifest"], bundle)
         if private_overlay:
             current_payload["private_portfolio_overlay"] = private_overlay

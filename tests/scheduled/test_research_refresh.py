@@ -27,11 +27,12 @@ def encoded_decision(**changes):
     return result
 
 
-def cohort(root, identity="20261022T120000-full", *, mode="full", parent=None, start=None):
+def cohort(root, identity="20261022T120000-full", *, mode="full", parent=None, start=None,
+           tickers=("AAPL", "AMD", "MSFT")):
     start = start or NOW - timedelta(hours=2)
     directory = root / "runs/2026" / identity
     rows = []
-    for ticker in ("AAPL", "AMD", "MSFT"):
+    for ticker in tickers:
         base = directory / "tickers" / ticker
         analysis = {"ticker": ticker, "status": "success", "trade_date": "2026-10-21", "analysis_date": "2026-10-22",
                     "started_at": start.isoformat(), "finished_at": (start + timedelta(minutes=1)).isoformat(),
@@ -47,7 +48,7 @@ def cohort(root, identity="20261022T120000-full", *, mode="full", parent=None, s
     result = {"run_id": identity, "label": "local-scheduler-us-full", "status": "success",
               "started_at": start.isoformat(), "finished_at": (start + timedelta(minutes=2)).isoformat(),
               "settings": {"market": "US", "run_mode": mode}, "tickers": rows,
-              "summary": {"configured_ticker_count": 3, "failed_tickers": 0}}
+              "summary": {"configured_ticker_count": len(tickers), "failed_tickers": 0}}
     if parent:
         result["overlay_source_run_id"] = parent
     atomic_write_json(directory / "run.json", result)
