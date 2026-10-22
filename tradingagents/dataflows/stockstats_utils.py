@@ -12,8 +12,7 @@ from typing import Annotated
 import os
 from .config import get_config
 from .integrity import safe_symbol, session_date, is_historical
-from .daily_history import selected_history, validate_with_fallback
-from .us_daily_history import fallback_enabled as us_fallback_enabled
+from .daily_history import fallback_enabled, selected_history, validate_with_fallback
 from .vendor_exceptions import InsufficientIndicatorHistoryError, VendorInputError
 
 logger = logging.getLogger(__name__)
@@ -217,7 +216,7 @@ def load_ohlcv(symbol: str, curr_date: str) -> pd.DataFrame:
                 auto_adjust=True,
             ))
         except Exception:
-            if not us_fallback_enabled(symbol):
+            if not fallback_enabled(symbol):
                 raise
             data = pd.DataFrame()
         data = data.reset_index()

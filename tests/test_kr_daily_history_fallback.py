@@ -9,6 +9,8 @@ from tradingagents.dataflows import kr_daily_history as kr
 from tradingagents.dataflows import stockstats_utils, y_finance
 from tradingagents.dataflows.vendor_exceptions import VendorMalformedResponseError
 from tradingagents.scheduled import runner
+from tradingagents.calendar_access import get_exchange_calendar
+from tradingagents.scheduled.market_calendar import is_supplemental_market_holiday
 
 
 def bar(day="20261012", **values):
@@ -22,12 +24,25 @@ def yahoo(*, latest="2026-10-12", close=float("nan")):
                         index=pd.DatetimeIndex([latest], name="Date"))
 
 
+def supply_complete_broker_history(broker, start="2021-10-12", end="2026-10-12"):
+    days = get_exchange_calendar("XKRX", start=start, end=end).sessions
+    rows = [(day.date(), bar(day.strftime("%Y%m%d"))) for day in days
+            if not is_supplemental_market_holiday(market="KR", session_date=day.date())]
+
+    def response(symbol, *, start_date, end_date, **kwargs):
+        matching = [row for day, row in rows if start_date <= day <= end_date]
+        return {"output2": list(reversed(matching[-100:]))}
+
+    broker.domestic_daily_itemchartprice.side_effect = response
+
+
 @pytest.fixture
 def broker(monkeypatch):
     kr._CACHE.clear()
     monkeypatch.setenv("TRADINGAGENTS_KIS_RESEARCH_FALLBACK_ENABLED", "1")
     monkeypatch.setattr(kr, "get_api_key", lambda name: "test-credential")
     monkeypatch.setattr(kr.time, "sleep", lambda _: None)
+    monkeypatch.setattr(stockstats_utils.yf, "download", Mock(side_effect=AssertionError("network forbidden")))
     client = Mock()
     client.domestic_daily_itemchartprice.return_value = {"output2": [bar()]}
     with patch("tradingagents.portfolio.kis.KisClient.from_api_keys", return_value=client):
@@ -78,7 +93,7 @@ def test_missing_required_session_cannot_use_older_bar(broker):
     broker.domestic_daily_itemchartprice.return_value = {"output2": [bar("20261008")]}
     with pytest.raises(VendorMalformedResponseError, match="required completed session"):
         kr.load_kr_daily_bars("000660.KS", "2026-10-08", "2026-10-12", require_end=True)
-    with pytest.raises(VendorMalformedResponseError, match="Latest requested"):
+    with pytest.raises(VendorMalformedResponseError, match="missing required sessions"):
         kr.validate_with_kr_fallback(yahoo().reset_index(), "000660.KS", "2026-10-08", "2026-10-12")
 
 
@@ -157,11 +172,10 @@ def test_healthy_yahoo_remains_primary(broker):
 
 
 def test_csv_and_indicator_paths_include_broker_provenance_without_yahoo_cache_poison(broker, tmp_path):
-    import exchange_calendars as xcals
-    days = xcals.get_calendar("XKRX").sessions_in_range("2026-09-01", "2026-10-12")[-10:]
-    broker.domestic_daily_itemchartprice.return_value = {
-        "output2": [bar(day.strftime("%Y%m%d")) for day in reversed(days)]}
-    with patch.object(y_finance.yf, "Ticker") as ticker:
+    supply_complete_broker_history(broker)
+    with patch.object(y_finance.yf, "Ticker") as ticker, \
+         patch.object(stockstats_utils, "get_config", return_value={"data_cache_dir": str(tmp_path)}), \
+         patch.object(stockstats_utils.yf, "download", return_value=yahoo()):
         ticker.return_value.history.return_value = yahoo()
         result = y_finance.get_YFin_data_online("000660.KS", "2026-10-08", "2026-10-12")
     assert "OHLCV source: KIS" in result
@@ -181,15 +195,16 @@ def test_repeated_indicator_read_cannot_accept_previously_rejected_older_fallbac
     with patch.object(stockstats_utils, "get_config", return_value={"data_cache_dir": str(tmp_path)}), \
          patch.object(stockstats_utils.yf, "download", return_value=yahoo()):
         for _ in range(2):
-            with pytest.raises(VendorMalformedResponseError, match="Latest requested"):
+            with pytest.raises(VendorMalformedResponseError, match="missing required sessions"):
                 stockstats_utils.load_ohlcv("000660.KS", "2026-10-12")
-    # Valid historical broker rows may be cached internally, but each caller
-    # must reapply its own source-selection and exact-latest-bar guard.
-    assert broker.domestic_daily_itemchartprice.call_count == 1
+    # An incomplete whole-frame response must not become a successful cache.
+    assert broker.domestic_daily_itemchartprice.call_count == 2
+    assert not kr._CACHE
     assert not list(tmp_path.glob("*.csv"))
 
 
 def test_existing_stale_yahoo_cache_does_not_hide_missing_session(broker, tmp_path):
+    supply_complete_broker_history(broker)
     today = pd.Timestamp.today()
     start = (min(today, pd.Timestamp("2026-10-12")) - pd.DateOffset(years=5)).strftime("%Y-%m-%d")
     end = (today + pd.DateOffset(days=1)).strftime("%Y-%m-%d")
