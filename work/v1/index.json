@@ -220,9 +220,9 @@
     "us": {
       "schema": "tradingagents.work-context/v1",
       "surface": "us",
-      "event_id": "us:1192f848c828256c71b1abaf2309d4b3",
-      "source_sha256": "df6431b1a3aba427727c550de0b5644a0c17ad5028d0aa33b51548b98b962903",
-      "packet_sha256": "57a695543085851459ef605099bce4177dce5fd939cc6da240cdb0282aec598f",
+      "event_id": "us:b3133073694e00d297a56b00b3b57b19",
+      "source_sha256": "749b52bb6c7e99880856cab42b782b5d1a5ca9ed9db610c13e8bbc01320f66b2",
+      "packet_sha256": "7dee5409fd72243be0c6a7f79b33bd6bb23767ce56943186e4c430b3e4e06a05",
       "prompt_contract_version": "market-work-v13-us",
       "prompt_sha256": "281749b3b871d01531e3ceb7377d60bb67ebcaf89d6d8ba3162cb53d38400d7a",
       "skill_sha256": "4dffe28b3721557cc2517b5afff2f94045832606e71ff61461df969f6abb53c7",
@@ -230,23 +230,23 @@
       "workflow_contract_sha256": "8d06ba979f55f01229636b73bdc643c5b21f326cc270c0e8143f3fd7a3204028",
       "status_url": "https://nornen0202.github.io/TradingAgents/work/v1/us/status.json",
       "latest_url": "https://nornen0202.github.io/TradingAgents/work/v1/us/latest.json",
-      "event_url": "https://nornen0202.github.io/TradingAgents/work/v1/us/events/us-1192f848c828256c71b1abaf2309d4b3.json",
+      "event_url": "https://nornen0202.github.io/TradingAgents/work/v1/us/events/us-b3133073694e00d297a56b00b3b57b19.json",
       "prompt_url": "https://nornen0202.github.io/TradingAgents/work/v1/prompts/market_us.md",
-      "source_health": "OK",
-      "report_mode": "READY",
+      "source_health": "STALE",
+      "report_mode": "OUTAGE",
       "freshness_receipt": {
         "schema": "tradingagents.source-freshness/v1",
-        "producer_run_id": "20261023T004327_local-freshness-us-overlay",
-        "producer_started_at": "2026-10-23T00:43:27.467214+09:00",
-        "producer_finished_at": "2026-10-23T00:44:03.225341+09:00",
+        "producer_run_id": "20261023T010653_local-freshness-us-overlay",
+        "producer_started_at": "2026-10-23T01:06:53.183057+09:00",
+        "producer_finished_at": "2026-10-23T01:07:29.097785+09:00",
         "analysis_run_id": "20261021T175015_local-scheduler-us-full",
         "analysis_lineage_status": "RESOLVED",
         "analysis_completed_at": "2026-10-21T21:13:33.227411+09:00",
         "analysis_trade_date_oldest": "2026-10-20",
         "analysis_trade_date_latest": "2026-10-20",
-        "market_data_oldest_at": "2026-10-22T15:42:56+00:00",
-        "market_data_latest_at": "2026-10-22T15:42:56+00:00",
-        "market_data_status": "FRESH",
+        "market_data_oldest_at": "2026-10-22T16:06:22+00:00",
+        "market_data_latest_at": "2026-10-22T16:06:22+00:00",
+        "market_data_status": "STALE",
         "publication_does_not_refresh_inputs": true,
         "execution_max_age_seconds": 120.0,
         "research_market_data_status": "VALID",
@@ -295,12 +295,6 @@
           },
           {
             "ticker": "ABBV",
-            "research_valid": true,
-            "category": "FRESH_REGULAR_SESSION",
-            "execution_eligible": false
-          },
-          {
-            "ticker": "XOM",
             "research_valid": true,
             "category": "FRESH_REGULAR_SESSION",
             "execution_eligible": false
@@ -391,6 +385,12 @@
           },
           {
             "ticker": "CVX",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "XOM",
             "research_valid": true,
             "category": "FRESH_REGULAR_SESSION",
             "execution_eligible": false
