@@ -38,7 +38,7 @@ def test_manual_finalization_counts_against_existing_budget_without_rewriting_hi
     item = target()
     watchdog = SimpleNamespace(due_targets=lambda *a, **k: [item])
     monkeypatch.setattr(local, "script", lambda _: watchdog)
-    monkeypatch.setattr(runner, "_iter_run_manifests_desc", lambda _: [])
+    monkeypatch.setattr(runner, "_iter_run_manifests_desc", lambda _, **kwargs: [])
     monkeypatch.setattr(local_advisory_recovery, "recover_due", lambda *a, **k: [])
     key = hashlib.sha256(f"{item.name}:{item.window_start_kst.isoformat()}".encode()).hexdigest()
     original = tmp_path / "attempts" / f"{key}.json"
@@ -70,7 +70,7 @@ def full_manifest():
 def test_coverage_is_independent_of_failed_delivery():
     manifest = full_manifest()
     manifest["publication"] = {"status": "failed"}
-    assert local.completed_target(manifest, target())
+    assert local.completed_target(manifest, target(), now=datetime(2026, 10, 9, 12, tzinfo=timezone.utc))
 
 
 @pytest.mark.parametrize("clock,expected", [
@@ -83,7 +83,7 @@ def test_coverage_is_independent_of_failed_delivery():
 def test_local_kr_refreshes_precede_all_three_work_briefings(tmp_path, monkeypatch, clock, expected):
     from tradingagents.scheduled import runner, automation_calendar
     from tradingagents import local_advisory_recovery
-    monkeypatch.setattr(runner, "_iter_run_manifests_desc", lambda _: [])
+    monkeypatch.setattr(runner, "_iter_run_manifests_desc", lambda _, **kwargs: [])
     monkeypatch.setattr(automation_calendar, "automated_market_session_status",
                         lambda **kwargs: SimpleNamespace(is_session=True))
     monkeypatch.setattr(local_advisory_recovery, "recover_due", lambda *a, **k: [])
@@ -104,10 +104,10 @@ def test_old_kr_refresh_does_not_cover_pre_work_refresh_and_calendar_still_holds
                 "summary": {"failed_tickers": 0},
                 "execution": {"overlay_phase": {"selected_checkpoints": ["09:35"]},
                               "refresh_checkpoint": "09:35", "execution_asof": "2026-10-15T10:09:00+09:00"}}
-    assert not local.completed_target(manifest, target)
+    assert not local.completed_target(manifest, target, now=now)
     manifest.update(started_at="2026-10-15T10:33:55+09:00", finished_at="2026-10-15T10:36:00+09:00")
     manifest["execution"]["execution_asof"] = "2026-10-15T10:34:00+09:00"
-    assert local.completed_target(manifest, target)
+    assert local.completed_target(manifest, target, now=now)
     held = watchdog.due_targets(now, kr_overlay_checkpoints=local.KR_WORK_OVERLAY_CHECKPOINTS,
         market_status_resolver=lambda **kwargs: SimpleNamespace(is_session=False))
     assert not any(t.name.startswith("intraday-overlay-kr-") for t in held)
@@ -143,7 +143,7 @@ def test_us_web_report_has_preparation_and_final_recheck_slots(clock, expected):
 def test_incomplete_or_wrong_cohort_never_suppresses_new_research(change):
     manifest = full_manifest()
     change(manifest)
-    assert not local.completed_target(manifest, target())
+    assert not local.completed_target(manifest, target(), now=datetime(2026, 10, 9, 12, tzinfo=timezone.utc))
 
 
 def partial_manifest():
@@ -186,7 +186,7 @@ def test_partial_local_retry_uses_failed_only_runner_and_preserves_budget(tmp_pa
     older = partial_manifest()
     older["run_id"] = "20261009T085000_local-scheduler-us-full"
     monkeypatch.setattr(local, "script", lambda _: SimpleNamespace(due_targets=lambda *a, **k: [item]))
-    monkeypatch.setattr(runner, "_iter_run_manifests_desc", lambda _: [(manifest, None), (older, None)])
+    monkeypatch.setattr(runner, "_iter_run_manifests_desc", lambda _, **kwargs: [(manifest, None), (older, None)])
     monkeypatch.setattr(local, "preflight", lambda _: None)
     calls, failures = [], []
     monkeypatch.setattr(local.subprocess, "run", lambda args, **kw: calls.append(args) or SimpleNamespace(returncode=exit_code))
@@ -223,7 +223,7 @@ def test_daily_research_delegation_keeps_producer_free_and_original_attempt_budg
     item = target()
     now = datetime(2026, 10, 9, 12, tzinfo=timezone.utc)
     monkeypatch.setattr(local, "script", lambda _: SimpleNamespace(due_targets=lambda *a, **k: [item]))
-    monkeypatch.setattr(runner, "_iter_run_manifests_desc", lambda _: [])
+    monkeypatch.setattr(runner, "_iter_run_manifests_desc", lambda _, **kwargs: [])
     monkeypatch.setattr(local, "preflight", lambda _: None)
     monkeypatch.setattr(local, "full_research_session_hold", lambda *a, **k: None)
     monkeypatch.setattr(refresh_runtime, "refresh_due", lambda *a, **k: [{"status": "REFRESH_COOLDOWN"}])
@@ -263,7 +263,7 @@ def test_scheduled_overlay_cannot_starve_enabled_paper_refresh(tmp_path, monkeyp
     item.workflow_file = 'intraday-overlay-refresh.yml'
     monkeypatch.setattr(local, 'script', lambda _: SimpleNamespace(due_targets=lambda *a, **k: [item]))
     monkeypatch.setattr(local, 'local_target_window_start', lambda *a, **k: item.window_start_kst)
-    monkeypatch.setattr(runner, '_iter_run_manifests_desc', lambda _: [])
+    monkeypatch.setattr(runner, '_iter_run_manifests_desc', lambda _, **kwargs: [])
     calls = []
     monkeypatch.setattr(local.subprocess, 'run', lambda args, **kw: calls.append(args) or SimpleNamespace(returncode=0))
     if enabled:

@@ -22,7 +22,7 @@ def offline_scheduler(monkeypatch):
         seen.append((market, now))
         return SimpleNamespace(is_session=True)
     monkeypatch.setattr(automation_calendar, "automated_market_session_status", calendar)
-    monkeypatch.setattr(runner, "_iter_run_manifests_desc", lambda _: [])
+    monkeypatch.setattr(runner, "_iter_run_manifests_desc", lambda _, **kwargs: [])
     monkeypatch.setattr(local, "full_research_session_hold", lambda *a, **kw: None)
     monkeypatch.setattr(refresh_runtime, "refresh_due", lambda *a, **kw: [])
     monkeypatch.setattr(local_advisory_recovery, "recover_due", lambda *a, **kw: [])

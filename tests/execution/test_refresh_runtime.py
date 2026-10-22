@@ -104,7 +104,7 @@ def test_existing_producer_calls_refresh_before_advisory_recovery(tmp_path, monk
     from tradingagents import local_automation as local, local_advisory_recovery
     from tradingagents.scheduled import runner
     monkeypatch.setattr(local, 'script', lambda _: SimpleNamespace(due_targets=lambda *a, **k: []))
-    monkeypatch.setattr(runner, '_iter_run_manifests_desc', lambda _: [])
+    monkeypatch.setattr(runner, '_iter_run_manifests_desc', lambda _, **kwargs: [])
     monkeypatch.setattr(refresh, 'refresh_due', lambda *a, **k: [{'target': 'execution-freshness-kr', 'status': 'COMPLETED'}])
     monkeypatch.setattr(local_advisory_recovery, 'recover_due', lambda *a, **k: pytest.fail('freshness gets priority'))
     assert local.run_due(tmp_path, tmp_path, now=AT)[0]['status'] == 'COMPLETED'

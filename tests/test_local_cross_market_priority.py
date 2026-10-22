@@ -39,7 +39,7 @@ def receipt_path(state, item):
 def wire(monkeypatch, item, *, refreshes=()):
     calls = {"workers": [], "preflights": [], "refreshes": []}
     monkeypatch.setattr(local, "script", lambda _: SimpleNamespace(due_targets=lambda *a, **k: [item]))
-    monkeypatch.setattr(runner, "_iter_run_manifests_desc", lambda _: [])
+    monkeypatch.setattr(runner, "_iter_run_manifests_desc", lambda _, **kwargs: [])
     monkeypatch.setattr(local, "require_storage_headroom", lambda *a: None)
     monkeypatch.setattr(local, "preflight", lambda path: calls["preflights"].append(path))
     monkeypatch.setattr(config, "load_scheduled_config", lambda _: SimpleNamespace(

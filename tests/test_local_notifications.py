@@ -351,7 +351,7 @@ def test_preflight_failure_records_terminal_attempt_and_queues_failure(tmp_path,
     target = SimpleNamespace(name='daily-codex-kr', workflow_file='daily-codex-analysis.yml', inputs={'profile': 'kr'},
                              window_start_kst=NOW, max_failed_attempts=2)
     monkeypatch.setattr(automation, 'script', lambda _: SimpleNamespace(due_targets=lambda *a, **k: [target]))
-    monkeypatch.setattr(scheduled, '_iter_run_manifests_desc', lambda _: [])
+    monkeypatch.setattr(scheduled, '_iter_run_manifests_desc', lambda _, **kwargs: [])
     def fail(_): raise RuntimeError('secret-bearing diagnostic must not be stored')
     monkeypatch.setattr(automation, 'preflight', fail)
     with pytest.raises(RuntimeError): automation.run_due(tmp_path / 'archive', tmp_path, now=NOW)

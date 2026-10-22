@@ -15,7 +15,7 @@ import traceback
 from datetime import date, datetime, time, timedelta, timezone
 from pathlib import Path
 from time import perf_counter, sleep
-from typing import Any
+from typing import Any, Callable
 from zoneinfo import ZoneInfo
 
 import yfinance as yf
@@ -5159,7 +5159,17 @@ def _find_latest_microstructure_run_manifest(archive_dir: Path, *, tickers: list
     return None
 
 
-def _iter_run_manifests_desc(archive_dir: Path) -> list[tuple[dict[str, Any], Path]]:
+def _iter_run_manifests_desc(
+    archive_dir: Path,
+    *,
+    project: Callable[[dict[str, Any]], dict[str, Any]] | None = None,
+) -> list[tuple[dict[str, Any], Path]]:
+    """Read every original in canonical order, optionally retaining a small view.
+
+    Projection bounds retained payloads without caching discovery or skipping
+    malformed older JSON. Full file reads and parsing still scale with archive
+    size. The default returns the original complete manifests as before.
+    """
     runs_dir = archive_dir / "runs"
     if not runs_dir.exists():
         return []
@@ -5172,7 +5182,8 @@ def _iter_run_manifests_desc(archive_dir: Path) -> list[tuple[dict[str, Any], Pa
             if not manifest_path.exists():
                 continue
             manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-            items.append((manifest, run_dir))
+            items.append((project(manifest) if project is not None else manifest, run_dir))
+            del manifest
     return items
 
 

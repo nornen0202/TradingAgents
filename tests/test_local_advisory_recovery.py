@@ -266,7 +266,7 @@ def test_core_due_never_calls_advisory_api_or_dispatches_on_same_tick(tmp_path, 
     from tradingagents.scheduled import runner
     targets = watchdog.due_targets(NOW)
     monkeypatch.setattr(local, "script", lambda _: SimpleNamespace(due_targets=lambda *a, **kw: targets))
-    monkeypatch.setattr(runner, "_iter_run_manifests_desc", lambda _: [])
+    monkeypatch.setattr(runner, "_iter_run_manifests_desc", lambda _, **kwargs: [])
     monkeypatch.setattr(local, "preflight", lambda _: None)
     monkeypatch.setattr(local.subprocess, "run", lambda *a, **kw: SimpleNamespace(returncode=0))
     monkeypatch.setattr(recovery, "recover_due", lambda *a, **kw: pytest.fail("Advisory API on core tick"))
@@ -279,7 +279,7 @@ def test_idle_api_exception_does_not_queue_core_failure(tmp_path, monkeypatch, w
     from tradingagents.notifications import local as notification
     targets = [target for target in watchdog.due_targets(NOW) if target.workflow_file in recovery.WORKFLOWS]
     monkeypatch.setattr(local, "script", lambda _: SimpleNamespace(due_targets=lambda *a, **kw: targets))
-    monkeypatch.setattr(runner, "_iter_run_manifests_desc", lambda _: [])
+    monkeypatch.setattr(runner, "_iter_run_manifests_desc", lambda _, **kwargs: [])
     monkeypatch.setattr(recovery, "create_client", lambda _: (_ for _ in ()).throw(OSError("secret auth")))
     monkeypatch.setattr(notification, "queue_failure", lambda *a, **kw: pytest.fail("Core failure from advisory API"))
     result = local.run_due(tmp_path / "archive", tmp_path / "state", now=NOW)
