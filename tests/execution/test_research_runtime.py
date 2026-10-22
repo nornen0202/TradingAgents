@@ -154,3 +154,41 @@ def test_new_research_waits_for_existing_producer_ownership_transfer(tmp_path, m
     (h.state / "actions-drained.json").unlink()
     assert h.tick() == [{"status": "WAITING_LOCAL_AUTOMATION_AUTHORITY"}]
     assert h.calls == []
+
+
+@pytest.mark.parametrize("kst_clock,expected", [
+    ("2026-10-22T17:49:00+09:00", []),
+    ("2026-10-22T17:50:00+09:00", ["daily-codex-us"]),
+    ("2026-10-23T00:10:00+09:00", ["daily-codex-us"]),
+    ("2026-10-24T00:10:00+09:00", ["daily-codex-us"]),
+    ("2026-10-22T05:01:00+09:00", ["daily-codex-us", "daily-codex-kr"]),
+])
+def test_independent_daily_research_uses_korean_schedule_for_utc_clock(
+        tmp_path, monkeypatch, kst_clock, expected):
+    from types import SimpleNamespace
+    from tradingagents import local_automation as local
+    from tradingagents.scheduled import automation_calendar
+
+    h = Harness(tmp_path, monkeypatch)
+    atomic_write_json(h.state / "research-lane-enabled.json", {
+        "mode": "PAPER_RESEARCH_INDEPENDENT_V1", "enabled": True, "real_orders_enabled": False})
+    monkeypatch.setattr(runner, "_iter_run_manifests_desc", lambda _: [])
+    monkeypatch.setattr(automation_calendar, "automated_market_session_status",
+                        lambda **kwargs: SimpleNamespace(is_session=True))
+    monkeypatch.setattr(local, "full_research_session_hold", lambda *a, **k: None)
+    now = datetime.fromisoformat(kst_clock)
+    # The installed research entry point normalizes its clock to UTC. Exercise
+    # the real daily dispatcher, rather than mocking away its KST calendar.
+    decisions = local.run_due(h.archive, h.state, now=now.astimezone(timezone.utc),
+                              dry_run=True, research_only=True)
+    assert [row["target"] for row in decisions if row["status"] == "DUE"] == expected
+    assert decisions == local.run_due(h.archive, h.state, now=now,
+                                     dry_run=True, research_only=True)
+    result = h.tick(now, dry_run=True)
+    if expected:
+        assert result == [{"status": "DAILY_RESEARCH_DUE", "decisions": decisions}]
+    else:
+        assert result == []
+    assert not list((h.state / "attempts").glob("*.json"))
+    assert not list((h.state / "research-refresh").glob("**/*.json"))
+    assert h.calls == []

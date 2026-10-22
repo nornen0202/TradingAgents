@@ -287,7 +287,7 @@ def run_due(archive, state, *, now=None, dry_run=False, research_only=False):
     # collection without extending input validity. The first US cloud slot
     # retains its separate New York execution-checkpoint alignment below.
     targets = watchdog.due_targets(
-        now, market_status_resolver=automated_market_session_status,
+        now.astimezone(ZoneInfo("Asia/Seoul")), market_status_resolver=automated_market_session_status,
         kr_overlay_checkpoints=KR_WORK_OVERLAY_CHECKPOINTS,
         us_overlay_checkpoints=US_WORK_OVERLAY_CHECKPOINTS,
     )
