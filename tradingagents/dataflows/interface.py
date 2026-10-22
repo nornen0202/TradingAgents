@@ -214,7 +214,13 @@ def _record_tool_telemetry(
     status: str,
     fallback: bool,
     note: str | None = None,
+    history_source: str | None = None,
 ) -> None:
+    provenance = {}
+    if history_source == _US_KIS_DAILY_SOURCE:
+        provenance = {"wrapper_vendor": vendor, "daily_history_source": history_source,
+                      "internal_recovery": True}
+        vendor = "kis"
     with _TELEMETRY_LOCK:
         _TOOL_TELEMETRY_EVENTS.append(
             {
@@ -223,6 +229,7 @@ def _record_tool_telemetry(
                 "status": status,
                 "fallback": fallback,
                 "note": note,
+                **provenance,
                 **({"request_id": _TOOL_REQUEST_ID.get()} if _TOOL_REQUEST_ID.get() else {}),
             }
         )
@@ -470,6 +477,11 @@ def _assert_history_vendor(request: tuple[str, str], vendor: str) -> None:
             raise VendorInputError("Daily history source changed within the same research")
 
 
+def _selected_history_source(request: tuple[str, str] | None) -> str | None:
+    selected = get_selected_daily_history(*request) if request is not None else None
+    return selected["source"] if selected else None
+
+
 def _route_to_vendor(method: str, *args, **kwargs):
     if method not in VENDOR_METHODS:
         raise ValueError(f"Method '{method}' not supported")
@@ -526,6 +538,7 @@ def _route_to_vendor(method: str, *args, **kwargs):
                     status="fallback",
                     fallback=True,
                     note=note,
+                    history_source=_selected_history_source(history_request),
                 )
                 fallback_notes.append(note)
                 _emit_vendor_fallback_log(method, note)
@@ -548,6 +561,7 @@ def _route_to_vendor(method: str, *args, **kwargs):
                         else "partial_window" if str(result).startswith("SEC disclosure coverage: PARTIAL_WINDOW")
                         else "success"),
                 fallback=False,
+                history_source=_selected_history_source(history_request),
             )
             return result
         except VendorInputError:
@@ -556,6 +570,7 @@ def _route_to_vendor(method: str, *args, **kwargs):
                 vendor=vendor,
                 status="input_error",
                 fallback=False,
+                history_source=_selected_history_source(history_request),
             )
             raise
         except Exception as exc:
@@ -568,6 +583,7 @@ def _route_to_vendor(method: str, *args, **kwargs):
                     status="fallback",
                     fallback=True,
                     note=note,
+                    history_source=_selected_history_source(history_request),
                 )
                 fallback_notes.append(note)
                 _emit_vendor_fallback_log(method, note)
@@ -578,6 +594,7 @@ def _route_to_vendor(method: str, *args, **kwargs):
                 status="error",
                 fallback=False,
                 note=str(exc),
+                history_source=_selected_history_source(history_request),
             )
             raise
 

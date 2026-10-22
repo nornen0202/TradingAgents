@@ -29,6 +29,7 @@ from tradingagents.agents.utils.instrument_resolver import resolve_instrument
 from cli.stats_handler import StatsCallbackHandler
 from tradingagents.default_config import DEFAULT_CONFIG
 from tradingagents.dataflows.interface import reset_tool_telemetry, snapshot_tool_telemetry, snapshot_tool_requests
+from tradingagents.dataflows.daily_history_evidence import DailyHistoryEvidenceRecorder
 from tradingagents.dataflows.research_evidence import SCHEMA as TOOL_REQUEST_SCHEMA
 from tradingagents.dataflows.institutional import (
     build_public_equity_intelligence_artifacts,
@@ -1957,7 +1958,8 @@ def _mask_sensitive_text(value: str) -> str:
 def _failed_tool_telemetry(metrics: dict[str, Any]) -> dict[str, Any]:
     """Keep failed request evidence without vendor notes, prompts or payloads."""
     events = [
-        {key: event[key] for key in ("method", "vendor", "status", "fallback", "request_id") if key in event}
+        {key: event[key] for key in ("method", "vendor", "status", "fallback", "request_id",
+                                   "wrapper_vendor", "daily_history_source", "internal_recovery") if key in event}
         for event in snapshot_tool_telemetry()
     ]
     requests = [
@@ -2007,6 +2009,8 @@ def _run_single_ticker(
     observation_recorder = ResearchObservationRecorder(ticker)
     chart_capture = ChartCapture(ticker)
     chart_token = chart_capture.activate()
+    history_recorder = DailyHistoryEvidenceRecorder(ticker)
+    history_token = history_recorder.activate()
 
     try:
         reset_tool_telemetry()
@@ -2098,6 +2102,7 @@ def _run_single_ticker(
                 f"::warning::{ticker} same-day analysis completed without get_intraday_snapshot tool usage."
             )
         analysis_payload = {
+            "daily_history_evidence": history_recorder.receipt(),
             "research_market_observation": observation_recorder.receipt(),
             "source_revision": os.getenv("TRADINGAGENTS_SOURCE_SHA"),
             "ticker": ticker,
@@ -2290,6 +2295,7 @@ def _run_single_ticker(
         }
     except Exception as exc:
         error_payload = {
+            "daily_history_evidence": history_recorder.receipt(),
             "research_market_observation": observation_recorder.receipt(),
             "ticker": ticker,
             "ticker_name": resolved_name,
@@ -2336,6 +2342,7 @@ def _run_single_ticker(
 
 
     finally:
+        history_recorder.reset(history_token)
         chart_capture.reset(chart_token)
         close = getattr(graph, "close", None)
         if callable(close):
