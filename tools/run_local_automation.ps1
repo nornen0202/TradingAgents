@@ -106,7 +106,10 @@ try {
         }
     }
     Set-Location $sourceRoot
-    $logPath = Join-Path $stateRoot "$Command.log"
+    # A read-only probe can overlap a scheduled worker. Windows native
+    # redirection keeps its file handle open for the worker's whole lifetime.
+    $logName = if ($DryRun) { "$Command-dry-run-$PID.log" } else { "$Command.log" }
+    $logPath = Join-Path $stateRoot $logName
     $arguments = @("-u", "-m", "tradingagents.local_automation", $Command,
         "--archive-dir", $ArchiveRoot, "--state-dir", $stateRoot,
         "--runtime-dir", (Join-Path $RepositoryRoot ".runtime\chatgpt-work"))
