@@ -1155,20 +1155,30 @@ def _market_sources(archive_dir: Path, market: str) -> list[dict[str, Any]]:
         candidates = list(runs_root.rglob("run.json"))
     # File modification time changes on restore/republish. Select by producer
     # clock before looking for the first ready bundle, across both markets.
-    manifests = [(path, load_json(path)) for path in candidates]
-    manifests.sort(key=lambda item: _timestamp(item[1].get("started_at")) or 0, reverse=True)
-    for manifest_path, manifest in manifests:
+    # Index only producer clocks, not every expanded manifest. The archive can
+    # contain gigabytes of repeated ticker research across minute overlays.
+    manifests = []
+    for path in candidates:
+        manifest = load_json(path)
         configured_market = str(((manifest.get("settings") or {}).get("market") or manifest.get("market") or "")).lower()
-        if configured_market != market:
-            continue
+        if configured_market == market:
+            manifests.append((_timestamp(manifest.get("started_at")) or 0, path))
+    manifests.sort(key=lambda item: item[0], reverse=True)
+    for started_at, manifest_path in manifests:
+        manifest = load_json(manifest_path)
+        configured_market = str(((manifest.get("settings") or {}).get("market") or manifest.get("market") or "")).lower()
+        if configured_market != market or (_timestamp(manifest.get("started_at")) or 0) != started_at:
+            raise ValueError("Market source changed during discovery")
         run_dir = manifest_path.parent
         artifact = ((manifest.get("decision_bundle") or {}).get("artifacts") or {}).get("decision_bundle_v2_json")
         bundle_path = _safe_artifact(run_dir, artifact) if artifact else run_dir / "decision_bundle_v2.json"
         bundle = load_json(bundle_path)
         if not bundle:
             continue
-        sources.append({"manifest": manifest, "bundle": bundle, "run_dir": run_dir})
-        if bool((bundle.get("quality") or {}).get("decision_ready")):
+        ready = bool((bundle.get("quality") or {}).get("decision_ready"))
+        if not sources or ready:
+            sources.append({"manifest": manifest, "bundle": bundle, "run_dir": run_dir})
+        if ready:
             break
     return sources
 
