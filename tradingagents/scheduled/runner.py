@@ -23,6 +23,7 @@ import yfinance as yf
 from tradingagents.atomic_io import atomic_write_json, interprocess_file_lock
 from tradingagents.scheduled.failure_diagnostics import failure_diagnostics, format_failure_diagnostics
 from tradingagents.scheduled.research_observation import ResearchObservationRecorder
+from tradingagents.scheduled.manifest_discovery import full_manifests_desc
 from tradingagents.charting.capture import ChartCapture
 from tradingagents.agents.utils.instrument_resolver import resolve_instrument
 from cli.stats_handler import StatsCallbackHandler
@@ -4501,7 +4502,7 @@ def _prefer_newer_completed_full_source(
             break
 
     eligible: list[tuple[tuple[datetime, str], dict[str, Any]]] = []
-    for full, _ in _iter_run_manifests_desc(archive_dir):
+    for full, _ in full_manifests_desc(archive_dir):
         settings = full.get("settings") if isinstance(full.get("settings"), dict) else {}
         actual_market = str(settings.get("market_scope") or settings.get("market") or "").upper()
         if (
@@ -4551,7 +4552,7 @@ def _resolve_latest_full_overlay_baseline_manifest(
             source_path = _find_run_manifest_path_by_run_id(archive_dir, source_run_id)
             if source_path is not None:
                 candidates.append(json.loads(source_path.read_text(encoding="utf-8")))
-    candidates.extend(manifest for manifest, _run_dir in _iter_run_manifests_desc(archive_dir))
+    candidates.extend(manifest for manifest, _run_dir in full_manifests_desc(archive_dir))
 
     unique: dict[str, dict[str, Any]] = {}
     for index, candidate in enumerate(candidates):
