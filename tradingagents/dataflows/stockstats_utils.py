@@ -57,9 +57,9 @@ def _verify_indicator_sessions(frame: pd.DataFrame, symbol: str, cutoff: pd.Time
     if market is None:
         return  # No invented exchange calendar for other instrument classes.
     try:
-        import exchange_calendars as xcals
+        from tradingagents.calendar_access import get_exchange_calendar
         from tradingagents.scheduled.market_calendar import default_calendar_name, is_supplemental_market_holiday
-        calendar = xcals.get_calendar(default_calendar_name(market), start=frame["Date"].iloc[0], end=cutoff)
+        calendar = get_exchange_calendar(default_calendar_name(market), start=frame["Date"].iloc[0], end=cutoff)
         # A weekend cutoff can be later than this calendar's last session.
         sessions = pd.DatetimeIndex(calendar.sessions).tz_localize(None)
         sessions = sessions[(sessions >= frame["Date"].iloc[0]) & (sessions <= cutoff)]

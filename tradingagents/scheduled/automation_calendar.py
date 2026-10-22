@@ -310,10 +310,10 @@ def _read_json_response(response: object) -> dict[str, object]:
 
 def _exchange_calendar_status(market: str, session_date: date) -> MarketSessionStatus:
     try:
-        import exchange_calendars as xcals
+        from tradingagents.calendar_access import get_exchange_calendar
 
         calendar_name = "XKRX" if market == "kr" else "XNYS"
-        calendar = xcals.get_calendar(calendar_name)
+        calendar = get_exchange_calendar(calendar_name)
         is_session = bool(calendar.is_session(session_date.isoformat()))
         if market == "kr":
             from tradingagents.scheduled.market_calendar import (

@@ -1186,14 +1186,14 @@ def _completed_daily_trade_date_from_exchange_calendar(
 ) -> date | None:
     try:
         import pandas as pd
-        import exchange_calendars as xcals
+        from tradingagents.calendar_access import get_exchange_calendar
     except Exception:
         return None
 
     try:
         local_now = _market_local_now(now=now, market=market)
         cutoff_utc = pd.Timestamp((local_now - timedelta(minutes=5)).astimezone(timezone.utc))
-        calendar = xcals.get_calendar(calendar_name)
+        calendar = get_exchange_calendar(calendar_name)
         schedule = calendar.schedule
         closes = pd.to_datetime(schedule["close"], utc=True)
         eligible = schedule.loc[closes <= cutoff_utc]
@@ -4886,10 +4886,10 @@ def _overlay_newer_session_count(
     if current_date <= baseline_date:
         return 0
     try:
-        import exchange_calendars as xcals
+        from tradingagents.calendar_access import get_exchange_calendar
         import pandas as pd
 
-        calendar = xcals.get_calendar(default_calendar_name(str(market or "")))
+        calendar = get_exchange_calendar(default_calendar_name(str(market or "")))
         sessions = calendar.sessions_in_range(
             pd.Timestamp(baseline_date),
             pd.Timestamp(current_date),

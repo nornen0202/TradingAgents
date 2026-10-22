@@ -43,11 +43,11 @@ def capture_daily_frame(ticker, frame, *, curr_date):
     recorder = _ACTIVE.get()
     if recorder is None or recorder.ticker != ticker:
         return
-    import exchange_calendars as xcals
+    from tradingagents.calendar_access import get_exchange_calendar
     from datetime import date
     from tradingagents.scheduled.market_calendar import is_supplemental_market_holiday
     market = "KR" if ticker[:6].isdigit() else "US"
-    calendar = xcals.get_calendar("XKRX" if market == "KR" else "XNYS")
+    calendar = get_exchange_calendar("XKRX" if market == "KR" else "XNYS")
     observed = datetime.now(timezone.utc)
     rows = []
     for row in frame.tail(260).to_dict("records"):
