@@ -348,6 +348,170 @@ def test_runner_retries_only_failed_ticker_and_recomputes_full_coverage(recovery
         assert manifest["terminal_failure"]["reason"] == "no_new_successful_recovery_research"
 
 
+def _offline_successful_worker(fixture, ticker, run_dir):
+    """Write a fresh research cohort member without a model or provider."""
+    original = fixture["source"]["tickers"][0]
+    row = deepcopy(original)
+    clock = datetime.now(timezone.utc)
+    row.update(ticker=ticker, started_at=clock.isoformat(), finished_at=clock.isoformat(),
+               analysis_date=clock.astimezone(ZoneInfo("America/New_York")).date().isoformat(),
+               duration_seconds=0, metrics={"llm_calls": 0}, llm_usage={"available": False, "calls": 0})
+    row["artifacts"] = {key: path.replace("AAPL", ticker) for key, path in original["artifacts"].items()}
+    row["artifacts"]["investment_review_html"] = f"tickers/{ticker}/investment_review.html"
+    for key, relative in row["artifacts"].items():
+        path = run_dir / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        if key == "investment_review_html":
+            path.write_text("<html>Fresh worker view</html>", encoding="utf-8")
+        elif key == "report_markdown":
+            path.write_bytes((fixture["root"] / original["artifacts"][key]).read_bytes())
+        else:
+            payload = json.loads((fixture["root"] / original["artifacts"][key]).read_text(encoding="utf-8"))
+            if key == "analysis_json":
+                payload.update({k: row[k] for k in ("ticker", "started_at", "finished_at", "analysis_date",
+                                                  "duration_seconds", "metrics", "llm_usage")})
+            elif key == "final_state_json":
+                payload["company_of_interest"] = ticker
+            elif key == "execution_contract_json":
+                payload["ticker"] = ticker
+            write(path, payload)
+    return row
+
+
+@pytest.mark.parametrize("original_html", [False, True])
+@pytest.mark.parametrize("execution_enabled", [False, True])
+@pytest.mark.parametrize("remaining_failure", [False, True])
+def test_recovery_postprocessing_preserves_original_artifacts_for_next_resume(
+    recovery, monkeypatch, original_html, execution_enabled, remaining_failure,
+):
+    from tradingagents.charting import report, snapshot
+
+    config = recovery["config"]
+    config = replace(config, run=replace(config.run, tickers=["AAPL", "XOM", "MSFT"]),
+                     execution=replace(config.execution, execution_refresh_enabled=execution_enabled))
+    recovery["config"] = config
+    source = recovery["source"]
+    source["settings"] = runner._settings_snapshot(config)
+    source["tickers"].append({"ticker": "MSFT", "status": "failed"})
+    source["active_universe"].update(active_count=3, expected_watchlist_tickers=["AAPL", "XOM", "MSFT"])
+    source["summary"].update(total_tickers=3, failed_tickers=2)
+    if original_html:
+        relative = "tickers/AAPL/investment_review.html"
+        source["tickers"][0]["artifacts"]["investment_review_html"] = relative
+        (recovery["root"] / relative).write_bytes(b"<html>Original dated view, immutable</html>")
+    write(recovery["root"] / "run.json", source)
+    before = {p.relative_to(recovery["root"]).as_posix(): p.read_bytes()
+              for p in recovery["root"].rglob("*") if p.is_file()}
+    analyzed, rendered, overlaid, bundled = [], [], [], []
+
+    def analyze(**kwargs):
+        ticker = kwargs["ticker"]
+        analyzed.append(ticker)
+        if ticker == "MSFT" and remaining_failure:
+            return {"ticker": ticker, "status": "failed", "error": "fixture only", "artifacts": {}}
+        return _offline_successful_worker(recovery, ticker, kwargs["run_dir"])
+
+    def fetch(**kwargs):
+        # Exercise the real overlay failure writer without a provider request.
+        for row in kwargs["ticker_summaries"]:
+            if row.get("status") != "success":
+                continue
+            overlaid.append(row["ticker"])
+        return {}
+
+    monkeypatch.setattr(runner, "_run_single_ticker", analyze)
+    monkeypatch.setattr(runner, "_augment_run_tickers_with_scanner", lambda **_: pytest.fail("Frozen cohort changed"))
+    for name in ("collect_event_signals", "collect_event_news", "build_live_context_delta"):
+        monkeypatch.setattr(runner, name, lambda **_: {})
+    monkeypatch.setattr(runner, "build_and_write_decision_bundle",
+                        lambda **kw: bundled.append([row["ticker"] for row in kw["manifest"]["tickers"]]) or {})
+    monkeypatch.setattr(runner, "_select_due_checkpoints", lambda **_: (["09:35"], "REGULAR"))
+    monkeypatch.setattr(runner, "market_session_state", lambda **_: {"is_open": True, "phase": "regular"})
+    monkeypatch.setattr(runner, "_fetch_overlay_market_snapshots", fetch)
+    monkeypatch.setattr(snapshot, "get_replay_snapshot", lambda ticker, *a, **kw: rendered.append(ticker) or {"ticker": ticker})
+    monkeypatch.setattr(report, "render_review", lambda value: f"<html>Postprocessed {value['ticker']}</html>")
+    manifest = runner.execute_scheduled_run(config, skip_site_build=True, run_label="preserve-reused-view",
+                                            resume_from_run=source["run_id"])
+    directory = config.storage.archive_dir / "runs" / manifest["run_id"][:4] / manifest["run_id"]
+    fresh = ["XOM"] if remaining_failure else ["XOM", "MSFT"]
+    assert analyzed == ["XOM", "MSFT"]
+    assert rendered == (fresh + fresh if execution_enabled else fresh)
+    assert overlaid == (fresh if execution_enabled else [])
+    assert bundled == [["AAPL", "XOM", "MSFT"]]
+    assert manifest["status"] == ("partial_failure" if remaining_failure else "success")
+    assert manifest["summary"]["successful_tickers"] == 1 + len(fresh)
+    assert manifest["active_universe"]["coverage"]["complete"] is (not remaining_failure)
+    reused = manifest["tickers"][0]
+    assert reused["artifacts"] == source["tickers"][0]["artifacts"]
+    assert reused["execution_update"] is None
+    for relative in reused["artifacts"].values():
+        assert (directory / relative).read_bytes() == before[relative]
+    for ticker in fresh:
+        assert (directory / f"tickers/{ticker}/investment_review.html").read_text() == f"<html>Postprocessed {ticker}</html>"
+    assert before == {p.relative_to(recovery["root"]).as_posix(): p.read_bytes()
+                      for p in recovery["root"].rglob("*") if p.is_file()}
+    if remaining_failure:
+        plan = load(recovery, source_run_id=manifest["run_id"], now=datetime.now(timezone.utc))
+        assert plan["retry_tickers"] == ["MSFT"]
+        assert plan["research_owners"]["AAPL"]["run_id"] == source["run_id"]
+        assert plan["research_owners"]["XOM"]["run_id"] == manifest["run_id"]
+    # The next ordinary overlay creates derived rows with their own artifact
+    # namespace. It still visits the entire successful cohort, including AAPL.
+    child_before = {p.relative_to(directory).as_posix(): p.read_bytes() for p in directory.rglob("*") if p.is_file()}
+    overlay_dir = directory.with_name(directory.name + "-overlay")
+    overlay_config = replace(config, run=replace(config.run, run_mode="overlay_only"),
+        execution=replace(config.execution, execution_lightweight_refresh=True))
+    # A completed child is discovered through the ordinary strict resolver.
+    # Partial cases exercise explicit-source copying only, not promotion of a
+    # partial run into a valid full-research baseline.
+    rows, baseline = runner._bootstrap_overlay_inputs_from_latest_run(config=overlay_config, run_dir=overlay_dir,
+        tickers=["AAPL", *fresh], source_manifest=manifest if remaining_failure else None)
+    assert baseline == manifest["run_id"]
+    assert all("research_reuse" not in row for row in rows)
+    overlaid.clear()
+    updates = runner._run_execution_overlay_passes(config=overlay_config, run_dir=overlay_dir,
+        ticker_summaries=rows, checkpoints=["09:36"], analysis_source_run_id=baseline)
+    assert overlaid == ["AAPL", *fresh]
+    assert all(ticker in updates for ticker in ["AAPL", *fresh])
+    assert child_before == {p.relative_to(directory).as_posix(): p.read_bytes() for p in directory.rglob("*") if p.is_file()}
+    if remaining_failure:
+        assert load(recovery, source_run_id=manifest["run_id"], now=datetime.now(timezone.utc))["retry_tickers"] == ["MSFT"]
+        if original_html:
+            (directory / reused["artifacts"]["investment_review_html"]).write_bytes(b"changed after publication")
+            with pytest.raises(ValueError, match="reused research changed"):
+                load(recovery, source_run_id=manifest["run_id"], now=datetime.now(timezone.utc))
+
+
+def test_all_reused_overlay_returns_no_new_evidence_without_fetch_or_render(recovery, monkeypatch):
+    plan = load(recovery)
+    summaries, _ = copy_recovered_research(plan, run_dir=recovery["destination"])
+    original = {p: p.read_bytes() for p in recovery["destination"].rglob("*") if p.is_file()}
+    monkeypatch.setattr(runner, "_fetch_overlay_market_snapshots", lambda **_: pytest.fail("No new rows to refresh"))
+    updates = runner._run_execution_overlay_passes(config=recovery["config"], run_dir=recovery["destination"],
+        ticker_summaries=summaries, checkpoints=["09:35"])
+    assert updates == {}
+    assert summaries[0]["execution_update"] is None
+    assert original == {p: p.read_bytes() for p in recovery["destination"].rglob("*") if p.is_file()}
+
+
+def test_entirely_new_research_still_renders_each_successful_review(recovery, monkeypatch):
+    from tradingagents.charting import report, snapshot
+
+    rendered = []
+    monkeypatch.setattr(runner, "_resolve_run_trade_date", lambda **_: recovery["source"]["daily_thesis_trade_date"])
+    monkeypatch.setattr(runner, "_run_single_ticker",
+                        lambda **kw: _offline_successful_worker(recovery, kw["ticker"], kw["run_dir"]))
+    for name in ("collect_event_signals", "collect_event_news", "build_live_context_delta", "build_and_write_decision_bundle"):
+        monkeypatch.setattr(runner, name, lambda **_: {})
+    monkeypatch.setattr(snapshot, "get_replay_snapshot", lambda ticker, *a, **kw: rendered.append(ticker) or {})
+    monkeypatch.setattr(report, "render_review", lambda _: "<html>Fresh completed view</html>")
+    manifest = runner.execute_scheduled_run(recovery["config"], skip_site_build=True, run_label="new-research-views")
+    assert manifest["status"] == "success"
+    assert "research_recovery" not in manifest
+    assert rendered == ["AAPL", "XOM"]
+    assert all("investment_review_html" in row["artifacts"] for row in manifest["tickers"])
+
+
 @pytest.mark.parametrize("parallel", [False, True])
 @pytest.mark.parametrize("retry_status", ["failed", "skipped"])
 def test_empty_failed_only_retry_preserves_22_original_successes_and_8_failures_without_postprocessing(recovery, monkeypatch, parallel, retry_status):
@@ -775,6 +939,8 @@ def test_completed_research_finalization_runs_no_graph_and_preserves_source(fina
     original = {p.relative_to(root).as_posix(): p.read_bytes() for p in root.rglob("*") if p.is_file()}
     monkeypatch.setattr(runner, "_run_single_ticker", lambda **_: pytest.fail("Completed research must not rerun"))
     monkeypatch.setattr(runner, "_augment_run_tickers_with_scanner", lambda **_: pytest.fail("Frozen selection must not rerun"))
+    monkeypatch.setattr("tradingagents.charting.snapshot.get_replay_snapshot",
+                        lambda *a, **kw: pytest.fail("Copied finalization reviews must not query a new replay snapshot"))
     downstream = Mock(return_value={})
     for name in ("collect_event_signals", "collect_event_news", "build_live_context_delta", "build_and_write_decision_bundle"):
         monkeypatch.setattr(runner, name, downstream)
@@ -786,6 +952,7 @@ def test_completed_research_finalization_runs_no_graph_and_preserves_source(fina
     assert manifest["active_universe"]["coverage"]["complete"] is True
     assert manifest["research_recovery"]["finalization_only"] is True
     assert manifest["research_recovery"]["retry_tickers"] == []
+    assert [row["artifacts"] for row in manifest["tickers"]] == [row["artifacts"] for row in finalization["rows"]]
     assert manifest["parallel_ticker_execution"]["requested_new_research_count"] == 0
     assert manifest["llm_usage"]["calls"] == 0
     assert downstream.call_count == 4

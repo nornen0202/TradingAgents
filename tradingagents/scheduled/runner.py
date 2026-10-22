@@ -2369,6 +2369,11 @@ def _run_single_ticker(
 
 
 def _refresh_integrated_review(ticker_dir: Path, summary: dict, *, run_dir: Path, db_paths=()) -> None:
+    # A recovered row's entire artifact map is bound to its original receipt.
+    # Keep even an absent legacy HTML artifact absent; adding or rerendering it
+    # would invalidate the next strict recovery hop.
+    if "research_reuse" in summary:
+        return
     from tradingagents.charting.report import render_review
     from tradingagents.charting.snapshot import get_replay_snapshot
     try:
@@ -5303,6 +5308,13 @@ def _run_execution_overlay_passes(
     checkpoints: list[str],
     analysis_source_run_id: str | None = None,
 ) -> dict[str, dict[str, Any]]:
+    # Failed-only/finalization recovery copies immutable research artifacts.
+    # Current overlays may update newly researched rows, but must not append to
+    # copied analysis or add/overwrite any of its receipt-bound artifact keys.
+    # Ordinary overlay bootstrap produces new rows without research_reuse.
+    ticker_summaries = [row for row in ticker_summaries if "research_reuse" not in row]
+    if not ticker_summaries:
+        return {}
     updates_by_ticker: dict[str, dict[str, Any]] = {}
     run_id = run_dir.name
     for checkpoint in checkpoints:
