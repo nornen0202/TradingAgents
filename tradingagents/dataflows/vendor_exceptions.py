@@ -12,3 +12,7 @@ class VendorTransientError(RuntimeError):
 
 class VendorMalformedResponseError(RuntimeError):
     """Raised when a vendor response is structurally invalid."""
+
+
+class InsufficientIndicatorHistoryError(RuntimeError):
+    """A requested indicator lacks usable inputs; do not retry another source."""

@@ -1,18 +1,114 @@
 import time
 import logging
+import math
+import re
+from datetime import datetime
 
 import pandas as pd
 import yfinance as yf
 from yfinance.exceptions import YFRateLimitError
-from stockstats import wrap
+from stockstats import dft_windows, wrap
 from typing import Annotated
 import os
 from .config import get_config
 from .integrity import safe_symbol, session_date, is_historical
 from .daily_history import selected_history, validate_with_fallback
 from .us_daily_history import fallback_enabled as us_fallback_enabled
+from .vendor_exceptions import InsufficientIndicatorHistoryError, VendorInputError
 
 logger = logging.getLogger(__name__)
+
+
+def _indicator_session_date(value):
+    try:
+        return session_date(value)
+    except (AttributeError, OverflowError):
+        return pd.NaT
+
+
+def indicator_minimum_observations(indicator: str) -> int:
+    """Nominal input requirements, not EMA/SMMA convergence guarantees.
+
+    Read stockstats' actual default periods, including explicit overrides.
+    Difference/true-range indicators require an observed preceding price;
+    MACD signal/histogram require a full signal period of mature MACD inputs.
+    """
+    fixed = {"close_50_sma": 50, "close_200_sma": 200, "close_10_ema": 10}
+    if indicator in fixed:
+        return fixed[indicator]
+    family = {"macds": "macd", "macdh": "macd", "boll_ub": "boll", "boll_lb": "boll"}.get(indicator, indicator)
+    if family not in {"macd", "boll", "rsi", "atr", "vwma", "mfi"}:
+        raise VendorInputError(f"Unsupported stockstats indicator: {indicator}")
+    try:
+        periods = [int(value) for value in dft_windows(family).split(",")]
+        if len(periods) != (3 if family == "macd" else 1) or any(value <= 0 for value in periods):
+            raise ValueError("Invalid period configuration")
+    except (AttributeError, TypeError, ValueError) as exc:
+        raise InsufficientIndicatorHistoryError("Stockstats indicator periods cannot be verified") from exc
+    if family == "macd":
+        return max(periods[:2]) + (periods[2] - 1 if indicator != "macd" else 0)
+    return periods[0] + (1 if family in {"rsi", "atr", "mfi"} else 0)
+
+
+def _verify_indicator_sessions(frame: pd.DataFrame, symbol: str, cutoff: pd.Timestamp) -> None:
+    """Never label a missing KR/US trading bar as a weekend or holiday."""
+    symbol = safe_symbol(symbol)
+    market = "KR" if re.fullmatch(r"[0-9]{6}\.(KS|KQ)", symbol) else "US" if re.fullmatch(r"[A-Z]{1,10}(?:-B)?", symbol) else None
+    if market is None:
+        return  # No invented exchange calendar for other instrument classes.
+    try:
+        import exchange_calendars as xcals
+        from tradingagents.scheduled.market_calendar import default_calendar_name, is_supplemental_market_holiday
+        calendar = xcals.get_calendar(default_calendar_name(market), start=frame["Date"].iloc[0], end=cutoff)
+        # A weekend cutoff can be later than this calendar's last session.
+        sessions = pd.DatetimeIndex(calendar.sessions).tz_localize(None)
+        sessions = sessions[(sessions >= frame["Date"].iloc[0]) & (sessions <= cutoff)]
+        expected = {stamp.date() for stamp in sessions
+                    if not is_supplemental_market_holiday(market=market, session_date=stamp.date())}
+    except Exception as exc:
+        raise InsufficientIndicatorHistoryError("Indicator session coverage cannot be verified") from exc
+    observed = set(frame["Date"].dt.date)
+    if observed != expected:
+        raise InsufficientIndicatorHistoryError("Indicator history has missing trading sessions or non-session bars")
+
+
+def calculate_stockstats_indicator(data: pd.DataFrame, symbol: str, indicator: str, curr_date: str) -> pd.DataFrame:
+    """Keep the full calculation history; mask only immature output rows."""
+    required = indicator_minimum_observations(indicator)
+    try:
+        cutoff = pd.Timestamp(datetime.strptime(curr_date, "%Y-%m-%d"))
+    except (TypeError, ValueError) as exc:
+        raise VendorInputError("Indicator date must be YYYY-MM-DD") from exc
+    if "Date" not in data:
+        raise InsufficientIndicatorHistoryError("Indicator history has no verifiable dates")
+    frame = data.copy()
+    frame["Date"] = pd.to_datetime(frame["Date"].map(_indicator_session_date))
+    # Unknown/future dates cannot contribute to observations or calculations.
+    frame = frame.loc[frame["Date"].notna() & (frame["Date"] <= cutoff)]
+    frame = frame.sort_values("Date").drop_duplicates("Date", keep="last").reset_index(drop=True)
+    if len(frame) < required:
+        raise InsufficientIndicatorHistoryError(
+            f"Insufficient history for {indicator}: requires {required} observed daily bars; found {len(frame)}"
+        )
+    columns = ["Close"]
+    if indicator in {"atr", "vwma", "mfi"}:
+        columns += ["High", "Low"]
+    if indicator in {"vwma", "mfi"}:
+        columns += ["Volume"]
+    for column in columns:
+        if column not in frame:
+            raise InsufficientIndicatorHistoryError(f"Indicator history is missing {column}")
+        frame[column] = pd.to_numeric(frame[column], errors="coerce")
+        if not frame[column].map(lambda value: pd.notna(value) and math.isfinite(value) and (value >= 0 if column == "Volume" else value > 0)).all():
+            raise InsufficientIndicatorHistoryError(f"Indicator history has invalid {column} observations")
+    _verify_indicator_sessions(frame, symbol, cutoff)
+    calculated = wrap(frame.copy())
+    values = calculated[indicator].copy()
+    values.iloc[:required - 1] = float("nan")
+    result = frame[["Date"]].copy()
+    result[indicator] = values.to_numpy()
+    result.attrs["indicator_minimum_observations"] = required
+    return result
 
 
 def yf_retry(func, max_retries=3, base_delay=2.0):
@@ -169,15 +265,16 @@ class StockstatsUtils:
         ],
     ):
         data = load_ohlcv(symbol, curr_date)
-        df = wrap(data)
+        df = calculate_stockstats_indicator(data, symbol, indicator, curr_date)
         df["Date"] = df["Date"].dt.strftime("%Y-%m-%d")
         curr_date_str = pd.to_datetime(curr_date).strftime("%Y-%m-%d")
 
-        df[indicator]  # trigger stockstats to calculate the indicator
         matching_rows = df[df["Date"].str.startswith(curr_date_str)]
 
         if not matching_rows.empty:
             indicator_value = matching_rows[indicator].values[0]
+            if pd.isna(indicator_value) or not math.isfinite(indicator_value):
+                raise InsufficientIndicatorHistoryError(f"Insufficient or undefined {indicator} history on {curr_date}")
             return indicator_value
         else:
-            return "N/A: Not a trading day (weekend or holiday)"
+            raise InsufficientIndicatorHistoryError(f"No observed {indicator} value for requested date {curr_date}")
