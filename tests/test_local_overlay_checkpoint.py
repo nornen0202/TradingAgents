@@ -95,7 +95,7 @@ def wire_overlay_only(monkeypatch, manifests=()):
                                            if t.workflow_file == "intraday-overlay-refresh.yml"]))
     monkeypatch.setattr(automation_calendar, "automated_market_session_status",
                         lambda market, now: SimpleNamespace(is_session=True))
-    monkeypatch.setattr(runner, "_iter_run_manifests_desc", lambda _: [(m, None) for m in manifests])
+    monkeypatch.setattr(runner, "_iter_run_manifests_desc", lambda _, **kwargs: [(m, None) for m in manifests])
 
 
 def write_receipt(state, target, **updates):
@@ -168,7 +168,7 @@ def test_crossing_checkpoint_completion_uses_execution_observation(asof, selecte
                              "overlay_phase": {"selected_checkpoints": selected}}
     now = kst("2026-10-13T23:08:00")
     target = us_target(now)
-    assert local.completed_target(manifest, target, window_start=kst("2026-10-13T23:00:00")) is expected
+    assert local.completed_target(manifest, target, window_start=kst("2026-10-13T23:00:00"), now=now) is expected
     if expected:
         wire_overlay_only(monkeypatch, [manifest])
         monkeypatch.setattr(local.subprocess, "run", lambda *a, **k: pytest.fail("duplicate after completed observation"))

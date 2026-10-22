@@ -177,10 +177,57 @@ def local_target_window_start(target, *, now):
     return max(start, first_checkpoint.astimezone(start.tzinfo))
 
 
-def completed_target(manifest, target, *, window_start=None):
-    """Gate on completed research coverage, independently of delivery status."""
+def _scheduler_manifest_view(manifest):
+    """Keep exactly the fields consumed by the two scheduler selectors below.
+
+    This is a per-tick view of a freshly parsed original, not a cached source or
+    approval. Recovery still reopens and validates the original manifest and its
+    artifacts. Preserve malformed types for the existing selectors to reject.
+    """
+    def fields(value, names):
+        return {key: value[key] for key in names if key in value} if isinstance(value, dict) else value
+
+    if not isinstance(manifest, dict):
+        return manifest
+    view = fields(manifest, ("run_id", "label", "started_at", "finished_at", "status"))
+    for name, keys in (
+        ("settings", ("market", "market_scope", "run_mode", "analysis_mode")),
+        ("summary", ("successful_tickers", "failed_tickers", "configured_ticker_count")),
+        ("active_universe", ("coverage",)),
+        ("execution", ("execution_asof", "refresh_checkpoint", "overlay_phase")),
+    ):
+        if name in manifest:
+            view[name] = fields(manifest[name], keys)
+    active = view.get("active_universe")
+    if isinstance(active, dict):
+        coverage = active.get("coverage")
+        if isinstance(coverage, dict) and coverage:
+            # Nonempty coverage without 'complete' must remain incomplete.
+            active["coverage"] = {"complete": coverage.get("complete")}
+    execution = view.get("execution")
+    if isinstance(execution, dict) and "overlay_phase" in execution:
+        execution["overlay_phase"] = fields(execution["overlay_phase"], ("selected_checkpoints",))
+    if "tickers" in manifest:
+        rows = manifest["tickers"]
+        view["tickers"] = [fields(row, ("ticker", "status", "artifacts")) for row in rows] if isinstance(rows, list) else rows
+        if isinstance(view["tickers"], list):
+            for row in view["tickers"]:
+                if isinstance(row, dict) and "artifacts" in row:
+                    row["artifacts"] = fields(row["artifacts"], ("analysis_json",))
+    return view
+
+
+def completed_target(manifest, target, *, window_start=None, now=None):
+    """Gate on research completed by an aware cutoff, independently of delivery.
+
+    Scheduled callers supply their original tick clock. Direct callers default
+    to the actual current UTC instant, never an unbounded future cutoff.
+    """
     from tradingagents.scheduled.runner import _manifest_is_complete_overlay_baseline
 
+    now = datetime.now(timezone.utc) if now is None else now
+    if not isinstance(now, datetime) or now.tzinfo is None or now.utcoffset() is None:
+        raise ValueError("Aware scheduler completion clock required")
     settings = manifest.get("settings") or {}
     mode = "full" if target.workflow_file == "daily-codex-analysis.yml" else "overlay_only"
     if str(settings.get("market", "")).lower() != target.inputs["profile"] or settings.get("run_mode", "full") != mode:
@@ -192,7 +239,7 @@ def completed_target(manifest, target, *, window_start=None):
         finished = datetime.fromisoformat(manifest["finished_at"].replace("Z", "+00:00"))
     except (KeyError, TypeError, ValueError):
         return False
-    if started.tzinfo is None or finished.tzinfo is None or finished < started:
+    if started.tzinfo is None or finished.tzinfo is None or not started <= finished <= now:
         return False
     boundary = window_start or target.window_start_kst
     if mode == "full":
@@ -297,7 +344,7 @@ def run_due(archive, state, *, now=None, dry_run=False, research_only=False):
         kr_overlay_checkpoints=KR_WORK_OVERLAY_CHECKPOINTS,
         us_overlay_checkpoints=US_WORK_OVERLAY_CHECKPOINTS,
     )
-    manifests = [m for m, _ in _iter_run_manifests_desc(archive)]
+    manifests = [m for m, _ in _iter_run_manifests_desc(archive, project=_scheduler_manifest_view)]
     decisions = []
     for target in targets:
         if target.workflow_file not in {"daily-codex-analysis.yml", "intraday-overlay-refresh.yml"}:
@@ -312,7 +359,7 @@ def run_due(archive, state, *, now=None, dry_run=False, research_only=False):
         if now < window_start:
             decisions.append({"target": target.name, "status": "AWAITING_EXECUTION_CHECKPOINT"})
             continue
-        if any(completed_target(m, target, window_start=window_start) for m in manifests):
+        if any(completed_target(m, target, window_start=window_start, now=now) for m in manifests):
             decisions.append({"target": target.name, "status": "RESEARCH_COMPLETE"})
             continue
         # Budget is per market/session, including Friday US work after KST midnight.
