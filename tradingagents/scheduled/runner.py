@@ -285,6 +285,7 @@ def execute_scheduled_run(
     finalization_source_config: Path | None = None,
     paper_state_dir: Path | None = None,
     defer_execution_handoff: bool = False,
+    research_refresh_plan: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     tz = ZoneInfo(config.run.timezone)
     started_at = datetime.now(tz)
@@ -301,13 +302,14 @@ def execute_scheduled_run(
                                  finalize_from_run=finalize_from_run,
                                  finalization_source_config=finalization_source_config,
                                  paper_state_dir=paper_state_dir,
-                                 defer_execution_handoff=defer_execution_handoff)
+                                 defer_execution_handoff=defer_execution_handoff,
+                                 research_refresh_plan=research_refresh_plan)
 
 
 def _execute_run_body(config, *, run_label, skip_site_build, tz, started_at,
                       run_timer_start, run_id, run_dir, resume_from_run=None,
                       finalize_from_run=None, finalization_source_config=None, paper_state_dir=None,
-                      defer_execution_handoff=False):
+                      defer_execution_handoff=False, research_refresh_plan=None):
     reset_llm_usage()
 
     run_mode = str(config.run.run_mode or "full").strip().lower()
@@ -324,11 +326,24 @@ def _execute_run_body(config, *, run_label, skip_site_build, tz, started_at,
     overlay_universe_warnings: list[str] = []
     recovery_plan = None
     recovery_receipt = None
+    refresh_source = None
+    if research_refresh_plan is not None:
+        from .research_refresh import load_plan_source
+        if (run_mode != "selective_rerun_only" or resume_from_run or finalize_from_run
+                or config.execution.execution_refresh_enabled or config.portfolio.enabled
+                or not skip_site_build or not defer_execution_handoff):
+            raise ValueError("Research refresh is an independent research-only lane")
+        refresh_source = load_plan_source(config.storage.archive_dir, research_refresh_plan, now=started_at)
+        if research_refresh_plan["market"] != str(config.run.market).upper():
+            raise ValueError("Research plan market does not match its config")
     if resume_from_run and run_mode != "full":
         raise ValueError("Research recovery requires run_mode=full")
     if finalize_from_run and (run_mode != "full" or resume_from_run or not finalization_source_config):
         raise ValueError("Finalization requires full mode, an original source config and no research recovery")
-    if portfolio_only:
+    if refresh_source is not None:
+        run_tickers = list(research_refresh_plan["cohort_tickers"])
+        scanner_status = None
+    elif portfolio_only:
         run_tickers: list[str] = []
         scanner_status = None
     else:
@@ -428,7 +443,7 @@ def _execute_run_body(config, *, run_label, skip_site_build, tz, started_at,
     max_runtime_seconds = _max_runtime_seconds(config)
     min_remaining_seconds = _min_remaining_seconds_for_next_ticker(config)
     post_processing_min_seconds = max(600.0, min_remaining_seconds)
-    if run_mode == "selective_rerun_only" and not config.execution.execution_refresh_enabled:
+    if run_mode == "selective_rerun_only" and not config.execution.execution_refresh_enabled and refresh_source is None:
         raise RuntimeError(
             "run_mode=selective_rerun_only requires [execution].enabled=true to compute rerun targets."
         )
@@ -490,17 +505,22 @@ def _execute_run_body(config, *, run_label, skip_site_build, tz, started_at,
             config=config,
             run_dir=run_dir,
             tickers=run_tickers,
+            **({"source_manifest": refresh_source, "preserve_thesis_bytes": True} if refresh_source is not None else {}),
         )
+        if refresh_source is not None:
+            _run_selective_rerun(config=config, run_dir=run_dir, engine_results_dir=engine_results_dir,
+                ticker_summaries=ticker_summaries,
+                targets={ticker: list(research_refresh_plan["reasons"]) for ticker in research_refresh_plan["targets"]})
 
     reset_llm_usage()
     # News collection can involve many slow network calls. Finish it BEFORE
     # collecting the short-lived price observations, and reuse the same dated
     # evidence in the report delta instead of fetching it a second time.
     news_as_of = datetime.now(tz)
-    news_context = {} if portfolio_only or lightweight_refresh else collect_event_news(
+    news_context = {} if portfolio_only or lightweight_refresh or refresh_source is not None else collect_event_news(
         ticker_summaries=ticker_summaries, analysis_as_of=news_as_of,
     )
-    event_signals = {} if portfolio_only or lightweight_refresh else collect_event_signals(
+    event_signals = {} if portfolio_only or lightweight_refresh or refresh_source is not None else collect_event_signals(
         run_dir=run_dir, ticker_summaries=ticker_summaries,
         analysis_as_of=news_as_of, news_context=news_context,
     )
@@ -861,6 +881,10 @@ def _execute_run_body(config, *, run_label, skip_site_build, tz, started_at,
     manifest["finished_at"] = completed_at.isoformat()
     manifest["duration_seconds"] = round((completed_at - started_at).total_seconds(), 2)
     manifest["postprocessing_duration_seconds"] = round((completed_at - finished_at).total_seconds(), 2)
+    if refresh_source is not None and manifest["status"] == "success":
+        from .research_refresh import revision_receipt
+        manifest["research_refresh"] = revision_receipt(
+            config.storage.archive_dir, run_dir, manifest, research_refresh_plan)
     _publish_completed_run_manifest(
         archive_dir=config.storage.archive_dir, run_dir=run_dir, manifest=manifest,
     )
@@ -3985,8 +4009,10 @@ def _bootstrap_overlay_inputs_from_latest_run(
     config: ScheduledAnalysisConfig,
     run_dir: Path,
     tickers: list[str],
+    source_manifest: dict[str, Any] | None = None,
+    preserve_thesis_bytes: bool = False,
 ) -> tuple[list[dict[str, Any]], str | None]:
-    source_manifest = _resolve_latest_overlay_source_manifest(
+    source_manifest = source_manifest or _resolve_latest_overlay_source_manifest(
         config.storage.archive_dir,
         tickers=tickers,
         market=config.run.market,
@@ -4026,7 +4052,7 @@ def _bootstrap_overlay_inputs_from_latest_run(
         target_ticker_dir = run_dir / "tickers" / ticker
         target_ticker_dir.mkdir(parents=True, exist_ok=True)
         target_analysis = target_ticker_dir / "analysis.json"
-        target_analysis.write_text(source_analysis.read_text(encoding="utf-8"), encoding="utf-8")
+        target_analysis.write_bytes(source_analysis.read_bytes())
         copied_source_artifacts: dict[str, str] = {}
         for artifact_key in (
             "report_markdown",
@@ -4078,7 +4104,7 @@ def _bootstrap_overlay_inputs_from_latest_run(
         target_contract = target_ticker_dir / "execution_contract.json"
         if contract_rel and (source_run_dir / contract_rel).exists():
             source_contract_text = (source_run_dir / contract_rel).read_text(encoding="utf-8")
-            if has_legacy_trim_invalidation(json.loads(source_contract_text)):
+            if not preserve_thesis_bytes and has_legacy_trim_invalidation(json.loads(source_contract_text)):
                 # Repair only the new overlay's derived contract. Research,
                 # source contracts and their original clocks stay immutable.
                 analysis_payload = json.loads(target_analysis.read_text(encoding="utf-8"))
@@ -4087,7 +4113,7 @@ def _bootstrap_overlay_inputs_from_latest_run(
                     raise RuntimeError(f"Cannot rebuild legacy trim invalidation from canonical research: {ticker}")
                 _write_json(target_contract, contract.to_dict())
             else:
-                target_contract.write_text(source_contract_text, encoding="utf-8")
+                target_contract.write_bytes((source_run_dir / contract_rel).read_bytes())
         else:
             analysis_payload = json.loads(target_analysis.read_text(encoding="utf-8"))
             contract = build_execution_contract(ticker=ticker, analysis_payload=analysis_payload)
@@ -4446,7 +4472,11 @@ def _resolve_latest_overlay_source_manifest(
 
     candidate = json.loads(latest_manifest_path.read_text(encoding="utf-8"))
     run_mode = str((((candidate.get("settings") or {}).get("run_mode")) or "full")).strip().lower()
-    candidate_market_ok = _manifest_market_matches(candidate, market=market)
+    from .research_refresh import verified_revision
+    candidate_revision_ok = ("research_refresh" not in candidate
+        and not str(candidate.get("label") or "").startswith("local-thesis-refresh-")) or verified_revision(
+            archive_dir, candidate, market=market, now=datetime.now(timezone.utc))
+    candidate_market_ok = _manifest_market_matches(candidate, market=market) and candidate_revision_ok
     if candidate_market_ok and run_mode == "full" and _manifest_has_bootstrap_ready_ticker(candidate, tickers=tickers):
         return _prefer_newer_completed_full_source(archive_dir, candidate, tickers=tickers, market=market)
 
@@ -4466,7 +4496,10 @@ def _resolve_latest_overlay_source_manifest(
         source_manifest_path = _find_run_manifest_path_by_run_id(archive_dir, source_run_id)
         if source_manifest_path is not None:
             resolved = json.loads(source_manifest_path.read_text(encoding="utf-8"))
-            if _manifest_market_matches(resolved, market=market) and _manifest_has_bootstrap_ready_ticker(
+            resolved_revision_ok = ("research_refresh" not in resolved
+                and not str(resolved.get("label") or "").startswith("local-thesis-refresh-")) or verified_revision(
+                    archive_dir, resolved, market=market, now=datetime.now(timezone.utc))
+            if resolved_revision_ok and _manifest_market_matches(resolved, market=market) and _manifest_has_bootstrap_ready_ticker(
                 resolved,
                 tickers=tickers,
             ):
@@ -4474,7 +4507,7 @@ def _resolve_latest_overlay_source_manifest(
 
     latest_full = _find_latest_full_run_manifest(archive_dir, tickers=tickers, market=market)
     if latest_full is not None:
-        return latest_full
+        return _prefer_newer_completed_full_source(archive_dir, latest_full, tickers=tickers, market=market)
     return None
 
 
@@ -4541,7 +4574,10 @@ def _prefer_newer_completed_full_source(
             continue
         if lineage_key is None or key > lineage_key:
             eligible.append((key, full))
-    return max(eligible, key=lambda item: item[0])[1] if eligible else candidate
+    selected = max(eligible, key=lambda item: item[0])[1] if eligible else candidate
+    from .research_refresh import prefer_completed_revision
+    return prefer_completed_revision(archive_dir, selected, market=market, tickers=tickers,
+                                     now=datetime.now(timezone.utc))
 
 
 def _resolve_latest_full_overlay_baseline_manifest(

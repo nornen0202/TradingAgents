@@ -591,7 +591,7 @@ def complete_handoffs(site, runtime_dir, publication):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("command", choices=("run-due", "publish", "paper", "review", "validate-kis", "strategy-kis"))
+    parser.add_argument("command", choices=("run-due", "publish", "paper", "review", "validate-kis", "strategy-kis", "research-kis"))
     parser.add_argument("--archive-dir", type=Path, required=True)
     parser.add_argument("--state-dir", type=Path, required=True)
     parser.add_argument("--runtime-dir", type=Path, required=True)
@@ -610,6 +610,15 @@ def main():
         os.environ["TRADINGAGENTS_LOCAL_PAPER_STATE_DIR"] = str(args.state_dir)
     # These are independent consumers. They neither acquire producer ownership
     # nor dispatch report notifications, and cannot send a real broker order.
+    if args.command == "research-kis":
+        from tradingagents.execution.research_runtime import research_due
+        try:
+            with interprocess_file_lock(args.state_dir / "research-kis.lock", timeout=0):
+                result = research_due(args.archive_dir, args.state_dir, dry_run=args.dry_run)
+        except TimeoutError:
+            result = [{"status": "RESEARCH_ALREADY_RUNNING", "broker_orders_sent": 0}]
+        print(json.dumps(result, ensure_ascii=True))
+        return 0
     if args.command == "strategy-kis":
         if args.dry_run:
             print(json.dumps({"status": "DRY_RUN", "mode": "KIS_DEMO_STRATEGY", "real_orders_enabled": False}))
