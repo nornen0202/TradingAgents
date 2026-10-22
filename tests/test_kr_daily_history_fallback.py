@@ -157,6 +157,10 @@ def test_healthy_yahoo_remains_primary(broker):
 
 
 def test_csv_and_indicator_paths_include_broker_provenance_without_yahoo_cache_poison(broker, tmp_path):
+    import exchange_calendars as xcals
+    days = xcals.get_calendar("XKRX").sessions_in_range("2026-09-01", "2026-10-12")[-10:]
+    broker.domestic_daily_itemchartprice.return_value = {
+        "output2": [bar(day.strftime("%Y%m%d")) for day in reversed(days)]}
     with patch.object(y_finance.yf, "Ticker") as ticker:
         ticker.return_value.history.return_value = yahoo()
         result = y_finance.get_YFin_data_online("000660.KS", "2026-10-08", "2026-10-12")

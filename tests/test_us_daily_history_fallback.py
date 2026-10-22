@@ -340,6 +340,13 @@ def test_stale_yahoo_with_missing_broker_credentials_still_fails_closed(broker, 
 
 
 def test_broker_price_pins_indicator_and_csv_paths_even_when_yahoo_recovers(broker, monkeypatch, tmp_path):
+    # The pin fixture must also provide EMA10's ten actual observations.
+    days = [date.fromisoformat(value) for value in (
+        "2026-10-08", "2026-10-09", "2026-10-12", "2026-10-13", "2026-10-14",
+        "2026-10-15", "2026-10-16", "2026-10-19", "2026-10-20", "2026-10-21",
+    )]
+    monkeypatch.setattr(us, "_sessions", Mock(return_value=days))
+    broker.request_json.return_value = payload([bar(day) for day in reversed(days)])
     ticker = Mock()
     ticker.history.return_value = yahoo()
     monkeypatch.setattr(y_finance.yf, "Ticker", Mock(return_value=ticker))

@@ -37,6 +37,7 @@ from .integrity import is_historical
 from .daily_history_selection import get_selected_daily_history, select_daily_history
 from .us_daily_history import SOURCE as _US_KIS_DAILY_SOURCE, fallback_enabled as _us_history_enabled
 from .vendor_exceptions import (
+    InsufficientIndicatorHistoryError,
     VendorConfigurationError,
     VendorInputError,
     VendorMalformedResponseError,
@@ -377,7 +378,7 @@ def should_fallback(result_or_exc: Any, method: str | None = None) -> bool:
     config = get_config()
     empty_result_fallback = bool(config.get("empty_result_fallback", True))
 
-    if isinstance(result_or_exc, VendorInputError):
+    if isinstance(result_or_exc, (VendorInputError, InsufficientIndicatorHistoryError)):
         return False
 
     if isinstance(

@@ -3,15 +3,14 @@ from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 import contextlib
 import io
+import math
 import pandas as pd
 import yfinance as yf
-import os
-from .stockstats_utils import StockstatsUtils, _clean_dataframe, yf_retry, load_ohlcv, filter_financials_by_date
-from .config import get_config
+from .stockstats_utils import StockstatsUtils, yf_retry, load_ohlcv, filter_financials_by_date, calculate_stockstats_indicator
 from .integrity import safe_symbol, is_historical
 from .daily_history import fallback_enabled, selected_history, validate_with_fallback, source_note
 from .us_daily_history import fallback_enabled as us_fallback_enabled
-from .vendor_exceptions import VendorInputError, VendorMalformedResponseError
+from .vendor_exceptions import VendorInputError, VendorMalformedResponseError, InsufficientIndicatorHistoryError
 
 
 def _build_yfinance_symbol_candidates(raw_ticker: str) -> list[str]:
@@ -204,9 +203,15 @@ def get_stock_stats_indicators_window(
             f"Indicator {indicator} is not supported. Please choose from: {list(best_ind_params.keys())}"
         )
 
+    if isinstance(look_back_days, bool) or not isinstance(look_back_days, int) or look_back_days < 0:
+        raise VendorInputError("look_back_days must be a non-negative integer")
+
     end_date = curr_date
     curr_date_dt = datetime.strptime(curr_date, "%Y-%m-%d")
-    before = curr_date_dt - relativedelta(days=look_back_days)
+    try:
+        before = curr_date_dt - relativedelta(days=look_back_days)
+    except (OverflowError, ValueError) as exc:
+        raise VendorInputError("Requested indicator window exceeds supported dates") from exc
 
     # Optimized: Get stock data once and calculate indicators for all dates
     provenance_note = ""
@@ -217,6 +222,7 @@ def get_stock_stats_indicators_window(
         # Generate the date range we need
         current_dt = curr_date_dt
         date_values = []
+        observed_values = 0
         
         while current_dt >= before:
             date_str = current_dt.strftime('%Y-%m-%d')
@@ -224,18 +230,26 @@ def get_stock_stats_indicators_window(
             # Look up the indicator value for this date
             if date_str in indicator_data:
                 indicator_value = indicator_data[date_str]
+                if str(indicator_value).startswith("N/A"):
+                    raise InsufficientIndicatorHistoryError(
+                        f"Insufficient or undefined {indicator} history on requested date {date_str}"
+                    )
+                observed_values += 1
             else:
-                indicator_value = "N/A: Not a trading day (weekend or holiday)"
+                indicator_value = "N/A: No observed daily bar for this date"
             
             date_values.append((date_str, indicator_value))
             current_dt = current_dt - relativedelta(days=1)
+
+        if not observed_values:
+            raise InsufficientIndicatorHistoryError(f"No observed {indicator} values in the requested window")
         
         # Build the result string
         ind_string = ""
         for date_str, value in date_values:
             ind_string += f"{date_str}: {value}\n"
         
-    except (VendorInputError, VendorMalformedResponseError):
+    except (VendorInputError, VendorMalformedResponseError, InsufficientIndicatorHistoryError):
         raise
     except Exception as e:
         if us_fallback_enabled(symbol):
@@ -274,14 +288,9 @@ def _get_stock_stats_bulk(
     Fetches data once and calculates indicator for all available dates.
     Returns dict mapping date strings to indicator values.
     """
-    from stockstats import wrap
-
     data = load_ohlcv(symbol, curr_date)
-    df = wrap(data)
+    df = calculate_stockstats_indicator(data, symbol, indicator, curr_date)
     df["Date"] = df["Date"].dt.strftime("%Y-%m-%d")
-    
-    # Calculate the indicator for all rows at once
-    df[indicator]  # This triggers stockstats to calculate the indicator
     
     # Create a dictionary mapping date strings to indicator values
     result_dict = {"__source_note__": source_note(data)}
@@ -290,8 +299,8 @@ def _get_stock_stats_bulk(
         indicator_value = row[indicator]
         
         # Handle NaN/None values
-        if pd.isna(indicator_value):
-            result_dict[date_str] = "N/A"
+        if pd.isna(indicator_value) or not pd.api.types.is_number(indicator_value) or not math.isfinite(indicator_value):
+            result_dict[date_str] = "N/A: Insufficient or undefined indicator history"
         else:
             result_dict[date_str] = str(indicator_value)
     
@@ -315,7 +324,7 @@ def get_stockstats_indicator(
             indicator,
             curr_date,
         )
-    except (VendorInputError, VendorMalformedResponseError):
+    except (VendorInputError, VendorMalformedResponseError, InsufficientIndicatorHistoryError):
         raise
     except Exception as e:
         if us_fallback_enabled(symbol):
