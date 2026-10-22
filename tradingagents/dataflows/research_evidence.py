@@ -49,16 +49,22 @@ def assess_tool_evidence(telemetry, *, started_at, finished_at):
                 return invalid
             by_id[identity] = row
             by_method.setdefault(method, []).append(row)
-        recovered = set()
+        recovered, final_events = set(), {}
         for event in events:
             row = by_id.get(event.get("request_id"))
             if row is None or row["method"] != event.get("method"):
                 return invalid
+            final_events[row["request_id"]] = event
             if event.get("fallback") is True and row["status"] == "available":
                 recovered.add(row["request_id"])
+        for identity, row in by_id.items():
+            if row["status"] == "available":
+                final = final_events.get(identity, {})
+                if final.get("status") not in {"success", "verified_zero"} or final.get("fallback") is not False:
+                    return invalid
         unavailable = {method for method, rows in by_method.items()
                        if any(row["status"] != "available" for row in rows)}
-        missing = sorted(REQUIRED_METHODS - by_method.keys() | REQUIRED_METHODS & unavailable)
+        missing = sorted((REQUIRED_METHODS - by_method.keys()) | (REQUIRED_METHODS & unavailable))
         return {"schema": SCHEMA, "status": "COMPLETE" if not missing else "REQUIRED_EVIDENCE_MISSING",
                 "missing_required_methods": missing,
                 "optional_unavailable_methods": sorted(unavailable - REQUIRED_METHODS),

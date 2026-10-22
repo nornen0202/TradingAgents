@@ -107,6 +107,9 @@ def test_optional_unavailability_is_visible_without_replacing_core_evidence():
         "method_mismatch",
         "bad_schema",
         "empty",
+        "no_events",
+        "no_final_success",
+        "last_event_failed",
     ],
 )
 def test_invalid_or_incomplete_evidence_never_clears_review(change):
@@ -139,6 +142,12 @@ def test_invalid_or_incomplete_evidence_never_clears_review(change):
         data["request_schema"] = "unknown"
     elif change == "empty":
         data["request_outcomes"] = []
+    elif change == "no_events":
+        data["events"] = []
+    elif change == "no_final_success":
+        data["events"] = [e for e in data["events"] if e["fallback"]]
+    elif change == "last_event_failed":
+        data["events"].append(deepcopy(data["events"][0]))
     assert (
         evidence_review_reason({"fallback_count": 0, "request_evidence": assess(data)})
         == "required_research_evidence_missing"
