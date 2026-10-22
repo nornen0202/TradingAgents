@@ -42,7 +42,7 @@ from tradingagents.dataflows.intraday_market import (
 )
 from tradingagents.dataflows.intraday.microstructure import render_microstructure_report
 from tradingagents.dataflows.stockstats_utils import is_retryable_yfinance_error, yf_retry
-from tradingagents.execution.contract_builder import build_execution_contract
+from tradingagents.execution.contract_builder import build_execution_contract, has_legacy_trim_invalidation
 from tradingagents.execution.overlay import evaluate_execution_state
 from tradingagents.execution.reporting import (
     render_execution_summary_markdown,
@@ -4074,7 +4074,17 @@ def _bootstrap_overlay_inputs_from_latest_run(
         contract_rel = artifacts.get("execution_contract_json")
         target_contract = target_ticker_dir / "execution_contract.json"
         if contract_rel and (source_run_dir / contract_rel).exists():
-            target_contract.write_text((source_run_dir / contract_rel).read_text(encoding="utf-8"), encoding="utf-8")
+            source_contract_text = (source_run_dir / contract_rel).read_text(encoding="utf-8")
+            if has_legacy_trim_invalidation(json.loads(source_contract_text)):
+                # Repair only the new overlay's derived contract. Research,
+                # source contracts and their original clocks stay immutable.
+                analysis_payload = json.loads(target_analysis.read_text(encoding="utf-8"))
+                contract = build_execution_contract(ticker=ticker, analysis_payload=analysis_payload)
+                if "fallback_contract" in contract.reason_codes:
+                    raise RuntimeError(f"Cannot rebuild legacy trim invalidation from canonical research: {ticker}")
+                _write_json(target_contract, contract.to_dict())
+            else:
+                target_contract.write_text(source_contract_text, encoding="utf-8")
         else:
             analysis_payload = json.loads(target_analysis.read_text(encoding="utf-8"))
             contract = build_execution_contract(ticker=ticker, analysis_payload=analysis_payload)
