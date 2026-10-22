@@ -47,6 +47,31 @@
 
 17:50 KST 독립 연구 작업이 성공 종료했지만 빈 대상 목록을 반환한 원인을 추가 추적했다. UTC→KST 변환 누락을 수정하고 관련 194개 검사를 통과했다. naive·잘못된 시각은 조회·원장 기록 전에 거절하며, 기존 시작 시각·세션 키·재시도 상한은 바꾸지 않는다. 이 검사도 실제 미국 재분석 시작 증거와 구분한다.
 
+## PR429 병합 후 미국 가격 장애와 대체 공급경로 확인
+
+PR429 병합 후 운영 체크아웃 `130c3c7f`에서 시작된 `20261022T182146_local-scheduler-us-full`은 18:32 KST에 30/30 종목 실패로 종료됐다. 첫 `get_stock_data`에서 Yahoo 최신 종가 검증 실패와 Alpha Vantage 호출 한도가 겹쳤으며, 30개 종목별 연구의 LLM 호출은 0회였다. 그러나 실패 후 포트폴리오 judge·writer 후처리가 실제 실행됐다. 보존한 `C:/TradingAgentsData/archive/runs/2026/20261022T182146_local-scheduler-us-full/run.json`의 최종 `llm_usage`는 judge 15회·writer 1회, 총 16회·354,923토큰이며 전체 실행은 632.03초였다. 후처리에 536.86초를 사용했으므로 전체 LLM 호출 0회로 해석하면 안 된다. 이번 코드는 전 종목 실패 뒤 이 불필요한 후처리를 차단한다. 정상 재분석 완료나 판단 생성으로 집계하지 않는다. 실패 원본을 보존하고 국내·미국 정상 전략 체결 0건, 국내 검증 왕복 0건을 유지한다.
+
+18:27 KST 별도 Yahoo 조회는 yfinance 1.5.1, `auto_adjust=False`, 요청 종료일 제외 `2026-10-22` 조건에서도 AAPL의 최신 완료 거래일 `2026-10-21`에 `Close=null`, `Adj Close=null`, 거래량 35,368,592를 반환했다. 과거 정상 종가로 바꾸거나 해당 완료봉을 삭제해서 통과시킬 문제가 아니다. 오프라인 검사에서는 정상 10/21봉 뒤 잘못된 10/22봉은 기준일 필터로 제외됐고, 10/21 종가 자체가 없으면 거절됐다. 이 원본과 CSV 해시는 운영 저장소의 `.runtime/local-automation/live-verification/yahoo-price-failure-20261022/aapl-raw-history.{csv,json}`에 보존했다.
+
+18:33 KST KIS 읽기 전용 시장데이터 조회(실전 시세 호스트, 계좌·주문 API 사용 없음)는 AAPL/NAS, `GUBN=0`, `MODP=1`로 허용된 GET 2회만 수행했다. 클라이언트 환경은 `environment="real"`이었고 결과를 주문에 사용하지 않았다. 모의 시세 호스트에서 얻은 응답으로 표시하지 않는다.
+
+| 실제 요청 | 응답에서 확인한 범위 | 확인한 최신 완료봉 |
+|---|---|---|
+| `BYMD=20261021` | 100행, 2026-06-01∼2026-10-21, `tr_cont=F` | 10/21 종가 343.9900 USD, 거래량 35,614,126 |
+| `BYMD=20260531` | 100행, 2026-01-06∼2026-05-29, `tr_cont=F` | 05/29까지의 과거 구간을 반환 |
+
+운영 저장소의 `.runtime/local-automation/live-verification/kis-us-price-probe-20261022/`에 `page-1.json`, `page-2.json`, 조회시각·요청범위·각 원문 SHA-256을 담은 `receipt.json`을 보존했다. 이 두 조회는 날짜를 내려 과거 구간을 얻을 수 있다는 AAPL의 단회 증거다. 370일 또는 5년 전체 기간, 모든 종목, 지표 재계산, 복구 후 연구·승인·체결 성공을 입증하지 않는다. Yahoo와 KIS의 거래량 등 차이도 남기며 두 공급자의 행을 섞어 누락 종가만 메우지 않는다.
+
+공식 [KIS 기간별시세 호출](https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/overseas_stock/dailyprice/dailyprice.py)과 [필드 설명](https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/overseas_stock/dailyprice/chk_dailyprice.py)은 `/uapi/overseas-price/v1/quotations/dailyprice`, 실전·모의 공통 TR `HHDFS76240000`, `xymd/clos/open/high/low/tvol`을 제시한다. `BYMD` 공란은 오늘이므로 완료 거래일을 명시한다. 공식 샘플은 `M/F` 응답에 `N`을 전달하고 최대 반복 횟수에서 부분 누적을 반환하므로, 샘플 종료만으로 전체 기간 완료를 인정하지 않는다.
+
+`MODP=1`의 공식 의미는 수정주가 반영이다. Yahoo `auto_adjust=True`와 배당·분할 처리까지 같다는 근거, 과거 시점에 실제 알려졌던 수정본이라는 증거는 없다. 공급자·조정 기준·조회시각을 보존하고 가격과 지표를 같은 전체 시계열에서 다시 계산해야 한다. 과거 날짜 필터만으로 수정본의 당시 가용성을 입증하지 않는다.
+
+이후 전체 일봉·지표 대체 경로를 구현하고 독립 오프라인 fixture 60개를 통과했다. 실제 XNYS 달력의 5년 구간과 Mock 응답 13페이지를 함께 검증했으며, 20페이지 상한·짧은 상장 이력·달력 누락·미래/누락/잘못된 날짜·모든 사용 행의 유효 OHLCV·중복 충돌·페이지 반복을 포함한다. 가격과 지표의 공급자 고정, 먼저 선택된 스냅샷 보존, 같은 연구 중 Yahoo→KIS 변경 거절, Yahoo 캐시 불변과 오류를 빈 지표 성공으로 바꾸지 않는 계약도 확인했다. 이 검사는 네트워크·모델·실제 주문을 호출하지 않았다.
+
+18:36 KST 신규 로더의 별도 실제 시세 검사에서는 AAPL GET 13회로 2021-10-21∼2026-10-21의 XNYS 거래일 1,255개가 모두 일치했다. 최신 종가는 343.99 USD, 같은 시계열의 200일 단순이동평균은 293.234602였다. 운영 저장소의 `.runtime/local-automation/live-verification/us-whole-history-recovery-20261022/receipt.json`에 원본 CSV SHA-256 `bfe68e91da187b1085cd530529602703692ae4056d23bc2dac373e47d85962ed`와 조회·지표 근거를 남겼다. Yahoo 캐시 생성, 모델 호출, 계좌·주문 호출은 모두 0이며 주문에 사용하지 않았다. 이는 AAPL 한 종목의 시세·지표 복구 증거로 한정한다.
+
+이 시점에는 **일봉 로더의 로컬 구현·위 검사 완료**, **병합·배포·30종목 정상 재분석·승인·체결은 미검증**이다. 추가 감사에서 바깥 라우터의 Alpha Vantage 대체 경로가 연구 내 공급자 고정을 우회할 수 있는 결함을 발견해 수정했다. 미국 복구 기본 경로는 검증된 Yahoo→KIS 전체 시계열 경로 안에서 끝내고, 호출 전·결과 반환 전·병렬 선택 경합에서 고정된 출처를 대조한다. 종목의 공백·대소문자도 같은 식별자로 정규화한다. 캐시는 공급자·조정 기준을 구분하며 부분 결과를 정상 완료로 승격하지 않는다. 복구 후 새 정상 분석과 원래 승인 검증을 거치며, 조회 성공만으로 자동 주문·실계좌 전환 또는 승인 우회를 허용하지 않는다. 국내·미국 정상 전략 체결과 국내 검증 왕복은 여전히 0건이다.
+
 ## 공식 자료 비교와 적용 권고
 
 Exa로 5개 검색 관점에서 25개 결과 슬롯을 검토하고 공식 상세 페이지 11개를 추가로 읽었다(`sources_reviewed: 25`). 이 수는 독립 검증된 프로젝트 수나 수익성 표본 수가 아니다. API 문서는 인터페이스 계약, 프로젝트 README는 개발팀의 설계 설명으로 구분한다. 외부 프로젝트의 성과 수치를 재현하거나 채택하지 않았다.
@@ -72,6 +97,8 @@ Exa로 5개 검색 관점에서 25개 결과 슬롯을 검토하고 공식 상�
 공식 KIS 샘플 `2077773a69a428daf63e148182511f068cc45de3`의 [국내 모의 잔고 필드](https://raw.githubusercontent.com/koreainvestment/open-trading-api/2077773a69a428daf63e148182511f068cc45de3/examples_llm/domestic_stock/inquire_balance/chk_inquire_balance.py)는 전일·금일 제비용 및 차기·가수도 정산금액을 제공하지만 계좌 집계다. 정상 전략·별도 검증·기존 보유분에 임의 배분하지 않는다. [국내 기간매매손익](https://raw.githubusercontent.com/koreainvestment/open-trading-api/2077773a69a428daf63e148182511f068cc45de3/examples_llm/domestic_stock/inquire_period_trade_profit/inquire_period_trade_profit.py)과 [해외 기간거래](https://raw.githubusercontent.com/koreainvestment/open-trading-api/2077773a69a428daf63e148182511f068cc45de3/examples_llm/overseas_stock/inquire_period_trans/inquire_period_trans.py)의 공식 코드에는 실전 TR만 확인된다. 모의 지원을 입증하지 못했으므로 허용 API에 추가하거나 실전 호스트로 우회하지 않는다.
 
 확정 비용을 향후 수입할 때에는 원주문·통화·명세 행·개정 ID 및 원문 해시를 연결한 추가 전용 증거가 필요하다. 비용의 명시적 0과 누락을 구분하고 거래일·정산일·발행·확정·수집 시점을 별도로 보존한다. 중복은 한 번만 반영하며 정정은 기존 행을 덮어쓰지 않고 연결한다. 모든 관련 체결의 수량·대금·귀속·비용 구성·정산을 기준일까지 대조할 수 있을 때만 확정 순손익으로 승격한다. 현재 구현에는 이 승격 증거가 없고 `actual_cost`와 `net_pnl`은 null이다.
+
+비용 체크포인트 검증 강화의 별도 관련 검사 177개가 통과했으며, 이는 실제 비용 명세 확보·정산 대조·순손익 확정 완료와 구분한다.
 
 ## 측정 가능한 수용 기준
 

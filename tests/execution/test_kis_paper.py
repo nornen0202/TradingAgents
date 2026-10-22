@@ -469,7 +469,7 @@ def test_invalid_account_totals_never_become_zero_holdings(tmp_path, totals):
 
 
 def test_explicit_vts_fill_import_never_labels_real_and_requires_known_clocks(tmp_path):
-    b, _, _, moment = make(tmp_path, ack(), report(filled=1, remaining=0))
+    b, _, _, moment = make(tmp_path, ack(), report(filled=1, remaining=0, tot_ccld_amt="70000"))
     b.submit(**order(b))
     moment[0] += timedelta(seconds=10)
     b.reconcile(intent_id="vts-intent-1")
@@ -488,6 +488,183 @@ def test_explicit_vts_fill_import_never_labels_real_and_requires_known_clocks(tm
     with pytest.raises(ValueError, match="different evidence"):
         import_demo_fill(b, {**receipt, "cost": 101})
     assert b.db.execute("SELECT count(*) FROM lifecycle_events WHERE mode='actual'").fetchone()[0] == 0
+    b.close()
+
+
+def _settled_receipt(broker, **changes):
+    return {"environment": "demo", "account_scope": broker.client.credentials.scope(), "intent_id": "vts-intent-1",
+            "fill_id": "fixture-fill-1", "ticker": "005930", "side": "BUY", "quantity": 1, "price": 70000,
+            "cost": 100, "currency": "KRW", "executed_at": "2026-10-19T10:01:02+09:00",
+            "confirmed_at": "2026-10-19T10:01:03+09:00", "settled_at": "2026-10-19T10:01:04+09:00", **changes}
+
+
+def _observed_import_broker(tmp_path, *, amount="70000"):
+    b, _, session, moment = make(tmp_path, ack(), report(filled=1, remaining=0, tot_ccld_amt=amount))
+    b.submit(**order(b))
+    moment[0] += timedelta(seconds=10)
+    b.reconcile(intent_id="vts-intent-1")
+    return b, session, moment
+
+
+def test_import_rejects_99_receipt_after_broker_observed_one_share_at_100(tmp_path):
+    b, _, session, moment = make(tmp_path, ack(), report(filled=1, remaining=0, ord_unpr="100", tot_ccld_amt="100"))
+    args = order(b, limit_price=100)
+    args["quote"]["last_price"] = 100
+    args["account"]["capacity_limit_price"] = 100
+    b.submit(**args)
+    moment[0] += timedelta(seconds=10)
+    b.reconcile(intent_id="vts-intent-1")
+    count = len(session.calls)
+    with pytest.raises(DemoError, match="equal broker-observed checkpoint"):
+        import_demo_fill(b, _settled_receipt(b, price=99))
+    assert b.db.execute("SELECT count(*) FROM lifecycle_events WHERE kind='FILL'").fetchone()[0] == 0
+    assert import_demo_fill(b, _settled_receipt(b, price=100))
+    assert len(session.calls) == count
+    b.close()
+
+
+@pytest.mark.parametrize("amount", [None, "", "NaN", "0", "69900"])
+def test_import_requires_matching_known_observed_money(tmp_path, amount):
+    b, session, _ = _observed_import_broker(tmp_path, amount=amount)
+    count = len(session.calls)
+    with pytest.raises(DemoError, match="equal broker-observed checkpoint"):
+        import_demo_fill(b, _settled_receipt(b))
+    assert b.db.execute("SELECT count(*) FROM lifecycle_events WHERE kind='FILL'").fetchone()[0] == 0
+    assert len(session.calls) == count
+    b.close()
+
+
+@pytest.mark.parametrize("field", ["executed_at", "confirmed_at", "settled_at"])
+@pytest.mark.parametrize("value", [None, "not-a-date", "2026-10-19T10:01:11+09:00"])
+def test_import_receipt_clocks_fail_closed_without_appending(tmp_path, field, value):
+    b, _, _ = _observed_import_broker(tmp_path)
+    with pytest.raises(DemoError):
+        import_demo_fill(b, _settled_receipt(b, **{field: value}))
+    assert b.db.execute("SELECT count(*) FROM lifecycle_events WHERE kind='FILL'").fetchone()[0] == 0
+    b.close()
+
+
+@pytest.mark.parametrize("change", [
+    {"mode": "actual"}, {"broker_order_id": "different-order"}, {"live_orders_enabled": True},
+    {"real_orders_enabled": True}, {"cumulative_observation_only": False}, {"fill_time_known": True},
+    {"settlement_known": True}, {"observed_at": None}, {"observed_at": "bad-date"},
+    {"observed_at": "2026-10-19T10:01:11+09:00"}, {"ingested_at": None}, {"ingested_at": "bad-date"},
+    {"ingested_at": "2026-10-19T10:01:11+09:00"}, {"ingested_at": "2026-10-19T10:01:09+09:00"},
+    {"filled_qty": 0}, {"remaining_qty": 1}, {"status": "UNRESOLVED"},
+])
+def test_import_requires_dated_same_order_demo_observation(tmp_path, change):
+    b, _, _ = _observed_import_broker(tmp_path)
+    encoded = b.db.execute("SELECT evidence FROM paper_observations").fetchone()[0]
+    b.db.execute("UPDATE paper_observations SET evidence=?", (json.dumps({**json.loads(encoded), **change}),))
+    with pytest.raises(DemoError):
+        import_demo_fill(b, _settled_receipt(b))
+    assert b.db.execute("SELECT count(*) FROM lifecycle_events WHERE kind='FILL'").fetchone()[0] == 0
+    b.close()
+
+
+@pytest.mark.parametrize("mutation", [
+    "UPDATE requests SET status='UNKNOWN'",
+    "UPDATE requests SET response='{}'",
+    "UPDATE requests SET created_at='2026-10-19T10:01:03+09:00'",
+    "UPDATE owner SET scope='other-fixture-scope'",
+    "DELETE FROM paper_observations",
+    "DELETE FROM reconciliations",
+    "UPDATE reconciliations SET observed_at='bad-date'",
+    "UPDATE reconciliations SET observed_at='2026-10-19T10:01:11+09:00'",
+    "UPDATE reconciliations SET evidence='{}'",
+    "UPDATE intents SET tr_id='TTTC0012U'",
+    "UPDATE intents SET endpoint='other'",
+    "UPDATE order_state SET filled=0",
+    "INSERT INTO reconciliation_issues VALUES('vts-intent-1','fixture-unresolved')",
+])
+def test_import_requires_original_owner_ack_and_reconciliation(tmp_path, mutation):
+    b, _, _ = _observed_import_broker(tmp_path)
+    b.db.execute(mutation)
+    with pytest.raises(DemoError):
+        import_demo_fill(b, _settled_receipt(b))
+    assert b.db.execute("SELECT count(*) FROM lifecycle_events WHERE kind='FILL'").fetchone()[0] == 0
+    b.close()
+
+
+@pytest.mark.parametrize("change", [{"broker_order_id": "other"}, {"source": "unverified"}])
+def test_import_rejects_conflicting_optional_receipt_provenance(tmp_path, change):
+    b, _, _ = _observed_import_broker(tmp_path)
+    with pytest.raises(DemoError, match="provenance"):
+        import_demo_fill(b, _settled_receipt(b, **change))
+    b.close()
+
+
+def test_import_partial_prices_match_cumulative_checkpoints_and_do_not_duplicate(tmp_path):
+    b, _, session, moment = make(tmp_path, ack(),
+        report(quantity=2, filled=1, remaining=1, tot_ccld_amt="69900"),
+        report(quantity=2, filled=2, remaining=0, tot_ccld_amt="139900"),
+        policy=PaperOrderPolicy(("005930",), max_order_krw=200000))
+    b.submit(**order(b, quantity=2))
+    moment[0] += timedelta(seconds=10)
+    b.reconcile(intent_id="vts-intent-1")
+    moment[0] += timedelta(seconds=10)
+    b.reconcile(intent_id="vts-intent-1")
+    first = _settled_receipt(b, price=69900)
+    second = _settled_receipt(b, fill_id="fixture-fill-2", executed_at="2026-10-19T10:01:12+09:00",
+                             confirmed_at="2026-10-19T10:01:13+09:00", settled_at="2026-10-19T10:01:14+09:00")
+    count = len(session.calls)
+    assert import_demo_fill(b, first)
+    with pytest.raises(DemoError, match="checkpoint"):
+        import_demo_fill(b, {**second, "price": 69900})
+    assert import_demo_fill(b, second)
+    assert not import_demo_fill(b, first)
+    assert not import_demo_fill(b, second)
+    assert b.db.execute("SELECT count(*) FROM lifecycle_events WHERE kind='FILL'").fetchone()[0] == 2
+    assert len(session.calls) == count
+    b.close()
+
+
+def test_import_never_infers_individual_price_from_only_final_cumulative_report(tmp_path):
+    b, _, _, moment = make(tmp_path, ack(), report(quantity=2, filled=2, remaining=0, tot_ccld_amt="139900"),
+                            policy=PaperOrderPolicy(("005930",), max_order_krw=200000))
+    b.submit(**order(b, quantity=2))
+    moment[0] += timedelta(seconds=10)
+    b.reconcile(intent_id="vts-intent-1")
+    with pytest.raises(DemoError, match="checkpoint"):
+        import_demo_fill(b, _settled_receipt(b, price=69900))
+    assert b.db.execute("SELECT count(*) FROM lifecycle_events WHERE kind='FILL'").fetchone()[0] == 0
+    b.close()
+
+
+def test_import_rejects_same_quantity_broker_cashflow_correction(tmp_path):
+    b, _, _, moment = make(tmp_path, ack(), report(filled=1, remaining=0, tot_ccld_amt="70000"),
+                            report(filled=1, remaining=0, tot_ccld_amt="69900"))
+    b.submit(**order(b))
+    moment[0] += timedelta(seconds=10)
+    b.reconcile(intent_id="vts-intent-1")
+    moment[0] += timedelta(seconds=10)
+    b.reconcile(intent_id="vts-intent-1")
+    with pytest.raises(DemoError, match="regressed or was corrected"):
+        import_demo_fill(b, _settled_receipt(b))
+    b.close()
+
+
+def test_import_does_not_backdate_fill_to_an_earlier_cumulative_observation(tmp_path):
+    b, _, moment = _observed_import_broker(tmp_path)
+    moment[0] += timedelta(seconds=20)
+    with pytest.raises(DemoError, match="checkpoint"):
+        import_demo_fill(b, _settled_receipt(b, executed_at="2026-10-19T10:01:11+09:00",
+            confirmed_at="2026-10-19T10:01:12+09:00", settled_at="2026-10-19T10:01:13+09:00"))
+    assert b.db.execute("SELECT count(*) FROM lifecycle_events WHERE kind='FILL'").fetchone()[0] == 0
+    b.close()
+
+
+def test_import_sell_uses_sell_ack_terms_and_exact_gross_notional(tmp_path):
+    b, _, _, moment = make(tmp_path, ack(), report(filled=1, remaining=0, sll_buy_dvsn_cd="01", tot_ccld_amt="70100"))
+    args = order(b, side="SELL")
+    args["signal"]["decision_now"] = "REDUCE_NOW"
+    b.submit(**args)
+    moment[0] += timedelta(seconds=10)
+    b.reconcile(intent_id="vts-intent-1")
+    with pytest.raises(DemoError, match="checkpoint"):
+        import_demo_fill(b, _settled_receipt(b, side="SELL", price=70000))
+    assert import_demo_fill(b, _settled_receipt(b, side="SELL", price=70100, broker_order_id="123", source="kis_vts"))
+    assert not import_demo_fill(b, _settled_receipt(b, side="SELL", price=70100))
     b.close()
 
 

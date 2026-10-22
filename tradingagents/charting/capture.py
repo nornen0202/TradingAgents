@@ -66,7 +66,9 @@ def capture_daily_frame(ticker, frame, *, curr_date):
                      "timestamp": completed.isoformat(), "available_at": completed.isoformat(),
                      "observed_at": observed.isoformat(), "session_id": day, "interval": "1d"})
     source = str(frame.attrs.get("source") or "")
-    recorder.add(rows, provider="kis" if source.startswith("KIS domestic_daily_itemchartprice") else "yfinance")
+    provider = str(frame.attrs.get("provider") or "").lower()
+    is_kis = provider == "kis" or source.startswith(("KIS domestic_daily_itemchartprice", "KIS overseas"))
+    recorder.add(rows, provider="kis" if is_kis else "yfinance")
 
 
 def normalize_kis_bars(rows, *, observed_at, timezone_name):

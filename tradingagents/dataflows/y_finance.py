@@ -9,7 +9,9 @@ import os
 from .stockstats_utils import StockstatsUtils, _clean_dataframe, yf_retry, load_ohlcv, filter_financials_by_date
 from .config import get_config
 from .integrity import safe_symbol, is_historical
-from .kr_daily_history import fallback_enabled, validate_with_kr_fallback, source_note
+from .daily_history import fallback_enabled, selected_history, validate_with_fallback, source_note
+from .us_daily_history import fallback_enabled as us_fallback_enabled
+from .vendor_exceptions import VendorInputError, VendorMalformedResponseError
 
 
 def _build_yfinance_symbol_candidates(raw_ticker: str) -> list[str]:
@@ -77,7 +79,16 @@ def get_YFin_data_online(
     end_exclusive = (datetime.strptime(end_date, "%Y-%m-%d") + timedelta(days=1)).strftime("%Y-%m-%d")
 
     # Fetch historical data for the specified date range
-    data = yf_retry(lambda: ticker.history(start=start_date, end=end_exclusive))
+    data = selected_history(symbol, start_date, end_date)
+    if data is not None:
+        data = data.set_index("Date")
+    else:
+        try:
+            data = yf_retry(lambda: ticker.history(start=start_date, end=end_exclusive))
+        except Exception:
+            if not us_fallback_enabled(symbol):
+                raise
+            data = pd.DataFrame()
 
     # Check if data is empty
     if data.empty and not fallback_enabled(symbol):
@@ -86,7 +97,7 @@ def get_YFin_data_online(
         )
 
     data.index.name = "Date"
-    data = validate_with_kr_fallback(data.reset_index(), symbol, start_date, end_date).set_index("Date")
+    data = validate_with_fallback(data.reset_index(), symbol, start_date, end_date).set_index("Date")
     data = data.loc[data.index >= pd.Timestamp(start_date)]
 
     # Round numerical values to 2 decimal places for cleaner display
@@ -224,7 +235,13 @@ def get_stock_stats_indicators_window(
         for date_str, value in date_values:
             ind_string += f"{date_str}: {value}\n"
         
+    except (VendorInputError, VendorMalformedResponseError):
+        raise
     except Exception as e:
+        if us_fallback_enabled(symbol):
+            # A failed/pinned recovery cannot become a success-shaped empty
+            # indicator report through repeated calls with different dates.
+            raise
         print(f"Error getting bulk stockstats data: {e}")
         # Fallback to original implementation if bulk method fails
         ind_string = ""
@@ -298,7 +315,11 @@ def get_stockstats_indicator(
             indicator,
             curr_date,
         )
+    except (VendorInputError, VendorMalformedResponseError):
+        raise
     except Exception as e:
+        if us_fallback_enabled(symbol):
+            raise
         print(
             f"Error getting stockstats indicator data for indicator {indicator} on {curr_date}: {e}"
         )

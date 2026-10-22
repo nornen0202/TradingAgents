@@ -264,7 +264,7 @@ def main(argv: list[str] | None = None) -> int:
         f"Completed run {manifest['run_id']} with status {manifest['status']} "
         f"({manifest['summary']['successful_tickers']} success / {manifest['summary']['failed_tickers']} failed)."
     )
-    strict_failed = bool(manifest["summary"]["failed_tickers"])
+    strict_failed = manifest["status"] == "failed" or bool(manifest["summary"]["failed_tickers"])
     if args.strict and _strict_required_coverage_failed(manifest):
         strict_failed = True
         print(
@@ -512,21 +512,24 @@ def _execute_run_body(config, *, run_label, skip_site_build, tz, started_at,
                 ticker_summaries=ticker_summaries,
                 targets={ticker: list(research_refresh_plan["reasons"]) for ticker in research_refresh_plan["targets"]})
 
+    research_failed = run_mode == "full" and not any(
+        item.get("status") == "success" for item in ticker_summaries
+    )
     reset_llm_usage()
     # News collection can involve many slow network calls. Finish it BEFORE
     # collecting the short-lived price observations, and reuse the same dated
     # evidence in the report delta instead of fetching it a second time.
     news_as_of = datetime.now(tz)
-    news_context = {} if portfolio_only or lightweight_refresh or refresh_source is not None else collect_event_news(
+    news_context = {} if research_failed or portfolio_only or lightweight_refresh or refresh_source is not None else collect_event_news(
         ticker_summaries=ticker_summaries, analysis_as_of=news_as_of,
     )
-    event_signals = {} if portfolio_only or lightweight_refresh or refresh_source is not None else collect_event_signals(
+    event_signals = {} if research_failed or portfolio_only or lightweight_refresh or refresh_source is not None else collect_event_signals(
         run_dir=run_dir, ticker_summaries=ticker_summaries,
         analysis_as_of=news_as_of, news_context=news_context,
     )
     execution_updates: dict[str, dict[str, Any]] = {}
     execution_refresh_budget_available = True
-    if config.execution.execution_refresh_enabled and not portfolio_only:
+    if config.execution.execution_refresh_enabled and not portfolio_only and not research_failed:
         execution_refresh_budget_available = _post_processing_budget_available(
             stage="execution_overlay",
             max_runtime_seconds=max_runtime_seconds,
@@ -534,7 +537,7 @@ def _execute_run_body(config, *, run_label, skip_site_build, tz, started_at,
             min_required_seconds=post_processing_min_seconds,
             warnings=run_warnings,
         )
-    if config.execution.execution_refresh_enabled and not portfolio_only and execution_refresh_budget_available:
+    if config.execution.execution_refresh_enabled and not portfolio_only and not research_failed and execution_refresh_budget_available:
         checkpoint_timezone = _execution_checkpoint_timezone(config)
         now_local = datetime.now(ZoneInfo(checkpoint_timezone))
         now_kst = now_local.astimezone(ZoneInfo("Asia/Seoul"))
@@ -572,7 +575,7 @@ def _execute_run_body(config, *, run_label, skip_site_build, tz, started_at,
                 f"run_mode={run_mode} produced no execution updates. "
                 "Check execution_contract artifacts and intraday market data availability."
             )
-    elif config.execution.execution_refresh_enabled and not portfolio_only:
+    elif config.execution.execution_refresh_enabled and not portfolio_only and not research_failed:
         manifest_overlay_phase = {
             "name": "SKIPPED_RUNTIME_BUDGET",
             "selected_checkpoints": [],
@@ -676,6 +679,41 @@ def _execute_run_body(config, *, run_label, skip_site_build, tz, started_at,
     for warning in run_warnings:
         if warning not in manifest["warnings"]:
             manifest["warnings"].append(warning)
+    if research_failed:
+        # No thesis exists to authorize downstream proposals. Persist the normal
+        # failed manifest before any portfolio model, performance journal or
+        # execution consumer is invoked; RunAttempt then records terminal FAILED.
+        reason = "no_successful_ticker_research"
+        manifest["status"] = "failed"
+        manifest["warnings"].append(reason)
+        manifest["terminal_failure"] = {
+            "schema": "tradingagents.research-terminal-failure/v1",
+            "stage": "ticker_research",
+            "reason": reason,
+            "successful_tickers": 0,
+            "failed_tickers": failures,
+        }
+        for stage in ("portfolio", "execution", "decision_bundle", "performance"):
+            manifest[stage] = {"status": "skipped", "reason": reason}
+        manifest["llm_usage"] = _aggregate_manifest_llm_usage(
+            ticker_summaries=ticker_summaries,
+            parent_usages=[pre_ticker_parent_usage, snapshot_llm_usage()],
+        )
+        manifest["run_quality"] = {
+            "run_quality_score": 0.0, "usefulness_rank": 100,
+            "signals": {"partial_failure_rate": round(partial_failure_rate, 4),
+                        "terminal_failure": reason},
+        }
+        manifest["usefulness_rank"] = 100
+        completed_at = datetime.now(tz)
+        manifest["finished_at"] = completed_at.isoformat()
+        manifest["duration_seconds"] = round((completed_at - started_at).total_seconds(), 2)
+        manifest["postprocessing_duration_seconds"] = round((completed_at - finished_at).total_seconds(), 2)
+        _publish_completed_run_manifest(
+            archive_dir=config.storage.archive_dir, run_dir=run_dir, manifest=manifest,
+        )
+        print("::error::No ticker research succeeded; downstream processing skipped.", flush=True)
+        return manifest
     manifest["market_session_phase"] = _market_session_phase(
         manifest_overlay_phase,
         now=started_at,
@@ -1916,6 +1954,33 @@ def _mask_sensitive_text(value: str) -> str:
     return text
 
 
+def _failed_tool_telemetry(metrics: dict[str, Any]) -> dict[str, Any]:
+    """Keep failed request evidence without vendor notes, prompts or payloads."""
+    events = [
+        {key: event[key] for key in ("method", "vendor", "status", "fallback", "request_id") if key in event}
+        for event in snapshot_tool_telemetry()
+    ]
+    requests = [
+        {key: row[key] for key in (
+            "request_id", "method", "status", "started_at", "completed_at", "result_sha256"
+        ) if key in row}
+        for row in snapshot_tool_requests()
+    ]
+    vendors: dict[str, int] = {}
+    for event in events:
+        vendor = str(event.get("vendor") or "unknown")
+        vendors[vendor] = vendors.get(vendor, 0) + 1
+    return {
+        "total_tool_calls": max(int(metrics.get("tool_calls", 0) or 0), len(events)),
+        "vendor_calls": vendors,
+        "fallback_count": sum(bool(event.get("fallback")) for event in events),
+        "events": events,
+        "request_schema": TOOL_REQUEST_SCHEMA,
+        "request_outcomes": requests,
+        "called_tools": sorted({str(row["method"]) for row in [*events, *requests] if row.get("method")}),
+    }
+
+
 def _run_single_ticker(
     *,
     config: ScheduledAnalysisConfig,
@@ -2241,6 +2306,7 @@ def _run_single_ticker(
                 "llm_calls": 0, "tool_calls": 0, "tokens_in": 0, "tokens_out": 0,
             },
         }
+        error_payload["tool_telemetry"] = _failed_tool_telemetry(error_payload["metrics"])
         error_path = ticker_dir / "error.json"
         _write_json(error_path, error_payload)
 
@@ -2262,6 +2328,7 @@ def _run_single_ticker(
                 "codex_usage": error_payload["llm_usage"],
             },
             "llm_usage": error_payload["llm_usage"],
+            "tool_telemetry": error_payload["tool_telemetry"],
             "artifacts": {
                 "error_json": _relative_to_run(run_dir, error_path),
             },
