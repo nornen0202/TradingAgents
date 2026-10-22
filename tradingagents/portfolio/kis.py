@@ -560,7 +560,10 @@ class KisClient:
         auth: str = "",
         tr_cont: str = "",
     ) -> tuple[dict[str, Any], requests.structures.CaseInsensitiveDict[str]]:
-        return self.request_json(
+        from tradingagents.dataflows.intraday.ranking_batch import read_market_ranking
+
+        return read_market_ranking(
+            self,
             method="GET",
             path="/uapi/overseas-stock/v1/ranking/volume-power",
             tr_id="HHDFS76280000",

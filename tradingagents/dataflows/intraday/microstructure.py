@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable
-from datetime import date, datetime, time, timedelta, timezone
+from datetime import datetime, time, timedelta, timezone
 from math import isfinite
 from typing import Any
 from zoneinfo import ZoneInfo
@@ -356,6 +356,13 @@ class KISMicrostructureProvider:
             raw_source_names.append("kis.overseas_volume_power")
             volume_power_payload = volume_power[0] if isinstance(volume_power, tuple) else volume_power
             volume_power_rank = _ranking_for_symbol(volume_power_payload, broker_symbol)
+            if "rank" in volume_power_rank and getattr(volume_power, "observed_at", None) is not None:
+                volume_power_rank["source_observation"] = {
+                    "source": "kis.overseas_volume_power",
+                    "observed_at": volume_power.observed_at,
+                    "clock_role": "ACQUISITION_ONLY_NOT_EXCHANGE_EVENT",
+                    "event_time_verified": False,
+                }
 
         # When the broker already supplies dated live book and strength, fetch
         # only the missing historical denominator, avoiding entitlement-failed

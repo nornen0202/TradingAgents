@@ -5555,6 +5555,9 @@ def _fetch_overlay_market_snapshots(
     for ticker in eligible_tickers:
         work_queue.put(ticker)
 
+    from tradingagents.dataflows.intraday.ranking_batch import RankingBatch, ranking_batch_context
+    ranking_batch = RankingBatch()
+
     def worker() -> None:
         while perf_counter() < deadline:
             try:
@@ -5562,12 +5565,13 @@ def _fetch_overlay_market_snapshots(
             except Empty:
                 return
             try:
-                result: IntradayMarketSnapshot | Exception = fetch_intraday_market_snapshot(
-                    ticker,
-                    interval=_EXECUTION_SNAPSHOT_INTERVAL,
-                    market_timezone=timezone_name,
-                    checkpoint_id=checkpoint_label,
-                )
+                with ranking_batch_context(ranking_batch):
+                    result: IntradayMarketSnapshot | Exception = fetch_intraday_market_snapshot(
+                        ticker,
+                        interval=_EXECUTION_SNAPSHOT_INTERVAL,
+                        market_timezone=timezone_name,
+                        checkpoint_id=checkpoint_label,
+                    )
             except Exception as exc:
                 result = exc
             result_queue.put((ticker, result))
@@ -5576,19 +5580,21 @@ def _fetch_overlay_market_snapshots(
         Thread(target=worker, name=f"overlay-snapshot-{index + 1}", daemon=True)
         for index in range(max_workers)
     ]
-    for worker_thread in workers:
-        worker_thread.start()
-
     results: dict[str, IntradayMarketSnapshot | Exception] = {}
-    while len(results) < len(eligible_tickers):
-        remaining = deadline - perf_counter()
-        if remaining <= 0:
-            break
-        try:
-            ticker, result = result_queue.get(timeout=min(1.0, remaining))
-        except Empty:
-            continue
-        results[ticker] = result
+    try:
+        for worker_thread in workers:
+            worker_thread.start()
+        while len(results) < len(eligible_tickers):
+            remaining = deadline - perf_counter()
+            if remaining <= 0:
+                break
+            try:
+                ticker, result = result_queue.get(timeout=min(1.0, remaining))
+            except Empty:
+                continue
+            results[ticker] = result
+    finally:
+        ranking_batch.close()
 
     for ticker in eligible_tickers:
         if ticker in results:

@@ -321,6 +321,61 @@ def test_us_microstructure_marks_kr_flow_fields_not_applicable():
     assert snapshot.volume_power_rank["rank"] == 1
 
 
+@pytest.mark.parametrize("source_clock", [
+    "2026-10-22T14:29:00+00:00", "2999-01-01T00:00:00+00:00", "invalid", "", None,
+])
+@pytest.mark.parametrize("listed", [True, False])
+def test_batch_ranking_observation_does_not_replace_source_clock_or_market_asof(monkeypatch, source_clock, listed):
+    from copy import deepcopy
+    from datetime import datetime, timezone
+    from tradingagents.dataflows.intraday import microstructure
+    from tradingagents.dataflows.intraday.ranking_batch import RankingBatch, ranking_batch_context
+    from tradingagents.portfolio.kis import KisClient, REAL_BASE_URL
+
+    fixed = datetime.now(timezone.utc)
+    class Clock(datetime):
+        @classmethod
+        def now(cls, tz=None):
+            return fixed.astimezone(tz) if tz else fixed.replace(tzinfo=None)
+    monkeypatch.setattr(microstructure, "datetime", Clock)
+    response = ({"output2": [{"symb": "AAPL" if listed else "MSFT", "published_at": source_clock}]}, {})
+    class RankingClient(FakeKisClient):
+        environment, app_key, app_secret = "real", "fixture-key", "fixture-secret"
+        overseas_volume_power = KisClient.overseas_volume_power
+        calls = 0
+
+        def _validated_base_url(self):
+            return REAL_BASE_URL
+
+        def request_json(self, **kwargs):
+            self.calls += 1
+            return deepcopy(response)
+
+    def snapshot(client, ticker="AAPL"):
+        return KISMicrostructureProvider(client=client, us_daily_volume_fallback=lambda _: 10000).fetch(
+            ticker, market_timezone="America/New_York", checkpoint_id="10:30").to_dict()
+
+    original = deepcopy(response)
+    direct = snapshot(RankingClient())
+    first, second = RankingClient(), RankingClient()
+    with ranking_batch_context(RankingBatch(clock=lambda: fixed)):
+        for payload in (snapshot(first), snapshot(second)):
+            receipt = payload["volume_power_rank"].pop("source_observation", None)
+            if listed:
+                assert receipt == {"source": "kis.overseas_volume_power", "observed_at": fixed.isoformat(),
+                                   "clock_role": "ACQUISITION_ONLY_NOT_EXCHANGE_EVENT",
+                                   "event_time_verified": False}
+            else:
+                assert receipt is None
+            # Even future/undated source text keeps its old, unverified meaning.
+            # Acquisition does not make it an eligible exchange event or move TTL.
+            assert payload == direct
+        if not listed:
+            assert snapshot(second, "MSFT")["volume_power_rank"]["source_observation"]["observed_at"] == fixed.isoformat()
+    assert first.calls == 1 and second.calls == 0
+    assert response == original
+
+
 def test_us_microstructure_keeps_probing_until_price_row_has_last_price():
     snapshot = KISMicrostructureProvider(client=FakeNysKisClient()).fetch(
         "CRM",
