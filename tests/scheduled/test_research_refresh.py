@@ -148,6 +148,7 @@ def test_changed_original_after_request_cannot_be_reinterpreted_as_recovery(tmp_
 
 
 def test_research_runner_replaces_selected_thesis_and_preserves_unchanged_bytes(tmp_path, monkeypatch):
+    monkeypatch.setenv("TRADINGAGENTS_SOURCE_SHA", "a" * 40)
     directory, full = cohort(tmp_path)
     now = datetime.now(timezone.utc)
     plan = refresh.make_plan(tmp_path, full, ["AAPL"], now=now, reasons=["refresh"])
@@ -189,6 +190,7 @@ enabled = false
     assert called == ["AAPL"]
     assert result["summary"]["total_tickers"] == 3
     assert result["research_refresh"]["carried_forward_tickers"] == ["AMD", "MSFT"]
+    assert result["source_revision"] == result["research_refresh"]["source_revision"] == "a" * 40
     assert refresh.verified_revision(tmp_path, result, market="US", now=datetime.now(timezone.utc))
     target = refresh.manifest_path(tmp_path, result["run_id"]).parent
     for ticker in ("AMD", "MSFT"):

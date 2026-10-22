@@ -634,6 +634,7 @@ def _execute_run_body(config, *, run_label, skip_site_build, tz, started_at,
         "version": 1,
         "run_id": run_id,
         "label": run_label,
+        "source_revision": os.getenv("TRADINGAGENTS_SOURCE_SHA"),
         "status": status,
         "started_at": started_at.isoformat(),
         "finished_at": finished_at.isoformat(),
@@ -2033,6 +2034,7 @@ def _run_single_ticker(
             )
         analysis_payload = {
             "research_market_observation": observation_recorder.receipt(),
+            "source_revision": os.getenv("TRADINGAGENTS_SOURCE_SHA"),
             "ticker": ticker,
             "ticker_name": (
                 config.run.ticker_name_overrides.get(ticker)

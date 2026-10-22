@@ -127,7 +127,7 @@ def revision_receipt(archive, run_dir, manifest, plan):
             if instant(contract.get("analysis_asof")) != end or contract.get("ticker") != ticker:
                 raise ValueError("New contract does not belong to the new research")
         fingerprints[ticker] = proofs
-    return {"plan": plan, "artifacts_sha256": fingerprints,
+    return {"plan": plan, "source_revision": manifest.get("source_revision"), "artifacts_sha256": fingerprints,
             "completed_targets": list(plan["targets"]),
             "carried_forward_tickers": sorted(set(current) - set(plan["targets"]))}
 
