@@ -1,6 +1,34 @@
 {
-  "generated_at": "2026-10-22T18:08:40.432266",
+  "generated_at": "2026-10-22T18:40:45.163535",
   "runs": [
+    {
+      "run_id": "20261022T182146_local-scheduler-us-full",
+      "label": "local-scheduler-us-full",
+      "started_at": "2026-10-22T18:21:46.364882+09:00",
+      "finished_at": "2026-10-22T18:32:18.399222+09:00",
+      "status": "failed",
+      "market": "US",
+      "run_mode": "full",
+      "settings": {
+        "market": "US",
+        "run_mode": "full"
+      },
+      "summary": {
+        "total_tickers": 27
+      },
+      "ticker_count": 27,
+      "success_count": 0,
+      "decision_bundle": {
+        "version": 2,
+        "decision_ready": false,
+        "conditional_strategy_ready": false,
+        "quality_label_ko": "연구 자료만 제공, 장중 데이터 대기",
+        "fresh_row_ratio": 0.0,
+        "conditional_row_ratio": 0.0
+      },
+      "published_to_site": true,
+      "run_url": "runs/20261022T182146_local-scheduler-us-full/index.html"
+    },
     {
       "run_id": "20261022T165722_local-thesis-refresh-kr-post-repair-427",
       "label": "local-thesis-refresh-kr-post-repair-427",
@@ -3358,8 +3386,8 @@
         "fresh_row_ratio": 0.9333,
         "conditional_row_ratio": 1.0
       },
-      "published_to_site": true,
-      "run_url": "runs/20261022T133420_local-freshness-kr-overlay/index.html"
+      "published_to_site": false,
+      "run_url": null
     },
     {
       "run_id": "20261022T133325_local-freshness-kr-overlay",
@@ -10918,8 +10946,8 @@
         "fresh_row_ratio": 1.0,
         "conditional_row_ratio": 1.0
       },
-      "published_to_site": false,
-      "run_url": null
+      "published_to_site": true,
+      "run_url": "runs/20261022T045810_local-freshness-us-overlay/index.html"
     },
     {
       "run_id": "20261022T045709_local-freshness-us-overlay",
