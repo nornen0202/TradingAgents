@@ -189,9 +189,9 @@ def latest_regular_session_context(market: str, *, as_of: Any) -> dict[str, Any]
     if session.get("phase") == "unknown" or session.get("source") not in {"exchange_calendars", "supplemental_market_holiday"}:
         return result
     try:
-        import exchange_calendars as xcals
+        from tradingagents.calendar_access import get_exchange_calendar
         import pandas as pd
-        calendar = xcals.get_calendar(default_calendar_name(normalized))
+        calendar = get_exchange_calendar(default_calendar_name(normalized))
         schedule = calendar.schedule
         closes = pd.to_datetime(schedule["close"], utc=True)
         completed = schedule.loc[closes <= pd.Timestamp(now)]

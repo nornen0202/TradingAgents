@@ -36,8 +36,8 @@ def fallback_enabled(symbol: str) -> bool:
 
 def _sessions(start: date, end: date) -> list[date]:
     try:
-        import exchange_calendars as xcals
-        calendar = xcals.get_calendar("XNYS")
+        from tradingagents.calendar_access import get_exchange_calendar
+        calendar = get_exchange_calendar("XNYS")
         sessions = [stamp.date() for stamp in calendar.sessions_in_range(start.isoformat(), end.isoformat())]
         if not sessions or calendar.session_close(sessions[-1].isoformat()).to_pydatetime() > datetime.now(timezone.utc):
             raise ValueError("No completed requested session")

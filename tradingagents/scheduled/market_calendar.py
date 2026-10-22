@@ -86,12 +86,12 @@ def market_session_state(
 
 def _exchange_calendar_state(*, calendar_name: str, now_local: datetime) -> dict[str, Any] | None:
     try:
-        import exchange_calendars as xcals
+        from tradingagents.calendar_access import get_exchange_calendar
     except Exception:
         return None
 
     try:
-        calendar = xcals.get_calendar(calendar_name)
+        calendar = get_exchange_calendar(calendar_name)
         minute = pd.Timestamp(now_local.astimezone(timezone.utc)).floor("min")
         is_open = bool(calendar.is_open_on_minute(minute))
         session_label = calendar.minute_to_session(minute, direction="previous")
