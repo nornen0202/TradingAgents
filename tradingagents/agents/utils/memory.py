@@ -8,7 +8,73 @@ import re
 import json
 import sqlite3
 from pathlib import Path
-from datetime import date
+from copy import deepcopy
+from datetime import date, datetime, time, timedelta, timezone
+
+
+def _clock(value: Any, *, allow_date: bool = False) -> datetime:
+    if isinstance(value, datetime):
+        stamp = value
+    elif isinstance(value, date) and allow_date:
+        return datetime.combine(value, time.min, timezone.utc)
+    elif isinstance(value, str):
+        if re.fullmatch(r"\d{4}-\d{2}-\d{2}", value):
+            if not allow_date:
+                raise ValueError("A timezone-aware memory clock is required")
+            return datetime.combine(date.fromisoformat(value), time.min, timezone.utc)
+        stamp = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    else:
+        raise ValueError("A verified memory clock is required")
+    if stamp.tzinfo is None or stamp.utcoffset() is None:
+        raise ValueError("A timezone-aware memory clock is required")
+    return stamp.astimezone(timezone.utc)
+
+
+def _query_cutoff(value: Any) -> tuple[datetime | None, bool]:
+    if value is None:
+        return None, False
+    date_only = ((isinstance(value, date) and not isinstance(value, datetime))
+                 or (isinstance(value, str) and re.fullmatch(r"\d{4}-\d{2}-\d{2}", value) is not None))
+    cutoff = _clock(value, allow_date=date_only)
+    return (cutoff + timedelta(days=1), True) if date_only else (cutoff, False)
+
+
+def _utc_now() -> datetime:
+    return datetime.now(timezone.utc)
+
+
+def _eligible_clocks(metadata: dict, cutoff: datetime, *, date_only: bool,
+                     knowledge_cutoff: datetime) -> bool:
+    try:
+        # Availability and local ingestion are always actual instants. A legacy
+        # outcome date cannot manufacture either clock for an archived memory.
+        available = _clock(metadata.get("available_at"))
+        ingested = _clock(metadata.get("ingested_at"))
+        known_value = metadata.get("outcome_known_at")
+        if date_only and "outcome_known_at" not in metadata:
+            known_value = metadata.get("settlement_date")
+        known = _clock(known_value, allow_date=date_only)
+        clocks = [known, available, ingested]
+        for field in ("settlement_date", "settled_at"):
+            if field in metadata:
+                clocks.append(_clock(metadata[field], allow_date=date_only))
+        if available < max([clocks[0], *clocks[3:]]) or ingested < available:
+            return False
+        # A current/future date query must not expose evidence that has not yet
+        # become available in the real world. Keep the original date boundary
+        # exclusive, while the actual-now knowledge boundary stays inclusive.
+        if any(stamp > knowledge_cutoff or (stamp >= cutoff if date_only else stamp > cutoff)
+               for stamp in clocks):
+            return False
+        if "trade_date" in metadata:
+            # A trade-date label remains a calendar date, even for an instant
+            # query. Its outcome/availability/ingestion must still be verified.
+            trade = _clock(metadata["trade_date"], allow_date=True)
+            if (trade >= cutoff if date_only else trade > cutoff) or trade > known:
+                return False
+    except (TypeError, ValueError, OverflowError):
+        return False
+    return True
 
 
 class FinancialSituationMemory:
@@ -23,7 +89,7 @@ class FinancialSituationMemory:
         self.bm25 = None
         self.default_n_matches = int(self.config.get("memory_n_matches", 2))
         self.max_entries = max(1, int(self.config.get("memory_max_entries", 500)))
-        self.as_of: str | None = None
+        self.as_of: str | date | datetime | None = None
         self.store_path = None
         if self.config.get("memory_dir"):
             if not re.fullmatch(r"[A-Za-z0-9_-]+", name):
@@ -31,12 +97,15 @@ class FinancialSituationMemory:
             self.store_path = Path(self.config["memory_dir"]) / f"{name}.sqlite3"
             if self.store_path.exists():
                 with sqlite3.connect(self.store_path) as connection:
-                    rows = connection.execute("SELECT situation, advice, metadata FROM memories ORDER BY id DESC LIMIT ?", (self.max_entries,)).fetchall()[::-1]
+                    rows = connection.execute("SELECT situation, advice, metadata FROM memories ORDER BY id").fetchall()
                 for situation, advice, metadata in rows:
                     self.documents.append(situation)
                     self.recommendations.append(advice)
-                    self.metadata.append(json.loads(metadata))
-                self._rebuild_index()
+                    try:
+                        decoded = json.loads(metadata)
+                    except (TypeError, ValueError):
+                        decoded = {}
+                    self.metadata.append(decoded if isinstance(decoded, dict) else {})
 
     def _tokenize(self, text: str) -> List[str]:
         return re.findall(r"\b\w+\b", text.lower())
@@ -62,14 +131,8 @@ class FinancialSituationMemory:
                 tags.add(tag)
         return tags
 
-    def _rebuild_index(self):
-        if self.documents:
-            tokenized_docs = [self._tokenize(doc) or ["_empty_"] for doc in self.documents]
-            self.bm25 = BM25Okapi(tokenized_docs)
-        else:
-            self.bm25 = None
-
     def add_situations(self, situations_and_advice: List[Tuple]):
+        """Append originals; max_entries limits a query, never stored history."""
         for item in situations_and_advice:
             if len(item) == 2:
                 situation, recommendation = item
@@ -79,7 +142,7 @@ class FinancialSituationMemory:
             else:
                 raise ValueError("Each memory entry must be (situation, recommendation) or (situation, recommendation, metadata).")
 
-            combined_metadata = dict(metadata or {})
+            combined_metadata = deepcopy(dict(metadata or {}))
             combined_metadata.setdefault("regime_tags", sorted(self._extract_regime_tags(str(situation))))
             self.documents.append(str(situation))
             self.recommendations.append(str(recommendation))
@@ -90,49 +153,46 @@ class FinancialSituationMemory:
                     connection.execute("CREATE TABLE IF NOT EXISTS memories (id INTEGER PRIMARY KEY, situation TEXT, advice TEXT, metadata TEXT)")
                     connection.execute("INSERT INTO memories (situation, advice, metadata) VALUES (?, ?, ?)",
                                        (str(situation), str(recommendation), json.dumps(combined_metadata, ensure_ascii=False)))
-                    connection.execute("DELETE FROM memories WHERE id NOT IN (SELECT id FROM memories ORDER BY id DESC LIMIT ?)", (self.max_entries,))
-
-        self.documents = self.documents[-self.max_entries:]
-        self.recommendations = self.recommendations[-self.max_entries:]
-        self.metadata = self.metadata[-self.max_entries:]
-        self._rebuild_index()
+        self.bm25 = None
 
     def get_memories(
         self,
         current_situation: str,
         n_matches: int | None = None,
         metadata_filters: dict[str, Any] | None = None,
-        as_of: str | None = None,
+        as_of: str | date | datetime | None = None,
     ) -> List[dict]:
-        if not self.documents or self.bm25 is None:
+        """Retrieve only evidence eligible before ranking and retention.
+
+        An aware timestamp is an exact, inclusive cutoff: outcome, availability,
+        ingestion and any settlement clock must be timezone-aware. A YYYY-MM-DD
+        cutoff means the entire UTC calendar day (exclusive next midnight), and
+        permits legacy outcome/settlement dates. Both paths require actual aware
+        availability and ingestion; missing or invalid clocks are excluded.
+        Both cutoff modes are additionally bounded by actual UTC now, inclusive,
+        so today's or a future as_of cannot admit future knowledge. Historical
+        date boundaries remain exclusive at the following UTC midnight.
+        Without as_of or self.as_of this remains an unbounded-time diagnostic
+        search, not point-in-time investment evidence.
+        """
+        cutoff, date_only = _query_cutoff(self.as_of if as_of is None else as_of)
+        knowledge_cutoff = _utc_now() if cutoff is not None else None
+        if not self.documents:
             return []
 
         limit = n_matches if n_matches is not None else self.default_n_matches
         if limit <= 0:
             return []
-        cutoff = as_of or self.as_of
-        cutoff_date = date.fromisoformat(cutoff) if cutoff else None
         eligible = []
         for idx in range(len(self.documents)):
             metadata = self.metadata[idx] if idx < len(self.metadata) else {}
-            if cutoff_date:
-                # Both the realized outcome and its settlement must be known.
-                # Do not treat an earlier outcome tag as permission to reveal an
-                # unsettled return, or an undated legacy memory as historical.
-                known = metadata.get("outcome_known_at") or metadata.get("settlement_date")
-                dates = [known]
-                if "settlement_date" in metadata:
-                    dates.append(metadata["settlement_date"])
-                if "trade_date" in metadata:
-                    dates.append(metadata["trade_date"])
-                try:
-                    if any(date.fromisoformat(str(value)) > cutoff_date for value in dates):
-                        continue
-                except (TypeError, ValueError):
-                    continue
+            if cutoff is not None and not _eligible_clocks(
+                    metadata, cutoff, date_only=date_only, knowledge_cutoff=knowledge_cutoff):
+                continue
             if metadata_filters and any(metadata.get(key) != value for key, value in metadata_filters.items()):
                 continue
             eligible.append((idx, metadata))
+        eligible = eligible[-self.max_entries:]
         if not eligible:
             return []
 
@@ -141,9 +201,10 @@ class FinancialSituationMemory:
         # Filtering only the returned rows still lets future entries change IDF,
         # average document length and ranking. Build the index from eligible
         # evidence so adding future memories cannot alter a historical query.
-        index = self.bm25 if len(eligible) == len(self.documents) else BM25Okapi(
+        index = BM25Okapi(
             [self._tokenize(self.documents[idx]) or ["_empty_"] for idx, _ in eligible]
         )
+        self.bm25 = index
         scores = index.get_scores(query_tokens)
         max_score = max(scores) if max(scores) > 0 else 1
 
@@ -166,7 +227,7 @@ class FinancialSituationMemory:
                     "similarity_score": hybrid_score,
                     "bm25_score": normalized_bm25,
                     "tag_overlap_score": tag_score,
-                    "metadata": metadata,
+                    "metadata": deepcopy(metadata),
                 }
             )
 

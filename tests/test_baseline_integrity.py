@@ -110,7 +110,8 @@ def test_persistent_memory_excludes_unknown_and_future_outcomes(tmp_path):
     config = {"memory_dir": str(tmp_path)}
     memory = FinancialSituationMemory("test", config)
     memory.add_situations([
-        ("earnings bullish", "known", {"outcome_known_at": "2026-03-01"}),
+        ("earnings bullish", "known", {"outcome_known_at": "2026-03-01",
+          "available_at": "2026-03-01T12:00:00+00:00", "ingested_at": "2026-03-01T12:00:00+00:00"}),
         ("earnings bullish", "future", {"outcome_known_at": "2026-04-01"}),
         ("earnings bullish", "undated"),
     ])

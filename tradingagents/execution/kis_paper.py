@@ -553,7 +553,7 @@ def import_demo_fill(broker: KisPaperBroker, receipt: Mapping) -> bool:
             for exit_row in broker.db.execute("SELECT event_id,payload_json FROM lifecycle_events WHERE mode='demo' AND kind='FILL'").fetchall():
                 candidate = json.loads(exit_row[1])
                 if candidate.get("side") == "SELL" and candidate.get("ticker") == terms["ticker"]:
-                    record_fill_retrospectives(broker.db, exit_event_id=exit_row[0], evaluated_at=now.isoformat())
+                    record_fill_retrospectives(broker.db, exit_event_id=exit_row[0], evaluated_at=now.isoformat(), clock=lambda: now)
             broker.db.execute("COMMIT")
             return inserted
         except Exception:

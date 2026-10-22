@@ -28,12 +28,15 @@ from tradingagents.graph.reflection import Reflector
 
 def test_future_and_undated_memories_cannot_change_historical_scores(tmp_path):
     memory = FinancialSituationMemory("temporal", {"memory_dir": str(tmp_path)})
+    clocks = {"outcome_known_at": "2026-03-01", "available_at": "2026-03-01T12:00:00+00:00",
+              "ingested_at": "2026-03-01T12:00:00+00:00"}
     memory.add_situations([
-        ("alpha beta market", "first", {"outcome_known_at": "2026-03-01"}),
-        ("alpha earnings", "second", {"outcome_known_at": "2026-03-01"}),
-        ("delta market", "third", {"outcome_known_at": "2026-03-01"}),
+        ("alpha beta market", "first", clocks),
+        ("alpha earnings", "second", clocks),
+        ("delta market", "third", clocks),
     ])
     expected = memory.get_memories("alpha market", n_matches=3, as_of="2026-03-02")
+    assert len(expected) == 3
     memory.add_situations([
         ("alpha " * 20, "future", {"outcome_known_at": "2026-04-01"}),
         ("market " * 20, "undated"),
@@ -66,6 +69,8 @@ def test_metadata_filters_also_apply_before_bm25_scoring():
 ])
 def test_settlement_and_decision_dates_bound_memory(metadata, eligible):
     memory = FinancialSituationMemory("settlement")
+    metadata = {"available_at": "2026-03-02T12:00:00+00:00", "ingested_at": "2026-03-02T12:00:00+00:00",
+                **metadata}
     memory.add_situations([("earnings", "advice", metadata)])
     assert bool(memory.get_memories("earnings", as_of="2026-03-02")) is eligible
 

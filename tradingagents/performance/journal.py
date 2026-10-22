@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 import hashlib
 import sqlite3
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Mapping
 
@@ -154,26 +154,61 @@ def _prepare_journal(conn: sqlite3.Connection) -> None:
     conn.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_trade_journal_review_id ON trade_journal(review_id)")
 
 
-def record_fill_retrospectives(conn: sqlite3.Connection, *, exit_event_id: str, evaluated_at: str | None = None) -> list[int]:
-    """FIFO reviews from known incremental fills, including both sides' costs.
+def record_fill_retrospectives(conn: sqlite3.Connection, *, exit_event_id: str,
+                               evaluated_at: str | None = None, clock=None) -> list[int]:
+    """Atomically publish one complete FIFO allocation for a known SELL.
 
-    Seed holdings have unknown acquisition basis and consume sells without a
-    fabricated realized return. Partial exits close only the matching lot slice.
+    Older allocations and their lessons remain immutable historical evidence.
+    An empty allocation explicitly withdraws an earlier known-cost allocation.
+    ``evaluated_at`` limits input evidence; it never backdates publication.
+    Publication uses the current UTC clock by default. Offline fixtures and
+    producers with an explicit execution clock must inject that clock themselves.
+    Historical queries use select_retrospectives, not this writer.
     """
-    rows = conn.execute("SELECT * FROM lifecycle_events WHERE kind IN ('ACCOUNT_SEED','FILL')").fetchall()
-    columns = [row[1] for row in conn.execute("PRAGMA table_info(lifecycle_events)")]
-    events = [{**dict(zip(columns, row)), "payload": json.loads(dict(zip(columns, row))["payload_json"])} for row in rows]
-    target = next((event for event in events if event["event_id"] == exit_event_id), None)
-    if not target or target["payload"].get("side") != "SELL":
+    publication = clock() if clock is not None else datetime.now(timezone.utc)
+    publication = timestamp(publication.isoformat() if isinstance(publication, datetime) else publication)
+    cutoff = timestamp(evaluated_at) if evaluated_at is not None else publication
+    if cutoff > publication:
+        raise ValueError("Evaluation cutoff cannot follow publication time")
+    conn.execute("SAVEPOINT fifo_allocation")
+    try:
+        result = _record_fill_allocation(conn, exit_event_id, cutoff, publication)
+        conn.execute("RELEASE SAVEPOINT fifo_allocation")
+        return result
+    except Exception:
+        conn.execute("ROLLBACK TO SAVEPOINT fifo_allocation")
+        conn.execute("RELEASE SAVEPOINT fifo_allocation")
+        raise
+
+
+def _record_fill_allocation(conn, exit_event_id, cutoff, publication):
+    from .outcome_revisions import (ALGORITHM, REVISION_KIND, allocation_hash, content_hash,
+                                    event_order, known_at, read_events, revision_heads,
+                                    validate_opening_seeds, visible_events)
+    all_events = read_events(conn)
+    target = next((event for event in all_events if event["event_id"] == exit_event_id), None)
+    if not target or target["kind"] != "FILL" or target["payload"].get("side") != "SELL":
         return []
-    target_known = max(timestamp(target[k]) for k in ("occurred_at", "available_at", "confirmed_at", "settled_at", "ingested_at"))
-    cutoff = timestamp(evaluated_at) if evaluated_at is not None else target_known
-    if target_known > cutoff:
+    visible = visible_events(all_events, cutoff.isoformat())
+    validate_opening_seeds(visible)
+    _, heads = revision_heads(all_events, publication.isoformat())
+    target = visible.get(exit_event_id)
+    if target is None:
         return []
-    symbol, currency = target["payload"]["ticker"], target["payload"].get("currency", "KRW")
-    lots, ids = [], []
-    for event in sorted(events, key=lambda item: (timestamp(item["occurred_at"]), item["event_id"])):
-        if event["mode"] != target["mode"] or any(timestamp(event[k]) > cutoff for k in ("occurred_at", "available_at", "confirmed_at", "settled_at", "ingested_at") if event.get(k)):
+    symbol, currency = target["payload"]["ticker"], target["payload"]["currency"]
+    key = target["mode"], currency, symbol, exit_event_id
+    head = heads.get(key)
+    if head and timestamp(head["payload"]["input_as_of"]) > cutoff:
+        raise ValueError("Cannot publish a backdated FIFO allocation")
+    # Historical reads never rewrite the allocation chain. A writer cannot
+    # append a fork behind an already published revision, even with old clocks.
+    for event in all_events:
+        if (event["kind"] == REVISION_KIND and event["mode"] == key[0]
+                and event["payload"].get("exit_fill_id") == exit_event_id and known_at(event) > publication):
+            raise ValueError("Cannot publish a backdated FIFO allocation")
+    lots, reviews, inputs = [], [], []
+    for event in sorted(visible.values(), key=event_order):
+        if event["kind"] not in {"ACCOUNT_SEED", "FILL"} or event["mode"] != target["mode"]:
             continue
         payload = event["payload"]
         if payload.get("currency", "KRW") != currency:
@@ -182,9 +217,11 @@ def record_fill_retrospectives(conn: sqlite3.Connection, *, exit_event_id: str, 
             quantity = (payload.get("positions") or {}).get(symbol, 0)
             if quantity:
                 lots.append({"remaining": quantity, "event": None})
+                inputs.append(event)
             continue
         if payload.get("ticker") != symbol:
             continue
+        inputs.append(event)
         if payload["side"] == "BUY":
             lots.append({"remaining": payload["quantity"], "event": event})
             continue
@@ -200,21 +237,48 @@ def record_fill_retrospectives(conn: sqlite3.Connection, *, exit_event_id: str, 
                 review = generate_closed_trade_review(entry_context={"ticker": symbol, "action": "BUY"},
                     exit_context={"ticker": symbol, "action": "SELL"}, realized_return_pct=100 * profit / (buy["price"] * closed),
                     holding_days=(timestamp(event["occurred_at"]) - timestamp(entry["occurred_at"])).days)
-                review.update(review_id=f"review:{entry['event_id']}:{exit_event_id}", entry_fill_id=entry["event_id"],
-                    exit_fill_id=exit_event_id, signal_id=event["signal_id"], entry_signal_id=entry["signal_id"],
+                review.update(entry_fill_id=entry["event_id"], exit_fill_id=exit_event_id,
+                    signal_id=event["signal_id"], entry_signal_id=entry["signal_id"],
                     closed_quantity=closed, net_profit=profit, total_cost=costs, currency=currency, mode=event["mode"],
-                    measurement_scope="realized_fill_return_after_costs", created_at=cutoff.isoformat(),
-                    ingested_at=cutoff.isoformat(),
-                    closed_at=event["occurred_at"], confirmed_at=event["confirmed_at"], settled_at=event["settled_at"],
+                    measurement_scope="realized_fill_return_after_costs", created_at=publication.isoformat(),
+                    ingested_at=publication.isoformat(), closed_at=event["occurred_at"],
                     entry_context=buy, exit_context=payload)
                 review["judgment_evaluation"] = "profitable_fill" if profit >= 0 else "unprofitable_fill"
-                ids.append(store_closed_trade_review(conn, review))
+                reviews.append(review)
             lot["remaining"] -= closed
             remaining -= closed
             if lot["remaining"] <= 1e-9:
                 lots.pop(0)
         if event["event_id"] == exit_event_id:
             break
+    input_ids = sorted(event["event_id"] for event in inputs)
+    digest = allocation_hash(reviews, input_ids)
+    if head and head["payload"]["content_hash"] == digest:
+        rows = [conn.execute("SELECT id FROM trade_journal WHERE review_id=?", (identity,)).fetchone()
+                for identity in head["payload"]["review_ids"]]
+        if any(row is None for row in rows):
+            raise ValueError("Committed FIFO allocation is missing its journal reviews")
+        return [row[0] for row in rows]
+    previous = head["event_id"] if head else None
+    revision_id = "allocation:" + content_hash({"scope": key, "previous": previous, "content": digest})
+    confirmed = max(timestamp(event["confirmed_at"]) for event in inputs if event.get("confirmed_at"))
+    settled = max(timestamp(event["settled_at"]) for event in inputs if event.get("settled_at"))
+    ids, review_ids = [], []
+    for review in reviews:
+        review_id = "review:" + content_hash({"revision": revision_id, "entry": review["entry_fill_id"]})
+        review.update(review_id=review_id, allocation_revision_id=revision_id,
+                      confirmed_at=confirmed.isoformat(), settled_at=settled.isoformat())
+        ids.append(store_closed_trade_review(conn, review))
+        review_ids.append(review_id)
+    append_lifecycle_event(conn, event_id=revision_id, signal_id=target["signal_id"],
+        kind=REVISION_KIND, mode=target["mode"], occurred_at=target["occurred_at"],
+        available_at=publication.isoformat(), ingested_at=publication.isoformat(),
+        confirmed_at=confirmed.isoformat(), settled_at=settled.isoformat(),
+        payload={"schema": "tradingagents.fifo-allocation/v1", "algorithm": ALGORITHM,
+                 "ticker": symbol, "currency": currency, "exit_fill_id": exit_event_id,
+                 "input_as_of": cutoff.isoformat(),
+                 "previous_revision_id": previous, "content_hash": digest,
+                 "input_event_ids": input_ids, "review_ids": review_ids})
     return ids
 
 

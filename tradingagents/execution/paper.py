@@ -394,7 +394,13 @@ class PaperBroker:
                             "quantity": qty, "price": fill, "cost": fees, "currency": "KRW", "reference_price": q["price_krw"]})
                     if order["side"] == "SELL":
                         from tradingagents.performance.journal import record_fill_retrospectives
-                        record_fill_retrospectives(self.db, exit_event_id="fill:paper:" + order["id"])
+                        # Migrate legacy exits together so current feedback never
+                        # combines unversioned lots with a new allocation basis.
+                        for exit_row in self.db.execute("SELECT event_id,payload_json FROM lifecycle_events WHERE kind='FILL' AND mode='paper'").fetchall():
+                            candidate = json.loads(exit_row[1])
+                            if (candidate.get("side") == "SELL" and candidate.get("ticker") == order["ticker"]
+                                    and candidate.get("currency") == "KRW"):
+                                record_fill_retrospectives(self.db, exit_event_id=exit_row[0], evaluated_at=now, clock=lambda: now)
                 self._set("turnover", self._get("turnover") + qty * fill)
                 nav = (
                     cash
