@@ -4,6 +4,7 @@ from collections import defaultdict
 from typing import Any
 
 from .account_models import AccountSnapshot, PortfolioCandidate, PortfolioProfile
+from tradingagents.dataflows.research_evidence import evidence_review_reason
 
 
 def apply_gates(
@@ -28,7 +29,6 @@ def apply_gates(
         reasons: list[str] = list(candidate.gate_reasons)
         quality_flags = set(candidate.quality_flags)
         company_news_count = int(candidate.data_coverage.get("company_news_count", 0) or 0)
-        fallback_count = int(candidate.vendor_health.get("fallback_count", 0) or 0)
         review_required = candidate.review_required
 
         if candidate.snapshot_id != snapshot.snapshot_id:
@@ -38,8 +38,9 @@ def apply_gates(
             review_required = True
         if not candidate.is_held and company_news_count == 0:
             reasons.append("blocked_new_entries_company_news_zero")
-        if fallback_count >= 3:
-            reasons.append("high_fallback_count")
+        evidence_reason = evidence_review_reason(candidate.vendor_health)
+        if evidence_reason:
+            reasons.append(evidence_reason)
             review_required = True
         if not candidate.is_held and wait_ratio >= 0.7 and bullish_ratio >= 0.5:
             reasons.append("wait_heavy_batch_reduce_immediate_entries")
@@ -105,6 +106,7 @@ def _apply_gate_actions(*, candidate: PortfolioCandidate, reasons: list[str]) ->
             "blocked_new_entries_no_tool_calls",
             "blocked_new_entries_company_news_zero",
             "high_fallback_count",
+            "required_research_evidence_missing",
         }
         if action_now in {"ADD_NOW", "STARTER_NOW"} and reason_set & hard_now_blockers:
             action_now = "WATCH"

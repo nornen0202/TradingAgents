@@ -52,6 +52,7 @@ _BLOCK_CATEGORY_TOKENS = {
         "blocked_new_entries_no_tool_calls",
         "blocked_new_entries_company_news_zero",
         "high_fallback_count",
+        "required_research_evidence_missing",
         "execution_data_quality_failed",
     },
     "account_concentration_block": {

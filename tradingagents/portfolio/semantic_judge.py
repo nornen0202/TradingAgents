@@ -7,6 +7,7 @@ from typing import Any, Mapping
 
 from tradingagents.llm_clients import create_llm_client
 from tradingagents.llm_clients.role_config import codex_client_kwargs
+from tradingagents.dataflows.research_evidence import evidence_review_reason, evidence_risk_count
 
 from .account_models import PortfolioCandidate
 from .instrument_identity import resolve_identity
@@ -158,7 +159,7 @@ def _should_call_semantic_llm(candidate: PortfolioCandidate) -> bool:
         return True
     if candidate.entry_action in {"WAIT", "EXIT"}:
         return True
-    if int(candidate.vendor_health.get("fallback_count", 0) or 0) >= 2:
+    if evidence_risk_count(candidate.vendor_health) >= 2:
         return True
     quality_flags = set(candidate.quality_flags)
     return bool({"no_tool_calls_detected", "missing_analysis_for_held_position"} & quality_flags)
@@ -231,7 +232,7 @@ def _infer_timing_readiness(candidate: PortfolioCandidate, trigger_type: str) ->
         base -= 0.06
     if candidate.is_held and candidate.entry_action == "WAIT":
         base += 0.03
-    if int(candidate.vendor_health.get("fallback_count", 0) or 0) >= 2:
+    if evidence_risk_count(candidate.vendor_health) >= 2:
         base -= 0.08
     if "no_tool_calls_detected" in set(candidate.quality_flags):
         base -= 0.15
@@ -245,7 +246,7 @@ def _infer_trigger_quality(candidate: PortfolioCandidate) -> float:
         quality += 0.12
     if int(candidate.data_coverage.get("disclosures_count", 0) or 0) > 0:
         quality += 0.05
-    if int(candidate.vendor_health.get("fallback_count", 0) or 0) >= 2:
+    if evidence_risk_count(candidate.vendor_health) >= 2:
         quality -= 0.10
     if "no_tool_calls_detected" in set(candidate.quality_flags):
         quality -= 0.20
@@ -274,8 +275,9 @@ def _reason_codes(candidate: PortfolioCandidate, thesis_state: str) -> list[str]
         codes.append("timing_not_confirmed")
     if candidate.is_held:
         codes.append("held_position_context")
-    if int(candidate.vendor_health.get("fallback_count", 0) or 0) >= 2:
-        codes.append("high_fallback_count")
+    if evidence_risk_count(candidate.vendor_health) >= 2:
+        codes.append(evidence_review_reason(candidate.vendor_health) or
+                     ("optional_context_incomplete" if "request_evidence" in candidate.vendor_health else "high_fallback_count"))
     if "no_tool_calls_detected" in set(candidate.quality_flags):
         codes.append("tool_coverage_insufficient")
     if thesis_state == "constructive_but_not_confirmed":
@@ -289,13 +291,13 @@ def _review_required(candidate: PortfolioCandidate) -> bool:
         return True
     if "missing_analysis_for_held_position" in quality_flags:
         return True
-    return int(candidate.vendor_health.get("fallback_count", 0) or 0) >= 3
+    return evidence_review_reason(candidate.vendor_health) is not None
 
 
 def _counter_evidence(candidate: PortfolioCandidate) -> list[str]:
     evidence: list[str] = []
-    if int(candidate.vendor_health.get("fallback_count", 0) or 0) >= 2:
-        evidence.append("벤더 fallback 비중이 높음")
+    if evidence_risk_count(candidate.vendor_health) >= 2:
+        evidence.append("필수 또는 보조 자료 일부 미확보" if "request_evidence" in candidate.vendor_health else "벤더 fallback 비중이 높음")
     if int(candidate.data_coverage.get("company_news_count", 0) or 0) == 0:
         evidence.append("company news coverage 부족")
     if "no_tool_calls_detected" in set(candidate.quality_flags):

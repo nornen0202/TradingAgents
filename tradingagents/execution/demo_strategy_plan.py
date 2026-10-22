@@ -10,12 +10,13 @@ import hashlib
 import json
 
 from .demo_validation import _at
+from tradingagents.dataflows.research_evidence import assess_tool_evidence, evidence_review_reason
 
 MODE = "DEMO_NATIVE_ONE_SHARE_V1"
 BUY = {"STARTER_NOW", "ADD_NOW", "BUY_NOW"}
 SELL = {"REDUCE_NOW", "EXIT_NOW", "STOP_LOSS_NOW"}
 HARD_BUY_GATES = {"blocked_new_entries_no_tool_calls", "blocked_new_entries_company_news_zero",
-                  "high_fallback_count", "prism_conflict_review_required", "BUY_MATRIX_FAIL"}
+                  "high_fallback_count", "required_research_evidence_missing", "prism_conflict_review_required", "BUY_MATRIX_FAIL"}
 
 
 def plan(source, market, now, tickers, owned):
@@ -98,7 +99,15 @@ def plan(source, market, now, tickers, owned):
                     # New demo positions must satisfy new-entry evidence even
                     # if the reporting account already owns this instrument.
                     coverage, vendor = research_row.get("data_coverage") or {}, research_row.get("vendor_health") or {}
-                    if (coverage.get("company_news_count", 0) < 1 or vendor.get("fallback_count", 0) >= 3
+                    if "request_evidence" in vendor:
+                        analysis = read(f"tickers/{ticker}/analysis.json")
+                        original_evidence = assess_tool_evidence(analysis.get("tool_telemetry") or {},
+                            started_at=analysis.get("started_at"), finished_at=analysis.get("finished_at"))
+                        if (analysis.get("ticker") != ticker or original_evidence is None
+                                or original_evidence != vendor["request_evidence"]
+                                or _at(analysis.get("finished_at")) != _at(contract["analysis_asof"])):
+                            raise ValueError("ENTRY_RESEARCH_EVIDENCE_INCOMPLETE")
+                    if (coverage.get("company_news_count", 0) < 1 or evidence_review_reason(vendor)
                             or "no_tool_calls_detected" in (research_row.get("quality_flags") or [])):
                         raise ValueError("ENTRY_RESEARCH_EVIDENCE_INCOMPLETE")
                 if now >= expiry:

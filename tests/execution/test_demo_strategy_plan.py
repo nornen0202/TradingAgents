@@ -35,6 +35,55 @@ def native_source(h, name="fixture-1", action="STARTER_NOW", contract=None):
 
 
 @pytest.mark.parametrize("market", ["KR", "US"])
+def test_recovered_core_requests_enable_only_new_original_approved_research(tmp_path, market):
+    from tests.test_research_evidence import receipt
+    from tradingagents.dataflows.research_evidence import assess_tool_evidence
+    h = Harness(tmp_path, market)
+    run, contract = native_source(h)
+    finished = contract["analysis_asof"]
+    started = (h.now - timedelta(hours=1, minutes=5)).isoformat()
+    telemetry = receipt()
+    for outcome in telemetry["request_outcomes"]:
+        outcome.update(started_at=started, completed_at=finished)
+    evidence = assess_tool_evidence(telemetry, started_at=started, finished_at=finished)
+    assert evidence["status"] == "COMPLETE"
+    analysis = {"ticker": h.ticker, "started_at": started, "finished_at": finished, "tool_telemetry": telemetry}
+    atomic_write_json(run / "tickers" / h.ticker / "analysis.json", analysis)
+    path = run / "portfolio-private/portfolio_candidates.json"
+    research = json.loads(path.read_text())
+    row = research["candidates"][0]
+    row["vendor_health"].update(fallback_count=20, request_evidence=evidence)
+    atomic_write_json(path, research)
+    orders, _ = planner.plan(run, market, h.now, (h.ticker,), {})
+    assert len(orders) == 1 and h.calls == []
+    # A cached COMPLETE summary cannot clear the real original's evidence.
+    analysis["tool_telemetry"] = {"fallback_count": 20, "events": []}
+    atomic_write_json(run / "tickers" / h.ticker / "analysis.json", analysis)
+    assert planner.plan(run, market, h.now, (h.ticker,), {})[0] == []
+
+
+def test_complete_data_never_promotes_original_wait_to_buy(tmp_path):
+    from tests.test_research_evidence import receipt
+    from tradingagents.dataflows.research_evidence import assess_tool_evidence
+    h = Harness(tmp_path, "US")
+    run, contract = native_source(h)
+    finished, started = contract["analysis_asof"], (h.now - timedelta(hours=1, minutes=5)).isoformat()
+    telemetry = receipt()
+    for outcome in telemetry["request_outcomes"]:
+        outcome.update(started_at=started, completed_at=finished)
+    evidence = assess_tool_evidence(telemetry, started_at=started, finished_at=finished)
+    atomic_write_json(run / "tickers" / h.ticker / "analysis.json",
+        {"ticker": h.ticker, "started_at": started, "finished_at": finished, "tool_telemetry": telemetry})
+    path = run / "portfolio-private/portfolio_candidates.json"
+    research = json.loads(path.read_text())
+    research["candidates"][0]["vendor_health"].update(fallback_count=20, request_evidence=evidence)
+    research["candidates"][0]["structured_decision"]["conditional_entry_action"] = "NONE"
+    atomic_write_json(path, research)
+    assert planner.plan(run, "US", h.now, (h.ticker,), {})[0] == []
+    assert h.calls == []
+
+
+@pytest.mark.parametrize("market", ["KR", "US"])
 def test_native_strategy_uses_demo_capacity_and_proves_two_distinct_fills(tmp_path, market):
     h = Harness(tmp_path, market)
     run, contract = native_source(h)

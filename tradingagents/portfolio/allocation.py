@@ -679,7 +679,8 @@ def _coverage_score(candidate: PortfolioCandidate, batch_metrics: dict[str, Any]
     quality_flags = set(candidate.quality_flags)
     if "no_tool_calls_detected" in quality_flags:
         coverage = min(coverage, 0.20)
-    if candidate.vendor_health.get("fallback_count", 0) >= 2:
+    from tradingagents.dataflows.research_evidence import evidence_risk_count
+    if evidence_risk_count(candidate.vendor_health) >= 2:
         coverage -= 0.10
     if candidate.review_required:
         coverage -= 0.08
