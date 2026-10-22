@@ -1,0 +1,407 @@
+{
+  "version": 4,
+  "video_id": "FaAgdmOGdhA",
+  "title": "지금은 공포에 살 때? 반도체 급락장에서 확인할 가격의 기준",
+  "url": "https://www.youtube.com/watch?v=FaAgdmOGdhA",
+  "channel": "PLUS TV (플러스 TV)",
+  "channel_id": "UCuHUaZo43N9PgOCjs3Hg2Uw",
+  "source_url": "https://www.youtube.com/@plus_tv_official/videos",
+  "thumbnail_url": "https://i.ytimg.com/vi/FaAgdmOGdhA/maxresdefault.jpg",
+  "published_at": "2026-10-21T08:00:05+00:00",
+  "status": "contradicted",
+  "strategy_source_tier": "STANDARD",
+  "strategy_evidence_weight": "STANDARD",
+  "strategy_validation_policy": "STANDARD_REVIEW",
+  "transcript_status": "available",
+  "transcript_source": "automatic",
+  "transcript_chars": 16254,
+  "transcript_quality": {
+    "status": "good",
+    "score": 1.0,
+    "warnings": [],
+    "source": "automatic",
+    "language": "Korean",
+    "model_or_format": "json3",
+    "chars": 16254,
+    "segments": 905,
+    "duration_seconds": 1965,
+    "repeated_ngram_ratio": 0.006
+  },
+  "generated_at": "2026-10-22T08:06:10.997096+09:00",
+  "llm_status": "success",
+  "research_status": "success",
+  "claim_verification_status": "success",
+  "research_pipeline_version": 4,
+  "evidence_count": 12,
+  "claim_status_summary": {
+    "unverified": 8,
+    "contradicted": 1,
+    "partially_supported": 1
+  },
+  "claims": [
+    {
+      "claim_id": "C1",
+      "claim_text": "SK하이닉스는 2023년 약 9조 원 적자에도 주가가 88% 상승했으며 반도체 지표는 -30%였다. 2019년 2.7조 원도 비교 대상으로 제시됐다.",
+      "status": "unverified",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.91,
+      "asr_confidence": 0.0,
+      "numeric_parse": {
+        "claimed": "2023년 적자 약 9조 원·주가 +88%·반도체 지표 -30%; 2019년 2.7조 원",
+        "observed": "해당 손익·수익률·산업통계 원자료 없음"
+      },
+      "investor_implication": "실적과 주가의 선행 관계를 입증하는 역사적 사례로 확정 인용할 수 없다."
+    },
+    {
+      "claim_id": "C2",
+      "claim_text": "SK하이닉스의 PBR 하락과 2026~2027년 예상 BPS를 근거로 90만 원을 바닥 시나리오로 제시한다.",
+      "status": "unverified",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:06:25",
+      "source_confidence": 0.91,
+      "asr_confidence": 0.0,
+      "numeric_parse": {
+        "claimed": "PBR 6배 이상→3.3배; 2026년 BPS 50만~54만 원; 2027년 98만~100만 원; 바닥 90만 원",
+        "observed": "조건부 산술만 확인 가능; 실제 가격·BPS·PBR은 확인 불가"
+      },
+      "investor_implication": "90만 원은 검증된 지지선이 아니라 미확인 전망치에 의존한 조건부 가격이다."
+    },
+    {
+      "claim_id": "C3",
+      "claim_text": "삼성전자의 2027년 BPS 17만 원에 PBR 1.1배를 적용한 약 19만 원이 지지선이며 HBM 경쟁력 유지가 이를 뒷받침한다.",
+      "status": "unverified",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:06:25",
+      "source_confidence": 0.9,
+      "asr_confidence": 0.0,
+      "numeric_parse": {
+        "claimed": "BPS 11만 원; 과거 주가 37만 원·현재 20만 원; 2027년 BPS 17만 원; 지지 PBR 1.1배",
+        "observed": "18.7만 원 산술만 확인; 실제 가격·순자산·제품 경쟁력 자료 없음"
+      },
+      "investor_implication": "약 19만 원을 매수 안전선으로 확정할 수 없으며 전망 순자산과 경쟁력 가정을 먼저 확인해야 한다."
+    },
+    {
+      "claim_id": "C4",
+      "claim_text": "소프트뱅크그룹의 5년 CDS가 420을 넘어 5년 내 부도확률 약 30%를 나타내며 코로나 위기 수준에 해당한다.",
+      "status": "unverified",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:13:19",
+      "source_confidence": 0.95,
+      "asr_confidence": 0.0,
+      "numeric_parse": {
+        "claimed": "5년 CDS 420 초과; 5년 부도확률 약 30%",
+        "observed": "시장 호가·단위·확률 환산 가정 모두 확인 불가"
+      },
+      "investor_implication": "소프트뱅크의 실제 부도 가능성이 30%라고 투자자에게 전달할 근거가 없다."
+    },
+    {
+      "claim_id": "C5",
+      "claim_text": "소프트뱅크의 Arm·OpenAI 투자 집중과 이자 부담이 사업 현금유입을 넘어 자산 매각이나 추가 차입을 요구한다.",
+      "status": "unverified",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:13:19",
+      "source_confidence": 0.95,
+      "asr_confidence": 0.0,
+      "numeric_parse": {
+        "claimed": "Arm 60%·OpenAI 23%; 부채 200조 원·연이자 11조 원·금리 약 5%; 사업 유입 연 1조~2조 원",
+        "observed": "합산 83%·단순 비율 5.5%만 계산 가능; 회계 수치와 비교 범위 미확인"
+      },
+      "investor_implication": "AI 집중과 유동성 위험은 점검 대상이지만 지급능력 위기가 입증된 것은 아니다."
+    },
+    {
+      "claim_id": "C6",
+      "claim_text": "Anthropic의 분기 매출성장률이 140%에서 45%로 둔화했고 11월 중순 IPO를 추진하며, 사람의 도입 속도가 AI 확산의 병목이어서 OpenAI·소프트뱅크에도 위험이 전이될 수 있다.",
+      "status": "unverified",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:13:19",
+      "source_confidence": 0.88,
+      "asr_confidence": 0.0,
+      "numeric_parse": {
+        "claimed": "전분기 대비 매출성장률 140%→45%; 2026년 11월 중순·추수감사절 전 IPO",
+        "observed": "실적·성장률·상장 일정의 직접 증거 없음"
+      },
+      "investor_implication": "성장 둔화와 IPO 일정을 확정 이벤트로 투자 판단에 반영할 수 없다."
+    },
+    {
+      "claim_id": "C7",
+      "claim_text": "2007년 6월부터 2013년 스마트폰 침투율 40%까지 7년 이상이 걸렸으며, ChatGPT 출시일·닷컴 PER·버핏 매매·인터뷰 사례가 투자 논거로 제시됐다.",
+      "status": "contradicted",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.0,
+      "numeric_parse": {
+        "claimed": "2007년 6월→2013년이 7년 이상; ChatGPT 2022년 11월 출시; 나스닥 PER 160배·S&P500 44배; 코카콜라 38년 무매도",
+        "observed": "날짜 사이 기간은 7년 미만; 나머지 수치·인용의 검증 자료 없음"
+      },
+      "investor_implication": "도입 속도 비교의 기간을 수정해야 하며, 나머지 역사적 사례도 확인 전에는 시장 저평가 근거로 사용할 수 없다."
+    },
+    {
+      "claim_id": "C8",
+      "claim_text": "로드스터 시연이 테슬라·스페이스X 합병 쇼케이스일 수 있으며, 양사 평가가치·차등의결권·보상안을 바탕으로 머스크의 통합 지배력 확대를 전망한다.",
+      "status": "partially_supported",
+      "confidence": 0.9,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:19:46",
+      "source_confidence": 0.93,
+      "asr_confidence": 0.0,
+      "numeric_parse": {
+        "claimed": "Tesla 약 1.5조 달러·SpaceX 2조 달러 이상; SpaceX 의결권 80% 이상·10배 의결권; Tesla 지분 약 12%; 보상안 1조 달러; 합병 후 의결권 50% 이상",
+        "observed": "TSLA market_cap 약 1.526조로 수치 규모만 부합; 나머지 수치·일정·권리구조 미확인"
+      },
+      "investor_implication": "테슬라 시가총액과 합병설을 분리해야 하며 합병·지배력 확대를 확정된 촉매로 볼 수 없다."
+    },
+    {
+      "claim_id": "C9",
+      "claim_text": "상법 개정과 물적분할·유상증자 감독 강화가 소액주주 보호 및 국내 증시 재평가를 뒷받침한다.",
+      "status": "unverified",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:26:08",
+      "source_confidence": 0.9,
+      "asr_confidence": 0.0,
+      "numeric_parse": {
+        "claimed": "정량 수치 없음",
+        "observed": "법령·시행 일정·감독 사례 원문 없음"
+      },
+      "investor_implication": "정책 변화의 구체 내용과 적용 사례를 확인하기 전에는 재평가 효과를 확정할 수 없다."
+    },
+    {
+      "claim_id": "C10",
+      "claim_text": "10월 중순 이후 미국 정부 지출이 금리를 낮추며, 코스닥150의 6개월 15% 이상 수익과 단기 반등을 예상한다. 주요 기술기업의 상대적 실적 발표 일정도 제시한다.",
+      "status": "unverified",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:06:25",
+      "source_confidence": 0.91,
+      "asr_confidence": 0.0,
+      "numeric_parse": {
+        "claimed": "10월 둘째~넷째 주 지출 확대; 2022·2023년 선례; 6개월 내 수익 15% 이상; Meta·Tesla 이번 주 목요일 실적",
+        "observed": "관련 거시 시계열·공식 일정·수익률 평가 자료 없음; E10~E12는 제목만 제공"
+      },
+      "investor_implication": "정부 지출의 금리 하락 효과와 15% 수익을 확정적 매수 근거로 사용할 수 없다."
+    }
+  ],
+  "entities": [
+    {
+      "ticker": "000660",
+      "name": "SK하이닉스",
+      "status": "unverified",
+      "claims": [
+        "반도체 주가는 현재 실적보다 사이클을 선반영하므로 실적 호조나 낮은 PER만으로 매수 시점을 판단하기 어렵다고 주장한다.",
+        "예상 BPS에 과거 저점 PBR을 적용하면 하락 여력이 제한적인 구간이라며 공포 국면에서 분할매수를 제안한다."
+      ],
+      "numeric_claims": [
+        "2023년 약 9조 원 적자에도 주가는 88% 상승했다고 발언한다.",
+        "2023년 반도체 관련 지표가 전년 대비 연중 -30%였다고 발언하나 해당 지표의 명칭은 불분명하다.",
+        "PBR이 6배 이상에서 약 3.3배로 하락했다고 설명한다."
+      ],
+      "verification_notes": [
+        "시장 데이터 조회 실패: no_usable_market_fields"
+      ],
+      "market_snapshot": {
+        "ticker": "000660",
+        "as_of": "2026-10-21T23:57:39.517493+00:00",
+        "current_price": null,
+        "market_cap": null,
+        "forward_pe": null,
+        "trailing_pe": null,
+        "fifty_two_week_high": null,
+        "fifty_two_week_low": null,
+        "average_target_price": null,
+        "source": "yfinance",
+        "status": "unverified"
+      },
+      "external_context_status": "verified"
+    },
+    {
+      "ticker": "005930",
+      "name": "삼성전자",
+      "status": "unverified",
+      "claims": [
+        "HBM 경쟁력과 업계 선두 지위 유지 가정 아래 예상 BPS에 PBR 1.1배를 적용한 가격을 강한 지지선으로 제시하고 저가 구간의 지속 매수를 주장한다."
+      ],
+      "numeric_claims": [
+        "현재 BPS 11만 원, 과거 주가 37만 원 및 PBR 약 3.3배, 현재 주가 약 20만 원으로 발언한다.",
+        "2027년 BPS를 17만 원으로 추정하고 PBR 1.1배를 적용한 18만 7천 원, 약 19만 원을 지지선으로 제시한다.",
+        "과거 선두 지위 유지 시 PBR 1.1배가 잘 깨지지 않았으나 하이닉스에 역전됐을 때 약 0.9배까지 하락했다고 설명한다."
+      ],
+      "verification_notes": [
+        "시장 데이터 조회 실패: no_usable_market_fields"
+      ],
+      "market_snapshot": {
+        "ticker": "005930",
+        "as_of": "2026-10-21T23:57:41.719638+00:00",
+        "current_price": null,
+        "market_cap": null,
+        "forward_pe": null,
+        "trailing_pe": null,
+        "fifty_two_week_high": null,
+        "fifty_two_week_low": null,
+        "average_target_price": null,
+        "source": "yfinance",
+        "status": "unverified"
+      },
+      "external_context_status": "verified"
+    },
+    {
+      "ticker": "TSLA",
+      "name": "테슬라·스페이스X",
+      "status": "unverified",
+      "claims": [
+        "로드스터 시연을 두 회사의 기술 시너지와 합병 가능성을 강조하는 쇼케이스로 해석하지만 차량의 실용성과 매출 기여에는 의문을 제기한다.",
+        "합병 시 스페이스X의 차등의결권이 인정되면 머스크가 통합회사의 지배력을 높일 수 있다는 시나리오를 소개한다."
+      ],
+      "numeric_claims": [
+        "로드스터 가격은 미공개라고 전제하고 최소 3억~4억 원 이상, 판매량은 2천~3천 대를 가정해 매출 기여를 논의한다.",
+        "12월 테슬라 주주총회에서 스페이스X 관련 발언이 나올지 주목한다고 언급한다.",
+        "머스크의 스페이스X 의결권이 80%를 넘고 차등의결권 주식은 10배라고 설명한다."
+      ],
+      "verification_notes": [
+        "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+      ],
+      "market_snapshot": {
+        "ticker": "TSLA",
+        "as_of": "2026-10-21T23:57:44.334342+00:00",
+        "current_price": 386.4700012207031,
+        "market_cap": 1526381586180.4048,
+        "forward_pe": 178.22244,
+        "trailing_pe": 357.8426,
+        "fifty_two_week_high": 498.83,
+        "fifty_two_week_low": 297.38,
+        "average_target_price": 397.83212,
+        "source": "yfinance",
+        "status": "verified"
+      },
+      "external_context_status": "verified"
+    }
+  ],
+  "evidence": [
+    {
+      "evidence_id": "E1",
+      "claim_id": "C1",
+      "title": "Canada to Provide Steel, Auto Sectors With Billions to Ease Trade Crunch",
+      "source_url": "https://finance.yahoo.com/m/8488d736-169d-3fd7-b8af-01e0498f6d99/canada-to-provide-steel%2C-auto.html",
+      "publisher": "The Wall Street Journal",
+      "published_at": "2026-10-21T19:59:00+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "Canada to Provide Steel, Auto Sectors With Billions to Ease Trade Crunch Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals Weather Newsletters..."
+    },
+    {
+      "evidence_id": "E2",
+      "claim_id": "C2",
+      "title": "Did SpaceX Just Save CoreWeave, Nebius, and the Neocloud Sector?",
+      "source_url": "https://finance.yahoo.com/technology/ai/articles/did-spacex-just-save-coreweave-210502330.html",
+      "publisher": "Motley Fool",
+      "published_at": "2026-10-21T21:05:02+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "Did SpaceX Just Save CoreWeave, Nebius, and the Neocloud Sector? Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals Weather Newsletters Finance..."
+    },
+    {
+      "evidence_id": "E3",
+      "claim_id": "C5",
+      "title": "What Kinder Morgan (KMI) Said on Its Q3 Earnings Call",
+      "source_url": "https://finance.yahoo.com/energy/articles/kinder-morgan-kmi-said-q3-230316748.html",
+      "publisher": "MarketBeat",
+      "published_at": "2026-10-21T23:03:16+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    },
+    {
+      "evidence_id": "E4",
+      "claim_id": "C6",
+      "title": "Steel Dynamics: 3 Key Takeaways for Long-Term Investors",
+      "source_url": "https://finance.yahoo.com/markets/stocks/articles/steel-dynamics-3-key-takeaways-134753555.html",
+      "publisher": "Motley Fool",
+      "published_at": "2026-10-21T13:47:53+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    },
+    {
+      "evidence_id": "E5",
+      "claim_id": "C7",
+      "title": "Basic Materials Roundup: Market Talk",
+      "source_url": "https://finance.yahoo.com/m/5d4a00eb-6e39-38fb-bdc3-18d7c85cecdb/basic-materials-roundup%3A.html",
+      "publisher": "The Wall Street Journal",
+      "published_at": "2026-10-21T21:16:00+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    },
+    {
+      "evidence_id": "E6",
+      "claim_id": "C7",
+      "title": "Santacruz Silver Reports Q3 2026 Production Results Producing 1,500,958 Ounces of Silver and 22,080 Tonnes of Zinc",
+      "source_url": "https://finance.yahoo.com/markets/commodities/articles/santacruz-silver-reports-q3-2026-210000533.html",
+      "publisher": "TMX Newsfile",
+      "published_at": "2026-10-21T21:00:00+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    },
+    {
+      "evidence_id": "E7",
+      "claim_id": "C9",
+      "title": "Senteon Wins Best Solution Patch and Configuration Management in the 2026 Top InfoSec Innovator Awards",
+      "source_url": "https://finance.yahoo.com/technology/articles/senteon-wins-best-solution-patch-235400804.html",
+      "publisher": "GlobeNewswire",
+      "published_at": "2026-10-21T23:54:00+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    },
+    {
+      "evidence_id": "E8",
+      "claim_id": "C9",
+      "title": "Better Retail Stock for 2026: Alibaba vs. Walmart",
+      "source_url": "https://finance.yahoo.com/markets/stocks/articles/better-retail-stock-2026-alibaba-233321778.html",
+      "publisher": "Motley Fool",
+      "published_at": "2026-10-21T23:33:21+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    },
+    {
+      "evidence_id": "E10",
+      "claim_id": "C10",
+      "title": "Dow Jones Futures Fall; Meta, Tesla Are Earnings Movers After SpaceX Leads Bullish Nasdaq Move",
+      "source_url": "https://finance.yahoo.com/m/2bd9a8b9-7491-307a-8f54-b091a90905b0/dow-jones-futures-fall%3B-meta%2C.html",
+      "publisher": "Investor's Business Daily",
+      "published_at": "2026-10-21T23:47:05+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    },
+    {
+      "evidence_id": "E11",
+      "claim_id": "C10",
+      "title": "S&P 500, Nasdaq Gain, Powered By Meta, Tesla Stock — SPCX, META, TSLA, SKYD, IBM In Focus",
+      "source_url": "https://finance.yahoo.com/markets/stocks/articles/p-500-nasdaq-gain-powered-231519176.html",
+      "publisher": "Stocktwits",
+      "published_at": "2026-10-21T23:15:19+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    }
+  ],
+  "source_policy": {
+    "raw_transcript_published": false,
+    "raw_transcript_in_evidence": false,
+    "research_pipeline_version": 4,
+    "closed_source_claims": "unverified_external_source",
+    "auto_caption_warning": true,
+    "local_asr_warning": false
+  }
+}

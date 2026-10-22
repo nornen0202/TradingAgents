@@ -1,0 +1,635 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YouTube 투자자용 검증 리포트 - 스페이스X가 로켓보다 AI 사업에 더 많은 돈을 쓰는 이유</title>
+  <style>
+:root {
+  color-scheme: light;
+  --bg: #f7f8fb;
+  --panel: #ffffff;
+  --text: #172033;
+  --muted: #667085;
+  --line: #d9dee8;
+  --accent: #0f766e;
+  --accent-2: #2563eb;
+  --warn: #b45309;
+  --bad: #b42318;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0 56px; }
+a { color: var(--accent-2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.hero { padding: 28px 0 22px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+.hero.compact { padding-top: 12px; }
+.hero h1 { margin: 0; font-size: clamp(28px, 4vw, 44px); line-height: 1.15; letter-spacing: 0; }
+.hero p { max-width: 760px; color: var(--muted); margin: 12px 0 0; }
+.eyebrow { color: var(--accent); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0; margin: 0 0 8px; }
+section { margin: 28px 0; }
+h2, h3, h4, h5 { letter-spacing: 0; line-height: 1.25; }
+.synthesis-callout { padding: clamp(20px, 4vw, 34px); border: 1px solid #6ee7d8; border-radius: 18px; background: linear-gradient(135deg, #ecfdf9 0%, #eff6ff 100%); box-shadow: 0 18px 44px rgba(15, 118, 110, .12); }
+.synthesis-callout.unavailable { border-color: var(--line); background: var(--panel); box-shadow: none; }
+.synthesis-callout h2 { margin: 0; font-size: clamp(24px, 3.2vw, 36px); }
+.synthesis-callout .lead { max-width: 900px; font-size: 17px; color: #334155; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.primary-link, .secondary-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border-radius: 999px; font-weight: 800; }
+.primary-link { color: white; background: var(--accent); }
+.secondary-link { color: var(--accent-2); border: 1px solid #93c5fd; background: white; }
+.primary-link:hover, .secondary-link:hover { text-decoration: none; filter: brightness(.97); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.card, .run { display: flex; flex-direction: column; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; color: var(--text); min-height: 128px; }
+.run { padding: 16px; }
+.card:hover, .run:hover { border-color: var(--accent-2); text-decoration: none; }
+.thumb { display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #e9edf5; border-radius: 8px 8px 0 0; color: var(--muted); font-size: 13px; font-weight: 700; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb-empty span { padding: 0 14px; text-align: center; }
+.card-body { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 16px; }
+.card strong { line-height: 1.35; }
+.source-line { color: #3f4a5f; font-weight: 600; }
+.runs { display: grid; gap: 10px; }
+.badge { display: inline-flex; width: fit-content; border-radius: 999px; padding: 2px 9px; background: #e6f4f1; color: var(--accent); font-size: 12px; font-weight: 700; }
+.status-contradicted, .status-llm_failed { background: #fee4e2; color: var(--bad); }
+.status-unverified, .status-stale { background: #fff4d6; color: var(--warn); }
+small, .muted { color: var(--muted); }
+.topnav { display: flex; gap: 14px; margin-bottom: 16px; font-size: 14px; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px; }
+.stats span { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
+.report { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: min(5vw, 36px); }
+.report-head { border-bottom: 1px solid var(--line); margin-bottom: 24px; padding-bottom: 20px; }
+.report-head h1 { margin: 0; font-size: clamp(24px, 3.5vw, 38px); line-height: 1.2; }
+.meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+.scope-note { padding: 12px 14px; border-left: 4px solid var(--warn); border-radius: 6px; background: #fff7ed; color: #7c2d12; }
+.synthesis-report h2 { margin-top: 34px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.synthesis-report h3 { margin: 24px 0 8px; color: #0f4c5c; }
+.synthesis-report p, .synthesis-report li { overflow-wrap: anywhere; }
+pre { overflow: auto; background: #111827; color: #f9fafb; border-radius: 8px; padding: 14px; }
+code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+details { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 18px; }
+@media (max-width: 640px) {
+  main { width: min(100% - 20px, 1120px); padding-top: 18px; }
+  .report { padding: 18px; }
+  .synthesis-callout { border-radius: 14px; padding: 18px; }
+  .cta-row a { width: 100%; }
+  .mobile-report { border-radius: 12px; }
+}
+</style>
+</head>
+<body>
+  <main>
+<nav class="topnav"><a href="index.html">실행 목록</a><a href="../../index.html">YouTube 홈</a></nav>
+<article class="report">
+  <header class="report-head">
+    <p class="eyebrow">youtube_20261022_080610</p>
+    <h1>스페이스X가 로켓보다 AI 사업에 더 많은 돈을 쓰는 이유</h1>
+    <div class="meta">
+      <span class="badge status-asr_uncertain">asr_uncertain</span>
+      <a href="https://www.youtube.com/watch?v=mKbboQXLmQ0">원본 영상</a>
+    </div>
+  </header>
+  <h2>스페이스X의 AI 투자 확대: 성장 논리보다 원자료 확인이 먼저</h2>
+<p><strong>분석 기준: 2026년 10월 22일 제공 자료</strong></p>
+<p>대상: 경제사냥꾼, <a href="https://www.youtube.com/watch?v=mKbboQXLmQ0">스페이스X가 로켓보다 AI 사업에 더 많은 돈을 쓰는 이유</a> · 2026년 10월 21일 게시</p>
+<h3>1. 핵심 판단</h3>
+<p>영상의 논리는 <strong>AI 연산 임대 수요와 빠른 투자 회수 기대가 로켓보다 큰 AI 투자를 유도한다</strong>는 것이다. 스타링크의 이익을 기반으로 AI 사업을 확대한다는 성장 시나리오와, 투자 지출·차입·계약 해지·락업 해제에 따른 위험을 함께 제시한다.</p>
+<p>그러나 <strong>제공된 주장 검증의 최종 판정은 ‘미검증’</strong>이다. 스페이스X의 발행인·상장일·티커, 인수에 따른 연결범위, 실적 공시와 고객 계약을 직접 확인할 자료가 없다. 따라서 아래 기업 수치는 확인된 실적이 아니라 영상 주장으로 읽어야 한다. 증거 부족이 해당 주장의 허위를 입증하는 것도 아니다.</p>
+<p>확인 가능한 부분은 일부 조건부 산술과 호스트가 수집한 TSLA 단독 시장 스냅샷이다. 이것만으로 스페이스X의 저평가나 지속 가능한 현금창출력을 판단하기는 어렵다.</p>
+<h3>2. 영상 주장과 확인된 근거</h3>
+<p>아래 시각은 <strong>개별 발화 시점이 아닌 자막 청크 시작점</strong>이다. 금액 단위는 달러다.</p>
+<p>| 항목·근거 구간 | 영상 주장 | 확인된 사실·검증 한계 |</p>
+<p>|---|---|---|</p>
+<p>| 발행인·인수 · 00:00, 05:14 | 스페이스X가 상장사이며 2월 xAI 편입, 8월 커서 인수 | 공식 상장·인수 자료 없음. 티커와 연결재무 범위부터 수동 확인 필요 |</p>
+<p>| 3분기 실적 · 00:00, 05:14 | 매출 146억, 영업이익 28억, 순이익 44억. AI 매출 26억→76억, 스타링크의 영업이익 기여 85% | 공시·부문 주석·실적 콜 없음. 입력값 기준 AI 매출 비중 76/146≈52.1%라는 산술만 일치 |</p>
+<p>| 투자 배분 · 00:00 | 총투자 196억 중 AI 164억, 로켓 16억, 스타링크 15억. 로켓 투자도 증가 | 입력값 기준 AI 비중 약 83.7%, 로켓 대비 10.25배. 실제 지출은 미확인이며 부문 합계는 195억으로 총액과 1억 차이 |</p>
+<p>| 고객 계약 · 05:14, 10:25 | 앤트로픽 월 12.5억, 구글 월 9.2억 규모 임대 및 90일 통지 해지권 | 공식 발표·계약·관련 보도 본문 없음. 월요금을 확정 장기매출로 취급할 수 없음 |</p>
+<p>| 용량·회수기간 · 05:14 | 9월 말 1.7GW, 연말 2.5~3GW. 현재 가격에서 설비 투자 회수 1년 미만 | 설치·통전·실가동 용량 구분과 가격·가동률·운영비 가정 모두 미확인 |</p>
+<p>| 현금흐름 · 05:14 | 9개월 영업현금흐름 131억, 투자 481억, 현금·유가증권 899억 | 131−481=−350억이라는 단순 계산만 확인. 실제 현금흐름과 가용 유동성은 미확인 |</p>
+<p>| 신용·추가 조달 · 05:14, 10:25 | 아폴로 주도 400억 차입 협상, 채권 가격 하락과 CDS 상승 | FT·제로헤지 원문, 채권 식별자와 CDS 시계열 없음. 협상과 조달 완료를 구분해야 함 |</p>
+<p>| 락업·주가 · 10:25, 15:32 | 미국시간 10월 22일 최대 28%, 26일 추가 7% 거래 허용 | 약정·분모·조기해제 조건·가격자료 없음. 예정된 거래 허용과 실제 매도는 별개 |</p>
+<p>| 테슬라 관련 · 05:14, 10:25 | 합병 검토 특별위원회와 공동 반도체 공장 추진 | 양사 공식 자료 없음. 합병 검토·승인·계약 체결을 확정 촉매로 묶을 수 없음 |</p>
+<h4>외부 증거의 실질적 한계</h4>
+<p>호스트는 검색 10회로 증거 6건을 수집했지만, 주장 검증 단계에서는 <strong>어느 항목도 직접적인 지지·반박 증거로 채택하지 않았다.</strong></p>
+<ul>
+<li><strong>E1:</strong> <a href="https://finance.yahoo.com/m/2bd9a8b9-7491-307a-8f54-b091a90905b0/dow-jones-futures-fall%3B-meta%2C.html">IBD의 스페이스X 언급 기사</a>는 제목에 스페이스X가 등장한다. 그러나 제공 발췌는 오류·탐색 문구가 대부분이어서 상장·인수·실적을 확인하지 못한다.</li>
+<li><strong>E2·E3:</strong> 테슬라 실적 기사다. <a href="https://finance.yahoo.com/markets/stocks/article/tesla-reports-q3-earnings-beat-positive-free-cash-flow-and-better-than-expected-capex-202153389.html">Yahoo Finance의 테슬라 3분기 기사</a>는 스페이스X 실적의 대체 근거가 아니다.</li>
+<li><strong>E4~E6:</strong> 금 가격·금광주·캐나다 산업 지원 관련 자료로 해당 투자·계약·차입 주장과 무관하다.</li>
+</ul>
+<p>호스트의 TSLA 스냅샷은 <strong>2026년 10월 21일 23:07:54 UTC 기준 약 386.47달러, 시가총액 약 1.5264조 달러</strong>다. 영상이 주장한 10월 20일 양사 합산 시가총액 3.5조 달러를 확인하는 자료는 아니다. 공시 조회도 제공자 이용 불가로 실패했으므로 ‘관련 공시가 없다’고 결론 낼 수 없다.</p>
+<h3>3. 강세 논리는 무엇이며, 어떤 조건이 필요한가</h3>
+<p>영상의 강세 시나리오는 다음 연결고리다.</p>
+<p><strong>연산 수요 증가 → 높은 임대가격·가동률 → AI 매출·이익 확대 → 설비 투자 회수 → 추가 용량 확보</strong></p>
+<p>이 논리가 성립하려면 다음 조건이 확인돼야 한다.</p>
+<p>1. <strong>외부 고객의 실제 지급 수요:</strong> 계약 발표나 최대 월요금뿐 아니라 최소 지급의무·가동 개시·청구·현금 회수가 필요하다.</p>
+<p>2. <strong>인수 효과를 제외한 성장:</strong> AI 매출 확대가 커서 편입에 따른 연결범위 변화인지, 기존 사업의 유기적 성장인지 구분해야 한다.</p>
+<p>3. <strong>반복 가능한 수익성:</strong> 스타링크 이익 기여와 AI 흑자가 일회성 효과를 제외하고도 지속돼야 한다.</p>
+<p>4. <strong>가동 가능한 인프라:</strong> GW 목표보다 실제 통전·냉각·칩 설치·유료 가동이 중요하다. 자체 사용 용량은 외부 임대 현금수입과 동일하지 않다.</p>
+<p>따라서 영상의 숫자가 사실로 확인되더라도 <strong>매출 성장만으로 투자 회수나 저평가가 자동 입증되지는 않는다.</strong></p>
+<h3>4. 핵심 반론과 시나리오 무효화 조건</h3>
+<h4>설비별 회수기간과 회사 전체 현금흐름은 다르다</h4>
+<p>영상 수치대로라면 9개월 투자 481억 달러는 영업현금흐름 131억 달러를 크게 웃돈다. 개별 설비가 빠르게 회수되더라도 신규 투자를 계속 확대하면 회사 전체 잉여현금흐름은 적자일 수 있다.</p>
+<p>4분기 투자 전망 350억~400억 달러를 누적액에 더하면 <strong>831억~881억 달러</strong>로, 영상의 연간 전망 830억~880억 달러와 소폭 차이가 난다. 반올림 여부는 미확인이다. 현금 잔액만으로 자금 여력을 판단하지 말고 사용제한·차입 만기·향후 투자약정도 확인해야 한다.</p>
+<p><strong>약화·무효화 조건:</strong> 투자 대비 영업현금 유입의 격차가 확대되고, 신규 조달 조건까지 악화되는데 이를 상쇄할 계약·수익성 개선이 나타나지 않는 경우.</p>
+<h4>단기 해지권은 장기 투자 회수와 충돌할 수 있다</h4>
+<p>90일 통지 해지권이 실제 존재한다면, 장기간 사용하는 인프라와 짧게 종료 가능한 매출 사이에 기간 불일치가 생긴다. 임대가격 하락·고객 이탈·가동률 저하는 회수기간을 늘릴 수 있다. 다만 해지권 자체도 현재 미검증이다.</p>
+<p><strong>약화·무효화 조건:</strong> 최소 지급의무가 약하고 고객이 이탈하거나, 대체 고객 확보를 위해 가격을 낮춰야 해 투자 회수 가정이 훼손되는 경우.</p>
+<h4>수주잔고와 순이익을 현금으로 읽으면 안 된다</h4>
+<p>영상은 수주잔고 630억 달러 중 420억 달러의 12개월 내 매출 인식을 주장한다. 그러나 매출 인식은 신규 현금수취와 다르다. 기청구·선수취로 설명한 175억 달러도 전부 이미 받은 현금이라고 볼 수 없다. 협상 중 계약 역시 확정 수주와 분리해야 한다.</p>
+<p>관계사 관련 이익 5.6억 달러, 관세 환급 및 다음 분기 마진 하락 전망도 원자료 확인 대상이다.</p>
+<p><strong>약화·무효화 조건:</strong> 잔고의 매출 전환이 지연되거나 현금 회수가 뒤처지고, 일회성 효과를 제외한 영업수익성도 개선되지 않는 경우.</p>
+<h4>락업과 합병은 확정된 가격 방향이 아니다</h4>
+<p>거래 가능한 물량은 실제 매도량이 아니며, 과거 해제 전후 수익률만으로 인과관계를 확정할 수 없다. 미국시간 10월 22일·26일 해제 주장은 제공 증거 시점에서 실제 매도가 확인된 사건이 아니다.</p>
+<p>합병 역시 특별위원회 구성 주장부터 공식 확인이 필요하다. 검토가 확인되더라도 조건 합의·주주 승인·거래 종결과는 다르다.</p>
+<h3>5. 단기 체크포인트와 구체적 관찰 항목</h3>
+<p>| 우선순위·시점 | 확인할 자료 | 관찰할 항목 |</p>
+<p>|---|---|---|</p>
+<p>| 최우선 | 공식 상장·공모·인수 자료 | 법인명, 거래소, 티커, 상장일, xAI·커서 종결일과 연결 편입일 |</p>
+<p>| 실적 원문 확보 시 | 3분기 공시·부문 주석·콜 | AI 유기적 성장, 일회성 제외 이익, 투자 합계 차이, 현금흐름 정의 |</p>
+<p>| 미국시간 10월 22일·26일 전후 | 락업 원약정·변경 공시·거래자료 | 28%·7%의 분모와 중복, 실제 매도 공시, 거래량 및 시장 대비 수익률 |</p>
+<p>| 계약·조달 발표 시 | 고객 발표·계약 요약·차입 종결 자료 | 최소 지급액, 해지·위약금, 실제 가동일, 금리·담보·만기·순조달액 |</p>
+<p>| 연말·후속 분기 | 인프라 진행 및 재무자료 | 실가동 용량, 임대가격·가동률, 영업현금흐름/투자 비율, 수주 전환과 현금 회수 |</p>
+<p>| 합병 관련 발표 시 | 양사 공식 공시 | 위원회 권한·독립성, 거래 단계, 조건 및 주주별 경제적 영향 |</p>
+<p>채권·CDS는 동일 식별자·만기·통화의 시계열로 비교해야 한다. 채권 가격 하락에서 국채금리와 신용스프레드 영향을 분리하지 않으면 신용위험을 과대 해석할 수 있다.</p>
+<h3>6. 자막·출처 신뢰도와 비공개 자료</h3>
+<ul>
+<li><strong>transcript_quality:</strong> 자동자막 547개 세그먼트, 상태 good·점수 1.0이다. 수집 품질 지표이지 숫자와 사건의 정확성 보증이 아니다.</li>
+<li><strong>source_confidence:</strong> 추출 단계의 0.88은 자막에서 주장을 읽어낸 확신도다. 검증 단계 C1~C9의 근거 직접성 점수는 0.01~0.05로 낮다. 서로 다른 의미의 지표다.</li>
+<li><strong>asr_confidence:</strong> 주요 재무 주장은 약 0.84~0.87이나, 채권·CDS는 0.70, 락업·주가는 0.65다. 불명확한 표현을 묶은 항목은 0.40이다. 이 점수들은 통계적으로 보정된 사실 확률이 아니다.</li>
+<li><strong>원음 재확인 대상:</strong> 선행 락업 날짜, CDS의 bp 단위, 일부 고점 대비 하락률, 반도체 공장명. 정확한 발화 시각과 원음이 없어 임의 복원할 수 없다.</li>
+<li><strong>비공개·유료 출처:</strong> 모건스탠리·도이체방크 보고서, CDS 원시자료, 비공개 계약 조항 및 회원 전용 자료는 <strong>미검증·수동 확인 필요</strong>다. Bloomberg·Morningstar 자료는 제공되지 않았으며 해당 기관의 확인으로 간주할 수 없다.</li>
+</ul>
+<p>상위 처리 상태에 ‘verified’ 또는 ‘verified_with_caveats’가 있어도, 이는 각 기업 주장에 대한 입증 완료와 동일하지 않다. 실질적 주장 검증 결과를 우선해야 한다.</p>
+<h3>7. 결론</h3>
+<p>영상은 AI 임대 성장과 대규모 투자 부담을 함께 짚지만, 제공 자료에서는 그 논리를 뒷받침할 기업·계약·공시 증거가 확보되지 않았다. <strong>먼저 발행인과 연결범위를 확정하고, 그다음 계약의 현금화와 투자 충당 능력을 확인하는 순서</strong>가 중요하다.</p>
+<p>15:32 구간의 동일 금액 분할투자 예시는 세 가격 150·135·120달러에서 모두 체결되고 비용을 제외하면 평균단가 약 <strong>133.884달러</strong>로 계산된다. 이는 산술만 지지할 뿐 저평가·미래 수익·전략의 우월성을 입증하지 않는다. 현재 판단을 바꿀 핵심 자료는 가격 예시보다 <strong>확정 계약, 반복 가능한 이익, 실제 현금 회수 및 조달 조건</strong>이다.</p>
+  <details>
+    <summary>공개 요약 JSON</summary>
+    <pre>{
+  &quot;version&quot;: 4,
+  &quot;video_id&quot;: &quot;mKbboQXLmQ0&quot;,
+  &quot;title&quot;: &quot;스페이스X가 로켓보다 AI 사업에 더 많은 돈을 쓰는 이유&quot;,
+  &quot;url&quot;: &quot;https://www.youtube.com/watch?v=mKbboQXLmQ0&quot;,
+  &quot;channel&quot;: &quot;경제사냥꾼&quot;,
+  &quot;channel_id&quot;: &quot;UC7usMJDHmtbs_oegmzQKKMA&quot;,
+  &quot;source_url&quot;: &quot;https://www.youtube.com/@%EA%B2%BD%EC%A0%9C%EC%82%AC%EB%83%A5%EA%BE%BC/videos&quot;,
+  &quot;thumbnail_url&quot;: &quot;https://i.ytimg.com/vi/mKbboQXLmQ0/maxresdefault.jpg&quot;,
+  &quot;published_at&quot;: &quot;2026-10-21T11:02:05+00:00&quot;,
+  &quot;status&quot;: &quot;asr_uncertain&quot;,
+  &quot;strategy_source_tier&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_evidence_weight&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_validation_policy&quot;: &quot;STANDARD_REVIEW&quot;,
+  &quot;transcript_status&quot;: &quot;available&quot;,
+  &quot;transcript_source&quot;: &quot;automatic&quot;,
+  &quot;transcript_chars&quot;: 10571,
+  &quot;transcript_quality&quot;: {
+    &quot;status&quot;: &quot;good&quot;,
+    &quot;score&quot;: 1.0,
+    &quot;warnings&quot;: [],
+    &quot;source&quot;: &quot;automatic&quot;,
+    &quot;language&quot;: &quot;Korean (Original)&quot;,
+    &quot;model_or_format&quot;: &quot;json3&quot;,
+    &quot;chars&quot;: 10571,
+    &quot;segments&quot;: 547,
+    &quot;duration_seconds&quot;: 1030,
+    &quot;repeated_ngram_ratio&quot;: 0.006
+  },
+  &quot;generated_at&quot;: &quot;2026-10-22T08:06:10.997096+09:00&quot;,
+  &quot;llm_status&quot;: &quot;success&quot;,
+  &quot;research_status&quot;: &quot;success&quot;,
+  &quot;claim_verification_status&quot;: &quot;success&quot;,
+  &quot;research_pipeline_version&quot;: 4,
+  &quot;evidence_count&quot;: 6,
+  &quot;claim_status_summary&quot;: {
+    &quot;unverified&quot;: 9,
+    &quot;asr_uncertain&quot;: 1,
+    &quot;partially_supported&quot;: 1
+  },
+  &quot;claims&quot;: [
+    {
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;claim_text&quot;: &quot;스페이스X가 상장사이며 2026년 2월 xAI를 주식교환으로 편입하고 8월 커서를 인수했다는 주장.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.05,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.05,
+      &quot;asr_confidence&quot;: 0.88,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;2026년 2월 xAI 편입·8월 커서 인수&quot;,
+        &quot;observed&quot;: &quot;공식 상장·인수 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;발행인과 연결범위를 확인하기 전에는 후속 재무수치·주가·투자 판단을 특정 상장증권에 연결할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;claim_text&quot;: &quot;3분기 매출 146억 달러·영업이익 28억·순이익 44억 달러로 상장 후 첫 분기 흑자이며, AI 매출·손익 개선과 스타링크의 높은 이익 기여가 있었다는 주장.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.05,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.02,
+      &quot;asr_confidence&quot;: 0.86,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;매출 146억·전년 대비 +161%·예상 대비 약 +15%; 영업이익 28억·순이익 44억; AI 매출 26억→76억·손익 -13억→+4억·누적 -33억; 스타링크 이익 기여 85%; 커서 제외 매출 +192%&quot;,
+        &quot;observed&quot;: &quot;외부 실적 관측값 없음; AI 매출 비중의 조건부 산술만 일치&quot;
+      },
+      &quot;investor_implication&quot;: &quot;매출 성장과 첫 흑자를 실적 개선의 확정 근거로 사용할 수 없으며, 인수 효과와 일회성 이익을 분리해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;claim_text&quot;: &quot;AI 설비투자가 로켓 투자를 크게 웃돌지만 로켓 투자도 증가했으며, 4분기·연간 투자를 확대하고 9월 28일 스타십이 위성 26기를 배치했다는 주장.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.08,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.02,
+      &quot;asr_confidence&quot;: 0.86,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;3분기 총투자 196억·AI 164억·로켓 16억·스타링크 15억 달러; 전분기 로켓 +37%·AI +4%; 전년 로켓 +44%·AI 3.5배; 누적 AI 투자 10배 이상·연구개발비 2.6배; 4분기 350억~400억·연간 830억~880억; 위성 26기&quot;,
+        &quot;observed&quot;: &quot;외부 관측값 없음; 투자 비율은 조건부 일치하나 부문 합계는 총액과 1억 달러 차이&quot;
+      },
+      &quot;investor_implication&quot;: &quot;조건부 비율 계산은 맞지만 실제 투자 배분과 로켓 사업 유지 여부를 입증하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;claim_text&quot;: &quot;앤트로픽·구글이 콜로서스 연산 용량을 대규모로 임차하고 두 계약에 90일 통지 해지권이 있다는 주장.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.02,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:05:14&quot;,
+      &quot;source_confidence&quot;: 0.01,
+      &quot;asr_confidence&quot;: 0.84,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;앤트로픽 월 12.5억 달러·2029년 5월까지; 구글 10월부터 칩 약 11만 개·월 9.2억 달러; 양측 90일 통지 해지&quot;,
+        &quot;observed&quot;: &quot;가격·용량·기간·해지 조건을 확인할 계약 또는 관련 보도 본문 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;월 임대료를 확정 장기매출이나 투자금 회수 보장으로 사용할 수 없다. 해지권과 최소 지급의무를 확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;claim_text&quot;: &quot;컴퓨팅 용량 확대, 자체사용·외부임대 병행, 전력·냉각 병목, 1년 미만 투자 회수와 매출·수주잔고 전망에 관한 주장.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.03,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:05:14&quot;,
+      &quot;source_confidence&quot;: 0.01,
+      &quot;asr_confidence&quot;: 0.85,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;0.6→1.7GW; 연말 2.5~3GW·2027년 10GW 추가; 자체사용·임대 50:50 및 월별 60:40; 회수 1년 미만; 2027년 1분기 매출 330억~370억; 수주잔고 630억 중 420억의 12개월 내 인식·175억 기청구 또는 선수취&quot;,
+        &quot;observed&quot;: &quot;해당 용량·전망·계약잔액에 대한 외부 관측값 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;용량·매출 전망을 실현 실적으로 취급하거나 수주잔고 전체를 신규 현금 유입으로 계산해서는 안 된다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;claim_text&quot;: &quot;9개월 잉여현금흐름 적자와 현금 잔액, 회사채 발행·대출 상환 및 아폴로 주도 차입 협상에 관한 주장.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.08,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:05:14&quot;,
+      &quot;source_confidence&quot;: 0.02,
+      &quot;asr_confidence&quot;: 0.87,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;영업현금흐름 131억·설비투자 481억·FCF -350억·현금 및 유가증권 899억; 회사채 250억·상환 200억; 차입 협상 400억 달러&quot;,
+        &quot;observed&quot;: &quot;외부 재무 관측값 없음; -350억 달러와 투자/매출 약 1.34배는 조건부 산술 일치&quot;
+      },
+      &quot;investor_implication&quot;: &quot;산술상 투자와 영업현금흐름의 격차는 크지만 실제 유동성·조달 필요액·차입 조건은 확인되지 않았다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;claim_text&quot;: &quot;회사채 가격 하락·CDS 최고치와 모건스탠리의 장기 FCF 전망·도이체방크의 2027년 투자 추정에 관한 주장.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.02,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:10:25&quot;,
+      &quot;source_confidence&quot;: 0.01,
+      &quot;asr_confidence&quot;: 0.7,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;2056년 만기 채권 약 100→83; 10월 19일 CDS 197.6bp·거래 개시 후 최고; 2035년 전 연간 FCF 흑자 없음 전망; 2027년 투자 2,070억 달러 추정&quot;,
+        &quot;observed&quot;: &quot;외부 가격·스프레드·보고서 관측값 없음; 197.6b의 bp 해석은 미확인&quot;
+      },
+      &quot;investor_implication&quot;: &quot;신용위험 급증이나 장기 현금흐름 적자를 확인된 사실로 제시할 수 없다. 증권사 추정은 확인되더라도 전망이다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;claim_text&quot;: &quot;락업 해제 일정·물량, 과거 해제 및 실적 발표 전후 수익률, 10월 20일 주가와 국내 투자자 순매수 순위에 관한 주장.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.03,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:10:25&quot;,
+      &quot;source_confidence&quot;: 0.02,
+      &quot;asr_confidence&quot;: 0.65,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;10월 22일 최대 28%·26일 추가 7%; 머스크 2027년 6월까지 제한; 8월 6일 9억 주·주가 +6% 이상; 다른 해제 후 5일 -10%; 실적일 -13.6%·저점 후 5일 +35%; 종가 147.79달러·고점 대비 -34% 이상·공모가 135달러; 시간외 +8% 이상·국내 순매수 1위&quot;,
+        &quot;observed&quot;: &quot;스페이스X 외부 관측값 없음; 공모가 대비 약 +9.47%만 조건부 계산 가능&quot;
+      },
+      &quot;investor_implication&quot;: &quot;해제 가능 물량을 실제 매도량으로 보거나 주가 하락의 확정 원인으로 해석할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;claim_text&quot;: &quot;스페이스X·테슬라 합병 검토 특별위원회, 공동 반도체 공장 계획 및 10월 20일 합산 시가총액 약 3.5조 달러에 관한 주장.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.05,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:05:14&quot;,
+      &quot;source_confidence&quot;: 0.05,
+      &quot;asr_confidence&quot;: 0.75,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;10월 20일 양사 시가총액 합계 약 3.5조 달러&quot;,
+        &quot;observed&quot;: &quot;다른 시점의 TSLA 단독 시가총액 약 1.5264조 달러만 제공; 스페이스X 값 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;합병을 확정 촉매로 반영하거나 합산 시가총액을 검증된 가치평가 기준으로 사용할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C10&quot;,
+      &quot;claim_text&quot;: &quot;불명확한 고유명사·단위·날짜를 원음 및 인용 원문으로 연결해야 하며 자막 추출 확신도는 사실 검증 신뢰도가 아니라는 항목.&quot;,
+      &quot;status&quot;: &quot;asr_uncertain&quot;,
+      &quot;confidence&quot;: 0.88,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.1,
+      &quot;asr_confidence&quot;: 0.4,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;197.6b·2달 9일·13 넘게 낮았어 등의 불명확한 전사&quot;,
+        &quot;observed&quot;: &quot;bp·정확한 해제일·하락률 단위를 확인할 원음 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;불명확한 표현을 확정 숫자·날짜·기업명으로 보정해 투자 근거로 사용하지 않아야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C11&quot;,
+      &quot;claim_text&quot;: &quot;150·135·120달러에 동일 금액을 투자하면 평균단가가 약 134달러로 낮아진다는 가상 예시와, 이를 활용한 저평가·분할매수 투자 판단.&quot;,
+      &quot;status&quot;: &quot;partially_supported&quot;,
+      &quot;confidence&quot;: 0.65,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:15:32&quot;,
+      &quot;source_confidence&quot;: 0.99,
+      &quot;asr_confidence&quot;: 0.88,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;평균 약 134달러·150달러 대비 약 16달러 낮음&quot;,
+        &quot;observed&quot;: &quot;조건부 재계산 평균 133.884달러·차이 16.116달러&quot;
+      },
+      &quot;investor_implication&quot;: &quot;가상 예시의 산술만 지지된다. 실제 매수 판단에는 발행인·재무·계약·가치평가 확인이 추가로 필요하다.&quot;
+    }
+  ],
+  &quot;entities&quot;: [
+    {
+      &quot;ticker&quot;: &quot;TSLA&quot;,
+      &quot;name&quot;: &quot;테슬라&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;머스크가 스페이스X와 테슬라의 합병 검토 특별위원회 구성을 밝혔으며, 영상은 AI 칩 설계·반도체 생산·데이터센터 통합 가능성을 투자 촉매로 제시한다. 조건 합의나 거래 성사는 보장되지 않았다고 설명한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;10월 20일 종가 기준 스페이스X와 테슬라 시가총액의 단순 합계가 약 3조 5천억 달러라고 주장.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;TSLA&quot;,
+        &quot;as_of&quot;: &quot;2026-10-21T23:07:54.710566+00:00&quot;,
+        &quot;current_price&quot;: 386.4700012207031,
+        &quot;market_cap&quot;: 1526381586180.4048,
+        &quot;forward_pe&quot;: 178.22244,
+        &quot;trailing_pe&quot;: 357.8426,
+        &quot;fifty_two_week_high&quot;: 498.83,
+        &quot;fifty_two_week_low&quot;: 297.38,
+        &quot;average_target_price&quot;: 397.83212,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    }
+  ],
+  &quot;evidence&quot;: [
+    {
+      &quot;evidence_id&quot;: &quot;E1&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;Dow Jones Futures Fall; Meta, Tesla Are Earnings Movers After SpaceX, Super Micro Lead Bullish Nasdaq Move&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/m/2bd9a8b9-7491-307a-8f54-b091a90905b0/dow-jones-futures-fall%3B-meta%2C.html&quot;,
+      &quot;publisher&quot;: &quot;Investor&#x27;s Business Daily&quot;,
+      &quot;published_at&quot;: &quot;2026-10-21T22:58:02+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Dow Jones Futures Fall; Meta, Tesla Are Earnings Movers After SpaceX, Super Micro Lead Bullish Nasdaq Move Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Scie...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E2&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;Tesla Earnings Beat, FSD Revenue Strong, But TSLA Falls After Call&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/m/0e6f45c4-f583-3080-9285-aee877fe5b99/tesla-earnings-beat%2C-fsd.html&quot;,
+      &quot;publisher&quot;: &quot;Investor&#x27;s Business Daily&quot;,
+      &quot;published_at&quot;: &quot;2026-10-21T22:44:52+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Tesla Earnings Beat, FSD Revenue Strong, But TSLA Falls After Call Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals Weather Newsletters Financ...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E4&quot;,
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;title&quot;: &quot;CIBC Revamps Gold Target but Still Sees Major 2027 Snapback&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/commodities/articles/cibc-revamps-gold-target-still-220538969.html&quot;,
+      &quot;publisher&quot;: &quot;GuruFocus.com&quot;,
+      &quot;published_at&quot;: &quot;2026-10-21T22:05:38+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;CIBC Revamps Gold Target but Still Sees Major 2027 Snapback Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals Weather Newsletters Finance My po...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E5&quot;,
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;title&quot;: &quot;This $40 Gold Mining Stock Could Turn $5,000 Into a Fortune&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/40-gold-mining-stock-could-215000592.html&quot;,
+      &quot;publisher&quot;: &quot;Motley Fool&quot;,
+      &quot;published_at&quot;: &quot;2026-10-21T21:50:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E6&quot;,
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;title&quot;: &quot;Canada to Provide Steel, Auto Sectors With Billions to Ease Trade Crunch&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/m/8488d736-169d-3fd7-b8af-01e0498f6d99/canada-to-provide-steel%2C-auto.html&quot;,
+      &quot;publisher&quot;: &quot;The Wall Street Journal&quot;,
+      &quot;published_at&quot;: &quot;2026-10-21T19:59:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    }
+  ],
+  &quot;source_policy&quot;: {
+    &quot;raw_transcript_published&quot;: false,
+    &quot;raw_transcript_in_evidence&quot;: false,
+    &quot;research_pipeline_version&quot;: 4,
+    &quot;closed_source_claims&quot;: &quot;unverified_external_source&quot;,
+    &quot;auto_caption_warning&quot;: true,
+    &quot;local_asr_warning&quot;: false
+  }
+}</pre>
+  </details>
+</article>
+</main>
+  <style>
+.reader-contents { margin: 16px 0; padding: 12px 16px; border: 1px solid var(--line, #64748b); border-radius: 12px; }
+.reader-contents > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-weight: 750; }
+.reader-contents nav { display: grid; gap: 4px; max-height: 45vh; overflow: auto; margin: 8px 0; }
+.reader-contents a { display: block; min-height: 44px; padding: 10px; border-radius: 6px; color: inherit; overflow-wrap: anywhere; }
+.reader-contents a:hover { background: #80808020; }
+.reader-contents .reader-subsection { padding-inline-start: 24px; font-size: .92em; }
+.reader-prose, .report { overflow-wrap: anywhere; line-height: 1.8; }
+.reader-prose p, .reader-prose li { max-width: 85ch; }
+.reader-prose h2, .reader-prose h3, .reader-prose h4, [data-reader-heading] { scroll-margin-top: 100px; line-height: 1.45; }
+.reader-prose h2 { margin-top: 1.8em; padding-bottom: 8px; border-bottom: 1px solid var(--line, #64748b); }
+.reader-prose h3 { margin-top: 1.5em; }
+.reader-prose li { margin: .5em 0; }
+.reader-prose pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.reader-prose blockquote { margin: 16px 0; padding: 4px 16px; border-left: 3px solid var(--accent, #64748b); }
+.reader-table { overflow: auto; max-width: 100%; margin: 16px 0; border: 1px solid var(--line, #64748b); border-radius: 10px; }
+.reader-table table { border-collapse: collapse; width: 100%; margin: 0; font-size: .92rem; }
+.reader-table th, .reader-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line, #64748b); min-width: 110px; max-width: 400px; overflow-wrap: anywhere; white-space: normal; }
+.reader-table th { background: #80808018; }
+.reader-table tr:nth-child(even) { background: #80808008; }
+.reader-search { display: grid; gap: 8px; margin: 16px 0; }
+.reader-search label { font-weight: 700; }
+.reader-search input { box-sizing: border-box; width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line, #64748b); border-radius: 10px; background: var(--panel, #fff); color: var(--text, #132238); font: inherit; }
+.reader-search p { margin: 0; font-size: .86rem; }
+.reader-back { position: fixed; bottom: max(14px, env(safe-area-inset-bottom)); right: 14px; z-index: 30; min-height: 44px; border: 1px solid #778899; border-radius: 99px; padding: 10px 16px; background: #18344a; color: #fff; font: 700 14px system-ui; cursor: pointer; box-shadow: 0 3px 12px #0003; }
+[data-reader-source] { margin-top: 20px; }
+[data-reader-source] > summary { min-height: 44px; cursor: pointer; }
+[data-reader-source] pre { font-size: .85rem; }
+[data-reader-source] pre, .reader-prose { min-width: 0; }
+.reader-contents :focus-visible, .reader-search :focus-visible, .reader-back:focus-visible, .reader-table:focus-visible { outline: 3px solid var(--accent, #008c95); outline-offset: 3px; }
+.reader-search + .grid > [hidden] { display: none !important; }
+@media (max-width: 600px) { .reader-prose { font-size: 1rem; } .reader-contents { padding: 8px 12px; } }
+@media print { .reader-back, .reader-search, .reader-contents, [data-reader-source] { display: none !important; } .reader-table { overflow: visible; } .reader-prose { color: #000; background: #fff; } }
+</style><script>
+(() => {
+  'use strict';
+  let serial = 0;
+  const rendered = new WeakMap();
+  const node = (tag, text) => { const el = document.createElement(tag); if (text != null) el.textContent = text; return el; };
+  function inline(parent, text) {
+    const pattern = /(`[^`]+`|\*\*[^*]+\*\*|\[[^\]]+\]\(https?:\/\/[^\s)]+\))/g;
+    let start = 0;
+    for (const match of String(text).matchAll(pattern)) {
+      parent.append(document.createTextNode(text.slice(start, match.index)));
+      const value = match[0];
+      if (value.startsWith('`')) parent.append(node('code', value.slice(1, -1)));
+      else if (value.startsWith('**')) parent.append(node('strong', value.slice(2, -2)));
+      else {
+        const link = value.match(/^\[([^\]]+)\]\((.+)\)$/);
+        const a = node('a', link[1]); a.href = link[2]; a.rel = 'noopener noreferrer'; parent.append(a);
+      }
+      start = match.index + value.length;
+    }
+    parent.append(document.createTextNode(text.slice(start)));
+  }
+  const cells = line => line.trim().replace(/^\|/, '').replace(/\|$/, '').split(/(?<!\\)\|/).map(v => v.trim().replace(/\\\|/g, '|'));
+  function markdown(source) {
+    const article = node('article'); article.className = 'reader-prose';
+    const lines = source.split(/\r?\n/); let list = null;
+    for (let i = 0; i < lines.length; i += 1) {
+      const line = lines[i], value = line.trim();
+      if (!value) { list = null; continue; }
+      if (/^```/.test(value)) {
+        const code = []; i += 1;
+        while (i < lines.length && !/^```/.test(lines[i].trim())) code.push(lines[i++]);
+        const pre = node('pre'); pre.append(node('code', code.join('\n'))); article.append(pre); list = null; continue;
+      }
+      if (i + 1 < lines.length && value.includes('|') && cells(lines[i + 1]).every(v => /^:?-{3,}:?$/.test(v))) {
+        const table = node('table'), head = node('thead'), body = node('tbody');
+        const row = (values, tag) => { const tr = node('tr'); values.forEach(v => { const cell = node(tag); if (tag === 'th') cell.scope = 'col'; inline(cell, v); tr.append(cell); }); return tr; };
+        head.append(row(cells(line), 'th')); i += 2;
+        while (i < lines.length && lines[i].trim() && lines[i].includes('|')) body.append(row(cells(lines[i++]), 'td'));
+        i -= 1; table.append(head, body); article.append(table); list = null; continue;
+      }
+      const heading = value.match(/^(#{1,6})\s+(.+)$/);
+      if (heading) { const h = node('h' + Math.min(4, heading[1].length + 1)); inline(h, heading[2]); article.append(h); list = null; continue; }
+      const bullet = value.match(/^(?:[-*+] |\d+\. )(.+)$/);
+      if (bullet) {
+        const tag = /^\d/.test(value) ? 'ol' : 'ul';
+        if (!list || list.tagName.toLowerCase() !== tag) { list = node(tag); if (tag === 'ol') list.start = parseInt(value, 10); article.append(list); }
+        const li = node('li'); inline(li, bullet[1]); list.append(li); continue;
+      }
+      list = null;
+      if (/^(---+|\*\*\*+)$/.test(value)) { article.append(node('hr')); continue; }
+      const p = node(value.startsWith('> ') ? 'blockquote' : 'p'); inline(p, value.startsWith('> ') ? value.slice(2) : line); article.append(p);
+    }
+    return article;
+  }
+  function contents(root) {
+    root.querySelectorAll(':scope > .reader-contents').forEach(el => el.remove());
+    const headings = [...root.querySelectorAll('h2,h3,h4')].filter(h => !h.closest('.card,.run-card,.reader-contents,[data-reader-source],[hidden]'));
+    if (headings.length < 2) return;
+    const details = node('details'); details.className = 'reader-contents';
+    details.append(node('summary', '이 리포트 목차 · ' + headings.length + '개 항목'));
+    const nav = node('nav'); nav.setAttribute('aria-label', '리포트 목차');
+    headings.forEach(h => {
+      if (!h.id) h.id = 'reader-section-' + (++serial);
+      h.dataset.readerHeading = ''; h.tabIndex = -1;
+      const a = node('a', h.textContent); a.href = '#' + h.id;
+      if (h.tagName !== 'H2') a.className = 'reader-subsection';
+      a.addEventListener('click', event => {
+        event.preventDefault();
+        for (let ancestor = h.parentElement; ancestor; ancestor = ancestor.parentElement) if (ancestor.tagName === 'DETAILS') ancestor.open = true;
+        h.scrollIntoView({block: 'start'}); h.focus({preventScroll: true});
+      }); nav.append(a);
+    });
+    details.append(nav); root.prepend(details);
+  }
+  function enhance(root) {
+    if (!root) return;
+    root.querySelectorAll('pre[data-report-markdown]').forEach(pre => {
+      const previous = rendered.get(pre);
+      if (previous && previous.source === pre.textContent) return;
+      const article = markdown(pre.textContent);
+      if (previous) previous.article.replaceWith(article);
+      else {
+        const details = node('details'); details.dataset.readerSource = '';
+        details.append(node('summary', 'Markdown 원문 보기'));
+        pre.before(article, details); details.append(pre);
+      }
+      rendered.set(pre, {source: pre.textContent, article});
+    });
+    root.querySelectorAll('table').forEach(table => {
+      if (table.closest('.reader-table,.account-table-wrap,.summary-scroll')) return;
+      const wrap = node('div'); wrap.className = 'reader-table'; wrap.tabIndex = 0;
+      wrap.setAttribute('role', 'region'); wrap.setAttribute('aria-label', '리포트 표 · 가로로 스크롤하여 전체 보기');
+      table.before(wrap); wrap.append(table);
+    });
+    root.querySelectorAll('.grid').forEach(grid => {
+      const cards = [...grid.querySelectorAll(':scope > a.card')];
+      if (cards.length < 2 || grid.dataset.readerSearch) return;
+      grid.dataset.readerSearch = 'true';
+      const box = node('div'); box.className = 'reader-search';
+      const input = node('input'); input.type = 'search'; input.placeholder = '제목 · 종목 · 채널 · 키워드'; input.id = 'report-search-' + (++serial);
+      const label = node('label', '리포트 찾기'); label.htmlFor = input.id;
+      const status = node('p'); status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
+      const update = () => {
+        const terms = input.value.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean); let count = 0;
+        cards.forEach(card => { card.hidden = !terms.every(t => card.textContent.toLocaleLowerCase().includes(t)); if (!card.hidden) count += 1; });
+        status.textContent = cards.length + '개 중 ' + count + '개 표시' + (count ? '' : ' · 검색어를 지우거나 다른 키워드를 입력하세요.');
+      };
+      input.addEventListener('input', update); box.append(label, input, status); grid.before(box); update();
+    });
+    contents(root);
+  }
+  window.TradingAgentsReader = {enhance};
+  const main = document.querySelector('main');
+  if (main && !main.hasAttribute('data-reader-dynamic')) enhance(main);
+  if (main) {
+    const top = node('button', '↑ 맨 위'); top.type = 'button'; top.className = 'reader-back'; top.setAttribute('aria-label', '리포트 맨 위로 이동');
+    top.addEventListener('click', () => { const target = document.querySelector('h1') || main; target.tabIndex = -1; target.scrollIntoView({block: 'start'}); target.focus({preventScroll: true}); });
+    document.body.append(top);
+  }
+})();
+</script>
+</body>
+</html>

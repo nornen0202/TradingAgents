@@ -1,0 +1,640 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YouTube 투자자용 검증 리포트 - 클래리티 법안 부결 이후, 미국 중간선거와 한국 디지털자산 기본법의 향방 | 서동주, 김동환, 한서희 법무법인 광장 변호사 [크립토 PLUS]</title>
+  <style>
+:root {
+  color-scheme: light;
+  --bg: #f7f8fb;
+  --panel: #ffffff;
+  --text: #172033;
+  --muted: #667085;
+  --line: #d9dee8;
+  --accent: #0f766e;
+  --accent-2: #2563eb;
+  --warn: #b45309;
+  --bad: #b42318;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0 56px; }
+a { color: var(--accent-2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.hero { padding: 28px 0 22px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+.hero.compact { padding-top: 12px; }
+.hero h1 { margin: 0; font-size: clamp(28px, 4vw, 44px); line-height: 1.15; letter-spacing: 0; }
+.hero p { max-width: 760px; color: var(--muted); margin: 12px 0 0; }
+.eyebrow { color: var(--accent); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0; margin: 0 0 8px; }
+section { margin: 28px 0; }
+h2, h3, h4, h5 { letter-spacing: 0; line-height: 1.25; }
+.synthesis-callout { padding: clamp(20px, 4vw, 34px); border: 1px solid #6ee7d8; border-radius: 18px; background: linear-gradient(135deg, #ecfdf9 0%, #eff6ff 100%); box-shadow: 0 18px 44px rgba(15, 118, 110, .12); }
+.synthesis-callout.unavailable { border-color: var(--line); background: var(--panel); box-shadow: none; }
+.synthesis-callout h2 { margin: 0; font-size: clamp(24px, 3.2vw, 36px); }
+.synthesis-callout .lead { max-width: 900px; font-size: 17px; color: #334155; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.primary-link, .secondary-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border-radius: 999px; font-weight: 800; }
+.primary-link { color: white; background: var(--accent); }
+.secondary-link { color: var(--accent-2); border: 1px solid #93c5fd; background: white; }
+.primary-link:hover, .secondary-link:hover { text-decoration: none; filter: brightness(.97); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.card, .run { display: flex; flex-direction: column; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; color: var(--text); min-height: 128px; }
+.run { padding: 16px; }
+.card:hover, .run:hover { border-color: var(--accent-2); text-decoration: none; }
+.thumb { display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #e9edf5; border-radius: 8px 8px 0 0; color: var(--muted); font-size: 13px; font-weight: 700; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb-empty span { padding: 0 14px; text-align: center; }
+.card-body { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 16px; }
+.card strong { line-height: 1.35; }
+.source-line { color: #3f4a5f; font-weight: 600; }
+.runs { display: grid; gap: 10px; }
+.badge { display: inline-flex; width: fit-content; border-radius: 999px; padding: 2px 9px; background: #e6f4f1; color: var(--accent); font-size: 12px; font-weight: 700; }
+.status-contradicted, .status-llm_failed { background: #fee4e2; color: var(--bad); }
+.status-unverified, .status-stale { background: #fff4d6; color: var(--warn); }
+small, .muted { color: var(--muted); }
+.topnav { display: flex; gap: 14px; margin-bottom: 16px; font-size: 14px; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px; }
+.stats span { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
+.report { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: min(5vw, 36px); }
+.report-head { border-bottom: 1px solid var(--line); margin-bottom: 24px; padding-bottom: 20px; }
+.report-head h1 { margin: 0; font-size: clamp(24px, 3.5vw, 38px); line-height: 1.2; }
+.meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+.scope-note { padding: 12px 14px; border-left: 4px solid var(--warn); border-radius: 6px; background: #fff7ed; color: #7c2d12; }
+.synthesis-report h2 { margin-top: 34px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.synthesis-report h3 { margin: 24px 0 8px; color: #0f4c5c; }
+.synthesis-report p, .synthesis-report li { overflow-wrap: anywhere; }
+pre { overflow: auto; background: #111827; color: #f9fafb; border-radius: 8px; padding: 14px; }
+code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+details { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 18px; }
+@media (max-width: 640px) {
+  main { width: min(100% - 20px, 1120px); padding-top: 18px; }
+  .report { padding: 18px; }
+  .synthesis-callout { border-radius: 14px; padding: 18px; }
+  .cta-row a { width: 100%; }
+  .mobile-report { border-radius: 12px; }
+}
+</style>
+</head>
+<body>
+  <main>
+<nav class="topnav"><a href="index.html">실행 목록</a><a href="../../index.html">YouTube 홈</a></nav>
+<article class="report">
+  <header class="report-head">
+    <p class="eyebrow">youtube_20261022_080610</p>
+    <h1>클래리티 법안 부결 이후, 미국 중간선거와 한국 디지털자산 기본법의 향방 | 서동주, 김동환, 한서희 법무법인 광장 변호사 [크립토 PLUS]</h1>
+    <div class="meta">
+      <span class="badge status-asr_uncertain">asr_uncertain</span>
+      <a href="https://www.youtube.com/watch?v=RbrDrLBVTi8">원본 영상</a>
+    </div>
+  </header>
+  <h2>디지털자산 제도화: 입법 기대와 확인된 근거의 간극</h2>
+<p><strong>분석 기준: 2026년 10월 22일 · 영상 게시: 2026년 10월 21일</strong></p>
+<p>출처: <a href="https://www.youtube.com/watch?v=RbrDrLBVTi8">삼프로TV 영상</a></p>
+<h3>1. 핵심 판단</h3>
+<p>영상은 미국의 디지털자산 입법 지연과 한국의 과세·거래소 지배구조·스테이블코인 제도 정비를 연결한다. 투자 관점의 핵심은 <strong>법안 통과 기대가 실제 영업 허용과 결제·정산 인프라 구축으로 이어지는지</strong>다.</p>
+<p>그러나 제공된 검증 결과는 전체적으로 <strong>미검증</strong>이다. 12개 주장 중 10개는 미검증, 1개는 부분 지지, 1개는 자동자막 불확실성으로 분류됐다. 영상 제목의 ‘클래리티 법안 부결’부터 공식 표결 기록으로 확인되지 않았다. 이를 확정 사건으로 삼아 시장 영향을 추론하기에는 근거가 부족하다.</p>
+<p>실질적으로 관련 있는 외부 자료는 한국 과세 쟁점을 다룬 E7뿐이다. 다른 8개 자료는 주장과 무관하거나 유효한 본문 근거가 없어 분석에서 제외했다. 수집 상태가 <code>verified</code>라는 표시만으로 영상 주장이 검증된 것은 아니다.</p>
+<h3>2. 영상 주장과 확인된 사실·근거</h3>
+<p>| 쟁점·영상 구간 | 영상 주장 | 확인된 사실·근거와 한계 |</p>
+<p>|---|---|---|</p>
+<p>| 미국 클래리티 표결 · 00:00~12:10 | 필요한 60표에 못 미치는 49표, 공화당 3명 반대, 틸리스 의원 재심의 동의 | 관련 공식 기록 없음. 법안번호·표결일·표결 대상부터 미확인이다. <strong>본안 부결과 토론종결인 클로처 실패를 구분할 수 없다.</strong> |</p>
+<p>| 윤리조항 · 00:00~06:06 | 대통령·부통령·연방 공직자와 배우자의 신규 디지털자산 발행·후원 제한, 2029년 1월 20일 일몰 | 합의문·수정안 원문 없음. 9월 14일 백악관 동의 주장도 연도와 근거가 불명확하다. 확정 법률로 해석할 수 없다. |</p>
+<p>| 선거·의회 일정 · 00:06:06~18:09 | 2026년 11월 3일 중간선거, 2027년 1월 3일 현 의회 종료, 재발의 시 6개월~1년 지연 | 제공 자료에 공식 일정·절차 근거 없음. 특히 지연 기간은 법정 대기기간이 아니라 출연자의 전망이다. |</p>
+<p>| 한국 과세 유예 · 00:12:10~24:25 | 2027년 1월 1일 시행 예정, 여야 폐지·유예안과 2029·2030년 시행안 발의 | E7 제목은 2027년 시행을 전제로 하지만 정확한 법정 시행일을 입증하지는 않는다. 법안 개수·발의자·부칙·심사 상태도 미확인이다. |</p>
+<p>| CARF · 00:12:10~18:09 | 일부 국가 2027년, 미국 2029년 시행 및 한국 과세 유예와 연동 | 공식 참여국·교환 일정 자료 없음. 국내법 시행, 자료 수집, 보고, 최초 국제교환을 구분해야 한다. 한국 유예안의 연동 산식도 추출 내용 안에서 일치하지 않는다. |</p>
+<p>| 세목별 과세 · 00:18:09~24:25 | 에어드롭·스테이킹 소득 구분의 불명확성, 해외 파생상품 과세 공백 | E7은 <strong>에어드롭 분류 차이만 제한적으로 뒷받침</strong>한다. 스테이킹·해외 파생상품의 과세 공백이나 고시 과세의 적법성은 확인되지 않았다. |</p>
+<p>| 거래소 지분 제한 · 00:18:09~30:33 | 의원안 약 8개, 정부안 미발의, 대주주 지분 상한 20%·34% 논의 | 의안·정부 발표·원보도 없음. 지분율은 출연자의 보도 기억에 근거한 수치다. 확정 상한이나 강제매각 의무로 볼 수 없다. |</p>
+<p>| 스테이블코인 인프라 · 00:24:25~31:20 | 계좌·지갑·망분리·결제정산 정비가 필요하며 2027~2028년 국내 진전 기대 | 정책 의견과 전망이다. 실제 허용 범위·공식 로드맵은 미확인이다. 미국 활용 개시 월·연도는 자막으로 확정할 수 없다. |</p>
+<h4>가장 유의미한 외부 근거: 에어드롭 과세의 분류 차이</h4>
+<p><a href="http://www.ifs.or.kr/bbs/board.php?bo_table=News&amp;wr_id=56013">E7: 「가상자산 소득과세의 쟁점 및 과제: 2027년 시행을 앞두고」</a>의 제공 발췌는 증여세 대상으로 본 견해와 이벤트성 에어드롭을 상금 성격의 기타소득으로 본 조세심판원 판단을 함께 소개한다. 또한 2026년 9월 7일 국세청의 국회예산정책처 서면답변을 인용한다.</p>
+<p>이는 거래 구조별 세목 확인이 중요하다는 점을 부분적으로 지지한다. 다만 심판결정문·서면답변·연구용역 원문은 제공되지 않았다. <strong>모든 에어드롭의 세목이 불명확하다거나 특정 거래가 비과세라는 결론까지 뒷받침하지는 않는다.</strong> 자료의 발행처 표시는 Naver News, 연결 주소는 ifs.or.kr이므로 원발행처 확인도 필요하다.</p>
+<h3>3. 상승 논리와 반론</h3>
+<h4>조건부 상승 논리</h4>
+<ul>
+<li><strong>규칙의 명확화:</strong> 최종 법령이 사업 범위와 의무를 분명히 한다면 규제 불확실성이 줄어들 수 있다. 다만 현재 자료로 법안 통과 시점이나 효과를 확정할 수는 없다.</li>
+<li><strong>금융·디지털자산 연결:</strong> 계좌 개설부터 지갑 운용, 교환, 결제·정산, 해외 송수취까지 연결된다면 발행 규정만 정비하는 경우보다 실사용 확대 경로가 구체화된다.</li>
+<li><strong>과세 예측 가능성:</strong> 시행일·취득가액·소득 구분·거래자료 제공 기준이 정리되면 참여자의 비용 계산이 쉬워질 수 있다. 단순 유예 여부뿐 아니라 집행 가능한 규정인지가 중요하다.</li>
+</ul>
+<p>이는 영상 논지를 바탕으로 한 조건부 분석이며, 확인된 성장률·수익 전망이 아니다.</p>
+<h4>반론과 하방 경로</h4>
+<ul>
+<li><strong>입법과 사업화는 별개다.</strong> 법률 통과 뒤에도 시행령, 인가 조건, 시스템 구축이 남을 수 있다. 제도화 기대가 곧 거래량·수익 증가를 뜻하지 않는다.</li>
+<li><strong>제도화에는 비용도 따른다.</strong> 최종 규정에 지분 제한·자료보고·자본 요건 등이 포함될 경우 사업자별 영향이 달라질 수 있다. 현재 수치로 그 비용을 계산할 근거는 없다.</li>
+<li><strong>과세 유예는 확정되지 않았다.</strong> 발의·심사·최종 의결을 구분해야 한다. 일부 소득 규정이 적용되지 않는다는 설명을 모든 세목의 비과세로 확대해서도 안 된다.</li>
+<li><strong>위헌 가능성은 판결이 아니다.</strong> 윤리조항이나 지분 강제매각에 대한 헌법상 문제 제기는 법률적 의견이다. 위헌 확정·효력정지 사실로 해석할 수 없다.</li>
+<li><strong>개별 기업의 수혜는 미확인이다.</strong> 기업 공시·지분구조·거래조건·실적·시장가격 자료가 없어 네이버·두나무 등의 가치 영향을 산출할 수 없다.</li>
+</ul>
+<h3>4. 별도 검증이 필요한 주변 주장</h3>
+<ul>
+<li><strong>민주당 하원 장악 확률 80% 초과:</strong> 예측시장명·계약·관측시각이 없어 재현 불가다. 다른 시장이나 최신 확률로 대체할 수 없다.</li>
+<li><strong>트럼프의 2028년 출마 가능성:</strong> 관련 헌법 조문·해석 근거가 제공되지 않았다. 확정된 정치 시나리오의 전제로 사용하지 않는다.</li>
+<li><strong>로빈후드 토큰화 증권:</strong> 제공 지역·상품 권리·허가 조건이 미확인이다. 미국 기업의 서비스라는 설명만으로 미국 고객 대상 제공이나 규제 부재가 입증되지는 않는다.</li>
+<li><strong>프랑스 스테이블코인 과세:</strong> 원보도·법안·시행 상태 모두 미확인이다. 현행 과세 규칙으로 인용할 수 없다.</li>
+<li><strong>Bloomberg·Morningstar 등 폐쇄형 자료:</strong> 이번 묶음에 확인 가능한 근거가 제공되지 않았다. 해당 출처에 기대는 주장은 <strong>미검증·수동 확인 필요</strong>로 남긴다.</li>
+</ul>
+<h3>5. 단기 체크포인트와 관찰 항목</h3>
+<p>영상에서 제시한 날짜는 아래 확인 작업의 후보 일정이지, 검증된 투자 촉매 일정이 아니다.</p>
+<p>| 우선순위 | 확인 대상 | 구체적 관찰 항목 |</p>
+<p>|---|---|---|</p>
+<p>| 최우선 | 미국 공식 표결·의사진행 | 법안번호, 표결일, 본안·클로처 구분, 찬반 명단, 재심의 동의 제출·처리 상태 |</p>
+<p>| 높음 | 윤리조항 최종 문안 | 적용 대상, 신규 발행과 기존 보유의 구분, 일몰, 민사 제소와 형사 기소 권한의 차이 |</p>
+<p>| 높음 | 영상상 11월 선거·차기 의회 | 공식 일정과 결과, 의회 구성, 후속 심의·재발의 여부. 6개월~1년 지연 전망과 실제 일정을 별도 기록 |</p>
+<p>| 높음 | 한국 과세 시행·유예 | 소득세법 부칙, 의안번호, 위원회 심사, 최종 의결·공포. 2027·2029·2030년을 확정일과 제안일로 구분 |</p>
+<p>| 높음 | CARF 연동 | 관할권별 자료 수집 연도와 최초 정보교환 연도, 한국 유예안 원문에 따른 시행일 계산 |</p>
+<p>| 중간 | 거래소·발행사 규율 | 지분 상한의 공식 조문, 예외, 기존 주주 경과조치, 처분 기간, 발행사 주주·자본 요건 |</p>
+<p>| 중간 | 실제 서비스 개시 | 허용 대상 법인, 계좌·지갑 운영 주체, 결제·정산 방식, 해외송금 허용 범위와 시행일 |</p>
+<p>실사용 확대를 관찰할 때는 발표 건수보다 <strong>정식 서비스 개시, 이용 가능한 고객 범위, 실제 결제·송금 실적, 수수료 수익 공개 여부</strong>를 우선 확인할 수 있다. 현재 묶음에는 이러한 실적 데이터가 없다.</p>
+<h3>6. 논지의 무효화·수정 조건</h3>
+<ul>
+<li><strong>‘표결 실패로 장기간 지연’ 논지:</strong> 공식 기록이 영상 설명과 다르거나 단기간 후속 심의가 진행되면 수정해야 한다. 공식 표결이 확인되기 전에는 출발 전제 자체가 미검증이다.</li>
+<li><strong>‘과세 유예로 불확실성 완화’ 논지:</strong> 유예안이 처리되지 않거나 시행일만 바뀌고 세목·자료제출 기준이 남으면 약해진다.</li>
+<li><strong>‘스테이블코인 제도화로 실사용 확대’ 논지:</strong> 발행만 허용되고 지갑·계좌·결제·외환 경로가 연결되지 않거나 이용 실적이 확인되지 않으면 사업화 기대를 재평가해야 한다.</li>
+<li><strong>‘특정 기업 수혜’ 논지:</strong> 최종 지분 규제·인가 조건·공시가 예상과 다르거나 추가 비용이 확인되면 수정해야 한다. 현재는 기업별 수혜 판단에 필요한 근거가 부족하다.</li>
+</ul>
+<h3>7. 데이터 품질과 결론</h3>
+<p>자동자막은 전체 31분 20초를 포괄하며 <code>transcript_quality</code>는 <code>good</code>, 점수는 1.0이다. 이는 수집 품질 지표로, 법률용어·인명·수치의 정확성을 보증하지 않는다. 재심의·수정헌법·의원명·망분리 등의 표현과 영상 말미 미국 스테이블코인 활용 시점에는 재청취가 필요하다.</p>
+<p><code>source_confidence</code> 0.85~0.96은 <strong>자막에서 해당 주장을 식별한 확신도</strong>다. 사실 정확도나 전망 실현 확률이 아니다. 주장별 <code>asr_confidence</code> 0.0은 실측값 미제공 표시이며 인식 정확도 0%를 뜻하지 않는다. 타임스탬프도 개별 문장이 아닌 관련 청크 시작점이다.</p>
+<p><strong>결론적으로 이 영상은 정책 쟁점을 정리하는 관찰 목록으로는 유용하지만, 입법 상태나 투자 촉매 일정을 확정하는 근거로는 부족하다.</strong> 현재 가장 제한적으로 뒷받침되는 부분은 에어드롭 과세 분류 차이다. 나머지 핵심 논지는 공식 표결·법률 부칙·최종 규정·실제 서비스와 이용 실적을 연결해 확인해야 한다.</p>
+  <details>
+    <summary>공개 요약 JSON</summary>
+    <pre>{
+  &quot;version&quot;: 4,
+  &quot;video_id&quot;: &quot;RbrDrLBVTi8&quot;,
+  &quot;title&quot;: &quot;클래리티 법안 부결 이후, 미국 중간선거와 한국 디지털자산 기본법의 향방 | 서동주, 김동환, 한서희 법무법인 광장 변호사 [크립토 PLUS]&quot;,
+  &quot;url&quot;: &quot;https://www.youtube.com/watch?v=RbrDrLBVTi8&quot;,
+  &quot;channel&quot;: &quot;삼프로TV 3PROTV&quot;,
+  &quot;channel_id&quot;: &quot;UChlv4GSd7OQl3js-jkLOnFA&quot;,
+  &quot;source_url&quot;: &quot;https://www.youtube.com/@3protv/videos&quot;,
+  &quot;thumbnail_url&quot;: &quot;https://i.ytimg.com/vi/RbrDrLBVTi8/maxresdefault.jpg&quot;,
+  &quot;published_at&quot;: &quot;2026-10-21T03:40:44+00:00&quot;,
+  &quot;status&quot;: &quot;asr_uncertain&quot;,
+  &quot;strategy_source_tier&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_evidence_weight&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_validation_policy&quot;: &quot;STANDARD_REVIEW&quot;,
+  &quot;transcript_status&quot;: &quot;available&quot;,
+  &quot;transcript_source&quot;: &quot;automatic&quot;,
+  &quot;transcript_chars&quot;: 16315,
+  &quot;transcript_quality&quot;: {
+    &quot;status&quot;: &quot;good&quot;,
+    &quot;score&quot;: 1.0,
+    &quot;warnings&quot;: [],
+    &quot;source&quot;: &quot;automatic&quot;,
+    &quot;language&quot;: &quot;Korean&quot;,
+    &quot;model_or_format&quot;: &quot;json3&quot;,
+    &quot;chars&quot;: 16315,
+    &quot;segments&quot;: 885,
+    &quot;duration_seconds&quot;: 1880,
+    &quot;repeated_ngram_ratio&quot;: 0.0
+  },
+  &quot;generated_at&quot;: &quot;2026-10-22T08:06:10.997096+09:00&quot;,
+  &quot;llm_status&quot;: &quot;success&quot;,
+  &quot;research_status&quot;: &quot;success&quot;,
+  &quot;claim_verification_status&quot;: &quot;success&quot;,
+  &quot;research_pipeline_version&quot;: 4,
+  &quot;evidence_count&quot;: 9,
+  &quot;claim_status_summary&quot;: {
+    &quot;unverified&quot;: 10,
+    &quot;partially_supported&quot;: 1,
+    &quot;asr_uncertain&quot;: 1
+  },
+  &quot;claims&quot;: [
+    {
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;claim_text&quot;: &quot;클래리티 관련 표결은 필요한 60표에 못 미치는 49표에 그쳤고 공화당 의원 3명이 반대했으며 틸리스 의원이 재심의 동의를 제출했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.05,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.96,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;필요 60표, 확보 49표, 공화당 반대 3명&quot;,
+        &quot;observed&quot;: &quot;관련 공식 표결 수치가 제공되지 않았다.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;법안이 최종 부결됐다는 전제로 규제 지연이나 시장 영향을 확정하지 말아야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;claim_text&quot;: &quot;윤리조항은 대통령·부통령·연방 공직자와 배우자의 재임 중 신규 디지털자산 발행·후원을 금지하고 2029년 1월 20일 일몰을 두며, 9월 14일 백악관이 주 법무장관의 제소 권한에 동의했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.05,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.96,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;일몰 2029-01-20, 백악관 동의 9월 14일&quot;,
+        &quot;observed&quot;: &quot;일몰 및 동의 날짜를 확인하는 자료가 없고, 9월 14일의 연도도 불명확하다.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;협상 설명을 확정된 법률이나 시행 의무로 해석할 근거가 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;claim_text&quot;: &quot;윤리조항에 재산권·특정인 처벌 입법 금지·표현의 자유 쟁점이 있고 대통령·부통령은 기존 이해충돌 규정에서 제외되며, 트럼프의 2028년 출마 가능성이 협상 변수다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.05,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.96,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;1995년 판결, 2028년 출마 가능성&quot;,
+        &quot;observed&quot;: &quot;관련 판결과 헌법 조문이 제공되지 않았다.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;윤리조항의 위헌이나 대통령 출마 가능성을 확정된 협상 전제로 사용하지 말아야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;claim_text&quot;: &quot;중간선거는 2026년 11월 3일이고 119대 의회가 2027년 1월 3일 종료되면 미처리 법안은 120대 의회에서 재발의해야 하며, 입법이 반년 또는 6개월~1년 지연될 수 있다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.05,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.96,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;선거 2026-11-03, 의회 종료 2027-01-03, 119대→120대, 지연 반년 또는 6개월~1년&quot;,
+        &quot;observed&quot;: &quot;일정·절차의 외부 확인 자료와 지연 기간의 산출 근거가 없다.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;입법 재개 시점을 고정된 투자 일정으로 삼기보다 실제 의사일정과 재발의 여부를 확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;claim_text&quot;: &quot;예측시장에서 민주당의 하원 장악 확률이 80%를 넘고 상원 장악 가능성도 상승했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:06:06&quot;,
+      &quot;source_confidence&quot;: 0.96,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;민주당 하원 장악 확률 80% 초과&quot;,
+        &quot;observed&quot;: &quot;시장 데이터가 제공되지 않았다.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;80%를 재현 가능한 시장 확률이나 선거 결과의 보증으로 사용할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;claim_text&quot;: &quot;가상자산 과세는 2027년 1월 1일 시행 예정이며 여당 1개·야당 4개의 폐지·유예안과 2029·2030년 시행안이 발의됐고 본격 심사 전이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.15,
+      &quot;supporting_evidence_ids&quot;: [
+        &quot;E7&quot;
+      ],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:12:10&quot;,
+      &quot;source_confidence&quot;: 0.95,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;2027-01-01 시행, 여당 1개·야당 4개, 2029-01-01·2030-01-01 유예안, 박민규 의원안 10월 16일 발의&quot;,
+        &quot;observed&quot;: &quot;E7 제목에 2027년 시행이 언급되지만 정확한 날짜와 나머지 수치는 확인되지 않는다.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;유예안 발의를 유예 확정으로 간주해서는 안 되며, 실제 적용일은 법률 부칙과 최종 처리 결과 확인이 필요하다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;claim_text&quot;: &quot;CARF는 일부 국가에서 2027년 1월 1일, 미국에서 2029년 1월 1일부터 시행되고 일부 역외 지역은 제외되며, 해외 거래정보 확보가 한국 과세 유예의 근거다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.05,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:12:10&quot;,
+      &quot;source_confidence&quot;: 0.95,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;일부 국가 2027-01-01, 미국 2029-01-01&quot;,
+        &quot;observed&quot;: &quot;국가별 참여 및 최초 교환 일정을 확인할 공식 자료가 없다.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;제시된 연도만으로 해외 거래정보가 확보되는 날짜나 한국 과세 유예 기간을 계산할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;claim_text&quot;: &quot;스테이킹의 소득 구분과 에어드롭의 증여세·기타소득 구분이 불명확하고 해외 가상자산 파생상품에는 과세 공백이 있으며, 관련 연구용역과 국세청의 고시 과세 답변이 있었다.&quot;,
+      &quot;status&quot;: &quot;partially_supported&quot;,
+      &quot;confidence&quot;: 0.4,
+      &quot;supporting_evidence_ids&quot;: [
+        &quot;E7&quot;
+      ],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:18:09&quot;,
+      &quot;source_confidence&quot;: 0.95,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;2020년부터 과세 논의, 2027년 시행 예정 제도와 관련한 과세 쟁점&quot;,
+        &quot;observed&quot;: &quot;E7 제목은 2027년 시행을 언급하고 발췌는 2026-09-07 서면답변과 조심2025서2821 등을 인용한다. 2020년 논의 시작은 확인되지 않는다.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;에어드롭의 거래 구조별 세목 확인이 필요하다. 이 자료만으로 스테이킹·해외 파생상품을 비과세로 판단할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;claim_text&quot;: &quot;디지털자산 2단계 의원안은 약 8개이고 정부안은 미발의이며 거래소 대주주 지분 상한 20%·34%와 원화 스테이블코인 발행사 요건이 논의 중이다. 기존 초과 지분 강제매각에는 헌법상 쟁점이 있다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.05,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:18:09&quot;,
+      &quot;source_confidence&quot;: 0.94,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;의원안 약 8개, 대주주 지분 상한 20%·34%&quot;,
+        &quot;observed&quot;: &quot;법안 수와 지분 상한을 확인할 자료가 없다.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;확인되지 않은 상한을 적용해 거래소 지분 처분 규모나 네이버·두나무의 투자 영향을 계산할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C10&quot;,
+      &quot;claim_text&quot;: &quot;금융·디지털자산업 상호 진출과 법인계좌·지갑·망분리·결제정산 체계 정비가 필요하고, 토큰증권 3단계에 스테이블코인·CBDC 결제가 포함되며 미국 달러 스테이블코인 활용이 한국의 2027~2028년 제도 진전을 촉진할 수 있다.&quot;,
+      &quot;status&quot;: &quot;asr_uncertain&quot;,
+      &quot;confidence&quot;: 0.05,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:24:25&quot;,
+      &quot;source_confidence&quot;: 0.92,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;토큰증권 3단계, 미국 활용 &#x27;2월, 1월부터&#x27;, 국내 진전 2027~2028년&quot;,
+        &quot;observed&quot;: &quot;미국 시점은 판독 불가이며 단계 구분과 국내 일정의 외부 근거도 없다.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;불명확한 미국 시행 시점을 투자 촉매 일정으로 사용하거나 국내 전망을 확정 로드맵으로 받아들일 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C11&quot;,
+      &quot;claim_text&quot;: &quot;로빈후드의 토큰화 증권·가상자산 거래는 미국 금융과 디지털자산의 자유로운 융합 사례다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.05,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:24:25&quot;,
+      &quot;source_confidence&quot;: 0.96,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;수치 주장 없음&quot;,
+        &quot;observed&quot;: &quot;제공 지역·출시일·상품 범위에 관한 자료가 없다.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;서비스 제공 지역과 토큰의 법적 권리를 확인하기 전에는 미국 내 규제 완화나 국내 사업 확장의 비교 근거로 사용할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C12&quot;,
+      &quot;claim_text&quot;: &quot;프랑스가 법정통화 환전 없이도 스테이블코인 거래 이익에 과세하려 한다는 보도가 있었다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:24:25&quot;,
+      &quot;source_confidence&quot;: 0.85,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;수치 주장 없음&quot;,
+        &quot;observed&quot;: &quot;과세 범위와 시행일을 확인할 자료가 없다.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;프랑스의 현행 과세 규정이나 다른 국가의 과세 방향을 판단하는 확정 근거로 사용할 수 없다.&quot;
+    }
+  ],
+  &quot;entities&quot;: [],
+  &quot;evidence&quot;: [
+    {
+      &quot;evidence_id&quot;: &quot;E1&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;Teradyne, Vishay Intertechnology, Allegro MicroSystems, Entegris, and AMD shares are soaring, what you need to know&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/teradyne-vishay-intertechnology-allegro-microsystems-231839928.html&quot;,
+      &quot;publisher&quot;: &quot;StockStory&quot;,
+      &quot;published_at&quot;: &quot;2026-10-21T23:18:39+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Teradyne, Vishay Intertechnology, Allegro MicroSystems, Entegris, and AMD shares are soaring, what you need to know Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E2&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;Buying This Stock Right Now Could Be a Once-in-a-Generation Opportunity&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/buying-stock-now-could-once-221300831.html&quot;,
+      &quot;publisher&quot;: &quot;Motley Fool&quot;,
+      &quot;published_at&quot;: &quot;2026-10-21T22:13:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Buying This Stock Right Now Could Be a Once-in-a-Generation Opportunity Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals Weather Newsletters F...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E4&quot;,
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;title&quot;: &quot;Canada to Provide Steel, Auto Sectors With Billions to Ease Trade Crunch&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/m/8488d736-169d-3fd7-b8af-01e0498f6d99/canada-to-provide-steel%2C-auto.html&quot;,
+      &quot;publisher&quot;: &quot;The Wall Street Journal&quot;,
+      &quot;published_at&quot;: &quot;2026-10-21T19:59:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Canada to Provide Steel, Auto Sectors With Billions to Ease Trade Crunch Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals Weather Newsletters...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E5&quot;,
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;title&quot;: &quot;Steel Dynamics: 3 Key Takeaways for Long-Term Investors&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/steel-dynamics-3-key-takeaways-134753555.html&quot;,
+      &quot;publisher&quot;: &quot;Motley Fool&quot;,
+      &quot;published_at&quot;: &quot;2026-10-21T13:47:53+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E6&quot;,
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;title&quot;: &quot;Skydance Rallies 10% as Shares Rebound After Warrant Selloff; Spotify Eases, Disney Holds Steady&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/skydance-rallies-10-shares-rebound-185958934.html&quot;,
+      &quot;publisher&quot;: &quot;24/7 Wall St.&quot;,
+      &quot;published_at&quot;: &quot;2026-10-21T18:59:58+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E7&quot;,
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;title&quot;: &quot;가상자산 소득과세의 쟁점 및 과제 : 2027년 시행을 앞두고&quot;,
+      &quot;source_url&quot;: &quot;http://www.ifs.or.kr/bbs/board.php?bo_table=News&amp;wr_id=56013&quot;,
+      &quot;publisher&quot;: &quot;Naver News&quot;,
+      &quot;published_at&quot;: &quot;2026-09-18T23:56:00+09:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;국세청, ‘가상자산소득 과세 관련 국세청의 과세 준비현황’, 국회예산정책처 서면답변, 2026.9.7. 6)... 증여세 대상이라 판단했으나, 조세심판원(조심2025서2821 등)은 이벤트성 에어드롭을 상금 성격의 기타소득으로...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E8&quot;,
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;title&quot;: &quot;Better Retail Stock for 2026: Alibaba vs. Walmart&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/better-retail-stock-2026-alibaba-233321778.html&quot;,
+      &quot;publisher&quot;: &quot;Motley Fool&quot;,
+      &quot;published_at&quot;: &quot;2026-10-21T23:33:21+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    }
+  ],
+  &quot;source_policy&quot;: {
+    &quot;raw_transcript_published&quot;: false,
+    &quot;raw_transcript_in_evidence&quot;: false,
+    &quot;research_pipeline_version&quot;: 4,
+    &quot;closed_source_claims&quot;: &quot;unverified_external_source&quot;,
+    &quot;auto_caption_warning&quot;: true,
+    &quot;local_asr_warning&quot;: false
+  }
+}</pre>
+  </details>
+</article>
+</main>
+  <style>
+.reader-contents { margin: 16px 0; padding: 12px 16px; border: 1px solid var(--line, #64748b); border-radius: 12px; }
+.reader-contents > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-weight: 750; }
+.reader-contents nav { display: grid; gap: 4px; max-height: 45vh; overflow: auto; margin: 8px 0; }
+.reader-contents a { display: block; min-height: 44px; padding: 10px; border-radius: 6px; color: inherit; overflow-wrap: anywhere; }
+.reader-contents a:hover { background: #80808020; }
+.reader-contents .reader-subsection { padding-inline-start: 24px; font-size: .92em; }
+.reader-prose, .report { overflow-wrap: anywhere; line-height: 1.8; }
+.reader-prose p, .reader-prose li { max-width: 85ch; }
+.reader-prose h2, .reader-prose h3, .reader-prose h4, [data-reader-heading] { scroll-margin-top: 100px; line-height: 1.45; }
+.reader-prose h2 { margin-top: 1.8em; padding-bottom: 8px; border-bottom: 1px solid var(--line, #64748b); }
+.reader-prose h3 { margin-top: 1.5em; }
+.reader-prose li { margin: .5em 0; }
+.reader-prose pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.reader-prose blockquote { margin: 16px 0; padding: 4px 16px; border-left: 3px solid var(--accent, #64748b); }
+.reader-table { overflow: auto; max-width: 100%; margin: 16px 0; border: 1px solid var(--line, #64748b); border-radius: 10px; }
+.reader-table table { border-collapse: collapse; width: 100%; margin: 0; font-size: .92rem; }
+.reader-table th, .reader-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line, #64748b); min-width: 110px; max-width: 400px; overflow-wrap: anywhere; white-space: normal; }
+.reader-table th { background: #80808018; }
+.reader-table tr:nth-child(even) { background: #80808008; }
+.reader-search { display: grid; gap: 8px; margin: 16px 0; }
+.reader-search label { font-weight: 700; }
+.reader-search input { box-sizing: border-box; width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line, #64748b); border-radius: 10px; background: var(--panel, #fff); color: var(--text, #132238); font: inherit; }
+.reader-search p { margin: 0; font-size: .86rem; }
+.reader-back { position: fixed; bottom: max(14px, env(safe-area-inset-bottom)); right: 14px; z-index: 30; min-height: 44px; border: 1px solid #778899; border-radius: 99px; padding: 10px 16px; background: #18344a; color: #fff; font: 700 14px system-ui; cursor: pointer; box-shadow: 0 3px 12px #0003; }
+[data-reader-source] { margin-top: 20px; }
+[data-reader-source] > summary { min-height: 44px; cursor: pointer; }
+[data-reader-source] pre { font-size: .85rem; }
+[data-reader-source] pre, .reader-prose { min-width: 0; }
+.reader-contents :focus-visible, .reader-search :focus-visible, .reader-back:focus-visible, .reader-table:focus-visible { outline: 3px solid var(--accent, #008c95); outline-offset: 3px; }
+.reader-search + .grid > [hidden] { display: none !important; }
+@media (max-width: 600px) { .reader-prose { font-size: 1rem; } .reader-contents { padding: 8px 12px; } }
+@media print { .reader-back, .reader-search, .reader-contents, [data-reader-source] { display: none !important; } .reader-table { overflow: visible; } .reader-prose { color: #000; background: #fff; } }
+</style><script>
+(() => {
+  'use strict';
+  let serial = 0;
+  const rendered = new WeakMap();
+  const node = (tag, text) => { const el = document.createElement(tag); if (text != null) el.textContent = text; return el; };
+  function inline(parent, text) {
+    const pattern = /(`[^`]+`|\*\*[^*]+\*\*|\[[^\]]+\]\(https?:\/\/[^\s)]+\))/g;
+    let start = 0;
+    for (const match of String(text).matchAll(pattern)) {
+      parent.append(document.createTextNode(text.slice(start, match.index)));
+      const value = match[0];
+      if (value.startsWith('`')) parent.append(node('code', value.slice(1, -1)));
+      else if (value.startsWith('**')) parent.append(node('strong', value.slice(2, -2)));
+      else {
+        const link = value.match(/^\[([^\]]+)\]\((.+)\)$/);
+        const a = node('a', link[1]); a.href = link[2]; a.rel = 'noopener noreferrer'; parent.append(a);
+      }
+      start = match.index + value.length;
+    }
+    parent.append(document.createTextNode(text.slice(start)));
+  }
+  const cells = line => line.trim().replace(/^\|/, '').replace(/\|$/, '').split(/(?<!\\)\|/).map(v => v.trim().replace(/\\\|/g, '|'));
+  function markdown(source) {
+    const article = node('article'); article.className = 'reader-prose';
+    const lines = source.split(/\r?\n/); let list = null;
+    for (let i = 0; i < lines.length; i += 1) {
+      const line = lines[i], value = line.trim();
+      if (!value) { list = null; continue; }
+      if (/^```/.test(value)) {
+        const code = []; i += 1;
+        while (i < lines.length && !/^```/.test(lines[i].trim())) code.push(lines[i++]);
+        const pre = node('pre'); pre.append(node('code', code.join('\n'))); article.append(pre); list = null; continue;
+      }
+      if (i + 1 < lines.length && value.includes('|') && cells(lines[i + 1]).every(v => /^:?-{3,}:?$/.test(v))) {
+        const table = node('table'), head = node('thead'), body = node('tbody');
+        const row = (values, tag) => { const tr = node('tr'); values.forEach(v => { const cell = node(tag); if (tag === 'th') cell.scope = 'col'; inline(cell, v); tr.append(cell); }); return tr; };
+        head.append(row(cells(line), 'th')); i += 2;
+        while (i < lines.length && lines[i].trim() && lines[i].includes('|')) body.append(row(cells(lines[i++]), 'td'));
+        i -= 1; table.append(head, body); article.append(table); list = null; continue;
+      }
+      const heading = value.match(/^(#{1,6})\s+(.+)$/);
+      if (heading) { const h = node('h' + Math.min(4, heading[1].length + 1)); inline(h, heading[2]); article.append(h); list = null; continue; }
+      const bullet = value.match(/^(?:[-*+] |\d+\. )(.+)$/);
+      if (bullet) {
+        const tag = /^\d/.test(value) ? 'ol' : 'ul';
+        if (!list || list.tagName.toLowerCase() !== tag) { list = node(tag); if (tag === 'ol') list.start = parseInt(value, 10); article.append(list); }
+        const li = node('li'); inline(li, bullet[1]); list.append(li); continue;
+      }
+      list = null;
+      if (/^(---+|\*\*\*+)$/.test(value)) { article.append(node('hr')); continue; }
+      const p = node(value.startsWith('> ') ? 'blockquote' : 'p'); inline(p, value.startsWith('> ') ? value.slice(2) : line); article.append(p);
+    }
+    return article;
+  }
+  function contents(root) {
+    root.querySelectorAll(':scope > .reader-contents').forEach(el => el.remove());
+    const headings = [...root.querySelectorAll('h2,h3,h4')].filter(h => !h.closest('.card,.run-card,.reader-contents,[data-reader-source],[hidden]'));
+    if (headings.length < 2) return;
+    const details = node('details'); details.className = 'reader-contents';
+    details.append(node('summary', '이 리포트 목차 · ' + headings.length + '개 항목'));
+    const nav = node('nav'); nav.setAttribute('aria-label', '리포트 목차');
+    headings.forEach(h => {
+      if (!h.id) h.id = 'reader-section-' + (++serial);
+      h.dataset.readerHeading = ''; h.tabIndex = -1;
+      const a = node('a', h.textContent); a.href = '#' + h.id;
+      if (h.tagName !== 'H2') a.className = 'reader-subsection';
+      a.addEventListener('click', event => {
+        event.preventDefault();
+        for (let ancestor = h.parentElement; ancestor; ancestor = ancestor.parentElement) if (ancestor.tagName === 'DETAILS') ancestor.open = true;
+        h.scrollIntoView({block: 'start'}); h.focus({preventScroll: true});
+      }); nav.append(a);
+    });
+    details.append(nav); root.prepend(details);
+  }
+  function enhance(root) {
+    if (!root) return;
+    root.querySelectorAll('pre[data-report-markdown]').forEach(pre => {
+      const previous = rendered.get(pre);
+      if (previous && previous.source === pre.textContent) return;
+      const article = markdown(pre.textContent);
+      if (previous) previous.article.replaceWith(article);
+      else {
+        const details = node('details'); details.dataset.readerSource = '';
+        details.append(node('summary', 'Markdown 원문 보기'));
+        pre.before(article, details); details.append(pre);
+      }
+      rendered.set(pre, {source: pre.textContent, article});
+    });
+    root.querySelectorAll('table').forEach(table => {
+      if (table.closest('.reader-table,.account-table-wrap,.summary-scroll')) return;
+      const wrap = node('div'); wrap.className = 'reader-table'; wrap.tabIndex = 0;
+      wrap.setAttribute('role', 'region'); wrap.setAttribute('aria-label', '리포트 표 · 가로로 스크롤하여 전체 보기');
+      table.before(wrap); wrap.append(table);
+    });
+    root.querySelectorAll('.grid').forEach(grid => {
+      const cards = [...grid.querySelectorAll(':scope > a.card')];
+      if (cards.length < 2 || grid.dataset.readerSearch) return;
+      grid.dataset.readerSearch = 'true';
+      const box = node('div'); box.className = 'reader-search';
+      const input = node('input'); input.type = 'search'; input.placeholder = '제목 · 종목 · 채널 · 키워드'; input.id = 'report-search-' + (++serial);
+      const label = node('label', '리포트 찾기'); label.htmlFor = input.id;
+      const status = node('p'); status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
+      const update = () => {
+        const terms = input.value.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean); let count = 0;
+        cards.forEach(card => { card.hidden = !terms.every(t => card.textContent.toLocaleLowerCase().includes(t)); if (!card.hidden) count += 1; });
+        status.textContent = cards.length + '개 중 ' + count + '개 표시' + (count ? '' : ' · 검색어를 지우거나 다른 키워드를 입력하세요.');
+      };
+      input.addEventListener('input', update); box.append(label, input, status); grid.before(box); update();
+    });
+    contents(root);
+  }
+  window.TradingAgentsReader = {enhance};
+  const main = document.querySelector('main');
+  if (main && !main.hasAttribute('data-reader-dynamic')) enhance(main);
+  if (main) {
+    const top = node('button', '↑ 맨 위'); top.type = 'button'; top.className = 'reader-back'; top.setAttribute('aria-label', '리포트 맨 위로 이동');
+    top.addEventListener('click', () => { const target = document.querySelector('h1') || main; target.tabIndex = -1; target.scrollIntoView({block: 'start'}); target.focus({preventScroll: true}); });
+    document.body.append(top);
+  }
+})();
+</script>
+</body>
+</html>

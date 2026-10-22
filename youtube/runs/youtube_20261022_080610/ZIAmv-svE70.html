@@ -1,0 +1,706 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YouTube 투자자용 검증 리포트 - 10월 21일 미국장 열리기 전 꼭 알아야 하는 &#x27;미장 시황&#x27; 투자 포인트</title>
+  <style>
+:root {
+  color-scheme: light;
+  --bg: #f7f8fb;
+  --panel: #ffffff;
+  --text: #172033;
+  --muted: #667085;
+  --line: #d9dee8;
+  --accent: #0f766e;
+  --accent-2: #2563eb;
+  --warn: #b45309;
+  --bad: #b42318;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0 56px; }
+a { color: var(--accent-2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.hero { padding: 28px 0 22px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+.hero.compact { padding-top: 12px; }
+.hero h1 { margin: 0; font-size: clamp(28px, 4vw, 44px); line-height: 1.15; letter-spacing: 0; }
+.hero p { max-width: 760px; color: var(--muted); margin: 12px 0 0; }
+.eyebrow { color: var(--accent); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0; margin: 0 0 8px; }
+section { margin: 28px 0; }
+h2, h3, h4, h5 { letter-spacing: 0; line-height: 1.25; }
+.synthesis-callout { padding: clamp(20px, 4vw, 34px); border: 1px solid #6ee7d8; border-radius: 18px; background: linear-gradient(135deg, #ecfdf9 0%, #eff6ff 100%); box-shadow: 0 18px 44px rgba(15, 118, 110, .12); }
+.synthesis-callout.unavailable { border-color: var(--line); background: var(--panel); box-shadow: none; }
+.synthesis-callout h2 { margin: 0; font-size: clamp(24px, 3.2vw, 36px); }
+.synthesis-callout .lead { max-width: 900px; font-size: 17px; color: #334155; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.primary-link, .secondary-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border-radius: 999px; font-weight: 800; }
+.primary-link { color: white; background: var(--accent); }
+.secondary-link { color: var(--accent-2); border: 1px solid #93c5fd; background: white; }
+.primary-link:hover, .secondary-link:hover { text-decoration: none; filter: brightness(.97); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.card, .run { display: flex; flex-direction: column; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; color: var(--text); min-height: 128px; }
+.run { padding: 16px; }
+.card:hover, .run:hover { border-color: var(--accent-2); text-decoration: none; }
+.thumb { display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #e9edf5; border-radius: 8px 8px 0 0; color: var(--muted); font-size: 13px; font-weight: 700; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb-empty span { padding: 0 14px; text-align: center; }
+.card-body { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 16px; }
+.card strong { line-height: 1.35; }
+.source-line { color: #3f4a5f; font-weight: 600; }
+.runs { display: grid; gap: 10px; }
+.badge { display: inline-flex; width: fit-content; border-radius: 999px; padding: 2px 9px; background: #e6f4f1; color: var(--accent); font-size: 12px; font-weight: 700; }
+.status-contradicted, .status-llm_failed { background: #fee4e2; color: var(--bad); }
+.status-unverified, .status-stale { background: #fff4d6; color: var(--warn); }
+small, .muted { color: var(--muted); }
+.topnav { display: flex; gap: 14px; margin-bottom: 16px; font-size: 14px; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px; }
+.stats span { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
+.report { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: min(5vw, 36px); }
+.report-head { border-bottom: 1px solid var(--line); margin-bottom: 24px; padding-bottom: 20px; }
+.report-head h1 { margin: 0; font-size: clamp(24px, 3.5vw, 38px); line-height: 1.2; }
+.meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+.scope-note { padding: 12px 14px; border-left: 4px solid var(--warn); border-radius: 6px; background: #fff7ed; color: #7c2d12; }
+.synthesis-report h2 { margin-top: 34px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.synthesis-report h3 { margin: 24px 0 8px; color: #0f4c5c; }
+.synthesis-report p, .synthesis-report li { overflow-wrap: anywhere; }
+pre { overflow: auto; background: #111827; color: #f9fafb; border-radius: 8px; padding: 14px; }
+code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+details { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 18px; }
+@media (max-width: 640px) {
+  main { width: min(100% - 20px, 1120px); padding-top: 18px; }
+  .report { padding: 18px; }
+  .synthesis-callout { border-radius: 14px; padding: 18px; }
+  .cta-row a { width: 100%; }
+  .mobile-report { border-radius: 12px; }
+}
+</style>
+</head>
+<body>
+  <main>
+<nav class="topnav"><a href="index.html">실행 목록</a><a href="../../index.html">YouTube 홈</a></nav>
+<article class="report">
+  <header class="report-head">
+    <p class="eyebrow">youtube_20261022_080610</p>
+    <h1>10월 21일 미국장 열리기 전 꼭 알아야 하는 &#x27;미장 시황&#x27; 투자 포인트</h1>
+    <div class="meta">
+      <span class="badge status-asr_uncertain">asr_uncertain</span>
+      <a href="https://www.youtube.com/watch?v=ZIAmv-svE70">원본 영상</a>
+    </div>
+  </header>
+  <h2>AI 투자 수익화와 미국 기술주: 실적 확인이 먼저</h2>
+<p>분석 대상: 경제사냥꾼의 <a href="https://www.youtube.com/watch?v=ZIAmv-svE70">2026년 10월 21일 영상</a> · 근거 수집 기준: 2026년 10월 22일 오전 한국시간</p>
+<h3>핵심 판단</h3>
+<p>영상의 중심 논리는 <strong>AI 투자 확대가 실제 매출·이익·기업 구매로 연결돼야 기술주 상승의 지속성을 설명할 수 있다</strong>는 것이다. 메타·IBM·테슬라 실적을 확인하고, 그 결과가 엔비디아 등 공급업체에 미칠 영향을 관찰하자는 조건부 가설이다.</p>
+<p>다만 제공 자료로는 핵심 수치와 사건을 확정할 수 없다. 주장 검증 결과는 <strong>10건 중 9건 미검증, 1건 자동자막 불확실</strong>이다. 이는 거짓으로 판명됐다는 뜻이 아니라, 투자 판단의 전제로 삼을 증거가 부족하다는 뜻이다.</p>
+<h3>1. 영상 주장과 확인된 근거</h3>
+<p>| 대상 | 영상 주장 | 확인된 사실·근거와 한계 |</p>
+<p>|---|---|---|</p>
+<p>| 미국 기술주 | AI 수익화 우려로 불안했으나 전날 실적이 심리를 회복시켰다 | 나스닥·반도체 지수 시계열과 원인 분석 자료가 없다. 반등·폭락의 규모와 인과관계 모두 미검증이다. |</p>
+<p>| SpaceX로 표기된 기업 | AI 매출이 전년 대비 9배 이상, 순이익 44억 달러로 사상 최고 실적을 기록했다 | 원음 대조 및 공식 실적자료가 없다. 기업명·보고기간·이익 기준 모두 불확실하다. 다른 기업의 실적으로 임의 대체할 수 없다. |</p>
+<p>| 메타 | 예상 매출 633억 달러, 분기 투자 약 410억 달러 | 컨센서스 제공기관·대상 분기가 없다. 투자액도 분기·연간, 총설비투자·AI 전용 투자, 리스 포함 여부를 확인하지 못했다. |</p>
+<p>| IBM | 예상 매출 168억 달러이며 소프트웨어 성장과 AI 계약 증가가 중요하다 | 예상 매출 원출처가 없다. 소프트웨어 강세를 언급한 기사 제목은 있으나 성장률·AI 계약 증가·인식매출은 확인되지 않았다. |</p>
+<p>| 테슬라·SpaceX | 머스크가 전날 합병 가능성을 공식 인정했다 | 관련 기사 제목은 있지만 발언 원문·시점·맥락과 공식 발표를 확보하지 못했다. 가능성 언급과 공식 거래 절차는 구분해야 한다. |</p>
+<p>| 테슬라 | 투자비를 충당하는 수익과 협력 기회가 반등 신호가 될 수 있다 | 영업현금흐름·설비투자·협력 계약이 없어 조건 충족 여부를 판단할 수 없다. |</p>
+<p>| 엔비디아 | 고객사의 AI 수익화 기대 강화가 긍정적으로 작용할 수 있다 | 조건부 전망이다. 고객 수익화 실적, 주문 변화, 발표 전후 상대수익률이 없어 실현 여부는 미검증이다. |</p>
+<p>| 실적 일정 | 메타·IBM·테슬라가 영상 전후로 실적을 발표한다 | 기사 게시시각만 확인된다. 공식 실적 공개시각과 컨퍼런스콜 일정은 확인되지 않았다. |</p>
+<h4>관련성이 높은 외부 자료의 활용 범위</h4>
+<ul>
+<li><a href="https://finance.yahoo.com/markets/stocks/articles/meta-platforms-q3-earnings-call-230315336.html">메타 실적발표 관련 기사 — MarketBeat, E4</a>: 제목은 관련성이 있지만 수집 본문이 오류·탐색 문구로 오염됐다. 매출 633억 달러나 투자 410억 달러의 근거가 아니다.</li>
+<li><a href="https://finance.yahoo.com/markets/stocks/articles/ibm-stock-rises-hours-tops-221258293.html">IBM 소프트웨어 강세·지연 계약 회복 관련 기사 — Stocktwits</a>: 제공된 것은 제목 수준이다. 기업 구매 회복을 점검할 단서이지, AI 계약의 매출 전환을 입증한 자료는 아니다.</li>
+<li><a href="https://finance.yahoo.com/markets/stocks/articles/tesla-report-earnings-elon-musk-194150176.html">테슬라 실적·머스크의 합병안 언급 관련 기사 — The Guardian, E7</a>: 제목은 합병 논의와 관련되지만, ‘전날 공식 인정’이나 확정된 거래를 뒷받침하지 않는다.</li>
+<li><a href="https://finance.yahoo.com/m/0e6f45c4-f583-3080-9285-aee877fe5b99/tesla-earnings-beat%2C-fsd.html">테슬라 실적 상회·콜 이후 하락 관련 기사 — IBD, E8</a>: 제목상 실적과 주가 반응이 엇갈린다. 다만 가격 시계열과 본문이 없어 하락 폭이나 원인을 확정할 수 없다.</li>
+</ul>
+<p>이 자료들은 모두 영상 공개 이후 게시됐다. 사후 기사로 영상 당시의 예상치나 예정 일정을 소급 검증할 수는 없다. 철강·자동차·갈륨 관련 E1~E3는 해당 AI 시장 주장과 직접 관련이 없어 판단 근거에서 제외한다.</p>
+<h3>2. 강세 논리와 반론</h3>
+<h4>강세 논리: 투자에서 현금 창출까지 연결되는가</h4>
+<p>영상의 논리가 강화되려면 다음 연결고리가 순차적으로 확인돼야 한다.</p>
+<p>1. <strong>메타:</strong> AI 관련 투자가 광고·서비스 매출과 이익 개선에 기여한다는 구체적 설명이 나온다.</p>
+<p>2. <strong>IBM:</strong> AI 계약 증가가 누적 사업규모 확대에 그치지 않고 실제 매출과 현금 회수로 이어진다.</p>
+<p>3. <strong>테슬라:</strong> 투자 확대를 뒷받침하는 영업현금 창출력과 구체적인 협력 사업이 확인된다.</p>
+<p>4. <strong>엔비디아:</strong> 고객의 수익화 성과가 투자계획 유지·확대 및 실제 주문으로 연결된다.</p>
+<p>이는 분석 가설이며, 현재 자료에서 확인된 성과는 아니다.</p>
+<h4>반론과 약화 조건</h4>
+<ul>
+<li><strong>매출 증가만으로 AI 투자수익률은 입증되지 않는다.</strong> 기존 사업 성장, 가격 변화 등 다른 요인을 구분해야 한다.</li>
+<li><strong>계약과 매출은 다르다.</strong> IBM의 계약 지표가 누적치라면 당기 수요 증가를 과대해석할 수 있다.</li>
+<li><strong>순이익과 투자비 충당 능력은 다르다.</strong> 테슬라는 같은 기간 영업현금흐름과 설비투자를 비교해야 한다.</li>
+<li><strong>고객 수익화가 공급업체 주가 상승을 보장하지 않는다.</strong> 주문·투자계획·마진과 이미 반영된 기대를 별도로 봐야 한다.</li>
+<li><strong>합병 가능성과 경제적 시너지는 별개다.</strong> 원발언이 확인되더라도 계약 조건과 실행 계획 없이는 이익 효과를 산정할 수 없다.</li>
+</ul>
+<h3>3. 시장 스냅샷: 확인 가능한 숫자의 범위</h3>
+<p>호스트가 수집한 yfinance 단일 시점 값은 다음과 같다.</p>
+<p>| 종목 | 수집 가격 | 예상 PER |</p>
+<p>|---|---:|---:|</p>
+<p>| META | 697.52달러 | 20.13배 |</p>
+<p>| NVDA | 221.97달러 | 13.95배 |</p>
+<p>| IBM | 251.46달러 | 19.12배 |</p>
+<p>| TSLA | 386.47달러 | 178.22배 |</p>
+<p>수집시각은 한국시간 10월 22일 약 08:13~08:14다. 실제 가격 체결시각·거래 세션과 예상 이익의 산출 기준은 확인되지 않았다. 따라서 이를 종가나 실적 발표 후 수익률로 해석하거나, PER만으로 저평가·고평가를 단정할 수 없다. 평균 목표주가는 산출 기준이 불명확해 판단에서 제외한다.</p>
+<h3>4. 단기 체크포인트와 논리 무효화 조건</h3>
+<p>| 확인 순서 | 구체적 관찰 항목 | 영상 논리가 약화되거나 해당 전제를 폐기할 조건 |</p>
+<p>|---|---|---|</p>
+<p>| 원음·원자료 | SpaceX 기업명, 9배·44억 달러 및 메타·IBM 수치 재대조 | 기업명·금액·기간이 다르면 해당 수치에 근거한 해석을 폐기한다. |</p>
+<p>| 공식 일정 | 세 기업의 실적 공개와 콜 시간을 각각 확인하고 미국 동부시간·한국시간 병기 | 기사 게시시각과 실제 발표시각이 다르면 영상의 일정 해석을 수정한다. |</p>
+<p>| 메타 | 당시 컨센서스 출처·분기, 투자 범위, 영업이익률·현금흐름·수익화 설명 | 투자 부담은 커지지만 수익화 설명과 현금 창출력이 뒷받침되지 않으면 강세 연결고리가 약해진다. |</p>
+<p>| IBM | 소프트웨어 성장률의 환율 영향, AI 계약의 당기 증가분·누적 여부·매출 전환 | 계약 지표만 늘고 실제 매출 전환이 확인되지 않으면 기업 구매 확대의 증거로 보기 어렵다. |</p>
+<p>| 테슬라 | 동일 기간 영업현금흐름·설비투자·잉여현금흐름, 협력 계약과 거래 규모 | 현금 창출력이 투자를 감당하지 못하면 투자비 충당 전제가 약화된다. 합병설만으로 협력 성과를 인정하지 않는다. |</p>
+<p>| 엔비디아·시장 | 고객 투자 가이던스·주문, 발표 전 종가 대비 다음 정규장 종가 및 5거래일 수익률을 나스닥·반도체 지수와 비교 | 고객 투자 축소나 주문 둔화가 확인되면 수익화 기대의 공급업체 파급 논리가 약해진다. 상대수익률만으로 인과관계를 확정하지 않는다. |</p>
+<h3>5. 데이터 품질과 신뢰도 해석</h3>
+<ul>
+<li><strong>자막 품질:</strong> transcript_quality는 <code>good</code>, 점수는 1.0이지만 한국어 자동자막이다. 문서 처리 품질이 고유명사·숫자·발언 내용의 사실 정확도를 보장하지 않는다. 원음 재청취 기록도 없다.</li>
+<li><strong>시각:</strong> 모든 주장에 붙은 <code>00:00:02</code>는 공통 청크 시작점이다. 실제 제공 구간은 00:02.986~02:02.660이며 개별 발언의 정확한 위치가 아니다.</li>
+<li><strong>source_confidence:</strong> 일반 시장·IBM·엔비디아 주장은 0.90, 메타 0.85, 테슬라 0.70, SpaceX 실적 0.55다. 이는 자막에서 주장을 추출한 신뢰도이지 외부 사실 확인 점수가 아니다. 통합 일정 주장 C5의 0.0은 별도 값 미제공을 나타낸다.</li>
+<li><strong>asr_confidence:</strong> 전 주장 0.0은 원음 대조 평가가 제공되지 않았다는 자리표시자다. 자막 정확도가 0%라는 의미가 아니다.</li>
+<li><strong>검증 강도:</strong> 주장별 confidence는 0.00~0.25로 낮다. 자료 수집 상태의 <code>verified</code>와 영상 주장 검증 완료를 혼동하면 안 된다.</li>
+<li><strong>자료 공백:</strong> 공시 공급자 이용 불가와 테슬라 뉴스 조회 오류는 공시·뉴스가 없다는 뜻이 아니다. Bloomberg·Morningstar 등 폐쇄형 원문은 제공되지 않았으며, 이에 의존하는 수치나 주장은 <strong>미검증·수동 확인 필요</strong>다. 비공개 멤버십 가이드의 내용·성과도 투자 근거에서 제외한다.</li>
+</ul>
+<h3>결론</h3>
+<p>영상은 AI 투자 확대보다 <strong>실제 수익화와 현금 창출을 확인하자</strong>는 관찰 틀을 제공한다. 그러나 메타·IBM 예상치, SpaceX 실적, 테슬라 합병 발언은 아직 검증된 전제가 아니다. 당장의 핵심은 반등을 예단하는 것이 아니라, 공식 자료에서 <strong>투자 → 계약·구매 → 인식매출 → 현금흐름</strong>의 연결이 확인되는지 추적하는 것이다.</p>
+  <details>
+    <summary>공개 요약 JSON</summary>
+    <pre>{
+  &quot;version&quot;: 4,
+  &quot;video_id&quot;: &quot;ZIAmv-svE70&quot;,
+  &quot;title&quot;: &quot;10월 21일 미국장 열리기 전 꼭 알아야 하는 &#x27;미장 시황&#x27; 투자 포인트&quot;,
+  &quot;url&quot;: &quot;https://www.youtube.com/watch?v=ZIAmv-svE70&quot;,
+  &quot;channel&quot;: &quot;경제사냥꾼&quot;,
+  &quot;channel_id&quot;: &quot;UC7usMJDHmtbs_oegmzQKKMA&quot;,
+  &quot;source_url&quot;: &quot;https://www.youtube.com/@%EA%B2%BD%EC%A0%9C%EC%82%AC%EB%83%A5%EA%BE%BC/shorts&quot;,
+  &quot;thumbnail_url&quot;: &quot;https://i.ytimg.com/vi/ZIAmv-svE70/maxresdefault.jpg&quot;,
+  &quot;published_at&quot;: &quot;2026-10-21T05:08:45+00:00&quot;,
+  &quot;status&quot;: &quot;asr_uncertain&quot;,
+  &quot;strategy_source_tier&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_evidence_weight&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_validation_policy&quot;: &quot;STANDARD_REVIEW&quot;,
+  &quot;transcript_status&quot;: &quot;available&quot;,
+  &quot;transcript_source&quot;: &quot;automatic&quot;,
+  &quot;transcript_chars&quot;: 1724,
+  &quot;transcript_quality&quot;: {
+    &quot;status&quot;: &quot;good&quot;,
+    &quot;score&quot;: 1.0,
+    &quot;warnings&quot;: [],
+    &quot;source&quot;: &quot;automatic&quot;,
+    &quot;language&quot;: &quot;Korean&quot;,
+    &quot;model_or_format&quot;: &quot;json3&quot;,
+    &quot;chars&quot;: 1724,
+    &quot;segments&quot;: 80,
+    &quot;duration_seconds&quot;: 122,
+    &quot;repeated_ngram_ratio&quot;: 0.005
+  },
+  &quot;generated_at&quot;: &quot;2026-10-22T08:06:10.997096+09:00&quot;,
+  &quot;llm_status&quot;: &quot;success&quot;,
+  &quot;research_status&quot;: &quot;success&quot;,
+  &quot;claim_verification_status&quot;: &quot;success&quot;,
+  &quot;research_pipeline_version&quot;: 4,
+  &quot;evidence_count&quot;: 8,
+  &quot;claim_status_summary&quot;: {
+    &quot;unverified&quot;: 9,
+    &quot;asr_uncertain&quot;: 1
+  },
+  &quot;claims&quot;: [
+    {
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;claim_text&quot;: &quot;AI 투자 수익화 우려가 최근 기술주 불안의 원인이며 전날 실적 발표가 투자심리를 회복시켰다는 주장과 시장 폭락 표현.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.15,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:02&quot;,
+      &quot;source_confidence&quot;: 0.9,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;폭락의 지수·기간·낙폭 미제시&quot;,
+        &quot;observed&quot;: &quot;비교 가능한 지수 가격·수익률 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;반등·폭락 및 AI 수익화 우려를 확인된 시장 진단으로 사용하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;claim_text&quot;: &quot;SpaceX가 전날 사상 최고 실적을 발표했으며 AI 관련 매출은 전년 대비 9배 이상, 순이익은 44억 달러였다는 주장.&quot;,
+      &quot;status&quot;: &quot;asr_uncertain&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:02&quot;,
+      &quot;source_confidence&quot;: 0.55,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;AI 매출 전년 대비 9배 이상; 순이익 44억 달러=4.4 billion USD&quot;,
+        &quot;observed&quot;: &quot;회사명·매출 비교치·순이익 원자료 모두 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;회사명과 수치의 연결을 확정하거나 다른 기업의 실적으로 대체해 투자 근거로 사용하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;claim_text&quot;: &quot;메타의 발표 예정 분기 시장 예상 매출이 약 633억 달러라는 주장.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:02&quot;,
+      &quot;source_confidence&quot;: 0.85,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;633억 달러=63.3 billion USD&quot;,
+        &quot;observed&quot;: &quot;대상 분기·제공기관·집계시각·일치하는 예상치 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;633억 달러를 실적 상회·하회 판단의 기준으로 사용하기 전에 당시 컨센서스와 보고분기를 확인한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;claim_text&quot;: &quot;메타의 이번 분기 AI 시설·장비 등을 포함한 예상 투자가 약 410억 달러이며 이에 상응하는 수익 증가를 확인해야 한다는 주장.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:02&quot;,
+      &quot;source_confidence&quot;: 0.85,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;이번 분기 예상 투자 410억 달러=41 billion USD&quot;,
+        &quot;observed&quot;: &quot;금액·기간·투자 범위에 대응하는 원자료 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;투자 범위와 기간을 확정한 뒤 동일 기간 현금흐름·이익 및 수익화 설명과 비교한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;claim_text&quot;: &quot;메타는 이른 아침 시장 마감 후, IBM과 테슬라는 내일 아침 일찍 실적을 발표한다는 일정 주장.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.25,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:02&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;영상 기준 내일 아침: 2026-10-22 KST로 해석 가능&quot;,
+        &quot;observed&quot;: &quot;E4 게시 10-22 08:03:15 KST; E7 게시 08:03:16 KST; E8 게시 07:44:52 KST. 실제 발표시각 미확인&quot;
+      },
+      &quot;investor_implication&quot;: &quot;세 기업의 실적 공개와 컨퍼런스콜 일정을 각각 공식 IR에서 확인하고 한국시간으로 구분한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;claim_text&quot;: &quot;IBM의 발표 예정 분기 시장 예상 매출이 약 168억 달러라는 주장.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:02&quot;,
+      &quot;source_confidence&quot;: 0.9,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;168억 달러=16.8 billion USD&quot;,
+        &quot;observed&quot;: &quot;일치하는 당시 매출 컨센서스 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;168억 달러를 확정된 시장 기대치나 실적 비교 기준으로 사용하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;claim_text&quot;: &quot;IBM의 기업용 소프트웨어 성장과 AI 계약 증가가 AI 투자 붐의 실제 기업 구매 전환을 보여준다는 해석.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.15,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:02&quot;,
+      &quot;source_confidence&quot;: 0.9,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;소프트웨어 성장·AI 계약 증가; 수치 미제시&quot;,
+        &quot;observed&quot;: &quot;성장률·AI 계약 비교치·인식매출 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;소프트웨어 실적과 AI 계약의 정의·증가분·매출 전환을 각각 확인하기 전에는 수익화가 입증됐다고 판단하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;claim_text&quot;: &quot;머스크가 전날 SpaceX와 테슬라의 합병 가능성을 공식 인정했다는 주장.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.2,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:02&quot;,
+      &quot;source_confidence&quot;: 0.7,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;전날인 2026-10-20 전후 공식 인정&quot;,
+        &quot;observed&quot;: &quot;E7 게시일은 2026-10-21 UTC이나 원발언 시각·문구는 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;합병 가능성 언급을 확정된 거래·공식 절차·실현될 시너지로 취급하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;claim_text&quot;: &quot;테슬라의 투자비 충당 수익과 SpaceX 협력 성장기회가 확인되면 테슬라·AI·로봇 관련주 반등 신호가 될 수 있다는 조건부 전망.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.1,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:02&quot;,
+      &quot;source_confidence&quot;: 0.7,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;투자비 충당과 협력 확인 시 반등 가능; 수치·기간 미제시&quot;,
+        &quot;observed&quot;: &quot;현금흐름·투자비·협력 규모·비교 수익률 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;실제 현금 창출력과 협력 계약을 확인하고, 충족되더라도 주가 반등이 보장되는 것은 아니라는 조건을 유지한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C10&quot;,
+      &quot;claim_text&quot;: &quot;AI 투자 수익화 기대가 커지면 엔비디아 등 AI 관련 기업에 긍정적으로 작용할 수 있다는 조건부 전망.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.1,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:02&quot;,
+      &quot;source_confidence&quot;: 0.9,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;수익화 기대 강화 시 긍정적 영향; 수치·기간 미제시&quot;,
+        &quot;observed&quot;: &quot;발표 전후 NVDA·비교지수 수익률 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;수익화 기대와 주가 상승을 자동 연결하지 말고 실제 수요·투자 지침과 발표 전후 상대수익률을 확인한다.&quot;
+    }
+  ],
+  &quot;entities&quot;: [
+    {
+      &quot;ticker&quot;: &quot;META&quot;,
+      &quot;name&quot;: &quot;메타&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;예정된 실적 발표에서 매출뿐 아니라 AI 시설·장비 투자와 이에 상응하는 수익 증가를 확인해야 한다고 주장한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;시장 예상 매출은 약 633억 달러라고 제시한다.&quot;,
+        &quot;이번 분기 AI 관련 시설·장비 등을 포함한 예상 투자는 약 410억 달러라고 제시한다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;META&quot;,
+        &quot;as_of&quot;: &quot;2026-10-21T23:13:51.994123+00:00&quot;,
+        &quot;current_price&quot;: 697.52001953125,
+        &quot;market_cap&quot;: 1776936591817.981,
+        &quot;forward_pe&quot;: 20.130001,
+        &quot;trailing_pe&quot;: 26.28184,
+        &quot;fifty_two_week_high&quot;: 779.82,
+        &quot;fifty_two_week_low&quot;: 520.26,
+        &quot;average_target_price&quot;: 817.87445,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;NVDA&quot;,
+      &quot;name&quot;: &quot;엔비디아&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;AI 투자가 실제 수익을 만든다는 기대가 커지면 엔비디아를 포함한 AI 관련 기업에 긍정적으로 작용할 수 있다고 전망한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;NVDA&quot;,
+        &quot;as_of&quot;: &quot;2026-10-21T23:13:53.877690+00:00&quot;,
+        &quot;current_price&quot;: 221.97000122070312,
+        &quot;market_cap&quot;: 5359909619476.318,
+        &quot;forward_pe&quot;: 13.94757,
+        &quot;trailing_pe&quot;: 28.061947,
+        &quot;fifty_two_week_high&quot;: 243.37,
+        &quot;fifty_two_week_low&quot;: 164.27,
+        &quot;average_target_price&quot;: 328.71695,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;IBM&quot;,
+      &quot;name&quot;: &quot;IBM&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;기업의 AI·관련 기술 도입에서 수익을 얻는 기업으로 설명하며 기업용 소프트웨어 매출을 핵심 지표로 제시한다.&quot;,
+        &quot;소프트웨어 매출 성장과 AI 계약 증가가 확인되면 AI 투자 붐이 실제 기업 구매로 이어진다는 근거가 강화된다고 주장한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;시장 예상 매출은 약 168억 달러라고 제시한다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;IBM&quot;,
+        &quot;as_of&quot;: &quot;2026-10-21T23:13:57.109256+00:00&quot;,
+        &quot;current_price&quot;: 251.4600067138672,
+        &quot;market_cap&quot;: 236909120034.76517,
+        &quot;forward_pe&quot;: 19.122318,
+        &quot;trailing_pe&quot;: 22.352001,
+        &quot;fifty_two_week_high&quot;: 332.46,
+        &quot;fifty_two_week_low&quot;: 199.19,
+        &quot;average_target_price&quot;: 243.08609,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;TSLA&quot;,
+      &quot;name&quot;: &quot;테슬라&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;머스크가 전날 SpaceX와 테슬라의 합병 가능성을 공식 인정했다고 주장하며 AI·로봇공학·반도체 분야 시너지에 관심이 커졌다고 설명한다.&quot;,
+        &quot;투자비를 충당할 수익과 SpaceX 협력을 통한 성장 기회가 확인되면 테슬라 및 AI·로봇 관련주의 반등 신호가 될 수 있다고 전망한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;TSLA&quot;,
+        &quot;as_of&quot;: &quot;2026-10-21T23:13:59.714555+00:00&quot;,
+        &quot;current_price&quot;: 386.4700012207031,
+        &quot;market_cap&quot;: 1526381586180.4048,
+        &quot;forward_pe&quot;: 178.22244,
+        &quot;trailing_pe&quot;: 357.8426,
+        &quot;fifty_two_week_high&quot;: 498.83,
+        &quot;fifty_two_week_low&quot;: 297.38,
+        &quot;average_target_price&quot;: 397.83212,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    }
+  ],
+  &quot;evidence&quot;: [
+    {
+      &quot;evidence_id&quot;: &quot;E1&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;Canada to Provide Steel, Auto Sectors With Billions to Ease Trade Crunch&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/m/8488d736-169d-3fd7-b8af-01e0498f6d99/canada-to-provide-steel%2C-auto.html&quot;,
+      &quot;publisher&quot;: &quot;The Wall Street Journal&quot;,
+      &quot;published_at&quot;: &quot;2026-10-21T19:59:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Canada to Provide Steel, Auto Sectors With Billions to Ease Trade Crunch Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals Weather Newsletters...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E2&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;Steel Dynamics: 3 Key Takeaways for Long-Term Investors&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/steel-dynamics-3-key-takeaways-134753555.html&quot;,
+      &quot;publisher&quot;: &quot;Motley Fool&quot;,
+      &quot;published_at&quot;: &quot;2026-10-21T13:47:53+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Steel Dynamics: 3 Key Takeaways for Long-Term Investors Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals Weather Newsletters Finance My portfo...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E4&quot;,
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;title&quot;: &quot;Meta Platforms Q3 Earnings Call Highlights&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/meta-platforms-q3-earnings-call-230315336.html&quot;,
+      &quot;publisher&quot;: &quot;MarketBeat&quot;,
+      &quot;published_at&quot;: &quot;2026-10-21T23:03:15+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Meta Platforms Q3 Earnings Call Highlights Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals Weather Newsletters Finance My portfolio News Mark...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E5&quot;,
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;title&quot;: &quot;Dow Jones Futures Fall; Meta, Tesla Are Earnings Movers After SpaceX, Super Micro Lead Bullish Nasdaq Move&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/m/2bd9a8b9-7491-307a-8f54-b091a90905b0/dow-jones-futures-fall%3B-meta%2C.html&quot;,
+      &quot;publisher&quot;: &quot;Investor&#x27;s Business Daily&quot;,
+      &quot;published_at&quot;: &quot;2026-10-21T22:58:02+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E7&quot;,
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;title&quot;: &quot;Tesla beats earnings projections after Musk floats SpaceX merger plan&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/tesla-report-earnings-elon-musk-194150176.html&quot;,
+      &quot;publisher&quot;: &quot;The Guardian&quot;,
+      &quot;published_at&quot;: &quot;2026-10-21T23:03:16+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E8&quot;,
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;title&quot;: &quot;Tesla Earnings Beat, FSD Revenue Strong, But TSLA Falls After Call&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/m/0e6f45c4-f583-3080-9285-aee877fe5b99/tesla-earnings-beat%2C-fsd.html&quot;,
+      &quot;publisher&quot;: &quot;Investor&#x27;s Business Daily&quot;,
+      &quot;published_at&quot;: &quot;2026-10-21T22:44:52+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    }
+  ],
+  &quot;source_policy&quot;: {
+    &quot;raw_transcript_published&quot;: false,
+    &quot;raw_transcript_in_evidence&quot;: false,
+    &quot;research_pipeline_version&quot;: 4,
+    &quot;closed_source_claims&quot;: &quot;unverified_external_source&quot;,
+    &quot;auto_caption_warning&quot;: true,
+    &quot;local_asr_warning&quot;: false
+  }
+}</pre>
+  </details>
+</article>
+</main>
+  <style>
+.reader-contents { margin: 16px 0; padding: 12px 16px; border: 1px solid var(--line, #64748b); border-radius: 12px; }
+.reader-contents > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-weight: 750; }
+.reader-contents nav { display: grid; gap: 4px; max-height: 45vh; overflow: auto; margin: 8px 0; }
+.reader-contents a { display: block; min-height: 44px; padding: 10px; border-radius: 6px; color: inherit; overflow-wrap: anywhere; }
+.reader-contents a:hover { background: #80808020; }
+.reader-contents .reader-subsection { padding-inline-start: 24px; font-size: .92em; }
+.reader-prose, .report { overflow-wrap: anywhere; line-height: 1.8; }
+.reader-prose p, .reader-prose li { max-width: 85ch; }
+.reader-prose h2, .reader-prose h3, .reader-prose h4, [data-reader-heading] { scroll-margin-top: 100px; line-height: 1.45; }
+.reader-prose h2 { margin-top: 1.8em; padding-bottom: 8px; border-bottom: 1px solid var(--line, #64748b); }
+.reader-prose h3 { margin-top: 1.5em; }
+.reader-prose li { margin: .5em 0; }
+.reader-prose pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.reader-prose blockquote { margin: 16px 0; padding: 4px 16px; border-left: 3px solid var(--accent, #64748b); }
+.reader-table { overflow: auto; max-width: 100%; margin: 16px 0; border: 1px solid var(--line, #64748b); border-radius: 10px; }
+.reader-table table { border-collapse: collapse; width: 100%; margin: 0; font-size: .92rem; }
+.reader-table th, .reader-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line, #64748b); min-width: 110px; max-width: 400px; overflow-wrap: anywhere; white-space: normal; }
+.reader-table th { background: #80808018; }
+.reader-table tr:nth-child(even) { background: #80808008; }
+.reader-search { display: grid; gap: 8px; margin: 16px 0; }
+.reader-search label { font-weight: 700; }
+.reader-search input { box-sizing: border-box; width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line, #64748b); border-radius: 10px; background: var(--panel, #fff); color: var(--text, #132238); font: inherit; }
+.reader-search p { margin: 0; font-size: .86rem; }
+.reader-back { position: fixed; bottom: max(14px, env(safe-area-inset-bottom)); right: 14px; z-index: 30; min-height: 44px; border: 1px solid #778899; border-radius: 99px; padding: 10px 16px; background: #18344a; color: #fff; font: 700 14px system-ui; cursor: pointer; box-shadow: 0 3px 12px #0003; }
+[data-reader-source] { margin-top: 20px; }
+[data-reader-source] > summary { min-height: 44px; cursor: pointer; }
+[data-reader-source] pre { font-size: .85rem; }
+[data-reader-source] pre, .reader-prose { min-width: 0; }
+.reader-contents :focus-visible, .reader-search :focus-visible, .reader-back:focus-visible, .reader-table:focus-visible { outline: 3px solid var(--accent, #008c95); outline-offset: 3px; }
+.reader-search + .grid > [hidden] { display: none !important; }
+@media (max-width: 600px) { .reader-prose { font-size: 1rem; } .reader-contents { padding: 8px 12px; } }
+@media print { .reader-back, .reader-search, .reader-contents, [data-reader-source] { display: none !important; } .reader-table { overflow: visible; } .reader-prose { color: #000; background: #fff; } }
+</style><script>
+(() => {
+  'use strict';
+  let serial = 0;
+  const rendered = new WeakMap();
+  const node = (tag, text) => { const el = document.createElement(tag); if (text != null) el.textContent = text; return el; };
+  function inline(parent, text) {
+    const pattern = /(`[^`]+`|\*\*[^*]+\*\*|\[[^\]]+\]\(https?:\/\/[^\s)]+\))/g;
+    let start = 0;
+    for (const match of String(text).matchAll(pattern)) {
+      parent.append(document.createTextNode(text.slice(start, match.index)));
+      const value = match[0];
+      if (value.startsWith('`')) parent.append(node('code', value.slice(1, -1)));
+      else if (value.startsWith('**')) parent.append(node('strong', value.slice(2, -2)));
+      else {
+        const link = value.match(/^\[([^\]]+)\]\((.+)\)$/);
+        const a = node('a', link[1]); a.href = link[2]; a.rel = 'noopener noreferrer'; parent.append(a);
+      }
+      start = match.index + value.length;
+    }
+    parent.append(document.createTextNode(text.slice(start)));
+  }
+  const cells = line => line.trim().replace(/^\|/, '').replace(/\|$/, '').split(/(?<!\\)\|/).map(v => v.trim().replace(/\\\|/g, '|'));
+  function markdown(source) {
+    const article = node('article'); article.className = 'reader-prose';
+    const lines = source.split(/\r?\n/); let list = null;
+    for (let i = 0; i < lines.length; i += 1) {
+      const line = lines[i], value = line.trim();
+      if (!value) { list = null; continue; }
+      if (/^```/.test(value)) {
+        const code = []; i += 1;
+        while (i < lines.length && !/^```/.test(lines[i].trim())) code.push(lines[i++]);
+        const pre = node('pre'); pre.append(node('code', code.join('\n'))); article.append(pre); list = null; continue;
+      }
+      if (i + 1 < lines.length && value.includes('|') && cells(lines[i + 1]).every(v => /^:?-{3,}:?$/.test(v))) {
+        const table = node('table'), head = node('thead'), body = node('tbody');
+        const row = (values, tag) => { const tr = node('tr'); values.forEach(v => { const cell = node(tag); if (tag === 'th') cell.scope = 'col'; inline(cell, v); tr.append(cell); }); return tr; };
+        head.append(row(cells(line), 'th')); i += 2;
+        while (i < lines.length && lines[i].trim() && lines[i].includes('|')) body.append(row(cells(lines[i++]), 'td'));
+        i -= 1; table.append(head, body); article.append(table); list = null; continue;
+      }
+      const heading = value.match(/^(#{1,6})\s+(.+)$/);
+      if (heading) { const h = node('h' + Math.min(4, heading[1].length + 1)); inline(h, heading[2]); article.append(h); list = null; continue; }
+      const bullet = value.match(/^(?:[-*+] |\d+\. )(.+)$/);
+      if (bullet) {
+        const tag = /^\d/.test(value) ? 'ol' : 'ul';
+        if (!list || list.tagName.toLowerCase() !== tag) { list = node(tag); if (tag === 'ol') list.start = parseInt(value, 10); article.append(list); }
+        const li = node('li'); inline(li, bullet[1]); list.append(li); continue;
+      }
+      list = null;
+      if (/^(---+|\*\*\*+)$/.test(value)) { article.append(node('hr')); continue; }
+      const p = node(value.startsWith('> ') ? 'blockquote' : 'p'); inline(p, value.startsWith('> ') ? value.slice(2) : line); article.append(p);
+    }
+    return article;
+  }
+  function contents(root) {
+    root.querySelectorAll(':scope > .reader-contents').forEach(el => el.remove());
+    const headings = [...root.querySelectorAll('h2,h3,h4')].filter(h => !h.closest('.card,.run-card,.reader-contents,[data-reader-source],[hidden]'));
+    if (headings.length < 2) return;
+    const details = node('details'); details.className = 'reader-contents';
+    details.append(node('summary', '이 리포트 목차 · ' + headings.length + '개 항목'));
+    const nav = node('nav'); nav.setAttribute('aria-label', '리포트 목차');
+    headings.forEach(h => {
+      if (!h.id) h.id = 'reader-section-' + (++serial);
+      h.dataset.readerHeading = ''; h.tabIndex = -1;
+      const a = node('a', h.textContent); a.href = '#' + h.id;
+      if (h.tagName !== 'H2') a.className = 'reader-subsection';
+      a.addEventListener('click', event => {
+        event.preventDefault();
+        for (let ancestor = h.parentElement; ancestor; ancestor = ancestor.parentElement) if (ancestor.tagName === 'DETAILS') ancestor.open = true;
+        h.scrollIntoView({block: 'start'}); h.focus({preventScroll: true});
+      }); nav.append(a);
+    });
+    details.append(nav); root.prepend(details);
+  }
+  function enhance(root) {
+    if (!root) return;
+    root.querySelectorAll('pre[data-report-markdown]').forEach(pre => {
+      const previous = rendered.get(pre);
+      if (previous && previous.source === pre.textContent) return;
+      const article = markdown(pre.textContent);
+      if (previous) previous.article.replaceWith(article);
+      else {
+        const details = node('details'); details.dataset.readerSource = '';
+        details.append(node('summary', 'Markdown 원문 보기'));
+        pre.before(article, details); details.append(pre);
+      }
+      rendered.set(pre, {source: pre.textContent, article});
+    });
+    root.querySelectorAll('table').forEach(table => {
+      if (table.closest('.reader-table,.account-table-wrap,.summary-scroll')) return;
+      const wrap = node('div'); wrap.className = 'reader-table'; wrap.tabIndex = 0;
+      wrap.setAttribute('role', 'region'); wrap.setAttribute('aria-label', '리포트 표 · 가로로 스크롤하여 전체 보기');
+      table.before(wrap); wrap.append(table);
+    });
+    root.querySelectorAll('.grid').forEach(grid => {
+      const cards = [...grid.querySelectorAll(':scope > a.card')];
+      if (cards.length < 2 || grid.dataset.readerSearch) return;
+      grid.dataset.readerSearch = 'true';
+      const box = node('div'); box.className = 'reader-search';
+      const input = node('input'); input.type = 'search'; input.placeholder = '제목 · 종목 · 채널 · 키워드'; input.id = 'report-search-' + (++serial);
+      const label = node('label', '리포트 찾기'); label.htmlFor = input.id;
+      const status = node('p'); status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
+      const update = () => {
+        const terms = input.value.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean); let count = 0;
+        cards.forEach(card => { card.hidden = !terms.every(t => card.textContent.toLocaleLowerCase().includes(t)); if (!card.hidden) count += 1; });
+        status.textContent = cards.length + '개 중 ' + count + '개 표시' + (count ? '' : ' · 검색어를 지우거나 다른 키워드를 입력하세요.');
+      };
+      input.addEventListener('input', update); box.append(label, input, status); grid.before(box); update();
+    });
+    contents(root);
+  }
+  window.TradingAgentsReader = {enhance};
+  const main = document.querySelector('main');
+  if (main && !main.hasAttribute('data-reader-dynamic')) enhance(main);
+  if (main) {
+    const top = node('button', '↑ 맨 위'); top.type = 'button'; top.className = 'reader-back'; top.setAttribute('aria-label', '리포트 맨 위로 이동');
+    top.addEventListener('click', () => { const target = document.querySelector('h1') || main; target.tabIndex = -1; target.scrollIntoView({block: 'start'}); target.focus({preventScroll: true}); });
+    document.body.append(top);
+  }
+})();
+</script>
+</body>
+</html>
