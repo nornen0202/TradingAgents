@@ -49,7 +49,7 @@
 
 ## PR429 병합 후 미국 가격 장애와 대체 공급경로 확인
 
-PR429 병합 후 운영 체크아웃 `130c3c7f`에서 시작된 `20261022T182146_local-scheduler-us-full`은 18:32 KST에 30/30 종목 실패로 종료됐다. 첫 `get_stock_data`에서 Yahoo 최신 종가 검증 실패와 Alpha Vantage 호출 한도가 겹쳤으며, 30개 종목별 연구의 LLM 호출은 0회였다. 그러나 실패 후 포트폴리오 judge·writer 후처리가 실제 실행됐다. 보존한 `C:/TradingAgentsData/archive/runs/2026/20261022T182146_local-scheduler-us-full/run.json`의 최종 `llm_usage`는 judge 15회·writer 1회, 총 16회·354,923토큰이며 전체 실행은 632.03초였다. 후처리에 536.86초를 사용했으므로 전체 LLM 호출 0회로 해석하면 안 된다. 이번 코드는 전 종목 실패 뒤 이 불필요한 후처리를 차단한다. 정상 재분석 완료나 판단 생성으로 집계하지 않는다. 실패 원본을 보존하고 국내·미국 정상 전략 체결 0건, 국내 검증 왕복 0건을 유지한다.
+PR429 병합 후 운영 체크아웃 `130c3c7f`에서 시작된 `20261022T182146_local-scheduler-us-full`은 18:32 KST에 30/30 종목 실패로 종료됐다. 첫 `get_stock_data`에서 Yahoo 최신 종가 검증 실패와 Alpha Vantage의 호출 한도 또는 구독 제한 예외가 겹쳤으며, 30개 종목별 연구의 LLM 호출은 0회였다. 원본 AAPL `error.json`의 표현도 `rate limit or subscription limit exceeded`여서 실제 한도 소진과 구독권한 부재를 구분할 수 없다. 그러나 실패 후 포트폴리오 judge·writer 후처리가 실제 실행됐다. 보존한 `C:/TradingAgentsData/archive/runs/2026/20261022T182146_local-scheduler-us-full/run.json`의 최종 `llm_usage`는 judge 15회·writer 1회, 총 16회·354,923토큰이며 전체 실행은 632.03초였다. 후처리에 536.86초를 사용했으므로 전체 LLM 호출 0회로 해석하면 안 된다. 이번 코드는 전 종목 실패 뒤 이 불필요한 후처리를 차단한다. 정상 재분석 완료나 판단 생성으로 집계하지 않는다. 실패 원본을 보존하고 국내·미국 정상 전략 체결 0건, 국내 검증 왕복 0건을 유지한다.
 
 18:27 KST 별도 Yahoo 조회는 yfinance 1.5.1, `auto_adjust=False`, 요청 종료일 제외 `2026-10-22` 조건에서도 AAPL의 최신 완료 거래일 `2026-10-21`에 `Close=null`, `Adj Close=null`, 거래량 35,368,592를 반환했다. 과거 정상 종가로 바꾸거나 해당 완료봉을 삭제해서 통과시킬 문제가 아니다. 오프라인 검사에서는 정상 10/21봉 뒤 잘못된 10/22봉은 기준일 필터로 제외됐고, 10/21 종가 자체가 없으면 거절됐다. 이 원본과 CSV 해시는 운영 저장소의 `.runtime/local-automation/live-verification/yahoo-price-failure-20261022/aapl-raw-history.{csv,json}`에 보존했다.
 
@@ -195,3 +195,11 @@ PR #436은 head `23dea3af013d5764f4bc8fd03bfb6751a1178c56`에서 Windows 테스�
 한국 자정 이후 미국 현지 날짜가 전날인 경우도 기존 runner와 같은 시장 날짜로 처리한다. 남은 실패 종목만 정상 그래프로 실행하며, 실패가 남으면 완전한 기준선으로 승격하지 않는다. 기존 예약·재시도 간격·횟수·현재 계좌 선정·승인·주문 경로는 바꾸지 않는다. 종료 명세가 없는 활성 연구에는 이 경로를 적용하지 않는다.
 
 관련 오프라인 검사 262개와 독립 경량 검증 8개, Ruff·diff 검사를 통과했다. 부모 원본 변조·순환·시각·설정·종목 귀속·사용량·복사 전 재검증과 실패 종목만 실행하는 runner 연결 검사를 포함한다. 실제 진행 중 source `0741e528`의 완료 4종목 시각·시장 날짜와도 호환성을 대조했다. 이 문서의 로컬 통과는 최종 head CI·병합·배포·실제 후속 재개 성공을 대신하지 않는다.
+
+## 미해결 시계열의 후속 설계 근거
+
+GEV처럼 실제 상장 이력이 5년보다 짧은 경우에는 동일 증권의 최초 정규 거래일이 검증된 경우만 원 요청 시작일과 상장일 중 늦은 날짜부터 모든 거래 세션을 요구하는 계약을 검토할 수 있다. 종목·주식 종류·ISIN/SEDOL·거래소·통화를 대조하고 원 요청 범위와 상장 전 비존재 구간을 명시해야 한다. 거래소 이전·재상장·when-issued·서비스 등록일이나 최초 수집 봉으로 대체하지 않는다. 최소 지표 관측 수, 전체 상장 후 이력 계산, 단일 시계열 고정과 수정본의 당시 가용성 한계는 그대로다. 이 계약은 아직 구현·운영 검증하지 않았다.
+
+KIS 공식 [search-info 호출](https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/overseas_stock/search_info/search_info.py)과 [필드 설명](https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/overseas_stock/search_info/chk_search_info.py)에는 `lstg_dt`와 증권 식별자·거래소·통화가 있지만, 상장일 필드만으로 모든 사건 유형을 구분한다는 근거는 없다. 예제의 기본 인증은 prod이며 [공통 인증 코드](https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/kis_auth.py)가 모의에서 `CTPF1702R`를 `VTPF1702R`로 바꾼다는 사실은 해당 API의 모의 지원 증거가 아니다. 현재 허용 목록에 이 경로는 없고 이번 조사에서 호출하거나 추가하지 않았다.
+
+[Alpha Vantage daily adjusted](https://www.alphavantage.co/documentation/#dailyadj)는 raw OHLCV와 adjusted close·배당·분할 이벤트를 반환하는 premium 경로다. raw 가격과 adjusted close를 혼합하지 않아야 하며, 원격 지표를 따로 가져오는 현재 설정만으로 동일 전체 프레임 계산 계약을 충족하지 못한다. 현재 계정 권한과 DELL·ETN의 유효 대체 자료는 확인되지 않았다. 별도 전체 시계열 검증·고정 어댑터와 실제 데이터 확인 전까지 해결된 대안으로 집계하지 않는다. 신규 유료 구독·계좌·주문 권한 변경은 수행하지 않았다.
