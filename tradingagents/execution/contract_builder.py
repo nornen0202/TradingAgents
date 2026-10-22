@@ -21,6 +21,25 @@ from tradingagents.schemas import (
 )
 
 
+def has_legacy_trim_invalidation(payload: dict[str, Any]) -> bool:
+    """Identify cached contracts whose downside threshold came from a trim."""
+    for level in payload.get("structured_levels") or []:
+        if not isinstance(level, dict) or _level_type_value(level.get("level_type")) != "TRIM":
+            continue
+        confirmation = str(level.get("confirmation") or "").lower()
+        if confirmation not in {"intraday", "close"}:
+            continue
+        try:
+            value = level.get("price")
+            if value is None:
+                value = min(float(level[key]) for key in ("low", "high") if level.get(key) is not None)
+            if float(payload.get(f"invalid_if_{confirmation}_below")) == float(value):
+                return True
+        except (TypeError, ValueError):
+            continue
+    return False
+
+
 def build_execution_contract(*, ticker: str, analysis_payload: dict[str, Any]) -> ExecutionContract:
     decision_payload = analysis_payload.get("decision")
     analysis_asof = str(analysis_payload.get("finished_at") or analysis_payload.get("started_at") or datetime.now().isoformat())
@@ -490,7 +509,9 @@ def _find_level(levels: tuple[PriceLevel, ...], *level_types: str) -> PriceLevel
 
 def _find_invalidation_level(levels: tuple[PriceLevel, ...], *, confirmation: str) -> PriceLevel | None:
     for level in levels:
-        if _level_type_value(level.level_type) not in {"INVALIDATION", "TRIM", "STOP_LOSS"}:
+        # A rebound trim is a partial reduction target, never a downside stop.
+        # Keep it available to the separate risk-action evaluator.
+        if _level_type_value(level.level_type) not in {"INVALIDATION", "STOP_LOSS"}:
             continue
         if str(level.confirmation).strip().lower() == confirmation:
             return level
