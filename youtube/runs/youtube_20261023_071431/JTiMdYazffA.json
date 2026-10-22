@@ -1,0 +1,493 @@
+{
+  "version": 4,
+  "video_id": "JTiMdYazffA",
+  "title": "10월 23일 투자자들이 꼭 알아야 하는 투자 포인트",
+  "url": "https://www.youtube.com/watch?v=JTiMdYazffA",
+  "channel": "경제사냥꾼",
+  "channel_id": "UC7usMJDHmtbs_oegmzQKKMA",
+  "source_url": "https://www.youtube.com/@%EA%B2%BD%EC%A0%9C%EC%82%AC%EB%83%A5%EA%BE%BC/shorts",
+  "thumbnail_url": "https://i.ytimg.com/vi/JTiMdYazffA/maxresdefault.jpg",
+  "published_at": "2026-10-22T21:54:17+00:00",
+  "status": "asr_uncertain",
+  "strategy_source_tier": "STANDARD",
+  "strategy_evidence_weight": "STANDARD",
+  "strategy_validation_policy": "STANDARD_REVIEW",
+  "transcript_status": "available",
+  "transcript_source": "automatic",
+  "transcript_chars": 1702,
+  "transcript_quality": {
+    "status": "good",
+    "score": 1.0,
+    "warnings": [],
+    "source": "automatic",
+    "language": "Korean",
+    "model_or_format": "json3",
+    "chars": 1702,
+    "segments": 89,
+    "duration_seconds": 147,
+    "repeated_ngram_ratio": 0.0
+  },
+  "generated_at": "2026-10-23T07:14:31.876608+09:00",
+  "llm_status": "success",
+  "research_status": "success",
+  "claim_verification_status": "success",
+  "research_pipeline_version": 4,
+  "evidence_count": 9,
+  "claim_status_summary": {
+    "unverified": 8,
+    "asr_uncertain": 2
+  },
+  "claims": [
+    {
+      "claim_id": "C1",
+      "claim_text": "美国股市下跌，半导体指数跌超6%，MU、LRCX、AMAT、疑似GE Vernova及VST分别下跌6.25%、11.76%、8.16%、10.64%及9.81%。",
+      "status": "unverified",
+      "confidence": 0.2,
+      "supporting_evidence_ids": [
+        "E3"
+      ],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.25,
+      "asr_confidence": 0.75,
+      "numeric_parse": {
+        "claimed": "半导体指数<-6%；MU -6.25%；LRCX -11.76%；AMAT -8.16%；疑似GEV -10.64%；VST -9.81%",
+        "observed": "MU快照价格856.489990234375美元；无对应前收盘价，其余所称跌幅不可核验。"
+      },
+      "investor_implication": "市场下跌方向有标题级线索，但不能将具体跌幅或跨板块传导解释作为已核实交易依据。"
+    },
+    {
+      "claim_id": "C2",
+      "claim_text": "Meta营收超预期，但投资支出导致自由现金流为负21亿美元，业绩公布后盘后涨逾4%，随后常规交易时段跌约7%。",
+      "status": "unverified",
+      "confidence": 0.15,
+      "supporting_evidence_ids": [
+        "E3",
+        "E4"
+      ],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.2,
+      "asr_confidence": 0.9,
+      "numeric_parse": {
+        "claimed": "自由现金流-21亿美元；盘后+4%区间；随后常规时段约-7%",
+        "observed": "META快照价格648.8499755859375美元；没有财报或可比时段价格。"
+      },
+      "investor_implication": "应分开核验投资者融资担忧、实际现金流和融资能力，不能由股价下跌推断资金不足。"
+    },
+    {
+      "claim_id": "C3",
+      "claim_text": "黄仁勋称资本不足限制AI云增长、内存越多越好；SK海力士是英伟达芯片HBM的最大供应商，融资担忧削弱HBM需求预期。",
+      "status": "unverified",
+      "confidence": 0.05,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.05,
+      "asr_confidence": 0.6,
+      "numeric_parse": {
+        "claimed": "SK海力士为最大HBM供应商；未给出份额",
+        "observed": "供应份额、比较口径及引语原文均不可得。"
+      },
+      "investor_implication": "不能将未核实引语或市场情绪解释等同于HBM订单转弱。"
+    },
+    {
+      "claim_id": "C4",
+      "claim_text": "美国交易的海力士ADR下跌8.07%；公司于21日提前约一个月完成回购，并计划28日公布业绩。",
+      "status": "unverified",
+      "confidence": 0.05,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.05,
+      "asr_confidence": 0.55,
+      "numeric_parse": {
+        "claimed": "ADR -8.07%；21日完成回购；提前约1个月；28日业绩发布",
+        "observed": "仅有000660.KS普通股快照价格1223000韩元，无对应ADR行情或公告。"
+      },
+      "investor_implication": "证券身份及回购完成事实确认前，不宜据此判断买盘支持消失或美国市场领先下跌。"
+    },
+    {
+      "claim_id": "C5",
+      "claim_text": "前一交易日PSK、HPSP、TES位居科斯达克外资净买入前列，HD现代电气获外资净买入165亿韩元。",
+      "status": "unverified",
+      "confidence": 0.05,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.05,
+      "asr_confidence": 0.9,
+      "numeric_parse": {
+        "claimed": "HD现代电气外资净买入165亿韩元，即16500000000韩元",
+        "observed": "没有净买入金额或排名数据。"
+      },
+      "investor_implication": "外资持续买入仅是待观察条件，不能表述为已经发生。"
+    },
+    {
+      "claim_id": "C6",
+      "claim_text": "不明主体的攻击及进一步空袭风险推动布伦特油价上涨4%，突破每桶113美元。",
+      "status": "asr_uncertain",
+      "confidence": 0.15,
+      "supporting_evidence_ids": [
+        "E2"
+      ],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.25,
+      "asr_confidence": 0.3,
+      "numeric_parse": {
+        "claimed": "布伦特+4%，超过113美元/桶",
+        "observed": "BZ=F单点价格约112.92美元；E2标题称油价突破113美元，无同口径涨幅数据。"
+      },
+      "investor_implication": "价格突破、具体涨幅和地缘事件因果链均需分别核实，不能据此直接推导炼油利润增长。"
+    },
+    {
+      "claim_id": "C7",
+      "claim_text": "近三个月S-Oil与SK Innovation全年利润预测分别上调28.9%和93%，乐天化学第三季度亏损预测扩大；差异来自炼油库存效应及石化成本转嫁不足。",
+      "status": "unverified",
+      "confidence": 0.05,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.05,
+      "asr_confidence": 0.85,
+      "numeric_parse": {
+        "claimed": "S-Oil利润预测+28.9%；SK Innovation +93%；乐天化学第三季度亏损预测扩大",
+        "observed": "无可计算预测变化率的原始数值；乐天化学亏损预测金额未提供。"
+      },
+      "investor_implication": "应比较同口径预测及业务分部资料，不能将油价上涨视为炼油股普遍获利的充分条件。"
+    },
+    {
+      "claim_id": "C8",
+      "claim_text": "新款途胜首日订单创该车型历史新高，字幕订单量为无法确定的‘15,45台’。",
+      "status": "asr_uncertain",
+      "confidence": 0.05,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.05,
+      "asr_confidence": 0.2,
+      "numeric_parse": {
+        "claimed": "字幕‘15,45台’，未恢复数值",
+        "observed": "没有官方订单量或历史纪录比较数据。"
+      },
+      "investor_implication": "准确订单数及历史比较尚未成立，也不能将订单直接作为已实现交付或收入。"
+    },
+    {
+      "claim_id": "C9",
+      "claim_text": "最近三个月美元兑韩元汇率下降超过10%。",
+      "status": "unverified",
+      "confidence": 0.05,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.05,
+      "asr_confidence": 0.8,
+      "numeric_parse": {
+        "claimed": "近三个月USD/KRW变化率<-10%",
+        "observed": "起止汇率均不可得，无法计算。"
+      },
+      "investor_implication": "需先复算同口径汇率变动，再评估企业汇率敞口。"
+    },
+    {
+      "claim_id": "C10",
+      "claim_text": "现代汽车全年营业利润预测下调10.8%，汇率下降对韩元折算利润构成压力。",
+      "status": "unverified",
+      "confidence": 0.05,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.05,
+      "asr_confidence": 0.85,
+      "numeric_parse": {
+        "claimed": "全年营业利润预测-10.8%",
+        "observed": "没有修订前后预测值；现代汽车单点股价不支持该比例。"
+      },
+      "investor_implication": "新车订单能否抵消汇率压力尚不能判断，10.8%的预测下调也不能直接归因于汇率。"
+    }
+  ],
+  "entities": [
+    {
+      "ticker": "META",
+      "name": "메타",
+      "status": "unverified",
+      "claims": [
+        "매출이 예상을 웃돌았지만 대규모 투자 지출과 자금 조달 지속 가능성이 시장의 우려로 부각됐다고 해석한다."
+      ],
+      "numeric_claims": [
+        "잉여현금흐름이 21억 달러 적자였다고 주장한다.",
+        "실적 직후 시간외 주가는 4%대 상승했으나 간밤 정규장에서는 약 7% 하락했다고 주장한다."
+      ],
+      "verification_notes": [
+        "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+      ],
+      "market_snapshot": {
+        "ticker": "META",
+        "as_of": "2026-10-22T22:16:24.760201+00:00",
+        "current_price": 648.8499755859375,
+        "market_cap": 1652949351896.274,
+        "forward_pe": 18.646185,
+        "trailing_pe": 22.137495,
+        "fifty_two_week_high": 779.82,
+        "fifty_two_week_low": 520.26,
+        "average_target_price": 833.1331,
+        "source": "yfinance",
+        "status": "verified"
+      },
+      "external_context_status": "verified"
+    },
+    {
+      "ticker": "000660.KS",
+      "name": "SK하이닉스",
+      "status": "unverified",
+      "claims": [
+        "빅테크의 AI 투자 재원 우려가 엔비디아 칩과 연계된 HBM 수요 기대에 부담을 주며, 자사주 매입 종료도 매수 수급을 약화할 수 있다고 해석한다."
+      ],
+      "numeric_claims": [
+        "미국에서 거래되는 하이닉스 ADR이 8.07% 하락했다고 주장한다.",
+        "21일 자사주 매입을 계획보다 약 한 달 일찍 종료했다고 주장한다.",
+        "28일 실적 발표를 언급한다."
+      ],
+      "verification_notes": [
+        "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+      ],
+      "market_snapshot": {
+        "ticker": "000660.KS",
+        "as_of": "2026-10-22T22:16:28.663701+00:00",
+        "current_price": 1223000.0,
+        "market_cap": 891403846908000.0,
+        "forward_pe": 2.6145825,
+        "trailing_pe": null,
+        "fifty_two_week_high": 2987000.0,
+        "fifty_two_week_low": 0.0,
+        "average_target_price": 3096288.0,
+        "source": "yfinance",
+        "status": "verified"
+      },
+      "external_context_status": "verified"
+    },
+    {
+      "ticker": "MU",
+      "name": "마이크론",
+      "status": "unverified",
+      "claims": [
+        "AI 투자 재원 우려에 따른 메모리주 약세 사례로 마이크론을 제시한다."
+      ],
+      "numeric_claims": [
+        "간밤 주가가 6.25% 하락했다고 주장한다."
+      ],
+      "verification_notes": [
+        "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+      ],
+      "market_snapshot": {
+        "ticker": "MU",
+        "as_of": "2026-10-22T22:16:30.124236+00:00",
+        "current_price": 856.489990234375,
+        "market_cap": 969052655796.8252,
+        "forward_pe": 4.1406345,
+        "trailing_pe": 11.522803,
+        "fifty_two_week_high": 1255.0,
+        "fifty_two_week_low": 192.59,
+        "average_target_price": 1560.5652,
+        "source": "yfinance",
+        "status": "verified"
+      },
+      "external_context_status": "verified"
+    },
+    {
+      "ticker": "267260.KS",
+      "name": "HD현대일렉트릭",
+      "status": "unverified",
+      "claims": [
+        "해외 전력주 급락 속에서 국내 외국인 매수의 지속 여부를 핵심 수급 변수로 제시한다."
+      ],
+      "numeric_claims": [
+        "전일 외국인이 165억 원 순매수했다고 주장한다."
+      ],
+      "verification_notes": [
+        "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+      ],
+      "market_snapshot": {
+        "ticker": "267260.KS",
+        "as_of": "2026-10-22T22:16:32.833954+00:00",
+        "current_price": 490000.0,
+        "market_cap": 17636424960000.0,
+        "forward_pe": 14.802474,
+        "trailing_pe": null,
+        "fifty_two_week_high": 1430000.0,
+        "fifty_two_week_low": 0.0,
+        "average_target_price": 1070596.9,
+        "source": "yfinance",
+        "status": "verified"
+      },
+      "external_context_status": "verified"
+    },
+    {
+      "ticker": "BZ=F",
+      "name": "브렌트유·정유: S-Oil·SK이노베이션",
+      "status": "unverified",
+      "claims": [
+        "공격 및 추가 공습 가능성과 관련된 유가 상승이 정유사의 기존 원유 재고 가치에 긍정적이라고 설명한다."
+      ],
+      "numeric_claims": [
+        "브렌트유가 4% 올라 배럴당 113달러를 넘었다고 주장한다.",
+        "최근 석 달간 올해 이익 전망이 S-Oil은 28.9%, SK이노베이션은 93% 상향됐다고 주장한다."
+      ],
+      "verification_notes": [
+        "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+      ],
+      "market_snapshot": {
+        "ticker": "BZ=F",
+        "as_of": "2026-10-22T22:16:34.439234+00:00",
+        "current_price": 112.91999816894531,
+        "market_cap": null,
+        "forward_pe": null,
+        "trailing_pe": null,
+        "fifty_two_week_high": 126.1,
+        "fifty_two_week_low": 58.72,
+        "average_target_price": null,
+        "source": "yfinance",
+        "status": "verified"
+      },
+      "external_context_status": "verified"
+    },
+    {
+      "ticker": "011170.KS",
+      "name": "롯데케미칼",
+      "status": "unverified",
+      "claims": [
+        "비싸게 확보한 원료가 원가에 반영되는 가운데 제품 가격으로 비용을 전가하지 못해 손실 전망이 확대됐다고 설명한다."
+      ],
+      "numeric_claims": [
+        "3분기 손실 전망이 더 커졌다고 주장하나 손실 금액은 제시하지 않는다."
+      ],
+      "verification_notes": [
+        "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+      ],
+      "market_snapshot": {
+        "ticker": "011170.KS",
+        "as_of": "2026-10-22T22:16:35.392057+00:00",
+        "current_price": 50200.0,
+        "market_cap": 2116790779400.0,
+        "forward_pe": -16.992887,
+        "trailing_pe": null,
+        "fifty_two_week_high": 119500.0,
+        "fifty_two_week_low": 0.0,
+        "average_target_price": 85470.586,
+        "source": "yfinance",
+        "status": "verified"
+      },
+      "external_context_status": "verified"
+    },
+    {
+      "ticker": "005380.KS",
+      "name": "현대차",
+      "status": "unverified",
+      "claims": [
+        "신형 투싼 계약 호조에도 원·달러 환율 하락이 원화 환산 이익에 부담을 준다고 설명한다."
+      ],
+      "numeric_claims": [
+        "전일 발표된 신형 투싼 첫날 계약이 역대 투싼 최다라고 주장하며, 계약 대수는 자막에 '15,45대'로 표기돼 확정할 수 없다.",
+        "최근 석 달간 원·달러 환율이 10% 넘게 하락했다고 주장한다.",
+        "올해 영업이익 전망이 10.8% 하향됐다는 분석을 인용한다."
+      ],
+      "verification_notes": [
+        "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+      ],
+      "market_snapshot": {
+        "ticker": "005380.KS",
+        "as_of": "2026-10-22T22:16:38.482072+00:00",
+        "current_price": 301500.0,
+        "market_cap": 78942973914000.0,
+        "forward_pe": 6.635213,
+        "trailing_pe": null,
+        "fifty_two_week_high": 783000.0,
+        "fifty_two_week_low": 0.0,
+        "average_target_price": 603941.5,
+        "source": "yfinance",
+        "status": "verified"
+      },
+      "external_context_status": "verified"
+    }
+  ],
+  "evidence": [
+    {
+      "evidence_id": "E1",
+      "claim_id": "C1",
+      "title": "1 Stock Under $50 with Exciting Potential and 2 We Question",
+      "source_url": "https://finance.yahoo.com/markets/stocks/articles/1-stock-under-50-exciting-204553274.html",
+      "publisher": "StockStory",
+      "published_at": "2026-10-22T20:45:53+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "1 Stock Under $50 with Exciting Potential and 2 We Question Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals Weather Newsletters Finance My po..."
+    },
+    {
+      "evidence_id": "E2",
+      "claim_id": "C1",
+      "title": "Oil prices top $113 on worries of Iran-US escalations after midterms",
+      "source_url": "https://finance.yahoo.com/markets/article/oil-price-gains-on-possible-escalation-of-iran-us-tensions-after-midterms-120738560.html",
+      "publisher": "Yahoo Finance",
+      "published_at": "2026-10-22T20:04:36+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "Oil prices top $113 on worries of Iran-US escalations after midterms Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals Weather Newsletters Fina..."
+    },
+    {
+      "evidence_id": "E4",
+      "claim_id": "C2",
+      "title": "Dow Jones Futures: Moderna Crashes, Meta Fuels AI Meltdown, But Warren Buffett Market Thriving",
+      "source_url": "https://finance.yahoo.com/m/47e878bb-824d-3243-a8e9-b86b1c3f85d3/dow-jones-futures%3A-moderna.html",
+      "publisher": "Investor's Business Daily",
+      "published_at": "2026-10-22T22:07:34+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "Dow Jones Futures: Moderna Crashes, Meta Fuels AI Meltdown, But Warren Buffett Market Thriving Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Original..."
+    },
+    {
+      "evidence_id": "E5",
+      "claim_id": "C2",
+      "title": "Bill Ackman Says Meta Can Finance 'Whatever They Want,' Points to $82 Billion Cash",
+      "source_url": "https://finance.yahoo.com/markets/stocks/articles/bill-ackman-says-meta-finance-211512802.html",
+      "publisher": "Benzinga Prediction Markets",
+      "published_at": "2026-10-22T21:15:12+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    },
+    {
+      "evidence_id": "E7",
+      "claim_id": "C6",
+      "title": "Crypto Market Today, Oct. 22: Bitcoin and Altcoins Slide as Wall Street Fears Spill Into Crypto Markets",
+      "source_url": "https://finance.yahoo.com/markets/crypto/articles/crypto-market-today-oct-22-215002279.html",
+      "publisher": "Motley Fool",
+      "published_at": "2026-10-22T21:50:02+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    },
+    {
+      "evidence_id": "E8",
+      "claim_id": "C6",
+      "title": "Valero Energy Corporation Q3 2026 Earnings Call Summary",
+      "source_url": "https://finance.yahoo.com/energy/articles/valero-energy-corporation-q3-2026-212548457.html",
+      "publisher": "Moby",
+      "published_at": "2026-10-22T21:25:48+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    },
+    {
+      "evidence_id": "E9",
+      "claim_id": "C8",
+      "title": "How major US stock indexes fared Thursday 10/22/2026",
+      "source_url": "https://finance.yahoo.com/markets/world-indices/articles/major-us-stock-indexes-fared-202801299.html",
+      "publisher": "Associated Press",
+      "published_at": "2026-10-22T20:28:01+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    }
+  ],
+  "source_policy": {
+    "raw_transcript_published": false,
+    "raw_transcript_in_evidence": false,
+    "research_pipeline_version": 4,
+    "closed_source_claims": "unverified_external_source",
+    "auto_caption_warning": true,
+    "local_asr_warning": false
+  }
+}
