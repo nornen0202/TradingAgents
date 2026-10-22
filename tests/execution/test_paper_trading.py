@@ -67,6 +67,100 @@ def test_next_snapshot_only_and_restart_idempotency(broker):
 
 
 @pytest.mark.parametrize(
+    "now,quoted_at,expiry",
+    [
+        ("10:00:00", "10:00:00", "10:01:00"),
+        ("10:00:40", "10:00:00", "10:00:59.999999"),
+        ("10:00:40", "10:00:00", "10:01:00"),
+        ("10:00:40", "09:59:00", "10:01:00"),
+        ("10:00:40", "10:00:20", "10:01:10"),
+    ],
+)
+def test_minute_price_requires_a_later_snapshot_before_expiry(
+    broker, now, quoted_at, expiry
+):
+    def instant(clock):
+        return f"2026-09-21T{clock}+09:00"
+    result = broker.step(
+        now=instant(now),
+        quotes=quote(instant(quoted_at), price_basis="COMPLETED_MINUTE_CLOSE"),
+        signals=[signal(valid_until=instant(expiry))],
+    )
+    order = result["orders"][0]
+    assert order["status"] == "REJECTED"
+    assert order["reason"] == "signal_expires_before_next_price_snapshot"
+    assert order["expires_at"] == instant(expiry)
+    assert broker._get("order_count") == 0
+    assert result["broker_orders_sent"] == 0
+
+
+@pytest.mark.parametrize("quoted_at,next_at", [("10:00:00", "10:01:00"), ("10:00:20", "10:01:20")])
+def test_minute_snapshot_strictly_before_expiry_can_fill(broker, quoted_at, next_at):
+    def instant(clock):
+        return f"2026-09-21T{clock}+09:00"
+    expiry = instant(next_at + ".000001")
+    queued = broker.step(
+        now=instant("10:00:40"),
+        quotes=quote(instant(quoted_at), price_basis="COMPLETED_MINUTE_CLOSE"),
+        signals=[signal(valid_until=expiry)],
+    )
+    assert queued["orders"][0]["status"] == "PENDING"
+    result = broker.step(
+        now=instant(next_at),
+        quotes=quote(instant(next_at), price_basis="COMPLETED_MINUTE_CLOSE"),
+        signals=[],
+    )
+    assert result["orders"][0]["status"] == "FILLED"
+    assert result["orders"][0]["expires_at"] == expiry
+
+
+@pytest.mark.parametrize("basis", [None, "LAST_TRADE"])
+def test_other_price_bases_keep_subminute_next_snapshot_fills(broker, basis):
+    queued = broker.step(
+        now="2026-09-21T10:00:40+09:00",
+        quotes=quote("2026-09-21T10:00:40+09:00", price_basis=basis),
+        signals=[signal(valid_until="2026-09-21T10:00:55+09:00")],
+    )
+    assert queued["orders"][0]["status"] == "PENDING"
+    result = broker.step(
+        now="2026-09-21T10:00:45+09:00",
+        quotes=quote("2026-09-21T10:00:45+09:00", price_basis=basis),
+        signals=[],
+    )
+    assert result["orders"][0]["status"] == "FILLED"
+
+
+@pytest.mark.parametrize("action", ["BUY", "REDUCE", "SELL"])
+def test_unfillable_minute_signal_preserves_daily_order_capacity(tmp_path, action):
+    b = PaperBroker(tmp_path / "capacity.sqlite", PaperLimits(cash_floor=0, max_daily_orders=1))
+    try:
+        b.seed({"as_of": "2026-09-21T10:00:00+09:00", "available_cash_krw": 10000,
+                "positions": [{"canonical_ticker": "A", "quantity": 2, "market_price_krw": 100}]})
+        stale = signal(action=action, quantity=1, valid_until="2026-09-21T10:01:00+09:00")
+        b.step(now="2026-09-21T10:00:40+09:00",
+               quotes=quote("2026-09-21T10:00:00+09:00", price_basis="COMPLETED_MINUTE_CLOSE"),
+               signals=[stale])
+        assert b._get("order_count") == 0
+        # Re-observing the same rejected evidence remains idempotent.
+        b.step(now="2026-09-21T10:00:41+09:00",
+               quotes=quote("2026-09-21T10:00:00+09:00", price_basis="COMPLETED_MINUTE_CLOSE"),
+               signals=[stale])
+        assert b.db.execute("SELECT count(*) FROM orders").fetchone()[0] == 1
+        accepted = b.step(now="2026-09-21T10:00:45+09:00",
+                          quotes=quote("2026-09-21T10:00:00+09:00", price_basis="COMPLETED_MINUTE_CLOSE"),
+                          signals=[signal(signal_id="fresh", action=action, quantity=1)])
+        assert accepted["orders"][-1]["status"] == "PENDING"
+        assert b._get("order_count") == 1
+        done = b.step(now="2026-09-21T10:01:00+09:00",
+                      quotes=quote("2026-09-21T10:01:00+09:00", price_basis="COMPLETED_MINUTE_CLOSE"),
+                      signals=[])
+        assert sorted(o["status"] for o in done["orders"]) == ["FILLED", "REJECTED"]
+        assert b._get("order_count") == 1
+    finally:
+        b.close()
+
+
+@pytest.mark.parametrize(
     "changes",
     [
         {"executable": False},

@@ -7,7 +7,7 @@ valuation basis (including US positions). This is a shadow simulator, not KIS VT
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass
-from datetime import datetime
+from datetime import datetime, timedelta
 import hashlib
 import json
 import math
@@ -78,6 +78,16 @@ def positive(value):
         and math.isfinite(value)
         and value > 0
     )
+
+
+def _minute_snapshot_before_expiry(quote, signal, at):
+    """A completed minute price can only advance on its original clock grid."""
+    if quote.get("price_basis") != "COMPLETED_MINUTE_CLOSE":
+        return True
+    quoted_at = stamp(quote["as_of"])
+    minute = timedelta(minutes=1)
+    next_at = quoted_at + ((at - quoted_at) // minute + 1) * minute
+    return next_at < stamp(signal["valid_until"])
 
 
 class PaperBroker:
@@ -428,6 +438,10 @@ class PaperBroker:
                     reason = "signal_expired_or_future"
                 elif not q:
                     reason = "quote_not_executable"
+                elif not _minute_snapshot_before_expiry(q, s, at):
+                    # No strictly later completed price can arrive while this
+                    # signal is valid. Do not spend an order slot on it.
+                    reason = "signal_expires_before_next_price_snapshot"
                 elif self._get("order_count") >= self.limits.max_daily_orders:
                     reason = "daily_order_limit"
                 elif self.db.execute(
