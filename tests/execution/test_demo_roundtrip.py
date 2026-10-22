@@ -279,13 +279,14 @@ def test_new_quote_cannot_mutate_cancelled_order_or_reprice_an_open_successor(h)
 
 def test_bar_only_price_is_bounded_without_fabricating_bid_ask():
     from decimal import Decimal
-    for last in (100, 89195, 89750, 100000):
+    for last in (100, 89195, 89750, 99600, 100000):
         quote = {'last_price': last, 'quote_basis': 'BAR_ONLY'}
         buy = rt._limit_price('KR', 'BUY', quote)
         sell = rt._limit_price('KR', 'SELL', quote)
         assert Decimal(last) <= buy <= Decimal(last)*Decimal('1.005')
         assert Decimal(last)*Decimal('0.995') <= sell <= Decimal(last)
         assert buy % 5 == sell % 5 == 0
+        assert buy <= rt.dv.MARKETS['KR']['cap']
         assert 'bid' not in quote and 'ask' not in quote
     assert rt._limit_price('KR', 'BUY', {'last_price': 89195, 'ask': 89200}) == 89200
     assert rt._limit_price('US', 'BUY', {'last_price': 200, 'ask': 200.01}) == Decimal('200.01')

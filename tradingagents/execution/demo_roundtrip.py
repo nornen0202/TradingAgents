@@ -109,6 +109,8 @@ def _limit_price(market, side, quote):
         # limit; it is a price limit, never an invented bid/ask or fill price.
         factor = Decimal("1.005") if side == "BUY" else Decimal("0.995")
         anchor = Decimal(str(quote["last_price"])) * factor
+        if side == "BUY" and Decimal(str(quote["last_price"])) <= Decimal(str(dv.MARKETS[market]["cap"])):
+            anchor = min(anchor, Decimal(str(dv.MARKETS[market]["cap"])))
         rounding = ROUND_DOWN if side == "BUY" else ROUND_UP
     else:
         anchor = Decimal(str(quote.get("ask", quote["last_price"] + float(tick)) if side == "BUY"
