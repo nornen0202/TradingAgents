@@ -8,6 +8,7 @@ from __future__ import annotations
 
 from dataclasses import asdict, dataclass
 from datetime import datetime, timedelta, timezone
+from decimal import Decimal
 import hashlib
 import json
 import math
@@ -422,11 +423,89 @@ class KisPaperBroker:
                 "observed_at": _clock(self.clock()).isoformat()}
 
 
+def _import_cashflow_checkpoints(broker, row, state, receipt, now):
+    """Read same-owner ACK/reconciliation proof, without making broker requests.
+
+    A cumulative report proves an aggregate cash flow, not each execution's
+    price. Incremental receipts can only reach an actually observed checkpoint;
+    missing checkpoints must not be replaced by an inferred average fill price.
+    """
+    owners = broker.db.execute("SELECT scope FROM owner").fetchall()
+    request = broker.db.execute("SELECT * FROM requests WHERE id=?", (row["id"],)).fetchone()
+    original = broker.db.execute("SELECT * FROM intents WHERE id=?", (row["id"],)).fetchone()
+    if (len(owners) != 1 or owners[0][0] != broker.client.credentials.scope()
+            or not request or request["status"] != "ACKNOWLEDGED" or not original
+            or broker.db.execute("SELECT 1 FROM reconciliation_issues WHERE id=?", (row["id"],)).fetchone()):
+        raise DemoError("Same-owner acknowledged VTS order proof required")
+    response, terms, body = json.loads(request["response"]), json.loads(row["terms"]), json.loads(original["body"])
+    broker_id = _stable(response.get("broker_order_id"))
+    created = _clock(row["created_at"])
+    if (not created <= _clock(request["created_at"]) <= _clock(receipt["executed_at"]) <= now
+            or original["endpoint"] != "order-cash"
+            or original["tr_id"] != ("VTTC0012U" if terms["side"] == "BUY" else "VTTC0011U")
+            or body.get("PDNO") != terms["ticker"]
+            or _broker_number(body.get("ORD_QTY"), integer=True) != terms["quantity"]
+            or _broker_number(body.get("ORD_UNPR")) != terms["limit_price"]
+            or ("broker_order_id" in receipt and receipt["broker_order_id"] != broker_id)
+            or ("source" in receipt and receipt["source"] != "kis_vts")):
+        raise DemoError("VTS receipt provenance conflicts with original order")
+    reconciliations = []
+    for item in broker.db.execute("SELECT observed_at,evidence FROM reconciliations WHERE id=?", (row["id"],)):
+        observed = _clock(item[0])
+        if not created <= observed <= now:
+            raise DemoError("Invalid VTS reconciliation proof clock")
+        reconciliations.append((observed, json.loads(item[1])))
+    observations = []
+    for item in broker.db.execute("SELECT observed_at,evidence FROM paper_observations WHERE id=?", (row["id"],)):
+        observed, evidence = _clock(item[0]), json.loads(item[1])
+        ingested = _clock(evidence.get("ingested_at"))
+        if (not _clock(request["created_at"]) <= observed <= ingested <= now
+                or observed != _clock(evidence.get("observed_at"))
+                or evidence.get("broker_order_id") != broker_id or evidence.get("mode") != "demo"
+                or evidence.get("live_orders_enabled") is True or evidence.get("real_orders_enabled") is True
+                or evidence.get("cumulative_observation_only") is not True
+                or evidence.get("fill_time_known") is not False or evidence.get("settlement_known") is not False):
+            raise DemoError("Invalid VTS cash-flow observation provenance")
+        qty = _integer(evidence.get("filled_qty"))
+        remaining = _integer(evidence.get("remaining_qty"))
+        status = evidence.get("status")
+        if (not 0 <= qty <= terms["quantity"] or remaining > terms["quantity"] - qty
+                or status not in {"OPEN", "PARTIAL", "FILLED", "CANCELLED"}
+                or (status == "OPEN" and (qty != 0 or remaining != terms["quantity"]))
+                or (status == "PARTIAL" and (not 0 < qty < terms["quantity"] or remaining != terms["quantity"] - qty))
+                or (status == "FILLED" and (qty != terms["quantity"] or remaining != 0))
+                or (status == "CANCELLED" and remaining != 0)
+                or not any(observed <= at <= ingested and all(proof.get(key) == evidence.get(key)
+                    for key in ("broker_order_id", "status", "filled_qty", "remaining_qty"))
+                    for at, proof in reconciliations)):
+            raise DemoError("VTS cash-flow observation lacks matching reconciliation")
+        amount = evidence.get("fill_notional")
+        amount = None if amount is None else Decimal(str(_number(amount, positive=qty > 0)))
+        if (amount is not None and (qty == 0 and amount != 0
+                or terms["side"] == "BUY" and amount > Decimal(str(terms["limit_price"])) * qty
+                or terms["side"] == "SELL" and amount < Decimal(str(terms["limit_price"])) * qty)):
+            raise DemoError("VTS observed cash flow conflicts with order price")
+        observations.append((observed, ingested, qty, amount, remaining, status))
+    observations.sort(key=lambda item: (item[0], item[1]))
+    last_qty, last_amount, amount_qty = 0, Decimal(0), 0
+    for _, _, qty, amount, _, _ in observations:
+        if qty < last_qty or amount is not None and (amount < last_amount or qty == amount_qty and amount != last_amount):
+            raise DemoError("VTS cash-flow proof regressed or was corrected")
+        last_qty = qty
+        if amount is not None:
+            last_amount, amount_qty = amount, qty
+    if not observations or (observations[-1][2], observations[-1][4], observations[-1][5]) != (state["filled"], state["remaining"], state["status"]):
+        raise DemoError("VTS state lacks a matching current observation")
+    return observations
+
+
 def import_demo_fill(broker: KisPaperBroker, receipt: Mapping) -> bool:
     """Append explicit incremental, settled VTS evidence as mode demo only.
 
     Daily cumulative order reports are insufficient input. Costs, execution,
     confirmation and settlement must be independently supplied and known by now.
+    Imported gross cash flows must match same-order broker observations. This
+    validates their provenance, not the independently supplied settlement cost.
     """
     if not isinstance(receipt, Mapping) or receipt.get("environment") != "demo" or receipt.get("account_scope") != broker.client.credentials.scope():
         raise DemoError("Explicit same-scope VTS fill receipt required")
@@ -444,15 +523,23 @@ def import_demo_fill(broker: KisPaperBroker, receipt: Mapping) -> bool:
         state = broker.db.execute("SELECT * FROM order_state WHERE id=?", (intent_id,)).fetchone()
         if not row or not state:
             raise DemoError("Verified reconciled VTS intent required")
+        checkpoints = _import_cashflow_checkpoints(broker, row, state, receipt, now)
         terms = json.loads(row["terms"])
         if receipt.get("ticker") != terms["ticker"] or receipt.get("side") != terms["side"] or executed < _clock(row["created_at"]) or (terms["side"] == "BUY" and price > terms["limit_price"]) or (terms["side"] == "SELL" and price < terms["limit_price"]):
             raise DemoError("VTS fill conflicts with immutable intent")
         event_id = "fill:demo:" + hashlib.sha256((broker.client.credentials.scope() + ":" + fill_id).encode()).hexdigest()
         previous = broker.db.execute("SELECT event_id FROM lifecycle_events WHERE event_id=?", (event_id,)).fetchone()
-        prior = broker.db.execute("SELECT payload_json FROM lifecycle_events WHERE intent_id=? AND mode='demo' AND kind='FILL'", (intent_id,)).fetchall()
-        already = sum(json.loads(r[0])["quantity"] for r in prior)
+        prior = [json.loads(r[0]) for r in broker.db.execute("SELECT payload_json FROM lifecycle_events WHERE intent_id=? AND mode='demo' AND kind='FILL'", (intent_id,))]
+        already = sum(item["quantity"] for item in prior)
         if not previous and already + quantity > state["filled"]:
             raise DemoError("Incremental fill exceeds broker-observed cumulative fill")
+        imported_quantity = already + (0 if previous else quantity)
+        imported_amount = sum((Decimal(str(item["quantity"])) * Decimal(str(item["price"])) for item in prior), Decimal(0))
+        if not previous:
+            imported_amount += Decimal(quantity) * Decimal(str(price))
+        if not any(executed <= observed and qty == imported_quantity and amount == imported_amount
+                   for observed, _, qty, amount, _, _ in checkpoints):
+            raise DemoError("Imported fill cash flow lacks an equal broker-observed checkpoint")
         broker.db.execute("BEGIN IMMEDIATE")
         try:
             inserted = append_lifecycle_event(broker.db, event_id=event_id, signal_id=row["signal_id"], intent_id=intent_id,

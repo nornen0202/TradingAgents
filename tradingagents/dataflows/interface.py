@@ -34,6 +34,8 @@ from .sec_edgar_statements import (
     get_income_statement as get_sec_income_statement,
 )
 from .integrity import is_historical
+from .daily_history_selection import get_selected_daily_history, select_daily_history
+from .us_daily_history import SOURCE as _US_KIS_DAILY_SOURCE, fallback_enabled as _us_history_enabled
 from .vendor_exceptions import (
     VendorConfigurationError,
     VendorInputError,
@@ -440,6 +442,34 @@ def route_to_vendor(method: str, *args, **kwargs):
         _TOOL_REQUEST_ID.reset(token)
 
 
+def _us_history_request(method: str, args: tuple[Any, ...], kwargs: dict[str, Any]) -> tuple[str, str] | None:
+    if method not in {"get_stock_data", "get_indicators"}:
+        return None
+    symbol = kwargs.get("symbol") or kwargs.get("ticker") or (args[0] if args else None)
+    date_name = "end_date" if method == "get_stock_data" else "curr_date"
+    end_date = kwargs.get(date_name) or (args[2] if len(args) > 2 else None)
+    if not isinstance(symbol, str):
+        return None
+    # Leaf price tools canonicalize accepted whitespace/case; this guard must
+    # use the same identity so an equivalent spelling cannot bypass a pin.
+    from .integrity import safe_symbol
+    symbol = safe_symbol(symbol)
+    if not _us_history_enabled(symbol):
+        return None
+    return symbol, str(end_date)
+
+
+def _assert_history_vendor(request: tuple[str, str], vendor: str) -> None:
+    selected = get_selected_daily_history(*request)
+    if selected is not None:
+        source = selected["source"]
+        expected = "yfinance" if source in {"yfinance", _US_KIS_DAILY_SOURCE} else source
+        if vendor != expected:
+            # Source consistency is a hard request boundary, not a recoverable
+            # vendor error that may continue to a differently adjusted series.
+            raise VendorInputError("Daily history source changed within the same research")
+
+
 def _route_to_vendor(method: str, *args, **kwargs):
     if method not in VENDOR_METHODS:
         raise ValueError(f"Method '{method}' not supported")
@@ -465,6 +495,14 @@ def _route_to_vendor(method: str, *args, **kwargs):
     category = get_category_for_method(method)
     vendor_chain = _normalize_vendor_chain(method, get_vendor(category, method))
     vendor_chain = _prioritize_market_specific_vendors(method, vendor_chain, args, kwargs)
+    history_request = _us_history_request(method, args, kwargs)
+    if history_request is not None:
+        selected = get_selected_daily_history(*history_request)
+        if ((selected and selected["source"] in {"yfinance", _US_KIS_DAILY_SOURCE})
+                or (not selected and vendor_chain[0] == "yfinance")):
+            # This wrapper owns the complete Yahoo -> KIS history recovery.
+            # An outer Alpha Vantage fallback would bypass its series checks.
+            vendor_chain = ["yfinance"]
 
     fallback_notes: list[str] = []
     last_result = None
@@ -474,6 +512,8 @@ def _route_to_vendor(method: str, *args, **kwargs):
         vendor_impl = VENDOR_METHODS[method].get(vendor)
         if vendor_impl is None:
             continue
+        if history_request is not None:
+            _assert_history_vendor(history_request, vendor)
 
         try:
             result = vendor_impl(*args, **kwargs)
@@ -490,6 +530,16 @@ def _route_to_vendor(method: str, *args, **kwargs):
                 fallback_notes.append(note)
                 _emit_vendor_fallback_log(method, note)
                 continue
+            if history_request is not None:
+                _assert_history_vendor(history_request, vendor)
+                selected = get_selected_daily_history(*history_request)
+                if vendor != "yfinance" or selected is None:
+                    try:
+                        select_daily_history(*history_request, source=vendor)
+                    except VendorMalformedResponseError as exc:
+                        # Another tool may have selected a different source
+                        # while this provider request was in flight.
+                        raise VendorInputError("Daily history source changed within the same research") from exc
             _record_tool_telemetry(
                 method=method,
                 vendor=vendor,

@@ -4,6 +4,7 @@ from contextvars import Context, ContextVar, copy_context
 from typing import Any, Dict, Optional
 
 import tradingagents.default_config as default_config
+from .daily_history_selection import activate_daily_history_selection, reset_daily_history_selection
 
 # Use default config but allow it to be overridden
 _config: Optional[Dict] = None
@@ -53,9 +54,11 @@ def run_config(config: Dict):
     Resetting the token also restores the caller's settings after a failed run.
     """
     token = _run_config.set(_deep_merge_dicts(default_config.DEFAULT_CONFIG, config))
+    history_token = activate_daily_history_selection()
     try:
         yield
     finally:
+        reset_daily_history_selection(history_token)
         _run_config.reset(token)
 
 
@@ -63,6 +66,7 @@ def run_config_context(config: Dict) -> Context:
     """Create a private context for a stream that yields back to its caller."""
     context = copy_context()
     context.run(_run_config.set, _deep_merge_dicts(default_config.DEFAULT_CONFIG, config))
+    context.run(activate_daily_history_selection)
     return context
 
 

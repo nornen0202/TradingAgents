@@ -9,7 +9,8 @@ from typing import Annotated
 import os
 from .config import get_config
 from .integrity import safe_symbol, session_date, is_historical
-from .kr_daily_history import validate_with_kr_fallback
+from .daily_history import selected_history, validate_with_fallback
+from .us_daily_history import fallback_enabled as us_fallback_enabled
 
 logger = logging.getLogger(__name__)
 
@@ -104,19 +105,27 @@ def load_ohlcv(symbol: str, curr_date: str) -> pd.DataFrame:
         curr_date_dt < today_date.normalize() - pd.Timedelta(days=1)
         or time.time() - os.path.getmtime(data_file) <= 300
     )
-    if use_cache:
+    pinned = selected_history(symbol, start_str, curr_date)
+    if pinned is not None:
+        data = pinned
+    elif use_cache:
         data = pd.read_csv(data_file, on_bad_lines="skip")
     else:
-        data = yf_retry(lambda: yf.download(
-            symbol,
-            start=start_str,
-            end=end_str,
-            multi_level_index=False,
-            progress=False,
-            auto_adjust=True,
-        ))
+        try:
+            data = yf_retry(lambda: yf.download(
+                symbol,
+                start=start_str,
+                end=end_str,
+                multi_level_index=False,
+                progress=False,
+                auto_adjust=True,
+            ))
+        except Exception:
+            if not us_fallback_enabled(symbol):
+                raise
+            data = pd.DataFrame()
         data = data.reset_index()
-    validated = validate_with_kr_fallback(data, symbol, start_str, curr_date)
+    validated = validate_with_fallback(data, symbol, start_str, curr_date)
     # Validate before admitting a new Yahoo cache. A KIS replacement must never
     # poison a Yahoo-labelled file or mix vendor adjustment bases.
     if not use_cache and not validated.attrs.get("source"):
