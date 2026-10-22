@@ -1,9 +1,9 @@
 {
   "schema": "tradingagents.work-context/v1",
   "surface": "us",
-  "event_id": "us:f512faa06723e2249d01bbc15d3d48a2",
-  "source_sha256": "48c436ced14d5fa7279969a460eeb5f73b8955cd0884451999c05810be642b5f",
-  "packet_sha256": "8113e8daeac4c7657ce4d5fae3ce15d948e5a788bed4ce8dda8fdbe30cd3df2a",
+  "event_id": "us:e68a4815012f3930f3814159d0f6d649",
+  "source_sha256": "9a51bf4997562073c820454ce470f2c75c8d198efef97acb265afa11f13451a9",
+  "packet_sha256": "44df435e7fb326e7e141ffe87dcc8ff11a0d00ca41e5f1332655f73d9005c8c2",
   "prompt_contract_version": "market-work-v13-us",
   "prompt_sha256": "281749b3b871d01531e3ceb7377d60bb67ebcaf89d6d8ba3162cb53d38400d7a",
   "skill_sha256": "4dffe28b3721557cc2517b5afff2f94045832606e71ff61461df969f6abb53c7",
@@ -11,22 +11,22 @@
   "workflow_contract_sha256": "8d06ba979f55f01229636b73bdc643c5b21f326cc270c0e8143f3fd7a3204028",
   "status_url": "https://nornen0202.github.io/TradingAgents/work/v1/us/status.json",
   "latest_url": "https://nornen0202.github.io/TradingAgents/work/v1/us/latest.json",
-  "event_url": "https://nornen0202.github.io/TradingAgents/work/v1/us/events/us-f512faa06723e2249d01bbc15d3d48a2.json",
+  "event_url": "https://nornen0202.github.io/TradingAgents/work/v1/us/events/us-e68a4815012f3930f3814159d0f6d649.json",
   "prompt_url": "https://nornen0202.github.io/TradingAgents/work/v1/prompts/market_us.md",
   "source_health": "STALE",
   "report_mode": "OUTAGE",
   "freshness_receipt": {
     "schema": "tradingagents.source-freshness/v1",
-    "producer_run_id": "20261023T030017_local-scheduler-us-overlay_only",
-    "producer_started_at": "2026-10-23T03:00:17.366869+09:00",
-    "producer_finished_at": "2026-10-23T03:01:06.317127+09:00",
+    "producer_run_id": "20261023T031942_pre-report-us-overlay",
+    "producer_started_at": "2026-10-23T03:19:42.326917+09:00",
+    "producer_finished_at": "2026-10-23T03:20:30.774634+09:00",
     "analysis_run_id": "20261021T175015_local-scheduler-us-full",
     "analysis_lineage_status": "RESOLVED",
     "analysis_completed_at": "2026-10-21T21:13:33.227411+09:00",
     "analysis_trade_date_oldest": "2026-10-20",
     "analysis_trade_date_latest": "2026-10-20",
-    "market_data_oldest_at": "2026-10-22T14:00:00-04:00",
-    "market_data_latest_at": "2026-10-22T14:00:00-04:00",
+    "market_data_oldest_at": "2026-10-22T18:19:07+00:00",
+    "market_data_latest_at": "2026-10-22T18:19:07+00:00",
     "market_data_status": "STALE",
     "publication_does_not_refresh_inputs": true,
     "execution_max_age_seconds": 120.0,
@@ -40,12 +40,6 @@
       },
       {
         "ticker": "DELL",
-        "research_valid": true,
-        "category": "FRESH_REGULAR_SESSION",
-        "execution_eligible": false
-      },
-      {
-        "ticker": "NVDA",
         "research_valid": true,
         "category": "FRESH_REGULAR_SESSION",
         "execution_eligible": false
@@ -112,6 +106,12 @@
       },
       {
         "ticker": "TXN",
+        "research_valid": true,
+        "category": "FRESH_REGULAR_SESSION",
+        "execution_eligible": false
+      },
+      {
+        "ticker": "NVDA",
         "research_valid": true,
         "category": "FRESH_REGULAR_SESSION",
         "execution_eligible": false
