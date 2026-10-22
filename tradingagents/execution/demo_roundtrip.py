@@ -10,12 +10,111 @@ import json
 from pathlib import Path
 import re
 import sqlite3
+from zoneinfo import ZoneInfo
 
 from tradingagents.atomic_io import atomic_write_json, interprocess_file_lock
 from tradingagents.execution import demo_validation as dv
 
 
 MODE = "KIS_DEMO_ROUNDTRIP"
+MAX_LEG_ATTEMPTS = 3
+
+
+def _leg_ids(config, market, side):
+    base = f"{config['campaign_id']}:{market}:{side}"
+    return [base] + [f"{base}:attempt-{n}" for n in range(2, MAX_LEG_ATTEMPTS + 1)]
+
+
+def _check_identities(db, config, market):
+    allowed = {identity for side in ("BUY", "SELL") for identity in _leg_ids(config, market, side)}
+    if any(row[0] not in allowed for row in db.execute("SELECT id FROM paper_intents")):
+        raise ValueError("UNEXPECTED_INTENT")
+    if any(row[0] not in allowed | {"authorization"} for row in db.execute("SELECT key FROM roundtrip_control")):
+        raise ValueError("UNEXPECTED_PREPARATION")
+    if any(row[0] not in allowed | {"cancel:" + identity for identity in allowed} for row in db.execute("SELECT id FROM requests")):
+        raise ValueError("UNEXPECTED_REQUEST")
+    if db.execute("SELECT 1 FROM reconciliation_issues LIMIT 1").fetchone():
+        raise ValueError("UNRESOLVED_ROUNDTRIP_RECONCILIATION")
+
+
+def _leg_identity(db, config, market, side, now):
+    """Advance only past our acknowledged, broker-confirmed zero-fill cancel.
+
+    Original IDs, terms, policy and observations remain immutable. A cancel ACK
+    alone, unknown request or a prepared request gap cannot authorize a successor.
+    """
+    identities = _leg_ids(config, market, side)
+    previous_cancel_at = None
+    for index, identity in enumerate(identities):
+        prepared = db.execute("SELECT value FROM roundtrip_control WHERE key=?", (identity,)).fetchone()
+        state = db.execute("SELECT status,filled,remaining FROM order_state WHERE id=?", (identity,)).fetchone()
+        if prepared and previous_cancel_at is not None:
+            if dv._at(json.loads(prepared[0])["prepared_at"]) < previous_cancel_at:
+                raise ValueError("SUCCESSOR_BEFORE_CONFIRMED_CANCELLATION")
+        if not state or state[0] != "CANCELLED":
+            for later in identities[index + 1:]:
+                if (db.execute("SELECT 1 FROM paper_intents WHERE id=?", (later,)).fetchone()
+                        or db.execute("SELECT 1 FROM roundtrip_control WHERE key=?", (later,)).fetchone()
+                        or db.execute("SELECT 1 FROM requests WHERE id=?", (later,)).fetchone()):
+                    raise ValueError("SUCCESSOR_WITHOUT_TERMINAL_PREDECESSOR")
+            return identity
+        request = db.execute("SELECT status,response,created_at FROM requests WHERE id=?", (identity,)).fetchone()
+        cancel = db.execute("SELECT status,response,created_at FROM requests WHERE id=?", ("cancel:" + identity,)).fetchone()
+        intent = db.execute("SELECT terms FROM paper_intents WHERE id=?", (identity,)).fetchone()
+        if (tuple(state) != ("CANCELLED", 0, 0) or not prepared or not intent or not request or not cancel
+                or request["status"] != "ACKNOWLEDGED" or cancel["status"] != "ACKNOWLEDGED"
+                or not json.loads(cancel["response"]).get("broker_order_id")):
+            raise ValueError("CANCELLATION_NOT_PROVEN")
+        preparation, terms = json.loads(prepared[0]), json.loads(intent[0])
+        _valid_terms(terms, market, side)
+        if (preparation["terms"] != terms
+                or not dv._at(config["authorized_at"]) <= dv._at(preparation["prepared_at"])
+                <= dv._at(request["created_at"]) <= dv._at(cancel["created_at"]) <= now):
+            raise ValueError("IMMUTABLE_TERMS_CONFLICT")
+        broker_id = json.loads(request["response"]).get("broker_order_id")
+        proof_at = None
+        for observation in db.execute("SELECT observed_at,evidence FROM paper_observations WHERE id=? ORDER BY observed_at", (identity,)):
+            evidence = json.loads(observation["evidence"])
+            observed = dv._at(observation["observed_at"])
+            if (broker_id and evidence.get("broker_order_id") == broker_id and evidence.get("mode") == "demo"
+                    and evidence.get("status") == "CANCELLED"
+                    and type(evidence.get("filled_qty")) is int and evidence["filled_qty"] == 0
+                    and type(evidence.get("remaining_qty")) is int and evidence["remaining_qty"] == 0
+                    and dv._at(cancel["created_at"]) <= observed == dv._at(evidence.get("observed_at"))
+                    <= dv._at(evidence.get("ingested_at")) <= now):
+                proof_at = observed
+                break
+        if proof_at is None:
+            raise ValueError("CANCELLATION_WITHOUT_OBSERVATION_EVIDENCE")
+        previous_cancel_at = proof_at
+    raise ValueError("ROUNDTRIP_ATTEMPTS_EXHAUSTED")
+
+
+def _has_daily_capacity(broker, market, side, now):
+    zone = ZoneInfo(dv.MARKETS[market]["zone"])
+    used = sum(1 for row in broker.db.execute("""SELECT p.created_at,r.status FROM paper_intents p
+        LEFT JOIN requests r ON r.id=p.id""")
+        if row["status"] not in {"NOT_SENT", "REJECTED"}
+        and dv._at(row["created_at"]).astimezone(zone).date() == now.astimezone(zone).date())
+    # Reserve a same-day exit before a new BUY. Cancelled submissions still count
+    # against the original immutable policy, exactly as the guarded broker does.
+    return used + (2 if side == "BUY" else 1) <= broker.policy.max_daily_orders
+
+
+def _limit_price(market, side, quote):
+    tick = Decimal("5") if market == "KR" else Decimal("0.01")
+    if market == "KR" and quote.get("quote_basis") == "BAR_ONLY":
+        # A completed minute bar is dated but may trail a moving market. A fixed
+        # 50 bps validation collar remains inside the broker's existing 100 bps
+        # limit; it is a price limit, never an invented bid/ask or fill price.
+        factor = Decimal("1.005") if side == "BUY" else Decimal("0.995")
+        anchor = Decimal(str(quote["last_price"])) * factor
+        rounding = ROUND_DOWN if side == "BUY" else ROUND_UP
+    else:
+        anchor = Decimal(str(quote.get("ask", quote["last_price"] + float(tick)) if side == "BUY"
+                             else quote.get("bid", quote["last_price"] - float(tick))))
+        rounding = ROUND_UP if side == "BUY" else ROUND_DOWN
+    return (anchor / tick).to_integral_value(rounding=rounding) * tick
 
 
 def _valid_terms(terms, market, side):
@@ -37,12 +136,10 @@ def _completed(path, market, config, now):
         authorization = db.execute("SELECT value FROM roundtrip_control WHERE key='authorization'").fetchone()
         if not authorization or json.loads(authorization[0]) != config:
             raise ValueError("AUTHORIZATION_CHANGED")
-        identities = {f"{config['campaign_id']}:{market}:{side}" for side in ("BUY", "SELL")}
-        if any(row[0] not in identities for row in db.execute("SELECT id FROM paper_intents")):
-            raise ValueError("UNEXPECTED_INTENT")
+        _check_identities(db, config, market)
         legs = []
         for side in ("BUY", "SELL"):
-            identity = f"{config['campaign_id']}:{market}:{side}"
+            identity = _leg_identity(db, config, market, side, now)
             state = db.execute("SELECT status,filled,remaining FROM order_state WHERE id=?", (identity,)).fetchone()
             if not state or tuple(state) != ("FILLED", 1, 0):
                 return None
@@ -70,7 +167,8 @@ def _completed(path, market, config, now):
                     break
             if proof is None:
                 raise ValueError("FILL_WITHOUT_OBSERVATION_EVIDENCE")
-            if legs and dv._at(preparation["prepared_at"]) < dv._at(legs[0]["observed_at"]):
+            first_preparation = db.execute("SELECT value FROM roundtrip_control WHERE key=?", (_leg_ids(config, market, side)[0],)).fetchone()
+            if legs and dv._at(json.loads(first_preparation[0])["prepared_at"]) < dv._at(legs[0]["observed_at"]):
                 raise ValueError("SELL_BEFORE_BUY_FILL")
             legs.append(proof)
         return {"status": "VERIFIED", "legs": legs, "strategy_performance": False}
@@ -111,11 +209,9 @@ def _advance(market, root, config, clock, factory, quote_loader, account_loader,
         if db.execute("SELECT value FROM roundtrip_control WHERE key='authorization'").fetchone()[0] != authority:
             raise ValueError("AUTHORIZATION_CHANGED")
         legs = []
-        ids = {side: f"{config['campaign_id']}:{market}:{side}" for side in ("BUY", "SELL")}
-        if any(row[0] not in set(ids.values()) for row in db.execute("SELECT id FROM paper_intents")):
-            raise ValueError("UNEXPECTED_INTENT")
+        _check_identities(db, config, market)
         for side in ("BUY", "SELL"):
-            identity = ids[side]
+            identity = _leg_identity(db, config, market, side, dv._at(clock()))
             prepared = db.execute("SELECT value FROM roundtrip_control WHERE key=?", (identity,)).fetchone()
             request = db.execute("SELECT status FROM requests WHERE id=?", (identity,)).fetchone()
             intent = db.execute("SELECT terms FROM paper_intents WHERE id=?", (identity,)).fetchone()
@@ -144,13 +240,15 @@ def _advance(market, root, config, clock, factory, quote_loader, account_loader,
                         if not db.execute("SELECT 1 FROM requests WHERE id=?", ("cancel:"+identity,)).fetchone():
                             broker.cancel(intent_id=identity)
                     return {"status": "RUNNING", "legs": legs}
+                if report.get("status") == "CANCELLED":
+                    return {"status": "RUNNING", "blocker": "AWAITING_NEXT_ALLOWED_ATTEMPT", "legs": legs}
                 return {"status": "ATTENTION", "blocker": "ORDER_REPORT_" + str(report.get("status")), "legs": legs}
             if (root / "HALT").exists():
                 return {"status": "BLOCKED", "blocker": "HALTED", "legs": legs}
+            if not _has_daily_capacity(broker, market, side, dv._at(clock())):
+                return {"status": "WAITING_POLICY_CAPACITY", "blocker": "DAILY_ORDER_CAPACITY_RESERVED_FOR_EXIT", "legs": legs}
             quote = quote_loader(market, clock)
-            tick = Decimal("5") if market == "KR" else Decimal("0.01")
-            anchor = quote.get("ask", quote["last_price"] + float(tick)) if side == "BUY" else quote.get("bid", quote["last_price"] - float(tick))
-            price = (Decimal(str(anchor)) / tick).to_integral_value(rounding=ROUND_UP if side == "BUY" else ROUND_DOWN) * tick
+            price = _limit_price(market, side, quote)
             if not 0 < price <= dv.MARKETS[market]["cap"]:
                 raise ValueError("PRICE_OUTSIDE_VALIDATION_CAP")
             terms = {"ticker": dv.MARKETS[market]["ticker"], "side": side, "quantity": 1,
@@ -170,7 +268,8 @@ def _advance(market, root, config, clock, factory, quote_loader, account_loader,
                       "execution_ready": True, "available_at": at.isoformat(),
                       "valid_until": min(at+timedelta(seconds=60), dv._at(config["expires_at"])).isoformat(),
                       "purpose": "USER_AUTHORIZED_VTS_ROUNDTRIP_VALIDATION"}
-            db.execute("INSERT INTO roundtrip_control VALUES (?,?)", (identity, json.dumps({"terms": terms, "prepared_at": at.isoformat()})))
+            db.execute("INSERT INTO roundtrip_control VALUES (?,?)", (identity, json.dumps({"terms": terms, "prepared_at": at.isoformat(),
+                "quote_evidence": {key: quote.get(key) for key in ("price_basis", "quote_basis", "last_price", "observed_at", "ingested_at")}})))
             response = broker.submit(intent_id=identity, **terms, signal=signal, quote=quote, account=account)
             return {"status": "RUNNING" if response.get("status") == "ACKNOWLEDGED" else "ATTENTION",
                     "submitted_side": side, "submission_status": response.get("status"), "legs": legs}
