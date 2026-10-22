@@ -1,6 +1,7 @@
 """Read-only evaluation of proven strategy cash flows, never trading authority.
 
-The caller supplies one latest cumulative observation per strategy intent.
+The caller supplies one latest cumulative observation per strategy intent and
+may attach verified availability of its current consecutive economic state.
 Sensitivity costs are explicit assumptions on observed turnover, not broker fees
 or a claim that taxes, FX, financing and model costs have been measured.
 """
@@ -47,6 +48,7 @@ def evaluate_strategy_orders(orders, *, market, as_of, gross_pnl, valuation_comp
     now = _at(as_of)
     currency, zone = ("KRW", "Asia/Seoul") if market == "KR" else ("USD", "America/New_York")
     identities, validated, sessions = set(), [], set()
+    availability, first_observations = {}, {}
     pending = False
     for order in orders:
         identity = order.get("id")
@@ -74,6 +76,21 @@ def evaluate_strategy_orders(orders, *, market, as_of, gross_pnl, valuation_comp
         amount = None if order.get("fill_notional") is None else _amount(order["fill_notional"])
         if amount == 0:
             raise ValueError("EVALUATION_FILL_AMOUNT_INVALID")
+        available, proof_observed = ingested, observed
+        if "fill_availability" in order:
+            proof = order["fill_availability"]
+            if (not isinstance(proof, dict) or proof.get("source") != "KIS_DEMO_BROKER_REPORT"
+                    or type(proof.get("filled_quantity")) is not int or proof["filled_quantity"] != quantity
+                    or "fill_notional" not in proof
+                    or (None if proof["fill_notional"] is None else _amount(proof["fill_notional"])) != amount):
+                raise ValueError("EVALUATION_FILL_AVAILABILITY_INVALID")
+            proof_observed, available = _at(proof.get("observed_at")), _at(proof.get("ingested_at"))
+            if not (prepared <= proof_observed <= observed and proof_observed <= available <= ingested):
+                raise ValueError("EVALUATION_FILL_AVAILABILITY_CLOCK_INVALID")
+        first_observed = _at(order["first_fill_observed_at"]) if "first_fill_observed_at" in order else proof_observed
+        if not prepared <= first_observed <= proof_observed:
+            raise ValueError("EVALUATION_FIRST_FILL_CLOCK_INVALID")
+        availability[identity], first_observations[identity] = available, first_observed
         validated.append((prepared, identity, order, amount))
         # This is the session in which the original order was submitted; exact
         # execution times are not available from the cumulative order report.
@@ -89,7 +106,7 @@ def evaluate_strategy_orders(orders, *, market, as_of, gross_pnl, valuation_comp
         # must have been ingested before the successor order was prepared.
         if ticker in last_available and prepared < last_available[ticker]:
             sequence_known = False
-        last_available[ticker] = _at(order["ingested_at"])
+        last_available[ticker] = availability[order["id"]]
         holdings[ticker] = holdings.get(ticker, 0) + (quantity if side == "BUY" else -quantity)
         if holdings[ticker] < 0:
             raise ValueError("EVALUATION_UNOWNED_SELL")
@@ -148,7 +165,9 @@ def evaluate_strategy_orders(orders, *, market, as_of, gross_pnl, valuation_comp
                        "sell_filled_quantity": sum(o["filled_quantity"] for o in sells),
                        "closed_inventory_episodes": closed if sequence_known else None,
                        "order_session_count": len(sessions), "order_sessions": sorted(sessions),
-                       "first_observed_at": min((o["observed_at"] for _, _, o, _ in validated), key=_at, default=None),
+                       # First positive cumulative report, not exact execution
+                       # time; legacy callers only supply their latest report.
+                       "first_observed_at": min(first_observations.values()).isoformat() if first_observations else None,
                        "last_observed_at": max((o["observed_at"] for _, _, o, _ in validated), key=_at, default=None)},
             "open_positions": {ticker: quantity for ticker, quantity in holdings.items() if quantity},
             "turnover": round(float(turnover), 4) if turnover is not None else None,
