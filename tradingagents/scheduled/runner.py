@@ -4088,7 +4088,7 @@ def _bootstrap_overlay_inputs_from_latest_run(
         # Searching the entire archive once per ticker for optional historical
         # fields can take minutes in production and starve the next refresh.
         # Failure of the new fetch must stay unavailable, not borrow old data.
-        if not config.execution.execution_lightweight_refresh:
+        if not config.execution.execution_lightweight_refresh and not preserve_thesis_bytes:
             copied_source_artifacts.update(
                 _copy_latest_microstructure_artifacts(
                     archive_dir=config.storage.archive_dir,

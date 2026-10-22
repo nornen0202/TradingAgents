@@ -16,6 +16,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 import mobile_layout_regression as layout
 from tradingagents.charting.server import make_handler
 from tradingagents.execution.experiments import ExperimentRegistry
+from tradingagents.execution.strategy_evaluation import evaluate_strategy_orders
 
 OUTPUT = None
 EMPTY_PAGE_URL = None
@@ -70,6 +71,12 @@ def fixture(root):
         "schema": "tradingagents.kis-strategy-runtime/v1", "mode": "KIS_DEMO_STRATEGY", "enabled": True,
         "real_orders_enabled": False, "checked_at": "2026-10-16T11:00:00Z", "markets": {
             "KR": {"status": "ACTIVE", "checked_at": "2026-10-16T11:00:00Z", "gate_passed": True,
+                "evaluation": evaluate_strategy_orders([{"id": "fixture-buy", "ticker": "005930.KS", "side": "BUY",
+                    "quantity": 1, "filled_quantity": 1, "fill_notional": 69900, "status": "FILLED", "mode": "demo",
+                    "source": "KIS_DEMO_BROKER_REPORT", "strategy_performance": True,
+                    "prepared_at": "2026-10-16T10:59:00Z", "observed_at": "2026-10-16T10:59:10Z",
+                    "ingested_at": "2026-10-16T10:59:10Z"}], market="KR", as_of="2026-10-16T11:00:00Z",
+                    gross_pnl=100, valuation_complete=True),
                 "orders": [{"ticker": "005930.KS", "run_id": "fixture-strategy", "side": "BUY", "quantity": 1,
                     "filled_quantity": 1, "limit_price": 70000, "average_fill_price": 69900, "status": "FILLED",
                     "prepared_at": "2026-10-16T10:59:00Z", "observed_at": "2026-10-16T10:59:10Z", "broker_order_id": "PRIVATE_DO_NOT_DISPLAY"}],
@@ -113,6 +120,7 @@ async def probe(websocket_url, page_url):
               if (document.body.textContent.includes('PRIVATE_DO_NOT_DISPLAY')) throw Error('Private metadata leaked');
               const strategy=document.querySelector('#kis-strategy-health').textContent;
               if (!strategy.includes('fixture-strategy') || !strategy.includes('체결 완료') || !strategy.includes('100 KRW') || !strategy.includes('정규장 검증 통과 대기') || !strategy.includes('순손익은 표시하지 않습니다')) throw Error('KIS strategy execution/performance missing');
+              if (!strategy.includes('가정 비용 민감도 · 실제 순손익 아님') || !strategy.includes('실투자 판단 미충족') || !strategy.includes('30 KRW') || !strategy.includes('실투자로 자동 전환하지 않습니다')) throw Error('Cost assumptions or readiness boundary missing');
               if (!document.querySelector('#experiment-cards').textContent.includes('paired-test')) throw Error('Experiment card absent');
               if (!document.querySelector('#experiment-cards').textContent.includes('수익률·낙폭을 표시하지 않습니다')) throw Error('Unobserved performance fabricated');
               if (document.documentElement.scrollWidth > innerWidth+2) throw Error('Viewport overflow');
@@ -134,6 +142,9 @@ async def probe(websocket_url, page_url):
                 await evaluate("document.querySelector('#kis-validation-health').scrollIntoView({block:'start'})")
                 shot = await call("Page.captureScreenshot", {"format": "png", "captureBeyondViewport": False})
                 (OUTPUT / f"kis-validation-{width}.png").write_bytes(base64.b64decode(shot["data"]))
+                await evaluate("document.querySelector('#kis-strategy-health').scrollIntoView({block:'start'})")
+                shot = await call("Page.captureScreenshot", {"format": "png", "captureBeyondViewport": False})
+                (OUTPUT / f"kis-strategy-costs-{width}.png").write_bytes(base64.b64decode(shot["data"]))
             await evaluate("document.querySelector('#asof').value='2026-10-16T08:00:00Z'; loadSnapshot()")
             await evaluate('''(() => {
               if (window.reviewSnapshot?.series.length || window.reviewSnapshot?.execution_verdict) throw Error('Future data in replay');

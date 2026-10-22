@@ -277,6 +277,111 @@ def now_utc():
     return datetime.now(timezone.utc)
 
 
+def _strategy_evaluation_view(raw, market, observed):
+    """Expose a bounded, dated evaluation; assumptions cannot become actual costs."""
+    import math
+    from decimal import Decimal, ROUND_CEILING
+    if not isinstance(raw, dict):
+        return None
+    known = instant(raw.get("analysis_as_of"))
+    currency = "KRW" if market == "KR" else "USD"
+    if (raw.get("schema") != "tradingagents.strategy-evaluation/v1"
+            or raw.get("scope") != "NORMAL_STRATEGY_ONLY" or raw.get("market") != market
+            or raw.get("currency") != currency or known is None or known > observed
+            or raw.get("status") not in {"NO_FILLS", "AVAILABLE_GROSS_ONLY", "INCOMPLETE"}
+            or raw.get("real_orders_enabled") is not False or raw.get("automatic_live_transition") is not False):
+        return None
+    sample = raw.get("sample")
+    if not isinstance(sample, dict):
+        return None
+    counts = {key: sample.get(key) for key in ("filled_order_count", "buy_filled_orders", "sell_filled_orders",
+              "buy_filled_quantity", "sell_filled_quantity", "order_session_count")}
+    if any(type(value) is not int or value < 0 for value in counts.values()):
+        return None
+    if counts["filled_order_count"] != counts["buy_filled_orders"] + counts["sell_filled_orders"]:
+        return None
+    if (counts["buy_filled_quantity"] < counts["buy_filled_orders"]
+            or counts["sell_filled_quantity"] < counts["sell_filled_orders"]
+            or counts["sell_filled_quantity"] > counts["buy_filled_quantity"]
+            or not 0 <= counts["order_session_count"] <= counts["filled_order_count"]
+            or any(counts[f"{side}_filled_quantity"] and not counts[f"{side}_filled_orders"] for side in ("buy", "sell"))):
+        return None
+    closed = sample.get("closed_inventory_episodes")
+    if closed is not None and (type(closed) is not int or not 0 <= closed <= min(counts["buy_filled_orders"], counts["sell_filled_orders"])):
+        return None
+    first, last = instant(sample.get("first_observed_at")), instant(sample.get("last_observed_at"))
+    if counts["filled_order_count"]:
+        if first is None or last is None or not first <= last <= known or raw["status"] == "NO_FILLS":
+            return None
+    elif sample.get("first_observed_at") is not None or sample.get("last_observed_at") is not None or raw["status"] != "NO_FILLS":
+        return None
+    def number(value):
+        return value if not isinstance(value, bool) and isinstance(value, (int, float)) and math.isfinite(value) else None
+    turnover, gross, realized = (number(raw.get(key)) for key in ("turnover", "gross_pnl", "realized_gross_pnl"))
+    if turnover is not None and turnover < 0:
+        return None
+    if (counts["filled_order_count"] and turnover == 0
+            or not counts["filled_order_count"] and (gross is not None or realized is not None or turnover not in {None, 0})):
+        return None
+    if raw["status"] != "AVAILABLE_GROSS_ONLY":
+        gross = None
+    elif gross is None:
+        return None
+    if (raw.get("realized_basis") != "FULLY_CLOSED_STRATEGY_CASHFLOWS" or not closed
+            or counts["buy_filled_quantity"] != counts["sell_filled_quantity"]):
+        realized = None
+    sensitivity = raw.get("cost_sensitivity")
+    if (not isinstance(sensitivity, dict) or sensitivity.get("basis") != "ASSUMPTION_ONLY_NOT_BROKER_COSTS"
+            or sensitivity.get("applies_to") != "OBSERVED_BUY_PLUS_SELL_NOTIONAL"
+            or sensitivity.get("includes_future_exit_cost") is not False):
+        return None
+    scenarios = sensitivity.get("scenarios")
+    if not isinstance(scenarios, list) or len(scenarios) != 3:
+        return None
+    projected = []
+    for bps, scenario in zip((10, 30, 50), scenarios):
+        if not isinstance(scenario, dict) or scenario.get("assumed_cost_bps_on_turnover") != bps:
+            return None
+        cost = number(scenario.get("estimated_cost"))
+        pnl = number(scenario.get("estimated_pnl_after_assumed_cost"))
+        expected = float((Decimal(str(turnover)) * bps / 10000).quantize(
+            Decimal("1") if market == "KR" else Decimal("0.01"), rounding=ROUND_CEILING)) if turnover is not None and counts["filled_order_count"] else None
+        if cost != expected or (pnl is None) != (gross is None or cost is None):
+            return None
+        if pnl is not None and abs(pnl - (gross - cost)) > .00011:
+            return None
+        projected.append({"assumed_cost_bps_on_turnover": bps, "estimated_cost": cost,
+                          "estimated_pnl_after_assumed_cost": pnl})
+    allowed = {"ACTUAL_FEES_TAXES_FX_UNVERIFIED", "SETTLEMENT_UNVERIFIED", "BROKER_CORRECTIONS_UNVERIFIED",
+               "STATISTICAL_AND_OUT_OF_SAMPLE_VALIDATION_REQUIRED", "NO_STRATEGY_FILLS", "STRATEGY_BUY_FILL_REQUIRED",
+               "STRATEGY_SELL_FILL_REQUIRED", "CLOSED_STRATEGY_ROUND_TRIP_UNVERIFIED", "FILL_NOTIONAL_UNVERIFIED",
+               "GROSS_VALUATION_INCOMPLETE", "OPEN_STRATEGY_INVENTORY", "ORDER_PENDING_OR_UNRESOLVED"}
+    unmet = raw.get("unmet_criteria")
+    if not isinstance(unmet, list) or not all(isinstance(value, str) and value in allowed for value in unmet):
+        return None
+    required = {"ACTUAL_FEES_TAXES_FX_UNVERIFIED", "SETTLEMENT_UNVERIFIED", "BROKER_CORRECTIONS_UNVERIFIED",
+                "STATISTICAL_AND_OUT_OF_SAMPLE_VALIDATION_REQUIRED"}
+    if not counts["filled_order_count"]:
+        required.add("NO_STRATEGY_FILLS")
+    for side in ("buy", "sell"):
+        if not counts[f"{side}_filled_orders"]:
+            required.add(f"STRATEGY_{side.upper()}_FILL_REQUIRED")
+    if not closed:
+        required.add("CLOSED_STRATEGY_ROUND_TRIP_UNVERIFIED")
+    if counts["buy_filled_quantity"] > counts["sell_filled_quantity"]:
+        required.add("OPEN_STRATEGY_INVENTORY")
+    if not required <= set(unmet):
+        return None
+    return {"status": raw["status"], "currency": currency, "analysis_as_of": known.isoformat(),
+            "sample": {**counts, "closed_inventory_episodes": closed}, "turnover": turnover,
+            "gross_pnl": gross, "realized_gross_pnl": realized,
+            "net_pnl": None, "actual_cost": None, "fees_known": False, "settlement_known": False,
+            "cost_sensitivity": {"basis": "ASSUMPTION_ONLY_NOT_BROKER_COSTS", "scenarios": projected,
+                                 "includes_future_exit_cost": False},
+            "unmet_criteria": list(dict.fromkeys(unmet)), "readiness": "NOT_READY_FOR_REAL_INVESTMENT",
+            "real_orders_enabled": False, "automatic_live_transition": False}
+
+
 def kis_strategy_health(archive_dir, *, analysis_as_of):
     """Fixed local projection; no account balances, secrets or broker IDs."""
     import math
@@ -343,6 +448,7 @@ def kis_strategy_health(archive_dir, *, analysis_as_of):
                     "net_pnl": None, "fees_known": False, "settlement_known": False}
             return None
         view["performance"] = performance_view(row.get("performance"))
+        view["evaluation"] = _strategy_evaluation_view(row.get("evaluation"), market, observed)
         for perf in (row.get("performance_history") if isinstance(row.get("performance_history"), list) else [])[-60:]:
             projected = performance_view(perf)
             if projected is not None and projected["status"] == "AVAILABLE":

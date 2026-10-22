@@ -5,7 +5,7 @@ failed/interrupted attempts in the budget. No broker client, order, approval
 rewrite or model retry until a desired direction appears exists in this lane.
 """
 from dataclasses import replace
-from datetime import datetime, time, timezone
+from datetime import datetime, time, timedelta, timezone
 import math
 import os
 from pathlib import Path
@@ -15,11 +15,41 @@ from tradingagents.atomic_io import atomic_write_json
 from tradingagents.charting.bars import instant
 from tradingagents.dataflows.research_evidence import assess_tool_evidence, evidence_review_reason
 from tradingagents.scheduled.research_refresh import artifact, make_plan, rows_by_ticker, MAX_TARGETS
+from tradingagents.schemas import parse_structured_decision
 from .paper_runtime import _latest_source, _read, _runtime_session
 
 SLOTS = {"KR": (time(10, 10), time(13, 10)), "US": (time(10), time(13))}
 ZONES = {"KR": "Asia/Seoul", "US": "America/New_York"}
 MAX_ADMISSION_MINUTES = 30
+
+
+def current_entry_authorization(analysis, now, *, ticker=None):
+    """Use the same canonical schema and research lifetime as the order planner.
+
+    Legacy/invalid decisions need research; they never become an approval here.
+    The public analysis stores its structured decision as JSON text.
+    """
+    now = instant(now)
+    if (not isinstance(analysis, dict) or analysis.get("status") != "success"
+            or not isinstance(analysis.get("ticker"), str) or not analysis["ticker"].strip()
+            or (ticker is not None and analysis["ticker"] != ticker)):
+        return False
+    started, finished = instant(analysis.get("started_at")), instant(analysis.get("finished_at"))
+    if now is None or started is None or finished is None or not started <= finished <= now:
+        return False
+    try:
+        decision = parse_structured_decision(analysis.get("decision"))
+    except (TypeError, ValueError, AttributeError):
+        return False
+    # The order planner requires original company news and actual tool use for
+    # a new entry. An unusable approval must remain eligible for fresh research.
+    if (decision.data_coverage.company_news_count < 1
+            or "no_tool_calls_detected" in (analysis.get("quality_flags") or [])):
+        return False
+    if decision.conditional_entry_action.value in {"STARTER", "ADD"}:
+        expires = instant(decision.conditional_entry_valid_until)
+        return expires is not None and now < expires
+    return decision.entry_action.value in {"STARTER", "ADD"} and now - finished < timedelta(hours=24)
 
 
 def research_lane_enabled(state):
@@ -60,19 +90,19 @@ def select_targets(source_dir, source, observation_dir, *, market, now, allowed,
                 or not math.isfinite(price) or not 0 < price <= cap):
             continue
         analysis = _read(artifact(source_dir, rows[ticker], "analysis_json"))
-        decision = analysis.get("decision") or {}
-        if not isinstance(decision, dict):
-            continue
-        entry = decision.get("entry_action")
-        conditional = decision.get("conditional_entry_action")
+        if not isinstance(analysis, dict):
+            analysis = {}
         telemetry = analysis.get("tool_telemetry") or {}
+        if not isinstance(telemetry, dict):
+            telemetry = {"request_schema": "unverified"}
         health = {"fallback_count": telemetry.get("fallback_count", 0)}
         evidence = assess_tool_evidence(telemetry, started_at=analysis.get("started_at"), finished_at=analysis.get("finished_at"))
         if evidence is not None:
             health["request_evidence"] = evidence
         # Existing executable approvals proceed in the minute lane immediately.
         # This research worker only revisits unapproved/reviewed original theses.
-        if (entry in {"STARTER", "ADD"} or conditional in {"STARTER", "ADD"}) and not evidence_review_reason(health):
+        invalidated = (row.get("raw_codes") or {}).get("decision_state") == "INVALIDATED"
+        if current_entry_authorization(analysis, now, ticker=ticker) and not evidence_review_reason(health) and not invalidated:
             continue
         confidence = row.get("confidence")
         score = float(confidence) if isinstance(confidence, (int, float)) and math.isfinite(confidence) else 0

@@ -9,8 +9,22 @@ from tradingagents.atomic_io import atomic_write_json
 from tradingagents.scheduled import runner
 from tradingagents.scheduled import research_refresh as refresh
 from tradingagents.scheduled.config import load_scheduled_config
+from tradingagents.schemas import parse_structured_decision
 
 NOW = datetime.now(timezone.utc) - timedelta(hours=1)
+
+
+def encoded_decision(**changes):
+    data = {"rating": "HOLD", "portfolio_stance": "NEUTRAL", "entry_action": "WAIT",
+            "conditional_entry_action": "NONE", "risk_action": "HOLD", "confidence": .6,
+            "time_horizon": "medium", "entry_logic": "Wait for verified entry conditions.",
+            "exit_logic": "Follow a verified risk exit.", "position_sizing": "One demo share within original limits.",
+            "risk_limits": "Keep the existing risk limits.", "catalysts": [], "invalidators": []}
+    data.update(changes)
+    # Production _select_public_decision returns this JSON text, not a mapping.
+    result = json.dumps(data)
+    parse_structured_decision(result)
+    return result
 
 
 def cohort(root, identity="20261022T120000-full", *, mode="full", parent=None, start=None):
@@ -21,7 +35,7 @@ def cohort(root, identity="20261022T120000-full", *, mode="full", parent=None, s
         base = directory / "tickers" / ticker
         analysis = {"ticker": ticker, "status": "success", "trade_date": "2026-10-21", "analysis_date": "2026-10-22",
                     "started_at": start.isoformat(), "finished_at": (start + timedelta(minutes=1)).isoformat(),
-                    "decision": {"entry_action": "WAIT", "conditional_entry_action": "NONE"},
+                    "decision": encoded_decision(),
                     "tool_telemetry": {"fallback_count": 8}}
         atomic_write_json(base / "analysis.json", analysis)
         atomic_write_json(base / "execution_contract.json", {"ticker": ticker, "analysis_asof": analysis["finished_at"],
@@ -141,7 +155,9 @@ def test_changed_original_after_request_cannot_be_reinterpreted_as_recovery(tmp_
     plan = refresh.make_plan(tmp_path, full, ["AAPL"], now=NOW, reasons=["refresh"])
     path = directory / "tickers/AMD/analysis.json"
     data = json.loads(path.read_text())
-    data["decision"]["entry_action"] = "STARTER"
+    decision = json.loads(data["decision"])
+    decision["entry_action"] = "STARTER"
+    data["decision"] = json.dumps(decision)
     atomic_write_json(path, data)
     with pytest.raises(ValueError, match="pinned source"):
         refresh.load_plan_source(tmp_path, plan, now=NOW)
@@ -181,7 +197,8 @@ enabled = false
     monkeypatch.setattr(runner, "_run_single_ticker", research)
     def forbidden(*a, **k):
         raise AssertionError("No universe discovery, price/order worker, portfolio model or duplicate news collection")
-    for name in ("_resolve_run_ticker_universe", "collect_event_news", "_run_execution_overlay_passes", "run_portfolio_pipeline"):
+    for name in ("_resolve_run_ticker_universe", "collect_event_news", "_run_execution_overlay_passes",
+                 "run_portfolio_pipeline", "_copy_latest_microstructure_artifacts"):
         monkeypatch.setattr(runner, name, forbidden)
     config = load_scheduled_config(config_path)
     result = runner.execute_scheduled_run(config, run_label="local-thesis-refresh-us", skip_site_build=True,
@@ -195,4 +212,4 @@ enabled = false
     target = refresh.manifest_path(tmp_path, result["run_id"]).parent
     for ticker in ("AMD", "MSFT"):
         assert (target / "tickers" / ticker / "analysis.json").read_bytes() == (directory / "tickers" / ticker / "analysis.json").read_bytes()
-    assert json.loads((target / "tickers/AAPL/analysis.json").read_text())["decision"]["entry_action"] == "WAIT"
+    assert parse_structured_decision(json.loads((target / "tickers/AAPL/analysis.json").read_text())["decision"]).entry_action.value == "WAIT"
