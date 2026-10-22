@@ -11,6 +11,7 @@ from contextlib import contextmanager
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal, ROUND_DOWN, ROUND_UP
 import hashlib
+import heapq
 import json
 import math
 from pathlib import Path
@@ -236,8 +237,36 @@ def verify_owned(account, owned, market, scope, now):
         raise ValueError("STRATEGY_ACCOUNT_POSITION_MISMATCH")
 
 
+def _performance_history(db, now):
+    """Return the latest 60 dated valuations available at this aware cutoff.
+
+    Stream clock keys only. Future/undated rows do not consume the limit, and
+    payloads are decoded only after selecting the bounded UTC-ordered window.
+    This display projection never changes stored valuations or order evidence.
+    """
+    cutoff, selected = at(now), []
+    for row in db.execute("SELECT observed_at FROM strategy_valuations"):
+        try:
+            observed = at(row[0])
+        except (TypeError, ValueError):
+            continue
+        if observed <= cutoff:
+            item = (observed, row[0])
+            if len(selected) < 60:
+                heapq.heappush(selected, item)
+            else:
+                heapq.heappushpop(selected, item)
+    return [json.loads(db.execute("SELECT payload FROM strategy_valuations WHERE observed_at=?", (key,)).fetchone()[0])
+            for _, key in sorted(selected)]
+
+
 def summary(db, now, market, marks=None):
-    """Read cumulative observations once per intent; partial fills never double count."""
+    """Read cumulative observations once per intent; partial fills never double count.
+
+    Latest report clocks remain freshness evidence. Availability refers to one
+    verified report of the current consecutive quantity/notional state, never
+    an earlier partial fill or a broker execution timestamp.
+    """
     marks = marks or {}
     orders, owned, buy, sell, complete = [], {}, 0.0, 0.0, True
     for row in db.execute("SELECT * FROM strategy_attempts ORDER BY prepared_at,id"):
@@ -250,18 +279,22 @@ def summary(db, now, market, marks=None):
             raise ValueError("STRATEGY_BROKER_TERMS_MISMATCH")
         status = request[0] if request else row["state"]
         evidence, observed, last_qty, last_amount, last_amount_qty = {}, None, 0, 0, 0
-        for item in db.execute("SELECT observed_at,evidence FROM paper_observations WHERE id=? ORDER BY observed_at", (row["id"],)):
-            observed_at = at(item[0])
+        economic_state, available_pair, first_fill = None, None, None
+        observations = [(at(item[0]), json.loads(item[1])) for item in db.execute(
+            "SELECT observed_at,evidence FROM paper_observations WHERE id=?", (row["id"],))]
+        observations.sort(key=lambda item: (item[0], at(item[1].get("ingested_at"))))
+        for observed_at, current in observations:
             if not at(row["prepared_at"]) <= observed_at <= now:
                 raise ValueError("INVALID_STRATEGY_OBSERVATION_CLOCK")
-            current = json.loads(item[1])
+            ingested_at = at(current.get("ingested_at"))
             broker_id = json.loads(request["response"]).get("broker_order_id") if request else None
             if (not request or request["status"] != "ACKNOWLEDGED" or not broker_id
                     or current.get("broker_order_id") != broker_id or current.get("mode") != "demo"
+                    or current.get("source", "KIS_DEMO_BROKER_REPORT") != "KIS_DEMO_BROKER_REPORT"
                     or current.get("live_orders_enabled") is True
                     or not at(row["prepared_at"]) <= at(request["created_at"]) <= observed_at
                     or observed_at != at(current.get("observed_at"))
-                    or not observed_at <= at(current.get("ingested_at")) <= now):
+                    or not observed_at <= ingested_at <= now):
                 raise ValueError("INVALID_STRATEGY_OBSERVATION_PROOF")
             qty, amount = current.get("filled_qty"), current.get("fill_notional")
             if type(qty) is not int or qty < last_qty or qty > terms["quantity"]:
@@ -280,6 +313,18 @@ def summary(db, now, market, marks=None):
                 raise ValueError("INVALID_STRATEGY_CASHFLOW")
             if amount is not None:
                 last_amount, last_amount_qty = amount, qty
+            state = (qty, None if amount is None else Decimal(str(amount)))
+            if observed == observed_at and state != economic_state:
+                raise ValueError("AMBIGUOUS_STRATEGY_OBSERVATION_STATE")
+            if state != economic_state:
+                # Reset even for known -> missing -> known: the later proof
+                # cannot borrow availability across a different economic state.
+                available_pair = (observed_at, ingested_at)
+            elif ingested_at < available_pair[1]:
+                available_pair = (observed_at, ingested_at)
+            economic_state = state
+            if qty and first_fill is None:
+                first_fill = observed_at
             last_qty = qty
             evidence, observed = current, observed_at
         filled, amount = evidence.get("filled_qty", 0), evidence.get("fill_notional", 0 if not evidence else None)
@@ -301,7 +346,11 @@ def summary(db, now, market, marks=None):
             "source": "KIS_DEMO_BROKER_REPORT" if evidence else None,
             "status": status, "cancel_status": "CONFIRMED" if status == "CANCELLED" else cancellation[0] if cancellation else None,
             "prepared_at": row["prepared_at"], "observed_at": observed.isoformat() if observed else None,
-            "ingested_at": evidence.get("ingested_at")})
+            "ingested_at": evidence.get("ingested_at"),
+            "first_fill_observed_at": first_fill.isoformat() if first_fill else None,
+            "fill_availability": {"source": "KIS_DEMO_BROKER_REPORT", "filled_quantity": filled,
+                                  "fill_notional": amount, "observed_at": available_pair[0].isoformat(),
+                                  "ingested_at": available_pair[1].isoformat()} if available_pair else None})
     if any(qty < 0 for qty in owned.values()):
         raise ValueError("STRATEGY_HOLDINGS_NEGATIVE")
     value, mark_times = 0.0, []
@@ -321,9 +370,9 @@ def summary(db, now, market, marks=None):
             complete = False
     counts = {key: sum(order["status"] == key for order in orders) for key in
               ("ACKNOWLEDGED", "OPEN", "PARTIAL", "FILLED", "CANCELLED", "REJECTED", "NOT_SENT", "BLOCKED", "UNKNOWN", "UNRESOLVED")}
-    history = [json.loads(row[1]) for row in db.execute("SELECT * FROM strategy_valuations ORDER BY observed_at DESC LIMIT 60") if at(row[0]) <= now]
+    history = _performance_history(db, now)
     gross_pnl = round(sell - buy + value, 4) if complete and any(o["filled_quantity"] for o in orders) else None
-    return {"orders": orders[-100:], "order_counts": counts, "owned": owned, "performance_history": list(reversed(history)),
+    return {"orders": orders[-100:], "order_counts": counts, "owned": owned, "performance_history": history,
             "evaluation": evaluate_strategy_orders(orders, market=market, as_of=now.isoformat(), gross_pnl=gross_pnl, valuation_complete=complete),
             "performance": {"currency": "KRW" if market == "KR" else "USD", "basis": "STRATEGY_GROSS_CASHFLOWS_PLUS_MARKED_HOLDINGS",
                 "status": "NO_FILLS" if not any(o["filled_quantity"] for o in orders) else "AVAILABLE" if complete else "INCOMPLETE",
@@ -526,7 +575,7 @@ def advance(archive, root, validation_root, market, *, clock, tickers, broker_fa
         performance = result["performance"]
         if performance["status"] == "AVAILABLE":
             broker.db.execute("INSERT OR IGNORE INTO strategy_valuations VALUES (?,?)", (performance["observed_at"], json.dumps(performance, sort_keys=True)))
-            result["performance_history"] = [json.loads(row[0]) for row in reversed(broker.db.execute("SELECT payload FROM strategy_valuations ORDER BY observed_at DESC LIMIT 60").fetchall())]
+            result["performance_history"] = _performance_history(broker.db, at(clock()))
     return finish("BLOCKED" if issues and issues != ["NO_FRESH_EXECUTABLE_STRATEGY"] else "WAITING_SIGNAL" if issues else "ACTIVE", *sorted(set(issues)))
 
 

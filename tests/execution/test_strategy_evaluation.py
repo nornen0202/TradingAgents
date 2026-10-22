@@ -1,11 +1,13 @@
 """Deterministic strategy evidence and cost-sensitivity checks; no external API."""
-from datetime import timedelta
+from contextlib import closing
+from datetime import timedelta, timezone
 import json
 import sqlite3
 
 import pytest
 
 from tradingagents.execution import demo_runtime
+from tradingagents.execution.kis_demo import DemoError
 from tradingagents.execution.strategy_evaluation import evaluate_strategy_orders
 from tests.execution.test_demo_runtime import Harness
 
@@ -179,3 +181,217 @@ def test_summary_rejects_mismatched_or_undated_broker_proof(tmp_path, change):
         db.row_factory = sqlite3.Row
         with pytest.raises((ValueError, TypeError)):
             demo_runtime.summary(db, h.now + timedelta(seconds=2), "US")
+
+
+def availability(value, **changes):
+    proof = {key: value[key] for key in ("source", "filled_quantity", "fill_notional", "observed_at", "ingested_at")}
+    proof.update(changes)
+    return proof
+
+
+def completed_harness(path, market, *, partial=False):
+    h = Harness(path, market)
+    quantity = 2 if partial else 1
+    if partial and market == "KR":
+        h.price = 40000
+    h.source(qty=quantity)
+    h.tick()
+    if partial:
+        h.now += timedelta(seconds=10)
+        h.fill(qty=1)
+        h.tick()
+    h.now += timedelta(seconds=20)
+    h.fill(qty=quantity, amount=h.price * quantity - 1)
+    h.tick()
+    h.now += timedelta(seconds=20)
+    h.source("fixture-2", action="EXIT_NOW", qty=5)
+    h.tick()
+    h.now += timedelta(seconds=20)
+    h.fill("2", qty=quantity, amount=h.price * quantity + 2)
+    result = h.tick()
+    return h, result
+
+
+def append_observation(db, identity, moment, **changes):
+    raw = db.execute("SELECT evidence FROM paper_observations WHERE id=? ORDER BY observed_at DESC LIMIT 1", (identity,)).fetchone()[0]
+    proof = json.loads(raw)
+    proof.update(observed_at=moment.isoformat(), ingested_at=moment.isoformat())
+    proof.update(changes)
+    db.execute("INSERT INTO paper_observations VALUES (?,?,?)", (identity, moment.isoformat(), json.dumps(proof, sort_keys=True)))
+
+
+@pytest.mark.parametrize("market", ["KR", "US"])
+@pytest.mark.parametrize("partial", [False, True])
+def test_actual_broker_repeat_report_preserves_roundtrip_and_first_fill_but_refreshes_latest_clocks(tmp_path, market, partial):
+    h, before = completed_harness(tmp_path, market, partial=partial)
+    buy = next(o for o in before["orders"] if o["side"] == "BUY")
+    assert before["evaluation"]["sample"]["closed_inventory_episodes"] == 1
+    assert before["evaluation"]["realized_gross_pnl"] == 3
+    assert buy["fill_availability"]["observed_at"] == buy["observed_at"]
+    if partial:
+        assert demo_runtime.at(buy["first_fill_observed_at"]) < demo_runtime.at(buy["fill_availability"]["observed_at"])
+    h.now += timedelta(seconds=20)
+    with h.factory(market, h.root / f"{market.lower()}-strategy.sqlite", lambda: h.now, (h.ticker,), h.credentials.scope()) as broker:
+        old_rows = set(tuple(row) for row in broker.db.execute("SELECT * FROM paper_observations"))
+        broker.reconcile(intent_id=buy["id"])
+        after = demo_runtime.summary(broker.db, h.now, market)
+        new_rows = set(tuple(row) for row in broker.db.execute("SELECT * FROM paper_observations"))
+        assert old_rows < new_rows and len(new_rows) == len(old_rows) + 1
+        broker.reconcile(intent_id=buy["id"])  # Identical full PK is still ignored.
+        assert set(tuple(row) for row in broker.db.execute("SELECT * FROM paper_observations")) == new_rows
+    repeated = next(o for o in after["orders"] if o["side"] == "BUY")
+    assert repeated["fill_availability"] == buy["fill_availability"]
+    assert repeated["first_fill_observed_at"] == buy["first_fill_observed_at"]
+    assert demo_runtime.at(repeated["observed_at"]) == demo_runtime.at(repeated["ingested_at"]) == h.now
+    assert repeated["observed_at"] != buy["observed_at"]
+    assert after["order_counts"] == before["order_counts"] and after["owned"] == before["owned"]
+    expected = dict(before["evaluation"])
+    expected["analysis_as_of"] = after["evaluation"]["analysis_as_of"]
+    expected["sample"] = {**expected["sample"], "last_observed_at": repeated["observed_at"]}
+    assert after["evaluation"] == expected
+
+
+def test_supplied_availability_restores_sequence_without_changing_latest_report():
+    orders = roundtrip()
+    proof = availability(orders[0])
+    orders[0].update(fill_availability=proof, first_fill_observed_at=proof["observed_at"],
+                     observed_at="2026-10-19T14:45:00+00:00", ingested_at="2026-10-19T14:45:01+00:00")
+    result = evaluate(orders)
+    assert result["realized_gross_pnl"] == 10 and result["sample"]["closed_inventory_episodes"] == 1
+    assert result["sample"]["first_observed_at"] == proof["observed_at"]
+    assert result["sample"]["last_observed_at"] == orders[0]["observed_at"]
+
+
+@pytest.mark.parametrize("change", [
+    {"source": "VALIDATION"}, {"source": None}, {"filled_quantity": 2}, {"filled_quantity": True},
+    {"fill_notional": 99}, {"fill_notional": None}, {"fill_notional": float("nan")},
+    {"observed_at": None}, {"observed_at": "bad"}, {"observed_at": "2026-10-19T14:00:00"},
+    {"observed_at": "2026-02-30T14:00:00Z"}, {"observed_at": "2026-10-20T14:00:00Z"},
+    {"observed_at": "2026-10-19T13:59:59Z"},
+    {"ingested_at": None}, {"ingested_at": "bad"}, {"ingested_at": "2026-10-19T14:01:00"},
+    {"ingested_at": "2026-10-19T14:00:59Z"}, {"ingested_at": "2026-10-19T14:01:02Z"},
+    {"ingested_at": "2026-10-20T14:01:00Z"},
+])
+def test_invalid_availability_never_falls_back_to_latest_or_creates_roundtrip(change):
+    buy = order()
+    buy["fill_availability"] = availability(buy, **change)
+    with pytest.raises(ValueError):
+        evaluate([buy, roundtrip()[1]])
+
+
+@pytest.mark.parametrize("proof", [None, {}, [], {"source": "KIS_DEMO_BROKER_REPORT"}])
+def test_present_but_incomplete_availability_is_not_legacy_fallback(proof):
+    with pytest.raises(ValueError):
+        evaluate([order(fill_availability=proof)])
+
+
+@pytest.mark.parametrize("value", [None, "bad", "2026-10-19T14:00:00", "2026-10-19T13:59:59Z", "2026-10-19T14:01:02Z", "2026-10-20T14:00:00Z"])
+def test_first_positive_observation_requires_original_valid_clock(value):
+    with pytest.raises(ValueError):
+        evaluate([order(first_fill_observed_at=value)])
+
+
+@pytest.mark.parametrize("market", ["KR", "US"])
+@pytest.mark.parametrize("initial_missing", [False, True])
+def test_money_disappearance_or_first_confirmation_never_borrows_an_earlier_availability(tmp_path, market, initial_missing):
+    h, before = completed_harness(tmp_path, market)
+    buy = next(o for o in before["orders"] if o["side"] == "BUY")
+    with closing(sqlite3.connect(h.root / f"{market.lower()}-strategy.sqlite")) as db:
+        db.row_factory = sqlite3.Row
+        if initial_missing:
+            old = db.execute("SELECT observed_at,evidence FROM paper_observations WHERE id=?", (buy["id"],)).fetchone()
+            raw = json.loads(old[1])
+            raw["fill_notional"] = None
+            db.execute("UPDATE paper_observations SET evidence=? WHERE id=?", (json.dumps(raw), buy["id"]))
+        else:
+            h.now += timedelta(seconds=10)
+            append_observation(db, buy["id"], h.now, fill_notional=None)
+        h.now += timedelta(seconds=10)
+        append_observation(db, buy["id"], h.now, fill_notional=buy["fill_notional"])
+        result = demo_runtime.summary(db, h.now, market)
+    repeated = next(o for o in result["orders"] if o["side"] == "BUY")
+    assert demo_runtime.at(repeated["fill_availability"]["ingested_at"]) == h.now
+    assert repeated["first_fill_observed_at"] == buy["first_fill_observed_at"]
+    assert result["evaluation"]["sample"]["closed_inventory_episodes"] is None
+    assert result["evaluation"]["realized_gross_pnl"] is None
+
+
+@pytest.mark.parametrize("market", ["KR", "US"])
+def test_partial_quantity_cannot_supply_current_complete_quantity_availability(tmp_path, market):
+    h, result = completed_harness(tmp_path, market, partial=True)
+    buy, sell = result["orders"]
+    sell["prepared_at"] = (demo_runtime.at(buy["first_fill_observed_at"]) + timedelta(seconds=1)).isoformat()
+    checked = evaluate_strategy_orders([buy, sell], market=market, as_of=h.now.isoformat(), gross_pnl=3, valuation_complete=True)
+    assert checked["sample"]["closed_inventory_episodes"] is None
+    assert checked["realized_gross_pnl"] is None
+
+
+@pytest.mark.parametrize("change", [
+    {"fill_notional": 198}, {"fill_notional": 201}, {"filled_qty": 0}, {"filled_qty": 2},
+    {"source": "VALIDATION"}, {"mode": "actual"}, {"broker_order_id": "different"},
+    {"observed_at": None}, {"ingested_at": None}, {"ingested_at": "2026-10-19T14:00:00"},
+    {"ingested_at": "2026-02-30T14:00:00Z"}, {"ingested_at": "2099-01-01T00:00:00Z"},
+    {"ingested_at": "2026-10-19T14:00:00Z"},
+])
+def test_prior_valid_availability_cannot_hide_invalid_later_proof(tmp_path, change):
+    h, before = completed_harness(tmp_path, "US")
+    buy = before["orders"][0]
+    h.now += timedelta(seconds=10)
+    with closing(sqlite3.connect(h.root / "us-strategy.sqlite")) as db:
+        db.row_factory = sqlite3.Row
+        append_observation(db, buy["id"], h.now, **change)
+        with pytest.raises(ValueError):
+            demo_runtime.summary(db, h.now, "US")
+
+
+def test_valid_earlier_availability_does_not_bypass_future_report_fail_closed_contract(tmp_path):
+    h, before = completed_harness(tmp_path, "US")
+    with closing(sqlite3.connect(h.root / "us-strategy.sqlite")) as db:
+        db.row_factory = sqlite3.Row
+        append_observation(db, before["orders"][0]["id"], h.now + timedelta(seconds=10))
+        with pytest.raises(ValueError, match="OBSERVATION_CLOCK"):
+            demo_runtime.summary(db, h.now, "US")
+
+
+def test_original_ack_is_required_even_when_earlier_availability_exists(tmp_path):
+    h, before = completed_harness(tmp_path, "US")
+    with closing(sqlite3.connect(h.root / "us-strategy.sqlite")) as db:
+        db.row_factory = sqlite3.Row
+        db.execute("UPDATE requests SET status='UNKNOWN' WHERE id=?", (before["orders"][0]["id"],))
+        with pytest.raises(ValueError, match="OBSERVATION_PROOF"):
+            demo_runtime.summary(db, h.now, "US")
+
+
+@pytest.mark.parametrize("market", ["KR", "US"])
+def test_repeated_reconciliation_retains_original_journal_owner_gate(tmp_path, market):
+    h, before = completed_harness(tmp_path, market)
+    calls = len(h.calls)
+    h.credentials = type(h.credentials)("fixture-key", "fixture-secret", "87654321", "01")
+    with pytest.raises(DemoError):
+        with h.factory(market, h.root / f"{market.lower()}-strategy.sqlite", lambda: h.now, (h.ticker,), h.credentials.scope()) as broker:
+            broker.reconcile(intent_id=before["orders"][0]["id"])
+    assert len(h.calls) == calls
+
+
+def test_equal_observation_clock_with_changed_economic_state_is_ambiguous(tmp_path):
+    h, before = completed_harness(tmp_path, "US")
+    buy = before["orders"][0]
+    with closing(sqlite3.connect(h.root / "us-strategy.sqlite")) as db:
+        db.row_factory = sqlite3.Row
+        append_observation(db, buy["id"], demo_runtime.at(buy["observed_at"]), fill_notional=None)
+        with pytest.raises(ValueError, match="AMBIGUOUS"):
+            demo_runtime.summary(db, h.now, "US")
+
+
+def test_availability_sorts_actual_instants_and_keeps_observed_ingested_from_one_report(tmp_path):
+    h, before = completed_harness(tmp_path, "US")
+    buy = before["orders"][0]
+    h.now += timedelta(seconds=10)
+    with closing(sqlite3.connect(h.root / "us-strategy.sqlite")) as db:
+        db.row_factory = sqlite3.Row
+        # The later -05:00 text sorts before the earlier UTC report.
+        append_observation(db, buy["id"], h.now.astimezone(timezone(timedelta(hours=-5))))
+        result = demo_runtime.summary(db, h.now, "US")
+    repeated = result["orders"][0]
+    assert repeated["fill_availability"] == buy["fill_availability"]
+    assert demo_runtime.at(repeated["observed_at"]) == h.now
