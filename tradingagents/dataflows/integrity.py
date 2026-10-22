@@ -36,6 +36,8 @@ def session_date(value):
     """Preserve exchange-local daily labels, including mixed DST offsets."""
     try:
         stamp = pd.Timestamp(value)
+        if pd.isna(stamp):
+            return pd.NaT
         return stamp.tz_localize(None).normalize() if stamp.tzinfo else stamp.normalize()
     except (TypeError, ValueError):
         return pd.NaT

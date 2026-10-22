@@ -188,6 +188,17 @@ def validate_with_us_fallback(data, symbol: str, start_date: str, end_date: str)
         valid = validate_daily_bars(data, end_date)
     except VendorMalformedResponseError as exc:
         error = exc
+    if valid is not None and fallback_enabled(symbol):
+        # A recent final bar cannot hide a missing session inside the observed
+        # series. Preserve the existing leading-history contract; the first
+        # observed bar is not evidence of a listing date.
+        begin = max(date.fromisoformat(start_date), valid.iloc[0]["Date"].date())
+        last = valid.iloc[-1]["Date"].date()
+        required = set(_sessions(begin, last)) if begin <= last else set()
+        observed = {stamp.date() for stamp in valid["Date"] if stamp.date() >= begin}
+        if required - observed:
+            error = VendorMalformedResponseError("Yahoo US daily history is missing an interior completed session")
+            valid = None
     stale_required_session = (valid is not None and fallback_enabled(symbol)
         and valid.iloc[-1]["Date"] < pd.Timestamp(_sessions(date.fromisoformat(start_date), date.fromisoformat(end_date))[-1]))
     if fallback_enabled(symbol) and (valid is None or stale_required_session):

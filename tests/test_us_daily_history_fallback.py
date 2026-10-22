@@ -56,7 +56,7 @@ def broker(monkeypatch):
     client = Mock(spec=["request_json"])
     client.request_json.return_value = payload()
     monkeypatch.setattr(KisClient, "from_api_keys", Mock(return_value=client))
-    monkeypatch.setattr(us, "_sessions", Mock(return_value=REQUIRED))
+    monkeypatch.setattr(us, "_sessions", Mock(side_effect=lambda start, end: [day for day in REQUIRED if start <= day <= end]))
     return client
 
 
