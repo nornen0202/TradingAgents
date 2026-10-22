@@ -5,7 +5,6 @@ Only filing metadata is returned; this never claims to have read filing content.
 """
 from __future__ import annotations
 
-import os
 import threading
 import time
 from datetime import datetime, timezone
@@ -13,6 +12,7 @@ from functools import lru_cache
 
 import requests
 
+from .api_keys import get_api_key
 from .news_models import DisclosureItem, format_disclosure_items_report
 from .vendor_exceptions import VendorMalformedResponseError, VendorTransientError
 
@@ -31,7 +31,7 @@ def _get_json(url: str) -> dict:
         _LAST_REQUEST = time.monotonic()
     try:
         response = requests.get(url, timeout=25, headers={
-            "User-Agent": os.getenv("SEC_EDGAR_USER_AGENT") or os.getenv("SEC_USER_AGENT") or "TradingAgents research contact https://github.com/nornen0202/TradingAgents/issues",
+            "User-Agent": get_api_key("SEC_EDGAR_USER_AGENT") or "TradingAgents research contact https://github.com/nornen0202/TradingAgents/issues",
             "Accept-Encoding": "gzip, deflate", "Accept": "application/json",
         })
         response.raise_for_status()
