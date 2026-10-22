@@ -130,6 +130,11 @@ def _build_single_candidate(
         "vendor_calls": tool_telemetry.get("vendor_calls") or {},
         "fallback_count": int(tool_telemetry.get("fallback_count", 0) or 0),
     }
+    from tradingagents.dataflows.research_evidence import assess_tool_evidence
+    request_evidence = assess_tool_evidence(tool_telemetry, started_at=(analysis or {}).get("started_at"),
+                                           finished_at=(analysis or {}).get("finished_at"))
+    if request_evidence is not None:
+        vendor_health["request_evidence"] = request_evidence
     institutional_intelligence = _institutional_intelligence_summary(analysis)
     if institutional_intelligence:
         vendor_health["institutional_coverage"] = institutional_intelligence.get("coverage", {})

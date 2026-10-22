@@ -28,7 +28,8 @@ from tradingagents.charting.capture import ChartCapture
 from tradingagents.agents.utils.instrument_resolver import resolve_instrument
 from cli.stats_handler import StatsCallbackHandler
 from tradingagents.default_config import DEFAULT_CONFIG
-from tradingagents.dataflows.interface import reset_tool_telemetry, snapshot_tool_telemetry
+from tradingagents.dataflows.interface import reset_tool_telemetry, snapshot_tool_telemetry, snapshot_tool_requests
+from tradingagents.dataflows.research_evidence import SCHEMA as TOOL_REQUEST_SCHEMA
 from tradingagents.dataflows.institutional import (
     build_public_equity_intelligence_artifacts,
     render_intelligence_markdown,
@@ -2029,6 +2030,8 @@ def _run_single_ticker(
                 "vendor_calls": tool_by_vendor,
                 "fallback_count": fallback_count,
                 "events": tool_events,
+                "request_schema": TOOL_REQUEST_SCHEMA,
+                "request_outcomes": snapshot_tool_requests(),
                 "called_tools": sorted(called_tools),
                 "intraday_snapshot_used": "get_intraday_snapshot" in called_tools,
                 "intraday_tool_used": "get_intraday_snapshot" in called_tools,

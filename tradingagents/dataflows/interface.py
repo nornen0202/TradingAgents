@@ -3,7 +3,11 @@ from __future__ import annotations
 import os
 import re
 import threading
-from datetime import datetime
+from contextvars import ContextVar
+from datetime import datetime, timezone
+import hashlib
+import json
+from uuid import uuid4
 from typing import Any
 
 from .alpha_vantage import (
@@ -181,16 +185,24 @@ _SEMANTIC_EMPTY_MARKERS = (
 
 _TELEMETRY_LOCK = threading.Lock()
 _TOOL_TELEMETRY_EVENTS: list[dict[str, Any]] = []
+_TOOL_REQUEST_OUTCOMES: list[dict[str, Any]] = []
+_TOOL_REQUEST_ID: ContextVar[str | None] = ContextVar("tool_request_id", default=None)
 
 
 def reset_tool_telemetry() -> None:
     with _TELEMETRY_LOCK:
         _TOOL_TELEMETRY_EVENTS.clear()
+        _TOOL_REQUEST_OUTCOMES.clear()
 
 
 def snapshot_tool_telemetry() -> list[dict[str, Any]]:
     with _TELEMETRY_LOCK:
         return [event.copy() for event in _TOOL_TELEMETRY_EVENTS]
+
+
+def snapshot_tool_requests() -> list[dict[str, Any]]:
+    with _TELEMETRY_LOCK:
+        return [row.copy() for row in _TOOL_REQUEST_OUTCOMES]
 
 
 def _record_tool_telemetry(
@@ -209,6 +221,7 @@ def _record_tool_telemetry(
                 "status": status,
                 "fallback": fallback,
                 "note": note,
+                **({"request_id": _TOOL_REQUEST_ID.get()} if _TOOL_REQUEST_ID.get() else {}),
             }
         )
 
@@ -394,6 +407,40 @@ def should_fallback(result_or_exc: Any, method: str | None = None) -> bool:
 
 
 def route_to_vendor(method: str, *args, **kwargs):
+    """Record one final outcome per request without retaining arguments/secrets."""
+    identity = uuid4().hex
+    token = _TOOL_REQUEST_ID.set(identity)
+    started = datetime.now(timezone.utc).isoformat()
+    status, digest = "error", None
+    try:
+        result = _route_to_vendor(method, *args, **kwargs)
+        # Financial Tool providers return dated text/CSV/JSON strings. Opaque
+        # objects and unvalidated raw HTTP envelopes are not evidence receipts.
+        usable = isinstance(result, str) and bool(result.strip())
+        if isinstance(result, str):
+            normalized = result.strip().lower()
+            usable = bool(normalized) and not normalized.startswith("error") and not any(
+                marker in normalized for marker in _SEMANTIC_EMPTY_MARKERS)
+            if result.startswith(("SEC disclosure coverage: UNMAPPED", "SEC disclosure coverage: PARTIAL_WINDOW")):
+                usable = False
+            if normalized.startswith(("data_unavailable", "no insider data:")):
+                usable = False
+        status = "available" if usable else "unavailable"
+        if usable:
+            digest = hashlib.sha256(json.dumps(result, sort_keys=True, default=str).encode()).hexdigest()
+        return result
+    except VendorInputError:
+        status = "input_error"
+        raise
+    finally:
+        with _TELEMETRY_LOCK:
+            _TOOL_REQUEST_OUTCOMES.append({"request_id": identity, "method": method, "status": status,
+                                           "started_at": started, "completed_at": datetime.now(timezone.utc).isoformat(),
+                                           "result_sha256": digest})
+        _TOOL_REQUEST_ID.reset(token)
+
+
+def _route_to_vendor(method: str, *args, **kwargs):
     if method not in VENDOR_METHODS:
         raise ValueError(f"Method '{method}' not supported")
 
