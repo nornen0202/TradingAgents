@@ -77,3 +77,7 @@ def select_daily_history(
                 raise VendorMalformedResponseError("Daily history source changed within the same research")
             return
         selection.values[key] = {"source": source, "frame": _copy_frame(frame)}
+        # Capture the first selected snapshot while the selection lock holds.
+        # Later cache refreshes or mutable attrs cannot revise this receipt.
+        from .daily_history_evidence import record_selected_history
+        record_selected_history(key[0], end_date, source, selection.values[key]["frame"])
