@@ -10,6 +10,7 @@ from .stockstats_utils import StockstatsUtils, yf_retry, load_ohlcv, filter_fina
 from .integrity import safe_symbol, is_historical
 from .daily_history import fallback_enabled, selected_history, validate_with_fallback, source_note
 from .us_daily_history import fallback_enabled as us_fallback_enabled
+from .kr_daily_history import fallback_enabled as kr_fallback_enabled
 from .vendor_exceptions import VendorInputError, VendorMalformedResponseError, InsufficientIndicatorHistoryError
 
 
@@ -79,6 +80,10 @@ def get_YFin_data_online(
 
     # Fetch historical data for the specified date range
     data = selected_history(symbol, start_date, end_date)
+    if data is None and kr_fallback_enabled(symbol):
+        # Validate and pin the same five-year calculation input before the
+        # first price report. Later indicators must not change its provider.
+        data = load_ohlcv(symbol, end_date)
     if data is not None:
         data = data.set_index("Date")
     else:

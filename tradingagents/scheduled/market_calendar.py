@@ -28,6 +28,12 @@ def is_supplemental_market_holiday(*, market: str, session_date: date) -> bool:
     if str(market or "").strip().upper() != "KR" or session_date.year < 2026:
         return False
 
+    # NEC's 2026 election schedule, KRX holiday rules and KIS chk-holiday
+    # identify this specific national election day as closed. Do not infer
+    # future election dates from a recurring weekday rule.
+    if session_date == date(2026, 6, 3):
+        return True
+
     constitution_day = date(session_date.year, 7, 17)
     holidays = {constitution_day}
     if constitution_day.weekday() >= 5:

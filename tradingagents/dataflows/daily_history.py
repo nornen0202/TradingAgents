@@ -7,7 +7,8 @@ def fallback_enabled(symbol):
 
 
 def selected_history(symbol, start_date, end_date):
-    return us.selected_history(symbol, start_date, end_date)
+    selected = kr.selected_history(symbol, start_date, end_date)
+    return selected if selected is not None else us.selected_history(symbol, start_date, end_date)
 
 
 def validate_with_fallback(data, symbol, start_date, end_date):

@@ -2,10 +2,12 @@
 from __future__ import annotations
 
 from datetime import date, datetime, timedelta, timezone
+import hashlib
 import math
 import os
 import re
 import time
+from threading import Lock
 
 import pandas as pd
 
@@ -15,6 +17,7 @@ from .vendor_exceptions import VendorInputError, VendorMalformedResponseError
 
 SOURCE = "KIS domestic_daily_itemchartprice (KRX, adjusted prices)"
 _CACHE: dict[tuple[str, str, str], tuple[float, pd.DataFrame]] = {}
+_CACHE_LOCK = Lock()
 _MAX_PAGES = 20
 _FIELDS = {"Open": "stck_oprc", "High": "stck_hgpr", "Low": "stck_lwpr",
            "Close": "stck_clpr", "Volume": "acml_vol"}
@@ -25,7 +28,50 @@ def fallback_enabled(symbol: str) -> bool:
             and re.fullmatch(r"[0-9]{6}\.(KS|KQ)", symbol.upper()) is not None)
 
 
-def load_kr_daily_bars(symbol: str, start_date: str, end_date: str, *, require_end=False):
+def _verify_sessions(frame, start_date, end_date, *, strict_start):
+    from tradingagents.calendar_access import get_exchange_calendar
+    from tradingagents.scheduled.market_calendar import is_supplemental_market_holiday
+
+    start, end = date.fromisoformat(start_date), date.fromisoformat(end_date)
+    if start > end:
+        raise VendorInputError("start_date must not be later than end_date")
+    begin = start if strict_start else max(start, frame.iloc[0]["Date"].date())
+    try:
+        # The upstream constructor needs a non-empty span even for a single
+        # requested session. Padding the calendar never broadens price bounds.
+        calendar = get_exchange_calendar("XKRX", start=begin - timedelta(days=1), end=end + timedelta(days=1))
+        required = {stamp.date() for stamp in calendar.sessions
+                    if begin <= stamp.date() <= end
+                    and not is_supplemental_market_holiday(market="KR", session_date=stamp.date())}
+    except Exception as exc:
+        raise VendorMalformedResponseError("KR daily history session coverage cannot be verified") from exc
+    observed = {stamp.date() for stamp in frame["Date"] if start <= stamp.date() <= end}
+    if not required or observed != required:
+        raise VendorMalformedResponseError("KR daily history has missing required sessions or non-session bars")
+
+
+def _window(frame, start_date, end_date):
+    window = frame.loc[(frame["Date"] >= pd.Timestamp(start_date)) & (frame["Date"] <= pd.Timestamp(end_date))].copy()
+    if window.empty:
+        raise VendorMalformedResponseError("Pinned KR history has no requested bars")
+    return window
+
+
+def selected_history(symbol: str, start_date: str, end_date: str):
+    from .daily_history_selection import get_selected_daily_history
+
+    if re.fullmatch(r"[0-9]{6}\.(KS|KQ)", symbol.upper()) is None:
+        return None
+    selected = get_selected_daily_history(symbol, end_date)
+    if selected and selected["source"] in {SOURCE, "yfinance"}:
+        frame = selected["frame"]
+        if frame is None or not isinstance(frame.attrs.get("requested_start"), str) or frame.attrs["requested_start"] > start_date:
+            raise VendorMalformedResponseError("Requested history exceeds the pinned KR research series")
+        return _window(frame, start_date, end_date)
+    return None
+
+
+def load_kr_daily_bars(symbol: str, start_date: str, end_date: str, *, require_end=False, require_complete=False):
     """Return an independently validated KIS series, or None when unavailable.
 
     Never splice vendors or fill a missing price. Pagination uses strictly older
@@ -42,10 +88,11 @@ def load_kr_daily_bars(symbol: str, start_date: str, end_date: str, *, require_e
     if start > end:
         raise VendorInputError("start_date must not be later than end_date")
     key = (symbol, start_date, end_date)
-    cached = _CACHE.get(key)
-    if cached and time.monotonic() - cached[0] <= 300:
-        frame = cached[1].copy()
-    else:
+    with _CACHE_LOCK:
+        cached = _CACHE.get(key)
+        frame = cached[1].copy() if cached and time.monotonic() - cached[0] <= 300 else None
+    fetched = frame is None
+    if fetched:
         from tradingagents.portfolio.kis import KisClient
 
         client = KisClient.from_api_keys(environment="real")
@@ -99,35 +146,59 @@ def load_kr_daily_bars(symbol: str, start_date: str, end_date: str, *, require_e
             raise VendorMalformedResponseError("KIS daily history has no requested bars")
         frame = pd.DataFrame([{"Date": stamp, **values} for stamp, values in sorted(records.items())])
         frame = validate_daily_bars(frame, end_date)
-        frame.attrs.update(source=SOURCE, observed_at=datetime.now(timezone.utc).isoformat(),
-                           requested_start=start_date, requested_end=end_date)
-        if len(_CACHE) >= 128:
-            _CACHE.clear()
-        _CACHE[key] = (time.monotonic(), frame.copy())
+        frame.attrs.update(source=SOURCE, provider="kis", exchange="KRX", adjustment="FID_ORG_ADJ_PRC=0",
+                           observed_at=datetime.now(timezone.utc).isoformat(), requested_start=start_date,
+                           requested_end=end_date, request_count=page + 1)
     if require_end and frame.iloc[-1]["Date"].date() != end:
         raise VendorMalformedResponseError("KIS has no valid bar for the required completed session")
+    if require_complete:
+        _verify_sessions(frame, start_date, end_date, strict_start=True)
+        frame.attrs.update(complete=True, session_count=len(frame),
+                           series_sha256=hashlib.sha256(frame.to_csv(index=False).encode("utf-8")).hexdigest())
+    if fetched:
+        with _CACHE_LOCK:
+            if len(_CACHE) >= 128:
+                _CACHE.clear()
+            _CACHE[key] = (time.monotonic(), frame.copy())
     return frame
 
 
 def validate_with_kr_fallback(data, symbol: str, start_date: str, end_date: str):
     """Retain Yahoo when valid/current, otherwise request an entire KIS series."""
+    from .daily_history_selection import select_daily_history
+
+    selected = selected_history(symbol, start_date, end_date)
+    if selected is not None:
+        return selected
     error = None
     try:
         valid = validate_daily_bars(data, end_date)
     except VendorMalformedResponseError as exc:
         error = exc
         valid = None
-    if valid is None or valid.iloc[-1]["Date"] < pd.Timestamp(end_date):
-        replacement = load_kr_daily_bars(symbol, start_date, end_date)
+    if not fallback_enabled(symbol):
+        if error is not None:
+            raise error
+        return valid
+    if valid is not None:
+        try:
+            _verify_sessions(valid, start_date, end_date, strict_start=valid.attrs.get("source") == SOURCE)
+        except VendorMalformedResponseError as exc:
+            error, valid = exc, None
+    if valid is None:
+        replacement = load_kr_daily_bars(symbol, start_date, end_date, require_complete=True)
         if replacement is not None:
-            # An invalid latest bar must never be replaced by an older valid bar.
-            if error is not None and replacement.iloc[-1]["Date"] < pd.Timestamp(end_date):
-                raise error
-            if valid is None or replacement.iloc[-1]["Date"] > valid.iloc[-1]["Date"]:
-                return replacement
+            replacement = validate_daily_bars(replacement, end_date)
+            _verify_sessions(replacement, start_date, end_date, strict_start=True)
+            select_daily_history(symbol, end_date, SOURCE, frame=replacement)
+            pinned = selected_history(symbol, start_date, end_date)
+            return pinned if pinned is not None else _window(replacement, start_date, end_date)
     if error is not None:
         raise error
-    return valid
+    valid.attrs.update(requested_start=start_date, requested_end=end_date)
+    select_daily_history(symbol, end_date, valid.attrs.get("source") or "yfinance", frame=valid)
+    pinned = selected_history(symbol, start_date, end_date)
+    return pinned if pinned is not None else valid
 
 
 def source_note(frame: pd.DataFrame) -> str:

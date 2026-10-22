@@ -40,11 +40,14 @@ def _snapshot(symbol, end_date, source, frame):
         if not isinstance(frame, pd.DataFrame) or frame.empty:
             raise ValueError("Missing snapshot rows")
         from .us_daily_history import SOURCE
+        from .kr_daily_history import SOURCE as KR_SOURCE
 
         attrs = frame.attrs
-        if (source != SOURCE or attrs.get("source") != source or attrs.get("provider") != "kis"
-                or attrs.get("adjustment") != "MODP=1" or attrs.get("complete") is not True
-                or attrs.get("exchange") not in {"NAS", "NYS", "AMS"}):
+        us_metadata = source == SOURCE and attrs.get("adjustment") == "MODP=1" and attrs.get("exchange") in {"NAS", "NYS", "AMS"}
+        kr_metadata = (source == KR_SOURCE and re.fullmatch(r"[0-9]{6}\.(KS|KQ)", symbol) is not None
+                       and attrs.get("adjustment") == "FID_ORG_ADJ_PRC=0" and attrs.get("exchange") == "KRX")
+        if (not (us_metadata or kr_metadata) or attrs.get("source") != source
+                or attrs.get("provider") != "kis" or attrs.get("complete") is not True):
             raise ValueError("Unverified provider metadata")
         start = _day(attrs.get("requested_start"))
         if _day(attrs.get("requested_end")) != end or start > end:
@@ -70,7 +73,7 @@ def _snapshot(symbol, end_date, source, frame):
         if attrs.get("series_sha256") != digest:
             raise ValueError("Snapshot content hash mismatch")
         entry.update(status="VERIFIED_RETRIEVED_SERIES", provider="kis", exchange=attrs["exchange"],
-                     adjustment="MODP=1", observed_at=observed.isoformat(), requested_start=start.isoformat(),
+                     adjustment=attrs["adjustment"], observed_at=observed.isoformat(), requested_start=start.isoformat(),
                      first_session=dates.min().date().isoformat(), last_session=dates.max().date().isoformat(),
                      row_count=len(frame), complete=True, series_sha256=digest)
         entry["snapshot_id"] = hashlib.sha256(json.dumps(entry, sort_keys=True).encode()).hexdigest()
