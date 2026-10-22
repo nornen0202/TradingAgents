@@ -327,6 +327,7 @@ def _execute_run_body(config, *, run_label, skip_site_build, tz, started_at,
     overlay_universe_warnings: list[str] = []
     recovery_plan = None
     recovery_receipt = None
+    recovery_without_new_success = False
     refresh_source = None
     if research_refresh_plan is not None:
         from .research_refresh import load_plan_source
@@ -491,6 +492,13 @@ def _execute_run_body(config, *, run_label, skip_site_build, tz, started_at,
                 run_warnings=run_warnings,
             )
         if recovery_plan:
+            # Reused successes retain their original research; they are not
+            # evidence that this failed-only retry produced a new thesis.
+            recovery_without_new_success = bool(
+                resume_from_run and research_tickers
+                and any(row.get("status") in {"failed", "skipped"} for row in ticker_summaries)
+                and not any(row.get("status") == "success" for row in ticker_summaries)
+            )
             order = {ticker: index for index, ticker in enumerate(run_tickers)}
             # Keep unexpected/duplicate worker rows visible to the final coverage validator.
             ticker_summaries = sorted([*reused_summaries, *ticker_summaries],
@@ -516,21 +524,22 @@ def _execute_run_body(config, *, run_label, skip_site_build, tz, started_at,
     research_failed = run_mode == "full" and not any(
         item.get("status") == "success" for item in ticker_summaries
     )
+    skip_research_postprocessing = research_failed or recovery_without_new_success
     reset_llm_usage()
     # News collection can involve many slow network calls. Finish it BEFORE
     # collecting the short-lived price observations, and reuse the same dated
     # evidence in the report delta instead of fetching it a second time.
     news_as_of = datetime.now(tz)
-    news_context = {} if research_failed or portfolio_only or lightweight_refresh or refresh_source is not None else collect_event_news(
+    news_context = {} if skip_research_postprocessing or portfolio_only or lightweight_refresh or refresh_source is not None else collect_event_news(
         ticker_summaries=ticker_summaries, analysis_as_of=news_as_of,
     )
-    event_signals = {} if research_failed or portfolio_only or lightweight_refresh or refresh_source is not None else collect_event_signals(
+    event_signals = {} if skip_research_postprocessing or portfolio_only or lightweight_refresh or refresh_source is not None else collect_event_signals(
         run_dir=run_dir, ticker_summaries=ticker_summaries,
         analysis_as_of=news_as_of, news_context=news_context,
     )
     execution_updates: dict[str, dict[str, Any]] = {}
     execution_refresh_budget_available = True
-    if config.execution.execution_refresh_enabled and not portfolio_only and not research_failed:
+    if config.execution.execution_refresh_enabled and not portfolio_only and not skip_research_postprocessing:
         execution_refresh_budget_available = _post_processing_budget_available(
             stage="execution_overlay",
             max_runtime_seconds=max_runtime_seconds,
@@ -538,7 +547,7 @@ def _execute_run_body(config, *, run_label, skip_site_build, tz, started_at,
             min_required_seconds=post_processing_min_seconds,
             warnings=run_warnings,
         )
-    if config.execution.execution_refresh_enabled and not portfolio_only and not research_failed and execution_refresh_budget_available:
+    if config.execution.execution_refresh_enabled and not portfolio_only and not skip_research_postprocessing and execution_refresh_budget_available:
         checkpoint_timezone = _execution_checkpoint_timezone(config)
         now_local = datetime.now(ZoneInfo(checkpoint_timezone))
         now_kst = now_local.astimezone(ZoneInfo("Asia/Seoul"))
@@ -576,7 +585,7 @@ def _execute_run_body(config, *, run_label, skip_site_build, tz, started_at,
                 f"run_mode={run_mode} produced no execution updates. "
                 "Check execution_contract artifacts and intraday market data availability."
             )
-    elif config.execution.execution_refresh_enabled and not portfolio_only and not research_failed:
+    elif config.execution.execution_refresh_enabled and not portfolio_only and not skip_research_postprocessing:
         manifest_overlay_phase = {
             "name": "SKIPPED_RUNTIME_BUDGET",
             "selected_checkpoints": [],
@@ -680,20 +689,27 @@ def _execute_run_body(config, *, run_label, skip_site_build, tz, started_at,
     for warning in run_warnings:
         if warning not in manifest["warnings"]:
             manifest["warnings"].append(warning)
-    if research_failed:
-        # No thesis exists to authorize downstream proposals. Persist the normal
-        # failed manifest before any portfolio model, performance journal or
-        # execution consumer is invoked; RunAttempt then records terminal FAILED.
-        reason = "no_successful_ticker_research"
-        manifest["status"] = "failed"
+    if skip_research_postprocessing:
+        # Preserve the complete cohort and original reused evidence, but do not
+        # spend downstream calls on an attempt with no newly usable research.
+        # Pure finalization (no retry targets) keeps the ordinary path below.
+        reason = "no_successful_ticker_research" if research_failed else "no_new_successful_recovery_research"
+        if research_failed:
+            manifest["status"] = "failed"
         manifest["warnings"].append(reason)
         manifest["terminal_failure"] = {
             "schema": "tradingagents.research-terminal-failure/v1",
             "stage": "ticker_research",
             "reason": reason,
-            "successful_tickers": 0,
+            "successful_tickers": successes,
             "failed_tickers": failures,
         }
+        if recovery_without_new_success:
+            manifest["terminal_failure"].update(
+                requested_new_research_count=len(research_tickers),
+                newly_successful_tickers=0,
+                reused_research_count=len(reused_summaries),
+            )
         for stage in ("portfolio", "execution", "decision_bundle", "performance"):
             manifest[stage] = {"status": "skipped", "reason": reason}
         manifest["llm_usage"] = _aggregate_manifest_llm_usage(
@@ -713,7 +729,7 @@ def _execute_run_body(config, *, run_label, skip_site_build, tz, started_at,
         _publish_completed_run_manifest(
             archive_dir=config.storage.archive_dir, run_dir=run_dir, manifest=manifest,
         )
-        print("::error::No ticker research succeeded; downstream processing skipped.", flush=True)
+        print(f"::error::{reason}; downstream processing skipped.", flush=True)
         return manifest
     manifest["market_session_phase"] = _market_session_phase(
         manifest_overlay_phase,

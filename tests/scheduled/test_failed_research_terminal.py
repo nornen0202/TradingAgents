@@ -70,6 +70,8 @@ def test_all_failed_full_research_finishes_without_downstream_calls(tmp_path, mo
     assert manifest["summary"]["failed_tickers"] == 30
     assert len(manifest["quality_gate"]["failed_tickers"]) == 30
     assert manifest["terminal_failure"]["reason"] == "no_successful_ticker_research"
+    assert manifest["terminal_failure"]["successful_tickers"] == 0
+    assert "requested_new_research_count" not in manifest["terminal_failure"]
     assert manifest["run_quality"]["run_quality_score"] == 0
     for stage in ("portfolio", "execution", "decision_bundle", "performance"):
         assert manifest[stage] == {"status": "skipped", "reason": "no_successful_ticker_research"}
