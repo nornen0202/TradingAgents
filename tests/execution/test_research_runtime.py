@@ -16,6 +16,7 @@ class Harness:
         self.archive, self.state = root / "archive", root / "state"
         self.source, self.manifest = cohort(self.archive, start=NOW - timedelta(hours=2))
         self.calls = []
+        atomic_write_json(self.state / "actions-drained.json", {"drained_at": NOW.isoformat()})
         self.enable()
         self.quote(NOW)
         monkeypatch.setattr(runner, "_resolve_latest_full_overlay_baseline_manifest", lambda *a, **k: self.manifest)
@@ -129,4 +130,27 @@ def test_missed_slot_is_not_launched_near_the_close(tmp_path, monkeypatch):
     later = NOW + timedelta(hours=5)
     h.quote(later)
     assert h.tick(later) == []
+    assert h.calls == []
+
+
+def test_installed_research_lane_admits_daily_full_with_unchanged_dispatcher(tmp_path, monkeypatch):
+    from tradingagents import local_automation as local
+    h = Harness(tmp_path, monkeypatch)
+    atomic_write_json(h.state / "research-lane-enabled.json", {
+        "mode": "PAPER_RESEARCH_INDEPENDENT_V1", "enabled": True, "real_orders_enabled": False})
+    seen = []
+    def due(archive, state, **kwargs):
+        seen.append(kwargs)
+        with interprocess_file_lock(state / "run-due.lock", timeout=0):
+            return [{"target": "daily-codex-us", "status": "DUE"}]
+    monkeypatch.setattr(local, "run_due", due)
+    assert h.tick()[0]["status"] == "DAILY_RESEARCH_ATTEMPTED"
+    assert seen == [{"now": NOW, "dry_run": False, "research_only": True}]
+    assert h.calls == []
+
+
+def test_new_research_waits_for_existing_producer_ownership_transfer(tmp_path, monkeypatch):
+    h = Harness(tmp_path, monkeypatch)
+    (h.state / "actions-drained.json").unlink()
+    assert h.tick() == [{"status": "WAITING_LOCAL_AUTOMATION_AUTHORITY"}]
     assert h.calls == []

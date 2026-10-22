@@ -216,6 +216,46 @@ def test_producer_lock_does_not_block_publication(tmp_path):
                 pass
 
 
+def test_daily_research_delegation_keeps_producer_free_and_original_attempt_budget(tmp_path, monkeypatch):
+    import hashlib
+    from tradingagents.execution import refresh_runtime
+    from tradingagents.scheduled import runner
+    item = target()
+    now = datetime(2026, 10, 9, 12, tzinfo=timezone.utc)
+    monkeypatch.setattr(local, "script", lambda _: SimpleNamespace(due_targets=lambda *a, **k: [item]))
+    monkeypatch.setattr(runner, "_iter_run_manifests_desc", lambda _: [])
+    monkeypatch.setattr(local, "preflight", lambda _: None)
+    monkeypatch.setattr(local, "full_research_session_hold", lambda *a, **k: None)
+    monkeypatch.setattr(refresh_runtime, "refresh_due", lambda *a, **k: [{"status": "REFRESH_COOLDOWN"}])
+    local.atomic_write_json(tmp_path / "research-lane-enabled.json", {
+        "mode": "PAPER_RESEARCH_INDEPENDENT_V1", "enabled": True, "real_orders_enabled": False})
+    local.atomic_write_json(tmp_path / "kis-strategy/enabled.json", {"mode": "KIS_DEMO_STRATEGY", "enabled": True,
+        "real_orders_enabled": False, "allocation_mode": "DEMO_NATIVE_ONE_SHARE_V1"})
+    local.atomic_write_json(tmp_path / "actions-drained.json", {})
+    key = hashlib.sha256(f"{item.name}:{item.window_start_kst.isoformat()}".encode()).hexdigest()
+    receipt = tmp_path / "attempts" / f"{key}.json"
+    local.atomic_write_json(receipt, {"attempts": 1, "started_at": "2026-10-09T09:00:00+00:00", "exit_code": 1})
+    before = receipt.read_bytes()
+    with interprocess_file_lock(tmp_path / "run-due.lock", timeout=0):
+        assert local.run_due(tmp_path / "archive", tmp_path, now=now) == [
+            {"target": item.name, "status": "DELEGATED_TO_RESEARCH_LANE"}, {"status": "REFRESH_COOLDOWN"}]
+    assert receipt.read_bytes() == before
+    calls = []
+    def full(args, **kwargs):
+        with interprocess_file_lock(tmp_path / "run-due.lock", timeout=0):
+            calls.append(args)
+        return SimpleNamespace(returncode=0)
+    monkeypatch.setattr(local.subprocess, "run", full)
+    with interprocess_file_lock(tmp_path / "research-kis.lock", timeout=0):
+        assert local.run_due(tmp_path / "archive", tmp_path, now=now, research_only=True) == [
+            {"target": item.name, "status": "DUE"}]
+    assert calls[0][calls[0].index("--run-mode") + 1] == "full"
+    assert json.loads(receipt.read_text())["attempts"] == 2
+    after = receipt.read_bytes()
+    assert local.run_due(tmp_path / "archive", tmp_path, now=now, research_only=True)[0]["status"] == "RETRY_BUDGET_OR_COOLDOWN"
+    assert receipt.read_bytes() == after and len(calls) == 1
+
+
 @pytest.mark.parametrize('enabled', [False, True])
 def test_scheduled_overlay_cannot_starve_enabled_paper_refresh(tmp_path, monkeypatch, enabled):
     from tradingagents.scheduled import runner

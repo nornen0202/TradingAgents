@@ -22,6 +22,22 @@ ZONES = {"KR": "Asia/Seoul", "US": "America/New_York"}
 MAX_ADMISSION_MINUTES = 30
 
 
+def research_lane_enabled(state):
+    state = Path(state)
+    try:
+        lane = _read(state / "research-lane-enabled.json", {})
+        strategy = _read(state / "kis-strategy/enabled.json", {})
+    except (OSError, ValueError):
+        return False
+    return (isinstance(lane, dict) and lane.get("mode") == "PAPER_RESEARCH_INDEPENDENT_V1"
+            and lane.get("enabled") is True and lane.get("real_orders_enabled") is False
+            and isinstance(strategy, dict) and strategy.get("enabled") is True
+            and strategy.get("mode") == "KIS_DEMO_STRATEGY"
+            and strategy.get("real_orders_enabled") is False
+            and strategy.get("allocation_mode") == "DEMO_NATIVE_ONE_SHARE_V1"
+            and (state / "actions-drained.json").is_file())
+
+
 def select_targets(source_dir, source, observation_dir, *, market, now, allowed, cap, excluded=()):
     """Eligibility for research is not entry authority; orders recheck all limits."""
     rows = rows_by_ticker(source)
@@ -77,6 +93,16 @@ def research_due(archive, state, *, now=None, dry_run=False, executor=None, sess
         return []
     if (state / "kis-strategy/HALT").exists() or (state / "kis-validation/HALT").exists():
         return [{"status": "HALTED"}]
+    if not (state / "actions-drained.json").is_file():
+        return [{"status": "WAITING_LOCAL_AUTOMATION_AUTHORITY"}]
+    if research_lane_enabled(state):
+        # Preserve the existing full-run target windows, attempt receipts,
+        # preflight and failed-only recovery. Only ownership of the long call
+        # moves to this independent research lock.
+        from tradingagents.local_automation import run_due
+        daily = run_due(archive, state, now=now, dry_run=dry_run, research_only=True)
+        if any(row.get("status") == "DUE" for row in daily):
+            return [{"status": "DAILY_RESEARCH_DUE" if dry_run else "DAILY_RESEARCH_ATTEMPTED", "decisions": daily}]
     from .demo_runtime import CAPS, universe
     from tradingagents.scheduled.config import load_scheduled_config
     from tradingagents.scheduled.runner import (

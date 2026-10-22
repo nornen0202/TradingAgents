@@ -28,7 +28,7 @@ function New-ScheduledTaskTrigger { param([switch]$Once,$At,$RepetitionInterval)
 function New-ScheduledTaskSettingsSet {
     param($MultipleInstances,[switch]$StartWhenAvailable,[switch]$AllowStartIfOnBatteries,
         [switch]$DontStopIfGoingOnBatteries,[switch]$Hidden,$ExecutionTimeLimit)
-    return @{Instances=$MultipleInstances;Hidden=[bool]$Hidden}
+    return @{Instances=$MultipleInstances;Hidden=[bool]$Hidden;Hours=$ExecutionTimeLimit.TotalHours}
 }
 function Register-ScheduledTask {
     param($TaskPath,$TaskName,$Action,$Trigger,$Principal,$Settings,[switch]$Force)
@@ -37,7 +37,7 @@ function Register-ScheduledTask {
 function Start-ScheduledTask { param($TaskPath,$TaskName) $global:started+=$TaskName }
 function Disable-ScheduledTask { throw 'Existing task must be preserved' }
 function Unregister-ScheduledTask { throw 'Existing task must be preserved' }
-''' + f"\n& {quote(install)} -InstallRoot {quote(tmp_path)}" + (" -NoStart" if no_start else "")
+''' + f"\n& {quote(install)} -InstallRoot {quote(tmp_path)} -RepositoryRoot {quote(tmp_path / 'repo')}" + (" -NoStart" if no_start else "")
         + "\n@{registered=@($global:registered);started=@($global:started)} | ConvertTo-Json -Depth 8 -Compress\n")
     result = subprocess.run(["powershell.exe", "-NoProfile", "-NonInteractive", "-File", str(probe)],
                             capture_output=True, text=True, timeout=15)
@@ -47,9 +47,11 @@ function Unregister-ScheduledTask { throw 'Existing task must be preserved' }
     task = row["registered"][0]
     assert task["TaskName"] == "LocalAutomation-research-kis"
     assert "-Command research-kis" in task["Action"]["Argument"]
-    assert task["Settings"] == {"Instances": "IgnoreNew", "Hidden": True}
+    assert task["Settings"] == {"Instances": "IgnoreNew", "Hidden": True, "Hours": 13}
     assert task["Trigger"]["Interval"] == 5
     assert row["started"] == ([] if no_start else ["LocalAutomation-research-kis"])
+    marker = json.loads((tmp_path / "repo/.runtime/local-automation/research-lane-enabled.json").read_text(encoding="utf-8-sig"))
+    assert marker["enabled"] is True and marker["real_orders_enabled"] is False
 
 
 @pytest.mark.skipif(not shutil.which("powershell.exe"), reason="Windows PowerShell required")
