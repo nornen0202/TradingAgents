@@ -9,12 +9,13 @@ from datetime import datetime, timezone
 import hashlib
 import json
 import math
+import re
 from pathlib import Path
 import sqlite3
 from typing import Any, Mapping
 
 
-KINDS = {"SIGNAL", "INTENT", "FILL", "CANCEL", "OUTCOME", "RETROSPECTIVE", "ACCOUNT_SEED"}
+KINDS = {"SIGNAL", "INTENT", "FILL", "CANCEL", "OUTCOME", "RETROSPECTIVE", "RETROSPECTIVE_ALLOCATION", "ACCOUNT_SEED"}
 MODES = {"recommendation", "paper", "demo", "actual"}
 
 
@@ -78,9 +79,9 @@ def validate_event(event: Mapping[str, Any]) -> None:
     kind, payload = event["kind"], event["payload"]
     if not isinstance(payload, Mapping):
         raise ValueError("Lifecycle payload must be an object")
-    if kind in {"FILL", "OUTCOME", "RETROSPECTIVE"}:
+    if kind in {"FILL", "OUTCOME", "RETROSPECTIVE", "RETROSPECTIVE_ALLOCATION"}:
         timestamp(event.get("confirmed_at"))
-    if kind in {"FILL", "RETROSPECTIVE"}:
+    if kind in {"FILL", "RETROSPECTIVE", "RETROSPECTIVE_ALLOCATION"}:
         timestamp(event.get("settled_at"))
     if kind in {"INTENT", "FILL", "CANCEL"} and not event.get("intent_id"):
         raise ValueError("Order evidence requires intent ID")
@@ -99,6 +100,27 @@ def validate_event(event: Mapping[str, Any]) -> None:
         if (not _number(payload.get("cash")) or not isinstance(payload.get("positions", {}), Mapping)
                 or any(not _number(quantity) for quantity in payload.get("positions", {}).values())):
             raise ValueError("Account seed requires finite cash and nonnegative quantities")
+    if kind == "RETROSPECTIVE_ALLOCATION":
+        if (event["mode"] == "recommendation" or payload.get("schema") != "tradingagents.fifo-allocation/v1"
+                or payload.get("algorithm") != "FIFO_INCREMENTAL_FILL_COSTS/v1"
+                or not isinstance(payload.get("ticker"), str) or not payload["ticker"]
+                or not isinstance(payload.get("exit_fill_id"), str) or not payload["exit_fill_id"]
+                or not re.fullmatch(r"[A-Z]{3}", str(payload.get("currency", "")))
+                or not re.fullmatch(r"[0-9a-f]{64}", str(payload.get("content_hash", "")))
+                or "previous_revision_id" not in payload
+                or (payload["previous_revision_id"] is not None and
+                    (not isinstance(payload["previous_revision_id"], str) or not payload["previous_revision_id"]))):
+            raise ValueError("Explicit allocation revision identity required")
+        for key in ("review_ids", "input_event_ids"):
+            values = payload.get(key)
+            if (not isinstance(values, list) or any(not isinstance(value, str) or not value for value in values)
+                    or len(values) != len(set(values))):
+                raise ValueError("Unique allocation evidence references required")
+        if (payload["exit_fill_id"] not in payload["input_event_ids"]
+                or timestamp(payload.get("input_as_of")) > available
+                or max(timestamp(event[k]) for k in ("occurred_at", "confirmed_at", "settled_at")) > available
+                or available > ingested):
+            raise ValueError("Allocation revision cannot precede its outcome evidence")
     json.dumps(dict(payload), allow_nan=False)
 
 

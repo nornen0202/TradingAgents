@@ -4,6 +4,7 @@ from typing import Any, Dict
 from datetime import date, datetime, timezone
 
 from tradingagents.schemas import parse_structured_decision
+from tradingagents.agents.utils.memory import _clock, _query_cutoff
 
 
 class Reflector:
@@ -59,21 +60,41 @@ Adhere strictly to these instructions, and ensure your output is detailed, accur
 
     @staticmethod
     def _outcome_metadata(state):
-        known_at = state.get("outcome_known_at") or datetime.now(timezone.utc).date().isoformat()
-        decision_date = date.fromisoformat(state.get("analysis_date") or state["trade_date"])
-        if date.fromisoformat(known_at) <= decision_date:
+        now = datetime.now(timezone.utc)
+        known_at = state.get("outcome_known_at", now.isoformat())
+        known = _clock(known_at, allow_date=True)
+        decision, date_only = _query_cutoff(state.get("analysis_date") or state["trade_date"])
+        if decision is None:
+            raise ValueError("Decision as-of date is required")
+        if (known < decision if date_only else known <= decision):
             raise ValueError("Outcome must become known after the decision as-of date")
+        if known > now:
+            raise ValueError("Outcome cannot be known in the future")
         metadata = {
             "symbol": state.get("company_of_interest"),
             "trade_date": state.get("trade_date"),
-            "outcome_known_at": known_at,
+            "outcome_known_at": known_at.isoformat() if isinstance(known_at, date) else known_at,
         }
-        if "settlement_date" in state:
-            settlement = state["settlement_date"]
-            if date.fromisoformat(settlement) <= decision_date:
+        for field in ("settlement_date", "settled_at"):
+            if field not in state:
+                continue
+            settlement = _clock(state[field], allow_date=True)
+            if (settlement < decision if date_only else settlement <= decision):
                 raise ValueError("Settlement must occur after the decision as-of date")
-            metadata["settlement_date"] = settlement
+            if settlement > now:
+                raise ValueError("Settlement cannot be known in the future")
+            metadata[field] = state[field].isoformat() if isinstance(state[field], date) else state[field]
         return metadata
+
+    @staticmethod
+    def _store_reflection(memory, situation, result, metadata):
+        # The generated lesson did not exist at the trade/outcome date. Stamp
+        # availability only after the model completed; never backdate ingestion
+        # from the historical state being reviewed.
+        received_at = datetime.now(timezone.utc).isoformat()
+        memory.add_situations([(situation, result, {
+            **metadata, "available_at": received_at, "ingested_at": received_at,
+        })])
 
     def _reflect_on_component(
         self, component_type: str, report: str, situation: str, returns_losses
@@ -99,7 +120,7 @@ Adhere strictly to these instructions, and ensure your output is detailed, accur
         result = self._reflect_on_component(
             "BULL", bull_debate_history, situation, returns_losses
         )
-        bull_memory.add_situations([(situation, result, metadata)])
+        self._store_reflection(bull_memory, situation, result, metadata)
 
     def reflect_bear_researcher(self, current_state, returns_losses, bear_memory):
         """Reflect on bear researcher's analysis and update memory."""
@@ -110,7 +131,7 @@ Adhere strictly to these instructions, and ensure your output is detailed, accur
         result = self._reflect_on_component(
             "BEAR", bear_debate_history, situation, returns_losses
         )
-        bear_memory.add_situations([(situation, result, metadata)])
+        self._store_reflection(bear_memory, situation, result, metadata)
 
     def reflect_trader(self, current_state, returns_losses, trader_memory):
         """Reflect on trader's decision and update memory."""
@@ -125,7 +146,7 @@ Adhere strictly to these instructions, and ensure your output is detailed, accur
         result = self._reflect_on_component(
             "TRADER", trader_decision, situation, returns_losses
         )
-        trader_memory.add_situations([(situation, result, metadata)])
+        self._store_reflection(trader_memory, situation, result, metadata)
 
     def reflect_invest_judge(self, current_state, returns_losses, invest_judge_memory):
         """Reflect on investment judge's decision and update memory."""
@@ -140,7 +161,7 @@ Adhere strictly to these instructions, and ensure your output is detailed, accur
         result = self._reflect_on_component(
             "INVEST JUDGE", judge_decision, situation, returns_losses
         )
-        invest_judge_memory.add_situations([(situation, result, metadata)])
+        self._store_reflection(invest_judge_memory, situation, result, metadata)
 
     def reflect_portfolio_manager(self, current_state, returns_losses, portfolio_manager_memory):
         """Reflect on portfolio manager's decision and update memory."""
@@ -155,4 +176,4 @@ Adhere strictly to these instructions, and ensure your output is detailed, accur
         result = self._reflect_on_component(
             "PORTFOLIO MANAGER", judge_decision, situation, returns_losses
         )
-        portfolio_manager_memory.add_situations([(situation, result, metadata)])
+        self._store_reflection(portfolio_manager_memory, situation, result, metadata)

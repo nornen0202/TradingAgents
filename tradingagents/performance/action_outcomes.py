@@ -12,6 +12,7 @@ from tradingagents.external.prism_normalize import normalize_market
 from .models import ACTION_TRACKER_SCHEMA, OUTCOME_CALCULATION_VERSION, ActionPerformanceSummary
 from .price_history import BENCHMARK_KEY
 from .lifecycle import append_lifecycle_event, initialize_lifecycle, stable_signal_id, timestamp, validate_event
+from .outcome_revisions import read_events, select_retrospectives, visible_events
 
 
 def initialize_action_tracker(db_path: Path) -> None:
@@ -290,21 +291,31 @@ def _outcome_refresh_cutoff_date(asof_date: str, refresh_window_days: int) -> st
     return (parsed - timedelta(days=max(1, int(refresh_window_days or 1)))).isoformat()
 
 
-def summarize_action_performance(db_path: Path) -> ActionPerformanceSummary:
+def summarize_action_performance(db_path: Path, *, analysis_as_of: str | None = None) -> ActionPerformanceSummary:
+    """Summarize recommendations and the active, dated execution feedback.
+
+    The optional cutoff governs lifecycle feedback; the existing recommendation
+    aggregates retain their all-record, counterfactual measurement scope.
+    """
+    cutoff = timestamp(analysis_as_of) if analysis_as_of is not None else datetime.now(timezone.utc)
     initialize_action_tracker(db_path)
     with sqlite3.connect(db_path) as conn:
         conn.row_factory = sqlite3.Row
         recommendations = int(conn.execute("SELECT COUNT(*) FROM action_recommendations").fetchone()[0])
         outcomes = int(conn.execute("SELECT COUNT(*) FROM action_outcomes").fetchone()[0])
-        closed_trades = int(_count_optional_table(conn, "trade_journal"))
-        learned = int(_count_optional_table(conn, "learned_intuitions"))
+        events = read_events(conn)
+        known_events = visible_events(events, cutoff.isoformat())
+        active_reviews = select_retrospectives(events, analysis_as_of=cutoff.isoformat())
+        closed_trades = len(active_reviews)
+        learned = _active_lesson_count(conn, active_reviews, cutoff)
         by_action = _aggregate(conn, "action")
         by_prism = _aggregate(conn, "prism_agreement")
         source_cohorts = _aggregate(conn, "source_cohort")
         action_buckets = _aggregate_action_buckets(conn)
         profit_taking = _aggregate_profit_taking(conn)
         calibration = _aggregate_calibration(conn)
-        data_quality = _performance_data_quality(conn, closed_trades=closed_trades)
+        data_quality = _performance_data_quality(conn, closed_trades=closed_trades,
+                                                known_events=known_events, active_reviews=active_reviews)
     return ActionPerformanceSummary(
         recommendations=recommendations,
         outcomes=outcomes,
@@ -318,6 +329,27 @@ def summarize_action_performance(db_path: Path) -> ActionPerformanceSummary:
         calibration=calibration,
         data_quality=data_quality,
     )
+
+
+def _active_lesson_count(conn, reviews, cutoff):
+    """Retain old lesson rows; only lessons of selected revisions count now."""
+    if "review_id" not in {row[1] for row in conn.execute("PRAGMA table_info(trade_journal)")}:
+        return 0
+    review_ids = {event["event_id"] for event in reviews}
+    journal_ids = {row[0] for row in conn.execute("SELECT id,review_id FROM trade_journal") if row[1] in review_ids}
+    count = 0
+    for row in conn.execute("SELECT * FROM learned_intuitions"):
+        lesson = dict(row)
+        try:
+            sources = json.loads(lesson["source_journal_ids_json"])
+            if (not isinstance(sources, list) or not sources
+                    or any(type(source) is not int or source not in journal_ids for source in sources)
+                    or any(timestamp(lesson.get(key)) > cutoff for key in ("created_at", "confirmed_at", "settled_at"))):
+                continue
+        except (ValueError, TypeError, KeyError):
+            continue
+        count += 1
+    return count
 
 
 def _portfolio_action_rows(
@@ -769,6 +801,8 @@ def _performance_data_quality(
     conn: sqlite3.Connection,
     *,
     closed_trades: int,
+    known_events: Mapping[str, dict],
+    active_reviews: list[dict],
 ) -> dict[str, Any]:
     row = conn.execute(
         """
@@ -804,24 +838,14 @@ def _performance_data_quality(
     legacy_fill_claims = int(row["broker_fill_linked_rows"] or 0) if row else 0
     # An old receipt label or a paper journal row cannot prove actual trading
     # effectiveness. Require the immutable, confirmed and settled evidence chain.
-    now = datetime.now(timezone.utc)
-    actual_fills, paper_fills, actual_reviews = {}, {}, []
-    for stored in conn.execute("SELECT * FROM lifecycle_events WHERE kind IN ('FILL','RETROSPECTIVE')"):
-        event = dict(stored)
-        try:
-            event["payload"] = json.loads(event.pop("payload_json"))
-            validate_event(event)
-            if any(timestamp(event[key]) > now for key in ("occurred_at", "available_at", "confirmed_at", "settled_at", "ingested_at") if event.get(key)):
-                continue
-        except (ValueError, TypeError, KeyError):
-            continue
+    actual_fills, paper_fills = {}, {}
+    actual_reviews = [event["payload"] for event in active_reviews if event["mode"] == "actual"]
+    for event in known_events.values():
         if event["kind"] == "FILL":
             if event["mode"] == "actual":
                 actual_fills[event["event_id"]] = event
             elif event["mode"] == "paper":
                 paper_fills[event["event_id"]] = event
-        elif event["mode"] == "actual":
-            actual_reviews.append(event["payload"])
     broker_fills = len({event["signal_id"] for event in actual_fills.values()})
     actual_closed = sum(review.get("entry_fill_id") in actual_fills and review.get("exit_fill_id") in actual_fills for review in actual_reviews)
     legacy_unverified = int(row["legacy_unverified_execution_rows"] or 0) if row else 0
@@ -973,7 +997,7 @@ def record_execution_receipt(db: Path | sqlite3.Connection, *, row: Mapping[str,
     for exit_id, encoded in exits:
         candidate = json.loads(encoded)
         if candidate.get("side") == "SELL" and candidate.get("ticker") == row["ticker"]:
-            record_fill_retrospectives(db, exit_event_id=exit_id, evaluated_at=ingested_at)
+            record_fill_retrospectives(db, exit_event_id=exit_id, evaluated_at=ingested_at, clock=lambda: ingested_at)
     return inserted
 
 
