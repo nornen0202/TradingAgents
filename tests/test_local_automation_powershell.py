@@ -10,6 +10,40 @@ import pytest
 
 
 @pytest.mark.skipif(not shutil.which("powershell.exe"), reason="Windows PowerShell required")
+@pytest.mark.parametrize("dry_run", [False, True])
+def test_diagnostic_worker_can_start_while_scheduled_log_is_open(tmp_path, dry_run):
+    wrapper = (Path(__file__).parents[1] / "tools/run_local_automation.ps1").read_text()
+    selection = wrapper.split('    $logName = ', 1)[1].split('    $arguments = ', 1)[0]
+    selection = '$logName = ' + selection
+    boundary = wrapper.split("    if ($DryRun)", 1)[1].split("    # End worker process boundary.", 1)[0]
+    boundary = "if ($DryRun)" + boundary
+    def quote(value):
+        return "'" + str(value).replace("'", "''") + "'"
+    worker = tmp_path / "worker.py"
+    worker.write_text("print('probe completed')\n")
+    script = tmp_path / "probe.ps1"
+    script.write_text("$ErrorActionPreference='Stop'\n" +
+        f"$stateRoot={quote(tmp_path)}\n$Command='research-kis'\n$DryRun=${str(dry_run).lower()}\n" +
+        f"$pythonPath={quote(sys.executable)}\n$arguments=@({quote(worker)})\n" +
+        "$regular=Join-Path $stateRoot 'research-kis.log'\n" +
+        "$stream=[IO.File]::Open($regular,[IO.FileMode]::OpenOrCreate,[IO.FileAccess]::ReadWrite,[IO.FileShare]::Read)\n" +
+        "$errorMessage=$null\ntry {\n" + selection + boundary +
+        "\n} catch { $errorMessage=$_.Exception.Message } finally { $stream.Dispose() }\n" +
+        "@{python_invoked=$pythonInvoked;error=$errorMessage;log=$logPath} | ConvertTo-Json -Compress\n")
+    result = subprocess.run(["powershell.exe", "-NoProfile", "-NonInteractive", "-File", str(script)],
+                            capture_output=True, text=True, errors="replace", timeout=15)
+    assert result.returncode == 0, result.stderr
+    row = json.loads(result.stdout)
+    if dry_run:
+        assert row["python_invoked"] is True and row["error"] is None
+        assert "probe completed" in Path(row["log"]).read_text(encoding="utf-16")
+        assert (tmp_path / "research-kis.log").read_bytes() == b""
+    else:
+        assert row["python_invoked"] is False
+        assert "research-kis.log" in row["error"]
+
+
+@pytest.mark.skipif(not shutil.which("powershell.exe"), reason="Windows PowerShell required")
 @pytest.mark.parametrize("no_start", [True, False])
 def test_research_task_registration_preserves_existing_windows_tasks(tmp_path, no_start):
     install = Path(__file__).parents[1] / "tools/install_paper_research_task.ps1"
