@@ -27,6 +27,7 @@ from . import demo_strategy_plan
 from .kis_demo import DemoCredentials, KisDemoClient
 from .kis_paper import KisPaperBroker, PaperOrderPolicy, _fresh, _tick
 from .paper_runtime import _latest_source, _runtime_session
+from .strategy_evaluation import evaluate_strategy_orders
 
 SCHEMA = "tradingagents.kis-strategy-runtime/v1"
 MODE = "KIS_DEMO_STRATEGY"
@@ -243,23 +244,43 @@ def summary(db, now, market, marks=None):
         if at(row["prepared_at"]) > now:
             raise ValueError("FUTURE_STRATEGY_ATTEMPT")
         terms = json.loads(row["terms"])
-        request = db.execute("SELECT status FROM requests WHERE id=?", (row["id"],)).fetchone()
+        request = db.execute("SELECT status,response,created_at FROM requests WHERE id=?", (row["id"],)).fetchone()
         original = db.execute("SELECT terms FROM paper_intents WHERE id=?", (row["id"],)).fetchone()
         if (request and not original) or (original and json.loads(original[0]) != terms):
             raise ValueError("STRATEGY_BROKER_TERMS_MISMATCH")
         status = request[0] if request else row["state"]
-        evidence, observed, last_qty, last_amount = {}, None, 0, 0
+        evidence, observed, last_qty, last_amount, last_amount_qty = {}, None, 0, 0, 0
         for item in db.execute("SELECT observed_at,evidence FROM paper_observations WHERE id=? ORDER BY observed_at", (row["id"],)):
             observed_at = at(item[0])
             if not at(row["prepared_at"]) <= observed_at <= now:
                 raise ValueError("INVALID_STRATEGY_OBSERVATION_CLOCK")
             current = json.loads(item[1])
+            broker_id = json.loads(request["response"]).get("broker_order_id") if request else None
+            if (not request or request["status"] != "ACKNOWLEDGED" or not broker_id
+                    or current.get("broker_order_id") != broker_id or current.get("mode") != "demo"
+                    or current.get("live_orders_enabled") is True
+                    or not at(row["prepared_at"]) <= at(request["created_at"]) <= observed_at
+                    or observed_at != at(current.get("observed_at"))
+                    or not observed_at <= at(current.get("ingested_at")) <= now):
+                raise ValueError("INVALID_STRATEGY_OBSERVATION_PROOF")
             qty, amount = current.get("filled_qty"), current.get("fill_notional")
             if type(qty) is not int or qty < last_qty or qty > terms["quantity"]:
                 raise ValueError("INVALID_STRATEGY_FILL")
-            if amount is not None and (isinstance(amount, bool) or not isinstance(amount, (int, float)) or not math.isfinite(amount) or amount < 0 or (last_amount is not None and (amount < last_amount or (qty == last_qty and amount != last_amount)))):
+            remaining, fill_status = current.get("remaining_qty"), current.get("status")
+            if (type(remaining) is not int or not 0 <= remaining <= terms["quantity"] - qty
+                    or fill_status not in {"OPEN", "PARTIAL", "FILLED", "CANCELLED", "UNRESOLVED"}
+                    or (fill_status == "FILLED" and (qty != terms["quantity"] or remaining != 0))
+                    or (fill_status == "CANCELLED" and remaining != 0)
+                    or (fill_status == "OPEN" and (qty != 0 or remaining != terms["quantity"]))
+                    or (fill_status == "PARTIAL" and (not 0 < qty < terms["quantity"] or remaining != terms["quantity"] - qty))):
+                raise ValueError("INVALID_STRATEGY_FILL_STATE")
+            if amount is not None and (isinstance(amount, bool) or not isinstance(amount, (int, float)) or not math.isfinite(amount)
+                    or amount < 0 or (qty > 0 and amount == 0) or (qty == 0 and amount != 0)
+                    or amount < last_amount or (qty == last_amount_qty and amount != last_amount)):
                 raise ValueError("INVALID_STRATEGY_CASHFLOW")
-            last_qty, last_amount = qty, amount
+            if amount is not None:
+                last_amount, last_amount_qty = amount, qty
+            last_qty = qty
             evidence, observed = current, observed_at
         filled, amount = evidence.get("filled_qty", 0), evidence.get("fill_notional", 0 if not evidence else None)
         status = evidence.get("status", status)
@@ -276,8 +297,11 @@ def summary(db, now, market, marks=None):
         orders.append({"id": row["id"], "ticker": row["ticker"], "run_id": row["run_id"], "side": terms["side"],
             "quantity": terms["quantity"], "limit_price": terms["limit_price"], "filled_quantity": filled,
             "average_fill_price": amount / filled if filled and amount is not None else None,
+            "fill_notional": amount, "mode": "demo", "strategy_performance": True,
+            "source": "KIS_DEMO_BROKER_REPORT" if evidence else None,
             "status": status, "cancel_status": "CONFIRMED" if status == "CANCELLED" else cancellation[0] if cancellation else None,
-            "prepared_at": row["prepared_at"], "observed_at": observed.isoformat() if observed else None})
+            "prepared_at": row["prepared_at"], "observed_at": observed.isoformat() if observed else None,
+            "ingested_at": evidence.get("ingested_at")})
     if any(qty < 0 for qty in owned.values()):
         raise ValueError("STRATEGY_HOLDINGS_NEGATIVE")
     value, mark_times = 0.0, []
@@ -298,10 +322,12 @@ def summary(db, now, market, marks=None):
     counts = {key: sum(order["status"] == key for order in orders) for key in
               ("ACKNOWLEDGED", "OPEN", "PARTIAL", "FILLED", "CANCELLED", "REJECTED", "NOT_SENT", "BLOCKED", "UNKNOWN", "UNRESOLVED")}
     history = [json.loads(row[1]) for row in db.execute("SELECT * FROM strategy_valuations ORDER BY observed_at DESC LIMIT 60") if at(row[0]) <= now]
+    gross_pnl = round(sell - buy + value, 4) if complete and any(o["filled_quantity"] for o in orders) else None
     return {"orders": orders[-100:], "order_counts": counts, "owned": owned, "performance_history": list(reversed(history)),
+            "evaluation": evaluate_strategy_orders(orders, market=market, as_of=now.isoformat(), gross_pnl=gross_pnl, valuation_complete=complete),
             "performance": {"currency": "KRW" if market == "KR" else "USD", "basis": "STRATEGY_GROSS_CASHFLOWS_PLUS_MARKED_HOLDINGS",
                 "status": "NO_FILLS" if not any(o["filled_quantity"] for o in orders) else "AVAILABLE" if complete else "INCOMPLETE",
-                "gross_pnl": round(sell - buy + value, 4) if complete and any(o["filled_quantity"] for o in orders) else None,
+                "gross_pnl": gross_pnl,
                 "net_pnl": None, "fees_known": False, "settlement_known": False,
                 "observed_at": now.isoformat(), "mark_times": mark_times}}
 

@@ -281,7 +281,13 @@ def run_due(archive, state, *, now=None, dry_run=False, research_only=False):
     from tradingagents.scheduled.runner import _iter_run_manifests_desc
     from tradingagents.execution.research_runtime import research_lane_enabled
 
-    now = now or datetime.now(ZoneInfo("Asia/Seoul"))
+    now = datetime.now(ZoneInfo("Asia/Seoul")) if now is None else now
+    if not isinstance(now, datetime) or now.tzinfo is None or now.utcoffset() is None:
+        raise ValueError("Aware local automation clock required")
+    # The watchdog's wall clocks and session keys are explicitly Korean-local.
+    # Independent research supplies UTC; normalize the instant at this boundary
+    # before selecting targets or touching their existing attempt receipts.
+    now = now.astimezone(ZoneInfo("Asia/Seoul"))
     watchdog = script("scheduled_actions_watchdog")
     # Refresh before Work, leaving time for the minute launcher tick and
     # collection without extending input validity. The first US cloud slot

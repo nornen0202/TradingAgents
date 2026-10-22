@@ -98,6 +98,54 @@ def test_completion_after_close_uses_durable_fill_proof_and_rejects_tampering(h)
     assert h.calls == calls
 
 
+@pytest.mark.parametrize('damage', [
+    'wrong_broker', 'missing_broker', 'future_ingestion', 'missing_ingestion',
+    'bad_ingestion', 'ingestion_before_observation', 'different_observation',
+    'missing_observation', 'invalid_amount', 'nonfinite_amount', 'request_after_expiry',
+])
+def test_completed_roundtrip_requires_matching_broker_and_available_report(h, damage):
+    run(h)
+    h.fill()
+    h.now += timedelta(seconds=5)
+    run(h)
+    h.fill('2')
+    h.now += timedelta(seconds=5)
+    assert run(h)['status'] == 'VERIFIED'
+    with sqlite3.connect(journal(h)) as db:
+        if damage == 'request_after_expiry':
+            config = json.loads(db.execute("SELECT value FROM roundtrip_control WHERE key='authorization'").fetchone()[0])
+            db.execute('UPDATE requests SET created_at=?', (config['expires_at'],))
+            h.now += timedelta(days=2)
+        else:
+            for identity, observed, raw in db.execute('SELECT id,observed_at,evidence FROM paper_observations').fetchall():
+                evidence = json.loads(raw)
+                if evidence['status'] != 'FILLED':
+                    continue
+                if damage == 'wrong_broker':
+                    evidence['broker_order_id'] = 'unrelated'
+                elif damage == 'missing_broker':
+                    evidence.pop('broker_order_id')
+                elif damage == 'future_ingestion':
+                    evidence['ingested_at'] = (h.now + timedelta(seconds=1)).isoformat()
+                elif damage == 'missing_ingestion':
+                    evidence.pop('ingested_at')
+                elif damage == 'bad_ingestion':
+                    evidence['ingested_at'] = 'invalid'
+                elif damage == 'ingestion_before_observation':
+                    evidence['ingested_at'] = (rt.dv._at(observed) - timedelta(seconds=1)).isoformat()
+                elif damage == 'different_observation':
+                    evidence['observed_at'] = (rt.dv._at(observed) - timedelta(seconds=1)).isoformat()
+                elif damage == 'missing_observation':
+                    evidence.pop('observed_at')
+                else:
+                    evidence['fill_notional'] = -1 if damage == 'invalid_amount' else float('nan')
+                db.execute('UPDATE paper_observations SET evidence=? WHERE id=? AND observed_at=?',
+                           (json.dumps(evidence), identity, observed))
+    calls = list(h.calls)
+    assert run(h, session_resolver=lambda **kw: {'source': 'exchange_calendars', 'is_open': False, 'phase': 'closed'})['status'] == 'BLOCKED'
+    assert h.calls == calls
+
+
 def test_forged_status_json_cannot_create_fill(h):
     atomic_write_json(h.validation / 'roundtrip-status.json', {
         'campaign_id': 'fixture-roundtrip', 'markets': {h.market: {'status': 'VERIFIED'}}})

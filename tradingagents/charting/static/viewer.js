@@ -105,6 +105,16 @@ function renderKisStrategy(payload) {
     if(diagnostic?.reason_counts?.limited_halt_status)card.append(paragraph("거래정지 상태를 확인하지 못한 종목이 있어 실행이 제한됩니다."));
     const perf=row.performance;
     card.append(paragraph("전략 누적 평가손익(비용 전): "+(perf?.status==="AVAILABLE"?number(perf.gross_pnl)+" "+perf.currency:perf?.status==="NO_FILLS"?"아직 체결 없음":"체결 금액·평가 시세 확인 대기")));
+    const evaluation=row.evaluation;
+    if(evaluation){
+      const sample=evaluation.sample||{};
+      card.append(paragraph("정상 전략 체결 표본: 매수 "+number(sample.buy_filled_orders)+"건 · 매도 "+number(sample.sell_filled_orders)+"건 · 보유분 청산 왕복 "+number(sample.closed_inventory_episodes)+"회 · 주문 거래일 "+number(sample.order_session_count)+"일"));
+      if(evaluation.status!=="NO_FILLS")card.append(table("가정 비용 민감도 · 실제 순손익 아님",["총 체결대금 대비 가정 비용","가정 비용액","가정 비용 차감 후 손익"],(evaluation.cost_sensitivity?.scenarios||[]).map(s=>[
+        number(s.assumed_cost_bps_on_turnover/100)+"%",number(s.estimated_cost)+" "+evaluation.currency,number(s.estimated_pnl_after_assumed_cost)+" "+evaluation.currency])));
+      const unmet={ACTUAL_FEES_TAXES_FX_UNVERIFIED:"실제 수수료·세금·환전비용",SETTLEMENT_UNVERIFIED:"정산",BROKER_CORRECTIONS_UNVERIFIED:"증권사 사후 체결 정정",STATISTICAL_AND_OUT_OF_SAMPLE_VALIDATION_REQUIRED:"반복 표본·별도 기간 성과 검증",NO_STRATEGY_FILLS:"정상 전략 체결",STRATEGY_BUY_FILL_REQUIRED:"정상 전략 매수 체결",STRATEGY_SELL_FILL_REQUIRED:"정상 전략 매도 체결",CLOSED_STRATEGY_ROUND_TRIP_UNVERIFIED:"정상 전략 왕복 체결",FILL_NOTIONAL_UNVERIFIED:"체결 대금",GROSS_VALUATION_INCOMPLETE:"보유분 평가",OPEN_STRATEGY_INVENTORY:"열린 보유분의 청산 평가",ORDER_PENDING_OR_UNRESOLVED:"미결·미확정 주문 대사"};
+      card.append(paragraph("실투자 판단 미충족: "+(evaluation.unmet_criteria||[]).map(code=>unmet[code]||"근거 확인").join(" · ")+". 실투자로 자동 전환하지 않습니다."));
+      if(evaluation.status!=="NO_FILLS")card.append(paragraph("0.1%·0.3%·0.5%는 이미 확인한 매수·매도 체결대금에 적용한 비교 가정입니다. 실제 증권사 요율이 아니며, 앞으로 보유분을 매도할 비용은 포함하지 않습니다."));
+    }
     if(row.performance_history?.length)card.append(table("최근 확인한 성과",["평가 확인 시각 (한국시간)","누적 평가손익 · 비용 전"],row.performance_history.slice(-10).reverse().map(p=>[clock(p.observed_at),number(p.gross_pnl)+" "+p.currency])));
     card.append(table("전략 주문·체결·취소",["종목 / 전략 실행","방향","주문 / 체결 수량","지정가 / 평균 체결가","상태 / 취소","마지막 확인 (한국시간)"],(row.orders||[]).slice().reverse().map(order=>[
       order.ticker+" / "+order.run_id,order.side==="BUY"?"매수":"매도",number(order.quantity)+" / "+number(order.filled_quantity),number(order.limit_price)+" / "+number(order.average_fill_price),

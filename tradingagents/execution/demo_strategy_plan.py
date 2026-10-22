@@ -11,12 +11,42 @@ import json
 
 from .demo_validation import _at
 from tradingagents.dataflows.research_evidence import assess_tool_evidence, evidence_review_reason
+from tradingagents.schemas import parse_structured_decision
 
 MODE = "DEMO_NATIVE_ONE_SHARE_V1"
 BUY = {"STARTER_NOW", "ADD_NOW", "BUY_NOW"}
 SELL = {"REDUCE_NOW", "EXIT_NOW", "STOP_LOSS_NOW"}
 HARD_BUY_GATES = {"blocked_new_entries_no_tool_calls", "blocked_new_entries_company_news_zero",
                   "high_fallback_count", "required_research_evidence_missing", "prism_conflict_review_required", "BUY_MATRIX_FAIL"}
+
+
+def _original_entry_research(read, ticker, contract, generated, candidate):
+    """A derived portfolio row cannot grant or extend the original approval."""
+    try:
+        analysis = read(f"tickers/{ticker}/analysis.json")
+        started, finished = _at(analysis.get("started_at")), _at(analysis.get("finished_at"))
+        if (analysis.get("ticker") != ticker or analysis.get("status") != "success"
+                or not started <= finished <= generated
+                or finished != _at(contract.get("analysis_asof"))):
+            raise ValueError("Unverified original research identity or clock")
+        original = parse_structured_decision(analysis.get("decision")).to_dict()
+    except (ValueError, TypeError, KeyError, OSError, AttributeError) as exc:
+        raise ValueError("ENTRY_ORIGINAL_RESEARCH_UNVERIFIED") from exc
+    try:
+        derived = parse_structured_decision(candidate.get("structured_decision")).to_dict()
+    except (ValueError, TypeError, KeyError, AttributeError) as exc:
+        raise ValueError("ENTRY_RESEARCH_DECISION_MISMATCH") from exc
+    if original != derived:
+        raise ValueError("ENTRY_RESEARCH_DECISION_MISMATCH")
+    conditional = original["conditional_entry_action"]
+    authorized = conditional if conditional in {"STARTER", "ADD"} else original["entry_action"]
+    if authorized not in {"STARTER", "ADD"}:
+        raise ValueError("ENTRY_NOT_AUTHORIZED_BY_RESEARCH")
+    if (contract.get("action_if_triggered") != authorized
+            or contract.get("entry_action_base") != original["entry_action"]
+            or contract.get("risk_action") != original["risk_action"]):
+        raise ValueError("ENTRY_AUTHORIZATION_MISMATCH")
+    return analysis, original
 
 
 def plan(source, market, now, tickers, owned):
@@ -78,12 +108,8 @@ def plan(source, market, now, tickers, owned):
                     raise ValueError("SELL_SIZE_REQUIRES_EXPLICIT_ALLOCATION")
                 if side == "BUY":
                     research_row = by_ticker.get(ticker) or {}
-                    structured = research_row.get("structured_decision") or {}
-                    base, conditional = structured.get("entry_action"), structured.get("conditional_entry_action")
-                    authorized = conditional if conditional in {"STARTER", "ADD"} else base
-                    if (base not in {"STARTER", "ADD"} and conditional not in {"STARTER", "ADD"}
-                            or contract.get("action_if_triggered") != authorized):
-                        raise ValueError("ENTRY_NOT_AUTHORIZED_BY_RESEARCH")
+                    analysis, structured = _original_entry_research(read, ticker, contract, generated, research_row)
+                    conditional = structured["conditional_entry_action"]
                     if conditional in {"STARTER", "ADD"}:
                         research_expiry = _at(structured.get("conditional_entry_valid_until"))
                         if _at(contract.get("entry_valid_until")) != research_expiry:
@@ -99,15 +125,18 @@ def plan(source, market, now, tickers, owned):
                     # New demo positions must satisfy new-entry evidence even
                     # if the reporting account already owns this instrument.
                     coverage, vendor = research_row.get("data_coverage") or {}, research_row.get("vendor_health") or {}
-                    if "request_evidence" in vendor:
-                        analysis = read(f"tickers/{ticker}/analysis.json")
-                        original_evidence = assess_tool_evidence(analysis.get("tool_telemetry") or {},
-                            started_at=analysis.get("started_at"), finished_at=analysis.get("finished_at"))
-                        if (analysis.get("ticker") != ticker or original_evidence is None
-                                or original_evidence != vendor["request_evidence"]
-                                or _at(analysis.get("finished_at")) != _at(contract["analysis_asof"])):
+                    original_telemetry = analysis.get("tool_telemetry") or {}
+                    original_evidence = assess_tool_evidence(original_telemetry,
+                        started_at=analysis.get("started_at"), finished_at=analysis.get("finished_at"))
+                    original_health = {"fallback_count": original_telemetry.get("fallback_count", 0)}
+                    if original_evidence is not None or "request_evidence" in vendor:
+                        if original_evidence is None or original_evidence != vendor.get("request_evidence"):
                             raise ValueError("ENTRY_RESEARCH_EVIDENCE_INCOMPLETE")
+                        original_health["request_evidence"] = original_evidence
                     if (coverage.get("company_news_count", 0) < 1 or evidence_review_reason(vendor)
+                            or structured["data_coverage"]["company_news_count"] < 1
+                            or evidence_review_reason(original_health)
+                            or "no_tool_calls_detected" in (analysis.get("quality_flags") or [])
                             or "no_tool_calls_detected" in (research_row.get("quality_flags") or [])):
                         raise ValueError("ENTRY_RESEARCH_EVIDENCE_INCOMPLETE")
                 if now >= expiry:
@@ -128,6 +157,7 @@ def plan(source, market, now, tickers, owned):
             except (ValueError, TypeError, KeyError, OSError) as exc:
                 reason = str(exc) if str(exc) in {
                     "STRATEGY_OBSERVATION_NOT_EXECUTABLE", "STRATEGY_LINEAGE_MISMATCH",
+                    "ENTRY_ORIGINAL_RESEARCH_UNVERIFIED", "ENTRY_RESEARCH_DECISION_MISMATCH",
                     "ENTRY_NOT_AUTHORIZED_BY_RESEARCH", "ENTRY_AUTHORIZATION_MISMATCH", "ENTRY_RESEARCH_EXPIRED",
                     "ENTRY_RESEARCH_REVIEW_REQUIRED", "ENTRY_RESEARCH_EVIDENCE_INCOMPLETE",
                     "STRATEGY_AUTHORIZATION_EXPIRED", "SELL_SIZE_REQUIRES_EXPLICIT_ALLOCATION"} else "STRATEGY_EVIDENCE_UNVERIFIED"

@@ -153,24 +153,33 @@ def _completed(path, market, config, now):
             terms = json.loads(intent[0])
             _valid_terms(terms, market, side)
             preparation = json.loads(prepared[0])
-            if (preparation["terms"] != terms or not json.loads(request["response"]).get("broker_order_id")
-                    or not dv._at(config["authorized_at"]) <= dv._at(preparation["prepared_at"]) <= dv._at(request["created_at"]) <= now):
+            broker_id = json.loads(request["response"]).get("broker_order_id")
+            if (preparation["terms"] != terms or not broker_id
+                    or not dv._at(config["authorized_at"]) <= dv._at(preparation["prepared_at"])
+                    <= dv._at(request["created_at"]) <= now
+                    or dv._at(request["created_at"]) >= dv._at(config["expires_at"])):
                 raise ValueError("IMMUTABLE_TERMS_CONFLICT")
             proof = None
             for observation in db.execute("SELECT observed_at,evidence FROM paper_observations WHERE id=? ORDER BY observed_at", (identity,)):
                 evidence = json.loads(observation["evidence"])
-                if (dv._at(request["created_at"]) <= dv._at(observation["observed_at"]) <= now
+                if (dv._at(request["created_at"]) <= dv._at(observation["observed_at"])
+                        == dv._at(evidence.get("observed_at")) <= dv._at(evidence.get("ingested_at")) <= now
+                        and evidence.get("broker_order_id") == broker_id
                         and evidence.get("status") == "FILLED" and evidence.get("mode") == "demo"
                         and type(evidence.get("filled_qty")) is int and evidence["filled_qty"] == 1
                         and type(evidence.get("remaining_qty")) is int and evidence["remaining_qty"] == 0):
+                    amount = evidence.get("fill_notional")
+                    if amount is not None and dv._number(amount) <= 0:
+                        raise ValueError("INVALID_ROUNDTRIP_CASHFLOW")
                     proof = {"side": side, "ticker": terms["ticker"], "quantity": 1, "status": "FILLED",
-                             "filled_quantity": 1, "remaining_quantity": 0, "fill_notional": evidence.get("fill_notional"),
-                             "observed_at": observation["observed_at"], "source": "KIS_DEMO_BROKER_REPORT"}
+                             "filled_quantity": 1, "remaining_quantity": 0, "fill_notional": amount,
+                             "observed_at": observation["observed_at"], "ingested_at": evidence["ingested_at"],
+                             "source": "KIS_DEMO_BROKER_REPORT"}
                     break
             if proof is None:
                 raise ValueError("FILL_WITHOUT_OBSERVATION_EVIDENCE")
             first_preparation = db.execute("SELECT value FROM roundtrip_control WHERE key=?", (_leg_ids(config, market, side)[0],)).fetchone()
-            if legs and dv._at(json.loads(first_preparation[0])["prepared_at"]) < dv._at(legs[0]["observed_at"]):
+            if legs and dv._at(json.loads(first_preparation[0])["prepared_at"]) < dv._at(legs[0]["ingested_at"]):
                 raise ValueError("SELL_BEFORE_BUY_FILL")
             legs.append(proof)
         return {"status": "VERIFIED", "legs": legs, "strategy_performance": False}
