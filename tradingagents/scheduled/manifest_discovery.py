@@ -30,7 +30,8 @@ def _load_index(path: Path) -> dict:
     return {}
 
 
-def full_manifests_desc(archive_dir: Path) -> list[tuple[dict, Path]]:
+def full_manifests_desc(archive_dir: Path, *, modes=None) -> list[tuple[dict, Path]]:
+    modes = {"full"} if modes is None else set(modes)
     runs_dir = archive_dir / "runs"
     if not runs_dir.exists():
         return []
@@ -48,7 +49,8 @@ def full_manifests_desc(archive_dir: Path) -> list[tuple[dict, Path]]:
             cached = previous.get(key)
             if (isinstance(cached, dict) and cached.get("signature") == signature
                     and isinstance(cached.get("mode"), str)
-                    and cached.get("mode") in {"overlay_only", "portfolio_only", "selective_rerun_only"}):
+                    and cached.get("mode") in {"overlay_only", "portfolio_only", "selective_rerun_only"}
+                    and cached["mode"] not in modes):
                 current[key] = cached
                 continue
             # Do not cache parsed objects: callers may mutate their own copy.
@@ -61,7 +63,7 @@ def full_manifests_desc(archive_dir: Path) -> list[tuple[dict, Path]]:
                 unchanged = False
             if unchanged:
                 current[key] = {"signature": signature, "mode": mode}
-            if mode == "full":
+            if mode in modes:
                 selected.append((manifest, directory))
     if current != previous:
         try:

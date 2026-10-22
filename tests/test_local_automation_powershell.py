@@ -10,6 +10,51 @@ import pytest
 
 
 @pytest.mark.skipif(not shutil.which("powershell.exe"), reason="Windows PowerShell required")
+@pytest.mark.parametrize("no_start", [True, False])
+def test_research_task_registration_preserves_existing_windows_tasks(tmp_path, no_start):
+    install = Path(__file__).parents[1] / "tools/install_paper_research_task.ps1"
+    for filename in ("run_local_automation.ps1", "run_powershell_hidden.vbs"):
+        (tmp_path / filename).write_text("fixture")
+    def quote(value):
+        return "'" + str(value).replace("'", "''") + "'"
+    probe = tmp_path / "register.ps1"
+    probe.write_text(r'''
+$ErrorActionPreference='Stop'
+$global:registered=@()
+$global:started=@()
+function New-ScheduledTaskPrincipal { param($UserId,$LogonType,$RunLevel) return @{LogonType=$LogonType} }
+function New-ScheduledTaskAction { param($Execute,$Argument) return @{Execute=$Execute;Argument=$Argument} }
+function New-ScheduledTaskTrigger { param([switch]$Once,$At,$RepetitionInterval) return @{Interval=$RepetitionInterval.TotalMinutes} }
+function New-ScheduledTaskSettingsSet {
+    param($MultipleInstances,[switch]$StartWhenAvailable,[switch]$AllowStartIfOnBatteries,
+        [switch]$DontStopIfGoingOnBatteries,[switch]$Hidden,$ExecutionTimeLimit)
+    return @{Instances=$MultipleInstances;Hidden=[bool]$Hidden;Hours=$ExecutionTimeLimit.TotalHours}
+}
+function Register-ScheduledTask {
+    param($TaskPath,$TaskName,$Action,$Trigger,$Principal,$Settings,[switch]$Force)
+    $global:registered+=@{TaskPath=$TaskPath;TaskName=$TaskName;Action=$Action;Trigger=$Trigger;Settings=$Settings}
+}
+function Start-ScheduledTask { param($TaskPath,$TaskName) $global:started+=$TaskName }
+function Disable-ScheduledTask { throw 'Existing task must be preserved' }
+function Unregister-ScheduledTask { throw 'Existing task must be preserved' }
+''' + f"\n& {quote(install)} -InstallRoot {quote(tmp_path)} -RepositoryRoot {quote(tmp_path / 'repo')}" + (" -NoStart" if no_start else "")
+        + "\n@{registered=@($global:registered);started=@($global:started)} | ConvertTo-Json -Depth 8 -Compress\n")
+    result = subprocess.run(["powershell.exe", "-NoProfile", "-NonInteractive", "-File", str(probe)],
+                            capture_output=True, text=True, timeout=15)
+    assert result.returncode == 0, result.stderr
+    row = json.loads(result.stdout)
+    assert len(row["registered"]) == 1
+    task = row["registered"][0]
+    assert task["TaskName"] == "LocalAutomation-research-kis"
+    assert "-Command research-kis" in task["Action"]["Argument"]
+    assert task["Settings"] == {"Instances": "IgnoreNew", "Hidden": True, "Hours": 13}
+    assert task["Trigger"]["Interval"] == 5
+    assert row["started"] == ([] if no_start else ["LocalAutomation-research-kis"])
+    marker = json.loads((tmp_path / "repo/.runtime/local-automation/research-lane-enabled.json").read_text(encoding="utf-8-sig"))
+    assert marker["enabled"] is True and marker["real_orders_enabled"] is False
+
+
+@pytest.mark.skipif(not shutil.which("powershell.exe"), reason="Windows PowerShell required")
 @pytest.mark.parametrize("case", ["fresh", "expired", "future", "invalid", "changed", "missing_ref", "fetch_failed"])
 def test_shared_source_fetch_receipt_is_bounded_and_fails_closed(tmp_path, case):
     wrapper = (Path(__file__).parents[1] / "tools/run_local_automation.ps1").read_text()

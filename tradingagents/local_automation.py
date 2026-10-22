@@ -276,9 +276,10 @@ def full_research_session_hold(profile, state, *, now):
     return "AWAITING_OTHER_MARKET_CALENDAR"
 
 
-def run_due(archive, state, *, now=None, dry_run=False):
+def run_due(archive, state, *, now=None, dry_run=False, research_only=False):
     from tradingagents.scheduled.automation_calendar import automated_market_session_status
     from tradingagents.scheduled.runner import _iter_run_manifests_desc
+    from tradingagents.execution.research_runtime import research_lane_enabled
 
     now = now or datetime.now(ZoneInfo("Asia/Seoul"))
     watchdog = script("scheduled_actions_watchdog")
@@ -294,6 +295,12 @@ def run_due(archive, state, *, now=None, dry_run=False):
     decisions = []
     for target in targets:
         if target.workflow_file not in {"daily-codex-analysis.yml", "intraday-overlay-refresh.yml"}:
+            continue
+        full_target = target.workflow_file == "daily-codex-analysis.yml"
+        if research_only and not full_target:
+            continue
+        if full_target and not research_only and research_lane_enabled(state):
+            decisions.append({"target": target.name, "status": "DELEGATED_TO_RESEARCH_LANE"})
             continue
         window_start = local_target_window_start(target, now=now)
         if now < window_start:
@@ -373,6 +380,8 @@ def run_due(archive, state, *, now=None, dry_run=False):
                 from tradingagents.notifications.local import queue_failure
                 queue_failure(state, stage=stage, source_key=key, error_type=error_type, finished_at=finished)
         # Re-evaluate calendars and archives on the next tick, after a long run.
+        return decisions
+    if research_only:
         return decisions
     if not any(item["status"] == "DUE" for item in decisions):
         from tradingagents.execution.refresh_runtime import refresh_due
@@ -591,7 +600,7 @@ def complete_handoffs(site, runtime_dir, publication):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("command", choices=("run-due", "publish", "paper", "review", "validate-kis", "strategy-kis"))
+    parser.add_argument("command", choices=("run-due", "publish", "paper", "review", "validate-kis", "strategy-kis", "research-kis"))
     parser.add_argument("--archive-dir", type=Path, required=True)
     parser.add_argument("--state-dir", type=Path, required=True)
     parser.add_argument("--runtime-dir", type=Path, required=True)
@@ -608,8 +617,17 @@ def main():
     prepare_environment()
     if args.command in {"run-due", "publish"} and not args.dry_run:
         os.environ["TRADINGAGENTS_LOCAL_PAPER_STATE_DIR"] = str(args.state_dir)
-    # These are independent consumers. They neither acquire producer ownership
-    # nor dispatch report notifications, and cannot send a real broker order.
+    # Independent lanes never acquire the minute producer lock. Research writes
+    # new analyses; existing consumers retain their own broker/state ownership.
+    if args.command == "research-kis":
+        from tradingagents.execution.research_runtime import research_due
+        try:
+            with interprocess_file_lock(args.state_dir / "research-kis.lock", timeout=0):
+                result = research_due(args.archive_dir, args.state_dir, dry_run=args.dry_run)
+        except TimeoutError:
+            result = [{"status": "RESEARCH_ALREADY_RUNNING", "broker_orders_sent": 0}]
+        print(json.dumps(result, ensure_ascii=True))
+        return 0
     if args.command == "strategy-kis":
         if args.dry_run:
             print(json.dumps({"status": "DRY_RUN", "mode": "KIS_DEMO_STRATEGY", "real_orders_enabled": False}))
