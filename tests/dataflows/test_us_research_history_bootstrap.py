@@ -134,9 +134,10 @@ def test_empty_or_missing_full_yahoo_fields_do_not_pin_healthy_short_history(dat
     data.ticker.history.assert_not_called()
 
 
-def test_bad_future_values_are_filtered_before_whole_history_validation(data):
+@pytest.mark.parametrize('future_day', ['2026-10-22', '2026-10-25'])
+def test_bad_future_values_are_filtered_before_whole_history_validation(data, future_day):
     future = data.good.tail(1).copy()
-    future.index = pd.DatetimeIndex(['2026-10-22'], name='Date')
+    future.index = pd.DatetimeIndex([future_day], name='Date')
     future.loc[:,'Close'] = float('inf')
     data.download.return_value = pd.concat([data.good, future])
     csv = y_finance.get_YFin_data_online(**ARGS)
@@ -155,3 +156,113 @@ def test_wrong_older_date_cannot_contribute_to_history_or_hide_missing_session(d
     csv = y_finance.get_YFin_data_online(**ARGS)
     assert 'OHLCV source: KIS overseas_dailyprice' in csv
     assert get_selected_daily_history('AAPL', END)['frame']['Date'].isna().sum() == 0
+
+
+@pytest.mark.parametrize('extra_day', ['2021-10-17', '2021-10-24', '2022-12-26'])
+def test_non_session_rows_trigger_complete_replacement_before_source_pin(data, extra_day):
+    extra = data.good.iloc[[20]].copy()
+    extra.index = pd.DatetimeIndex([extra_day], name='Date')
+    broken = pd.concat([data.good, extra]).sort_index()
+    data.download.return_value = broken
+    csv = y_finance.get_YFin_data_online(**ARGS)
+    indicator = y_finance._get_stock_stats_bulk('AAPL', 'close_200_sma', END)
+    assert 'OHLCV source: KIS overseas_dailyprice' in csv
+    assert float(indicator[END]) == pytest.approx(data.broker['Close'].tail(200).mean())
+    assert pd.Timestamp(extra_day) not in get_selected_daily_history('AAPL', END)['frame']['Date'].tolist()
+    pd.testing.assert_frame_equal(broken, pd.concat([data.good, extra]).sort_index())
+
+
+def test_only_a_non_session_row_recovers_instead_of_stopping_before_fallback(data):
+    bad = data.good.iloc[[20]].copy()
+    bad.index = pd.DatetimeIndex(['2022-12-26'], name='Date')
+    data.download.return_value = bad
+    csv = y_finance.get_YFin_data_online(**ARGS)
+    assert 'OHLCV source: KIS overseas_dailyprice' in csv
+
+
+def test_non_session_in_existing_yahoo_cache_is_rejected_without_rewriting_it(data):
+    extra = data.good.iloc[[20]].copy()
+    extra.index = pd.DatetimeIndex(['2022-12-26'], name='Date')
+    broken = pd.concat([data.good, extra]).sort_index()
+    exclusive = (pd.Timestamp.today() + pd.DateOffset(days=1)).strftime('%Y-%m-%d')
+    path = data.path / f'AAPL-YFin-data-{WARMUP}-{exclusive}.csv'
+    broken.reset_index().to_csv(path, index=False)
+    raw = path.read_bytes()
+    csv = y_finance.get_YFin_data_online(**ARGS)
+    assert 'OHLCV source: KIS overseas_dailyprice' in csv
+    data.download.assert_not_called()
+    assert path.read_bytes() == raw
+
+
+def _long_frame(start):
+    days = get_exchange_calendar('XNYS').sessions_in_range(start, END).tz_localize(None)
+    close = pd.Series([100. + index * .02 for index in range(len(days))], index=days)
+    frame = pd.DataFrame({'Open':close-1, 'High':close+2, 'Low':close-2,
+                          'Close':close, 'Volume':1000.}, index=days)
+    frame.index.name = 'Date'
+    return frame
+
+
+def test_ten_year_price_request_keeps_its_original_start(data):
+    start = '2016-10-21'
+    frame = _long_frame(start)
+    data.download.return_value = frame
+    csv = y_finance.get_YFin_data_online(symbol='AAPL', start_date=start, end_date=END)
+    rows = pd.read_csv(StringIO(csv), comment='#')
+    assert data.download.call_args.kwargs['start'] == start
+    assert rows['Date'].min() == start
+    assert len(rows) == len(frame)
+    data.client.request_json.assert_not_called()
+    data.ticker.history.assert_not_called()
+
+
+def test_longer_request_recovers_the_same_full_range_without_raising_page_budget(data):
+    start = '2020-10-21'
+    frame = _long_frame(start)
+    invalid = frame.copy()
+    invalid.iloc[10, invalid.columns.get_loc('Close')] = float('nan')
+    data.download.return_value = invalid
+    broker = frame.copy()
+    for column in ('Open','High','Low','Close'):
+        broker[column] += 200
+    mapping = {'Open':'open','High':'high','Low':'low','Close':'clos','Volume':'tvol'}
+    bars = [{'xymd':day.strftime('%Y%m%d'), **{target:str(row[source]) for source,target in mapping.items()}}
+            for day,row in broker.iloc[::-1].iterrows()]
+    data.client.request_json.side_effect = lambda **kwargs: (
+        {'output2':[dict(row) for row in bars if row['xymd'] <= kwargs['params']['BYMD']][:100]}, {})
+    csv = y_finance.get_YFin_data_online(symbol='AAPL', start_date=start, end_date=END)
+    rows = pd.read_csv(StringIO(csv), comment='#')
+    assert 'OHLCV source: KIS overseas_dailyprice' in csv
+    assert rows['Date'].min() == start and len(rows) == len(frame)
+    assert get_selected_daily_history('AAPL', END)['frame'].attrs['requested_start'] == start
+    price_calls = data.client.request_json.call_count
+    assert 1 < price_calls <= 20
+    indicator = y_finance._get_stock_stats_bulk('AAPL', 'close_200_sma', END)
+    assert float(indicator[END]) == pytest.approx(broker['Close'].tail(200).mean())
+    assert data.client.request_json.call_count == price_calls
+
+
+def test_ten_year_kis_history_fails_at_original_page_cap_without_silent_truncation(data):
+    from tradingagents.dataflows.vendor_exceptions import VendorMalformedResponseError
+    start = '2016-10-21'
+    frame = _long_frame(start)
+    data.download.return_value = pd.DataFrame()
+    mapping = {'Open':'open','High':'high','Low':'low','Close':'clos','Volume':'tvol'}
+    bars = [{'xymd':day.strftime('%Y%m%d'), **{target:str(row[source]) for source,target in mapping.items()}}
+            for day,row in frame.iloc[::-1].iterrows()]
+    data.client.request_json.side_effect = lambda **kwargs: (
+        {'output2':[dict(row) for row in bars if row['xymd'] <= kwargs['params']['BYMD']][:100]}, {})
+    with pytest.raises(VendorMalformedResponseError, match='bounded page limit'):
+        y_finance.get_YFin_data_online(symbol='AAPL', start_date=start, end_date=END)
+    assert data.download.call_args.kwargs['start'] == start
+    assert data.client.request_json.call_count == 20
+    assert get_selected_daily_history('AAPL', END) is None
+
+
+@pytest.mark.parametrize('start', ['unverifiable-date', '2026-10-22'])
+def test_invalid_explicit_start_fails_before_any_download(data, start):
+    from tradingagents.dataflows.vendor_exceptions import VendorInputError
+    with pytest.raises(VendorInputError):
+        stats.load_ohlcv('AAPL', END, requested_start=start)
+    data.download.assert_not_called()
+    data.client.request_json.assert_not_called()

@@ -80,9 +80,12 @@ def get_YFin_data_online(
 
     # Fetch historical data for the specified date range
     data = selected_history(symbol, start_date, end_date)
-    if data is None and (kr_fallback_enabled(symbol) or us_fallback_enabled(symbol)):
+    if data is None and us_fallback_enabled(symbol):
         # Validate and pin the same five-year calculation input before the
-        # first price report. Later indicators must not change its provider.
+        # first price report, retaining any longer explicitly requested range.
+        # Later indicators must not change its provider.
+        data = load_ohlcv(symbol, end_date, requested_start=start_date)
+    elif data is None and kr_fallback_enabled(symbol):
         data = load_ohlcv(symbol, end_date)
     if data is not None:
         data = data.set_index("Date")

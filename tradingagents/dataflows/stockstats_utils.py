@@ -170,11 +170,12 @@ def _clean_dataframe(data: pd.DataFrame) -> pd.DataFrame:
     return data
 
 
-def load_ohlcv(symbol: str, curr_date: str) -> pd.DataFrame:
+def load_ohlcv(symbol: str, curr_date: str, *, requested_start: str | None = None) -> pd.DataFrame:
     """Fetch OHLCV data with caching, filtered to prevent look-ahead bias.
 
-    Downloads at least five years before the requested date and caches per
-    symbol. Active-date caches expire after five minutes; historical rows
+    Downloads at least five years before the requested date, or an explicitly
+    earlier price-report start, and caches per symbol/window. Active-date caches
+    expire after five minutes; historical rows
     are cut off before validation and indicator calculation.
     """
     config = get_config()
@@ -184,6 +185,14 @@ def load_ohlcv(symbol: str, curr_date: str) -> pd.DataFrame:
     # Include enough warm-up history even for an older evaluation date.
     today_date = pd.Timestamp.today()
     start_date = min(today_date, curr_date_dt) - pd.DateOffset(years=5)
+    if requested_start is not None:
+        try:
+            requested = pd.Timestamp(datetime.strptime(requested_start, "%Y-%m-%d"))
+        except (TypeError, ValueError) as exc:
+            raise VendorInputError("Requested history start must be YYYY-MM-DD") from exc
+        if requested > curr_date_dt:
+            raise VendorInputError("Requested history start exceeds the price end date")
+        start_date = min(start_date, requested)
     start_str = start_date.strftime("%Y-%m-%d")
     # yfinance's ``end`` is exclusive. Use tomorrow as the download boundary so
     # a completed same-day bar is not silently omitted after the market close.
