@@ -247,8 +247,10 @@ def validate_with_us_fallback(data, symbol: str, start_date: str, end_date: str)
         try:
             required = set(_sessions(begin, last)) if begin <= last else set()
             observed = {stamp.date() for stamp in valid["Date"]}
-            if observed != required:
-                raise VendorMalformedResponseError("Yahoo US daily history has missing or non-session bars")
+            if required - observed:
+                raise VendorMalformedResponseError("Yahoo US daily history is missing an interior completed session")
+            if observed - required:
+                raise VendorMalformedResponseError("Yahoo US daily history contains non-session bars")
         except VendorMalformedResponseError as exc:
             error = exc
             valid = None
