@@ -77,13 +77,31 @@ def load_us_daily_bars(symbol: str, start_date: str, end_date: str):
     with _CACHE_LOCK:
         cached = _CACHE.get(key)
         if cached and time.monotonic() - cached[0] <= 300:
-            return cached[1].copy()
+            contract = cached[1].attrs.get("listing_contract")
+            if contract is not None:
+                from .security_listing import cutoff_for_day, validate_listing_receipt
+                current_cutoff = cutoff_for_day(end_date)
+                validate_listing_receipt(symbol, contract, requested_start=start.isoformat(),
+                                         end_date=end_date, observed_at=current_cutoff)
+                available = datetime.fromisoformat(contract["metadata_identity"]["available_at"])
+                if (current_cutoff - available).total_seconds() <= 300:
+                    return cached[1].copy()
+            else:
+                return cached[1].copy()
 
     from tradingagents.portfolio.kis import KisApiError, KisClient
 
-    client = KisClient.from_api_keys(environment="real")  # allowlisted GET market data only
-    cursor, records, exchange = end, {}, None
     started = time.monotonic()
+    client = KisClient.from_api_keys(environment="real")  # allowlisted GET market data only
+    from .security_listing import collect_listing_contract
+    contract = collect_listing_contract(symbol, client, requested_start=start.isoformat(), end_date=end_date)
+    required_start = date.fromisoformat(contract["required_start"]) if contract else start
+    if contract:
+        required = _sessions(required_start, end)
+        if not required or required[0] != required_start:
+            raise VendorMalformedResponseError("Reviewed first regular listing is not a completed requested session")
+    cursor, records, exchange = end, {}, contract["reviewed_event"]["exchange"] if contract else None
+    excluded_pre_regular_dates = set()
     calls = 0
     for page in range(_MAX_PAGES):
         if time.monotonic() - started >= _MAX_SECONDS:
@@ -130,7 +148,9 @@ def load_us_daily_bars(symbol: str, start_date: str, end_date: str):
             if stamp > cursor:
                 continue
             page_dates.append(stamp)
-            if stamp < start:
+            if stamp < required_start:
+                if contract and stamp >= start:
+                    excluded_pre_regular_dates.add(stamp.isoformat())
                 continue
             try:
                 values = {name: float(row[field]) for name, field in _FIELDS.items()}
@@ -158,6 +178,9 @@ def load_us_daily_bars(symbol: str, start_date: str, end_date: str):
                        observed_at=datetime.now(timezone.utc).isoformat(), requested_start=start.isoformat(),
                        requested_end=end_date, complete=True, session_count=len(required), request_count=calls,
                        series_sha256=hashlib.sha256(frame.to_csv(index=False).encode("utf-8")).hexdigest())
+    if contract:
+        frame.attrs.update(listing_contract=contract, required_start=required_start.isoformat(),
+                           excluded_before_verified_regular_listing=sorted(excluded_pre_regular_dates))
     with _CACHE_LOCK:
         if len(_CACHE) >= 128:
             _CACHE.clear()
@@ -219,7 +242,11 @@ def validate_with_us_fallback(data, symbol: str, start_date: str, end_date: str)
 def source_note(frame: pd.DataFrame) -> str:
     if frame.attrs.get("source") != SOURCE:
         return ""
+    listing = frame.attrs.get("listing_contract")
+    listing_note = (f" Original request start={frame.attrs['requested_start']}; "
+                    f"verified first regular session={listing['required_start']}; "
+                    f"listing_contract={listing['contract_id']}." if listing else "")
     return (f"# OHLCV source: {SOURCE}; exchange={frame.attrs['exchange']}; "
             f"observed_at={frame.attrs['observed_at']}; requested_end={frame.attrs['requested_end']}; "
             f"series_sha256={frame.attrs['series_sha256']}; complete=true. "
-            "Single provider adjustment basis for price and indicators; not a historical snapshot vintage.\n")
+            f"Single provider adjustment basis for price and indicators; not a historical snapshot vintage.{listing_note}\n")
