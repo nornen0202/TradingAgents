@@ -1160,6 +1160,9 @@ def _public_quality(value: Any) -> dict[str, Any]:
         value,
         (
             "execution_ready",
+            "data_ready",
+            "action_ready",
+            "action_status",
             "conditional_strategy_ready",
             "current_execution_promotion",
             "generated_in_current_run",
@@ -1178,6 +1181,11 @@ def _public_quality(value: Any) -> dict[str, Any]:
         machine_mode,
         ("RESEARCH", "분석 시점 참고"),
     )
+    if machine_mode == "IMMEDIATE" and source.get("data_ready") is True:
+        if source.get("action_status") == "NO_EXECUTION_ACTION":
+            investor_state, investor_label = "RESEARCH", "자료 확인 · 매매 행동 없음"
+        elif source.get("action_status") == "WAITING_TRIGGER":
+            investor_state, investor_label = "CONDITIONAL", "조건 충족 대기"
     result["investor_state"] = investor_state
     result["investor_label"] = investor_label
     return result

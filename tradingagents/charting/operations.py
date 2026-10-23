@@ -124,7 +124,7 @@ _CODE = re.compile(r"^[A-Za-z0-9_.:-]{1,160}$")
 def _source_health(raw):
     if not isinstance(raw, dict):
         return {}
-    statuses = {"NO_SOURCE", "BLOCKED", "NO_ALLOCATED_ORDERS", "PROPOSALS_AVAILABLE"}
+    statuses = {"NO_SOURCE", "BLOCKED", "NO_ALLOCATED_ORDERS", "PROPOSALS_AVAILABLE", "EXECUTION_OBSERVATIONS_AVAILABLE"}
     result = {"status": raw.get("status") if raw.get("status") in statuses else "BLOCKED"}
     for key in ("strategy_rows", "fresh_rows", "execution_ready_rows", "allocated_orders"):
         value = raw.get(key)
@@ -411,6 +411,9 @@ def kis_strategy_health(archive_dir, *, analysis_as_of):
                 "blockers": [b for b in (row.get("blockers") if isinstance(row.get("blockers"), list) else []) if isinstance(b, str) and re.fullmatch(r"[A-Z_]{1,80}", b)],
                 "order_counts": {}, "orders": [], "performance": None, "performance_history": []}
         view["source_diagnostics"] = _source_health(row.get("source_diagnostics"))
+        from tradingagents.execution.strategy_diagnostics import allocation_view, refresh_attempt_health
+        view["allocation_diagnostics"] = allocation_view(row.get("allocation_diagnostics"))
+        view["refresh_health"] = refresh_attempt_health(row.get("refresh_attempt"), market=market, now=observed)
         for key, value in (row.get("order_counts") if isinstance(row.get("order_counts"), dict) else {}).items():
             if key in order_states and type(value) is int and value >= 0:
                 view["order_counts"][key] = value

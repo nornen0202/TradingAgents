@@ -5726,13 +5726,16 @@ def _microstructure_publication_metadata(
     if not generated_in_current_run:
         freshness = FRESHNESS_PRIOR_SESSION_BACKFILL
         eligibility = ELIGIBILITY_HISTORICAL_REFERENCE_ONLY
+    elif age_seconds is None:
+        freshness = FRESHNESS_STALE
+        eligibility = ELIGIBILITY_NOT_EXECUTION_ELIGIBLE
     elif quality == DELAYED_ANALYSIS_ONLY:
         freshness = FRESHNESS_DELAYED_CHECKPOINT
         eligibility = ELIGIBILITY_DELAYED_ANALYSIS_ONLY
     elif quality == STALE_INVALID_FOR_EXECUTION:
         freshness = FRESHNESS_STALE
         eligibility = ELIGIBILITY_NOT_EXECUTION_ELIGIBLE
-    elif age_seconds is not None and age_seconds <= max_data_age_seconds and session == "regular":
+    elif age_seconds is not None and age_seconds < max_data_age_seconds and session == "regular":
         freshness = FRESHNESS_CURRENT_RUN_FRESH
         eligibility = ELIGIBILITY_LIVE_EXECUTION_OK
     elif age_seconds is not None and age_seconds <= 3600:
@@ -5755,13 +5758,12 @@ def _microstructure_publication_metadata(
     }
 
 
-def _age_seconds_at_publish(market_data_asof: str | None, published_at: datetime) -> int | None:
+def _age_seconds_at_publish(market_data_asof: str | None, published_at: datetime) -> float | None:
     parsed = _parse_datetime(market_data_asof)
-    if parsed is None:
+    if parsed is None or parsed.tzinfo is None or published_at.tzinfo is None:
         return None
-    if parsed.tzinfo is None:
-        parsed = parsed.replace(tzinfo=published_at.tzinfo)
-    return int(max(0, (published_at.astimezone(parsed.tzinfo) - parsed).total_seconds()))
+    age = (published_at.astimezone(parsed.tzinfo) - parsed).total_seconds()
+    return age if age >= 0 else None
 
 
 def _parse_datetime(value: str | None) -> datetime | None:
