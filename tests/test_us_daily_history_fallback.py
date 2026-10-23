@@ -350,9 +350,13 @@ def test_broker_price_pins_indicator_and_csv_paths_even_when_yahoo_recovers(brok
     ticker = Mock()
     ticker.history.return_value = yahoo()
     monkeypatch.setattr(y_finance.yf, "Ticker", Mock(return_value=ticker))
+    initial_download = Mock(return_value=yahoo())
+    monkeypatch.setattr(stockstats_utils.yf, "download", initial_download)
     csv = y_finance.get_YFin_data_online("AAPL", START, END)
     assert "OHLCV source: KIS overseas_dailyprice" in csv
-    assert ticker.history.call_args.kwargs["end"] == "2026-10-22"
+    initial_download.assert_called_once()
+    assert initial_download.call_args.kwargs["start"] == WARMUP
+    ticker.history.assert_not_called()
     ticker.history.return_value = yahoo(close=109)
     download = Mock(return_value=yahoo(close=109))
     monkeypatch.setattr(stockstats_utils.yf, "download", download)
@@ -361,7 +365,7 @@ def test_broker_price_pins_indicator_and_csv_paths_even_when_yahoo_recovers(brok
     assert "OHLCV source: KIS overseas_dailyprice" in indicator
     assert f"{END}: 105.0" in indicator
     assert "105.0" in again
-    assert ticker.history.call_count == 1
+    ticker.history.assert_not_called()
     download.assert_not_called()
     assert broker.request_json.call_count == 1
     assert not list(tmp_path.glob("*.csv"))

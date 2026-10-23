@@ -48,6 +48,17 @@ def test_missing_interior_session_cannot_succeed_without_replacement(monkeypatch
     assert get_selected_daily_history('ETN','2026-10-21') is None
 
 
+@pytest.mark.parametrize('days,start,end', [
+    (['2026-10-18','2026-10-19','2026-10-20','2026-10-21'], '2026-10-19', '2026-10-21'),
+    (['2026-09-04','2026-09-07','2026-09-08'], '2026-09-04', '2026-09-08'),
+])
+def test_non_session_cannot_succeed_without_replacement(monkeypatch, days, start, end):
+    monkeypatch.setattr(us, 'load_us_daily_bars', Mock(return_value=None))
+    with pytest.raises(VendorMalformedResponseError, match='contains non-session bars'):
+        us.validate_with_us_fallback(frame(days), 'ETN', start, end)
+    assert get_selected_daily_history('ETN', end) is None
+
+
 def test_older_only_response_keeps_existing_stale_whole_recovery(monkeypatch):
     replacement = frame(['2026-10-19', '2026-10-20', '2026-10-21'])
     replacement['Date'] = pd.to_datetime(replacement['Date'])

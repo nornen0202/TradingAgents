@@ -224,15 +224,35 @@ def validate_with_us_fallback(data, symbol: str, start_date: str, end_date: str)
     except VendorMalformedResponseError as exc:
         error = exc
     if valid is not None and fallback_enabled(symbol):
+        try:
+            values = valid[["Open", "High", "Low", "Close", "Volume"]].astype(float)
+            complete_values = (
+                all(math.isfinite(value) for value in values.to_numpy().flat)
+                and (values[["Open", "High", "Low", "Close"]] > 0).all().all()
+                and (values["Volume"] >= 0).all()
+                and (values["High"] >= values[["Open", "Low", "Close"]].max(axis=1)).all()
+                and (values["Low"] <= values[["Open", "High", "Close"]].min(axis=1)).all()
+            )
+        except (KeyError, TypeError, ValueError, OverflowError):
+            complete_values = False
+        if not complete_values:
+            error = VendorMalformedResponseError("Yahoo US daily history has invalid or incomplete OHLCV")
+            valid = None
+    if valid is not None and fallback_enabled(symbol):
         # A recent final bar cannot hide a missing session inside the observed
         # series. Preserve the existing leading-history contract; the first
         # observed bar is not evidence of a listing date.
-        begin = max(date.fromisoformat(start_date), valid.iloc[0]["Date"].date())
+        begin = valid.iloc[0]["Date"].date()
         last = valid.iloc[-1]["Date"].date()
-        required = set(_sessions(begin, last)) if begin <= last else set()
-        observed = {stamp.date() for stamp in valid["Date"] if stamp.date() >= begin}
-        if required - observed:
-            error = VendorMalformedResponseError("Yahoo US daily history is missing an interior completed session")
+        try:
+            required = set(_sessions(begin, last)) if begin <= last else set()
+            observed = {stamp.date() for stamp in valid["Date"]}
+            if required - observed:
+                raise VendorMalformedResponseError("Yahoo US daily history is missing an interior completed session")
+            if observed - required:
+                raise VendorMalformedResponseError("Yahoo US daily history contains non-session bars")
+        except VendorMalformedResponseError as exc:
+            error = exc
             valid = None
     stale_required_session = (valid is not None and fallback_enabled(symbol)
         and valid.iloc[-1]["Date"] < pd.Timestamp(_sessions(date.fromisoformat(start_date), date.fromisoformat(end_date))[-1]))
