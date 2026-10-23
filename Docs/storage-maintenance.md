@@ -51,7 +51,9 @@ run; malformed local policy JSON fails before cleanup begins.
 The optional `relocations` list registers `{id, source, destination}` directory
 aliases created by a verified migration. Each source must remain a junction to
 the exact destination. A mismatch is reported without repairing or deleting
-either path, and the helper returns exit code 2. `critical_free_bytes` also
+either path, and the helper returns exit code 2 before any retention starts.
+The wrapper runs mount and alias preflight before its own cleanup as well.
+`critical_free_bytes` also
 returns code 2 below its threshold; `warning_free_bytes` remains informational.
 The wrapper propagates a failure so existing scheduled-task monitoring can see
 the condition. Omit `critical_free_bytes` to retain warning-only behavior.
