@@ -72,10 +72,25 @@ def _snapshot(symbol, end_date, source, frame):
         digest = hashlib.sha256(frame.to_csv(index=False).encode("utf-8")).hexdigest()
         if attrs.get("series_sha256") != digest:
             raise ValueError("Snapshot content hash mismatch")
+        listing = None
+        if "listing_contract" in attrs:
+            if not us_metadata:
+                raise ValueError("Listing contract requires the US source.")
+            from .security_listing import cutoff_for_day, validate_listing_receipt
+            if datetime.fromisoformat(attrs["listing_contract"]["analysis_as_of"]) > cutoff_for_day(end_date):
+                raise ValueError("Listing receipt exceeds this analysis cutoff.")
+            listing = validate_listing_receipt(symbol, attrs["listing_contract"], requested_start=start.isoformat(),
+                                               end_date=end_date, observed_at=observed)
+            if (attrs.get("required_start") != listing["required_start"]
+                    or dates.min().date().isoformat() != listing["required_start"]
+                    or attrs.get("exchange") != listing["reviewed_event"]["exchange"]):
+                raise ValueError("Listing contract and snapshot bounds differ.")
         entry.update(status="VERIFIED_RETRIEVED_SERIES", provider="kis", exchange=attrs["exchange"],
                      adjustment=attrs["adjustment"], observed_at=observed.isoformat(), requested_start=start.isoformat(),
                      first_session=dates.min().date().isoformat(), last_session=dates.max().date().isoformat(),
                      row_count=len(frame), complete=True, series_sha256=digest)
+        if listing is not None:
+            entry["listing_contract"] = listing
         entry["snapshot_id"] = hashlib.sha256(json.dumps(entry, sort_keys=True).encode()).hexdigest()
     except (ValueError, TypeError, KeyError, AttributeError, OverflowError):
         # Preserve the failed verification without promoting untrusted values
