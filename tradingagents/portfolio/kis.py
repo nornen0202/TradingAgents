@@ -22,6 +22,8 @@ from .account_models import AccountSnapshot, InstrumentIdentity, PendingOrder, P
 REAL_BASE_URL = "https://openapi.koreainvestment.com:9443"
 DEMO_BASE_URL = "https://openapivts.koreainvestment.com:29443"
 _TRANSIENT_HTTP_STATUS_CODES = {429, 500, 502, 503, 504}
+_SECURITY_INFO_READ = ("/uapi/overseas-price/v1/quotations/search-info", "CTPF1702R")
+_SECURITY_INFO_MARKETS = {"NAS": "512", "NYS": "513", "AMS": "529"}
 
 
 def resolve_identity(broker_symbol: str, display_name: str | None = None) -> InstrumentIdentity:
@@ -250,10 +252,21 @@ class KisClient:
         tr_cont: str = "",
     ) -> tuple[dict[str, Any], requests.structures.CaseInsensitiveDict[str]]:
         base_url = self._validated_base_url()
+        security_info = (path, tr_id) == _SECURITY_INFO_READ
+        if security_info and (
+            self.environment != "real"
+            or not isinstance(params, dict)
+            or set(params) != {"PRDT_TYPE_CD", "PDNO"}
+            or params.get("PRDT_TYPE_CD") not in _SECURITY_INFO_MARKETS.values()
+            or not isinstance(params.get("PDNO"), str)
+            or re.fullmatch(r"[A-Z][A-Z0-9.\-]{0,19}", params["PDNO"]) is None
+            or tr_cont != ""
+        ):
+            raise PortfolioConfigurationError("Invalid real read-only security metadata request.")
         if (
             method.upper() != "GET"
             or body is not None
-            or (path, tr_id) not in _MARKET_READS | _ACCOUNT_READS[self.environment]
+            or not (security_info or (path, tr_id) in _MARKET_READS | _ACCOUNT_READS[self.environment])
         ):
             raise PortfolioConfigurationError("KisClient permits only allowlisted read-only requests.")
         url = f"{base_url}{path}"
@@ -465,6 +478,16 @@ class KisClient:
                 "FID_PERIOD_DIV_CODE": period_division,
                 "FID_ORG_ADJ_PRC": adjusted_price,
             },
+        )
+        return payload
+
+    def overseas_product_info_raw(self, symbol: str, *, exchange: str) -> dict[str, Any]:
+        """Current public metadata; never historical identity or listing authorization."""
+        if exchange not in _SECURITY_INFO_MARKETS:
+            raise PortfolioConfigurationError("Unsupported security metadata exchange.")
+        payload, _headers = self.request_json(
+            method="GET", path=_SECURITY_INFO_READ[0], tr_id=_SECURITY_INFO_READ[1],
+            params={"PRDT_TYPE_CD": _SECURITY_INFO_MARKETS[exchange], "PDNO": symbol},
         )
         return payload
 
