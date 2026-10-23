@@ -366,7 +366,7 @@ def _build_strategy_row(
     # Keep the legacy data-readiness contract for consumers; expose the distinct
     # engine action so readers cannot infer a buy from an IMMEDIATE data row.
     has_action = context.get("decision_now") in EXECUTION_ACTIONS
-    conditional_action = context.get("decision_if_triggered") in {"STARTER", "ADD"}
+    conditional_action = context.get("decision_if_triggered") in {"STARTER", "ADD", "REDUCE", "EXIT"}
     action_status = ("ACTION_SIGNAL_PRESENT" if execution_ready and has_action
                      else "DATA_RECHECK_REQUIRED" if has_action
                      else "WAITING_TRIGGER" if conditional_action else "NO_EXECUTION_ACTION")

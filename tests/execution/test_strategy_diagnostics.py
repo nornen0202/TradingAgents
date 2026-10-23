@@ -71,6 +71,23 @@ def test_actual_reason_counts_survive_projection_without_private_details():
         assert allocation_view({**allocation(), key: value}) is None
 
 
+def test_every_valid_research_entry_action_preserves_blocker_counts():
+    from tradingagents.schemas.decision import EntryAction
+    raw = allocation()
+    raw["research_entry_actions"] = {action.value: 1 for action in EntryAction}
+    raw["research_entry_actions"]["MISSING"] = 1
+    projected = allocation_view(raw)
+    assert projected is not None
+    assert projected["research_entry_actions"] == raw["research_entry_actions"]
+    assert projected["reason_counts"] == raw["reason_counts"]
+    assert "PRIVATE" not in json.dumps(projected)
+
+
+@pytest.mark.parametrize("action", ["REDUCE", "EXIT", "UNKNOWN"])
+def test_research_conditional_entry_does_not_accept_execution_exit_codes(action):
+    assert allocation_view({**allocation(), "research_conditional_entries": {action: 1}}) is None
+
+
 @pytest.mark.parametrize("market", ["KR", "US"])
 def test_closed_market_still_records_producer_failure_without_broker_calls(tmp_path, market):
     h = Harness(tmp_path, market)
