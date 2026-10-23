@@ -14,6 +14,22 @@ import time
 import maintain_codex_storage as storage
 
 
+def audit_relocations(config: dict) -> bool:
+    """Observe registered aliases without repairing or deleting changed paths."""
+    healthy = True
+    for item in config.get("relocations", []):
+        source, destination = Path(item["source"]), Path(item["destination"])
+        try:
+            matches = (source.is_dir() and destination.is_dir() and storage.is_reparse(source)
+                       and source.resolve() == destination.resolve())
+        except OSError:
+            matches = False
+        storage.emit("relocation-health", id=item["id"], healthy=matches,
+                     source=str(source), destination=str(destination))
+        healthy = healthy and matches
+    return healthy
+
+
 def completed_runs(archive_roots: list[str]) -> dict[str, dict]:
     completed = {}
     for root in archive_roots:
@@ -109,12 +125,20 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--config", type=Path, required=True)
     parser.add_argument("--apply", action="store_true")
+    parser.add_argument("--preflight-only", action="store_true",
+                        help="Validate mounts and aliases before wrapper retention")
     args = parser.parse_args()
     config = json.loads(args.config.read_text(encoding="utf-8-sig"))
     if not config.get("enabled", False):
         storage.emit("policy-disabled")
         return 0
     storage.validate_volumes(config)
+    relocations_ok = audit_relocations(config)
+    if not relocations_ok:
+        storage.emit("policy-blocked", reason="relocation-mismatch")
+        return 2
+    if args.preflight_only:
+        return 0
     journal = Path(config["journal_root"])
     backup = Path(config["backup_root"])
     processes = storage.process_references()
@@ -146,8 +170,10 @@ def main() -> int:
             raise RuntimeError("uv cache prune failed or was busy; cache was preserved")
         storage.emit("uv-cache-pruned", root=uv["root"])
     free = shutil.disk_usage(config["system_drive"]).free
-    storage.emit("storage-headroom", free_bytes=free, warning=free < config.get("warning_free_bytes", 30 * 1024**3))
-    return 0
+    critical = free < config.get("critical_free_bytes", 0)
+    storage.emit("storage-headroom", free_bytes=free,
+                 warning=free < config.get("warning_free_bytes", 30 * 1024**3), critical=critical)
+    return 2 if critical else 0
 
 
 if __name__ == "__main__":
