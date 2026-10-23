@@ -213,7 +213,7 @@ def load_ohlcv(symbol: str, curr_date: str, *, requested_start: str | None = Non
     if pinned is not None:
         data = pinned
     elif use_cache:
-        data = pd.read_csv(data_file, on_bad_lines="skip")
+        data = pd.read_csv(data_file, on_bad_lines="skip", float_precision="round_trip")
     else:
         try:
             data = yf_retry(lambda: yf.download(
@@ -232,7 +232,7 @@ def load_ohlcv(symbol: str, curr_date: str, *, requested_start: str | None = Non
     validated = validate_with_fallback(data, symbol, start_str, curr_date)
     # Validate before admitting a new Yahoo cache. A KIS replacement must never
     # poison a Yahoo-labelled file or mix vendor adjustment bases.
-    if not use_cache and not validated.attrs.get("source"):
+    if pinned is None and not use_cache and not validated.attrs.get("source"):
         data.to_csv(data_file, index=False)
 
     # Reuse this exact validated input for the private chart, without refetching.

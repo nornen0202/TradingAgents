@@ -195,11 +195,13 @@ def selected_history(symbol: str, start_date: str, end_date: str):
     from .daily_history_selection import get_selected_daily_history
 
     selected = get_selected_daily_history(symbol, end_date)
-    if selected and selected["source"] == SOURCE:
+    if selected and selected["source"] in {SOURCE, "yfinance"}:
         frame = selected["frame"]
+        if frame is None and selected["source"] == "yfinance":
+            return None  # Legacy opt-out callers pin only the provider.
         if frame is None or frame.attrs["requested_start"] > start_date:
             raise VendorMalformedResponseError("Requested history exceeds the pinned research series")
-        if "listing_contract" in frame.attrs:
+        if selected["source"] == SOURCE and "listing_contract" in frame.attrs:
             from .security_listing import cutoff_for_day, validate_listing_receipt
             try:
                 observed = datetime.fromisoformat(frame.attrs["observed_at"])
@@ -267,6 +269,12 @@ def validate_with_us_fallback(data, symbol: str, start_date: str, end_date: str)
         raise error
     if stale_required_session:
         raise VendorMalformedResponseError("No provider supplied the required completed US session")
+    if fallback_enabled(symbol):
+        valid.attrs.update(requested_start=start_date, requested_end=end_date)
+        select_daily_history(symbol, end_date, "yfinance", frame=valid)
+        # Concurrent native tools must return the first admitted snapshot too.
+        pinned = selected_history(symbol, start_date, end_date)
+        return pinned if pinned is not None else valid
     select_daily_history(symbol, end_date, "yfinance")
     return valid
 
