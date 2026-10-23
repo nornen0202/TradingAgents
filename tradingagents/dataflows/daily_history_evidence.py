@@ -76,7 +76,9 @@ def _snapshot(symbol, end_date, source, frame):
         if "listing_contract" in attrs:
             if not us_metadata:
                 raise ValueError("Listing contract requires the US source.")
-            from .security_listing import validate_listing_receipt
+            from .security_listing import cutoff_for_day, validate_listing_receipt
+            if datetime.fromisoformat(attrs["listing_contract"]["analysis_as_of"]) > cutoff_for_day(end_date):
+                raise ValueError("Listing receipt exceeds this analysis cutoff.")
             listing = validate_listing_receipt(symbol, attrs["listing_contract"], requested_start=start.isoformat(),
                                                end_date=end_date, observed_at=observed)
             if (attrs.get("required_start") != listing["required_start"]

@@ -19,6 +19,7 @@ END = "2026-10-21"
 ORIGINAL = "2021-10-21"
 FIRST = "2024-04-02"
 ASOF = datetime(2026, 10, 21, 23, 59, tzinfo=timezone.utc)
+REAL_CUTOFF = listing.cutoff_for_day
 
 
 def metadata():
@@ -322,3 +323,19 @@ def test_non_session_reviewed_first_date_is_rejected_before_prices(broker, monke
     with pytest.raises(VendorMalformedResponseError, match='first regular listing'):
         us.load_us_daily_bars('GEV', '2026-10-20', END)
     client.request_json.assert_not_called()
+
+
+def test_receipt_cannot_be_imported_into_an_earlier_analysis_context(broker, monkeypatch):
+    result = us.load_us_daily_bars('GEV', '2026-10-20', END)
+    data = metadata()
+    data['collection_started_at'] = '2026-10-22T04:29:59+00:00'
+    data['available_at'] = '2026-10-22T04:30:00+00:00'
+    result.attrs['listing_contract'] = listing.verify_listing_contract(
+        'GEV', data, requested_start=ORIGINAL, end_date=END,
+        analysis_as_of=datetime(2026, 10, 22, 4, 30, 1, tzinfo=timezone.utc))
+    # Restore the real scoped cutoff, which this loader fixture replaces with a fixed clock.
+    monkeypatch.setattr(listing, 'cutoff_for_day', REAL_CUTOFF)
+    with run_config({'analysis_as_of': '2026-10-22'}):
+        assert _snapshot('GEV', END, us.SOURCE, result)['status'] == 'VERIFIED_RETRIEVED_SERIES'
+    with run_config({'analysis_as_of': END}):
+        assert _snapshot('GEV', END, us.SOURCE, result)['status'] == 'UNVERIFIED'
