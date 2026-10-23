@@ -1,0 +1,612 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YouTube 투자자용 검증 리포트 - 물타기를 하면 안 되는 주식들 공통점 3가지</title>
+  <style>
+:root {
+  color-scheme: light;
+  --bg: #f7f8fb;
+  --panel: #ffffff;
+  --text: #172033;
+  --muted: #667085;
+  --line: #d9dee8;
+  --accent: #0f766e;
+  --accent-2: #2563eb;
+  --warn: #b45309;
+  --bad: #b42318;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0 56px; }
+a { color: var(--accent-2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.hero { padding: 28px 0 22px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+.hero.compact { padding-top: 12px; }
+.hero h1 { margin: 0; font-size: clamp(28px, 4vw, 44px); line-height: 1.15; letter-spacing: 0; }
+.hero p { max-width: 760px; color: var(--muted); margin: 12px 0 0; }
+.eyebrow { color: var(--accent); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0; margin: 0 0 8px; }
+section { margin: 28px 0; }
+h2, h3, h4, h5 { letter-spacing: 0; line-height: 1.25; }
+.synthesis-callout { padding: clamp(20px, 4vw, 34px); border: 1px solid #6ee7d8; border-radius: 18px; background: linear-gradient(135deg, #ecfdf9 0%, #eff6ff 100%); box-shadow: 0 18px 44px rgba(15, 118, 110, .12); }
+.synthesis-callout.unavailable { border-color: var(--line); background: var(--panel); box-shadow: none; }
+.synthesis-callout h2 { margin: 0; font-size: clamp(24px, 3.2vw, 36px); }
+.synthesis-callout .lead { max-width: 900px; font-size: 17px; color: #334155; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.primary-link, .secondary-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border-radius: 999px; font-weight: 800; }
+.primary-link { color: white; background: var(--accent); }
+.secondary-link { color: var(--accent-2); border: 1px solid #93c5fd; background: white; }
+.primary-link:hover, .secondary-link:hover { text-decoration: none; filter: brightness(.97); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.card, .run { display: flex; flex-direction: column; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; color: var(--text); min-height: 128px; }
+.run { padding: 16px; }
+.card:hover, .run:hover { border-color: var(--accent-2); text-decoration: none; }
+.thumb { display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #e9edf5; border-radius: 8px 8px 0 0; color: var(--muted); font-size: 13px; font-weight: 700; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb-empty span { padding: 0 14px; text-align: center; }
+.card-body { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 16px; }
+.card strong { line-height: 1.35; }
+.source-line { color: #3f4a5f; font-weight: 600; }
+.runs { display: grid; gap: 10px; }
+.badge { display: inline-flex; width: fit-content; border-radius: 999px; padding: 2px 9px; background: #e6f4f1; color: var(--accent); font-size: 12px; font-weight: 700; }
+.status-contradicted, .status-llm_failed { background: #fee4e2; color: var(--bad); }
+.status-unverified, .status-stale { background: #fff4d6; color: var(--warn); }
+small, .muted { color: var(--muted); }
+.topnav { display: flex; gap: 14px; margin-bottom: 16px; font-size: 14px; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px; }
+.stats span { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
+.report { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: min(5vw, 36px); }
+.report-head { border-bottom: 1px solid var(--line); margin-bottom: 24px; padding-bottom: 20px; }
+.report-head h1 { margin: 0; font-size: clamp(24px, 3.5vw, 38px); line-height: 1.2; }
+.meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+.scope-note { padding: 12px 14px; border-left: 4px solid var(--warn); border-radius: 6px; background: #fff7ed; color: #7c2d12; }
+.synthesis-report h2 { margin-top: 34px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.synthesis-report h3 { margin: 24px 0 8px; color: #0f4c5c; }
+.synthesis-report p, .synthesis-report li { overflow-wrap: anywhere; }
+pre { overflow: auto; background: #111827; color: #f9fafb; border-radius: 8px; padding: 14px; }
+code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+details { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 18px; }
+@media (max-width: 640px) {
+  main { width: min(100% - 20px, 1120px); padding-top: 18px; }
+  .report { padding: 18px; }
+  .synthesis-callout { border-radius: 14px; padding: 18px; }
+  .cta-row a { width: 100%; }
+  .mobile-report { border-radius: 12px; }
+}
+</style>
+</head>
+<body>
+  <main>
+<nav class="topnav"><a href="index.html">실행 목록</a><a href="../../index.html">YouTube 홈</a></nav>
+<article class="report">
+  <header class="report-head">
+    <p class="eyebrow">youtube_20261023_090556</p>
+    <h1>물타기를 하면 안 되는 주식들 공통점 3가지</h1>
+    <div class="meta">
+      <span class="badge status-asr_uncertain">asr_uncertain</span>
+      <a href="https://www.youtube.com/watch?v=DcdoCBojO6c">원본 영상</a>
+    </div>
+  </header>
+  <h2>물타기 위험을 가르는 세 가지 신호: 영상 주장과 검증 결과</h2>
+<p><a href="https://www.youtube.com/watch?v=DcdoCBojO6c">경제사냥꾼 영상</a> · 게시일 2026-10-22 · 제공된 검증자료 기준</p>
+<h3>1. 핵심 판단</h3>
+<p>영상은 <strong>이익 감소, 반복적인 신주 발행, 실적 없는 테마 상승</strong>을 추가 투자에 앞서 경계할 특징으로 제시한다. 반대로 기업의 이익이 유지되는데 시장과 함께 하락한 경우에는 계획적 분할매수의 기회가 될 수 있다고 주장한다.</p>
+<p><strong>평균 매입가를 낮추는 것과 투자 위험을 낮추는 것은 다르다는 산술적 설명은 확인된다.</strong> 다만 세 가지 특징을 보편적인 투자 규칙으로 뒷받침할 성과 자료는 없다. 익명 게임·바이오 기업과 초전도체 테마 사례의 핵심 수치도 대부분 확인되지 않았다.</p>
+<p>총 10개 주장 중 산술 예시 1개는 확인, 게임 사례 1개는 부분 지지, 2개는 자막 인식 불확실, 나머지 6개는 미검증이다. 미검증은 거짓으로 판명됐다는 뜻이 아니다.</p>
+<h3>2. 영상 주장과 확인된 사실·근거</h3>
+<p>모든 주장에 부여된 시각은 <strong>00:00</strong>이다. 이는 전체 내용을 담은 단일 청크의 시작점으로, 개별 발화의 정확한 위치가 아니다. 분석 범위는 청크 기준 00:00~02:12다.</p>
+<p>| 구분 | 영상 주장 | 확인된 사실·근거 | 판단 |</p>
+<p>|---|---|---|---|</p>
+<p>| 손익 계산 | 추가매수로 평균단가가 낮아져도 이후 하락하면 손실금액은 커질 수 있다. | 제시된 가정의 평균단가·손실금액 계산이 일치한다. | 확인 |</p>
+<p>| 투자 원칙 | 세 가지 위험 특징을 피하고, 이익이 유지되는 시장 동반 하락 기업은 계획적으로 접근할 수 있다. | 해당 기준의 투자 성과나 현재 적용 대상을 검증할 자료는 없다. | 투자 의견·미검증 |</p>
+<p>| 익명 게임 기업 | 과거 주가 100만 원 초과, 영업이익·주가의 절반 초과 하락, 이후 매출 반감 | 후보 기업에 관한 실적 악화 보도는 있으나 기업 동일성·비교 기간·전체 가격 경로는 확인되지 않았다. | 부분 지지 |</p>
+<p>| 익명 바이오 기업 | 반복 신주 발행, 임상 기대 미달, 고점 대비 98% 초과 하락 | 발행금액 인식이 불명확하고 기업 식별·실제 발행 공시·조정주가 자료가 없다. | 인식 불확실·미검증 |</p>
+<p>| 초전도체 테마 | 단기 급등 후 붕괴, 기업들의 관련성 부인, 학계 결론, 약 500억 원 매수와 대주주 매도 | 사건·종목·기간 및 대응 원자료가 확보되지 않았다. | 미검증 |</p>
+<h4>평균단가와 손실을 따로 봐야 하는 이유</h4>
+<p>세금·수수료를 제외하고, 최초 10,000원에 10주를 취득한 뒤 주가가 5,000원일 때 10주를 추가하는 가정이다. 이후 주가가 2,500원이면 다음과 같다.</p>
+<p>| 항목 | 추가매수 없음 | 추가매수 있음 |</p>
+<p>|---|---:|---:|</p>
+<p>| 총취득액 | 100,000원 | 150,000원 |</p>
+<p>| 보유 주식 수 | 10주 | 20주 |</p>
+<p>| 평균단가 | 10,000원 | 7,500원 |</p>
+<p>| 평가액 | 25,000원 | 50,000원 |</p>
+<p>| 손실금액 | 75,000원 | 100,000원 |</p>
+<p>| 투자원금 대비 손실률 | 75.0% | 약 66.7% |</p>
+<p>평균단가와 손실률은 낮아졌지만, 투입한 자금이 늘어 <strong>손실금액은 25,000원 증가</strong>한다. 이 계산은 위험 노출의 차이를 보여줄 뿐, 실제 종목의 향후 회복 여부를 설명하지는 않는다.</p>
+<h4>게임 사례: 실적 악화 보도는 있으나 동일 기업 확인은 안 됨</h4>
+<p>제공된 <a href="http://news.mk.co.kr/newsRead.php?no=450441&amp;year=2021">매일경제의 2021년 1분기 관련 보도</a>는 엔씨소프트의 영업이익이 567억 원으로 전년 동기 대비 77%, 매출은 5,125억 원으로 30% 감소했다고 전한다. 이는 게임기업의 실적 악화 사례를 일부 뒷받침한다.</p>
+<p>그러나 다음 구분이 필요하다.</p>
+<ul>
+<li>영상의 익명 기업이 엔씨소프트라는 확인은 없다.</li>
+<li>분기 실적의 전년 동기 대비 감소는 연간 실적 감소와 다르다.</li>
+<li><a href="http://news.mk.co.kr/newsRead.php?no=780746&amp;year=2021">2021년 2분기 관련 보도</a>의 영업이익 감소율은 46%다. 비교 분기가 다르므로 앞선 수치의 직접 반증은 아니다.</li>
+<li><a href="http://www.seoulfn.com/news/articleView.html?idxno=447478">서울파이낸스의 2022년 게임주 하락 보도</a>는 업종 침체를 다루지만, 제공된 발췌만으로 영상의 1년 주가 반감과 후속 매출 반감을 재현할 수 없다.</li>
+</ul>
+<p>또한 1분기 실적 보도의 제목은 이익 급감에도 주가가 상승한 사례를 다룬다. 실적과 주가는 항상 같은 시점에 같은 방향으로 움직인다고 단정할 수 없다.</p>
+<h4>바이오 사례: 임상 보도와 영상 사례를 연결하면 안 됨</h4>
+<p><a href="https://www.smarttoday.co.kr/ko-kr/articles/106553">스마트투데이 보도</a>는 헬릭스미스의 엔젠시스 DPN 임상 3-2상·3-2b상에서 1차 평가지표를 충족하지 못했고, 다음 날 주가가 29.98% 하락했다고 전한다.</p>
+<p>이는 해당 기업에 관한 보도이며, <strong>영상 속 익명 바이오 기업의 신원을 확인하는 근거는 아니다.</strong> 하루 하락률 역시 고점 대비 98% 초과 하락을 입증하지 않는다. 발행금액은 자막 오류로 해석할 수 없으므로 임의 보정하지 않았다.</p>
+<p>초전도체 사례는 별도의 유효한 직접 증거가 없다. KIND 일반 화면은 개별 해명공시가 아니며, 함께 수집된 무관한 미국 증시 기사도 지지 근거에서 제외했다. LK-99 사건이라는 식별도 확정하지 않는다.</p>
+<h3>3. 상승 논리와 반론</h3>
+<h4>성립할 수 있는 상승 논리</h4>
+<p>영상의 긍정적 시나리오는 <strong>기업의 현금 창출력은 유지되지만 시장 위험 회피로 가격이 함께 하락한 경우</strong>다. 이때 시장 불안 완화, 실적 유지 확인, 자금조달 위험 축소가 재평가의 조건이 될 수 있다. 다만 제공 자료에는 이를 충족하는 현재 종목이나 가격이 없어, 특정 투자 기회가 확인됐다고 해석할 수 없다.</p>
+<h4>반드시 함께 볼 반론</h4>
+<ul>
+<li><strong>이익 감소가 영구적 훼손을 뜻하지는 않는다.</strong> 일회성 비용과 핵심 사업의 구조적 악화를 구분해야 한다.</li>
+<li><strong>증자가 곧 주당가치 하락을 뜻하지는 않는다.</strong> 미참여 주주의 지분율 희석과 조달자금 사용에 따른 기업가치 변화는 별개다.</li>
+<li><strong>현재 이익 유지가 저평가의 증거는 아니다.</strong> 향후 성장 둔화, 부채 부담, 높은 기존 밸류에이션이 가격 하락에 반영될 수 있다.</li>
+<li><strong>계획적 분할매수도 손실을 방지하지 못한다.</strong> 계획이 있어도 기업 상태에 관한 전제가 틀리면 노출이 누적된다.</li>
+<li><strong>대주주 매도만으로 의도를 판단할 수 없다.</strong> 실제 처분 사실과 목적, 내부정보 이용 여부는 각각 다른 문제다.</li>
+</ul>
+<h3>4. 단기 체크포인트와 관찰 항목</h3>
+<p>특정 기업과 발표 일정이 확인되지 않아 날짜가 정해진 촉매는 제시할 수 없다. 다음 실적 발표와 관련 공시에서 확인할 항목은 다음과 같다.</p>
+<p>| 점검 시점 | 구체적 관찰 항목 | 판단에 주는 의미 |</p>
+<p>|---|---|---|</p>
+<p>| 다음 실적 발표 | 동일 회계기준의 매출·영업이익·영업현금흐름, 일회성 항목, 핵심 제품 매출 | 일시적 부진과 구조적 악화 구분 |</p>
+<p>| 자금조달 공시 | 실제 납입액, 발행 전후 주식 수, 자금 용도, 현금 잔액과 현금 소진 속도 | 희석 규모와 추가 조달 필요성 확인 |</p>
+<p>| 임상 결과 발표 | 시험 식별번호, 사전 지정 1차 평가지표, 통계 결과, 후속 개발 계획 | 시장 기대와 실제 시험 성패 구분 |</p>
+<p>| 테마 관련 발표 | 기업별 사업·투자 연관성, 계약·매출 발생 여부, 검증기관 원문 | 이야기와 사업 실체의 간극 확인 |</p>
+<p>| 가격·수급 점검 | 동일 기간 종목·업종·시장 수익률, 기업행동 조정 여부, 총매수·순매수 구분 | 시장 동반 하락 설명과 수급 수치 검증 |</p>
+<p>| 주요주주 공시 | 실제 거래일, 매도인 지위, 수량·가격·거래 유형 | 영상이 주장한 동시 매매 여부 확인 |</p>
+<p>영상 사례의 수치 검증에는 기업명·비교 기간 확인이 먼저다. 특히 약 500억 원의 매수 주체를 개인 투자자로 확정하거나, 공시 제출일을 실제 매도일로 대신 사용해서는 안 된다.</p>
+<h4>상승 논리가 무효화되는 조건</h4>
+<p>‘기업은 건전하고 시장 때문에만 하락했다’는 가정은 다음 사실이 확인되면 재검토해야 한다.</p>
+<ul>
+<li>핵심 제품 매출과 정상화 이익·영업현금흐름이 지속적으로 악화되는 경우</li>
+<li>사업 진척 없이 반복 조달이 필요해지고 자금 여력이 줄어드는 경우</li>
+<li>투자 논리의 핵심인 임상 평가변수나 기술·사업 연관성이 충족되지 않는 경우</li>
+<li>같은 기간 시장·업종과 비교한 부진이 기업 고유의 악재와 함께 나타나는 경우</li>
+</ul>
+<p>반대로 영상의 회피 논리도 일회성 이익 감소의 해소, 조달자금의 생산적 활용, 실제 사업 성과가 확인된다면 수정될 수 있다. 어느 방향이든 가격 하락만으로 결론을 내릴 수 없다.</p>
+<h3>5. 데이터 품질과 해석 한계</h3>
+<ul>
+<li><strong>추출 확신도:</strong> <code>source_confidence</code>는 일반 논리·산술 0.96, 게임 0.83, 바이오 0.70, 초전도체 0.77이다. 이는 자막에서 주장을 추출한 확신도이지 사실일 확률이 아니다.</li>
+<li><strong>음성 인식:</strong> <code>asr_confidence=0.0</code>은 개별 발화 점수가 제공되지 않았다는 표시다. 인식 정확도 0%를 뜻하지 않는다.</li>
+<li><strong>자막 품질:</strong> <code>transcript_quality</code>는 자동자막 기준 good·1.0이나, 발행금액과 매수 주체의 불확실성은 남아 있다. 원음 대조 결과는 없다.</li>
+<li><strong>시간 정밀도:</strong> 영상 길이는 130초지만 청크 종료는 132.119초로 약 2초 차이가 있다. 00:00 표시는 개별 주장 시각으로 사용할 수 없다.</li>
+<li><strong>원자료 부족:</strong> 실제 기업 공시, 임상 원자료, 학회 보고서, 거래소 가격·수급 자료가 제공되지 않았다. 보도는 보도 수준의 근거이며 검색 계획 자체는 증거가 아니다.</li>
+<li><strong>비공개 출처:</strong> Bloomberg·Morningstar 등 비공개 원문 근거는 제공되지 않았다. 해당 출처에 의존하는 주장은 미검증·수동 확인 필요로 남겨야 한다.</li>
+</ul>
+<h3>결론</h3>
+<p>이 영상에서 확실히 확인되는 교훈은 <strong>평균단가가 낮아져도 총손실 노출은 커질 수 있다</strong>는 점이다. 세 가지 경계 신호는 점검 틀로 활용할 수 있지만 회복 불가능성을 자동으로 입증하지 않는다. 투자자가 관찰할 핵심은 과거 매입가가 아니라 향후 현금 창출력, 추가 자금조달 필요성, 검증 가능한 사업 성과와 그 전제를 깨뜨리는 변화다.</p>
+  <details>
+    <summary>공개 요약 JSON</summary>
+    <pre>{
+  &quot;version&quot;: 4,
+  &quot;video_id&quot;: &quot;DcdoCBojO6c&quot;,
+  &quot;title&quot;: &quot;물타기를 하면 안 되는 주식들 공통점 3가지&quot;,
+  &quot;url&quot;: &quot;https://www.youtube.com/watch?v=DcdoCBojO6c&quot;,
+  &quot;channel&quot;: &quot;경제사냥꾼&quot;,
+  &quot;channel_id&quot;: &quot;UC7usMJDHmtbs_oegmzQKKMA&quot;,
+  &quot;source_url&quot;: &quot;https://www.youtube.com/@%EA%B2%BD%EC%A0%9C%EC%82%AC%EB%83%A5%EA%BE%BC/shorts&quot;,
+  &quot;thumbnail_url&quot;: &quot;https://i.ytimg.com/vi/DcdoCBojO6c/maxresdefault.jpg&quot;,
+  &quot;published_at&quot;: &quot;2026-10-22T13:30:35+00:00&quot;,
+  &quot;status&quot;: &quot;asr_uncertain&quot;,
+  &quot;strategy_source_tier&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_evidence_weight&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_validation_policy&quot;: &quot;STANDARD_REVIEW&quot;,
+  &quot;transcript_status&quot;: &quot;available&quot;,
+  &quot;transcript_source&quot;: &quot;automatic&quot;,
+  &quot;transcript_chars&quot;: 1674,
+  &quot;transcript_quality&quot;: {
+    &quot;status&quot;: &quot;good&quot;,
+    &quot;score&quot;: 1.0,
+    &quot;warnings&quot;: [],
+    &quot;source&quot;: &quot;automatic&quot;,
+    &quot;language&quot;: &quot;Korean (Original)&quot;,
+    &quot;model_or_format&quot;: &quot;json3&quot;,
+    &quot;chars&quot;: 1674,
+    &quot;segments&quot;: 88,
+    &quot;duration_seconds&quot;: 130,
+    &quot;repeated_ngram_ratio&quot;: 0.0
+  },
+  &quot;generated_at&quot;: &quot;2026-10-23T07:14:31.876608+09:00&quot;,
+  &quot;llm_status&quot;: &quot;success&quot;,
+  &quot;research_status&quot;: &quot;success&quot;,
+  &quot;claim_verification_status&quot;: &quot;success&quot;,
+  &quot;research_pipeline_version&quot;: 4,
+  &quot;evidence_count&quot;: 7,
+  &quot;claim_status_summary&quot;: {
+    &quot;supported&quot;: 1,
+    &quot;unverified&quot;: 6,
+    &quot;partially_supported&quot;: 1,
+    &quot;asr_uncertain&quot;: 2
+  },
+  &quot;claims&quot;: [
+    {
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;claim_text&quot;: &quot;10,000원에 10주, 5,000원에 10주를 매수하면 평균단가는 7,500원이며, 이후 2,500원에서 손실은 추가매수 전 75,000원, 추가매수 후 100,000원이다.&quot;,
+      &quot;status&quot;: &quot;supported&quot;,
+      &quot;confidence&quot;: 1.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: false,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.96,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;평균단가 7,500원; 추가매수 없음 손실 75,000원; 추가매수 있음 손실 100,000원&quot;,
+        &quot;observed&quot;: &quot;제공된 가정으로 직접 계산한 결과 모두 일치&quot;
+      },
+      &quot;investor_implication&quot;: &quot;평균단가 하락만 보지 말고 추가 투입액과 총손실 노출을 함께 확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;claim_text&quot;: &quot;이익 감소·반복 신주발행·실적 없는 테마 상승 종목은 물타기를 피하고, 이익이 유지되면서 시장 때문에 하락한 기업은 계획적 분할매수 기회가 될 수 있다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.2,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.96,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;물타기 회피 특징 세 가지&quot;,
+        &quot;observed&quot;: &quot;해당 기준의 투자 성과를 검증할 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;영상의 투자 판단 기준으로 소개하되 검증된 보편적 매매 규칙으로 제시하지 않아야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;claim_text&quot;: &quot;주가가 한때 100만 원을 넘던 익명 게임 기업은 특정 게임 매출 감소로 영업이익이 1년 만에 절반 넘게 줄었고 주가도 절반 아래로 하락했으며, 이후 매출도 다시 반감했다.&quot;,
+      &quot;status&quot;: &quot;partially_supported&quot;,
+      &quot;confidence&quot;: 0.45,
+      &quot;supporting_evidence_ids&quot;: [
+        &quot;E1&quot;,
+        &quot;E3&quot;
+      ],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.83,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;주가 100만 원 초과; 영업이익·주가 절반 초과 하락; 이후 매출 반감&quot;,
+        &quot;observed&quot;: &quot;후보 기업 보도: 2021년 1분기 영업이익 전년 동기 대비 -77%, 매출 -30%; 2분기 영업이익 -46%. 나머지는 확인 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;게임업체의 실적 악화 보도는 일부 확인되지만 영상 사례의 기업명과 전체 수치를 확정해 인용해서는 안 된다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;claim_text&quot;: &quot;단일 신약 의존 바이오 기업이 자금 부족으로 1년 동안 반복적으로 신주를 발행했으며, 발행금액 자막은 ‘1,억 원 넘게’로 불명확하다.&quot;,
+      &quot;status&quot;: &quot;asr_uncertain&quot;,
+      &quot;confidence&quot;: 0.1,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.7,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;1년 동안 반복 발행; ‘1,억 원 넘게’&quot;,
+        &quot;observed&quot;: &quot;금액 해석 불가; 기간과 실제 발행 내역도 확인 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;발행금액을 임의로 복원하거나 특정 기업의 반복 증자 사실로 전달해서는 안 된다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;claim_text&quot;: &quot;해당 익명 바이오 기업은 임상 결과가 기대에 못 미쳤고 최고점 대비 주가가 98% 넘게 하락했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.2,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.7,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;최고점 대비 98% 초과 하락&quot;,
+        &quot;observed&quot;: &quot;E4는 후보 기업의 하루 -29.98%만 제시; 최고점 대비 하락률 확인 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;후보 기업의 임상 부진 보도와 영상의 익명 사례를 연결하지 말고, 98% 하락 수치는 검증 전 인용을 보류해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;claim_text&quot;: &quot;몇 년 전 초전도체 관련주들이 며칠 만에 두 배 가까이 상승한 뒤 급락했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.1,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.77,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;며칠 만에 두 배 가까이 상승 후 급락&quot;,
+        &quot;observed&quot;: &quot;재계산 가능한 가격 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;정확한 상승·하락률이나 기간을 검증된 시장 사실로 제시하지 않아야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;claim_text&quot;: &quot;초전도체 관련주로 묶인 기업 대부분이 실제 관련성을 부인했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.1,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.77,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;관련 기업 대부분&quot;,
+        &quot;observed&quot;: &quot;전체 기업 수와 부인 기업 수 모두 확인 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;‘대부분이 부인했다’는 표현은 기업별 공시와 집계 범위 확인 전 확정적으로 전달하지 않아야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;claim_text&quot;: &quot;학계가 해당 물질은 초전도체가 아니라고 결론 내린 뒤 관련주가 무너졌다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.1,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.77,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;학계 결론 이후 급락&quot;,
+        &quot;observed&quot;: &quot;발표일과 가격 변동 구간 확인 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;학계의 결론과 주가 급락 원인을 하나의 확정된 사건 경로로 설명하지 않아야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;claim_text&quot;: &quot;당시 관련주를 약 500억 원 매수했다는 발화가 있으나 매수 주체와 합산 기준이 불분명하다.&quot;,
+      &quot;status&quot;: &quot;asr_uncertain&quot;,
+      &quot;confidence&quot;: 0.1,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.77,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;약 500억 원 매수&quot;,
+        &quot;observed&quot;: &quot;자막상 수치는 있으나 주체·기간·집계 방식 및 거래자료 확인 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;500억 원을 개인 순매수액 또는 확정된 수급 통계로 전달해서는 안 된다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C10&quot;,
+      &quot;claim_text&quot;: &quot;약 500억 원 매수가 발생한 같은 시기 일부 초전도체 관련주의 대주주가 매도했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.1,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.77,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;같은 시기 일부 종목 대주주 매도&quot;,
+        &quot;observed&quot;: &quot;종목 수·매도 규모·기간 중첩 확인 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;대주주와 일반 투자자의 거래가 엇갈렸다는 서사는 실제 거래일과 공시 확인 전 사실로 단정하지 않아야 한다.&quot;
+    }
+  ],
+  &quot;entities&quot;: [],
+  &quot;evidence&quot;: [
+    {
+      &quot;evidence_id&quot;: &quot;E1&quot;,
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;title&quot;: &quot;신작 부진에 게임주 속절없는 하락···투심 반전 언제?&quot;,
+      &quot;source_url&quot;: &quot;http://www.seoulfn.com/news/articleView.html?idxno=447478&quot;,
+      &quot;publisher&quot;: &quot;Naver News&quot;,
+      &quot;published_at&quot;: &quot;2022-02-23T17:50:00+09:00&quot;,
+      &quot;source_tier&quot;: &quot;web&quot;,
+      &quot;excerpt&quot;: &quot;의 절반을 밑돈다. 한때 게임 대장주에 자리했던 엔씨소프트도 긴 침체를 겪고 있다. 이날 전장 대비 0.22... 기존 매출 게임이 감소 추세인 점을 감안, 올해 영업이익 추정치를 15.3% 내려잡는다\&quot;면서 \&quot;제한적인 주가... 신작 부진에 게임주 속절없는 하락···투심 반전 언제? --&gt; 주요서비스 바로가기 본문 바로가기 매체정보 바로가기 로그인 바로가기 기사검색 바로가기 발행일: 2026-10-23 07:00 (금) 로그인 회원가입 모바일 정책/경제일반...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E2&quot;,
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;title&quot;: &quot;카카오게임즈 잘 나간다는데…대장주 엔씨 목표가 줄하향 왜?&quot;,
+      &quot;source_url&quot;: &quot;http://news.mk.co.kr/newsRead.php?no=780746&amp;year=2021&quot;,
+      &quot;publisher&quot;: &quot;Naver News&quot;,
+      &quot;published_at&quot;: &quot;2021-08-12T09:46:00+09:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;전날 엔씨소프트는 2분기 영업이익이 1128억원으로 전년 동기 대비 46% 감소했다고 밝혔다. 이는 시장 전망치 1766억원에 크게 못 미치는 금액이다. 매출액도 전망치는 5970억원이었으나 실제 발표치는 5125억원에...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E4&quot;,
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;title&quot;: &quot;[바이오 공시 잔혹사] ⑤기술특례 1호의 몰락…헬릭스미스, 실패를 실패...&quot;,
+      &quot;source_url&quot;: &quot;https://www.smarttoday.co.kr/ko-kr/articles/106553&quot;,
+      &quot;publisher&quot;: &quot;Naver News&quot;,
+      &quot;published_at&quot;: &quot;2026-04-16T09:28:00+09:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;DPN 임상 3-2상 및 3-2b상 톱라인 결과를 공시했다. 엔젠시스 투약군은 위약군 대비 1차 평가지표를 충족하지 못했다. 5년에 걸친 재도전이 다시 실패로 끝났다. 다음 날 주가는 29.98% 하락하며 하한가(4250원)로 직행했다....&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E5&quot;,
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;title&quot;: &quot;Food Stocks Jump as Top MAHA Ally Departs&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/m/e9840b34-99a0-3695-bfdc-0f98409eb0fb/food-stocks-jump-as-top-maha.html&quot;,
+      &quot;publisher&quot;: &quot;The Wall Street Journal&quot;,
+      &quot;published_at&quot;: &quot;2026-10-22T20:14:08+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E6&quot;,
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;title&quot;: &quot;대한민국 대표 기업공시채널 Kind (2) - Krx&quot;,
+      &quot;source_url&quot;: &quot;//duckduckgo.com/l/?uddg=https%3A%2F%2Fkind.krx.co.kr%2Fmain.do%3Fmethod%3DloadInitPage%26scrnmode%3D1&amp;rut=afa743a02aff7bd5c9e52a15c8417d01a5f429065cd30aee495573a2982b137b&quot;,
+      &quot;publisher&quot;: &quot;duckduckgo.com&quot;,
+      &quot;published_at&quot;: null,
+      &quot;source_tier&quot;: &quot;official&quot;,
+      &quot;excerpt&quot;: &quot;[ ] 오늘의 공시는 10초 주기로 자동 갱신됩니다.&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E7&quot;,
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;title&quot;: &quot;Dow Jones Futures: Moderna Crashes, Meta Fuels AI Meltdown, But Warren Buffett Market Thriving&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/m/47e878bb-824d-3243-a8e9-b86b1c3f85d3/dow-jones-futures%3A-moderna.html&quot;,
+      &quot;publisher&quot;: &quot;Investor&#x27;s Business Daily&quot;,
+      &quot;published_at&quot;: &quot;2026-10-22T22:07:34+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    }
+  ],
+  &quot;source_policy&quot;: {
+    &quot;raw_transcript_published&quot;: false,
+    &quot;raw_transcript_in_evidence&quot;: false,
+    &quot;research_pipeline_version&quot;: 4,
+    &quot;closed_source_claims&quot;: &quot;unverified_external_source&quot;,
+    &quot;auto_caption_warning&quot;: true,
+    &quot;local_asr_warning&quot;: false
+  }
+}</pre>
+  </details>
+</article>
+</main>
+  <style>
+.reader-contents { margin: 16px 0; padding: 12px 16px; border: 1px solid var(--line, #64748b); border-radius: 12px; }
+.reader-contents > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-weight: 750; }
+.reader-contents nav { display: grid; gap: 4px; max-height: 45vh; overflow: auto; margin: 8px 0; }
+.reader-contents a { display: block; min-height: 44px; padding: 10px; border-radius: 6px; color: inherit; overflow-wrap: anywhere; }
+.reader-contents a:hover { background: #80808020; }
+.reader-contents .reader-subsection { padding-inline-start: 24px; font-size: .92em; }
+.reader-prose, .report { overflow-wrap: anywhere; line-height: 1.8; }
+.reader-prose p, .reader-prose li { max-width: 85ch; }
+.reader-prose h2, .reader-prose h3, .reader-prose h4, [data-reader-heading] { scroll-margin-top: 100px; line-height: 1.45; }
+.reader-prose h2 { margin-top: 1.8em; padding-bottom: 8px; border-bottom: 1px solid var(--line, #64748b); }
+.reader-prose h3 { margin-top: 1.5em; }
+.reader-prose li { margin: .5em 0; }
+.reader-prose pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.reader-prose blockquote { margin: 16px 0; padding: 4px 16px; border-left: 3px solid var(--accent, #64748b); }
+.reader-table { overflow: auto; max-width: 100%; margin: 16px 0; border: 1px solid var(--line, #64748b); border-radius: 10px; }
+.reader-table table { border-collapse: collapse; width: 100%; margin: 0; font-size: .92rem; }
+.reader-table th, .reader-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line, #64748b); min-width: 110px; max-width: 400px; overflow-wrap: anywhere; white-space: normal; }
+.reader-table th { background: #80808018; }
+.reader-table tr:nth-child(even) { background: #80808008; }
+.reader-search { display: grid; gap: 8px; margin: 16px 0; }
+.reader-search label { font-weight: 700; }
+.reader-search input { box-sizing: border-box; width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line, #64748b); border-radius: 10px; background: var(--panel, #fff); color: var(--text, #132238); font: inherit; }
+.reader-search p { margin: 0; font-size: .86rem; }
+.reader-back { position: fixed; bottom: max(14px, env(safe-area-inset-bottom)); right: 14px; z-index: 30; min-height: 44px; border: 1px solid #778899; border-radius: 99px; padding: 10px 16px; background: #18344a; color: #fff; font: 700 14px system-ui; cursor: pointer; box-shadow: 0 3px 12px #0003; }
+[data-reader-source] { margin-top: 20px; }
+[data-reader-source] > summary { min-height: 44px; cursor: pointer; }
+[data-reader-source] pre { font-size: .85rem; }
+[data-reader-source] pre, .reader-prose { min-width: 0; }
+.reader-contents :focus-visible, .reader-search :focus-visible, .reader-back:focus-visible, .reader-table:focus-visible { outline: 3px solid var(--accent, #008c95); outline-offset: 3px; }
+.reader-search + .grid > [hidden] { display: none !important; }
+@media (max-width: 600px) { .reader-prose { font-size: 1rem; } .reader-contents { padding: 8px 12px; } }
+@media print { .reader-back, .reader-search, .reader-contents, [data-reader-source] { display: none !important; } .reader-table { overflow: visible; } .reader-prose { color: #000; background: #fff; } }
+</style><script>
+(() => {
+  'use strict';
+  let serial = 0;
+  const rendered = new WeakMap();
+  const node = (tag, text) => { const el = document.createElement(tag); if (text != null) el.textContent = text; return el; };
+  function inline(parent, text) {
+    const pattern = /(`[^`]+`|\*\*[^*]+\*\*|\[[^\]]+\]\(https?:\/\/[^\s)]+\))/g;
+    let start = 0;
+    for (const match of String(text).matchAll(pattern)) {
+      parent.append(document.createTextNode(text.slice(start, match.index)));
+      const value = match[0];
+      if (value.startsWith('`')) parent.append(node('code', value.slice(1, -1)));
+      else if (value.startsWith('**')) parent.append(node('strong', value.slice(2, -2)));
+      else {
+        const link = value.match(/^\[([^\]]+)\]\((.+)\)$/);
+        const a = node('a', link[1]); a.href = link[2]; a.rel = 'noopener noreferrer'; parent.append(a);
+      }
+      start = match.index + value.length;
+    }
+    parent.append(document.createTextNode(text.slice(start)));
+  }
+  const cells = line => line.trim().replace(/^\|/, '').replace(/\|$/, '').split(/(?<!\\)\|/).map(v => v.trim().replace(/\\\|/g, '|'));
+  function markdown(source) {
+    const article = node('article'); article.className = 'reader-prose';
+    const lines = source.split(/\r?\n/); let list = null;
+    for (let i = 0; i < lines.length; i += 1) {
+      const line = lines[i], value = line.trim();
+      if (!value) { list = null; continue; }
+      if (/^```/.test(value)) {
+        const code = []; i += 1;
+        while (i < lines.length && !/^```/.test(lines[i].trim())) code.push(lines[i++]);
+        const pre = node('pre'); pre.append(node('code', code.join('\n'))); article.append(pre); list = null; continue;
+      }
+      if (i + 1 < lines.length && value.includes('|') && cells(lines[i + 1]).every(v => /^:?-{3,}:?$/.test(v))) {
+        const table = node('table'), head = node('thead'), body = node('tbody');
+        const row = (values, tag) => { const tr = node('tr'); values.forEach(v => { const cell = node(tag); if (tag === 'th') cell.scope = 'col'; inline(cell, v); tr.append(cell); }); return tr; };
+        head.append(row(cells(line), 'th')); i += 2;
+        while (i < lines.length && lines[i].trim() && lines[i].includes('|')) body.append(row(cells(lines[i++]), 'td'));
+        i -= 1; table.append(head, body); article.append(table); list = null; continue;
+      }
+      const heading = value.match(/^(#{1,6})\s+(.+)$/);
+      if (heading) { const h = node('h' + Math.min(4, heading[1].length + 1)); inline(h, heading[2]); article.append(h); list = null; continue; }
+      const bullet = value.match(/^(?:[-*+] |\d+\. )(.+)$/);
+      if (bullet) {
+        const tag = /^\d/.test(value) ? 'ol' : 'ul';
+        if (!list || list.tagName.toLowerCase() !== tag) { list = node(tag); if (tag === 'ol') list.start = parseInt(value, 10); article.append(list); }
+        const li = node('li'); inline(li, bullet[1]); list.append(li); continue;
+      }
+      list = null;
+      if (/^(---+|\*\*\*+)$/.test(value)) { article.append(node('hr')); continue; }
+      const p = node(value.startsWith('> ') ? 'blockquote' : 'p'); inline(p, value.startsWith('> ') ? value.slice(2) : line); article.append(p);
+    }
+    return article;
+  }
+  function contents(root) {
+    root.querySelectorAll(':scope > .reader-contents').forEach(el => el.remove());
+    const headings = [...root.querySelectorAll('h2,h3,h4')].filter(h => !h.closest('.card,.run-card,.reader-contents,[data-reader-source],[hidden]'));
+    if (headings.length < 2) return;
+    const details = node('details'); details.className = 'reader-contents';
+    details.append(node('summary', '이 리포트 목차 · ' + headings.length + '개 항목'));
+    const nav = node('nav'); nav.setAttribute('aria-label', '리포트 목차');
+    headings.forEach(h => {
+      if (!h.id) h.id = 'reader-section-' + (++serial);
+      h.dataset.readerHeading = ''; h.tabIndex = -1;
+      const a = node('a', h.textContent); a.href = '#' + h.id;
+      if (h.tagName !== 'H2') a.className = 'reader-subsection';
+      a.addEventListener('click', event => {
+        event.preventDefault();
+        for (let ancestor = h.parentElement; ancestor; ancestor = ancestor.parentElement) if (ancestor.tagName === 'DETAILS') ancestor.open = true;
+        h.scrollIntoView({block: 'start'}); h.focus({preventScroll: true});
+      }); nav.append(a);
+    });
+    details.append(nav); root.prepend(details);
+  }
+  function enhance(root) {
+    if (!root) return;
+    root.querySelectorAll('pre[data-report-markdown]').forEach(pre => {
+      const previous = rendered.get(pre);
+      if (previous && previous.source === pre.textContent) return;
+      const article = markdown(pre.textContent);
+      if (previous) previous.article.replaceWith(article);
+      else {
+        const details = node('details'); details.dataset.readerSource = '';
+        details.append(node('summary', 'Markdown 원문 보기'));
+        pre.before(article, details); details.append(pre);
+      }
+      rendered.set(pre, {source: pre.textContent, article});
+    });
+    root.querySelectorAll('table').forEach(table => {
+      if (table.closest('.reader-table,.account-table-wrap,.summary-scroll')) return;
+      const wrap = node('div'); wrap.className = 'reader-table'; wrap.tabIndex = 0;
+      wrap.setAttribute('role', 'region'); wrap.setAttribute('aria-label', '리포트 표 · 가로로 스크롤하여 전체 보기');
+      table.before(wrap); wrap.append(table);
+    });
+    root.querySelectorAll('.grid').forEach(grid => {
+      const cards = [...grid.querySelectorAll(':scope > a.card')];
+      if (cards.length < 2 || grid.dataset.readerSearch) return;
+      grid.dataset.readerSearch = 'true';
+      const box = node('div'); box.className = 'reader-search';
+      const input = node('input'); input.type = 'search'; input.placeholder = '제목 · 종목 · 채널 · 키워드'; input.id = 'report-search-' + (++serial);
+      const label = node('label', '리포트 찾기'); label.htmlFor = input.id;
+      const status = node('p'); status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
+      const update = () => {
+        const terms = input.value.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean); let count = 0;
+        cards.forEach(card => { card.hidden = !terms.every(t => card.textContent.toLocaleLowerCase().includes(t)); if (!card.hidden) count += 1; });
+        status.textContent = cards.length + '개 중 ' + count + '개 표시' + (count ? '' : ' · 검색어를 지우거나 다른 키워드를 입력하세요.');
+      };
+      input.addEventListener('input', update); box.append(label, input, status); grid.before(box); update();
+    });
+    contents(root);
+  }
+  window.TradingAgentsReader = {enhance};
+  const main = document.querySelector('main');
+  if (main && !main.hasAttribute('data-reader-dynamic')) enhance(main);
+  if (main) {
+    const top = node('button', '↑ 맨 위'); top.type = 'button'; top.className = 'reader-back'; top.setAttribute('aria-label', '리포트 맨 위로 이동');
+    top.addEventListener('click', () => { const target = document.querySelector('h1') || main; target.tabIndex = -1; target.scrollIntoView({block: 'start'}); target.focus({preventScroll: true}); });
+    document.body.append(top);
+  }
+})();
+</script>
+</body>
+</html>

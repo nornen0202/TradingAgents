@@ -1,13 +1,13 @@
 {
   "schema": "tradingagents.work-context/v1",
   "surface": "kr",
-  "event_id": "kr:344d87772aeebb5945e0cfdf2678d630",
+  "event_id": "kr:e3dd12004c3046db42d171fa1c567e7c",
   "prompt_contract_version": "market-work-v12-kr",
   "prompt_sha256": "a72e95420df2bdbf27008d2fc88ea82b9aa78c1222a888149cb844d5f0402a46",
   "skill_sha256": "4dffe28b3721557cc2517b5afff2f94045832606e71ff61461df969f6abb53c7",
   "task_manifest_sha256": "c0992fa275c9961bc91c679030c0b4d9b8b06f3d164226776421f1e354b5c22e",
   "workflow_contract_sha256": "97fde7add4383c59c23330c927f073c5c281e98221519d9aeab3615f11917f8a",
-  "source_sha256": "1da2bb3bfd77e797540c670dc8d882edd1778c9d10fb43c32ebb58968e5480dc",
+  "source_sha256": "b262b1ac7e960906c67125ae68ccec4021b687220a135a58310433349f1d72be",
   "body": {
     "kind": "market",
     "market": "KR",
@@ -768,17 +768,17 @@
       "youtube": {
         "source_health": "OK",
         "coverage": {
-          "total_unique_events": 436,
-          "window_events": 106,
+          "total_unique_events": 439,
+          "window_events": 108,
           "transmitted_events": 12,
           "truncated": true,
-          "oldest_occurred_at": "2026-10-21T12:00:29+00:00",
-          "newest_occurred_at": "2026-10-22T21:54:17+00:00",
+          "oldest_occurred_at": "2026-10-21T21:45:02+00:00",
+          "newest_occurred_at": "2026-10-22T23:00:25+00:00",
           "available_events_before_context_cap": 60,
           "context_event_cap": 12,
-          "omitted_events": 94,
+          "omitted_events": 96,
           "omitted_due_to_context_cap": 48,
-          "omitted_before_context_selection": 46
+          "omitted_before_context_selection": 48
         },
         "events": [
           {
@@ -1165,6 +1165,131 @@
                 {
                   "ticker": "005380.KS",
                   "name": "현대차",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "event_key": "xpSbfDPXnlQ",
+            "content_sha256": "9ceb1d7bf60b36d6f7f07d595ede93e1dcdf405581237db649a577ebc5577719",
+            "occurred_at": "2026-10-22T23:00:25+00:00",
+            "relevance": {
+              "tickers": [
+                "^KS11",
+                "META",
+                "000660",
+                "005930",
+                "CL=F"
+              ],
+              "markets": [
+                "US",
+                "KR"
+              ],
+              "themes": [],
+              "match_basis": "verified_entities",
+              "matched_tickers": [
+                "000660",
+                "005930"
+              ],
+              "market_match": true,
+              "score": 220
+            },
+            "summary": {
+              "video_id": "xpSbfDPXnlQ",
+              "title": "10월 23일 오늘 코스피 어디까지 떨어질까?!",
+              "channel": "경제사냥꾼",
+              "source_url": "https://www.youtube.com/watch?v=xpSbfDPXnlQ",
+              "claim_status_summary": {
+                "unverified": 11,
+                "partially_supported": 1
+              },
+              "claims": [
+                {
+                  "claim_id": "C1",
+                  "claim_text": "나스닥이 6월 이후 최대 하락하고 반도체 지수는 6.7% 하락했으나 동일가중 지수는 0.8% 상승했으며, 상승 종목이 더 많았다는 의미다.",
+                  "status": "unverified",
+                  "confidence": 0.2,
+                  "supporting_evidence_ids": [
+                    "E6",
+                    "E7"
+                  ],
+                  "manual_check_required": true,
+                  "investor_implication": "AI 관련주 약세라는 제목 수준의 정황과 정확한 지수 수익률·시장 폭 검증을 구분해야 한다."
+                },
+                {
+                  "claim_id": "C2",
+                  "claim_text": "야간선물이 장중 1.5% 넘게 상승했다가 2.61% 하락하며 저점 마감했고, 6월 이후 1.5% 초과 변동일에는 코스피가 같은 방향으로 출발했다.",
+                  "status": "unverified",
+                  "confidence": 0.05,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "야간선물 수치와 과거 개장 방향의 일치율을 검증된 하락 확률로 사용할 수 없다."
+                },
+                {
+                  "claim_id": "C3",
+                  "claim_text": "메타는 매출이 예상치를 웃돌았지만 AI 투자 후 현금이 21억 달러 적자로 전환했고 신주 발행으로 자금을 조달하려 하면서 주가가 7% 하락했다.",
+                  "status": "unverified",
+                  "confidence": 0.15,
+                  "supporting_evidence_ids": [
+                    "E5",
+                    "E6",
+                    "E7"
+                  ],
+                  "manual_check_required": true,
+                  "investor_implication": "자금조달 방식과 현금흐름을 확인하기 전에는 메타의 유동성 부족이나 주주 희석을 확정할 수 없다."
+                },
+                {
+                  "claim_id": "C4",
+                  "claim_text": "미국에서 거래되는 하이닉스 주식이 8% 넘게 하락했고 자사주 매입이 10월 21일 종료됐다.",
+                  "status": "partially_supported",
+                  "confidence": 0.65,
+                  "supporting_evidence_ids": [
+                    "market_evidence[2].external_context.company_news_excerpt"
+                  ],
+                  "manual_check_required": true,
+                  "investor_implication": "8% 초과 하락에는 직접 대응하는 보도가 있지만 매입 종료와 수급 지지력 약화는 별도 확인이 필요하다."
+                }
+              ],
+              "entities": [
+                {
+                  "ticker": "^KS11",
+                  "name": "코스피",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                },
+                {
+                  "ticker": "META",
+                  "name": "메타",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                },
+                {
+                  "ticker": "000660",
+                  "name": "SK하이닉스",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "시장 데이터 조회 실패: no_usable_market_fields"
+                  ]
+                },
+                {
+                  "ticker": "005930",
+                  "name": "삼성전자",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "시장 데이터 조회 실패: no_usable_market_fields"
+                  ]
+                },
+                {
+                  "ticker": "CL=F",
+                  "name": "국제유가·중동 지정학",
                   "status": "unverified",
                   "verification_notes": [
                     "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
@@ -2082,104 +2207,6 @@
                 }
               ]
             }
-          },
-          {
-            "event_key": "aI52gGQQCC8",
-            "content_sha256": "50fc7c37d93eddbfc4f47031efd3ead6058c6bb2c7d73a2e35611eb90ae70e6a",
-            "occurred_at": "2026-10-21T12:00:29+00:00",
-            "relevance": {
-              "tickers": [
-                "^KS11",
-                "000660",
-                "005930"
-              ],
-              "markets": [
-                "US",
-                "KR"
-              ],
-              "themes": [],
-              "match_basis": "verified_entities",
-              "matched_tickers": [
-                "000660",
-                "005930"
-              ],
-              "market_match": true,
-              "score": 220
-            },
-            "summary": {
-              "video_id": "aI52gGQQCC8",
-              "title": "8조 적자 ‘미운 오리’가 100조 백조로…솔리다임 상장, SK하이닉스는 주주에게 뭘 설명해야 하나ㅣ명민준, 서수진, 송재경 [주린이 구조대]",
-              "channel": "삼프로TV 3PROTV",
-              "source_url": "https://www.youtube.com/watch?v=aI52gGQQCC8",
-              "claim_status_summary": {
-                "unverified": 8,
-                "asr_uncertain": 2
-              },
-              "claims": [
-                {
-                  "claim_id": "C1",
-                  "claim_text": "8거래일 연속 하락은 IMF·금융위기·코로나 당시 세 번뿐이었고 이후 약 6개월 수익률은 40~60%였으며, 현재 시장은 과매도·바닥권이라는 주장.",
-                  "status": "unverified",
-                  "confidence": 0.05,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "역사적 반등 수치를 현재의 매수 근거로 사용하기 전에 대상 지수·사건 정의·수익률 산식을 확인해야 한다."
-                },
-                {
-                  "claim_id": "C2",
-                  "claim_text": "해외 비교 대상의 밸류에이션은 14~40배, 국내 대상은 3~4배이며 국내 기업 약 40%가 PBR 0.5배 미만, 약 80%가 1배 미만이다. 중복상장 비율은 한국 20% 초과·중국 약 5%·일본 약 3%라는 주장.",
-                  "status": "unverified",
-                  "confidence": 0.02,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "비교 기준을 통일하기 전에는 제시된 배수와 비율로 국내 시장의 할인 폭을 산정할 수 없다."
-                },
-                {
-                  "claim_id": "C3",
-                  "claim_text": "월요일 고객예탁금 92조원과 신용잔고 30조6천억원이 최근 3개월 최저이며, 과거 예탁금은 120~130조원이었다. 전일 신용잔고는 30조원을 밑돌았을 것이라는 추정.",
-                  "status": "unverified",
-                  "confidence": 0.03,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "수급 위축 판단은 같은 기준일의 예탁금·신용융자·외국인 현물 및 선물 자료로 다시 확인해야 한다."
-                },
-                {
-                  "claim_id": "C4",
-                  "claim_text": "북한 지도자 관련 SNS 소문이 허위로 판명됐고 JTBC 등이 보도했으며 남북 핫라인이 단절됐다는 주장. 소문이 증시 하락을 심화했다는 설명은 가설.",
-                  "status": "unverified",
-                  "confidence": 0.01,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "확인되지 않은 소문을 지정학적 사실이나 주가 하락의 확정 원인으로 사용하지 않아야 한다."
-                }
-              ],
-              "entities": [
-                {
-                  "ticker": "^KS11",
-                  "name": "한국 증시·지배구조 정책",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                },
-                {
-                  "ticker": "000660",
-                  "name": "SK하이닉스·SK 지배구조",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "시장 데이터 조회 실패: no_usable_market_fields"
-                  ]
-                },
-                {
-                  "ticker": "005930",
-                  "name": "삼성전자·메모리 업황",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "시장 데이터 조회 실패: no_usable_market_fields"
-                  ]
-                }
-              ]
-            }
           }
         ],
         "execution_eligible": false
@@ -2188,15 +2215,15 @@
         "source_health": "OK",
         "coverage": {
           "total_unique_events": 220,
-          "window_events": 25,
+          "window_events": 24,
           "transmitted_events": 20,
           "truncated": true,
           "oldest_occurred_at": "2026-10-22T18:49:54+00:00",
           "newest_occurred_at": "2026-10-22T21:18:26+00:00",
-          "available_events_before_context_cap": 25,
+          "available_events_before_context_cap": 24,
           "context_event_cap": 20,
-          "omitted_events": 5,
-          "omitted_due_to_context_cap": 5,
+          "omitted_events": 4,
+          "omitted_due_to_context_cap": 4,
           "omitted_before_context_selection": 0
         },
         "events": [
@@ -2959,6 +2986,7 @@
               "DIc0wqglRKg",
               "2NVBahZ9rGU",
               "JTiMdYazffA",
+              "xpSbfDPXnlQ",
               "qNPxRnb0w9g",
               "9bfZdoWxT7o",
               "Ylobdk7q-xs",
@@ -2966,21 +2994,20 @@
               "fUQEqOK5sag",
               "EsXRMk8t2rw",
               "_lnx0OrZydU",
-              "GJ4qhsYAO6M",
-              "aI52gGQQCC8"
+              "GJ4qhsYAO6M"
             ],
             "coverage": {
-              "total_unique_events": 436,
-              "window_events": 106,
+              "total_unique_events": 439,
+              "window_events": 108,
               "transmitted_events": 12,
               "truncated": true,
-              "oldest_occurred_at": "2026-10-21T12:00:29+00:00",
-              "newest_occurred_at": "2026-10-22T21:54:17+00:00",
+              "oldest_occurred_at": "2026-10-21T21:45:02+00:00",
+              "newest_occurred_at": "2026-10-22T23:00:25+00:00",
               "available_events_before_context_cap": 60,
               "context_event_cap": 12,
-              "omitted_events": 94,
+              "omitted_events": 96,
               "omitted_due_to_context_cap": 48,
-              "omitted_before_context_selection": 46
+              "omitted_before_context_selection": 48
             }
           },
           "prism": {
@@ -3009,15 +3036,15 @@
             ],
             "coverage": {
               "total_unique_events": 220,
-              "window_events": 25,
+              "window_events": 24,
               "transmitted_events": 20,
               "truncated": true,
               "oldest_occurred_at": "2026-10-22T18:49:54+00:00",
               "newest_occurred_at": "2026-10-22T21:18:26+00:00",
-              "available_events_before_context_cap": 25,
+              "available_events_before_context_cap": 24,
               "context_event_cap": 20,
-              "omitted_events": 5,
-              "omitted_due_to_context_cap": 5,
+              "omitted_events": 4,
+              "omitted_due_to_context_cap": 4,
               "omitted_before_context_selection": 0
             }
           }

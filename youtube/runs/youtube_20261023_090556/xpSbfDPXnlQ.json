@@ -1,0 +1,464 @@
+{
+  "version": 4,
+  "video_id": "xpSbfDPXnlQ",
+  "title": "10월 23일 오늘 코스피 어디까지 떨어질까?!",
+  "url": "https://www.youtube.com/watch?v=xpSbfDPXnlQ",
+  "channel": "경제사냥꾼",
+  "channel_id": "UC7usMJDHmtbs_oegmzQKKMA",
+  "source_url": "https://www.youtube.com/@%EA%B2%BD%EC%A0%9C%EC%82%AC%EB%83%A5%EA%BE%BC/shorts",
+  "thumbnail_url": "https://i.ytimg.com/vi/xpSbfDPXnlQ/maxresdefault.jpg",
+  "published_at": "2026-10-22T23:00:25+00:00",
+  "status": "unverified",
+  "strategy_source_tier": "STANDARD",
+  "strategy_evidence_weight": "STANDARD",
+  "strategy_validation_policy": "STANDARD_REVIEW",
+  "transcript_status": "available",
+  "transcript_source": "automatic",
+  "transcript_chars": 1766,
+  "transcript_quality": {
+    "status": "good",
+    "score": 1.0,
+    "warnings": [],
+    "source": "automatic",
+    "language": "Korean (Original)",
+    "model_or_format": "json3",
+    "chars": 1766,
+    "segments": 91,
+    "duration_seconds": 144,
+    "repeated_ngram_ratio": 0.0
+  },
+  "generated_at": "2026-10-23T09:05:56.792632+09:00",
+  "llm_status": "success",
+  "research_status": "success",
+  "claim_verification_status": "success",
+  "research_pipeline_version": 4,
+  "evidence_count": 8,
+  "claim_status_summary": {
+    "unverified": 11,
+    "partially_supported": 1
+  },
+  "claims": [
+    {
+      "claim_id": "C1",
+      "claim_text": "나스닥이 6월 이후 최대 하락하고 반도체 지수는 6.7% 하락했으나 동일가중 지수는 0.8% 상승했으며, 상승 종목이 더 많았다는 의미다.",
+      "status": "unverified",
+      "confidence": 0.2,
+      "supporting_evidence_ids": [
+        "E6",
+        "E7"
+      ],
+      "manual_check_required": true,
+      "timestamp": "00:00",
+      "source_confidence": 0.25,
+      "asr_confidence": 0.55,
+      "numeric_parse": {
+        "claimed": "반도체 -6.7%, 동일가중 +0.8%; 나스닥은 6월 이후 최대 하락",
+        "observed": "정확한 지수별 수익률과 비교 시계열 없음"
+      },
+      "investor_implication": "AI 관련주 약세라는 제목 수준의 정황과 정확한 지수 수익률·시장 폭 검증을 구분해야 한다."
+    },
+    {
+      "claim_id": "C2",
+      "claim_text": "야간선물이 장중 1.5% 넘게 상승했다가 2.61% 하락하며 저점 마감했고, 6월 이후 1.5% 초과 변동일에는 코스피가 같은 방향으로 출발했다.",
+      "status": "unverified",
+      "confidence": 0.05,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.55,
+      "numeric_parse": {
+        "claimed": "장중 +1.5% 초과, 마감 -2.61%; 6월 이후 절대변동 1.5% 초과 사례의 방향 일치",
+        "observed": "야간선물·현물 대응 시계열 및 사례 수 없음"
+      },
+      "investor_implication": "야간선물 수치와 과거 개장 방향의 일치율을 검증된 하락 확률로 사용할 수 없다."
+    },
+    {
+      "claim_id": "C3",
+      "claim_text": "메타는 매출이 예상치를 웃돌았지만 AI 투자 후 현금이 21억 달러 적자로 전환했고 신주 발행으로 자금을 조달하려 하면서 주가가 7% 하락했다.",
+      "status": "unverified",
+      "confidence": 0.15,
+      "supporting_evidence_ids": [
+        "E5",
+        "E6",
+        "E7"
+      ],
+      "manual_check_required": true,
+      "timestamp": "00:00",
+      "source_confidence": 0.25,
+      "asr_confidence": 0.45,
+      "numeric_parse": {
+        "claimed": "현금 21억 달러 적자, 주가 -7%",
+        "observed": "가격 648.85달러만 제공; 적자 지표·기간과 비교가격 없음"
+      },
+      "investor_implication": "자금조달 방식과 현금흐름을 확인하기 전에는 메타의 유동성 부족이나 주주 희석을 확정할 수 없다."
+    },
+    {
+      "claim_id": "C4",
+      "claim_text": "미국에서 거래되는 하이닉스 주식이 8% 넘게 하락했고 자사주 매입이 10월 21일 종료됐다.",
+      "status": "partially_supported",
+      "confidence": 0.65,
+      "supporting_evidence_ids": [
+        "market_evidence[2].external_context.company_news_excerpt"
+      ],
+      "manual_check_required": true,
+      "timestamp": "00:00",
+      "source_confidence": 0.65,
+      "asr_confidence": 0.8,
+      "numeric_parse": {
+        "claimed": "미국 거래상품 -8% 초과; 자사주 매입 10월 21일 종료",
+        "observed": "기사 발췌상 ADR -8.07%; 매입 종료일 근거 없음"
+      },
+      "investor_implication": "8% 초과 하락에는 직접 대응하는 보도가 있지만 매입 종료와 수급 지지력 약화는 별도 확인이 필요하다."
+    },
+    {
+      "claim_id": "C5",
+      "claim_text": "외국인이 이달 코스피에서 17조 원 넘게 팔았고 그중 77%가 삼성전자·SK하이닉스였다.",
+      "status": "unverified",
+      "confidence": 0.05,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.85,
+      "numeric_parse": {
+        "claimed": "월간 매도 17조 원 초과; 두 종목 비중 77%",
+        "observed": "해당 투자자별 거래자료 없음"
+      },
+      "investor_implication": "외국인 매도가 두 종목에 집중됐다는 수치를 투자 판단의 확정 근거로 사용할 수 없다."
+    },
+    {
+      "claim_id": "C6",
+      "claim_text": "매수 대기자금이 올해 최저인 89조 원대로 감소했고 전일 코스피 거래대금도 13조 7천억 원으로 올해 최저였다.",
+      "status": "unverified",
+      "confidence": 0.05,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.75,
+      "numeric_parse": {
+        "claimed": "대기자금 89조 원대, 거래대금 13.7조 원; 각각 연중 최저",
+        "observed": "대응 통계와 연중 비교자료 없음"
+      },
+      "investor_implication": "유동성 약화 주장은 지표 정의와 연중 최저 여부를 확인한 뒤 평가해야 한다."
+    },
+    {
+      "claim_id": "C7",
+      "claim_text": "최근 열흘 중 하락 출발한 6일 가운데 시가보다 높게 마감한 날은 하루뿐이었다.",
+      "status": "unverified",
+      "confidence": 0.05,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.9,
+      "numeric_parse": {
+        "claimed": "최근 10일 중 갭하락 6일; 그중 종가가 시가를 웃돈 날 1일",
+        "observed": "조건별 재집계에 필요한 OHLC 없음"
+      },
+      "investor_implication": "6일 중 1일이라는 빈도를 당일 반등 확률로 일반화할 수 없다."
+    },
+    {
+      "claim_id": "C8",
+      "claim_text": "미국 10년물 금리가 한 달 만에 5%를 하회했으며 위험회피성 국채 매수가 원인이고 반도체에는 도움이 되지 않았다.",
+      "status": "unverified",
+      "confidence": 0.05,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.9,
+      "numeric_parse": {
+        "claimed": "10년물 금리 5% 미만; 약 한 달 만",
+        "observed": "대응 금리 자료 없음"
+      },
+      "investor_implication": "5% 하회와 위험회피 해석을 검증된 거시 신호로 취급할 수 없다."
+    },
+    {
+      "claim_id": "C9",
+      "claim_text": "후티의 사우디 공격으로 국제유가가 배럴당 113달러, 5월 이후 최고로 올랐고 물가와 금리 인하에 부담이 된다.",
+      "status": "unverified",
+      "confidence": 0.1,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00",
+      "source_confidence": 0.25,
+      "asr_confidence": 0.8,
+      "numeric_parse": {
+        "claimed": "113달러/배럴; 5월 이후 최고",
+        "observed": "CL=F 약 99.30달러; 영상 상품·시점과의 동일성 미확인"
+      },
+      "investor_implication": "113달러와 공격 원인이 확인되기 전에는 이를 국내 물가·금리 전망의 확정 전제로 삼을 수 없다."
+    },
+    {
+      "claim_id": "C10",
+      "claim_text": "10월 23일 오전 10시 한국은행 총재의 국정감사 발언이 예정돼 있다.",
+      "status": "unverified",
+      "confidence": 0.05,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.75,
+      "numeric_parse": {
+        "claimed": "2026년 10월 23일 10:00 KST",
+        "observed": "공식 일정 및 실제 발언 자료 없음"
+      },
+      "investor_implication": "예정 행사 여부와 실제 발언 내용을 별도로 확인해야 한다."
+    },
+    {
+      "claim_id": "C11",
+      "claim_text": "오후까지 약세면 코스피 5,250선, 외국인이 삼성전자·SK하이닉스를 순매수하면 전일 종가가 있는 5,500선 위까지 가능하다는 분석이다.",
+      "status": "unverified",
+      "confidence": 0.1,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00",
+      "source_confidence": 0.2,
+      "asr_confidence": 0.85,
+      "numeric_parse": {
+        "claimed": "약세 시 5,250; 외국인 매수 전환 시 5,500선 위; 전일 종가 5,500선",
+        "observed": "당일 조회 스냅샷 5,533.77; 전일 종가와 시나리오 검증자료 없음"
+      },
+      "investor_implication": "두 지수 수준은 검증된 목표가나 지지선이 아니라 출처 미상의 조건부 전망으로 취급해야 한다."
+    },
+    {
+      "claim_id": "C12",
+      "claim_text": "AI 투자 재원 우려가 칩·메모리 주문과 국내 반도체 매출을 위협하고 코스피 수급을 약화시키므로 현재를 저점으로 보고 분할매수를 권한다.",
+      "status": "unverified",
+      "confidence": 0.1,
+      "supporting_evidence_ids": [
+        "E6",
+        "E7",
+        "market_evidence[2].external_context.company_news_excerpt"
+      ],
+      "manual_check_required": true,
+      "timestamp": "00:00",
+      "source_confidence": 0.25,
+      "asr_confidence": 0.85,
+      "numeric_parse": {
+        "claimed": "정량적 저점 평가와 전략 성과 수치 없음",
+        "observed": "주문·매출·평가모형·전략 성과 자료 없음"
+      },
+      "investor_implication": "시장 우려와 실제 이익 훼손을 구분해야 하며, 저점 판단이나 분할매수의 적합성이 검증됐다고 볼 수 없다."
+    }
+  ],
+  "entities": [
+    {
+      "ticker": "^KS11",
+      "name": "코스피",
+      "status": "unverified",
+      "claims": [
+        "야간선물 급락을 근거로 10월 23일 하락 출발 가능성이 높다고 전망한다.",
+        "외국인의 반도체 집중 매도와 국내 매수 여력 약화로 하락 출발 후 추가 약세가 나타날 수 있다고 주장한다.",
+        "오후까지 약세가 이어지는 경우와 외국인이 삼성전자·SK하이닉스 순매수로 전환하는 경우에 서로 다른 지수 경로를 제시한다."
+      ],
+      "numeric_claims": [
+        "코스피 야간선물이 한때 1.5% 넘게 상승했다가 2.61% 하락해 저점에서 마감했다고 발언한다.",
+        "6월 이후 야간선물이 1.5% 넘게 움직인 날에는 코스피도 같은 방향으로 출발했다고 주장하나, 해당 문장의 횟수 표현은 불명확하다.",
+        "외국인이 이달 코스피에서 17조 원 넘게 매도했으며 그중 77%가 삼성전자·SK하이닉스였다고 주장한다."
+      ],
+      "verification_notes": [
+        "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+      ],
+      "market_snapshot": {
+        "ticker": "^KS11",
+        "as_of": "2026-10-23T00:07:31.384475+00:00",
+        "current_price": 5533.77,
+        "market_cap": null,
+        "forward_pe": null,
+        "trailing_pe": null,
+        "fifty_two_week_high": 9385.59,
+        "fifty_two_week_low": 0.0,
+        "average_target_price": null,
+        "source": "yfinance",
+        "status": "verified"
+      },
+      "external_context_status": "verified"
+    },
+    {
+      "ticker": "META",
+      "name": "메타",
+      "status": "unverified",
+      "claims": [
+        "예상보다 좋은 매출에도 AI 투자 지출과 현금 부족 우려가 주가 하락을 촉발했다고 설명한다.",
+        "신주 발행으로 부족한 자금을 조달하려 한다며, 시장의 관심이 이익 규모에서 AI 투자 재원 조달의 지속 가능성으로 이동했다고 주장한다."
+      ],
+      "numeric_claims": [
+        "AI 지출 이후 남는 돈이 21억 달러 적자로 전환됐다는 취지로 발언하지만 자동자막은 '덕자'로 표기돼 있다.",
+        "메타 주가가 7% 하락했다고 주장한다."
+      ],
+      "verification_notes": [
+        "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+      ],
+      "market_snapshot": {
+        "ticker": "META",
+        "as_of": "2026-10-23T00:07:33.046475+00:00",
+        "current_price": 648.85,
+        "market_cap": 1652949414091.25,
+        "forward_pe": 18.646185,
+        "trailing_pe": 22.137495,
+        "fifty_two_week_high": 779.82,
+        "fifty_two_week_low": 520.26,
+        "average_target_price": 833.1331,
+        "source": "yfinance",
+        "status": "verified"
+      },
+      "external_context_status": "verified"
+    },
+    {
+      "ticker": "000660",
+      "name": "SK하이닉스",
+      "status": "unverified",
+      "claims": [
+        "빅테크의 AI 투자 재원 우려가 AI 칩 주문과 메모리 매출 우려로 이어지며, 자사주 매입 종료로 국내 수급 지지력도 약해졌다고 주장한다."
+      ],
+      "numeric_claims": [
+        "미국에서 거래되는 하이닉스 주식이 8% 넘게 하락했다고 주장한다.",
+        "자사주 매입이 21일 종료됐다고 주장한다."
+      ],
+      "verification_notes": [
+        "시장 데이터 조회 실패: no_usable_market_fields"
+      ],
+      "market_snapshot": {
+        "ticker": "000660",
+        "as_of": "2026-10-23T00:07:37.488834+00:00",
+        "current_price": null,
+        "market_cap": null,
+        "forward_pe": null,
+        "trailing_pe": null,
+        "fifty_two_week_high": null,
+        "fifty_two_week_low": null,
+        "average_target_price": null,
+        "source": "yfinance",
+        "status": "unverified"
+      },
+      "external_context_status": "verified"
+    },
+    {
+      "ticker": "005930",
+      "name": "삼성전자",
+      "status": "unverified",
+      "claims": [
+        "빅테크 AI 투자가 칩 주문과 메모리 매출로 연결되므로 투자 재원 우려가 삼성전자에도 부담이라고 설명한다."
+      ],
+      "numeric_claims": [],
+      "verification_notes": [
+        "시장 데이터 조회 실패: no_usable_market_fields"
+      ],
+      "market_snapshot": {
+        "ticker": "005930",
+        "as_of": "2026-10-23T00:07:40.400611+00:00",
+        "current_price": null,
+        "market_cap": null,
+        "forward_pe": null,
+        "trailing_pe": null,
+        "fifty_two_week_high": null,
+        "fifty_two_week_low": null,
+        "average_target_price": null,
+        "source": "yfinance",
+        "status": "unverified"
+      },
+      "external_context_status": "verified"
+    },
+    {
+      "ticker": "CL=F",
+      "name": "국제유가·중동 지정학",
+      "status": "unverified",
+      "claims": [
+        "후티 반군의 사우디 공격으로 유가가 상승했으며, 물가 상승이 금리 인하를 어렵게 만들 수 있다고 주장한다."
+      ],
+      "numeric_claims": [
+        "국제유가가 113달러로 5월 이후 최고 수준에 올랐다고 주장한다."
+      ],
+      "verification_notes": [
+        "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+      ],
+      "market_snapshot": {
+        "ticker": "CL=F",
+        "as_of": "2026-10-23T00:07:43.059228+00:00",
+        "current_price": 99.30000305175781,
+        "market_cap": null,
+        "forward_pe": null,
+        "trailing_pe": null,
+        "fifty_two_week_high": 119.48,
+        "fifty_two_week_low": 54.98,
+        "average_target_price": null,
+        "source": "yfinance",
+        "status": "verified"
+      },
+      "external_context_status": "verified"
+    }
+  ],
+  "evidence": [
+    {
+      "evidence_id": "E1",
+      "claim_id": "C1",
+      "title": "Basic Materials Roundup: Market Talk",
+      "source_url": "https://finance.yahoo.com/m/724acac2-9cd0-383d-aa13-7b41999c69c2/basic-materials-roundup%3A.html",
+      "publisher": "The Wall Street Journal",
+      "published_at": "2026-10-22T20:57:00+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "Basic Materials Roundup: Market Talk Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals Weather Newsletters Finance My portfolio News Markets Re..."
+    },
+    {
+      "evidence_id": "E2",
+      "claim_id": "C1",
+      "title": "Silver Futures Fall to Lowest This Year as Oil Prices Fuel Inflation Risks",
+      "source_url": "https://finance.yahoo.com/m/24dad137-8bf9-387b-9dad-31e5d21d37ca/silver-futures-fall-to-lowest.html",
+      "publisher": "The Wall Street Journal",
+      "published_at": "2026-10-22T18:34:00+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "Silver Futures Fall to Lowest This Year as Oil Prices Fuel Inflation Risks Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals Weather Newsletter..."
+    },
+    {
+      "evidence_id": "E4",
+      "claim_id": "C2",
+      "title": "1 Stock Under $50 with Exciting Potential and 2 We Question",
+      "source_url": "https://finance.yahoo.com/markets/stocks/articles/1-stock-under-50-exciting-204553274.html",
+      "publisher": "StockStory",
+      "published_at": "2026-10-22T20:45:53+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "1 Stock Under $50 with Exciting Potential and 2 We Question Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals Weather Newsletters Finance My po..."
+    },
+    {
+      "evidence_id": "E5",
+      "claim_id": "C3",
+      "title": "Dow Jones Futures: Moderna Crashes, Meta Fuels AI Meltdown, But Warren Buffett Market Thriving",
+      "source_url": "https://finance.yahoo.com/m/47e878bb-824d-3243-a8e9-b86b1c3f85d3/dow-jones-futures%3A-moderna.html",
+      "publisher": "Investor's Business Daily",
+      "published_at": "2026-10-22T23:56:06+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    },
+    {
+      "evidence_id": "E6",
+      "claim_id": "C3",
+      "title": "Nasdaq 100 Clocks Worst Day In Four Months As Investors Grow Weary Of Capex, Elevated Debt — META, SPCX, BE, MRNA In Focus",
+      "source_url": "https://finance.yahoo.com/markets/stocks/articles/nasdaq-100-clocks-worst-day-234448333.html",
+      "publisher": "Stocktwits",
+      "published_at": "2026-10-22T23:44:48+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    },
+    {
+      "evidence_id": "E8",
+      "claim_id": "C7",
+      "title": "SOXL Sinks To 6-Month Low As Nasdaq Slides Amid Oil Surge: Trump Blames Iran, But Wells Fargo Says Huang’s Comments Spooked Markets",
+      "source_url": "https://finance.yahoo.com/markets/stocks/articles/soxl-sinks-6-month-low-170113972.html",
+      "publisher": "Stocktwits",
+      "published_at": "2026-10-22T17:01:13+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    }
+  ],
+  "source_policy": {
+    "raw_transcript_published": false,
+    "raw_transcript_in_evidence": false,
+    "research_pipeline_version": 4,
+    "closed_source_claims": "unverified_external_source",
+    "auto_caption_warning": true,
+    "local_asr_warning": false
+  }
+}

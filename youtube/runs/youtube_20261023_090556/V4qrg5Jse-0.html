@@ -1,0 +1,763 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YouTube 투자자용 검증 리포트 - “메타·테슬라 호실적에도 한국증시는 왜 하락하나?”  빅테크 깜짝 실적보다 무서운 악재가 있나? | 이주연 대표</title>
+  <style>
+:root {
+  color-scheme: light;
+  --bg: #f7f8fb;
+  --panel: #ffffff;
+  --text: #172033;
+  --muted: #667085;
+  --line: #d9dee8;
+  --accent: #0f766e;
+  --accent-2: #2563eb;
+  --warn: #b45309;
+  --bad: #b42318;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0 56px; }
+a { color: var(--accent-2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.hero { padding: 28px 0 22px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+.hero.compact { padding-top: 12px; }
+.hero h1 { margin: 0; font-size: clamp(28px, 4vw, 44px); line-height: 1.15; letter-spacing: 0; }
+.hero p { max-width: 760px; color: var(--muted); margin: 12px 0 0; }
+.eyebrow { color: var(--accent); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0; margin: 0 0 8px; }
+section { margin: 28px 0; }
+h2, h3, h4, h5 { letter-spacing: 0; line-height: 1.25; }
+.synthesis-callout { padding: clamp(20px, 4vw, 34px); border: 1px solid #6ee7d8; border-radius: 18px; background: linear-gradient(135deg, #ecfdf9 0%, #eff6ff 100%); box-shadow: 0 18px 44px rgba(15, 118, 110, .12); }
+.synthesis-callout.unavailable { border-color: var(--line); background: var(--panel); box-shadow: none; }
+.synthesis-callout h2 { margin: 0; font-size: clamp(24px, 3.2vw, 36px); }
+.synthesis-callout .lead { max-width: 900px; font-size: 17px; color: #334155; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.primary-link, .secondary-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border-radius: 999px; font-weight: 800; }
+.primary-link { color: white; background: var(--accent); }
+.secondary-link { color: var(--accent-2); border: 1px solid #93c5fd; background: white; }
+.primary-link:hover, .secondary-link:hover { text-decoration: none; filter: brightness(.97); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.card, .run { display: flex; flex-direction: column; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; color: var(--text); min-height: 128px; }
+.run { padding: 16px; }
+.card:hover, .run:hover { border-color: var(--accent-2); text-decoration: none; }
+.thumb { display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #e9edf5; border-radius: 8px 8px 0 0; color: var(--muted); font-size: 13px; font-weight: 700; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb-empty span { padding: 0 14px; text-align: center; }
+.card-body { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 16px; }
+.card strong { line-height: 1.35; }
+.source-line { color: #3f4a5f; font-weight: 600; }
+.runs { display: grid; gap: 10px; }
+.badge { display: inline-flex; width: fit-content; border-radius: 999px; padding: 2px 9px; background: #e6f4f1; color: var(--accent); font-size: 12px; font-weight: 700; }
+.status-contradicted, .status-llm_failed { background: #fee4e2; color: var(--bad); }
+.status-unverified, .status-stale { background: #fff4d6; color: var(--warn); }
+small, .muted { color: var(--muted); }
+.topnav { display: flex; gap: 14px; margin-bottom: 16px; font-size: 14px; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px; }
+.stats span { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
+.report { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: min(5vw, 36px); }
+.report-head { border-bottom: 1px solid var(--line); margin-bottom: 24px; padding-bottom: 20px; }
+.report-head h1 { margin: 0; font-size: clamp(24px, 3.5vw, 38px); line-height: 1.2; }
+.meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+.scope-note { padding: 12px 14px; border-left: 4px solid var(--warn); border-radius: 6px; background: #fff7ed; color: #7c2d12; }
+.synthesis-report h2 { margin-top: 34px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.synthesis-report h3 { margin: 24px 0 8px; color: #0f4c5c; }
+.synthesis-report p, .synthesis-report li { overflow-wrap: anywhere; }
+pre { overflow: auto; background: #111827; color: #f9fafb; border-radius: 8px; padding: 14px; }
+code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+details { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 18px; }
+@media (max-width: 640px) {
+  main { width: min(100% - 20px, 1120px); padding-top: 18px; }
+  .report { padding: 18px; }
+  .synthesis-callout { border-radius: 14px; padding: 18px; }
+  .cta-row a { width: 100%; }
+  .mobile-report { border-radius: 12px; }
+}
+</style>
+</head>
+<body>
+  <main>
+<nav class="topnav"><a href="index.html">실행 목록</a><a href="../../index.html">YouTube 홈</a></nav>
+<article class="report">
+  <header class="report-head">
+    <p class="eyebrow">youtube_20261023_090556</p>
+    <h1>“메타·테슬라 호실적에도 한국증시는 왜 하락하나?”  빅테크 깜짝 실적보다 무서운 악재가 있나? | 이주연 대표</h1>
+    <div class="meta">
+      <span class="badge status-asr_uncertain">asr_uncertain</span>
+      <a href="https://www.youtube.com/watch?v=V4qrg5Jse-0">원본 영상</a>
+    </div>
+  </header>
+  <h2>빅테크 실적과 한국 증시 약세: 기대와 검증 사이</h2>
+<p><a href="https://www.youtube.com/watch?v=V4qrg5Jse-0">분석 대상 영상</a> · 815Money talk · 2026년 10월 22일 업로드 · 25분 6초</p>
+<h3>1. 핵심 결론</h3>
+<p><strong>한국 증시가 왜 하락했는지는 제공된 자료로 확인되지 않는다.</strong> 출연자도 영상 도중 나스닥 선물과 반도체주의 상승분 반납을 확인했지만, 원인을 특정하지 못했다. 따라서 제목에 제시된 ‘호실적보다 무서운 악재’가 실제로 확인됐다고 해석해서는 안 된다.</p>
+<p>영상의 중심 논리는 <strong>빅테크 실적 개선 → AI 투자 지속 → 반도체·기판·패키징·로봇 수요 확대 → 국내 관련 기업 수혜</strong>다. 다만 이를 연결하는 실적 수치, 협력사 명단, 공급관계와 수주 근거가 확보되지 않았다. 현재로서는 검증된 실적 전망보다 <strong>후속 확인이 필요한 투자 가설</strong>에 가깝다.</p>
+<p>주장 12개 중 10개는 <code>unverified</code>, 제품·회사 식별이 불명확한 2개는 <code>asr_uncertain</code>이다. <strong>미검증은 거짓이라는 판정이 아니라, 제공된 근거가 부족하다는 뜻이다.</strong></p>
+<h3>2. 확인된 사실·근거의 범위</h3>
+<h4>시장자료: 단일 시점 관측값은 있으나 수익률 검증은 불가</h4>
+<p>호스트가 수집한 yfinance 스냅샷은 다음과 같다. 조회 시각은 2026년 10월 23일 오전 7시 39분경 한국시간이며, 영상 업로드 이후다.</p>
+<p>| 종목 | 제공 가격 | 선행 PER | 후행 PER |</p>
+<p>|---|---:|---:|---:|</p>
+<p>| 메타(META) | 648.85달러 | 18.65배 | 22.14배 |</p>
+<p>| 테슬라(TSLA) | 374.58달러 | 171.13배 | 346.83배 |</p>
+<p>| 엔비디아(NVDA) | 212.21달러 | 13.33배 | 26.83배 |</p>
+<p>이는 <strong>해당 조회 결과에 기록된 값</strong>이다. 거래 세션과 비교가격이 없어 영상 속 상승률·시간외 반전은 재현할 수 없다. 선행 PER의 추정이익 기준과 갱신 시점도 제공되지 않아, 이 표만으로 저평가·고평가를 확정하기 어렵다.</p>
+<h4>뉴스: 관련 제목의 존재와 사건 확인은 다르다</h4>
+<p>제공된 자료 중 상대적으로 관련성이 높은 항목도 대부분 제목만 확인된다.</p>
+<ul>
+<li><strong>E8:</strong> <a href="https://finance.yahoo.com/markets/stocks/articles/tsla-spcx-boards-confirm-special-223448287.html">TSLA·SPCX의 잠재적 결합 관련 특별위원회 보도</a>는 합병 검토 주장과 방향이 맞는 제목이다. 그러나 기사 본문·당사자 공시가 없고 영상 업로드 이후 게시됐다. 전사상의 ‘SpaceX’와 SPCX가 같은 대상인지, 검토가 어느 단계인지, 실제 주가가 7% 올랐는지는 확인되지 않았다.</li>
+<li><strong>E6:</strong> <a href="https://finance.yahoo.com/m/47e878bb-824d-3243-a8e9-b86b1c3f85d3/dow-jones-futures%3A-moderna.html">메타와 AI 투자 우려를 언급한 IBD 기사</a>는 부정적 시장반응을 시사하는 제목이지만 본문이 없다. 영상의 다른 시점 상승 발언이나 실적 수치를 반박하는 근거로 사용할 수 없다.</li>
+<li><strong>E7:</strong> <a href="https://finance.yahoo.com/markets/stocks/articles/bill-ackman-says-meta-finance-211512802.html">메타의 자금조달 여력을 다룬 기사</a> 역시 제목만 제공됐다. 제목 속 현금 규모를 확인된 재무 수치로 채택하지 않는다.</li>
+</ul>
+<p>나머지 수집 항목 상당수는 주제와 무관하거나 오류 문구·사이트 메뉴만 포함한다. <strong>수집 상태의 <code>verified</code>는 개별 투자 주장 검증 완료를 뜻하지 않는다.</strong> 메타·테슬라·엔비디아의 공시 조회도 제공업체 이용 불가로 원문을 확보하지 못했다. 이는 공시가 없다는 의미가 아니다.</p>
+<h3>3. 영상 주장과 검증 결과</h3>
+<p>아래 시각은 정확한 개별 발언 시각이 아니라 해당 내용을 담은 <strong>자막 청크 시작 시각</strong>이다. 모든 수치는 영상 주장으로, 별도 표시가 없는 한 미검증이다.</p>
+<p>| 주제·주장 ID | 영상 주장 | 확인된 사실/근거 및 한계 |</p>
+<p>|---|---|---|</p>
+<p>| 미국·한국 시장 C1 · 00:00:07 이후 | 나스닥 1% 이상, 반도체지수 약 1.9%, 한국 ETF 1.88% 상승. 이후 상승분 반납 | 동일 거래일·세션의 가격자료가 없다. ETF 상품과 야간선물 수치도 불명확하다. LRCX·TXN 호실적 평가 역시 공식 실적·컨센서스 미확보 |</p>
+<p>| 메타 재무 C3 · 00:07:21 | 매출·EPS가 예상보다 약 2%·29% 높고, 다음 분기 매출 전망은 730억~760억 달러. FCF는 -21억 달러로 예상 -80억 달러보다 양호 | 공식 실적·현금흐름표·발표 전 예상치가 없다. CAPEX 기존 범위 1,300억~1,450억 달러의 하한 50억 달러 상향, 소송 벌금 33조 원 주장도 미확인 |</p>
+<p>| 메타 AI 비서·국내 기판 C4 · 00:07:21 | ‘뮤즈’가 출시 6주 만에 가입자 1,000만 명 이상을 확보했고 25%가 매일 이용. 심텍·삼성전기·대덕전자 수혜 | 제품명·운영회사·통계가 식별되지 않았다. 국내 기업의 직접 공급관계·수주도 확인되지 않음 |</p>
+<p>| 테슬라 재무 C5 · 00:14:26 | EPS 예상 대비 약 10% 상회, 영업이익 50~56% 감소, 이익률 약 2~2.6%. 차량 판매 3% 감소는 배터리 부족 때문 | 재무·인도량·주문·재고 원자료가 없다. 재고 11일만으로 수요 부진을 배제할 수 없다. CAPEX 110% 증가의 비교 기준과 에너지 매출 16% 감소의 회계 설명도 불명확 |</p>
+<p>| 테슬라 신사업 C6 · 00:14:26 | FSD 구독자 67% 증가, 북미 신규 구매자 약 75% 가입, 유럽 9개국 승인. 오스틴 무인운행과 옵티머스·세미 양산 진전 | 유료 구독 정의, 국가별 승인 조건, 운행 범위, 실제 생산·인도량 미확보. 옵티머스 연말 1만 대는 목표이지 생산 실적이 아님 |</p>
+<p>| 엔비디아 공급망 C7 · 00:14:26 이후 | 베를린 GTC에서 6개 협력사와 증설 발표. 3년간 PCB 능력 2.5배 또는 3배 확대, 삼성전기 신규 참여 | 행사·협력사 공식 자료가 없다. 증설 대상과 기준 생산능력이 불명확하고 두 배수의 관계도 미해소 |</p>
+<p>| AI 공장·로봇 C8 · 00:21:22 | ‘DSX Pod’로 구축기간을 6개월에서 14일로 단축. Dell·Vertiv 참여, ABB·KUKA 채택 및 로보티즈 관련성 | 제품·로봇 명칭과 협력 범위 미확인. 14일에 전력 확보·인허가 등이 포함되는지 알 수 없어 전체 가동기간 단축으로 일반화 불가 |</p>
+<p>| 앰코·피에스케이홀딩스 C9 · 00:21:22 | 앰코 한국 사업 인증과 관련 장비업체 수혜 | 인증 대상·주체·예정일 및 완료 여부, 피에스케이홀딩스 공급관계·매출 기여 미확인 |</p>
+<p>기타 촉매도 확인이 필요하다.</p>
+<ul>
+<li><strong>외교·유가 C2, 00:00:07:</strong> 러시아·우크라이나 평화회담 및 미국·이란 협상 진전, 유가 하락 전환과 미국 10년물 금리 안정은 정부 원문과 해당 시점 시장자료가 없다.</li>
+<li><strong>합병설 C10, 00:00:07:</strong> 관련 기사 제목은 있지만 회사·거래상품 식별과 당사자 공시 확인이 선행돼야 한다.</li>
+<li><strong>암호화폐 C11, 00:00:07:</strong> OCC의 GENIUS Act 최종규칙과 Strategy 약 7%·Circle 약 5%·비트코인 약 3% 상승은 관보·동일 기준 가격자료가 없다. 제안규칙과 최종규칙을 구분해야 한다.</li>
+<li><strong>AI 보안 C12, 00:21:22:</strong> 취약점·발견 주체·원보도가 식별되지 않아 특정 기업의 수혜나 위험을 도출할 수 없다.</li>
+</ul>
+<h3>4. 강세 논리와 반론</h3>
+<h4>강세 논리가 성립하려면</h4>
+<p>영상의 가설은 다음 연결고리가 확인될 때 설득력이 높아진다.</p>
+<p>1. <strong>AI 투자 지속성:</strong> 빅테크의 실적과 현금창출이 투자 확대를 감당한다.</p>
+<p>2. <strong>공급망 매출 전환:</strong> 투자 계획이 기판·패키징·장비의 실제 주문과 출하로 이어진다.</p>
+<p>3. <strong>국내 기업 이익 전환:</strong> 고객관계와 공급 품목이 확인되고, 증설 비용을 넘어 이익·현금흐름이 개선된다.</p>
+<p>4. <strong>신사업 상업화:</strong> FSD·로보택시·로봇의 이용·생산 목표가 유료 매출과 지속 가능한 수익으로 연결된다.</p>
+<p>현재 자료는 이 연결고리를 입증하지 못한다.</p>
+<h4>핵심 반론</h4>
+<ul>
+<li><strong>실적 서프라이즈와 투자 회수는 별개다.</strong> 영상 수치를 가정하더라도 예상보다 적은 FCF 적자가 곧 AI 수익화 성공을 의미하지 않는다.</li>
+<li><strong>EPS와 영업이익은 다르게 움직일 수 있다.</strong> 테슬라 평가에는 GAAP·조정 EPS, 영업비용, 주식보상과 일회성 항목을 같은 기준으로 대조해야 한다.</li>
+<li><strong>협력사 로고·인증·행사 발표는 수주액이 아니다.</strong> 실제 공급 범위, 양산 시점, 계약 규모가 없으면 국내 기업별 이익 기여를 산정하기 어렵다.</li>
+<li><strong>좋은 실적이 주가 상승을 보장하지 않는다.</strong> 기대치·가이던스·투자 부담이 반응을 달리 만들 수 있다는 해석은 가능하지만, 이번 한국 증시 약세의 원인으로 확인된 것은 아니다.</li>
+</ul>
+<h3>5. 데이터 품질과 신뢰도 해석</h3>
+<p>자동 한국어 자막은 542개 세그먼트·11,392자이며 <code>transcript_quality</code>는 <code>good</code>, 점수는 1.0이다. 수동 자막과 원음·화면은 제공되지 않았다. <strong>자막 품질 점수는 숫자·고유명사의 정확성이나 발언의 사실성을 보증하지 않는다.</strong></p>
+<p>신뢰도 항목은 서로 구분해야 한다.</p>
+<ul>
+<li><strong>주장 추출 단계 <code>source_confidence</code> 0.64~0.84:</strong> 자막에서 발언을 얼마나 명확히 추출했는지에 관한 값이다.</li>
+<li><strong>검증 단계 <code>source_confidence</code> 0~0.15:</strong> 외부 자료가 해당 주장 검증에 얼마나 적합한지에 관한 정성적 추정치다. 같은 이름이지만 추출 단계와 의미가 다르다.</li>
+<li><strong><code>asr_confidence</code> 0.30~0.70:</strong> 전사 명료성의 비보정 추정치다. 특히 C10 회사 식별은 0.30, C4 제품 식별은 0.35, C8 제품·로봇 관련 내용은 0.40으로 낮다.</li>
+<li><strong>사실적 지지 <code>confidence</code> 0~0.12:</strong> 제공된 증거의 지지 수준이지, 주장이 참일 확률로 계산된 값이 아니다.</li>
+</ul>
+<p>‘뮤즈’, ‘DSX Pod’, ‘마이크로 덕’, ‘SpaceX’, CAPEX 비교 기준과 야간선물 수치는 임의로 교정하지 않는다. 영상 업로드일만으로 발언의 ‘어제’를 특정할 수도 없다. 수집 기사와 시장 스냅샷이 모두 업로드 이후라는 시간 차이 역시 중요하다.</p>
+<p><strong>Bloomberg·Morningstar·기타 폐쇄형 출처 원문은 제공되지 않았다.</strong> 해당 출처에 의존하는 주장과 접근 불가능한 컨센서스는 미검증·수동 확인 필요로 유지한다. 이번 자료에서 폐쇄형 출처 전용으로 확정된 주장은 없다.</p>
+<h3>6. 단기 체크포인트와 가설 무효화 조건</h3>
+<p>| 관찰 시점 | 구체적 확인 항목 | 강세 가설을 약화·무효화하는 조건 |</p>
+<p>|---|---|---|</p>
+<p>| 다음 한국 거래일 및 이후 수 거래일 | 녹화일과 미국 거래일 대응, 정규장·시간외 수익률, 외국인 현물·선물 순매수, 원/달러, 반도체 업종 상대수익률을 시간대별 기록 | 미국 기술주 강세와 국내 관련주 동행이 반복적으로 나타나지 않으면 단순 전이 가설 약화. 수급·환율의 동행만으로 하락 원인을 확정하지는 않음 |</p>
+<p>| 공식 실적 원문 확보 시 | META·TSLA·LRCX·TXN의 동일 분기 실적과 발표 직전 컨센서스 비교. GAAP·조정 지표 구분 | 원자료가 영상의 핵심 수치와 다르면 해당 서프라이즈 해석 수정 |</p>
+<p>| 메타 차기 실적·투자 안내 | 영업현금흐름·CAPEX·FCF 추이, 소송비용의 현금성·반복성, AI 비서의 정확한 명칭과 실제 매출 | 투자 증가에 비해 현금창출·수익화가 따라오지 않으면 투자 회수 개선 가설 약화 |</p>
+<p>| 테슬라 다음 운영·실적 공시 | 인도량·재고·가격·인센티브, 배터리 공급 설명, 유료 FSD 구독, 국가별 승인 조건, 무인운행·제품별 실제 인도량 | 공급 제약 완화 뒤에도 판매가 회복되지 않으면 공급 부족 중심 해석 약화. 승인·양산 지연은 신사업 수익화 시점 지연 요인 |</p>
+<p>| 엔비디아·국내 기업 공식 발표 | 행사 원문, 협력사 명단, 증설 대상·배수·완료연도, 국내 기업 IR·DART의 공급·수주·가동률 | 직접 공급관계가 부인되거나 해당 발표에 포함되지 않으면 직접 수혜 가설 무효. 단순 공시 미확보는 반증이 아님 |</p>
+<p>| 정책·외교 원문 공개 시 | OCC 관보의 규칙 단계·시행일, 정부 협상 성명, 동일 시점 유가·금리 | 제안규칙을 최종규칙으로 표현했거나 협상 내용이 원문과 다르면 촉매 해석 수정 |</p>
+<h3>결론</h3>
+<p>이 영상은 AI 투자 확대와 국내 공급망의 연결 가능성을 제시하지만, <strong>한국 증시 약세의 원인과 개별 기업의 확정 수혜를 입증하지는 못했다.</strong> 투자자가 우선 관찰할 대상은 기사 제목이나 행사 언급보다 <strong>공식 실적, 현금흐름, 실제 공급·수주, 승인·운영·인도 실적</strong>이다. 이 자료들이 확인될 때 영상의 기대가 실적으로 이어지는지 평가할 수 있다.</p>
+  <details>
+    <summary>공개 요약 JSON</summary>
+    <pre>{
+  &quot;version&quot;: 4,
+  &quot;video_id&quot;: &quot;V4qrg5Jse-0&quot;,
+  &quot;title&quot;: &quot;“메타·테슬라 호실적에도 한국증시는 왜 하락하나?”  빅테크 깜짝 실적보다 무서운 악재가 있나? | 이주연 대표&quot;,
+  &quot;url&quot;: &quot;https://www.youtube.com/watch?v=V4qrg5Jse-0&quot;,
+  &quot;channel&quot;: &quot;815Money talk&quot;,
+  &quot;channel_id&quot;: &quot;UCCG6BEYjfQMGzypJw2EJCDQ&quot;,
+  &quot;source_url&quot;: &quot;https://www.youtube.com/@815moneytalk/videos&quot;,
+  &quot;thumbnail_url&quot;: &quot;https://i.ytimg.com/vi/V4qrg5Jse-0/maxresdefault.jpg&quot;,
+  &quot;published_at&quot;: &quot;2026-10-22T02:11:16+00:00&quot;,
+  &quot;status&quot;: &quot;asr_uncertain&quot;,
+  &quot;strategy_source_tier&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_evidence_weight&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_validation_policy&quot;: &quot;STANDARD_REVIEW&quot;,
+  &quot;transcript_status&quot;: &quot;available&quot;,
+  &quot;transcript_source&quot;: &quot;automatic&quot;,
+  &quot;transcript_chars&quot;: 11392,
+  &quot;transcript_quality&quot;: {
+    &quot;status&quot;: &quot;good&quot;,
+    &quot;score&quot;: 1.0,
+    &quot;warnings&quot;: [],
+    &quot;source&quot;: &quot;automatic&quot;,
+    &quot;language&quot;: &quot;Korean&quot;,
+    &quot;model_or_format&quot;: &quot;json3&quot;,
+    &quot;chars&quot;: 11392,
+    &quot;segments&quot;: 542,
+    &quot;duration_seconds&quot;: 1506,
+    &quot;repeated_ngram_ratio&quot;: 0.0
+  },
+  &quot;generated_at&quot;: &quot;2026-10-23T07:14:31.876608+09:00&quot;,
+  &quot;llm_status&quot;: &quot;success&quot;,
+  &quot;research_status&quot;: &quot;success&quot;,
+  &quot;claim_verification_status&quot;: &quot;success&quot;,
+  &quot;research_pipeline_version&quot;: 4,
+  &quot;evidence_count&quot;: 10,
+  &quot;claim_status_summary&quot;: {
+    &quot;unverified&quot;: 10,
+    &quot;asr_uncertain&quot;: 2
+  },
+  &quot;claims&quot;: [
+    {
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;claim_text&quot;: &quot;미국 주요 지수·반도체주·한국 ETF가 제시된 비율로 상승했으며, 실적 발표 후와 영상 진행 중 주가가 반전했다는 주장이다. LRCX·TXN 실적 평가도 포함한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.02,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:07&quot;,
+      &quot;source_confidence&quot;: 0.02,
+      &quot;asr_confidence&quot;: 0.6,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;나스닥 1% 이상, SOX 약 1.9%, 한국 ETF 1.88%, NVDA 약 2.5%, SMCI 9% 이상·시간외 15~16%, DELL 약 5%, TSLA 약 3.4%; 야간선물과 약 6% 하락 대상 불명확&quot;,
+        &quot;observed&quot;: &quot;동일 거래일·세션의 비교가격과 수익률 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;제시된 등락률과 실적 평가를 한국 증시 방향의 검증된 선행 신호로 사용하기 어렵다. 한국 증시 하락 원인도 확인되지 않았다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;claim_text&quot;: &quot;푸틴의 3자 평화회담 원칙적 동의와 미국·이란 협상 진전으로 유가가 하락 전환했고 미국 10년물 금리는 안정적이었다는 주장이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:07&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.7,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;미국 10년물 금리 안정; 유가 상승에서 하락 전환&quot;,
+        &quot;observed&quot;: &quot;해당 시점의 금리·유가 관측치 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;지정학적 위험 완화나 유가 하락을 확인된 투자 전제로 삼을 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;claim_text&quot;: &quot;메타의 매출·EPS·FCF가 예상을 웃돌았고 매출 및 CAPEX 가이던스가 상향됐으며 소송 벌금이 33조 원이라는 주장이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.03,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:07:21&quot;,
+      &quot;source_confidence&quot;: 0.04,
+      &quot;asr_confidence&quot;: 0.65,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;매출 예상 대비 +2%, EPS +29%; 다음 분기 매출 730억~760억 달러; 기존 CAPEX 1300억~1450억 달러에서 하한 50억 달러 상향; FCF -21억 달러 대 예상 -80억 달러; 분기 투자 약 350억 달러; 벌금 33조 원&quot;,
+        &quot;observed&quot;: &quot;대조 가능한 공식 수치와 컨센서스 없음; 영업이익률 관련 -8%의 의미 불명확&quot;
+      },
+      &quot;investor_implication&quot;: &quot;실적 서프라이즈와 투자 회수 개선을 구분하고, 소송 충당금·확정 벌금·현금 지급의 성격을 확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;claim_text&quot;: &quot;메타 AI 비서 ‘뮤즈’의 이용자가 빠르게 늘고 수익화가 추진되며, AI 투자 확대가 심텍·삼성전기·대덕전자의 직접 수혜로 이어진다는 주장이다.&quot;,
+      &quot;status&quot;: &quot;asr_uncertain&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:07:21&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.35,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;출시 6주 만에 가입자 1000만 명 이상, 사용자 25%가 매일 이용&quot;,
+        &quot;observed&quot;: &quot;제품 식별 및 가입자·일간 이용자 통계 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;제품명 복원과 공급관계 확인 전에는 이용자 성장이나 국내 기판주 직접 수혜를 투자 근거로 채택하기 어렵다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;claim_text&quot;: &quot;테슬라의 EPS는 예상을 웃돌았지만 영업이익이 급감했으며, 차량 판매 감소는 배터리 부족, 에너지 매출 감소는 관세 관련 환불 때문이라는 주장이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.01,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:14:26&quot;,
+      &quot;source_confidence&quot;: 0.01,
+      &quot;asr_confidence&quot;: 0.6,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;EPS 예상 대비 +10%; 영업이익 전년 대비 -50~-56%; 이익률 약 2~2.6%; 차량 판매 -3%; 재고 11일; CAPEX +110%; 학습 컴퓨팅 400MW; 에너지 매출 -16%·설치량 +10%&quot;,
+        &quot;observed&quot;: &quot;비교 가능한 분기 재무·인도량·설치량 자료 없음; CAPEX의 ‘모델 Y 대비’ 표현은 복원 필요&quot;
+      },
+      &quot;investor_implication&quot;: &quot;이익 감소의 원인과 반복성을 확인하기 전에는 판매 감소를 공급 문제로만 해석하거나 수익성 회복을 단정하기 어렵다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;claim_text&quot;: &quot;테슬라 FSD 구독·지역 승인이 확대되고 오스틴 무인 로보택시와 옵티머스·세미 양산이 진행되며 세미의 에너지 소비가 디젤의 3분의 1이라는 주장이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:14:26&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.68,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;FSD 구독자 +67%, 북미 신규 구매자 약 75% 가입, 유럽 9개국 승인; 9월 오스틴 무인운행; 옵티머스 연말 목표 1만 대; 세미 에너지 소비 디젤 대비 약 1/3&quot;,
+        &quot;observed&quot;: &quot;가입자·국가별 승인·운행 개시·양산·동일 조건 에너지 비교 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;사업계획·목표와 실제 승인·상업운행·양산·매출을 분리해 평가해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;claim_text&quot;: &quot;엔비디아가 베를린 GTC에서 6개 업체와 공급망 증설을 발표하고 3년간 PCB 능력을 2.5배 또는 3배 확대하며 삼성전기가 신규 참여했다는 주장이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.01,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:14:26&quot;,
+      &quot;source_confidence&quot;: 0.01,
+      &quot;asr_confidence&quot;: 0.65,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;협력사 6개, 향후 3년간 생산능력 2.5배 또는 3배&quot;,
+        &quot;observed&quot;: &quot;공식 협력사 명단·기준 생산능력·완료연도 없음; 두 배수의 관계 미해소&quot;
+      },
+      &quot;investor_implication&quot;: &quot;협력사 편입과 증설 규모가 확인되기 전에는 국내 기판주의 확정 수주나 이익 증가로 연결할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;claim_text&quot;: &quot;‘DSX Pod’가 AI 데이터센터 구축을 6개월에서 14일로 줄이고 Dell·Vertiv가 참여하며 ABB·KUKA의 기술 채택과 ‘마이크로 덕’·로보티즈의 관계가 발표됐다는 주장이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:21:22&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.4,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;기존 약 6개월에서 최소 약 14일로 구축기간 단축&quot;,
+        &quot;observed&quot;: &quot;동일 규모·범위·현장조건의 비교자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;구축기간 단축을 전체 데이터센터 가동 일정 단축으로 일반화하거나 국내 로봇 기업의 매출 수혜로 연결하기 어렵다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;claim_text&quot;: &quot;앰코 한국 사업이 인증을 획득할 예정이며 피에스케이홀딩스가 관련 밸류체인 수혜 기업이라는 주장이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:21:22&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.55,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;구체적인 인증 일정·수주액·매출 기여 수치 없음&quot;,
+        &quot;observed&quot;: &quot;인증 및 공급관계 대조자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;인증 뉴스만으로 장비업체의 직접 수혜나 실적 기여를 추정하기 어렵다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C10&quot;,
+      &quot;claim_text&quot;: &quot;전사상 ‘SpaceX’가 실적 발표 후 7% 이상 상승했고 테슬라와의 합병 검토가 공식화됐다는 주장이다.&quot;,
+      &quot;status&quot;: &quot;asr_uncertain&quot;,
+      &quot;confidence&quot;: 0.12,
+      &quot;supporting_evidence_ids&quot;: [
+        &quot;E8&quot;
+      ],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:07&quot;,
+      &quot;source_confidence&quot;: 0.15,
+      &quot;asr_confidence&quot;: 0.3,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;실적 발표 후 7% 이상 상승&quot;,
+        &quot;observed&quot;: &quot;해당 거래상품·기준 세션·비교가격 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;회사명·거래상품 복원 및 당사자 공시 확인 전에는 합병 공식화나 주가 반응을 확정 사실로 제시할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C11&quot;,
+      &quot;claim_text&quot;: &quot;OCC가 GENIUS Act 최종 시행규칙을 발표했고 이것이 Strategy·Circle·비트코인 상승에 영향을 주었다는 주장이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:07&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.65,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;Strategy 약 +7%, Circle 약 +5%, 비트코인 약 +3%&quot;,
+        &quot;observed&quot;: &quot;거래일·세션·통화쌍·수익률 기준이 명시된 가격자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;최종규칙 시행이나 규제 불확실성 해소를 확인된 촉매로 간주하기 어렵다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C12&quot;,
+      &quot;claim_text&quot;: &quot;AI가 또 다른 심각한 보안 결함을 발견했다는 외부 보도 인용이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:21:22&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.6,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;‘심각한’ 보안 결함; 정량 심각도 미제시&quot;,
+        &quot;observed&quot;: &quot;취약점 식별자·심각도·영향 버전 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;대상 기업·영향 범위를 특정할 수 없어 투자상 수혜나 위험을 도출할 수 없다.&quot;
+    }
+  ],
+  &quot;entities&quot;: [
+    {
+      &quot;ticker&quot;: &quot;META&quot;,
+      &quot;name&quot;: &quot;메타&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;매출·EPS와 잉여현금흐름이 예상보다 양호해 AI 투자 회수에 대한 우려를 완화했다고 평가했다.&quot;,
+        &quot;AI 비서 ‘뮤즈’의 이용 확대와 수익화 기대를 긍정적으로 보며, 회사가 AI 설비투자를 계속 확대할 것으로 해석했다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;매출은 시장 예상치를 약 2%, EPS는 약 29% 상회했다고 말했다.&quot;,
+        &quot;영업이익률 관련 ‘예상치를 밑도는 -8%’라는 발언은 지표와 비교 기준이 불명확하다.&quot;,
+        &quot;다음 분기 매출 가이던스는 730억~760억 달러, 중간값 745억 달러로 시장 예상치보다 약 1% 높다고 말했다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;META&quot;,
+        &quot;as_of&quot;: &quot;2026-10-22T22:39:42.620494+00:00&quot;,
+        &quot;current_price&quot;: 648.8499755859375,
+        &quot;market_cap&quot;: 1652949351896.274,
+        &quot;forward_pe&quot;: 18.646185,
+        &quot;trailing_pe&quot;: 22.137495,
+        &quot;fifty_two_week_high&quot;: 779.82,
+        &quot;fifty_two_week_low&quot;: 520.26,
+        &quot;average_target_price&quot;: 833.1331,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;TSLA&quot;,
+      &quot;name&quot;: &quot;테슬라&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;매출·EPS는 기대를 웃돌았지만 AI·로봇 연구개발과 주식보상 지출이 늘어 영업이익이 크게 감소했다고 설명했다.&quot;,
+        &quot;자동차 판매 감소를 수요 부진보다 배터리 공급 제약으로 해석하고, FSD 구독 확대를 반복 매출의 성장 동력으로 평가했다.&quot;,
+        &quot;로보택시·옵티머스·세미 생산과 에너지 저장 수주를 미래 성장 동력으로 보지만, 의미 있는 수익 창출에는 시간이 필요하다고 말했다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;EPS는 시장 예상치를 약 10% 상회, 영업이익은 전년 대비 약 56% 감소했다고 말했다. 다른 대목에서는 약 50% 감소로 표현했다.&quot;,
+        &quot;매출 100원당 이익이 약 2~2.6원 남는다고 설명했다.&quot;,
+        &quot;자동차 판매량은 전년 대비 약 3% 감소, 주문량은 거의 4년 만의 최고 수준, 재고는 11일분이라고 회사 설명을 인용했다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;TSLA&quot;,
+        &quot;as_of&quot;: &quot;2026-10-22T22:39:45.007633+00:00&quot;,
+        &quot;current_price&quot;: 374.5799865722656,
+        &quot;market_cap&quot;: 1479421409811.0466,
+        &quot;forward_pe&quot;: 171.13408,
+        &quot;trailing_pe&quot;: 346.8333,
+        &quot;fifty_two_week_high&quot;: 498.83,
+        &quot;fifty_two_week_low&quot;: 297.38,
+        &quot;average_target_price&quot;: 401.39514,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;NVDA&quot;,
+      &quot;name&quot;: &quot;엔비디아&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;GTC에서 기판·패키징·테스트·광학 엔진 협력을 통해 AI 공급 병목을 해소하려는 증설 계획을 발표했다고 설명했다.&quot;,
+        &quot;모듈형 AI 공장, AI 통신망, 에이전트 보안 및 로봇 학습 도구 발표가 관련 산업의 투자 모멘텀이 될 수 있다고 평가했다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;6개 공급업체와 협력한다고 말했다.&quot;,
+        &quot;향후 3년간 PCB 생산능력을 2.5배로 늘린다고 말한 뒤 ‘세 배’라고도 표현했다.&quot;,
+        &quot;‘DSX Pod’는 기존 약 6개월 걸리던 데이터센터 구축을 최소 약 14일로 단축한다고 설명했다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;NVDA&quot;,
+        &quot;as_of&quot;: &quot;2026-10-22T22:39:47.259197+00:00&quot;,
+        &quot;current_price&quot;: 212.2100067138672,
+        &quot;market_cap&quot;: 5124235032119.751,
+        &quot;forward_pe&quot;: 13.334297,
+        &quot;trailing_pe&quot;: 26.828068,
+        &quot;fifty_two_week_high&quot;: 243.37,
+        &quot;fifty_two_week_low&quot;: 164.27,
+        &quot;average_target_price&quot;: 328.71695,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    }
+  ],
+  &quot;evidence&quot;: [
+    {
+      &quot;evidence_id&quot;: &quot;E1&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;1 Stock Under $50 with Exciting Potential and 2 We Question&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/1-stock-under-50-exciting-204553274.html&quot;,
+      &quot;publisher&quot;: &quot;StockStory&quot;,
+      &quot;published_at&quot;: &quot;2026-10-22T20:45:53+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;1 Stock Under $50 with Exciting Potential and 2 We Question Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals Weather Newsletters Finance My po...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E2&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;Steel Dynamics Stock Has One Thing Left To Prove&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/steel-dynamics-stock-one-thing-170754882.html&quot;,
+      &quot;publisher&quot;: &quot;Trefis&quot;,
+      &quot;published_at&quot;: &quot;2026-10-22T17:07:54+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Steel Dynamics Stock Has One Thing Left To Prove Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals Weather Newsletters Finance My portfolio New...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E4&quot;,
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;title&quot;: &quot;3 Growth Stocks With At Least 29% Earnings Growth&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/3-growth-stocks-least-29-221708738.html&quot;,
+      &quot;publisher&quot;: &quot;Simply Wall St.&quot;,
+      &quot;published_at&quot;: &quot;2026-10-22T22:17:08+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;3 Growth Stocks With At Least 29% Earnings Growth Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals Weather Newsletters Finance My portfolio Ne...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E5&quot;,
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;title&quot;: &quot;3 Australian Founder Led Stocks With Revenue Up To A$2.9b&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/3-australian-founder-led-stocks-221450059.html&quot;,
+      &quot;publisher&quot;: &quot;Simply Wall St.&quot;,
+      &quot;published_at&quot;: &quot;2026-10-22T22:14:50+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E6&quot;,
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;title&quot;: &quot;Dow Jones Futures: Moderna Crashes, Meta Fuels AI Meltdown, But Warren Buffett Market Thriving&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/m/47e878bb-824d-3243-a8e9-b86b1c3f85d3/dow-jones-futures%3A-moderna.html&quot;,
+      &quot;publisher&quot;: &quot;Investor&#x27;s Business Daily&quot;,
+      &quot;published_at&quot;: &quot;2026-10-22T22:27:52+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E7&quot;,
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;title&quot;: &quot;Bill Ackman Says Meta Can Finance &#x27;Whatever They Want,&#x27; Points to $82 Billion Cash&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/bill-ackman-says-meta-finance-211512802.html&quot;,
+      &quot;publisher&quot;: &quot;Benzinga Prediction Markets&quot;,
+      &quot;published_at&quot;: &quot;2026-10-22T21:15:12+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E8&quot;,
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;title&quot;: &quot;TSLA, SPCX Boards Confirm Special Committees On Potential Combination As Megapack Deals And Terafab Plans Deepen Ties&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/tsla-spcx-boards-confirm-special-223448287.html&quot;,
+      &quot;publisher&quot;: &quot;Stocktwits&quot;,
+      &quot;published_at&quot;: &quot;2026-10-22T22:34:48+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E9&quot;,
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;title&quot;: &quot;Auto &amp; Transport Roundup: Market Talk&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/m/115e435f-e9ee-3341-b796-5c39f3990111/auto-%26-transport-roundup%3A.html&quot;,
+      &quot;publisher&quot;: &quot;The Wall Street Journal&quot;,
+      &quot;published_at&quot;: &quot;2026-10-22T20:56:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E10&quot;,
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;title&quot;: &quot;Basic Materials Roundup: Market Talk&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/m/724acac2-9cd0-383d-aa13-7b41999c69c2/basic-materials-roundup%3A.html&quot;,
+      &quot;publisher&quot;: &quot;The Wall Street Journal&quot;,
+      &quot;published_at&quot;: &quot;2026-10-22T20:57:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    }
+  ],
+  &quot;source_policy&quot;: {
+    &quot;raw_transcript_published&quot;: false,
+    &quot;raw_transcript_in_evidence&quot;: false,
+    &quot;research_pipeline_version&quot;: 4,
+    &quot;closed_source_claims&quot;: &quot;unverified_external_source&quot;,
+    &quot;auto_caption_warning&quot;: true,
+    &quot;local_asr_warning&quot;: false
+  }
+}</pre>
+  </details>
+</article>
+</main>
+  <style>
+.reader-contents { margin: 16px 0; padding: 12px 16px; border: 1px solid var(--line, #64748b); border-radius: 12px; }
+.reader-contents > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-weight: 750; }
+.reader-contents nav { display: grid; gap: 4px; max-height: 45vh; overflow: auto; margin: 8px 0; }
+.reader-contents a { display: block; min-height: 44px; padding: 10px; border-radius: 6px; color: inherit; overflow-wrap: anywhere; }
+.reader-contents a:hover { background: #80808020; }
+.reader-contents .reader-subsection { padding-inline-start: 24px; font-size: .92em; }
+.reader-prose, .report { overflow-wrap: anywhere; line-height: 1.8; }
+.reader-prose p, .reader-prose li { max-width: 85ch; }
+.reader-prose h2, .reader-prose h3, .reader-prose h4, [data-reader-heading] { scroll-margin-top: 100px; line-height: 1.45; }
+.reader-prose h2 { margin-top: 1.8em; padding-bottom: 8px; border-bottom: 1px solid var(--line, #64748b); }
+.reader-prose h3 { margin-top: 1.5em; }
+.reader-prose li { margin: .5em 0; }
+.reader-prose pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.reader-prose blockquote { margin: 16px 0; padding: 4px 16px; border-left: 3px solid var(--accent, #64748b); }
+.reader-table { overflow: auto; max-width: 100%; margin: 16px 0; border: 1px solid var(--line, #64748b); border-radius: 10px; }
+.reader-table table { border-collapse: collapse; width: 100%; margin: 0; font-size: .92rem; }
+.reader-table th, .reader-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line, #64748b); min-width: 110px; max-width: 400px; overflow-wrap: anywhere; white-space: normal; }
+.reader-table th { background: #80808018; }
+.reader-table tr:nth-child(even) { background: #80808008; }
+.reader-search { display: grid; gap: 8px; margin: 16px 0; }
+.reader-search label { font-weight: 700; }
+.reader-search input { box-sizing: border-box; width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line, #64748b); border-radius: 10px; background: var(--panel, #fff); color: var(--text, #132238); font: inherit; }
+.reader-search p { margin: 0; font-size: .86rem; }
+.reader-back { position: fixed; bottom: max(14px, env(safe-area-inset-bottom)); right: 14px; z-index: 30; min-height: 44px; border: 1px solid #778899; border-radius: 99px; padding: 10px 16px; background: #18344a; color: #fff; font: 700 14px system-ui; cursor: pointer; box-shadow: 0 3px 12px #0003; }
+[data-reader-source] { margin-top: 20px; }
+[data-reader-source] > summary { min-height: 44px; cursor: pointer; }
+[data-reader-source] pre { font-size: .85rem; }
+[data-reader-source] pre, .reader-prose { min-width: 0; }
+.reader-contents :focus-visible, .reader-search :focus-visible, .reader-back:focus-visible, .reader-table:focus-visible { outline: 3px solid var(--accent, #008c95); outline-offset: 3px; }
+.reader-search + .grid > [hidden] { display: none !important; }
+@media (max-width: 600px) { .reader-prose { font-size: 1rem; } .reader-contents { padding: 8px 12px; } }
+@media print { .reader-back, .reader-search, .reader-contents, [data-reader-source] { display: none !important; } .reader-table { overflow: visible; } .reader-prose { color: #000; background: #fff; } }
+</style><script>
+(() => {
+  'use strict';
+  let serial = 0;
+  const rendered = new WeakMap();
+  const node = (tag, text) => { const el = document.createElement(tag); if (text != null) el.textContent = text; return el; };
+  function inline(parent, text) {
+    const pattern = /(`[^`]+`|\*\*[^*]+\*\*|\[[^\]]+\]\(https?:\/\/[^\s)]+\))/g;
+    let start = 0;
+    for (const match of String(text).matchAll(pattern)) {
+      parent.append(document.createTextNode(text.slice(start, match.index)));
+      const value = match[0];
+      if (value.startsWith('`')) parent.append(node('code', value.slice(1, -1)));
+      else if (value.startsWith('**')) parent.append(node('strong', value.slice(2, -2)));
+      else {
+        const link = value.match(/^\[([^\]]+)\]\((.+)\)$/);
+        const a = node('a', link[1]); a.href = link[2]; a.rel = 'noopener noreferrer'; parent.append(a);
+      }
+      start = match.index + value.length;
+    }
+    parent.append(document.createTextNode(text.slice(start)));
+  }
+  const cells = line => line.trim().replace(/^\|/, '').replace(/\|$/, '').split(/(?<!\\)\|/).map(v => v.trim().replace(/\\\|/g, '|'));
+  function markdown(source) {
+    const article = node('article'); article.className = 'reader-prose';
+    const lines = source.split(/\r?\n/); let list = null;
+    for (let i = 0; i < lines.length; i += 1) {
+      const line = lines[i], value = line.trim();
+      if (!value) { list = null; continue; }
+      if (/^```/.test(value)) {
+        const code = []; i += 1;
+        while (i < lines.length && !/^```/.test(lines[i].trim())) code.push(lines[i++]);
+        const pre = node('pre'); pre.append(node('code', code.join('\n'))); article.append(pre); list = null; continue;
+      }
+      if (i + 1 < lines.length && value.includes('|') && cells(lines[i + 1]).every(v => /^:?-{3,}:?$/.test(v))) {
+        const table = node('table'), head = node('thead'), body = node('tbody');
+        const row = (values, tag) => { const tr = node('tr'); values.forEach(v => { const cell = node(tag); if (tag === 'th') cell.scope = 'col'; inline(cell, v); tr.append(cell); }); return tr; };
+        head.append(row(cells(line), 'th')); i += 2;
+        while (i < lines.length && lines[i].trim() && lines[i].includes('|')) body.append(row(cells(lines[i++]), 'td'));
+        i -= 1; table.append(head, body); article.append(table); list = null; continue;
+      }
+      const heading = value.match(/^(#{1,6})\s+(.+)$/);
+      if (heading) { const h = node('h' + Math.min(4, heading[1].length + 1)); inline(h, heading[2]); article.append(h); list = null; continue; }
+      const bullet = value.match(/^(?:[-*+] |\d+\. )(.+)$/);
+      if (bullet) {
+        const tag = /^\d/.test(value) ? 'ol' : 'ul';
+        if (!list || list.tagName.toLowerCase() !== tag) { list = node(tag); if (tag === 'ol') list.start = parseInt(value, 10); article.append(list); }
+        const li = node('li'); inline(li, bullet[1]); list.append(li); continue;
+      }
+      list = null;
+      if (/^(---+|\*\*\*+)$/.test(value)) { article.append(node('hr')); continue; }
+      const p = node(value.startsWith('> ') ? 'blockquote' : 'p'); inline(p, value.startsWith('> ') ? value.slice(2) : line); article.append(p);
+    }
+    return article;
+  }
+  function contents(root) {
+    root.querySelectorAll(':scope > .reader-contents').forEach(el => el.remove());
+    const headings = [...root.querySelectorAll('h2,h3,h4')].filter(h => !h.closest('.card,.run-card,.reader-contents,[data-reader-source],[hidden]'));
+    if (headings.length < 2) return;
+    const details = node('details'); details.className = 'reader-contents';
+    details.append(node('summary', '이 리포트 목차 · ' + headings.length + '개 항목'));
+    const nav = node('nav'); nav.setAttribute('aria-label', '리포트 목차');
+    headings.forEach(h => {
+      if (!h.id) h.id = 'reader-section-' + (++serial);
+      h.dataset.readerHeading = ''; h.tabIndex = -1;
+      const a = node('a', h.textContent); a.href = '#' + h.id;
+      if (h.tagName !== 'H2') a.className = 'reader-subsection';
+      a.addEventListener('click', event => {
+        event.preventDefault();
+        for (let ancestor = h.parentElement; ancestor; ancestor = ancestor.parentElement) if (ancestor.tagName === 'DETAILS') ancestor.open = true;
+        h.scrollIntoView({block: 'start'}); h.focus({preventScroll: true});
+      }); nav.append(a);
+    });
+    details.append(nav); root.prepend(details);
+  }
+  function enhance(root) {
+    if (!root) return;
+    root.querySelectorAll('pre[data-report-markdown]').forEach(pre => {
+      const previous = rendered.get(pre);
+      if (previous && previous.source === pre.textContent) return;
+      const article = markdown(pre.textContent);
+      if (previous) previous.article.replaceWith(article);
+      else {
+        const details = node('details'); details.dataset.readerSource = '';
+        details.append(node('summary', 'Markdown 원문 보기'));
+        pre.before(article, details); details.append(pre);
+      }
+      rendered.set(pre, {source: pre.textContent, article});
+    });
+    root.querySelectorAll('table').forEach(table => {
+      if (table.closest('.reader-table,.account-table-wrap,.summary-scroll')) return;
+      const wrap = node('div'); wrap.className = 'reader-table'; wrap.tabIndex = 0;
+      wrap.setAttribute('role', 'region'); wrap.setAttribute('aria-label', '리포트 표 · 가로로 스크롤하여 전체 보기');
+      table.before(wrap); wrap.append(table);
+    });
+    root.querySelectorAll('.grid').forEach(grid => {
+      const cards = [...grid.querySelectorAll(':scope > a.card')];
+      if (cards.length < 2 || grid.dataset.readerSearch) return;
+      grid.dataset.readerSearch = 'true';
+      const box = node('div'); box.className = 'reader-search';
+      const input = node('input'); input.type = 'search'; input.placeholder = '제목 · 종목 · 채널 · 키워드'; input.id = 'report-search-' + (++serial);
+      const label = node('label', '리포트 찾기'); label.htmlFor = input.id;
+      const status = node('p'); status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
+      const update = () => {
+        const terms = input.value.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean); let count = 0;
+        cards.forEach(card => { card.hidden = !terms.every(t => card.textContent.toLocaleLowerCase().includes(t)); if (!card.hidden) count += 1; });
+        status.textContent = cards.length + '개 중 ' + count + '개 표시' + (count ? '' : ' · 검색어를 지우거나 다른 키워드를 입력하세요.');
+      };
+      input.addEventListener('input', update); box.append(label, input, status); grid.before(box); update();
+    });
+    contents(root);
+  }
+  window.TradingAgentsReader = {enhance};
+  const main = document.querySelector('main');
+  if (main && !main.hasAttribute('data-reader-dynamic')) enhance(main);
+  if (main) {
+    const top = node('button', '↑ 맨 위'); top.type = 'button'; top.className = 'reader-back'; top.setAttribute('aria-label', '리포트 맨 위로 이동');
+    top.addEventListener('click', () => { const target = document.querySelector('h1') || main; target.tabIndex = -1; target.scrollIntoView({block: 'start'}); target.focus({preventScroll: true}); });
+    document.body.append(top);
+  }
+})();
+</script>
+</body>
+</html>

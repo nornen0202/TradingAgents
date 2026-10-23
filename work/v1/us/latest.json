@@ -1,13 +1,13 @@
 {
   "schema": "tradingagents.work-context/v1",
   "surface": "us",
-  "event_id": "us:043748b4cbdc92471418ed664f5dc81b",
+  "event_id": "us:075e6a5af6bd97eeae25735b2d203654",
   "prompt_contract_version": "market-work-v13-us",
   "prompt_sha256": "281749b3b871d01531e3ceb7377d60bb67ebcaf89d6d8ba3162cb53d38400d7a",
   "skill_sha256": "4dffe28b3721557cc2517b5afff2f94045832606e71ff61461df969f6abb53c7",
   "task_manifest_sha256": "c0992fa275c9961bc91c679030c0b4d9b8b06f3d164226776421f1e354b5c22e",
   "workflow_contract_sha256": "8d06ba979f55f01229636b73bdc643c5b21f326cc270c0e8143f3fd7a3204028",
-  "source_sha256": "976cfc83d49388b0a20f462c1d343d124fc432483811a04afac58adaf9ef72f2",
+  "source_sha256": "e24a794821a0881d88fa9aeb931b3094455daa6ddb62ed7c9a3d35ae04109f6f",
   "body": {
     "kind": "market",
     "market": "US",
@@ -1165,17 +1165,17 @@
       "youtube": {
         "source_health": "OK",
         "coverage": {
-          "total_unique_events": 436,
-          "window_events": 106,
+          "total_unique_events": 439,
+          "window_events": 108,
           "transmitted_events": 12,
           "truncated": true,
           "oldest_occurred_at": "2026-10-21T05:08:45+00:00",
-          "newest_occurred_at": "2026-10-22T22:00:56+00:00",
+          "newest_occurred_at": "2026-10-22T23:20:08+00:00",
           "available_events_before_context_cap": 60,
           "context_event_cap": 12,
-          "omitted_events": 94,
+          "omitted_events": 96,
           "omitted_due_to_context_cap": 48,
-          "omitted_before_context_selection": 46
+          "omitted_before_context_selection": 48
         },
         "events": [
           {
@@ -1701,6 +1701,104 @@
                   "status": "unverified",
                   "verification_notes": [
                     "시장 데이터 조회 실패: no_usable_market_fields"
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "event_key": "kGsdIHtqmlg",
+            "content_sha256": "22efa4ddc9eef04921ed8195c55bf05c8022678fb92781746ca0e878aff5b4bd",
+            "occurred_at": "2026-10-22T23:20:08+00:00",
+            "relevance": {
+              "tickers": [
+                "000660",
+                "009150",
+                "NVDA"
+              ],
+              "markets": [
+                "KR",
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "verified_entities",
+              "matched_tickers": [
+                "NVDA"
+              ],
+              "market_match": true,
+              "score": 120
+            },
+            "summary": {
+              "video_id": "kGsdIHtqmlg",
+              "title": "SK하이닉스, 솔리다임 IPO 검토 중단…주주의견 수용 | 삼성전기 공장 만드는데 테슬라·엔비디아서 3.6조 댄다 | 권순우 삼프로TV 취재팀장 [뉴스3]",
+              "channel": "삼프로TV 3PROTV",
+              "source_url": "https://www.youtube.com/watch?v=kGsdIHtqmlg",
+              "claim_status_summary": {
+                "partially_supported": 2,
+                "unverified": 9,
+                "asr_uncertain": 1
+              },
+              "claims": [
+                {
+                  "claim_id": "C1",
+                  "claim_text": "SK하이닉스가 솔리다임 IPO 추진 검토와 프리 IPO 자금조달을 중단했으며 주주 의견, 중복상장 할인 우려와 시장 변동성을 고려했다.",
+                  "status": "partially_supported",
+                  "confidence": 0.88,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "중단 보도에는 근거가 있으나 공식 공시 본문과 대체 조달계획 확인 전 주주환원 확대나 주가 반등을 확정할 수 없다."
+                },
+                {
+                  "claim_id": "C2",
+                  "claim_text": "엔터프라이즈 SSD 수요로 솔리다임 실적이 증가했고 기존 시설의 한계와 중국 장비 반입 제약 때문에 미국 신규 생산시설 및 대체 자금조달이 필요하다.",
+                  "status": "unverified",
+                  "confidence": 0.99,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "실적 성장과 미국 증설을 확인된 투자 전제로 삼을 수 없다. 실제 투자비와 조달조건이 주주가치 판단의 핵심이다."
+                },
+                {
+                  "claim_id": "C3",
+                  "claim_text": "중복상장을 하려면 투자자 보호 관련 다섯 가지 조건을 충족해야 한다.",
+                  "status": "unverified",
+                  "confidence": 0.99,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "해당 발언을 솔리다임의 상장 가능 여부나 모회사 주주의 보상 권리를 판단하는 근거로 사용할 수 없다."
+                },
+                {
+                  "claim_id": "C4",
+                  "claim_text": "테슬라가 1.1조 원, 엔비디아가 2.6조 원을 삼성전기 FC-BGA 공장에 지원하고 2029~2033년 물량을 확보한다. 제목의 총액은 3.6조 원이다.",
+                  "status": "unverified",
+                  "confidence": 0.98,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "3.6조 원 또는 3.7조 원을 확정 투자유치액으로 제시하면 안 된다. 상환·공급 의무와 공장 소유권 확인 없이 투자비 부담 소멸을 추정할 수 없다."
+                }
+              ],
+              "entities": [
+                {
+                  "ticker": "000660",
+                  "name": "SK하이닉스·솔리다임",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "시장 데이터 조회 실패: no_usable_market_fields"
+                  ]
+                },
+                {
+                  "ticker": "009150",
+                  "name": "삼성전기",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "시장 데이터 조회 실패: no_usable_market_fields"
+                  ]
+                },
+                {
+                  "ticker": "NVDA",
+                  "name": "엔비디아",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
                   ]
                 }
               ]
@@ -2358,161 +2456,16 @@
             }
           },
           {
-            "event_key": "COVlzkuxAc0",
-            "content_sha256": "cdb7bc5784f6e9cfac04f46a6f4cb32fb471ece52fbd09f800f7d44060fe48fc",
-            "occurred_at": "2026-10-22T22:00:56+00:00",
+            "event_key": "xpSbfDPXnlQ",
+            "content_sha256": "9ceb1d7bf60b36d6f7f07d595ede93e1dcdf405581237db649a577ebc5577719",
+            "occurred_at": "2026-10-22T23:00:25+00:00",
             "relevance": {
               "tickers": [
-                "BE",
-                "WDC",
-                "MXL",
+                "^KS11",
                 "META",
-                "TSLA",
-                "LRCX",
-                "CRWV",
-                "NBIS",
-                "SPOT",
-                "PANW"
-              ],
-              "markets": [
-                "US"
-              ],
-              "themes": [],
-              "match_basis": "verified_entities",
-              "matched_tickers": [],
-              "market_match": true,
-              "score": 20
-            },
-            "summary": {
-              "video_id": "COVlzkuxAc0",
-              "title": "블룸에너지, 호실적에도 급락…AI 관련주 투매 확산세 [월가 뉴스레터]",
-              "channel": "삼프로TV 3PROTV",
-              "source_url": "https://www.youtube.com/watch?v=COVlzkuxAc0",
-              "claim_status_summary": {
-                "unverified": 11,
-                "asr_uncertain": 1
-              },
-              "claims": [
-                {
-                  "claim_id": "C1",
-                  "claim_text": "나스닥 -2.6%, 미국 10년물 금리 4.95%, 달러인덱스 101, 유가 99달러가 언급됐으며 AI·하드웨어 약세와 방어주·소프트웨어 강세를 과도한 비관 또는 경기침체 우려로 해석했다.",
-                  "status": "unverified",
-                  "confidence": 0.96,
-                  "supporting_evidence_ids": [
-                    "E3"
-                  ],
-                  "manual_check_required": true,
-                  "investor_implication": "시장 하락 방향을 저가매수 근거로 확대하지 말고 동일 거래일·세션의 가격과 거시지표를 확인해야 한다."
-                },
-                {
-                  "claim_id": "C2",
-                  "claim_text": "블룸에너지는 EPS와 가이던스가 예상을 상회했지만 정규장 약 8%, 이후 약 5% 하락했다. EPS 0.94달러 대 예상 0.68달러와 여러 매출·EPS·마진 전망치가 제시됐다.",
-                  "status": "unverified",
-                  "confidence": 0.95,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "실적 상회 여부뿐 아니라 현금흐름과 마진 전망을 함께 검토하기 전에는 하락을 비합리적이라고 판단하기 어렵다."
-                },
-                {
-                  "claim_id": "C3",
-                  "claim_text": "웨스턴디지털은 매출총이익률 58.1%, 다음 분기 약 60%, EPS 가이던스 5.6~6달러로 예상 4.78달러를 상회했지만 주가는 하락했으며 FCF와 도시바 생산 확대가 부담으로 제시됐다.",
-                  "status": "unverified",
-                  "confidence": 0.96,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "전망 EPS만으로 투자 매력을 판단하지 말고 현금 전환과 경쟁사의 실제 공급 확대를 확인해야 한다."
-                },
-                {
-                  "claim_id": "C4",
-                  "claim_text": "맥스리니어는 광통신 관련 매출총이익률 59~62%에도 정규장 14%, 이후 추가 1.5% 하락했다.",
-                  "status": "unverified",
-                  "confidence": 0.95,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "전사 마진을 광통신 사업 수익성으로 오인하거나 정규장 하락을 발표된 실적에 직접 귀속하지 않아야 한다."
-                }
-              ],
-              "entities": [
-                {
-                  "ticker": "BE",
-                  "name": "블룸에너지",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                },
-                {
-                  "ticker": "WDC",
-                  "name": "웨스턴디지털",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                },
-                {
-                  "ticker": "MXL",
-                  "name": "맥스리니어",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                },
-                {
-                  "ticker": "META",
-                  "name": "메타",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                },
-                {
-                  "ticker": "TSLA",
-                  "name": "테슬라",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                },
-                {
-                  "ticker": "LRCX",
-                  "name": "램리서치",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                },
-                {
-                  "ticker": "CRWV",
-                  "name": "코어위브",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                },
-                {
-                  "ticker": "NBIS",
-                  "name": "네비우스",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                }
-              ]
-            }
-          },
-          {
-            "event_key": "JTiMdYazffA",
-            "content_sha256": "da1ed213734999fb4ec039d095cecfa916d6577bb121554b845c5c59e5918d5d",
-            "occurred_at": "2026-10-22T21:54:17+00:00",
-            "relevance": {
-              "tickers": [
-                "META",
-                "000660.KS",
-                "MU",
-                "267260.KS",
-                "BZ=F",
-                "011170.KS",
-                "005380.KS"
+                "000660",
+                "005930",
+                "CL=F"
               ],
               "markets": [
                 "US",
@@ -2525,58 +2478,70 @@
               "score": 20
             },
             "summary": {
-              "video_id": "JTiMdYazffA",
-              "title": "10월 23일 투자자들이 꼭 알아야 하는 투자 포인트",
+              "video_id": "xpSbfDPXnlQ",
+              "title": "10월 23일 오늘 코스피 어디까지 떨어질까?!",
               "channel": "경제사냥꾼",
-              "source_url": "https://www.youtube.com/watch?v=JTiMdYazffA",
+              "source_url": "https://www.youtube.com/watch?v=xpSbfDPXnlQ",
               "claim_status_summary": {
-                "unverified": 8,
-                "asr_uncertain": 2
+                "unverified": 11,
+                "partially_supported": 1
               },
               "claims": [
                 {
                   "claim_id": "C1",
-                  "claim_text": "美国股市下跌，半导体指数跌超6%，MU、LRCX、AMAT、疑似GE Vernova及VST分别下跌6.25%、11.76%、8.16%、10.64%及9.81%。",
+                  "claim_text": "나스닥이 6월 이후 최대 하락하고 반도체 지수는 6.7% 하락했으나 동일가중 지수는 0.8% 상승했으며, 상승 종목이 더 많았다는 의미다.",
                   "status": "unverified",
                   "confidence": 0.2,
                   "supporting_evidence_ids": [
-                    "E3"
+                    "E6",
+                    "E7"
                   ],
                   "manual_check_required": true,
-                  "investor_implication": "市场下跌方向有标题级线索，但不能将具体跌幅或跨板块传导解释作为已核实交易依据。"
+                  "investor_implication": "AI 관련주 약세라는 제목 수준의 정황과 정확한 지수 수익률·시장 폭 검증을 구분해야 한다."
                 },
                 {
                   "claim_id": "C2",
-                  "claim_text": "Meta营收超预期，但投资支出导致自由现金流为负21亿美元，业绩公布后盘后涨逾4%，随后常规交易时段跌约7%。",
+                  "claim_text": "야간선물이 장중 1.5% 넘게 상승했다가 2.61% 하락하며 저점 마감했고, 6월 이후 1.5% 초과 변동일에는 코스피가 같은 방향으로 출발했다.",
                   "status": "unverified",
-                  "confidence": 0.15,
-                  "supporting_evidence_ids": [
-                    "E3",
-                    "E4"
-                  ],
+                  "confidence": 0.05,
+                  "supporting_evidence_ids": [],
                   "manual_check_required": true,
-                  "investor_implication": "应分开核验投资者融资担忧、实际现金流和融资能力，不能由股价下跌推断资金不足。"
+                  "investor_implication": "야간선물 수치와 과거 개장 방향의 일치율을 검증된 하락 확률로 사용할 수 없다."
                 },
                 {
                   "claim_id": "C3",
-                  "claim_text": "黄仁勋称资本不足限制AI云增长、内存越多越好；SK海力士是英伟达芯片HBM的最大供应商，融资担忧削弱HBM需求预期。",
+                  "claim_text": "메타는 매출이 예상치를 웃돌았지만 AI 투자 후 현금이 21억 달러 적자로 전환했고 신주 발행으로 자금을 조달하려 하면서 주가가 7% 하락했다.",
                   "status": "unverified",
-                  "confidence": 0.05,
-                  "supporting_evidence_ids": [],
+                  "confidence": 0.15,
+                  "supporting_evidence_ids": [
+                    "E5",
+                    "E6",
+                    "E7"
+                  ],
                   "manual_check_required": true,
-                  "investor_implication": "不能将未核实引语或市场情绪解释等同于HBM订单转弱。"
+                  "investor_implication": "자금조달 방식과 현금흐름을 확인하기 전에는 메타의 유동성 부족이나 주주 희석을 확정할 수 없다."
                 },
                 {
                   "claim_id": "C4",
-                  "claim_text": "美国交易的海力士ADR下跌8.07%；公司于21日提前约一个月完成回购，并计划28日公布业绩。",
-                  "status": "unverified",
-                  "confidence": 0.05,
-                  "supporting_evidence_ids": [],
+                  "claim_text": "미국에서 거래되는 하이닉스 주식이 8% 넘게 하락했고 자사주 매입이 10월 21일 종료됐다.",
+                  "status": "partially_supported",
+                  "confidence": 0.65,
+                  "supporting_evidence_ids": [
+                    "market_evidence[2].external_context.company_news_excerpt"
+                  ],
                   "manual_check_required": true,
-                  "investor_implication": "证券身份及回购完成事实确认前，不宜据此判断买盘支持消失或美国市场领先下跌。"
+                  "investor_implication": "8% 초과 하락에는 직접 대응하는 보도가 있지만 매입 종료와 수급 지지력 약화는 별도 확인이 필요하다."
                 }
               ],
               "entities": [
+                {
+                  "ticker": "^KS11",
+                  "name": "코스피",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                },
                 {
                   "ticker": "META",
                   "name": "메타",
@@ -2586,48 +2551,24 @@
                   ]
                 },
                 {
-                  "ticker": "000660.KS",
+                  "ticker": "000660",
                   "name": "SK하이닉스",
                   "status": "unverified",
                   "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                    "시장 데이터 조회 실패: no_usable_market_fields"
                   ]
                 },
                 {
-                  "ticker": "MU",
-                  "name": "마이크론",
+                  "ticker": "005930",
+                  "name": "삼성전자",
                   "status": "unverified",
                   "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                    "시장 데이터 조회 실패: no_usable_market_fields"
                   ]
                 },
                 {
-                  "ticker": "267260.KS",
-                  "name": "HD현대일렉트릭",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                },
-                {
-                  "ticker": "BZ=F",
-                  "name": "브렌트유·정유: S-Oil·SK이노베이션",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                },
-                {
-                  "ticker": "011170.KS",
-                  "name": "롯데케미칼",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                },
-                {
-                  "ticker": "005380.KS",
-                  "name": "현대차",
+                  "ticker": "CL=F",
+                  "name": "국제유가·중동 지정학",
                   "status": "unverified",
                   "verification_notes": [
                     "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
@@ -2643,15 +2584,15 @@
         "source_health": "OK",
         "coverage": {
           "total_unique_events": 220,
-          "window_events": 25,
+          "window_events": 24,
           "transmitted_events": 20,
           "truncated": true,
           "oldest_occurred_at": "2026-10-22T18:42:31+00:00",
           "newest_occurred_at": "2026-10-22T21:18:26+00:00",
-          "available_events_before_context_cap": 25,
+          "available_events_before_context_cap": 24,
           "context_event_cap": 20,
-          "omitted_events": 5,
-          "omitted_due_to_context_cap": 5,
+          "omitted_events": 4,
+          "omitted_due_to_context_cap": 4,
           "omitted_before_context_selection": 0
         },
         "events": [
@@ -3473,27 +3414,27 @@
               "qNPxRnb0w9g",
               "3qFC-2RxSis",
               "AVqXPwaziYo",
+              "kGsdIHtqmlg",
               "2oMNRHt-mLg",
               "V4qrg5Jse-0",
               "_lnx0OrZydU",
               "nfaSBwzGV40",
               "KLY4_VCgqe4",
               "ZIAmv-svE70",
-              "COVlzkuxAc0",
-              "JTiMdYazffA"
+              "xpSbfDPXnlQ"
             ],
             "coverage": {
-              "total_unique_events": 436,
-              "window_events": 106,
+              "total_unique_events": 439,
+              "window_events": 108,
               "transmitted_events": 12,
               "truncated": true,
               "oldest_occurred_at": "2026-10-21T05:08:45+00:00",
-              "newest_occurred_at": "2026-10-22T22:00:56+00:00",
+              "newest_occurred_at": "2026-10-22T23:20:08+00:00",
               "available_events_before_context_cap": 60,
               "context_event_cap": 12,
-              "omitted_events": 94,
+              "omitted_events": 96,
               "omitted_due_to_context_cap": 48,
-              "omitted_before_context_selection": 46
+              "omitted_before_context_selection": 48
             }
           },
           "prism": {
@@ -3522,15 +3463,15 @@
             ],
             "coverage": {
               "total_unique_events": 220,
-              "window_events": 25,
+              "window_events": 24,
               "transmitted_events": 20,
               "truncated": true,
               "oldest_occurred_at": "2026-10-22T18:42:31+00:00",
               "newest_occurred_at": "2026-10-22T21:18:26+00:00",
-              "available_events_before_context_cap": 25,
+              "available_events_before_context_cap": 24,
               "context_event_cap": 20,
-              "omitted_events": 5,
-              "omitted_due_to_context_cap": 5,
+              "omitted_events": 4,
+              "omitted_due_to_context_cap": 4,
               "omitted_before_context_selection": 0
             }
           }
