@@ -70,7 +70,8 @@ def refresh_attempt_health(raw, *, market, now):
             or (status == "STARTED" and raw.get("finished_at") is not None)):
         return invalid
     current = session == now.astimezone(zone).date()
-    state = ("PREVIOUS_SESSION" if not current else "RUNNING" if status == "STARTED"
+    # A durable STARTED record is not proof that its process is still alive.
+    state = ("PREVIOUS_SESSION" if not current else "COMPLETION_UNVERIFIED" if status == "STARTED"
              else "RETRY_LIMIT_REACHED" if failures >= MAX_CONSECUTIVE_FAILURES
              else "LAST_ATTEMPT_FAILED" if status == "FAILED" else "LAST_ATTEMPT_COMPLETED")
     error = raw.get("error_type")

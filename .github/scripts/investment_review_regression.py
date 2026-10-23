@@ -29,7 +29,7 @@ class CheckedServer(ThreadingHTTPServer):
         self.unhandled_errors = []
 
     def handle_error(self, request, client_address):
-        error = sys.exception()
+        error = sys.exc_info()[1]
         if not isinstance(error, (BrokenPipeError, ConnectionResetError)):
             self.unhandled_errors.append(type(error).__name__)
         super().handle_error(request, client_address)
