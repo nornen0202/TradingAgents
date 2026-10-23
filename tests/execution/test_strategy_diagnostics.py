@@ -47,7 +47,9 @@ def test_empty_and_running_are_not_success():
     assert refresh_attempt_health(None, market="US", now=NOW)["status"] == "UNAVAILABLE"
     assert refresh_attempt_health({}, market="US", now=NOW)["status"] == "UNVERIFIED"
     raw = {**attempt(), "status": "STARTED", "finished_at": None}
-    assert refresh_attempt_health(raw, market="US", now=NOW)["status"] == "RUNNING"
+    assert refresh_attempt_health(raw, market="US", now=NOW)["status"] == "COMPLETION_UNVERIFIED"
+    assert refresh_attempt_health(raw, market="US", now=NOW+timedelta(hours=2))["status"] == "COMPLETION_UNVERIFIED"
+    assert raw["consecutive_failures"] == 3 and raw["finished_at"] is None
     raw.update(status="COMPLETED", finished_at=NOW.isoformat(), consecutive_failures=0)
     assert refresh_attempt_health(raw, market="US", now=NOW)["status"] == "LAST_ATTEMPT_COMPLETED"
     raw["error_type"] = {"message": "PRIVATE_SECRET"}

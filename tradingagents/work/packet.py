@@ -256,12 +256,8 @@ def _compact_market_row(row: dict[str, Any], display_priority: int) -> dict[str,
     compact["quality"] = quality
     compact["display_priority"] = display_priority
     compact["thesis"] = dict(row["thesis"]) if isinstance(row.get("thesis"), dict) else _market_row_thesis(compact)
-    execution = _market_row_execution(compact)
-    if isinstance(row.get("execution"), dict):
-        # Row-level validity is applied before packet compaction.  Preserve its
-        # readiness downgrade, blockers, and required rechecks instead of
-        # silently rebuilding an executable gate from the compact row.
-        execution.update(row["execution"])
+    # Consume the engine codes before omitting the raw payload from the packet.
+    execution = _market_row_execution({**row, "quality": quality})
     compact["execution"] = execution
     return compact
 
@@ -319,7 +315,7 @@ def _market_row_execution(row: dict[str, Any]) -> dict[str, Any]:
         "BLOCKED_STALE": "NEEDS_LIVE_RECHECK",
         "MISSING": "DATA_OUTAGE",
     }.get(row_mode, "NEEDS_LIVE_RECHECK")
-    return {
+    execution = {
         "readiness": readiness,
         "source_row_mode": row_mode,
         "as_of": row.get("market_data_asof"),
@@ -335,6 +331,42 @@ def _market_row_execution(row: dict[str, Any]) -> dict[str, Any]:
             if str(item).strip()
         ],
     }
+    if isinstance(row.get("execution"), dict):
+        execution.update(row["execution"])
+    raw = row.get("raw_codes") if isinstance(row.get("raw_codes"), dict) else {}
+    if not raw and execution.get("action_contract_source") == "EXECUTION_ENGINE_V1":
+        raw = {"decision_now": execution.get("engine_decision_now"),
+               "decision_if_triggered": execution.get("engine_decision_if_triggered")}
+    if "decision_now" not in raw and "action_ready" not in quality and "action_status" not in quality:
+        return execution  # Legacy rows without an engine contract retain their old display contract.
+    immediate = {"STARTER_NOW": "신규 매수", "BUY_NOW": "신규 매수", "ADD_NOW": "추가 매수",
+                 "REDUCE_NOW": "비중 축소", "EXIT_NOW": "전량 매도", "STOP_LOSS_NOW": "손절 매도"}
+    conditional = {"STARTER": "신규 매수", "ADD": "추가 매수", "REDUCE": "비중 축소", "EXIT": "전량 매도"}
+    now, later = raw.get("decision_now"), raw.get("decision_if_triggered")
+    now = now if isinstance(now, str) and now in {*immediate, "NONE"} else None
+    later = later if isinstance(later, str) and later in {*conditional, "NONE"} else None
+    execution.update(action_contract_source="EXECUTION_ENGINE_V1", engine_decision_now=now,
+                     engine_decision_if_triggered=later, action_now=None, action_if_triggered=None)
+    # An earlier validity/market downgrade remains a ceiling. Data row_mode
+    # alone never supplies action authority, including on a second compaction.
+    if execution.get("readiness") not in {"READY_NOW", "WAIT_FOR_TRIGGER"}:
+        return execution
+    data_ready = quality.get("data_ready", quality.get("execution_ready")) is True
+    if now in immediate:
+        if row_mode == "IMMEDIATE" and data_ready and quality.get("action_ready", True) is True:
+            execution.update(readiness="READY_NOW", action_now=immediate[now])
+        else:
+            execution["readiness"] = "NEEDS_LIVE_RECHECK"
+    elif now == "NONE" and later in conditional:
+        if row_mode in {"IMMEDIATE", "CONDITIONAL"} and (data_ready or quality.get("conditional_strategy_ready") is True):
+            execution.update(readiness="WAIT_FOR_TRIGGER", action_if_triggered=conditional[later])
+        else:
+            execution["readiness"] = "NEEDS_LIVE_RECHECK"
+    elif now == "NONE" and later == "NONE":
+        execution["readiness"] = "RESEARCH_ONLY"
+    else:
+        execution["readiness"] = "NEEDS_LIVE_RECHECK"
+    return execution
 
 
 def build_surface_packet(

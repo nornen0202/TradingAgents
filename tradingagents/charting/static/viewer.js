@@ -109,7 +109,7 @@ function renderKisStrategy(payload) {
       if(Object.keys(allocation.reason_counts||{}).length)card.append(table("주문까지 가지 못한 이유",["이유","종목 수"],Object.entries(allocation.reason_counts).map(([reason,count])=>[planningReasons[reason]||"근거 확인 필요",number(count)])));
     }else card.append(paragraph("이번 점검에는 종목별 주문 계획 검사 결과가 없습니다. 휴장·점검 성공만으로 매매 준비 완료를 판단하지 않습니다."));
     const refresh=row.refresh_health;
-    const refreshLabels={RETRY_LIMIT_REACHED:"당일 시세 갱신 재시도 한도 소진",LAST_ATTEMPT_FAILED:"최근 시세 갱신 실패",LAST_ATTEMPT_COMPLETED:"최근 시세 갱신 완료 · 연속 신선도는 별도 검증",RUNNING:"시세 갱신 진행 기록 · 완료 미확인",PREVIOUS_SESSION:"이전 거래일의 갱신 기록",UNVERIFIED:"시세 갱신 기록 검증 필요",UNAVAILABLE:"시세 갱신 기록 미수집"};
+    const refreshLabels={RETRY_LIMIT_REACHED:"당일 시세 갱신 재시도 한도 소진",LAST_ATTEMPT_FAILED:"최근 시세 갱신 실패",LAST_ATTEMPT_COMPLETED:"최근 시세 갱신 완료 · 연속 신선도는 별도 검증",COMPLETION_UNVERIFIED:"시세 갱신 시작 기록 · 현재 실행 여부와 완료 미확인",PREVIOUS_SESSION:"이전 거래일의 갱신 기록",UNVERIFIED:"시세 갱신 기록 검증 필요",UNAVAILABLE:"시세 갱신 기록 미수집"};
     card.append(paragraph("시세 생산: "+(refreshLabels[refresh?.status]||refreshLabels.UNAVAILABLE)+(refresh?.session_date?" · 거래일 "+refresh.session_date+" · 연속 실패 "+number(refresh.consecutive_failures)+"/"+number(refresh.max_consecutive_failures):"")));
     if(refresh?.error_type==="LocalStorageHeadroomError")card.append(paragraph("마지막 실패 원인은 저장공간 부족입니다. 현재 여유 공간과 다음 정상 생산을 별도로 확인해야 하며, 공간이 늘어도 소진한 재시도 한도는 초기화되지 않습니다."));
     if(diagnostic?.reason_counts?.limited_halt_status)card.append(paragraph("거래정지 상태를 확인하지 못한 종목이 있어 실행이 제한됩니다."));
