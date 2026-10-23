@@ -281,9 +281,14 @@ def test_cache_expiry_rechecks_provider_and_does_not_replace_good_cache_on_failu
 
 
 def test_yahoo_then_broker_source_change_is_rejected_with_original_selection(broker):
-    us.validate_with_us_fallback(yahoo(close=104).reset_index(), "AAPL", START, END)
+    first = us.validate_with_us_fallback(yahoo(close=104).reset_index(), "AAPL", START, END)
+    # A later tool reuses the admitted Yahoo snapshot before considering recovery.
+    later = us.validate_with_us_fallback(yahoo().reset_index(), "AAPL", START, END)
+    pd.testing.assert_frame_equal(first, later)
+    broker.request_json.assert_not_called()
+    # Explicit provider replacement remains forbidden within this scope.
     with pytest.raises(VendorMalformedResponseError, match="source changed"):
-        us.validate_with_us_fallback(yahoo().reset_index(), "AAPL", START, END)
+        daily_history_selection.select_daily_history("AAPL", END, us.SOURCE, frame=first)
     assert get_selected_daily_history("AAPL", END)["source"] == "yfinance"
 
 
