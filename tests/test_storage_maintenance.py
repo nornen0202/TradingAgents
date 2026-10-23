@@ -99,11 +99,16 @@ def test_referenced_canonical_history_is_preserved_while_other_retention_runs(tm
     config.write_text(json.dumps({"enabled": False, "python_executable": sys.executable,
                                   "preserve_canonical_archive": True}), encoding="utf-8")
     (tmp_path / "runner").mkdir()
+    diagnostic = tmp_path / "runner" / "_diag" / "Worker_old.log"
+    diagnostic.parent.mkdir()
+    diagnostic.write_text("old diagnostic")
+    os.utime(diagnostic, (old.timestamp(), old.timestamp()))
     result = _run_maintenance(tmp_path, apply=True, extended_policy=config)
     assert result.returncode == 0, result.stderr
     assert (main / "payload.txt").read_text() == "generated"
     assert (youtube / "payload.txt").read_text() == "generated"
-    assert not prism.exists()
+    assert (prism / "payload.txt").read_text() == "generated"
+    assert not diagnostic.exists()
     assert "PRESERVED root=" in result.stdout
 
 

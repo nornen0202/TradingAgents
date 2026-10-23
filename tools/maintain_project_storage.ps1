@@ -276,12 +276,12 @@ try {
     else {
         $archiveCutoff = (Get-Date).Date.AddDays(-$RetentionDays)
         $archiveSpecs = @(
-            @{ Root = Join-Path $DataRoot "archive\runs"; Pattern = "^(\d{8})T"; Canonical = $true },
-            @{ Root = Join-Path $DataRoot "archive\youtube-archive\runs"; Pattern = "^youtube_(\d{8})_"; Canonical = $true },
-            @{ Root = Join-Path $DataRoot "prism-telegram-archive\runs"; Pattern = "^prism_telegram_(\d{8})_"; Canonical = $false }
+            @{ Root = Join-Path $DataRoot "archive\runs"; Pattern = "^(\d{8})T" },
+            @{ Root = Join-Path $DataRoot "archive\youtube-archive\runs"; Pattern = "^youtube_(\d{8})_" },
+            @{ Root = Join-Path $DataRoot "prism-telegram-archive\runs"; Pattern = "^prism_telegram_(\d{8})_" }
         )
         foreach ($spec in $archiveSpecs) {
-            if ($preserveCanonicalArchive -and $spec.Canonical) {
+            if ($preserveCanonicalArchive) {
                 $preservedMessage = "PRESERVED root=$($spec.Root) reason=canonical research retention enabled"
                 Write-Output $preservedMessage
                 Write-MaintenanceLog $preservedMessage

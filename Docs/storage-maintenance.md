@@ -41,7 +41,9 @@ warning is written to task output below the configured threshold.
 
 Set `preserve_canonical_archive=true` when canonical research history is still
 referenced by provenance, approvals, or ledgers. The PowerShell task then retains
-`archive/runs` and `archive/youtube-archive/runs` regardless of age. It does not
+`archive/runs`, `archive/youtube-archive/runs`, and `prism-telegram-archive/runs`
+regardless of age. This preservation flag is independent of the Python helper's
+`enabled` switch. It does not
 move those directories or weaken any application path boundary. Other retention
 categories keep their existing rules. Configure this guard before a maintenance
 run; malformed local policy JSON fails before cleanup begins.
