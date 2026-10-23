@@ -39,6 +39,27 @@ locking with a short lock timeout, never a forced directory deletion. Existing
 archive and self-hosted runner retention remains in place. A low C: free-space
 warning is written to task output below the configured threshold.
 
+Set `preserve_canonical_archive=true` when canonical research history is still
+referenced by provenance, approvals, or ledgers. The PowerShell task then retains
+`archive/runs`, `archive/youtube-archive/runs`, and `prism-telegram-archive/runs`
+regardless of age. This preservation flag is independent of the Python helper's
+`enabled` switch. It does not
+move those directories or weaken any application path boundary. Other retention
+categories keep their existing rules. Configure this guard before a maintenance
+run; malformed local policy JSON fails before cleanup begins.
+
+The optional `relocations` list registers `{id, source, destination}` directory
+aliases created by a verified migration. Each source must remain a junction to
+the exact destination. A mismatch is reported without repairing or deleting
+either path, and the helper returns exit code 2 before any retention starts.
+The wrapper runs mount and alias preflight before its own cleanup as well.
+`critical_free_bytes` also
+returns code 2 below its threshold; `warning_free_bytes` remains informational.
+The wrapper propagates a failure so existing scheduled-task monitoring can see
+the condition. Omit `critical_free_bytes` to retain warning-only behavior.
+The example uses 12GiB critical and 30GiB warning; these maintenance alerts do not
+change trading, order, research, or retry limits.
+
 For an initial migration, `maintain_codex_storage.py --config ... --apply` leaves
 the staged originals intact. Run Codex and local automation checks, write a JSON
 receipt containing `codex_ok`, `tradingagents_ok`, and a numeric `verified_at`
