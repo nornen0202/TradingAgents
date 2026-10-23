@@ -326,6 +326,7 @@ def test_non_session_reviewed_first_date_is_rejected_before_prices(broker, monke
 
 
 def test_receipt_cannot_be_imported_into_an_earlier_analysis_context(broker, monkeypatch):
+    from tradingagents.dataflows.daily_history_selection import select_daily_history
     result = us.load_us_daily_bars('GEV', '2026-10-20', END)
     data = metadata()
     data['collection_started_at'] = '2026-10-22T04:29:59+00:00'
@@ -337,5 +338,17 @@ def test_receipt_cannot_be_imported_into_an_earlier_analysis_context(broker, mon
     monkeypatch.setattr(listing, 'cutoff_for_day', REAL_CUTOFF)
     with run_config({'analysis_as_of': '2026-10-22'}):
         assert _snapshot('GEV', END, us.SOURCE, result)['status'] == 'VERIFIED_RETRIEVED_SERIES'
+        select_daily_history('GEV', END, us.SOURCE, result)
+        assert us.selected_history('GEV', ORIGINAL, END) is not None
     with run_config({'analysis_as_of': END}):
         assert _snapshot('GEV', END, us.SOURCE, result)['status'] == 'UNVERIFIED'
+        select_daily_history('GEV', END, us.SOURCE, result)
+        with pytest.raises(VendorInputError, match='Pinned listing evidence'):
+            us.selected_history('GEV', ORIGINAL, END)
+
+
+def test_cross_analysis_cache_reuse_cannot_fall_through_to_other_vendors(broker, monkeypatch):
+    us.load_us_daily_bars('GEV', '2026-10-20', END)
+    monkeypatch.setattr(listing, 'cutoff_for_day', lambda _: ASOF - timedelta(seconds=1))
+    with pytest.raises(VendorInputError, match='Cached listing evidence'):
+        us.load_us_daily_bars('GEV', '2026-10-20', END)

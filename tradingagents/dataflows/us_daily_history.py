@@ -81,8 +81,11 @@ def load_us_daily_bars(symbol: str, start_date: str, end_date: str):
             if contract is not None:
                 from .security_listing import cutoff_for_day, validate_listing_receipt
                 current_cutoff = cutoff_for_day(end_date)
-                validate_listing_receipt(symbol, contract, requested_start=start.isoformat(),
-                                         end_date=end_date, observed_at=current_cutoff)
+                try:
+                    validate_listing_receipt(symbol, contract, requested_start=start.isoformat(),
+                                             end_date=end_date, observed_at=current_cutoff)
+                except (ValueError, TypeError, KeyError) as exc:
+                    raise VendorInputError("Cached listing evidence conflicts with this analysis cutoff") from exc
                 available = datetime.fromisoformat(contract["metadata_identity"]["available_at"])
                 if (current_cutoff - available).total_seconds() <= 300:
                     return cached[1].copy()
@@ -196,6 +199,15 @@ def selected_history(symbol: str, start_date: str, end_date: str):
         frame = selected["frame"]
         if frame is None or frame.attrs["requested_start"] > start_date:
             raise VendorMalformedResponseError("Requested history exceeds the pinned research series")
+        if "listing_contract" in frame.attrs:
+            from .security_listing import cutoff_for_day, validate_listing_receipt
+            try:
+                observed = datetime.fromisoformat(frame.attrs["observed_at"])
+                validate_listing_receipt(symbol, frame.attrs["listing_contract"],
+                                         requested_start=frame.attrs["requested_start"], end_date=end_date,
+                                         observed_at=min(observed, cutoff_for_day(end_date)))
+            except (ValueError, TypeError, KeyError) as exc:
+                raise VendorInputError("Pinned listing evidence conflicts with this analysis cutoff") from exc
         return _window(frame, start_date, end_date)
     return None
 
