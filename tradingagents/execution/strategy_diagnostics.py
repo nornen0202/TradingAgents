@@ -30,7 +30,7 @@ def allocation_view(raw):
         return None
     result = {"eligible_candidates": eligible, "strategy_owned_positions": owned,
               "reason_counts": dict(reasons), "real_account_allocation_used": False}
-    for field, allowed in (("research_entry_actions", {"WAIT", "STARTER", "ADD", "MISSING"}),
+    for field, allowed in (("research_entry_actions", {"NONE", "WAIT", "STARTER", "ADD", "EXIT", "MISSING"}),
                            ("research_conditional_entries", {"NONE", "STARTER", "ADD", "MISSING"})):
         values = raw.get(field)
         if not isinstance(values, dict) or any(k not in allowed or not count(v) for k, v in values.items()):

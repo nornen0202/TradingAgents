@@ -1,3 +1,5 @@
+import pytest
+
 from tests.scheduled.test_decision_bundle import _live_context
 from tradingagents.scheduled.decision_bundle import build_decision_bundle
 
@@ -28,6 +30,17 @@ def test_conditional_authorization_is_not_an_immediate_buy():
     assert row["strategy_code"] == "BUY_ON_CONFIRMATION"
     assert row["quality"]["action_ready"] is False
     assert row["quality"]["action_status"] == "WAITING_TRIGGER"
+
+
+@pytest.mark.parametrize("conditional", ["REDUCE", "EXIT"])
+def test_conditional_risk_exit_remains_visible_without_immediate_authority(conditional):
+    from tradingagents.scheduled.mobile_site import _public_quality
+    row = build("NONE", conditional, portfolio="HOLD", held=True)["strategy_table"][0]
+    assert row["raw_codes"]["decision_now"] == "NONE"
+    assert row["raw_codes"]["decision_if_triggered"] == conditional
+    assert row["quality"]["action_ready"] is False
+    assert row["quality"]["action_status"] == "WAITING_TRIGGER"
+    assert _public_quality(row["quality"])["investor_label"] == "조건 충족 대기"
 
 
 def test_original_execution_buy_and_risk_sell_survive_portfolio_disagreement():
