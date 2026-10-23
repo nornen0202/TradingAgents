@@ -179,11 +179,26 @@ def test_relocation_mismatch_fails_task_without_removing_either_copy(tmp_path, m
     config.write_text(json.dumps({"enabled": True, "system_drive": str(tmp_path),
                                   "backup_root": str(tmp_path / "backups"), "journal_root": str(tmp_path / "journal"),
                                   "relocations": [{"id": "saved", "source": str(source), "destination": str(destination)}]}))
-    monkeypatch.setattr(sys, "argv", ["policy", "--config", str(config)])
-    monkeypatch.setattr(policy.storage, "process_references", lambda: [])
+    monkeypatch.setattr(sys, "argv", ["policy", "--config", str(config), "--apply"])
+    def mutation_must_not_start(*args, **kwargs):
+        pytest.fail("retention started after failed relocation audit")
+    monkeypatch.setattr(policy, "candidates", mutation_must_not_start)
+    monkeypatch.setattr(policy.storage, "process_references", mutation_must_not_start)
+    monkeypatch.setattr(policy.storage, "finalize", mutation_must_not_start)
     assert policy.main() == 2
     assert (source / "new.txt").read_text() == "new data"
     assert (destination / "saved.txt").read_text() == "saved data"
+
+
+def test_successful_preflight_does_not_start_retention(tmp_path, monkeypatch):
+    config = tmp_path / "policy.json"
+    config.write_text(json.dumps({"enabled": True}))
+    monkeypatch.setattr(sys, "argv", ["policy", "--config", str(config), "--preflight-only"])
+    def mutation_must_not_start(*args, **kwargs):
+        pytest.fail("preflight started retention")
+    monkeypatch.setattr(policy, "candidates", mutation_must_not_start)
+    monkeypatch.setattr(policy.storage, "process_references", mutation_must_not_start)
+    assert policy.main() == 0
 
 
 @pytest.mark.parametrize("free,critical,expected", [(20, 12, 0), (8, 12, 2), (8, 0, 0)])

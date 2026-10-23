@@ -123,6 +123,27 @@ def test_invalid_policy_preserves_old_history_before_any_cleanup(tmp_path):
     assert (main / "payload.txt").read_text() == "generated"
 
 
+@pytest.mark.skipif(os.name != "nt" or PWSH is None, reason="Windows PowerShell required")
+def test_relocation_mismatch_blocks_wrapper_cleanup_before_mutation(tmp_path):
+    old = datetime.now() - timedelta(days=40)
+    main = _directory(tmp_path / "data" / "archive" / "runs" / str(old.year) / f"{old:%Y%m%d}T010101_old")
+    source = _directory(tmp_path / "recreated-source")
+    destination = _directory(tmp_path / "offloaded")
+    diagnostic = tmp_path / "runner" / "_diag" / "Worker_old.log"
+    diagnostic.parent.mkdir(parents=True)
+    diagnostic.write_text("old diagnostic")
+    os.utime(diagnostic, (old.timestamp(), old.timestamp()))
+    config = tmp_path / "policy.json"
+    config.write_text(json.dumps({"enabled": True, "python_executable": sys.executable,
+                                  "relocations": [{"id": "saved", "source": str(source), "destination": str(destination)}]}))
+    result = _run_maintenance(tmp_path, apply=True, extended_policy=config)
+    assert result.returncode != 0
+    assert "cleanup was not started" in result.stderr
+    assert (main / "payload.txt").read_text() == "generated"
+    assert diagnostic.read_text() == "old diagnostic"
+    assert (source / "payload.txt").exists() and (destination / "payload.txt").exists()
+
+
 @pytest.mark.skipif(os.name != "nt" or PWSH is None, reason="Windows PowerShell 7 is required")
 def test_storage_maintenance_dry_run_and_guarded_cleanup(tmp_path: Path) -> None:
     now = datetime.now()

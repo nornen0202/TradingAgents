@@ -125,6 +125,8 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--config", type=Path, required=True)
     parser.add_argument("--apply", action="store_true")
+    parser.add_argument("--preflight-only", action="store_true",
+                        help="Validate mounts and aliases before wrapper retention")
     args = parser.parse_args()
     config = json.loads(args.config.read_text(encoding="utf-8-sig"))
     if not config.get("enabled", False):
@@ -132,6 +134,11 @@ def main() -> int:
         return 0
     storage.validate_volumes(config)
     relocations_ok = audit_relocations(config)
+    if not relocations_ok:
+        storage.emit("policy-blocked", reason="relocation-mismatch")
+        return 2
+    if args.preflight_only:
+        return 0
     journal = Path(config["journal_root"])
     backup = Path(config["backup_root"])
     processes = storage.process_references()
@@ -166,7 +173,7 @@ def main() -> int:
     critical = free < config.get("critical_free_bytes", 0)
     storage.emit("storage-headroom", free_bytes=free,
                  warning=free < config.get("warning_free_bytes", 30 * 1024**3), critical=critical)
-    return 0 if relocations_ok and not critical else 2
+    return 2 if critical else 0
 
 
 if __name__ == "__main__":

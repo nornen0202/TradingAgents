@@ -267,6 +267,21 @@ try {
             $preserveCanonicalArchive = [bool]$extendedConfig.preserve_canonical_archive
         }
     }
+    if ($null -ne $extendedConfig -and $extendedConfig.enabled) {
+        $preflightScript = Join-Path $PSScriptRoot "maintain_codex_storage_policy.py"
+        if (-not (Test-Path -LiteralPath $preflightScript -PathType Leaf)) {
+            throw "Configured Codex storage policy helper is missing."
+        }
+        $preflightOutput = & $extendedConfig.python_executable $preflightScript --config $ExtendedPolicyPath --preflight-only
+        $preflightExitCode = $LASTEXITCODE
+        foreach ($line in @($preflightOutput)) {
+            Write-Output $line
+            Write-MaintenanceLog "CODEX_STORAGE_PREFLIGHT $line"
+        }
+        if ($preflightExitCode -ne 0) {
+            throw "Storage preflight returned $preflightExitCode; cleanup was not started. Inspect mounts and relocation-health."
+        }
+    }
     $runnerBusy = Test-TradingAgentsRunnerBusy -Root $RunnerRoot
     $latestRunIds = Get-LatestRunIds -Root $DataRoot
 
