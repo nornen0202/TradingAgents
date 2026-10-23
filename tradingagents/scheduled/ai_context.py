@@ -15,7 +15,7 @@ ROW_FIELDS = (
     "execution_condition_ko", "risk_condition_ko", "decision_state_ko",
     "data_status_ko", "reference_strategy",
 )
-QUALITY_FIELDS = ("execution_ready", "current_execution_promotion", "generated_in_current_run", "row_valid_until",
+QUALITY_FIELDS = ("execution_ready", "data_ready", "action_ready", "action_status", "current_execution_promotion", "generated_in_current_run", "row_valid_until",
                   "expired_at_build", "provider_limitations", "provider_blockers")
 POSITION_FIELDS = ("ticker", "name", "quantity", "sellable_quantity", "average_cost_krw",
                    "current_price_krw", "market_value_krw", "unrealized_pnl_krw")

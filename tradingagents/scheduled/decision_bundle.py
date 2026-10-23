@@ -31,6 +31,7 @@ CURRENT_ELIGIBILITY = {
     "PILOT_READY",
 }
 CONDITIONAL_ELIGIBILITY = {*CURRENT_ELIGIBILITY, "DELAYED_ANALYSIS_ONLY"}
+EXECUTION_ACTIONS = {"STARTER_NOW", "ADD_NOW", "BUY_NOW", "REDUCE_NOW", "EXIT_NOW", "STOP_LOSS_NOW"}
 
 _STRATEGY_ORDER = {
     "SELL": 0,
@@ -361,6 +362,14 @@ def _build_strategy_row(
         execution_ready=execution_ready,
         conditional_ready=conditional_ready,
     )
+    # Fresh observations are not an execution decision or broker permission.
+    # Keep the legacy data-readiness contract for consumers; expose the distinct
+    # engine action so readers cannot infer a buy from an IMMEDIATE data row.
+    has_action = context.get("decision_now") in EXECUTION_ACTIONS
+    conditional_action = context.get("decision_if_triggered") in {"STARTER", "ADD"}
+    action_status = ("ACTION_SIGNAL_PRESENT" if execution_ready and has_action
+                     else "DATA_RECHECK_REQUIRED" if has_action
+                     else "WAITING_TRIGGER" if conditional_action else "NO_EXECUTION_ACTION")
     return {
         "table_priority": 0,
         "portfolio_priority": action.get("priority"),
@@ -427,6 +436,9 @@ def _build_strategy_row(
             "execution_eligibility": context.get("execution_eligibility"),
             "core_fields_present": bool(gate.get("core_fields_present")),
             "execution_ready": execution_ready,
+            "data_ready": execution_ready,
+            "action_ready": execution_ready and has_action,
+            "action_status": action_status,
             "conditional_strategy_ready": conditional_ready,
             "row_mode": _row_mode(
                 context=context,
@@ -460,6 +472,13 @@ def _strategy_code(
     decision_state = str(context.get("decision_state") or "").upper()
     timing = str(context.get("execution_timing_state") or "").upper()
     triggered_action = str(action.get("action_if_triggered") or candidate.get("suggested_action_if_triggered") or context.get("decision_if_triggered") or "").upper()
+    # Portfolio advice cannot override an explicit engine NONE, nor turn a
+    # conditional entry into an immediate entry. Missing legacy fields retain
+    # their historical display behavior; they still do not grant an order.
+    if "decision_now" in context:
+        action_now = decision_now
+    if "decision_if_triggered" in context:
+        triggered_action = str(context.get("decision_if_triggered") or "").upper()
     if not execution_ready and not conditional_ready:
         return "DATA_CHECK"
     if action_now in {"EXIT_NOW", "STOP_LOSS_NOW"} or decision_now == "EXIT_NOW":
@@ -473,7 +492,7 @@ def _strategy_code(
     if not execution_ready:
         if decision_state == "TRIGGERED_PENDING_CLOSE":
             return "WAIT_CLOSE"
-        if action_now in {"ADD_NOW", "STARTER_NOW"} or decision_now in {"ADD_NOW", "STARTER_NOW"}:
+        if action_now in {"ADD_NOW", "STARTER_NOW", "BUY_NOW"} or decision_now in {"ADD_NOW", "STARTER_NOW", "BUY_NOW"}:
             return "BUY_ON_CONFIRMATION"
         if triggered_action in {"ADD", "STARTER", "ADD_IF_TRIGGERED", "STARTER_IF_TRIGGERED"}:
             return "BUY_ON_CONFIRMATION"
@@ -482,7 +501,7 @@ def _strategy_code(
         if action_now == "AVOID" or risk_action in {"REDUCE_RISK", "STOP_LOSS", "EXIT"}:
             return "AVOID"
         return "WAIT"
-    if action_now in {"ADD_NOW", "STARTER_NOW"} or decision_now in {"ADD_NOW", "STARTER_NOW"}:
+    if action_now in {"ADD_NOW", "STARTER_NOW", "BUY_NOW"} or decision_now in {"ADD_NOW", "STARTER_NOW", "BUY_NOW"}:
         return "BUY_NOW"
     if decision_state == "TRIGGERED_PENDING_CLOSE":
         return "WAIT_CLOSE"
@@ -552,6 +571,7 @@ def _build_quality(*, rows: list[dict[str, Any]], context: dict[str, Any], min_f
         "fresh_row_ratio": round(fresh_ratio, 4),
         "conditional_row_ratio": round(conditional_ratio, 4),
         "ready_rows": ready_rows,
+        "action_ready_rows": sum((row.get("quality") or {}).get("action_ready") is True for row in rows),
         "conditional_rows": conditional_rows,
         "total_rows": total,
         "held_rows": len(held_rows),

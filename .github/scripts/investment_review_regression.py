@@ -22,6 +22,19 @@ OUTPUT = None
 EMPTY_PAGE_URL = None
 
 
+class CheckedServer(ThreadingHTTPServer):
+    """A recovered later request must not hide an earlier server exception."""
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.unhandled_errors = []
+
+    def handle_error(self, request, client_address):
+        error = sys.exception()
+        if not isinstance(error, (BrokenPipeError, ConnectionResetError)):
+            self.unhandled_errors.append(type(error).__name__)
+        super().handle_error(request, client_address)
+
+
 def fixture(root):
     run = root / "runs/2026/fixture"
     directory = run / "tickers" / "TEST"
@@ -71,6 +84,14 @@ def fixture(root):
         "schema": "tradingagents.kis-strategy-runtime/v1", "mode": "KIS_DEMO_STRATEGY", "enabled": True,
         "real_orders_enabled": False, "checked_at": "2026-10-16T11:00:00Z", "markets": {
             "KR": {"status": "ACTIVE", "checked_at": "2026-10-16T11:00:00Z", "gate_passed": True,
+                "allocation_diagnostics": {"allocation_mode": "DEMO_NATIVE_ONE_SHARE_V1",
+                    "eligible_candidates": 0, "strategy_owned_positions": 1, "real_account_allocation_used": False,
+                    "reason_counts": {"NO_AUTHORIZED_EXECUTION_ACTION": 30},
+                    "research_entry_actions": {"WAIT": 30}, "research_conditional_entries": {"NONE": 30},
+                    "ticker_blockers": {"PRIVATE_DO_NOT_DISPLAY": "PRIVATE_DO_NOT_DISPLAY"}},
+                "refresh_attempt": {"market": "kr", "session_date": "2026-10-16", "status": "FAILED",
+                    "started_at": "2026-10-16T10:50:00Z", "finished_at": "2026-10-16T10:51:00Z",
+                    "consecutive_failures": 3, "real_orders_enabled": False, "error_type": "LocalStorageHeadroomError"},
                 "evaluation": evaluate_strategy_orders([{"id": "fixture-buy", "ticker": "005930.KS", "side": "BUY",
                     "quantity": 1, "filled_quantity": 1, "fill_notional": 69900, "status": "FILLED", "mode": "demo",
                     "source": "KIS_DEMO_BROKER_REPORT", "strategy_performance": True,
@@ -121,6 +142,7 @@ async def probe(websocket_url, page_url):
               const strategy=document.querySelector('#kis-strategy-health').textContent;
               if (!strategy.includes('fixture-strategy') || !strategy.includes('체결 완료') || !strategy.includes('100 KRW') || !strategy.includes('정규장 검증 통과 대기') || !strategy.includes('순손익은 표시하지 않습니다')) throw Error('KIS strategy execution/performance missing');
               if (!strategy.includes('가정 비용 민감도 · 실제 순손익 아님') || !strategy.includes('실투자 판단 미충족') || !strategy.includes('30 KRW') || !strategy.includes('실투자로 자동 전환하지 않습니다')) throw Error('Cost assumptions or readiness boundary missing');
+              if (!strategy.includes('계획 검사 통과 후보 0개') || !strategy.includes('실행 엔진의 매수·매도 행동 없음') || !strategy.includes('당일 시세 갱신 재시도 한도 소진') || !strategy.includes('저장공간 부족')) throw Error('Actual no-action and producer failure diagnostics missing');
               if (!document.querySelector('#experiment-cards').textContent.includes('paired-test')) throw Error('Experiment card absent');
               if (!document.querySelector('#experiment-cards').textContent.includes('수익률·낙폭을 표시하지 않습니다')) throw Error('Unobserved performance fabricated');
               if (document.documentElement.scrollWidth > innerWidth+2) throw Error('Viewport overflow');
@@ -219,13 +241,13 @@ def main():
     with tempfile.TemporaryDirectory(prefix="ta-review-ui-") as temporary:
         root = Path(temporary)
         status_path, registry_path = fixture(root)
-        server = ThreadingHTTPServer(("127.0.0.1", 0), make_handler(archive_dir=root, experiment_registry=registry_path, paper_status_path=status_path))
+        server = CheckedServer(("127.0.0.1", 0), make_handler(archive_dir=root, experiment_registry=registry_path, paper_status_path=status_path))
         worker = Thread(target=server.serve_forever, daemon=True)
         worker.start()
         empty = root / "empty"
         (empty / "paper").mkdir(parents=True)
         (empty / "paper/kis-session-validation.json").write_bytes((root / "paper/kis-session-validation.json").read_bytes())
-        empty_server = ThreadingHTTPServer(("127.0.0.1", 0), make_handler(archive_dir=empty, paper_status_path=status_path))
+        empty_server = CheckedServer(("127.0.0.1", 0), make_handler(archive_dir=empty, paper_status_path=status_path))
         empty_worker = Thread(target=empty_server.serve_forever, daemon=True)
         empty_worker.start()
         EMPTY_PAGE_URL = f"http://127.0.0.1:{empty_server.server_port}/"
@@ -239,6 +261,8 @@ def main():
             empty_server.shutdown()
             empty_worker.join(timeout=5)
             empty_server.server_close()
+        if server.unhandled_errors or empty_server.unhandled_errors:
+            raise RuntimeError(f"Unhandled HTTP errors: {server.unhandled_errors + empty_server.unhandled_errors}")
     print(json.dumps({"status": "PASSED", "viewports": results}, indent=2))
     return 0
 

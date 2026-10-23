@@ -42,6 +42,27 @@ def test_native_currency_gross_performance_order_history_and_private_projection(
     assert us["status"] == "WAITING_VALIDATION"
 
 
+def test_planning_rejections_and_producer_limits_are_visible_without_secrets(tmp_path):
+    from tests.execution.test_strategy_diagnostics import allocation
+    raw = receipt()
+    row = raw["markets"]["KR"]
+    row["allocation_diagnostics"] = allocation()
+    row["source_diagnostics"] = {"status": "EXECUTION_OBSERVATIONS_AVAILABLE", "strategy_rows": 30,
+                                  "execution_ready_rows": 30, "allocated_orders": None}
+    row["refresh_attempt"] = {"market": "kr", "session_date": "2026-10-19", "started_at": "2026-10-19T00:50:00Z",
+        "finished_at": "2026-10-19T00:51:00Z", "status": "FAILED", "consecutive_failures": 3,
+        "real_orders_enabled": False, "error_type": "LocalStorageHeadroomError", "private": "PRIVATE_SECRET"}
+    write(tmp_path, raw)
+    view = kis_strategy_health(tmp_path, analysis_as_of=NOW)["markets"]["KR"]
+    assert view["allocation_diagnostics"]["reason_counts"] == {"NO_AUTHORIZED_EXECUTION_ACTION": 30}
+    assert view["source_diagnostics"]["status"] == "EXECUTION_OBSERVATIONS_AVAILABLE"
+    assert view["refresh_health"]["status"] == "RETRY_LIMIT_REACHED"
+    assert "PRIVATE" not in json.dumps(view)
+    row["refresh_attempt"]["finished_at"] = "2026-10-20T00:51:00Z"
+    write(tmp_path, raw)
+    assert kis_strategy_health(tmp_path, analysis_as_of=NOW)["markets"]["KR"]["refresh_health"] == {"status": "UNVERIFIED"}
+
+
 @pytest.mark.parametrize("changes", [{"checked_at": None}, {"checked_at": "bad"}, {"checked_at": "2026-10-20T01:00:00Z"},
     {"mode": "real"}, {"real_orders_enabled": True}, {"markets": []}])
 def test_invalid_root_cannot_show_trading(tmp_path, changes):

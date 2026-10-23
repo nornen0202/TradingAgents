@@ -10,7 +10,7 @@
 2. `current`와 `last_ready`를 절대 합쳐 현재 전략처럼 표현하지 않는다. 과거 last-ready는 명시적으로 만료된 참고 자료다.
 3. 답변을 만드는 현재 시각에 `generated_at`, `started_at`, `market_data_asof`, `guardrails.valid_until`, 행별 `row_valid_until`을 다시 검증한다. 필드가 없거나 파싱 불가·미래 시각·순서 역전이면 fail-closed 한다.
 4. `source_health`가 `OK`가 아니거나 유효시간이 지났으면 최상단에 데이터 상태를 표시하고 현재 주문 행동을 금지한다. 단, 분석 시점의 `thesis`(방향·조건·무효화·기간)는 지우지 말고 `execution.readiness=NEEDS_LIVE_RECHECK`와 분리해 보여 준다. 특히 `STALE`, `FAILED`, `DEGRADED`, `UNVERIFIED`, `MISSING`을 성공으로 해석하지 않는다.
-5. 전역 report mode는 행별 준비도를 승격하지 못한다. `지금` 행동은 해당 행의 `quality.row_mode=IMMEDIATE`, `execution_ready=true`, `current_execution_promotion=POSSIBLE`, 현재 run 생성, 유효시간 미경과를 모두 만족할 때만 허용한다.
+5. 전역 report mode는 행별 준비도를 승격하지 못한다. `지금` 행동은 해당 행의 `quality.row_mode=IMMEDIATE`, `execution_ready=true`, `current_execution_promotion=POSSIBLE`, 현재 run 생성, 유효시간 미경과를 모두 만족할 때만 허용한다. 이 필드들은 자료 준비 조건이다. 명시적인 `raw_codes.decision_now` 매수·매도 신호도 필요하며 `NONE`을 포트폴리오 참고 의견으로 승격하지 않는다. `action_ready=false`인 새 행은 즉시 행동을 금지한다. 조건부 행동은 원래 `decision_if_triggered` 범위에서만 설명한다.
 6. feed 지연·비통합 시세, provider 상태 제한, 과도한 spread, LULD/news halt 미확인은 `CONDITIONAL`로 낮춘다. `BLOCKED_STALE` 또는 `MISSING`이어도 packet의 분석 시점 BUY/HOLD/REDUCE/SELL thesis와 정확한 조건·무효화는 유지하되, 지금 주문 가능하다고 표현하지 않는다.
 7. 생산 커버리지와 응답 전송 범위를 구분한다. `current.universe_coverage`와 `bundle.transmission_scope`가 제공되면 보유·관심종목 기대/누락 수와 전체 ticker 성공/실패 수를 대조한다. 계좌 snapshot을 확인했고 보유·관심 누락과 ticker 실패가 모두 0일 때만 `COMPLETE`다. 필드가 없으면 추정하지 않고 `UNVERIFIED`, 하나라도 누락·실패면 `INCOMPLETE`다.
 8. 보유 종목과 설정/profile 관심종목은 모두 표시한다. 관심목록 밖 scanner/discovery 신규 후보만 최대 10개로 제한한다. `all_holdings_included=false`, `all_required_watchlist_included=false` 또는 보유·관심 누락이 있으면 종목 목록과 함께 최상단에 경고한다.
