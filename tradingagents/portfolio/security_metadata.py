@@ -42,7 +42,8 @@ def security_metadata_candidate(snapshot: dict[str, Any], *, analysis_as_of: dat
     This does not establish issuer binding, first regular listing, or historical
     validity before collection. No caller may use it to shorten price history.
     """
-    if not isinstance(analysis_as_of, datetime) or analysis_as_of.tzinfo is None:
+    if (not isinstance(analysis_as_of, datetime) or analysis_as_of.tzinfo is None
+            or analysis_as_of.utcoffset() is None):
         raise ValueError("analysis_as_of must be an aware datetime.")
     cutoff = analysis_as_of.astimezone(timezone.utc)
     started = _clock(snapshot.get("collection_started_at"))

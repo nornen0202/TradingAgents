@@ -1,6 +1,6 @@
 """Public metadata boundary and point-in-time projection; no external API."""
 from copy import deepcopy
-from datetime import datetime, timezone
+from datetime import datetime, timezone, tzinfo
 from unittest.mock import Mock
 
 import pytest
@@ -138,3 +138,12 @@ def test_cutoff_is_required_aware_and_no_backdating_from_listing_date():
         security_metadata_candidate(snapshot(), analysis_as_of=datetime(2024, 4, 2, tzinfo=timezone.utc))
     at_collection = datetime.fromisoformat(snapshot()["available_at"])
     assert security_metadata_candidate(snapshot(), analysis_as_of=at_collection)["isin"]
+
+
+def test_timezone_object_without_offset_is_still_naive():
+    class UnspecifiedOffset(tzinfo):
+        def utcoffset(self, dt):
+            return None
+
+    with pytest.raises(ValueError, match="aware"):
+        security_metadata_candidate(snapshot(), analysis_as_of=ASOF.replace(tzinfo=UnspecifiedOffset()))
