@@ -1,0 +1,655 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YouTube 투자자용 검증 리포트 - [#글로벌인사이트] “엔비디아도 없어서 못 구한다?” 한국 핵심 부품의 정체 / 일론 머스크, AI데이터센터  가격 상승에 베팅한 이유 (삼성전기) 노근창 대표</title>
+  <style>
+:root {
+  color-scheme: light;
+  --bg: #f7f8fb;
+  --panel: #ffffff;
+  --text: #172033;
+  --muted: #667085;
+  --line: #d9dee8;
+  --accent: #0f766e;
+  --accent-2: #2563eb;
+  --warn: #b45309;
+  --bad: #b42318;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0 56px; }
+a { color: var(--accent-2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.hero { padding: 28px 0 22px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+.hero.compact { padding-top: 12px; }
+.hero h1 { margin: 0; font-size: clamp(28px, 4vw, 44px); line-height: 1.15; letter-spacing: 0; }
+.hero p { max-width: 760px; color: var(--muted); margin: 12px 0 0; }
+.eyebrow { color: var(--accent); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0; margin: 0 0 8px; }
+section { margin: 28px 0; }
+h2, h3, h4, h5 { letter-spacing: 0; line-height: 1.25; }
+.synthesis-callout { padding: clamp(20px, 4vw, 34px); border: 1px solid #6ee7d8; border-radius: 18px; background: linear-gradient(135deg, #ecfdf9 0%, #eff6ff 100%); box-shadow: 0 18px 44px rgba(15, 118, 110, .12); }
+.synthesis-callout.unavailable { border-color: var(--line); background: var(--panel); box-shadow: none; }
+.synthesis-callout h2 { margin: 0; font-size: clamp(24px, 3.2vw, 36px); }
+.synthesis-callout .lead { max-width: 900px; font-size: 17px; color: #334155; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.primary-link, .secondary-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border-radius: 999px; font-weight: 800; }
+.primary-link { color: white; background: var(--accent); }
+.secondary-link { color: var(--accent-2); border: 1px solid #93c5fd; background: white; }
+.primary-link:hover, .secondary-link:hover { text-decoration: none; filter: brightness(.97); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.card, .run { display: flex; flex-direction: column; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; color: var(--text); min-height: 128px; }
+.run { padding: 16px; }
+.card:hover, .run:hover { border-color: var(--accent-2); text-decoration: none; }
+.thumb { display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #e9edf5; border-radius: 8px 8px 0 0; color: var(--muted); font-size: 13px; font-weight: 700; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb-empty span { padding: 0 14px; text-align: center; }
+.card-body { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 16px; }
+.card strong { line-height: 1.35; }
+.source-line { color: #3f4a5f; font-weight: 600; }
+.runs { display: grid; gap: 10px; }
+.badge { display: inline-flex; width: fit-content; border-radius: 999px; padding: 2px 9px; background: #e6f4f1; color: var(--accent); font-size: 12px; font-weight: 700; }
+.status-contradicted, .status-llm_failed { background: #fee4e2; color: var(--bad); }
+.status-unverified, .status-stale { background: #fff4d6; color: var(--warn); }
+small, .muted { color: var(--muted); }
+.topnav { display: flex; gap: 14px; margin-bottom: 16px; font-size: 14px; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px; }
+.stats span { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
+.report { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: min(5vw, 36px); }
+.report-head { border-bottom: 1px solid var(--line); margin-bottom: 24px; padding-bottom: 20px; }
+.report-head h1 { margin: 0; font-size: clamp(24px, 3.5vw, 38px); line-height: 1.2; }
+.meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+.scope-note { padding: 12px 14px; border-left: 4px solid var(--warn); border-radius: 6px; background: #fff7ed; color: #7c2d12; }
+.synthesis-report h2 { margin-top: 34px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.synthesis-report h3 { margin: 24px 0 8px; color: #0f4c5c; }
+.synthesis-report p, .synthesis-report li { overflow-wrap: anywhere; }
+pre { overflow: auto; background: #111827; color: #f9fafb; border-radius: 8px; padding: 14px; }
+code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+details { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 18px; }
+@media (max-width: 640px) {
+  main { width: min(100% - 20px, 1120px); padding-top: 18px; }
+  .report { padding: 18px; }
+  .synthesis-callout { border-radius: 14px; padding: 18px; }
+  .cta-row a { width: 100%; }
+  .mobile-report { border-radius: 12px; }
+}
+</style>
+</head>
+<body>
+  <main>
+<nav class="topnav"><a href="index.html">실행 목록</a><a href="../../index.html">YouTube 홈</a></nav>
+<article class="report">
+  <header class="report-head">
+    <p class="eyebrow">youtube_20261024_071836</p>
+    <h1>[#글로벌인사이트] “엔비디아도 없어서 못 구한다?” 한국 핵심 부품의 정체 / 일론 머스크, AI데이터센터  가격 상승에 베팅한 이유 (삼성전기) 노근창 대표</h1>
+    <div class="meta">
+      <span class="badge status-asr_uncertain">asr_uncertain</span>
+      <a href="https://www.youtube.com/watch?v=Cm7DCct7Xbw">원본 영상</a>
+    </div>
+  </header>
+  <h2>AI 인프라 공급 병목과 한국 기판업체: 기대와 검증 공백</h2>
+<p><strong>분석 기준: 2026년 10월 24일 · 제공된 영상·증거·주장 검증 결과 한정</strong></p>
+<p>영상: <a href="https://www.youtube.com/watch?v=Cm7DCct7Xbw">815Money talk, 2026년 10월 23일 공개</a></p>
+<h3>1. 핵심 판단</h3>
+<p>영상의 중심 논리는 <strong>AI 인프라 수요 증가 → 데이터센터·장비·기판 공급 병목 → 임대료·부품 가격 지지 → 한국 기판업체의 공급망 진입 및 실적 개선 가능성</strong>이다. 삼성전기의 엔비디아 관련 FC-BGA 공급과 향후 GPU용 기판 진입이 주요 관심사다.</p>
+<p>그러나 <strong>제공 자료에서 이 투자 논리를 직접 입증한 실질적 외부 근거는 없다.</strong> 12개 주장 중 10개는 미검증, 2개는 자동자막 인식 불확실로 분류됐으며, 모든 항목에 수동 확인이 필요하다. 이는 주장이 거짓으로 판명됐다는 의미가 아니라, 현재 증거로 사실 여부를 확정할 수 없다는 의미다.</p>
+<p>따라서 이번 영상은 확정된 수주·가격 상승의 보고서보다, <strong>공식 공시와 운영지표로 확인해야 할 투자 가설 목록</strong>으로 읽는 것이 적절하다. 현재 주가·밸류에이션·목표수익률을 판단할 시장자료도 제공되지 않았다.</p>
+<h3>2. 영상 주장과 확인된 사실·근거</h3>
+<p>아래 시각은 개별 발화의 정확한 시작점이 아니라 해당 주장을 포함하는 청크 시작 시각이다.</p>
+<p>| 주제·시각 | 영상 주장 | 확인된 사실·근거 및 한계 |</p>
+<p>| --- | --- | --- |</p>
+<p>| 삼성전기·엔비디아, 06:20·12:46·18:52 | NVSwitch·Groq LPU용 FC-BGA 공급을 발판으로 GPU용 기판까지 진입할 수 있다. | 계약·공시·회사 발표가 없다. 삼성전기와 삼성전자의 당사자 구분, 제품 범위, 인증·수주·양산 단계 모두 미확인이다. GPU용 진입은 조건부 전망이다. |</p>
+<p>| 한국 기판업체, 18:52·25:01 | 칩렛 확대와 대면적·고다층화가 삼성전기·대덕전자·LG이노텍·심텍의 기회를 넓힌다. | 업체별 제품 구성·수주·가동률·수율·가격 자료가 없다. 산업 차원의 가능성을 모든 업체의 동일한 수혜로 연결할 수 없다. |</p>
+<p>| 이비덴·유니미크론, 18:52 | Hopper용 기판은 이비덴이 100%, Blackwell부터 유니미크론이 약 30%를 공급했다. | 고객·세대별 점유율 원출처가 없다. 물량·매출 중 어떤 기준인지, 측정 시점과 제품 범위가 무엇인지 미확인이다. |</p>
+<p>| 아지노모토, 25:01 | ABF 점유율이 100%이고 모든 FC-BGA에 사용된다. | 시장 정의·적용 범위·대체 소재 자료가 없다. 완전 독점과 보편적 적용을 확정할 수 없다. |</p>
+<p>| 머스크 관련 사업, 00:05·06:20 | 5~6개월 내 수익 창출 또는 투자 회수, 단기 GPU 임대계약 선호가 가격 상승 기대를 시사한다. | 발언 전문과 계약이 없다. Tesla·xAI·SpaceX 주체도 혼재한다. 수익 발생과 투자금 전액 회수는 다르며, 통상 계약 3년이라는 설명과 구글의 SpaceX 임대 주장도 미검증이다. |</p>
+<p>| CoreWeave, 00:05 | 수요는 강하고 신용위험의 핵심은 과도한 부채다. | 차입금·만기·현금·계약 취소 조건·가동률 자료가 없어 수요위험과 금융위험의 상대적 크기를 판단할 수 없다. |</p>
+<p>| Lam·ASML·메모리, 06:20 | Lam 매출 증가율 22%, 영업이익률 40%, 이후 성장률 4~5%를 언급하며 장비 병목이 메모리 가격을 지지한다고 본다. | 실적·가이던스 원문이 없다. 전년동기·전분기 및 회계기간 구분이 불명확하다. EUV 부품 4만 개, 중국 증설 제약과 2027년 가격 전망도 미검증이다. |</p>
+<p>| 엔비디아 시스템, 12:46 | Groq 인수, 최대 7종 칩 설계, NVL72 구성과 대만 서버 생산 관리 비중 90%를 설명한다. | 거래·기술문서·산업통계가 없다. GPU·노드·트레이·랙 단위가 혼재해 자막상 수량으로 기판 수요를 계산할 수 없다. |</p>
+<p>| 구글, 25:01 | TPU 외부 판매와 펀드·구조화 금융이 EBITDA·잉여현금흐름을 개선한다. | 실물 판매와 클라우드 사용권이 구분되지 않았다. BlackRock·Blackstone 참여, 계약·회계처리와 일정이 미확인이다. ‘28일부터’의 날짜·연도도 불명확하다. |</p>
+<p>| 메타, 00:05·06:20·25:01 | 최초 잉여현금흐름 적자에도 신규 서비스 이용이 위험을 완화한다. | 재무 이력·시장가격 자료가 없다. ‘Muse’, 250만 명, 200달러·200토큰은 서비스명·정의·단위가 불분명해 수익성 추정에 사용할 수 없다. |</p>
+<p>| Solidigm, 00:05 | 신뢰할 만한 매체가 IPO 철회를 단독 보도했다. | 해당 기사 본문·최초 보도일·회사 입장이 없다. IPO 철회는 미검증이다. |</p>
+<p>| 시장 움직임, 여러 구간 | 기판주 상승 후 하락, 마이크론 상대 선방, Supermicro의 예상 밖 실적발표를 언급한다. | 일별 가격·거래량·공식 발표 일정이 없어 방향·상대수익률·사건 인과관계 모두 확인할 수 없다. |</p>
+<h4>외부 출처 점검</h4>
+<p>수집된 10건 중 E1~E4는 오류·사이트 탐색 문구 중심이고, E5~E10은 발췌 본문이 없다. <strong>핵심 주장을 뒷받침하는 강한 출처 링크는 확보되지 않았다.</strong> 다음은 지지 근거가 아니라 수집 자료의 한계를 보여주는 사례다.</p>
+<ul>
+<li><a href="https://finance.yahoo.com/markets/stocks/articles/sk-hynix-kose-a000660-stock-221311278.html">E1: SK하이닉스 평가 기사</a>는 제공된 발췌에서 Solidigm IPO 철회를 확인하지 못한다.</li>
+<li><a href="https://finance.yahoo.com/m/9cdb41d6-a291-37eb-bff7-347d06660a9d/nvidia-stock%E2%80%99s-2-critical.html">E8: 엔비디아 관련 Barron’s 기사 검색 결과</a>는 제목만 제공돼 삼성전기 공급계약의 근거가 되지 않는다.</li>
+<li>ABF 주장에 연결된 E9는 축류팬 시장, 메타 주장에 연결된 E10은 Rio Tinto 투자 기사여서 해당 주장과 무관하다.</li>
+</ul>
+<p>모든 수집 기사의 표시 발행시각은 영상 공개 이후다. 이는 반증은 아니지만 영상 이전 보도의 존재나 당시 알려진 사실을 입증하지도 않는다. 수집 상태의 <code>verified</code> 표시는 개별 투자 주장이 검증됐다는 뜻이 아니다.</p>
+<h3>3. 강세 논리: 무엇이 확인돼야 성립하나</h3>
+<h4>기판의 복잡성이 수익성으로 전환되는 경로</h4>
+<p>영상의 긍정적 가설은 고성능 기판의 면적·층수·기술 난도가 높아질수록 유효 생산능력이 부족해지고, 인증된 공급자의 협상력이 강화된다는 것이다. 다만 이 경로가 실적으로 연결되려면 다음이 함께 확인돼야 한다.</p>
+<p>1. 실제 고객 인증과 양산 수주가 확보된다.</p>
+<p>2. 수율과 가동률이 올라 판매 가능한 물량이 늘어난다.</p>
+<p>3. 가격·제품 구성 개선이 원가·감가상각 증가를 웃돈다.</p>
+<p>4. 투자 지출 이후에도 영업현금흐름과 수익성이 개선된다.</p>
+<p>삼성전기의 경우 <strong>스위치용 공급 확인과 GPU용 공급 확인은 별개의 단계</strong>다. 전자가 확인되더라도 후자의 인증·수주·매출을 자동으로 의미하지 않는다.</p>
+<h4>인프라 공급 제약과 임대료</h4>
+<p>전력·자금·장비 제약이 실제 존재하고 고객의 지급능력과 이용 수요가 유지된다면, 공급 제약이 임대료를 지지할 가능성은 있다. 그러나 머스크의 단기계약 선호만으로 가격 상승을 입증할 수는 없다. 동일 GPU·지역·계약기간·서비스 조건의 실현 임대료와 가동률이 필요하다.</p>
+<h4>구글의 현금흐름 개선 가능성</h4>
+<p>TPU 사업 확대가 이익으로 연결될 가능성과 구조화 금융이 자금조달을 분산할 가능성은 각각 검토할 수 있다. 다만 <strong>EBITDA 증가, 회사채 발행 감소, 잉여현금흐름 개선은 서로 같은 사건이 아니다.</strong> 실제 투자 부담, 연결 범위, 리스·보증 의무를 확인해야 한다.</p>
+<h3>4. 반론과 가설 무효화 조건</h3>
+<p>아래는 이미 발생했다고 확인된 사건이 아니라, 투자자가 향후 관찰할 조건이다.</p>
+<p>| 가설 | 주요 반론 | 약화·무효화 신호 |</p>
+<p>| --- | --- | --- |</p>
+<p>| 기판 부족이 가격·마진을 높인다 | 낮은 수율과 높은 투자비가 이익을 상쇄할 수 있다. 경쟁사 증설로 부족이 완화될 수도 있다. | 리드타임 단축·재고 증가와 함께 가격 하락, 가동률·마진 부진이 지속된다. |</p>
+<p>| 삼성전기 공급망 진입이 확대된다 | 특정 제품 공급이 GPU용 공급으로 이어진다는 보장은 없다. | 공식 자료에서 제품 범위가 제한되거나 인증·양산 일정이 지연·철회된다. |</p>
+<p>| GPU 임대료가 상승한다 | 신규 장비 경쟁과 고객 투자 축소가 가격을 압박할 수 있다. | 같은 조건의 실현 임대료·가동률 하락, 할인 확대·계약 취소가 나타난다. |</p>
+<p>| CoreWeave의 문제는 부채 중심이다 | 금융 압박과 고객 수요 약화가 동시에 발생할 수 있다. | 계약의 매출 전환 지연, 고객 이탈과 차환 부담이 함께 커진다. |</p>
+<p>| 장비 병목이 메모리 가격을 지지한다 | 수요 감소·재고 증가가 공급 제약 효과를 압도할 수 있다. | 장비 제약이 남아 있는데도 재고가 늘고 계약가격이 하락한다. |</p>
+<p>| 금융구조 변경이 구글 FCF를 개선한다 | 비용·의무의 시점이나 표시만 달라질 수 있다. | 리스·보증 등 부담을 포함하면 현금 유출과 투자 부담이 줄지 않는다. |</p>
+<p>현재 증거 부족은 위 가설의 무효화 자체가 아니다. <strong>확인 전 상태와 확인 후 반증 상태를 구별해야 한다.</strong></p>
+<h3>5. 단기 체크포인트와 구체적 관찰 항목</h3>
+<p>| 우선순위 | 확인할 자료·사건 | 관찰할 항목 |</p>
+<p>| --- | --- | --- |</p>
+<p>| 1 | 삼성전기·엔비디아 공식 발표, 공시·IR | 법적 당사자, NVSwitch·LPU·GPU 제품별 범위, 인증·수주·양산 시점, 매출 반영 여부 |</p>
+<p>| 2 | 기판업체의 다음 공식 실적·사업보고서 | 제품 구성, 가동률·수율, 생산능력·증설, 판매가격, 재고, 영업이익률·현금흐름 |</p>
+<p>| 3 | 엔비디아 공식 시스템 문서·거래 발표 | 세대별 GPU·패키지·노드·트레이·랙 대응, 실제 기판 수량, Groq 거래 형태 |</p>
+<p>| 4 | CoreWeave 재무·계약 자료 | 현금, 차입 만기·이자비용, 투자약정, 계약 취소 조건, 가동·전력 확보 일정 |</p>
+<p>| 5 | GPU 임대가격 자료 | 동일 조건의 가격 변화와 가동률, 단기·장기계약 차이, 계약가격과 제시가격 구분 |</p>
+<p>| 6 | Lam 실적·가이던스, 메모리 수급 자료 | 회계기간·성장률 기준, 병목 설명, 중국 증설·규제, 메모리 재고·계약가격 |</p>
+<p>| 7 | Alphabet·자산운용사 공식 발표 | TPU 실물 판매 여부, 실제 계약 당사자, 금융상품 조건, 연결·리스·보증·자본지출 처리 |</p>
+<p>| 8 | 메타 공식 실적·제품 지표 | FCF 정의와 과거 이력, 서비스명, 활성 사용자 기준, 소비 단위·측정기간 |</p>
+<p>영상의 ‘다음 주’를 업로드일에 단순 대응하면 <strong>2026년 10월 26일~11월 1일</strong>이지만, 이는 공식 실적 일정이 아니다. 녹화일과 공식 발표일을 먼저 확인해야 한다. ‘어제’, ‘이틀 전’, ‘중간선거 일주일 전’도 같은 이유로 확정 날짜에 배정하지 않는다.</p>
+<h3>6. 데이터 품질과 신뢰도 해석</h3>
+<ul>
+<li><strong>transcript_quality:</strong> 자동 한국어 자막 706개 세그먼트이며 상태는 <code>good</code>, 점수는 1.0이다. 이는 고유명사·숫자·인용까지 정확하다는 보증이 아니다. 원음과 수동 자막은 제공되지 않았다.</li>
+<li><strong>추출 단계 source_confidence:</strong> 삼성전기 0.88, CoreWeave 0.90, 구글 0.73, 메타 0.57 등으로 표시됐지만, 외부 사실 검증의 성공률로 읽어서는 안 된다.</li>
+<li><strong>검증 단계 source_confidence:</strong> 전 항목 0.0이다. 제공 자료에 유효한 검증 출처가 없다는 의미다.</li>
+<li><strong>asr_confidence:</strong> 전 항목 0.0으로, 원음 대조 기반 평가가 불가능했다는 의미다. 모든 발화가 틀렸다는 뜻은 아니다. 특히 NVL72 구성과 메타 사용지표는 인식·단위 불확실이 크다.</li>
+<li><strong>검증 confidence 0.98~0.99:</strong> 미검증·ASR 불확실이라는 분류 판단의 확신이지, 영상 주장이 참일 확률이 아니다.</li>
+<li><strong>폐쇄형 출처:</strong> Bloomberg·Morningstar 원문은 제공되지 않았다. 해당 출처에 귀속되는 주장, 유료 공급망 조사, 비공개 고객 인증·사모 금융계약은 <strong>미검증·수동 확인 필요</strong>다. 실제 그 출처에 정보가 존재하는지도 확인되지 않았다.</li>
+</ul>
+<h3>결론</h3>
+<p>영상의 핵심 관찰 대상은 AI 투자 규모 그 자체보다 <strong>공급 병목이 누구의 수주·가격·마진·현금흐름으로 전환되는가</strong>다. 삼성전기는 제품별 공급 단계, 다른 기판업체는 기술·제품 구성과 수율, 데이터센터 사업자는 계약의 매출 전환과 차입 부담이 중요하다.</p>
+<p>현재 자료는 이 경로를 확인하지 못한다. 후속 판단의 핵심은 <strong>공식 계약 확인 → 양산·가동 확인 → 이익·현금흐름 확인</strong>이며, 주가 반등이나 산업 기대만으로 이 단계를 대체할 수 없다.</p>
+  <details>
+    <summary>공개 요약 JSON</summary>
+    <pre>{
+  &quot;version&quot;: 4,
+  &quot;video_id&quot;: &quot;Cm7DCct7Xbw&quot;,
+  &quot;title&quot;: &quot;[#글로벌인사이트] “엔비디아도 없어서 못 구한다?” 한국 핵심 부품의 정체 / 일론 머스크, AI데이터센터  가격 상승에 베팅한 이유 (삼성전기) 노근창 대표&quot;,
+  &quot;url&quot;: &quot;https://www.youtube.com/watch?v=Cm7DCct7Xbw&quot;,
+  &quot;channel&quot;: &quot;815Money talk&quot;,
+  &quot;channel_id&quot;: &quot;UCCG6BEYjfQMGzypJw2EJCDQ&quot;,
+  &quot;source_url&quot;: &quot;https://www.youtube.com/@815moneytalk/videos&quot;,
+  &quot;thumbnail_url&quot;: &quot;https://i.ytimg.com/vi/Cm7DCct7Xbw/maxresdefault.jpg&quot;,
+  &quot;published_at&quot;: &quot;2026-10-23T07:00:36+00:00&quot;,
+  &quot;status&quot;: &quot;asr_uncertain&quot;,
+  &quot;strategy_source_tier&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_evidence_weight&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_validation_policy&quot;: &quot;STANDARD_REVIEW&quot;,
+  &quot;transcript_status&quot;: &quot;available&quot;,
+  &quot;transcript_source&quot;: &quot;automatic&quot;,
+  &quot;transcript_chars&quot;: 14642,
+  &quot;transcript_quality&quot;: {
+    &quot;status&quot;: &quot;good&quot;,
+    &quot;score&quot;: 1.0,
+    &quot;warnings&quot;: [],
+    &quot;source&quot;: &quot;automatic&quot;,
+    &quot;language&quot;: &quot;Korean&quot;,
+    &quot;model_or_format&quot;: &quot;json3&quot;,
+    &quot;chars&quot;: 14642,
+    &quot;segments&quot;: 706,
+    &quot;duration_seconds&quot;: 1731,
+    &quot;repeated_ngram_ratio&quot;: 0.001
+  },
+  &quot;generated_at&quot;: &quot;2026-10-24T07:18:36.058095+09:00&quot;,
+  &quot;llm_status&quot;: &quot;success&quot;,
+  &quot;research_status&quot;: &quot;success&quot;,
+  &quot;claim_verification_status&quot;: &quot;success&quot;,
+  &quot;research_pipeline_version&quot;: 4,
+  &quot;evidence_count&quot;: 10,
+  &quot;claim_status_summary&quot;: {
+    &quot;unverified&quot;: 10,
+    &quot;asr_uncertain&quot;: 2
+  },
+  &quot;claims&quot;: [
+    {
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;claim_text&quot;: &quot;신뢰할 만한 매체가 Solidigm의 IPO 철회를 단독 보도했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:05&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;해당 없음&quot;,
+        &quot;observed&quot;: &quot;관련 보도와 공식 입장 확인 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;IPO 철회를 확정된 투자 판단 근거로 사용할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;claim_text&quot;: &quot;머스크가 AI 데이터센터 투자로 5~6개월 내 수익 또는 투자금 회수를 언급하고 단기 GPU 임대계약을 선호했으며, 통상 계약은 3년이고 구글은 SpaceX에서 용량을 임대한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:05&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;5~6개월 내 수익 또는 회수; 통상 계약기간 3년&quot;,
+        &quot;observed&quot;: &quot;기간·회수 정의·대표 계약기간을 검증할 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;단기 투자회수와 GPU 임대료 상승을 실적 전망에 반영하기 전에 발언 전문과 계약 조건이 필요하다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;claim_text&quot;: &quot;CoreWeave는 건설한 용량을 즉시 임대할 만큼 수요가 강하며 신용위험의 핵심은 수요보다 과도한 부채다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:05&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;구체적 수치 없음&quot;,
+        &quot;observed&quot;: &quot;차입 및 운영 지표 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;수요위험과 차입·증설위험의 상대적 크기를 현재 자료로 판단할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;claim_text&quot;: &quot;Lam Research의 매출 증가율은 22%, 영업이익률은 40%이며 부품 병목으로 4분기 성장률은 4~5%에 그친 뒤 다음 해 1분기 회복한다. ASML EUV에는 부품 4만 개가 사용되며 장비 부족이 중국 증설을 제한하고 메모리 가격을 지지한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:06:20&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;매출 증가율 22%; 영업이익률 40%; 4분기 성장률 4~5%; EUV 부품 40,000개&quot;,
+        &quot;observed&quot;: &quot;비교 기준·대상 기간·장비 모델별 수치를 대조할 근거 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;장비 실적 수치와 메모리 가격 지지 논리를 검증된 전망으로 사용할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;claim_text&quot;: &quot;삼성전기가 엔비디아 NVSwitch 및 Groq LPU용 FC-BGA를 공급하며, GPU용 기판 진입 시 재평가 가능성이 있다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:06:20&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;영상 기준 ‘어제’ 계약; 수량·금액 미제시&quot;,
+        &quot;observed&quot;: &quot;계약일·당사자·제품·양산 여부 확인 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;NVSwitch·LPU·GPU용 공급을 각각 확인하기 전에는 관련 매출과 재평가를 확정할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;claim_text&quot;: &quot;엔비디아가 Groq을 인수했고 최대 7종 칩을 설계한다. NVL72 구성은 스위치 트레이 9개와 트레이당 칩·기판 4개, 컴퓨팅 트레이 18개 등으로 설명되며 대만의 서버 생산 관리 비중은 90%다.&quot;,
+      &quot;status&quot;: &quot;asr_uncertain&quot;,
+      &quot;confidence&quot;: 0.98,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:12:46&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;최대 7종 칩; 스위치 트레이 9×칩·기판 4; 컴퓨팅 트레이 18; 랙 4×노드 18=72; 대만 비중 90%&quot;,
+        &quot;observed&quot;: &quot;영상 요약의 단위 혼재만 확인되며 공식 구성·거래·점유율 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;불명확한 시스템 수량으로 FC-BGA 수요를 계산하거나 거래 형태를 인수로 확정해서는 안 된다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;claim_text&quot;: &quot;Hopper용 엔비디아 GPU FC-BGA는 이비덴이 100% 공급했고 Blackwell부터 유니미크론이 약 30%를 차지했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:18:52&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;Hopper 이비덴 100%; Blackwell 유니미크론 약 30%&quot;,
+        &quot;observed&quot;: &quot;동일 제품·세대·분모 기준의 공급비중 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;해당 점유율을 경쟁구도나 신규 공급자의 확보 가능 매출 계산에 사용할 근거가 부족하다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;claim_text&quot;: &quot;칩렛 확대와 기판 대면적화·고다층화가 구조적 공급 부족을 만들어 삼성전기·대덕전자·LG이노텍·심텍의 수주와 가격 결정력을 개선한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:18:52&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;정량 수치 없는 구조적 공급 부족·수혜 전망&quot;,
+        &quot;observed&quot;: &quot;업체별 수급·수주·가격 지표 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;산업 전망을 개별 기업의 실적 개선이나 주가 반등으로 일반화할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;claim_text&quot;: &quot;아지노모토 ABF의 세계 점유율은 100%이며 모든 FC-BGA에 사용된다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:25:01&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;세계 점유율 100%; 모든 FC-BGA 적용&quot;,
+        &quot;observed&quot;: &quot;시장 정의·조사 연도·적용 범위를 검증할 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;완전 독점과 보편적 적용을 전제로 가격 결정력이나 수익성을 추정할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C10&quot;,
+      &quot;claim_text&quot;: &quot;구글이 2분기부터 TPU를 외부 판매했고 ‘28일부터’ 대량 판매하며, TPU 판매·GPU 임대료 상승·펀드 및 구조화 금융이 EBITDA와 잉여현금흐름을 개선한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:25:01&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;2분기 판매 시작; ‘28일부터’ 대량 판매; ‘다음 주’ 실적·금융상품 일정&quot;,
+        &quot;observed&quot;: &quot;연도·날짜·실제 판매 및 금융상품 일정 확인 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;판매 형태와 연결·리스·보증·자본지출 처리를 확인하기 전에는 현금흐름 개선을 확정할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C11&quot;,
+      &quot;claim_text&quot;: &quot;메타가 처음으로 잉여현금흐름 적자를 기록했고 실적 후 시간외 상승·정규장 급락했다. 앱 평균 지출은 200달러이며 ‘Muse’ 활성 사용자는 250만 명, 월 소비는 200토큰이다.&quot;,
+      &quot;status&quot;: &quot;asr_uncertain&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:05&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;평균 지출 약 200달러; 활성 사용자 약 250만 명; 사용자당 월 200토큰; 최초 FCF 적자&quot;,
+        &quot;observed&quot;: &quot;서비스·기간·단위·재무 이력을 확인할 근거 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;사용자 수·소비 지표로 수익성을 추정하거나 현금흐름 위험이 작다고 판단할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C12&quot;,
+      &quot;claim_text&quot;: &quot;반도체시장 약세와 삼성전기·기판주의 상승 후 하락, Lam 발표 뒤 마이크론의 상대 선방, Supermicro의 ‘이틀 전’ 예상 밖 실적발표가 있었다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:05&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;‘이틀 전’ 발표; ‘중간선거 일주일 전’; ‘6~7월 고점’&quot;,
+        &quot;observed&quot;: &quot;일별 가격·거래량·발표 일정·녹화일 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;최근 가격 움직임이나 실적 발표를 저점·반등 신호 또는 인과관계의 근거로 사용할 수 없다.&quot;
+    }
+  ],
+  &quot;entities&quot;: [],
+  &quot;evidence&quot;: [
+    {
+      &quot;evidence_id&quot;: &quot;E1&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;SK hynix (KOSE:A000660) Stock Looks Reasonable After Its Huge Run&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/sk-hynix-kose-a000660-stock-221311278.html&quot;,
+      &quot;publisher&quot;: &quot;Simply Wall St.&quot;,
+      &quot;published_at&quot;: &quot;2026-10-23T22:13:11+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;SK hynix (KOSE:A000660) Stock Looks Reasonable After Its Huge Run Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals Weather Newsletters Finance...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E2&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;Stocks to Watch Recap: SK Hynix, Chip Stocks, Kering, SpaceX&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/m/c1f127e8-03cd-35ad-a474-0ccb36f2a07d/stocks-to-watch-recap%3A-sk.html&quot;,
+      &quot;publisher&quot;: &quot;The Wall Street Journal&quot;,
+      &quot;published_at&quot;: &quot;2026-10-23T21:38:08+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Stocks to Watch Recap: SK Hynix, Chip Stocks, Kering, SpaceX Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals Weather Newsletters Finance My p...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E4&quot;,
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;title&quot;: &quot;&#x27;Banker coin&#x27; defies oil shock as gold sinks&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/crypto/articles/banker-coin-defies-oil-shock-213403754.html&quot;,
+      &quot;publisher&quot;: &quot;TheStreet&quot;,
+      &quot;published_at&quot;: &quot;2026-10-23T21:34:03+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;&#x27;Banker coin&#x27; defies oil shock as gold sinks Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals Weather Newsletters Finance My portfolio News Ma...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E5&quot;,
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;title&quot;: &quot;Basic Materials Roundup: Market Talk&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/m/568b1471-14d7-3e79-b025-6556e0c37d0d/basic-materials-roundup%3A.html&quot;,
+      &quot;publisher&quot;: &quot;The Wall Street Journal&quot;,
+      &quot;published_at&quot;: &quot;2026-10-23T21:30:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E6&quot;,
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;title&quot;: &quot;These 2 Neocloud Stocks Could Rebound Over 90%, Say Analysts&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/2-neocloud-stocks-could-rebound-180000561.html&quot;,
+      &quot;publisher&quot;: &quot;TipRanks&quot;,
+      &quot;published_at&quot;: &quot;2026-10-23T18:00:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E7&quot;,
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;title&quot;: &quot;Fastly Jumps 8% as Cloud Rebound Broadens; Nebius Ticks Up, CoreWeave Slips&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/fastly-jumps-8-cloud-rebound-165110835.html&quot;,
+      &quot;publisher&quot;: &quot;24/7 Wall St.&quot;,
+      &quot;published_at&quot;: &quot;2026-10-23T16:51:10+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E9&quot;,
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;title&quot;: &quot;Global Axial Fans Market: Size, Share, Trends, Opportunities, and Forecast, 2021-2031F | AI Data Centers, EC Motors, and EV Cooling Propel Market to US$4.7 B...&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/commodities/articles/global-axial-fans-market-size-143700100.html&quot;,
+      &quot;publisher&quot;: &quot;GlobeNewswire&quot;,
+      &quot;published_at&quot;: &quot;2026-10-23T14:37:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E10&quot;,
+      &quot;claim_id&quot;: &quot;C11&quot;,
+      &quot;title&quot;: &quot;Rio Tinto commits $1.9bn for Queensland’s Kangwinan bauxite project&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/news/rio-tinto-commits-1-9bn-110617532.html&quot;,
+      &quot;publisher&quot;: &quot;Mining Technology&quot;,
+      &quot;published_at&quot;: &quot;2026-10-23T11:06:17+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    }
+  ],
+  &quot;source_policy&quot;: {
+    &quot;raw_transcript_published&quot;: false,
+    &quot;raw_transcript_in_evidence&quot;: false,
+    &quot;research_pipeline_version&quot;: 4,
+    &quot;closed_source_claims&quot;: &quot;unverified_external_source&quot;,
+    &quot;auto_caption_warning&quot;: true,
+    &quot;local_asr_warning&quot;: false
+  }
+}</pre>
+  </details>
+</article>
+</main>
+  <style>
+.reader-contents { margin: 16px 0; padding: 12px 16px; border: 1px solid var(--line, #64748b); border-radius: 12px; }
+.reader-contents > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-weight: 750; }
+.reader-contents nav { display: grid; gap: 4px; max-height: 45vh; overflow: auto; margin: 8px 0; }
+.reader-contents a { display: block; min-height: 44px; padding: 10px; border-radius: 6px; color: inherit; overflow-wrap: anywhere; }
+.reader-contents a:hover { background: #80808020; }
+.reader-contents .reader-subsection { padding-inline-start: 24px; font-size: .92em; }
+.reader-prose, .report { overflow-wrap: anywhere; line-height: 1.8; }
+.reader-prose p, .reader-prose li { max-width: 85ch; }
+.reader-prose h2, .reader-prose h3, .reader-prose h4, [data-reader-heading] { scroll-margin-top: 100px; line-height: 1.45; }
+.reader-prose h2 { margin-top: 1.8em; padding-bottom: 8px; border-bottom: 1px solid var(--line, #64748b); }
+.reader-prose h3 { margin-top: 1.5em; }
+.reader-prose li { margin: .5em 0; }
+.reader-prose pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.reader-prose blockquote { margin: 16px 0; padding: 4px 16px; border-left: 3px solid var(--accent, #64748b); }
+.reader-table { overflow: auto; max-width: 100%; margin: 16px 0; border: 1px solid var(--line, #64748b); border-radius: 10px; }
+.reader-table table { border-collapse: collapse; width: 100%; margin: 0; font-size: .92rem; }
+.reader-table th, .reader-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line, #64748b); min-width: 110px; max-width: 400px; overflow-wrap: anywhere; white-space: normal; }
+.reader-table th { background: #80808018; }
+.reader-table tr:nth-child(even) { background: #80808008; }
+.reader-search { display: grid; gap: 8px; margin: 16px 0; }
+.reader-search label { font-weight: 700; }
+.reader-search input { box-sizing: border-box; width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line, #64748b); border-radius: 10px; background: var(--panel, #fff); color: var(--text, #132238); font: inherit; }
+.reader-search p { margin: 0; font-size: .86rem; }
+.reader-back { position: fixed; bottom: max(14px, env(safe-area-inset-bottom)); right: 14px; z-index: 30; min-height: 44px; border: 1px solid #778899; border-radius: 99px; padding: 10px 16px; background: #18344a; color: #fff; font: 700 14px system-ui; cursor: pointer; box-shadow: 0 3px 12px #0003; }
+[data-reader-source] { margin-top: 20px; }
+[data-reader-source] > summary { min-height: 44px; cursor: pointer; }
+[data-reader-source] pre { font-size: .85rem; }
+[data-reader-source] pre, .reader-prose { min-width: 0; }
+.reader-contents :focus-visible, .reader-search :focus-visible, .reader-back:focus-visible, .reader-table:focus-visible { outline: 3px solid var(--accent, #008c95); outline-offset: 3px; }
+.reader-search + .grid > [hidden] { display: none !important; }
+@media (max-width: 600px) { .reader-prose { font-size: 1rem; } .reader-contents { padding: 8px 12px; } }
+@media print { .reader-back, .reader-search, .reader-contents, [data-reader-source] { display: none !important; } .reader-table { overflow: visible; } .reader-prose { color: #000; background: #fff; } }
+</style><script>
+(() => {
+  'use strict';
+  let serial = 0;
+  const rendered = new WeakMap();
+  const node = (tag, text) => { const el = document.createElement(tag); if (text != null) el.textContent = text; return el; };
+  function inline(parent, text) {
+    const pattern = /(`[^`]+`|\*\*[^*]+\*\*|\[[^\]]+\]\(https?:\/\/[^\s)]+\))/g;
+    let start = 0;
+    for (const match of String(text).matchAll(pattern)) {
+      parent.append(document.createTextNode(text.slice(start, match.index)));
+      const value = match[0];
+      if (value.startsWith('`')) parent.append(node('code', value.slice(1, -1)));
+      else if (value.startsWith('**')) parent.append(node('strong', value.slice(2, -2)));
+      else {
+        const link = value.match(/^\[([^\]]+)\]\((.+)\)$/);
+        const a = node('a', link[1]); a.href = link[2]; a.rel = 'noopener noreferrer'; parent.append(a);
+      }
+      start = match.index + value.length;
+    }
+    parent.append(document.createTextNode(text.slice(start)));
+  }
+  const cells = line => line.trim().replace(/^\|/, '').replace(/\|$/, '').split(/(?<!\\)\|/).map(v => v.trim().replace(/\\\|/g, '|'));
+  function markdown(source) {
+    const article = node('article'); article.className = 'reader-prose';
+    const lines = source.split(/\r?\n/); let list = null;
+    for (let i = 0; i < lines.length; i += 1) {
+      const line = lines[i], value = line.trim();
+      if (!value) { list = null; continue; }
+      if (/^```/.test(value)) {
+        const code = []; i += 1;
+        while (i < lines.length && !/^```/.test(lines[i].trim())) code.push(lines[i++]);
+        const pre = node('pre'); pre.append(node('code', code.join('\n'))); article.append(pre); list = null; continue;
+      }
+      if (i + 1 < lines.length && value.includes('|') && cells(lines[i + 1]).every(v => /^:?-{3,}:?$/.test(v))) {
+        const table = node('table'), head = node('thead'), body = node('tbody');
+        const row = (values, tag) => { const tr = node('tr'); values.forEach(v => { const cell = node(tag); if (tag === 'th') cell.scope = 'col'; inline(cell, v); tr.append(cell); }); return tr; };
+        head.append(row(cells(line), 'th')); i += 2;
+        while (i < lines.length && lines[i].trim() && lines[i].includes('|')) body.append(row(cells(lines[i++]), 'td'));
+        i -= 1; table.append(head, body); article.append(table); list = null; continue;
+      }
+      const heading = value.match(/^(#{1,6})\s+(.+)$/);
+      if (heading) { const h = node('h' + Math.min(4, heading[1].length + 1)); inline(h, heading[2]); article.append(h); list = null; continue; }
+      const bullet = value.match(/^(?:[-*+] |\d+\. )(.+)$/);
+      if (bullet) {
+        const tag = /^\d/.test(value) ? 'ol' : 'ul';
+        if (!list || list.tagName.toLowerCase() !== tag) { list = node(tag); if (tag === 'ol') list.start = parseInt(value, 10); article.append(list); }
+        const li = node('li'); inline(li, bullet[1]); list.append(li); continue;
+      }
+      list = null;
+      if (/^(---+|\*\*\*+)$/.test(value)) { article.append(node('hr')); continue; }
+      const p = node(value.startsWith('> ') ? 'blockquote' : 'p'); inline(p, value.startsWith('> ') ? value.slice(2) : line); article.append(p);
+    }
+    return article;
+  }
+  function contents(root) {
+    root.querySelectorAll(':scope > .reader-contents').forEach(el => el.remove());
+    const headings = [...root.querySelectorAll('h2,h3,h4')].filter(h => !h.closest('.card,.run-card,.reader-contents,[data-reader-source],[hidden]'));
+    if (headings.length < 2) return;
+    const details = node('details'); details.className = 'reader-contents';
+    details.append(node('summary', '이 리포트 목차 · ' + headings.length + '개 항목'));
+    const nav = node('nav'); nav.setAttribute('aria-label', '리포트 목차');
+    headings.forEach(h => {
+      if (!h.id) h.id = 'reader-section-' + (++serial);
+      h.dataset.readerHeading = ''; h.tabIndex = -1;
+      const a = node('a', h.textContent); a.href = '#' + h.id;
+      if (h.tagName !== 'H2') a.className = 'reader-subsection';
+      a.addEventListener('click', event => {
+        event.preventDefault();
+        for (let ancestor = h.parentElement; ancestor; ancestor = ancestor.parentElement) if (ancestor.tagName === 'DETAILS') ancestor.open = true;
+        h.scrollIntoView({block: 'start'}); h.focus({preventScroll: true});
+      }); nav.append(a);
+    });
+    details.append(nav); root.prepend(details);
+  }
+  function enhance(root) {
+    if (!root) return;
+    root.querySelectorAll('pre[data-report-markdown]').forEach(pre => {
+      const previous = rendered.get(pre);
+      if (previous && previous.source === pre.textContent) return;
+      const article = markdown(pre.textContent);
+      if (previous) previous.article.replaceWith(article);
+      else {
+        const details = node('details'); details.dataset.readerSource = '';
+        details.append(node('summary', 'Markdown 원문 보기'));
+        pre.before(article, details); details.append(pre);
+      }
+      rendered.set(pre, {source: pre.textContent, article});
+    });
+    root.querySelectorAll('table').forEach(table => {
+      if (table.closest('.reader-table,.account-table-wrap,.summary-scroll')) return;
+      const wrap = node('div'); wrap.className = 'reader-table'; wrap.tabIndex = 0;
+      wrap.setAttribute('role', 'region'); wrap.setAttribute('aria-label', '리포트 표 · 가로로 스크롤하여 전체 보기');
+      table.before(wrap); wrap.append(table);
+    });
+    root.querySelectorAll('.grid').forEach(grid => {
+      const cards = [...grid.querySelectorAll(':scope > a.card')];
+      if (cards.length < 2 || grid.dataset.readerSearch) return;
+      grid.dataset.readerSearch = 'true';
+      const box = node('div'); box.className = 'reader-search';
+      const input = node('input'); input.type = 'search'; input.placeholder = '제목 · 종목 · 채널 · 키워드'; input.id = 'report-search-' + (++serial);
+      const label = node('label', '리포트 찾기'); label.htmlFor = input.id;
+      const status = node('p'); status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
+      const update = () => {
+        const terms = input.value.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean); let count = 0;
+        cards.forEach(card => { card.hidden = !terms.every(t => card.textContent.toLocaleLowerCase().includes(t)); if (!card.hidden) count += 1; });
+        status.textContent = cards.length + '개 중 ' + count + '개 표시' + (count ? '' : ' · 검색어를 지우거나 다른 키워드를 입력하세요.');
+      };
+      input.addEventListener('input', update); box.append(label, input, status); grid.before(box); update();
+    });
+    contents(root);
+  }
+  window.TradingAgentsReader = {enhance};
+  const main = document.querySelector('main');
+  if (main && !main.hasAttribute('data-reader-dynamic')) enhance(main);
+  if (main) {
+    const top = node('button', '↑ 맨 위'); top.type = 'button'; top.className = 'reader-back'; top.setAttribute('aria-label', '리포트 맨 위로 이동');
+    top.addEventListener('click', () => { const target = document.querySelector('h1') || main; target.tabIndex = -1; target.scrollIntoView({block: 'start'}); target.focus({preventScroll: true}); });
+    document.body.append(top);
+  }
+})();
+</script>
+</body>
+</html>
