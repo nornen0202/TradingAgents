@@ -1,0 +1,3588 @@
+{
+  "schema": "tradingagents.work-context/v1",
+  "surface": "us",
+  "event_id": "us:42e64dffce0d5f26198502c0a2b7787d",
+  "prompt_contract_version": "market-work-v13-us",
+  "prompt_sha256": "281749b3b871d01531e3ceb7377d60bb67ebcaf89d6d8ba3162cb53d38400d7a",
+  "skill_sha256": "4dffe28b3721557cc2517b5afff2f94045832606e71ff61461df969f6abb53c7",
+  "task_manifest_sha256": "c0992fa275c9961bc91c679030c0b4d9b8b06f3d164226776421f1e354b5c22e",
+  "workflow_contract_sha256": "8d06ba979f55f01229636b73bdc643c5b21f326cc270c0e8143f3fd7a3204028",
+  "source_sha256": "4edc4aa61b5da02034cca9ce4bd8d67e75587fd1111f18b33e35f842e87a9efc",
+  "body": {
+    "kind": "market",
+    "market": "US",
+    "session_id": "US:2026-10-22",
+    "source_health": "STALE",
+    "source": {
+      "run_id": "20261023T031942_pre-report-us-overlay",
+      "last_run_at": "2026-10-23T03:20:30.774634+09:00",
+      "status": "success"
+    },
+    "report_mode": "OUTAGE",
+    "current": {
+      "run_id": "20261023T031942_pre-report-us-overlay",
+      "started_at": "2026-10-23T03:19:42.326917+09:00",
+      "run_mode": "overlay_only",
+      "freshness_receipt": {
+        "schema": "tradingagents.source-freshness/v1",
+        "producer_run_id": "20261023T031942_pre-report-us-overlay",
+        "producer_started_at": "2026-10-23T03:19:42.326917+09:00",
+        "producer_finished_at": "2026-10-23T03:20:30.774634+09:00",
+        "analysis_run_id": "20261021T175015_local-scheduler-us-full",
+        "analysis_lineage_status": "RESOLVED",
+        "analysis_completed_at": "2026-10-21T21:13:33.227411+09:00",
+        "analysis_trade_date_oldest": "2026-10-20",
+        "analysis_trade_date_latest": "2026-10-20",
+        "market_data_oldest_at": "2026-10-22T18:19:07+00:00",
+        "market_data_latest_at": "2026-10-22T18:19:07+00:00",
+        "market_data_status": "STALE",
+        "publication_does_not_refresh_inputs": true,
+        "execution_max_age_seconds": 120.0,
+        "research_market_data_status": "UNVERIFIED",
+        "research_market_data_receipts": [
+          {
+            "ticker": "TSM",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "DELL",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "GOOGL",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "AMZN",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "UNH",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "AAPL",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "ABBV",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "PG",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "AMT",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "COST",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "MDT",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "PM",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "TXN",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "NVDA",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "MPWR",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "GEV",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "ETN",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "AVGO",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "LLY",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "MA",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "V",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "BRK-B",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "CVX",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "SHEL",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "XOM",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "SNPS",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "SCCO",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false
+          }
+        ],
+        "research_calendar_verified": true,
+        "latest_regular_close_at": "2026-10-22T20:00:00+00:00",
+        "research_does_not_enable_execution": true
+      },
+      "latest_attempt": {
+        "schema": "tradingagents.analysis-attempt/v1",
+        "run_id": "20261022T231601_local-scheduler-us-full",
+        "market": "US",
+        "run_mode": "full",
+        "started_at": "2026-10-22T23:16:01.094648+09:00",
+        "status": "FAILED",
+        "heartbeat_at": "2026-10-22T14:16:02.087243+00:00",
+        "finished_at": "2026-10-22T14:16:02.087226+00:00",
+        "completed_tickers": null,
+        "error_type": "ValueError"
+      },
+      "latest_completed_analysis": {
+        "run_id": "20261021T175015_local-scheduler-us-full",
+        "status": "success",
+        "finished_at": "2026-10-21T21:44:56.298321+09:00"
+      },
+      "analysis_receipt": {
+        "analysis_run_id": "20261021T175015_local-scheduler-us-full",
+        "decisions": {}
+      },
+      "bundle": {
+        "artifact_type": "decision_bundle",
+        "version": 2,
+        "run_id": "20261023T031942_pre-report-us-overlay",
+        "market": "US",
+        "generated_at": "2026-10-23T03:20:29.770262+09:00",
+        "analysis_source_run_id": "20261023T031302_pre-report-us-overlay",
+        "execution_source_run_id": "20261023T031942_pre-report-us-overlay",
+        "checkpoint": "14:19",
+        "checkpoint_timezone": "America/New_York",
+        "quality": {
+          "report_mode": "OUTAGE",
+          "decision_ready": false,
+          "conditional_strategy_ready": false,
+          "quality_label_ko": "장중 투자 판단 가능",
+          "fresh_row_ratio": 1.0,
+          "conditional_row_ratio": 1.0,
+          "portfolio_membership_omitted": true
+        },
+        "strategy_table": [
+          {
+            "ticker": "TSM",
+            "display_name": "Taiwan Semiconductor Manufacturing",
+            "last_price": 411.71,
+            "market_data_asof": "2026-10-22T18:19:07+00:00",
+            "session_vwap": 415.2087248418454,
+            "vwap_distance_pct": -0.842642418744477,
+            "vwap_position_ko": "VWAP 아래 -0.84%",
+            "relative_volume": 0.6129492632074447,
+            "trading_value": 2054390074.0,
+            "price_change_pct": -4.67,
+            "spread_bps": 3.6433854337444838,
+            "day_high": 421.9099,
+            "day_low": 410.33,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
+            "data_status_ko": "시세 유효기간 만료",
+            "reason_codes_ko": [
+              "support zone failed"
+            ],
+            "quality": {
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
+              "generated_in_current_run": true,
+              "freshness_class": "LIVE_CHECKPOINT",
+              "execution_eligibility": "LIVE_EXECUTION_READY",
+              "row_valid_until": "2026-10-22T18:21:07+00:00",
+              "expired_at_build": true
+            },
+            "display_priority": 1
+          },
+          {
+            "ticker": "DELL",
+            "display_name": "Dell Technologies",
+            "last_price": 452.455,
+            "market_data_asof": "2026-10-22T18:19:07+00:00",
+            "session_vwap": 456.99057541043,
+            "vwap_distance_pct": -0.9924877348633565,
+            "vwap_position_ko": "VWAP 아래 -0.99%",
+            "relative_volume": 0.4792254243406795,
+            "trading_value": 1116366282.0,
+            "price_change_pct": -6.88,
+            "spread_bps": 9.500767794606807,
+            "day_high": 473.01,
+            "day_low": 447.925,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
+            "data_status_ko": "시세 유효기간 만료",
+            "reason_codes_ko": [
+              "support zone failed"
+            ],
+            "quality": {
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
+              "generated_in_current_run": true,
+              "freshness_class": "LIVE_CHECKPOINT",
+              "execution_eligibility": "LIVE_EXECUTION_READY",
+              "row_valid_until": "2026-10-22T18:21:07+00:00",
+              "expired_at_build": true
+            },
+            "display_priority": 2
+          },
+          {
+            "ticker": "GOOGL",
+            "display_name": "Alphabet",
+            "last_price": 324.6,
+            "market_data_asof": "2026-10-22T18:19:07+00:00",
+            "session_vwap": 327.4043354626471,
+            "vwap_distance_pct": -0.8565358362418563,
+            "vwap_position_ko": "VWAP 아래 -0.86%",
+            "relative_volume": 0.6013648617266956,
+            "trading_value": 3471399414.0,
+            "price_change_pct": -3.04,
+            "spread_bps": 0.9241717111030826,
+            "day_high": 331.43,
+            "day_low": 324.0,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
+            "data_status_ko": "시세 유효기간 만료",
+            "reason_codes_ko": [
+              "support zone failed"
+            ],
+            "quality": {
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
+              "generated_in_current_run": true,
+              "freshness_class": "LIVE_CHECKPOINT",
+              "execution_eligibility": "LIVE_EXECUTION_READY",
+              "row_valid_until": "2026-10-22T18:21:07+00:00",
+              "expired_at_build": true
+            },
+            "display_priority": 3
+          },
+          {
+            "ticker": "AMZN",
+            "display_name": "Amazon",
+            "last_price": 250.6,
+            "market_data_asof": "2026-10-22T18:19:07+00:00",
+            "session_vwap": 252.87500135160448,
+            "vwap_distance_pct": -0.8996545089252517,
+            "vwap_position_ko": "VWAP 아래 -0.90%",
+            "relative_volume": 0.7363561273888951,
+            "trading_value": 4911176942.0,
+            "price_change_pct": -4.49,
+            "spread_bps": 0.7980527512872684,
+            "day_high": 258.36,
+            "day_low": 249.85,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
+            "data_status_ko": "시세 유효기간 만료",
+            "reason_codes_ko": [
+              "support zone failed"
+            ],
+            "quality": {
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
+              "generated_in_current_run": true,
+              "freshness_class": "LIVE_CHECKPOINT",
+              "execution_eligibility": "LIVE_EXECUTION_READY",
+              "row_valid_until": "2026-10-22T18:21:07+00:00",
+              "expired_at_build": true
+            },
+            "display_priority": 4
+          },
+          {
+            "ticker": "UNH",
+            "display_name": "UNH",
+            "last_price": 424.88,
+            "market_data_asof": "2026-10-22T18:19:07+00:00",
+            "session_vwap": 424.12359764304614,
+            "vwap_distance_pct": 0.178344794101859,
+            "vwap_position_ko": "VWAP 위 +0.18%",
+            "relative_volume": 0.46685692313742905,
+            "trading_value": 887347998.0,
+            "price_change_pct": 1.89,
+            "spread_bps": 3.765769158349844,
+            "day_high": 426.3999,
+            "day_low": 417.13,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
+            "data_status_ko": "시세 유효기간 만료",
+            "reason_codes_ko": [
+              "risk action level triggered"
+            ],
+            "quality": {
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
+              "generated_in_current_run": true,
+              "freshness_class": "LIVE_CHECKPOINT",
+              "execution_eligibility": "LIVE_EXECUTION_READY",
+              "row_valid_until": "2026-10-22T18:21:07+00:00",
+              "expired_at_build": true
+            },
+            "display_priority": 5
+          },
+          {
+            "ticker": "AAPL",
+            "display_name": "Apple",
+            "last_price": 346.825,
+            "market_data_asof": "2026-10-22T18:19:07+00:00",
+            "session_vwap": 345.1949455052842,
+            "vwap_distance_pct": 0.47221273542397135,
+            "vwap_position_ko": "VWAP 위 +0.47%",
+            "relative_volume": 0.5276081445816757,
+            "trading_value": 5001599640.0,
+            "price_change_pct": 0.82,
+            "spread_bps": 0.2883132234873718,
+            "day_high": 347.28,
+            "day_low": 342.28,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
+            "data_status_ko": "시세 유효기간 만료",
+            "reason_codes_ko": [
+              "relative volume unconfirmed"
+            ],
+            "quality": {
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
+              "generated_in_current_run": true,
+              "freshness_class": "LIVE_CHECKPOINT",
+              "execution_eligibility": "LIVE_EXECUTION_READY",
+              "row_valid_until": "2026-10-22T18:21:07+00:00",
+              "expired_at_build": true
+            },
+            "display_priority": 6
+          },
+          {
+            "ticker": "ABBV",
+            "display_name": "ABBV",
+            "last_price": 284.66,
+            "market_data_asof": "2026-10-22T18:19:07+00:00",
+            "session_vwap": 283.94569714032235,
+            "vwap_distance_pct": 0.2515631921425676,
+            "vwap_position_ko": "VWAP 위 +0.25%",
+            "relative_volume": 0.5210851166160807,
+            "trading_value": 557539586.0,
+            "price_change_pct": -0.05,
+            "spread_bps": 2.4587716679250833,
+            "day_high": 285.36,
+            "day_low": 278.01,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
+            "data_status_ko": "시세 유효기간 만료",
+            "reason_codes_ko": [
+              "relative volume unconfirmed"
+            ],
+            "quality": {
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
+              "generated_in_current_run": true,
+              "freshness_class": "LIVE_CHECKPOINT",
+              "execution_eligibility": "LIVE_EXECUTION_READY",
+              "row_valid_until": "2026-10-22T18:21:07+00:00",
+              "expired_at_build": true
+            },
+            "display_priority": 7
+          },
+          {
+            "ticker": "PG",
+            "display_name": "PG",
+            "last_price": 166.4,
+            "market_data_asof": "2026-10-22T18:19:07+00:00",
+            "session_vwap": 165.6268487671423,
+            "vwap_distance_pct": 0.46680308090911726,
+            "vwap_position_ko": "VWAP 위 +0.47%",
+            "relative_volume": 1.222457469933285,
+            "trading_value": 1371106589.0,
+            "price_change_pct": 6.1,
+            "spread_bps": 1.201923076923692,
+            "day_high": 166.85,
+            "day_low": 161.78,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
+            "data_status_ko": "시세 유효기간 만료",
+            "reason_codes_ko": [
+              "pilot ready",
+              "entry not authorized"
+            ],
+            "quality": {
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
+              "generated_in_current_run": true,
+              "freshness_class": "LIVE_CHECKPOINT",
+              "execution_eligibility": "LIVE_EXECUTION_READY",
+              "row_valid_until": "2026-10-22T18:21:07+00:00",
+              "expired_at_build": true
+            },
+            "display_priority": 8
+          },
+          {
+            "ticker": "AMT",
+            "display_name": "AMT",
+            "last_price": 181.16,
+            "market_data_asof": "2026-10-22T18:19:07+00:00",
+            "session_vwap": 180.5368265891182,
+            "vwap_distance_pct": 0.3451780019929629,
+            "vwap_position_ko": "VWAP 위 +0.35%",
+            "relative_volume": 0.49865248393786005,
+            "trading_value": 212132035.0,
+            "price_change_pct": 1.98,
+            "spread_bps": 9.379051612370192,
+            "day_high": 182.78,
+            "day_low": 177.2,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
+            "data_status_ko": "시세 유효기간 만료",
+            "reason_codes_ko": [
+              "relative volume unconfirmed"
+            ],
+            "quality": {
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
+              "generated_in_current_run": true,
+              "freshness_class": "LIVE_CHECKPOINT",
+              "execution_eligibility": "LIVE_EXECUTION_READY",
+              "row_valid_until": "2026-10-22T18:21:07+00:00",
+              "expired_at_build": true
+            },
+            "display_priority": 9
+          },
+          {
+            "ticker": "COST",
+            "display_name": "Costco Wholesale",
+            "last_price": 1013.96,
+            "market_data_asof": "2026-10-22T18:19:07+00:00",
+            "session_vwap": 1009.7353999116272,
+            "vwap_distance_pct": 0.4183868455778228,
+            "vwap_position_ko": "VWAP 위 +0.42%",
+            "relative_volume": 0.4896337269246872,
+            "trading_value": 829516816.0,
+            "price_change_pct": 1.57,
+            "spread_bps": 1.4793993638580494,
+            "day_high": 1014.66,
+            "day_low": 1001.23,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
+            "data_status_ko": "시세 유효기간 만료",
+            "reason_codes_ko": [
+              "relative volume unconfirmed"
+            ],
+            "quality": {
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
+              "generated_in_current_run": true,
+              "freshness_class": "LIVE_CHECKPOINT",
+              "execution_eligibility": "LIVE_EXECUTION_READY",
+              "row_valid_until": "2026-10-22T18:21:07+00:00",
+              "expired_at_build": true
+            },
+            "display_priority": 10
+          },
+          {
+            "ticker": "MDT",
+            "display_name": "MDT",
+            "last_price": 95.67,
+            "market_data_asof": "2026-10-22T18:19:07+00:00",
+            "session_vwap": 95.24322988539282,
+            "vwap_distance_pct": 0.4480844624029645,
+            "vwap_position_ko": "VWAP 위 +0.45%",
+            "relative_volume": 0.0888321512337489,
+            "trading_value": 218717966.0,
+            "price_change_pct": 2.84,
+            "spread_bps": 1.0448774881135683,
+            "day_high": 96.14,
+            "day_low": 93.12,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
+            "data_status_ko": "시세 유효기간 만료",
+            "reason_codes_ko": [
+              "relative volume unconfirmed"
+            ],
+            "quality": {
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
+              "generated_in_current_run": true,
+              "freshness_class": "LIVE_CHECKPOINT",
+              "execution_eligibility": "LIVE_EXECUTION_READY",
+              "row_valid_until": "2026-10-22T18:21:07+00:00",
+              "expired_at_build": true
+            },
+            "display_priority": 11
+          },
+          {
+            "ticker": "PM",
+            "display_name": "PM",
+            "last_price": 200.655,
+            "market_data_asof": "2026-10-22T18:19:07+00:00",
+            "session_vwap": 200.67660165160652,
+            "vwap_distance_pct": -0.010764409716290668,
+            "vwap_position_ko": "VWAP 아래 -0.01%",
+            "relative_volume": 0.33988652057562146,
+            "trading_value": 226969250.0,
+            "price_change_pct": 1.62,
+            "spread_bps": 5.4820462983735085,
+            "day_high": 201.879,
+            "day_low": 197.0,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
+            "data_status_ko": "시세 유효기간 만료",
+            "reason_codes_ko": [
+              "waiting for trigger"
+            ],
+            "quality": {
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
+              "generated_in_current_run": true,
+              "freshness_class": "LIVE_CHECKPOINT",
+              "execution_eligibility": "LIVE_EXECUTION_READY",
+              "row_valid_until": "2026-10-22T18:21:07+00:00",
+              "expired_at_build": true
+            },
+            "display_priority": 12
+          },
+          {
+            "ticker": "TXN",
+            "display_name": "Texas Instruments",
+            "last_price": 282.74,
+            "market_data_asof": "2026-10-22T18:19:07+00:00",
+            "session_vwap": 282.08784484050676,
+            "vwap_distance_pct": 0.23118867807365717,
+            "vwap_position_ko": "VWAP 위 +0.23%",
+            "relative_volume": 0.9152582433233686,
+            "trading_value": 1061508972.0,
+            "price_change_pct": -0.67,
+            "spread_bps": 9.552956994002223,
+            "day_high": 286.54,
+            "day_low": 276.59,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
+            "data_status_ko": "시세 유효기간 만료",
+            "reason_codes_ko": [
+              "relative volume unconfirmed"
+            ],
+            "quality": {
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
+              "generated_in_current_run": true,
+              "freshness_class": "LIVE_CHECKPOINT",
+              "execution_eligibility": "LIVE_EXECUTION_READY",
+              "row_valid_until": "2026-10-22T18:21:07+00:00",
+              "expired_at_build": true
+            },
+            "display_priority": 13
+          },
+          {
+            "ticker": "NVDA",
+            "display_name": "NVIDIA",
+            "last_price": 212.9201,
+            "market_data_asof": "2026-10-22T18:19:07+00:00",
+            "session_vwap": 214.4682731099667,
+            "vwap_distance_pct": -0.7218657974519593,
+            "vwap_position_ko": "VWAP 아래 -0.72%",
+            "relative_volume": 0.6308128650129853,
+            "trading_value": 10405978950.0,
+            "price_change_pct": -4.08,
+            "spread_bps": 0.9392758183445373,
+            "day_high": 218.88,
+            "day_low": 212.0,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
+            "data_status_ko": "시세 유효기간 만료",
+            "reason_codes_ko": [
+              "waiting for trigger"
+            ],
+            "quality": {
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
+              "generated_in_current_run": true,
+              "freshness_class": "LIVE_CHECKPOINT",
+              "execution_eligibility": "LIVE_EXECUTION_READY",
+              "row_valid_until": "2026-10-22T18:21:07+00:00",
+              "expired_at_build": true
+            },
+            "display_priority": 14
+          },
+          {
+            "ticker": "MPWR",
+            "display_name": "Monolithic Power Systems",
+            "last_price": 1173.07,
+            "market_data_asof": "2026-10-22T18:19:07+00:00",
+            "session_vwap": 1191.5816077640086,
+            "vwap_distance_pct": -1.5535325187458593,
+            "vwap_position_ko": "VWAP 아래 -1.55%",
+            "relative_volume": 0.8726758315766878,
+            "trading_value": 509046046.0,
+            "price_change_pct": -8.59,
+            "spread_bps": 13.215952934154327,
+            "day_high": 1230.415,
+            "day_low": 1166.37,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
+            "data_status_ko": "시세 유효기간 만료",
+            "reason_codes_ko": [
+              "risk action confirmation required"
+            ],
+            "quality": {
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
+              "generated_in_current_run": true,
+              "freshness_class": "LIVE_CHECKPOINT",
+              "execution_eligibility": "LIVE_EXECUTION_READY",
+              "row_valid_until": "2026-10-22T18:21:07+00:00",
+              "expired_at_build": true
+            },
+            "display_priority": 15
+          },
+          {
+            "ticker": "GEV",
+            "display_name": "GE Vernova",
+            "last_price": 824.18,
+            "market_data_asof": "2026-10-22T18:19:07+00:00",
+            "session_vwap": 835.2348086026298,
+            "vwap_distance_pct": -1.32355697927925,
+            "vwap_position_ko": "VWAP 아래 -1.32%",
+            "relative_volume": 1.5948892407642221,
+            "trading_value": 2158985093.0,
+            "price_change_pct": -10.99,
+            "spread_bps": 5.822275053977562,
+            "day_high": 901.0,
+            "day_low": 815.02,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
+            "data_status_ko": "시세 유효기간 만료",
+            "reason_codes_ko": [
+              "risk action close confirmation required"
+            ],
+            "quality": {
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
+              "generated_in_current_run": true,
+              "freshness_class": "LIVE_CHECKPOINT",
+              "execution_eligibility": "LIVE_EXECUTION_READY",
+              "row_valid_until": "2026-10-22T18:21:07+00:00",
+              "expired_at_build": true
+            },
+            "display_priority": 16
+          },
+          {
+            "ticker": "ETN",
+            "display_name": "Eaton",
+            "last_price": 369.57,
+            "market_data_asof": "2026-10-22T18:19:07+00:00",
+            "session_vwap": 368.25604827003775,
+            "vwap_distance_pct": 0.35680384236316254,
+            "vwap_position_ko": "VWAP 위 +0.36%",
+            "relative_volume": 0.9270634905671811,
+            "trading_value": 558143597.0,
+            "price_change_pct": -6.19,
+            "spread_bps": 3.246841094185572,
+            "day_high": 380.65,
+            "day_low": 362.57,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
+            "data_status_ko": "시세 유효기간 만료",
+            "reason_codes_ko": [
+              "risk action close confirmation required"
+            ],
+            "quality": {
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
+              "generated_in_current_run": true,
+              "freshness_class": "LIVE_CHECKPOINT",
+              "execution_eligibility": "LIVE_EXECUTION_READY",
+              "row_valid_until": "2026-10-22T18:21:07+00:00",
+              "expired_at_build": true
+            },
+            "display_priority": 17
+          },
+          {
+            "ticker": "AVGO",
+            "display_name": "Broadcom",
+            "last_price": 325.29,
+            "market_data_asof": "2026-10-22T18:19:07+00:00",
+            "session_vwap": 325.64508325461475,
+            "vwap_distance_pct": -0.10903995572907332,
+            "vwap_position_ko": "VWAP 아래 -0.11%",
+            "relative_volume": 0.5950762216191862,
+            "trading_value": 3075385979.0,
+            "price_change_pct": -3.7,
+            "spread_bps": 3.0743689857646235,
+            "day_high": 330.82,
+            "day_low": 322.06,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
+            "data_status_ko": "시세 유효기간 만료",
+            "reason_codes_ko": [
+              "risk action close confirmation required"
+            ],
+            "quality": {
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
+              "generated_in_current_run": true,
+              "freshness_class": "LIVE_CHECKPOINT",
+              "execution_eligibility": "LIVE_EXECUTION_READY",
+              "row_valid_until": "2026-10-22T18:21:07+00:00",
+              "expired_at_build": true
+            },
+            "display_priority": 18
+          },
+          {
+            "ticker": "LLY",
+            "display_name": "Eli Lilly",
+            "last_price": 1312.455,
+            "market_data_asof": "2026-10-22T18:19:07+00:00",
+            "session_vwap": 1306.4953862437826,
+            "vwap_distance_pct": 0.45615268289247446,
+            "vwap_position_ko": "VWAP 위 +0.46%",
+            "relative_volume": 0.596199788772136,
+            "trading_value": 1325678658.0,
+            "price_change_pct": 3.28,
+            "spread_bps": 7.54340314156079,
+            "day_high": 1321.21,
+            "day_low": 1275.1,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
+            "data_status_ko": "시세 유효기간 만료",
+            "reason_codes_ko": [
+              "close confirmation required"
+            ],
+            "quality": {
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
+              "generated_in_current_run": true,
+              "freshness_class": "LIVE_CHECKPOINT",
+              "execution_eligibility": "LIVE_EXECUTION_READY",
+              "row_valid_until": "2026-10-22T18:21:07+00:00",
+              "expired_at_build": true
+            },
+            "display_priority": 19
+          },
+          {
+            "ticker": "MA",
+            "display_name": "MA",
+            "last_price": 632.375,
+            "market_data_asof": "2026-10-22T18:19:07+00:00",
+            "session_vwap": 628.2749918339657,
+            "vwap_distance_pct": 0.6525817865304706,
+            "vwap_position_ko": "VWAP 위 +0.65%",
+            "relative_volume": 0.6275283283645684,
+            "trading_value": 875165074.0,
+            "price_change_pct": 1.57,
+            "spread_bps": 5.534690650324713,
+            "day_high": 633.2945,
+            "day_low": 623.88,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
+            "data_status_ko": "시세 유효기간 만료",
+            "reason_codes_ko": [
+              "close confirmation required"
+            ],
+            "quality": {
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
+              "generated_in_current_run": true,
+              "freshness_class": "LIVE_CHECKPOINT",
+              "execution_eligibility": "LIVE_EXECUTION_READY",
+              "row_valid_until": "2026-10-22T18:21:07+00:00",
+              "expired_at_build": true
+            },
+            "display_priority": 20
+          },
+          {
+            "ticker": "V",
+            "display_name": "V",
+            "last_price": 413.745,
+            "market_data_asof": "2026-10-22T18:19:07+00:00",
+            "session_vwap": 411.8221536051082,
+            "vwap_distance_pct": 0.46691183999187924,
+            "vwap_position_ko": "VWAP 위 +0.47%",
+            "relative_volume": 0.5262713684999689,
+            "trading_value": 934671148.0,
+            "price_change_pct": 1.45,
+            "spread_bps": 1.4501861072171478,
+            "day_high": 414.6,
+            "day_low": 407.28,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
+            "data_status_ko": "시세 유효기간 만료",
+            "reason_codes_ko": [
+              "close confirmation required"
+            ],
+            "quality": {
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
+              "generated_in_current_run": true,
+              "freshness_class": "LIVE_CHECKPOINT",
+              "execution_eligibility": "LIVE_EXECUTION_READY",
+              "row_valid_until": "2026-10-22T18:21:07+00:00",
+              "expired_at_build": true
+            },
+            "display_priority": 21
+          },
+          {
+            "ticker": "BRK-B",
+            "display_name": "BRK-B",
+            "last_price": 549.65,
+            "market_data_asof": "2026-10-22T18:19:07+00:00",
+            "session_vwap": 547.047484273095,
+            "vwap_distance_pct": 0.47573854221505396,
+            "vwap_position_ko": "VWAP 위 +0.48%",
+            "relative_volume": 0.4667957050149969,
+            "trading_value": 804645033.0,
+            "price_change_pct": 1.98,
+            "spread_bps": 0.9096615149494597,
+            "day_high": 549.94,
+            "day_low": 542.01,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
+            "data_status_ko": "시세 유효기간 만료",
+            "reason_codes_ko": [
+              "close confirmation required"
+            ],
+            "quality": {
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
+              "generated_in_current_run": true,
+              "freshness_class": "LIVE_CHECKPOINT",
+              "execution_eligibility": "LIVE_EXECUTION_READY",
+              "row_valid_until": "2026-10-22T18:21:07+00:00",
+              "expired_at_build": true
+            },
+            "display_priority": 22
+          },
+          {
+            "ticker": "CVX",
+            "display_name": "CVX",
+            "last_price": 226.13,
+            "market_data_asof": "2026-10-22T18:19:07+00:00",
+            "session_vwap": 225.59783403777053,
+            "vwap_distance_pct": 0.23589143242410682,
+            "vwap_position_ko": "VWAP 위 +0.24%",
+            "relative_volume": 0.37027330930518904,
+            "trading_value": 464473003.0,
+            "price_change_pct": -0.29,
+            "spread_bps": 2.211264179730798,
+            "day_high": 228.835,
+            "day_low": 222.86,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
+            "data_status_ko": "시세 유효기간 만료",
+            "reason_codes_ko": [
+              "돌파 후 안착 실패"
+            ],
+            "quality": {
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
+              "generated_in_current_run": true,
+              "freshness_class": "LIVE_CHECKPOINT",
+              "execution_eligibility": "LIVE_EXECUTION_READY",
+              "row_valid_until": "2026-10-22T18:21:07+00:00",
+              "expired_at_build": true
+            },
+            "display_priority": 23
+          },
+          {
+            "ticker": "SHEL",
+            "display_name": "SHEL",
+            "last_price": 105.67,
+            "market_data_asof": "2026-10-22T18:19:07+00:00",
+            "session_vwap": 105.19411967249084,
+            "vwap_distance_pct": 0.4523830124637751,
+            "vwap_position_ko": "VWAP 위 +0.45%",
+            "relative_volume": 0.36627098652683693,
+            "trading_value": 193693091.0,
+            "price_change_pct": 0.29,
+            "spread_bps": 0.9462976105990172,
+            "day_high": 106.63,
+            "day_low": 104.14,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
+            "data_status_ko": "시세 유효기간 만료",
+            "reason_codes_ko": [
+              "돌파 후 안착 실패"
+            ],
+            "quality": {
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
+              "generated_in_current_run": true,
+              "freshness_class": "LIVE_CHECKPOINT",
+              "execution_eligibility": "LIVE_EXECUTION_READY",
+              "row_valid_until": "2026-10-22T18:21:07+00:00",
+              "expired_at_build": true
+            },
+            "display_priority": 24
+          },
+          {
+            "ticker": "XOM",
+            "display_name": "XOM",
+            "last_price": 177.27,
+            "market_data_asof": "2026-10-22T18:19:07+00:00",
+            "session_vwap": 176.741365094552,
+            "vwap_distance_pct": 0.299100838768096,
+            "vwap_position_ko": "VWAP 위 +0.30%",
+            "relative_volume": 0.3344760342887728,
+            "trading_value": 502454492.0,
+            "price_change_pct": -0.46,
+            "spread_bps": 2.256572266726393,
+            "day_high": 180.31,
+            "day_low": 174.63,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
+            "data_status_ko": "시세 유효기간 만료",
+            "reason_codes_ko": [
+              "돌파 후 안착 실패"
+            ],
+            "quality": {
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
+              "generated_in_current_run": true,
+              "freshness_class": "LIVE_CHECKPOINT",
+              "execution_eligibility": "LIVE_EXECUTION_READY",
+              "row_valid_until": "2026-10-22T18:21:07+00:00",
+              "expired_at_build": true
+            },
+            "display_priority": 25
+          },
+          {
+            "ticker": "SNPS",
+            "display_name": "Synopsys",
+            "last_price": 428.49,
+            "market_data_asof": "2026-10-22T18:19:07+00:00",
+            "session_vwap": 434.97570083472453,
+            "vwap_distance_pct": -1.4910489993529286,
+            "vwap_position_ko": "VWAP 아래 -1.49%",
+            "relative_volume": 0.3840390184507398,
+            "trading_value": 325688056.0,
+            "price_change_pct": -5.03,
+            "spread_bps": 10.739633918566406,
+            "day_high": 444.05,
+            "day_low": 427.79,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
+            "data_status_ko": "시세 유효기간 만료",
+            "reason_codes_ko": [
+              "support zone failed"
+            ],
+            "quality": {
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
+              "generated_in_current_run": true,
+              "freshness_class": "LIVE_CHECKPOINT",
+              "execution_eligibility": "LIVE_EXECUTION_READY",
+              "row_valid_until": "2026-10-22T18:21:07+00:00",
+              "expired_at_build": true
+            },
+            "display_priority": 26
+          },
+          {
+            "ticker": "SCCO",
+            "display_name": "SCCO",
+            "last_price": 184.11,
+            "market_data_asof": "2026-10-22T18:19:07+00:00",
+            "session_vwap": 185.15938142834892,
+            "vwap_distance_pct": -0.5667449417111947,
+            "vwap_position_ko": "VWAP 아래 -0.57%",
+            "relative_volume": 1.0147277869658433,
+            "trading_value": 137897079.0,
+            "price_change_pct": -7.05,
+            "spread_bps": 10.314035230572847,
+            "day_high": 190.75,
+            "day_low": 182.51,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
+            "data_status_ko": "시세 유효기간 만료",
+            "reason_codes_ko": [
+              "support zone failed"
+            ],
+            "quality": {
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
+              "generated_in_current_run": true,
+              "freshness_class": "LIVE_CHECKPOINT",
+              "execution_eligibility": "LIVE_EXECUTION_READY",
+              "row_valid_until": "2026-10-22T18:21:07+00:00",
+              "expired_at_build": true
+            },
+            "display_priority": 27
+          }
+        ],
+        "benchmark_context": {},
+        "transmission_scope": {
+          "public_recovery_only": true,
+          "portfolio_membership_omitted": true,
+          "transmitted_research_candidate_count": 27,
+          "raw_codes_omitted": true
+        }
+      },
+      "universe_coverage": {
+        "status": "COMPLETE",
+        "complete": true,
+        "source_run_id": "20261023T031942_pre-report-us-overlay",
+        "ticker_universe_mode": "config_plus_account",
+        "expected_watchlist_count": 27,
+        "missing_watchlist_count": 0,
+        "portfolio_coverage_details_omitted": true
+      }
+    },
+    "last_ready": {
+      "run_id": "20261023T031942_pre-report-us-overlay",
+      "started_at": "2026-10-23T03:19:42.326917+09:00",
+      "same_as_current": true,
+      "same_session": true,
+      "reference_only": false
+    },
+    "supporting_context": {
+      "policy": {
+        "profile": "balanced_external",
+        "material_thesis_effects": [
+          "ranking",
+          "confidence",
+          "position_size_within_existing_risk_limits",
+          "research_priority"
+        ],
+        "supported_evidence_weight": "MEDIUM",
+        "partially_supported_evidence_weight": "LOW_TO_MEDIUM",
+        "unverified_evidence_weight": "LOW_LABELED",
+        "user_primary_channels": [
+          "@kpunch",
+          "@sosumonkey"
+        ],
+        "user_primary_source_tier": "USER_PRIMARY",
+        "user_primary_evidence_weight": "HIGH",
+        "user_primary_validation_policy": "USER_ACCEPTED",
+        "matching_multi_source_signal_may_raise_thesis_priority": true,
+        "conflicting_signal_must_be_visible": true,
+        "may_bypass_market_or_portfolio_execution_gate": false
+      },
+      "youtube": {
+        "source_health": "OK",
+        "coverage": {
+          "total_unique_events": 439,
+          "window_events": 102,
+          "transmitted_events": 12,
+          "truncated": true,
+          "oldest_occurred_at": "2026-10-21T05:08:45+00:00",
+          "newest_occurred_at": "2026-10-22T23:20:08+00:00",
+          "available_events_before_context_cap": 60,
+          "context_event_cap": 12,
+          "omitted_events": 90,
+          "omitted_due_to_context_cap": 48,
+          "omitted_before_context_selection": 42
+        },
+        "events": [
+          {
+            "event_key": "ZPF7UdMncFs",
+            "content_sha256": "1dbeacea617b7a1084207c06a493c14086fbbf77263e727c620f2e04b42eb0bd",
+            "occurred_at": "2026-10-21T09:08:40+00:00",
+            "relevance": {
+              "tickers": [
+                "^KS11",
+                "005930",
+                "000660",
+                "TSM",
+                "NVDA",
+                "MU",
+                "005380",
+                "064350"
+              ],
+              "markets": [
+                "US",
+                "KR"
+              ],
+              "themes": [],
+              "match_basis": "verified_entities",
+              "matched_tickers": [
+                "NVDA",
+                "TSM"
+              ],
+              "market_match": true,
+              "score": 220
+            },
+            "summary": {
+              "video_id": "ZPF7UdMncFs",
+              "title": "\"남은 현금은 '이때' 씁니다\"…손익비 생각하면 흔들려도 지금은 버틸 구간!ㅣ홍선애, 민재기 KB증권 PRIME CLUB 팀장 [여의도 인사이트]",
+              "channel": "삼프로TV 3PROTV",
+              "source_url": "https://www.youtube.com/watch?v=ZPF7UdMncFs",
+              "claim_status_summary": {
+                "unverified": 9,
+                "partially_supported": 2,
+                "asr_uncertain": 1
+              },
+              "claims": [
+                {
+                  "claim_id": "C1",
+                  "claim_text": "하이일드 스프레드 3.33%, 나스닥에 대한 선행성 및 이란 공격 전후 스프레드·주가 움직임",
+                  "status": "unverified",
+                  "confidence": 0.99,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "3.33%나 추세선 하향 돌파를 검증된 매수 신호로 제시할 수 없다."
+                },
+                {
+                  "claim_id": "C2",
+                  "claim_text": "정유시설 훼손·장기 복구에 따른 물가 부담, 한국 유류 가격 상한 및 트럼프 농민지원 약 80억 달러",
+                  "status": "unverified",
+                  "confidence": 0.99,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "미확인 에너지 피해나 지원금 수치를 금리 전망의 확정 근거로 사용하지 않는다."
+                },
+                {
+                  "claim_id": "C3",
+                  "claim_text": "미 국채금리 하락, 주택 매도·매수자 수, 모기지금리·중고차지수 및 FOMC 전망과 한미 차환 취약성 비교",
+                  "status": "unverified",
+                  "confidence": 0.99,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "금리 하락을 위험 완화로 단정하거나 동결 전망을 실제 결정처럼 전달할 수 없다."
+                },
+                {
+                  "claim_id": "C4",
+                  "claim_text": "앤트로픽 창업자의 AI에 따른 2030년 GDP 약 50% 성장 발언과 미국 정부의 AI 투자 지속 동기",
+                  "status": "unverified",
+                  "confidence": 0.99,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "GDP 성장 수치를 확정 전망이나 정부의 AI 투자 보장으로 사용하지 않는다."
+                }
+              ],
+              "entities": [
+                {
+                  "ticker": "^KS11",
+                  "name": "코스피·한국 주식시장",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                },
+                {
+                  "ticker": "005930",
+                  "name": "삼성전자",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "시장 데이터 조회 실패: no_usable_market_fields"
+                  ]
+                },
+                {
+                  "ticker": "000660",
+                  "name": "SK하이닉스·솔리다임",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "시장 데이터 조회 실패: no_usable_market_fields"
+                  ]
+                },
+                {
+                  "ticker": "TSM",
+                  "name": "TSMC",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                },
+                {
+                  "ticker": "NVDA",
+                  "name": "엔비디아",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                },
+                {
+                  "ticker": "MU",
+                  "name": "마이크론",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                },
+                {
+                  "ticker": "005380",
+                  "name": "현대차",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "시장 데이터 조회 실패: no_usable_market_fields"
+                  ]
+                },
+                {
+                  "ticker": "064350",
+                  "name": "현대로템",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "시장 데이터 조회 실패: no_usable_market_fields"
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "event_key": "qNPxRnb0w9g",
+            "content_sha256": "b8a47c4599e41b2170072138a780bf87b2abd7cd1f69be17493da7f6b9e9ce0c",
+            "occurred_at": "2026-10-22T14:00:15+00:00",
+            "relevance": {
+              "tickers": [
+                "^KS11",
+                "005930",
+                "000660",
+                "META",
+                "MSFT",
+                "AMZN"
+              ],
+              "markets": [
+                "US",
+                "KR"
+              ],
+              "themes": [],
+              "match_basis": "verified_entities",
+              "matched_tickers": [
+                "AMZN"
+              ],
+              "market_match": true,
+              "score": 120
+            },
+            "summary": {
+              "video_id": "qNPxRnb0w9g",
+              "title": "코스피 재평가 구간 진입, 하락장 때 매수해야 하는 이유",
+              "channel": "경제사냥꾼",
+              "source_url": "https://www.youtube.com/watch?v=qNPxRnb0w9g",
+              "claim_status_summary": {
+                "unverified": 12
+              },
+              "claims": [
+                {
+                  "claim_id": "C1",
+                  "claim_text": "코스피의 10월 급락·반등, 서킷브레이커·매수 사이드카 발동, 반도체 중심 상승과 동일가중지수 보합, 최고점 대비 하락률 및 7월 저점 비교가 영상 설명과 일치한다는 주장이다.",
+                  "status": "unverified",
+                  "confidence": 0.0,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "급락 폭과 반등의 시장 확산 여부를 확인하기 전에는 바닥 형성이나 시장 전반의 회복으로 판단할 수 없다."
+                },
+                {
+                  "claim_id": "C2",
+                  "claim_text": "FnGuide 기준 코스피 12개월 선행 PER이 5.43배에서 4.41배로 하락했으며 2008년·2020년 위기 때보다 낮다는 주장이다.",
+                  "status": "unverified",
+                  "confidence": 0.0,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "제시된 PER과 위기 당시 배수 비교를 매수 근거로 확정해서는 안 된다."
+                },
+                {
+                  "claim_id": "C3",
+                  "claim_text": "10월 19일 골드만삭스 보고서가 코스피 선행 PER 4.2배, 급락 구간 선행 EPS 0.3% 상승과 역사적 극단 저평가를 제시하고 하락을 투자심리·수급 중심으로 진단했다는 주장이다.",
+                  "status": "unverified",
+                  "confidence": 0.0,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "실적 훼손 없는 배수 축소라는 핵심 전제가 확인되지 않아 재평가 가능성을 확정할 수 없다."
+                },
+                {
+                  "claim_id": "C4",
+                  "claim_text": "2027년 코스피 영업이익 전망은 상승한 반면 올해 및 3분기 전망은 하향됐고, 증권사들이 원화 강세 영향·2027~2028년 이익 신뢰·W자 바닥을 언급했다는 주장이다.",
+                  "status": "unverified",
+                  "confidence": 0.0,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "내년 이익 전망의 유지 여부와 환율 영향을 별도로 확인해야 하며 W자 해석을 반등 예고로 취급할 수 없다."
+                }
+              ],
+              "entities": [
+                {
+                  "ticker": "^KS11",
+                  "name": "코스피",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                },
+                {
+                  "ticker": "005930",
+                  "name": "삼성전자",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "시장 데이터 조회 실패: no_usable_market_fields"
+                  ]
+                },
+                {
+                  "ticker": "000660",
+                  "name": "SK하이닉스",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "시장 데이터 조회 실패: no_usable_market_fields"
+                  ]
+                },
+                {
+                  "ticker": "META",
+                  "name": "메타",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                },
+                {
+                  "ticker": "MSFT",
+                  "name": "마이크로소프트",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                },
+                {
+                  "ticker": "AMZN",
+                  "name": "아마존",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "event_key": "3qFC-2RxSis",
+            "content_sha256": "2cf8a6baae469b3f1418b4837a1a99014724293935e2def860ca3cb15559a7b4",
+            "occurred_at": "2026-10-21T09:00:22+00:00",
+            "relevance": {
+              "tickers": [
+                "005930",
+                "005935",
+                "000660",
+                "MU",
+                "META",
+                "AAPL"
+              ],
+              "markets": [
+                "KR",
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "verified_entities",
+              "matched_tickers": [
+                "AAPL"
+              ],
+              "market_match": true,
+              "score": 120
+            },
+            "summary": {
+              "video_id": "3qFC-2RxSis",
+              "title": "삼성전자 HBM4 대반격 시작..  SK하이닉스 독주 끝나나 / 영업이익 500조 가능할까? ㅣ메리츠증권 이화진 차장",
+              "channel": "815Money talk",
+              "source_url": "https://www.youtube.com/watch?v=3qFC-2RxSis",
+              "claim_status_summary": {
+                "unverified": 7,
+                "asr_uncertain": 4
+              },
+              "claims": [
+                {
+                  "claim_id": "C1",
+                  "claim_text": "범용 메모리 가격 상승과 실적 격차 확대를 근거로 삼성전자를 우선하며, 삼성 매출 370조~400조 원과 양사 분기 실적 및 이익 300조·450조·500조 원을 언급했다.",
+                  "status": "unverified",
+                  "confidence": 0.05,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "삼성전자 우선 의견은 출연자의 투자 견해다. 제시된 이익 수치를 확정 실적이나 가치평가의 검증된 입력값으로 사용할 수 없다."
+                },
+                {
+                  "claim_id": "C2",
+                  "claim_text": "삼성 HBM4 수율이 예상보다 양호하고 하이닉스에는 수율·Solidigm 우려가 있으며, 공급 점유율 변화와 삼성의 추월 가능성이 있다고 주장했다.",
+                  "status": "unverified",
+                  "confidence": 0.04,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "삼성의 점유율 확대나 하이닉스의 경쟁력 저하를 확인된 사실로 반영할 수 없다. 고객 인증·양산·출하와 실제 수율을 구분해야 한다."
+                },
+                {
+                  "claim_id": "C3",
+                  "claim_text": "삼성의 2027~2028년 FCF 50% 환원과 대규모 매입·배당, 하이닉스의 150조 중 40조 사용 및 110조 잔여 계산을 제시했다.",
+                  "status": "asr_uncertain",
+                  "confidence": 0.02,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "배당수익률이나 환원 규모를 계산할 근거로 사용할 수 없다. 승인된 정책과 출연자 추정을 먼저 분리해야 한다."
+                },
+                {
+                  "claim_id": "C4",
+                  "claim_text": "삼성 우선주 배당의 4대 1·8대 1 비율, 운용사 서한과 우선주 관련 검토, 상속주식 및 다음 해 소득세 50%·분리과세를 언급했다.",
+                  "status": "asr_uncertain",
+                  "confidence": 0.01,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "우선주 배당 확대나 개인 세금 동기를 투자 근거로 확정할 수 없다."
+                }
+              ],
+              "entities": [
+                {
+                  "ticker": "005930",
+                  "name": "삼성전자",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "시장 데이터 조회 실패: no_usable_market_fields"
+                  ]
+                },
+                {
+                  "ticker": "005935",
+                  "name": "삼성전자 우선주",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "시장 데이터 조회 실패: no_usable_market_fields"
+                  ]
+                },
+                {
+                  "ticker": "000660",
+                  "name": "SK하이닉스",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "시장 데이터 조회 실패: no_usable_market_fields"
+                  ]
+                },
+                {
+                  "ticker": "MU",
+                  "name": "마이크론",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                },
+                {
+                  "ticker": "META",
+                  "name": "메타",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                },
+                {
+                  "ticker": "AAPL",
+                  "name": "애플·모바일 메모리 수요",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "event_key": "AVqXPwaziYo",
+            "content_sha256": "a2a18fb19c758fda7c00a301d0ec1a34fffdf497bcd852656a8a39101e4b00f3",
+            "occurred_at": "2026-10-21T21:57:56+00:00",
+            "relevance": {
+              "tickers": [
+                "CL=F",
+                "META",
+                "TSLA",
+                "LRCX",
+                "TXN",
+                "NVDA",
+                "009150"
+              ],
+              "markets": [
+                "US",
+                "KR"
+              ],
+              "themes": [],
+              "match_basis": "verified_entities",
+              "matched_tickers": [
+                "NVDA",
+                "TXN"
+              ],
+              "market_match": true,
+              "score": 220
+            },
+            "summary": {
+              "video_id": "AVqXPwaziYo",
+              "title": "메타, 소송 비용 반영에도 서프라이즈…테슬라, FSD 호조에 마진 개선 [월가 뉴스레터]",
+              "channel": "삼프로TV 3PROTV",
+              "source_url": "https://www.youtube.com/watch?v=AVqXPwaziYo",
+              "claim_status_summary": {
+                "unverified": 8,
+                "asr_uncertain": 3,
+                "partially_supported": 1
+              },
+              "claims": [
+                {
+                  "claim_id": "C1",
+                  "claim_text": "나스닥 1% 이상, 팔란티어 4.7~4.8%, 테슬라 3.4%, 맥스리니어 약 3%, 루멘텀 약 3.4% 상승과 비트코인 84,600달러 도달, 네오클라우드 상대 부진 및 다음 날 실적 일정 주장.",
+                  "status": "unverified",
+                  "confidence": 0.15,
+                  "supporting_evidence_ids": [
+                    "E5"
+                  ],
+                  "manual_check_required": true,
+                  "investor_implication": "제시된 수익률과 업종 확산을 확인된 시장 데이터로 인용하거나 다음 날 실적 일정에 근거한 거래에 사용하기 어렵다."
+                },
+                {
+                  "claim_id": "C2",
+                  "claim_text": "평화회담·이란 중재 가능성, 미국 원유 재고의 예상 초과 감소와 비축유 방출·중동 수출 회복, 유가 약 97달러, 미국 금리 5~5.1%, 프랑스 금리의 2002년 이후 첫 5% 돌파 및 8월 외국인 미국 국채 보유 증가 주장.",
+                  "status": "unverified",
+                  "confidence": 0.15,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "원유 가격의 대략적인 수준만 참고할 수 있으며, 외교 진전이나 금리 위험을 확정된 투자 전제로 삼을 근거는 부족하다."
+                },
+                {
+                  "claim_id": "C3",
+                  "claim_text": "앤트로픽의 금요일 IPO 서류 공개·11월 상장 추진에 관한 세 소식통 보도, OpenAI·Google Cloud AI 배포 계약, 트럼프의 데이터센터 지역 배당금 제안 및 네비우스 CEO 반응 주장.",
+                  "status": "unverified",
+                  "confidence": 0.05,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "IPO 일정, 클라우드 매출 기회와 데이터센터 보상 비용을 확정된 촉매나 비용으로 반영할 수 없다."
+                },
+                {
+                  "claim_id": "C4",
+                  "claim_text": "켄 그리핀의 AI 버블 경고와 야데니 리서치의 버블 조건 83점·붕괴 촉발 요인 34점·유사 국면의 2년 내 약세장 비중 9%·평균 수익률 18% 인용 주장.",
+                  "status": "unverified",
+                  "confidence": 0.05,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "9%를 현재 시장의 약세장 확률로, 18%를 향후 기대수익률로 사용해서는 안 된다."
+                }
+              ],
+              "entities": [
+                {
+                  "ticker": "CL=F",
+                  "name": "원유·지정학·국채",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                },
+                {
+                  "ticker": "META",
+                  "name": "메타",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                },
+                {
+                  "ticker": "TSLA",
+                  "name": "테슬라",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                },
+                {
+                  "ticker": "LRCX",
+                  "name": "램리서치",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                },
+                {
+                  "ticker": "TXN",
+                  "name": "텍사스인스트루먼트",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                },
+                {
+                  "ticker": "NVDA",
+                  "name": "엔비디아",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                },
+                {
+                  "ticker": "009150",
+                  "name": "삼성전기·이비덴",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "시장 데이터 조회 실패: no_usable_market_fields"
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "event_key": "kGsdIHtqmlg",
+            "content_sha256": "22efa4ddc9eef04921ed8195c55bf05c8022678fb92781746ca0e878aff5b4bd",
+            "occurred_at": "2026-10-22T23:20:08+00:00",
+            "relevance": {
+              "tickers": [
+                "000660",
+                "009150",
+                "NVDA"
+              ],
+              "markets": [
+                "KR",
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "verified_entities",
+              "matched_tickers": [
+                "NVDA"
+              ],
+              "market_match": true,
+              "score": 120
+            },
+            "summary": {
+              "video_id": "kGsdIHtqmlg",
+              "title": "SK하이닉스, 솔리다임 IPO 검토 중단…주주의견 수용 | 삼성전기 공장 만드는데 테슬라·엔비디아서 3.6조 댄다 | 권순우 삼프로TV 취재팀장 [뉴스3]",
+              "channel": "삼프로TV 3PROTV",
+              "source_url": "https://www.youtube.com/watch?v=kGsdIHtqmlg",
+              "claim_status_summary": {
+                "partially_supported": 2,
+                "unverified": 9,
+                "asr_uncertain": 1
+              },
+              "claims": [
+                {
+                  "claim_id": "C1",
+                  "claim_text": "SK하이닉스가 솔리다임 IPO 추진 검토와 프리 IPO 자금조달을 중단했으며 주주 의견, 중복상장 할인 우려와 시장 변동성을 고려했다.",
+                  "status": "partially_supported",
+                  "confidence": 0.88,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "중단 보도에는 근거가 있으나 공식 공시 본문과 대체 조달계획 확인 전 주주환원 확대나 주가 반등을 확정할 수 없다."
+                },
+                {
+                  "claim_id": "C2",
+                  "claim_text": "엔터프라이즈 SSD 수요로 솔리다임 실적이 증가했고 기존 시설의 한계와 중국 장비 반입 제약 때문에 미국 신규 생산시설 및 대체 자금조달이 필요하다.",
+                  "status": "unverified",
+                  "confidence": 0.99,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "실적 성장과 미국 증설을 확인된 투자 전제로 삼을 수 없다. 실제 투자비와 조달조건이 주주가치 판단의 핵심이다."
+                },
+                {
+                  "claim_id": "C3",
+                  "claim_text": "중복상장을 하려면 투자자 보호 관련 다섯 가지 조건을 충족해야 한다.",
+                  "status": "unverified",
+                  "confidence": 0.99,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "해당 발언을 솔리다임의 상장 가능 여부나 모회사 주주의 보상 권리를 판단하는 근거로 사용할 수 없다."
+                },
+                {
+                  "claim_id": "C4",
+                  "claim_text": "테슬라가 1.1조 원, 엔비디아가 2.6조 원을 삼성전기 FC-BGA 공장에 지원하고 2029~2033년 물량을 확보한다. 제목의 총액은 3.6조 원이다.",
+                  "status": "unverified",
+                  "confidence": 0.98,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "3.6조 원 또는 3.7조 원을 확정 투자유치액으로 제시하면 안 된다. 상환·공급 의무와 공장 소유권 확인 없이 투자비 부담 소멸을 추정할 수 없다."
+                }
+              ],
+              "entities": [
+                {
+                  "ticker": "000660",
+                  "name": "SK하이닉스·솔리다임",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "시장 데이터 조회 실패: no_usable_market_fields"
+                  ]
+                },
+                {
+                  "ticker": "009150",
+                  "name": "삼성전기",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "시장 데이터 조회 실패: no_usable_market_fields"
+                  ]
+                },
+                {
+                  "ticker": "NVDA",
+                  "name": "엔비디아",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "event_key": "2oMNRHt-mLg",
+            "content_sha256": "c66288bd0c2900af46f0cc5071b2c9f5f61905e1aea84a4f6afc3277e9530a57",
+            "occurred_at": "2026-10-22T10:00:22+00:00",
+            "relevance": {
+              "tickers": [
+                "^KS11",
+                "NVDA"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "verified_entities",
+              "matched_tickers": [
+                "NVDA"
+              ],
+              "market_match": true,
+              "score": 120
+            },
+            "summary": {
+              "video_id": "2oMNRHt-mLg",
+              "title": "[#긴급인터뷰]  “외국인 매도 폭탄 언제 끝나나?” 끝없이 추락하는 한국증시… 큰 돈이 다시 몰려올 결정적 신호는 ‘이것’ ㅣ우리은행 WM그룹 박석현 부부장",
+              "channel": "815Money talk",
+              "source_url": "https://www.youtube.com/watch?v=2oMNRHt-mLg",
+              "claim_status_summary": {
+                "unverified": 9,
+                "partially_supported": 1,
+                "asr_uncertain": 2
+              },
+              "claims": [
+                {
+                  "claim_id": "C1",
+                  "claim_text": "블랙록이 3개월 만에 신흥국 주식 비중 확대를 권고하고 한국·대만 AI 반도체를 지목했다.",
+                  "status": "unverified",
+                  "confidence": 0.99,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "해당 발언을 블랙록의 확인된 투자 권고나 실제 한국 주식 매수로 인용하지 않는다."
+                },
+                {
+                  "claim_id": "C2",
+                  "claim_text": "외국인은 지난주까지 한국보다 대만에서 더 많이 매도했고 인도에서도 매도했다. 삼성전자는 상반기 마이크론과 유사하게 움직였지만 이후 더 크게 하락했다.",
+                  "status": "unverified",
+                  "confidence": 0.99,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "외국인 이탈 규모와 삼성전자 상대 부진의 원인을 확정하지 않는다."
+                },
+                {
+                  "claim_id": "C3",
+                  "claim_text": "상반기에는 국내 자금이 외국인 매도를 흡수했으나 현재 유입 주체가 부족하다. 경제 전체의 자금 고갈보다 금융시장 내 순환 부진이며 수익 기대 회복 시 자금이 돌아올 수 있다.",
+                  "status": "unverified",
+                  "confidence": 0.99,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "자금 재유입은 확인된 전환 신호가 아니라 조건부 전망으로 취급한다."
+                },
+                {
+                  "claim_id": "C4",
+                  "claim_text": "증시안정기금의 직접 효과는 제한적이지만 관련 논의는 과거 시장 저점 부근에서 등장했다.",
+                  "status": "partially_supported",
+                  "confidence": 0.9,
+                  "supporting_evidence_ids": [
+                    "E3",
+                    "E4"
+                  ],
+                  "manual_check_required": true,
+                  "investor_implication": "증안펀드 논의만으로 현재 바닥이나 정책 효과를 확정하지 않는다."
+                }
+              ],
+              "entities": [
+                {
+                  "ticker": "^KS11",
+                  "name": "한국 증시·투자자 유동성",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                },
+                {
+                  "ticker": "NVDA",
+                  "name": "엔비디아",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "event_key": "V4qrg5Jse-0",
+            "content_sha256": "1786eef2decedbd2bf9328e26e7de2cdbc3821f6800d8fcc608aeab7be2cbc95",
+            "occurred_at": "2026-10-22T02:11:16+00:00",
+            "relevance": {
+              "tickers": [
+                "META",
+                "TSLA",
+                "NVDA"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "verified_entities",
+              "matched_tickers": [
+                "NVDA"
+              ],
+              "market_match": true,
+              "score": 120
+            },
+            "summary": {
+              "video_id": "V4qrg5Jse-0",
+              "title": "“메타·테슬라 호실적에도 한국증시는 왜 하락하나?”  빅테크 깜짝 실적보다 무서운 악재가 있나? | 이주연 대표",
+              "channel": "815Money talk",
+              "source_url": "https://www.youtube.com/watch?v=V4qrg5Jse-0",
+              "claim_status_summary": {
+                "unverified": 10,
+                "asr_uncertain": 2
+              },
+              "claims": [
+                {
+                  "claim_id": "C1",
+                  "claim_text": "미국 주요 지수·반도체주·한국 ETF가 제시된 비율로 상승했으며, 실적 발표 후와 영상 진행 중 주가가 반전했다는 주장이다. LRCX·TXN 실적 평가도 포함한다.",
+                  "status": "unverified",
+                  "confidence": 0.02,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "제시된 등락률과 실적 평가를 한국 증시 방향의 검증된 선행 신호로 사용하기 어렵다. 한국 증시 하락 원인도 확인되지 않았다."
+                },
+                {
+                  "claim_id": "C2",
+                  "claim_text": "푸틴의 3자 평화회담 원칙적 동의와 미국·이란 협상 진전으로 유가가 하락 전환했고 미국 10년물 금리는 안정적이었다는 주장이다.",
+                  "status": "unverified",
+                  "confidence": 0.0,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "지정학적 위험 완화나 유가 하락을 확인된 투자 전제로 삼을 수 없다."
+                },
+                {
+                  "claim_id": "C3",
+                  "claim_text": "메타의 매출·EPS·FCF가 예상을 웃돌았고 매출 및 CAPEX 가이던스가 상향됐으며 소송 벌금이 33조 원이라는 주장이다.",
+                  "status": "unverified",
+                  "confidence": 0.03,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "실적 서프라이즈와 투자 회수 개선을 구분하고, 소송 충당금·확정 벌금·현금 지급의 성격을 확인해야 한다."
+                },
+                {
+                  "claim_id": "C4",
+                  "claim_text": "메타 AI 비서 ‘뮤즈’의 이용자가 빠르게 늘고 수익화가 추진되며, AI 투자 확대가 심텍·삼성전기·대덕전자의 직접 수혜로 이어진다는 주장이다.",
+                  "status": "asr_uncertain",
+                  "confidence": 0.0,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "제품명 복원과 공급관계 확인 전에는 이용자 성장이나 국내 기판주 직접 수혜를 투자 근거로 채택하기 어렵다."
+                }
+              ],
+              "entities": [
+                {
+                  "ticker": "META",
+                  "name": "메타",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                },
+                {
+                  "ticker": "TSLA",
+                  "name": "테슬라",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                },
+                {
+                  "ticker": "NVDA",
+                  "name": "엔비디아",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "event_key": "_lnx0OrZydU",
+            "content_sha256": "6b13c1a11a9a9c42f1d9444a5a3090bab0c9e1326bcce7b2c82d75c6bc057edc",
+            "occurred_at": "2026-10-22T00:16:42+00:00",
+            "relevance": {
+              "tickers": [
+                "^KS11",
+                "005930",
+                "000660",
+                "META",
+                "NVDA"
+              ],
+              "markets": [
+                "US",
+                "KR"
+              ],
+              "themes": [],
+              "match_basis": "verified_entities",
+              "matched_tickers": [
+                "NVDA"
+              ],
+              "market_match": true,
+              "score": 120
+            },
+            "summary": {
+              "video_id": "_lnx0OrZydU",
+              "title": "방향 잃은 코스피…앞으로 3주가 고비, 시장 대응 전략은? | 박병창 MP파트너스 대표 [마켓 인사이드]",
+              "channel": "삼프로TV 3PROTV",
+              "source_url": "https://www.youtube.com/watch?v=_lnx0OrZydU",
+              "claim_status_summary": {
+                "unverified": 8,
+                "asr_uncertain": 4
+              },
+              "claims": [
+                {
+                  "claim_id": "C1",
+                  "claim_text": "전일 코스피 장중 +4.7%·종가 +3.3%, 삼성전자·SK하이닉스 약 +7% 또는 +5% 상승 및 주요 지수·종목·레버리지 ETF의 고점 대비 급락 주장.",
+                  "status": "unverified",
+                  "confidence": 0.99,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "제시된 낙폭을 저평가나 매수 근거로 사용하기 전에 거래일·가격 단위·ETF 종목을 확인해야 한다."
+                },
+                {
+                  "claim_id": "C2",
+                  "claim_text": "최근 일주일 ETF 거래 상위와 개인 순매수 상위가 지수·레버리지에 집중됐고, 급락 이후 거래 위축과 바이오의 일시적 반등이 나타났다는 주장.",
+                  "status": "unverified",
+                  "confidence": 0.99,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "거래 순위만으로 투자자 방향성이나 바이오 순환매 지속성을 판단할 수 없다."
+                },
+                {
+                  "claim_id": "C3",
+                  "claim_text": "삼성전자 외국인 4거래일 연속 순매수와 SK하이닉스의 장기 매도 후 첫 순매수, 외국인 매도 규모에 따른 시장 반응을 근거로 매도 정점 통과 가능성을 제시한다.",
+                  "status": "unverified",
+                  "confidence": 0.99,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "외국인 매도 정점이나 추세 전환을 확인된 사실로 제시할 수 없다."
+                },
+                {
+                  "claim_id": "C4",
+                  "claim_text": "10월 22일 기준 다음 주 FOMC, 그다음 주 미국 선거이며 선거 다음 주까지 약 3주가 경계 기간이라는 설명.",
+                  "status": "unverified",
+                  "confidence": 0.99,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "공식 일정을 확인하기 전에는 특정 주간에 맞춘 포지션 조정의 근거로 사용할 수 없다."
+                }
+              ],
+              "entities": [
+                {
+                  "ticker": "^KS11",
+                  "name": "코스피·국내 지수 ETF",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                },
+                {
+                  "ticker": "005930",
+                  "name": "삼성전자",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "시장 데이터 조회 실패: no_usable_market_fields"
+                  ]
+                },
+                {
+                  "ticker": "000660",
+                  "name": "SK하이닉스",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "시장 데이터 조회 실패: no_usable_market_fields"
+                  ]
+                },
+                {
+                  "ticker": "META",
+                  "name": "메타·자막상 '뮤즈' AI 서비스",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                },
+                {
+                  "ticker": "NVDA",
+                  "name": "엔비디아",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "event_key": "nfaSBwzGV40",
+            "content_sha256": "6f80bc1a83e71be67c27d350c7ec18fb63144cab577e4fd14c883e0056c7291e",
+            "occurred_at": "2026-10-21T23:12:13+00:00",
+            "relevance": {
+              "tickers": [
+                "TSLA",
+                "CRWV",
+                "NVDA"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "verified_entities",
+              "matched_tickers": [
+                "NVDA"
+              ],
+              "market_match": true,
+              "score": 120
+            },
+            "summary": {
+              "video_id": "nfaSBwzGV40",
+              "title": "테슬라-스페이스X 합병 공식화…'코어위브 사태' 불 껐다 | K-전기차 위기에 '세액공제' 카드 꺼낸 여야 | 권순우 삼프로TV 취재팀장 [뉴스3]",
+              "channel": "삼프로TV 3PROTV",
+              "source_url": "https://www.youtube.com/watch?v=nfaSBwzGV40",
+              "claim_status_summary": {
+                "unverified": 10,
+                "partially_supported": 1,
+                "asr_uncertain": 1
+              },
+              "claims": [
+                {
+                  "claim_id": "C1",
+                  "claim_text": "머스크가 테슬라·스페이스X 결합의 장점을 언급했으며 두 회사가 합병을 추진한다. 스페이스X 존속과 주식교환 방식은 예상이다.",
+                  "status": "unverified",
+                  "confidence": 0.25,
+                  "supporting_evidence_ids": [
+                    "E1"
+                  ],
+                  "manual_check_required": true,
+                  "investor_implication": "제목의 합병 공식화를 확정 거래로 받아들이거나 인수 프리미엄을 기정사실화할 근거가 부족하다."
+                },
+                {
+                  "claim_id": "C2",
+                  "claim_text": "스페이스X 기업가치 2.01조 달러와 테슬라 시가총액 1.48조 달러를 합산하면 3.49조 달러이며, 테슬라 인수가격 480·550달러와 머스크 보상안 약 1조 달러가 거론된다.",
+                  "status": "partially_supported",
+                  "confidence": 0.4,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "시장 규모에 대한 일부 수치만 근접 확인된다. 480·550달러는 확정 매수가격이나 검증된 합병 조건으로 사용할 수 없다."
+                },
+                {
+                  "claim_id": "C3",
+                  "claim_text": "스페이스X·xAI가 이미 합병했고 SI 부문 매출과 영업이익이 급증했으며 투자회수기간이 1년 미만이다.",
+                  "status": "unverified",
+                  "confidence": 0.05,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "해당 수치를 AI 클라우드 산업 전체의 수익성이나 신속한 투자회수의 실증 근거로 사용할 수 없다."
+                },
+                {
+                  "claim_id": "C4",
+                  "claim_text": "앤트로픽이 데이터센터 품질 때문에 다른 공급자보다 xAI에 더 많은 돈을 지불한다는 메타 관계자의 전언이다.",
+                  "status": "unverified",
+                  "confidence": 0.02,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "xAI의 기술 우위·가격 결정력·고객 매출 추정에 반영하기 어렵다."
+                }
+              ],
+              "entities": [
+                {
+                  "ticker": "TSLA",
+                  "name": "테슬라",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                },
+                {
+                  "ticker": "CRWV",
+                  "name": "코어위브·AI 데이터센터",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                },
+                {
+                  "ticker": "NVDA",
+                  "name": "엔비디아",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "event_key": "KLY4_VCgqe4",
+            "content_sha256": "98289ca6a1fc9bb76f9e34e7381251912ba176b16788eaf7cc19f653e1b23aa2",
+            "occurred_at": "2026-10-21T22:53:03+00:00",
+            "relevance": {
+              "tickers": [
+                "005930/000660",
+                "TSLA",
+                "META",
+                "STX/WDC/MU",
+                "LRCX/AMAT/ASML",
+                "009150",
+                "NVDA",
+                "GOOGL/AMZN/MSFT"
+              ],
+              "markets": [
+                "US",
+                "KR"
+              ],
+              "themes": [],
+              "match_basis": "verified_entities",
+              "matched_tickers": [
+                "NVDA"
+              ],
+              "market_match": true,
+              "score": 120
+            },
+            "summary": {
+              "video_id": "KLY4_VCgqe4",
+              "title": "\"지금은 분할 매수할 타이밍\"…삼성전자·SK하이닉스 반등, 다음 주 빅테크 실적에 달렸다? | 김장열 유니스토리자산운용 리서치센터 센터장 [글로벌 인터뷰]",
+              "channel": "삼프로TV 3PROTV",
+              "source_url": "https://www.youtube.com/watch?v=KLY4_VCgqe4",
+              "claim_status_summary": {
+                "unverified": 7,
+                "partially_supported": 2,
+                "asr_uncertain": 1
+              },
+              "claims": [
+                {
+                  "claim_id": "C1",
+                  "claim_text": "SK하이닉스가 2% 넘게 반등했으며, AI 자금조달 악재의 선반영과 PBR 평가를 고려하면 현재는 분할 매수 구간이라는 평가다.",
+                  "status": "unverified",
+                  "confidence": 0.98,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "반등률과 밸류에이션을 확인하기 전에는 영상의 매수 의견을 검증된 저점 신호로 사용하기 어렵다."
+                },
+                {
+                  "claim_id": "C2",
+                  "claim_text": "스페이스X와 연결된 AI 사업의 매출 비중은 52%, 투자 비중은 82%이며, 컴퓨팅 용량이 연말 3GW에서 다음 해 13GW 또는 조건부 20GW로 확대되고 투자 회수는 1년 이내에서 6개월까지 단축될 수 있다는 주장이다.",
+                  "status": "unverified",
+                  "confidence": 0.99,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "공식 투자 계획과 구매·전력 확보 근거 없이 이 수치를 GPU·메모리 주문 증가로 환산하기 어렵다."
+                },
+                {
+                  "claim_id": "C3",
+                  "claim_text": "테슬라의 실적 호조가 FSD 보급과 마진 개선에 기인하며, 스페이스X와의 합병 기대 및 테슬라 주당 400~500달러 환산 가치가 거론된다는 주장이다.",
+                  "status": "partially_supported",
+                  "confidence": 0.9,
+                  "supporting_evidence_ids": [
+                    "E7"
+                  ],
+                  "manual_check_required": true,
+                  "investor_implication": "결합 가능성에 대한 보도와 실제 합병·가치 산정을 분리해야 한다. 400~500달러는 검증된 목표주가가 아니다."
+                },
+                {
+                  "claim_id": "C4",
+                  "claim_text": "메타 매출이 약 26% 증가했고 법률비용 조정 후 EPS가 양호했으며, 투자 가이던스 하단이 1,300억에서 1,350억 달러로 상승했지만 상단은 유지됐다. 시간외 주가는 약 3% 상승했고 이전 2분기 FCF 마진은 약 1%였다는 주장이다.",
+                  "status": "unverified",
+                  "confidence": 0.98,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "투자 확대의 현금흐름 부담과 시장의 수용 여부는 공식 실적표·가이던스·동일 세션 가격으로 확인해야 한다."
+                }
+              ],
+              "entities": [
+                {
+                  "ticker": "005930/000660",
+                  "name": "삼성전자·SK하이닉스",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "시장 데이터 조회 실패: Failed to parse json response from Yahoo Finance: {'code': 'Not Found', 'description': 'HTTP 404 Not Found'}"
+                  ]
+                },
+                {
+                  "ticker": "TSLA",
+                  "name": "테슬라",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                },
+                {
+                  "ticker": "META",
+                  "name": "메타",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                },
+                {
+                  "ticker": "STX/WDC/MU",
+                  "name": "시게이트·웨스턴디지털·마이크론",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "시장 데이터 조회 실패: Failed to parse json response from Yahoo Finance: {'code': 'Not Found', 'description': 'HTTP 404 Not Found'}"
+                  ]
+                },
+                {
+                  "ticker": "LRCX/AMAT/ASML",
+                  "name": "램리서치·어플라이드머티어리얼즈·ASML",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "시장 데이터 조회 실패: Failed to parse json response from Yahoo Finance: {'code': 'Not Found', 'description': 'HTTP 404 Not Found'}"
+                  ]
+                },
+                {
+                  "ticker": "009150",
+                  "name": "삼성전기",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "시장 데이터 조회 실패: no_usable_market_fields"
+                  ]
+                },
+                {
+                  "ticker": "NVDA",
+                  "name": "엔비디아",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                },
+                {
+                  "ticker": "GOOGL/AMZN/MSFT",
+                  "name": "알파벳·아마존·마이크로소프트",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "시장 데이터 조회 실패: Failed to parse json response from Yahoo Finance: {'code': 'Not Found', 'description': 'HTTP 404 Not Found'}"
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "event_key": "ZIAmv-svE70",
+            "content_sha256": "0064bc5c5e7049b32a11c80871a668bcf1fc9b1c8a3ab61fc82a770df432e14a",
+            "occurred_at": "2026-10-21T05:08:45+00:00",
+            "relevance": {
+              "tickers": [
+                "META",
+                "NVDA",
+                "IBM",
+                "TSLA"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "verified_entities",
+              "matched_tickers": [
+                "NVDA"
+              ],
+              "market_match": true,
+              "score": 120
+            },
+            "summary": {
+              "video_id": "ZIAmv-svE70",
+              "title": "10월 21일 미국장 열리기 전 꼭 알아야 하는 '미장 시황' 투자 포인트",
+              "channel": "경제사냥꾼",
+              "source_url": "https://www.youtube.com/watch?v=ZIAmv-svE70",
+              "claim_status_summary": {
+                "unverified": 9,
+                "asr_uncertain": 1
+              },
+              "claims": [
+                {
+                  "claim_id": "C1",
+                  "claim_text": "AI 투자 수익화 우려가 최근 기술주 불안의 원인이며 전날 실적 발표가 투자심리를 회복시켰다는 주장과 시장 폭락 표현.",
+                  "status": "unverified",
+                  "confidence": 0.15,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "반등·폭락 및 AI 수익화 우려를 확인된 시장 진단으로 사용하지 않는다."
+                },
+                {
+                  "claim_id": "C2",
+                  "claim_text": "SpaceX가 전날 사상 최고 실적을 발표했으며 AI 관련 매출은 전년 대비 9배 이상, 순이익은 44억 달러였다는 주장.",
+                  "status": "asr_uncertain",
+                  "confidence": 0.0,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "회사명과 수치의 연결을 확정하거나 다른 기업의 실적으로 대체해 투자 근거로 사용하지 않는다."
+                },
+                {
+                  "claim_id": "C3",
+                  "claim_text": "메타의 발표 예정 분기 시장 예상 매출이 약 633억 달러라는 주장.",
+                  "status": "unverified",
+                  "confidence": 0.0,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "633억 달러를 실적 상회·하회 판단의 기준으로 사용하기 전에 당시 컨센서스와 보고분기를 확인한다."
+                },
+                {
+                  "claim_id": "C4",
+                  "claim_text": "메타의 이번 분기 AI 시설·장비 등을 포함한 예상 투자가 약 410억 달러이며 이에 상응하는 수익 증가를 확인해야 한다는 주장.",
+                  "status": "unverified",
+                  "confidence": 0.0,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "투자 범위와 기간을 확정한 뒤 동일 기간 현금흐름·이익 및 수익화 설명과 비교한다."
+                }
+              ],
+              "entities": [
+                {
+                  "ticker": "META",
+                  "name": "메타",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                },
+                {
+                  "ticker": "NVDA",
+                  "name": "엔비디아",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                },
+                {
+                  "ticker": "IBM",
+                  "name": "IBM",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                },
+                {
+                  "ticker": "TSLA",
+                  "name": "테슬라",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "event_key": "xpSbfDPXnlQ",
+            "content_sha256": "9ceb1d7bf60b36d6f7f07d595ede93e1dcdf405581237db649a577ebc5577719",
+            "occurred_at": "2026-10-22T23:00:25+00:00",
+            "relevance": {
+              "tickers": [
+                "^KS11",
+                "META",
+                "000660",
+                "005930",
+                "CL=F"
+              ],
+              "markets": [
+                "US",
+                "KR"
+              ],
+              "themes": [],
+              "match_basis": "verified_entities",
+              "matched_tickers": [],
+              "market_match": true,
+              "score": 20
+            },
+            "summary": {
+              "video_id": "xpSbfDPXnlQ",
+              "title": "10월 23일 오늘 코스피 어디까지 떨어질까?!",
+              "channel": "경제사냥꾼",
+              "source_url": "https://www.youtube.com/watch?v=xpSbfDPXnlQ",
+              "claim_status_summary": {
+                "unverified": 11,
+                "partially_supported": 1
+              },
+              "claims": [
+                {
+                  "claim_id": "C1",
+                  "claim_text": "나스닥이 6월 이후 최대 하락하고 반도체 지수는 6.7% 하락했으나 동일가중 지수는 0.8% 상승했으며, 상승 종목이 더 많았다는 의미다.",
+                  "status": "unverified",
+                  "confidence": 0.2,
+                  "supporting_evidence_ids": [
+                    "E6",
+                    "E7"
+                  ],
+                  "manual_check_required": true,
+                  "investor_implication": "AI 관련주 약세라는 제목 수준의 정황과 정확한 지수 수익률·시장 폭 검증을 구분해야 한다."
+                },
+                {
+                  "claim_id": "C2",
+                  "claim_text": "야간선물이 장중 1.5% 넘게 상승했다가 2.61% 하락하며 저점 마감했고, 6월 이후 1.5% 초과 변동일에는 코스피가 같은 방향으로 출발했다.",
+                  "status": "unverified",
+                  "confidence": 0.05,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "야간선물 수치와 과거 개장 방향의 일치율을 검증된 하락 확률로 사용할 수 없다."
+                },
+                {
+                  "claim_id": "C3",
+                  "claim_text": "메타는 매출이 예상치를 웃돌았지만 AI 투자 후 현금이 21억 달러 적자로 전환했고 신주 발행으로 자금을 조달하려 하면서 주가가 7% 하락했다.",
+                  "status": "unverified",
+                  "confidence": 0.15,
+                  "supporting_evidence_ids": [
+                    "E5",
+                    "E6",
+                    "E7"
+                  ],
+                  "manual_check_required": true,
+                  "investor_implication": "자금조달 방식과 현금흐름을 확인하기 전에는 메타의 유동성 부족이나 주주 희석을 확정할 수 없다."
+                },
+                {
+                  "claim_id": "C4",
+                  "claim_text": "미국에서 거래되는 하이닉스 주식이 8% 넘게 하락했고 자사주 매입이 10월 21일 종료됐다.",
+                  "status": "partially_supported",
+                  "confidence": 0.65,
+                  "supporting_evidence_ids": [
+                    "market_evidence[2].external_context.company_news_excerpt"
+                  ],
+                  "manual_check_required": true,
+                  "investor_implication": "8% 초과 하락에는 직접 대응하는 보도가 있지만 매입 종료와 수급 지지력 약화는 별도 확인이 필요하다."
+                }
+              ],
+              "entities": [
+                {
+                  "ticker": "^KS11",
+                  "name": "코스피",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                },
+                {
+                  "ticker": "META",
+                  "name": "메타",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                },
+                {
+                  "ticker": "000660",
+                  "name": "SK하이닉스",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "시장 데이터 조회 실패: no_usable_market_fields"
+                  ]
+                },
+                {
+                  "ticker": "005930",
+                  "name": "삼성전자",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "시장 데이터 조회 실패: no_usable_market_fields"
+                  ]
+                },
+                {
+                  "ticker": "CL=F",
+                  "name": "국제유가·중동 지정학",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                }
+              ]
+            }
+          }
+        ],
+        "execution_eligible": false
+      },
+      "prism": {
+        "source_health": "OK",
+        "coverage": {
+          "total_unique_events": 220,
+          "window_events": 24,
+          "transmitted_events": 20,
+          "truncated": true,
+          "oldest_occurred_at": "2026-10-22T18:42:31+00:00",
+          "newest_occurred_at": "2026-10-22T21:18:26+00:00",
+          "available_events_before_context_cap": 24,
+          "context_event_cap": 20,
+          "omitted_events": 4,
+          "omitted_due_to_context_cap": 4,
+          "omitted_before_context_selection": 0
+        },
+        "events": [
+          {
+            "event_key": "stock_ai_agent:16547",
+            "content_sha256": "2349196c3a74e9bcec34e3b3865f94f28ccd5c7310b8bfa7c86f2019321b2f68",
+            "occurred_at": "2026-10-22T18:59:27+00:00",
+            "relevance": {
+              "tickers": [
+                "FRSH",
+                "LLY",
+                "BKH",
+                "BP",
+                "HALO"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "normalized_prism_signals",
+              "matched_tickers": [
+                "LLY"
+              ],
+              "market_match": true,
+              "score": 120
+            },
+            "summary": {
+              "message_id": "16547",
+              "posted_at": "2026-10-22T18:59:27+00:00",
+              "source_url": "https://t.me/stock_ai_agent/16547",
+              "preview": "📊 프리즘 US 시뮬레이터 | 실시간 포트폴리오 (2026-10-23 03:59) 🔸 현재 보유: 5/10개 🔸 사용 비중: 3.89/10 슬롯 (분할 매수·시험매수 반영) ✅ 최고 수익: Freshworks Inc.(FRSH) +10.45% ⚠️ 최저 수익: Eli Lilly and Company(LLY) +3.29% 🔸 보유 종목: - Freshworks Inc.(FRSH) [Tec...",
+              "signals": [
+                {
+                  "canonical_ticker": "FRSH",
+                  "display_name": "Freshworks Inc.",
+                  "market": "US",
+                  "source_asof": "2026-10-22T18:59:27+00:00",
+                  "signal_action": "HOLD",
+                  "trigger_type": "telegram_portfolio_snapshot",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "confidence": 0.45,
+                  "warnings": []
+                },
+                {
+                  "canonical_ticker": "LLY",
+                  "display_name": "Eli Lilly and Company",
+                  "market": "US",
+                  "source_asof": "2026-10-22T18:59:27+00:00",
+                  "signal_action": "HOLD",
+                  "trigger_type": "telegram_portfolio_snapshot",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "confidence": 0.45,
+                  "warnings": []
+                },
+                {
+                  "canonical_ticker": "BKH",
+                  "display_name": "Black Hills Corporation",
+                  "market": "US",
+                  "source_asof": "2026-10-22T18:59:27+00:00",
+                  "signal_action": "HOLD",
+                  "trigger_type": "telegram_portfolio_snapshot",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "stop_loss_price": 73.5,
+                  "target_price": 91.88,
+                  "confidence": 0.45,
+                  "warnings": [
+                    "multi_ticker_prices_scoped_to_mention_block"
+                  ]
+                },
+                {
+                  "canonical_ticker": "BP",
+                  "display_name": "BP p.l.c.",
+                  "market": "US",
+                  "source_asof": "2026-10-22T18:59:27+00:00",
+                  "signal_action": "HOLD",
+                  "trigger_type": "telegram_portfolio_snapshot",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "stop_loss_price": 46.08,
+                  "target_price": 58.12,
+                  "confidence": 0.45,
+                  "warnings": [
+                    "multi_ticker_prices_scoped_to_mention_block"
+                  ]
+                },
+                {
+                  "canonical_ticker": "HALO",
+                  "display_name": "Halozyme Therapeutics, Inc.",
+                  "market": "US",
+                  "source_asof": "2026-10-22T18:59:27+00:00",
+                  "signal_action": "HOLD",
+                  "trigger_type": "telegram_portfolio_snapshot",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "stop_loss_price": 118.72,
+                  "target_price": 141.53,
+                  "confidence": 0.45,
+                  "warnings": [
+                    "multi_ticker_prices_scoped_to_mention_block"
+                  ]
+                }
+              ],
+              "simulation_only": true,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:16546",
+            "content_sha256": "eee96e8a5c95c06a280998dd3db27cb600ec1d6a3144b51ba9faae2a1f5bfe6f",
+            "occurred_at": "2026-10-22T18:59:24+00:00",
+            "relevance": {
+              "tickers": [
+                "CMCSA"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "normalized_prism_signals",
+              "matched_tickers": [],
+              "market_match": true,
+              "score": 20
+            },
+            "summary": {
+              "message_id": "16546",
+              "posted_at": "2026-10-22T18:59:24+00:00",
+              "source_url": "https://t.me/stock_ai_agent/16546",
+              "preview": "⚠️ 매수 보류: Comcast Corporation(CMCSA) 현재가: $22.68 매수 점수: 3/10 결정: 미진입 시장 상황: 횡보장 산업군: Communication Services 보류 사유: AI 판단: 미진입 — 현재가 22.68달러가 하락 중인 50일선보다 4.0% 낮아 필수 추세 차단 조건에 해당합니다. / 점수 부족 (3/5) — AI 사유: 현재가 22.68달러가...",
+              "signals": [
+                {
+                  "canonical_ticker": "CMCSA",
+                  "display_name": "Comcast Corporation",
+                  "market": "US",
+                  "source_asof": "2026-10-22T18:59:24+00:00",
+                  "signal_action": "NO_ENTRY",
+                  "trigger_type": "telegram_buy_skip",
+                  "trigger_score": 0.3,
+                  "composite_score": 0.3,
+                  "confidence": 0.3,
+                  "warnings": []
+                }
+              ],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:16545",
+            "content_sha256": "a2f1c4623bedcddcf62e62198b0a937de64f73449f5d9c27c78ae00356a6506c",
+            "occurred_at": "2026-10-22T18:59:22+00:00",
+            "relevance": {
+              "tickers": [
+                "BX"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "normalized_prism_signals",
+              "matched_tickers": [],
+              "market_match": true,
+              "score": 20
+            },
+            "summary": {
+              "message_id": "16545",
+              "posted_at": "2026-10-22T18:59:22+00:00",
+              "source_url": "https://t.me/stock_ai_agent/16545",
+              "preview": "⚠️ 매수 보류: Blackstone Inc.(BX) 현재가: $117.76 매수 점수: 2/10 결정: 미진입 시장 상황: 횡보장 산업군: Financial Services 보류 사유: AI 판단: 미진입 — 현재가 117.78달러가 하락 중인 50일선보다 6.8% 낮아 개별 추세 차단 조건에 해당합니다. / 점수 부족 (2/5) — AI 사유: 현재가 117.78달러가 하락 중인 5...",
+              "signals": [
+                {
+                  "canonical_ticker": "BX",
+                  "display_name": "Blackstone Inc.",
+                  "market": "US",
+                  "source_asof": "2026-10-22T18:59:22+00:00",
+                  "signal_action": "NO_ENTRY",
+                  "trigger_type": "telegram_buy_skip",
+                  "trigger_score": 0.2,
+                  "composite_score": 0.2,
+                  "confidence": 0.2,
+                  "warnings": []
+                }
+              ],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:16544",
+            "content_sha256": "2119e89d069c75fe72c390aca1a67a1cfd0d67407704bddf494586479e5e71b3",
+            "occurred_at": "2026-10-22T18:59:19+00:00",
+            "relevance": {
+              "tickers": [
+                "TSCO"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "normalized_prism_signals",
+              "matched_tickers": [],
+              "market_match": true,
+              "score": 20
+            },
+            "summary": {
+              "message_id": "16544",
+              "posted_at": "2026-10-22T18:59:19+00:00",
+              "source_url": "https://t.me/stock_ai_agent/16544",
+              "preview": "⚠️ 매수 보류: Tractor Supply Company(TSCO) 현재가: $34.22 매수 점수: 2/10 결정: 미진입 시장 상황: 횡보장 산업군: Consumer Cyclical 보류 사유: AI 판단: 미진입 — 횡보 국면에서 재무 건전성 기준이 미달하여 펀더멘털 게이트를 통과하지 못했습니다. / 점수 부족 (2/5) — AI 사유: 횡보 국면에서 재무 건전성 기준이 미달하여...",
+              "signals": [
+                {
+                  "canonical_ticker": "TSCO",
+                  "display_name": "Tractor Supply Company",
+                  "market": "US",
+                  "source_asof": "2026-10-22T18:59:19+00:00",
+                  "signal_action": "NO_ENTRY",
+                  "trigger_type": "telegram_buy_skip",
+                  "trigger_score": 0.2,
+                  "composite_score": 0.2,
+                  "stop_loss_price": 32.56,
+                  "target_price": 36.36,
+                  "confidence": 0.2,
+                  "warnings": []
+                }
+              ],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:16542",
+            "content_sha256": "7ea771a57ec4ab7afee90a53b1c13f9e6c6fea4c4975eb055ee897c3a34f13a5",
+            "occurred_at": "2026-10-22T18:51:04+00:00",
+            "relevance": {
+              "tickers": [
+                "CMCSA"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "normalized_prism_signals",
+              "matched_tickers": [],
+              "market_match": true,
+              "score": 20
+            },
+            "summary": {
+              "message_id": "16542",
+              "posted_at": "2026-10-22T18:51:04+00:00",
+              "source_url": "https://t.me/stock_ai_agent/16542",
+              "preview": "📊 Comcast Corporation (CMCSA) O'Neil 인사이트 차트의 베이스/피벗/RS 주석을 함께 참고하세요. ※ 보조 참고용 · 투자 권유 아님",
+              "signals": [
+                {
+                  "canonical_ticker": "CMCSA",
+                  "display_name": "Comcast Corporation",
+                  "market": "US",
+                  "source_asof": "2026-10-22T18:51:04+00:00",
+                  "signal_action": "WATCH",
+                  "trigger_type": "telegram_oneil_insight",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "confidence": 0.45,
+                  "warnings": []
+                }
+              ],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:16541",
+            "content_sha256": "f49ec5f6ac3dd274b82d92b46fdba0766cec4ce8af32bf0d9d649047d5f57c2d",
+            "occurred_at": "2026-10-22T18:50:51+00:00",
+            "relevance": {
+              "tickers": [
+                "BX"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "normalized_prism_signals",
+              "matched_tickers": [],
+              "market_match": true,
+              "score": 20
+            },
+            "summary": {
+              "message_id": "16541",
+              "posted_at": "2026-10-22T18:50:51+00:00",
+              "source_url": "https://t.me/stock_ai_agent/16541",
+              "preview": "📊 Blackstone Inc. (BX) O'Neil 인사이트 차트의 베이스/피벗/RS 주석을 함께 참고하세요. ※ 보조 참고용 · 투자 권유 아님",
+              "signals": [
+                {
+                  "canonical_ticker": "BX",
+                  "display_name": "Blackstone Inc.",
+                  "market": "US",
+                  "source_asof": "2026-10-22T18:50:51+00:00",
+                  "signal_action": "WATCH",
+                  "trigger_type": "telegram_oneil_insight",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "confidence": 0.45,
+                  "warnings": []
+                }
+              ],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:16540",
+            "content_sha256": "bf12c84cef2822b0da6b4c6f7b76200693e89450e765a4d9814e910d71f73010",
+            "occurred_at": "2026-10-22T18:50:39+00:00",
+            "relevance": {
+              "tickers": [
+                "TSCO"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "normalized_prism_signals",
+              "matched_tickers": [],
+              "market_match": true,
+              "score": 20
+            },
+            "summary": {
+              "message_id": "16540",
+              "posted_at": "2026-10-22T18:50:39+00:00",
+              "source_url": "https://t.me/stock_ai_agent/16540",
+              "preview": "📊 Tractor Supply Company (TSCO) O'Neil 인사이트 차트의 베이스/피벗/RS 주석을 함께 참고하세요. ※ 보조 참고용 · 투자 권유 아님",
+              "signals": [
+                {
+                  "canonical_ticker": "TSCO",
+                  "display_name": "Tractor Supply Company",
+                  "market": "US",
+                  "source_asof": "2026-10-22T18:50:39+00:00",
+                  "signal_action": "WATCH",
+                  "trigger_type": "telegram_oneil_insight",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "confidence": 0.45,
+                  "warnings": []
+                }
+              ],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:16539",
+            "content_sha256": "ad6a3c96ba4421eda76562d3046953c027294ab8ab37fa4d2ed92086cf0d247a",
+            "occurred_at": "2026-10-22T18:50:22+00:00",
+            "relevance": {
+              "tickers": [
+                "CMCSA"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "normalized_prism_signals",
+              "matched_tickers": [],
+              "market_match": true,
+              "score": 20
+            },
+            "summary": {
+              "message_id": "16539",
+              "posted_at": "2026-10-22T18:50:22+00:00",
+              "source_url": "https://t.me/stock_ai_agent/16539",
+              "preview": "",
+              "signals": [
+                {
+                  "canonical_ticker": "CMCSA",
+                  "display_name": "Comcast Corporation",
+                  "market": "US",
+                  "source_asof": "2026-10-22T18:50:22+00:00",
+                  "signal_action": "WATCH",
+                  "trigger_type": "telegram_pdf_report",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "confidence": 0.45,
+                  "warnings": []
+                }
+              ],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:16538",
+            "content_sha256": "67d5d9ed2e9b56fa0684d814dbf456d9113db30d970d74b0b709d172ee154673",
+            "occurred_at": "2026-10-22T18:50:17+00:00",
+            "relevance": {
+              "tickers": [
+                "BX"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "normalized_prism_signals",
+              "matched_tickers": [],
+              "market_match": true,
+              "score": 20
+            },
+            "summary": {
+              "message_id": "16538",
+              "posted_at": "2026-10-22T18:50:17+00:00",
+              "source_url": "https://t.me/stock_ai_agent/16538",
+              "preview": "",
+              "signals": [
+                {
+                  "canonical_ticker": "BX",
+                  "display_name": "Blackstone Inc.",
+                  "market": "US",
+                  "source_asof": "2026-10-22T18:50:17+00:00",
+                  "signal_action": "WATCH",
+                  "trigger_type": "telegram_pdf_report",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "confidence": 0.45,
+                  "warnings": []
+                }
+              ],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:16537",
+            "content_sha256": "585712ad5871dc1f1ad7c87be6c1f680e16f5f2e152fc51ee01ec565b99971a4",
+            "occurred_at": "2026-10-22T18:50:11+00:00",
+            "relevance": {
+              "tickers": [
+                "TSCO"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "normalized_prism_signals",
+              "matched_tickers": [],
+              "market_match": true,
+              "score": 20
+            },
+            "summary": {
+              "message_id": "16537",
+              "posted_at": "2026-10-22T18:50:11+00:00",
+              "source_url": "https://t.me/stock_ai_agent/16537",
+              "preview": "",
+              "signals": [
+                {
+                  "canonical_ticker": "TSCO",
+                  "display_name": "Tractor Supply Company",
+                  "market": "US",
+                  "source_asof": "2026-10-22T18:50:11+00:00",
+                  "signal_action": "WATCH",
+                  "trigger_type": "telegram_pdf_report",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "confidence": 0.45,
+                  "warnings": []
+                }
+              ],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:16536",
+            "content_sha256": "377fd6b8cb6d307b96c72f4c09685e27335ab8802af877504f5276e61f6b9496",
+            "occurred_at": "2026-10-22T18:50:03+00:00",
+            "relevance": {
+              "tickers": [
+                "CMCSA"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "normalized_prism_signals",
+              "matched_tickers": [],
+              "market_match": true,
+              "score": 20
+            },
+            "summary": {
+              "message_id": "16536",
+              "posted_at": "2026-10-22T18:50:03+00:00",
+              "source_url": "https://t.me/stock_ai_agent/16536",
+              "preview": "📊 Comcast Corporation (CMCSA) — 미국 미디어·통신 기업으로, Xfinity 광대역·무선 서비스와 NBCUniversal, Peacock, 영화·테마파크 사업을 운영합니다. 💰 가격: $22.74~$22.75 관측가 (10/22 장중, 확정 종가 아님). 전일 종가 $22.08 대비 약 +3.0%. 거래량 약 3,210만 주로, 최근 관측치(10/15 약 3,24...",
+              "signals": [
+                {
+                  "canonical_ticker": "CMCSA",
+                  "display_name": "Comcast Corporation",
+                  "market": "US",
+                  "source_asof": "2026-10-22T18:50:03+00:00",
+                  "signal_action": "UNKNOWN",
+                  "trigger_type": "telegram_message",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "confidence": 0.45,
+                  "warnings": []
+                }
+              ],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:16535",
+            "content_sha256": "0beed05e664e592ec8350bcdd4c672efdc4224e110a44b8a7089805c5139b08c",
+            "occurred_at": "2026-10-22T18:49:58+00:00",
+            "relevance": {
+              "tickers": [
+                "BX"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "normalized_prism_signals",
+              "matched_tickers": [],
+              "market_match": true,
+              "score": 20
+            },
+            "summary": {
+              "message_id": "16535",
+              "posted_at": "2026-10-22T18:49:58+00:00",
+              "source_url": "https://t.me/stock_ai_agent/16535",
+              "preview": "📊 Blackstone Inc. (BX) — 대체투자 운용사로 사모펀드·부동산·신용 등에 투자하며, 운용 수수료와 투자 성과 수익을 얻습니다. 💰 거래 현황 (2026.10.22 관측치; 최종 종가 확정 여부 미확인) - 현재가: $117.42 - 전일 종가 $109.57 대비 +$7.85 (+7.2%) - 거래량: 약 666만 주. 최근 하락·반등 구간의 거래량 증가가 있었지만, 하루...",
+              "signals": [
+                {
+                  "canonical_ticker": "BX",
+                  "display_name": "Blackstone Inc.",
+                  "market": "US",
+                  "source_asof": "2026-10-22T18:49:58+00:00",
+                  "signal_action": "UNKNOWN",
+                  "trigger_type": "telegram_message",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "confidence": 0.45,
+                  "warnings": []
+                }
+              ],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:16534",
+            "content_sha256": "9449e55355e74799e3f68e2a666bf6e28e3f8605a72526b36eadca6c8c496b33",
+            "occurred_at": "2026-10-22T18:49:54+00:00",
+            "relevance": {
+              "tickers": [
+                "TSCO"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "normalized_prism_signals",
+              "matched_tickers": [],
+              "market_match": true,
+              "score": 20
+            },
+            "summary": {
+              "message_id": "16534",
+              "posted_at": "2026-10-22T18:49:54+00:00",
+              "source_url": "https://t.me/stock_ai_agent/16534",
+              "preview": "📊 Tractor Supply Company (TSCO) 미국 농촌 생활·농장·반려동물용품을 판매하는 전문 소매업체입니다. 💰 거래 현황 (2026.10.22 장중 관측치; 종가 확정 여부 미확인) - 주가: $34.21 - 전일 종가 $32.69 대비 약 +4.7% - 거래량: 약 2,291만 주로 최근 거래일에도 높은 수준. 반등과 거래량 증가가 함께 관측됐지만, 기관 순매수로 단정...",
+              "signals": [
+                {
+                  "canonical_ticker": "TSCO",
+                  "display_name": "Tractor Supply Company",
+                  "market": "US",
+                  "source_asof": "2026-10-22T18:49:54+00:00",
+                  "signal_action": "UNKNOWN",
+                  "trigger_type": "telegram_message",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "confidence": 0.45,
+                  "warnings": []
+                }
+              ],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:16533",
+            "content_sha256": "7a0a5af01126941c83e181c013f3ee9d90a3e0f0449ad835a6224a45df09bd71",
+            "occurred_at": "2026-10-22T18:42:31+00:00",
+            "relevance": {
+              "tickers": [
+                "EMS",
+                "TSCO",
+                "BX",
+                "CMCSA"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "normalized_prism_signals",
+              "matched_tickers": [],
+              "market_match": true,
+              "score": 20
+            },
+            "summary": {
+              "message_id": "16533",
+              "posted_at": "2026-10-22T18:42:31+00:00",
+              "source_url": "https://t.me/stock_ai_agent/16533",
+              "preview": "🔔 미국주식 오후 프리즘 시그널 얼럿 📅 2026.10.22 오후 분석 포착된 관심종목 🤖 프리즘봇의 가상 포트폴리오 운용 과정을 투명하게 공개합니다. 실제 매수 권유가 아닙니다. 🧭 장기추세: 횡보 | 스윙: 횡보·숨고르기 | 실행기준: 횡보 | 선정: 탑다운 0종목 + 바텀업 3종목 🧭 오늘 테마 흐름 미국 1,018종목 · 전일 종가 대비 · 테마별 중앙값 📈 강한 테마 1. IT...",
+              "signals": [
+                {
+                  "canonical_ticker": "EMS",
+                  "display_name": "전자제품 위탁생산",
+                  "market": "US",
+                  "source_asof": "2026-10-22T18:42:31+00:00",
+                  "signal_action": "WATCH",
+                  "trigger_type": "telegram_signal_alert",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "confidence": 0.45,
+                  "warnings": []
+                },
+                {
+                  "canonical_ticker": "TSCO",
+                  "display_name": "Tractor Supply Company",
+                  "market": "US",
+                  "source_asof": "2026-10-22T18:42:31+00:00",
+                  "signal_action": "WATCH",
+                  "trigger_type": "telegram_signal_alert",
+                  "trigger_score": 0.83,
+                  "composite_score": 0.83,
+                  "confidence": 0.83,
+                  "warnings": []
+                },
+                {
+                  "canonical_ticker": "BX",
+                  "display_name": "Blackstone Inc.",
+                  "market": "US",
+                  "source_asof": "2026-10-22T18:42:31+00:00",
+                  "signal_action": "WATCH",
+                  "trigger_type": "telegram_signal_alert",
+                  "trigger_score": 0.67,
+                  "composite_score": 0.67,
+                  "confidence": 0.67,
+                  "warnings": []
+                },
+                {
+                  "canonical_ticker": "CMCSA",
+                  "display_name": "Comcast Corporation",
+                  "market": "US",
+                  "source_asof": "2026-10-22T18:42:31+00:00",
+                  "signal_action": "WATCH",
+                  "trigger_type": "telegram_signal_alert",
+                  "trigger_score": 0.72,
+                  "composite_score": 0.72,
+                  "confidence": 0.72,
+                  "warnings": []
+                }
+              ],
+              "simulation_only": true,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:16553",
+            "content_sha256": "5e356a4cadce1b90744a3720729c181c7377ad7d1e812bf04d47574447483f5b",
+            "occurred_at": "2026-10-22T21:18:26+00:00",
+            "relevance": {
+              "tickers": [],
+              "markets": [],
+              "themes": [],
+              "match_basis": "message_context",
+              "matched_tickers": [],
+              "market_match": false,
+              "score": 0
+            },
+            "summary": {
+              "message_id": "16553",
+              "posted_at": "2026-10-22T21:18:26+00:00",
+              "source_url": "https://t.me/stock_ai_agent/16553",
+              "preview": "🏁 BTC 데모 시나리오 종료 · 정산 확인 🕐 10/23 06:17:17 KST 💵 청산 결과 정리 수량: 0.094 BTC 진입 → 청산: 81,284.20 USDT → 81,343.60 USDT 보유 시간: 44.5분 확정 순손익: -12.66 USDT • 시작 계좌 9,417.21 USDT 대비 -0.13% • 수수료 7.07 USDT · 펀딩 0.00 USDT 반영 💰 종료 후...",
+              "signals": [],
+              "simulation_only": true,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:16552",
+            "content_sha256": "0fd0e6deb9e5ea6acaef31db3deb8e5a16f8aa4825ae4c923c0552c8c6134c23",
+            "occurred_at": "2026-10-22T21:01:28+00:00",
+            "relevance": {
+              "tickers": [],
+              "markets": [],
+              "themes": [],
+              "match_basis": "message_context",
+              "matched_tickers": [],
+              "market_match": false,
+              "score": 0
+            },
+            "summary": {
+              "message_id": "16552",
+              "posted_at": "2026-10-22T21:01:28+00:00",
+              "source_url": "https://t.me/stock_ai_agent/16552",
+              "preview": "🛡 BTC 데모 보호 변경 확인 · 숏 🕐 10/23 06:01:23 KST 📦 보유량 0.047 BTC · 평단 81,284.20 USDT 💰 계좌 순자산: 9,419.13 USDT • 총 증거금 384.11 USDT(계좌 4.08%) · 10배 · 교차 🛡 손절 SL 81,490.00 USDT · 남은 전량 • 예상 손익: -9.67 USDT · 계좌 -0.10% (1배 -0.25%...",
+              "signals": [],
+              "simulation_only": true,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:16551",
+            "content_sha256": "04b0addadf41b71f63f0b635441f292ae426e9624b9f20d15915fefcdbb202d9",
+            "occurred_at": "2026-10-22T20:51:28+00:00",
+            "relevance": {
+              "tickers": [],
+              "markets": [],
+              "themes": [],
+              "match_basis": "message_context",
+              "matched_tickers": [],
+              "market_match": false,
+              "score": 0
+            },
+            "summary": {
+              "message_id": "16551",
+              "posted_at": "2026-10-22T20:51:28+00:00",
+              "source_url": "https://t.me/stock_ai_agent/16551",
+              "preview": "🛡 BTC 데모 보호 변경 확인 · 숏 🕐 10/23 05:51:23 KST 📦 보유량 0.047 BTC · 평단 81,284.20 USDT 💰 계좌 순자산: 9,422.75 USDT • 총 증거금 383.75 USDT(계좌 4.07%) · 10배 · 교차 🛡 손절 SL 81,530.00 → 81,490.00 USDT · 남은 전량 • 예상 손익: -9.67 USDT · 계좌 -0.10...",
+              "signals": [],
+              "simulation_only": true,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:16550",
+            "content_sha256": "e3a5d9bb4228fffd9e084a103c94fb20747237709c79b8f48e584c41e23a4998",
+            "occurred_at": "2026-10-22T20:48:27+00:00",
+            "relevance": {
+              "tickers": [],
+              "markets": [],
+              "themes": [],
+              "match_basis": "message_context",
+              "matched_tickers": [],
+              "market_match": false,
+              "score": 0
+            },
+            "summary": {
+              "message_id": "16550",
+              "posted_at": "2026-10-22T20:48:27+00:00",
+              "source_url": "https://t.me/stock_ai_agent/16550",
+              "preview": "✂️ BTC 데모 부분 청산 체결 · 숏 🕐 10/23 05:47:41 KST 사유: 부분 익절 🧾 이번 체결: 0.047 BTC · 81,187.30 USDT • 체결금액(명목): 3,815.80 USDT · 증거금 아님 • 이번 청산 가격손익: +4.55 USDT · 계좌 +0.05% 수수료·펀딩 전 · 확정 순손익 아님 손익·비용 정산 미확정: 확정 수익으로 집계하지 않음 📦 전체...",
+              "signals": [],
+              "simulation_only": true,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:16549",
+            "content_sha256": "5cf39ce005585e2c67eaac05baffc67623e915ff819d84bfe795d057e0343eb1",
+            "occurred_at": "2026-10-22T20:41:27+00:00",
+            "relevance": {
+              "tickers": [],
+              "markets": [],
+              "themes": [],
+              "match_basis": "message_context",
+              "matched_tickers": [],
+              "market_match": false,
+              "score": 0
+            },
+            "summary": {
+              "message_id": "16549",
+              "posted_at": "2026-10-22T20:41:27+00:00",
+              "source_url": "https://t.me/stock_ai_agent/16549",
+              "preview": "🛡 BTC 데모 보호 변경 확인 · 숏 🕐 10/23 05:41:22 KST 📦 보유량 0.094 BTC · 평단 81,284.20 USDT 💰 계좌 순자산: 9,410.93 USDT • 총 증거금 768.90 USDT(계좌 8.17%) · 10배 · 교차 🛡 손절 SL 81,530.00 USDT · 남은 전량 • 예상 손익: -23.11 USDT · 계좌 -0.25% (1배 -0.30...",
+              "signals": [],
+              "simulation_only": true,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:16548",
+            "content_sha256": "9385d4b428fe9c9b0c9b93078f91fda8375d4330dc011309ec817376534cebeb",
+            "occurred_at": "2026-10-22T20:33:27+00:00",
+            "relevance": {
+              "tickers": [],
+              "markets": [],
+              "themes": [],
+              "match_basis": "message_context",
+              "matched_tickers": [],
+              "market_match": false,
+              "score": 0
+            },
+            "summary": {
+              "message_id": "16548",
+              "posted_at": "2026-10-22T20:33:27+00:00",
+              "source_url": "https://t.me/stock_ai_agent/16548",
+              "preview": "📌 BTC 데모 첫 진입 체결 · 숏 🕐 10/23 05:32:45 KST 🧾 이번 체결: 0.094 BTC · 81,284.20 USDT • 체결금액(명목): 7,640.71 USDT · 증거금 아님 📦 전체 포지션 • 누적 보유 0 BTC → 0.094 BTC · 관측 기준 • 평단 81,284.20 USDT 💰 계좌 순자산: 9,413.27 USDT • 총 증거금 768.67 US...",
+              "signals": [],
+              "simulation_only": true,
+              "actionability": "research_only"
+            }
+          }
+        ],
+        "execution_eligible": false
+      },
+      "receipt_contract": {
+        "schema": "tradingagents.external-evidence-receipt/v1",
+        "sources": {
+          "youtube": {
+            "source_health": "OK",
+            "event_keys": [
+              "ZPF7UdMncFs",
+              "qNPxRnb0w9g",
+              "3qFC-2RxSis",
+              "AVqXPwaziYo",
+              "kGsdIHtqmlg",
+              "2oMNRHt-mLg",
+              "V4qrg5Jse-0",
+              "_lnx0OrZydU",
+              "nfaSBwzGV40",
+              "KLY4_VCgqe4",
+              "ZIAmv-svE70",
+              "xpSbfDPXnlQ"
+            ],
+            "coverage": {
+              "total_unique_events": 439,
+              "window_events": 102,
+              "transmitted_events": 12,
+              "truncated": true,
+              "oldest_occurred_at": "2026-10-21T05:08:45+00:00",
+              "newest_occurred_at": "2026-10-22T23:20:08+00:00",
+              "available_events_before_context_cap": 60,
+              "context_event_cap": 12,
+              "omitted_events": 90,
+              "omitted_due_to_context_cap": 48,
+              "omitted_before_context_selection": 42
+            }
+          },
+          "prism": {
+            "source_health": "OK",
+            "event_keys": [
+              "stock_ai_agent:16547",
+              "stock_ai_agent:16546",
+              "stock_ai_agent:16545",
+              "stock_ai_agent:16544",
+              "stock_ai_agent:16542",
+              "stock_ai_agent:16541",
+              "stock_ai_agent:16540",
+              "stock_ai_agent:16539",
+              "stock_ai_agent:16538",
+              "stock_ai_agent:16537",
+              "stock_ai_agent:16536",
+              "stock_ai_agent:16535",
+              "stock_ai_agent:16534",
+              "stock_ai_agent:16533",
+              "stock_ai_agent:16553",
+              "stock_ai_agent:16552",
+              "stock_ai_agent:16551",
+              "stock_ai_agent:16550",
+              "stock_ai_agent:16549",
+              "stock_ai_agent:16548"
+            ],
+            "coverage": {
+              "total_unique_events": 220,
+              "window_events": 24,
+              "transmitted_events": 20,
+              "truncated": true,
+              "oldest_occurred_at": "2026-10-22T18:42:31+00:00",
+              "newest_occurred_at": "2026-10-22T21:18:26+00:00",
+              "available_events_before_context_cap": 24,
+              "context_event_cap": 20,
+              "omitted_events": 4,
+              "omitted_due_to_context_cap": 4,
+              "omitted_before_context_selection": 0
+            }
+          }
+        }
+      }
+    },
+    "guardrails": {
+      "untrusted_external_context": true,
+      "global_mode_cannot_promote_a_row": true,
+      "immediate_requires_row_mode": "IMMEDIATE",
+      "market_data_asof": "2026-10-22T18:19:07+00:00",
+      "valid_until": "2026-10-22T18:21:07+00:00",
+      "expired_at_build": true,
+      "decision_ready": false,
+      "conditional_strategy_ready": false,
+      "report_mode": "OUTAGE",
+      "required_rechecks": [
+        "실시간 호가와 주문 가능 상태 재확인",
+        "계좌 현금·미체결 주문 재확인",
+        "NBBO/스프레드·LULD·뉴스 halt·feed 지연 상태 재확인"
+      ],
+      "stale_buy_sell_reduce_is_reference_only": true,
+      "supporting_context_may_promote_execution": false,
+      "external_evidence_policy": {
+        "profile": "balanced_external",
+        "material_thesis_effects": [
+          "ranking",
+          "confidence",
+          "position_size_within_existing_risk_limits",
+          "research_priority"
+        ],
+        "supported_evidence_weight": "MEDIUM",
+        "partially_supported_evidence_weight": "LOW_TO_MEDIUM",
+        "unverified_evidence_weight": "LOW_LABELED",
+        "user_primary_channels": [
+          "@kpunch",
+          "@sosumonkey"
+        ],
+        "user_primary_source_tier": "USER_PRIMARY",
+        "user_primary_evidence_weight": "HIGH",
+        "user_primary_validation_policy": "USER_ACCEPTED",
+        "matching_multi_source_signal_may_raise_thesis_priority": true,
+        "conflicting_signal_must_be_visible": true,
+        "may_bypass_market_or_portfolio_execution_gate": false
+      }
+    },
+    "model_provenance": {
+      "schema": "tradingagents.model-provenance/v1",
+      "work_synthesis": {
+        "execution_mode": "local",
+        "requested_model": "gpt-6.1-sol",
+        "requested_reasoning_effort": "xhigh",
+        "task_id": "tradingagents-work-us",
+        "verification_status": "CONFIGURED_NOT_RUNTIME_VERIFIED",
+        "observed_model": null,
+        "observed_reasoning_effort": null,
+        "note": "The local task contract is verified; the Work host does not expose a signed per-response model receipt."
+      },
+      "market_analysis": {
+        "source_run_id": "20261021T175015_local-scheduler-us-full",
+        "provider": "codex",
+        "requested_models": {
+          "quick": "gpt-6.1-sol",
+          "deep": "gpt-6.1-sol",
+          "output": "gpt-6.1-sol",
+          "writer": "gpt-6.1-sol",
+          "judge": "gpt-6.1-sol"
+        },
+        "requested_reasoning_effort": {
+          "default": "medium",
+          "quick": "medium",
+          "deep": "xhigh",
+          "output": "medium",
+          "writer": "medium",
+          "judge": "xhigh"
+        },
+        "verification_status": "RUNTIME_USAGE_OBSERVED",
+        "observed_calls": 813,
+        "observed_models": {
+          "gpt-6.1-sol": {
+            "calls": 813,
+            "input_tokens": 20884114,
+            "output_tokens": 1574548,
+            "total_tokens": 22458662
+          }
+        },
+        "usage_available": true
+      },
+      "overlay": {
+        "source_run_id": "20261023T031942_pre-report-us-overlay",
+        "provider": "codex",
+        "requested_models": {
+          "quick": "gpt-6.1-sol",
+          "deep": "gpt-6.1-sol",
+          "output": "gpt-6.1-sol",
+          "writer": "gpt-6.1-sol",
+          "judge": "gpt-6.1-sol"
+        },
+        "requested_reasoning_effort": {
+          "default": "medium",
+          "quick": "medium",
+          "deep": "xhigh",
+          "output": "medium",
+          "writer": "medium",
+          "judge": "xhigh"
+        },
+        "verification_status": "CONFIGURED_ONLY",
+        "observed_calls": 0,
+        "observed_models": {},
+        "usage_available": false
+      }
+    }
+  }
+}
