@@ -29,7 +29,10 @@ def test_packet_preserves_engine_phase_and_action_without_raw_code_payload(now, 
     assert "raw_codes" not in row and original == before
     assert _compact_market_row(row, 1)["execution"] == execution
     checked_at = datetime.fromisoformat("2026-07-10T12:01:00-04:00")
-    _apply_market_row_validity({"strategy_table": [row]}, now=checked_at)
+    # Match production: validate raw clocks before adding compact execution fields.
+    _apply_market_row_validity({"strategy_table": [original]}, now=checked_at)
+    row = _compact_market_row(original, 1)
+    assert row["execution"]["readiness"] == readiness
     _validate_report_execution_gate({"execution": deepcopy(row["execution"])}, row,
                                    ticker="NVDA", now=checked_at)
 
@@ -49,13 +52,15 @@ def test_packet_risk_exit_cannot_be_rewritten_as_conditional_buy():
         _validate_report_execution_gate(report, row, ticker="NVDA", now=datetime.fromisoformat("2026-07-10T12:01:00-04:00"))
 
 
-@pytest.mark.parametrize("case", ["expired", "downgraded", "contradictory", "missing_raw"])
+@pytest.mark.parametrize("case", ["expired", "downgraded", "waiting", "contradictory", "missing_raw"])
 def test_packet_engine_contract_does_not_upgrade_unverified_inputs(case):
     original = build("STARTER_NOW", "NONE")["strategy_table"][0]
     if case == "expired":
         _apply_market_row_validity({"strategy_table": [original]}, now=datetime.fromisoformat("2026-07-11T12:01:00-04:00"))
     elif case == "downgraded":
         original["execution"] = {"readiness": "NEEDS_LIVE_RECHECK", "blockers": ["extra_check"]}
+    elif case == "waiting":
+        original["execution"] = {"readiness": "WAIT_FOR_TRIGGER", "action_if_triggered": "추가 확인"}
     elif case == "contradictory":
         original["quality"]["action_ready"] = False
     else:
@@ -70,3 +75,13 @@ def test_legacy_raw_engine_none_also_prevents_immediate_packet():
     for field in ("data_ready", "action_ready", "action_status"):
         original["quality"].pop(field)
     assert _compact_market_row(original, 1)["execution"]["readiness"] == "RESEARCH_ONLY"
+
+
+def test_report_action_spacing_does_not_change_the_original_exit():
+    original = build("NONE", "EXIT", held=True)["strategy_table"][0]
+    checked_at = datetime.fromisoformat("2026-07-10T12:01:00-04:00")
+    _apply_market_row_validity({"strategy_table": [original]}, now=checked_at)
+    row = _compact_market_row(original, 1)
+    assert row["execution"]["readiness"] == "WAIT_FOR_TRIGGER"
+    report = {"execution": {**row["execution"], "action_if_triggered": " 전량   매도 "}}
+    _validate_report_execution_gate(report, row, ticker="NVDA", now=checked_at)

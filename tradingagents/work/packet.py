@@ -353,7 +353,8 @@ def _market_row_execution(row: dict[str, Any]) -> dict[str, Any]:
         return execution
     data_ready = quality.get("data_ready", quality.get("execution_ready")) is True
     if now in immediate:
-        if row_mode == "IMMEDIATE" and data_ready and quality.get("action_ready", True) is True:
+        if (execution.get("readiness") == "READY_NOW" and row_mode == "IMMEDIATE"
+                and data_ready and quality.get("action_ready", True) is True):
             execution.update(readiness="READY_NOW", action_now=immediate[now])
         else:
             execution["readiness"] = "NEEDS_LIVE_RECHECK"

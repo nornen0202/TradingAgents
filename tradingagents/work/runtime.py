@@ -1503,7 +1503,7 @@ def _validate_report_execution_gate(
     executable = report_readiness in {"READY_NOW", "WAIT_FOR_TRIGGER"}
     if executable and packet_execution.get("action_contract_source") == "EXECUTION_ENGINE_V1":
         field = "action_now" if report_readiness == "READY_NOW" else "action_if_triggered"
-        if not packet_execution.get(field) or report_execution.get(field) != packet_execution[field]:
+        if not packet_execution.get(field) or not _report_actions_equal(report_execution.get(field), packet_execution[field]):
             raise WorkRuntimeError(f"Structured market strategy {ticker} changes the packet engine action")
     if executable:
         effective_now = _parse_datetime(now.isoformat())
