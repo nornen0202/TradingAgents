@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 from pathlib import Path
 import shutil
 import subprocess
+import sys
 
 import pytest
 
@@ -41,7 +42,7 @@ def _directory(path: Path, *, modified: datetime | None = None) -> Path:
     return path
 
 
-def _run_maintenance(tmp_path: Path, *, apply: bool) -> subprocess.CompletedProcess[str]:
+def _run_maintenance(tmp_path: Path, *, apply: bool, extended_policy=None) -> subprocess.CompletedProcess[str]:
     # These fixtures model an idle temporary runner, regardless of unrelated
     # production Runner.Worker processes on the machine running the tests.
     wrapper = tmp_path / "maintenance-test-wrapper.ps1"
@@ -81,8 +82,40 @@ def _run_maintenance(tmp_path: Path, *, apply: bool) -> subprocess.CompletedProc
     ]
     if apply:
         command.append("-Apply")
+    if extended_policy is not None:
+        command += ["-ExtendedPolicyPath", str(extended_policy)]
     return subprocess.run(command, check=False, capture_output=True, text=True,
                           env={**os.environ, "TEST_MAINTENANCE_SCRIPT": str(SCRIPT)})
+
+
+@pytest.mark.skipif(os.name != "nt" or PWSH is None, reason="Windows PowerShell required")
+def test_referenced_canonical_history_is_preserved_while_other_retention_runs(tmp_path):
+    old = datetime.now() - timedelta(days=40)
+    stamp = old.strftime("%Y%m%d")
+    main = _directory(tmp_path / "data" / "archive" / "runs" / str(old.year) / f"{stamp}T010101_old")
+    youtube = _directory(tmp_path / "data" / "archive" / "youtube-archive" / "runs" / str(old.year) / f"youtube_{stamp}_010101")
+    prism = _directory(tmp_path / "data" / "prism-telegram-archive" / "runs" / str(old.year) / f"prism_telegram_{stamp}_010101")
+    config = tmp_path / "policy.json"
+    config.write_text(json.dumps({"enabled": False, "python_executable": sys.executable,
+                                  "preserve_canonical_archive": True}), encoding="utf-8")
+    (tmp_path / "runner").mkdir()
+    result = _run_maintenance(tmp_path, apply=True, extended_policy=config)
+    assert result.returncode == 0, result.stderr
+    assert (main / "payload.txt").read_text() == "generated"
+    assert (youtube / "payload.txt").read_text() == "generated"
+    assert not prism.exists()
+    assert "PRESERVED root=" in result.stdout
+
+
+@pytest.mark.skipif(os.name != "nt" or PWSH is None, reason="Windows PowerShell required")
+def test_invalid_policy_preserves_old_history_before_any_cleanup(tmp_path):
+    old = datetime.now() - timedelta(days=40)
+    main = _directory(tmp_path / "data" / "archive" / "runs" / str(old.year) / f"{old:%Y%m%d}T010101_old")
+    config = tmp_path / "invalid-policy.json"
+    config.write_text("{malformed")
+    result = _run_maintenance(tmp_path, apply=True, extended_policy=config)
+    assert result.returncode != 0
+    assert (main / "payload.txt").read_text() == "generated"
 
 
 @pytest.mark.skipif(os.name != "nt" or PWSH is None, reason="Windows PowerShell 7 is required")

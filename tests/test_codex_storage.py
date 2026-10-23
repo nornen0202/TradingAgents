@@ -151,6 +151,54 @@ def test_wrong_volume_blocks_changes(monkeypatch):
         storage.validate_volumes({"volumes": {"G:\\": "EXPECTED"}})
 
 
+def test_registered_relocation_audit_reports_replaced_alias_without_repair(tmp_path):
+    source, destination = tmp_path / "old-path", tmp_path / "offloaded"
+    destination.mkdir()
+    (destination / "saved.txt").write_text("keep")
+    storage.make_junction(source, destination)
+    config = {"relocations": [{"id": "saved", "source": str(source), "destination": str(destination)}]}
+    assert policy.audit_relocations(config)
+    if source.is_symlink():
+        source.unlink()
+    else:
+        source.rmdir()
+    source.mkdir()
+    (source / "new.txt").write_text("new application data")
+    assert not policy.audit_relocations(config)
+    assert (source / "new.txt").read_text() == "new application data"
+    assert (destination / "saved.txt").read_text() == "keep"
+
+
+def test_relocation_mismatch_fails_task_without_removing_either_copy(tmp_path, monkeypatch):
+    source, destination = tmp_path / "old-path", tmp_path / "offloaded"
+    source.mkdir()
+    destination.mkdir()
+    (source / "new.txt").write_text("new data")
+    (destination / "saved.txt").write_text("saved data")
+    config = tmp_path / "policy.json"
+    config.write_text(json.dumps({"enabled": True, "system_drive": str(tmp_path),
+                                  "backup_root": str(tmp_path / "backups"), "journal_root": str(tmp_path / "journal"),
+                                  "relocations": [{"id": "saved", "source": str(source), "destination": str(destination)}]}))
+    monkeypatch.setattr(sys, "argv", ["policy", "--config", str(config)])
+    monkeypatch.setattr(policy.storage, "process_references", lambda: [])
+    assert policy.main() == 2
+    assert (source / "new.txt").read_text() == "new data"
+    assert (destination / "saved.txt").read_text() == "saved data"
+
+
+@pytest.mark.parametrize("free,critical,expected", [(20, 12, 0), (8, 12, 2), (8, 0, 0)])
+def test_critical_capacity_is_visible_as_task_failure_but_warning_is_not(tmp_path, monkeypatch, free, critical, expected):
+    from types import SimpleNamespace
+    config = tmp_path / "policy.json"
+    config.write_text(json.dumps({"enabled": True, "system_drive": str(tmp_path),
+                                  "backup_root": str(tmp_path / "backups"), "journal_root": str(tmp_path / "journal"),
+                                  "warning_free_bytes": 30, "critical_free_bytes": critical}))
+    monkeypatch.setattr(sys, "argv", ["policy", "--config", str(config)])
+    monkeypatch.setattr(policy.storage, "process_references", lambda: [])
+    monkeypatch.setattr(policy.shutil, "disk_usage", lambda path: SimpleNamespace(free=free))
+    assert policy.main() == expected
+
+
 def test_forward_archive_has_standard_readable_data_descriptors(tmp_path):
     path = tmp_path / "stream.zip"
     with path.open("xb", buffering=1024 * 1024) as handle, zipfile.ZipFile(storage.ForwardOnlyArchive(handle), "w") as saved:

@@ -207,7 +207,7 @@ function Get-LatestRunIds {
             Write-Warning "Could not read latest-run pointer $manifestPath`: $($_.Exception.Message)"
         }
     }
-    return $ids
+    return ,$ids
 }
 
 function Test-TradingAgentsRunnerBusy {
@@ -256,6 +256,17 @@ try {
     }
 
     $startedAt = Get-Date
+    if ([string]::IsNullOrWhiteSpace($ExtendedPolicyPath)) {
+        $ExtendedPolicyPath = Join-Path $PSScriptRoot "storage-policy.json"
+    }
+    $extendedConfig = $null
+    $preserveCanonicalArchive = $false
+    if (Test-Path -LiteralPath $ExtendedPolicyPath -PathType Leaf) {
+        $extendedConfig = Get-Content -LiteralPath $ExtendedPolicyPath -Raw | ConvertFrom-Json
+        if ($extendedConfig.PSObject.Properties.Name -contains "preserve_canonical_archive") {
+            $preserveCanonicalArchive = [bool]$extendedConfig.preserve_canonical_archive
+        }
+    }
     $runnerBusy = Test-TradingAgentsRunnerBusy -Root $RunnerRoot
     $latestRunIds = Get-LatestRunIds -Root $DataRoot
 
@@ -265,11 +276,17 @@ try {
     else {
         $archiveCutoff = (Get-Date).Date.AddDays(-$RetentionDays)
         $archiveSpecs = @(
-            @{ Root = Join-Path $DataRoot "archive\runs"; Pattern = "^(\d{8})T" },
-            @{ Root = Join-Path $DataRoot "archive\youtube-archive\runs"; Pattern = "^youtube_(\d{8})_" },
-            @{ Root = Join-Path $DataRoot "prism-telegram-archive\runs"; Pattern = "^prism_telegram_(\d{8})_" }
+            @{ Root = Join-Path $DataRoot "archive\runs"; Pattern = "^(\d{8})T"; Canonical = $true },
+            @{ Root = Join-Path $DataRoot "archive\youtube-archive\runs"; Pattern = "^youtube_(\d{8})_"; Canonical = $true },
+            @{ Root = Join-Path $DataRoot "prism-telegram-archive\runs"; Pattern = "^prism_telegram_(\d{8})_"; Canonical = $false }
         )
         foreach ($spec in $archiveSpecs) {
+            if ($preserveCanonicalArchive -and $spec.Canonical) {
+                $preservedMessage = "PRESERVED root=$($spec.Root) reason=canonical research retention enabled"
+                Write-Output $preservedMessage
+                Write-MaintenanceLog $preservedMessage
+                continue
+            }
             if (-not (Test-Path -LiteralPath $spec.Root -PathType Container)) {
                 continue
             }
@@ -407,11 +424,7 @@ try {
         }
     }
 
-    if ([string]::IsNullOrWhiteSpace($ExtendedPolicyPath)) {
-        $ExtendedPolicyPath = Join-Path $PSScriptRoot "storage-policy.json"
-    }
-    if (Test-Path -LiteralPath $ExtendedPolicyPath -PathType Leaf) {
-        $extendedConfig = Get-Content -LiteralPath $ExtendedPolicyPath -Raw | ConvertFrom-Json
+    if ($null -ne $extendedConfig) {
         $extendedScript = Join-Path $PSScriptRoot "maintain_codex_storage_policy.py"
         if (-not (Test-Path -LiteralPath $extendedScript -PathType Leaf)) {
             throw "Configured Codex storage policy helper is missing."
@@ -424,7 +437,7 @@ try {
             Write-Output $line
             Write-MaintenanceLog "CODEX_STORAGE $line"
         }
-        if ($extendedExitCode -ne 0) { throw "Codex storage policy failed; originals without verified backups were preserved." }
+        if ($extendedExitCode -ne 0) { throw "Codex storage policy returned $extendedExitCode; inspect relocation-health, storage-headroom, or the helper error. Unverified originals were preserved." }
     }
 
     $summary = "SUMMARY time=$($startedAt.ToString('s')) mode=$(if ($Apply) {'apply'} else {'dry-run'}) planned_items=$script:plannedItems planned_bytes=$script:plannedBytes removed_items=$script:removedItems removed_bytes=$script:removedBytes runner_busy=$runnerBusy"
