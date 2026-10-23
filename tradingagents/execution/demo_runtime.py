@@ -605,6 +605,16 @@ def tick(archive, root, validation_root, *, clock=None, broker_factory=None, quo
             except Exception:
                 markets[market] = {"status": "BLOCKED", "checked_at": at(clock()).isoformat(), "gate_passed": False, "blockers": ["RUNTIME_EVIDENCE_UNVERIFIED"]}
         finished = at(clock())
+        # Preserve the original attempt receipt as diagnostics even when the
+        # exchange is closed. This does not reset the producer or spend a slot.
+        from .strategy_diagnostics import REFRESH_FIELDS
+        for market, row in markets.items():
+            try:
+                attempt = read(root.parent / "execution-refresh" / f"{market.lower()}.json")
+                row["refresh_attempt"] = ({key: attempt.get(key) for key in REFRESH_FIELDS}
+                                          if isinstance(attempt, dict) else attempt)
+            except (OSError, ValueError):
+                row["refresh_attempt"] = {"status": "UNVERIFIED"}
         if finished < start or any(at(row["checked_at"]) > finished for row in markets.values()):
             raise ValueError("RUNTIME_CLOCK_REGRESSED")
         import os

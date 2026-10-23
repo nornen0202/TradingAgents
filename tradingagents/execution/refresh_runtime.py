@@ -11,11 +11,11 @@ from zoneinfo import ZoneInfo
 from tradingagents.atomic_io import atomic_write_json
 from tradingagents.charting.bars import instant
 from tradingagents.execution.paper_runtime import _latest_source, _read, _runtime_session
+from tradingagents.execution.refresh_policy import MAX_CONSECUTIVE_FAILURES
 
 
 ATTEMPT_INTERVAL_SECONDS = 60
 FAILURE_RETRY_SECONDS = 300
-MAX_CONSECUTIVE_FAILURES = 3
 
 
 def execution_refresh_enabled(state):

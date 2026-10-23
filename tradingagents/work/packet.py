@@ -1005,6 +1005,9 @@ def _compact_public_market_bundle(
             for key in (
                 "row_mode",
                 "execution_ready",
+                "data_ready",
+                "action_ready",
+                "action_status",
                 "conditional_strategy_ready",
                 "current_execution_promotion",
                 "generated_in_current_run",
@@ -1101,6 +1104,9 @@ def _apply_market_row_validity(bundle: dict[str, Any], *, now: datetime,
             quality.setdefault("source_execution_promotion", quality.get("current_execution_promotion"))
             quality["row_mode"] = "BLOCKED_STALE"
             quality["execution_ready"] = False
+            quality["data_ready"] = False
+            quality["action_ready"] = False
+            quality["action_status"] = "DATA_RECHECK_REQUIRED"
             quality["conditional_strategy_ready"] = False
             quality["current_execution_promotion"] = "BLOCKED"
             # Keep the research thesis intact, but do not leave an actionable
