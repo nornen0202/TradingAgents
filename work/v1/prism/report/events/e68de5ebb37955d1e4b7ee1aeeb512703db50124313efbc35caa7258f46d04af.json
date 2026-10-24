@@ -1,0 +1,329 @@
+{
+  "schema": "tradingagents.work-report/v1",
+  "surface": "prism",
+  "event_id": "prism:882039e6ba6eddcc69720b4caf699156",
+  "source_sha256": "10967abc994a2048c3e0e6ef3ea5a8e171441ff035d81c5d1c30f07468cda08e",
+  "prompt_contract_version": "prism-work-v5",
+  "workflow_contract_sha256": "6e9bacf847e1ea3fede5d24780fde443897da2d480119b5ef7dfdc873bb87103",
+  "policy": {
+    "visibility": "investor_safe_no_credentials",
+    "external_evidence_profile": "balanced_external",
+    "external_evidence_may_affect": [
+      "ranking",
+      "confidence",
+      "position_size_within_existing_risk_limits",
+      "research_priority"
+    ],
+    "external_evidence_may_bypass_execution_gate": false,
+    "thesis_is_independent_from_execution_readiness": true
+  },
+  "report_markdown": "# PRISM 연구 델타 · 2026-10-24\n\n기준 2026-10-24T10:35:17.027443+09:00 · 소스 정상. 생산 성공 2026-10-24T08:33:46.468020+09:00; 현재 24시간 27/27건, 신규 27·수정 0·중복 제외 0·생략 0, 잘림 없음.\n\n- **MU·RY·MRVL:** 관심 신호 이후 모두 미진입. balanced_external LOW_LABELED로 공식 위험 검증의 연구 우선순위를 높입니다. 순위·확신·투입 비중 상향 근거는 부족합니다.\n- **자료 한계:** PDF 16605–16607 전문과 차트 원본은 패킷에 없습니다. 같은 채널의 반복을 독립 다중 출처로 세지 않습니다. 원문 점수는 검증 신뢰도가 아닙니다.\n- **미처리 과거 수정 45건:** 현재 24시간 prepare 계약에 포함되지 않아 PENDING_CANONICAL_BACKLOG_PACKET으로 남깁니다. 해당 항목을 ACK하거나 완료 처리하지 않습니다.\n\n|종목|연구 영향과 확인 근거|이벤트|\n|---|---|---|\n|MU|관심→미진입. 하락 중인 20·50일선 아래라는 주장을 공식 조정주가로 확인. 추세 회복 전 증액 검토 보류.|16601,16602,16605,16608,16611|\n|RY|관심→미진입. 추세·평가 조건과 공식 IR 확인. RBC 표기를 RY 외 별도 매수 후보로 취급하지 않음.|16601,16603,16606,16609,16612|\n|MRVL|관심→미진입. 하락 추세와 AI 연결·맞춤형 칩 수요를 공식 IR 및 가격으로 검증.|16601,16604,16607,16610,16613|\n\n모든 번호는 stock_ai_agent 이벤트입니다. 분석 관측가는 10월 23일 장중의 출처 주장으로 현재 주문 가격이나 확정 종가가 아닙니다. SNDK·WDC·INTC는 PDF 비교 언급만으로 독립 신호로 승격하지 않습니다. SMA10은 지표 표기로 보고 종목 후보에서 제외합니다.\n\n16601은 가상 포트폴리오 관심 알림이고 16614는 5개 보유 시뮬레이터 스냅샷입니다. 실제 계좌 보유나 주문으로 해석하지 않습니다. BTC 데모 16600·16615–16617과 16618–16626은 두 생애주기로 묶어 연구 참고만 유지합니다. 부분 청산의 미정산 손익을 확정 수익으로 합산하지 않습니다.\n\nKR에는 직접 종목 근거가 없으며 미국 반도체 추세 검증 항목만 간접 전달합니다. US에는 세 종목의 관심/미진입 충돌과 공식 근거 확인을 전달합니다. 시장·계좌·위험 한도와 실시간 재확인 게이트를 유지합니다. 실제 포지션 크기 변경은 없습니다.\n\n다음 확인: 다음 성공한 정제 수집 또는 신규·수정 이벤트, 과거 수정분의 정본 패킷 지원. 현재 최초 이벤트의 24시간 만료는 2026-10-25 03:38:27 KST이며 이후 현재 근거로 재사용하지 않습니다.\n\nCOVERAGE_RECEIPT {\"event_id\": \"prism:882039e6ba6eddcc69720b4caf699156\", \"status\": \"COMPLETE\", \"window_events\": 27, \"transmitted_events\": 27, \"truncated\": false, \"new_events\": 27, \"revised_events\": 0}\n\nMOBILE_HANDOFF {\"owner\": \"external_github_notification_pipeline\", \"status\": \"PENDING_EXTERNAL_VERIFICATION\", \"work_sent_notification\": false}\n\n로컬 보고서만 발행하며 외부 Telegram·Pages 전달은 영수증 미확인입니다.",
+  "structured_report": {
+    "binding": {
+      "surface": "prism",
+      "event_id": "prism:882039e6ba6eddcc69720b4caf699156",
+      "source_sha256": "10967abc994a2048c3e0e6ef3ea5a8e171441ff035d81c5d1c30f07468cda08e"
+    },
+    "title": "PRISM 연구 델타 · 관심 뒤 미진입 검증",
+    "generated_at": "2026-10-24T10:35:17.027443+09:00",
+    "as_of": "2026-10-24T10:35:17.027443+09:00",
+    "source_health": "OK",
+    "report_mode": "RESEARCH_DELTA",
+    "summary": "MU·RY·MRVL 관심 신호 뒤 미진입: 공식 추세·위험 검증 우선순위 상향. 실거래 승격 없음.",
+    "top_actions": [],
+    "strategies": [
+      {
+        "ticker": "MU",
+        "execution": {
+          "readiness": "RESEARCH_ONLY"
+        },
+        "research_impact": "하락 중인 20·50일선 아래라는 미진입 사유를 공식 가격·조정주가로 재검증",
+        "evidence_weight": "LOW_LABELED",
+        "affected_field": "research_priority",
+        "ranking_effect": "NO_UPGRADE",
+        "confidence_effect": "NO_UPGRADE",
+        "sizing_effect": "NO_INCREASE",
+        "source_contributions": [
+          {
+            "event_key": "stock_ai_agent:16611",
+            "content_sha256": "39f80a7c0dfbca3cc93e727e7bd4f364041f212b73efe134aa08a0093f7f9126",
+            "affected_field": "research_priority",
+            "effect": "하락 중인 20·50일선 아래라는 미진입 사유를 공식 가격·조정주가로 재검증"
+          },
+          {
+            "event_key": "stock_ai_agent:16608",
+            "content_sha256": "651cc2e599b50f460b8414b81894185758cf3a51948c8f3b7e672dd5a148e669",
+            "affected_field": "research_priority",
+            "effect": "하락 중인 20·50일선 아래라는 미진입 사유를 공식 가격·조정주가로 재검증"
+          },
+          {
+            "event_key": "stock_ai_agent:16605",
+            "content_sha256": "4dc49985ebcdd44faf425d93bd335b2e701cd673c0ab78e25c7c103aab5e3df8",
+            "affected_field": "research_priority",
+            "effect": "하락 중인 20·50일선 아래라는 미진입 사유를 공식 가격·조정주가로 재검증"
+          },
+          {
+            "event_key": "stock_ai_agent:16602",
+            "content_sha256": "6fef748203d75741adfe745ca275be6f69af138dafbb8542174d9eafdab4f2d3",
+            "affected_field": "research_priority",
+            "effect": "하락 중인 20·50일선 아래라는 미진입 사유를 공식 가격·조정주가로 재검증"
+          },
+          {
+            "event_key": "stock_ai_agent:16601",
+            "content_sha256": "558a6762b82311e3711a8651a704c7576963164f4c36ff665fca59882fe5eaf5",
+            "affected_field": "research_priority",
+            "effect": "하락 중인 20·50일선 아래라는 미진입 사유를 공식 가격·조정주가로 재검증"
+          }
+        ]
+      },
+      {
+        "ticker": "RY",
+        "execution": {
+          "readiness": "RESEARCH_ONLY"
+        },
+        "research_impact": "관심 신호와 미진입 충돌 확인; RY와 RBC 표기 혼동을 먼저 해소",
+        "evidence_weight": "LOW_LABELED",
+        "affected_field": "research_priority",
+        "ranking_effect": "NO_UPGRADE",
+        "confidence_effect": "NO_UPGRADE",
+        "sizing_effect": "NO_INCREASE",
+        "source_contributions": [
+          {
+            "event_key": "stock_ai_agent:16612",
+            "content_sha256": "4b689d14ea34d62fa5f1bd63f5c67ea5e435c0a3052ba0d4d8317dfa94b0c56a",
+            "affected_field": "research_priority",
+            "effect": "관심 신호와 미진입 충돌 확인; RY와 RBC 표기 혼동을 먼저 해소"
+          },
+          {
+            "event_key": "stock_ai_agent:16609",
+            "content_sha256": "81ae05d20bf3acbb881d63820981de95ff2d5b7bca49d7edfa38fc15c50dd2b5",
+            "affected_field": "research_priority",
+            "effect": "관심 신호와 미진입 충돌 확인; RY와 RBC 표기 혼동을 먼저 해소"
+          },
+          {
+            "event_key": "stock_ai_agent:16606",
+            "content_sha256": "aa0cb2388f5d7fbc59b6cd69021a00ca11849fbb37b3d89ce6b52e9400c5d725",
+            "affected_field": "research_priority",
+            "effect": "관심 신호와 미진입 충돌 확인; RY와 RBC 표기 혼동을 먼저 해소"
+          },
+          {
+            "event_key": "stock_ai_agent:16603",
+            "content_sha256": "187039931d744f65bc99752ce3cfd158bddcc7915b257b94853dbf39159b5174",
+            "affected_field": "research_priority",
+            "effect": "관심 신호와 미진입 충돌 확인; RY와 RBC 표기 혼동을 먼저 해소"
+          },
+          {
+            "event_key": "stock_ai_agent:16601",
+            "content_sha256": "558a6762b82311e3711a8651a704c7576963164f4c36ff665fca59882fe5eaf5",
+            "affected_field": "research_priority",
+            "effect": "관심 신호와 미진입 충돌 확인; RY와 RBC 표기 혼동을 먼저 해소"
+          }
+        ]
+      },
+      {
+        "ticker": "MRVL",
+        "execution": {
+          "readiness": "RESEARCH_ONLY"
+        },
+        "research_impact": "하락 추세 차단 사유와 AI 연결·맞춤형 칩 성장 가설을 공식 IR로 대조",
+        "evidence_weight": "LOW_LABELED",
+        "affected_field": "research_priority",
+        "ranking_effect": "NO_UPGRADE",
+        "confidence_effect": "NO_UPGRADE",
+        "sizing_effect": "NO_INCREASE",
+        "source_contributions": [
+          {
+            "event_key": "stock_ai_agent:16613",
+            "content_sha256": "ae88e334c94f0db3bf634cf7adf1dac1368bae6eebe0a2991eb18605da9af089",
+            "affected_field": "research_priority",
+            "effect": "하락 추세 차단 사유와 AI 연결·맞춤형 칩 성장 가설을 공식 IR로 대조"
+          },
+          {
+            "event_key": "stock_ai_agent:16610",
+            "content_sha256": "b957510c8c4f5f1d2bdcf44ca3284567bd3b1718d7116e0e94233380cfd89b4c",
+            "affected_field": "research_priority",
+            "effect": "하락 추세 차단 사유와 AI 연결·맞춤형 칩 성장 가설을 공식 IR로 대조"
+          },
+          {
+            "event_key": "stock_ai_agent:16607",
+            "content_sha256": "518727c1493e2f09040798ffae5987c4faf919f4e78640c908b65cb8232bb8c6",
+            "affected_field": "research_priority",
+            "effect": "하락 추세 차단 사유와 AI 연결·맞춤형 칩 성장 가설을 공식 IR로 대조"
+          },
+          {
+            "event_key": "stock_ai_agent:16604",
+            "content_sha256": "de094b7ab18980a8c382c2671b40a9344302aa59ac2f4ddd792bb2e31d4cce28",
+            "affected_field": "research_priority",
+            "effect": "하락 추세 차단 사유와 AI 연결·맞춤형 칩 성장 가설을 공식 IR로 대조"
+          },
+          {
+            "event_key": "stock_ai_agent:16601",
+            "content_sha256": "558a6762b82311e3711a8651a704c7576963164f4c36ff665fca59882fe5eaf5",
+            "affected_field": "research_priority",
+            "effect": "하락 추세 차단 사유와 AI 연결·맞춤형 칩 성장 가설을 공식 IR로 대조"
+          }
+        ]
+      }
+    ],
+    "coverage_receipt": {
+      "event_id": "prism:882039e6ba6eddcc69720b4caf699156",
+      "status": "COMPLETE",
+      "window_events": 27,
+      "transmitted_events": 27,
+      "truncated": false,
+      "new_events": 27,
+      "revised_events": 0
+    },
+    "model_receipt": {
+      "schema": "tradingagents.model-provenance/v1",
+      "work_synthesis": {
+        "execution_mode": "local",
+        "requested_model": "gpt-6.1-sol",
+        "requested_reasoning_effort": "medium",
+        "task_id": "tradingagents-work-prism",
+        "verification_status": "CONFIGURED_NOT_RUNTIME_VERIFIED",
+        "observed_model": null,
+        "observed_reasoning_effort": null,
+        "note": "The local task contract is verified; the Work host does not expose a signed per-response model receipt."
+      }
+    },
+    "source_summary": {
+      "source": {
+        "health": "OK",
+        "run_id": "prism_telegram_20261024_083331",
+        "last_run_at": "2026-10-24T08:33:46.468020+09:00",
+        "status": "success",
+        "stale_after_hours": 30
+      },
+      "coverage": {
+        "total_unique_events": 247,
+        "window_events": 27,
+        "transmitted_events": 27,
+        "truncated": false,
+        "oldest_occurred_at": "2026-10-23T18:38:27+00:00",
+        "newest_occurred_at": "2026-10-23T23:11:25+00:00"
+      },
+      "delta": {
+        "new_events": 27,
+        "revised_events": 0,
+        "unchanged_events": 0,
+        "delivered_event_keys": [
+          "stock_ai_agent:16626",
+          "stock_ai_agent:16625",
+          "stock_ai_agent:16624",
+          "stock_ai_agent:16623",
+          "stock_ai_agent:16622",
+          "stock_ai_agent:16621",
+          "stock_ai_agent:16620",
+          "stock_ai_agent:16619",
+          "stock_ai_agent:16618",
+          "stock_ai_agent:16617",
+          "stock_ai_agent:16616",
+          "stock_ai_agent:16615",
+          "stock_ai_agent:16614",
+          "stock_ai_agent:16613",
+          "stock_ai_agent:16612",
+          "stock_ai_agent:16611",
+          "stock_ai_agent:16610",
+          "stock_ai_agent:16609",
+          "stock_ai_agent:16608",
+          "stock_ai_agent:16607",
+          "stock_ai_agent:16606",
+          "stock_ai_agent:16605",
+          "stock_ai_agent:16604",
+          "stock_ai_agent:16603",
+          "stock_ai_agent:16602",
+          "stock_ai_agent:16601",
+          "stock_ai_agent:16600"
+        ]
+      },
+      "evidence_policy": {
+        "profile": "balanced_external",
+        "material_thesis_effects": [
+          "ranking",
+          "confidence",
+          "position_size_within_existing_risk_limits",
+          "research_priority"
+        ],
+        "supported_evidence_weight": "MEDIUM",
+        "partially_supported_evidence_weight": "LOW_TO_MEDIUM",
+        "unverified_evidence_weight": "LOW_LABELED",
+        "user_primary_channels": [
+          "@kpunch",
+          "@sosumonkey"
+        ],
+        "user_primary_source_tier": "USER_PRIMARY",
+        "user_primary_evidence_weight": "HIGH",
+        "user_primary_validation_policy": "USER_ACCEPTED",
+        "matching_multi_source_signal_may_raise_thesis_priority": true,
+        "conflicting_signal_must_be_visible": true,
+        "may_bypass_market_or_portfolio_execution_gate": false
+      },
+      "backlog": {
+        "status": "PENDING_CANONICAL_BACKLOG_PACKET",
+        "unacknowledged_events": 45,
+        "event_keys": [
+          "stock_ai_agent:16335",
+          "stock_ai_agent:16287",
+          "stock_ai_agent:16286",
+          "stock_ai_agent:16285",
+          "stock_ai_agent:16284",
+          "stock_ai_agent:16283",
+          "stock_ai_agent:16282",
+          "stock_ai_agent:16281",
+          "stock_ai_agent:16280",
+          "stock_ai_agent:16279",
+          "stock_ai_agent:16266",
+          "stock_ai_agent:16265",
+          "stock_ai_agent:16264",
+          "stock_ai_agent:16263",
+          "stock_ai_agent:16262",
+          "stock_ai_agent:16233",
+          "stock_ai_agent:16232",
+          "stock_ai_agent:16231",
+          "stock_ai_agent:16230",
+          "stock_ai_agent:16229",
+          "stock_ai_agent:16164",
+          "stock_ai_agent:16112",
+          "stock_ai_agent:16098",
+          "stock_ai_agent:16045",
+          "stock_ai_agent:16009",
+          "stock_ai_agent:16008",
+          "stock_ai_agent:16005",
+          "stock_ai_agent:16003",
+          "stock_ai_agent:16002",
+          "stock_ai_agent:16001",
+          "stock_ai_agent:16000",
+          "stock_ai_agent:15999",
+          "stock_ai_agent:15998",
+          "stock_ai_agent:15931",
+          "stock_ai_agent:15930",
+          "stock_ai_agent:15929",
+          "stock_ai_agent:15928",
+          "stock_ai_agent:15905",
+          "stock_ai_agent:15866",
+          "stock_ai_agent:15865",
+          "stock_ai_agent:15864",
+          "stock_ai_agent:15863",
+          "stock_ai_agent:15862",
+          "stock_ai_agent:15807",
+          "stock_ai_agent:15794"
+        ]
+      },
+      "limitations": [
+        "PDF text unavailable",
+        "Single channel, not independent corroboration",
+        "Simulation and BTC excluded from stock execution"
+      ],
+      "mobile_handoff": {
+        "owner": "external_github_notification_pipeline",
+        "status": "PENDING_EXTERNAL_VERIFICATION",
+        "work_sent_notification": false
+      }
+    },
+    "next_checkpoint": "다음 성공 수집·신규/수정 이벤트 및 과거 수정 정본 패킷 지원"
+  },
+  "report_id": "prism:e68de5ebb37955d1e4b7ee1aeeb51270",
+  "report_sha256": "e68de5ebb37955d1e4b7ee1aeeb512703db50124313efbc35caa7258f46d04af",
+  "published_at": "2026-10-24T10:35:25.180006+09:00"
+}
