@@ -1,0 +1,299 @@
+{
+  "schema": "tradingagents.work-context/v1",
+  "surface": "prism",
+  "event_id": "prism:0aab044e06334768c997d0c78d78a97d",
+  "prompt_contract_version": "prism-work-v5",
+  "prompt_sha256": "2d6e6a207021f5126507994f77ca7850fa9bf42701a32286227ca874c1f535df",
+  "skill_sha256": "4dffe28b3721557cc2517b5afff2f94045832606e71ff61461df969f6abb53c7",
+  "task_manifest_sha256": "c0992fa275c9961bc91c679030c0b4d9b8b06f3d164226776421f1e354b5c22e",
+  "workflow_contract_sha256": "6e9bacf847e1ea3fede5d24780fde443897da2d480119b5ef7dfdc873bb87103",
+  "source_sha256": "4b6edded388cf366a909b63ff0be97288d8d444574668657d0a5aacfe581fa8c",
+  "body": {
+    "kind": "prism",
+    "source_health": "OK",
+    "source": {
+      "health": "OK",
+      "run_id": "prism_telegram_20261025_080113",
+      "last_run_at": "2026-10-25T08:01:15.647128+09:00",
+      "status": "success",
+      "stale_after_hours": 30
+    },
+    "window_hours": 24,
+    "execution_eligible": false,
+    "evidence_policy": {
+      "profile": "balanced_external",
+      "material_thesis_effects": [
+        "ranking",
+        "confidence",
+        "position_size_within_existing_risk_limits",
+        "research_priority"
+      ],
+      "supported_evidence_weight": "MEDIUM",
+      "partially_supported_evidence_weight": "LOW_TO_MEDIUM",
+      "unverified_evidence_weight": "LOW_LABELED",
+      "user_primary_channels": [
+        "@kpunch",
+        "@sosumonkey"
+      ],
+      "user_primary_source_tier": "USER_PRIMARY",
+      "user_primary_evidence_weight": "HIGH",
+      "user_primary_validation_policy": "USER_ACCEPTED",
+      "matching_multi_source_signal_may_raise_thesis_priority": true,
+      "conflicting_signal_must_be_visible": true,
+      "may_bypass_market_or_portfolio_execution_gate": false
+    },
+    "coverage": {
+      "total_unique_events": 254,
+      "window_events": 7,
+      "transmitted_events": 7,
+      "truncated": false,
+      "oldest_occurred_at": "2026-10-24T18:56:36+00:00",
+      "newest_occurred_at": "2026-10-24T21:07:48+00:00"
+    },
+    "events": [
+      {
+        "event_key": "stock_ai_agent:16659",
+        "content_sha256": "b2bda89f85c6a8408ad574c1329083a0c58ec13fe6f20f5f860c9106b91b09fc",
+        "occurred_at": "2026-10-24T21:07:48+00:00",
+        "relevance": {
+          "tickers": [],
+          "markets": [],
+          "themes": [],
+          "match_basis": "message_context"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "16659",
+          "posted_at": "2026-10-24T21:07:48+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16659",
+          "preview": "✂️ BTC 데모 청산 체결 · 잔량 확인 중 🕐 10/25 06:06:18 KST 사유: 즉시 일부 감축 💵 청산 결과 정리 수량: 0.003 BTC 진입 → 청산: 미확인 → 80,391.20 USDT 보유 시간: 130.7분 손익·비용 정산 미확정: 확정 수익으로 집계하지 않음",
+          "signals": [],
+          "signals_total": 0,
+          "signals_transmitted": 0,
+          "signals_truncated": false,
+          "simulation_only": true,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 159,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:16658",
+        "content_sha256": "1d585a1014fbc0d6f5101b67c8575252df35daa839457897a98de1b6f4c3894d",
+        "occurred_at": "2026-10-24T20:01:40+00:00",
+        "relevance": {
+          "tickers": [],
+          "markets": [],
+          "themes": [],
+          "match_basis": "message_context"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "16658",
+          "posted_at": "2026-10-24T20:01:40+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16658",
+          "preview": "🛡 BTC 데모 보호 변경 확인 · 롱 🕐 10/25 05:01:34 KST 📦 보유량 0.007 BTC · 평단 80,411.40 USDT 💰 계좌 순자산: 9,388.01 USDT • 총 증거금 56.66 USDT(계좌 0.60%) · 10배 · 교차 🛡 손절 SL 80,180.00 USDT · 남은 전량 • 예상 손익: -1.62 USDT · 계좌 -0.02% (1배 -0.29%...",
+          "signals": [],
+          "signals_total": 0,
+          "signals_transmitted": 0,
+          "signals_truncated": false,
+          "simulation_only": true,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 830,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:16657",
+        "content_sha256": "594c1948075e16efbb3f7db0d0cbf5166c375ef6b461c09be7173e6d00bb5d9b",
+        "occurred_at": "2026-10-24T19:56:46+00:00",
+        "relevance": {
+          "tickers": [],
+          "markets": [],
+          "themes": [],
+          "match_basis": "message_context"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "16657",
+          "posted_at": "2026-10-24T19:56:46+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16657",
+          "preview": "✂️ BTC 데모 부분 청산 체결 · 롱 🕐 10/25 04:56:11 KST 사유: 즉시 일부 감축 🧾 이번 체결: 0.004 BTC · 80,474.60 USDT • 체결금액(명목): 321.90 USDT · 증거금 아님 • 이번 청산 가격손익: +0.25 USDT · 계좌 +0.00% 수수료·펀딩 전 · 확정 순손익 아님 손익·비용 정산 미확정: 확정 수익으로 집계하지 않음 📦 전...",
+          "signals": [],
+          "signals_total": 0,
+          "signals_transmitted": 0,
+          "signals_truncated": false,
+          "simulation_only": true,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 1110,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:16656",
+        "content_sha256": "65550e3ebc3d2c99e44d33041464e01b02e19aaccb5effd3142855d6fea6539c",
+        "occurred_at": "2026-10-24T19:51:29+00:00",
+        "relevance": {
+          "tickers": [],
+          "markets": [],
+          "themes": [],
+          "match_basis": "message_context"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "16656",
+          "posted_at": "2026-10-24T19:51:29+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16656",
+          "preview": "🛡 BTC 데모 보호 변경 확인 · 롱 🕐 10/25 04:51:24 KST 📦 보유량 0.011 BTC · 평단 80,411.40 USDT 💰 계좌 순자산: 9,387.80 USDT • 총 증거금 88.97 USDT(계좌 0.95%) · 10배 · 교차 🛡 손절 SL 80,180.00 USDT · 남은 전량 • 예상 손익: -2.55 USDT · 계좌 -0.03% (1배 -0.29%...",
+          "signals": [],
+          "signals_total": 0,
+          "signals_transmitted": 0,
+          "signals_truncated": false,
+          "simulation_only": true,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 898,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:16655",
+        "content_sha256": "50915fbf1e95c4c47170e494dac88f89b15ac65ab8bd315ac09397ba1f30ff9d",
+        "occurred_at": "2026-10-24T19:01:28+00:00",
+        "relevance": {
+          "tickers": [],
+          "markets": [],
+          "themes": [],
+          "match_basis": "message_context"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "16655",
+          "posted_at": "2026-10-24T19:01:28+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16655",
+          "preview": "🛡 BTC 데모 보호 변경 확인 · 롱 🕐 10/25 04:01:22 KST 📦 보유량 0.011 BTC · 평단 80,411.40 USDT 💰 계좌 순자산: 9,387.70 USDT • 총 증거금 88.96 USDT(계좌 0.95%) · 10배 · 교차 🛡 손절 SL 80,040.00 → 80,180.00 USDT · 남은 전량 • 예상 손익: -2.55 USDT · 계좌 -0.03%...",
+          "signals": [],
+          "signals_total": 0,
+          "signals_transmitted": 0,
+          "signals_truncated": false,
+          "simulation_only": true,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 781,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:16654",
+        "content_sha256": "7ab35f68309291ac3e22d662317c969c1deb9bd5de3349f30d9a7b10788d22d8",
+        "occurred_at": "2026-10-24T18:58:28+00:00",
+        "relevance": {
+          "tickers": [],
+          "markets": [],
+          "themes": [],
+          "match_basis": "message_context"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "16654",
+          "posted_at": "2026-10-24T18:58:28+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16654",
+          "preview": "✂️ BTC 데모 부분 청산 체결 · 롱 🕐 10/25 03:58:03 KST 사유: 부분 익절 🧾 이번 체결: 0.011 BTC · 80,512.70 USDT • 체결금액(명목): 885.64 USDT · 증거금 아님 • 이번 청산 가격손익: +1.11 USDT · 계좌 +0.01% 수수료·펀딩 전 · 확정 순손익 아님 손익·비용 정산 미확정: 확정 수익으로 집계하지 않음 📦 전체 포...",
+          "signals": [],
+          "signals_total": 0,
+          "signals_transmitted": 0,
+          "signals_truncated": false,
+          "simulation_only": true,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 998,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:16653",
+        "content_sha256": "4aadff6361014b67136495e19c82e28753515842fdc03c10e580aaa25e7f4906",
+        "occurred_at": "2026-10-24T18:56:36+00:00",
+        "relevance": {
+          "tickers": [],
+          "markets": [],
+          "themes": [],
+          "match_basis": "message_context"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "16653",
+          "posted_at": "2026-10-24T18:56:36+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16653",
+          "preview": "📌 BTC 데모 첫 진입 체결 · 롱 🕐 10/25 03:55:36 KST 🧾 이번 체결: 0.022 BTC · 80,411.40 USDT • 체결금액(명목): 1,769.05 USDT · 증거금 아님 📦 전체 포지션 • 누적 보유 0 BTC → 0.022 BTC · 관측 기준 • 평단 80,411.40 USDT 💰 계좌 순자산: 9,386.39 USDT • 총 증거금 177.81 US...",
+          "signals": [],
+          "signals_total": 0,
+          "signals_transmitted": 0,
+          "signals_truncated": false,
+          "simulation_only": true,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 1001,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      }
+    ],
+    "guardrails": {
+      "untrusted_content": true,
+      "advisory_only": true,
+      "may_promote_market_execution": false,
+      "multi_ticker_message_prices_require_recheck": true
+    },
+    "model_provenance": {
+      "schema": "tradingagents.model-provenance/v1",
+      "work_synthesis": {
+        "execution_mode": "local",
+        "requested_model": "gpt-6.1-sol",
+        "requested_reasoning_effort": "medium",
+        "task_id": "tradingagents-work-prism",
+        "verification_status": "CONFIGURED_NOT_RUNTIME_VERIFIED",
+        "observed_model": null,
+        "observed_reasoning_effort": null,
+        "note": "The local task contract is verified; the Work host does not expose a signed per-response model receipt."
+      }
+    }
+  }
+}
