@@ -1,0 +1,630 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YouTube 투자자용 검증 리포트 - 하락장, 상승장 아무 영향 안 받고 기초자산 불리는 방법</title>
+  <style>
+:root {
+  color-scheme: light;
+  --bg: #f7f8fb;
+  --panel: #ffffff;
+  --text: #172033;
+  --muted: #667085;
+  --line: #d9dee8;
+  --accent: #0f766e;
+  --accent-2: #2563eb;
+  --warn: #b45309;
+  --bad: #b42318;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0 56px; }
+a { color: var(--accent-2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.hero { padding: 28px 0 22px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+.hero.compact { padding-top: 12px; }
+.hero h1 { margin: 0; font-size: clamp(28px, 4vw, 44px); line-height: 1.15; letter-spacing: 0; }
+.hero p { max-width: 760px; color: var(--muted); margin: 12px 0 0; }
+.eyebrow { color: var(--accent); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0; margin: 0 0 8px; }
+section { margin: 28px 0; }
+h2, h3, h4, h5 { letter-spacing: 0; line-height: 1.25; }
+.synthesis-callout { padding: clamp(20px, 4vw, 34px); border: 1px solid #6ee7d8; border-radius: 18px; background: linear-gradient(135deg, #ecfdf9 0%, #eff6ff 100%); box-shadow: 0 18px 44px rgba(15, 118, 110, .12); }
+.synthesis-callout.unavailable { border-color: var(--line); background: var(--panel); box-shadow: none; }
+.synthesis-callout h2 { margin: 0; font-size: clamp(24px, 3.2vw, 36px); }
+.synthesis-callout .lead { max-width: 900px; font-size: 17px; color: #334155; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.primary-link, .secondary-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border-radius: 999px; font-weight: 800; }
+.primary-link { color: white; background: var(--accent); }
+.secondary-link { color: var(--accent-2); border: 1px solid #93c5fd; background: white; }
+.primary-link:hover, .secondary-link:hover { text-decoration: none; filter: brightness(.97); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.card, .run { display: flex; flex-direction: column; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; color: var(--text); min-height: 128px; }
+.run { padding: 16px; }
+.card:hover, .run:hover { border-color: var(--accent-2); text-decoration: none; }
+.thumb { display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #e9edf5; border-radius: 8px 8px 0 0; color: var(--muted); font-size: 13px; font-weight: 700; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb-empty span { padding: 0 14px; text-align: center; }
+.card-body { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 16px; }
+.card strong { line-height: 1.35; }
+.source-line { color: #3f4a5f; font-weight: 600; }
+.runs { display: grid; gap: 10px; }
+.badge { display: inline-flex; width: fit-content; border-radius: 999px; padding: 2px 9px; background: #e6f4f1; color: var(--accent); font-size: 12px; font-weight: 700; }
+.status-contradicted, .status-llm_failed { background: #fee4e2; color: var(--bad); }
+.status-unverified, .status-stale { background: #fff4d6; color: var(--warn); }
+small, .muted { color: var(--muted); }
+.topnav { display: flex; gap: 14px; margin-bottom: 16px; font-size: 14px; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px; }
+.stats span { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
+.report { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: min(5vw, 36px); }
+.report-head { border-bottom: 1px solid var(--line); margin-bottom: 24px; padding-bottom: 20px; }
+.report-head h1 { margin: 0; font-size: clamp(24px, 3.5vw, 38px); line-height: 1.2; }
+.meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+.scope-note { padding: 12px 14px; border-left: 4px solid var(--warn); border-radius: 6px; background: #fff7ed; color: #7c2d12; }
+.synthesis-report h2 { margin-top: 34px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.synthesis-report h3 { margin: 24px 0 8px; color: #0f4c5c; }
+.synthesis-report p, .synthesis-report li { overflow-wrap: anywhere; }
+pre { overflow: auto; background: #111827; color: #f9fafb; border-radius: 8px; padding: 14px; }
+code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+details { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 18px; }
+@media (max-width: 640px) {
+  main { width: min(100% - 20px, 1120px); padding-top: 18px; }
+  .report { padding: 18px; }
+  .synthesis-callout { border-radius: 14px; padding: 18px; }
+  .cta-row a { width: 100%; }
+  .mobile-report { border-radius: 12px; }
+}
+</style>
+</head>
+<body>
+  <main>
+<nav class="topnav"><a href="index.html">실행 목록</a><a href="../../index.html">YouTube 홈</a></nav>
+<article class="report">
+  <header class="report-head">
+    <p class="eyebrow">youtube_20261025_070206</p>
+    <h1>하락장, 상승장 아무 영향 안 받고 기초자산 불리는 방법</h1>
+    <div class="meta">
+      <span class="badge status-asr_uncertain">asr_uncertain</span>
+      <a href="https://www.youtube.com/watch?v=VYqLOZkGBIw">원본 영상</a>
+    </div>
+  </header>
+  <h2>정액 적립·분배금 재투자 전략: 수량 증가와 수익 보장은 다르다</h2>
+<p><strong>분석 기준: 2026년 10월 25일 · 대상: 경제사냥꾼, 2026년 10월 24일 게시 영상</strong></p>
+<h3>1. 핵심 판단</h3>
+<p>영상은 대표 지수 ETF를 정기적으로 정액 매수하고, 분배금을 재투자하며, 별도 여유자금을 사전에 정한 하락 구간에 나눠 투입하는 전략을 제시한다. 제목의 ‘시장 영향을 받지 않는다’는 <strong>가격 위험이 사라진다는 뜻이 아니라 매수 규칙을 유지한다는 의미</strong>다. 영상 본문도 적립 계좌의 손실과 상승장에서의 일시투자 우위를 인정한다.</p>
+<p>검증 결과는 제한적이다. 총 12개 주장 중 <strong>1개는 산술적으로 지지, 1개는 영상 내용의 해석에 한해 부분 지지, 7개는 미검증, 3개는 음성·자막 해석 불확실</strong>로 분류됐다. 역사적 수익률과 원금 회복 시점은 독립적으로 재현되지 않았다.</p>
+<p><a href="https://www.youtube.com/watch?v=VYqLOZkGBIw">분석 대상 영상</a></p>
+<h3>2. 영상 주장과 확인된 사실·근거</h3>
+<p>아래 시각은 정확한 개별 발화 시점이 아니라 관련 자막 묶음의 시작점이다.</p>
+<p>| 주제·구간 | 영상 주장 | 확인된 사실·검증 한계 |</p>
+<p>|---|---|---|</p>
+<p>| 정액 매수 산식 · <a href="https://www.youtube.com/watch?v=VYqLOZkGBIw&amp;t=0s">00:00</a> | 12,000원·8,000원에 각각 24만 원을 투자하면 평균단가가 9,600원이 된다. | <strong>산술 확인.</strong> 각각 20주·30주, 총 48만 원÷50주=9,600원이다. 두 가격의 단순평균 10,000원보다 낮지만, 일시투자보다 수익률이 높다는 증거는 아니다. |</p>
+<p>| S&amp;P 500 금융위기 사례 · 00:00~05:18 | 2007년 고점부터 적립하면 위기 저점 손실이 약 -40%로 일시투자 -57%보다 작고, 2009년 10월 원금을 회복했다. | <strong>성과 미검증.</strong> 2007년 10월부터 2009년 10월까지 월 1회 납입하면 25회라는 달력 계산만 맞는다. 회복일·평균단가·배당 재투자 효과는 시계열과 매수 규칙이 없어 확인할 수 없다. |</p>
+<p>| S&amp;P 500 장기 비교 · <a href="https://www.youtube.com/watch?v=VYqLOZkGBIw&amp;t=318s">05:18</a> | 20년간 1,000만 원이 가격 기준 5,600만 원, 배당 재투자 기준 8,190만 원이 됐으며 투자이익의 약 36%가 배당·재투자 효과다. | <strong>주어진 금액의 산술만 확인.</strong> 차액은 2,590만 원이고, 2,590÷7,190≈36.02%다. 실제 5.6배·8.19배 성과와 기간은 미검증이며 환율·배당세·ETF 비용도 반영되지 않았다. |</p>
+<p>| 2000년 시작 10년 비교 · 05:18 | 지수 -23%, 적립 가격수익 -3.5%, 적립 배당 재투자 +7%, 일시투자 배당 재투자 -8%다. | <strong>미검증.</strong> 종료일과 월별 매수가격·배당 처리 자료가 없다. |</p>
+<p>| 코스피 2021년 시작 사례 · 00:00 | 지수 약 -35%, 적립 약 -22%를 거쳐 2023년 6월 적립 계좌가 먼저 원금을 회복했다. | <strong>수치 해석 불확실.</strong> 회복 당시 지수 -20%와 일시투자 -2%가 함께 제시된다. 같은 지수·시점이고 다른 조정 요인이 없다면 양립하기 어렵다. 이후 적립 +26% 등도 미검증이다. |</p>
+<p>| 코스피 당해연도 하락 사례 · 00:00~10:33 | 500만 원 일시투자는 304만 원, 5회 적립은 404만 원이 됐다. | <strong>조건부 계산만 확인.</strong> 각각 -39.2%, -19.2%다. 적립 수익률이라는 -1% 표현은 404만 원과 맞지 않는다. 실제 날짜별 종가와 다섯 매수가격은 없다. |</p>
+<p>| 코스피 상승 구간 · <a href="https://www.youtube.com/watch?v=VYqLOZkGBIw&amp;t=633s">10:33</a> | 1년 사례는 일시투자 +44%·적립 -0.8%, 2년 사례는 +113%·+50%다. | <strong>미검증.</strong> 평가일과 월별 가격, 초기 가용자금·대기 현금 처리 조건이 불명확하다. |</p>
+<p>| SPIVA·모닝스타 · 05:18 | 액티브 펀드 부진 비율 79%·86%·93%, 펀드와 투자자 수익률 격차 연 1.2%포인트, ETF 격차 1.6%포인트를 인용한다. | <strong>원문 미확보.</strong> SPIVA의 기간·범주·표를 확인할 수 없다. 모닝스타는 19.9%와 9.9% 자막도 상충한다. 9.9%-8.7%=1.2%포인트라는 계산만 맞는다. |</p>
+<p>| ISA 절세 예시 · 10:33 | 일반 계좌 15.4%, 일반형 ISA 200만 원 비과세·초과분 9.9% 등을 적용하면 분배금 300만 원에서 36만 3,000원을 절약한다. | <strong>가정하의 산술만 확인.</strong> 일반 계좌 세금 46만 2,000원, ISA 9만 9,000원의 차액이다. 게시일 시행 법규와 상품별 적용 여부는 미검증이다. |</p>
+<p>코스피 예시의 평가액을 그대로 가정하면 원금 회복에 필요한 상승률은 304만 원 계좌 약 <strong>64.47%</strong>, 404만 원 계좌 약 <strong>23.76%</strong>다. 이는 손실률과 회복 상승률이 비대칭이라는 계산이지, 실제 적립 성과가 확인됐다는 뜻은 아니다.</p>
+<h3>3. 긍정 논리와 반론</h3>
+<h4>긍정 논리</h4>
+<ul>
+<li><strong>하락 시 수량 확보:</strong> 같은 금액으로 더 많은 수량을 매수할 수 있다. 다만 평균단가 하락은 실제 매수가격 경로에 달려 있다.</li>
+<li><strong>실행의 일관성:</strong> 날짜·금액을 고정하면 매번 매수 시점을 판단해야 하는 부담을 줄일 수 있다는 전략적 취지가 있다. 실제 투자자 성과 개선 폭은 이번 자료로 입증되지 않았다.</li>
+<li><strong>재투자 기반 확대:</strong> 분배금으로 추가 수량을 매수하고 주당 분배금이 유지된다면 다음 총분배금은 증가한다. 세금·비용이 작을수록 재투자 가능한 금액도 커진다.</li>
+</ul>
+<h4>반론과 비용</h4>
+<ul>
+<li><strong>수량 증가와 자산가치 증가는 다르다.</strong> 가격 하락이 지속되면 수량이 늘어도 평가액은 납입원금보다 작을 수 있다. 최초 원금 회복 이후 재손실도 가능하다.</li>
+<li><strong>지속 상승에서는 자금 투입 지연이 불리할 수 있다.</strong> 처음부터 목돈이 있었는지, 매월 소득이 유입되는지에 따라 공정한 비교 조건이 달라진다.</li>
+<li><strong>분배금 자체가 추가 수익을 보장하지 않는다.</strong> 영상은 분배금을 자산의 현금 이전으로 설명하지만, 이를 확인할 상품 공시는 제공되지 않았다. 주당 분배금도 고정된 것으로 볼 수 없다.</li>
+<li><strong>추가 매수 규칙은 미완성이다.</strong> 기준 고점·하락폭·회차별 금액·현금 소진 조건이 없어 구체적인 전략 성과를 평가할 수 없다.</li>
+</ul>
+<h3>4. 증거와 자막의 품질 한계</h3>
+<p><strong>외부 검증을 뒷받침할 직접 관련 자료가 부족하다.</strong> 수집된 E1~E5는 은·Newmont·드론 방어주·인도 기업 실적 기사로, S&amp;P 500 및 코스피 백테스트의 지지·반박 근거로 채택되지 않았다. 따라서 이 기사들을 관련 수익률의 출처로 연결하지 않았다. 수집 상태의 <code>verified</code>는 주장 자체의 검증 완료를 의미하지 않는다.</p>
+<p>호스트의 yfinance 코스피 스냅샷에는 현재값 약 5,550.30, 52주 최고값 9,385.59가 있다. 두 값의 차이는 약 -40.9%지만, 영상이 비교한 6월 22일·10월 22일 종가나 고점 날짜를 확인하지 못하므로 영상의 하락률을 검증하는 자료로 사용할 수 없다.</p>
+<p>자동자막의 <strong>transcript_quality는 good·1.0</strong>이지만 숫자 정확성을 보장하지 않는다. 주요 충돌은 -20%/-2%, -1%/-19%, 19.9%/9.9%, 9%/9.9%다. 주장 검증 단계의 <strong>asr_confidence</strong>도 코스피 당해연도 사례와 모닝스타는 0.45, 코스피 2021년 사례는 0.50으로 낮다.</p>
+<p>추출 단계의 <strong>source_confidence 0.82~0.96은 발화 추출의 명확성</strong>이다. 반면 검증 단계에서는 대부분 0.0으로, 직접 관련 외부 근거가 없음을 반영한다. 판정 confidence가 높아도 ‘주장이 거짓일 확률이 높다’는 뜻은 아니다.</p>
+<p>영상 게시일은 10월 24일이지만 발화에는 10월 23일을 기준으로 한 표현이 있어 실제 평가일도 확정되지 않았다. <strong>모닝스타 상세 보고서·제작자 비공개 계산표·멤버십 콘텐츠는 미검증이며 수동 확인이 필요하다.</strong> Bloomberg 자료는 제공되지 않아 확인 근거로 사용할 수 없다.</p>
+<h3>5. 단기 체크포인트와 관찰 항목</h3>
+<p>| 시점 | 확인·관찰할 항목 | 판단 목적 |</p>
+<p>|---|---|---|</p>
+<p>| 원자료 확보 시 | 매수일, 휴장일 대체 규칙, 납입 횟수, 종료일, 소수 단위 매수, 배당 재투자일 | 영상 백테스트의 재현 가능성 확인 |</p>
+<p>| 원음·화면 재확인 시 | 코스피 -20%/-2%, 적립 -1%/-19%, 모닝스타 19.9%/9.9%, ISA 9%/9.9% | 숫자 누락·발화·자막 오류 구분 |</p>
+<p>| 공식 자료 확보 시 | SPIVA 원문 표, 모닝스타 표본·수익률 정의·권고 문맥, 게시일 시행 ISA 법규 | 기관 인용과 세제 전제 확인 |</p>
+<p>| 매월 | 누적납입액, 평가액, 보유 수량, 평균단가, 납입 중단 여부, 대기 현금 | 수량 증가와 실제 손익을 분리해 관찰 |</p>
+<p>| 분배금 지급 시 | 주당 분배금, 세후 입금액, 재매수 수량·체결가, 수수료 | 재투자가 실제 수량·총수익에 미친 영향 확인 |</p>
+<p>| 상품 특정 시 | 추종지수, 보수, 추적 차이, 분배 재원·일정, 환율 노출 | 지수 가상 성과와 실제 ETF 성과의 차이 확인 |</p>
+<h3>6. 논리가 성립하지 않거나 재평가가 필요한 조건</h3>
+<ul>
+<li>동일 조건의 재계산에서 영상의 손실률·회복일이 재현되지 않으면 <strong>해당 역사적 사례를 근거로 한 결론은 철회 대상</strong>이다.</li>
+<li>초기 자금과 대기 현금 수익을 맞춘 비교에서 결과가 달라지면 <strong>적립식의 일반적 우월성이라는 해석은 성립하지 않는다.</strong></li>
+<li>생활비 부족이나 현금 소진으로 하락기에 납입이 중단되면, 지속 매수를 전제로 한 영상 경로를 기대하기 어렵다.</li>
+<li>주당 분배금 감소, 재투자 중단, 세금·비용 증가가 발생하면 <strong>총분배금이 계속 늘어난다는 전제</strong>를 다시 점검해야 한다.</li>
+<li>시행 세제나 계좌·상품 요건이 예시와 다르면 <strong>36만 3,000원 절세액을 개인 계좌에 그대로 적용할 수 없다.</strong></li>
+</ul>
+<p><strong>결론:</strong> 영상에서 확인 가능한 핵심은 정액 매수의 산식과 규칙 유지라는 취지다. 특정 수익률·원금 회복 시점·기관 인용·세제 효과는 대부분 미검증이다. 투자자가 관찰할 중심 지표는 보유 수량뿐 아니라 누적납입액 대비 평가손익, 세후·비용 차감 총수익, 그리고 매수 규칙의 실제 지속 가능성이다.</p>
+  <details>
+    <summary>공개 요약 JSON</summary>
+    <pre>{
+  &quot;version&quot;: 4,
+  &quot;video_id&quot;: &quot;VYqLOZkGBIw&quot;,
+  &quot;title&quot;: &quot;하락장, 상승장 아무 영향 안 받고 기초자산 불리는 방법&quot;,
+  &quot;url&quot;: &quot;https://www.youtube.com/watch?v=VYqLOZkGBIw&quot;,
+  &quot;channel&quot;: &quot;경제사냥꾼&quot;,
+  &quot;channel_id&quot;: &quot;UC7usMJDHmtbs_oegmzQKKMA&quot;,
+  &quot;source_url&quot;: &quot;https://www.youtube.com/@%EA%B2%BD%EC%A0%9C%EC%82%AC%EB%83%A5%EA%BE%BC/videos&quot;,
+  &quot;thumbnail_url&quot;: &quot;https://i.ytimg.com/vi/VYqLOZkGBIw/maxresdefault.jpg&quot;,
+  &quot;published_at&quot;: &quot;2026-10-24T01:00:28+00:00&quot;,
+  &quot;status&quot;: &quot;asr_uncertain&quot;,
+  &quot;strategy_source_tier&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_evidence_weight&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_validation_policy&quot;: &quot;STANDARD_REVIEW&quot;,
+  &quot;transcript_status&quot;: &quot;available&quot;,
+  &quot;transcript_source&quot;: &quot;automatic&quot;,
+  &quot;transcript_chars&quot;: 9290,
+  &quot;transcript_quality&quot;: {
+    &quot;status&quot;: &quot;good&quot;,
+    &quot;score&quot;: 1.0,
+    &quot;warnings&quot;: [],
+    &quot;source&quot;: &quot;automatic&quot;,
+    &quot;language&quot;: &quot;Korean (Original)&quot;,
+    &quot;model_or_format&quot;: &quot;json3&quot;,
+    &quot;chars&quot;: 9290,
+    &quot;segments&quot;: 484,
+    &quot;duration_seconds&quot;: 919,
+    &quot;repeated_ngram_ratio&quot;: 0.008
+  },
+  &quot;generated_at&quot;: &quot;2026-10-25T07:02:06.837307+09:00&quot;,
+  &quot;llm_status&quot;: &quot;success&quot;,
+  &quot;research_status&quot;: &quot;success&quot;,
+  &quot;claim_verification_status&quot;: &quot;success&quot;,
+  &quot;research_pipeline_version&quot;: 4,
+  &quot;evidence_count&quot;: 5,
+  &quot;claim_status_summary&quot;: {
+    &quot;unverified&quot;: 7,
+    &quot;asr_uncertain&quot;: 3,
+    &quot;supported&quot;: 1,
+    &quot;partially_supported&quot;: 1
+  },
+  &quot;claims&quot;: [
+    {
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;claim_text&quot;: &quot;2007년 고점에서 시작한 S&amp;P 500 월 적립은 금융위기 손실을 줄이고 2009년 10월 원금을 회복했으며, 배당 재투자 시 회복이 더 빨랐다는 주장.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.9,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;일시투자 -57%, 적립 -40%; 2009년 10월 회복, 배당 재투자 시 9월; 지수 회복은 3년 5개월 뒤&quot;,
+        &quot;observed&quot;: &quot;납입 횟수의 달력상 정합성만 확인 가능하며 시장 성과는 확인 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;회복 기간과 손실 완화 수치를 투자계획의 확정 근거로 사용하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;claim_text&quot;: &quot;최근 20년간 1,000만 원의 S&amp;P 500 투자 평가액은 가격 기준 5,600만 원, 배당 재투자 기준 8,190만 원이고 차액은 투자이익의 약 36%라는 주장.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:05:18&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.9,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;1,000만 원→5,600만 원 또는 8,190만 원; 차액 2,590만 원, 투자이익 기여 약 36%&quot;,
+        &quot;observed&quot;: &quot;차액과 36.02% 계산은 일치하나 5.6배·8.19배의 실제 시장 수익은 미검증&quot;
+      },
+      &quot;investor_implication&quot;: &quot;36%는 제시된 평가액이 맞다는 조건부 계산이며, 실제 ETF의 세후·비용 차감 성과는 확인되지 않았다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;claim_text&quot;: &quot;2000년 첫 거래일부터 10년간 S&amp;P 500 지수는 -23%, 월 적립은 가격 기준 -3.5%·배당 재투자 +7%, 일시투자 총수익은 -8%였다는 주장.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:05:18&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.9,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;지수 -23%, 적립 가격수익 -3.5%, 적립 총수익 +7%, 일시투자 총수익 -8%&quot;,
+        &quot;observed&quot;: &quot;관련 시계열과 재현 계산 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;해당 사례만으로 장기 적립이나 배당 재투자가 특정 수익률을 보장한다고 판단할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;claim_text&quot;: &quot;2021년 7월 코스피 고점부터 적립하면 손실이 약 -22%로 줄고 2023년 6월 원금을 회복했으며, 당시 지수 -20%와 일시투자 -2%라는 설명이 함께 등장한다는 주장.&quot;,
+      &quot;status&quot;: &quot;asr_uncertain&quot;,
+      &quot;confidence&quot;: 0.98,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.5,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;지수 -35%, 적립 -22%; 2023년 6월 회복 당시 지수 -20%·일시투자 -2%; 이후 적립 +26%&quot;,
+        &quot;observed&quot;: &quot;-20%·-2% 내부 불일치 확인; 실제 시장 수익률과 회복일 확인 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;숫자 불일치를 해소하기 전에는 해당 회복 사례를 투자 판단에 인용하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;claim_text&quot;: &quot;맥락상 2026년 6월 22일 코스피 고점에서 10월 22일까지 39% 넘게 하락했고, 500만 원 일시투자는 304만 원, 5회 적립은 404만 원이 되었다는 주장.&quot;,
+      &quot;status&quot;: &quot;asr_uncertain&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.25,
+      &quot;asr_confidence&quot;: 0.45,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;일시투자 304만 원, 적립 404만 원; 적립 -1% 또는 -19%; 회복 상승률 65%·24%; 수량비 1.65배&quot;,
+        &quot;observed&quot;: &quot;금액 기준 수익률 -39.2%·-19.2%; 회복률 64.47%·23.76%; 조건부 수량비 1.645배&quot;
+      },
+      &quot;investor_implication&quot;: &quot;조건부 산술은 대체로 맞지만 실제 코스피 백테스트와 적립 수익률의 발화는 미확정이다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;claim_text&quot;: &quot;코스피를 2025년 10월 23일부터 투자하면 일시투자 +44%·월 적립 -0.8%, 2년 전 같은 날부터 투자하면 각각 +113%·+50%라는 주장.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:10:33&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.85,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;1년 사례 +44%·-0.8%, 2년 사례 +113%·+50%&quot;,
+        &quot;observed&quot;: &quot;해당 기간 가격 및 월별 납입 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;네 수익률은 검증되지 않았고, 자금 노출 기간이 다른 단순 수익률 비교만으로 전략의 우열을 일반화할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;claim_text&quot;: &quot;SPIVA 비교에서 수수료 차감 후 S&amp;P 500에 뒤진 미국 대형주 액티브 펀드 비율은 2025년 79%, 10년 86%, 20년 93%라는 주장.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:05:18&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.85,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;2025년 79%, 10년 86%, 20년 93%&quot;,
+        &quot;observed&quot;: &quot;대조할 공식 표 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;정확한 비율을 인용하거나 특정 액티브 펀드의 미래 부진을 추론할 근거로 쓰기 어렵다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;claim_text&quot;: &quot;모닝스타의 2016~2025년 분석에서 펀드 수익률 9.9%, 투자자 수익률 8.7%, 격차 1.2%포인트, ETF 격차 1.6%포인트이며 정액 적립을 권했다는 주장.&quot;,
+      &quot;status&quot;: &quot;asr_uncertain&quot;,
+      &quot;confidence&quot;: 0.98,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:05:18&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.45,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;9.9%·8.7%·격차 1.2%포인트; ETF 1.6%포인트; 자막에는 19.9%·연.7%&quot;,
+        &quot;observed&quot;: &quot;후속 수치의 뺄셈만 일치하며 원문 수치는 확인 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;9.9%·8.7%를 확정 수치로 인용하기 전 원문과 원음 확인이 필요하다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;claim_text&quot;: &quot;일반 계좌 분배금 세율 15.4%, 일반형 ISA 3년 유지·순이익 200만 원 비과세·초과분 9.9%를 적용하면 분배금 300만 원의 절세액은 36만 3,000원이라는 주장.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:10:33&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.75,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;15.4%; 3년·200만 원·9.9%; 절세 363,000원&quot;,
+        &quot;observed&quot;: &quot;주어진 전제에서 462,000원-99,000원=363,000원; 법적 적용 여부 미확인&quot;
+      },
+      &quot;investor_implication&quot;: &quot;예시 계산은 맞지만 현재 적용 세제와 개인별 절세액이 검증된 것은 아니다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C10&quot;,
+      &quot;claim_text&quot;: &quot;ETF 분배금은 공짜 수익이 아닌 자산의 현금 이전이며 재매수로 보유 수량이 늘고 주당 분배금이 같으면 다음 분배금도 증가한다는 설명.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.97,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:05:18&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.9,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;재투자→수량 증가→주당 분배금이 같다면 다음 총분배금 증가&quot;,
+        &quot;observed&quot;: &quot;조건부 수량·분배금 관계만 계산상 확인; 실제 상품 구조와 성과는 미검증&quot;
+      },
+      &quot;investor_implication&quot;: &quot;보유 수량과 총수익은 구분해야 하며 분배금 증가를 확정 수익으로 간주할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C11&quot;,
+      &quot;claim_text&quot;: &quot;12,000원과 8,000원에 각각 24만 원을 투자하면 20주·30주, 총 50주이며 평균단가는 9,600원으로 단순평균 10,000원보다 낮다는 설명.&quot;,
+      &quot;status&quot;: &quot;supported&quot;,
+      &quot;confidence&quot;: 1.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: false,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 1.0,
+      &quot;asr_confidence&quot;: 0.96,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;20주+30주=50주; 평균단가 9,600원; 단순평균 10,000원&quot;,
+        &quot;observed&quot;: &quot;제시된 모든 산술 일치&quot;
+      },
+      &quot;investor_implication&quot;: &quot;정액 매수의 수량 가중 평균단가 계산은 맞지만 전략의 수익 우월성을 입증하는 예시는 아니다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C12&quot;,
+      &quot;claim_text&quot;: &quot;제목의 시장 영향 없음은 손실 회피가 아닌 매수 규칙 유지라는 뜻이며, 생활비를 제외한 정기 투자와 사전 규칙에 따른 추가 분할매수를 제안한다는 설명.&quot;,
+      &quot;status&quot;: &quot;partially_supported&quot;,
+      &quot;confidence&quot;: 0.95,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.6,
+      &quot;asr_confidence&quot;: 0.9,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;40% 이상 계좌 하락에도 지속 가능한 투자액; 구체적인 추가 매수 수치는 없음&quot;,
+        &quot;observed&quot;: &quot;전략의 서술상 취지는 확인되나 최적 투자액·매수 기준·성과는 확인 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;규칙 유지와 시장 위험 제거를 구분하고, 추가 매수 전략의 성과는 검증되지 않은 것으로 취급한다.&quot;
+    }
+  ],
+  &quot;entities&quot;: [
+    {
+      &quot;ticker&quot;: &quot;^KS11&quot;,
+      &quot;name&quot;: &quot;코스피 지수&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;2021년 고점에서 시작한 정액 적립 계좌는 지수가 고점에 못 미치는 상태에서도 먼저 원금을 회복했다고 주장한다.&quot;,
+        &quot;영상이 제시한 올해 고점 이후 사례에서는 정액 적립이 일시투자보다 손실과 원금 회복에 필요한 상승폭을 줄였다고 주장한다.&quot;,
+        &quot;정액 적립이 항상 수익을 극대화하는 것은 아니며, 먼저 크게 상승한 구간에서는 일시투자 수익률이 더 높았다고 설명한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;2021년 7월 고점 이후 지수는 약 35%, 매월 적립 계좌는 약 22% 하락했다는 주장.&quot;,
+        &quot;2023년 6월 24번째 납입 무렵 적립 계좌가 원금을 회복했고 지수는 고점 대비 -20%였다는 설명. 같은 대목에서 일시투자 계좌는 &#x27;-2%&#x27;라고 발화되어 상충한다.&quot;,
+        &quot;지수는 그로부터 2년 3개월 후 고점을 회복했으며 당시 적립 계좌는 납입액 대비 +26%였다는 주장.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;^KS11&quot;,
+        &quot;as_of&quot;: &quot;2026-10-24T22:04:00.904653+00:00&quot;,
+        &quot;current_price&quot;: 5550.2998046875,
+        &quot;market_cap&quot;: null,
+        &quot;forward_pe&quot;: null,
+        &quot;trailing_pe&quot;: null,
+        &quot;fifty_two_week_high&quot;: 9385.59,
+        &quot;fifty_two_week_low&quot;: 3833.35,
+        &quot;average_target_price&quot;: null,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    }
+  ],
+  &quot;evidence&quot;: [
+    {
+      &quot;evidence_id&quot;: &quot;E1&quot;,
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;title&quot;: &quot;Can silver recover from its latest sell-off? UBS weighs in&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/commodities/articles/silver-recover-latest-sell-off-210417888.html&quot;,
+      &quot;publisher&quot;: &quot;Investing.com&quot;,
+      &quot;published_at&quot;: &quot;2026-10-24T21:04:17+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Can silver recover from its latest sell-off? UBS weighs in Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals Weather Newsletters Finance My por...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E2&quot;,
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;title&quot;: &quot;Newmont Corp (NEM) Q3 2026 Earnings Call Highlights: Record Free Cash Flow, Improved Cost ...&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/newmont-corp-nem-q3-2026-090225744.html&quot;,
+      &quot;publisher&quot;: &quot;GuruFocus.com&quot;,
+      &quot;published_at&quot;: &quot;2026-10-24T09:02:25+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E3&quot;,
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;title&quot;: &quot;Top 3 Drone Defense Stocks To Watch In October 2026&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/top-3-drone-defense-stocks-111514603.html&quot;,
+      &quot;publisher&quot;: &quot;Simply Wall St.&quot;,
+      &quot;published_at&quot;: &quot;2026-10-24T11:15:14+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E4&quot;,
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;title&quot;: &quot;Havells India Ltd (BOM:517354) (Q2 2027) Earnings Call Highlights: Revenue Jumps 35% as Lloyd ...&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/havells-india-ltd-bom-517354-110128987.html&quot;,
+      &quot;publisher&quot;: &quot;GuruFocus.com&quot;,
+      &quot;published_at&quot;: &quot;2026-10-24T11:01:28+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    }
+  ],
+  &quot;source_policy&quot;: {
+    &quot;raw_transcript_published&quot;: false,
+    &quot;raw_transcript_in_evidence&quot;: false,
+    &quot;research_pipeline_version&quot;: 4,
+    &quot;closed_source_claims&quot;: &quot;unverified_external_source&quot;,
+    &quot;auto_caption_warning&quot;: true,
+    &quot;local_asr_warning&quot;: false
+  }
+}</pre>
+  </details>
+</article>
+</main>
+  <style>
+.reader-contents { margin: 16px 0; padding: 12px 16px; border: 1px solid var(--line, #64748b); border-radius: 12px; }
+.reader-contents > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-weight: 750; }
+.reader-contents nav { display: grid; gap: 4px; max-height: 45vh; overflow: auto; margin: 8px 0; }
+.reader-contents a { display: block; min-height: 44px; padding: 10px; border-radius: 6px; color: inherit; overflow-wrap: anywhere; }
+.reader-contents a:hover { background: #80808020; }
+.reader-contents .reader-subsection { padding-inline-start: 24px; font-size: .92em; }
+.reader-prose, .report { overflow-wrap: anywhere; line-height: 1.8; }
+.reader-prose p, .reader-prose li { max-width: 85ch; }
+.reader-prose h2, .reader-prose h3, .reader-prose h4, [data-reader-heading] { scroll-margin-top: 100px; line-height: 1.45; }
+.reader-prose h2 { margin-top: 1.8em; padding-bottom: 8px; border-bottom: 1px solid var(--line, #64748b); }
+.reader-prose h3 { margin-top: 1.5em; }
+.reader-prose li { margin: .5em 0; }
+.reader-prose pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.reader-prose blockquote { margin: 16px 0; padding: 4px 16px; border-left: 3px solid var(--accent, #64748b); }
+.reader-table { overflow: auto; max-width: 100%; margin: 16px 0; border: 1px solid var(--line, #64748b); border-radius: 10px; }
+.reader-table table { border-collapse: collapse; width: 100%; margin: 0; font-size: .92rem; }
+.reader-table th, .reader-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line, #64748b); min-width: 110px; max-width: 400px; overflow-wrap: anywhere; white-space: normal; }
+.reader-table th { background: #80808018; }
+.reader-table tr:nth-child(even) { background: #80808008; }
+.reader-search { display: grid; gap: 8px; margin: 16px 0; }
+.reader-search label { font-weight: 700; }
+.reader-search input { box-sizing: border-box; width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line, #64748b); border-radius: 10px; background: var(--panel, #fff); color: var(--text, #132238); font: inherit; }
+.reader-search p { margin: 0; font-size: .86rem; }
+.reader-back { position: fixed; bottom: max(14px, env(safe-area-inset-bottom)); right: 14px; z-index: 30; min-height: 44px; border: 1px solid #778899; border-radius: 99px; padding: 10px 16px; background: #18344a; color: #fff; font: 700 14px system-ui; cursor: pointer; box-shadow: 0 3px 12px #0003; }
+[data-reader-source] { margin-top: 20px; }
+[data-reader-source] > summary { min-height: 44px; cursor: pointer; }
+[data-reader-source] pre { font-size: .85rem; }
+[data-reader-source] pre, .reader-prose { min-width: 0; }
+.reader-contents :focus-visible, .reader-search :focus-visible, .reader-back:focus-visible, .reader-table:focus-visible { outline: 3px solid var(--accent, #008c95); outline-offset: 3px; }
+.reader-search + .grid > [hidden] { display: none !important; }
+@media (max-width: 600px) { .reader-prose { font-size: 1rem; } .reader-contents { padding: 8px 12px; } }
+@media print { .reader-back, .reader-search, .reader-contents, [data-reader-source] { display: none !important; } .reader-table { overflow: visible; } .reader-prose { color: #000; background: #fff; } }
+</style><script>
+(() => {
+  'use strict';
+  let serial = 0;
+  const rendered = new WeakMap();
+  const node = (tag, text) => { const el = document.createElement(tag); if (text != null) el.textContent = text; return el; };
+  function inline(parent, text) {
+    const pattern = /(`[^`]+`|\*\*[^*]+\*\*|\[[^\]]+\]\(https?:\/\/[^\s)]+\))/g;
+    let start = 0;
+    for (const match of String(text).matchAll(pattern)) {
+      parent.append(document.createTextNode(text.slice(start, match.index)));
+      const value = match[0];
+      if (value.startsWith('`')) parent.append(node('code', value.slice(1, -1)));
+      else if (value.startsWith('**')) parent.append(node('strong', value.slice(2, -2)));
+      else {
+        const link = value.match(/^\[([^\]]+)\]\((.+)\)$/);
+        const a = node('a', link[1]); a.href = link[2]; a.rel = 'noopener noreferrer'; parent.append(a);
+      }
+      start = match.index + value.length;
+    }
+    parent.append(document.createTextNode(text.slice(start)));
+  }
+  const cells = line => line.trim().replace(/^\|/, '').replace(/\|$/, '').split(/(?<!\\)\|/).map(v => v.trim().replace(/\\\|/g, '|'));
+  function markdown(source) {
+    const article = node('article'); article.className = 'reader-prose';
+    const lines = source.split(/\r?\n/); let list = null;
+    for (let i = 0; i < lines.length; i += 1) {
+      const line = lines[i], value = line.trim();
+      if (!value) { list = null; continue; }
+      if (/^```/.test(value)) {
+        const code = []; i += 1;
+        while (i < lines.length && !/^```/.test(lines[i].trim())) code.push(lines[i++]);
+        const pre = node('pre'); pre.append(node('code', code.join('\n'))); article.append(pre); list = null; continue;
+      }
+      if (i + 1 < lines.length && value.includes('|') && cells(lines[i + 1]).every(v => /^:?-{3,}:?$/.test(v))) {
+        const table = node('table'), head = node('thead'), body = node('tbody');
+        const row = (values, tag) => { const tr = node('tr'); values.forEach(v => { const cell = node(tag); if (tag === 'th') cell.scope = 'col'; inline(cell, v); tr.append(cell); }); return tr; };
+        head.append(row(cells(line), 'th')); i += 2;
+        while (i < lines.length && lines[i].trim() && lines[i].includes('|')) body.append(row(cells(lines[i++]), 'td'));
+        i -= 1; table.append(head, body); article.append(table); list = null; continue;
+      }
+      const heading = value.match(/^(#{1,6})\s+(.+)$/);
+      if (heading) { const h = node('h' + Math.min(4, heading[1].length + 1)); inline(h, heading[2]); article.append(h); list = null; continue; }
+      const bullet = value.match(/^(?:[-*+] |\d+\. )(.+)$/);
+      if (bullet) {
+        const tag = /^\d/.test(value) ? 'ol' : 'ul';
+        if (!list || list.tagName.toLowerCase() !== tag) { list = node(tag); if (tag === 'ol') list.start = parseInt(value, 10); article.append(list); }
+        const li = node('li'); inline(li, bullet[1]); list.append(li); continue;
+      }
+      list = null;
+      if (/^(---+|\*\*\*+)$/.test(value)) { article.append(node('hr')); continue; }
+      const p = node(value.startsWith('> ') ? 'blockquote' : 'p'); inline(p, value.startsWith('> ') ? value.slice(2) : line); article.append(p);
+    }
+    return article;
+  }
+  function contents(root) {
+    root.querySelectorAll(':scope > .reader-contents').forEach(el => el.remove());
+    const headings = [...root.querySelectorAll('h2,h3,h4')].filter(h => !h.closest('.card,.run-card,.reader-contents,[data-reader-source],[hidden]'));
+    if (headings.length < 2) return;
+    const details = node('details'); details.className = 'reader-contents';
+    details.append(node('summary', '이 리포트 목차 · ' + headings.length + '개 항목'));
+    const nav = node('nav'); nav.setAttribute('aria-label', '리포트 목차');
+    headings.forEach(h => {
+      if (!h.id) h.id = 'reader-section-' + (++serial);
+      h.dataset.readerHeading = ''; h.tabIndex = -1;
+      const a = node('a', h.textContent); a.href = '#' + h.id;
+      if (h.tagName !== 'H2') a.className = 'reader-subsection';
+      a.addEventListener('click', event => {
+        event.preventDefault();
+        for (let ancestor = h.parentElement; ancestor; ancestor = ancestor.parentElement) if (ancestor.tagName === 'DETAILS') ancestor.open = true;
+        h.scrollIntoView({block: 'start'}); h.focus({preventScroll: true});
+      }); nav.append(a);
+    });
+    details.append(nav); root.prepend(details);
+  }
+  function enhance(root) {
+    if (!root) return;
+    root.querySelectorAll('pre[data-report-markdown]').forEach(pre => {
+      const previous = rendered.get(pre);
+      if (previous && previous.source === pre.textContent) return;
+      const article = markdown(pre.textContent);
+      if (previous) previous.article.replaceWith(article);
+      else {
+        const details = node('details'); details.dataset.readerSource = '';
+        details.append(node('summary', 'Markdown 원문 보기'));
+        pre.before(article, details); details.append(pre);
+      }
+      rendered.set(pre, {source: pre.textContent, article});
+    });
+    root.querySelectorAll('table').forEach(table => {
+      if (table.closest('.reader-table,.account-table-wrap,.summary-scroll')) return;
+      const wrap = node('div'); wrap.className = 'reader-table'; wrap.tabIndex = 0;
+      wrap.setAttribute('role', 'region'); wrap.setAttribute('aria-label', '리포트 표 · 가로로 스크롤하여 전체 보기');
+      table.before(wrap); wrap.append(table);
+    });
+    root.querySelectorAll('.grid').forEach(grid => {
+      const cards = [...grid.querySelectorAll(':scope > a.card')];
+      if (cards.length < 2 || grid.dataset.readerSearch) return;
+      grid.dataset.readerSearch = 'true';
+      const box = node('div'); box.className = 'reader-search';
+      const input = node('input'); input.type = 'search'; input.placeholder = '제목 · 종목 · 채널 · 키워드'; input.id = 'report-search-' + (++serial);
+      const label = node('label', '리포트 찾기'); label.htmlFor = input.id;
+      const status = node('p'); status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
+      const update = () => {
+        const terms = input.value.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean); let count = 0;
+        cards.forEach(card => { card.hidden = !terms.every(t => card.textContent.toLocaleLowerCase().includes(t)); if (!card.hidden) count += 1; });
+        status.textContent = cards.length + '개 중 ' + count + '개 표시' + (count ? '' : ' · 검색어를 지우거나 다른 키워드를 입력하세요.');
+      };
+      input.addEventListener('input', update); box.append(label, input, status); grid.before(box); update();
+    });
+    contents(root);
+  }
+  window.TradingAgentsReader = {enhance};
+  const main = document.querySelector('main');
+  if (main && !main.hasAttribute('data-reader-dynamic')) enhance(main);
+  if (main) {
+    const top = node('button', '↑ 맨 위'); top.type = 'button'; top.className = 'reader-back'; top.setAttribute('aria-label', '리포트 맨 위로 이동');
+    top.addEventListener('click', () => { const target = document.querySelector('h1') || main; target.tabIndex = -1; target.scrollIntoView({block: 'start'}); target.focus({preventScroll: true}); });
+    document.body.append(top);
+  }
+})();
+</script>
+</body>
+</html>
