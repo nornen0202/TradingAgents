@@ -3,6 +3,7 @@
 const byId = id => document.getElementById(id);
 let charts = [];
 let planPriceLines = [];
+let chartSignalMarkers = [];
 let requestVersion = 0;
 let viewBusy = false;
 let viewController = null;
@@ -17,6 +18,60 @@ function priceLevelOptions(level, showLabels) {
 }
 function updatePriceLevelLabels(lines, visible) {
   lines.forEach(({line,label})=>line.applyOptions({title:visible?label:"",axisLabelVisible:visible}));
+}
+function chartMarkerProjection(markers, showSignalText) {
+  // Keep category until this display-only projection. All other marker fields,
+  // including every fill's text, remain exactly as supplied by the snapshot.
+  return markers.map(({category,...marker})=>category==="SIGNAL"&&!showSignalText?{...marker,text:""}:marker);
+}
+function signalTextControl(markers, element, interval, version, chartIndex) {
+  const toggle=document.createElement("input");toggle.type="checkbox";
+  toggle.id="chart-signal-text-"+version+"-"+chartIndex;
+  toggle.disabled=!markers.some(marker=>marker.category==="SIGNAL");
+  toggle.setAttribute("aria-controls",element.id);toggle.setAttribute("aria-describedby","chart-signal-hint");
+  const label=document.createElement("label");label.className="chart-signal-control";
+  label.append(toggle,interval+" 차트에 과거 추천 글자 표시");
+  return {toggle,label};
+}
+function bindSignalTextControl(toggle, chart, markerApi, markers, version, chartId) {
+  const record={control_id:toggle.id,chart_id:chartId,api:markerApi,markers};
+  chartSignalMarkers.push(record);
+  toggle.addEventListener("change",()=>{
+    if(version===requestVersion&&toggle.isConnected&&charts.includes(chart))markerApi.setMarkers(chartMarkerProjection(markers,toggle.checked));
+  });
+}
+function renderHistoricalSignals(snapshot) {
+  const area=byId("historical-signal-records");if(!area)return;
+  const markers=(snapshot.markers||[]).filter(marker=>marker.category==="SIGNAL");
+  // These are the already cutoff-filtered API events, never a wider source or
+  // the selected archive's captured run. Preserve their original order/duplicates.
+  const events=(snapshot.lifecycle?.events||[]).filter(event=>event.kind==="SIGNAL");
+  const text=value=>typeof value==="string"?value:"원문 문자열 미제공";
+  const rawClock=value=>{
+    if(value===undefined||value===null)return "미제공";
+    return typeof value==="string"&&/^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d(?:\.\d+)?(?:Z|[+-]\d\d:\d\d)$/.test(value)&&Number.isFinite(Date.parse(value))?value:"형식 미확인 · 값 표시 안 함";
+  };
+  const individualRun=value=>typeof value==="string"&&/^[A-Za-z0-9][A-Za-z0-9_.-]*$/.test(value)&&!value.includes("..")?value:"개별 실행 미제공·미검증";
+  const individualSource=value=>["TradingAgents","scanner","PRISM"].includes(value)?value:"개별 출처 미제공·미검증";
+  const details=document.createElement("details"),summary=document.createElement("summary");
+  summary.textContent="과거 추천 원문 확인 · 도표 문구 "+markers.length+"개 / 원장 기록 "+events.length+"개";
+  details.append(summary,paragraph("과거 추천은 현재 승인이나 체결이 아닙니다. 선택한 보관 보고서의 원본 실행과 과거 추천 원장은 별개입니다. 아래 두 표의 행을 임의로 서로 연결하지 않습니다."),
+    table("도표에 제공된 과거 추천 문구",["원래 순서","전체 원래 문구","도표 위치 · 초 단위"],markers.map((marker,index)=>[
+      String(index+1),text(marker.text),typeof marker.time==="number"&&Number.isFinite(marker.time)?String(marker.time):"위치 미제공"])),
+    paragraph("도표 위치는 초 단위 표시 좌표이며 원래 정밀 시각이 아닙니다. 좌표로 원래 시각을 복원하지 않습니다."));
+  const records=table("원장에 제공된 과거 추천 기록",["원래 순서","원래 action / side","개별 출처 / 실행","제공된 원래 정밀 시각"],events.map((event,index)=>{
+    const payload=event.payload&&typeof event.payload==="object"?event.payload:{};
+    return [String(index+1),"action: "+text(payload.action)+" / side: "+text(payload.side),
+      individualSource(payload.source)+" / "+individualRun(payload.run_id),""];
+  }));
+  const rows=records.querySelectorAll("tr");
+  events.forEach((event,index)=>{
+    const clocks=document.createElement("div");
+    for(const [label,key] of [["사건","occurred_at"],["가용","available_at"],["수집","ingested_at"],["확정","confirmed_at"],["정산","settled_at"]])clocks.append(paragraph(label+": "+rawClock(event[key])));
+    rows[index+1].children[3].append(clocks);
+  });
+  details.append(records);area.replaceChildren(details);
+  if(markers.length&&!events.length)details.append(paragraph("원장 원문·정밀 시각은 이 응답에 제공되지 않았습니다. 도표 좌표나 선택한 원본 실행으로 대체하지 않습니다."));
 }
 function renderPriceLevelLegend(snapshot) {
   const levels=snapshot.price_levels||[];
@@ -321,7 +376,8 @@ function list(id, values) {
   }));
 }
 function clearSnapshot() {
-  charts.forEach(chart=>chart.remove());charts=[];planPriceLines=[];byId("charts").replaceChildren();
+  charts.forEach(chart=>chart.remove());charts=[];planPriceLines=[];chartSignalMarkers=[];byId("charts").replaceChildren();
+  byId("historical-signal-records")?.replaceChildren();
   ["verdict","freshness","profile","performance","unverified","source-context","experiment-cards","price-levels"].forEach(id=>byId(id).textContent="");
   ["reasons","facts","inferences","events"].forEach(id=>list(id,[]));window.reviewSnapshot=null;
 }
@@ -341,7 +397,7 @@ async function showSnapshot(existingOperational, existingVersion) {
   try {
     const snapshot = await getJson("/api/snapshot?" + params,progress=>{if(version===requestVersion&&!signal?.aborted)snapshotProgress(progress);},signal);
     if (version !== requestVersion) return;
-    charts.forEach(chart => chart.remove()); charts = []; planPriceLines=[];
+    charts.forEach(chart => chart.remove()); charts = []; planPriceLines=[];chartSignalMarkers=[];
     byId("charts").replaceChildren();
     const source=snapshot.source_context||{};
     byId("source-context").textContent=snapshotSourceText(snapshot);
@@ -370,6 +426,7 @@ async function showSnapshot(existingOperational, existingVersion) {
     renderPerformance(snapshot.lifecycle);
     renderProfile(snapshot.series);
     renderPriceLevelLegend(snapshot);
+    renderHistoricalSignals(snapshot);
     for (const item of snapshot.series) {
       const wrapper = document.createElement("div");
       const label = document.createElement("h3"); label.textContent = item.interval + " · UTC";
@@ -382,9 +439,13 @@ async function showSnapshot(existingOperational, existingVersion) {
       levelToggle.setAttribute("aria-controls",element.id);levelToggle.setAttribute("aria-describedby","chart-level-hint");
       const levelControl=document.createElement("label");levelControl.className="chart-level-control";
       levelControl.append(levelToggle,item.interval+" 차트에 가격 이름 표시");
+      const firstTime=item.bars.length?Math.floor(Date.parse(item.bars[0].timestamp)/1000):null;
+      const lastTime=item.bars.length?Math.floor(Date.parse(item.bars[item.bars.length-1].timestamp)/1000):null;
+      const markers=snapshot.markers.filter(marker=>firstTime!==null&&marker.time>=firstTime&&marker.time<=lastTime);
+      const signalControl=signalTextControl(markers,element,item.interval,version,chartIndex);
       const clocks = document.createElement("p"); clocks.className="muted";
       if(item.bars.length){const latest=item.bars[item.bars.length-1];clocks.textContent="최근 봉 " + latest.event_time + " · 관측 " + latest.ingested_at + " · 평가 " + latest.evaluated_at;}
-      wrapper.append(label, clocks, levelControl, element); byId("charts").append(wrapper);
+      wrapper.append(label, clocks, levelControl, signalControl.label, element); byId("charts").append(wrapper);
       const chart = LightweightCharts.createChart(element, {autoSize:true, layout:{attributionLogo:true}, timeScale:{timeVisible:item.interval !== "1d"}});
       charts.push(chart);
       const candles = chart.addSeries(LightweightCharts.CandlestickSeries);
@@ -398,8 +459,8 @@ async function showSnapshot(existingOperational, existingVersion) {
         if(levelToggle.isConnected&&charts.includes(chart))updatePriceLevelLabels(chartLines,levelToggle.checked);
       });
       if (data.length) {
-        const markers = snapshot.markers.filter(m=>m.time>=data[0].time && m.time<=data[data.length-1].time).map(({category,...marker})=>marker);
-        LightweightCharts.createSeriesMarkers(candles, markers);
+        const markerApi=LightweightCharts.createSeriesMarkers(candles,chartMarkerProjection(markers,false));
+        bindSignalTextControl(signalControl.toggle,chart,markerApi,markers,version,element.id);
       }
       chart.timeScale().fitContent();
     }

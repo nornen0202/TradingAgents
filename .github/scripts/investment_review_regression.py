@@ -20,6 +20,7 @@ from tradingagents.execution.strategy_evaluation import evaluate_strategy_orders
 
 OUTPUT = None
 EMPTY_PAGE_URL = None
+MARKER_ONLY = False
 
 
 class CheckedServer(ThreadingHTTPServer):
@@ -139,6 +140,26 @@ async def probe(websocket_url, page_url):
             if(['/api/tickers','/api/snapshot'].includes(address.pathname))window.__reviewRequests.push(row);
             const response=await wireFetch(url,...args);
             row.status=response.status;row.generation=response.headers.get('X-Archive-Catalog-Generation');
+            if(address.pathname==='/api/snapshot'&&response.status===200){
+              // Synthetic display fixture only: do not modify backend evidence,
+              // order counts, verdicts, fills or accounting calculations.
+              const body=await response.clone().json();
+              if(body.series?.length===2){
+                const events=[],markers=[];
+                for(const stamp of ['2026-10-15T20:00:00.123456+00:00','2026-10-16T09:10:00.123456Z']){
+                  const time=Math.floor(Date.parse(stamp)/1000);
+                  for(let i=0;i<2;i++){
+                    markers.push({category:'SIGNAL',text:'추천 · ADD_IF_CONFIRMED · <img src=x onerror=bad>',time,position:'belowBar',shape:'arrowUp',color:'#13785f'});
+                    events.push({kind:'SIGNAL',occurred_at:stamp,available_at:stamp,ingested_at:'2026-10-16T10:00:00.654321Z',payload:{action:'ADD_IF_CONFIRMED',source:'TradingAgents',run_id:'fixture-original-signal',account:'PRIVATE_DO_NOT_DISPLAY',order_id:'PRIVATE_DO_NOT_DISPLAY',path:'PRIVATE_DO_NOT_DISPLAY'}});
+                  }
+                  for(const [category,text] of [['REAL_FILL','실제 체결 · BUY'],['DEMO_FILL','데모 체결 · SELL'],['PAPER_FILL','모의 체결 · BUY']])markers.push({category,text,time,position:'aboveBar',shape:'arrowDown',color:'#c53b51'});
+                  markers.push({category:'EVENT_GUARD',text:'공시 표식 유지',time,position:'aboveBar',shape:'circle',color:'#90642f'});
+                }
+                body.markers=[...markers,...body.markers].sort((a,b)=>a.time-b.time);
+                body.lifecycle.events=[...events,...(body.lifecycle.events||[])];
+                return new Response(JSON.stringify(body),{status:200,headers:response.headers});
+              }
+            }
             return response;
           };
         '''})
@@ -180,6 +201,91 @@ async def probe(websocket_url, page_url):
               if(!catalog||!/^\\d+$/.test(catalog.generation)||!snapshot||snapshot.query.catalog_generation!==catalog.generation)throw Error('First catalog 200 generation was lost before snapshot');
               return true;
             })()''')
+            result["historical_signal_clarity"] = await evaluate('''(() => {
+              const snapshot=window.reviewSnapshot,controls=[...document.querySelectorAll('.chart-signal-control input')];
+              if(controls.length!==2||new Set(controls.map(c=>c.id)).size!==2)throw Error('Historical text needs unique controls on both charts');
+              if(controls.some(c=>c.type!=='checkbox'||c.checked||c.disabled||!document.getElementById(c.getAttribute('aria-controls'))||c.getAttribute('aria-describedby')!=='chart-signal-hint'))throw Error('Native historical control lacks its own accessible binding');
+              if(document.querySelector('#chart-signal-hint').textContent.indexOf('현재 승인이나 체결이 아닙니다')<0)throw Error('Past signal is confused with approval');
+              window.__historicalBefore=JSON.stringify(snapshot);
+              for(const record of chartSignalMarkers){
+                const expected=chartMarkerProjection(record.markers,false),actual=record.api.markers();
+                if(JSON.stringify(actual)!==JSON.stringify(expected))throw Error('Default signal text or fill markers changed');
+                if(record.markers.filter(m=>m.category==='SIGNAL').length!==2||record.markers.filter(m=>m.category.endsWith('_FILL')).length!==3)throw Error('Synthetic signal/fill categories did not reach chart');
+              }
+              const area=document.querySelector('#historical-signal-records'),details=area.querySelector('details');
+              if(!details||details.open)throw Error('Historical disclosure absent or covers default chart');
+              details.open=true;
+              const tables=[...area.querySelectorAll('table')],rows=tables.map(t=>[...t.rows].slice(1));
+              if(rows[0].length!==4||rows[1].length!==4)throw Error('Historical duplicates lost');
+              if(rows[0].some(r=>r.cells[1].textContent!=='추천 · ADD_IF_CONFIRMED · <img src=x onerror=bad>'))throw Error('Original complete marker text was lost');
+              if(!area.textContent.includes('2026-10-16T09:10:00.123456Z')||!area.textContent.includes('2026-10-15T20:00:00.123456+00:00')||!area.textContent.includes('확정: 미제공'))throw Error('Raw precision or missing clocks changed');
+              if(area.querySelector('img')||area.textContent.includes('PRIVATE_DO_NOT_DISPLAY')||window.__pwned)throw Error('Historical display leaked private fields or interpreted markup');
+              if(!area.textContent.includes('두 표의 행을 임의로 서로 연결하지 않습니다')||!area.textContent.includes('초 단위 표시 좌표이며 원래 정밀 시각이 아닙니다'))throw Error('Unproved pairing or original clock reconstruction implied');
+              if(document.documentElement.scrollWidth>innerWidth+2)throw Error('Historical table overflow escaped page');
+              details.open=false;controls[0].focus();
+              window.__oldSignalControl=controls[0];window.__oldSignalApi=chartSignalMarkers[0].api;
+              return {charts:controls.length,signalRows:rows[0].length,originalRows:rows[1].length,defaultSignalText:false,fillMarkersUnchanged:true,rawPrecision:true,privacy:true};
+            })()''')
+            for chart_index in (0, 1):
+                await evaluate(f"document.querySelectorAll('.chart-signal-control input')[{chart_index}].focus()")
+                for enabled in (True, False):
+                    await call("Input.dispatchKeyEvent", {"type": "keyDown", "key": " ", "code": "Space", "windowsVirtualKeyCode": 32})
+                    await call("Input.dispatchKeyEvent", {"type": "keyUp", "key": " ", "code": "Space", "windowsVirtualKeyCode": 32})
+                    if not await evaluate('''(() => {
+                      const controls=[...document.querySelectorAll('.chart-signal-control input')],enabled=ENABLED,index=CHARTINDEX;
+                      if(controls.some((control,i)=>control.checked!==(enabled&&i===index)))throw Error('Historical keyboard toggle crossed charts');
+                      for(const record of chartSignalMarkers){const show=enabled&&record.control_id===controls[index].id;
+                        if(JSON.stringify(record.api.markers())!==JSON.stringify(chartMarkerProjection(record.markers,show)))throw Error('Marker display differs from exact projection');}
+                      if(planPriceLines.some(p=>p.line.options().axisLabelVisible||p.line.options().title!==''))throw Error('Historical text toggle changed price labels');
+                      if(JSON.stringify(window.reviewSnapshot)!==window.__historicalBefore)throw Error('Historical display mutated original snapshot');
+                      return true;
+                    })()'''.replace("ENABLED", json.dumps(enabled)).replace("CHARTINDEX", str(chart_index))):
+                        raise RuntimeError("Historical text keyboard toggle failed")
+            result["historical_signal_clarity"]["keyboard_chart_scoped_toggle"] = True
+            await evaluate("document.querySelector('#historical-signal-records summary').focus()")
+            await call("Input.dispatchKeyEvent", {"type": "keyDown", "key": " ", "code": "Space", "windowsVirtualKeyCode": 32})
+            await call("Input.dispatchKeyEvent", {"type": "keyUp", "key": " ", "code": "Space", "windowsVirtualKeyCode": 32})
+            if not await evaluate("document.querySelector('#historical-signal-records details').open"):
+                raise RuntimeError("Historical original records did not open with the keyboard")
+            if OUTPUT:
+                await evaluate("document.querySelector('#charts').scrollIntoView({block:'start'})")
+                shot = await call("Page.captureScreenshot", {"format": "png", "captureBeyondViewport": False})
+                (OUTPUT / f"historical-signals-chart-{width}.png").write_bytes(base64.b64decode(shot["data"]))
+                await evaluate("document.querySelector('#historical-signal-records').scrollIntoView({block:'start'})")
+                shot = await call("Page.captureScreenshot", {"format": "png", "captureBeyondViewport": False})
+                (OUTPUT / f"historical-signals-records-{width}.png").write_bytes(base64.b64decode(shot["data"]))
+            if width < 600:
+                await evaluate("window.__signalRegion=document.querySelector('#historical-signal-records .review-table-scroll');window.__signalRegion.scrollIntoView({block:'center'});window.__signalRegion.focus();")
+                await call("Input.dispatchKeyEvent", {"type": "keyDown", "key": "ArrowRight", "code": "ArrowRight", "windowsVirtualKeyCode": 39})
+                await call("Input.dispatchKeyEvent", {"type": "keyUp", "key": "ArrowRight", "code": "ArrowRight", "windowsVirtualKeyCode": 39})
+                for _ in range(20):
+                    await asyncio.sleep(.05)
+                    if await evaluate("window.__signalRegion.scrollLeft>0"):
+                        break
+                else:
+                    raise RuntimeError("Historical record table did not scroll with the keyboard")
+                await evaluate("window.__signalRegion.scrollLeft=0;window.__signalRegion.blur();")
+            result["historical_signal_clarity"]["keyboard_details_and_scroll"] = True
+            await evaluate("document.querySelector('#historical-signal-records details').open=false;loadSnapshot()")
+            for _ in range(100):
+                await asyncio.sleep(.1)
+                if await evaluate("!viewBusy&&window.reviewSnapshot&&document.querySelector('.chart-signal-control input')!==window.__oldSignalControl"):
+                    break
+            else:
+                raise RuntimeError("New snapshot did not replace historical control")
+            if not await evaluate('''(() => {
+              window.__oldSignalTouched=false;window.__oldSignalApi.setMarkers=()=>{window.__oldSignalTouched=true;};
+              window.__oldSignalControl.checked=true;window.__oldSignalControl.dispatchEvent(new Event('change'));
+              if(window.__oldSignalTouched)throw Error('Detached historical control touched a removed chart');
+              if(chartSignalMarkers.some(r=>r.api.markers().some(m=>m.text.startsWith('추천 ·'))))throw Error('Old control changed new chart');
+              if(JSON.stringify(window.reviewSnapshot)!==window.__historicalBefore)throw Error('Reload changed synthetic evidence');
+              return true;
+            })()'''):
+                raise RuntimeError("Old historical chart handle remained active")
+            result["historical_signal_clarity"]["stale_handle_ignored"] = True
+            if MARKER_ONLY:
+                results.append(result)
+                continue
             result["readable_price_levels"] = await evaluate('''(() => {
               const levels=window.reviewSnapshot.price_levels,controls=[...document.querySelectorAll('.chart-level-control input')];
               const rows=[...document.querySelectorAll('#price-levels table tr')].slice(1);
@@ -470,10 +576,12 @@ async def probe(websocket_url, page_url):
 
 
 def main():
-    global OUTPUT, EMPTY_PAGE_URL
+    global OUTPUT, EMPTY_PAGE_URL, MARKER_ONLY
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output-dir", type=Path)
+    parser.add_argument("--marker-only", action="store_true", help="Run only the small synthetic historical-marker browser checks")
     args = parser.parse_args()
+    MARKER_ONLY = args.marker_only
     if args.output_dir:
         OUTPUT = args.output_dir
         OUTPUT.mkdir(parents=True, exist_ok=True)
