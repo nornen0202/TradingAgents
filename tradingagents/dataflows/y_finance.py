@@ -362,10 +362,21 @@ def get_fundamentals(
                 f"Attempted Yahoo Finance symbols: {attempt_summary}"
             )
 
+        def currency_token(value):
+            # Case can distinguish vendor minor-unit tokens from currency
+            # codes (for example GBp versus GBP). Never normalize or infer it.
+            if value is None or isinstance(value, str) and not value.strip():
+                return "UNVERIFIED_MISSING"
+            if isinstance(value, str) and len(value) == 3 and value.isascii() and value.isalpha():
+                return value if value.isupper() else "UNVERIFIED_NONSTANDARD_VENDOR_TOKEN"
+            return "UNVERIFIED_MALFORMED"
+
         fields = [
             ("Name", info.get("longName")),
             ("Sector", info.get("sector")),
             ("Industry", info.get("industry")),
+            ("Vendor-reported Trading Currency (info.currency)", currency_token(info.get("currency"))),
+            ("Vendor-reported Financial Reporting Currency (info.financialCurrency)", currency_token(info.get("financialCurrency"))),
             ("Market Cap", info.get("marketCap")),
             ("PE Ratio (TTM)", info.get("trailingPE")),
             ("Forward PE", info.get("forwardPE")),
@@ -400,6 +411,8 @@ def get_fundamentals(
 
         header = f"# Company Fundamentals for {resolved_ticker or ticker.upper()}\n"
         header += "# Current vendor snapshot; not verified point-in-time.\n"
+        header += ("# Currency fields are vendor tokens only: code format does not verify ISO registration, "
+                   "financial-statement units, per-share or ADR basis, or filing/publication times.\n")
         header += f"# Data retrieved on: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n"
 
         return header + "\n".join(lines)
