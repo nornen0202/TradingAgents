@@ -435,11 +435,13 @@ def _strategy_evaluation_view(raw, market, observed, *, verified_costs=None):
 
 
 def _same_cost_order_bindings(cached, proven):
-    """Keep exact bindings except an undated, economically empty request state.
+    """Keep exact bindings except undated submission/cancel request receipts.
 
     A historical read cannot date ACK/BLOCKED request state without a broker
     observation. That UNKNOWN must not hide settled costs of other orders.
-    No observed state, cancellation, identity, terms or key set is relaxed.
+    Nor can an undated cancel ACK invalidate an unchanged observed fill. It is
+    not confirmation of cancellation. Observed states, economics, cancellation
+    confirmation, identity, clocks and key sets remain exact.
     """
     if not isinstance(cached, list) or not isinstance(proven, list) or len(cached) != len(proven):
         return False
@@ -457,6 +459,16 @@ def _same_cost_order_bindings(cached, proven):
                             "observed_at", "ingested_at", "first_fill_observed_at", "fill_availability"))
                         for order in (raw, known))):
             value["status"] = "UNKNOWN"
+        if (raw.get("cancel_status") == "ACKNOWLEDGED" and known.get("cancel_status") is None
+                and isinstance(raw.get("status"), str)
+                and raw["status"] in {"OPEN", "PARTIAL", "FILLED"}
+                and raw["status"] == known.get("status")
+                and known.get("source") == "KIS_DEMO_BROKER_REPORT"
+                and known.get("observed_at") is not None):
+            # Only the request's undated ACK differs. The canonical comparison
+            # below still requires the entire dated broker observation and all
+            # cash flows to match; a CANCELLED/CONFIRMED report is never erased.
+            value["cancel_status"] = None
         adjusted.append(value)
     try:
         def canonical(value):

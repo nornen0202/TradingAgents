@@ -319,6 +319,113 @@ def test_unobserved_request_exception_does_not_relax_evaluation_cutoff(tmp_path,
     assert view is None or view["actual_cost"] is view["net_pnl"] is None
 
 
+def partial_fill_with_reviewed_cost_and_cancel_ack(tmp_path, market):
+    from tradingagents.execution import demo_runtime
+    from tradingagents.execution.strategy_settlement import import_strategy_settlement
+    from tests.execution.test_demo_runtime import Harness
+    from tests.execution.test_strategy_settlement import document
+
+    h = Harness(tmp_path, market)
+    if market == "KR":
+        h.price = 40000  # Two fixture shares stay inside the unchanged KR cap.
+    h.source(qty=2)
+    h.tick()
+    h.now += timedelta(seconds=20)
+    h.fill(qty=1, amount=h.price)
+    partial = h.tick()
+    assert partial["orders"][0]["status"] == "PARTIAL"
+    h.now += timedelta(seconds=5)
+    with h.factory(market, h.root / f"{market.lower()}-strategy.sqlite", lambda: h.now,
+                   (h.ticker,), h.credentials.scope()) as broker:
+        value, source = document(h, partial["orders"][0])
+        assert import_strategy_settlement(broker, value, source_bytes=source)
+        before = demo_runtime.summary(broker.db, h.now, market)
+    h.now += timedelta(seconds=10)
+    with h.factory(market, h.root / f"{market.lower()}-strategy.sqlite", lambda: h.now,
+                   (h.ticker,), h.credentials.scope()) as broker:
+        broker.cancel(intent_id=partial["orders"][0]["id"])
+        after = demo_runtime.summary(broker.db, h.now, market)
+    dated = summary_at(h, h.now, historical=True)
+    assert before["evaluation"]["actual_cost"] == after["evaluation"]["actual_cost"] == dated["evaluation"]["actual_cost"] == 1
+    assert after["orders"][0]["status"] == dated["orders"][0]["status"] == "PARTIAL"
+    assert after["orders"][0]["cancel_status"] == "ACKNOWLEDGED"
+    assert dated["orders"][0]["cancel_status"] is None
+    assert {**after["orders"][0], "cancel_status": None} == dated["orders"][0]
+    return h, after
+
+
+@pytest.fixture(scope="module", params=["KR", "US"])
+def partial_cancel_ack_snapshot(tmp_path_factory, request):
+    return partial_fill_with_reviewed_cost_and_cancel_ack(
+        tmp_path_factory.mktemp(f"partial-cancel-{request.param.lower()}"), request.param)
+
+
+def test_partial_fill_cancel_ack_does_not_hide_reviewed_execution_cost(tmp_path, partial_cancel_ack_snapshot):
+    h, original = partial_cancel_ack_snapshot
+    archive = tmp_path / "ui"
+    cached = runtime(archive, h, original)
+    ledger = h.root / f"{h.market.lower()}-strategy.sqlite"
+    before = (cached.read_bytes(), ledger.read_bytes(), ledger.stat().st_mtime_ns, set(h.root.iterdir()), list(h.calls))
+    for _ in range(2):
+        view = read(archive, h)
+        assert view["actual_cost"] == 1 and view["fees_known"] is view["settlement_known"] is True
+        assert view["net_pnl"] is None  # Open inventory has no independently proven mark.
+        assert view["sample"]["filled_order_count"] == view["sample"]["buy_filled_quantity"] == 1
+        assert view["cost_evidence_status"] == "COMPLETE_REVIEWED_IMPORT"
+        assert view["readiness"] == "NOT_READY_FOR_REAL_INVESTMENT"
+        assert view["real_orders_enabled"] is view["automatic_live_transition"] is False
+    assert before == (cached.read_bytes(), ledger.read_bytes(), ledger.stat().st_mtime_ns, set(h.root.iterdir()), list(h.calls))
+
+
+def test_cancel_ack_cannot_make_cached_cost_claim_authoritative(tmp_path, partial_cancel_ack_snapshot):
+    h, original = partial_cancel_ack_snapshot
+    result = deepcopy(original)
+    result["evaluation"].update(actual_cost=999, net_pnl=999, realized_net_pnl=999)
+    archive = tmp_path / "ui"
+    runtime(archive, h, result)
+    assert read(archive, h)["actual_cost"] == 1
+    assert read(archive, h)["net_pnl"] is None
+    assert read(archive, h, ledger=False)["actual_cost"] is None
+
+
+@pytest.mark.parametrize("field,wrong", [
+    ("cancel_status", "CONFIRMED"), ("status", "CANCELLED"), ("filled_quantity", 0),
+    ("fill_notional", 999), ("observed_at", None), ("ingested_at", None),
+    ("fill_availability", None), ("source", "WRONG"), ("cancel_observed_at", "2026-10-19T15:00:00Z"),
+])
+def test_cancel_ack_exception_preserves_dated_fill_and_confirmation_bindings(tmp_path, partial_cancel_ack_snapshot, field, wrong):
+    h, original = partial_cancel_ack_snapshot
+    result = deepcopy(original)
+    result["orders"][0][field] = wrong
+    archive = tmp_path / "ui"
+    runtime(archive, h, result)
+    view = read(archive, h)
+    assert view is None or view["actual_cost"] is view["net_pnl"] is None
+
+
+@pytest.mark.parametrize("market", ["KR", "US"])
+def test_later_dated_cancel_confirmation_is_exact_and_not_backdated(tmp_path, market):
+    h, pending = partial_fill_with_reviewed_cost_and_cancel_ack(tmp_path, market)
+    cutoff = h.now
+    archive = tmp_path / "ui"
+    runtime(archive, h, pending)
+    before = read(archive, h)
+    assert before["actual_cost"] == 1
+    h.now += timedelta(seconds=20)
+    confirmed = h.tick()
+    assert confirmed["orders"][0]["status"] == "CANCELLED"
+    assert confirmed["orders"][0]["cancel_status"] == "CONFIRMED"
+    # The old cutoff retains its PARTIAL fill and never borrows future cancel
+    # confirmation; the request-only ACK still cannot erase its known cost.
+    dated = summary_at(h, cutoff, historical=True)
+    assert dated["orders"][0]["status"] == "PARTIAL"
+    assert dated["orders"][0]["cancel_status"] is None
+    assert read(archive, h) == before
+    runtime(archive, h, confirmed)
+    assert summary_at(h, h.now, historical=True)["orders"] == confirmed["orders"]
+    assert read(archive, h)["actual_cost"] == 1
+
+
 def test_later_normal_order_before_runtime_json_replacement_does_not_erase_verified_past_cost(tmp_path):
     h, _, _, result = imported_roundtrip(tmp_path)
     cutoff = h.now
