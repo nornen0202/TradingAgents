@@ -8,6 +8,7 @@ from pathlib import Path
 import re
 
 from .bars import instant, validate_bars
+from .catalog_index import project_manifest
 
 
 def _json(path):
@@ -22,7 +23,10 @@ def _json(path):
 def _cached_manifest(path, modified_ns, size):
     # Filesystem metadata only invalidates parsed bytes; it never determines
     # data availability. Timestamp eligibility is checked afresh per request.
-    return _json(path)
+    try:
+        return project_manifest(Path(path))[1]
+    except (OSError, ValueError, TypeError):
+        return {}
 
 
 def _manifest(path):
@@ -64,7 +68,8 @@ def known_artifacts(directory, cutoff):
     return {"chart_capture_available": chart, "event_board_available": events, "chart_capture_status": status}
 
 
-def archive_catalog(archive_dir, *, analysis_as_of, only_ticker=None, include_coverage=True):
+def archive_catalog(archive_dir, *, analysis_as_of, only_ticker=None, include_coverage=True,
+                    manifest_entries=None, names_only=False):
     """Discover the latest completed producer per ticker, at the requested cutoff.
 
     Directory names and the global latest pointer are never data clocks. Return
@@ -76,11 +81,15 @@ def archive_catalog(archive_dir, *, analysis_as_of, only_ticker=None, include_co
         raise ValueError("Archive cutoff requires a timezone")
     root = (Path(archive_dir) / "runs").resolve()
     selected = {}
-    for manifest_path in root.glob("*/*/run.json"):
+    entries = manifest_entries if manifest_entries is not None else ((path, _manifest(path)) for path in root.glob("*/*/run.json") if path.resolve().is_relative_to(root))
+    # Newest candidates first: do not resolve every historical ticker directory.
+    # A broken newest path still falls back to the next valid producer.
+    entries = sorted(entries, key=lambda pair: (instant(pair[1].get("started_at")) or datetime.min.replace(tzinfo=timezone.utc), str(pair[1].get("run_id") or "")), reverse=True)
+    for manifest_path, manifest in entries:
         run_dir = manifest_path.parent.resolve()
         if not run_dir.is_relative_to(root):
             continue
-        manifest = _manifest(manifest_path)
+        manifest = manifest if manifest is not None else _manifest(manifest_path)
         started, finished = instant(manifest.get("started_at")), instant(manifest.get("finished_at"))
         run_id = str(manifest.get("run_id") or "")
         if (started is None or finished is None or not started <= finished <= cutoff
@@ -93,18 +102,22 @@ def archive_catalog(archive_dir, *, analysis_as_of, only_ticker=None, include_co
             ticker = str(summary.get("ticker") or "")
             if only_ticker is not None and ticker != only_ticker:
                 continue
-            ticker_dir = (run_dir / "tickers" / ticker).resolve()
-            ticker_root = (run_dir / "tickers").resolve()
-            if not ticker or not ticker_dir.is_relative_to(ticker_root) or not ticker_dir.is_dir():
+            if not ticker or Path(ticker).name != ticker or ticker in {".", ".."} or "/" in ticker or "\\" in ticker:
                 continue
             key = (started, run_id)
             if ticker in selected and selected[ticker]["key"] >= key:
+                continue
+            ticker_dir = (run_dir / "tickers" / ticker).resolve()
+            ticker_root = (run_dir / "tickers").resolve()
+            if not ticker_root.is_relative_to(root) or not ticker_dir.is_relative_to(ticker_root) or not ticker_dir.is_dir():
                 continue
             selected[ticker] = {"key": key, "ticker_dir": ticker_dir, "_manifest": manifest, "_summary": summary}
     # Inspect candle/event vintages only for the selected sources, rather than
     # every historical candidate encountered while finding the newest run.
     for entry in selected.values():
         manifest, summary = entry.pop("_manifest"), entry.pop("_summary")
+        if names_only:
+            continue
         ticker_dir = entry["ticker_dir"]
         research_finished = instant(_json(ticker_dir / "analysis.json").get("finished_at"))
         settings = manifest.get("settings") if isinstance(manifest.get("settings"), dict) else {}
