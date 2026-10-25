@@ -11,12 +11,14 @@ from pathlib import Path
 from typing import Any, Iterator
 
 from .packet import (
+    MARKET_CONTEXT_CONTRACTS,
     WORK_REPORT_SCHEMA,
     WORK_SCHEMA,
     WORK_STATE_SCHEMA,
     build_surface_packet,
     canonical_json,
     resolve_archive_roots,
+    prompt_path,
     seal_packet,
     sha256_json,
 )
@@ -47,6 +49,7 @@ class WorkRuntime:
         fresh_report: bool = False,
         expected_producer_run_id: str | None = None,
         refresh_started_at: datetime | None = None,
+        report_context_v1: bool = False,
     ) -> dict[str, Any]:
         key = surface.lower()
         guarded_refresh = expected_producer_run_id is not None or refresh_started_at is not None
@@ -62,6 +65,7 @@ class WorkRuntime:
                 prism_archive_dir=prism_archive_dir,
                 now=now,
                 public=False,
+                report_context_v1=report_context_v1,
             )
             if guarded_refresh:
                 from .pre_report import (
@@ -82,7 +86,25 @@ class WorkRuntime:
                     raise WorkRuntimeError("Fresh report source failed revalidation: " + ",".join(blockers))
             state = self._load_state()
             surface_state = state["surfaces"].setdefault(key, {})
-            packet, event_hashes, material_noop = _delivery_packet(source_packet, surface_state)
+            if surface_state.get("pending_event_id") and (
+                    report_context_v1 or surface_state.get("pending_report_context_contract")):
+                # A contract migration must not supersede an unfinished report.
+                # Leave the legacy default path unchanged; only explicit context
+                # preparation (or its pending marker) enters this new guard.
+                try:
+                    pending_packet = _context_packet(self, surface_state, surface=key, prefix="pending")
+                except (OSError, KeyError, TypeError, ValueError) as exc:
+                    raise WorkRuntimeError("Cannot verify the pending market report contract") from exc
+                if any(pending_packet.get(field) != source_packet.get(field) for field in (
+                        "prompt_contract_version", "workflow_contract_sha256")):
+                    raise WorkRuntimeError("Resolve the pending market report before changing its contract")
+            if report_context_v1:
+                packet, material_noop = _market_context_delivery(
+                    self, source_packet, surface_state, archive_dir=archive_dir,
+                    cutoff=datetime.fromisoformat(_now(now)))
+                event_hashes = {}
+            else:
+                packet, event_hashes, material_noop = _delivery_packet(source_packet, surface_state)
             validate_packet(packet)
             event_id = str(packet["event_id"])
             event_path = self.outbox_dir / key / f"{_safe_name(event_id)}.json"
@@ -160,6 +182,10 @@ class WorkRuntime:
                         "prepared_at": prepared_at,
                     }
                 )
+                if report_context_v1:
+                    surface_state["pending_report_context_contract"] = packet["prompt_contract_version"]
+                else:
+                    surface_state.pop("pending_report_context_contract", None)
                 self._append_ledger(
                     {
                         "at": prepared_at,
@@ -186,7 +212,7 @@ class WorkRuntime:
             self._save_state(state)
             return {
                 **latest,
-                "prompt_path": str((Path(__file__).with_name("prompts") / _prompt_filename(key)).resolve()),
+                "prompt_path": str(prompt_path(key, packet.get("prompt_contract_version")).resolve()),
                 "packet_chars": len(event_path.read_text(encoding="utf-8")),
                 "publish_required": key in {"kr", "us"},
                 "report_markdown_path": str(
@@ -370,6 +396,11 @@ class WorkRuntime:
                 }
             )
             state["revision"] = int(state.get("revision") or 0) + 1
+            surface_state.pop("pending_report_context_contract", None)
+            if report and report.get("prompt_contract_version") == MARKET_CONTEXT_CONTRACTS.get(key):
+                surface_state["last_acked_revision"] = state["revision"]
+            else:
+                surface_state.pop("last_acked_revision", None)
             self._append_ledger(
                 {
                     "at": acknowledged_at,
@@ -539,6 +570,7 @@ class WorkRuntime:
             # not create a new analysis/ACK revision.  Preserve the greatest
             # canonical revision seen across sequential surface recovery.
             state["revision"] = max(previous_revision, requested_revision)
+            surface_state.pop("pending_report_context_contract", None)
             self._append_ledger(
                 {
                     "at": recovered_at,
@@ -679,6 +711,121 @@ def _load_recovery_report(
     if latest_bytes != report_bytes:
         raise WorkRuntimeError("Recovery report is stale; it is not the latest content-addressed report")
     return report, report_path
+
+
+def _context_packet(runtime: WorkRuntime, state: dict, *, surface: str, prefix: str) -> dict:
+    from .market_report_context import bounded_file
+    path = bounded_file(runtime.outbox_dir / surface, Path(str(state[f"{prefix}_packet_path"])))
+    packet = _load_json_object(path, label="immutable market context packet")
+    validate_packet(packet)
+    if any(packet.get(field) != state.get(f"{prefix}_{field}") for field in (
+            "event_id", "source_sha256", "workflow_contract_sha256")) or packet.get("surface") != surface:
+        raise WorkRuntimeError("Immutable market context packet does not match canonical state")
+    return packet
+
+
+def _load_last_acked_market_baseline(runtime: WorkRuntime, state: dict, *, surface: str,
+                                   archive_dir: Path | None, cutoff: datetime) -> tuple[dict, dict | None]:
+    """Verify an exact surface ACK; latest.json is deliberately not authority."""
+    from .market_report_context import bounded_file, empty_baseline, instant
+    if not state.get("last_acked_event_id"):
+        return empty_baseline(), None
+    try:
+        ack_at = instant(state["last_acked_at"])
+        if (state.get("last_acked_status") != "rendered" or ack_at > cutoff
+                or type(state.get("last_acked_revision")) is not int or state["last_acked_revision"] < 1):
+            raise ValueError("Unverified ACK status or clock")
+        packet = _context_packet(runtime, state, surface=surface, prefix="last_acked")
+        report_sha = str(state["last_acked_report_sha256"])
+        if not re.fullmatch(r"[a-f0-9]{64}", report_sha):
+            raise ValueError("Invalid report identity")
+        root = resolve_archive_roots(archive_dir=archive_dir)["market"] / "work-reports" / surface
+        report_path = bounded_file(root, root / "events" / f"{report_sha}.json")
+        # The state cannot nominate a different report with the same filename.
+        if Path(str(state["last_acked_report_path"])).resolve() != report_path:
+            raise ValueError("ACK report path mismatch")
+        report = _load_json_object(report_path, label="last ACK market report")
+        validate_work_report(report)
+        if (report.get("report_sha256") != report_sha or report.get("report_id") != state.get("last_acked_report_id")
+                or any(report.get(key) != packet.get(key) for key in (
+                    "surface", "event_id", "source_sha256", "prompt_contract_version", "workflow_contract_sha256"))):
+            raise ValueError("ACK report and packet mismatch")
+        draft = report["structured_report"]
+        generated, published = instant(draft["generated_at"]), instant(report["published_at"])
+        if not generated <= published <= ack_at <= cutoff:
+            raise ValueError("ACK report chronology mismatch")
+        _validate_report_packet_coverage(draft, packet, now=published)
+        body = packet["body"]
+        current = body.get("current") or {}
+        freshness = current.get("freshness_receipt") or {}
+        clocks = [current.get("started_at"), (current.get("latest_completed_analysis") or {}).get("finished_at")]
+        clocks.extend(freshness.get(key) for key in ("producer_started_at", "producer_finished_at", "analysis_completed_at", "market_data_oldest_at", "market_data_latest_at"))
+        for row in (current.get("bundle") or {}).get("strategy_table", []):
+            clocks.extend((row.get("market_data_asof"), (row.get("thesis") or {}).get("analysis_asof")))
+        if any(instant(clock) > generated for clock in clocks if clock is not None):
+            raise ValueError("ACK source clock is after its report")
+        if body.get("report_context") and instant(body["report_context"]["comparison_cutoff"]) > generated:
+            raise ValueError("ACK comparison clock is after its report")
+        # Read exact ACK rows only. Global state revision may belong to another
+        # surface; a malformed/mismatching duplicate is never cherry-picked.
+        matches = []
+        for line in runtime.ledger_path.read_text(encoding="utf-8").splitlines():
+            item = json.loads(line)
+            if not isinstance(item, dict):
+                raise ValueError("Malformed ACK ledger")
+            if item.get("event") == "acknowledged" and item.get("surface") == surface and item.get("event_id") == packet["event_id"]:
+                matches.append(item)
+        if len(matches) != 1:
+            raise ValueError("Ambiguous ACK ledger binding")
+        ack = matches[0]
+        if (any(ack.get(key) != value for key, value in {
+                "source_sha256": packet["source_sha256"], "report_id": report["report_id"],
+                "report_sha256": report_sha, "at": state["last_acked_at"], "status": "rendered"}.items())
+                or type(ack.get("state_revision")) is not int
+                or ack["state_revision"] != state["last_acked_revision"]):
+            raise ValueError("ACK ledger differs from canonical state")
+        return {"status": "VERIFIED", "reason": "VERIFIED", "event_id": packet["event_id"],
+                "source_sha256": packet["source_sha256"], "report_sha256": report_sha,
+                "workflow_contract_sha256": packet["workflow_contract_sha256"],
+                "acknowledged_at": state["last_acked_at"], "ledger_revision": ack["state_revision"]}, packet
+    except (OSError, ValueError, KeyError, TypeError, WorkRuntimeError):
+        return empty_baseline("UNVERIFIED"), None
+
+
+def _market_context_delivery(runtime: WorkRuntime, source: dict, state: dict, *, archive_dir: Path | None,
+                             cutoff: datetime) -> tuple[dict, bool]:
+    from .market_report_context import instant, make_context, validate_context
+    surface = source["surface"]
+    if source.get("prompt_contract_version") != MARKET_CONTEXT_CONTRACTS.get(surface):
+        raise WorkRuntimeError("Report context requires the explicit new market contract")
+    for prefix in ("pending", "last_acked"):
+        if (state.get(f"{prefix}_upstream_source_sha256") == source["source_sha256"]
+                and state.get(f"{prefix}_workflow_contract_sha256") == source["workflow_contract_sha256"]):
+            # Validate before RESUME/NOOP. Equal state fields cannot conceal
+            # a missing or corrupted immutable packet.
+            try:
+                saved = _context_packet(runtime, state, surface=surface, prefix=prefix)
+                body = dict(saved["body"])
+                context = body.pop("report_context")
+                validate_context(context)
+                if sha256_json(body) != source["source_sha256"] or instant(context["comparison_cutoff"]) > cutoff:
+                    raise ValueError("Stable market upstream proof mismatch")
+            except (OSError, KeyError, TypeError, ValueError) as exc:
+                raise WorkRuntimeError("Cannot reuse an unverified immutable market context") from exc
+            if prefix == "last_acked":
+                baseline, _ = _load_last_acked_market_baseline(runtime, state, surface=surface,
+                                                              archive_dir=archive_dir, cutoff=cutoff)
+                if baseline["status"] != "VERIFIED":
+                    raise WorkRuntimeError("Cannot NOOP an unverified ACK market context")
+            return saved, prefix == "last_acked"
+    baseline, prior = _load_last_acked_market_baseline(runtime, state, surface=surface,
+                                                      archive_dir=archive_dir, cutoff=cutoff)
+    body = dict(source["body"])
+    body["report_context"] = make_context(body, market=surface, cutoff=cutoff, baseline=baseline,
+        prior_body=prior["body"] if prior else None,
+        comparable=bool(prior and prior["prompt_contract_version"] == source["prompt_contract_version"]
+                        and prior["workflow_contract_sha256"] == source["workflow_contract_sha256"]))
+    return seal_packet(surface, body=body, contract_version=source["prompt_contract_version"]), False
 
 
 def validate_packet(packet: dict[str, Any], *, max_chars: int = 700_000) -> None:
@@ -894,6 +1041,15 @@ def validate_work_report(report: dict[str, Any], *, max_chars: int = 600_000) ->
         event_id=str(report.get("event_id") or ""),
         source_sha256=str(report.get("source_sha256") or ""),
     )
+    _validate_market_context_report(report.get("structured_report"), surface=surface,
+                                   contract=report.get("prompt_contract_version"))
+    if report.get("prompt_contract_version") == MARKET_CONTEXT_CONTRACTS.get(surface):
+        from .market_report_context import instant
+        try:
+            if instant(report["structured_report"]["generated_at"]) > instant(report["published_at"]):
+                raise ValueError("Report generation is after publication")
+        except (ValueError, TypeError) as exc:
+            raise WorkRuntimeError("New market report clocks are invalid") from exc
     markdown = str(report.get("report_markdown") or "")
     if not markdown.strip():
         raise WorkRuntimeError("Work report Markdown is empty")
@@ -1064,6 +1220,13 @@ def _validate_report_packet_coverage(
     if surface not in {"kr", "us"}:
         return
     body = packet.get("body") if isinstance(packet.get("body"), dict) else {}
+    _validate_market_context_report(draft, surface=surface, contract=packet.get("prompt_contract_version"))
+    if packet.get("prompt_contract_version") == MARKET_CONTEXT_CONTRACTS.get(surface):
+        if (draft.get("source_summary") or {}).get("report_context_receipt") != body.get("report_context"):
+            raise WorkRuntimeError("Structured market report context must exactly match the sealed packet")
+        from .market_report_context import instant
+        if instant(draft["generated_at"]) > now:
+            raise WorkRuntimeError("Structured market report generation is after publication cutoff")
     current = body.get("current") if isinstance(body.get("current"), dict) else {}
     bundle = current.get("bundle") if isinstance(current.get("bundle"), dict) else {}
     packet_rows = [row for row in (bundle.get("strategy_table") or []) if isinstance(row, dict)]
@@ -1155,6 +1318,28 @@ def _validate_report_packet_coverage(
             now=now,
         )
     validate_account_execution(strategies, freshness, now=now)
+
+
+def _validate_market_context_report(draft: dict, *, surface: str, contract: str) -> None:
+    from .market_report_context import validate_context, validate_public_report_envelope
+    context = (draft.get("source_summary") or {}).get("report_context_receipt")
+    if contract == MARKET_CONTEXT_CONTRACTS.get(surface):
+        try:
+            validate_public_report_envelope(draft)
+        except (ValueError, TypeError) as exc:
+            raise WorkRuntimeError("New public market report contains unsupported or private fields") from exc
+    if contract == MARKET_CONTEXT_CONTRACTS.get(surface) or context is not None:
+        try:
+            validate_context(context)
+            if context["market"] != surface.upper():
+                raise ValueError("Report context market mismatch")
+            from .market_report_context import instant
+            if instant(context["comparison_cutoff"]) > instant(draft["generated_at"]):
+                raise ValueError("Report generation is before its comparison cutoff")
+        except (ValueError, TypeError, KeyError) as exc:
+            raise WorkRuntimeError("Structured market report public context is invalid") from exc
+    if contract == MARKET_CONTEXT_CONTRACTS.get(surface) and len(draft.get("top_actions") or []) > 3:
+        raise WorkRuntimeError("New market report contract permits at most 3 top actions")
 
 
 def _validate_external_evidence_binding(

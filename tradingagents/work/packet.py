@@ -31,6 +31,7 @@ PROMPT_FILENAMES = {
     "youtube": "youtube.md",
     "prism": "prism.md",
 }
+MARKET_CONTEXT_CONTRACTS = {"kr": "market-work-v13-kr", "us": "market-work-v14-us"}
 
 
 def load_json(path: Path) -> dict[str, Any]:
@@ -57,8 +58,12 @@ def sha256_json(payload: Any) -> str:
     return sha256_text(canonical_json(payload))
 
 
-def prompt_path(surface: str) -> Path:
+def prompt_path(surface: str, contract_version: str | None = None) -> Path:
     key = _surface(surface)
+    if contract_version is not None and contract_version != PROMPT_CONTRACTS[key]:
+        if contract_version != MARKET_CONTEXT_CONTRACTS.get(key):
+            raise ValueError("Unsupported Work prompt contract")
+        return Path(__file__).with_name("prompts") / f"market_{key}_readiness.md"
     return Path(__file__).with_name("prompts") / PROMPT_FILENAMES[key]
 
 
@@ -66,13 +71,13 @@ def prompt_text(surface: str) -> str:
     return prompt_path(surface).read_text(encoding="utf-8")
 
 
-def workflow_contract_hashes(surface: str) -> dict[str, str]:
+def workflow_contract_hashes(surface: str, contract_version: str | None = None) -> dict[str, str]:
     key = _surface(surface)
     repo_root = Path(__file__).resolve().parents[2]
     skill = repo_root / ".agents" / "skills" / "tradingagents-daily-investment-work" / "SKILL.md"
     task_manifest = repo_root / "config" / "chatgpt_work_tasks.json"
     return {
-        "prompt_sha256": sha256_bytes(prompt_path(key).read_bytes()),
+        "prompt_sha256": sha256_bytes((prompt_path(key, contract_version) if contract_version else prompt_path(key)).read_bytes()),
         "skill_sha256": sha256_bytes(skill.read_bytes()) if skill.is_file() else sha256_text("skill-unavailable"),
         "task_manifest_sha256": (
             sha256_bytes(task_manifest.read_bytes()) if task_manifest.is_file() else sha256_text("task-manifest-unavailable")
@@ -378,8 +383,11 @@ def build_surface_packet(
     prism_archive_dir: Path | None = None,
     now: datetime | None = None,
     public: bool = False,
+    report_context_v1: bool = False,
 ) -> dict[str, Any]:
     key = _surface(surface)
+    if report_context_v1 and key not in MARKET_CONTEXT_CONTRACTS:
+        raise ValueError("Report readiness context supports market surfaces only")
     now = now or datetime.now().astimezone()
     roots = resolve_archive_roots(
         archive_dir=archive_dir,
@@ -387,7 +395,7 @@ def build_surface_packet(
         prism_archive_dir=prism_archive_dir,
     )
     if key in {"kr", "us"}:
-        body = _market_body(key, roots=roots, now=now, public=public)
+        body = _market_body(key, roots=roots, now=now, public=public, research_readiness=report_context_v1)
     elif key == "youtube":
         body = _youtube_body(roots["youtube"], now=now)
     else:
@@ -397,7 +405,8 @@ def build_surface_packet(
         body=body,
         archive_dir=roots["market"],
     )
-    return _seal_packet(key, body=body)
+    return _seal_packet(key, body=body,
+                        contract_version=MARKET_CONTEXT_CONTRACTS[key] if report_context_v1 else None)
 
 
 def _model_provenance(
@@ -699,7 +708,8 @@ def _revision_membership(archive: Path, manifest: dict[str, Any], *, now: dateti
     ) if key in active} | {"source_run_id": parent["run_id"]}
 
 
-def _market_body(surface: str, *, roots: dict[str, Path], now: datetime, public: bool) -> dict[str, Any]:
+def _market_body(surface: str, *, roots: dict[str, Path], now: datetime, public: bool,
+                 research_readiness: bool = False) -> dict[str, Any]:
     sources = _market_sources(roots["market"], surface)
     if not sources:
         return {
@@ -803,6 +813,10 @@ def _market_body(surface: str, *, roots: dict[str, Path], now: datetime, public:
             public=public,
         ),
     }
+    if research_readiness:
+        from .market_report_context import research_receipts
+        current_payload["research_readiness"] = research_receipts(
+            roots["market"], analysis_manifest, bundle.get("strategy_table", []), market=surface, now=now)
     if analysis_manifest.get("research_recovery"):
         recovery = analysis_manifest["research_recovery"]
         # Public recovery packets must not reveal account-only ticker membership.
@@ -2044,10 +2058,10 @@ def _market_guardrails(surface: str, bundle: dict[str, Any], *, now: datetime,
     }
 
 
-def _seal_packet(surface: str, *, body: dict[str, Any]) -> dict[str, Any]:
-    contract_hashes = workflow_contract_hashes(surface)
+def _seal_packet(surface: str, *, body: dict[str, Any], contract_version: str | None = None) -> dict[str, Any]:
+    contract_hashes = workflow_contract_hashes(surface, contract_version) if contract_version else workflow_contract_hashes(surface)
     semantic_source_sha = sha256_json(body)
-    contract = PROMPT_CONTRACTS[surface]
+    contract = contract_version or PROMPT_CONTRACTS[surface]
     workflow_contract_sha = sha256_json({"version": contract, **contract_hashes})
     event_material = {
         "schema": WORK_SCHEMA,
@@ -2069,10 +2083,10 @@ def _seal_packet(surface: str, *, body: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def seal_packet(surface: str, *, body: dict[str, Any]) -> dict[str, Any]:
+def seal_packet(surface: str, *, body: dict[str, Any], contract_version: str | None = None) -> dict[str, Any]:
     """Seal a prepared body after runtime delta filtering."""
 
-    return _seal_packet(_surface(surface), body=body)
+    return _seal_packet(_surface(surface), body=body, contract_version=contract_version)
 
 
 def _market_report_mode(bundle: dict[str, Any]) -> str:

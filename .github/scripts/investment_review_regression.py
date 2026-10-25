@@ -4,7 +4,7 @@ from __future__ import annotations
 import argparse
 import asyncio
 import base64
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from http.server import ThreadingHTTPServer
 import json
 from pathlib import Path
@@ -46,11 +46,20 @@ def fixture(root):
              "observed_at": "2026-10-16T10:00:00Z", "open": 100+i, "high": 110+i,
              "low": 95+i, "close": 102+i, "volume": 1000+i*100, "session_id": "2026-10-16", "interval": "1m"}
             for i in range(30)]
+    for i in range(30):
+        stamp = datetime(2026, 9, 16, 20, tzinfo=timezone.utc) + timedelta(days=i)
+        bars.append({"timestamp": stamp.isoformat(), "available_at": (stamp + timedelta(hours=1)).isoformat(),
+                     "observed_at": "2026-10-16T10:00:00Z", "open": 100+i, "high": 110+i,
+                     "low": 95+i, "close": 102+i, "volume": 1000+i*100,
+                     "session_id": stamp.date().isoformat(), "interval": "1d"})
     payloads = {"chart_evidence.json": {"ticker": "TEST", "bars": bars},
                 "analysis.json": {"finished_at": "2026-10-16T10:00:00Z"},
-                "execution_contract.json": {"ingested_at": "2026-10-16T10:00:00Z", "structured_levels": [{"price": 110, "label": "계획 진입 기준"}]},
+                "execution_contract.json": {"ingested_at": "2026-10-16T10:00:00Z", "structured_levels": [
+                    {"price": 123.123456789 + (i//3)*.1, "label": f"원래 계획 {i+1} · 동일 가격의 긴 진입·무효화 조건"}
+                    for i in range(18)]},
                 "execution_update.json": {"execution_asof": "2026-10-16T10:00:00Z", "ingested_at": "2026-10-16T10:00:00Z",
                                           "market_data_asof": "2026-10-16T09:59:00Z", "decision_state": "WAIT",
+                                          "session_vwap": 123.987654321,
                                           "reason_codes": ["volume_rule_not_met"]},
                 "evidence_ledger.json": {"items": [{"claim": "<img src=x onerror='window.__pwned=true'>", "kind": "fact",
                                           "known_at": "2026-10-16T10:00:00Z", "published_at": "2026-10-16T09:00:00Z", "observed_at": "2026-10-16T10:00:00Z"}]}}
@@ -171,6 +180,69 @@ async def probe(websocket_url, page_url):
               if(!catalog||!/^\\d+$/.test(catalog.generation)||!snapshot||snapshot.query.catalog_generation!==catalog.generation)throw Error('First catalog 200 generation was lost before snapshot');
               return true;
             })()''')
+            result["readable_price_levels"] = await evaluate('''(() => {
+              const levels=window.reviewSnapshot.price_levels,controls=[...document.querySelectorAll('.chart-level-control input')];
+              const rows=[...document.querySelectorAll('#price-levels table tr')].slice(1);
+              if(levels.length!==19||rows.length!==levels.length)throw Error('Dense levels or duplicate names were lost');
+              rows.forEach((row,i)=>{if(row.cells[0].textContent!==levels[i].label||row.cells[1].textContent!==String(levels[i].price))throw Error('Legend rounded or changed original levels');});
+              rows.forEach(row=>{const cell=row.cells[1],range=document.createRange();range.selectNodeContents(cell);if(range.getBoundingClientRect().width>cell.clientWidth-15)throw Error('Exact price text overlaps the source column');});
+              if(!document.querySelector('#price-levels').textContent.includes('개별 출처 미제공')||!document.querySelector('#price-levels').textContent.includes('원래 시세 2026-10-16T09:59:00Z'))throw Error('Original source clocks or unknown-source boundary lost');
+              const originalClocks=document.querySelector('#price-levels details');
+              if(!originalClocks||originalClocks.open||!originalClocks.querySelector('summary').textContent.includes('원래 시각 4개'))throw Error('Original clock disclosure missing or obscuring default price list');
+              if(controls.length!==window.reviewSnapshot.series.length||controls.length!==2)throw Error('Each interval requires its own label control');
+              if(new Set(controls.map(c=>c.id)).size!==controls.length)throw Error('Duplicate chart control id');
+              controls.forEach(c=>{if(c.checked||!document.getElementById(c.getAttribute('aria-controls'))?.classList.contains('chart')||!c.closest('label')?.textContent.includes('차트에 가격 이름 표시'))throw Error('Chart control lacks an accessible unique binding');});
+              const options=planPriceLines.map(p=>p.line.options());
+              if(options.length!==levels.length*controls.length||options.some(p=>p.axisLabelVisible||p.title!==''))throw Error('Default level labels still obscure candles');
+              const styles={DOTTED:LightweightCharts.LineStyle.Dotted,SOLID:LightweightCharts.LineStyle.Solid,DASHED:LightweightCharts.LineStyle.Dashed};
+              options.forEach((p,i)=>{const level=levels[i%levels.length];if(p.price!==level.price||p.color!=='#90642f'||p.lineStyle!==(styles[level.style]??LightweightCharts.LineStyle.Dashed)||p.lineVisible!==true)throw Error('Price line economics/style changed');});
+              if([...document.querySelectorAll('#strategy-overview .review-unit')].some(e=>getComputedStyle(e).whiteSpace!=='nowrap'||e.getClientRects().length!==1))throw Error('Count and unit wrap separately');
+              window.__levelSnapshotBefore=JSON.stringify(window.reviewSnapshot);
+              controls[0].focus();
+              return {levels:levels.length,charts:controls.length,default_inline_names:false,exact_legend:true,zero_roundtrip_unit:[...document.querySelectorAll('#strategy-overview .review-unit')].some(e=>e.textContent==='0회')};
+            })()''')
+            for _ in range(2):
+                await call("Input.dispatchKeyEvent", {"type": "keyDown", "key": " ", "code": "Space", "windowsVirtualKeyCode": 32})
+                await call("Input.dispatchKeyEvent", {"type": "keyUp", "key": " ", "code": "Space", "windowsVirtualKeyCode": 32})
+                enabled = _ == 0
+                if not await evaluate('''(() => {
+                  const controls=[...document.querySelectorAll('.chart-level-control input')],enabled=ENABLED;
+                  if(controls[0].checked!==enabled||controls[1].checked)throw Error('Keyboard label toggle crossed charts');
+                  for(const p of planPriceLines){const options=p.line.options(),show=enabled&&p.control_id===controls[0].id;if(options.axisLabelVisible!==show||options.title!==(show?p.label:''))throw Error('Keyboard label display did not match its chart');}
+                  if(JSON.stringify(window.reviewSnapshot)!==window.__levelSnapshotBefore)throw Error('Display toggle mutated snapshot evidence');
+                  return true;
+                })()'''.replace("ENABLED", json.dumps(enabled))):
+                    raise RuntimeError("Chart labels did not respond to keyboard")
+            result["readable_price_levels"]["keyboard_chart_scoped_toggle"] = True
+            # Capture the actual default legend before the keyboard-scroll
+            # interaction changes its position. Native key scrolling may
+            # continue animating after keyUp; that is not its initial layout.
+            if OUTPUT:
+                await evaluate("document.querySelector('#charts').scrollIntoView({block:'start'})")
+                shot = await call("Page.captureScreenshot", {"format": "png", "captureBeyondViewport": False})
+                (OUTPUT / f"chart-levels-{width}.png").write_bytes(base64.b64decode(shot["data"]))
+                await evaluate("document.querySelector('#price-levels').scrollIntoView({block:'start'})")
+                shot = await call("Page.captureScreenshot", {"format": "png", "captureBeyondViewport": False})
+                (OUTPUT / f"chart-level-legend-{width}.png").write_bytes(base64.b64decode(shot["data"]))
+            await evaluate("document.querySelector('#price-levels details summary').focus()")
+            for opened in (True, False):
+                await call("Input.dispatchKeyEvent", {"type": "keyDown", "key": " ", "code": "Space", "windowsVirtualKeyCode": 32})
+                await call("Input.dispatchKeyEvent", {"type": "keyUp", "key": " ", "code": "Space", "windowsVirtualKeyCode": 32})
+                if not await evaluate("document.querySelector('#price-levels details').open===" + json.dumps(opened)):
+                    raise RuntimeError("Original price-level clocks did not open with keyboard")
+            result["readable_price_levels"]["keyboard_original_clock_details"] = True
+            if width < 600:
+                await evaluate("window.__legendRegion=document.querySelector('#price-levels .review-table-scroll');window.__legendRegion.scrollIntoView({block:'center'});window.__legendRegion.focus();")
+                await call("Input.dispatchKeyEvent", {"type": "keyDown", "key": "ArrowRight", "code": "ArrowRight", "windowsVirtualKeyCode": 39})
+                await call("Input.dispatchKeyEvent", {"type": "keyUp", "key": "ArrowRight", "code": "ArrowRight", "windowsVirtualKeyCode": 39})
+                for _ in range(20):
+                    await asyncio.sleep(.05)
+                    if await evaluate("window.__legendRegion.scrollLeft>0"):
+                        break
+                else:
+                    raise RuntimeError("Price-level legend did not scroll with the keyboard")
+                await evaluate("window.__legendRegion.scrollTo({left:0,behavior:'instant'});window.__legendRegion.blur();")
+                result["readable_price_levels"]["keyboard_legend_scroll"] = True
             table_layout = await evaluate('''(() => {
               document.querySelectorAll('#kis-strategy-health details').forEach(d=>d.open=true);
               const visible=e=>!!e.getClientRects().length&&getComputedStyle(e).visibility!=='hidden';

@@ -95,7 +95,7 @@ def publish_freshness_blockers(packet: dict, *, now: datetime) -> list[str]:
 
 def prepare_market_report(runtime, surface: str, *, producer_state_dir: Path,
                           archive_dir: Path | None = None, youtube_archive_dir: Path | None = None,
-                          prism_archive_dir: Path | None = None) -> dict:
+                          prism_archive_dir: Path | None = None, report_context_v1: bool = False) -> dict:
     if surface not in {"kr", "us"}:
         raise ValueError("Broker refresh only supports kr/us")
     state = Path(producer_state_dir)
@@ -175,7 +175,8 @@ def prepare_market_report(runtime, surface: str, *, producer_state_dir: Path,
             return finish(status="FRESH_INPUT_UNAVAILABLE", blockers=blockers, observations=safe_clocks)
         result = runtime.prepare(surface, archive_dir=archive,
             youtube_archive_dir=youtube_archive_dir, prism_archive_dir=prism_archive_dir, fresh_report=True,
-            expected_producer_run_id=manifest.get("run_id"), refresh_started_at=started)
+            expected_producer_run_id=manifest.get("run_id"), refresh_started_at=started,
+            report_context_v1=report_context_v1)
         saved = finish(status="REFRESHED", observations=safe_clocks,
                        event_created=result.get("result") in {"NEW", "RESUME"})
         return {**result, "pre_report_refresh": saved}

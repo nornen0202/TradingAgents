@@ -2,6 +2,7 @@
 "use strict";
 const byId = id => document.getElementById(id);
 let charts = [];
+let planPriceLines = [];
 let requestVersion = 0;
 let viewBusy = false;
 let viewController = null;
@@ -9,6 +10,40 @@ let currentCatalog = null;
 const number = value => typeof value === "number" && Number.isFinite(value) ? value.toLocaleString("ko-KR", {maximumFractionDigits:3}) : "확인 불가";
 const display = value => value === null || value === undefined ? "확인 불가" : typeof value === "object" ? JSON.stringify(value) : String(value);
 function paragraph(text) { const element=document.createElement("p");element.textContent=text;return element; }
+function unit(value, suffix) { const element=document.createElement("span");element.className="review-unit";element.textContent=number(value)+suffix;return element; }
+function priceLevelOptions(level, showLabels) {
+  return {price:level.price,title:showLabels?level.label:"",axisLabelVisible:showLabels,
+    lineStyle:({DOTTED:LightweightCharts.LineStyle.Dotted,SOLID:LightweightCharts.LineStyle.Solid,DASHED:LightweightCharts.LineStyle.Dashed})[level.style] ?? LightweightCharts.LineStyle.Dashed,color:"#90642f"};
+}
+function updatePriceLevelLabels(lines, visible) {
+  lines.forEach(({line,label})=>line.applyOptions({title:visible?label:"",axisLabelVisible:visible}));
+}
+function renderPriceLevelLegend(snapshot) {
+  const levels=snapshot.price_levels||[];
+  const provenance=level=>{
+    const style={DOTTED:"점선",DASHED:"파선",SOLID:"실선"}[level.style]||"파선";
+    const source=level.source===undefined||level.source===null?"개별 출처 미제공":display(level.source);
+    const clocks=[["원래 시세",level.market_data_asof],["원래 사건",level.event_time],["원래 수집",level.ingested_at],["원래 평가",level.evaluated_at]]
+      .filter(([,value])=>value!==undefined&&value!==null).map(([label,value])=>label+" "+display(value));
+    return {caption:[style,source].join(" · "),clocks};
+  };
+  const provenanceRows=levels.map(provenance);
+  const legend=table("가격선의 원래 이름·가격·출처",["원래 이름","원래 가격 · 반올림 없음","선·출처·제공된 원래 시각"],levels.map((level,index)=>[
+    display(level.label),typeof level.price==="number"&&Number.isFinite(level.price)?String(level.price):display(level.price),provenanceRows[index].caption]));
+  const grid=legend.querySelector("table");
+  if(grid){
+    grid.style.tableLayout="auto";
+    const rows=grid.querySelectorAll("tr");
+    provenanceRows.forEach(({clocks},index)=>{
+      if(!clocks.length)return;
+      const details=document.createElement("details"),caption=document.createElement("summary");
+      caption.textContent="제공된 원래 시각 "+clocks.length+"개";
+      details.append(caption,...clocks.map(paragraph));rows[index+1].children[2].append(details);
+    });
+  }
+  byId("price-levels").replaceChildren(
+    paragraph("원본 실행: "+(snapshot.source_context?.run_id||"미확인")+" · 가격선 "+levels.length+"개. 같은 가격의 다른 이름도 원본 순서대로 모두 표시합니다."),legend);
+}
 async function getJson(url, onProgress, signal=viewController?.signal, catalogReceipt) {
   const address=new URL(url,location.origin), deadline=performance.now()+120000;
   let snapshotJob=null;
@@ -186,7 +221,9 @@ function renderKisStrategy(payload) {
       const sample=row.evaluation?.sample||{},allocation=row.allocation_diagnostics||{},refresh=row.refresh_health||{};
       const card=document.createElement("article");card.className="overview-card";
       const heading=document.createElement("h3");heading.textContent=(market==="KR"?"국내":"미국")+" · "+(labels[row.status]||"운영 확인 필요");card.append(heading);
-      card.append(paragraph("정상 체결 · 매수 "+number(sample.buy_filled_orders)+"건 / 매도 "+number(sample.sell_filled_orders)+"건 · 왕복 "+number(sample.closed_inventory_episodes)+"회"));
+      const counts=document.createElement("p");
+      counts.append("정상 체결 · 매수 ",unit(sample.buy_filled_orders,"건")," / 매도 ",unit(sample.sell_filled_orders,"건")," · 왕복 ",unit(sample.closed_inventory_episodes,"회"));
+      card.append(counts);
       const reason=(row.blockers||[]).map(code=>reasons[code]||"운영 근거 확인 필요")[0];
       let next=reason||"정상 전략의 원래 승인과 새 시세를 확인합니다.";
       if(allocation.reason_counts?.NO_AUTHORIZED_EXECUTION_ACTION)next+=" · 연구 판단에 매수·매도 행동이 없습니다.";
@@ -284,8 +321,8 @@ function list(id, values) {
   }));
 }
 function clearSnapshot() {
-  charts.forEach(chart=>chart.remove());charts=[];byId("charts").replaceChildren();
-  ["verdict","freshness","profile","performance","unverified","source-context","experiment-cards"].forEach(id=>byId(id).textContent="");
+  charts.forEach(chart=>chart.remove());charts=[];planPriceLines=[];byId("charts").replaceChildren();
+  ["verdict","freshness","profile","performance","unverified","source-context","experiment-cards","price-levels"].forEach(id=>byId(id).textContent="");
   ["reasons","facts","inferences","events"].forEach(id=>list(id,[]));window.reviewSnapshot=null;
 }
 function snapshotSourceText(snapshot){
@@ -304,7 +341,7 @@ async function showSnapshot(existingOperational, existingVersion) {
   try {
     const snapshot = await getJson("/api/snapshot?" + params,progress=>{if(version===requestVersion&&!signal?.aborted)snapshotProgress(progress);},signal);
     if (version !== requestVersion) return;
-    charts.forEach(chart => chart.remove()); charts = [];
+    charts.forEach(chart => chart.remove()); charts = []; planPriceLines=[];
     byId("charts").replaceChildren();
     const source=snapshot.source_context||{};
     byId("source-context").textContent=snapshotSourceText(snapshot);
@@ -332,13 +369,22 @@ async function showSnapshot(existingOperational, existingVersion) {
     list("events", snapshot.events.events.length?snapshot.events.events.map(row => (row.title || "공시") + " · 발표 " + (row.published_at || "시각 미확인") + " · 최초 감지 " + (row.first_seen_at || "별도 기록 없음") + " · 관측 " + row.observed_at + " · 정정 " + (row.is_amended ? "예" : "아니오") + " · 버전 " + row.version_id):["발표·정정 시각을 검증한 이벤트 기록이 없습니다. 일정이 없다는 뜻은 아닙니다."]);
     renderPerformance(snapshot.lifecycle);
     renderProfile(snapshot.series);
+    renderPriceLevelLegend(snapshot);
     for (const item of snapshot.series) {
       const wrapper = document.createElement("div");
       const label = document.createElement("h3"); label.textContent = item.interval + " · UTC";
       const element = document.createElement("div"); element.className = "chart";
+      const chartIndex=charts.length;
+      element.id="review-chart-"+version+"-"+chartIndex;
+      const levelToggle=document.createElement("input");levelToggle.type="checkbox";
+      levelToggle.id="chart-level-labels-"+version+"-"+chartIndex;
+      levelToggle.disabled=!snapshot.price_levels.length;
+      levelToggle.setAttribute("aria-controls",element.id);levelToggle.setAttribute("aria-describedby","chart-level-hint");
+      const levelControl=document.createElement("label");levelControl.className="chart-level-control";
+      levelControl.append(levelToggle,item.interval+" 차트에 가격 이름 표시");
       const clocks = document.createElement("p"); clocks.className="muted";
       if(item.bars.length){const latest=item.bars[item.bars.length-1];clocks.textContent="최근 봉 " + latest.event_time + " · 관측 " + latest.ingested_at + " · 평가 " + latest.evaluated_at;}
-      wrapper.append(label, clocks, element); byId("charts").append(wrapper);
+      wrapper.append(label, clocks, levelControl, element); byId("charts").append(wrapper);
       const chart = LightweightCharts.createChart(element, {autoSize:true, layout:{attributionLogo:true}, timeScale:{timeVisible:item.interval !== "1d"}});
       charts.push(chart);
       const candles = chart.addSeries(LightweightCharts.CandlestickSeries);
@@ -346,7 +392,11 @@ async function showSnapshot(existingOperational, existingVersion) {
       candles.setData(data);
       const vwap = chart.addSeries(LightweightCharts.LineSeries,{color:"#395dd1",lineWidth:2});
       vwap.setData(item.avwap.series.filter(row=>row.value !== null).map(row=>({time:Math.floor(Date.parse(row.timestamp)/1000),value:row.value})));
-      snapshot.price_levels.forEach(level=>candles.createPriceLine({price:level.price,title:level.label,lineStyle:({DOTTED:LightweightCharts.LineStyle.Dotted,SOLID:LightweightCharts.LineStyle.Solid,DASHED:LightweightCharts.LineStyle.Dashed})[level.style] ?? LightweightCharts.LineStyle.Dashed,color:"#90642f"}));
+      const chartLines=snapshot.price_levels.map(level=>({line:candles.createPriceLine(priceLevelOptions(level,false)),label:level.label}));
+      planPriceLines.push(...chartLines.map(line=>({...line,control_id:levelToggle.id,chart_id:element.id})));
+      levelToggle.addEventListener("change",()=>{
+        if(levelToggle.isConnected&&charts.includes(chart))updatePriceLevelLabels(chartLines,levelToggle.checked);
+      });
       if (data.length) {
         const markers = snapshot.markers.filter(m=>m.time>=data[0].time && m.time<=data[data.length-1].time).map(({category,...marker})=>marker);
         LightweightCharts.createSeriesMarkers(candles, markers);
