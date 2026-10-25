@@ -1,13 +1,13 @@
 {
   "schema": "tradingagents.work-context/v1",
   "surface": "us",
-  "event_id": "us:1ee0098f743e5d690b8b0bbfcea21feb",
+  "event_id": "us:01314e976196021eb8b117e7149eb542",
   "prompt_contract_version": "market-work-v13-us",
   "prompt_sha256": "d89884ce9232b2695f637cb3a5654da9f473e7138706cc074cbd9a1601e61f77",
   "skill_sha256": "4dffe28b3721557cc2517b5afff2f94045832606e71ff61461df969f6abb53c7",
   "task_manifest_sha256": "c0992fa275c9961bc91c679030c0b4d9b8b06f3d164226776421f1e354b5c22e",
   "workflow_contract_sha256": "6e0b555b6a8ae53cf919baa1e96d671d2ef180fd3d86a58e5c8b568f278c8ec6",
-  "source_sha256": "3d309c775dbf51188cddf42d8ff0f8ea8e7a10d43e887e45e9427d8795435561",
+  "source_sha256": "bb3e9933b77b37fed6a26ba67059c3b1429d0a67fe46642034ba0354225948c5",
   "body": {
     "kind": "market",
     "market": "US",
@@ -994,15 +994,15 @@
         "source_health": "OK",
         "coverage": {
           "total_unique_events": 489,
-          "window_events": 53,
+          "window_events": 50,
           "transmitted_events": 12,
           "truncated": true,
-          "oldest_occurred_at": "2026-10-22T23:20:08+00:00",
-          "newest_occurred_at": "2026-10-25T07:00:37+00:00",
-          "available_events_before_context_cap": 53,
+          "oldest_occurred_at": "2026-10-23T00:16:51+00:00",
+          "newest_occurred_at": "2026-10-25T11:00:26+00:00",
+          "available_events_before_context_cap": 50,
           "context_event_cap": 12,
-          "omitted_events": 41,
-          "omitted_due_to_context_cap": 41,
+          "omitted_events": 38,
+          "omitted_due_to_context_cap": 38,
           "omitted_before_context_selection": 0
         },
         "events": [
@@ -2336,95 +2336,101 @@
             }
           },
           {
-            "event_key": "kGsdIHtqmlg",
-            "content_sha256": "22efa4ddc9eef04921ed8195c55bf05c8022678fb92781746ca0e878aff5b4bd",
-            "occurred_at": "2026-10-22T23:20:08+00:00",
+            "event_key": "b2my6Nq32rs",
+            "content_sha256": "f9a47d5529fe0c273fe2c228b42c31c5f6408a28f2bfafad740f9328e6010f8a",
+            "occurred_at": "2026-10-25T11:00:26+00:00",
             "relevance": {
               "tickers": [
-                "000660",
-                "009150",
-                "NVDA"
+                "CL=F",
+                "META",
+                "RBTX",
+                "^KS11"
               ],
               "markets": [
-                "KR",
                 "US"
               ],
               "themes": [],
               "match_basis": "verified_entities",
-              "matched_tickers": [
-                "NVDA"
-              ],
+              "matched_tickers": [],
               "market_match": true,
-              "score": 120
+              "score": 20
             },
             "summary": {
-              "video_id": "kGsdIHtqmlg",
-              "title": "SK하이닉스, 솔리다임 IPO 검토 중단…주주의견 수용 | 삼성전기 공장 만드는데 테슬라·엔비디아서 3.6조 댄다 | 권순우 삼프로TV 취재팀장 [뉴스3]",
-              "channel": "삼프로TV 3PROTV",
-              "source_url": "https://www.youtube.com/watch?v=kGsdIHtqmlg",
+              "video_id": "b2my6Nq32rs",
+              "title": "[#찐시황]  “외국인이 수상하다!” 현물 1조 팔고 선물은 매수… 삼성전자·SK하이닉스  다음 주 운명 갈린다 | 미래에셋자산운용 최창규 이사",
+              "channel": "815Money talk",
+              "source_url": "https://www.youtube.com/watch?v=b2my6Nq32rs",
               "claim_status_summary": {
-                "partially_supported": 2,
-                "unverified": 9,
-                "asr_uncertain": 1
+                "unverified": 8,
+                "asr_uncertain": 3,
+                "partially_supported": 1
               },
               "claims": [
                 {
                   "claim_id": "C1",
-                  "claim_text": "SK하이닉스가 솔리다임 IPO 추진 검토와 프리 IPO 자금조달을 중단했으며 주주 의견, 중복상장 할인 우려와 시장 변동성을 고려했다.",
-                  "status": "partially_supported",
-                  "confidence": 0.88,
+                  "claim_text": "10월 23일 미국 주요 지수는 하락하고 반도체지수는 상승했으며, 원유재고 감소와 중동 공급위험이 유가·금리를 자극했다.",
+                  "status": "unverified",
+                  "confidence": 0.99,
                   "supporting_evidence_ids": [],
                   "manual_check_required": true,
-                  "investor_implication": "중단 보도에는 근거가 있으나 공식 공시 본문과 대체 조달계획 확인 전 주주환원 확대나 주가 반등을 확정할 수 없다."
+                  "investor_implication": "유가 상승에 따른 업종 부담은 확인된 당일 시장 설명이 아닌 검증 대기 가설로 취급한다."
                 },
                 {
                   "claim_id": "C2",
-                  "claim_text": "엔터프라이즈 SSD 수요로 솔리다임 실적이 증가했고 기존 시설의 한계와 중국 장비 반입 제약 때문에 미국 신규 생산시설 및 대체 자금조달이 필요하다.",
+                  "claim_text": "솔리다임 IPO 검토 중단이 SK하이닉스 희석 우려를 완화했으며 미국 반도체주는 반등하고 스토리지주는 하락했다.",
                   "status": "unverified",
                   "confidence": 0.99,
                   "supporting_evidence_ids": [],
                   "manual_check_required": true,
-                  "investor_implication": "실적 성장과 미국 증설을 확인된 투자 전제로 삼을 수 없다. 실제 투자비와 조달조건이 주주가치 판단의 핵심이다."
+                  "investor_implication": "희석 위험 해소나 반도체 업황 회복을 매매 근거로 확정할 수 없다."
                 },
                 {
                   "claim_id": "C3",
-                  "claim_text": "중복상장을 하려면 투자자 보호 관련 다섯 가지 조건을 충족해야 한다.",
+                  "claim_text": "미국 당국의 PHP 취약점 경고와 AI 공격 우려가 사이버보안주 및 BUG 상승을 촉발했다.",
                   "status": "unverified",
                   "confidence": 0.99,
                   "supporting_evidence_ids": [],
                   "manual_check_required": true,
-                  "investor_implication": "해당 발언을 솔리다임의 상장 가능 여부나 모회사 주주의 보상 권리를 판단하는 근거로 사용할 수 없다."
+                  "investor_implication": "보안 수요 확대와 특정 종목 급등을 연결한 투자 논리는 미검증이다."
                 },
                 {
                   "claim_id": "C4",
-                  "claim_text": "테슬라가 1.1조 원, 엔비디아가 2.6조 원을 삼성전기 FC-BGA 공장에 지원하고 2029~2033년 물량을 확보한다. 제목의 총액은 3.6조 원이다.",
-                  "status": "unverified",
-                  "confidence": 0.98,
+                  "claim_text": "스페이스X로 지칭된 기업이 AI 매출·이익을 확대하고 대규모 컴퓨팅 투자와 통신 인프라 확보를 추진했으며 증권사가 목표주가를 상향했다.",
+                  "status": "asr_uncertain",
+                  "confidence": 0.99,
                   "supporting_evidence_ids": [],
                   "manual_check_required": true,
-                  "investor_implication": "3.6조 원 또는 3.7조 원을 확정 투자유치액으로 제시하면 안 된다. 상환·공급 의무와 공장 소유권 확인 없이 투자비 부담 소멸을 추정할 수 없다."
+                  "investor_implication": "기업 식별과 실적 원문 확보 전에는 수치, 밸류에이션 및 관련 통신주 파급효과를 투자 판단에 사용하지 않는다."
                 }
               ],
               "entities": [
                 {
-                  "ticker": "000660",
-                  "name": "SK하이닉스·솔리다임",
+                  "ticker": "CL=F",
+                  "name": "미국 증시·국제유가",
                   "status": "unverified",
                   "verification_notes": [
-                    "시장 데이터 조회 실패: no_usable_market_fields"
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
                   ]
                 },
                 {
-                  "ticker": "009150",
-                  "name": "삼성전기",
+                  "ticker": "META",
+                  "name": "메타",
                   "status": "unverified",
                   "verification_notes": [
-                    "시장 데이터 조회 실패: no_usable_market_fields"
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
                   ]
                 },
                 {
-                  "ticker": "NVDA",
-                  "name": "엔비디아",
+                  "ticker": "RBTX",
+                  "name": "아이셰어스 글로벌 로보틱스 ETF로 소개된 상품",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                },
+                {
+                  "ticker": "^KS11",
+                  "name": "한국 증시·외국인 현선물 및 옵션 포지션",
                   "status": "unverified",
                   "verification_notes": [
                     "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
@@ -2471,19 +2477,19 @@
               "NqknsS3X98I",
               "GrPFIU3SJAc",
               "6esEt4-hjqw",
-              "kGsdIHtqmlg"
+              "b2my6Nq32rs"
             ],
             "coverage": {
               "total_unique_events": 489,
-              "window_events": 53,
+              "window_events": 50,
               "transmitted_events": 12,
               "truncated": true,
-              "oldest_occurred_at": "2026-10-22T23:20:08+00:00",
-              "newest_occurred_at": "2026-10-25T07:00:37+00:00",
-              "available_events_before_context_cap": 53,
+              "oldest_occurred_at": "2026-10-23T00:16:51+00:00",
+              "newest_occurred_at": "2026-10-25T11:00:26+00:00",
+              "available_events_before_context_cap": 50,
               "context_event_cap": 12,
-              "omitted_events": 41,
-              "omitted_due_to_context_cap": 41,
+              "omitted_events": 38,
+              "omitted_due_to_context_cap": 38,
               "omitted_before_context_selection": 0
             }
           },
