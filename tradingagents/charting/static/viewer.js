@@ -47,10 +47,27 @@ function table(title, headings, rows) {
   const heading = document.createElement("h3"); heading.textContent = title; section.append(heading);
   if (!rows.length) { const empty = document.createElement("p"); empty.textContent = "연결된 기록이 없습니다."; section.append(empty); return section; }
   const scroll = document.createElement("div"); scroll.style.overflowX = "auto";
-  const grid = document.createElement("table"); grid.style.cssText = "border-collapse:collapse;width:100%;text-align:left";
+  const grid = document.createElement("table"); grid.className = "review-data-table"; grid.style.cssText = "border-collapse:collapse;width:100%;text-align:left";
+  const wide = headings.length >= 3;
+  if (wide) {
+    grid.style.minWidth = (headings.length * 9) + "rem";
+    grid.style.tableLayout = "fixed";
+    scroll.className = "review-table-scroll";
+    scroll.tabIndex = 0;
+    scroll.setAttribute("role", "region");
+    scroll.setAttribute("aria-label", title + " 표 · 좌우로 이동해 모든 열 확인");
+    if (!byId("review-table-hint-style")) {
+      const style = document.createElement("style");style.id = "review-table-hint-style";
+      style.textContent = ".review-table-scroll-hint{font-size:.875rem;margin:4px 0}@media(min-width:761px){.review-table-scroll-hint{display:none}}";
+      document.head.append(style);
+    }
+    const hint = paragraph("표를 좌우로 밀어 나머지 항목을 확인하세요.");
+    hint.className = "muted review-table-scroll-hint";
+    section.append(hint);
+  }
   for (const [i, row] of [headings, ...rows].entries()) {
     const tr = document.createElement("tr");
-    row.forEach(value=>{const cell=document.createElement(i===0?"th":"td");cell.style.cssText="padding:8px;border-bottom:1px solid #dce4ee;overflow-wrap:anywhere";cell.textContent=value??"확인 불가";tr.append(cell);});
+    row.forEach(value=>{const cell=document.createElement(i===0?"th":"td");cell.style.cssText="padding:8px;border-bottom:1px solid #dce4ee;overflow-wrap:anywhere";if(wide)cell.style.wordBreak="keep-all";cell.textContent=value??"확인 불가";tr.append(cell);});
     grid.append(tr);
   }
   scroll.append(grid); section.append(scroll); return section;

@@ -152,6 +152,42 @@ async def probe(websocket_url, page_url):
             })()''')
             if result["width"] != width:
                 raise RuntimeError(f"Mobile layout viewport expanded from {width} to {result['width']}")
+            table_layout = await evaluate('''(() => {
+              document.querySelectorAll('#kis-strategy-health details').forEach(d=>d.open=true);
+              const visible=e=>!!e.getClientRects().length&&getComputedStyle(e).visibility!=='hidden';
+              if(!visible(document.querySelector('#status')))throw Error('Progress/status hidden in collapsed settings');
+              const tables=[...document.querySelectorAll('table.review-data-table')].filter(visible);
+              const wide=tables.filter(t=>t.rows[0].cells.length>=3),simple=tables.filter(t=>t.rows[0].cells.length===2);
+              if(!wide.length||!simple.length)throw Error('Readable wide/simple table fixtures absent');
+              const measurements=wide.map(t=>{
+                const wrapper=t.parentElement,columns=t.rows[0].cells.length;
+                const minimum=Math.min(...[...t.rows[0].cells].map(c=>c.getBoundingClientRect().width));
+                const range=wrapper.scrollWidth-wrapper.clientWidth;
+                if(minimum<136)throw Error('Operational header column collapsed below readable width: '+columns+' columns / '+minimum+'px');
+                if(getComputedStyle(wrapper).overflowX!=='auto'||wrapper.tabIndex!==0)throw Error('Wide table has no local keyboard scrolling');
+                if([...t.rows[0].cells].some(c=>getComputedStyle(c).wordBreak!=='keep-all'))throw Error('Korean headings break into vertical characters');
+                if(innerWidth<600&&range<=0)throw Error('Mobile table unexpectedly shrunk instead of local horizontal scrolling');
+                if(wrapper.clientWidth>=columns*144&&range>1)throw Error('Wide desktop table adds unnecessary horizontal scroll');
+                return {columns,minimumCellWidth:minimum,scrollRange:range};
+              });
+              if(simple.some(t=>t.getBoundingClientRect().width>t.parentElement.clientWidth+1))throw Error('Simple two-column table expanded');
+              const scroll=wide.map(t=>t.parentElement).find(e=>e.scrollWidth>e.clientWidth+2);
+              if(scroll){scroll.scrollIntoView({block:'center'});scroll.scrollLeft=0;scroll.focus();window.__tableScrollTarget=scroll;}
+              if(document.documentElement.scrollWidth>innerWidth+2)throw Error('Table overflow escaped into the page');
+              return {measurements,simpleTableCount:simple.length,keyboardScrollRequired:!!scroll};
+            })()''')
+            if table_layout["keyboardScrollRequired"]:
+                await call("Input.dispatchKeyEvent", {"type": "keyDown", "key": "ArrowRight", "code": "ArrowRight", "windowsVirtualKeyCode": 39})
+                await call("Input.dispatchKeyEvent", {"type": "keyUp", "key": "ArrowRight", "code": "ArrowRight", "windowsVirtualKeyCode": 39})
+                for _ in range(20):
+                    await asyncio.sleep(.05)
+                    if await evaluate("window.__tableScrollTarget.scrollLeft>0"):
+                        break
+                else:
+                    raise RuntimeError("Focused operational table did not scroll with ArrowRight")
+                await evaluate("window.__tableScrollTarget.scrollLeft=0;window.__tableScrollTarget.blur();")
+            await evaluate("scrollTo(0,0)")
+            result["readable_operational_tables"] = table_layout
             await evaluate("document.querySelector('#condition-text').value='거래대금 100억원 이상 그리고 전일 대비 거래량 1.5배 이상 그리고 거래정지 제외'; compileCondition()")
             if not await evaluate("window.conditionDraft?.status === 'compiled' && document.querySelector('#condition-draft').textContent.includes('저장·활성화 안 됨')"):
                 raise RuntimeError("Explicit natural-language draft failed")
@@ -232,7 +268,7 @@ async def probe(websocket_url, page_url):
                 if catalog_mode == "health-delay" and not await evaluate("document.querySelector('#kis-demo-health').textContent.includes('확인하고 있습니다')"):
                     raise RuntimeError("Slow health fixture did not remain pending")
                 if catalog_mode == "indexing":
-                    if not await evaluate("document.querySelector('#status').textContent.includes('실행 기록') && viewBusy"):
+                    if not await evaluate("document.querySelector('#status').textContent.includes('실행 기록') && viewBusy && document.querySelector('#status').getClientRects().length>0"):
                         raise RuntimeError("202 discovery progress was not visible")
                     for _ in range(60):
                         await asyncio.sleep(.1)
@@ -245,11 +281,11 @@ async def probe(websocket_url, page_url):
                 if catalog_mode == "timeout":
                     for _ in range(30):
                         await asyncio.sleep(.1)
-                        if await evaluate("document.querySelector('#status').textContent.includes('15초') && !viewBusy"):
+                        if await evaluate("document.querySelector('#status').textContent.includes('15초') && !viewBusy && document.querySelector('#status').getClientRects().length>0"):
                             break
                     else:
                         raise RuntimeError("Timed-out catalog did not restore controls with an actionable error")
-                if catalog_mode == "failed" and not await evaluate("document.querySelector('#status').textContent.includes('자료를 읽지 못했습니다')"):
+                if catalog_mode == "failed" and not await evaluate("document.querySelector('#status').textContent.includes('자료를 읽지 못했습니다') && document.querySelector('#status').getClientRects().length>0"):
                     raise RuntimeError("Failed catalog did not report its own error")
                 # Controls/retry must already be registered while the first
                 # catalog is pending or failed. No data clock is changed.
