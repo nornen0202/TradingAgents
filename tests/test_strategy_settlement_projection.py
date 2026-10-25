@@ -1,5 +1,6 @@
 """The review API derives costs from configured readonly ledgers, never JSON claims."""
 from copy import deepcopy
+from contextlib import closing
 from datetime import timedelta
 import hashlib
 import json
@@ -134,7 +135,8 @@ def test_readonly_connection_handle_is_closed_on_success_and_error(tmp_path, mon
     db.execute("CREATE TABLE fixture (n INTEGER)")
     db.commit()
     db.close()
-    def summary(db, cutoff, market):
+    def summary(db, cutoff, market, *, historical=False):
+        assert historical is True
         assert db.execute("PRAGMA query_only").fetchone()[0] == 1
         if fails:
             raise ValueError("Bad schema/evidence")
@@ -209,3 +211,152 @@ def test_partial_sell_projects_settled_fifo_without_borrowing_cached_open_invent
     assert view["readiness"] == "NOT_READY_FOR_REAL_INVESTMENT"
     assert view["automatic_live_transition"] is view["real_orders_enabled"] is False
     assert h.calls == calls
+
+
+def summary_at(h, cutoff, *, historical=False):
+    from tradingagents.execution import demo_runtime
+    with closing(sqlite3.connect(h.root / f"{h.market.lower()}-strategy.sqlite")) as db:
+        db.row_factory = sqlite3.Row
+        return demo_runtime.summary(db, cutoff, h.market, historical=historical)
+
+
+def test_later_normal_order_before_runtime_json_replacement_does_not_erase_verified_past_cost(tmp_path):
+    h, _, _, result = imported_roundtrip(tmp_path)
+    cutoff = h.now
+    archive = tmp_path / "ui"
+    cached = runtime(archive, h, result)
+    cached_bytes = cached.read_bytes()
+    before = read(archive, h)
+    assert before["actual_cost"] == 2
+
+    h.now += timedelta(seconds=30)
+    h.source("fixture-3", qty=1)
+    new = h.tick()
+    assert len(new["orders"]) == 3  # An actual new guarded, offline order.
+    assert new["orders"][-1]["prepared_at"] != result["orders"][-1]["prepared_at"]
+    calls = list(h.calls)
+    # SQLite advanced, while the archive runtime receipt remains the prior
+    # generation. Only the reader may exclude those later rows.
+    assert read(archive, h) == before
+    replay = summary_at(h, cutoff, historical=True)
+    assert replay["orders"] == result["orders"]
+    assert replay["order_counts"] == result["order_counts"]
+    assert replay["evaluation"]["sample"]["filled_order_count"] == 2
+    assert replay["evaluation"]["turnover"] == result["evaluation"]["turnover"] == 401
+    with pytest.raises(ValueError, match="FUTURE_STRATEGY_ATTEMPT"):
+        summary_at(h, cutoff)
+    assert cached.read_bytes() == cached_bytes and h.calls == calls
+
+
+def test_later_valid_repeat_observation_cannot_change_dated_reader_or_default_future_guard(tmp_path):
+    h, _, _, result = imported_roundtrip(tmp_path)
+    cutoff = h.now
+    archive = tmp_path / "ui"
+    runtime(archive, h, result)
+    before = read(archive, h)
+    buy = result["orders"][0]
+    h.now += timedelta(seconds=30)
+    with h.factory("US", h.root / "us-strategy.sqlite", lambda: h.now, (h.ticker,), h.credentials.scope()) as broker:
+        broker.reconcile(intent_id=buy["id"])
+    calls = list(h.calls)
+    assert read(archive, h) == before
+    assert summary_at(h, cutoff, historical=True)["orders"] == result["orders"]
+    with pytest.raises(ValueError, match="INVALID_STRATEGY_OBSERVATION_CLOCK"):
+        summary_at(h, cutoff)
+    assert h.calls == calls
+
+
+@pytest.mark.parametrize("later", ["future_attempt", "future_observation", "future_ingestion", "undated_observation"])
+def test_unavailable_rows_are_filtered_before_payload_and_economic_validation(tmp_path, later):
+    h, _, _, result = imported_roundtrip(tmp_path)
+    cutoff = h.now
+    archive = tmp_path / "ui"
+    runtime(archive, h, result)
+    before = read(archive, h)
+    with closing(sqlite3.connect(h.root / "us-strategy.sqlite")) as db:
+        identity = result["orders"][0]["id"]
+        future = (cutoff + timedelta(minutes=1)).isoformat()
+        if later == "future_attempt":
+            db.execute("INSERT INTO strategy_attempts VALUES (?,?,?,?,?,?)",
+                ("future-only", "FUTURE", "future-run", future, "not valid JSON", "PREPARED"))
+        elif later == "future_observation":
+            db.execute("INSERT INTO paper_observations VALUES (?,?,?)", (identity, future, "not valid JSON"))
+        elif later == "future_ingestion":
+            observed = (cutoff - timedelta(seconds=1)).isoformat()
+            # The timestamp is visible but the input was not yet ingested. Its
+            # deliberately invalid quantities/status must never reach scoring.
+            db.execute("INSERT INTO paper_observations VALUES (?,?,?)", (identity, observed,
+                json.dumps({"observed_at": observed, "ingested_at": future, "filled_qty": 999, "status": "INVALID"})))
+        else:
+            db.execute("INSERT INTO paper_observations VALUES (?,?,?)", (identity, "not a date", "not valid JSON"))
+        db.commit()
+    assert read(archive, h) == before
+    assert summary_at(h, cutoff, historical=True)["evaluation"] == result["evaluation"]
+    with pytest.raises((ValueError, TypeError)):
+        summary_at(h, cutoff)
+
+
+def test_later_partial_fill_and_cost_revision_preserve_the_original_api_cutoff(tmp_path):
+    from tradingagents.execution import demo_runtime
+    from tradingagents.execution.strategy_settlement import import_strategy_settlement
+    from tests.execution.test_demo_runtime import Harness
+    from tests.execution.test_strategy_settlement import document
+
+    h = Harness(tmp_path, "US")
+    h.source(qty=2)
+    h.tick()
+    h.now += timedelta(seconds=10)
+    h.fill(qty=1, amount=200)
+    partial = h.tick()
+    h.now += timedelta(seconds=5)
+    with h.factory("US", h.root / "us-strategy.sqlite", lambda: h.now, (h.ticker,), h.credentials.scope()) as broker:
+        receipt, source = document(h, partial["orders"][0])
+        assert import_strategy_settlement(broker, receipt, source_bytes=source)
+        early = demo_runtime.summary(broker.db, h.now, "US")
+    cutoff = h.now
+    archive = tmp_path / "ui"
+    runtime(archive, h, early)
+    before = read(archive, h)
+    assert before["actual_cost"] == 1
+
+    h.now += timedelta(seconds=10)
+    h.fill(qty=2, amount=399)
+    later = h.tick()
+    h.now += timedelta(seconds=5)
+    with h.factory("US", h.root / "us-strategy.sqlite", lambda: h.now, (h.ticker,), h.credentials.scope()) as broker:
+        expanded, source = document(h, later["orders"][0], revision="expanded", previous="first", partial=True)
+        assert import_strategy_settlement(broker, expanded, source_bytes=source)
+        assert demo_runtime.summary(broker.db, h.now, "US")["evaluation"]["actual_cost"] == 2
+    calls = list(h.calls)
+    assert read(archive, h) == before
+    assert summary_at(h, cutoff, historical=True)["orders"] == early["orders"]
+    assert summary_at(h, cutoff, historical=True)["evaluation"] == early["evaluation"]
+    with pytest.raises(ValueError, match="INVALID_STRATEGY_OBSERVATION_CLOCK"):
+        summary_at(h, cutoff)
+    assert h.calls == calls
+
+
+def test_historical_reader_does_not_backdate_mutable_ack_or_cancellation_ack(tmp_path):
+    from tests.execution.test_demo_runtime import Harness
+    h = Harness(tmp_path, "US")
+    first = h.tick()
+    submitted = h.now
+    identity = first["orders"][0]["id"]
+    assert first["orders"][0]["status"] == "ACKNOWLEDGED"
+    dated = summary_at(h, submitted, historical=True)
+    assert dated["orders"][0]["status"] == "UNKNOWN"
+    assert dated["orders"][0]["filled_quantity"] == 0
+
+    h.now += timedelta(seconds=10)
+    opened = h.tick()
+    cutoff = h.now
+    assert opened["orders"][0]["status"] == "OPEN"
+    h.now += timedelta(seconds=20)
+    with h.factory("US", h.root / "us-strategy.sqlite", lambda: h.now, (h.ticker,), h.credentials.scope()) as broker:
+        broker.cancel(intent_id=identity)
+    replay = summary_at(h, cutoff, historical=True)
+    assert replay["orders"] == opened["orders"]
+    assert replay["orders"][0]["cancel_status"] is None
+    assert summary_at(h, submitted, historical=True)["orders"] == dated["orders"]
+    with pytest.raises(ValueError, match="INVALID_STRATEGY_OBSERVATION_CLOCK"):
+        summary_at(h, cutoff)

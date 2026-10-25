@@ -27,7 +27,13 @@
 
 `strategy_settlement_sources`, `strategy_settlements`, `strategy_settlement_bindings`는 UPDATE/DELETE를 거부한다. 같은 revision/같은 입력 재호출은 no-op이고, 다른 입력의 ID 재사용·부모 분기·뒤로 간 원본 시각·다른 주문으로 fill ID 이동은 거절한다. 비용 정정은 이전 기록을 보존한 채 최신 부모를 지정하는 전체 주문 snapshot으로 추가한다. 이미 알려진 체결의 수량·가격·체결/확인 시각 변경은 이 비용 import만으로 처리하지 못하며, 증권사 대사를 먼저 해결해야 한다.
 
-평가에는 기준 시각까지 실제 수집된 revision만 반영한다. 나중 비용 정정이 과거 성과를 소급 변경하지 않는다. import 당시 원장의 owner, 정상 전략 원문·불변 terms, broker 요청 body/TR, ACK/fingerprint와 검증된 누적 관측·대사 prefix를 별도로 고정한다. 비용을 읽을 때 이 고정 원본과 현재 원장을 다시 비교한다. 원래 ACK/body/TR이나 기존 관측이 바뀌거나 없어지면 비용을 인정하지 않는다. 새 관측은 기준 시각 필터 후 기존 prefix를 보존하는 추가만 허용하므로 나중 부분 체결이 이전 cutoff의 비용을 바꾸지 않는다. 미확정 대사 이슈가 있으면 실제 비용 계산을 차단한다.
+평가에는 기준 시각까지 실제 수집된 revision만 반영한다. 나중 비용 정정이 과거 성과를 소급 변경하지 않는다. import 당시 원장의 owner, 정상 전략 원문·불변 terms, broker 요청 body/TR, ACK/fingerprint와 검증된 누적 관측·대사·이슈 이력 prefix를 별도로 고정한다. 비용을 읽을 때 이 고정 원본과 현재 원장을 다시 비교한다. 원래 ACK/body/TR이나 기존 관측이 바뀌거나 없어지면 비용을 인정하지 않는다. 새 관측은 기준 시각 필터 후 기존 prefix를 보존하는 추가만 허용하므로 나중 부분 체결이 이전 cutoff의 비용을 바꾸지 않는다.
+
+`reconciliation_issues`는 현재 주문을 엄격하게 차단하는 기존 가변 상태다. 이것을 과거 시점의 이슈 상태로 사용하지 않는다. 공통 모의 저널은 원래 SET/CLEAR 위치에서 기존 broker clock으로 `reconciliation_issue_history`를 append-only 기록한다. 관측·수집 시각과 이전 전이의 hash를 보존하며, 같은 SET/같은 원인 반복은 새 행을 만들지 않는다. 검증된 원래 KR/US 대사 경로만 CLEAR를 기록하고 현재 테이블에서 지운다. 시계가 역행하거나 기록에 실패하면 현재 주문 차단을 없애지 않는다.
+
+`strategy_settlement_evidence(..., historical=False)`의 기본 현재 평가는 현재 활성 이슈를 계속 차단한다. 명시적 `historical=True`는 평가 cutoff까지 가용한 dated 전이만 선택한다. 따라서 이후 SET은 과거의 확인된 CLEAR를 바꾸지 않고, 이후 CLEAR도 이슈가 활성화되어 있던 과거 시점을 정상으로 만들지 않는다. 전체 append-only chain의 끝과 현재 가변 상태가 불일치하면 날짜 없는 변경 또는 훼손으로 간주해 보수적으로 미검증 처리한다.
+
+기존 날짜 없는 활성 이슈를 처음 발견하면 `LEGACY_UNKNOWN`으로 원래 시작 시점 미상을 보존한다. 처음 본 시각을 발생 시각으로 소급하거나 미래 SET으로 가정하지 않는다. 이런 이력은 이전 cutoff도 미검증으로 남기며, 나중 실제 CLEAR가 과거를 정상화하지 않는다. 원래 대사로 CLEAR가 관측된 이후의 상태만 새롭게 확인한다. schema와 전이는 정상 broker 초기화/원래 import·writer에서만 생성한다. 읽기 전용 조회는 DDL이나 상태 수정을 하지 않는다.
 
 읽기 검증 함수는 일반 JSON status가 아닌 해당 원장 조회에서 만든 내부 읽기전용 객체를 반환한다. 이 객체는 정확한 주문 관측 목록·시장·평가 cutoff에 묶이며, 내용 조회로 얻은 dict/list는 별도 사본이다. `COMPLETE_REVIEWED_IMPORT` 문자열을 가진 임의 dict나 저장된 화면 JSON을 다시 넘겨 실제 비용을 주장할 수 없다. API/UI도 원장에서 다시 검증한 평가만 사용해야 한다. 이는 JSON 경계의 상태 위조를 차단하는 내부 계약이며, 동일 Python 프로세스의 악성 코드를 방어하는 보안 경계라는 뜻은 아니다.
 

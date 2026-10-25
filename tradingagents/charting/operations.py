@@ -463,7 +463,7 @@ def _readonly_strategy_costs(directory, market, cutoff):
                 db.row_factory = sqlite3.Row
                 db.execute("PRAGMA query_only=ON")
                 db.execute("BEGIN")
-                result = summary(db, cutoff, market)
+                result = summary(db, cutoff, market, historical=True)
                 return {"evaluation": result["evaluation"], "orders": result["orders"]}
         except DemoError:
             return None

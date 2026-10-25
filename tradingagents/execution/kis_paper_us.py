@@ -147,8 +147,8 @@ def read_paper_us_account(client: KisDemoUSClient, *, ticker, exchange, limit_pr
 class USOrderJournal(DemoOrderJournal):
     """Reuse the request-before-transport UNKNOWN journal, with US report rules."""
 
-    def __init__(self, path, client):
-        super().__init__(path, client)
+    def __init__(self, path, client, *, issue_clock=None):
+        super().__init__(path, client, issue_clock=issue_clock)
         self.db.execute("CREATE TABLE IF NOT EXISTS market_scope(market TEXT PRIMARY KEY)")
         rows = self.db.execute("SELECT market FROM market_scope").fetchall()
         if (rows and rows[0][0] != "US") or self.db.execute(
@@ -259,7 +259,7 @@ class USOrderJournal(DemoOrderJournal):
                 self._block(intent_id, "unresolved_us_fill_arithmetic")
             else:
                 self.db.execute("INSERT OR REPLACE INTO order_state VALUES (?,?,?,?)", (intent_id, status, filled, remaining))
-                self.db.execute("DELETE FROM reconciliation_issues WHERE id=?", (intent_id,))
+                self._clear_issue(intent_id)
             self.db.execute("COMMIT")
         except Exception:
             self.db.execute("ROLLBACK")
@@ -299,7 +299,7 @@ class KisPaperUSBroker:
             raise DemoError("Dedicated VTS client, explicit policy and boolean opt-in required")
         self.path, self.client, self.policy = Path(path), client, policy
         self.enabled, self.clock = paper_enabled, clock or (lambda: datetime.now(timezone.utc))
-        self.journal = USOrderJournal(self.path, client)
+        self.journal = USOrderJournal(self.path, client, issue_clock=self.clock)
         self.db = self.journal.db
         self.db.executescript("""
             CREATE TABLE IF NOT EXISTS paper_policy(scope TEXT PRIMARY KEY, policy TEXT NOT NULL);

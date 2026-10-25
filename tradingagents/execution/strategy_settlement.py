@@ -14,7 +14,7 @@ import json
 from typing import Mapping
 
 from tradingagents.atomic_io import interprocess_file_lock
-from .kis_demo import DemoError, KisDemoClient
+from .kis_demo import DemoError, KisDemoClient, reconciliation_issue_state
 from .kis_demo_us import KisDemoUSClient
 from .kis_paper import _clock, _integer, _number, _stable, _import_cashflow_checkpoints
 
@@ -114,7 +114,13 @@ def _binding(db, identity, as_of):
                 reconciliations.append(list(row))
         except DemoError:
             continue
-    return {"static": static, "observations": sorted(observations), "reconciliations": sorted(reconciliations)}
+    issue_history = []
+    if db.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='reconciliation_issue_history'").fetchone():
+        for sequence, digest, ingested in db.execute("SELECT sequence,proof_sha256,ingested_at FROM reconciliation_issue_history WHERE intent_id=?", (identity,)):
+            if _clock(ingested) <= as_of:
+                issue_history.append([sequence, digest])
+    return {"static": static, "observations": sorted(observations), "reconciliations": sorted(reconciliations),
+            "issue_history": sorted(issue_history)}
 
 
 def _verify_binding(db, record, as_of):
@@ -125,8 +131,8 @@ def _verify_binding(db, record, as_of):
     current = _binding(db, record["document"]["intent_id"], as_of)
     if pinned.get("static") != current["static"]:
         raise DemoError("Settlement original ACK/body/TR/strategy proof changed")
-    for key in ("observations", "reconciliations"):
-        if not {_canonical(r) for r in pinned[key]} <= {_canonical(r) for r in current[key]}:
+    for key in ("observations", "reconciliations", "issue_history"):
+        if key not in pinned or not {_canonical(r) for r in pinned[key]} <= {_canonical(r) for r in current[key]}:
             raise DemoError("Settlement cumulative cash-flow proof changed")
 
 
@@ -271,6 +277,10 @@ def import_strategy_settlement(broker, document, *, source_bytes):
         db.execute("BEGIN IMMEDIATE")
         try:
             _initialize(db)
+            broker.journal.ensure_issue_baseline(document["intent_id"])
+            imported_at = _clock(broker.clock())
+            if imported_at < now:
+                raise DemoError("Settlement import clock regressed")
             records = _revision_chain(_records(db, document["intent_id"]))
             duplicate = next((r for r in records if r["revision_id"] == document["revision_id"]), None)
             if duplicate:
@@ -296,9 +306,9 @@ def import_strategy_settlement(broker, document, *, source_bytes):
                     raise DemoError("Broker execution already attributed to another order")
             db.execute("INSERT OR IGNORE INTO strategy_settlement_sources VALUES (?,?)", (document["source"]["sha256"], source_bytes))
             db.execute("INSERT INTO strategy_settlements VALUES (?,?,?,?,?)", (document["revision_id"], document["intent_id"],
-                       document["previous_revision_id"], now.isoformat(), encoded))
+                       document["previous_revision_id"], imported_at.isoformat(), encoded))
             db.execute("INSERT INTO strategy_settlement_bindings VALUES (?,?)",
-                       (document["revision_id"], _canonical(_binding(db, document["intent_id"], now))))
+                       (document["revision_id"], _canonical(_binding(db, document["intent_id"], imported_at))))
             db.execute("COMMIT")
             return True
         except Exception:
@@ -306,13 +316,15 @@ def import_strategy_settlement(broker, document, *, source_bytes):
             raise
 
 
-def strategy_settlement_evidence(db, orders, *, market, as_of):
+def strategy_settlement_evidence(db, orders, *, market, as_of, historical=False):
     """Read only visible same-owner snapshots matching the current cash flows.
 
     An older revision remains visible before a later correction was ingested.
     No source/quantity/cost is guessed when evidence is absent or incomplete.
     """
     now = _clock(as_of)
+    if type(historical) is not bool:
+        raise ValueError("Explicit historical settlement mode required")
     result = {"schema": PROOF_SCHEMA, "status": "UNVERIFIED", "orders": []}
     if not db.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='strategy_settlements'").fetchone():
         return _validated(result, orders, market, now)
@@ -324,8 +336,10 @@ def strategy_settlement_evidence(db, orders, *, market, as_of):
     required = [o for o in orders if o["filled_quantity"]]
     try:
         for order in required:
-            if db.execute("SELECT 1 FROM reconciliation_issues WHERE id=?", (order["id"],)).fetchone():
+            if not historical and db.execute("SELECT 1 FROM reconciliation_issues WHERE id=?", (order["id"],)).fetchone():
                 raise DemoError("Settlement order has an unresolved broker reconciliation")
+            if reconciliation_issue_state(db, order["id"], as_of=now)["status"] != "CLEAR":
+                raise DemoError("Settlement reconciliation issue history is active or unverified")
             visible = []
             for record in _records(db, order["id"], as_of=now):
                 document = record["document"]

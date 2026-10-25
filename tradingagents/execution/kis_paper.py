@@ -170,7 +170,7 @@ class KisPaperBroker:
             raise DemoError("Dedicated VTS client, explicit policy and boolean opt-in required")
         self.path, self.client, self.policy = Path(path), client, policy
         self.enabled, self.clock = paper_enabled, clock or (lambda: datetime.now(timezone.utc))
-        self.journal = DemoOrderJournal(self.path, client)
+        self.journal = DemoOrderJournal(self.path, client, issue_clock=self.clock)
         self.db = self.journal.db
         self.db.executescript("""
             CREATE TABLE IF NOT EXISTS paper_policy(scope TEXT PRIMARY KEY, policy TEXT NOT NULL);
