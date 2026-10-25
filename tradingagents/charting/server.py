@@ -11,7 +11,10 @@ from urllib.parse import parse_qs, urlparse
 
 from .bars import instant
 from .catalog_index import ArchiveCatalogIndex, CatalogPending
-from .snapshot_jobs import SnapshotJobs, SnapshotJobError, evidence_fingerprint, journal_fingerprint, journal_identities
+from .snapshot_jobs import (
+    SnapshotJobs, SnapshotJobError, evidence_fingerprint, journal_fingerprint, journal_identities,
+    tracked_source_metadata, boundary_identities,
+)
 from .snapshot import get_replay_snapshot
 from .operations import archive_catalog, known_artifacts, paper_health, kis_demo_health, kis_validation_health, kis_strategy_health, now_utc
 
@@ -94,6 +97,7 @@ def make_handler(run_dir=None, *, db_paths=(), archive_dir=None, experiment_regi
         def fingerprint():
             return evidence_fingerprint(directory, root=root, manifest=manifest, alias=alias)
         before = fingerprint()
+        boundaries = boundary_identities((root, alias))
         journal_before = journals_stamp()
         if manifest is not None:
             from .catalog_index import project_manifest
@@ -117,6 +121,8 @@ def make_handler(run_dir=None, *, db_paths=(), archive_dir=None, experiment_regi
         expected_lifecycle = lifecycle_hash(snapshot.get("lifecycle", {}))
         def verify():
             nonlocal journal_before
+            if boundary_identities((root, alias)) != boundaries:
+                raise ValueError("Archive root boundary changed")
             if fingerprint() != before:
                 raise ValueError("Archive snapshot evidence changed")
             current = journals_stamp()
@@ -150,7 +156,13 @@ def make_handler(run_dir=None, *, db_paths=(), archive_dir=None, experiment_regi
                     raise ValueError("Archive snapshot evidence changed")
         progress("VERIFY")
         verify()
-        return snapshot, verify
+        def delivery_valid():
+            # Only known-path stat checks run on HTTP delivery. Changed
+            # metadata re-enters the worker; replay/JSON/discovery stay there.
+            return (boundary_identities((root, alias)) == boundaries
+                    and tracked_source_metadata(before) == before
+                    and journal_fingerprint(journals, validate_paths=False) == journal_before)
+        return snapshot, verify, delivery_valid
 
     class Handler(BaseHTTPRequestHandler):
         def log_message(self, *args):

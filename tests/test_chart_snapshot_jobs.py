@@ -3,9 +3,12 @@ from contextlib import closing, contextmanager
 from datetime import datetime, timezone
 from http.server import ThreadingHTTPServer
 import json
+import shutil
 from pathlib import Path
 import sqlite3
+import stat as stat_module
 from threading import Event, Thread
+from types import SimpleNamespace
 import time
 from urllib.error import HTTPError
 from urllib.parse import urlencode
@@ -15,7 +18,7 @@ import pytest
 
 from tradingagents.charting import server as module
 from tradingagents.charting.catalog_index import ArchiveCatalogIndex
-from tradingagents.charting.snapshot_jobs import SnapshotJobs, SnapshotJobError, evidence_fingerprint
+from tradingagents.charting.snapshot_jobs import SnapshotJobs, SnapshotJobError, evidence_fingerprint, journal_fingerprint, journal_identities
 from tests.test_chart_catalog_index import put, ASOF
 
 
@@ -88,6 +91,57 @@ def test_verification_is_one_transition_and_slow_verify_does_not_rebuild():
     release.set()
     assert finish(jobs, KEY, token) == {"value": 1}
     assert builds == verifies == [1]
+
+
+def test_delivery_guard_reenters_only_async_verification_and_has_a_finite_retry_budget():
+    for eventually_valid in (True, False):
+        jobs = SnapshotJobs()
+        valid, verifies = [False], []
+        def verify():
+            verifies.append(1)
+            if eventually_valid and len(verifies) == 2:
+                valid[0] = True
+        _, pending = jobs.request(KEY, lambda _: ({"whole_original": True}, verify, lambda: valid[0]))
+        if eventually_valid:
+            assert finish(jobs, KEY, pending["job_token"]) == {"whole_original": True}
+            assert len(verifies) == 2
+        else:
+            with pytest.raises(SnapshotJobError) as error:
+                finish(jobs, KEY, pending["job_token"])
+            assert error.value.status == 422 and len(verifies) == 3
+        assert not jobs._jobs
+
+
+def test_only_ctime_and_shm_derived_metadata_are_excluded_from_journal_financial_stamps(tmp_path, monkeypatch):
+    journal = tmp_path / "paper.sqlite"
+    wal, shm = Path(str(journal) + "-wal"), Path(str(journal) + "-shm")
+    for path in (journal, wal, shm):
+        path.write_bytes(b"fixture")
+    before = journal_fingerprint((journal,))
+    original = Path.stat
+    change = ["ctime_and_shm"]
+    def changed(path, *args, **kwargs):
+        raw = original(path, *args, **kwargs)
+        fields = {name: getattr(raw, name) for name in dir(raw) if name.startswith("st_")}
+        fields["st_ctime_ns"] += 1000
+        if path == shm:
+            for field in ("st_mtime_ns", "st_size", "st_ino"):
+                fields[field] += 1000
+        elif path == journal and change[0] == "financial_mtime":
+            fields["st_mtime_ns"] += 1000
+        elif path == wal and change[0] == "financial_size":
+            fields["st_size"] += 1
+        elif path == journal and change[0] == "main_identity":
+            fields["st_ino"] += 1
+        return SimpleNamespace(**fields)
+    monkeypatch.setattr(Path, "stat", changed)
+    assert journal_fingerprint((journal,)) == before
+    for field in ("financial_mtime", "financial_size", "main_identity"):
+        change[0] = field
+        after = journal_fingerprint((journal,))
+        assert after != before
+        if field == "main_identity":
+            assert journal_identities(after) != journal_identities(before)
 
 
 def test_active_and_queued_jobs_are_bounded_and_cancellation_discards_late_result():
@@ -432,6 +486,121 @@ def test_future_wal_append_keeps_same_cutoff_snapshot_without_modifying_wal_or_m
             assert {e["event_id"] for e in payload["lifecycle"]["events"]} == {"original"}
             assert wal.read_bytes() == changed_wal and journal.read_bytes() == original_main
             assert journal.stat().st_ino == identity
+
+
+def test_readonly_wal_clone_can_create_shm_without_invalidating_unchanged_financial_evidence(tmp_path):
+    from tests.test_market_journal_review import producer
+    from tradingagents.performance.lifecycle import append_lifecycle_event
+    root = tmp_path / "archive"
+    producer(root, "source", "AAPL", "US")
+    source = tmp_path / "idle-writer.sqlite"
+    journal = root / "paper/us.sqlite"
+    journal.parent.mkdir(parents=True)
+    with closing(sqlite3.connect(source)) as writer:
+        assert writer.execute("PRAGMA journal_mode=WAL").fetchone()[0] == "wal"
+        append_lifecycle_event(writer, event_id="known", signal_id="known", kind="SIGNAL",
+            occurred_at="2026-10-16T10:30:00Z", available_at="2026-10-16T10:30:00Z", ingested_at="2026-10-16T10:30:00Z",
+            payload={"ticker": "AAPL", "action": "WAIT"})
+        writer.commit()
+        shutil.copyfile(source, journal)
+        shutil.copyfile(Path(str(source) + "-wal"), Path(str(journal) + "-wal"))
+        assert not Path(str(journal) + "-shm").exists()
+        before = {path: path.read_bytes() for path in (journal, Path(str(journal) + "-wal"))}
+        with api(root, market_journals={"US": journal}) as request:
+            _, pending, _ = request("/api/snapshot", ticker="AAPL")
+            payload, _ = http_finish(request, pending)
+            assert {event["event_id"] for event in payload["lifecycle"]["events"]} == {"known"}
+            assert {path: path.read_bytes() for path in before} == before
+
+
+@pytest.mark.parametrize("change", ["source", "visible_append", "future_append"])
+def test_delivery_ready_result_is_invalidated_again_before_actual_200(tmp_path, monkeypatch, change):
+    from tests.test_market_journal_review import producer
+    from tradingagents.performance.lifecycle import append_lifecycle_event
+    root = tmp_path / "archive"
+    producer(root, "source", "AAPL", "US")
+    journal = root / "paper/us.sqlite"
+    journal.parent.mkdir(parents=True)
+    def record(identity, at):
+        with closing(sqlite3.connect(journal)) as db:
+            append_lifecycle_event(db, event_id=identity, signal_id=identity, kind="SIGNAL",
+                occurred_at=at, available_at=at, ingested_at=at, payload={"ticker": "AAPL", "action": "WAIT"})
+            db.commit()
+    record("original", "2026-10-16T10:30:00Z")
+    jobs = SnapshotJobs()
+    monkeypatch.setattr(module, "SnapshotJobs", lambda: jobs)
+    with api(root, market_journals={"US": journal}) as request:
+        _, pending, _ = request("/api/snapshot", ticker="AAPL")
+        token = pending["job_token"]
+        deadline = time.monotonic() + 10
+        while jobs._jobs[token].state != "READY":
+            assert time.monotonic() < deadline
+            time.sleep(.005)
+        assert request("/api/snapshot", ticker="AAPL", catalog_generation=pending["generation"], snapshot_job=token)[0] == 202
+        while jobs._jobs[token].state != "DELIVERY_READY":
+            assert time.monotonic() < deadline
+            time.sleep(.005)
+        if change == "source":
+            (root / "runs/2026/source/tickers/AAPL/analysis.json").write_text('{"changed":true}')
+        else:
+            record("new", "2026-10-17T10:30:00Z" if change == "future_append" else "2026-10-16T11:00:00Z")
+        # This request must never do the expensive validation synchronously or
+        # deliver a previously-ready payload before seeing the new evidence.
+        status, again, _ = request("/api/snapshot", ticker="AAPL", catalog_generation=pending["generation"], snapshot_job=token)
+        assert status == 202 and again["phase"] == "VERIFY"
+        if change == "future_append":
+            payload, _ = http_finish(request, pending)
+            assert {event["event_id"] for event in payload["lifecycle"]["events"]} == {"original"}
+        else:
+            with pytest.raises(HTTPError) as error:
+                http_finish(request, pending)
+            assert error.value.code == 422
+
+
+@pytest.mark.parametrize("when", ["before_build", "after_ready"])
+def test_derived_shm_reparse_escape_is_rejected_before_read_and_before_delivery(tmp_path, monkeypatch, when):
+    from tests.test_market_journal_review import producer
+    root = tmp_path / "archive"
+    producer(root, "source", "AAPL", "US")
+    journal = root / "paper/us.sqlite"
+    journal.parent.mkdir(parents=True)
+    with closing(sqlite3.connect(journal)):
+        pass
+    shm = Path(str(journal) + "-shm")
+    shm.write_bytes(b"derived fixture index")
+    escaped = [when == "before_build"]
+    original_resolve, original_lstat = Path.resolve, Path.lstat
+    def resolve(path, *args, **kwargs):
+        return tmp_path / "outside" if path == shm and escaped[0] else original_resolve(path, *args, **kwargs)
+    def lstat(path, *args, **kwargs):
+        raw = original_lstat(path, *args, **kwargs)
+        if path != shm or not escaped[0]:
+            return raw
+        fields = {name: getattr(raw, name) for name in dir(raw) if name.startswith("st_")}
+        fields["st_mode"] = stat_module.S_IFLNK
+        fields["st_file_attributes"] = 0x400
+        fields["st_reparse_tag"] = 0xA000000C
+        return SimpleNamespace(**fields)
+    monkeypatch.setattr(Path, "resolve", resolve)
+    monkeypatch.setattr(Path, "lstat", lstat)
+    jobs = SnapshotJobs()
+    monkeypatch.setattr(module, "SnapshotJobs", lambda: jobs)
+    with api(root, market_journals={"US": journal}) as request:
+        _, pending, _ = request("/api/snapshot", ticker="AAPL")
+        if when == "after_ready":
+            token = pending["job_token"]
+            deadline = time.monotonic() + 10
+            while jobs._jobs[token].state != "READY":
+                assert time.monotonic() < deadline
+                time.sleep(.005)
+            request("/api/snapshot", ticker="AAPL", catalog_generation=pending["generation"], snapshot_job=token)
+            while jobs._jobs[token].state != "DELIVERY_READY":
+                assert time.monotonic() < deadline
+                time.sleep(.005)
+            escaped[0] = True
+        with pytest.raises(HTTPError) as error:
+            http_finish(request, pending)
+        assert error.value.code == 422
 
 
 @pytest.mark.parametrize("query", [{"ticker": ".."}, {"ticker": "AAPL", "as_of": "bad"},

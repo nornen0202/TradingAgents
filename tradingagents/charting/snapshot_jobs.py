@@ -35,6 +35,8 @@ class _Job:
     phase: str = "QUEUED"
     payload: bytes | None = None
     verify: object = None
+    delivery_valid: object = None
+    delivery_invalidations: int = 0
     completed: float | None = None
     error: SnapshotJobError | None = None
 
@@ -42,9 +44,10 @@ class _Job:
 class SnapshotJobs:
     """One worker, four total jobs and bounded results; no executor work queue.
 
-    READY -> VERIFYING -> DELIVERY_READY is a single transition. A delivery
-    consumes its token even if the client subsequently disconnects. The client
-    must start a fresh query after a lost response, not replay cached authority.
+    A completed job is verified before delivery. A cheap tracked-path check at
+    the actual poll can re-enter asynchronous verification at most twice if
+    evidence changed meanwhile. A delivery consumes its token even if the
+    client subsequently disconnects; a lost response needs a fresh query.
     """
     def __init__(self, *, max_jobs=4, max_result_bytes=8 * 1024 * 1024,
                  max_total_bytes=16 * 1024 * 1024, retention_seconds=120, clock=monotonic):
@@ -98,8 +101,19 @@ class SnapshotJobs:
                 job.state, job.phase, job.phase_started = "VERIFYING", "VERIFY", now
                 self._enqueue(job.token, verify=True)
             if job.state == "DELIVERY_READY":
-                del self._jobs[job.token]
-                return 200, job.payload
+                try:
+                    valid = job.delivery_valid is None or job.delivery_valid()
+                except (OSError, ValueError, TypeError):
+                    valid = False
+                if valid:
+                    del self._jobs[job.token]
+                    return 200, job.payload
+                if job.delivery_invalidations >= 2:
+                    del self._jobs[job.token]
+                    raise SnapshotJobError(422, "Archive evidence changed repeatedly before delivery; start a fresh query")
+                job.delivery_invalidations += 1
+                job.state, job.phase, job.phase_started = "VERIFYING", "VERIFY", now
+                self._enqueue(job.token, verify=True)
             if job.state == "CANCELLED":
                 raise SnapshotJobError(410, "Archive snapshot was cancelled; start a fresh query")
             return 202, {"status": "SNAPSHOT_BUILDING", "job_token": job.token, "generation": key[3],
@@ -148,7 +162,10 @@ class SnapshotJobs:
                     job.verify()
                     encoded = job.payload
                 else:
-                    payload, verify = job.build(lambda phase: self._progress(job, phase))
+                    payload, verify, *guards = job.build(lambda phase: self._progress(job, phase))
+                    if len(guards) > 1:
+                        raise ValueError("Unexpected snapshot delivery guard")
+                    job.delivery_valid = guards[0] if guards else None
                     self._progress(job, "SERIALIZE")
                     encoded = json.dumps(payload, ensure_ascii=False, allow_nan=False).encode("utf-8")
                     payload = None  # Do not retain a decoded duplicate while idle.
@@ -204,29 +221,59 @@ def evidence_fingerprint(directory, *, root, manifest=None, journals=(), alias=N
     return tuple(rows) + journal_fingerprint(journals)
 
 
-def journal_fingerprint(journals):
+def journal_fingerprint(journals, *, validate_paths=True):
     """Metadata invalidation only; the caller must compare cutoff-visible proof.
 
     A normal future append may change every SQLite byte without changing a past
-    view. This signature is not itself a requirement that journals stay frozen.
+    view. ctime does not establish content mutation. SHM is a reader-generated
+    SQLite index, so its mutable times/size/identity are not financial evidence;
+    its existence, type and reparse attributes still invalidate the reader.
     """
     rows = []
     for configured in journals:
         path = Path(configured)
-        fixed = path.resolve()
+        fixed = path.resolve() if validate_paths else None
         for suffix in ("", "-wal", "-shm", "-journal"):
             item = Path(str(path) + suffix)
-            if item.resolve() != Path(str(fixed) + suffix):
+            if validate_paths and item.resolve() != Path(str(fixed) + suffix):
                 raise ValueError("Configured journal boundary changed")
-            if item.exists():
-                stat = item.stat()
-                rows.append((str(item), stat.st_mtime_ns, stat.st_ctime_ns, stat.st_size, stat.st_ino, stat.st_dev, stat.st_mode))
-            else:
+            try:
+                local = item.lstat()
+            except FileNotFoundError:
                 rows.append((str(item), None))
+            else:
+                if suffix == "-shm":
+                    rows.append((str(item), None, None, None, None, None, local.st_mode,
+                                 getattr(local, "st_file_attributes", None), getattr(local, "st_reparse_tag", None)))
+                else:
+                    stat = item.stat()
+                    rows.append((str(item), stat.st_mtime_ns, None, stat.st_size, stat.st_ino, stat.st_dev, stat.st_mode,
+                                 local.st_ino, local.st_dev, local.st_mode,
+                                 getattr(local, "st_file_attributes", None), getattr(local, "st_reparse_tag", None)))
     return tuple(rows)
 
 
 def journal_identities(stamps):
     # Four rows per configured main DB: file, WAL, SHM and rollback journal.
     return tuple((row[0], row[4:6] if len(row) > 2 else None) for row in stamps[::4])
+
+
+def tracked_source_metadata(stamps):
+    """Re-stat already known paths only: no rglob, resolve, JSON or content I/O."""
+    rows = []
+    for old in stamps:
+        path = Path(old[0])
+        stat = path.lstat()
+        rows.append((str(path), stat.st_mtime_ns, stat.st_ctime_ns, stat.st_size, stat.st_ino, stat.st_dev, stat.st_mode))
+    return tuple(rows)
+
+
+def boundary_identities(paths):
+    rows = []
+    for configured in paths:
+        path = Path(configured)
+        stat = path.stat()
+        rows.append((str(path), stat.st_ino, stat.st_dev, stat.st_mode,
+                     getattr(stat, "st_file_attributes", None), getattr(stat, "st_reparse_tag", None)))
+    return tuple(rows)
 
