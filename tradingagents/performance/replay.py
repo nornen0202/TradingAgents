@@ -1,6 +1,7 @@
 """Deterministic, offline replay of evidence known by an explicit instant."""
 from __future__ import annotations
 
+from contextlib import closing
 import json
 import math
 from pathlib import Path
@@ -40,7 +41,7 @@ def _include_seed_dependencies(paths, visible, cutoff):
         path = Path(path)
         if not path.is_file():
             continue
-        with sqlite3.connect(path.resolve().as_uri() + "?mode=ro", uri=True) as conn:
+        with closing(sqlite3.connect(path.resolve().as_uri() + "?mode=ro", uri=True)) as conn:
             conn.row_factory = sqlite3.Row
             if not conn.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='lifecycle_events'").fetchone():
                 continue
@@ -78,7 +79,7 @@ def replay_action_history(
         path = Path(path)
         if not path.is_file():
             continue
-        with sqlite3.connect(path.resolve().as_uri() + "?mode=ro", uri=True) as conn:
+        with closing(sqlite3.connect(path.resolve().as_uri() + "?mode=ro", uri=True)) as conn:
             conn.row_factory = sqlite3.Row
             if not conn.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='lifecycle_events'").fetchone():
                 continue

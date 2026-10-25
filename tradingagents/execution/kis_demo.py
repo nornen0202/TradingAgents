@@ -370,10 +370,71 @@ class KisDemoClient:
         return payload["output"]
 
 
+def _issue_at(value):
+    try:
+        return stamp(value.isoformat() if isinstance(value, datetime) else value).astimezone(timezone.utc)
+    except (TypeError, ValueError):
+        raise DemoError("Explicit reconciliation issue clock required") from None
+
+
+def _issue_hash(intent_id, previous_sequence, previous_hash, transition, reason, present, observed_at, ingested_at):
+    values = [intent_id, previous_sequence, previous_hash, transition, reason, present, observed_at, ingested_at]
+    return hashlib.sha256(json.dumps(values, ensure_ascii=False, separators=(",", ":"), allow_nan=False).encode()).hexdigest()
+
+
+def reconciliation_issue_state(db, intent_id, *, as_of):
+    """Read dated issue transitions without inferring legacy occurrence times.
+
+    Mutable current rows remain the live order gate. Comparing the full immutable
+    history head with that current table only detects an unlogged edit; historical
+    state is selected solely from transitions available by the requested cutoff.
+    No schema migration or other write happens in this reader.
+    """
+    unknown = {"status": "UNVERIFIED", "known_at": None}
+    cutoff = _issue_at(as_of)
+    if not db.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='reconciliation_issue_history'").fetchone():
+        return unknown
+    rows = db.execute("""SELECT sequence,previous_sequence,transition,reason,present,observed_at,ingested_at,proof_sha256
+        FROM reconciliation_issue_history WHERE intent_id=? ORDER BY sequence""", (intent_id,)).fetchall()
+    current = db.execute("SELECT reason FROM reconciliation_issues WHERE id=?", (intent_id,)).fetchone()
+    if not rows:
+        return unknown
+    previous, previous_hash, previous_time, selected = None, None, None, None
+    try:
+        for row in rows:
+            sequence, parent, transition, reason, present, observed, ingested, digest = row
+            received, known = _issue_at(observed), _issue_at(ingested)
+            if (parent != previous or transition not in {"BASELINE_CLEAR", "SET", "CLEAR", "LEGACY_UNKNOWN"}
+                    or type(present) is not int or present not in {0, 1}
+                    or transition in {"BASELINE_CLEAR", "CLEAR"} and (present or reason is not None)
+                    or transition == "SET" and (not present or not isinstance(reason, str) or not reason)
+                    or transition == "LEGACY_UNKNOWN" and (present and (not isinstance(reason, str) or not reason)
+                        or not present and reason is not None)
+                    or received > known or previous_time is not None and received < previous_time
+                    or digest != _issue_hash(intent_id, parent, previous_hash, transition, reason, present, observed, ingested)):
+                return unknown
+            if known <= cutoff:
+                selected = row
+            previous, previous_hash, previous_time = sequence, digest, known
+        head = rows[-1]
+        if bool(current) != bool(head[4]) or current is not None and current[0] != head[3]:
+            return unknown
+        if any(row[2] == "LEGACY_UNKNOWN" and _issue_at(row[6]) > cutoff for row in rows):
+            # Its first observation is not its onset. In particular, recording
+            # an undated legacy row must not turn it into a harmless future SET.
+            return unknown
+        if selected is None or selected[2] == "LEGACY_UNKNOWN":
+            return unknown
+        return {"status": "ACTIVE" if selected[4] else "CLEAR", "known_at": selected[6]}
+    except (DemoError, TypeError, ValueError):
+        return unknown
+
+
 class DemoOrderJournal:
-    def __init__(self, path: Path, client: KisDemoClient):
+    def __init__(self, path: Path, client: KisDemoClient, *, issue_clock=None):
         path.parent.mkdir(parents=True, exist_ok=True)
         self.client = client
+        self.issue_clock = issue_clock or (lambda: client.utcnow())
         self.db = sqlite3.connect(path, isolation_level=None, timeout=20)
         self.db.row_factory = sqlite3.Row
         self.db.executescript("""
@@ -387,6 +448,15 @@ class DemoOrderJournal:
           CREATE TABLE IF NOT EXISTS order_state(id TEXT PRIMARY KEY, status TEXT NOT NULL,
             filled INTEGER NOT NULL, remaining INTEGER NOT NULL);
           CREATE TABLE IF NOT EXISTS reconciliation_issues(id TEXT PRIMARY KEY, reason TEXT NOT NULL);
+          CREATE TABLE IF NOT EXISTS reconciliation_issue_history(
+            sequence INTEGER PRIMARY KEY AUTOINCREMENT, intent_id TEXT NOT NULL,
+            previous_sequence INTEGER, transition TEXT NOT NULL, reason TEXT,
+            present INTEGER NOT NULL, observed_at TEXT NOT NULL, ingested_at TEXT NOT NULL,
+            proof_sha256 TEXT NOT NULL);
+          CREATE TRIGGER IF NOT EXISTS reconciliation_issue_history_no_update BEFORE UPDATE ON reconciliation_issue_history
+            BEGIN SELECT RAISE(ABORT,'Reconciliation issue history is immutable'); END;
+          CREATE TRIGGER IF NOT EXISTS reconciliation_issue_history_no_delete BEFORE DELETE ON reconciliation_issue_history
+            BEGIN SELECT RAISE(ABORT,'Reconciliation issue history is immutable'); END;
         """)
         self.db.execute("BEGIN IMMEDIATE")
         try:
@@ -396,6 +466,11 @@ class DemoOrderJournal:
             self.db.execute(
                 "INSERT OR IGNORE INTO owner VALUES (?)", (client.credentials.scope(),)
             )
+            for identity, reason in self.db.execute("SELECT id,reason FROM reconciliation_issues").fetchall():
+                head = self._issue_head(identity)
+                if not head or not head[4] or head[3] != reason:
+                    # First seen is an observation, never a backdated start.
+                    self._append_issue(identity, "LEGACY_UNKNOWN", reason, 1)
             self.db.execute("COMMIT")
         except Exception:
             self.db.execute("ROLLBACK")
@@ -406,10 +481,70 @@ class DemoOrderJournal:
         self.db.close()
 
     def _block(self, intent_id, reason):
-        self.db.execute(
-            "INSERT OR REPLACE INTO reconciliation_issues VALUES (?,?)",
-            (intent_id, reason),
-        )
+        self.db.execute("SAVEPOINT reconciliation_issue_change")
+        try:
+            self._observe_unlogged_issue(intent_id)
+            head = self._issue_head(intent_id)
+            if not head or (head[2], head[3], head[4]) != ("SET", reason, 1):
+                self._append_issue(intent_id, "SET", reason, 1)
+            self.db.execute("INSERT OR REPLACE INTO reconciliation_issues VALUES (?,?)", (intent_id, reason))
+            self.db.execute("RELEASE SAVEPOINT reconciliation_issue_change")
+        except Exception:
+            self.db.execute("ROLLBACK TO SAVEPOINT reconciliation_issue_change")
+            self.db.execute("RELEASE SAVEPOINT reconciliation_issue_change")
+            # A missing/regressed clock cannot remove the original live block.
+            # This undated state is deliberately unverified for cost evaluation.
+            self.db.execute("INSERT OR REPLACE INTO reconciliation_issues VALUES (?,?)", (intent_id, reason))
+            raise
+
+    def _issue_head(self, intent_id):
+        return self.db.execute("""SELECT sequence,previous_sequence,transition,reason,present,observed_at,ingested_at,proof_sha256
+            FROM reconciliation_issue_history WHERE intent_id=? ORDER BY sequence DESC LIMIT 1""", (intent_id,)).fetchone()
+
+    def _append_issue(self, intent_id, transition, reason, present):
+        observed, ingested = _issue_at(self.issue_clock()), _issue_at(self.issue_clock())
+        head = self._issue_head(intent_id)
+        if observed > ingested or head and observed < _issue_at(head[6]):
+            raise DemoError("Reconciliation issue clock regressed")
+        parent, previous_hash = (head[0], head[7]) if head else (None, None)
+        observed, ingested = observed.isoformat(), ingested.isoformat()
+        digest = _issue_hash(intent_id, parent, previous_hash, transition, reason, present, observed, ingested)
+        self.db.execute("""INSERT INTO reconciliation_issue_history
+            (intent_id,previous_sequence,transition,reason,present,observed_at,ingested_at,proof_sha256)
+            VALUES (?,?,?,?,?,?,?,?)""", (intent_id, parent, transition, reason, present, observed, ingested, digest))
+
+    def _observe_unlogged_issue(self, intent_id):
+        current = self.db.execute("SELECT reason FROM reconciliation_issues WHERE id=?", (intent_id,)).fetchone()
+        head = self._issue_head(intent_id)
+        if current is not None and (not head or not head[4] or head[3] != current[0]):
+            self._append_issue(intent_id, "LEGACY_UNKNOWN", current[0], 1)
+        elif current is None and head and head[4]:
+            self._append_issue(intent_id, "LEGACY_UNKNOWN", None, 0)
+
+    def _clear_issue(self, intent_id):
+        """Called only by the original verified reconciliation CLEAR paths."""
+        self.db.execute("SAVEPOINT reconciliation_issue_change")
+        try:
+            self._observe_unlogged_issue(intent_id)
+            head = self._issue_head(intent_id)
+            if not head or head[2] not in {"BASELINE_CLEAR", "CLEAR"} or head[4]:
+                self._append_issue(intent_id, "CLEAR", None, 0)
+            self.db.execute("DELETE FROM reconciliation_issues WHERE id=?", (intent_id,))
+            self.db.execute("RELEASE SAVEPOINT reconciliation_issue_change")
+        except Exception:
+            self.db.execute("ROLLBACK TO SAVEPOINT reconciliation_issue_change")
+            self.db.execute("RELEASE SAVEPOINT reconciliation_issue_change")
+            raise
+
+    def ensure_issue_baseline(self, intent_id):
+        """Date a currently issue-free import; never invent its earlier history."""
+        if self.db.execute("SELECT 1 FROM reconciliation_issues WHERE id=?", (intent_id,)).fetchone():
+            raise DemoError("Settlement order has an unresolved reconciliation")
+        head = self._issue_head(intent_id)
+        if head is None:
+            self._append_issue(intent_id, "BASELINE_CLEAR", None, 0)
+        elif reconciliation_issue_state(self.db, intent_id, as_of=_issue_at(self.issue_clock()))["status"] != "CLEAR":
+            raise DemoError("Settlement reconciliation history is unverified")
 
     def _write_once(self, intent_id, endpoint, tr_id, body, now, *, deadline=None):
         if not isinstance(intent_id, str) or not intent_id or len(intent_id) > 200:
@@ -651,9 +786,7 @@ class DemoOrderJournal:
                     "INSERT OR REPLACE INTO order_state VALUES (?,?,?,?)",
                     (intent_id, status, filled, remaining),
                 )
-                self.db.execute(
-                    "DELETE FROM reconciliation_issues WHERE id=?", (intent_id,)
-                )
+                self._clear_issue(intent_id)
             else:
                 self._block(intent_id, "unresolved_fill_arithmetic")
             self.db.execute("COMMIT")

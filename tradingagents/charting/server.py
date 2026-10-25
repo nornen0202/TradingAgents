@@ -15,9 +15,36 @@ from .operations import archive_catalog, known_artifacts, paper_health, kis_demo
 STATIC = Path(__file__).parent / "static"
 
 
-def make_handler(run_dir=None, *, db_paths=(), archive_dir=None, experiment_registry=None, paper_status_path=None):
+class JournalScopeError(ValueError):
+    """Do not combine another market's paper account into a ticker replay."""
+
+
+def _snapshot_journals(ticker, source_context, common_paths, market_journals):
+    if market_journals is None:
+        return common_paths  # Existing explicit single-account CLI contract.
+    from tradingagents.agents.utils.instrument_resolver import resolve_instrument
+    try:
+        market = source_context.get("market")
+        country = resolve_instrument(ticker).country.upper()
+        expected = "KR" if country == "KR" else "US" if country == "US" else None
+        if not isinstance(market, str) or market.upper() != expected or expected not in market_journals:
+            raise ValueError("Unverified journal market")
+    except (ValueError, AttributeError) as error:
+        raise JournalScopeError("Archive journal market scope unverified") from error
+    return (*common_paths, market_journals[expected])
+
+
+def make_handler(run_dir=None, *, db_paths=(), archive_dir=None, experiment_registry=None, paper_status_path=None,
+                 strategy_ledger_dir=None, market_journals=None):
     if (run_dir is None) == (archive_dir is None):
         raise ValueError("Choose one existing run_dir or archive_dir")
+    db_paths = tuple(db_paths)
+    if market_journals is not None:
+        if not isinstance(market_journals, dict) or not market_journals or set(market_journals) - {"KR", "US"}:
+            raise ValueError("Explicit KR/US single-account journal mapping required")
+        market_journals = {market: Path(path) for market, path in market_journals.items()}
+        if len({path.resolve() for path in market_journals.values()}) != len(market_journals):
+            raise ValueError("Markets must not share a paper account journal")
     index = ArchiveCatalogIndex(archive_dir) if archive_dir is not None else None
     def catalog(cutoff, *, only_ticker=None, include_coverage=True, names_only=False, generation=None):
         if archive_dir is not None:
@@ -75,7 +102,7 @@ def make_handler(run_dir=None, *, db_paths=(), archive_dir=None, experiment_regi
                 elif parsed.path == "/api/context":
                     payload = {"as_of": at.isoformat(), "archive_mode": archive_dir is not None,
                                "tickers": {ticker: entry["public_context"] for ticker, entry in catalog(at, generation=generation).items()},
-                               "journal_sources_configured": len(db_paths),
+                               "journal_sources_configured": len(db_paths) + len(market_journals or {}),
                                "experiment_registry_configured": experiment_registry is not None,
                                "read_only": True, "broker_orders_sent": 0, "real_orders_enabled": False}
                     self.reply(200, json.dumps(payload, ensure_ascii=False), "application/json; charset=utf-8")
@@ -86,7 +113,7 @@ def make_handler(run_dir=None, *, db_paths=(), archive_dir=None, experiment_regi
                 elif parsed.path == "/api/kis-validation-health":
                     self.reply(200, json.dumps(kis_validation_health(archive_dir, analysis_as_of=at)), "application/json; charset=utf-8")
                 elif parsed.path == "/api/kis-strategy-health":
-                    self.reply(200, json.dumps(kis_strategy_health(archive_dir, analysis_as_of=at), allow_nan=False), "application/json; charset=utf-8")
+                    self.reply(200, json.dumps(kis_strategy_health(archive_dir, analysis_as_of=at, strategy_ledger_dir=strategy_ledger_dir), allow_nan=False), "application/json; charset=utf-8")
                 elif parsed.path == "/api/condition-draft":
                     from tradingagents.scanner.natural_language import compile_condition_text
                     draft = compile_condition_text(query.get("text", [""])[0], market=query.get("market", [None])[0])
@@ -106,7 +133,8 @@ def make_handler(run_dir=None, *, db_paths=(), archive_dir=None, experiment_regi
                     if ticker not in tickers:
                         self.reply(400, "Valid ticker and past aware as_of required", "text/plain")
                         return
-                    snapshot = get_replay_snapshot(ticker, at, ticker_dir=tickers[ticker]["ticker_dir"], db_paths=db_paths,
+                    journals = _snapshot_journals(ticker, tickers[ticker]["public_context"], db_paths, market_journals)
+                    snapshot = get_replay_snapshot(ticker, at, ticker_dir=tickers[ticker]["ticker_dir"], db_paths=journals,
                                                    anchor=query.get("anchor", [None])[0])
                     snapshot["source_context"] = tickers[ticker]["public_context"]
                     self.reply(200, json.dumps(snapshot, ensure_ascii=False, allow_nan=False), "application/json; charset=utf-8")
@@ -124,14 +152,18 @@ def make_handler(run_dir=None, *, db_paths=(), archive_dir=None, experiment_regi
                     self.reply(200, (STATIC / name).read_bytes(), kind)
             except CatalogPending as pending:
                 self.reply(202, json.dumps(pending.progress), "application/json")
+            except JournalScopeError:
+                self.reply(422, "Archive journal market scope unverified", "text/plain")
             except (OSError, ValueError, KeyError, TypeError, sqlite3.DatabaseError):
                 self.reply(422, "Archive input invalid or unavailable", "text/plain")
     return Handler
 
 
-def serve(run_dir=None, *, port=8765, db_paths=(), archive_dir=None, experiment_registry=None, paper_status_path=None):
+def serve(run_dir=None, *, port=8765, db_paths=(), archive_dir=None, experiment_registry=None, paper_status_path=None,
+          strategy_ledger_dir=None, market_journals=None):
     server = ThreadingHTTPServer(("127.0.0.1", port), make_handler(run_dir, db_paths=db_paths, archive_dir=archive_dir,
-                                 experiment_registry=experiment_registry, paper_status_path=paper_status_path))
+                                 experiment_registry=experiment_registry, paper_status_path=paper_status_path,
+                                 strategy_ledger_dir=strategy_ledger_dir, market_journals=market_journals))
     print(f"TradingAgents local read-only review: http://127.0.0.1:{server.server_port}", flush=True)
     try:
         server.serve_forever()
@@ -150,6 +182,9 @@ def main(argv=None):
     parser.add_argument("--journal", "--tracker-db", type=Path, action="append", default=[])
     parser.add_argument("--experiment-registry", type=Path)
     parser.add_argument("--paper-status", type=Path)
+    parser.add_argument("--strategy-ledgers", type=Path, help="Existing normal-strategy ledgers; read-only cost validation")
+    parser.add_argument("--paper-journal-kr", type=Path, help="Single KR paper account; selected only for a verified KR source")
+    parser.add_argument("--paper-journal-us", type=Path, help="Single US paper account; selected only for a verified US source")
     args = parser.parse_args(argv)
     if args.run_dir is not None and not (args.run_dir / "tickers").is_dir():
         parser.error("--run-dir must contain an existing tickers archive directory")
@@ -158,7 +193,10 @@ def main(argv=None):
     if not 0 <= args.port <= 65535:
         parser.error("--port must be between 0 and 65535")
     serve(args.run_dir, port=args.port, db_paths=args.journal, archive_dir=args.archive_dir,
-          experiment_registry=args.experiment_registry, paper_status_path=args.paper_status)
+          experiment_registry=args.experiment_registry, paper_status_path=args.paper_status,
+          strategy_ledger_dir=args.strategy_ledgers,
+          market_journals=({market: path for market, path in (("KR", args.paper_journal_kr), ("US", args.paper_journal_us))
+                            if path is not None} or None))
     return 0
 
 

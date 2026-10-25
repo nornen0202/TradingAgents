@@ -170,7 +170,7 @@ class KisPaperBroker:
             raise DemoError("Dedicated VTS client, explicit policy and boolean opt-in required")
         self.path, self.client, self.policy = Path(path), client, policy
         self.enabled, self.clock = paper_enabled, clock or (lambda: datetime.now(timezone.utc))
-        self.journal = DemoOrderJournal(self.path, client)
+        self.journal = DemoOrderJournal(self.path, client, issue_clock=self.clock)
         self.db = self.journal.db
         self.db.executescript("""
             CREATE TABLE IF NOT EXISTS paper_policy(scope TEXT PRIMARY KEY, policy TEXT NOT NULL);
@@ -423,7 +423,7 @@ class KisPaperBroker:
                 "observed_at": _clock(self.clock()).isoformat()}
 
 
-def _import_cashflow_checkpoints(broker, row, state, receipt, now):
+def _import_cashflow_checkpoints(broker, row, state, receipt, now, *, market="KR"):
     """Read same-owner ACK/reconciliation proof, without making broker requests.
 
     A cumulative report proves an aggregate cash flow, not each execution's
@@ -440,12 +440,17 @@ def _import_cashflow_checkpoints(broker, row, state, receipt, now):
     response, terms, body = json.loads(request["response"]), json.loads(row["terms"]), json.loads(original["body"])
     broker_id = _stable(response.get("broker_order_id"))
     created = _clock(row["created_at"])
+    if market not in {"KR", "US"}:
+        raise DemoError("Explicit settlement market required")
+    endpoint, buy_tr, sell_tr, price_key = (("order-cash", "VTTC0012U", "VTTC0011U", "ORD_UNPR")
+        if market == "KR" else ("order", "VTTT1002U", "VTTT1001U", "OVRS_ORD_UNPR"))
     if (not created <= _clock(request["created_at"]) <= _clock(receipt["executed_at"]) <= now
-            or original["endpoint"] != "order-cash"
-            or original["tr_id"] != ("VTTC0012U" if terms["side"] == "BUY" else "VTTC0011U")
+            or original["endpoint"] != endpoint
+            or original["tr_id"] != (buy_tr if terms["side"] == "BUY" else sell_tr)
             or body.get("PDNO") != terms["ticker"]
             or _broker_number(body.get("ORD_QTY"), integer=True) != terms["quantity"]
-            or _broker_number(body.get("ORD_UNPR")) != terms["limit_price"]
+            or _broker_number(body.get(price_key)) != terms["limit_price"]
+            or (market == "US" and body.get("OVRS_EXCG_CD") != terms.get("exchange"))
             or ("broker_order_id" in receipt and receipt["broker_order_id"] != broker_id)
             or ("source" in receipt and receipt["source"] != "kis_vts")):
         raise DemoError("VTS receipt provenance conflicts with original order")

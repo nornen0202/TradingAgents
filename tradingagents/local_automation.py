@@ -736,8 +736,10 @@ def main():
             return 0
         from tradingagents.charting.server import serve
         serve(archive_dir=args.archive_dir, port=args.review_port,
-              db_paths=[args.archive_dir / "performance.sqlite", args.archive_dir / "paper/kr.sqlite", args.archive_dir / "paper/us.sqlite"],
-              experiment_registry=args.archive_dir / "experiments.sqlite", paper_status_path=args.archive_dir / "paper/status.json")
+              db_paths=[args.archive_dir / "performance.sqlite"],
+              market_journals={"KR": args.archive_dir / "paper/kr.sqlite", "US": args.archive_dir / "paper/us.sqlite"},
+              experiment_registry=args.archive_dir / "experiments.sqlite", paper_status_path=args.archive_dir / "paper/status.json",
+              strategy_ledger_dir=args.state_dir / "kis-strategy")
         return 0
     lane_acquired = False
     try:

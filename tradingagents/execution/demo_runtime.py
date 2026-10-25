@@ -260,28 +260,67 @@ def _performance_history(db, now):
             for _, key in sorted(selected)]
 
 
-def summary(db, now, market, marks=None):
+def summary(db, now, market, marks=None, *, historical=False):
     """Read cumulative observations once per intent; partial fills never double count.
 
     Latest report clocks remain freshness evidence. Availability refers to one
     verified report of the current consecutive quantity/notional state, never
     an earlier partial fill or a broker execution timestamp.
+
+    ``historical`` is only for the read-only viewer's dated cost projection.
+    Future/unavailable rows are excluded before their contents can affect it.
+    The live runtime keeps the default strict whole-input rejection, and a
+    mutable request status without a dated observation is never backdated.
     """
     marks = marks or {}
     orders, owned, buy, sell, complete = [], {}, 0.0, 0.0, True
     for row in db.execute("SELECT * FROM strategy_attempts ORDER BY prepared_at,id"):
-        if at(row["prepared_at"]) > now:
+        try:
+            prepared = at(row["prepared_at"])
+        except (ValueError, TypeError):
+            if historical:
+                continue
+            raise
+        if prepared > now:
+            if historical:
+                continue
             raise ValueError("FUTURE_STRATEGY_ATTEMPT")
         terms = json.loads(row["terms"])
         request = db.execute("SELECT status,response,created_at FROM requests WHERE id=?", (row["id"],)).fetchone()
-        original = db.execute("SELECT terms FROM paper_intents WHERE id=?", (row["id"],)).fetchone()
+        original = db.execute("SELECT terms,created_at FROM paper_intents WHERE id=?", (row["id"],)).fetchone()
+        if historical:
+            def visible(value):
+                try:
+                    return value is not None and at(value["created_at"]) <= now
+                except (ValueError, TypeError):
+                    return False
+            request = request if visible(request) else None
+            original = original if visible(original) else None
         if (request and not original) or (original and json.loads(original[0]) != terms):
             raise ValueError("STRATEGY_BROKER_TERMS_MISMATCH")
-        status = request[0] if request else row["state"]
+        # The legacy request table timestamps submission, not ACK availability.
+        # A visible cumulative observation below witnesses its historical state.
+        status = "UNKNOWN" if historical else request[0] if request else row["state"]
         evidence, observed, last_qty, last_amount, last_amount_qty = {}, None, 0, 0, 0
         economic_state, available_pair, first_fill = None, None, None
-        observations = [(at(item[0]), json.loads(item[1])) for item in db.execute(
-            "SELECT observed_at,evidence FROM paper_observations WHERE id=?", (row["id"],))]
+        observations = []
+        for item in db.execute("SELECT observed_at,evidence FROM paper_observations WHERE id=?", (row["id"],)):
+            if not historical:
+                observations.append((at(item[0]), json.loads(item[1])))
+                continue
+            try:
+                observation_at = at(item[0])
+                if observation_at > now:
+                    continue
+                current = json.loads(item[1])
+                if not isinstance(current, dict) or at(current.get("ingested_at")) > now:
+                    continue
+            except (ValueError, TypeError):
+                # No usable availability clock means no historical evidence.
+                # Immutable settlement bindings still reject a corrupted or
+                # removed prefix that originally supported a known cost.
+                continue
+            observations.append((observation_at, current))
         observations.sort(key=lambda item: (item[0], at(item[1].get("ingested_at"))))
         for observed_at, current in observations:
             if not at(row["prepared_at"]) <= observed_at <= now:
@@ -338,7 +377,7 @@ def summary(db, now, market, marks=None):
             buy += amount or 0
         else:
             sell += amount or 0
-        cancellation = db.execute("SELECT status FROM requests WHERE id=?", ("cancel:" + row["id"],)).fetchone()
+        cancellation = None if historical else db.execute("SELECT status FROM requests WHERE id=?", ("cancel:" + row["id"],)).fetchone()
         orders.append({"id": row["id"], "ticker": row["ticker"], "run_id": row["run_id"], "side": terms["side"],
             "quantity": terms["quantity"], "limit_price": terms["limit_price"], "filled_quantity": filled,
             "average_fill_price": amount / filled if filled and amount is not None else None,
@@ -372,12 +411,17 @@ def summary(db, now, market, marks=None):
               ("ACKNOWLEDGED", "OPEN", "PARTIAL", "FILLED", "CANCELLED", "REJECTED", "NOT_SENT", "BLOCKED", "UNKNOWN", "UNRESOLVED")}
     history = _performance_history(db, now)
     gross_pnl = round(sell - buy + value, 4) if complete and any(o["filled_quantity"] for o in orders) else None
+    from .strategy_settlement import strategy_settlement_evidence
+    settlements = strategy_settlement_evidence(db, orders, market=market, as_of=now.isoformat(), historical=historical)
+    evaluation = evaluate_strategy_orders(orders, market=market, as_of=now.isoformat(), gross_pnl=gross_pnl,
+                                          valuation_complete=complete, settlement_evidence=settlements)
     return {"orders": orders[-100:], "order_counts": counts, "owned": owned, "performance_history": history,
-            "evaluation": evaluate_strategy_orders(orders, market=market, as_of=now.isoformat(), gross_pnl=gross_pnl, valuation_complete=complete),
+            "evaluation": evaluation,
             "performance": {"currency": "KRW" if market == "KR" else "USD", "basis": "STRATEGY_GROSS_CASHFLOWS_PLUS_MARKED_HOLDINGS",
                 "status": "NO_FILLS" if not any(o["filled_quantity"] for o in orders) else "AVAILABLE" if complete else "INCOMPLETE",
                 "gross_pnl": gross_pnl,
-                "net_pnl": None, "fees_known": False, "settlement_known": False,
+                "net_pnl": evaluation["net_pnl"], "actual_cost": evaluation["actual_cost"],
+                "fees_known": evaluation["fees_known"], "settlement_known": evaluation["settlement_known"],
                 "observed_at": now.isoformat(), "mark_times": mark_times}}
 
 
