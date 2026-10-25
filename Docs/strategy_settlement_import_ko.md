@@ -25,7 +25,7 @@
 
 ## 정정과 과거 조회
 
-`strategy_settlement_sources`, `strategy_settlements`, `strategy_settlement_bindings`는 UPDATE/DELETE를 거부한다. 같은 revision/같은 입력 재호출은 no-op이고, 다른 입력의 ID 재사용·부모 분기·뒤로 간 원본 시각·다른 주문으로 fill ID 이동은 거절한다. 비용 정정은 이전 기록을 보존한 채 최신 부모를 지정하는 전체 주문 snapshot으로 추가한다. 이미 알려진 체결의 수량·가격·체결/확인 시각 변경은 이 비용 import만으로 처리하지 못하며, 증권사 대사를 먼저 해결해야 한다.
+`strategy_settlement_sources`, `strategy_settlements`, `strategy_settlement_bindings`는 UPDATE/DELETE를 거부한다. 같은 revision/같은 입력 재호출은 no-op이고, 다른 입력의 ID 재사용·부모 분기·뒤로 간 원본 시각·다른 주문으로 fill ID 이동은 거절한다. 추가 체결·정정 이후 이전 완료 문서를 재수집해도, 원래 계좌·주문 binding·원문·보존 체인이 그대로라면 현재 체결 커버리지 검사 전에 쓰기 없는 no-op으로 인식한다. schema·이슈 baseline·원장 행·수집 시각을 갱신하지 않으며, 이 반환은 현재 비용 재인정이나 미확정 주문 해제를 뜻하지 않는다. 기존 binding 형식도 바꾸지 않는다. 새 비용 정정은 이전 기록을 보존한 채 최신 부모를 지정하는 현재 전체 주문 snapshot으로 추가한다. 이미 알려진 체결의 수량·가격·체결/확인 시각 변경은 이 비용 import만으로 처리하지 못하며, 증권사 대사를 먼저 해결해야 한다.
 
 평가에는 기준 시각까지 실제 수집된 revision만 반영한다. 나중 비용 정정이 과거 성과를 소급 변경하지 않는다. import 당시 원장의 owner, 정상 전략 원문·불변 terms, broker 요청 body/TR, ACK/fingerprint와 검증된 누적 관측·대사·이슈 이력 prefix를 별도로 고정한다. 비용을 읽을 때 이 고정 원본과 현재 원장을 다시 비교한다. 원래 ACK/body/TR이나 기존 관측이 바뀌거나 없어지면 비용을 인정하지 않는다. 새 관측은 기준 시각 필터 후 기존 prefix를 보존하는 추가만 허용하므로 나중 부분 체결이 이전 cutoff의 비용을 바꾸지 않는다.
 

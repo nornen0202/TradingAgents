@@ -282,6 +282,132 @@ def test_later_partial_quantity_requires_new_snapshot_and_preserves_original_exe
         assert replay == early
 
 
+def partial_settlement_successors(tmp_path, market):
+    h = Harness(tmp_path, market)
+    if market == "KR":
+        h.price = 40000  # Two shares remain inside the original KR order cap.
+    h.source(qty=2)
+    h.tick()
+    h.now += timedelta(seconds=10)
+    h.fill(qty=1, amount=h.price)
+    partial = h.tick()
+    h.now += timedelta(seconds=5)
+    first, source = document(h, partial["orders"][0])
+    with h.factory(market, h.root / f"{market.lower()}-strategy.sqlite", lambda: h.now,
+                   (h.ticker,), h.credentials.scope()) as broker:
+        assert import_strategy_settlement(broker, first, source_bytes=source)
+    h.now += timedelta(seconds=10)
+    h.fill(qty=2, amount=h.price * 2)
+    full = h.tick()
+    h.now += timedelta(seconds=5)
+    expanded, _ = document(h, full["orders"][0], revision="expanded", previous="first", partial=True)
+    with h.factory(market, h.root / f"{market.lower()}-strategy.sqlite", lambda: h.now,
+                   (h.ticker,), h.credentials.scope()) as broker:
+        assert import_strategy_settlement(broker, expanded, source_bytes=source)
+    h.now += timedelta(seconds=5)
+    corrected, _ = document(h, full["orders"][0], revision="corrected", previous="expanded", commission=1.5, partial=True)
+    with h.factory(market, h.root / f"{market.lower()}-strategy.sqlite", lambda: h.now,
+                   (h.ticker,), h.credentials.scope()) as broker:
+        assert import_strategy_settlement(broker, corrected, source_bytes=source)
+    return h, (first, expanded, corrected), source
+
+
+@pytest.mark.parametrize("market", ["KR", "US"])
+def test_old_partial_and_superseded_settlement_retry_is_a_readonly_noop(tmp_path, monkeypatch, market):
+    from tradingagents.execution import strategy_settlement
+
+    h, documents, source = partial_settlement_successors(tmp_path, market)
+    path = h.root / f"{market.lower()}-strategy.sqlite"
+    with h.factory(market, path, lambda: h.now, (h.ticker,), h.credentials.scope()) as broker:
+        before = (path.read_bytes(), path.stat().st_mtime_ns, broker.db.total_changes,
+                  list(broker.db.iterdump()), list(h.calls))
+        monkeypatch.setattr(strategy_settlement, "_initialize", lambda *_: pytest.fail("Duplicate attempted DDL"))
+        monkeypatch.setattr(broker.journal, "ensure_issue_baseline", lambda *_: pytest.fail("Duplicate changed issue baseline"))
+        traced = []
+        clock_reads = []
+        broker.clock = lambda: clock_reads.append(h.now) or h.now
+        broker.db.set_trace_callback(traced.append)
+        for document_ in documents:
+            assert import_strategy_settlement(broker, document_, source_bytes=source) is False
+        broker.db.set_trace_callback(None)
+        assert all(statement.lstrip().split()[0].upper() in {"SELECT"} for statement in traced)
+        assert clock_reads == [h.now] * len(documents)
+        assert before == (path.read_bytes(), path.stat().st_mtime_ns, broker.db.total_changes,
+                          list(broker.db.iterdump()), list(h.calls))
+
+
+@pytest.mark.parametrize("market", ["KR", "US"])
+@pytest.mark.parametrize("tamper", ["source_bytes", "stored_source", "ack", "body", "tr_id", "policy", "owner",
+                                   "other_account", "real_document", "conflicting_document"])
+def test_duplicate_settlement_does_not_excuse_original_evidence_or_scope_changes(tmp_path, market, tamper):
+    h, orders, docs, _ = imported_roundtrip(tmp_path, market)
+    value, source = deepcopy(docs[0][0]), docs[0][1]
+    identity = orders["orders"][0]["id"]
+    with h.factory(market, h.root / f"{market.lower()}-strategy.sqlite", lambda: h.now,
+                   (h.ticker,), h.credentials.scope()) as broker:
+        db = broker.db
+        if tamper == "source_bytes":
+            source += b"changed"
+        elif tamper == "stored_source":
+            db.execute("DROP TRIGGER strategy_settlement_sources_no_update")  # Fixture corruption only.
+            db.execute("UPDATE strategy_settlement_sources SET content=?", (b"changed",))
+        elif tamper == "ack":
+            db.execute("UPDATE requests SET response=? WHERE id=?", (json.dumps({"broker_order_id": "999"}), identity))
+        elif tamper == "body":
+            body = json.loads(db.execute("SELECT body FROM intents WHERE id=?", (identity,)).fetchone()[0])
+            body["ORD_UNPR" if market == "KR" else "OVRS_ORD_UNPR"] = "999"
+            db.execute("UPDATE intents SET body=? WHERE id=?", (json.dumps(body), identity))
+        elif tamper == "tr_id":
+            db.execute("UPDATE intents SET tr_id='CHANGED' WHERE id=?", (identity,))
+        elif tamper == "policy":
+            db.execute("UPDATE paper_policy SET policy='{}'")
+        elif tamper == "owner":
+            db.execute("UPDATE owner SET scope='other-account'")
+        elif tamper == "other_account":
+            value["account_scope"] = "other-account"
+        elif tamper == "real_document":
+            value["environment"] = "real"
+        else:
+            value["fills"][0]["commission"] += 1
+        before = (db.total_changes, list(db.iterdump()), list(h.calls))
+        with pytest.raises(DemoError):
+            import_strategy_settlement(broker, value, source_bytes=source)
+        assert before == (db.total_changes, list(db.iterdump()), list(h.calls))
+
+
+@pytest.mark.parametrize("market", ["KR", "US"])
+def test_new_revision_still_requires_current_full_coverage_and_latest_parent(tmp_path, market):
+    h, (first, expanded, corrected), source = partial_settlement_successors(tmp_path, market)
+    with h.factory(market, h.root / f"{market.lower()}-strategy.sqlite", lambda: h.now,
+                   (h.ticker,), h.credentials.scope()) as broker:
+        before = list(broker.db.iterdump())
+        partial = {**first, "revision_id": "new-partial", "previous_revision_id": corrected["revision_id"]}
+        with pytest.raises(DemoError, match="current complete cumulative fill"):
+            import_strategy_settlement(broker, partial, source_bytes=source)
+        wrong_parent = {**expanded, "revision_id": "new-wrong-parent"}
+        with pytest.raises(DemoError, match="latest predecessor"):
+            import_strategy_settlement(broker, wrong_parent, source_bytes=source)
+        assert list(broker.db.iterdump()) == before
+
+
+@pytest.mark.parametrize("market", ["KR", "US"])
+def test_existing_static_binding_format_is_preserved_and_not_retroactively_upgraded(tmp_path, market):
+    h, before, docs, _ = imported_roundtrip(tmp_path, market)
+    with h.factory(market, h.root / f"{market.lower()}-strategy.sqlite", lambda: h.now,
+                   (h.ticker,), h.credentials.scope()) as broker:
+        bindings = [tuple(row) for row in broker.db.execute("SELECT * FROM strategy_settlement_bindings")]
+        for _, encoded in bindings:
+            # The pre-existing v1 format has no historical policy snapshot.
+            # Adding one without versioning would invalidate every old proof.
+            assert set(json.loads(encoded)["static"]) == {
+                "owner", "strategy", "paper_intent", "intent", "request", "strategy_source"}
+        for value, source in docs:
+            assert import_strategy_settlement(broker, value, source_bytes=source) is False
+        proof = strategy_settlement_evidence(broker.db, before["orders"], market=market, as_of=h.now.isoformat())
+        assert proof["status"] == "COMPLETE_REVIEWED_IMPORT"
+        assert [tuple(row) for row in broker.db.execute("SELECT * FROM strategy_settlement_bindings")] == bindings
+
+
 def test_exported_proof_is_detached_and_serialized_claims_cannot_be_promoted(tmp_path):
     h, before, _, _ = imported_roundtrip(tmp_path, partial=True)
     with h.factory(h.market, h.root / "us-strategy.sqlite", lambda: h.now, (h.ticker,), h.credentials.scope()) as broker:

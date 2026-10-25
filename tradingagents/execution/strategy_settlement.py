@@ -8,6 +8,7 @@ not meet this contract. Originals and corrections are append-only revisions.
 from __future__ import annotations
 
 from decimal import Decimal
+from dataclasses import asdict
 from collections.abc import Mapping as ReadOnlyMapping
 import hashlib
 import json
@@ -222,6 +223,50 @@ def _records(db, intent_id, *, as_of=None):
     return result
 
 
+def _validated_duplicate(broker, document, encoded, now):
+    """Recognize an immutable completed import before checking today's fills.
+
+    This path is read-only, including schema and issue baselines. A superseded
+    partial snapshot is already imported, not a new claim to cover later fills.
+    Original sources, static order bindings and the preserved chain must still
+    validate; duplicate IDs never excuse corruption or conflicting documents.
+    """
+    db = broker.db
+    if not db.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='strategy_settlements'").fetchone():
+        return False
+    existing = db.execute("SELECT intent_id,document_json FROM strategy_settlements WHERE revision_id=?",
+                          (document["revision_id"],)).fetchone()
+    if existing is None:
+        return False
+    if existing[0] != document["intent_id"] or _canonical(json.loads(existing[1])) != encoded:
+        raise DemoError("Settlement revision ID reused with different evidence")
+    # Preserve existing binding bytes. Check the current frozen broker policy
+    # against its journal, without inventing a historical policy pin retroactively.
+    policy = asdict(broker.policy)
+    if document["market"] == "US" and not broker.policy.allowed_tickers:
+        policy.pop("allowed_tickers")
+    policies = db.execute("SELECT scope,policy FROM paper_policy").fetchall()
+    if len(policies) != 1 or tuple(policies[0]) != (document["account_scope"], json.dumps(policy, sort_keys=True)):
+        raise DemoError("Settlement broker policy changed")
+    for table in ("strategy_settlement_sources", "strategy_settlement_bindings"):
+        if not db.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name=?", (table,)).fetchone():
+            raise DemoError("Settlement original evidence is missing")
+    if reconciliation_issue_state(db, document["intent_id"], as_of=now)["status"] == "UNVERIFIED":
+        raise DemoError("Settlement reconciliation issue history is unverified")
+    for record in _revision_chain(_records(db, document["intent_id"])):
+        prior = _validate_document(record["document"], now)
+        if (prior["revision_id"] != record["revision_id"] or prior["previous_revision_id"] != record["previous_revision_id"]
+                or prior["intent_id"] != document["intent_id"] or prior["account_scope"] != document["account_scope"]
+                or prior["market"] != document["market"]
+                or not _clock(prior["review"]["reviewed_at"]) <= _clock(record["ingested_at"]) <= now):
+            raise DemoError("Settlement row provenance conflicts")
+        source = db.execute("SELECT content FROM strategy_settlement_sources WHERE sha256=?", (prior["source"]["sha256"],)).fetchone()
+        if source is None or _digest(source[0]) != prior["source"]["sha256"]:
+            raise DemoError("Settlement original source hash mismatch")
+        _verify_binding(db, record, now)
+    return True
+
+
 def import_strategy_settlement(broker, document, *, source_bytes):
     """Append a reviewed whole-order execution/cost snapshot, never an order.
 
@@ -248,6 +293,8 @@ def import_strategy_settlement(broker, document, *, source_bytes):
         strategy = db.execute("SELECT ticker,terms,prepared_at FROM strategy_attempts WHERE id=?", (document["intent_id"],)).fetchone()
         if not row or not state or not strategy or json.loads(row["terms"]) != json.loads(strategy["terms"]):
             raise DemoError("Original normal-strategy owned intent required")
+        if _validated_duplicate(broker, document, encoded, now):
+            return False
         terms = json.loads(row["terms"])
         fills = sorted(document["fills"], key=lambda f: (_clock(f["executed_at"]), f["fill_id"]))
         receipt = {"executed_at": fills[0]["executed_at"], "broker_order_id": document["broker_order_id"], "source": "kis_vts"}
@@ -282,12 +329,6 @@ def import_strategy_settlement(broker, document, *, source_bytes):
             if imported_at < now:
                 raise DemoError("Settlement import clock regressed")
             records = _revision_chain(_records(db, document["intent_id"]))
-            duplicate = next((r for r in records if r["revision_id"] == document["revision_id"]), None)
-            if duplicate:
-                if _canonical(duplicate["document"]) != encoded:
-                    raise DemoError("Settlement revision ID reused with different evidence")
-                db.execute("ROLLBACK")
-                return False
             previous = records[-1] if records else None
             if document["previous_revision_id"] != (previous["revision_id"] if previous else None):
                 raise DemoError("Settlement correction must name the latest predecessor")

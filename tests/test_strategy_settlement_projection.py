@@ -296,7 +296,7 @@ def test_unobserved_request_exception_preserves_exact_keyset(tmp_path, unobserve
 
 @pytest.mark.parametrize("field,wrong", [
     ("status", "PARTIAL"), ("filled_quantity", 0), ("fill_notional", 999), ("average_fill_price", 999),
-    ("observed_at", None), ("ingested_at", None), ("fill_availability", None), ("cancel_status", "ACKNOWLEDGED"),
+    ("observed_at", None), ("ingested_at", None), ("fill_availability", None), ("cancel_status", "CONFIRMED"),
 ])
 def test_settled_order_binding_remains_strict_with_an_unobserved_request(tmp_path, unobserved_order_snapshot, field, wrong):
     h, original = unobserved_order_snapshot
@@ -306,6 +306,26 @@ def test_settled_order_binding_remains_strict_with_an_unobserved_request(tmp_pat
     runtime(archive, h, result)
     view = read(archive, h)
     assert view is None or view["actual_cost"] is view["net_pnl"] is None
+
+
+def test_cancel_request_metadata_is_not_cancellation_confirmation_or_cost_authority(tmp_path, unobserved_order_snapshot):
+    h, original = unobserved_order_snapshot
+    result = deepcopy(original)
+    result["orders"][0]["cancel_status"] = "ACKNOWLEDGED"
+    archive = tmp_path / "ui"
+    runtime(archive, h, result)
+    calls = list(h.calls)
+    view = read(archive, h)
+    # An untrusted request receipt neither changes the dated FILLED observation
+    # nor attests to cancellation. Independently bound executions prove costs.
+    dated = summary_at(h, h.now, historical=True)
+    assert result["orders"][0]["status"] == dated["orders"][0]["status"] == "FILLED"
+    assert dated["orders"][0]["cancel_status"] is None
+    assert view["actual_cost"] == 2 and view["net_pnl"] == 1
+    assert read(archive, h, ledger=False)["actual_cost"] is None
+    assert view["readiness"] == "NOT_READY_FOR_REAL_INVESTMENT"
+    assert view["real_orders_enabled"] is view["automatic_live_transition"] is False
+    assert h.calls == calls
 
 
 @pytest.mark.parametrize("seconds", [-1, 1])
@@ -424,6 +444,36 @@ def test_later_dated_cancel_confirmation_is_exact_and_not_backdated(tmp_path, ma
     runtime(archive, h, confirmed)
     assert summary_at(h, h.now, historical=True)["orders"] == confirmed["orders"]
     assert read(archive, h)["actual_cost"] == 1
+
+
+@pytest.mark.parametrize("market", ["KR", "US"])
+def test_settled_roundtrip_and_new_open_order_timeout_cancel_ack_preserves_cost(tmp_path, market):
+    h, acknowledged = settled_roundtrip_with_unobserved_order(tmp_path, market)
+    assert acknowledged["orders"][-1]["status"] == "ACKNOWLEDGED"
+    assert acknowledged["orders"][-1]["observed_at"] is None
+    h.now += timedelta(minutes=5)
+    pending = h.tick()  # Native refresh -> OPEN observation -> timeout cancel ACK.
+    dated = summary_at(h, h.now, historical=True)
+    assert len(pending["orders"]) == len(dated["orders"]) == 3
+    assert pending["orders"][:2] == dated["orders"][:2]
+    order, proof = pending["orders"][-1], dated["orders"][-1]
+    assert order["status"] == proof["status"] == "OPEN"
+    assert order["filled_quantity"] == proof["filled_quantity"] == 0
+    assert order["fill_notional"] == proof["fill_notional"] == 0
+    assert order["source"] == proof["source"] == "KIS_DEMO_BROKER_REPORT"
+    assert order["observed_at"] is not None and order["ingested_at"] is not None
+    assert order["cancel_status"] == "ACKNOWLEDGED" and proof["cancel_status"] is None
+    assert {**order, "cancel_status": None} == proof
+    assert pending["evaluation"]["actual_cost"] == dated["evaluation"]["actual_cost"] == 2
+    archive = tmp_path / "ui"
+    cached = runtime(archive, h, pending)
+    before, calls = cached.read_bytes(), list(h.calls)
+    view = read(archive, h)
+    assert view["actual_cost"] == 2 and view["net_pnl"] == 1
+    assert view["sample"]["filled_order_count"] == 2
+    assert view["cost_evidence_status"] == "COMPLETE_REVIEWED_IMPORT"
+    assert view["real_orders_enabled"] is view["automatic_live_transition"] is False
+    assert cached.read_bytes() == before and h.calls == calls
 
 
 def test_later_normal_order_before_runtime_json_replacement_does_not_erase_verified_past_cost(tmp_path):
