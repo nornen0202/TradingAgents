@@ -2,7 +2,6 @@
 from contextlib import contextmanager
 from http.server import ThreadingHTTPServer
 import json
-from pathlib import Path
 from threading import Thread
 import time
 from unittest.mock import Mock
@@ -67,12 +66,15 @@ def api(root, **kwargs):
     base = f"http://127.0.0.1:{server.server_port}"
     def get(route, **values):
         query = {"as_of": ASOF, **values}
-        for _ in range(30):
+        deadline = time.monotonic() + 10
+        while time.monotonic() < deadline:
             with urlopen(base + route + "?" + urlencode(query), timeout=5) as response:
                 payload = json.load(response)
                 if response.status != 202:
                     return payload
             query["catalog_generation"] = payload["generation"]
+            if payload.get("status") == "SNAPSHOT_BUILDING":
+                query["snapshot_job"] = payload["job_token"]
             time.sleep(.01)
         pytest.fail("Fixture catalog did not finish")
     try:

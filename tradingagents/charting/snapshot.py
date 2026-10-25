@@ -7,7 +7,8 @@ from .bars import finite, instant
 from .report import build_review
 
 
-def get_replay_snapshot(ticker, as_of_ts, *, ticker_dir, db_paths=(), anchor=None, clock=None):
+def get_replay_snapshot(ticker, as_of_ts, *, ticker_dir, db_paths=(), anchor=None, clock=None, phase_hook=None,
+                        journal_proof_hook=None):
     from tradingagents.performance.replay import replay_action_history
     from tradingagents.dataflows.market_policy import observation_status, latest_regular_session_context, research_observation_policy
     cutoff = instant(as_of_ts)
@@ -16,7 +17,12 @@ def get_replay_snapshot(ticker, as_of_ts, *, ticker_dir, db_paths=(), anchor=Non
     now = instant(clock() if clock is not None else datetime.now(timezone.utc))
     if now is None or cutoff > now:
         raise ValueError("Snapshot cutoff cannot be in the future")
-    history = replay_action_history(db_paths, analysis_as_of=cutoff.isoformat(), ticker=ticker) if db_paths else {}
+    if phase_hook is not None:
+        phase_hook("REPLAY")
+    proof_args = {"proof_hook": journal_proof_hook} if journal_proof_hook is not None else {}
+    history = replay_action_history(db_paths, analysis_as_of=cutoff.isoformat(), ticker=ticker, **proof_args) if db_paths else {}
+    if phase_hook is not None:
+        phase_hook("BUILD")
     review = build_review(ticker_dir, analysis_as_of=cutoff, anchor=anchor, lifecycle=history)
     if review["ticker"].upper() != ticker.upper():
         raise ValueError("Snapshot ticker does not match its archive")
