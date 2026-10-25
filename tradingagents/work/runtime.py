@@ -86,6 +86,18 @@ class WorkRuntime:
                     raise WorkRuntimeError("Fresh report source failed revalidation: " + ",".join(blockers))
             state = self._load_state()
             surface_state = state["surfaces"].setdefault(key, {})
+            if surface_state.get("pending_event_id") and (
+                    report_context_v1 or surface_state.get("pending_report_context_contract")):
+                # A contract migration must not supersede an unfinished report.
+                # Leave the legacy default path unchanged; only explicit context
+                # preparation (or its pending marker) enters this new guard.
+                try:
+                    pending_packet = _context_packet(self, surface_state, surface=key, prefix="pending")
+                except (OSError, KeyError, TypeError, ValueError) as exc:
+                    raise WorkRuntimeError("Cannot verify the pending market report contract") from exc
+                if any(pending_packet.get(field) != source_packet.get(field) for field in (
+                        "prompt_contract_version", "workflow_contract_sha256")):
+                    raise WorkRuntimeError("Resolve the pending market report before changing its contract")
             if report_context_v1:
                 packet, material_noop = _market_context_delivery(
                     self, source_packet, surface_state, archive_dir=archive_dir,
@@ -170,6 +182,10 @@ class WorkRuntime:
                         "prepared_at": prepared_at,
                     }
                 )
+                if report_context_v1:
+                    surface_state["pending_report_context_contract"] = packet["prompt_contract_version"]
+                else:
+                    surface_state.pop("pending_report_context_contract", None)
                 self._append_ledger(
                     {
                         "at": prepared_at,
@@ -380,6 +396,7 @@ class WorkRuntime:
                 }
             )
             state["revision"] = int(state.get("revision") or 0) + 1
+            surface_state.pop("pending_report_context_contract", None)
             if report and report.get("prompt_contract_version") == MARKET_CONTEXT_CONTRACTS.get(key):
                 surface_state["last_acked_revision"] = state["revision"]
             else:
@@ -553,6 +570,7 @@ class WorkRuntime:
             # not create a new analysis/ACK revision.  Preserve the greatest
             # canonical revision seen across sequential surface recovery.
             state["revision"] = max(previous_revision, requested_revision)
+            surface_state.pop("pending_report_context_contract", None)
             self._append_ledger(
                 {
                     "at": recovered_at,

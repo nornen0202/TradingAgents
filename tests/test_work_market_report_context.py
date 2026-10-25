@@ -76,7 +76,13 @@ def test_explicit_opt_in_preserves_legacy_packets_prompts_and_advisory(tmp_path)
     assert legacy == explicit_false
     old = prepare(runtime, archive, opt=False)
     old_bytes = Path(old["packet_path"]).read_bytes()
-    new = prepare(runtime, archive)
+    before = protected_bytes(runtime)
+    with pytest.raises(WorkRuntimeError, match="pending market report before changing"):
+        prepare(runtime, archive)
+    assert protected_bytes(runtime) == before
+    publish(runtime, archive, old)
+    runtime.acknowledge("us", old["event_id"], now=NOW + timedelta(minutes=2))
+    new = prepare(runtime, archive, now=NOW + timedelta(minutes=3))
     assert packet(old)["prompt_contract_version"] == "market-work-v13-us"
     assert packet(new)["prompt_contract_version"] == "market-work-v14-us"
     assert Path(old["packet_path"]).read_bytes() == old_bytes
@@ -86,6 +92,53 @@ def test_explicit_opt_in_preserves_legacy_packets_prompts_and_advisory(tmp_path)
     for surface in ("youtube", "prism"):
         with pytest.raises(ValueError, match="market surfaces"):
             packets.build_surface_packet(surface, archive_dir=archive, now=NOW, report_context_v1=True)
+
+
+def protected_bytes(runtime):
+    return {str(path.relative_to(runtime.root)): path.read_bytes()
+            for path in runtime.root.rglob("*") if path.is_file() and "locks" not in path.relative_to(runtime.root).parts}
+
+
+@pytest.mark.parametrize("market", ["kr", "us"])
+def test_context_pending_cannot_be_overwritten_by_default_contract(tmp_path, market):
+    runtime, archive = setup(tmp_path, market=market)
+    first = prepare(runtime, archive, market=market)
+    before = protected_bytes(runtime)
+    with pytest.raises(WorkRuntimeError, match="pending market report before changing"):
+        prepare(runtime, archive, market=market, opt=False)
+    assert protected_bytes(runtime) == before
+    publish(runtime, archive, first)
+    runtime.acknowledge(market, first["event_id"], now=NOW + timedelta(minutes=2))
+    state = json.loads(runtime.state_path.read_bytes())["surfaces"][market]
+    assert "pending_report_context_contract" not in state
+    legacy = prepare(runtime, archive, market=market, opt=False, now=NOW + timedelta(minutes=3))
+    assert packet(legacy)["prompt_contract_version"] == packets.PROMPT_CONTRACTS[market]
+
+
+def test_context_pending_workflow_change_refuses_before_any_output_write(tmp_path, monkeypatch):
+    runtime, archive = setup(tmp_path)
+    prepare(runtime, archive)
+    before = protected_bytes(runtime)
+    original = packets.workflow_contract_hashes("us", packets.MARKET_CONTEXT_CONTRACTS["us"])
+    monkeypatch.setattr(packets, "workflow_contract_hashes", lambda *args: {**original, "prompt_sha256": "f" * 64})
+    with pytest.raises(WorkRuntimeError, match="pending market report before changing"):
+        prepare(runtime, archive)
+    assert protected_bytes(runtime) == before
+
+
+@pytest.mark.parametrize("opt", [False, True])
+def test_same_contract_new_upstream_still_supersedes_pending(tmp_path, opt):
+    runtime, archive = setup(tmp_path)
+    first = prepare(runtime, archive, opt=opt)
+    original = Path(first["packet_path"]).read_bytes()
+    next_source(archive)
+    second = prepare(runtime, archive, opt=opt, now=NOW + timedelta(minutes=9))
+    assert second["result"] == "NEW" and second["event_id"] != first["event_id"]
+    assert Path(first["packet_path"]).read_bytes() == original
+    ledger = [json.loads(line) for line in runtime.ledger_path.read_text().splitlines()]
+    assert any(row["event"] == "superseded_pending" and row["event_id"] == first["event_id"] for row in ledger)
+    state = json.loads(runtime.state_path.read_bytes())["surfaces"]["us"]
+    assert (state.get("pending_report_context_contract") == packets.MARKET_CONTEXT_CONTRACTS["us"]) is opt
 
 
 def test_no_ack_resume_and_self_ack_do_not_ratchet_event(tmp_path):
