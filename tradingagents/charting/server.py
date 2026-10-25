@@ -1,7 +1,9 @@
 """Optional localhost read-only adapter for existing archived reports."""
 from __future__ import annotations
 
+from datetime import timezone
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+import hashlib
 import json
 from pathlib import Path
 import sqlite3
@@ -9,6 +11,7 @@ from urllib.parse import parse_qs, urlparse
 
 from .bars import instant
 from .catalog_index import ArchiveCatalogIndex, CatalogPending
+from .snapshot_jobs import SnapshotJobs, SnapshotJobError, evidence_fingerprint, journal_fingerprint, journal_identities
 from .snapshot import get_replay_snapshot
 from .operations import archive_catalog, known_artifacts, paper_health, kis_demo_health, kis_validation_health, kis_strategy_health, now_utc
 
@@ -46,17 +49,108 @@ def make_handler(run_dir=None, *, db_paths=(), archive_dir=None, experiment_regi
         if len({path.resolve() for path in market_journals.values()}) != len(market_journals):
             raise ValueError("Markets must not share a paper account journal")
     index = ArchiveCatalogIndex(archive_dir) if archive_dir is not None else None
+    jobs = SnapshotJobs()
+    # These are configuration bindings, never request-supplied file paths.
+    journal_bounds = {Path(path): Path(path).resolve() for path in (*db_paths, *(market_journals or {}).values())}
     def catalog(cutoff, *, only_ticker=None, include_coverage=True, names_only=False, generation=None):
         if archive_dir is not None:
-            return archive_catalog(archive_dir, analysis_as_of=cutoff, only_ticker=only_ticker,
+            token, entries = index.snapshot_with_generation(generation=generation)
+            return token, archive_catalog(archive_dir, analysis_as_of=cutoff, only_ticker=only_ticker,
                                    include_coverage=include_coverage, names_only=names_only,
-                                   manifest_entries=index.snapshot(generation=generation))
+                                   manifest_entries=entries)
         root = (Path(run_dir) / "tickers").resolve()
         # An allowlist of archive directories, never an arbitrary request-supplied path.
-        return {path.name: {"ticker_dir": path, "public_context": {"run_id": Path(run_dir).name,
+        return 0, {path.name: {"ticker_dir": path, "public_context": {"run_id": Path(run_dir).name,
                 **(known_artifacts(path, cutoff) if include_coverage else {})}}
                 for path in root.iterdir() if path.is_dir() and path.resolve().is_relative_to(root)
                 and (only_ticker is None or path.name == only_ticker)}
+
+    def build_snapshot(ticker, cutoff, anchor, catalog_ticket, progress):
+        progress("INDEX")
+        if index is not None:
+            entries = catalog_ticket.result()
+            progress("SELECTION_COVERAGE")
+            selected = archive_catalog(archive_dir, analysis_as_of=cutoff, only_ticker=ticker,
+                                       names_only=True, manifest_entries=entries)
+        else:
+            progress("SELECTION_COVERAGE")
+            _, selected = catalog(cutoff, only_ticker=ticker, include_coverage=False)
+        if ticker not in selected:
+            raise SnapshotJobError(400, "Valid ticker and past aware as_of required")
+        directory = selected[ticker]["ticker_dir"]
+        manifest = directory.parent.parent / "run.json" if index is not None else None
+        expected = next((raw for path, raw in entries if path == manifest), None) if index is not None else None
+        context = {"market": (expected.get("settings") or {}).get("market")} if expected is not None else selected[ticker]["public_context"]
+        try:
+            journals = _snapshot_journals(ticker, context, db_paths, market_journals)
+        except JournalScopeError:
+            raise SnapshotJobError(422, "Archive journal market scope unverified") from None
+        root = index.root if index is not None else (Path(run_dir) / "tickers").resolve()
+        alias = Path(archive_dir) / "runs" if index is not None else Path(run_dir) / "tickers"
+        def journals_stamp():
+            if any(Path(path).resolve() != journal_bounds[Path(path)] for path in journals):
+                raise ValueError("Configured journal scope changed")
+            return journal_fingerprint(journals)
+        def fingerprint():
+            return evidence_fingerprint(directory, root=root, manifest=manifest, alias=alias)
+        before = fingerprint()
+        journal_before = journals_stamp()
+        if manifest is not None:
+            from .catalog_index import project_manifest
+            if expected is None or project_manifest(manifest)[1] != expected:
+                raise ValueError("Catalog source changed")
+            selected = archive_catalog(archive_dir, analysis_as_of=cutoff, only_ticker=ticker,
+                                       manifest_entries=((manifest, expected),))
+            if ticker not in selected:
+                raise ValueError("Catalog source changed")
+            context = selected[ticker]["public_context"]
+        else:
+            context = {**context, **known_artifacts(directory, cutoff)}
+        private_proofs = []
+        snapshot = get_replay_snapshot(ticker, cutoff, ticker_dir=directory, db_paths=journals,
+                                       anchor=anchor, phase_hook=progress, journal_proof_hook=private_proofs.append)
+        if journals and len(private_proofs) != 1:
+            raise ValueError("Snapshot journal proof unavailable")
+        snapshot["source_context"] = context
+        def lifecycle_hash(value):
+            return hashlib.sha256(json.dumps(value, sort_keys=True, separators=(",", ":"), allow_nan=False).encode()).hexdigest()
+        expected_lifecycle = lifecycle_hash(snapshot.get("lifecycle", {}))
+        def verify():
+            nonlocal journal_before
+            if fingerprint() != before:
+                raise ValueError("Archive snapshot evidence changed")
+            current = journals_stamp()
+            if journal_identities(current) != journal_identities(journal_before):
+                raise ValueError("Configured journal identity changed")
+            if current != journal_before:
+                # Appends after the explicit cutoff must not change or erase a
+                # past view. Compare the existing strict reader's visible proof,
+                # not the whole database bytes or its latest write timestamp.
+                from tradingagents.performance.replay import replay_action_history
+                for _ in range(2):
+                    revised_proofs = []
+                    replay = replay_action_history(journals, analysis_as_of=cutoff.isoformat(), ticker=ticker,
+                                                   proof_hook=revised_proofs.append) if journals else {}
+                    if (lifecycle_hash(replay) != expected_lifecycle
+                            or revised_proofs != private_proofs):
+                        raise ValueError("Cutoff-visible journal proof changed")
+                    after = journals_stamp()
+                    if journal_identities(after) != journal_identities(journal_before):
+                        raise ValueError("Configured journal identity changed")
+                    if after == current:
+                        journal_before = after
+                        break
+                    # Never promote metadata for bytes the replay did not see.
+                    # One concurrent future append can stabilize on the second
+                    # pass; continuing writes exhaust this bounded verification.
+                    current = after
+                else:
+                    raise ValueError("Journal changed during bounded verification")
+                if fingerprint() != before:
+                    raise ValueError("Archive snapshot evidence changed")
+        progress("VERIFY")
+        verify()
+        return snapshot, verify
 
     class Handler(BaseHTTPRequestHandler):
         def log_message(self, *args):
@@ -76,6 +170,8 @@ def make_handler(run_dir=None, *, db_paths=(), archive_dir=None, experiment_regi
             self.send_header("Content-Type", content_type)
             self.send_header("Content-Length", str(len(encoded)))
             self.send_header("Cache-Control", "no-store")
+            if getattr(self, "catalog_generation", None) is not None:
+                self.send_header("X-Archive-Catalog-Generation", str(self.catalog_generation))
             self.send_header("X-Content-Type-Options", "nosniff")
             self.send_header("Content-Security-Policy", "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; connect-src 'self'; img-src 'self' data:; frame-ancestors 'none'")
             self.end_headers()
@@ -93,15 +189,19 @@ def make_handler(run_dir=None, *, db_paths=(), archive_dir=None, experiment_regi
                     return
                 query = parse_qs(parsed.query)
                 generation = int(query["catalog_generation"][0]) if "catalog_generation" in query else None
+                if generation is not None and generation < (1 if index is not None else 0):
+                    raise SnapshotJobError(400, "Invalid archive catalog generation")
                 at = instant(query.get("as_of", [now_utc().isoformat()])[0])
                 if parsed.path.startswith("/api/") and (at is None or at > now_utc()):
                     self.reply(400, "Past aware as_of required", "text/plain")
                     return
                 if parsed.path == "/api/tickers":
-                    self.reply(200, json.dumps(sorted(catalog(at, include_coverage=False, names_only=True, generation=generation))), "application/json")
+                    self.catalog_generation, tickers = catalog(at, include_coverage=False, names_only=True, generation=generation)
+                    self.reply(200, json.dumps(sorted(tickers)), "application/json")
                 elif parsed.path == "/api/context":
+                    self.catalog_generation, tickers = catalog(at, generation=generation)
                     payload = {"as_of": at.isoformat(), "archive_mode": archive_dir is not None,
-                               "tickers": {ticker: entry["public_context"] for ticker, entry in catalog(at, generation=generation).items()},
+                               "tickers": {ticker: entry["public_context"] for ticker, entry in tickers.items()},
                                "journal_sources_configured": len(db_paths) + len(market_journals or {}),
                                "experiment_registry_configured": experiment_registry is not None,
                                "read_only": True, "broker_orders_sent": 0, "real_orders_enabled": False}
@@ -128,16 +228,45 @@ def make_handler(run_dir=None, *, db_paths=(), archive_dir=None, experiment_regi
                         cards = list_experiment_cards(experiment_registry, analysis_as_of=at.isoformat())
                     self.reply(200, json.dumps(cards, ensure_ascii=False, allow_nan=False), "application/json; charset=utf-8")
                 elif parsed.path == "/api/snapshot":
+                    if "as_of" not in query:
+                        # Polling must retain one explicit point in time. A
+                        # moving default of now cannot be an immutable job key.
+                        raise SnapshotJobError(400, "Explicit past aware as_of required for a snapshot")
+                    if "snapshot_cancel" in query:
+                        # A shared read-only job is not an observer's authority
+                        # to cancel another tab's work or confirm an order.
+                        raise SnapshotJobError(400, "Snapshot cancellation is not a public API")
                     ticker = query.get("ticker", [""])[0]
-                    tickers = catalog(at, only_ticker=ticker, generation=generation)
-                    if ticker not in tickers:
-                        self.reply(400, "Valid ticker and past aware as_of required", "text/plain")
-                        return
-                    journals = _snapshot_journals(ticker, tickers[ticker]["public_context"], db_paths, market_journals)
-                    snapshot = get_replay_snapshot(ticker, at, ticker_dir=tickers[ticker]["ticker_dir"], db_paths=journals,
-                                                   anchor=query.get("anchor", [None])[0])
-                    snapshot["source_context"] = tickers[ticker]["public_context"]
-                    self.reply(200, json.dumps(snapshot, ensure_ascii=False, allow_nan=False), "application/json; charset=utf-8")
+                    if not ticker or Path(ticker).name != ticker or ticker in {".", ".."} or "/" in ticker or "\\" in ticker:
+                        raise SnapshotJobError(400, "Valid ticker and past aware as_of required")
+                    anchor = query.get("anchor", [None])[0]
+                    if anchor is not None and (instant(anchor) is None or instant(anchor) > at):
+                        raise SnapshotJobError(400, "Past aware anchor required")
+                    token = query.get("snapshot_job", [None])[0]
+                    if token is not None and (len(token) > 160 or not token or any(c not in "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-" for c in token)):
+                        raise SnapshotJobError(400, "Invalid archive snapshot token")
+                    if token is not None and generation is None:
+                        raise SnapshotJobError(400, "Snapshot polling requires its catalog generation")
+                    try:
+                        # Existing opaque jobs already bind their exact cohort.
+                        # Another tab refreshing the index must not invalidate
+                        # that job merely by evicting old index metadata.
+                        if token is not None:
+                            self.catalog_generation = generation
+                            catalog_ticket = None
+                        else:
+                            if index is not None:
+                                self.catalog_generation, catalog_ticket = index.capture_generation(generation)
+                            else:
+                                self.catalog_generation, catalog_ticket = 0, None
+                    except ValueError:
+                        raise SnapshotJobError(409, "Archive catalog generation is stale or unknown; refresh the catalog") from None
+                    if index is None and generation not in {None, 0}:
+                        raise SnapshotJobError(409, "Archive catalog generation is stale or unknown; refresh the catalog")
+                    actual_generation = self.catalog_generation
+                    key = (ticker, at.astimezone(timezone.utc).isoformat(), anchor, actual_generation)
+                    status, payload = jobs.request(key, lambda progress: build_snapshot(ticker, at, anchor, catalog_ticket, progress), token=token)
+                    self.reply(status, json.dumps(payload) if status == 202 else payload, "application/json; charset=utf-8")
                 else:
                     allowed = {"/": ("viewer.html", "text/html; charset=utf-8"),
                                "/viewer.js": ("viewer.js", "text/javascript"),
@@ -151,7 +280,10 @@ def make_handler(run_dir=None, *, db_paths=(), archive_dir=None, experiment_regi
                     name, kind = allowed[parsed.path]
                     self.reply(200, (STATIC / name).read_bytes(), kind)
             except CatalogPending as pending:
+                self.catalog_generation = pending.progress["generation"]
                 self.reply(202, json.dumps(pending.progress), "application/json")
+            except SnapshotJobError as error:
+                self.reply(error.status, error.message, "text/plain")
             except JournalScopeError:
                 self.reply(422, "Archive journal market scope unverified", "text/plain")
             except (OSError, ValueError, KeyError, TypeError, sqlite3.DatabaseError):

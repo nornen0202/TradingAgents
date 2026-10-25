@@ -97,7 +97,18 @@ def test_persistent_server_sees_new_runs_and_pure_research_apis_without_writes(t
     worker.start()
     base = f"http://127.0.0.1:{server.server_port}"
     def get(route, **query):
-        return json.load(urlopen(base + route + "?" + urlencode({"as_of": ASOF, **query})))
+        import time
+        values = {"as_of": ASOF, **query}
+        for _ in range(100):
+            with urlopen(base + route + "?" + urlencode(values)) as response:
+                payload = json.load(response)
+                if response.status != 202:
+                    return payload
+            values["catalog_generation"] = payload["generation"]
+            if payload.get("status") == "SNAPSHOT_BUILDING":
+                values["snapshot_job"] = payload["job_token"]
+            time.sleep(.01)
+        pytest.fail("Fixture archive response did not finish")
     try:
         context = get("/api/context")
         assert context["tickers"]["AAPL"]["run_id"] == "original"
@@ -154,7 +165,8 @@ def test_kis_health_whitelist_distinguishes_read_connection_and_unverified_order
 def test_experiment_cards_api_reads_frozen_registry_and_filters_future(tmp_path):
     directory = run(tmp_path, "run")
     registry_path = tmp_path / "experiments.sqlite"
-    now = lambda: datetime(2026, 10, 16, 9, tzinfo=timezone.utc)
+    def now():
+        return datetime(2026, 10, 16, 9, tzinfo=timezone.utc)
     registry = ExperimentRegistry(registry_path, clock=now)
     spec = {"id": "paired", "hypothesis": "동일 비용의 규칙 비교", "universe": ["AAPL"], "capital": 10000,
         "currency": "USD", "benchmark": "SPY", "costs": {"fee_bps": 1, "slippage_bps": 2},

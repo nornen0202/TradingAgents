@@ -122,6 +122,7 @@ def test_slow_catalog_returns_progress_without_blocking_operational_health(tmp_p
         with urlopen(base + "/api/tickers") as response:
             assert response.status == 202
             progress = json.load(response)
+            assert int(response.headers["X-Archive-Catalog-Generation"]) == progress["generation"]
         assert time.monotonic() - started < 2
         assert json.load(urlopen(base + "/api/kis-strategy-health"))["real_orders_enabled"] is False
         release.set()
@@ -131,6 +132,7 @@ def test_slow_catalog_returns_progress_without_blocking_operational_health(tmp_p
                 data = json.load(response)
                 if response.status == 200:
                     assert data == ["AAPL"]
+                    assert int(response.headers["X-Archive-Catalog-Generation"]) == progress["generation"]
                     break
             assert time.monotonic() < deadline
     finally:

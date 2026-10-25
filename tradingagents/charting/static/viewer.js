@@ -5,11 +5,13 @@ let charts = [];
 let requestVersion = 0;
 let viewBusy = false;
 let viewController = null;
+let currentCatalog = null;
 const number = value => typeof value === "number" && Number.isFinite(value) ? value.toLocaleString("ko-KR", {maximumFractionDigits:3}) : "확인 불가";
 const display = value => value === null || value === undefined ? "확인 불가" : typeof value === "object" ? JSON.stringify(value) : String(value);
 function paragraph(text) { const element=document.createElement("p");element.textContent=text;return element; }
-async function getJson(url, onProgress, signal=viewController?.signal) {
+async function getJson(url, onProgress, signal=viewController?.signal, catalogReceipt) {
   const address=new URL(url,location.origin), deadline=performance.now()+120000;
+  let snapshotJob=null;
   while(true){
     if(signal?.aborted)throw new DOMException("조회 취소", "AbortError");
     const controller=new AbortController(), cancel=()=>controller.abort();
@@ -18,7 +20,10 @@ async function getJson(url, onProgress, signal=viewController?.signal) {
     let payload, response;
     try{
       response=await fetch(address,{signal:controller.signal});
-      if(!response.ok)throw Error("자료를 읽지 못했습니다. 잠시 후 다시 조회해 주세요.");
+      if(!response.ok){
+        const snapshotErrors={409:"자료 목록이 갱신됐습니다. 목록을 새로 확인한 뒤 다시 조회해 주세요.",410:"이전 차트 준비 작업이 종료됐거나 만료됐습니다. 다시 조회해 주세요.",429:"진행 중인 차트 준비 작업이 많습니다. 잠시 후 다시 조회해 주세요."};
+        throw Error(address.pathname==="/api/snapshot"&&snapshotErrors[response.status]||"자료를 읽지 못했습니다. 잠시 후 다시 조회해 주세요.");
+      }
       payload=await response.json();
     }catch(error){
       if(signal?.aborted)throw new DOMException("조회 취소", "AbortError");
@@ -26,16 +31,38 @@ async function getJson(url, onProgress, signal=viewController?.signal) {
       throw error;
     }finally{clearTimeout(timer);signal?.removeEventListener("abort",cancel);}
     if(signal?.aborted)throw new DOMException("조회 취소", "AbortError");
+    const catalogHeader=response.headers.get("X-Archive-Catalog-Generation");
+    let generation=null;
+    if(catalogHeader!==null){
+      generation=/^\d+$/.test(catalogHeader)?Number(catalogHeader):NaN;
+      if(!Number.isSafeInteger(generation)||generation<0)throw Error("자료 목록의 세대를 확인할 수 없습니다.");
+      if(catalogReceipt)catalogReceipt.generation=generation;
+    }else if(catalogReceipt)throw Error("자료 목록의 세대를 확인할 수 없습니다.");
+    if(snapshotJob && generation!==Number(address.searchParams.get("catalog_generation")))throw Error("조회 작업의 자료 세대가 변경됐습니다. 다시 조회해 주세요.");
     if(response.status!==202)return payload;
-    if(payload.status!=="INDEXING" || !Number.isInteger(payload.generation))throw Error("자료 목록의 진행 상태를 확인할 수 없습니다.");
+    if(!payload||typeof payload!=="object"||!Number.isSafeInteger(payload.generation)||payload.generation<0||generation!==payload.generation)throw Error("자료 목록의 진행 상태를 확인할 수 없습니다.");
+    if(payload.status==="SNAPSHOT_BUILDING"){
+      if(address.pathname!=="/api/snapshot"||typeof payload.job_token!=="string"||!(/^[A-Za-z0-9_-]{1,160}$/).test(payload.job_token)
+          ||!['QUEUED','INDEX','SELECTION_COVERAGE','REPLAY','BUILD','SERIALIZE','VERIFY'].includes(payload.phase)
+          ||!Number.isFinite(payload.elapsed_seconds)||payload.elapsed_seconds<0
+          ||!Number.isFinite(payload.phase_elapsed_seconds)||payload.phase_elapsed_seconds<0
+          ||(snapshotJob!==null&&snapshotJob!==payload.job_token))throw Error("차트 준비 작업의 진행 상태를 확인할 수 없습니다.");
+      snapshotJob=payload.job_token;
+      address.searchParams.set("snapshot_job",snapshotJob);
+    }else if(payload.status!=="INDEXING"||snapshotJob!==null)throw Error("자료 목록의 진행 상태를 확인할 수 없습니다.");
     if(onProgress)onProgress(payload);
-    if(performance.now()>=deadline)throw Error("보관 자료 목록을 아직 확인 중입니다. 운영 상태는 아래에서 볼 수 있으며, 잠시 후 목록을 다시 조회해 주세요.");
+    if(performance.now()>=deadline)throw Error(snapshotJob?"차트 자료를 아직 준비 중입니다. 운영 상태를 확인한 뒤 다시 조회해 주세요.":"보관 자료 목록을 아직 확인 중입니다. 운영 상태는 아래에서 볼 수 있으며, 잠시 후 목록을 다시 조회해 주세요.");
     address.searchParams.set("catalog_generation",payload.generation);
     await new Promise(resolve=>setTimeout(resolve,500));
   }
 }
 function catalogProgress(progress){
   byId("status").textContent="보관 자료 목록을 확인하고 있습니다 · 실행 기록 "+number(progress.manifests_checked)+"개 확인. 운영 상태는 아래에서 별도로 확인할 수 있습니다.";
+}
+function snapshotProgress(progress){
+  if(progress.status==="INDEXING"){catalogProgress(progress);return;}
+  const phases={QUEUED:"차트 준비 순서를 기다리고 있습니다",INDEX:"차트 원본 목록을 확인하고 있습니다",SELECTION_COVERAGE:"선택한 원본과 표시 근거를 확인하고 있습니다",REPLAY:"당시 체결·성과 이력을 확인하고 있습니다",BUILD:"완료 봉과 차트를 준비하고 있습니다",SERIALIZE:"차트 응답을 준비하고 있습니다",VERIFY:"원본 변경 여부를 확인하고 있습니다"};
+  byId("status").textContent=phases[progress.phase]+" · "+number(Math.floor(progress.elapsed_seconds))+"초 경과. 운영 상태는 아래에서 별도로 확인할 수 있습니다.";
 }
 function setViewBusy(busy){
   viewBusy=busy;
@@ -131,13 +158,13 @@ function renderKisValidation(health) {
   byId("kis-validation-health").replaceChildren(heading,cards,paragraph("접수는 체결과 다르며, 취소 요청 접수만으로 취소 완료를 표시하지 않습니다. 표시 시각은 증권사 결과를 확인한 한국 시각이며 실제 체결·정산 시각과 다를 수 있습니다. 이 화면은 읽기전용입니다."));
   if(Object.values(markets).some(row=>["ATTENTION","BLOCKED"].includes(row.status)))byId("kis-validation-health").append(paragraph("추가 확인이 필요한 기록이 있습니다. 미확정 주문은 자동 재전송하지 않습니다."));
 }
-async function loadOperational(asof,version) {
+async function loadOperational(asof,version,signal=viewController?.signal) {
   const views=[['kis-strategy-health',renderKisStrategy,"KIS 전략 운영 기록을 읽지 못했습니다."],['paper-health',renderHealth,"모의 운영 상태를 읽지 못했습니다."],['kis-demo-health',renderKisHealth,"모의 서버 조회 점검 기록을 읽지 못했습니다."],['kis-validation-health',renderKisValidation,"모의 서버 주문 검증 기록을 읽지 못했습니다."]];
   views.forEach(([id])=>byId(id).replaceChildren(paragraph("운영 기록을 확인하고 있습니다.")));
   byId("strategy-overview")?.replaceChildren(paragraph("기준 시각의 정상 전략 체결·비용·다음 확인 항목을 불러오고 있습니다."));
   await Promise.allSettled(views.map(async([id,render,error])=>{
     try{
-      const result=await getJson("/api/"+id+"?as_of="+encodeURIComponent(asof));
+      const result=await getJson("/api/"+id+"?as_of="+encodeURIComponent(asof),undefined,signal);
       if(version===requestVersion)render(result);
     }catch(failure){if(version===requestVersion){byId(id).replaceChildren(paragraph(error));if(id==="kis-strategy-health")byId("strategy-overview")?.replaceChildren(paragraph("현재 운영 상태를 읽지 못했습니다. 이전 결과로 판단하지 말고 다시 조회해 주세요."));}}
   }));
@@ -261,26 +288,32 @@ function clearSnapshot() {
   ["verdict","freshness","profile","performance","unverified","source-context","experiment-cards"].forEach(id=>byId(id).textContent="");
   ["reasons","facts","inferences","events"].forEach(id=>list(id,[]));window.reviewSnapshot=null;
 }
+function snapshotSourceText(snapshot){
+  const source=snapshot.source_context||{};
+  return "조회 기준 시각: "+(snapshot.as_of_evaluated_at||"시각 미확인")+" · 원본 실행: "+(source.run_id||"미확인")+" · 연구 완료 "+(source.research_finished_at||"시각 미확인")+" · 완료 봉 "+snapshot.series.reduce((sum,item)=>sum+item.bars.length,0)+"개 · 이벤트 "+snapshot.events.events.length+"건";
+}
 async function showSnapshot(existingOperational, existingVersion) {
   const version = existingVersion ?? ++requestVersion;
+  const signal=viewController?.signal;
   byId("status").textContent = "기준 시각의 자료를 확인하고 있습니다.";
   const params = new URLSearchParams({ ticker: byId("ticker").value, as_of: byId("asof").value });
   // Operational receipts must remain visible even when a ticker has no chart.
-  const operational = existingOperational || loadOperational(params.get("as_of"),version);
+  const operational = existingOperational || loadOperational(params.get("as_of"),version,signal);
+  if(currentCatalog?.asOf===params.get("as_of"))params.set("catalog_generation",currentCatalog.generation);
   if (byId("anchor").value) params.set("anchor", byId("anchor").value);
   try {
-    const snapshot = await getJson("/api/snapshot?" + params, catalogProgress);
+    const snapshot = await getJson("/api/snapshot?" + params,progress=>{if(version===requestVersion&&!signal?.aborted)snapshotProgress(progress);},signal);
     if (version !== requestVersion) return;
     charts.forEach(chart => chart.remove()); charts = [];
     byId("charts").replaceChildren();
     const source=snapshot.source_context||{};
-    byId("source-context").textContent="원본 실행: "+(source.run_id||"미확인")+" · 연구 완료 "+(source.research_finished_at||"시각 미확인")+" · 완료 봉 "+snapshot.series.reduce((sum,item)=>sum+item.bars.length,0)+"개 · 이벤트 "+snapshot.events.events.length+"건";
+    byId("source-context").textContent=snapshotSourceText(snapshot);
     if(source.chart_capture_status){
       const capture=source.chart_capture_status;
       byId("source-context").textContent+=" · 차트 갱신 "+(capture.status==="REFRESHED"?"확인":"자료 확보 실패·원본 유지")+" "+capture.checked_at;
       if(capture.error_type)byId("source-context").textContent+=" ("+capture.error_type+")";
     }
-    const secondary=await Promise.allSettled([getJson("/api/experiment-cards?as_of="+encodeURIComponent(snapshot.as_of_evaluated_at)),operational]);
+    const secondary=await Promise.allSettled([getJson("/api/experiment-cards?as_of="+encodeURIComponent(snapshot.as_of_evaluated_at),undefined,signal),operational]);
     if(version!==requestVersion)return;
     if(secondary[0].status==="fulfilled")renderCards(secondary[0].value);else byId("experiment-cards").replaceChildren(paragraph("실험 카드를 읽지 못했습니다."));
     byId("verdict").textContent = snapshot.execution_verdict
@@ -338,9 +371,12 @@ async function loadSnapshot() {
   setViewBusy(true);
   try{await showSnapshot();}finally{if(controller===viewController)setViewBusy(false);}
 }
-async function refreshCatalog() {
+async function refreshCatalog(version=requestVersion,signal=viewController?.signal) {
   const selected=byId("ticker").value;
-  const tickers=await getJson("/api/tickers?as_of="+encodeURIComponent(byId("asof").value),catalogProgress);
+  const asOf=byId("asof").value, receipt={};
+  const tickers=await getJson("/api/tickers?as_of="+encodeURIComponent(asOf),progress=>{if(version===requestVersion&&!signal?.aborted)catalogProgress(progress);},signal,receipt);
+  if(version!==requestVersion||signal?.aborted)return false;
+  currentCatalog={asOf,generation:receipt.generation};
   byId("ticker").replaceChildren(...tickers.map(ticker=>{const option=document.createElement("option");option.value=ticker;option.textContent=ticker;return option;}));
   if(tickers.includes(selected))byId("ticker").value=selected;
   list("candidates",tickers);
@@ -359,7 +395,7 @@ async function start() {
     if(byId("follow-current").checked)byId("asof").value=new Date().toISOString();
     const version=++requestVersion;
     const operational=loadOperational(byId("asof").value,version);
-    try{if(await refreshCatalog())await showSnapshot(operational,version);}
+    try{if(await refreshCatalog(version,viewController.signal))await showSnapshot(operational,version);}
     catch(error){if(version===requestVersion)byId("status").textContent=error.message;}
     finally{await operational;if(version===requestVersion)setViewBusy(false);}
   });

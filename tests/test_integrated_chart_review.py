@@ -1,8 +1,7 @@
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 import hashlib
 from http.server import ThreadingHTTPServer
 import json
-from pathlib import Path
 from threading import Thread
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
@@ -174,7 +173,18 @@ def test_local_snapshot_api_blocks_traversal_rebinding_and_writes(tmp_path):
     url = f"http://127.0.0.1:{server.server_port}"
     try:
         assert json.load(urlopen(url + "/api/tickers")) == ["TEST"]
-        snapshot = json.load(urlopen(url + "/api/snapshot?ticker=TEST&as_of=2026-10-16T12:00:00Z"))
+        import time
+        from urllib.parse import urlencode
+        query = {"ticker": "TEST", "as_of": "2026-10-16T12:00:00Z"}
+        for _ in range(100):
+            with urlopen(url + "/api/snapshot?" + urlencode(query)) as response:
+                snapshot = json.load(response)
+                if response.status != 202:
+                    break
+            query.update(catalog_generation=snapshot["generation"], snapshot_job=snapshot["job_token"])
+            time.sleep(.01)
+        else:
+            pytest.fail("Fixture snapshot did not finish")
         assert snapshot["ticker"] == "TEST"
         for path, code in (("/api/snapshot?ticker=..", 400), ("/../../AGENTS.md", 404)):
             with pytest.raises(HTTPError) as error:

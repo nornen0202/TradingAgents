@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from contextlib import closing
+import hashlib
 import json
 import math
 from pathlib import Path
@@ -62,6 +63,7 @@ def replay_action_history(
     db_path: str | Path | Sequence[str | Path], *, analysis_as_of: str,
     ticker: str | None = None, initial_cash: float | None = None,
     initial_positions: Mapping[str, float] | None = None,
+    proof_hook=None,
 ) -> dict[str, Any]:
     """Read tracker plus a single account's journal without writes or networking.
 
@@ -101,6 +103,12 @@ def replay_action_history(
                (event["mode"], event["intent_id"], event["signal_id"]) in known_intents}
     if ticker:
         validate_opening_seeds(visible)
+    if proof_hook is not None:
+        # Private response-job integrity receipt over exactly these already
+        # admitted dependencies, including seeds concealed from a ticker view.
+        # No extra SQL, changed admission rule, or new data authority is added.
+        proof_hook(hashlib.sha256(json.dumps(visible, sort_keys=True, separators=(",", ":"), allow_nan=False).encode()).hexdigest())
+    if ticker:
         visible = {key: event for key, event in visible.items() if event["kind"] == "ACCOUNT_SEED"
                    or str(event["payload"].get("ticker", "")).upper() == ticker.upper()}
     active_reviews = {event["event_id"] for event in select_retrospectives(

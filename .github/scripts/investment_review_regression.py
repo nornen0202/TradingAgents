@@ -122,6 +122,17 @@ async def probe(websocket_url, page_url):
             return result.get("result", {}).get("value")
 
         await call("Page.enable")
+        await call("Page.addScriptToEvaluateOnNewDocument", {"source": '''
+          window.__reviewRequests=[];
+          const wireFetch=window.fetch.bind(window);
+          window.fetch=async(url,...args)=>{
+            const address=new URL(url,location.origin),row={path:address.pathname,query:Object.fromEntries(address.searchParams)};
+            if(['/api/tickers','/api/snapshot'].includes(address.pathname))window.__reviewRequests.push(row);
+            const response=await wireFetch(url,...args);
+            row.status=response.status;row.generation=response.headers.get('X-Archive-Catalog-Generation');
+            return response;
+          };
+        '''})
         for width in (360, 390, 430, 1440):
             await call("Emulation.setDeviceMetricsOverride", {"width": width, "height": 1000, "deviceScaleFactor": 1, "mobile": width < 600})
             await call("Page.navigate", {"url": page_url})
@@ -130,11 +141,13 @@ async def probe(websocket_url, page_url):
                 if await evaluate("Boolean(window.reviewSnapshot && document.querySelector('#charts canvas'))"):
                     break
             else:
-                raise RuntimeError("Lightweight Charts did not render its snapshot")
+                diagnostic = await evaluate("({status:document.querySelector('#status')?.textContent,requests:window.__reviewRequests?.slice(-8)})")
+                raise RuntimeError("Lightweight Charts did not render its snapshot: " + json.dumps(diagnostic, ensure_ascii=False))
             result = await evaluate('''(() => {
               if (window.__pwned || document.querySelector('#facts img')) throw Error('Evidence executed markup');
               if (!document.querySelector('#reasons').textContent.includes('volume_rule_not_met')) throw Error('Engine reasons missing');
               if (window.reviewSnapshot.broker_orders_sent !== 0) throw Error('Viewer is not read only');
+              if (!document.querySelector('#source-context').textContent.includes('조회 기준 시각: '+window.reviewSnapshot.as_of_evaluated_at)) throw Error('Snapshot cutoff was hidden or replaced by completion time');
               if (!document.querySelector('#paper-health').textContent.includes('휴장·장 종료')) throw Error('Paper status absent');
               if (!document.querySelector('#kis-demo-health').textContent.includes('조회 점검 기록 없음') || !document.querySelector('#kis-demo-health').textContent.includes('잔고·주문내역 조회')) throw Error('KIS read/order distinction absent');
               if (!document.querySelector('#kis-validation-health').textContent.includes('주문·체결·취소 확인 완료') || !document.querySelector('#kis-validation-health').textContent.includes('다음 정규장 대기') || !document.querySelector('#kis-validation-health').textContent.includes('미검증')) throw Error('KIS execution stage distinction absent');
@@ -152,6 +165,12 @@ async def probe(websocket_url, page_url):
             })()''')
             if result["width"] != width:
                 raise RuntimeError(f"Mobile layout viewport expanded from {width} to {result['width']}")
+            result["catalog_snapshot_same_generation"] = await evaluate('''(() => {
+              const catalog=window.__reviewRequests.find(r=>r.path==='/api/tickers'&&r.status===200);
+              const snapshot=window.__reviewRequests.find(r=>r.path==='/api/snapshot');
+              if(!catalog||!/^\\d+$/.test(catalog.generation)||!snapshot||snapshot.query.catalog_generation!==catalog.generation)throw Error('First catalog 200 generation was lost before snapshot');
+              return true;
+            })()''')
             table_layout = await evaluate('''(() => {
               document.querySelectorAll('#kis-strategy-health details').forEach(d=>d.open=true);
               const visible=e=>!!e.getClientRects().length&&getComputedStyle(e).visibility!=='hidden';
@@ -234,20 +253,54 @@ async def probe(websocket_url, page_url):
             if not await evaluate("document.querySelector('#status').getAttribute('aria-busy')==='false' && !document.querySelector('#asof').disabled && !viewBusy"):
                 raise RuntimeError("Empty archive stranded refresh controls")
             result["empty_catalog_preserves_operations"] = True
-            for catalog_mode in ("indexing", "health-delay", "pending", "timeout", "failed"):
+            for catalog_mode in ("indexing", "snapshot-progress", "health-delay", "pending", "timeout", "failed"):
                 injected = await call("Page.addScriptToEvaluateOnNewDocument", {"source": '''
                   window.__catalogMode=MODE;
                   const originalFetch=window.fetch.bind(window),originalTimeout=window.setTimeout.bind(window);
                   window.__indexingResponses=0;
+                  window.__snapshotProgressResponses=0;
                   window.setTimeout=(fn,ms,...args)=>originalTimeout(fn,window.__catalogMode==='timeout'&&ms===15000?300:ms,...args);
                   function pendingRequest(args){return new Promise((resolve,reject)=>{
                     args[0]?.signal?.addEventListener('abort',()=>reject(new DOMException('aborted','AbortError')),{once:true});
                   });}
                   window.fetch=(url,...args)=>{
-                    const path=new URL(url,location.origin).pathname;
+                    const address=new URL(url,location.origin),path=address.pathname;
+                    const jsonResponse=(payload,status,generation)=>new Response(JSON.stringify(payload),{status,headers:{'Content-Type':'application/json','X-Archive-Catalog-Generation':String(generation)}});
+                    const indexProgress=()=>jsonResponse({status:'INDEXING',generation:Number(window.__indexingGeneration),manifests_checked:12,manifests_parsed:12},202,window.__indexingGeneration);
+                    const snapshotProgress=()=>{
+                      const phase=window.__releaseSnapshot?'BUILD':'REPLAY';
+                      if(window.__releaseSnapshot)window.__snapshotBuildShown=true;
+                      window.__snapshotProgressResponses++;
+                      return jsonResponse({status:'SNAPSHOT_BUILDING',job_token:window.__fixtureJob,generation:Number(window.__snapshotGeneration),phase,elapsed_seconds:20+window.__snapshotProgressResponses,phase_elapsed_seconds:1},202,window.__snapshotGeneration);
+                    };
                     if(path==='/api/kis-demo-health' && window.__catalogMode==='health-delay')return pendingRequest(args);
+                    if(path==='/api/snapshot' && window.__catalogMode==='snapshot-progress'){
+                      if(window.__snapshotPayload){
+                        if(!window.__releaseSnapshot||!window.__snapshotBuildShown)return Promise.resolve(snapshotProgress());
+                        return Promise.resolve(jsonResponse(window.__snapshotPayload,200,window.__snapshotGeneration));
+                      }
+                      return originalFetch(url,...args).then(async response=>{
+                        if(response.status!==200)return response;
+                        window.__snapshotPayload=await response.clone().json();
+                        window.__snapshotGeneration=response.headers.get('X-Archive-Catalog-Generation');
+                        window.__fixtureJob=address.searchParams.get('snapshot_job')||'fixture_job';
+                        return snapshotProgress();
+                      });
+                    }
                     if(path==='/api/tickers') {
-                      if(window.__catalogMode==='indexing' && window.__indexingResponses++<2)return Promise.resolve(new Response(JSON.stringify({status:'INDEXING',generation:1,manifests_checked:12,manifests_parsed:12}),{status:202,headers:{'Content-Type':'application/json'}}));
+                      if(window.__catalogMode==='indexing'){
+                        if(window.__indexingPayload){
+                          if(window.__indexingResponses++<2)return Promise.resolve(indexProgress());
+                          return Promise.resolve(jsonResponse(window.__indexingPayload,200,window.__indexingGeneration));
+                        }
+                        return originalFetch(url,...args).then(async response=>{
+                          if(response.status!==200)return response;
+                          window.__indexingPayload=await response.clone().json();
+                          window.__indexingGeneration=response.headers.get('X-Archive-Catalog-Generation');
+                          window.__indexingResponses++;
+                          return indexProgress();
+                        });
+                      }
                       if(window.__catalogMode==='timeout')return pendingRequest(args);
                       if(window.__catalogMode==='pending')return new Promise((resolve,reject)=>{
                         const signal=args[0]?.signal;
@@ -278,6 +331,23 @@ async def probe(websocket_url, page_url):
                         raise RuntimeError("202 discovery did not complete")
                     if not await evaluate("window.__indexingResponses>=2"):
                         raise RuntimeError("202 fixture not exercised")
+                if catalog_mode == "snapshot-progress":
+                    for _ in range(60):
+                        await asyncio.sleep(.1)
+                        if await evaluate("viewBusy && document.querySelector('#status').textContent.includes('체결·성과 이력') && document.querySelector('#status').getClientRects().length>0"):
+                            break
+                    else:
+                        diagnostic = await evaluate("({status:document.querySelector('#status')?.textContent,polls:window.__snapshotProgressResponses,busy:viewBusy})")
+                        raise RuntimeError("Snapshot work did not expose separate replay progress: " + json.dumps(diagnostic, ensure_ascii=False))
+                    await evaluate("window.__releaseSnapshot=true")
+                    for _ in range(60):
+                        await asyncio.sleep(.1)
+                        if await evaluate("Boolean(window.reviewSnapshot && !viewBusy)"):
+                            break
+                    else:
+                        raise RuntimeError("Snapshot 202 progress did not complete")
+                    if not await evaluate("window.__snapshotProgressResponses>=2 && window.__snapshotBuildShown"):
+                        raise RuntimeError("Snapshot work-progress fixture was not exercised")
                 if catalog_mode == "timeout":
                     for _ in range(30):
                         await asyncio.sleep(.1)
@@ -351,6 +421,12 @@ def main():
         try:
             layout._probe_viewports = probe
             results = layout._run_probe(f"http://127.0.0.1:{server.server_port}/", root / "chrome")
+        except Exception as error:
+            if OUTPUT:
+                with (OUTPUT / "result.json").open("x", encoding="utf-8") as stream:
+                    json.dump({"status": "FAILED", "mode": "FIXTURE_ONLY", "error_type": type(error).__name__,
+                               "message": str(error)[:15000]}, stream, ensure_ascii=False, indent=2)
+            raise
         finally:
             server.shutdown()
             worker.join(timeout=5)
@@ -360,7 +436,11 @@ def main():
             empty_server.server_close()
         if server.unhandled_errors or empty_server.unhandled_errors:
             raise RuntimeError(f"Unhandled HTTP errors: {server.unhandled_errors + empty_server.unhandled_errors}")
-    print(json.dumps({"status": "PASSED", "viewports": results}, indent=2))
+    report = {"status": "PASSED", "mode": "FIXTURE_ONLY", "viewports": results}
+    if OUTPUT:
+        with (OUTPUT / "result.json").open("x", encoding="utf-8") as stream:
+            json.dump(report, stream, ensure_ascii=False, indent=2)
+    print(json.dumps(report, indent=2))
     return 0
 
 
