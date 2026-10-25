@@ -7,6 +7,7 @@ import shutil
 from pathlib import Path
 import sqlite3
 import stat as stat_module
+import weakref
 from threading import Event, Thread
 from types import SimpleNamespace
 import time
@@ -23,6 +24,56 @@ from tests.test_chart_catalog_index import put, ASOF
 
 
 KEY = ("AAPL", ASOF, None, 1)
+
+
+@pytest.mark.parametrize("kind,expected_status", [("result", 413), ("total", 429), ("builder", 422)])
+def test_terminal_errors_keep_no_worker_or_delivery_tracebacks(kind, expected_status):
+    jobs = SnapshotJobs(max_result_bytes=16 if kind == "result" else 1024,
+                        max_total_bytes=16 if kind == "total" else 2048)
+    entered, release = Event(), Event()
+    original_refs = []
+    class Original:
+        def __init__(self):
+            self.raw = bytearray(128 * 1024)
+    def build(_):
+        rejected_original = Original()
+        original_refs.append(weakref.ref(rejected_original))
+        entered.set()
+        assert release.wait(5)
+        if kind == "builder":
+            raise SnapshotJobError(422, "Fixture input invalid")
+        return ({"blob": "x" * 128, "original_bytes": len(rejected_original.raw)},
+                lambda: None, lambda: bool(rejected_original.raw))
+    try:
+        first = jobs.request(KEY, build)[1]["job_token"]
+        assert entered.wait(2)
+        second = jobs.request(KEY, build)[1]["job_token"]
+    finally:
+        release.set()
+    deadline = time.monotonic() + 3
+    while time.monotonic() < deadline:
+        with jobs._condition:
+            job = jobs._receipt_job(first)
+            if job.state == "ERROR":
+                stored = job.error
+                break
+        time.sleep(.005)
+    else:
+        pytest.fail("Fixture error did not finish")
+    assert stored.status == expected_status
+    assert stored.__traceback__ is None
+    assert stored.__context__ is None and stored.__cause__ is None
+    release_deadline = time.monotonic() + 2
+    while original_refs[0]() is not None and time.monotonic() < release_deadline:
+        time.sleep(.005)
+    assert original_refs[0]() is None, "Rejected financial input retained by terminal error callbacks"
+    for token in (first, second):
+        with pytest.raises(SnapshotJobError) as delivered:
+            jobs.request(KEY, token=token)
+        assert delivered.value.status == expected_status and delivered.value is not stored
+        assert stored.__traceback__ is None
+        assert stored.__context__ is None and stored.__cause__ is None
+    assert not jobs._jobs and not jobs._receipts
 
 
 def finish(jobs, key, token, *, timeout=5):

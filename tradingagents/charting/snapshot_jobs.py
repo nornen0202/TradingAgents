@@ -125,7 +125,9 @@ class SnapshotJobs:
                     raise SnapshotJobError(400, "Archive snapshot token does not match this query")
             if job.state == "ERROR":
                 self._drop_receipt(token)
-                raise job.error
+                # Raising the stored object would attach this caller's frame
+                # while another receipt still retains the terminal job.
+                raise SnapshotJobError(job.error.status, job.error.message) from None
             if job.state == "READY":
                 job.state, job.phase, job.phase_started = "VERIFYING", "VERIFY", now
                 self._enqueue(job.token, verify=True)
@@ -213,8 +215,13 @@ class SnapshotJobs:
                     if job.state == "CANCELLED" or token not in self._jobs:
                         self._drop_job(token)
                         continue
-                    job.error = error if isinstance(error, SnapshotJobError) else SnapshotJobError(422, "Archive input invalid, changed or unavailable")
-                    job.payload, job.build, job.verify = None, None, None
+                    # Keep status/message only, never a worker traceback that
+                    # retains rejected buffers, builders or financial inputs.
+                    job.error = (SnapshotJobError(error.status, error.message) if isinstance(error, SnapshotJobError)
+                                 else SnapshotJobError(422, "Archive input invalid, changed or unavailable"))
+                    job.payload, job.build, job.verify, job.delivery_valid = None, None, None, None
+                    encoded = payload = verify = None
+                    guards = ()
                     job.state, job.completed = "ERROR", self.clock()
 
 
