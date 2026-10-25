@@ -27,6 +27,7 @@ from tradingagents.scheduled.manifest_discovery import full_manifests_desc
 from tradingagents.scheduled.research_artifact_refs import KEYS as RESEARCH_REFERENCE_KEYS, ResearchArtifactStore
 from tradingagents.charting.capture import ChartCapture
 from tradingagents.agents.utils.instrument_resolver import resolve_instrument
+from tradingagents.agents.utils.decision_provenance import DecisionProvenanceSession
 from cli.stats_handler import StatsCallbackHandler
 from tradingagents.default_config import DEFAULT_CONFIG
 from tradingagents.dataflows.interface import reset_tool_telemetry, snapshot_tool_telemetry, snapshot_tool_requests
@@ -2028,6 +2029,7 @@ def _run_single_ticker(
     chart_token = chart_capture.activate()
     history_recorder = DailyHistoryEvidenceRecorder(ticker)
     history_token = history_recorder.activate()
+    decision_trace = DecisionProvenanceSession(ticker)
 
     try:
         reset_tool_telemetry()
@@ -2046,14 +2048,16 @@ def _run_single_ticker(
             config=graph_config,
             callbacks=[stats_handler, observation_recorder],
         )
-        final_state, decision = graph.propagate(
-            ticker,
-            trade_date,
-            analysis_date=analysis_date,
-        )
+        with decision_trace.capture():
+            final_state, decision = graph.propagate(
+                ticker,
+                trade_date,
+                analysis_date=analysis_date,
+            )
         if stats_handler.get_stats().get("llm_fallback_calls", 0):
             raise RuntimeError("Research graph returned an LLM fallback response; full analysis is incomplete.")
         structured_decision = _select_public_decision(final_state, decision)
+        decision_trace.bind_selected(structured_decision, final_state)
         final_state, report_writer_payload = polish_ticker_report(
             final_state,
             ticker=ticker,
@@ -2119,6 +2123,7 @@ def _run_single_ticker(
                 f"::warning::{ticker} same-day analysis completed without get_intraday_snapshot tool usage."
             )
         analysis_payload = {
+            "decision_provenance": decision_trace.receipt(),
             "daily_history_evidence": history_recorder.receipt(),
             "research_market_observation": observation_recorder.receipt(),
             "source_revision": os.getenv("TRADINGAGENTS_SOURCE_SHA"),
@@ -2312,6 +2317,7 @@ def _run_single_ticker(
         }
     except Exception as exc:
         error_payload = {
+            "decision_provenance": decision_trace.receipt(),
             "daily_history_evidence": history_recorder.receipt(),
             "research_market_observation": observation_recorder.receipt(),
             "ticker": ticker,

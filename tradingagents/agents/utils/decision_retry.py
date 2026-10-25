@@ -7,8 +7,16 @@ from typing import Any
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage
 
 from tradingagents.schemas import StructuredDecisionValidationError, ensure_structured_decision_json
+from .decision_provenance import mark_trace_unverified, record_decision_input as _record_decision_input
 
 _CODEX_FALLBACK_MARKER = "TRADINGAGENTS_CODEX_FALLBACK_RESPONSE"
+
+
+def record_decision_input(*args, **kwargs):
+    try:
+        _record_decision_input(*args, **kwargs)
+    except Exception:
+        mark_trace_unverified()
 
 
 def invoke_structured_decision_with_retry(
@@ -23,25 +31,34 @@ def invoke_structured_decision_with_retry(
         response = llm.invoke(prompt)
     except Exception as exc:
         if not _is_recoverable_codex_provider_error(exc):
+            record_decision_input(context, 0, "PROVIDER_EXCEPTION")
             raise
         decision_json = _fallback_structured_decision_json(context=context, reason=str(exc))
+        record_decision_input(context, 0, "PROVIDER_FALLBACK", normalized=decision_json)
         return AIMessage(content=decision_json), decision_json
     last_content = str(getattr(response, "content", "") or "")
     last_error: StructuredDecisionValidationError | None = None
 
     for _attempt in range(max(0, max_retries) + 1):
         if _is_codex_fallback_response(last_content):
-            return response, _fallback_structured_decision_json(context=context, reason=last_content)
+            decision_json = _fallback_structured_decision_json(context=context, reason=last_content)
+            record_decision_input(context, _attempt, "PROVIDER_FALLBACK", text=last_content, normalized=decision_json)
+            return response, decision_json
         try:
-            return response, ensure_structured_decision_json(last_content)
+            decision_json = ensure_structured_decision_json(last_content)
+            record_decision_input(context, _attempt, "VALIDATED_REPAIR" if _attempt else "VALIDATED_INITIAL",
+                                  text=last_content, normalized=decision_json)
+            return response, decision_json
         except StructuredDecisionValidationError as exc:
             last_error = exc
+            record_decision_input(context, _attempt, "VALIDATION_REJECTED", text=last_content)
             if _attempt >= max(0, max_retries):
                 decision_json = _fallback_structured_decision_json(
                     context=context,
                     reason=str(exc),
                     reason_code="STRUCTURED_DECISION_INVALID",
                 )
+                record_decision_input(context, _attempt, "STRUCTURAL_FALLBACK", normalized=decision_json)
                 return AIMessage(content=decision_json), decision_json
             repair_prompt = _build_repair_prompt(
                 context=context,
@@ -52,8 +69,10 @@ def invoke_structured_decision_with_retry(
                 response = llm.invoke(_append_repair_request(prompt, last_content, repair_prompt))
             except Exception as repair_exc:
                 if not _is_recoverable_codex_provider_error(repair_exc):
+                    record_decision_input(context, _attempt + 1, "PROVIDER_EXCEPTION")
                     raise
                 decision_json = _fallback_structured_decision_json(context=context, reason=str(repair_exc))
+                record_decision_input(context, _attempt + 1, "PROVIDER_FALLBACK", normalized=decision_json)
                 return AIMessage(content=decision_json), decision_json
             last_content = str(getattr(response, "content", "") or "")
 
