@@ -95,6 +95,23 @@ _REVIEWED = {
              "role": "REVIEWED_CURRENT_MASTER_IDENTITY_NOT_HISTORICAL_LISTING"},
         ],
     },
+    "396300.KQ": {
+        "symbol": "396300.KQ", "short_code": "396300", "board": "kosdaq",
+        "exchange": "KRX", "currency": "KRW", "isin": "KR7396300006",
+        # Original IPO issuer and current master name are separate evidence fields.
+        "issuer": "(주)세아메카닉스 보통주", "provider_name": "HT로보틱스",
+        "security_class": "COMMON_STOCK", "event_kind": "IPO_FIRST_REGULAR_COMMON_STOCK",
+        "first_regular_session": "2022-03-24",
+        "evidence_available_at": "2026-10-25T22:29:04.545082+00:00",
+        "sources": [
+            {"url": "https://kind.krx.co.kr/external/2022/03/22/001510/20220322005961/70760.htm",
+             "sha256": "a49cfc42142b5c71e5a1272d0262cb88e5e472458801dbc3d7237533f5ceb2a6",
+             "role": "EXCHANGE_NEW_COMMON_FIRST_TRADING_DATE_AND_ISIN"},
+            {"url": "https://new.real.download.dws.co.kr/common/master/kosdaq_code.mst.zip",
+             "sha256": "9e2db1f0bea2b3f7f74b71f3bdfcc3058466db50bd7d3764229bd9a4609a534e",
+             "role": "REVIEWED_CURRENT_MASTER_IDENTITY_NOT_HISTORICAL_LISTING"},
+        ],
+    },
 }
 _SHA = re.compile(r"[a-f0-9]{64}")
 
