@@ -372,12 +372,17 @@ def summary(db, now, market, marks=None):
               ("ACKNOWLEDGED", "OPEN", "PARTIAL", "FILLED", "CANCELLED", "REJECTED", "NOT_SENT", "BLOCKED", "UNKNOWN", "UNRESOLVED")}
     history = _performance_history(db, now)
     gross_pnl = round(sell - buy + value, 4) if complete and any(o["filled_quantity"] for o in orders) else None
+    from .strategy_settlement import strategy_settlement_evidence
+    settlements = strategy_settlement_evidence(db, orders, market=market, as_of=now.isoformat())
+    evaluation = evaluate_strategy_orders(orders, market=market, as_of=now.isoformat(), gross_pnl=gross_pnl,
+                                          valuation_complete=complete, settlement_evidence=settlements)
     return {"orders": orders[-100:], "order_counts": counts, "owned": owned, "performance_history": history,
-            "evaluation": evaluate_strategy_orders(orders, market=market, as_of=now.isoformat(), gross_pnl=gross_pnl, valuation_complete=complete),
+            "evaluation": evaluation,
             "performance": {"currency": "KRW" if market == "KR" else "USD", "basis": "STRATEGY_GROSS_CASHFLOWS_PLUS_MARKED_HOLDINGS",
                 "status": "NO_FILLS" if not any(o["filled_quantity"] for o in orders) else "AVAILABLE" if complete else "INCOMPLETE",
                 "gross_pnl": gross_pnl,
-                "net_pnl": None, "fees_known": False, "settlement_known": False,
+                "net_pnl": evaluation["net_pnl"], "actual_cost": evaluation["actual_cost"],
+                "fees_known": evaluation["fees_known"], "settlement_known": evaluation["settlement_known"],
                 "observed_at": now.isoformat(), "mark_times": mark_times}}
 
 

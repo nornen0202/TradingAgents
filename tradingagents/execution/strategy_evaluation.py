@@ -36,7 +36,7 @@ def _amount(value):
     return Decimal(str(value))
 
 
-def evaluate_strategy_orders(orders, *, market, as_of, gross_pnl, valuation_complete):
+def evaluate_strategy_orders(orders, *, market, as_of, gross_pnl, valuation_complete, settlement_evidence=None):
     """Evaluate verified cumulative observations without importing validation trades.
 
     Missing or invalid proof fails closed. A full liquidation establishes gross
@@ -157,9 +157,20 @@ def evaluate_strategy_orders(orders, *, market, as_of, gross_pnl, valuation_comp
         missing.append("OPEN_STRATEGY_INVENTORY")
     if pending:
         missing.append("ORDER_PENDING_OR_UNRESOLVED")
+    costs = {"status": "UNVERIFIED", "actual_cost": None, "realized_net_pnl": None,
+             "realized_actual_cost": None, "exact_fifo_available": False}
+    if settlement_evidence is not None:
+        from .strategy_settlement import settled_cost_totals
+        costs = settled_cost_totals(settlement_evidence, orders, currency=currency, as_of=as_of)
+    costs_known = costs["actual_cost"] is not None
+    actual_cost = Decimal(str(costs["actual_cost"])) if costs_known else None
+    net = gross - actual_cost if gross is not None and actual_cost is not None else None
+    if costs_known:
+        missing = [code for code in missing if code not in {
+            "ACTUAL_FEES_TAXES_FX_UNVERIFIED", "SETTLEMENT_UNVERIFIED", "BROKER_CORRECTIONS_UNVERIFIED"}]
     return {"schema": SCHEMA, "scope": "NORMAL_STRATEGY_ONLY", "market": market,
             "currency": currency, "analysis_as_of": as_of,
-            "status": "NO_FILLS" if not has_fills else "AVAILABLE_GROSS_ONLY" if gross is not None else "INCOMPLETE",
+            "status": "NO_FILLS" if not has_fills else "AVAILABLE_NET_OF_REVIEWED_COSTS" if net is not None else "AVAILABLE_GROSS_ONLY" if gross is not None else "INCOMPLETE",
             "sample": {"filled_order_count": len(validated), "buy_filled_orders": len(buys), "sell_filled_orders": len(sells),
                        "buy_filled_quantity": sum(o["filled_quantity"] for o in buys),
                        "sell_filled_quantity": sum(o["filled_quantity"] for o in sells),
@@ -174,8 +185,12 @@ def evaluate_strategy_orders(orders, *, market, as_of, gross_pnl, valuation_comp
             "gross_pnl": round(float(gross), 4) if gross is not None else None,
             "realized_gross_pnl": round(float(sell - buy), 4) if has_fills and flat and money_known and sequence_known else None,
             "realized_basis": "FULLY_CLOSED_STRATEGY_CASHFLOWS" if has_fills and flat and money_known and sequence_known else "UNAVAILABLE",
-            "exact_fifo_available": False, "actual_cost": None, "net_pnl": None,
-            "fees_known": False, "settlement_known": False,
+            "exact_fifo_available": costs["exact_fifo_available"], "actual_cost": float(actual_cost) if actual_cost is not None else None,
+            "net_pnl": round(float(net), 4) if net is not None else None,
+            "realized_net_pnl": costs["realized_net_pnl"], "realized_actual_cost": costs["realized_actual_cost"],
+            "fees_known": costs_known, "settlement_known": costs_known,
+            "cost_evidence_status": costs["status"],
+            "actual_cost_basis": "OPERATOR_REVIEWED_EXECUTION_SETTLEMENT_IMPORT" if costs_known else "UNVERIFIED",
             "cost_sensitivity": {"basis": "ASSUMPTION_ONLY_NOT_BROKER_COSTS", "applies_to": "OBSERVED_BUY_PLUS_SELL_NOTIONAL",
                                  "assumption": "10/30/50 bps of observed turnover; no measured fee, tax, FX or other cost coverage is claimed",
                                  "includes_future_exit_cost": False,
