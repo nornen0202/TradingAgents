@@ -290,7 +290,7 @@ def now_utc():
     return datetime.now(timezone.utc)
 
 
-def _strategy_evaluation_view(raw, market, observed):
+def _strategy_evaluation_view(raw, market, observed, *, verified_costs=None):
     """Expose a bounded, dated evaluation; assumptions cannot become actual costs."""
     import math
     from decimal import Decimal, ROUND_CEILING
@@ -301,7 +301,7 @@ def _strategy_evaluation_view(raw, market, observed):
     if (raw.get("schema") != "tradingagents.strategy-evaluation/v1"
             or raw.get("scope") != "NORMAL_STRATEGY_ONLY" or raw.get("market") != market
             or raw.get("currency") != currency or known is None or known > observed
-            or raw.get("status") not in {"NO_FILLS", "AVAILABLE_GROSS_ONLY", "INCOMPLETE"}
+            or raw.get("status") not in {"NO_FILLS", "AVAILABLE_GROSS_ONLY", "AVAILABLE_NET_OF_REVIEWED_COSTS", "INCOMPLETE"}
             or raw.get("real_orders_enabled") is not False or raw.get("automatic_live_transition") is not False):
         return None
     sample = raw.get("sample")
@@ -336,7 +336,7 @@ def _strategy_evaluation_view(raw, market, observed):
     if (counts["filled_order_count"] and turnover == 0
             or not counts["filled_order_count"] and (gross is not None or realized is not None or turnover not in {None, 0})):
         return None
-    if raw["status"] != "AVAILABLE_GROSS_ONLY":
+    if raw["status"] not in {"AVAILABLE_GROSS_ONLY", "AVAILABLE_NET_OF_REVIEWED_COSTS"}:
         gross = None
     elif gross is None:
         return None
@@ -372,8 +372,43 @@ def _strategy_evaluation_view(raw, market, observed):
     unmet = raw.get("unmet_criteria")
     if not isinstance(unmet, list) or not all(isinstance(value, str) and value in allowed for value in unmet):
         return None
-    required = {"ACTUAL_FEES_TAXES_FX_UNVERIFIED", "SETTLEMENT_UNVERIFIED", "BROKER_CORRECTIONS_UNVERIFIED",
-                "STATISTICAL_AND_OUT_OF_SAMPLE_VALIDATION_REQUIRED"}
+    # Cached JSON cannot attest to charged costs. Only the separately configured
+    # ledger reader below may supply this value; no HTTP parameter controls it.
+    actual, net, realized_net, realized_cost, exact_fifo = None, None, None, None, False
+    costs_known = False
+    if isinstance(verified_costs, dict) and verified_costs.get("cost_evidence_status") == "COMPLETE_REVIEWED_IMPORT":
+        proof_sample = verified_costs.get("sample") or {}
+        matches = (verified_costs.get("currency") == currency
+                   and instant(verified_costs.get("analysis_as_of")) == known
+                   and verified_costs.get("turnover") == turnover
+                   and all(proof_sample.get(k) == v for k, v in counts.items())
+                   and instant(proof_sample.get("first_observed_at")) == first
+                   and instant(proof_sample.get("last_observed_at")) == last
+                   and verified_costs.get("fees_known") is True and verified_costs.get("settlement_known") is True
+                   and verified_costs.get("actual_cost_basis") == "OPERATOR_REVIEWED_EXECUTION_SETTLEMENT_IMPORT")
+        cost = number(verified_costs.get("actual_cost"))
+        if matches and counts["filled_order_count"] and cost is not None and cost >= 0:
+            actual, costs_known = cost, True
+            # No mark price is reconstructed from a cached timestamp alone.
+            # With open inventory the readonly reader proves costs and FIFO
+            # realization, while marked net waits for reproducible mark proof.
+            if verified_costs.get("net_pnl") is not None:
+                proof_gross, proof_net = number(verified_costs.get("gross_pnl")), number(verified_costs.get("net_pnl"))
+                if proof_gross is None or proof_net is None or gross is None or abs(proof_gross-gross) > .00011 or abs(proof_net-(gross-cost)) > .00011:
+                    return None
+                net = proof_net
+            exact_fifo = verified_costs.get("exact_fifo_available") is True
+            if exact_fifo:
+                realized_net, realized_cost = (number(verified_costs.get(k)) for k in ("realized_net_pnl", "realized_actual_cost"))
+    required = {"STATISTICAL_AND_OUT_OF_SAMPLE_VALIDATION_REQUIRED"}
+    cost_missing = {"ACTUAL_FEES_TAXES_FX_UNVERIFIED", "SETTLEMENT_UNVERIFIED", "BROKER_CORRECTIONS_UNVERIFIED"}
+    if not costs_known:
+        required |= cost_missing
+        # A stale or unconfigured receipt is not grounds to trust cached fees.
+        if raw.get("cost_evidence_status") == "COMPLETE_REVIEWED_IMPORT":
+            unmet = list(dict.fromkeys([*unmet, *sorted(cost_missing)]))
+    else:
+        unmet = [code for code in unmet if code not in cost_missing]
     if not counts["filled_order_count"]:
         required.add("NO_STRATEGY_FILLS")
     for side in ("buy", "sell"):
@@ -385,17 +420,58 @@ def _strategy_evaluation_view(raw, market, observed):
         required.add("OPEN_STRATEGY_INVENTORY")
     if not required <= set(unmet):
         return None
-    return {"status": raw["status"], "currency": currency, "analysis_as_of": known.isoformat(),
+    status = "AVAILABLE_NET_OF_REVIEWED_COSTS" if net is not None else "AVAILABLE_GROSS_ONLY" if gross is not None else raw["status"]
+    return {"status": status, "currency": currency, "analysis_as_of": known.isoformat(),
             "sample": {**counts, "closed_inventory_episodes": closed}, "turnover": turnover,
             "gross_pnl": gross, "realized_gross_pnl": realized,
-            "net_pnl": None, "actual_cost": None, "fees_known": False, "settlement_known": False,
+            "net_pnl": net, "actual_cost": actual, "fees_known": costs_known, "settlement_known": costs_known,
+            "realized_net_pnl": realized_net, "realized_actual_cost": realized_cost, "exact_fifo_available": exact_fifo,
+            "cost_evidence_status": "COMPLETE_REVIEWED_IMPORT" if costs_known else "UNVERIFIED",
+            "actual_cost_basis": "OPERATOR_REVIEWED_EXECUTION_SETTLEMENT_IMPORT" if costs_known else "UNVERIFIED",
             "cost_sensitivity": {"basis": "ASSUMPTION_ONLY_NOT_BROKER_COSTS", "scenarios": projected,
                                  "includes_future_exit_cost": False},
             "unmet_criteria": list(dict.fromkeys(unmet)), "readiness": "NOT_READY_FOR_REAL_INVESTMENT",
             "real_orders_enabled": False, "automatic_live_transition": False}
 
 
-def kis_strategy_health(archive_dir, *, analysis_as_of):
+def _readonly_strategy_costs(directory, market, cutoff):
+    """Read the fixed normal ledger without credentials, a broker, DDL or HTTP.
+
+    Rollback-journal ledgers are the current strategy format. An active journal
+    or WAL configuration defers this optional cost read; SQLite must not create
+    SHM or recover a hot journal from a viewer request. No immutable=1 bypass.
+    """
+    from contextlib import closing
+    import sqlite3
+    if directory is None or cutoff is None:
+        return None
+    try:
+        root = Path(directory).resolve()
+        path = (root / f"{market.lower()}-strategy.sqlite").resolve()
+        if not path.is_relative_to(root) or not path.is_file():
+            return None
+        if any(Path(str(path)+suffix).exists() for suffix in ("-wal", "-shm", "-journal")):
+            return None
+        with path.open("rb") as stream:
+            header = stream.read(20)
+        if len(header) != 20 or header[:16] != b"SQLite format 3\x00" or header[18:20] != b"\x01\x01":
+            return None
+        from tradingagents.execution.demo_runtime import summary
+        from tradingagents.execution.kis_demo import DemoError
+        try:
+            with closing(sqlite3.connect(path.as_uri()+"?mode=ro", uri=True, timeout=.5)) as db:
+                db.row_factory = sqlite3.Row
+                db.execute("PRAGMA query_only=ON")
+                db.execute("BEGIN")
+                result = summary(db, cutoff, market)
+                return {"evaluation": result["evaluation"], "orders": result["orders"]}
+        except DemoError:
+            return None
+    except (OSError, ValueError, TypeError, KeyError, sqlite3.DatabaseError):
+        return None
+
+
+def kis_strategy_health(archive_dir, *, analysis_as_of, strategy_ledger_dir=None):
     """Fixed local projection; no account balances, secrets or broker IDs."""
     import math
     cutoff = instant(analysis_as_of)
@@ -464,7 +540,26 @@ def kis_strategy_health(archive_dir, *, analysis_as_of):
                     "net_pnl": None, "fees_known": False, "settlement_known": False}
             return None
         view["performance"] = performance_view(row.get("performance"))
-        view["evaluation"] = _strategy_evaluation_view(row.get("evaluation"), market, observed)
+        evaluation = row.get("evaluation")
+        proof = None
+        sample = evaluation.get("sample") if isinstance(evaluation, dict) else None
+        if isinstance(sample, dict) and type(sample.get("filled_order_count")) is int and sample["filled_order_count"] > 0:
+            validated = _readonly_strategy_costs(strategy_ledger_dir, market, instant(evaluation.get("analysis_as_of")))
+            if isinstance(validated, dict) and isinstance(row.get("orders"), list):
+                try:
+                    canonical = lambda value: json.dumps(value, sort_keys=True, separators=(",", ":"), allow_nan=False)
+                    if canonical(row["orders"]) == canonical(validated["orders"]):
+                        proof = validated["evaluation"]
+                except (ValueError, TypeError, KeyError):
+                    pass
+        view["evaluation"] = _strategy_evaluation_view(evaluation, market, observed, verified_costs=proof)
+        if (view["performance"] and view["evaluation"]
+                and instant(view["performance"]["observed_at"]) == instant(view["evaluation"]["analysis_as_of"])):
+            # Latest aggregate only; historical marks keep their original gross
+            # scope instead of borrowing today's settled costs.
+            current = view["evaluation"]
+            view["performance"].update(actual_cost=current["actual_cost"], net_pnl=current["net_pnl"],
+                                       fees_known=current["fees_known"], settlement_known=current["settlement_known"])
         for perf in (row.get("performance_history") if isinstance(row.get("performance_history"), list) else [])[-60:]:
             projected = performance_view(perf)
             if projected is not None and projected["status"] == "AVAILABLE":

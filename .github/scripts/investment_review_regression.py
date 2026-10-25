@@ -142,6 +142,8 @@ async def probe(websocket_url, page_url):
               const strategy=document.querySelector('#kis-strategy-health').textContent;
               if (!strategy.includes('fixture-strategy') || !strategy.includes('체결 완료') || !strategy.includes('100 KRW') || !strategy.includes('정규장 검증 통과 대기') || !strategy.includes('순손익은 표시하지 않습니다')) throw Error('KIS strategy execution/performance missing');
               if (!strategy.includes('가정 비용 민감도 · 실제 순손익 아님') || !strategy.includes('실투자 판단 미충족') || !strategy.includes('30 KRW') || !strategy.includes('실투자로 자동 전환하지 않습니다')) throw Error('Cost assumptions or readiness boundary missing');
+              const overview=document.querySelector('#strategy-overview').textContent;
+              if(!overview.includes('정상 체결') || !overview.includes('다음 확인') || !overview.includes('3분 경과')) throw Error('First unmet evidence summary missing or wrong clock threshold');
               if (!strategy.includes('계획 검사 통과 후보 0개') || !strategy.includes('실행 엔진의 매수·매도 행동 없음') || !strategy.includes('당일 시세 갱신 재시도 한도 소진') || !strategy.includes('저장공간 부족')) throw Error('Actual no-action and producer failure diagnostics missing');
               if (!document.querySelector('#experiment-cards').textContent.includes('paired-test')) throw Error('Experiment card absent');
               if (!document.querySelector('#experiment-cards').textContent.includes('수익률·낙폭을 표시하지 않습니다')) throw Error('Unobserved performance fabricated');
@@ -260,6 +262,31 @@ async def probe(websocket_url, page_url):
                     raise RuntimeError(f"{catalog_mode} initial catalog disabled retry controls")
                 await call("Page.removeScriptToEvaluateOnNewDocument", {"identifier": injected["identifier"]})
                 result[catalog_mode+"_catalog_preserves_operations_and_retry"] = True
+            await evaluate("window.__previousHealthFetch=window.fetch; window.fetch=(url,...args)=>new URL(url,location.origin).pathname==='/api/kis-strategy-health'?Promise.resolve(new Response('',{status:503})):window.__previousHealthFetch(url,...args); document.querySelector('#refresh-catalog').click()")
+            for _ in range(100):
+                await asyncio.sleep(.1)
+                if await evaluate("!viewBusy && document.querySelector('#strategy-overview').textContent.includes('현재 운영 상태를 읽지 못했습니다')"):
+                    break
+            else:
+                raise RuntimeError("Failed strategy health retained a previous overview")
+            await evaluate("window.fetch=window.__previousHealthFetch; document.querySelector('#refresh-catalog').click()")
+            for _ in range(100):
+                await asyncio.sleep(.1)
+                if await evaluate("!viewBusy && document.querySelector('#strategy-overview').textContent.includes('정상 체결')"):
+                    break
+            else:
+                raise RuntimeError("Strategy overview did not recover after retry")
+            result["overview_error_and_retry"] = True
+            # Display fixture only. Actual evidence admission and ledger-derived
+            # API costs are independently exercised by settlement projection tests.
+            await evaluate("""(async()=>{
+              const payload=await getJson('/api/kis-strategy-health?as_of=2026-10-16T12:00:00Z');
+              Object.assign(payload.markets.KR.evaluation,{cost_evidence_status:'COMPLETE_REVIEWED_IMPORT',actual_cost:0,net_pnl:100,exact_fifo_available:false});
+              renderKisStrategy(payload);
+            })()""")
+            if not await evaluate("document.querySelector('#kis-strategy-health').textContent.includes('검토한 증권사 원문 비용·정산') && document.querySelector('#strategy-overview').textContent.includes('검토 원문 비용 0 KRW · 체결 비용 차감 순손익 100 KRW')"):
+                raise RuntimeError("Explicit zero cost was hidden or unknown costs became zero")
+            result["reviewed_cost_display_fixture"] = True
             results.append(result)
     return results
 
