@@ -399,6 +399,8 @@ def build_decision_output_instructions(context: str) -> str:
         '{"rating":"NO_TRADE | UNDERWEIGHT | HOLD | OVERWEIGHT | BUY | SELL",'
         '"portfolio_stance":"BEARISH | NEUTRAL | BULLISH",'
         '"entry_action":"NONE | WAIT | STARTER | ADD | EXIT",'
+        '"conditional_entry_action":"NONE | STARTER | ADD",'
+        '"conditional_entry_valid_until":"timezone-aware ISO timestamp for a justified conditional buy, otherwise null",'
         '"risk_action":"NONE | HOLD | TRIM_TO_FUND | REDUCE_RISK | TAKE_PROFIT | STOP_LOSS | EXIT",'
         '"risk_action_reason":"...",'
         '"risk_action_reason_codes":["..."],'
@@ -431,6 +433,7 @@ def build_decision_output_instructions(context: str) -> str:
         '"trigger_quality":"weak | medium | strong"}}. '
         "Treat rating as the legacy medium-term investment/allocation view, not the same-day execution action. "
         "Use portfolio_stance for directional view, and entry_action for immediate action today. "
+        "Choose conditional_entry_action from the evidence, not from a fixed example: use STARTER/ADD only for a justified BULLISH WAIT plan with numeric levels, no conflicting sell risk, and an explicit timezone-aware validity timestamp; otherwise use NONE and JSON null. "
         "Evaluate both buy-side entry and sell-side/downside risk. "
         "For held positions, explicitly decide whether risk_action should be HOLD, TRIM_TO_FUND, REDUCE_RISK, TAKE_PROFIT, STOP_LOSS, or EXIT. "
         "Use TRIM_TO_FUND only for funding or rotation when the thesis is not invalidated; use REDUCE_RISK, STOP_LOSS, or EXIT for support breaks, invalidation, failed breakout, thesis damage, weak earnings/guidance, regime headwinds, or deteriorated reward/risk. "
