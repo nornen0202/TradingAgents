@@ -1,0 +1,650 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YouTube 투자자용 검증 리포트 - 퇴직 후 겪게 되는 4가지 변화, 노후엔 보험료보다 의료비가 더 큰 과제?ㅣ민복기 교수 [주말인터뷰]</title>
+  <style>
+:root {
+  color-scheme: light;
+  --bg: #f7f8fb;
+  --panel: #ffffff;
+  --text: #172033;
+  --muted: #667085;
+  --line: #d9dee8;
+  --accent: #0f766e;
+  --accent-2: #2563eb;
+  --warn: #b45309;
+  --bad: #b42318;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0 56px; }
+a { color: var(--accent-2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.hero { padding: 28px 0 22px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+.hero.compact { padding-top: 12px; }
+.hero h1 { margin: 0; font-size: clamp(28px, 4vw, 44px); line-height: 1.15; letter-spacing: 0; }
+.hero p { max-width: 760px; color: var(--muted); margin: 12px 0 0; }
+.eyebrow { color: var(--accent); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0; margin: 0 0 8px; }
+section { margin: 28px 0; }
+h2, h3, h4, h5 { letter-spacing: 0; line-height: 1.25; }
+.synthesis-callout { padding: clamp(20px, 4vw, 34px); border: 1px solid #6ee7d8; border-radius: 18px; background: linear-gradient(135deg, #ecfdf9 0%, #eff6ff 100%); box-shadow: 0 18px 44px rgba(15, 118, 110, .12); }
+.synthesis-callout.unavailable { border-color: var(--line); background: var(--panel); box-shadow: none; }
+.synthesis-callout h2 { margin: 0; font-size: clamp(24px, 3.2vw, 36px); }
+.synthesis-callout .lead { max-width: 900px; font-size: 17px; color: #334155; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.primary-link, .secondary-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border-radius: 999px; font-weight: 800; }
+.primary-link { color: white; background: var(--accent); }
+.secondary-link { color: var(--accent-2); border: 1px solid #93c5fd; background: white; }
+.primary-link:hover, .secondary-link:hover { text-decoration: none; filter: brightness(.97); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.card, .run { display: flex; flex-direction: column; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; color: var(--text); min-height: 128px; }
+.run { padding: 16px; }
+.card:hover, .run:hover { border-color: var(--accent-2); text-decoration: none; }
+.thumb { display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #e9edf5; border-radius: 8px 8px 0 0; color: var(--muted); font-size: 13px; font-weight: 700; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb-empty span { padding: 0 14px; text-align: center; }
+.card-body { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 16px; }
+.card strong { line-height: 1.35; }
+.source-line { color: #3f4a5f; font-weight: 600; }
+.runs { display: grid; gap: 10px; }
+.badge { display: inline-flex; width: fit-content; border-radius: 999px; padding: 2px 9px; background: #e6f4f1; color: var(--accent); font-size: 12px; font-weight: 700; }
+.status-contradicted, .status-llm_failed { background: #fee4e2; color: var(--bad); }
+.status-unverified, .status-stale { background: #fff4d6; color: var(--warn); }
+small, .muted { color: var(--muted); }
+.topnav { display: flex; gap: 14px; margin-bottom: 16px; font-size: 14px; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px; }
+.stats span { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
+.report { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: min(5vw, 36px); }
+.report-head { border-bottom: 1px solid var(--line); margin-bottom: 24px; padding-bottom: 20px; }
+.report-head h1 { margin: 0; font-size: clamp(24px, 3.5vw, 38px); line-height: 1.2; }
+.meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+.scope-note { padding: 12px 14px; border-left: 4px solid var(--warn); border-radius: 6px; background: #fff7ed; color: #7c2d12; }
+.synthesis-report h2 { margin-top: 34px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.synthesis-report h3 { margin: 24px 0 8px; color: #0f4c5c; }
+.synthesis-report p, .synthesis-report li { overflow-wrap: anywhere; }
+pre { overflow: auto; background: #111827; color: #f9fafb; border-radius: 8px; padding: 14px; }
+code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+details { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 18px; }
+@media (max-width: 640px) {
+  main { width: min(100% - 20px, 1120px); padding-top: 18px; }
+  .report { padding: 18px; }
+  .synthesis-callout { border-radius: 14px; padding: 18px; }
+  .cta-row a { width: 100%; }
+  .mobile-report { border-radius: 12px; }
+}
+</style>
+</head>
+<body>
+  <main>
+<nav class="topnav"><a href="index.html">실행 목록</a><a href="../../index.html">YouTube 홈</a></nav>
+<article class="report">
+  <header class="report-head">
+    <p class="eyebrow">youtube_20261026_065853</p>
+    <h1>퇴직 후 겪게 되는 4가지 변화, 노후엔 보험료보다 의료비가 더 큰 과제?ㅣ민복기 교수 [주말인터뷰]</h1>
+    <div class="meta">
+      <span class="badge status-asr_uncertain">asr_uncertain</span>
+      <a href="https://www.youtube.com/watch?v=pfK5cs3z04Q">원본 영상</a>
+    </div>
+  </header>
+  <h2>은퇴자산 분석: 수익률보다 중요한 세후 현금흐름과 의료·돌봄 비용</h2>
+<p>분석 기준: 2026년 10월 26일 · <a href="https://www.youtube.com/watch?v=pfK5cs3z04Q">삼프로TV 영상</a> · 공개일 2026년 10월 25일</p>
+<h3>1. 핵심 판단</h3>
+<p>영상의 중심 주장은 <strong>퇴직 후 자산관리의 초점을 자산 증식에서 생활비 인출과 건강보험료·의료비·간병비 관리로 옮겨야 한다</strong>는 것이다. 개별 종목이나 시장 방향을 제시하는 영상이 아니라 은퇴 가계의 재무설계에 관한 인터뷰다.</p>
+<p>다만 제도별 숫자를 현재 적용 기준으로 받아들이기는 어렵다. 제공된 검증 결과는 <strong>12개 주장 중 1개 부분 지지, 10개 미확인, 1개 음성인식 불확실</strong>이다. 관련 공식 법령·고시·공단 통계·보험 약관은 확보되지 않았다. 미확인은 거짓 판정이 아니라 근거 부족을 뜻한다.</p>
+<p>가장 직접적인 외부 근거는 퇴직급여 연금수령 세제를 다룬 기사 E5다. 나머지 핵심 보험료·환급·통계 수치는 수동 확인이 필요하다. 따라서 영상은 <strong>점검할 문제를 찾는 자료</strong>로 활용하되, 제시된 절감액이나 환급액을 확정 현금흐름으로 반영하기에는 부족하다.</p>
+<h3>2. 영상 주장과 확인된 근거</h3>
+<p>아래 시각은 개별 발언의 정확한 위치가 아니라 해당 자막 청크의 시작 시각이다.</p>
+<p>| 주제·영상 구간 | 영상 주장 | 확인된 사실·근거와 한계 |</p>
+<p>|---|---|---|</p>
+<p>| 은퇴기간·고령자 지출, 00:00:01·00:05:56 | 은퇴 후 30년 이상을 준비해야 하며, 60세 이상 진료비는 비교집단의 3배 이상이고 독거노인의 68%가 여성이라는 설명 | <strong>미확인.</strong> 통계연도·연령·비교집단·가구 정의가 없다. 30년은 계획 가정이며, 진료비와 개인의 실제 본인부담 지출도 구분해야 한다. |</p>
+<p>| 피부양자 자격, 00:11:49·00:23:07 | 연소득 2,000만원·재산세 과세표준 9억원 등의 문턱과 과거 기준 강화를 설명 | <strong>미확인.</strong> 전체 인정요건과 시행일을 확인할 공식 자료가 없다. 두 문턱만으로 개인 자격을 판정할 수 없으며, 과거 7,200만원 기준의 합산 방식도 불명확하다. |</p>
+<p>| 보험료 상한, 00:11:49·00:17:32 | 월 상한 약 459만원, 재산분 약 49만원, 장기요양보험료 13.14% 등을 제시 | <strong>입력값에 대한 산술만 확인.</strong> 49÷459는 약 10.68%지만 개인 보험료의 재산 비중을 뜻하지 않는다. 월 1,000만원 초과 설명도 사용자 부담과 개인 부담을 구분하지 못해 실제 개인 부담액으로 확인되지 않았다. |</p>
+<p>| 소득 종류별 반영, 00:17:32 | 금융소득 1,000만원 문턱, 사업소득 100%·근로소득 50% 반영, 비과세·분리과세 제외를 설명 | <strong>미확인.</strong> 금융소득 전액·초과분 구분, 분리과세 예외, 보험료 부과와 피부양자 심사의 차이를 확인할 근거가 없다. |</p>
+<p>| 공적·사적연금, 00:17:32·00:23:07 | 사적연금은 실제 건강보험 부과·피부양자 심사에서 제외되며 감사원 지적이 있었다는 설명 | <strong>미확인.</strong> 공단 공식 설명과 감사원 원보고서가 없다. 법령상 범위·자료 연계·실제 부과 관행을 구분할 수 없다. |</p>
+<p>| 국민연금 보험료, 00:17:32 | 기준소득월액 상한 659만원, 보험료율 9.5%, 월 보험료 약 62만원을 제시 | <strong>산술만 확인.</strong> 659만원×9.5%=626,050원이다. 상한·요율·분담 규정과 각각의 적용일은 미확인이다. |</p>
+<p>| 퇴직급여 세제, 00:23:07 | 연금으로 받으면 세금을 30~50% 줄일 수 있다는 설명 | <strong>부분 지지.</strong> E5는 실제 연금 수령연차가 20년을 초과할 때 비교 원천징수세율의 50%를 적용한다는 내용을 담고 있다. 30% 구간과 전체 적용요건은 확인되지 않았다. |</p>
+<p>| 임의계속가입, 00:28:46·00:34:13 | 최대 36개월, 직전 18개월 중 1년 이상 가입, 신청·최초 납부 관련 2개월 기한을 설명 | <strong>미확인.</strong> 공식 자격요건·평균 보수 산식·기한의 기산점이 없다. 종전 부담액이 그대로 유지된다고 확정할 수 없다. |</p>
+<p>| 허위 직장가입 조사, 00:28:46·00:34:13 | 올해 상·하반기 전환기에 대규모 조사와 추징이 있었다는 설명 | <strong>미확인.</strong> 발표·조사기간·규모가 없고 촬영일도 불명확하다. 공개일만으로 발언의 ‘올해’를 확정할 수 없다. |</p>
+<p>| 본인부담상한제, 00:34:13·00:39:52 | 상한 173만원·843만원, 다음 해 8월 환급, 신청서 수령 후 3년 소멸과 자격 변경 효과를 설명 | <strong>미확인.</strong> 기준연도·제외 의료비·자격변동 산식·청구권 기산점을 확인하지 못했다. 약 700만원 환급 예시는 확정액이 아니다. |</p>
+<p>| 치매자산·보험, 00:39:52·00:45:32 | 치매 관련 명의자산 172조원→2050년 488조원 전망과 고령 재가입의 비용·거절 가능성을 설명 | <strong>미확인.</strong> 원보고서·전망 가정·상품별 가입조건이 없다. 명의자산 증가만으로 발병률 상승이나 보험업 실적 개선을 도출할 수 없다. |</p>
+<p>| 교육사업·신원, 00:00:01·00:45:32 | 노후준비 교육사업의 약 13년 운영, 무상 지원·2시간 교육을 소개 | <strong>음성인식 불확실·외부 근거 부재.</strong> 기관·사업명과 출연자 이름이 자막에서 혼재한다. 제목 표기는 ‘민복기’이나 공식 신원 확인은 아니다. |</p>
+<h4>가장 강한 외부 근거: 연금수령 세제의 제한적 지지</h4>
+<p><a href="http://www.intn.co.kr/news/articleView.html?idxno=2047657">「2025 핵심 개정 세법」 기사(E5)</a>의 제공 발췌는 이연퇴직소득의 실제 연금 수령연차가 <strong>20년을 초과하는 경우</strong>, 원천징수세율을 연금외수령 원천징수세율의 60%에서 50%로 낮추고 <strong>2026년 1월 1일 이후 수령분부터 적용</strong>한다고 설명한다.</p>
+<p>이는 특정 조건의 세율 비율에 관한 기사 근거다. 모든 연금·모든 세금이 50% 줄어든다는 뜻은 아니며, 최종 법령·수령한도·경과규정 대조가 필요하다. <a href="http://www.intn.co.kr/news/articleView.html?idxno=2052332">2026년 세제개편안 기사(E4)</a>는 제공 발췌가 납입 단계 세액공제에 관한 것이므로 수령 단계의 30~50% 경감을 입증하지 않는다.</p>
+<h3>3. 긍정 논리와 반론</h3>
+<h4>긍정 논리: 같은 자산으로 생활을 유지할 여지</h4>
+<p>영상의 논리가 성립하려면 개인별 제도 적용과 절감 효과가 먼저 확인돼야 한다. 그 조건 아래에서는 다음 경로를 검토할 수 있다.</p>
+<ul>
+<li><strong>인출 부담 완화:</strong> 수령 시기·방식에 따른 세금과 보험료 차이가 실제로 줄어들면 같은 세전 자산에서 확보하는 생활비가 늘어날 수 있다.</li>
+<li><strong>큰 지출에 대한 대응:</strong> 의료비·간병비를 생활비와 별도로 추정하면 예상 밖 지출에 따른 자산 처분 필요성을 점검할 수 있다.</li>
+<li><strong>보장 공백 식별:</strong> 기존 보험의 실제 지급조건과 유지비를 비교하면 중복 보장과 미보장 위험을 구분할 수 있다.</li>
+</ul>
+<p>이는 은퇴자산의 지속 가능성에 관한 조건부 논리다. 시장가격·기업 실적·밸류에이션 자료가 없어 보험·의료·자산관리 업종의 투자 매력으로 확대할 근거는 없다.</p>
+<h4>반론: 절감액보다 순현금흐름이 중요</h4>
+<p>보험료 하나를 줄여도 추가 세금, 새로운 보험료, 인출 제약, 보장 축소가 생기면 전체 효과는 달라진다. 배우자 소득 분산이나 자녀 피부양자 변경 역시 실제 자격과 세대 단위 산식을 확인하기 전에는 절감 수단으로 확정할 수 없다.</p>
+<p>본인부담상한제도 총 병원비 전액의 환급을 뜻한다고 볼 근거가 없다. 보험료·급여 본인부담·비급여·간병비를 구분하지 않으면 의료비 위험을 과소평가할 수 있다. 기존 보험 유지 역시 언제나 유리한 것은 아니며 보험료 부담과 보장 실효성을 함께 비교해야 한다.</p>
+<h3>4. 단기 점검표: 무엇을 관찰할 것인가</h3>
+<p>| 확인 시점 | 확보할 자료·관찰 항목 | 비교할 결과 |</p>
+<p>|---|---|---|</p>
+<p>| 퇴직·자격 변경 전 | 공단의 개인별 자격 판단, 피부양자 전체 요건, 지역보험료 및 임의계속가입 예상액 | 본인 부담 건강·장기요양보험료의 월액·연액, 신청·납부 마감일 |</p>
+<p>| 퇴직급여 수령 방식 결정 전 | 퇴직급여 원천별 금액, 수령연차·한도별 세금 계산, 사적연금 건강보험 처리의 공식 답변 | 일시금·연금의 연도별 세후 가용액과 인출 제약 |</p>
+<p>| 의료비 지출·환급 안내 시 | 진료연도별 상한표, 상한 적용 지출과 제외 지출, 자격변동 처리, 청구권 기산점 | 실제 환급 예상액과 지급 시점, 추가 보험료 차감 후 순효과 |</p>
+<p>| 보험 갱신·해지 검토 전 | 증권·약관·갱신 보험료·해지환급금·재가입 심사 및 간병 지급조건 | 유지비 대비 실제 보장, 보장 공백과 대체 가능성 |</p>
+<p>| 정기 현금흐름 점검 시 | 연금·기타소득, 생활비, 보험료, 의료·간병 지출, 가족 지원 가능성 | 연간 자산 인출액과 의료·돌봄비 증가 시 자금 부족 규모 |</p>
+<p>비교는 예상 환급액만이 아니라 <strong>세후 수입−생활비−보험료−의료·간병비+실제 환급액</strong>을 기준으로 해야 한다. 환급이 늦어질 경우 그 사이 필요한 현금도 별도로 관찰할 항목이다.</p>
+<h3>5. 논리의 무효화·재산정 조건</h3>
+<ul>
+<li>공식 산정 결과 제안된 자격 변경의 추가 보험료가 환급 증가분 이상이면, 해당 변경의 비용 절감 논리는 성립하지 않는다.</li>
+<li>사적연금 처리에 관한 공식 확인이 영상 설명과 다르거나 향후 기준이 변경되면, 미반영을 전제로 한 현금흐름을 재산정해야 한다.</li>
+<li>퇴직급여가 세제 적용대상·수령연차·한도 요건을 충족하지 못하면 영상의 절세율을 적용할 수 없다.</li>
+<li>주요 의료·간병 지출이 상한제 제외 항목이라면 환급으로 큰 지출을 방어한다는 가정이 약해진다.</li>
+<li>보험의 실제 면책·지급조건상 예상 간병 상황이 보장되지 않으면 보험 유지에 따른 방어 효과를 다시 평가해야 한다.</li>
+</ul>
+<p>이 조건들은 영상 전체를 반박하기보다 <strong>개인에게 적용한 구체적인 절감 가정이 깨지는 지점</strong>이다.</p>
+<h3>6. 데이터 품질과 결론</h3>
+<p>자동자막의 <code>transcript_quality</code>는 good·1.0이지만 이는 원음 대비 숫자·법령명 정확도 인증이 아니다. 최초 추출의 <code>source_confidence</code> 0.88~0.94는 자막에서 주장이 확인되는 정도다. 외부 근거를 평가한 검증 단계에서는 C7만 0.6이고 나머지는 0.0으로, 관련 근거 부재를 나타낸다. 두 값을 같은 의미로 읽어서는 안 된다.</p>
+<p>모든 주장의 <code>asr_confidence</code> 0.0은 원음 대조 평가가 없다는 표시이지 전사가 모두 틀렸다는 뜻이 아니다. 이름·기관명·법령명과 반복·분절된 숫자는 원음 확인이 필요하다. 검증 판정의 높은 <code>confidence</code>도 영상 내용의 진실성에 대한 확률이 아니라 해당 검증 상태에 대한 확신이다.</p>
+<p>증거 10건 중 E5만 일부 주장을 직접 지지하며, E4는 다른 과세 단계의 자료이고 나머지 8건은 주제와 무관하다. 증거 묶음의 ‘verified’ 표시는 영상 주장 전체의 사실 확인을 의미하지 않는다. Bloomberg·Morningstar 자료는 제공되지 않았으며, 이를 통한 확인은 <strong>미검증·수동 확인 필요</strong>다. 비공개 상담·강의 경험 역시 대표성 있는 통계로 사용할 수 없다.</p>
+<p><strong>결론적으로 영상의 유용한 질문은 ‘얼마를 벌 것인가’에 더해 ‘세금·보험료·의료·돌봄 지출 후 얼마를 사용할 수 있는가’다.</strong> 다만 현재 근거로 확정할 수 있는 제도상 절감액은 제한적이다. 개인별 공식 산정과 약관 확인을 통해 순현금흐름을 계산하는 것이 다음 분석 단계다.</p>
+  <details>
+    <summary>공개 요약 JSON</summary>
+    <pre>{
+  &quot;version&quot;: 4,
+  &quot;video_id&quot;: &quot;pfK5cs3z04Q&quot;,
+  &quot;title&quot;: &quot;퇴직 후 겪게 되는 4가지 변화, 노후엔 보험료보다 의료비가 더 큰 과제?ㅣ민복기 교수 [주말인터뷰]&quot;,
+  &quot;url&quot;: &quot;https://www.youtube.com/watch?v=pfK5cs3z04Q&quot;,
+  &quot;channel&quot;: &quot;삼프로TV 3PROTV&quot;,
+  &quot;channel_id&quot;: &quot;UChlv4GSd7OQl3js-jkLOnFA&quot;,
+  &quot;source_url&quot;: &quot;https://www.youtube.com/@3protv/videos&quot;,
+  &quot;thumbnail_url&quot;: &quot;https://i.ytimg.com/vi/pfK5cs3z04Q/maxresdefault.jpg&quot;,
+  &quot;published_at&quot;: &quot;2026-10-25T06:00:11+00:00&quot;,
+  &quot;status&quot;: &quot;asr_uncertain&quot;,
+  &quot;strategy_source_tier&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_evidence_weight&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_validation_policy&quot;: &quot;STANDARD_REVIEW&quot;,
+  &quot;transcript_status&quot;: &quot;available&quot;,
+  &quot;transcript_source&quot;: &quot;automatic&quot;,
+  &quot;transcript_chars&quot;: 28010,
+  &quot;transcript_quality&quot;: {
+    &quot;status&quot;: &quot;good&quot;,
+    &quot;score&quot;: 1.0,
+    &quot;warnings&quot;: [],
+    &quot;source&quot;: &quot;automatic&quot;,
+    &quot;language&quot;: &quot;Korean&quot;,
+    &quot;model_or_format&quot;: &quot;json3&quot;,
+    &quot;chars&quot;: 28010,
+    &quot;segments&quot;: 1712,
+    &quot;duration_seconds&quot;: 3001,
+    &quot;repeated_ngram_ratio&quot;: 0.0
+  },
+  &quot;generated_at&quot;: &quot;2026-10-26T06:58:53.896635+09:00&quot;,
+  &quot;llm_status&quot;: &quot;success&quot;,
+  &quot;research_status&quot;: &quot;success&quot;,
+  &quot;claim_verification_status&quot;: &quot;success&quot;,
+  &quot;research_pipeline_version&quot;: 4,
+  &quot;evidence_count&quot;: 10,
+  &quot;claim_status_summary&quot;: {
+    &quot;unverified&quot;: 10,
+    &quot;partially_supported&quot;: 1,
+    &quot;asr_uncertain&quot;: 1
+  },
+  &quot;claims&quot;: [
+    {
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;claim_text&quot;: &quot;퇴직 후 30년 이상 인출·돌봄 재원을 준비해야 하며, 60세 이상 1인당 진료비는 소득활동 인구의 3배 이상이고 독거노인의 68%는 여성이라는 주장이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:01&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;준비기간 30년 이상; 진료비 3배 이상; 독거노인 여성 비중 68%&quot;,
+        &quot;observed&quot;: &quot;비교 가능한 외부 관측값 없음. 통계연도·연령·비교집단·가구 정의 확인 불가.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;3배·68%를 확정 수치로 사용하지 말고 생활비·의료비·돌봄비와 생존기간별 현금흐름을 구분해 검토할 필요가 있다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;claim_text&quot;: &quot;피부양자는 연소득 2,000만원 초과 또는 재산세 과세표준 9억원 초과 시 제외되며, 소득 기준이 7,200만원→3,400만원→2,000만원으로 강화됐다는 주장이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:11:49&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;연소득 2,000만원; 재산세 과세표준 9억원; 과거 소득 기준 7,200만원·3,400만원&quot;,
+        &quot;observed&quot;: &quot;현행 기준·과거 산정 방식·시행일을 확인할 관련 증거 없음.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;제시된 두 문턱만으로 피부양자 자격을 판단하거나 자산 명의를 변경해서는 안 된다. 개인별 전체 요건 확인이 선행돼야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;claim_text&quot;: &quot;2026년 지역보험료 월 상한 약 459만원, 재산분 약 49만원·10.8%, 직장가입자 두 보험료 상한 각각 약 459만원과 장기요양보험료 13.14%를 적용하면 월 1,000만원을 넘을 수 있다는 주장이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:11:49&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;459만원; 49만원; 10.8%; 장기요양보험료 13.14%; 합계 1,000만원 초과&quot;,
+        &quot;observed&quot;: &quot;공식 적용값 없음. 제시값 산술은 49/459≈10.68%, 459×2×1.1314≈1,038.63만원. 개인 부담 여부 미확인.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;월 1,000만원 초과를 개인 부담 상한으로 인용하지 말고 사용자 분담과 보험료 종류별 산정 기준을 확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;claim_text&quot;: &quot;금융소득은 연 1,000만원 초과 시 반영하고 비과세·분리과세는 제외하며, 사업소득은 경비 차감 후 100%, 근로소득은 공제 전 총급여의 50%를 반영한다는 주장이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:17:32&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;금융소득 연 1,000만원 초과; 사업소득 100%; 근로소득 50%&quot;,
+        &quot;observed&quot;: &quot;각 기준의 적용 대상·반영 범위·시행일을 검증할 외부 자료 없음.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;소득원 전환이나 배우자 분산에 따른 절감액은 미확정이다. 자격 유형과 소득 항목별 산식부터 확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;claim_text&quot;: &quot;실무에서는 공적연금만 건강보험에 반영하고 사적연금은 보험료·피부양자 심사에서 모두 제외하며, 감사원이 이를 지적했다는 주장이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:17:32&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;사적연금의 보험료 산출·피부양자 소득 심사 미반영&quot;,
+        &quot;observed&quot;: &quot;미반영 범위·실무 기준일·감사 지적과 후속 조치 확인 불가.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;사적연금이 건강보험료와 피부양자 심사에서 영구적으로 제외된다고 가정한 은퇴 설계는 검증되지 않았다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;claim_text&quot;: &quot;2026년 국민연금 기준소득월액 상한은 659만원, 보험료율은 9.5%, 월 보험료 상한은 약 62만원이고 사업장가입자는 회사가 절반 부담한다는 주장이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:17:32&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;659만원×9.5%≈62만원; 회사 절반 부담&quot;,
+        &quot;observed&quot;: &quot;조건부 산술값 626,050원, 절반 313,025원. 공식 상한·요율·적용기간 미확인.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;2026년 전체에 동일 금액이 적용된다고 가정하지 말고 해당 월의 공식 기준과 가입 유형별 부담을 확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;claim_text&quot;: &quot;퇴직금을 일시금 대신 연금으로 수령하면 세금을 30~50% 줄일 수 있다는 주장이다.&quot;,
+      &quot;status&quot;: &quot;partially_supported&quot;,
+      &quot;confidence&quot;: 0.9,
+      &quot;supporting_evidence_ids&quot;: [
+        &quot;E5&quot;
+      ],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:23:07&quot;,
+      &quot;source_confidence&quot;: 0.6,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;퇴직금 연금 수령 시 세금 30~50% 경감&quot;,
+        &quot;observed&quot;: &quot;E5: 실제 수령연차 20년 초과 시 비교 원천징수세율의 60%→50%, 2026-01-01 이후 수령분 적용. 30% 구간과 전체 적용요건은 미확인.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;일률적인 30~50% 절세를 전제로 수령 방식을 결정하지 말고 이연퇴직소득 해당 여부·수령연차·수령한도에 따른 세후 현금흐름을 비교해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;claim_text&quot;: &quot;건강보험 임의계속가입은 퇴직 후 최대 36개월이며, 직전 18개월 중 통산 1년 이상 직장가입 이력과 신청·최초 납부 기한 준수가 필요하다는 주장이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:28:46&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;최대 36개월; 직전 18개월 중 1년 이상; 신청·최초 납부 관련 2개월 기한&quot;,
+        &quot;observed&quot;: &quot;기간·기산점·산정 방식과 미납 시 효과를 확인할 관련 증거 없음.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;36개월 유지나 종전 부담액을 확정 현금흐름으로 잡기 전에 실제 가입 이력·산정 보험료·신청 및 납부 기한을 확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;claim_text&quot;: &quot;올해 상반기에서 하반기로 넘어가며 허위 직장가입자 심사·소명과 지역보험료 차액 추징이 대대적으로 있었다는 주장이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:28:46&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;올해 상반기에서 하반기로 넘어가는 시기 대규모 조사·추징&quot;,
+        &quot;observed&quot;: &quot;사건 연도·집행기간·규모·추징액 모두 확인 불가.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;특정 시기의 대규모 단속 사실로 인용하지 말고 실제 근로관계와 가입 자격의 적정성을 개별 확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C10&quot;,
+      &quot;claim_text&quot;: &quot;본인부담상한제의 4~5분위 상한은 173만원, 최고 분위는 843만원이며 이듬해 8월 환급되고 신청서 수령 후 3년이 지나면 청구권이 소멸한다는 설명과, 자격 변경으로 환급이 늘 수 있다는 주장이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:34:13&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;상한 173만원·843만원; 200만원 지출 시 27만원 환급; 800만원 지출 시 약 700만원 환급; 신청서 수령 후 3년; 월 보험료 1만~4만원&quot;,
+        &quot;observed&quot;: &quot;조건부 차액 200−173=27만원. 월 보험료의 단순 연액은 12만~48만원. 공식 상한·환급액·청구기한은 미확인.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;약 700만원 환급이나 지역가입 전환의 순이익을 확정 수익으로 제시하지 말고 실제 적용 의료비·연간 보험료·자격변동 산식을 함께 확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C11&quot;,
+      &quot;claim_text&quot;: &quot;치매 진단자 명의 자산은 172조원이고 2050년에는 488조원으로 증가한다는 자료를 인용하며, 고령 재가입의 비용·거절 가능성을 고려해 기존 보험의 보장 공백을 점검해야 한다는 주장이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:39:52&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;치매 관련 명의자산 172조원; 2050년 488조원; 60세 이후 재가입 비용 증가·거절 가능성&quot;,
+        &quot;observed&quot;: &quot;자산 원자료와 전망 가정, 보험별 고령 가입조건 모두 제공되지 않음.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;172조원·488조원을 확정 통계로 인용하지 말고 보험 해지 여부는 기존 보장, 유지비, 재가입 가능 조건을 비교해 판단해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C12&quot;,
+      &quot;claim_text&quot;: &quot;생명보험사회공헌위원회로 추정되는 기관의 해피투모로우 계열 사업이 약 13년 운영됐고, 회사·단체 요청 시 무상 강사 지원과 통상 2시간 이상 교육을 제공한다는 주장이다.&quot;,
+      &quot;status&quot;: &quot;asr_uncertain&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:01&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;약 13년 운영; 통상 2시간 이상; 무상 강사 지원; 자막상 &#x27;30&#x27; 포함 가능성&quot;,
+        &quot;observed&quot;: &quot;운영기간·교육시간·비용 확인 불가. &#x27;30&#x27;이 사업명 일부인지도 미확인.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;교육사업을 소개하거나 신청을 안내하기 전에 정확한 운영기관·사업명·출연자 신원·지원조건을 확인해야 한다.&quot;
+    }
+  ],
+  &quot;entities&quot;: [],
+  &quot;evidence&quot;: [
+    {
+      &quot;evidence_id&quot;: &quot;E1&quot;,
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;title&quot;: &quot;Kaiser reports underwhelming results for Q3&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/kaiser-reports-underwhelming-results-q3-122300044.html&quot;,
+      &quot;publisher&quot;: &quot;Lewiston Tribune, Idaho&quot;,
+      &quot;published_at&quot;: &quot;2026-10-25T12:23:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Kaiser reports underwhelming results for Q3 Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals Weather Newsletters Finance My portfolio News Mar...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E2&quot;,
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;title&quot;: &quot;Havells India Ltd (BOM:517354) (Q2 2027) Earnings Call Highlights: Revenue Jumps 35% as Lloyd ...&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/havells-india-ltd-bom-517354-110128987.html&quot;,
+      &quot;publisher&quot;: &quot;GuruFocus.com&quot;,
+      &quot;published_at&quot;: &quot;2026-10-24T11:01:28+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E3&quot;,
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;title&quot;: &quot;Century Aluminum (CENX) Stock Still Looks Cheap Following Its 4x Three Year Run&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/century-aluminum-cenx-stock-still-221342136.html&quot;,
+      &quot;publisher&quot;: &quot;Simply Wall St.&quot;,
+      &quot;published_at&quot;: &quot;2026-10-24T22:13:42+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E4&quot;,
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;title&quot;: &quot;2026년 세제개편안 세목별 핵심사항&quot;,
+      &quot;source_url&quot;: &quot;http://www.intn.co.kr/news/articleView.html?idxno=2052332&quot;,
+      &quot;publisher&quot;: &quot;Naver News&quot;,
+      &quot;published_at&quot;: &quot;2026-08-04T11:40:00+09:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;대한 소득세 세제지원* 확대 (소득법 §59의3) * 퇴직연금 납입액에 대해 12%(총급여 5,500만원 또는 종합소득금액 4,500만원 이하는 15%) 세액공제(연 900만원 한도(연금저축계좌 납입액 포함)) ㅇ 청년층 자산형성 및...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E5&quot;,
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;title&quot;: &quot;&#x27;2025 핵심 개정 세법&#x27; 총정리 - 국회 본회의 의결(2025. 12. 2.)&quot;,
+      &quot;source_url&quot;: &quot;http://www.intn.co.kr/news/articleView.html?idxno=2047657&quot;,
+      &quot;publisher&quot;: &quot;Naver News&quot;,
+      &quot;published_at&quot;: &quot;2025-12-04T15:26:00+09:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;아니한 퇴직소득을 연금수령할 때 실제 수령연차가 20년을 초과하는 경우의 원천징수세율을 연금외수령 원천징수세율의 60%→50%로 인하 &#x27;26.1.1. 이후 연금 수령하는 분부터 적용 □ 사업소득 연말정산 시...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E6&quot;,
+      &quot;claim_id&quot;: &quot;C11&quot;,
+      &quot;title&quot;: &quot;Stock Futures Set to Trade Ahead of Fed Decision&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/m/6aa0a251-3626-3c5e-9bb0-32356c21ae2b/stock-futures-set-to-trade.html&quot;,
+      &quot;publisher&quot;: &quot;Barrons.com&quot;,
+      &quot;published_at&quot;: &quot;2026-10-25T19:44:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E7&quot;,
+      &quot;claim_id&quot;: &quot;C11&quot;,
+      &quot;title&quot;: &quot;Dow Jones Futures Due With Microsoft, Google, Amazon Ahead; Will Doom Or Bloom Control Market?&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/m/cdb9c13b-db57-3551-acd0-7507e9d69b5a/dow-jones-futures-due-with.html&quot;,
+      &quot;publisher&quot;: &quot;Investor&#x27;s Business Daily&quot;,
+      &quot;published_at&quot;: &quot;2026-10-25T19:33:52+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E8&quot;,
+      &quot;claim_id&quot;: &quot;C12&quot;,
+      &quot;title&quot;: &quot;KBRA Assigns Preliminary Ratings to Foundation Finance Trust 2026-2&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/real-estate/articles/kbra-assigns-preliminary-ratings-foundation-174600444.html&quot;,
+      &quot;publisher&quot;: &quot;Business Wire&quot;,
+      &quot;published_at&quot;: &quot;2026-10-23T17:46:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E9&quot;,
+      &quot;claim_id&quot;: &quot;C12&quot;,
+      &quot;title&quot;: &quot;KBRA Assigns Preliminary Ratings to DataBank Issuer, LLC and DataBank Co-Issuer, LLC Series 2026-2/3/4&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/kbra-assigns-preliminary-ratings-databank-174500931.html&quot;,
+      &quot;publisher&quot;: &quot;Business Wire&quot;,
+      &quot;published_at&quot;: &quot;2026-10-09T17:45:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    }
+  ],
+  &quot;source_policy&quot;: {
+    &quot;raw_transcript_published&quot;: false,
+    &quot;raw_transcript_in_evidence&quot;: false,
+    &quot;research_pipeline_version&quot;: 4,
+    &quot;closed_source_claims&quot;: &quot;unverified_external_source&quot;,
+    &quot;auto_caption_warning&quot;: true,
+    &quot;local_asr_warning&quot;: false
+  }
+}</pre>
+  </details>
+</article>
+</main>
+  <style>
+.reader-contents { margin: 16px 0; padding: 12px 16px; border: 1px solid var(--line, #64748b); border-radius: 12px; }
+.reader-contents > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-weight: 750; }
+.reader-contents nav { display: grid; gap: 4px; max-height: 45vh; overflow: auto; margin: 8px 0; }
+.reader-contents a { display: block; min-height: 44px; padding: 10px; border-radius: 6px; color: inherit; overflow-wrap: anywhere; }
+.reader-contents a:hover { background: #80808020; }
+.reader-contents .reader-subsection { padding-inline-start: 24px; font-size: .92em; }
+.reader-prose, .report { overflow-wrap: anywhere; line-height: 1.8; }
+.reader-prose p, .reader-prose li { max-width: 85ch; }
+.reader-prose h2, .reader-prose h3, .reader-prose h4, [data-reader-heading] { scroll-margin-top: 100px; line-height: 1.45; }
+.reader-prose h2 { margin-top: 1.8em; padding-bottom: 8px; border-bottom: 1px solid var(--line, #64748b); }
+.reader-prose h3 { margin-top: 1.5em; }
+.reader-prose li { margin: .5em 0; }
+.reader-prose pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.reader-prose blockquote { margin: 16px 0; padding: 4px 16px; border-left: 3px solid var(--accent, #64748b); }
+.reader-table { overflow: auto; max-width: 100%; margin: 16px 0; border: 1px solid var(--line, #64748b); border-radius: 10px; }
+.reader-table table { border-collapse: collapse; width: 100%; margin: 0; font-size: .92rem; }
+.reader-table th, .reader-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line, #64748b); min-width: 110px; max-width: 400px; overflow-wrap: anywhere; white-space: normal; }
+.reader-table th { background: #80808018; }
+.reader-table tr:nth-child(even) { background: #80808008; }
+.reader-search { display: grid; gap: 8px; margin: 16px 0; }
+.reader-search label { font-weight: 700; }
+.reader-search input { box-sizing: border-box; width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line, #64748b); border-radius: 10px; background: var(--panel, #fff); color: var(--text, #132238); font: inherit; }
+.reader-search p { margin: 0; font-size: .86rem; }
+.reader-back { position: fixed; bottom: max(14px, env(safe-area-inset-bottom)); right: 14px; z-index: 30; min-height: 44px; border: 1px solid #778899; border-radius: 99px; padding: 10px 16px; background: #18344a; color: #fff; font: 700 14px system-ui; cursor: pointer; box-shadow: 0 3px 12px #0003; }
+[data-reader-source] { margin-top: 20px; }
+[data-reader-source] > summary { min-height: 44px; cursor: pointer; }
+[data-reader-source] pre { font-size: .85rem; }
+[data-reader-source] pre, .reader-prose { min-width: 0; }
+.reader-contents :focus-visible, .reader-search :focus-visible, .reader-back:focus-visible, .reader-table:focus-visible { outline: 3px solid var(--accent, #008c95); outline-offset: 3px; }
+.reader-search + .grid > [hidden] { display: none !important; }
+@media (max-width: 600px) { .reader-prose { font-size: 1rem; } .reader-contents { padding: 8px 12px; } }
+@media print { .reader-back, .reader-search, .reader-contents, [data-reader-source] { display: none !important; } .reader-table { overflow: visible; } .reader-prose { color: #000; background: #fff; } }
+</style><script>
+(() => {
+  'use strict';
+  let serial = 0;
+  const rendered = new WeakMap();
+  const node = (tag, text) => { const el = document.createElement(tag); if (text != null) el.textContent = text; return el; };
+  function inline(parent, text) {
+    const pattern = /(`[^`]+`|\*\*[^*]+\*\*|\[[^\]]+\]\(https?:\/\/[^\s)]+\))/g;
+    let start = 0;
+    for (const match of String(text).matchAll(pattern)) {
+      parent.append(document.createTextNode(text.slice(start, match.index)));
+      const value = match[0];
+      if (value.startsWith('`')) parent.append(node('code', value.slice(1, -1)));
+      else if (value.startsWith('**')) parent.append(node('strong', value.slice(2, -2)));
+      else {
+        const link = value.match(/^\[([^\]]+)\]\((.+)\)$/);
+        const a = node('a', link[1]); a.href = link[2]; a.rel = 'noopener noreferrer'; parent.append(a);
+      }
+      start = match.index + value.length;
+    }
+    parent.append(document.createTextNode(text.slice(start)));
+  }
+  const cells = line => line.trim().replace(/^\|/, '').replace(/\|$/, '').split(/(?<!\\)\|/).map(v => v.trim().replace(/\\\|/g, '|'));
+  function markdown(source) {
+    const article = node('article'); article.className = 'reader-prose';
+    const lines = source.split(/\r?\n/); let list = null;
+    for (let i = 0; i < lines.length; i += 1) {
+      const line = lines[i], value = line.trim();
+      if (!value) { list = null; continue; }
+      if (/^```/.test(value)) {
+        const code = []; i += 1;
+        while (i < lines.length && !/^```/.test(lines[i].trim())) code.push(lines[i++]);
+        const pre = node('pre'); pre.append(node('code', code.join('\n'))); article.append(pre); list = null; continue;
+      }
+      if (i + 1 < lines.length && value.includes('|') && cells(lines[i + 1]).every(v => /^:?-{3,}:?$/.test(v))) {
+        const table = node('table'), head = node('thead'), body = node('tbody');
+        const row = (values, tag) => { const tr = node('tr'); values.forEach(v => { const cell = node(tag); if (tag === 'th') cell.scope = 'col'; inline(cell, v); tr.append(cell); }); return tr; };
+        head.append(row(cells(line), 'th')); i += 2;
+        while (i < lines.length && lines[i].trim() && lines[i].includes('|')) body.append(row(cells(lines[i++]), 'td'));
+        i -= 1; table.append(head, body); article.append(table); list = null; continue;
+      }
+      const heading = value.match(/^(#{1,6})\s+(.+)$/);
+      if (heading) { const h = node('h' + Math.min(4, heading[1].length + 1)); inline(h, heading[2]); article.append(h); list = null; continue; }
+      const bullet = value.match(/^(?:[-*+] |\d+\. )(.+)$/);
+      if (bullet) {
+        const tag = /^\d/.test(value) ? 'ol' : 'ul';
+        if (!list || list.tagName.toLowerCase() !== tag) { list = node(tag); if (tag === 'ol') list.start = parseInt(value, 10); article.append(list); }
+        const li = node('li'); inline(li, bullet[1]); list.append(li); continue;
+      }
+      list = null;
+      if (/^(---+|\*\*\*+)$/.test(value)) { article.append(node('hr')); continue; }
+      const p = node(value.startsWith('> ') ? 'blockquote' : 'p'); inline(p, value.startsWith('> ') ? value.slice(2) : line); article.append(p);
+    }
+    return article;
+  }
+  function contents(root) {
+    root.querySelectorAll(':scope > .reader-contents').forEach(el => el.remove());
+    const headings = [...root.querySelectorAll('h2,h3,h4')].filter(h => !h.closest('.card,.run-card,.reader-contents,[data-reader-source],[hidden]'));
+    if (headings.length < 2) return;
+    const details = node('details'); details.className = 'reader-contents';
+    details.append(node('summary', '이 리포트 목차 · ' + headings.length + '개 항목'));
+    const nav = node('nav'); nav.setAttribute('aria-label', '리포트 목차');
+    headings.forEach(h => {
+      if (!h.id) h.id = 'reader-section-' + (++serial);
+      h.dataset.readerHeading = ''; h.tabIndex = -1;
+      const a = node('a', h.textContent); a.href = '#' + h.id;
+      if (h.tagName !== 'H2') a.className = 'reader-subsection';
+      a.addEventListener('click', event => {
+        event.preventDefault();
+        for (let ancestor = h.parentElement; ancestor; ancestor = ancestor.parentElement) if (ancestor.tagName === 'DETAILS') ancestor.open = true;
+        h.scrollIntoView({block: 'start'}); h.focus({preventScroll: true});
+      }); nav.append(a);
+    });
+    details.append(nav); root.prepend(details);
+  }
+  function enhance(root) {
+    if (!root) return;
+    root.querySelectorAll('pre[data-report-markdown]').forEach(pre => {
+      const previous = rendered.get(pre);
+      if (previous && previous.source === pre.textContent) return;
+      const article = markdown(pre.textContent);
+      if (previous) previous.article.replaceWith(article);
+      else {
+        const details = node('details'); details.dataset.readerSource = '';
+        details.append(node('summary', 'Markdown 원문 보기'));
+        pre.before(article, details); details.append(pre);
+      }
+      rendered.set(pre, {source: pre.textContent, article});
+    });
+    root.querySelectorAll('table').forEach(table => {
+      if (table.closest('.reader-table,.account-table-wrap,.summary-scroll')) return;
+      const wrap = node('div'); wrap.className = 'reader-table'; wrap.tabIndex = 0;
+      wrap.setAttribute('role', 'region'); wrap.setAttribute('aria-label', '리포트 표 · 가로로 스크롤하여 전체 보기');
+      table.before(wrap); wrap.append(table);
+    });
+    root.querySelectorAll('.grid').forEach(grid => {
+      const cards = [...grid.querySelectorAll(':scope > a.card')];
+      if (cards.length < 2 || grid.dataset.readerSearch) return;
+      grid.dataset.readerSearch = 'true';
+      const box = node('div'); box.className = 'reader-search';
+      const input = node('input'); input.type = 'search'; input.placeholder = '제목 · 종목 · 채널 · 키워드'; input.id = 'report-search-' + (++serial);
+      const label = node('label', '리포트 찾기'); label.htmlFor = input.id;
+      const status = node('p'); status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
+      const update = () => {
+        const terms = input.value.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean); let count = 0;
+        cards.forEach(card => { card.hidden = !terms.every(t => card.textContent.toLocaleLowerCase().includes(t)); if (!card.hidden) count += 1; });
+        status.textContent = cards.length + '개 중 ' + count + '개 표시' + (count ? '' : ' · 검색어를 지우거나 다른 키워드를 입력하세요.');
+      };
+      input.addEventListener('input', update); box.append(label, input, status); grid.before(box); update();
+    });
+    contents(root);
+  }
+  window.TradingAgentsReader = {enhance};
+  const main = document.querySelector('main');
+  if (main && !main.hasAttribute('data-reader-dynamic')) enhance(main);
+  if (main) {
+    const top = node('button', '↑ 맨 위'); top.type = 'button'; top.className = 'reader-back'; top.setAttribute('aria-label', '리포트 맨 위로 이동');
+    top.addEventListener('click', () => { const target = document.querySelector('h1') || main; target.tabIndex = -1; target.scrollIntoView({block: 'start'}); target.focus({preventScroll: true}); });
+    document.body.append(top);
+  }
+})();
+</script>
+</body>
+</html>
