@@ -23,6 +23,8 @@ def main() -> int:
     prepare.add_argument("--refresh-market", action="store_true",
                          help="Require new broker quotes and a VALID account before preparing KR/US.")
     prepare.add_argument("--producer-state-dir", type=Path, default=Path(".runtime/local-automation"))
+    prepare.add_argument("--report-context-v1", action="store_true",
+                         help="Explicitly opt KR/US into sealed prior-ACK and public readiness context.")
 
     publish = subparsers.add_parser("publish")
     publish.add_argument("--surface", required=True, choices=("kr", "us", "youtube", "prism"))
@@ -77,13 +79,15 @@ def main() -> int:
                 from .pre_report import prepare_market_report
                 result = prepare_market_report(runtime, args.surface,
                     producer_state_dir=args.producer_state_dir, archive_dir=args.archive_dir,
-                    youtube_archive_dir=args.youtube_archive_dir, prism_archive_dir=args.prism_archive_dir)
+                    youtube_archive_dir=args.youtube_archive_dir, prism_archive_dir=args.prism_archive_dir,
+                    report_context_v1=args.report_context_v1)
             else:
                 result = runtime.prepare(
                     args.surface,
                     archive_dir=args.archive_dir,
                     youtube_archive_dir=args.youtube_archive_dir,
                     prism_archive_dir=args.prism_archive_dir,
+                    report_context_v1=args.report_context_v1,
                 )
         elif args.command == "publish":
             try:
