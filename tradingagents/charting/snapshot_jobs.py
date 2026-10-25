@@ -230,4 +230,3 @@ def journal_identities(stamps):
     # Four rows per configured main DB: file, WAL, SHM and rollback journal.
     return tuple((row[0], row[4:6] if len(row) > 2 else None) for row in stamps[::4])
 
-
