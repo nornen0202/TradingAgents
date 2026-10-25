@@ -25,7 +25,8 @@ from tradingagents.portfolio.kis import KisClient
 NOW = datetime(2026, 10, 26, 1, tzinfo=timezone.utc)
 ORIGINAL, END = "2021-10-23", "2026-10-23"
 REVIEWED_CASES = [("278470.KS", "2024-02-27"), ("403870.KQ", "2022-07-15"),
-                  ("064400.KS", "2025-02-05"), ("411080.KQ", "2023-02-15")]
+                  ("064400.KS", "2025-02-05"), ("411080.KQ", "2023-02-15"),
+                  ("396300.KQ", "2022-03-24")]
 
 
 @pytest.fixture(autouse=True)
@@ -76,6 +77,69 @@ def test_exact_original_event_and_current_master_keep_original_window(symbol, fi
     assert contract["historical_vintage_verified"] is False
     assert listing.validate_listing_receipt(symbol, contract, requested_start=ORIGINAL,
         end_date=END, observed_at=NOW) == contract
+
+
+def test_396300_original_issuer_matches_retained_master_row_by_stable_identity():
+    # Exact public row retained at 2026-10-25T21:12:42.022291Z; not a fresh clock.
+    raw = bytes.fromhex(
+        "3339363330302020204b52373339363330303030364854b7cebab8c6bdbdba202020202020202020"
+        "202020202020202020202020202020202020202020535433313030393130323630303030204e4e20"
+        "4e202020204e20203020204e202020204e303030303039323130303030303130303030314e4e4e30"
+        "304e4e4e3030303030303130304e3039303030303030363335303231363030303030303030303130"
+        "30323032323033323430303030303030303030323634383930303030303030303030303236343839"
+        "353030303031322020202020202030204e4e3030303030303932332d303030303030323730303030"
+        "3030303133303030323530303030303030303432303234313233313030303030323433392020204e"
+        "4e4e0a"
+    )
+    assert hashlib.sha256(raw).hexdigest() == "d6a51ad6dbdac6059cc24371d34d015a3c7769f294265fe4573beb1a78b5e6b4"
+    identity = listing._parse_master(raw, board="kosdaq", short_code="396300")
+    assert identity == {
+        "short_code_raw": "396300", "standard_code": "KR7396300006",
+        "korean_name": "HT로보틱스", "security_group_token": "ST",
+        "listing_date_raw": "20220324", "indirect_listing_raw": "N",
+        "row_sha256": "d6a51ad6dbdac6059cc24371d34d015a3c7769f294265fe4573beb1a78b5e6b4",
+        "row_bytes": 283,
+    }
+    issue = listing._REVIEWED["396300.KQ"]
+    assert issue["issuer"] == "(주)세아메카닉스 보통주"
+    assert issue["provider_name"] == identity["korean_name"]
+    assert issue["isin"] == identity["standard_code"]
+    assert issue["first_regular_session"] == "2022-03-24"
+    assert issue["sources"][0] == {
+        "url": "https://kind.krx.co.kr/external/2022/03/22/001510/20220322005961/70760.htm",
+        "sha256": "a49cfc42142b5c71e5a1272d0262cb88e5e472458801dbc3d7237533f5ceb2a6",
+        "role": "EXCHANGE_NEW_COMMON_FIRST_TRADING_DATE_AND_ISIN",
+    }
+    snapshot = metadata("396300.KQ")
+    snapshot["identity"] = identity
+    assert verify(snapshot, symbol="396300.KQ")["required_start"] == "2022-03-24"
+
+
+@pytest.mark.parametrize("field,value", [("korean_name", "세아메카닉스"),
+                                         ("standard_code", "KR7411080005")])
+def test_396300_rename_does_not_replace_current_master_or_stable_id(field, value):
+    snapshot = metadata("396300.KQ")
+    snapshot["identity"][field] = value
+    with pytest.raises(ValueError, match="bind"):
+        verify(snapshot, symbol="396300.KQ")
+
+
+@pytest.mark.parametrize("cutoff,available", [("2026-10-25T22:29:04.545081+00:00", False),
+                                            ("2026-10-25T22:29:04.545082+00:00", True)])
+def test_396300_new_ipo_proof_never_reaches_an_earlier_analysis(monkeypatch, clock, cutoff, available):
+    clock.now = datetime.fromisoformat(cutoff)
+    collect = Mock(side_effect=lambda symbol, **_: metadata(symbol))
+    monkeypatch.setattr(listing, "collect_master_identity", collect)
+    contract = listing.collect_listing_contract("396300.KQ", requested_start=ORIGINAL, end_date=END)
+    assert listing._REVIEWED["396300.KQ"]["evidence_available_at"] == "2026-10-25T22:29:04.545082+00:00"
+    if available:
+        assert contract["required_start"] == "2022-03-24"
+        collect.assert_called_once()
+    else:
+        assert contract is None
+        collect.assert_not_called()
+        with pytest.raises(ValueError, match="Unavailable"):
+            verify(symbol="396300.KQ", analysis_as_of=clock.now)
 
 
 @pytest.mark.parametrize("field,value", [
@@ -252,6 +316,15 @@ def test_complete_post_listing_series_pins_original_window_receipt_and_200_minim
 def test_listing_never_excuses_missing_regular_session(broker, missing):
     client, _, state = broker
     state.missing = {missing}
+    with pytest.raises(VendorMalformedResponseError):
+        kr.load_kr_daily_bars(state.symbol, ORIGINAL, END, require_complete=True)
+    assert not kr._CACHE
+
+
+@pytest.mark.parametrize("missing", ["2022-03-24", "2025-09-19", END])
+def test_396300_first_interior_and_last_session_cannot_be_excused(broker, missing):
+    _, _, state = broker
+    state.symbol, state.missing = "396300.KQ", {missing}
     with pytest.raises(VendorMalformedResponseError):
         kr.load_kr_daily_bars(state.symbol, ORIGINAL, END, require_complete=True)
     assert not kr._CACHE
@@ -480,13 +553,15 @@ def test_local_identity_clock_does_not_become_vendor_price_observation(broker):
     assert "observed_at" not in receipt
 
 
-@pytest.mark.parametrize("symbol", ["064400.KS", "411080.KQ"])
-def test_later_extraction_of_old_master_does_not_renew_300_second_availability(symbol):
+@pytest.mark.parametrize("symbol,cutoff", [("064400.KS", "2026-10-25T21:30:00+00:00"),
+                                         ("411080.KQ", "2026-10-25T21:30:00+00:00"),
+                                         ("396300.KQ", "2026-10-25T22:30:00+00:00")])
+def test_later_extraction_of_old_master_does_not_renew_300_second_availability(symbol, cutoff):
     snapshot = metadata(symbol)
     snapshot["collection_started_at"] = "2026-10-25T21:12:40+00:00"
     snapshot["available_at"] = "2026-10-25T21:12:42.022291+00:00"
     with pytest.raises(ValueError, match="current KR master"):
-        verify(snapshot, symbol=symbol, analysis_as_of="2026-10-25T21:30:00+00:00")
+        verify(snapshot, symbol=symbol, analysis_as_of=cutoff)
 
 
 @pytest.mark.parametrize("age,accepted", [(300, True), (300.000001, False)])
@@ -507,7 +582,7 @@ def test_future_analysis_cutoff_is_rejected_even_if_current_metadata_is_fresh():
         verify(analysis_as_of=NOW + timedelta(seconds=1))
 
 
-@pytest.mark.parametrize("symbol", ["278470.KQ", "403870.KS", "064400.KQ", "411080.KS"])
+@pytest.mark.parametrize("symbol", ["278470.KQ", "403870.KS", "064400.KQ", "411080.KS", "396300.KS"])
 def test_reviewed_wrong_board_cannot_be_treated_as_unreviewed_legacy(broker, symbol):
     client, collect, _ = broker
     with pytest.raises(VendorInputError, match="suffix"):
