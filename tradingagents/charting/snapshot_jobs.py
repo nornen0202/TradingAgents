@@ -36,13 +36,12 @@ class _Job:
     payload: bytes | None = None
     verify: object = None
     delivery_valid: object = None
-    delivery_invalidations: int = 0
     completed: float | None = None
     error: SnapshotJobError | None = None
 
 
 class SnapshotJobs:
-    """One worker, four total jobs and bounded results; no executor work queue.
+    """One worker, four total jobs and four caller receipts; no executor queue.
 
     A completed job is verified before delivery. A cheap tracked-path check at
     the actual poll can re-enter asynchronous verification at most twice if
@@ -55,7 +54,31 @@ class SnapshotJobs:
         self.retention_seconds, self.clock = retention_seconds, clock
         self._condition = Condition()
         self._jobs, self._queue = {}, deque()
+        self._receipts, self._delivery_invalidations = {}, {}
         self._worker = None
+
+    def _receipt_job(self, token):
+        return self._jobs.get(self._receipts.get(token))
+
+    def _drop_receipt(self, token):
+        identity = self._receipts.pop(token, None)
+        self._delivery_invalidations.pop(token, None)
+        if identity is None or identity in self._receipts.values():
+            return
+        job = self._jobs.get(identity)
+        if job is not None and job.state in {"RUNNING", "VERIFYING"}:
+            # No remaining reader owns the work. Do not stop the Python reader;
+            # discard its late result, retaining its bounded worker slot.
+            job.state, job.payload, job.completed = "CANCELLED", None, self.clock()
+        else:
+            self._jobs.pop(identity, None)
+
+    def _drop_job(self, identity):
+        for token, owner in list(self._receipts.items()):
+            if owner == identity:
+                self._receipts.pop(token)
+                self._delivery_invalidations.pop(token, None)
+        self._jobs.pop(identity, None)
 
     def _enqueue(self, token, verify=False):
         self._queue.append((token, verify))
@@ -68,7 +91,7 @@ class SnapshotJobs:
         for token, job in list(self._jobs.items()):
             if (job.state in {"READY", "DELIVERY_READY", "ERROR"} and job.completed is not None
                     and now - job.completed >= self.retention_seconds):
-                del self._jobs[token]
+                self._drop_job(token)
 
     def request(self, key, build=None, *, token=None):
         with self._condition:
@@ -76,26 +99,32 @@ class SnapshotJobs:
             self._purge(now)
             if token is None:
                 job = next((j for j in self._jobs.values() if j.key == key and j.state in {"QUEUED", "RUNNING", "VERIFYING"}), None)
+                # Receipts are globally bounded, not four per shared job. Old
+                # terminal readers may be evicted; active callers are retained.
+                terminal = sorted((r for r, owner in self._receipts.items()
+                                   if self._jobs[owner].state in {"READY", "DELIVERY_READY", "ERROR"}),
+                                  key=lambda r: self._receipt_job(r).completed)
+                def full():
+                    return len(self._receipts) >= self.max_jobs or job is None and len(self._jobs) >= self.max_jobs
+                while full() and terminal:
+                    self._drop_receipt(terminal.pop(0))
+                if full():
+                    raise SnapshotJobError(429, "Archive snapshot capacity reached; retry a fresh query later")
                 if job is None:
-                    # Aborted clients may never collect a completed response.
-                    # Reclaim only terminal jobs, never running/queued evidence.
-                    terminal = sorted((j for j in self._jobs.values() if j.state in {"READY", "DELIVERY_READY", "ERROR"}),
-                                      key=lambda j: j.completed)
-                    while len(self._jobs) >= self.max_jobs and terminal:
-                        del self._jobs[terminal.pop(0).token]
-                    if len(self._jobs) >= self.max_jobs:
-                        raise SnapshotJobError(429, "Archive snapshot capacity reached; retry a fresh query later")
                     job = _Job(secrets.token_urlsafe(24), key, build, now, now)
                     self._jobs[job.token] = job
                     self._enqueue(job.token)
+                token = secrets.token_urlsafe(24)
+                self._receipts[token] = job.token
+                self._delivery_invalidations[token] = 0
             else:
-                job = self._jobs.get(token)
+                job = self._receipt_job(token)
                 if job is None:
                     raise SnapshotJobError(410, "Archive snapshot token expired or unknown; start a fresh query")
                 if job.key != key:
                     raise SnapshotJobError(400, "Archive snapshot token does not match this query")
             if job.state == "ERROR":
-                del self._jobs[job.token]
+                self._drop_receipt(token)
                 raise job.error
             if job.state == "READY":
                 job.state, job.phase, job.phase_started = "VERIFYING", "VERIFY", now
@@ -103,35 +132,32 @@ class SnapshotJobs:
             if job.state == "DELIVERY_READY":
                 try:
                     valid = job.delivery_valid is None or job.delivery_valid()
-                except (OSError, ValueError, TypeError):
+                except (OSError, ValueError, TypeError, RuntimeError):
                     valid = False
                 if valid:
-                    del self._jobs[job.token]
+                    self._drop_receipt(token)
                     return 200, job.payload
-                if job.delivery_invalidations >= 2:
-                    del self._jobs[job.token]
+                if self._delivery_invalidations[token] >= 2:
+                    self._drop_receipt(token)
                     raise SnapshotJobError(422, "Archive evidence changed repeatedly before delivery; start a fresh query")
-                job.delivery_invalidations += 1
+                self._delivery_invalidations[token] += 1
                 job.state, job.phase, job.phase_started = "VERIFYING", "VERIFY", now
                 self._enqueue(job.token, verify=True)
             if job.state == "CANCELLED":
                 raise SnapshotJobError(410, "Archive snapshot was cancelled; start a fresh query")
-            return 202, {"status": "SNAPSHOT_BUILDING", "job_token": job.token, "generation": key[3],
+            return 202, {"status": "SNAPSHOT_BUILDING", "job_token": token, "generation": key[3],
                          "as_of": key[1],
                          "phase": job.phase, "elapsed_seconds": max(0, now - job.created),
                          "phase_elapsed_seconds": max(0, now - job.phase_started)}
 
     def cancel(self, key, token):
         with self._condition:
-            job = self._jobs.get(token)
+            job = self._receipt_job(token)
             if job is None:
                 raise SnapshotJobError(410, "Archive snapshot token expired or unknown; start a fresh query")
             if job.key != key:
                 raise SnapshotJobError(400, "Archive snapshot token does not match this query")
-            if job.state in {"READY", "DELIVERY_READY", "ERROR", "QUEUED"}:
-                del self._jobs[token]
-                return
-            job.state, job.payload, job.completed = "CANCELLED", None, self.clock()
+            self._drop_receipt(token)
 
     def _progress(self, job, phase):
         if phase not in PHASES:
@@ -153,7 +179,7 @@ class SnapshotJobs:
                 if job is None:
                     continue
                 if job.state == "CANCELLED":
-                    del self._jobs[token]
+                    self._drop_job(token)
                     continue
                 if not checking:
                     job.state = "RUNNING"
@@ -174,7 +200,7 @@ class SnapshotJobs:
                     job.verify = verify
                 with self._condition:
                     if job.state == "CANCELLED" or token not in self._jobs:
-                        self._jobs.pop(token, None)
+                        self._drop_job(token)
                         continue
                     total = sum(len(j.payload) for j in self._jobs.values() if j is not job and j.payload is not None)
                     if total + len(encoded) > self.max_total_bytes:
@@ -185,7 +211,7 @@ class SnapshotJobs:
             except Exception as error:
                 with self._condition:
                     if job.state == "CANCELLED" or token not in self._jobs:
-                        self._jobs.pop(token, None)
+                        self._drop_job(token)
                         continue
                     job.error = error if isinstance(error, SnapshotJobError) else SnapshotJobError(422, "Archive input invalid, changed or unavailable")
                     job.payload, job.build, job.verify = None, None, None
@@ -232,10 +258,12 @@ def journal_fingerprint(journals, *, validate_paths=True):
     rows = []
     for configured in journals:
         path = Path(configured)
-        fixed = path.resolve() if validate_paths else None
+        # sqlite3 opens the resolved main DB in the replay reader. Its WAL/SHM
+        # belong to that DB filename, not to a differently named file alias.
+        fixed = path.resolve() if validate_paths else path
         for suffix in ("", "-wal", "-shm", "-journal"):
-            item = Path(str(path) + suffix)
-            if validate_paths and item.resolve() != Path(str(fixed) + suffix):
+            item = Path(str(fixed) + suffix)
+            if validate_paths and item.resolve() != item:
                 raise ValueError("Configured journal boundary changed")
             try:
                 local = item.lstat()

@@ -28,13 +28,13 @@ GET /api/snapshot?ticker=AAPL&as_of=2026-10-25T17:00:00Z&catalog_generation=N&sn
 
 ## 자원·무결성 경계
 
-서버당 worker1개와 최대4작업으로 제한한다. 직렬화 결과는 한 건8MiB·합계16MiB 한도이며 큰 원문을 잘라 성공처럼 내보내지 않는다. 이 수는 프로세스 전체 메모리 한도가 아니다. 목록 projection과 진행 작업의 세대 참조 등은 별도이며 작업 수로 제한된다. 완료됐지만 수령되지 않은 작업은 새 입장 시 회수할 수 있어 영구적인 용량 정체를 막는다.
+서버당 worker1개와 최대4계산 작업, 전역 최대4개의 독립 수령 receipt로 제한한다. 같은 조건을 동시에 요청하면 계산·직렬화 원문은 한 개를 공유하고 호출자마다 별도 opaque token을 받는다. 한 호출자의 수령이 다른 호출자의 결과를 소비하지 않으며 각 수령 때 근거를 확인한다. 직렬화 결과는 한 건8MiB·합계16MiB 한도이며 큰 원문을 잘라 성공처럼 내보내지 않는다. 이 수는 프로세스 전체 메모리 한도가 아니다. 목록 projection과 진행 작업의 세대 참조 등은 별도이며 작업 수로 제한된다. 완료됐지만 수령되지 않은 작업과 receipt는 새 입장 시 회수할 수 있어 영구적인 용량 정체를 막는다.
 
 완료 응답은 같은 작업의 검증 후 한 번 전달한다. 실제 전달 직전에도 이미 알려진 원본·경계·원장의 가벼운 metadata 검사를 수행한다. 대기 중 변경이 있으면200 대신202로 같은 worker의 재검증을 요청하며, 최대2회 재진입 뒤에도 안정되지 않으면 실패한다. 소비·만료된 token은410, 다른 조건은400, 새 요청의 오래된 세대는409, 활성 작업 포화는429다. 통신 실패 후에는 새 조회가 필요하다. 공개 취소 HTTP는 제공하지 않는다. 이 기능은 보관자료 읽기 전용이며 주문을 전송하지 않는다.
 
 선택 ticker tree·명시 manifest·고정 journal 경계와 파일 식별자를 검증한다. 이것을 CAS 전체 또는 archive 전체의 원자적 snapshot 증명으로 표현하지 않는다. 원장 metadata 변경은 원래 cutoff의 기존 replay와 비공개 admitted-row proof를 재검증해 정상 미래 append와 과거 가용 증거 변경을 구분한다. ACCOUNT_SEED 원문·경로·비공개 proof는 HTTP에 노출하지 않는다. 검증 도중 다시 변경되면 최대2회 안에서 확인하고, 안정된 증거를 얻지 못하면 실패한다. 파일 시각은 무효화·무결성 검사에만 사용한다.
 
-일반 SQLite 원장의 읽기가 WAL `ctime`과 SHM의 파생 metadata를 바꿀 수 있어 이 값들만으로 금융 근거 변경을 판정하지 않는다. main/WAL/rollback의 mtime·size·식별자와 cutoff 증거는 유지하고, SHM은 파일 종류·attributes·reparse 및 실제 경로 경계를 확인한다. immutable 연구 원문의 ctime 검사는 유지한다. 같은 metadata를 복원한 임의의 저수준 byte 변조 전체를 stat 검사만으로 증명한다고 주장하지 않는다.
+일반 SQLite 원장의 읽기가 WAL `ctime`과 SHM의 파생 metadata를 바꿀 수 있어 이 값들만으로 금융 근거 변경을 판정하지 않는다. main/WAL/rollback의 mtime·size·식별자와 cutoff 증거는 유지하고, SHM은 파일 종류·attributes·reparse 및 실제 경로 경계를 확인한다. 설정된 journal 별칭은 처음 고정한 실제 DB 대상과 계속 대조하고, sidecar는 기존 replay reader와 같이 그 실제 대상에서 유도한다. 별칭 전환·sidecar 경계 탈출은 거절한다. immutable 연구 원문의 ctime 검사는 유지한다. 같은 metadata를 복원한 임의의 저수준 byte 변조 전체를 stat 검사만으로 증명한다고 주장하지 않는다.
 
 브라우저의 요청당15초·202 전체 대기120초 예산은 유지한다. 금융 자료의 원래120초 신선도, 계좌·소유권·승인·원장·한도는 변경하지 않는다. 가격·계좌·주문 cache나 승인 경로를 추가하지 않는다.
 
@@ -43,6 +43,8 @@ GET /api/snapshot?ticker=AAPL&as_of=2026-10-25T17:00:00Z&catalog_generation=N&sn
 느린 builder의 bounded202·단일 작업 join, 독립 health, 서로 다른 시점/종목/anchor/token, 미래·잘못된 날짜, source/경계/원장 교체, 미래 append 허용과 가용 증거·seed 변조 거절, 검사 중 추가 변경, 세대 회수와 queued 작업, 미수령 완료 작업 회수, 용량·만료·단회 전달을 fixture로 확인한다. 직접 API에서 명시 시각 누락은 작업 입장 전에 거절한다. 360/390/430/1440px 화면·Node 가상 시계 검증은 실제 운영 성능과 구분한다.
 
 PR 검토에서 추가로 찾은 정상 WAL 읽기 거절과 `DELIVERY_READY` 대기 중 근거 변경 누락은 수정 전 native fixture로 재현했다. 수정 후 관련 모듈47개, 독립 native WAL 및 전달 변경 재현이 통과했다. 정상 main/WAL 원문은 그대로이며, 전달 중 source/과거 가용 행 변경은 재검증 후422, 미래 append는 같은 cutoff 증거가 같을 때200이다. SHM 경계 탈출과 반복 재검증 한도도 확인했다. 검사 집합은 기존166개 등과 중복되므로 합산하지 않는다.
+
+후속 검토의 다중 호출자 수령 충돌과 journal 별칭 sidecar 오인도 회귀로 고쳤다. 관련 모듈57 PASS/1 SKIP, 독립 표적10 PASS/1 SKIP이며 실제 파일 symlink는 Windows 권한1314로 SKIP했다. 실제 임시 directory junction과 resolution mock은 통과했으므로 두 증거를 구분한다. 계산 한 번·동일 원문 객체·전역 receipt 한도, 한 호출자의 취소 격리, 첫 호출자 수령 뒤 다른 호출자의 원본/가용 행 변경 재검증을 확인했다. 별칭 cycle 예외의 마지막 작은 변경은 관련4개 표적으로 별도 확인했으며 검사 수를 합산하지 않는다.
 
 실제 화면 helper도 별도 새 버전에서 종목·시장·원래 cutoff·세대·작업 token의 일치를 검사한다. 초기 국내 차트를 미국 결과로 인정하지 않는다. 기존90초 harness는 목록과 snapshot 각각의120초 대기를 모두 관측하기에 짧았으므로 새 harness 상한은 단계당270초로 명시한다. 앱의 요청당15초·각202 전체120초 제한은 변경하지 않으며, 이전90초 실패와 새 harness 결과를 같은 지연 기준의 비교로 사용하지 않는다.
 

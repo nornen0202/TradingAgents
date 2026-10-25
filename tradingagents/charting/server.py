@@ -88,12 +88,13 @@ def make_handler(run_dir=None, *, db_paths=(), archive_dir=None, experiment_regi
             journals = _snapshot_journals(ticker, context, db_paths, market_journals)
         except JournalScopeError:
             raise SnapshotJobError(422, "Archive journal market scope unverified") from None
+        bound_journals = tuple(journal_bounds[Path(path)] for path in journals)
         root = index.root if index is not None else (Path(run_dir) / "tickers").resolve()
         alias = Path(archive_dir) / "runs" if index is not None else Path(run_dir) / "tickers"
         def journals_stamp():
             if any(Path(path).resolve() != journal_bounds[Path(path)] for path in journals):
                 raise ValueError("Configured journal scope changed")
-            return journal_fingerprint(journals)
+            return journal_fingerprint(bound_journals)
         def fingerprint():
             return evidence_fingerprint(directory, root=root, manifest=manifest, alias=alias)
         before = fingerprint()
@@ -111,7 +112,7 @@ def make_handler(run_dir=None, *, db_paths=(), archive_dir=None, experiment_regi
         else:
             context = {**context, **known_artifacts(directory, cutoff)}
         private_proofs = []
-        snapshot = get_replay_snapshot(ticker, cutoff, ticker_dir=directory, db_paths=journals,
+        snapshot = get_replay_snapshot(ticker, cutoff, ticker_dir=directory, db_paths=bound_journals,
                                        anchor=anchor, phase_hook=progress, journal_proof_hook=private_proofs.append)
         if journals and len(private_proofs) != 1:
             raise ValueError("Snapshot journal proof unavailable")
@@ -135,7 +136,7 @@ def make_handler(run_dir=None, *, db_paths=(), archive_dir=None, experiment_regi
                 from tradingagents.performance.replay import replay_action_history
                 for _ in range(2):
                     revised_proofs = []
-                    replay = replay_action_history(journals, analysis_as_of=cutoff.isoformat(), ticker=ticker,
+                    replay = replay_action_history(bound_journals, analysis_as_of=cutoff.isoformat(), ticker=ticker,
                                                    proof_hook=revised_proofs.append) if journals else {}
                     if (lifecycle_hash(replay) != expected_lifecycle
                             or revised_proofs != private_proofs):
@@ -161,7 +162,8 @@ def make_handler(run_dir=None, *, db_paths=(), archive_dir=None, experiment_regi
             # metadata re-enters the worker; replay/JSON/discovery stay there.
             return (boundary_identities((root, alias)) == boundaries
                     and tracked_source_metadata(before) == before
-                    and journal_fingerprint(journals, validate_paths=False) == journal_before)
+                    and all(Path(path).resolve() == journal_bounds[Path(path)] for path in journals)
+                    and journal_fingerprint(bound_journals, validate_paths=False) == journal_before)
         return snapshot, verify, delivery_valid
 
     class Handler(BaseHTTPRequestHandler):

@@ -51,7 +51,7 @@ def test_worker_singleflight_and_exact_token_binding():
     assert first["as_of"] == KEY[1]
     assert entered.wait(2)
     for _ in range(10):
-        status, poll = jobs.request(KEY, build)
+        status, poll = jobs.request(KEY, token=first["job_token"])
         assert status == 202 and poll["job_token"] == first["job_token"]
         assert poll["phase"] == "BUILD" and poll["elapsed_seconds"] >= 0
     for key in (("MSFT", *KEY[1:]), (KEY[0], "2026-10-16T11:00:00Z", *KEY[2:]),
@@ -65,6 +65,58 @@ def test_worker_singleflight_and_exact_token_binding():
     with pytest.raises(SnapshotJobError) as error:
         jobs.request(KEY, token=first["job_token"])
     assert error.value.status == 410
+
+
+def test_initial_callers_share_one_computation_but_consume_independent_receipts():
+    jobs = SnapshotJobs()
+    entered, release = Event(), Event()
+    builds, guards = [], []
+    def build(_):
+        builds.append(1)
+        entered.set()
+        assert release.wait(5)
+        return {"whole_original": True}, lambda: None, lambda: guards.append(1) or True
+    try:
+        _, first = jobs.request(KEY, build)
+        assert entered.wait(2)
+        _, second = jobs.request(KEY, build)
+        assert first["job_token"] != second["job_token"]
+    finally:
+        release.set()
+    assert finish(jobs, KEY, first["job_token"]) == {"whole_original": True}
+    assert finish(jobs, KEY, second["job_token"]) == {"whole_original": True}
+    assert builds == [1] and len(guards) == 2
+    for token in (first["job_token"], second["job_token"]):
+        with pytest.raises(SnapshotJobError) as error:
+            jobs.request(KEY, token=token)
+        assert error.value.status == 410
+
+
+def test_shared_computation_cannot_bypass_global_receipt_limit_or_cancel_another_reader():
+    jobs = SnapshotJobs()
+    entered, release = Event(), Event()
+    calls = []
+    def build(_):
+        calls.append(1)
+        entered.set()
+        assert release.wait(5)
+        return {"whole_original": True}, lambda: None
+    try:
+        receipts = [jobs.request(KEY, build)[1]]
+        assert entered.wait(2)
+        receipts.extend(jobs.request(KEY, build)[1] for _ in range(3))
+        assert len({r["job_token"] for r in receipts}) == 4
+        assert len(jobs._jobs) == 1 and len(jobs._receipts) == 4
+        with pytest.raises(SnapshotJobError) as error:
+            jobs.request(KEY, build)
+        assert error.value.status == 429
+        jobs.cancel(KEY, receipts[0]["job_token"])
+        assert len(jobs._jobs) == 1 and len(jobs._receipts) == 3
+    finally:
+        release.set()
+    for receipt in receipts[1:]:
+        assert finish(jobs, KEY, receipt["job_token"]) == {"whole_original": True}
+    assert calls == [1] and not jobs._jobs and not jobs._receipts
 
 
 def test_verification_is_one_transition_and_slow_verify_does_not_rebuild():
@@ -193,7 +245,7 @@ def test_result_memory_and_terminal_retention_are_bounded():
     jobs = SnapshotJobs(max_total_bytes=32, max_result_bytes=32, retention_seconds=5, clock=lambda: now[0])
     _, first = jobs.request(KEY, lambda _: ({"text": "x" * 10}, lambda: None))
     deadline = time.monotonic() + 2
-    while jobs._jobs[first["job_token"]].state != "READY":
+    while jobs._receipt_job(first["job_token"]).state != "READY":
         assert time.monotonic() < deadline
         time.sleep(.005)
     second_key = ("MSFT", *KEY[1:])
@@ -211,7 +263,7 @@ def test_new_query_reclaims_uncollected_terminal_results_and_ready_cancel_is_imm
     jobs = SnapshotJobs(max_jobs=1)
     _, first = jobs.request(KEY, lambda _: ({"original": True}, lambda: None))
     deadline = time.monotonic() + 2
-    while jobs._jobs[first["job_token"]].state != "READY":
+    while jobs._receipt_job(first["job_token"]).state != "READY":
         assert time.monotonic() < deadline
         time.sleep(.005)
     _, second = jobs.request(KEY, lambda _: ({"fresh": True}, lambda: None))
@@ -219,7 +271,7 @@ def test_new_query_reclaims_uncollected_terminal_results_and_ready_cancel_is_imm
     with pytest.raises(SnapshotJobError) as error:
         jobs.request(KEY, token=first["job_token"])
     assert error.value.status == 410
-    while jobs._jobs[second["job_token"]].state != "READY":
+    while jobs._receipt_job(second["job_token"]).state != "READY":
         assert time.monotonic() < deadline
         time.sleep(.005)
     jobs.cancel(KEY, second["job_token"])
@@ -248,7 +300,7 @@ def test_ready_result_is_revalidated_before_single_delivery(tmp_path, monkeypatc
         return {"whole_original": True}, verify
     _, progress = jobs.request(KEY, build)
     deadline = time.monotonic() + 2
-    while jobs._jobs[progress["job_token"]].state != "READY":
+    while jobs._receipt_job(progress["job_token"]).state != "READY":
         assert time.monotonic() < deadline
         time.sleep(.005)
     if change == "source":
@@ -422,7 +474,7 @@ def test_ready_http_snapshot_distinguishes_future_append_from_changed_visible_jo
         status, pending, _ = request("/api/snapshot", ticker="AAPL")
         assert status == 202
         deadline = time.monotonic() + 5
-        while jobs._jobs[pending["job_token"]].state != "READY":
+        while jobs._receipt_job(pending["job_token"]).state != "READY":
             assert time.monotonic() < deadline
             time.sleep(.005)
         # The normal reader already completed. Only delivery validation remains.
@@ -475,7 +527,7 @@ def test_future_wal_append_keeps_same_cutoff_snapshot_without_modifying_wal_or_m
         with api(root, market_journals={"US": journal}) as request:
             _, pending, _ = request("/api/snapshot", ticker="AAPL")
             deadline = time.monotonic() + 5
-            while jobs._jobs[pending["job_token"]].state != "READY":
+            while jobs._receipt_job(pending["job_token"]).state != "READY":
                 assert time.monotonic() < deadline
                 time.sleep(.005)
             original_main, original_wal, identity = journal.read_bytes(), wal.read_bytes(), journal.stat().st_ino
@@ -513,6 +565,170 @@ def test_readonly_wal_clone_can_create_shm_without_invalidating_unchanged_financ
             assert {path: path.read_bytes() for path in before} == before
 
 
+@pytest.mark.parametrize("link", ["mock", "native", "junction"])
+def test_configured_file_journal_alias_uses_the_bound_target_sqlite_sidecars(tmp_path, monkeypatch, link):
+    from tests.test_market_journal_review import producer
+    from tradingagents.performance.lifecycle import append_lifecycle_event
+    root = tmp_path / "archive"
+    producer(root, "source", "AAPL", "US")
+    target_dir = tmp_path / "bound"
+    target_dir.mkdir()
+    target, alias = target_dir / "target.sqlite", tmp_path / "alias.sqlite"
+    with closing(sqlite3.connect(target)) as writer:
+        assert writer.execute("PRAGMA journal_mode=WAL").fetchone()[0] == "wal"
+        append_lifecycle_event(writer, event_id="known", signal_id="known", kind="SIGNAL",
+            occurred_at="2026-10-16T10:30:00Z", available_at="2026-10-16T10:30:00Z", ingested_at="2026-10-16T10:30:00Z",
+            payload={"ticker": "AAPL", "action": "WAIT"})
+        writer.commit()
+        if link == "junction":
+            import sys
+            if sys.platform != "win32":
+                pytest.skip("Windows directory junction fixture")
+            import _winapi
+            alias_dir = tmp_path / "journal-alias"
+            try:
+                _winapi.CreateJunction(str(target_dir), str(alias_dir))
+            except OSError as error:
+                pytest.skip(f"Temporary junction unavailable: {error.winerror}")
+            alias = alias_dir / target.name
+            assert alias.resolve() == target
+        elif link == "native":
+            try:
+                alias.symlink_to(target)
+            except OSError as error:
+                pytest.skip(f"Native file symlink unavailable: {error.winerror if hasattr(error, 'winerror') else error.errno}")
+        else:
+            alias.write_bytes(b"mock alias placeholder")
+            original = Path.resolve
+            monkeypatch.setattr(Path, "resolve", lambda p, *a, **kw: target if p == alias else original(p, *a, **kw))
+        originals = {p: p.read_bytes() for p in (target, Path(str(target) + "-wal"))}
+        with api(root, market_journals={"US": alias}) as request:
+            _, pending, _ = request("/api/snapshot", ticker="AAPL")
+            payload, _ = http_finish(request, pending)
+            assert {event["event_id"] for event in payload["lifecycle"]["events"]} == {"known"}
+            assert {p: p.read_bytes() for p in originals} == originals
+
+
+@pytest.mark.parametrize("change", ["alias_retarget", "alias_cycle", "wal_escape", "future_append"])
+def test_bound_alias_checks_retarget_and_sidecar_scope_without_rejecting_future_append(tmp_path, monkeypatch, change):
+    from tests.test_market_journal_review import producer
+    from tradingagents.performance.lifecycle import append_lifecycle_event
+    root = tmp_path / "archive"
+    producer(root, "source", "AAPL", "US")
+    target, alias, outside = tmp_path / "bound.sqlite", tmp_path / "alias.sqlite", tmp_path / "do-not-open.sqlite"
+    alias.write_bytes(b"mock configured alias")
+    outside.write_bytes(b"must not be opened")
+    wal = Path(str(target) + "-wal")
+    changed = [False]
+    original_resolve, original_lstat = Path.resolve, Path.lstat
+    def resolve(path, *args, **kwargs):
+        if path == alias:
+            if changed[0] and change == "alias_cycle":
+                raise RuntimeError("Mock alias symlink cycle")
+            return outside if changed[0] and change == "alias_retarget" else target
+        if path == wal and changed[0] and change == "wal_escape":
+            return outside
+        return original_resolve(path, *args, **kwargs)
+    def lstat(path, *args, **kwargs):
+        raw = original_lstat(path, *args, **kwargs)
+        if path != wal or not changed[0] or change != "wal_escape":
+            return raw
+        fields = {name: getattr(raw, name) for name in dir(raw) if name.startswith("st_")}
+        fields["st_mode"] = stat_module.S_IFLNK
+        return SimpleNamespace(**fields)
+    monkeypatch.setattr(Path, "resolve", resolve)
+    monkeypatch.setattr(Path, "lstat", lstat)
+    jobs = SnapshotJobs()
+    monkeypatch.setattr(module, "SnapshotJobs", lambda: jobs)
+    original_builder, received = module.get_replay_snapshot, []
+    def observed(*args, **kwargs):
+        received.append(kwargs["db_paths"])
+        return original_builder(*args, **kwargs)
+    monkeypatch.setattr(module, "get_replay_snapshot", observed)
+    with closing(sqlite3.connect(target)) as writer:
+        writer.execute("PRAGMA journal_mode=WAL")
+        def record(identity, at):
+            append_lifecycle_event(writer, event_id=identity, signal_id=identity, kind="SIGNAL", occurred_at=at,
+                available_at=at, ingested_at=at, payload={"ticker": "AAPL", "action": "WAIT"})
+            writer.commit()
+        record("original", "2026-10-16T10:30:00Z")
+        with api(root, market_journals={"US": alias}) as request:
+            _, pending, _ = request("/api/snapshot", ticker="AAPL")
+            token = pending["job_token"]
+            deadline = time.monotonic() + 10
+            while jobs._receipt_job(token).state != "READY":
+                assert time.monotonic() < deadline
+                time.sleep(.005)
+            request("/api/snapshot", ticker="AAPL", catalog_generation=pending["generation"], snapshot_job=token)
+            while jobs._receipt_job(token).state != "DELIVERY_READY":
+                assert time.monotonic() < deadline
+                time.sleep(.005)
+            changed[0] = True
+            if change == "future_append":
+                record("future", "2026-10-17T10:30:00Z")
+            assert request("/api/snapshot", ticker="AAPL", catalog_generation=pending["generation"], snapshot_job=token)[0] == 202
+            if change == "future_append":
+                payload, _ = http_finish(request, pending)
+                assert {e["event_id"] for e in payload["lifecycle"]["events"]} == {"original"}
+            else:
+                with pytest.raises(HTTPError) as error:
+                    http_finish(request, pending)
+                assert error.value.code == 422
+            assert received == [(target,)]
+
+
+@pytest.mark.parametrize("change", ["source", "visible_append", "future_append"])
+def test_second_caller_revalidates_its_receipt_after_first_caller_consumed_shared_payload(tmp_path, monkeypatch, change):
+    from tests.test_market_journal_review import producer
+    from tradingagents.performance.lifecycle import append_lifecycle_event
+    root = tmp_path / "archive"
+    producer(root, "source", "AAPL", "US")
+    journal = root / "paper/us.sqlite"
+    journal.parent.mkdir(parents=True)
+    def record(identity, at):
+        with closing(sqlite3.connect(journal)) as db:
+            append_lifecycle_event(db, event_id=identity, signal_id=identity, kind="SIGNAL", occurred_at=at,
+                available_at=at, ingested_at=at, payload={"ticker": "AAPL", "action": "WAIT"})
+            db.commit()
+    record("original", "2026-10-16T10:30:00Z")
+    jobs, entered, release = SnapshotJobs(), Event(), Event()
+    monkeypatch.setattr(module, "SnapshotJobs", lambda: jobs)
+    original_builder, builds = module.get_replay_snapshot, []
+    def held(*args, **kwargs):
+        result = original_builder(*args, **kwargs)
+        builds.append(1)
+        entered.set()
+        assert release.wait(5)
+        return result
+    monkeypatch.setattr(module, "get_replay_snapshot", held)
+    with api(root, market_journals={"US": journal}) as request:
+        try:
+            _, first, _ = request("/api/snapshot", ticker="AAPL")
+            assert entered.wait(3)
+            _, second, _ = request("/api/snapshot", ticker="AAPL", catalog_generation=first["generation"])
+            assert first["job_token"] != second["job_token"]
+            assert len(jobs._jobs) == 1 and len(jobs._receipts) == 2
+        finally:
+            release.set()
+        first_payload, _ = http_finish(request, first)
+        assert {e["event_id"] for e in first_payload["lifecycle"]["events"]} == {"original"}
+        shared_bytes = jobs._receipt_job(second["job_token"]).payload
+        assert len(jobs._jobs) == 1 and sum(len(j.payload) for j in jobs._jobs.values()) == len(shared_bytes)
+        if change == "source":
+            (root / "runs/2026/source/tickers/AAPL/analysis.json").write_text('{"changed":true}')
+        else:
+            record("new", "2026-10-17T10:30:00Z" if change == "future_append" else "2026-10-16T11:00:00Z")
+        assert request("/api/snapshot", ticker="AAPL", catalog_generation=second["generation"], snapshot_job=second["job_token"])[0] == 202
+        if change == "future_append":
+            payload, _ = http_finish(request, second)
+            assert payload == first_payload
+        else:
+            with pytest.raises(HTTPError) as error:
+                http_finish(request, second)
+            assert error.value.code == 422
+        assert builds == [1] and not jobs._jobs and not jobs._receipts
+
+
 @pytest.mark.parametrize("change", ["source", "visible_append", "future_append"])
 def test_delivery_ready_result_is_invalidated_again_before_actual_200(tmp_path, monkeypatch, change):
     from tests.test_market_journal_review import producer
@@ -533,11 +749,11 @@ def test_delivery_ready_result_is_invalidated_again_before_actual_200(tmp_path, 
         _, pending, _ = request("/api/snapshot", ticker="AAPL")
         token = pending["job_token"]
         deadline = time.monotonic() + 10
-        while jobs._jobs[token].state != "READY":
+        while jobs._receipt_job(token).state != "READY":
             assert time.monotonic() < deadline
             time.sleep(.005)
         assert request("/api/snapshot", ticker="AAPL", catalog_generation=pending["generation"], snapshot_job=token)[0] == 202
-        while jobs._jobs[token].state != "DELIVERY_READY":
+        while jobs._receipt_job(token).state != "DELIVERY_READY":
             assert time.monotonic() < deadline
             time.sleep(.005)
         if change == "source":
@@ -590,11 +806,11 @@ def test_derived_shm_reparse_escape_is_rejected_before_read_and_before_delivery(
         if when == "after_ready":
             token = pending["job_token"]
             deadline = time.monotonic() + 10
-            while jobs._jobs[token].state != "READY":
+            while jobs._receipt_job(token).state != "READY":
                 assert time.monotonic() < deadline
                 time.sleep(.005)
             request("/api/snapshot", ticker="AAPL", catalog_generation=pending["generation"], snapshot_job=token)
-            while jobs._jobs[token].state != "DELIVERY_READY":
+            while jobs._receipt_job(token).state != "DELIVERY_READY":
                 assert time.monotonic() < deadline
                 time.sleep(.005)
             escaped[0] = True
