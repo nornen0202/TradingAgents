@@ -220,6 +220,105 @@ def summary_at(h, cutoff, *, historical=False):
         return demo_runtime.summary(db, cutoff, h.market, historical=historical)
 
 
+def settled_roundtrip_with_unobserved_order(tmp_path, market="US", *, blocked=False):
+    h, _, _, _ = imported_roundtrip(tmp_path, market)
+    h.now += timedelta(seconds=30)
+    h.source("fixture-3", qty=1)
+
+    def wrong_account(*args):
+        account = h.account(*args)
+        account["account_scope"] = "wrong"
+        return account
+
+    result = h.tick(account_loader=wrong_account if blocked else h.account)
+    order = result["orders"][-1]
+    assert len(result["orders"]) == 3
+    assert len(h.orders) == (2 if blocked else 3)
+    assert order["status"] == ("BLOCKED" if blocked else "ACKNOWLEDGED")
+    assert order["filled_quantity"] == order["fill_notional"] == 0
+    assert all(order[key] is None for key in (
+        "average_fill_price", "observed_at", "ingested_at", "first_fill_observed_at", "fill_availability"))
+    dated = summary_at(h, h.now, historical=True)
+    assert dated["orders"][-1]["status"] == "UNKNOWN"
+    assert result["evaluation"]["actual_cost"] == dated["evaluation"]["actual_cost"] == 2
+    return h, result
+
+
+@pytest.mark.parametrize("market", ["KR", "US"])
+@pytest.mark.parametrize("blocked", [False, True])
+def test_unobserved_zero_fill_request_state_does_not_erase_settled_costs(tmp_path, market, blocked):
+    h, result = settled_roundtrip_with_unobserved_order(tmp_path, market, blocked=blocked)
+    archive = tmp_path / "ui"
+    cached = runtime(archive, h, result)
+    original_bytes, calls = cached.read_bytes(), list(h.calls)
+    for _ in range(2):
+        view = read(archive, h)
+        assert view["actual_cost"] == 2 and view["net_pnl"] == 1
+        assert view["sample"]["filled_order_count"] == 2
+        assert view["cost_evidence_status"] == "COMPLETE_REVIEWED_IMPORT"
+        assert view["real_orders_enabled"] is view["automatic_live_transition"] is False
+    assert cached.read_bytes() == original_bytes and h.calls == calls
+
+
+@pytest.fixture(scope="module")
+def unobserved_order_snapshot(tmp_path_factory):
+    return settled_roundtrip_with_unobserved_order(tmp_path_factory.mktemp("settled-unobserved"))
+
+
+@pytest.mark.parametrize("field,wrong", [
+    ("id", "other-intent"), ("ticker", "MSFT"), ("run_id", "other-run"), ("side", "SELL"),
+    ("quantity", 2), ("limit_price", 999), ("filled_quantity", 1), ("filled_quantity", False),
+    ("fill_notional", 1), ("average_fill_price", 0), ("mode", "real"), ("strategy_performance", False),
+    ("source", "KIS_DEMO_BROKER_REPORT"), ("prepared_at", "2026-10-19T10:00:00-04:00"),
+    ("observed_at", "2026-10-19T10:00:00-04:00"), ("ingested_at", "2026-10-19T10:00:00-04:00"),
+    ("first_fill_observed_at", "2026-10-19T10:00:00-04:00"), ("fill_availability", {}),
+    ("cancel_status", "ACKNOWLEDGED"), ("extra_key", None),
+    ("status", "OPEN"), ("status", "PARTIAL"), ("status", "FILLED"), ("status", "CANCELLED"),
+])
+def test_unobserved_request_exception_cannot_hide_other_cached_order_changes(tmp_path, unobserved_order_snapshot, field, wrong):
+    h, original = unobserved_order_snapshot
+    result = deepcopy(original)
+    result["orders"][-1][field] = wrong
+    archive = tmp_path / "ui"
+    runtime(archive, h, result)
+    view = read(archive, h)
+    assert view is None or view["actual_cost"] is view["net_pnl"] is None
+
+
+def test_unobserved_request_exception_preserves_exact_keyset(tmp_path, unobserved_order_snapshot):
+    h, original = unobserved_order_snapshot
+    result = deepcopy(original)
+    del result["orders"][-1]["source"]
+    archive = tmp_path / "ui"
+    runtime(archive, h, result)
+    assert read(archive, h)["actual_cost"] is None
+
+
+@pytest.mark.parametrize("field,wrong", [
+    ("status", "PARTIAL"), ("filled_quantity", 0), ("fill_notional", 999), ("average_fill_price", 999),
+    ("observed_at", None), ("ingested_at", None), ("fill_availability", None), ("cancel_status", "ACKNOWLEDGED"),
+])
+def test_settled_order_binding_remains_strict_with_an_unobserved_request(tmp_path, unobserved_order_snapshot, field, wrong):
+    h, original = unobserved_order_snapshot
+    result = deepcopy(original)
+    result["orders"][0][field] = wrong
+    archive = tmp_path / "ui"
+    runtime(archive, h, result)
+    view = read(archive, h)
+    assert view is None or view["actual_cost"] is view["net_pnl"] is None
+
+
+@pytest.mark.parametrize("seconds", [-1, 1])
+def test_unobserved_request_exception_does_not_relax_evaluation_cutoff(tmp_path, unobserved_order_snapshot, seconds):
+    h, original = unobserved_order_snapshot
+    result = deepcopy(original)
+    result["evaluation"]["analysis_as_of"] = (h.now + timedelta(seconds=seconds)).isoformat()
+    archive = tmp_path / "ui"
+    runtime(archive, h, result)
+    view = read(archive, h)
+    assert view is None or view["actual_cost"] is view["net_pnl"] is None
+
+
 def test_later_normal_order_before_runtime_json_replacement_does_not_erase_verified_past_cost(tmp_path):
     h, _, _, result = imported_roundtrip(tmp_path)
     cutoff = h.now

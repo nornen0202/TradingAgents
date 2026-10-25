@@ -434,6 +434,38 @@ def _strategy_evaluation_view(raw, market, observed, *, verified_costs=None):
             "real_orders_enabled": False, "automatic_live_transition": False}
 
 
+def _same_cost_order_bindings(cached, proven):
+    """Keep exact bindings except an undated, economically empty request state.
+
+    A historical read cannot date ACK/BLOCKED request state without a broker
+    observation. That UNKNOWN must not hide settled costs of other orders.
+    No observed state, cancellation, identity, terms or key set is relaxed.
+    """
+    if not isinstance(cached, list) or not isinstance(proven, list) or len(cached) != len(proven):
+        return False
+    adjusted = []
+    for raw, known in zip(cached, proven):
+        if not isinstance(raw, dict) or not isinstance(known, dict):
+            return False
+        value = dict(raw)
+        if (isinstance(raw.get("status"), str)
+                and raw["status"] in {"ACKNOWLEDGED", "BLOCKED", "REJECTED", "NOT_SENT"}
+                and known.get("status") == "UNKNOWN"
+                and all(type(order.get("filled_quantity")) is int and order["filled_quantity"] == 0
+                        and order.get("fill_notional") == 0 and order.get("average_fill_price") is None
+                        and all(order.get(key) is None for key in (
+                            "observed_at", "ingested_at", "first_fill_observed_at", "fill_availability"))
+                        for order in (raw, known))):
+            value["status"] = "UNKNOWN"
+        adjusted.append(value)
+    try:
+        def canonical(value):
+            return json.dumps(value, sort_keys=True, separators=(",", ":"), allow_nan=False)
+        return canonical(adjusted) == canonical(proven)
+    except (ValueError, TypeError):
+        return False
+
+
 def _readonly_strategy_costs(directory, market, cutoff):
     """Read the fixed normal ledger without credentials, a broker, DDL or HTTP.
 
@@ -545,13 +577,8 @@ def kis_strategy_health(archive_dir, *, analysis_as_of, strategy_ledger_dir=None
         sample = evaluation.get("sample") if isinstance(evaluation, dict) else None
         if isinstance(sample, dict) and type(sample.get("filled_order_count")) is int and sample["filled_order_count"] > 0:
             validated = _readonly_strategy_costs(strategy_ledger_dir, market, instant(evaluation.get("analysis_as_of")))
-            if isinstance(validated, dict) and isinstance(row.get("orders"), list):
-                try:
-                    canonical = lambda value: json.dumps(value, sort_keys=True, separators=(",", ":"), allow_nan=False)
-                    if canonical(row["orders"]) == canonical(validated["orders"]):
-                        proof = validated["evaluation"]
-                except (ValueError, TypeError, KeyError):
-                    pass
+            if isinstance(validated, dict) and _same_cost_order_bindings(row.get("orders"), validated.get("orders")):
+                proof = validated.get("evaluation")
         view["evaluation"] = _strategy_evaluation_view(evaluation, market, observed, verified_costs=proof)
         if (view["performance"] and view["evaluation"]
                 and instant(view["performance"]["observed_at"]) == instant(view["evaluation"]["analysis_as_of"])):
