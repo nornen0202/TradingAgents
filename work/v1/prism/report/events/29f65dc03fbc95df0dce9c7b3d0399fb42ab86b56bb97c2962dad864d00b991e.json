@@ -1,0 +1,230 @@
+{
+  "schema": "tradingagents.work-report/v1",
+  "surface": "prism",
+  "event_id": "prism:9b2ae93f9b08bafc2095e489af5343f6",
+  "source_sha256": "70db28135a0d171535e87017c17e9442b5254d3ae3747953e634ba5c4e37d9bf",
+  "prompt_contract_version": "prism-work-v5",
+  "workflow_contract_sha256": "6e9bacf847e1ea3fede5d24780fde443897da2d480119b5ef7dfdc873bb87103",
+  "policy": {
+    "visibility": "investor_safe_no_credentials",
+    "external_evidence_profile": "balanced_external",
+    "external_evidence_may_affect": [
+      "ranking",
+      "confidence",
+      "position_size_within_existing_risk_limits",
+      "research_priority"
+    ],
+    "external_evidence_may_bypass_execution_gate": false,
+    "thesis_is_independent_from_execution_readiness": true
+  },
+  "report_markdown": "# PRISM 연구 델타 · 2026-10-25\n\n신규 7건은 모두 BTC 데모의 진입·부분 청산·보호 변경 기록. 실제 주식에 반영할 새 근거 없음: NO_ACTIONABLE_DELTA.\n\n출처 정상: 성공 수집 2026-10-25T08:01:15.647128+09:00. 검증 시각 2026-10-25T10:39:38.984685+09:00, 수집 후 2.64시간(허용 30시간). 원문 게시 시각 범위 10월 25일 03:56:36–06:07:48 KST이며, 현재 24시간 이내·미래 날짜 없음·순서 정상입니다.\n\n신규 7 · 수정 0 · 동일 이벤트 제외 0 · 전송 7/7 · 생략 0 · 잘림 없음. 이 범위의 기록은 모두 확인했으나, 과거 수정 대기 45건은 별도 미완료입니다.\n\n| 이벤트 | 데모 기록 | 연구 처리 |\n|---|---|---|\n| stock_ai_agent:16653 | 첫 진입 | 주식 후보와 분리 |\n| stock_ai_agent:16654 | 부분 청산 | 비용 차감 전 손익을 확정 수익으로 사용하지 않음 |\n| stock_ai_agent:16655 | 보호 변경 | 데모 위험 관리 기록 |\n| stock_ai_agent:16656 | 보호 변경 | 데모 위험 관리 기록 |\n| stock_ai_agent:16657 | 부분 청산 | 정산 미확정 |\n| stock_ai_agent:16658 | 보호 변경 | 데모 위험 관리 기록 |\n| stock_ai_agent:16659 | 청산·잔량 확인 중 | 진입 정보·최종 정산 미확인, 전량 종료로 단정하지 않음 |\n\nbalanced_external: 전부 simulation_only=true이고 검증된 주식 매핑이 없어 LOW_LABELED 연구 참고로만 보존합니다. KR·US 순위·thesis 신뢰도·포지션 크기·리서치 우선순위에 추가 변경은 없습니다. 현재 시세·계좌·시장·위험 실행 관문은 그대로 적용합니다.\n\n과거 수정 45건은 현재 prepare의 24시간 패킷 밖이므로 PENDING_CANONICAL_BACKLOG_PACKET을 유지하며 ACK하지 않습니다. 미확인 신규는 0건입니다. 전체 누적 처리 완료를 주장하지 않습니다.\n\n다음 확인: 다음 예약 실행 또는 독립 복구 운영자의 새 정본 이벤트·과거 수정 패킷 확인. 주식 근거가 추가되면 공식 공시·기업 IR·거래소 가격과 종목 매핑부터 검증합니다. 외부 Telegram/Pages 전달은 영수증 미확인입니다.\n\nCOVERAGE_RECEIPT {\"event_id\":\"prism:9b2ae93f9b08bafc2095e489af5343f6\",\"status\":\"COMPLETE\",\"window_events\":7,\"transmitted_events\":7,\"truncated\":false,\"new_events\":7,\"revised_events\":0}\n\nMOBILE_HANDOFF {\"owner\":\"external_github_notification_pipeline\",\"status\":\"PENDING_EXTERNAL_VERIFICATION\",\"work_sent_notification\":false}",
+  "structured_report": {
+    "schema": "tradingagents.work-report/v1",
+    "binding": {
+      "surface": "prism",
+      "event_id": "prism:9b2ae93f9b08bafc2095e489af5343f6",
+      "source_sha256": "70db28135a0d171535e87017c17e9442b5254d3ae3747953e634ba5c4e37d9bf"
+    },
+    "title": "PRISM 연구 델타: BTC 데모 7건, 주식 새 근거 없음",
+    "generated_at": "2026-10-25T10:39:38.984685+09:00",
+    "as_of": "2026-10-25T10:39:38.984685+09:00",
+    "source_health": "OK",
+    "report_mode": "NO_ACTIONABLE_DELTA",
+    "summary": "신규 7건은 모두 BTC 데모의 진입·부분 청산·보호 변경 기록. 실제 주식에 반영할 새 근거 없음: NO_ACTIONABLE_DELTA.",
+    "top_actions": [],
+    "strategies": [],
+    "coverage_receipt": {
+      "event_id": "prism:9b2ae93f9b08bafc2095e489af5343f6",
+      "status": "COMPLETE",
+      "window_events": 7,
+      "transmitted_events": 7,
+      "truncated": false,
+      "new_events": 7,
+      "revised_events": 0
+    },
+    "model_receipt": {
+      "schema": "tradingagents.model-provenance/v1",
+      "work_synthesis": {
+        "execution_mode": "local",
+        "requested_model": "gpt-6.1-sol",
+        "requested_reasoning_effort": "medium",
+        "task_id": "tradingagents-work-prism",
+        "verification_status": "CONFIGURED_NOT_RUNTIME_VERIFIED",
+        "observed_model": null,
+        "observed_reasoning_effort": null,
+        "note": "The local task contract is verified; the Work host does not expose a signed per-response model receipt."
+      }
+    },
+    "source_summary": {
+      "source": {
+        "health": "OK",
+        "run_id": "prism_telegram_20261025_080113",
+        "last_run_at": "2026-10-25T08:01:15.647128+09:00",
+        "status": "success",
+        "stale_after_hours": 30
+      },
+      "coverage": {
+        "total_unique_events": 254,
+        "window_events": 7,
+        "transmitted_events": 7,
+        "truncated": false,
+        "oldest_occurred_at": "2026-10-24T18:56:36+00:00",
+        "newest_occurred_at": "2026-10-24T21:07:48+00:00"
+      },
+      "delta": {
+        "new_events": 7,
+        "revised_events": 0,
+        "unchanged_events": 0,
+        "delivered_event_keys": [
+          "stock_ai_agent:16659",
+          "stock_ai_agent:16658",
+          "stock_ai_agent:16657",
+          "stock_ai_agent:16656",
+          "stock_ai_agent:16655",
+          "stock_ai_agent:16654",
+          "stock_ai_agent:16653"
+        ]
+      },
+      "evidence_policy": {
+        "profile": "balanced_external",
+        "material_thesis_effects": [
+          "ranking",
+          "confidence",
+          "position_size_within_existing_risk_limits",
+          "research_priority"
+        ],
+        "supported_evidence_weight": "MEDIUM",
+        "partially_supported_evidence_weight": "LOW_TO_MEDIUM",
+        "unverified_evidence_weight": "LOW_LABELED",
+        "user_primary_channels": [
+          "@kpunch",
+          "@sosumonkey"
+        ],
+        "user_primary_source_tier": "USER_PRIMARY",
+        "user_primary_evidence_weight": "HIGH",
+        "user_primary_validation_policy": "USER_ACCEPTED",
+        "matching_multi_source_signal_may_raise_thesis_priority": true,
+        "conflicting_signal_must_be_visible": true,
+        "may_bypass_market_or_portfolio_execution_gate": false
+      },
+      "events": [
+        {
+          "event_key": "stock_ai_agent:16659",
+          "content_sha256": "b2bda89f85c6a8408ad574c1329083a0c58ec13fe6f20f5f860c9106b91b09fc",
+          "occurred_at": "2026-10-24T21:07:48+00:00",
+          "simulation_only": true,
+          "execution_readiness": "RESEARCH_ONLY"
+        },
+        {
+          "event_key": "stock_ai_agent:16658",
+          "content_sha256": "1d585a1014fbc0d6f5101b67c8575252df35daa839457897a98de1b6f4c3894d",
+          "occurred_at": "2026-10-24T20:01:40+00:00",
+          "simulation_only": true,
+          "execution_readiness": "RESEARCH_ONLY"
+        },
+        {
+          "event_key": "stock_ai_agent:16657",
+          "content_sha256": "594c1948075e16efbb3f7db0d0cbf5166c375ef6b461c09be7173e6d00bb5d9b",
+          "occurred_at": "2026-10-24T19:56:46+00:00",
+          "simulation_only": true,
+          "execution_readiness": "RESEARCH_ONLY"
+        },
+        {
+          "event_key": "stock_ai_agent:16656",
+          "content_sha256": "65550e3ebc3d2c99e44d33041464e01b02e19aaccb5effd3142855d6fea6539c",
+          "occurred_at": "2026-10-24T19:51:29+00:00",
+          "simulation_only": true,
+          "execution_readiness": "RESEARCH_ONLY"
+        },
+        {
+          "event_key": "stock_ai_agent:16655",
+          "content_sha256": "50915fbf1e95c4c47170e494dac88f89b15ac65ab8bd315ac09397ba1f30ff9d",
+          "occurred_at": "2026-10-24T19:01:28+00:00",
+          "simulation_only": true,
+          "execution_readiness": "RESEARCH_ONLY"
+        },
+        {
+          "event_key": "stock_ai_agent:16654",
+          "content_sha256": "7ab35f68309291ac3e22d662317c969c1deb9bd5de3349f30d9a7b10788d22d8",
+          "occurred_at": "2026-10-24T18:58:28+00:00",
+          "simulation_only": true,
+          "execution_readiness": "RESEARCH_ONLY"
+        },
+        {
+          "event_key": "stock_ai_agent:16653",
+          "content_sha256": "4aadff6361014b67136495e19c82e28753515842fdc03c10e580aaa25e7f4906",
+          "occurred_at": "2026-10-24T18:56:36+00:00",
+          "simulation_only": true,
+          "execution_readiness": "RESEARCH_ONLY"
+        }
+      ],
+      "no_relevant_evidence_reason": "All seven events are BTC demo records without verified stock mappings; no stock ranking/confidence/sizing/research-priority change.",
+      "backlog": {
+        "status": "PENDING_CANONICAL_BACKLOG_PACKET",
+        "unacknowledged_events": 45,
+        "unseen_new_events": 0,
+        "event_keys": [
+          "stock_ai_agent:16335",
+          "stock_ai_agent:16287",
+          "stock_ai_agent:16286",
+          "stock_ai_agent:16285",
+          "stock_ai_agent:16284",
+          "stock_ai_agent:16283",
+          "stock_ai_agent:16282",
+          "stock_ai_agent:16281",
+          "stock_ai_agent:16280",
+          "stock_ai_agent:16279",
+          "stock_ai_agent:16266",
+          "stock_ai_agent:16265",
+          "stock_ai_agent:16264",
+          "stock_ai_agent:16263",
+          "stock_ai_agent:16262",
+          "stock_ai_agent:16233",
+          "stock_ai_agent:16232",
+          "stock_ai_agent:16231",
+          "stock_ai_agent:16230",
+          "stock_ai_agent:16229",
+          "stock_ai_agent:16164",
+          "stock_ai_agent:16112",
+          "stock_ai_agent:16098",
+          "stock_ai_agent:16045",
+          "stock_ai_agent:16009",
+          "stock_ai_agent:16008",
+          "stock_ai_agent:16005",
+          "stock_ai_agent:16003",
+          "stock_ai_agent:16002",
+          "stock_ai_agent:16001",
+          "stock_ai_agent:16000",
+          "stock_ai_agent:15999",
+          "stock_ai_agent:15998",
+          "stock_ai_agent:15931",
+          "stock_ai_agent:15930",
+          "stock_ai_agent:15929",
+          "stock_ai_agent:15928",
+          "stock_ai_agent:15905",
+          "stock_ai_agent:15866",
+          "stock_ai_agent:15865",
+          "stock_ai_agent:15864",
+          "stock_ai_agent:15863",
+          "stock_ai_agent:15862",
+          "stock_ai_agent:15807",
+          "stock_ai_agent:15794"
+        ]
+      },
+      "mobile_handoff": {
+        "owner": "external_github_notification_pipeline",
+        "status": "PENDING_EXTERNAL_VERIFICATION",
+        "work_sent_notification": false
+      },
+      "validation": {
+        "validated_at": "2026-10-25T10:39:38.984685+09:00",
+        "producer_age_hours": 2.6398159880555556,
+        "all_event_clocks_valid": true
+      }
+    },
+    "next_checkpoint": "다음 예약 실행 또는 독립 복구: 신규·수정 정본과 과거 대기 패킷 확인"
+  },
+  "report_id": "prism:29f65dc03fbc95df0dce9c7b3d0399fb",
+  "report_sha256": "29f65dc03fbc95df0dce9c7b3d0399fb42ab86b56bb97c2962dad864d00b991e",
+  "published_at": "2026-10-25T10:39:51.416159+09:00"
+}
