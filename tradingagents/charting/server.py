@@ -8,6 +8,7 @@ import sqlite3
 from urllib.parse import parse_qs, urlparse
 
 from .bars import instant
+from .catalog_index import ArchiveCatalogIndex, CatalogPending
 from .snapshot import get_replay_snapshot
 from .operations import archive_catalog, known_artifacts, paper_health, kis_demo_health, kis_validation_health, kis_strategy_health, now_utc
 
@@ -17,9 +18,12 @@ STATIC = Path(__file__).parent / "static"
 def make_handler(run_dir=None, *, db_paths=(), archive_dir=None, experiment_registry=None, paper_status_path=None):
     if (run_dir is None) == (archive_dir is None):
         raise ValueError("Choose one existing run_dir or archive_dir")
-    def catalog(cutoff, *, only_ticker=None, include_coverage=True):
+    index = ArchiveCatalogIndex(archive_dir) if archive_dir is not None else None
+    def catalog(cutoff, *, only_ticker=None, include_coverage=True, names_only=False, generation=None):
         if archive_dir is not None:
-            return archive_catalog(archive_dir, analysis_as_of=cutoff, only_ticker=only_ticker, include_coverage=include_coverage)
+            return archive_catalog(archive_dir, analysis_as_of=cutoff, only_ticker=only_ticker,
+                                   include_coverage=include_coverage, names_only=names_only,
+                                   manifest_entries=index.snapshot(generation=generation))
         root = (Path(run_dir) / "tickers").resolve()
         # An allowlist of archive directories, never an arbitrary request-supplied path.
         return {path.name: {"ticker_dir": path, "public_context": {"run_id": Path(run_dir).name,
@@ -33,6 +37,14 @@ def make_handler(run_dir=None, *, db_paths=(), archive_dir=None, experiment_regi
 
         def reply(self, status, body, content_type):
             encoded = body.encode("utf-8") if isinstance(body, str) else body
+            try:
+                self._reply(status, encoded, content_type)
+            except (BrokenPipeError, ConnectionResetError, ConnectionAbortedError):
+                # Manual retry/navigation can cancel a read-only request while
+                # its response is being written. Do not send a second response.
+                return
+
+        def _reply(self, status, encoded, content_type):
             self.send_response(status)
             self.send_header("Content-Type", content_type)
             self.send_header("Content-Length", str(len(encoded)))
@@ -53,15 +65,16 @@ def make_handler(run_dir=None, *, db_paths=(), archive_dir=None, experiment_regi
                     self.reply(414, "Query too long", "text/plain")
                     return
                 query = parse_qs(parsed.query)
+                generation = int(query["catalog_generation"][0]) if "catalog_generation" in query else None
                 at = instant(query.get("as_of", [now_utc().isoformat()])[0])
                 if parsed.path.startswith("/api/") and (at is None or at > now_utc()):
                     self.reply(400, "Past aware as_of required", "text/plain")
                     return
                 if parsed.path == "/api/tickers":
-                    self.reply(200, json.dumps(sorted(catalog(at, include_coverage=False))), "application/json")
+                    self.reply(200, json.dumps(sorted(catalog(at, include_coverage=False, names_only=True, generation=generation))), "application/json")
                 elif parsed.path == "/api/context":
                     payload = {"as_of": at.isoformat(), "archive_mode": archive_dir is not None,
-                               "tickers": {ticker: entry["public_context"] for ticker, entry in catalog(at).items()},
+                               "tickers": {ticker: entry["public_context"] for ticker, entry in catalog(at, generation=generation).items()},
                                "journal_sources_configured": len(db_paths),
                                "experiment_registry_configured": experiment_registry is not None,
                                "read_only": True, "broker_orders_sent": 0, "real_orders_enabled": False}
@@ -89,7 +102,7 @@ def make_handler(run_dir=None, *, db_paths=(), archive_dir=None, experiment_regi
                     self.reply(200, json.dumps(cards, ensure_ascii=False, allow_nan=False), "application/json; charset=utf-8")
                 elif parsed.path == "/api/snapshot":
                     ticker = query.get("ticker", [""])[0]
-                    tickers = catalog(at, only_ticker=ticker)
+                    tickers = catalog(at, only_ticker=ticker, generation=generation)
                     if ticker not in tickers:
                         self.reply(400, "Valid ticker and past aware as_of required", "text/plain")
                         return
@@ -109,6 +122,8 @@ def make_handler(run_dir=None, *, db_paths=(), archive_dir=None, experiment_regi
                         return
                     name, kind = allowed[parsed.path]
                     self.reply(200, (STATIC / name).read_bytes(), kind)
+            except CatalogPending as pending:
+                self.reply(202, json.dumps(pending.progress), "application/json")
             except (OSError, ValueError, KeyError, TypeError, sqlite3.DatabaseError):
                 self.reply(422, "Archive input invalid or unavailable", "text/plain")
     return Handler

@@ -3,10 +3,45 @@
 const byId = id => document.getElementById(id);
 let charts = [];
 let requestVersion = 0;
+let viewBusy = false;
+let viewController = null;
 const number = value => typeof value === "number" && Number.isFinite(value) ? value.toLocaleString("ko-KR", {maximumFractionDigits:3}) : "확인 불가";
 const display = value => value === null || value === undefined ? "확인 불가" : typeof value === "object" ? JSON.stringify(value) : String(value);
 function paragraph(text) { const element=document.createElement("p");element.textContent=text;return element; }
-async function getJson(url) { const response=await fetch(url);if(!response.ok)throw Error("자료를 읽지 못했습니다.");return response.json(); }
+async function getJson(url, onProgress, signal=viewController?.signal) {
+  const address=new URL(url,location.origin), deadline=performance.now()+120000;
+  while(true){
+    if(signal?.aborted)throw new DOMException("조회 취소", "AbortError");
+    const controller=new AbortController(), cancel=()=>controller.abort();
+    signal?.addEventListener("abort",cancel,{once:true});
+    const timer=setTimeout(cancel,15000);
+    let payload, response;
+    try{
+      response=await fetch(address,{signal:controller.signal});
+      if(!response.ok)throw Error("자료를 읽지 못했습니다. 잠시 후 다시 조회해 주세요.");
+      payload=await response.json();
+    }catch(error){
+      if(signal?.aborted)throw new DOMException("조회 취소", "AbortError");
+      if(error.name==="AbortError")throw Error("조회가 15초 안에 응답하지 않았습니다. 운영 상태를 확인한 뒤 다시 조회해 주세요.");
+      throw error;
+    }finally{clearTimeout(timer);signal?.removeEventListener("abort",cancel);}
+    if(signal?.aborted)throw new DOMException("조회 취소", "AbortError");
+    if(response.status!==202)return payload;
+    if(payload.status!=="INDEXING" || !Number.isInteger(payload.generation))throw Error("자료 목록의 진행 상태를 확인할 수 없습니다.");
+    if(onProgress)onProgress(payload);
+    if(performance.now()>=deadline)throw Error("보관 자료 목록을 아직 확인 중입니다. 운영 상태는 아래에서 볼 수 있으며, 잠시 후 목록을 다시 조회해 주세요.");
+    address.searchParams.set("catalog_generation",payload.generation);
+    await new Promise(resolve=>setTimeout(resolve,500));
+  }
+}
+function catalogProgress(progress){
+  byId("status").textContent="보관 자료 목록을 확인하고 있습니다 · 실행 기록 "+number(progress.manifests_checked)+"개 확인. 운영 상태는 아래에서 별도로 확인할 수 있습니다.";
+}
+function setViewBusy(busy){
+  viewBusy=busy;
+  ["load","ticker","asof","anchor"].forEach(id=>byId(id).disabled=busy);
+  byId("status").setAttribute("aria-busy",String(busy));
+}
 function table(title, headings, rows) {
   const section = document.createElement("section");
   const heading = document.createElement("h3"); heading.textContent = title; section.append(heading);
@@ -82,9 +117,12 @@ function renderKisValidation(health) {
 async function loadOperational(asof,version) {
   const views=[['kis-strategy-health',renderKisStrategy,"KIS 전략 운영 기록을 읽지 못했습니다."],['paper-health',renderHealth,"모의 운영 상태를 읽지 못했습니다."],['kis-demo-health',renderKisHealth,"모의 서버 조회 점검 기록을 읽지 못했습니다."],['kis-validation-health',renderKisValidation,"모의 서버 주문 검증 기록을 읽지 못했습니다."]];
   views.forEach(([id])=>byId(id).replaceChildren(paragraph("운영 기록을 확인하고 있습니다.")));
-  const results=await Promise.allSettled(views.map(([id])=>getJson("/api/"+id+"?as_of="+encodeURIComponent(asof))));
-  if(version!==requestVersion)return;
-  views.forEach(([id,render,error],index)=>results[index].status==="fulfilled"?render(results[index].value):byId(id).replaceChildren(paragraph(error)));
+  await Promise.allSettled(views.map(async([id,render,error])=>{
+    try{
+      const result=await getJson("/api/"+id+"?as_of="+encodeURIComponent(asof));
+      if(version===requestVersion)render(result);
+    }catch(failure){if(version===requestVersion)byId(id).replaceChildren(paragraph(error));}
+  }));
 }
 function renderKisStrategy(payload) {
   const target=byId("kis-strategy-health");
@@ -177,17 +215,15 @@ function clearSnapshot() {
   ["verdict","freshness","profile","performance","unverified","source-context","experiment-cards"].forEach(id=>byId(id).textContent="");
   ["reasons","facts","inferences","events"].forEach(id=>list(id,[]));window.reviewSnapshot=null;
 }
-async function loadSnapshot() {
-  const version = ++requestVersion;
+async function showSnapshot(existingOperational, existingVersion) {
+  const version = existingVersion ?? ++requestVersion;
   byId("status").textContent = "기준 시각의 자료를 확인하고 있습니다.";
   const params = new URLSearchParams({ ticker: byId("ticker").value, as_of: byId("asof").value });
   // Operational receipts must remain visible even when a ticker has no chart.
-  const operational = loadOperational(params.get("as_of"),version);
+  const operational = existingOperational || loadOperational(params.get("as_of"),version);
   if (byId("anchor").value) params.set("anchor", byId("anchor").value);
   try {
-    const response = await fetch("/api/snapshot?" + params);
-    if (!response.ok) throw new Error("시각과 보관 자료를 확인해 주세요.");
-    const snapshot = await response.json();
+    const snapshot = await getJson("/api/snapshot?" + params, catalogProgress);
     if (version !== requestVersion) return;
     charts.forEach(chart => chart.remove()); charts = [];
     byId("charts").replaceChildren();
@@ -249,13 +285,20 @@ async function loadSnapshot() {
     await operational;
   }
 }
+async function loadSnapshot() {
+  if(viewBusy)return;
+  viewController?.abort();viewController=new AbortController();
+  const controller=viewController;
+  setViewBusy(true);
+  try{await showSnapshot();}finally{if(controller===viewController)setViewBusy(false);}
+}
 async function refreshCatalog() {
   const selected=byId("ticker").value;
-  const tickers=await getJson("/api/tickers?as_of="+encodeURIComponent(byId("asof").value));
+  const tickers=await getJson("/api/tickers?as_of="+encodeURIComponent(byId("asof").value),catalogProgress);
   byId("ticker").replaceChildren(...tickers.map(ticker=>{const option=document.createElement("option");option.value=ticker;option.textContent=ticker;return option;}));
   if(tickers.includes(selected))byId("ticker").value=selected;
   list("candidates",tickers);
-  if(!tickers.length){const version=++requestVersion;clearSnapshot();byId("status").textContent="이 시점까지 완료된 분석이 없습니다.";await loadOperational(byId("asof").value,version);return false;}return true;
+  if(!tickers.length){clearSnapshot();byId("status").textContent="이 시점까지 완료된 분석이 없습니다.";return false;}return true;
 }
 async function start() {
   byId("asof").value = new Date().toISOString();
@@ -264,14 +307,17 @@ async function start() {
   byId("asof").addEventListener("input",()=>byId("follow-current").checked=false);
   byId("compile-condition").addEventListener("click",compileCondition);
   byId("refresh-catalog").addEventListener("click",async()=>{
+    viewController?.abort();viewController=new AbortController();
+    setViewBusy(true);
+    byId("status").textContent="보관 자료 목록을 확인하고 있습니다. 운영 상태는 별도로 불러옵니다.";
     if(byId("follow-current").checked)byId("asof").value=new Date().toISOString();
     const version=++requestVersion;
     const operational=loadOperational(byId("asof").value,version);
-    try{if(await refreshCatalog())await loadSnapshot();}
+    try{if(await refreshCatalog())await showSnapshot(operational,version);}
     catch(error){if(version===requestVersion)byId("status").textContent=error.message;}
-    finally{await operational;}
+    finally{await operational;if(version===requestVersion)setViewBusy(false);}
   });
-  setInterval(()=>{if(byId("follow-current").checked)byId("refresh-catalog").click();},60000);
+  setInterval(()=>{if(byId("follow-current").checked&&!viewBusy)byId("refresh-catalog").click();},60000);
   byId("refresh-catalog").click();
 }
 start().catch(error=>byId("status").textContent=error.message);

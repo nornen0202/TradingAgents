@@ -193,14 +193,28 @@ async def probe(websocket_url, page_url):
                 raise RuntimeError("Empty catalog hid operational status")
             if not await evaluate("!document.querySelector('#ticker').options.length && document.querySelector('#paper-health').textContent.includes('휴장·장 종료')"):
                 raise RuntimeError("Empty archive status missing")
+            if not await evaluate("document.querySelector('#status').getAttribute('aria-busy')==='false' && !document.querySelector('#asof').disabled && !viewBusy"):
+                raise RuntimeError("Empty archive stranded refresh controls")
             result["empty_catalog_preserves_operations"] = True
-            for catalog_mode in ("pending", "failed"):
+            for catalog_mode in ("indexing", "health-delay", "pending", "timeout", "failed"):
                 injected = await call("Page.addScriptToEvaluateOnNewDocument", {"source": '''
                   window.__catalogMode=MODE;
-                  const originalFetch=window.fetch.bind(window);
+                  const originalFetch=window.fetch.bind(window),originalTimeout=window.setTimeout.bind(window);
+                  window.__indexingResponses=0;
+                  window.setTimeout=(fn,ms,...args)=>originalTimeout(fn,window.__catalogMode==='timeout'&&ms===15000?300:ms,...args);
+                  function pendingRequest(args){return new Promise((resolve,reject)=>{
+                    args[0]?.signal?.addEventListener('abort',()=>reject(new DOMException('aborted','AbortError')),{once:true});
+                  });}
                   window.fetch=(url,...args)=>{
-                    if(String(url).startsWith('/api/tickers')) {
-                      if(window.__catalogMode==='pending')return new Promise(()=>{});
+                    const path=new URL(url,location.origin).pathname;
+                    if(path==='/api/kis-demo-health' && window.__catalogMode==='health-delay')return pendingRequest(args);
+                    if(path==='/api/tickers') {
+                      if(window.__catalogMode==='indexing' && window.__indexingResponses++<2)return Promise.resolve(new Response(JSON.stringify({status:'INDEXING',generation:1,manifests_checked:12,manifests_parsed:12}),{status:202,headers:{'Content-Type':'application/json'}}));
+                      if(window.__catalogMode==='timeout')return pendingRequest(args);
+                      if(window.__catalogMode==='pending')return new Promise((resolve,reject)=>{
+                        const signal=args[0]?.signal;
+                        signal?.addEventListener('abort',()=>reject(new DOMException('aborted','AbortError')),{once:true});
+                      });
                       if(window.__catalogMode==='failed')return Promise.resolve(new Response('',{status:503}));
                     }
                     return originalFetch(url,...args);
@@ -213,6 +227,26 @@ async def probe(websocket_url, page_url):
                         break
                 else:
                     raise RuntimeError(f"{catalog_mode} initial catalog hid operational status")
+                if catalog_mode == "health-delay" and not await evaluate("document.querySelector('#kis-demo-health').textContent.includes('확인하고 있습니다')"):
+                    raise RuntimeError("Slow health fixture did not remain pending")
+                if catalog_mode == "indexing":
+                    if not await evaluate("document.querySelector('#status').textContent.includes('실행 기록') && viewBusy"):
+                        raise RuntimeError("202 discovery progress was not visible")
+                    for _ in range(60):
+                        await asyncio.sleep(.1)
+                        if await evaluate("Boolean(window.reviewSnapshot && !viewBusy)"):
+                            break
+                    else:
+                        raise RuntimeError("202 discovery did not complete")
+                    if not await evaluate("window.__indexingResponses>=2"):
+                        raise RuntimeError("202 fixture not exercised")
+                if catalog_mode == "timeout":
+                    for _ in range(30):
+                        await asyncio.sleep(.1)
+                        if await evaluate("document.querySelector('#status').textContent.includes('15초') && !viewBusy"):
+                            break
+                    else:
+                        raise RuntimeError("Timed-out catalog did not restore controls with an actionable error")
                 if catalog_mode == "failed" and not await evaluate("document.querySelector('#status').textContent.includes('자료를 읽지 못했습니다')"):
                     raise RuntimeError("Failed catalog did not report its own error")
                 # Controls/retry must already be registered while the first
