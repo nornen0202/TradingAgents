@@ -1,6 +1,27 @@
 {
-  "generated_at": "2026-10-26T21:41:55.717100",
+  "generated_at": "2026-10-26T22:08:30.334152",
   "runs": [
+    {
+      "run_id": "20261026T213112_local-scheduler-us-full",
+      "label": "local-scheduler-us-full",
+      "started_at": "2026-10-26T21:31:12.632056+09:00",
+      "finished_at": "2026-10-26T21:50:39.054891+09:00",
+      "status": "partial_failure",
+      "market": "US",
+      "run_mode": "full",
+      "settings": {
+        "market": "US",
+        "run_mode": "full"
+      },
+      "summary": {
+        "total_tickers": 27
+      },
+      "ticker_count": 27,
+      "success_count": 4,
+      "decision_bundle": {},
+      "published_to_site": true,
+      "run_url": "runs/20261026T213112_local-scheduler-us-full/index.html"
+    },
     {
       "run_id": "20261026T200051_local-scheduler-us-full",
       "label": "local-scheduler-us-full",
@@ -3323,8 +3344,8 @@
         "fresh_row_ratio": 1.0,
         "conditional_row_ratio": 1.0
       },
-      "published_to_site": true,
-      "run_url": "runs/20261022T225833_local-freshness-us-overlay/index.html"
+      "published_to_site": false,
+      "run_url": null
     },
     {
       "run_id": "20261022T225730_local-freshness-us-overlay",
