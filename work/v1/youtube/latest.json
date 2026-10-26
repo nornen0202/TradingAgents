@@ -1,13 +1,13 @@
 {
   "schema": "tradingagents.work-context/v1",
   "surface": "youtube",
-  "event_id": "youtube:d2d4b59ff59e0de7a197f586cef839f8",
+  "event_id": "youtube:2e94c555f3647cfe7b03c1ddad7f0b7f",
   "prompt_contract_version": "youtube-work-v5",
   "prompt_sha256": "82a87727ec636b928ccb90cfe8cd823d86347e254ed0b204903699e34e35ef0b",
   "skill_sha256": "4dffe28b3721557cc2517b5afff2f94045832606e71ff61461df969f6abb53c7",
   "task_manifest_sha256": "c0992fa275c9961bc91c679030c0b4d9b8b06f3d164226776421f1e354b5c22e",
   "workflow_contract_sha256": "4982d0db0e5a97f3b0f392bdff489a6940be0d2d88e7ea94533edbdb009b4556",
-  "source_sha256": "0f22c3083edd01cf6d679a014aeb12f2a60ef953b928702c8a0b0aca06d80890",
+  "source_sha256": "eeef01da1af418a78ecfbf48ab3651820d5beebf2f7c46c8a0498808f5d2a1b3",
   "body": {
     "kind": "youtube",
     "source_health": "OK",
@@ -44,12 +44,11 @@
     },
     "coverage": {
       "total_unique_events": 489,
-      "window_events": 27,
-      "transmitted_events": 24,
-      "truncated": true,
-      "oldest_occurred_at": "2026-10-23T11:00:13+00:00",
-      "newest_occurred_at": "2026-10-25T11:00:26+00:00",
-      "omitted_due_to_packet_budget": 3
+      "window_events": 23,
+      "transmitted_events": 23,
+      "truncated": false,
+      "oldest_occurred_at": "2026-10-23T13:30:23+00:00",
+      "newest_occurred_at": "2026-10-25T11:00:26+00:00"
     },
     "events": [
       {
@@ -4053,201 +4052,6 @@
               "source_url": "http://www.newsdream.kr/news/articleView.html?idxno=115239",
               "publisher": "Naver News",
               "published_at": "2026-07-29T15:50:00+09:00",
-              "source_tier": "news"
-            }
-          ]
-        }
-      },
-      {
-        "event_key": "UcOMutnpjIs",
-        "content_sha256": "f4ca83a74fe02618ddfbc8686b8eb7f199285acf94143180a45c715cbda55a48",
-        "occurred_at": "2026-10-23T12:30:24+00:00",
-        "relevance": {
-          "tickers": [
-            "META",
-            "WDC",
-            "BE",
-            "000660.KS"
-          ],
-          "markets": [
-            "US",
-            "KR"
-          ],
-          "themes": [],
-          "match_basis": "verified_entities"
-        },
-        "strategy_source_tier": "STANDARD",
-        "strategy_evidence_weight": "STANDARD",
-        "summary": {
-          "video_id": "UcOMutnpjIs",
-          "title": "10월 23일 미국장 열리기 전 꼭 알아야 하는 '미장 시황' 투자 포인트",
-          "channel": "경제사냥꾼",
-          "source_url": "https://www.youtube.com/watch?v=UcOMutnpjIs",
-          "published_at": "2026-10-23T12:30:24+00:00",
-          "status": "asr_uncertain",
-          "strategy_source_tier": "STANDARD",
-          "strategy_evidence_weight": "STANDARD",
-          "strategy_validation_policy": "STANDARD_REVIEW",
-          "transcript_quality": {
-            "status": "good",
-            "score": 1.0,
-            "warnings": [],
-            "source": "automatic",
-            "language": "Korean",
-            "model_or_format": "json3",
-            "chars": 1650,
-            "segments": 68,
-            "duration_seconds": 121,
-            "repeated_ngram_ratio": 0.0
-          },
-          "claim_status_summary": {
-            "unverified": 10,
-            "asr_uncertain": 1,
-            "partially_supported": 1
-          },
-          "claims": [
-            {
-              "claim_id": "C1",
-              "claim_text": "전일 S&P 500과 반도체 지수가 하락했으며 메타 실적이 원인이었다.",
-              "status": "unverified",
-              "confidence": 0.98,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "지수 하락과 메타 실적의 인과관계를 매매 근거로 확정하지 말아야 한다."
-            },
-            {
-              "claim_id": "C2",
-              "claim_text": "메타의 3분기 매출은 전년 대비 26% 증가했지만 21억 2천만 달러 적자를 기록했다.",
-              "status": "unverified",
-              "confidence": 0.99,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "현금흐름 악화와 회계상 적자를 구분하기 전에는 수익성 판단에 이 수치를 사용하기 어렵다."
-            },
-            {
-              "claim_id": "C3",
-              "claim_text": "메타는 내년 무의결권 신주로 자금을 조달하고 적자에도 AI 시설 투자를 확대하며 관련주 불안을 유발했다.",
-              "status": "unverified",
-              "confidence": 0.99,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "실제 발행 조건을 확인하기 전에는 지분 희석 규모나 자금조달 부담을 계산할 수 없다."
-            },
-            {
-              "claim_id": "C4",
-              "claim_text": "웨스턴 디지털의 매출은 55% 증가했으나 주가는 상승세를 보이지 못했다.",
-              "status": "unverified",
-              "confidence": 0.96,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "성장률과 발표 후 수익률을 각각 확인하기 전에는 실적 개선이 주가에 반영되지 않았다고 단정하기 어렵다."
-            },
-            {
-              "claim_id": "C5",
-              "claim_text": "블룸 에너지의 매출은 138% 증가했으나 주가는 상승세를 보이지 못했다.",
-              "status": "unverified",
-              "confidence": 0.95,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "매출 성장 외에 현금흐름·수익성·가이던스와 실제 가격 반응을 함께 확인해야 한다."
-            },
-            {
-              "claim_id": "C6",
-              "claim_text": "10월 23일 한국시간 22시 45분 PMI와 23시 CPI가 발표된다.",
-              "status": "unverified",
-              "confidence": 0.99,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "확인되지 않은 지표명과 시각을 이벤트 거래 일정으로 사용하지 말아야 한다."
-            }
-          ],
-          "entities": [
-            {
-              "ticker": "META",
-              "name": "메타",
-              "status": "unverified",
-              "verification_notes": [
-                "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-              ]
-            },
-            {
-              "ticker": "WDC",
-              "name": "웨스턴 디지털",
-              "status": "unverified",
-              "verification_notes": [
-                "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-              ]
-            },
-            {
-              "ticker": "BE",
-              "name": "블룸 에너지",
-              "status": "unverified",
-              "verification_notes": [
-                "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-              ]
-            },
-            {
-              "ticker": "000660.KS",
-              "name": "SK하이닉스",
-              "status": "unverified",
-              "verification_notes": [
-                "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-              ]
-            }
-          ],
-          "evidence": [
-            {
-              "evidence_id": "E1",
-              "claim_id": "C1",
-              "title": "'Banker coin' defies oil shock as gold sinks",
-              "source_url": "https://finance.yahoo.com/markets/crypto/articles/banker-coin-defies-oil-shock-213403754.html",
-              "publisher": "TheStreet",
-              "published_at": "2026-10-23T21:34:03+00:00",
-              "source_tier": "market_or_news"
-            },
-            {
-              "evidence_id": "E2",
-              "claim_id": "C1",
-              "title": "Basic Materials Roundup: Market Talk",
-              "source_url": "https://finance.yahoo.com/m/568b1471-14d7-3e79-b025-6556e0c37d0d/basic-materials-roundup%3A.html",
-              "publisher": "The Wall Street Journal",
-              "published_at": "2026-10-23T21:30:00+00:00",
-              "source_tier": "market_or_news"
-            },
-            {
-              "evidence_id": "E4",
-              "claim_id": "C2",
-              "title": "Stocks fall, but tech shares steady after selloff; oil hits highest in nearly six months",
-              "source_url": "https://finance.yahoo.com/markets/articles/tech-selloff-relents-oil-five-103308077.html",
-              "publisher": "Reuters",
-              "published_at": "2026-10-23T21:39:06+00:00",
-              "source_tier": "market_or_news"
-            },
-            {
-              "evidence_id": "E5",
-              "claim_id": "C2",
-              "title": "3 Energy Stocks to Buy and Hold for the Next Decade, Starting With ExxonMobil",
-              "source_url": "https://finance.yahoo.com/energy/articles/3-energy-stocks-buy-hold-213500990.html",
-              "publisher": "Motley Fool",
-              "published_at": "2026-10-23T21:35:00+00:00",
-              "source_tier": "news"
-            },
-            {
-              "evidence_id": "E6",
-              "claim_id": "C5",
-              "title": "Stock Market Today, Oct. 23: Bloom Energy Falls on Cash Flow Concerns Despite Record Q3 Revenue",
-              "source_url": "https://finance.yahoo.com/markets/stocks/articles/stock-market-today-oct-23-210638069.html",
-              "publisher": "Motley Fool",
-              "published_at": "2026-10-23T21:06:38+00:00",
-              "source_tier": "news"
-            },
-            {
-              "evidence_id": "E7",
-              "claim_id": "C5",
-              "title": "Moderna, Meta, SpaceX, Bloom Energy, AT&T, and More Stocks That Explain Today’s Market",
-              "source_url": "https://finance.yahoo.com/m/f96806d8-9583-3620-89cf-a7ccb8de8237/moderna%2C-meta%2C-spacex%2C-bloom.html",
-              "publisher": "Barrons.com",
-              "published_at": "2026-10-23T20:39:00+00:00",
               "source_tier": "news"
             }
           ]
