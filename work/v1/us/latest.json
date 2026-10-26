@@ -1,13 +1,13 @@
 {
   "schema": "tradingagents.work-context/v1",
   "surface": "us",
-  "event_id": "us:01314e976196021eb8b117e7149eb542",
+  "event_id": "us:4ec01605f8cf07ef886fd175720fcfc9",
   "prompt_contract_version": "market-work-v13-us",
   "prompt_sha256": "d89884ce9232b2695f637cb3a5654da9f473e7138706cc074cbd9a1601e61f77",
   "skill_sha256": "4dffe28b3721557cc2517b5afff2f94045832606e71ff61461df969f6abb53c7",
   "task_manifest_sha256": "c0992fa275c9961bc91c679030c0b4d9b8b06f3d164226776421f1e354b5c22e",
   "workflow_contract_sha256": "6e0b555b6a8ae53cf919baa1e96d671d2ef180fd3d86a58e5c8b568f278c8ec6",
-  "source_sha256": "bb3e9933b77b37fed6a26ba67059c3b1429d0a67fe46642034ba0354225948c5",
+  "source_sha256": "9a00f99b5e16dcc6850bd77a937abf893def659541d3385fce97f5dcd946f051",
   "body": {
     "kind": "market",
     "market": "US",
@@ -994,15 +994,15 @@
         "source_health": "OK",
         "coverage": {
           "total_unique_events": 489,
-          "window_events": 50,
+          "window_events": 48,
           "transmitted_events": 12,
           "truncated": true,
-          "oldest_occurred_at": "2026-10-23T00:16:51+00:00",
+          "oldest_occurred_at": "2026-10-23T01:26:19+00:00",
           "newest_occurred_at": "2026-10-25T11:00:26+00:00",
-          "available_events_before_context_cap": 50,
+          "available_events_before_context_cap": 48,
           "context_event_cap": 12,
-          "omitted_events": 38,
-          "omitted_due_to_context_cap": 38,
+          "omitted_events": 36,
+          "omitted_due_to_context_cap": 36,
           "omitted_before_context_selection": 0
         },
         "events": [
@@ -2012,128 +2012,6 @@
             }
           },
           {
-            "event_key": "NqknsS3X98I",
-            "content_sha256": "65b577f6fea9a80eebee3d14d11d5b79ba9cb7f9d31e75c7b9ac076d1e065af3",
-            "occurred_at": "2026-10-23T00:16:51+00:00",
-            "relevance": {
-              "tickers": [
-                "^KS11",
-                "AAPL",
-                "005930",
-                "000660",
-                "CL=F"
-              ],
-              "markets": [
-                "US",
-                "KR"
-              ],
-              "themes": [],
-              "match_basis": "verified_entities",
-              "matched_tickers": [
-                "AAPL"
-              ],
-              "market_match": true,
-              "score": 120
-            },
-            "summary": {
-              "video_id": "NqknsS3X98I",
-              "title": "\"외국인 매도 규모가 중요하다\"…급락장, 반등의 조건은? | 박병창 MP파트너스 대표 [마켓 인사이드]",
-              "channel": "삼프로TV 3PROTV",
-              "source_url": "https://www.youtube.com/watch?v=NqknsS3X98I",
-              "claim_status_summary": {
-                "unverified": 10
-              },
-              "claims": [
-                {
-                  "claim_id": "C1",
-                  "claim_text": "외국인 순매도 확대가 반등을 제한하며, 판단 기준은 지난주 5천억원·이번 주 3천억원이다. 전일 외국인 순매도는 8천억→4천억원, 프로그램 매도는 1조2천억→8천억원으로 줄었고 방송 중 119억원 순매수를 기록했다.",
-                  "status": "unverified",
-                  "confidence": 0.99,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "3천억·5천억원을 검증된 매매 임계값으로 사용하지 말고, 해당 시장·시각의 수급과 거래대금을 대조해야 한다."
-                },
-                {
-                  "claim_id": "C2",
-                  "claim_text": "미국 반도체지수 약 -6.7%, MU 약 -6%, SNDK·INTC·AMD 약 -8%; MU·SNDK는 고점 대비 약 -30%·-50%다. AAPL은 +1.25%로 종가 신고가이며 시총이 NVDA에 근접하고 충성 고객은 2억5천만명이다. 미식별 증권의 -9%·-8% 하락도 언급했다.",
-                  "status": "unverified",
-                  "confidence": 0.99,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "애플의 상대적 강세와 AI 투자 부담 우위를 확인된 사실로 전제하지 말고, 동일 거래일 가격·시총과 회사 공시를 확인해야 한다."
-                },
-                {
-                  "claim_id": "C3",
-                  "claim_text": "삼성전자와 SK하이닉스의 장중 하락률은 각각 약 3.7~4%, 1.8~2.7%다. 삼성전자는 30만원→20만원, SK하이닉스는 고점 대비 60% 이상 하락했다. 솔리다임 IPO 철회가 SK하이닉스 선방에 기여했고 삼성전자는 현금이 풍부하다.",
-                  "status": "unverified",
-                  "confidence": 0.99,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "선행 낙폭이나 현금 보유를 하방 방어의 근거로 삼기 전에 실제 가격, 순현금, 투자지출 및 IPO 공시 본문을 확인해야 한다."
-                },
-                {
-                  "claim_id": "C4",
-                  "claim_text": "메타 향후 지출은 8,250억달러로 한 달 사이 1,250억달러 늘었으며 AI 기업 CDS가 상승했다. 경영진 발언과 'J' 보고서는 AI 수요보다 자본 부족이 제약이며 현금흐름에 따른 기업 차별화가 나타날 것이라는 해석의 근거다.",
-                  "status": "unverified",
-                  "confidence": 0.99,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "기업별 영업현금흐름·투자지출·차입 만기·조달비용을 구분해 평가하고, 미확인 총액이나 인용으로 AI 산업 전체를 판단하지 않아야 한다."
-                }
-              ],
-              "entities": [
-                {
-                  "ticker": "^KS11",
-                  "name": "한국 증시·외국인 수급",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                },
-                {
-                  "ticker": "AAPL",
-                  "name": "애플",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                },
-                {
-                  "ticker": "005930",
-                  "name": "삼성전자",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "시장 데이터 조회 실패: no_usable_market_fields"
-                  ]
-                },
-                {
-                  "ticker": "000660",
-                  "name": "SK하이닉스·솔리다임",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "시장 데이터 조회 실패: no_usable_market_fields"
-                  ]
-                },
-                {
-                  "ticker": "CL=F",
-                  "name": "금리·유가·전쟁·선거",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                },
-                {
-                  "ticker": "^KS11",
-                  "name": "코스피·하나증권 전망",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                }
-              ]
-            }
-          },
-          {
             "event_key": "GrPFIU3SJAc",
             "content_sha256": "396a6e7fa840b6ebb90426551ae5900959aa8a471a39a37bd368b420c0d2f4bb",
             "occurred_at": "2026-10-23T01:26:19+00:00",
@@ -2438,6 +2316,82 @@
                 }
               ]
             }
+          },
+          {
+            "event_key": "SuGP5dZdXQM",
+            "content_sha256": "13acac8c8c71118a9c0dcf99665fa8d90b0c45317acf6921e21058c507990aa5",
+            "occurred_at": "2026-10-25T02:00:27+00:00",
+            "relevance": {
+              "tickers": [
+                "CRWV"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "verified_entities",
+              "matched_tickers": [],
+              "market_match": true,
+              "score": 20
+            },
+            "summary": {
+              "video_id": "SuGP5dZdXQM",
+              "title": "고금리 시대 길어진다…채권·배당주·금, 투자 기준은 | 조원경 세종대학교 교수 [신과대화]",
+              "channel": "삼프로TV 3PROTV",
+              "source_url": "https://www.youtube.com/watch?v=SuGP5dZdXQM",
+              "claim_status_summary": {
+                "unverified": 11,
+                "asr_uncertain": 1
+              },
+              "claims": [
+                {
+                  "claim_id": "C1",
+                  "claim_text": "AI 투자·정부 차입·전쟁발 물가가 고금리를 장기화하며, 한국 성장률은 3.3이고 금리 5.3% 당시에도 나스닥이 신고가였다는 발언.",
+                  "status": "unverified",
+                  "confidence": 0.99,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "고금리 장기화를 확정된 투자 전제로 사용하거나 3.3·5.3을 현재 지표로 인용하기 어렵다."
+                },
+                {
+                  "claim_id": "C2",
+                  "claim_text": "미국 국채금리 5% 초과, 메타 조달금리 7%, 저신용 기업 조달금리 8~9%라는 발언.",
+                  "status": "unverified",
+                  "confidence": 0.99,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "제시된 금리를 실제 매입수익률이나 기업별 현재 조달비용으로 사용하지 않는다."
+                },
+                {
+                  "claim_id": "C3",
+                  "claim_text": "올해 1월 금이 5,000달러를 넘었다가 4,000달러로 하락했고 중앙은행 매입이 가격 하단을 지지한다는 발언.",
+                  "status": "unverified",
+                  "confidence": 0.99,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "5,000·4,000달러를 검증된 가격 기준이나 매수 지지선으로 제시하지 않는다."
+                },
+                {
+                  "claim_id": "C4",
+                  "claim_text": "서울 공급 부족이 고금리 부담보다 강하고 최장 연속 상승 중이며 DTI·LTV가 사실상 무시되고 있다는 발언.",
+                  "status": "unverified",
+                  "confidence": 0.99,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "서울 가격 상승의 지속성이나 대출 규제의 실효성 부재를 확인된 사실로 판단하지 않는다."
+                }
+              ],
+              "entities": [
+                {
+                  "ticker": "CRWV",
+                  "name": "코어위브·네오클라우드",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                }
+              ]
+            }
           }
         ],
         "execution_eligible": false
@@ -2474,22 +2428,22 @@
               "5v_OgboQYx8",
               "JaLRHTG_Kks",
               "FgZ_AtNbN9Y",
-              "NqknsS3X98I",
               "GrPFIU3SJAc",
               "6esEt4-hjqw",
-              "b2my6Nq32rs"
+              "b2my6Nq32rs",
+              "SuGP5dZdXQM"
             ],
             "coverage": {
               "total_unique_events": 489,
-              "window_events": 50,
+              "window_events": 48,
               "transmitted_events": 12,
               "truncated": true,
-              "oldest_occurred_at": "2026-10-23T00:16:51+00:00",
+              "oldest_occurred_at": "2026-10-23T01:26:19+00:00",
               "newest_occurred_at": "2026-10-25T11:00:26+00:00",
-              "available_events_before_context_cap": 50,
+              "available_events_before_context_cap": 48,
               "context_event_cap": 12,
-              "omitted_events": 38,
-              "omitted_due_to_context_cap": 38,
+              "omitted_events": 36,
+              "omitted_due_to_context_cap": 36,
               "omitted_before_context_selection": 0
             }
           },

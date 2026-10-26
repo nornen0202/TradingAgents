@@ -1,41 +1,41 @@
 {
   "schema": "tradingagents.work-context/v1",
   "surface": "kr",
-  "event_id": "kr:bbd476965e50e11b764d5ea1666c0150",
+  "event_id": "kr:896a01903792f863c9dca58a0612371e",
   "prompt_contract_version": "market-work-v12-kr",
   "prompt_sha256": "ce58e681561b3a6ddb646ea4fc0c4aabaf4bbf140a3894b895f30f0f954092dc",
   "skill_sha256": "4dffe28b3721557cc2517b5afff2f94045832606e71ff61461df969f6abb53c7",
   "task_manifest_sha256": "c0992fa275c9961bc91c679030c0b4d9b8b06f3d164226776421f1e354b5c22e",
   "workflow_contract_sha256": "ddf0892f9079721a3c716f1f1aab8216028890c541e722a0ec83feef9c09b18c",
-  "source_sha256": "fe7fc4cab083fa4b7dc1f988436ddee663bef8e99ca073c931a708a5ab68a1fc",
+  "source_sha256": "bd44a3eac6e8d37254600c3900c6d8b2ac03cbeb820d21bec6fd6717aa658474",
   "body": {
     "kind": "market",
     "market": "KR",
     "session_id": "KR:2026-10-23",
-    "source_health": "UNVERIFIED",
+    "source_health": "STALE",
     "source": {
-      "run_id": "20261026T044544_local-scheduler-kr-full",
-      "last_run_at": "2026-10-26T08:07:38.454072+09:00",
+      "run_id": "20261026T081100_local-scheduler-kr-full",
+      "last_run_at": "2026-10-26T09:36:56.827168+09:00",
       "status": "partial_failure"
     },
     "report_mode": "OUTAGE",
     "current": {
-      "run_id": "20261026T044544_local-scheduler-kr-full",
-      "started_at": "2026-10-26T04:45:44.240713+09:00",
+      "run_id": "20261026T081100_local-scheduler-kr-full",
+      "started_at": "2026-10-26T08:11:00.820417+09:00",
       "run_mode": "full",
       "freshness_receipt": {
         "schema": "tradingagents.source-freshness/v1",
-        "producer_run_id": "20261026T044544_local-scheduler-kr-full",
-        "producer_started_at": "2026-10-26T04:45:44.240713+09:00",
-        "producer_finished_at": "2026-10-26T08:07:38.454072+09:00",
-        "analysis_run_id": "20261026T044544_local-scheduler-kr-full",
+        "producer_run_id": "20261026T081100_local-scheduler-kr-full",
+        "producer_started_at": "2026-10-26T08:11:00.820417+09:00",
+        "producer_finished_at": "2026-10-26T09:36:56.827168+09:00",
+        "analysis_run_id": "20261026T081100_local-scheduler-kr-full",
         "analysis_lineage_status": "RESOLVED",
-        "analysis_completed_at": "2026-10-26T07:31:36.520688+09:00",
+        "analysis_completed_at": "2026-10-26T09:02:33.309877+09:00",
         "analysis_trade_date_oldest": "2026-10-23",
         "analysis_trade_date_latest": "2026-10-23",
         "market_data_oldest_at": "2026-10-23T20:00:00+09:00",
         "market_data_latest_at": "2026-10-23T20:00:00+09:00",
-        "market_data_status": "MISSING",
+        "market_data_status": "STALE",
         "publication_does_not_refresh_inputs": true,
         "execution_max_age_seconds": 180.0,
         "research_market_data_status": "UNVERIFIED",
@@ -113,13 +113,13 @@
             "execution_eligible": false
           },
           {
-            "ticker": "033780.KS",
+            "ticker": "090430.KS",
             "research_valid": false,
             "category": "UNVERIFIED_RESEARCH_INPUT",
             "execution_eligible": false
           },
           {
-            "ticker": "090430.KS",
+            "ticker": "033780.KS",
             "research_valid": false,
             "category": "UNVERIFIED_RESEARCH_INPUT",
             "execution_eligible": false
@@ -138,6 +138,12 @@
           },
           {
             "ticker": "000100.KS",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "064400.KS",
             "research_valid": false,
             "category": "UNVERIFIED_RESEARCH_INPUT",
             "execution_eligible": false
@@ -167,6 +173,18 @@
             "execution_eligible": false
           },
           {
+            "ticker": "396300.KQ",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "411080.KQ",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false
+          },
+          {
             "ticker": "079650.KQ",
             "research_valid": false,
             "category": "UNVERIFIED_RESEARCH_INPUT",
@@ -183,24 +201,6 @@
             "research_valid": false,
             "category": "UNVERIFIED_RESEARCH_INPUT",
             "execution_eligible": false
-          },
-          {
-            "ticker": "064400.KS",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
-            "execution_eligible": false
-          },
-          {
-            "ticker": "396300.KQ",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
-            "execution_eligible": false
-          },
-          {
-            "ticker": "411080.KQ",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
-            "execution_eligible": false
           }
         ],
         "research_calendar_verified": true,
@@ -209,29 +209,36 @@
       },
       "latest_attempt": {
         "schema": "tradingagents.analysis-attempt/v1",
-        "run_id": "20261026T081100_local-scheduler-kr-full",
+        "run_id": "20261026T094055_local-scheduler-kr-full",
         "market": "KR",
         "run_mode": "full",
-        "started_at": "2026-10-26T08:11:00.820417+09:00",
+        "started_at": "2026-10-26T09:40:55.784177+09:00",
         "status": "RUNNING",
-        "heartbeat_at": "2026-10-25T23:24:01.201502+00:00"
+        "heartbeat_at": "2026-10-26T00:40:55.788667+00:00"
       },
       "latest_completed_analysis": {
-        "run_id": "20261026T044544_local-scheduler-kr-full",
+        "run_id": "20261026T081100_local-scheduler-kr-full",
         "status": "partial_failure",
-        "finished_at": "2026-10-26T08:07:38.454072+09:00"
+        "finished_at": "2026-10-26T09:36:56.827168+09:00"
       },
       "analysis_receipt": {
-        "analysis_run_id": "20261026T044544_local-scheduler-kr-full",
-        "decisions": {}
+        "analysis_run_id": "20261026T081100_local-scheduler-kr-full",
+        "decisions": {},
+        "research_recovery": {
+          "schema": "tradingagents.research-recovery/v1",
+          "source_run_id": "20261026T044544_local-scheduler-kr-full",
+          "source_manifest_sha256": "cfa63794a72f005b192ee498171d18f03d5439a683cd1e7bf2ced41df798655f",
+          "source_status": "partial_failure",
+          "usage_scope": "This run's LLM usage excludes reused source calls; original per-ticker artifacts and source_llm_usage preserve them."
+        }
       },
       "bundle": {
         "artifact_type": "decision_bundle",
         "version": 2,
-        "run_id": "20261026T044544_local-scheduler-kr-full",
+        "run_id": "20261026T081100_local-scheduler-kr-full",
         "market": "KR",
-        "generated_at": "2026-10-26T08:05:09.898353+09:00",
-        "analysis_source_run_id": "20261026T044544_local-scheduler-kr-full",
+        "generated_at": "2026-10-26T09:35:59.789130+09:00",
+        "analysis_source_run_id": "20261026T081100_local-scheduler-kr-full",
         "quality": {
           "report_mode": "OUTAGE",
           "decision_ready": false,
@@ -499,9 +506,12 @@
           {
             "ticker": "278470.KS",
             "display_name": "에이피알",
+            "last_price": 284500.0,
+            "market_data_asof": "2026-10-23T20:00:00+09:00",
             "vwap_position_ko": "VWAP 미확인",
+            "relative_volume": 0.0,
             "sync_summary_ko": "섹터 비교 없음 / 지수 비교 지표 미수집",
-            "data_status_ko": "시세 시각 확인 필요",
+            "data_status_ko": "시세 유효기간 만료",
             "reason_codes_ko": [],
             "quality": {
               "row_mode": "BLOCKED_STALE",
@@ -512,7 +522,8 @@
               "conditional_strategy_ready": false,
               "current_execution_promotion": "BLOCKED",
               "generated_in_current_run": false,
-              "expired_at_build": false
+              "row_valid_until": "2026-10-23T20:03:00+09:00",
+              "expired_at_build": true
             },
             "display_priority": 11
           },
@@ -541,9 +552,9 @@
             "display_priority": 12
           },
           {
-            "ticker": "033780.KS",
-            "display_name": "033780",
-            "last_price": 189400.0,
+            "ticker": "090430.KS",
+            "display_name": "090430",
+            "last_price": 128800.0,
             "market_data_asof": "2026-10-23T20:00:00+09:00",
             "vwap_position_ko": "VWAP 미확인",
             "relative_volume": 0.0,
@@ -565,9 +576,9 @@
             "display_priority": 13
           },
           {
-            "ticker": "090430.KS",
-            "display_name": "090430",
-            "last_price": 128800.0,
+            "ticker": "033780.KS",
+            "display_name": "033780",
+            "last_price": 189400.0,
             "market_data_asof": "2026-10-23T20:00:00+09:00",
             "vwap_position_ko": "VWAP 미확인",
             "relative_volume": 0.0,
@@ -661,6 +672,30 @@
             "display_priority": 17
           },
           {
+            "ticker": "064400.KS",
+            "display_name": "LG CNS",
+            "last_price": 72800.0,
+            "market_data_asof": "2026-10-23T20:00:00+09:00",
+            "vwap_position_ko": "VWAP 미확인",
+            "relative_volume": 0.0,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 비교 지표 미수집",
+            "data_status_ko": "시세 유효기간 만료",
+            "reason_codes_ko": [],
+            "quality": {
+              "row_mode": "BLOCKED_STALE",
+              "execution_ready": false,
+              "data_ready": false,
+              "action_ready": false,
+              "action_status": "DATA_RECHECK_REQUIRED",
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
+              "generated_in_current_run": false,
+              "row_valid_until": "2026-10-23T20:03:00+09:00",
+              "expired_at_build": true
+            },
+            "display_priority": 18
+          },
+          {
             "ticker": "036460.KS",
             "display_name": "036460",
             "last_price": 36600.0,
@@ -682,7 +717,7 @@
               "row_valid_until": "2026-10-23T20:03:00+09:00",
               "expired_at_build": true
             },
-            "display_priority": 18
+            "display_priority": 19
           },
           {
             "ticker": "096770.KS",
@@ -706,7 +741,7 @@
               "row_valid_until": "2026-10-23T20:03:00+09:00",
               "expired_at_build": true
             },
-            "display_priority": 19
+            "display_priority": 20
           },
           {
             "ticker": "003230.KS",
@@ -730,7 +765,7 @@
               "row_valid_until": "2026-10-23T20:03:00+09:00",
               "expired_at_build": true
             },
-            "display_priority": 20
+            "display_priority": 21
           },
           {
             "ticker": "018880.KS",
@@ -754,7 +789,55 @@
               "row_valid_until": "2026-10-23T20:03:00+09:00",
               "expired_at_build": true
             },
-            "display_priority": 21
+            "display_priority": 22
+          },
+          {
+            "ticker": "396300.KQ",
+            "display_name": "396300",
+            "last_price": 9210.0,
+            "market_data_asof": "2026-10-23T20:00:00+09:00",
+            "vwap_position_ko": "VWAP 미확인",
+            "relative_volume": 0.0016000218801700385,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 비교 지표 미수집",
+            "data_status_ko": "시세 유효기간 만료",
+            "reason_codes_ko": [],
+            "quality": {
+              "row_mode": "BLOCKED_STALE",
+              "execution_ready": false,
+              "data_ready": false,
+              "action_ready": false,
+              "action_status": "DATA_RECHECK_REQUIRED",
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
+              "generated_in_current_run": false,
+              "row_valid_until": "2026-10-23T20:03:00+09:00",
+              "expired_at_build": true
+            },
+            "display_priority": 23
+          },
+          {
+            "ticker": "411080.KQ",
+            "display_name": "411080",
+            "last_price": 6090.0,
+            "market_data_asof": "2026-10-23T20:00:00+09:00",
+            "vwap_position_ko": "VWAP 미확인",
+            "relative_volume": 0.0,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 비교 지표 미수집",
+            "data_status_ko": "시세 유효기간 만료",
+            "reason_codes_ko": [],
+            "quality": {
+              "row_mode": "BLOCKED_STALE",
+              "execution_ready": false,
+              "data_ready": false,
+              "action_ready": false,
+              "action_status": "DATA_RECHECK_REQUIRED",
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
+              "generated_in_current_run": false,
+              "row_valid_until": "2026-10-23T20:03:00+09:00",
+              "expired_at_build": true
+            },
+            "display_priority": 24
           },
           {
             "ticker": "079650.KQ",
@@ -778,7 +861,7 @@
               "row_valid_until": "2026-10-23T20:03:00+09:00",
               "expired_at_build": true
             },
-            "display_priority": 22
+            "display_priority": 25
           },
           {
             "ticker": "011200.KS",
@@ -802,7 +885,7 @@
               "row_valid_until": "2026-10-23T20:03:00+09:00",
               "expired_at_build": true
             },
-            "display_priority": 23
+            "display_priority": 26
           },
           {
             "ticker": "068270.KS",
@@ -826,66 +909,6 @@
               "row_valid_until": "2026-10-23T20:03:00+09:00",
               "expired_at_build": true
             },
-            "display_priority": 24
-          },
-          {
-            "ticker": "064400.KS",
-            "display_name": "LG CNS",
-            "vwap_position_ko": "VWAP 미확인",
-            "sync_summary_ko": "섹터 비교 없음 / 지수 비교 지표 미수집",
-            "data_status_ko": "시세 시각 확인 필요",
-            "reason_codes_ko": [],
-            "quality": {
-              "row_mode": "BLOCKED_STALE",
-              "execution_ready": false,
-              "data_ready": false,
-              "action_ready": false,
-              "action_status": "DATA_RECHECK_REQUIRED",
-              "conditional_strategy_ready": false,
-              "current_execution_promotion": "BLOCKED",
-              "generated_in_current_run": false,
-              "expired_at_build": false
-            },
-            "display_priority": 25
-          },
-          {
-            "ticker": "396300.KQ",
-            "display_name": "396300",
-            "vwap_position_ko": "VWAP 미확인",
-            "sync_summary_ko": "섹터 비교 없음 / 지수 비교 지표 미수집",
-            "data_status_ko": "시세 시각 확인 필요",
-            "reason_codes_ko": [],
-            "quality": {
-              "row_mode": "BLOCKED_STALE",
-              "execution_ready": false,
-              "data_ready": false,
-              "action_ready": false,
-              "action_status": "DATA_RECHECK_REQUIRED",
-              "conditional_strategy_ready": false,
-              "current_execution_promotion": "BLOCKED",
-              "generated_in_current_run": false,
-              "expired_at_build": false
-            },
-            "display_priority": 26
-          },
-          {
-            "ticker": "411080.KQ",
-            "display_name": "411080",
-            "vwap_position_ko": "VWAP 미확인",
-            "sync_summary_ko": "섹터 비교 없음 / 지수 비교 지표 미수집",
-            "data_status_ko": "시세 시각 확인 필요",
-            "reason_codes_ko": [],
-            "quality": {
-              "row_mode": "BLOCKED_STALE",
-              "execution_ready": false,
-              "data_ready": false,
-              "action_ready": false,
-              "action_status": "DATA_RECHECK_REQUIRED",
-              "conditional_strategy_ready": false,
-              "current_execution_promotion": "BLOCKED",
-              "generated_in_current_run": false,
-              "expired_at_build": false
-            },
             "display_priority": 27
           }
         ],
@@ -900,7 +923,7 @@
       "universe_coverage": {
         "status": "INCOMPLETE",
         "complete": false,
-        "source_run_id": "20261026T044544_local-scheduler-kr-full",
+        "source_run_id": "20261026T081100_local-scheduler-kr-full",
         "ticker_universe_mode": "config_plus_account",
         "expected_watchlist_count": 27,
         "missing_watchlist_count": 0,
@@ -941,15 +964,15 @@
         "source_health": "OK",
         "coverage": {
           "total_unique_events": 489,
-          "window_events": 50,
+          "window_events": 48,
           "transmitted_events": 12,
           "truncated": true,
           "oldest_occurred_at": "2026-10-23T02:10:26+00:00",
           "newest_occurred_at": "2026-10-24T23:30:09+00:00",
-          "available_events_before_context_cap": 50,
+          "available_events_before_context_cap": 48,
           "context_event_cap": 12,
-          "omitted_events": 38,
-          "omitted_due_to_context_cap": 38,
+          "omitted_events": 36,
+          "omitted_due_to_context_cap": 36,
           "omitted_before_context_selection": 0
         },
         "events": [
@@ -2429,15 +2452,15 @@
             ],
             "coverage": {
               "total_unique_events": 489,
-              "window_events": 50,
+              "window_events": 48,
               "transmitted_events": 12,
               "truncated": true,
               "oldest_occurred_at": "2026-10-23T02:10:26+00:00",
               "newest_occurred_at": "2026-10-24T23:30:09+00:00",
-              "available_events_before_context_cap": 50,
+              "available_events_before_context_cap": 48,
               "context_event_cap": 12,
-              "omitted_events": 38,
-              "omitted_due_to_context_cap": 38,
+              "omitted_events": 36,
+              "omitted_due_to_context_cap": 36,
               "omitted_before_context_selection": 0
             }
           },
@@ -2514,7 +2537,7 @@
         "note": "The local task contract is verified; the Work host does not expose a signed per-response model receipt."
       },
       "market_analysis": {
-        "source_run_id": "20261026T044544_local-scheduler-kr-full",
+        "source_run_id": "20261026T081100_local-scheduler-kr-full",
         "provider": "codex",
         "requested_models": {
           "quick": "gpt-6.1-sol",
@@ -2532,19 +2555,19 @@
           "judge": "xhigh"
         },
         "verification_status": "RUNTIME_USAGE_OBSERVED",
-        "observed_calls": 557,
+        "observed_calls": 137,
         "observed_models": {
           "gpt-6.1-sol": {
-            "calls": 557,
-            "input_tokens": 15555922,
-            "output_tokens": 1325768,
-            "total_tokens": 16881690
+            "calls": 137,
+            "input_tokens": 4353236,
+            "output_tokens": 234972,
+            "total_tokens": 4588208
           }
         },
         "usage_available": true
       },
       "overlay": {
-        "source_run_id": "20261026T044544_local-scheduler-kr-full",
+        "source_run_id": "20261026T081100_local-scheduler-kr-full",
         "provider": null,
         "requested_models": {},
         "requested_reasoning_effort": {},
