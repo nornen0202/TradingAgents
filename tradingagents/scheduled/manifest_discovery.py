@@ -30,7 +30,8 @@ def _load_index(path: Path) -> dict:
     return {}
 
 
-def full_manifests_desc(archive_dir: Path, *, modes=None) -> list[tuple[dict, Path]]:
+def full_manifests_desc(archive_dir: Path, *, modes=None, write_index: bool = True) -> list[tuple[dict, Path]]:
+    """Discover original manifests; read-only callers can suppress cache writes."""
     modes = {"full"} if modes is None else set(modes)
     runs_dir = archive_dir / "runs"
     if not runs_dir.exists():
@@ -65,7 +66,7 @@ def full_manifests_desc(archive_dir: Path, *, modes=None) -> list[tuple[dict, Pa
                 current[key] = {"signature": signature, "mode": mode}
             if mode in modes:
                 selected.append((manifest, directory))
-    if current != previous:
+    if write_index and current != previous:
         try:
             # Concurrent discovery may replace this optional index; each next
             # reader enumerates and re-stats every original file regardless.

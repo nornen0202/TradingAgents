@@ -5,10 +5,19 @@ from pathlib import Path
 import pytest
 
 from tradingagents.execution import refresh_runtime as refresh
-from tests.execution.test_paper_runtime import source
+from tests.execution.test_paper_runtime import source as observation_source
+from tests.test_scheduled_run_mode import _write_full_overlay_baseline
 
 
 AT = datetime.fromisoformat("2026-10-19T10:00:00+09:00")
+
+
+def source(root, at):
+    # Existing cadence tests need both an eligible full research baseline and
+    # an observation source. The latter alone cannot authorize a new overlay.
+    _write_full_overlay_baseline(root, tickers=["005930.KS"], market="KR",
+        started_at=AT.isoformat(), run_id="20261019T090000_local-scheduler-kr-full")
+    return observation_source(root, at)
 
 
 def enable(state):
@@ -85,6 +94,8 @@ def test_failure_budget_and_us_session_day_across_kst_midnight(tmp_path, monkeyp
     monkeypatch.setattr(local_automation, "require_storage_headroom", lambda *a: None)
     enable(tmp_path)
     at = datetime.fromisoformat("2026-10-20T00:00:00+09:00")
+    _write_full_overlay_baseline(tmp_path, tickers=["AAPL"], market="US",
+        started_at=at.isoformat(), run_id="20261019T180000_local-scheduler-us-full")
     def fail(*a, **k):
         raise RuntimeError("private broker context must not escape")
     for minute in (0, 5, 10):
@@ -222,3 +233,120 @@ def test_expired_observation_still_respects_failure_budget(tmp_path):
     receipt.write_text(json.dumps({"started_at": (AT - timedelta(minutes=5)).isoformat(),
         "session_date": AT.date().isoformat(), "status": "FAILED", "consecutive_failures": 3}))
     assert refresh.refresh_due(archive, state, now=AT, dry_run=True, session_resolver=open_kr)[0]["status"] == "REFRESH_RETRY_LIMIT"
+
+
+@pytest.mark.parametrize("dry_run", [False, True])
+@pytest.mark.parametrize("defect", ["missing", "stale", "future", "failed", "incomplete", "other_market", "overlay", "manual", "newer_sessions"])
+def test_ineligible_baseline_does_not_spend_attempts(tmp_path, monkeypatch, defect, dry_run):
+    from tradingagents.scheduled import runner
+    archive, state = tmp_path / "archive", tmp_path / "state"
+    enable(state)
+    manifest = _write_full_overlay_baseline(archive, tickers=["005930.KS"], market="KR",
+        started_at=AT.isoformat(), run_id="20261019T090000_local-scheduler-kr-full")
+    if defect == "stale":
+        manifest["started_at"] = (AT - timedelta(hours=97)).isoformat()
+    elif defect == "future":
+        manifest["started_at"] = (AT + timedelta(hours=1)).isoformat()
+    elif defect == "failed":
+        manifest["status"] = "partial_failure"
+    elif defect == "incomplete":
+        manifest["summary"] = {"configured_ticker_count": 2, "failed_tickers": 1}
+    elif defect == "other_market":
+        manifest["settings"]["market"] = "US"
+    elif defect == "overlay":
+        manifest["settings"]["run_mode"] = "overlay_only"
+    elif defect == "manual":
+        manifest["label"] = "manual-smoke"
+    elif defect == "newer_sessions":
+        monkeypatch.setattr(runner, "_overlay_newer_session_count", lambda *a, **k: 2)
+    for path in (archive / "latest-run.json", archive / "runs/2026" / manifest["run_id"] / "run.json"):
+        if defect == "missing":
+            path.unlink()
+        else:
+            path.write_text(json.dumps(manifest), encoding="utf-8")
+    receipt = state / "execution-refresh/kr.json"
+    receipt.parent.mkdir()
+    receipt.write_text(json.dumps({"started_at": (AT - timedelta(minutes=6)).isoformat(),
+        "session_date": AT.date().isoformat(), "status": "FAILED", "consecutive_failures": 2}))
+    before = {p: p.read_bytes() for p in tmp_path.rglob("*") if p.is_file()}
+    assert refresh.refresh_due(archive, state, now=AT, dry_run=dry_run, session_resolver=open_kr,
+        executor=lambda *a, **k: pytest.fail("ineligible baseline must not start an overlay")) == [
+            {"target": "execution-freshness-kr", "status": "WAITING_RESEARCH_BASELINE"}]
+    assert before == {p: p.read_bytes() for p in tmp_path.rglob("*") if p.is_file()}
+
+
+@pytest.mark.parametrize("dry_run", [False, True])
+def test_preflight_read_error_is_not_an_attempt_or_private_error_output(tmp_path, dry_run):
+    archive, state = tmp_path / "archive", tmp_path / "state"
+    enable(state)
+    archive.mkdir()
+    (archive / "latest-run.json").write_text("private malformed payload", encoding="utf-8")
+    assert refresh.refresh_due(archive, state, now=AT, dry_run=dry_run, session_resolver=open_kr,
+        executor=lambda *a, **k: pytest.fail("unverified baseline")) == [
+            {"target": "execution-freshness-kr", "status": "REFRESH_BASELINE_UNVERIFIED",
+             "error_type": "JSONDecodeError"}]
+    assert not (state / "execution-refresh").exists()
+
+
+def test_completed_baseline_naturally_admits_first_attempt_after_wait(tmp_path, monkeypatch):
+    from tradingagents import local_automation
+    monkeypatch.setattr(local_automation, "require_storage_headroom", lambda *a: None)
+    archive, state = tmp_path / "archive", tmp_path / "state"
+    enable(state)
+    for minute in (0, 5, 10):
+        assert refresh.refresh_due(archive, state, now=AT + timedelta(minutes=minute),
+            session_resolver=open_kr)[0]["status"] == "WAITING_RESEARCH_BASELINE"
+    assert not (state / "execution-refresh").exists()
+    _write_full_overlay_baseline(archive, tickers=["005930.KS"], market="KR",
+        started_at=AT.isoformat(), run_id="20261019T090000_local-scheduler-kr-full")
+    now = AT + timedelta(minutes=11)
+    def execute(config, **kwargs):
+        receipt = json.loads((state / "execution-refresh/kr.json").read_text())
+        assert receipt["status"] == "STARTED"
+        assert receipt["consecutive_failures"] == 1
+        assert "baseline" not in kwargs
+        return {"status": "success", "run_id": "new-observations"}
+    assert refresh.refresh_due(archive, state, now=now, clock=lambda: now,
+        session_resolver=open_kr, executor=execute)[0]["status"] == "COMPLETED"
+    assert json.loads((state / "execution-refresh/kr.json").read_text())["consecutive_failures"] == 0
+
+
+@pytest.mark.parametrize("failures,seconds,expected", [
+    (2, 299, "REFRESH_COOLDOWN"), (3, 300, "REFRESH_RETRY_LIMIT"),
+])
+def test_original_cooldown_and_budget_precede_baseline_admission(tmp_path, monkeypatch, failures, seconds, expected):
+    from tradingagents.scheduled import runner
+    enable(tmp_path)
+    receipt = tmp_path / "execution-refresh/kr.json"
+    receipt.parent.mkdir()
+    receipt.write_text(json.dumps({"started_at": (AT - timedelta(seconds=seconds)).isoformat(),
+        "session_date": AT.date().isoformat(), "status": "FAILED", "consecutive_failures": failures}))
+    before = receipt.read_bytes()
+    monkeypatch.setattr(runner, "_resolve_latest_full_overlay_baseline_manifest",
+        lambda *a, **k: pytest.fail("original retry gates run first"))
+    assert refresh.refresh_due(tmp_path, tmp_path, now=AT,
+        session_resolver=open_kr)[0]["status"] == expected
+    assert receipt.read_bytes() == before
+
+
+def test_source_change_after_preflight_still_fails_under_original_attempt_budget(tmp_path, monkeypatch):
+    from tradingagents import local_automation
+    from tradingagents.scheduled import runner
+    monkeypatch.setattr(local_automation, "require_storage_headroom", lambda *a: None)
+    archive, state = tmp_path / "archive", tmp_path / "state"
+    enable(state)
+    baseline = _write_full_overlay_baseline(archive, tickers=["005930.KS"], market="KR",
+        started_at=AT.isoformat(), run_id="20261019T090000_local-scheduler-kr-full")
+    def execute(config, **kwargs):
+        # The real executor must still select/check its source at execution.
+        assert set(kwargs) == {"run_label", "skip_site_build", "paper_state_dir"}
+        baseline["status"] = "partial_failure"
+        for path in (archive / "latest-run.json", archive / "runs/2026" / baseline["run_id"] / "run.json"):
+            path.write_text(json.dumps(baseline), encoding="utf-8")
+        assert runner._resolve_latest_full_overlay_baseline_manifest(archive, market="KR", now=AT) is None
+        raise RuntimeError("private source failure after admission")
+    assert refresh.refresh_due(archive, state, now=AT, clock=lambda: AT,
+        session_resolver=open_kr, executor=execute)[0]["status"] == "FAILED"
+    receipt = (state / "execution-refresh/kr.json").read_text()
+    assert "private source" not in receipt
+    assert json.loads(receipt)["consecutive_failures"] == 1

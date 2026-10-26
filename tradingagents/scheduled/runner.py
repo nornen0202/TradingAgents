@@ -4770,6 +4770,7 @@ def _resolve_latest_full_overlay_baseline_manifest(
     required_holding_tickers: list[str] | None = None,
     now: datetime | None = None,
     max_age: timedelta | None = _OVERLAY_BASELINE_MAX_AGE,
+    write_discovery_index: bool = True,
 ) -> dict[str, Any] | None:
     """Resolve the newest complete, same-market and sufficiently recent full baseline."""
 
@@ -4783,7 +4784,8 @@ def _resolve_latest_full_overlay_baseline_manifest(
             source_path = _find_run_manifest_path_by_run_id(archive_dir, source_run_id)
             if source_path is not None:
                 candidates.append(json.loads(source_path.read_text(encoding="utf-8")))
-    candidates.extend(manifest for manifest, _run_dir in full_manifests_desc(archive_dir))
+    candidates.extend(manifest for manifest, _run_dir in full_manifests_desc(
+        archive_dir, write_index=write_discovery_index))
 
     unique: dict[str, dict[str, Any]] = {}
     for index, candidate in enumerate(candidates):
