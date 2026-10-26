@@ -67,6 +67,22 @@ def refresh_due(archive, state, *, now, dry_run=False, clock=None, executor=None
         if not isinstance(failures, int) or isinstance(failures, bool) or failures < 0 or failures >= MAX_CONSECUTIVE_FAILURES:
             results.append({"target": target, "status": "REFRESH_RETRY_LIMIT"})
             continue
+        # A quote overlay cannot create its own full research baseline. Wait
+        # without consuming an attempt when the existing selector cannot find
+        # one. This is only an admission check: the executor still resolves and
+        # validates the current universe, holdings and source artifacts itself.
+        # Never pass the observed manifest through as a pinned authorization.
+        try:
+            from tradingagents.scheduled.runner import _resolve_latest_full_overlay_baseline_manifest
+            baseline = _resolve_latest_full_overlay_baseline_manifest(
+                archive, market=market.upper(), now=now, write_discovery_index=False)
+        except Exception as exc:
+            results.append({"target": target, "status": "REFRESH_BASELINE_UNVERIFIED",
+                            "error_type": type(exc).__name__})
+            continue
+        if baseline is None:
+            results.append({"target": target, "status": "WAITING_RESEARCH_BASELINE"})
+            continue
         if dry_run:
             results.append({"target": target, "status": "DUE"})
             continue

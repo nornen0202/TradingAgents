@@ -95,3 +95,19 @@ def test_legacy_missing_mode_and_empty_archive(tmp_path):
     path = write(tmp_path, "legacy")
     path.write_text('{"run_id":"legacy"}', encoding="utf-8")
     assert discovery.full_manifests_desc(tmp_path)[0][0]["run_id"] == "legacy"
+
+
+@pytest.mark.parametrize("existing_index", [False, True])
+def test_read_only_discovery_preserves_index_and_finds_new_full(tmp_path, monkeypatch, existing_index):
+    write(tmp_path, "01-full")
+    write(tmp_path, "02-changing", "overlay_only")
+    if existing_index:
+        discovery.full_manifests_desc(tmp_path)
+    write(tmp_path, "02-changing", "full", revision="completed")
+    write(tmp_path, "03-overlay", "overlay_only")
+    before = {p: p.read_bytes() for p in tmp_path.rglob("*") if p.is_file()}
+    monkeypatch.setattr(discovery, "atomic_write_json", lambda *a, **k: pytest.fail("read-only cache"))
+    results = discovery.full_manifests_desc(tmp_path, write_index=False)
+    assert [m["run_id"] for m, _ in results] == ["02-changing", "01-full"]
+    assert results[0][0]["revision"] == "completed"
+    assert before == {p: p.read_bytes() for p in tmp_path.rglob("*") if p.is_file()}
