@@ -1,13 +1,13 @@
 {
   "schema": "tradingagents.work-context/v1",
   "surface": "us",
-  "event_id": "us:dace97e47330af14876881432d2e10b7",
+  "event_id": "us:04f8a9aa4fb436898396b5532624dd21",
   "prompt_contract_version": "market-work-v13-us",
   "prompt_sha256": "d89884ce9232b2695f637cb3a5654da9f473e7138706cc074cbd9a1601e61f77",
   "skill_sha256": "4dffe28b3721557cc2517b5afff2f94045832606e71ff61461df969f6abb53c7",
   "task_manifest_sha256": "c0992fa275c9961bc91c679030c0b4d9b8b06f3d164226776421f1e354b5c22e",
   "workflow_contract_sha256": "6e0b555b6a8ae53cf919baa1e96d671d2ef180fd3d86a58e5c8b568f278c8ec6",
-  "source_sha256": "1ee6f2b31b223bac6e88a04a11009c61eaec7a8c4dc75a5bcfbf873de6510f8d",
+  "source_sha256": "f51ca0e905335181662422430cb1d7103a1048e3cecbec41e21afb77af9a0b51",
   "body": {
     "kind": "market",
     "market": "US",
@@ -994,15 +994,15 @@
         "source_health": "OK",
         "coverage": {
           "total_unique_events": 489,
-          "window_events": 47,
+          "window_events": 46,
           "transmitted_events": 12,
           "truncated": true,
-          "oldest_occurred_at": "2026-10-23T01:26:19+00:00",
+          "oldest_occurred_at": "2026-10-23T10:28:20+00:00",
           "newest_occurred_at": "2026-10-25T11:00:26+00:00",
-          "available_events_before_context_cap": 47,
+          "available_events_before_context_cap": 46,
           "context_event_cap": 12,
-          "omitted_events": 35,
-          "omitted_due_to_context_cap": 35,
+          "omitted_events": 34,
+          "omitted_due_to_context_cap": 34,
           "omitted_before_context_selection": 0
         },
         "events": [
@@ -2012,92 +2012,6 @@
             }
           },
           {
-            "event_key": "GrPFIU3SJAc",
-            "content_sha256": "396a6e7fa840b6ebb90426551ae5900959aa8a471a39a37bd368b420c0d2f4bb",
-            "occurred_at": "2026-10-23T01:26:19+00:00",
-            "relevance": {
-              "tickers": [
-                "META",
-                "NVDA"
-              ],
-              "markets": [
-                "US"
-              ],
-              "themes": [],
-              "match_basis": "verified_entities",
-              "matched_tickers": [
-                "NVDA"
-              ],
-              "market_match": true,
-              "score": 120
-            },
-            "summary": {
-              "video_id": "GrPFIU3SJAc",
-              "title": "일론 머스크, 스페이스X '테라팹' 추진...투자한 이유는?ㅣ소현철 상지대학교 외래교수 [더블 업]",
-              "channel": "삼프로TV 3PROTV",
-              "source_url": "https://www.youtube.com/watch?v=GrPFIU3SJAc",
-              "claim_status_summary": {
-                "unverified": 12
-              },
-              "claims": [
-                {
-                  "claim_id": "C1",
-                  "claim_text": "메타 매출이 전년 대비 26% 증가하고 컨센서스를 상회했으며, 소송 영향을 제외한 영업이익률은 35%, 감소폭은 5%, 활성 이용자는 31억 명 이상이라는 주장이다.",
-                  "status": "unverified",
-                  "confidence": 0.0,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "실적 부진의 원인과 투자 확대의 영향을 구분하려면 해당 분기 실적 원문과 조정표가 필요하다."
-                },
-                {
-                  "claim_id": "C2",
-                  "claim_text": "스페이스X로 지칭된 AI 사업의 매출이 전분기 대비 195%, 전년 대비 830% 증가하고 매출 비중 52%, EBITDA 마진 66%를 기록했으며 투자 회수가 1년 반 또는 1년 미만이라는 주장이다.",
-                  "status": "unverified",
-                  "confidence": 0.0,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "사업 귀속 법인과 현금흐름을 확인하기 전에는 AI 투자 수익성이 입증됐다는 근거로 사용할 수 없다."
-                },
-                {
-                  "claim_id": "C3",
-                  "claim_text": "테라팹이 AI 모델·칩 설계·반도체 생산을 수직계열화하고 우주 데이터센터 수요에 대응하는 사업이라는 설명이다.",
-                  "status": "unverified",
-                  "confidence": 0.0,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "사업 구상과 확정된 설비투자·발주를 구분해야 하며 관련 기업의 수혜를 확정할 수 없다."
-                },
-                {
-                  "claim_id": "C4",
-                  "claim_text": "팰컨 약 20톤 대비 최근 스타십이 100톤과 위성 26개를 운반했고, 스타링크 위성이 1만 개 이상이며 10만 개 이상 추가 발사 계획이 있다는 주장이다.",
-                  "status": "unverified",
-                  "confidence": 0.0,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "실증된 운송능력과 승인된 배치계획 확인 전에는 우주 데이터센터·국방 경쟁우위의 정량 근거로 사용하기 어렵다."
-                }
-              ],
-              "entities": [
-                {
-                  "ticker": "META",
-                  "name": "메타",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                },
-                {
-                  "ticker": "NVDA",
-                  "name": "엔비디아·H100",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                }
-              ]
-            }
-          },
-          {
             "event_key": "6esEt4-hjqw",
             "content_sha256": "b5512647a9b7488402c94aab1e717dbde1d16c3be1eb1a8ca0fa949742fd0502",
             "occurred_at": "2026-10-23T12:00:14+00:00",
@@ -2392,6 +2306,85 @@
                 }
               ]
             }
+          },
+          {
+            "event_key": "6MRxfCgJ3XU",
+            "content_sha256": "ba29557c3436c455a9f515edf5ba45533bca7b50670f03c56a2cc6deb8277b83",
+            "occurred_at": "2026-10-24T11:00:03+00:00",
+            "relevance": {
+              "tickers": [
+                "CL=F"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "verified_entities",
+              "matched_tickers": [],
+              "market_match": true,
+              "score": 20
+            },
+            "summary": {
+              "video_id": "6MRxfCgJ3XU",
+              "title": "[#찐시황] 삼성전자·SK하이닉스 드디어 반격하나? 주가 폭락 끝낼 ‘초대형 이벤트’가 다가온다  | 주식황금돼지 이건희 대표",
+              "channel": "815Money talk",
+              "source_url": "https://www.youtube.com/watch?v=6MRxfCgJ3XU",
+              "claim_status_summary": {
+                "unverified": 9,
+                "partially_supported": 1
+              },
+              "claims": [
+                {
+                  "claim_id": "C1",
+                  "claim_text": "미국 주요 지수 하락, 미국 10년물 금리·유가 상승, 금 4,000달러 하회·3개월 최저, SK하이닉스 ADR 4% 이상 상승, CDS 거래량 약 10조 원 및 프랑스·독일 스프레드의 2011년 수준 접근 주장.",
+                  "status": "unverified",
+                  "confidence": 0.98,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "해당 시장 수치와 인과 설명을 확인된 매매 근거로 사용하기 어렵다."
+                },
+                {
+                  "claim_id": "C2",
+                  "claim_text": "11월 3일 미국 중간선거 및 10월 29일 FOMC·삼성전자 실적 콜·PCE·GDP 잠정치·아마존·인텔 실적 발표 일정 주장.",
+                  "status": "unverified",
+                  "confidence": 0.99,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "일정에 기반한 포지션 조정 전 각 기관과 회사의 공식 발표일을 확인해야 한다."
+                },
+                {
+                  "claim_id": "C3",
+                  "claim_text": "지난 8월 초 미국·이란 협상, 유가 하락과 실적 발표가 숏 스퀴즈를 유발해 삼성전자 25% 이상 상승 및 SK하이닉스 상한가로 이어졌다는 주장.",
+                  "status": "unverified",
+                  "confidence": 0.99,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "과거 급등의 재현을 전제로 반등 폭이나 시점을 추정할 근거가 부족하다."
+                },
+                {
+                  "claim_id": "C4",
+                  "claim_text": "삼성전자의 HBM·파운드리·최고 실적·주주환원이 반등 근거이며, 금융 계열사 지분 약 10%와 금융 관련 법률이 자사주 매입·소각을 제약한다는 주장.",
+                  "status": "partially_supported",
+                  "confidence": 0.9,
+                  "supporting_evidence_ids": [
+                    "E6",
+                    "E7"
+                  ],
+                  "manual_check_required": true,
+                  "investor_implication": "소각 관련 규제 고려사항은 일부 뒷받침되지만 실적·환원에 따른 주가 반등 논리는 미검증이다."
+                }
+              ],
+              "entities": [
+                {
+                  "ticker": "CL=F",
+                  "name": "글로벌 증시·금리·원유·안전자산",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                }
+              ]
+            }
           }
         ],
         "execution_eligible": false
@@ -2428,22 +2421,22 @@
               "5v_OgboQYx8",
               "JaLRHTG_Kks",
               "FgZ_AtNbN9Y",
-              "GrPFIU3SJAc",
               "6esEt4-hjqw",
               "b2my6Nq32rs",
-              "SuGP5dZdXQM"
+              "SuGP5dZdXQM",
+              "6MRxfCgJ3XU"
             ],
             "coverage": {
               "total_unique_events": 489,
-              "window_events": 47,
+              "window_events": 46,
               "transmitted_events": 12,
               "truncated": true,
-              "oldest_occurred_at": "2026-10-23T01:26:19+00:00",
+              "oldest_occurred_at": "2026-10-23T10:28:20+00:00",
               "newest_occurred_at": "2026-10-25T11:00:26+00:00",
-              "available_events_before_context_cap": 47,
+              "available_events_before_context_cap": 46,
               "context_event_cap": 12,
-              "omitted_events": 35,
-              "omitted_due_to_context_cap": 35,
+              "omitted_events": 34,
+              "omitted_due_to_context_cap": 34,
               "omitted_before_context_selection": 0
             }
           },
