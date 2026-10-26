@@ -19,6 +19,7 @@ def save_report_bundle(
     language: str = "English",
     settings: Mapping[str, Any] | None = None,
     html: bool = True,
+    presentation_diagnostics: Mapping[str, Any] | None = None,
 ) -> Path:
     """Persist a complete TradingAgents report bundle to disk."""
 
@@ -136,6 +137,12 @@ def save_report_bundle(
         metadata_lines.append(f"{labels['trade_date']}: {trade_date}")
 
     header = f"# {labels['report_title']}: {ticker}\n\n" + "\n".join(metadata_lines) + "\n\n"
+    if (type(presentation_diagnostics) is dict
+            and type(presentation_diagnostics.get("schema")) is str
+            and presentation_diagnostics["schema"] == "tradingagents.presentation-diagnostics/v1"
+            and type(presentation_diagnostics.get("status")) is str
+            and presentation_diagnostics["status"] == "DEGRADED"):
+        header += "> 언어 변환 미완료(DEGRADED): 변환되지 않은 원문을 보존했습니다. 금융 판단·가격·승인 조건은 변경하지 않았습니다.\n\n"
     complete_report = save_path / "complete_report.md"
     from tradingagents.report_settings import public_run_settings
 

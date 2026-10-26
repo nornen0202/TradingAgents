@@ -13,6 +13,7 @@ from typing import Dict, Any, Tuple, List, Optional
 from langgraph.prebuilt import ToolNode
 
 from tradingagents.llm_clients import create_llm_client
+from tradingagents.llm_clients.codex_app_server import CodexAppServerError
 from tradingagents.llm_clients.role_config import codex_client_kwargs, tier_provider, tier_backend_url
 
 from tradingagents.agents import *
@@ -410,12 +411,23 @@ class TradingAgentsGraph:
     def _localize_final_state(self, final_state: Dict[str, Any]) -> Dict[str, Any]:
         """Rewrite only the persisted report-facing outputs into the configured output language."""
         language = get_output_language()
+        diagnostics = {
+            "schema": "tradingagents.presentation-diagnostics/v1",
+            "status": "NOT_REQUIRED" if language.lower() == "english" else "STARTED",
+            "language_completion": "NOT_REQUIRED" if language.lower() == "english" else "NOT_INDEPENDENTLY_VERIFIED",
+            "reason_code": None,
+            "original_preserved_fields": [],
+            "financial_action_fields_modified": False,
+            "execution_authorized": False,
+        }
+        self.presentation_diagnostics = diagnostics
         if language.lower() == "english":
             return final_state
 
         localized = dict(final_state)
+        backend_failed = False
 
-        def maybe_localize(content: str, *, content_type: str, force_llm_backend: bool = False) -> str:
+        def localize_content(content: str, *, content_type: str, force_llm_backend: bool = False) -> str:
             if force_llm_backend:
                 localization_llm = getattr(self, "quick_thinking_llm", None) or getattr(
                     self, "output_thinking_llm", None
@@ -474,6 +486,26 @@ class TradingAgentsGraph:
                     payload[key] = value
             return json.dumps(payload, indent=2, ensure_ascii=False)
 
+        def maybe_localize(content: str, *, field_path: str, content_type: str,
+                           force_llm_backend: bool = False) -> str:
+            nonlocal backend_failed
+            disposition = "SKIPPED_AFTER_PROVIDER_ERROR" if backend_failed else None
+            if not backend_failed:
+                try:
+                    return localize_content(content, content_type=content_type,
+                                            force_llm_backend=force_llm_backend)
+                except CodexAppServerError:
+                    backend_failed = True
+                    disposition = "PROVIDER_ERROR"
+                    diagnostics.update(status="DEGRADED", language_completion="INCOMPLETE_PRESERVED_ORIGINAL",
+                                       reason_code="CODEX_APP_SERVER_PRESENTATION_ERROR")
+            diagnostics["original_preserved_fields"].append({
+                "field": field_path,
+                "disposition": disposition,
+                "original_text_sha256": hashlib.sha256(content.encode("utf-8")).hexdigest() if isinstance(content, str) else None,
+            })
+            return content
+
         for field_name, content_type in (
             ("market_report", "market analyst report"),
             ("sentiment_report", "social sentiment report"),
@@ -483,6 +515,7 @@ class TradingAgentsGraph:
         ):
             localized[field_name] = maybe_localize(
                 localized.get(field_name, ""),
+                field_path=field_name,
                 content_type=content_type,
             )
 
@@ -494,6 +527,7 @@ class TradingAgentsGraph:
         ):
             investment_debate[field_name] = maybe_localize(
                 investment_debate.get(field_name, ""),
+                field_path=f"investment_debate_state.{field_name}",
                 content_type=content_type,
             )
         localized["investment_debate_state"] = investment_debate
@@ -507,11 +541,14 @@ class TradingAgentsGraph:
         ):
             risk_debate[field_name] = maybe_localize(
                 risk_debate.get(field_name, ""),
+                field_path=f"risk_debate_state.{field_name}",
                 content_type=content_type,
                 force_llm_backend=(field_name == "judge_decision"),
             )
         localized["risk_debate_state"] = risk_debate
 
+        if not backend_failed:
+            diagnostics["status"] = "PROCESSED"
         return localized
 
 

@@ -26,6 +26,7 @@ def test_codex_app_server_sets_isolated_codex_home(tmp_path: Path):
         patch("tradingagents.llm_clients.codex_app_server.subprocess.Popen", side_effect=_fake_popen),
         patch.object(CodexAppServerSession, "_start_reader_threads", return_value=None),
         patch.object(CodexAppServerSession, "_initialize", return_value=None),
+        patch.object(CodexAppServerSession, "_source_codex_home", return_value=None),
         patch.dict(os.environ, {}, clear=True),
     ):
         session = CodexAppServerSession(
@@ -39,6 +40,9 @@ def test_codex_app_server_sets_isolated_codex_home(tmp_path: Path):
     env = captured["kwargs"]["env"]
     assert "CODEX_HOME" in env
     assert str(workspace / ".codex-home") == env["CODEX_HOME"]
+    sqlite_home = Path(env["CODEX_SQLITE_HOME"])
+    assert sqlite_home.parent == workspace / ".codex-home"
+    assert sqlite_home.name.startswith("sqlite-session-") and sqlite_home.is_dir()
 
 
 def test_codex_app_server_seeds_auth_into_isolated_codex_home(tmp_path: Path):
@@ -73,7 +77,7 @@ def test_codex_app_server_seeds_auth_into_isolated_codex_home(tmp_path: Path):
     assert (isolated_home / "config.toml").read_text(encoding="utf-8") == "model = 'gpt-5.5'\n"
 
 
-def test_codex_app_server_prunes_isolated_home_logs_on_close(tmp_path: Path):
+def test_codex_app_server_never_prunes_unowned_legacy_home_logs_on_close(tmp_path: Path):
     workspace = tmp_path / "workspace"
     isolated_home = workspace / ".codex-home"
     isolated_home.mkdir(parents=True)
@@ -90,8 +94,8 @@ def test_codex_app_server_prunes_isolated_home_logs_on_close(tmp_path: Path):
     session._codex_home = isolated_home
     session.close()
 
-    assert not (isolated_home / "logs_2.sqlite").exists()
-    assert not (isolated_home / "logs_2.sqlite-wal").exists()
+    assert (isolated_home / "logs_2.sqlite").read_text() == "log"
+    assert (isolated_home / "logs_2.sqlite-wal").read_text() == "wal"
     assert (isolated_home / "auth.json").exists()
 
 
