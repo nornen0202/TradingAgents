@@ -1,7 +1,7 @@
 # TradingAgents US 최신 공개 입력
 
 schema: tradingagents.ai-context/v1
-문서 생성: 2026-10-26T10:40:22.956450+00:00
+문서 생성: 2026-10-26T12:44:36.498103+00:00
 
 이 문서는 이미 공개된 자료의 축약 전사이며 새 분석·주문 승인이 아닙니다. 원분석 거래일(완료 일봉), 분석 완료, 장중 시세, 계좌 관측, 문서 생성은 서로 다른 시각입니다. 휴장·주말의 마지막 완료 거래일을 장애로 단정하지 마세요. null은 미확인이지 0이 아닙니다. 빌드 당시 실행 상태는 현재 상태가 아니며 row_valid_until과 현재 세션을 다시 확인해야 합니다. 현재 문서를 읽지 못하면 과거 대화의 계좌·한도를 최신 사실로 재사용하지 마세요.
 
@@ -16,15 +16,15 @@ schema: tradingagents.ai-context/v1
 ## 원분석·시세 시각
 ```json
 {
-  "producer_run_id": "20261023T185657_local-scheduler-us-full",
-  "producer_finished_at": "2026-10-23T22:17:15.470288+09:00",
-  "analysis_run_id": "20261023T185657_local-scheduler-us-full",
-  "analysis_completed_at": "2026-10-23T21:50:39.034967+09:00",
-  "analysis_trade_date_oldest": "2026-10-22",
-  "analysis_trade_date_latest": "2026-10-22",
+  "producer_run_id": "20261026T200051_local-scheduler-us-full",
+  "producer_finished_at": "2026-10-26T21:29:53.784849+09:00",
+  "analysis_run_id": "20261026T200051_local-scheduler-us-full",
+  "analysis_completed_at": "2026-10-26T21:03:37.483603+09:00",
+  "analysis_trade_date_oldest": "2026-10-23",
+  "analysis_trade_date_latest": "2026-10-23",
   "analysis_lineage_status": "RESOLVED",
-  "market_data_oldest_at": "2026-10-23T05:55:00-04:00",
-  "market_data_latest_at": "2026-10-23T08:25:00-04:00",
+  "market_data_oldest_at": "2026-10-26T07:00:00-04:00",
+  "market_data_latest_at": "2026-10-26T07:55:00-04:00",
   "market_data_status": "MISSING"
 }
 ```
@@ -33,25 +33,25 @@ schema: tradingagents.ai-context/v1
 ```json
 {
   "status": "available",
-  "as_of": "2026-10-23T21:51:10.451237+09:00",
+  "as_of": "2026-10-26T21:03:41.911087+09:00",
   "snapshot_health": "VALID",
   "currency": "KRW",
   "latest_attempt": {
-    "status": "PIPELINE_SKIPPED",
-    "account_as_of": null,
-    "run_started_at": "2026-10-26T18:55:49.523782+09:00",
-    "run_finished_at": "2026-10-26T19:20:38.292070+09:00",
-    "selected_for_public_account": false
+    "status": "VALID",
+    "account_as_of": "2026-10-26T21:03:41.911087+09:00",
+    "run_started_at": "2026-10-26T20:00:51.426402+09:00",
+    "run_finished_at": "2026-10-26T21:29:53.784849+09:00",
+    "selected_for_public_account": true
   },
   "summary": {
     "position_count": 14,
-    "total_purchase_amount_krw": 23374717,
-    "total_market_value_krw": 22727498,
-    "total_unrealized_pnl_krw": -647219,
+    "total_purchase_amount_krw": 23369427,
+    "total_market_value_krw": 22869535,
+    "total_unrealized_pnl_krw": -499892,
     "settled_cash_krw": 0,
     "available_cash_krw": 976652,
-    "buying_power_krw": 106126,
-    "total_equity_krw": 23810276
+    "buying_power_krw": 106102,
+    "total_equity_krw": 23948082
   },
   "positions": [
     {
@@ -59,140 +59,140 @@ schema: tradingagents.ai-context/v1
       "name": "TSMC(ADR)",
       "quantity": 12.0,
       "sellable_quantity": 12.0,
-      "average_cost_krw": 539999,
-      "current_price_krw": 547033,
-      "market_value_krw": 6564399,
-      "unrealized_pnl_krw": 84403
+      "average_cost_krw": 539877,
+      "current_price_krw": 558324,
+      "market_value_krw": 6699898,
+      "unrealized_pnl_krw": 221370
     },
     {
       "ticker": "RSP",
       "name": "INVESCO S&P 500 EQUAL WEIGHT",
       "quantity": 11.0,
       "sellable_quantity": 11.0,
-      "average_cost_krw": 289432,
-      "current_price_krw": 289054,
-      "market_value_krw": 3179596,
-      "unrealized_pnl_krw": -4158
+      "average_cost_krw": 289366,
+      "current_price_krw": 287505,
+      "market_value_krw": 3162556,
+      "unrealized_pnl_krw": -20477
     },
     {
       "ticker": "GOOGL",
       "name": "알파벳 A",
       "quantity": 6.0,
       "sellable_quantity": 6.0,
-      "average_cost_krw": 419803,
-      "current_price_krw": 426031,
-      "market_value_krw": 2556186,
-      "unrealized_pnl_krw": 37363
+      "average_cost_krw": 419708,
+      "current_price_krw": 427007,
+      "market_value_krw": 2562043,
+      "unrealized_pnl_krw": 43790
     },
     {
       "ticker": "NVDA",
       "name": "엔비디아",
       "quantity": 6.0,
       "sellable_quantity": 6.0,
-      "average_cost_krw": 264504,
-      "current_price_krw": 280497,
-      "market_value_krw": 1682983,
-      "unrealized_pnl_krw": 95954
+      "average_cost_krw": 264444,
+      "current_price_krw": 282605,
+      "market_value_krw": 1695633,
+      "unrealized_pnl_krw": 108964
     },
     {
       "ticker": "MPWR",
       "name": "모놀리식 파워 시스템",
       "quantity": 1.0,
       "sellable_quantity": 1.0,
-      "average_cost_krw": 1860718,
-      "current_price_krw": 1543602,
-      "market_value_krw": 1543602,
-      "unrealized_pnl_krw": -317116
+      "average_cost_krw": 1860297,
+      "current_price_krw": 1540160,
+      "market_value_krw": 1540160,
+      "unrealized_pnl_krw": -320137
     },
     {
       "ticker": "ETN",
       "name": "이턴 코퍼레이션",
       "quantity": 3.0,
       "sellable_quantity": 3.0,
-      "average_cost_krw": 550235,
-      "current_price_krw": 486128,
-      "market_value_krw": 1458384,
-      "unrealized_pnl_krw": -192322
+      "average_cost_krw": 550111,
+      "current_price_krw": 490785,
+      "market_value_krw": 1472356,
+      "unrealized_pnl_krw": -177977
     },
     {
       "ticker": "SGOV",
       "name": "ISHARES 0-3M TREASURY BOND",
       "quantity": 9.0,
       "sellable_quantity": 9.0,
-      "average_cost_krw": 133137,
-      "current_price_krw": 133320,
-      "market_value_krw": 1199888,
-      "unrealized_pnl_krw": 1650
+      "average_cost_krw": 133107,
+      "current_price_krw": 133310,
+      "market_value_krw": 1199795,
+      "unrealized_pnl_krw": 1829
     },
     {
       "ticker": "GEV",
       "name": "GE베르노바",
       "quantity": 1.0,
       "sellable_quantity": 1.0,
-      "average_cost_krw": 1457775,
-      "current_price_krw": 1094583,
-      "market_value_krw": 1094583,
-      "unrealized_pnl_krw": -363192
+      "average_cost_krw": 1457445,
+      "current_price_krw": 1097844,
+      "market_value_krw": 1097844,
+      "unrealized_pnl_krw": -359601
     },
     {
       "ticker": "AAPL",
       "name": "애플",
       "quantity": 2.0,
       "sellable_quantity": 2.0,
-      "average_cost_krw": 360839,
-      "current_price_krw": 460735,
-      "market_value_krw": 921471,
-      "unrealized_pnl_krw": 199793
+      "average_cost_krw": 360757,
+      "current_price_krw": 453228,
+      "market_value_krw": 906456,
+      "unrealized_pnl_krw": 184942
     },
     {
       "ticker": "LLY",
       "name": "일라이 릴리",
       "quantity": 0.436065,
       "sellable_quantity": 0.436065,
-      "average_cost_krw": 1405414,
-      "current_price_krw": 1724695,
-      "market_value_krw": 752079,
-      "unrealized_pnl_krw": 139227
+      "average_cost_krw": 1405095,
+      "current_price_krw": 1692308,
+      "market_value_krw": 737956,
+      "unrealized_pnl_krw": 125243
     },
     {
       "ticker": "DELL",
       "name": "델 테크놀로지스",
       "quantity": 1.0,
       "sellable_quantity": 1.0,
-      "average_cost_krw": 655948,
-      "current_price_krw": 596732,
-      "market_value_krw": 596732,
-      "unrealized_pnl_krw": -59216
+      "average_cost_krw": 655799,
+      "current_price_krw": 610502,
+      "market_value_krw": 610502,
+      "unrealized_pnl_krw": -45297
     },
     {
       "ticker": "AVGO",
       "name": "브로드컴",
       "quantity": 1.0,
       "sellable_quantity": 1.0,
-      "average_cost_krw": 563782,
-      "current_price_krw": 425991,
-      "market_value_krw": 425991,
-      "unrealized_pnl_krw": -137791
+      "average_cost_krw": 563655,
+      "current_price_krw": 432174,
+      "market_value_krw": 432174,
+      "unrealized_pnl_krw": -131481
     },
     {
       "ticker": "GLDM",
       "name": "SPDR GOLD MINISHARES TRUST",
       "quantity": 4.0,
       "sellable_quantity": 4.0,
-      "average_cost_krw": 134815,
-      "current_price_krw": 105544,
-      "market_value_krw": 422176,
-      "unrealized_pnl_krw": -117086
+      "average_cost_krw": 134785,
+      "current_price_krw": 105281,
+      "market_value_krw": 421127,
+      "unrealized_pnl_krw": -118013
     },
     {
       "ticker": "AMZN",
       "name": "아마존닷컴",
       "quantity": 1.0,
       "sellable_quantity": 1.0,
-      "average_cost_krw": 344184,
-      "current_price_krw": 329428,
-      "market_value_krw": 329428,
-      "unrealized_pnl_krw": -14756
+      "average_cost_krw": 344106,
+      "current_price_krw": 331035,
+      "market_value_krw": 331035,
+      "unrealized_pnl_krw": -13071
     }
   ]
 }
@@ -201,123 +201,123 @@ schema: tradingagents.ai-context/v1
 ## 종목별 원안과 조건 — 현재 재검증 필요
 
 ```json
-{"ticker":"GEV","display_name":"GE Vernova","is_held":true,"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","last_price":834.6948,"market_data_asof":"2026-10-23T06:20:00-04:00","session_vwap":843.265676129831,"relative_volume":0.09473179835048114,"spread_bps":null,"day_high":null,"day_low":null,"execution_condition_ko":"813.26 방어와 최신 정규장 저점 상승을 확인한다. 지지 접촉이나 과매도만으로 매수하지 않는다. / 877.44와 최신 정규장 거래량가중평균가격 위 5분봉 두 개, 재시험 지지, 검증된 동시간대 상대거래량 1.2 이상을 관찰한다. 이는 자동 주문 조건이 아니다.","risk_condition_ko":"868.25 이하 하락, 종가 확인 후 리스크 축소","decision_state_ko":"데이터 확인 전 대기","data_status_ko":"시세 유효기간 만료","reference_strategy":{"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","decision_state_ko":"-","market_data_asof":"2026-10-23T06:20:00-04:00"},"quality_at_build":{"execution_ready":false,"data_ready":false,"action_ready":false,"action_status":"DATA_RECHECK_REQUIRED","current_execution_promotion":"BLOCKED","generated_in_current_run":false,"row_valid_until":"2026-10-23T06:23:00-04:00","expired_at_build":true,"provider_limitations":[],"provider_blockers":["work_packet_row_expired"]}}
+{"ticker":"DELL","display_name":"Dell Technologies","is_held":true,"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","last_price":455.0,"market_data_asof":"2026-10-26T07:00:00-04:00","session_vwap":453.8346363576637,"relative_volume":0.04635671220508336,"spread_bps":null,"day_high":null,"day_low":null,"execution_condition_ko":"447~449에서 정규장 지지 형성과 이탈 후 회복 실패를 구분한다. 제공된 장전 저가 446.25만으로 정규장 지지 붕괴를 확정하지 않는다. / 464.81·473 회복과 485.88 돌파·재시험을 단계별 개선 신호로 기록한다. 현재 매수 승인은 아니며 502~512.21 저항과 이동평균 수준을 갱신한다.","risk_condition_ko":"447 이하 하락, 2개 봉 확인 후 리스크 축소","decision_state_ko":"데이터 확인 전 대기","data_status_ko":"시세 유효기간 만료","reference_strategy":{"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","decision_state_ko":"-","market_data_asof":"2026-10-26T07:00:00-04:00"},"quality_at_build":{"execution_ready":false,"data_ready":false,"action_ready":false,"action_status":"DATA_RECHECK_REQUIRED","current_execution_promotion":"BLOCKED","generated_in_current_run":false,"row_valid_until":"2026-10-26T07:03:00-04:00","expired_at_build":true,"provider_limitations":[],"provider_blockers":["work_packet_row_expired"]}}
 ```
 
 ```json
-{"ticker":"ETN","display_name":"Eaton","is_held":true,"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","last_price":378.0087,"market_data_asof":"2026-10-23T06:00:00-04:00","session_vwap":372.15486470926885,"relative_volume":0.014957694947374431,"spread_bps":null,"day_high":null,"day_low":null,"execution_condition_ko":"실제 정규장과 신선한 체결 가능 호가를 확인한다. 과거 호가나 같은 날짜 표기만으로 장중 조건 충족을 판정하지 않는다. / 380.65–381.98 회복 후 재시험 지지, 장중 거래량가중평균가격 상회, 같은 경과시간 대비 상대거래량 1.2 이상을 관찰한다. 매수 허가는 아니다.","risk_condition_ko":"393.99 이하 하락, 종가 확인 후 리스크 축소","decision_state_ko":"데이터 확인 전 대기","data_status_ko":"시세 유효기간 만료","reference_strategy":{"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","decision_state_ko":"-","market_data_asof":"2026-10-23T06:00:00-04:00"},"quality_at_build":{"execution_ready":false,"data_ready":false,"action_ready":false,"action_status":"DATA_RECHECK_REQUIRED","current_execution_promotion":"BLOCKED","generated_in_current_run":false,"row_valid_until":"2026-10-23T06:03:00-04:00","expired_at_build":true,"provider_limitations":[],"provider_blockers":["work_packet_row_expired"]}}
+{"ticker":"AVGO","display_name":"Broadcom","is_held":true,"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","last_price":322.14,"market_data_asof":"2026-10-26T07:00:00-04:00","session_vwap":322.5826470226702,"relative_volume":0.052527330576247255,"spread_bps":null,"day_high":null,"day_low":null,"execution_condition_ko":"실제 거래일과 정규장 거래 가능 여부를 확인한 뒤 320.23 방어와 327.70–330.82 회복을 관찰한다. / 실시간 정규장 거래량 가중평균가 지지와 비교 가능한 동일 경과시간 기준 상대거래량 1.2 이상을 확인한다. 제공된 장전 상대거래량 0.0525는 대체 근거가 아니다.","risk_condition_ko":"320.23 이하 하락, 2개 봉 확인 후 리스크 축소","decision_state_ko":"데이터 확인 전 대기","data_status_ko":"시세 유효기간 만료","reference_strategy":{"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","decision_state_ko":"-","market_data_asof":"2026-10-26T07:00:00-04:00"},"quality_at_build":{"execution_ready":false,"data_ready":false,"action_ready":false,"action_status":"DATA_RECHECK_REQUIRED","current_execution_promotion":"BLOCKED","generated_in_current_run":false,"row_valid_until":"2026-10-26T07:03:00-04:00","expired_at_build":true,"provider_limitations":[],"provider_blockers":["work_packet_row_expired"]}}
 ```
 
 ```json
-{"ticker":"MPWR","display_name":"Monolithic Power Systems","is_held":true,"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","last_price":1171.45,"market_data_asof":"2026-10-23T06:30:00-04:00","session_vwap":1183.3874345549739,"relative_volume":0.02159783715794306,"spread_bps":null,"day_high":null,"day_low":null,"execution_condition_ko":"재무제표 통화·단위·회계기간·주식 기준·미국예탁증서 해당 여부와 비율·주당이익 차이·현금흐름 차이·최초 공개시각을 원문에서 확인한다. 현재는 확인 불가다. / 공식 실적 발표 일시, 거래일 및 조기폐장 여부, 거래정지, 신선한 정규장 가격·호가 차이·거래량·거래량가중평균가격을 확인한다. 2026-10-23 06:30의 지연 장전 가격 1171.45는 현재 체결 근거가 아니다.","risk_condition_ko":"1,195 이하 하락, 종가 확인 후 리스크 축소","decision_state_ko":"데이터 확인 전 대기","data_status_ko":"시세 유효기간 만료","reference_strategy":{"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","decision_state_ko":"-","market_data_asof":"2026-10-23T06:30:00-04:00"},"quality_at_build":{"execution_ready":false,"data_ready":false,"action_ready":false,"action_status":"DATA_RECHECK_REQUIRED","current_execution_promotion":"BLOCKED","generated_in_current_run":false,"row_valid_until":"2026-10-23T06:33:00-04:00","expired_at_build":true,"provider_limitations":[],"provider_blockers":["work_packet_row_expired"]}}
+{"ticker":"AAPL","display_name":"Apple","is_held":true,"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","last_price":343.5704,"market_data_asof":"2026-10-26T07:00:00-04:00","session_vwap":343.6411484386562,"relative_volume":0.08772817324380482,"spread_bps":null,"day_high":null,"day_low":null,"execution_condition_ko":"2026-10-26T07:23:43.194346-04:00은 미 동부시간 10:30보다 이르다. 10:30은 최초 고려 가능 시각이지 만료가 아니다. 실제 정규장 일정은 별도 확인하며 다음 거래일이나 조건부 매수 만료를 임의로 설정하지 않는다. / 지연된 장전 관측을 최신 정규장 호가·완성된 5분봉·실시간 거래량가중평균가격으로 대체하고 거래정지 여부를 확인한다.","risk_condition_ko":"338.7 이하 하락, 종가 확인 후 신규 진입 보류·보유 위험 대응 계획 재확인","decision_state_ko":"데이터 확인 전 대기","data_status_ko":"시세 유효기간 만료","reference_strategy":{"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","decision_state_ko":"-","market_data_asof":"2026-10-26T07:00:00-04:00"},"quality_at_build":{"execution_ready":false,"data_ready":false,"action_ready":false,"action_status":"DATA_RECHECK_REQUIRED","current_execution_promotion":"BLOCKED","generated_in_current_run":false,"row_valid_until":"2026-10-26T07:03:00-04:00","expired_at_build":true,"provider_limitations":[],"provider_blockers":["work_packet_row_expired"]}}
 ```
 
 ```json
-{"ticker":"NVDA","display_name":"NVIDIA","is_held":true,"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","last_price":213.0241,"market_data_asof":"2026-10-23T06:45:00-04:00","session_vwap":214.02609951279152,"relative_volume":0.07174585142465698,"spread_bps":null,"day_high":null,"day_low":null,"execution_condition_ko":"판단 시각은 2026-10-23T07:00:30.682571-04:00다. 실제 거래일·휴장·조기종료·거래정지 여부와 신선한 정규장 호가·호가차는 제공 자료로 검증되지 않았다. 실행 전에 별도로 확인한다. / 2026-10-23 06:45 미국 동부시간의 지연된 장전 관측은 정규장 진입 신호가 아니다. 조회 당시 지연 수치를 현재 시각의 신선도로 해석하지 않는다.","risk_condition_ko":"212.85 이하 하락, 종가 확인 후 리스크 축소","decision_state_ko":"데이터 확인 전 대기","data_status_ko":"시세 유효기간 만료","reference_strategy":{"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","decision_state_ko":"-","market_data_asof":"2026-10-23T06:45:00-04:00"},"quality_at_build":{"execution_ready":false,"data_ready":false,"action_ready":false,"action_status":"DATA_RECHECK_REQUIRED","current_execution_promotion":"BLOCKED","generated_in_current_run":false,"row_valid_until":"2026-10-23T06:48:00-04:00","expired_at_build":true,"provider_limitations":[],"provider_blockers":["work_packet_row_expired"]}}
+{"ticker":"AMZN","display_name":"Amazon","is_held":true,"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","last_price":248.78,"market_data_asof":"2026-10-26T07:00:00-04:00","session_vwap":249.14512498874652,"relative_volume":0.07442720116537098,"spread_bps":null,"day_high":null,"day_low":null,"execution_condition_ko":"거래소 달력, 실제 정규장 여부, 거래정지, 최신 호가와 동일 경과시간 거래량을 확인한다. 2026-10-26T07:24:06.315710-04:00 기준 제공된 07:00 호가는 약 24분 6초 전 자료이며 현재 지지나 진입 충족을 입증하지 않는다. / 246.45–248.00 방어와 250.38 재탈환·재시험, 실시간 정규장 거래량가중평균가격 회복 및 상대거래량 1.2 이상을 관찰한다. 거래량 기준은 제안된 정책이지 관측 결과가 아니다.","risk_condition_ko":"246.45 이하 하락, 장중 확인 시 신규 진입 보류·보유 위험 대응 계획 재확인","decision_state_ko":"데이터 확인 전 대기","data_status_ko":"시세 유효기간 만료","reference_strategy":{"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","decision_state_ko":"-","market_data_asof":"2026-10-26T07:00:00-04:00"},"quality_at_build":{"execution_ready":false,"data_ready":false,"action_ready":false,"action_status":"DATA_RECHECK_REQUIRED","current_execution_promotion":"BLOCKED","generated_in_current_run":false,"row_valid_until":"2026-10-26T07:03:00-04:00","expired_at_build":true,"provider_limitations":[],"provider_blockers":["work_packet_row_expired"]}}
 ```
 
 ```json
-{"ticker":"TSM","display_name":"Taiwan Semiconductor Manufacturing","is_held":true,"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","last_price":414.35,"market_data_asof":"2026-10-23T07:05:00-04:00","session_vwap":416.36552894211576,"relative_volume":0.08876490308019795,"spread_bps":null,"day_high":null,"day_low":null,"execution_condition_ko":"407.13–410.22 시험 후 회복, 완료된 정규장 5분봉 저점 상승과 거래량가중평균가격 회복을 관찰한다. 지지선 접촉만으로 매수하지 않는다. / 421.91 회복과 재시험 유지, 비교 가능한 정규장 상대거래량 1.2 이상은 재평가 신호이며 자동 매수 조건이 아니다.","risk_condition_ko":"430.02 이상 도달, 2개 봉 확인 후 리스크 축소","decision_state_ko":"데이터 확인 전 대기","data_status_ko":"시세 유효기간 만료","reference_strategy":{"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","decision_state_ko":"-","market_data_asof":"2026-10-23T07:05:00-04:00"},"quality_at_build":{"execution_ready":false,"data_ready":false,"action_ready":false,"action_status":"DATA_RECHECK_REQUIRED","current_execution_promotion":"BLOCKED","generated_in_current_run":false,"row_valid_until":"2026-10-23T07:08:00-04:00","expired_at_build":true,"provider_limitations":[],"provider_blockers":["work_packet_row_expired"]}}
+{"ticker":"GLDM","display_name":"SPDR Gold MiniShares Trust","is_held":true,"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","last_price":79.4099,"market_data_asof":"2026-10-26T07:30:00-04:00","session_vwap":79.46833612672123,"relative_volume":0.4470284012970347,"spread_bps":null,"day_high":null,"day_low":null,"execution_condition_ko":"추가 실행 조건 없음","risk_condition_ko":"현재 명시된 위험 행동 없음","decision_state_ko":"데이터 확인 전 대기","data_status_ko":"시세 유효기간 만료","reference_strategy":{"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","decision_state_ko":"-","market_data_asof":"2026-10-26T07:30:00-04:00"},"quality_at_build":{"execution_ready":false,"data_ready":false,"action_ready":false,"action_status":"DATA_RECHECK_REQUIRED","current_execution_promotion":"BLOCKED","generated_in_current_run":false,"row_valid_until":"2026-10-26T07:33:00-04:00","expired_at_build":true,"provider_limitations":[],"provider_blockers":["work_packet_row_expired"]}}
 ```
 
 ```json
-{"ticker":"GOOGL","display_name":"Alphabet","is_held":true,"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","last_price":323.4942,"market_data_asof":"2026-10-23T06:25:00-04:00","session_vwap":324.1270961542861,"relative_volume":0.07314987034247818,"spread_bps":null,"day_high":null,"day_low":null,"execution_condition_ko":"322.00 방어와 327.90 회복 후 완료된 정규장 5분봉 두 개의 재지지, 상승 고점·저점 및 거래량가중평균가 상회를 확인한다. 관찰 조건이지 자동 매수 지시가 아니다. / 시간대 보정 방식이 검증된 상대거래량 1.20 이상을 관찰한다. 충족 여부는 미확인이며 장전 수치를 정규장 기준과 직접 비교하지 않는다.","risk_condition_ko":"327.74 이하 하락, 종가 확인 후 리스크 축소","decision_state_ko":"데이터 확인 전 대기","data_status_ko":"시세 유효기간 만료","reference_strategy":{"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","decision_state_ko":"-","market_data_asof":"2026-10-23T06:25:00-04:00"},"quality_at_build":{"execution_ready":false,"data_ready":false,"action_ready":false,"action_status":"DATA_RECHECK_REQUIRED","current_execution_promotion":"BLOCKED","generated_in_current_run":false,"row_valid_until":"2026-10-23T06:28:00-04:00","expired_at_build":true,"provider_limitations":[],"provider_blockers":["work_packet_row_expired"]}}
+{"ticker":"GOOGL","display_name":"Alphabet","is_held":true,"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","last_price":321.67,"market_data_asof":"2026-10-26T07:35:00-04:00","session_vwap":321.59766941487845,"relative_volume":0.0886898039950941,"spread_bps":null,"day_high":null,"day_low":null,"execution_condition_ko":"추가 실행 조건 없음","risk_condition_ko":"현재 명시된 위험 행동 없음","decision_state_ko":"데이터 확인 전 대기","data_status_ko":"시세 유효기간 만료","reference_strategy":{"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","decision_state_ko":"-","market_data_asof":"2026-10-26T07:35:00-04:00"},"quality_at_build":{"execution_ready":false,"data_ready":false,"action_ready":false,"action_status":"DATA_RECHECK_REQUIRED","current_execution_promotion":"BLOCKED","generated_in_current_run":false,"row_valid_until":"2026-10-26T07:38:00-04:00","expired_at_build":true,"provider_limitations":[],"provider_blockers":["work_packet_row_expired"]}}
 ```
 
 ```json
-{"ticker":"DELL","display_name":"Dell Technologies","is_held":true,"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","last_price":458.26,"market_data_asof":"2026-10-23T05:55:00-04:00","session_vwap":462.59814675682446,"relative_volume":0.05883678742947984,"spread_bps":null,"day_high":null,"day_low":null,"execution_condition_ko":"원문 재무제표의 통화·금액 단위·회계기간·공개 시점과 주식 종류를 확인하고, 주식예탁증서 해당 여부 및 해당 시 원주 교환비율을 검증한다. / 제공된 공시 3건의 본문을 확인한다. 목록만으로 악재나 내부자 매도 완료를 단정하지 않는다.","risk_condition_ko":"491.38 이하 하락, 2개 봉 확인 후 (보호 매도에는 최소 상대거래량 조건 없음) 리스크 축소","decision_state_ko":"데이터 확인 전 대기","data_status_ko":"시세 유효기간 만료","reference_strategy":{"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","decision_state_ko":"-","market_data_asof":"2026-10-23T05:55:00-04:00"},"quality_at_build":{"execution_ready":false,"data_ready":false,"action_ready":false,"action_status":"DATA_RECHECK_REQUIRED","current_execution_promotion":"BLOCKED","generated_in_current_run":false,"row_valid_until":"2026-10-23T05:58:00-04:00","expired_at_build":true,"provider_limitations":[],"provider_blockers":["work_packet_row_expired"]}}
+{"ticker":"LLY","display_name":"Eli Lilly","is_held":true,"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","last_price":null,"market_data_asof":null,"session_vwap":null,"relative_volume":null,"spread_bps":null,"day_high":null,"day_low":null,"execution_condition_ko":"추가 실행 조건 없음","risk_condition_ko":"현재 명시된 위험 행동 없음","decision_state_ko":"데이터 확인 전 대기","data_status_ko":"시세 시각 확인 필요","reference_strategy":{"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","decision_state_ko":"-","market_data_asof":null},"quality_at_build":{"execution_ready":false,"data_ready":false,"action_ready":false,"action_status":"DATA_RECHECK_REQUIRED","current_execution_promotion":"BLOCKED","generated_in_current_run":false,"row_valid_until":null,"expired_at_build":false,"provider_limitations":[],"provider_blockers":["work_packet_row_invalid_timestamp"]}}
 ```
 
 ```json
-{"ticker":"AVGO","display_name":"Broadcom","is_held":true,"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","last_price":324.02,"market_data_asof":"2026-10-23T05:55:00-04:00","session_vwap":325.3979542395693,"relative_volume":0.05136008628383896,"spread_bps":null,"day_high":null,"day_low":null,"execution_condition_ko":"판단 시각은 2026-10-23T06:16:15.624660-04:00이다. 최신 제공 봉은 05:55의 지연된 장전 자료로, 현재 체결 가능 호가나 정규장 조건 충족을 입증하지 않는다. 실제 거래일과 거래 상태를 별도로 확인한다. / 미국 동부시간 10:30은 소액 시험 진입의 최초 재검토 제한 시각이지 만기가 아니다. 현재 승인된 진입계획이나 만기는 없으며 다음 거래일로 임의 이월하지 않는다. 방어적 매도에는 이 시각 제한을 적용하지 않는다.","risk_condition_ko":"328.58 이하 하락, 종가 확인 후 리스크 축소","decision_state_ko":"데이터 확인 전 대기","data_status_ko":"시세 유효기간 만료","reference_strategy":{"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","decision_state_ko":"-","market_data_asof":"2026-10-23T05:55:00-04:00"},"quality_at_build":{"execution_ready":false,"data_ready":false,"action_ready":false,"action_status":"DATA_RECHECK_REQUIRED","current_execution_promotion":"BLOCKED","generated_in_current_run":false,"row_valid_until":"2026-10-23T05:58:00-04:00","expired_at_build":true,"provider_limitations":[],"provider_blockers":["work_packet_row_expired"]}}
+{"ticker":"TSM","display_name":"Taiwan Semiconductor Manufacturing","is_held":true,"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","last_price":419.58,"market_data_asof":"2026-10-26T07:45:00-04:00","session_vwap":417.4461200847177,"relative_volume":0.06890368295802989,"spread_bps":null,"day_high":null,"day_low":null,"execution_condition_ko":"추가 실행 조건 없음","risk_condition_ko":"현재 명시된 위험 행동 없음","decision_state_ko":"데이터 확인 전 대기","data_status_ko":"시세 유효기간 만료","reference_strategy":{"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","decision_state_ko":"-","market_data_asof":"2026-10-26T07:45:00-04:00"},"quality_at_build":{"execution_ready":false,"data_ready":false,"action_ready":false,"action_status":"DATA_RECHECK_REQUIRED","current_execution_promotion":"BLOCKED","generated_in_current_run":false,"row_valid_until":"2026-10-26T07:48:00-04:00","expired_at_build":true,"provider_limitations":[],"provider_blockers":["work_packet_row_expired"]}}
 ```
 
 ```json
-{"ticker":"GLDM","display_name":"SPDR Gold MiniShares Trust","is_held":true,"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","last_price":79.5881,"market_data_asof":"2026-10-23T06:25:00-04:00","session_vwap":79.41923851946123,"relative_volume":0.046402698925458126,"spread_bps":null,"day_high":null,"day_low":null,"execution_condition_ko":"최신 매수·매도호가, 거래일·정규장 여부, 거래정지, 유동성과 당일 거래량가중평균가를 확인한다. 미체결 보호매도는 위험이 제거된 것으로 간주하지 않는다. / 80.67은 초기 안정화, 81.74는 더 강한 회복 관찰선이다. 재시험 지지와 동일 경과시간 대비 상대거래량 1.2 이상을 확인한 뒤 신규 진입을 별도로 재평가한다.","risk_condition_ko":"80.57 이하 하락, 종가 확인 후 리스크 축소","decision_state_ko":"데이터 확인 전 대기","data_status_ko":"시세 유효기간 만료","reference_strategy":{"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","decision_state_ko":"-","market_data_asof":"2026-10-23T06:25:00-04:00"},"quality_at_build":{"execution_ready":false,"data_ready":false,"action_ready":false,"action_status":"DATA_RECHECK_REQUIRED","current_execution_promotion":"BLOCKED","generated_in_current_run":false,"row_valid_until":"2026-10-23T06:28:00-04:00","expired_at_build":true,"provider_limitations":[],"provider_blockers":["work_packet_row_expired"]}}
+{"ticker":"ETN","display_name":"Eaton","is_held":true,"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","last_price":366.48,"market_data_asof":"2026-10-26T07:25:00-04:00","session_vwap":366.5061728395062,"relative_volume":0.005479809918259006,"spread_bps":null,"day_high":null,"day_low":null,"execution_condition_ko":"추가 실행 조건 없음","risk_condition_ko":"현재 명시된 위험 행동 없음","decision_state_ko":"데이터 확인 전 대기","data_status_ko":"시세 유효기간 만료","reference_strategy":{"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","decision_state_ko":"-","market_data_asof":"2026-10-26T07:25:00-04:00"},"quality_at_build":{"execution_ready":false,"data_ready":false,"action_ready":false,"action_status":"DATA_RECHECK_REQUIRED","current_execution_promotion":"BLOCKED","generated_in_current_run":false,"row_valid_until":"2026-10-26T07:28:00-04:00","expired_at_build":true,"provider_limitations":[],"provider_blockers":["work_packet_row_expired"]}}
 ```
 
 ```json
-{"ticker":"AMZN","display_name":"Amazon","is_held":true,"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","last_price":249.7,"market_data_asof":"2026-10-23T05:55:00-04:00","session_vwap":250.24738524268133,"relative_volume":0.05195566743941737,"spread_bps":null,"day_high":null,"day_low":null,"execution_condition_ko":"248.00~250.00 시험 후 저점 상승, 정규장 거래량가중평균가격 회복, 연속 두 5분봉 재시험 지지 및 동시간대 상대거래량 1.2 이상 / 256.82 위 정규장 종가와 일간 상대거래량 1.2 이상, 255.99~256.82 지지 전환 및 다음 검증 거래일 유지; 첫 유효 저항까지 순보상/위험 재계산","risk_condition_ko":"255.99 이하 하락, 종가 확인 후 리스크 축소","decision_state_ko":"데이터 확인 전 대기","data_status_ko":"시세 유효기간 만료","reference_strategy":{"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","decision_state_ko":"-","market_data_asof":"2026-10-23T05:55:00-04:00"},"quality_at_build":{"execution_ready":false,"data_ready":false,"action_ready":false,"action_status":"DATA_RECHECK_REQUIRED","current_execution_promotion":"BLOCKED","generated_in_current_run":false,"row_valid_until":"2026-10-23T05:58:00-04:00","expired_at_build":true,"provider_limitations":[],"provider_blockers":["work_packet_row_expired"]}}
+{"ticker":"GEV","display_name":"GE Vernova","is_held":true,"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","last_price":818.9244,"market_data_asof":"2026-10-26T07:30:00-04:00","session_vwap":818.2537181749433,"relative_volume":0.06319000701091296,"spread_bps":null,"day_high":null,"day_low":null,"execution_condition_ko":"추가 실행 조건 없음","risk_condition_ko":"현재 명시된 위험 행동 없음","decision_state_ko":"데이터 확인 전 대기","data_status_ko":"시세 유효기간 만료","reference_strategy":{"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","decision_state_ko":"-","market_data_asof":"2026-10-26T07:30:00-04:00"},"quality_at_build":{"execution_ready":false,"data_ready":false,"action_ready":false,"action_status":"DATA_RECHECK_REQUIRED","current_execution_promotion":"BLOCKED","generated_in_current_run":false,"row_valid_until":"2026-10-26T07:33:00-04:00","expired_at_build":true,"provider_limitations":[],"provider_blockers":["work_packet_row_expired"]}}
 ```
 
 ```json
-{"ticker":"AAPL","display_name":"Apple","is_held":true,"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","last_price":346.4052,"market_data_asof":"2026-10-23T05:55:00-04:00","session_vwap":346.16512527324704,"relative_volume":0.040653471251338384,"spread_bps":null,"day_high":null,"day_low":null,"execution_condition_ko":"판단시각은 2026-10-23T06:15:46.762774-04:00이다. 제공된 최신 관측은 같은 날 미국 동부시간 05:55의 개장 전 가격 346.4052로 약 21분 전 자료다. 일봉 기준일은 2026-10-22이며 현재 정규장 조건 충족을 확인할 수 없다. / 확인된 정규장에서 348.36 위 5분봉 두 개 마감과 재시험 유지, 당일 거래량가중평균가격 상회 및 시간대 보정 상대거래량 1.2 이상을 관찰한다. 손익비 미달이면 돌파 확인 후에도 매수하지 않는다.","risk_condition_ko":"340.85 이하 하락, 종가 확인 후 신규 진입 보류·보유 위험 대응 계획 재확인","decision_state_ko":"데이터 확인 전 대기","data_status_ko":"시세 유효기간 만료","reference_strategy":{"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","decision_state_ko":"-","market_data_asof":"2026-10-23T05:55:00-04:00"},"quality_at_build":{"execution_ready":false,"data_ready":false,"action_ready":false,"action_status":"DATA_RECHECK_REQUIRED","current_execution_promotion":"BLOCKED","generated_in_current_run":false,"row_valid_until":"2026-10-23T05:58:00-04:00","expired_at_build":true,"provider_limitations":[],"provider_blockers":["work_packet_row_expired"]}}
+{"ticker":"MPWR","display_name":"Monolithic Power Systems","is_held":true,"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","last_price":null,"market_data_asof":null,"session_vwap":null,"relative_volume":null,"spread_bps":null,"day_high":null,"day_low":null,"execution_condition_ko":"추가 실행 조건 없음","risk_condition_ko":"현재 명시된 위험 행동 없음","decision_state_ko":"데이터 확인 전 대기","data_status_ko":"시세 시각 확인 필요","reference_strategy":{"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","decision_state_ko":"-","market_data_asof":null},"quality_at_build":{"execution_ready":false,"data_ready":false,"action_ready":false,"action_status":"DATA_RECHECK_REQUIRED","current_execution_promotion":"BLOCKED","generated_in_current_run":false,"row_valid_until":null,"expired_at_build":false,"provider_limitations":[],"provider_blockers":["work_packet_row_invalid_timestamp"]}}
 ```
 
 ```json
-{"ticker":"LLY","display_name":"Eli Lilly","is_held":true,"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","last_price":1297.22,"market_data_asof":"2026-10-23T06:40:00-04:00","session_vwap":1296.2014773306164,"relative_volume":0.03413855675860056,"spread_bps":null,"day_high":null,"day_low":null,"execution_condition_ko":"1280–1293에서 정규장 지지 전환, 상승하는 5분봉 저점, 거래량가중평균가격 회복과 동시간대 상대거래량 1.2 이상을 관찰한다. 가격 접촉만으로 매수하지 않는다. / 1321.21 위 두 개 연속 5분봉 종가와 지지 재시험을 관찰한다. 정규장 공식 종가 확인과 다음 검증 거래일의 지지 유지 여부는 확대 진입 판단에 별도로 적용한다.","risk_condition_ko":"1,260 이하 하락, 종가 확인 후 신규 진입 보류·보유 위험 대응 계획 재확인","decision_state_ko":"데이터 확인 전 대기","data_status_ko":"시세 유효기간 만료","reference_strategy":{"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","decision_state_ko":"-","market_data_asof":"2026-10-23T06:40:00-04:00"},"quality_at_build":{"execution_ready":false,"data_ready":false,"action_ready":false,"action_status":"DATA_RECHECK_REQUIRED","current_execution_promotion":"BLOCKED","generated_in_current_run":false,"row_valid_until":"2026-10-23T06:43:00-04:00","expired_at_build":true,"provider_limitations":[],"provider_blockers":["work_packet_row_expired"]}}
+{"ticker":"RSP","display_name":"RSP","is_held":true,"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","last_price":216.54,"market_data_asof":"2026-10-26T07:40:00-04:00","session_vwap":216.9727072044953,"relative_volume":0.011464517882238305,"spread_bps":null,"day_high":null,"day_low":null,"execution_condition_ko":"추가 실행 조건 없음","risk_condition_ko":"현재 명시된 위험 행동 없음","decision_state_ko":"데이터 확인 전 대기","data_status_ko":"시세 유효기간 만료","reference_strategy":{"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","decision_state_ko":"-","market_data_asof":"2026-10-26T07:40:00-04:00"},"quality_at_build":{"execution_ready":false,"data_ready":false,"action_ready":false,"action_status":"DATA_RECHECK_REQUIRED","current_execution_promotion":"BLOCKED","generated_in_current_run":false,"row_valid_until":"2026-10-26T07:43:00-04:00","expired_at_build":true,"provider_limitations":[],"provider_blockers":["work_packet_row_expired"]}}
 ```
 
 ```json
-{"ticker":"RSP","display_name":"RSP","is_held":true,"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","last_price":217.93,"market_data_asof":"2026-10-23T06:05:00-04:00","session_vwap":217.91603053435114,"relative_volume":0.0018153203229563566,"spread_bps":null,"day_high":null,"day_low":null,"execution_condition_ko":"215.70~217.02달러에서 매도 거래량 둔화와 완료된 봉의 가격 회복을 확인한다. 구간 도달만으로 매수하지 않는다. / 218.29~218.38달러 상회 후 지지 전환, 정규장 거래량가중평균가격 상회, 동시간대 상대거래량 1.2 이상 및 첫 유효 저항까지 비용 후 보상/위험 2 이상을 함께 확인한다. 수치 기준은 채택한 정책이지 관측된 당일 값이 아니다.","risk_condition_ko":"215.05 이하 하락, 종가 확인 후 신규 진입 보류·보유 위험 대응 계획 재확인","decision_state_ko":"데이터 확인 전 대기","data_status_ko":"시세 유효기간 만료","reference_strategy":{"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","decision_state_ko":"-","market_data_asof":"2026-10-23T06:05:00-04:00"},"quality_at_build":{"execution_ready":false,"data_ready":false,"action_ready":false,"action_status":"DATA_RECHECK_REQUIRED","current_execution_promotion":"BLOCKED","generated_in_current_run":false,"row_valid_until":"2026-10-23T06:08:00-04:00","expired_at_build":true,"provider_limitations":[],"provider_blockers":["work_packet_row_expired"]}}
+{"ticker":"SGOV","display_name":"iShares 0-3 Month Treasury Bond ETF","is_held":true,"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","last_price":100.66,"market_data_asof":"2026-10-26T07:45:00-04:00","session_vwap":100.66549316643552,"relative_volume":0.14818604135417332,"spread_bps":null,"day_high":null,"day_low":null,"execution_condition_ko":"추가 실행 조건 없음","risk_condition_ko":"현재 명시된 위험 행동 없음","decision_state_ko":"데이터 확인 전 대기","data_status_ko":"시세 유효기간 만료","reference_strategy":{"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","decision_state_ko":"-","market_data_asof":"2026-10-26T07:45:00-04:00"},"quality_at_build":{"execution_ready":false,"data_ready":false,"action_ready":false,"action_status":"DATA_RECHECK_REQUIRED","current_execution_promotion":"BLOCKED","generated_in_current_run":false,"row_valid_until":"2026-10-26T07:48:00-04:00","expired_at_build":true,"provider_limitations":[],"provider_blockers":["work_packet_row_expired"]}}
 ```
 
 ```json
-{"ticker":"SGOV","display_name":"iShares 0-3 Month Treasury Bond ETF","is_held":true,"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","last_price":100.65,"market_data_asof":"2026-10-23T07:05:00-04:00","session_vwap":100.65516239373008,"relative_volume":0.10549143051927701,"spread_bps":null,"day_high":null,"day_low":null,"execution_condition_ko":"판단 시각은 2026-10-23T07:17:32.034207-04:00이다. 최초 재검토 시각 2026-10-23T10:30:00-04:00 이전이며 이는 만료시각이나 매수 승인이 아니다. 실제 거래일·정규장 운영·거래정지 여부와 최신 양방향 호가는 별도 확인한다. / 100.63 위 연속 두 정규장 5분봉 종가, 당시 거래량가중평균가격 상회, 검증된 동시간대 상대거래량 1.2 이상을 관찰한다. 1.2는 제안 조건이지 관측값이 아니다.","risk_condition_ko":"100.54 이하 하락, 2개 봉 확인 후 신규 진입 보류·보유 위험 대응 계획 재확인","decision_state_ko":"데이터 확인 전 대기","data_status_ko":"시세 유효기간 만료","reference_strategy":{"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","decision_state_ko":"-","market_data_asof":"2026-10-23T07:05:00-04:00"},"quality_at_build":{"execution_ready":false,"data_ready":false,"action_ready":false,"action_status":"DATA_RECHECK_REQUIRED","current_execution_promotion":"BLOCKED","generated_in_current_run":false,"row_valid_until":"2026-10-23T07:08:00-04:00","expired_at_build":true,"provider_limitations":[],"provider_blockers":["work_packet_row_expired"]}}
+{"ticker":"NVDA","display_name":"NVIDIA","is_held":true,"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","last_price":null,"market_data_asof":null,"session_vwap":null,"relative_volume":null,"spread_bps":null,"day_high":null,"day_low":null,"execution_condition_ko":"추가 실행 조건 없음","risk_condition_ko":"현재 명시된 위험 행동 없음","decision_state_ko":"데이터 확인 전 대기","data_status_ko":"시세 시각 확인 필요","reference_strategy":{"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","decision_state_ko":"-","market_data_asof":null},"quality_at_build":{"execution_ready":false,"data_ready":false,"action_ready":false,"action_status":"DATA_RECHECK_REQUIRED","current_execution_promotion":"BLOCKED","generated_in_current_run":false,"row_valid_until":null,"expired_at_build":false,"provider_limitations":[],"provider_blockers":["work_packet_row_invalid_timestamp"]}}
 ```
 
 ```json
-{"ticker":"V","display_name":"V","is_held":false,"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","last_price":412.575,"market_data_asof":"2026-10-23T07:30:00-04:00","session_vwap":412.2914328469884,"relative_volume":0.009015380025840378,"spread_bps":null,"day_high":null,"day_low":null,"execution_condition_ko":"V 거래일정·거래정지·최신 호가·거래비용·발표 일정과 계좌 집중도·전체 스트레스 손실을 먼저 확인한다. / V 407.28~409.53에서 하락 거래량 감소 후 두 개의 정규장 5분봉으로 회복을 확인한다.","risk_condition_ko":"421.05 이상 도달, 장중 확인 시 이익실현성 축소","decision_state_ko":"데이터 확인 전 대기","data_status_ko":"시세 유효기간 만료","reference_strategy":{"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","decision_state_ko":"-","market_data_asof":"2026-10-23T07:30:00-04:00"},"quality_at_build":{"execution_ready":false,"data_ready":false,"action_ready":false,"action_status":"DATA_RECHECK_REQUIRED","current_execution_promotion":"BLOCKED","generated_in_current_run":false,"row_valid_until":"2026-10-23T07:33:00-04:00","expired_at_build":true,"provider_limitations":[],"provider_blockers":["work_packet_row_expired"]}}
+{"ticker":"ABBV","display_name":"ABBV","is_held":false,"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","last_price":null,"market_data_asof":null,"session_vwap":null,"relative_volume":null,"spread_bps":null,"day_high":null,"day_low":null,"execution_condition_ko":"추가 실행 조건 없음","risk_condition_ko":"현재 명시된 위험 행동 없음","decision_state_ko":"데이터 확인 전 대기","data_status_ko":"시세 시각 확인 필요","reference_strategy":{"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","decision_state_ko":"-","market_data_asof":null},"quality_at_build":{"execution_ready":false,"data_ready":false,"action_ready":false,"action_status":"DATA_RECHECK_REQUIRED","current_execution_promotion":"BLOCKED","generated_in_current_run":false,"row_valid_until":null,"expired_at_build":false,"provider_limitations":[],"provider_blockers":["work_packet_row_invalid_timestamp"]}}
 ```
 
 ```json
-{"ticker":"ABBV","display_name":"ABBV","is_held":false,"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","last_price":284.0,"market_data_asof":"2026-10-23T07:40:00-04:00","session_vwap":284.854415274463,"relative_volume":0.001611724243752251,"spread_bps":null,"day_high":null,"day_low":null,"execution_condition_ko":"281–282 시험 후 282 위 회복, 정규장 거래량가중평균가격 상회, 개선된 유동성 및 검증된 시간대 보정 상대거래량 1.2 이상을 확인하면 소규모 진입을 재평가한다. / 291.40 위 정규장 5분봉 종가와 성공적인 재시험을 관찰한다. 추가 상승 여력·보호가격·비용 반영 보상 대비 위험 검증 전에는 돌파만으로 매수하지 않는다.","risk_condition_ko":"277.16 이하 하락, 종가 확인 후 신규 진입 보류·보유 위험 대응 계획 재확인","decision_state_ko":"데이터 확인 전 대기","data_status_ko":"시세 유효기간 만료","reference_strategy":{"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","decision_state_ko":"-","market_data_asof":"2026-10-23T07:40:00-04:00"},"quality_at_build":{"execution_ready":false,"data_ready":false,"action_ready":false,"action_status":"DATA_RECHECK_REQUIRED","current_execution_promotion":"BLOCKED","generated_in_current_run":false,"row_valid_until":"2026-10-23T07:43:00-04:00","expired_at_build":true,"provider_limitations":[],"provider_blockers":["work_packet_row_expired"]}}
+{"ticker":"AMT","display_name":"AMT","is_held":false,"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","last_price":null,"market_data_asof":null,"session_vwap":null,"relative_volume":null,"spread_bps":null,"day_high":null,"day_low":null,"execution_condition_ko":"추가 실행 조건 없음","risk_condition_ko":"현재 명시된 위험 행동 없음","decision_state_ko":"데이터 확인 전 대기","data_status_ko":"시세 시각 확인 필요","reference_strategy":{"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","decision_state_ko":"-","market_data_asof":null},"quality_at_build":{"execution_ready":false,"data_ready":false,"action_ready":false,"action_status":"DATA_RECHECK_REQUIRED","current_execution_promotion":"BLOCKED","generated_in_current_run":false,"row_valid_until":null,"expired_at_build":false,"provider_limitations":[],"provider_blockers":["work_packet_row_invalid_timestamp"]}}
 ```
 
 ```json
-{"ticker":"COST","display_name":"Costco Wholesale","is_held":false,"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","last_price":1012.52,"market_data_asof":"2026-10-23T08:00:00-04:00","session_vwap":1012.3182035355949,"relative_volume":0.018589958322699027,"spread_bps":null,"day_high":null,"day_low":null,"execution_condition_ko":"공식 거래 일정·거래 상태·최신 정규장 시세와 공시 시각을 확인한다. 현재 시계만으로 거래 가능 세션이나 진입 충족을 추정하지 않는다. / 1003-1008.37에서 매도 거래량 감소와 높은 5분봉 저점을 확인하고, 연속 두 번의 5분봉 종가가 1008.37 위이며 정규장 거래량가중평균가격도 유지되는지 감시한다.","risk_condition_ko":"988 이하 하락, 종가 확인 후 신규 진입 보류·보유 위험 대응 계획 재확인","decision_state_ko":"데이터 확인 전 대기","data_status_ko":"시세 유효기간 만료","reference_strategy":{"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","decision_state_ko":"-","market_data_asof":"2026-10-23T08:00:00-04:00"},"quality_at_build":{"execution_ready":false,"data_ready":false,"action_ready":false,"action_status":"DATA_RECHECK_REQUIRED","current_execution_promotion":"BLOCKED","generated_in_current_run":false,"row_valid_until":"2026-10-23T08:03:00-04:00","expired_at_build":true,"provider_limitations":[],"provider_blockers":["work_packet_row_expired"]}}
+{"ticker":"BRK-B","display_name":"BRK-B","is_held":false,"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","last_price":null,"market_data_asof":null,"session_vwap":null,"relative_volume":null,"spread_bps":null,"day_high":null,"day_low":null,"execution_condition_ko":"추가 실행 조건 없음","risk_condition_ko":"현재 명시된 위험 행동 없음","decision_state_ko":"데이터 확인 전 대기","data_status_ko":"시세 시각 확인 필요","reference_strategy":{"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","decision_state_ko":"-","market_data_asof":null},"quality_at_build":{"execution_ready":false,"data_ready":false,"action_ready":false,"action_status":"DATA_RECHECK_REQUIRED","current_execution_promotion":"BLOCKED","generated_in_current_run":false,"row_valid_until":null,"expired_at_build":false,"provider_limitations":[],"provider_blockers":["work_packet_row_invalid_timestamp"]}}
 ```
 
 ```json
-{"ticker":"MA","display_name":"MA","is_held":false,"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","last_price":630.2,"market_data_asof":"2026-10-23T07:20:00-04:00","session_vwap":630.6423982869379,"relative_volume":0.0030360305772985795,"spread_bps":null,"day_high":null,"day_low":null,"execution_condition_ko":"확인된 정규거래일 미국 동부시간 10:30 이후 최신 체결·거래 상태·정규장 거래량가중평균가격·동시간대 상대거래량을 확보한다. / 633.29 돌파·재시험 지지와 634.00 부근 실행 가능성을 관찰한다. 기존 익절과 신규 매수를 상계해 불필요한 왕복 거래를 피한다.","risk_condition_ko":"633.29 이상 도달, 장중 확인 시 이익실현성 축소","decision_state_ko":"데이터 확인 전 대기","data_status_ko":"시세 유효기간 만료","reference_strategy":{"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","decision_state_ko":"-","market_data_asof":"2026-10-23T07:20:00-04:00"},"quality_at_build":{"execution_ready":false,"data_ready":false,"action_ready":false,"action_status":"DATA_RECHECK_REQUIRED","current_execution_promotion":"BLOCKED","generated_in_current_run":false,"row_valid_until":"2026-10-23T07:23:00-04:00","expired_at_build":true,"provider_limitations":[],"provider_blockers":["work_packet_row_expired"]}}
+{"ticker":"COST","display_name":"Costco Wholesale","is_held":false,"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","last_price":null,"market_data_asof":null,"session_vwap":null,"relative_volume":null,"spread_bps":null,"day_high":null,"day_low":null,"execution_condition_ko":"추가 실행 조건 없음","risk_condition_ko":"현재 명시된 위험 행동 없음","decision_state_ko":"데이터 확인 전 대기","data_status_ko":"시세 시각 확인 필요","reference_strategy":{"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","decision_state_ko":"-","market_data_asof":null},"quality_at_build":{"execution_ready":false,"data_ready":false,"action_ready":false,"action_status":"DATA_RECHECK_REQUIRED","current_execution_promotion":"BLOCKED","generated_in_current_run":false,"row_valid_until":null,"expired_at_build":false,"provider_limitations":[],"provider_blockers":["work_packet_row_invalid_timestamp"]}}
 ```
 
 ```json
-{"ticker":"PG","display_name":"PG","is_held":false,"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","last_price":163.6,"market_data_asof":"2026-10-23T08:10:00-04:00","session_vwap":163.74980574980574,"relative_volume":0.034035819755648206,"spread_bps":null,"day_high":null,"day_low":null,"execution_condition_ko":"판단 시각은 2026-10-23T08:22:23.427393-04:00이다. 08:10 미국 동부시간 가격표는 약 12분 전 자료이며 표시된 18초 지연이 현재 신선도를 보장하지 않는다. 거래일·단축거래 일정, 거래정지, 실제 정규장 상태, 최신 호가·스프레드·5분봉을 확인한다. / 미국 동부시간 10:30은 최초 재검토 시각이지 만료시각이 아니다. 현재 시각은 그 이전이며 거래 가능 세션도 확인되지 않았다. 만료된 주문이나 다음 거래일로 이월할 기한은 확인되지 않았다.","risk_condition_ko":"161.36 이하 하락, 2개 봉 확인 후 신규 진입 보류·보유 위험 대응 계획 재확인","decision_state_ko":"데이터 확인 전 대기","data_status_ko":"시세 유효기간 만료","reference_strategy":{"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","decision_state_ko":"-","market_data_asof":"2026-10-23T08:10:00-04:00"},"quality_at_build":{"execution_ready":false,"data_ready":false,"action_ready":false,"action_status":"DATA_RECHECK_REQUIRED","current_execution_promotion":"BLOCKED","generated_in_current_run":false,"row_valid_until":"2026-10-23T08:13:00-04:00","expired_at_build":true,"provider_limitations":[],"provider_blockers":["work_packet_row_expired"]}}
+{"ticker":"CVX","display_name":"CVX","is_held":false,"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","last_price":null,"market_data_asof":null,"session_vwap":null,"relative_volume":null,"spread_bps":null,"day_high":null,"day_low":null,"execution_condition_ko":"추가 실행 조건 없음","risk_condition_ko":"현재 명시된 위험 행동 없음","decision_state_ko":"데이터 확인 전 대기","data_status_ko":"시세 시각 확인 필요","reference_strategy":{"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","decision_state_ko":"-","market_data_asof":null},"quality_at_build":{"execution_ready":false,"data_ready":false,"action_ready":false,"action_status":"DATA_RECHECK_REQUIRED","current_execution_promotion":"BLOCKED","generated_in_current_run":false,"row_valid_until":null,"expired_at_build":false,"provider_limitations":[],"provider_blockers":["work_packet_row_invalid_timestamp"]}}
 ```
 
 ```json
-{"ticker":"SO","display_name":"SO","is_held":false,"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","last_price":93.82,"market_data_asof":"2026-10-23T07:00:00-04:00","session_vwap":93.50344827586207,"relative_volume":0.0004492751596727869,"spread_bps":null,"day_high":null,"day_low":null,"execution_condition_ko":"거래일정·정규장 운영·거래정지 여부와 최신 호가·호가 차이·5분봉·정규장 거래량가중평균가격을 확인한다. / 기존 SO 수량·평가비중·개별 방어 기준·유사 위험 집중도와 스트레스 손실을 확인한다. 한도 초과면 추가매수를 차단하고 초과 노출을 위험축소한다.","risk_condition_ko":"91 이하 하락, 종가 확인 후 신규 진입 보류·보유 위험 대응 계획 재확인","decision_state_ko":"데이터 확인 전 대기","data_status_ko":"시세 유효기간 만료","reference_strategy":{"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","decision_state_ko":"-","market_data_asof":"2026-10-23T07:00:00-04:00"},"quality_at_build":{"execution_ready":false,"data_ready":false,"action_ready":false,"action_status":"DATA_RECHECK_REQUIRED","current_execution_promotion":"BLOCKED","generated_in_current_run":false,"row_valid_until":"2026-10-23T07:03:00-04:00","expired_at_build":true,"provider_limitations":[],"provider_blockers":["work_packet_row_expired"]}}
+{"ticker":"MA","display_name":"MA","is_held":false,"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","last_price":null,"market_data_asof":null,"session_vwap":null,"relative_volume":null,"spread_bps":null,"day_high":null,"day_low":null,"execution_condition_ko":"추가 실행 조건 없음","risk_condition_ko":"현재 명시된 위험 행동 없음","decision_state_ko":"데이터 확인 전 대기","data_status_ko":"시세 시각 확인 필요","reference_strategy":{"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","decision_state_ko":"-","market_data_asof":null},"quality_at_build":{"execution_ready":false,"data_ready":false,"action_ready":false,"action_status":"DATA_RECHECK_REQUIRED","current_execution_promotion":"BLOCKED","generated_in_current_run":false,"row_valid_until":null,"expired_at_build":false,"provider_limitations":[],"provider_blockers":["work_packet_row_invalid_timestamp"]}}
 ```
 
 ```json
-{"ticker":"XOM","display_name":"XOM","is_held":false,"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","last_price":179.37,"market_data_asof":"2026-10-23T08:20:00-04:00","session_vwap":179.00081482990427,"relative_volume":0.008630174848621502,"spread_bps":null,"day_high":null,"day_low":null,"execution_condition_ko":"실제 보유수량·순자산·결제완료 현금·종목 및 총 에너지 노출을 확인하고 승인 한도 초과분은 별도로 감축한다. / 174.63–175.36 지지 시험, 높아지는 저점, 175.50 위 5분봉 두 개 종가, 당일 거래량가중평균가격 상회 및 동시간대 상대거래량 1.2배 이상을 관찰한다.","risk_condition_ko":"180.3 이상 도달, 장중 확인 시 이익실현성 축소","decision_state_ko":"데이터 확인 전 대기","data_status_ko":"시세 유효기간 만료","reference_strategy":{"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","decision_state_ko":"-","market_data_asof":"2026-10-23T08:20:00-04:00"},"quality_at_build":{"execution_ready":false,"data_ready":false,"action_ready":false,"action_status":"DATA_RECHECK_REQUIRED","current_execution_promotion":"BLOCKED","generated_in_current_run":false,"row_valid_until":"2026-10-23T08:23:00-04:00","expired_at_build":true,"provider_limitations":[],"provider_blockers":["work_packet_row_expired"]}}
+{"ticker":"MDT","display_name":"MDT","is_held":false,"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","last_price":null,"market_data_asof":null,"session_vwap":null,"relative_volume":null,"spread_bps":null,"day_high":null,"day_low":null,"execution_condition_ko":"추가 실행 조건 없음","risk_condition_ko":"현재 명시된 위험 행동 없음","decision_state_ko":"데이터 확인 전 대기","data_status_ko":"시세 시각 확인 필요","reference_strategy":{"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","decision_state_ko":"-","market_data_asof":null},"quality_at_build":{"execution_ready":false,"data_ready":false,"action_ready":false,"action_status":"DATA_RECHECK_REQUIRED","current_execution_promotion":"BLOCKED","generated_in_current_run":false,"row_valid_until":null,"expired_at_build":false,"provider_limitations":[],"provider_blockers":["work_packet_row_invalid_timestamp"]}}
 ```
 
 ```json
-{"ticker":"CVX","display_name":"CVX","is_held":false,"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","last_price":228.0,"market_data_asof":"2026-10-23T08:10:00-04:00","session_vwap":227.56274980015988,"relative_volume":0.013649043845814491,"spread_bps":null,"day_high":null,"day_low":null,"execution_condition_ko":"221.56–222.86 시험 후 222.86 회복과 더 높은 저점 형성, 정규장 거래량가중평균가격 상회 및 동시간대 상대거래량 1.2 이상 확인. / 229.04 위에서 완료된 5분봉 2개와 성공적인 재시험 확인. 별도로 검증된 목표가·손절가와 비용 차감 후 보상위험비 2 이상이 필요하다.","risk_condition_ko":"221.56 이하 하락, 종가 확인 후 신규 진입 보류·보유 위험 대응 계획 재확인","decision_state_ko":"데이터 확인 전 대기","data_status_ko":"시세 유효기간 만료","reference_strategy":{"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","decision_state_ko":"-","market_data_asof":"2026-10-23T08:10:00-04:00"},"quality_at_build":{"execution_ready":false,"data_ready":false,"action_ready":false,"action_status":"DATA_RECHECK_REQUIRED","current_execution_promotion":"BLOCKED","generated_in_current_run":false,"row_valid_until":"2026-10-23T08:13:00-04:00","expired_at_build":true,"provider_limitations":[],"provider_blockers":["work_packet_row_expired"]}}
+{"ticker":"NET","display_name":"Cloudflare","is_held":false,"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","last_price":327.21,"market_data_asof":"2026-10-26T07:45:00-04:00","session_vwap":325.79012920498195,"relative_volume":0.05710574320522418,"spread_bps":null,"day_high":null,"day_low":null,"execution_condition_ko":"추가 실행 조건 없음","risk_condition_ko":"현재 명시된 위험 행동 없음","decision_state_ko":"데이터 확인 전 대기","data_status_ko":"시세 유효기간 만료","reference_strategy":{"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","decision_state_ko":"-","market_data_asof":"2026-10-26T07:45:00-04:00"},"quality_at_build":{"execution_ready":false,"data_ready":false,"action_ready":false,"action_status":"DATA_RECHECK_REQUIRED","current_execution_promotion":"BLOCKED","generated_in_current_run":false,"row_valid_until":"2026-10-26T07:48:00-04:00","expired_at_build":true,"provider_limitations":[],"provider_blockers":["work_packet_row_expired"]}}
 ```
 
 ```json
-{"ticker":"BRK-B","display_name":"BRK-B","is_held":false,"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","last_price":545.5,"market_data_asof":"2026-10-23T08:25:00-04:00","session_vwap":545.3391159462903,"relative_volume":0.04653367293078483,"spread_bps":null,"day_high":null,"day_low":null,"execution_condition_ko":"542.01–543.34에서 완료된 정규장 5분봉으로 반등을 확인하되 매수가별 순손익비를 다시 계산한다. 약 542.65의 비용 전 산술 상한은 매수 허가가 아니다. / 549.96–550 돌파 후 550 및 당일 거래량가중평균가격 위 재시험 지지를 확인하고 근거 있는 상승 목표를 확보한다.","risk_condition_ko":"549.96 이상 도달, 장중 확인 시 이익실현성 축소","decision_state_ko":"데이터 확인 전 대기","data_status_ko":"시세 유효기간 만료","reference_strategy":{"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","decision_state_ko":"-","market_data_asof":"2026-10-23T08:25:00-04:00"},"quality_at_build":{"execution_ready":false,"data_ready":false,"action_ready":false,"action_status":"DATA_RECHECK_REQUIRED","current_execution_promotion":"BLOCKED","generated_in_current_run":false,"row_valid_until":"2026-10-23T08:28:00-04:00","expired_at_build":true,"provider_limitations":[],"provider_blockers":["work_packet_row_expired"]}}
-```
-
-```json
-{"ticker":"UNH","display_name":"UNH","is_held":false,"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","last_price":423.5,"market_data_asof":"2026-10-23T08:00:00-04:00","session_vwap":422.40519394040285,"relative_volume":0.01982517461922601,"spread_bps":null,"day_high":null,"day_low":null,"execution_condition_ko":"거래소 달력·세션·호가 시각·스프레드와 같은 날 뉴스의 실제 공표시각을 확인한다. 제공된 시계나 날짜만으로 체결 조건 충족 또는 만료를 추정하지 않는다. / 415.00–417.13에서 완성된 두 개의 5분봉에 걸친 안정과 저점 상승을 관찰한다. 당일 거래량가중평균가격 지지와 동일 경과시간 대비 상대거래량 1.2 이상이 필요하지만 손익비가 부족하면 매수하지 않는다.","risk_condition_ko":"415 이하 하락, 종가 확인 후 신규 진입 보류·보유 위험 대응 계획 재확인","decision_state_ko":"데이터 확인 전 대기","data_status_ko":"시세 유효기간 만료","reference_strategy":{"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","decision_state_ko":"-","market_data_asof":"2026-10-23T08:00:00-04:00"},"quality_at_build":{"execution_ready":false,"data_ready":false,"action_ready":false,"action_status":"DATA_RECHECK_REQUIRED","current_execution_promotion":"BLOCKED","generated_in_current_run":false,"row_valid_until":"2026-10-23T08:03:00-04:00","expired_at_build":true,"provider_limitations":[],"provider_blockers":["work_packet_row_expired"]}}
-```
-
-```json
-{"ticker":"MDT","display_name":"MDT","is_held":false,"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","last_price":95.2944,"market_data_asof":"2026-10-23T07:45:00-04:00","session_vwap":96.32748538011695,"relative_volume":0.0002962430303538988,"spread_bps":null,"day_high":null,"day_low":null,"execution_condition_ko":"신규 매수 검토 전에 실제 보유·순자산·현금·관련 노출을 확인한다. 확인된 한도 초과는 지지선 이탈을 기다리지 않고 축소한다. / 96.66 돌파 후 96.50–96.66 재시험 지지, 실시간 거래량가중평균가격 상회, 이상치 영향을 조정한 동시간대 상대거래량 1.2 이상을 확인한다. 모두 제안된 조건이며 현재 관측값이 아니다.","risk_condition_ko":"92.67 이하 하락, 2개 봉 확인 후 신규 진입 보류·보유 위험 대응 계획 재확인","decision_state_ko":"데이터 확인 전 대기","data_status_ko":"시세 유효기간 만료","reference_strategy":{"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","decision_state_ko":"-","market_data_asof":"2026-10-23T07:45:00-04:00"},"quality_at_build":{"execution_ready":false,"data_ready":false,"action_ready":false,"action_status":"DATA_RECHECK_REQUIRED","current_execution_promotion":"BLOCKED","generated_in_current_run":false,"row_valid_until":"2026-10-23T07:48:00-04:00","expired_at_build":true,"provider_limitations":[],"provider_blockers":["work_packet_row_expired"]}}
-```
-
-```json
-{"ticker":"IBM","display_name":"IBM","is_held":false,"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","last_price":250.236,"market_data_asof":"2026-10-23T07:05:00-04:00","session_vwap":249.85066803699897,"relative_volume":0.033080112663792134,"spread_bps":null,"day_high":null,"day_low":null,"execution_condition_ko":"제공된 공시 목록의 원문과 공개·접수 시각, 재무 표시통화·배율·기간·주식 및 예탁증서 기준을 확인한다. 잠정 현금흐름·배당충당·유동성 수치를 확정 사실로 사용하지 않는다. / 제공된 판단 시각 2026-10-23T07:22:12.235674-04:00은 최초 검토 시각 10:30 이전이다. 실제 거래일·정규장 운영·거래정지·호가 신선도는 별도 확인이 필요하며, 07:05 장전 분석 자료는 정규장 조건 충족의 증거가 아니다.","risk_condition_ko":"248.34 이하 하락, 다음 거래일 확인 후 신규 진입 보류·보유 위험 대응 계획 재확인","decision_state_ko":"데이터 확인 전 대기","data_status_ko":"시세 유효기간 만료","reference_strategy":{"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","decision_state_ko":"-","market_data_asof":"2026-10-23T07:05:00-04:00"},"quality_at_build":{"execution_ready":false,"data_ready":false,"action_ready":false,"action_status":"DATA_RECHECK_REQUIRED","current_execution_promotion":"BLOCKED","generated_in_current_run":false,"row_valid_until":"2026-10-23T07:08:00-04:00","expired_at_build":true,"provider_limitations":[],"provider_blockers":["work_packet_row_expired"]}}
-```
-
-```json
-{"ticker":"AMT","display_name":"AMT","is_held":false,"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","last_price":181.57,"market_data_asof":"2026-10-23T07:35:00-04:00","session_vwap":191.2822906940554,"relative_volume":0.02002628571645697,"spread_bps":null,"day_high":null,"day_low":null,"execution_condition_ko":"거래일 달력·휴장 또는 조기 종료·실제 장 상태·거래정지 여부·최신 매수매도 호가·실제 5분봉·정규장 거래량가중평균가격을 확인한다. / 미국 동부시간 10:30 이후의 검증된 정규장에서 177.10–177.23 지지, 178.00 부근 회복, 높아지는 5분봉 저점과 동시간대 상대 거래량 1.2배 이상을 관찰한다.","risk_condition_ko":"177.1 이하 하락, 종가 확인 후 신규 진입 보류·보유 위험 대응 계획 재확인","decision_state_ko":"데이터 확인 전 대기","data_status_ko":"시세 유효기간 만료","reference_strategy":{"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","decision_state_ko":"-","market_data_asof":"2026-10-23T07:35:00-04:00"},"quality_at_build":{"execution_ready":false,"data_ready":false,"action_ready":false,"action_status":"DATA_RECHECK_REQUIRED","current_execution_promotion":"BLOCKED","generated_in_current_run":false,"row_valid_until":"2026-10-23T07:38:00-04:00","expired_at_build":true,"provider_limitations":[],"provider_blockers":["work_packet_row_expired"]}}
-```
-
-```json
-{"ticker":"TXN","display_name":"Texas Instruments","is_held":false,"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","last_price":279.5,"market_data_asof":"2026-10-23T07:35:00-04:00","session_vwap":280.7187655550025,"relative_volume":0.006639470121372339,"spread_bps":null,"day_high":null,"day_low":null,"execution_condition_ko":"2026-10-23T07:53:01.558750-04:00은 판단 시각이지 실제 거래 세션이나 호가 신선도의 증거가 아니다. 거래소 달력·거래정지·실제 세션·최신 호가·매수매도 차이를 확인한다. 제공된 07:35 관측치는 지연된 개장 전 자료다. / 270.90–274.16 시험 뒤 274.16 회복, 상승하는 완료 5분봉 저점, 당일 거래량가중평균가격 회복을 감시한다. 실제 손절선과 비용을 적용해도 첫 저항까지 보상·위험 조건이 남아야 한다.","risk_condition_ko":"270.9 이하 하락, 종가 확인 후 신규 진입 보류·보유 위험 대응 계획 재확인","decision_state_ko":"데이터 확인 전 대기","data_status_ko":"시세 유효기간 만료","reference_strategy":{"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","decision_state_ko":"-","market_data_asof":"2026-10-23T07:35:00-04:00"},"quality_at_build":{"execution_ready":false,"data_ready":false,"action_ready":false,"action_status":"DATA_RECHECK_REQUIRED","current_execution_promotion":"BLOCKED","generated_in_current_run":false,"row_valid_until":"2026-10-23T07:38:00-04:00","expired_at_build":true,"provider_limitations":[],"provider_blockers":["work_packet_row_expired"]}}
-```
-
-```json
-{"ticker":"JNJ","display_name":"JNJ","is_held":false,"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","last_price":265.6807,"market_data_asof":"2026-10-23T07:10:00-04:00","session_vwap":265.9911711243833,"relative_volume":0.00982853814053744,"spread_bps":null,"day_high":null,"day_low":null,"execution_condition_ko":"기준시각 2026-10-23T07:24:12.332354-04:00에서 최초 검토시각 2026-10-23T10:30:00-04:00은 미래다. 이는 만료시각이 아니며 거래일과 정규장 여부도 별도 확인해야 한다. 검증된 주문 유효기한이 없어 조건부 매수는 비활성 상태다. / 눌림목 경로는 264.50–265.00 시험 후 265.00 위에서 두 번 연속 5분봉 종가 확인, 정규장 거래량가중평균가격 지지, 같은 시간대 기준 상대거래량 1.2 이상을 요구한다. 269.67만 목표로 하는 거래는 거절한다.","risk_condition_ko":"264.5 이하 하락, 종가 확인 후 신규 진입 보류·보유 위험 대응 계획 재확인","decision_state_ko":"데이터 확인 전 대기","data_status_ko":"시세 유효기간 만료","reference_strategy":{"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","decision_state_ko":"-","market_data_asof":"2026-10-23T07:10:00-04:00"},"quality_at_build":{"execution_ready":false,"data_ready":false,"action_ready":false,"action_status":"DATA_RECHECK_REQUIRED","current_execution_promotion":"BLOCKED","generated_in_current_run":false,"row_valid_until":"2026-10-23T07:13:00-04:00","expired_at_build":true,"provider_limitations":[],"provider_blockers":["work_packet_row_expired"]}}
+{"ticker":"PG","display_name":"PG","is_held":false,"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","last_price":null,"market_data_asof":null,"session_vwap":null,"relative_volume":null,"spread_bps":null,"day_high":null,"day_low":null,"execution_condition_ko":"추가 실행 조건 없음","risk_condition_ko":"현재 명시된 위험 행동 없음","decision_state_ko":"데이터 확인 전 대기","data_status_ko":"시세 시각 확인 필요","reference_strategy":{"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","decision_state_ko":"-","market_data_asof":null},"quality_at_build":{"execution_ready":false,"data_ready":false,"action_ready":false,"action_status":"DATA_RECHECK_REQUIRED","current_execution_promotion":"BLOCKED","generated_in_current_run":false,"row_valid_until":null,"expired_at_build":false,"provider_limitations":[],"provider_blockers":["work_packet_row_invalid_timestamp"]}}
 ```
 
 ```json
 {"ticker":"SHEL","display_name":"SHEL","is_held":false,"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","last_price":null,"market_data_asof":null,"session_vwap":null,"relative_volume":null,"spread_bps":null,"day_high":null,"day_low":null,"execution_condition_ko":"추가 실행 조건 없음","risk_condition_ko":"현재 명시된 위험 행동 없음","decision_state_ko":"데이터 확인 전 대기","data_status_ko":"시세 시각 확인 필요","reference_strategy":{"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","decision_state_ko":"-","market_data_asof":null},"quality_at_build":{"execution_ready":false,"data_ready":false,"action_ready":false,"action_status":"DATA_RECHECK_REQUIRED","current_execution_promotion":"BLOCKED","generated_in_current_run":false,"row_valid_until":null,"expired_at_build":false,"provider_limitations":[],"provider_blockers":["work_packet_row_invalid_timestamp"]}}
+```
+
+```json
+{"ticker":"SPG","display_name":"에스피지","is_held":false,"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","last_price":null,"market_data_asof":null,"session_vwap":null,"relative_volume":null,"spread_bps":null,"day_high":null,"day_low":null,"execution_condition_ko":"추가 실행 조건 없음","risk_condition_ko":"현재 명시된 위험 행동 없음","decision_state_ko":"데이터 확인 전 대기","data_status_ko":"시세 시각 확인 필요","reference_strategy":{"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","decision_state_ko":"-","market_data_asof":null},"quality_at_build":{"execution_ready":false,"data_ready":false,"action_ready":false,"action_status":"DATA_RECHECK_REQUIRED","current_execution_promotion":"BLOCKED","generated_in_current_run":false,"row_valid_until":null,"expired_at_build":false,"provider_limitations":[],"provider_blockers":["work_packet_row_invalid_timestamp"]}}
+```
+
+```json
+{"ticker":"TXN","display_name":"Texas Instruments","is_held":false,"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","last_price":286.56,"market_data_asof":"2026-10-26T07:55:00-04:00","session_vwap":285.5048430603237,"relative_volume":0.05237091902454861,"spread_bps":null,"day_high":null,"day_low":null,"execution_condition_ko":"추가 실행 조건 없음","risk_condition_ko":"현재 명시된 위험 행동 없음","decision_state_ko":"데이터 확인 전 대기","data_status_ko":"시세 유효기간 만료","reference_strategy":{"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","decision_state_ko":"-","market_data_asof":"2026-10-26T07:55:00-04:00"},"quality_at_build":{"execution_ready":false,"data_ready":false,"action_ready":false,"action_status":"DATA_RECHECK_REQUIRED","current_execution_promotion":"BLOCKED","generated_in_current_run":false,"row_valid_until":"2026-10-26T07:58:00-04:00","expired_at_build":true,"provider_limitations":[],"provider_blockers":["work_packet_row_expired"]}}
+```
+
+```json
+{"ticker":"UNH","display_name":"UNH","is_held":false,"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","last_price":null,"market_data_asof":null,"session_vwap":null,"relative_volume":null,"spread_bps":null,"day_high":null,"day_low":null,"execution_condition_ko":"추가 실행 조건 없음","risk_condition_ko":"현재 명시된 위험 행동 없음","decision_state_ko":"데이터 확인 전 대기","data_status_ko":"시세 시각 확인 필요","reference_strategy":{"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","decision_state_ko":"-","market_data_asof":null},"quality_at_build":{"execution_ready":false,"data_ready":false,"action_ready":false,"action_status":"DATA_RECHECK_REQUIRED","current_execution_promotion":"BLOCKED","generated_in_current_run":false,"row_valid_until":null,"expired_at_build":false,"provider_limitations":[],"provider_blockers":["work_packet_row_invalid_timestamp"]}}
+```
+
+```json
+{"ticker":"URI","display_name":"United Rentals","is_held":false,"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","last_price":null,"market_data_asof":null,"session_vwap":null,"relative_volume":null,"spread_bps":null,"day_high":null,"day_low":null,"execution_condition_ko":"추가 실행 조건 없음","risk_condition_ko":"현재 명시된 위험 행동 없음","decision_state_ko":"데이터 확인 전 대기","data_status_ko":"시세 시각 확인 필요","reference_strategy":{"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","decision_state_ko":"-","market_data_asof":null},"quality_at_build":{"execution_ready":false,"data_ready":false,"action_ready":false,"action_status":"DATA_RECHECK_REQUIRED","current_execution_promotion":"BLOCKED","generated_in_current_run":false,"row_valid_until":null,"expired_at_build":false,"provider_limitations":[],"provider_blockers":["work_packet_row_invalid_timestamp"]}}
+```
+
+```json
+{"ticker":"V","display_name":"V","is_held":false,"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","last_price":null,"market_data_asof":null,"session_vwap":null,"relative_volume":null,"spread_bps":null,"day_high":null,"day_low":null,"execution_condition_ko":"추가 실행 조건 없음","risk_condition_ko":"현재 명시된 위험 행동 없음","decision_state_ko":"데이터 확인 전 대기","data_status_ko":"시세 시각 확인 필요","reference_strategy":{"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","decision_state_ko":"-","market_data_asof":null},"quality_at_build":{"execution_ready":false,"data_ready":false,"action_ready":false,"action_status":"DATA_RECHECK_REQUIRED","current_execution_promotion":"BLOCKED","generated_in_current_run":false,"row_valid_until":null,"expired_at_build":false,"provider_limitations":[],"provider_blockers":["work_packet_row_invalid_timestamp"]}}
+```
+
+```json
+{"ticker":"XOM","display_name":"XOM","is_held":false,"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","last_price":null,"market_data_asof":null,"session_vwap":null,"relative_volume":null,"spread_bps":null,"day_high":null,"day_low":null,"execution_condition_ko":"추가 실행 조건 없음","risk_condition_ko":"현재 명시된 위험 행동 없음","decision_state_ko":"데이터 확인 전 대기","data_status_ko":"시세 시각 확인 필요","reference_strategy":{"strategy_code":"DATA_CHECK","strategy_ko":"데이터 확인 전 대기","decision_state_ko":"-","market_data_asof":null},"quality_at_build":{"execution_ready":false,"data_ready":false,"action_ready":false,"action_status":"DATA_RECHECK_REQUIRED","current_execution_promotion":"BLOCKED","generated_in_current_run":false,"row_valid_until":null,"expired_at_build":false,"provider_limitations":[],"provider_blockers":["work_packet_row_invalid_timestamp"]}}
 ```
 
 ## 별도로 발행된 Work 보고서 — 현재 입력과 시각이 다를 수 있음
