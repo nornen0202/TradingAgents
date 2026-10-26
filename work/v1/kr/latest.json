@@ -1,13 +1,13 @@
 {
   "schema": "tradingagents.work-context/v1",
   "surface": "kr",
-  "event_id": "kr:645f89d2cd363458a1c6b1e1195324be",
+  "event_id": "kr:27b11c28cd6bb0fa755dd09e9f8f2572",
   "prompt_contract_version": "market-work-v12-kr",
   "prompt_sha256": "ce58e681561b3a6ddb646ea4fc0c4aabaf4bbf140a3894b895f30f0f954092dc",
   "skill_sha256": "4dffe28b3721557cc2517b5afff2f94045832606e71ff61461df969f6abb53c7",
   "task_manifest_sha256": "c0992fa275c9961bc91c679030c0b4d9b8b06f3d164226776421f1e354b5c22e",
   "workflow_contract_sha256": "ddf0892f9079721a3c716f1f1aab8216028890c541e722a0ec83feef9c09b18c",
-  "source_sha256": "4bb428510bebbb48a987cfa16fc3b838378e117f4dbc773024611fa53e1cf84e",
+  "source_sha256": "2a0bac9172b60846fadbb0f26353cdf05d4467344949ba8b0b43f52e27cb8cbc",
   "body": {
     "kind": "market",
     "market": "KR",
@@ -1255,15 +1255,15 @@
         "source_health": "OK",
         "coverage": {
           "total_unique_events": 489,
-          "window_events": 30,
+          "window_events": 27,
           "transmitted_events": 12,
           "truncated": true,
-          "oldest_occurred_at": "2026-10-23T10:28:20+00:00",
+          "oldest_occurred_at": "2026-10-23T11:00:13+00:00",
           "newest_occurred_at": "2026-10-25T11:00:26+00:00",
-          "available_events_before_context_cap": 30,
+          "available_events_before_context_cap": 27,
           "context_event_cap": 12,
-          "omitted_events": 18,
-          "omitted_due_to_context_cap": 18,
+          "omitted_events": 15,
+          "omitted_due_to_context_cap": 15,
           "omitted_before_context_selection": 0
         },
         "events": [
@@ -2202,153 +2202,6 @@
             }
           },
           {
-            "event_key": "mJGcENdLVOQ",
-            "content_sha256": "9cb318b6dc4b3cd360c6c3684c1925ac53d5d75bd7a1382c943a6f28df323b56",
-            "occurred_at": "2026-10-23T10:28:20+00:00",
-            "relevance": {
-              "tickers": [
-                "^KS11",
-                "META",
-                "MSFT",
-                "AMZN",
-                "GOOGL",
-                "000660",
-                "005930",
-                "NVDA",
-                "CRWV",
-                "BZ=F"
-              ],
-              "markets": [
-                "US",
-                "KR"
-              ],
-              "themes": [],
-              "match_basis": "verified_entities",
-              "matched_tickers": [
-                "000660",
-                "005930"
-              ],
-              "market_match": true,
-              "score": 220
-            },
-            "summary": {
-              "video_id": "mJGcENdLVOQ",
-              "title": "투자자들이 꼭 알아야 하는 다음 주 투자 포인트(10.26~10.30)",
-              "channel": "경제사냥꾼",
-              "source_url": "https://www.youtube.com/watch?v=mJGcENdLVOQ",
-              "claim_status_summary": {
-                "unverified": 11,
-                "partially_supported": 1
-              },
-              "claims": [
-                {
-                  "claim_id": "C1",
-                  "claim_text": "코스피의 7월 급락·7월 31일 약 18% 반등 및 역대 기록, 10월 15일 서킷브레이커, 10월 22일 하락과 고점 대비 약 39% 낙폭, 삼성전자·SK하이닉스 주가 및 투자자별 매매 수치가 영상 설명과 일치한다.",
-                  "status": "unverified",
-                  "confidence": 0.99,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "급등락 기록과 수급 수치를 확인된 역사적 근거로 사용하지 말고 KRX 일별 원자료와 거래중단 공지를 확인해야 한다."
-                },
-                {
-                  "claim_id": "C2",
-                  "claim_text": "메타의 3분기 매출·설비투자·현금흐름·법률 비용과 무의결권 C주 배분 구조, 실적 발표 이후 주가 -6.98%가 영상 설명과 일치한다.",
-                  "status": "unverified",
-                  "confidence": 0.98,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "잉여현금흐름 악화와 자금조달 부담의 규모는 공시 확인 전 확정할 수 없으며, 영업이익 감소를 전부 AI 투자 탓으로 돌릴 근거도 없다."
-                },
-                {
-                  "claim_id": "C3",
-                  "claim_text": "MSFT·알파벳은 한국시간 10월 29일, 아마존은 10월 30일, 애플은 11월 3일 실적을 발표하며, MSFT 투자·Azure 성장 및 아마존 현금흐름·AWS 성장·가이던스가 영상 수치와 일치한다.",
-                  "status": "unverified",
-                  "confidence": 0.99,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "발표 일정과 동일 기간·동일 정의의 현금흐름을 먼저 확인하고, 클라우드 성장만으로 투자 회수나 한국 반도체 수요를 확정하지 않아야 한다."
-                },
-                {
-                  "claim_id": "C4",
-                  "claim_text": "SK하이닉스의 10월 28일 실적 설명회, 77조 원 영업이익 컨센서스와 하향 조정, 7월 실적·고객 계약, 40조 원 자사주 매입·소각 계획 및 솔리다임 상장 검토 중단이 영상 설명과 일치한다.",
-                  "status": "partially_supported",
-                  "confidence": 0.94,
-                  "supporting_evidence_ids": [
-                    "M_SKH_NEWS"
-                  ],
-                  "manual_check_required": true,
-                  "investor_implication": "상장 검토 중단은 일부 뒷받침되지만 투자 재원 부족이나 추가 환원 규모까지 입증하지 않는다. 77조 원 기대치와 40조 원 자사주 수치는 확인 전 투자 기준으로 확정하지 않아야 한다."
-                }
-              ],
-              "entities": [
-                {
-                  "ticker": "^KS11",
-                  "name": "코스피",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                },
-                {
-                  "ticker": "META",
-                  "name": "메타",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                },
-                {
-                  "ticker": "MSFT",
-                  "name": "마이크로소프트",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                },
-                {
-                  "ticker": "AMZN",
-                  "name": "아마존",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                },
-                {
-                  "ticker": "GOOGL",
-                  "name": "알파벳",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                },
-                {
-                  "ticker": "000660",
-                  "name": "SK하이닉스",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "시장 데이터 조회 실패: no_usable_market_fields"
-                  ]
-                },
-                {
-                  "ticker": "005930",
-                  "name": "삼성전자",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "시장 데이터 조회 실패: no_usable_market_fields"
-                  ]
-                },
-                {
-                  "ticker": "NVDA",
-                  "name": "엔비디아",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                }
-              ]
-            }
-          },
-          {
             "event_key": "UcOMutnpjIs",
             "content_sha256": "f4ca83a74fe02618ddfbc8686b8eb7f199285acf94143180a45c715cbda55a48",
             "occurred_at": "2026-10-23T12:30:24+00:00",
@@ -2680,6 +2533,69 @@
                 }
               ]
             }
+          },
+          {
+            "event_key": "Xxu5sqHcCbA",
+            "content_sha256": "64419a7b6a18fbc571ebf36e306744b44df38edae8e1d7613fff6cfc50b5cee8",
+            "occurred_at": "2026-10-25T08:30:30+00:00",
+            "relevance": {
+              "tickers": [],
+              "markets": [],
+              "themes": [],
+              "match_basis": "title_and_claim_context",
+              "matched_tickers": [],
+              "market_match": false,
+              "score": 0
+            },
+            "summary": {
+              "video_id": "Xxu5sqHcCbA",
+              "title": "반도체 소부장 아직 끝나지 않았다! / ESS 내년 실적 개선, 2차전지 지금이 매수 기회일까?ㅣ이영훈 이사",
+              "channel": "815Money talk",
+              "source_url": "https://www.youtube.com/watch?v=Xxu5sqHcCbA",
+              "claim_status_summary": {
+                "unverified": 8,
+                "asr_uncertain": 2
+              },
+              "claims": [
+                {
+                  "claim_id": "C1",
+                  "claim_text": "삼성바이오로직스의 론자 대비 과거 40~50%, 최대 두 배 이상 밸류에이션 프리미엄이 소진됐고 양사 성장률도 유사하다는 평가.",
+                  "status": "unverified",
+                  "confidence": 0.99,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "상대적 저평가가 확인된 것으로 해석하지 말고 동일 기준의 배수와 성장률을 재계산해야 한다."
+                },
+                {
+                  "claim_id": "C2",
+                  "claim_text": "셀트리온은 산도즈 대비 과거 두 배 이상이던 밸류에이션이 현재 유사해졌고 수익성·성장률은 더 높다. 약 7년간 20만 원 부근 상단에 눌렸으며 발언상 올해 24만 원대까지 상승했다는 주장.",
+                  "status": "unverified",
+                  "confidence": 0.99,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "가격 정체나 상대배수 수렴을 매수 근거로 확정할 수 없다."
+                },
+                {
+                  "claim_id": "C3",
+                  "claim_text": "고용량 졸레어 바이오시밀러를 셀트리온만 출시했으며 유럽·미국 판매 성장과 일본 출시가 이익 확대를 이끈다는 주장.",
+                  "status": "asr_uncertain",
+                  "confidence": 0.99,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "고용량 제품의 독점적 지위와 해외 판매 확대를 이익 추정에 반영하기 전에 확인해야 한다."
+                },
+                {
+                  "claim_id": "C4",
+                  "claim_text": "셀트리온의 3분기 영업이익이 처음 5천억 원을 돌파했고 단순 연환산으로 2조 원을 넘으며, 차년도 증권사 전망은 2조~2조 5천억 원이라는 주장. 5천억 원은 문맥상 추정이다.",
+                  "status": "asr_uncertain",
+                  "confidence": 0.99,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "추정 복원한 분기 이익이나 출처 없는 차년도 전망을 확정 실적으로 사용하면 안 된다."
+                }
+              ],
+              "entities": []
+            }
           }
         ],
         "execution_eligible": false
@@ -2716,22 +2632,22 @@
               "BRhAgo6VIds",
               "6esEt4-hjqw",
               "hNnkvxAZb5U",
-              "mJGcENdLVOQ",
               "UcOMutnpjIs",
               "Zf1zPKS3gmU",
-              "b2my6Nq32rs"
+              "b2my6Nq32rs",
+              "Xxu5sqHcCbA"
             ],
             "coverage": {
               "total_unique_events": 489,
-              "window_events": 30,
+              "window_events": 27,
               "transmitted_events": 12,
               "truncated": true,
-              "oldest_occurred_at": "2026-10-23T10:28:20+00:00",
+              "oldest_occurred_at": "2026-10-23T11:00:13+00:00",
               "newest_occurred_at": "2026-10-25T11:00:26+00:00",
-              "available_events_before_context_cap": 30,
+              "available_events_before_context_cap": 27,
               "context_event_cap": 12,
-              "omitted_events": 18,
-              "omitted_due_to_context_cap": 18,
+              "omitted_events": 15,
+              "omitted_due_to_context_cap": 15,
               "omitted_before_context_selection": 0
             }
           },
