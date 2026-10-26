@@ -2074,6 +2074,7 @@ def _run_single_ticker(
             generated_at=ticker_started,
             language=config.run.output_language,
             settings={**graph_config, "analysts": list(config.run.analysts)},
+            presentation_diagnostics=_presentation_diagnostics(graph),
         )
         final_state_path = ticker_dir / "final_state.json"
         _write_json(final_state_path, _serialize_final_state(final_state))
@@ -2123,6 +2124,7 @@ def _run_single_ticker(
                 f"::warning::{ticker} same-day analysis completed without get_intraday_snapshot tool usage."
             )
         analysis_payload = {
+            "presentation_diagnostics": _presentation_diagnostics(graph),
             "decision_provenance": decision_trace.receipt(),
             "daily_history_evidence": history_recorder.receipt(),
             "research_market_observation": observation_recorder.receipt(),
@@ -2317,6 +2319,7 @@ def _run_single_ticker(
         }
     except Exception as exc:
         error_payload = {
+            "presentation_diagnostics": _presentation_diagnostics(graph),
             "decision_provenance": decision_trace.receipt(),
             "daily_history_evidence": history_recorder.receipt(),
             "research_market_observation": observation_recorder.receipt(),
@@ -2504,6 +2507,58 @@ def _graph_config(config: ScheduledAnalysisConfig, engine_results_dir: Path) -> 
     if config.llm.codex_binary:
         graph_config["codex_binary"] = config.llm.codex_binary
     return graph_config
+
+
+def _presentation_diagnostics(graph) -> dict[str, Any]:
+    """Only copy the closed, presentation-only receipt; never mask a run error."""
+    result = {"schema": "tradingagents.presentation-diagnostics/v1", "status": "UNVERIFIED",
+              "language_completion": "NOT_VERIFIED", "reason_code": None,
+              "original_preserved_fields": [], "financial_action_fields_modified": False,
+              "execution_authorized": False}
+    try:
+        value = getattr(graph, "presentation_diagnostics", None)
+        if value is None:
+            result["status"] = "NOT_RECORDED"
+            return result
+        if type(value) is not dict or set(value) != set(result):
+            return result
+        status = value["status"]
+        completion = {"NOT_REQUIRED": "NOT_REQUIRED", "STARTED": "NOT_INDEPENDENTLY_VERIFIED",
+                      "PROCESSED": "NOT_INDEPENDENTLY_VERIFIED", "DEGRADED": "INCOMPLETE_PRESERVED_ORIGINAL"}
+        if (type(status) is not str or status not in completion
+                or value["schema"] != result["schema"] or type(value["schema"]) is not str
+                or type(value["language_completion"]) is not str
+                or value["language_completion"] != completion[status]
+                or value["financial_action_fields_modified"] is not False
+                or value["execution_authorized"] is not False):
+            return result
+        reason = "CODEX_APP_SERVER_PRESENTATION_ERROR" if status == "DEGRADED" else None
+        if value["reason_code"] != reason or (reason is not None and type(value["reason_code"]) is not str):
+            return result
+        fields = value["original_preserved_fields"]
+        known_fields = {"market_report", "sentiment_report", "news_report", "fundamentals_report", "trader_investment_plan",
+                        "investment_debate_state.bull_history", "investment_debate_state.bear_history",
+                        "investment_debate_state.judge_decision", "risk_debate_state.aggressive_history",
+                        "risk_debate_state.conservative_history", "risk_debate_state.neutral_history",
+                        "risk_debate_state.judge_decision"}
+        if type(fields) is not list or len(fields) > 12 or bool(fields) != (status == "DEGRADED"):
+            return result
+        clean_fields, seen = [], set()
+        for index, field in enumerate(fields):
+            if type(field) is not dict or set(field) != {"field", "disposition", "original_text_sha256"}:
+                return result
+            path, digest = field["field"], field["original_text_sha256"]
+            disposition = "PROVIDER_ERROR" if index == 0 else "SKIPPED_AFTER_PROVIDER_ERROR"
+            if (type(path) is not str or path not in known_fields or path in seen
+                    or type(field["disposition"]) is not str or field["disposition"] != disposition
+                    or digest is not None and (type(digest) is not str or not re.fullmatch(r"[0-9a-f]{64}", digest))):
+                return result
+            seen.add(path)
+            clean_fields.append({"field": path, "disposition": disposition, "original_text_sha256": digest})
+        return {**result, "status": status, "language_completion": completion[status],
+                "reason_code": reason, "original_preserved_fields": clean_fields}
+    except Exception:
+        return result
 
 
 def _select_public_decision(final_state: dict[str, Any], decision: Any) -> str:

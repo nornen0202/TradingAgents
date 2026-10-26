@@ -4,6 +4,7 @@ import json
 import errno
 import os
 import queue
+import re
 import shutil
 import subprocess
 import threading
@@ -90,7 +91,13 @@ class CodexAppServerSession:
     ) -> None:
         self.codex_binary = codex_binary
         self.request_timeout = float(request_timeout or 0)
-        self.workspace_dir = str(Path(workspace_dir).expanduser().resolve())
+        if (not isinstance(workspace_dir, str) or not workspace_dir.strip()
+                or any(ord(char) < 32 or ord(char) == 127 for char in workspace_dir)):
+            raise CodexAppServerStorageError("Codex workspace path is invalid.")
+        self._workspace_path = Path(workspace_dir).expanduser().absolute()
+        if ".." in self._workspace_path.parts:
+            raise CodexAppServerStorageError("Codex workspace path is invalid.")
+        self.workspace_dir = str(self._workspace_path.resolve())
         self.cleanup_threads = cleanup_threads
         self.client_name = client_name
         self.client_title = client_title
@@ -104,28 +111,43 @@ class CodexAppServerSession:
         self._reader_thread: threading.Thread | None = None
         self._stderr_thread: threading.Thread | None = None
         self._codex_home: Path | None = None
+        self._sqlite_home: Path | None = None
+        self._sqlite_owner: tuple[Path, int, int] | None = None
 
     def start(self) -> None:
         with self._lock:
             if self._proc is not None:
                 return
 
-            Path(self.workspace_dir).mkdir(parents=True, exist_ok=True)
+            self._ordinary_directory(self._workspace_path, create=True)
+            if self._workspace_path.resolve() != Path(self.workspace_dir):
+                raise CodexAppServerStorageError("Codex workspace boundary changed.")
 
             binary = resolve_codex_binary(self.codex_binary)
             if not binary:
                 raise CodexAppServerBinaryError(codex_binary_error_message(self.codex_binary))
             self.codex_binary = binary
             codex_home = Path(self.workspace_dir) / ".codex-home"
-            codex_home.mkdir(parents=True, exist_ok=True)
+            self._ordinary_directory(codex_home, create=True)
             self._codex_home = codex_home
+            sqlite_home = codex_home / ("sqlite-session-" + uuid.uuid4().hex)
+            # UUID + exclusive mkdir gives this start ownership of a new scope.
+            # Never copy, migrate or reuse a worker's existing SQLite databases.
+            sqlite_home.mkdir(exist_ok=False)
+            self._ordinary_directory(sqlite_home)
+            info = sqlite_home.stat()
+            self._sqlite_home = sqlite_home
+            self._sqlite_owner = (sqlite_home, info.st_dev, info.st_ino)
             self._seed_codex_home(codex_home)
+            self._owned_sqlite_home()
             proc_env = os.environ.copy()
             proc_env["CODEX_HOME"] = str(codex_home)
+            proc_env["CODEX_SQLITE_HOME"] = str(sqlite_home)
 
             try:
                 self._proc = subprocess.Popen(
-                    [binary, "app-server", "--listen", "stdio://"],
+                    [binary, "app-server", "--listen", "stdio://", "-c",
+                     "sqlite_home=" + json.dumps(str(sqlite_home), ensure_ascii=False)],
                     stdin=subprocess.PIPE,
                     stdout=subprocess.PIPE,
                     stderr=subprocess.PIPE,
@@ -142,6 +164,40 @@ class CodexAppServerSession:
 
             self._start_reader_threads()
             self._initialize()
+
+    @staticmethod
+    def _ordinary_directory(path: Path, *, create: bool = False) -> None:
+        """Reject literal aliases before resolving or creating a private scope."""
+        def check():
+            for item in (path, *path.parents):
+                try:
+                    info = item.lstat()
+                except FileNotFoundError:
+                    continue
+                if item.is_symlink() or getattr(info, "st_file_attributes", 0) & 0x400:
+                    raise CodexAppServerStorageError("Codex SQLite path aliases are refused.")
+            if path.exists() and not path.is_dir():
+                raise CodexAppServerStorageError("Codex SQLite directory is invalid.")
+        check()
+        if create:
+            path.mkdir(parents=True, exist_ok=True)
+            check()
+        if not path.is_dir():
+            raise CodexAppServerStorageError("Codex SQLite directory is unavailable.")
+
+    def _owned_sqlite_home(self) -> Path:
+        owner = self._sqlite_owner
+        home = self._sqlite_home
+        if (owner is None or home is None or home != owner[0] or self._codex_home is None
+                or home.parent != self._codex_home
+                or re.fullmatch(r"sqlite-session-[a-f0-9]{32}", home.name) is None):
+            raise CodexAppServerStorageError("Codex SQLite scope ownership is unavailable.")
+        self._ordinary_directory(home)
+        info = home.stat()
+        if (home.resolve() != self._codex_home.resolve() / home.name
+                or (info.st_dev, info.st_ino) != owner[1:]):
+            raise CodexAppServerStorageError("Codex SQLite scope ownership changed.")
+        return home
 
     def _seed_codex_home(self, codex_home: Path) -> None:
         source_home = self._source_codex_home()
@@ -199,7 +255,6 @@ class CodexAppServerSession:
             proc = self._proc
             self._proc = None
             if proc is None:
-                self._prune_isolated_codex_logs()
                 return
 
             try:
@@ -212,28 +267,39 @@ class CodexAppServerSession:
                 proc.terminate()
                 proc.wait(timeout=2)
             except Exception:
-                proc.kill()
                 try:
+                    proc.kill()
                     proc.wait(timeout=2)
                 except Exception:
                     pass
             finally:
-                self._prune_isolated_codex_logs()
+                # A failed termination must never remove a live process's WAL.
+                try:
+                    stopped = type(proc.poll()) is int
+                except Exception:
+                    stopped = False
+                if stopped:
+                    self._prune_isolated_codex_logs()
+                else:
+                    # Keep ownership of an unconfirmed process for a later close.
+                    self._proc = proc
 
     def _prune_isolated_codex_logs(self) -> None:
         flag = os.environ.get("TRADINGAGENTS_CODEX_PRUNE_HOME_LOGS", "1").strip().lower()
         if flag in _FALSE_VALUES:
             return
 
-        codex_home = self._codex_home
-        if codex_home is None or codex_home.name != ".codex-home":
-            return
-
         try:
-            for path in codex_home.glob("logs_*.sqlite*"):
-                if path.is_file():
+            sqlite_home = self._owned_sqlite_home()
+            for path in sqlite_home.glob("logs_*.sqlite*"):
+                self._owned_sqlite_home()
+                info = path.lstat()
+                if (path.is_symlink() or getattr(info, "st_file_attributes", 0) & 0x400
+                        or path.resolve().parent != sqlite_home.resolve()):
+                    continue
+                if path.is_file() and info.st_nlink == 1:
                     path.unlink()
-        except OSError:
+        except (OSError, RuntimeError):
             return
 
     def account_read(self) -> dict[str, Any]:
