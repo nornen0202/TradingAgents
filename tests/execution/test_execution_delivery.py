@@ -46,8 +46,9 @@ def setup_handoff(tmp_path, monkeypatch):
 def test_handoff_preserves_existing_roots_and_independent_consumers(tmp_path, monkeypatch):
     manifest = setup_handoff(tmp_path, monkeypatch)
     seen = []
-    def paper(archive, root, *, lock_timeout):
+    def paper(archive, root, *, lock_timeout, follow_up_pending):
         assert lock_timeout == 15
+        assert follow_up_pending is True
         seen.append(root)
         raise TimeoutError()
     def strategy(archive, root, validation):
@@ -66,8 +67,9 @@ def test_handoff_preserves_existing_roots_and_independent_consumers(tmp_path, mo
 def test_handoff_never_retries_a_timed_out_consumer_callback(tmp_path, monkeypatch):
     manifest = setup_handoff(tmp_path, monkeypatch)
     attempts = {"paper": 0, "kis": 0}
-    def paper(*args, lock_timeout):
+    def paper(*args, lock_timeout, follow_up_pending):
         assert lock_timeout == 15
+        assert follow_up_pending is True
         attempts["paper"] += 1
         raise TimeoutError("consumer may already have made progress")
     def strategy(*args):

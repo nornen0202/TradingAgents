@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from os import PathLike, fspath
 from typing import Callable
 
 from .codex_app_server import (
@@ -78,7 +79,7 @@ def run_codex_preflight(
     codex_binary: str | None,
     model: str,
     request_timeout: float,
-    workspace_dir: str,
+    workspace_dir: str | PathLike[str],
     cleanup_threads: bool,
     fallback_models: list[str] | tuple[str, ...] | None = None,
     session_factory: Callable[..., CodexAppServerSession] = CodexAppServerSession,
@@ -92,7 +93,7 @@ def run_codex_preflight(
     session = session_factory(
         codex_binary=binary,
         request_timeout=request_timeout,
-        workspace_dir=workspace_dir,
+        workspace_dir=fspath(workspace_dir),
         cleanup_threads=cleanup_threads,
     )
 
