@@ -43,9 +43,16 @@ def require_storage_headroom(*paths):
     for path in paths:
         candidate = Path(path).resolve()
         while not candidate.exists():
+            if candidate.parent == candidate:
+                raise LocalStorageHeadroomError(f"Local analysis storage volume is unavailable: {candidate}")
             candidate = candidate.parent
-        if shutil.disk_usage(candidate).free < 4 * 1024**3:
-            raise LocalStorageHeadroomError("Local analysis needs at least 4 GiB of free output storage.")
+        free = shutil.disk_usage(candidate).free
+        if free < 4 * 1024**3:
+            raise LocalStorageHeadroomError(
+                f"Local analysis needs at least 4 GiB of free output storage: "
+                f"path={candidate}, free_bytes={free}, required_bytes={4 * 1024**3}. "
+                "Relocate both the archive and automation state; moving only the LLM workspace is insufficient."
+            )
 
 
 def script(name):
@@ -389,9 +396,27 @@ def run_due(archive, state, *, now=None, dry_run=False, research_only=False):
         decisions.append({"target": target.name, "status": "DUE"})
         if dry_run:
             continue
-        atomic_write_json(receipt_path, {"target": target.name, "attempts": attempts + 1, "started_at": now.isoformat(), "status": "STARTED"})
         profile = target.inputs["profile"]
         config = ROOT / "config" / ("scheduled_analysis_korea.toml" if profile == "kr" else "scheduled_analysis.toml")
+        # An infrastructure admission failure has not started any model work.
+        # Keep the existing research budget intact so a repaired volume can be
+        # used in this same window. Historical failed attempts are never reset.
+        from tradingagents.scheduled.config import load_scheduled_config
+        admission_error = None
+        try:
+            workspace = load_scheduled_config(config).llm.codex_workspace_dir
+            require_storage_headroom(archive, state, workspace)
+        except LocalStorageHeadroomError:
+            from tradingagents.notifications.local import queue_failure
+            queue_failure(state, stage="preflight", source_key=key,
+                          error_type="LocalStorageHeadroomError", finished_at=now.isoformat())
+            decisions[-1]["status"] = "STORAGE_BLOCKED"
+            return decisions
+        except Exception as exc:
+            # Configuration/IO errors retain the original terminal receipt and
+            # notification path; only known storage shortages defer admission.
+            admission_error = exc
+        atomic_write_json(receipt_path, {"target": target.name, "attempts": attempts + 1, "started_at": now.isoformat(), "status": "STARTED"})
         mode = "full" if target.workflow_file == "daily-codex-analysis.yml" else "overlay_only"
         args = [sys.executable, "-u", "-m", "tradingagents.scheduled", "--config", str(config),
                 "--archive-dir", str(archive), "--run-mode", mode, "--skip-site-build", "--strict",
@@ -408,8 +433,8 @@ def run_due(archive, state, *, now=None, dry_run=False, research_only=False):
         stage = "preflight" if mode == "full" else "analysis"
         exit_code, error_type = 1, "WorkerInterrupted"
         try:
-            from tradingagents.scheduled.config import load_scheduled_config
-            workspace = load_scheduled_config(config).llm.codex_workspace_dir
+            if admission_error is not None:
+                raise admission_error
             require_storage_headroom(archive, state, workspace)
             if mode == "full":
                 source = partial_target_source(manifests, target, window_start=window_start, now=now)

@@ -347,6 +347,7 @@ def test_failure_outbox_preserves_first_real_time_and_omits_error_text(tmp_path)
 
 
 def test_preflight_failure_records_terminal_attempt_and_queues_failure(tmp_path, monkeypatch):
+    monkeypatch.setattr(automation, "require_storage_headroom", lambda *paths: None)
     import tradingagents.scheduled.runner as scheduled
     target = SimpleNamespace(name='daily-codex-kr', workflow_file='daily-codex-analysis.yml', inputs={'profile': 'kr'},
                              window_start_kst=NOW, max_failed_attempts=2)

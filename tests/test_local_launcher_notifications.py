@@ -173,13 +173,15 @@ def test_real_wrapper_captures_fetch_failure_before_python(sandbox):
     assert calls[2].startswith("gh workflow run ")
 
 
-def test_concurrent_launchers_share_new_main_revision_without_fetch_race(sandbox):
+@pytest.mark.parametrize("external_runtime", [False, True])
+def test_concurrent_launchers_share_new_main_revision_without_fetch_race(sandbox, external_runtime):
     tmp_path, env = sandbox
     # Use real local Git repositories and a harmless worker; no remote service,
     # account configuration, publication, or notification is contacted.
     env["PATH"] = os.environ["PATH"]
     remote, writer = tmp_path / "remote.git", tmp_path / "writer"
     repo = Path(env["TA_TEST_REPO"])
+    runtime = tmp_path / "external-runtime" if external_runtime else repo / ".runtime"
     def git(*args, cwd=None):
         result = subprocess.run(["git", *map(str, args)], cwd=cwd, env=env,
                                 capture_output=True, text=True, timeout=15)
@@ -217,7 +219,7 @@ class Worker {
     for iteration in range(3):
         # Each iteration represents the next cache period. Workers within the
         # period deliberately share a single fetch under the repository mutex.
-        receipt = repo / ".runtime/local-automation/source-fetch.json"
+        receipt = runtime / "local-automation/source-fetch.json"
         if receipt.exists():
             saved = json.loads(receipt.read_text(encoding="utf-8-sig"))
             saved["checked_at"] = "2020-01-01T00:00:00Z"
@@ -228,15 +230,18 @@ class Worker {
         expected = git("rev-parse", "HEAD", cwd=writer)
         workers = [subprocess.Popen(
             [POWERSHELL, "-NoProfile", "-NonInteractive", "-File", str(WRAPPER),
-             "-Command", command, "-RepositoryRoot", str(repo), "-DryRun"],
+             "-Command", command, "-RepositoryRoot", str(repo), "-RuntimeRoot", str(runtime), "-DryRun"],
             env=env, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
             for command in ("run-due", "publish")]
         for worker in workers:
             _, stderr = worker.communicate(timeout=30)
             assert worker.returncode == 0, stderr
         assert all((results / command).read_text() == expected for command in ("run-due", "publish"))
-        assert (repo / f".runtime/local-automation/source/{expected}/tracked.txt").read_text() == str(iteration)
-    assert not (repo / ".runtime/local-automation/notifications").exists()
+        assert (runtime / f"local-automation/source/{expected}/tracked.txt").read_text() == str(iteration)
+    assert not (runtime / "local-automation/notifications").exists()
+    if external_runtime:
+        assert not (repo / ".runtime").exists()
+    assert (runtime / "temp").is_dir()
 
 
 def test_source_fetch_lock_wait_is_bounded_and_does_not_start_git(sandbox):

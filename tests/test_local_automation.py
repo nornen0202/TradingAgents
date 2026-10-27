@@ -30,6 +30,16 @@ def test_local_output_reserve_blocks_full_disk_before_auth(tmp_path, monkeypatch
             unpatched.require_storage_headroom(tmp_path / "not-created")
 
 
+def test_unmounted_volume_does_not_loop_forever(tmp_path, monkeypatch):
+    from importlib import util
+    spec = util.spec_from_file_location("missing_storage_test", Path(local.__file__))
+    unpatched = util.module_from_spec(spec)
+    spec.loader.exec_module(unpatched)
+    monkeypatch.setattr(Path, "exists", lambda _: False)
+    with pytest.raises(unpatched.LocalStorageHeadroomError, match="volume is unavailable"):
+        unpatched.require_storage_headroom(tmp_path / "disconnected-volume")
+
+
 def test_manual_finalization_counts_against_existing_budget_without_rewriting_history(tmp_path, monkeypatch):
     import hashlib
     from tradingagents.scheduled import runner
@@ -58,6 +68,40 @@ def target():
                            window_start_kst=datetime(2026, 10, 9, 8, 45, tzinfo=timezone.utc), max_failed_attempts=2)
 
 
+@pytest.mark.parametrize("overlay", [False, True])
+def test_storage_admission_does_not_spend_research_attempts(tmp_path, monkeypatch, overlay):
+    from tradingagents.scheduled import runner
+    from tradingagents.notifications import local as notifications
+    item = target()
+    if overlay:
+        item.workflow_file = "intraday-overlay-refresh.yml"
+    monkeypatch.setattr(local, "script", lambda _: SimpleNamespace(due_targets=lambda *a, **k: [item]))
+    monkeypatch.setattr(runner, "_iter_run_manifests_desc", lambda *a, **k: [])
+    monkeypatch.setattr(local, "full_research_session_hold", lambda *a, **k: None)
+    monkeypatch.setattr(local, "local_target_window_start", lambda *a, **k: item.window_start_kst)
+    def blocked(*paths):
+        raise local.LocalStorageHeadroomError("fixture disk full")
+    monkeypatch.setattr(local, "require_storage_headroom", blocked)
+    monkeypatch.setattr(local, "preflight", lambda *a: pytest.fail("No model work on a full volume"))
+    monkeypatch.setattr(local.subprocess, "run", lambda *a, **k: pytest.fail("No worker admitted"))
+    failures = []
+    monkeypatch.setattr(notifications, "queue_failure", lambda *a, **k: failures.append(k))
+    now = datetime(2026, 10, 9, 12, tzinfo=timezone.utc)
+    for _ in range(2):
+        assert local.run_due(tmp_path / "archive", tmp_path, now=now) == [
+            {"target": item.name, "status": "STORAGE_BLOCKED"}]
+    assert not (tmp_path / "attempts").exists()
+    assert failures[0]["source_key"] == failures[1]["source_key"]
+    monkeypatch.setattr(local, "require_storage_headroom", lambda *a: None)
+    monkeypatch.setattr(local, "preflight", lambda *a: None)
+    calls = []
+    monkeypatch.setattr(local.subprocess, "run", lambda *a, **k: calls.append(a) or SimpleNamespace(returncode=0))
+    assert local.run_due(tmp_path / "archive", tmp_path, now=now)[0]["status"] == "DUE"
+    assert len(calls) == 1
+    receipt, = (tmp_path / "attempts").glob("*.json")
+    assert json.loads(receipt.read_text())["attempts"] == 1
+
+
 def full_manifest():
     return {"started_at": "2026-10-09T09:00:00+00:00", "finished_at": "2026-10-09T10:00:00+00:00",
             "label": "local-scheduler-us-full", "settings": {"market": "US", "run_mode": "full"}, "status": "success",
@@ -65,6 +109,26 @@ def full_manifest():
             "active_universe": {"coverage": {"complete": True}},
             "tickers": [{"ticker": "AAPL", "status": "success", "artifacts": {"analysis_json": "AAPL.json"}},
                         {"ticker": "MSFT", "status": "success", "artifacts": {"analysis_json": "MSFT.json"}}]}
+
+
+def test_invalid_configuration_still_records_terminal_failure(tmp_path, monkeypatch):
+    from tradingagents.scheduled import config, runner
+    from tradingagents.notifications import local as notifications
+    item = target()
+    monkeypatch.setattr(local, "script", lambda _: SimpleNamespace(due_targets=lambda *a, **k: [item]))
+    monkeypatch.setattr(runner, "_iter_run_manifests_desc", lambda *a, **k: [])
+    monkeypatch.setattr(local, "full_research_session_hold", lambda *a, **k: None)
+    def fail(*args):
+        raise ValueError("invalid fixture config")
+    monkeypatch.setattr(config, "load_scheduled_config", fail)
+    failures = []
+    monkeypatch.setattr(notifications, "queue_failure", lambda *a, **k: failures.append(k))
+    with pytest.raises(ValueError, match="invalid fixture"):
+        local.run_due(tmp_path / "archive", tmp_path, now=datetime(2026, 10, 9, 12, tzinfo=timezone.utc))
+    path, = (tmp_path / "attempts").glob("*.json")
+    receipt = json.loads(path.read_text())
+    assert receipt["attempts"] == 1 and receipt["error_type"] == "ValueError"
+    assert len(failures) == 1
 
 
 def test_coverage_is_independent_of_failed_delivery():

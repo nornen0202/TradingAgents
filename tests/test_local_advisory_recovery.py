@@ -263,6 +263,7 @@ def test_truncated_history_fails_closed(tmp_path, watchdog):
 
 @pytest.mark.parametrize("dry_run", [False, True])
 def test_core_due_never_calls_advisory_api_or_dispatches_on_same_tick(tmp_path, monkeypatch, watchdog, dry_run):
+    monkeypatch.setattr(local, "require_storage_headroom", lambda *paths: None)
     from tradingagents.scheduled import runner
     targets = watchdog.due_targets(NOW)
     monkeypatch.setattr(local, "script", lambda _: SimpleNamespace(due_targets=lambda *a, **kw: targets))

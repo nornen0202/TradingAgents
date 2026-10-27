@@ -6,18 +6,19 @@ does not prove that the user received the current strategy.
 
 ## Active schedule and ownership
 
-On 2026-10-07, the Codex app registered the active thread heartbeat
-`tradingagents`, **TradingAgents 능동 장애 점검·복구**, every hour at minute 55 in
-Asia/Seoul. It returns to the incident-recovery conversation, retaining its
-context. The app's Scheduled entry is authoritative; this file does not register
-a schedule. The existing KR, US, YouTube and PRISM production automations remain
-the primary report writers. The heartbeat repairs omissions after checking for
-an active writer, rather than starting a second writer.
+As verified on 2026-10-28, `tradingagents`, **TradingAgents 능동 장애 점검·복구**,
+is an independent local cron automation at 01:55, 05:55, 09:55, 13:55, 17:55 and
+21:55 Asia/Seoul. The app's saved Scheduled entry is authoritative; this file
+does not register a schedule. Preserve its model, effort, existing incident
+records and ownership checks. KR, US, YouTube and PRISM Work automations remain
+the report writers. Check for an active writer before repairing omissions.
 
-The GitHub Scheduled Actions Watchdog remains the first recovery layer, scheduled
-every 15 minutes. The independent Codex heartbeat also checks whether that
-watchdog ran. On the first check each KST day, review the last 24 hours for
-recurring causes and implement supported preventive repairs.
+With the current local backend, Windows LocalAutomation tasks own production,
+research and publication. The GitHub Scheduled Actions Watchdog yields to this
+ownership; its intentionally old run time is not a reason to dispatch it. On the
+first check each KST day, review the last 24 hours for recurring causes and
+implement supported preventive repairs. Consult the current receipts, not an
+older success or a historical schedule description.
 
 This setup uses local files and requires the PC to be online with the desktop
 app running. GitHub's hosted watchdog can continue independently, but cannot
