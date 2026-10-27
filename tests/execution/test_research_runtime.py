@@ -288,3 +288,61 @@ def test_new_research_waits_for_existing_producer_ownership_transfer(tmp_path, m
     (h.state / "actions-drained.json").unlink()
     assert h.tick() == [{"status": "WAITING_LOCAL_AUTOMATION_AUTHORITY"}]
     assert h.calls == []
+
+
+def production_tick(h):
+    return research.research_due(h.archive, h.state, now=NOW, executor=h.execute,
+        universe_loader=lambda: {"KR": (), "US": ("AAPL", "AMD", "MSFT")},
+        session_resolver=lambda **k: {"is_open": k["market"] == "us", "phase": "regular"})
+
+
+@pytest.mark.parametrize("volume", [0, 1, 2])
+def test_storage_repair_preserves_same_selective_research_slot(tmp_path, monkeypatch, volume):
+    from tradingagents import local_automation as local
+    from tradingagents.notifications import local as notifications
+    h = Harness(tmp_path, monkeypatch)
+    failures, model_preflights, checked = [], [], []
+    def blocked(*paths):
+        checked.append(paths)
+        raise local.LocalStorageHeadroomError(str(paths[volume]))
+    monkeypatch.setattr(local, "require_storage_headroom", blocked)
+    monkeypatch.setattr(local, "preflight", lambda p: model_preflights.append(p))
+    monkeypatch.setattr(notifications, "queue_failure", lambda *a, **k: failures.append(k))
+    assert production_tick(h) == [{"market": "US", "status": "STORAGE_BLOCKED", "broker_orders_sent": 0}]
+    assert checked[0][:2] == (h.archive, h.state)
+    assert len(checked[0]) == 3
+    assert not list(h.state.glob("research-refresh/**/*.json"))
+    assert not h.calls and not model_preflights
+    assert failures[0]["source_key"] == "research-refresh:US:2026-10-21:0"
+    monkeypatch.setattr(local, "require_storage_headroom", lambda *p: None)
+    assert production_tick(h)[0]["status"] == "COMPLETED"
+    assert len(h.calls) == len(model_preflights) == 1
+    assert production_tick(h) == []
+
+
+def test_selective_invalid_config_still_consumes_terminal_attempt(tmp_path, monkeypatch):
+    from tradingagents.scheduled import config
+    h = Harness(tmp_path, monkeypatch)
+    def invalid(*a, **k):
+        raise ValueError("invalid fixture configuration")
+    monkeypatch.setattr(config, "load_scheduled_config", invalid)
+    result = production_tick(h)[0]
+    assert (result["status"], result["error_type"], result["failure_stage"]) == ("FAILED", "ValueError", "preflight")
+    assert production_tick(h) == []
+    assert not h.calls
+
+
+def test_storage_loss_after_admission_retains_failed_selective_attempt(tmp_path, monkeypatch):
+    from tradingagents import local_automation as local
+    h = Harness(tmp_path, monkeypatch)
+    checked = []
+    def lose_volume(*paths):
+        checked.append(paths)
+        if len(checked) == 2:
+            raise local.LocalStorageHeadroomError("fixture volume disappeared")
+    monkeypatch.setattr(local, "require_storage_headroom", lose_volume)
+    result = production_tick(h)[0]
+    assert result["status"] == "FAILED" and result["error_type"] == "LocalStorageHeadroomError"
+    assert len(checked) == 2
+    assert production_tick(h) == []
+    assert not h.calls

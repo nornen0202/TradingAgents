@@ -186,9 +186,27 @@ def research_due(archive, state, *, now=None, dry_run=False, executor=None, sess
         if dry_run:
             results.append({**receipt, "status": "DUE"})
             continue
+        admission_error = None
+        if prepare is None:
+            from tradingagents.local_automation import LocalStorageHeadroomError, require_storage_headroom
+            try:
+                root = Path(__file__).resolve().parents[2]
+                config_path = root / "config" / ("scheduled_analysis_korea.toml" if market == "KR" else "scheduled_analysis.toml")
+                config = load_scheduled_config(config_path)
+                require_storage_headroom(archive, state, config.llm.codex_workspace_dir)
+            except LocalStorageHeadroomError:
+                from tradingagents.notifications.local import queue_failure
+                queue_failure(state, stage="preflight", source_key=f"research-refresh:{market}:{day}:{slot}",
+                              error_type="LocalStorageHeadroomError", finished_at=now.isoformat())
+                results.append({"market": market, "status": "STORAGE_BLOCKED", "broker_orders_sent": 0})
+                continue
+            except Exception as exc:
+                admission_error = exc
         atomic_write_json(path, receipt)
         stage = "preflight"
         try:
+            if admission_error is not None:
+                raise admission_error
             root = Path(__file__).resolve().parents[2]
             config_path = root / "config" / ("scheduled_analysis_korea.toml" if market == "KR" else "scheduled_analysis.toml")
             config = load_scheduled_config(config_path)
