@@ -1,13 +1,13 @@
 {
   "schema": "tradingagents.work-context/v1",
   "surface": "us",
-  "event_id": "us:d2a427978119fbc0b4dcf4fcbbd99bfe",
+  "event_id": "us:7f77d8550cc1113c4baf33170fb89522",
   "prompt_contract_version": "market-work-v13-us",
   "prompt_sha256": "d89884ce9232b2695f637cb3a5654da9f473e7138706cc074cbd9a1601e61f77",
   "skill_sha256": "4dffe28b3721557cc2517b5afff2f94045832606e71ff61461df969f6abb53c7",
   "task_manifest_sha256": "c0992fa275c9961bc91c679030c0b4d9b8b06f3d164226776421f1e354b5c22e",
   "workflow_contract_sha256": "6e0b555b6a8ae53cf919baa1e96d671d2ef180fd3d86a58e5c8b568f278c8ec6",
-  "source_sha256": "aa285bd0bed502012b9e6a0b0f1e46d49985a44a816ee5d70181aea29005df31",
+  "source_sha256": "200fa8db736aa09dce509e2c329b6491a89fdf5b89c3ab64aae214254af0f0f5",
   "body": {
     "kind": "market",
     "market": "US",
@@ -898,15 +898,15 @@
         "source_health": "OK",
         "coverage": {
           "total_unique_events": 489,
-          "window_events": 18,
+          "window_events": 17,
           "transmitted_events": 12,
           "truncated": true,
-          "oldest_occurred_at": "2026-10-24T02:00:31+00:00",
+          "oldest_occurred_at": "2026-10-24T04:00:23+00:00",
           "newest_occurred_at": "2026-10-25T11:00:26+00:00",
-          "available_events_before_context_cap": 18,
+          "available_events_before_context_cap": 17,
           "context_event_cap": 12,
-          "omitted_events": 6,
-          "omitted_due_to_context_cap": 6,
+          "omitted_events": 5,
+          "omitted_due_to_context_cap": 5,
           "omitted_before_context_selection": 0
         },
         "events": [
@@ -1983,81 +1983,6 @@
             }
           },
           {
-            "event_key": "FANtW-t-aBI",
-            "content_sha256": "289ec7ac9a924e67ff142cc2f7325e9ed573cbe78f5f2c264129d5211b8b5977",
-            "occurred_at": "2026-10-24T02:00:31+00:00",
-            "relevance": {
-              "tickers": [
-                "CL=F"
-              ],
-              "markets": [
-                "US"
-              ],
-              "themes": [],
-              "match_basis": "verified_entities",
-              "matched_tickers": [],
-              "market_match": true,
-              "score": 20
-            },
-            "summary": {
-              "video_id": "FANtW-t-aBI",
-              "title": "\"이란은 확전할 것\" 트럼프 미치게하는 이란의 전략 | 인남식 국립외교원 교수 [신과 대화]",
-              "channel": "삼프로TV 3PROTV",
-              "source_url": "https://www.youtube.com/watch?v=FANtW-t-aBI",
-              "claim_status_summary": {
-                "unverified": 10
-              },
-              "claims": [
-                {
-                  "claim_id": "C1",
-                  "claim_text": "영상은 2026년 2월 28일 개전, 4월 휴전, 6월 14개 조항의 종전 MOU, 8월 미국 경제봉쇄를 주장하며 재건기금 지원과 이란에 유리한 합의라는 평가를 제시한다.",
-                  "status": "unverified",
-                  "confidence": 0.0,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "종전·봉쇄·재건기금의 존재를 확정 전제로 원유 공급이나 제재 완화를 예상할 근거가 부족하다."
-                },
-                {
-                  "claim_id": "C2",
-                  "claim_text": "영상은 이스라엘 총선 2026년 10월 27일, 미국 중간선거 11월 3일, 2027년 1월 3일 '120대 의회' 출범을 제시하고 연정 구성과 선거 이후 확전·의회 견제를 전망한다.",
-                  "status": "unverified",
-                  "confidence": 0.0,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "선거일과 의회 개원일을 검증하기 전에는 이를 확정적인 시장 변동성 구간으로 사용하기 어렵다."
-                },
-                {
-                  "claim_id": "C3",
-                  "claim_text": "영상은 이란 최고지도자 사망·승계를 전제로 핵 금지 방침 변경이 공식 발표되지 않았다고 설명하고, 협상 중 공격이 핵무장 유인과 수평적 확전을 강화했다고 해석한다.",
-                  "status": "unverified",
-                  "confidence": 0.0,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "핵정책 전환이나 협상 포기를 확정 사건으로 반영할 수 없으며, 에너지 위험 시나리오로만 취급해야 한다."
-                },
-                {
-                  "claim_id": "C4",
-                  "claim_text": "영상은 호르무즈 원유 비중 약 20%, 그중 60~70% 우회 가능, UAE 임차선 셔틀·해상환적과 운임·인건비 급등을 주장하고 기존 항행체제로의 복귀가 어렵다고 전망한다.",
-                  "status": "unverified",
-                  "confidence": 0.0,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "제공된 원유 가격만으로 공급 차질 규모나 운송비 상승의 지속성을 산정할 수 없다."
-                }
-              ],
-              "entities": [
-                {
-                  "ticker": "CL=F",
-                  "name": "호르무즈 해협·원유 운송",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                }
-              ]
-            }
-          },
-          {
             "event_key": "Xxu5sqHcCbA",
             "content_sha256": "64419a7b6a18fbc571ebf36e306744b44df38edae8e1d7613fff6cfc50b5cee8",
             "occurred_at": "2026-10-25T08:30:30+00:00",
@@ -2115,6 +2040,70 @@
                   "supporting_evidence_ids": [],
                   "manual_check_required": true,
                   "investor_implication": "추정 복원한 분기 이익이나 출처 없는 차년도 전망을 확정 실적으로 사용하면 안 된다."
+                }
+              ],
+              "entities": []
+            }
+          },
+          {
+            "event_key": "pfK5cs3z04Q",
+            "content_sha256": "6cb92a65b5851962deb5fea5738531f6ee2c0f2e75e71c54d524e07427e6285f",
+            "occurred_at": "2026-10-25T06:00:11+00:00",
+            "relevance": {
+              "tickers": [],
+              "markets": [],
+              "themes": [],
+              "match_basis": "title_and_claim_context",
+              "matched_tickers": [],
+              "market_match": false,
+              "score": 0
+            },
+            "summary": {
+              "video_id": "pfK5cs3z04Q",
+              "title": "퇴직 후 겪게 되는 4가지 변화, 노후엔 보험료보다 의료비가 더 큰 과제?ㅣ민복기 교수 [주말인터뷰]",
+              "channel": "삼프로TV 3PROTV",
+              "source_url": "https://www.youtube.com/watch?v=pfK5cs3z04Q",
+              "claim_status_summary": {
+                "unverified": 10,
+                "partially_supported": 1,
+                "asr_uncertain": 1
+              },
+              "claims": [
+                {
+                  "claim_id": "C1",
+                  "claim_text": "퇴직 후 30년 이상 인출·돌봄 재원을 준비해야 하며, 60세 이상 1인당 진료비는 소득활동 인구의 3배 이상이고 독거노인의 68%는 여성이라는 주장이다.",
+                  "status": "unverified",
+                  "confidence": 0.99,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "3배·68%를 확정 수치로 사용하지 말고 생활비·의료비·돌봄비와 생존기간별 현금흐름을 구분해 검토할 필요가 있다."
+                },
+                {
+                  "claim_id": "C2",
+                  "claim_text": "피부양자는 연소득 2,000만원 초과 또는 재산세 과세표준 9억원 초과 시 제외되며, 소득 기준이 7,200만원→3,400만원→2,000만원으로 강화됐다는 주장이다.",
+                  "status": "unverified",
+                  "confidence": 0.99,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "제시된 두 문턱만으로 피부양자 자격을 판단하거나 자산 명의를 변경해서는 안 된다. 개인별 전체 요건 확인이 선행돼야 한다."
+                },
+                {
+                  "claim_id": "C3",
+                  "claim_text": "2026년 지역보험료 월 상한 약 459만원, 재산분 약 49만원·10.8%, 직장가입자 두 보험료 상한 각각 약 459만원과 장기요양보험료 13.14%를 적용하면 월 1,000만원을 넘을 수 있다는 주장이다.",
+                  "status": "unverified",
+                  "confidence": 0.99,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "월 1,000만원 초과를 개인 부담 상한으로 인용하지 말고 사용자 분담과 보험료 종류별 산정 기준을 확인해야 한다."
+                },
+                {
+                  "claim_id": "C4",
+                  "claim_text": "금융소득은 연 1,000만원 초과 시 반영하고 비과세·분리과세는 제외하며, 사업소득은 경비 차감 후 100%, 근로소득은 공제 전 총급여의 50%를 반영한다는 주장이다.",
+                  "status": "unverified",
+                  "confidence": 0.99,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "소득원 전환이나 배우자 분산에 따른 절감액은 미확정이다. 자격 유형과 소득 항목별 산식부터 확인해야 한다."
                 }
               ],
               "entities": []
@@ -3110,20 +3099,20 @@
               "-x9uzZ6663E",
               "qNyqnAJ1LeI",
               "Sl-xaZDGZXM",
-              "FANtW-t-aBI",
-              "Xxu5sqHcCbA"
+              "Xxu5sqHcCbA",
+              "pfK5cs3z04Q"
             ],
             "coverage": {
               "total_unique_events": 489,
-              "window_events": 18,
+              "window_events": 17,
               "transmitted_events": 12,
               "truncated": true,
-              "oldest_occurred_at": "2026-10-24T02:00:31+00:00",
+              "oldest_occurred_at": "2026-10-24T04:00:23+00:00",
               "newest_occurred_at": "2026-10-25T11:00:26+00:00",
-              "available_events_before_context_cap": 18,
+              "available_events_before_context_cap": 17,
               "context_event_cap": 12,
-              "omitted_events": 6,
-              "omitted_due_to_context_cap": 6,
+              "omitted_events": 5,
+              "omitted_due_to_context_cap": 5,
               "omitted_before_context_selection": 0
             }
           },
