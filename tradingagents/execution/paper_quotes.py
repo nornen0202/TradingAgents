@@ -1,7 +1,8 @@
 """Dated broker observations for local simulation; the client can only read.
 
-The simulated price is a completed one-minute close, never a retrieval-time
-timestamp attached to an undated last price. USD conversion is explicitly a
+Marks use a completed one-minute close; execution uses a separately dated
+bid/ask book. Neither uses a retrieval clock in place of a price event clock.
+USD conversion is explicitly a
 broker reference valuation, not a simulated foreign-exchange transaction.
 """
 from __future__ import annotations
@@ -127,7 +128,10 @@ def normalize_quote(*, ticker, market, chart, orderbook, observed_at, fx_quote=N
               "price_krw": price, "session": "regular", "executable": True,
               "spread_bps": spread, "source": "kis.completed_minute_close+observed_orderbook",
               "price_basis": "COMPLETED_MINUTE_CLOSE", "ticker": ticker,
-              "orderbook_event_at": book_at.isoformat(), "orderbook_date_basis": book_date_basis}
+              "orderbook_event_at": book_at.isoformat(), "orderbook_date_basis": book_date_basis,
+              "execution_quote": {"basis": "KIS_ORDERBOOK", "as_of": book_at.astimezone(timezone.utc).isoformat(),
+                                  "observed_at": at.astimezone(timezone.utc).isoformat(),
+                                  "bid_krw": bid, "ask_krw": ask}}
     if market == "us":
         fx = fx_quote or {}
         fx_at = instant(fx.get("observed_at"))
@@ -140,6 +144,7 @@ def normalize_quote(*, ticker, market, chart, orderbook, observed_at, fx_quote=N
         result.update(price_krw=price * rate, price_usd=price, fx_rate=rate,
                       fx_observed_at=fx_at.isoformat(), fx_kind="BROKER_REFERENCE_RATE",
                       fx_limitation="Reference KRW valuation only; not real-time FX execution")
+        result["execution_quote"].update(bid_krw=bid * rate, ask_krw=ask * rate)
     return result
 
 

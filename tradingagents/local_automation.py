@@ -725,7 +725,7 @@ def main():
             return 0
         from tradingagents.execution.paper_runtime import tick
         try:
-            result = tick(args.archive_dir, args.state_dir / "paper")
+            result = tick(args.archive_dir, args.state_dir / "paper", follow_up_pending=True)
         except TimeoutError:
             result = {"status": "PAPER_ALREADY_RUNNING", "broker_orders_sent": 0}
         print(json.dumps(result, ensure_ascii=True))
