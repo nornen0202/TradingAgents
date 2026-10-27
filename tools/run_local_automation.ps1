@@ -2,11 +2,13 @@ param(
     [ValidateSet("run-due", "publish", "paper", "review", "validate-kis", "strategy-kis", "research-kis")][string] $Command,
     [string] $RepositoryRoot = "C:\Projects\TradingAgents",
     [string] $ArchiveRoot = "C:\TradingAgentsData\archive",
+    [string] $RuntimeRoot = "",
     [ValidateRange(1024, 65535)][int] $ReviewPort = 8766,
     [switch] $DryRun
 )
 $ErrorActionPreference = "Stop"
-$stateRoot = Join-Path $RepositoryRoot ".runtime\local-automation"
+if ([string]::IsNullOrWhiteSpace($RuntimeRoot)) { $RuntimeRoot = Join-Path $RepositoryRoot '.runtime' }
+$stateRoot = Join-Path $RuntimeRoot "local-automation"
 $pythonPath = Join-Path $RepositoryRoot ".venv\Scripts\python.exe"
 . (Join-Path $PSScriptRoot 'local_automation_launcher_notifications.ps1')
 $pythonInvoked = $false
@@ -90,11 +92,16 @@ try {
     $env:PYTHONUTF8 = "1"
     $env:TRADINGAGENTS_SOURCE_SHA = $revision
     $env:TRADINGAGENTS_API_KEYS_PATH = Join-Path $RepositoryRoot "config\api_keys.json"
-    $env:TRADINGAGENTS_PRISM_TELEGRAM_ARCHIVE_DIR = "C:\TradingAgentsData\prism-telegram-archive"
+    $env:TRADINGAGENTS_PRISM_TELEGRAM_ARCHIVE_DIR = Join-Path (Split-Path -Parent $ArchiveRoot) 'prism-telegram-archive'
     $env:TRADINGAGENTS_YOUTUBE_ARCHIVE_DIR = Join-Path $ArchiveRoot "youtube-archive"
     $env:TRADINGAGENTS_MARKET_CALENDAR_CACHE_PATH = Join-Path $stateRoot "market-calendar.json"
     $env:TRADINGAGENTS_AUTOMATION_BACKEND = "local"
     $env:TRADINGAGENTS_SCHEDULED_CONSUMER_STATE_ROOT = $stateRoot
+    # Large child-process temporary files belong on the configured runtime volume.
+    $temporaryRoot = Join-Path $RuntimeRoot 'temp'
+    [IO.Directory]::CreateDirectory($temporaryRoot) | Out-Null
+    $env:TEMP = $temporaryRoot
+    $env:TMP = $temporaryRoot
     $runtimeSettingsPath = Join-Path $stateRoot 'runtime-settings.json'
     if (Test-Path -LiteralPath $runtimeSettingsPath) {
         $runtimeSettings = Get-Content -LiteralPath $runtimeSettingsPath -Raw | ConvertFrom-Json
@@ -112,7 +119,7 @@ try {
     $logPath = Join-Path $stateRoot $logName
     $arguments = @("-u", "-m", "tradingagents.local_automation", $Command,
         "--archive-dir", $ArchiveRoot, "--state-dir", $stateRoot,
-        "--runtime-dir", (Join-Path $RepositoryRoot ".runtime\chatgpt-work"))
+        "--runtime-dir", (Join-Path $RuntimeRoot "chatgpt-work"))
     if ($DryRun) { $arguments += "--dry-run" }
     if ($Command -eq 'review') { $arguments += @('--review-port', [string]$ReviewPort) }
     # Windows PowerShell converts redirected native stderr to error records.

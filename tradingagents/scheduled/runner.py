@@ -1910,9 +1910,10 @@ def _circuit_breaker_reason(
     immediate_pattern = _first_matching_pattern(error_text, _CODEX_IMMEDIATE_FATAL_PATTERNS)
     if immediate_pattern:
         return f"fatal_pattern:{immediate_pattern}"
-    if _is_codex_transient_failure_text(error_text):
+    rate_limited = _is_codex_rate_limit_summary(summary)
+    if _is_codex_transient_failure_text(error_text) and not rate_limited:
         return None
-    if not _is_codex_global_failure_text(error_text):
+    if not _is_codex_global_failure_text(error_text) and not rate_limited:
         return None
     threshold = max(1, int(getattr(config.run, "max_consecutive_codex_failures", 3) or 3))
     if consecutive_codex_failures >= threshold:
@@ -1922,7 +1923,17 @@ def _circuit_breaker_reason(
 
 def _is_codex_failure_summary(summary: dict[str, Any]) -> bool:
     text = _summary_error_text(summary)
-    return _is_codex_global_failure_text(text)
+    return _is_codex_global_failure_text(text) or _is_codex_rate_limit_summary(summary)
+
+
+def _is_codex_rate_limit_summary(summary: dict[str, Any]) -> bool:
+    # A data vendor's 429 must not open the LLM circuit. Codex can exhaust its
+    # own retries with generic HTTP text that contains no provider name.
+    diagnostics = summary.get("failure_diagnostics") or {}
+    exception = str(diagnostics.get("exception_class", "")) if isinstance(diagnostics, dict) else ""
+    text = _summary_error_text(summary)
+    codex = exception.startswith("Codex") or "codex" in text
+    return codex and bool(re.search(r"\b429\b|too many requests|rate.limit", text))
 
 
 def _is_codex_transient_failure_text(text: str) -> bool:

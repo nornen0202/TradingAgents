@@ -117,6 +117,7 @@ def test_early_tick_waits_without_spending_attempt_or_running_worker(tmp_path, m
 
 
 def test_legacy_early_success_does_not_suppress_real_refresh_or_reset_its_budget(tmp_path, monkeypatch):
+    monkeypatch.setattr(local, "require_storage_headroom", lambda *paths: None)
     now = kst("2026-10-13T23:08:00")
     target = us_target(now)
     state = tmp_path / "state"
