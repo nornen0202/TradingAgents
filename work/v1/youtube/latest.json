@@ -1,13 +1,13 @@
 {
   "schema": "tradingagents.work-context/v1",
   "surface": "youtube",
-  "event_id": "youtube:4a94fec9f7701de14616d466e57bed90",
+  "event_id": "youtube:87dccca2e92392db9e07e9beca92f87e",
   "prompt_contract_version": "youtube-work-v5",
   "prompt_sha256": "82a87727ec636b928ccb90cfe8cd823d86347e254ed0b204903699e34e35ef0b",
   "skill_sha256": "4dffe28b3721557cc2517b5afff2f94045832606e71ff61461df969f6abb53c7",
   "task_manifest_sha256": "c0992fa275c9961bc91c679030c0b4d9b8b06f3d164226776421f1e354b5c22e",
   "workflow_contract_sha256": "4982d0db0e5a97f3b0f392bdff489a6940be0d2d88e7ea94533edbdb009b4556",
-  "source_sha256": "256b01811953c1edc7d528d0fec78bc0c8e0a93356d17710e1172f9e2c1ff51d",
+  "source_sha256": "19b040048dbfcf0980aaf8dca8ad5151cc47ec9e29225f079acbd67cc29aedaa",
   "body": {
     "kind": "youtube",
     "source_health": "OK",
@@ -44,10 +44,10 @@
     },
     "coverage": {
       "total_unique_events": 489,
-      "window_events": 16,
-      "transmitted_events": 16,
+      "window_events": 15,
+      "transmitted_events": 15,
       "truncated": false,
-      "oldest_occurred_at": "2026-10-24T06:00:33+00:00",
+      "oldest_occurred_at": "2026-10-24T07:00:22+00:00",
       "newest_occurred_at": "2026-10-25T11:00:26+00:00"
     },
     "events": [
@@ -2694,150 +2694,6 @@
               "source_url": "https://www.kdpress.co.kr/news/articleView.html?idxno=205129",
               "publisher": "Naver News",
               "published_at": "2026-05-09T22:32:00+09:00",
-              "source_tier": "news"
-            }
-          ]
-        }
-      },
-      {
-        "event_key": "oYwxemi8E6w",
-        "content_sha256": "51b1280cb28bf543c419c82a8f59949a5fc38aac6e9b105c93c07ec70732b45a",
-        "occurred_at": "2026-10-24T06:00:33+00:00",
-        "relevance": {
-          "tickers": [],
-          "markets": [],
-          "themes": [],
-          "match_basis": "title_and_claim_context"
-        },
-        "strategy_source_tier": "STANDARD",
-        "strategy_evidence_weight": "STANDARD",
-        "summary": {
-          "video_id": "oYwxemi8E6w",
-          "title": "태초의 세상은 검은 바다였다? 신이 바다를 가른 이유  | 주원준 한님성서연구소 수석연구원 [에인션트]",
-          "channel": "삼프로TV 3PROTV",
-          "source_url": "https://www.youtube.com/watch?v=oYwxemi8E6w",
-          "published_at": "2026-10-24T06:00:33+00:00",
-          "status": "asr_uncertain",
-          "strategy_source_tier": "STANDARD",
-          "strategy_evidence_weight": "STANDARD",
-          "strategy_validation_policy": "STANDARD_REVIEW",
-          "transcript_quality": {
-            "status": "good",
-            "score": 1.0,
-            "warnings": [],
-            "source": "automatic",
-            "language": "Korean",
-            "model_or_format": "json3",
-            "chars": 26168,
-            "segments": 1493,
-            "duration_seconds": 2854,
-            "repeated_ngram_ratio": 0.012
-          },
-          "claim_status_summary": {
-            "unverified": 9,
-            "asr_uncertain": 1
-          },
-          "claims": [
-            {
-              "claim_id": "C1",
-              "claim_text": "고대 근동 창조신화는 공통적으로 물을 가르는 행위를 혼돈에서 질서를 만드는 창조로 표현한다는 해설이다.",
-              "status": "unverified",
-              "confidence": 0.99,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "종교·역사 해설이며 시장 전망이나 매매 판단의 근거로 사용할 수 없다."
-            },
-            {
-              "claim_id": "C2",
-              "claim_text": "아툼이 원시 바다 눈을 반으로 갈라 공간을 만들고 원초의 언덕이 올라왔으며 자기생식으로 창조했다는 설명이다.",
-              "status": "unverified",
-              "confidence": 0.99,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "투자 관련 사실이나 기업·자산 평가 근거가 아니다."
-            },
-            {
-              "claim_id": "C3",
-              "claim_text": "마르두크가 티아마트를 갈라 세계를 만들었으며 이 사건이 신들이 태어나기 전이라는 취지의 설명이다.",
-              "status": "unverified",
-              "confidence": 0.99,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "신화 서술에서 투자 시사점을 도출할 근거가 없다."
-            },
-            {
-              "claim_id": "C4",
-              "claim_text": "티아마트와 창세기의 테홈이 같은 말이며 바빌론 유배를 통한 영향 가능성이 있다는 설명이다.",
-              "status": "unverified",
-              "confidence": 0.99,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "언어·문헌 해석에 관한 주장으로 금융시장 판단과 연결할 수 없다."
-            },
-            {
-              "claim_id": "C5",
-              "claim_text": "기원전 약 14세기 일리밀쿠가 기록한 여섯 서판에 바알과 바다신 얌의 전투가 전하며 바알이 얌을 갈랐다는 설명이다.",
-              "status": "unverified",
-              "confidence": 0.99,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "투자 대상이나 경제 전망에 관한 주장이 아니다."
-            },
-            {
-              "claim_id": "C6",
-              "claim_text": "창세기 1:6–10은 물의 분리와 육지 출현을 기술하며, 바다는 언제나 부정적 혼돈을 상징하고 아시리아 침공에도 적용된다는 설명이다.",
-              "status": "unverified",
-              "confidence": 0.99,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "바다·혼돈의 종교적 상징을 경기순환이나 투자 위험의 증거로 해석할 수 없다."
-            }
-          ],
-          "entities": [],
-          "evidence": [
-            {
-              "evidence_id": "E1",
-              "claim_id": "C6",
-              "title": "Can Bitcoin Get Back Above $85,000 in November?",
-              "source_url": "https://finance.yahoo.com/markets/crypto/articles/bitcoin-back-above-85-000-214039495.html",
-              "publisher": "24/7 Wall St.",
-              "published_at": "2026-10-24T21:40:39+00:00",
-              "source_tier": "news"
-            },
-            {
-              "evidence_id": "E2",
-              "claim_id": "C7",
-              "title": "Wall Street Lowers the Bar: Why Ford’s Q3 Earnings on Oct. 28 Could Trigger a Surprise October Breakout",
-              "source_url": "https://finance.yahoo.com/markets/stocks/articles/wall-street-lowers-bar-why-145702057.html",
-              "publisher": "24/7 Wall St.",
-              "published_at": "2026-10-24T14:57:02+00:00",
-              "source_tier": "news"
-            },
-            {
-              "evidence_id": "E3",
-              "claim_id": "C7",
-              "title": "Ford Yields Nearly 5%. Is the Dividend Safe With Earnings in the Red?",
-              "source_url": "https://finance.yahoo.com/markets/stocks/articles/ford-yields-nearly-5-dividend-114505552.html",
-              "publisher": "24/7 Wall St.",
-              "published_at": "2026-10-24T11:45:05+00:00",
-              "source_tier": "news"
-            },
-            {
-              "evidence_id": "E4",
-              "claim_id": "C9",
-              "title": "Havells India Ltd (BOM:517354) (Q2 2027) Earnings Call Highlights: Revenue Jumps 35% as Lloyd ...",
-              "source_url": "https://finance.yahoo.com/markets/stocks/articles/havells-india-ltd-bom-517354-110128987.html",
-              "publisher": "GuruFocus.com",
-              "published_at": "2026-10-24T11:01:28+00:00",
-              "source_tier": "news"
-            },
-            {
-              "evidence_id": "E5",
-              "claim_id": "C9",
-              "title": "SRF Ltd (BOM:503806) Q2 2027 Earnings Call Highlights: Revenue Jumps 35% as Chemicals Guidance ...",
-              "source_url": "https://finance.yahoo.com/markets/stocks/articles/srf-ltd-bom-503806-q2-050502802.html",
-              "publisher": "GuruFocus.com",
-              "published_at": "2026-10-24T05:05:02+00:00",
               "source_tier": "news"
             }
           ]
