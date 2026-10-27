@@ -72,7 +72,7 @@ def handoff_completed_run(archive, manifest, *, state_root=None):
         else:
             paper = pool.submit(consume, "paper", "LOCAL_PAPER_ONLY",
                                 lambda: paper_runtime.tick(archive, root / "paper",
-                                    lock_timeout=PAPER_HANDOFF_LOCK_TIMEOUT_SECONDS))
+                                    lock_timeout=PAPER_HANDOFF_LOCK_TIMEOUT_SECONDS, follow_up_pending=True))
             strategy = pool.submit(consume, "kis-strategy", "KIS_DEMO_STRATEGY",
                                    lambda: demo_runtime.tick(archive, root / "kis-strategy", root / "kis-validation"))
         results = {"paper": paper.result(), "kis_strategy": strategy.result()}

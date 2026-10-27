@@ -421,6 +421,9 @@ def test_completed_dated_quote_keeps_source_time_and_rejects_bad_records():
     result = normalize_quote(ticker=TICKER, market="kr", chart=raw_quote(), orderbook=BOOK, observed_at=AT)
     assert datetime.fromisoformat(result["as_of"]) == AT
     assert result["price_krw"] == 20000
+    assert result["execution_quote"] == {"basis": "KIS_ORDERBOOK",
+        "as_of": "2026-10-19T01:00:00+00:00", "observed_at": "2026-10-19T01:00:00+00:00",
+        "bid_krw": 19995, "ask_krw": 20005}
 
 
 @pytest.mark.parametrize("case", ["empty", "missing_date", "bad_date", "future", "stale", "missing_book", "bad_price", "bad_response"])
@@ -457,6 +460,9 @@ def test_us_requires_separate_observed_reference_rate():
           "source": "kis.inquire_present_balance.output2.frst_bltn_exrt", "kind": "BROKER_REFERENCE_RATE"}
     result = normalize_quote(ticker="AAPL", market="us", chart=chart, orderbook=book, observed_at=observed, fx_quote=fx)
     assert result["price_krw"] == 140000
+    assert result["execution_quote"]["bid_krw"] == pytest.approx(99.99 * 1400)
+    assert result["execution_quote"]["ask_krw"] == pytest.approx(100.01 * 1400)
+    assert result["execution_quote"]["as_of"] == "2026-10-19T14:00:00+00:00"
     fx["observed_at"] = (observed + timedelta(seconds=1)).isoformat()
     with pytest.raises(ValueError):
         normalize_quote(ticker="AAPL", market="us", chart=chart, orderbook=book, observed_at=observed, fx_quote=fx)

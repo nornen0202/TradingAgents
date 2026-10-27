@@ -10,6 +10,7 @@ from datetime import datetime, timedelta, timezone
 import hashlib
 import json
 import os
+import time
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
@@ -279,7 +280,8 @@ def advance_market(archive, state, market, *, now=None, clock=None, account_load
         return finish("ERROR", ("PAPER_TICK_FAILED",), error_type=type(exc).__name__, attempted_source_run_id=source.name if source else None)
 
 
-def tick(archive, state, *, now=None, clock=None, lock_timeout=0, **kwargs):
+def tick(archive, state, *, now=None, clock=None, lock_timeout=0,
+         follow_up_pending=False, sleep=time.sleep, **kwargs):
     archive, state = Path(archive).resolve(), Path(state).resolve()
     state.mkdir(parents=True, exist_ok=True)
     fixed_now = instant(now) if now is not None else None
@@ -298,7 +300,23 @@ def tick(archive, state, *, now=None, clock=None, lock_timeout=0, **kwargs):
         enabled = _read(state / "enabled.json", {})
         if enabled.get("mode") != "LOCAL_PAPER_ONLY" or enabled.get("enabled") is not True:
             return {"schema": SCHEMA, "status": "DISABLED", "broker_orders_sent": 0, "real_orders_enabled": False}
-        markets = {market: advance_market(archive, state, market, now=at, clock=clock, **kwargs) for market in ("kr", "us")}
+        markets = {}
+        for market in ("kr", "us"):
+            receipt = advance_market(archive, state, market, now=instant(clock()), clock=clock, **kwargs)
+            if (follow_up_pending and receipt.get("status") == "ACTIVE"
+                    and receipt.get("order_counts", {}).get("PENDING", 0) > 0):
+                # A fresh 120s signal may have less than one scheduler minute
+                # left after collection. Take one independent post-order read
+                # under the same lock. KIS book clocks have second precision.
+                # Re-run account/session/HALT/expiry checks; never renew TTL.
+                sleep(1)
+                follow_at = instant(clock())
+                if follow_at is None or follow_at <= instant(receipt["checked_at"]):
+                    raise ValueError("Pending follow-up clock must advance")
+                receipt = advance_market(archive, state, market, now=follow_at, clock=clock, **kwargs)
+                receipt["pending_follow_up_attempted"] = True
+                atomic_write_json(state / f"{market}-status.json", receipt)
+            markets[market] = receipt
         completed = instant(clock())
         if completed is None or completed < at or any(completed < instant(receipt["checked_at"]) for receipt in markets.values()):
             raise ValueError("Paper tick completion clock precedes a market receipt")
@@ -317,7 +335,7 @@ def main(argv=None):
     if args.enable:
         atomic_write_json(args.state_dir / "enabled.json", {"mode": "LOCAL_PAPER_ONLY", "enabled": True,
                           "created_at": datetime.now(timezone.utc).isoformat(), "real_orders_enabled": False})
-    result = tick(args.archive_dir, args.state_dir)
+    result = tick(args.archive_dir, args.state_dir, follow_up_pending=True)
     print(json.dumps(result, ensure_ascii=True))
     return 0
 

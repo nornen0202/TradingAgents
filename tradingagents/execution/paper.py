@@ -82,12 +82,32 @@ def positive(value):
 
 def _minute_snapshot_before_expiry(quote, signal, at):
     """A completed minute price can only advance on its original clock grid."""
-    if quote.get("price_basis") != "COMPLETED_MINUTE_CLOSE":
+    if quote.get("execution_quote") or quote.get("price_basis") != "COMPLETED_MINUTE_CLOSE":
         return True
     quoted_at = stamp(quote["as_of"])
     minute = timedelta(minutes=1)
     next_at = quoted_at + ((at - quoted_at) // minute + 1) * minute
     return next_at < stamp(signal["valid_until"])
+
+
+def _valid_execution_quote(quote, at, max_age):
+    """An optional book must carry its own event clock and both KRW sides.
+
+    Missing books retain the legacy minute model. A malformed supplied book
+    cannot silently fall back to that model and conceal a failed live read.
+    """
+    if "execution_quote" not in quote:
+        return True
+    book = quote["execution_quote"]
+    try:
+        event, observed = stamp(book["as_of"]), stamp(book["observed_at"])
+        bid, ask = book["bid_krw"], book["ask_krw"]
+        return (book.get("basis") == "KIS_ORDERBOOK" and event <= observed <= at
+                and 0 <= (at - event).total_seconds() <= max_age
+                and positive(bid) and positive(ask) and bid <= ask
+                and (ask - bid) / ((ask + bid) / 2) * 10000 <= 100)
+    except (KeyError, ValueError, TypeError, AttributeError):
+        return False
 
 
 class PaperBroker:
@@ -227,6 +247,9 @@ class PaperBroker:
 
         A quote requires price_krw, as_of, session='regular', executable=True and
         spread_bps. Quotes/flags are trusted adapter inputs, never inferred from prose.
+        An optional execution_quote carries independently dated bid/ask prices;
+        only a book strictly newer than the intent may fill it. Legacy snapshots
+        retain their next-price model when no execution_quote is supplied.
         Paper orders expire at the local calendar-day boundary; each ledger uses
         market-local now. US fills use fixed quote FX normalization, not FX trading.
         """
@@ -261,6 +284,7 @@ class PaperBroker:
                     and isinstance(spread, (float, int))
                     and math.isfinite(spread)
                     and 0 <= spread <= 100
+                    and _valid_execution_quote(q, at, self.limits.max_quote_age_seconds)
                 ):
                     valid[ticker] = q
             for ticker, q in valid.items():
@@ -336,16 +360,26 @@ class PaperBroker:
                             payload={"ticker": order["ticker"], "reason": "kill_or_daily_stop_or_expired"})
                     continue
                 q = valid.get(order["ticker"])
-                if not q or stamp(q["as_of"]) <= stamp(order["created_at"]):
+                book = q.get("execution_quote") if q else None
+                fill_clock = book["as_of"] if book else q["as_of"] if q else None
+                if not q or stamp(fill_clock) <= stamp(order["created_at"]):
                     continue
                 sign = 1 if order["side"] == "BUY" else -1
-                fill = q["price_krw"] * (
-                    1 + sign * (q["spread_bps"] / 2 + self.limits.slippage_bps) / 10000
-                )
-                if (sign == 1 and fill > order["limit_price"]) or (
-                    sign == -1 and fill < order["limit_price"]
-                ):
-                    continue
+                if book:
+                    # A limit must cross the executable side, not the minute
+                    # close/midpoint. Slippage consumes price improvement only;
+                    # a limit order never executes beyond its limit.
+                    raw = book["ask_krw"] if sign > 0 else book["bid_krw"]
+                    if sign * (raw - order["limit_price"]) > 0:
+                        continue
+                    slipped = raw * (1 + sign * self.limits.slippage_bps / 10000)
+                    fill = min(slipped, order["limit_price"]) if sign > 0 else max(slipped, order["limit_price"])
+                else:
+                    fill = q["price_krw"] * (
+                        1 + sign * (q["spread_bps"] / 2 + self.limits.slippage_bps) / 10000
+                    )
+                    if sign * (fill - order["limit_price"]) > 0:
+                        continue
                 qty = order["qty"]
                 holding = self.db.execute(
                     "SELECT qty FROM positions WHERE ticker=?", (order["ticker"],)
@@ -391,7 +425,9 @@ class PaperBroker:
                         intent_id=order["id"], kind="FILL", mode="paper", occurred_at=now, available_at=now,
                         ingested_at=now,
                         confirmed_at=now, settled_at=now, payload={"ticker": order["ticker"], "side": order["side"],
-                            "quantity": qty, "price": fill, "cost": fees, "currency": "KRW", "reference_price": q["price_krw"]})
+                            "quantity": qty, "price": fill, "cost": fees, "currency": "KRW", "reference_price": q["price_krw"],
+                            "fill_basis": "KIS_ORDERBOOK" if book else "LEGACY_SNAPSHOT",
+                            "quote_event_at": fill_clock})
                     if order["side"] == "SELL":
                         from tradingagents.performance.journal import record_fill_retrospectives
                         # Migrate legacy exits together so current feedback never
