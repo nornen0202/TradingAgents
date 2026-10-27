@@ -1,13 +1,13 @@
 {
   "schema": "tradingagents.work-context/v1",
   "surface": "us",
-  "event_id": "us:7f77d8550cc1113c4baf33170fb89522",
+  "event_id": "us:577bc9e1b6cafbf3d8fa0cf157f6ced6",
   "prompt_contract_version": "market-work-v13-us",
   "prompt_sha256": "d89884ce9232b2695f637cb3a5654da9f473e7138706cc074cbd9a1601e61f77",
   "skill_sha256": "4dffe28b3721557cc2517b5afff2f94045832606e71ff61461df969f6abb53c7",
   "task_manifest_sha256": "c0992fa275c9961bc91c679030c0b4d9b8b06f3d164226776421f1e354b5c22e",
   "workflow_contract_sha256": "6e0b555b6a8ae53cf919baa1e96d671d2ef180fd3d86a58e5c8b568f278c8ec6",
-  "source_sha256": "200fa8db736aa09dce509e2c329b6491a89fdf5b89c3ab64aae214254af0f0f5",
+  "source_sha256": "1b1585f7731597e995180941e9727250784a0b4778a96f0a518ca34e46f24f42",
   "body": {
     "kind": "market",
     "market": "US",
@@ -898,124 +898,18 @@
         "source_health": "OK",
         "coverage": {
           "total_unique_events": 489,
-          "window_events": 17,
+          "window_events": 16,
           "transmitted_events": 12,
           "truncated": true,
-          "oldest_occurred_at": "2026-10-24T04:00:23+00:00",
+          "oldest_occurred_at": "2026-10-24T07:00:22+00:00",
           "newest_occurred_at": "2026-10-25T11:00:26+00:00",
-          "available_events_before_context_cap": 17,
+          "available_events_before_context_cap": 16,
           "context_event_cap": 12,
-          "omitted_events": 5,
-          "omitted_due_to_context_cap": 5,
+          "omitted_events": 4,
+          "omitted_due_to_context_cap": 4,
           "omitted_before_context_selection": 0
         },
         "events": [
-          {
-            "event_key": "7ZFGxk2nbiE",
-            "content_sha256": "700a621e8d45167634f12e0540d31b437f921fc8efb0daea607033b65fc4ee34",
-            "occurred_at": "2026-10-24T04:00:23+00:00",
-            "relevance": {
-              "tickers": [
-                "META",
-                "GOOGL",
-                "MSFT",
-                "AMZN"
-              ],
-              "markets": [
-                "US"
-              ],
-              "themes": [],
-              "match_basis": "verified_entities",
-              "matched_tickers": [
-                "AMZN",
-                "GOOGL"
-              ],
-              "market_match": true,
-              "score": 220
-            },
-            "summary": {
-              "video_id": "7ZFGxk2nbiE",
-              "title": "투자자들이 꼭 알아야 하는 다음 주 미국 투자 포인트(10.26~10.30)",
-              "channel": "경제사냥꾼",
-              "source_url": "https://www.youtube.com/watch?v=7ZFGxk2nbiE",
-              "claim_status_summary": {
-                "unverified": 8,
-                "asr_uncertain": 1
-              },
-              "claims": [
-                {
-                  "claim_id": "C1",
-                  "claim_text": "10월 22일 미국 국채 금리가 크게 하락했지만 나스닥은 2.6% 하락했으며, AI 투자 수익성 우려가 원인이다.",
-                  "status": "unverified",
-                  "confidence": 0.99,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "금리 하락에도 기술주가 하락했다는 수치와 원인을 확인하기 전에는 이를 매매 근거로 사용하기 어렵다."
-                },
-                {
-                  "claim_id": "C2",
-                  "claim_text": "메타의 AI 설비 지출이 사업으로 벌어들인 현금을 초과했다.",
-                  "status": "unverified",
-                  "confidence": 0.99,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "동일 기간 현금흐름표에서 설비투자와 영업현금흐름을 비교하기 전에는 현금 부족을 단정할 수 없다."
-                },
-                {
-                  "claim_id": "C3",
-                  "claim_text": "26일 한국시간 23:30 텍사스 제조업, 27일 내구재 주문과 23:00 소비자 신뢰가 발표되며, 대형 항공기 주문을 제외한 기업 투자 흐름을 확인해야 한다.",
-                  "status": "unverified",
-                  "confidence": 0.99,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "발표 일정과 세부 지표를 확인하고, 전체 주문 증가를 곧바로 기업 투자 확대와 동일시하지 않아야 한다."
-                },
-                {
-                  "claim_id": "C4",
-                  "claim_text": "28일 한국시간 06:00 카드 결제 관련 기업의 실적 설명회가 있으며, 미국 내 결제 증가로 실제 소비를 확인할 수 있다.",
-                  "status": "asr_uncertain",
-                  "confidence": 0.99,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "기업명과 지표 범위를 먼저 확인해야 하며, 확인 전에는 특정 카드사 일정이나 소비 강세로 해석할 수 없다."
-                }
-              ],
-              "entities": [
-                {
-                  "ticker": "META",
-                  "name": "메타",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                },
-                {
-                  "ticker": "GOOGL",
-                  "name": "알파벳",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                },
-                {
-                  "ticker": "MSFT",
-                  "name": "마이크로소프트",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                },
-                {
-                  "ticker": "AMZN",
-                  "name": "아마존",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                }
-              ]
-            }
-          },
           {
             "event_key": "JcLYlAz5sJY",
             "content_sha256": "68457401cb885b5c7fd0deb6062123e185341cddcc4ccc46663dba24c2f4c9b0",
@@ -2108,6 +2002,70 @@
               ],
               "entities": []
             }
+          },
+          {
+            "event_key": "05eN_Yk6JNg",
+            "content_sha256": "1b07004fe71ddfe1149dfdd7a0c62fb577291fa075b8ce5e3b5aa73638b12995",
+            "occurred_at": "2026-10-25T05:00:00+00:00",
+            "relevance": {
+              "tickers": [],
+              "markets": [],
+              "themes": [],
+              "match_basis": "title_and_claim_context",
+              "matched_tickers": [],
+              "market_match": false,
+              "score": 0
+            },
+            "summary": {
+              "video_id": "05eN_Yk6JNg",
+              "title": "AI절대 안 망한다, 삼전닉스가 준비하는 '차세대 메모리' 정체",
+              "channel": "경제사냥꾼",
+              "source_url": "https://www.youtube.com/watch?v=05eN_Yk6JNg",
+              "claim_status_summary": {
+                "unverified": 8,
+                "asr_uncertain": 1,
+                "partially_supported": 1
+              },
+              "claims": [
+                {
+                  "claim_id": "C1",
+                  "claim_text": "2026년 10월 삼성전자 약 20%, SK하이닉스 약 30% 하락이 2008년 금융위기 이후 최대 낙폭이라는 주장.",
+                  "status": "unverified",
+                  "confidence": 0.99,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "낙폭이나 역사적 저평가를 매수 근거로 사용할 수 없다."
+                },
+                {
+                  "claim_id": "C2",
+                  "claim_text": "삼성전자가 이달 초 분기 영업이익 107조 원을 발표해 국내 기업 최초로 100조 원을 넘겼다는 주장.",
+                  "status": "asr_uncertain",
+                  "confidence": 0.98,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "실적 규모와 지표를 확정하기 전 이익 전망이나 밸류에이션 계산에서 제외해야 한다."
+                },
+                {
+                  "claim_id": "C3",
+                  "claim_text": "주가 하락은 2028년 AI 투자 둔화 우려의 선반영이며 차세대 메모리 매출이 당시 성장 둔화를 보완한다는 투자 가설.",
+                  "status": "unverified",
+                  "confidence": 0.99,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "2028년 성장 방어는 확인된 전망이 아니라 검증되지 않은 시나리오다."
+                },
+                {
+                  "claim_id": "C4",
+                  "claim_text": "AI 사용·추론 확대에 따라 메모리 병목이 커지며 삼성전자 전문가가 메모리 때문에 AI 성능을 100% 활용하지 못한다고 발언했다는 주장.",
+                  "status": "unverified",
+                  "confidence": 0.98,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "인용문이나 병목 설명을 특정 업체의 매출 증가 근거로 확장할 수 없다."
+                }
+              ],
+              "entities": []
+            }
           }
         ],
         "execution_eligible": false
@@ -3089,7 +3047,6 @@
           "youtube": {
             "source_health": "OK",
             "event_keys": [
-              "7ZFGxk2nbiE",
               "JcLYlAz5sJY",
               "5v_OgboQYx8",
               "JaLRHTG_Kks",
@@ -3100,19 +3057,20 @@
               "qNyqnAJ1LeI",
               "Sl-xaZDGZXM",
               "Xxu5sqHcCbA",
-              "pfK5cs3z04Q"
+              "pfK5cs3z04Q",
+              "05eN_Yk6JNg"
             ],
             "coverage": {
               "total_unique_events": 489,
-              "window_events": 17,
+              "window_events": 16,
               "transmitted_events": 12,
               "truncated": true,
-              "oldest_occurred_at": "2026-10-24T04:00:23+00:00",
+              "oldest_occurred_at": "2026-10-24T07:00:22+00:00",
               "newest_occurred_at": "2026-10-25T11:00:26+00:00",
-              "available_events_before_context_cap": 17,
+              "available_events_before_context_cap": 16,
               "context_event_cap": 12,
-              "omitted_events": 5,
-              "omitted_due_to_context_cap": 5,
+              "omitted_events": 4,
+              "omitted_due_to_context_cap": 4,
               "omitted_before_context_selection": 0
             }
           },

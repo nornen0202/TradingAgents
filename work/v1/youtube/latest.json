@@ -1,13 +1,13 @@
 {
   "schema": "tradingagents.work-context/v1",
   "surface": "youtube",
-  "event_id": "youtube:4eca2396c6a9a56413a80316b457f602",
+  "event_id": "youtube:4a94fec9f7701de14616d466e57bed90",
   "prompt_contract_version": "youtube-work-v5",
   "prompt_sha256": "82a87727ec636b928ccb90cfe8cd823d86347e254ed0b204903699e34e35ef0b",
   "skill_sha256": "4dffe28b3721557cc2517b5afff2f94045832606e71ff61461df969f6abb53c7",
   "task_manifest_sha256": "c0992fa275c9961bc91c679030c0b4d9b8b06f3d164226776421f1e354b5c22e",
   "workflow_contract_sha256": "4982d0db0e5a97f3b0f392bdff489a6940be0d2d88e7ea94533edbdb009b4556",
-  "source_sha256": "b9c8b0415dd72e6364f8e35b8f2a9f064a5bfd2b2a22fd8245436cd848bf1406",
+  "source_sha256": "256b01811953c1edc7d528d0fec78bc0c8e0a93356d17710e1172f9e2c1ff51d",
   "body": {
     "kind": "youtube",
     "source_health": "OK",
@@ -44,10 +44,10 @@
     },
     "coverage": {
       "total_unique_events": 489,
-      "window_events": 17,
-      "transmitted_events": 17,
+      "window_events": 16,
+      "transmitted_events": 16,
       "truncated": false,
-      "oldest_occurred_at": "2026-10-24T04:00:23+00:00",
+      "oldest_occurred_at": "2026-10-24T06:00:33+00:00",
       "newest_occurred_at": "2026-10-25T11:00:26+00:00"
     },
     "events": [
@@ -2838,199 +2838,6 @@
               "source_url": "https://finance.yahoo.com/markets/stocks/articles/srf-ltd-bom-503806-q2-050502802.html",
               "publisher": "GuruFocus.com",
               "published_at": "2026-10-24T05:05:02+00:00",
-              "source_tier": "news"
-            }
-          ]
-        }
-      },
-      {
-        "event_key": "7ZFGxk2nbiE",
-        "content_sha256": "700a621e8d45167634f12e0540d31b437f921fc8efb0daea607033b65fc4ee34",
-        "occurred_at": "2026-10-24T04:00:23+00:00",
-        "relevance": {
-          "tickers": [
-            "META",
-            "GOOGL",
-            "MSFT",
-            "AMZN"
-          ],
-          "markets": [
-            "US"
-          ],
-          "themes": [],
-          "match_basis": "verified_entities"
-        },
-        "strategy_source_tier": "STANDARD",
-        "strategy_evidence_weight": "STANDARD",
-        "summary": {
-          "video_id": "7ZFGxk2nbiE",
-          "title": "투자자들이 꼭 알아야 하는 다음 주 미국 투자 포인트(10.26~10.30)",
-          "channel": "경제사냥꾼",
-          "source_url": "https://www.youtube.com/watch?v=7ZFGxk2nbiE",
-          "published_at": "2026-10-24T04:00:23+00:00",
-          "status": "asr_uncertain",
-          "strategy_source_tier": "STANDARD",
-          "strategy_evidence_weight": "STANDARD",
-          "strategy_validation_policy": "STANDARD_REVIEW",
-          "transcript_quality": {
-            "status": "good",
-            "score": 1.0,
-            "warnings": [],
-            "source": "automatic",
-            "language": "Korean (Original)",
-            "model_or_format": "json3",
-            "chars": 1657,
-            "segments": 88,
-            "duration_seconds": 135,
-            "repeated_ngram_ratio": 0.0
-          },
-          "claim_status_summary": {
-            "unverified": 8,
-            "asr_uncertain": 1
-          },
-          "claims": [
-            {
-              "claim_id": "C1",
-              "claim_text": "10월 22일 미국 국채 금리가 크게 하락했지만 나스닥은 2.6% 하락했으며, AI 투자 수익성 우려가 원인이다.",
-              "status": "unverified",
-              "confidence": 0.99,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "금리 하락에도 기술주가 하락했다는 수치와 원인을 확인하기 전에는 이를 매매 근거로 사용하기 어렵다."
-            },
-            {
-              "claim_id": "C2",
-              "claim_text": "메타의 AI 설비 지출이 사업으로 벌어들인 현금을 초과했다.",
-              "status": "unverified",
-              "confidence": 0.99,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "동일 기간 현금흐름표에서 설비투자와 영업현금흐름을 비교하기 전에는 현금 부족을 단정할 수 없다."
-            },
-            {
-              "claim_id": "C3",
-              "claim_text": "26일 한국시간 23:30 텍사스 제조업, 27일 내구재 주문과 23:00 소비자 신뢰가 발표되며, 대형 항공기 주문을 제외한 기업 투자 흐름을 확인해야 한다.",
-              "status": "unverified",
-              "confidence": 0.99,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "발표 일정과 세부 지표를 확인하고, 전체 주문 증가를 곧바로 기업 투자 확대와 동일시하지 않아야 한다."
-            },
-            {
-              "claim_id": "C4",
-              "claim_text": "28일 한국시간 06:00 카드 결제 관련 기업의 실적 설명회가 있으며, 미국 내 결제 증가로 실제 소비를 확인할 수 있다.",
-              "status": "asr_uncertain",
-              "confidence": 0.99,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "기업명과 지표 범위를 먼저 확인해야 하며, 확인 전에는 특정 카드사 일정이나 소비 강세로 해석할 수 없다."
-            },
-            {
-              "claim_id": "C5",
-              "claim_text": "29일 한국시간 03:00 금리 결정과 03:30 기자회견이 예정되어 있으며, 경제학자 100명 대상 동결 전망 설문과 의장의 12월 추가 인상 관련 발언이 중요하다.",
-              "status": "unverified",
-              "confidence": 0.99,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "회의 일정과 정책 맥락을 확인하기 전에는 동결 합의나 12월 추가 인상 전망을 확정된 정보로 사용할 수 없다."
-            },
-            {
-              "claim_id": "C6",
-              "claim_text": "29일 한국시간 21:30 성장률과 물가가 금리 결정 18시간 30분 뒤 발표되고, 30일에는 기업 임금 부담 지표가 발표된다. 높은 물가·임금은 금리 부담을 늘릴 수 있다.",
-              "status": "unverified",
-              "confidence": 0.99,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "발표 지표와 일정을 먼저 확인하고, 향후 수치와 정책 반응은 조건부 시나리오로 다뤄야 한다."
-            }
-          ],
-          "entities": [
-            {
-              "ticker": "META",
-              "name": "메타",
-              "status": "unverified",
-              "verification_notes": [
-                "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-              ]
-            },
-            {
-              "ticker": "GOOGL",
-              "name": "알파벳",
-              "status": "unverified",
-              "verification_notes": [
-                "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-              ]
-            },
-            {
-              "ticker": "MSFT",
-              "name": "마이크로소프트",
-              "status": "unverified",
-              "verification_notes": [
-                "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-              ]
-            },
-            {
-              "ticker": "AMZN",
-              "name": "아마존",
-              "status": "unverified",
-              "verification_notes": [
-                "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-              ]
-            }
-          ],
-          "evidence": [
-            {
-              "evidence_id": "E1",
-              "claim_id": "C1",
-              "title": "The Nasdaq Just Had Its Worst Day in 4 Months. Here's the Level That Would Signal a Correction, and What History Says Investors Can Do About It.",
-              "source_url": "https://finance.yahoo.com/markets/stocks/articles/nasdaq-just-had-worst-day-195000854.html",
-              "publisher": "Motley Fool",
-              "published_at": "2026-10-24T19:50:00+00:00",
-              "source_tier": "market_or_news"
-            },
-            {
-              "evidence_id": "E2",
-              "claim_id": "C1",
-              "title": "Stock Market Sell-Off: History Says This Is the Best Move to Make Right Now",
-              "source_url": "https://finance.yahoo.com/markets/stocks/articles/stock-market-sell-off-history-194100080.html",
-              "publisher": "Motley Fool",
-              "published_at": "2026-10-24T19:41:00+00:00",
-              "source_tier": "market_or_news"
-            },
-            {
-              "evidence_id": "E4",
-              "claim_id": "C2",
-              "title": "Havells India Ltd (BOM:517354) (Q2 2027) Earnings Call Highlights: Revenue Jumps 35% as Lloyd ...",
-              "source_url": "https://finance.yahoo.com/markets/stocks/articles/havells-india-ltd-bom-517354-110128987.html",
-              "publisher": "GuruFocus.com",
-              "published_at": "2026-10-24T11:01:28+00:00",
-              "source_tier": "market_or_news"
-            },
-            {
-              "evidence_id": "E5",
-              "claim_id": "C3",
-              "title": "Top 3 Silver Stocks To Watch In October 2026",
-              "source_url": "https://finance.yahoo.com/markets/commodities/articles/top-3-silver-stocks-watch-211052800.html",
-              "publisher": "Simply Wall St.",
-              "published_at": "2026-10-24T21:10:52+00:00",
-              "source_tier": "news"
-            },
-            {
-              "evidence_id": "E6",
-              "claim_id": "GLOBAL",
-              "title": "Bitcoin or Gold: Which Is the Better Inflation Hedge With Prices Up 3.7%?",
-              "source_url": "https://finance.yahoo.com/markets/crypto/articles/bitcoin-gold-better-inflation-hedge-214840479.html",
-              "publisher": "24/7 Wall St.",
-              "published_at": "2026-10-24T21:48:40+00:00",
-              "source_tier": "news"
-            },
-            {
-              "evidence_id": "E7",
-              "claim_id": "GLOBAL",
-              "title": "Berkshire Owns Both Chevron and Occidental. Which Oil Stock Is the Better Buy Now?",
-              "source_url": "https://finance.yahoo.com/energy/articles/berkshire-owns-both-chevron-occidental-213500011.html",
-              "publisher": "Motley Fool",
-              "published_at": "2026-10-24T21:35:00+00:00",
               "source_tier": "news"
             }
           ]
