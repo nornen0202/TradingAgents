@@ -43,6 +43,8 @@ def require_storage_headroom(*paths):
     for path in paths:
         candidate = Path(path).resolve()
         while not candidate.exists():
+            if candidate.parent == candidate:
+                raise LocalStorageHeadroomError(f"Local analysis storage volume is unavailable: {candidate}")
             candidate = candidate.parent
         free = shutil.disk_usage(candidate).free
         if free < 4 * 1024**3:

@@ -30,6 +30,16 @@ def test_local_output_reserve_blocks_full_disk_before_auth(tmp_path, monkeypatch
             unpatched.require_storage_headroom(tmp_path / "not-created")
 
 
+def test_unmounted_volume_does_not_loop_forever(tmp_path, monkeypatch):
+    from importlib import util
+    spec = util.spec_from_file_location("missing_storage_test", Path(local.__file__))
+    unpatched = util.module_from_spec(spec)
+    spec.loader.exec_module(unpatched)
+    monkeypatch.setattr(Path, "exists", lambda _: False)
+    with pytest.raises(unpatched.LocalStorageHeadroomError, match="volume is unavailable"):
+        unpatched.require_storage_headroom(tmp_path / "disconnected-volume")
+
+
 def test_manual_finalization_counts_against_existing_budget_without_rewriting_history(tmp_path, monkeypatch):
     import hashlib
     from tradingagents.scheduled import runner
