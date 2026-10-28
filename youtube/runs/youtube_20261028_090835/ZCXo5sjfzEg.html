@@ -1,0 +1,682 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YouTube 투자자용 검증 리포트 - 코스피 &#x27;매수 사이드카&#x27;…SK하이닉스, 키옥시아 &#x27;16조 특별배당&#x27; 나올까 | 박지훈 NH투자증권 부장, 김종문 NH투자증권 부장 [아침N투자]</title>
+  <style>
+:root {
+  color-scheme: light;
+  --bg: #f7f8fb;
+  --panel: #ffffff;
+  --text: #172033;
+  --muted: #667085;
+  --line: #d9dee8;
+  --accent: #0f766e;
+  --accent-2: #2563eb;
+  --warn: #b45309;
+  --bad: #b42318;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0 56px; }
+a { color: var(--accent-2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.hero { padding: 28px 0 22px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+.hero.compact { padding-top: 12px; }
+.hero h1 { margin: 0; font-size: clamp(28px, 4vw, 44px); line-height: 1.15; letter-spacing: 0; }
+.hero p { max-width: 760px; color: var(--muted); margin: 12px 0 0; }
+.eyebrow { color: var(--accent); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0; margin: 0 0 8px; }
+section { margin: 28px 0; }
+h2, h3, h4, h5 { letter-spacing: 0; line-height: 1.25; }
+.synthesis-callout { padding: clamp(20px, 4vw, 34px); border: 1px solid #6ee7d8; border-radius: 18px; background: linear-gradient(135deg, #ecfdf9 0%, #eff6ff 100%); box-shadow: 0 18px 44px rgba(15, 118, 110, .12); }
+.synthesis-callout.unavailable { border-color: var(--line); background: var(--panel); box-shadow: none; }
+.synthesis-callout h2 { margin: 0; font-size: clamp(24px, 3.2vw, 36px); }
+.synthesis-callout .lead { max-width: 900px; font-size: 17px; color: #334155; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.primary-link, .secondary-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border-radius: 999px; font-weight: 800; }
+.primary-link { color: white; background: var(--accent); }
+.secondary-link { color: var(--accent-2); border: 1px solid #93c5fd; background: white; }
+.primary-link:hover, .secondary-link:hover { text-decoration: none; filter: brightness(.97); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.card, .run { display: flex; flex-direction: column; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; color: var(--text); min-height: 128px; }
+.run { padding: 16px; }
+.card:hover, .run:hover { border-color: var(--accent-2); text-decoration: none; }
+.thumb { display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #e9edf5; border-radius: 8px 8px 0 0; color: var(--muted); font-size: 13px; font-weight: 700; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb-empty span { padding: 0 14px; text-align: center; }
+.card-body { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 16px; }
+.card strong { line-height: 1.35; }
+.source-line { color: #3f4a5f; font-weight: 600; }
+.runs { display: grid; gap: 10px; }
+.badge { display: inline-flex; width: fit-content; border-radius: 999px; padding: 2px 9px; background: #e6f4f1; color: var(--accent); font-size: 12px; font-weight: 700; }
+.status-contradicted, .status-llm_failed { background: #fee4e2; color: var(--bad); }
+.status-unverified, .status-stale { background: #fff4d6; color: var(--warn); }
+small, .muted { color: var(--muted); }
+.topnav { display: flex; gap: 14px; margin-bottom: 16px; font-size: 14px; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px; }
+.stats span { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
+.report { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: min(5vw, 36px); }
+.report-head { border-bottom: 1px solid var(--line); margin-bottom: 24px; padding-bottom: 20px; }
+.report-head h1 { margin: 0; font-size: clamp(24px, 3.5vw, 38px); line-height: 1.2; }
+.meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+.scope-note { padding: 12px 14px; border-left: 4px solid var(--warn); border-radius: 6px; background: #fff7ed; color: #7c2d12; }
+.synthesis-report h2 { margin-top: 34px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.synthesis-report h3 { margin: 24px 0 8px; color: #0f4c5c; }
+.synthesis-report p, .synthesis-report li { overflow-wrap: anywhere; }
+pre { overflow: auto; background: #111827; color: #f9fafb; border-radius: 8px; padding: 14px; }
+code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+details { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 18px; }
+@media (max-width: 640px) {
+  main { width: min(100% - 20px, 1120px); padding-top: 18px; }
+  .report { padding: 18px; }
+  .synthesis-callout { border-radius: 14px; padding: 18px; }
+  .cta-row a { width: 100%; }
+  .mobile-report { border-radius: 12px; }
+}
+</style>
+</head>
+<body>
+  <main>
+<nav class="topnav"><a href="index.html">실행 목록</a><a href="../../index.html">YouTube 홈</a></nav>
+<article class="report">
+  <header class="report-head">
+    <p class="eyebrow">youtube_20261028_090835</p>
+    <h1>코스피 &#x27;매수 사이드카&#x27;…SK하이닉스, 키옥시아 &#x27;16조 특별배당&#x27; 나올까 | 박지훈 NH투자증권 부장, 김종문 NH투자증권 부장 [아침N투자]</h1>
+    <div class="meta">
+      <span class="badge status-asr_uncertain">asr_uncertain</span>
+      <a href="https://www.youtube.com/watch?v=ZCXo5sjfzEg">원본 영상</a>
+    </div>
+  </header>
+  <h2>메모리 업황과 주주환원 기대: ‘16조원 특별배당’은 어디까지 확인됐나</h2>
+<ul>
+<li>대상: <a href="https://www.youtube.com/watch?v=ZCXo5sjfzEg">삼프로TV 영상</a>, 2026년 10월 27일 업로드</li>
+<li>분석 범위: 제공된 자동자막 분석·공시 목록·뉴스 발췌·주장 검증 결과</li>
+</ul>
+<h3>1. 핵심 결론</h3>
+<p>영상의 상승 논리는 <strong>AI 투자 확대 → 메모리 수요·가격 강세 → 현금흐름 증가 → 주주환원 확대</strong>다. 다만 제공 자료로 부분 확인되는 것은 SK하이닉스의 <strong>후속 배당·자사주 취득 결정 공시 목록</strong>과 <strong>솔리다임 IPO 중단 관련 보도</strong>다. 업황 전망과 특별배당의 구체적인 규모는 별도 검증이 필요하다.</p>
+<p>특히 <strong>키옥시아 투자 차익 20조원, 특별배당 16조원, 주당 23,000원은 확정된 사실이 아니다.</strong> 공시 목록에 배당결정이 있다는 사실만으로 배당의 종류·금액·재원이 영상 시나리오와 일치한다고 볼 수 없다.</p>
+<p>검증 대상 11개 중 2개는 부분 지지, 2개는 자동음성인식 불확실, 나머지 7개는 미검증이다. 이는 주장들이 거짓이라는 뜻이 아니라, 제공 근거가 충분하지 않다는 의미다.</p>
+<h3>2. 영상 주장과 확인된 근거</h3>
+<p>| 주제·영상 구간 | 영상 주장 | 확인된 사실·근거와 한계 |</p>
+<p>|---|---|---|</p>
+<p>| 코스피 반등·수급, 00:00·54:06 | 약 4% 상승, 매수 사이드카, 외국인 현물·선물 동반 매수 | <strong>미검증.</strong> 해당 방송 시점의 KRX 자료가 없다. 다음 날 장중 보도로 전날 발언을 검증할 수 없다. |</p>
+<p>| SK하이닉스 특별배당, 06:15 | 키옥시아 투자 차익을 활용한 16조원 특별배당 가능성 | <strong>부분 지지.</strong> 10월 28일 배당결정·배당 기준일·자사주 취득 결정 공시 목록은 있다. 특별배당 여부와 금액·재원은 본문 미제공으로 확인 불가다. |</p>
+<p>| 환원 정책·소각, 12:16 | 2027년까지 FCF 50% 이상 환원, 11월 5일 대규모 소각 | <strong>인식 불확실·원문 확인 필요.</strong> 정책 원문과 소각 공시 본문이 없다. 자사주 취득 결정은 소각 결정과 다르다. |</p>
+<p>| 키옥시아 가치평가, 24:51 | 급락 후 예상 PER 약 2배로 저평가 | <strong>미검증.</strong> 시가총액·실적 전망·환율 자료가 없다. 제시된 숫자끼리도 산술이 맞지 않는다. |</p>
+<p>| 솔리다임, 18:28 | IPO 중단에도 자체 현금흐름으로 미국 투자 가능 | <strong>중단 사실만 부분 지지.</strong> 후속 보도는 시장 변동성을 중단 이유로 전한다. 투자재원의 충분성·이익 전망·가정 기업가치는 확인되지 않았다. |</p>
+<p>| 메모리 산업, 24:51·30:55 | AI 수요와 장기계약이 가격 강세 및 장기 호황을 지지 | <strong>전망·미검증.</strong> 제품별 가격과 회사별 계약 조건이 없다. |</p>
+<p>| 삼성전자 우선주, 30:55·36:40 | 배당 세제 변화가 수요를 높이고 높은 배당수익률 가능 | <strong>미검증.</strong> 적용 법령·우선주 가격·주당배당금이 없어 수익률을 계산할 수 없다. |</p>
+<p>| CXMT 경쟁력, 36:40 | 수율 홍보와 IPO 자료가 다르고 기술 추격에 한계 | <strong>인식 불확실·미검증.</strong> 제품·공정·수율 정의와 원자료가 없어 과장 여부나 경쟁력을 판정할 수 없다. |</p>
+<h4>근거의 강도</h4>
+<p>가장 직접적인 자료는 제공된 OpenDART 목록이다. <a href="https://dart.fss.or.kr/dsaf001/main.do?rcpNo=20261028800045">현금·현물배당결정</a>, <a href="https://dart.fss.or.kr/dsaf001/main.do?rcpNo=20261028800048">배당 기준일 결정</a>, <a href="https://dart.fss.or.kr/dsaf001/main.do?rcpNo=20261028000014">자기주식취득결정</a>이 포함돼 있다. 다만 <strong>확인 범위는 목록 정보이며 공시 본문 내용은 아니다.</strong></p>
+<p><a href="https://zdnet.co.kr/view/?no=20261028091956">ZDNet의 솔리다임 IPO 중단 보도</a> 발췌에는 경영진이 시장 변동성을 이유로 중단을 설명했다는 내용이 있다. 영구 철회인지, 영상이 언급한 10월 23일에 발표됐는지는 확인되지 않았다.</p>
+<p><a href="https://biz.chosun.com/it-science/ict/2026/10/28/CPXJACMY2ZD3FDPODI2UYNSNVY/">SK하이닉스 출하량 전망 보도</a> 발췌에는 4분기 D램 출하량이 전 분기 대비 20% 중반, NAND는 한 자릿수 중반 증가할 것이라는 회사 전망이 담겼다. 이는 <strong>실현된 출하량이나 가격·이익 증가의 확인은 아니다.</strong></p>
+<p>이 자료들은 모두 업로드 다음 날의 후속 자료이므로 방송 당시 확정 정보였다고 소급할 수 없다.</p>
+<h3>3. 상승 논리와 반론</h3>
+<h4>상승 논리가 성립하려면</h4>
+<p>1. <strong>수요의 수익화:</strong> AI 투자 확대가 실제 주문·출하로 연결되고, 판매가격과 제품 구성이 수익성을 뒷받침해야 한다.</p>
+<p>2. <strong>이익의 현금화:</strong> 회계상 이익 증가가 운전자본·설비투자·세금 등을 거친 뒤 잉여현금흐름 증가로 이어져야 한다.</p>
+<p>3. <strong>환원의 구체화:</strong> 배당·자사주 정책이 총액뿐 아니라 기간·재원·실행 조건까지 명확해져야 한다.</p>
+<p>영상은 이 연결고리를 낙관적으로 해석한다. 후속 공시 목록과 출하량 전망은 관련 관찰 자료이지만, 전체 논리가 입증됐다는 의미는 아니다.</p>
+<h4>주요 반론</h4>
+<ul>
+<li><strong>환원 기대가 실제 발표보다 클 수 있다.</strong> 영상의 16조원 특별배당이나 50조원 환원 기대가 선반영됐다면, 실적 개선과 별개로 발표 세부 내용에 실망할 가능성이 있다.</li>
+<li><strong>투자 차익과 배당 재원은 다르다.</strong> 키옥시아 관련 평가·처분손익, 펀드 분배금, 세후 실제 유입 현금과 배당가능이익을 구별해야 한다.</li>
+<li><strong>출하 증가가 이익 증가를 보장하지 않는다.</strong> 판매단가·원가·제품 구성·투자지출도 함께 확인해야 한다. 장기계약 역시 가격 재설정 조건을 모르면 이익을 보장하는 근거가 되지 못한다.</li>
+<li><strong>경쟁사의 불확실성이 국내 업체의 우위를 증명하지 않는다.</strong> CXMT의 수율·납품·기술 자료가 없으므로 경쟁력을 낮게 단정할 수 없다.</li>
+<li><strong>하루 반등은 추세 전환의 증거가 아니다.</strong> 영상의 사이드카와 외국인 수급 자체도 아직 미검증이다. 레버리지 노출이 있다면 변동성에 따른 강제 청산 가능성을 별도로 점검할 필요가 있다.</li>
+</ul>
+<h3>4. 숫자와 출처를 읽을 때의 한계</h3>
+<h4>특별배당·PER의 조건부 산술</h4>
+<ul>
+<li><strong>16조원 ÷ 23,000원 ≈ 6억 9,565만주:</strong> 두 주장이 동시에 맞으려면 필요한 배당 대상 주식 수다. 실제 주식 수를 확인한 결과가 아니다.</li>
+<li><strong>16조원 ÷ 2% = 800조원:</strong> 영상의 비율이 전제하는 시가총액이다. 시장 조회값이 아니다.</li>
+<li><strong>180조원 ÷ 50조원 = PER 3.6배:</strong> 키옥시아에 제시된 시가총액과 순이익을 동일 시점·회계 범위로 가정하면 약 2배와 불일치한다. 어느 입력값이 잘못됐는지는 알 수 없다.</li>
+</ul>
+<p>SK하이닉스·삼성전자 시장 조회는 모두 실패해 현재 주가·시가총액·PER이 제공되지 않았다. 뉴스 제목이나 영상 수치로 이를 대체하지 않았다. 삼성전자 보통주 코드 005930의 자료를 우선주 가격 검증으로 사용할 수도 없다.</p>
+<h4>자막 신뢰도와 사실 신뢰도는 다르다</h4>
+<p><code>transcript_quality</code>는 <code>good</code>, 점수는 1.0이지만 자동자막의 금융 숫자 정확성을 보증하지 않는다. 주요 항목의 <code>source_confidence / asr_confidence</code>는 다음과 같다.</p>
+<p>| 주장 | source_confidence | asr_confidence |</p>
+<p>|---|---:|---:|</p>
+<p>| 특별배당, 06:15 | 0.74 | 0.80 |</p>
+<p>| 환원 정책·이익·소각 수치, 12:16 | 0.74 | 0.30 |</p>
+<p>| 키옥시아 가치평가, 24:51 | 0.68 | 0.45 |</p>
+<p>| 솔리다임, 18:28 | 0.79 | 0.75 |</p>
+<p>| CXMT, 36:40 | 0.55 | 0.25 |</p>
+<p>이 값들은 사실일 확률이 아니다. 특히 ASR 신뢰도는 표현 명료성에 대한 정성적 추정치다. 타임스탬프도 정확한 문장 시각이 아니라 자막 청크 시작점이다. 초반 날짜와 후반 날짜 발언이 충돌해 실제 방송일의 추가 확인도 필요하다.</p>
+<p>수집 근거 E1~E4는 대상 주장과 무관한 금속 기사이며, E5~E7은 본문 발췌가 없다. E6 제목의 ‘750억 달러 환원’도 기간·구성·조건이 없어 영상 수치와 직접 비교하지 않았다. 수집 상태가 <code>verified</code>라는 표시는 주장 전체가 검증됐다는 뜻이 아니다.</p>
+<p>골드만삭스·노무라 전망, BNK 평가, 유명 인사 인터뷰는 원문 미확보다. <strong>Bloomberg·Morningstar 원문도 제공되지 않았으며, 해당 출처 및 고객 전용 보고서·비공개 계약 관련 주장은 미검증·수동 확인 필요</strong>로 남긴다.</p>
+<h3>5. 가까운 체크포인트와 무효화 조건</h3>
+<p>| 확인 대상 | 구체적으로 관찰할 항목 | 영상의 낙관적 해석이 약해지는 조건 |</p>
+<p>|---|---|---|</p>
+<p>| SK하이닉스 배당·자사주 | 공시 본문의 총액·DPS·기간·기준일·재원, 특별배당 여부, 취득과 소각 구분 | 특별배당이 아니거나 규모·시점·조건이 영상 가정과 크게 다름 |</p>
+<p>| 키옥시아 회수 | 계약·결제 여부, 펀드 분배금, 세금, 잔존 지분, 실제 유입 현금 | 회수가 미완료이거나 배당에 활용 가능한 현금이 기대보다 적음 |</p>
+<p>| FCF 환원 정책 | 적용 기간·FCF 정의·환원 비율·예외 조건, 11월 5일 소각 주장 원문 | 정책 조건이 영상 설명과 다르거나 투자 부담으로 환원 여력이 제한됨 |</p>
+<p>| 메모리 업황 | 출하 전망 달성, 제품별 ASP·이익률·재고·설비투자·영업현금흐름 | 출하 증가에도 가격·마진·현금흐름이 악화됨 |</p>
+<p>| 솔리다임 | IPO 중단 범위, 대체 조달 수단, 실제 이익·현금흐름과 미국 투자지출 | 투자자금 수요가 자체 창출 현금을 웃돎 |</p>
+<p>| 시장·거시 | 방송일 KRX 기록과 시각별 현선물 수급, 공식 FOMC·PCE·선거 일정, 유종별 유가 | 수급 개선이 이어지지 않거나 금리·유가 부담이 실적 기대를 훼손함 |</p>
+<p>| 삼성전자 우선주 | 실제 우선주 가격·DPS, 세제 시행일·적격 요건·세율·일몰 | 예상 배당이 실현되지 않거나 세제 혜택이 해당 기업·투자자에게 적용되지 않음 |</p>
+<p>배당수익률은 <strong>동일 기준의 연간 주당배당금 ÷ 취득가격</strong>으로 재계산하고 세전·세후를 구분해야 한다. 영상의 5~10%, 10~20%는 확인된 수익률이 아니다. 대만 세제 변경과 주가 상승의 시간적 동행도 인과관계의 증거로 볼 수 없다.</p>
+<h3>6. 종합 판단</h3>
+<p>영상은 급반등 속에서도 선도기업의 이익·현금흐름과 주주환원을 중심으로 판단하자는 관점을 제시한다. 그러나 현재 근거로는 <strong>‘16조원 특별배당 확정’, ‘키옥시아 PER 2배’, ‘2028년까지 호황 보장’, ‘삼성전자 우선주 고배당 보장’으로 결론 낼 수 없다.</strong></p>
+<p>향후 판단을 바꿀 핵심은 주가 반등 자체보다 <strong>공시 본문의 환원 조건, 키옥시아 회수 현금, 투자지출 이후 FCF, 실제 메모리 가격·마진의 변화</strong>다. 이 항목들이 확인될 때 영상의 기대를 검증 가능한 실적·환원 시나리오로 좁힐 수 있다.</p>
+  <details>
+    <summary>공개 요약 JSON</summary>
+    <pre>{
+  &quot;version&quot;: 4,
+  &quot;video_id&quot;: &quot;ZCXo5sjfzEg&quot;,
+  &quot;title&quot;: &quot;코스피 &#x27;매수 사이드카&#x27;…SK하이닉스, 키옥시아 &#x27;16조 특별배당&#x27; 나올까 | 박지훈 NH투자증권 부장, 김종문 NH투자증권 부장 [아침N투자]&quot;,
+  &quot;url&quot;: &quot;https://www.youtube.com/watch?v=ZCXo5sjfzEg&quot;,
+  &quot;channel&quot;: &quot;삼프로TV 3PROTV&quot;,
+  &quot;channel_id&quot;: &quot;UChlv4GSd7OQl3js-jkLOnFA&quot;,
+  &quot;source_url&quot;: &quot;https://www.youtube.com/@3protv/videos&quot;,
+  &quot;thumbnail_url&quot;: &quot;https://i.ytimg.com/vi/ZCXo5sjfzEg/maxresdefault.jpg&quot;,
+  &quot;published_at&quot;: &quot;2026-10-27T02:45:20+00:00&quot;,
+  &quot;status&quot;: &quot;asr_uncertain&quot;,
+  &quot;strategy_source_tier&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_evidence_weight&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_validation_policy&quot;: &quot;STANDARD_REVIEW&quot;,
+  &quot;transcript_status&quot;: &quot;available&quot;,
+  &quot;transcript_source&quot;: &quot;automatic&quot;,
+  &quot;transcript_chars&quot;: 30424,
+  &quot;transcript_quality&quot;: {
+    &quot;status&quot;: &quot;good&quot;,
+    &quot;score&quot;: 1.0,
+    &quot;warnings&quot;: [],
+    &quot;source&quot;: &quot;automatic&quot;,
+    &quot;language&quot;: &quot;Korean&quot;,
+    &quot;model_or_format&quot;: &quot;json3&quot;,
+    &quot;chars&quot;: 30424,
+    &quot;segments&quot;: 1669,
+    &quot;duration_seconds&quot;: 3434,
+    &quot;repeated_ngram_ratio&quot;: 0.0
+  },
+  &quot;generated_at&quot;: &quot;2026-10-28T09:08:35.315227+09:00&quot;,
+  &quot;llm_status&quot;: &quot;success&quot;,
+  &quot;research_status&quot;: &quot;success&quot;,
+  &quot;claim_verification_status&quot;: &quot;success&quot;,
+  &quot;research_pipeline_version&quot;: 4,
+  &quot;evidence_count&quot;: 7,
+  &quot;claim_status_summary&quot;: {
+    &quot;unverified&quot;: 7,
+    &quot;partially_supported&quot;: 2,
+    &quot;asr_uncertain&quot;: 2
+  },
+  &quot;claims&quot;: [
+    {
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;claim_text&quot;: &quot;방송 당일 코스피 약 4% 상승과 매수 사이드카, 전일 5,500 하회, 장중 코스피 5,711·코스닥 758, 외국인 현선물 동반 순매수 및 거래대금·레버리지 거래량 비교 주장.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.98,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.83,
+      &quot;asr_confidence&quot;: 0.55,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;전일 코스피 5,500 미만; 당일 약 +4%; 장중 5,711·758; 거래대금 과거 70~80조원·현재 10조원 초반; 레버리지 거래량 약 3배&quot;,
+        &quot;observed&quot;: &quot;방송일 해당 시점의 KRX 자료 없음. 다음 날 기사에는 5,788.89, +150.55포인트가 제시됐으나 비교 시점이 다름.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;사이드카 발동이나 외국인 매수 지속성을 확인된 매수 근거로 사용하기 어렵다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;claim_text&quot;: &quot;방송일부터 이틀간 FOMC 개최와 동결 예상, PCE 발표, 미국 중간선거 11월 3일 및 한국시간 11월 4일 결과 확인, 이스라엘 선거 일정과 유가 100 부근 주장.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:12:16&quot;,
+      &quot;source_confidence&quot;: 0.83,
+      &quot;asr_confidence&quot;: 0.65,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;FOMC 2026년 10월 27~28일 추정; 미국 선거 11월 3일; 한국시간 11월 4일; 유가 약 100&quot;,
+        &quot;observed&quot;: &quot;대조 가능한 공식 일정·정책금리·원유 가격 없음.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;이벤트 일정과 금리 전망을 거래 시점이나 확정 결과로 사용하기 전에 공식 자료를 확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;claim_text&quot;: &quot;키옥시아 투자 차익 약 20조원을 바탕으로 SK하이닉스 특별배당 16조원·주당 23,000원·시가총액 대비 2%가 가능하며, 언론에서 50조원 환원을 기대했다는 미확정 시나리오.&quot;,
+      &quot;status&quot;: &quot;partially_supported&quot;,
+      &quot;confidence&quot;: 0.93,
+      &quot;supporting_evidence_ids&quot;: [
+        &quot;E6&quot;,
+        &quot;ME_SK_DISC&quot;
+      ],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:06:15&quot;,
+      &quot;source_confidence&quot;: 0.74,
+      &quot;asr_confidence&quot;: 0.8,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;투자 차익 20조원; 특별배당 16조원; 주당 23,000원; 시총 대비 2%; 환원 기대 50조원&quot;,
+        &quot;observed&quot;: &quot;배당·자사주 취득 결정 공시의 존재만 확인. E6 제목상 환원 규모는 750억 달러이나 세부 조건 없음. 주식 수·시총 계산은 주장 내부의 조건부 산술이며 시장 관측값이 아님.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;후속 주주환원 발표 정황은 있으나 16조원 특별배당이나 주당 23,000원을 확정 수익으로 반영할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;claim_text&quot;: &quot;8월 정책은 2027년까지 잉여현금흐름 50% 이상 환원이며, 다음 달 5일 40조원 소각과 내년 영업이익 400조원·순이익 300조원 이상·환원 100~150조원·시총 800~900조원이라는 발언.&quot;,
+      &quot;status&quot;: &quot;asr_uncertain&quot;,
+      &quot;confidence&quot;: 0.98,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:12:16&quot;,
+      &quot;source_confidence&quot;: 0.74,
+      &quot;asr_confidence&quot;: 0.3,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;FCF 50% 이상·2027년까지; 11월 5일 40조원 소각; 영업이익 400조원·순이익 300조원 이상; 환원 100~150조원; 시총 800~900조원&quot;,
+        &quot;observed&quot;: &quot;정책·소각·전망 수치를 확인할 자료 없음. 숫자나 단위를 임의 교정하지 않음.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;대규모 이익·환원 전망과 소각액을 가치평가에 적용하기 전에 원음과 공시 원문을 대조해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;claim_text&quot;: &quot;키옥시아의 2024년 상장, 고점 대비 65% 하락, 시총 20~21조엔 또는 180조원, 2027년 3월기 순이익 약 40조원 후반~50조원·성장 30%·PER 2배·NAND 3~4위 및 SK하이닉스 간접 투자 지분·수익 주장.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:24:51&quot;,
+      &quot;source_confidence&quot;: 0.68,
+      &quot;asr_confidence&quot;: 0.45,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;시총 20~21조엔 또는 180조원; 순이익 약 40조원 후반~50조원; PER 약 2배; 지분 약 21%→14%대; 투자 수익 10~15배&quot;,
+        &quot;observed&quot;: &quot;외부 관측값 없음. 주장 내부 산술은 180조원÷50조원=3.6배. 회수 가격 37,000엔·12,500·13,000원엔은 확정 불가.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;저PER 평가와 투자 회수 수익을 확인된 사실로 사용할 수 없으며, 회계연도·환율·지분 구조를 먼저 일치시켜야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;claim_text&quot;: &quot;솔리다임 미국 IPO가 지난 금요일 중단됐으며, 인수가 12조원·가정 기업가치 200조원·상반기 이익 5조원 이상·연간 10조원 이상과 자체 현금흐름을 통한 미국 투자 조달이 가능하다는 주장.&quot;,
+      &quot;status&quot;: &quot;partially_supported&quot;,
+      &quot;confidence&quot;: 0.97,
+      &quot;supporting_evidence_ids&quot;: [
+        &quot;ME_SK_NEWS_IPO&quot;
+      ],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:18:28&quot;,
+      &quot;source_confidence&quot;: 0.79,
+      &quot;asr_confidence&quot;: 0.75,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;인수가 12조원; IPO 가치 200조원; 잔존 지분 80~90%; 조달 지분 10~15%; 상반기 이익 5조원 이상·연간 10조원 이상&quot;,
+        &quot;observed&quot;: &quot;IPO 중단과 그 이유에 관한 발언 보도만 확인. 금액·지분율·이익 수치 없음.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;IPO 중단은 후속 보도로 부분 확인되지만, 대체 투자재원과 가치평가·이익 전망은 별도로 검증해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;claim_text&quot;: &quot;골드만삭스 코스피 목표 12,000→9,000과 삼성전자·SK하이닉스 목표가 유지, 노무라의 2028년까지 메모리 사이클 전망, 댄 아이브스 추정 인물의 6~12개월 내 전고점 돌파 전망 인용.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:24:51&quot;,
+      &quot;source_confidence&quot;: 0.77,
+      &quot;asr_confidence&quot;: 0.6,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;코스피 목표 12,000→9,000; 메모리 사이클 적어도 2028년; 전고점 돌파 6개월~1년&quot;,
+        &quot;observed&quot;: &quot;일치하는 보고서·인터뷰 원문 없음.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;기관명이나 유명 인사 인용을 검증된 목표가·시장 전망으로 제시할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;claim_text&quot;: &quot;AI 투자와 장기 공급계약이 메모리 가격 강세를 지지하며 마이크론과 삼성전자·SK하이닉스의 계약 가격 반영 방식이 다르다는 설명 및 머스크·AI 서비스 사례 인용.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.97,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:30:55&quot;,
+      &quot;source_confidence&quot;: 0.77,
+      &quot;asr_confidence&quot;: 0.5,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;AI 서비스 무료 토큰·계정별 맥미니급 서버 제공; 회사별 장기계약 선체결 및 가격 상승 반영&quot;,
+        &quot;observed&quot;: &quot;서비스명·제공 조건·계약 기간·가격 조건을 확인할 원자료 없음.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;AI 수요에서 메모리 가격·이익 증가로 연결되는 논리는 전망으로 취급해야 하며 계약상 수익 보장으로 볼 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;claim_text&quot;: &quot;2026년부터 3년간 배당소득 분리과세와 금융소득 2,000만원 기준, 삼성전자 우선주 수요 및 예상 배당수익률 5~10% 또는 10~20%, 대만 세제 변경 이후 지수·TSMC 상승 비교.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:30:55&quot;,
+      &quot;source_confidence&quot;: 0.72,
+      &quot;asr_confidence&quot;: 0.65,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;2026년부터 3년; 금융소득 2,000만원; 예상 배당수익률 5~10%·10~20%; 대만 지수 3배·TSMC 10배·밸류에이션 20배&quot;,
+        &quot;observed&quot;: &quot;법령과 수익률 계산 입력값 및 대만 비교 시계열 없음. 20배가 PER 수준인지 상승 배수인지 불명확.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;제시된 배당수익률을 확정 수익으로 해석하거나 세후 수익률 계산에 적용할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C10&quot;,
+      &quot;claim_text&quot;: &quot;CXMT 상장 여부, 홍보 수율 90%와 IPO 문서 80% 차이, 샤오미 납품·전송속도·칩 규격·웨이퍼당 칩 증가 및 장비 제약과 경쟁사 기술 일정 주장.&quot;,
+      &quot;status&quot;: &quot;asr_uncertain&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:36:40&quot;,
+      &quot;source_confidence&quot;: 0.55,
+      &quot;asr_confidence&quot;: 0.25,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;수율 90% 대 80%; 약 4,000·10,000·12,800Mbps; 4×4·6×6; 웨이퍼당 칩 50% 증가; SK하이닉스 2025년·삼성전자 2028년&quot;,
+        &quot;observed&quot;: &quot;대조 자료 없음. 제품 세대·기술명·측정 기준을 확정할 수 없음.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;경쟁사의 기술력을 부정하거나 국내 업체의 우위를 확정하는 근거로 해당 수치들을 사용하기 어렵다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C11&quot;,
+      &quot;claim_text&quot;: &quot;한국 밸류에이션이 인도네시아의 절반이고 일부 소부장 기업은 50~100배라는 주장과 코스톨라니 모형·아이젠하워 일화를 근거로 한 분할 접근·현금 확보 제안.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.98,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:42:27&quot;,
+      &quot;source_confidence&quot;: 0.88,
+      &quot;asr_confidence&quot;: 0.75,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;한국 밸류에이션 인도네시아의 1/2; 일부 소부장 50~100배; 가상 하락률 40%; 모형 국면 B1~B2·B3·A2&quot;,
+        &quot;observed&quot;: &quot;비교 가능한 팩트시트·종목 지표·원전 없음. 40%는 관측된 포트폴리오 성과가 아니라 가정.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;투자 모형을 매수 시점의 객관적 증거로 사용하지 말고 실제 보유기업의 현금흐름·차입·밸류에이션을 확인해야 한다.&quot;
+    }
+  ],
+  &quot;entities&quot;: [
+    {
+      &quot;ticker&quot;: &quot;000660&quot;,
+      &quot;name&quot;: &quot;SK하이닉스&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;키옥시아 투자 회수 이익을 활용한 대규모 특별배당 가능성이 거론됐지만 확정되지 않았으며, 출연자는 28일 실적 발표에서 주주환원 관련 설명을 기대했다.&quot;,
+        &quot;출연자는 기존 환원 정책과 자사주 소각이 저평가 해소에 기여할 수 있다고 봤지만, 언론이 키운 기대에 실제 발표가 못 미칠 위험도 지적했다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;키옥시아 관련 투자 차익 약 20조원, 특별배당 재원 약 16조원, 주당 약 23,000원, 당시 시가총액 대비 약 2%라는 시나리오를 제시했다. 모두 미확정 추정이다.&quot;,
+        &quot;언론에서 약 50조원 규모 주주환원 기대가 거론됐다고 말했다.&quot;,
+        &quot;지난 8월 발표 정책을 &#x27;2027년까지 잉여현금흐름 50% 이상 주주환원&#x27; 취지로 설명했다. 정책 원문 확인이 필요하다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;시장 데이터 조회 실패: no_usable_market_fields&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;000660&quot;,
+        &quot;as_of&quot;: &quot;2026-10-28T00:35:07.868311+00:00&quot;,
+        &quot;current_price&quot;: null,
+        &quot;market_cap&quot;: null,
+        &quot;forward_pe&quot;: null,
+        &quot;trailing_pe&quot;: null,
+        &quot;fifty_two_week_high&quot;: null,
+        &quot;fifty_two_week_low&quot;: null,
+        &quot;average_target_price&quot;: null,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;unverified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;005930&quot;,
+      &quot;name&quot;: &quot;삼성전자·삼성전자 우선주&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;출연자는 배당소득 분리과세가 대주주와 일반주주의 배당 선호를 높여 삼성전자 우선주의 수요와 하방 지지에 기여할 수 있다고 평가했다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;배당소득 분리과세가 올해부터 3년간 한시 시행된다고 설명했고, 금융소득 2,000만원 기준을 언급했다.&quot;,
+        &quot;현재 가격 취득을 가정한 향후 배당수익률 약 5~10%, 일부 발언에서는 10~20% 가능성을 예시했다. 확정 배당이나 검증된 수익률이 아니다.&quot;,
+        &quot;대만의 2018년 배당소득 분리과세 이후 지수 약 3배·TSMC 주가 약 10배·밸류에이션 약 20배를 비교 사례로 제시했다. 제도와 상승의 인과관계가 검증된 것은 아니다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;시장 데이터 조회 실패: no_usable_market_fields&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;005930&quot;,
+        &quot;as_of&quot;: &quot;2026-10-28T00:35:10.519774+00:00&quot;,
+        &quot;current_price&quot;: null,
+        &quot;market_cap&quot;: null,
+        &quot;forward_pe&quot;: null,
+        &quot;trailing_pe&quot;: null,
+        &quot;fifty_two_week_high&quot;: null,
+        &quot;fifty_two_week_low&quot;: null,
+        &quot;average_target_price&quot;: null,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;unverified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    }
+  ],
+  &quot;evidence&quot;: [
+    {
+      &quot;evidence_id&quot;: &quot;E1&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;What the Aluminum Tariff Has Meant for U.S. Prices&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/m/bbdab404-8386-3b0a-938e-4333f4284a0b/what-the-aluminum-tariff-has.html&quot;,
+      &quot;publisher&quot;: &quot;The Wall Street Journal&quot;,
+      &quot;published_at&quot;: &quot;2026-10-27T21:30:02+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;What the Aluminum Tariff Has Meant for U.S. Prices Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 2026 Elections Weather Newsletters Finance...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E2&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;UACJ (TSE:5741) Stock May Still Be Below Fair Value&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/uacj-tse-5741-stock-may-181222630.html&quot;,
+      &quot;publisher&quot;: &quot;Simply Wall St.&quot;,
+      &quot;published_at&quot;: &quot;2026-10-27T18:12:22+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;UACJ (TSE:5741) Stock May Still Be Below Fair Value Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 2026 Elections Weather Newsletters Financ...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E4&quot;,
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;title&quot;: &quot;Constellium vs. Ryerson: Which Metal Stock Should You Invest in Now?&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/constellium-vs-ryerson-metal-stock-111400657.html&quot;,
+      &quot;publisher&quot;: &quot;Zacks&quot;,
+      &quot;published_at&quot;: &quot;2026-10-27T11:14:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Constellium vs. Ryerson: Which Metal Stock Should You Invest in Now? Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 2026 Elections Weather N...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E5&quot;,
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;title&quot;: &quot;Goldman Sachs Sees Investors De-Risking From AI Stocks. At 63, She Finds the Same Crowded Trade Inside Her $900,000 401(k)&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/goldman-sachs-sees-investors-risking-203326882.html&quot;,
+      &quot;publisher&quot;: &quot;24/7 Wall St.&quot;,
+      &quot;published_at&quot;: &quot;2026-10-27T20:33:26+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E6&quot;,
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;title&quot;: &quot;SK Hynix Q3 profit beats expectations, vows $75 bln in shareholder returns&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/technology/articles/sk-hynix-q3-profit-beats-001828365.html&quot;,
+      &quot;publisher&quot;: &quot;Investing.com&quot;,
+      &quot;published_at&quot;: &quot;2026-10-28T00:18:28+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E7&quot;,
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;title&quot;: &quot;SK hynix Announces 3Q26 Financial Results&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/sk-hynix-announces-3q26-financial-234500011.html&quot;,
+      &quot;publisher&quot;: &quot;PR Newswire&quot;,
+      &quot;published_at&quot;: &quot;2026-10-27T23:45:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    }
+  ],
+  &quot;source_policy&quot;: {
+    &quot;raw_transcript_published&quot;: false,
+    &quot;raw_transcript_in_evidence&quot;: false,
+    &quot;research_pipeline_version&quot;: 4,
+    &quot;closed_source_claims&quot;: &quot;unverified_external_source&quot;,
+    &quot;auto_caption_warning&quot;: true,
+    &quot;local_asr_warning&quot;: false
+  }
+}</pre>
+  </details>
+</article>
+</main>
+  <style>
+.reader-contents { margin: 16px 0; padding: 12px 16px; border: 1px solid var(--line, #64748b); border-radius: 12px; }
+.reader-contents > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-weight: 750; }
+.reader-contents nav { display: grid; gap: 4px; max-height: 45vh; overflow: auto; margin: 8px 0; }
+.reader-contents a { display: block; min-height: 44px; padding: 10px; border-radius: 6px; color: inherit; overflow-wrap: anywhere; }
+.reader-contents a:hover { background: #80808020; }
+.reader-contents .reader-subsection { padding-inline-start: 24px; font-size: .92em; }
+.reader-prose, .report { overflow-wrap: anywhere; line-height: 1.8; }
+.reader-prose p, .reader-prose li { max-width: 85ch; }
+.reader-prose h2, .reader-prose h3, .reader-prose h4, [data-reader-heading] { scroll-margin-top: 100px; line-height: 1.45; }
+.reader-prose h2 { margin-top: 1.8em; padding-bottom: 8px; border-bottom: 1px solid var(--line, #64748b); }
+.reader-prose h3 { margin-top: 1.5em; }
+.reader-prose li { margin: .5em 0; }
+.reader-prose pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.reader-prose blockquote { margin: 16px 0; padding: 4px 16px; border-left: 3px solid var(--accent, #64748b); }
+.reader-table { overflow: auto; max-width: 100%; margin: 16px 0; border: 1px solid var(--line, #64748b); border-radius: 10px; }
+.reader-table table { border-collapse: collapse; width: 100%; margin: 0; font-size: .92rem; }
+.reader-table th, .reader-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line, #64748b); min-width: 110px; max-width: 400px; overflow-wrap: anywhere; white-space: normal; }
+.reader-table th { background: #80808018; }
+.reader-table tr:nth-child(even) { background: #80808008; }
+.reader-search { display: grid; gap: 8px; margin: 16px 0; }
+.reader-search label { font-weight: 700; }
+.reader-search input { box-sizing: border-box; width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line, #64748b); border-radius: 10px; background: var(--panel, #fff); color: var(--text, #132238); font: inherit; }
+.reader-search p { margin: 0; font-size: .86rem; }
+.reader-back { position: fixed; bottom: max(14px, env(safe-area-inset-bottom)); right: 14px; z-index: 30; min-height: 44px; border: 1px solid #778899; border-radius: 99px; padding: 10px 16px; background: #18344a; color: #fff; font: 700 14px system-ui; cursor: pointer; box-shadow: 0 3px 12px #0003; }
+[data-reader-source] { margin-top: 20px; }
+[data-reader-source] > summary { min-height: 44px; cursor: pointer; }
+[data-reader-source] pre { font-size: .85rem; }
+[data-reader-source] pre, .reader-prose { min-width: 0; }
+.reader-contents :focus-visible, .reader-search :focus-visible, .reader-back:focus-visible, .reader-table:focus-visible { outline: 3px solid var(--accent, #008c95); outline-offset: 3px; }
+.reader-search + .grid > [hidden] { display: none !important; }
+@media (max-width: 600px) { .reader-prose { font-size: 1rem; } .reader-contents { padding: 8px 12px; } }
+@media print { .reader-back, .reader-search, .reader-contents, [data-reader-source] { display: none !important; } .reader-table { overflow: visible; } .reader-prose { color: #000; background: #fff; } }
+</style><script>
+(() => {
+  'use strict';
+  let serial = 0;
+  const rendered = new WeakMap();
+  const node = (tag, text) => { const el = document.createElement(tag); if (text != null) el.textContent = text; return el; };
+  function inline(parent, text) {
+    const pattern = /(`[^`]+`|\*\*[^*]+\*\*|\[[^\]]+\]\(https?:\/\/[^\s)]+\))/g;
+    let start = 0;
+    for (const match of String(text).matchAll(pattern)) {
+      parent.append(document.createTextNode(text.slice(start, match.index)));
+      const value = match[0];
+      if (value.startsWith('`')) parent.append(node('code', value.slice(1, -1)));
+      else if (value.startsWith('**')) parent.append(node('strong', value.slice(2, -2)));
+      else {
+        const link = value.match(/^\[([^\]]+)\]\((.+)\)$/);
+        const a = node('a', link[1]); a.href = link[2]; a.rel = 'noopener noreferrer'; parent.append(a);
+      }
+      start = match.index + value.length;
+    }
+    parent.append(document.createTextNode(text.slice(start)));
+  }
+  const cells = line => line.trim().replace(/^\|/, '').replace(/\|$/, '').split(/(?<!\\)\|/).map(v => v.trim().replace(/\\\|/g, '|'));
+  function markdown(source) {
+    const article = node('article'); article.className = 'reader-prose';
+    const lines = source.split(/\r?\n/); let list = null;
+    for (let i = 0; i < lines.length; i += 1) {
+      const line = lines[i], value = line.trim();
+      if (!value) { list = null; continue; }
+      if (/^```/.test(value)) {
+        const code = []; i += 1;
+        while (i < lines.length && !/^```/.test(lines[i].trim())) code.push(lines[i++]);
+        const pre = node('pre'); pre.append(node('code', code.join('\n'))); article.append(pre); list = null; continue;
+      }
+      if (i + 1 < lines.length && value.includes('|') && cells(lines[i + 1]).every(v => /^:?-{3,}:?$/.test(v))) {
+        const table = node('table'), head = node('thead'), body = node('tbody');
+        const row = (values, tag) => { const tr = node('tr'); values.forEach(v => { const cell = node(tag); if (tag === 'th') cell.scope = 'col'; inline(cell, v); tr.append(cell); }); return tr; };
+        head.append(row(cells(line), 'th')); i += 2;
+        while (i < lines.length && lines[i].trim() && lines[i].includes('|')) body.append(row(cells(lines[i++]), 'td'));
+        i -= 1; table.append(head, body); article.append(table); list = null; continue;
+      }
+      const heading = value.match(/^(#{1,6})\s+(.+)$/);
+      if (heading) { const h = node('h' + Math.min(4, heading[1].length + 1)); inline(h, heading[2]); article.append(h); list = null; continue; }
+      const bullet = value.match(/^(?:[-*+] |\d+\. )(.+)$/);
+      if (bullet) {
+        const tag = /^\d/.test(value) ? 'ol' : 'ul';
+        if (!list || list.tagName.toLowerCase() !== tag) { list = node(tag); if (tag === 'ol') list.start = parseInt(value, 10); article.append(list); }
+        const li = node('li'); inline(li, bullet[1]); list.append(li); continue;
+      }
+      list = null;
+      if (/^(---+|\*\*\*+)$/.test(value)) { article.append(node('hr')); continue; }
+      const p = node(value.startsWith('> ') ? 'blockquote' : 'p'); inline(p, value.startsWith('> ') ? value.slice(2) : line); article.append(p);
+    }
+    return article;
+  }
+  function contents(root) {
+    root.querySelectorAll(':scope > .reader-contents').forEach(el => el.remove());
+    const headings = [...root.querySelectorAll('h2,h3,h4')].filter(h => !h.closest('.card,.run-card,.reader-contents,[data-reader-source],[hidden]'));
+    if (headings.length < 2) return;
+    const details = node('details'); details.className = 'reader-contents';
+    details.append(node('summary', '이 리포트 목차 · ' + headings.length + '개 항목'));
+    const nav = node('nav'); nav.setAttribute('aria-label', '리포트 목차');
+    headings.forEach(h => {
+      if (!h.id) h.id = 'reader-section-' + (++serial);
+      h.dataset.readerHeading = ''; h.tabIndex = -1;
+      const a = node('a', h.textContent); a.href = '#' + h.id;
+      if (h.tagName !== 'H2') a.className = 'reader-subsection';
+      a.addEventListener('click', event => {
+        event.preventDefault();
+        for (let ancestor = h.parentElement; ancestor; ancestor = ancestor.parentElement) if (ancestor.tagName === 'DETAILS') ancestor.open = true;
+        h.scrollIntoView({block: 'start'}); h.focus({preventScroll: true});
+      }); nav.append(a);
+    });
+    details.append(nav); root.prepend(details);
+  }
+  function enhance(root) {
+    if (!root) return;
+    root.querySelectorAll('pre[data-report-markdown]').forEach(pre => {
+      const previous = rendered.get(pre);
+      if (previous && previous.source === pre.textContent) return;
+      const article = markdown(pre.textContent);
+      if (previous) previous.article.replaceWith(article);
+      else {
+        const details = node('details'); details.dataset.readerSource = '';
+        details.append(node('summary', 'Markdown 원문 보기'));
+        pre.before(article, details); details.append(pre);
+      }
+      rendered.set(pre, {source: pre.textContent, article});
+    });
+    root.querySelectorAll('table').forEach(table => {
+      if (table.closest('.reader-table,.account-table-wrap,.summary-scroll')) return;
+      const wrap = node('div'); wrap.className = 'reader-table'; wrap.tabIndex = 0;
+      wrap.setAttribute('role', 'region'); wrap.setAttribute('aria-label', '리포트 표 · 가로로 스크롤하여 전체 보기');
+      table.before(wrap); wrap.append(table);
+    });
+    root.querySelectorAll('.grid').forEach(grid => {
+      const cards = [...grid.querySelectorAll(':scope > a.card')];
+      if (cards.length < 2 || grid.dataset.readerSearch) return;
+      grid.dataset.readerSearch = 'true';
+      const box = node('div'); box.className = 'reader-search';
+      const input = node('input'); input.type = 'search'; input.placeholder = '제목 · 종목 · 채널 · 키워드'; input.id = 'report-search-' + (++serial);
+      const label = node('label', '리포트 찾기'); label.htmlFor = input.id;
+      const status = node('p'); status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
+      const update = () => {
+        const terms = input.value.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean); let count = 0;
+        cards.forEach(card => { card.hidden = !terms.every(t => card.textContent.toLocaleLowerCase().includes(t)); if (!card.hidden) count += 1; });
+        status.textContent = cards.length + '개 중 ' + count + '개 표시' + (count ? '' : ' · 검색어를 지우거나 다른 키워드를 입력하세요.');
+      };
+      input.addEventListener('input', update); box.append(label, input, status); grid.before(box); update();
+    });
+    contents(root);
+  }
+  window.TradingAgentsReader = {enhance};
+  const main = document.querySelector('main');
+  if (main && !main.hasAttribute('data-reader-dynamic')) enhance(main);
+  if (main) {
+    const top = node('button', '↑ 맨 위'); top.type = 'button'; top.className = 'reader-back'; top.setAttribute('aria-label', '리포트 맨 위로 이동');
+    top.addEventListener('click', () => { const target = document.querySelector('h1') || main; target.tabIndex = -1; target.scrollIntoView({block: 'start'}); target.focus({preventScroll: true}); });
+    document.body.append(top);
+  }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,412 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YouTube 투자자용 검증 리포트 - &quot;동트기 직전이 가장 어둡다&quot; DAT 기업 옥석은 이렇게 가린다 | 서동주, 김동환, 윤수목 위스퍼드리서치 대표 [크립토 PLUS]</title>
+  <style>
+:root {
+  color-scheme: light;
+  --bg: #f7f8fb;
+  --panel: #ffffff;
+  --text: #172033;
+  --muted: #667085;
+  --line: #d9dee8;
+  --accent: #0f766e;
+  --accent-2: #2563eb;
+  --warn: #b45309;
+  --bad: #b42318;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0 56px; }
+a { color: var(--accent-2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.hero { padding: 28px 0 22px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+.hero.compact { padding-top: 12px; }
+.hero h1 { margin: 0; font-size: clamp(28px, 4vw, 44px); line-height: 1.15; letter-spacing: 0; }
+.hero p { max-width: 760px; color: var(--muted); margin: 12px 0 0; }
+.eyebrow { color: var(--accent); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0; margin: 0 0 8px; }
+section { margin: 28px 0; }
+h2, h3, h4, h5 { letter-spacing: 0; line-height: 1.25; }
+.synthesis-callout { padding: clamp(20px, 4vw, 34px); border: 1px solid #6ee7d8; border-radius: 18px; background: linear-gradient(135deg, #ecfdf9 0%, #eff6ff 100%); box-shadow: 0 18px 44px rgba(15, 118, 110, .12); }
+.synthesis-callout.unavailable { border-color: var(--line); background: var(--panel); box-shadow: none; }
+.synthesis-callout h2 { margin: 0; font-size: clamp(24px, 3.2vw, 36px); }
+.synthesis-callout .lead { max-width: 900px; font-size: 17px; color: #334155; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.primary-link, .secondary-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border-radius: 999px; font-weight: 800; }
+.primary-link { color: white; background: var(--accent); }
+.secondary-link { color: var(--accent-2); border: 1px solid #93c5fd; background: white; }
+.primary-link:hover, .secondary-link:hover { text-decoration: none; filter: brightness(.97); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.card, .run { display: flex; flex-direction: column; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; color: var(--text); min-height: 128px; }
+.run { padding: 16px; }
+.card:hover, .run:hover { border-color: var(--accent-2); text-decoration: none; }
+.thumb { display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #e9edf5; border-radius: 8px 8px 0 0; color: var(--muted); font-size: 13px; font-weight: 700; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb-empty span { padding: 0 14px; text-align: center; }
+.card-body { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 16px; }
+.card strong { line-height: 1.35; }
+.source-line { color: #3f4a5f; font-weight: 600; }
+.runs { display: grid; gap: 10px; }
+.badge { display: inline-flex; width: fit-content; border-radius: 999px; padding: 2px 9px; background: #e6f4f1; color: var(--accent); font-size: 12px; font-weight: 700; }
+.status-contradicted, .status-llm_failed { background: #fee4e2; color: var(--bad); }
+.status-unverified, .status-stale { background: #fff4d6; color: var(--warn); }
+small, .muted { color: var(--muted); }
+.topnav { display: flex; gap: 14px; margin-bottom: 16px; font-size: 14px; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px; }
+.stats span { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
+.report { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: min(5vw, 36px); }
+.report-head { border-bottom: 1px solid var(--line); margin-bottom: 24px; padding-bottom: 20px; }
+.report-head h1 { margin: 0; font-size: clamp(24px, 3.5vw, 38px); line-height: 1.2; }
+.meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+.scope-note { padding: 12px 14px; border-left: 4px solid var(--warn); border-radius: 6px; background: #fff7ed; color: #7c2d12; }
+.synthesis-report h2 { margin-top: 34px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.synthesis-report h3 { margin: 24px 0 8px; color: #0f4c5c; }
+.synthesis-report p, .synthesis-report li { overflow-wrap: anywhere; }
+pre { overflow: auto; background: #111827; color: #f9fafb; border-radius: 8px; padding: 14px; }
+code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+details { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 18px; }
+@media (max-width: 640px) {
+  main { width: min(100% - 20px, 1120px); padding-top: 18px; }
+  .report { padding: 18px; }
+  .synthesis-callout { border-radius: 14px; padding: 18px; }
+  .cta-row a { width: 100%; }
+  .mobile-report { border-radius: 12px; }
+}
+</style>
+</head>
+<body>
+  <main>
+<nav class="topnav"><a href="index.html">실행 목록</a><a href="../../index.html">YouTube 홈</a></nav>
+<article class="report">
+  <header class="report-head">
+    <p class="eyebrow">youtube_20261028_071446</p>
+    <h1>&quot;동트기 직전이 가장 어둡다&quot; DAT 기업 옥석은 이렇게 가린다 | 서동주, 김동환, 윤수목 위스퍼드리서치 대표 [크립토 PLUS]</h1>
+    <div class="meta">
+      <span class="badge status-llm_failed">llm_failed</span>
+      <a href="https://www.youtube.com/watch?v=VHCqxxey9WU">원본 영상</a>
+    </div>
+  </header>
+  <h2>투자자용 YouTube 검증 리포트: &quot;동트기 직전이 가장 어둡다&quot; DAT 기업 옥석은 이렇게 가린다 | 서동주, 김동환, 윤수목 위스퍼드리서치 대표 [크립토 PLUS]</h2>
+<h3>핵심 결론</h3>
+<ul>
+<li>이 리포트는 영상 자막/ASR 기반 주장, 공개 시장 데이터, 웹/뉴스/공시 근거 묶음으로 자동 생성한 검증 결과입니다.</li>
+<li>LLM 정제 단계가 실패했거나 사용할 수 없어 deterministic 형식으로 작성했습니다.</li>
+<li>영상 속 주장과 검증된 사실은 구분해서 읽어야 하며, 매수/매도 지시가 아닙니다.</li>
+</ul>
+<h3>검증 상태</h3>
+<ul>
+<li>전체 상태: <code>llm_failed</code></li>
+<li>LLM 상태: <code>llm_failed</code></li>
+<li>리서치 상태: <code>llm_failed</code></li>
+<li>주장 검증 상태: <code>llm_failed</code></li>
+<li>자막/ASR 품질: <code>good</code> (score=1.0)</li>
+<li>영상 URL: https://www.youtube.com/watch?v=VHCqxxey9WU</li>
+</ul>
+<h3>주장별 검증</h3>
+<h4>C1</h4>
+<ul>
+<li>영상 주장: &quot;동트기 직전이 가장 어둡다&quot; DAT 기업 옥석은 이렇게 가린다 | 서동주, 김동환, 윤수목 위스퍼드리서치 대표 [크립토 PLUS]</li>
+<li>근거 시각/신뢰도: <code>-</code> / source <code>-</code> / ASR <code>-</code></li>
+<li>상태: <code>unverified</code></li>
+<li>확인된 사실: -</li>
+<li>반론/한계: 자동 조사에서 직접 확인 가능한 외부 근거를 충분히 찾지 못했습니다.</li>
+<li>투자 시사점: 관련 뉴스/공시/가격 데이터를 추가 관찰해야 합니다.</li>
+</ul>
+<h3>공개 근거</h3>
+<ul>
+<li>공개 가능한 외부 근거를 충분히 확보하지 못했습니다.</li>
+</ul>
+<h3>종목별 공개 데이터 확인</h3>
+<ul>
+<li>식별된 종목 또는 검증 가능한 시장 데이터가 없습니다.</li>
+</ul>
+<h3>Deterministic 초안</h3>
+<h2>유튜브 영상 분석 리포트: &quot;동트기 직전이 가장 어둡다&quot; DAT 기업 옥석은 이렇게 가린다 | 서동주, 김동환, 윤수목 위스퍼드리서치 대표 [크립토 PLUS]</h2>
+<ul>
+<li>채널: 삼프로TV 3PROTV</li>
+<li>영상 URL: https://www.youtube.com/watch?v=VHCqxxey9WU</li>
+<li>업로드일: 2026-10-27</li>
+<li>길이: 33:19</li>
+<li>조회수: 32,708</li>
+<li>생성 시각: 2026-10-28 07:14:46</li>
+</ul>
+<h3>1. 분석 가능 수준</h3>
+<ul>
+<li>자막 본문: 수집 성공 (automatic, Korean, json3)</li>
+<li>자막 세그먼트: 950개</li>
+<li>정규화 본문 길이: 16,497자</li>
+<li>사용 가능 수동 자막: 없음</li>
+<li>사용 가능 자동 자막: aa, ab, af, ak, am, ar, as, ay, az, ba, be, bg 외 145개</li>
+<li>주의: 자동자막은 인식 오류가 있을 수 있으므로 숫자와 고유명사는 원출처 재검증이 필요합니다.</li>
+</ul>
+<h3>2. 핵심 요약</h3>
+<ul>
+<li>영상은 <code>&quot;동트기 직전이 가장 어둡다&quot; DAT 기업 옥석은 이렇게 가린다 | 서동주, 김동환, 윤수목 위스퍼드리서치 대표 [크립토 PLUS]</code>라는 제목 아래 개별 종목보다 시장/매크로 이슈를 중심으로 다룹니다.</li>
+<li>자막 기준 반복 핵심어는 AI, 매출, 실적, 저평가입니다.</li>
+<li>이 deterministic 초안은 영상 발화를 구조화한 1차 산출물이며, 최종 리포트에서는 LLM 검증 단계가 시장·자산 단위 주장과 재검증 필요 수치를 다시 분리합니다.</li>
+<li>투자 판단에는 영상 주장과 현재 시장 데이터, 원출처 확인을 별도로 대조해야 합니다.</li>
+</ul>
+<h3>3. 종목별 주장 요약</h3>
+<p>자막에서 사전 정의된 종목/티커를 식별하지 못했습니다.</p>
+<h3>4. 공통 투자 논리</h3>
+<ul>
+<li>그래서 지금은 그때와 같은 정도의 상승률을 어 방감기 4년 사이에 무슨 1,000% 5,000%씩 이렇게 기대하기는 어렵겠지만은 &gt;&gt; 네.</li>
+<li>아무래도이 그 지금 이제 Y축에 해당되는 어이 부분은 어 반감기 시점을 기준으로 100이라고 두고 한마디로 가격 상승률을 나타내는 거거든요.</li>
+<li>&gt;&gt; 그래서 어, 다음 그 사이클에서 어떤 쪽에서 수요가 들어오겠냐라고 한다면은 어 비트코인을 보유하는 기업 숫자가 전반적으로 늘 것으로 기대를 해야 될 것 같고 그리고 어 현재는 이제 지난 24년도 ETF 때문에 이제 좀 상승한 면이 있다고 했는데 ETF를 포함한 관련된 금융 상품들이 좀 많아지지 않겠나 그런 기대를...</li>
+<li>&gt;&gt; 근데 초기에는 아무래도 훨씬 더 뭐 &gt;&gt; 비트코인이 가파르게 상승했잖아요.</li>
+<li>어, 대부분의 지금 어, 이런 트레저리 기업들의 경우에는 별도의 매출원이 없거든요.</li>
+</ul>
+<h3>5. 주요 리스크와 반론</h3>
+<ul>
+<li>그러니까 어 기업이 가지고 있는 어 자금 조달리 방법이 크게 부채하고 투자받는 거잖아요.</li>
+<li>그리고 또 각 기업들이 다 부채도 가지고 있고 &gt;&gt; 어 이런 것들이 어 제대로 계산이 되지 않으면은 잘못된 값이 굉장히 많이 나옵니다.</li>
+<li>투자받는 건 이제 어 회사의 주식이나 보통주나 우선주를 발행하는 거고 &gt;&gt; 어 부채의 경우에는 채권 발행을 해서 자금 조달를 하는 건데 어 회사가 갚아야 될 최우선 순위는 이제 빚죠.</li>
+</ul>
+<h3>6. 후속 체크포인트</h3>
+<ul>
+<li>&gt;&gt; 지금 설명해 주신 그 맥락을 뭐 쓰시는 AI한테 설명을 해 주고 요런 차원에서 현실적으로 그러면 어이 멀티플을 좀 구해 달라라고 하면 대충 나오겠네요.</li>
+</ul>
+<h3>7. 검증 필요 항목</h3>
+<ul>
+<li>이거를 보시면은음 지금 보시는 차트는 이제 2011년 경부터 어 비트코인 변동성 지수를 어 한 달짜리 30일짜리 그 변동성을 측정을 한 건데 이제 여기에서 1%라고 하면은 &gt;&gt; 어 한 달간 평균적으로 1% 정도 움직였다는 의미로 해석을 하시면 됩니다.</li>
+<li>어 어 성숙하지 않은 자산이기 때문에 뭐 현재보다도 더어 &gt;&gt; 그러다 보니까 이제 변동성이 좀 하루에 막 10%씩 움직이는게 굉장히 자연스러운 시절이 있었고 어 지금은 이제 어 물론 어 하루에 뭐 4% 45%씩 움직일 때도 있지만은 최근에 여러분들이 느끼기에 삼성 전자나 하이닉스보다 변동성이 낮거든요.</li>
+<li>&gt;&gt; 아 저도 제 저걸 그래프 오랜만에 지금 봐서 기억이 나는데 참고로 &gt;&gt; 지금 보면은 한 10% 정도의 월간 변동률을 기록했던게 2020년 3월 정도가 마지막이거든요.</li>
+<li>저 때가 언제냐면 리플 가격이 한 달 만에 한 40배 오르고 40배 아니한 20배 정도 오르고 &gt;&gt; 그리고 이제 한국 법무 장관이 거래소 폐쇄해야 된다 [웃음] 얘기를 했었던 그때입니다.</li>
+<li>그래서 지금은 그때와 같은 정도의 상승률을 어 방감기 4년 사이에 무슨 1,000% 5,000%씩 이렇게 기대하기는 어렵겠지만은 &gt;&gt; 네.</li>
+<li>그리고 비트코인 보유량도 사실은 전체 상장기업이 가지고 있는게 한 120만 개 정도 되는데 그중에 80만 개 이상을 스트레티지 혼자 가지고 있기 때문에 거의 한 60 6 7% 정도 돼요.</li>
+<li>자동자막 기반 분석이므로 종목명, 티커, 숫자 단위, 날짜는 원영상/공시/실적 자료로 재확인해야 합니다.</li>
+</ul>
+<h3>8. 원문 근거 발췌</h3>
+<ul>
+<li>발췌할 종목별 근거가 없습니다.</li>
+</ul>
+<h3>9. 결론</h3>
+<p>자막 또는 ASR 본문은 수집됐지만 사전 정의된 종목/티커 중심 영상은 아닙니다. 이 경우 최종 리포트는 LLM 검증 단계에서 시장·자산·거시 이벤트 단위로 주장과 체크포인트를 재구성해야 합니다.</p>
+  <details>
+    <summary>공개 요약 JSON</summary>
+    <pre>{
+  &quot;version&quot;: 4,
+  &quot;video_id&quot;: &quot;VHCqxxey9WU&quot;,
+  &quot;title&quot;: &quot;\&quot;동트기 직전이 가장 어둡다\&quot; DAT 기업 옥석은 이렇게 가린다 | 서동주, 김동환, 윤수목 위스퍼드리서치 대표 [크립토 PLUS]&quot;,
+  &quot;url&quot;: &quot;https://www.youtube.com/watch?v=VHCqxxey9WU&quot;,
+  &quot;channel&quot;: &quot;삼프로TV 3PROTV&quot;,
+  &quot;channel_id&quot;: &quot;UChlv4GSd7OQl3js-jkLOnFA&quot;,
+  &quot;source_url&quot;: &quot;https://www.youtube.com/@3protv/videos&quot;,
+  &quot;thumbnail_url&quot;: &quot;https://i.ytimg.com/vi/VHCqxxey9WU/maxresdefault.jpg&quot;,
+  &quot;published_at&quot;: &quot;2026-10-27T03:52:56+00:00&quot;,
+  &quot;status&quot;: &quot;llm_failed&quot;,
+  &quot;strategy_source_tier&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_evidence_weight&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_validation_policy&quot;: &quot;STANDARD_REVIEW&quot;,
+  &quot;transcript_status&quot;: &quot;available&quot;,
+  &quot;transcript_source&quot;: &quot;automatic&quot;,
+  &quot;transcript_chars&quot;: 16497,
+  &quot;transcript_quality&quot;: {
+    &quot;status&quot;: &quot;good&quot;,
+    &quot;score&quot;: 1.0,
+    &quot;warnings&quot;: [],
+    &quot;source&quot;: &quot;automatic&quot;,
+    &quot;language&quot;: &quot;Korean&quot;,
+    &quot;model_or_format&quot;: &quot;json3&quot;,
+    &quot;chars&quot;: 16497,
+    &quot;segments&quot;: 950,
+    &quot;duration_seconds&quot;: 1999,
+    &quot;repeated_ngram_ratio&quot;: 0.001
+  },
+  &quot;generated_at&quot;: &quot;2026-10-28T07:14:46.595118+09:00&quot;,
+  &quot;llm_status&quot;: &quot;llm_failed&quot;,
+  &quot;research_status&quot;: &quot;llm_failed&quot;,
+  &quot;claim_verification_status&quot;: &quot;llm_failed&quot;,
+  &quot;research_pipeline_version&quot;: 4,
+  &quot;evidence_count&quot;: 0,
+  &quot;claim_status_summary&quot;: {
+    &quot;unverified&quot;: 1
+  },
+  &quot;claims&quot;: [
+    {
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;claim_text&quot;: &quot;\&quot;동트기 직전이 가장 어둡다\&quot; DAT 기업 옥석은 이렇게 가린다 | 서동주, 김동환, 윤수목 위스퍼드리서치 대표 [크립토 PLUS]&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.25,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: null,
+      &quot;source_confidence&quot;: null,
+      &quot;asr_confidence&quot;: null,
+      &quot;numeric_parse&quot;: {},
+      &quot;investor_implication&quot;: &quot;관련 뉴스/공시/가격 데이터를 추가 관찰해야 합니다.&quot;
+    }
+  ],
+  &quot;entities&quot;: [],
+  &quot;evidence&quot;: [],
+  &quot;source_policy&quot;: {
+    &quot;raw_transcript_published&quot;: false,
+    &quot;raw_transcript_in_evidence&quot;: false,
+    &quot;research_pipeline_version&quot;: 4,
+    &quot;closed_source_claims&quot;: &quot;unverified_external_source&quot;,
+    &quot;auto_caption_warning&quot;: true,
+    &quot;local_asr_warning&quot;: false
+  }
+}</pre>
+  </details>
+</article>
+</main>
+  <style>
+.reader-contents { margin: 16px 0; padding: 12px 16px; border: 1px solid var(--line, #64748b); border-radius: 12px; }
+.reader-contents > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-weight: 750; }
+.reader-contents nav { display: grid; gap: 4px; max-height: 45vh; overflow: auto; margin: 8px 0; }
+.reader-contents a { display: block; min-height: 44px; padding: 10px; border-radius: 6px; color: inherit; overflow-wrap: anywhere; }
+.reader-contents a:hover { background: #80808020; }
+.reader-contents .reader-subsection { padding-inline-start: 24px; font-size: .92em; }
+.reader-prose, .report { overflow-wrap: anywhere; line-height: 1.8; }
+.reader-prose p, .reader-prose li { max-width: 85ch; }
+.reader-prose h2, .reader-prose h3, .reader-prose h4, [data-reader-heading] { scroll-margin-top: 100px; line-height: 1.45; }
+.reader-prose h2 { margin-top: 1.8em; padding-bottom: 8px; border-bottom: 1px solid var(--line, #64748b); }
+.reader-prose h3 { margin-top: 1.5em; }
+.reader-prose li { margin: .5em 0; }
+.reader-prose pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.reader-prose blockquote { margin: 16px 0; padding: 4px 16px; border-left: 3px solid var(--accent, #64748b); }
+.reader-table { overflow: auto; max-width: 100%; margin: 16px 0; border: 1px solid var(--line, #64748b); border-radius: 10px; }
+.reader-table table { border-collapse: collapse; width: 100%; margin: 0; font-size: .92rem; }
+.reader-table th, .reader-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line, #64748b); min-width: 110px; max-width: 400px; overflow-wrap: anywhere; white-space: normal; }
+.reader-table th { background: #80808018; }
+.reader-table tr:nth-child(even) { background: #80808008; }
+.reader-search { display: grid; gap: 8px; margin: 16px 0; }
+.reader-search label { font-weight: 700; }
+.reader-search input { box-sizing: border-box; width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line, #64748b); border-radius: 10px; background: var(--panel, #fff); color: var(--text, #132238); font: inherit; }
+.reader-search p { margin: 0; font-size: .86rem; }
+.reader-back { position: fixed; bottom: max(14px, env(safe-area-inset-bottom)); right: 14px; z-index: 30; min-height: 44px; border: 1px solid #778899; border-radius: 99px; padding: 10px 16px; background: #18344a; color: #fff; font: 700 14px system-ui; cursor: pointer; box-shadow: 0 3px 12px #0003; }
+[data-reader-source] { margin-top: 20px; }
+[data-reader-source] > summary { min-height: 44px; cursor: pointer; }
+[data-reader-source] pre { font-size: .85rem; }
+[data-reader-source] pre, .reader-prose { min-width: 0; }
+.reader-contents :focus-visible, .reader-search :focus-visible, .reader-back:focus-visible, .reader-table:focus-visible { outline: 3px solid var(--accent, #008c95); outline-offset: 3px; }
+.reader-search + .grid > [hidden] { display: none !important; }
+@media (max-width: 600px) { .reader-prose { font-size: 1rem; } .reader-contents { padding: 8px 12px; } }
+@media print { .reader-back, .reader-search, .reader-contents, [data-reader-source] { display: none !important; } .reader-table { overflow: visible; } .reader-prose { color: #000; background: #fff; } }
+</style><script>
+(() => {
+  'use strict';
+  let serial = 0;
+  const rendered = new WeakMap();
+  const node = (tag, text) => { const el = document.createElement(tag); if (text != null) el.textContent = text; return el; };
+  function inline(parent, text) {
+    const pattern = /(`[^`]+`|\*\*[^*]+\*\*|\[[^\]]+\]\(https?:\/\/[^\s)]+\))/g;
+    let start = 0;
+    for (const match of String(text).matchAll(pattern)) {
+      parent.append(document.createTextNode(text.slice(start, match.index)));
+      const value = match[0];
+      if (value.startsWith('`')) parent.append(node('code', value.slice(1, -1)));
+      else if (value.startsWith('**')) parent.append(node('strong', value.slice(2, -2)));
+      else {
+        const link = value.match(/^\[([^\]]+)\]\((.+)\)$/);
+        const a = node('a', link[1]); a.href = link[2]; a.rel = 'noopener noreferrer'; parent.append(a);
+      }
+      start = match.index + value.length;
+    }
+    parent.append(document.createTextNode(text.slice(start)));
+  }
+  const cells = line => line.trim().replace(/^\|/, '').replace(/\|$/, '').split(/(?<!\\)\|/).map(v => v.trim().replace(/\\\|/g, '|'));
+  function markdown(source) {
+    const article = node('article'); article.className = 'reader-prose';
+    const lines = source.split(/\r?\n/); let list = null;
+    for (let i = 0; i < lines.length; i += 1) {
+      const line = lines[i], value = line.trim();
+      if (!value) { list = null; continue; }
+      if (/^```/.test(value)) {
+        const code = []; i += 1;
+        while (i < lines.length && !/^```/.test(lines[i].trim())) code.push(lines[i++]);
+        const pre = node('pre'); pre.append(node('code', code.join('\n'))); article.append(pre); list = null; continue;
+      }
+      if (i + 1 < lines.length && value.includes('|') && cells(lines[i + 1]).every(v => /^:?-{3,}:?$/.test(v))) {
+        const table = node('table'), head = node('thead'), body = node('tbody');
+        const row = (values, tag) => { const tr = node('tr'); values.forEach(v => { const cell = node(tag); if (tag === 'th') cell.scope = 'col'; inline(cell, v); tr.append(cell); }); return tr; };
+        head.append(row(cells(line), 'th')); i += 2;
+        while (i < lines.length && lines[i].trim() && lines[i].includes('|')) body.append(row(cells(lines[i++]), 'td'));
+        i -= 1; table.append(head, body); article.append(table); list = null; continue;
+      }
+      const heading = value.match(/^(#{1,6})\s+(.+)$/);
+      if (heading) { const h = node('h' + Math.min(4, heading[1].length + 1)); inline(h, heading[2]); article.append(h); list = null; continue; }
+      const bullet = value.match(/^(?:[-*+] |\d+\. )(.+)$/);
+      if (bullet) {
+        const tag = /^\d/.test(value) ? 'ol' : 'ul';
+        if (!list || list.tagName.toLowerCase() !== tag) { list = node(tag); if (tag === 'ol') list.start = parseInt(value, 10); article.append(list); }
+        const li = node('li'); inline(li, bullet[1]); list.append(li); continue;
+      }
+      list = null;
+      if (/^(---+|\*\*\*+)$/.test(value)) { article.append(node('hr')); continue; }
+      const p = node(value.startsWith('> ') ? 'blockquote' : 'p'); inline(p, value.startsWith('> ') ? value.slice(2) : line); article.append(p);
+    }
+    return article;
+  }
+  function contents(root) {
+    root.querySelectorAll(':scope > .reader-contents').forEach(el => el.remove());
+    const headings = [...root.querySelectorAll('h2,h3,h4')].filter(h => !h.closest('.card,.run-card,.reader-contents,[data-reader-source],[hidden]'));
+    if (headings.length < 2) return;
+    const details = node('details'); details.className = 'reader-contents';
+    details.append(node('summary', '이 리포트 목차 · ' + headings.length + '개 항목'));
+    const nav = node('nav'); nav.setAttribute('aria-label', '리포트 목차');
+    headings.forEach(h => {
+      if (!h.id) h.id = 'reader-section-' + (++serial);
+      h.dataset.readerHeading = ''; h.tabIndex = -1;
+      const a = node('a', h.textContent); a.href = '#' + h.id;
+      if (h.tagName !== 'H2') a.className = 'reader-subsection';
+      a.addEventListener('click', event => {
+        event.preventDefault();
+        for (let ancestor = h.parentElement; ancestor; ancestor = ancestor.parentElement) if (ancestor.tagName === 'DETAILS') ancestor.open = true;
+        h.scrollIntoView({block: 'start'}); h.focus({preventScroll: true});
+      }); nav.append(a);
+    });
+    details.append(nav); root.prepend(details);
+  }
+  function enhance(root) {
+    if (!root) return;
+    root.querySelectorAll('pre[data-report-markdown]').forEach(pre => {
+      const previous = rendered.get(pre);
+      if (previous && previous.source === pre.textContent) return;
+      const article = markdown(pre.textContent);
+      if (previous) previous.article.replaceWith(article);
+      else {
+        const details = node('details'); details.dataset.readerSource = '';
+        details.append(node('summary', 'Markdown 원문 보기'));
+        pre.before(article, details); details.append(pre);
+      }
+      rendered.set(pre, {source: pre.textContent, article});
+    });
+    root.querySelectorAll('table').forEach(table => {
+      if (table.closest('.reader-table,.account-table-wrap,.summary-scroll')) return;
+      const wrap = node('div'); wrap.className = 'reader-table'; wrap.tabIndex = 0;
+      wrap.setAttribute('role', 'region'); wrap.setAttribute('aria-label', '리포트 표 · 가로로 스크롤하여 전체 보기');
+      table.before(wrap); wrap.append(table);
+    });
+    root.querySelectorAll('.grid').forEach(grid => {
+      const cards = [...grid.querySelectorAll(':scope > a.card')];
+      if (cards.length < 2 || grid.dataset.readerSearch) return;
+      grid.dataset.readerSearch = 'true';
+      const box = node('div'); box.className = 'reader-search';
+      const input = node('input'); input.type = 'search'; input.placeholder = '제목 · 종목 · 채널 · 키워드'; input.id = 'report-search-' + (++serial);
+      const label = node('label', '리포트 찾기'); label.htmlFor = input.id;
+      const status = node('p'); status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
+      const update = () => {
+        const terms = input.value.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean); let count = 0;
+        cards.forEach(card => { card.hidden = !terms.every(t => card.textContent.toLocaleLowerCase().includes(t)); if (!card.hidden) count += 1; });
+        status.textContent = cards.length + '개 중 ' + count + '개 표시' + (count ? '' : ' · 검색어를 지우거나 다른 키워드를 입력하세요.');
+      };
+      input.addEventListener('input', update); box.append(label, input, status); grid.before(box); update();
+    });
+    contents(root);
+  }
+  window.TradingAgentsReader = {enhance};
+  const main = document.querySelector('main');
+  if (main && !main.hasAttribute('data-reader-dynamic')) enhance(main);
+  if (main) {
+    const top = node('button', '↑ 맨 위'); top.type = 'button'; top.className = 'reader-back'; top.setAttribute('aria-label', '리포트 맨 위로 이동');
+    top.addEventListener('click', () => { const target = document.querySelector('h1') || main; target.tabIndex = -1; target.scrollIntoView({block: 'start'}); target.focus({preventScroll: true}); });
+    document.body.append(top);
+  }
+})();
+</script>
+</body>
+</html>

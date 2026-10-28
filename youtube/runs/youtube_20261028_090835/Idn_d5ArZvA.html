@@ -1,0 +1,858 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YouTube 투자자용 검증 리포트 - 나스닥, 앤트로픽 IPO 신청 이후 AI 랠리 지속...코어위브, 네비우스 동반 급등 [월가 뉴스레터]</title>
+  <style>
+:root {
+  color-scheme: light;
+  --bg: #f7f8fb;
+  --panel: #ffffff;
+  --text: #172033;
+  --muted: #667085;
+  --line: #d9dee8;
+  --accent: #0f766e;
+  --accent-2: #2563eb;
+  --warn: #b45309;
+  --bad: #b42318;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0 56px; }
+a { color: var(--accent-2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.hero { padding: 28px 0 22px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+.hero.compact { padding-top: 12px; }
+.hero h1 { margin: 0; font-size: clamp(28px, 4vw, 44px); line-height: 1.15; letter-spacing: 0; }
+.hero p { max-width: 760px; color: var(--muted); margin: 12px 0 0; }
+.eyebrow { color: var(--accent); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0; margin: 0 0 8px; }
+section { margin: 28px 0; }
+h2, h3, h4, h5 { letter-spacing: 0; line-height: 1.25; }
+.synthesis-callout { padding: clamp(20px, 4vw, 34px); border: 1px solid #6ee7d8; border-radius: 18px; background: linear-gradient(135deg, #ecfdf9 0%, #eff6ff 100%); box-shadow: 0 18px 44px rgba(15, 118, 110, .12); }
+.synthesis-callout.unavailable { border-color: var(--line); background: var(--panel); box-shadow: none; }
+.synthesis-callout h2 { margin: 0; font-size: clamp(24px, 3.2vw, 36px); }
+.synthesis-callout .lead { max-width: 900px; font-size: 17px; color: #334155; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.primary-link, .secondary-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border-radius: 999px; font-weight: 800; }
+.primary-link { color: white; background: var(--accent); }
+.secondary-link { color: var(--accent-2); border: 1px solid #93c5fd; background: white; }
+.primary-link:hover, .secondary-link:hover { text-decoration: none; filter: brightness(.97); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.card, .run { display: flex; flex-direction: column; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; color: var(--text); min-height: 128px; }
+.run { padding: 16px; }
+.card:hover, .run:hover { border-color: var(--accent-2); text-decoration: none; }
+.thumb { display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #e9edf5; border-radius: 8px 8px 0 0; color: var(--muted); font-size: 13px; font-weight: 700; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb-empty span { padding: 0 14px; text-align: center; }
+.card-body { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 16px; }
+.card strong { line-height: 1.35; }
+.source-line { color: #3f4a5f; font-weight: 600; }
+.runs { display: grid; gap: 10px; }
+.badge { display: inline-flex; width: fit-content; border-radius: 999px; padding: 2px 9px; background: #e6f4f1; color: var(--accent); font-size: 12px; font-weight: 700; }
+.status-contradicted, .status-llm_failed { background: #fee4e2; color: var(--bad); }
+.status-unverified, .status-stale { background: #fff4d6; color: var(--warn); }
+small, .muted { color: var(--muted); }
+.topnav { display: flex; gap: 14px; margin-bottom: 16px; font-size: 14px; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px; }
+.stats span { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
+.report { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: min(5vw, 36px); }
+.report-head { border-bottom: 1px solid var(--line); margin-bottom: 24px; padding-bottom: 20px; }
+.report-head h1 { margin: 0; font-size: clamp(24px, 3.5vw, 38px); line-height: 1.2; }
+.meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+.scope-note { padding: 12px 14px; border-left: 4px solid var(--warn); border-radius: 6px; background: #fff7ed; color: #7c2d12; }
+.synthesis-report h2 { margin-top: 34px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.synthesis-report h3 { margin: 24px 0 8px; color: #0f4c5c; }
+.synthesis-report p, .synthesis-report li { overflow-wrap: anywhere; }
+pre { overflow: auto; background: #111827; color: #f9fafb; border-radius: 8px; padding: 14px; }
+code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+details { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 18px; }
+@media (max-width: 640px) {
+  main { width: min(100% - 20px, 1120px); padding-top: 18px; }
+  .report { padding: 18px; }
+  .synthesis-callout { border-radius: 14px; padding: 18px; }
+  .cta-row a { width: 100%; }
+  .mobile-report { border-radius: 12px; }
+}
+</style>
+</head>
+<body>
+  <main>
+<nav class="topnav"><a href="index.html">실행 목록</a><a href="../../index.html">YouTube 홈</a></nav>
+<article class="report">
+  <header class="report-head">
+    <p class="eyebrow">youtube_20261028_090835</p>
+    <h1>나스닥, 앤트로픽 IPO 신청 이후 AI 랠리 지속...코어위브, 네비우스 동반 급등 [월가 뉴스레터]</h1>
+    <div class="meta">
+      <span class="badge status-asr_uncertain">asr_uncertain</span>
+      <a href="https://www.youtube.com/watch?v=Idn_d5ArZvA">원본 영상</a>
+    </div>
+  </header>
+  <h2>AI 랠리의 지속성: IPO 기대보다 현금 유입·계약 이행·수익성 확인이 우선</h2>
+<h3>1. 핵심 판단</h3>
+<p>영상의 중심 논리는 <strong>앤트로픽 IPO 기대 → 신규 자금 유입 → AI 구매약정 이행 여력 개선 → 네오클라우드·반도체 투자심리 회복</strong>이다. 다만 제공 자료에서는 이 연결고리의 출발점인 <strong>IPO 제출 여부부터 독립적으로 확인되지 않았다.</strong> 따라서 현재로서는 확인된 실적 전망이 아니라 검증 대기 중인 투자 가설이다.</p>
+<p>주장별 검증 결과는 12개 중 <strong>부분 지지 2개, 미검증 9개, 음성인식 불확실 1개</strong>다. 부분 지지도 기술주 상승 방향과 GM 거래소 이전 관련 기사 제목 등에 한정된다. 자료 부족은 해당 주장이 거짓이라는 의미는 아니다.</p>
+<p>분석 대상은 삼프로TV의 <a href="https://www.youtube.com/watch?v=Idn_d5ArZvA">해당 영상</a>이다. 제공된 게시 시각은 2026년 10월 27일 22:01 UTC, 한국시간 10월 28일 07:01이다. 실제 발화 기준 거래일과 영상 속 ‘내일’은 별도 확인이 필요하다.</p>
+<h3>2. 확인된 사실·근거의 범위</h3>
+<p>| 제공 근거 | 확인 가능한 내용 | 확인할 수 없는 내용 |</p>
+<p>| --- | --- | --- |</p>
+<p>| 호스트 수집 yfinance 원유 스냅샷 | 2026년 10월 28일 00:17:58 UTC 조회 기준 CL=F 약 <strong>100.37달러</strong> | 102달러에서 하락한 경로, 영상과 동일한 월물·시세 기준 시각 |</p>
+<p>| E2: <a href="https://finance.yahoo.com/markets/article/tech-rises-for-2nd-day-in-a-row-as-chip-stocks-gain-alphacheck-134531476.html">Yahoo Finance 기술주 상승 기사</a> | 제목상 기술주 이틀 연속 상승·반도체주 강세라는 방향성 | 나스닥·러셀2000 각각 1.2% 상승, 종가, 앤트로픽 IPO의 인과효과 |</p>
+<p>| GM 뉴스 목록의 <a href="https://finance.yahoo.com/m/120e543c-4d2a-3a87-a9d3-d3240403fec2/gm-stock-rises-after-news-of.html">WSJ 기사</a> | 제목상 NYSE→Nasdaq 이전 소식과 GM 주가 상승을 함께 보도 | 이전 효력일·연도, Nasdaq-100 실제 편입 여부·일정 |</p>
+<p>| TSM 뉴스 목록의 <a href="https://finance.yahoo.com/technology/ai/articles/tsmc-gets-fresh-pricing-power-190308506.html">가격 결정력 관련 기사</a> | 가격 결정력을 다룬 기사 제목이 존재 | 패키징 가격 20% 추가 인상, 적용 대상·시점, 당일 3% 상승 |</p>
+<p><strong>근거의 강도는 제한적이다.</strong> E2의 수집 본문은 오류 문구와 사이트 탐색 항목이 대부분이어서 제목 이상으로 확인하기 어렵다. E1은 광물 처리, E3는 팔라듐 전망, E4는 알루미늄 관세 기사로 핵심 주장의 입증 근거에서 제외했다. 제공 번들의 <code>verified</code> 표시는 조회 처리 상태이며, 영상 내용 전체의 사실 확인을 뜻하지 않는다.</p>
+<h3>3. 영상 주장과 검증 결과</h3>
+<p>아래 시각은 정확한 개별 발화 시점이 아니라 관련 내용이 포함된 <strong>자막 청크 시작점</strong>이다. 모든 항목은 추가 수동 확인이 필요하다.</p>
+<p>| 주제·근거 시각 | 영상 주장 | 확인된 사실/근거 및 판단 |</p>
+<p>| --- | --- | --- |</p>
+<p>| 시장·금리·원유·비트코인 · 00:00:00, 00:06:17 | 나스닥·러셀2000 각각 +1.2%, 미국 10년물 약 5%, 유가 102→100달러, 비트코인 80,700달러 회복 | <strong>부분 지지.</strong> 원유 약 100달러와 기술주 상승 방향만 제한적으로 부합한다. 나머지 수치와 변동 경로는 미확인이다. |</p>
+<p>| 경제지표·연준 · 00:06:17, 00:12:53 | 소비자신뢰지수 91.7, 내구재 주문 예상 상회, CNBC 조사 30명 중 93% 동결 예상, 12월 인상 가능성 | <strong>미검증.</strong> 공식 지표·당시 예상치·설문 원문이 없다. 설문과 금리 전망은 실제 정책 결정이 아니다. 도이체방크의 중간선거 연도 23회 표본도 확인되지 않았다. |</p>
+<p>| 앤트로픽 · 00:00:00, 00:12:53 | IPO 신청, 기업가치 1.5조~2조 달러, 직원당 매출 엔비디아 제외 2위 | <strong>미검증.</strong> 신고서·회사 발표·비교표가 없다. 비공개 제출 여부도 확인하거나 반증할 수 없다. 기업가치와 실제 신규 조달액은 구분해야 한다. |</p>
+<p>| 코어위브·네비우스·아이렌 · 00:00:00, 00:12:53 | 코어위브 +8%, 네비우스 +11%; 코펜하겐 22.5MW 대부분 가동; CDS 일주일 최저 | <strong>미검증.</strong> 가격 시계열·시설 발표·CDS 자료가 없다. 22.5MW에는 자막 중복이 있으며, 설비 용량과 실제 이용률은 다르다. |</p>
+<p>| 브로드컴 · 00:12:53, 00:19:21 | 2027년 개시 630억 달러 XPU 금융계약에 외부 금융기관 참여, 목표주가 400달러 상향 | <strong>미검증.</strong> 계약·기관별 역할·보증 조건이 없다. 목표주가 상향 기관명도 불명확하다. 평균 목표주가 스냅샷은 특정 기관의 전망을 검증하지 못한다. |</p>
+<p>| 메타·엔비디아·AMD · 00:19:21 | 메타 950억 달러 조달, 엔비디아 30억 달러 투자, AMD 투자 및 공급 협력 | <strong>음성인식·발화 불확실 및 미검증.</strong> AMD 금액이 10억/15억 달러로 상충한다. 자금 수취 법인과 부채·지분 구분도 불명확하다. 스페이스X 450억 달러 조달 주장 역시 미확인이다. |</p>
+<p>| 오라클·기타 AI 기업 · 00:19:21, 00:32:29, 00:38:55 | 오라클 하드웨어·OpenAI 4개 솔루션 협력, Genie 4, Waymo 확대, 애플 M6 제품, 버티브 인수, 아이온Q AFRL 750만 달러 후속 지원 | <strong>미검증.</strong> 공식 발표·제품 사양·계약 자료가 없다. 발표와 실제 제공 시점, 투자·계약·보조금의 성격을 구분해야 한다. |</p>
+<p>| TSMC·메모리 · 00:19:21, 00:26:04 | 패키징 가격 20% 추가 인상, 솔리다임 미국 공장 450억 달러 투자, 중국 IT 기업 최장 10년 메모리 계약 추진 | <strong>미검증.</strong> 가격 결정력 관련 기사 제목만 있다. 공정명은 CoWoS로 추정될 뿐 확정되지 않았다. 투자 재원·승인과 장기계약 체결 여부도 미확인이다. |</p>
+<p>| 소파이·실적 발표 기업 · 00:26:04, 00:32:29 | 소파이 +13%·가이던스 개선·추가 조달 불필요; 시게이트·테라다인·로빈후드·비자 실적 후 하락; 보잉 인도 전망 하향 | <strong>미검증.</strong> 실적 원문·컨센서스·정규장 및 시간외 가격이 없다. 로빈후드 EPS와 비자 등락률에는 자막 오류 가능성이 있다. |</p>
+<p>| MSFT·아마존 · 00:32:29 | 레이먼드제임스 MSFT 목표주가 630달러; Business Insider의 AWS AI 호스팅 수익성 우려 | <strong>미검증.</strong> 보고서·기사 본문과 실제 클라우드 실적이 없다. AWS 전체 마진을 개별 AI 호스팅 마진과 동일시할 수 없다. |</p>
+<p>| GM·발표 일정 · 00:38:55 | 11월 17일 Nasdaq 이전 및 Nasdaq-100 편입 수혜; ‘다음 날’ 주요 실적·FOMC | <strong>부분 지지.</strong> 이전 관련 기사 제목만 확인된다. 이전일의 연도, 실제 지수 편입과 기업별 공식 일정은 미확인이다. |</p>
+<p>| 지정학·정책 · 00:06:17, 00:12:53 | 베네수엘라 원유 공급, 이란·러시아 관련 협상·제재 변화, AI 용어를 SI로 변경하는 금지 정책 | <strong>미검증.</strong> 공식 문서·발언 전문이 없고 주체·범위도 불명확하다. 에너지 공급이나 정책 전망의 확정 근거로 사용할 수 없다. |</p>
+<h3>4. 강세 논리와 반론</h3>
+<h4>강세 시나리오: 자금조달이 실제 매출·현금흐름으로 연결되는 경우</h4>
+<p>영상의 논리가 성립하려면 다음 조건이 차례로 확인돼야 한다.</p>
+<p>1. <strong>신규 현금 유입:</strong> 앤트로픽이 실제로 자금을 조달하고, 구주매출·비용 등을 제외한 회사 순유입액이 구매약정 이행에 충분해야 한다.</p>
+<p>2. <strong>설비의 매출 전환:</strong> 네오클라우드의 전력 확보와 설비 가동이 고객 인도·사용량·매출 회수로 연결돼야 한다.</p>
+<p>3. <strong>공급사 위험 배분:</strong> 외부 금융기관 참여가 브로드컴의 직접 자금 부담과 잔존 보증 위험을 실질적으로 낮춰야 한다.</p>
+<p>4. <strong>수익화 확인:</strong> Azure·AWS 등에서 AI 수요 증가가 비용·감가상각·금융비용을 감당하는 이익과 현금흐름으로 나타나야 한다.</p>
+<p>이는 <strong>분석상 조건부 시나리오</strong>이며, 제공 자료로 달성이 확인된 것은 아니다.</p>
+<h4>반론: 조달·수주·성장이 곧 수익성은 아니다</h4>
+<ul>
+<li><strong>기업가치 ≠ 조달 현금:</strong> 높은 상장 가치만으로 구매약정 이행 능력이 개선됐다고 볼 수 없다.</li>
+<li><strong>외부 금융 ≠ 위험 소멸:</strong> 보증·담보·상환청구권이 남아 있다면 위험이 다른 주체로 이전되거나 분산될 뿐일 수 있다.</li>
+<li><strong>공급사 투자와 고객 구매의 연결:</strong> 투자금이 공급사 제품 구매로 돌아오는 구조라면 최종 고객 수요와 독립적인 현금 창출을 따로 확인해야 한다.</li>
+<li><strong>매출 성장 ≠ 이익 성장:</strong> AI 호스팅 수요가 늘어도 전력·칩·감가상각 비용으로 수익성이 제한될 가능성은 검토할 가치가 있다. 다만 영상이 인용한 AWS 관련 보도 자체는 미검증이다.</li>
+<li><strong>심리 회복 ≠ 펀더멘털 개선:</strong> 주가와 CDS가 동시에 개선되더라도 시설 이용률·차입 부담·현금 회수가 개선됐다는 증거는 별도로 필요하다.</li>
+<li><strong>상장 이전 ≠ 지수 편입:</strong> GM의 거래소 이전 보도와 확정적인 지수 수급 효과는 분리해야 한다.</li>
+</ul>
+<h3>5. 단기 체크포인트와 가설 무효화 조건</h3>
+<p>공식 일정이 제공되지 않았으므로 특정 날짜를 확정하지 않고, 다음 자료 공개 시점을 관찰 기준으로 삼는다.</p>
+<p>| 우선순위 | 구체적 관찰 항목 | 강세 가설이 약화되거나 무효화되는 조건 |</p>
+<p>| --- | --- | --- |</p>
+<p>| 1. 앤트로픽 조달 | 제출 형태, 신규 발행·구주매출 구분, 순유입액, 현금 사용처, 부채·구매약정 만기 | IPO 신청 전제가 잘못된 것으로 확인되거나, 조달 지연·축소 및 사용 제한으로 약정 이행 여력이 개선되지 않는 경우 |</p>
+<p>| 2. 금융계약 | 브로드컴 관련 계약 당사자·기간·총액·보증·상환청구권; 메타 조달의 수취 법인과 부채·지분 구성 | 외부 금융 참여에도 공급사 위험이 유지되거나, 영상의 거래 주체·금액이 잘못 귀속된 것으로 확인되는 경우 |</p>
+<p>| 3. 네오클라우드 운영 | 확보 전력, 통전 용량, 고객 인도, 실제 이용률, 현금 회수; 동일 조건 CDS 추이 | 가동·인도가 지연되거나 이용률·회수 실적이 부진하고 신용 스프레드가 재확대되는 경우 |</p>
+<p>| 4. 클라우드 실적 | Azure 명목·고정환율 성장률과 AI 기여도; AWS 매출·영업이익률; 설비투자·감가상각·잉여현금흐름 | 매출 성장에도 비용 증가로 이익·현금흐름 개선이 나타나지 않거나 가이던스가 약화되는 경우 |</p>
+<p>| 5. 반도체·메모리 | 패키징 인상률·대상·적용일, 장기계약 체결·최소구매량·가격 조정 조건, 공장 투자 재원 | 인상·계약이 협상 단계에 머물거나 투자 지연·비용 증가로 기대 수익이 축소되는 경우 |</p>
+<p>| 6. 거시·시장 | 공식 FOMC 일정·성명, 경제지표와 당시 예상치, 동일 거래일 가격 시계열, 원유 월물 | 물가·금리·에너지 비용 상승이 실제 할인율과 운영비 부담으로 확인되는 경우 |</p>
+<p>| 7. 개별 이벤트 | 소파이 실적·조달 관련 발언의 조건, 보잉 기종별 인도 전망, GM 이전·지수 편입 공식 공지 | 실적 수치나 발표 일정이 영상과 다르거나 지수 편입 기대가 공식화되지 않는 경우 |</p>
+<p>주가 검증은 전일 종가와 정규장 종가를 먼저 맞추고, 시간외 등락은 별도로 기록해야 한다. 단일 현재가격이나 52주 범위로 영상의 일간 상승률을 복원할 수는 없다.</p>
+<h3>6. 신뢰도와 데이터 품질</h3>
+<ul>
+<li><strong>transcript_quality:</strong> 자동자막 평가 <code>good</code>, 점수 1.0이지만 숫자·고유명사의 정확성을 보증하지 않는다. 원음과 수동자막은 제공되지 않았다.</li>
+<li><strong>source_confidence:</strong> 영상에서 누구의 어떤 주장인지 귀속한 확실성이다. 예를 들어 앤트로픽·브로드컴은 각각 0.94지만 외부 입증 수준과는 별개다.</li>
+<li><strong>asr_confidence:</strong> 자막 문제를 반영한 추정치이며 독립 측정값이 아니다. 메타·AMD 0.50, 지정학·정책 0.55, 브로드컴 0.72, 네오클라우드 0.73으로 금액·용어 재확인이 중요하다.</li>
+<li><strong>외부 검증 confidence:</strong> 부분 지지인 시장 주장은 0.25, GM·일정은 0.35다. 다른 주장들은 0.01~0.08로 낮다. 이는 통계적으로 산출된 사실 확률이 아니라 제공 근거에 대한 보수적 평가다.</li>
+<li><strong>자료 접근 한계:</strong> 공시 제공업체 이용 불가와 소파이 뉴스 조회 실패는 공시·뉴스가 없다는 뜻이 아니다. 비공개 IPO 초안도 공개 자료 부재만으로 반증할 수 없다.</li>
+<li><strong>폐쇄형 출처:</strong> Bloomberg·Morningstar 원문은 제공되지 않았다. 이에 의존하는 내용은 <strong>미검증·수동 확인 필요</strong>다. 도이체방크·레이먼드제임스 등 고객 전용 보고서, CDS 원시 호가, Business Insider 기사 역시 원문 접근 범위를 확인해야 한다.</li>
+</ul>
+<p>종목 귀속은 수정된 주장 추출 결과를 따랐다. 브로드컴 금융계약을 오라클에, MSFT 목표주가를 서비스나우에 귀속하지 않았으며, 서비스나우는 실적 예정 기업 이상의 독립 투자논지로 해석하지 않았다.</p>
+<h3>결론</h3>
+<p>이 영상에서 투자자가 점검할 핵심은 AI 관련 주가 상승 자체가 아니라 <strong>조달 현금이 구매약정 이행을 돕고, 가동 설비가 매출로 전환되며, 그 매출이 이익·현금흐름으로 남는지</strong>다. 현재 제공 근거는 그 연결고리를 입증하기에 부족하다. 당장은 IPO·금융계약 원문, 실제 시설 이용률, 클라우드 수익성, 공식 실적·일정 확인이 강세 시나리오의 지속성을 가르는 관찰 항목이다.</p>
+  <details>
+    <summary>공개 요약 JSON</summary>
+    <pre>{
+  &quot;version&quot;: 4,
+  &quot;video_id&quot;: &quot;Idn_d5ArZvA&quot;,
+  &quot;title&quot;: &quot;나스닥, 앤트로픽 IPO 신청 이후 AI 랠리 지속...코어위브, 네비우스 동반 급등 [월가 뉴스레터]&quot;,
+  &quot;url&quot;: &quot;https://www.youtube.com/watch?v=Idn_d5ArZvA&quot;,
+  &quot;channel&quot;: &quot;삼프로TV 3PROTV&quot;,
+  &quot;channel_id&quot;: &quot;UChlv4GSd7OQl3js-jkLOnFA&quot;,
+  &quot;source_url&quot;: &quot;https://www.youtube.com/@3protv/videos&quot;,
+  &quot;thumbnail_url&quot;: &quot;https://i.ytimg.com/vi/Idn_d5ArZvA/maxresdefault.jpg&quot;,
+  &quot;published_at&quot;: &quot;2026-10-27T22:01:54+00:00&quot;,
+  &quot;status&quot;: &quot;asr_uncertain&quot;,
+  &quot;strategy_source_tier&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_evidence_weight&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_validation_policy&quot;: &quot;STANDARD_REVIEW&quot;,
+  &quot;transcript_status&quot;: &quot;available&quot;,
+  &quot;transcript_source&quot;: &quot;automatic&quot;,
+  &quot;transcript_chars&quot;: 22137,
+  &quot;transcript_quality&quot;: {
+    &quot;status&quot;: &quot;good&quot;,
+    &quot;score&quot;: 1.0,
+    &quot;warnings&quot;: [],
+    &quot;source&quot;: &quot;automatic&quot;,
+    &quot;language&quot;: &quot;Korean&quot;,
+    &quot;model_or_format&quot;: &quot;json3&quot;,
+    &quot;chars&quot;: 22137,
+    &quot;segments&quot;: 1227,
+    &quot;duration_seconds&quot;: 2686,
+    &quot;repeated_ngram_ratio&quot;: 0.0
+  },
+  &quot;generated_at&quot;: &quot;2026-10-28T09:08:35.315227+09:00&quot;,
+  &quot;llm_status&quot;: &quot;success&quot;,
+  &quot;research_status&quot;: &quot;success&quot;,
+  &quot;claim_verification_status&quot;: &quot;success&quot;,
+  &quot;research_pipeline_version&quot;: 4,
+  &quot;evidence_count&quot;: 4,
+  &quot;claim_status_summary&quot;: {
+    &quot;partially_supported&quot;: 2,
+    &quot;unverified&quot;: 9,
+    &quot;asr_uncertain&quot;: 1
+  },
+  &quot;claims&quot;: [
+    {
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;claim_text&quot;: &quot;나스닥·러셀2000 각각 1.2% 상승, 미국 10년물 약 5%, 유가 102→100달러, 비트코인 80,000달러 하회 후 80,700달러 회복 및 AI 심리 개선에 따른 상승이라는 주장.&quot;,
+      &quot;status&quot;: &quot;partially_supported&quot;,
+      &quot;confidence&quot;: 0.25,
+      &quot;supporting_evidence_ids&quot;: [
+        &quot;E2&quot;
+      ],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.88,
+      &quot;asr_confidence&quot;: 0.85,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;나스닥·러셀2000 +1.2%; 10년물 약 5%; 원유 102→100달러; BTC 80,000달러 하회→80,700달러; TSLA 400달러 초과·+4% 이상; MXL +12%&quot;,
+        &quot;observed&quot;: &quot;CL=F 스냅샷 100.37000274658203달러. 나머지 가격·수익률·변동 경로 자료는 unavailable.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;약 100달러의 원유 가격 외에는 제시된 시장 수치를 확인된 투자 근거로 사용하기 어렵다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;claim_text&quot;: &quot;10월 소비자신뢰지수 91.7, 9월 내구재 주문 예상 상회, CNBC 조사 30명 중 93% 동결 예상, 12월 금리 인상 전망 및 도이체방크의 중간선거 연도 23회 표본에 기초한 연말 상승론.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.02,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:06:17&quot;,
+      &quot;source_confidence&quot;: 0.88,
+      &quot;asr_confidence&quot;: 0.83,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;소비자신뢰지수 91.7; 설문 30명·동결 예상 93%; 중간선거 연도 표본 23회&quot;,
+        &quot;observed&quot;: &quot;대응하는 공식 수치·설문·표본 자료는 unavailable.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;금리 인상 전망이나 계절성 상승론을 확정된 정책·통계로 취급하지 않아야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;claim_text&quot;: &quot;행정부별 휘발유 평균가격 비교, 베네수엘라 원유 100만 배럴 공급·51번째 주 발언, 이란 종전 제안·올레슈키 휴전·러시아 제재 일시 해제 및 AI 용어를 SI로 바꾸도록 금지한다는 주장.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.01,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:06:17&quot;,
+      &quot;source_confidence&quot;: 0.7,
+      &quot;asr_confidence&quot;: 0.55,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;베네수엘라 원유 1,000,000배럴; 미국 51번째 주&quot;,
+        &quot;observed&quot;: &quot;관련 수량·발언·정책의 독립 확인 자료는 unavailable.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;확인되지 않은 지정학·정책 발언으로 에너지 공급이나 인플레이션 전망을 변경할 근거가 부족하다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;claim_text&quot;: &quot;앤트로픽이 IPO 신고서를 제출했고 기업가치 1.5조~2조 달러가 거론되며 직원당 매출은 엔비디아 제외 2위이고, 조달금 유입이 AI 구매약정 이행을 돕는다는 주장.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.01,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:12:53&quot;,
+      &quot;source_confidence&quot;: 0.94,
+      &quot;asr_confidence&quot;: 0.88,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;기업가치 1.5조~2조 달러; 직원당 매출 엔비디아 제외 2위&quot;,
+        &quot;observed&quot;: &quot;기업가치·신규 조달액·순위 원자료는 unavailable.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;영상의 핵심 상승 촉매인 IPO와 자금순환 개선 논리는 아직 검증되지 않은 투자 가설이다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;claim_text&quot;: &quot;코어위브 8%·네비우스 11% 상승과 아이렌 동반 상승이 크루소 발언, 코펜하겐 시설 22.5MW 대부분 가동 및 코어위브 CDS의 일주일 최저치와 관련 있다는 주장.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.01,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:12:53&quot;,
+      &quot;source_confidence&quot;: 0.9,
+      &quot;asr_confidence&quot;: 0.73,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;CRWV +8%; NBIS +11%; 시설 22.5MW 대부분 가동; CDS 최근 1주 최저&quot;,
+        &quot;observed&quot;: &quot;수익률·시설 가동 자료·동일 조건 CDS 시계열은 unavailable.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;시설 가동이나 신용위험 개선이 확인된 것으로 보고 네오클라우드 반등의 지속성을 판단하기 어렵다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;claim_text&quot;: &quot;2027년 개시 브로드컴 XPU 사용을 위한 630억 달러 금융계약에 BofA·Citi·Morgan Stanley와 Blackstone이 참여해 직접 금융 부담을 줄였고 목표주가가 400달러로 상향됐다는 주장.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.02,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:12:53&quot;,
+      &quot;source_confidence&quot;: 0.94,
+      &quot;asr_confidence&quot;: 0.72,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;630억 달러=63,000,000,000달러; 개시 2027년; 목표주가 400달러&quot;,
+        &quot;observed&quot;: &quot;AVGO 평균 목표주가 스냅샷은 530.14166달러이나 해당 기관의 목표주가와 직접 비교할 수 없다. 계약 수치는 unavailable.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;금융 부담 경감과 IPO 수혜를 평가하려면 계약상 위험 배분을 먼저 확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;claim_text&quot;: &quot;메타 950억 달러 조달에 엔비디아 30억 달러와 AMD 10억 또는 15억 달러가 참여하고 칩·네트워킹 협력을 확대하며, 스페이스X가 450억 달러를 조달했다는 주장.&quot;,
+      &quot;status&quot;: &quot;asr_uncertain&quot;,
+      &quot;confidence&quot;: 0.01,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:19:21&quot;,
+      &quot;source_confidence&quot;: 0.85,
+      &quot;asr_confidence&quot;: 0.5,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;메타 95,000,000,000달러; 엔비디아 3,000,000,000달러; AMD 1,000,000,000 또는 1,500,000,000달러; 스페이스X 4,500,000,000달러가 아니라 45,000,000,000달러&quot;,
+        &quot;observed&quot;: &quot;거래 금액을 검증할 독립 자료는 unavailable. AMD 주장 금액은 두 값으로 남아 있다.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;금액과 거래 당사자가 확정되기 전에는 공급사 매출 기회나 메타의 부채 부담을 정량화하기 어렵다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;claim_text&quot;: &quot;오라클의 AI 하드웨어·OpenAI 4개 솔루션 협력, 알파벳 Genie 4·웨이모 권역 확대, 애플 M6 맥북 프로와 메모리 공급 거절, 버티브 인수 및 아이온Q AFRL 후속 지원 주장.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.01,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:19:21&quot;,
+      &quot;source_confidence&quot;: 0.85,
+      &quot;asr_confidence&quot;: 0.68,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;오라클 솔루션 4개; Genie 4; M6·14인치·2,000달러; AFRL 후속 750만 달러=7,500,000달러&quot;,
+        &quot;observed&quot;: &quot;대응하는 공식 발표·제품 사양·지원 계약 자료는 unavailable.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;발표 여부와 실제 제공·매출 인식 시점이 확인되기 전에는 개별 기업의 수익 기여를 평가하기 어렵다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;claim_text&quot;: &quot;TSMC 패키징 가격 20% 추가 인상과 주가 약 3% 반등, 솔리다임 미국 공장 450억 달러 투자 및 중국 IT 기업들의 최장 10년 메모리 계약 추진 주장.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.08,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:26:04&quot;,
+      &quot;source_confidence&quot;: 0.9,
+      &quot;asr_confidence&quot;: 0.75,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;패키징 가격 +20%; TSMC 주가 약 +3%; 솔리다임 450억 달러=45,000,000,000달러; 최장 10년 계약&quot;,
+        &quot;observed&quot;: &quot;TSM 가격 스냅샷 436.87달러만 제공됐다. 수익률·가격 인상률·투자·계약 수치는 unavailable.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;가격 인상과 장기 구매약정의 확정 여부를 확인한 뒤 메모리·패키징 실적에 반영해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C10&quot;,
+      &quot;claim_text&quot;: &quot;소파이 13% 상승·가이던스 개선·추가 조달 불필요, 시게이트·테라다인·로빈후드·비자의 실적 후 등락, UPS·로열캐리비안·코닝·아메리칸타워 실적 해석 및 보잉 적자·인도 전망 주장.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.01,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:26:04&quot;,
+      &quot;source_confidence&quot;: 0.85,
+      &quot;asr_confidence&quot;: 0.68,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;SOFI +13%, 2026·2027 전망 개선; STX 정규장 +3.7%·시간외 -5.7%; TER 약 -5.5%; HOOD 약 -4.5%~-5%; V 약 -1.6%; BA 737 인도 500대 미만·787 90대&quot;,
+        &quot;observed&quot;: &quot;SOFI 가격 스냅샷 16.4달러만 제공됐다. 해당 수익률·실적·인도 전망의 비교 자료는 unavailable.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;확인되지 않은 실적 서프라이즈나 시간외 등락을 근거로 추격 매매 또는 실적 전망을 변경하기 어렵다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C11&quot;,
+      &quot;claim_text&quot;: &quot;레이먼드제임스가 Azure 수요를 근거로 MSFT 목표주가를 630달러로 상향했고 Business Insider는 AI 호스팅 비용과 수익 배분 때문에 AWS 이익 증가가 제한될 수 있다고 보도했다는 주장.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.02,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:32:29&quot;,
+      &quot;source_confidence&quot;: 0.95,
+      &quot;asr_confidence&quot;: 0.88,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;MSFT 목표주가 630달러&quot;,
+        &quot;observed&quot;: &quot;MSFT 평균 목표주가 스냅샷 605.1243달러. 레이먼드제임스 개별 목표주가 및 AWS AI 호스팅 마진은 unavailable.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;목표주가 상향이나 AI 수익성 우려는 출처와 실제 클라우드 실적을 확인한 뒤 평가해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C12&quot;,
+      &quot;claim_text&quot;: &quot;GM이 11월 17일 NYSE에서 Nasdaq으로 이전해 Nasdaq-100 편입 수혜를 받는다는 주장과 영상의 다음 날 FOMC·주요 기업 실적 예고.&quot;,
+      &quot;status&quot;: &quot;partially_supported&quot;,
+      &quot;confidence&quot;: 0.35,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:38:55&quot;,
+      &quot;source_confidence&quot;: 0.9,
+      &quot;asr_confidence&quot;: 0.78,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;이전일 11월 17일·연도 미명시; Nasdaq-100 편입 기대; 다음 날 FOMC·기업 실적&quot;,
+        &quot;observed&quot;: &quot;이전과 주가 상승을 언급한 기사 제목은 있으나 11월 17일·연도·지수 편입일·공식 발표 일정은 unavailable.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;거래소 이전 보도와 지수 편입에 따른 확정 수급을 분리하고 공식 편입 공지와 발표 일정을 확인해야 한다.&quot;
+    }
+  ],
+  &quot;entities&quot;: [
+    {
+      &quot;ticker&quot;: &quot;CL=F&quot;,
+      &quot;name&quot;: &quot;미국 증시·금리·원유&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;AI 투자심리 개선과 견조한 경제지표가 증시를 지지했지만, 유가와 인플레이션 부담 때문에 향후 금리 인상 가능성을 계속 점검해야 한다는 해석이다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;나스닥과 러셀2000이 각각 1.2% 상승했다고 언급한다.&quot;,
+        &quot;미국 10년물 국채금리는 5% 부근, 유가는 최근 102달러에서 약 100달러로 내려왔다고 설명한다.&quot;,
+        &quot;10월 소비자신뢰지수는 91.7, 9월 내구재 주문은 예상치를 상회했다고 언급한다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;CL=F&quot;,
+        &quot;as_of&quot;: &quot;2026-10-28T00:17:58.967022+00:00&quot;,
+        &quot;current_price&quot;: 100.37000274658203,
+        &quot;market_cap&quot;: null,
+        &quot;forward_pe&quot;: null,
+        &quot;trailing_pe&quot;: null,
+        &quot;fifty_two_week_high&quot;: 119.48,
+        &quot;fifty_two_week_low&quot;: 54.98,
+        &quot;average_target_price&quot;: null,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;AVGO&quot;,
+      &quot;name&quot;: &quot;브로드컴&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;앤트로픽 관련 금융계약에 외부 금융사가 참여하는 구조가 브로드컴의 직접 금융 부담을 줄여 주요 IPO 수혜주로 평가받았다고 설명한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;2027년부터 앤트로픽이 브로드컴 XPU 가속기를 사용하기 위한 630억 달러 규모 금융계약을 체결했다고 언급한다.&quot;,
+        &quot;자동자막상 &#x27;D데데이비스&#x27;가 목표주가를 400달러로 상향했다고 언급한다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;AVGO&quot;,
+        &quot;as_of&quot;: &quot;2026-10-28T00:17:59.743371+00:00&quot;,
+        &quot;current_price&quot;: 342.33,
+        &quot;market_cap&quot;: 1634156711685.45,
+        &quot;forward_pe&quot;: 17.586885,
+        &quot;trailing_pe&quot;: 43.720306,
+        &quot;fifty_two_week_high&quot;: 495.0,
+        &quot;fifty_two_week_low&quot;: 289.96,
+        &quot;average_target_price&quot;: 530.14166,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;META&quot;,
+      &quot;name&quot;: &quot;메타·엔비디아·AMD 협력&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;메타 자금조달에 엔비디아와 AMD가 참여하고 AI 칩·네트워킹 협력을 확대하는 움직임을 공급사와 고객 간 상호 수혜로 해석한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;메타 조달 규모는 950억 달러, 엔비디아 추가 투자액은 30억 달러라고 언급한다.&quot;,
+        &quot;AMD 투자액은 처음 10억 달러, 뒤에는 15억 달러로 발화해 일관되지 않는다.&quot;,
+        &quot;비교 사례로 스페이스X의 450억 달러 자금조달을 언급한다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;META&quot;,
+        &quot;as_of&quot;: &quot;2026-10-28T00:18:04.392019+00:00&quot;,
+        &quot;current_price&quot;: 620.19,
+        &quot;market_cap&quot;: 1585722279356.4602,
+        &quot;forward_pe&quot;: 17.644096,
+        &quot;trailing_pe&quot;: 21.159674,
+        &quot;fifty_two_week_high&quot;: 779.82,
+        &quot;fifty_two_week_low&quot;: 520.26,
+        &quot;average_target_price&quot;: 846.79034,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;ORCL&quot;,
+      &quot;name&quot;: &quot;오라클&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;AI World에서 다양한 AI 하드웨어 도입과 OpenAI 기업용 솔루션 통합을 발표하며 클라우드 AI 선택지를 확대했다고 설명한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;ChatGPT와 Codex를 업무흐름·사이버보안·애플리케이션 개발·중소기업 운영 등에 통합하는 4개 기업용 솔루션을 언급한다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;ORCL&quot;,
+        &quot;as_of&quot;: &quot;2026-10-28T00:18:10.130091+00:00&quot;,
+        &quot;current_price&quot;: 130.53,
+        &quot;market_cap&quot;: 395701844978.97003,
+        &quot;forward_pe&quot;: 11.875357,
+        &quot;trailing_pe&quot;: 20.459248,
+        &quot;fifty_two_week_high&quot;: 285.46,
+        &quot;fifty_two_week_low&quot;: 114.5,
+        &quot;average_target_price&quot;: 235.8034,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;TSM&quot;,
+      &quot;name&quot;: &quot;TSMC&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;첨단 후공정 패키징 수요 증가에 따른 가격 인상 소식이 주가 반등을 이끌었다고 설명한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;주가가 약 3% 반등했다고 언급한다.&quot;,
+        &quot;자동자막상 &#x27;코어스&#x27; 패키징 가격을 20% 추가 인상한다고 언급한다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;TSM&quot;,
+        &quot;as_of&quot;: &quot;2026-10-28T00:18:12.837877+00:00&quot;,
+        &quot;current_price&quot;: 436.87,
+        &quot;market_cap&quot;: 2265814902059.31,
+        &quot;forward_pe&quot;: 18.681402,
+        &quot;trailing_pe&quot;: 28.313026,
+        &quot;fifty_two_week_high&quot;: 487.47,
+        &quot;fifty_two_week_low&quot;: 266.82,
+        &quot;average_target_price&quot;: 584.39294,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;SOFI&quot;,
+      &quot;name&quot;: &quot;소파이&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;가이던스 상향과 추가 자금조달 불필요 발언이 주가 급등을 뒷받침했다고 설명한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;주가가 13% 급등했다고 언급한다.&quot;,
+        &quot;2026년 가이던스를 상향하고 2027년 전망을 월가 예상치보다 높게 제시했다고 설명한다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;SOFI&quot;,
+        &quot;as_of&quot;: &quot;2026-10-28T00:18:15.833859+00:00&quot;,
+        &quot;current_price&quot;: 16.4,
+        &quot;market_cap&quot;: 21181753313.6,
+        &quot;forward_pe&quot;: 19.937027,
+        &quot;trailing_pe&quot;: 33.469387,
+        &quot;fifty_two_week_high&quot;: 32.73,
+        &quot;fifty_two_week_low&quot;: 13.86,
+        &quot;average_target_price&quot;: 20.22083,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;MSFT&quot;,
+      &quot;name&quot;: &quot;마이크로소프트&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;강한 Azure 수요를 근거로 실적 발표 전 목표주가가 상향됐으며, 클라우드 성장률이 AI 수익화의 핵심 확인 지표라고 설명한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;레이먼드 제임스가 목표주가를 630달러로 상향했다고 언급한다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;MSFT&quot;,
+        &quot;as_of&quot;: &quot;2026-10-28T00:18:18.566366+00:00&quot;,
+        &quot;current_price&quot;: 531.33,
+        &quot;market_cap&quot;: 3945415085733.0303,
+        &quot;forward_pe&quot;: 22.428717,
+        &quot;trailing_pe&quot;: 29.600557,
+        &quot;fifty_two_week_high&quot;: 553.72,
+        &quot;fifty_two_week_low&quot;: 349.2,
+        &quot;average_target_price&quot;: 605.1243,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;AMZN&quot;,
+      &quot;name&quot;: &quot;아마존&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;Business Insider 보도를 인용해 AI 호스팅 수요가 늘어도 관련 비용과 AI 업체에 돌아가는 몫 때문에 클라우드 이익 증가가 기대보다 작을 수 있다고 설명한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;AMZN&quot;,
+        &quot;as_of&quot;: &quot;2026-10-28T00:18:20.329008+00:00&quot;,
+        &quot;current_price&quot;: 253.1,
+        &quot;market_cap&quot;: 2730015965073.1997,
+        &quot;forward_pe&quot;: 24.259678,
+        &quot;trailing_pe&quot;: 20.362028,
+        &quot;fifty_two_week_high&quot;: 287.2,
+        &quot;fifty_two_week_low&quot;: 196.0,
+        &quot;average_target_price&quot;: 332.2369,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;GM&quot;,
+      &quot;name&quot;: &quot;제너럴모터스&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;뉴욕증권거래소에서 나스닥으로 이전 상장한다는 소식과 지수 편입에 따른 수급 기대를 주가 상승 배경으로 설명한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;이전 상장 기준일로 11월 17일을 제시한다. 해당 발화에서 연도는 명시하지 않는다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;GM&quot;,
+        &quot;as_of&quot;: &quot;2026-10-28T00:18:23.549433+00:00&quot;,
+        &quot;current_price&quot;: 80.54,
+        &quot;market_cap&quot;: 68378460000.00001,
+        &quot;forward_pe&quot;: 5.440947,
+        &quot;trailing_pe&quot;: 17.623632,
+        &quot;fifty_two_week_high&quot;: 91.85,
+        &quot;fifty_two_week_low&quot;: 66.75,
+        &quot;average_target_price&quot;: 101.0,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    }
+  ],
+  &quot;evidence&quot;: [
+    {
+      &quot;evidence_id&quot;: &quot;E1&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;RecycLiCo and Alaska Energy Metals Collaborate to Test Proprietary Processing Methods on the Polymetallic Eureka Deposit, Nikolai Nickel Project, Alaska&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/energy/articles/recyclico-alaska-energy-metals-collaborate-164700091.html&quot;,
+      &quot;publisher&quot;: &quot;ACCESS Newswire&quot;,
+      &quot;published_at&quot;: &quot;2026-10-27T16:47:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;RecycLiCo and Alaska Energy Metals Collaborate to Test Proprietary Processing Methods on the Polymetallic Eureka Deposit, Nikolai Nickel Project, Alaska Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Financ...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E2&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;Tech rises for second day in a row as chip stocks gain: AlphaCheck&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/article/tech-rises-for-2nd-day-in-a-row-as-chip-stocks-gain-alphacheck-134531476.html&quot;,
+      &quot;publisher&quot;: &quot;Yahoo Finance&quot;,
+      &quot;published_at&quot;: &quot;2026-10-27T13:45:31+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Tech rises for second day in a row as chip stocks gain: AlphaCheck Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 2026 Elections Weather New...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E4&quot;,
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;title&quot;: &quot;What the Aluminum Tariff Has Meant for U.S. Prices&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/m/bbdab404-8386-3b0a-938e-4333f4284a0b/what-the-aluminum-tariff-has.html&quot;,
+      &quot;publisher&quot;: &quot;The Wall Street Journal&quot;,
+      &quot;published_at&quot;: &quot;2026-10-27T21:30:02+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;What the Aluminum Tariff Has Meant for U.S. Prices Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 2026 Elections Weather Newsletters Finance...&quot;
+    }
+  ],
+  &quot;source_policy&quot;: {
+    &quot;raw_transcript_published&quot;: false,
+    &quot;raw_transcript_in_evidence&quot;: false,
+    &quot;research_pipeline_version&quot;: 4,
+    &quot;closed_source_claims&quot;: &quot;unverified_external_source&quot;,
+    &quot;auto_caption_warning&quot;: true,
+    &quot;local_asr_warning&quot;: false
+  }
+}</pre>
+  </details>
+</article>
+</main>
+  <style>
+.reader-contents { margin: 16px 0; padding: 12px 16px; border: 1px solid var(--line, #64748b); border-radius: 12px; }
+.reader-contents > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-weight: 750; }
+.reader-contents nav { display: grid; gap: 4px; max-height: 45vh; overflow: auto; margin: 8px 0; }
+.reader-contents a { display: block; min-height: 44px; padding: 10px; border-radius: 6px; color: inherit; overflow-wrap: anywhere; }
+.reader-contents a:hover { background: #80808020; }
+.reader-contents .reader-subsection { padding-inline-start: 24px; font-size: .92em; }
+.reader-prose, .report { overflow-wrap: anywhere; line-height: 1.8; }
+.reader-prose p, .reader-prose li { max-width: 85ch; }
+.reader-prose h2, .reader-prose h3, .reader-prose h4, [data-reader-heading] { scroll-margin-top: 100px; line-height: 1.45; }
+.reader-prose h2 { margin-top: 1.8em; padding-bottom: 8px; border-bottom: 1px solid var(--line, #64748b); }
+.reader-prose h3 { margin-top: 1.5em; }
+.reader-prose li { margin: .5em 0; }
+.reader-prose pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.reader-prose blockquote { margin: 16px 0; padding: 4px 16px; border-left: 3px solid var(--accent, #64748b); }
+.reader-table { overflow: auto; max-width: 100%; margin: 16px 0; border: 1px solid var(--line, #64748b); border-radius: 10px; }
+.reader-table table { border-collapse: collapse; width: 100%; margin: 0; font-size: .92rem; }
+.reader-table th, .reader-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line, #64748b); min-width: 110px; max-width: 400px; overflow-wrap: anywhere; white-space: normal; }
+.reader-table th { background: #80808018; }
+.reader-table tr:nth-child(even) { background: #80808008; }
+.reader-search { display: grid; gap: 8px; margin: 16px 0; }
+.reader-search label { font-weight: 700; }
+.reader-search input { box-sizing: border-box; width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line, #64748b); border-radius: 10px; background: var(--panel, #fff); color: var(--text, #132238); font: inherit; }
+.reader-search p { margin: 0; font-size: .86rem; }
+.reader-back { position: fixed; bottom: max(14px, env(safe-area-inset-bottom)); right: 14px; z-index: 30; min-height: 44px; border: 1px solid #778899; border-radius: 99px; padding: 10px 16px; background: #18344a; color: #fff; font: 700 14px system-ui; cursor: pointer; box-shadow: 0 3px 12px #0003; }
+[data-reader-source] { margin-top: 20px; }
+[data-reader-source] > summary { min-height: 44px; cursor: pointer; }
+[data-reader-source] pre { font-size: .85rem; }
+[data-reader-source] pre, .reader-prose { min-width: 0; }
+.reader-contents :focus-visible, .reader-search :focus-visible, .reader-back:focus-visible, .reader-table:focus-visible { outline: 3px solid var(--accent, #008c95); outline-offset: 3px; }
+.reader-search + .grid > [hidden] { display: none !important; }
+@media (max-width: 600px) { .reader-prose { font-size: 1rem; } .reader-contents { padding: 8px 12px; } }
+@media print { .reader-back, .reader-search, .reader-contents, [data-reader-source] { display: none !important; } .reader-table { overflow: visible; } .reader-prose { color: #000; background: #fff; } }
+</style><script>
+(() => {
+  'use strict';
+  let serial = 0;
+  const rendered = new WeakMap();
+  const node = (tag, text) => { const el = document.createElement(tag); if (text != null) el.textContent = text; return el; };
+  function inline(parent, text) {
+    const pattern = /(`[^`]+`|\*\*[^*]+\*\*|\[[^\]]+\]\(https?:\/\/[^\s)]+\))/g;
+    let start = 0;
+    for (const match of String(text).matchAll(pattern)) {
+      parent.append(document.createTextNode(text.slice(start, match.index)));
+      const value = match[0];
+      if (value.startsWith('`')) parent.append(node('code', value.slice(1, -1)));
+      else if (value.startsWith('**')) parent.append(node('strong', value.slice(2, -2)));
+      else {
+        const link = value.match(/^\[([^\]]+)\]\((.+)\)$/);
+        const a = node('a', link[1]); a.href = link[2]; a.rel = 'noopener noreferrer'; parent.append(a);
+      }
+      start = match.index + value.length;
+    }
+    parent.append(document.createTextNode(text.slice(start)));
+  }
+  const cells = line => line.trim().replace(/^\|/, '').replace(/\|$/, '').split(/(?<!\\)\|/).map(v => v.trim().replace(/\\\|/g, '|'));
+  function markdown(source) {
+    const article = node('article'); article.className = 'reader-prose';
+    const lines = source.split(/\r?\n/); let list = null;
+    for (let i = 0; i < lines.length; i += 1) {
+      const line = lines[i], value = line.trim();
+      if (!value) { list = null; continue; }
+      if (/^```/.test(value)) {
+        const code = []; i += 1;
+        while (i < lines.length && !/^```/.test(lines[i].trim())) code.push(lines[i++]);
+        const pre = node('pre'); pre.append(node('code', code.join('\n'))); article.append(pre); list = null; continue;
+      }
+      if (i + 1 < lines.length && value.includes('|') && cells(lines[i + 1]).every(v => /^:?-{3,}:?$/.test(v))) {
+        const table = node('table'), head = node('thead'), body = node('tbody');
+        const row = (values, tag) => { const tr = node('tr'); values.forEach(v => { const cell = node(tag); if (tag === 'th') cell.scope = 'col'; inline(cell, v); tr.append(cell); }); return tr; };
+        head.append(row(cells(line), 'th')); i += 2;
+        while (i < lines.length && lines[i].trim() && lines[i].includes('|')) body.append(row(cells(lines[i++]), 'td'));
+        i -= 1; table.append(head, body); article.append(table); list = null; continue;
+      }
+      const heading = value.match(/^(#{1,6})\s+(.+)$/);
+      if (heading) { const h = node('h' + Math.min(4, heading[1].length + 1)); inline(h, heading[2]); article.append(h); list = null; continue; }
+      const bullet = value.match(/^(?:[-*+] |\d+\. )(.+)$/);
+      if (bullet) {
+        const tag = /^\d/.test(value) ? 'ol' : 'ul';
+        if (!list || list.tagName.toLowerCase() !== tag) { list = node(tag); if (tag === 'ol') list.start = parseInt(value, 10); article.append(list); }
+        const li = node('li'); inline(li, bullet[1]); list.append(li); continue;
+      }
+      list = null;
+      if (/^(---+|\*\*\*+)$/.test(value)) { article.append(node('hr')); continue; }
+      const p = node(value.startsWith('> ') ? 'blockquote' : 'p'); inline(p, value.startsWith('> ') ? value.slice(2) : line); article.append(p);
+    }
+    return article;
+  }
+  function contents(root) {
+    root.querySelectorAll(':scope > .reader-contents').forEach(el => el.remove());
+    const headings = [...root.querySelectorAll('h2,h3,h4')].filter(h => !h.closest('.card,.run-card,.reader-contents,[data-reader-source],[hidden]'));
+    if (headings.length < 2) return;
+    const details = node('details'); details.className = 'reader-contents';
+    details.append(node('summary', '이 리포트 목차 · ' + headings.length + '개 항목'));
+    const nav = node('nav'); nav.setAttribute('aria-label', '리포트 목차');
+    headings.forEach(h => {
+      if (!h.id) h.id = 'reader-section-' + (++serial);
+      h.dataset.readerHeading = ''; h.tabIndex = -1;
+      const a = node('a', h.textContent); a.href = '#' + h.id;
+      if (h.tagName !== 'H2') a.className = 'reader-subsection';
+      a.addEventListener('click', event => {
+        event.preventDefault();
+        for (let ancestor = h.parentElement; ancestor; ancestor = ancestor.parentElement) if (ancestor.tagName === 'DETAILS') ancestor.open = true;
+        h.scrollIntoView({block: 'start'}); h.focus({preventScroll: true});
+      }); nav.append(a);
+    });
+    details.append(nav); root.prepend(details);
+  }
+  function enhance(root) {
+    if (!root) return;
+    root.querySelectorAll('pre[data-report-markdown]').forEach(pre => {
+      const previous = rendered.get(pre);
+      if (previous && previous.source === pre.textContent) return;
+      const article = markdown(pre.textContent);
+      if (previous) previous.article.replaceWith(article);
+      else {
+        const details = node('details'); details.dataset.readerSource = '';
+        details.append(node('summary', 'Markdown 원문 보기'));
+        pre.before(article, details); details.append(pre);
+      }
+      rendered.set(pre, {source: pre.textContent, article});
+    });
+    root.querySelectorAll('table').forEach(table => {
+      if (table.closest('.reader-table,.account-table-wrap,.summary-scroll')) return;
+      const wrap = node('div'); wrap.className = 'reader-table'; wrap.tabIndex = 0;
+      wrap.setAttribute('role', 'region'); wrap.setAttribute('aria-label', '리포트 표 · 가로로 스크롤하여 전체 보기');
+      table.before(wrap); wrap.append(table);
+    });
+    root.querySelectorAll('.grid').forEach(grid => {
+      const cards = [...grid.querySelectorAll(':scope > a.card')];
+      if (cards.length < 2 || grid.dataset.readerSearch) return;
+      grid.dataset.readerSearch = 'true';
+      const box = node('div'); box.className = 'reader-search';
+      const input = node('input'); input.type = 'search'; input.placeholder = '제목 · 종목 · 채널 · 키워드'; input.id = 'report-search-' + (++serial);
+      const label = node('label', '리포트 찾기'); label.htmlFor = input.id;
+      const status = node('p'); status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
+      const update = () => {
+        const terms = input.value.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean); let count = 0;
+        cards.forEach(card => { card.hidden = !terms.every(t => card.textContent.toLocaleLowerCase().includes(t)); if (!card.hidden) count += 1; });
+        status.textContent = cards.length + '개 중 ' + count + '개 표시' + (count ? '' : ' · 검색어를 지우거나 다른 키워드를 입력하세요.');
+      };
+      input.addEventListener('input', update); box.append(label, input, status); grid.before(box); update();
+    });
+    contents(root);
+  }
+  window.TradingAgentsReader = {enhance};
+  const main = document.querySelector('main');
+  if (main && !main.hasAttribute('data-reader-dynamic')) enhance(main);
+  if (main) {
+    const top = node('button', '↑ 맨 위'); top.type = 'button'; top.className = 'reader-back'; top.setAttribute('aria-label', '리포트 맨 위로 이동');
+    top.addEventListener('click', () => { const target = document.querySelector('h1') || main; target.tabIndex = -1; target.scrollIntoView({block: 'start'}); target.focus({preventScroll: true}); });
+    document.body.append(top);
+  }
+})();
+</script>
+</body>
+</html>
