@@ -165,7 +165,10 @@ def _load_run_manifests(archive_dir: Path) -> list[dict[str, Any]]:
     if not runs_root.exists():
         return manifests
 
-    for path in runs_root.rglob("run.json"):
+    # Canonical year/run and legacy flat run layouts contain the manifests.
+    # Descending into every ticker/artifact directory scales with the entire
+    # archive and can also mistake a nested evidence document for a producer run.
+    for path in (*runs_root.glob("*/run.json"), *runs_root.glob("*/*/run.json")):
         try:
             payload = json.loads(path.read_text(encoding="utf-8"))
             if not isinstance(payload, dict) or not all(
