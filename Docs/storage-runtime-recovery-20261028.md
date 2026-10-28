@@ -82,6 +82,9 @@
   a legacy manifest, and only reconciles a full result for a RUNNING attempt.
   Terminal attempts and minute overlays no longer cause redundant expanded
   manifest reads. Legacy-run selection and interrupted-run handling are retained.
+  Work source-clock discovery overlaps two reads while retaining the existing
+  three-manifest memory bound, producer-clock ordering and selected-source
+  reread/consistency checks.
 
 ## Code and dependency acceptance
 

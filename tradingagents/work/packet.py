@@ -5,7 +5,9 @@ import json
 import os
 import re
 from collections.abc import Iterable
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta
+from itertools import islice
 from pathlib import Path
 from typing import Any
 
@@ -1210,12 +1212,20 @@ def _market_sources(archive_dir: Path, market: str) -> list[dict[str, Any]]:
     # clock before looking for the first ready bundle, across both markets.
     # Index only producer clocks, not every expanded manifest. The archive can
     # contain gigabytes of repeated ticker research across minute overlays.
-    manifests = []
-    for path in candidates:
+    def source_clock(path):
         manifest = load_json(path)
         configured_market = str(((manifest.get("settings") or {}).get("market") or manifest.get("market") or "")).lower()
         if configured_market == market:
-            manifests.append((_timestamp(manifest.get("started_at")) or 0, path))
+            return (_timestamp(manifest.get("started_at")) or 0, path)
+        return None
+
+    manifests = []
+    remaining = iter(candidates)
+    # Two readers overlap disk latency without exceeding the existing bounded
+    # expanded-manifest retention. Only clock/path pairs leave the workers.
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        while batch := list(islice(remaining, 8)):
+            manifests.extend(item for item in pool.map(source_clock, batch) if item is not None)
     manifests.sort(key=lambda item: item[0], reverse=True)
     for started_at, manifest_path in manifests:
         manifest = load_json(manifest_path)
