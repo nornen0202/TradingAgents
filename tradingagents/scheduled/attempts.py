@@ -58,15 +58,20 @@ def latest_full_attempt(archive: Path, market: str, *, now: datetime) -> dict:
         item = _read(path)
         if item.get("market", "").lower() != market.lower() or item.get("run_mode") != "full":
             continue
-        completed = _read(path.with_name("run.json"))
-        if item.get("status") == "RUNNING" and completed.get("finished_at"):
-            item.update(status=str(completed.get("status") or "UNVERIFIED").upper(), finished_at=completed["finished_at"])
+        if item.get("status") == "RUNNING":
+            completed = _read(path.with_name("run.json"))
+            if completed.get("finished_at"):
+                item.update(status=str(completed.get("status") or "UNVERIFIED").upper(), finished_at=completed["finished_at"])
         candidates.append(item)
     # Completed legacy runs predate attempt.json. They remain valid baselines.
     for path in (archive / "runs").glob("*/*/run.json"):
+        # The attempt pass already owns these runs. Check the small receipt's
+        # existence before reading repeated megabytes of ticker research.
+        if path.with_name("attempt.json").exists():
+            continue
         item = _read(path)
         settings = item.get("settings") or {}
-        if path.with_name("attempt.json").exists() or str(settings.get("market", "")).lower() != market.lower() or settings.get("run_mode", "full") != "full":
+        if str(settings.get("market", "")).lower() != market.lower() or settings.get("run_mode", "full") != "full":
             continue
         candidates.append({"run_id": item.get("run_id"), "started_at": item.get("started_at"),
                            "finished_at": item.get("finished_at"), "status": str(item.get("status") or "UNVERIFIED").upper()})

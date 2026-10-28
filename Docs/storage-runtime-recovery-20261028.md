@@ -78,6 +78,10 @@
   official daily closure checks, exception propagation and freshness gates are
   unchanged. Offline tests cover range/default alternation, day and factory
   changes, failed construction and serialized concurrency.
+- Work attempt discovery checks for an existing attempt receipt before reading
+  a legacy manifest, and only reconciles a full result for a RUNNING attempt.
+  Terminal attempts and minute overlays no longer cause redundant expanded
+  manifest reads. Legacy-run selection and interrupted-run handling are retained.
 
 ## Code and dependency acceptance
 
@@ -125,6 +129,14 @@ requires `archive-original-backup-result.json` plus the final backup inventory
 in the audit directory. The preservation worker must not be duplicated while
 its recorded process is still active. Originals include NTFS-compressed files,
 so logical archive bytes are not the same as reclaimed C: disk allocation.
+
+The original backup move finished at 13:01:56 KST with zero failed or mismatched
+files. At 13:08:52 the independent inventory accepted all 897,496 files /
+52,543,145,845 bytes, found no source files remaining on C:, and passed four
+SQLite checks on private clones. C: had 37,673,783,296 free bytes (35.1 GiB).
+The G: canonical copy had already passed complete content hashing; L: acceptance
+combines successful preservation, the empty source, exact inventory totals and
+database checks. It is not a second complete hash pass over L:.
 
 The cutover guard found one historical GitHub request, run 37655538332 from
 October 7, whose API status remains `queued` despite zero jobs. Normal cancel
