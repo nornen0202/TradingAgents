@@ -71,6 +71,13 @@
   not an end-to-end freshness guarantee. Idle or delegated research ticks defer
   discovery until a target actually needs archive evidence, avoiding a second
   unnecessary full scan alongside the minute producer.
+- The exchange-calendar wrapper retains at most the two default KR/US calendars
+  per factory and actual day. Upstream retains only the last range per exchange,
+  so explicit history windows previously evicted the default session calendar
+  and triggered repeated construction during quote refresh. Explicit ranges,
+  official daily closure checks, exception propagation and freshness gates are
+  unchanged. Offline tests cover range/default alternation, day and factory
+  changes, failed construction and serialized concurrency.
 
 ## Code and dependency acceptance
 
