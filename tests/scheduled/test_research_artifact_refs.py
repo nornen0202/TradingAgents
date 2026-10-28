@@ -134,6 +134,81 @@ def test_nonlightweight_and_full_preserve_existing_local_copy(evidence, monkeypa
     assert not (archive / "research-snapshots").exists()
 
 
+def test_site_reuses_verified_manifest_only_within_each_run(evidence, tmp_path, monkeypatch):
+    from tradingagents.scheduled import site
+    from tradingagents.scheduled.config import SiteSettings
+    archive, source, source_manifest, first = evidence
+    second = deepcopy(first)
+    second["ticker"] = "MSFT"
+    second["artifacts"] = {key: value.replace("AAPL", "MSFT") for key, value in first["artifacts"].items()}
+    shutil.copytree(source / "tickers/AAPL", source / "tickers/MSFT")
+    analysis_path = source / second["artifacts"]["analysis_json"]
+    analysis = json.loads(analysis_path.read_bytes())
+    analysis["ticker"] = "MSFT"
+    write(analysis_path, analysis)
+    source_manifest["tickers"].append(second)
+    write(source / "run.json", source_manifest)
+    source_store = ResearchArtifactStore(archive, now=NOW)
+    references = [source_store.make(source, row, "report_markdown") for row in (first, second)]
+    manifests = []
+    for name in ("overlay_one", "overlay_two"):
+        destination = archive / "runs/2026" / name
+        rows = deepcopy([first, second])
+        for row, reference in zip(rows, references):
+            write(destination / row["artifacts"]["analysis_json"],
+                  json.loads((source / row["artifacts"]["analysis_json"]).read_bytes()))
+            row["artifacts"]["report_markdown"] = reference
+        manifest = publish_overlay(destination, rows[0])
+        manifest["finished_at"] = "2026-05-30T10:00:00+00:00"
+        manifest["tickers"] = rows
+        manifest["active_universe"] = {"expected_watchlist_tickers": ["AAPL", "MSFT"]}
+        write(destination / "run.json", manifest)
+        manifests.append(manifest)
+    expected = {(manifest["run_id"], row["ticker"]): site._render_ticker_page(
+                    manifest, row, SiteSettings(), manifests=manifests, portfolio_summary={})
+                for manifest in manifests for row in site._public_ticker_summaries(manifest)}
+    monkeypatch.setattr(site, "_load_run_manifests", lambda _: manifests)
+    monkeypatch.setattr(site, "_select_published_manifests", lambda *_: manifests)
+    for target in ("tradingagents.scheduled.site._build_youtube_site_addon",
+                   "tradingagents.scheduled.site._build_prism_telegram_site_addon",
+                   "tradingagents.work.site.build_work_site",
+                   "tradingagents.scheduled.mobile_site.build_mobile_site",
+                   "tradingagents.scheduled.ai_context.build_ai_context"):
+        monkeypatch.setattr(target, lambda *args, **kwargs: None)
+    digest = references[0]["source_manifest_sha256"]
+    reads = []
+    original_blob = ResearchArtifactStore._blob
+    def counted_blob(self, value):
+        if value == digest:
+            reads.append(value)
+        return original_blob(self, value)
+    monkeypatch.setattr(ResearchArtifactStore, "_blob", counted_blob)
+    output = tmp_path / "site"
+    site.build_site(archive, output, SiteSettings())
+    assert len(reads) == 2  # One verified manifest per run, rather than per ticker.
+    for (run_id, ticker), page in expected.items():
+        assert (output / "runs" / run_id / f"{ticker}.html").read_text(encoding="utf-8") == page
+    # A new run must enforce its own earlier cutoff, not inherit a later cache.
+    manifests[1]["finished_at"] = "2026-05-30T08:00:00+00:00"
+    with pytest.raises(ValueError, match="future-dated"):
+        site.build_site(archive, output, SiteSettings())
+
+
+def test_cached_site_manifest_still_checks_each_owner(evidence, monkeypatch):
+    from tradingagents.scheduled.config import SiteSettings
+    from tradingagents.scheduled.site import _render_ticker_page
+    destination, row = bootstrap(evidence, monkeypatch)
+    manifest = publish_overlay(destination, row)
+    store = ResearchArtifactStore.from_run_dir(destination, now=manifest["finished_at"])
+    _render_ticker_page(manifest, row, SiteSettings(), research_store=store)
+    owner = destination / row["artifacts"]["analysis_json"]
+    analysis = json.loads(owner.read_bytes())
+    analysis["decision"] = "BUY"
+    write(owner, analysis)
+    with pytest.raises(ValueError, match="original thesis"):
+        _render_ticker_page(manifest, row, SiteSettings(), research_store=store)
+
+
 @pytest.mark.parametrize("field,value", [
     ("started_at", None), ("started_at", "bad"), ("started_at", "2026-05-30T09:01:00"),
     ("finished_at", "2026-05-31T12:00:00+00:00"), ("finished_at", "2026-05-30T08:00:00+00:00"),

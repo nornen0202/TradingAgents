@@ -351,7 +351,7 @@ def run_due(archive, state, *, now=None, dry_run=False, research_only=False):
         kr_overlay_checkpoints=KR_WORK_OVERLAY_CHECKPOINTS,
         us_overlay_checkpoints=US_WORK_OVERLAY_CHECKPOINTS,
     )
-    manifests = [m for m, _ in _iter_run_manifests_desc(archive, project=_scheduler_manifest_view)]
+    manifests = None
     decisions = []
     for target in targets:
         if target.workflow_file not in {"daily-codex-analysis.yml", "intraday-overlay-refresh.yml"}:
@@ -366,6 +366,9 @@ def run_due(archive, state, *, now=None, dry_run=False, research_only=False):
         if now < window_start:
             decisions.append({"target": target.name, "status": "AWAITING_EXECUTION_CHECKPOINT"})
             continue
+        if manifests is None:
+            manifests = [m for m, _ in _iter_run_manifests_desc(
+                archive, project=_scheduler_manifest_view, read_workers=4)]
         if any(completed_target(m, target, window_start=window_start, now=now) for m in manifests):
             decisions.append({"target": target.name, "status": "RESEARCH_COMPLETE"})
             continue

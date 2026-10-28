@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import argparse
+from concurrent.futures import ThreadPoolExecutor
 from copy import deepcopy
 from dataclasses import dataclass, replace
 import json
+from itertools import islice
 import os
 from queue import Empty, Queue
 import re
@@ -5266,27 +5268,46 @@ def _iter_run_manifests_desc(
     archive_dir: Path,
     *,
     project: Callable[[dict[str, Any]], dict[str, Any]] | None = None,
+    read_workers: int = 1,
 ) -> list[tuple[dict[str, Any], Path]]:
     """Read every original in canonical order, optionally retaining a small view.
 
     Projection bounds retained payloads without caching discovery or skipping
     malformed older JSON. Full file reads and parsing still scale with archive
     size. The default returns the original complete manifests as before.
+    Opt-in parallel reads require a thread-safe projection and retain at most
+    four full parse operations. Results and exceptions keep canonical order.
     """
+    if type(read_workers) is not int or not 1 <= read_workers <= 4:
+        raise ValueError("Manifest read workers must be between one and four")
+    if read_workers > 1 and project is None:
+        raise ValueError("Parallel manifest reads require a bounded projection")
     runs_dir = archive_dir / "runs"
     if not runs_dir.exists():
         return []
+
+    def paths():
+        year_dirs = sorted((path for path in runs_dir.iterdir() if path.is_dir()), reverse=True)
+        for year_dir in year_dirs:
+            run_dirs = sorted((path for path in year_dir.iterdir() if path.is_dir()), reverse=True)
+            for run_dir in run_dirs:
+                manifest_path = run_dir / "run.json"
+                if manifest_path.exists():
+                    yield manifest_path
+
+    def read_manifest(path):
+        manifest = json.loads(path.read_text(encoding="utf-8"))
+        return (project(manifest) if project is not None else manifest, path.parent)
+
+    if read_workers == 1:
+        return [read_manifest(path) for path in paths()]
     items: list[tuple[dict[str, Any], Path]] = []
-    year_dirs = sorted((path for path in runs_dir.iterdir() if path.is_dir()), reverse=True)
-    for year_dir in year_dirs:
-        run_dirs = sorted((path for path in year_dir.iterdir() if path.is_dir()), reverse=True)
-        for run_dir in run_dirs:
-            manifest_path = run_dir / "run.json"
-            if not manifest_path.exists():
-                continue
-            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-            items.append((project(manifest) if project is not None else manifest, run_dir))
-            del manifest
+    remaining = paths()
+    with ThreadPoolExecutor(max_workers=read_workers) as pool:
+        while batch := list(islice(remaining, read_workers)):
+            # executor.map over the complete archive would queue and retain an
+            # unbounded number of results behind one slow file. Bound submission.
+            items.extend(pool.map(read_manifest, batch))
     return items
 
 
