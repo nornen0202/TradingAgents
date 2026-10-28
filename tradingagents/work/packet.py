@@ -2132,7 +2132,9 @@ def _source_manifests(archive_dir: Path, filename: str) -> list[tuple[dict[str, 
     root = Path(archive_dir) / "runs"
     if not root.exists():
         return manifests
-    for path in root.rglob(filename):
+    # Producer manifests live directly in flat runs or year/run directories.
+    # Do not walk every transcript/evidence folder or admit nested documents.
+    for path in (*root.glob(f"*/{filename}"), *root.glob(f"*/*/{filename}")):
         payload = load_json(path)
         if payload:
             manifests.append((payload, path.parent))

@@ -85,6 +85,8 @@
   Work source-clock discovery overlaps two reads while retaining the existing
   three-manifest memory bound, producer-clock ordering and selected-source
   reread/consistency checks.
+  YouTube/PRISM manifest discovery reads the supported flat and year/run layouts,
+  avoiding recursive transcript/evidence traversal and nested manifest impostors.
 
 ## Code and dependency acceptance
 

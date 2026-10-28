@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta, timezone
 import weakref
+import json
 
 import pytest
 
@@ -93,3 +94,15 @@ def test_discovery_overlaps_two_reads_without_changing_selection_or_retention(tm
     selected = packet._market_sources(tmp_path, "us")
     assert [row["manifest"]["run_id"] for row in selected] == ["run-079", "run-042"]
     assert peak() <= 3
+
+
+@pytest.mark.parametrize("filename", ["youtube_run.json", "prism_telegram_run.json"])
+def test_advisory_discovery_keeps_producer_layouts_and_excludes_nested_evidence(tmp_path, filename):
+    for directory, started in (("legacy", "2026-10-26T00:00:00Z"),
+                               ("2026/current", "2026-10-27T00:00:00Z"),
+                               ("2026/current/videos/embedded", "2099-01-01T00:00:00Z")):
+        path = tmp_path / "runs" / directory / filename
+        path.parent.mkdir(parents=True)
+        path.write_text(json.dumps({"run_id": path.parent.name, "started_at": started}), encoding="utf-8")
+    sources = packet._source_manifests(tmp_path, filename)
+    assert [payload["run_id"] for payload, _ in sources] == ["current", "legacy"]
