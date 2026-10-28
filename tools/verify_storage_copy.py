@@ -72,6 +72,17 @@ def verify(source, destination, receipt, *, workers=8):
     errors = []
     extras = sorted((copied.keys() - original.keys()) | (copied_directories - directories))
     missing = sorted((original.keys() - copied.keys()) | (directories - copied_directories))
+    errors = [(name, "size-mismatch") for name in original.keys() & copied.keys()
+              if original[name][0] != copied[name][0]]
+    if missing or extras or errors:
+        # An incomplete online copy cannot become valid by hashing unchanged
+        # files for hours. Report the exact inventory defects before content I/O.
+        result = {"source": str(source), "destination": str(destination), "files": len(original),
+                  "bytes": sum(row[0] for row in original.values()), "errors": errors,
+                  "missing": missing, "extras": extras, "unchanged": False, "verified": False,
+                  "phase": "inventory-mismatch", "started_at": started, "finished_at": time.time()}
+        Path(receipt).write_text(json.dumps(result, indent=2), encoding="utf-8")
+        return result
     def check(relative):
         left, right = source / relative, destination / relative
         if original[relative][0] != copied.get(relative, (None,))[0]:

@@ -87,3 +87,18 @@ def test_parallel_inventory_propagates_unreadable_directory(tmp_path, monkeypatc
     monkeypatch.setattr(copy.os, "scandir", denied)
     with pytest.raises(PermissionError):
         copy.inventory(tmp_path)
+
+
+@pytest.mark.parametrize("fault", ["missing", "extra", "size"])
+def test_incomplete_inventory_is_reported_before_expensive_hashing(tmp_path, monkeypatch, fault):
+    source, destination = tmp_path / "source", tmp_path / "destination"
+    source.mkdir(); destination.mkdir()
+    (source / "report.json").write_text("original")
+    if fault != "missing":
+        (destination / "report.json").write_text("short" if fault == "size" else "original")
+    if fault == "extra":
+        (destination / "stale.json").write_text("stale")
+    monkeypatch.setattr(copy, "digest", lambda path: pytest.fail("Inventory defects must fail before hashing"))
+    result = copy.verify(source, destination, tmp_path / "receipt.json")
+    assert not result["verified"] and result["phase"] == "inventory-mismatch"
+    assert result["missing"] or result["extras"] or result["errors"]
