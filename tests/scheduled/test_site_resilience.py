@@ -37,6 +37,17 @@ def test_homepage_does_not_parse_private_portfolio_files(tmp_path, monkeypatch):
     assert 'aria-label="주요 메뉴"' in page
 
 
+def test_discovery_preserves_both_run_layouts_and_excludes_nested_artifacts(tmp_path):
+    for relative, run_id in (("legacy", "legacy"), ("2026/current", "current"),
+                             ("2026/current/tickers/embedded", "embedded")):
+        path = tmp_path / "runs" / relative / "run.json"
+        path.parent.mkdir(parents=True)
+        path.write_text(json.dumps({"run_id": run_id, "started_at": "2026-10-27",
+                                    "status": "success", "settings": {}}), encoding="utf-8")
+    manifests = site._load_run_manifests(tmp_path)
+    assert {item["run_id"] for item in manifests} == {"legacy", "current"}
+
+
 def test_corrupt_portfolio_status_degrades_to_empty_summary(tmp_path):
     private = tmp_path / "portfolio-private"
     private.mkdir()
