@@ -45,7 +45,7 @@ def producer_lock(path):
 
 
 def freshness_blockers(packet: dict, *, now: datetime, started_at: datetime, run_id: str) -> list[str]:
-    """Require observations collected in this invocation, not a recently copied cache."""
+    """Require observations from this producer window, not a recently copied cache."""
     body = packet.get("body") or {}
     current = body.get("current") or {}
     receipt = current.get("freshness_receipt") or {}
