@@ -89,6 +89,9 @@ def overlay_manifest(started="2026-10-13T22:54:00+09:00", finished="2026-10-13T2
 
 
 def wire_overlay_only(monkeypatch, manifests=()):
+    # These tests isolate checkpoint clocks; baseline admission has its own
+    # archive-backed regressions in test_local_overlay_baseline_admission.
+    monkeypatch.setattr(runner, "_resolve_latest_full_overlay_baseline_manifest", lambda *a, **kw: {"run_id": "ready"})
     watchdog = local.script("scheduled_actions_watchdog")
     monkeypatch.setattr(local, "script", lambda _: SimpleNamespace(
         due_targets=lambda now, **kwargs: [t for t in watchdog.due_targets(now, **kwargs)
