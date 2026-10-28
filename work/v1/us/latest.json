@@ -1,13 +1,13 @@
 {
   "schema": "tradingagents.work-context/v1",
   "surface": "us",
-  "event_id": "us:3ec43788b1fd2ddf23a98a4abf7fcb92",
+  "event_id": "us:c2d2dde2b868a68926d4aecffb5b0264",
   "prompt_contract_version": "market-work-v13-us",
   "prompt_sha256": "d89884ce9232b2695f637cb3a5654da9f473e7138706cc074cbd9a1601e61f77",
   "skill_sha256": "4dffe28b3721557cc2517b5afff2f94045832606e71ff61461df969f6abb53c7",
   "task_manifest_sha256": "c0992fa275c9961bc91c679030c0b4d9b8b06f3d164226776421f1e354b5c22e",
   "workflow_contract_sha256": "6e0b555b6a8ae53cf919baa1e96d671d2ef180fd3d86a58e5c8b568f278c8ec6",
-  "source_sha256": "9ef3f890503ea8aad42e8efaa7e3661c7d5cc7c7510e615049f69dcd60ffdadf",
+  "source_sha256": "602cf487136769c8545c07e3c66cf7245d72774771ad589a3fdc4a3e6e0f72e6",
   "body": {
     "kind": "market",
     "market": "US",
@@ -209,15 +209,12 @@
       },
       "latest_attempt": {
         "schema": "tradingagents.analysis-attempt/v1",
-        "run_id": "20261026T213112_local-scheduler-us-full",
+        "run_id": "20261028T185153_local-scheduler-us-full",
         "market": "US",
         "run_mode": "full",
-        "started_at": "2026-10-26T21:31:12.632056+09:00",
-        "status": "PARTIAL_FAILURE",
-        "heartbeat_at": "2026-10-26T12:50:39.107771+00:00",
-        "finished_at": "2026-10-26T12:50:39.107744+00:00",
-        "completed_tickers": 4,
-        "error_type": null
+        "started_at": "2026-10-28T18:51:53.833608+09:00",
+        "status": "INTERRUPTED",
+        "heartbeat_at": "2026-10-28T10:10:30.137744+00:00"
       },
       "latest_completed_analysis": {
         "run_id": "20261026T200051_local-scheduler-us-full",
@@ -898,15 +895,15 @@
         "source_health": "OK",
         "coverage": {
           "total_unique_events": 532,
-          "window_events": 45,
+          "window_events": 44,
           "transmitted_events": 12,
           "truncated": true,
           "oldest_occurred_at": "2026-10-27T01:35:08+00:00",
           "newest_occurred_at": "2026-10-28T00:00:06+00:00",
-          "available_events_before_context_cap": 45,
+          "available_events_before_context_cap": 44,
           "context_event_cap": 12,
-          "omitted_events": 33,
-          "omitted_due_to_context_cap": 33,
+          "omitted_events": 32,
+          "omitted_due_to_context_cap": 32,
           "omitted_before_context_selection": 0
         },
         "events": [
@@ -3411,15 +3408,15 @@
             ],
             "coverage": {
               "total_unique_events": 532,
-              "window_events": 45,
+              "window_events": 44,
               "transmitted_events": 12,
               "truncated": true,
               "oldest_occurred_at": "2026-10-27T01:35:08+00:00",
               "newest_occurred_at": "2026-10-28T00:00:06+00:00",
-              "available_events_before_context_cap": 45,
+              "available_events_before_context_cap": 44,
               "context_event_cap": 12,
-              "omitted_events": 33,
-              "omitted_due_to_context_cap": 33,
+              "omitted_events": 32,
+              "omitted_due_to_context_cap": 32,
               "omitted_before_context_selection": 0
             }
           },
