@@ -396,6 +396,23 @@ def run_due(archive, state, *, now=None, dry_run=False, research_only=False):
             if hold:
                 decisions.append({"target": target.name, "status": hold})
                 continue
+        else:
+            # Like minute refreshes, scheduled overlays need completed research
+            # before admission. An absent/stale baseline is a dependency wait,
+            # not a failed worker attempt. Keep the executor's universe, holding
+            # and artifact checks authoritative; never pin this observed source.
+            try:
+                from tradingagents.scheduled.runner import _resolve_latest_full_overlay_baseline_manifest
+                baseline = _resolve_latest_full_overlay_baseline_manifest(
+                    archive, market=target.inputs["profile"].upper(), now=now,
+                    write_discovery_index=False)
+            except Exception as exc:
+                decisions.append({"target": target.name, "status": "OVERLAY_BASELINE_UNVERIFIED",
+                                  "error_type": type(exc).__name__})
+                continue
+            if baseline is None:
+                decisions.append({"target": target.name, "status": "WAITING_RESEARCH_BASELINE"})
+                continue
         decisions.append({"target": target.name, "status": "DUE"})
         if dry_run:
             continue
@@ -465,6 +482,11 @@ def run_due(archive, state, *, now=None, dry_run=False, research_only=False):
     if research_only:
         return decisions
     if not any(item["status"] == "DUE" for item in decisions):
+        if any(item["status"] in {"WAITING_RESEARCH_BASELINE", "OVERLAY_BASELINE_UNVERIFIED"}
+               for item in decisions):
+            # The minute fallback uses this same selector and clock. It cannot
+            # repair this dependency; avoid rescanning the archive in this tick.
+            return decisions
         from tradingagents.execution.refresh_runtime import refresh_due
         refreshes = refresh_due(archive, state, now=now, dry_run=dry_run)
         decisions.extend(refreshes)

@@ -178,6 +178,7 @@ def test_dry_run_hold_is_read_only(tmp_path, monkeypatch):
 
 
 def test_overlay_admission_is_not_subject_to_full_research_hold(tmp_path, monkeypatch):
+    monkeypatch.setattr(runner, "_resolve_latest_full_overlay_baseline_manifest", lambda *a, **kw: {"run_id": "ready"})
     enable(tmp_path)
     item = target(mode="overlay_only")
     calls = wire(monkeypatch, item)

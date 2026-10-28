@@ -311,5 +311,6 @@ def test_future_manifest_cannot_change_past_scheduler_decision(
         future.pop("execution")
     write(archive, future)
     after = local.run_due(archive, state, now=NOW, dry_run=True)
-    assert before == after == [{"target": item.name, "status": "RESEARCH_COMPLETE" if past_complete else "DUE"}]
+    status = "RESEARCH_COMPLETE" if past_complete else ("DUE" if mode == "full" else "WAITING_RESEARCH_BASELINE")
+    assert before == after == [{"target": item.name, "status": status}]
     assert not state.exists()

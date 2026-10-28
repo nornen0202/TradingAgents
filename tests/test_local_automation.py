@@ -13,6 +13,10 @@ from tradingagents.atomic_io import interprocess_file_lock
 
 @pytest.fixture(autouse=True)
 def ample_test_storage(monkeypatch):
+    from tradingagents.scheduled import runner
+    # Worker/budget tests assume research is ready. Real baseline rejection is
+    # covered by test_local_overlay_baseline_admission.
+    monkeypatch.setattr(runner, "_resolve_latest_full_overlay_baseline_manifest", lambda *a, **kw: {"run_id": "ready"})
     monkeypatch.setattr(local, "require_storage_headroom", lambda *paths: None)
 
 
