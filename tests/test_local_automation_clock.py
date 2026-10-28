@@ -66,6 +66,23 @@ def test_invalid_or_naive_scheduler_clock_fails_before_target_lookup(tmp_path, m
     assert not (tmp_path / "state").exists()
 
 
+def test_idle_research_tick_does_not_read_unneeded_archive(tmp_path, monkeypatch, offline_scheduler):
+    from tradingagents.scheduled import runner
+    monkeypatch.setattr(runner, "_iter_run_manifests_desc", lambda *a, **kw: pytest.fail("No daily target needs archive evidence"))
+    now = datetime.fromisoformat("2026-10-22T12:00:00+09:00")
+    assert local.run_due(tmp_path / "archive", tmp_path / "state", now=now, research_only=True) == []
+
+
+def test_delegated_tick_does_not_read_unneeded_archive(tmp_path, monkeypatch, offline_scheduler):
+    from tradingagents.scheduled import runner
+    from tradingagents.execution import research_runtime
+    monkeypatch.setattr(research_runtime, "research_lane_enabled", lambda _: True)
+    monkeypatch.setattr(runner, "_iter_run_manifests_desc", lambda *a, **kw: pytest.fail("Research owner will verify its own evidence"))
+    now = datetime.fromisoformat("2026-10-22T18:00:00+09:00")
+    rows = local.run_due(tmp_path / "archive", tmp_path / "state", now=now, dry_run=True)
+    assert rows and all(row["status"] == "DELEGATED_TO_RESEARCH_LANE" for row in rows)
+
+
 def test_friday_utc_worker_uses_original_key_and_budget_after_kst_midnight(tmp_path, monkeypatch, offline_scheduler):
     from tradingagents.scheduled import config
 

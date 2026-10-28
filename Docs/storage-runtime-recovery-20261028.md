@@ -62,6 +62,15 @@
   digest and source clock is still verified. Regression tests compare complete
   HTML, reject changed owner evidence, and reject a source beyond the next run's
   earlier cutoff. No process-global or cross-run evidence cache is introduced.
+- Scheduler discovery retains canonical order and reads/parses every original,
+  including malformed older JSON, using at most four parallel projected reads.
+  Submission and parse memory are bounded by four files; there is no historical
+  cutoff shortcut or persistent cache. A live read-only comparison of 1,264
+  identical paths produced the same view digest in 23.5 seconds with four
+  readers versus 40.7 seconds serially. This is a loaded-host discovery probe,
+  not an end-to-end freshness guarantee. Idle or delegated research ticks defer
+  discovery until a target actually needs archive evidence, avoiding a second
+  unnecessary full scan alongside the minute producer.
 
 ## Code and dependency acceptance
 

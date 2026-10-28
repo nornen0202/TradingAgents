@@ -187,9 +187,10 @@ def test_older_broken_json_fails_before_scheduler_actions(tmp_path, monkeypatch)
         local.run_due(tmp_path, tmp_path / "state", now=NOW, research_only=True)
 
 
-def test_large_unused_bodies_are_not_retained_across_manifests(tmp_path):
+@pytest.mark.parametrize("read_workers", [1, 4])
+def test_large_unused_bodies_are_not_retained_across_manifests(tmp_path, read_workers):
     payload_bytes = 1024 * 1024
-    count = 20
+    count = 40
     for index in range(count):
         data = manifest(f"{index:04d}")
         data["llm_usage"]["events"][0]["unused_body"] = "x" * payload_bytes
@@ -198,17 +199,47 @@ def test_large_unused_bodies_are_not_retained_across_manifests(tmp_path):
     gc.collect()
     tracemalloc.start()
     try:
-        result = runner._iter_run_manifests_desc(tmp_path, project=local._scheduler_manifest_view)
+        result = runner._iter_run_manifests_desc(tmp_path, project=local._scheduler_manifest_view,
+                                               read_workers=read_workers)
         current, peak = tracemalloc.get_traced_memory()
     finally:
         tracemalloc.stop()
     assert len(result) == count
     assert all(local.completed_target(m, target(), now=NOW) for m, _ in result)
-    # A full list necessarily retains at least the 20 MiB string corpus. Allow
-    # several parse/read temporaries, but never archive-sized retained bodies.
-    assert peak < 6 * payload_bytes, (current, peak)
+    # Bound parse temporaries by workers, never by the 40 MiB archive corpus.
+    assert peak < (6 if read_workers == 1 else 16) * payload_bytes, (current, peak)
     assert current < payload_bytes, (current, peak)
     assert all("llm_usage" not in m and "research_recovery" not in m for m, _ in result)
+
+
+def test_parallel_discovery_preserves_order_and_rechecks_changed_originals(tmp_path, monkeypatch):
+    from threading import Barrier
+    from pathlib import Path
+    paths = [write(tmp_path, manifest(f"{index:04d}")) for index in range(4)]
+    expected = runner._iter_run_manifests_desc(tmp_path, project=local._scheduler_manifest_view)
+    barrier = Barrier(4)
+    original = Path.read_text
+    def overlapping_read(path, *args, **kwargs):
+        if path in paths:
+            barrier.wait(timeout=10)
+        return original(path, *args, **kwargs)
+    monkeypatch.setattr(Path, "read_text", overlapping_read)
+    assert runner._iter_run_manifests_desc(tmp_path, project=local._scheduler_manifest_view,
+                                          read_workers=4) == expected
+    paths[0].write_text('{"unfinished":', encoding="utf-8")
+    with pytest.raises(json.JSONDecodeError):
+        runner._iter_run_manifests_desc(tmp_path, project=local._scheduler_manifest_view, read_workers=4)
+
+
+@pytest.mark.parametrize("workers", [0, 5, True, "4"])
+def test_parallel_discovery_rejects_unbounded_worker_counts(tmp_path, workers):
+    with pytest.raises(ValueError, match="workers"):
+        runner._iter_run_manifests_desc(tmp_path, project=local._scheduler_manifest_view, read_workers=workers)
+
+
+def test_parallel_discovery_requires_projection(tmp_path):
+    with pytest.raises(ValueError, match="projection"):
+        runner._iter_run_manifests_desc(tmp_path, read_workers=4)
 
 
 @pytest.mark.parametrize("mode,receipt", [("full", True), ("overlay_only", True), ("overlay_only", False)])
