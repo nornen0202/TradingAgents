@@ -19,12 +19,14 @@ import tempfile
 import time
 
 
-def inventory(root):
+def inventory(root, *, workers=8):
     root = Path(root)
     files, directories = {}, set()
     pending = [(str(root), "")]
-    while pending:
-        directory, prefix = pending.pop()
+
+    def scan(item):
+        directory, prefix = item
+        children, found = [], {}
         with os.scandir(directory) as entries:
             for entry in entries:
                 # Windows scandir already supplies metadata; avoid millions of
@@ -34,10 +36,21 @@ def inventory(root):
                     raise ValueError(f"Linked entry is not a plain copy: {entry.path}")
                 relative = prefix + entry.name
                 if entry.is_dir(follow_symlinks=False):
-                    directories.add(relative)
-                    pending.append((entry.path, relative + "/"))
+                    children.append((entry.path, relative + "/"))
                 else:
-                    files[relative] = (stat.st_size, stat.st_mtime_ns)
+                    found[relative] = (stat.st_size, stat.st_mtime_ns)
+        return children, found
+
+    # Bound outstanding directory reads and retained batches. Serial traversal
+    # of 160,000 small directories can dominate verification on a data HDD.
+    # Only the caller mutates inventory state; worker exceptions still fail closed.
+    with ThreadPoolExecutor(max_workers=workers) as pool:
+        while pending:
+            batch = [pending.pop() for _ in range(min(128, len(pending)))]
+            for children, found in pool.map(scan, batch):
+                pending.extend(children)
+                directories.update(prefix[:-1] for _, prefix in children)
+                files.update(found)
     return files, directories
 
 
@@ -59,6 +72,17 @@ def verify(source, destination, receipt, *, workers=8):
     errors = []
     extras = sorted((copied.keys() - original.keys()) | (copied_directories - directories))
     missing = sorted((original.keys() - copied.keys()) | (directories - copied_directories))
+    errors = [(name, "size-mismatch") for name in original.keys() & copied.keys()
+              if original[name][0] != copied[name][0]]
+    if missing or extras or errors:
+        # An incomplete online copy cannot become valid by hashing unchanged
+        # files for hours. Report the exact inventory defects before content I/O.
+        result = {"source": str(source), "destination": str(destination), "files": len(original),
+                  "bytes": sum(row[0] for row in original.values()), "errors": errors,
+                  "missing": missing, "extras": extras, "unchanged": False, "verified": False,
+                  "phase": "inventory-mismatch", "started_at": started, "finished_at": time.time()}
+        Path(receipt).write_text(json.dumps(result, indent=2), encoding="utf-8")
+        return result
     def check(relative):
         left, right = source / relative, destination / relative
         if original[relative][0] != copied.get(relative, (None,))[0]:

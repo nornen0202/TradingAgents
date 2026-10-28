@@ -87,9 +87,9 @@ there is no unlocked fallback. The OS releases the lock if a process dies.
     acquired = False
     try:
         fd = os.open(lock_path, os.O_RDWR | os.O_CREAT, 0o600)
-        # msvcrt locks a byte range, including for a newly created lock file.
-        if os.fstat(fd).st_size == 0:
-            os.write(fd, b"\0")
+        # Both OS locks support an empty file (Windows permits ranges past EOF).
+        # Never initialize byte zero before acquiring: a peer can already hold
+        # that range, making an otherwise valid contender fail with EACCES.
         while True:
             try:
                 if os.name == "nt":

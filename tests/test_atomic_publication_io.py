@@ -62,6 +62,21 @@ def _held_lock_worker(path, ready, release):
         release.wait(10)
 
 
+def _held_empty_native_lock_worker(path, ready, release):
+    fd = os.open(path, os.O_RDWR | os.O_CREAT, 0o600)
+    try:
+        if os.name == "nt":
+            import msvcrt
+            msvcrt.locking(fd, msvcrt.LK_NBLCK, 1)
+        else:
+            import fcntl
+            fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        ready.set()
+        release.wait(10)
+    finally:
+        os.close(fd)
+
+
 def _client(cache, **kwargs):
     return KisClient(
         app_key="synthetic-key", app_secret="synthetic-secret",
@@ -172,6 +187,26 @@ def test_thread_lock_is_bounded(tmp_path):
         worker.start()
         worker.join(5)
     assert outcomes == ["timed-out"]
+
+
+def test_empty_native_lock_is_respected_without_initialization_write(tmp_path):
+    ctx = multiprocessing.get_context("spawn")
+    path = tmp_path / "empty.lock"
+    ready, release = ctx.Event(), ctx.Event()
+    worker = ctx.Process(target=_held_empty_native_lock_worker, args=(str(path), ready, release))
+    worker.start()
+    try:
+        assert ready.wait(15)
+        assert path.stat().st_size == 0
+        with pytest.raises(TimeoutError):
+            with interprocess_file_lock(path, timeout=0.05):
+                pytest.fail("An empty file's held byte range must not be bypassed")
+    finally:
+        release.set()
+        worker.join(15)
+    assert worker.exitcode == 0
+    with interprocess_file_lock(path, timeout=1):
+        assert path.stat().st_size == 0
 
 
 def test_concurrent_token_refresh_issues_once_across_processes(tmp_path):

@@ -41,6 +41,36 @@ Useful JSON keys are:
 
 Missing paid data is reported as a limitation, not treated as a failure.
 
+### Point-in-time import contract
+
+Every imported snapshot must include the actual publication time of that version
+and the time it was observed, with explicit timezone offsets:
+
+```json
+{
+  "timestamp_envelope": {
+    "published_at": "2026-06-08T10:00:00Z",
+    "observed_at": "2026-06-08T11:00:00Z"
+  },
+  "estimate_revision_direction": "neutral"
+}
+```
+
+The analysis date is mandatory. The execution context's `analysis_as_of` can
+only narrow it. Date-only cutoffs use the security's market timezone (Seoul for
+Korean symbols, New York otherwise), capped at the current instant. Imports with
+missing, invalid, naive, reversed, or future availability clocks are excluded
+from tool responses, evidence, coverage, and source-quality calculations.
+Declared nested publication, observation, amendment, and as-of dates must also
+fall within the cutoff; an invalid nested clock rejects the snapshot.
+
+A financial period end, filesystem timestamp, or assumed reporting delay cannot
+establish publication. Revised exports need the actual publication clock of the
+revision. A future `scheduled_at` may describe an event announced before the
+cutoff; it does not establish that the event has occurred. Older undated imports
+remain on disk but cannot influence historical analysis until their provenance
+is supplied.
+
 ## Runtime Artifacts
 
 Each successful scheduled ticker run can emit:

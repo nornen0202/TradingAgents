@@ -104,6 +104,7 @@ class InstitutionalIntelligenceTests(unittest.TestCase):
             (vendor_dir / "financials.json").write_text(
                 json.dumps(
                     {
+                        "timestamp_envelope": {"published_at": "2026-06-08T10:00:00Z", "observed_at": "2026-06-08T11:00:00Z"},
                         "source_refs": [
                             {
                                 "provider": "daloopa",
@@ -166,7 +167,8 @@ class InstitutionalIntelligenceTests(unittest.TestCase):
             vendor_dir = data_dir / "factset" / "MSFT"
             vendor_dir.mkdir(parents=True)
             (vendor_dir / "estimates.json").write_text(
-                json.dumps({"estimate_revision_direction": "neutral"}, ensure_ascii=False),
+                json.dumps({"estimate_revision_direction": "neutral", "timestamp_envelope": {
+                    "published_at": "2026-06-08T10:00:00Z", "observed_at": "2026-06-08T11:00:00Z"}}, ensure_ascii=False),
                 encoding="utf-8",
             )
             with patch.dict("os.environ", {"TRADINGAGENTS_INSTITUTIONAL_DATA_DIR": str(data_dir)}, clear=False):

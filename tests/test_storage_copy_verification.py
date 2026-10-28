@@ -63,3 +63,42 @@ def test_wal_integrity_check_never_opens_original_database(tmp_path):
         result = copy.verify(source, destination, tmp_path / "receipt.json")
         assert result["verified"]
         assert before == {p.name: p.read_bytes() for p in source.iterdir()}
+
+
+def test_parallel_inventory_preserves_empty_directories_and_metadata(tmp_path):
+    for i in range(150):
+        child = tmp_path / str(i) / "nested"
+        child.mkdir(parents=True)
+        if i % 3:
+            (child / "report.json").write_text(str(i))
+    serial = copy.inventory(tmp_path, workers=1)
+    assert copy.inventory(tmp_path, workers=8) == serial
+    assert len(serial[0]) == 100 and len(serial[1]) == 300
+
+
+def test_parallel_inventory_propagates_unreadable_directory(tmp_path, monkeypatch):
+    child = tmp_path / "unreadable"
+    child.mkdir()
+    original = copy.os.scandir
+    def denied(path):
+        if Path(path) == child:
+            raise PermissionError("fixture inaccessible directory")
+        return original(path)
+    monkeypatch.setattr(copy.os, "scandir", denied)
+    with pytest.raises(PermissionError):
+        copy.inventory(tmp_path)
+
+
+@pytest.mark.parametrize("fault", ["missing", "extra", "size"])
+def test_incomplete_inventory_is_reported_before_expensive_hashing(tmp_path, monkeypatch, fault):
+    source, destination = tmp_path / "source", tmp_path / "destination"
+    source.mkdir(); destination.mkdir()
+    (source / "report.json").write_text("original")
+    if fault != "missing":
+        (destination / "report.json").write_text("short" if fault == "size" else "original")
+    if fault == "extra":
+        (destination / "stale.json").write_text("stale")
+    monkeypatch.setattr(copy, "digest", lambda path: pytest.fail("Inventory defects must fail before hashing"))
+    result = copy.verify(source, destination, tmp_path / "receipt.json")
+    assert not result["verified"] and result["phase"] == "inventory-mismatch"
+    assert result["missing"] or result["extras"] or result["errors"]

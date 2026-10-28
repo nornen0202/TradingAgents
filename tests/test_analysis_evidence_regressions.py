@@ -102,7 +102,7 @@ def test_summary_uses_injected_current_context_without_exposing_state_to_model(m
 
 
 def test_failed_and_repeated_provider_calls_do_not_inflate_quality(monkeypatch):
-    monkeypatch.setattr(institutional, "_load_all_imported_payloads", lambda ticker: [])
+    monkeypatch.setattr(institutional, "_load_all_imported_payloads", lambda ticker, *, cutoff: [])
     success = {"vendor": "yfinance", "method": "get_stock_data", "status": "success"}
     failure = {"vendor": "fred", "method": "get_macro_indicators", "status": "fallback"}
     def score(events):

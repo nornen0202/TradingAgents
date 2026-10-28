@@ -23,7 +23,7 @@ def test_maintenance_refuses_nested_junction_without_touching_external_data(tmp_
         [PWSH, '-NoProfile', '-NonInteractive', '-Command',
          'New-Item -ItemType Junction -Path $env:TEST_LINK -Target $env:TEST_TARGET | Out-Null'],
         env={**os.environ, 'TEST_LINK': str(stale / 'linked'), 'TEST_TARGET': str(outside)},
-        capture_output=True, text=True, timeout=30,
+        capture_output=True, text=True, encoding="utf-8", timeout=30,
     )
     assert result.returncode == 0, result.stderr
     result = _run_maintenance(tmp_path, apply=True)
@@ -84,7 +84,7 @@ def _run_maintenance(tmp_path: Path, *, apply: bool, extended_policy=None) -> su
         command.append("-Apply")
     if extended_policy is not None:
         command += ["-ExtendedPolicyPath", str(extended_policy)]
-    return subprocess.run(command, check=False, capture_output=True, text=True,
+    return subprocess.run(command, check=False, capture_output=True, text=True, encoding="utf-8",
                           env={**os.environ, "TEST_MAINTENANCE_SCRIPT": str(SCRIPT)})
 
 

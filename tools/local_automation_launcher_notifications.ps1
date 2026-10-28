@@ -29,7 +29,8 @@ function Send-LocalAutomationLauncherFailure {
         [IO.FileMode]::OpenOrCreate, [IO.FileAccess]::ReadWrite, [IO.FileShare]::ReadWrite)
     $owned = $false
     try {
-        if ($stream.Length -eq 0) { $stream.WriteByte(0); $stream.Flush() }
+        # Windows byte-range locks cover empty files. A pre-lock write can race
+        # another holder and can also fail later when FileStream disposes.
         $stream.Lock(0, 1)
         $owned = $true
         $sourceKey = 'launcher:' + $ObservedAt.ToOffset([TimeSpan]::FromHours(9)).ToString('yyyy-MM-dd')
@@ -63,7 +64,6 @@ function Send-LocalAutomationLauncherFailure {
         # Same byte-range lock as atomic_io.interprocess_file_lock on Windows.
         $stream = [IO.File]::Open((Join-Path $notificationRoot 'dispatch.lock'),
             [IO.FileMode]::OpenOrCreate, [IO.FileAccess]::ReadWrite, [IO.FileShare]::ReadWrite)
-        if ($stream.Length -eq 0) { $stream.WriteByte(0); $stream.Flush() }
         try { $stream.Lock(0, 1) } catch [IO.IOException] { return }
         $owned = $true
         $receiptPath = Join-Path $notificationRoot "dispatches\$key.json"
