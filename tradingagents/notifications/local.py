@@ -226,8 +226,15 @@ def compose(event, archive, state):
         if not re.fullmatch(r"[A-Za-z0-9_]+", str(event.get("error_type", ""))):
             raise NotificationError("Unsafe local diagnostic.")
         lines = ["TradingAgents 자동화 실패", f"단계: {event['stage']}",
-                 f"확인 시각: {event['finished_at']}", f"오류 분류: {event['error_type']}",
-                 "분석·배포 완료로 처리하지 않았습니다. 운영 점검에서 원인과 재시도 한도를 확인합니다."]
+                 f"확인 시각: {event['finished_at']}", f"오류 분류: {event['error_type']}"]
+        if event["error_type"] == "LocalStorageHeadroomError":
+            # Explain the known class without exposing exception text, native
+            # output, local paths or credentials through the public outbox.
+            lines.extend([
+                "원인: 분석 저장 드라이브의 여유 공간이 부족하거나 드라이브에 접근할 수 없습니다.",
+                "확인 항목: 분석 데이터·실행 상태·LLM 작업 공간의 실제 저장 드라이브 연결과 각각 4 GiB 이상의 여유 공간.",
+            ])
+        lines.append("분석·배포 완료로 처리하지 않았습니다. 운영 점검에서 원인과 재시도 한도를 확인합니다.")
         return "\n".join(lines), [], {"conclusion": "failure"}
     if event.get("kind") != "success" or event.get("market") not in {"kr", "us"}:
         raise NotificationError("Unknown local notification event.")
