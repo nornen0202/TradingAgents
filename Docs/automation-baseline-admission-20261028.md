@@ -12,9 +12,14 @@ spent an attempt and emitted a worker-failure notification for each new slot.
   ticker work; the final cohort had zero successes and 30 failures/skips.
 - The existing bounded retry started
   `20261028T185153_local-scheduler-us-full`. At the investigation checkpoint,
-  all 30 ticker workers had succeeded, but the full manifest was still being
-  finalized. A running attempt or individual ticker artifacts cannot authorize
-  an overlay or establish report delivery.
+  all 30 ticker workers had returned, but the full manifest was still being
+  finalized. Direct worker-summary verification at 00:41 KST on October 29
+  established 29 successes and one DELL failure with another Codex `429`.
+  The earlier investigation statement that all 30 had succeeded was incorrect.
+  A running attempt or individual ticker artifacts cannot authorize an overlay
+  or establish report delivery. After terminal publication, the existing
+  partial-cohort recovery must validate and reuse successful research and retry
+  only failed tickers within its original budget.
 - A read-only process stack at 00:08 KST on October 29 located the long
   postprocessing delay in `_load_snapshot_history`: a recursive glob was
   traversing the entire runs archive while building account performance.
