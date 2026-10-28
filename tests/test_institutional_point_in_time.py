@@ -60,6 +60,7 @@ def test_imports_are_filtered_before_routing_evidence_and_quality(imported, faul
         assert result["source_quality_score"] == baseline["source_quality_score"]
         assert result["evidence_ledger"] == baseline["evidence_ledger"]
         assert result["coverage"] == baseline["coverage"]
+        assert result["provider_catalog"] == baseline["provider_catalog"]
     assert path.read_bytes() == before
 
 
@@ -103,3 +104,13 @@ def test_scheduled_future_event_is_distinct_from_future_publication(imported):
     value["event_records"] = [{"scheduled_at": "2026-07-01T12:00:00Z"}]
     _, cutoff = module._analysis_cutoff("2026-06-08", "MSFT")
     assert module._import_available(value, cutoff)
+
+
+def test_other_ticker_imports_do_not_change_analysis_provider_availability(imported):
+    path, _ = imported
+    other = path.parent.parent / "AAPL" / path.name
+    other.parent.mkdir()
+    baseline = module.build_public_equity_intelligence(ticker="MSFT", curr_date="2026-06-08")
+    other.write_text(json.dumps(payload()))
+    result = module.build_public_equity_intelligence(ticker="MSFT", curr_date="2026-06-08")
+    assert result["provider_catalog"] == baseline["provider_catalog"]

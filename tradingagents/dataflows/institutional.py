@@ -73,12 +73,13 @@ INSTITUTIONAL_PROVIDERS: tuple[ProviderDefinition, ...] = (
 )
 
 
-def provider_catalog() -> list[dict[str, Any]]:
+def provider_catalog(*, imported_providers: set[str] | None = None) -> list[dict[str, Any]]:
     data_dir = _institutional_data_dir()
     return [
         provider.to_dict(
             configured=_provider_configured(provider),
-            imported=_has_imported_payload(provider.id, data_dir=data_dir),
+            imported=(provider.id in imported_providers if imported_providers is not None
+                      else _has_imported_payload(provider.id, data_dir=data_dir)),
         )
         for provider in sorted(INSTITUTIONAL_PROVIDERS, key=lambda item: item.priority)
     ]
@@ -214,7 +215,9 @@ def build_public_equity_intelligence(
         "source_quality_score": source_quality_score,
         "source_cohort": _source_cohort(coverage),
         "coverage": coverage,
-        "provider_catalog": provider_catalog(),
+        "provider_catalog": provider_catalog(imported_providers={
+            item["_import_provider"] for item in imported_payloads
+        }),
         "source_refs": [source.to_dict() for source in source_refs],
         "evidence_ledger": [item.to_dict() for item in evidence_items],
         "earnings_event_pack": event_pack,
