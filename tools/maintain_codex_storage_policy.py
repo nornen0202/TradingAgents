@@ -182,7 +182,7 @@ def run_policy(config: dict, *, apply: bool, preflight_only: bool = False) -> in
     return 2 if critical else 0
 
 
-def domain_policy(config: dict, *, apply: bool, preflight_only: bool = False) -> int:
+def domain_policy(config: dict, *, apply: bool, preflight_only: bool = False, health_only: bool = False) -> int:
     """Fail closed within each domain while retaining a failed overall result.
 
     Exit 3 is only a degraded preflight: shared wrapper dependencies passed,
@@ -228,7 +228,7 @@ def domain_policy(config: dict, *, apply: bool, preflight_only: bool = False) ->
     for domain in config.get("domains", []):
         row = {"id": domain["id"], "observed_at": observed}
         try:
-            code = run_policy(domain, apply=apply and shared_ok, preflight_only=preflight_only or not shared_ok)
+            code = run_policy(domain, apply=apply and shared_ok, preflight_only=preflight_only or not shared_ok or health_only)
             row.update(status="HEALTHY" if code == 0 else "BLOCKED", exit_code=code)
         except (OSError, RuntimeError, ValueError, subprocess.SubprocessError) as exc:
             row.update(status="BLOCKED", exit_code=2, error_type=type(exc).__name__)
@@ -236,7 +236,7 @@ def domain_policy(config: dict, *, apply: bool, preflight_only: bool = False) ->
         storage.emit("domain-health", **row)
     failed = not shared_ok or any(x["exit_code"] for x in results)
     receipt = {"observed_at": observed, "shared_ok": shared_ok, "domains": results,
-               "capacity": headroom, "healthy": not failed, "mode": "apply" if apply else "dry-run"}
+               "capacity": headroom, "healthy": not failed, "mode": "health-only" if health_only else ("apply" if apply else "dry-run")}
     if apply and not preflight_only and config.get("health_receipt"):
         path = Path(config["health_receipt"])
         previous = json.loads(path.read_text(encoding="utf-8")) if path.exists() else {}
@@ -261,12 +261,14 @@ def main() -> int:
     parser.add_argument("--config", type=Path, required=True)
     parser.add_argument("--apply", action="store_true")
     parser.add_argument("--preflight-only", action="store_true")
+    parser.add_argument("--health-only", action="store_true", help="Observe domains; --apply writes only the health receipt")
     args = parser.parse_args()
     config = json.loads(args.config.read_text(encoding="utf-8-sig"))
     if not config.get("enabled", False):
         return 0
-    runner = domain_policy if config.get("domains") else run_policy
-    return runner(config, apply=args.apply, preflight_only=args.preflight_only)
+    if config.get("domains"):
+        return domain_policy(config, apply=args.apply, preflight_only=args.preflight_only, health_only=args.health_only)
+    return run_policy(config, apply=args.apply, preflight_only=args.preflight_only or args.health_only)
 
 
 if __name__ == "__main__":

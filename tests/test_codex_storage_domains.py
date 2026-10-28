@@ -80,3 +80,14 @@ def test_worker_manifest_discovery_ignores_unrelated_archive_runs(tmp_path):
         p.write_text(json.dumps({"status":"success","finished_at":"2026-10-01T00:00:00+00:00","run_id":name}))
     assert set(policy.completed_runs([str(archive)], {"wanted"})) == {"wanted"}
     assert policy.completed_runs([str(archive)], set()) == {}
+
+
+def test_health_only_can_save_receipt_without_running_retention(monkeypatch, tmp_path):
+    import json
+    monkeypatch.setattr(policy.storage, "validate_volumes", lambda x: None)
+    run = Mock(return_value=0)
+    monkeypatch.setattr(policy, "run_policy", run)
+    cfg=configuration();cfg["health_receipt"]=str(tmp_path/"health.json")
+    assert policy.domain_policy(cfg, apply=True, health_only=True) == 0
+    assert all(call.kwargs["preflight_only"] for call in run.call_args_list)
+    assert json.loads(Path(cfg["health_receipt"]).read_text())["mode"] == "health-only"
