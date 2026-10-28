@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta, timezone
 import weakref
+import json
 
 import pytest
 
@@ -73,3 +74,35 @@ def test_changed_producer_clock_cannot_reorder_sources_silently(tmp_path, monkey
 
 def test_empty_archive_has_no_sources(tmp_path):
     assert packet._market_sources(tmp_path, "us") == []
+
+
+def test_discovery_overlaps_two_reads_without_changing_selection_or_retention(tmp_path, monkeypatch):
+    from threading import Barrier, Lock
+    _, peak = history(tmp_path, monkeypatch, ready=42)
+    load = packet.load_json
+    barrier, lock = Barrier(2), Lock()
+    calls = 0
+    def overlapping(path):
+        nonlocal calls
+        with lock:
+            calls += 1
+            position = calls
+        if position <= 2:
+            barrier.wait(timeout=5)
+        return load(path)
+    monkeypatch.setattr(packet, "load_json", overlapping)
+    selected = packet._market_sources(tmp_path, "us")
+    assert [row["manifest"]["run_id"] for row in selected] == ["run-079", "run-042"]
+    assert peak() <= 3
+
+
+@pytest.mark.parametrize("filename", ["youtube_run.json", "prism_telegram_run.json"])
+def test_advisory_discovery_keeps_producer_layouts_and_excludes_nested_evidence(tmp_path, filename):
+    for directory, started in (("legacy", "2026-10-26T00:00:00Z"),
+                               ("2026/current", "2026-10-27T00:00:00Z"),
+                               ("2026/current/videos/embedded", "2099-01-01T00:00:00Z")):
+        path = tmp_path / "runs" / directory / filename
+        path.parent.mkdir(parents=True)
+        path.write_text(json.dumps({"run_id": path.parent.name, "started_at": started}), encoding="utf-8")
+    sources = packet._source_manifests(tmp_path, filename)
+    assert [payload["run_id"] for payload, _ in sources] == ["current", "legacy"]

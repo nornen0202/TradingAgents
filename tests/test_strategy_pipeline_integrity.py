@@ -289,6 +289,52 @@ def test_failed_and_interrupted_attempt_do_not_replace_completed_cohort(tmp_path
     assert latest_full_attempt(tmp_path, 'us', now=now)['status'] == 'INTERRUPTED'
 
 
+@pytest.mark.parametrize('status', ['SUCCESS', 'FAILED'])
+def test_terminal_attempts_skip_duplicate_expanded_manifest_reads(tmp_path, monkeypatch, status):
+    from tradingagents.scheduled import attempts
+    now = datetime(2026, 10, 28, 10, tzinfo=timezone.utc)
+    modern = tmp_path / 'runs/2026/modern'
+    modern.mkdir(parents=True)
+    (modern / 'attempt.json').write_text(json.dumps({'market': 'US', 'run_mode': 'full',
+        'run_id': 'modern', 'started_at': '2026-10-28T09:00:00+00:00',
+        'finished_at': '2026-10-28T09:30:00+00:00', 'status': status}))
+    (modern / 'run.json').write_text(json.dumps({'expanded_body': 'not needed by terminal attempt discovery'}))
+    legacy = tmp_path / 'runs/2026/legacy'
+    legacy.mkdir()
+    (legacy / 'run.json').write_text(json.dumps({'run_id': 'legacy', 'status': 'success',
+        'started_at': '2026-10-28T08:00:00+00:00', 'finished_at': '2026-10-28T08:30:00+00:00',
+        'settings': {'market': 'US', 'run_mode': 'full'}}))
+    reads = []
+    original = attempts._read
+    def read(path):
+        assert path != modern / 'run.json', 'Terminal attempt must not hydrate its expanded manifest'
+        reads.append(path)
+        return original(path)
+    monkeypatch.setattr(attempts, '_read', read)
+    result = latest_full_attempt(tmp_path, 'us', now=now)
+    assert result['run_id'] == 'modern' and result['status'] == status
+    assert legacy / 'run.json' in reads
+
+
+def test_running_attempt_still_reconciles_completed_manifest_once(tmp_path, monkeypatch):
+    from tradingagents.scheduled import attempts
+    directory = tmp_path / 'runs/2026/completed'
+    directory.mkdir(parents=True)
+    (directory / 'attempt.json').write_text(json.dumps({'market': 'US', 'run_mode': 'full',
+        'run_id': 'completed', 'status': 'RUNNING', 'started_at': '2026-10-28T09:00:00+00:00'}))
+    (directory / 'run.json').write_text(json.dumps({'status': 'success', 'finished_at': '2026-10-28T09:30:00+00:00'}))
+    reads = []
+    original = attempts._read
+    def read(path):
+        reads.append(path)
+        return original(path)
+    monkeypatch.setattr(attempts, '_read', read)
+    result = latest_full_attempt(tmp_path, 'us', now=datetime(2026, 10, 28, 10, tzinfo=timezone.utc))
+    assert result['status'] == 'SUCCESS'
+    assert result['finished_at'] == '2026-10-28T09:30:00+00:00'
+    assert reads.count(directory / 'run.json') == 1
+
+
 def test_sec_filings_preserve_publication_and_retrieval_times(monkeypatch):
     from tradingagents.dataflows import sec_edgar as sec
     monkeypatch.setattr(sec, '_ticker_map', lambda day: {'ABC': '0000000001'})
