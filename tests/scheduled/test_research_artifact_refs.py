@@ -513,3 +513,21 @@ def test_reference_consumer_requires_own_clock_market_and_local_path(evidence, m
         manifest[field] = value
     with pytest.raises(ValueError):
         _load_context_by_ticker(destination, manifest)
+
+
+def test_initial_blob_paths_are_validated_only_after_boundary_exists_and_writer_lock(evidence, monkeypatch):
+    from tradingagents.scheduled import research_artifact_refs as module
+    from tradingagents.atomic_io import interprocess_file_lock
+    archive, source, _, row = evidence
+    original = module._safe
+    validations = []
+    def guarded(root, relative, *, must_exist=True):
+        if root.name == "research-snapshots" and relative.startswith("sha256/") and not must_exist:
+            assert root.is_dir(), "Resolve only an established snapshot boundary"
+            with pytest.raises(TimeoutError), interprocess_file_lock(root/".publication.lock", timeout=0):
+                pytest.fail("Initial blob path validation must be inside the publication lock")
+            validations.append(relative)
+        return original(root, relative, must_exist=must_exist)
+    monkeypatch.setattr(module, "_safe", guarded)
+    ResearchArtifactStore(archive, now=NOW).make(source, row, "report_markdown")
+    assert validations

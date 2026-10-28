@@ -119,10 +119,18 @@ class ResearchArtifactStore:
     def _publish(self, raw):
         digest = hashlib.sha256(raw).hexdigest()
         relative = f"sha256/{digest[:2]}/{digest}"
-        target = _safe(self.root, relative, must_exist=False)
-        target.parent.mkdir(parents=True, exist_ok=True)
-        lock = _safe(self.root, ".publication.lock", must_exist=False)
+        # Initialize the snapshot boundary under an archive-level lock. On
+        # Windows, resolving a missing root while a peer creates it can produce
+        # inconsistent canonical paths. Keep the existing publication lock for
+        # compatibility with already-running writers; no boundary guard is relaxed.
+        initialization_lock = _safe(self.archive, ".research-snapshots-init.lock", must_exist=False)
+        with interprocess_file_lock(initialization_lock):
+            boundary = _safe(self.archive, "research-snapshots", must_exist=False)
+            boundary.mkdir(exist_ok=True)
+            lock = _safe(self.root, ".publication.lock", must_exist=False)
         with interprocess_file_lock(lock):
+            target = _safe(self.root, relative, must_exist=False)
+            target.parent.mkdir(parents=True, exist_ok=True)
             target = _safe(self.root, relative, must_exist=False)
             if target.exists():
                 if _read(target) != raw:

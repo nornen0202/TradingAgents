@@ -9,6 +9,7 @@ from dataclasses import replace
 from contextlib import contextmanager, redirect_stderr, redirect_stdout
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
+import json
 from zoneinfo import ZoneInfo
 
 from tradingagents.atomic_io import atomic_write_json, interprocess_file_lock
@@ -44,7 +45,7 @@ def producer_lock(path):
 
 
 def freshness_blockers(packet: dict, *, now: datetime, started_at: datetime, run_id: str) -> list[str]:
-    """Require observations collected in this invocation, not a recently copied cache."""
+    """Require observations from this producer window, not a recently copied cache."""
     body = packet.get("body") or {}
     current = body.get("current") or {}
     receipt = current.get("freshness_receipt") or {}
@@ -93,6 +94,40 @@ def publish_freshness_blockers(packet: dict, *, now: datetime) -> list[str]:
     return blockers
 
 
+def completed_busy_source(surface: str, *, archive: Path, config,
+                          youtube_archive_dir=None, prism_archive_dir=None):
+    """Select only an immutable, genuinely current completed producer.
+
+    This is a read-only consumer of a completed run, never ownership of the
+    active writer. Runtime.prepare pins this same run and revalidates clocks.
+    """
+    now = datetime.now(timezone.utc)
+    packet = build_surface_packet(surface, archive_dir=archive,
+        youtube_archive_dir=youtube_archive_dir, prism_archive_dir=prism_archive_dir, now=now)
+    receipt = (packet.get("body", {}).get("current", {}).get("freshness_receipt") or {})
+    run_id = str(receipt.get("producer_run_id") or "")
+    if not run_id or Path(run_id).name != run_id or "/" in run_id or "\\" in run_id:
+        return None
+    path = archive / "runs" / run_id[:4] / run_id / "run.json"
+    if not path.is_file():
+        return None
+    manifest = json.loads(path.read_text(encoding="utf-8"))
+    started = aware_datetime(manifest.get("started_at"))
+    finished = aware_datetime(manifest.get("finished_at"))
+    now = datetime.now(timezone.utc)
+    if (manifest.get("run_id") != run_id or manifest.get("status") != "success"
+            or started is None or finished is None or not started <= finished <= now
+            or now - finished >= MAX_PREPARE_AGE):
+        return None
+    session = market_session_state(market=surface.upper(), now_local=now,
+                                   calendar_name=config.execution.execution_session_calendar)
+    if not session.get("is_open") or automated_market_session_status(market=surface, now=now).is_session is not True:
+        return None
+    if freshness_blockers(packet, now=now, started_at=started, run_id=run_id):
+        return None
+    return manifest, started, receipt
+
+
 def prepare_market_report(runtime, surface: str, *, producer_state_dir: Path,
                           archive_dir: Path | None = None, youtube_archive_dir: Path | None = None,
                           prism_archive_dir: Path | None = None, report_context_v1: bool = False) -> dict:
@@ -109,7 +144,8 @@ def prepare_market_report(runtime, surface: str, *, producer_state_dir: Path,
         return dict(receipt)
 
     # Same lock as the minute production lane. Never start a competing
-    # writer, kill a healthy worker, or allocate/acknowledge a Work event on BUSY.
+    # writer or kill a healthy worker. BUSY may consume only an independently
+    # validated completed result; it never uses the active writer's artifacts.
     try:
         config = load_scheduled_config(ROOT / "config" / (
             "scheduled_analysis_korea.toml" if surface == "kr" else "scheduled_analysis.toml"))
@@ -181,6 +217,26 @@ def prepare_market_report(runtime, surface: str, *, producer_state_dir: Path,
                        event_created=result.get("result") in {"NEW", "RESUME"})
         return {**result, "pre_report_refresh": saved}
     except ProducerBusy:
+        # A minute producer may own the writer lock while its previous immutable
+        # result is still fresh. Reuse only verified observations; no TTL renewal,
+        # broker calls, handoff, waiting loop, or duplicate producer is needed.
+        try:
+            archive = resolve_archive_roots(archive_dir=archive_dir)["market"]
+            selected = completed_busy_source(surface, archive=archive, config=config,
+                youtube_archive_dir=youtube_archive_dir, prism_archive_dir=prism_archive_dir)
+            if selected is not None:
+                manifest, started, clocks = selected
+                result = runtime.prepare(surface, archive_dir=archive,
+                    youtube_archive_dir=youtube_archive_dir, prism_archive_dir=prism_archive_dir,
+                    fresh_report=True, expected_producer_run_id=manifest["run_id"],
+                    refresh_started_at=started, report_context_v1=report_context_v1)
+                saved = finish(status="ADOPTED_COMPLETED_PRODUCER", producer_run_id=manifest["run_id"],
+                    producer_started_at=manifest["started_at"], producer_finished_at=manifest["finished_at"],
+                    event_created=result.get("result") in {"NEW", "RESUME"})
+                return {**result, "pre_report_refresh": saved}
+        except Exception as exc:
+            return finish(status="BUSY_NO_STATE_ADVANCE", blockers=["PRODUCER_ALREADY_RUNNING"],
+                          adoption_error_type=type(exc).__name__)
         return finish(status="BUSY_NO_STATE_ADVANCE", blockers=["PRODUCER_ALREADY_RUNNING"])
     except Exception as exc:
         # Broker errors can contain private request details. Keep the durable

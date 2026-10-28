@@ -205,3 +205,41 @@ def test_broker_error_receipt_does_not_leak_request(wired, tmp_path, monkeypatch
     assert result["status"] == "FRESH_INPUT_UNAVAILABLE"
     assert "secret" not in str(result)
     assert not prepared
+
+
+@pytest.mark.parametrize("case", ["fresh", "expired", "future", "running", "missing", "wrong_id", "bad_account", "changed_during_prepare"])
+def test_busy_adoption_requires_immutable_same_run_and_current_observations(wired, tmp_path, monkeypatch, case):
+    import json
+    runtime, prepared, configs = wired
+    current = datetime.now(timezone.utc)
+    started = current - timedelta(seconds=30)
+    finished = current - timedelta(seconds=1)
+    run_id = "20261029T000000-existing"
+    item = packet()
+    receipt = item["body"]["current"]["freshness_receipt"]
+    receipt["producer_run_id"] = run_id
+    for field in ("market_data_oldest_at", "market_data_latest_at", "account_as_of"):
+        receipt[field] = current.isoformat()
+    if case == "bad_account": receipt["account_snapshot_health"] = "INVALID"
+    monkeypatch.setattr(pre, "build_surface_packet", lambda *a, **kw: deepcopy(item))
+    path = tmp_path/"archive"/"runs"/"2026"/run_id/"run.json"
+    path.parent.mkdir(parents=True)
+    manifest = {"run_id":run_id,"status":"success","started_at":started.isoformat(),"finished_at":finished.isoformat()}
+    if case == "expired": manifest["finished_at"] = (current-timedelta(minutes=3)).isoformat()
+    if case == "future": manifest["finished_at"] = (current+timedelta(minutes=1)).isoformat()
+    if case == "running": manifest["status"] = "running"
+    if case == "wrong_id": manifest["run_id"] = "other"
+    if case != "missing": path.write_text(json.dumps(manifest))
+    if case == "changed_during_prepare":
+        def reject(*a, **kw): raise RuntimeError("run no longer selected")
+        runtime.prepare = reject
+    with interprocess_file_lock(tmp_path/"run-due.lock", timeout=0):
+        result = pre.prepare_market_report(runtime, "us", producer_state_dir=tmp_path)
+    assert not configs
+    if case == "fresh":
+        assert result["pre_report_refresh"]["status"] == "ADOPTED_COMPLETED_PRODUCER"
+        assert prepared[0]["expected_producer_run_id"] == run_id
+        assert prepared[0]["refresh_started_at"] == started
+    else:
+        assert result["status"] == "BUSY_NO_STATE_ADVANCE"
+        assert not prepared
