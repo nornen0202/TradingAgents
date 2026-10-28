@@ -88,6 +88,20 @@ def test_unreadable_baseline_fails_closed_without_leaking_error_or_spending_atte
     assert not state.exists()
 
 
+@pytest.mark.parametrize("unreadable", [False, True])
+def test_minute_fallback_does_not_rescan_the_same_unready_baseline(admission, monkeypatch, unreadable):
+    from tradingagents.execution import refresh_runtime
+    archive, state, _ = admission
+    if unreadable:
+        archive.mkdir()
+        (archive / "latest-run.json").write_text("invalid", encoding="utf-8")
+    monkeypatch.setattr(refresh_runtime, "refresh_due",
+        lambda *a, **kw: pytest.fail("The minute fallback cannot repair an unready research baseline"))
+    assert local.run_due(archive, state, now=AT)[0]["status"] == (
+        "OVERLAY_BASELINE_UNVERIFIED" if unreadable else "WAITING_RESEARCH_BASELINE")
+    assert not state.exists()
+
+
 def test_kr_overlay_waits_for_same_market_research(admission):
     archive, state, item = admission
     item.inputs["profile"] = "kr"

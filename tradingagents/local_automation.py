@@ -482,6 +482,11 @@ def run_due(archive, state, *, now=None, dry_run=False, research_only=False):
     if research_only:
         return decisions
     if not any(item["status"] == "DUE" for item in decisions):
+        if any(item["status"] in {"WAITING_RESEARCH_BASELINE", "OVERLAY_BASELINE_UNVERIFIED"}
+               for item in decisions):
+            # The minute fallback uses this same selector and clock. It cannot
+            # repair this dependency; avoid rescanning the archive in this tick.
+            return decisions
         from tradingagents.execution.refresh_runtime import refresh_due
         refreshes = refresh_due(archive, state, now=now, dry_run=dry_run)
         decisions.extend(refreshes)
