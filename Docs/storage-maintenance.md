@@ -68,3 +68,35 @@ timestamp newer than the prepared transactions, then rerun with
 manifests, and backups for recovery. This workflow never moves the main Codex
 authentication, configuration, session database, or active TradingAgents source
 checkout.
+
+
+## Isolated policy domains and current completion reuse (2026-10-29)
+
+A policy may contain `domains`. Each domain retains the existing volume/alias,
+quiet-period, process, backup and verification checks. Mutation roots must not
+be duplicated or overlap across domains. Use `observe_only: true` for alias-only
+cache and Repair checks; those domains must not replay another domain's journal.
+The shared wrapper runs once. A degraded preflight returns 3 only when the shared
+volumes/capacity passed; the wrapper then continues and the final aggregate returns
+failure if any domain is blocked. Shared failures block every mutation.
+
+`capacity_checks` records the actual resolved path, bytes and measurement time;
+unavailable measurements are null. `health_receipt` is written only with `--apply`
+and includes deltas, consecutive failures and a changed alert signature. Delivery
+remains explicitly unverified until the existing monitor observes a receipt. Dry
+run/preflight does not write that receipt or the PowerShell error log. D hardware
+errors are never repaired, formatted, scanned or hidden by this helper.
+
+The host policy keeps one TradingAgents worker owner, one Codex documents/dump/uv
+owner, five cache aliases and one Repair alias. Retention (7 days, latest 2, 48-hour
+quiet window; wrapper 7/14/30 days) and canonical archive preservation are unchanged.
+The installed policy and scheduler XML are backed up before deployment; new tasks
+or schedule changes are unnecessary.
+
+When Work preparation finds the producer writer lock busy, it may consume an
+already completed immutable result only if the manifest identity, success state,
+original start/finish clocks, current market session, complete coverage, research
+lineage and account/quote freshness all validate. Runtime.prepare pins the same
+run and rechecks clocks under its state lock. Missing, stale, running or replaced
+results remain BUSY without event allocation. This path performs no producer,
+order or duplicate consumer handoff, and it does not extend any TTL.

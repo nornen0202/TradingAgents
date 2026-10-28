@@ -25,7 +25,7 @@ Set-StrictMode -Version Latest
 
 trap {
     try {
-        if (-not [string]::IsNullOrWhiteSpace($LogPath)) {
+        if ($Apply -and -not [string]::IsNullOrWhiteSpace($LogPath)) {
             $errorLogParent = Split-Path -Parent $LogPath
             if ($errorLogParent) {
                 [IO.Directory]::CreateDirectory($errorLogParent) | Out-Null
@@ -278,7 +278,10 @@ try {
             Write-Output $line
             Write-MaintenanceLog "CODEX_STORAGE_PREFLIGHT $line"
         }
-        if ($preflightExitCode -ne 0) {
+        if ($preflightExitCode -eq 3 -and ($extendedConfig.PSObject.Properties.Name -contains "domains")) {
+            Write-Warning "An isolated storage domain is blocked; shared preflight passed. Final result will retain the domain failure."
+        }
+        elseif ($preflightExitCode -ne 0) {
             throw "Storage preflight returned $preflightExitCode; cleanup was not started. Inspect mounts and relocation-health."
         }
     }
