@@ -2,10 +2,11 @@
 from __future__ import annotations
 
 import json
-import os
 import threading
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
+
+from tradingagents.atomic_io import atomic_write_json
 
 
 class RunAttempt:
@@ -15,13 +16,13 @@ class RunAttempt:
                       "market": market.upper(), "run_mode": run_mode,
                       "started_at": started_at.isoformat(), "status": "RUNNING"}
         self.stop = threading.Event()
+        self.write_lock = threading.RLock()
         self.thread = threading.Thread(target=self._heartbeat, daemon=True)
 
     def _write(self):
-        self.state["heartbeat_at"] = datetime.now(timezone.utc).isoformat()
-        temporary = self.path.with_suffix(".tmp")
-        temporary.write_text(json.dumps(self.state, indent=2), encoding="utf-8")
-        os.replace(temporary, self.path)
+        with self.write_lock:
+            self.state["heartbeat_at"] = datetime.now(timezone.utc).isoformat()
+            atomic_write_json(self.path, self.state)
 
     def _heartbeat(self):
         while not self.stop.wait(30):
@@ -36,13 +37,16 @@ class RunAttempt:
         self.stop.set()
         self.thread.join(timeout=5)
         manifest = _read(self.path.parent / "run.json")
-        self.state["status"] = "FAILED" if exc_type else str(manifest.get("status") or "FAILED").upper()
-        self.state["finished_at"] = datetime.now(timezone.utc).isoformat()
-        # An interrupted batch may have completed workers without a final
-        # aggregate manifest. Unknown aggregate progress must not become zero.
-        self.state["completed_tickers"] = (manifest.get("summary") or {}).get("successful_tickers")
-        self.state["error_type"] = exc_type.__name__ if exc_type else None
-        self._write()
+        # A slow heartbeat replacement must finish before terminal publication;
+        # it cannot overwrite a completed attempt after the bounded thread join.
+        with self.write_lock:
+            self.state["status"] = "FAILED" if exc_type else str(manifest.get("status") or "FAILED").upper()
+            self.state["finished_at"] = datetime.now(timezone.utc).isoformat()
+            # An interrupted batch may have completed workers without a final
+            # aggregate manifest. Unknown aggregate progress must not become zero.
+            self.state["completed_tickers"] = (manifest.get("summary") or {}).get("successful_tickers")
+            self.state["error_type"] = exc_type.__name__ if exc_type else None
+            self._write()
 
 
 def _read(path):
