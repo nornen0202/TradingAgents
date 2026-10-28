@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Any, Mapping
 
 from tradingagents.agents.utils.instrument_resolver import resolve_instrument
+from tradingagents.charting.bars import instant
 from tradingagents.portfolio.account_models import AccountSnapshot, PortfolioProfile
 from tradingagents.portfolio.benchmarks.dca_engine import build_etf_dca_comparison
 from tradingagents.portfolio.performance.broker_kis import (
@@ -131,7 +132,8 @@ def build_account_performance_outputs(
     market_scope = _market_scope(profile)
     benchmark_names = _benchmark_names(settings, market_scope)
     current_snapshot = _snapshot_row(snapshot, profile_name=profile.name)
-    raw_snapshot_rows = _load_snapshot_history(run_dir=run_dir, profile_name=profile.name)
+    raw_snapshot_rows = _load_snapshot_history(
+        run_dir=run_dir, profile_name=profile.name, analysis_as_of=snapshot.as_of)
     raw_snapshot_rows.append(current_snapshot)
     snapshot_selection = _select_performance_snapshots(
         raw_snapshot_rows,
@@ -602,12 +604,29 @@ def render_account_performance_markdown(payload: Mapping[str, Any]) -> str:
     )
 
 
-def _load_snapshot_history(*, run_dir: Path, profile_name: str) -> list[dict[str, Any]]:
+def _snapshot_history_paths(runs_root: Path):
+    """Read only flat runs and year/run layouts, never ticker/evidence trees."""
+    for directory in runs_root.iterdir():
+        if not directory.is_dir():
+            continue
+        candidates = directory.iterdir() if re.fullmatch(r"\d{4}", directory.name) else (directory,)
+        for candidate in candidates:
+            snapshot_path = candidate / "portfolio-private" / "account_snapshot.json"
+            if snapshot_path.is_file():
+                yield snapshot_path
+
+
+def _load_snapshot_history(
+    *, run_dir: Path, profile_name: str, analysis_as_of: str | datetime,
+) -> list[dict[str, Any]]:
+    cutoff = instant(analysis_as_of)
+    if cutoff is None:
+        raise ValueError("Aware account performance analysis_as_of required")
     runs_root = _find_runs_root(run_dir)
-    if runs_root is None:
+    if runs_root is None or not runs_root.exists():
         return []
     rows: list[dict[str, Any]] = []
-    for snapshot_path in runs_root.rglob("portfolio-private/account_snapshot.json"):
+    for snapshot_path in _snapshot_history_paths(runs_root):
         private_dir = snapshot_path.parent
         status_path = private_dir / "status.json"
         status: dict[str, Any] = {}
@@ -622,7 +641,10 @@ def _load_snapshot_history(*, run_dir: Path, profile_name: str) -> list[dict[str
             payload = json.loads(snapshot_path.read_text(encoding="utf-8"))
             if isinstance(payload, dict) and not payload.get("snapshot_health") and status.get("snapshot_health"):
                 payload = {**payload, "snapshot_health": status.get("snapshot_health")}
-            rows.append(_snapshot_payload_row(payload, profile_name=profile_name))
+            row = _snapshot_payload_row(payload, profile_name=profile_name)
+            observed = instant(row.get("as_of"))
+            if observed is not None and observed <= cutoff:
+                rows.append(row)
         except Exception:
             continue
     return rows
