@@ -67,10 +67,18 @@ def build_site(archive_dir: Path, site_dir: Path, settings: SiteSettings) -> lis
                 site_dir / "runs" / manifest["run_id"] / "portfolio.html",
                 _render_portfolio_page(manifest, settings, portfolio_summary={}),
             )
+        # Keep verified source manifests only for this run's rendering operation.
+        # Every ticker still verifies its own owner, clocks and artifact digest.
+        research_store = None
         for ticker_summary in _public_ticker_summaries(manifest):
+            if research_store is None and isinstance(
+                (ticker_summary.get("artifacts") or {}).get("report_markdown"), dict
+            ):
+                research_store = ResearchArtifactStore.from_run_dir(run_dir, now=manifest.get("finished_at"))
             _write_text(
                 site_dir / "runs" / manifest["run_id"] / f"{ticker_summary['ticker']}.html",
-                _render_ticker_page(manifest, ticker_summary, settings, manifests=manifests, portfolio_summary={}),
+                _render_ticker_page(manifest, ticker_summary, settings, manifests=manifests,
+                                    portfolio_summary={}, research_store=research_store),
             )
 
     _publish_latest_decision_bundles(site_dir=site_dir, manifests=published_manifests)
@@ -3176,6 +3184,7 @@ def _render_ticker_page(
     *,
     manifests: list[dict[str, Any]] | None = None,
     portfolio_summary: dict[str, Any] | None = None,
+    research_store: ResearchArtifactStore | None = None,
 ) -> str:
     run_dir = Path(manifest["_run_dir"])
     language = _manifest_language(manifest)
@@ -3183,7 +3192,7 @@ def _render_ticker_page(
     report_html = "<p class='empty'>No report markdown was generated for this ticker.</p>"
     report_relative = (ticker_summary.get("artifacts") or {}).get("report_markdown")
     if isinstance(report_relative, dict):
-        store = ResearchArtifactStore.from_run_dir(run_dir, now=manifest.get("finished_at"))
+        store = research_store or ResearchArtifactStore.from_run_dir(run_dir, now=manifest.get("finished_at"))
         source_settings = manifest.get("settings") or {}
         raw = store.read_owned(report_relative, key="report_markdown", run_dir=run_dir, row=ticker_summary,
                                market=source_settings.get("market_scope") or source_settings.get("market"))
