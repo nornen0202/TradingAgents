@@ -3,9 +3,10 @@ from __future__ import annotations
 import json
 import os
 import re
-from datetime import datetime, timedelta
+from datetime import date, datetime, time, timedelta, timezone
 from pathlib import Path
 from typing import Any
+from zoneinfo import ZoneInfo
 
 from .api_keys import get_api_key
 from .config import get_config
@@ -17,6 +18,7 @@ from .institutional_models import (
     ThesisTracker,
 )
 from .interface import route_to_vendor
+from .market_policy import TimestampEnvelope, aware_datetime
 from .vendor_exceptions import VendorConfigurationError, VendorTransientError
 
 
@@ -107,10 +109,11 @@ def route_to_institutional_provider(
     normalized_capability = str(capability or "").strip().lower()
     if normalized_capability not in INSTITUTIONAL_CAPABILITIES:
         raise ValueError(f"Unsupported institutional capability: {capability}")
+    curr_date, cutoff = _analysis_cutoff(curr_date, ticker)
 
     providers = _ordered_provider_chain(normalized_capability, provider_chain)
     for provider in providers:
-        imported = _load_imported_payload(provider.id, ticker, normalized_capability)
+        imported = _load_imported_payload(provider.id, ticker, normalized_capability, cutoff=cutoff)
         if imported:
             return _provider_payload(
                 provider=provider,
@@ -145,6 +148,7 @@ def route_to_institutional_provider(
     return {
         "ticker": ticker,
         "capability": normalized_capability,
+        "asof": curr_date,
         "status": "unavailable",
         "mode": "none",
         "provider": None,
@@ -152,6 +156,7 @@ def route_to_institutional_provider(
         "warnings": [
             "No free/public or imported institutional payload was available.",
             "Paid vendor adapters are optional and require credentials or exported JSON fixtures.",
+            "Imported snapshots require publication and observation clocks at or before the analysis cutoff.",
         ],
     }
 
@@ -164,10 +169,10 @@ def build_public_equity_intelligence(
     final_state: dict[str, Any] | None = None,
     tool_events: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
-    asof = analysis_date or curr_date
+    asof, cutoff = _analysis_cutoff(analysis_date or curr_date, ticker)
     final_state = final_state or {}
     tool_events = tool_events or []
-    imported_payloads = _load_all_imported_payloads(ticker)
+    imported_payloads = _load_all_imported_payloads(ticker, cutoff=cutoff)
     source_refs = _source_refs_from_tool_events(ticker=ticker, asof=asof, tool_events=tool_events)
     source_refs.extend(_source_refs_from_final_state(ticker=ticker, asof=asof, final_state=final_state))
     source_refs.extend(_source_refs_from_imports(imported_payloads))
@@ -338,7 +343,7 @@ def _provider_payload(
         "mode": mode,
         "provider": provider.to_dict(
             configured=_provider_configured(provider),
-            imported=_load_imported_payload(provider.id, ticker, capability) is not None,
+            imported=mode == "imported",
         ),
         "payload": payload,
         "warnings": payload.get("warnings", []) if isinstance(payload, dict) else [],
@@ -347,27 +352,28 @@ def _provider_payload(
 
 def _fetch_free_capability(provider_id: str, capability: str, ticker: str, curr_date: str | None) -> dict[str, Any]:
     try:
+        curr_date, _ = _analysis_cutoff(curr_date, ticker)
         if capability == CAP_FINANCIALS and provider_id in {"yfinance", "alpha_vantage"}:
             return {
                 "status": "success",
-                "raw": route_to_vendor("get_fundamentals", ticker, curr_date or datetime.now().date().isoformat()),
+                "raw": route_to_vendor("get_fundamentals", ticker, curr_date),
             }
         if capability == CAP_FILINGS and provider_id == "opendart":
-            end_date = curr_date or datetime.now().date().isoformat()
+            end_date = curr_date
             start_date = _date_minus_days(end_date, 365)
             return {
                 "status": "success",
                 "raw": route_to_vendor("get_disclosures", ticker, start_date, end_date),
             }
         if capability == CAP_MARKET_DATA and provider_id in {"yfinance", "alpha_vantage"}:
-            end_date = curr_date or datetime.now().date().isoformat()
+            end_date = curr_date
             start_date = _date_minus_days(end_date, 30)
             return {
                 "status": "success",
                 "raw": route_to_vendor("get_stock_data", ticker, start_date, end_date),
             }
         if capability == CAP_SOCIAL and provider_id in {"yfinance", "naver"}:
-            end_date = curr_date or datetime.now().date().isoformat()
+            end_date = curr_date
             start_date = _date_minus_days(end_date, 30)
             return {
                 "status": "success",
@@ -376,7 +382,7 @@ def _fetch_free_capability(provider_id: str, capability: str, ticker: str, curr_
         if capability == CAP_MACRO and provider_id in {"alpha_vantage", "ecos", "yfinance"}:
             return {
                 "status": "success",
-                "raw": route_to_vendor("get_macro_news", curr_date or datetime.now().date().isoformat(), 7, 10),
+                "raw": route_to_vendor("get_macro_news", curr_date, 7, 10),
             }
     except (VendorConfigurationError, VendorTransientError, RuntimeError, ValueError) as exc:
         return {"status": "unavailable", "warnings": [str(exc)]}
@@ -421,10 +427,79 @@ def _import_candidate_paths(provider_id: str, ticker: str, capability: str | Non
     return paths
 
 
-def _load_imported_payload(provider_id: str, ticker: str, capability: str | None = None) -> dict[str, Any] | None:
+def _analysis_cutoff(value: str | None, ticker: str) -> tuple[str, datetime]:
+    if not isinstance(value, str) or not re.fullmatch(r"\d{4}-\d{2}-\d{2}", value):
+        raise ValueError("Institutional analysis requires an explicit YYYY-MM-DD date")
+    requested = date.fromisoformat(value)
+    symbol = str(ticker).strip().upper()
+    korean = symbol.endswith((".KS", ".KQ")) or bool(re.fullmatch(r"\d[A-Z0-9]{5}", symbol))
+    zone = ZoneInfo("Asia/Seoul" if korean else "America/New_York")
+    scoped = get_config().get("analysis_as_of")
+    scoped_instant = None
+    if scoped is not None:
+        if isinstance(scoped, str) and re.fullmatch(r"\d{4}-\d{2}-\d{2}", scoped):
+            requested = min(requested, date.fromisoformat(scoped))
+        else:
+            scoped_instant = aware_datetime(scoped)
+            if scoped_instant is None:
+                raise ValueError("Invalid institutional analysis cutoff")
+            requested = min(requested, scoped_instant.astimezone(zone).date())
+    now = datetime.now(timezone.utc)
+    if requested > now.astimezone(zone).date():
+        raise ValueError("Institutional analysis date is in the future")
+    boundary = datetime.combine(requested, time.max, zone)
+    cutoff = min(boundary, now)
+    if scoped_instant is not None:
+        cutoff = min(cutoff, scoped_instant)
+    return requested.isoformat(), cutoff.astimezone(zone)
+
+
+def _import_available(payload: dict[str, Any], cutoff: datetime) -> bool:
+    # A period end, file mtime or guessed reporting delay cannot date a vendor
+    # snapshot. Require this version's actual publication and observation clocks.
+    envelope = payload.get("timestamp_envelope")
+    if not isinstance(envelope, dict):
+        return False
+    event = aware_datetime(envelope.get("event_time", envelope.get("published_at")))
+    if event is None:
+        return False
+    if not TimestampEnvelope.from_mapping(envelope, evaluated_at=cutoff.isoformat()).to_dict()["available_as_of"]:
+        return False
+    clocks = {"published_at", "event_time", "observed_at", "ingested_at", "retrieved_at",
+              "known_at", "available_at", "accepted_at", "filed_at", "first_seen_at",
+              "amended_at", "exported_at", "updated_at", "generated_at"}
+    dates = {"date", "asof", "as_of", "analysis_as_of", "filing_date"}
+    pending = [payload]
+    while pending:
+        item = pending.pop()
+        if isinstance(item, list):
+            pending.extend(item)
+        elif isinstance(item, dict):
+            for key, value in item.items():
+                if key in clocks:
+                    instant = aware_datetime(value)
+                    if instant is None or instant > cutoff:
+                        return False
+                elif key in dates:
+                    if isinstance(value, str) and re.fullmatch(r"\d{4}-\d{2}-\d{2}", value):
+                        try:
+                            if date.fromisoformat(value) > cutoff.date():
+                                return False
+                        except ValueError:
+                            return False
+                    else:
+                        instant = aware_datetime(value)
+                        if instant is None or instant > cutoff:
+                            return False
+                elif isinstance(value, (dict, list)):
+                    pending.append(value)
+    return True
+
+
+def _load_imported_payload(provider_id: str, ticker: str, capability: str | None = None, *, cutoff: datetime) -> dict[str, Any] | None:
     for path in _import_candidate_paths(provider_id, ticker, capability):
         payload = _load_json_file(path)
-        if not payload:
+        if not payload or not _import_available(payload, cutoff):
             continue
         payload.setdefault("_import_provider", provider_id)
         payload.setdefault("_import_path", str(path))
@@ -432,12 +507,12 @@ def _load_imported_payload(provider_id: str, ticker: str, capability: str | None
     return None
 
 
-def _load_all_imported_payloads(ticker: str) -> list[dict[str, Any]]:
+def _load_all_imported_payloads(ticker: str, *, cutoff: datetime) -> list[dict[str, Any]]:
     payloads: list[dict[str, Any]] = []
     seen_paths: set[str] = set()
     for provider in INSTITUTIONAL_PROVIDERS:
         for capability in (None, *provider.capabilities):
-            payload = _load_imported_payload(provider.id, ticker, capability)
+            payload = _load_imported_payload(provider.id, ticker, capability, cutoff=cutoff)
             if not payload:
                 continue
             import_path = str(payload.get("_import_path") or "")
@@ -740,8 +815,5 @@ def _truncate_payload(value: Any, *, max_chars: int = 2500) -> Any:
 
 
 def _date_minus_days(date_text: str, days: int) -> str:
-    try:
-        parsed = datetime.strptime(str(date_text), "%Y-%m-%d").date()
-    except ValueError:
-        parsed = datetime.now().date()
+    parsed = date.fromisoformat(date_text)
     return (parsed - timedelta(days=days)).isoformat()
