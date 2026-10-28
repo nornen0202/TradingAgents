@@ -442,6 +442,7 @@ try {
         }
     }
 
+    $extendedFailure = $null
     if ($null -ne $extendedConfig) {
         $extendedScript = Join-Path $PSScriptRoot "maintain_codex_storage_policy.py"
         if (-not (Test-Path -LiteralPath $extendedScript -PathType Leaf)) {
@@ -455,12 +456,13 @@ try {
             Write-Output $line
             Write-MaintenanceLog "CODEX_STORAGE $line"
         }
-        if ($extendedExitCode -ne 0) { throw "Codex storage policy returned $extendedExitCode; inspect relocation-health, storage-headroom, or the helper error. Unverified originals were preserved." }
+        if ($extendedExitCode -ne 0) { $extendedFailure = "Codex storage policy returned $extendedExitCode; inspect relocation-health, storage-headroom, or the helper error. Unverified originals were preserved." }
     }
 
     $summary = "SUMMARY time=$($startedAt.ToString('s')) mode=$(if ($Apply) {'apply'} else {'dry-run'}) planned_items=$script:plannedItems planned_bytes=$script:plannedBytes removed_items=$script:removedItems removed_bytes=$script:removedBytes runner_busy=$runnerBusy"
     Write-Output $summary
     Write-MaintenanceLog $summary
+    if ($null -ne $extendedFailure) { throw $extendedFailure }
 }
 finally {
     if ($hasMutex) {

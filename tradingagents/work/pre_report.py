@@ -144,7 +144,8 @@ def prepare_market_report(runtime, surface: str, *, producer_state_dir: Path,
         return dict(receipt)
 
     # Same lock as the minute production lane. Never start a competing
-    # writer, kill a healthy worker, or allocate/acknowledge a Work event on BUSY.
+    # writer or kill a healthy worker. BUSY may consume only an independently
+    # validated completed result; it never uses the active writer's artifacts.
     try:
         config = load_scheduled_config(ROOT / "config" / (
             "scheduled_analysis_korea.toml" if surface == "kr" else "scheduled_analysis.toml"))

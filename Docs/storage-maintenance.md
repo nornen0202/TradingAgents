@@ -100,3 +100,7 @@ lineage and account/quote freshness all validate. Runtime.prepare pins the same
 run and rechecks clocks under its state lock. Missing, stale, running or replaced
 results remain BUSY without event allocation. This path performs no producer,
 order or duplicate consumer handoff, and it does not extend any TTL.
+
+Use `--health-only --apply` to persist current domain/capacity health without
+starting retention I/O. This receipt is labelled health-only, never cleanup success.
+The wrapper records its cleanup summary before propagating a degraded final exit.
