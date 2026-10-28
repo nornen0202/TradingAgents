@@ -1,13 +1,14 @@
 """Bounded-memory, single-flight discovery for the read-only archive viewer.
 
-Only metadata needed for selection is retained. Filesystem clocks invalidate
-bytes; eligibility still uses the producer's aware timestamps on every query.
+Only metadata needed for selection is retained. Content fingerprints invalidate
+projections; eligibility still uses the producer's aware timestamps on every query.
 No archive, trading state, or on-disk index is written.
 """
 from __future__ import annotations
 
 from concurrent.futures import Future
 from collections import OrderedDict
+import hashlib
 import json
 from pathlib import Path
 from threading import Lock, Thread
@@ -15,7 +16,17 @@ from threading import Lock, Thread
 
 def signature(path):
     stat = path.stat()
-    return stat.st_mtime_ns, stat.st_ctime_ns, stat.st_size, stat.st_ino
+    stamp = stat.st_mtime_ns, stat.st_ctime_ns, stat.st_size, stat.st_ino
+    # Equal-sized in-place writes can share a filesystem clock tick, notably on
+    # Windows. Metadata alone must not retain an old valid or past projection.
+    digest = hashlib.sha256()
+    with path.open("rb") as stream:
+        for block in iter(lambda: stream.read(1024 * 1024), b""):
+            digest.update(block)
+    after = path.stat()
+    if stamp != (after.st_mtime_ns, after.st_ctime_ns, after.st_size, after.st_ino):
+        raise ValueError("Manifest changed during fingerprinting")
+    return (*stamp, digest.digest())
 
 
 def project_manifest(path):

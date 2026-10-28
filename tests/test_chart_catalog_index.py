@@ -59,6 +59,19 @@ def test_rewrite_invalidates_old_valid_projection(tmp_path, changes):
     assert select(index) == {}
 
 
+@pytest.mark.parametrize("changes", [{"run_id": "wrong"}, {"finished_at": "2026-10-17T10:00:00Z"}])
+def test_same_metadata_rewrite_invalidates_projection(tmp_path, monkeypatch, changes):
+    path = put(tmp_path)
+    stamp = path.stat()
+    real_stat = module.Path.stat
+    monkeypatch.setattr(module.Path, "stat", lambda current, *a, **k:
+                        stamp if current == path else real_stat(current, *a, **k))
+    index = ArchiveCatalogIndex(tmp_path)
+    assert set(select(index)) == {"AAPL"}
+    put(tmp_path, **changes)
+    assert select(index) == {}
+
+
 def test_rewrites_additions_and_reversed_cutoffs_do_not_leak_future(tmp_path):
     put(tmp_path)
     index = ArchiveCatalogIndex(tmp_path)
