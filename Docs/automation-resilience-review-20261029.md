@@ -244,3 +244,14 @@ Only research already available at the requested cutoff can establish that
 mismatch; future or undated identity evidence cannot alter a past chart view.
 Original archive files remain available for audit without becoming valid UI
 research or order authority.
+
+### Independent browser deadlines and retry completion
+
+The merged-main browser check exposed a test fixture defect: accelerating every
+15-second timeout to 300 milliseconds also aborted healthy operational APIs.
+A 500-millisecond strategy-health fixture reproduced the same failure twice.
+The catalog-timeout check now uses the real request deadline while the delayed
+operational receipt must still render. Retry checks wait for the new request
+generation to finish, so an earlier snapshot cannot satisfy a retry assertion.
+Failure diagnostics include the current overview, status and request generation.
+These changes do not relax UI assertions or alter production request deadlines.
