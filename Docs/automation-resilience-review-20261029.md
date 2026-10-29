@@ -266,3 +266,18 @@ An undated timezone is rejected before recommendation recording or provider
 requests. Mock provider fixtures cover equivalent instants, both markets, empty
 responses, future/missing/invalid provider dates, and outcome cutoff agreement.
 Existing completed research and historical outcome records are not rewritten.
+
+### Fresh Work preparation in a large archive
+
+Observed market packet reads took 46–64 seconds. Rebuilding the same input before
+and inside event allocation could consume a row's original 120-second validity.
+An owned refresh now builds only once inside Work's existing validation boundary;
+producer identity, real current clocks, account, coverage, row expiry and session
+still pass before any event or state advance. Safe typed blockers remain visible.
+
+Guarded preparation can directly read its expected terminal producer only when
+the latest pointer equals the canonical manifest, its successful attempt and
+aware clocks agree, and the ready bundle names that same market/run. Otherwise
+it retains full discovery and revalidation. This shortcut has no persistent
+cache, changes no input clock, and never renews validity. Independent sanitized
+YouTube and PRISM inputs are read concurrently at the same fixed cutoff.

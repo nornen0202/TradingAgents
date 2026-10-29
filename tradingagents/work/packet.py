@@ -386,6 +386,7 @@ def build_surface_packet(
     now: datetime | None = None,
     public: bool = False,
     report_context_v1: bool = False,
+    expected_producer_run_id: str | None = None,
 ) -> dict[str, Any]:
     key = _surface(surface)
     if report_context_v1 and key not in MARKET_CONTEXT_CONTRACTS:
@@ -397,7 +398,8 @@ def build_surface_packet(
         prism_archive_dir=prism_archive_dir,
     )
     if key in {"kr", "us"}:
-        body = _market_body(key, roots=roots, now=now, public=public, research_readiness=report_context_v1)
+        body = _market_body(key, roots=roots, now=now, public=public, research_readiness=report_context_v1,
+                            expected_producer_run_id=expected_producer_run_id)
     elif key == "youtube":
         body = _youtube_body(roots["youtube"], now=now)
     else:
@@ -711,8 +713,9 @@ def _revision_membership(archive: Path, manifest: dict[str, Any], *, now: dateti
 
 
 def _market_body(surface: str, *, roots: dict[str, Path], now: datetime, public: bool,
-                 research_readiness: bool = False) -> dict[str, Any]:
-    sources = _market_sources(roots["market"], surface)
+                 research_readiness: bool = False, expected_producer_run_id: str | None = None) -> dict[str, Any]:
+    sources = (_market_sources(roots["market"], surface, expected_producer_run_id=expected_producer_run_id, now=now)
+               if expected_producer_run_id else _market_sources(roots["market"], surface))
     if not sources:
         return {
             "kind": "market",
@@ -1200,7 +1203,48 @@ def _apply_market_row_validity(bundle: dict[str, Any], *, now: datetime,
         bundle["quality"] = bundle_quality
 
 
-def _market_sources(archive_dir: Path, market: str) -> list[dict[str, Any]]:
+def _guarded_current_source(archive_dir: Path, market: str, run_id: str, now: datetime) -> dict[str, Any] | None:
+    """Use only the exact terminal producer acknowledged by the live pointer.
+
+    This shortcut is for guarded fresh-input preparation. It has no cache and
+    retains full canonical reads. Unready sources need the historical fallback.
+    """
+    if not run_id or Path(run_id).name != run_id or any(c in run_id for c in "/*?[]\\") or now.utcoffset() is None:
+        return None
+    archive = Path(archive_dir).resolve()
+    pointer = load_json(archive / 'latest-run.json')
+    settings = pointer.get('settings')
+    if (pointer.get('run_id') != run_id or not isinstance(settings, dict)
+            or str(settings.get('market') or '').lower() != market):
+        return None
+    run_dir = (archive / 'runs' / run_id[:4] / run_id).resolve()
+    if not run_dir.is_relative_to(archive / 'runs'):
+        return None
+    manifest = load_json(run_dir / 'run.json')
+    attempt = load_json(run_dir / 'attempt.json')
+    started, finished = aware_datetime(manifest.get('started_at')), aware_datetime(manifest.get('finished_at'))
+    ended = aware_datetime(attempt.get('finished_at'))
+    if (manifest != pointer or manifest.get('status') != 'success' or started is None or finished is None
+            or not started <= finished <= now or attempt.get('run_id') != run_id or attempt.get('status') != 'SUCCESS'
+            or str(attempt.get('market') or '').lower() != market
+            or attempt.get('run_mode') != (settings.get('run_mode') or 'full')
+            or aware_datetime(attempt.get('started_at')) != started or ended is None or not finished <= ended <= now):
+        return None
+    artifact = ((manifest.get('decision_bundle') or {}).get('artifacts') or {}).get('decision_bundle_v2_json')
+    bundle = load_json(_safe_artifact(run_dir, artifact) if artifact else run_dir / 'decision_bundle_v2.json')
+    if (bundle.get('run_id') != run_id or str(bundle.get('market') or '').lower() != market
+            or (bundle.get('quality') or {}).get('decision_ready') is not True
+            or load_json(archive / 'latest-run.json') != pointer):
+        return None
+    return {'manifest': manifest, 'bundle': bundle, 'run_dir': run_dir}
+
+
+def _market_sources(archive_dir: Path, market: str, *, expected_producer_run_id: str | None = None,
+                    now: datetime | None = None) -> list[dict[str, Any]]:
+    if expected_producer_run_id and now is not None:
+        current = _guarded_current_source(archive_dir, market, expected_producer_run_id, now)
+        if current is not None:
+            return [current]
     sources: list[dict[str, Any]] = []
     runs_root = Path(archive_dir) / "runs"
     if not runs_root.exists():
@@ -1950,8 +1994,10 @@ def _supporting_context(
     tickers: Iterable[Any] = (),
 ) -> dict[str, Any]:
     target_tickers = list(tickers)
-    youtube = _youtube_body(roots["youtube"], now=now)
-    prism = _prism_body(roots["prism"], now=now)
+    with ThreadPoolExecutor(max_workers=2) as readers:
+        youtube_read = readers.submit(_youtube_body, roots["youtube"], now=now)
+        prism_read = readers.submit(_prism_body, roots["prism"], now=now)
+        youtube, prism = youtube_read.result(), prism_read.result()
     youtube_ranked, youtube_events = _select_fair_support_events(
         youtube.get("events") or [],
         market=market,

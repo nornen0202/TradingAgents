@@ -21,7 +21,7 @@ from tradingagents.dataflows.market_policy import MAX_EXECUTION_AGE, observation
 from tradingagents.execution.delivery import handoff_completed_run
 
 from .freshness import aware_datetime
-from .packet import build_surface_packet, resolve_archive_roots
+from .packet import build_surface_packet, resolve_archive_roots, load_json
 
 ROOT = Path(__file__).resolve().parents[2]
 MAX_PREPARE_AGE = MAX_EXECUTION_AGE
@@ -102,8 +102,12 @@ def completed_busy_source(surface: str, *, archive: Path, config,
     active writer. Runtime.prepare pins this same run and revalidates clocks.
     """
     now = datetime.now(timezone.utc)
+    pointer = load_json(archive / 'latest-run.json')
+    settings = pointer.get('settings') if isinstance(pointer.get('settings'), dict) else {}
+    candidate = str(pointer.get('run_id') or '') if str(settings.get('market') or '').lower() == surface else None
     packet = build_surface_packet(surface, archive_dir=archive,
-        youtube_archive_dir=youtube_archive_dir, prism_archive_dir=prism_archive_dir, now=now)
+        youtube_archive_dir=youtube_archive_dir, prism_archive_dir=prism_archive_dir, now=now,
+        **({'expected_producer_run_id': candidate} if candidate else {}))
     receipt = (packet.get("body", {}).get("current", {}).get("freshness_receipt") or {})
     run_id = str(receipt.get("producer_run_id") or "")
     if not run_id or Path(run_id).name != run_id or "/" in run_id or "\\" in run_id:
@@ -133,6 +137,7 @@ def prepare_market_report(runtime, surface: str, *, producer_state_dir: Path,
                           prism_archive_dir: Path | None = None, report_context_v1: bool = False) -> dict:
     if surface not in {"kr", "us"}:
         raise ValueError("Broker refresh only supports kr/us")
+    from .runtime import FreshReportSourceError
     state = Path(producer_state_dir)
     receipt_path = state / "pre-report" / f"{surface}.json"
     receipt = {"schema": "tradingagents.pre-report-refresh/v1", "surface": surface,
@@ -193,29 +198,27 @@ def prepare_market_report(runtime, surface: str, *, producer_state_dir: Path,
         # guarded handoff, but never hold the producer lock while they finish.
         handoff_completed_run(archive, manifest, state_root=state)
         now = datetime.now(timezone.utc)
-        packet = build_surface_packet(surface, archive_dir=archive,
-            youtube_archive_dir=youtube_archive_dir, prism_archive_dir=prism_archive_dir, now=now)
-        now = datetime.now(timezone.utc)
-        blockers = freshness_blockers(packet, now=now, started_at=started, run_id=manifest.get("run_id"))
+        blockers = []
         session = market_session_state(market=surface.upper(), now_local=now,
                                        calendar_name=config.execution.execution_session_calendar)
         if not session.get("is_open"):
             blockers.append("SESSION_ENDED_DURING_REFRESH")
         if manifest.get("status") != "success":
             blockers.append("REFRESH_NOT_SUCCESSFUL")
-        clocks = (packet.get("body", {}).get("current", {}).get("freshness_receipt") or {})
-        safe_clocks = {key: clocks.get(key) for key in (
-            "producer_run_id", "analysis_run_id", "market_data_oldest_at", "market_data_latest_at",
-            "market_data_status", "account_as_of", "account_snapshot_health")}
         if blockers:
-            return finish(status="FRESH_INPUT_UNAVAILABLE", blockers=blockers, observations=safe_clocks)
+            return finish(status="FRESH_INPUT_UNAVAILABLE", blockers=blockers)
+        # Runtime.prepare constructs the packet once and validates the exact
+        # producer, current source clocks, account, rows and session before any
+        # event/state allocation. A second preflight packet ages the same quotes.
         result = runtime.prepare(surface, archive_dir=archive,
             youtube_archive_dir=youtube_archive_dir, prism_archive_dir=prism_archive_dir, fresh_report=True,
             expected_producer_run_id=manifest.get("run_id"), refresh_started_at=started,
             report_context_v1=report_context_v1)
-        saved = finish(status="REFRESHED", observations=safe_clocks,
+        saved = finish(status="REFRESHED", observations=result.get('verified_refresh_observations', {}),
                        event_created=result.get("result") in {"NEW", "RESUME"})
         return {**result, "pre_report_refresh": saved}
+    except FreshReportSourceError as exc:
+        return finish(status='FRESH_INPUT_UNAVAILABLE', blockers=list(exc.blockers))
     except ProducerBusy:
         # A minute producer may own the writer lock while its previous immutable
         # result is still fresh. Reuse only verified observations; no TTL renewal,
@@ -236,7 +239,8 @@ def prepare_market_report(runtime, surface: str, *, producer_state_dir: Path,
                 return {**result, "pre_report_refresh": saved}
         except Exception as exc:
             return finish(status="BUSY_NO_STATE_ADVANCE", blockers=["PRODUCER_ALREADY_RUNNING"],
-                          adoption_error_type=type(exc).__name__)
+                          adoption_error_type=type(exc).__name__,
+                          **({'adoption_blockers': list(exc.blockers)} if isinstance(exc, FreshReportSourceError) else {}))
         return finish(status="BUSY_NO_STATE_ADVANCE", blockers=["PRODUCER_ALREADY_RUNNING"])
     except Exception as exc:
         # Broker errors can contain private request details. Keep the durable

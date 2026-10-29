@@ -17,7 +17,8 @@ def packet():
         "freshness_receipt": {"producer_run_id": "refreshed", "market_data_status": "FRESH",
             "market_data_oldest_at": NOW.isoformat(), "market_data_latest_at": NOW.isoformat(),
             "account_as_of": NOW.isoformat(), "account_snapshot_health": "VALID",
-            "analysis_lineage_status": "RESOLVED", "analysis_completed_at": NOW.isoformat()}}}}
+            "analysis_lineage_status": "RESOLVED", "analysis_completed_at": NOW.isoformat()},
+        "bundle": {"strategy_table": [{"execution": {"valid_until": (NOW+timedelta(minutes=10)).isoformat()}}]}}}}
 
 
 def test_real_observations_and_full_coverage_required():
@@ -70,7 +71,17 @@ def wired(tmp_path, monkeypatch):
     monkeypatch.setattr(pre, "automated_market_session_status", lambda **kw: SimpleNamespace(is_session=True))
     monkeypatch.setattr(pre, "resolve_archive_roots", lambda **kw: {"market": tmp_path / "archive"})
     prepared, configs = [], []
-    runtime = SimpleNamespace(prepare=lambda *a, **kw: prepared.append(kw) or {"result": "NEW", "event_id": "new"})
+    def prepare(*args, **kw):
+        from tradingagents.work.runtime import FreshReportSourceError
+        current = datetime.now(timezone.utc)
+        item = pre.build_surface_packet(*args, now=current)
+        blockers = pre.freshness_blockers(item, now=current, started_at=kw['refresh_started_at'],
+            run_id=kw['expected_producer_run_id']) + pre.publish_freshness_blockers(item, now=current)
+        if blockers:
+            raise FreshReportSourceError(blockers)
+        prepared.append(kw)
+        return {"result": "NEW", "event_id": "new", "verified_refresh_observations": item['body']['current']['freshness_receipt']}
+    runtime = SimpleNamespace(prepare=prepare)
 
     def execute(config, **kw):
         assert kw["paper_state_dir"] == tmp_path
@@ -142,7 +153,19 @@ def test_writer_lock_only_covers_collection_not_packet_build_or_event_prepare(wi
     runtime.prepare = allocate
     result = pre.prepare_market_report(runtime, "us", producer_state_dir=tmp_path)
     assert result["result"] == "NEW"
-    assert phases == ["collection_locked", "consumer_handoff_unlocked", "packet_read_unlocked", "event_prepare_unlocked"]
+    assert phases == ["collection_locked", "consumer_handoff_unlocked", "event_prepare_unlocked", "packet_read_unlocked"]
+
+
+def test_owned_refresh_constructs_exactly_one_guarded_packet(wired, tmp_path, monkeypatch):
+    runtime, prepared, configs = wired
+    original = pre.build_surface_packet
+    calls = []
+    def build(*args, **kwargs):
+        calls.append(kwargs)
+        return original(*args, **kwargs)
+    monkeypatch.setattr(pre, 'build_surface_packet', build)
+    assert pre.prepare_market_report(runtime, 'us', producer_state_dir=tmp_path)['result'] == 'NEW'
+    assert len(calls) == len(prepared) == 1
 
 
 def test_busy_producer_does_not_start_or_allocate_event(wired, tmp_path):
