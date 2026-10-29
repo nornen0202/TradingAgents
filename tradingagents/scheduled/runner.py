@@ -528,7 +528,13 @@ def _execute_run_body(config, *, run_label, skip_site_build, tz, started_at,
     research_failed = run_mode == "full" and not any(
         item.get("status") == "success" for item in ticker_summaries
     )
-    skip_research_postprocessing = research_failed or recovery_without_new_success
+    incomplete_research = run_mode == "full" and any(
+        item.get("status") != "success" for item in ticker_summaries
+    )
+    # A partial cohort cannot authorize an overlay. Publish its terminal source
+    # before optional network/portfolio work so failed-only recovery can reuse
+    # successful artifacts even when downstream services are slow or broken.
+    skip_research_postprocessing = research_failed or recovery_without_new_success or incomplete_research
     reset_llm_usage()
     # News collection can involve many slow network calls. Finish it BEFORE
     # collecting the short-lived price observations, and reuse the same dated
@@ -697,7 +703,9 @@ def _execute_run_body(config, *, run_label, skip_site_build, tz, started_at,
         # Preserve the complete cohort and original reused evidence, but do not
         # spend downstream calls on an attempt with no newly usable research.
         # Pure finalization (no retry targets) keeps the ordinary path below.
-        reason = "no_successful_ticker_research" if research_failed else "no_new_successful_recovery_research"
+        reason = ("no_successful_ticker_research" if research_failed else
+                  "no_new_successful_recovery_research" if recovery_without_new_success else
+                  "incomplete_ticker_research")
         if research_failed:
             manifest["status"] = "failed"
         manifest["warnings"].append(reason)

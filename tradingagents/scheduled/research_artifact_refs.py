@@ -78,7 +78,9 @@ def _read(path):
     if not 0 < before.st_size <= _MAX_BYTES:
         raise ValueError("Research evidence is empty or exceeds its bound")
     with path.open("rb") as stream:
-        raw = stream.read(_MAX_BYTES + 1)
+        # Allocate for the verified file size, not the 64 MiB safety ceiling
+        # for every tiny reference. The extra byte still detects concurrent growth.
+        raw = stream.read(before.st_size + 1)
     after = path.stat()
     if (len(raw) != before.st_size or
             (before.st_size, before.st_mtime_ns, before.st_ino) !=

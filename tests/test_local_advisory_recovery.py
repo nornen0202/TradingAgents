@@ -214,6 +214,20 @@ def test_collection_success_with_missing_canonical_or_publication_requires_diagn
     assert len(client.dispatched) == 1 and client.dispatched[0][0] == PRISM
 
 
+@pytest.mark.parametrize("surface", ["youtube", "prism"])
+def test_local_collector_completion_requires_canonical_evidence_but_not_cloud_stamp(tmp_path, monkeypatch, watchdog, surface):
+    monkeypatch.setenv("TRADINGAGENTS_AUTOMATION_BACKEND", "local")
+    monkeypatch.delenv(recovery.SPECS[surface][4], raising=False)
+    write_manifest(tmp_path / "archive", surface)
+    workflow = recovery.SPECS[surface][0]
+    client = Client({workflow: [run_record(surface)]}, {10: [build(surface, stamp="skipped")]})
+    client.jobs[10][0]["steps"].append({"name": "Confirm canonical collection handoff to local publisher",
+                                      "conclusion": "success"})
+    targets = [target for target in watchdog.due_targets(NOW) if target.workflow_file == workflow]
+    assert recover(tmp_path, watchdog, client, targets=targets)[0]["status"] == "ADVISORY_COVERED_OR_HELD"
+    assert not client.dispatched
+
+
 def test_native_and_local_same_cause_failures_share_watchdog_budget(tmp_path, watchdog):
     a = run_record(run_id=10, conclusion="failure")
     a["event"], a["display_title"] = "schedule", "[recovery_source=native]"

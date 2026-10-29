@@ -435,9 +435,9 @@ def test_recovery_postprocessing_preserves_original_artifacts_for_next_resume(
     directory = config.storage.archive_dir / "runs" / manifest["run_id"][:4] / manifest["run_id"]
     fresh = ["XOM"] if remaining_failure else ["XOM", "MSFT"]
     assert analyzed == ["XOM", "MSFT"]
-    assert rendered == (fresh + fresh if execution_enabled else fresh)
-    assert overlaid == (fresh if execution_enabled else [])
-    assert bundled == [["AAPL", "XOM", "MSFT"]]
+    assert rendered == ([] if remaining_failure else fresh + fresh if execution_enabled else fresh)
+    assert overlaid == (fresh if execution_enabled and not remaining_failure else [])
+    assert bundled == ([] if remaining_failure else [["AAPL", "XOM", "MSFT"]])
     assert manifest["status"] == ("partial_failure" if remaining_failure else "success")
     assert manifest["summary"]["successful_tickers"] == 1 + len(fresh)
     assert manifest["active_universe"]["coverage"]["complete"] is (not remaining_failure)
@@ -447,7 +447,8 @@ def test_recovery_postprocessing_preserves_original_artifacts_for_next_resume(
     for relative in reused["artifacts"].values():
         assert (directory / relative).read_bytes() == before[relative]
     for ticker in fresh:
-        assert (directory / f"tickers/{ticker}/investment_review.html").read_text() == f"<html>Postprocessed {ticker}</html>"
+        expected_html = "<html>Fresh worker view</html>" if remaining_failure else f"<html>Postprocessed {ticker}</html>"
+        assert (directory / f"tickers/{ticker}/investment_review.html").read_text() == expected_html
     assert before == {p.relative_to(recovery["root"]).as_posix(): p.read_bytes()
                       for p in recovery["root"].rglob("*") if p.is_file()}
     if remaining_failure:

@@ -3,6 +3,7 @@ from __future__ import annotations
 from tradingagents.report_reader import reader_assets
 
 import html
+import hashlib
 import json
 import os
 import re
@@ -169,6 +170,7 @@ def _compact_feed_manifest(manifest: dict[str, Any], *, published_to_site: bool)
 
 def _load_run_manifests(archive_dir: Path) -> list[dict[str, Any]]:
     manifests: list[dict[str, Any]] = []
+    shared_evidence: dict[bytes, Any] = {}
     runs_root = archive_dir / "runs"
     if not runs_root.exists():
         return manifests
@@ -190,6 +192,23 @@ def _load_run_manifests(archive_dir: Path) -> list[dict[str, Any]]:
             warnings.warn("Skipping an unreadable or invalid archived run manifest", RuntimeWarning, stacklevel=2)
             continue
         payload["_run_dir"] = str(path.parent)
+        # Minute overlays repeat the same large research decisions. Rendering
+        # is read-only; share equal subtrees within this build instead of keeping
+        # thousands of expanded copies in RAM. Saved manifests stay untouched.
+        for row in [payload, *(payload.get("tickers") or [])]:
+            if not isinstance(row, dict):
+                continue
+            for key in ("decision", "execution_contract", "settings", "tool_telemetry", "metrics", "llm_usage"):
+                value = row.get(key)
+                if not isinstance(value, (dict, str)):
+                    continue
+                digest = hashlib.sha256(json.dumps(value, sort_keys=True, ensure_ascii=False,
+                                                  separators=(",", ":")).encode("utf-8")).digest()
+                existing = shared_evidence.get(digest)
+                if existing is not None and existing == value:
+                    row[key] = existing
+                elif len(shared_evidence) < 4096:
+                    shared_evidence[digest] = value
         manifests.append(payload)
 
     manifests.sort(key=lambda item: item.get("started_at", ""), reverse=True)
