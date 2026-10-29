@@ -4877,7 +4877,7 @@ def _manifest_is_complete_overlay_baseline(
         return False
     if _manifest_production_priority(manifest) == 0:
         from .research_recovery import verified_completed_recovery
-        if (archive_dir is None or not manifest.get("research_recovery")
+        if (archive_dir is None
                 or not verified_completed_recovery(archive_dir, manifest, now=now or datetime.now(timezone.utc))):
             return False
     if not _manifest_market_matches(manifest, market=market):

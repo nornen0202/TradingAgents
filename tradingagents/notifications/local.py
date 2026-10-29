@@ -77,7 +77,7 @@ def _local_market_producer(manifest, archive=None, *, now=None):
     label = str(manifest.get("label", ""))
     if market not in {"kr", "us"}:
         return False
-    if archive is not None and manifest.get("research_recovery") and "manual" in label.lower():
+    if archive is not None and "manual" in label.lower():
         from tradingagents.scheduled.research_recovery import verified_completed_recovery
         return verified_completed_recovery(archive, manifest, now=now or datetime.now(timezone.utc))
     # Work's read-only freshness barrier is a real overlay producer. Its

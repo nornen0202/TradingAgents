@@ -568,6 +568,7 @@ def archive_fingerprint(archive):
     for label, root in roots.items():
         paths = list((root / "runs").glob(f"*/*/{manifest_names[label]}"))
         if label == "research":
+            paths += list((root / "runs").glob("*/*/operator-production-admission.json"))
             paths += list((root / "work-reports").glob("*/latest.json"))
             paths += list((root / "work-reports").glob("*/historical-events/*.json"))
         for path in sorted(paths):

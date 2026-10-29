@@ -200,3 +200,23 @@ logged-in host; the Codex operations schedule additionally requires the desktop
 app running. AC/DC automatic sleep was disabled at inspection. No login policy,
 privilege, real-order permission, disabled legacy schedule, original data or
 backup retention rule was changed as part of this review.
+
+### Fresh operator research after pre-worker identity failure
+
+A full manual restart after a terminal pre-worker failure has no failed ticker
+cohort to inherit. It therefore cannot use failed-only recovery lineage. Such a
+run remains excluded until an operator explicitly certifies its canonical bytes:
+
+```powershell
+python tools/certify_operator_research.py --archive-dir <archive> --state-dir <scheduler-state> --run-id <completed-run> --target-key <original-target-key>
+```
+
+The certificate requires complete full Codex research, exact paired model roles,
+fresh successful artifacts, aware original clocks, immutable failed attempt
+hashes, no original worker results, and the original combined retry limit of
+four. It accepts only the identity-repair path, never ordinary smoke/test runs.
+The existing research, source revision and scheduler attempt counters remain
+unchanged. Research baseline selection, scheduler completion and notifications
+revalidate the certificate, and its creation changes the publication fingerprint.
+Mutated evidence revokes admission. Certification grants no execution freshness,
+order permission or extension of research age.

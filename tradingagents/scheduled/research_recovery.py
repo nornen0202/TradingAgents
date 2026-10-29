@@ -180,6 +180,11 @@ def verified_completed_recovery(archive_dir, manifest, *, now):
     Check the recovery at its real completion clock; later readers still apply
     the original research age and session limits. No source file is rewritten.
     """
+    if not isinstance(manifest, dict):
+        return False
+    if not manifest.get("research_recovery"):
+        from .operator_admission import verified_operator_research
+        return verified_operator_research(archive_dir, manifest, now=now)
     try:
         run_id = manifest["run_id"]
         if not isinstance(run_id, str) or not re.fullmatch(r"\d{8}T\d{6}_[A-Za-z0-9_-]+", run_id):
