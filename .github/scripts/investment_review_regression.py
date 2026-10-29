@@ -437,7 +437,6 @@ async def probe(websocket_url, page_url):
                   const originalFetch=window.fetch.bind(window),originalTimeout=window.setTimeout.bind(window);
                   window.__indexingResponses=0;
                   window.__snapshotProgressResponses=0;
-                  window.setTimeout=(fn,ms,...args)=>originalTimeout(fn,window.__catalogMode==='timeout'&&ms===15000?300:ms,...args);
                   function pendingRequest(args){return new Promise((resolve,reject)=>{
                     args[0]?.signal?.addEventListener('abort',()=>reject(new DOMException('aborted','AbortError')),{once:true});
                   });}
@@ -452,6 +451,13 @@ async def probe(websocket_url, page_url):
                       return jsonResponse({status:'SNAPSHOT_BUILDING',job_token:window.__fixtureJob,generation:Number(window.__snapshotGeneration),phase,elapsed_seconds:20+window.__snapshotProgressResponses,phase_elapsed_seconds:1},202,window.__snapshotGeneration);
                     };
                     if(path==='/api/kis-demo-health' && window.__catalogMode==='health-delay')return pendingRequest(args);
+                    if(path==='/api/kis-strategy-health' && window.__catalogMode==='timeout')return new Promise((resolve,reject)=>{
+                      // A slow but valid independent receipt must survive a
+                      // catalog timeout. Keep the real per-request deadline;
+                      // globally shortening timers also aborts this request.
+                      args[0]?.signal?.addEventListener('abort',()=>reject(new DOMException('aborted','AbortError')),{once:true});
+                      originalTimeout(()=>resolve(originalFetch(url,...args)),500);
+                    });
                     if(path==='/api/snapshot' && window.__catalogMode==='snapshot-progress'){
                       if(window.__snapshotPayload){
                         if(!window.__releaseSnapshot||!window.__snapshotBuildShown)return Promise.resolve(snapshotProgress());
@@ -527,7 +533,7 @@ async def probe(websocket_url, page_url):
                     if not await evaluate("window.__snapshotProgressResponses>=2 && window.__snapshotBuildShown"):
                         raise RuntimeError("Snapshot work-progress fixture was not exercised")
                 if catalog_mode == "timeout":
-                    for _ in range(30):
+                    for _ in range(200):
                         await asyncio.sleep(.1)
                         if await evaluate("document.querySelector('#status').textContent.includes('15초') && !viewBusy && document.querySelector('#status').getClientRects().length>0"):
                             break
@@ -537,10 +543,10 @@ async def probe(websocket_url, page_url):
                     raise RuntimeError("Failed catalog did not report its own error")
                 # Controls/retry must already be registered while the first
                 # catalog is pending or failed. No data clock is changed.
-                await evaluate("window.__catalogMode='pass'; document.querySelector('#refresh-catalog').click()")
+                retry_version = await evaluate("window.__catalogMode='pass'; document.querySelector('#refresh-catalog').click(); requestVersion")
                 for _ in range(100):
                     await asyncio.sleep(.1)
-                    if await evaluate("Boolean(window.reviewSnapshot && document.querySelector('#charts canvas'))"):
+                    if await evaluate(f"Boolean(requestVersion==={retry_version} && !viewBusy && window.reviewSnapshot && document.querySelector('#charts canvas'))"):
                         break
                 else:
                     raise RuntimeError(f"{catalog_mode} initial catalog disabled retry controls")
@@ -559,7 +565,8 @@ async def probe(websocket_url, page_url):
                 if await evaluate("!viewBusy && document.querySelector('#strategy-overview').textContent.includes('정상 체결')"):
                     break
             else:
-                raise RuntimeError("Strategy overview did not recover after retry")
+                diagnostic = await evaluate("({status:document.querySelector('#status')?.textContent,overview:document.querySelector('#strategy-overview')?.textContent,busy:viewBusy,version:requestVersion})")
+                raise RuntimeError("Strategy overview did not recover after retry: " + json.dumps(diagnostic, ensure_ascii=False))
             result["overview_error_and_retry"] = True
             # Display fixture only. Actual evidence admission and ledger-derived
             # API costs are independently exercised by settlement projection tests.
