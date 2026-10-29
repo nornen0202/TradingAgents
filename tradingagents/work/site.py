@@ -6,6 +6,7 @@ import hashlib
 import html
 import json
 import shutil
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 
@@ -18,7 +19,7 @@ from .packet import (
     prompt_path,
     seal_packet,
 )
-from .runtime import validate_packet, validate_work_report
+from .runtime import WorkRuntimeError, validate_packet, validate_work_report
 
 
 def build_work_site(
@@ -140,6 +141,8 @@ def _publish_latest_report(
     if not content_source.is_file() or content_source.read_bytes() != latest_source.read_bytes():
         raise ValueError(f"Latest Work report is not backed by its content-addressed event: {surface}")
     target_root = root / surface / "report"
+    history = publish_report_history(root=root, archive_dir=archive_dir, surface=surface,
+                                     url_prefix=url_prefix)
     _write_bytes(target_root / "events" / f"{report_sha}.json", content_source.read_bytes())
     _write_bytes(target_root / "latest.json", latest_source.read_bytes())
     markdown = str(report.get("report_markdown") or "")
@@ -149,6 +152,7 @@ def _publish_latest_report(
         f"{surface.upper()} Work 보고서",
         f"<p>보고서 게시: {html.escape(str(report.get('published_at') or '미확인'))}</p>"
         f"<p>입력 시세 기준: {html.escape(str(structured.get('as_of') or '미확인'))}</p>"
+        '<p><a href="index.html">지난 보고서 목록</a></p>'
         '<p>게시 시각은 입력 갱신 시각이 아닙니다. 아래 내용은 발행 당시 보고서이며 현재 주문 전에 다시 검증해야 합니다.</p>'
         f"<pre data-report-markdown>{html.escape(markdown)}</pre>",
         enhance=True,
@@ -165,7 +169,70 @@ def _publish_latest_report(
         "markdown_url": f"{url_prefix}/{surface}/report/latest.md",
         "latest_url": f"{url_prefix}/{surface}/report/latest.json",
         "event_url": f"{url_prefix}/{surface}/report/events/{report_sha}.json",
+        "history_url": f"{url_prefix}/{surface}/report/index.html",
+        "history_count": len(history["reports"]),
     }
+
+
+def publish_report_history(*, root: Path, archive_dir: Path, surface: str,
+                           url_prefix: str, now: datetime | None = None) -> dict[str, Any]:
+    """Publish validated recent archive entries without changing current delivery state."""
+    now = now or datetime.now(timezone.utc)
+    target = root / surface / "report"
+    source = archive_dir / "work-reports" / surface
+    rows, rejected = [], 0
+    for directory, kind in (("events", "PUBLISHED"), ("historical-events", "HISTORICAL_REFERENCE")):
+        for path in sorted((source / directory).glob("*.json")):
+            try:
+                if path.is_symlink():
+                    raise ValueError("Linked report")
+                raw = path.read_bytes()
+                report = json.loads(raw)
+                validate_work_report(report)
+                if report["surface"] != surface or path.stem != report["report_sha256"]:
+                    raise ValueError("Report archive binding mismatch")
+                published = datetime.fromisoformat(report["published_at"].replace("Z", "+00:00"))
+                if published.tzinfo is None or published > now:
+                    raise ValueError("Unverified report clock")
+                if published < now - timedelta(days=30):
+                    continue
+            except (OSError, ValueError, TypeError, KeyError, WorkRuntimeError):
+                rejected += 1
+                continue
+            digest = report["report_sha256"]
+            relative = f"{directory}/{digest}"
+            structured = report["structured_report"]
+            _write_bytes(target / f"{relative}.json", raw)
+            _write_bytes(target / f"{relative}.md", report["report_markdown"].encode("utf-8"))
+            _write_bytes(target / f"{relative}.html", _readable_html(
+                str(structured.get("title") or f"{surface.upper()} 과거 보고서"),
+                '<p><a href="../index.html">지난 보고서 목록</a></p>'
+                f'<p>원본 작성: {html.escape(str(structured.get("generated_at") or "미확인"))}</p>'
+                f'<p>입력 기준: {html.escape(str(structured.get("as_of") or "미확인"))}</p>'
+                f'<p>게시: {html.escape(report["published_at"])}</p>'
+                '<p>과거 기록입니다. 게시 시각은 입력 갱신 시각이 아니며 현재 주문 지시가 아닙니다.</p>'
+                f'<pre data-report-markdown>{html.escape(report["report_markdown"])}</pre>',
+                enhance=True).encode("utf-8"))
+            rows.append({"report_sha256": digest, "published_at": report["published_at"],
+                         "generated_at": structured.get("generated_at"), "as_of": structured.get("as_of"),
+                         "kind": kind, "title": structured.get("title"),
+                         "bytes_sha256": hashlib.sha256(raw).hexdigest(),
+                         "url": f"{url_prefix}/{surface}/report/{relative}.html",
+                         "json_url": f"{url_prefix}/{surface}/report/{relative}.json"})
+    rows.sort(key=lambda row: datetime.fromisoformat(row["published_at"].replace("Z", "+00:00")), reverse=True)
+    catalog = {"schema": "tradingagents.work-report-history/v1", "surface": surface,
+               "window_days": 30, "reports": rows, "rejected_count": rejected}
+    _write_bytes(target / "history.json", json.dumps(catalog, ensure_ascii=False, indent=2).encode("utf-8"))
+    items = "".join(f'<li><a href="{html.escape(row["url"], quote=True)}">'
+                    f'{html.escape(str(row["generated_at"] or row["published_at"]))} · '
+                    f'{html.escape(str(row["title"] or surface.upper()))}</a>'
+                    f'{" · 미발행 초안 보관본" if row["kind"] == "HISTORICAL_REFERENCE" else ""}</li>' for row in rows)
+    _write_bytes(target / "index.html", _readable_html(
+        f"{surface.upper()} 지난 보고서",
+        '<p>최근 30일의 검증된 발행본과 과거 초안 보관본입니다. 현재 시세·주문 승인과 구분합니다.</p>'
+        '<p><a href="../../../../reports/index.html">일일 종목 분석 보고서 전체 목록</a></p>'
+        '<p><a href="latest.html">최근 정식 발행 보고서</a></p>' + f'<ul>{items}</ul>').encode("utf-8"))
+    return catalog
 
 
 def _readable_html(title: str, content: str, *, enhance: bool = False) -> str:

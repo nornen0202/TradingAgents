@@ -33,6 +33,8 @@ def main() -> int:
     publish.add_argument("--markdown-file", required=True, type=Path)
     publish.add_argument("--structured-file", required=True, type=Path)
     publish.add_argument("--archive-dir", type=Path)
+    publish.add_argument("--historical", action="store_true",
+                         help="Archive a bound, non-executable past market draft without advancing latest or ACK state.")
 
     acknowledge = subparsers.add_parser("ack")
     acknowledge.add_argument("--surface", required=True, choices=("kr", "us", "youtube", "prism"))
@@ -102,6 +104,7 @@ def main() -> int:
                 report_markdown=report_markdown,
                 structured_report=structured_report,
                 archive_dir=args.archive_dir,
+                historical=args.historical,
             )
         elif args.command == "ack":
             result = runtime.acknowledge(args.surface, args.event_id, status=args.status)

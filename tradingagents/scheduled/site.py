@@ -10,7 +10,7 @@ import re
 import shutil
 import time
 import warnings
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 
@@ -56,31 +56,10 @@ def build_site(archive_dir: Path, site_dir: Path, settings: SiteSettings) -> lis
 
     for index, manifest in enumerate(published_manifests, 1):
         print(f"Pages build: run {index}/{len(published_manifests)} {manifest['run_id']}", flush=True)
-        run_dir = Path(manifest["_run_dir"])
-        portfolio_summary = _load_portfolio_summary(run_dir)
-        _copy_artifacts(site_dir, run_dir, manifest, portfolio_summary)
-        _write_text(
-            site_dir / "runs" / manifest["run_id"] / "index.html",
-            _render_run_page(manifest, settings, portfolio_summary=portfolio_summary, manifests=manifests),
-        )
-        if portfolio_summary.get("status_path"):
-            _write_text(
-                site_dir / "runs" / manifest["run_id"] / "portfolio.html",
-                _render_portfolio_page(manifest, settings, portfolio_summary={}),
-            )
-        # Keep verified source manifests only for this run's rendering operation.
-        # Every ticker still verifies its own owner, clocks and artifact digest.
-        research_store = None
-        for ticker_summary in _public_ticker_summaries(manifest):
-            if research_store is None and isinstance(
-                (ticker_summary.get("artifacts") or {}).get("report_markdown"), dict
-            ):
-                research_store = ResearchArtifactStore.from_run_dir(run_dir, now=manifest.get("finished_at"))
-            _write_text(
-                site_dir / "runs" / manifest["run_id"] / f"{ticker_summary['ticker']}.html",
-                _render_ticker_page(manifest, ticker_summary, settings, manifests=manifests,
-                                    portfolio_summary={}, research_store=research_store),
-            )
+        _write_run_pages(site_dir, manifest, settings, manifests)
+
+    historical = publish_daily_report_history(archive_dir, site_dir, settings, manifests=manifests)
+    published_run_ids.update(row["run_id"] for row in historical)
 
     _publish_latest_decision_bundles(site_dir=site_dir, manifests=published_manifests)
 
@@ -128,6 +107,72 @@ def build_site(archive_dir: Path, site_dir: Path, settings: SiteSettings) -> lis
     build_ai_context(site_dir)
     print(f"Pages build completed in {time.monotonic() - build_started:.1f}s", flush=True)
     return manifests
+
+
+def _write_run_pages(site_dir, manifest, settings, manifests):
+    run_dir = Path(manifest["_run_dir"])
+    portfolio_summary = _load_portfolio_summary(run_dir)
+    _copy_artifacts(site_dir, run_dir, manifest, portfolio_summary)
+    _write_text(
+        site_dir / "runs" / manifest["run_id"] / "index.html",
+        _render_run_page(manifest, settings, portfolio_summary=portfolio_summary, manifests=manifests),
+    )
+    if portfolio_summary.get("status_path"):
+        _write_text(
+            site_dir / "runs" / manifest["run_id"] / "portfolio.html",
+            _render_portfolio_page(manifest, settings, portfolio_summary={}),
+        )
+    # Keep verified source manifests only for this run's rendering operation.
+    # Every ticker still verifies its own owner, clocks and artifact digest.
+    research_store = None
+    for ticker_summary in _public_ticker_summaries(manifest):
+        if research_store is None and isinstance(
+            (ticker_summary.get("artifacts") or {}).get("report_markdown"), dict
+        ):
+            research_store = ResearchArtifactStore.from_run_dir(run_dir, now=manifest.get("finished_at"))
+        _write_text(
+            site_dir / "runs" / manifest["run_id"] / f"{ticker_summary['ticker']}.html",
+            _render_ticker_page(manifest, ticker_summary, settings, manifests=manifests,
+                                portfolio_summary={}, research_store=research_store),
+        )
+
+
+def publish_daily_report_history(archive_dir, site_dir, settings, *, manifests=None, now=None):
+    """Keep completed daily research accessible after minute overlays fill the page limit."""
+    now = now or datetime.now(timezone.utc)
+    manifests = _load_run_manifests(archive_dir) if manifests is None else manifests
+    rows = []
+    for manifest in manifests:
+        if not _is_daily_analysis_run(manifest) or manifest.get("status") not in {"success", "partial_failure"}:
+            continue
+        try:
+            finished = datetime.fromisoformat(str(manifest.get("finished_at") or "").replace("Z", "+00:00"))
+            started = datetime.fromisoformat(str(manifest.get("started_at") or "").replace("Z", "+00:00"))
+            if (finished.tzinfo is None or started.tzinfo is None or started > finished
+                    or not now - timedelta(days=30) <= finished <= now):
+                continue
+        except ValueError:
+            continue
+        run_id = manifest["run_id"]
+        if not (site_dir / "runs" / run_id / "index.html").is_file():
+            print(f"Pages history: {run_id}", flush=True)
+            _write_run_pages(site_dir, manifest, settings, manifests)
+        total, successful, failed = _run_success_counts(manifest)
+        rows.append({"run_id": run_id, "market": _manifest_market(manifest),
+                     "status": manifest.get("status"), "finished_at": manifest["finished_at"],
+                     "total": total, "successful": successful, "failed": failed,
+                     "url": f"../runs/{run_id}/index.html"})
+    _write_json(site_dir / "reports" / "history.json", {"window_days": 30, "reports": rows})
+    items = "".join(f'<li><a href="{html.escape(row["url"], quote=True)}">'
+                    f'{html.escape(row["finished_at"])} · {html.escape(row["market"].upper())}</a>'
+                    f' · {html.escape(str(row["status"]))} · 성공 {row["successful"]}/{row["total"]}'
+                    f' · 실패 {row["failed"]}</li>' for row in rows)
+    _write_text(site_dir / "reports" / "index.html",
+                '<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
+                '<title>지난 일일 분석 보고서</title><main><h1>지난 일일 분석 보고서</h1>'
+                '<p>최근 30일의 완료된 분석 기록입니다. 부분 실패는 그대로 표시하며 현재 주문 승인으로 해석하지 않습니다.</p>'
+                f'<ul>{items}</ul></main></html>')
+    return rows
 
 
 def _compact_feed_manifest(manifest: dict[str, Any], *, published_to_site: bool) -> dict[str, Any]:
