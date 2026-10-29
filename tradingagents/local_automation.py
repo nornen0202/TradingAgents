@@ -11,6 +11,7 @@ import hashlib
 import importlib.util
 import json
 import os
+import re
 import shutil
 from pathlib import Path
 import subprocess
@@ -226,17 +227,28 @@ def _scheduler_manifest_view(manifest):
     return view
 
 
-def completed_target(manifest, target, *, window_start=None, now=None):
+def completed_target(manifest, target, *, window_start=None, now=None, archive=None):
     """Gate on research completed by an aware cutoff, independently of delivery.
 
     Scheduled callers supply their original tick clock. Direct callers default
     to the actual current UTC instant, never an unbounded future cutoff.
     """
-    from tradingagents.scheduled.runner import _manifest_is_complete_overlay_baseline
+    from tradingagents.scheduled.runner import _manifest_is_complete_overlay_baseline, _manifest_production_priority
 
     now = datetime.now(timezone.utc) if now is None else now
     if not isinstance(now, datetime) or now.tzinfo is None or now.utcoffset() is None:
         raise ValueError("Aware scheduler completion clock required")
+    if archive is not None and _manifest_production_priority(manifest) == 0:
+        run_id = str(manifest.get("run_id") or "")
+        if not re.fullmatch(r"\d{8}T\d{6}_[A-Za-z0-9_-]+", run_id):
+            return False
+        try:
+            canonical = read_json(archive / "runs" / run_id[:4] / run_id / "run.json", {})
+            if manifest != canonical and manifest != _scheduler_manifest_view(canonical):
+                return False
+            manifest = canonical
+        except (OSError, ValueError):
+            return False
     settings = manifest.get("settings") or {}
     mode = "full" if target.workflow_file == "daily-codex-analysis.yml" else "overlay_only"
     if str(settings.get("market", "")).lower() != target.inputs["profile"] or settings.get("run_mode", "full") != mode:
@@ -256,6 +268,7 @@ def completed_target(manifest, target, *, window_start=None, now=None):
             return False
         return _manifest_is_complete_overlay_baseline(
             manifest, market=target.inputs["profile"], requested_tickers=None, required_holding_tickers=None,
+            archive_dir=archive, now=now,
         )
     execution = manifest.get("execution")
     if isinstance(execution, dict):
@@ -332,7 +345,7 @@ def full_research_session_hold(profile, state, *, now):
     return "AWAITING_OTHER_MARKET_CALENDAR"
 
 
-def run_due(archive, state, *, now=None, dry_run=False, research_only=False):
+def run_due(archive, state, *, now=None, dry_run=False, research_only=False, catch_up_market=None):
     from tradingagents.scheduled.automation_calendar import automated_market_session_status
     from tradingagents.scheduled.runner import _iter_run_manifests_desc
     from tradingagents.execution.research_runtime import research_lane_enabled
@@ -353,6 +366,24 @@ def run_due(archive, state, *, now=None, dry_run=False, research_only=False):
         kr_overlay_checkpoints=KR_WORK_OVERLAY_CHECKPOINTS,
         us_overlay_checkpoints=US_WORK_OVERLAY_CHECKPOINTS,
     )
+    if catch_up_market is not None:
+        if not research_only or catch_up_market not in {"kr", "us"}:
+            raise ValueError("Daily catch-up requires the independent research lane")
+        # Explicit operator recovery of this day's missed window. Only target
+        # selection uses its original clock; workers, data and receipts use now.
+        # Never roll a missed slot into a different day or reset its budget.
+        cutoff = wall_time(10, 15) if catch_up_market == "kr" else wall_time(8, 0, 1)
+        if not cutoff <= now.time().replace(tzinfo=None) < wall_time(17, 45):
+            raise ValueError("Daily catch-up is outside the original session recovery window")
+        anchor = now.replace(hour=4 if catch_up_market == "kr" else 8,
+                             minute=45 if catch_up_market == "kr" else 0, second=0, microsecond=0)
+        targets = [target for target in watchdog.due_targets(anchor, market_status_resolver=automated_market_session_status)
+                   if target.workflow_file == "daily-codex-analysis.yml" and target.inputs.get("profile") == catch_up_market]
+        if len(targets) != 1:
+            raise ValueError("No original daily target exists for catch-up")
+    # An overdue US retry must not get the sole research lane ahead of today's
+    # KR first attempt. Keep original window keys, counts and calendar guards.
+    targets.sort(key=lambda target: target.window_start_kst, reverse=True)
     manifests = None
     decisions = []
     for target in targets:
@@ -371,7 +402,7 @@ def run_due(archive, state, *, now=None, dry_run=False, research_only=False):
         if manifests is None:
             manifests = [m for m, _ in _iter_run_manifests_desc(
                 archive, project=_scheduler_manifest_view, read_workers=4)]
-        if any(completed_target(m, target, window_start=window_start, now=now) for m in manifests):
+        if any(completed_target(m, target, window_start=window_start, now=now, archive=archive) for m in manifests):
             decisions.append({"target": target.name, "status": "RESEARCH_COMPLETE"})
             continue
         # Budget is per market/session, including Friday US work after KST midnight.
@@ -394,6 +425,13 @@ def run_due(archive, state, *, now=None, dry_run=False, research_only=False):
             decisions.append({"target": target.name, "status": "RETRY_BUDGET_OR_COOLDOWN"})
             continue
         if target.workflow_file == "daily-codex-analysis.yml":
+            newer = [other for other in targets if other.workflow_file == "daily-codex-analysis.yml"
+                     and other.window_start_kst > target.window_start_kst
+                     and other.inputs.get("profile") != target.inputs.get("profile")]
+            if any(not any(completed_target(m, other, now=now, archive=archive) for m in manifests)
+                   for other in newer):
+                decisions.append({"target": target.name, "status": "DEFERRED_FOR_NEXT_MARKET_RESEARCH"})
+                continue
             hold = full_research_session_hold(target.inputs["profile"], state, now=now)
             if hold:
                 decisions.append({"target": target.name, "status": hold})
@@ -438,7 +476,10 @@ def run_due(archive, state, *, now=None, dry_run=False, research_only=False):
             # Configuration/IO errors retain the original terminal receipt and
             # notification path; only known storage shortages defer admission.
             admission_error = exc
-        atomic_write_json(receipt_path, {"target": target.name, "attempts": attempts + 1, "started_at": now.isoformat(), "status": "STARTED"})
+        recovery_note = ({"recovery": "MISSED_WINDOW_CATCHUP", "original_window_start": target.window_start_kst.isoformat()}
+                         if catch_up_market else {})
+        atomic_write_json(receipt_path, {"target": target.name, "attempts": attempts + 1,
+                                        "started_at": now.isoformat(), "status": "STARTED", **recovery_note})
         mode = "full" if target.workflow_file == "daily-codex-analysis.yml" else "overlay_only"
         args = [sys.executable, "-u", "-m", "tradingagents.scheduled", "--config", str(config),
                 "--archive-dir", str(archive), "--run-mode", mode, "--skip-site-build", "--strict",
@@ -475,7 +516,7 @@ def run_due(archive, state, *, now=None, dry_run=False, research_only=False):
             finished = datetime.now(timezone.utc).isoformat()
             atomic_write_json(receipt_path, {"target": target.name, "attempts": attempts + 1, "started_at": now.isoformat(),
                                            "finished_at": finished, "exit_code": exit_code,
-                                           "stage": stage, "error_type": error_type if exit_code else None})
+                                           "stage": stage, "error_type": error_type if exit_code else None, **recovery_note})
             if exit_code:
                 from tradingagents.notifications.local import queue_failure
                 queue_failure(state, stage=stage, source_key=key, error_type=error_type, finished_at=finished)
@@ -494,7 +535,8 @@ def run_due(archive, state, *, now=None, dry_run=False, research_only=False):
         decisions.extend(refreshes)
         if refreshes:
             return decisions
-        if any(item["status"] in {"DEFERRED_FOR_OTHER_MARKET_SESSION", "AWAITING_OTHER_MARKET_CALENDAR"}
+        if any(item["status"] in {"DEFERRED_FOR_OTHER_MARKET_SESSION", "AWAITING_OTHER_MARKET_CALENDAR",
+                                 "DEFERRED_FOR_NEXT_MARKET_RESEARCH"}
                for item in decisions):
             return decisions  # Do not replace deferred research with another long collector.
         from tradingagents.local_advisory_recovery import recover_due
@@ -648,11 +690,17 @@ def publish(archive, state, runtime_dir, *, rebuild=False, publication_locked=Fa
     if receipt.get("fingerprint") == fingerprint and receipt.get("status") == "DELIVERY_VERIFIED" and not rebuild and not reports_only:
         complete_handoffs(site, runtime_dir, receipt)
         return receipt
-    if not resume_pending and (receipt.get("fingerprint") != fingerprint or not receipt.get("commit") or rebuild or reports_only):
+    if not resume_pending and (receipt.get("fingerprint") != fingerprint or not receipt.get("commit")
+                               or receipt.get("status") in {"BUILDING", "BUILD_FAILED"} or rebuild or reports_only):
         from tradingagents.scheduled.config import load_scheduled_config
         from tradingagents.scheduled.site import build_site
 
         config = load_scheduled_config(ROOT / "config" / "scheduled_analysis.toml")
+        # The public branch keeps the last verified generation during a build,
+        # but the local site is mutable. Never leave its previous verified stamp
+        # attached to a partial tree after a worker exits or the host restarts.
+        atomic_write_json(receipt_path, {**receipt, "status": "BUILDING",
+                                        "build_started_at": datetime.now(timezone.utc).isoformat()})
         if reports_only:
             refresh_report_history(archive, state, receipt)
         else:
@@ -748,11 +796,15 @@ def main():
     parser.add_argument("--state-dir", type=Path, required=True)
     parser.add_argument("--runtime-dir", type=Path, required=True)
     parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument("--catch-up-market", choices=("kr", "us"),
+                        help="Explicit same-day missed research recovery; retain the original slot budget and actual clocks.")
     parser.add_argument("--reports-only", action="store_true",
                         help="Publish validated report history from an unchanged verified site.")
     parser.add_argument("--rebuild", action="store_true")
     parser.add_argument("--review-port", type=int, default=8766)
     args = parser.parse_args()
+    if args.catch_up_market and args.command != "research-kis":
+        parser.error("--catch-up-market requires research-kis")
     if not 1024 <= args.review_port <= 65535:
         parser.error("--review-port must be between 1024 and 65535")
     args.archive_dir = args.archive_dir.resolve()
@@ -768,7 +820,7 @@ def main():
         from tradingagents.execution.research_runtime import research_due
         try:
             with interprocess_file_lock(args.state_dir / "research-kis.lock", timeout=0):
-                result = research_due(args.archive_dir, args.state_dir, dry_run=args.dry_run)
+                result = research_due(args.archive_dir, args.state_dir, dry_run=args.dry_run, catch_up_market=args.catch_up_market)
         except TimeoutError:
             result = [{"status": "RESEARCH_ALREADY_RUNNING", "broker_orders_sent": 0}]
         print(json.dumps(result, ensure_ascii=True))

@@ -1,5 +1,12 @@
 # Dependency security recovery — 2026-10-28
 
+**Superseded on 2026-10-29:** new advisories GHSA-8mx5-7m5m-r77g and
+GHSA-69hj-f68j-2879 also affect filelock 3.20.3. Supported Python is now 3.11+
+and every supported interpreter requires filelock 4.2.1+. The 3.10 exception
+below records the earlier decision and must not be restored. LangGraph's floor
+is 1.2.14 and langgraph-sdk's is 0.4.6 (locked at 0.4.10), fixing
+GHSA-3fx2-cqw9-xr3c. Production already uses Python 3.14.
+
 The repository audit found eight open dependency advisories: three for pypdf,
 three for filelock, one for the SQLite checkpoint store and one for setuptools.
 The recovery updates the lock and installation floors rather than dismissing

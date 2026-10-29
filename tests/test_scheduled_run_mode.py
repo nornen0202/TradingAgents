@@ -99,6 +99,8 @@ def _write_full_overlay_baseline(
         "run_id": run_id,
         "label": label,
         "started_at": started_at or _recent_started_at(),
+        "finished_at": started_at or _recent_started_at(),
+        "status": "success",
         "settings": {"run_mode": "full", "market": market},
         "tickers": rows,
     }
@@ -244,6 +246,8 @@ def test_overlay_only_mode_uses_latest_run_without_full_research(tmp_path: Path)
     latest_manifest = {
         "run_id": "20260414T220000_full",
         "started_at": _recent_started_at(),
+        "finished_at": _recent_started_at(),
+        "status": "success",
         "tickers": [
             {
                 "ticker": "NVDA",
@@ -572,6 +576,8 @@ def test_overlay_source_resolution_fails_closed_on_partial_target_coverage(tmp_p
     partial = {
         "run_id": "partial-full",
         "started_at": _recent_started_at(),
+        "finished_at": _recent_started_at(),
+        "status": "success",
         "settings": {"run_mode": "full", "market": "US"},
         "tickers": [
             {
@@ -605,6 +611,8 @@ def test_overlay_bootstrap_matches_kr_alias_identity(tmp_path: Path):
     source_manifest = {
         "run_id": "alias-full",
         "started_at": _recent_started_at(),
+        "finished_at": _recent_started_at(),
+        "status": "success",
         "settings": {"run_mode": "full", "market": "KR"},
         "tickers": [
             {
@@ -728,6 +736,8 @@ def test_overlay_only_mode_prefers_full_source_when_latest_is_overlay(tmp_path: 
             {
                 "run_id": "20260414T235900_overlay",
                 "started_at": _recent_started_at(hours_ago=0.5),
+                "finished_at": _recent_started_at(hours_ago=0.5),
+                "status": "success",
                 "overlay_source_run_id": "20260414T220000_full",
                 "settings": {"run_mode": "overlay_only"},
                 "tickers": [
@@ -747,6 +757,8 @@ def test_overlay_only_mode_prefers_full_source_when_latest_is_overlay(tmp_path: 
             {
                 "run_id": "20260414T220000_full",
                 "started_at": _recent_started_at(hours_ago=1.0),
+                "finished_at": _recent_started_at(hours_ago=1.0),
+                "status": "success",
                 "settings": {"run_mode": "full"},
                 "tickers": [
                     {
@@ -915,6 +927,8 @@ def test_overlay_only_mode_falls_back_to_latest_matching_full_run(tmp_path: Path
             {
                 "run_id": "20260414T235900_full_us",
                 "started_at": _recent_started_at(hours_ago=0.5),
+                "finished_at": _recent_started_at(hours_ago=0.5),
+                "status": "success",
                 "settings": {"run_mode": "full"},
                 "tickers": [
                     {
@@ -942,6 +956,8 @@ def test_overlay_only_mode_falls_back_to_latest_matching_full_run(tmp_path: Path
             {
                 "run_id": "20260414T220000_full_kr",
                 "started_at": _recent_started_at(hours_ago=1.0),
+                "finished_at": _recent_started_at(hours_ago=1.0),
+                "status": "success",
                 "settings": {"run_mode": "full"},
                 "tickers": [
                     {
@@ -963,6 +979,8 @@ def test_overlay_only_mode_falls_back_to_latest_matching_full_run(tmp_path: Path
             {
                 "run_id": "20260414T235900_full_us",
                 "started_at": _recent_started_at(hours_ago=0.5),
+                "finished_at": _recent_started_at(hours_ago=0.5),
+                "status": "success",
                 "settings": {"run_mode": "full"},
                 "tickers": [
                     {
@@ -1024,6 +1042,8 @@ def test_overlay_only_mode_copies_source_report_markdown(tmp_path: Path):
             {
                 "run_id": "20260414T220000_full",
                 "started_at": _recent_started_at(),
+                "finished_at": _recent_started_at(),
+                "status": "success",
                 "settings": {"run_mode": "full"},
                 "tickers": [
                     {
@@ -1050,6 +1070,8 @@ def test_overlay_only_mode_copies_source_report_markdown(tmp_path: Path):
             {
                 "run_id": "20260414T220000_full",
                 "started_at": _recent_started_at(),
+                "finished_at": _recent_started_at(),
+                "status": "success",
                 "settings": {"run_mode": "full"},
                 "tickers": [
                     {

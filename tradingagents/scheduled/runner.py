@@ -4761,6 +4761,7 @@ def _prefer_newer_completed_full_source(
             or _strict_required_coverage_failed(full)
             or not _manifest_is_complete_overlay_baseline(
                 full, market=market, requested_tickers=tickers, required_holding_tickers=tickers,
+                archive_dir=archive_dir,
             )
         ):
             continue
@@ -4814,13 +4815,6 @@ def _resolve_latest_full_overlay_baseline_manifest(
         unique.setdefault(identity, candidate)
     eligible: list[dict[str, Any]] = []
     for candidate in unique.values():
-        if not _manifest_is_complete_overlay_baseline(
-            candidate,
-            market=market,
-            requested_tickers=requested_tickers,
-            required_holding_tickers=required_holding_tickers,
-        ):
-            continue
         if max_age is not None:
             age_seconds = _manifest_age_seconds(candidate, now=now, market=market)
             if age_seconds is None:
@@ -4831,6 +4825,11 @@ def _resolve_latest_full_overlay_baseline_manifest(
                 continue
             if _overlay_newer_session_count(candidate, now=now, market=market) > _OVERLAY_BASELINE_MAX_NEWER_SESSIONS:
                 continue
+        if not _manifest_is_complete_overlay_baseline(
+            candidate, market=market, requested_tickers=requested_tickers,
+            required_holding_tickers=required_holding_tickers, archive_dir=archive_dir, now=now,
+        ):
+            continue
         eligible.append(candidate)
     if not eligible:
         return None
@@ -4838,14 +4837,12 @@ def _resolve_latest_full_overlay_baseline_manifest(
         # A deliberate smaller cohort must not lose to yesterday's larger seed
         # list merely because the latter overlaps more configured tickers.
         eligible.sort(key=lambda item: (
-            _manifest_production_priority(item),
             _manifest_started_at_for_sort(item, market=market),
         ), reverse=True)
         return eligible[0]
     eligible.sort(
         key=lambda manifest: (
             _manifest_requested_coverage_count(manifest, requested_tickers),
-            _manifest_production_priority(manifest),
             _manifest_started_at_for_sort(manifest, market=market),
         ),
         reverse=True,
@@ -4859,15 +4856,28 @@ def _manifest_is_complete_overlay_baseline(
     market: str | None,
     requested_tickers: list[str] | None,
     required_holding_tickers: list[str] | None,
+    archive_dir: Path | None = None,
+    now: datetime | None = None,
 ) -> bool:
     settings = manifest.get("settings") if isinstance(manifest.get("settings"), dict) else {}
     if str(settings.get("run_mode") or "full").strip().lower() != "full":
         return False
-    if _manifest_production_priority(manifest) == 0:
+    try:
+        started = datetime.fromisoformat(str(manifest["started_at"]).replace("Z", "+00:00"))
+        finished = datetime.fromisoformat(str(manifest["finished_at"]).replace("Z", "+00:00"))
+        cutoff = now or datetime.now(timezone.utc)
+        if started.tzinfo is None or finished.tzinfo is None or not started <= finished <= cutoff:
+            return False
+    except (KeyError, TypeError, ValueError):
         return False
+    if _manifest_production_priority(manifest) == 0:
+        from .research_recovery import verified_completed_recovery
+        if (archive_dir is None or not manifest.get("research_recovery")
+                or not verified_completed_recovery(archive_dir, manifest, now=now or datetime.now(timezone.utc))):
+            return False
     if not _manifest_market_matches(manifest, market=market):
         return False
-    status = str(manifest.get("status") or "success").strip().lower()
+    status = str(manifest.get("status") or "").strip().lower()
     if status not in {"success", "completed", "complete"}:
         return False
     summary = manifest.get("summary") if isinstance(manifest.get("summary"), dict) else {}
@@ -4935,7 +4945,7 @@ def _manifest_age_seconds(
     now: datetime | None,
     market: str | None,
 ) -> int | None:
-    parsed = _parse_datetime(str(manifest.get("started_at") or ""))
+    parsed = _baseline_research_started_at(manifest)
     if parsed is None:
         return None
     timezone_name = "US/Eastern" if str(market or "").upper() == "US" else "Asia/Seoul"
@@ -4955,7 +4965,7 @@ def _overlay_newer_session_count(
 ) -> int:
     """Count expected exchange sessions after the baseline through the current day."""
 
-    parsed = _parse_datetime(str(manifest.get("started_at") or ""))
+    parsed = _baseline_research_started_at(manifest)
     if parsed is None:
         return _OVERLAY_BASELINE_MAX_NEWER_SESSIONS + 1
     timezone_name = "US/Eastern" if str(market or "").upper() == "US" else "Asia/Seoul"
@@ -4998,6 +5008,21 @@ def _overlay_newer_session_count(
                 count += 1
             cursor += timedelta(days=1)
         return count
+
+
+def _baseline_research_started_at(manifest):
+    """Carrying a thesis forward never renews its age or session allowance."""
+    started = _parse_datetime(str(manifest.get("started_at") or ""))
+    if "research_recovery" not in manifest:
+        return started
+    try:
+        clocks = [started, *(_parse_datetime(str(row.get("started_at") or ""))
+                             for row in manifest["tickers"] if "research_reuse" in row)]
+        if any(clock is None or clock.tzinfo is None for clock in clocks):
+            return None
+        return min(clocks)
+    except (KeyError, TypeError, AttributeError):
+        return None
 
 
 def _successful_manifest_tickers(manifest: dict[str, Any]) -> list[str]:

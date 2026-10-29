@@ -1,5 +1,6 @@
 """Recover a completed partial full run into a new, explicitly sourced cohort."""
 from copy import deepcopy
+from concurrent.futures import ThreadPoolExecutor
 from datetime import date, datetime, timedelta
 import hashlib
 import json
@@ -42,7 +43,7 @@ def _market_date(value, settings):
     return _instant(value).astimezone(ZoneInfo(zone)).date()
 
 
-def _load_one_terminal_source(*, archive_dir: Path, source_run_id: str, now: datetime):
+def _load_one_terminal_source(*, archive_dir: Path, source_run_id: str, now: datetime, completed_head=False):
     if not isinstance(source_run_id, str) or not re.fullmatch(r"\d{8}T\d{6}_[A-Za-z0-9_-]+", source_run_id):
         raise ValueError("Invalid recovery source run ID")
     root = archive_dir.resolve()
@@ -54,13 +55,15 @@ def _load_one_terminal_source(*, archive_dir: Path, source_run_id: str, now: dat
         attempt = _read(source_dir / "attempt.json")
     except (OSError, ValueError) as exc:
         raise ValueError("Recovery source manifest or attempt is missing or malformed") from exc
-    if not isinstance(source, dict) or source.get("run_id") != source_run_id or source.get("status") not in {"partial_failure", "failed"}:
+    statuses = {"success"} if completed_head else {"partial_failure", "failed"}
+    if not isinstance(source, dict) or source.get("run_id") != source_run_id or source.get("status") not in statuses:
         raise ValueError("Recovery requires a completed failed or partial full run")
     if (any(not isinstance(source.get(key), dict) for key in ("settings", "active_universe", "summary"))
             or not isinstance(source.get("tickers"), list)
             or any(not isinstance(row, dict) for row in source["tickers"])):
         raise ValueError("Recovery source cohort is malformed")
-    if not isinstance(attempt, dict) or attempt.get("status") not in {"FAILED", "PARTIAL_FAILURE"}:
+    attempt_statuses = {"SUCCESS"} if completed_head else {"FAILED", "PARTIAL_FAILURE"}
+    if not isinstance(attempt, dict) or attempt.get("status") not in attempt_statuses:
         raise ValueError("Recovery source attempt is still active or unverified")
     if any(key in attempt and attempt[key] != value for key, value in (
             ("run_id", source_run_id), ("run_mode", "full"),
@@ -77,19 +80,21 @@ def _load_one_terminal_source(*, archive_dir: Path, source_run_id: str, now: dat
 
 
 def _artifact_hashes(source_dir, row):
-    result = {}
     artifacts = row.get("artifacts")
     if not isinstance(artifacts, dict):
         raise ValueError("Recovery lineage artifacts are missing")
-    for key, relative in artifacts.items():
-        if relative is None:
-            continue
+    def fingerprint(item):
+        key, relative = item
         if not isinstance(relative, str):
             raise ValueError("Recovery lineage artifact path is invalid")
         path = (source_dir / relative).resolve()
         if not path.is_relative_to(source_dir) or not path.is_file():
             raise ValueError("Recovery lineage artifact path is invalid or missing")
-        result[key] = hashlib.sha256(path.read_bytes()).hexdigest()
+        return key, hashlib.sha256(path.read_bytes()).hexdigest()
+    # The archive may be a separate spinning volume. Bound parallel reads and
+    # preserve deterministic key order; no hashes or containment checks are skipped.
+    with ThreadPoolExecutor(max_workers=4) as workers:
+        result = dict(workers.map(fingerprint, ((k, v) for k, v in artifacts.items() if v is not None)))
     if not all(key in result for key in ("analysis_json", "final_state_json", "report_markdown", "execution_contract_json")):
         raise ValueError("Recovery lineage required artifacts are missing")
     return result
@@ -101,14 +106,15 @@ def _reuse_receipt(source, row, hashes):
             "artifact_sha256": hashes}
 
 
-def _load_recovery_lineage(*, archive_dir, source_run_id, now):
+def _load_recovery_lineage(*, archive_dir, source_run_id, now, completed_head=False):
     """Validate immutable parent links without treating copied research as new."""
     chain, seen = [], set()
     while True:
         if not isinstance(source_run_id, str) or source_run_id in seen or len(chain) >= MAX_RECOVERY_LINEAGE:
             raise ValueError("Recovery lineage is cyclic, malformed or too deep")
         seen.add(source_run_id)
-        source, directory = _load_one_terminal_source(archive_dir=archive_dir, source_run_id=source_run_id, now=now)
+        source, directory = _load_one_terminal_source(archive_dir=archive_dir, source_run_id=source_run_id, now=now,
+                                                     completed_head=completed_head and not chain)
         chain.append((source, directory))
         if "research_recovery" not in source:
             break
@@ -165,6 +171,57 @@ def _load_recovery_lineage(*, archive_dir, source_run_id, now):
                         for key in ("llm_usage", "metrics", "duration_seconds"))):
                 raise ValueError("Recovery lineage reused research changed")
     return chain
+
+
+def verified_completed_recovery(archive_dir, manifest, *, now):
+    """Admit a manual repair only through its immutable production lineage.
+
+    This is research eligibility, never execution freshness or a new attempt.
+    Check the recovery at its real completion clock; later readers still apply
+    the original research age and session limits. No source file is rewritten.
+    """
+    try:
+        run_id = manifest["run_id"]
+        if not isinstance(run_id, str) or not re.fullmatch(r"\d{8}T\d{6}_[A-Za-z0-9_-]+", run_id):
+            return False
+        directory = (Path(archive_dir) / "runs" / run_id[:4] / run_id).resolve()
+        if not directory.is_relative_to(Path(archive_dir).resolve()):
+            return False
+        canonical = _read(directory / "run.json")
+        if canonical != {key: value for key, value in manifest.items() if not key.startswith("_")}:
+            return False
+        attempt = _read(directory / "attempt.json")
+        completed = _instant(attempt["finished_at"])
+        if not _instant(manifest["finished_at"]) <= completed <= _instant(now):
+            return False
+        chain = _load_recovery_lineage(archive_dir=Path(archive_dir), source_run_id=run_id,
+                                       now=completed, completed_head=True)
+        if len(chain) < 2:
+            return False
+        market = manifest["settings"]["market"].lower()
+        if market not in {"kr", "us"} or any(
+                parent.get("label") != f"local-scheduler-{market}-full" for parent, _ in chain[1:]):
+            return False
+        rows, summary = manifest["tickers"], manifest["summary"]
+        if (not rows or summary.get("total_tickers") != len(rows)
+                or summary.get("successful_tickers") != len(rows) or summary.get("failed_tickers") != 0
+                or (manifest["active_universe"].get("coverage") or {}).get("complete") is not True):
+            return False
+        for row in rows:
+            if row.get("status") != "success":
+                return False
+            if "research_reuse" not in row:
+                _artifact_hashes(directory, row)
+                analysis = _read(directory / row["artifacts"]["analysis_json"])
+                if (analysis.get("ticker") != row["ticker"] or analysis.get("status") != "success"
+                        or any(analysis.get(key) != row.get(key) for key in ("started_at", "finished_at", "analysis_date", "trade_date"))
+                        or not _instant(manifest["started_at"]) <= _instant(row["started_at"])
+                        <= _instant(row["finished_at"]) <= _instant(manifest["finished_at"])
+                        or _research_date(row["analysis_date"]) > _market_date(row["started_at"], manifest["settings"])):
+                    return False
+        return True
+    except (OSError, ValueError, TypeError, KeyError, AttributeError):
+        return False
 
 
 def _load_terminal_source(*, archive_dir: Path, source_run_id: str, now: datetime):

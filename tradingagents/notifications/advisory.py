@@ -11,10 +11,37 @@ from pathlib import Path
 from urllib.request import Request, urlopen
 from uuid import uuid4
 
-from tradingagents.atomic_io import interprocess_file_lock
+from tradingagents.atomic_io import atomic_write_json, interprocess_file_lock
 from tradingagents.prism_telegram.completion import collection_complete
 from tradingagents.work.packet import sha256_json
 from .telegram import NotificationError
+
+
+class AdvisoryProducerNotVerified(NotificationError):
+    """No unique successful publish-enabled owner covers this collection."""
+
+
+def _all_pages(api, endpoint, field):
+    rows, seen = [], set()
+    for page in range(1, 11):
+        payload = api(f"{endpoint}&page={page}")
+        batch = payload.get(field) or []
+        if not isinstance(batch, list):
+            raise NotificationError("Invalid advisory producer history.")
+        for row in batch:
+            identity = row.get("id")
+            # Single-page legacy fixtures may omit IDs; pagination cannot.
+            if identity is not None and identity in seen:
+                raise NotificationError("Advisory producer history changed during pagination.")
+            if identity is not None:
+                seen.add(identity)
+        rows.extend(batch)
+        total = payload.get("total_count", len(rows))
+        if len(batch) < 100 and len(rows) >= total:
+            return rows
+        if not batch:
+            break
+    raise NotificationError("Advisory producer history is incomplete.")
 
 SPECS = {
     "youtube": ("daily-youtube-reports.yml", "build_youtube_pages", "Run YouTube verification reports",
@@ -108,11 +135,7 @@ def producer_for(surface, manifest, *, api=None):
     from .local import REPOSITORY, timestamp
     api = api or github
     since = (timestamp(manifest["started_at"]) - timedelta(days=1)).astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-    payload = api(f"repos/{REPOSITORY}/actions/workflows/{SPECS[surface][0]}/runs?per_page=100&created=>={since}")
-    runs = payload.get("workflow_runs") or []
-    # Never infer uniqueness from a truncated result set.
-    if len(runs) >= 100:
-        raise NotificationError("Advisory producer history requires pagination.")
+    runs = _all_pages(api, f"repos/{REPOSITORY}/actions/workflows/{SPECS[surface][0]}/runs?per_page=100&created=>={since}", "workflow_runs")
     matches = []
     for run in runs:
         if run.get("status") != "completed" or run.get("conclusion") != "success":
@@ -121,13 +144,11 @@ def producer_for(surface, manifest, *, api=None):
                 and timestamp(run.get("updated_at")) >= timestamp(manifest.get("finished_at"))):
             continue
         attempt = int(run.get("run_attempt") or 1)
-        jobs = api(f"repos/{REPOSITORY}/actions/runs/{run['id']}/attempts/{attempt}/jobs?per_page=100")
-        if jobs.get("total_count", 0) >= 100:
-            raise NotificationError("Advisory producer jobs require pagination.")
-        if admitted(run, jobs.get("jobs") or [], surface, manifest):
+        jobs = _all_pages(api, f"repos/{REPOSITORY}/actions/runs/{run['id']}/attempts/{attempt}/jobs?per_page=100", "jobs")
+        if admitted(run, jobs, surface, manifest):
             matches.append((int(run["id"]), attempt))
     if len(matches) != 1:
-        raise NotificationError("Advisory completion lacks one publish-enabled producer.")
+        raise AdvisoryProducerNotVerified("Advisory completion lacks one publish-enabled producer.")
     return matches[0]
 
 
@@ -143,7 +164,12 @@ def queue_surface(archive, state, surface, *, now, api=None):
             and now - finished <= timedelta(hours=24) and packet_covers(packet, surface, manifest)):
         return
     for path in (state / "notifications" / "events").glob("*.json"):
-        event = read(path)
+        try:
+            event = read(path)
+            if not isinstance(event, dict):
+                continue
+        except (OSError, ValueError):
+            continue
         if (event.get("kind"), event.get("surface"), event.get("run_id")) == ("advisory_success", surface, run_id):
             if event.get("manifest_sha256") != digest:
                 raise NotificationError("Previously queued advisory source was mutated.")
@@ -174,11 +200,17 @@ def _queue_completed_locked(archive, state, *, now=None, api=None):
         return
     errors = []
     for surface in SPECS:
+        health = {"surface": surface, "checked_at": now.isoformat(), "notification_status": "CHECKED"}
         try:
             queue_surface(archive, state, surface, now=now, api=api)
         except Exception as exc:
             # One collector's metadata/API failure must not starve the other.
             errors.append(type(exc).__name__)
+            health.update(notification_status="PENDING", error_type=type(exc).__name__)
+        try:
+            atomic_write_json(state / "notifications/health" / f"advisory-{surface}.json", health)
+        except OSError:
+            pass
     if errors:
         raise NotificationError("Advisory preparation pending: " + ",".join(errors))
 

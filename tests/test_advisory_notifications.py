@@ -372,3 +372,38 @@ def test_busy_publisher_does_not_starve_other_notification_dispatch(tmp_path, mo
         local.reconcile_safely(archive, state)
     assert calls == ["existing notification"]
     assert not list((state / "notifications/events").glob("*.json"))
+
+
+
+def test_producer_on_second_history_page_is_verified_not_lost(tmp_path,monkeypatch):
+    archive,state,manifest,_,_,run,jobs=fixture(tmp_path,monkeypatch)
+    calls=[]
+    def api(endpoint):
+        calls.append(endpoint)
+        if "/jobs?" in endpoint: return {"jobs":jobs,"total_count":len(jobs)}
+        if endpoint.endswith("page=1"):
+            return {"workflow_runs":[{"id":i,"status":"completed","conclusion":"failure"} for i in range(100)],"total_count":101}
+        return {"workflow_runs":[run],"total_count":101}
+    assert advisory.producer_for("youtube",manifest,api=api)==(run["id"],2)
+    assert any(endpoint.endswith("page=2") for endpoint in calls)
+
+
+@pytest.mark.parametrize("case",["truncated","repeated","ambiguous"])
+def test_history_pagination_never_infers_unique_owner_from_incomplete_or_duplicate_results(tmp_path,monkeypatch,case):
+    archive,state,manifest,_,_,run,jobs=fixture(tmp_path,monkeypatch)
+    first=[{"id":i,"status":"completed","conclusion":"failure"} for i in range(99)]+[run]
+    def api(endpoint):
+        if "/jobs?" in endpoint: return {"jobs":jobs,"total_count":len(jobs)}
+        if endpoint.endswith("page=1"): return {"workflow_runs":first,"total_count":101}
+        last=[] if case=="truncated" else [run if case=="repeated" else {**run,"id":run["id"]+1}]
+        return {"workflow_runs":last,"total_count":101}
+    with pytest.raises(NotificationError): advisory.producer_for("youtube",manifest,api=api)
+
+
+def test_failed_collection_provenance_is_diagnosed_per_surface(tmp_path,monkeypatch):
+    archive,state,*_=fixture(tmp_path,monkeypatch,surface="prism")
+    monkeypatch.setattr(advisory,"github",lambda _: {"workflow_runs":[]})
+    with pytest.raises(NotificationError): advisory.queue_completed(archive,state,now=NOW)
+    health=local.read(state / "notifications/health/advisory-prism.json")
+    assert health["error_type"]=="AdvisoryProducerNotVerified"
+    assert health["notification_status"]=="PENDING"

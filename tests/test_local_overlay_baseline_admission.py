@@ -152,3 +152,15 @@ def test_existing_budget_and_cooldown_still_precede_baseline_admission(admission
     assert local.run_due(archive, state, now=AT) == [
         {"target": item.name, "status": "RETRY_BUDGET_OR_COOLDOWN"}]
     assert path.read_bytes() == original
+
+
+@pytest.mark.parametrize("change",[
+    {"finished_at":None},{"finished_at":"invalid"},{"finished_at":"2026-10-28T17:45:00"},
+    {"finished_at":"2026-10-29T00:00:00+09:00"},{"finished_at":"2026-10-27T00:00:00+09:00"},
+    {"status":None},
+])
+def test_missing_invalid_or_future_completion_never_becomes_a_baseline(admission,change):
+    archive,state,item=admission
+    baseline(archive,**change)
+    assert local.run_due(archive,state,now=AT)==[{"target":item.name,"status":"WAITING_RESEARCH_BASELINE"}]
+    assert not state.exists()
