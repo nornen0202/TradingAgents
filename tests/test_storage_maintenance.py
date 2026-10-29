@@ -7,6 +7,9 @@ from pathlib import Path
 import shutil
 import subprocess
 import sys
+import time
+import uuid
+import xml.etree.ElementTree as ET
 
 import pytest
 
@@ -42,7 +45,7 @@ def _directory(path: Path, *, modified: datetime | None = None) -> Path:
     return path
 
 
-def _run_maintenance(tmp_path: Path, *, apply: bool, extended_policy=None) -> subprocess.CompletedProcess[str]:
+def _maintenance_invocation(tmp_path: Path, *, apply: bool, extended_policy=None):
     # These fixtures model an idle temporary runner, regardless of unrelated
     # production Runner.Worker processes on the machine running the tests.
     wrapper = tmp_path / "maintenance-test-wrapper.ps1"
@@ -53,6 +56,19 @@ def _run_maintenance(tmp_path: Path, *, apply: bool, extended_policy=None) -> su
         "}\n& $env:TEST_MAINTENANCE_SCRIPT @args\nexit $LASTEXITCODE\n",
         encoding="utf-8",
     )
+    # A real host maintenance owner must neither block these temporary fixtures
+    # nor be disturbed by them. Only the test copy receives a distinct mutex.
+    isolated = tmp_path / "maintenance-scripts"
+    isolated.mkdir(exist_ok=True)
+    test_script = isolated / SCRIPT.name
+    test_script.write_text(
+        SCRIPT.read_text(encoding="utf-8").replace(
+            "Local\\TradingAgentsStorageMaintenance",
+            "Local\\TradingAgentsStorageTest-" + uuid.uuid4().hex,
+        ), encoding="utf-8",
+    )
+    for helper in ("maintain_codex_storage.py", "maintain_codex_storage_policy.py"):
+        shutil.copyfile(SCRIPT.parent / helper, isolated / helper)
     command = [
         PWSH,
         "-NoLogo",
@@ -84,8 +100,81 @@ def _run_maintenance(tmp_path: Path, *, apply: bool, extended_policy=None) -> su
         command.append("-Apply")
     if extended_policy is not None:
         command += ["-ExtendedPolicyPath", str(extended_policy)]
+    return command, {**os.environ, "TEST_MAINTENANCE_SCRIPT": str(test_script)}
+
+
+def _run_maintenance(tmp_path: Path, *, apply: bool, extended_policy=None) -> subprocess.CompletedProcess[str]:
+    command, environment = _maintenance_invocation(tmp_path, apply=apply, extended_policy=extended_policy)
     return subprocess.run(command, check=False, capture_output=True, text=True, encoding="utf-8",
-                          env={**os.environ, "TEST_MAINTENANCE_SCRIPT": str(SCRIPT)})
+                          env=environment, timeout=60)
+
+
+@pytest.mark.skipif(os.name != "nt" or PWSH is None, reason="Windows PowerShell required")
+@pytest.mark.parametrize("helper_exit", [0, 7])
+def test_helper_progress_is_persisted_before_exit_and_failure_propagates(tmp_path, helper_exit):
+    (tmp_path / "runner").mkdir()
+    config = tmp_path / "policy.json"
+    config.write_text(json.dumps({"enabled": True, "python_executable": sys.executable,
+                                  "preserve_canonical_archive": True}), encoding="utf-8")
+    command, environment = _maintenance_invocation(tmp_path, apply=True, extended_policy=config)
+    release = tmp_path / "release-helper"
+    (tmp_path / "maintenance-scripts" / "maintain_codex_storage_policy.py").write_text(
+        "import os, sys, time\nfrom pathlib import Path\n"
+        "if '--preflight-only' in sys.argv:\n print('preflight-ready', flush=True); sys.exit(0)\n"
+        "print('verified-copy-progress', flush=True)\n"
+        "deadline = time.monotonic() + 40\n"
+        "while not Path(os.environ['TEST_RELEASE']).exists():\n"
+        " if time.monotonic() > deadline: sys.exit(99)\n time.sleep(0.05)\n"
+        "print('helper-finished', flush=True)\n"
+        "sys.exit(int(os.environ['TEST_HELPER_EXIT']))\n", encoding="utf-8",
+    )
+    process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                               text=True, encoding="utf-8", env={**environment,
+                               "TEST_RELEASE": str(release), "TEST_HELPER_EXIT": str(helper_exit)})
+    log = tmp_path / "maintenance.log"
+    try:
+        deadline = time.monotonic() + 20
+        while time.monotonic() < deadline:
+            if log.exists() and "CODEX_STORAGE verified-copy-progress" in log.read_text(encoding="utf-8-sig"):
+                break
+            if process.poll() is not None:
+                pytest.fail("Helper exited before its externally released completion")
+            time.sleep(0.05)
+        assert process.poll() is None
+        assert "CODEX_STORAGE verified-copy-progress" in log.read_text(encoding="utf-8-sig")
+    finally:
+        release.touch()
+        stdout, stderr = process.communicate(timeout=30)
+    assert "SUMMARY" in stdout
+    assert "helper-finished" in log.read_text(encoding="utf-8-sig")
+    if helper_exit:
+        assert process.returncode != 0
+        assert "returned 7" in stderr
+    else:
+        assert process.returncode == 0, stderr
+
+
+@pytest.mark.skipif(os.name != "nt" or PWSH is None, reason="Windows PowerShell required")
+def test_installer_keeps_scheduler_owner_until_guarded_maintenance_finishes(tmp_path):
+    captured = tmp_path / "registered-task.xml"
+    wrapper = tmp_path / "install-wrapper.ps1"
+    wrapper.write_text(
+        "function Register-ScheduledTask { param($TaskPath, $TaskName, $Xml, [switch]$Force)\n"
+        " [IO.File]::WriteAllText($env:TEST_CAPTURE_XML, $Xml)\n}\n"
+        "& $env:TEST_INSTALL_SCRIPT -InstallRoot $env:TEST_INSTALL_ROOT\n", encoding="utf-8",
+    )
+    result = subprocess.run([PWSH, "-NoProfile", "-NonInteractive", "-File", str(wrapper)],
+                            capture_output=True, text=True, encoding="utf-8", timeout=30,
+                            env={**os.environ, "TEST_CAPTURE_XML": str(captured),
+                                 "TEST_INSTALL_SCRIPT": str(SCRIPT.with_name("install_storage_maintenance.ps1")),
+                                 "TEST_INSTALL_ROOT": str(tmp_path / "installed")})
+    assert result.returncode == 0, result.stderr
+    root = ET.fromstring(captured.read_text(encoding="utf-8"))
+    ns = {"t": "http://schemas.microsoft.com/windows/2004/02/mit/task"}
+    assert root.findtext("t:Settings/t:ExecutionTimeLimit", namespaces=ns) == "PT0S"
+    assert root.findtext("t:Settings/t:MultipleInstancesPolicy", namespaces=ns) == "IgnoreNew"
+    assert root.findtext("t:Principals/t:Principal/t:RunLevel", namespaces=ns) == "LeastPrivilege"
+    assert root.findtext("t:Triggers/t:CalendarTrigger/t:ScheduleByDay/t:DaysInterval", namespaces=ns) == "1"
 
 
 @pytest.mark.skipif(os.name != "nt" or PWSH is None, reason="Windows PowerShell required")
