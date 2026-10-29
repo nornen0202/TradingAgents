@@ -715,9 +715,10 @@ def test_market_packet_distinguishes_runtime_observed_analysis_from_configured_w
     assert provenance["market_analysis"]["observed_calls"] == 9
     assert "gpt-5.6-sol" in provenance["market_analysis"]["observed_models"]
     assert provenance["work_synthesis"]["requested_model"] == "gpt-6.1-sol"
-    assert provenance["work_synthesis"]["requested_reasoning_effort"] == "xhigh"
+    assert provenance["work_synthesis"]["requested_reasoning_effort"] == "high"
     assert provenance["work_synthesis"]["verification_status"] == "CONFIGURED_NOT_RUNTIME_VERIFIED"
     assert provenance["work_synthesis"]["observed_model"] is None
+    assert provenance["work_synthesis"]["observed_reasoning_effort"] is None
 
 
 def test_packet_integrity_rejects_body_tampering_without_reseal():
@@ -2821,7 +2822,7 @@ def test_scheduled_work_task_manifest_uses_gpt6_local_mode_and_unique_surfaces()
     for task in manifest["tasks"]:
         strategy = task["surface"] in {"kr", "us"}
         assert task["model"] == "gpt-6.1-sol"
-        assert task["reasoning_effort"] == ("xhigh" if strategy else "medium")
+        assert task["reasoning_effort"] == ("high" if strategy else "medium")
     boundary = manifest["capability_boundary"]
     assert boundary["local_archives_require_local_host"] is True
     assert boundary["chatgpt_web_direct_local_file_access"] is False
@@ -2867,7 +2868,8 @@ def test_work_skill_and_operations_doc_state_local_and_mobile_delivery_boundarie
         "https://help.openai.com/en/articles/10291617-scheduled-tasks-in-chatgpt"
         in operations
     )
-    assert "Scheduled Tasks는 공식적으로 Pro 모델을 지원하지 않는다" in operations
+    assert "설정값을 관측값으로 표현하지 않는다" in operations
+    assert "CONFIGURED_NOT_RUNTIME_VERIFIED" in operations
     assert "https://learn.chatgpt.com/docs/remote-connections" in operations
     assert "Plaintext 전략 Pages" in operations
     assert "tradingagents.work-report/v1" in operations
