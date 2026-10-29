@@ -736,6 +736,49 @@ Report the impact, confirmed cause, performed repair, verified result and any
 remaining action in Korean. For a healthy check, keep the result short. Preserve
 normal failure notifications; do not mute them to make the system appear healthy.
 Use the repository's existing notification pipeline for external delivery.
+
+### Runtime dependency alignment
+
+A merged dependency lock is not evidence that the installed local Python
+environment uses those versions. After adopting dependency changes, and during
+the first daily health review, export the current frozen lock with
+`uv export --frozen --no-dev --all-extras --no-hashes --no-emit-project` to a
+temporary constraints file. Run the production interpreter with
+`tools/check_runtime_constraints.py --constraints <export>` and separately run
+`python -m pip check`. The audit evaluates this interpreter's platform/Python
+markers, compares installed versions and reports absent optional constraints
+separately. ALIGNED covers only installed constrained packages; it does not
+prove dependency completeness, successful imports or service operation.
+
+For confirmed drift, stage and smoke-test the exact locked replacements first.
+Wait for the current research owner to finish; temporarily hold new scheduled
+starts and let existing workers drain without termination. Install only the
+required changes, rerun the audit, dependency and relevant import checks, then
+restore every previously enabled schedule even if the update fails. Preserve
+original analysis source snapshots and retry counters. Never hot-swap an active
+research process's environment or enable unused extras to make an audit green.
+Record actual before/after versions and observation clocks in the operations
+ledger. Do not add a dependency scan or package installation to the minute
+observation producer.
+
+### Hidden Windows review-service instances
+
+Include hidden tasks when checking the installed persistent review service:
+`Schedule.Service.GetRunningTasks(1)` and its `InstanceGuid`, `EnginePID` and
+action identify the actual scheduled owner. A default enumeration can omit this
+hidden task. Correlate that owner with the Python process chain and an HTTP 200
+response containing the expected TradingAgents read-only page at the configured
+loopback URL. A random listener or an old task result is insufficient evidence.
+Microsoft documents [hidden-instance enumeration](https://learn.microsoft.com/en-us/windows/win32/taskschd/displaying-task-names-and-state--c---)
+and the [IgnoreNew policy](https://learn.microsoft.com/en-us/windows/win32/api/taskschd/ne-taskschd-task_instances_policy).
+
+During the October 29 review, the actual instance remained running from 14:43
+across subsequent repeated-start refusals (`0x800710E0`), while the expected page
+returned HTTP 200 at 18:06. This supports an operational diagnosis of a refused
+duplicate start, not evidence of a stopped service. Preserve the raw result;
+do not clear it or restart a healthy owner merely to change the displayed code.
+The code alone never establishes health: absent owner, failed HTTP identity or
+lost responsiveness requires separate investigation.
 Do not send messages to unrelated chats or people. Ask the user only when a real
 missing permission, login or decision prevents the authorized repair.
 
