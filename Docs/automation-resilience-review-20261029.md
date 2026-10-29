@@ -277,7 +277,18 @@ still pass before any event or state advance. Safe typed blockers remain visible
 
 Guarded preparation can directly read its expected terminal producer only when
 the latest pointer equals the canonical manifest, its successful attempt and
-aware clocks agree, and the ready bundle names that same market/run. Otherwise
+aware clocks agree, and the bundle names that same market/run. Otherwise
 it retains full discovery and revalidation. This shortcut has no persistent
 cache, changes no input clock, and never renews validity. Independent sanitized
 YouTube and PRISM inputs are read concurrently at the same fixed cutoff.
+
+Live verification found a remaining slow path: a successful current overlay with
+an explicit `decision_ready=false` scanned every historical manifest to find a
+past executable reference. That scan could consume its original 120-second row
+validity even though all research and broker observations were valid. Exact
+producer preparation now also reads an explicitly non-executable current bundle
+directly. It leaves `last_ready` empty instead of discovering an unused historical
+reference. Ordinary discovery is unchanged. Missing or non-boolean readiness,
+pointer changes, unsuccessful attempts and invalid clocks still use the guarded
+fallback. Account/coverage/session/freshness checks still run before event creation
+and at publish; row gates, actions and original expiry are never promoted.
