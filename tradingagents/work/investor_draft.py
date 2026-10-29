@@ -31,6 +31,13 @@ def _time_label(value):
     return clock.astimezone(ZoneInfo("Asia/Seoul")).strftime("%m/%d %H:%M KST") if clock else "확인 불가"
 
 
+def _price_label(zone):
+    def number(value):
+        return f"{value:,.8f}".rstrip("0").rstrip(".")
+    low, high = number(zone["low"]), number(zone["high"])
+    return low if zone["low"] == zone["high"] else f"{low}–{high}"
+
+
 def compose_investor_draft(packet: dict, *, now: datetime) -> tuple[str, dict]:
     validate_packet(packet)
     body = packet["body"]
@@ -76,7 +83,7 @@ def compose_investor_draft(packet: dict, *, now: datetime) -> tuple[str, dict]:
             "portfolio_role": row.get("portfolio_role") or "watchlist",
             "thesis": thesis, "investment_plan": plan, "execution": deepcopy(row["execution"]),
             "source_contributions": [{"source": "tradingagents", "direction": "MAINTAIN",
-                                      "reason": "날짜가 검증된 원분석을 그대로 전달", "execution_gate_override": False}],
+                                      "reason": "날짜 검증 불가 원분석 제외; 자료 확인 필요" if plan["status"] == "DATA_NEEDED" else "날짜가 검증된 원분석을 그대로 전달", "execution_gate_override": False}],
         }
         matched = matches.get(_identity(row["ticker"]), [])
         strategy["source_contributions"].extend(matched)
@@ -115,8 +122,9 @@ def compose_investor_draft(packet: dict, *, now: datetime) -> tuple[str, dict]:
         plan = strategy["investment_plan"]
         zones = plan["price_zones"]
         focus = next((z for z in zones if z["level_type"] in {"STOP_LOSS", "INVALIDATION", "TRIM"}), zones[0] if zones else None)
-        zone_text = f" · 우선 확인 {focus['low']:g}–{focus['high']:g}" if focus else ""
-        lines.append(f"- **{strategy['ticker']} · {risks.get(plan['risk_action'], plan['risk_action']) if plan['purpose'] == 'RISK_REDUCTION' else labels.get(plan['stance'], plan['stance'])}**: {statuses[plan['status']]}{zone_text} · 검토일 {_time_label(plan['review_window']['review_by'])}")
+        zone_text = f" · 우선 확인 {_price_label(focus)}" if focus else ""
+        name = strategy.get("display_name") or strategy["ticker"]
+        lines.append(f"- **{name} · {risks.get(plan['risk_action'], plan['risk_action']) if plan['purpose'] == 'RISK_REDUCTION' else labels.get(plan['stance'], plan['stance'])}**: {statuses[plan['status']]}{zone_text} · 검토일 {_time_label(plan['review_window']['review_by'])}")
     missing = {key: value for key, value in coverage.items()
                if ('missing' in key or 'failed' in key or key == 'analysis_failures') and value}
     if missing:
@@ -134,7 +142,7 @@ def compose_investor_draft(packet: dict, *, now: datetime) -> tuple[str, dict]:
         if plan["price_zones"]:
             lines.extend(["| 가격 구간 | 용도 | 확인 기준 | 근거 |", "|---|---|---|---|"])
             for zone in plan["price_zones"]:
-                price = f"{zone['low']:g}" if zone['low'] == zone['high'] else f"{zone['low']:g}–{zone['high']:g}"
+                price = _price_label(zone)
                 basis = "원분석 구간" if zone['basis'] == 'SOURCE_RANGE' else "원분석 가격선" if zone['basis'] == 'SOURCE_LEVEL' else "정책상 1% 검토 여유폭; 주문 허용폭 아님"
                 lines.append(f"| {price} {_text(zone.get('currency')) if zone.get('currency') else ''} | {_text(zone['label']).replace('|', '/')} | {confirmations.get(zone['confirmation'], _text(zone['confirmation']))} | {basis} |")
         else:
