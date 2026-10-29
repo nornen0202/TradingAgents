@@ -255,3 +255,14 @@ operational receipt must still render. Retry checks wait for the new request
 generation to finish, so an earlier snapshot cannot satisfy a retry assertion.
 Failure diagnostics include the current overview, status and request generation.
 These changes do not relax UI assertions or alter production request deadlines.
+
+### Market date for performance inputs
+
+Performance tracking previously derived its price and outcome cutoff from the
+run timestamp's display timezone. A US run after KST midnight could therefore
+request and admit the next New York date; a KR run represented in UTC could use
+the previous Seoul date. Both operations now share the declared market's date.
+An undated timezone is rejected before recommendation recording or provider
+requests. Mock provider fixtures cover equivalent instants, both markets, empty
+responses, future/missing/invalid provider dates, and outcome cutoff agreement.
+Existing completed research and historical outcome records are not rewritten.

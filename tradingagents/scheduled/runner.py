@@ -3122,7 +3122,14 @@ def _run_performance_tracking(
 ) -> dict[str, Any]:
     db_path = config.performance.store_path or (config.storage.archive_dir / "performance.sqlite")
     try:
+        if started_at.tzinfo is None or started_at.utcoffset() is None:
+            raise ValueError("Performance tracking requires an aware analysis clock")
         performance_market = _performance_market_filter(config)
+        # The host/report timezone may already be on the next day while the
+        # US session is still open. Use one market date for price admission,
+        # due-selection and outcome calculation; never advance it to KST.
+        analysis_date = (_market_local_now(now=started_at, market=performance_market).date()
+                         if performance_market in {"US", "KR"} else started_at.date()).isoformat()
         recorded_this_run = record_run_recommendations(
             run_dir,
             db_path,
@@ -3143,7 +3150,7 @@ def _run_performance_tracking(
                     benchmark_ticker=config.performance.benchmark_ticker,
                     market=performance_market,
                     lookback_days=config.performance.price_lookback_days,
-                    asof_date=started_at.date().isoformat(),
+                    asof_date=analysis_date,
                 )
                 outcome_update.update(
                     {
@@ -3161,7 +3168,7 @@ def _run_performance_tracking(
                 elif price_result.has_prices:
                     update_action_outcomes(
                         db_path,
-                        asof_date=started_at.date().isoformat(),
+                        asof_date=analysis_date,
                         horizons=config.performance.outcome_horizons,
                         price_history=price_result.price_history,
                         refresh_window_days=config.performance.price_lookback_days,
