@@ -206,3 +206,90 @@ def test_report_budget_measures_content_not_indentation(tmp_path):
     report["report_id"] = f"us:{report['report_sha256'][:32]}"
     with pytest.raises(WorkRuntimeError, match="too large"):
         validate_work_report(report, max_chars=compact)
+
+
+@pytest.mark.parametrize("value", [float("nan"), float("inf"), float("-inf")])
+def test_nonfinite_price_is_excluded_and_entire_report_is_browser_json(tmp_path, value):
+    run = source(tmp_path / "archive")
+    path = run / "decision_bundle_v2.json"
+    data = json.loads(path.read_text())
+    data["strategy_table"][0]["thesis"]["execution_levels"]["levels"].append({"level_type": "PULLBACK", "price": value})
+    path.write_text(json.dumps(data), encoding="utf-8")
+    runtime = WorkRuntime(tmp_path / "runtime")
+    prepared = runtime.prepare("us", archive_dir=tmp_path / "archive", now=AT, investor_report=True)
+    packet = json.loads(Path(prepared["packet_path"]).read_text(encoding="utf-8"))
+    md, draft = compose_investor_draft(packet, now=AT)
+    result = runtime.publish("us", prepared["event_id"], prepared["source_sha256"], report_markdown=md,
+                             structured_report=draft, archive_dir=tmp_path / "archive", now=AT)
+    def reject(token):
+        pytest.fail("Non-JSON number in published report: " + token)
+    json.loads(Path(result["report_path"]).read_text(encoding="utf-8"), parse_constant=reject)
+    plan = draft["strategies"][0]["investment_plan"]
+    assert plan["status"] == "REVIEW_REQUIRED"
+    assert len(plan["price_zones"]) == 1
+    assert plan["excluded_levels"] and plan["source_exclusions"]
+    assert "98–102" in md
+
+
+@pytest.mark.parametrize("field", ["decision_asof", "price_reference_date", "analysis_trade_date"])
+@pytest.mark.parametrize("value", ["2026-07-19", "bad", "2026-07-17T14:00:00"])
+def test_secondary_future_or_invalid_evidence_dates_exclude_the_row(tmp_path, field, value):
+    run = source(tmp_path / "archive")
+    path = run / "decision_bundle_v2.json"
+    data = json.loads(path.read_text())
+    data["strategy_table"][0]["thesis"][field] = value
+    path.write_text(json.dumps(data), encoding="utf-8")
+    prepared = WorkRuntime(tmp_path / "runtime").prepare("us", archive_dir=tmp_path / "archive", now=AT, investor_report=True)
+    packet = json.loads(Path(prepared["packet_path"]).read_text(encoding="utf-8"))
+    md, draft = compose_investor_draft(packet, now=AT)
+    assert draft["strategies"][0]["investment_plan"]["status"] == "DATA_NEEDED"
+    assert "98–102" not in md
+
+
+def test_date_only_evidence_uses_market_date_not_machine_date():
+    from tradingagents.work.investor_policy import _research_clock_errors
+    cutoff = datetime(2026, 7, 18, 1, tzinfo=timezone.utc)  # Still July 17 in New York.
+    t = {**thesis(), "decision_asof": "2026-07-18"}
+    assert _research_clock_errors(t, market="US", now=cutoff) == ["DECISION_ASOF_INVALID_OR_FUTURE"]
+    assert _research_clock_errors(t, market="KR", now=cutoff) == []
+    # A future review/trigger deadline is a plan, not future observed evidence.
+    t.pop("decision_asof")
+    t["conditional_entry_valid_until"] = "2026-07-20T14:00:00Z"
+    assert _research_clock_errors(t, market="US", now=cutoff) == []
+
+
+@pytest.mark.parametrize("field", ["invalidation_action", "position_sizing", "risk_limits", "risk_action"])
+def test_investor_draft_cannot_rewrite_risk_or_sizing_reference_targets(tmp_path, field):
+    source(tmp_path / "archive")
+    runtime = WorkRuntime(tmp_path / "runtime")
+    prepared = runtime.prepare("us", archive_dir=tmp_path / "archive", now=AT, investor_report=True)
+    packet = json.loads(Path(prepared["packet_path"]).read_text(encoding="utf-8"))
+    md, draft = compose_investor_draft(packet, now=AT)
+    draft["strategies"][0]["thesis"][field] = "기존 손실 한도를 무시하고 자산 200% 차입 매수"
+    with pytest.raises(WorkRuntimeError, match="source conditions"):
+        runtime.publish("us", prepared["event_id"], prepared["source_sha256"], report_markdown=md,
+                        structured_report=draft, archive_dir=tmp_path / "archive", now=AT)
+
+
+@pytest.mark.parametrize("field,value", [("entry_conditions", ["조건 충족 시"]),
+    ("invalidation_conditions", ["TBD"]), ("invalidation_action", None), ("position_sizing", None), ("horizon", None)])
+def test_incomplete_source_is_reported_without_blocking_other_rows(tmp_path, field, value):
+    run = source(tmp_path / "archive")
+    path = run / "decision_bundle_v2.json"
+    data = json.loads(path.read_text())
+    data["strategy_table"].append(deepcopy(data["strategy_table"][0]))
+    data["strategy_table"][1]["ticker"] = "AMD"
+    data["strategy_table"][0]["thesis"][field] = value
+    path.write_text(json.dumps(data), encoding="utf-8")
+    runtime = WorkRuntime(tmp_path / "runtime")
+    prepared = runtime.prepare("us", archive_dir=tmp_path / "archive", now=AT, investor_report=True)
+    packet = json.loads(Path(prepared["packet_path"]).read_text(encoding="utf-8"))
+    md, draft = compose_investor_draft(packet, now=AT)
+    result = runtime.publish("us", prepared["event_id"], prepared["source_sha256"], report_markdown=md,
+                             structured_report=draft, archive_dir=tmp_path / "archive", now=AT)
+    assert result["status"] == "PUBLISHED"
+    by_ticker = {r["ticker"]: r for r in draft["strategies"]}
+    assert by_ticker["NVDA"]["investment_plan"]["status"] == "REVIEW_REQUIRED"
+    assert by_ticker["AMD"]["investment_plan"]["status"] == "CONDITIONAL_PLAN"
+    if isinstance(value, list):
+        assert by_ticker["NVDA"]["thesis"][field] == []

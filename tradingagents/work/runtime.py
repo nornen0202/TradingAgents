@@ -1290,6 +1290,10 @@ def _validate_report_draft(
         raise WorkRuntimeError(f"Structured Work report contains forbidden key: {forbidden}")
     if _find_sensitive_report_text(draft):
         raise WorkRuntimeError("Structured Work report contains a blocked secret, identifier, or local path")
+    try:
+        json.dumps(draft, allow_nan=False)
+    except (ValueError, OverflowError) as exc:
+        raise WorkRuntimeError("Structured Work report contains non-finite numbers; strict JSON is required") from exc
 
 
 def _validate_report_packet_coverage(

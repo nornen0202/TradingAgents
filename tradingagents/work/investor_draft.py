@@ -144,7 +144,7 @@ def compose_investor_draft(packet: dict, *, now: datetime) -> tuple[str, dict]:
                       f"**조건 훼손 시:** {_text(thesis.get('invalidation_action'))}", "",
                       f"**규모:** {_text(thesis.get('position_sizing'))}", "",
                       f"**거래 전 확인:** {_text(plan['before_acting'])}", ""])
-        if plan["excluded_levels"]:
+        if plan["excluded_levels"] or plan.get("source_exclusions"):
             lines.extend(["일부 가격선 또는 조건의 근거가 불완전해 재검토가 필요합니다. 확정된 주문 조건으로 사용하지 않습니다.", ""])
         if plan.get("source_trigger_valid_until"):
             lines.extend([f"원래 주문 트리거 유효시각: {plan['source_trigger_valid_until']} (검토 기간과 별개이며 자동 연장되지 않음)", ""])

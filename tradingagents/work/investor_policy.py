@@ -6,8 +6,9 @@ Review windows are editorial checkpoints, not claims that a thesis stays true.
 from __future__ import annotations
 
 from copy import deepcopy
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 import math
+from zoneinfo import ZoneInfo
 
 from tradingagents.dataflows.market_policy import aware_datetime
 from tradingagents.schemas.decision import explicit_price_range_conflicts
@@ -27,8 +28,83 @@ POLICY = {
 
 
 def _number(value):
-    return (float(value) if isinstance(value, (int, float)) and not isinstance(value, bool)
-            and math.isfinite(value) and value > 0 else None)
+    try:
+        return (float(value) if isinstance(value, (int, float)) and not isinstance(value, bool)
+                and math.isfinite(value) and value > 0 else None)
+    except OverflowError:
+        return None
+
+
+def _transport_value(value, exclusions: list[str], path=""):
+    """Keep partial source responses usable by JSON.parse, without NaN tokens."""
+    if isinstance(value, float) and not math.isfinite(value):
+        exclusions.append(path)
+        return None
+    if isinstance(value, dict):
+        return {key: _transport_value(item, exclusions, f"{path}/{key}") for key, item in value.items()}
+    if isinstance(value, list):
+        return [_transport_value(item, exclusions, f"{path}/{index}") for index, item in enumerate(value)]
+    return value
+
+
+def _research_clock_errors(thesis: dict, *, market: str, now: datetime) -> list[str]:
+    errors = []
+    available = aware_datetime(thesis.get("analysis_asof"))
+    if available is None or available > now:
+        errors.append("ANALYSIS_ASOF_INVALID_OR_FUTURE")
+    local_date = now.astimezone(ZoneInfo("America/New_York" if market.upper() == "US" else "Asia/Seoul")).date()
+    # Availability, decision date and referenced price date are different. A
+    # valid availability timestamp must not legitimize future dated evidence.
+    # Optional absent legacy date labels do not override the required clock.
+    for field in ("decision_asof", "price_reference_date", "analysis_trade_date"):
+        raw = thesis.get(field)
+        if raw in (None, ""):
+            continue
+        try:
+            if isinstance(raw, str) and len(raw) == 10:
+                valid = date.fromisoformat(raw) <= local_date
+            else:
+                clock = aware_datetime(raw)
+                valid = clock is not None and clock <= now
+        except (ValueError, TypeError):
+            valid = False
+        if not valid:
+            errors.append(field.upper() + "_INVALID_OR_FUTURE")
+    return errors
+
+
+def _normalize_thesis(thesis: dict, exclusions: list[str]) -> None:
+    from .runtime import WorkRuntimeError, _validate_condition_list, _has_meaningful_contract_value
+    for field in ("entry_conditions", "invalidation_conditions"):
+        values = thesis.get(field)
+        if not isinstance(values, list):
+            values = []
+            exclusions.append(field + ":MISSING_CONDITIONS")
+        accepted = []
+        for index, value in enumerate(values):
+            try:
+                _validate_condition_list([value], ticker="source", field=field, require_anchor=False)
+            except WorkRuntimeError:
+                exclusions.append(f"{field}/{index}:UNUSABLE_CONDITION")
+            else:
+                accepted.append(value)
+        thesis[field] = accepted
+    for field, fallback in (
+        ("invalidation_action", "무효화·축소 조건을 먼저 확인하고 계획을 재평가"),
+        ("position_sizing", "수량 산출 없음; 현재 보유·현금·위험 한도로 결정"),
+        ("horizon", "원분석 기간 미지정; 표시된 검토일까지 재평가"),
+    ):
+        if not _has_meaningful_contract_value(thesis.get(field)):
+            thesis[field] = fallback
+            exclusions.append(field + ":SOURCE_VALUE_UNAVAILABLE")
+    confidence = thesis.get("confidence")
+    if (isinstance(confidence, bool) or not isinstance(confidence, (int, float))
+            or not 0 <= confidence <= 1):
+        thesis["confidence"] = 0.0
+        thesis["confidence_note"] = "원분석 신뢰도 미제공 또는 형식 오류; 0은 미확인 표시"
+        exclusions.append("confidence:SOURCE_VALUE_UNAVAILABLE")
+    if not thesis["entry_conditions"] or not thesis["invalidation_conditions"]:
+        thesis["data_needed_reason"] = "원분석의 사용 가능한 진입 또는 무효화 조건이 없어 임의 보충하지 않음"
 
 
 def price_zones(thesis: dict) -> tuple[list[dict], list[str]]:
@@ -38,7 +114,12 @@ def price_zones(thesis: dict) -> tuple[list[dict], list[str]]:
     stance remain binding; being inside a zone alone does not mean buy.
     """
     zones, excluded = [], []
-    levels = (thesis.get("execution_levels") or {}).get("levels") or []
+    execution_levels = thesis.get("execution_levels")
+    if execution_levels is not None and not isinstance(execution_levels, dict):
+        return [], ["INVALID_EXECUTION_LEVELS"]
+    levels = (execution_levels or {}).get("levels") or []
+    if not isinstance(levels, list):
+        return [], ["INVALID_PRICE_LEVELS"]
     for index, level in enumerate(levels):
         if not isinstance(level, dict):
             excluded.append(f"level_{index}:INVALID_LEVEL")
@@ -88,7 +169,7 @@ def investment_plan(row: dict, *, now: datetime) -> dict:
     reducing = stance in {"REDUCE", "SELL"} or risk in {"REDUCE_RISK", "STOP_LOSS", "EXIT", "TAKE_PROFIT"}
     return {
         "schema": "tradingagents.investment-plan/v1",
-        "status": "DATA_NEEDED" if not dated else "REVIEW_REQUIRED" if now >= review or exclusions else "CONDITIONAL_PLAN",
+        "status": "DATA_NEEDED" if not dated else "REVIEW_REQUIRED" if now >= review or exclusions or row.get("investor_exclusions") else "CONDITIONAL_PLAN",
         "stance": stance,
         "risk_action": risk if dated else "NONE",
         "purpose": "RISK_REDUCTION" if reducing else "ENTRY_REVIEW" if stance == "BUY" else "MONITOR",
@@ -99,6 +180,7 @@ def investment_plan(row: dict, *, now: datetime) -> dict:
         "source_trigger_valid_until": thesis.get("conditional_entry_valid_until") if dated else None,
         "price_zones": zones,
         "excluded_levels": exclusions,
+        "source_exclusions": list(row.get("investor_exclusions") or []),
         "conditions_ref": "/thesis/entry_conditions",
         "invalidation_conditions_ref": "/thesis/invalidation_conditions",
         "invalidation_action_ref": "/thesis/invalidation_action",
@@ -121,12 +203,18 @@ def project_investor_body(body: dict, *, now: datetime) -> dict:
     # report-only consumer must not inherit a stale order ticket as advice.
     if current.pop("private_portfolio_overlay", None) is not None:
         current["private_execution_overlay_omitted"] = True
+    transport_exclusions = []
+    result = _transport_value(result, transport_exclusions)
+    current = result.get("current") or {}
+    current["transport_exclusions"] = transport_exclusions
     rows = (current.get("bundle") or {}).get("strategy_table") or []
-    for row in rows:
+    for index, row in enumerate(rows):
         thesis = row.get("thesis") or {}
-        analysis = aware_datetime(thesis.get("analysis_asof"))
+        clock_errors = _research_clock_errors(thesis, market=str(result.get("market") or ""), now=now)
         quote = aware_datetime(row.get("market_data_asof"))
-        if analysis is None or analysis > now:
+        exclusions = ["NON_FINITE_SOURCE_VALUE:" + path for path in transport_exclusions
+                      if path.startswith(f"/current/bundle/strategy_table/{index}/")]
+        if clock_errors:
             # Excluded source text must not leak into the composition as evidence.
             keep = {k: row[k] for k in ("ticker", "display_name", "portfolio_role", "is_held",
                                        "display_priority", "quality", "execution") if k in row}
@@ -135,7 +223,8 @@ def project_investor_body(body: dict, *, now: datetime) -> dict:
             row["thesis"] = {"stance": "RESEARCH", "confidence": 0.0, "analysis_asof": None,
                              "entry_conditions": [], "invalidation_conditions": [],
                              "invalidation_action": "분석 기준시각 확인 후 계획 재작성",
-                             "data_needed_reason": "원분석 기준시각이 없거나 잘못됐거나 미래여서 근거에서 제외"}
+                             "data_needed_reason": "원분석·의사결정·가격 기준시각이 없거나 잘못됐거나 미래여서 근거에서 제외"}
+            exclusions.extend(clock_errors)
         elif quote is None or quote > now:
             for field in ("last_price", "session_vwap", "relative_volume", "day_high", "day_low",
                           "price_change_pct", "vwap_distance_pct", "spread_bps", "trading_value",
@@ -143,6 +232,8 @@ def project_investor_body(body: dict, *, now: datetime) -> dict:
                           "sync_summary_ko", "vwap_position_ko"):
                 row.pop(field, None)
             row["data_status_ko"] = "시각 미검증 시세 제외; 별도 날짜가 검증된 분석만 사용"
+        row["investor_exclusions"] = exclusions
+        _normalize_thesis(row["thesis"], exclusions)
         plan = investment_plan(row, now=now)
         row["investment_plan"] = plan
         execution = row.setdefault("execution", {})
@@ -168,8 +259,9 @@ def validate_investor_draft(draft: dict, packet: dict, *, now: datetime) -> None
         row = rows.get(strategy.get("ticker"), {})
         if strategy.get("investment_plan") != row.get("investment_plan"):
             raise WorkRuntimeError("Investor plan must match the dated packet price zones and review window")
-        for field in ("stance", "risk_action", "conditional_entry_valid_until",
-                      "entry_conditions", "invalidation_conditions", "execution_levels"):
+        for field in ("stance", "risk_action", "risk_action_level", "risk_action_reason", "risk_limits",
+                      "conditional_entry_valid_until", "entry_conditions", "invalidation_conditions",
+                      "execution_levels", "invalidation_action", "position_sizing", "profit_taking_plan", "horizon"):
             if (strategy.get("thesis") or {}).get(field) != (row.get("thesis") or {}).get(field):
                 raise WorkRuntimeError("Investor plan source conditions and levels must match the prepared packet")
         execution = strategy.get("execution") or {}
@@ -182,6 +274,10 @@ def publication_notice(packet: dict) -> str:
     current = packet.get("body", {}).get("current", {})
     receipt = current.get("freshness_receipt") or {}
     coverage = current.get("universe_coverage") or {}
-    coverage_label = {"COMPLETE": "전체 범위 확보", "INCOMPLETE": "일부 누락", "UNVERIFIED": "범위 미확인"}.get(coverage.get("status"), "범위 미확인")
+    coverage_label = {"COMPLETE": "전체 종목 수신", "INCOMPLETE": "일부 누락", "UNVERIFIED": "범위 미확인"}.get(coverage.get("status"), "범위 미확인")
+    rows = (current.get("bundle") or {}).get("strategy_table") or []
+    excluded = sum((row.get("investment_plan") or {}).get("status") == "DATA_NEEDED" for row in rows)
+    if excluded:
+        coverage_label += f" · 날짜 검증 불가 {excluded}종목 근거 제외"
     return (f"**원분석 기준 {receipt.get('analysis_trade_date_latest') or '확인 불가'} · {coverage_label}**\n\n"
             "지연 시세로 읽는 조건부 계획입니다. 거래 전 현재 가격·무효화 조건을 확인하세요.\n\n")
