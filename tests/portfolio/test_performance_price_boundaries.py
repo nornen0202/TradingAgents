@@ -118,3 +118,65 @@ def test_runner_distinguishes_complete_and_partial_price_updates(tmp_path, monke
     assert result['outcome_update']['updated'] is complete
     assert result['status'] == ('ok' if complete else 'recorded_pending_outcomes')
     assert result['outcome_update']['missing_price_tickers'] == ([] if complete else ['MSFT'])
+
+
+@pytest.mark.parametrize('market,started,expected', [
+    ('US', '2026-10-30T02:00:00+09:00', '2026-10-29'),
+    ('US', '2026-10-29T17:00:00+00:00', '2026-10-29'),
+    ('US', '2026-10-30T14:00:00+09:00', '2026-10-30'),
+    ('KR', '2026-10-29T17:00:00+00:00', '2026-10-30'),
+])
+@pytest.mark.parametrize('empty', [False, True])
+def test_runner_prices_and_outcomes_share_market_date_at_midnight(tmp_path, monkeypatch, market, started, expected, empty):
+    config_path = tmp_path / 'config.toml'
+    config_path.write_text(f'[run]\ntickers=["AAPL"]\nmarket="{market}"\n'
+        '[storage]\narchive_dir="./archive"\nsite_dir="./site"\n'
+        '[performance]\nenabled=true\nupdate_outcomes_on_run=true\nprice_provider="yfinance"\n')
+    config = load_scheduled_config(config_path)
+    run_dir = tmp_path / 'run'
+    run_dir.mkdir()
+    monkeypatch.setattr(runner, 'record_run_recommendations', Mock(return_value=1))
+    monkeypatch.setattr(runner, 'summarize_action_performance', Mock(return_value={'recommendations': 1}))
+    frame = pd.DataFrame() if empty else pd.DataFrame({('Close', 'AAPL'): [100, 101, 102, 103]},
+        index=['2026-10-29', '2026-10-30', None, 'not-a-date'])
+    download = Mock(return_value=frame)
+    monkeypatch.setitem(sys.modules, 'yfinance', SimpleNamespace(download=download))
+    seen = {}
+
+    def load(*args, **kwargs):
+        seen['price_date'] = kwargs['asof_date']
+        history, _ = prices._fetch_yfinance_price_history(['AAPL'], benchmark_ticker=None,
+            lookback_days=5, asof_date=kwargs['asof_date'])
+        seen['history'] = history
+        return prices.PriceHistoryLoadResult(price_history=history, provider='yfinance',
+            due_recommendation_ids=(1,), required_tickers=('AAPL',))
+
+    monkeypatch.setattr(runner, 'load_price_history_for_recommendations', load)
+    update = Mock()
+    monkeypatch.setattr(runner, 'update_action_outcomes', update)
+    result = runner._run_performance_tracking(config=config, run_dir=run_dir,
+        started_at=datetime.fromisoformat(started))
+    assert seen['price_date'] == expected
+    if empty:
+        update.assert_not_called()
+        assert result['status'] == 'recorded_pending_outcomes'
+    else:
+        assert all(row['date'] <= expected for row in seen['history']['AAPL'])
+        assert update.call_args.kwargs['asof_date'] == expected
+        assert len(seen['history']['AAPL']) == (1 if expected == '2026-10-29' else 2)
+
+
+def test_performance_runner_rejects_naive_clock_before_recording_or_price_requests(tmp_path, monkeypatch):
+    config_path = tmp_path / 'config.toml'
+    config_path.write_text('[run]\ntickers=["AAPL"]\nmarket="US"\n'
+        '[storage]\narchive_dir="./archive"\nsite_dir="./site"\n')
+    config = load_scheduled_config(config_path)
+    record = Mock(side_effect=AssertionError('unverifiable clock must not record'))
+    fetch = Mock(side_effect=AssertionError('unverifiable clock must not fetch'))
+    monkeypatch.setattr(runner, 'record_run_recommendations', record)
+    monkeypatch.setattr(runner, 'load_price_history_for_recommendations', fetch)
+    result = runner._run_performance_tracking(config=config, run_dir=tmp_path,
+        started_at=datetime(2026, 10, 30, 2))
+    assert result['status'] == 'failed'
+    record.assert_not_called()
+    fetch.assert_not_called()
