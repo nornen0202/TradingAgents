@@ -1,0 +1,414 @@
+{
+  "version": 4,
+  "video_id": "pS_xJ_sKTwE",
+  "title": "\"변수 투성이 상황\" 조심해야 하는 이유 | 김진엽 하나증권 PB [더블 크루]",
+  "url": "https://www.youtube.com/watch?v=pS_xJ_sKTwE",
+  "channel": "삼프로TV 3PROTV",
+  "channel_id": "UChlv4GSd7OQl3js-jkLOnFA",
+  "source_url": "https://www.youtube.com/@3protv/videos",
+  "thumbnail_url": "https://i.ytimg.com/vi/pS_xJ_sKTwE/maxresdefault.jpg",
+  "published_at": "2026-10-28T02:20:38+00:00",
+  "status": "asr_uncertain",
+  "strategy_source_tier": "STANDARD",
+  "strategy_evidence_weight": "STANDARD",
+  "strategy_validation_policy": "STANDARD_REVIEW",
+  "transcript_status": "available",
+  "transcript_source": "automatic",
+  "transcript_chars": 7237,
+  "transcript_quality": {
+    "status": "good",
+    "score": 1.0,
+    "warnings": [],
+    "source": "automatic",
+    "language": "Korean",
+    "model_or_format": "json3",
+    "chars": 7237,
+    "segments": 405,
+    "duration_seconds": 887,
+    "repeated_ngram_ratio": 0.0
+  },
+  "generated_at": "2026-10-29T07:16:04.252027+09:00",
+  "llm_status": "success",
+  "research_status": "success",
+  "claim_verification_status": "success",
+  "research_pipeline_version": 4,
+  "evidence_count": 8,
+  "claim_status_summary": {
+    "partially_supported": 5,
+    "asr_uncertain": 2,
+    "unverified": 4,
+    "supported": 1
+  },
+  "claims": [
+    {
+      "claim_id": "C1",
+      "claim_text": "방송은 오늘 SK하이닉스 실적, 내일 삼성전자 실적·FOMC, 오늘 이스라엘 선거 결과, 다음 주 미국 중간선거를 언급한다.",
+      "status": "partially_supported",
+      "confidence": 0.9,
+      "supporting_evidence_ids": [
+        "E4",
+        "E5",
+        "E6"
+      ],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.84,
+      "asr_confidence": 0.7,
+      "numeric_parse": {
+        "claimed": "오늘·내일·다음 주의 상대 일정",
+        "observed": "2026-10-28 09:54 사이드카 보도만 일정 단서로 확인"
+      },
+      "investor_implication": "업로드일을 기준으로 오늘·내일·다음 주를 모두 확정해 투자 일정을 구성하지 않는다."
+    },
+    {
+      "claim_id": "C2",
+      "claim_text": "전일 코스피가 5,650이며 10월 초 고점 대비 약 19% 하락했다.",
+      "status": "partially_supported",
+      "confidence": 0.9,
+      "supporting_evidence_ids": [
+        "E5"
+      ],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.88,
+      "asr_confidence": 0.5,
+      "numeric_parse": {
+        "claimed": "전일 5,650; 고점 대비 약 -19%",
+        "observed": "E5에서 계산한 전일 종가 5,638.34; 고점 대비 하락률 확인 불가"
+      },
+      "investor_implication": "낙폭을 투자 판단에 사용하기 전에 고점의 날짜와 장중·종가 기준을 확인해야 한다."
+    },
+    {
+      "claim_id": "C3",
+      "claim_text": "일평균 거래대금이 6월 약 50조 원에서 10월 약 20조 원, 최근 약 15조 원으로 감소했고 얇은 호가가 변동성을 키운다.",
+      "status": "asr_uncertain",
+      "confidence": 0.95,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.88,
+      "asr_confidence": 0.45,
+      "numeric_parse": {
+        "claimed": "6월 50조 원; 10월 20조 원; 최근 15조 원; 직전 두 날 모두 15조 원인데 증가",
+        "observed": "비교 가능한 거래대금 자료 없음"
+      },
+      "investor_implication": "50조·20조·15조 원을 확정 통계로 인용하거나 유동성 고갈의 직접 증거로 사용하지 않는다."
+    },
+    {
+      "claim_id": "C4",
+      "claim_text": "8월 이후 외국인 매도가 전기전자·삼성전자·SK하이닉스에 집중됐고 다른 업종으로의 이동은 불분명하다. 당일 외국인·기관 동반 매수와 향후 최소 5거래일의 수급 개선·업종 확산 확인을 언급한다.",
+      "status": "partially_supported",
+      "confidence": 0.87,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.88,
+      "asr_confidence": 0.75,
+      "numeric_parse": {
+        "claimed": "8월 이후 매도; 최소 5거래일 개선 확인",
+        "observed": "단일 반등일의 외국인·기관 매수 보도만 제공; 기간별 수급 수치 없음"
+      },
+      "investor_implication": "하루의 동반 매수를 지속적 외국인 복귀로 해석하지 말고 현물·업종별 수급을 구분해 확인한다."
+    },
+    {
+      "claim_id": "C5",
+      "claim_text": "최근 급락 과정에서 신용잔고가 약 4조 원 감소했다.",
+      "status": "unverified",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.88,
+      "asr_confidence": 0.78,
+      "numeric_parse": {
+        "claimed": "신용잔고 약 4조 원 감소",
+        "observed": "잔고 관측값 없음"
+      },
+      "investor_implication": "4조 원 감소를 반대매매 규모 또는 매물 소진의 근거로 사용하지 않는다."
+    },
+    {
+      "claim_id": "C6",
+      "claim_text": "방송 중 삼성전자 보통주 약 6%, 우선주 약 10%, SK하이닉스 5% 초과 상승을 언급한다.",
+      "status": "unverified",
+      "confidence": 0.97,
+      "supporting_evidence_ids": [
+        "E6"
+      ],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.9,
+      "asr_confidence": 0.82,
+      "numeric_parse": {
+        "claimed": "005930 약 +6%; 005935 약 +10%; 000660 >+5%",
+        "observed": "개별 종목 장중 등락률 없음; 반도체주 급등 보도만 확인"
+      },
+      "investor_implication": "해당 수치는 미검증 장중 발언으로만 표기하고 종가 수익률로 제시하지 않는다."
+    },
+    {
+      "claim_id": "C7",
+      "claim_text": "당일 오전 9시 54분 매수 사이드카가 발동했다.",
+      "status": "supported",
+      "confidence": 0.97,
+      "supporting_evidence_ids": [
+        "E4",
+        "E5",
+        "E6"
+      ],
+      "manual_check_required": false,
+      "timestamp": "00:06:45",
+      "source_confidence": 0.88,
+      "asr_confidence": 0.9,
+      "numeric_parse": {
+        "claimed": "당일 09:54 매수 사이드카",
+        "observed": "2026-10-28 09:54경 유가증권시장 매수 사이드카"
+      },
+      "investor_implication": "해당 시장의 강한 장중 상승을 보여 주는 사건이지만 추세 전환이나 상승 지속을 보장하지 않는다."
+    },
+    {
+      "claim_id": "C8",
+      "claim_text": "삼성전자 실적 발표가 내일이며 실적·주주환원 지속성이 외국인 복귀 판단에 중요하다.",
+      "status": "unverified",
+      "confidence": 0.97,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.94,
+      "asr_confidence": 0.9,
+      "numeric_parse": {
+        "claimed": "녹화일 다음 날 실적 발표; 내년 상반기까지 지속성 확인",
+        "observed": "발표일 및 해당 기간 실적·주주환원 자료 없음"
+      },
+      "investor_implication": "잠정실적·확정실적·컨퍼런스콜 일정을 구분하고 배당·자사주 내용은 실제 공시로 확인한다."
+    },
+    {
+      "claim_id": "C9",
+      "claim_text": "당일 SK하이닉스 호실적과 2029년·2030년까지라는 LTA가 반등을 뒷받침했다.",
+      "status": "partially_supported",
+      "confidence": 0.92,
+      "supporting_evidence_ids": [
+        "E4",
+        "E6"
+      ],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.87,
+      "asr_confidence": 0.55,
+      "numeric_parse": {
+        "claimed": "LTA 2030년·2029년까지; 실적 수치 미제시",
+        "observed": "호실적·반등 보도만 확인; 계약 기간 및 실적 수치 없음"
+      },
+      "investor_implication": "호실적 보도와 장기계약의 확정 조건을 분리하고 LTA 연도를 수요·매출 보장의 근거로 사용하지 않는다."
+    },
+    {
+      "claim_id": "C10",
+      "claim_text": "미국 국채금리·유가가 단기 진정됐으나 전쟁·금리·정치 일정·AI 불확실성이 남아 반등 지속을 확신하기 어렵다.",
+      "status": "unverified",
+      "confidence": 0.98,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.84,
+      "asr_confidence": 0.8,
+      "numeric_parse": {
+        "claimed": "금리·유가 단기 진정; 구체적 수치 없음",
+        "observed": "비교 가능한 금리·유가 자료 없음"
+      },
+      "investor_implication": "보수적 견해의 사실 전제가 검증되지 않았으므로 구체적인 금리·유가 관측값과 이벤트를 별도로 확인한다."
+    },
+    {
+      "claim_id": "C11",
+      "claim_text": "이번 FOMC는 동결 가능성이 높고 의장 발언이 중요하며, 월가 전문가가 12월 1회·내년 2회 금리 인상을 예상했다는 뉴스를 인용한다.",
+      "status": "asr_uncertain",
+      "confidence": 0.95,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:06:45",
+      "source_confidence": 0.84,
+      "asr_confidence": 0.45,
+      "numeric_parse": {
+        "claimed": "12월 추가 인상 1회; 내년 인상 2회; 이번 회의 동결 우세",
+        "observed": "원기사·전문가·당시 확률 없음; 인상·인하 원음 미확인"
+      },
+      "investor_implication": "12월·내년 금리 경로를 확정 전망이나 시장 합의로 전달하지 않는다."
+    },
+    {
+      "claim_id": "C12",
+      "claim_text": "반도체 비중 90%인 투자자를 예시로 들어 추가 반등 시 일부 현금화와 포트폴리오 재정비를 조언한다.",
+      "status": "partially_supported",
+      "confidence": 0.9,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:13:07",
+      "source_confidence": 0.97,
+      "asr_confidence": 0.78,
+      "numeric_parse": {
+        "claimed": "반도체 비중 90%인 투자자 예시",
+        "observed": "추출문에 90% 예시가 있으나 실제 보유자료 없음"
+      },
+      "investor_implication": "집중도 완화에 관한 조건부 의견으로 전달하며 모든 투자자에게 적용되는 매도 신호로 일반화하지 않는다."
+    }
+  ],
+  "entities": [
+    {
+      "ticker": "^KS11",
+      "name": "한국 증시·코스피 및 수급",
+      "status": "unverified",
+      "claims": [
+        "최근 반등만으로 바닥이나 상승 추세 전환을 확정하기 어렵고, 거래대금 감소와 얇은 호가는 상승·하락 변동성을 키울 수 있다는 주장이다.",
+        "외국인 현물 순매수의 지속과 반도체에서 소부장·전력 등으로의 상승 확산을 확인해야 한다.",
+        "외국인 매도는 삼성전자·SK하이닉스 중심 전기전자 업종에 집중됐으며, 다른 업종으로의 유의미한 자금 이동은 뚜렷하지 않았다는 설명이다."
+      ],
+      "numeric_claims": [
+        "10월 초 고점 대비 전일 지수가 약 19% 하락했으며 전일 지수 수준을 '5,650'으로 언급했다. 수치 재확인이 필요하다.",
+        "일평균 거래대금이 6월 약 50조 원에서 10월 약 20조 원으로 감소했고, 최근 거래일은 약 15조 원 수준이라고 발언했다.",
+        "외국인이 8월부터 지속적으로 매도했으며, 최근 급락 과정에서 신용잔고가 약 4조 원 감소했다고 설명했다."
+      ],
+      "verification_notes": [
+        "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+      ],
+      "market_snapshot": {
+        "ticker": "^KS11",
+        "as_of": "2026-10-28T23:00:04.755139+00:00",
+        "current_price": 6012.44,
+        "market_cap": null,
+        "forward_pe": null,
+        "trailing_pe": null,
+        "fifty_two_week_high": 9385.59,
+        "fifty_two_week_low": 0.0,
+        "average_target_price": null,
+        "source": "yfinance",
+        "status": "verified"
+      },
+      "external_context_status": "verified"
+    },
+    {
+      "ticker": "005930",
+      "name": "삼성전자",
+      "status": "unverified",
+      "claims": [
+        "방송 중 큰 폭으로 반등했지만, 출연자는 단기 주가 상승만으로 추세 전환을 판단하기 어렵다고 봤다."
+      ],
+      "numeric_claims": [
+        "방송 당일 삼성전자 보통주가 약 6%, 우선주가 약 10% 가까이 상승했다고 언급했다.",
+        "삼성전자 실적 발표를 방송 기준 '내일'의 주요 일정으로 언급했다."
+      ],
+      "verification_notes": [
+        "시장 데이터 조회 실패: no_usable_market_fields"
+      ],
+      "market_snapshot": {
+        "ticker": "005930",
+        "as_of": "2026-10-28T23:00:06.008745+00:00",
+        "current_price": null,
+        "market_cap": null,
+        "forward_pe": null,
+        "trailing_pe": null,
+        "fifty_two_week_high": null,
+        "fifty_two_week_low": null,
+        "average_target_price": null,
+        "source": "yfinance",
+        "status": "unverified"
+      },
+      "external_context_status": "verified"
+    },
+    {
+      "ticker": "000660",
+      "name": "SK하이닉스",
+      "status": "unverified",
+      "claims": [
+        "방송 당일 실적 호조가 시장과 반도체 주가 반등에 기여했다는 평가다.",
+        "진행자는 장기계약으로 보이는 LTA와 실적 수치가 반등을 뒷받침했다고 해석했다."
+      ],
+      "numeric_claims": [
+        "방송 중 SK하이닉스 주가가 5% 넘게 상승했다고 언급했다.",
+        "LTA 관련 기간으로 '2030년, 2029년까지'를 연이어 언급했으나 정확한 만기와 계약 내용은 불명확하다."
+      ],
+      "verification_notes": [
+        "시장 데이터 조회 실패: no_usable_market_fields"
+      ],
+      "market_snapshot": {
+        "ticker": "000660",
+        "as_of": "2026-10-28T23:00:09.331319+00:00",
+        "current_price": null,
+        "market_cap": null,
+        "forward_pe": null,
+        "trailing_pe": null,
+        "fifty_two_week_high": null,
+        "fifty_two_week_low": null,
+        "average_target_price": null,
+        "source": "yfinance",
+        "status": "unverified"
+      },
+      "external_context_status": "verified"
+    }
+  ],
+  "evidence": [
+    {
+      "evidence_id": "E1",
+      "claim_id": "C1",
+      "title": "Dow Jones Futures: Microsoft Rises Late, But Google, ServiceNow, Fortinet Dive On Earnings",
+      "source_url": "https://finance.yahoo.com/m/6c0b166b-19af-3d40-b6ff-7c6d65d3c4da/dow-jones-futures%3A-microsoft.html",
+      "publisher": "Investor's Business Daily",
+      "published_at": "2026-10-28T22:45:06+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "Dow Jones Futures: Microsoft Rises Late, But Google, ServiceNow, Fortinet Dive On Earnings Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 20..."
+    },
+    {
+      "evidence_id": "E2",
+      "claim_id": "C1",
+      "title": "Intel to report Q3 earnings as chip stocks continue to rebound",
+      "source_url": "https://finance.yahoo.com/technology/article/intel-to-report-q3-earnings-as-chip-stocks-continue-to-rebound-221713961.html",
+      "publisher": "Yahoo Finance",
+      "published_at": "2026-10-28T22:17:13+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "Intel to report Q3 earnings as chip stocks continue to rebound Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 2026 Elections Weather Newslet..."
+    },
+    {
+      "evidence_id": "E4",
+      "claim_id": "C7",
+      "title": "코스피, SK하이닉스 호실적 업고 6% '껑충'…6000선 회복 마감",
+      "source_url": "https://www.newsworks.co.kr/news/articleView.html?idxno=901142",
+      "publisher": "Naver News",
+      "published_at": "2026-10-28T16:04:00+09:00",
+      "source_tier": "news",
+      "excerpt": "코스피가 6000선 위에서 장을 마친 건 종가 기준 지난 10월 14일(6008.81) 이후 10거래일 만이다. 한국거래소는 이날 오전 9시 54분 유가증권시장 프로그램매매 매수호가 효력정지(매수 사이드카)를 발동시켰다...."
+    },
+    {
+      "evidence_id": "E5",
+      "claim_id": "C7",
+      "title": "코스피, 반도체 훈풍에 6.6%↑…열흘만에 6000선 회복",
+      "source_url": "https://www.g-enews.com/view.php?ud=202610281546503090923c501012_1",
+      "publisher": "Naver News",
+      "published_at": "2026-10-28T16:00:00+09:00",
+      "source_tier": "news",
+      "excerpt": "28일 한국거래소에 따르면 코스피 지수는 전 거래일에서 6.63%(374.10포인트) 상승한 6012.44로 마감했다.... 85로 개장 후 오전 9시 54분께 5% 급등하며 매수 사이드카가 발동되기도 했다. 코스피 반등의 열쇠로..."
+    },
+    {
+      "evidence_id": "E7",
+      "claim_id": "C10",
+      "title": "Australian Uranium Stocks To Watch In October 2026",
+      "source_url": "https://finance.yahoo.com/energy/articles/australian-uranium-stocks-watch-october-220738571.html",
+      "publisher": "Simply Wall St.",
+      "published_at": "2026-10-28T22:07:38+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    },
+    {
+      "evidence_id": "E8",
+      "claim_id": "C11",
+      "title": "If You Invested $1,000 in NRG Energy 10 Years Ago, Even This Year’s Sell-Off Wouldn’t Erase Your Gains",
+      "source_url": "https://finance.yahoo.com/markets/stocks/articles/invested-1-000-nrg-energy-184715804.html",
+      "publisher": "24/7 Wall St.",
+      "published_at": "2026-10-28T18:47:15+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    }
+  ],
+  "source_policy": {
+    "raw_transcript_published": false,
+    "raw_transcript_in_evidence": false,
+    "research_pipeline_version": 4,
+    "closed_source_claims": "unverified_external_source",
+    "auto_caption_warning": true,
+    "local_asr_warning": false
+  }
+}

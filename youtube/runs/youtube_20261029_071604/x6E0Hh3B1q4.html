@@ -1,0 +1,848 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YouTube 투자자용 검증 리포트 - MS·구글·아마존은 왜 다른가…AI 투자 부담 견디게 하는 &#x27;돈 버는 구조&#x27;ㅣ명민준, 박가영, 송재경 [주린이 구조대]</title>
+  <style>
+:root {
+  color-scheme: light;
+  --bg: #f7f8fb;
+  --panel: #ffffff;
+  --text: #172033;
+  --muted: #667085;
+  --line: #d9dee8;
+  --accent: #0f766e;
+  --accent-2: #2563eb;
+  --warn: #b45309;
+  --bad: #b42318;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0 56px; }
+a { color: var(--accent-2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.hero { padding: 28px 0 22px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+.hero.compact { padding-top: 12px; }
+.hero h1 { margin: 0; font-size: clamp(28px, 4vw, 44px); line-height: 1.15; letter-spacing: 0; }
+.hero p { max-width: 760px; color: var(--muted); margin: 12px 0 0; }
+.eyebrow { color: var(--accent); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0; margin: 0 0 8px; }
+section { margin: 28px 0; }
+h2, h3, h4, h5 { letter-spacing: 0; line-height: 1.25; }
+.synthesis-callout { padding: clamp(20px, 4vw, 34px); border: 1px solid #6ee7d8; border-radius: 18px; background: linear-gradient(135deg, #ecfdf9 0%, #eff6ff 100%); box-shadow: 0 18px 44px rgba(15, 118, 110, .12); }
+.synthesis-callout.unavailable { border-color: var(--line); background: var(--panel); box-shadow: none; }
+.synthesis-callout h2 { margin: 0; font-size: clamp(24px, 3.2vw, 36px); }
+.synthesis-callout .lead { max-width: 900px; font-size: 17px; color: #334155; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.primary-link, .secondary-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border-radius: 999px; font-weight: 800; }
+.primary-link { color: white; background: var(--accent); }
+.secondary-link { color: var(--accent-2); border: 1px solid #93c5fd; background: white; }
+.primary-link:hover, .secondary-link:hover { text-decoration: none; filter: brightness(.97); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.card, .run { display: flex; flex-direction: column; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; color: var(--text); min-height: 128px; }
+.run { padding: 16px; }
+.card:hover, .run:hover { border-color: var(--accent-2); text-decoration: none; }
+.thumb { display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #e9edf5; border-radius: 8px 8px 0 0; color: var(--muted); font-size: 13px; font-weight: 700; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb-empty span { padding: 0 14px; text-align: center; }
+.card-body { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 16px; }
+.card strong { line-height: 1.35; }
+.source-line { color: #3f4a5f; font-weight: 600; }
+.runs { display: grid; gap: 10px; }
+.badge { display: inline-flex; width: fit-content; border-radius: 999px; padding: 2px 9px; background: #e6f4f1; color: var(--accent); font-size: 12px; font-weight: 700; }
+.status-contradicted, .status-llm_failed { background: #fee4e2; color: var(--bad); }
+.status-unverified, .status-stale { background: #fff4d6; color: var(--warn); }
+small, .muted { color: var(--muted); }
+.topnav { display: flex; gap: 14px; margin-bottom: 16px; font-size: 14px; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px; }
+.stats span { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
+.report { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: min(5vw, 36px); }
+.report-head { border-bottom: 1px solid var(--line); margin-bottom: 24px; padding-bottom: 20px; }
+.report-head h1 { margin: 0; font-size: clamp(24px, 3.5vw, 38px); line-height: 1.2; }
+.meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+.scope-note { padding: 12px 14px; border-left: 4px solid var(--warn); border-radius: 6px; background: #fff7ed; color: #7c2d12; }
+.synthesis-report h2 { margin-top: 34px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.synthesis-report h3 { margin: 24px 0 8px; color: #0f4c5c; }
+.synthesis-report p, .synthesis-report li { overflow-wrap: anywhere; }
+pre { overflow: auto; background: #111827; color: #f9fafb; border-radius: 8px; padding: 14px; }
+code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+details { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 18px; }
+@media (max-width: 640px) {
+  main { width: min(100% - 20px, 1120px); padding-top: 18px; }
+  .report { padding: 18px; }
+  .synthesis-callout { border-radius: 14px; padding: 18px; }
+  .cta-row a { width: 100%; }
+  .mobile-report { border-radius: 12px; }
+}
+</style>
+</head>
+<body>
+  <main>
+<nav class="topnav"><a href="index.html">실행 목록</a><a href="../../index.html">YouTube 홈</a></nav>
+<article class="report">
+  <header class="report-head">
+    <p class="eyebrow">youtube_20261029_071604</p>
+    <h1>MS·구글·아마존은 왜 다른가…AI 투자 부담 견디게 하는 &#x27;돈 버는 구조&#x27;ㅣ명민준, 박가영, 송재경 [주린이 구조대]</h1>
+    <div class="meta">
+      <span class="badge status-unverified">unverified</span>
+      <a href="https://www.youtube.com/watch?v=x6E0Hh3B1q4">원본 영상</a>
+    </div>
+  </header>
+  <h2>AI 투자 부담을 견디는 ‘돈 버는 구조’는 확인됐나</h2>
+<p><a href="https://www.youtube.com/watch?v=x6E0Hh3B1q4">삼프로TV 영상</a> · 게시일 2026년 10월 28일 · 길이 44분 41초</p>
+<h3>1. 핵심 판단</h3>
+<p>영상의 중심 논리는 <strong>AI 모델 기업 간 경쟁이 심해져도 컴퓨팅 수요가 유지된다면 클라우드·GPU·메모리 공급사가 수혜를 볼 수 있다</strong>는 것이다. Microsoft·Google·Amazon은 외부 고객의 컴퓨팅 수요를 매출로 전환하므로, 투자 부담을 평가할 때 클라우드 성장과 현금흐름을 함께 보자는 주장이다.</p>
+<p>그러나 <strong>제공된 근거로는 이 논리를 뒷받침하는 핵심 수치를 확인하지 못했다.</strong> 주장 검증 단위 C1~C10은 모두 미검증이다. 이는 거짓이라는 판정이 아니라, 공시·원통계·계약 등 직접 근거가 부족하다는 뜻이다. 자료 수집 상태의 ‘verified’를 영상 주장에 대한 사실 확인으로 해석해서는 안 된다.</p>
+<p>투자자가 가져갈 분석 틀은 유효하다. 다만 ‘투자 약속 → 실제 집행 → 외부 매출 → 현금 회수’의 각 연결고리를 따로 확인해야 한다.</p>
+<h3>2. 영상 주장과 확인된 사실·근거</h3>
+<p>아래 시각은 정확한 발언 위치가 아니라 해당 자막 청크의 시작점이다.</p>
+<p>| 주제·시각 | 영상 주장 | 확인된 사실·근거 및 한계 |</p>
+<p>| --- | --- | --- |</p>
+<p>| 국내외 유동성·정책, 00:00:00~00:13:05 | 미국 통화량 증가율은 7%대, 국내 광의유동성은 둔화했다. 추가 금리 인상 가능성이 반등을 제약한다. | 한국은행·연준 원통계와 당시 금리선물 자료가 없다. 통화지표·비교기간·회의연도가 불명확하다. 배정 자료 E1은 기업 실적 기사로 이 주장을 검증하지 못한다. |</p>
+<p>| 삼성전자·SK하이닉스, 00:00:00·00:19:29 | 외국인이 당일 7천억~8천억원 순매수했고, 급등 후에도 저평가다. AI 투자가 장기 수혜를 뒷받침한다. | E3 기사 제목은 SK하이닉스 상승을 최대 3분기 실적·AI 메모리 수요와 연결한다. 본문은 없으며 외국인 수급·삼성전자·저평가·2030년 전망은 확인하지 못했다. |</p>
+<p>| 선거·원유, 00:00:00·00:13:05 | 이스라엘 선거와 미국 중간선거가 유가·증시에 영향을 주며 유가는 110달러대다. | 선거 집계·예측시장 기록·원유 시세가 없다. 선거연도와 WTI/Brent·계약월도 미확정이다. 정치 전망을 관측 사실과 구분해야 한다. |</p>
+<p>| Anthropic 단위경제성, 00:13:05 | 컴퓨팅 비용 1달러당 매출이 약 0.4→2→1.7달러로 개선됐다. | 원차트·비용 정의·분기연도는 없다. 가정한 비율이 2라면 해당 비용 차감 후 매출 대비 잔여 비율은 50%, 1.7이면 약 41.2%다. 이는 조건부 산술이지 실제 이익 확인이 아니다. |</p>
+<p>| IPO·장기 투자 약정, 00:19:29 | Anthropic의 11월 16일 IPO 가능성, OpenAI·Anthropic의 5~8년간 1.3조~1.5조달러 투자 약속을 제시한다. | 공식 상장자료·원보도·계약별 합산표가 없다. 연도·환율·중복·조건도 미확정이다. SpaceX 상장 사례와 기업가치·오버행 설명 역시 미검증이다. |</p>
+<p>| 빅테크 실적, 00:26:20 | 클라우드 성장률은 Microsoft 40%대, Google 80%, AWS 30% 중반이며 Microsoft 외 제시 기업들의 FCF는 음수다. | 해당 분기 IR·현금흐름표가 없다. 성장률의 지표·환율 기준, FCF의 분기/최근 12개월 구분을 확인하지 못했다. Meta의 첫 FCF 적자·주가 약 10% 하락, Oracle의 적자 전환 시점도 미검증이다. |</p>
+<p>| AI 활용 기업, 00:26:20 | Spotify는 Anthropic 활용의 초기 성공 사례다. FedEx·Walmart·Uber·Deere 실적에서도 성과를 확인해야 한다. | 사용 사실과 정량 성과를 입증할 회사 자료가 없다. 나머지 네 기업은 확인 대상으로 제시됐으며 성공이 검증된 사례가 아니다. 공식 발표 일정도 미제공이다. |</p>
+<p>| Broadcom·Anthropic 조달, 00:32:44 | 630억달러 차입 확정에 약 두 달이 걸렸으며 심사가 강화됐다. | E5는 Broadcom 주가 기사 제목일 뿐 계약 근거가 아니다. 차입자·금액 성격·조건·협상 기간 모두 미확인이다. 소요 기간만으로 심사 강화라는 원인을 확정할 수 없다. |</p>
+<p>| 신용스프레드, 00:32:44 | 등급별 스프레드는 0.91·3.38·13%포인트 이상이며 위험이 고위험군에 집중됐다. | 지수·관측일·역사적 시계열이 없다. 단위 환산은 각각 91·338·1,300bp이며, 설명용 국채금리 5%에 13%포인트를 더하면 18%다. 프랑스 기업 30% 주장도 모집단 미확인이다. |</p>
+<p>| CoreWeave·NVIDIA, 00:39:14 | 관련 약정 규모가 작고 은행 연결이 거의 없어 연쇄위험은 제한적이다. | 계약상 최대 노출액·비교 분모·은행 연결 자료가 없다. 인용된 연준 보고서도 식별되지 않아 해당 해석을 연준의 공식 결론으로 제시할 수 없다. |</p>
+<h4>제공 근거 중 상대적으로 관련성이 높은 자료</h4>
+<ul>
+<li><a href="https://finance.yahoo.com/markets/stocks/articles/stock-market-today-oct-28-214859402.html">SK하이닉스 실적·AI 메모리 수요 관련 기사(E3)</a>: <strong>제목 수준의 보조 단서</strong>다. 실제 실적 수치와 수급·가치평가를 확인할 본문은 제공되지 않았다.</li>
+<li><a href="https://finance.yahoo.com/markets/stocks/live/microsoft-earnings-live-microsoft-beats-q1-expectations-on-top-and-bottom-line-on-ai-growth-204510452.html">Microsoft 실적 관련 Yahoo Finance 보도</a>: 수집된 제목은 AI 성장에 따른 실적 예상 상회를 전한다. 영상의 클라우드 성장률·FCF 수치를 입증하지는 않는다.</li>
+</ul>
+<p>두 자료 모두 영상 게시 이후 공개된 자료다. 영상 당시 이용 가능했던 근거로 소급해서 취급할 수 없다. E1·E2는 오류·탐색 문구가 대부분이고 E4·E5는 본문이 없어, 핵심 주장에 대한 직접 근거로 사용하지 않았다.</p>
+<h3>3. 상승 논리와 반론</h3>
+<h4>상승 논리가 성립하려면</h4>
+<p>1. <strong>모델 경쟁이 컴퓨팅 수요 확대로 연결돼야 한다.</strong> 모델 가격 하락이 사용량 증가를 유도하고 총 컴퓨팅 지출까지 유지·확대한다면 인프라 공급사의 수혜 가능성이 있다. 이는 영상에서 제시한 조건부 논리이며, 제공 자료로 실제 수요 확대를 확인한 것은 아니다.</p>
+<p>2. <strong>클라우드 성장이 현금 회수로 이어져야 한다.</strong> 외부 고객 매출은 투자 수요를 관찰하는 지표가 될 수 있다. 여기에 영업현금흐름·설비투자·금융리스 부담을 함께 봐야 투자 회수 여부를 평가할 수 있다.</p>
+<p>3. <strong>장기 약정이 실제 주문으로 전환돼야 한다.</strong> 삼성전자·SK하이닉스의 수혜는 발표된 투자 총액보다 실제 메모리 주문·출하·가격·수익성으로 확인해야 한다.</p>
+<h4>주요 반론</h4>
+<ul>
+<li>컴퓨팅 사용량이 늘어도 가격 경쟁과 투자비 증가로 공급사의 수익성이 악화할 수 있다. <strong>수요 증가와 주주에게 귀속되는 현금 증가는 같은 명제가 아니다.</strong></li>
+<li>외부 클라우드 매출 성장만으로 FCF 악화가 일시적이라고 결론 내릴 수 없다. FCF 적자는 순손실과도 구분해야 한다.</li>
+<li>영상은 Meta의 자체 사용 목적 투자를 외부 클라우드 사업과 구분한다. 자체 사용 투자라면 광고·추천·운영 효율 등의 정량 성과로 회수 여부를 따져야 하며, 외부 클라우드 매출 부재만으로 실패를 판정할 수 없다.</li>
+<li>Anthropic의 제시 비율은 초기 0.4 대비 개선이지만 2에서 1.7로는 하락한다. 비용 범위도 불명확해 전사 수익성 개선으로 확대 해석할 수 없다.</li>
+<li>사모대출이라는 분류만으로 은행과의 연결이 없다고 볼 수 없다. 직접 대출뿐 아니라 펀드 신용한도·레버리지·보증 등 간접 연결을 확인해야 한다.</li>
+</ul>
+<h3>4. 데이터 품질과 불확실성</h3>
+<p>자동자막의 <strong>transcript_quality는 good, 점수는 1.0</strong>이다. 이는 수집·텍스트 품질 평가이지 숫자와 고유명사의 정확도 보증이 아니다. 원음이 제공되지 않아 의심 구간은 해소되지 않았다.</p>
+<p>| 검증 주제 | source_confidence | asr_confidence |</p>
+<p>| --- | ---: | ---: |</p>
+<p>| 유동성·정책 | 0.88 | 0.65 |</p>
+<p>| 국내 반도체·수급 | 0.92 | 0.80 |</p>
+<p>| 선거·유가 | 0.88 | 0.60 |</p>
+<p>| Anthropic 단위경제성 | 0.85 | 0.45 |</p>
+<p>| IPO·투자 약정 | 0.85 | 0.50 |</p>
+<p>| 빅테크 성장률·FCF | 0.94 | 0.60 |</p>
+<p>| AI 활용 기업 | 0.93 | 0.80 |</p>
+<p>| 630억달러 조달 | 0.90 | 0.65 |</p>
+<p>| 신용스프레드 | 0.91 | 0.75 |</p>
+<p>| CoreWeave·NVIDIA 연결 위험 | 0.91 | 0.60 |</p>
+<p><strong>source_confidence는 발언 추출의 명확성이지 사실일 확률이 아니다.</strong> asr_confidence 역시 원음 검증이나 통계적 보정이 없는 추정치다. 특히 Anthropic의 0.4·4·40 숫자 혼선, Microsoft 성장률 범위, Google 80%, 오버행 대상·단위는 수동 확인이 중요하다. 외부 근거에 의한 주장 지지 confidence는 0.01~0.15로 낮다.</p>
+<p>추가 한계는 다음과 같다.</p>
+<ul>
+<li>‘오늘·지난주·작년’의 실제 기준일이 확인되지 않았다. 게시일을 거래일·정책회의 기준일로 대입하면 안 된다.</li>
+<li>한국 종목 조회는 실패했다. 복합 티커에 반환된 단일 가격은 기업별 귀속이 불명확해 제외했다.</li>
+<li>개별 미국 종목 가격·PER 스냅샷은 수집됐지만 클라우드 성장·FCF·보증을 검증하지 않는다. 단일 가격으로 Meta의 약 10% 하락도 확인할 수 없다.</li>
+<li>공시 제공자가 이용 불가했다. 공시 미수집은 공시·계약이 없다는 증거가 아니며 뉴스 조회 실패도 뉴스 부재를 뜻하지 않는다.</li>
+<li><strong>Bloomberg·Morningstar 및 기타 유료·폐쇄형 출처의 원문은 제공되지 않았다. 관련 주장은 미검증·수동 확인 필요다.</strong> Anthropic 비공개 재무자료, 차입 협상 경위, 채권 차트도 원자료 확보 전에는 확정 근거로 사용할 수 없다.</li>
+</ul>
+<h3>5. 단기 체크포인트와 논리 무효화 조건</h3>
+<p>공식 일정이 없어 영상의 ‘이번 주·다음 주’를 현재 일정으로 옮기지 않았다. 아래 항목은 각 회사의 다음 공식 발표·공시에서 확인할 관찰 목록이다.</p>
+<p>| 관찰 대상 | 구체적으로 확인할 항목 | 상승 논리를 약화·무효화하는 조건 |</p>
+<p>| --- | --- | --- |</p>
+<p>| Microsoft·Google·AWS | 동일 분기·동일 정의의 클라우드 성장률, 영업현금흐름, 현금 설비투자·금융리스, FCF | 매출 성장 둔화와 투자·조달 부담 확대가 지속되고 현금 회수 개선 근거가 나오지 않음 |</p>
+<p>| 삼성전자·SK하이닉스 | KRX 거래일별 외국인 수급, 동일 기준 PER·PBR, IR의 AI 메모리 주문·출하·수익성 | 투자 약속이 주문으로 이어지지 않거나 수요 증가에도 수익성이 악화함 |</p>
+<p>| Anthropic·OpenAI | 원재무자료의 비용 정의, 투자 계약의 당사자·조건·중복·실제 집행, 공식 IPO 자료 | 조달 지연·약정 축소·취소 또는 단위경제성 악화로 집행 능력이 약해짐 |</p>
+<p>| Meta·Spotify 등 AI 활용 기업 | AI 도입 전후 매출·비용·생산성 변화, 측정기간과 경영진 설명 | 사용 확대에도 정량 성과가 없거나 추가 비용을 상쇄하지 못함 |</p>
+<p>| Broadcom 관련 조달 | 실제 차입 법인, 차입금/시설한도/사업비 구분, 만기·담보·금리·보증 | 계약 조건이 예상보다 불리하거나 자금 집행 조건을 충족하지 못함 |</p>
+<p>| CoreWeave·NVIDIA·신용시장 | 최대 계약 노출액, 은행 직접·간접 연결, 동일 지수의 등급별 스프레드, 연준 보고서 원문 | 부담이 고위험 차주를 넘어 확산하거나 보증·은행 연결이 영상 설명보다 큼 |</p>
+<p>| 유동성·유가 | 녹화 기준일 확정 후 한국은행·연준 원통계, 정책결정·당시 선물, 원유 종류·계약월 | 같은 날짜의 원자료가 영상의 유동성·정책·유가 설명과 맞지 않음 |</p>
+<h3>6. 결론</h3>
+<p>영상은 AI 투자 규모보다 <strong>수익화 구조와 투자 회수 능력</strong>을 보자는 관점을 제시한다. 다만 현재 근거는 SK하이닉스 관련 기사 제목 등 제한적 단서에 머물며, 클라우드 성장률·FCF·투자 약정·신용위험에 관한 핵심 숫자는 미검증이다.</p>
+<p>관찰의 우선순위는 <strong>클라우드 매출과 현금흐름의 동반 개선 → 투자 약정의 실제 집행 → 메모리 주문·수익성 → 신용위험의 전이 여부</strong>다. 이 연결고리가 공시와 원자료로 확인되기 전까지 영상의 낙관론은 확정 사실이 아닌 조건부 시나리오로 보는 것이 적절하다.</p>
+  <details>
+    <summary>공개 요약 JSON</summary>
+    <pre>{
+  &quot;version&quot;: 4,
+  &quot;video_id&quot;: &quot;x6E0Hh3B1q4&quot;,
+  &quot;title&quot;: &quot;MS·구글·아마존은 왜 다른가…AI 투자 부담 견디게 하는 &#x27;돈 버는 구조&#x27;ㅣ명민준, 박가영, 송재경 [주린이 구조대]&quot;,
+  &quot;url&quot;: &quot;https://www.youtube.com/watch?v=x6E0Hh3B1q4&quot;,
+  &quot;channel&quot;: &quot;삼프로TV 3PROTV&quot;,
+  &quot;channel_id&quot;: &quot;UChlv4GSd7OQl3js-jkLOnFA&quot;,
+  &quot;source_url&quot;: &quot;https://www.youtube.com/@3protv/videos&quot;,
+  &quot;thumbnail_url&quot;: &quot;https://i.ytimg.com/vi/x6E0Hh3B1q4/maxresdefault.jpg&quot;,
+  &quot;published_at&quot;: &quot;2026-10-28T12:00:30+00:00&quot;,
+  &quot;status&quot;: &quot;unverified&quot;,
+  &quot;strategy_source_tier&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_evidence_weight&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_validation_policy&quot;: &quot;STANDARD_REVIEW&quot;,
+  &quot;transcript_status&quot;: &quot;available&quot;,
+  &quot;transcript_source&quot;: &quot;automatic&quot;,
+  &quot;transcript_chars&quot;: 21903,
+  &quot;transcript_quality&quot;: {
+    &quot;status&quot;: &quot;good&quot;,
+    &quot;score&quot;: 1.0,
+    &quot;warnings&quot;: [],
+    &quot;source&quot;: &quot;automatic&quot;,
+    &quot;language&quot;: &quot;Korean&quot;,
+    &quot;model_or_format&quot;: &quot;json3&quot;,
+    &quot;chars&quot;: 21903,
+    &quot;segments&quot;: 1257,
+    &quot;duration_seconds&quot;: 2681,
+    &quot;repeated_ngram_ratio&quot;: 0.0
+  },
+  &quot;generated_at&quot;: &quot;2026-10-29T07:16:04.252027+09:00&quot;,
+  &quot;llm_status&quot;: &quot;success&quot;,
+  &quot;research_status&quot;: &quot;success&quot;,
+  &quot;claim_verification_status&quot;: &quot;success&quot;,
+  &quot;research_pipeline_version&quot;: 4,
+  &quot;evidence_count&quot;: 5,
+  &quot;claim_status_summary&quot;: {
+    &quot;unverified&quot;: 10
+  },
+  &quot;claims&quot;: [
+    {
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;claim_text&quot;: &quot;미국 통화량 증가율은 7%대이며 2020년 이후 계속 증가했고, 국내 광의유동성 증가율은 9% 이상에서 둔화하며 8월 잔액은 전월보다 감소했다. 금통위는 7·8월 인상 후 지난주 동결했으며 국채금리는 최소 세 차례 추가 인상, 12월 FOMC는 인상 가능성을 반영한다는 주장.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.02,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.88,
+      &quot;asr_confidence&quot;: 0.65,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;미국 증가율 7%대; 국내 증가율 종전 9% 이상; 8월 잔액 감소; 추가 인상 최소 3회&quot;,
+        &quot;observed&quot;: &quot;대조 가능한 원통계·정책결정·금리선물 수치 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;유동성 둔화나 추가 긴축을 확인된 매매 전제로 사용하지 말고, 동일 기준일의 원통계와 정책자료를 먼저 확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;claim_text&quot;: &quot;당일 외국인이 7천억~8천억원을 순매수했고 삼성전자·SK하이닉스는 급등 후에도 저평가 상태이며, AI 컴퓨팅 투자 지속이 2030년까지의 반도체 낙관론을 뒷받침한다는 주장.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.15,
+      &quot;supporting_evidence_ids&quot;: [
+        &quot;E3&quot;
+      ],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.92,
+      &quot;asr_confidence&quot;: 0.8,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;외국인 순매수 7,000억~8,000억원; 전망 시계 2030년&quot;,
+        &quot;observed&quot;: &quot;순매수액·밸류에이션·2030년 수요 전망의 대조 수치 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;AI 메모리 수요에 관한 제한적 보도 단서는 있으나, 두 종목의 저평가나 장기 수익률을 확인한 결과로 해석해서는 안 된다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;claim_text&quot;: &quot;이스라엘 총선 개표율 75%에서 친네타냐후 진영은 52~55석, 아이젠코트 측은 약 21석이며 전체 120석·과반 61석이라는 주장. Polymarket 예측이 빗나갔고 유가는 110달러대이며, 선거와 중동 긴장이 증시에 영향을 주고 미국 민주당의 양원 확보 가능성이 높다는 전망.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.01,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.88,
+      &quot;asr_confidence&quot;: 0.6,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;개표율 75%; 친네타냐후 52~55석; 아이젠코트 측 약 21석; 총 120석·과반 61석; 원유 배럴당 110달러대&quot;,
+        &quot;observed&quot;: &quot;독립적으로 대조할 집계·가격 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;선거 숫자와 유가를 확인된 시장 현황으로 인용하지 말고, 정치 전망과 관측 사실을 구분해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;claim_text&quot;: &quot;Anthropic의 컴퓨팅 비용 1달러당 매출이 작년 1분기 약 0.4달러에서 이후 2분기 2달러, 3분기 1.7달러로 개선됐으며 4분기 회복 가능성이 있다는 주장. 이 비율은 전체 비용을 반영한 이익과 다르다는 설명.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.05,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:13:05&quot;,
+      &quot;source_confidence&quot;: 0.85,
+      &quot;asr_confidence&quot;: 0.45,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;컴퓨팅 비용 1달러당 매출 0.4달러→2달러→1.7달러&quot;,
+        &quot;observed&quot;: &quot;외부 관측치 없음; 주장 수치의 조건부 계산상 컴퓨팅 비용 차감률은 각각 -150%, 50%, 약 41.2%&quot;
+      },
+      &quot;investor_implication&quot;: &quot;단위경제성 개선이나 투자 약정 이행 능력을 확정할 수 없으며, 원재무자료와 비용 정의 확인이 우선이다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;claim_text&quot;: &quot;Anthropic의 11월 16일 상장 가능성이 보도됐고 OpenAI·Anthropic의 향후 5~8년 투자 약속 합계는 1.3조~1.5조달러, 원화 1,600조원 이상이라는 주장. SpaceX는 이미 IPO가 진행된 비교 사례로 제시되며 2조달러 가치 예시와 약 1.5조달러 오버행 발언이 나온다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.01,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:19:29&quot;,
+      &quot;source_confidence&quot;: 0.85,
+      &quot;asr_confidence&quot;: 0.5,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;11월 16일 IPO 가능성; 5~8년간 1.3조~1.5조달러; 1,600조원 이상; SpaceX 가치 예시 2조달러; 오버행 약 1.5조달러&quot;,
+        &quot;observed&quot;: &quot;공식 일정·약정 합계·환산 환율·매도 가능 물량 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;IPO 날짜나 대규모 투자 합계를 확정 사실로 제시하지 말고, 계약의 실질과 상장·락업 공시 확인 전까지 시나리오로만 취급해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;claim_text&quot;: &quot;지난 분기 클라우드 성장률은 Microsoft 40%대, Alphabet 80%, AWS 30% 중반이며 Microsoft 외 기업의 FCF는 마이너스라는 주장. Oracle은 작년부터, Alphabet·Amazon은 최근 분기, Meta는 지난주 처음 적자로 전환했고 Meta 주가는 약 10% 하락했다는 설명. 외부 클라우드 매출 성장이 AI 투자 부담 평가의 핵심이라는 견해.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.05,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:26:20&quot;,
+      &quot;source_confidence&quot;: 0.94,
+      &quot;asr_confidence&quot;: 0.6,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;Microsoft 성장률 40%대; Google Cloud 80%; AWS 30% 중반; Microsoft 외 FCF 음수; Meta 주가 약 -10%&quot;,
+        &quot;observed&quot;: &quot;성장률·FCF·동일 거래일 주가 변화율 자료 없음; 단일 시점 가격은 해당 변화율을 검증하지 못함&quot;
+      },
+      &quot;investor_implication&quot;: &quot;클라우드 성장과 현금흐름을 함께 보자는 견해는 분석 틀로 제시할 수 있으나, 기업별 수치와 투자 정당화는 공시 확인 전까지 미검증이다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;claim_text&quot;: &quot;Spotify는 Anthropic AI 활용의 초기 성공 사례이며 FedEx·Walmart·Uber·Deere의 이번 주·다음 주 실적에서도 AI의 실제 수익 기여를 확인해야 한다는 주장과 제안.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.01,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:26:20&quot;,
+      &quot;source_confidence&quot;: 0.93,
+      &quot;asr_confidence&quot;: 0.8,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;이번 주·다음 주 실적에서 성과 확인; 정량 성과 수치 미제시&quot;,
+        &quot;observed&quot;: &quot;공식 발표 일정·AI 성과 수치 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;AI 사용 사실과 매출·비용·생산성 개선을 구분하고, 성공 사례로 인용하기 전에 정량 성과와 발표 일정을 확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;claim_text&quot;: &quot;Broadcom·Anthropic 관련 630억달러 차입이 약 두 달 만에 최종 결정됐으며 이는 채권 투자자의 심사 강화 신호라는 주장.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.01,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:32:44&quot;,
+      &quot;source_confidence&quot;: 0.9,
+      &quot;asr_confidence&quot;: 0.65,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;차입 630억달러, 약 2개월 소요&quot;,
+        &quot;observed&quot;: &quot;차입금액·시설한도·사업비·구매약정 중 무엇인지 확인할 계약 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;조달 성사나 신용 여건 악화의 확인된 사례로 사용하지 말고, 계약 조건과 협상 경위의 원자료를 확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;claim_text&quot;: &quot;투자등급 기준은 BBB- 이상이고 신용스프레드는 투자등급 0.91%포인트, 상대적 저위험 투기등급 3.38%포인트, 고위험군 13%포인트 이상이라는 주장. 고위험군은 2022년 고점을 넘어 코로나 수준에 접근했고 프랑스 기업 30%는 국채보다 금리가 낮다는 설명.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.05,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:32:44&quot;,
+      &quot;source_confidence&quot;: 0.91,
+      &quot;asr_confidence&quot;: 0.75,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;0.91·3.38·13%포인트 이상; 프랑스 기업 30%; 설명용 국채금리 5%&quot;,
+        &quot;observed&quot;: &quot;시장 관측치 없음; 단위 환산 91·338·1,300bp 이상; 설명용 5%+13%포인트=18%&quot;
+      },
+      &quot;investor_implication&quot;: &quot;신용위험이 특정 등급에 집중됐다는 결론은 미검증이며 동일 지수·기준일 자료를 확보한 뒤 등급별 위험을 비교해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C10&quot;,
+      &quot;claim_text&quot;: &quot;CoreWeave 관련 신용 부담은 고위험군에 집중됐고 NVIDIA의 보증·약정 규모는 작으며 사모대출과 은행권의 연결은 거의 없다는 주장. 최근 연준 보고서도 연쇄위험을 과도하게 우려할 단계가 아니라는 근거로 인용된다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.01,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:39:14&quot;,
+      &quot;source_confidence&quot;: 0.91,
+      &quot;asr_confidence&quot;: 0.6,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;NVIDIA 관련 노출은 작고 은행 연결은 거의 없음; 구체적 금액 미제시&quot;,
+        &quot;observed&quot;: &quot;노출액·비교 분모·은행 연결 규모·연준 보고서 수치 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;시스템 위험이 제한적이라는 결론은 보류하고, 계약상 최대 노출과 은행·펀드 간 연결을 확인해야 한다.&quot;
+    }
+  ],
+  &quot;entities&quot;: [
+    {
+      &quot;ticker&quot;: &quot;005930,000660&quot;,
+      &quot;name&quot;: &quot;삼성전자·SK하이닉스&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;당일 급등 후에도 밸류에이션이 저렴하며, AI 기업들의 컴퓨팅 투자 지속이 반도체 수혜 논리의 기반이라고 평가한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;발표자는 향후 2030년까지의 긍정적 전망이 AI 투자 계획과 연결된다고 설명한다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;시장 데이터 조회 실패: no_usable_market_fields&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;005930,000660&quot;,
+        &quot;as_of&quot;: &quot;2026-10-28T22:45:27.992784+00:00&quot;,
+        &quot;current_price&quot;: null,
+        &quot;market_cap&quot;: null,
+        &quot;forward_pe&quot;: null,
+        &quot;trailing_pe&quot;: null,
+        &quot;fifty_two_week_high&quot;: null,
+        &quot;fifty_two_week_low&quot;: null,
+        &quot;average_target_price&quot;: null,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;unverified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;MSFT&quot;,
+      &quot;name&quot;: &quot;Microsoft&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;외부 고객 대상 클라우드 매출이 AI 수요를 보여주며, 성장 지속이 대규모 투자에 대한 시장의 신뢰를 뒷받침할 수 있다고 주장한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;지난 분기 클라우드 성장률을 40%대라고 언급하나 초반·후반 구분은 자막상 불명확하다.&quot;,
+        &quot;제시된 빅테크 중 Microsoft를 제외한 기업들은 잉여현금흐름이 마이너스라고 설명한다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;MSFT&quot;,
+        &quot;as_of&quot;: &quot;2026-10-28T22:45:30.233103+00:00&quot;,
+        &quot;current_price&quot;: 531.010009765625,
+        &quot;market_cap&quot;: 3943038983691.003,
+        &quot;forward_pe&quot;: 22.415209,
+        &quot;trailing_pe&quot;: 29.58273,
+        &quot;fifty_two_week_high&quot;: 551.15,
+        &quot;fifty_two_week_low&quot;: 349.2,
+        &quot;average_target_price&quot;: 605.1243,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;GOOGL&quot;,
+      &quot;name&quot;: &quot;Alphabet·Google Cloud&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;클라우드 고성장이 유지되면 투자 확대에 따른 현금흐름 악화를 일시적인 것으로 받아들일 근거가 될 수 있다고 주장한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;지난 분기 클라우드 성장률을 80%로 언급한다.&quot;,
+        &quot;잉여현금흐름이 최근 분기 마이너스로 전환했다고 설명하나 정확한 분기는 자막상 불명확하다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;GOOGL&quot;,
+        &quot;as_of&quot;: &quot;2026-10-28T22:45:32.071423+00:00&quot;,
+        &quot;current_price&quot;: 324.8900146484375,
+        &quot;market_cap&quot;: 3973383706393.026,
+        &quot;forward_pe&quot;: 21.39095,
+        &quot;trailing_pe&quot;: 16.301556,
+        &quot;fifty_two_week_high&quot;: 408.61,
+        &quot;fifty_two_week_low&quot;: 267.67,
+        &quot;average_target_price&quot;: 429.67776,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;AMZN&quot;,
+      &quot;name&quot;: &quot;Amazon·AWS&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;외부 컴퓨팅 수요를 매출로 연결하는 클라우드 사업이 투자 부담을 평가할 핵심이라고 설명한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;지난 분기 클라우드 성장률을 30% 중반대로 기억한다고 발언한다.&quot;,
+        &quot;잉여현금흐름이 최근 분기 마이너스로 내려왔다고 설명하나 정확한 분기는 불명확하다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;AMZN&quot;,
+        &quot;as_of&quot;: &quot;2026-10-28T22:45:33.848598+00:00&quot;,
+        &quot;current_price&quot;: 254.60000610351562,
+        &quot;market_cap&quot;: 2746195501265.6333,
+        &quot;forward_pe&quot;: 24.363426,
+        &quot;trailing_pe&quot;: 20.482702,
+        &quot;fifty_two_week_high&quot;: 287.2,
+        &quot;fifty_two_week_low&quot;: 196.0,
+        &quot;average_target_price&quot;: 332.4093,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;META&quot;,
+      &quot;name&quot;: &quot;Meta&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;자체 사용 목적의 컴퓨팅 투자가 중심이어서 외부 클라우드 매출을 창출하는 기업들과 구분해야 한다고 주장한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;지난주 실적 발표에서 잉여현금흐름이 처음 마이너스로 전환했으며 주가가 약 10% 하락했다고 언급한다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;META&quot;,
+        &quot;as_of&quot;: &quot;2026-10-28T22:45:36.602117+00:00&quot;,
+        &quot;current_price&quot;: 612.489990234375,
+        &quot;market_cap&quot;: 1566034640025.5874,
+        &quot;forward_pe&quot;: 17.425035,
+        &quot;trailing_pe&quot;: 20.896963,
+        &quot;fifty_two_week_high&quot;: 779.82,
+        &quot;fifty_two_week_low&quot;: 520.26,
+        &quot;average_target_price&quot;: 846.79034,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;ORCL&quot;,
+      &quot;name&quot;: &quot;Oracle&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;대규모 투자 부담으로 잉여현금흐름이 이미 마이너스로 전환한 사례로 제시한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;잉여현금흐름 적자 전환 시점을 작년부터라고 언급한다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;ORCL&quot;,
+        &quot;as_of&quot;: &quot;2026-10-28T22:45:39.806364+00:00&quot;,
+        &quot;current_price&quot;: 144.5399932861328,
+        &quot;market_cap&quot;: 438173155723.3639,
+        &quot;forward_pe&quot;: 13.149958,
+        &quot;trailing_pe&quot;: 22.65517,
+        &quot;fifty_two_week_high&quot;: 281.62,
+        &quot;fifty_two_week_low&quot;: 114.5,
+        &quot;average_target_price&quot;: 235.8034,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;SPOT,FDX,WMT,UBER,DE&quot;,
+      &quot;name&quot;: &quot;Spotify·FedEx·Walmart·Uber·Deere&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;Spotify를 AI 활용의 초기 성공 사례로 평가하며 다른 업종 기업들도 AI가 실제 수익에 기여한다는 증거를 보여줘야 한다고 주장한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;SPOT,FDX,WMT,UBER,DE&quot;,
+        &quot;as_of&quot;: &quot;2026-10-28T22:45:41.878445+00:00&quot;,
+        &quot;current_price&quot;: 538.4,
+        &quot;market_cap&quot;: 110686543872.0,
+        &quot;forward_pe&quot;: 31.394192,
+        &quot;trailing_pe&quot;: 32.809265,
+        &quot;fifty_two_week_high&quot;: 673.16,
+        &quot;fifty_two_week_low&quot;: 405.0,
+        &quot;average_target_price&quot;: null,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;AVGO&quot;,
+      &quot;name&quot;: &quot;Broadcom·Anthropic 자금조달&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;대규모 차입 성사에도 협상에 시간이 걸린 점을 채권 투자자의 심사 강화 신호로 해석한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;Broadcom과 Anthropic이 630억달러 차입을 최종 결정했고 약 두 달이 걸렸다고 발언한다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;AVGO&quot;,
+        &quot;as_of&quot;: &quot;2026-10-28T22:45:44.277121+00:00&quot;,
+        &quot;current_price&quot;: 351.80999755859375,
+        &quot;market_cap&quot;: 1679410711151.2803,
+        &quot;forward_pe&quot;: 18.073914,
+        &quot;trailing_pe&quot;: 44.931034,
+        &quot;fifty_two_week_high&quot;: 495.0,
+        &quot;fifty_two_week_low&quot;: 289.96,
+        &quot;average_target_price&quot;: 530.14166,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;CRWV,NVDA&quot;,
+      &quot;name&quot;: &quot;CoreWeave·NVIDIA 및 미국 신용시장&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;신용시장 부담은 고위험 기업에 집중돼 있으며 CoreWeave 관련 보증·사모대출의 규모와 은행권 연결성을 고려하면 아직 연쇄 위기를 과도하게 걱정할 단계는 아니라고 주장한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;투자등급 기준을 BBB- 이상으로 설명하고 투자등급 신용스프레드를 0.91%포인트로 제시한다.&quot;,
+        &quot;상대적으로 낮은 위험의 투기등급 스프레드를 3.38%포인트, 고위험군은 13%포인트 이상으로 언급한다.&quot;,
+        &quot;고위험군 스프레드가 2022년 고점을 넘어서 코로나 시기 수준에 접근한다고 설명한다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;CRWV,NVDA&quot;,
+        &quot;as_of&quot;: &quot;2026-10-28T22:45:47.810728+00:00&quot;,
+        &quot;current_price&quot;: 63.93,
+        &quot;market_cap&quot;: 35259731968.0,
+        &quot;forward_pe&quot;: -32.47832,
+        &quot;trailing_pe&quot;: null,
+        &quot;fifty_two_week_high&quot;: 140.33,
+        &quot;fifty_two_week_low&quot;: 51.24,
+        &quot;average_target_price&quot;: null,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    }
+  ],
+  &quot;evidence&quot;: [
+    {
+      &quot;evidence_id&quot;: &quot;E1&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;Dow Jones Futures: Microsoft Rises Late, But Google, ServiceNow, Fortinet Dive On Earnings&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/m/6c0b166b-19af-3d40-b6ff-7c6d65d3c4da/dow-jones-futures%3A-microsoft.html&quot;,
+      &quot;publisher&quot;: &quot;Investor&#x27;s Business Daily&quot;,
+      &quot;published_at&quot;: &quot;2026-10-28T22:33:03+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Dow Jones Futures: Microsoft Rises Late, But Google, ServiceNow, Fortinet Dive On Earnings Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 20...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E2&quot;,
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;title&quot;: &quot;Intel to report Q3 earnings as chip stocks continue to rebound&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/technology/article/intel-to-report-q3-earnings-as-chip-stocks-continue-to-rebound-221713961.html&quot;,
+      &quot;publisher&quot;: &quot;Yahoo Finance&quot;,
+      &quot;published_at&quot;: &quot;2026-10-28T22:17:13+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Intel to report Q3 earnings as chip stocks continue to rebound Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 2026 Elections Weather Newslet...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E3&quot;,
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;title&quot;: &quot;Stock Market Today, Oct. 28: SK Hynix Surges on Record Q3 Results and AI-Memory Demand&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/stock-market-today-oct-28-214859402.html&quot;,
+      &quot;publisher&quot;: &quot;Motley Fool&quot;,
+      &quot;published_at&quot;: &quot;2026-10-28T21:48:59+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E4&quot;,
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;title&quot;: &quot;Earnings live updates: ServiceNow stock plunges on Q3 earnings miss&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/live/earnings-live-updates-servicenow-stock-plunges-on-q3-earnings-miss-202539714.html&quot;,
+      &quot;publisher&quot;: &quot;Yahoo Finance&quot;,
+      &quot;published_at&quot;: &quot;2026-10-28T22:16:59+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E5&quot;,
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;title&quot;: &quot;Broadcom Inc. (AVGO) Laps the Stock Market: Here&#x27;s Why&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/broadcom-inc-avgo-laps-stock-204503001.html&quot;,
+      &quot;publisher&quot;: &quot;Zacks&quot;,
+      &quot;published_at&quot;: &quot;2026-10-28T20:45:03+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    }
+  ],
+  &quot;source_policy&quot;: {
+    &quot;raw_transcript_published&quot;: false,
+    &quot;raw_transcript_in_evidence&quot;: false,
+    &quot;research_pipeline_version&quot;: 4,
+    &quot;closed_source_claims&quot;: &quot;unverified_external_source&quot;,
+    &quot;auto_caption_warning&quot;: true,
+    &quot;local_asr_warning&quot;: false
+  }
+}</pre>
+  </details>
+</article>
+</main>
+  <style>
+.reader-contents { margin: 16px 0; padding: 12px 16px; border: 1px solid var(--line, #64748b); border-radius: 12px; }
+.reader-contents > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-weight: 750; }
+.reader-contents nav { display: grid; gap: 4px; max-height: 45vh; overflow: auto; margin: 8px 0; }
+.reader-contents a { display: block; min-height: 44px; padding: 10px; border-radius: 6px; color: inherit; overflow-wrap: anywhere; }
+.reader-contents a:hover { background: #80808020; }
+.reader-contents .reader-subsection { padding-inline-start: 24px; font-size: .92em; }
+.reader-prose, .report { overflow-wrap: anywhere; line-height: 1.8; }
+.reader-prose p, .reader-prose li { max-width: 85ch; }
+.reader-prose h2, .reader-prose h3, .reader-prose h4, [data-reader-heading] { scroll-margin-top: 100px; line-height: 1.45; }
+.reader-prose h2 { margin-top: 1.8em; padding-bottom: 8px; border-bottom: 1px solid var(--line, #64748b); }
+.reader-prose h3 { margin-top: 1.5em; }
+.reader-prose li { margin: .5em 0; }
+.reader-prose pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.reader-prose blockquote { margin: 16px 0; padding: 4px 16px; border-left: 3px solid var(--accent, #64748b); }
+.reader-table { overflow: auto; max-width: 100%; margin: 16px 0; border: 1px solid var(--line, #64748b); border-radius: 10px; }
+.reader-table table { border-collapse: collapse; width: 100%; margin: 0; font-size: .92rem; }
+.reader-table th, .reader-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line, #64748b); min-width: 110px; max-width: 400px; overflow-wrap: anywhere; white-space: normal; }
+.reader-table th { background: #80808018; }
+.reader-table tr:nth-child(even) { background: #80808008; }
+.reader-search { display: grid; gap: 8px; margin: 16px 0; }
+.reader-search label { font-weight: 700; }
+.reader-search input { box-sizing: border-box; width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line, #64748b); border-radius: 10px; background: var(--panel, #fff); color: var(--text, #132238); font: inherit; }
+.reader-search p { margin: 0; font-size: .86rem; }
+.reader-back { position: fixed; bottom: max(14px, env(safe-area-inset-bottom)); right: 14px; z-index: 30; min-height: 44px; border: 1px solid #778899; border-radius: 99px; padding: 10px 16px; background: #18344a; color: #fff; font: 700 14px system-ui; cursor: pointer; box-shadow: 0 3px 12px #0003; }
+[data-reader-source] { margin-top: 20px; }
+[data-reader-source] > summary { min-height: 44px; cursor: pointer; }
+[data-reader-source] pre { font-size: .85rem; }
+[data-reader-source] pre, .reader-prose { min-width: 0; }
+.reader-contents :focus-visible, .reader-search :focus-visible, .reader-back:focus-visible, .reader-table:focus-visible { outline: 3px solid var(--accent, #008c95); outline-offset: 3px; }
+.reader-search + .grid > [hidden] { display: none !important; }
+@media (max-width: 600px) { .reader-prose { font-size: 1rem; } .reader-contents { padding: 8px 12px; } }
+@media print { .reader-back, .reader-search, .reader-contents, [data-reader-source] { display: none !important; } .reader-table { overflow: visible; } .reader-prose { color: #000; background: #fff; } }
+</style><script>
+(() => {
+  'use strict';
+  let serial = 0;
+  const rendered = new WeakMap();
+  const node = (tag, text) => { const el = document.createElement(tag); if (text != null) el.textContent = text; return el; };
+  function inline(parent, text) {
+    const pattern = /(`[^`]+`|\*\*[^*]+\*\*|\[[^\]]+\]\(https?:\/\/[^\s)]+\))/g;
+    let start = 0;
+    for (const match of String(text).matchAll(pattern)) {
+      parent.append(document.createTextNode(text.slice(start, match.index)));
+      const value = match[0];
+      if (value.startsWith('`')) parent.append(node('code', value.slice(1, -1)));
+      else if (value.startsWith('**')) parent.append(node('strong', value.slice(2, -2)));
+      else {
+        const link = value.match(/^\[([^\]]+)\]\((.+)\)$/);
+        const a = node('a', link[1]); a.href = link[2]; a.rel = 'noopener noreferrer'; parent.append(a);
+      }
+      start = match.index + value.length;
+    }
+    parent.append(document.createTextNode(text.slice(start)));
+  }
+  const cells = line => line.trim().replace(/^\|/, '').replace(/\|$/, '').split(/(?<!\\)\|/).map(v => v.trim().replace(/\\\|/g, '|'));
+  function markdown(source) {
+    const article = node('article'); article.className = 'reader-prose';
+    const lines = source.split(/\r?\n/); let list = null;
+    for (let i = 0; i < lines.length; i += 1) {
+      const line = lines[i], value = line.trim();
+      if (!value) { list = null; continue; }
+      if (/^```/.test(value)) {
+        const code = []; i += 1;
+        while (i < lines.length && !/^```/.test(lines[i].trim())) code.push(lines[i++]);
+        const pre = node('pre'); pre.append(node('code', code.join('\n'))); article.append(pre); list = null; continue;
+      }
+      if (i + 1 < lines.length && value.includes('|') && cells(lines[i + 1]).every(v => /^:?-{3,}:?$/.test(v))) {
+        const table = node('table'), head = node('thead'), body = node('tbody');
+        const row = (values, tag) => { const tr = node('tr'); values.forEach(v => { const cell = node(tag); if (tag === 'th') cell.scope = 'col'; inline(cell, v); tr.append(cell); }); return tr; };
+        head.append(row(cells(line), 'th')); i += 2;
+        while (i < lines.length && lines[i].trim() && lines[i].includes('|')) body.append(row(cells(lines[i++]), 'td'));
+        i -= 1; table.append(head, body); article.append(table); list = null; continue;
+      }
+      const heading = value.match(/^(#{1,6})\s+(.+)$/);
+      if (heading) { const h = node('h' + Math.min(4, heading[1].length + 1)); inline(h, heading[2]); article.append(h); list = null; continue; }
+      const bullet = value.match(/^(?:[-*+] |\d+\. )(.+)$/);
+      if (bullet) {
+        const tag = /^\d/.test(value) ? 'ol' : 'ul';
+        if (!list || list.tagName.toLowerCase() !== tag) { list = node(tag); if (tag === 'ol') list.start = parseInt(value, 10); article.append(list); }
+        const li = node('li'); inline(li, bullet[1]); list.append(li); continue;
+      }
+      list = null;
+      if (/^(---+|\*\*\*+)$/.test(value)) { article.append(node('hr')); continue; }
+      const p = node(value.startsWith('> ') ? 'blockquote' : 'p'); inline(p, value.startsWith('> ') ? value.slice(2) : line); article.append(p);
+    }
+    return article;
+  }
+  function contents(root) {
+    root.querySelectorAll(':scope > .reader-contents').forEach(el => el.remove());
+    const headings = [...root.querySelectorAll('h2,h3,h4')].filter(h => !h.closest('.card,.run-card,.reader-contents,[data-reader-source],[hidden]'));
+    if (headings.length < 2) return;
+    const details = node('details'); details.className = 'reader-contents';
+    details.append(node('summary', '이 리포트 목차 · ' + headings.length + '개 항목'));
+    const nav = node('nav'); nav.setAttribute('aria-label', '리포트 목차');
+    headings.forEach(h => {
+      if (!h.id) h.id = 'reader-section-' + (++serial);
+      h.dataset.readerHeading = ''; h.tabIndex = -1;
+      const a = node('a', h.textContent); a.href = '#' + h.id;
+      if (h.tagName !== 'H2') a.className = 'reader-subsection';
+      a.addEventListener('click', event => {
+        event.preventDefault();
+        for (let ancestor = h.parentElement; ancestor; ancestor = ancestor.parentElement) if (ancestor.tagName === 'DETAILS') ancestor.open = true;
+        h.scrollIntoView({block: 'start'}); h.focus({preventScroll: true});
+      }); nav.append(a);
+    });
+    details.append(nav); root.prepend(details);
+  }
+  function enhance(root) {
+    if (!root) return;
+    root.querySelectorAll('pre[data-report-markdown]').forEach(pre => {
+      const previous = rendered.get(pre);
+      if (previous && previous.source === pre.textContent) return;
+      const article = markdown(pre.textContent);
+      if (previous) previous.article.replaceWith(article);
+      else {
+        const details = node('details'); details.dataset.readerSource = '';
+        details.append(node('summary', 'Markdown 원문 보기'));
+        pre.before(article, details); details.append(pre);
+      }
+      rendered.set(pre, {source: pre.textContent, article});
+    });
+    root.querySelectorAll('table').forEach(table => {
+      if (table.closest('.reader-table,.account-table-wrap,.summary-scroll')) return;
+      const wrap = node('div'); wrap.className = 'reader-table'; wrap.tabIndex = 0;
+      wrap.setAttribute('role', 'region'); wrap.setAttribute('aria-label', '리포트 표 · 가로로 스크롤하여 전체 보기');
+      table.before(wrap); wrap.append(table);
+    });
+    root.querySelectorAll('.grid').forEach(grid => {
+      const cards = [...grid.querySelectorAll(':scope > a.card')];
+      if (cards.length < 2 || grid.dataset.readerSearch) return;
+      grid.dataset.readerSearch = 'true';
+      const box = node('div'); box.className = 'reader-search';
+      const input = node('input'); input.type = 'search'; input.placeholder = '제목 · 종목 · 채널 · 키워드'; input.id = 'report-search-' + (++serial);
+      const label = node('label', '리포트 찾기'); label.htmlFor = input.id;
+      const status = node('p'); status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
+      const update = () => {
+        const terms = input.value.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean); let count = 0;
+        cards.forEach(card => { card.hidden = !terms.every(t => card.textContent.toLocaleLowerCase().includes(t)); if (!card.hidden) count += 1; });
+        status.textContent = cards.length + '개 중 ' + count + '개 표시' + (count ? '' : ' · 검색어를 지우거나 다른 키워드를 입력하세요.');
+      };
+      input.addEventListener('input', update); box.append(label, input, status); grid.before(box); update();
+    });
+    contents(root);
+  }
+  window.TradingAgentsReader = {enhance};
+  const main = document.querySelector('main');
+  if (main && !main.hasAttribute('data-reader-dynamic')) enhance(main);
+  if (main) {
+    const top = node('button', '↑ 맨 위'); top.type = 'button'; top.className = 'reader-back'; top.setAttribute('aria-label', '리포트 맨 위로 이동');
+    top.addEventListener('click', () => { const target = document.querySelector('h1') || main; target.tabIndex = -1; target.scrollIntoView({block: 'start'}); target.focus({preventScroll: true}); });
+    document.body.append(top);
+  }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,227 @@
+{
+  "version": 4,
+  "video_id": "II7gXbI2WAE",
+  "title": "GPT로 지금 내 주식 '물타기'해도 되는지 계산하는 방법",
+  "url": "https://www.youtube.com/watch?v=II7gXbI2WAE",
+  "channel": "경제사냥꾼",
+  "channel_id": "UC7usMJDHmtbs_oegmzQKKMA",
+  "source_url": "https://www.youtube.com/@%EA%B2%BD%EC%A0%9C%EC%82%AC%EB%83%A5%EA%BE%BC/shorts",
+  "thumbnail_url": "https://i.ytimg.com/vi/II7gXbI2WAE/maxresdefault.jpg",
+  "published_at": "2026-10-28T09:42:32+00:00",
+  "status": "asr_uncertain",
+  "strategy_source_tier": "STANDARD",
+  "strategy_evidence_weight": "STANDARD",
+  "strategy_validation_policy": "STANDARD_REVIEW",
+  "transcript_status": "available",
+  "transcript_source": "automatic",
+  "transcript_chars": 1488,
+  "transcript_quality": {
+    "status": "good",
+    "score": 1.0,
+    "warnings": [],
+    "source": "automatic",
+    "language": "Korean (Original)",
+    "model_or_format": "json3",
+    "chars": 1488,
+    "segments": 79,
+    "duration_seconds": 125,
+    "repeated_ngram_ratio": 0.0
+  },
+  "generated_at": "2026-10-29T07:16:04.252027+09:00",
+  "llm_status": "success",
+  "research_status": "success",
+  "claim_verification_status": "success",
+  "research_pipeline_version": 4,
+  "evidence_count": 6,
+  "claim_status_summary": {
+    "unverified": 2,
+    "supported": 3,
+    "partially_supported": 2,
+    "asr_uncertain": 1
+  },
+  "claims": [
+    {
+      "claim_id": "C1",
+      "claim_text": "주당 매입가 2,500,000원과 현재가 1,443,000원은 영상의 가정값이며 실제 시세나 거래를 입증하지 않는다.",
+      "status": "unverified",
+      "confidence": 0.95,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00",
+      "source_confidence": 0.2,
+      "asr_confidence": 0.85,
+      "numeric_parse": {
+        "claimed": "매입가 2,500,000원; 현재가 1,443,000원",
+        "observed": "가정 입력값으로만 제공됨; 실제 시세 자료 없음"
+      },
+      "investor_implication": "두 가격을 SK하이닉스의 실제 시세나 투자 판단의 기준 가격으로 사용하지 않는다."
+    },
+    {
+      "claim_id": "C2",
+      "claim_text": "2,500,000원에 44주를 매수했다면 원금은 110,000,000원이고, 현재가 1,443,000원에서 평가손실은 46,508,000원이다.",
+      "status": "supported",
+      "confidence": 1.0,
+      "supporting_evidence_ids": [
+        "E6"
+      ],
+      "manual_check_required": false,
+      "timestamp": "00:00",
+      "source_confidence": 0.45,
+      "asr_confidence": 0.85,
+      "numeric_parse": {
+        "claimed": "원금 110,000,000원; 평가손실 46,508,000원",
+        "observed": "독립 산술 재계산 결과 동일"
+      },
+      "investor_implication": "평가손실 계산은 가정 입력값 아래에서 정확하지만 실제 계좌 손익을 확인한 결과는 아니다."
+    },
+    {
+      "claim_id": "C3",
+      "claim_text": "예산 10,000,000원으로 6주를 매수하면 사용액은 8,658,000원, 잔액은 1,342,000원이며, 총 50주의 평균 매입가는 2,373,160원이다.",
+      "status": "supported",
+      "confidence": 1.0,
+      "supporting_evidence_ids": [],
+      "manual_check_required": false,
+      "timestamp": "00:00",
+      "source_confidence": 0.35,
+      "asr_confidence": 0.85,
+      "numeric_parse": {
+        "claimed": "6주; 사용액 8,658,000원; 잔액 1,342,000원; 평균가 2,373,160원",
+        "observed": "모든 수치가 가정 아래에서 산술적으로 일치"
+      },
+      "investor_implication": "추가 매수 예산 전액이 투자되는 것은 아니며 실제 체결가와 비용에 따라 결과가 달라진다."
+    },
+    {
+      "claim_id": "C4",
+      "claim_text": "추가 매수 후 회복 필요 상승률은 약 73.25%에서 64.46%로 낮아지고 평가손실액은 동일하다. 영상에서 추출된 매수 전 손실률은 41.28%, 매수 후는 39.19%이다.",
+      "status": "partially_supported",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [
+        "E6"
+      ],
+      "manual_check_required": true,
+      "timestamp": "00:00",
+      "source_confidence": 0.45,
+      "asr_confidence": 0.55,
+      "numeric_parse": {
+        "claimed": "회복률 73.25%→64.46%; 손실률 41.28%→39.19%; 손실액 동일",
+        "observed": "회복률과 손실액은 일치; 손실률은 42.28%→약 39.19%"
+      },
+      "investor_implication": "손실률 하락은 원금 증가에 따른 비율 변화이며 기존 손실액이 줄었다는 뜻이 아니다."
+    },
+    {
+      "claim_id": "C5",
+      "claim_text": "현재가에서 10%·20%·30% 추가 하락하면 추가 매수한 6주 때문에 미매수 대비 손실이 각각 865,800원·1,731,600원·2,597,400원 증가한다.",
+      "status": "supported",
+      "confidence": 1.0,
+      "supporting_evidence_ids": [],
+      "manual_check_required": false,
+      "timestamp": "00:00",
+      "source_confidence": 0.35,
+      "asr_confidence": 0.85,
+      "numeric_parse": {
+        "claimed": "추가 손실 865,800원·1,731,600원·2,597,400원",
+        "observed": "6×1,443,000×각 하락률과 일치"
+      },
+      "investor_implication": "평균 매입가가 낮아져도 추가 보유분만큼 하락 시 금액 손실이 커진다."
+    },
+    {
+      "claim_id": "C6",
+      "claim_text": "30% 추가 하락 시 총손실은 미매수 65,555,600원, 추가 매수 후 68,153,000원으로 계산되지만 자막의 미매수 손실 표기는 불명확하다.",
+      "status": "asr_uncertain",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00",
+      "source_confidence": 0.3,
+      "asr_confidence": 0.3,
+      "numeric_parse": {
+        "claimed": "미매수 ‘6,55만5,600원’; 추가 매수 후 68,153,000원",
+        "observed": "조건부 재계산: 미매수 65,555,600원; 추가 매수 후 68,153,000원"
+      },
+      "investor_implication": "계산 결과와 영상의 실제 표현을 분리해 인용해야 한다."
+    },
+    {
+      "claim_id": "C7",
+      "claim_text": "증분 손실 한도가 1,000,000원이라면 20% 하락 시 증가분 1,731,600원은 한도를 초과한다. GPT 계산은 회복이나 손실 방지를 보장하지 않으며 실적·생활비·비상금은 별도 검토 대상이다.",
+      "status": "partially_supported",
+      "confidence": 0.97,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00",
+      "source_confidence": 0.3,
+      "asr_confidence": 0.6,
+      "numeric_parse": {
+        "claimed": "20% 하락 시 증분 손실 약 173만 원이 100만 원 한도 초과",
+        "observed": "증분 손실 1,731,600원; 초과액 731,600원"
+      },
+      "investor_implication": "증분 손실과 전체 손실을 구분하고 개인 한도를 적용해야 한다. 계산 일치를 투자 적합성 검증으로 해석하지 않는다."
+    },
+    {
+      "claim_id": "C8",
+      "claim_text": "영상은 프롬프트를 멤버십 관련 공간에 무료 게시한다고 말하지만 게시 위치·접근 조건·전문은 미확인이고, 제공 자막에는 외부 데이터 출처가 없다.",
+      "status": "unverified",
+      "confidence": 0.97,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00",
+      "source_confidence": 0.15,
+      "asr_confidence": 0.4,
+      "numeric_parse": {
+        "claimed": "수치 주장 없음",
+        "observed": "검증 가능한 원본 게시물과 프롬프트 없음"
+      },
+      "investor_implication": "프롬프트 접근성과 실제 GPT 계산 재현 여부를 확인된 사실로 소개하지 않는다."
+    }
+  ],
+  "entities": [],
+  "evidence": [
+    {
+      "evidence_id": "E1",
+      "claim_id": "C1",
+      "title": "Intel to report Q3 earnings as chip stocks continue to rebound",
+      "source_url": "https://finance.yahoo.com/technology/article/intel-to-report-q3-earnings-as-chip-stocks-continue-to-rebound-221713961.html",
+      "publisher": "Yahoo Finance",
+      "published_at": "2026-10-28T22:17:13+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "Intel to report Q3 earnings as chip stocks continue to rebound Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 2026 Elections Weather Newslet..."
+    },
+    {
+      "evidence_id": "E2",
+      "claim_id": "C1",
+      "title": "Dow Jones Futures: Microsoft Rises Late, But Google, ServiceNow, Fortinet Dive On Earnings",
+      "source_url": "https://finance.yahoo.com/m/6c0b166b-19af-3d40-b6ff-7c6d65d3c4da/dow-jones-futures%3A-microsoft.html",
+      "publisher": "Investor's Business Daily",
+      "published_at": "2026-10-28T22:09:01+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "Dow Jones Futures: Microsoft Rises Late, But Google, ServiceNow, Fortinet Dive On Earnings Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 20..."
+    },
+    {
+      "evidence_id": "E4",
+      "claim_id": "C2",
+      "title": "평가 손익 계산기 | 계산기 & 툴",
+      "source_url": "//duckduckgo.com/l/?uddg=https%3A%2F%2Ftools.devcomma.com%2Fcalculators%2Fevaluation%2Dpnl&rut=9a607b3dd00773cfd71b0a88bd31dc860a23414f9a91164df7d6b187f1bc6bc2",
+      "publisher": "duckduckgo.com",
+      "published_at": null,
+      "source_tier": "web",
+      "excerpt": "평균 매수가, 수량, 현재가를 입력하면 평가손익과 수익률, 손익분기점을 계산합니다. 수수료/세금 반영 옵션과 목표가 계산, 여러 번 매수 평균단가 기능도 지원합니다."
+    },
+    {
+      "evidence_id": "E5",
+      "claim_id": "C2",
+      "title": "주식 평단가 계산기 — 분할매수 평균단가·평가손익 자동계산 ...",
+      "source_url": "//duckduckgo.com/l/?uddg=https%3A%2F%2Fsohotip.co.kr%2Fstock%2Daverage%2Dcalc.html&rut=d962498cc9872fd58f12b6000294ae5e09951a879594e9169b099845eb2ce473",
+      "publisher": "duckduckgo.com",
+      "published_at": null,
+      "source_tier": "web",
+      "excerpt": "주식 이야기 주식 평단가 계산기 여러 번 나눠 산 주식의 매수가와 수량을 넣으면 평균 매입단가와 총 매입금액을 자동으로 계산해드립니다. 현재가까지 넣으면 지금 평가손익이 얼마인지, 수익률은 몇 %인지 바로 확인할 수 있어요."
+    }
+  ],
+  "source_policy": {
+    "raw_transcript_published": false,
+    "raw_transcript_in_evidence": false,
+    "research_pipeline_version": 4,
+    "closed_source_claims": "unverified_external_source",
+    "auto_caption_warning": true,
+    "local_asr_warning": false
+  }
+}

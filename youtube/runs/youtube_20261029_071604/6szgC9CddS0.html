@@ -1,0 +1,863 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YouTube 투자자용 검증 리포트 - 앤트로픽 상장 이후, 벌어질 &#x27;주가 흐름&#x27; 전부 분석해왔습니다</title>
+  <style>
+:root {
+  color-scheme: light;
+  --bg: #f7f8fb;
+  --panel: #ffffff;
+  --text: #172033;
+  --muted: #667085;
+  --line: #d9dee8;
+  --accent: #0f766e;
+  --accent-2: #2563eb;
+  --warn: #b45309;
+  --bad: #b42318;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0 56px; }
+a { color: var(--accent-2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.hero { padding: 28px 0 22px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+.hero.compact { padding-top: 12px; }
+.hero h1 { margin: 0; font-size: clamp(28px, 4vw, 44px); line-height: 1.15; letter-spacing: 0; }
+.hero p { max-width: 760px; color: var(--muted); margin: 12px 0 0; }
+.eyebrow { color: var(--accent); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0; margin: 0 0 8px; }
+section { margin: 28px 0; }
+h2, h3, h4, h5 { letter-spacing: 0; line-height: 1.25; }
+.synthesis-callout { padding: clamp(20px, 4vw, 34px); border: 1px solid #6ee7d8; border-radius: 18px; background: linear-gradient(135deg, #ecfdf9 0%, #eff6ff 100%); box-shadow: 0 18px 44px rgba(15, 118, 110, .12); }
+.synthesis-callout.unavailable { border-color: var(--line); background: var(--panel); box-shadow: none; }
+.synthesis-callout h2 { margin: 0; font-size: clamp(24px, 3.2vw, 36px); }
+.synthesis-callout .lead { max-width: 900px; font-size: 17px; color: #334155; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.primary-link, .secondary-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border-radius: 999px; font-weight: 800; }
+.primary-link { color: white; background: var(--accent); }
+.secondary-link { color: var(--accent-2); border: 1px solid #93c5fd; background: white; }
+.primary-link:hover, .secondary-link:hover { text-decoration: none; filter: brightness(.97); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.card, .run { display: flex; flex-direction: column; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; color: var(--text); min-height: 128px; }
+.run { padding: 16px; }
+.card:hover, .run:hover { border-color: var(--accent-2); text-decoration: none; }
+.thumb { display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #e9edf5; border-radius: 8px 8px 0 0; color: var(--muted); font-size: 13px; font-weight: 700; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb-empty span { padding: 0 14px; text-align: center; }
+.card-body { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 16px; }
+.card strong { line-height: 1.35; }
+.source-line { color: #3f4a5f; font-weight: 600; }
+.runs { display: grid; gap: 10px; }
+.badge { display: inline-flex; width: fit-content; border-radius: 999px; padding: 2px 9px; background: #e6f4f1; color: var(--accent); font-size: 12px; font-weight: 700; }
+.status-contradicted, .status-llm_failed { background: #fee4e2; color: var(--bad); }
+.status-unverified, .status-stale { background: #fff4d6; color: var(--warn); }
+small, .muted { color: var(--muted); }
+.topnav { display: flex; gap: 14px; margin-bottom: 16px; font-size: 14px; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px; }
+.stats span { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
+.report { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: min(5vw, 36px); }
+.report-head { border-bottom: 1px solid var(--line); margin-bottom: 24px; padding-bottom: 20px; }
+.report-head h1 { margin: 0; font-size: clamp(24px, 3.5vw, 38px); line-height: 1.2; }
+.meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+.scope-note { padding: 12px 14px; border-left: 4px solid var(--warn); border-radius: 6px; background: #fff7ed; color: #7c2d12; }
+.synthesis-report h2 { margin-top: 34px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.synthesis-report h3 { margin: 24px 0 8px; color: #0f4c5c; }
+.synthesis-report p, .synthesis-report li { overflow-wrap: anywhere; }
+pre { overflow: auto; background: #111827; color: #f9fafb; border-radius: 8px; padding: 14px; }
+code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+details { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 18px; }
+@media (max-width: 640px) {
+  main { width: min(100% - 20px, 1120px); padding-top: 18px; }
+  .report { padding: 18px; }
+  .synthesis-callout { border-radius: 14px; padding: 18px; }
+  .cta-row a { width: 100%; }
+  .mobile-report { border-radius: 12px; }
+}
+</style>
+</head>
+<body>
+  <main>
+<nav class="topnav"><a href="index.html">실행 목록</a><a href="../../index.html">YouTube 홈</a></nav>
+<article class="report">
+  <header class="report-head">
+    <p class="eyebrow">youtube_20261029_071604</p>
+    <h1>앤트로픽 상장 이후, 벌어질 &#x27;주가 흐름&#x27; 전부 분석해왔습니다</h1>
+    <div class="meta">
+      <span class="badge status-asr_uncertain">asr_uncertain</span>
+      <a href="https://www.youtube.com/watch?v=6szgC9CddS0">원본 영상</a>
+    </div>
+  </header>
+  <h2>앤트로픽 IPO: 주가 전망보다 먼저 확인할 공모조건·실적·유통물량</h2>
+<p><a href="https://www.youtube.com/watch?v=6szgC9CddS0">경제사냥꾼 영상</a> · 2026년 10월 28일 게시 · 제공 자료 기준 2026년 10월 29일 분석</p>
+<h3>1. 핵심 판단</h3>
+<p>영상의 핵심은 앤트로픽 IPO를 <strong>공모가격 결정 → 지수 편입 가능성 → 보호예수 해제</strong>로 이어지는 과정으로 보자는 것이다. 투자 관찰 틀로는 활용할 수 있지만, 이를 실제 일정이나 주가 경로로 받아들일 근거는 부족하다.</p>
+<p><strong>개별 주장 검증 결과는 12건 모두 미확인이다.</strong> C1~C10·C12는 미검증, C11은 음성인식 불확실로 분류됐다. 직접적인 반증도 확보되지 않았으므로, 이는 ‘거짓으로 확인됐다’는 뜻이 아니다. 상위 처리 상태의 <code>verified_with_caveats</code>나 자료 수집 상태의 <code>verified</code>를 영상 내용의 사실 인증으로 해석해서는 안 된다.</p>
+<p>현재 자료만으로 앤트로픽의 상장 완료 여부, 신청 티커 ANT, 공모조건, 첫 거래일을 확정할 수 없다. 제목의 ‘상장 이후’는 전망의 대상이지, 상장이 완료됐다는 확인 자료가 아니다.</p>
+<h3>2. 영상 주장과 확인된 근거</h3>
+<p>아래 시각은 문장별 정확한 발언 시각이 아니라 제공된 자막 청크의 시작점이다.</p>
+<p>| 쟁점 | 영상 주장 | 확인된 사실·근거 및 한계 |</p>
+<p>|---|---|---|</p>
+<p>| 상장 절차·일정 — 00:00, C1 | 10월 26일 공개 신고서 제출, 나스닥 ANT 신청. 11월 9일 주간 로드쇼와 빠르면 11월 16일 거래 예상 | SEC 접수번호·신고서·회사 또는 거래소 공지가 없다. 로이터·야후의 해당 전망 원문도 미제공이다. <strong>티커와 날짜 모두 미검증</strong>이다. |</p>
+<p>| 재무 — 00:00·05:18, C2 | 상반기 매출 163억 달러, 순손실 807억 달러 중 비현금 손실 724억 달러 | 재무제표·현금흐름표·회계 주석이 없다. 입력값 기준 비현금 손실 비중 약 89.7%라는 산술만 확인된다. |</p>
+<p>| 가치평가 — 00:00, C3 | 예상 상장 가치 1.5조~2조 달러. 분기 매출 연율화 기준 약 22~43배 | 가치 보도와 매출의 원자료가 없다. 아래 배수 계산은 재현되지만 <strong>기초 수치는 미검증</strong>이다. |</p>
+<p>| 지수 편입 — 05:18, C4 | 나스닥100 신속 편입의 상위 40위·15거래일 조건, S&amp;P500의 거래기간·이익 요건 | 당시 유효한 공식 방법론이 없다. 특히 순위 부분의 자동자막이 불명확하다. 편입일이나 유입액을 확정할 수 없다. |</p>
+<p>| 보호예수 — 05:18·15:42, C5 | 첫날 일부 매도 가능, 이후 27·48·62·76일 및 실적 연동 해제, 최장 365일 | 계약·기산일·주주별 물량이 없다. <strong>확정 해제 달력과 공급 규모를 계산할 수 없다.</strong> |</p>
+<p>| 투자·공급 관계 — 05:18·10:29, C7~C9 | 아마존·구글·SKT 등의 지분가치 재평가와 클라우드·반도체 수혜 | 투자계약·법원 문서·관련 재무 주석이 없어 금액·지분율·매출 귀속을 독립 확인하지 못했다. |</p>
+<h4>외부 자료가 실제로 뒷받침하는 범위</h4>
+<ul>
+<li><strong>공식 공시:</strong> 호스트는 SK텔레콤의 10월 28일 <a href="https://dart.fss.or.kr/dsaf001/main.do?rcpNo=20261028800090">기업설명회 개최 안내공시</a>를 확보했다. 이는 IR 안내의 근거이지, 영상이 제시한 앤트로픽 지분 장부가·평가이익을 입증하는 공시는 아니다.</li>
+<li><strong>관련 보도:</strong> 제공된 <a href="https://www.sedaily.com/article/20107282?ref=naver">서울경제 기사 발췌</a>는 앤트로픽 지분가치 재평가 기대와 SKT 주가 흐름을 연결한다. 다만 10월 29일 기사에서 전날 흐름을 다뤘으므로, 영상의 <strong>10월 27일 장중 +5.83%·종가 +1.94%</strong>를 확인하는 자료로 사용할 수 없다.</li>
+<li><strong>시장 조회값:</strong> 호스트의 yfinance 조회에서 AMZN 254.60달러, GOOGL 324.89달러, AVGO 351.81달러, MSFT 531.01달러, NVDA 215.38달러가 반환됐다. 조회 시각은 한국시간 10월 29일 약 07:25다. 이 값들은 해당 시점의 조회 스냅샷이며, 확정 종가나 앤트로픽 투자관계·과거 등락률의 증거가 아니다.</li>
+</ul>
+<p>핵심 검색 결과 E1~E4는 오류 문구와 탐색 메뉴 중심이고 E5~E10은 발췌문이 없다. 따라서 수집된 10개 항목 중 영상 주장을 직접 지지하거나 반박하는 근거는 배정되지 않았다. ANT·SKT 시세 조회 실패와 일부 공시 제공자 장애도 증권·뉴스·공시의 부재를 뜻하지 않는다.</p>
+<h3>3. 가치평가: 계산은 맞아도 입력값은 미확인</h3>
+<p>영상의 예상 가치 1.5조~2조 달러를 그대로 가정하면 다음 계산이 성립한다.</p>
+<p>| 매출 가정 | 단순 연율화 매출 | 예상 가치 ÷ 연율화 매출 |</p>
+<p>|---|---:|---:|</p>
+<p>| 2분기 매출 116억 달러 | 464억 달러 | 32.3~43.1배 |</p>
+<p>| 3분기 매출 168억 달러 | 672억 달러 | 22.3~29.8배 |</p>
+<p>분모만 바꿔도 배수가 크게 낮아진다. 그러나 3분기 168억 달러는 <strong>투자자 행사 참석자 전언</strong>으로 제시됐으며, 공시나 회사 확인이 없다. 이를 확정 실적에 기반한 저평가 근거로 사용할 수 없다.</p>
+<p>또한 위 수치는 후행 12개월 매출배수가 아니다. 가치가 지분가치인지 기업가치(EV)인지, 조달 전인지 후인지도 확인되지 않아 EV/매출로 단정할 수 없다. 분기 연율화는 해당 매출 수준의 지속을 가정하며, 이익률·현금흐름·추가 희석을 반영하지 않는다.</p>
+<h3>4. 상승 논리와 반론</h3>
+<h4>조건부 상승 논리</h4>
+<p>1. <strong>매출 성장의 지속:</strong> 영상의 급성장 수치가 공식 자료로 확인되고 연산비용보다 매출이 빠르게 증가한다면, 높은 가치평가를 설명할 근거가 강화될 수 있다.</p>
+<p>2. <strong>투자·공급의 이중 연결:</strong> 관련 지분 보유와 공급계약이 확인된다면, 투자사는 지분가치 변화와 사업 매출 양쪽에서 영향을 받을 수 있다.</p>
+<p>3. <strong>지수 추종 수요:</strong> 실제 편입이 결정되면 관련 추종자금 수요가 발생할 가능성이 있다. 다만 규모는 편입 비중·추종자산·기존 보유량을 확인해야 한다.</p>
+<p>이는 확인된 주가 예측이 아니라, 검증해야 할 조건부 경로다.</p>
+<h4>핵심 반론</h4>
+<ul>
+<li><strong>비현금 손실 제외가 현금건전성을 보장하지 않는다.</strong> 영상의 순손실 807억 달러에서 비현금 손실 724억 달러를 뺀 83억 달러도 현금 소진액으로 볼 수 없다. 영업현금흐름·설비투자·현금잔고를 별도로 확인해야 한다. 영상의 영업손실 약 7억 달러, 조정 영업이익 16억 달러, 연산비용 약 90억 달러 역시 정의와 조정표가 없다.</li>
+<li><strong>성장과 장기 부담이 함께 커질 수 있다.</strong> 상위 두 고객 매출 비중 약 25%, 약 10년간 최소 5,180억 달러 구매약정은 모두 미검증이다. 사실로 확인되더라도 계약기간·해지조건·최소보장액과 매출 회수 가능성을 함께 봐야 한다.</li>
+<li><strong>평가이익은 매각 현금이 아니다.</strong> 투자사별 증권 종류·회계분류·매각제한에 따라 반영 방식이 달라질 수 있다. 같은 상장가격을 모든 투자사에 동일하게 적용할 수 없다.</li>
+<li><strong>편입·해제는 방향을 보장하지 않는다.</strong> 편입 기대가 선반영됐거나 매도 공급이 더 크면 편입 후에도 하락할 수 있다. 보호예수 해제량은 실제 매도량과 다르다.</li>
+<li><strong>동반 상승은 인과 증거가 아니다.</strong> 영상의 나스닥·반도체지수 상승률은 해당 구간 가격자료가 없어 재현되지 않았다. 다른 실적·금리 요인의 영향을 분리하지 못했다.</li>
+</ul>
+<p>스페이스X·페이스북·우버·알리바바·Arm의 역사 비교도 원자료와 동일 기준 수익률이 없어 검증된 선례로 사용하지 않았다.</p>
+<h3>5. 관련 기업별 구체적 관찰 항목</h3>
+<p>아래 연결 관계와 금액은 영상 주장에 기반하며, 공식 확인 전 확정 수혜로 해석할 수 없다.</p>
+<p>| 기업 | 우선 관찰할 항목 |</p>
+<p>|---|---|</p>
+<p>| 아마존 | 투자 약정 대비 실제 납입액, 보유 증권과 평가손익, AWS 구매약정의 실제 사용·매출 전환 |</p>
+<p>| 알파벳 | 영상의 2025년 약 14% 지분율 이후 희석 여부, 권리 조건, 평가 회계, 연산 공급 일정 |</p>
+<p>| SK텔레콤 | 직접·간접 보유주체와 지분율, 기초 장부가·취득·평가·환율·처분을 연결하는 반기 주석 |</p>
+<p>| 브로드컴 | 영상의 630억 달러 금융구조 중 실제 귀속 계약액, 장비 인도·검수·매출 인식 시점 |</p>
+<p>| MSFT·엔비디아 | 최대 투자 약정과 집행액의 차이, 실제 클라우드 소비·공급 실적 |</p>
+<p>| 삼성·SK하이닉스·마이크론 | 정확한 참여 법인, 투자액·공급계약·납품액의 공식 공개 여부 |</p>
+<p>SKT의 장부가 1.4조→3.5조 원을 가정하면 증가액은 2.1조 원이다. 추가 취득 1,399억 원을 빼면 약 1.96조 원이지만, 환율·처분·기타 변동을 모르는 상태에서 이를 실제 평가이익으로 확정할 수 없다. 자료에 금액이 없다는 이유만으로 ‘공개된 적 없다’고 단정할 수도 없다.</p>
+<h3>6. 단기 체크포인트와 시나리오 무효화 조건</h3>
+<p>| 확인 단계 | 구체적으로 기록할 지표 | 기대 시나리오가 약화·무효화되는 조건 |</p>
+<p>|---|---|---|</p>
+<p>| 신고서·공모조건 | SEC 접수번호, 정정 이력, 공모가 범위, 신주·구주, 희석 후 주식 수, 거래일 | 공식 자료가 영상의 신청·일정·가치 전제와 불일치하거나 상장이 연기·철회되는 경우 |</p>
+<p>| 첫 공식 실적 | 매출 증가율, 연산비용 증가율, 영업현금흐름, 현금잔고, 비GAAP 조정 | 매출 가속이 확인되지 않거나 비용·현금 소진이 더 빠르게 증가하는 경우 |</p>
+<p>| 지수 편입 | 유효 방법론, 공식 편입일·비중, 편입 전후 가격·거래량 | 적격성 미충족 또는 편입 미결정이면 해당 수급 가정은 무효. 편입 후 약세면 단순 상승 논리는 약화 |</p>
+<p>| 보호예수 해제 | 확정 기산일, 주주별 해제량, 해제량/직전 유통주식, 해제량/평균 일거래량 | 물량·조건이 영상과 다르면 예상 달력을 수정. 공급 증가와 가격 약세가 지속되면 수급 부담 확대 |</p>
+<p>| 관련 기업 실적·공시 | 실제 투자 집행, 평가손익, 공급 매출, 인도 지연·계약 변경 | 약정 미집행, 공급 지연, 귀속액 축소 또는 평가손실이 확인되는 경우 |</p>
+<p>영상이 제시한 알파벳·아마존 설명회 시각, 서머타임 종료 및 한국시간 개장 안내도 공식 일정이 확보되지 않았다. 분석 기준시각상 이미 지났을 수 있는 알파벳 설명회는 결과 자료를, 아마존 설명회는 공식 IR 일정을 확인하는 것이 우선이다. 예상 첫 거래일과 실제 최초 체결 시각도 구분해야 한다.</p>
+<h3>7. 데이터 품질과 신뢰도 해석</h3>
+<ul>
+<li><strong>transcript_quality:</strong> 한국어 자동자막은 <code>good</code>, 점수 1.0이다. 이는 수집·텍스트 품질 지표이며 숫자·고유명사·사실 정확성의 보증이 아니다. 수동자막과 음성 재청취 결과는 없다.</li>
+<li><strong>source_confidence:</strong> 추출 단계의 0.93~0.97은 영상 발언을 명확히 추출했다는 의미다. 검증 단계에서는 직접 대조할 외부 근거가 없어 모든 주장에 0.0이 부여됐다. 두 지표는 의미가 다르다.</li>
+<li><strong>asr_confidence:</strong> 정성적 추정치다. 상장 연기 기업명 C11은 0.35, SKT 수치 C9는 0.55, 지수 규정 C4는 0.60, 공급계약 C8은 0.65로 특히 주의가 필요하다. 상대적으로 높은 점수도 사실 검증을 대신하지 않는다.</li>
+<li><strong>검증 confidence 0.99:</strong> ‘미검증 판정에 대한 확신’이지 영상 주장이 사실일 확률 99%라는 뜻이 아니다.</li>
+<li><strong>시간·범위:</strong> 00:00·05:18·10:29·15:42는 청크 시작점이다. 영상 말미 약 2초는 제공 구간에 없다.</li>
+<li><strong>폐쇄형 출처:</strong> 참석자 전언, 비공개 신고서 기반 수치, 비공개 취재원 전망은 <strong>미검증·수동 확인 필요</strong>다. Bloomberg·Morningstar 원문은 제공되지 않았으며, 해당 출처에 귀속되는 주장도 검증된 근거로 사용할 수 없다.</li>
+</ul>
+<h3>결론</h3>
+<p>이 영상에서 활용할 부분은 확정된 ‘주가 흐름’이 아니라 <strong>공모가치, 실적의 질, 편입 수요, 해제 공급을 분리해 관찰하는 틀</strong>이다. 현재는 핵심 전제를 입증할 직접 자료가 부족하다. 우선순위는 SEC·회사 원문 확보이며, 이후 실제 현금흐름과 유통물량을 확인해야 상승 논리와 반론의 무게를 비교할 수 있다.</p>
+  <details>
+    <summary>공개 요약 JSON</summary>
+    <pre>{
+  &quot;version&quot;: 4,
+  &quot;video_id&quot;: &quot;6szgC9CddS0&quot;,
+  &quot;title&quot;: &quot;앤트로픽 상장 이후, 벌어질 &#x27;주가 흐름&#x27; 전부 분석해왔습니다&quot;,
+  &quot;url&quot;: &quot;https://www.youtube.com/watch?v=6szgC9CddS0&quot;,
+  &quot;channel&quot;: &quot;경제사냥꾼&quot;,
+  &quot;channel_id&quot;: &quot;UC7usMJDHmtbs_oegmzQKKMA&quot;,
+  &quot;source_url&quot;: &quot;https://www.youtube.com/@%EA%B2%BD%EC%A0%9C%EC%82%AC%EB%83%A5%EA%BE%BC/videos&quot;,
+  &quot;thumbnail_url&quot;: &quot;https://i.ytimg.com/vi/6szgC9CddS0/maxresdefault.jpg&quot;,
+  &quot;published_at&quot;: &quot;2026-10-28T07:26:02+00:00&quot;,
+  &quot;status&quot;: &quot;asr_uncertain&quot;,
+  &quot;strategy_source_tier&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_evidence_weight&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_validation_policy&quot;: &quot;STANDARD_REVIEW&quot;,
+  &quot;transcript_status&quot;: &quot;available&quot;,
+  &quot;transcript_source&quot;: &quot;automatic&quot;,
+  &quot;transcript_chars&quot;: 9903,
+  &quot;transcript_quality&quot;: {
+    &quot;status&quot;: &quot;good&quot;,
+    &quot;score&quot;: 1.0,
+    &quot;warnings&quot;: [],
+    &quot;source&quot;: &quot;automatic&quot;,
+    &quot;language&quot;: &quot;Korean&quot;,
+    &quot;model_or_format&quot;: &quot;json3&quot;,
+    &quot;chars&quot;: 9903,
+    &quot;segments&quot;: 515,
+    &quot;duration_seconds&quot;: 980,
+    &quot;repeated_ngram_ratio&quot;: 0.007
+  },
+  &quot;generated_at&quot;: &quot;2026-10-29T07:16:04.252027+09:00&quot;,
+  &quot;llm_status&quot;: &quot;success&quot;,
+  &quot;research_status&quot;: &quot;success&quot;,
+  &quot;claim_verification_status&quot;: &quot;success&quot;,
+  &quot;research_pipeline_version&quot;: 4,
+  &quot;evidence_count&quot;: 10,
+  &quot;claim_status_summary&quot;: {
+    &quot;unverified&quot;: 11,
+    &quot;asr_uncertain&quot;: 1
+  },
+  &quot;claims&quot;: [
+    {
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;claim_text&quot;: &quot;앤트로픽은 2026-06-01 비공개 초안 제출을 발표하고 10-26 나스닥 ANT 상장 신고서를 공개했으며, 11-09 주간 로드쇼와 빠르면 11-16 첫 거래가 예상된다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.9,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;06-01 비공개 제출 발표; 10-26 공개 제출; 11-09 주간 로드쇼; 빠르면 11-16 거래&quot;,
+        &quot;observed&quot;: &quot;해당 날짜와 사건을 대조할 독립 원문 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;ANT를 확정 티커로 사용하거나 예상 날짜를 확정 청약·거래 일정으로 취급할 근거가 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;claim_text&quot;: &quot;상반기 매출 163억 달러, 순손실 807억 달러 중 비현금 손실 724억 달러이며, 영업손실·조정이익·고객 집중도·장기 구매약정도 제시한 수치와 같다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.78,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;Q1 47억·Q2 116억·상반기 매출 163억 달러; 순손실 807억·비현금 손실 724억; 2025년 순손실 420억; 영업손실 약 7억·조정 영업이익 16억·연산비용 약 90억 달러&quot;,
+        &quot;observed&quot;: &quot;입력값을 가정하면 47+116=163, 724/807=89.71%. 차액 83억 달러는 현금 소진액으로 확인된 수치가 아님. 실제 재무수치는 미확인&quot;
+      },
+      &quot;investor_implication&quot;: &quot;순손실을 현금 소진액으로 대체하거나 조정이익만으로 자금조달 필요성을 판단할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;claim_text&quot;: &quot;5월 조달액 650억 달러·가치 9,650억 달러, 예상 IPO 가치 1.5조~2조 달러이며, Q2·Q3 단순 연율화 매출을 적용한 배수는 각각 약 32~43배·22~30배다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.95,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;Q2 기준 32~43배·종전 가치 21배; 가치 상승 1.6~2.1배; Q3 기준 22~30배; 원화 약 1,280조 원&quot;,
+        &quot;observed&quot;: &quot;입력값 가정 시 Q2 연율화 464억 달러, 32.33~43.10배; 종전 가치 20.80배; 가치 상승 1.55~2.07배. Q3 연율화 672억 달러, 22.32~29.76배. 9,650억 달러를 1,280조 원으로 환산한 내재 환율은 약 1,326.42원/달러이나 실제 환율은 미확인&quot;
+      },
+      &quot;investor_implication&quot;: &quot;배수는 미확인 가치와 분기 매출을 가정한 시나리오이며, 후행 12개월 실적 배수나 확정 공모가치가 아니다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;claim_text&quot;: &quot;나스닥100은 2026-05-01 도입된 신속 편입 규정에 따라 시총 상위 40위 등의 요건 충족 시 상장 15거래일 후 편입되며, S&amp;P500은 12개월 거래와 최근 분기·4분기 합산 순이익 흑자를 요구한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:05:18&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.6,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;05-01 시행; 상위 40위; 15거래일; S&amp;P500 12개월; 빨라야 2027-11 자격&quot;,
+        &quot;observed&quot;: &quot;공식 규정 미제공. 2027-11은 2026-11 실제 상장과 해당 규정의 유효성을 전제로 한 조건부 계산&quot;
+      },
+      &quot;investor_implication&quot;: &quot;편입일·추종자금 유입액을 확정할 수 없으며, 적격성 충족과 실제 편입 결정을 구분해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;claim_text&quot;: &quot;일부 주식은 상장 첫날 매도 가능하며, 나머지는 최종 투자설명서 기준 27·48·62·76일째, 실적 발표 연동 또는 최장 365일에 걸쳐 보호예수가 해제된다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:05:18&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.9,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;첫날 및 27·48·62·76일; 실적 연동; 최장 365일&quot;,
+        &quot;observed&quot;: &quot;계약 원문과 대상 물량 없음; 확정 해제일 계산 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;현재 자료로 달력상 해제일이나 유통주식 대비 공급 부담을 산정할 수 없다. 매도 가능 물량과 실제 매도 물량도 구분해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;claim_text&quot;: &quot;스페이스X의 2026년 상장·편입 사례와 페이스북의 2012년 보호예수 해제 사례, 페이스북·우버·알리바바·Arm의 IPO 6개월 수익률이 제시한 흐름과 같다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:05:18&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.85,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;스페이스X 공개 신청 후 23일 거래·편입 첫 주 -15%; 페이스북 공모가 38달러, 08-16 2.71억 주 해제·종가 19.87달러·6% 이상 하락, 11-14 약 8억 주 해제·12.6% 상승; 페이스북·우버 6개월 약 -40%&quot;,
+        &quot;observed&quot;: &quot;입력 가격만으로 19.87/38-1=-47.71% 계산 가능. 실제 가격·해제 수량·사건·나머지 수익률은 미확인&quot;
+      },
+      &quot;investor_implication&quot;: &quot;역사 사례를 검증된 선례나 앤트로픽 주가 예측의 근거로 사용할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;claim_text&quot;: &quot;아마존·알파벳·마이크로소프트·엔비디아가 제시한 규모와 조건으로 앤트로픽에 투자하거나 투자 약정을 맺었으며, 상장가격은 투자사 지분 평가에 영향을 준다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:05:18&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.94,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;AMZN 기존 80억+추가 50억 달러·조건부 최대 200억 달러; 알파벳 약 14%; MSFT 최대 50억·NVDA 최대 100억 달러&quot;,
+        &quot;observed&quot;: &quot;투자·권리·집행·회계처리를 대조할 원문 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;투자 약정·집행액·보유지분·평가손익을 분리해야 하며, 미실현 평가이익을 현금 유입으로 계산할 근거는 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;claim_text&quot;: &quot;AWS·Azure 구매약정, 구글·브로드컴의 2027년 연산 공급, 630억 달러 장비 금융 구조와 메모리 업체들의 전략적 파트너 참여가 제시한 내용과 같다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:10:29&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.65,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;AWS 10년간 1,000억 달러 초과; Azure 300억 달러; 금융 구조 630억 달러; 인도·가동 2027년&quot;,
+        &quot;observed&quot;: &quot;계약 금액·범위·당사자·일정을 대조할 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;약정·금융조달 총액을 공급사의 당해 매출이나 확정 수혜액으로 환산할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;claim_text&quot;: &quot;SK텔레콤은 2023-08 앤트로픽에 1억 달러를 추가 투자했고, 2026년 상반기 장부가는 약 1.4조 원에서 3.5조 원으로 증가했으며 추가 취득 1,399억 원과 평가이익 약 2조 원이 발생했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:10:29&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.55,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;1억 달러 투자; 장부가 약 1.4조→3.5조 원·2.5배; 추가 취득 1,399억 원; 평가이익 약 2조 원&quot;,
+        &quot;observed&quot;: &quot;입력값 가정 시 3.5/1.4=2.5배. 장부가 증가 2.1조 원에서 취득액 0.1399조 원을 빼면 1.9601조 원이나, 이를 실제 평가이익으로 확정할 조정표는 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;장부가 증가 전부를 평가이익으로 볼 수 없으며, 지분율과 평가 기준 없이 IPO 가치에서 SKT 귀속 가치를 산출할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C10&quot;,
+      &quot;claim_text&quot;: &quot;신고서 공개 후 2거래일 나스닥 약 2%·SOX 약 6.5% 상승, 10-26 AMZN +0.44%·알파벳 -1.06%, 10-27 SKT 장중 +5.83%·종가 +1.94%, 5월 초 연초 대비 약 +70%이며 언론은 앤트로픽을 반등 배경으로 언급했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.94,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;나스닥 +2%; SOX +6.5%; AMZN +0.44%; 알파벳 -1.06%; SKT +5.83%·+1.94%·연초 대비 약 +70%&quot;,
+        &quot;observed&quot;: &quot;해당 날짜의 기준가격·종가·고가와 지수 시계열 없음; 재계산 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;신고서 공개가 시장 상승을 유발했다고 단정하거나 제시된 등락률을 검증된 수치로 인용할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C11&quot;,
+      &quot;claim_text&quot;: &quot;로이터는 변동성·금리 상승·AI 지출 우려 속 스위치스케일·SB에너지 등의 상장 연기와 에어트렁크 리치·퍼머스 등의 철회 또는 중단을 보도했다.&quot;,
+      &quot;status&quot;: &quot;asr_uncertain&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:05:18&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.35,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;2026년 9~10월경 복수 기업 상장 연기·철회·중단&quot;,
+        &quot;observed&quot;: &quot;정확한 법인명·사건일·상태·금리 및 변동성 측정치 미확인&quot;
+      },
+      &quot;investor_implication&quot;: &quot;기업명과 사건 확인 전 이를 AI IPO 시장 악화의 실증 사례로 인용할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C12&quot;,
+      &quot;claim_text&quot;: &quot;알파벳·아마존 실적 설명회는 한국시간 10-29 05:30·10-30 06:00이며, 11-01 미국 서머타임 종료 후 나스닥 개장은 23:30이고 앤트로픽 첫 거래는 빠르면 11-16 그 이후다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:10:29&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.95,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;KST 10-29 05:30·10-30 06:00; 서머타임 종료 11-01; 이후 개장 23:30; 첫 거래 빠르면 11-16&quot;,
+        &quot;observed&quot;: &quot;공식 일정과 시간대 근거 없음; 실제 설명회·거래 개시 시각 미확인&quot;
+      },
+      &quot;investor_implication&quot;: &quot;실적 확인·첫 거래 대응 일정은 회사 IR과 거래소 공식 공지를 기준으로 다시 확인해야 한다.&quot;
+    }
+  ],
+  &quot;entities&quot;: [
+    {
+      &quot;ticker&quot;: &quot;ANT&quot;,
+      &quot;name&quot;: &quot;앤트로픽 — 영상에서 제시한 신청 티커이며 확정 여부 미검증&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;영상 시점에는 상장을 완료한 것이 아니라 공개 신고서를 제출한 상태이며, 공모가·공모 주식 수·첫 거래일은 미정이라고 설명한다.&quot;,
+        &quot;큰 순손실의 대부분은 전환성 투자계약 평가에 따른 비현금 손실이므로 현금 소진액과 구분해야 하지만, 본업의 연산·인프라 비용 부담은 크다고 주장한다.&quot;,
+        &quot;보도된 상장 기업가치는 AI 기업 가치평가의 비교 기준이 되며, 어느 분기 매출을 연율화하느냐에 따라 매출 배수가 크게 달라진다고 설명한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;2026년 6월 1일 비공개 신청서 초안 제출 발표, 미국 시간 10월 26일 공개 신고서 제출, 나스닥·ANT로 신청했다고 발언한다.&quot;,
+        &quot;로이터 관계자 보도상 11월 9일 주간 로드쇼·11월 중순 상장 예상, 야후 파이낸스 계산상 첫 거래는 빠르면 미국 시간 11월 16일이라고 소개한다.&quot;,
+        &quot;2026년 상반기 매출 163억 달러, 전년 동기 대비 약 14배로 들리는 발언, 1분기 약 47억 달러·2분기 116억 달러 매출을 제시한다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;시장 데이터 조회 실패: no_usable_market_fields&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;ANT&quot;,
+        &quot;as_of&quot;: &quot;2026-10-28T22:25:05.913832+00:00&quot;,
+        &quot;current_price&quot;: null,
+        &quot;market_cap&quot;: null,
+        &quot;forward_pe&quot;: null,
+        &quot;trailing_pe&quot;: null,
+        &quot;fifty_two_week_high&quot;: null,
+        &quot;fifty_two_week_low&quot;: null,
+        &quot;average_target_price&quot;: null,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;unverified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;AMZN&quot;,
+      &quot;name&quot;: &quot;아마존&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;앤트로픽 투자자이자 AWS 공급자로서 지분 평가와 연산 매출 양쪽에 연결되지만, 지분 평가이익은 현금 유입과 다르다고 설명한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;기존 투자 80억 달러에 이어 4월 50억 달러 추가 투자, 조건에 따라 최대 200억 달러 추가 투자 약정을 제시한다.&quot;,
+        &quot;앤트로픽이 4월 AWS 기술에 향후 10년간 1,000억 달러 넘게 지출하기로 했다고 발언한다.&quot;,
+        &quot;10월 26일 아마존 주가는 0.44% 상승했다고 제시한다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;AMZN&quot;,
+        &quot;as_of&quot;: &quot;2026-10-28T22:25:10.064592+00:00&quot;,
+        &quot;current_price&quot;: 254.60000610351562,
+        &quot;market_cap&quot;: 2746195501265.6333,
+        &quot;forward_pe&quot;: 24.363426,
+        &quot;trailing_pe&quot;: 20.482702,
+        &quot;fifty_two_week_high&quot;: 287.2,
+        &quot;fifty_two_week_low&quot;: 196.0,
+        &quot;average_target_price&quot;: 332.4093,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;GOOGL&quot;,
+      &quot;name&quot;: &quot;알파벳·구글&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;앤트로픽 지분 투자와 AI 연산 공급에 동시에 연결되며, 상장 후 시장가격이 지분 평가에 영향을 준다고 설명한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;2025년 법원 자료 기준 앤트로픽 지분 약 14%이며 의결권·이사회 자리가 없는 투자라고 설명한다.&quot;,
+        &quot;10월 26일 알파벳 주가는 1.06% 하락했다고 제시한다.&quot;,
+        &quot;구글·브로드컴과의 구글 AI칩 사용 계약에 따른 연산 용량은 2027년부터 가동 예정이라고 발언한다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;GOOGL&quot;,
+        &quot;as_of&quot;: &quot;2026-10-28T22:25:12.599544+00:00&quot;,
+        &quot;current_price&quot;: 324.8900146484375,
+        &quot;market_cap&quot;: 3973383706393.026,
+        &quot;forward_pe&quot;: 21.39095,
+        &quot;trailing_pe&quot;: 16.301556,
+        &quot;fifty_two_week_high&quot;: 408.61,
+        &quot;fifty_two_week_low&quot;: 267.67,
+        &quot;average_target_price&quot;: 429.67776,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;017670&quot;,
+      &quot;name&quot;: &quot;SK텔레콤&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;앤트로픽 기대가 주가와 보유지분 장부가에 반영됐으며, 상장 기업가치가 장부 반영 가격보다 낮으면 평가이익이 축소될 수 있다고 주장한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;계열 벤처투자사의 선행 투자 이후 2023년 8월 앤트로픽에 1억 달러를 추가 투자했다고 발언한다.&quot;,
+        &quot;지분 장부가는 연초 약 1조 4천억 원에서 6월 말 약 3조 5천억 원으로 약 2.5배, 반년 평가이익은 약 2조 원이며 그 사이 1,399억 원어치를 추가 취득했다고 설명한다. 연초 금액의 ASR은 불명확하다.&quot;,
+        &quot;5월 초 보도 기준 연초 대비 주가 약 70% 상승, 10월 27일 장중 최대 5.83% 상승 후 종가 기준 1.94% 상승했다고 제시한다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;시장 데이터 조회 실패: no_usable_market_fields&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;017670&quot;,
+        &quot;as_of&quot;: &quot;2026-10-28T22:25:14.663566+00:00&quot;,
+        &quot;current_price&quot;: null,
+        &quot;market_cap&quot;: null,
+        &quot;forward_pe&quot;: null,
+        &quot;trailing_pe&quot;: null,
+        &quot;fifty_two_week_high&quot;: null,
+        &quot;fifty_two_week_low&quot;: null,
+        &quot;average_target_price&quot;: null,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;unverified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;AVGO&quot;,
+      &quot;name&quot;: &quot;브로드컴&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;앤트로픽의 AI 연산 확대가 칩·네트워크 장비 수요로 연결되지만, 미래 인도 계약을 당해 매출로 해석해서는 안 된다고 설명한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;10월 26일 미국 대형 금융사들이 630억 달러 규모 금융 구조를 발표했으며, 신설 회사가 브로드컴 AI칩·네트워크 장비를 구매해 앤트로픽에 임대한다고 발언한다.&quot;,
+        &quot;해당 장비 인도와 구글 AI칩 계약의 연산 용량 가동은 2027년부터라고 제시한다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;AVGO&quot;,
+        &quot;as_of&quot;: &quot;2026-10-28T22:25:16.946389+00:00&quot;,
+        &quot;current_price&quot;: 351.80999755859375,
+        &quot;market_cap&quot;: 1679410711151.2803,
+        &quot;forward_pe&quot;: 18.073914,
+        &quot;trailing_pe&quot;: 44.931034,
+        &quot;fifty_two_week_high&quot;: 495.0,
+        &quot;fifty_two_week_low&quot;: 289.96,
+        &quot;average_target_price&quot;: 530.14166,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;MSFT&quot;,
+      &quot;name&quot;: &quot;마이크로소프트&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;앤트로픽에 대한 투자 약정과 클라우드 판매 약정으로 투자·거래 양쪽에 연결됐다고 설명한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;2025년 11월 앤트로픽이 마이크로소프트 클라우드 300억 달러 구매를 약정했다고 발언한다.&quot;,
+        &quot;같은 시기 마이크로소프트는 앤트로픽에 최대 50억 달러 투자를 약정했다고 제시한다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;MSFT&quot;,
+        &quot;as_of&quot;: &quot;2026-10-28T22:25:18.729648+00:00&quot;,
+        &quot;current_price&quot;: 531.010009765625,
+        &quot;market_cap&quot;: 3943038983691.003,
+        &quot;forward_pe&quot;: 22.415209,
+        &quot;trailing_pe&quot;: 29.58273,
+        &quot;fifty_two_week_high&quot;: 551.15,
+        &quot;fifty_two_week_low&quot;: 349.2,
+        &quot;average_target_price&quot;: 605.1243,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;NVDA&quot;,
+      &quot;name&quot;: &quot;엔비디아&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;앤트로픽과 투자·거래 관계로 연결되며, 신고서 공개일에는 투자사보다 반도체 관련주의 상승이 두드러졌다고 설명한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;2025년 11월 앤트로픽에 최대 100억 달러 투자를 약정했다고 제시한다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;NVDA&quot;,
+        &quot;as_of&quot;: &quot;2026-10-28T22:25:21.360755+00:00&quot;,
+        &quot;current_price&quot;: 215.3800048828125,
+        &quot;market_cap&quot;: 5200780977905.273,
+        &quot;forward_pe&quot;: 13.533485,
+        &quot;trailing_pe&quot;: 27.228825,
+        &quot;fifty_two_week_high&quot;: 243.37,
+        &quot;fifty_two_week_low&quot;: 164.27,
+        &quot;average_target_price&quot;: 328.95346,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    }
+  ],
+  &quot;evidence&quot;: [
+    {
+      &quot;evidence_id&quot;: &quot;E1&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;Dow Jones Futures: Microsoft Rises Late, But Google, ServiceNow, Fortinet Dive On Earnings&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/m/6c0b166b-19af-3d40-b6ff-7c6d65d3c4da/dow-jones-futures%3A-microsoft.html&quot;,
+      &quot;publisher&quot;: &quot;Investor&#x27;s Business Daily&quot;,
+      &quot;published_at&quot;: &quot;2026-10-28T22:09:01+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Dow Jones Futures: Microsoft Rises Late, But Google, ServiceNow, Fortinet Dive On Earnings Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 20...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E2&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;Stock Market Today, Oct. 28: Markets Edge Higher as Fed Holds Rates Steady&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/stock-market-today-oct-28-220317072.html&quot;,
+      &quot;publisher&quot;: &quot;Motley Fool&quot;,
+      &quot;published_at&quot;: &quot;2026-10-28T22:03:17+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Stock Market Today, Oct. 28: Markets Edge Higher as Fed Holds Rates Steady Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 2026 Elections Wea...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E4&quot;,
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;title&quot;: &quot;Intel to report Q3 earnings as chip stocks continue to rebound&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/technology/article/intel-to-report-q3-earnings-as-chip-stocks-continue-to-rebound-221713961.html&quot;,
+      &quot;publisher&quot;: &quot;Yahoo Finance&quot;,
+      &quot;published_at&quot;: &quot;2026-10-28T22:17:13+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Intel to report Q3 earnings as chip stocks continue to rebound Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 2026 Elections Weather Newslet...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E5&quot;,
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;title&quot;: &quot;Meta’s Raising $97.5 Billion. Nvidia and AMD Are Buying In.&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/meta-raising-97-5-billion-202052016.html&quot;,
+      &quot;publisher&quot;: &quot;Moby&quot;,
+      &quot;published_at&quot;: &quot;2026-10-28T20:20:52+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E7&quot;,
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;title&quot;: &quot;Stock market today: Dow, S&amp;P 500, Nasdaq rise as Fed holds rates steady, Big Tech earnings loom&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/live/stock-market-today-dow-sp-500-nasdaq-rise-as-fed-holds-rates-steady-in-split-vote-185837696.html&quot;,
+      &quot;publisher&quot;: &quot;Yahoo Finance&quot;,
+      &quot;published_at&quot;: &quot;2026-10-28T20:39:51+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E8&quot;,
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;title&quot;: &quot;Vedanta Ltd (BOM:500295) (Q2 2027) Earnings Call Highlights: Record Revenue, Doubled EBITDA and ...&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/vedanta-ltd-bom-500295-q2-190447331.html&quot;,
+      &quot;publisher&quot;: &quot;GuruFocus.com&quot;,
+      &quot;published_at&quot;: &quot;2026-10-28T19:04:47+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E9&quot;,
+      &quot;claim_id&quot;: &quot;C11&quot;,
+      &quot;title&quot;: &quot;Natural Gas Is Plentiful. Getting It Into AI Power Is the Hard Part&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/energy/articles/natural-gas-plentiful-getting-ai-184100085.html&quot;,
+      &quot;publisher&quot;: &quot;CNW Group&quot;,
+      &quot;published_at&quot;: &quot;2026-10-28T18:41:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E10&quot;,
+      &quot;claim_id&quot;: &quot;C11&quot;,
+      &quot;title&quot;: &quot;Natural Gas Is Plentiful. Getting It Into AI Power Is the Hard Part&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/energy/articles/natural-gas-plentiful-getting-ai-184100866.html&quot;,
+      &quot;publisher&quot;: &quot;PR Newswire&quot;,
+      &quot;published_at&quot;: &quot;2026-10-28T18:41:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    }
+  ],
+  &quot;source_policy&quot;: {
+    &quot;raw_transcript_published&quot;: false,
+    &quot;raw_transcript_in_evidence&quot;: false,
+    &quot;research_pipeline_version&quot;: 4,
+    &quot;closed_source_claims&quot;: &quot;unverified_external_source&quot;,
+    &quot;auto_caption_warning&quot;: true,
+    &quot;local_asr_warning&quot;: false
+  }
+}</pre>
+  </details>
+</article>
+</main>
+  <style>
+.reader-contents { margin: 16px 0; padding: 12px 16px; border: 1px solid var(--line, #64748b); border-radius: 12px; }
+.reader-contents > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-weight: 750; }
+.reader-contents nav { display: grid; gap: 4px; max-height: 45vh; overflow: auto; margin: 8px 0; }
+.reader-contents a { display: block; min-height: 44px; padding: 10px; border-radius: 6px; color: inherit; overflow-wrap: anywhere; }
+.reader-contents a:hover { background: #80808020; }
+.reader-contents .reader-subsection { padding-inline-start: 24px; font-size: .92em; }
+.reader-prose, .report { overflow-wrap: anywhere; line-height: 1.8; }
+.reader-prose p, .reader-prose li { max-width: 85ch; }
+.reader-prose h2, .reader-prose h3, .reader-prose h4, [data-reader-heading] { scroll-margin-top: 100px; line-height: 1.45; }
+.reader-prose h2 { margin-top: 1.8em; padding-bottom: 8px; border-bottom: 1px solid var(--line, #64748b); }
+.reader-prose h3 { margin-top: 1.5em; }
+.reader-prose li { margin: .5em 0; }
+.reader-prose pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.reader-prose blockquote { margin: 16px 0; padding: 4px 16px; border-left: 3px solid var(--accent, #64748b); }
+.reader-table { overflow: auto; max-width: 100%; margin: 16px 0; border: 1px solid var(--line, #64748b); border-radius: 10px; }
+.reader-table table { border-collapse: collapse; width: 100%; margin: 0; font-size: .92rem; }
+.reader-table th, .reader-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line, #64748b); min-width: 110px; max-width: 400px; overflow-wrap: anywhere; white-space: normal; }
+.reader-table th { background: #80808018; }
+.reader-table tr:nth-child(even) { background: #80808008; }
+.reader-search { display: grid; gap: 8px; margin: 16px 0; }
+.reader-search label { font-weight: 700; }
+.reader-search input { box-sizing: border-box; width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line, #64748b); border-radius: 10px; background: var(--panel, #fff); color: var(--text, #132238); font: inherit; }
+.reader-search p { margin: 0; font-size: .86rem; }
+.reader-back { position: fixed; bottom: max(14px, env(safe-area-inset-bottom)); right: 14px; z-index: 30; min-height: 44px; border: 1px solid #778899; border-radius: 99px; padding: 10px 16px; background: #18344a; color: #fff; font: 700 14px system-ui; cursor: pointer; box-shadow: 0 3px 12px #0003; }
+[data-reader-source] { margin-top: 20px; }
+[data-reader-source] > summary { min-height: 44px; cursor: pointer; }
+[data-reader-source] pre { font-size: .85rem; }
+[data-reader-source] pre, .reader-prose { min-width: 0; }
+.reader-contents :focus-visible, .reader-search :focus-visible, .reader-back:focus-visible, .reader-table:focus-visible { outline: 3px solid var(--accent, #008c95); outline-offset: 3px; }
+.reader-search + .grid > [hidden] { display: none !important; }
+@media (max-width: 600px) { .reader-prose { font-size: 1rem; } .reader-contents { padding: 8px 12px; } }
+@media print { .reader-back, .reader-search, .reader-contents, [data-reader-source] { display: none !important; } .reader-table { overflow: visible; } .reader-prose { color: #000; background: #fff; } }
+</style><script>
+(() => {
+  'use strict';
+  let serial = 0;
+  const rendered = new WeakMap();
+  const node = (tag, text) => { const el = document.createElement(tag); if (text != null) el.textContent = text; return el; };
+  function inline(parent, text) {
+    const pattern = /(`[^`]+`|\*\*[^*]+\*\*|\[[^\]]+\]\(https?:\/\/[^\s)]+\))/g;
+    let start = 0;
+    for (const match of String(text).matchAll(pattern)) {
+      parent.append(document.createTextNode(text.slice(start, match.index)));
+      const value = match[0];
+      if (value.startsWith('`')) parent.append(node('code', value.slice(1, -1)));
+      else if (value.startsWith('**')) parent.append(node('strong', value.slice(2, -2)));
+      else {
+        const link = value.match(/^\[([^\]]+)\]\((.+)\)$/);
+        const a = node('a', link[1]); a.href = link[2]; a.rel = 'noopener noreferrer'; parent.append(a);
+      }
+      start = match.index + value.length;
+    }
+    parent.append(document.createTextNode(text.slice(start)));
+  }
+  const cells = line => line.trim().replace(/^\|/, '').replace(/\|$/, '').split(/(?<!\\)\|/).map(v => v.trim().replace(/\\\|/g, '|'));
+  function markdown(source) {
+    const article = node('article'); article.className = 'reader-prose';
+    const lines = source.split(/\r?\n/); let list = null;
+    for (let i = 0; i < lines.length; i += 1) {
+      const line = lines[i], value = line.trim();
+      if (!value) { list = null; continue; }
+      if (/^```/.test(value)) {
+        const code = []; i += 1;
+        while (i < lines.length && !/^```/.test(lines[i].trim())) code.push(lines[i++]);
+        const pre = node('pre'); pre.append(node('code', code.join('\n'))); article.append(pre); list = null; continue;
+      }
+      if (i + 1 < lines.length && value.includes('|') && cells(lines[i + 1]).every(v => /^:?-{3,}:?$/.test(v))) {
+        const table = node('table'), head = node('thead'), body = node('tbody');
+        const row = (values, tag) => { const tr = node('tr'); values.forEach(v => { const cell = node(tag); if (tag === 'th') cell.scope = 'col'; inline(cell, v); tr.append(cell); }); return tr; };
+        head.append(row(cells(line), 'th')); i += 2;
+        while (i < lines.length && lines[i].trim() && lines[i].includes('|')) body.append(row(cells(lines[i++]), 'td'));
+        i -= 1; table.append(head, body); article.append(table); list = null; continue;
+      }
+      const heading = value.match(/^(#{1,6})\s+(.+)$/);
+      if (heading) { const h = node('h' + Math.min(4, heading[1].length + 1)); inline(h, heading[2]); article.append(h); list = null; continue; }
+      const bullet = value.match(/^(?:[-*+] |\d+\. )(.+)$/);
+      if (bullet) {
+        const tag = /^\d/.test(value) ? 'ol' : 'ul';
+        if (!list || list.tagName.toLowerCase() !== tag) { list = node(tag); if (tag === 'ol') list.start = parseInt(value, 10); article.append(list); }
+        const li = node('li'); inline(li, bullet[1]); list.append(li); continue;
+      }
+      list = null;
+      if (/^(---+|\*\*\*+)$/.test(value)) { article.append(node('hr')); continue; }
+      const p = node(value.startsWith('> ') ? 'blockquote' : 'p'); inline(p, value.startsWith('> ') ? value.slice(2) : line); article.append(p);
+    }
+    return article;
+  }
+  function contents(root) {
+    root.querySelectorAll(':scope > .reader-contents').forEach(el => el.remove());
+    const headings = [...root.querySelectorAll('h2,h3,h4')].filter(h => !h.closest('.card,.run-card,.reader-contents,[data-reader-source],[hidden]'));
+    if (headings.length < 2) return;
+    const details = node('details'); details.className = 'reader-contents';
+    details.append(node('summary', '이 리포트 목차 · ' + headings.length + '개 항목'));
+    const nav = node('nav'); nav.setAttribute('aria-label', '리포트 목차');
+    headings.forEach(h => {
+      if (!h.id) h.id = 'reader-section-' + (++serial);
+      h.dataset.readerHeading = ''; h.tabIndex = -1;
+      const a = node('a', h.textContent); a.href = '#' + h.id;
+      if (h.tagName !== 'H2') a.className = 'reader-subsection';
+      a.addEventListener('click', event => {
+        event.preventDefault();
+        for (let ancestor = h.parentElement; ancestor; ancestor = ancestor.parentElement) if (ancestor.tagName === 'DETAILS') ancestor.open = true;
+        h.scrollIntoView({block: 'start'}); h.focus({preventScroll: true});
+      }); nav.append(a);
+    });
+    details.append(nav); root.prepend(details);
+  }
+  function enhance(root) {
+    if (!root) return;
+    root.querySelectorAll('pre[data-report-markdown]').forEach(pre => {
+      const previous = rendered.get(pre);
+      if (previous && previous.source === pre.textContent) return;
+      const article = markdown(pre.textContent);
+      if (previous) previous.article.replaceWith(article);
+      else {
+        const details = node('details'); details.dataset.readerSource = '';
+        details.append(node('summary', 'Markdown 원문 보기'));
+        pre.before(article, details); details.append(pre);
+      }
+      rendered.set(pre, {source: pre.textContent, article});
+    });
+    root.querySelectorAll('table').forEach(table => {
+      if (table.closest('.reader-table,.account-table-wrap,.summary-scroll')) return;
+      const wrap = node('div'); wrap.className = 'reader-table'; wrap.tabIndex = 0;
+      wrap.setAttribute('role', 'region'); wrap.setAttribute('aria-label', '리포트 표 · 가로로 스크롤하여 전체 보기');
+      table.before(wrap); wrap.append(table);
+    });
+    root.querySelectorAll('.grid').forEach(grid => {
+      const cards = [...grid.querySelectorAll(':scope > a.card')];
+      if (cards.length < 2 || grid.dataset.readerSearch) return;
+      grid.dataset.readerSearch = 'true';
+      const box = node('div'); box.className = 'reader-search';
+      const input = node('input'); input.type = 'search'; input.placeholder = '제목 · 종목 · 채널 · 키워드'; input.id = 'report-search-' + (++serial);
+      const label = node('label', '리포트 찾기'); label.htmlFor = input.id;
+      const status = node('p'); status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
+      const update = () => {
+        const terms = input.value.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean); let count = 0;
+        cards.forEach(card => { card.hidden = !terms.every(t => card.textContent.toLocaleLowerCase().includes(t)); if (!card.hidden) count += 1; });
+        status.textContent = cards.length + '개 중 ' + count + '개 표시' + (count ? '' : ' · 검색어를 지우거나 다른 키워드를 입력하세요.');
+      };
+      input.addEventListener('input', update); box.append(label, input, status); grid.before(box); update();
+    });
+    contents(root);
+  }
+  window.TradingAgentsReader = {enhance};
+  const main = document.querySelector('main');
+  if (main && !main.hasAttribute('data-reader-dynamic')) enhance(main);
+  if (main) {
+    const top = node('button', '↑ 맨 위'); top.type = 'button'; top.className = 'reader-back'; top.setAttribute('aria-label', '리포트 맨 위로 이동');
+    top.addEventListener('click', () => { const target = document.querySelector('h1') || main; target.tabIndex = -1; target.scrollIntoView({block: 'start'}); target.focus({preventScroll: true}); });
+    document.body.append(top);
+  }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,570 @@
+{
+  "version": 4,
+  "video_id": "ytsRGIP_NEU",
+  "title": "[10월 28일 마감시황] 하이닉스 호실적에 코스피 6.63% 폭등…외국인도 돌아왔지만 아직 확인해야 할 반등의 조건들ㅣ홍선애, 이권희, 장우진 [클로징벨 라이브]",
+  "url": "https://www.youtube.com/watch?v=ytsRGIP_NEU",
+  "channel": "삼프로TV 3PROTV",
+  "channel_id": "UChlv4GSd7OQl3js-jkLOnFA",
+  "source_url": "https://www.youtube.com/@3protv/videos",
+  "thumbnail_url": "https://i.ytimg.com/vi/ytsRGIP_NEU/maxresdefault.jpg",
+  "published_at": "2026-10-28T08:00:04+00:00",
+  "status": "contradicted",
+  "strategy_source_tier": "STANDARD",
+  "strategy_evidence_weight": "STANDARD",
+  "strategy_validation_policy": "STANDARD_REVIEW",
+  "transcript_status": "available",
+  "transcript_source": "automatic",
+  "transcript_chars": 35432,
+  "transcript_quality": {
+    "status": "good",
+    "score": 1.0,
+    "warnings": [],
+    "source": "automatic",
+    "language": "Korean",
+    "model_or_format": "json3",
+    "chars": 35432,
+    "segments": 2092,
+    "duration_seconds": 4294,
+    "repeated_ngram_ratio": 0.0
+  },
+  "generated_at": "2026-10-29T07:16:04.252027+09:00",
+  "llm_status": "success",
+  "research_status": "success",
+  "claim_verification_status": "success",
+  "research_pipeline_version": 4,
+  "evidence_count": 9,
+  "claim_status_summary": {
+    "partially_supported": 3,
+    "unverified": 8,
+    "contradicted": 1
+  },
+  "claims": [
+    {
+      "claim_id": "C1",
+      "claim_text": "코스피 +6.63%·374포인트·약 6,012, 코스닥 +3.69%·약 771, 외국인·기관 각각 1.1조원 이상 순매수, 외국인 선물 약 3,600억원 순매도, 환율 약 1,338원이며 외국인 조단위 순매수와 이틀 연속 사이드카가 반등 신호라는 주장이다.",
+      "status": "partially_supported",
+      "confidence": 0.96,
+      "supporting_evidence_ids": [
+        "/market_evidence/0/market_snapshot"
+      ],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.55,
+      "asr_confidence": 0.78,
+      "numeric_parse": {
+        "claimed": "코스피 약 6,012·+6.63%·+374포인트; 코스닥 약 771·+3.69%; 현물 각 1.1조원 이상; 선물 -3,600억원; 환율 약 1,338원",
+        "observed": "코스피 current_price 6,012.44, 조회시각 2026-10-28T22:50:36Z. 나머지 직접 관측값은 제공되지 않았다."
+      },
+      "investor_implication": "지수 수준만 제한적으로 확인됐으므로 수급 개선과 추세 전환을 검증된 결론으로 제시하지 않아야 한다."
+    },
+    {
+      "claim_id": "C2",
+      "claim_text": "SK하이닉스 분기 매출 104.6조원·영업이익 83.3조원·이익률 79.7%, LTA 14곳과 장기 공급 부족, 대규모 주주환원이 실적 우려를 완화했다는 주장이다. 4분기 이익 100조원과 향후 3년 이익 1천조원은 전망이다.",
+      "status": "partially_supported",
+      "confidence": 0.95,
+      "supporting_evidence_ids": [
+        "E6",
+        "/market_evidence/1/external_context/company_news_excerpt",
+        "/market_evidence/1/external_context/disclosure_excerpt"
+      ],
+      "manual_check_required": true,
+      "timestamp": "00:19:21",
+      "source_confidence": 0.58,
+      "asr_confidence": 0.62,
+      "numeric_parse": {
+        "claimed": "매출 104.6조원; 영업이익 83.3조원; 이익률 79.7%; 컨센서스 77조원; LTA 14곳; 4분기 이익 약 100조원",
+        "observed": "실적·계약 금액의 직접 관측값은 없다. 입력값으로 계산한 이익률은 약 79.64%, 컨센서스 대비 차이는 6.3조원이다. 100조원 초과는 기사에 인용된 전망이다."
+      },
+      "investor_implication": "주주환원 결정의 존재와 낙관적 이익 전망은 확인되지만, 계약과 환원 규모를 확정 수익 또는 확정 배당으로 평가해서는 안 된다."
+    },
+    {
+      "claim_id": "C3",
+      "claim_text": "마이크론 NDR에서 2035년 수요를 논의하고 구글이 10년 메모리 계약을 요구했으며, 앤트로픽 IPO 서류에 메모리 확보 위험이 기재됐다는 주장이다. 마이크론 PER 5~7배를 근거로 메모리의 구조적 재평가 가능성을 제시한다.",
+      "status": "unverified",
+      "confidence": 0.97,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:25:51",
+      "source_confidence": 0.3,
+      "asr_confidence": 0.76,
+      "numeric_parse": {
+        "claimed": "2026~2035년 10년 계약; PER 약 5~7배",
+        "observed": "조회시각 2026-10-28T22:50:39Z 기준 선행 PER 약 4.75배, 후행 PER 약 13.23배. 계약 기간의 독립 근거는 없다."
+      },
+      "investor_implication": "저평가 및 장기 공급 부족 논거는 계약 원문과 이익 추정 기준이 확인될 때까지 가설로 취급해야 한다."
+    },
+    {
+      "claim_id": "C4",
+      "claim_text": "삼성전자 잠정 영업이익 약 107조원, D램 이익 80조원·낸드 30조원·이익률 55.1%와 사업별 적자를 언급한다. HBM4 베이스다이 4나노 생산능력 포화 및 TSMC 협업 가능성도 제시한다.",
+      "status": "unverified",
+      "confidence": 0.97,
+      "supporting_evidence_ids": [
+        "/market_evidence/3/external_context/company_news_excerpt"
+      ],
+      "manual_check_required": true,
+      "timestamp": "00:45:12",
+      "source_confidence": 0.28,
+      "asr_confidence": 0.58,
+      "numeric_parse": {
+        "claimed": "잠정 이익 107조원; D램 80조원; 낸드 30조원; 이익률 55.1%; HBM4 베이스다이 4나노",
+        "observed": "해당 숫자를 직접 검증할 실적표나 기술 발표는 제공되지 않았다."
+      },
+      "investor_implication": "발표 일정만 보조 확인됐으며, 사업별 이익과 협업설은 투자 판단의 확정 입력값으로 사용할 수 없다."
+    },
+    {
+      "claim_id": "C5",
+      "claim_text": "삼성전기 매출 3.7조원대 후반·영업이익 6,910억원, MLCC 최대 30% 인상, GPU·ASIC당 정전용량 연간 2배 증가, 6.8조원 기판 투자와 고객사 참여 및 로봇 카메라 공급을 주장한다.",
+      "status": "unverified",
+      "confidence": 0.97,
+      "supporting_evidence_ids": [
+        "/market_evidence/4/external_context/company_news_excerpt",
+        "/market_evidence/4/external_context/disclosure_excerpt"
+      ],
+      "manual_check_required": true,
+      "timestamp": "00:39:04",
+      "source_confidence": 0.32,
+      "asr_confidence": 0.69,
+      "numeric_parse": {
+        "claimed": "영업이익 6,910억원; 컴포넌트 매출 1.88조원·+36%; 매출 컨센서스 -1.7%, 이익 +7.1%; MLCC 최대 +30%; 투자 6.8조원",
+        "observed": "직접 대조 가능한 금액·비율은 제공되지 않았다."
+      },
+      "investor_implication": "업황에 대한 긍정적 의견과 실제 가격 인상·고객 확보·투자 집행을 구분해야 한다."
+    },
+    {
+      "claim_id": "C6",
+      "claim_text": "베라 루빈·SOCAMM2 수요가 티엘비·코리아써키트·심텍 반등을 지지하며, 심텍이 18만원에서 11만원대로 60% 이상 하락했다는 주장이다.",
+      "status": "contradicted",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:39:04",
+      "source_confidence": 0.1,
+      "asr_confidence": 0.55,
+      "numeric_parse": {
+        "claimed": "심텍 18만원→11만원대, 60% 이상 하락",
+        "observed": "제시 가격의 산술상 하락률은 약 33.3~38.9%이며, 11만원 기준 약 38.89%다. 독립 가격 관측값은 없다."
+      },
+      "investor_implication": "60% 이상 급락을 전제로 한 낙폭 과대 판단은 수정해야 하며, 제품 수요와 개별 기업 매출 연결은 별도로 확인해야 한다."
+    },
+    {
+      "claim_id": "C7",
+      "claim_text": "앤트로픽·브로드컴 630억달러 SPV 금융, 엔비디아 관련 5,000억달러 계획, 메타 950억달러, 앤트로픽 IPO 1,000억달러를 합쳐 AI 자금 공급을 7,000억~9,000억달러로 추산하며 이수페타시스 수혜를 주장한다.",
+      "status": "unverified",
+      "confidence": 0.98,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:45:12",
+      "source_confidence": 0.18,
+      "asr_confidence": 0.71,
+      "numeric_parse": {
+        "claimed": "630억+5,000억+950억+1,000억달러; 총 7,000억~9,000억달러; 이수페타시스 +8.9%",
+        "observed": "입력값 합계 7,580억달러. 기사 발췌의 이수페타시스 상승률은 8.76%이며 거래소 직접 확인값은 없다."
+      },
+      "investor_implication": "산술 합계가 맞아도 실제 투자 가능 자금이나 이수페타시스 수주로 간주할 수 없다."
+    },
+    {
+      "claim_id": "C8",
+      "claim_text": "조선주 약세와 HD현대중공업 실적의 예상·가이던스 하회를 주장한다. HD현대마린엔진은 중국 수요와 약 197% 실적 증가로 14~15% 상승했으며 한화오션은 8만원 회복 여지가 있다는 설명이다.",
+      "status": "partially_supported",
+      "confidence": 0.94,
+      "supporting_evidence_ids": [
+        "/market_evidence/6/external_context/company_news_excerpt",
+        "/market_evidence/6/external_context/disclosure_excerpt"
+      ],
+      "manual_check_required": true,
+      "timestamp": "00:39:04",
+      "source_confidence": 0.56,
+      "asr_confidence": 0.66,
+      "numeric_parse": {
+        "claimed": "HD현대마린엔진 실적 +약 197%, 주가 +14~15%; 한화오션 8만원 회복",
+        "observed": "기사 발췌: 3분기 영업이익 603억원, 전년 대비 '197...' 증가. 주가 수치는 제공되지 않았다."
+      },
+      "investor_implication": "엔진 업체 실적 개선의 일부 근거는 있으나, 주가 차별화의 원인과 조선주 회복 목표는 미검증이다."
+    },
+    {
+      "claim_id": "C9",
+      "claim_text": "FOMC 10월 인상 확률 10%·동결 90%, 12월 인상 80%, 미국 10년물 금리 약 4.9%, 한국시간 새벽 3시30분 기자회견을 주장한다. 전쟁이 없었다면 금리가 0.5%포인트 낮았을 것이라고 추정한다.",
+      "status": "unverified",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:57:59",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.66,
+      "numeric_parse": {
+        "claimed": "10월 인상 10%·동결 90%; 12월 인상 80%; 10년물 약 4.9%; 회견 03:30 KST; 전쟁 효과 +0.5%포인트",
+        "observed": "직접 대조 가능한 확률·금리·공식 일정이 제공되지 않았다."
+      },
+      "investor_implication": "금리 확률과 이벤트 시각을 확인된 시장 데이터로 제시하지 말고, 회의별 경로와 발언 위험은 시나리오로 구분해야 한다."
+    },
+    {
+      "claim_id": "C10",
+      "claim_text": "WSJ가 미국의 이란 공격 준비 완료와 대통령 명령 후 96시간 이내 공격 가능성을 보도했다는 인용이다. 11월 3일 이후 확전과 협상 불발에 따른 주가 하락은 시나리오다.",
+      "status": "unverified",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:19:21",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.75,
+      "numeric_parse": {
+        "claimed": "명령 후 96시간 이내 공격 가능; 11월 3일 이후 확전 위험",
+        "observed": "이를 뒷받침하는 기사 본문이나 공식 발표는 제공되지 않았다."
+      },
+      "investor_implication": "확전 우려는 조건부 위험 시나리오로만 다루고, 96시간 내 공격을 확인된 예정 사건처럼 전달해서는 안 된다."
+    },
+    {
+      "claim_id": "C11",
+      "claim_text": "GTC 베를린 시연, 젠슨 황의 다음 달 방한, CES 삼성 로봇 공개와 로봇 100만대 생산 이야기가 로봇주 모멘텀을 지지한다는 주장이다.",
+      "status": "unverified",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "01:04:16",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.48,
+      "numeric_parse": {
+        "claimed": "로봇 100만대; 레인보우로보틱스 약 +15%; 다음 달 방한; 다음 해 1월 CES",
+        "observed": "생산량·주가·행사 계획을 직접 검증할 자료가 제공되지 않았다."
+      },
+      "investor_implication": "행사 기대감과 실제 공급계약·매출을 구분해야 하며, 생산량이 불명확한 상태에서 공급업체 수익을 계산해서는 안 된다."
+    },
+    {
+      "claim_id": "C12",
+      "claim_text": "네이버 12조원 AI 인프라 계약·1GW 계획, 브룩필드·엔비디아 투자, 절차 완료 후 엔비디아 3대 주주, PBR 1배 미만 및 두나무 합병의 연내 결론 가능성을 주장한다. 네비우스 용량과도 비교한다.",
+      "status": "unverified",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "01:04:16",
+      "source_confidence": 0.12,
+      "asr_confidence": 0.5,
+      "numeric_parse": {
+        "claimed": "12조원; 네이버 1GW; 네비우스 운영 0.9~1GW·최종 4~5GW; PBR 1배 미만; 엔비디아 3대 주주",
+        "observed": "계약금액·전력용량·PBR·지분 순위를 확인할 본문이나 시장값은 제공되지 않았다."
+      },
+      "investor_implication": "계획 용량을 가동 실적으로, 조건부 투자를 확정 지분으로, 낮은 PBR을 검증된 저평가로 해석해서는 안 된다."
+    }
+  ],
+  "entities": [
+    {
+      "ticker": "^KS11",
+      "name": "코스피·코스닥 및 외국인 수급",
+      "status": "unverified",
+      "claims": [
+        "급반등으로 바닥 형성 가능성이 생겼지만 외국인의 지속적인 신규 매수와 추가 상승을 확인해야 한다는 조건부 견해다."
+      ],
+      "numeric_claims": [
+        "10월 28일 코스피 종가 상승률 6.63%, 상승폭 374포인트, 종가 약 6,012선으로 발화됐다.",
+        "코스닥 종가 상승률 3.69%, 종가 약 771선으로 발화됐다.",
+        "코스피에서 외국인과 기관이 각각 1조1천억원 이상 순매수했다고 설명했다. 외국인 조단위 순매수는 9월 18일 이후 처음이라고 했다."
+      ],
+      "verification_notes": [
+        "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+      ],
+      "market_snapshot": {
+        "ticker": "^KS11",
+        "as_of": "2026-10-28T22:50:36.170877+00:00",
+        "current_price": 6012.44,
+        "market_cap": null,
+        "forward_pe": null,
+        "trailing_pe": null,
+        "fifty_two_week_high": 9385.59,
+        "fifty_two_week_low": 0.0,
+        "average_target_price": null,
+        "source": "yfinance",
+        "status": "verified"
+      },
+      "external_context_status": "verified"
+    },
+    {
+      "ticker": "000660",
+      "name": "SK하이닉스",
+      "status": "unverified",
+      "claims": [
+        "발표 실적과 자신감 있는 컨퍼런스콜, 장기 공급 부족 전망 및 주주환원이 시장의 미래 실적 우려를 완화했다는 평가다."
+      ],
+      "numeric_claims": [
+        "분기 매출 104조6천억원, 영업이익 83조3천억원, 영업이익률 79.7%, 영업이익 컨센서스 약 77조원으로 제시됐다.",
+        "환율 영향으로 약 10조원 손실이 있었다는 설명과, 환율이 1,500원이었다면 영업이익 약 93조원이었을 것이라는 가정을 제시했다.",
+        "4분기 영업이익이 100조원 안팎 또는 이상일 수 있다는 출연자 추정을 제시했다."
+      ],
+      "verification_notes": [
+        "시장 데이터 조회 실패: no_usable_market_fields"
+      ],
+      "market_snapshot": {
+        "ticker": "000660",
+        "as_of": "2026-10-28T22:50:37.238447+00:00",
+        "current_price": null,
+        "market_cap": null,
+        "forward_pe": null,
+        "trailing_pe": null,
+        "fifty_two_week_high": null,
+        "fifty_two_week_low": null,
+        "average_target_price": null,
+        "source": "yfinance",
+        "status": "unverified"
+      },
+      "external_context_status": "verified"
+    },
+    {
+      "ticker": "MU",
+      "name": "마이크론 및 메모리 업종",
+      "status": "unverified",
+      "claims": [
+        "장기계약과 제한된 공급 증설이 유지된다면 메모리를 단순 가격 사이클이 아닌 구조적 성장 산업으로 재평가할 여지가 있다는 견해다."
+      ],
+      "numeric_claims": [
+        "마이크론 NDR에서 2035년까지의 수요를 논의하고, 구글이 2026~2035년 10년 계약을 요구한다고 주장했다.",
+        "마이크론 이익배수를 약 5~7배로 언급했다.",
+        "SK하이닉스의 향후 3년 이익 약 1천조원, 시가총액 약 1천조원, 연간 주주환원 약 10%라는 출연자 추산을 제시했다."
+      ],
+      "verification_notes": [
+        "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+      ],
+      "market_snapshot": {
+        "ticker": "MU",
+        "as_of": "2026-10-28T22:50:39.690466+00:00",
+        "current_price": 983.22998046875,
+        "market_cap": 1112449222636.6504,
+        "forward_pe": 4.7523413,
+        "trailing_pe": 13.227902,
+        "fifty_two_week_high": 1255.0,
+        "fifty_two_week_low": 192.59,
+        "average_target_price": 1561.9111,
+        "source": "yfinance",
+        "status": "verified"
+      },
+      "external_context_status": "verified"
+    },
+    {
+      "ticker": "005930",
+      "name": "삼성전자",
+      "status": "unverified",
+      "claims": [
+        "다음 날 확정실적에서는 잠정 실적 자체보다 장기계약, HBM4 확대, 비메모리·DX 손실과 주주환원 설명이 중요하다고 평가했다."
+      ],
+      "numeric_claims": [
+        "당일 주가 약 9% 상승, 약 24만원으로 제시됐다.",
+        "잠정 영업이익으로 해석되는 107조원을 언급했다.",
+        "D램 이익 약 80조원, 낸드 약 30조원, 영업이익률 약 55.1%를 출연자 예상치로 제시했다."
+      ],
+      "verification_notes": [
+        "시장 데이터 조회 실패: no_usable_market_fields"
+      ],
+      "market_snapshot": {
+        "ticker": "005930",
+        "as_of": "2026-10-28T22:50:43.106222+00:00",
+        "current_price": null,
+        "market_cap": null,
+        "forward_pe": null,
+        "trailing_pe": null,
+        "fifty_two_week_high": null,
+        "fifty_two_week_low": null,
+        "average_target_price": null,
+        "source": "yfinance",
+        "status": "unverified"
+      },
+      "external_context_status": "verified"
+    },
+    {
+      "ticker": "009150",
+      "name": "삼성전기",
+      "status": "unverified",
+      "claims": [
+        "매출보다 이익이 강한 실적과 AI용 MLCC·패키지 기판 공급 부족이 수익성 개선을 뒷받침하며, 로봇 카메라도 추가 성장 재료라는 견해다."
+      ],
+      "numeric_claims": [
+        "매출은 3조7천억원대 후반으로 컨센서스 1.7% 하회, 영업이익은 6,910억원으로 컨센서스 7.1% 상회했다고 설명했다.",
+        "컴포넌트 매출 1조8,800억원, 전년 동기 대비 36% 증가를 제시했다.",
+        "기판과 카메라 사업 비중은 각각 약 25%로 설명했다."
+      ],
+      "verification_notes": [
+        "시장 데이터 조회 실패: no_usable_market_fields"
+      ],
+      "market_snapshot": {
+        "ticker": "009150",
+        "as_of": "2026-10-28T22:50:46.097954+00:00",
+        "current_price": null,
+        "market_cap": null,
+        "forward_pe": null,
+        "trailing_pe": null,
+        "fifty_two_week_high": null,
+        "fifty_two_week_low": null,
+        "average_target_price": null,
+        "source": "yfinance",
+        "status": "unverified"
+      },
+      "external_context_status": "verified"
+    },
+    {
+      "ticker": "007660",
+      "name": "이수페타시스·브로드컴 연계",
+      "status": "unverified",
+      "claims": [
+        "브로드컴·앤트로픽의 AI 반도체 자금조달이 TPU 투자와 관련 기판 수요를 지원해 이수페타시스에 긍정적이라는 해석이다."
+      ],
+      "numeric_claims": [
+        "이수페타시스 당일 8.9%, 브로드컴 전일 약 4% 상승을 언급했다.",
+        "앤트로픽 칩 관련 630억달러 자금조달과 특수목적법인을 통한 브로드컴 반도체 구매 구조를 설명했다.",
+        "엔비디아 관련 5천억달러 조성 계획, 메타 950억달러, 앤트로픽 IPO 1천억달러를 언급했다."
+      ],
+      "verification_notes": [
+        "시장 데이터 조회 실패: no_usable_market_fields"
+      ],
+      "market_snapshot": {
+        "ticker": "007660",
+        "as_of": "2026-10-28T22:50:48.810170+00:00",
+        "current_price": null,
+        "market_cap": null,
+        "forward_pe": null,
+        "trailing_pe": null,
+        "fifty_two_week_high": null,
+        "fifty_two_week_low": null,
+        "average_target_price": null,
+        "source": "yfinance",
+        "status": "unverified"
+      },
+      "external_context_status": "verified"
+    },
+    {
+      "ticker": "071970",
+      "name": "HD현대마린엔진",
+      "status": "unverified",
+      "claims": [
+        "중국의 강한 엔진 수요와 실적 개선 때문에 조선주와 다른 반등 흐름을 보였다는 설명이다."
+      ],
+      "numeric_claims": [
+        "당일 주가 약 14~15% 상승을 언급했다.",
+        "전년 대비 약 197% 증가한 실적 수치를 언급했으나 해당 지표는 명확하지 않다."
+      ],
+      "verification_notes": [
+        "시장 데이터 조회 실패: no_usable_market_fields"
+      ],
+      "market_snapshot": {
+        "ticker": "071970",
+        "as_of": "2026-10-28T22:50:51.518508+00:00",
+        "current_price": null,
+        "market_cap": null,
+        "forward_pe": null,
+        "trailing_pe": null,
+        "fifty_two_week_high": null,
+        "fifty_two_week_low": null,
+        "average_target_price": null,
+        "source": "yfinance",
+        "status": "unverified"
+      },
+      "external_context_status": "verified"
+    },
+    {
+      "ticker": "035420",
+      "name": "네이버",
+      "status": "unverified",
+      "claims": [
+        "AI 인프라·네오클라우드 투자와 두나무 합병 기대에도 낮은 평가를 받고 있으며, 사업 진척과 불확실성 해소가 재평가 계기가 될 수 있다는 견해다."
+      ],
+      "numeric_claims": [
+        "AI 인프라 확보 계약 규모를 12조원으로 제시했다.",
+        "네이버의 계획 규모를 1GW, 네비우스 운영 규모를 약 0.9~1GW·최종 계획을 4~5GW로 비교했다. 자막상 단위는 혼재한다.",
+        "네이버 PBR이 1배 미만이라고 설명했다."
+      ],
+      "verification_notes": [
+        "시장 데이터 조회 실패: no_usable_market_fields"
+      ],
+      "market_snapshot": {
+        "ticker": "035420",
+        "as_of": "2026-10-28T22:50:53.991412+00:00",
+        "current_price": null,
+        "market_cap": null,
+        "forward_pe": null,
+        "trailing_pe": null,
+        "fifty_two_week_high": null,
+        "fifty_two_week_low": null,
+        "average_target_price": null,
+        "source": "yfinance",
+        "status": "unverified"
+      },
+      "external_context_status": "verified"
+    }
+  ],
+  "evidence": [
+    {
+      "evidence_id": "E1",
+      "claim_id": "C1",
+      "title": "Mexico, US assess viability of trade deal before midterms",
+      "source_url": "https://finance.yahoo.com/news/mexico-us-assess-viability-trade-161206204.html",
+      "publisher": "Reuters",
+      "published_at": "2026-10-28T17:37:28+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "Mexico, US assess viability of trade deal before midterms Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 2026 Elections Weather Newsletters..."
+    },
+    {
+      "evidence_id": "E2",
+      "claim_id": "C1",
+      "title": "Cymat Technologies, Kap Minerals Sign MOU to Produce Scandium-Aluminum Master Alloy in Canada",
+      "source_url": "https://finance.yahoo.com/markets/stocks/articles/cymat-technologies-kap-minerals-sign-162253922.html",
+      "publisher": "MT Newswires",
+      "published_at": "2026-10-28T16:22:53+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "Cymat Technologies, Kap Minerals Sign MOU to Produce Scandium-Aluminum Master Alloy in Canada Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals..."
+    },
+    {
+      "evidence_id": "E4",
+      "claim_id": "C2",
+      "title": "Dow Jones Futures: Microsoft Rises Late, But Google, ServiceNow, Fortinet Dive On Earnings",
+      "source_url": "https://finance.yahoo.com/m/6c0b166b-19af-3d40-b6ff-7c6d65d3c4da/dow-jones-futures%3A-microsoft.html",
+      "publisher": "Investor's Business Daily",
+      "published_at": "2026-10-28T22:33:03+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "Dow Jones Futures: Microsoft Rises Late, But Google, ServiceNow, Fortinet Dive On Earnings Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 20..."
+    },
+    {
+      "evidence_id": "E5",
+      "claim_id": "C2",
+      "title": "Intel to report Q3 earnings as chip stocks continue to rebound",
+      "source_url": "https://finance.yahoo.com/technology/article/intel-to-report-q3-earnings-as-chip-stocks-continue-to-rebound-221713961.html",
+      "publisher": "Yahoo Finance",
+      "published_at": "2026-10-28T22:17:13+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    },
+    {
+      "evidence_id": "E7",
+      "claim_id": "C7",
+      "title": "Lumentum Jumps On Marvell Buyout Report",
+      "source_url": "https://finance.yahoo.com/m/4dcc41b1-1cb8-395f-b86f-c08b38260525/lumentum-jumps-on-marvell.html",
+      "publisher": "Investor's Business Daily",
+      "published_at": "2026-10-28T22:34:39+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    },
+    {
+      "evidence_id": "E8",
+      "claim_id": "C7",
+      "title": "NVDA Stock Edges Down On DOJ Interest In $12.9 Billion Hugging Face Acquisition",
+      "source_url": "https://finance.yahoo.com/markets/stocks/articles/nvda-stock-edges-down-doj-222639728.html",
+      "publisher": "Stocktwits",
+      "published_at": "2026-10-28T22:26:39+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    },
+    {
+      "evidence_id": "E9",
+      "claim_id": "C9",
+      "title": "Australian Uranium Stocks To Watch In October 2026",
+      "source_url": "https://finance.yahoo.com/energy/articles/australian-uranium-stocks-watch-october-220738571.html",
+      "publisher": "Simply Wall St.",
+      "published_at": "2026-10-28T22:07:38+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    }
+  ],
+  "source_policy": {
+    "raw_transcript_published": false,
+    "raw_transcript_in_evidence": false,
+    "research_pipeline_version": 4,
+    "closed_source_claims": "unverified_external_source",
+    "auto_caption_warning": true,
+    "local_asr_warning": false
+  }
+}

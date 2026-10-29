@@ -1,0 +1,681 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YouTube 투자자용 검증 리포트 - 주식 안 팔아도 세금 내라? 사상 초유의 억만장자세 실험 현실 될까</title>
+  <style>
+:root {
+  color-scheme: light;
+  --bg: #f7f8fb;
+  --panel: #ffffff;
+  --text: #172033;
+  --muted: #667085;
+  --line: #d9dee8;
+  --accent: #0f766e;
+  --accent-2: #2563eb;
+  --warn: #b45309;
+  --bad: #b42318;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0 56px; }
+a { color: var(--accent-2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.hero { padding: 28px 0 22px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+.hero.compact { padding-top: 12px; }
+.hero h1 { margin: 0; font-size: clamp(28px, 4vw, 44px); line-height: 1.15; letter-spacing: 0; }
+.hero p { max-width: 760px; color: var(--muted); margin: 12px 0 0; }
+.eyebrow { color: var(--accent); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0; margin: 0 0 8px; }
+section { margin: 28px 0; }
+h2, h3, h4, h5 { letter-spacing: 0; line-height: 1.25; }
+.synthesis-callout { padding: clamp(20px, 4vw, 34px); border: 1px solid #6ee7d8; border-radius: 18px; background: linear-gradient(135deg, #ecfdf9 0%, #eff6ff 100%); box-shadow: 0 18px 44px rgba(15, 118, 110, .12); }
+.synthesis-callout.unavailable { border-color: var(--line); background: var(--panel); box-shadow: none; }
+.synthesis-callout h2 { margin: 0; font-size: clamp(24px, 3.2vw, 36px); }
+.synthesis-callout .lead { max-width: 900px; font-size: 17px; color: #334155; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.primary-link, .secondary-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border-radius: 999px; font-weight: 800; }
+.primary-link { color: white; background: var(--accent); }
+.secondary-link { color: var(--accent-2); border: 1px solid #93c5fd; background: white; }
+.primary-link:hover, .secondary-link:hover { text-decoration: none; filter: brightness(.97); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.card, .run { display: flex; flex-direction: column; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; color: var(--text); min-height: 128px; }
+.run { padding: 16px; }
+.card:hover, .run:hover { border-color: var(--accent-2); text-decoration: none; }
+.thumb { display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #e9edf5; border-radius: 8px 8px 0 0; color: var(--muted); font-size: 13px; font-weight: 700; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb-empty span { padding: 0 14px; text-align: center; }
+.card-body { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 16px; }
+.card strong { line-height: 1.35; }
+.source-line { color: #3f4a5f; font-weight: 600; }
+.runs { display: grid; gap: 10px; }
+.badge { display: inline-flex; width: fit-content; border-radius: 999px; padding: 2px 9px; background: #e6f4f1; color: var(--accent); font-size: 12px; font-weight: 700; }
+.status-contradicted, .status-llm_failed { background: #fee4e2; color: var(--bad); }
+.status-unverified, .status-stale { background: #fff4d6; color: var(--warn); }
+small, .muted { color: var(--muted); }
+.topnav { display: flex; gap: 14px; margin-bottom: 16px; font-size: 14px; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px; }
+.stats span { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
+.report { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: min(5vw, 36px); }
+.report-head { border-bottom: 1px solid var(--line); margin-bottom: 24px; padding-bottom: 20px; }
+.report-head h1 { margin: 0; font-size: clamp(24px, 3.5vw, 38px); line-height: 1.2; }
+.meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+.scope-note { padding: 12px 14px; border-left: 4px solid var(--warn); border-radius: 6px; background: #fff7ed; color: #7c2d12; }
+.synthesis-report h2 { margin-top: 34px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.synthesis-report h3 { margin: 24px 0 8px; color: #0f4c5c; }
+.synthesis-report p, .synthesis-report li { overflow-wrap: anywhere; }
+pre { overflow: auto; background: #111827; color: #f9fafb; border-radius: 8px; padding: 14px; }
+code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+details { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 18px; }
+@media (max-width: 640px) {
+  main { width: min(100% - 20px, 1120px); padding-top: 18px; }
+  .report { padding: 18px; }
+  .synthesis-callout { border-radius: 14px; padding: 18px; }
+  .cta-row a { width: 100%; }
+  .mobile-report { border-radius: 12px; }
+}
+</style>
+</head>
+<body>
+  <main>
+<nav class="topnav"><a href="index.html">실행 목록</a><a href="../../index.html">YouTube 홈</a></nav>
+<article class="report">
+  <header class="report-head">
+    <p class="eyebrow">youtube_20261029_071604</p>
+    <h1>주식 안 팔아도 세금 내라? 사상 초유의 억만장자세 실험 현실 될까</h1>
+    <div class="meta">
+      <span class="badge status-unverified">unverified</span>
+      <a href="https://www.youtube.com/watch?v=_gMyqLP0928">원본 영상</a>
+    </div>
+  </header>
+  <h2>억만장자세 논의와 대주주 매도 위험: 투자자 점검 보고서</h2>
+<p><strong>분석 기준: 2026년 10월 29일 제공 자료</strong></p>
+<p>영상: 소수몽키, 2026년 10월 28일 공개 · <a href="https://www.youtube.com/watch?v=_gMyqLP0928">영상 보기</a></p>
+<h3>1. 핵심 판단</h3>
+<p>영상의 중심은 오라클 실적이나 AI 투자 전망이 아니라 <strong>캘리포니아의 순자산 과세 제안과 자산가 이주·세수·대주주 지분 매각의 연결 가능성</strong>이다. 발화자는 과세 논의의 확산을 경계하면서도, 분할 납부와 소송 가능성 등을 들어 즉각적인 대량매도 우려는 과도하다고 해석한다.</p>
+<p>그러나 제공된 주장 검증 결과는 <strong>10개 항목 모두 미검증</strong>이다. 과세안의 공식 문안, 투표 상정 인증, 관련 공시, 원인터뷰가 확보되지 않았다. 따라서 ‘2026년 11월 3일 확정 투표’와 ‘5년 분납 가능’을 확인된 전제로 삼을 수 없다. 이는 주장이 거짓이라는 판정이 아니라, 이를 뒷받침할 관련 증거가 부족하다는 뜻이다.</p>
+<p>확인 가능한 내용은 호스트가 조회한 종목별 시장 스냅샷과 영상의 환율 가정에 따른 산술 검산이다. 이 자료들은 법안이나 개인의 납세·이주 주장을 입증하지 않는다.</p>
+<h3>2. 영상 주장과 확인된 사실·근거</h3>
+<p>아래 시각은 정확한 발언 시점이 아니라 <strong>해당 내용을 포함하는 자막 청크의 시작점</strong>이다.</p>
+<p>| 항목·참조 시각 | 영상 주장 | 확인된 사실·근거 및 한계 |</p>
+<p>| --- | --- | --- |</p>
+<p>| 캘리포니아 과세안 · 00:00, 05:33, 11:08 | 순자산 10억 달러 이상 약 200명에게 일회성 5% 과세. 2026년 1월 1일을 기준으로 적용하며 11월 3일 투표, 5년 분납 가능 | 공식 문안과 투표 자격 인증 자료가 없다. 반대 개헌안의 동시 상정과 ‘세계 최초’라는 설명도 미검증이다. |</p>
+<p>| 세수·이주 · 00:00 | 총세수 약 140조원. 6명 이주로 270억 달러·약 25% 감소, 추가 20명 이전 검토 | 인물 명단·이전일·과세 제외 근거·추산표가 없다. 총세수 달러 단위에 자막 오류가 의심된다. |</p>
+<p>| 반대 측 연구 · 05:33 | 과세기반 30% 이탈, 10만 회 시뮬레이션 중 약 85%에서 정부 손실 | 연구 제목·저자·모형이 없다. 30%의 분모와 85% 손실의 기간·비교 기준도 불명확하다. 현실의 정책 실패 확률로 해석할 수 없다. |</p>
+<p>| 여론·예측시장 · 05:33, 11:08 | 찬성 여론 약 절반, 두 예측시장 통과 확률 약 30%. 민주당 의회 장악 베팅 증가 | 조사 원문·시장명·계약·관측 시점이 없다. 상정 확률과 통과 확률, 상원·하원 장악 계약을 구분할 수 없다. |</p>
+<p>| META · 00:00, 05:33 | 저커버그가 의결권 보호용 주식 발행 후 8년 잔류 약속 | 발행 조건·승인 문서·거주 계약이 없다. 뉴스 목록의 주식 매각 관련 제목은 이 주장의 증거가 아니다. |</p>
+<p>| ORCL·PLTR 및 자산가 이전 · 00:00, 05:33 | 엘리슨 주택 매각, 팔란티어 본사 이전 검토, 여러 자산가의 이주 | 원보도·공식 발표·거주 기록이 없다. 주택 거래, 개인의 세법상 거주지, 자산관리 법인과 회사 본사 이전은 서로 다른 사건이다. |</p>
+<p>| NVDA 및 기업가 발언 · 00:00 | 젠슨 황이 예상 세금 80억 달러를 수용. 아모데이는 설계 비판, 안두릴 창업자는 대량매도 경고 | 원인터뷰와 세액 산정 근거가 없다. 예상 부담·매도 경고·실제 지분 매각은 구분해야 한다. |</p>
+<p>| 프랑스 · 05:33 | 자산 1억 유로 이상에 연 2% 과세안을 2026년 재추진 | 법안과 처리 이력이 없다. 기존 세금을 반영한 최저세인지 별도 추가세인지도 확인되지 않았다. 자문 학자 이름은 인식 오류 가능성이 있다. |</p>
+<p>| 미국 연방 · 11:08 | 샌더스가 억만장자 938명 대상 연 5% 부유세 발의 | 의안 번호·발의 기록·대상 인원 근거가 없다. 의회 구성과 통과 전망도 제공 증거로 확인되지 않았다. |</p>
+<p>| 기타 지역·한국 세금 · 05:33, 11:08 | 워싱턴 9.9% 소득세와 폐지 투표, 미네소타 연 1% 부유세, 뉴욕 2% 증세안 무산, 한국 해외주식 양도세율 22% | 각각 법률·시행·투표·적용 요건이 미확인이다. 한국의 22%를 개인별 실효세율이나 매각대금 전체에 적용하는 세율로 해석할 수 없다. |</p>
+<h4>확인 가능한 산술과 단위 충돌</h4>
+<p>아래는 모두 <strong>영상이 가정한 1달러=1,400원</strong> 기준이며 실제 환율이나 실제 세수를 검증한 결과가 아니다.</p>
+<p>| 입력값 | 환산·검산 결과 |</p>
+<p>| --- | --- |</p>
+<p>| 10억 달러 | 1.4조원 |</p>
+<p>| 270억 달러 | 37.8조원 |</p>
+<p>| 80억 달러 | 11.2조원 |</p>
+<p>| 100만 달러 | 14억원 |</p>
+<p>| 자막상 총세수 1억 달러 | 0.14조원으로, 영상의 140조원과 불일치 |</p>
+<p>| 37.8조원 ÷ 총세수 가정 140조원 | 27%로, 영상의 ‘약 25%’와 차이 |</p>
+<p>140조원에 대응하는 달러 금액은 이 가정에서 1,000억 달러다. 다만 이를 실제 발언의 정정값으로 채택하지 않았다. 원영상 화면이나 원자료 확인이 필요하다.</p>
+<h3>3. 외부 증거와 시장 데이터의 범위</h3>
+<p>호스트는 검색 10건에서 외부 기사 4건을 수집했지만, <strong>과세 주장을 직접 지지하거나 반박하는 관련 자료는 없었다.</strong> E1~E4는 무역협정, 합금 생산 협력, 설탕 선물 기사이며 제공 발췌도 오류 안내와 메뉴가 대부분이다. 예를 들어 <a href="https://finance.yahoo.com/news/mexico-us-assess-viability-trade-161206204.html">Reuters의 무역협정 기사</a>는 캘리포니아 과세안의 근거로 사용할 수 없다. 네 기사 모두 영상 공개 이후 게시돼 영상 당시의 출처로도 볼 수 없다.</p>
+<p>따라서 수집 상태의 <code>verified</code>와 주장 내용의 사실 확인은 구분해야 한다. <strong>관련성이 있는 강한 외부 증거 링크는 이번 자료에 없다.</strong></p>
+<p>호스트가 yfinance에서 조회한 가격은 다음과 같다.</p>
+<p>| 종목 | 조회 가격 | 조회 시각 |</p>
+<p>| --- | ---: | --- |</p>
+<p>| META | 612.49달러 | 2026-10-28 22:17 UTC경 |</p>
+<p>| ORCL | 144.54달러 | 2026-10-28 22:17 UTC경 |</p>
+<p>| PLTR | 196.81달러 | 2026-10-28 22:17 UTC경 |</p>
+<p>| NVDA | 215.38달러 | 2026-10-28 22:18 UTC경 |</p>
+<p>이는 조회 시점의 스냅샷으로, 실시간 가격이나 공식 종가로 확정하지 않는다. 비교 시계열과 사건별 분석이 없어 세금 뉴스에 대한 주가 반응도 판단할 수 없다. 기업 시가총액은 창업자 개인의 과세 대상 순자산을 대신하지 않는다.</p>
+<p>공시 공급자는 이용 불가였고 PLTR 뉴스 조회도 실패했다. 이는 관련 공시나 뉴스가 없다는 뜻이 아니다. Bloomberg는 뉴스 목록에 제목만 있으며 관련 본문 검증은 불가능하다. Morningstar 자료는 제공되지 않았다. <strong>Bloomberg·Morningstar 및 기타 폐쇄형 출처에 의존하는 주장은 미검증·수동 확인 필요</strong>로 취급한다.</p>
+<h3>4. 상승 논리와 반론: 모두 조건부 시나리오</h3>
+<h4>주가 부담이 완화될 수 있는 논리</h4>
+<p>영상의 완화 논리는 ‘과세 논의가 곧 대주주 일시 매도를 뜻하지 않는다’는 것이다. 실제 최종 제도가 장기 분납을 허용하거나 적용 대상·평가액이 제한된다면, 단기간에 필요한 현금 규모가 줄어들 수 있다. 법안이 상정되지 않거나 부결되는 경우에도 해당 정책으로 인한 매도 우려는 약해질 수 있다.</p>
+<p>다만 <strong>분납 조건과 상정 상태 자체가 미확인</strong>이다. 소송 가능성만으로 집행정지나 납부 연기를 가정할 수도 없다. 현재 자료로는 이를 META·ORCL·PLTR·NVDA의 실적 개선이나 적정가치 상승 논리로 확대할 근거가 없다.</p>
+<h4>반론과 하방 경로</h4>
+<ul>
+<li>실제 제도가 주식 중심 순자산에 과세하고 납부 재원이 부족하다면 지분 매각이나 담보 차입 수요가 생길 수 있다. 규모는 개인별 보유 현금·부채·지분·납기 확인이 필요하다.</li>
+<li>분납이 있어도 누적 현금 수요가 사라지는 것은 아니다. 소송 중에도 납부 의무가 유지된다면 영상의 단기 충격 완화 논리는 약해질 수 있다.</li>
+<li>창업자의 의결권 보호가 다른 주주의 권리 변화로 이어지는지는 실제 주식 조건을 봐야 한다. META의 해당 조치는 현재 미확인이다.</li>
+<li>자산가 이주가 장기 과세기반을 줄일 가능성과 일회성 세수 확보 효과는 별도 평가해야 한다. 미확인 시뮬레이션의 85%를 정부 손실의 실제 확률로 사용할 수 없다.</li>
+<li>순자산세와 고소득자 소득세는 과세표준이 다르다. 여러 지역의 논의를 하나의 확정된 증세 흐름으로 합산하면 위험을 과대평가할 수 있다.</li>
+</ul>
+<h3>5. 단기 체크포인트와 무효화 조건</h3>
+<p>| 우선순위 | 구체적 관찰 항목 | 해석을 바꿀 조건 |</p>
+<p>| --- | --- | --- |</p>
+<p>| 1. 투표 상정 확인 | 영상이 제시한 11월 3일 전에 선거당국의 최종 안건 목록·안건 번호·반대 개헌안 확인 | 미상정이면 ‘이번 투표로 즉시 현실화’ 시나리오는 성립하지 않는다. |</p>
+<p>| 2. 최종 과세 문안 | 기준일, 순자산 평가, 주식·의결권 처리, 분납 자격·이자·첫 납기 | 단기 일시납 부담이 크면 ‘즉각 매도 우려 과도’ 논리는 약화된다. |</p>
+<p>| 3. 실제 지분 거래 | 관련자의 SEC Form 4·144, 사전 거래계획, 매각 수량과 기존 거래 패턴 비교 | 예상 밖 대규모 거래가 확인되면 공급 부담을 재평가하되, 세금 목적이라는 인과관계는 별도 확인한다. |</p>
+<p>| 4. 지배구조·이전 | META 주주 문서·정관·계약, PLTR 공식 발표, 개인 거주 기록을 각각 확인 | 기존 구조를 신규 조치로 잘못 설명했거나 이전이 확정되지 않았다면 해당 사례 논리는 철회해야 한다. |</p>
+<p>| 5. 세수·이주 원자료 | 총세수 원화·달러 단위, 6명 명단, 270억 달러 산식, 연구 부록 | 분모·평가일·이주 가정이 달라지면 ‘25% 감소’와 ‘85% 손실’ 해석을 다시 계산한다. |</p>
+<p>| 6. 여론·정책 확산 | 조사 질문·표본, 영상 당시 예측시장 계약·가격, 지역별 의안 번호·처리 단계 | 30%가 통과가 아닌 상정 확률이거나 다른 시점 가격이면 영상의 확률 비교는 무효다. |</p>
+<p>예측시장 자료를 확보하더라도 거래량·호가 차이·정산 조건을 함께 봐야 한다. 현재 가격으로 영상 당시 가격을 대체해서는 안 된다.</p>
+<h3>6. 자막과 신뢰도 해석</h3>
+<ul>
+<li><strong>transcript_quality:</strong> 자동 한국어 자막은 <code>good</code>, 점수 1.0이며 452개 구간이 수집됐다. 이는 수집·형식 품질이지 숫자·인명·법률 용어의 의미 정확성을 보증하지 않는다. 수동 자막은 없다.</li>
+<li><strong>추출 source_confidence:</strong> 주요 항목은 0.85~0.95다. 발화 내용을 추출한 명확성을 뜻하며 주장이 참일 확률이 아니다.</li>
+<li><strong>검증 source_confidence:</strong> 각 주장에 표시된 0.0은 직접 관련 외부 근거가 없다는 뜻이다. 추출 단계의 점수와 의미가 다르다.</li>
+<li><strong>asr_confidence:</strong> 독립 평가값이 없어 검증 결과에 0.0으로 표시됐다. 자막 전체가 틀렸다는 의미로 해석하면 안 된다.</li>
+<li><strong>판정 confidence 0.99:</strong> ‘근거 부족으로 미검증’이라는 판정에 대한 확신이며, 영상 주장의 진실 확률이 아니다.</li>
+</ul>
+<p>특히 총세수 달러 단위와 학자·정치인 이름에 인식 오류가 의심된다. 00:00·05:33·11:08 표시는 청크 탐색용이며 문장 단위의 정밀 시각이 아니다.</p>
+<h3>결론</h3>
+<p>이번 영상은 <strong>정책 불확실성이 개인의 유동성 수요와 주식 공급 부담으로 연결될 수 있다는 관찰 틀</strong>을 제공한다. 그러나 제공 증거만으로 과세 확정, 자산가 이주에 따른 세수 손실, 대주주 대량매도 또는 그 부재를 단정할 수 없다.</p>
+<p>가장 먼저 확인할 것은 <strong>공식 투표 상정 여부 → 최종 납세 조건 → 실제 지분 거래</strong>다. 이 세 단계가 확인되기 전에는 영상의 수치와 개별 인물 사례를 확정된 기업가치 변화로 반영할 근거가 부족하다.</p>
+  <details>
+    <summary>공개 요약 JSON</summary>
+    <pre>{
+  &quot;version&quot;: 4,
+  &quot;video_id&quot;: &quot;_gMyqLP0928&quot;,
+  &quot;title&quot;: &quot;주식 안 팔아도 세금 내라? 사상 초유의 억만장자세 실험 현실 될까&quot;,
+  &quot;url&quot;: &quot;https://www.youtube.com/watch?v=_gMyqLP0928&quot;,
+  &quot;channel&quot;: &quot;소수몽키&quot;,
+  &quot;channel_id&quot;: &quot;UCC3yfxS5qC6PCwDzetUuEWg&quot;,
+  &quot;source_url&quot;: &quot;https://www.youtube.com/@sosumonkey/videos&quot;,
+  &quot;thumbnail_url&quot;: &quot;https://i.ytimg.com/vi/_gMyqLP0928/maxresdefault.jpg&quot;,
+  &quot;published_at&quot;: &quot;2026-10-28T11:54:54+00:00&quot;,
+  &quot;status&quot;: &quot;unverified&quot;,
+  &quot;strategy_source_tier&quot;: &quot;USER_PRIMARY&quot;,
+  &quot;strategy_evidence_weight&quot;: &quot;HIGH&quot;,
+  &quot;strategy_validation_policy&quot;: &quot;USER_ACCEPTED&quot;,
+  &quot;transcript_status&quot;: &quot;available&quot;,
+  &quot;transcript_source&quot;: &quot;automatic&quot;,
+  &quot;transcript_chars&quot;: 8740,
+  &quot;transcript_quality&quot;: {
+    &quot;status&quot;: &quot;good&quot;,
+    &quot;score&quot;: 1.0,
+    &quot;warnings&quot;: [],
+    &quot;source&quot;: &quot;automatic&quot;,
+    &quot;language&quot;: &quot;Korean (Original)&quot;,
+    &quot;model_or_format&quot;: &quot;json3&quot;,
+    &quot;chars&quot;: 8740,
+    &quot;segments&quot;: 452,
+    &quot;duration_seconds&quot;: 922,
+    &quot;repeated_ngram_ratio&quot;: 0.0
+  },
+  &quot;generated_at&quot;: &quot;2026-10-29T07:16:04.252027+09:00&quot;,
+  &quot;llm_status&quot;: &quot;success&quot;,
+  &quot;research_status&quot;: &quot;success&quot;,
+  &quot;claim_verification_status&quot;: &quot;success&quot;,
+  &quot;research_pipeline_version&quot;: 4,
+  &quot;evidence_count&quot;: 4,
+  &quot;claim_status_summary&quot;: {
+    &quot;unverified&quot;: 10
+  },
+  &quot;claims&quot;: [
+    {
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;claim_text&quot;: &quot;캘리포니아가 순자산 10억 달러 이상 약 200명에게 미실현 주식을 포함한 순자산의 5%를 일회성 과세하며, 반대 개헌안과 함께 2026년 11월 3일 투표한다. 기준일은 2026년 1월 1일이고 5년 분납이 가능하며 즉각적인 대량매도 우려는 과도하다는 주장이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;10억 달러 이상·약 200명·일회성 5%·2026-11-03 투표·2026-01-01 기준·5년 분납&quot;,
+        &quot;observed&quot;: &quot;관련 법률·선거당국 자료가 없어 확인 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;과세안의 확정 상정이나 강제 매도를 투자 판단의 전제로 삼을 근거가 부족하다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;claim_text&quot;: &quot;예상 세수는 약 140조원이며, 2025년 말 6명 이주로 270억 달러·약 30~40조원·전체 약 25%가 감소했고 추가 20명이 이주를 검토한다는 주장이다. 총세수 달러 자막은 ‘1억 불’이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;140조원 / 자막 1억 달러; 6명; 270억 달러; 약 25%; 추가 20명&quot;,
+        &quot;observed&quot;: &quot;조건부 산술: 1억 달러=0.14조원, 270억 달러=37.8조원, 37.8÷140=27%. 실제 총세수·인원은 확인 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;세수 감소는 검증된 결과가 아니다. 환산 계산의 일치 여부와 실제 이주·세수 추정의 타당성을 분리해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;claim_text&quot;: &quot;반대 측 연구가 소득세 과세기반 30% 이탈과 10만 회 시뮬레이션 중 약 85%에서 정부 손실을 제시했다는 주장이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:05:33&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;과세기반 30% 이탈; 시뮬레이션 100,000회; 약 85%에서 정부 손실&quot;,
+        &quot;observed&quot;: &quot;원연구와 계산 결과가 없어 확인 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;조건부 모형 수치를 실제 세수 손실이나 정책 실패 확률로 해석할 근거가 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;claim_text&quot;: &quot;과세안 찬성 여론은 약 절반이지만 양대 예측시장의 통과 확률은 약 30%이며, 민주당 의회 장악에 대한 베팅이 증가했다는 주장이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:05:33&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;찬성 약 50%; 두 예측시장 통과 확률 약 30%; 민주당 장악 베팅 증가&quot;,
+        &quot;observed&quot;: &quot;관련 조사·계약 가격·시계열이 없어 확인 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;30%를 검증된 통과 가능성으로 인용하거나 민주당 동시 의회 장악 전망으로 확대할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;claim_text&quot;: &quot;구글 공동창업자·피터 틸·우버 창업자·스필버그 등이 이전했거나 검토 중이며, 엘리슨은 주택을 매각하고 팔란티어는 본사 이전을 검토한다는 주장이다. 플로리다의 과세 제한과 부자 밀집도 3위도 이주 근거로 제시된다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;플로리다 부자 밀집도 3위&quot;,
+        &quot;observed&quot;: &quot;순위 기관·기준연도·지리 단위·부자 정의가 없어 확인 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;미확인 개인 동향을 기업의 사업 이전이나 실적·주가 영향으로 연결할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;claim_text&quot;: &quot;저커버그가 납세 목적의 주식 매각과 의결권 약화를 우려해 이주 의사를 전했으나, 의결권 보호용 주식 발행 후 8년간 잔류하기로 했다는 주장이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;8년 거주 약속&quot;,
+        &quot;observed&quot;: &quot;거주 계약·공식 발언·관련 공시가 없어 확인 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;지배구조 변경이나 창업자 지분 매각 전망에 반영하기 전에 실제 주주 문서와 계약 확인이 필요하다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;claim_text&quot;: &quot;젠슨 황이 예상 세금 80억 달러를 수용하며 납세를 특권이라고 했고, 다리오 아모데이는 과세 설계를 비판했으며 안두릴 창업자는 대주주 대량매도를 경고했다는 주장이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;예상 세금 80억 달러; 약 10조원인지 반문&quot;,
+        &quot;observed&quot;: &quot;조건부 환산 11.2조원. 실제 예상 세액과 발언은 확인 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;미확인 발언이나 예상 부담액으로 실제 지분 매도 규모·시기 또는 주가 충격을 추정할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;claim_text&quot;: &quot;두 학자가 캘리포니아 과세 설계에 참여했고, 프랑스에서는 자산 1억 유로 이상에 매년 2%를 추가 과세하는 주쿠만세가 2025년 최종 통과에 실패한 뒤 2026년 재추진된다는 주장이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:05:33&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;자산 1억 유로 이상; 연 2%; 2025년 실패·2026년 재추진&quot;,
+        &quot;observed&quot;: &quot;과세 방식과 연도별 입법 상태 모두 확인 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;프랑스와 캘리포니아 제도를 동일한 과세 방식이나 확정된 정책 확산으로 취급할 근거가 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;claim_text&quot;: &quot;샌더스가 미국 억만장자 938명에게 미실현 주식을 포함해 매년 5%를 부과하는 법안을 발의했으며 공화당 주도 의회에서 통과가 어렵다는 주장이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:11:08&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;억만장자 938명; 연 5%&quot;,
+        &quot;observed&quot;: &quot;법안 존재·세율·대상 인원 모두 확인 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;연방 부유세를 성립된 제도로 반영하거나 통과 가능성을 수치화할 근거가 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C10&quot;,
+      &quot;claim_text&quot;: &quot;워싱턴의 100만 달러 이상 소득자 대상 9.9% 세금과 폐지 투표, 미네소타의 연 1% 부유세 발의, 뉴욕시장의 100만 달러 이상 소득자 2% 증세안 무산, 한국 투자자의 미국주식 양도세율 22%에 관한 주장이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:11:08&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;워싱턴 100만 달러·9.9%; 미네소타 연 1%; 뉴욕 100만 달러·2%; 한국 22%&quot;,
+        &quot;observed&quot;: &quot;100만 달러=14억원이라는 조건부 환산만 확인. 세율·과세표준·입법 상태·적용 요건은 확인 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;각 지역의 제안·법률 성립·시행·투표 상태를 분리하고, 22%를 개인별 실효세율이나 총매각대금에 적용되는 세율로 단정하지 않아야 한다.&quot;
+    }
+  ],
+  &quot;entities&quot;: [
+    {
+      &quot;ticker&quot;: &quot;META&quot;,
+      &quot;name&quot;: &quot;메타 / 마크 저커버그&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;저커버그가 납세 목적의 주식 매각에 따른 의결권 약화를 우려해 이주 의사를 전달했으나, 의결권 보호용 주식 발행 후 잔류하기로 했다고 전한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;저커버그가 8년간 거주하겠다고 약속했다는 설명이다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;META&quot;,
+        &quot;as_of&quot;: &quot;2026-10-28T22:17:50.987023+00:00&quot;,
+        &quot;current_price&quot;: 612.489990234375,
+        &quot;market_cap&quot;: 1566034640025.5874,
+        &quot;forward_pe&quot;: 17.425035,
+        &quot;trailing_pe&quot;: 20.896963,
+        &quot;fifty_two_week_high&quot;: 779.82,
+        &quot;fifty_two_week_low&quot;: 520.26,
+        &quot;average_target_price&quot;: 846.79034,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;ORCL&quot;,
+      &quot;name&quot;: &quot;오라클 / 래리 엘리슨&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;래리 엘리슨을 관련 기업가로 언급하며, 캘리포니아 주택 매각 보도를 근거로 이주할 가능성을 제시한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;ORCL&quot;,
+        &quot;as_of&quot;: &quot;2026-10-28T22:17:54.614871+00:00&quot;,
+        &quot;current_price&quot;: 144.5399932861328,
+        &quot;market_cap&quot;: 438173155723.3639,
+        &quot;forward_pe&quot;: 13.149958,
+        &quot;trailing_pe&quot;: 22.65517,
+        &quot;fifty_two_week_high&quot;: 281.62,
+        &quot;fifty_two_week_low&quot;: 114.5,
+        &quot;average_target_price&quot;: 235.8034,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;PLTR&quot;,
+      &quot;name&quot;: &quot;팔란티어 / 알렉스 카프&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;알렉스 카프를 관련 기업가로 거론하고 팔란티어의 본사 이전 검토를 전한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;PLTR&quot;,
+        &quot;as_of&quot;: &quot;2026-10-28T22:17:57.429099+00:00&quot;,
+        &quot;current_price&quot;: 196.80999755859375,
+        &quot;market_cap&quot;: 472945933581.958,
+        &quot;forward_pe&quot;: 84.22526,
+        &quot;trailing_pe&quot;: 169.6638,
+        &quot;fifty_two_week_high&quot;: 212.94,
+        &quot;fifty_two_week_low&quot;: 106.37,
+        &quot;average_target_price&quot;: 208.96538,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;NVDA&quot;,
+      &quot;name&quot;: &quot;엔비디아 / 젠슨 황&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;젠슨 황은 세금을 내는 것을 특권으로 표현하며 예상 세금 부담을 수용하는 태도를 보였다고 전한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;예상 세금으로 80억 달러를 언급하고 원화로 약 10조원인지 발화자가 반문한다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;NVDA&quot;,
+        &quot;as_of&quot;: &quot;2026-10-28T22:18:00.629528+00:00&quot;,
+        &quot;current_price&quot;: 215.3800048828125,
+        &quot;market_cap&quot;: 5200780977905.273,
+        &quot;forward_pe&quot;: 13.533485,
+        &quot;trailing_pe&quot;: 27.228825,
+        &quot;fifty_two_week_high&quot;: 243.37,
+        &quot;fifty_two_week_low&quot;: 164.27,
+        &quot;average_target_price&quot;: 328.95346,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    }
+  ],
+  &quot;evidence&quot;: [
+    {
+      &quot;evidence_id&quot;: &quot;E1&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;Mexico, US assess viability of trade deal before midterms&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/news/mexico-us-assess-viability-trade-161206204.html&quot;,
+      &quot;publisher&quot;: &quot;Reuters&quot;,
+      &quot;published_at&quot;: &quot;2026-10-28T17:37:28+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Mexico, US assess viability of trade deal before midterms Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 2026 Elections Weather Newsletters...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E2&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;Cymat Technologies, Kap Minerals Sign MOU to Produce Scandium-Aluminum Master Alloy in Canada&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/cymat-technologies-kap-minerals-sign-162253922.html&quot;,
+      &quot;publisher&quot;: &quot;MT Newswires&quot;,
+      &quot;published_at&quot;: &quot;2026-10-28T16:22:53+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Cymat Technologies, Kap Minerals Sign MOU to Produce Scandium-Aluminum Master Alloy in Canada Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E4&quot;,
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;title&quot;: &quot;KAP Minerals and Cymat Technologies Announce Strategic Partnership to Develop Canadian Scandium-Aluminum Master Alloy Production&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/energy/articles/kap-minerals-cymat-technologies-announce-130000546.html&quot;,
+      &quot;publisher&quot;: &quot;TMX Newsfile&quot;,
+      &quot;published_at&quot;: &quot;2026-10-28T13:00:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;KAP Minerals and Cymat Technologies Announce Strategic Partnership to Develop Canadian Scandium-Aluminum Master Alloy Production Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Po...&quot;
+    }
+  ],
+  &quot;source_policy&quot;: {
+    &quot;raw_transcript_published&quot;: false,
+    &quot;raw_transcript_in_evidence&quot;: false,
+    &quot;research_pipeline_version&quot;: 4,
+    &quot;closed_source_claims&quot;: &quot;unverified_external_source&quot;,
+    &quot;auto_caption_warning&quot;: true,
+    &quot;local_asr_warning&quot;: false
+  }
+}</pre>
+  </details>
+</article>
+</main>
+  <style>
+.reader-contents { margin: 16px 0; padding: 12px 16px; border: 1px solid var(--line, #64748b); border-radius: 12px; }
+.reader-contents > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-weight: 750; }
+.reader-contents nav { display: grid; gap: 4px; max-height: 45vh; overflow: auto; margin: 8px 0; }
+.reader-contents a { display: block; min-height: 44px; padding: 10px; border-radius: 6px; color: inherit; overflow-wrap: anywhere; }
+.reader-contents a:hover { background: #80808020; }
+.reader-contents .reader-subsection { padding-inline-start: 24px; font-size: .92em; }
+.reader-prose, .report { overflow-wrap: anywhere; line-height: 1.8; }
+.reader-prose p, .reader-prose li { max-width: 85ch; }
+.reader-prose h2, .reader-prose h3, .reader-prose h4, [data-reader-heading] { scroll-margin-top: 100px; line-height: 1.45; }
+.reader-prose h2 { margin-top: 1.8em; padding-bottom: 8px; border-bottom: 1px solid var(--line, #64748b); }
+.reader-prose h3 { margin-top: 1.5em; }
+.reader-prose li { margin: .5em 0; }
+.reader-prose pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.reader-prose blockquote { margin: 16px 0; padding: 4px 16px; border-left: 3px solid var(--accent, #64748b); }
+.reader-table { overflow: auto; max-width: 100%; margin: 16px 0; border: 1px solid var(--line, #64748b); border-radius: 10px; }
+.reader-table table { border-collapse: collapse; width: 100%; margin: 0; font-size: .92rem; }
+.reader-table th, .reader-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line, #64748b); min-width: 110px; max-width: 400px; overflow-wrap: anywhere; white-space: normal; }
+.reader-table th { background: #80808018; }
+.reader-table tr:nth-child(even) { background: #80808008; }
+.reader-search { display: grid; gap: 8px; margin: 16px 0; }
+.reader-search label { font-weight: 700; }
+.reader-search input { box-sizing: border-box; width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line, #64748b); border-radius: 10px; background: var(--panel, #fff); color: var(--text, #132238); font: inherit; }
+.reader-search p { margin: 0; font-size: .86rem; }
+.reader-back { position: fixed; bottom: max(14px, env(safe-area-inset-bottom)); right: 14px; z-index: 30; min-height: 44px; border: 1px solid #778899; border-radius: 99px; padding: 10px 16px; background: #18344a; color: #fff; font: 700 14px system-ui; cursor: pointer; box-shadow: 0 3px 12px #0003; }
+[data-reader-source] { margin-top: 20px; }
+[data-reader-source] > summary { min-height: 44px; cursor: pointer; }
+[data-reader-source] pre { font-size: .85rem; }
+[data-reader-source] pre, .reader-prose { min-width: 0; }
+.reader-contents :focus-visible, .reader-search :focus-visible, .reader-back:focus-visible, .reader-table:focus-visible { outline: 3px solid var(--accent, #008c95); outline-offset: 3px; }
+.reader-search + .grid > [hidden] { display: none !important; }
+@media (max-width: 600px) { .reader-prose { font-size: 1rem; } .reader-contents { padding: 8px 12px; } }
+@media print { .reader-back, .reader-search, .reader-contents, [data-reader-source] { display: none !important; } .reader-table { overflow: visible; } .reader-prose { color: #000; background: #fff; } }
+</style><script>
+(() => {
+  'use strict';
+  let serial = 0;
+  const rendered = new WeakMap();
+  const node = (tag, text) => { const el = document.createElement(tag); if (text != null) el.textContent = text; return el; };
+  function inline(parent, text) {
+    const pattern = /(`[^`]+`|\*\*[^*]+\*\*|\[[^\]]+\]\(https?:\/\/[^\s)]+\))/g;
+    let start = 0;
+    for (const match of String(text).matchAll(pattern)) {
+      parent.append(document.createTextNode(text.slice(start, match.index)));
+      const value = match[0];
+      if (value.startsWith('`')) parent.append(node('code', value.slice(1, -1)));
+      else if (value.startsWith('**')) parent.append(node('strong', value.slice(2, -2)));
+      else {
+        const link = value.match(/^\[([^\]]+)\]\((.+)\)$/);
+        const a = node('a', link[1]); a.href = link[2]; a.rel = 'noopener noreferrer'; parent.append(a);
+      }
+      start = match.index + value.length;
+    }
+    parent.append(document.createTextNode(text.slice(start)));
+  }
+  const cells = line => line.trim().replace(/^\|/, '').replace(/\|$/, '').split(/(?<!\\)\|/).map(v => v.trim().replace(/\\\|/g, '|'));
+  function markdown(source) {
+    const article = node('article'); article.className = 'reader-prose';
+    const lines = source.split(/\r?\n/); let list = null;
+    for (let i = 0; i < lines.length; i += 1) {
+      const line = lines[i], value = line.trim();
+      if (!value) { list = null; continue; }
+      if (/^```/.test(value)) {
+        const code = []; i += 1;
+        while (i < lines.length && !/^```/.test(lines[i].trim())) code.push(lines[i++]);
+        const pre = node('pre'); pre.append(node('code', code.join('\n'))); article.append(pre); list = null; continue;
+      }
+      if (i + 1 < lines.length && value.includes('|') && cells(lines[i + 1]).every(v => /^:?-{3,}:?$/.test(v))) {
+        const table = node('table'), head = node('thead'), body = node('tbody');
+        const row = (values, tag) => { const tr = node('tr'); values.forEach(v => { const cell = node(tag); if (tag === 'th') cell.scope = 'col'; inline(cell, v); tr.append(cell); }); return tr; };
+        head.append(row(cells(line), 'th')); i += 2;
+        while (i < lines.length && lines[i].trim() && lines[i].includes('|')) body.append(row(cells(lines[i++]), 'td'));
+        i -= 1; table.append(head, body); article.append(table); list = null; continue;
+      }
+      const heading = value.match(/^(#{1,6})\s+(.+)$/);
+      if (heading) { const h = node('h' + Math.min(4, heading[1].length + 1)); inline(h, heading[2]); article.append(h); list = null; continue; }
+      const bullet = value.match(/^(?:[-*+] |\d+\. )(.+)$/);
+      if (bullet) {
+        const tag = /^\d/.test(value) ? 'ol' : 'ul';
+        if (!list || list.tagName.toLowerCase() !== tag) { list = node(tag); if (tag === 'ol') list.start = parseInt(value, 10); article.append(list); }
+        const li = node('li'); inline(li, bullet[1]); list.append(li); continue;
+      }
+      list = null;
+      if (/^(---+|\*\*\*+)$/.test(value)) { article.append(node('hr')); continue; }
+      const p = node(value.startsWith('> ') ? 'blockquote' : 'p'); inline(p, value.startsWith('> ') ? value.slice(2) : line); article.append(p);
+    }
+    return article;
+  }
+  function contents(root) {
+    root.querySelectorAll(':scope > .reader-contents').forEach(el => el.remove());
+    const headings = [...root.querySelectorAll('h2,h3,h4')].filter(h => !h.closest('.card,.run-card,.reader-contents,[data-reader-source],[hidden]'));
+    if (headings.length < 2) return;
+    const details = node('details'); details.className = 'reader-contents';
+    details.append(node('summary', '이 리포트 목차 · ' + headings.length + '개 항목'));
+    const nav = node('nav'); nav.setAttribute('aria-label', '리포트 목차');
+    headings.forEach(h => {
+      if (!h.id) h.id = 'reader-section-' + (++serial);
+      h.dataset.readerHeading = ''; h.tabIndex = -1;
+      const a = node('a', h.textContent); a.href = '#' + h.id;
+      if (h.tagName !== 'H2') a.className = 'reader-subsection';
+      a.addEventListener('click', event => {
+        event.preventDefault();
+        for (let ancestor = h.parentElement; ancestor; ancestor = ancestor.parentElement) if (ancestor.tagName === 'DETAILS') ancestor.open = true;
+        h.scrollIntoView({block: 'start'}); h.focus({preventScroll: true});
+      }); nav.append(a);
+    });
+    details.append(nav); root.prepend(details);
+  }
+  function enhance(root) {
+    if (!root) return;
+    root.querySelectorAll('pre[data-report-markdown]').forEach(pre => {
+      const previous = rendered.get(pre);
+      if (previous && previous.source === pre.textContent) return;
+      const article = markdown(pre.textContent);
+      if (previous) previous.article.replaceWith(article);
+      else {
+        const details = node('details'); details.dataset.readerSource = '';
+        details.append(node('summary', 'Markdown 원문 보기'));
+        pre.before(article, details); details.append(pre);
+      }
+      rendered.set(pre, {source: pre.textContent, article});
+    });
+    root.querySelectorAll('table').forEach(table => {
+      if (table.closest('.reader-table,.account-table-wrap,.summary-scroll')) return;
+      const wrap = node('div'); wrap.className = 'reader-table'; wrap.tabIndex = 0;
+      wrap.setAttribute('role', 'region'); wrap.setAttribute('aria-label', '리포트 표 · 가로로 스크롤하여 전체 보기');
+      table.before(wrap); wrap.append(table);
+    });
+    root.querySelectorAll('.grid').forEach(grid => {
+      const cards = [...grid.querySelectorAll(':scope > a.card')];
+      if (cards.length < 2 || grid.dataset.readerSearch) return;
+      grid.dataset.readerSearch = 'true';
+      const box = node('div'); box.className = 'reader-search';
+      const input = node('input'); input.type = 'search'; input.placeholder = '제목 · 종목 · 채널 · 키워드'; input.id = 'report-search-' + (++serial);
+      const label = node('label', '리포트 찾기'); label.htmlFor = input.id;
+      const status = node('p'); status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
+      const update = () => {
+        const terms = input.value.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean); let count = 0;
+        cards.forEach(card => { card.hidden = !terms.every(t => card.textContent.toLocaleLowerCase().includes(t)); if (!card.hidden) count += 1; });
+        status.textContent = cards.length + '개 중 ' + count + '개 표시' + (count ? '' : ' · 검색어를 지우거나 다른 키워드를 입력하세요.');
+      };
+      input.addEventListener('input', update); box.append(label, input, status); grid.before(box); update();
+    });
+    contents(root);
+  }
+  window.TradingAgentsReader = {enhance};
+  const main = document.querySelector('main');
+  if (main && !main.hasAttribute('data-reader-dynamic')) enhance(main);
+  if (main) {
+    const top = node('button', '↑ 맨 위'); top.type = 'button'; top.className = 'reader-back'; top.setAttribute('aria-label', '리포트 맨 위로 이동');
+    top.addEventListener('click', () => { const target = document.querySelector('h1') || main; target.tabIndex = -1; target.scrollIntoView({block: 'start'}); target.focus({preventScroll: true}); });
+    document.body.append(top);
+  }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,305 @@
+{
+  "version": 4,
+  "video_id": "P9V3MmvIzy4",
+  "title": "10월 28일 오늘 코스피 어떻게 흘러갈까?!",
+  "url": "https://www.youtube.com/watch?v=P9V3MmvIzy4",
+  "channel": "경제사냥꾼",
+  "channel_id": "UC7usMJDHmtbs_oegmzQKKMA",
+  "source_url": "https://www.youtube.com/@%EA%B2%BD%EC%A0%9C%EC%82%AC%EB%83%A5%EA%BE%BC/shorts",
+  "thumbnail_url": "https://i.ytimg.com/vi/P9V3MmvIzy4/maxresdefault.jpg",
+  "published_at": "2026-10-27T22:47:04+00:00",
+  "status": "asr_uncertain",
+  "strategy_source_tier": "STANDARD",
+  "strategy_evidence_weight": "STANDARD",
+  "strategy_validation_policy": "STANDARD_REVIEW",
+  "transcript_status": "available",
+  "transcript_source": "automatic",
+  "transcript_chars": 1749,
+  "transcript_quality": {
+    "status": "good",
+    "score": 1.0,
+    "warnings": [],
+    "source": "automatic",
+    "language": "Korean (Original)",
+    "model_or_format": "json3",
+    "chars": 1749,
+    "segments": 91,
+    "duration_seconds": 143,
+    "repeated_ngram_ratio": 0.004
+  },
+  "generated_at": "2026-10-28T09:08:35.315227+09:00",
+  "llm_status": "success",
+  "research_status": "success",
+  "claim_verification_status": "success",
+  "research_pipeline_version": 4,
+  "evidence_count": 5,
+  "claim_status_summary": {
+    "unverified": 7,
+    "asr_uncertain": 3,
+    "partially_supported": 1
+  },
+  "claims": [
+    {
+      "claim_id": "C1",
+      "claim_text": "코스피200 야간선물이 장중 2.65% 상승하고 1.99% 상승 마감했으며, 종가는 자막에 '900점 영호'로 기록됐다.",
+      "status": "unverified",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.55,
+      "numeric_parse": {
+        "claimed": "장중 +2.65%, 마감 +1.99%, 종가 '900점 영호'",
+        "observed": "해당 야간선물 시세 없음; 불명확한 종가는 복원하지 않음"
+      },
+      "investor_implication": "야간선물 상승률을 확인된 개장 방향 신호로 사용하기 어렵다."
+    },
+    {
+      "claim_id": "C2",
+      "claim_text": "6월~10월 초 야간선물 절대 변동률 1.5% 이상인 37회 중 34회 코스피가 같은 방향으로 출발했으며, 전일 2% 초과 상승 다음 날 시가보다 높게 마감한 빈도는 '2번 중 일곱 번'이라고 주장한다.",
+      "status": "asr_uncertain",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.3,
+      "numeric_parse": {
+        "claimed": "34/37; 야간선물 절대 변동률 ≥1.5%; 전일 상승률 >2%; '2번 중 일곱 번'",
+        "observed": "원표·재현 계산 없음; 두 번째 빈도의 분자·분모 확정 불가"
+      },
+      "investor_implication": "두 빈도를 재현된 확률이나 당일 상승 확률로 제시해서는 안 된다."
+    },
+    {
+      "claim_id": "C3",
+      "claim_text": "전일 코스피가 3% 넘게 상승했으며 3.46% 상승 출발, 장중 5,737, 종가 5,638을 기록하고 시가보다 하락했다고 주장한다.",
+      "status": "unverified",
+      "confidence": 0.97,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00",
+      "source_confidence": 0.2,
+      "asr_confidence": 0.55,
+      "numeric_parse": {
+        "claimed": "일간 +3% 초과; 시가 +3.46%; 장중 5,737; 종가 5,638; 시가 대비 '0.36% 36%' 하락",
+        "observed": "스냅샷 current_price 5,638.34만 제공; 거래일별 OHLC와 수익률 없음"
+      },
+      "investor_implication": "조회된 단일 가격을 전일 장중 경로나 수익률 전체의 확인 근거로 확대하면 안 된다."
+    },
+    {
+      "claim_id": "C4",
+      "claim_text": "외국인이 전일 코스피에서 5,813억 원 순매수했지만 그 이전 기간에는 1조 6천억 원 넘게 순매도했으며, 삼성전자는 사고 SK하이닉스는 팔았다고 주장한다.",
+      "status": "unverified",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.65,
+      "numeric_parse": {
+        "claimed": "전일 코스피 +5,813억 원; 이전 미상 기간 -1조 6천억 원 초과",
+        "observed": "수급 자료와 이전 집계 기간 없음"
+      },
+      "investor_implication": "외국인 매수 전환이나 종목 간 수급 이동을 확인된 투자 근거로 사용할 수 없다."
+    },
+    {
+      "claim_id": "C5",
+      "claim_text": "SK하이닉스가 10월 28일 개장 전 3분기 실적을 발표하고 오전 9시 설명회에서 추가 주주환원을 공개할 예정이라고 주장한다.",
+      "status": "partially_supported",
+      "confidence": 0.88,
+      "supporting_evidence_ids": [
+        "E5"
+      ],
+      "manual_check_required": true,
+      "timestamp": "00:00",
+      "source_confidence": 0.45,
+      "asr_confidence": 0.75,
+      "numeric_parse": {
+        "claimed": "10월 28일 개장 전 실적 발표; 오전 9시 설명회",
+        "observed": "E5는 28일 실적 발표를 언급하나 개장 전·09:00은 확인하지 못함"
+      },
+      "investor_implication": "실적·주주환원 관련 일정은 일부 보도 근거가 있지만 구체적 시각과 확정 정책은 공식 자료로 확인해야 한다."
+    },
+    {
+      "claim_id": "C6",
+      "claim_text": "SK하이닉스 분기 영업이익 시장 예상이 약 77조 원으로 사상 최대이며, KB증권은 추가 주주환원을 40조 원 규모로 예상했다고 주장한다.",
+      "status": "asr_uncertain",
+      "confidence": 0.97,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00",
+      "source_confidence": 0.1,
+      "asr_confidence": 0.35,
+      "numeric_parse": {
+        "claimed": "분기 영업이익 예상 약 77조 원; 추가 주주환원 예상 40조 원",
+        "observed": "두 수치의 일치 근거 없음; E5의 다른 기간·대상 수치로 대체 불가"
+      },
+      "investor_implication": "77조 원과 40조 원을 실적 기대치나 주주환원 확정액으로 인용하지 않아야 한다."
+    },
+    {
+      "claim_id": "C7",
+      "claim_text": "미국에서 거래되는 SK하이닉스 주식이 1.92% 상승했다고 주장한다.",
+      "status": "unverified",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.75,
+      "numeric_parse": {
+        "claimed": "미국 거래 하이닉스 관련 주식 +1.92%",
+        "observed": "상품 식별자와 가격 자료 없음"
+      },
+      "investor_implication": "미식별 상품의 등락률을 국내 하이닉스 주가의 선행 지표로 사용하기 어렵다."
+    },
+    {
+      "claim_id": "C8",
+      "claim_text": "미국 반도체 지수가 간밤 3.6% 상승해 사흘 연속 올랐지만 6월 고점보다 20% 넘게 낮다고 주장한다.",
+      "status": "unverified",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.55,
+      "numeric_parse": {
+        "claimed": "일간 +3.6%; 사흘 연속 상승; 6월 고점 대비 -20% 초과",
+        "observed": "지수 식별자·종가 시계열·고점 자료 없음"
+      },
+      "investor_implication": "국내 반도체주에 우호적인 배경이나 추세 회복 신호로 단정하기 어렵다."
+    },
+    {
+      "claim_id": "C9",
+      "claim_text": "자막상 '엔트로픽'이라는 기업의 상장 서류에 매출 급증과 분기 영업흑자 전환이 담겨 AI 투자 회수 기대를 높였다고 주장한다.",
+      "status": "asr_uncertain",
+      "confidence": 0.97,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.35,
+      "numeric_parse": {
+        "claimed": "매출 급증·분기 영업흑자 전환; 구체적 금액 없음",
+        "observed": "법인 식별·등록서류·매출·영업손익 자료 없음"
+      },
+      "investor_implication": "특정 AI 기업의 흑자 전환과 반도체 구매 지속성을 확인된 사실로 연결해서는 안 된다."
+    },
+    {
+      "claim_id": "C10",
+      "claim_text": "미국 투자회사 대표가 반도체 반등을 큰 하락 이후의 안도 랠리라고 평가했다고 인용한다.",
+      "status": "unverified",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.7,
+      "numeric_parse": {
+        "claimed": "수치 주장 없음",
+        "observed": "발언자와 인용 원문 미제공"
+      },
+      "investor_implication": "출처 미확인 인용을 전문가 합의나 반등의 성격에 대한 확인으로 제시할 수 없다."
+    },
+    {
+      "claim_id": "C11",
+      "claim_text": "당일 코스피 상승 출발·상승 마감을 기본 시나리오로 제시하며, 기대 이상의 하이닉스 실적·주주환원과 외국인 매수가 동반되면 5,700선이 지지될 수 있다고 전망한다. 차익실현과 기대 미달 매물도 경고한다.",
+      "status": "unverified",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.7,
+      "numeric_parse": {
+        "claimed": "조건부 지지선 5,700; 상승 출발·상승 마감",
+        "observed": "당일 시가·종가·5,700선 접촉 여부와 조건 충족 자료 없음"
+      },
+      "investor_implication": "확정적 예측이 아닌 미검증 조건부 시나리오로 취급하고 발표 후 가격·수급을 별도로 관찰해야 한다."
+    }
+  ],
+  "entities": [
+    {
+      "ticker": "^KS11",
+      "name": "코스피·코스피200 야간선물",
+      "status": "unverified",
+      "claims": [
+        "야간선물 상승을 근거로 당일 코스피의 상승 출발 가능성이 높다고 전망한다.",
+        "전일 급등 이후에는 차익실현 매물이 나올 수 있어 출발보다 시가 수준을 유지하는지가 중요하다고 주장한다.",
+        "외국인의 코스피 순매수 지속과 하이닉스 순매수 전환이 함께 나타나면 지수 지지력이 강화될 수 있다고 본다."
+      ],
+      "numeric_claims": [
+        "코스피200 야간선물이 한때 2.65% 상승한 뒤 1.99% 상승 마감했다고 발언한다. 종가 수준은 자막상 '900점 영호'로 불명확하다.",
+        "지난 6월부터 10월 초까지 주말·연휴 직후를 제외하고 야간선물이 1.5% 이상 움직인 37회 중 34회 코스피가 같은 방향으로 출발했다고 주장한다.",
+        "전일 코스피가 3% 넘게 상승했으며, 3.46% 상승 출발해 장중 5,737에 도달한 뒤 5,638에 마감했다고 발언한다. 시가 대비 하락률은 자막상 '0.36% 36%'로 중복된다."
+      ],
+      "verification_notes": [
+        "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+      ],
+      "market_snapshot": {
+        "ticker": "^KS11",
+        "as_of": "2026-10-28T00:09:51.577039+00:00",
+        "current_price": 5638.34,
+        "market_cap": null,
+        "forward_pe": null,
+        "trailing_pe": null,
+        "fifty_two_week_high": 9385.59,
+        "fifty_two_week_low": 0.0,
+        "average_target_price": null,
+        "source": "yfinance",
+        "status": "verified"
+      },
+      "external_context_status": "verified"
+    }
+  ],
+  "evidence": [
+    {
+      "evidence_id": "E1",
+      "claim_id": "C1",
+      "title": "What the Aluminum Tariff Has Meant for U.S. Prices",
+      "source_url": "https://finance.yahoo.com/m/bbdab404-8386-3b0a-938e-4333f4284a0b/what-the-aluminum-tariff-has.html",
+      "publisher": "The Wall Street Journal",
+      "published_at": "2026-10-27T21:30:02+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "What the Aluminum Tariff Has Meant for U.S. Prices Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 2026 Elections Weather Newsletters Finance..."
+    },
+    {
+      "evidence_id": "E2",
+      "claim_id": "C1",
+      "title": "UACJ (TSE:5741) Stock May Still Be Below Fair Value",
+      "source_url": "https://finance.yahoo.com/markets/stocks/articles/uacj-tse-5741-stock-may-181222630.html",
+      "publisher": "Simply Wall St.",
+      "published_at": "2026-10-27T18:12:22+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "UACJ (TSE:5741) Stock May Still Be Below Fair Value Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 2026 Elections Weather Newsletters Financ..."
+    },
+    {
+      "evidence_id": "E4",
+      "claim_id": "C2",
+      "title": "Constellium vs. Ryerson: Which Metal Stock Should You Invest in Now?",
+      "source_url": "https://finance.yahoo.com/markets/stocks/articles/constellium-vs-ryerson-metal-stock-111400657.html",
+      "publisher": "Zacks",
+      "published_at": "2026-10-27T11:14:00+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "Constellium vs. Ryerson: Which Metal Stock Should You Invest in Now? Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 2026 Elections Weather N..."
+    },
+    {
+      "evidence_id": "E5",
+      "claim_id": "C6",
+      "title": "삼성·SK하이닉스 3분기 영업익 184조 전망…HBM4가 키운 실적, 모바일 ...",
+      "source_url": "http://www.dailypop.kr/news/articleView.html?idxno=103756",
+      "publisher": "Naver News",
+      "published_at": "2026-10-27T13:40:00+09:00",
+      "source_tier": "news",
+      "excerpt": "4분기 영업이익 컨센서스는 87조2701억원이다. SK하이닉스는 28일 실적 발표와 함께 추가 주주환원 방안도... 한편 KB증권은 지난 26일 보고서에서 양사의 2026~2027년 합산 영업이익을 1571조원(삼성전자 924조원..."
+    }
+  ],
+  "source_policy": {
+    "raw_transcript_published": false,
+    "raw_transcript_in_evidence": false,
+    "research_pipeline_version": 4,
+    "closed_source_claims": "unverified_external_source",
+    "auto_caption_warning": true,
+    "local_asr_warning": false
+  }
+}
