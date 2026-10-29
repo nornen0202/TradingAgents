@@ -670,3 +670,25 @@ def test_history_refresh_rejects_unverified_or_changed_base(tmp_path, monkeypatc
     with pytest.raises((ValueError,RuntimeError)):
         local.refresh_report_history(archive,state,receipt)
     assert not writes
+
+
+def test_history_refresh_accepts_new_advisories_without_advancing_market_generation(tmp_path, monkeypatch):
+    from tradingagents.work import site as work_site
+    from tradingagents.scheduled import site as research_site, config
+
+    state, archive = tmp_path / 'state', tmp_path / 'archive'
+    for surface in ('kr', 'us'):
+        report = {'generation': 'committed-market'}
+        local.atomic_write_json(archive / 'work-reports' / surface / 'latest.json', report)
+        local.atomic_write_json(state / 'site/work/v1' / surface / 'report/latest.json', report)
+    for surface in ('youtube', 'prism'):
+        local.atomic_write_json(archive / 'work-reports' / surface / 'latest.json', {'generation': 'new-advisory'})
+        local.atomic_write_json(state / 'site/work/v1' / surface / 'report/latest.json', {'generation': 'old-advisory'})
+    writes = []
+    monkeypatch.setattr(local, 'git_run', lambda *a, **k: '')
+    monkeypatch.setattr(work_site, '_publish_latest_report', lambda **kw: writes.append(kw['surface']))
+    monkeypatch.setattr(config, 'load_scheduled_config', lambda *a: SimpleNamespace(site={}))
+    monkeypatch.setattr(research_site, 'publish_daily_report_history', lambda *a: writes.append('daily-history'))
+    local.refresh_report_history(archive, state, {'status': 'DELIVERY_VERIFIED', 'commit': 'base'})
+    assert writes == ['kr', 'us', 'youtube', 'prism', 'daily-history']
+    assert local.read_json(state / 'site/work/v1/us/report/latest.json')['generation'] == 'committed-market'
