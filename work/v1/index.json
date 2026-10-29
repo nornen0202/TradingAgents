@@ -216,15 +216,15 @@
         "latest_url": "https://nornen0202.github.io/TradingAgents/work/v1/kr/report/latest.json",
         "event_url": "https://nornen0202.github.io/TradingAgents/work/v1/kr/report/events/eef1a7d6ffec0b8b8d6fe14e92e77f4206abc0a88ffac423999581e31502d7c7.json",
         "history_url": "https://nornen0202.github.io/TradingAgents/work/v1/kr/report/index.html",
-        "history_count": 59
+        "history_count": 57
       }
     },
     "us": {
       "schema": "tradingagents.work-context/v1",
       "surface": "us",
-      "event_id": "us:e24189034900b2b9e1bfa4a3bab73218",
-      "source_sha256": "b1820375e37be88b7523fd3f974ad5be00f49221aac2b73ec936a2e15a361d7d",
-      "packet_sha256": "94ff4cb10c645898020caf6ef5bce9f93f3592ece352c2c4bb06f1475504bd24",
+      "event_id": "us:420568edcb354f75f8385c28c27b79a9",
+      "source_sha256": "689aee3ea84bfba8f2a5b15bbfe2044d71de6fde82f8707949d02af4f7eef73b",
+      "packet_sha256": "ec66216b828762fafb01a16c303e1a68a4ec711574b93e2cfa129ed0b4ab5ea3",
       "prompt_contract_version": "market-work-v13-us",
       "prompt_sha256": "d89884ce9232b2695f637cb3a5654da9f473e7138706cc074cbd9a1601e61f77",
       "skill_sha256": "4dffe28b3721557cc2517b5afff2f94045832606e71ff61461df969f6abb53c7",
@@ -232,29 +232,35 @@
       "workflow_contract_sha256": "6e0b555b6a8ae53cf919baa1e96d671d2ef180fd3d86a58e5c8b568f278c8ec6",
       "status_url": "https://nornen0202.github.io/TradingAgents/work/v1/us/status.json",
       "latest_url": "https://nornen0202.github.io/TradingAgents/work/v1/us/latest.json",
-      "event_url": "https://nornen0202.github.io/TradingAgents/work/v1/us/events/us-e24189034900b2b9e1bfa4a3bab73218.json",
+      "event_url": "https://nornen0202.github.io/TradingAgents/work/v1/us/events/us-420568edcb354f75f8385c28c27b79a9.json",
       "prompt_url": "https://nornen0202.github.io/TradingAgents/work/v1/prompts/market_us.md",
-      "source_health": "UNVERIFIED",
+      "source_health": "STALE",
       "report_mode": "OUTAGE",
       "freshness_receipt": {
         "schema": "tradingagents.source-freshness/v1",
-        "producer_run_id": "20261029T065759_local-scheduler-us-full",
-        "producer_started_at": "2026-10-29T06:57:59.228547+09:00",
-        "producer_finished_at": "2026-10-29T12:48:12.976763+09:00",
-        "analysis_run_id": "20261029T065759_local-scheduler-us-full",
+        "producer_run_id": "20261029T124921_manual-us-failed-recovery",
+        "producer_started_at": "2026-10-29T12:49:21.009364+09:00",
+        "producer_finished_at": "2026-10-29T14:14:07.115277+09:00",
+        "analysis_run_id": "20261029T124921_manual-us-failed-recovery",
         "analysis_lineage_status": "RESOLVED",
-        "analysis_completed_at": "2026-10-29T10:52:33.685699+09:00",
+        "analysis_completed_at": "2026-10-29T13:15:09.675150+09:00",
         "analysis_trade_date_oldest": "2026-10-28",
         "analysis_trade_date_latest": "2026-10-28",
         "market_data_oldest_at": "2026-10-28T18:00:00-04:00",
         "market_data_latest_at": "2026-10-28T19:55:00-04:00",
-        "market_data_status": "MISSING",
+        "market_data_status": "STALE",
         "publication_does_not_refresh_inputs": true,
         "execution_max_age_seconds": 180.0,
         "research_market_data_status": "UNVERIFIED",
         "research_market_data_receipts": [
           {
             "ticker": "GOOGL",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "TSM",
             "research_valid": false,
             "category": "UNVERIFIED_RESEARCH_INPUT",
             "execution_eligible": false
@@ -273,12 +279,6 @@
           },
           {
             "ticker": "DELL",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
-            "execution_eligible": false
-          },
-          {
-            "ticker": "TSM",
             "research_valid": false,
             "category": "UNVERIFIED_RESEARCH_INPUT",
             "execution_eligible": false
@@ -332,7 +332,19 @@
             "execution_eligible": false
           },
           {
+            "ticker": "BRK-B",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false
+          },
+          {
             "ticker": "ABBV",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "CVX",
             "research_valid": false,
             "category": "UNVERIFIED_RESEARCH_INPUT",
             "execution_eligible": false
@@ -357,6 +369,12 @@
           },
           {
             "ticker": "MDT",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "PM",
             "research_valid": false,
             "category": "UNVERIFIED_RESEARCH_INPUT",
             "execution_eligible": false
@@ -393,24 +411,6 @@
           },
           {
             "ticker": "MU",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
-            "execution_eligible": false
-          },
-          {
-            "ticker": "BRK-B",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
-            "execution_eligible": false
-          },
-          {
-            "ticker": "CVX",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
-            "execution_eligible": false
-          },
-          {
-            "ticker": "PM",
             "research_valid": false,
             "category": "UNVERIFIED_RESEARCH_INPUT",
             "execution_eligible": false
@@ -475,9 +475,9 @@
     "prism": {
       "schema": "tradingagents.work-context/v1",
       "surface": "prism",
-      "event_id": "prism:99c4fb7f65ace2c7dd6f6ff1323e36f1",
-      "source_sha256": "ce50f776e2a3b49062c9c63478afb5924228c9b796c5601dd5e442c123a6466e",
-      "packet_sha256": "dc1fd8c6c41b35041bc32bcd7d5307b32dc5556f1ca62dbc9c76a933c1406ef1",
+      "event_id": "prism:fb55317adbb91cdf566e24f62765fd3f",
+      "source_sha256": "c772655940c3f2bbf4c29fc5ee5c20dbd456a4505ed199eef3e9d01560f2d533",
+      "packet_sha256": "0e4e6e3c8e9e68d4c8bf6f4282e7679745deca9f71c2205c0d49f7fc3fd37c1b",
       "prompt_contract_version": "prism-work-v5",
       "prompt_sha256": "2d6e6a207021f5126507994f77ca7850fa9bf42701a32286227ca874c1f535df",
       "skill_sha256": "4dffe28b3721557cc2517b5afff2f94045832606e71ff61461df969f6abb53c7",
@@ -485,7 +485,7 @@
       "workflow_contract_sha256": "6e9bacf847e1ea3fede5d24780fde443897da2d480119b5ef7dfdc873bb87103",
       "status_url": "https://nornen0202.github.io/TradingAgents/work/v1/prism/status.json",
       "latest_url": "https://nornen0202.github.io/TradingAgents/work/v1/prism/latest.json",
-      "event_url": "https://nornen0202.github.io/TradingAgents/work/v1/prism/events/prism-99c4fb7f65ace2c7dd6f6ff1323e36f1.json",
+      "event_url": "https://nornen0202.github.io/TradingAgents/work/v1/prism/events/prism-fb55317adbb91cdf566e24f62765fd3f.json",
       "prompt_url": "https://nornen0202.github.io/TradingAgents/work/v1/prompts/prism.md",
       "source_health": "OK",
       "report_mode": null,

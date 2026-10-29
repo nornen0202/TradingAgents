@@ -1,13 +1,13 @@
 {
   "schema": "tradingagents.work-context/v1",
   "surface": "prism",
-  "event_id": "prism:99c4fb7f65ace2c7dd6f6ff1323e36f1",
+  "event_id": "prism:fb55317adbb91cdf566e24f62765fd3f",
   "prompt_contract_version": "prism-work-v5",
   "prompt_sha256": "2d6e6a207021f5126507994f77ca7850fa9bf42701a32286227ca874c1f535df",
   "skill_sha256": "4dffe28b3721557cc2517b5afff2f94045832606e71ff61461df969f6abb53c7",
   "task_manifest_sha256": "c0992fa275c9961bc91c679030c0b4d9b8b06f3d164226776421f1e354b5c22e",
   "workflow_contract_sha256": "6e9bacf847e1ea3fede5d24780fde443897da2d480119b5ef7dfdc873bb87103",
-  "source_sha256": "ce50f776e2a3b49062c9c63478afb5924228c9b796c5601dd5e442c123a6466e",
+  "source_sha256": "c772655940c3f2bbf4c29fc5ee5c20dbd456a4505ed199eef3e9d01560f2d533",
   "body": {
     "kind": "prism",
     "source_health": "OK",
@@ -44,10 +44,10 @@
     },
     "coverage": {
       "total_unique_events": 317,
-      "window_events": 28,
-      "transmitted_events": 28,
+      "window_events": 27,
+      "transmitted_events": 27,
       "truncated": false,
-      "oldest_occurred_at": "2026-10-28T05:49:17+00:00",
+      "oldest_occurred_at": "2026-10-28T05:56:00+00:00",
       "newest_occurred_at": "2026-10-28T18:53:32+00:00"
     },
     "events": [
@@ -1509,81 +1509,6 @@
             "version": "prism-telegram/v3",
             "status": "ARCHIVED_TEXT_RECHECKED",
             "text_chars": 434,
-            "text_source": "public_metadata",
-            "action_changes": [],
-            "recovered_tickers": []
-          }
-        }
-      },
-      {
-        "event_key": "stock_ai_agent:16792",
-        "content_sha256": "a8d3f81ca4c478b7652f3b7b8d7d04cb61a2591efba71d61c88c6e65bb839480",
-        "occurred_at": "2026-10-28T05:49:17+00:00",
-        "relevance": {
-          "tickers": [
-            "295310.KS",
-            "003160.KS",
-            "000660.KS"
-          ],
-          "markets": [
-            "KR"
-          ],
-          "themes": [],
-          "match_basis": "normalized_prism_signals"
-        },
-        "summary": {
-          "channel": "stock_ai_agent",
-          "message_id": "16792",
-          "posted_at": "2026-10-28T05:49:17+00:00",
-          "source_url": "https://t.me/stock_ai_agent/16792",
-          "preview": "🔔 오후 프리즘 시그널 얼럿 📅 2026.10.28 오후 분석 포착된 관심종목 🤖 프리즘봇의 가상 포트폴리오 운용 과정을 투명하게 공개합니다. 실제 매수 권유가 아닙니다. 🧭 장기추세: 횡보 | 실행기준: 횡보 | 선정: 탑다운 0종목 + 바텀업 3종목 🧭 오늘 돈이 몰린 테마 (상승 상위 종목 + KIS 뉴스 제목 기준) 1) 반도체: 디아이 +14.6%, 엑시콘 +14.3%, 피에스...",
-          "signals": [
-            {
-              "canonical_ticker": "295310.KS",
-              "display_name": "에이치브이엠",
-              "market": "KR",
-              "source_asof": "2026-10-28T05:49:17+00:00",
-              "signal_action": "WATCH",
-              "trigger_type": "telegram_signal_alert",
-              "trigger_score": 0.82,
-              "composite_score": 0.82,
-              "confidence": 0.82,
-              "warnings": []
-            },
-            {
-              "canonical_ticker": "003160.KS",
-              "display_name": "디아이",
-              "market": "KR",
-              "source_asof": "2026-10-28T05:49:17+00:00",
-              "signal_action": "WATCH",
-              "trigger_type": "telegram_signal_alert",
-              "trigger_score": 0.84,
-              "composite_score": 0.84,
-              "confidence": 0.84,
-              "warnings": []
-            },
-            {
-              "canonical_ticker": "000660.KS",
-              "display_name": "SK하이닉스",
-              "market": "KR",
-              "source_asof": "2026-10-28T05:49:17+00:00",
-              "signal_action": "WATCH",
-              "trigger_type": "telegram_signal_alert",
-              "trigger_score": 0.45,
-              "composite_score": 0.45,
-              "confidence": 0.45,
-              "warnings": []
-            }
-          ],
-          "signals_total": 3,
-          "signals_transmitted": 3,
-          "signals_truncated": false,
-          "simulation_only": true,
-          "actionability": "research_only",
-          "normalization": {
-            "version": "prism-telegram/v3",
-            "status": "ARCHIVED_TEXT_RECHECKED",
-            "text_chars": 691,
             "text_source": "public_metadata",
             "action_changes": [],
             "recovered_tickers": []

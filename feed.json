@@ -1,6 +1,34 @@
 {
-  "generated_at": "2026-10-29T13:20:00.523752",
+  "generated_at": "2026-10-29T14:40:16.848722",
   "runs": [
+    {
+      "run_id": "20261029T124921_manual-us-failed-recovery",
+      "label": "manual-us-failed-recovery",
+      "started_at": "2026-10-29T12:49:21.009364+09:00",
+      "finished_at": "2026-10-29T14:14:07.115277+09:00",
+      "status": "success",
+      "market": "US",
+      "run_mode": "full",
+      "settings": {
+        "market": "US",
+        "run_mode": "full"
+      },
+      "summary": {
+        "total_tickers": 27
+      },
+      "ticker_count": 27,
+      "success_count": 27,
+      "decision_bundle": {
+        "version": 2,
+        "decision_ready": false,
+        "conditional_strategy_ready": false,
+        "quality_label_ko": "연구 자료만 제공, 장중 데이터 대기",
+        "fresh_row_ratio": 0.0,
+        "conditional_row_ratio": 0.0
+      },
+      "published_to_site": true,
+      "run_url": "runs/20261029T124921_manual-us-failed-recovery/index.html"
+    },
     {
       "run_id": "20261029T065759_local-scheduler-us-full",
       "label": "local-scheduler-us-full",
@@ -3351,8 +3379,8 @@
         "fresh_row_ratio": 0.9667,
         "conditional_row_ratio": 1.0
       },
-      "published_to_site": true,
-      "run_url": "runs/20261027T112211_local-freshness-kr-overlay/index.html"
+      "published_to_site": false,
+      "run_url": null
     },
     {
       "run_id": "20261027T112058_local-freshness-kr-overlay",
