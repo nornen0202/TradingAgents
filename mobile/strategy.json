@@ -1,11 +1,11 @@
 {
   "schema": "tradingagents.mobile-strategy/v1",
-  "generated_at": "2026-10-29T14:52:38.665704+09:00",
+  "generated_at": "2026-10-29T17:13:35.665089+09:00",
   "privacy": "PLAINTEXT_ACTION_DATA_NO_RAW_ACCOUNT_IDENTIFIERS",
   "markets": {
     "kr": {
       "market": "KR",
-      "event_id": "kr:0b643114b6f80e16bf8e257ac07c4dc2",
+      "event_id": "kr:fd95f7653b92a677b9d2a5118cb1f4dc",
       "source_health": "STALE",
       "report_mode": "OUTAGE",
       "run_id": "20261028T152855_local-freshness-kr-overlay",
@@ -210,7 +210,7 @@
           }
         ],
         "research_calendar_verified": true,
-        "latest_regular_close_at": "2026-10-28T06:30:00+00:00",
+        "latest_regular_close_at": "2026-10-29T06:30:00+00:00",
         "research_does_not_enable_execution": true,
         "market_data_row_count": 30,
         "market_data_observed_count": 30,
@@ -222,15 +222,12 @@
       },
       "latest_attempt": {
         "schema": "tradingagents.analysis-attempt/v1",
-        "run_id": "20261027T050051_local-scheduler-kr-full",
+        "run_id": "20261029T161248_local-scheduler-kr-full",
         "market": "KR",
         "run_mode": "full",
-        "started_at": "2026-10-27T05:00:51.086879+09:00",
-        "status": "SUCCESS",
-        "heartbeat_at": "2026-10-27T00:10:27.097040+00:00",
-        "finished_at": "2026-10-27T00:10:27.097019+00:00",
-        "completed_tickers": 30,
-        "error_type": null
+        "started_at": "2026-10-29T16:12:48.666737+09:00",
+        "status": "INTERRUPTED",
+        "heartbeat_at": "2026-10-29T08:13:37.472874+00:00"
       },
       "latest_completed_analysis": {
         "run_id": "20261027T050051_local-scheduler-kr-full",
@@ -17713,7 +17710,7 @@
         "market": "KR",
         "currency": "KRW",
         "account_asof": "2026-10-28T15:30:27.010869+09:00",
-        "account_fresh": true,
+        "account_fresh": false,
         "fx_krw_per_usd": null,
         "fx_asof": null,
         "capital_policy": {
@@ -17726,7 +17723,7 @@
           "soft_sell_rounding": "nearest_with_core",
           "evidence": "Docs/balanced_capital_policy_ko.md",
           "status": "provisional_balanced_policy_not_optimality_claim",
-          "calculated_at": "2026-10-29T14:52:38.665704+09:00"
+          "calculated_at": "2026-10-29T17:13:35.665089+09:00"
         },
         "capital_context": {
           "account_value_krw": 10157632.0,
@@ -17835,7 +17832,7 @@
               "holding_fraction": 1.0,
               "risk_reduction": true,
               "full_exit": true,
-              "recalculated_at": "2026-10-29T14:52:38.665704+09:00"
+              "recalculated_at": "2026-10-29T17:13:35.665089+09:00"
             },
             "zero_reason_code": null,
             "allocated_amount_krw": -1494000.0,
@@ -17866,7 +17863,8 @@
             "status_label": "최신 정보 재확인",
             "reasons": [
               "정수 수량 전략: 목표 1.179주 → 2주, 보유량의 100.0% 감축. 위험 축소 최소 단위를 적용합니다.",
-              "표시 가격은 조건 기준값이며 체결 보장 범위가 아닙니다. 조건 충족 후 호가와 수량을 다시 계산합니다."
+              "표시 가격은 조건 기준값이며 체결 보장 범위가 아닙니다. 조건 충족 후 호가와 수량을 다시 계산합니다.",
+              "계좌 시점·상태를 갱신한 뒤 주문가능 현금과 수량을 다시 확인합니다."
             ],
             "account_asof": "2026-10-28T15:30:27.010869+09:00",
             "price_asof": "2026-10-27T05:23:25.178879+09:00",
@@ -17966,7 +17964,7 @@
               "holding_fraction": 0.3,
               "risk_reduction": true,
               "full_exit": false,
-              "recalculated_at": "2026-10-29T14:52:38.665704+09:00"
+              "recalculated_at": "2026-10-29T17:13:35.665089+09:00"
             },
             "zero_reason_code": null,
             "allocated_amount_krw": -484000.0,
@@ -17997,7 +17995,8 @@
             "status_label": "최신 정보 재확인",
             "reasons": [
               "정수 수량 전략: 목표 2.378주 → 3주, 보유량의 30.0% 감축. 위험 축소 최소 단위를 적용합니다.",
-              "표시 가격은 조건 기준값이며 체결 보장 범위가 아닙니다. 조건 충족 후 호가와 수량을 다시 계산합니다."
+              "표시 가격은 조건 기준값이며 체결 보장 범위가 아닙니다. 조건 충족 후 호가와 수량을 다시 계산합니다.",
+              "계좌 시점·상태를 갱신한 뒤 주문가능 현금과 수량을 다시 확인합니다."
             ],
             "account_asof": "2026-10-28T15:30:27.010869+09:00",
             "price_asof": "2026-10-27T05:24:03.089248+09:00",
@@ -18169,7 +18168,7 @@
               "holding_fraction": 0.5,
               "risk_reduction": true,
               "full_exit": false,
-              "recalculated_at": "2026-10-29T14:52:38.665704+09:00"
+              "recalculated_at": "2026-10-29T17:13:35.665089+09:00"
             },
             "zero_reason_code": null,
             "allocated_amount_krw": -164600.0,
@@ -18200,7 +18199,8 @@
             "status_label": "최신 정보 재확인",
             "reasons": [
               "정수 수량 전략: 목표 1.097주 → 2주, 보유량의 50.0% 감축. 위험 축소 최소 단위를 적용합니다.",
-              "표시 가격은 조건 기준값이며 체결 보장 범위가 아닙니다. 조건 충족 후 호가와 수량을 다시 계산합니다."
+              "표시 가격은 조건 기준값이며 체결 보장 범위가 아닙니다. 조건 충족 후 호가와 수량을 다시 계산합니다.",
+              "계좌 시점·상태를 갱신한 뒤 주문가능 현금과 수량을 다시 확인합니다."
             ],
             "account_asof": "2026-10-28T15:30:27.010869+09:00",
             "price_asof": "2026-10-27T05:26:40.612938+09:00",
@@ -18227,7 +18227,7 @@
               "holding_fraction": 0.2222222222222222,
               "risk_reduction": true,
               "full_exit": false,
-              "recalculated_at": "2026-10-29T14:52:38.665704+09:00"
+              "recalculated_at": "2026-10-29T17:13:35.665089+09:00"
             },
             "zero_reason_code": null,
             "allocated_amount_krw": -49530.0,
@@ -18258,7 +18258,8 @@
             "status_label": "최신 정보 재확인",
             "reasons": [
               "정수 수량 전략: 목표 3.078주 → 4주, 보유량의 22.2% 감축. 위험 축소 최소 단위를 적용합니다.",
-              "표시 가격은 조건 기준값이며 체결 보장 범위가 아닙니다. 조건 충족 후 호가와 수량을 다시 계산합니다."
+              "표시 가격은 조건 기준값이며 체결 보장 범위가 아닙니다. 조건 충족 후 호가와 수량을 다시 계산합니다.",
+              "계좌 시점·상태를 갱신한 뒤 주문가능 현금과 수량을 다시 확인합니다."
             ],
             "account_asof": "2026-10-28T15:30:27.010869+09:00",
             "price_asof": "2026-10-27T05:24:27.736839+09:00",
@@ -18484,7 +18485,8 @@
             "reasons": [
               "가용 현금에서 최소 보유 현금 2,031,527원을 확보하고 주문가능금액 한도를 적용하면 신규 매수 예산은 0원입니다.",
               "분석 방향은 있으나 배정 금액이 0원입니다.",
-              "표시 가격은 조건 기준값이며 체결 보장 범위가 아닙니다. 조건 충족 후 호가와 수량을 다시 계산합니다."
+              "표시 가격은 조건 기준값이며 체결 보장 범위가 아닙니다. 조건 충족 후 호가와 수량을 다시 계산합니다.",
+              "계좌 시점·상태를 갱신한 뒤 주문가능 현금과 수량을 다시 확인합니다."
             ],
             "account_asof": "2026-10-28T15:30:27.010869+09:00",
             "price_asof": "2026-10-27T06:30:53.568329+09:00",
@@ -18594,7 +18596,7 @@
               "holding_fraction": 1.0,
               "risk_reduction": true,
               "full_exit": true,
-              "recalculated_at": "2026-10-29T14:52:38.665704+09:00"
+              "recalculated_at": "2026-10-29T17:13:35.665089+09:00"
             },
             "zero_reason_code": null,
             "allocated_amount_krw": -61400.0,
@@ -18625,7 +18627,8 @@
             "status_label": "최신 정보 재확인",
             "reasons": [
               "정수 수량 전략: 목표 0.978주 → 1주, 보유량의 100.0% 감축. 위험 축소 최소 단위를 적용합니다.",
-              "표시 가격은 조건 기준값이며 체결 보장 범위가 아닙니다. 조건 충족 후 호가와 수량을 다시 계산합니다."
+              "표시 가격은 조건 기준값이며 체결 보장 범위가 아닙니다. 조건 충족 후 호가와 수량을 다시 계산합니다.",
+              "계좌 시점·상태를 갱신한 뒤 주문가능 현금과 수량을 다시 확인합니다."
             ],
             "account_asof": "2026-10-28T15:30:27.010869+09:00",
             "price_asof": "2026-10-27",
@@ -18652,7 +18655,7 @@
               "holding_fraction": 1.0,
               "risk_reduction": true,
               "full_exit": true,
-              "recalculated_at": "2026-10-29T14:52:38.665704+09:00"
+              "recalculated_at": "2026-10-29T17:13:35.665089+09:00"
             },
             "zero_reason_code": null,
             "allocated_amount_krw": -178000.0,
@@ -18683,7 +18686,8 @@
             "status_label": "최신 정보 재확인",
             "reasons": [
               "정수 수량 전략: 목표 1.042주 → 1주, 보유량의 100.0% 감축. 위험 축소 최소 단위를 적용합니다.",
-              "표시 가격은 조건 기준값이며 체결 보장 범위가 아닙니다. 조건 충족 후 호가와 수량을 다시 계산합니다."
+              "표시 가격은 조건 기준값이며 체결 보장 범위가 아닙니다. 조건 충족 후 호가와 수량을 다시 계산합니다.",
+              "계좌 시점·상태를 갱신한 뒤 주문가능 현금과 수량을 다시 확인합니다."
             ],
             "account_asof": "2026-10-28T15:30:27.010869+09:00",
             "price_asof": "2026-10-27T05:43:55.897826+09:00",
@@ -18758,7 +18762,8 @@
             "reasons": [
               "가용 현금에서 최소 보유 현금 2,031,527원을 확보하고 주문가능금액 한도를 적용하면 신규 매수 예산은 0원입니다.",
               "분석 방향은 있으나 배정 금액이 0원입니다.",
-              "표시 가격은 조건 기준값이며 체결 보장 범위가 아닙니다. 조건 충족 후 호가와 수량을 다시 계산합니다."
+              "표시 가격은 조건 기준값이며 체결 보장 범위가 아닙니다. 조건 충족 후 호가와 수량을 다시 계산합니다.",
+              "계좌 시점·상태를 갱신한 뒤 주문가능 현금과 수량을 다시 확인합니다."
             ],
             "account_asof": "2026-10-28T15:30:27.010869+09:00",
             "price_asof": "2026-10-27T07:39:19.975027+09:00",
@@ -18785,7 +18790,7 @@
               "holding_fraction": 1.0,
               "risk_reduction": true,
               "full_exit": true,
-              "recalculated_at": "2026-10-29T14:52:38.665704+09:00"
+              "recalculated_at": "2026-10-29T17:13:35.665089+09:00"
             },
             "zero_reason_code": null,
             "allocated_amount_krw": -203500.0,
@@ -18816,7 +18821,8 @@
             "status_label": "최신 정보 재확인",
             "reasons": [
               "정수 수량 전략: 목표 1.118주 → 1주, 보유량의 100.0% 감축. 위험 축소 최소 단위를 적용합니다.",
-              "표시 가격은 조건 기준값이며 체결 보장 범위가 아닙니다. 조건 충족 후 호가와 수량을 다시 계산합니다."
+              "표시 가격은 조건 기준값이며 체결 보장 범위가 아닙니다. 조건 충족 후 호가와 수량을 다시 계산합니다.",
+              "계좌 시점·상태를 갱신한 뒤 주문가능 현금과 수량을 다시 확인합니다."
             ],
             "account_asof": "2026-10-28T15:30:27.010869+09:00",
             "price_asof": "2026-10-27T05:45:34.428177+09:00",
@@ -18843,7 +18849,7 @@
               "holding_fraction": 0.6666666666666666,
               "risk_reduction": true,
               "full_exit": false,
-              "recalculated_at": "2026-10-29T14:52:38.665704+09:00"
+              "recalculated_at": "2026-10-29T17:13:35.665089+09:00"
             },
             "zero_reason_code": null,
             "allocated_amount_krw": -63500.0,
@@ -18874,7 +18880,8 @@
             "status_label": "최신 정보 재확인",
             "reasons": [
               "정수 수량 전략: 목표 1.014주 → 2주, 보유량의 66.7% 감축. 위험 축소 최소 단위를 적용합니다.",
-              "표시 가격은 조건 기준값이며 체결 보장 범위가 아닙니다. 조건 충족 후 호가와 수량을 다시 계산합니다."
+              "표시 가격은 조건 기준값이며 체결 보장 범위가 아닙니다. 조건 충족 후 호가와 수량을 다시 계산합니다.",
+              "계좌 시점·상태를 갱신한 뒤 주문가능 현금과 수량을 다시 확인합니다."
             ],
             "account_asof": "2026-10-28T15:30:27.010869+09:00",
             "price_asof": "2026-10-27",
@@ -18956,7 +18963,8 @@
             "reasons": [
               "가용 현금에서 최소 보유 현금 2,031,527원을 확보하고 주문가능금액 한도를 적용하면 신규 매수 예산은 0원입니다.",
               "분석 방향은 있으나 배정 금액이 0원입니다.",
-              "표시 가격은 조건 기준값이며 체결 보장 범위가 아닙니다. 조건 충족 후 호가와 수량을 다시 계산합니다."
+              "표시 가격은 조건 기준값이며 체결 보장 범위가 아닙니다. 조건 충족 후 호가와 수량을 다시 계산합니다.",
+              "계좌 시점·상태를 갱신한 뒤 주문가능 현금과 수량을 다시 확인합니다."
             ],
             "account_asof": "2026-10-28T15:30:27.010869+09:00",
             "price_asof": "2026-10-27T06:54:36.050513+09:00",
@@ -19196,7 +19204,7 @@
               "holding_fraction": 1.0,
               "risk_reduction": true,
               "full_exit": true,
-              "recalculated_at": "2026-10-29T14:52:38.665704+09:00"
+              "recalculated_at": "2026-10-29T17:13:35.665089+09:00"
             },
             "zero_reason_code": null,
             "allocated_amount_krw": -45600.0,
@@ -19227,7 +19235,8 @@
             "status_label": "최신 정보 재확인",
             "reasons": [
               "정수 수량 전략: 목표 1.084주 → 2주, 보유량의 100.0% 감축. 위험 축소 최소 단위를 적용합니다.",
-              "표시 가격은 조건 기준값이며 체결 보장 범위가 아닙니다. 조건 충족 후 호가와 수량을 다시 계산합니다."
+              "표시 가격은 조건 기준값이며 체결 보장 범위가 아닙니다. 조건 충족 후 호가와 수량을 다시 계산합니다.",
+              "계좌 시점·상태를 갱신한 뒤 주문가능 현금과 수량을 다시 확인합니다."
             ],
             "account_asof": "2026-10-28T15:30:27.010869+09:00",
             "price_asof": "2026-10-27T06:05:05.962266+09:00",
@@ -19464,7 +19473,7 @@
               "holding_fraction": 1.0,
               "risk_reduction": true,
               "full_exit": true,
-              "recalculated_at": "2026-10-29T14:52:38.665704+09:00"
+              "recalculated_at": "2026-10-29T17:13:35.665089+09:00"
             },
             "zero_reason_code": null,
             "allocated_amount_krw": -462500.0,
@@ -19495,7 +19504,8 @@
             "status_label": "최신 정보 재확인",
             "reasons": [
               "정수 수량 전략: 목표 1.044주 → 1주, 보유량의 100.0% 감축. 위험 축소 최소 단위를 적용합니다.",
-              "표시 가격은 조건 기준값이며 체결 보장 범위가 아닙니다. 조건 충족 후 호가와 수량을 다시 계산합니다."
+              "표시 가격은 조건 기준값이며 체결 보장 범위가 아닙니다. 조건 충족 후 호가와 수량을 다시 계산합니다.",
+              "계좌 시점·상태를 갱신한 뒤 주문가능 현금과 수량을 다시 확인합니다."
             ],
             "account_asof": "2026-10-28T15:30:27.010869+09:00",
             "price_asof": "2026-10-27T06:06:24.973272+09:00",
@@ -19522,7 +19532,7 @@
               "holding_fraction": 0.4,
               "risk_reduction": true,
               "full_exit": false,
-              "recalculated_at": "2026-10-29T14:52:38.665704+09:00"
+              "recalculated_at": "2026-10-29T17:13:35.665089+09:00"
             },
             "zero_reason_code": null,
             "allocated_amount_krw": -289000.0,
@@ -19553,7 +19563,8 @@
             "status_label": "최신 정보 재확인",
             "reasons": [
               "정수 수량 전략: 목표 1.051주 → 2주, 보유량의 40.0% 감축. 위험 축소 최소 단위를 적용합니다.",
-              "표시 가격은 조건 기준값이며 체결 보장 범위가 아닙니다. 조건 충족 후 호가와 수량을 다시 계산합니다."
+              "표시 가격은 조건 기준값이며 체결 보장 범위가 아닙니다. 조건 충족 후 호가와 수량을 다시 계산합니다.",
+              "계좌 시점·상태를 갱신한 뒤 주문가능 현금과 수량을 다시 확인합니다."
             ],
             "account_asof": "2026-10-28T15:30:27.010869+09:00",
             "price_asof": "2026-10-27T06:09:25.496561+09:00",
@@ -19580,7 +19591,7 @@
               "holding_fraction": 1.0,
               "risk_reduction": true,
               "full_exit": true,
-              "recalculated_at": "2026-10-29T14:52:38.665704+09:00"
+              "recalculated_at": "2026-10-29T17:13:35.665089+09:00"
             },
             "zero_reason_code": null,
             "allocated_amount_krw": -138000.0,
@@ -19611,7 +19622,8 @@
             "status_label": "최신 정보 재확인",
             "reasons": [
               "정수 수량 전략: 목표 1.190주 → 1주, 보유량의 100.0% 감축. 위험 축소 최소 단위를 적용합니다.",
-              "표시 가격은 조건 기준값이며 체결 보장 범위가 아닙니다. 조건 충족 후 호가와 수량을 다시 계산합니다."
+              "표시 가격은 조건 기준값이며 체결 보장 범위가 아닙니다. 조건 충족 후 호가와 수량을 다시 계산합니다.",
+              "계좌 시점·상태를 갱신한 뒤 주문가능 현금과 수량을 다시 확인합니다."
             ],
             "account_asof": "2026-10-28T15:30:27.010869+09:00",
             "price_asof": "2026-10-27T06:11:16.779774+09:00",
@@ -19638,7 +19650,7 @@
               "holding_fraction": 1.0,
               "risk_reduction": true,
               "full_exit": true,
-              "recalculated_at": "2026-10-29T14:52:38.665704+09:00"
+              "recalculated_at": "2026-10-29T17:13:35.665089+09:00"
             },
             "zero_reason_code": null,
             "allocated_amount_krw": -47300.0,
@@ -19669,7 +19681,8 @@
             "status_label": "최신 정보 재확인",
             "reasons": [
               "정수 수량 전략: 목표 1.005주 → 1주, 보유량의 100.0% 감축. 위험 축소 최소 단위를 적용합니다.",
-              "표시 가격은 조건 기준값이며 체결 보장 범위가 아닙니다. 조건 충족 후 호가와 수량을 다시 계산합니다."
+              "표시 가격은 조건 기준값이며 체결 보장 범위가 아닙니다. 조건 충족 후 호가와 수량을 다시 계산합니다.",
+              "계좌 시점·상태를 갱신한 뒤 주문가능 현금과 수량을 다시 확인합니다."
             ],
             "account_asof": "2026-10-28T15:30:27.010869+09:00",
             "price_asof": "2026-10-27T06:32:43.660910+09:00",
@@ -19778,7 +19791,7 @@
       "funded_rebalance": {
         "version": "funded-rebalance-v1",
         "market": "KR",
-        "calculated_at": "2026-10-29T14:52:38.665704+09:00",
+        "calculated_at": "2026-10-29T17:13:35.665089+09:00",
         "account_asof": "2026-10-28T15:30:27.010869+09:00",
         "order_ready": false,
         "status": "UNAVAILABLE",
@@ -19804,7 +19817,7 @@
     },
     "us": {
       "market": "US",
-      "event_id": "us:5f50a6336e0f3b75fac8cc75b7632e87",
+      "event_id": "us:e4f8e83d7f4e6e513029de77d1771819",
       "source_health": "STALE",
       "report_mode": "OUTAGE",
       "run_id": "20261029T124921_manual-us-failed-recovery",
@@ -42183,7 +42196,7 @@
           "soft_sell_rounding": "nearest_with_core",
           "evidence": "Docs/balanced_capital_policy_ko.md",
           "status": "provisional_balanced_policy_not_optimality_claim",
-          "calculated_at": "2026-10-29T14:52:38.665704+09:00"
+          "calculated_at": "2026-10-29T17:13:35.665089+09:00"
         },
         "capital_context": {
           "account_value_krw": 24807982.0,
@@ -42833,7 +42846,7 @@
               "holding_fraction": 1.0,
               "risk_reduction": true,
               "full_exit": true,
-              "recalculated_at": "2026-10-29T14:52:38.665704+09:00"
+              "recalculated_at": "2026-10-29T17:13:35.665089+09:00"
             },
             "zero_reason_code": null,
             "allocated_amount_krw": -659851.0,
@@ -42962,7 +42975,7 @@
               "holding_fraction": 1.0,
               "risk_reduction": true,
               "full_exit": true,
-              "recalculated_at": "2026-10-29T14:52:38.665704+09:00"
+              "recalculated_at": "2026-10-29T17:13:35.665089+09:00"
             },
             "zero_reason_code": null,
             "allocated_amount_krw": -1173311.0,
@@ -43020,7 +43033,7 @@
               "holding_fraction": 0.5,
               "risk_reduction": true,
               "full_exit": false,
-              "recalculated_at": "2026-10-29T14:52:38.665704+09:00"
+              "recalculated_at": "2026-10-29T17:13:35.665089+09:00"
             },
             "zero_reason_code": null,
             "allocated_amount_krw": -107705.0,
@@ -43078,7 +43091,7 @@
               "holding_fraction": 0.3333333333333333,
               "risk_reduction": true,
               "full_exit": false,
-              "recalculated_at": "2026-10-29T14:52:38.665704+09:00"
+              "recalculated_at": "2026-10-29T17:13:35.665089+09:00"
             },
             "zero_reason_code": null,
             "allocated_amount_krw": -434150.0,
@@ -43371,7 +43384,7 @@
               "holding_fraction": 1.0,
               "risk_reduction": true,
               "full_exit": true,
-              "recalculated_at": "2026-10-29T14:52:38.665704+09:00"
+              "recalculated_at": "2026-10-29T17:13:35.665089+09:00"
             },
             "zero_reason_code": null,
             "allocated_amount_krw": -1618553.0,
@@ -43500,7 +43513,7 @@
               "holding_fraction": 0.3333333333333333,
               "risk_reduction": true,
               "full_exit": false,
-              "recalculated_at": "2026-10-29T14:52:38.665704+09:00"
+              "recalculated_at": "2026-10-29T17:13:35.665089+09:00"
             },
             "zero_reason_code": null,
             "allocated_amount_krw": -575624.0,
@@ -44415,7 +44428,7 @@
       "funded_rebalance": {
         "version": "funded-rebalance-v1",
         "market": "US",
-        "calculated_at": "2026-10-29T14:52:38.665704+09:00",
+        "calculated_at": "2026-10-29T17:13:35.665089+09:00",
         "account_asof": "2026-10-29T13:15:38.892216+09:00",
         "order_ready": false,
         "status": "CONDITIONAL_FUNDED",

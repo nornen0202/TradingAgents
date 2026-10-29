@@ -1,13 +1,13 @@
 {
   "schema": "tradingagents.work-context/v1",
   "surface": "kr",
-  "event_id": "kr:82916e47e19ad4ffd1e5632696d062e4",
+  "event_id": "kr:630f6d3124bb26a265bff8a9d1e608a7",
   "prompt_contract_version": "market-work-v12-kr",
   "prompt_sha256": "ce58e681561b3a6ddb646ea4fc0c4aabaf4bbf140a3894b895f30f0f954092dc",
   "skill_sha256": "4dffe28b3721557cc2517b5afff2f94045832606e71ff61461df969f6abb53c7",
   "task_manifest_sha256": "c0992fa275c9961bc91c679030c0b4d9b8b06f3d164226776421f1e354b5c22e",
   "workflow_contract_sha256": "ddf0892f9079721a3c716f1f1aab8216028890c541e722a0ec83feef9c09b18c",
-  "source_sha256": "79b028e82b9f3d161542e5457e6bbc778e541652114f99f03c95cb5d266c489b",
+  "source_sha256": "2c91eb88059595eb72d4d6c10287efdc9124cf32071496f4186f7b915f8676a3",
   "body": {
     "kind": "market",
     "market": "KR",
@@ -204,20 +204,17 @@
           }
         ],
         "research_calendar_verified": true,
-        "latest_regular_close_at": "2026-10-28T06:30:00+00:00",
+        "latest_regular_close_at": "2026-10-29T06:30:00+00:00",
         "research_does_not_enable_execution": true
       },
       "latest_attempt": {
         "schema": "tradingagents.analysis-attempt/v1",
-        "run_id": "20261027T050051_local-scheduler-kr-full",
+        "run_id": "20261029T161248_local-scheduler-kr-full",
         "market": "KR",
         "run_mode": "full",
-        "started_at": "2026-10-27T05:00:51.086879+09:00",
-        "status": "SUCCESS",
-        "heartbeat_at": "2026-10-27T00:10:27.097040+00:00",
-        "finished_at": "2026-10-27T00:10:27.097019+00:00",
-        "completed_tickers": 30,
-        "error_type": null
+        "started_at": "2026-10-29T16:12:48.666737+09:00",
+        "status": "INTERRUPTED",
+        "heartbeat_at": "2026-10-29T08:11:37.051933+00:00"
       },
       "latest_completed_analysis": {
         "run_id": "20261027T050051_local-scheduler-kr-full",
@@ -2770,574 +2767,18 @@
         "source_health": "OK",
         "coverage": {
           "total_unique_events": 317,
-          "window_events": 28,
-          "transmitted_events": 20,
-          "truncated": true,
-          "oldest_occurred_at": "2026-10-28T05:49:17+00:00",
+          "window_events": 14,
+          "transmitted_events": 14,
+          "truncated": false,
+          "oldest_occurred_at": "2026-10-28T18:38:25+00:00",
           "newest_occurred_at": "2026-10-28T18:53:32+00:00",
-          "available_events_before_context_cap": 28,
+          "available_events_before_context_cap": 14,
           "context_event_cap": 20,
-          "omitted_events": 8,
-          "omitted_due_to_context_cap": 8,
+          "omitted_events": 0,
+          "omitted_due_to_context_cap": 0,
           "omitted_before_context_selection": 0
         },
         "events": [
-          {
-            "event_key": "stock_ai_agent:16804",
-            "content_sha256": "94d8366dd2c67a973ef43bacc4cd4c707b69b0ad4354e418d4bfdcf6495638e1",
-            "occurred_at": "2026-10-28T06:01:02+00:00",
-            "relevance": {
-              "tickers": [
-                "000660.KS"
-              ],
-              "markets": [
-                "KR"
-              ],
-              "themes": [],
-              "match_basis": "normalized_prism_signals",
-              "matched_tickers": [
-                "000660"
-              ],
-              "market_match": true,
-              "score": 120
-            },
-            "summary": {
-              "message_id": "16804",
-              "posted_at": "2026-10-28T06:01:02+00:00",
-              "source_url": "https://t.me/stock_ai_agent/16804",
-              "preview": "⚠️ 매수 보류: SK하이닉스(000660) 현재가: 1,483,000원 매수 점수: 4/10 결정: 미진입 시장 상황: 횡보장 산업군: 전기·전자 보류 사유: AI 판단: 미진입 — 현재가가 하락 중인 50일선보다 8.9% 낮아 개별 종목 하락 추세 차단 조건에 해당합니다. / 점수 부족 (4/5.0) 분석 의견: 2025년 높은 영업이익률과 ROE, 낮은 부채비율 및 AI 메모리 수...",
-              "signals": [
-                {
-                  "canonical_ticker": "000660.KS",
-                  "display_name": "SK하이닉스",
-                  "market": "KR",
-                  "source_asof": "2026-10-28T06:01:02+00:00",
-                  "signal_action": "NO_ENTRY",
-                  "trigger_type": "telegram_buy_skip",
-                  "trigger_score": 0.4,
-                  "composite_score": 0.4,
-                  "confidence": 0.4,
-                  "warnings": []
-                }
-              ],
-              "simulation_only": false,
-              "actionability": "research_only"
-            }
-          },
-          {
-            "event_key": "stock_ai_agent:16801",
-            "content_sha256": "62bf627e23ac4182f173596dcfe0b721481622dc2f2cd7c6b21c1a27b8d0b3bc",
-            "occurred_at": "2026-10-28T05:57:21+00:00",
-            "relevance": {
-              "tickers": [
-                "000660.KS"
-              ],
-              "markets": [
-                "KR"
-              ],
-              "themes": [],
-              "match_basis": "normalized_prism_signals",
-              "matched_tickers": [
-                "000660"
-              ],
-              "market_match": true,
-              "score": 120
-            },
-            "summary": {
-              "message_id": "16801",
-              "posted_at": "2026-10-28T05:57:21+00:00",
-              "source_url": "https://t.me/stock_ai_agent/16801",
-              "preview": "📊 SK하이닉스 (000660) O'Neil 인사이트 차트의 베이스/피벗/RS 주석을 함께 참고하세요. ※ 보조 참고용 · 투자 권유 아님",
-              "signals": [
-                {
-                  "canonical_ticker": "000660.KS",
-                  "display_name": "SK하이닉스",
-                  "market": "KR",
-                  "source_asof": "2026-10-28T05:57:21+00:00",
-                  "signal_action": "WATCH",
-                  "trigger_type": "telegram_oneil_insight",
-                  "trigger_score": 0.45,
-                  "composite_score": 0.45,
-                  "confidence": 0.45,
-                  "warnings": []
-                }
-              ],
-              "simulation_only": false,
-              "actionability": "research_only"
-            }
-          },
-          {
-            "event_key": "stock_ai_agent:16798",
-            "content_sha256": "3c55baccbf536d592b9dab4cd4d752ec7374b4bd3ae169c5e6825f22afcdaed6",
-            "occurred_at": "2026-10-28T05:56:33+00:00",
-            "relevance": {
-              "tickers": [
-                "000660.KS"
-              ],
-              "markets": [
-                "KR"
-              ],
-              "themes": [],
-              "match_basis": "normalized_prism_signals",
-              "matched_tickers": [
-                "000660"
-              ],
-              "market_match": true,
-              "score": 120
-            },
-            "summary": {
-              "message_id": "16798",
-              "posted_at": "2026-10-28T05:56:33+00:00",
-              "source_url": "https://t.me/stock_ai_agent/16798",
-              "preview": "",
-              "signals": [
-                {
-                  "canonical_ticker": "000660.KS",
-                  "display_name": "SK하이닉스",
-                  "market": "KR",
-                  "source_asof": "2026-10-28T05:56:33+00:00",
-                  "signal_action": "WATCH",
-                  "trigger_type": "telegram_pdf_report",
-                  "trigger_score": 0.45,
-                  "composite_score": 0.45,
-                  "confidence": 0.45,
-                  "warnings": []
-                }
-              ],
-              "simulation_only": false,
-              "actionability": "research_only"
-            }
-          },
-          {
-            "event_key": "stock_ai_agent:16795",
-            "content_sha256": "9c2a7f19ea880182e2742b711117f27f65c06651e5e8ad1a32a8f52d2b16e6dc",
-            "occurred_at": "2026-10-28T05:56:10+00:00",
-            "relevance": {
-              "tickers": [
-                "000660.KS"
-              ],
-              "markets": [
-                "KR"
-              ],
-              "themes": [],
-              "match_basis": "normalized_prism_signals",
-              "matched_tickers": [
-                "000660"
-              ],
-              "market_match": true,
-              "score": 120
-            },
-            "summary": {
-              "message_id": "16795",
-              "posted_at": "2026-10-28T05:56:10+00:00",
-              "source_url": "https://t.me/stock_ai_agent/16795",
-              "preview": "📈 매크로 섹터 리더 | SK하이닉스(000660) DRAM·NAND 중심의 메모리 반도체 기업으로, AI 메모리 수요와 높은 수익성이 핵심 동력입니다. 💹 10/28 종가 1,481,000원(+10.44%). 거래량 3,363,301주로 전일보다 7.2% 증가. 💰 시가총액 1,081.86조원. 동종 업계 순위: UNKNOWN. 📰 보고서에서 확인 가능한 최신 개별 뉴스는 UNKNOW...",
-              "signals": [
-                {
-                  "canonical_ticker": "000660.KS",
-                  "display_name": "매크로 섹터 리더 | SK하이닉스",
-                  "market": "KR",
-                  "source_asof": "2026-10-28T05:56:10+00:00",
-                  "signal_action": "UNKNOWN",
-                  "trigger_type": "telegram_message",
-                  "trigger_score": 0.45,
-                  "composite_score": 0.45,
-                  "confidence": 0.45,
-                  "warnings": []
-                }
-              ],
-              "simulation_only": false,
-              "actionability": "research_only"
-            }
-          },
-          {
-            "event_key": "stock_ai_agent:16792",
-            "content_sha256": "a8d3f81ca4c478b7652f3b7b8d7d04cb61a2591efba71d61c88c6e65bb839480",
-            "occurred_at": "2026-10-28T05:49:17+00:00",
-            "relevance": {
-              "tickers": [
-                "295310.KS",
-                "003160.KS",
-                "000660.KS"
-              ],
-              "markets": [
-                "KR"
-              ],
-              "themes": [],
-              "match_basis": "normalized_prism_signals",
-              "matched_tickers": [
-                "000660"
-              ],
-              "market_match": true,
-              "score": 120
-            },
-            "summary": {
-              "message_id": "16792",
-              "posted_at": "2026-10-28T05:49:17+00:00",
-              "source_url": "https://t.me/stock_ai_agent/16792",
-              "preview": "🔔 오후 프리즘 시그널 얼럿 📅 2026.10.28 오후 분석 포착된 관심종목 🤖 프리즘봇의 가상 포트폴리오 운용 과정을 투명하게 공개합니다. 실제 매수 권유가 아닙니다. 🧭 장기추세: 횡보 | 실행기준: 횡보 | 선정: 탑다운 0종목 + 바텀업 3종목 🧭 오늘 돈이 몰린 테마 (상승 상위 종목 + KIS 뉴스 제목 기준) 1) 반도체: 디아이 +14.6%, 엑시콘 +14.3%, 피에스...",
-              "signals": [
-                {
-                  "canonical_ticker": "295310.KS",
-                  "display_name": "에이치브이엠",
-                  "market": "KR",
-                  "source_asof": "2026-10-28T05:49:17+00:00",
-                  "signal_action": "WATCH",
-                  "trigger_type": "telegram_signal_alert",
-                  "trigger_score": 0.82,
-                  "composite_score": 0.82,
-                  "confidence": 0.82,
-                  "warnings": []
-                },
-                {
-                  "canonical_ticker": "003160.KS",
-                  "display_name": "디아이",
-                  "market": "KR",
-                  "source_asof": "2026-10-28T05:49:17+00:00",
-                  "signal_action": "WATCH",
-                  "trigger_type": "telegram_signal_alert",
-                  "trigger_score": 0.84,
-                  "composite_score": 0.84,
-                  "confidence": 0.84,
-                  "warnings": []
-                },
-                {
-                  "canonical_ticker": "000660.KS",
-                  "display_name": "SK하이닉스",
-                  "market": "KR",
-                  "source_asof": "2026-10-28T05:49:17+00:00",
-                  "signal_action": "WATCH",
-                  "trigger_type": "telegram_signal_alert",
-                  "trigger_score": 0.45,
-                  "composite_score": 0.45,
-                  "confidence": 0.45,
-                  "warnings": []
-                }
-              ],
-              "simulation_only": true,
-              "actionability": "research_only"
-            }
-          },
-          {
-            "event_key": "stock_ai_agent:16803",
-            "content_sha256": "cc03e96fc3c1477269e60ff83c5a6ea4ea3c2baa0d57a6f2dedc47b733596599",
-            "occurred_at": "2026-10-28T06:00:54+00:00",
-            "relevance": {
-              "tickers": [
-                "003160.KS"
-              ],
-              "markets": [
-                "KR"
-              ],
-              "themes": [],
-              "match_basis": "normalized_prism_signals",
-              "matched_tickers": [],
-              "market_match": true,
-              "score": 20
-            },
-            "summary": {
-              "message_id": "16803",
-              "posted_at": "2026-10-28T06:00:54+00:00",
-              "source_url": "https://t.me/stock_ai_agent/16803",
-              "preview": "⚠️ 매수 보류: 디아이(003160) 현재가: 43,200원 매수 점수: 8/10 결정: 미진입 시장 상황: 횡보장 산업군: 의료·정밀기기 보류 사유: AI 판단: 미진입 — 분산일 6건으로 신규매수에는 보통 약세장 행을 적용합니다. 분석 의견: 2026년 1·2분기 영업이익 흑자와 상반기 고성장, 93.87%의 부채비율로 품질 기준을 모두 통과했습니다. 14시 57분 장중 누적 거래...",
-              "signals": [
-                {
-                  "canonical_ticker": "003160.KS",
-                  "display_name": "디아이",
-                  "market": "KR",
-                  "source_asof": "2026-10-28T06:00:54+00:00",
-                  "signal_action": "NO_ENTRY",
-                  "trigger_type": "telegram_buy_skip",
-                  "trigger_score": 0.8,
-                  "composite_score": 0.8,
-                  "confidence": 0.8,
-                  "warnings": []
-                }
-              ],
-              "simulation_only": false,
-              "actionability": "research_only"
-            }
-          },
-          {
-            "event_key": "stock_ai_agent:16802",
-            "content_sha256": "4a4f4061610f9d511518dea31fb32df93d596c97d602a47d3e942c5b3ed5087f",
-            "occurred_at": "2026-10-28T06:00:51+00:00",
-            "relevance": {
-              "tickers": [
-                "295310.KS"
-              ],
-              "markets": [
-                "KR"
-              ],
-              "themes": [],
-              "match_basis": "normalized_prism_signals",
-              "matched_tickers": [],
-              "market_match": true,
-              "score": 20
-            },
-            "summary": {
-              "message_id": "16802",
-              "posted_at": "2026-10-28T06:00:51+00:00",
-              "source_url": "https://t.me/stock_ai_agent/16802",
-              "preview": "⚠️ 매수 보류: 에이치브이엠(295310) 현재가: 63,000원 매수 점수: 5/10 결정: 미진입 시장 상황: 횡보장 산업군: 금속 보류 사유: AI 판단: 미진입 — 분산일 6건으로 신규매수 판정 행이 보통 약세장으로 한 단계 낮아져 모멘텀 신호 2개 이상과 보강 요소 1개 이상이 필요합니다. 분석 의견: 2026년 반기 공시와 보고서 2-1·2-2 기준으로 영업 흑자, 재무 기...",
-              "signals": [
-                {
-                  "canonical_ticker": "295310.KS",
-                  "display_name": "에이치브이엠",
-                  "market": "KR",
-                  "source_asof": "2026-10-28T06:00:51+00:00",
-                  "signal_action": "NO_ENTRY",
-                  "trigger_type": "telegram_buy_skip",
-                  "trigger_score": 0.5,
-                  "composite_score": 0.5,
-                  "confidence": 0.5,
-                  "warnings": []
-                }
-              ],
-              "simulation_only": false,
-              "actionability": "research_only"
-            }
-          },
-          {
-            "event_key": "stock_ai_agent:16800",
-            "content_sha256": "06cc4b92746d4209b2d76826e9add91725885409d4e577cebd69ec48dee300ea",
-            "occurred_at": "2026-10-28T05:57:07+00:00",
-            "relevance": {
-              "tickers": [
-                "003160.KS"
-              ],
-              "markets": [
-                "KR"
-              ],
-              "themes": [],
-              "match_basis": "normalized_prism_signals",
-              "matched_tickers": [],
-              "market_match": true,
-              "score": 20
-            },
-            "summary": {
-              "message_id": "16800",
-              "posted_at": "2026-10-28T05:57:07+00:00",
-              "source_url": "https://t.me/stock_ai_agent/16800",
-              "preview": "📊 디아이 (003160) O'Neil 인사이트 차트의 베이스/피벗/RS 주석을 함께 참고하세요. ※ 보조 참고용 · 투자 권유 아님",
-              "signals": [
-                {
-                  "canonical_ticker": "003160.KS",
-                  "display_name": "디아이",
-                  "market": "KR",
-                  "source_asof": "2026-10-28T05:57:07+00:00",
-                  "signal_action": "WATCH",
-                  "trigger_type": "telegram_oneil_insight",
-                  "trigger_score": 0.45,
-                  "composite_score": 0.45,
-                  "confidence": 0.45,
-                  "warnings": []
-                }
-              ],
-              "simulation_only": false,
-              "actionability": "research_only"
-            }
-          },
-          {
-            "event_key": "stock_ai_agent:16799",
-            "content_sha256": "751c66913a10137012cdf9b72b76a854bf3d224013c5e80aeaf3521e945ad881",
-            "occurred_at": "2026-10-28T05:56:52+00:00",
-            "relevance": {
-              "tickers": [
-                "295310.KS"
-              ],
-              "markets": [
-                "KR"
-              ],
-              "themes": [],
-              "match_basis": "normalized_prism_signals",
-              "matched_tickers": [],
-              "market_match": true,
-              "score": 20
-            },
-            "summary": {
-              "message_id": "16799",
-              "posted_at": "2026-10-28T05:56:52+00:00",
-              "source_url": "https://t.me/stock_ai_agent/16799",
-              "preview": "📊 에이치브이엠 (295310) O'Neil 인사이트 차트의 베이스/피벗/RS 주석을 함께 참고하세요. ※ 보조 참고용 · 투자 권유 아님",
-              "signals": [
-                {
-                  "canonical_ticker": "295310.KS",
-                  "display_name": "에이치브이엠",
-                  "market": "KR",
-                  "source_asof": "2026-10-28T05:56:52+00:00",
-                  "signal_action": "WATCH",
-                  "trigger_type": "telegram_oneil_insight",
-                  "trigger_score": 0.45,
-                  "composite_score": 0.45,
-                  "confidence": 0.45,
-                  "warnings": []
-                }
-              ],
-              "simulation_only": false,
-              "actionability": "research_only"
-            }
-          },
-          {
-            "event_key": "stock_ai_agent:16797",
-            "content_sha256": "35024c2b02cc6f94cdf7b06a3b97e0af24cea9d1bfc0af5feea6a9c16299dec8",
-            "occurred_at": "2026-10-28T05:56:27+00:00",
-            "relevance": {
-              "tickers": [
-                "003160.KS"
-              ],
-              "markets": [
-                "KR"
-              ],
-              "themes": [],
-              "match_basis": "normalized_prism_signals",
-              "matched_tickers": [],
-              "market_match": true,
-              "score": 20
-            },
-            "summary": {
-              "message_id": "16797",
-              "posted_at": "2026-10-28T05:56:27+00:00",
-              "source_url": "https://t.me/stock_ai_agent/16797",
-              "preview": "",
-              "signals": [
-                {
-                  "canonical_ticker": "003160.KS",
-                  "display_name": "디아이",
-                  "market": "KR",
-                  "source_asof": "2026-10-28T05:56:27+00:00",
-                  "signal_action": "WATCH",
-                  "trigger_type": "telegram_pdf_report",
-                  "trigger_score": 0.45,
-                  "composite_score": 0.45,
-                  "confidence": 0.45,
-                  "warnings": []
-                }
-              ],
-              "simulation_only": false,
-              "actionability": "research_only"
-            }
-          },
-          {
-            "event_key": "stock_ai_agent:16796",
-            "content_sha256": "2d74156ef2c2a1f9e159e8b858b34203d2dc87b8c47db05892f087e2261ceef9",
-            "occurred_at": "2026-10-28T05:56:20+00:00",
-            "relevance": {
-              "tickers": [
-                "295310.KS"
-              ],
-              "markets": [
-                "KR"
-              ],
-              "themes": [],
-              "match_basis": "normalized_prism_signals",
-              "matched_tickers": [],
-              "market_match": true,
-              "score": 20
-            },
-            "summary": {
-              "message_id": "16796",
-              "posted_at": "2026-10-28T05:56:20+00:00",
-              "source_url": "https://t.me/stock_ai_agent/16796",
-              "preview": "",
-              "signals": [
-                {
-                  "canonical_ticker": "295310.KS",
-                  "display_name": "에이치브이엠",
-                  "market": "KR",
-                  "source_asof": "2026-10-28T05:56:20+00:00",
-                  "signal_action": "WATCH",
-                  "trigger_type": "telegram_pdf_report",
-                  "trigger_score": 0.45,
-                  "composite_score": 0.45,
-                  "confidence": 0.45,
-                  "warnings": []
-                }
-              ],
-              "simulation_only": false,
-              "actionability": "research_only"
-            }
-          },
-          {
-            "event_key": "stock_ai_agent:16794",
-            "content_sha256": "140a1734d52dbb9b577cdc67cc76e7b00f96685d7c0eb4d3f82b6e2f2047172f",
-            "occurred_at": "2026-10-28T05:56:04+00:00",
-            "relevance": {
-              "tickers": [
-                "003160.KS"
-              ],
-              "markets": [
-                "KR"
-              ],
-              "themes": [],
-              "match_basis": "normalized_prism_signals",
-              "matched_tickers": [],
-              "market_match": true,
-              "score": 20
-            },
-            "summary": {
-              "message_id": "16794",
-              "posted_at": "2026-10-28T05:56:04+00:00",
-              "source_url": "https://t.me/stock_ai_agent/16794",
-              "preview": "📈 마감 강도 상위주 트리거 | 디아이(003160) 반도체 검사장비 중심 기업입니다. ⚠️ 당일 강세가 추세 전환을 뜻하지는 않습니다. 💹 10/28 종가 43,050원(+13.89%). 거래량 1,731,385주로 전일 506,386주 대비 +241.9%. 시가총액 1조 2,183억원. 반도체 후공정 동반 강세가 당일 상승에 반영됐을 가능성이 있습니다. 📊 기술 구간: 지지 39,4...",
-              "signals": [
-                {
-                  "canonical_ticker": "003160.KS",
-                  "display_name": "마감 강도 상위주 트리거 | 디아이",
-                  "market": "KR",
-                  "source_asof": "2026-10-28T05:56:04+00:00",
-                  "signal_action": "UNKNOWN",
-                  "trigger_type": "telegram_message",
-                  "trigger_score": 0.45,
-                  "composite_score": 0.45,
-                  "confidence": 0.45,
-                  "warnings": []
-                }
-              ],
-              "simulation_only": false,
-              "actionability": "research_only"
-            }
-          },
-          {
-            "event_key": "stock_ai_agent:16793",
-            "content_sha256": "59bda530fcf46324521880a8fb3d0166886ca327cc526ec493b35063886dd70e",
-            "occurred_at": "2026-10-28T05:56:00+00:00",
-            "relevance": {
-              "tickers": [
-                "295310.KS"
-              ],
-              "markets": [
-                "KR"
-              ],
-              "themes": [],
-              "match_basis": "normalized_prism_signals",
-              "matched_tickers": [],
-              "market_match": true,
-              "score": 20
-            },
-            "summary": {
-              "message_id": "16793",
-              "posted_at": "2026-10-28T05:56:00+00:00",
-              "source_url": "https://t.me/stock_ai_agent/16793",
-              "preview": "📈 일중 상승률 상위 트리거 | 에이치브이엠(295310) 우주·항공·방위·반도체용 첨단 금속 소재를 제조합니다. 📊 KIS 10/28 종가 63,100원, 거래량 135,367주. 전일 거래량 72,648주 대비 +86.3%. 전일 대비 등락률은 KIS 종가 비교 시 약 +10.7%(57,000원→63,100원). 💰 시가총액 약 7,976억원. 📰 확인된 개별 상승 재료 뉴스는 없습...",
-              "signals": [
-                {
-                  "canonical_ticker": "295310.KS",
-                  "display_name": "일중 상승률 상위 트리거 | 에이치브이엠",
-                  "market": "KR",
-                  "source_asof": "2026-10-28T05:56:00+00:00",
-                  "signal_action": "UNKNOWN",
-                  "trigger_type": "telegram_message",
-                  "trigger_score": 0.45,
-                  "composite_score": 0.45,
-                  "confidence": 0.45,
-                  "warnings": []
-                }
-              ],
-              "simulation_only": false,
-              "actionability": "research_only"
-            }
-          },
           {
             "event_key": "stock_ai_agent:16834",
             "content_sha256": "914ae90d4984c27669628b087e3e449846dda0c869c420a7aaad5e372c7f2301",
@@ -3734,6 +3175,351 @@
               "simulation_only": false,
               "actionability": "research_only"
             }
+          },
+          {
+            "event_key": "stock_ai_agent:16827",
+            "content_sha256": "91d34b5aa702210257b3df67d0933070d104ac37e17875bb9f05cbda85639482",
+            "occurred_at": "2026-10-28T18:45:50+00:00",
+            "relevance": {
+              "tickers": [
+                "BSX"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "normalized_prism_signals",
+              "matched_tickers": [],
+              "market_match": false,
+              "score": 0
+            },
+            "summary": {
+              "message_id": "16827",
+              "posted_at": "2026-10-28T18:45:50+00:00",
+              "source_url": "https://t.me/stock_ai_agent/16827",
+              "preview": "",
+              "signals": [
+                {
+                  "canonical_ticker": "BSX",
+                  "display_name": "Boston Scientific Corporation",
+                  "market": "US",
+                  "source_asof": "2026-10-28T18:45:50+00:00",
+                  "signal_action": "WATCH",
+                  "trigger_type": "telegram_pdf_report",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "confidence": 0.45,
+                  "warnings": []
+                }
+              ],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:16826",
+            "content_sha256": "44e2801e358f7c56ca59e1e805d0bee4ed9218a57c5cf4288fe87e97ba3dbcb2",
+            "occurred_at": "2026-10-28T18:45:43+00:00",
+            "relevance": {
+              "tickers": [
+                "MU",
+                "SNDK",
+                "INTC"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "normalized_prism_signals",
+              "matched_tickers": [],
+              "market_match": false,
+              "score": 0
+            },
+            "summary": {
+              "message_id": "16826",
+              "posted_at": "2026-10-28T18:45:43+00:00",
+              "source_url": "https://t.me/stock_ai_agent/16826",
+              "preview": "",
+              "signals": [
+                {
+                  "canonical_ticker": "MU",
+                  "display_name": "Micron Technology,  Inc.",
+                  "market": "US",
+                  "source_asof": "2026-10-28T18:45:43+00:00",
+                  "signal_action": "WATCH",
+                  "trigger_type": "telegram_pdf_report",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "confidence": 0.45,
+                  "warnings": []
+                },
+                {
+                  "canonical_ticker": "SNDK",
+                  "display_name": "Sandisk",
+                  "market": "US",
+                  "source_asof": "2026-10-28T18:45:43+00:00",
+                  "signal_action": "WATCH",
+                  "trigger_type": "telegram_pdf_report",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "confidence": 0.45,
+                  "warnings": []
+                },
+                {
+                  "canonical_ticker": "INTC",
+                  "display_name": "와 Intel",
+                  "market": "US",
+                  "source_asof": "2026-10-28T18:45:43+00:00",
+                  "signal_action": "WATCH",
+                  "trigger_type": "telegram_pdf_report",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "confidence": 0.45,
+                  "warnings": []
+                }
+              ],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:16825",
+            "content_sha256": "a200989950efd613a4389266f9cd5a97978d4c8687991e76f31ef128cd87d0f7",
+            "occurred_at": "2026-10-28T18:45:35+00:00",
+            "relevance": {
+              "tickers": [
+                "SDGR"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "normalized_prism_signals",
+              "matched_tickers": [],
+              "market_match": false,
+              "score": 0
+            },
+            "summary": {
+              "message_id": "16825",
+              "posted_at": "2026-10-28T18:45:35+00:00",
+              "source_url": "https://t.me/stock_ai_agent/16825",
+              "preview": "",
+              "signals": [
+                {
+                  "canonical_ticker": "SDGR",
+                  "display_name": "Schrodinger,  Inc.",
+                  "market": "US",
+                  "source_asof": "2026-10-28T18:45:35+00:00",
+                  "signal_action": "WATCH",
+                  "trigger_type": "telegram_pdf_report",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "confidence": 0.45,
+                  "warnings": []
+                }
+              ],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:16824",
+            "content_sha256": "42d568c885e64d74af9d68d4423b42319a7717b57146d89c77463a72bf8f7214",
+            "occurred_at": "2026-10-28T18:45:26+00:00",
+            "relevance": {
+              "tickers": [
+                "BSX"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "normalized_prism_signals",
+              "matched_tickers": [],
+              "market_match": false,
+              "score": 0
+            },
+            "summary": {
+              "message_id": "16824",
+              "posted_at": "2026-10-28T18:45:26+00:00",
+              "source_url": "https://t.me/stock_ai_agent/16824",
+              "preview": "📊 Boston Scientific (BSX) — 심혈관 및 의료기기 기업으로, Cardiovascular와 MedSurg 두 부문에서 진단·치료 기기를 판매합니다. 💰 가격: $43.83 관측값(10/28, 종가 확정 여부 미확인). 전일 확정 종가 $45.06 대비 약 -2.7%입니다. 📈 거래량: 약 4,358만 주로 직전 거래일들(약 878만~1,639만 주)보다 크게 늘었지만,...",
+              "signals": [
+                {
+                  "canonical_ticker": "BSX",
+                  "display_name": "Boston Scientific",
+                  "market": "US",
+                  "source_asof": "2026-10-28T18:45:26+00:00",
+                  "signal_action": "UNKNOWN",
+                  "trigger_type": "telegram_message",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "confidence": 0.45,
+                  "warnings": []
+                }
+              ],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:16823",
+            "content_sha256": "64027f88b2ea7b7b580e2b45d2fe5ff4220ab57e9ad2cc9164cda4213feed3ad",
+            "occurred_at": "2026-10-28T18:45:17+00:00",
+            "relevance": {
+              "tickers": [
+                "MU"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "normalized_prism_signals",
+              "matched_tickers": [],
+              "market_match": false,
+              "score": 0
+            },
+            "summary": {
+              "message_id": "16823",
+              "posted_at": "2026-10-28T18:45:17+00:00",
+              "source_url": "https://t.me/stock_ai_agent/16823",
+              "preview": "📊 Micron Technology (MU) | 2026.10.29 미국 나스닥 상장 반도체 기업으로 DRAM·HBM·NAND 메모리를 설계·생산합니다. AI·데이터센터 메모리 수요가 실적 개선의 주요 동력입니다. 💰 거래 현황 - 관측가: $978.58 (10/28, 마감 확정 여부 미확인) - 전일 대비 등락률: 보고서에 비교 가능한 전일 가격이 없어 확인 불가 - 거래량: 약 1,...",
+              "signals": [
+                {
+                  "canonical_ticker": "MU",
+                  "display_name": "Micron Technology",
+                  "market": "US",
+                  "source_asof": "2026-10-28T18:45:17+00:00",
+                  "signal_action": "UNKNOWN",
+                  "trigger_type": "telegram_message",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "confidence": 0.45,
+                  "warnings": []
+                }
+              ],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:16822",
+            "content_sha256": "b8279a87878431b539ca8d71648086b1e516fec62ce9e1c238a573cb2189a468",
+            "occurred_at": "2026-10-28T18:45:11+00:00",
+            "relevance": {
+              "tickers": [
+                "SDGR"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "normalized_prism_signals",
+              "matched_tickers": [],
+              "market_match": false,
+              "score": 0
+            },
+            "summary": {
+              "message_id": "16822",
+              "posted_at": "2026-10-28T18:45:11+00:00",
+              "source_url": "https://t.me/stock_ai_agent/16822",
+              "preview": "📊 Schrödinger, Inc. (SDGR) 계산화학 소프트웨어로 신약·소재 개발을 지원하며, 자체 신약개발 사업도 운영합니다. 💵 거래 현황 | 2026.10.28 관측치 - 현재가: $30.385 - 전일 대비: 보고서에 등락률 미제공 - 거래량: 234만 주. 당일 수치는 마감 확정 전 관측값이며, 최근 급등·하락 구간에는 거래량이 크게 늘었습니다(9/17 약 903만 주)....",
+              "signals": [
+                {
+                  "canonical_ticker": "SDGR",
+                  "display_name": "Schrödinger, Inc.",
+                  "market": "US",
+                  "source_asof": "2026-10-28T18:45:11+00:00",
+                  "signal_action": "UNKNOWN",
+                  "trigger_type": "telegram_message",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "confidence": 0.45,
+                  "warnings": []
+                }
+              ],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:16821",
+            "content_sha256": "39761274eab98334b9326f86a50afba016656aa92c5d81d75f0e7a5d43638f19",
+            "occurred_at": "2026-10-28T18:38:25+00:00",
+            "relevance": {
+              "tickers": [
+                "EMS",
+                "SDGR",
+                "MU",
+                "BSX"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "normalized_prism_signals",
+              "matched_tickers": [],
+              "market_match": false,
+              "score": 0
+            },
+            "summary": {
+              "message_id": "16821",
+              "posted_at": "2026-10-28T18:38:25+00:00",
+              "source_url": "https://t.me/stock_ai_agent/16821",
+              "preview": "🔔 미국주식 오후 프리즘 시그널 얼럿 📅 2026.10.28 오후 분석 포착된 관심종목 🤖 프리즘봇의 가상 포트폴리오 운용 과정을 투명하게 공개합니다. 실제 매수 권유가 아닙니다. 🧭 장기추세: 온건 강세 | 스윙: 횡보·숨고르기 | 실행기준: 온건 강세 | 선정: 탑다운 1종목 + 바텀업 2종목 🧭 오늘 테마 흐름 미국 1,019종목 · 전일 종가 대비 · 테마별 중앙값 📈 강한 테마...",
+              "signals": [
+                {
+                  "canonical_ticker": "EMS",
+                  "display_name": "1. 전자제품 위탁생산",
+                  "market": "US",
+                  "source_asof": "2026-10-28T18:38:25+00:00",
+                  "signal_action": "WATCH",
+                  "trigger_type": "telegram_signal_alert",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "confidence": 0.45,
+                  "warnings": []
+                },
+                {
+                  "canonical_ticker": "SDGR",
+                  "display_name": "Schrodinger, Inc.",
+                  "market": "US",
+                  "source_asof": "2026-10-28T18:38:25+00:00",
+                  "signal_action": "WATCH",
+                  "trigger_type": "telegram_signal_alert",
+                  "trigger_score": 0.82,
+                  "composite_score": 0.82,
+                  "confidence": 0.82,
+                  "warnings": []
+                },
+                {
+                  "canonical_ticker": "MU",
+                  "display_name": "Micron Technology, Inc.",
+                  "market": "US",
+                  "source_asof": "2026-10-28T18:38:25+00:00",
+                  "signal_action": "WATCH",
+                  "trigger_type": "telegram_signal_alert",
+                  "trigger_score": 0.75,
+                  "composite_score": 0.75,
+                  "confidence": 0.75,
+                  "warnings": []
+                },
+                {
+                  "canonical_ticker": "BSX",
+                  "display_name": "Boston Scientific Corporation",
+                  "market": "US",
+                  "source_asof": "2026-10-28T18:38:25+00:00",
+                  "signal_action": "WATCH",
+                  "trigger_type": "telegram_signal_alert",
+                  "trigger_score": 0.7,
+                  "composite_score": 0.7,
+                  "confidence": 0.7,
+                  "warnings": []
+                }
+              ],
+              "simulation_only": true,
+              "actionability": "research_only"
+            }
           }
         ],
         "execution_eligible": false
@@ -3774,38 +3560,32 @@
           "prism": {
             "source_health": "OK",
             "event_keys": [
-              "stock_ai_agent:16804",
-              "stock_ai_agent:16801",
-              "stock_ai_agent:16798",
-              "stock_ai_agent:16795",
-              "stock_ai_agent:16792",
-              "stock_ai_agent:16803",
-              "stock_ai_agent:16802",
-              "stock_ai_agent:16800",
-              "stock_ai_agent:16799",
-              "stock_ai_agent:16797",
-              "stock_ai_agent:16796",
-              "stock_ai_agent:16794",
-              "stock_ai_agent:16793",
               "stock_ai_agent:16834",
               "stock_ai_agent:16833",
               "stock_ai_agent:16832",
               "stock_ai_agent:16831",
               "stock_ai_agent:16830",
               "stock_ai_agent:16829",
-              "stock_ai_agent:16828"
+              "stock_ai_agent:16828",
+              "stock_ai_agent:16827",
+              "stock_ai_agent:16826",
+              "stock_ai_agent:16825",
+              "stock_ai_agent:16824",
+              "stock_ai_agent:16823",
+              "stock_ai_agent:16822",
+              "stock_ai_agent:16821"
             ],
             "coverage": {
               "total_unique_events": 317,
-              "window_events": 28,
-              "transmitted_events": 20,
-              "truncated": true,
-              "oldest_occurred_at": "2026-10-28T05:49:17+00:00",
+              "window_events": 14,
+              "transmitted_events": 14,
+              "truncated": false,
+              "oldest_occurred_at": "2026-10-28T18:38:25+00:00",
               "newest_occurred_at": "2026-10-28T18:53:32+00:00",
-              "available_events_before_context_cap": 28,
+              "available_events_before_context_cap": 14,
               "context_event_cap": 20,
-              "omitted_events": 8,
-              "omitted_due_to_context_cap": 8,
+              "omitted_events": 0,
+              "omitted_due_to_context_cap": 0,
               "omitted_before_context_selection": 0
             }
           }
