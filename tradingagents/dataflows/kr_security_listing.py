@@ -112,6 +112,46 @@ _REVIEWED = {
              "role": "REVIEWED_CURRENT_MASTER_IDENTITY_NOT_HISTORICAL_LISTING"},
         ],
     },
+    "179880.KQ": {
+        "symbol": "179880.KQ", "short_code": "179880", "board": "kosdaq",
+        "exchange": "KRX", "currency": "KRW", "isin": "KR7179880000",
+        "issuer": "멜콘 주식회사", "provider_name": "멜콘",
+        "security_class": "COMMON_STOCK", "event_kind": "IPO_FIRST_REGULAR_COMMON_STOCK",
+        "first_regular_session": "2026-10-15",
+        "evidence_available_at": "2026-10-29T08:34:21.037673+00:00",
+        "sources": [
+            {"url": "https://kind.krx.co.kr/external/2026/10/13/000679/20261013001545/70760.htm",
+             "sha256": "beb8b355cf67375f69ef5c4ffda36e1598439033921edb60e605e8c6ae597ffe",
+             "role": "EXCHANGE_NEW_COMMON_FIRST_TRADING_DATE_AND_ISIN"},
+            {"url": "https://kind.krx.co.kr/external/2026/10/14/000511/20261014000808/72100.htm",
+             "sha256": "1bded0ebc902b5e17897b182634aa1a93f6573d42561942be42f658eb4d5b263",
+             "role": "EXCHANGE_LISTING_DAY_TRADING_REFERENCE_CORROBORATION"},
+            {"url": "https://new.real.download.dws.co.kr/common/master/kosdaq_code.mst.zip",
+             "sha256": "a87fa3d6d1ebe76f7bdf32efef9bcdce2679aa06e8d8e3590aafdd74710b0d44",
+             "role": "REVIEWED_CURRENT_MASTER_IDENTITY_NOT_HISTORICAL_LISTING"},
+        ],
+    },
+    "443670.KQ": {
+        "symbol": "443670.KQ", "short_code": "443670", "board": "kosdaq",
+        "exchange": "KRX", "currency": "KRW", "isin": "KR7443670005",
+        "issuer": "주식회사 에스피소프트", "provider_name": "에스피소프트",
+        "security_class": "COMMON_STOCK", "event_kind": "SPAC_DISSOLUTION_NEW_COMMON_ISSUE",
+        "first_regular_session": "2024-02-15",
+        "predecessor_name": "IBKS제19호스팩", "predecessor_history_allowed": False,
+        "new_security": True,
+        "evidence_available_at": "2026-10-29T08:34:21.515152+00:00",
+        "sources": [
+            {"url": "https://kind.krx.co.kr/external/2024/02/13/001310/20240213003429/70980.htm",
+             "sha256": "be2102a8b23870df11954e5feaeac12817b7ea392ec4ff2e36e83eeed92f6002",
+             "role": "EXCHANGE_SPAC_DISSOLUTION_NEW_COMMON_DATE_AND_ISIN"},
+            {"url": "https://kind.krx.co.kr/external/2024/02/14/001266/20240214003127/70718.htm",
+             "sha256": "454be58a405add58fe3e1a47d00fb9e4945d17cae5f319e6735639cdbbaa002e",
+             "role": "EXCHANGE_SPAC_DISSOLUTION_TRADING_REFERENCE_CORROBORATION"},
+            {"url": "https://new.real.download.dws.co.kr/common/master/kosdaq_code.mst.zip",
+             "sha256": "a87fa3d6d1ebe76f7bdf32efef9bcdce2679aa06e8d8e3590aafdd74710b0d44",
+             "role": "REVIEWED_CURRENT_MASTER_IDENTITY_NOT_HISTORICAL_LISTING"},
+        ],
+    },
 }
 _SHA = re.compile(r"[a-f0-9]{64}")
 
@@ -221,7 +261,17 @@ def verify_listing_contract(symbol, snapshot, *, requested_start, end_date, anal
         raise ValueError("No reviewed KR first regular listing event")
     cutoff, start, end = _instant(analysis_as_of), _day(requested_start), _day(end_date)
     first = _day(issue["first_regular_session"])
-    if (issue["security_class"] != "COMMON_STOCK" or issue["event_kind"] != "IPO_FIRST_REGULAR_COMMON_STOCK"
+    # The reviewed dissolution lists a new operating-company security. This
+    # never admits the dissolved SPAC's prices or an ordinary reverse merger.
+    event = issue["event_kind"]
+    spac_new_issue = (event == "SPAC_DISSOLUTION_NEW_COMMON_ISSUE"
+        and issue.get("new_security") is True and issue.get("predecessor_history_allowed") is False
+        and bool(issue.get("predecessor_name"))
+        and {"EXCHANGE_SPAC_DISSOLUTION_NEW_COMMON_DATE_AND_ISIN",
+             "EXCHANGE_SPAC_DISSOLUTION_TRADING_REFERENCE_CORROBORATION"}
+            <= {row.get("role") for row in issue.get("sources", [])})
+    if (issue["security_class"] != "COMMON_STOCK"
+            or not (event == "IPO_FIRST_REGULAR_COMMON_STOCK" or spac_new_issue)
             or issue["exchange"] != "KRX" or issue["currency"] != "KRW"
             or cutoff > datetime.now(timezone.utc) or _instant(issue["evidence_available_at"]) > cutoff
             or not start < first <= end or end > cutoff.astimezone(ZoneInfo("Asia/Seoul")).date()):

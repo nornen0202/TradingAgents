@@ -77,7 +77,11 @@ Volume-Based Indicators:
                     " Return the completed market report directly once you have enough evidence."
                     " You have access to the following tools: {tool_names}.\n{system_message}"
                     "The decision date is {analysis_date}; daily prices are referenced to {current_date}. "
-                    "Use the price reference date for historical indicator queries. Check the intraday snapshot's own timestamp and session before using it for decision-date timing; stale or closed-session quotes do not confirm a current entry. {instrument_context}",
+                    "Use the price reference date for historical indicator queries. "
+                    "An UNAVAILABLE indicator is missing evidence, never a zero or a trading signal. "
+                    "For recently listed securities, state the limited observed history and do not invent "
+                    "pre-listing bars, substitute another security, or claim a mature long-period indicator. "
+                    "Check the intraday snapshot's own timestamp and session before using it for decision-date timing; stale or closed-session quotes do not confirm a current entry. {instrument_context}",
                 ),
                 MessagesPlaceholder(variable_name="messages"),
             ]

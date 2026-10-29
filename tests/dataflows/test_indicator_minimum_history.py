@@ -1,5 +1,6 @@
 """Offline minimum-observation contracts; these do not assert IIR convergence."""
 
+import json
 from unittest.mock import Mock
 
 import exchange_calendars as xcals
@@ -260,8 +261,10 @@ def test_upper_vendor_and_agent_tool_cannot_hide_insufficient_history(monkeypatc
         "yfinance": y_finance.get_stock_stats_indicators_window, "alpha_vantage": alternative,
     })
     with run_config({"tool_vendors": {"get_indicators": "yfinance,alpha_vantage"}}):
-        with pytest.raises(InsufficientIndicatorHistoryError):
-            get_indicators.invoke({"symbol": symbol, "indicator": "close_200_sma", "curr_date": DAY, "look_back_days": 0})
+        result = json.loads(get_indicators.invoke({"symbol": symbol, "indicator": "close_200_sma",
+                                                  "curr_date": DAY, "look_back_days": 0}))
+        assert result["status"] == "UNAVAILABLE" and result["value"] is None
+        assert result["execution_authorized"] is False
     alternative.assert_not_called()
     assert interface.snapshot_tool_requests()[-1]["status"] == "error"
     events = interface.snapshot_tool_telemetry()
@@ -285,8 +288,9 @@ def test_weekend_window_evidence_depends_on_actual_observed_values(monkeypatch, 
     with run_config({"tool_vendors": {"get_indicators": "yfinance,alpha_vantage"}}):
         args = {"symbol": "AAPL", "indicator": "close_200_sma", "curr_date": "2026-10-18", "look_back_days": lookback}
         if lookback == 0:
-            with pytest.raises(InsufficientIndicatorHistoryError, match="No observed"):
-                get_indicators.invoke(args)
+            result = json.loads(get_indicators.invoke(args))
+            assert result["status"] == "UNAVAILABLE" and result["value"] is None
+            assert result["execution_authorized"] is False
             assert interface.snapshot_tool_requests()[-1]["status"] == "error"
             assert interface.snapshot_tool_requests()[-1]["result_sha256"] is None
         else:

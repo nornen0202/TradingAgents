@@ -4,10 +4,18 @@ from unittest.mock import patch
 
 from tradingagents.dataflows.alpha_vantage_common import AlphaVantageRateLimitError
 from tradingagents.dataflows.interface import route_to_vendor
-from tradingagents.dataflows.vendor_exceptions import VendorConfigurationError, VendorInputError, VendorMalformedResponseError
+from tradingagents.dataflows.vendor_exceptions import VendorConfigurationError, VendorInputError, VendorMalformedResponseError, VendorUnavailableError
 
 
 class VendorFallbackTests(unittest.TestCase):
+    def test_exhausted_providers_have_typed_diagnostics_without_changing_retry_policy(self):
+        with patch("tradingagents.dataflows.interface.get_vendor", return_value="yfinance"), patch.dict(
+            "tradingagents.dataflows.interface.VENDOR_METHODS",
+            {"get_company_news": {"yfinance": lambda *_args, **_kwargs: (_ for _ in ()).throw(VendorMalformedResponseError("bad payload"))}},
+        ):
+            with self.assertRaises(VendorUnavailableError):
+                route_to_vendor("get_company_news", "AAPL", "2026-04-01", "2026-04-02")
+
     def test_rate_limit_falls_back_to_next_vendor(self):
         with patch("tradingagents.dataflows.interface.get_vendor", return_value="alpha_vantage,yfinance"), patch.dict(
             "tradingagents.dataflows.interface.VENDOR_METHODS",

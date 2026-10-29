@@ -43,6 +43,7 @@ from .vendor_exceptions import (
     VendorInputError,
     VendorMalformedResponseError,
     VendorTransientError,
+    VendorUnavailableError,
 )
 from .y_finance import (
     get_YFin_data_online,
@@ -611,14 +612,14 @@ def _route_to_vendor(method: str, *args, **kwargs):
             return "No disclosures found (provider unavailable)."
         if method == "get_social_sentiment":
             return "No social sentiment data found (provider unavailable)."
-        raise RuntimeError(f"No available vendor for '{method}'. Fallback attempts: {note}") from last_exception
+        raise VendorUnavailableError(f"No available vendor for '{method}'. Fallback attempts: {note}") from last_exception
 
     if method == "get_disclosures":
         return "No disclosures found (provider unavailable)."
     if method == "get_social_sentiment":
         return "No social sentiment data found (provider unavailable)."
 
-    raise RuntimeError(f"No available vendor for '{method}'.")
+    raise VendorUnavailableError(f"No available vendor for '{method}'.")
 
 
 def _emit_vendor_fallback_log(method: str, note: str) -> None:

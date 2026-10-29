@@ -10,6 +10,10 @@ class VendorTransientError(RuntimeError):
     """Raised when a vendor hit a transient/network/service issue."""
 
 
+class VendorUnavailableError(RuntimeError):
+    """Every configured provider failed; retryability needs separate evidence."""
+
+
 class VendorMalformedResponseError(RuntimeError):
     """Raised when a vendor response is structurally invalid."""
 
