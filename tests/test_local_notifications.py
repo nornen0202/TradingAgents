@@ -369,6 +369,30 @@ def test_notification_transport_failure_does_not_terminate_production(tmp_path, 
     local.reconcile_safely(tmp_path, tmp_path)
 
 
+def test_minute_producer_dispatches_existing_events_without_history_discovery(tmp_path, monkeypatch):
+    from tradingagents.notifications import advisory
+    archive, state, _, success = prepared(tmp_path, monkeypatch)
+    failure = local.queue_failure(state, stage="analysis", source_key="today", error_type="WorkerExitError",
+                                  finished_at=NOW.isoformat())
+    def forbidden(*args, **kwargs):
+        pytest.fail("Completion history belongs to the publication lane")
+    monkeypatch.setattr(local, "queue_completed", forbidden)
+    monkeypatch.setattr(advisory, "queue_completed", forbidden)
+    monkeypatch.setattr(automation, "prepare_environment", lambda: None)
+    monkeypatch.setattr(automation, "drain_actions", lambda *a, **k: [])
+    monkeypatch.setattr(automation, "run_due", lambda *a, **k: [])
+    monkeypatch.setattr(automation.sys, "argv", ["local", "run-due", "--archive-dir", str(archive),
+                        "--state-dir", str(state), "--runtime-dir", str(tmp_path / "runtime")])
+    calls, actual = [], local.reconcile
+    monkeypatch.setattr(local, "reconcile", lambda destination, **kwargs: actual(
+        destination, now=NOW, runner=lambda args, **kw: calls.append(args) or SimpleNamespace(
+            returncode=0, stdout="[]"), **kwargs))
+    assert automation.main() == 0
+    assert sum(call[1] == "workflow" for call in calls) == 2
+    for key in (success, failure):
+        assert local.read(state / "notifications/dispatches" / f"{key}.json")["attempts"] == 1
+
+
 def test_market_admission_yields_to_publisher_without_blocking_failures(tmp_path, monkeypatch):
     archive, state = tmp_path / "archive", tmp_path / "state"
     manifest = completed(archive)

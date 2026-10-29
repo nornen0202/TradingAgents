@@ -239,7 +239,7 @@ def _reconcile_event(state, path, *, now, runner, completions_allowed):
     atomic_write_json(receipt_path, {"status": "DISPATCH_ACCEPTED" if sent.returncode == 0 else "DISPATCH_FAILED",
                                     "attempts": attempt, "dispatched_at": now.isoformat()})
 
-def reconcile_safely(archive, state, *, publication_locked=False):
+def reconcile_safely(archive, state, *, publication_locked=False, discover_completions=True):
     from .advisory import queue_completed as queue_advisory_completed
     # One unavailable advisory/API must not starve independent failures or
     # already queued market completions of their notification dispatch.
@@ -256,7 +256,8 @@ def reconcile_safely(archive, state, *, publication_locked=False):
         except OSError:
             pass
 
-    for stage, prepare in (("market_queue", queue_completed), ("advisory_queue", queue_advisory_completed)):
+    discovery = (("market_queue", queue_completed), ("advisory_queue", queue_advisory_completed)) if discover_completions else ()
+    for stage, prepare in discovery:
         try:
             prepare(archive, state, publication_locked=publication_locked)
             health(stage)

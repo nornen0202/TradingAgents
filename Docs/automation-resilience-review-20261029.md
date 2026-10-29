@@ -76,6 +76,12 @@ every validation and a fixed cutoff, and queues results serially in original
 order. Durable diagnostics record scan count and duration. Tests verify the
 concurrency bound, serial outbox writes, corrupt-neighbor isolation, and
 duplicate suppression even after a newer publication of the same source.
+The live four-reader probe still took 45.1 seconds for 1,321 manifests under
+concurrent production. Completion discovery therefore belongs exclusively to
+the publication lane, which runs it even for an unchanged verified generation.
+The minute producer dispatches existing events and failures without rereading
+the historical archive or discovering advisory producers. This keeps completion
+recovery active without delaying fresh observation production.
 
 ### Operational acceptance recorded during the review
 

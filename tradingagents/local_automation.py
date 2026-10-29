@@ -907,7 +907,12 @@ def main():
                 finally:
                     if not args.dry_run:
                         from tradingagents.notifications.local import reconcile_safely
-                        reconcile_safely(args.archive_dir, args.state_dir)
+                        # Publication owns completion discovery, including
+                        # unchanged verified generations. Do not make the
+                        # minute producer scan all historical research/API
+                        # records while live observations expire in 120s.
+                        # Existing events and independent failures still drain.
+                        reconcile_safely(args.archive_dir, args.state_dir, discover_completions=False)
             elif args.dry_run:
                 result = {"fingerprint": archive_fingerprint(args.archive_dir), "status": "DRY_RUN"}
             else:
