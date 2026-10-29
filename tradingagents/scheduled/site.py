@@ -170,7 +170,7 @@ def _compact_feed_manifest(manifest: dict[str, Any], *, published_to_site: bool)
 
 def _load_run_manifests(archive_dir: Path) -> list[dict[str, Any]]:
     manifests: list[dict[str, Any]] = []
-    shared_evidence: dict[bytes, dict] = {}
+    shared_evidence: dict[bytes, Any] = {}
     runs_root = archive_dir / "runs"
     if not runs_root.exists():
         return manifests
@@ -200,7 +200,7 @@ def _load_run_manifests(archive_dir: Path) -> list[dict[str, Any]]:
                 continue
             for key in ("decision", "execution_contract", "settings", "tool_telemetry", "metrics", "llm_usage"):
                 value = row.get(key)
-                if not isinstance(value, dict):
+                if not isinstance(value, (dict, str)):
                     continue
                 digest = hashlib.sha256(json.dumps(value, sort_keys=True, ensure_ascii=False,
                                                   separators=(",", ":")).encode("utf-8")).digest()

@@ -56,7 +56,8 @@ def test_corrupt_portfolio_status_degrades_to_empty_summary(tmp_path):
         assert site._load_portfolio_summary(tmp_path) == {}
 
 
-def test_repeated_research_is_shared_without_changing_rendered_values(tmp_path):
+@pytest.mark.parametrize("text_decision", [False, True])
+def test_repeated_research_is_shared_without_changing_rendered_values(tmp_path, text_decision):
     original = []
     for index in range(3):
         run_id = f"run-{index}"
@@ -67,6 +68,8 @@ def test_repeated_research_is_shared_without_changing_rendered_values(tmp_path):
                                 "decision": {"reason": "same research " * 1000,
                                              "rating": "HOLD" if index < 2 else "WAIT"},
                                 "artifacts": {}}]}
+        if text_decision:
+            payload["tickers"][0]["decision"] = json.dumps(payload["tickers"][0]["decision"])
         path = tmp_path / "runs" / "2026" / run_id / "run.json"
         path.parent.mkdir(parents=True)
         path.write_text(json.dumps(payload), encoding="utf-8")
@@ -77,6 +80,9 @@ def test_repeated_research_is_shared_without_changing_rendered_values(tmp_path):
     before = json.dumps(manifests)
     for manifest in manifests:
         public = site._public_ticker_summaries(manifest)
-        public[0]["decision"]["reason"] = "modified public copy"
+        if text_decision:
+            public[0]["decision"] = "modified public copy"
+        else:
+            public[0]["decision"]["reason"] = "modified public copy"
     assert json.dumps(manifests) == before
     assert all(path.read_bytes() == data for path, data in original)
