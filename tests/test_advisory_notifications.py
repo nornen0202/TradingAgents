@@ -81,6 +81,31 @@ def test_completed_producer_published_exact_source_sends_once(tmp_path, monkeypa
 
 
 @pytest.mark.parametrize("surface", ["youtube", "prism"])
+@pytest.mark.parametrize("handoff", ["success", "skipped", "failure", "duplicate", "both_paths"])
+def test_local_collection_handoff_replaces_cloud_stamp(tmp_path, monkeypatch, surface, handoff):
+    archive, state, manifest, _, _, _, jobs = fixture(tmp_path, monkeypatch, surface)
+    steps = jobs[0]["steps"]
+    steps[1]["conclusion"] = "success" if handoff == "both_paths" else "skipped"
+    marker = {"name": "Confirm canonical collection handoff to local publisher",
+              "conclusion": handoff if handoff in {"skipped", "failure"} else "success"}
+    steps.append(marker)
+    if handoff == "duplicate":
+        steps.append(dict(marker))
+    if handoff != "success":
+        with pytest.raises(NotificationError):
+            advisory.queue_completed(archive, state, now=NOW)
+        assert not list((state / "notifications/events").glob("*.json"))
+        return
+    advisory.queue_completed(archive, state, now=NOW)
+    event = local.read(next((state / "notifications/events").glob("*.json")))
+    assert event["run_id"] == manifest["run_id"]
+    assert advisory.compose(event, archive, state)[2]["conclusion"] == "success"
+    monkeypatch.setattr(advisory, "verify_packet_live", lambda *_: False)
+    with pytest.raises(NotificationError):
+        advisory.compose(event, archive, state)
+
+
+@pytest.mark.parametrize("surface", ["youtube", "prism"])
 @pytest.mark.parametrize("published", ["current", "superseded", "pending", "live_mismatch"])
 def test_advisory_waits_for_publisher_then_revalidates(
         tmp_path, monkeypatch, publication_contention, surface, published):
