@@ -993,6 +993,7 @@ def resolve_trade_date(
         config=config,
         now=now,
     )
+    available_research = getattr(config.run, "daily_bar_policy", "strict") == "available" and config.run.run_mode in {"full", "selective_rerun_only"}
 
     normalized_symbol = (normalized_symbol or "").strip().upper()
     if not _looks_like_yahoo_ticker_format(normalized_symbol):
@@ -1007,6 +1008,8 @@ def resolve_trade_date(
             lookback_days=config.run.latest_market_data_lookback_days,
         )
     except Exception as exc:
+        if available_research:
+            raise RuntimeError("No observed daily bar is available; retain the previous dated investor report") from exc
         if not is_retryable_yfinance_error(exc):
             raise
         market = _trade_date_market(ticker=normalized_symbol, config=config)
@@ -1024,6 +1027,9 @@ def resolve_trade_date(
             f"using fallback completed trade date {fallback_date}. reason={_summarize_exception(exc)}"
         )
         return fallback_date
+    if available_research:
+        return _available_research_trade_date(history, ticker=normalized_symbol, config=config,
+                                              now=now, completed=expected_completed_date)
     if history.empty:
         symbol_hint = _ticker_hint(normalized_symbol)
         raise RuntimeError(
@@ -1109,6 +1115,41 @@ def resolve_trade_date(
                 f"{wait_detail}."
             )
     return last_date.isoformat()
+
+
+def _available_research_trade_date(history, *, ticker, config, now, completed):
+    """Use an observed completed bar, without waiting or inventing today's price."""
+    import math
+    import pandas as pd
+
+    market = _trade_date_market(ticker=ticker, config=config)
+    local_day = _market_local_now(now=now, market=market).date()
+    cutoff = min(completed, local_day) if completed is not None else local_day - timedelta(days=1)
+    earliest = cutoff - timedelta(days=max(1, config.run.latest_market_data_lookback_days))
+    dates = []
+    if isinstance(history, pd.DataFrame) and "Close" in history.columns:
+        for index, row in history.iterrows():
+            if not isinstance(index, (str, date, datetime, pd.Timestamp)):
+                continue
+            try:
+                stamp = pd.Timestamp(index)
+                if pd.isna(stamp):
+                    continue
+                observed = stamp.date()
+                if isinstance(row["Close"], bool):
+                    continue
+                close = float(row["Close"])
+                if earliest <= observed <= cutoff and math.isfinite(close) and close > 0:
+                    dates.append(observed)
+            except (ValueError, TypeError, OverflowError):
+                continue
+    if not dates:
+        raise RuntimeError("No valid dated completed daily bar is available for investor research")
+    selected = max(dates)
+    if selected < cutoff:
+        print(f"::warning::Investor research uses observed {ticker} daily bar {selected.isoformat()}; "
+              f"latest completed session is {cutoff.isoformat()}. Source date is preserved; no freshness wait.")
+    return selected.isoformat()
 
 
 def _resolve_run_trade_date(
@@ -2669,6 +2710,7 @@ def _settings_snapshot(config: ScheduledAnalysisConfig) -> dict[str, Any]:
         "translation_model": config.translation.model,
         "analysts": list(config.run.analysts),
         "trade_date_mode": config.run.trade_date_mode,
+        "daily_bar_policy": config.run.daily_bar_policy,
         "ticker_universe_mode": config.run.ticker_universe_mode,
         "market": config.run.market,
         "run_mode": config.run.run_mode,

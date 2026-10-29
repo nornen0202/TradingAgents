@@ -43,6 +43,7 @@ class RunSettings:
     latest_market_data_lookback_days: int = 14
     latest_market_data_wait_minutes: float = 0.0
     latest_market_data_retry_interval_seconds: float = 300.0
+    daily_bar_policy: str = "strict"
     continue_on_ticker_error: bool = True
     report_polisher_enabled: bool = True
     ticker_name_overrides: dict[str, str] = field(default_factory=dict)
@@ -376,6 +377,9 @@ def load_scheduled_config(path: str | Path) -> ScheduledAnalysisConfig:
     analysts = _normalize_analysts(run_raw.get("analysts") or list(ALL_ANALYSTS))
 
     trade_date_mode = str(run_raw.get("trade_date_mode", "latest_available")).strip().lower()
+    daily_bar_policy = str(run_raw.get("daily_bar_policy", "strict")).strip().lower()
+    if daily_bar_policy not in {"strict", "available"}:
+        raise ValueError("daily_bar_policy must be strict or available")
     explicit_trade_date = None
     if run_raw.get("trade_date"):
         trade_date_mode = "explicit"
@@ -439,6 +443,7 @@ def load_scheduled_config(path: str | Path) -> ScheduledAnalysisConfig:
             analysts=analysts,
             output_language=str(run_raw.get("output_language", "Korean")).strip() or "Korean",
             trade_date_mode=trade_date_mode,
+            daily_bar_policy=daily_bar_policy,
             explicit_trade_date=explicit_trade_date,
             timezone=timezone_name,
             max_debate_rounds=int(run_raw.get("max_debate_rounds", 2)),

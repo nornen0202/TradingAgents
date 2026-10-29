@@ -57,14 +57,24 @@ class WorkRuntime:
         expected_producer_run_id: str | None = None,
         refresh_started_at: datetime | None = None,
         report_context_v1: bool = False,
+        investor_report: bool = False,
     ) -> dict[str, Any]:
         key = surface.lower()
+        if investor_report and (key not in {"kr", "us"} or fresh_report):
+            raise WorkRuntimeError("Investor publication requires a market surface and is separate from fresh execution")
         guarded_refresh = expected_producer_run_id is not None or refresh_started_at is not None
         if guarded_refresh and (key not in {"kr", "us"} or not fresh_report
                 or not isinstance(expected_producer_run_id, str) or not expected_producer_run_id.strip()
                 or not isinstance(refresh_started_at, datetime) or refresh_started_at.utcoffset() is None):
             raise WorkRuntimeError("Fresh report requires an exact producer run and aware refresh start")
         with self.lock("state"):
+            source_run = expected_producer_run_id
+            if investor_report:
+                from .packet import load_json
+                roots = resolve_archive_roots(archive_dir=archive_dir)
+                pointer = load_json(roots["market"] / "latest-run.json")
+                if str((pointer.get("settings") or {}).get("market") or "").lower() == key:
+                    source_run = pointer.get("run_id")
             source_packet = build_surface_packet(
                 key,
                 archive_dir=archive_dir,
@@ -73,8 +83,14 @@ class WorkRuntime:
                 now=now,
                 public=False,
                 report_context_v1=report_context_v1,
-                **({'expected_producer_run_id': expected_producer_run_id} if guarded_refresh else {}),
+                **({'expected_producer_run_id': source_run} if source_run else {}),
             )
+            if investor_report:
+                from .investor_policy import project_investor_body
+                body = project_investor_body(source_packet["body"], now=datetime.fromisoformat(_now(now)))
+                if not (body.get("current", {}).get("bundle") or {}).get("strategy_table"):
+                    raise WorkRuntimeError("No completed market rows are available for an investor report")
+                source_packet = seal_packet(key, body=body, contract_version=source_packet["prompt_contract_version"])
             if guarded_refresh:
                 from .pre_report import (
                     aware_datetime, freshness_blockers, market_session_state, publish_freshness_blockers,
@@ -278,6 +294,7 @@ class WorkRuntime:
                 raise WorkRuntimeError("Publish source SHA-256 does not match the immutable Work packet")
             if surface_state.get("pending_source_sha256") != source_sha256:
                 raise WorkRuntimeError("Publish source SHA-256 does not match canonical pending state")
+            investor_report = (packet.get("body", {}).get("publication_policy") or {}).get("profile") == "investor"
 
             if historical:
                 if key not in {"kr", "us"}:
@@ -297,7 +314,7 @@ class WorkRuntime:
                 if any(row.get("readiness") != "NEEDS_LIVE_RECHECK" or row.get("action")
                        for row in structured_report.get("top_actions", [])):
                     raise WorkRuntimeError("Historical reports must contain no executable actions")
-            elif surface_state.get("requires_fresh_publish"):
+            elif surface_state.get("requires_fresh_publish") and not investor_report:
                 from .pre_report import publish_freshness_blockers
                 blockers = publish_freshness_blockers(packet, now=effective_now)
                 if blockers:
@@ -313,6 +330,9 @@ class WorkRuntime:
             )
             _validate_report_packet_coverage(draft, packet, now=effective_now)
             markdown = str(report_markdown or "").strip()
+            if investor_report:
+                from .investor_policy import publication_notice
+                markdown = publication_notice(packet) + markdown
             if historical:
                 markdown = ("# 과거 분석 보관본 — 현재 투자 지시 아님\n\n"
                             "미발행 초안을 원래 분석 시각 그대로 보관합니다. 현재 시세·계좌 검증과 "
@@ -1106,7 +1126,9 @@ def validate_work_report(report: dict[str, Any], *, max_chars: int = 600_000) ->
         raise WorkRuntimeError("Work report Markdown contains a blocked secret, identifier, or local path")
     if surface in {"kr", "us"} and _contains_blocked_market_markdown(markdown):
         raise WorkRuntimeError("Market investor Markdown contains a blocked empty-state or raw status code")
-    size = len(json.dumps(report, ensure_ascii=False, indent=2))
+    # Content, not indentation, consumes the report budget. Deeply structured
+    # price-zone plans otherwise fail solely because of pretty-print layout.
+    size = len(_packet_json(report))
     if size > max_chars:
         raise WorkRuntimeError(f"Work report is too large: {size} chars > {max_chars}")
 
@@ -1152,6 +1174,7 @@ def _validate_report_draft(
     if not isinstance(draft.get("source_summary"), dict):
         raise WorkRuntimeError("Structured Work report source_summary must be an object")
     if surface in {"kr", "us"}:
+        investor_conditions = (draft.get("source_summary", {}).get("publication_policy") or {}).get("profile") == "investor"
         ranks: set[float] = set()
         strategy_tickers: set[str] = set()
         for index, strategy in enumerate(strategies):
@@ -1186,6 +1209,8 @@ def _validate_report_draft(
                 raise WorkRuntimeError(f"Structured market strategy {index} has invalid thesis stance")
             if readiness not in _REPORT_EXECUTION_READINESS:
                 raise WorkRuntimeError(f"Structured market strategy {index} has invalid execution readiness")
+            if investor_conditions and readiness != "NEEDS_LIVE_RECHECK":
+                raise WorkRuntimeError("Investor reports cannot contain executable readiness")
             confidence = thesis.get("confidence")
             if (
                 isinstance(confidence, bool)
@@ -1208,12 +1233,19 @@ def _validate_report_draft(
                 raise WorkRuntimeError(
                     f"Structured market strategy {ticker} thesis requires invalidation_action"
                 )
-            if stance in _ACTIONABLE_REPORT_STANCES:
-                _validate_condition_list(entry_conditions, ticker=ticker, field="entry_conditions")
+            incomplete_investor_plan = (
+                (draft.get("source_summary", {}).get("publication_policy") or {}).get("profile") == "investor"
+                and (strategy.get("investment_plan") or {}).get("status") in {"DATA_NEEDED", "REVIEW_REQUIRED"}
+                and readiness == "NEEDS_LIVE_RECHECK"
+                and _has_meaningful_contract_value(thesis.get("data_needed_reason"))
+            )
+            if stance in _ACTIONABLE_REPORT_STANCES and not incomplete_investor_plan:
+                _validate_condition_list(entry_conditions, ticker=ticker, field="entry_conditions", require_anchor=not investor_conditions)
                 _validate_condition_list(
                     invalidation_conditions,
                     ticker=ticker,
                     field="invalidation_conditions",
+                    require_anchor=not investor_conditions,
                 )
                 for field in ("horizon", "position_sizing"):
                     if not _has_meaningful_contract_value(thesis.get(field)):
@@ -1222,12 +1254,13 @@ def _validate_report_draft(
                         )
             else:
                 if entry_conditions:
-                    _validate_condition_list(entry_conditions, ticker=ticker, field="entry_conditions")
+                    _validate_condition_list(entry_conditions, ticker=ticker, field="entry_conditions", require_anchor=not investor_conditions)
                 if invalidation_conditions:
                     _validate_condition_list(
                         invalidation_conditions,
                         ticker=ticker,
                         field="invalidation_conditions",
+                        require_anchor=not investor_conditions,
                     )
                 if (not entry_conditions or not invalidation_conditions) and not _has_meaningful_contract_value(
                     thesis.get("data_needed_reason")
@@ -1257,6 +1290,10 @@ def _validate_report_draft(
         raise WorkRuntimeError(f"Structured Work report contains forbidden key: {forbidden}")
     if _find_sensitive_report_text(draft):
         raise WorkRuntimeError("Structured Work report contains a blocked secret, identifier, or local path")
+    try:
+        json.dumps(draft, allow_nan=False)
+    except (ValueError, OverflowError) as exc:
+        raise WorkRuntimeError("Structured Work report contains non-finite numbers; strict JSON is required") from exc
 
 
 def _validate_report_packet_coverage(
@@ -1268,6 +1305,8 @@ def _validate_report_packet_coverage(
     surface = str(packet.get("surface") or "").lower()
     if surface not in {"kr", "us"}:
         return
+    from .investor_policy import validate_investor_draft
+    validate_investor_draft(draft, packet, now=now)
     body = packet.get("body") if isinstance(packet.get("body"), dict) else {}
     _validate_market_context_report(draft, surface=surface, contract=packet.get("prompt_contract_version"))
     if packet.get("prompt_contract_version") == MARKET_CONTEXT_CONTRACTS.get(surface):
@@ -1512,7 +1551,7 @@ def _external_evidence_receipt(context: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def _validate_condition_list(items: list[Any], *, ticker: str, field: str) -> None:
+def _validate_condition_list(items: list[Any], *, ticker: str, field: str, require_anchor: bool = True) -> None:
     if not items:
         raise WorkRuntimeError(
             f"Structured market strategy {ticker} actionable thesis requires nonempty {field}"
@@ -1523,7 +1562,7 @@ def _validate_condition_list(items: list[Any], *, ticker: str, field: str) -> No
             not text
             or _CONTRACT_PLACEHOLDER_RE.fullmatch(text)
             or _CONTRACT_TAUTOLOGY_RE.fullmatch(text)
-            or not _CONCRETE_CONDITION_ANCHOR_RE.search(text)
+            or (require_anchor and not _CONCRETE_CONDITION_ANCHOR_RE.search(text))
         ):
             raise WorkRuntimeError(
                 f"Structured market strategy {ticker} {field}[{index}] must be concrete and non-placeholder"

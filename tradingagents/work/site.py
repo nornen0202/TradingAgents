@@ -148,13 +148,22 @@ def _publish_latest_report(
     markdown = str(report.get("report_markdown") or "")
     _write_bytes(target_root / "latest.md", markdown.encode("utf-8"))
     structured = report.get("structured_report") or {}
-    _write_bytes(target_root / "latest.html", _readable_html(
-        f"{surface.upper()} Work 보고서",
+    investor = ((structured.get("source_summary") or {}).get("publication_policy") or {}).get("profile") == "investor"
+    title = str(structured.get("title") or f"{surface.upper()} 투자 계획") if investor else f"{surface.upper()} Work 보고서"
+    metadata = (
+        '<details><summary>발행 시각·지난 보고서</summary>'
+        f"<p>보고서 게시: {html.escape(str(report.get('published_at') or '미확인'))}</p>"
+        f"<p>입력 시세 기준: {html.escape(str(structured.get('as_of') or '미확인'))}</p>"
+        '<p><a href="index.html">지난 보고서 목록</a></p></details>'
+    ) if investor else (
         f"<p>보고서 게시: {html.escape(str(report.get('published_at') or '미확인'))}</p>"
         f"<p>입력 시세 기준: {html.escape(str(structured.get('as_of') or '미확인'))}</p>"
         '<p><a href="index.html">지난 보고서 목록</a></p>'
         '<p>게시 시각은 입력 갱신 시각이 아닙니다. 아래 내용은 발행 당시 보고서이며 현재 주문 전에 다시 검증해야 합니다.</p>'
-        f"<pre data-report-markdown>{html.escape(markdown)}</pre>",
+    )
+    displayed_markdown = markdown.replace(f"# {title}\n\n", "", 1) if investor else markdown
+    _write_bytes(target_root / "latest.html", _readable_html(
+        title, metadata + f"<pre data-report-markdown>{html.escape(displayed_markdown)}</pre>",
         enhance=True,
     ).encode("utf-8"))
     return {

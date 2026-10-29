@@ -419,19 +419,26 @@ def build_decision_output_instructions(context: str) -> str:
         '"watchlist_triggers":["..."],'
         '"data_coverage":{"company_news_count":0,"disclosures_count":0,"social_source":"dedicated | news_derived | unavailable","macro_items_count":0},'
         '"execution_levels":{'
-        '"intraday_pilot_rule":"After 10:30 local, allow only a small pilot if trigger, VWAP, and volume conditions are met",'
-        '"close_confirm_rule":"Require a close above the trigger before a full add",'
-        '"next_day_followthrough_rule":"Next day, keep the trigger during the first 30-60 minutes before adding",'
-        '"failed_breakout_rule":"If price loses the trigger or VWAP after breakout, block new buying",'
+        '"intraday_pilot_rule":"Optional only when supported by intraday evidence; otherwise use the dated daily plan",'
+        '"close_confirm_rule":"Describe a supported price zone and daily-close confirmation when needed",'
+        '"next_day_followthrough_rule":"Reassess the price zone over the next few sessions; state a review deadline",'
+        '"failed_breakout_rule":"Cancel new entry when the dated thesis invalidation condition occurs",'
         '"trim_rule":"Trim if invalidation or failed breakout confirms",'
         '"levels":[{"label":"breakout above 426000","level_type":"BREAKOUT","price":426000,"confirmation":"close","volume_rule":"RVOL >= 1.2","source_text":"close above 426,000 with volume","reason_code":"BREAKOUT_TRIGGER"}],'
-        '"min_relative_volume":1.2,'
-        '"vwap_required":true,'
+        '"min_relative_volume":null,'
+        '"vwap_required":false,'
         '"earliest_pilot_time_local":"10:30",'
         '"funding_priority":"low | medium | high",'
         '"entry_window":"open | mid | late",'
         '"trigger_quality":"weak | medium | strong"}}. '
         "Treat rating as the legacy medium-term investment/allocation view, not the same-day execution action. "
+        "The user is a discretionary investor, not a quantitative intraday trader. Deliver a useful conditional investment plan even with delayed or prior-session prices. "
+        "Use dated daily evidence, explicit price ranges (low/high), a review period measured in days or weeks, invalidation, and staged sizing. "
+        "Missing live quotes, current account quantities, VWAP or minute bars alone do not invalidate a supported investment thesis or prevent a conditional price-zone plan. "
+        "Default to daily-close or next-session confirmation. Require exact minutes, two bars, VWAP, relative volume or a particular clock time only when the evidence makes them necessary; do not stack them mechanically. "
+        "A source-supported conditional entry can have a justified multi-session validity window based on analysis date, thesis horizon and known events; it is not an immediate order or proof that the trigger is met. "
+        "Unknown cash/holdings prevents an exact order quantity, not a risk-bounded sizing principle. Risk-reducing exits do not require new-buy cash or bullish-volume confirmation. "
+        "Never widen a stop to accommodate stale data; exclude future/undated evidence and retain existing risk limits. "
         "Use portfolio_stance for directional view, and entry_action for immediate action today. "
         "Choose conditional_entry_action from the evidence, not from a fixed example: use STARTER/ADD only for a justified BULLISH WAIT plan with numeric levels, no conflicting sell risk, and an explicit timezone-aware validity timestamp; otherwise use NONE and JSON null. "
         "Evaluate both buy-side entry and sell-side/downside risk. "

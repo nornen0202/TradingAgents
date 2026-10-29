@@ -22,6 +22,8 @@ def main() -> int:
     prepare.add_argument("--prism-archive-dir", type=Path)
     prepare.add_argument("--refresh-market", action="store_true",
                          help="Require new broker quotes and a VALID account before preparing KR/US.")
+    prepare.add_argument("--report-policy", choices=("investor", "execution"),
+                         help="Default: investor plans; --refresh-market alone retains strict execution preparation.")
     prepare.add_argument("--producer-state-dir", type=Path, default=Path(".runtime/local-automation"))
     prepare.add_argument("--report-context-v1", action="store_true",
                          help="Explicitly opt KR/US into sealed prior-ACK and public readiness context.")
@@ -35,6 +37,11 @@ def main() -> int:
     publish.add_argument("--archive-dir", type=Path)
     publish.add_argument("--historical", action="store_true",
                          help="Archive a bound, non-executable past market draft without advancing latest or ACK state.")
+
+    draft = subparsers.add_parser("draft-investor", help="Write a source-bound investor draft without model/API calls.")
+    draft.add_argument("--packet-file", required=True, type=Path)
+    draft.add_argument("--markdown-file", required=True, type=Path)
+    draft.add_argument("--structured-file", required=True, type=Path)
 
     acknowledge = subparsers.add_parser("ack")
     acknowledge.add_argument("--surface", required=True, choices=("kr", "us", "youtube", "prism"))
@@ -77,6 +84,10 @@ def main() -> int:
     runtime = WorkRuntime(args.runtime_dir)
     try:
         if args.command == "prepare":
+            investor = args.surface in {"kr", "us"} and (
+                args.report_policy == "investor" or (args.report_policy is None and not args.refresh_market))
+            if investor and args.refresh_market:
+                raise WorkRuntimeError("Use --report-policy investor without --refresh-market; execution refresh is a separate operation")
             if args.refresh_market:
                 from .pre_report import prepare_market_report
                 result = prepare_market_report(runtime, args.surface,
@@ -90,7 +101,11 @@ def main() -> int:
                     youtube_archive_dir=args.youtube_archive_dir,
                     prism_archive_dir=args.prism_archive_dir,
                     report_context_v1=args.report_context_v1,
+                    investor_report=investor,
                 )
+        elif args.command == "draft-investor":
+            from .investor_draft import write_investor_draft
+            result = write_investor_draft(args.packet_file, args.markdown_file, args.structured_file)
         elif args.command == "publish":
             try:
                 report_markdown = args.markdown_file.read_text(encoding="utf-8")

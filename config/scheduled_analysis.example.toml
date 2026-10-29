@@ -7,6 +7,8 @@ ticker_universe_mode = "config_plus_account"
 analysts = ["market", "social", "news", "fundamentals"]
 output_language = "Korean"
 trade_date_mode = "latest_available"
+# Use actual completed daily bars without waiting for a delayed vendor.
+daily_bar_policy = "available"
 timezone = "Asia/Seoul"
 max_debate_rounds = 1
 max_risk_discuss_rounds = 1
