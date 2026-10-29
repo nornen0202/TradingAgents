@@ -221,6 +221,8 @@ def test_local_collector_completion_requires_canonical_evidence_but_not_cloud_st
     write_manifest(tmp_path / "archive", surface)
     workflow = recovery.SPECS[surface][0]
     client = Client({workflow: [run_record(surface)]}, {10: [build(surface, stamp="skipped")]})
+    client.jobs[10][0]["steps"].append({"name": "Confirm canonical collection handoff to local publisher",
+                                      "conclusion": "success"})
     targets = [target for target in watchdog.due_targets(NOW) if target.workflow_file == workflow]
     assert recover(tmp_path, watchdog, client, targets=targets)[0]["status"] == "ADVISORY_COVERED_OR_HELD"
     assert not client.dispatched

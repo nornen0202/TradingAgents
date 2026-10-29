@@ -24,3 +24,7 @@ def test_local_collector_keeps_collection_but_leaves_full_site_to_local_publishe
         if name == collection:
             assert "AUTOMATION_BACKEND" not in step["if"]
     assert len(guarded) >= 5
+    handoff = next(step for step in steps if step.get("name") == "Confirm canonical collection handoff to local publisher")
+    assert "vars.TRADINGAGENTS_AUTOMATION_BACKEND == 'local'" in handoff["if"]
+    if "youtube" in workflow:
+        assert "github.event.inputs.publish != 'false'" in handoff["if"]

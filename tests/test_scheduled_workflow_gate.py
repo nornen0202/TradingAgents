@@ -352,7 +352,7 @@ def test_youtube_local_collection_suppresses_backup_without_cloud_deployment(mon
         assert "delivery remains owned by the local publisher" in reason
 
 
-@pytest.mark.parametrize("step_index", [0])
+@pytest.mark.parametrize("step_index", [0, 1, 2])
 @pytest.mark.parametrize("step_result", ["skipped", "failure", "missing"])
 def test_local_youtube_requires_actual_collection(monkeypatch, step_index, step_result):
     monkeypatch.setenv("TRADINGAGENTS_AUTOMATION_BACKEND", "local")
@@ -390,6 +390,8 @@ def test_local_youtube_does_not_require_redundant_site_build(monkeypatch):
     jobs = _local_youtube_jobs()
     for step in jobs[0]["steps"][1:]:
         step["conclusion"] = "skipped"
+    jobs[0]["steps"].append({"name": "Confirm canonical collection handoff to local publisher",
+                             "status": "completed", "conclusion": "success"})
     covered, reason = gate._run_covers_target(
         client=FakeClient(jobs={333: jobs}),
         run={"id": 333, "status": "completed", "conclusion": "success"}, current_run_id=444,

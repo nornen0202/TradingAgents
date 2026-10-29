@@ -246,6 +246,11 @@ jobs:
               args += ["--download-pdfs"]
           subprocess.check_call(args)
 
+      - name: Confirm canonical collection handoff to local publisher
+        if: ${{ vars.TRADINGAGENTS_AUTOMATION_BACKEND == 'local' && steps.runtime_gate.outputs.should_run == 'true' }}
+        run: |
+          print("Canonical collection completed; local publisher owns merged build and delivery verification.")
+
       - name: Rebuild merged site and Work context after PRISM collection
         if: ${{ vars.TRADINGAGENTS_AUTOMATION_BACKEND != 'local' && steps.runtime_gate.outputs.should_run == 'true' }}
         working-directory: ${{ env.TRADINGAGENTS_REPO_DIR }}

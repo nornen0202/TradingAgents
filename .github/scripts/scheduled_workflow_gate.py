@@ -263,7 +263,12 @@ def _run_covers_target(
                 step.get("name") for step in job.get("steps", [])
                 if step.get("status") == "completed" and step.get("conclusion") == "success"
             }
-            if required_steps.issubset(completed_steps):
+            publication_handoff = (
+                "Confirm canonical collection handoff to local publisher" in completed_steps
+                or {"Rebuild merged site and Work context after YouTube collection",
+                    "Stamp rollback-resistant Pages snapshot"}.issubset(completed_steps)
+            )
+            if required_steps.issubset(completed_steps) and publication_handoff:
                 return True, (
                     f"Prior {event} run {run_id} has completed YouTube collection; "
                     "delivery remains owned by the local publisher."

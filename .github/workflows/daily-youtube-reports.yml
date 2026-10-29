@@ -575,6 +575,11 @@ jobs:
               args += ["--no-publish"]
           subprocess.check_call(args)
 
+      - name: Confirm canonical collection handoff to local publisher
+        if: ${{ vars.TRADINGAGENTS_AUTOMATION_BACKEND == 'local' && steps.runtime_gate.outputs.should_run == 'true' && (github.event_name != 'workflow_dispatch' || github.event.inputs.publish != 'false') }}
+        run: |
+          print("Canonical collection completed; local publisher owns merged build and delivery verification.")
+
       - name: Rebuild merged site and Work context after YouTube collection
         if: ${{ vars.TRADINGAGENTS_AUTOMATION_BACKEND != 'local' && steps.runtime_gate.outputs.should_run == 'true' && (github.event_name != 'workflow_dispatch' || github.event.inputs.publish != 'false') }}
         run: |
