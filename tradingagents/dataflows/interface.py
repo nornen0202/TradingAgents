@@ -36,6 +36,7 @@ from .sec_edgar_statements import (
 from .integrity import is_historical
 from .daily_history_selection import get_selected_daily_history, select_daily_history
 from .us_daily_history import SOURCE as _US_KIS_DAILY_SOURCE, fallback_enabled as _us_history_enabled
+from .alpaca_daily_history import SOURCE as _US_ALPACA_DAILY_SOURCE
 from .vendor_exceptions import (
     InsufficientIndicatorHistoryError,
     VendorConfigurationError,
@@ -471,7 +472,7 @@ def _assert_history_vendor(request: tuple[str, str], vendor: str) -> None:
     selected = get_selected_daily_history(*request)
     if selected is not None:
         source = selected["source"]
-        expected = "yfinance" if source in {"yfinance", _US_KIS_DAILY_SOURCE} else source
+        expected = "yfinance" if source in {"yfinance", _US_KIS_DAILY_SOURCE, _US_ALPACA_DAILY_SOURCE} else source
         if vendor != expected:
             # Source consistency is a hard request boundary, not a recoverable
             # vendor error that may continue to a differently adjusted series.
@@ -511,7 +512,7 @@ def _route_to_vendor(method: str, *args, **kwargs):
     history_request = _us_history_request(method, args, kwargs)
     if history_request is not None:
         selected = get_selected_daily_history(*history_request)
-        if ((selected and selected["source"] in {"yfinance", _US_KIS_DAILY_SOURCE})
+        if ((selected and selected["source"] in {"yfinance", _US_KIS_DAILY_SOURCE, _US_ALPACA_DAILY_SOURCE})
                 or (not selected and vendor_chain[0] == "yfinance")):
             # This wrapper owns the complete Yahoo -> KIS history recovery.
             # An outer Alpha Vantage fallback would bypass its series checks.
