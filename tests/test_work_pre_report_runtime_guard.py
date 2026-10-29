@@ -89,6 +89,35 @@ def test_incomplete_refresh_identity_fails_before_read(tmp_path, monkeypatch, ru
             refresh_started_at=started, fresh_report=fresh)
 
 
+@pytest.mark.parametrize("case", ["expired", "missing", "reversed", "future_observation", "future_quote", "account", "closed"])
+def test_only_verified_well_formed_expiry_can_request_one_real_refresh(tmp_path, monkeypatch, case):
+    packet = source_packet()
+    current = packet['body']['current']
+    row = current['bundle']['strategy_table'][0]
+    row['execution']['as_of'] = AT.isoformat()
+    if case == 'missing':
+        row['execution']['valid_until'] = None
+    elif case == 'reversed':
+        row['execution']['valid_until'] = (AT-timedelta(seconds=1)).isoformat()
+    elif case == 'future_observation':
+        row['execution']['as_of'] = (AT+timedelta(seconds=122)).isoformat()
+    elif case == 'future_quote':
+        current['freshness_receipt']['market_data_latest_at'] = (AT+timedelta(seconds=122)).isoformat()
+    elif case == 'account':
+        current['freshness_receipt']['account_snapshot_health'] = 'INVALID'
+    packet = seal_packet('us', body=packet['body'])
+    original = deepcopy(packet)
+    monkeypatch.setattr(work_runtime, 'build_surface_packet', lambda *args, **kwargs: packet)
+    monkeypatch.setattr(pre_report, 'market_session_state', lambda **kwargs: {'is_open': case != 'closed'})
+    runtime = WorkRuntime(tmp_path)
+    with pytest.raises(work_runtime.FreshReportSourceError) as failure:
+        runtime.prepare('us', fresh_report=True, expected_producer_run_id='verified-run',
+            refresh_started_at=AT, now=AT+timedelta(seconds=121))
+    assert failure.value.retryable_expiry is (case == 'expired')
+    assert not runtime.state_path.exists() and not runtime.ledger_path.exists() and not runtime.outbox_dir.exists()
+    assert packet == original
+
+
 @pytest.mark.parametrize("command,enabled,release_after,expected", [
     ("run-due", True, 40, True), ("run-due", True, 70, False),
     ("run-due", False, 40, False), ("publish", True, 40, False),

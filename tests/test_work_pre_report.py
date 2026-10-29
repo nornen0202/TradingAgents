@@ -176,6 +176,101 @@ def test_fresh_fixture_validity_is_not_anchored_to_test_collection_time(wired, t
     assert pre.prepare_market_report(runtime, 'us', producer_state_dir=tmp_path)['result'] == 'NEW'
 
 
+def test_expired_cold_read_retries_one_actual_overlay_and_keeps_both_receipts(wired, tmp_path, monkeypatch):
+    import json
+    from tradingagents.work.runtime import FreshReportSourceError
+    runtime, prepared, configs = wired
+    original_execute = pre.execute_scheduled_run
+    def execute(*args, **kwargs):
+        manifest = original_execute(*args, **kwargs)
+        manifest['run_id'] = f'refreshed-{len(configs)}'
+        return manifest
+    calls = []
+    def prepare(*args, **kwargs):
+        calls.append(kwargs['expected_producer_run_id'])
+        if len(calls) == 1:
+            raise FreshReportSourceError(['ROW_VALIDITY_EXPIRED_OR_MISSING'], retryable_expiry=True)
+        return {'result': 'NEW', 'event_id': 'second-only',
+                'verified_refresh_observations': {'producer_run_id': kwargs['expected_producer_run_id']}}
+    runtime.prepare = prepare
+    monkeypatch.setattr(pre, 'execute_scheduled_run', execute)
+    result = pre.prepare_market_report(runtime, 'us', producer_state_dir=tmp_path)
+    receipt = result['pre_report_refresh']
+    assert calls == ['refreshed-1', 'refreshed-2'] and len(configs) == 2
+    assert result['event_id'] == 'second-only' and receipt['refresh_attempt_count'] == receipt['refresh_attempt_limit'] == 2
+    first, second = receipt['refresh_attempts']
+    assert first['event_created'] is False and first['producer_run_id'] == 'refreshed-1'
+    assert first['status'] == 'FRESH_INPUT_UNAVAILABLE' and second['status'] == 'REFRESHED'
+    assert second['observations']['producer_run_id'] == 'refreshed-2'
+    history = list((tmp_path / 'pre-report/refresh-attempts').glob('*.json'))
+    assert len(history) == 1
+    durable = json.loads(history[0].read_text(encoding='utf-8'))
+    assert durable['attempts'] == receipt['refresh_attempts']
+    assert durable['research_rerun'] is False and durable['live_orders_submitted'] is False
+    assert all(c.run.run_mode == 'overlay_only' and not c.execution.execution_selective_rerun_enabled
+               and c.execution.execution_llm_summary_model is None for c in configs)
+
+
+def test_repeated_expiry_stops_at_two_without_allocating_an_event(wired, tmp_path):
+    from tradingagents.work.runtime import FreshReportSourceError
+    runtime, prepared, configs = wired
+    def fail(*args, **kwargs):
+        raise FreshReportSourceError(['ROW_VALIDITY_EXPIRED_OR_MISSING'], retryable_expiry=True)
+    runtime.prepare = fail
+    result = pre.prepare_market_report(runtime, 'us', producer_state_dir=tmp_path)
+    assert result['status'] == 'FRESH_INPUT_UNAVAILABLE' and result['event_created'] is False
+    assert len(configs) == result['refresh_attempt_count'] == result['refresh_attempt_limit'] == 2
+    assert len(result['refresh_attempts']) == 2 and not prepared
+
+
+@pytest.mark.parametrize('blockers,retryable', [
+    (['ROW_VALIDITY_EXPIRED_OR_MISSING'], False),
+    (['ACCOUNT_NOT_VALID'], True),
+    (['ROW_VALIDITY_EXPIRED_OR_MISSING', 'SESSION_ENDED_DURING_PREPARE'], True),
+    (['MARKET_DATA_FROM_FUTURE'], True),
+])
+def test_other_or_unverified_failures_do_not_retry_broker_collection(wired, tmp_path, blockers, retryable):
+    from tradingagents.work.runtime import FreshReportSourceError
+    runtime, prepared, configs = wired
+    def fail(*args, **kwargs):
+        raise FreshReportSourceError(blockers, retryable_expiry=retryable)
+    runtime.prepare = fail
+    result = pre.prepare_market_report(runtime, 'us', producer_state_dir=tmp_path)
+    assert result['status'] == 'FRESH_INPUT_UNAVAILABLE' and len(configs) == 1 and not prepared
+    assert not (tmp_path / 'pre-report/refresh-attempts').exists()
+
+
+def test_retry_never_competes_with_a_new_healthy_producer(wired, tmp_path):
+    from tradingagents.work.runtime import FreshReportSourceError
+    runtime, prepared, configs = wired
+    owner = interprocess_file_lock(tmp_path / 'run-due.lock', timeout=0)
+    def fail(*args, **kwargs):
+        owner.__enter__()
+        raise FreshReportSourceError(['ROW_VALIDITY_EXPIRED_OR_MISSING'], retryable_expiry=True)
+    runtime.prepare = fail
+    try:
+        result = pre.prepare_market_report(runtime, 'us', producer_state_dir=tmp_path)
+        assert result['status'] == 'BUSY_NO_STATE_ADVANCE' and result['event_created'] is False
+        assert len(configs) == 1 and not prepared
+        with pytest.raises(TimeoutError), interprocess_file_lock(tmp_path / 'run-due.lock', timeout=0):
+            pytest.fail('Existing producer ownership must be preserved')
+    finally:
+        owner.__exit__(None, None, None)
+
+
+def test_market_closing_before_retry_prevents_another_collection(wired, tmp_path, monkeypatch):
+    from tradingagents.work.runtime import FreshReportSourceError
+    runtime, prepared, configs = wired
+    states = iter([True, True, True, False])
+    monkeypatch.setattr(pre, 'market_session_state', lambda **kwargs: {'is_open': next(states), 'phase': 'closed'})
+    def fail(*args, **kwargs):
+        raise FreshReportSourceError(['ROW_VALIDITY_EXPIRED_OR_MISSING'], retryable_expiry=True)
+    runtime.prepare = fail
+    result = pre.prepare_market_report(runtime, 'us', producer_state_dir=tmp_path)
+    assert result['status'] == 'MARKET_CLOSED' and result['event_created'] is False
+    assert len(configs) == 1 and not prepared and result['refresh_attempt_count'] == 2
+
+
 def test_busy_producer_does_not_start_or_allocate_event(wired, tmp_path):
     runtime, prepared, configs = wired
     with interprocess_file_lock(tmp_path / "run-due.lock", timeout=0):
