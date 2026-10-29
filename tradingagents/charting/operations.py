@@ -9,6 +9,7 @@ import re
 
 from .bars import instant, validate_bars
 from .catalog_index import project_manifest
+from .identity import research_company_matches
 
 
 def _json(path):
@@ -110,6 +111,10 @@ def archive_catalog(archive_dir, *, analysis_as_of, only_ticker=None, include_co
             ticker_dir = (run_dir / "tickers" / ticker).resolve()
             ticker_root = (run_dir / "tickers").resolve()
             if not ticker_root.is_relative_to(root) or not ticker_dir.is_relative_to(ticker_root) or not ticker_dir.is_dir():
+                continue
+            market = (manifest.get("settings") or {}).get("market")
+            if not research_company_matches(ticker_dir, ticker, cutoff=cutoff,
+                    market=market if market in {"US", "KR"} else None):
                 continue
             selected[ticker] = {"key": key, "ticker_dir": ticker_dir, "_manifest": manifest, "_summary": summary}
     # Inspect candle/event vintages only for the selected sources, rather than

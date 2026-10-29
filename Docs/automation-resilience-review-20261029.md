@@ -237,3 +237,10 @@ budget at most four. Reserved correction attempts also block automatic excess
 retries. Use `--integrity-correction` with the certification tool only after the
 new repair has actually completed. Unverified operator cohorts are excluded from
 public history, pages and bundles while the corrected cohort is pending.
+
+The local review catalog and direct replay snapshots also reject a known
+wrong-company graph, falling back to another valid producer when available.
+Only research already available at the requested cutoff can establish that
+mismatch; future or undated identity evidence cannot alter a past chart view.
+Original archive files remain available for audit without becoming valid UI
+research or order authority.
