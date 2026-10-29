@@ -18,7 +18,7 @@ from .telegram import NotificationError
 
 
 class AdvisoryProducerNotVerified(NotificationError):
-    """No unique successful publish-enabled owner covers this collection."""
+    """No unique verified publish-enabled owner covers this collection."""
 
 
 def _all_pages(api, endpoint, field):
@@ -131,21 +131,86 @@ def admitted(run, jobs, surface, manifest):
     return collection_contains_manifest(collections[0], manifest)
 
 
-def producer_for(surface, manifest, *, api=None):
+def recovered_publication_failure(run, jobs, surface, manifest, *, published_at=None):
+    """Prove collection success followed only by a now-recovered site build.
+
+    Preserve the failed workflow result. A local verified publication may finish
+    its delivery, but cannot recover collection, cancellation or unknown failures.
+    The named merged-build step is publish-enabled, including YouTube's explicit
+    publish=false guard. Neither a skipped step nor a later no-op proves this.
+    """
+    from .local import REPOSITORY, timestamp
+    spec = SPECS[surface]
+    if (published_at is None or run.get("status") != "completed" or run.get("conclusion") != "failure"
+            or run.get("head_branch") != "main"
+            or (run.get("head_repository") or {}).get("full_name") != REPOSITORY
+            or str(run.get("path", "")).split("@", 1)[0] != f".github/workflows/{spec[0]}"):
+        return None
+    builds = [job for job in jobs if job.get("name") == spec[1]]
+    deploys = [job for job in jobs if job.get("name") == "deploy"]
+    if (len(builds) != 1 or builds[0].get("conclusion") != "failure"
+            or len(deploys) != 1 or deploys[0].get("conclusion") != "skipped"
+            or any(job is not builds[0] and job.get("conclusion") not in {"success", "skipped"} for job in jobs)):
+        return None
+    steps = builds[0].get("steps") or []
+    name = f"Rebuild merged site and Work context after {'YouTube' if surface == 'youtube' else 'PRISM'} collection"
+    collections = [step for step in steps if step.get("name") == spec[2]]
+    failures = [step for step in steps if step.get("conclusion") == "failure"]
+    stamps = [step for step in steps if step.get("name") == "Stamp rollback-resistant Pages snapshot"]
+    handoffs = [step for step in steps if step.get("name") == "Confirm canonical collection handoff to local publisher"]
+    builds_after = [step for step in steps if step.get("name") == name]
+    if (len(collections) != 1 or collections[0].get("conclusion") != "success"
+            or len(failures) != 1 or len(builds_after) != 1 or failures[0] is not builds_after[0]
+            or len(stamps) != 1 or stamps[0].get("conclusion") != "skipped"
+            or len(handoffs) > 1 or any(step.get("conclusion") != "skipped" for step in handoffs)
+            or any(step.get("status") != "completed"
+                   or step.get("conclusion") not in {"success", "skipped", "failure"} for step in steps)):
+        return None
+    try:
+        collection = collections[0]
+        failed = failures[0]
+        if (not collection_contains_manifest(collection, manifest)
+                or not timestamp(collection["completed_at"]) <= timestamp(failed["started_at"])
+                <= timestamp(failed["completed_at"]) <= published_at
+                or not steps.index(collection) < steps.index(failed) < steps.index(stamps[0])):
+            return None
+    except (KeyError, TypeError, ValueError):
+        return None
+    return failed
+
+
+def _recovery_publication_time(state, manifest, now):
+    from .local import read, timestamp
+    publication = read(state / "publication.json")
+    if (read(state / "enabled.json").get("backend") != "local"
+            or publication.get("status") != "DELIVERY_VERIFIED"
+            or not re.fullmatch(r"[0-9a-f]{40}", str(publication.get("commit", "")))):
+        return None
+    try:
+        verified = timestamp(publication.get("verified_at"))
+        return verified if timestamp(manifest["finished_at"]) <= verified <= now else None
+    except (KeyError, TypeError, ValueError):
+        return None
+
+
+def producer_for(surface, manifest, *, api=None, publication_verified_at=None):
     from .local import REPOSITORY, timestamp
     api = api or github
     since = (timestamp(manifest["started_at"]) - timedelta(days=1)).astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     runs = _all_pages(api, f"repos/{REPOSITORY}/actions/workflows/{SPECS[surface][0]}/runs?per_page=100&created=>={since}", "workflow_runs")
     matches = []
     for run in runs:
-        if run.get("status") != "completed" or run.get("conclusion") != "success":
+        if run.get("status") != "completed" or run.get("conclusion") not in {"success", "failure"}:
+            continue
+        if run.get("conclusion") == "failure" and publication_verified_at is None:
             continue
         if not (timestamp(run.get("created_at")) <= timestamp(manifest.get("started_at"))
                 and timestamp(run.get("updated_at")) >= timestamp(manifest.get("finished_at"))):
             continue
         attempt = int(run.get("run_attempt") or 1)
         jobs = _all_pages(api, f"repos/{REPOSITORY}/actions/runs/{run['id']}/attempts/{attempt}/jobs?per_page=100", "jobs")
-        if admitted(run, jobs, surface, manifest):
+        if (admitted(run, jobs, surface, manifest)
+                or recovered_publication_failure(run, jobs, surface, manifest, published_at=publication_verified_at)):
             matches.append((int(run["id"]), attempt))
     if len(matches) != 1:
         raise AdvisoryProducerNotVerified("Advisory completion lacks one publish-enabled producer.")
@@ -174,7 +239,8 @@ def queue_surface(archive, state, surface, *, now, api=None):
             if event.get("manifest_sha256") != digest:
                 raise NotificationError("Previously queued advisory source was mutated.")
             return
-    run, attempt = producer_for(surface, manifest, api=api)
+    run, attempt = producer_for(surface, manifest, api=api,
+                               publication_verified_at=_recovery_publication_time(state, manifest, now))
     queue(state, {"kind": "advisory_success", "surface": surface, "run_id": run_id,
                   "manifest_sha256": digest, "finished_at": manifest["finished_at"],
                   "upstream_run_id": run, "upstream_run_attempt": attempt})
@@ -241,10 +307,14 @@ def compose(event, archive, state, *, api=None):
         raise NotificationError("Invalid advisory producer provenance.")
     run = api(f"repos/{REPOSITORY}/actions/runs/{run_id}")
     jobs = api(f"repos/{REPOSITORY}/actions/runs/{run_id}/attempts/{attempt}/jobs?per_page=100")
-    if (run.get("run_attempt") != attempt or jobs.get("total_count", 0) >= 100
-            or not admitted(run, jobs.get("jobs") or [], surface, manifest)):
+    if run.get("run_attempt") != attempt or jobs.get("total_count", 0) >= 100:
         raise NotificationError("Advisory producer is not an admitted completed attempt.")
     with interprocess_file_lock(state / "publish.lock", timeout=PUBLICATION_LOCK_TIMEOUT_SECONDS):
+        published_at = _recovery_publication_time(state, manifest, datetime.now(timezone.utc))
+        recovered = recovered_publication_failure(
+            run, jobs.get("jobs") or [], surface, manifest, published_at=published_at)
+        if not admitted(run, jobs.get("jobs") or [], surface, manifest) and recovered is None:
+            raise NotificationError("Advisory producer is not an admitted completed attempt.")
         packet = read(state / "site" / "work" / "v1" / surface / "latest.json")
         if (read(state / "publication.json").get("status") != "DELIVERY_VERIFIED"
                 or not packet_covers(packet, surface, manifest) or not verify_live(state / "site")
@@ -253,10 +323,20 @@ def compose(event, archive, state, *, api=None):
     summary = manifest["summary"]
     detail = (f"영상 {summary['successful_videos']}/{summary['total_videos']}건 처리 · 실패 0"
               if surface == "youtube" else f"메시지 {summary['messages']}건 · 신호 {summary.get('signals', 0)}건")
-    text = (f"TradingAgents {'YouTube' if surface == 'youtube' else 'PRISM'} 자료 처리·게시 완료\n"
-            f"완료 시각: {event['finished_at']}\n{detail}\n공개 자료의 원본 실행과 실제 게시를 확인했습니다.\n"
+    title = "자료 게시 복구 완료" if recovered else "자료 처리·게시 완료"
+    recovery_note = ("수집은 성공했고 이후 게시 단계의 실패를 복구했습니다. 원래 실패 기록은 보존했습니다.\n"
+                     if recovered else "")
+    # Message identity must survive a newer verified publication of this same
+    # source. Store the actual verification clock in provenance, not message text.
+    clocks = (f"수집 완료 시각: {event['finished_at']}\n"
+              if recovered else f"완료 시각: {event['finished_at']}\n")
+    text = (f"TradingAgents {'YouTube' if surface == 'youtube' else 'PRISM'} {title}\n"
+            f"{clocks}{detail}\n공개 자료의 원본 실행과 실제 게시를 확인했습니다.\n"
+            f"{recovery_note}"
             "외부 자료의 검증 상태와 불확실성을 유지합니다. 신규 투자 분석·Work 보고서 완료나 주문 신호를 뜻하지 않습니다.")
     path = "youtube/" if surface == "youtube" else "prism-telegram/"
     return text, [[{"text": "공개 자료 보기", "url": f"{PUBLIC_BASE}/{path}"}]], {
         "conclusion": "success", "run_ids": [event["run_id"]], "surfaces": [surface],
-        "upstream_run_id": run_id, "upstream_run_attempt": attempt, "source_sha256": packet["source_sha256"]}
+        "upstream_run_id": run_id, "upstream_run_attempt": attempt, "source_sha256": packet["source_sha256"],
+        "publication_recovered": recovered is not None, "upstream_conclusion": run.get("conclusion"),
+        **({"publication_verified_at": published_at.isoformat()} if recovered else {})}

@@ -80,6 +80,121 @@ def test_completed_producer_published_exact_source_sends_once(tmp_path, monkeypa
     assert local.read(state / "notifications/results" / events[0].name)["message_ids"] == [42]
 
 
+def recovered_publication_fixture(tmp_path, monkeypatch, surface="prism"):
+    values = fixture(tmp_path, monkeypatch, surface)
+    archive, state, manifest, _, _, run, jobs = values
+    run["conclusion"] = jobs[0]["conclusion"] = "failure"
+    finished = datetime.fromisoformat(manifest["finished_at"])
+    jobs[0]["steps"][1]["conclusion"] = "skipped"
+    jobs[0]["steps"].insert(1, {
+        "name": f"Rebuild merged site and Work context after {'YouTube' if surface == 'youtube' else 'PRISM'} collection",
+        "conclusion": "failure", "started_at": (finished + timedelta(seconds=1)).isoformat(),
+        "completed_at": (finished + timedelta(minutes=2)).isoformat()})
+    for step in jobs[0]["steps"]:
+        step["status"] = "completed"
+    write(state / "enabled.json", {"backend": "local"})
+    write(state / "publication.json", {"status": "DELIVERY_VERIFIED", "commit": "a" * 40, "verified_at": NOW.isoformat()})
+    return values
+
+
+@pytest.mark.parametrize("surface", ["youtube", "prism"])
+def test_recovered_publication_sends_once_without_rewriting_failed_producer(tmp_path, monkeypatch, surface):
+    archive, state, manifest, path, _, run, jobs = recovered_publication_fixture(tmp_path, monkeypatch, surface)
+    original_bytes = path.read_bytes()
+    original_producer = json.dumps([run, jobs], sort_keys=True)
+    for _ in range(2):
+        advisory.queue_completed(archive, state, now=NOW)
+    events = list((state / "notifications/events").glob("*.json"))
+    assert len(events) == 1
+    event = local.read(events[0])
+    assert event["upstream_run_id"] == run["id"] and event["upstream_run_attempt"] == 2
+    assert not advisory.admitted(run, jobs, surface, manifest)
+    sent = []
+    class Client:
+        chat_id = "123"
+        def __init__(self, **kwargs): pass
+        def ensure_private_chat(self): pass
+        def send_message(self, message, *, buttons):
+            sent.append(message)
+            return 43
+    monkeypatch.setattr(local, "TelegramBotClient", Client)
+    receipt = local.notify(events[0].stem, archive, state)
+    assert receipt["status"] == "SENT"
+    assert receipt["publication_recovered"] is True and receipt["upstream_conclusion"] == "failure"
+    publication = local.read(state / "publication.json")
+    publication["verified_at"] = (NOW + timedelta(microseconds=1)).isoformat()
+    write(state / "publication.json", publication)
+    assert local.notify(events[0].stem, archive, state)["status"] == "NOOP"
+    assert len(sent) == 1 and "게시 복구 완료" in sent[0] and "수집 완료 시각" in sent[0]
+    assert path.read_bytes() == original_bytes and json.dumps([run, jobs], sort_keys=True) == original_producer
+
+
+@pytest.mark.parametrize("change", [
+    "collection_failed", "collection_skipped", "wrong_failure", "duplicate_failure", "duplicate_build",
+    "stamp_success", "stamp_missing", "handoff_success", "cancelled_step", "running_step",
+    "run_cancelled", "other_job_failed", "cloud_deployed", "untrusted", "wrong_workflow",
+    "failure_before_collection", "failure_after_publication", "missing_failure_clock",
+    "old_publication", "future_publication", "missing_publication_clock", "missing_commit",
+    "pending_publication", "nonlocal", "duplicate_producer",
+])
+def test_publication_recovery_rejects_incomplete_or_ambiguous_proof(tmp_path, monkeypatch, change):
+    archive, state, manifest, _, _, run, jobs = recovered_publication_fixture(tmp_path, monkeypatch)
+    steps = jobs[0]["steps"]
+    publication = local.read(state / "publication.json")
+    if change == "collection_failed": steps[0]["conclusion"] = "failure"
+    if change == "collection_skipped": steps[0]["conclusion"] = "skipped"
+    if change == "wrong_failure": steps[1]["name"] = "Unknown operation"
+    if change == "duplicate_failure": steps.append({**steps[1], "name": "Cleanup failure"})
+    if change == "duplicate_build": steps.append({**steps[1], "conclusion": "skipped"})
+    if change == "stamp_success": steps[2]["conclusion"] = "success"
+    if change == "stamp_missing": steps.pop(2)
+    if change == "handoff_success": steps.append({"name": "Confirm canonical collection handoff to local publisher", "conclusion": "success", "status": "completed"})
+    if change == "cancelled_step": steps.append({"name": "Cancelled", "conclusion": "cancelled", "status": "completed"})
+    if change == "running_step": steps[1]["status"] = "in_progress"
+    if change == "run_cancelled": run["conclusion"] = "cancelled"
+    if change == "other_job_failed": jobs.append({"name": "other", "conclusion": "failure"})
+    if change == "cloud_deployed": jobs[1]["conclusion"] = "success"
+    if change == "untrusted": run["head_branch"] = "untrusted"
+    if change == "wrong_workflow": run["path"] = ".github/workflows/unrelated.yml"
+    if change == "failure_before_collection": steps[1]["started_at"] = manifest["started_at"]
+    if change == "failure_after_publication": steps[1]["completed_at"] = (NOW + timedelta(seconds=1)).isoformat()
+    if change == "missing_failure_clock": steps[1].pop("completed_at")
+    if change == "old_publication": publication["verified_at"] = manifest["finished_at"]
+    if change == "future_publication": publication["verified_at"] = (NOW + timedelta(seconds=1)).isoformat()
+    if change == "missing_publication_clock": publication.pop("verified_at")
+    if change == "missing_commit": publication.pop("commit")
+    if change == "pending_publication": publication["status"] = "PAGES_PENDING"
+    if change == "nonlocal": write(state / "enabled.json", {"backend": "github"})
+    write(state / "publication.json", publication)
+    if change == "duplicate_producer":
+        original_api = advisory.github
+        monkeypatch.setattr(advisory, "github", lambda endpoint: (
+            {"workflow_runs": [run, {**run, "id": run["id"] + 1}]} if "/workflows/" in endpoint else original_api(endpoint)))
+    if change == "pending_publication":
+        advisory.queue_completed(archive, state, now=NOW)
+    else:
+        with pytest.raises(NotificationError):
+            advisory.queue_completed(archive, state, now=NOW)
+    assert not list((state / "notifications/events").glob("*.json"))
+
+
+@pytest.mark.parametrize("change", ["live_packet", "live_site", "publication", "owner", "producer", "source"])
+def test_recovered_publication_is_revalidated_before_sending(tmp_path, monkeypatch, change):
+    archive, state, manifest, path, _, run, _ = recovered_publication_fixture(tmp_path, monkeypatch)
+    advisory.queue_completed(archive, state, now=NOW)
+    event = next((state / "notifications/events").glob("*.json"))
+    if change == "live_packet": monkeypatch.setattr(advisory, "verify_packet_live", lambda *_: False)
+    if change == "live_site": monkeypatch.setattr(automation, "verify_live", lambda *_: False)
+    if change == "publication": write(state / "publication.json", {"status": "BUILDING"})
+    if change == "owner": write(state / "enabled.json", {"backend": "github"})
+    if change == "producer": run["run_attempt"] += 1
+    if change == "source": write(path, {**manifest, "changed": True})
+    monkeypatch.setattr(local, "TelegramBotClient", lambda **_: pytest.fail("unverified recovery must not send"))
+    with pytest.raises(NotificationError):
+        local.notify(event.stem, archive, state)
+    assert not (state / "notifications/results" / event.name).exists()
+
+
 @pytest.mark.parametrize("surface", ["youtube", "prism"])
 @pytest.mark.parametrize("handoff", ["success", "skipped", "failure", "duplicate", "both_paths"])
 def test_local_collection_handoff_replaces_cloud_stamp(tmp_path, monkeypatch, surface, handoff):

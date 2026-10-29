@@ -1341,6 +1341,11 @@ def _safe_receipt_metadata(value: dict[str, Any]) -> dict[str, Any]:
     allowed = {
         "repository",
         "upstream_run_id",
+        "upstream_run_attempt",
+        "upstream_conclusion",
+        "publication_recovered",
+        "publication_verified_at",
+        "source_sha256",
         "workflow_name",
         "conclusion",
         "markets",

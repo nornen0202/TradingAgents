@@ -10,7 +10,10 @@ import json
 import os
 import re
 import subprocess
+import time
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta, timezone
+from itertools import islice
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
@@ -133,18 +136,28 @@ def _queue_completed_locked(archive, state, *, now=None):
         marker = {"started_at": now.isoformat()}
         atomic_write_json(marker_path, marker)
     marker_started = timestamp(marker["started_at"])
-    invalid = 0
-    for path in (archive / "runs").glob("*/*/run.json"):
+    scan_started = time.perf_counter()
+    def completion(path):
         try:
-            event = _completion_event(read(path), archive, strategy, marker_started, now)
+            return _completion_event(read(path), archive, strategy, marker_started, now), 0
         except (OSError, ValueError, TypeError, KeyError, AttributeError, NotificationError):
-            invalid += 1
-            continue
-        if event:
-            queue(state, event)
+            return None, 1
+    invalid = scanned = 0
+    paths = iter((archive / "runs").glob("*/*/run.json"))
+    # A serial scan held the publication lock for over a minute on the live
+    # removable-volume archive. Bound in-flight originals to four, keep every
+    # validation and its fixed cutoff, and write the outbox in original order.
+    with ThreadPoolExecutor(max_workers=4) as workers:
+        while batch := list(islice(paths, 4)):
+            for event, corrupt in workers.map(completion, batch):
+                scanned += 1
+                invalid += corrupt
+                if event:
+                    queue(state, event)
     atomic_write_json(state / "notifications/health/market_sources.json", {
         "notification_status": "DEGRADED" if invalid else "CHECKED",
-        "invalid_manifests": invalid, "checked_at": now.isoformat()})
+        "invalid_manifests": invalid, "scanned_manifests": scanned,
+        "scan_seconds": round(time.perf_counter() - scan_started, 3), "checked_at": now.isoformat()})
 
 
 def _completion_event(manifest, archive, strategy, marker_started, now):
@@ -226,7 +239,7 @@ def _reconcile_event(state, path, *, now, runner, completions_allowed):
     atomic_write_json(receipt_path, {"status": "DISPATCH_ACCEPTED" if sent.returncode == 0 else "DISPATCH_FAILED",
                                     "attempts": attempt, "dispatched_at": now.isoformat()})
 
-def reconcile_safely(archive, state, *, publication_locked=False):
+def reconcile_safely(archive, state, *, publication_locked=False, discover_completions=True):
     from .advisory import queue_completed as queue_advisory_completed
     # One unavailable advisory/API must not starve independent failures or
     # already queued market completions of their notification dispatch.
@@ -243,7 +256,8 @@ def reconcile_safely(archive, state, *, publication_locked=False):
         except OSError:
             pass
 
-    for stage, prepare in (("market_queue", queue_completed), ("advisory_queue", queue_advisory_completed)):
+    discovery = (("market_queue", queue_completed), ("advisory_queue", queue_advisory_completed)) if discover_completions else ()
+    for stage, prepare in discovery:
         try:
             prepare(archive, state, publication_locked=publication_locked)
             health(stage)
@@ -399,5 +413,10 @@ def notify(key, archive, state, *, dry_run=False):
         incident_key=incident, incident_cooldown_seconds=6 * 3600,
     )
     result.update(local_event_id=key, workflow_run_id=os.getenv("GITHUB_RUN_ID"), verified_at=datetime.now(timezone.utc).isoformat())
+    if event["kind"] == "advisory_success":
+        result.update({field: metadata[field] for field in (
+            "upstream_run_id", "upstream_run_attempt", "upstream_conclusion",
+            "publication_recovered", "publication_verified_at", "source_sha256",
+        ) if field in metadata})
     atomic_write_json(state / "notifications" / "results" / f"{key}.json", result)
     return result

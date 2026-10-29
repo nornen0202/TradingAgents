@@ -369,6 +369,30 @@ def test_notification_transport_failure_does_not_terminate_production(tmp_path, 
     local.reconcile_safely(tmp_path, tmp_path)
 
 
+def test_minute_producer_dispatches_existing_events_without_history_discovery(tmp_path, monkeypatch):
+    from tradingagents.notifications import advisory
+    archive, state, _, success = prepared(tmp_path, monkeypatch)
+    failure = local.queue_failure(state, stage="analysis", source_key="today", error_type="WorkerExitError",
+                                  finished_at=NOW.isoformat())
+    def forbidden(*args, **kwargs):
+        pytest.fail("Completion history belongs to the publication lane")
+    monkeypatch.setattr(local, "queue_completed", forbidden)
+    monkeypatch.setattr(advisory, "queue_completed", forbidden)
+    monkeypatch.setattr(automation, "prepare_environment", lambda: None)
+    monkeypatch.setattr(automation, "drain_actions", lambda *a, **k: [])
+    monkeypatch.setattr(automation, "run_due", lambda *a, **k: [])
+    monkeypatch.setattr(automation.sys, "argv", ["local", "run-due", "--archive-dir", str(archive),
+                        "--state-dir", str(state), "--runtime-dir", str(tmp_path / "runtime")])
+    calls, actual = [], local.reconcile
+    monkeypatch.setattr(local, "reconcile", lambda destination, **kwargs: actual(
+        destination, now=NOW, runner=lambda args, **kw: calls.append(args) or SimpleNamespace(
+            returncode=0, stdout="[]"), **kwargs))
+    assert automation.main() == 0
+    assert sum(call[1] == "workflow" for call in calls) == 2
+    for key in (success, failure):
+        assert local.read(state / "notifications/dispatches" / f"{key}.json")["attempts"] == 1
+
+
 def test_market_admission_yields_to_publisher_without_blocking_failures(tmp_path, monkeypatch):
     archive, state = tmp_path / "archive", tmp_path / "state"
     manifest = completed(archive)
@@ -491,6 +515,46 @@ def test_corrupt_history_does_not_starve_valid_market_notice(tmp_path, bad):
     local.queue_completed(archive, state, now=NOW)
     events = list((state / "notifications/events").glob("*.json"))
     assert len(events) == 1 and local.read(events[0])["run_id"] == good["run_id"]
+
+
+def test_notification_scan_bounds_parallel_reads_and_serializes_outbox(tmp_path, monkeypatch):
+    from threading import Barrier, Lock, get_ident
+    archive, state = tmp_path / "archive", tmp_path / "state"
+    good = completed(archive)
+    for i in range(7):
+        completed(archive, run_id=f"old-{i}", finished_at=(NOW - timedelta(days=2)).isoformat())
+    published_strategy(state, good)
+    write(state / "publication.json", {"status": "DELIVERY_VERIFIED"})
+    original = local.read
+    barrier, guard = Barrier(4), Lock()
+    active = maximum = 0
+    owners = set()
+    def parallel_read(path):
+        nonlocal active, maximum
+        if path.name != "run.json":
+            return original(path)
+        with guard:
+            active += 1
+            maximum = max(maximum, active)
+            owners.add(get_ident())
+        try:
+            barrier.wait(timeout=10)
+            return original(path)
+        finally:
+            with guard:
+                active -= 1
+    monkeypatch.setattr(local, "read", parallel_read)
+    outbox_owner = get_ident()
+    original_queue = local.queue
+    def serial_queue(*args, **kwargs):
+        assert get_ident() == outbox_owner
+        return original_queue(*args, **kwargs)
+    monkeypatch.setattr(local, "queue", serial_queue)
+    local.queue_completed(archive, state, now=NOW)
+    assert maximum == 4 and len(owners) == 4
+    assert len(list((state / "notifications/events").glob("*.json"))) == 1
+    health = original(state / "notifications/health/market_sources.json")
+    assert health["scanned_manifests"] == 8 and health["invalid_manifests"] == 0 and health["scan_seconds"] >= 0
 
 
 def test_corrupt_outbox_receipt_cannot_starve_an_independent_failure(tmp_path):
