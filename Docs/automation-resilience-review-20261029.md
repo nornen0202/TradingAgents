@@ -220,3 +220,20 @@ unchanged. Research baseline selection, scheduler completion and notifications
 revalidate the certificate, and its creation changes the publication fingerprint.
 Mutated evidence revokes admission. Certification grants no execution freshness,
 order permission or extension of research age.
+
+The SPG incident also exposed a semantic failure: a worker can complete while
+its graph researches Korean SPG (`058610.KQ`) instead of US Simon Property Group
+(`SPG`). Declared scheduled market now reaches the graph's scoped resolver and
+trade-date/name resolution. Qualified Korean symbols remain distinct. Recovery
+compares each stored graph's `company_of_interest` with its required instrument;
+a deterministic mismatch is a retry target even if the original run says
+success. The original status and files remain immutable.
+
+An operator source certificate with such a mismatch is lineage evidence only:
+it cannot become a baseline or public report. A separate, terminal correction
+certificate requires the actual corrected cohort, unchanged valid research,
+original failed-attempt hashes and the combined original/manual/correction
+budget at most four. Reserved correction attempts also block automatic excess
+retries. Use `--integrity-correction` with the certification tool only after the
+new repair has actually completed. Unverified operator cohorts are excluded from
+public history, pages and bundles while the corrected cohort is pending.

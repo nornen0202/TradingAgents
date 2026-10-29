@@ -44,7 +44,8 @@ def test_unmounted_volume_does_not_loop_forever(tmp_path, monkeypatch):
         unpatched.require_storage_headroom(tmp_path / "disconnected-volume")
 
 
-def test_manual_finalization_counts_against_existing_budget_without_rewriting_history(tmp_path, monkeypatch):
+@pytest.mark.parametrize("integrity", [False, True])
+def test_manual_finalization_counts_against_existing_budget_without_rewriting_history(tmp_path, monkeypatch, integrity):
     import hashlib
     from tradingagents.scheduled import runner
     from tradingagents import local_advisory_recovery
@@ -61,6 +62,11 @@ def test_manual_finalization_counts_against_existing_budget_without_rewriting_hi
     manual = tmp_path / "finalization-recovery" / f"{key}.json"
     manual.parent.mkdir()
     manual.write_text(json.dumps({"attempts": 1, "status": "FAILED"}))
+    if integrity:
+        item.max_failed_attempts = 3
+        correction = tmp_path / "research-integrity-recovery" / f"{key}.json"
+        correction.parent.mkdir()
+        correction.write_text(json.dumps({"attempts": 1, "status": "RESERVED"}))
     before = original.read_bytes()
     assert local.run_due(tmp_path / "archive", tmp_path, now=now) == [
         {"target": item.name, "status": "RETRY_BUDGET_OR_COOLDOWN"}]

@@ -44,7 +44,8 @@ def build_site(archive_dir: Path, site_dir: Path, settings: SiteSettings) -> lis
     build_started = time.monotonic()
     archive_dir = Path(archive_dir)
     site_dir = Path(site_dir)
-    manifests = _load_run_manifests(archive_dir)
+    manifests = [m for m in _load_run_manifests(archive_dir)
+                 if _operator_publication_eligible(archive_dir, m)]
     published_manifests = _select_published_manifests(manifests, settings)
     print(f"Pages build: publishing {len(published_manifests)} of {len(manifests)} archived runs", flush=True)
     published_run_ids = {str(manifest.get("run_id") or "") for manifest in published_manifests}
@@ -109,6 +110,20 @@ def build_site(archive_dir: Path, site_dir: Path, settings: SiteSettings) -> lis
     return manifests
 
 
+def _operator_publication_eligible(archive_dir, manifest):
+    """Keep an unadmitted operator cohort out of public reports and bundles."""
+    market = str((manifest.get("settings") or {}).get("market", "")).lower()
+    label = manifest.get("label")
+    now = datetime.now(timezone.utc)
+    if label == f"manual-{market}-identity-recovery":
+        from .operator_admission import verified_operator_research
+        return verified_operator_research(archive_dir, manifest, now=now)
+    if label == f"manual-{market}-integrity-recovery":
+        from .research_recovery import verified_completed_recovery
+        return verified_completed_recovery(archive_dir, manifest, now=now)
+    return True
+
+
 def _write_run_pages(site_dir, manifest, settings, manifests):
     run_dir = Path(manifest["_run_dir"])
     portfolio_summary = _load_portfolio_summary(run_dir)
@@ -143,6 +158,8 @@ def publish_daily_report_history(archive_dir, site_dir, settings, *, manifests=N
     manifests = _load_run_manifests(archive_dir) if manifests is None else manifests
     rows = []
     for manifest in manifests:
+        if not _operator_publication_eligible(archive_dir, manifest):
+            continue
         if not _is_daily_analysis_run(manifest) or manifest.get("status") not in {"success", "partial_failure"}:
             continue
         try:

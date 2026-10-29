@@ -33,7 +33,9 @@ def operator(recovery, tmp_path):  # noqa: F811 -- imported pytest fixture
     )
     m["tickers"] = m["tickers"][:1]
     m["summary"].update(total_tickers=1, successful_tickers=1, failed_tickers=0)
-    m["active_universe"].update(active_count=1, selected_tickers=["AAPL"])
+    m["active_universe"].update(
+        active_count=1, selected_tickers=["AAPL"], expected_watchlist_tickers=["AAPL"]
+    )
     m["active_universe"]["coverage"].update(complete=True, analysis_complete=True)
     m["settings"].update(
         provider="codex",

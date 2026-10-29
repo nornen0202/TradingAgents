@@ -18,10 +18,13 @@ from .research_recovery import (
     _read,
     _research_date,
     _tickers,
+    _identity_failures,
 )
 
 CERTIFICATE = "operator-production-admission.json"
 SCHEMA = "tradingagents.operator-production-admission/v1"
+INTEGRITY_CERTIFICATE = "operator-integrity-budget.json"
+INTEGRITY_SCHEMA = "tradingagents.operator-integrity-budget/v1"
 
 
 def _sha(path):
@@ -223,10 +226,24 @@ def _evidence(archive, manifest, original, repair, *, now):
         "original_target_key": repair["original_target_key"],
         "cumulative_attempts": counts[0] + counts[1],
         "cumulative_limit": 4,
+        "invalid_research": _identity_failures(canonical, directory),
     }
 
 
 def verified_operator_research(archive_dir, manifest, *, now):
+    return _verified_certificate(
+        archive_dir, manifest, now=now, require_valid_research=True
+    )
+
+
+def verified_operator_lineage_source(archive_dir, manifest, *, now):
+    """Budget/provenance only; never admit identified wrong-company research."""
+    return _verified_certificate(
+        archive_dir, manifest, now=now, require_valid_research=False
+    )
+
+
+def _verified_certificate(archive_dir, manifest, *, now, require_valid_research):
     """Fail closed without a terminal, byte-bound canonical certificate."""
     try:
         archive = Path(archive_dir)
@@ -245,8 +262,14 @@ def verified_operator_research(archive_dir, manifest, *, now):
             repair["finished_at"]
         ) <= certified <= _instant(now):
             return False
-        return certificate["evidence"] == _evidence(
+        evidence = _evidence(
             archive, manifest, certificate["original_receipt"], repair, now=certified
+        )
+        return (
+            certificate["evidence"] == evidence
+            and certificate.get("baseline_eligible")
+            is (not bool(evidence["invalid_research"]))
+            and (not require_valid_research or not evidence["invalid_research"])
         )
     except (OSError, ValueError, TypeError, KeyError, AttributeError):
         return False
@@ -304,7 +327,7 @@ def certify_operator_research(*, archive_dir, state_dir, run_id, target_key, now
         if path.exists():
             existing = _read(path)
             if (
-                not verified_operator_research(archive, manifest, now=now)
+                not verified_operator_lineage_source(archive, manifest, now=now)
                 or existing.get("evidence") != evidence
                 or existing.get("original_receipt") != original
                 or existing.get("repair_receipt") != repair
@@ -318,6 +341,201 @@ def certify_operator_research(*, archive_dir, state_dir, run_id, target_key, now
             "certified_at": _instant(now).isoformat(),
             "original_receipt": original,
             "repair_receipt": repair,
+            "evidence": evidence,
+            "baseline_eligible": not bool(evidence["invalid_research"]),
+        }
+        atomic_write_json(path, certificate)
+        return certificate
+
+
+def _integrity_evidence(archive, manifest, parent, receipt, *, now):
+    source, source_dir = _load_one_terminal_source(
+        archive_dir=archive,
+        source_run_id=parent["run_id"],
+        now=now,
+        completed_head=True,
+    )
+    child, directory = _load_one_terminal_source(
+        archive_dir=archive,
+        source_run_id=manifest["run_id"],
+        now=now,
+        completed_head=True,
+    )
+    if source != parent or child != {
+        k: v for k, v in manifest.items() if not k.startswith("_")
+    }:
+        raise ValueError("Noncanonical integrity correction source")
+    certificate = _read(source_dir / CERTIFICATE)
+    invalid = certificate["evidence"]["invalid_research"]
+    market = child["settings"]["market"].lower()
+    recovery = child.get("research_recovery") or {}
+    if (
+        not verified_operator_lineage_source(archive, source, now=now)
+        or not invalid
+        or child.get("label") != f"manual-{market}-integrity-recovery"
+        or not child["run_id"].endswith("_" + child["label"])
+        or recovery.get("source_run_id") != source["run_id"]
+        or recovery.get("invalid_research") != invalid
+        or set(recovery.get("retry_tickers") or []) != set(invalid)
+        or _identity_failures(child, directory)
+    ):
+        raise ValueError("Correction does not repair the proven wrong-company research")
+    if (
+        receipt.get("schema") != INTEGRITY_SCHEMA
+        or receipt.get("status") != "COMPLETED"
+        or type(receipt.get("attempts")) is not int
+        or receipt["attempts"] != 1
+        or type(receipt.get("exit_code")) is not int
+        or receipt["exit_code"] != 0
+        or type(receipt.get("orders_sent")) is not int
+        or receipt["orders_sent"] != 0
+        or receipt.get("run_id") != child["run_id"]
+        or receipt.get("source_run_id") != source["run_id"]
+        or receipt.get("source_certificate_sha256") != _sha(source_dir / CERTIFICATE)
+        or receipt.get("original_target_key")
+        != certificate["evidence"]["original_target_key"]
+        or type(receipt.get("original_attempts")) is not int
+        or receipt["original_attempts"] != certificate["original_receipt"]["attempts"]
+        or type(receipt.get("original_manual_attempts")) is not int
+        or receipt["original_manual_attempts"]
+        != certificate["repair_receipt"]["attempts"]
+        or type(receipt.get("cumulative_limit")) is not int
+        or receipt["cumulative_limit"] != 4
+        or certificate["evidence"]["cumulative_attempts"] + receipt["attempts"] > 4
+        or not re.fullmatch(r"[a-f0-9]{40}", str(child.get("source_revision")))
+        or receipt.get("source_revision") != child["source_revision"]
+    ):
+        raise ValueError("Correction attempt budget or source identity is unverified")
+    attempt = _read(directory / "attempt.json")
+    if not (
+        _instant(source["finished_at"])
+        <= _instant(receipt["started_at"])
+        <= _instant(child["started_at"])
+        <= _instant(child["finished_at"])
+        <= _instant(attempt["finished_at"])
+        <= _instant(receipt["finished_at"])
+        <= _instant(now)
+    ):
+        raise ValueError("Correction attempt clocks are unverified")
+    owned = []
+    for path in (archive / "runs").glob(
+        f"*/*_manual-{market}-integrity-recovery/attempt.json"
+    ):
+        candidate = _read(path)
+        if (
+            _instant(receipt["started_at"])
+            <= _instant(candidate["started_at"])
+            <= _instant(receipt["finished_at"])
+        ):
+            owned.append(candidate.get("run_id"))
+    if owned != [child["run_id"]]:
+        raise ValueError("Correction receipt identifies multiple or missing attempts")
+    return {
+        "run_id": child["run_id"],
+        "source_run_id": source["run_id"],
+        "manifest_sha256": _sha(directory / "run.json"),
+        "attempt_sha256": _sha(directory / "attempt.json"),
+        "source_certificate_sha256": _sha(source_dir / CERTIFICATE),
+        "invalid_research": invalid,
+        "original_target_key": receipt["original_target_key"],
+        "cumulative_attempts": certificate["evidence"]["cumulative_attempts"]
+        + receipt["attempts"],
+        "cumulative_limit": 4,
+    }
+
+
+def verified_integrity_budget(archive_dir, manifest, parent, *, now):
+    try:
+        archive = Path(archive_dir)
+        run_id = manifest["run_id"]
+        if not isinstance(run_id, str) or not re.fullmatch(
+            r"\d{8}T\d{6}_[A-Za-z0-9_-]+", run_id
+        ):
+            return False
+        directory = (archive / "runs" / run_id[:4] / run_id).resolve()
+        if not directory.is_relative_to(archive.resolve()):
+            return False
+        certificate = _read(directory / INTEGRITY_CERTIFICATE)
+        certified = _instant(certificate["certified_at"])
+        if certificate.get("schema") != INTEGRITY_SCHEMA or not certified <= _instant(
+            now
+        ):
+            return False
+        return certificate["evidence"] == _integrity_evidence(
+            archive, manifest, parent, certificate["repair_receipt"], now=certified
+        )
+    except (OSError, ValueError, TypeError, KeyError, AttributeError):
+        return False
+
+
+def certify_integrity_recovery(*, archive_dir, state_dir, run_id, target_key, now=None):
+    archive, state = Path(archive_dir), Path(state_dir)
+    if (
+        not isinstance(run_id, str)
+        or not re.fullmatch(r"\d{8}T\d{6}_[A-Za-z0-9_-]+", run_id)
+        or not re.fullmatch(r"[a-f0-9]{64}", str(target_key))
+    ):
+        raise ValueError("Invalid correction identity")
+    now = datetime.now(timezone.utc) if now is None else now
+    directory = (archive / "runs" / run_id[:4] / run_id).resolve()
+    if not directory.is_relative_to(archive.resolve()):
+        raise ValueError("Correction source escapes archive")
+    with interprocess_file_lock(state / "research-kis.lock", timeout=0):
+        raw = _read(state / "research-integrity-recovery" / f"{target_key}.json")
+        receipt = {
+            k: raw[k]
+            for k in (
+                "schema",
+                "status",
+                "attempts",
+                "exit_code",
+                "orders_sent",
+                "run_id",
+                "source_run_id",
+                "source_revision",
+                "source_certificate_sha256",
+                "original_target_key",
+                "original_attempts",
+                "original_manual_attempts",
+                "cumulative_limit",
+                "started_at",
+                "finished_at",
+            )
+            if k in raw
+        }
+        original = _read(state / "attempts" / f"{target_key}.json")
+        manual = _read(state / "finalization-recovery" / f"{target_key}.json")
+        if (
+            receipt.get("original_target_key") != target_key
+            or original.get("attempts") != receipt.get("original_attempts")
+            or manual.get("attempts") != receipt.get("original_manual_attempts")
+        ):
+            raise ValueError("Original correction attempt counters changed")
+        manifest = _read(directory / "run.json")
+        parent_id = manifest["research_recovery"]["source_run_id"]
+        parent, _ = _load_one_terminal_source(
+            archive_dir=archive, source_run_id=parent_id, now=now, completed_head=True
+        )
+        evidence = _integrity_evidence(archive, manifest, parent, receipt, now=now)
+        from .research_recovery import _load_recovery_lineage
+
+        _load_recovery_lineage(
+            archive_dir=archive, source_run_id=run_id, now=now, completed_head=True
+        )
+        path = directory / INTEGRITY_CERTIFICATE
+        if path.exists():
+            existing = _read(path)
+            if (
+                not verified_integrity_budget(archive, manifest, parent, now=now)
+                or existing.get("evidence") != evidence
+                or existing.get("repair_receipt") != receipt
+            ):
+                raise ValueError("Existing correction certificate changed")
+            return existing
+        certificate = {
+            "schema": INTEGRITY_SCHEMA,
+            "certified_at": _instant(now).isoformat(),
+            "repair_receipt": receipt,
             "evidence": evidence,
         }
         atomic_write_json(path, certificate)

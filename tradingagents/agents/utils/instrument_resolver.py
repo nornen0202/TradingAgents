@@ -410,6 +410,7 @@ _US_COMPANIES = {
     "ORCL": "Oracle",
     "QCOM": "Qualcomm",
     "SGOV": "iShares 0-3 Month Treasury Bond ETF",
+    "SPG": "Simon Property Group",
     "SMCI": "Super Micro Computer",
     "SNOW": "Snowflake",
     "SNPS": "Synopsys",
@@ -432,12 +433,28 @@ def is_krx_symbol(symbol: str) -> bool:
     return bool(re.fullmatch(r"\d{6}\.(KS|KQ)", symbol.upper()))
 
 
-def resolve_instrument(user_input: str) -> InstrumentProfile:
+def resolve_instrument(user_input: str, *, market: str | None = None) -> InstrumentProfile:
     raw_value = (user_input or "").strip()
     if not raw_value:
         raise InstrumentResolutionError("Instrument input is empty.")
 
     upper = raw_value.upper()
+    if market is None:
+        from tradingagents.dataflows.config import get_config
+        market = get_config().get("instrument_market")
+    if market is not None:
+        if market not in {"US", "KR"}:
+            raise InstrumentResolutionError("Explicit instrument market must be US or KR.")
+        if market == "US":
+            if not re.fullmatch(r"[A-Za-z][A-Za-z0-9.\-]{0,14}", raw_value):
+                raise InstrumentResolutionError("Instrument does not belong to the explicit US market.")
+            return _build_us_profile(raw_value, upper)
+    # A real US ticker must not be replaced by a Korean company's English
+    # alias. Scoped graph settings disambiguate the same bare spelling in KR.
+    if upper in _US_COMPANIES and upper in _ALIAS_TO_KRX_CODE and market is None:
+        from tradingagents.dataflows.config import get_config
+        if get_config().get("market_country") != "KR":
+            return _build_us_profile(raw_value, upper)
     code = _ALIAS_TO_KRX_CODE.get(upper)
     if code:
         return _build_krx_profile(raw_value, code)
@@ -453,24 +470,20 @@ def resolve_instrument(user_input: str) -> InstrumentProfile:
             return _build_krx_profile(raw_value, raw_value)
         return _build_generic_krx_profile(raw_value, f"{raw_value}.KS", raw_value)
 
-    if re.fullmatch(r"[A-Za-z][A-Za-z0-9.\-]{0,14}", raw_value):
-        display_name = _US_COMPANIES.get(upper, upper)
-        return InstrumentProfile(
-            input_symbol=raw_value,
-            normalized_symbol=upper,
-            display_name=display_name,
-            country="US",
-            exchange="US",
-            timezone="US/Eastern",
-            currency="USD",
-            display_name_en=display_name,
-            yahoo_symbol=upper,
-            aliases=tuple(dict.fromkeys((upper, display_name))),
-        )
+    if market != "KR" and re.fullmatch(r"[A-Za-z][A-Za-z0-9.\-]{0,14}", raw_value):
+        return _build_us_profile(raw_value, upper)
 
     raise InstrumentResolutionError(
         f"Could not resolve instrument '{user_input}'. Pass an exchange-qualified ticker or a known company name/code."
     )
+
+
+def _build_us_profile(raw_value: str, upper: str) -> InstrumentProfile:
+    display_name = _US_COMPANIES.get(upper, upper)
+    return InstrumentProfile(input_symbol=raw_value, normalized_symbol=upper,
+        display_name=display_name, country="US", exchange="US", timezone="US/Eastern",
+        currency="USD", display_name_en=display_name, yahoo_symbol=upper,
+        aliases=tuple(dict.fromkeys((upper, display_name))))
 
 
 def _build_krx_profile(input_symbol: str, code: str) -> InstrumentProfile:

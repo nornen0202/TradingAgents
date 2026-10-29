@@ -27,7 +27,7 @@ def test_new_analysis_or_error_persists_trace_after_scope_reset(tmp_path, monkey
         _, normalized = invoke_structured_decision_with_retry(llm, "fixture", context="portfolio manager final decision")
         if failure:
             raise RuntimeError("fixture graph failure")
-        return {"final_trade_decision": normalized, "messages": []}, "HOLD"
+        return {"company_of_interest":"AAPL", "final_trade_decision": normalized, "messages": []}, "HOLD"
 
     graph = SimpleNamespace(propagate=propagate, close=Mock())
     monkeypatch.setattr(runner, "TradingAgentsGraph", lambda *a, **kw: graph)
