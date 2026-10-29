@@ -33,7 +33,7 @@ if ($PSCmdlet.ShouldProcess($stateRoot, 'Enable persistent local-only paper simu
         $periodic = New-ScheduledTaskTrigger -Once -At ([DateTime]::Now.AddSeconds(30)) -RepetitionInterval (New-TimeSpan -Minutes $minutes)
         $logon = New-ScheduledTaskTrigger -AtLogOn -User $identity
         $logon.Delay = 'PT30S'
-        $settings = New-ScheduledTaskSettingsSet -MultipleInstances IgnoreNew -StartWhenAvailable -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -Hidden `
+        $settings = New-ScheduledTaskSettingsSet -Priority 4 -MultipleInstances IgnoreNew -StartWhenAvailable -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -Hidden `
             -ExecutionTimeLimit $(if ($command -eq 'paper') { New-TimeSpan -Minutes 10 } else { [TimeSpan]::Zero }) `
             -RestartCount 3 -RestartInterval (New-TimeSpan -Minutes 1)
         Register-ScheduledTask -TaskPath '\TradingAgents\' -TaskName $name -Action $action -Trigger @($periodic,$logon) -Principal $principal -Settings $settings -Force | Out-Null

@@ -31,7 +31,7 @@ if ($PSCmdlet.ShouldProcess($stateRoot, 'Enable validation-gated KR/US KIS mock 
     $periodic = New-ScheduledTaskTrigger -Once -At ([DateTime]::Now.AddSeconds(45)) -RepetitionInterval (New-TimeSpan -Minutes 1)
     $logon = New-ScheduledTaskTrigger -AtLogOn -User $identity
     $logon.Delay = 'PT45S'
-    $settings = New-ScheduledTaskSettingsSet -MultipleInstances IgnoreNew -StartWhenAvailable -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -Hidden `
+    $settings = New-ScheduledTaskSettingsSet -Priority 4 -MultipleInstances IgnoreNew -StartWhenAvailable -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -Hidden `
         -ExecutionTimeLimit (New-TimeSpan -Minutes 10) -RestartCount 3 -RestartInterval (New-TimeSpan -Minutes 1)
     Register-ScheduledTask -TaskPath '\TradingAgents\' -TaskName 'LocalAutomation-strategy-kis' -Action $action -Trigger @($periodic,$logon) -Principal $principal -Settings $settings -Force | Out-Null
     if (-not $NoStart) { Start-ScheduledTask -TaskPath '\TradingAgents\' -TaskName 'LocalAutomation-strategy-kis' }
