@@ -186,7 +186,7 @@ jobs:
           main()
 
       - name: Rebuild base scheduled site
-        if: ${{ steps.runtime_gate.outputs.should_run == 'true' }}
+        if: ${{ vars.TRADINGAGENTS_AUTOMATION_BACKEND != 'local' && steps.runtime_gate.outputs.should_run == 'true' }}
         working-directory: ${{ env.TRADINGAGENTS_REPO_DIR }}
         run: |
           import os
@@ -247,7 +247,7 @@ jobs:
           subprocess.check_call(args)
 
       - name: Rebuild merged site and Work context after PRISM collection
-        if: ${{ steps.runtime_gate.outputs.should_run == 'true' }}
+        if: ${{ vars.TRADINGAGENTS_AUTOMATION_BACKEND != 'local' && steps.runtime_gate.outputs.should_run == 'true' }}
         working-directory: ${{ env.TRADINGAGENTS_REPO_DIR }}
         run: |
           import os
@@ -271,7 +271,7 @@ jobs:
           subprocess.check_call(args)
 
       - name: Stamp rollback-resistant Pages snapshot
-        if: ${{ steps.runtime_gate.outputs.should_run == 'true' }}
+        if: ${{ vars.TRADINGAGENTS_AUTOMATION_BACKEND != 'local' && steps.runtime_gate.outputs.should_run == 'true' }}
         id: stamp_pages_snapshot
         working-directory: ${{ env.TRADINGAGENTS_REPO_DIR }}
         run: |
@@ -301,7 +301,7 @@ jobs:
           )
 
       - name: Add Git Bash to PATH for Pages packaging
-        if: ${{ steps.runtime_gate.outputs.should_run == 'true' && runner.os == 'Windows' }}
+        if: ${{ vars.TRADINGAGENTS_AUTOMATION_BACKEND != 'local' && steps.runtime_gate.outputs.should_run == 'true' && runner.os == 'Windows' }}
         shell: python {0}
         run: |
           import os
@@ -321,14 +321,14 @@ jobs:
               )
 
       - name: Verify Pages packaging tools
-        if: ${{ steps.runtime_gate.outputs.should_run == 'true' && runner.os == 'Windows' }}
+        if: ${{ vars.TRADINGAGENTS_AUTOMATION_BACKEND != 'local' && steps.runtime_gate.outputs.should_run == 'true' && runner.os == 'Windows' }}
         shell: bash
         run: |
           bash --version
           tar --version
 
       - name: Upload GitHub Pages artifact
-        if: ${{ steps.runtime_gate.outputs.should_run == 'true' }}
+        if: ${{ vars.TRADINGAGENTS_AUTOMATION_BACKEND != 'local' && steps.runtime_gate.outputs.should_run == 'true' }}
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9
         with:
           name: github-pages-prism-telegram

@@ -36,6 +36,18 @@ preserving size/change/digest verification. Site discovery shares equal research
 subtrees within its read-only build with a bounded index; source files and report
 values are unchanged.
 
+In local-backend mode, YouTube/PRISM collectors no longer rebuild the entire
+market site twice, stamp a cloud snapshot, or upload an unused Pages artifact.
+The existing local publisher owns the merged build and exact live verification.
+Collection coverage still requires a successful real collection; local recovery
+also verifies its matching canonical archive. Cloud-backend build/stamp/deploy
+gates remain unchanged. This removes simultaneous multi-gigabyte builds rather
+than merely increasing their memory limit.
+
+A read-only CVX provider check confirmed the KIS 2023-06-05 row has Open 138.4362
+above High 137.9470. It is rejected, not repaired by inventing prices or deleting
+required sessions.
+
 ## Acceptance
 
 Offline tests cover partial and skipped research in parallel/sequential modes,

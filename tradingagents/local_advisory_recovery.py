@@ -212,7 +212,9 @@ class LocalCoverageClient:
         builds = [job for job in jobs if job.get("name") == SPECS[surface][1]]
         stamps = [step for job in builds for step in job.get("steps", [])
                   if step.get("name") == "Stamp rollback-resistant Pages snapshot" and step.get("conclusion") == "success"]
-        if len(builds) != 1 or builds[0].get("conclusion") != "success" or len(stamps) != 1:
+        local_publication = os.environ.get("TRADINGAGENTS_AUTOMATION_BACKEND", "").strip().lower() == "local"
+        if (len(builds) != 1 or builds[0].get("conclusion") != "success"
+                or not local_publication and len(stamps) != 1):
             raise RecoveryDiagnostic("COLLECTION_COMPLETE_PUBLICATION_INCOMPLETE")
 
     def failure_diagnostic_signature(self, run_id):
