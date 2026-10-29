@@ -1,0 +1,338 @@
+{
+  "version": 4,
+  "video_id": "OTUsM-_Mrdc",
+  "title": "국민연금 수령 65세 말고 '이때' 해야 되는 진짜 이유",
+  "url": "https://www.youtube.com/watch?v=OTUsM-_Mrdc",
+  "channel": "경제사냥꾼",
+  "channel_id": "UC7usMJDHmtbs_oegmzQKKMA",
+  "source_url": "https://www.youtube.com/@%EA%B2%BD%EC%A0%9C%EC%82%AC%EB%83%A5%EA%BE%BC/shorts",
+  "thumbnail_url": "https://i.ytimg.com/vi/OTUsM-_Mrdc/maxresdefault.jpg",
+  "published_at": "2026-10-29T07:35:28+00:00",
+  "status": "unverified",
+  "strategy_source_tier": "STANDARD",
+  "strategy_evidence_weight": "STANDARD",
+  "strategy_validation_policy": "STANDARD_REVIEW",
+  "transcript_status": "available",
+  "transcript_source": "automatic",
+  "transcript_chars": 1395,
+  "transcript_quality": {
+    "status": "good",
+    "score": 1.0,
+    "warnings": [],
+    "source": "automatic",
+    "language": "Korean",
+    "model_or_format": "json3",
+    "chars": 1395,
+    "segments": 66,
+    "duration_seconds": 104,
+    "repeated_ngram_ratio": 0.0
+  },
+  "generated_at": "2026-10-30T06:51:29.578065+09:00",
+  "llm_status": "success",
+  "research_status": "success",
+  "claim_verification_status": "success",
+  "research_pipeline_version": 4,
+  "evidence_count": 14,
+  "claim_status_summary": {
+    "unverified": 5,
+    "partially_supported": 3,
+    "supported": 2
+  },
+  "claims": [
+    {
+      "claim_id": "C1",
+      "claim_text": "1969년 이후 출생자는 정상 65세·조기 60세·연기 70세 수령이 가능하며 이는 새로운 제도다.",
+      "status": "unverified",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:02",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.9,
+      "numeric_parse": {
+        "claimed": "1969년 이후 출생: 조기 60세, 정상 65세, 연기 70세",
+        "observed": "관련 외부 근거 없음"
+      },
+      "investor_implication": "제시된 연령만으로 수령 계획을 확정하지 말고 본인의 출생연도와 신청 자격을 확인해야 한다."
+    },
+    {
+      "claim_id": "C2",
+      "claim_text": "조기 수령은 연 6% 감액, 연기 수령은 연 7.2% 증액되며 정상 월 100만 원이면 5년 조기 시 월 70만 원, 5년 연기 시 월 136만 원을 평생 받는다.",
+      "status": "partially_supported",
+      "confidence": 0.91,
+      "supporting_evidence_ids": [
+        "E4",
+        "E6",
+        "E7"
+      ],
+      "manual_check_required": true,
+      "timestamp": "00:00:02",
+      "source_confidence": 0.69,
+      "asr_confidence": 0.76,
+      "numeric_parse": {
+        "claimed": "조기 연 6%·5년 30% 감액, 연기 연 7.2%·5년 36% 증액; 월 70만 원·136만 원",
+        "observed": "연기 연 7.2%·5년 36% 및 월 136만 원은 기사와 일치; 조기 비율은 외부 확인 불가"
+      },
+      "investor_implication": "연기 증액 예시는 참고할 수 있으나 조기 감액 규정과 실제 예상연금액을 별도로 확인해야 한다."
+    },
+    {
+      "claim_id": "C3",
+      "claim_text": "65세 월 100만 원을 70세까지 전액 연기하면 6천만 원을 받지 못하고, 이후 월 36만 원 추가 수령으로 약 84세에 만회한다.",
+      "status": "supported",
+      "confidence": 0.98,
+      "supporting_evidence_ids": [
+        "E5",
+        "E6",
+        "E7"
+      ],
+      "manual_check_required": false,
+      "timestamp": "00:00:02",
+      "source_confidence": 0.78,
+      "asr_confidence": 0.93,
+      "numeric_parse": {
+        "claimed": "미수령액 6천만 원, 추가 월 36만 원, 손익분기 약 84세",
+        "observed": "60,000,000÷360,000=166.67개월; 70세+13.89년≈83.89세"
+      },
+      "investor_implication": "약 84세는 예시의 단순 누적액 손익분기점이며 개인의 세후 손익분기점으로 그대로 적용할 수 없다."
+    },
+    {
+      "claim_id": "C4",
+      "claim_text": "수령 시점 선택 하나로 최대 6천만 원의 차이가 난다.",
+      "status": "unverified",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:02",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.9,
+      "numeric_parse": {
+        "claimed": "최대 차이 60,000,000원",
+        "observed": "특정 예시의 60개월 미수령액만 확인; 일반 상한은 확인 불가"
+      },
+      "investor_implication": "6천만 원을 개인별 손실액이나 제도상 최대 차이로 해석해서는 안 된다."
+    },
+    {
+      "claim_id": "C5",
+      "claim_text": "건강하고 오래 생존하면 연기가, 건강이 걱정되거나 당장 생활비가 필요하면 조기가 유리할 수 있다.",
+      "status": "unverified",
+      "confidence": 0.94,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:02",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.55,
+      "numeric_parse": {
+        "claimed": "건강·장수·생활비 필요에 따른 수령 전략",
+        "observed": "개인별 비교 자료와 생명표 없음"
+      },
+      "investor_implication": "생활비 공백과 예상 수급 기간을 함께 비교하되 평균적 논리를 개인의 건강 판단이나 치료 결정에 연결하지 않아야 한다."
+    },
+    {
+      "claim_id": "C6",
+      "claim_text": "65세 이후 월 소득 약 519만 원을 초과하면 연금이 감액될 수 있어 고소득 근로자는 연기가 유리할 수 있다.",
+      "status": "partially_supported",
+      "confidence": 0.91,
+      "supporting_evidence_ids": [
+        "E9"
+      ],
+      "manual_check_required": true,
+      "timestamp": "00:00:02",
+      "source_confidence": 0.64,
+      "asr_confidence": 0.88,
+      "numeric_parse": {
+        "claimed": "65세 이후 월 소득 약 5,190,000원 초과 시 감액 가능",
+        "observed": "E9: A값 3,193,511원+2,000,000원=5,193,511원; 월평균 소득금액 기준"
+      },
+      "investor_implication": "급여명세서의 월급을 519만 원과 바로 비교하지 말고 적용 소득금액과 감액 대상 기간을 확인해야 한다."
+    },
+    {
+      "claim_id": "C7",
+      "claim_text": "70세까지 연기해 늘어난 36% 가산액은 사망 후 배우자의 유족연금에 반영되지 않는다.",
+      "status": "unverified",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:02",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.9,
+      "numeric_parse": {
+        "claimed": "연기 가산 36%는 유족연금에 미반영",
+        "observed": "36% 연기 증액 자체는 E4·E6과 부합하나 유족연금 반영 여부는 확인 불가"
+      },
+      "investor_implication": "배우자에게 증액분이 승계되지 않는다는 전제로 연기 결정을 내리기 전에 공식 산정 규정을 확인해야 한다."
+    },
+    {
+      "claim_id": "C8",
+      "claim_text": "연기 수령으로 연금이 늘어나면 세금 부담도 증가할 수 있다.",
+      "status": "unverified",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:02",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.88,
+      "numeric_parse": {
+        "claimed": "연금 증액 시 세금 증가 가능",
+        "observed": "적용 과세 규정과 세액 계산 자료 없음"
+      },
+      "investor_implication": "증액률을 세후 소득 증가율로 간주하지 말고 개인별 과세대상 연금과 공제를 반영해 비교해야 한다."
+    },
+    {
+      "claim_id": "C9",
+      "claim_text": "연금 증가로 건강보험료가 늘 수 있고, 자녀의 피부양자는 연소득 2천만 원 초과 시 별도 보험료를 낼 수 있다.",
+      "status": "partially_supported",
+      "confidence": 0.9,
+      "supporting_evidence_ids": [
+        "E13"
+      ],
+      "manual_check_required": true,
+      "timestamp": "00:00:02",
+      "source_confidence": 0.6,
+      "asr_confidence": 0.91,
+      "numeric_parse": {
+        "claimed": "연소득 20,000,000원 초과 시 피부양자 제외·보험료 부담 가능",
+        "observed": "E13에서 공적연금 연 2천만 원 초과에 따른 제외 사례 확인; 1,360,000원×12=16,320,000원"
+      },
+      "investor_implication": "월 136만 원으로 증액된다는 이유만으로 피부양자 탈락을 단정할 수 없으며 다른 소득과 자격 요건을 함께 확인해야 한다."
+    },
+    {
+      "claim_id": "C10",
+      "claim_text": "전액 연기가 부담되면 연금의 절반만 연기할 수 있다.",
+      "status": "supported",
+      "confidence": 0.88,
+      "supporting_evidence_ids": [
+        "E6"
+      ],
+      "manual_check_required": true,
+      "timestamp": "00:00:02",
+      "source_confidence": 0.73,
+      "asr_confidence": 0.91,
+      "numeric_parse": {
+        "claimed": "연금의 50%만 연기 가능",
+        "observed": "E6: 50~100%를 10% 단위로 선택 가능"
+      },
+      "investor_implication": "일부 연기는 검토 가능한 선택지이나 실제 신청 조건과 남는 현금흐름을 확인해야 한다."
+    }
+  ],
+  "entities": [],
+  "evidence": [
+    {
+      "evidence_id": "E1",
+      "claim_id": "C1",
+      "title": "60 Degrees Pharmaceuticals Announces Partnership with The University of Southern Mississippi to Evaluate Castanospermine in Nonclinical Models of Alpha-Gal S...",
+      "source_url": "https://finance.yahoo.com/healthcare/articles/60-degrees-pharmaceuticals-announces-partnership-123000157.html",
+      "publisher": "GlobeNewswire",
+      "published_at": "2026-10-28T12:30:00+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "60 Degrees Pharmaceuticals Announces Partnership with The University of Southern Mississippi to Evaluate Castanospermine in Nonclinical Models of Alpha-Gal Syndrome Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home..."
+    },
+    {
+      "evidence_id": "E2",
+      "claim_id": "C1",
+      "title": "60 Degrees Pharmaceuticals Announces Clinical Improvement and Negative PCR Results in All Completed Expanded Access Babesiosis Study Patients",
+      "source_url": "https://finance.yahoo.com/healthcare/articles/60-degrees-pharmaceuticals-announces-clinical-120600415.html",
+      "publisher": "GlobeNewswire",
+      "published_at": "2026-10-27T12:06:00+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "60 Degrees Pharmaceuticals Announces Clinical Improvement and Negative PCR Results in All Completed Expanded Access Babesiosis Study Patients Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports Mo..."
+    },
+    {
+      "evidence_id": "E4",
+      "claim_id": "C2",
+      "title": "[차호중의 재테크 칼럼]노령연금의 이해와 활용",
+      "source_url": "http://www.kookje.co.kr/news2011/asp/newsbody.asp?code=2500&key=20210625.99099007654",
+      "publisher": "Naver News",
+      "published_at": "2021-06-25T17:56:00+09:00",
+      "source_tier": "web",
+      "excerpt": "연금을 받게 될 때는 연기신청 금액에 대하여 연기된 기간 1년당 7.2%(월 0.6%)의 연금액을 올려 받을 수 있다. 따라서 연금수급시기를 5년 뒤로 미루면 연금을 36% 더 받을 수 있는 셈이다. 여기다 연기 기간 동안 물가상승... [Â÷È£ÁßÀÇ ÀçÅ×Å© Ä®·³]³ë·É¿¬±ÝÀÇ ÀÌÇØ¿Í È°¿ë : ±¹Á¦½Å¹® 2 º»¹® ¹Ù·Î°¡±â ÆäÀÌ½ººÏ ¿¢½º Ä«Ä«¿ÀÃ¤³Î À¯Æ©ºê ÀÎ½ºÅ¸±×·¥ --> ·Î±×À..."
+    },
+    {
+      "evidence_id": "E5",
+      "claim_id": "C3",
+      "title": "“833만 원 내고 1억 수령…” 국민연금 수급자, 구간별로 살펴봤더니",
+      "source_url": "https://www.wikitree.co.kr/articles/1165801",
+      "publisher": "Naver News",
+      "published_at": "2026-10-13T12:24:00+09:00",
+      "source_tier": "news",
+      "excerpt": "줄어든다.연금 5년 미루면 84세부터 누적 수령액 앞서연기연금을 고를 때는 손익분기점을 따져봐야 한다. 65세부터 월 100만 원을 받을 사람이 5년간 전액을 미루면, 70세까지 받지 못하는 연금이 총 6000만 원이다.이..."
+    },
+    {
+      "evidence_id": "E6",
+      "claim_id": "C3",
+      "title": "국민연금 5년 늦추면 36% 더 받는다…손익분기점 84세",
+      "source_url": "https://www.mk.co.kr/article/12166016",
+      "publisher": "Naver News",
+      "published_at": "2026-10-01T14:31:00+09:00",
+      "source_tier": "news",
+      "excerpt": "수령액은 136만원이 된다. 연금액의 50~100% 가운데 원하는 비율만 10% 단위로 미룰 수도 있다. 관건은 손익분기점이다. 65세부터 월 100만원을 받을 사람이 5년간 전액을 연기하면 70세까지 받지 못한 연금은 6000만원이..."
+    },
+    {
+      "evidence_id": "E8",
+      "claim_id": "C4",
+      "title": "Dow Jones Futures: Amazon, Intel Lead Earnings Losers After Google, ServiceNow, Fortinet Hit Nasdaq",
+      "source_url": "https://finance.yahoo.com/m/0a5ce393-a6df-312b-af64-1893a264d0df/dow-jones-futures%3A-amazon%2C.html",
+      "publisher": "Investor's Business Daily",
+      "published_at": "2026-10-29T21:58:19+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    },
+    {
+      "evidence_id": "E9",
+      "claim_id": "C6",
+      "title": "일하는 고령 1인 가구, 국민연금 감액 완화 기대…저소득층은 '글쎄'",
+      "source_url": "https://www.1conomynews.co.kr/news/articleView.html?idxno=48989",
+      "publisher": "Naver News",
+      "published_at": "2026-06-10T15:54:00+09:00",
+      "source_tier": "news",
+      "excerpt": "연금을 받지 못한 것으로 나타났다. 개정 국민연금법은 A값을 초과한 근로·사업소득이 200만원 미만이면 감액 대상에서 제외된다. 2026년 기준 A값은 월 319만3511원으로, 월평균 소득금액이 약 519만원 미만인 경우 노령연..."
+    },
+    {
+      "evidence_id": "E10",
+      "claim_id": "C7",
+      "title": "Nps 국민연금공단 - 국민을 든든하게 연금을 튼튼하게",
+      "source_url": "//duckduckgo.com/l/?uddg=https%3A%2F%2Fwww.nps.or.kr%2Fpnsinfo%2Fntpsklg%2FgetOHAF0072M0.do&rut=679f00bd8d521b06e912edfb709233d0aa29305f90538962d8a0ddefec605547",
+      "publisher": "duckduckgo.com",
+      "published_at": null,
+      "source_tier": "web",
+      "excerpt": "유족의 범위 (법 제73조) 국민연금법상 유족이란 사망자에 의하여 생계를 유지하고 있던 가족으로 아래의 요건을 충족하는 배우자 (사실혼배우자 포함), 자녀, 부모, 손자녀, 조부모 순위 중 최우선 순위자에게 유족연금을 지급합니다."
+    },
+    {
+      "evidence_id": "E11",
+      "claim_id": "C7",
+      "title": "국민연금 유족연금 배우자 수령 조건 및 중복 급여 수령액 총정리",
+      "source_url": "//duckduckgo.com/l/?uddg=https%3A%2F%2Fcanil1.tistory.com%2Fentry%2F2026%25EB%2585%2584%2D%25EC%25B5%259C%25EC%258B%25A0%2D%25EA%25B5%25AD%25EB%25AF%25BC%25EC%2597%25B0%25EA%25B8%2588%2D%25EC%259C%25A0%25EC%25A1%25B1%25EC%2597%25B0%25EA%25B8%2588%2D%25EB%25B0%25B0%25EC%259A%25B0%25EC%259E%2590%2D%25EC%2588%2598%25EB%25A0%25B9%2D%25EC%25A1%25B0%25EA%25B1%25B4%2D%25EB%25B0%258F%2D%25EC%25A4%2591%25EB%25B3%25B5%2D%25EA%25B8%2589%25EC%2597%25AC%2D%25EC%2588%2598%25EB%25A0%25B9%25EC%2595%25A1%2D%25EC%25B4%259D%25EC%25A0%2595%25EB%25A6%25AC&rut=4e39d122283e38f8374ef1bc6a3ec20f0291fb9265a1ffefe6d0ad98f2874574",
+      "publisher": "duckduckgo.com",
+      "published_at": null,
+      "source_tier": "web",
+      "excerpt": "오늘은 많은 분이 궁금해하시는 국민연금 유족연금의 배우자 수령 조건과 내 연금과 겹칠 때 어떻게 되는지 (중복 급여)를 최신 정보를 바탕으로 정리해 드리겠습니다. 꼼꼼하게 읽어보시고 꼭 혜택을 누리시길 바랍니다.1."
+    },
+    {
+      "evidence_id": "E13",
+      "claim_id": "C9",
+      "title": "\"年 2천만원 넘으면 끝\"…건보 공적연금 피부양자 탈락자 31만명",
+      "source_url": "https://www.pinpointnews.co.kr/news/articleView.html?idxno=339054",
+      "publisher": "Naver News",
+      "published_at": "2025-04-24T09:30:00+09:00",
+      "source_tier": "news",
+      "excerpt": "국민연금공단 서울북부지역본부에서 한 시민이 업무 처리를 위해 대기하고 있다. 사진=연합뉴스 공무원연금이나 국민연금 등 공적연금 소득이 연간 2000만원을 초과했다는 이유로 건강보험 피부양자에서 제외된..."
+    },
+    {
+      "evidence_id": "E14",
+      "claim_id": "C9",
+      "title": "iShares Russell 2000 (IWM) Adds Critical Metals and Vaxcyte on Oct. 27",
+      "source_url": "https://finance.yahoo.com/markets/stocks/articles/ishares-russell-2000-iwm-adds-110409258.html",
+      "publisher": "GuruFocus.com",
+      "published_at": "2026-10-29T11:04:09+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    }
+  ],
+  "source_policy": {
+    "raw_transcript_published": false,
+    "raw_transcript_in_evidence": false,
+    "research_pipeline_version": 4,
+    "closed_source_claims": "unverified_external_source",
+    "auto_caption_warning": true,
+    "local_asr_warning": false
+  }
+}

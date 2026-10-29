@@ -1,0 +1,858 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YouTube 투자자용 검증 리포트 - 추가 급락 가능성은 줄었지만 12월까지 길어질 조정에 대비하는 법ㅣ명민준, 박가영, 이지환 [주린이 구조대]</title>
+  <style>
+:root {
+  color-scheme: light;
+  --bg: #f7f8fb;
+  --panel: #ffffff;
+  --text: #172033;
+  --muted: #667085;
+  --line: #d9dee8;
+  --accent: #0f766e;
+  --accent-2: #2563eb;
+  --warn: #b45309;
+  --bad: #b42318;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0 56px; }
+a { color: var(--accent-2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.hero { padding: 28px 0 22px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+.hero.compact { padding-top: 12px; }
+.hero h1 { margin: 0; font-size: clamp(28px, 4vw, 44px); line-height: 1.15; letter-spacing: 0; }
+.hero p { max-width: 760px; color: var(--muted); margin: 12px 0 0; }
+.eyebrow { color: var(--accent); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0; margin: 0 0 8px; }
+section { margin: 28px 0; }
+h2, h3, h4, h5 { letter-spacing: 0; line-height: 1.25; }
+.synthesis-callout { padding: clamp(20px, 4vw, 34px); border: 1px solid #6ee7d8; border-radius: 18px; background: linear-gradient(135deg, #ecfdf9 0%, #eff6ff 100%); box-shadow: 0 18px 44px rgba(15, 118, 110, .12); }
+.synthesis-callout.unavailable { border-color: var(--line); background: var(--panel); box-shadow: none; }
+.synthesis-callout h2 { margin: 0; font-size: clamp(24px, 3.2vw, 36px); }
+.synthesis-callout .lead { max-width: 900px; font-size: 17px; color: #334155; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.primary-link, .secondary-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border-radius: 999px; font-weight: 800; }
+.primary-link { color: white; background: var(--accent); }
+.secondary-link { color: var(--accent-2); border: 1px solid #93c5fd; background: white; }
+.primary-link:hover, .secondary-link:hover { text-decoration: none; filter: brightness(.97); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.card, .run { display: flex; flex-direction: column; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; color: var(--text); min-height: 128px; }
+.run { padding: 16px; }
+.card:hover, .run:hover { border-color: var(--accent-2); text-decoration: none; }
+.thumb { display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #e9edf5; border-radius: 8px 8px 0 0; color: var(--muted); font-size: 13px; font-weight: 700; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb-empty span { padding: 0 14px; text-align: center; }
+.card-body { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 16px; }
+.card strong { line-height: 1.35; }
+.source-line { color: #3f4a5f; font-weight: 600; }
+.runs { display: grid; gap: 10px; }
+.badge { display: inline-flex; width: fit-content; border-radius: 999px; padding: 2px 9px; background: #e6f4f1; color: var(--accent); font-size: 12px; font-weight: 700; }
+.status-contradicted, .status-llm_failed { background: #fee4e2; color: var(--bad); }
+.status-unverified, .status-stale { background: #fff4d6; color: var(--warn); }
+small, .muted { color: var(--muted); }
+.topnav { display: flex; gap: 14px; margin-bottom: 16px; font-size: 14px; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px; }
+.stats span { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
+.report { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: min(5vw, 36px); }
+.report-head { border-bottom: 1px solid var(--line); margin-bottom: 24px; padding-bottom: 20px; }
+.report-head h1 { margin: 0; font-size: clamp(24px, 3.5vw, 38px); line-height: 1.2; }
+.meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+.scope-note { padding: 12px 14px; border-left: 4px solid var(--warn); border-radius: 6px; background: #fff7ed; color: #7c2d12; }
+.synthesis-report h2 { margin-top: 34px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.synthesis-report h3 { margin: 24px 0 8px; color: #0f4c5c; }
+.synthesis-report p, .synthesis-report li { overflow-wrap: anywhere; }
+pre { overflow: auto; background: #111827; color: #f9fafb; border-radius: 8px; padding: 14px; }
+code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+details { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 18px; }
+@media (max-width: 640px) {
+  main { width: min(100% - 20px, 1120px); padding-top: 18px; }
+  .report { padding: 18px; }
+  .synthesis-callout { border-radius: 14px; padding: 18px; }
+  .cta-row a { width: 100%; }
+  .mobile-report { border-radius: 12px; }
+}
+</style>
+</head>
+<body>
+  <main>
+<nav class="topnav"><a href="index.html">실행 목록</a><a href="../../index.html">YouTube 홈</a></nav>
+<article class="report">
+  <header class="report-head">
+    <p class="eyebrow">youtube_20261030_065129</p>
+    <h1>추가 급락 가능성은 줄었지만 12월까지 길어질 조정에 대비하는 법ㅣ명민준, 박가영, 이지환 [주린이 구조대]</h1>
+    <div class="meta">
+      <span class="badge status-asr_uncertain">asr_uncertain</span>
+      <a href="https://www.youtube.com/watch?v=DFuuPZ9qI1E">원본 영상</a>
+    </div>
+  </header>
+  <h2>추가 급락 위험 완화론, 아직은 검증보다 관찰이 필요한 단계</h2>
+<p><a href="https://www.youtube.com/watch?v=DFuuPZ9qI1E">삼프로TV 영상</a> · 제공 게시일 2026년 10월 29일 · 41분 57초</p>
+<h3>1. 핵심 판단</h3>
+<p>영상의 논리는 <strong>네오클라우드 숏커버링과 외국인 수급 개선이 급락 압력을 낮추되, 뚜렷한 촉매가 없으면 12월까지 기간 조정이 이어질 수 있다</strong>는 것이다. 반등 국면에서는 반도체 주도주의 상대강도를 강조하지만, 출연자는 바닥 확인 전 추가 현금 투입에 신중한 입장도 밝혔다.</p>
+<p>그러나 제공된 검증 결과의 전체 판정은 <strong>미검증</strong>이다. 12개 검증 항목 가운데 부분 지지 1개, 미검증 7개, 자동음성인식 불확실 4개이며, 완전히 확인된 항목은 없다. 특히 핵심 근거인 외국인 누적 순매수, 공매도 잔고 감소, 옵션 하방 포지션, 연준 정책 경로를 직접 입증할 자료가 부족하다.</p>
+<p>따라서 이 영상은 시장 저점 확인 자료보다는 <strong>반등·횡보·재하락을 구분하기 위한 조건부 시나리오</strong>로 읽는 것이 적절하다. 근거 부족은 주장이 틀렸다는 뜻도, 급락 위험이 실제로 줄었다는 뜻도 아니다.</p>
+<h3>2. 영상 주장과 확인된 근거</h3>
+<p>아래 시각은 정확한 문장 발화 시점이 아니라 해당 내용을 포함한 자막 청크의 시작점이다.</p>
+<p>| 쟁점·영상 시각 | 영상 주장 | 확인된 사실·근거와 한계 |</p>
+<p>|---|---|---|</p>
+<p>| 삼성전자 환원정책 · 00:00 | 배당 약 30조원, 2024~2026년 FCF 50% 환원, 다음 해 1월 추가 내용 확인 | 정책 원문이 없어 모두 미검증. 연간 배당과 3개년 누적 규모를 구분해야 한다. DART 공시 목록만으로 해당 수치를 확정할 수 없다. |</p>
+<p>| 삼성전자·SK하이닉스 수급 · 06:13~12:14 | 삼성전자 외국인 누적 매수와 하이닉스 최근 매수 전환, 두 종목의 엇갈린 주가 움직임 | 제공 뉴스 발췌는 10월 29일 종가 기준 삼성전자 -4.13%, 하이닉스 +2.62%를 보도한다. 반대 방향 움직임은 부분 부합하지만 외국인 수량은 미확인이다. |</p>
+<p>| 대차·옵션 · 06:13~30:13 | 대차잔고 고점과 차월물 하방 포지션 부재가 추가 급락 위험을 낮춘다 | 대차·공매도 시계열과 만기별 옵션 자료가 없어 미검증. 대차잔고와 실제 공매도, 환매는 서로 다른 지표다. |</p>
+<p>| 코어위브 · 00:00~18:21 | 이틀 약 15% 상승이 숏커버링 신호이며 MS 관련 비중은 약 3분의 2 | 연속 거래일 가격과 공매도 잔고 변화가 없다. 23.7~24%의 지표 정의, 3분의 2의 분모가 매출인지 수주인지도 불명확하다. |</p>
+<p>| 마이크로소프트 · 12:14~18:21 | 매출·EPS 예상 상회가 네오클라우드 수요 우려를 완화했다 | 실적 원문·발표 전 컨센서스·설비투자 가이던스가 없어 미검증. 코어위브 상승과의 인과관계도 확인되지 않았다. |</p>
+<p>| 알파벳·아마존 · 12:14~18:21 | 클라우드 성장에도 광고·과잉투자·현금흐름 우려가 주가를 압박 | 아마존의 클라우드 성장 가속·이익 예상 미달·주가 하락은 E7 제목 수준에서만 부합한다. FCF 수치와 기업 귀속은 복원되지 않았다. |</p>
+<p>| 연준·정치 변수 · 18:21~36:46 | 추가 인상 후 종료 가능성과 선거 전후 정책 충격을 함께 고려 | 성명·경제전망·발언 원문이 없어 미검증. ‘12월 7~8일’ 일정과 인상·인하 표현도 원음 대조가 필요하다. |</p>
+<p>가장 직접적인 가격 근거는 제공된 <a href="https://www.fntimes.com/html/view.php?ud=202610300705546661141825007d_18">한국금융신문 브리핑 발췌</a>다. 이 자료는 코스피 5,937.66, 전일 대비 -1.24%와 두 반도체 종목의 종가 등락률을 보도한다. 다만 주주환원 실망이라는 기사 설명은 가격 변동 원인의 독립적인 입증과는 구분해야 한다. 하이닉스 종가 +2.62%는 영상의 장중 +4% 주장과 관측 시각이 달라 직접적인 반증이 아니다.</p>
+<p>아마존 관련 <a href="https://finance.yahoo.com/markets/stocks/articles/amazon-cloud-business-accelerates-shares-222112520.html">AFP 기사 검색 결과 E7</a>은 제목만 제공됐다. <a href="https://finance.yahoo.com/news/google-owner-alphabet-reports-25-222600571.html">알파벳 관련 E6</a>의 총매출 성장 제목 역시 클라우드나 검색광고의 개별 실적을 입증하지 않는다. 두 결과 모두 제공 게시시각이 영상 게시시각보다 늦으므로 영상 당시의 근거로 소급할 수 없다.</p>
+<h3>3. 상승 논리와 반론</h3>
+<h4>상승 논리가 성립하려면</h4>
+<ul>
+<li><strong>환매가 지속적인 수요로 이어져야 한다.</strong> 공매도 잔고 감소와 함께 반등이 이어지고, 외국인 현물·선물 수급 개선도 확인돼야 일시적 포지션 청산 이상의 의미를 검토할 수 있다.</li>
+<li><strong>AI 투자가 매출과 현금흐름으로 연결돼야 한다.</strong> 마이크로소프트 투자 지속과 네오클라우드 계약 이행, 클라우드 성장의 수익성 기여가 중요하다. 현재 자료는 이 연결고리를 확인하지 못한다.</li>
+<li><strong>주도주의 상대강도가 유지돼야 한다.</strong> 하이닉스가 반등 탄력이 강하다는 평가는 동일 구간의 삼성전자·소부장·반도체 ETF 수익률과 비교해야 한다. 하루의 차별화만으로 주도력을 확정하기는 어렵다.</li>
+</ul>
+<h4>핵심 반론</h4>
+<p>1. <strong>가격 상승만으로 숏커버링을 식별할 수 없다.</strong> 코어위브의 실제 일별 상승률부터 미확인이다. 가정한 +8%, +7%의 복리 수익률은 +15.56%이지만 이는 관측값이 아닌 산술 검산이다.</p>
+<p>2. <strong>외국인 순매수는 장기 가치 자금의 증거가 아니다.</strong> 투자 목적·보유기간을 알 수 없으며, 실제 매집량이 순매수의 몇 배라는 추정도 확인되지 않았다.</p>
+<p>3. <strong>클라우드 성장과 주주가치 증가는 별개일 수 있다.</strong> 투자 부담과 현금흐름 악화 가능성을 함께 봐야 한다. 다만 영상의 FCF 연속 적자·약 -22억 달러는 기업·기간 귀속이 불명확해 확정 수치로 사용할 수 없다.</p>
+<p>4. <strong>검색광고 잠식은 아직 이 자료에서 입증되지 않았다.</strong> 출연자의 높은 ChatGPT 사용 비중은 개인 경험이다. 반대로 구글의 데이터·제미나이·TPU 경쟁력이라는 반론도 사업 실적으로 검증해야 한다.</p>
+<p>5. <strong>급락 위험 완화와 상승 추세 전환은 다른 판단이다.</strong> 환매 이후 신규 수요가 부족하면 반등이 약해질 수 있으며, 정책 충격은 기존 수급 해석을 바꿀 수 있다.</p>
+<h3>4. 단기 체크포인트와 무효화 조건</h3>
+<p>아래는 영상 논리를 평가하기 위한 관찰 기준이며 매매 지시가 아니다.</p>
+<p>| 구분 | 구체적 관찰 항목 | 영상 논리를 약화시키는 조건 |</p>
+<p>|---|---|---|</p>
+<p>| 한국 수급 | 기준 거래일을 확정한 뒤 외국인 일별·누적 순매수 수량과 금액, 현물·선물 동행 여부 확인 | 수급 개선이 일시적이고 이후 매도 우위가 이어짐 |</p>
+<p>| 반등의 성격 | 공시 지연을 반영한 공매도 잔고, 대차잔고, 거래량과 가격 흐름 비교 | 잔고 감소가 확인되지 않거나 환매 이후 반등이 지속되지 못함 |</p>
+<p>| 반도체 주도력 | 같은 관측 기간의 삼성전자·하이닉스·소부장·ETF 상대수익률과 상승 종목 확산도 | 주도주 상대강도가 꺾이고 시장 전반으로 반등이 확산되지 않음 |</p>
+<p>| 삼성전자 환원 | 정책 원문의 연간·누적 배당 기준, 실제 FCF, 추가 발표의 확정 여부 확인 | 기대 환원 규모를 뒷받침할 FCF·공식 계획이 확인되지 않음 |</p>
+<p>| 네오클라우드 | 코어위브 고객별 매출·RPO, 계약 조건, 차입·리스 의무와 MS 투자 계획 확인 | 고객 투자 축소·계약 변경·자금조달 부담이 확인됨 |</p>
+<p>| 빅테크 실적 | 동일 회계분기의 매출·EPS와 발표 전 예상치, 영업현금흐름·설비투자·FCF 대조 | 클라우드 성장에도 현금창출력 개선이 뒤따르지 않음 |</p>
+<p>| 정책 | 녹화연도 확인 후 FOMC 공식 일정·성명·경제전망과 실제 정책 문서 대조 | 영상의 정책 방향·일정 전제가 원문과 불일치하거나 새로운 충격이 발생함 |</p>
+<p>삼성전자 <a href="https://dart.fss.or.kr/dsaf001/main.do?rcpNo=20261029800752">10월 29일 자율공시 목록에 연결된 문서</a>는 원문 확인 경로다. 제공 자료에는 본문이 없어 주주환원 정책을 입증하는 공시라고 단정할 수 없다.</p>
+<p>관세 50%와 군사 행동은 <strong>출연자의 가상 충격 시나리오</strong>다. 실제 발표로 취급해서는 안 된다. 또한 ‘12월까지 조정’은 기준연도부터 불확실한 전망이므로 확정된 일정처럼 사용할 수 없다.</p>
+<h3>5. 출연자 운용 견해의 해석</h3>
+<p>30:13~36:46 구간에서는 급반등 시 코스피 반도체, 박스권에서는 일부 코스닥 모멘텀 종목을 살펴보는 조건부 접근이 제시됐다. 강한 종목과 턴어라운드 후보의 약 3:1 언급은 <strong>관심 후보 구성 제안</strong>이지 확인된 자산배분 비율이 아니다.</p>
+<p>바닥 확인 전 추가 현금을 투입하지 않겠다는 발언 역시 출연자의 운용 견해다. 과거 현금 미투입은 자기보고이며 계좌 기록으로 확인되지 않았다. 명확한 진입·청산 조건과 벤치마크가 없어 검증된 전략 성과로 제시할 수 없다.</p>
+<h3>6. 데이터 품질과 신뢰도</h3>
+<ul>
+<li><strong>transcript_quality:</strong> 자동 한국어 자막은 <code>good</code>, 점수 1.0으로 제공됐다. 이는 숫자·기업명·정책 방향이 정확하다는 보증이 아니다. 원음과 자막 전문은 이번 작성 자료에 없다.</li>
+<li><strong>source_confidence:</strong> 0.55~0.96은 주장 추출의 명확성이다. 포트폴리오 발언 0.96도 성과의 신뢰도가 아니며, 기업 귀속이 혼재한 C7은 0.55다.</li>
+<li><strong>asr_confidence:</strong> 전 항목 0.0은 원음 대조 점수가 제공되지 않았다는 표시다. 음성인식 정확도 0%라는 뜻이 아니다. 검증 항목의 별도 confidence 역시 상태 판정에 대한 확신이지 전망 적중 확률이 아니다.</li>
+<li><strong>시점:</strong> 게시일은 제공됐지만 실제 녹화일은 미확정이다. ‘오늘·어제·내년’을 절대 날짜로 바꾸지 않았다. 영상보다 늦게 나온 뉴스는 사후 정황으로만 구분한다.</li>
+<li><strong>증거 적합성:</strong> 수집 묶음의 <code>verified</code> 표시는 영상 주장 검증 완료를 뜻하지 않는다. E1~E5와 E9~E12는 무관하거나 본문이 없고, E6~E8도 제목 수준이다.</li>
+<li><strong>시장·공시 공백:</strong> 삼성전자·하이닉스 가격 스냅샷 조회는 실패했다. 코스피 52주 최저가 0.0은 분석에서 제외했다. 다른 종목의 단일 가격·PER·목표가도 실적이나 저평가를 입증하지 않는다. 공시 제공기관 이용 불가는 공시 부재를 뜻하지 않는다.</li>
+<li><strong>폐쇄형 출처:</strong> 미식별 외부 금융기관 보고서와 비공개 시뮬레이션은 <strong>미검증·수동 확인 필요</strong>다. Bloomberg·Morningstar 원문도 제공되지 않았으므로 해당 출처의 확인을 받은 주장처럼 인용할 수 없다.</li>
+</ul>
+<h3>결론</h3>
+<p>현재 확인된 근거는 일부 당일 가격 차별화와 제한적인 뉴스 정황에 머문다. <strong>‘추가 급락 가능성이 줄었다’는 핵심 결론을 검증된 사실로 받아들일 단계는 아니다.</strong> 우선순위는 실제 녹화일과 주요 수치의 원음 복원, 거래소 수급·공매도 자료, 기업 실적·환원정책 원문 확인이다. 이후 환매성 반등이 지속 수요로 연결되는지, AI 투자 확대가 현금창출력으로 이어지는지를 구분해 관찰해야 한다.</p>
+  <details>
+    <summary>공개 요약 JSON</summary>
+    <pre>{
+  &quot;version&quot;: 4,
+  &quot;video_id&quot;: &quot;DFuuPZ9qI1E&quot;,
+  &quot;title&quot;: &quot;추가 급락 가능성은 줄었지만 12월까지 길어질 조정에 대비하는 법ㅣ명민준, 박가영, 이지환 [주린이 구조대]&quot;,
+  &quot;url&quot;: &quot;https://www.youtube.com/watch?v=DFuuPZ9qI1E&quot;,
+  &quot;channel&quot;: &quot;삼프로TV 3PROTV&quot;,
+  &quot;channel_id&quot;: &quot;UChlv4GSd7OQl3js-jkLOnFA&quot;,
+  &quot;source_url&quot;: &quot;https://www.youtube.com/@3protv/videos&quot;,
+  &quot;thumbnail_url&quot;: &quot;https://i.ytimg.com/vi/DFuuPZ9qI1E/maxresdefault.jpg&quot;,
+  &quot;published_at&quot;: &quot;2026-10-29T12:00:29+00:00&quot;,
+  &quot;status&quot;: &quot;asr_uncertain&quot;,
+  &quot;strategy_source_tier&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_evidence_weight&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_validation_policy&quot;: &quot;STANDARD_REVIEW&quot;,
+  &quot;transcript_status&quot;: &quot;available&quot;,
+  &quot;transcript_source&quot;: &quot;automatic&quot;,
+  &quot;transcript_chars&quot;: 21838,
+  &quot;transcript_quality&quot;: {
+    &quot;status&quot;: &quot;good&quot;,
+    &quot;score&quot;: 1.0,
+    &quot;warnings&quot;: [],
+    &quot;source&quot;: &quot;automatic&quot;,
+    &quot;language&quot;: &quot;Korean&quot;,
+    &quot;model_or_format&quot;: &quot;json3&quot;,
+    &quot;chars&quot;: 21838,
+    &quot;segments&quot;: 1235,
+    &quot;duration_seconds&quot;: 2517,
+    &quot;repeated_ngram_ratio&quot;: 0.0
+  },
+  &quot;generated_at&quot;: &quot;2026-10-30T06:51:29.578065+09:00&quot;,
+  &quot;llm_status&quot;: &quot;success&quot;,
+  &quot;research_status&quot;: &quot;success&quot;,
+  &quot;claim_verification_status&quot;: &quot;success&quot;,
+  &quot;research_pipeline_version&quot;: 4,
+  &quot;evidence_count&quot;: 12,
+  &quot;claim_status_summary&quot;: {
+    &quot;unverified&quot;: 7,
+    &quot;partially_supported&quot;: 1,
+    &quot;asr_uncertain&quot;: 4
+  },
+  &quot;claims&quot;: [
+    {
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;claim_text&quot;: &quot;삼성전자 배당 약 30조원, 2024~2026년 FCF 50% 주주환원 및 다음 해 1월 추가 발표 주장.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.98,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.87,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;배당 약 30조원; 2024~2026년 FCF 50%; 내년 1월&quot;,
+        &quot;observed&quot;: &quot;정책 수치 확인 불가. 연간·3개년 누적 배당 구분 및 다음 해의 절대연도 미확정.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;배당 규모와 추가 환원을 확정된 투자수익으로 반영할 근거가 부족하다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;claim_text&quot;: &quot;삼성전자·SK하이닉스의 장중 등락 차이와 외국인 매수 전환, 10월 말 현물·선물 수급 개선 주장.&quot;,
+      &quot;status&quot;: &quot;partially_supported&quot;,
+      &quot;confidence&quot;: 0.94,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:06:13&quot;,
+      &quot;source_confidence&quot;: 0.87,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;삼성전자 당일 약 60만 주 매도·직전 이틀 400만 주 이상 매수·10월 16일 이후 약 900만 주 매수; 장중 삼성전자 -4%대·하이닉스 +4%대&quot;,
+        &quot;observed&quot;: &quot;뉴스 발췌의 종가 등락률: 삼성전자 -4.13%, 하이닉스 +2.62%. 외국인 수량 및 장중 수치는 확인 불가.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;당일 주가 차이는 일부 확인되지만 외국인 매집이나 수급 개선에 따른 매수 판단은 미검증이다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;claim_text&quot;: &quot;대차잔고 고점과 차월물 하방 포지션 부재가 추가 급락 위험 축소 및 숏커버링 반등을 시사한다는 주장.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:06:13&quot;,
+      &quot;source_confidence&quot;: 0.82,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;코스피 고점권·코스닥 역대급 대차잔고; 차월물 하방 포지션 축적 없음&quot;,
+        &quot;observed&quot;: &quot;비교 시계열, 잔고 기준 및 만기별 옵션 자료 없음.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;추가 급락 가능성이 낮아졌다는 결론은 검증된 위험지표가 아니라 출연자의 전망으로 취급해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;claim_text&quot;: &quot;코어위브가 이틀간 약 8%, 7% 상승했으며 공매도 관련 23.7~24% 수치와 함께 숏커버링 신호라는 주장.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.98,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.81,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;일별 약 +8%, +7%; 이틀 약 +15%; 공매도 관련 23.7~24%&quot;,
+        &quot;observed&quot;: &quot;실제 수익률·공매도 비율 확인 불가. 가정한 8%와 7%의 복리 검산은 15.56%이며 관측값은 아니다.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;네오클라우드 하방 압력 완화나 실제 숏커버링이 확인됐다고 해석할 근거가 부족하다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;claim_text&quot;: &quot;코어위브 매출 또는 수주 약 3분의 2가 마이크로소프트 관련이며 고객 투자 축소가 위험으로 전이될 수 있다는 주장.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:18:21&quot;,
+      &quot;source_confidence&quot;: 0.81,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;마이크로소프트 관련 비중 약 2/3&quot;,
+        &quot;observed&quot;: &quot;비율·분모·회계기간 모두 확인 불가.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;고객 집중도는 확인할 위험요인이지만 3분의 2를 확정 비율로 사용하거나 매출 감소폭으로 연결할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;claim_text&quot;: &quot;마이크로소프트 매출·EPS 예상 상회와 투자 전망이 네오클라우드 수요 우려를 완화했다는 주장.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:12:14&quot;,
+      &quot;source_confidence&quot;: 0.91,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;매출·EPS 컨센서스 상회&quot;,
+        &quot;observed&quot;: &quot;실제 매출·EPS, 컨센서스, 회계분기 및 투자 전망 수치 없음.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;실적 서프라이즈나 네오클라우드 수요 개선을 확인된 촉매로 반영하기 어렵다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;claim_text&quot;: &quot;알파벳 클라우드 호조·광고 압박·약 10% 급락과 아마존 실적 미달·FCF 연속 적자 및 관련 주가 수치 주장.&quot;,
+      &quot;status&quot;: &quot;asr_uncertain&quot;,
+      &quot;confidence&quot;: 0.98,
+      &quot;supporting_evidence_ids&quot;: [
+        &quot;E7&quot;
+      ],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:12:14&quot;,
+      &quot;source_confidence&quot;: 0.55,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;알파벳 약 -10% 이상; 아마존 약 -1%; FCF 2분기 적자·3분기 -22억 달러·연간 ‘100달러 이상 플러스’&quot;,
+        &quot;observed&quot;: &quot;뉴스 발췌의 알파벳 하락률은 12% 초과이나 거래 구간 미확정. 아마존 하락률과 FCF 수치는 확인 불가. 연간 금액 단위 복원 불가.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;기업별 현금흐름과 가격 반응을 복원하기 전에는 이를 근거로 과잉투자, 광고 잠식 또는 저가매수 기회를 확정할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;claim_text&quot;: &quot;연준 동결·경기 평가 개선·GDP 및 실업률 전망 수정, 윌리엄스의 추가 인상 발언과 12월 7~8일 FOMC 주장.&quot;,
+      &quot;status&quot;: &quot;asr_uncertain&quot;,
+      &quot;confidence&quot;: 0.97,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:18:21&quot;,
+      &quot;source_confidence&quot;: 0.82,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;다음 해 GDP 전망 +0.1%포인트·실업률 -0.1%포인트; 12월 7~8일 FOMC; 추가 인상 1회&quot;,
+        &quot;observed&quot;: &quot;모든 수치와 일정 확인 불가. 비교 SEP 및 전망연도 미확정.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;12월 한 차례 인상 후 종료를 공식 정책 경로나 확인된 시장 기대처럼 사용할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;claim_text&quot;: &quot;중간선거 관련 정책 불확실성, 방산주 약 10% 급등락, 부시 가문 선거운동 및 선거 전후 랠리 패턴 주장.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:24:09&quot;,
+      &quot;source_confidence&quot;: 0.82,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;방산주 약 +10% 후 급락; 가상 일괄 관세 50%&quot;,
+        &quot;observed&quot;: &quot;방산주 변동 확인 불가. 50%는 추출상 가정값이지 관측된 정책 수치가 아니다.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;가상 정책 충격은 시나리오로만 다루고 실제 정책 발표나 반복 가능한 선거 랠리로 제시하지 않아야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C10&quot;,
+      &quot;claim_text&quot;: &quot;미식별 외부 금융기관 자료를 근거로 10월 급락이 AI 기술주 레버리지 청산과 하방 공격에서 비롯됐다는 주장.&quot;,
+      &quot;status&quot;: &quot;asr_uncertain&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:06:13&quot;,
+      &quot;source_confidence&quot;: 0.82,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;10월 급락의 원인이 레버리지 청산 및 하방 공격&quot;,
+        &quot;observed&quot;: &quot;대상연도·원문·정량 기여도 확인 불가.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;권위 있는 기관이 확인한 급락 원인으로 인용할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C11&quot;,
+      &quot;claim_text&quot;: &quot;급반등 시 반도체, 박스권 시 코스닥 모멘텀에 대응하고 후보를 약 3대 1로 살피며, 본인은 바닥 확인 전 현금을 추가 투입하지 않겠다는 전략 및 자기보고.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.97,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:30:13&quot;,
+      &quot;source_confidence&quot;: 0.96,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;모멘텀 종목 대 턴어라운드 후보 약 3:1; 6월 고점 이후 추가 현금 투입 0회&quot;,
+        &quot;observed&quot;: &quot;비율의 원음과 실제 거래 횟수 확인 불가. 3:1을 보유 비중으로 환산하지 않음.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;출연자의 조건부 운용 견해로 제시할 수 있으나 검증된 매매법이나 확인된 계좌 운용 실적으로 표현하면 안 된다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C12&quot;,
+      &quot;claim_text&quot;: &quot;삼성전자 20만원도 비싸지 않고 외국인 유입은 중장기 가치 자금이며 반등 탄력은 하이닉스가 더 강하다는 평가.&quot;,
+      &quot;status&quot;: &quot;asr_uncertain&quot;,
+      &quot;confidence&quot;: 0.96,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:12:14&quot;,
+      &quot;source_confidence&quot;: 0.87,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;삼성전자 20만원도 비싸지 않음; 실제 매집량은 순매수의 3~4배라는 추정&quot;,
+        &quot;observed&quot;: &quot;뉴스 발췌의 삼성전자 종가 23만2000원. 적정가치·매집량 배수·구간별 상대수익률 확인 불가.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;20만원을 검증된 적정가격으로, 외국인 순매수를 장기 투자자의 확신으로 해석할 수 없다.&quot;
+    }
+  ],
+  &quot;entities&quot;: [
+    {
+      &quot;ticker&quot;: &quot;005930&quot;,
+      &quot;name&quot;: &quot;삼성전자&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;실적보다 기존과 유사한 주주환원 발표 방식과 비전 제시 부족이 단기 상승 모멘텀을 약화시켰다고 평가한다.&quot;,
+        &quot;외국인 매도가 제한적이고 저점권 누적 매수가 있어 감정적인 비중 축소는 하지 않으며, 유입 자금을 밸류에이션을 중시하는 중장기 자금으로 해석한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;배당 규모를 ‘30조원 정도’로 발언했으나 수치 재확인 필요.&quot;,
+        &quot;2024~2026년 3개년 잉여현금흐름의 50%를 주주가치 제고에 사용하고 추가 내용은 내년 1월 확인한다는 설명.&quot;,
+        &quot;장중 삼성전자 4%대 하락, SK하이닉스 4%대 상승을 비교.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;시장 데이터 조회 실패: no_usable_market_fields&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;005930&quot;,
+        &quot;as_of&quot;: &quot;2026-10-29T22:25:23.819190+00:00&quot;,
+        &quot;current_price&quot;: null,
+        &quot;market_cap&quot;: null,
+        &quot;forward_pe&quot;: null,
+        &quot;trailing_pe&quot;: null,
+        &quot;fifty_two_week_high&quot;: null,
+        &quot;fifty_two_week_low&quot;: null,
+        &quot;average_target_price&quot;: null,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;unverified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;000660&quot;,
+      &quot;name&quot;: &quot;SK하이닉스&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;저점권 누적 수급은 삼성전자보다 약하지만, 반등 시 주가 탄력이 더 강한 주도주로 평가하며 장기 가치 선택과 단기 반등 선택을 구분한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;실적 발표 이후 최근 이틀 외국인 매수로 전환했다고 설명.&quot;,
+        &quot;과거 반등에서 두 자릿수 상승을 보였다고 언급하나 정확한 거래일은 제시되지 않음.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;시장 데이터 조회 실패: no_usable_market_fields&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;000660&quot;,
+        &quot;as_of&quot;: &quot;2026-10-29T22:25:26.772472+00:00&quot;,
+        &quot;current_price&quot;: null,
+        &quot;market_cap&quot;: null,
+        &quot;forward_pe&quot;: null,
+        &quot;trailing_pe&quot;: null,
+        &quot;fifty_two_week_high&quot;: null,
+        &quot;fifty_two_week_low&quot;: null,
+        &quot;average_target_price&quot;: null,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;unverified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;^KS11&quot;,
+      &quot;name&quot;: &quot;한국 증시·미국 통화정책 및 정치 변수&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;대차잔고 고점권, 하방 포지션 청산, 외국인 수급 개선을 근거로 추가 급락보다 숏커버링 반등 또는 기간 조정 가능성을 높게 본다.&quot;,
+        &quot;연준의 긍정적인 경기 평가와 금리 인상 종료 가능성은 우호적이지만, 미국 중간선거 전 돌발 관세·군사 행동이 시장 방향을 바꿀 수 있다고 본다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;10월 중순까지 외국인이 몇 조원 단위로 매도했으나 10월 마지막 주 현물·선물 수급이 개선됐다고 설명.&quot;,
+        &quot;12월 금리 인상 1회 이후 인상 국면이 마무리될 가능성을 제시.&quot;,
+        &quot;연준이 내년도 GDP 성장률 전망을 0.1%포인트 올리고 실업률 전망을 0.1%포인트 낮췄다고 설명.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;^KS11&quot;,
+        &quot;as_of&quot;: &quot;2026-10-29T22:25:29.351259+00:00&quot;,
+        &quot;current_price&quot;: 5937.66,
+        &quot;market_cap&quot;: null,
+        &quot;forward_pe&quot;: null,
+        &quot;trailing_pe&quot;: null,
+        &quot;fifty_two_week_high&quot;: 9385.59,
+        &quot;fifty_two_week_low&quot;: 0.0,
+        &quot;average_target_price&quot;: null,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;CRWV&quot;,
+      &quot;name&quot;: &quot;코어위브·네오클라우드&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;코어위브의 연속 급등을 숏커버링 신호로 해석하며, 네오클라우드 하방 압력이 완화되고 있다고 판단한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;이틀 전 약 8%, 전일 약 7%, 이틀간 약 15% 상승했다고 설명.&quot;,
+        &quot;공매도 관련 수치로 ‘24%, 23.7%’가 언급되지만 잔고·비중·증가율 중 어떤 지표인지 불명확.&quot;,
+        &quot;코어위브의 매출 또는 수주 물량 약 3분의 2가 마이크로소프트 관련이라고 설명했으나 지표 구분 불명확.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;CRWV&quot;,
+        &quot;as_of&quot;: &quot;2026-10-29T22:25:30.347780+00:00&quot;,
+        &quot;current_price&quot;: 60.7400016784668,
+        &quot;market_cap&quot;: 33500334131.215874,
+        &quot;forward_pe&quot;: -30.857708,
+        &quot;trailing_pe&quot;: null,
+        &quot;fifty_two_week_high&quot;: 138.36,
+        &quot;fifty_two_week_low&quot;: 51.24,
+        &quot;average_target_price&quot;: 134.57895,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;MSFT&quot;,
+      &quot;name&quot;: &quot;마이크로소프트&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;매출과 EPS가 예상을 웃돈 실적을 네오클라우드 고객 수요 및 투자 우려를 완화한 요인으로 해석한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;MSFT&quot;,
+        &quot;as_of&quot;: &quot;2026-10-29T22:25:33.340755+00:00&quot;,
+        &quot;current_price&quot;: 530.1400146484375,
+        &quot;market_cap&quot;: 3936578795371.379,
+        &quot;forward_pe&quot;: 21.98939,
+        &quot;trailing_pe&quot;: 29.534262,
+        &quot;fifty_two_week_high&quot;: 551.15,
+        &quot;fifty_two_week_low&quot;: 349.2,
+        &quot;average_target_price&quot;: 605.1243,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;GOOGL&quot;,
+      &quot;name&quot;: &quot;알파벳·구글&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;클라우드 실적은 좋지만 검색 이용이 AI로 이동하면서 광고 의존도가 높은 기존 수익구조가 압박받을 수 있다고 본다. 다른 출연자는 데이터·상업화·자체 AI 경쟁력을 근거로 반론을 제시한다.&quot;,
+        &quot;클라우드 성과를 고려하면 급락 후 일부 회복할 수 있으며 장기 투자자의 진입 기회가 될 수 있다고 보지만, 단기 매매 타이밍은 어렵다고 평가한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;실적 발표 이후 프리마켓 또는 시간외 주가가 약 10% 이상 하락했다고 언급.&quot;,
+        &quot;출연자 개인의 검색 이용 중 약 90% 이상이 ChatGPT라는 경험을 제시했으며 시장점유율 수치가 아님.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;GOOGL&quot;,
+        &quot;as_of&quot;: &quot;2026-10-29T22:25:35.043072+00:00&quot;,
+        &quot;current_price&quot;: 283.82000732421875,
+        &quot;market_cap&quot;: 3471100193309.138,
+        &quot;forward_pe&quot;: 18.748026,
+        &quot;trailing_pe&quot;: 14.8208885,
+        &quot;fifty_two_week_high&quot;: 408.61,
+        &quot;fifty_two_week_low&quot;: 270.7,
+        &quot;average_target_price&quot;: 419.91537,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;AMZN&quot;,
+      &quot;name&quot;: &quot;아마존&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;실적 예상치 미달과 잉여현금흐름의 연속 적자가 과도한 투자에 대한 우려를 키울 수 있다고 설명한다. 다만 인접한 알파벳 논의와 기업명이 혼재되어 귀속 확인이 필요하다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;잉여현금흐름이 2분기 연속 마이너스라고 발언.&quot;,
+        &quot;3분기 잉여현금흐름 약 -22억 달러, 연간으로 ‘100달러 이상 플러스’라고 인식되나 연간 수치의 단위가 훼손됨.&quot;,
+        &quot;주가 약 -1% 언급이 있으나 인접한 알파벳 약 -10% 발언과 관계가 불명확.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;AMZN&quot;,
+        &quot;as_of&quot;: &quot;2026-10-29T22:25:37.002544+00:00&quot;,
+        &quot;current_price&quot;: 243.7899932861328,
+        &quot;market_cap&quot;: 2629595313300.0034,
+        &quot;forward_pe&quot;: 23.328983,
+        &quot;trailing_pe&quot;: 19.613031,
+        &quot;fifty_two_week_high&quot;: 287.2,
+        &quot;fifty_two_week_low&quot;: 196.0,
+        &quot;average_target_price&quot;: 332.4093,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    }
+  ],
+  &quot;evidence&quot;: [
+    {
+      &quot;evidence_id&quot;: &quot;E1&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;BC-Sugar Futures&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/commodities/articles/bc-sugar-futures-140102564.html&quot;,
+      &quot;publisher&quot;: &quot;Associated Press&quot;,
+      &quot;published_at&quot;: &quot;2026-10-29T14:01:02+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;BC-Sugar Futures Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 2026 Elections Weather Newsletters Finance My portfolio News Markets Researc...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E2&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;3 low-volatility stocks with questionable fundamentals&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/3-low-volatility-stocks-questionable-100325387.html&quot;,
+      &quot;publisher&quot;: &quot;StockStory&quot;,
+      &quot;published_at&quot;: &quot;2026-10-29T10:03:25+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;3 low-volatility stocks with questionable fundamentals Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 2026 Elections Weather Newsletters Fin...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E4&quot;,
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;title&quot;: &quot;Meta Has Given Back All of Its Muse Advance. Shares Could Face More Pressure Ahead.&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/m/e14aa9d8-8120-3452-84f5-ab6a866d6ef4/meta-has-given-back-all-of.html&quot;,
+      &quot;publisher&quot;: &quot;Barrons.com&quot;,
+      &quot;published_at&quot;: &quot;2026-10-29T17:47:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E5&quot;,
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;title&quot;: &quot;Capstone Copper Q3 adjusted profit rises on metal prices; output slumps&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/commodities/articles/capstone-copper-q3-adjusted-profit-221609306.html&quot;,
+      &quot;publisher&quot;: &quot;Investing.com&quot;,
+      &quot;published_at&quot;: &quot;2026-10-29T22:16:09+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E6&quot;,
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;title&quot;: &quot;Google owner Alphabet reports 25% revenue growth in Q3 2026&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/news/google-owner-alphabet-reports-25-222600571.html&quot;,
+      &quot;publisher&quot;: &quot;Verdict&quot;,
+      &quot;published_at&quot;: &quot;2026-10-29T22:26:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E7&quot;,
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;title&quot;: &quot;Amazon cloud business accelerates but shares drop on profit miss&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/amazon-cloud-business-accelerates-shares-222112520.html&quot;,
+      &quot;publisher&quot;: &quot;AFP&quot;,
+      &quot;published_at&quot;: &quot;2026-10-29T22:21:12+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E9&quot;,
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;title&quot;: &quot;Merck Earnings Blow Past Estimates. Why Wall Street Is Looking Past the Numbers.&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/m/8f7d376d-79f5-3692-96ea-8b951c5732f2/merck-earnings-blow-past.html&quot;,
+      &quot;publisher&quot;: &quot;Barrons.com&quot;,
+      &quot;published_at&quot;: &quot;2026-10-29T18:27:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E10&quot;,
+      &quot;claim_id&quot;: &quot;GLOBAL&quot;,
+      &quot;title&quot;: &quot;Invesco NASDAQ 100 ETF (QQQM) Buys $20.6 Million More NVIDIA on Oct. 27&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/invesco-nasdaq-100-etf-qqqm-110424873.html&quot;,
+      &quot;publisher&quot;: &quot;GuruFocus.com&quot;,
+      &quot;published_at&quot;: &quot;2026-10-29T11:04:24+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E11&quot;,
+      &quot;claim_id&quot;: &quot;GLOBAL&quot;,
+      &quot;title&quot;: &quot;ETFs Bought $40.7 Million of Tesla (TSLA) on Oct. 27&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/etfs-bought-40-7-million-110201539.html&quot;,
+      &quot;publisher&quot;: &quot;GuruFocus.com&quot;,
+      &quot;published_at&quot;: &quot;2026-10-29T11:02:01+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    }
+  ],
+  &quot;source_policy&quot;: {
+    &quot;raw_transcript_published&quot;: false,
+    &quot;raw_transcript_in_evidence&quot;: false,
+    &quot;research_pipeline_version&quot;: 4,
+    &quot;closed_source_claims&quot;: &quot;unverified_external_source&quot;,
+    &quot;auto_caption_warning&quot;: true,
+    &quot;local_asr_warning&quot;: false
+  }
+}</pre>
+  </details>
+</article>
+</main>
+  <style>
+.reader-contents { margin: 16px 0; padding: 12px 16px; border: 1px solid var(--line, #64748b); border-radius: 12px; }
+.reader-contents > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-weight: 750; }
+.reader-contents nav { display: grid; gap: 4px; max-height: 45vh; overflow: auto; margin: 8px 0; }
+.reader-contents a { display: block; min-height: 44px; padding: 10px; border-radius: 6px; color: inherit; overflow-wrap: anywhere; }
+.reader-contents a:hover { background: #80808020; }
+.reader-contents .reader-subsection { padding-inline-start: 24px; font-size: .92em; }
+.reader-prose, .report { overflow-wrap: anywhere; line-height: 1.8; }
+.reader-prose p, .reader-prose li { max-width: 85ch; }
+.reader-prose h2, .reader-prose h3, .reader-prose h4, [data-reader-heading] { scroll-margin-top: 100px; line-height: 1.45; }
+.reader-prose h2 { margin-top: 1.8em; padding-bottom: 8px; border-bottom: 1px solid var(--line, #64748b); }
+.reader-prose h3 { margin-top: 1.5em; }
+.reader-prose li { margin: .5em 0; }
+.reader-prose pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.reader-prose blockquote { margin: 16px 0; padding: 4px 16px; border-left: 3px solid var(--accent, #64748b); }
+.reader-table { overflow: auto; max-width: 100%; margin: 16px 0; border: 1px solid var(--line, #64748b); border-radius: 10px; }
+.reader-table table { border-collapse: collapse; width: 100%; margin: 0; font-size: .92rem; }
+.reader-table th, .reader-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line, #64748b); min-width: 110px; max-width: 400px; overflow-wrap: anywhere; white-space: normal; }
+.reader-table th { background: #80808018; }
+.reader-table tr:nth-child(even) { background: #80808008; }
+.reader-search { display: grid; gap: 8px; margin: 16px 0; }
+.reader-search label { font-weight: 700; }
+.reader-search input { box-sizing: border-box; width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line, #64748b); border-radius: 10px; background: var(--panel, #fff); color: var(--text, #132238); font: inherit; }
+.reader-search p { margin: 0; font-size: .86rem; }
+.reader-back { position: fixed; bottom: max(14px, env(safe-area-inset-bottom)); right: 14px; z-index: 30; min-height: 44px; border: 1px solid #778899; border-radius: 99px; padding: 10px 16px; background: #18344a; color: #fff; font: 700 14px system-ui; cursor: pointer; box-shadow: 0 3px 12px #0003; }
+[data-reader-source] { margin-top: 20px; }
+[data-reader-source] > summary { min-height: 44px; cursor: pointer; }
+[data-reader-source] pre { font-size: .85rem; }
+[data-reader-source] pre, .reader-prose { min-width: 0; }
+.reader-contents :focus-visible, .reader-search :focus-visible, .reader-back:focus-visible, .reader-table:focus-visible { outline: 3px solid var(--accent, #008c95); outline-offset: 3px; }
+.reader-search + .grid > [hidden] { display: none !important; }
+@media (max-width: 600px) { .reader-prose { font-size: 1rem; } .reader-contents { padding: 8px 12px; } }
+@media print { .reader-back, .reader-search, .reader-contents, [data-reader-source] { display: none !important; } .reader-table { overflow: visible; } .reader-prose { color: #000; background: #fff; } }
+</style><script>
+(() => {
+  'use strict';
+  let serial = 0;
+  const rendered = new WeakMap();
+  const node = (tag, text) => { const el = document.createElement(tag); if (text != null) el.textContent = text; return el; };
+  function inline(parent, text) {
+    const pattern = /(`[^`]+`|\*\*[^*]+\*\*|\[[^\]]+\]\(https?:\/\/[^\s)]+\))/g;
+    let start = 0;
+    for (const match of String(text).matchAll(pattern)) {
+      parent.append(document.createTextNode(text.slice(start, match.index)));
+      const value = match[0];
+      if (value.startsWith('`')) parent.append(node('code', value.slice(1, -1)));
+      else if (value.startsWith('**')) parent.append(node('strong', value.slice(2, -2)));
+      else {
+        const link = value.match(/^\[([^\]]+)\]\((.+)\)$/);
+        const a = node('a', link[1]); a.href = link[2]; a.rel = 'noopener noreferrer'; parent.append(a);
+      }
+      start = match.index + value.length;
+    }
+    parent.append(document.createTextNode(text.slice(start)));
+  }
+  const cells = line => line.trim().replace(/^\|/, '').replace(/\|$/, '').split(/(?<!\\)\|/).map(v => v.trim().replace(/\\\|/g, '|'));
+  function markdown(source) {
+    const article = node('article'); article.className = 'reader-prose';
+    const lines = source.split(/\r?\n/); let list = null;
+    for (let i = 0; i < lines.length; i += 1) {
+      const line = lines[i], value = line.trim();
+      if (!value) { list = null; continue; }
+      if (/^```/.test(value)) {
+        const code = []; i += 1;
+        while (i < lines.length && !/^```/.test(lines[i].trim())) code.push(lines[i++]);
+        const pre = node('pre'); pre.append(node('code', code.join('\n'))); article.append(pre); list = null; continue;
+      }
+      if (i + 1 < lines.length && value.includes('|') && cells(lines[i + 1]).every(v => /^:?-{3,}:?$/.test(v))) {
+        const table = node('table'), head = node('thead'), body = node('tbody');
+        const row = (values, tag) => { const tr = node('tr'); values.forEach(v => { const cell = node(tag); if (tag === 'th') cell.scope = 'col'; inline(cell, v); tr.append(cell); }); return tr; };
+        head.append(row(cells(line), 'th')); i += 2;
+        while (i < lines.length && lines[i].trim() && lines[i].includes('|')) body.append(row(cells(lines[i++]), 'td'));
+        i -= 1; table.append(head, body); article.append(table); list = null; continue;
+      }
+      const heading = value.match(/^(#{1,6})\s+(.+)$/);
+      if (heading) { const h = node('h' + Math.min(4, heading[1].length + 1)); inline(h, heading[2]); article.append(h); list = null; continue; }
+      const bullet = value.match(/^(?:[-*+] |\d+\. )(.+)$/);
+      if (bullet) {
+        const tag = /^\d/.test(value) ? 'ol' : 'ul';
+        if (!list || list.tagName.toLowerCase() !== tag) { list = node(tag); if (tag === 'ol') list.start = parseInt(value, 10); article.append(list); }
+        const li = node('li'); inline(li, bullet[1]); list.append(li); continue;
+      }
+      list = null;
+      if (/^(---+|\*\*\*+)$/.test(value)) { article.append(node('hr')); continue; }
+      const p = node(value.startsWith('> ') ? 'blockquote' : 'p'); inline(p, value.startsWith('> ') ? value.slice(2) : line); article.append(p);
+    }
+    return article;
+  }
+  function contents(root) {
+    root.querySelectorAll(':scope > .reader-contents').forEach(el => el.remove());
+    const headings = [...root.querySelectorAll('h2,h3,h4')].filter(h => !h.closest('.card,.run-card,.reader-contents,[data-reader-source],[hidden]'));
+    if (headings.length < 2) return;
+    const details = node('details'); details.className = 'reader-contents';
+    details.append(node('summary', '이 리포트 목차 · ' + headings.length + '개 항목'));
+    const nav = node('nav'); nav.setAttribute('aria-label', '리포트 목차');
+    headings.forEach(h => {
+      if (!h.id) h.id = 'reader-section-' + (++serial);
+      h.dataset.readerHeading = ''; h.tabIndex = -1;
+      const a = node('a', h.textContent); a.href = '#' + h.id;
+      if (h.tagName !== 'H2') a.className = 'reader-subsection';
+      a.addEventListener('click', event => {
+        event.preventDefault();
+        for (let ancestor = h.parentElement; ancestor; ancestor = ancestor.parentElement) if (ancestor.tagName === 'DETAILS') ancestor.open = true;
+        h.scrollIntoView({block: 'start'}); h.focus({preventScroll: true});
+      }); nav.append(a);
+    });
+    details.append(nav); root.prepend(details);
+  }
+  function enhance(root) {
+    if (!root) return;
+    root.querySelectorAll('pre[data-report-markdown]').forEach(pre => {
+      const previous = rendered.get(pre);
+      if (previous && previous.source === pre.textContent) return;
+      const article = markdown(pre.textContent);
+      if (previous) previous.article.replaceWith(article);
+      else {
+        const details = node('details'); details.dataset.readerSource = '';
+        details.append(node('summary', 'Markdown 원문 보기'));
+        pre.before(article, details); details.append(pre);
+      }
+      rendered.set(pre, {source: pre.textContent, article});
+    });
+    root.querySelectorAll('table').forEach(table => {
+      if (table.closest('.reader-table,.account-table-wrap,.summary-scroll')) return;
+      const wrap = node('div'); wrap.className = 'reader-table'; wrap.tabIndex = 0;
+      wrap.setAttribute('role', 'region'); wrap.setAttribute('aria-label', '리포트 표 · 가로로 스크롤하여 전체 보기');
+      table.before(wrap); wrap.append(table);
+    });
+    root.querySelectorAll('.grid').forEach(grid => {
+      const cards = [...grid.querySelectorAll(':scope > a.card')];
+      if (cards.length < 2 || grid.dataset.readerSearch) return;
+      grid.dataset.readerSearch = 'true';
+      const box = node('div'); box.className = 'reader-search';
+      const input = node('input'); input.type = 'search'; input.placeholder = '제목 · 종목 · 채널 · 키워드'; input.id = 'report-search-' + (++serial);
+      const label = node('label', '리포트 찾기'); label.htmlFor = input.id;
+      const status = node('p'); status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
+      const update = () => {
+        const terms = input.value.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean); let count = 0;
+        cards.forEach(card => { card.hidden = !terms.every(t => card.textContent.toLocaleLowerCase().includes(t)); if (!card.hidden) count += 1; });
+        status.textContent = cards.length + '개 중 ' + count + '개 표시' + (count ? '' : ' · 검색어를 지우거나 다른 키워드를 입력하세요.');
+      };
+      input.addEventListener('input', update); box.append(label, input, status); grid.before(box); update();
+    });
+    contents(root);
+  }
+  window.TradingAgentsReader = {enhance};
+  const main = document.querySelector('main');
+  if (main && !main.hasAttribute('data-reader-dynamic')) enhance(main);
+  if (main) {
+    const top = node('button', '↑ 맨 위'); top.type = 'button'; top.className = 'reader-back'; top.setAttribute('aria-label', '리포트 맨 위로 이동');
+    top.addEventListener('click', () => { const target = document.querySelector('h1') || main; target.tabIndex = -1; target.scrollIntoView({block: 'start'}); target.focus({preventScroll: true}); });
+    document.body.append(top);
+  }
+})();
+</script>
+</body>
+</html>

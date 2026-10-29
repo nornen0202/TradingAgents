@@ -1,20 +1,20 @@
 {
   "schema": "tradingagents.work-context/v1",
   "surface": "prism",
-  "event_id": "prism:928744e5a0d547693badc9ae37d9043d",
+  "event_id": "prism:bf179d4c082ebc50f9d63cad8e600db7",
   "prompt_contract_version": "prism-work-v5",
   "prompt_sha256": "2d6e6a207021f5126507994f77ca7850fa9bf42701a32286227ca874c1f535df",
   "skill_sha256": "2fc508d85fe6afb80608a3d2ca1ada647cb71254d0e38d7828f498908f28e99a",
   "task_manifest_sha256": "8a8d24b0b49e832a3849d0ecca03fab2e8370d33747d066b8de21712c105e415",
   "workflow_contract_sha256": "2fcc0a99a8b3460b8cc9c6261dcaa4e9814678f715792d9b8dad8a24b6ed4775",
-  "source_sha256": "c39ec20d6921943f185cfd2b50b1d32dd0f1064e7b7c2b10fc7cf325f67cb013",
+  "source_sha256": "b4e528726631a6e1886c151b81c4dd55545f5aa2ba43440d4d91d9c616d3271f",
   "body": {
     "kind": "prism",
-    "source_health": "EMPTY",
+    "source_health": "OK",
     "source": {
-      "health": "EMPTY",
-      "run_id": "prism_telegram_20261029_091203",
-      "last_run_at": "2026-10-29T09:12:25.014783+09:00",
+      "health": "OK",
+      "run_id": "prism_telegram_20261030_080500",
+      "last_run_at": "2026-10-30T08:05:12.559362+09:00",
       "status": "success",
       "stale_after_hours": 30
     },
@@ -43,14 +43,1385 @@
       "may_bypass_market_or_portfolio_execution_gate": false
     },
     "coverage": {
-      "total_unique_events": 317,
-      "window_events": 0,
-      "transmitted_events": 0,
+      "total_unique_events": 338,
+      "window_events": 21,
+      "transmitted_events": 21,
       "truncated": false,
-      "oldest_occurred_at": null,
-      "newest_occurred_at": null
+      "oldest_occurred_at": "2026-10-29T17:52:55+00:00",
+      "newest_occurred_at": "2026-10-29T19:56:55+00:00"
     },
-    "events": [],
+    "events": [
+      {
+        "event_key": "stock_ai_agent:16918",
+        "content_sha256": "3c47a686cb0b27fe1b070133a594e02a69d49af30b58a0dfc5260556adb5cd34",
+        "occurred_at": "2026-10-29T19:56:55+00:00",
+        "relevance": {
+          "tickers": [
+            "HALO",
+            "CRGY",
+            "FRSH",
+            "BKH",
+            "BP",
+            "QCOM"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "16918",
+          "posted_at": "2026-10-29T19:56:55+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16918",
+          "preview": "📊 프리즘 US 시뮬레이터 | 실시간 포트폴리오 (2026-10-30 04:56) 🔸 현재 보유: 6/10개 🔸 사용 비중: 4.35/10 슬롯 (분할 매수·시험매수 반영) ✅ 최고 수익: Halozyme Therapeutics, Inc.(HALO) +10.98% ⚠️ 최저 수익: Crescent Energy Company(CRGY) +0.18% 🔸 보유 종목: - Freshworks...",
+          "signals": [
+            {
+              "canonical_ticker": "HALO",
+              "display_name": "Halozyme Therapeutics, Inc.",
+              "market": "US",
+              "source_asof": "2026-10-29T19:56:55+00:00",
+              "signal_action": "HOLD",
+              "trigger_type": "telegram_portfolio_snapshot",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            },
+            {
+              "canonical_ticker": "CRGY",
+              "display_name": "Crescent Energy Company",
+              "market": "US",
+              "source_asof": "2026-10-29T19:56:55+00:00",
+              "signal_action": "HOLD",
+              "trigger_type": "telegram_portfolio_snapshot",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            },
+            {
+              "canonical_ticker": "FRSH",
+              "display_name": "Freshworks Inc.",
+              "market": "US",
+              "source_asof": "2026-10-29T19:56:55+00:00",
+              "signal_action": "HOLD",
+              "trigger_type": "telegram_portfolio_snapshot",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "stop_loss_price": 14.48,
+              "target_price": 16.43,
+              "confidence": 0.45,
+              "warnings": [
+                "multi_ticker_prices_scoped_to_mention_block"
+              ]
+            },
+            {
+              "canonical_ticker": "BKH",
+              "display_name": "Black Hills Corporation",
+              "market": "US",
+              "source_asof": "2026-10-29T19:56:55+00:00",
+              "signal_action": "HOLD",
+              "trigger_type": "telegram_portfolio_snapshot",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "stop_loss_price": 77.2,
+              "target_price": 91.88,
+              "confidence": 0.45,
+              "warnings": [
+                "multi_ticker_prices_scoped_to_mention_block"
+              ]
+            },
+            {
+              "canonical_ticker": "BP",
+              "display_name": "BP p.l.c.",
+              "market": "US",
+              "source_asof": "2026-10-29T19:56:55+00:00",
+              "signal_action": "HOLD",
+              "trigger_type": "telegram_portfolio_snapshot",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "stop_loss_price": 48.67,
+              "target_price": 58.12,
+              "confidence": 0.45,
+              "warnings": [
+                "multi_ticker_prices_scoped_to_mention_block"
+              ]
+            },
+            {
+              "canonical_ticker": "QCOM",
+              "display_name": "QUALCOMM Incorporated",
+              "market": "US",
+              "source_asof": "2026-10-29T19:56:55+00:00",
+              "signal_action": "HOLD",
+              "trigger_type": "telegram_portfolio_snapshot",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "stop_loss_price": 172.18,
+              "target_price": 194.0,
+              "confidence": 0.45,
+              "warnings": [
+                "multi_ticker_prices_scoped_to_mention_block"
+              ]
+            }
+          ],
+          "signals_total": 6,
+          "signals_transmitted": 6,
+          "signals_truncated": false,
+          "simulation_only": true,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 1200,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:16917",
+        "content_sha256": "fc70a4d6eec086990696a4272792914307556403bfc6ca20b7e023fa1d07febe",
+        "occurred_at": "2026-10-29T19:56:50+00:00",
+        "relevance": {
+          "tickers": [
+            "LITE"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "16917",
+          "posted_at": "2026-10-29T19:56:50+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16917",
+          "preview": "📉 매도: Lumentum Holdings Inc.(LITE) 매수가: $931.33 매도가: $917.29 수익률(전략 기준): ⬇️ -1.51% (실제 투입 비중 35% 반영 시 -0.53%) 시뮬레이터 가격 기준이며 증권사 확정 실현손익이 아닙니다 보유기간: 2시간 3분 매도이유: 손실 중 50일 이동평균선($923.63) 아래로 내려가 매도했습니다 (매수가 대비 -1.51%)....",
+          "signals": [
+            {
+              "canonical_ticker": "LITE",
+              "display_name": "매도: Lumentum Holdings Inc.",
+              "market": "US",
+              "source_asof": "2026-10-29T19:56:50+00:00",
+              "signal_action": "UNKNOWN",
+              "trigger_type": "telegram_message",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            }
+          ],
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false,
+          "simulation_only": true,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 291,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:16916",
+        "content_sha256": "75e6df3d7bb37e84daabf8870ebf852ab4eee1c59d5e1918fc4b66b963129110",
+        "occurred_at": "2026-10-29T18:58:36+00:00",
+        "relevance": {
+          "tickers": [
+            "HALO",
+            "LITE",
+            "FRSH",
+            "BKH",
+            "BP",
+            "QCOM",
+            "CRGY"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "16916",
+          "posted_at": "2026-10-29T18:58:36+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16916",
+          "preview": "📊 프리즘 US 시뮬레이터 | 실시간 포트폴리오 (2026-10-30 03:58) 🔸 현재 보유: 7/10개 🔸 사용 비중: 4.70/10 슬롯 (분할 매수·시험매수 반영) ✅ 최고 수익: Halozyme Therapeutics, Inc.(HALO) +10.98% ⚠️ 최저 수익: Lumentum Holdings Inc.(LITE) -0.79% 🔸 보유 종목: - Freshworks I...",
+          "signals": [
+            {
+              "canonical_ticker": "HALO",
+              "display_name": "Halozyme Therapeutics, Inc.",
+              "market": "US",
+              "source_asof": "2026-10-29T18:58:36+00:00",
+              "signal_action": "HOLD",
+              "trigger_type": "telegram_portfolio_snapshot",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            },
+            {
+              "canonical_ticker": "LITE",
+              "display_name": "Lumentum Holdings Inc.",
+              "market": "US",
+              "source_asof": "2026-10-29T18:58:36+00:00",
+              "signal_action": "HOLD",
+              "trigger_type": "telegram_portfolio_snapshot",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            },
+            {
+              "canonical_ticker": "FRSH",
+              "display_name": "Freshworks Inc.",
+              "market": "US",
+              "source_asof": "2026-10-29T18:58:36+00:00",
+              "signal_action": "HOLD",
+              "trigger_type": "telegram_portfolio_snapshot",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "stop_loss_price": 14.48,
+              "target_price": 16.43,
+              "confidence": 0.45,
+              "warnings": [
+                "multi_ticker_prices_scoped_to_mention_block"
+              ]
+            },
+            {
+              "canonical_ticker": "BKH",
+              "display_name": "Black Hills Corporation",
+              "market": "US",
+              "source_asof": "2026-10-29T18:58:36+00:00",
+              "signal_action": "HOLD",
+              "trigger_type": "telegram_portfolio_snapshot",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "stop_loss_price": 77.2,
+              "target_price": 91.88,
+              "confidence": 0.45,
+              "warnings": [
+                "multi_ticker_prices_scoped_to_mention_block"
+              ]
+            },
+            {
+              "canonical_ticker": "BP",
+              "display_name": "BP p.l.c.",
+              "market": "US",
+              "source_asof": "2026-10-29T18:58:36+00:00",
+              "signal_action": "HOLD",
+              "trigger_type": "telegram_portfolio_snapshot",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "stop_loss_price": 48.67,
+              "target_price": 58.12,
+              "confidence": 0.45,
+              "warnings": [
+                "multi_ticker_prices_scoped_to_mention_block"
+              ]
+            },
+            {
+              "canonical_ticker": "QCOM",
+              "display_name": "QUALCOMM Incorporated",
+              "market": "US",
+              "source_asof": "2026-10-29T18:58:36+00:00",
+              "signal_action": "HOLD",
+              "trigger_type": "telegram_portfolio_snapshot",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "stop_loss_price": 172.18,
+              "target_price": 194.0,
+              "confidence": 0.45,
+              "warnings": [
+                "multi_ticker_prices_scoped_to_mention_block"
+              ]
+            },
+            {
+              "canonical_ticker": "CRGY",
+              "display_name": "Crescent Energy Company",
+              "market": "US",
+              "source_asof": "2026-10-29T18:58:36+00:00",
+              "signal_action": "HOLD",
+              "trigger_type": "telegram_portfolio_snapshot",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "stop_loss_price": 13.14,
+              "target_price": 14.79,
+              "confidence": 0.45,
+              "warnings": [
+                "multi_ticker_prices_scoped_to_mention_block"
+              ]
+            }
+          ],
+          "signals_total": 7,
+          "signals_transmitted": 7,
+          "signals_truncated": false,
+          "simulation_only": true,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 1200,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:16915",
+        "content_sha256": "dbd12eda289b4b521726a7eed9f073677c67deb072056ddc6f8f88cdc1dec82d",
+        "occurred_at": "2026-10-29T18:58:34+00:00",
+        "relevance": {
+          "tickers": [
+            "PURR"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "16915",
+          "posted_at": "2026-10-29T18:58:34+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16915",
+          "preview": "⚠️ 매수 보류: Hyperliquid Strategies Inc(PURR) 현재가: $11.96 매수 점수: 7/10 결정: 미진입 시장 상황: 보통 강세장 산업군: Financial Services 보류 사유: AI 판단: 미진입 — AI 사유: R — 손익비 하한 미달: 현재가 11.97달러에서 가장 가까운 과거 저항 구간의 중간값 12.71달러까지 거리의 80%를 적용한 목표가는...",
+          "signals": [
+            {
+              "canonical_ticker": "PURR",
+              "display_name": "Hyperliquid Strategies Inc",
+              "market": "US",
+              "source_asof": "2026-10-29T18:58:34+00:00",
+              "signal_action": "NO_ENTRY",
+              "trigger_type": "telegram_buy_skip",
+              "trigger_score": 0.7,
+              "composite_score": 0.7,
+              "confidence": 0.7,
+              "warnings": []
+            }
+          ],
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 950,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:16914",
+        "content_sha256": "a7dbe5e5642d2ab29c4369ce378744bdeac57929e7aa6629ff2e963c53e0599d",
+        "occurred_at": "2026-10-29T18:58:31+00:00",
+        "relevance": {
+          "tickers": [
+            "BMO"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "16914",
+          "posted_at": "2026-10-29T18:58:31+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16914",
+          "preview": "⚠️ 매수 보류: Bank Of Montreal(BMO) 현재가: $175.11 매수 점수: 2/10 결정: 미진입 시장 상황: 보통 강세장 산업군: Financial Services 보류 사유: AI 판단: 미진입 — 최근 두 분기 영업흑자와 재무 건전성 기준이 검증되지 않아 펀더멘털 게이트 두 항목이 미달하며, 강세장의 한 항목 미달 보완 경로에 해당하지 않습니다. / 점수 부족 (...",
+          "signals": [
+            {
+              "canonical_ticker": "BMO",
+              "display_name": "Bank Of Montreal",
+              "market": "US",
+              "source_asof": "2026-10-29T18:58:31+00:00",
+              "signal_action": "NO_ENTRY",
+              "trigger_type": "telegram_buy_skip",
+              "trigger_score": 0.2,
+              "composite_score": 0.2,
+              "stop_loss_price": 167.0,
+              "target_price": 184.25,
+              "confidence": 0.2,
+              "warnings": []
+            }
+          ],
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 897,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:16913",
+        "content_sha256": "914bbed10c7a0a6f61075fb59ef234c1ade8faf4134c5aecc8eb9b84b81ca5e9",
+        "occurred_at": "2026-10-29T18:58:28+00:00",
+        "relevance": {
+          "tickers": [
+            "ATI"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "16913",
+          "posted_at": "2026-10-29T18:58:28+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16913",
+          "preview": "⚠️ 매수 보류: ATI Inc.(ATI) 현재가: $178.68 매수 점수: 4/10 결정: 미진입 시장 상황: 보통 강세장 산업군: Industrials 보류 사유: AI 판단: 미진입 — 현재가 178.68달러가 하락하는 50일선보다 6.7% 낮아 필수 개별 추세 게이트에 해당합니다. / 점수 부족 (4/5) — AI 사유: 현재가 178.68달러가 하락하는 50일선보다 6.7%...",
+          "signals": [
+            {
+              "canonical_ticker": "ATI",
+              "display_name": "ATI Inc.",
+              "market": "US",
+              "source_asof": "2026-10-29T18:58:28+00:00",
+              "signal_action": "NO_ENTRY",
+              "trigger_type": "telegram_buy_skip",
+              "trigger_score": 0.4,
+              "composite_score": 0.4,
+              "confidence": 0.4,
+              "warnings": []
+            }
+          ],
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 942,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:16912",
+        "content_sha256": "b3b3ca21fda9e1d50383423a8b7cb977c6a66440cd1f759676c049e78b70e88c",
+        "occurred_at": "2026-10-29T18:58:25+00:00",
+        "relevance": {
+          "tickers": [
+            "LLY"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "16912",
+          "posted_at": "2026-10-29T18:58:25+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16912",
+          "preview": "📉 매도: Eli Lilly and Company(LLY) 매수가: $1,264.96 매도가: $1,365.60 수익률(전략 기준): ⬆️ +7.96% (실제 투입 비중 80% 반영 시 +6.36%) 시뮬레이터 가격 기준이며 증권사 확정 실현손익이 아닙니다 보유기간: 14일 매도이유: 확정 종가의 트레일링 이탈로 100% 전량 매도를 결정합니다. 기준일인 2026년 10월 28일 확정...",
+          "signals": [
+            {
+              "canonical_ticker": "LLY",
+              "display_name": "매도: Eli Lilly and Company",
+              "market": "US",
+              "source_asof": "2026-10-29T18:58:25+00:00",
+              "signal_action": "UNKNOWN",
+              "trigger_type": "telegram_message",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            }
+          ],
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false,
+          "simulation_only": true,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 510,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:16911",
+        "content_sha256": "1f63811b06a2eaac116df02dc04523db728d18661c8f188beb2dc86a4d05c5b6",
+        "occurred_at": "2026-10-29T18:58:23+00:00",
+        "relevance": {
+          "tickers": [
+            "HALO"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "16911",
+          "posted_at": "2026-10-29T18:58:23+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16911",
+          "preview": "🚨 포트폴리오 조정: Halozyme Therapeutics, Inc.(HALO) 손절가: $125.24로 상향조정 AI 제안 근거: 진입 후 고점이 매수가보다 5% 이상 상승하여 추적 손절이 활성화되어 있습니다. 관리 기준 고점 $131.83에 횡보장 비율 0.95를 적용한 손절선 $125.24는 기존 $118.72보다 5.5% 높아 조정 임계값 3.5%를 충족하며 현재가보다 낮습니다...",
+          "signals": [
+            {
+              "canonical_ticker": "HALO",
+              "display_name": "🚨 포트폴리오 조정: Halozyme Therapeutics, Inc.",
+              "market": "US",
+              "source_asof": "2026-10-29T18:58:23+00:00",
+              "signal_action": "UNKNOWN",
+              "trigger_type": "telegram_message",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "stop_loss_price": 125.24,
+              "confidence": 0.45,
+              "warnings": []
+            }
+          ],
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 607,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:16910",
+        "content_sha256": "9c79c69d44c6eea4ef9f2fde8d2732c631826b74b57786ee6fbbeeffd6bbdaeb",
+        "occurred_at": "2026-10-29T18:58:20+00:00",
+        "relevance": {
+          "tickers": [
+            "BKH"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "16910",
+          "posted_at": "2026-10-29T18:58:20+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16910",
+          "preview": "⚠️ 포트폴리오 조정: Black Hills Corporation(BKH) 손절가: $77.20로 상향조정 AI 제안 근거: 진입 후 고점의 5% 상승 요건을 충족하여 트레일링이 활성화됐습니다. 횡보 국면의 기준선 $77.20은 기존 손절가 $74.76보다 3.3% 높아 상향 임계값 1.7%를 충족하고 현재가보다 낮습니다. 손절가를 $77.20으로 상향하며, 상향 후에는 해당 손절가에...",
+          "signals": [
+            {
+              "canonical_ticker": "BKH",
+              "display_name": "포트폴리오 조정: Black Hills Corporation",
+              "market": "US",
+              "source_asof": "2026-10-29T18:58:20+00:00",
+              "signal_action": "UNKNOWN",
+              "trigger_type": "telegram_message",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "stop_loss_price": 77.2,
+              "confidence": 0.45,
+              "warnings": []
+            }
+          ],
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 564,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:16909",
+        "content_sha256": "d3498cc23e4a710c95a51b37ebca4514190423b64e3905bec147f9e0fe4978ca",
+        "occurred_at": "2026-10-29T18:47:33+00:00",
+        "relevance": {
+          "tickers": [
+            "PURR"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "16909",
+          "posted_at": "2026-10-29T18:47:33+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16909",
+          "preview": "📊 Hyperliquid Strategies Inc (PURR) O'Neil 인사이트 차트의 베이스/피벗/RS 주석을 함께 참고하세요. ※ 보조 참고용 · 투자 권유 아님",
+          "signals": [
+            {
+              "canonical_ticker": "PURR",
+              "display_name": "Hyperliquid Strategies Inc",
+              "market": "US",
+              "source_asof": "2026-10-29T18:47:33+00:00",
+              "signal_action": "WATCH",
+              "trigger_type": "telegram_oneil_insight",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            }
+          ],
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 95,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:16908",
+        "content_sha256": "44b3286880182d1471d37a62baeaa5838d754fe0ac38b7fc7a08cf38c9d07de8",
+        "occurred_at": "2026-10-29T18:47:21+00:00",
+        "relevance": {
+          "tickers": [
+            "BMO"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "16908",
+          "posted_at": "2026-10-29T18:47:21+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16908",
+          "preview": "📊 Bank Of Montreal (BMO) O'Neil 인사이트 차트의 베이스/피벗/RS 주석을 함께 참고하세요. ※ 보조 참고용 · 투자 권유 아님",
+          "signals": [
+            {
+              "canonical_ticker": "BMO",
+              "display_name": "Bank Of Montreal",
+              "market": "US",
+              "source_asof": "2026-10-29T18:47:21+00:00",
+              "signal_action": "WATCH",
+              "trigger_type": "telegram_oneil_insight",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            }
+          ],
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 84,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:16907",
+        "content_sha256": "ea6ba2dd0c84e65f47e4b24e1c40041683596ad18ef63bb13d9987ccb3a146a9",
+        "occurred_at": "2026-10-29T18:47:06+00:00",
+        "relevance": {
+          "tickers": [
+            "ATI"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "16907",
+          "posted_at": "2026-10-29T18:47:06+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16907",
+          "preview": "📊 ATI Inc. (ATI) O'Neil 인사이트 차트의 베이스/피벗/RS 주석을 함께 참고하세요. ※ 보조 참고용 · 투자 권유 아님",
+          "signals": [
+            {
+              "canonical_ticker": "ATI",
+              "display_name": "ATI Inc.",
+              "market": "US",
+              "source_asof": "2026-10-29T18:47:06+00:00",
+              "signal_action": "WATCH",
+              "trigger_type": "telegram_oneil_insight",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            }
+          ],
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 76,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:16906",
+        "content_sha256": "4f8269e70bdf8b1b9a3aebbc68c323ce89c10610de987aef7bb84a11782a87c3",
+        "occurred_at": "2026-10-29T18:46:46+00:00",
+        "relevance": {
+          "tickers": [
+            "PURR",
+            "SBET",
+            "BLSH"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "16906",
+          "posted_at": "2026-10-29T18:46:46+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16906",
+          "preview": "",
+          "signals": [
+            {
+              "canonical_ticker": "PURR",
+              "display_name": "Hyperliquid Strategies Inc",
+              "market": "US",
+              "source_asof": "2026-10-29T18:46:46+00:00",
+              "signal_action": "WATCH",
+              "trigger_type": "telegram_pdf_report",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            },
+            {
+              "canonical_ticker": "SBET",
+              "display_name": "경쟁사와 비교하면 — PURR의 비교기업은 SharpLink",
+              "market": "US",
+              "source_asof": "2026-10-29T18:46:46+00:00",
+              "signal_action": "WATCH",
+              "trigger_type": "telegram_pdf_report",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            },
+            {
+              "canonical_ticker": "BLSH",
+              "display_name": "Bullish",
+              "market": "US",
+              "source_asof": "2026-10-29T18:46:46+00:00",
+              "signal_action": "WATCH",
+              "trigger_type": "telegram_pdf_report",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            }
+          ],
+          "signals_total": 3,
+          "signals_transmitted": 3,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "NO_ARCHIVED_TEXT"
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:16905",
+        "content_sha256": "8cad2529c52c2fd7bcdf096c7adbb29e2f91e260f968c78e04084fe82c400f90",
+        "occurred_at": "2026-10-29T18:46:41+00:00",
+        "relevance": {
+          "tickers": [
+            "BMO"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "16905",
+          "posted_at": "2026-10-29T18:46:41+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16905",
+          "preview": "",
+          "signals": [
+            {
+              "canonical_ticker": "BMO",
+              "display_name": "Bank Of Montreal",
+              "market": "US",
+              "source_asof": "2026-10-29T18:46:41+00:00",
+              "signal_action": "WATCH",
+              "trigger_type": "telegram_pdf_report",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            }
+          ],
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "NO_ARCHIVED_TEXT"
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:16904",
+        "content_sha256": "438d5fac042b5b87c834584b22918c3cfafe1190531c3e4d123f765ac01cda81",
+        "occurred_at": "2026-10-29T18:46:33+00:00",
+        "relevance": {
+          "tickers": [
+            "ATI"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "16904",
+          "posted_at": "2026-10-29T18:46:33+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16904",
+          "preview": "",
+          "signals": [
+            {
+              "canonical_ticker": "ATI",
+              "display_name": "ATI Inc.",
+              "market": "US",
+              "source_asof": "2026-10-29T18:46:33+00:00",
+              "signal_action": "WATCH",
+              "trigger_type": "telegram_pdf_report",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            }
+          ],
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "NO_ARCHIVED_TEXT"
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:16903",
+        "content_sha256": "d98d4e79361cf7356a7d7da3ec8c94980b51e835a558e533b15a2d44ea804650",
+        "occurred_at": "2026-10-29T18:46:26+00:00",
+        "relevance": {
+          "tickers": [
+            "PURR"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "16903",
+          "posted_at": "2026-10-29T18:46:26+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16903",
+          "preview": "📊 Hyperliquid Strategies (PURR) HYPE 토큰을 보유·관리하고 스테이킹 및 검증인 수수료를 얻는 디지털자산 재무회사입니다. 실적은 반복 수수료 수익뿐 아니라 HYPE 가격 변동에도 크게 좌우됩니다. 💰 거래 현황 | 2026.10.29 관측치 - 현재가: $11.795 — 전일 $9.97 대비 약 +18.3% - 거래량: 약 4,788만 주, 전일 약 943만...",
+          "signals": [
+            {
+              "canonical_ticker": "PURR",
+              "display_name": "Hyperliquid Strategies",
+              "market": "US",
+              "source_asof": "2026-10-29T18:46:26+00:00",
+              "signal_action": "UNKNOWN",
+              "trigger_type": "telegram_message",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            }
+          ],
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 940,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:16902",
+        "content_sha256": "fd4c11fdc011b4be949e0c956a6412447adb93634d1767c8c8a08dfc18db0c15",
+        "occurred_at": "2026-10-29T18:46:21+00:00",
+        "relevance": {
+          "tickers": [
+            "BMO"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "16902",
+          "posted_at": "2026-10-29T18:46:21+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16902",
+          "preview": "📊 Bank of Montreal (BMO) — 캐나다 기반 대형 은행으로, 캐나다·미국에서 개인·기업 금융, 자산관리, 자본시장 서비스를 제공합니다. 💵 주가: $175.32 (10/29 오후 2:38 ET 관측값; 확정 종가 아님) 📈 전일 대비: +0.9% 🔄 거래량: 약 116만 주 관측. 당일 수치가 미확정이며, 거래량 지표도 엇갈려 지속적인 매수세로 단정하기 어렵습니다. 🎯...",
+          "signals": [
+            {
+              "canonical_ticker": "BMO",
+              "display_name": "Bank of Montreal",
+              "market": "US",
+              "source_asof": "2026-10-29T18:46:21+00:00",
+              "signal_action": "UNKNOWN",
+              "trigger_type": "telegram_message",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "target_price": 168.76,
+              "confidence": 0.45,
+              "warnings": []
+            }
+          ],
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 679,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:16901",
+        "content_sha256": "0eefb7e3a0563f892cfc18843cb5a7065726c6018c4c7b50639b0aa4ae02944c",
+        "occurred_at": "2026-10-29T18:46:15+00:00",
+        "relevance": {
+          "tickers": [
+            "ATI"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "16901",
+          "posted_at": "2026-10-29T18:46:15+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16901",
+          "preview": "📊 ATI Inc. (ATI) — 항공우주·방위와 산업용 특수금속·정밀 부품을 공급하는 소재 기업입니다. 항공우주·방위가 3분기 매출의 69%를 차지했습니다. 💰 주가: $178.84 관측가, 전일 종가 $165.30 대비 약 +8.2%. 10월 29일 장중 수치로 최종 종가는 아닐 수 있습니다. 📈 거래량: 약 217만 주로 관측됐습니다. 10월 22일 급락 때는 약 374만 주까지...",
+          "signals": [
+            {
+              "canonical_ticker": "ATI",
+              "display_name": "ATI Inc.",
+              "market": "US",
+              "source_asof": "2026-10-29T18:46:15+00:00",
+              "signal_action": "UNKNOWN",
+              "trigger_type": "telegram_message",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            }
+          ],
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 891,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:16900",
+        "content_sha256": "12eadf0c076a692158e2457ad7ed924e5009507b2884ef7bd49f634f1decfc99",
+        "occurred_at": "2026-10-29T18:38:59+00:00",
+        "relevance": {
+          "tickers": [
+            "ATI",
+            "BMO",
+            "PURR"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "16900",
+          "posted_at": "2026-10-29T18:38:59+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16900",
+          "preview": "🔔 미국주식 오후 프리즘 시그널 얼럿 📅 2026.10.29 오후 분석 포착된 관심종목 🤖 프리즘봇의 가상 포트폴리오 운용 과정을 투명하게 공개합니다. 실제 매수 권유가 아닙니다. 🧭 장기추세: 온건 강세 | 스윙: 횡보·숨고르기 | 실행기준: 온건 강세 | 선정: 탑다운 0종목 + 바텀업 3종목 🧭 오늘 테마 흐름 미국 1,019종목 · 전일 종가 대비 · 테마별 중앙값 📈 강한 테마...",
+          "signals": [
+            {
+              "canonical_ticker": "ATI",
+              "display_name": "ATI Inc.",
+              "market": "US",
+              "source_asof": "2026-10-29T18:38:59+00:00",
+              "signal_action": "WATCH",
+              "trigger_type": "telegram_signal_alert",
+              "trigger_score": 0.83,
+              "composite_score": 0.83,
+              "confidence": 0.83,
+              "warnings": []
+            },
+            {
+              "canonical_ticker": "BMO",
+              "display_name": "Bank Of Montreal",
+              "market": "US",
+              "source_asof": "2026-10-29T18:38:59+00:00",
+              "signal_action": "WATCH",
+              "trigger_type": "telegram_signal_alert",
+              "trigger_score": 0.37,
+              "composite_score": 0.37,
+              "confidence": 0.37,
+              "warnings": []
+            },
+            {
+              "canonical_ticker": "PURR",
+              "display_name": "Hyperliquid Strategies Inc",
+              "market": "US",
+              "source_asof": "2026-10-29T18:38:59+00:00",
+              "signal_action": "WATCH",
+              "trigger_type": "telegram_signal_alert",
+              "trigger_score": 1.0,
+              "composite_score": 1.0,
+              "confidence": 1.0,
+              "warnings": []
+            }
+          ],
+          "signals_total": 3,
+          "signals_transmitted": 3,
+          "signals_truncated": false,
+          "simulation_only": true,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 965,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:16899",
+        "content_sha256": "232628abef41c754cd6b130b79ea41e578f26b57427f92fd546335b22b6d16f2",
+        "occurred_at": "2026-10-29T17:53:00+00:00",
+        "relevance": {
+          "tickers": [
+            "HALO",
+            "LITE",
+            "FRSH",
+            "BKH",
+            "BP",
+            "LLY",
+            "QCOM",
+            "CRGY"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "16899",
+          "posted_at": "2026-10-29T17:53:00+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16899",
+          "preview": "📊 프리즘 US 시뮬레이터 | 실시간 포트폴리오 (2026-10-30 02:52) 🔸 현재 보유: 8/10개 🔸 사용 비중: 5.50/10 슬롯 (분할 매수·시험매수 반영) ✅ 최고 수익: Halozyme Therapeutics, Inc.(HALO) +11.75% ⚠️ 최저 수익: Lumentum Holdings Inc.(LITE) 0.00% 🔸 보유 종목: - Freshworks In...",
+          "signals": [
+            {
+              "canonical_ticker": "HALO",
+              "display_name": "Halozyme Therapeutics, Inc.",
+              "market": "US",
+              "source_asof": "2026-10-29T17:53:00+00:00",
+              "signal_action": "HOLD",
+              "trigger_type": "telegram_portfolio_snapshot",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            },
+            {
+              "canonical_ticker": "LITE",
+              "display_name": "Lumentum Holdings Inc.",
+              "market": "US",
+              "source_asof": "2026-10-29T17:53:00+00:00",
+              "signal_action": "HOLD",
+              "trigger_type": "telegram_portfolio_snapshot",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            },
+            {
+              "canonical_ticker": "FRSH",
+              "display_name": "Freshworks Inc.",
+              "market": "US",
+              "source_asof": "2026-10-29T17:53:00+00:00",
+              "signal_action": "HOLD",
+              "trigger_type": "telegram_portfolio_snapshot",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "stop_loss_price": 14.48,
+              "target_price": 16.43,
+              "confidence": 0.45,
+              "warnings": [
+                "multi_ticker_prices_scoped_to_mention_block"
+              ]
+            },
+            {
+              "canonical_ticker": "BKH",
+              "display_name": "Black Hills Corporation",
+              "market": "US",
+              "source_asof": "2026-10-29T17:53:00+00:00",
+              "signal_action": "HOLD",
+              "trigger_type": "telegram_portfolio_snapshot",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "stop_loss_price": 74.76,
+              "target_price": 91.88,
+              "confidence": 0.45,
+              "warnings": [
+                "multi_ticker_prices_scoped_to_mention_block"
+              ]
+            },
+            {
+              "canonical_ticker": "BP",
+              "display_name": "BP p.l.c.",
+              "market": "US",
+              "source_asof": "2026-10-29T17:53:00+00:00",
+              "signal_action": "HOLD",
+              "trigger_type": "telegram_portfolio_snapshot",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "stop_loss_price": 48.67,
+              "target_price": 58.12,
+              "confidence": 0.45,
+              "warnings": [
+                "multi_ticker_prices_scoped_to_mention_block"
+              ]
+            },
+            {
+              "canonical_ticker": "LLY",
+              "display_name": "Eli Lilly and Company",
+              "market": "US",
+              "source_asof": "2026-10-29T17:53:00+00:00",
+              "signal_action": "HOLD",
+              "trigger_type": "telegram_portfolio_snapshot",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "stop_loss_price": 1271.21,
+              "target_price": 1514.05,
+              "confidence": 0.45,
+              "warnings": [
+                "multi_ticker_prices_scoped_to_mention_block"
+              ]
+            },
+            {
+              "canonical_ticker": "QCOM",
+              "display_name": "QUALCOMM Incorporated",
+              "market": "US",
+              "source_asof": "2026-10-29T17:53:00+00:00",
+              "signal_action": "HOLD",
+              "trigger_type": "telegram_portfolio_snapshot",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "stop_loss_price": 172.18,
+              "target_price": 194.0,
+              "confidence": 0.45,
+              "warnings": [
+                "multi_ticker_prices_scoped_to_mention_block"
+              ]
+            },
+            {
+              "canonical_ticker": "CRGY",
+              "display_name": "Crescent Energy Company",
+              "market": "US",
+              "source_asof": "2026-10-29T17:53:00+00:00",
+              "signal_action": "HOLD",
+              "trigger_type": "telegram_portfolio_snapshot",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "stop_loss_price": 13.14,
+              "target_price": 14.79,
+              "confidence": 0.45,
+              "warnings": [
+                "multi_ticker_prices_scoped_to_mention_block"
+              ]
+            }
+          ],
+          "signals_total": 8,
+          "signals_transmitted": 8,
+          "signals_truncated": false,
+          "simulation_only": true,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 1200,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:16898",
+        "content_sha256": "bdfdf47a82ad1481ff19edd527ea0755c1617822e03ee6a1e6fca3354039d337",
+        "occurred_at": "2026-10-29T17:52:55+00:00",
+        "relevance": {
+          "tickers": [
+            "LITE"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "16898",
+          "posted_at": "2026-10-29T17:52:55+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16898",
+          "preview": "📈 신규 매수 | Lumentum Holdings Inc. (LITE) 💵 매수가 $931.33 🎯 목표가 $1,100.64 (+18.2%) ⛔ 손절가 $895.68 (-3.8%, 장중 이탈 시 즉시 매도) 🏷 업종 미확인 · 중기 🧩 분할 매수: 1슬롯의 35%로 시작 • 증액 조건은 다음 보유 점검에서 정합니다 • 손절 시 전량 매도 🔁 재진입 매수 (기준 가격 재돌파 매수, 1/3...",
+          "signals": [
+            {
+              "canonical_ticker": "LITE",
+              "display_name": "신규 매수 | Lumentum Holdings Inc.",
+              "market": "US",
+              "source_asof": "2026-10-29T17:52:55+00:00",
+              "signal_action": "BUY",
+              "trigger_type": "telegram_message",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "stop_loss_price": 895.68,
+              "target_price": 1100.64,
+              "confidence": 0.45,
+              "warnings": []
+            }
+          ],
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 437,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      }
+    ],
     "guardrails": {
       "untrusted_content": true,
       "advisory_only": true,

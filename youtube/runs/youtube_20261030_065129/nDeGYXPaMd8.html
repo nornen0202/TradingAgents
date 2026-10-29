@@ -1,0 +1,648 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YouTube 투자자용 검증 리포트 - 2027년, 시장의 돈 버는 규칙이 달라질 수 있다는 이유</title>
+  <style>
+:root {
+  color-scheme: light;
+  --bg: #f7f8fb;
+  --panel: #ffffff;
+  --text: #172033;
+  --muted: #667085;
+  --line: #d9dee8;
+  --accent: #0f766e;
+  --accent-2: #2563eb;
+  --warn: #b45309;
+  --bad: #b42318;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0 56px; }
+a { color: var(--accent-2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.hero { padding: 28px 0 22px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+.hero.compact { padding-top: 12px; }
+.hero h1 { margin: 0; font-size: clamp(28px, 4vw, 44px); line-height: 1.15; letter-spacing: 0; }
+.hero p { max-width: 760px; color: var(--muted); margin: 12px 0 0; }
+.eyebrow { color: var(--accent); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0; margin: 0 0 8px; }
+section { margin: 28px 0; }
+h2, h3, h4, h5 { letter-spacing: 0; line-height: 1.25; }
+.synthesis-callout { padding: clamp(20px, 4vw, 34px); border: 1px solid #6ee7d8; border-radius: 18px; background: linear-gradient(135deg, #ecfdf9 0%, #eff6ff 100%); box-shadow: 0 18px 44px rgba(15, 118, 110, .12); }
+.synthesis-callout.unavailable { border-color: var(--line); background: var(--panel); box-shadow: none; }
+.synthesis-callout h2 { margin: 0; font-size: clamp(24px, 3.2vw, 36px); }
+.synthesis-callout .lead { max-width: 900px; font-size: 17px; color: #334155; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.primary-link, .secondary-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border-radius: 999px; font-weight: 800; }
+.primary-link { color: white; background: var(--accent); }
+.secondary-link { color: var(--accent-2); border: 1px solid #93c5fd; background: white; }
+.primary-link:hover, .secondary-link:hover { text-decoration: none; filter: brightness(.97); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.card, .run { display: flex; flex-direction: column; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; color: var(--text); min-height: 128px; }
+.run { padding: 16px; }
+.card:hover, .run:hover { border-color: var(--accent-2); text-decoration: none; }
+.thumb { display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #e9edf5; border-radius: 8px 8px 0 0; color: var(--muted); font-size: 13px; font-weight: 700; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb-empty span { padding: 0 14px; text-align: center; }
+.card-body { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 16px; }
+.card strong { line-height: 1.35; }
+.source-line { color: #3f4a5f; font-weight: 600; }
+.runs { display: grid; gap: 10px; }
+.badge { display: inline-flex; width: fit-content; border-radius: 999px; padding: 2px 9px; background: #e6f4f1; color: var(--accent); font-size: 12px; font-weight: 700; }
+.status-contradicted, .status-llm_failed { background: #fee4e2; color: var(--bad); }
+.status-unverified, .status-stale { background: #fff4d6; color: var(--warn); }
+small, .muted { color: var(--muted); }
+.topnav { display: flex; gap: 14px; margin-bottom: 16px; font-size: 14px; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px; }
+.stats span { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
+.report { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: min(5vw, 36px); }
+.report-head { border-bottom: 1px solid var(--line); margin-bottom: 24px; padding-bottom: 20px; }
+.report-head h1 { margin: 0; font-size: clamp(24px, 3.5vw, 38px); line-height: 1.2; }
+.meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+.scope-note { padding: 12px 14px; border-left: 4px solid var(--warn); border-radius: 6px; background: #fff7ed; color: #7c2d12; }
+.synthesis-report h2 { margin-top: 34px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.synthesis-report h3 { margin: 24px 0 8px; color: #0f4c5c; }
+.synthesis-report p, .synthesis-report li { overflow-wrap: anywhere; }
+pre { overflow: auto; background: #111827; color: #f9fafb; border-radius: 8px; padding: 14px; }
+code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+details { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 18px; }
+@media (max-width: 640px) {
+  main { width: min(100% - 20px, 1120px); padding-top: 18px; }
+  .report { padding: 18px; }
+  .synthesis-callout { border-radius: 14px; padding: 18px; }
+  .cta-row a { width: 100%; }
+  .mobile-report { border-radius: 12px; }
+}
+</style>
+</head>
+<body>
+  <main>
+<nav class="topnav"><a href="index.html">실행 목록</a><a href="../../index.html">YouTube 홈</a></nav>
+<article class="report">
+  <header class="report-head">
+    <p class="eyebrow">youtube_20261030_065129</p>
+    <h1>2027년, 시장의 돈 버는 규칙이 달라질 수 있다는 이유</h1>
+    <div class="meta">
+      <span class="badge status-asr_uncertain">asr_uncertain</span>
+      <a href="https://www.youtube.com/watch?v=nDeGYXPaMd8">원본 영상</a>
+    </div>
+  </header>
+  <h2>2027년 시장의 투자 판단 기준은 달라질까</h2>
+<p><strong>분석 대상:</strong> <a href="https://www.youtube.com/watch?v=nDeGYXPaMd8">경제사냥꾼 영상</a>, 2026년 10월 29일 게시 · 19분 34초</p>
+<p><strong>기준:</strong> 제공된 영상 주장·외부 증거·검증 결과. 별도의 최신 데이터 조회는 수행하지 않았다.</p>
+<h3>1. 핵심 결론</h3>
+<p>영상의 논리는 <strong>연준의 정책 안내 축소 → 경제지표의 중요성 확대 → 금리·환율 변동성 증가</strong>, 그리고 <strong>근원물가 안정과 기업이익 성장 유지 시 주가 상승 가능성</strong>으로 요약된다.</p>
+<p>그러나 이 논리의 출발점인 <strong>2027~2028년 금리 결정 회의 축소부터 확인되지 않았다.</strong> 주장 검증 결과는 12개 중 11개가 미검증, 1개가 자막·단위 불확실이다. 거짓으로 판정된 것은 아니지만, 새로운 투자 규칙이 확정됐다고 해석할 근거도 없다.</p>
+<p>현재 투자자에게 유용한 부분은 특정 수치나 정책 경로보다 <strong>정책·물가·이익 전망을 각각 확인하는 관찰 체계</strong>다.</p>
+<h3>2. 영상 주장과 확인된 근거</h3>
+<p>아래 시각은 개별 문장이 아닌 자막 청크 시작점이다. 모든 수치는 별도 표시가 없는 한 <strong>영상 주장</strong>이다.</p>
+<p>| 주제·영상 위치 | 영상 주장 | 확인된 사실/근거와 판정 |</p>
+<p>|---|---|---|</p>
+<p>| 연준 결정·금리 전망 · 00:00, 04:29 | 금리 3.75~4.00% 동결, 인상 의견 2명. 12월 인상 확률 42%→85%, Reuters 조사 100명 전원 인상 예상 | 공식 성명·표결, CME 과거 확률, 설문 원문이 없다. <strong>미검증.</strong> 의장 이름과 반대표 방향에도 혼선이 있다. |</p>
+<p>| 회의 운영·정책 안내 · 00:00, 04:29, 08:49, 17:32 | 금리 표결을 2027년 7회·2028년 6회로 축소. 성명 244→123단어, 점도표 중앙값 4.1% | 공식 일정·운영 공지·성명·SEP가 없다. <strong>미검증.</strong> 특히 2028년 변경은 확정과 예상이 혼용된다. |</p>
+<p>| 미국 성장·물가·발표 일정 · 00:00, 13:14, 17:32 | 상반기 성장률 2.4%, 9월 CPI 3.7%·근원 2.6%. PCE 예상 전체 3.6%·근원 3.1% | BLS·BEA 원표, 컨센서스, 공식 달력이 없다. <strong>미검증.</strong> 실제치와 전망치, 통계 대상 연도를 구분해야 한다. |</p>
+<p>| 미국 주식·국채·역사 사례 · 08:49, 13:14 | 미국 지수 3일 연속 상승, 2년물 4.78%→4.70%, 10년물 5% 초과. 1994년 충격과 회견 변동성 연구 인용 | 동일 거래일 시세·장중 자료·연구 원문이 없다. <strong>미검증.</strong> 과거 사례를 현재 손실 규모의 예측치로 쓸 수 없다. |</p>
+<p>| 한국 시장 · 00:00, 13:14, 17:32 | 원·달러 1,337원·14원 상승, 코스피 6.63% 상승·6,000선 회복 | 해당 거래일 환율·종가·수급 자료가 없다. <strong>미검증.</strong> 별도 코스피 스냅샷은 아래와 같이 제한적으로만 확인된다. |</p>
+<p>| SK하이닉스 · 13:14 | 분기 영업이익 8.3조 원 초과, 약 1조 원 주주환원, 주가 10% 이상 상승 | 회사 IR·DART·거래소 자료가 없다. <strong>미검증.</strong> 대상 연도와 환원 방식도 미확정이다. |</p>
+<p>| 기업이익·AI 투자·시장폭 · 13:14, 17:32 | 이익 증가율 올해 35%·2027년 15%, 빅테크 설비투자 1.1조 달러. Russell 3000 종목 40% 이상이 20% 이상 하락 | 전망 원문·집계 기준·종목별 자료가 없다. <strong>미검증이며, 설비투자 원화 표기는 단위 불확실.</strong> |</p>
+<h4>제한적으로 확인되는 내용</h4>
+<ul>
+<li><strong>시장 데이터 기록:</strong> 호스트가 수집한 yfinance 코스피 스냅샷은 2026-10-29 21:59:31 UTC 조회 기준 <code>current_price=5,937.66</code>을 기록했다. 실제 시세 기준시각이나 영상의 ‘어제’ 종가를 뜻하지 않으므로, 전날 6,000선 회복의 입증·반증에 사용할 수 없다. 52주 최저값 <code>0.0</code>은 이상값 가능성이 있어 제외한다.</li>
+<li><strong>조건부 금리차 산술:</strong> 미국 상단 4.00%, 한국 3.00%가 맞다면 차이는 1.00%포인트다. 미국만 0.25%포인트 인상하면 1.25%포인트가 된다. 이는 계산 확인이지 실제 금리 확인이 아니다.</li>
+<li><strong>환산 불일치:</strong> 영상의 환율 1,337원을 계산 가정으로 사용하면 1.1조 달러는 <strong>1,470.7조 원</strong>이다. 자막의 약 1.47조 원과 약 1,000배 차이가 난다. 설비투자 전망과 환율 자체는 미검증이며, 오류가 원발언인지 자막인지도 알 수 없다.</li>
+</ul>
+<h3>3. 외부 출처의 증거력</h3>
+<p><strong>이번 묶음에는 핵심 주장을 직접 입증하는 강한 외부 근거 링크가 없다.</strong> 수집 결과의 <code>verified</code> 표시는 주장 검증 완료로 해석할 수 없다.</p>
+<ul>
+<li>E1~E3는 관련 시장 기사지만 제공된 발췌 대부분이 제목·오류 메시지·메뉴다. <a href="https://finance.yahoo.com/markets/article/google-microsoft-amazon-and-the-fed-step-up-to-a-skittish-market-what-to-watch-this-week-100000081.html">10월 26일 연준·빅테크 관련 기사</a>도 실제 FOMC 결정·표결을 확인해 주지 않는다.</li>
+<li><a href="https://finance.yahoo.com/markets/article/tech-extends-decline-10-year-treasury-holds-below-5-alphacheck-134224473.html">10월 23일 국채 관련 기사</a>의 제목은 10년물 5% 미만을 언급한다. 그러나 영상이 지칭하는 잠정 10월 28일과 날짜가 달라 ‘5% 초과 마감’ 주장의 반증은 아니다.</li>
+<li>E4~E6은 광업·개별 주식 기사로 배정된 연준 운영·금리 확률 주장과 무관하다. 해당 주장 근거에서 제외한다.</li>
+</ul>
+<p>Reuters 설문, Barclays 전망, Goldman Sachs·Inflation Insights·Sage Advisory·Corpay 인용은 <strong>원문 미확인·수동 확인 필요</strong>다. Bloomberg·Morningstar 자료는 제공되지 않았으므로 해당 서비스에 근거한 독립 확인도 불가능하다. 폐쇄형 자료는 공개 재인용이 있더라도 원자료 검증과 구분해야 한다.</p>
+<h3>4. 상승 논리와 반론</h3>
+<h4>상승 시나리오: 물가 안정과 이익의 동시 개선</h4>
+<p>영상은 근원물가가 안정돼 추가 긴축 우려가 완화되고, 기업이익 및 AI 투자가 유지된다면 실적이 금리 부담을 상쇄할 수 있다고 본다. 반도체 실적 사례도 이 논리에 포함된다.</p>
+<p>다만 이는 <strong>조건부 시나리오</strong>다. 2027년 이익 성장률 15%나 SK하이닉스 실적 수치가 확인되지 않았으므로 상승 여력을 계산하는 입력값으로 삼기 어렵다. 전망치가 확인돼도 실현 이익이나 주가 수익률이 보장되는 것은 아니다.</p>
+<h4>주요 반론</h4>
+<ul>
+<li><strong>선행 조건 부재:</strong> 회의·정책 안내 축소가 확인되지 않으면 ‘2027년부터 시장 규칙이 바뀐다’는 제도적 설명은 성립 근거가 약해진다.</li>
+<li><strong>변동성 확대의 자동성 부족:</strong> 회의 횟수나 성명 길이만으로 정보량과 시장 충격을 판단할 수 없다. 기자회견 등 다른 소통과 실제 가격 반응도 봐야 한다.</li>
+<li><strong>물가와 이익만으로 부족:</strong> 두 조건이 양호해도 이미 반영된 기대나 높은 평가 수준 등에 따라 주가가 상승하지 않을 수 있다.</li>
+<li><strong>한국 시장 전이의 불확실성:</strong> 한미 금리차 확대가 원화 약세·외국인 매도로 이어진다는 경로는 관찰할 가설이지 확정 인과가 아니다.</li>
+<li><strong>AI 투자 규모와 수익성의 차이:</strong> 설비투자 확대가 공급업체 매출을 지지할 가능성과 투자기업의 현금흐름·차입 부담은 함께 점검해야 한다.</li>
+<li><strong>확률과 가격 반영의 혼동:</strong> FedWatch의 인상 확률 85%가 확인되더라도 ‘주가에 85% 반영됐다’는 뜻은 아니다.</li>
+</ul>
+<h3>5. 가까운 확인 과제와 구체적 관찰 항목</h3>
+<p>영상의 ‘오늘 21:30’, ‘12월 10일 새벽’은 공식 달력으로 검증되지 않았다. 이를 확정 일정으로 사용하지 않고 다음 순서로 확인할 필요가 있다.</p>
+<p>| 우선순위 | 확인 대상 | 기록할 항목과 판단 기준 |</p>
+<p>|---|---|---|</p>
+<p>| 1 | FOMC 성명·표결·기자회견 | 회의 날짜, 의장, 목표금리 범위, 반대 이유. 인상·동결·인하 방향부터 확정한다. |</p>
+<p>| 2 | 2027~2028년 운영 공지 | 총회의·금리 표결·전략회의 횟수와 성명 여부. 공식 확정과 민간 예상을 분리한다. |</p>
+<p>| 3 | 다음 공식 물가·고용·GDP 발표 | 대상 월, 발표 한국시간, 예상치·실제치·수정치, 근원물가의 전월비와 전년비를 구분해 기록한다. |</p>
+<p>| 4 | 발표 전후 금리 반응 | 동일 출처의 2·10·30년물 수익률을 발표 직전·직후·종가로 비교한다. 지표 발표와 기자회견 반응을 분리한다. |</p>
+<p>| 5 | 원화·코스피·수급 | 동일 거래일 환율 종가, 지수 등락률, 외국인·기관 순매수를 대조한다. 한 번의 동행만으로 인과를 확정하지 않는다. |</p>
+<p>| 6 | 기업 실적·AI 투자 | SK하이닉스 공시의 실적 연도·환원 방식·이행 기간, 빅테크 투자 가이던스·현금흐름·조달 계획을 확인한다. |</p>
+<p>| 7 | 이익 전망·시장폭 | 같은 작성기관·이익 정의로 전망 수정 방향을 추적한다. Russell 3000은 기준일·구성종목·고점 대비인지 기간 수익률인지부터 확인한다. |</p>
+<h4>논리의 무효화·약화 조건</h4>
+<ul>
+<li><strong>제도 변화 논리:</strong> 공식 자료가 회의·소통 축소를 부정하면 출발 전제가 무효화된다. 단순히 자료가 없다는 사실은 부정 증거와 다르다.</li>
+<li><strong>지표 충격 확대 논리:</strong> 실제 제도 변화 이후에도 비교 가능한 발표 전후 변동성이 커지지 않으면 설명력이 약해진다.</li>
+<li><strong>실적 방어 논리:</strong> 근원물가 재가속, 긴축 기대 상향, 기업이익 전망 하향 또는 실적 부진이 나타나면 상승 시나리오의 조건이 훼손된다.</li>
+<li><strong>AI 수요 논리:</strong> 투자 계획 축소나 관련 공급업체 주문·이익 둔화가 확인되면 투자 확대가 실적을 지지한다는 설명이 약해진다.</li>
+</ul>
+<h3>6. 데이터 품질과 해석 한계</h3>
+<p>자동 한국어 자막의 <code>transcript_quality</code>는 <strong>good·1.0</strong>이다. 이는 수집·형식 품질이지 숫자와 사실의 정확도 보증이 아니다.</p>
+<p>발화 추출 단계의 <code>source_confidence</code>는 <strong>0.90~0.98</strong>로 높지만, 주장 내용이 명확하게 추출됐다는 의미다. 외부 검증 단계에서는 직접 근거가 없어 <strong>0.0</strong>으로 기록됐다. 문장별 <code>asr_confidence</code>도 <strong>0.0</strong>이나, 이는 측정값 부재를 나타내며 인식 정확도가 실제 0%라는 뜻은 아니다. 미검증 판정의 <code>confidence=0.99</code> 역시 주장 진실 확률이 아니다.</p>
+<p>특히 의장 이름 혼용, 금리 인상·동결 관련 오인식, 이익 증가율 35%의 소수점 가능성, 원화 환산 단위는 원영상 화면·음성 대조가 필요하다. 게시일만으로 녹화일과 ‘어제·올해·내년’의 기준을 확정할 수 없고, 청크 종료와 영상 길이에는 약 1초 차이도 있다.</p>
+<h3>종합 판단</h3>
+<p>이 영상은 <strong>정책 불확실성 속에서 물가와 실적을 함께 보자</strong>는 관찰 틀을 제공한다. 그러나 핵심 정책 변화·시장 수치·기업 전망은 아직 입증되지 않았다. 공식 정책 문서, 동일 거래일 시세, 기업 공시를 통해 전제를 확인하고, 이후 물가·이익·금리·환율이 시나리오와 일치하는지 추적하는 것이 이번 분석의 결론이다.</p>
+  <details>
+    <summary>공개 요약 JSON</summary>
+    <pre>{
+  &quot;version&quot;: 4,
+  &quot;video_id&quot;: &quot;nDeGYXPaMd8&quot;,
+  &quot;title&quot;: &quot;2027년, 시장의 돈 버는 규칙이 달라질 수 있다는 이유&quot;,
+  &quot;url&quot;: &quot;https://www.youtube.com/watch?v=nDeGYXPaMd8&quot;,
+  &quot;channel&quot;: &quot;경제사냥꾼&quot;,
+  &quot;channel_id&quot;: &quot;UC7usMJDHmtbs_oegmzQKKMA&quot;,
+  &quot;source_url&quot;: &quot;https://www.youtube.com/@%EA%B2%BD%EC%A0%9C%EC%82%AC%EB%83%A5%EA%BE%BC/videos&quot;,
+  &quot;thumbnail_url&quot;: &quot;https://i.ytimg.com/vi/nDeGYXPaMd8/maxresdefault.jpg&quot;,
+  &quot;published_at&quot;: &quot;2026-10-29T05:11:23+00:00&quot;,
+  &quot;status&quot;: &quot;asr_uncertain&quot;,
+  &quot;strategy_source_tier&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_evidence_weight&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_validation_policy&quot;: &quot;STANDARD_REVIEW&quot;,
+  &quot;transcript_status&quot;: &quot;available&quot;,
+  &quot;transcript_source&quot;: &quot;automatic&quot;,
+  &quot;transcript_chars&quot;: 14338,
+  &quot;transcript_quality&quot;: {
+    &quot;status&quot;: &quot;good&quot;,
+    &quot;score&quot;: 1.0,
+    &quot;warnings&quot;: [],
+    &quot;source&quot;: &quot;automatic&quot;,
+    &quot;language&quot;: &quot;Korean&quot;,
+    &quot;model_or_format&quot;: &quot;json3&quot;,
+    &quot;chars&quot;: 14338,
+    &quot;segments&quot;: 684,
+    &quot;duration_seconds&quot;: 1174,
+    &quot;repeated_ngram_ratio&quot;: 0.002
+  },
+  &quot;generated_at&quot;: &quot;2026-10-30T06:51:29.578065+09:00&quot;,
+  &quot;llm_status&quot;: &quot;success&quot;,
+  &quot;research_status&quot;: &quot;success&quot;,
+  &quot;claim_verification_status&quot;: &quot;success&quot;,
+  &quot;research_pipeline_version&quot;: 4,
+  &quot;evidence_count&quot;: 6,
+  &quot;claim_status_summary&quot;: {
+    &quot;unverified&quot;: 11,
+    &quot;asr_uncertain&quot;: 1
+  },
+  &quot;claims&quot;: [
+    {
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;claim_text&quot;: &quot;10월 기준금리는 3.75~4.00%로 동결됐고 쿡·해먹이 인상을 주장했으며, 9월에는 만장일치로 2023년 7월 이후 처음 인상했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;10월 3.75~4.00% 동결; 인상 의견 2/12명; 9월 만장일치 인상&quot;,
+        &quot;observed&quot;: &quot;대응하는 공식 결정·표결 자료가 제공되지 않았다.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;추가 긴축을 확정된 정책 경로로 전제하지 말고 공식 성명과 표결을 먼저 확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;claim_text&quot;: &quot;연 8회 회의는 유지하면서 금리 표결을 2027년 7회·2028년 6회로 줄이고 성명을 축소한다. 9월 점도표의 두 연말 중앙값은 4.1%이며 의장은 점을 제출하지 않았다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;연간 회의 8회; 금리 표결 7회·6회; 성명 244→123단어; 중앙값 4.1%; 결정 간격 12주&quot;,
+        &quot;observed&quot;: &quot;공식 일정·운영 변경 공지·성명·SEP가 없어 수치와 기간을 재현할 수 없다.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;회의 축소와 정책 공백 확대를 확정 사실로 투자 판단에 반영할 근거가 부족하다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;claim_text&quot;: &quot;12월 인상 확률은 42%에서 85%로 상승했고 Reuters 조사 100명 전원이 인상을 예상했으며 선물은 다음 해 중반까지 3회 인상을 반영했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;42%→85%; 경제학자 100/100명; 다음 해 중반까지 3회 인상&quot;,
+        &quot;observed&quot;: &quot;확률 스냅샷·설문 응답 분포·선물 만기별 자료가 제공되지 않았다.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;확인되지 않은 확률을 매매 신호나 주가의 추가 하락 여력으로 환산해서는 안 된다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;claim_text&quot;: &quot;상반기 성장률은 2.4%, 3분기는 3% 초과 가능성이 있으며, 9월 CPI는 3.7%·근원은 2.6%·휘발유는 34% 이상 상승했다. PCE 예상치는 전체 3.6%·근원 3.1%다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;GDP 2.4%·3% 초과 가능성; CPI 3.7%; 근원 2.6%; 휘발유 34% 이상; PCE 예상 3.6%·3.1%&quot;,
+        &quot;observed&quot;: &quot;공식 실제치와 조사 전망치 모두 확인 불가다.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;근원물가와 성장률 수치를 검증하기 전에는 긴축 강도에 대한 정량적 결론을 내리기 어렵다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;claim_text&quot;: &quot;오늘 한국시간 21시 30분에 3분기 GDP와 9월 PCE가 함께 발표되고, 11월에는 10월 고용·CPI·PCE가, 12월 10일 새벽에는 FOMC 결과가 발표된다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:13:14&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;당일 21:30 GDP·PCE 동시 발표; 한국시간 12월 10일 새벽 FOMC 결과&quot;,
+        &quot;observed&quot;: &quot;날짜·발표시각·서머타임 반영 여부를 검증할 자료가 없다.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;이벤트 대응 주문과 위험 관리는 공식 달력의 날짜·시간대를 확인한 뒤 설정해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;claim_text&quot;: &quot;결정 당일 미국 3대 지수가 3거래일 연속 상승했고, 2년물은 4.78%에서 4.70%로 하락했으며 10년물은 5%를 넘어 마감했다. 7월에는 30년물 5.21%와 다우 약 150포인트 하락을 제시한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:08:49&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;3거래일 연속 상승; 2년물 4.78%→4.70%; 10년물 종가 5% 초과; 30년물 5.21%; 다우 약 -150포인트&quot;,
+        &quot;observed&quot;: &quot;동일 거래일·시각·수익률 계열의 대응 자료가 없다.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;장중 반응과 종가를 확인하기 전에는 의장 발언이 주식·채권에 미친 방향을 단정할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;claim_text&quot;: &quot;1994년 정책 결정 공지가 시작됐고 연중 6회 인상·11월 75bp 인상·향후 1년 약 300bp 인상이 있었다. 채권 손실과 이후 기자회견 제도 변화, 회견 중 변동성 상위 5%라는 연구를 인용한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:08:49&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;1994년 6회·11월 75bp·약 1년 300bp; 10년물 약 +200bp; 채권 손실 1.5조 달러; 2011·2019년 회견 변화; 변동성 상위 5%&quot;,
+        &quot;observed&quot;: &quot;정책 이력·가격 계열·손실 추정 방법론·연구 표본이 제공되지 않았다.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;1994년 사례를 현재 손실 규모나 금리 상승폭의 직접 예측치로 사용할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;claim_text&quot;: &quot;어제 원·달러는 14원 오른 1,337원, 코스피는 6.63% 상승해 6,000선을 회복했다. 한국 금리 3.00%와 미국 상단 4.00%의 격차는 1%p이며 과거 급락·외국인 순매도 사례도 제시한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;환율 1,337원·+14원; 금리차 1.00→1.25%p; 코스피 +6.63%·6,000 회복; 8월 19일 -5.80%·외국인 -3.5조 원&quot;,
+        &quot;observed&quot;: &quot;스냅샷의 코스피 5,937.66만 확인 가능하다. 과거 등락률과 순매도 금액은 확인 불가다.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;금리차 확대와 원화 약세·외국인 매도는 확정된 인과관계로 제시할 수 없으며 실제 흐름을 따로 확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;claim_text&quot;: &quot;SK하이닉스가 3분기 영업이익 8.3조 원 초과와 약 1조 원 주주환원을 발표했고 당일 주가가 10% 이상 상승했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:13:14&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;분기 영업이익 8.3조 원 초과; 주주환원 약 1조 원; 당일 주가 +10% 이상&quot;,
+        &quot;observed&quot;: &quot;공식 실적·환원 공시와 발표일 수익률 자료가 없다.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;미확인 실적과 환원 규모를 바탕으로 이익 추정치나 주주수익률을 계산할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C10&quot;,
+      &quot;claim_text&quot;: &quot;S&amp;P 500 기업이익 증가율은 올해 35%, 2027년 15%이며 과거 35년 중간값은 10%라는 바클레이즈 전망을 인용한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:13:14&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;올해 +35%; 2027년 +15%; 과거 35년 중간값 +10%&quot;,
+        &quot;observed&quot;: &quot;전망 원표·작성일·이익 정의·역사 표본이 제공되지 않았다.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;전망의 기준과 수정 이력이 확인되기 전에는 기업이익이 높은 금리를 상쇄한다고 정량 평가하기 어렵다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C11&quot;,
+      &quot;claim_text&quot;: &quot;5대 IT 기업의 2027년까지 설비투자는 1.1조 달러이며 원화 약 1조 4,700억 원이다. Russell 3000 종목의 40% 이상은 6월 이후 20% 이상 하락했다.&quot;,
+      &quot;status&quot;: &quot;asr_uncertain&quot;,
+      &quot;confidence&quot;: 0.95,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:13:14&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;1.1조 달러≈1.47조 원; Russell 3000 구성종목 40% 이상이 20% 이상 하락&quot;,
+        &quot;observed&quot;: &quot;1,337원/달러를 가정한 산술값은 1,470.7조 원으로 자막 표기와 약 1,000배 차이다. 설비투자와 하락 종목 비율 자체는 미검증이다.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;원화 환산 금액을 규모 비교에 사용하지 말아야 하며, 투자 총액과 시장폭 통계도 별도 검증이 필요하다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C12&quot;,
+      &quot;claim_text&quot;: &quot;연준 정책 안내가 줄면 경제지표 발표의 금리·환율 영향력이 커지지만, 근원물가 안정과 이익 전망 유지가 함께 충족되면 주가는 상승할 수 있다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:08:49&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;2027년 시장 가격 형성 및 투자성과에 관한 조건부 전망&quot;,
+        &quot;observed&quot;: &quot;전망의 실현 여부와 인과관계를 판단할 검증 자료가 없다.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;확정된 투자 규칙이 아니라 추적할 시나리오로 취급하고 정책·물가·이익 전망을 각각 점검해야 한다.&quot;
+    }
+  ],
+  &quot;entities&quot;: [
+    {
+      &quot;ticker&quot;: &quot;^KS11&quot;,
+      &quot;name&quot;: &quot;원·달러 환율·코스피&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;미국 금리 상승과 한미 금리차 확대가 원화 약세·외국인 자금 이탈로 한국 시장에 전파될 수 있다고 주장한다.&quot;,
+        &quot;환율이 급등한 날에도 반도체 실적과 외국인·기관 매수로 코스피가 상승해 기업 이익이 금리 부담을 상쇄할 수 있다고 해석한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;영상의 &#x27;어제&#x27; 원·달러 환율이 14원 올라 1,337원 마감했으며 5개월 만의 최대 상승폭이라고 주장.&quot;,
+        &quot;한국 기준금리 3.00%, 미국 상단 4.00%로 격차 1%포인트; 미국의 한 차례 추가 인상 시 1.25%포인트로 확대된다고 설명.&quot;,
+        &quot;8월 19일 코스피 5.80% 하락, 외국인 약 3조 5천억 원 순매도라고 제시.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;^KS11&quot;,
+        &quot;as_of&quot;: &quot;2026-10-29T21:59:31.722838+00:00&quot;,
+        &quot;current_price&quot;: 5937.66,
+        &quot;market_cap&quot;: null,
+        &quot;forward_pe&quot;: null,
+        &quot;trailing_pe&quot;: null,
+        &quot;fifty_two_week_high&quot;: 9385.59,
+        &quot;fifty_two_week_low&quot;: 0.0,
+        &quot;average_target_price&quot;: null,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    }
+  ],
+  &quot;evidence&quot;: [
+    {
+      &quot;evidence_id&quot;: &quot;E1&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;Google, Microsoft, Amazon, and the Fed step up to a skittish market: What to watch this week&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/article/google-microsoft-amazon-and-the-fed-step-up-to-a-skittish-market-what-to-watch-this-week-100000081.html&quot;,
+      &quot;publisher&quot;: &quot;Yahoo Finance&quot;,
+      &quot;published_at&quot;: &quot;2026-10-26T10:00:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Google, Microsoft, Amazon, and the Fed step up to a skittish market: What to watch this week Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E2&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;Stock market today: Dow sinks 600 points, S&amp;P 500, Nasdaq drop to cap a volatile week, oil prices rise&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/live/stock-market-today-dow-sp-500-drop-nasdaq-rises-after-sharp-tech-sell-off-160940864.html&quot;,
+      &quot;publisher&quot;: &quot;Yahoo Finance&quot;,
+      &quot;published_at&quot;: &quot;2026-10-23T20:42:56+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Stock market today: Dow sinks 600 points, S&amp;P 500, Nasdaq drop to cap a volatile week, oil prices rise Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E4&quot;,
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;title&quot;: &quot;Emerita Announces Positive IBW Pre-Feasibility Study Results Highlighting US$776 Million After-Tax NPV (8%), 23.51% IRR and 21-Year Mine Life&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/commodities/articles/emerita-announces-positive-ibw-pre-200200269.html&quot;,
+      &quot;publisher&quot;: &quot;TMX Newsfile&quot;,
+      &quot;published_at&quot;: &quot;2026-10-29T20:02:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Emerita Announces Positive IBW Pre-Feasibility Study Results Highlighting US$776 Million After-Tax NPV (8%), 23.51% IRR and 21-Year Mine Life Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports Mo...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E5&quot;,
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;title&quot;: &quot;GoldHaven Resources&#x27; Maiden Drilling Program at Magno Project Reaches 3,000 Meters&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/commodities/articles/goldhaven-resources-apos-maiden-drilling-165613649.html&quot;,
+      &quot;publisher&quot;: &quot;MT Newswires&quot;,
+      &quot;published_at&quot;: &quot;2026-10-29T16:56:13+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E6&quot;,
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;title&quot;: &quot;3 low-volatility stocks with questionable fundamentals&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/3-low-volatility-stocks-questionable-100325387.html&quot;,
+      &quot;publisher&quot;: &quot;StockStory&quot;,
+      &quot;published_at&quot;: &quot;2026-10-29T10:03:25+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    }
+  ],
+  &quot;source_policy&quot;: {
+    &quot;raw_transcript_published&quot;: false,
+    &quot;raw_transcript_in_evidence&quot;: false,
+    &quot;research_pipeline_version&quot;: 4,
+    &quot;closed_source_claims&quot;: &quot;unverified_external_source&quot;,
+    &quot;auto_caption_warning&quot;: true,
+    &quot;local_asr_warning&quot;: false
+  }
+}</pre>
+  </details>
+</article>
+</main>
+  <style>
+.reader-contents { margin: 16px 0; padding: 12px 16px; border: 1px solid var(--line, #64748b); border-radius: 12px; }
+.reader-contents > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-weight: 750; }
+.reader-contents nav { display: grid; gap: 4px; max-height: 45vh; overflow: auto; margin: 8px 0; }
+.reader-contents a { display: block; min-height: 44px; padding: 10px; border-radius: 6px; color: inherit; overflow-wrap: anywhere; }
+.reader-contents a:hover { background: #80808020; }
+.reader-contents .reader-subsection { padding-inline-start: 24px; font-size: .92em; }
+.reader-prose, .report { overflow-wrap: anywhere; line-height: 1.8; }
+.reader-prose p, .reader-prose li { max-width: 85ch; }
+.reader-prose h2, .reader-prose h3, .reader-prose h4, [data-reader-heading] { scroll-margin-top: 100px; line-height: 1.45; }
+.reader-prose h2 { margin-top: 1.8em; padding-bottom: 8px; border-bottom: 1px solid var(--line, #64748b); }
+.reader-prose h3 { margin-top: 1.5em; }
+.reader-prose li { margin: .5em 0; }
+.reader-prose pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.reader-prose blockquote { margin: 16px 0; padding: 4px 16px; border-left: 3px solid var(--accent, #64748b); }
+.reader-table { overflow: auto; max-width: 100%; margin: 16px 0; border: 1px solid var(--line, #64748b); border-radius: 10px; }
+.reader-table table { border-collapse: collapse; width: 100%; margin: 0; font-size: .92rem; }
+.reader-table th, .reader-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line, #64748b); min-width: 110px; max-width: 400px; overflow-wrap: anywhere; white-space: normal; }
+.reader-table th { background: #80808018; }
+.reader-table tr:nth-child(even) { background: #80808008; }
+.reader-search { display: grid; gap: 8px; margin: 16px 0; }
+.reader-search label { font-weight: 700; }
+.reader-search input { box-sizing: border-box; width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line, #64748b); border-radius: 10px; background: var(--panel, #fff); color: var(--text, #132238); font: inherit; }
+.reader-search p { margin: 0; font-size: .86rem; }
+.reader-back { position: fixed; bottom: max(14px, env(safe-area-inset-bottom)); right: 14px; z-index: 30; min-height: 44px; border: 1px solid #778899; border-radius: 99px; padding: 10px 16px; background: #18344a; color: #fff; font: 700 14px system-ui; cursor: pointer; box-shadow: 0 3px 12px #0003; }
+[data-reader-source] { margin-top: 20px; }
+[data-reader-source] > summary { min-height: 44px; cursor: pointer; }
+[data-reader-source] pre { font-size: .85rem; }
+[data-reader-source] pre, .reader-prose { min-width: 0; }
+.reader-contents :focus-visible, .reader-search :focus-visible, .reader-back:focus-visible, .reader-table:focus-visible { outline: 3px solid var(--accent, #008c95); outline-offset: 3px; }
+.reader-search + .grid > [hidden] { display: none !important; }
+@media (max-width: 600px) { .reader-prose { font-size: 1rem; } .reader-contents { padding: 8px 12px; } }
+@media print { .reader-back, .reader-search, .reader-contents, [data-reader-source] { display: none !important; } .reader-table { overflow: visible; } .reader-prose { color: #000; background: #fff; } }
+</style><script>
+(() => {
+  'use strict';
+  let serial = 0;
+  const rendered = new WeakMap();
+  const node = (tag, text) => { const el = document.createElement(tag); if (text != null) el.textContent = text; return el; };
+  function inline(parent, text) {
+    const pattern = /(`[^`]+`|\*\*[^*]+\*\*|\[[^\]]+\]\(https?:\/\/[^\s)]+\))/g;
+    let start = 0;
+    for (const match of String(text).matchAll(pattern)) {
+      parent.append(document.createTextNode(text.slice(start, match.index)));
+      const value = match[0];
+      if (value.startsWith('`')) parent.append(node('code', value.slice(1, -1)));
+      else if (value.startsWith('**')) parent.append(node('strong', value.slice(2, -2)));
+      else {
+        const link = value.match(/^\[([^\]]+)\]\((.+)\)$/);
+        const a = node('a', link[1]); a.href = link[2]; a.rel = 'noopener noreferrer'; parent.append(a);
+      }
+      start = match.index + value.length;
+    }
+    parent.append(document.createTextNode(text.slice(start)));
+  }
+  const cells = line => line.trim().replace(/^\|/, '').replace(/\|$/, '').split(/(?<!\\)\|/).map(v => v.trim().replace(/\\\|/g, '|'));
+  function markdown(source) {
+    const article = node('article'); article.className = 'reader-prose';
+    const lines = source.split(/\r?\n/); let list = null;
+    for (let i = 0; i < lines.length; i += 1) {
+      const line = lines[i], value = line.trim();
+      if (!value) { list = null; continue; }
+      if (/^```/.test(value)) {
+        const code = []; i += 1;
+        while (i < lines.length && !/^```/.test(lines[i].trim())) code.push(lines[i++]);
+        const pre = node('pre'); pre.append(node('code', code.join('\n'))); article.append(pre); list = null; continue;
+      }
+      if (i + 1 < lines.length && value.includes('|') && cells(lines[i + 1]).every(v => /^:?-{3,}:?$/.test(v))) {
+        const table = node('table'), head = node('thead'), body = node('tbody');
+        const row = (values, tag) => { const tr = node('tr'); values.forEach(v => { const cell = node(tag); if (tag === 'th') cell.scope = 'col'; inline(cell, v); tr.append(cell); }); return tr; };
+        head.append(row(cells(line), 'th')); i += 2;
+        while (i < lines.length && lines[i].trim() && lines[i].includes('|')) body.append(row(cells(lines[i++]), 'td'));
+        i -= 1; table.append(head, body); article.append(table); list = null; continue;
+      }
+      const heading = value.match(/^(#{1,6})\s+(.+)$/);
+      if (heading) { const h = node('h' + Math.min(4, heading[1].length + 1)); inline(h, heading[2]); article.append(h); list = null; continue; }
+      const bullet = value.match(/^(?:[-*+] |\d+\. )(.+)$/);
+      if (bullet) {
+        const tag = /^\d/.test(value) ? 'ol' : 'ul';
+        if (!list || list.tagName.toLowerCase() !== tag) { list = node(tag); if (tag === 'ol') list.start = parseInt(value, 10); article.append(list); }
+        const li = node('li'); inline(li, bullet[1]); list.append(li); continue;
+      }
+      list = null;
+      if (/^(---+|\*\*\*+)$/.test(value)) { article.append(node('hr')); continue; }
+      const p = node(value.startsWith('> ') ? 'blockquote' : 'p'); inline(p, value.startsWith('> ') ? value.slice(2) : line); article.append(p);
+    }
+    return article;
+  }
+  function contents(root) {
+    root.querySelectorAll(':scope > .reader-contents').forEach(el => el.remove());
+    const headings = [...root.querySelectorAll('h2,h3,h4')].filter(h => !h.closest('.card,.run-card,.reader-contents,[data-reader-source],[hidden]'));
+    if (headings.length < 2) return;
+    const details = node('details'); details.className = 'reader-contents';
+    details.append(node('summary', '이 리포트 목차 · ' + headings.length + '개 항목'));
+    const nav = node('nav'); nav.setAttribute('aria-label', '리포트 목차');
+    headings.forEach(h => {
+      if (!h.id) h.id = 'reader-section-' + (++serial);
+      h.dataset.readerHeading = ''; h.tabIndex = -1;
+      const a = node('a', h.textContent); a.href = '#' + h.id;
+      if (h.tagName !== 'H2') a.className = 'reader-subsection';
+      a.addEventListener('click', event => {
+        event.preventDefault();
+        for (let ancestor = h.parentElement; ancestor; ancestor = ancestor.parentElement) if (ancestor.tagName === 'DETAILS') ancestor.open = true;
+        h.scrollIntoView({block: 'start'}); h.focus({preventScroll: true});
+      }); nav.append(a);
+    });
+    details.append(nav); root.prepend(details);
+  }
+  function enhance(root) {
+    if (!root) return;
+    root.querySelectorAll('pre[data-report-markdown]').forEach(pre => {
+      const previous = rendered.get(pre);
+      if (previous && previous.source === pre.textContent) return;
+      const article = markdown(pre.textContent);
+      if (previous) previous.article.replaceWith(article);
+      else {
+        const details = node('details'); details.dataset.readerSource = '';
+        details.append(node('summary', 'Markdown 원문 보기'));
+        pre.before(article, details); details.append(pre);
+      }
+      rendered.set(pre, {source: pre.textContent, article});
+    });
+    root.querySelectorAll('table').forEach(table => {
+      if (table.closest('.reader-table,.account-table-wrap,.summary-scroll')) return;
+      const wrap = node('div'); wrap.className = 'reader-table'; wrap.tabIndex = 0;
+      wrap.setAttribute('role', 'region'); wrap.setAttribute('aria-label', '리포트 표 · 가로로 스크롤하여 전체 보기');
+      table.before(wrap); wrap.append(table);
+    });
+    root.querySelectorAll('.grid').forEach(grid => {
+      const cards = [...grid.querySelectorAll(':scope > a.card')];
+      if (cards.length < 2 || grid.dataset.readerSearch) return;
+      grid.dataset.readerSearch = 'true';
+      const box = node('div'); box.className = 'reader-search';
+      const input = node('input'); input.type = 'search'; input.placeholder = '제목 · 종목 · 채널 · 키워드'; input.id = 'report-search-' + (++serial);
+      const label = node('label', '리포트 찾기'); label.htmlFor = input.id;
+      const status = node('p'); status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
+      const update = () => {
+        const terms = input.value.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean); let count = 0;
+        cards.forEach(card => { card.hidden = !terms.every(t => card.textContent.toLocaleLowerCase().includes(t)); if (!card.hidden) count += 1; });
+        status.textContent = cards.length + '개 중 ' + count + '개 표시' + (count ? '' : ' · 검색어를 지우거나 다른 키워드를 입력하세요.');
+      };
+      input.addEventListener('input', update); box.append(label, input, status); grid.before(box); update();
+    });
+    contents(root);
+  }
+  window.TradingAgentsReader = {enhance};
+  const main = document.querySelector('main');
+  if (main && !main.hasAttribute('data-reader-dynamic')) enhance(main);
+  if (main) {
+    const top = node('button', '↑ 맨 위'); top.type = 'button'; top.className = 'reader-back'; top.setAttribute('aria-label', '리포트 맨 위로 이동');
+    top.addEventListener('click', () => { const target = document.querySelector('h1') || main; target.tabIndex = -1; target.scrollIntoView({block: 'start'}); target.focus({preventScroll: true}); });
+    document.body.append(top);
+  }
+})();
+</script>
+</body>
+</html>

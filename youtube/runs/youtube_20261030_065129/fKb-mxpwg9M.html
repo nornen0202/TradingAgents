@@ -1,0 +1,847 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YouTube 투자자용 검증 리포트 - 이번 실적발표로 확인된, 반도체 전망 진짜 역대급입니다</title>
+  <style>
+:root {
+  color-scheme: light;
+  --bg: #f7f8fb;
+  --panel: #ffffff;
+  --text: #172033;
+  --muted: #667085;
+  --line: #d9dee8;
+  --accent: #0f766e;
+  --accent-2: #2563eb;
+  --warn: #b45309;
+  --bad: #b42318;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0 56px; }
+a { color: var(--accent-2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.hero { padding: 28px 0 22px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+.hero.compact { padding-top: 12px; }
+.hero h1 { margin: 0; font-size: clamp(28px, 4vw, 44px); line-height: 1.15; letter-spacing: 0; }
+.hero p { max-width: 760px; color: var(--muted); margin: 12px 0 0; }
+.eyebrow { color: var(--accent); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0; margin: 0 0 8px; }
+section { margin: 28px 0; }
+h2, h3, h4, h5 { letter-spacing: 0; line-height: 1.25; }
+.synthesis-callout { padding: clamp(20px, 4vw, 34px); border: 1px solid #6ee7d8; border-radius: 18px; background: linear-gradient(135deg, #ecfdf9 0%, #eff6ff 100%); box-shadow: 0 18px 44px rgba(15, 118, 110, .12); }
+.synthesis-callout.unavailable { border-color: var(--line); background: var(--panel); box-shadow: none; }
+.synthesis-callout h2 { margin: 0; font-size: clamp(24px, 3.2vw, 36px); }
+.synthesis-callout .lead { max-width: 900px; font-size: 17px; color: #334155; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.primary-link, .secondary-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border-radius: 999px; font-weight: 800; }
+.primary-link { color: white; background: var(--accent); }
+.secondary-link { color: var(--accent-2); border: 1px solid #93c5fd; background: white; }
+.primary-link:hover, .secondary-link:hover { text-decoration: none; filter: brightness(.97); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.card, .run { display: flex; flex-direction: column; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; color: var(--text); min-height: 128px; }
+.run { padding: 16px; }
+.card:hover, .run:hover { border-color: var(--accent-2); text-decoration: none; }
+.thumb { display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #e9edf5; border-radius: 8px 8px 0 0; color: var(--muted); font-size: 13px; font-weight: 700; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb-empty span { padding: 0 14px; text-align: center; }
+.card-body { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 16px; }
+.card strong { line-height: 1.35; }
+.source-line { color: #3f4a5f; font-weight: 600; }
+.runs { display: grid; gap: 10px; }
+.badge { display: inline-flex; width: fit-content; border-radius: 999px; padding: 2px 9px; background: #e6f4f1; color: var(--accent); font-size: 12px; font-weight: 700; }
+.status-contradicted, .status-llm_failed { background: #fee4e2; color: var(--bad); }
+.status-unverified, .status-stale { background: #fff4d6; color: var(--warn); }
+small, .muted { color: var(--muted); }
+.topnav { display: flex; gap: 14px; margin-bottom: 16px; font-size: 14px; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px; }
+.stats span { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
+.report { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: min(5vw, 36px); }
+.report-head { border-bottom: 1px solid var(--line); margin-bottom: 24px; padding-bottom: 20px; }
+.report-head h1 { margin: 0; font-size: clamp(24px, 3.5vw, 38px); line-height: 1.2; }
+.meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+.scope-note { padding: 12px 14px; border-left: 4px solid var(--warn); border-radius: 6px; background: #fff7ed; color: #7c2d12; }
+.synthesis-report h2 { margin-top: 34px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.synthesis-report h3 { margin: 24px 0 8px; color: #0f4c5c; }
+.synthesis-report p, .synthesis-report li { overflow-wrap: anywhere; }
+pre { overflow: auto; background: #111827; color: #f9fafb; border-radius: 8px; padding: 14px; }
+code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+details { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 18px; }
+@media (max-width: 640px) {
+  main { width: min(100% - 20px, 1120px); padding-top: 18px; }
+  .report { padding: 18px; }
+  .synthesis-callout { border-radius: 14px; padding: 18px; }
+  .cta-row a { width: 100%; }
+  .mobile-report { border-radius: 12px; }
+}
+</style>
+</head>
+<body>
+  <main>
+<nav class="topnav"><a href="index.html">실행 목록</a><a href="../../index.html">YouTube 홈</a></nav>
+<article class="report">
+  <header class="report-head">
+    <p class="eyebrow">youtube_20261030_065129</p>
+    <h1>이번 실적발표로 확인된, 반도체 전망 진짜 역대급입니다</h1>
+    <div class="meta">
+      <span class="badge status-unverified">unverified</span>
+      <a href="https://www.youtube.com/watch?v=fKb-mxpwg9M">원본 영상</a>
+    </div>
+  </header>
+  <h2>AI 메모리 장기 호황론: 투자 논리와 검증의 간극</h2>
+<p><strong>분석 기준: 제공된 2026년 10월 30일 수집·검증 자료</strong></p>
+<p>영상: 경제사냥꾼, <a href="https://www.youtube.com/watch?v=fKb-mxpwg9M">「이번 실적발표로 확인된, 반도체 전망 진짜 역대급입니다」</a> · 2026년 10월 29일 게시</p>
+<h3>1. 핵심 결론</h3>
+<p>영상의 논리는 <strong>빅테크 AI 투자 지속 → 메모리 수요 확대 → 증설 지연과 장기계약에 따른 공급 부족 장기화</strong>다. 그러나 제공된 검증 결과에서 <strong>핵심 주장 12개는 모두 미검증</strong>이다. 이는 거짓으로 판정됐다는 뜻이 아니라, 수치와 발언을 직접 대조할 공식 원자료가 부족하다는 의미다.</p>
+<p>후속 뉴스에는 HBM 중심 생산 전환에 따른 PC용 메모리 확보 어려움과 용인 공사 관련 활동이 나타난다. 다만 이를 근거로 <strong>2030년까지의 공급 부족, 특정 영업이익, 계약 확정 규모까지 확인됐다고 볼 수는 없다.</strong> 현재로서는 장기 호황을 확정 사실이 아닌 조건부 시나리오로 평가해야 한다.</p>
+<h3>2. 영상 주장과 확인된 사실·근거</h3>
+<p>아래 시각은 개별 발화 시점이 아니라 자막 청크의 시작 위치다. 모든 행의 핵심 주장은 미검증이며 수동 확인이 필요하다.</p>
+<p>| 구분·대략적 위치 | 영상 주장 | 확인된 사실·근거와 한계 |</p>
+<p>|---|---|---|</p>
+<p>| 주가·지수 · 00:00 이후 | SK하이닉스 약 56% 하락 후 약 11% 반등, 종가 148만7,000원. 코스피 고점 대비 34% 하락. 알파벳 시간외 약 10% 하락 | SK하이닉스 가격 조회 실패. 코스피 스냅샷은 5,937.66이나 비교 기준이 다른 52주 최고값만 있어 주장 수익률을 재현할 수 없다. 알파벳 단일 가격도 시간외 등락률의 증거가 아니다. |</p>
+<p>| 양사 실적 · 00:00·10:35 이후 | SK하이닉스 영업이익 83.3조원·이익률 약 80%, 삼성전자 영업이익 107.4조원 | 공식 실적표·매출·표시단위가 없어 확인 불가. 숫자 인식 오류 가능성은 있지만 임의 정정할 근거도 없다. 가치평가 입력값으로 사용하기 전 원음과 공시 대조가 우선이다. |</p>
+<p>| 과거 사이클 · 00:00 이후 | 2019년 이익 급감과 2023년 적자를 공급 증가·재고·가격 하락으로 설명 | 당시 감사보고서와 가격·재고 원자료가 없다. 제시된 20.8조원→2.7조원의 감소율 약 87%는 산술적으로 맞지만, 입력값의 사실 확인과는 별개다. |</p>
+<p>| 장기계약·2030년 전망 · 전 구간 | 고객 14곳, 통상 5년 계약. 2027~2028년 생산능력 절반 이상 확보, 협의 포함 2029년 물량 판매. 공급 부족은 2030년까지 지속 | 공식 IR 발언과 계약 집계 근거가 없다. <strong>협의 물량은 확정계약이 아니며</strong>, 예치금·취소권·가격조정 조건도 확인되지 않았다. 경영진 발언이 확인되더라도 장기 수급은 전망이다. |</p>
+<p>| 생산 제약·증설 · 전 구간 | HBM3 웨이퍼 소모 3배, 청주·용인 확대, 인디애나 2028년 클린룸·2029년 하반기 양산 | 용인 공사 관련 뉴스만 제한적으로 확보됐다. 웨이퍼 비교 원문과 각 시설의 가동·양산 일정은 미확인이다. |</p>
+<p>| 빅테크 투자·현금흐름 · 00:00·05:21 이후 | 알파벳 연간 CAPEX 1,950억~2,050억달러·분기 FCF -91억달러. MS 분기 CAPEX 452억달러·FCF +186억달러. 메타 FCF 21억달러 초과 적자 | 공식 실적·현금흐름표가 없어 모두 미확인. 클라우드 성장률·수주잔고·차년도 투자 지침도 검증되지 않았다. MS의 회계기간과 금융리스 포함 여부 역시 불명확하다. |</p>
+<p>| 산업 가격·중국 공급 · 05:21·10:35 이후 | 기업용 SSD 용량 수요 80% 초과 증가, 범용 D램 계약가격 10~15% 상승 전망. CXMT 월 생산능력 32만→42만장, HBM 수율 20~30% | TrendForce·마이크론·Reuters 원문과 대만 매체가 확보되지 않았다. 생산능력·실제 출하·상업 양산을 구분해야 하며 가격 전망은 실현치가 아니다. |</p>
+<h4>확보된 근거가 실제로 보여주는 범위</h4>
+<ul>
+<li><strong>용인 공사 활동:</strong> 10월 30일 <a href="https://www.seoul.co.kr/news/publicnews/local_govern/2026/10/30/20261030500011?wlog_tag3=naver">서울신문 보도 발췌</a>는 SK하이닉스 등이 참여한 팹 공사 대책회의와 주차장 확대를 언급한다. 공사 진행의 맥락이지 특정 양산일이나 공급량의 확인은 아니다.</li>
+<li><strong>제품 간 공급 배분:</strong> 10월 30일 <a href="https://www.sedaily.com/article/20108097?ref=naver">서울경제 보도 발췌</a>는 HBM 중심 생산 전환과 PC용 메모리 확보 어려움을 연결한다. 일부 공급 제약의 보도 근거지만, 소비자 수요 강세나 2030년 부족을 입증하지 않는다.</li>
+<li><strong>공시 목록:</strong> <a href="https://dart.fss.or.kr/dsaf001/main.do?rcpNo=20261028800052">SK하이닉스 IR 개최 정정 공시</a>의 접수번호와 제목은 제공됐지만 본문은 없다. 장기계약이나 공급 전망이 공시로 확인됐다는 의미는 아니다.</li>
+</ul>
+<p>이 뉴스들은 영상 게시 이후의 자료다. 후속 맥락으로만 활용하며 영상 당시 근거로 소급하지 않는다.</p>
+<h3>3. 강세 논리가 성립하는 조건</h3>
+<p>영상의 전제가 공식 자료로 확인된다면 다음 경로가 가능하다.</p>
+<p>1. <strong>수요 가시성:</strong> 빅테크 투자계획이 실제 서버 발주·메모리 구매로 이어지고, 장기계약이 취소 가능성이 낮은 물량을 확보한다.</p>
+<p>2. <strong>공급 탄력성 제약:</strong> 웨이퍼·패키징·고객 인증 병목이 지속돼 수요 증가만큼 공급을 빠르게 늘리지 못한다.</p>
+<p>3. <strong>수익성 연결:</strong> 공급 제약이 실제 계약가격과 제품 믹스 개선으로 이어지고, 투자비·감가상각 부담을 넘어 이익과 현금흐름을 높인다.</p>
+<p>핵심은 <strong>투자 발표 → 실제 집행 → 메모리 비트 수요 → 가격 → 마진</strong>의 연결이다. 데이터센터 건물과 네트워크를 포함한 CAPEX 전체를 메모리 구매액으로 볼 수는 없다.</p>
+<h3>4. 반론과 시나리오 무효화 조건</h3>
+<ul>
+<li><strong>투자 지연과 수요 감소의 혼동:</strong> 공급 지연으로 집행이 늦어지는 것과 고객이 투자 의지를 낮추는 것은 다르다. 다음 분기 이연 집행 여부가 판단 기준이다.</li>
+<li><strong>장기계약의 경제적 한계:</strong> 물량 확보가 가격·이익 보장을 뜻하지 않는다. 재협상, 취소, 환급 조건이나 낮은 가격 상승률이 수익성을 제한할 수 있다.</li>
+<li><strong>증설의 누적 효과:</strong> SK하이닉스·경쟁사·중국 업체의 실제 출하와 수율이 예상보다 빠르게 늘면 공급 부족 기간은 짧아질 수 있다.</li>
+<li><strong>제품별 사이클 차이:</strong> HBM 부족과 범용 D램·NAND 수익성은 동일하지 않다. PC·스마트폰 수요와 고객 재고를 별도로 봐야 한다.</li>
+<li><strong>주가와 실적의 차이:</strong> 공급 부족이 지속돼도 높은 기대가 이미 반영됐거나 현금흐름·주주환원 평가가 나빠지면 주가 상승으로 연결되지 않을 수 있다.</li>
+</ul>
+<p><strong>장기 호황 시나리오를 약화시키는 관측 조합</strong>은 고객의 투자·주문 축소, 계약 취소·재협상 확대, 고객 재고 증가, 실제 계약가격 하락, 경쟁사 공급의 예상 초과다. 반대로 공급 부족이 지속되더라도 마진과 현금흐름이 악화되면 ‘부족이 높은 수익성을 보장한다’는 연결은 재검토해야 한다.</p>
+<h3>5. 가까운 확인 순서와 관찰 항목</h3>
+<p>| 우선순위 | 확인할 자료 | 투자자가 관찰할 항목 |</p>
+<p>|---|---|---|</p>
+<p>| 1. 실적 원표 | SK하이닉스·삼성전자 공식 3분기 자료 | 연결 기준, 원화 단위, 매출·영업이익·이익률 재계산 |</p>
+<p>| 2. 계약·수급 발언 | SK하이닉스·삼성전자 공식 IR 문답 | 확정·협의 물량 구분, 대상 제품, 생산능력 분모, 취소·가격조정 공개 범위 |</p>
+<p>| 3. 고객 투자 지속성 | 알파벳·MS·메타 다음 공식 실적과 투자 지침 | 계획 대비 실제 집행, 지연분 인도, 현금 CAPEX·리스·FCF, 2027년 예산 |</p>
+<p>| 4. 가격·재고 | 제품별 계약가격과 기업 IR | HBM·서버 D램·범용 D램·NAND를 분리한 가격, 출하, 고객 재고 추세 |</p>
+<p>| 5. 공급 현실화 | 청주·용인·인디애나 및 경쟁사 발표 | 공사·클린룸·장비 반입·인증·양산 단계, 실제 비트 출하와 수율 |</p>
+<p>| 6. 중국 경쟁 | CXMT 원기사·고객 인증·출하 근거 | 명목 생산능력보다 실제 공급량, 중국 내수와 해외 공급의 구분 |</p>
+<p>영상의 ‘오늘·내일’ 행사 시각은 녹화일과 공식 IR 달력이 없어 확정할 수 없다. 아마존도 별도 실적·투자 수치가 제공되지 않아 평가 대상에서 제외한다.</p>
+<h3>6. 데이터 품질과 해석 한계</h3>
+<ul>
+<li><strong>자막 품질:</strong> <code>transcript_quality</code>는 good·1.0이지만 자동 한국어 자막이다. 개별 숫자와 단위의 정확도를 보장하지 않는다. 실적 금액, 코스피 지수, 과거 가격의 대상 분기와 CXMT 점유율은 특히 원음·화면 대조가 필요하다.</li>
+<li><strong>신뢰도 지표:</strong> <code>source_confidence</code> 약 0.76~0.90은 자막상 주장 식별 점수이지 사실일 확률이 아니다. 개별 <code>asr_confidence</code>는 미제공이며 0.0은 결측 표시다. 검증 <code>confidence</code> 0.98~0.99 역시 ‘미검증 판정’에 대한 확신도다.</li>
+<li><strong>근거 수집 한계:</strong> E1~E4는 오류 화면·메뉴 중심이고 E5~E12는 본문이 비어 있다. 다른 기업 기사도 섞여 있어 핵심 주장을 직접 입증하거나 반박한 항목은 없다. 수집 상태의 verified를 사실 검증 완료로 해석해서는 안 된다.</li>
+<li><strong>시장 자료 한계:</strong> 미국 주식 단일 스냅샷으로 과거 수익률이나 실적을 검증할 수 없다. 코스피 52주 최저값 0.0은 이상치로 제외한다. 조회 실패는 뉴스·공시의 부재를 뜻하지 않는다.</li>
+<li><strong>비공개·유료 자료:</strong> 고객별 계약 조항, TrendForce 유료 세부 통계와 익명 출처의 CXMT 수율은 <strong>미검증·수동 확인 필요</strong>다. Bloomberg·Morningstar 원문은 제공되지 않았으며 해당 폐쇄형 자료의 주장을 확인 근거로 사용하지 않았다.</li>
+</ul>
+<h3>종합 판단</h3>
+<p>이 영상은 AI 메모리 수급을 점검할 유용한 가설을 제시하지만, 제공된 근거만으로 ‘역대급 실적’이나 ‘2030년까지 확정된 공급 부족’을 인정하기는 어렵다. 우선순위는 <strong>실적 단위 확인, 확정계약의 범위, 빅테크 실제 투자 집행, 제품별 계약가격과 신규 출하량</strong>이다. 이 항목들이 같은 방향으로 확인되는지를 통해 장기 호황 시나리오의 설득력을 판단할 수 있다.</p>
+  <details>
+    <summary>공개 요약 JSON</summary>
+    <pre>{
+  &quot;version&quot;: 4,
+  &quot;video_id&quot;: &quot;fKb-mxpwg9M&quot;,
+  &quot;title&quot;: &quot;이번 실적발표로 확인된, 반도체 전망 진짜 역대급입니다&quot;,
+  &quot;url&quot;: &quot;https://www.youtube.com/watch?v=fKb-mxpwg9M&quot;,
+  &quot;channel&quot;: &quot;경제사냥꾼&quot;,
+  &quot;channel_id&quot;: &quot;UC7usMJDHmtbs_oegmzQKKMA&quot;,
+  &quot;source_url&quot;: &quot;https://www.youtube.com/@%EA%B2%BD%EC%A0%9C%EC%82%AC%EB%83%A5%EA%BE%BC/videos&quot;,
+  &quot;thumbnail_url&quot;: &quot;https://i.ytimg.com/vi/fKb-mxpwg9M/maxresdefault.jpg&quot;,
+  &quot;published_at&quot;: &quot;2026-10-29T10:00:37+00:00&quot;,
+  &quot;status&quot;: &quot;unverified&quot;,
+  &quot;strategy_source_tier&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_evidence_weight&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_validation_policy&quot;: &quot;STANDARD_REVIEW&quot;,
+  &quot;transcript_status&quot;: &quot;available&quot;,
+  &quot;transcript_source&quot;: &quot;automatic&quot;,
+  &quot;transcript_chars&quot;: 9433,
+  &quot;transcript_quality&quot;: {
+    &quot;status&quot;: &quot;good&quot;,
+    &quot;score&quot;: 1.0,
+    &quot;warnings&quot;: [],
+    &quot;source&quot;: &quot;automatic&quot;,
+    &quot;language&quot;: &quot;Korean (Original)&quot;,
+    &quot;model_or_format&quot;: &quot;json3&quot;,
+    &quot;chars&quot;: 9433,
+    &quot;segments&quot;: 493,
+    &quot;duration_seconds&quot;: 935,
+    &quot;repeated_ngram_ratio&quot;: 0.001
+  },
+  &quot;generated_at&quot;: &quot;2026-10-30T06:51:29.578065+09:00&quot;,
+  &quot;llm_status&quot;: &quot;success&quot;,
+  &quot;research_status&quot;: &quot;success&quot;,
+  &quot;claim_verification_status&quot;: &quot;success&quot;,
+  &quot;research_pipeline_version&quot;: 4,
+  &quot;evidence_count&quot;: 12,
+  &quot;claim_status_summary&quot;: {
+    &quot;unverified&quot;: 12
+  },
+  &quot;claims&quot;: [
+    {
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;claim_text&quot;: &quot;SK하이닉스가 6월 22일~10월 26일 56% 하락한 뒤 전일 약 11% 상승해 148만7,000원에 마감했고, 코스피는 6월 종가 고점 대비 34% 낮았으며 알파벳은 실적 발표 후 시간외 약 10% 하락했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.82,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;SK하이닉스 -56%, 전일 약 +11%, 종가 1,487,000원; 코스피 -34%; 알파벳 시간외 약 -10%&quot;,
+        &quot;observed&quot;: &quot;주장과 동일한 기간의 가격 자료 없음. 코스피 스냅샷 5,937.66과 52주 최고값 9,385.59만 제공됨.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;정확한 낙폭과 반등률을 확인하기 전에는 이를 저평가나 추세 반전의 근거로 사용하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;claim_text&quot;: &quot;SK하이닉스 3분기 영업이익은 83조3,000억원, 영업이익률은 약 80%, 2019년 연간 이익의 30배 초과이며 삼성전자 잠정 영업이익은 107조4,000억원이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.76,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;SK하이닉스 영업이익 83.3조원·이익률 약 80%; 삼성전자 영업이익 107.4조원&quot;,
+        &quot;observed&quot;: &quot;공식 실적 금액과 매출 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;원음과 공식 실적표에서 금액·단위를 확인하기 전에는 이익 규모나 이익률을 가치평가에 반영하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;claim_text&quot;: &quot;과거 메모리 하강기에는 공급 증가·주문 감소·재고 누적·가격 하락이 겹쳤고, SK하이닉스는 2018~2019년 이익 급감과 2023년 연간 적자를 겪었다. 당시 출하량·ASP·서버 재고·가격 수치도 이를 뒷받침한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.82,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;2018년 이익 20.8조원→2019년 2.7조원; 2022년 6.8조원→2023년 -7.7조원; 2023년 4분기 +3,460억원; 2019년 말 출하량 +8%·ASP -7%&quot;,
+        &quot;observed&quot;: &quot;역사적 실적·산업 통계 원자료 없음; 주장된 이익 감소율의 산술만 확인 가능&quot;
+      },
+      &quot;investor_implication&quot;: &quot;과거 사이클을 현재와 비교하려면 같은 제품·기간·회계 기준의 가격, 재고, 출하량을 먼저 맞춰야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;claim_text&quot;: &quot;고객 14곳과 통상 5년 계약을 맺어 2027~2028년 생산능력 절반 이상을 확보했고, 협의 물량까지 포함하면 2029년까지 사실상 판매됐다. HBM 요구량은 공급량의 2배를 넘으며 경영진은 공급 부족이 2030년까지 지속될 것으로 전망했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.84,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;14개 고객·통상 5년; 2027~2028년 생산능력 절반 이상; 협의 포함 2029년; HBM 요구량 2배 초과; 공급 부족 2030년 또는 2030년 말&quot;,
+        &quot;observed&quot;: &quot;계약 집계와 경영진 발언 원문 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;장기 수요 가시성을 평가할 때 확정계약과 협의 물량을 분리하고 계약가격·취소권을 확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;claim_text&quot;: &quot;HBM3는 동일 용량 일반 D램보다 웨이퍼를 3배 사용한다. SK하이닉스는 선택적 HBM 투자와 청주·용인 증설을 추진하며 인디애나 공장은 2028년 10월 클린룸, 2029년 하반기 양산을 목표로 한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.98,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.82,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;웨이퍼 소모 3배; 인디애나 투자 5조원 초과·2028년 10월 클린룸·2029년 하반기 양산; 내년 증가율 20%대 중반&quot;,
+        &quot;observed&quot;: &quot;용인 공사 대책회의 관련 뉴스 발췌만 제공; 구체적 수치·일정 확인 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;공장 건설, 장비 반입, 고객 인증과 양산을 구분해 실제 공급 증가 시점을 평가해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;claim_text&quot;: &quot;알파벳은 연간 CAPEX 1,950억~2,050억달러와 2027년 확대 방향을 제시했고, 클라우드 매출 2배 초과 성장·수주잔고 5,610억달러, 분기 CAPEX 514억달러, 분기 FCF -91억달러·최근 12개월 +197억달러를 발표했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.88,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;연간 CAPEX 1,950억~2,050억달러; 클라우드 수주잔고 5,610억달러; 분기 CAPEX 514억달러; FCF -91억달러·최근 12개월 +197억달러&quot;,
+        &quot;observed&quot;: &quot;대응하는 실적·투자·현금흐름 자료 없음; 원화 261조~274조원 환산의 환율·기준일도 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;공식 현금흐름표와 투자 지침이 확인되기 전에는 투자 확대의 지속 가능성이나 메모리 구매 규모를 단정하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;claim_text&quot;: &quot;마이크로소프트는 매출 19%·Azure 48% 성장, 분기 CAPEX 452억달러와 FCF 186억달러를 발표했다. 외부 용량 지연으로 투자 집행이 예고에 미달했으며 다음 분기 500억달러 초과 투자와 연간 전망 하향을 제시했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:05:21&quot;,
+      &quot;source_confidence&quot;: 0.9,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;매출 +19%·Azure +48%; CAPEX 452억달러; 다음 분기 500억달러 초과; 연간 1,750억→1,700억달러; FCF +186억달러&quot;,
+        &quot;observed&quot;: &quot;실적 및 지침 원자료 없음. 주장값 500억과 452억의 차이 48억달러는 산술일 뿐 실제 예고치 확인이 아님.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;같은 기간·환율·리스 기준의 지침과 실적을 맞춘 뒤 투자 축소인지 인도 지연인지 판단해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;claim_text&quot;: &quot;메타는 10월 21일 실적 발표에서 차년도 공격적 투자 지속 의사를 밝혔고 분기 FCF는 21억달러 초과 적자였다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:05:21&quot;,
+      &quot;source_confidence&quot;: 0.87,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;2026년 10월 21일 발표; 분기 FCF -21억달러보다 큰 적자&quot;,
+        &quot;observed&quot;: &quot;발표 일정·FCF·투자계획 확인 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;투자 지속과 현금흐름 부담을 함께 평가하려면 메타의 공식 투자 전망 및 FCF 조정표가 필요하다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;claim_text&quot;: &quot;TrendForce는 2026년 기업용 SSD 수요가 용량 기준 80% 초과 증가하고 4분기 범용 D램 계약가격이 10~15% 상승할 것으로 전망했다. 서버 공급 병목과 소비자 수요 약화도 제시된다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.98,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:05:21&quot;,
+      &quot;source_confidence&quot;: 0.82,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;기업용 SSD 용량 수요 전년 대비 80% 초과 증가; 4분기 범용 D램 계약가격 전분기 대비 +10~15% 전망&quot;,
+        &quot;observed&quot;: &quot;TrendForce 수치 원문과 실제 계약가격 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;제품별 실제 계약가격과 재고를 확인하고 HBM 수급을 전체 메모리 수익성으로 일반화하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C10&quot;,
+      &quot;claim_text&quot;: &quot;CXMT는 월 D램 생산능력을 32만장에서 2027년 42만장으로 늘리고 매출 점유율도 7.6%에서 9.5%로 높였다. Reuters에 따르면 HBM 견본 제공 후 2개월 내 소량 생산을 추진하며 수율은 20~30%다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:10:35&quot;,
+      &quot;source_confidence&quot;: 0.81,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;월 32만→42만장; 점유율 7.6%→9.5%; 2개월 내 소량 생산; 수율 20~30%&quot;,
+        &quot;observed&quot;: &quot;출처 원문 없음; 증가율 31.25%와 점유율 차이 1.9%포인트의 조건부 산술만 확인&quot;
+      },
+      &quot;investor_implication&quot;: &quot;증설 전망만으로 공급 부족 해소를 단정하지 말고 실제 가동률·수율·고객 인증·출하를 확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C11&quot;,
+      &quot;claim_text&quot;: &quot;알파벳은 미국 10월 28일 장 마감 후, 메타는 21일 실적을 발표했고 삼성전자 설명회는 오늘 오전 10시, 아마존 설명회는 내일 오전 6시다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:10:35&quot;,
+      &quot;source_confidence&quot;: 0.76,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;알파벳 10월 28일 미국 장 마감 후; 메타 10월 21일; 삼성전자 오늘 10시; 아마존 내일 06시&quot;,
+        &quot;observed&quot;: &quot;영상 게시 시각만 제공; 기업별 행사 일시와 녹화일은 미확인&quot;
+      },
+      &quot;investor_implication&quot;: &quot;공식 행사 일정과 녹화 기준일을 확인하기 전에는 상대 날짜를 거래 일정에 사용하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C12&quot;,
+      &quot;claim_text&quot;: &quot;빅테크 투자 지속·증설 소요기간·장기계약은 AI 메모리 공급 부족의 장기화를 뒷받침하며 중국 증설·고객 현금흐름·계약가격은 반증 변수다. 공급 부족 전망은 주가나 이익을 보장하지 않는다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.98,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.76,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;2026년 관측을 근거로 한 2027~2030년 공급 부족 시나리오&quot;,
+        &quot;observed&quot;: &quot;장기 수급을 검증할 제품별 수요·공급·재고·가격 시계열 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;2030년 공급 부족은 확인된 사실이 아닌 조건부 시나리오로 취급하고 가격·마진·현금흐름과 실제 공급 증가를 따로 점검한다.&quot;
+    }
+  ],
+  &quot;entities&quot;: [
+    {
+      &quot;ticker&quot;: &quot;000660&quot;,
+      &quot;name&quot;: &quot;SK하이닉스&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;최근 주가 급락과 달리 실적과 AI 메모리 수요는 강하며, 경영진은 메모리 공급 부족이 2030년까지 이어질 것으로 전망했다.&quot;,
+        &quot;대형 고객과의 장기계약 및 예치금 장치로 향후 생산물량 상당 부분이 확보됐다고 설명했다.&quot;,
+        &quot;HBM 생산은 웨이퍼 소모와 공장 건설기간 때문에 빠르게 늘리기 어렵지만, 회사도 청주·용인 생산 확대와 투자 증가를 추진하고 있다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;6월 22일~10월 26일 주가 56% 하락; 영상 기준 전일 약 11% 상승해 148만7,000원 마감 주장.&quot;,
+        &quot;3분기 잠정 영업이익 83조3,000억원, 2019년 연간 이익의 30배 초과, 영업이익률 약 80% 주장.&quot;,
+        &quot;2018년 영업이익 20조8,000억원 초과→2019년 2조7,000억원, 약 87% 감소; 2019년 마지막 분기 D램 출하량 8% 증가·평균판매가격 7% 하락 주장.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;시장 데이터 조회 실패: no_usable_market_fields&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;000660&quot;,
+        &quot;as_of&quot;: &quot;2026-10-29T21:53:23.707327+00:00&quot;,
+        &quot;current_price&quot;: null,
+        &quot;market_cap&quot;: null,
+        &quot;forward_pe&quot;: null,
+        &quot;trailing_pe&quot;: null,
+        &quot;fifty_two_week_high&quot;: null,
+        &quot;fifty_two_week_low&quot;: null,
+        &quot;average_target_price&quot;: null,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;unverified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;GOOGL&quot;,
+      &quot;name&quot;: &quot;알파벳·구글 클라우드&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;클라우드 성장과 수주잔고를 바탕으로 AI 인프라 투자를 확대하며, 공급 부족으로 외부 컴퓨팅 설비 이용도 늘리고 있다고 설명했다.&quot;,
+        &quot;투자 확대와 기타 지출이 분기 잉여현금흐름 적자로 이어졌으며, 향후 투자 지속 여부가 메모리 수요의 핵심 변수라고 지적했다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;미국 현지 10월 28일 장 마감 후 실적 발표; 올해 설비투자 계획 1,950억~2,050억달러 유지, 원화 약 261조~274조원이라는 설명.&quot;,
+        &quot;2027년 설비투자가 크게 늘어날 전망이며 세부 계획은 4분기 실적 때 공개 예정.&quot;,
+        &quot;구글 클라우드 3분기 매출은 전년 대비 2배 초과, 수주잔고 5,610억달러 주장.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;GOOGL&quot;,
+        &quot;as_of&quot;: &quot;2026-10-29T21:53:26.233341+00:00&quot;,
+        &quot;current_price&quot;: 283.82000732421875,
+        &quot;market_cap&quot;: 3471100193309.138,
+        &quot;forward_pe&quot;: 18.7071,
+        &quot;trailing_pe&quot;: 14.8208885,
+        &quot;fifty_two_week_high&quot;: 408.61,
+        &quot;fifty_two_week_low&quot;: 270.7,
+        &quot;average_target_price&quot;: 419.91537,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;MSFT&quot;,
+      &quot;name&quot;: &quot;마이크로소프트&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;클라우드 성장에도 외부 컴퓨팅 용량과 GPU 임대계약 지연으로 투자 집행이 예고보다 적었으며, 수요가 공급능력을 초과한다고 설명했다.&quot;,
+        &quot;연간 설비투자 전망은 낮췄지만 다음 분기 대규모 투자와 양의 잉여현금흐름을 제시했다고 전했다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;전체 매출 전년 대비 19%, 애저 매출 48% 증가 주장.&quot;,
+        &quot;7~9월 설비투자는 500억달러 초과 예고 대비 실제 452억달러로 최소 48억달러 미달; 전년 대비 약 30% 증가라는 설명.&quot;,
+        &quot;10~12월 설비투자는 500억달러 초과 계획; 연간 전망은 7월 제시한 약 1,750억달러에서 약 1,700억달러로 하향.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;MSFT&quot;,
+        &quot;as_of&quot;: &quot;2026-10-29T21:53:28.086308+00:00&quot;,
+        &quot;current_price&quot;: 530.1400146484375,
+        &quot;market_cap&quot;: 3936578795371.379,
+        &quot;forward_pe&quot;: 21.98939,
+        &quot;trailing_pe&quot;: 29.534262,
+        &quot;fifty_two_week_high&quot;: 551.15,
+        &quot;fifty_two_week_low&quot;: 349.2,
+        &quot;average_target_price&quot;: 605.1243,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;META&quot;,
+      &quot;name&quot;: &quot;메타&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;차년도 예산 수립 중에도 공격적인 투자 지속 의사를 밝혔으나 분기 잉여현금흐름은 적자라고 전했다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;지난주 21일 실적 발표라는 설명; 분기 잉여현금흐름 21억달러 초과 적자 주장.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;META&quot;,
+        &quot;as_of&quot;: &quot;2026-10-29T21:53:29.924109+00:00&quot;,
+        &quot;current_price&quot;: 624.52001953125,
+        &quot;market_cap&quot;: 1596793416331.8252,
+        &quot;forward_pe&quot;: 17.548687,
+        &quot;trailing_pe&quot;: 21.307405,
+        &quot;fifty_two_week_high&quot;: 779.82,
+        &quot;fifty_two_week_low&quot;: 520.26,
+        &quot;average_target_price&quot;: 848.3765,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;^KS11&quot;,
+      &quot;name&quot;: &quot;메모리 산업·마이크론·코스피&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;과거 메모리 하강은 공급 증가·주문 축소·재고 누적·가격 및 이익 하락이 겹친 결과였지만, 현재 AI 메모리는 공급 병목이 두드러진다고 비교했다.&quot;,
+        &quot;AI 수요와 소비자용 수요가 갈리는 가운데 계약가격 상승을 전망하되, 실제 가격과 공급 증가를 점검해야 한다고 주장했다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;코스피는 전일 상승했지만 6월 종가 고점보다 34% 낮다는 주장; 지수 수준은 자막에 &#x27;6,11&#x27;로 표시돼 불명확.&quot;,
+        &quot;2019년 1분기 D램 산업 매출 전분기 대비 28.6% 감소; 4월 PC용 8GB 메모리 부품 가격 34달러로 한 분기 동안 20% 하락 주장.&quot;,
+        &quot;2022년 서버 고객 D램 재고 9~12주분, 4분기 서버 D램 가격 13~18% 하락 전망을 소개; 이후 3월 집계에서 해당 분기 계약가격이 20~30%대 하락했다는 설명이나 정확한 연도·분기 불명확.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;^KS11&quot;,
+        &quot;as_of&quot;: &quot;2026-10-29T21:53:32.788192+00:00&quot;,
+        &quot;current_price&quot;: 5937.66,
+        &quot;market_cap&quot;: null,
+        &quot;forward_pe&quot;: null,
+        &quot;trailing_pe&quot;: null,
+        &quot;fifty_two_week_high&quot;: 9385.59,
+        &quot;fifty_two_week_low&quot;: 0.0,
+        &quot;average_target_price&quot;: null,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;005930&quot;,
+      &quot;name&quot;: &quot;삼성전자&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;실적 설명회에서 공급과 장기계약에 대한 전망이 SK하이닉스의 공급 부족 전망과 일치하는지 확인해야 한다고 제시했다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;3분기 잠정 영업이익 107조4,000억원 주장; 영상 기준 당일 오전 10시 실적 설명회 예정.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;시장 데이터 조회 실패: no_usable_market_fields&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;005930&quot;,
+        &quot;as_of&quot;: &quot;2026-10-29T21:53:34.086435+00:00&quot;,
+        &quot;current_price&quot;: null,
+        &quot;market_cap&quot;: null,
+        &quot;forward_pe&quot;: null,
+        &quot;trailing_pe&quot;: null,
+        &quot;fifty_two_week_high&quot;: null,
+        &quot;fifty_two_week_low&quot;: null,
+        &quot;average_target_price&quot;: null,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;unverified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    }
+  ],
+  &quot;evidence&quot;: [
+    {
+      &quot;evidence_id&quot;: &quot;E1&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;Equities and bond yields dip with AI jitters and economic data in focus&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/asian-shares-fall-alphabet-earnings-022830389.html&quot;,
+      &quot;publisher&quot;: &quot;Reuters&quot;,
+      &quot;published_at&quot;: &quot;2026-10-29T21:31:24+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Equities and bond yields dip with AI jitters and economic data in focus Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 2026 Elections Weathe...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E2&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;Whitecap Profits Surge 60% as Ottawa&#x27;s Tax Break Promises Another $400 Million&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/energy/articles/whitecap-profits-surge-60-ottawas-212824717.html&quot;,
+      &quot;publisher&quot;: &quot;Oilprice.com&quot;,
+      &quot;published_at&quot;: &quot;2026-10-29T21:28:24+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Whitecap Profits Surge 60% as Ottawa&#x27;s Tax Break Promises Another $400 Million Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 2026 Elections...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E4&quot;,
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;title&quot;: &quot;SK hynix Has Slumped Since September: Why Rosenblatt Sees 175% Upside&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/sk-hynix-slumped-since-september-192307177.html&quot;,
+      &quot;publisher&quot;: &quot;TIKR&quot;,
+      &quot;published_at&quot;: &quot;2026-10-29T19:23:07+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;SK hynix Has Slumped Since September: Why Rosenblatt Sees 175% Upside Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 2026 Elections Weather...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E5&quot;,
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;title&quot;: &quot;Sandisk and Micron Slide 5% as Samsung Miss Cools Memory Rally Ahead of Sandisk Earnings; SK Hynix Falls 3%, Western Digital Dips&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/sandisk-micron-slide-5-samsung-190932273.html&quot;,
+      &quot;publisher&quot;: &quot;24/7 Wall St.&quot;,
+      &quot;published_at&quot;: &quot;2026-10-29T19:09:32+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E6&quot;,
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;title&quot;: &quot;3 low-volatility stocks with questionable fundamentals&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/3-low-volatility-stocks-questionable-100325387.html&quot;,
+      &quot;publisher&quot;: &quot;StockStory&quot;,
+      &quot;published_at&quot;: &quot;2026-10-29T10:03:25+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E7&quot;,
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;title&quot;: &quot;Earnings live updates: Sandisk posts solid earnings, announces 8-for-1 stock split&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/live/earnings-live-updates-sandisk-posts-solid-earnings-announces-8-for-1-stock-split-202935679.html&quot;,
+      &quot;publisher&quot;: &quot;Yahoo Finance&quot;,
+      &quot;published_at&quot;: &quot;2026-10-29T21:01:24+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E8&quot;,
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;title&quot;: &quot;Microsoft, IBD Stock Of The Day, Showing Quickening Cloud Growth&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/m/ebb60b70-4292-33f6-9001-6afe3488adf5/microsoft%2C-ibd-stock-of-the.html&quot;,
+      &quot;publisher&quot;: &quot;Investor&#x27;s Business Daily&quot;,
+      &quot;published_at&quot;: &quot;2026-10-29T20:56:44+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E9&quot;,
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;title&quot;: &quot;Microsoft Issues $25 Billion in New Bonds, Adding to AI Debt Spree&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/m/b19c6e1a-ed1d-3f04-8a85-fb91af9a3ec9/microsoft-issues-%2425-billion.html&quot;,
+      &quot;publisher&quot;: &quot;Barrons.com&quot;,
+      &quot;published_at&quot;: &quot;2026-10-29T20:07:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E10&quot;,
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;title&quot;: &quot;Microsoft Finalizes Terms on $25 Billion Bond Sale&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/m/c021512a-6a09-391c-9585-8a2b13e79236/microsoft-finalizes-terms-on.html&quot;,
+      &quot;publisher&quot;: &quot;The Wall Street Journal&quot;,
+      &quot;published_at&quot;: &quot;2026-10-29T19:28:27+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E11&quot;,
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;title&quot;: &quot;Dow Jones Futures: Amazon, Intel Lead Earnings Losers After Google, ServiceNow, Fortinet Hit Nasdaq&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/m/0a5ce393-a6df-312b-af64-1893a264d0df/dow-jones-futures%3A-amazon%2C.html&quot;,
+      &quot;publisher&quot;: &quot;Investor&#x27;s Business Daily&quot;,
+      &quot;published_at&quot;: &quot;2026-10-29T21:43:40+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E12&quot;,
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;title&quot;: &quot;ServiceNow stock sinks in worst day ever, Fortinet shares drop as Q3 earnings reports send software sector lower&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/article/fortinet-drags-down-cybersecurity-stocks-as-the-companys-service-revenue-forecast-misses-estimates-124146969.html&quot;,
+      &quot;publisher&quot;: &quot;Yahoo Finance&quot;,
+      &quot;published_at&quot;: &quot;2026-10-29T20:27:44+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    }
+  ],
+  &quot;source_policy&quot;: {
+    &quot;raw_transcript_published&quot;: false,
+    &quot;raw_transcript_in_evidence&quot;: false,
+    &quot;research_pipeline_version&quot;: 4,
+    &quot;closed_source_claims&quot;: &quot;unverified_external_source&quot;,
+    &quot;auto_caption_warning&quot;: true,
+    &quot;local_asr_warning&quot;: false
+  }
+}</pre>
+  </details>
+</article>
+</main>
+  <style>
+.reader-contents { margin: 16px 0; padding: 12px 16px; border: 1px solid var(--line, #64748b); border-radius: 12px; }
+.reader-contents > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-weight: 750; }
+.reader-contents nav { display: grid; gap: 4px; max-height: 45vh; overflow: auto; margin: 8px 0; }
+.reader-contents a { display: block; min-height: 44px; padding: 10px; border-radius: 6px; color: inherit; overflow-wrap: anywhere; }
+.reader-contents a:hover { background: #80808020; }
+.reader-contents .reader-subsection { padding-inline-start: 24px; font-size: .92em; }
+.reader-prose, .report { overflow-wrap: anywhere; line-height: 1.8; }
+.reader-prose p, .reader-prose li { max-width: 85ch; }
+.reader-prose h2, .reader-prose h3, .reader-prose h4, [data-reader-heading] { scroll-margin-top: 100px; line-height: 1.45; }
+.reader-prose h2 { margin-top: 1.8em; padding-bottom: 8px; border-bottom: 1px solid var(--line, #64748b); }
+.reader-prose h3 { margin-top: 1.5em; }
+.reader-prose li { margin: .5em 0; }
+.reader-prose pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.reader-prose blockquote { margin: 16px 0; padding: 4px 16px; border-left: 3px solid var(--accent, #64748b); }
+.reader-table { overflow: auto; max-width: 100%; margin: 16px 0; border: 1px solid var(--line, #64748b); border-radius: 10px; }
+.reader-table table { border-collapse: collapse; width: 100%; margin: 0; font-size: .92rem; }
+.reader-table th, .reader-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line, #64748b); min-width: 110px; max-width: 400px; overflow-wrap: anywhere; white-space: normal; }
+.reader-table th { background: #80808018; }
+.reader-table tr:nth-child(even) { background: #80808008; }
+.reader-search { display: grid; gap: 8px; margin: 16px 0; }
+.reader-search label { font-weight: 700; }
+.reader-search input { box-sizing: border-box; width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line, #64748b); border-radius: 10px; background: var(--panel, #fff); color: var(--text, #132238); font: inherit; }
+.reader-search p { margin: 0; font-size: .86rem; }
+.reader-back { position: fixed; bottom: max(14px, env(safe-area-inset-bottom)); right: 14px; z-index: 30; min-height: 44px; border: 1px solid #778899; border-radius: 99px; padding: 10px 16px; background: #18344a; color: #fff; font: 700 14px system-ui; cursor: pointer; box-shadow: 0 3px 12px #0003; }
+[data-reader-source] { margin-top: 20px; }
+[data-reader-source] > summary { min-height: 44px; cursor: pointer; }
+[data-reader-source] pre { font-size: .85rem; }
+[data-reader-source] pre, .reader-prose { min-width: 0; }
+.reader-contents :focus-visible, .reader-search :focus-visible, .reader-back:focus-visible, .reader-table:focus-visible { outline: 3px solid var(--accent, #008c95); outline-offset: 3px; }
+.reader-search + .grid > [hidden] { display: none !important; }
+@media (max-width: 600px) { .reader-prose { font-size: 1rem; } .reader-contents { padding: 8px 12px; } }
+@media print { .reader-back, .reader-search, .reader-contents, [data-reader-source] { display: none !important; } .reader-table { overflow: visible; } .reader-prose { color: #000; background: #fff; } }
+</style><script>
+(() => {
+  'use strict';
+  let serial = 0;
+  const rendered = new WeakMap();
+  const node = (tag, text) => { const el = document.createElement(tag); if (text != null) el.textContent = text; return el; };
+  function inline(parent, text) {
+    const pattern = /(`[^`]+`|\*\*[^*]+\*\*|\[[^\]]+\]\(https?:\/\/[^\s)]+\))/g;
+    let start = 0;
+    for (const match of String(text).matchAll(pattern)) {
+      parent.append(document.createTextNode(text.slice(start, match.index)));
+      const value = match[0];
+      if (value.startsWith('`')) parent.append(node('code', value.slice(1, -1)));
+      else if (value.startsWith('**')) parent.append(node('strong', value.slice(2, -2)));
+      else {
+        const link = value.match(/^\[([^\]]+)\]\((.+)\)$/);
+        const a = node('a', link[1]); a.href = link[2]; a.rel = 'noopener noreferrer'; parent.append(a);
+      }
+      start = match.index + value.length;
+    }
+    parent.append(document.createTextNode(text.slice(start)));
+  }
+  const cells = line => line.trim().replace(/^\|/, '').replace(/\|$/, '').split(/(?<!\\)\|/).map(v => v.trim().replace(/\\\|/g, '|'));
+  function markdown(source) {
+    const article = node('article'); article.className = 'reader-prose';
+    const lines = source.split(/\r?\n/); let list = null;
+    for (let i = 0; i < lines.length; i += 1) {
+      const line = lines[i], value = line.trim();
+      if (!value) { list = null; continue; }
+      if (/^```/.test(value)) {
+        const code = []; i += 1;
+        while (i < lines.length && !/^```/.test(lines[i].trim())) code.push(lines[i++]);
+        const pre = node('pre'); pre.append(node('code', code.join('\n'))); article.append(pre); list = null; continue;
+      }
+      if (i + 1 < lines.length && value.includes('|') && cells(lines[i + 1]).every(v => /^:?-{3,}:?$/.test(v))) {
+        const table = node('table'), head = node('thead'), body = node('tbody');
+        const row = (values, tag) => { const tr = node('tr'); values.forEach(v => { const cell = node(tag); if (tag === 'th') cell.scope = 'col'; inline(cell, v); tr.append(cell); }); return tr; };
+        head.append(row(cells(line), 'th')); i += 2;
+        while (i < lines.length && lines[i].trim() && lines[i].includes('|')) body.append(row(cells(lines[i++]), 'td'));
+        i -= 1; table.append(head, body); article.append(table); list = null; continue;
+      }
+      const heading = value.match(/^(#{1,6})\s+(.+)$/);
+      if (heading) { const h = node('h' + Math.min(4, heading[1].length + 1)); inline(h, heading[2]); article.append(h); list = null; continue; }
+      const bullet = value.match(/^(?:[-*+] |\d+\. )(.+)$/);
+      if (bullet) {
+        const tag = /^\d/.test(value) ? 'ol' : 'ul';
+        if (!list || list.tagName.toLowerCase() !== tag) { list = node(tag); if (tag === 'ol') list.start = parseInt(value, 10); article.append(list); }
+        const li = node('li'); inline(li, bullet[1]); list.append(li); continue;
+      }
+      list = null;
+      if (/^(---+|\*\*\*+)$/.test(value)) { article.append(node('hr')); continue; }
+      const p = node(value.startsWith('> ') ? 'blockquote' : 'p'); inline(p, value.startsWith('> ') ? value.slice(2) : line); article.append(p);
+    }
+    return article;
+  }
+  function contents(root) {
+    root.querySelectorAll(':scope > .reader-contents').forEach(el => el.remove());
+    const headings = [...root.querySelectorAll('h2,h3,h4')].filter(h => !h.closest('.card,.run-card,.reader-contents,[data-reader-source],[hidden]'));
+    if (headings.length < 2) return;
+    const details = node('details'); details.className = 'reader-contents';
+    details.append(node('summary', '이 리포트 목차 · ' + headings.length + '개 항목'));
+    const nav = node('nav'); nav.setAttribute('aria-label', '리포트 목차');
+    headings.forEach(h => {
+      if (!h.id) h.id = 'reader-section-' + (++serial);
+      h.dataset.readerHeading = ''; h.tabIndex = -1;
+      const a = node('a', h.textContent); a.href = '#' + h.id;
+      if (h.tagName !== 'H2') a.className = 'reader-subsection';
+      a.addEventListener('click', event => {
+        event.preventDefault();
+        for (let ancestor = h.parentElement; ancestor; ancestor = ancestor.parentElement) if (ancestor.tagName === 'DETAILS') ancestor.open = true;
+        h.scrollIntoView({block: 'start'}); h.focus({preventScroll: true});
+      }); nav.append(a);
+    });
+    details.append(nav); root.prepend(details);
+  }
+  function enhance(root) {
+    if (!root) return;
+    root.querySelectorAll('pre[data-report-markdown]').forEach(pre => {
+      const previous = rendered.get(pre);
+      if (previous && previous.source === pre.textContent) return;
+      const article = markdown(pre.textContent);
+      if (previous) previous.article.replaceWith(article);
+      else {
+        const details = node('details'); details.dataset.readerSource = '';
+        details.append(node('summary', 'Markdown 원문 보기'));
+        pre.before(article, details); details.append(pre);
+      }
+      rendered.set(pre, {source: pre.textContent, article});
+    });
+    root.querySelectorAll('table').forEach(table => {
+      if (table.closest('.reader-table,.account-table-wrap,.summary-scroll')) return;
+      const wrap = node('div'); wrap.className = 'reader-table'; wrap.tabIndex = 0;
+      wrap.setAttribute('role', 'region'); wrap.setAttribute('aria-label', '리포트 표 · 가로로 스크롤하여 전체 보기');
+      table.before(wrap); wrap.append(table);
+    });
+    root.querySelectorAll('.grid').forEach(grid => {
+      const cards = [...grid.querySelectorAll(':scope > a.card')];
+      if (cards.length < 2 || grid.dataset.readerSearch) return;
+      grid.dataset.readerSearch = 'true';
+      const box = node('div'); box.className = 'reader-search';
+      const input = node('input'); input.type = 'search'; input.placeholder = '제목 · 종목 · 채널 · 키워드'; input.id = 'report-search-' + (++serial);
+      const label = node('label', '리포트 찾기'); label.htmlFor = input.id;
+      const status = node('p'); status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
+      const update = () => {
+        const terms = input.value.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean); let count = 0;
+        cards.forEach(card => { card.hidden = !terms.every(t => card.textContent.toLocaleLowerCase().includes(t)); if (!card.hidden) count += 1; });
+        status.textContent = cards.length + '개 중 ' + count + '개 표시' + (count ? '' : ' · 검색어를 지우거나 다른 키워드를 입력하세요.');
+      };
+      input.addEventListener('input', update); box.append(label, input, status); grid.before(box); update();
+    });
+    contents(root);
+  }
+  window.TradingAgentsReader = {enhance};
+  const main = document.querySelector('main');
+  if (main && !main.hasAttribute('data-reader-dynamic')) enhance(main);
+  if (main) {
+    const top = node('button', '↑ 맨 위'); top.type = 'button'; top.className = 'reader-back'; top.setAttribute('aria-label', '리포트 맨 위로 이동');
+    top.addEventListener('click', () => { const target = document.querySelector('h1') || main; target.tabIndex = -1; target.scrollIntoView({block: 'start'}); target.focus({preventScroll: true}); });
+    document.body.append(top);
+  }
+})();
+</script>
+</body>
+</html>
