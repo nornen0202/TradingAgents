@@ -94,7 +94,12 @@ def admitted(run, jobs, surface, manifest):
     collections = [step for step in steps if step.get("name") == spec[2] and step.get("conclusion") == "success"]
     stamps = [step for step in steps if step.get("name") == "Stamp rollback-resistant Pages snapshot"
               and step.get("conclusion") == "success"]
-    if len(collections) != 1 or len(stamps) != 1:
+    handoffs = [step for step in steps if step.get("name") == "Confirm canonical collection handoff to local publisher"
+                and step.get("conclusion") == "success"]
+    # Local collectors deliberately skip cloud snapshot construction. Their
+    # publish-enabled handoff replaces that marker; the sender still requires
+    # exact canonical lineage and verified public bytes under the publish lock.
+    if len(collections) != 1 or len(stamps) + len(handoffs) != 1:
         return False
     return collection_contains_manifest(collections[0], manifest)
 
