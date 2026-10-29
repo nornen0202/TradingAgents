@@ -26,7 +26,10 @@ class PriceHistoryLoadResult:
 
     @property
     def has_prices(self) -> bool:
-        return any(key != BENCHMARK_KEY and values for key, values in self.price_history.items())
+        if self.required_tickers:
+            return any(self.price_history.get(ticker) for ticker in self.required_tickers)
+        return any(key not in {BENCHMARK_KEY, "BENCHMARK"} and values
+                   for key, values in self.price_history.items())
 
     @property
     def missing_price_tickers(self) -> tuple[str, ...]:

@@ -56,6 +56,13 @@ def test_empty_response_remains_missing(monkeypatch):
     assert not history and 'performance_yfinance_no_data:AAPL' in warnings
 
 
+def test_unrelated_or_benchmark_prices_do_not_count_as_due_security_prices():
+    result = prices.PriceHistoryLoadResult(price_history={'MSFT': [{'date': '2026-04-02', 'close': 100}]},
+        due_recommendation_ids=(1,), required_tickers=('AAPL',))
+    assert not result.has_prices and not result.price_coverage_complete
+    assert not prices.PriceHistoryLoadResult(price_history={'BENCHMARK': [1], '__BENCHMARK__': [1]}).has_prices
+
+
 def test_local_prices_preserve_availability_clocks_and_exclude_conflicts(tmp_path):
     path = tmp_path / 'prices.json'
     path.write_text(json.dumps({'AAPL': [
