@@ -4,6 +4,12 @@ import subprocess
 import pytest
 from requests import exceptions as request_errors
 
+from tradingagents.dataflows.vendor_exceptions import (
+    InsufficientIndicatorHistoryError,
+    VendorMalformedResponseError,
+    VendorUnavailableError,
+)
+
 from tradingagents.llm_clients.codex_app_server import (
     CodexAppServerAuthError,
     CodexAppServerBinaryError,
@@ -24,6 +30,9 @@ _UNKNOWN = {"failure_category": "UNKNOWN_ERROR", "exception_class": "OtherError"
 
 
 @pytest.mark.parametrize("exception,category,class_name,retryability", [
+    (InsufficientIndicatorHistoryError(_SENSITIVE_SENTINEL), "INDICATOR_HISTORY_UNAVAILABLE", "InsufficientIndicatorHistoryError", "NON_RETRYABLE"),
+    (VendorMalformedResponseError(_SENSITIVE_SENTINEL), "DATA_INTEGRITY_ERROR", "VendorMalformedResponseError", "UNKNOWN"),
+    (VendorUnavailableError(_SENSITIVE_SENTINEL), "DATA_PROVIDERS_UNAVAILABLE", "VendorUnavailableError", "UNKNOWN"),
     (CodexAppServerAuthError(_SENSITIVE_SENTINEL), "AUTHENTICATION_ERROR", "CodexAppServerAuthError", "NON_RETRYABLE"),
     (CodexAppServerBinaryError(_SENSITIVE_SENTINEL), "RUNTIME_CONFIGURATION_ERROR", "CodexAppServerBinaryError", "NON_RETRYABLE"),
     (CodexModelUnavailableError(_SENSITIVE_SENTINEL), "MODEL_UNAVAILABLE", "CodexModelUnavailableError", "NON_RETRYABLE"),

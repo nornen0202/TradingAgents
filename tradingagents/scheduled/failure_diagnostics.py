@@ -14,6 +14,12 @@ from typing import Any
 
 from requests import exceptions as request_errors
 
+from tradingagents.dataflows.vendor_exceptions import (
+    InsufficientIndicatorHistoryError,
+    VendorMalformedResponseError,
+    VendorUnavailableError,
+)
+
 from tradingagents.llm_clients.codex_app_server import (
     CodexAppServerAuthError,
     CodexAppServerBinaryError,
@@ -31,6 +37,9 @@ _UNKNOWN = ("UNKNOWN_ERROR", "OtherError", "UNKNOWN")
 # classes must precede their parents. Unknown provider errors stay unknown rather
 # than being guessed from free-form messages (including timeout-looking text).
 _RULES: tuple[tuple[type[BaseException], tuple[str, str, str]], ...] = (
+    (InsufficientIndicatorHistoryError, ("INDICATOR_HISTORY_UNAVAILABLE", "InsufficientIndicatorHistoryError", "NON_RETRYABLE")),
+    (VendorMalformedResponseError, ("DATA_INTEGRITY_ERROR", "VendorMalformedResponseError", "UNKNOWN")),
+    (VendorUnavailableError, ("DATA_PROVIDERS_UNAVAILABLE", "VendorUnavailableError", "UNKNOWN")),
     (CodexAppServerAuthError, ("AUTHENTICATION_ERROR", "CodexAppServerAuthError", "NON_RETRYABLE")),
     (CodexAppServerBinaryError, ("RUNTIME_CONFIGURATION_ERROR", "CodexAppServerBinaryError", "NON_RETRYABLE")),
     (CodexModelUnavailableError, ("MODEL_UNAVAILABLE", "CodexModelUnavailableError", "NON_RETRYABLE")),

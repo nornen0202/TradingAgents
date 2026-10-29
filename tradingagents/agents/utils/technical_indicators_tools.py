@@ -1,6 +1,8 @@
 from langchain_core.tools import tool
 from typing import Annotated
+import json
 from tradingagents.dataflows.interface import route_to_vendor
+from tradingagents.dataflows.vendor_exceptions import InsufficientIndicatorHistoryError
 
 @tool
 def get_indicators(
@@ -27,6 +29,16 @@ def get_indicators(
     for ind in indicators:
         try:
             results.append(route_to_vendor("get_indicators", symbol, ind, curr_date, look_back_days))
+        except InsufficientIndicatorHistoryError:
+            # The vendor request retains its error evidence and execution gate.
+            # Let the analyst explain an unavailable indicator, without making
+            # up warm-up bars or discarding the rest of the company's research.
+            results.append(json.dumps({
+                "status": "UNAVAILABLE", "reason": "INSUFFICIENT_OR_UNVERIFIED_INDICATOR_HISTORY",
+                "symbol": symbol, "indicator": ind, "as_of": curr_date,
+                "look_back_days": look_back_days, "value": None, "execution_authorized": False,
+                "instruction": "State this limitation. Do not infer, fill, or substitute an indicator value.",
+            }, ensure_ascii=True))
         except ValueError as e:
             results.append(str(e))
     return "\n\n".join(results)

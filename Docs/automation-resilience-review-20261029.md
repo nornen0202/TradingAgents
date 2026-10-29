@@ -105,13 +105,91 @@ recovery active without delaying fresh observation production.
 
 ## Remaining acceptance work and limits
 
+### KR failures observed during the real catch-up
+
+The original October 29 KR catch-up exposed two distinct data failures before
+completion. Its healthy workers continue on immutable source `fae53db7`; original
+failures, attempt counters and successful research clocks are preserved.
+
+- `179880.KQ` (Melcon): Yahoo omitted the first regular session, October 15,
+  2026. The [KRX new-listing notice](https://kind.krx.co.kr/external/2026/10/13/000679/20261013001545/70760.htm)
+  and [separate trading-reference notice](https://kind.krx.co.kr/external/2026/10/14/000511/20261014000808/72100.htm)
+  bind that date to common-stock ISIN `KR7179880000`. A current public KIS master
+  independently binds the same identity. There are only ten real sessions through
+  October 28: even after correcting the missing first bar, longer indicators
+  remain unavailable.
+- `443670.KQ` (SPSoft): Yahoo omitted September 19, 2025. The
+  [KRX SPAC-dissolution new-listing notice](https://kind.krx.co.kr/external/2024/02/13/001310/20240213003429/70980.htm)
+  and [separate trading-reference notice](https://kind.krx.co.kr/external/2024/02/14/001266/20240214003127/70718.htm)
+  establish a **new operating-company security**, ISIN `KR7443670005`, first
+  trading February 15, 2024. This is an explicit reviewed event; neither an
+  ordinary SPAC reverse merger nor predecessor IBKS 19 prices are admitted.
+- Prechecking the eight not-yet-started tickers found the same unverified history
+  boundary for `419050.KQ` (Samkee Energy Solutions, originally Samkee EV).
+  The [original KRX listing](https://kind.krx.co.kr/external/2023/02/01/000811/20230201002370/70760.htm)
+  binds ISIN `KR7419050000` to February 3, 2023; a
+  [separate first-session reference](https://kind.krx.co.kr/external/2023/02/02/000412/20230202001250/70793.htm)
+  corroborates the day. The [exchange rename notice](https://kind.krx.co.kr/external/2025/04/15/000602/20250415001572/70765.htm)
+  explains the current master name without replacing security identity. Its
+  actual review clock is October 29 08:54 UTC. Read-only corrected validation at
+  17:55 KST verified all 909 required sessions in ten KIS calls. The other seven
+  remaining tickers passed actual price and six-indicator input checks.
+
+The reviewed-event registry stores the original source hashes and actual October
+29 08:34 UTC collection clocks. It cannot qualify earlier historical analyses.
+Admission still requires the exact current master, an aware evidence cutoff, and
+every KRX regular session since the verified first listing within the original
+requested window. Recovery replaces the entire series from one adjusted-price
+provider; it never patches individual Yahoo bars with another provider's values.
+Future and unverifiable dates remain excluded; missing regular sessions fail.
+
+The analyst Tool now returns explicit `UNAVAILABLE`, null value and no execution
+authorization for insufficient/unverifiable indicator history. The failed vendor
+request remains failed in its original telemetry. A later valid short indicator
+cannot clear the missing long-indicator evidence or new-entry execution gate.
+This allows an honest limited-history report without terminating the whole
+company analysis. Unrelated integrity/runtime exceptions still propagate.
+Public diagnostics classify typed indicator-history, invalid-data and exhausted
+provider errors without inspecting private exception text or changing retry
+permissions.
+
+Read-only live validation at 17:44 KST returned ten Melcon and 656 SPSoft bars
+through October 28, complete over their exact required sessions, in one and seven
+bounded KIS calls respectively. It used an isolated cache and sent no orders.
+Offline validation passed 300 history/evidence cases and 89 related vendor,
+diagnostic, analyst and deterministic risk cases (five overlap). These include
+empty, future, missing and malformed dates, predecessor/identity mismatches,
+pre-review clocks and the mixed available/unavailable indicator gate. Full CI and
+actual failed-only research completion/delivery are separate acceptance steps.
+
+### Additional deployment and publication observations
+
+- PR 495 merged as `be4de8e4`; CI 40836158926 passed 6,519 tests and 131 subtests,
+  plus browser/CodeQL checks. The PRISM recovery notice was actually SENT once
+  by workflow 40838184663, message 826, at 16:52 KST. Its original owning workflow
+  remains failed. US message 825 remains SENT once.
+- A complete publisher exercise returned zero at 17:17:53 KST. Total elapsed time
+  was 22 minutes 29 seconds; the core Pages build took 18 minutes 27 seconds.
+  Publication `cd5c2010a0112f453c49a66e85318388207ddf8e` was DELIVERY_VERIFIED at
+  17:16:53 KST with a verified public mirror. All 67 selected public files were
+  checked against committed bytes. Repeated publication did not resend either
+  existing notification.
+- PR 496 merged as `e352f211` and was adopted at 17:38 KST after all PR checks
+  passed. Repository Work contracts now match the user's already approved saved
+  model efforts and schedules; the installed settings were not changed. Declared
+  model configuration is not represented as runtime observation.
+- Runtime comparison found two remaining installed-version drifts: cryptography
+  49.0.0 versus locked 50.0.0, and soupsieve 2.8.4 versus 2.9. Correct versions were
+  staged and their encryption/selector smoke checks passed. Live installation
+  awaits a safe idle interval; healthy research must not load mixed dependencies.
+
 At review start, KR had no full production on October 28/29; the last was
 October 27. The new same-day recovery must finish and publish before KR research
 recovery is complete. Code tests alone cannot close that incident. End-of-session
 or stale-input execution blocks remain valid until a real current observation.
 
-The last full publisher took about 37 minutes. Parallel reads remove confirmed
-serialization, but the full generation still needs measurement after deployment.
+The completed publication exercise above measures the deployed parallel-reader
+path. Future builds can still vary with archive size and storage/network load.
 Storage and process checks are observations, not guarantees against disconnects,
 power loss, upstream outages or future vulnerabilities. Keep protected-volume
 headroom, original retry limits, exact configured model roles, as-of validation,
