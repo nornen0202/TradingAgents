@@ -54,6 +54,14 @@ def initialize_action_tracker(db_path: Path) -> None:
             "missed_upside_20d": "REAL",
             "calculation_version": "INTEGER DEFAULT 1",
         })
+        # Refresh eligibility needs only these narrow fields. A ticker-only
+        # scan otherwise reads large recommendation payloads in random order,
+        # followed by another table lookup for each outcome. Build after column
+        # migration so legacy archives receive the same covering indexes.
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_action_refresh_recommendations "
+                     "ON action_recommendations(ticker, id, created_at, market)")
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_action_refresh_outcomes "
+                     "ON action_outcomes(recommendation_id, calculation_version, return_60d, updated_at)")
         conn.commit()
 
 
