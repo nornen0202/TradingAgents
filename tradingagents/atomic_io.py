@@ -10,7 +10,7 @@ from __future__ import annotations
 import errno
 import json
 import os
-import tempfile
+import uuid
 import threading
 import time
 from contextlib import contextmanager
@@ -21,6 +21,20 @@ from typing import Any, Iterator
 _THREAD_LOCKS: dict[str, threading.Lock] = {}
 _THREAD_LOCKS_GUARD = threading.Lock()
 _WINDOWS_REPLACE_RETRY_DELAYS = (0.05, 0.1, 0.2, 0.4, 0.8, 1.0)
+
+
+def _temporary_sibling(destination: Path) -> tuple[int, Path]:
+    # tempfile.mkstemp retries PermissionError on Windows when os.access says
+    # writable. ACL/sandbox denial can therefore spin for TMP_MAX attempts.
+    # Retry actual name collisions only, with a finite bound; never alter ACLs.
+    flags = os.O_RDWR | os.O_CREAT | os.O_EXCL | getattr(os, "O_BINARY", 0)
+    for _ in range(16):
+        temporary = destination.with_name(f".{destination.name}.{uuid.uuid4().hex}.tmp")
+        try:
+            return os.open(temporary, flags, 0o600), temporary
+        except FileExistsError:
+            continue
+    raise FileExistsError("Unable to allocate a unique atomic-write sibling")
 
 
 def atomic_write_json(
@@ -44,8 +58,7 @@ persistent denial still fails without deleting or changing the destination.
     content = (json.dumps(payload, ensure_ascii=False, indent=indent) + "\n").encode("utf-8")
     destination = Path(path)
     destination.parent.mkdir(parents=True, exist_ok=True)
-    fd, temporary_name = tempfile.mkstemp(prefix=f".{destination.name}.", suffix=".tmp", dir=destination.parent)
-    temporary = Path(temporary_name)
+    fd, temporary = _temporary_sibling(destination)
     try:
         with os.fdopen(fd, "wb") as stream:
             stream.write(content)

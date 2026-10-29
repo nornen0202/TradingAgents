@@ -88,7 +88,6 @@ def test_all_failed_full_research_finishes_without_downstream_calls(tmp_path, mo
 
 
 @pytest.mark.parametrize("mode,statuses,expected", [
-    ("full", ["failed", "success"], "partial_failure"),
     ("full", ["success", "success"], "success"),
     ("portfolio_only", [], "success"),
 ])
@@ -120,6 +119,33 @@ def test_successful_research_and_account_only_keep_portfolio_path(tmp_path, monk
     assert manifest["summary"]["successful_tickers"] == statuses.count("success")
     attempt_path = next(config.storage.archive_dir.glob("runs/*/*/attempt.json"))
     assert json.loads(attempt_path.read_text())["status"] == expected.upper()
+
+
+@pytest.mark.parametrize("parallel", [False, True])
+@pytest.mark.parametrize("failed_status", ["failed", "skipped"])
+def test_partial_research_is_terminal_before_any_optional_postprocessing(tmp_path, monkeypatch, parallel, failed_status):
+    config = config_for(tmp_path, parallel=parallel, execution=True)
+    rows = [{"ticker": "AAPL", "status": "success", "metrics": {}, "artifacts": {}},
+            {"ticker": "MSFT", "status": failed_status, "metrics": {}, "artifacts": {}}]
+    monkeypatch.setattr(runner, "_resolve_run_trade_date", lambda **_: "2026-10-28")
+    monkeypatch.setattr(runner, "_run_parallel_tickers" if parallel else "_run_sequential_tickers",
+                        lambda **_: (rows, {}, {}, []) if parallel else rows)
+    forbidden = Mock(side_effect=AssertionError("Partial research must be available for recovery immediately"))
+    for name in ("collect_event_news", "collect_event_signals", "_run_execution_overlay_passes",
+                 "run_portfolio_pipeline", "build_and_write_decision_bundle", "build_live_context_delta",
+                 "_run_performance_tracking", "build_site"):
+        monkeypatch.setattr(runner, name, forbidden)
+    monkeypatch.setattr(delivery, "handoff_completed_run", forbidden)
+    manifest = runner.execute_scheduled_run(config, run_label="local-scheduler-us-full")
+    assert manifest["status"] == "partial_failure"
+    assert manifest["terminal_failure"]["reason"] == "incomplete_ticker_research"
+    assert manifest["tickers"] == rows
+    assert manifest["summary"]["successful_tickers"] == 1
+    assert manifest["summary"]["failed_tickers"] == 1
+    run_dir = next(config.storage.archive_dir.glob("runs/*/*"))
+    assert json.loads((run_dir / "run.json").read_text()) == manifest
+    assert json.loads((run_dir / "attempt.json").read_text())["status"] == "PARTIAL_FAILURE"
+    forbidden.assert_not_called()
 
 
 def test_failed_worker_preserves_safe_partial_tool_evidence(tmp_path, monkeypatch):

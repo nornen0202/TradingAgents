@@ -54,3 +54,29 @@ def test_corrupt_portfolio_status_degrades_to_empty_summary(tmp_path):
     (private / "status.json").write_text("{", encoding="utf-8")
     with pytest.warns(RuntimeWarning, match="portfolio status"):
         assert site._load_portfolio_summary(tmp_path) == {}
+
+
+def test_repeated_research_is_shared_without_changing_rendered_values(tmp_path):
+    original = []
+    for index in range(3):
+        run_id = f"run-{index}"
+        payload = {"run_id": run_id, "started_at": f"2026-10-28T10:0{index}:00+09:00",
+                   "status": "success", "settings": {"market": "US"},
+                   "active_universe": {"expected_watchlist_tickers": ["AAPL"]},
+                   "tickers": [{"ticker": "AAPL", "status": "success",
+                                "decision": {"reason": "same research " * 1000,
+                                             "rating": "HOLD" if index < 2 else "WAIT"},
+                                "artifacts": {}}]}
+        path = tmp_path / "runs" / "2026" / run_id / "run.json"
+        path.parent.mkdir(parents=True)
+        path.write_text(json.dumps(payload), encoding="utf-8")
+        original.append((path, path.read_bytes()))
+    manifests = site._load_run_manifests(tmp_path)
+    assert manifests[1]["tickers"][0]["decision"] is manifests[2]["tickers"][0]["decision"]
+    assert manifests[0]["tickers"][0]["decision"] is not manifests[1]["tickers"][0]["decision"]
+    before = json.dumps(manifests)
+    for manifest in manifests:
+        public = site._public_ticker_summaries(manifest)
+        public[0]["decision"]["reason"] = "modified public copy"
+    assert json.dumps(manifests) == before
+    assert all(path.read_bytes() == data for path, data in original)
