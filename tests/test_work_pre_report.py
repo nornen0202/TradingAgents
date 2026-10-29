@@ -95,6 +95,7 @@ def wired(tmp_path, monkeypatch):
         observed = kw["now"].isoformat()
         for field in ("market_data_oldest_at", "market_data_latest_at", "account_as_of"):
             item["body"]["current"]["freshness_receipt"][field] = observed
+        item['body']['current']['bundle']['strategy_table'][0]['execution']['valid_until'] = (kw['now']+timedelta(seconds=120)).isoformat()
         return item
 
     monkeypatch.setattr(pre, "execute_scheduled_run", execute)
@@ -166,6 +167,13 @@ def test_owned_refresh_constructs_exactly_one_guarded_packet(wired, tmp_path, mo
     monkeypatch.setattr(pre, 'build_surface_packet', build)
     assert pre.prepare_market_report(runtime, 'us', producer_state_dir=tmp_path)['result'] == 'NEW'
     assert len(calls) == len(prepared) == 1
+
+
+def test_fresh_fixture_validity_is_not_anchored_to_test_collection_time(wired, tmp_path, monkeypatch):
+    import sys
+    monkeypatch.setattr(sys.modules[__name__], 'NOW', datetime.now(timezone.utc)-timedelta(hours=2))
+    runtime, prepared, configs = wired
+    assert pre.prepare_market_report(runtime, 'us', producer_state_dir=tmp_path)['result'] == 'NEW'
 
 
 def test_busy_producer_does_not_start_or_allocate_event(wired, tmp_path):
@@ -243,6 +251,7 @@ def test_busy_adoption_requires_immutable_same_run_and_current_observations(wire
     receipt["producer_run_id"] = run_id
     for field in ("market_data_oldest_at", "market_data_latest_at", "account_as_of"):
         receipt[field] = current.isoformat()
+    item['body']['current']['bundle']['strategy_table'][0]['execution']['valid_until'] = (current+timedelta(seconds=120)).isoformat()
     if case == "bad_account": receipt["account_snapshot_health"] = "INVALID"
     monkeypatch.setattr(pre, "build_surface_packet", lambda *a, **kw: deepcopy(item))
     path = tmp_path/"archive"/"runs"/"2026"/run_id/"run.json"
