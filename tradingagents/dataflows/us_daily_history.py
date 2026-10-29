@@ -19,6 +19,7 @@ from .api_keys import get_api_key
 from .integrity import validate_daily_bars
 from .intraday.us_symbols import kis_symbol
 from .vendor_exceptions import VendorInputError, VendorMalformedResponseError
+from .alpaca_daily_history import SOURCE as ALPACA_SOURCE
 
 SOURCE = "KIS overseas_dailyprice (US, MODP=1 adjusted prices)"
 _MAX_PAGES = 20
@@ -195,7 +196,7 @@ def selected_history(symbol: str, start_date: str, end_date: str):
     from .daily_history_selection import get_selected_daily_history
 
     selected = get_selected_daily_history(symbol, end_date)
-    if selected and selected["source"] in {SOURCE, "yfinance"}:
+    if selected and selected["source"] in {SOURCE, ALPACA_SOURCE, "yfinance"}:
         frame = selected["frame"]
         if frame is None and selected["source"] == "yfinance":
             return None  # Legacy opt-out callers pin only the provider.
@@ -259,9 +260,19 @@ def validate_with_us_fallback(data, symbol: str, start_date: str, end_date: str)
     stale_required_session = (valid is not None and fallback_enabled(symbol)
         and valid.iloc[-1]["Date"] < pd.Timestamp(_sessions(date.fromisoformat(start_date), date.fromisoformat(end_date))[-1]))
     if fallback_enabled(symbol) and (valid is None or stale_required_session):
-        replacement = load_us_daily_bars(symbol, start_date, end_date)
+        from tradingagents.portfolio.kis import KisApiError
+        try:
+            replacement = load_us_daily_bars(symbol, start_date, end_date)
+        except (VendorMalformedResponseError, KisApiError):
+            from .alpaca_daily_history import load_us_daily_bars as load_alpaca
+            replacement = load_alpaca(symbol, start_date, end_date)
+            if replacement is None:
+                raise
+        if replacement is None:
+            from .alpaca_daily_history import load_us_daily_bars as load_alpaca
+            replacement = load_alpaca(symbol, start_date, end_date)
         if replacement is not None:
-            select_daily_history(symbol, end_date, SOURCE, frame=replacement)
+            select_daily_history(symbol, end_date, replacement.attrs.get("source", SOURCE), frame=replacement)
             # A parallel tool may have selected first; return that exact frame.
             pinned = selected_history(symbol, start_date, end_date)
             return pinned if pinned is not None else _window(replacement, start_date, end_date)
@@ -280,6 +291,10 @@ def validate_with_us_fallback(data, symbol: str, start_date: str, end_date: str)
 
 
 def source_note(frame: pd.DataFrame) -> str:
+    if frame.attrs.get("source") == ALPACA_SOURCE:
+        return (f"# OHLCV source: {ALPACA_SOURCE}; observed_at={frame.attrs['observed_at']}; "
+                f"requested_end={frame.attrs['requested_end']}; series_sha256={frame.attrs['series_sha256']}; "
+                "complete=true. Single SIP series for prices and indicators; not a historical snapshot vintage.\n")
     if frame.attrs.get("source") != SOURCE:
         return ""
     listing = frame.attrs.get("listing_contract")

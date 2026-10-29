@@ -40,11 +40,15 @@ def _snapshot(symbol, end_date, source, frame):
         if not isinstance(frame, pd.DataFrame) or frame.empty:
             raise ValueError("Missing snapshot rows")
         from .us_daily_history import SOURCE
+        from .alpaca_daily_history import SOURCE as ALPACA_SOURCE
         from .kr_daily_history import SOURCE as KR_SOURCE
         from .kr_daily_history import verified_yahoo_basis
 
         attrs = frame.attrs
         us_metadata = source == SOURCE and attrs.get("adjustment") == "MODP=1" and attrs.get("exchange") in {"NAS", "NYS", "AMS"}
+        alpaca_metadata = (source == ALPACA_SOURCE and attrs.get("adjustment") == "all"
+                           and attrs.get("exchange") == "US_SIP" and attrs.get("feed") == "sip"
+                           and attrs.get("symbol_asof") == end_date)
         kr_metadata = (source == KR_SOURCE and re.fullmatch(r"[0-9]{6}\.(KS|KQ)", symbol) is not None
                        and attrs.get("adjustment") == "FID_ORG_ADJ_PRC=0" and attrs.get("exchange") == "KRX")
         kr_yahoo_metadata = (source == "yfinance" and attrs.get("provider") == "yfinance"
@@ -53,8 +57,8 @@ def _snapshot(symbol, end_date, source, frame):
                              and verified_yahoo_basis(frame, symbol, attrs.get("requested_start"), end_date, as_of=now) is not None
                              and isinstance(attrs.get("listing_contract"), dict)
                              and attrs["listing_contract"].get("schema") == "tradingagents.verified-kr-first-regular-listing/v1")
-        if (not (us_metadata or kr_metadata or kr_yahoo_metadata) or attrs.get("source") != source
-                or attrs.get("provider") != ("yfinance" if kr_yahoo_metadata else "kis")
+        if (not (us_metadata or alpaca_metadata or kr_metadata or kr_yahoo_metadata) or attrs.get("source") != source
+                or attrs.get("provider") != ("yfinance" if kr_yahoo_metadata else "alpaca" if alpaca_metadata else "kis")
                 or attrs.get("complete") is not True):
             raise ValueError("Unverified provider metadata")
         start = _day(attrs.get("requested_start"))
@@ -81,6 +85,14 @@ def _snapshot(symbol, end_date, source, frame):
         digest = hashlib.sha256(frame.to_csv(index=False).encode("utf-8")).hexdigest()
         if attrs.get("series_sha256") != digest:
             raise ValueError("Snapshot content hash mismatch")
+        if alpaca_metadata:
+            from .us_daily_history import _sessions
+            from tradingagents.calendar_access import get_exchange_calendar
+            required = _sessions(start, end)
+            close = get_exchange_calendar("XNYS").session_close(required[-1].isoformat()).to_pydatetime()
+            request_end = datetime.fromisoformat(attrs.get("request_end", ""))
+            if set(dates.dt.date) != set(required) or request_end != close or observed < close:
+                raise ValueError("SIP series coverage or completed-session cutoff mismatch")
         listing = None
         if "listing_contract" in attrs:
             if us_metadata:
