@@ -3142,6 +3142,8 @@ def _run_performance_tracking(
                         "has_prices": price_result.has_prices,
                         "warnings": price_result.warnings,
                         "due_recommendations": price_result.due_recommendation_count,
+                        "price_coverage_complete": price_result.price_coverage_complete,
+                        "missing_price_tickers": list(price_result.missing_price_tickers),
                     }
                 )
                 if price_result.due_recommendation_count == 0:
@@ -3156,7 +3158,10 @@ def _run_performance_tracking(
                         refresh_window_days=config.performance.price_lookback_days,
                         recommendation_ids=price_result.due_recommendation_ids,
                     )
-                    outcome_update["updated"] = True
+                    outcome_update["updated"] = price_result.price_coverage_complete
+                    outcome_update["partially_updated"] = not price_result.price_coverage_complete
+                    if not price_result.price_coverage_complete:
+                        outcome_update["unavailable_reason"] = "incomplete_price_coverage"
                 else:
                     outcome_update["unavailable_reason"] = "price_provider_unavailable_or_no_price_history"
             except Exception as exc:

@@ -761,6 +761,24 @@ Record actual before/after versions and observation clocks in the operations
 ledger. Do not add a dependency scan or package installation to the minute
 observation producer.
 
+### Performance price evidence
+
+Performance price loading requires an explicit ISO analysis date. Both provider
+request boundaries and returned rows are restricted to that date and the configured
+lookback window. Local files receive the same validation, including availability
+clocks, invalid prices and conflicting duplicate dates. Future or unverifiable
+recommendation clocks do not select provider requests. A labelled response for a
+different security cannot fill a missing requested security.
+
+When only some due securities have prices, the available outcomes can update, but
+the aggregate remains `recorded_pending_outcomes` with `incomplete_price_coverage`
+and explicit missing symbols. Do not infer complete price coverage from one usable
+series. Immature outcome horizons remain pending independently of price coverage.
+Preserve original security identifiers and unavailable historical outcomes; changing
+a legacy exchange suffix without verified security lineage can substitute another
+security's history. A provider's missing-price warning alone is not an analysis-worker
+failure or proof of delisting.
+
 ### Explicit CI acceptance
 
 Do not infer successful CI from the exit status of `gh pr checks --watch` alone.
