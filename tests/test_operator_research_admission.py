@@ -23,6 +23,11 @@ from tradingagents.scheduled.operator_admission import (
 def operator(recovery, tmp_path):  # noqa: F811 -- imported pytest fixture
     f = recovery
     m, root, now = f["source"], f["root"], f["now"]
+    m["run_id"] = m["run_id"].split("_")[0] + "_manual-us-identity-recovery"
+    destination = root.with_name(m["run_id"])
+    assert destination.parent.resolve().is_relative_to(tmp_path.resolve())
+    root.rename(destination)
+    root = destination
     m.update(
         status="success", label="manual-us-identity-recovery", source_revision="a" * 40
     )
@@ -196,6 +201,7 @@ def test_certificate_admits_three_consumers_and_changes_publication_fingerprint_
         "future_row",
         "active_attempt",
         "noncanonical",
+        "duplicate_restart",
     ],
 )
 def test_invalid_operator_run_is_rejected_before_any_certificate(operator, case):
@@ -277,6 +283,18 @@ def test_invalid_operator_run_is_rejected_before_any_certificate(operator, case)
     elif case == "noncanonical":
         f["manifest"] = deepcopy(m)
         f["manifest"]["label"] = "noncanonical"
+    elif case == "duplicate_restart":
+        duplicate = (f["now"] - timedelta(hours=2, minutes=1)).strftime(
+            "%Y%m%dT%H%M%S"
+        ) + "_manual-us-identity-recovery"
+        write(
+            f["archive"] / "runs" / duplicate[:4] / duplicate / "attempt.json",
+            {
+                "run_id": duplicate,
+                "started_at": (f["now"] - timedelta(hours=2, minutes=1)).isoformat(),
+                "status": "SUCCESS",
+            },
+        )
     write(f["state"] / "attempts" / f"{f['key']}.json", o)
     write(f["state"] / "finalization-recovery" / f"{f['key']}.json", r)
     write(f["root"] / "run.json", m)

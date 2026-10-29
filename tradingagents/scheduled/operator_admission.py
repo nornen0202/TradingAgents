@@ -39,6 +39,7 @@ def _evidence(archive, manifest, original, repair, *, now):
     if (
         market not in {"us", "kr"}
         or canonical.get("label") != f"manual-{market}-identity-recovery"
+        or not run_id.endswith("_" + canonical["label"])
         or "research_recovery" in canonical
     ):
         raise ValueError("Not a fresh operator identity repair")
@@ -74,6 +75,7 @@ def _evidence(archive, manifest, original, repair, *, now):
     ]
     if (
         any(type(n) is not int or n < 1 for n in counts)
+        or counts[1] != 1
         or counts[0] != counts[2]
         or counts[0] + counts[1] > 4
         or type(repair.get("cumulative_limit")) is not int
@@ -109,6 +111,21 @@ def _evidence(archive, manifest, original, repair, *, now):
         <= _instant(now)
     ):
         raise ValueError("Unverified operator repair chronology")
+    # A receipt without a run ID must never certify multiple restarts as one
+    # attempt. Bind its real interval to exactly one archived operator attempt.
+    owned = []
+    for path in (archive / "runs").glob(
+        f"*/*_manual-{market}-identity-recovery/attempt.json"
+    ):
+        candidate = _read(path)
+        if (
+            _instant(repair["started_at"])
+            <= _instant(candidate["started_at"])
+            <= _instant(repair["finished_at"])
+        ):
+            owned.append(candidate.get("run_id"))
+    if owned != [run_id]:
+        raise ValueError("Operator receipt does not identify exactly one fresh attempt")
     sources = repair.get("source_attempt_sha256")
     if (
         not isinstance(sources, dict)
