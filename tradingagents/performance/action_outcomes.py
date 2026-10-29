@@ -23,6 +23,9 @@ def initialize_action_tracker(db_path: Path) -> None:
             conn.execute(statement)
         _ensure_columns(conn, "action_recommendations", {
             "market": "TEXT",
+            "source": "TEXT",
+            "risk_action": "TEXT",
+            "was_executed": "INTEGER DEFAULT 0",
             "prism_agreement": "TEXT",
             "skip_reason": "TEXT",
             "sell_intent": "TEXT",
@@ -42,6 +45,8 @@ def initialize_action_tracker(db_path: Path) -> None:
             "execution_evidence": "TEXT",
         })
         _ensure_columns(conn, "action_outcomes", {
+            "return_5d": "REAL",
+            "return_20d": "REAL",
             "return_60d": "REAL",
             "benchmark_return_5d": "REAL",
             "benchmark_excess_5d": "REAL",
@@ -62,6 +67,15 @@ def initialize_action_tracker(db_path: Path) -> None:
                      "ON action_recommendations(ticker, id, created_at, market)")
         conn.execute("CREATE INDEX IF NOT EXISTS idx_action_refresh_outcomes "
                      "ON action_outcomes(recommendation_id, calculation_version, return_60d, updated_at)")
+        # Final report summaries repeatedly join the same scalar metrics. Keep
+        # these reads off the wide payload rows, especially on archive disks.
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_action_summary_recommendations "
+                     "ON action_recommendations(source, id, action, prism_agreement, source_cohort, "
+                     "sell_intent, risk_action, lift_status, run_id, ticker, market, "
+                     "execution_evidence, was_executed)")
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_action_summary_outcomes "
+                     "ON action_outcomes(recommendation_id, return_5d, return_20d, benchmark_excess_20d, "
+                     "avoided_drawdown_20d, missed_upside_20d, return_60d)")
         conn.commit()
 
 
