@@ -36,6 +36,8 @@ def identity(ticker):
 
 
 def in_market(ticker, market):
+    if not isinstance(ticker, str) or not ticker.strip():
+        return False
     text = str(ticker).upper()
     if market == "KR":
         return bool(re.fullmatch(r"\d{6}(?:\.KS|\.KQ)?", text))
@@ -45,6 +47,8 @@ def in_market(ticker, market):
 def unique(values):
     result = {}
     for value in values:
+        if not isinstance(value, str):
+            continue
         text = str(value).strip().upper()
         if text:
             result.setdefault(identity(text), text)
@@ -327,7 +331,15 @@ def select_adaptive_universe(*, config, universe, tickers, asof, requested_limit
     quotes = dict(quotes)
     for key, quote in cached.items():
         if key not in quotes:
-            quotes[key] = {**quote, "source": "archived_quote"}
+            quotes[key] = {**quote, "source": "archived_quote"} if isinstance(quote, dict) else quote
+    validated_quotes = {}
+    for quote in quotes.values():
+        if not isinstance(quote, dict) or not in_market(quote.get("symbol"), market):
+            continue
+        validated_quotes[identity(quote["symbol"])] = quote
+    if len(validated_quotes) != len(quotes):
+        warnings.append(f"invalid_research_quote_identity:{len(quotes) - len(validated_quotes)}")
+    quotes = validated_quotes
     pool = unique([*holdings, *previous, *tickers, *(q["symbol"] for q in quotes.values()), *(h["ticker"] for h in history.values())])
     pool = [t for t in pool if in_market(t, market)]
     # Reserve discovery capacity even when legacy seed files grow very large.

@@ -15,6 +15,32 @@ from tradingagents.scheduled.site import _render_universe_selection_section
 NOW = datetime(2026, 9, 10, 22, tzinfo=timezone.utc)
 
 
+@pytest.mark.parametrize('invalid', [None, '', 123, {}, []])
+def test_missing_security_identity_cannot_become_a_us_symbol(invalid):
+    assert not au.in_market(invalid, 'US')
+    assert not au.in_market(invalid, 'KR')
+    assert au.unique([invalid, 'AAPL']) == ['AAPL']
+
+
+def test_invalid_live_and_cached_quotes_preserve_holdings_without_crashing(tmp_path):
+    config, universe = setup(tmp_path)
+    selected, _, receipt = select(config, universe,
+        {'BROKEN': {}, 'NULL': None, 'GOOD': quote('GOOD')},
+        cached={'NONE': {}, 'BAD': {'symbol': None}}, tickers=['HOLD', 'GOOD'])
+    assert set(selected) == {'HOLD', 'GOOD'}
+    assert all(row['ticker'] != 'NONE' for row in receipt['candidates'])
+
+
+def test_archive_candidate_without_quote_is_not_cached_as_none_security(tmp_path):
+    root = tmp_path / 'runs/2026/20260910T120000_test'
+    root.mkdir(parents=True)
+    (root / 'run.json').write_text(json.dumps({'status': 'success', 'finished_at': NOW.isoformat(),
+        'settings': {'market': 'US'}, 'active_universe': {'candidates': [{'ticker': 'HOLD', 'quote': {}}]},
+        'tickers': []}), encoding='utf-8')
+    _, _, cached = au.read_history(tmp_path, market='US', asof=NOW, days=7)
+    assert cached == {}
+
+
 def setup(tmp_path, *, holdings=("HOLD",), market="US", **settings):
     config = SimpleNamespace(universe=replace(UniverseSettings(enabled=True), **settings),
         run=SimpleNamespace(market=market, run_mode="full", explicit_trade_date=None),

@@ -763,6 +763,13 @@ observation producer.
 
 ### Performance price evidence
 
+Adaptive selection also validates explicit quote identities before constructing
+the candidate pool. Missing identifiers must not become the US symbol `NONE`
+through string conversion. Empty archived quote records and malformed live
+records are excluded with a diagnostic; mandatory account holdings remain in the
+cohort even when their optional quote is unavailable. This prevents a missing
+`symbol` key from aborting research before any ticker worker starts.
+
 Performance price loading requires an explicit ISO analysis date. Both provider
 request boundaries and returned rows are restricted to that date and the configured
 lookback window. Local files receive the same validation, including availability
