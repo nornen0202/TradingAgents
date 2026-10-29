@@ -123,3 +123,14 @@ Inspect process ownership, current journal phase, file I/O and log progress befo
 diagnosing a long run. Absence of new copy messages during a hash-verification
 stage is not by itself evidence of a hang. An unrelated blocked storage domain
 must still produce a failed aggregate result.
+
+Read-only checks later distinguished a false Repair-path alarm from a missing
+drive: D: retained its configured NTFS volume identity and about 602.5 GB free.
+The alias and intended destination had the same nonzero volume/file identifiers,
+but Windows final-path resolution returned error 433 for both. For this specific
+error only, alias health may use those exact directory identities. Missing paths,
+zero/unknown IDs, different targets, changed volumes and other errors still fail.
+Capacity may use the existing directory directly after the same identity check;
+the receipt retains error 433 and a null resolved path instead of claiming a
+canonical path was resolved. This observes metadata only and does not modify,
+repair, relocate or delete the unrelated project.

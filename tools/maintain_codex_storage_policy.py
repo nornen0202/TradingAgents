@@ -14,18 +14,40 @@ import time
 import maintain_codex_storage as storage
 
 
+def directory_identity(path: Path) -> tuple[int, int]:
+    """Require a real directory and nonzero volume/file IDs for a narrow fallback."""
+    if not path.is_dir():
+        raise OSError("Directory identity unavailable")
+    observed = path.stat()
+    if not observed.st_dev or not observed.st_ino:
+        raise OSError("Directory identity unavailable")
+    return observed.st_dev, observed.st_ino
+
+
 def audit_relocations(config: dict) -> bool:
     """Observe registered aliases without repairing or deleting changed paths."""
     healthy = True
     for item in config.get("relocations", []):
         source, destination = Path(item["source"]), Path(item["destination"])
+        evidence = {"verification_method": "resolved_path"}
         try:
-            matches = (source.is_dir() and destination.is_dir() and storage.is_reparse(source)
-                       and source.resolve() == destination.resolve())
+            matches = False
+            if source.is_dir() and destination.is_dir() and storage.is_reparse(source):
+                try:
+                    matches = source.resolve(strict=True) == destination.resolve(strict=True)
+                except OSError as exc:
+                    # Some mounted Windows NTFS directories return 433 only for
+                    # GetFinalPathNameByHandle. Do not confuse that with a lost
+                    # target when both exact paths have the same real file ID.
+                    if getattr(exc, "winerror", None) != 433:
+                        raise
+                    matches = directory_identity(source) == directory_identity(destination)
+                    evidence.update(verification_method="directory_file_identity",
+                                    path_resolution_error=433)
         except OSError:
             matches = False
         storage.emit("relocation-health", id=item["id"], healthy=matches,
-                     source=str(source), destination=str(destination))
+                     source=str(source), destination=str(destination), **evidence)
         healthy = healthy and matches
     return healthy
 
@@ -202,9 +224,20 @@ def domain_policy(config: dict, *, apply: bool, preflight_only: bool = False, he
     for item in config.get("capacity_checks", []):
         row = {"id": item["id"], "path": item["path"], "observed_at": observed}
         try:
-            resolved = Path(item["path"]).resolve(strict=True)
-            usage = shutil.disk_usage(resolved)
-            row.update(available=True, resolved_path=str(resolved), free_bytes=usage.free,
+            path = Path(item["path"])
+            try:
+                measured = path.resolve(strict=True)
+                row["resolved_path"] = str(measured)
+            except OSError as exc:
+                if getattr(exc, "winerror", None) != 433:
+                    raise
+                directory_identity(path)
+                measured = path.absolute()
+                row.update(resolved_path=None, measurement_path=str(measured),
+                           path_resolution_error=433,
+                           verification_method="directory_file_identity")
+            usage = shutil.disk_usage(measured)
+            row.update(available=True, free_bytes=usage.free,
                        warning=usage.free < item.get("warning_free_bytes", 0),
                        critical=usage.free < item.get("critical_free_bytes", 0))
             if row["critical"] and item.get("required_for_shared", False):
