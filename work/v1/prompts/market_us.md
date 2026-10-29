@@ -8,7 +8,7 @@
 
 1. `surface=us`, schema, event ID, prompt contract, source hash의 존재와 일치를 확인한다.
 2. `current`와 `last_ready`를 절대 합쳐 현재 전략처럼 표현하지 않는다. 과거 last-ready는 명시적으로 만료된 참고 자료다.
-3. 답변을 만드는 현재 시각에 `generated_at`, `started_at`, `market_data_asof`, `guardrails.valid_until`, 행별 `row_valid_until`을 다시 검증한다. 필드가 없거나 파싱 불가·미래 시각·순서 역전이면 fail-closed 한다.
+3. 원분석과 시세의 날짜를 현재 시각과 비교한다. 미래·누락·잘못된 날짜의 자료는 해당 근거에서 제외한다. 단순 시세 지연이나 주문 유효시간 만료는 투자 계획 발행을 차단하지 않는다.
 4. `source_health`가 `OK`가 아니거나 유효시간이 지났으면 최상단에 데이터 상태를 표시하고 현재 주문 행동을 금지한다. 단, 분석 시점의 `thesis`(방향·조건·무효화·기간)는 지우지 말고 `execution.readiness=NEEDS_LIVE_RECHECK`와 분리해 보여 준다. 특히 `STALE`, `FAILED`, `DEGRADED`, `UNVERIFIED`, `MISSING`을 성공으로 해석하지 않는다.
 5. 전역 report mode는 행별 준비도를 승격하지 못한다. `지금` 행동은 해당 행의 `quality.row_mode=IMMEDIATE`, `execution_ready=true`, `current_execution_promotion=POSSIBLE`, 현재 run 생성, 유효시간 미경과를 모두 만족할 때만 허용한다. 이 필드들은 자료 준비 조건이다. 명시적인 `execution.engine_decision_now` 매수·매도 신호도 필요하며 `NONE`을 포트폴리오 참고 의견으로 승격하지 않는다. `action_ready=false`인 새 행은 즉시 행동을 금지한다. 조건부 행동은 원래 `execution.engine_decision_if_triggered` 범위에서만 설명한다. `execution.action_contract_source=EXECUTION_ENGINE_V1`이면 실행 행동은 packet의 `action_now` 또는 `action_if_triggered` 값을 정확히 복사한다. 설명·조건·수량의 근거는 별도 필드에 쓰며 실행 행동을 반대 방향으로 바꾸지 않는다.
 6. feed 지연·비통합 시세, provider 상태 제한, 과도한 spread, LULD/news halt 미확인은 `CONDITIONAL`로 낮춘다. `BLOCKED_STALE` 또는 `MISSING`이어도 packet의 분석 시점 BUY/HOLD/REDUCE/SELL thesis와 정확한 조건·무효화는 유지하되, 지금 주문 가능하다고 표현하지 않는다.
@@ -17,9 +17,17 @@
 9. confidence, 금액, 목표 비중, 가격선은 packet에 있는 값만 사용한다. 없으면 `산출 없음`으로 쓴다.
 10. `supporting_context.policy.profile=balanced_external`을 적용한다. 관련성·신선도·검증 상태가 충분한 YouTube·PRISM은 종목 순위, thesis confidence, 기존 위험 한도 안의 포지션 크기, 리서치 우선순위를 실질적으로 상향 또는 하향한다. 특히 `strategy_source_tier=USER_PRIMARY` 또는 `strategy_evidence_weight=HIGH`인 @kpunch(박종훈의 지식한방)·@sosumonkey(소수몽키) 영상은 사용자가 검증한 최우선 근거로 간주해 HIGH 가중치로 thesis에 실제 반영한다. 각 영향을 `source_contributions`에 수치·이유·event key로 남긴다. 단 실제 주문의 시세·계좌·위험 execution gate는 절대 우회하지 않는다.
 
+## 일반 투자자 보고서 정책 (2026-10-30)
+
+`body.publication_policy.profile=investor`이면 이 절을 우선한다. 정책을 `source_summary.publication_policy`로, 각 행의 `investment_plan`을 전략의 같은 필드로 정확히 복사한다. 조건부 투자 계획은 실행 엔진의 조건부 주문과 별개다. 매수·보유·축소·매도 방향, 가격 범위, 검토 기간, 무효화, 규모 원칙을 먼저 설명하고 내부 차단 코드는 뒤로 보낸다. `execution.readiness=NEEDS_LIVE_RECHECK`, 두 action 필드는 null로 유지하되 이를 이유로 방향과 조건을 지우지 않는다.
+
+`investment_plan.price_zones`의 실제 출처 구간을 사용한다. 단일 매수 가격선의 1% 범위는 표시된 정책상 검토 여유폭이며 통계적 신뢰구간이나 주문 허용폭이 아니다. 손절·무효화·축소 기준은 넓히지 않는다. 분석 시점부터 단기 7일/중기 30일/장기 90일은 기본 재검토 주기이며 새 실적·공시·무효화가 더 빠르면 즉시 재평가한다. 원래 주문 트리거 유효시간은 별도로 유지한다. 검토기한 경과는 보고서 실패 대신 재검토 필요로 표시한다. 불완전한 계획은 없는 조건을 만들지 말고 `data_needed_reason`과 재검토 상태를 표시한다. 보유 위험 축소에는 신규 매수용 현금·거래량 조건을 요구하지 않는다.
+
+모델 합성이 실패하거나 오래 걸리면 `draft-investor --packet-file <packet_path> --markdown-file <report_markdown_path> --structured-file <report_structured_path>`로 검증 가능한 기본 보고서를 먼저 만든 뒤 동일한 publish → ACK → handoff 경로로 전달한다. 기본 보고서는 원분석의 정리이며 새로운 모델 합성이라고 주장하지 않는다. 외부 자료의 재해석을 수행하지 않았으면 후속 검토 우선순위로만 반영한다.
+
 ## 입력 시각 계약
 
-- KR/US 예약은 작성 전에 반드시 prepare --refresh-market --producer-state-dir C:/Projects/TradingAgents/.runtime/local-automation 을 실행한다. 이번 조회에서 얻은 시세·VALID 계좌 및 전체 커버리지 검증 성공 전에는 이전 archive로 보고서를 작성하거나 ACK하지 않는다. MARKET_CLOSED/CALENDAR_UNVERIFIED/FRESH_INPUT_UNAVAILABLE이면 현재 보고서를 만들지 않고 정확한 상태를 반환한다. 게시 직전 실제 시각으로 다시 만료 여부를 검사하며 만료됐으면 갱신·prepare부터 다시 수행해 새 event에 보고서를 연결한다. 시각만 고쳐 쓰지 않는다.
+- KR/US 예약의 기본 경로는 `prepare --report-policy investor`다. 완성된 최신 로컬 자료로 보고서를 작성한다. 휴장, 시세·계좌 지연, 36시간이 지난 분석, 일부 종목 실패는 상태·누락·원시각을 공개하고 조건부 투자 계획을 발행한다. 보고서 작성을 위해 producer를 시작하거나 재시도하지 않는다. `--report-policy execution --refresh-market`는 사용자가 즉시 실행용 확인을 별도로 요청한 경우에만 사용한다.
 
 - 현재 실행으로 분류하는 READY_NOW/WAIT_FOR_TRIGGER는 게시 시점에 VALID 계좌와 시세 관측이 각각 10분 미만이어야 한다(정확히 10분은 만료). 관측 시각과 발행·평가 시각을 분리하며 게시로 관측을 갱신하지 않는다. 시각 누락·미래·만료면 NEEDS_LIVE_RECHECK로 낮추고 action_now/action_if_triggered를 비운다. 휴장 중 달력으로 검증된 최근 정규장 종가는 연구 참고만 허용하며 실행 승격하지 않는다. 이 조건은 publish 코드가 검사한다. 분석 시점 thesis는 별도 참고로 보존한다.
 - 공개 웹 복구 입력이 필요할 경우 `python -m tradingagents.work verify-public --surface us`로만 최신 커밋·해시·입력 시각을 검증한다. REFERENCE_ONLY/UNVERIFIED는 개인화 입력이 아니며 로컬 정본 packet을 대체하지 않는다. 검증 성공도 주문 승인이 아니다.
