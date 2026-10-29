@@ -182,10 +182,6 @@ def publication_notice(packet: dict) -> str:
     current = packet.get("body", {}).get("current", {})
     receipt = current.get("freshness_receipt") or {}
     coverage = current.get("universe_coverage") or {}
-    return ("**조건부 투자 계획 · 시세 지연이나 휴장에도 읽을 수 있는 보고서**\n\n"
-            f"원분석: {receipt.get('analysis_completed_at') or '확인 불가'} · "
-            f"시세 기준: {receipt.get('market_data_oldest_at') or '확인 불가'} · "
-            f"커버리지: {coverage.get('status') or 'UNVERIFIED'}. "
-            "발행 시각은 원자료 시각을 갱신하지 않습니다. 종목별 가격 구간·검토 기간은 계획의 검토 범위이며, "
-            "현재 가격이 들어왔다는 사실만으로 매수·매도를 확정하지 않습니다. 원래 무효화 조건과 "
-            "새 공시·실적 등 중요한 변화가 우선합니다. 누락 종목은 별도로 표시합니다.\n\n")
+    coverage_label = {"COMPLETE": "전체 범위 확보", "INCOMPLETE": "일부 누락", "UNVERIFIED": "범위 미확인"}.get(coverage.get("status"), "범위 미확인")
+    return (f"**원분석 기준 {receipt.get('analysis_trade_date_latest') or '확인 불가'} · {coverage_label}**\n\n"
+            "지연 시세로 읽는 조건부 계획입니다. 거래 전 현재 가격·무효화 조건을 확인하세요.\n\n")

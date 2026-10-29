@@ -5,6 +5,9 @@ from copy import deepcopy
 from datetime import datetime
 import json
 from pathlib import Path
+from zoneinfo import ZoneInfo
+
+from tradingagents.dataflows.market_policy import aware_datetime
 
 from .runtime import WorkRuntimeError, validate_packet, _validate_report_draft, _validate_report_packet_coverage
 
@@ -21,6 +24,11 @@ def _text(value) -> str:
 
 def _identity(ticker):
     return str(ticker).upper().removesuffix(".KS").removesuffix(".KQ")
+
+
+def _time_label(value):
+    clock = aware_datetime(value)
+    return clock.astimezone(ZoneInfo("Asia/Seoul")).strftime("%m/%d %H:%M KST") if clock else "확인 불가"
 
 
 def compose_investor_draft(packet: dict, *, now: datetime) -> tuple[str, dict]:
@@ -101,28 +109,28 @@ def compose_investor_draft(packet: dict, *, now: datetime) -> tuple[str, dict]:
     confirmations = {"close": "종가 확인", "next_day": "다음 거래일 확인", "two_bar": "원분석의 2개 봉 확인",
                      "intraday": "장중 확인", "volume_confirmed": "거래량 확인"}
     statuses = {"CONDITIONAL_PLAN": "조건부 계획", "REVIEW_REQUIRED": "재검토 필요", "DATA_NEEDED": "자료 확인 필요"}
-    lines = [f"# {draft['title']}", "", draft["summary"], "",
-             "원분석을 정리한 기본 보고서입니다. 새 모델 분석이나 최신 가격 조회를 수행한 결과는 아닙니다.", "",
-             f"작성: {now.isoformat()} · 원분석: {_text(freshness.get('analysis_completed_at'))}",
-             f"시세 기준: {_text(freshness.get('market_data_oldest_at'))} ~ {_text(freshness.get('market_data_latest_at'))}",
-             f"계좌 기준: {_text(freshness.get('account_as_of'))} · 분석 거래일: {_text(freshness.get('analysis_trade_date_oldest'))} ~ {_text(freshness.get('analysis_trade_date_latest'))}",
-             f"자료 범위: {_text(coverage.get('status'))} · 원분석 실패: {_text(coverage.get('analysis_failed_count'))}", "",
+    lines = [f"# {draft['title']}", "", "원분석을 정리한 기본 보고서입니다. 새로운 분석·시세 조회는 수행하지 않았습니다.", "",
              "## 먼저 볼 계획", ""]
     for strategy in strategies[:3]:
         plan = strategy["investment_plan"]
         zones = plan["price_zones"]
         focus = next((z for z in zones if z["level_type"] in {"STOP_LOSS", "INVALIDATION", "TRIM"}), zones[0] if zones else None)
         zone_text = f" · 우선 확인 {focus['low']:g}–{focus['high']:g}" if focus else ""
-        lines.append(f"- **{strategy['ticker']} · {risks.get(plan['risk_action'], plan['risk_action']) if plan['purpose'] == 'RISK_REDUCTION' else labels.get(plan['stance'], plan['stance'])}**: {statuses[plan['status']]}{zone_text} · 검토일 {_text(plan['review_window']['review_by'])}")
+        lines.append(f"- **{strategy['ticker']} · {risks.get(plan['risk_action'], plan['risk_action']) if plan['purpose'] == 'RISK_REDUCTION' else labels.get(plan['stance'], plan['stance'])}**: {statuses[plan['status']]}{zone_text} · 검토일 {_time_label(plan['review_window']['review_by'])}")
     missing = {key: value for key, value in coverage.items()
                if ('missing' in key or 'failed' in key or key == 'analysis_failures') and value}
     if missing:
         lines.extend(["", "## 누락·실패 범위", "", _text(missing)])
+    lines.extend(["", "## 자료 기준", "",
+                  f"작성 {_time_label(now)} · 원분석 {_time_label(freshness.get('analysis_completed_at'))}", "",
+                  f"시세 {_time_label(freshness.get('market_data_oldest_at'))} ~ {_time_label(freshness.get('market_data_latest_at'))} · 계좌 {_time_label(freshness.get('account_as_of'))}", "",
+                  f"분석 거래일 {_text(freshness.get('analysis_trade_date_oldest'))} ~ {_text(freshness.get('analysis_trade_date_latest'))}. 발행이 원자료를 갱신하지 않습니다.", "",
+                  "검토일은 재평가 기한이며 주문 유효기간이 아닙니다. 새 실적·공시나 무효화가 먼저 발생하면 바로 재검토합니다."])
     lines.extend(["", "## 종목별 조건과 가격 범위", ""])
     for strategy in strategies:
         plan, thesis = strategy["investment_plan"], strategy["thesis"]
         lines.extend([f"### {strategy['ticker']} · {_text(strategy.get('display_name'))} — {labels.get(plan['stance'], plan['stance'])}", "",
-                      f"{statuses[plan['status']]} · 원분석 {_text(plan['analysis_as_of'])} · 검토일 {_text(plan['review_window']['review_by'])}", ""])
+                      f"{statuses[plan['status']]} · 원분석 {_time_label(plan['analysis_as_of'])} · 검토일 {_time_label(plan['review_window']['review_by'])}", ""])
         if plan["price_zones"]:
             lines.extend(["| 가격 구간 | 용도 | 확인 기준 | 근거 |", "|---|---|---|---|"])
             for zone in plan["price_zones"]:
