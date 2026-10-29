@@ -84,6 +84,41 @@ def test_ticker_projection_filters_in_sql_before_json_decoding(tmp_path, monkeyp
     assert len(decoded) == 1
 
 
+def test_ticker_projection_indexes_preserve_legacy_rows_and_cutoff(tmp_path, monkeypatch):
+    from tradingagents.performance.lifecycle import initialize_lifecycle
+    path = tmp_path / "indexed.sqlite"
+    put(path)
+    put(path, event_id="future", available_at=T3)
+    put(path, event_id="other", payload={"ticker": "B", "action": "BUY"})
+    with sqlite3.connect(path) as conn:
+        conn.execute("DROP INDEX idx_lifecycle_kind")
+        conn.execute("DROP INDEX idx_lifecycle_ticker")
+        for key, payload in [("bad", "broken"), ("missing", '{}'), ("wrong", '[]')]:
+            conn.execute("INSERT INTO lifecycle_events SELECT ?, signal_id, intent_id, kind, mode, "
+                         "occurred_at, available_at, confirmed_at, settled_at, ?, ingested_at "
+                         "FROM lifecycle_events WHERE event_id='other'", (key, payload))
+        rows = conn.execute("SELECT * FROM lifecycle_events ORDER BY event_id").fetchall()
+    before = replay_action_history(path, analysis_as_of=T2, ticker="a")
+    with sqlite3.connect(path) as conn:
+        initialize_lifecycle(conn)
+        assert rows == conn.execute("SELECT * FROM lifecycle_events ORDER BY event_id").fetchall()
+    queries = []
+    connect = sqlite3.connect
+    def traced(*args, **kwargs):
+        conn = connect(*args, **kwargs)
+        conn.set_trace_callback(queries.append)
+        return conn
+    monkeypatch.setattr(sqlite3, "connect", traced)
+    assert replay_action_history(path, analysis_as_of=T2, ticker="a") == before
+    assert len(before["events"]) == 1
+    query = next(query for query in queries if query.startswith("SELECT * FROM lifecycle_events"))
+    with connect(path) as conn:
+        plan = " ".join(row[3] for row in conn.execute("EXPLAIN QUERY PLAN " + query))
+    assert "MULTI-INDEX OR" in plan
+    assert "idx_lifecycle_kind" in plan and "idx_lifecycle_ticker" in plan
+    assert "SCAN lifecycle_events" not in plan
+
+
 @pytest.mark.parametrize("clock,value", [
     ("occurred_at", None), ("available_at", None), ("available_at", "bad"),
     ("available_at", "2026-09-21T10:00:00"), ("confirmed_at", None), ("settled_at", None),
