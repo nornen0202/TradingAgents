@@ -191,6 +191,7 @@ def test_runner_persists_new_presentation_metadata_without_relaxing_fallback_gat
     llm = Mock(invoke=Mock(side_effect=CodexAppServerStorageError("sqlite init private value")))
     graph = graph_with_llm(llm)
     original = full_state()
+    original["company_of_interest"] = "AAPL"
     graph.propagate = lambda *a, **kw: (graph._localize_final_state(original), "HOLD")
     graph.close = Mock()
     monkeypatch.setattr(runner, "TradingAgentsGraph", lambda *a, **kw: graph)

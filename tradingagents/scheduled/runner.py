@@ -2081,10 +2081,10 @@ def _run_single_ticker(
                 trade_date,
                 analysis_date=analysis_date,
             )
-        if final_state.get("company_of_interest") != _resolve_run_instrument(ticker, config).primary_symbol:
-            raise ValueError("Research graph company differs from the required instrument and market")
         if stats_handler.get_stats().get("llm_fallback_calls", 0):
             raise RuntimeError("Research graph returned an LLM fallback response; full analysis is incomplete.")
+        if final_state.get("company_of_interest") != _resolve_run_instrument(ticker, config).primary_symbol:
+            raise ValueError("Research graph company differs from the required instrument and market")
         structured_decision = _select_public_decision(final_state, decision)
         decision_trace.bind_selected(structured_decision, final_state)
         final_state, report_writer_payload = polish_ticker_report(
