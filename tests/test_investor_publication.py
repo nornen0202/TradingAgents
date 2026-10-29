@@ -136,13 +136,14 @@ def test_price_tolerance_never_widens_risk_threshold_or_overrides_source_range()
     assert original["execution_levels"]["levels"][:3] == before["execution_levels"]["levels"][:3]
 
 
-def test_risk_reduction_does_not_demand_buy_funding_or_volume():
-    row = {"thesis": {**thesis(), "stance": "HOLD", "risk_action": "REDUCE_RISK"}}
+@pytest.mark.parametrize("risk", ["REDUCE_RISK", "STOP_LOSS", "EXIT", "TAKE_PROFIT", "TRIM_TO_FUND"])
+def test_risk_reduction_does_not_demand_buy_funding_or_volume(risk):
+    row = {"thesis": {**thesis(), "stance": "HOLD", "risk_action": risk}}
     plan = investment_plan(row, now=AT)
     assert plan["purpose"] == "RISK_REDUCTION"
     assert "현금" not in str(plan["before_acting"])
     assert "매도 가능" in str(plan["before_acting"])
-    assert plan["risk_action"] == "REDUCE_RISK"
+    assert plan["risk_action"] == risk
 
 
 def test_projection_is_pure_and_empty_input_does_not_create_state(tmp_path):

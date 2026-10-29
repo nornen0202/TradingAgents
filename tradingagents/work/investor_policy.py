@@ -166,7 +166,7 @@ def investment_plan(row: dict, *, now: datetime) -> dict:
         exclusions.append("PLAN_CONDITIONS_INCOMPLETE")
     risk = str(thesis.get("risk_action") or "NONE").upper()
     stance = thesis.get("stance") if dated else "RESEARCH"
-    reducing = stance in {"REDUCE", "SELL"} or risk in {"REDUCE_RISK", "STOP_LOSS", "EXIT", "TAKE_PROFIT"}
+    reducing = stance in {"REDUCE", "SELL"} or risk in {"REDUCE_RISK", "STOP_LOSS", "EXIT", "TAKE_PROFIT", "TRIM_TO_FUND"}
     return {
         "schema": "tradingagents.investment-plan/v1",
         "status": "DATA_NEEDED" if not dated else "REVIEW_REQUIRED" if now >= review or exclusions or row.get("investor_exclusions") else "CONDITIONAL_PLAN",
