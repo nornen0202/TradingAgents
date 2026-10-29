@@ -1,0 +1,590 @@
+{
+  "schema": "tradingagents.work-report/v1",
+  "surface": "youtube",
+  "event_id": "youtube:bc11bdcc1bc487cc011a6ba990c6f0ac",
+  "source_sha256": "3902b872c8c69e6bbc8cc0ccacf0477e2a34ba51eb2b842d72bc5d2dc37c6fbc",
+  "prompt_contract_version": "youtube-work-v5",
+  "workflow_contract_sha256": "bc33d7680318d3200a3ef2fd2cc1f830d41fd1ba019e4f20ed6d1951cd6dc343",
+  "policy": {
+    "visibility": "investor_safe_no_credentials",
+    "external_evidence_profile": "balanced_external",
+    "external_evidence_may_affect": [
+      "ranking",
+      "confidence",
+      "position_size_within_existing_risk_limits",
+      "research_priority"
+    ],
+    "external_evidence_may_bypass_execution_gate": false,
+    "thesis_is_independent_from_execution_readiness": true
+  },
+  "report_markdown": "# YouTube 검증 델타 | 2026-10-07 오전\n\n기준 2026-10-07T07:34:21+09:00 · 원천 상태 **OK** · 생산자 성공 실행 `youtube_20261006_120139` (19.1시간 경과, 한도 36시간). 최오래 커버리지 71.57시간 경과(한도 72시간). 이 검증은 작성 시점에만 유효하며, 이후 시세·계좌 실행 가능성을 뜻하지 않습니다.\n\n## 핵심 변화\n\n1. **미국 금리·물가 재확인** — 영상의 9월 서비스 PMI 54.9는 [ISM 원자료](https://www.ismworld.org/supply-management-news-and-reports/reports/ism-pmi-reports/services/september/)와 일치합니다. 가격지수는 영상 일부의 74.5가 아니라 **74.0**입니다. [미 재무부 10월 6일 종가](https://home.treasury.gov/resource-center/data-chart-center/interest-rates/TextView?type=daily_treasury_yield_curve&field_tdr_date_value_month=202610)의 10년물은 **5.27%**입니다. KR·US 성장주 연구에서 할인율·실적 민감도 확인 우선순위를 높이고, 현재 주문은 제안하지 않습니다. 관련 이벤트: `41_UaeSmKoE`, `1IU1k7cdwGE`, `dvO3e4Xrf5M`.\n2. **NVDA·META 사용자 우선 근거** — [소수몽키 영상](https://www.youtube.com/watch?v=V3ZQ02Syf5U) `V3ZQ02Syf5U`는 `USER_PRIMARY/HIGH`로 연구 순위 1·2위에 반영했습니다. [NVIDIA IR](https://investor.nvidia.com/news/press-release-details/2026/NVIDIA-Announces-a-150-Billion-Share-Repurchase-Authorization-Increase/default.aspx)은 매입 승인액 추가 1,500억 달러와 잔여 승인 2,350억 달러를 확인합니다. 애플과의 규모 비교, 저평가 발언, META 이용자·2030 매출 수치는 미검증입니다. 따라서 분석 우선순위는 높이되 thesis 확신과 기존 위험 한도 내 포지션 크기는 올리지 않습니다.\n3. **KR 반도체·기판** — `IhkWGREnBGo`, `ZOou1XSWDF8`의 순환매·기판 부족 주장은 공식 수급, 실적, 공급 계약과 대조할 연구 과제입니다. 삼성전자·SK하이닉스 연구 우선순위를 중간 수준으로 올리되 영상만으로 매수·비중 확대는 하지 않습니다.\n4. **XRP·유가·관세** — `Vv7amQ5ty6M`, `Hv7LTm56vRw`의 기관 확대·지정학 수치와 관세 발언은 원문 근거가 부족합니다. 시장 위험 점검 목록에만 남기고 현재 전략 방향이나 주문으로 바꾸지 않습니다.\n\n## 범위와 검증 한계\n\n새 이벤트 19건 · 수정 0건 · 중복 제외 16건. 최근 72시간 35건 중 35건 전송, 생략 0건, 잘림 없음.\n전송된 19건의 표시된 주장 114개: supported 0, partially supported 16, unverified 79, ASR uncertain 19. 24시간 초과 신규 이벤트 10건은 현재 시세 근거가 아닌 맥락·연구 우선순위에만 사용했습니다.\n`41_UaeSmKoE`의 C1이 지목한 `E3`는 전송된 근거 목록에 없습니다. 그 연결에 기대는 수치는 확인된 사실로 승격하지 않았습니다. 근거 자료 2건은 발행 시각이 없어 시각 검증에 쓰지 않았습니다.\n\n## KR·US 연구 영향과 허용 액션\n\n| 순위 | 대상 | 허용 액션 | 근거와 한계 | 실행 |\n|---:|---|---|---|---|\n| 1 | NVDA | `UPGRADE_RESEARCH` | `V3ZQ02Syf5U` · HIGH 연구 · 확신 0.45 | 연구 전용, 크기 변경 없음 |\n| 2 | META | `UPGRADE_RESEARCH` | `V3ZQ02Syf5U` · HIGH 연구 · 확신 0.30 | 연구 전용, 크기 변경 없음 |\n| 3 | 005930 | `UPGRADE_RESEARCH` | `IhkWGREnBGo` · MEDIUM 연구 · 확신 0.35 | 연구 전용, 크기 변경 없음 |\n| 4 | 000660 | `UPGRADE_RESEARCH` | `IhkWGREnBGo` · MEDIUM 연구 · 확신 0.35 | 연구 전용, 크기 변경 없음 |\n| 5 | AMD | `REQUIRES_PRIMARY_VERIFICATION` | `bdDUNSFOd8E` · MEDIUM 연구 · 확신 0.25 | 연구 전용, 크기 변경 없음 |\n| 6 | XRP | `REQUIRES_PRIMARY_VERIFICATION` | `Vv7amQ5ty6M` · LOW 연구 · 확신 0.20 | 연구 전용, 크기 변경 없음 |\n\n`balanced_external` 반영은 연구 순위·근거 확신에 한정했습니다. 시장·계좌·위험 게이트와 실행 가능성은 이 패킷에서 검증되지 않았습니다.\n\n## 신규 이벤트 19건 검토 기록\n\n| 구간 | 이벤트·주제 | 주장 상태(부분/미검증/ASR) |\n|---|---|---|\n| 배경 | [V3ZQ02Syf5U](https://www.youtube.com/watch?v=V3ZQ02Syf5U) NVDA·META 시장 폭/AI | 1/5/0 |\n| 24h | [Vv7amQ5ty6M](https://www.youtube.com/watch?v=Vv7amQ5ty6M) XRP 기관 금융 | 0/5/1 |\n| 24h | [bdDUNSFOd8E](https://www.youtube.com/watch?v=bdDUNSFOd8E) AI 반도체 신고가 | 0/6/0 |\n| 24h | [41_UaeSmKoE](https://www.youtube.com/watch?v=41_UaeSmKoE) 미 금리·KR 순환매 | 3/2/1 |\n| 24h | [ZOou1XSWDF8](https://www.youtube.com/watch?v=ZOou1XSWDF8) 기판·MLCC 부족 | 0/3/3 |\n| 24h | [1IU1k7cdwGE](https://www.youtube.com/watch?v=1IU1k7cdwGE) 나스닥·코스피 | 0/3/3 |\n| 24h | [IhkWGREnBGo](https://www.youtube.com/watch?v=IhkWGREnBGo) KR 반도체 순환매 | 2/4/0 |\n| 24h | [4uTpHcFYe-4](https://www.youtube.com/watch?v=4uTpHcFYe-4) 코스피 개장 전망 | 1/4/1 |\n| 24h | [Hv7LTm56vRw](https://www.youtube.com/watch?v=Hv7LTm56vRw) 유가·관세 | 1/5/0 |\n| 24h | [dvO3e4Xrf5M](https://www.youtube.com/watch?v=dvO3e4Xrf5M) 미 실적·금리 | 1/4/1 |\n| 배경 | [bbaeUYXfRNc](https://www.youtube.com/watch?v=bbaeUYXfRNc) KR 투자 포인트 | 0/5/1 |\n| 배경 | [hUH70pivXSU](https://www.youtube.com/watch?v=hUH70pivXSU) 나스닥·금리 | 4/1/1 |\n| 배경 | [4jaRaPkYItk](https://www.youtube.com/watch?v=4jaRaPkYItk) 삼성전자 실적 일정 | 0/4/2 |\n| 배경 | [tkAFD1bL8XU](https://www.youtube.com/watch?v=tkAFD1bL8XU) KR 반도체 자사주 | 0/4/2 |\n| 배경 | [WkcVCqxh-Oo](https://www.youtube.com/watch?v=WkcVCqxh-Oo) 중간선거 계절성 | 0/5/1 |\n| 배경 | [-TwotENCoa8](https://www.youtube.com/watch?v=-TwotENCoa8) 고유가·차환 | 2/4/0 |\n| 배경 | [s3r7b_76UTQ](https://www.youtube.com/watch?v=s3r7b_76UTQ) 배터리·ESS | 0/4/2 |\n| 배경 | [n2hw5LsMFek](https://www.youtube.com/watch?v=n2hw5LsMFek) 치과 기술 | 0/6/0 |\n| 배경 | [X5NJ4hZPLtk](https://www.youtube.com/watch?v=X5NJ4hZPLtk) 현대차 로봇 | 1/5/0 |\n\n## 다음 공식 검증\n\n- ISM 서비스 가격 압력과 미 재무부 10년물 종가의 후속 변화 확인.\n- NVIDIA 매입 집행 내역, META 이용자·매출 공식 공시, 시장 폭 원자료 확인.\n- 삼성전자·SK하이닉스 공식 실적·자사주 공시와 거래소 수급, 기판 공급 계약 확인.\n- Ripple 기관 전략 원문과 관세·유가 공식 발표 확인. ASR 숫자와 과거 중간선거 수익률의 현재 재현을 가정하지 않음.\n\nCOVERAGE_RECEIPT {\"event_id\":\"youtube:bc11bdcc1bc487cc011a6ba990c6f0ac\",\"status\":\"COMPLETE\",\"window_events\":35,\"transmitted_events\":35,\"truncated\":false,\"new_events\":19,\"revised_events\":0}\nMOBILE_HANDOFF {\"owner\":\"external_github_notification_pipeline\",\"status\":\"PENDING_EXTERNAL_VERIFICATION\",\"work_sent_notification\":false}",
+  "structured_report": {
+    "binding": {
+      "surface": "youtube",
+      "event_id": "youtube:bc11bdcc1bc487cc011a6ba990c6f0ac",
+      "source_sha256": "3902b872c8c69e6bbc8cc0ccacf0477e2a34ba51eb2b842d72bc5d2dc37c6fbc"
+    },
+    "title": "YouTube 검증 델타 | 2026-10-07 오전",
+    "generated_at": "2026-10-07T07:34:21+09:00",
+    "as_of": "2026-10-07T07:34:21+09:00",
+    "source_health": "OK",
+    "report_mode": "RESEARCH",
+    "summary": "신규 19건. ISM 가격지수 오인용을 교정하고 USER_PRIMARY NVDA·META 연구 우선순위를 올렸다. 시장 실행은 연구 전용이다.",
+    "top_actions": [
+      {
+        "rank": 1,
+        "ticker": "NVDA",
+        "action": "UPGRADE_RESEARCH",
+        "readiness": "RESEARCH_ONLY",
+        "event_key": "V3ZQ02Syf5U"
+      },
+      {
+        "rank": 2,
+        "ticker": "META",
+        "action": "UPGRADE_RESEARCH",
+        "readiness": "RESEARCH_ONLY",
+        "event_key": "V3ZQ02Syf5U"
+      },
+      {
+        "rank": 3,
+        "ticker": "005930",
+        "action": "UPGRADE_RESEARCH",
+        "readiness": "RESEARCH_ONLY",
+        "event_key": "IhkWGREnBGo"
+      },
+      {
+        "rank": 4,
+        "ticker": "000660",
+        "action": "UPGRADE_RESEARCH",
+        "readiness": "RESEARCH_ONLY",
+        "event_key": "IhkWGREnBGo"
+      },
+      {
+        "rank": 5,
+        "ticker": "AMD",
+        "action": "REQUIRES_PRIMARY_VERIFICATION",
+        "readiness": "RESEARCH_ONLY",
+        "event_key": "bdDUNSFOd8E"
+      }
+    ],
+    "strategies": [
+      {
+        "rank": 1,
+        "ticker": "NVDA",
+        "market": "US",
+        "action": "UPGRADE_RESEARCH",
+        "research_priority": "HIGH",
+        "thesis_confidence": 0.45,
+        "thesis": "USER_PRIMARY 영상의 시장 폭과 자사주 매입 논점을 최우선 검증 과제로 올린다. 공식 자료는 추가 자사주 매입 승인 1,500억 달러와 잔여 승인 2,350억 달러만 확인했다.",
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "V3ZQ02Syf5U",
+            "affected_field": "research_priority",
+            "effect": "HIGH로 상향; 시장 폭·매입 규모 비교는 별도 검증",
+            "claim_status": "partially_supported/unverified"
+          }
+        ],
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "position_sizing": "기존 위험 한도 내 변경 없음",
+          "eligible": false
+        },
+        "next_primary_check": "NVIDIA IR의 매입 집행 내역과 시장 폭 원자료 확인"
+      },
+      {
+        "rank": 2,
+        "ticker": "META",
+        "market": "US",
+        "action": "UPGRADE_RESEARCH",
+        "research_priority": "HIGH",
+        "thesis_confidence": 0.3,
+        "thesis": "USER_PRIMARY 영상의 AI 비서 이용자·매출 전망을 연구 목록 상단에 두되, 회사 공시 전까지 수치를 실적 근거로 쓰지 않는다.",
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "V3ZQ02Syf5U",
+            "affected_field": "research_priority",
+            "effect": "HIGH로 상향; 이용자·2030 매출 숫자는 미검증",
+            "claim_status": "unverified"
+          }
+        ],
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "position_sizing": "기존 위험 한도 내 변경 없음",
+          "eligible": false
+        },
+        "next_primary_check": "Meta IR의 이용자 및 매출 공시 확인"
+      },
+      {
+        "rank": 3,
+        "ticker": "005930",
+        "market": "KR",
+        "action": "UPGRADE_RESEARCH",
+        "research_priority": "MEDIUM",
+        "thesis_confidence": 0.35,
+        "thesis": "삼성전자·SK하이닉스 수급과 실적에 관한 영상 주장으로 공식 잠정실적·자사주 공시 확인 우선순위를 높인다.",
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "IhkWGREnBGo",
+            "affected_field": "research_priority",
+            "effect": "실적·수급 원자료 검증 우선순위 상향",
+            "claim_status": "unverified/partially_supported"
+          }
+        ],
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "position_sizing": "변경 없음",
+          "eligible": false
+        },
+        "next_primary_check": "삼성전자 IR 잠정실적과 공시 확인"
+      },
+      {
+        "rank": 4,
+        "ticker": "000660",
+        "market": "KR",
+        "action": "UPGRADE_RESEARCH",
+        "research_priority": "MEDIUM",
+        "thesis_confidence": 0.35,
+        "thesis": "반도체 종목 순환매 논점은 수급·메모리 계약 공식 자료 확인에만 반영한다.",
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "IhkWGREnBGo",
+            "affected_field": "research_priority",
+            "effect": "수급·메모리 근거 확인 우선순위 상향",
+            "claim_status": "unverified/partially_supported"
+          }
+        ],
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "position_sizing": "변경 없음",
+          "eligible": false
+        },
+        "next_primary_check": "SK하이닉스 IR·DART 및 거래소 수급 확인"
+      },
+      {
+        "rank": 5,
+        "ticker": "AMD",
+        "market": "US",
+        "action": "REQUIRES_PRIMARY_VERIFICATION",
+        "research_priority": "MEDIUM",
+        "thesis_confidence": 0.25,
+        "thesis": "AI 반도체 신고가·성장률·밸류에이션 수치는 영상 주장으로 유지하고 공식 실적과 시세 시점을 대조한다.",
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "bdDUNSFOd8E",
+            "affected_field": "research_priority",
+            "effect": "공식 실적·시세 대조 과제로 등록",
+            "claim_status": "unverified"
+          }
+        ],
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "position_sizing": "변경 없음",
+          "eligible": false
+        },
+        "next_primary_check": "AMD IR 실적 및 거래소 종가 확인"
+      },
+      {
+        "rank": 6,
+        "ticker": "XRP",
+        "market": "US",
+        "action": "REQUIRES_PRIMARY_VERIFICATION",
+        "research_priority": "LOW",
+        "thesis_confidence": 0.2,
+        "thesis": "기관 금융·아시아 조직 확대 주장은 영상만으로 전략에 확정 반영하지 않는다.",
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "Vv7amQ5ty6M",
+            "affected_field": "research_priority",
+            "effect": "공식 조직 발표 확인 전 관찰",
+            "claim_status": "unverified"
+          }
+        ],
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "position_sizing": "변경 없음",
+          "eligible": false
+        },
+        "next_primary_check": "Ripple·XRP 공식 발표 확인"
+      }
+    ],
+    "coverage_receipt": {
+      "event_id": "youtube:bc11bdcc1bc487cc011a6ba990c6f0ac",
+      "status": "COMPLETE",
+      "window_events": 35,
+      "transmitted_events": 35,
+      "truncated": false,
+      "new_events": 19,
+      "revised_events": 0
+    },
+    "model_receipt": {
+      "schema": "tradingagents.model-provenance/v1",
+      "work_synthesis": {
+        "execution_mode": "local",
+        "requested_model": "gpt-6-sol",
+        "requested_reasoning_effort": "xhigh",
+        "task_id": "tradingagents-work-youtube",
+        "verification_status": "CONFIGURED_NOT_RUNTIME_VERIFIED",
+        "observed_model": null,
+        "observed_reasoning_effort": null,
+        "note": "The local task contract is verified; the Work host does not expose a signed per-response model receipt."
+      }
+    },
+    "source_summary": {
+      "canonical_source": {
+        "health": "OK",
+        "run_id": "youtube_20261006_120139",
+        "last_run_at": "2026-10-06T12:28:36.568391+09:00",
+        "status": "success",
+        "stale_after_hours": 36
+      },
+      "coverage": {
+        "total_unique_events": 333,
+        "window_events": 35,
+        "transmitted_events": 35,
+        "truncated": false,
+        "oldest_occurred_at": "2026-10-03T23:00:12+00:00",
+        "newest_occurred_at": "2026-10-06T02:37:14+00:00"
+      },
+      "delta": {
+        "new_events": 19,
+        "revised_events": 0,
+        "unchanged_events": 16,
+        "delivered_event_keys": [
+          "V3ZQ02Syf5U",
+          "Vv7amQ5ty6M",
+          "bdDUNSFOd8E",
+          "41_UaeSmKoE",
+          "ZOou1XSWDF8",
+          "1IU1k7cdwGE",
+          "IhkWGREnBGo",
+          "4uTpHcFYe-4",
+          "Hv7LTm56vRw",
+          "dvO3e4Xrf5M",
+          "bbaeUYXfRNc",
+          "hUH70pivXSU",
+          "4jaRaPkYItk",
+          "tkAFD1bL8XU",
+          "WkcVCqxh-Oo",
+          "-TwotENCoa8",
+          "s3r7b_76UTQ",
+          "n2hw5LsMFek",
+          "X5NJ4hZPLtk"
+        ]
+      },
+      "claim_status_counts": {
+        "partially_supported": 16,
+        "unverified": 79,
+        "asr_uncertain": 19
+      },
+      "event_manifest": [
+        {
+          "event_key": "V3ZQ02Syf5U",
+          "content_sha256": "5b3a9f09dd9cf3bd54d324b94b3d48665c3a4b429ec8d7ed31c203ab718d1a33",
+          "source_url": "https://www.youtube.com/watch?v=V3ZQ02Syf5U",
+          "occurred_at": "2026-10-05T12:07:39+00:00",
+          "window_bucket": "24_TO_72H_BACKGROUND",
+          "topic": "NVDA·META 시장 폭/AI",
+          "claim_status_counts": {
+            "partially_supported": 1,
+            "unverified": 5
+          },
+          "strategy_source_tier": "USER_PRIMARY",
+          "strategy_evidence_weight": "HIGH"
+        },
+        {
+          "event_key": "Vv7amQ5ty6M",
+          "content_sha256": "c71f4f84515a846fac44277862fdbdc1e158077aa8fef9e2ecd09d442e1f6ef1",
+          "source_url": "https://www.youtube.com/watch?v=Vv7amQ5ty6M",
+          "occurred_at": "2026-10-06T02:37:14+00:00",
+          "window_bucket": "LAST_24H",
+          "topic": "XRP 기관 금융",
+          "claim_status_counts": {
+            "asr_uncertain": 1,
+            "unverified": 5
+          },
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD"
+        },
+        {
+          "event_key": "bdDUNSFOd8E",
+          "content_sha256": "a889449b74cacf6fd2b637ceb1b3806205d58115003a7c0006fcf78fbf0ad777",
+          "source_url": "https://www.youtube.com/watch?v=bdDUNSFOd8E",
+          "occurred_at": "2026-10-06T02:13:02+00:00",
+          "window_bucket": "LAST_24H",
+          "topic": "AI 반도체 신고가",
+          "claim_status_counts": {
+            "unverified": 6
+          },
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD"
+        },
+        {
+          "event_key": "41_UaeSmKoE",
+          "content_sha256": "2ae9b03b483750088f557953e0dc871166c00c7a9ca58ef1d7eded1cf64a7faf",
+          "source_url": "https://www.youtube.com/watch?v=41_UaeSmKoE",
+          "occurred_at": "2026-10-06T01:38:49+00:00",
+          "window_bucket": "LAST_24H",
+          "topic": "미 금리·KR 순환매",
+          "claim_status_counts": {
+            "partially_supported": 3,
+            "asr_uncertain": 1,
+            "unverified": 2
+          },
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD"
+        },
+        {
+          "event_key": "ZOou1XSWDF8",
+          "content_sha256": "d782cb6f031a06e8b48cfa2efeecdeed502d5804aebe48af91e381ded6d39af8",
+          "source_url": "https://www.youtube.com/watch?v=ZOou1XSWDF8",
+          "occurred_at": "2026-10-06T01:20:29+00:00",
+          "window_bucket": "LAST_24H",
+          "topic": "기판·MLCC 부족",
+          "claim_status_counts": {
+            "unverified": 3,
+            "asr_uncertain": 3
+          },
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD"
+        },
+        {
+          "event_key": "1IU1k7cdwGE",
+          "content_sha256": "d2c17a04c2e873b6c706ab2eda53923f41982560cc7e89e68f184f2070b8ef7e",
+          "source_url": "https://www.youtube.com/watch?v=1IU1k7cdwGE",
+          "occurred_at": "2026-10-06T00:54:39+00:00",
+          "window_bucket": "LAST_24H",
+          "topic": "나스닥·코스피",
+          "claim_status_counts": {
+            "asr_uncertain": 3,
+            "unverified": 3
+          },
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD"
+        },
+        {
+          "event_key": "IhkWGREnBGo",
+          "content_sha256": "9bcbc1f928ebebfbc9c1ea3c6d9e61e24ccda9b5c20cf30ca7a935cbfb1ae3a7",
+          "source_url": "https://www.youtube.com/watch?v=IhkWGREnBGo",
+          "occurred_at": "2026-10-06T00:08:50+00:00",
+          "window_bucket": "LAST_24H",
+          "topic": "KR 반도체 순환매",
+          "claim_status_counts": {
+            "unverified": 4,
+            "partially_supported": 2
+          },
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD"
+        },
+        {
+          "event_key": "4uTpHcFYe-4",
+          "content_sha256": "3e5a6d9cad6fe02f1331626a9e7c6316f97d89bc66f4dd8a99fdf7a96b8fcf14",
+          "source_url": "https://www.youtube.com/watch?v=4uTpHcFYe-4",
+          "occurred_at": "2026-10-05T23:35:26+00:00",
+          "window_bucket": "LAST_24H",
+          "topic": "코스피 개장 전망",
+          "claim_status_counts": {
+            "partially_supported": 1,
+            "unverified": 4,
+            "asr_uncertain": 1
+          },
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD"
+        },
+        {
+          "event_key": "Hv7LTm56vRw",
+          "content_sha256": "65cca5379ed4f32f045eee2e7c3411f502f6e4dac0b2272caecc0cffab60df5d",
+          "source_url": "https://www.youtube.com/watch?v=Hv7LTm56vRw",
+          "occurred_at": "2026-10-05T23:05:22+00:00",
+          "window_bucket": "LAST_24H",
+          "topic": "유가·관세",
+          "claim_status_counts": {
+            "partially_supported": 1,
+            "unverified": 5
+          },
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD"
+        },
+        {
+          "event_key": "dvO3e4Xrf5M",
+          "content_sha256": "a36edc20a43d88732f476dde367d9165b7ca9f8ac023a16644add03a2f5aa0bd",
+          "source_url": "https://www.youtube.com/watch?v=dvO3e4Xrf5M",
+          "occurred_at": "2026-10-05T22:47:09+00:00",
+          "window_bucket": "LAST_24H",
+          "topic": "미 실적·금리",
+          "claim_status_counts": {
+            "unverified": 4,
+            "asr_uncertain": 1,
+            "partially_supported": 1
+          },
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD"
+        },
+        {
+          "event_key": "bbaeUYXfRNc",
+          "content_sha256": "9bff863aca1f8f07f0dd418a2434b5480b02d35a93cb3546214d229d9aec325c",
+          "source_url": "https://www.youtube.com/watch?v=bbaeUYXfRNc",
+          "occurred_at": "2026-10-05T22:11:05+00:00",
+          "window_bucket": "24_TO_72H_BACKGROUND",
+          "topic": "KR 투자 포인트",
+          "claim_status_counts": {
+            "unverified": 5,
+            "asr_uncertain": 1
+          },
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD"
+        },
+        {
+          "event_key": "hUH70pivXSU",
+          "content_sha256": "66d313896e42b3efa72e053687730ae9dd58671ce5f8222dcc9ded26ae6df148",
+          "source_url": "https://www.youtube.com/watch?v=hUH70pivXSU",
+          "occurred_at": "2026-10-05T22:02:17+00:00",
+          "window_bucket": "24_TO_72H_BACKGROUND",
+          "topic": "나스닥·금리",
+          "claim_status_counts": {
+            "partially_supported": 4,
+            "asr_uncertain": 1,
+            "unverified": 1
+          },
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD"
+        },
+        {
+          "event_key": "4jaRaPkYItk",
+          "content_sha256": "ef26fce691745fb4e30e3edb40974239c7169702e831f76dffbf90fa7d210ca8",
+          "source_url": "https://www.youtube.com/watch?v=4jaRaPkYItk",
+          "occurred_at": "2026-10-05T12:15:25+00:00",
+          "window_bucket": "24_TO_72H_BACKGROUND",
+          "topic": "삼성전자 실적 일정",
+          "claim_status_counts": {
+            "unverified": 4,
+            "asr_uncertain": 2
+          },
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD"
+        },
+        {
+          "event_key": "tkAFD1bL8XU",
+          "content_sha256": "d6b003f619c63da88b87e6b3fe72284e472ed0a8f5d78b427092ce9db6569290",
+          "source_url": "https://www.youtube.com/watch?v=tkAFD1bL8XU",
+          "occurred_at": "2026-10-05T11:00:05+00:00",
+          "window_bucket": "24_TO_72H_BACKGROUND",
+          "topic": "KR 반도체 자사주",
+          "claim_status_counts": {
+            "asr_uncertain": 2,
+            "unverified": 4
+          },
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD"
+        },
+        {
+          "event_key": "WkcVCqxh-Oo",
+          "content_sha256": "7f6f3a57811807cb4a86943cae915ba642d21f1ed24cb0b87dab96d31fb26a7b",
+          "source_url": "https://www.youtube.com/watch?v=WkcVCqxh-Oo",
+          "occurred_at": "2026-10-05T10:20:45+00:00",
+          "window_bucket": "24_TO_72H_BACKGROUND",
+          "topic": "중간선거 계절성",
+          "claim_status_counts": {
+            "unverified": 5,
+            "asr_uncertain": 1
+          },
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD"
+        },
+        {
+          "event_key": "-TwotENCoa8",
+          "content_sha256": "05c72eaa7aa0abb053568b4b13584073af4b62594c075f9efaf8a6720907075b",
+          "source_url": "https://www.youtube.com/watch?v=-TwotENCoa8",
+          "occurred_at": "2026-10-05T08:06:50+00:00",
+          "window_bucket": "24_TO_72H_BACKGROUND",
+          "topic": "고유가·차환",
+          "claim_status_counts": {
+            "partially_supported": 2,
+            "unverified": 4
+          },
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD"
+        },
+        {
+          "event_key": "s3r7b_76UTQ",
+          "content_sha256": "36b8048814569e2977c6436dd5608463cdeac26b256b5d4a197c462dc884f8d8",
+          "source_url": "https://www.youtube.com/watch?v=s3r7b_76UTQ",
+          "occurred_at": "2026-10-05T08:00:04+00:00",
+          "window_bucket": "24_TO_72H_BACKGROUND",
+          "topic": "배터리·ESS",
+          "claim_status_counts": {
+            "unverified": 4,
+            "asr_uncertain": 2
+          },
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD"
+        },
+        {
+          "event_key": "n2hw5LsMFek",
+          "content_sha256": "05ec223f4479eee600d9562704af611fb05a4eaba22ad875a4c0117fdaaa7df5",
+          "source_url": "https://www.youtube.com/watch?v=n2hw5LsMFek",
+          "occurred_at": "2026-10-05T06:00:20+00:00",
+          "window_bucket": "24_TO_72H_BACKGROUND",
+          "topic": "치과 기술",
+          "claim_status_counts": {
+            "unverified": 6
+          },
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD"
+        },
+        {
+          "event_key": "X5NJ4hZPLtk",
+          "content_sha256": "f1e039d9d46d3b3c11d37400471ccd86ea3b883c559957e4c49be0a9b344550f",
+          "source_url": "https://www.youtube.com/watch?v=X5NJ4hZPLtk",
+          "occurred_at": "2026-10-05T05:52:59+00:00",
+          "window_bucket": "24_TO_72H_BACKGROUND",
+          "topic": "현대차 로봇",
+          "claim_status_counts": {
+            "unverified": 5,
+            "partially_supported": 1
+          },
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD"
+        }
+      ],
+      "broken_evidence_links": [
+        {
+          "event_key": "41_UaeSmKoE",
+          "claim_id": "C1",
+          "evidence_id": "E3"
+        }
+      ],
+      "external_evidence_profile": "balanced_external",
+      "primary_cross_checks": [
+        {
+          "topic": "September 2026 ISM Services PMI and Prices",
+          "url": "https://www.ismworld.org/supply-management-news-and-reports/reports/ism-pmi-reports/services/september/",
+          "finding": "PMI 54.9; Prices 74.0, not 74.5"
+        },
+        {
+          "topic": "October 6 2026 U.S. Treasury 10-year par yield",
+          "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/TextView?type=daily_treasury_yield_curve&field_tdr_date_value_month=202610",
+          "finding": "5.27 percent at the daily close"
+        },
+        {
+          "topic": "NVIDIA share repurchase authorization",
+          "url": "https://investor.nvidia.com/news/press-release-details/2026/NVIDIA-Announces-a-150-Billion-Share-Repurchase-Authorization-Increase/default.aspx",
+          "finding": "Additional 150 billion USD authorization; 235 billion USD remaining"
+        }
+      ],
+      "execution_eligible": false,
+      "external_delivery_verified": false,
+      "source_age_hours_at_generation": 19.1,
+      "oldest_coverage_age_hours_at_generation": 71.57
+    },
+    "next_checkpoint": "새 생산자 실행과 신규·수정 event key가 생기면 재검증; 커버리지 최오래 시각이 72시간에 도달하면 현재 원천으로 사용 중지."
+  },
+  "report_id": "youtube:fbd0b623b9ab1c948b3b0e10c5b674c0",
+  "report_sha256": "fbd0b623b9ab1c948b3b0e10c5b674c0ef7bff511eb87863740de77b8022dc94",
+  "published_at": "2026-10-07T07:34:26.249926+09:00"
+}

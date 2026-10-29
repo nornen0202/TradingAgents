@@ -1,0 +1,201 @@
+{
+  "schema": "tradingagents.work-report/v1",
+  "surface": "prism",
+  "event_id": "prism:4c24f9cb52c2dc38413fac57b12a22d8",
+  "source_sha256": "6a320a2751894520febd4c60e95e0bdc040ad3a25304a9c94bd07268eef0c04c",
+  "prompt_contract_version": "prism-work-v5",
+  "workflow_contract_sha256": "54544c5a6bb3eb17cc24908ceef2377403d48fb6a6c258e4c33d8891923bc403",
+  "policy": {
+    "visibility": "investor_safe_no_credentials",
+    "external_evidence_profile": "balanced_external",
+    "external_evidence_may_affect": [
+      "ranking",
+      "confidence",
+      "position_size_within_existing_risk_limits",
+      "research_priority"
+    ],
+    "external_evidence_may_bypass_execution_gate": false,
+    "thesis_is_independent_from_execution_readiness": true
+  },
+  "report_markdown": "# PRISM 연구 델타 · 2026-10-05\n\n**NO_ACTIONABLE_DELTA · 정제 소스 OK · 신규 8건 / 수정 0건**  \n작성 2026-10-05 10:39 KST · 생산 10-05 10:10 KST · 최신 이벤트 10-05 08:16 KST\n\n## 핵심 델타\n\n- 8건 모두 **BTC 데모** 부분 청산·보호 수준 변경 기록입니다. 정규화된 주식 종목과 주식 신호는 각각 0건입니다. 실제 주식 매매나 실계좌 상태로 전이하지 않습니다.\n- 일부 데모 메시지의 손익·비용 정산이 미확정입니다. 확정 수익이나 전략 성과로 집계하지 않습니다.\n- simulation_only=false 메타데이터가 본문의 ‘데모’ 표기와 충돌합니다. 보수적으로 데모로 분류하고 생산자 분류를 재확인할 연구 과제로 남깁니다.\n- **balanced_external 결과:** 종목 매핑과 공식 검증 근거가 없어 KR·US 종목 순위, thesis confidence, 기존 위험 한도 안의 크기 및 종목 연구 우선순위 변경이 없습니다. 신규 실행 배분 0%; 시장·계좌·위험 게이트 통과 근거도 없습니다.\n\n## 범위와 근거\n\n정제 스냅샷 전체 고유 102건 중 현재 24시간 창 8건 전부 전송, 생략 0건, 전송 잘림 없음. 신규 8건, 수정 0건, 기존 전달 중복 0건입니다. COMPLETE는 정제 패킷의 창 전송 범위만 뜻하며 원문 전체·시세·손익의 독립 검증을 뜻하지 않습니다.\n\n| 분류 | 정확한 이벤트 키 | 연구 처리 |\n|---|---|---|\n| 데모 부분 청산 | stock_ai_agent:15638, stock_ai_agent:15641, stock_ai_agent:15643 | 미정산 손익은 성과에서 제외; 주식 실행 신호 없음 |\n| 데모 보호 수준 변경 | stock_ai_agent:15639, stock_ai_agent:15640, stock_ai_agent:15642, stock_ai_agent:15644, stock_ai_agent:15645 | 파생상품 데모 관리 기록; 실제 주식 포지션에 미적용 |\n\n모든 이벤트는 10-05 04:32–10-05 08:16 KST에 발생했고 생산은 10-05 10:10 KST에 성공했습니다. 생산자 상태 OK는 외부 전달, 실시간 시세 또는 실계좌 검증을 뜻하지 않습니다.\n\n## KR·US 전달 및 다음 확인\n\n- **KR:** 직접 종목 근거 0건. 기존 종목 논거·순위·크기 유지. 암호자산 데모를 KR 주식 수급 신호로 해석하지 않습니다.\n- **US:** 정규화된 주식 종목 근거 0건. BTC 데모를 특정 주식과 임의로 연결하지 않습니다. 관련 종목 조정에는 별도의 실시간 시세, 공식 자료, 종목 매핑이 필요합니다.\n- **연구 과제:** 데모 표시와 simulation_only 불일치, 미정산 손익 표현을 생산자에서 대조합니다. 이 확인 전 주식 thesis 조정은 보류합니다.\n\n**다음 확인:** 새 성공 정제 생산 결과 또는 최초 이벤트의 24시간 창 만료인 10-06 04:32 KST 중 먼저 도래하는 시점. 생산 결과는 10-06 16:10 KST 이후 오래된 소스입니다. 그때까지 새 근거가 없으면 이 8건을 현재 델타로 재사용하지 않습니다.\n\nCOVERAGE_RECEIPT {\"event_id\":\"prism:4c24f9cb52c2dc38413fac57b12a22d8\",\"status\":\"COMPLETE\",\"window_events\":8,\"transmitted_events\":8,\"truncated\":false,\"new_events\":8,\"revised_events\":0}\nMOBILE_HANDOFF {\"owner\":\"external_github_notification_pipeline\",\"status\":\"PENDING_EXTERNAL_VERIFICATION\",\"work_sent_notification\":false}",
+  "structured_report": {
+    "binding": {
+      "surface": "prism",
+      "event_id": "prism:4c24f9cb52c2dc38413fac57b12a22d8",
+      "source_sha256": "6a320a2751894520febd4c60e95e0bdc040ad3a25304a9c94bd07268eef0c04c"
+    },
+    "title": "PRISM 연구 델타 · 2026-10-05",
+    "generated_at": "2026-10-05T01:39:28.978468+00:00",
+    "as_of": "2026-10-04T23:16:25+00:00",
+    "source_health": "OK",
+    "report_mode": "NO_ACTIONABLE_DELTA",
+    "summary": "신규 8건은 모두 BTC 데모 기록이며 정규화된 주식 종목·신호가 없다. 손익 정산 미확정과 simulation_only 메타데이터 충돌로 주식 thesis 및 실행 변경 없음.",
+    "top_actions": [],
+    "strategies": [],
+    "coverage_receipt": {
+      "event_id": "prism:4c24f9cb52c2dc38413fac57b12a22d8",
+      "status": "COMPLETE",
+      "window_events": 8,
+      "transmitted_events": 8,
+      "truncated": false,
+      "new_events": 8,
+      "revised_events": 0
+    },
+    "model_receipt": {
+      "schema": "tradingagents.model-provenance/v1",
+      "work_synthesis": {
+        "execution_mode": "local",
+        "requested_model": "gpt-6-sol",
+        "requested_reasoning_effort": "xhigh",
+        "task_id": "tradingagents-work-prism",
+        "verification_status": "CONFIGURED_NOT_RUNTIME_VERIFIED",
+        "observed_model": null,
+        "observed_reasoning_effort": null,
+        "note": "The local task contract is verified; the Work host does not expose a signed per-response model receipt."
+      }
+    },
+    "source_summary": {
+      "producer": {
+        "health": "OK",
+        "run_id": "prism_telegram_20261005_101024",
+        "last_run_at": "2026-10-05T10:10:25.491581+09:00",
+        "status": "success",
+        "stale_after_hours": 30
+      },
+      "window_hours": 24,
+      "coverage": {
+        "total_unique_events": 102,
+        "window_events": 8,
+        "transmitted_events": 8,
+        "truncated": false,
+        "oldest_occurred_at": "2026-10-04T19:32:24+00:00",
+        "newest_occurred_at": "2026-10-04T23:16:25+00:00"
+      },
+      "delta": {
+        "new_events": 8,
+        "revised_events": 0,
+        "unchanged_events": 0,
+        "delivered_event_keys": [
+          "stock_ai_agent:15645",
+          "stock_ai_agent:15644",
+          "stock_ai_agent:15643",
+          "stock_ai_agent:15642",
+          "stock_ai_agent:15641",
+          "stock_ai_agent:15640",
+          "stock_ai_agent:15639",
+          "stock_ai_agent:15638"
+        ]
+      },
+      "evidence_policy": {
+        "profile": "balanced_external",
+        "material_thesis_effects": [
+          "ranking",
+          "confidence",
+          "position_size_within_existing_risk_limits",
+          "research_priority"
+        ],
+        "supported_evidence_weight": "MEDIUM",
+        "partially_supported_evidence_weight": "LOW_TO_MEDIUM",
+        "unverified_evidence_weight": "LOW_LABELED",
+        "user_primary_channels": [
+          "@kpunch",
+          "@sosumonkey"
+        ],
+        "user_primary_source_tier": "USER_PRIMARY",
+        "user_primary_evidence_weight": "HIGH",
+        "user_primary_validation_policy": "USER_ACCEPTED",
+        "matching_multi_source_signal_may_raise_thesis_priority": true,
+        "conflicting_signal_must_be_visible": true,
+        "may_bypass_market_or_portfolio_execution_gate": false
+      },
+      "relevant_new_evidence": [],
+      "excluded_new_evidence": [
+        {
+          "event_key": "stock_ai_agent:15645",
+          "content_sha256": "292ab2e2f5764fcd5246228be85769eb753ce02bb541f1c67fe5d887683b7696",
+          "classification": "BTC_DEMO_RESEARCH_ONLY",
+          "reason": "주식 종목·신호 매핑 없음; 데모 손익 미정산 또는 보호 수준 변경",
+          "simulation_flag_conflict": true
+        },
+        {
+          "event_key": "stock_ai_agent:15644",
+          "content_sha256": "8d553cc21e2ce6dc46e48ab073b6a4b7fbd93f9b42d7457031df68ba548f3ea8",
+          "classification": "BTC_DEMO_RESEARCH_ONLY",
+          "reason": "주식 종목·신호 매핑 없음; 데모 손익 미정산 또는 보호 수준 변경",
+          "simulation_flag_conflict": true
+        },
+        {
+          "event_key": "stock_ai_agent:15643",
+          "content_sha256": "e525b41b06bbb75cd3c3a1e3ae42c8ce76db7f837dc11b9a6a9b3d72ebffdd11",
+          "classification": "BTC_DEMO_RESEARCH_ONLY",
+          "reason": "주식 종목·신호 매핑 없음; 데모 손익 미정산 또는 보호 수준 변경",
+          "simulation_flag_conflict": true
+        },
+        {
+          "event_key": "stock_ai_agent:15642",
+          "content_sha256": "88595998baa539879e7faef9bd6053d89cd2f5cef073442b74409af5a7c77b2d",
+          "classification": "BTC_DEMO_RESEARCH_ONLY",
+          "reason": "주식 종목·신호 매핑 없음; 데모 손익 미정산 또는 보호 수준 변경",
+          "simulation_flag_conflict": true
+        },
+        {
+          "event_key": "stock_ai_agent:15641",
+          "content_sha256": "f20e1b932e03d438919cfc4a3a598990bced60d033da7f95db01e11f787a7a3b",
+          "classification": "BTC_DEMO_RESEARCH_ONLY",
+          "reason": "주식 종목·신호 매핑 없음; 데모 손익 미정산 또는 보호 수준 변경",
+          "simulation_flag_conflict": true
+        },
+        {
+          "event_key": "stock_ai_agent:15640",
+          "content_sha256": "db4f4be99ab339bc5ab9f0cc8bf9bf99c1ae5a7122e53d0c5a70fd16464eb056",
+          "classification": "BTC_DEMO_RESEARCH_ONLY",
+          "reason": "주식 종목·신호 매핑 없음; 데모 손익 미정산 또는 보호 수준 변경",
+          "simulation_flag_conflict": true
+        },
+        {
+          "event_key": "stock_ai_agent:15639",
+          "content_sha256": "727b6bfd1a496cf4f3bb1b4df647e0bf4f91906bb10b4073b52df51abf5069bf",
+          "classification": "BTC_DEMO_RESEARCH_ONLY",
+          "reason": "주식 종목·신호 매핑 없음; 데모 손익 미정산 또는 보호 수준 변경",
+          "simulation_flag_conflict": true
+        },
+        {
+          "event_key": "stock_ai_agent:15638",
+          "content_sha256": "82f45cd8ab30136a28767efa6731c32beb9284ddf6afa6bfa0de9f64c28232c6",
+          "classification": "BTC_DEMO_RESEARCH_ONLY",
+          "reason": "주식 종목·신호 매핑 없음; 데모 손익 미정산 또는 보호 수준 변경",
+          "simulation_flag_conflict": true
+        }
+      ],
+      "no_relevant_evidence_reason": "신규 8건 모두 BTC 데모이며 정규화된 주식 종목과 신호가 없어 balanced_external 종목별 ranking/confidence/sizing/research_priority 조정 근거가 없다.",
+      "source_health_scope": "정제 생산자·이벤트·창 시각만 확인; 실시간 시세·실계좌·데모 손익·외부 전달은 미검증",
+      "market_data_status": "UNVERIFIED",
+      "market_data_asof": null,
+      "valid_until": null,
+      "kr_handoff": "직접 KR 주식 근거 0건; 종목 논거·순위·크기 추가 조정 없음",
+      "us_handoff": "직접 US 주식 종목 매핑 0건; BTC 데모를 주식 종목에 임의 연결하지 않음",
+      "producer_data_quality_issue": "본문의 데모 표기와 simulation_only=false 메타데이터 충돌; 보수적으로 데모로 분류"
+    },
+    "next_checkpoint": {
+      "at": "2026-10-05T19:32:24+00:00",
+      "trigger": "다음 성공 정제 생산 결과 또는 최초 이벤트 창 만료 중 먼저 도래",
+      "current_window_first_expiry_at": "2026-10-05T19:32:24+00:00",
+      "producer_stale_at": "2026-10-06T16:10:25.491581+09:00",
+      "required_evidence": [
+        "새 정제 PRISM 이벤트",
+        "데모 분류 메타데이터 생산자 대조",
+        "종목별 공식 자료·실시간 시세",
+        "실제 시장·계좌·위험 실행 게이트"
+      ]
+    },
+    "mobile_handoff": {
+      "owner": "external_github_notification_pipeline",
+      "status": "PENDING_EXTERNAL_VERIFICATION",
+      "work_sent_notification": false
+    },
+    "external_delivery_verified": false
+  },
+  "report_id": "prism:9ee90e92e6118b07346c8e35262a60b6",
+  "report_sha256": "9ee90e92e6118b07346c8e35262a60b668e4da11a4a48617d4bc77fb43e39706",
+  "published_at": "2026-10-05T10:39:35.824248+09:00"
+}

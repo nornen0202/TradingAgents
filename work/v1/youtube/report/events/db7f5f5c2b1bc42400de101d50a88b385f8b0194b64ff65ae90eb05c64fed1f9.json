@@ -1,0 +1,137 @@
+{
+  "schema": "tradingagents.work-report/v1",
+  "surface": "youtube",
+  "event_id": "youtube:8533695e9290db1be8b90f04823fc3c5",
+  "source_sha256": "0d0144734cf706b2d0eec6af410aa5db4b677e805933b3a50bba11a5c560b5bc",
+  "prompt_contract_version": "youtube-work-v5",
+  "workflow_contract_sha256": "bc33d7680318d3200a3ef2fd2cc1f830d41fd1ba019e4f20ed6d1951cd6dc343",
+  "policy": {
+    "visibility": "investor_safe_no_credentials",
+    "external_evidence_profile": "balanced_external",
+    "external_evidence_may_affect": [
+      "ranking",
+      "confidence",
+      "position_size_within_existing_risk_limits",
+      "research_priority"
+    ],
+    "external_evidence_may_bypass_execution_gate": false,
+    "thesis_is_independent_from_execution_readiness": true
+  },
+  "report_markdown": "# YouTube 검증 델타 — 2026-10-03 08:34 KST\n\n**NO_ACTIONABLE_DELTA · 현재 실행 지시 없음**\n\n- **소스 상태:** 생산자 youtube_20261002_070408 성공. 마지막 실행 후 약 24.67시간 / 허용 36시간. 72시간 창의 가장 오래된 시각은 약 68.06시간 전이다.\n- **이번 변화:** 신규 0건, 수정 0건, 동일 60건 제외. 새 이벤트 본문과 전달 키가 없어 새 주장·수치·ASR 오류를 검증하거나 투자 판단에 반영할 대상이 없다.\n- **범위:** 창 69건 중 60건 전송, 절단됨. 전수성과 생략 항목의 내용·건수는 확인되지 않아 범위 상태는 **UNVERIFIED**다.\n- **KR·US 연구 영향:** 새 근거가 없어 balanced_external에 따른 종목 순위, thesis 신뢰도, 기존 위험 한도 안의 조건부 규모, 연구 우선순위를 변경하지 않는다. 사용자 최우선 채널의 신규 이벤트도 없다.\n- **실행 경계:** 패킷은 execution_eligible=false. 현재 시장 시세·계좌·위험 한도·유효 시각이 없으므로 매수·매도·감축 결정을 내리지 않는다.\n\n## 다음 공식 검증\n\n다음 성공 생산자 실행에서 새·수정 이벤트 키와 원자료를 확인한다. 신규 핵심 주장이 생기면 최근 24시간 자료부터 공식 원자료로 대조하고, coverage 절단·시각 및 근거 ID를 재검증한다. 모든 주문 판단은 별도 최신 시장·계좌·위험 게이트 확인이 필요하다.\n\nCOVERAGE_RECEIPT {\"event_id\":\"youtube:8533695e9290db1be8b90f04823fc3c5\",\"status\":\"UNVERIFIED\",\"window_events\":69,\"transmitted_events\":60,\"truncated\":true,\"new_events\":0,\"revised_events\":0}\nMOBILE_HANDOFF {\"owner\":\"external_github_notification_pipeline\",\"status\":\"PENDING_EXTERNAL_VERIFICATION\",\"work_sent_notification\":false}",
+  "structured_report": {
+    "binding": {
+      "surface": "youtube",
+      "event_id": "youtube:8533695e9290db1be8b90f04823fc3c5",
+      "source_sha256": "0d0144734cf706b2d0eec6af410aa5db4b677e805933b3a50bba11a5c560b5bc"
+    },
+    "title": "YouTube 검증 델타 — 2026-10-03",
+    "generated_at": "2026-10-03T08:34:01+09:00",
+    "as_of": "2026-10-02T07:53:51.311718+09:00",
+    "source_health": "OK",
+    "report_mode": "NO_ACTIONABLE_DELTA",
+    "summary": [
+      "신규 0건·수정 0건·동일 60건 제외. 검증할 새 이벤트 본문이 없다.",
+      "생산자 성공 후 24.67시간 / 36시간 한도. 창 69건 중 60건 전송, 전수성 미검증.",
+      "새 balanced_external 근거가 없어 연구 순위·신뢰도·조건부 규모 변경 없음. 현재 실행 지시 없음."
+    ],
+    "top_actions": [],
+    "strategies": [],
+    "coverage_receipt": {
+      "event_id": "youtube:8533695e9290db1be8b90f04823fc3c5",
+      "status": "UNVERIFIED",
+      "window_events": 69,
+      "transmitted_events": 60,
+      "truncated": true,
+      "new_events": 0,
+      "revised_events": 0
+    },
+    "model_receipt": {
+      "schema": "tradingagents.model-provenance/v1",
+      "work_synthesis": {
+        "execution_mode": "local",
+        "requested_model": "gpt-6-sol",
+        "requested_reasoning_effort": "xhigh",
+        "task_id": "tradingagents-work-youtube",
+        "verification_status": "CONFIGURED_NOT_RUNTIME_VERIFIED",
+        "observed_model": null,
+        "observed_reasoning_effort": null,
+        "note": "The local task contract is verified; the Work host does not expose a signed per-response model receipt."
+      }
+    },
+    "source_summary": {
+      "canonical_source": {
+        "health": "OK",
+        "run_id": "youtube_20261002_070408",
+        "last_run_at": "2026-10-02T07:53:51.311718+09:00",
+        "status": "success",
+        "stale_after_hours": 36
+      },
+      "coverage": {
+        "total_unique_events": 334,
+        "window_events": 69,
+        "transmitted_events": 60,
+        "truncated": true,
+        "oldest_occurred_at": "2026-09-30T03:30:14+00:00",
+        "newest_occurred_at": "2026-10-01T12:02:43+00:00"
+      },
+      "delta": {
+        "new_events": 0,
+        "revised_events": 0,
+        "unchanged_events": 60,
+        "delivered_event_keys": []
+      },
+      "source_snapshot_sha256": "f87812c7fcf7c5a1ae5d322e81e3f236b3e8eab188145056ae3b20a6db7fc4eb",
+      "balanced_external_policy": {
+        "profile": "balanced_external",
+        "material_thesis_effects": [
+          "ranking",
+          "confidence",
+          "position_size_within_existing_risk_limits",
+          "research_priority"
+        ],
+        "supported_evidence_weight": "MEDIUM",
+        "partially_supported_evidence_weight": "LOW_TO_MEDIUM",
+        "unverified_evidence_weight": "LOW_LABELED",
+        "user_primary_channels": [
+          "@kpunch",
+          "@sosumonkey"
+        ],
+        "user_primary_source_tier": "USER_PRIMARY",
+        "user_primary_evidence_weight": "HIGH",
+        "user_primary_validation_policy": "USER_ACCEPTED",
+        "matching_multi_source_signal_may_raise_thesis_priority": true,
+        "conflicting_signal_must_be_visible": true,
+        "may_bypass_market_or_portfolio_execution_gate": false
+      },
+      "execution_eligible": false,
+      "omitted_events": null,
+      "freshness_receipt": {
+        "checked_at": "2026-10-03T08:34:01+09:00",
+        "source_age_hours": 24.67,
+        "coverage_oldest_age_hours": 68.063,
+        "available_clocks_parse_nonfuture_ordered": true,
+        "event_clocks_available": false,
+        "market_account_validity_available": false
+      },
+      "external_evidence_receipt": {
+        "new_relevant_event_keys": [],
+        "status": "NO_NEW_OR_REVISED_EVENTS",
+        "effect": "No ranking, confidence, risk-bounded sizing or research-priority change."
+      }
+    },
+    "next_checkpoint": [
+      "다음 성공 생산자 실행에서 신규·수정 이벤트 키와 원자료 확인",
+      "coverage 절단·시각 및 근거 ID 대조",
+      "실행 전 최신 시장·계좌·위험 한도와 시세 유효 시각 재확인"
+    ],
+    "mobile_handoff": {
+      "owner": "external_github_notification_pipeline",
+      "status": "PENDING_EXTERNAL_VERIFICATION",
+      "work_sent_notification": false
+    },
+    "external_delivery_verified": false
+  },
+  "report_id": "youtube:db7f5f5c2b1bc42400de101d50a88b38",
+  "report_sha256": "db7f5f5c2b1bc42400de101d50a88b385f8b0194b64ff65ae90eb05c64fed1f9",
+  "published_at": "2026-10-03T08:34:10.086249+09:00"
+}

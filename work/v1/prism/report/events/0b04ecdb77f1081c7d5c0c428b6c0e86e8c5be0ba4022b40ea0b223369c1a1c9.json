@@ -1,0 +1,121 @@
+{
+  "schema": "tradingagents.work-report/v1",
+  "surface": "prism",
+  "event_id": "prism:e2a43815c495622784a67f7fd9bedcca",
+  "source_sha256": "63f845c58d5444c75f3d96ad6ec215a22d08e16e3afcc454bb7fa7b68eedd8db",
+  "prompt_contract_version": "prism-work-v5",
+  "workflow_contract_sha256": "affa33ed518a96ac60bff25950a3fe646a7ff652ceb8d1ab5a9f50dde0362c75",
+  "policy": {
+    "visibility": "investor_safe_no_credentials",
+    "external_evidence_profile": "balanced_external",
+    "external_evidence_may_affect": [
+      "ranking",
+      "confidence",
+      "position_size_within_existing_risk_limits",
+      "research_priority"
+    ],
+    "external_evidence_may_bypass_execution_gate": false,
+    "thesis_is_independent_from_execution_readiness": true
+  },
+  "report_markdown": "# PRISM 연구 델타 · 2026-10-09\n\n**NO_ACTIONABLE_DELTA · 소스 정상 · 연구 전용**  \n작성 08:31 KST · 정제 생산 10-08 11:14 KST\n\n- **새 신호 없음:** 신규 0건, 수정 0건. 기존 ACK와 같은 16건은 재분석하거나 재전달하지 않습니다.\n- **투자 영향 없음:** KR·US 종목 순위, thesis 신뢰도, 위험 한도 내 크기, 연구 우선순위를 이번 이벤트로 변경하지 않습니다.\n- **실행 배분 0%:** 이 자료는 advisory 전용이며 현재 시장·계좌·위험 게이트를 통과시키지 않습니다.\n\n## 범위와 신선도\n\n최근 24시간 창 16건 중 16건 전송, 생략 0건, 잘림 없음. 전체 아카이브 고유 131건의 전수 검증을 뜻하지 않습니다. COMPLETE는 정제 패킷 전송 범위만 나타내며 독립적인 투자 근거 검증을 뜻하지 않습니다. 생산 완료, 창의 시작·끝 사건 시각은 현재보다 이르고 순서가 일치합니다. 생산 시각은 허용 30시간, 가장 오래된 창 사건은 24시간 안에 있습니다.\n\n## 연구 반영\n\n새로운 실제 주식 신호, 시뮬레이션 변경, 기타 자료가 없습니다. 기존 신호를 새로운 다중 출처 확인으로 재가중하지 않습니다. 관련 신규 사건 키가 없으므로 `balanced_external`에 따른 추가 thesis 변경도 없습니다. KR·US 후속 브리핑은 기존 독립 근거와 실시간 시장·계좌 확인을 그대로 요구합니다.\n\n**다음 확인:** 다음 성공한 정제 생산 결과, 또는 10-09 09:44:16 KST의 첫 창 만료. 이후에는 신선도와 범위를 다시 준비해야 합니다. 실제 주문 판단에는 공식 시장 시세, 계좌, 위험 한도 검증이 별도로 필요합니다.\n\nCOVERAGE_RECEIPT {\"event_id\":\"prism:e2a43815c495622784a67f7fd9bedcca\",\"status\":\"COMPLETE\",\"window_events\":16,\"transmitted_events\":16,\"truncated\":false,\"new_events\":0,\"revised_events\":0}\nMOBILE_HANDOFF {\"owner\":\"external_github_notification_pipeline\",\"status\":\"PENDING_EXTERNAL_VERIFICATION\",\"work_sent_notification\":false}",
+  "structured_report": {
+    "binding": {
+      "surface": "prism",
+      "event_id": "prism:e2a43815c495622784a67f7fd9bedcca",
+      "source_sha256": "63f845c58d5444c75f3d96ad6ec215a22d08e16e3afcc454bb7fa7b68eedd8db"
+    },
+    "title": "PRISM 연구 델타 · 2026-10-09",
+    "generated_at": "2026-10-09T08:31:53.560846+09:00",
+    "as_of": "2026-10-09T08:31:53.560846+09:00",
+    "source_health": "OK",
+    "report_mode": "NO_ACTIONABLE_DELTA",
+    "summary": "신규 0건·수정 0건, 기존 ACK와 동일한 16건. KR·US thesis 순위·신뢰도·크기·연구 우선순위 변경 없음. 연구 전용, 신규 실행 배분 0%.",
+    "top_actions": [],
+    "strategies": [],
+    "coverage_receipt": {
+      "event_id": "prism:e2a43815c495622784a67f7fd9bedcca",
+      "status": "COMPLETE",
+      "window_events": 16,
+      "transmitted_events": 16,
+      "truncated": false,
+      "new_events": 0,
+      "revised_events": 0
+    },
+    "model_receipt": {
+      "schema": "tradingagents.model-provenance/v1",
+      "work_synthesis": {
+        "execution_mode": "local",
+        "requested_model": "gpt-6.1-sol",
+        "requested_reasoning_effort": "xhigh",
+        "task_id": "tradingagents-work-prism",
+        "verification_status": "CONFIGURED_NOT_RUNTIME_VERIFIED",
+        "observed_model": null,
+        "observed_reasoning_effort": null,
+        "note": "The local task contract is verified; the Work host does not expose a signed per-response model receipt."
+      }
+    },
+    "source_summary": {
+      "source": {
+        "health": "OK",
+        "run_id": "prism_telegram_20261008_111430",
+        "last_run_at": "2026-10-08T11:14:44.225712+09:00",
+        "status": "success",
+        "stale_after_hours": 30
+      },
+      "coverage": {
+        "total_unique_events": 131,
+        "window_events": 16,
+        "transmitted_events": 16,
+        "truncated": false,
+        "oldest_occurred_at": "2026-10-08T00:44:16+00:00",
+        "newest_occurred_at": "2026-10-08T01:06:46+00:00"
+      },
+      "delta": {
+        "new_events": 0,
+        "revised_events": 0,
+        "unchanged_events": 16,
+        "delivered_event_keys": []
+      },
+      "guardrails": {
+        "untrusted_content": true,
+        "advisory_only": true,
+        "may_promote_market_execution": false,
+        "multi_ticker_message_prices_require_recheck": true
+      },
+      "evidence_policy": {
+        "profile": "balanced_external",
+        "material_thesis_effects": [
+          "ranking",
+          "confidence",
+          "position_size_within_existing_risk_limits",
+          "research_priority"
+        ],
+        "supported_evidence_weight": "MEDIUM",
+        "partially_supported_evidence_weight": "LOW_TO_MEDIUM",
+        "unverified_evidence_weight": "LOW_LABELED",
+        "user_primary_channels": [
+          "@kpunch",
+          "@sosumonkey"
+        ],
+        "user_primary_source_tier": "USER_PRIMARY",
+        "user_primary_evidence_weight": "HIGH",
+        "user_primary_validation_policy": "USER_ACCEPTED",
+        "matching_multi_source_signal_may_raise_thesis_priority": true,
+        "conflicting_signal_must_be_visible": true,
+        "may_bypass_market_or_portfolio_execution_gate": false
+      },
+      "event_keys": [],
+      "actual_delta_event_count": 0,
+      "omitted_window_events": 0,
+      "no_relevant_evidence_reason": "신규·수정 사건이 없으며 16건 모두 이미 ACK된 동일 사건이다."
+    },
+    "next_checkpoint": {
+      "at": "2026-10-09T09:44:16+09:00",
+      "trigger": "다음 성공한 정제 생산 결과 또는 현재 24시간 창의 첫 만료",
+      "required_evidence": "새·수정 정제 사건, 공식 시장 시세, 실제 계좌와 위험 게이트"
+    }
+  },
+  "report_id": "prism:0b04ecdb77f1081c7d5c0c428b6c0e86",
+  "report_sha256": "0b04ecdb77f1081c7d5c0c428b6c0e86e8c5be0ba4022b40ea0b223369c1a1c9",
+  "published_at": "2026-10-09T08:31:57.828735+09:00"
+}

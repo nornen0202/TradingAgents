@@ -1,0 +1,131 @@
+{
+  "schema": "tradingagents.work-report/v1",
+  "surface": "prism",
+  "event_id": "prism:f949220fdd68f45a96bf5d4aa6dc00d0",
+  "source_sha256": "f941b61f8effff5389692da952d03f26886d4c80face9048b70aef2384a51f57",
+  "prompt_contract_version": "prism-work-v5",
+  "workflow_contract_sha256": "54544c5a6bb3eb17cc24908ceef2377403d48fb6a6c258e4c33d8891923bc403",
+  "policy": {
+    "visibility": "investor_safe_no_credentials",
+    "external_evidence_profile": "balanced_external",
+    "external_evidence_may_affect": [
+      "ranking",
+      "confidence",
+      "position_size_within_existing_risk_limits",
+      "research_priority"
+    ],
+    "external_evidence_may_bypass_execution_gate": false,
+    "thesis_is_independent_from_execution_readiness": true
+  },
+  "report_markdown": "# PRISM 연구 델타 · 2026-10-02\n\n**소스 OK · 새 투자 델타 없음 · 연구 전용**  \n작성 2026-10-02 09:38:08 KST · 정제 생산 성공 10-01 10:28:45 KST\n\n**NO_ACTIONABLE_DELTA.** 새 이벤트 0건, 수정 0건입니다. 이전에 본 11건의 현재 창 재집계만 있으므로 종목별 해석을 반복하거나 투자 판단을 갱신하지 않습니다. 신규 실행 배분은 0%이며, 기존 시장·계좌·위험 게이트는 그대로 필요합니다.\n\n## 범위와 신선도\n\n- 전체 고유 이벤트 111건 중 현재 24시간 창 11건, 정제 스냅샷 전송 11건, 생략 0건, 잘림 false. **이번 연구 델타에 전달된 이벤트는 0건**입니다. COMPLETE는 정제 스냅샷의 전송 범위에만 적용됩니다.\n- 생산 시각과 현재 창의 시작·끝 시각은 순서가 맞고, 작성 시각 기준 24시간 창 및 생산자 30시간 신선도 한도 안입니다. 가장 오래된 이벤트는 10-02 09:43:18 KST에 창을 벗어납니다.\n- 가격·거래량의 실시간 유효성, 공식 자료, 실제 계좌와 위험 한도는 이번 패킷으로 확인되지 않았습니다. 이전 BUY/SELL/REDUCE는 현재 주문 지시가 아닙니다.\n\n## 연구 영향과 전달\n\n**KR·US:** 새롭거나 수정된 event key가 없어 `balanced_external`에 따른 순위·thesis confidence·위험 한도 내 크기·연구 우선순위 변경 근거가 없습니다. 기존 PRISM 시뮬레이터 기록은 실제 계좌 신호로 전이하지 않습니다. 종목별 재평가가 필요하면 새 정제 이벤트와 거래소·공시·기업 IR, 시장·계좌·위험 게이트를 확인해야 합니다.\n\n**다음 확인:** 다음 성공한 정제 생산 결과 또는 10-02 09:43:18 KST 창 만료 중 먼저 도래하는 시점. 자동 재확인이나 외부 전달이 완료됐다는 뜻은 아닙니다.\n\nCOVERAGE_RECEIPT {\"event_id\":\"prism:f949220fdd68f45a96bf5d4aa6dc00d0\",\"status\":\"COMPLETE\",\"window_events\":11,\"transmitted_events\":11,\"truncated\":false,\"new_events\":0,\"revised_events\":0}\nMOBILE_HANDOFF {\"owner\":\"external_github_notification_pipeline\",\"status\":\"PENDING_EXTERNAL_VERIFICATION\",\"work_sent_notification\":false}",
+  "structured_report": {
+    "binding": {
+      "surface": "prism",
+      "event_id": "prism:f949220fdd68f45a96bf5d4aa6dc00d0",
+      "source_sha256": "f941b61f8effff5389692da952d03f26886d4c80face9048b70aef2384a51f57"
+    },
+    "title": "PRISM 연구 델타 · 2026-10-02",
+    "generated_at": "2026-10-02T00:38:08.479124+00:00",
+    "as_of": "2026-10-02T00:38:08.479124+00:00",
+    "source_health": "OK",
+    "report_mode": "RESEARCH",
+    "summary": "NO_ACTIONABLE_DELTA: 새 이벤트와 수정 이벤트 모두 0건. 현재 창 11건은 이미 본 이벤트이며 연구 순위·신뢰도·크기·우선순위 변경 없음. 신규 실행 배분 0%.",
+    "top_actions": [],
+    "strategies": [],
+    "coverage_receipt": {
+      "event_id": "prism:f949220fdd68f45a96bf5d4aa6dc00d0",
+      "status": "COMPLETE",
+      "window_events": 11,
+      "transmitted_events": 11,
+      "truncated": false,
+      "new_events": 0,
+      "revised_events": 0
+    },
+    "model_receipt": {
+      "schema": "tradingagents.model-provenance/v1",
+      "work_synthesis": {
+        "execution_mode": "local",
+        "requested_model": "gpt-6-sol",
+        "requested_reasoning_effort": "xhigh",
+        "task_id": "tradingagents-work-prism",
+        "verification_status": "CONFIGURED_NOT_RUNTIME_VERIFIED",
+        "observed_model": null,
+        "observed_reasoning_effort": null,
+        "note": "The local task contract is verified; the Work host does not expose a signed per-response model receipt."
+      }
+    },
+    "source_summary": {
+      "producer": {
+        "run_id": "prism_telegram_20261001_102833",
+        "last_run_at": "2026-10-01T10:28:45.003805+09:00",
+        "status": "success",
+        "stale_after_hours": 30
+      },
+      "window_hours": 24,
+      "coverage": {
+        "total_unique_events": 111,
+        "window_events": 11,
+        "transmitted_events": 11,
+        "truncated": false,
+        "oldest_occurred_at": "2026-10-01T00:43:18+00:00",
+        "newest_occurred_at": "2026-10-01T01:02:38+00:00"
+      },
+      "delta": {
+        "new_events": 0,
+        "revised_events": 0,
+        "unchanged_events": 11,
+        "delivered_event_keys": []
+      },
+      "evidence_policy": {
+        "profile": "balanced_external",
+        "material_thesis_effects": [
+          "ranking",
+          "confidence",
+          "position_size_within_existing_risk_limits",
+          "research_priority"
+        ],
+        "supported_evidence_weight": "MEDIUM",
+        "partially_supported_evidence_weight": "LOW_TO_MEDIUM",
+        "unverified_evidence_weight": "LOW_LABELED",
+        "user_primary_channels": [
+          "@kpunch",
+          "@sosumonkey"
+        ],
+        "user_primary_source_tier": "USER_PRIMARY",
+        "user_primary_evidence_weight": "HIGH",
+        "user_primary_validation_policy": "USER_ACCEPTED",
+        "matching_multi_source_signal_may_raise_thesis_priority": true,
+        "conflicting_signal_must_be_visible": true,
+        "may_bypass_market_or_portfolio_execution_gate": false
+      },
+      "relevant_new_evidence": [],
+      "no_relevant_evidence_reason": "새롭거나 수정된 정제 PRISM 이벤트가 없어 기존 thesis 평가를 반복하지 않음",
+      "source_health_scope": "정제 생산자·현재 창 이벤트 시각에 한함; 실시간 시장·계좌·외부 전달은 미검증",
+      "market_data_status": "UNVERIFIED",
+      "market_data_asof": null,
+      "valid_until": null,
+      "kr_handoff": "새 PRISM 델타 없음; 공식 근거 및 실행 게이트 확인 전 승격 없음",
+      "us_handoff": "새 PRISM 델타 없음; US thesis·순위·크기 변경 근거 없음"
+    },
+    "next_checkpoint": {
+      "at": "2026-10-02T09:43:18+09:00",
+      "trigger": "다음 성공한 정제 생산 결과 또는 현재 창의 가장 오래된 이벤트 만료 중 먼저 도래하는 시점",
+      "current_window_expires_at": "2026-10-02T09:43:18+09:00",
+      "required_evidence": [
+        "새롭거나 수정된 정제 PRISM 이벤트",
+        "거래소 시세·거래량·관측시각",
+        "공식 공시·기업 IR",
+        "실제 시장·계좌·위험 게이트"
+      ]
+    },
+    "mobile_handoff": {
+      "owner": "external_github_notification_pipeline",
+      "status": "PENDING_EXTERNAL_VERIFICATION",
+      "work_sent_notification": false
+    },
+    "external_delivery_verified": false
+  },
+  "report_id": "prism:8676ebbb5d10023493609000c706de51",
+  "report_sha256": "8676ebbb5d10023493609000c706de518a24d62e4ac14a23e53c19f7cb78b81e",
+  "published_at": "2026-10-02T09:38:14.711562+09:00"
+}

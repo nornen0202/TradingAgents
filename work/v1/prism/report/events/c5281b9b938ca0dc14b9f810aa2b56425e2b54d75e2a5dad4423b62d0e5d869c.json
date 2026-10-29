@@ -1,0 +1,358 @@
+{
+  "schema": "tradingagents.work-report/v1",
+  "surface": "prism",
+  "event_id": "prism:9b2aa37574b7901c3d8f5b35efe6d3b3",
+  "source_sha256": "1e674b2b7d530b683ba3bdb6e9e70132b3ab352623549da35653882669bea3e7",
+  "prompt_contract_version": "prism-work-v5",
+  "workflow_contract_sha256": "54544c5a6bb3eb17cc24908ceef2377403d48fb6a6c258e4c33d8891923bc403",
+  "policy": {
+    "visibility": "investor_safe_no_credentials",
+    "external_evidence_profile": "balanced_external",
+    "external_evidence_may_affect": [
+      "ranking",
+      "confidence",
+      "position_size_within_existing_risk_limits",
+      "research_priority"
+    ],
+    "external_evidence_may_bypass_execution_gate": false,
+    "thesis_is_independent_from_execution_readiness": true
+  },
+  "report_markdown": "# PRISM 연구 델타 · 2026-10-03\n\n**소스 OK · 새 10건 · 연구 전용**  \n작성 10-03 08:40 KST · 정제 생산 10-02 13:29 KST · 최신 이벤트 10-02 10:02 KST\n\n## 핵심 델타\n\n1. **RF머트리얼즈(327260): 검증 우선 1, 신규 매수 보류.** 거래량·공급계약 주장이 연구 우선순위를 높이지만, 뒤이은 미진입 판단(6/10, 지지선과 가격 간 약 12% 거리)이 추격 신뢰도를 낮춥니다. 계약 공시와 가격·지지선 시각을 확인하기 전 신규 배분 0%. 근거 `stock_ai_agent:15548`, `:15549`, `:15555`.\n2. **대한광통신(010170): 관찰 순위 하향, 신규 매수 보류.** 갭 상승·광케이블 수요 서술 뒤에 횡보장 성장성·점수 미달(2/10) 미진입 판단이 나왔습니다. 일봉·실적을 공식 자료로 확인하기 전 thesis 신뢰도 낮음. 근거 `stock_ai_agent:15548`, `:15550`, `:15556`.\n3. **샘씨엔에스(252990): 가상 보유 기록만.** 시뮬레이터 1/10 보유와 +27.38%는 실제 계좌 수익률이나 매수 신호가 아닙니다. 실제 주문·보유 추론 금지. 근거 `stock_ai_agent:15557`.\n\n## 범위와 신선도\n\n- 정제 스냅샷 전체 고유 112건, 최근 24시간 창 10건 중 10건 전송, 생략 0건, 잘림 false. 이번 델타는 새 10건·수정 0건·기존 중복 0건입니다. COMPLETE는 이 **정제 패킷의 전송 범위**에 한합니다.\n- 생산 성공과 이벤트·신호·coverage 시각은 순서가 맞고 작성 시각 기준 한도 안입니다. 가장 오래된 이벤트는 10-03 09:45 KST에 24시간 창을 벗어납니다. 이때 새 정제 생산 결과가 없으면 현재 근거로 재사용하지 않습니다.\n- 오전 게시물 `:15549`와 `:15550`의 **당일 ‘종가/확정 일봉’** 문구는 게시 시각과 맞지 않아 확정 시세로 채택하지 않습니다. 점수·Telegram confidence도 독립 검증 신뢰도가 아닙니다. PDF 2건(`:15551`, `:15552`)은 본문이 없고 O’Neil 차트 2건(`:15553`, `:15554`)은 주석·피벗·RS를 검증할 원본이 없어 증거 가중치를 주지 않습니다.\n\n## 종목별 후속 연구\n\n| 구분 | 연구 영향과 반대 근거 | 검증 후 재평가 조건 |\n|---|---|---|\n| RF머트리얼즈 | 공급계약·거래량 주장은 조건부 우선 조사. 후행 `NO_ENTRY`와 먼 지지선이 매수 확신을 낮춤. | DART 공급계약 규모·이행, 거래소 일봉·거래량, 최신 지지선 재산출. |\n| 대한광통신 | AI 광케이블 수요 주장은 관찰만. 후행 `NO_ENTRY`, 성장성·점수 미달이 우선. | 거래소 일봉·거래량, 분기 실적·부채비율의 공시 원문, 시장 체제 재확인. |\n| 샘씨엔에스 | 시뮬레이터 보유·손익만 확인. 실제 포트폴리오 판단에 반영하지 않음. | 별도 실제 계좌 스냅샷과 KR 시장 전략이 있을 때만 독립 평가. |\n\n**KR 전달:** `balanced_external`로 RF 계약 검증을 연구 우선순위 1, 대한광통신을 2로 둡니다. 두 종목의 후행 미진입을 confidence·순위 하향 근거로 유지하고 위험 한도 내 신규 크기는 **0%**입니다. 공식 공시·거래소 시세와 실제 계좌·시장·위험 게이트가 새로 충족되기 전 실행 준비도를 높이지 않습니다.  \n**US 전달:** 직접 매칭 종목·근거가 없어 US thesis 순위·confidence·크기 변경 없음.\n\n**다음 확인:** 다음 성공한 정제 생산 결과 또는 10-03 09:45 KST 창 만료 중 먼저 도래하는 시점. 필요한 근거는 DART·거래소 일봉/거래량·기업 IR, 당일 종가 표기 오류 해명, 실시간 시장·계좌·위험 점검입니다.\n\nCOVERAGE_RECEIPT {\"event_id\":\"prism:9b2aa37574b7901c3d8f5b35efe6d3b3\",\"status\":\"COMPLETE\",\"window_events\":10,\"transmitted_events\":10,\"truncated\":false,\"new_events\":10,\"revised_events\":0}\nMOBILE_HANDOFF {\"owner\":\"external_github_notification_pipeline\",\"status\":\"PENDING_EXTERNAL_VERIFICATION\",\"work_sent_notification\":false}",
+  "structured_report": {
+    "binding": {
+      "surface": "prism",
+      "event_id": "prism:9b2aa37574b7901c3d8f5b35efe6d3b3",
+      "source_sha256": "1e674b2b7d530b683ba3bdb6e9e70132b3ab352623549da35653882669bea3e7"
+    },
+    "title": "PRISM 연구 델타 · 2026-10-03",
+    "generated_at": "2026-10-02T23:40:34.273669+00:00",
+    "as_of": "2026-10-02T01:02:28+00:00",
+    "source_health": "OK",
+    "report_mode": "RESEARCH",
+    "summary": "새 PRISM 10건. RF머트리얼즈 계약·거래량 검증을 연구 1순위로, 대한광통신은 후행 미진입으로 관찰 하향. 샘씨엔에스는 가상 보유만. 신규 실행 배분 0%.",
+    "top_actions": [
+      {
+        "type": "RESEARCH",
+        "ticker": "327260.KS",
+        "priority": 1,
+        "readiness": "RESEARCH_ONLY",
+        "action": "공급계약 공시·일봉·지지선 재검증; 신규 주문 보류",
+        "event_keys": [
+          "stock_ai_agent:15549",
+          "stock_ai_agent:15555"
+        ]
+      },
+      {
+        "type": "RESEARCH",
+        "ticker": "010170.KS",
+        "priority": 2,
+        "readiness": "RESEARCH_ONLY",
+        "action": "일봉·분기실적 공식 확인; 신규 주문 보류",
+        "event_keys": [
+          "stock_ai_agent:15550",
+          "stock_ai_agent:15556"
+        ]
+      }
+    ],
+    "strategies": [
+      {
+        "ticker": "327260.KS",
+        "display_name": "RF머트리얼즈",
+        "rank": 1,
+        "thesis": {
+          "stance": "RESEARCH",
+          "horizon": "다음 공식 공시·거래소 일봉 확인까지",
+          "confidence": 0.35,
+          "research_priority": 1,
+          "rationale": "거래량·공급계약 주장으로 검증 가치는 높지만 후행 미진입, 지지선 거리, 오전 종가 표현이 확신을 낮춤.",
+          "entry_conditions": [
+            "DART 공급계약 원문 및 이행 조건 확인",
+            "거래소 확정 일봉·거래량과 최신 지지선 재산출"
+          ],
+          "invalidation_conditions": [
+            "공시 계약 조건 불일치",
+            "거래소 확정 일봉이 게시물 수치와 불일치",
+            "실제 시장·계좌·위험 게이트 미충족"
+          ],
+          "invalidation_action": "신규 주문을 보류하고 계약·가격 가정을 폐기한 뒤 재분석",
+          "position_sizing": "신규 실행 배분 0%; 향후 크기는 별도 시장·계좌·위험 한도 내에서만 결정"
+        },
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action_now": null,
+          "action_if_triggered": null,
+          "blockers": [
+            "후행 NO_ENTRY",
+            "공시·일봉·지지선 미검증",
+            "실시간 시장·계좌·위험 게이트 없음"
+          ]
+        },
+        "source_contributions": [
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15548",
+            "affected_field": "research_priority",
+            "direction": "up",
+            "reason": "오전 관심목록·거래량 관찰로 확인 우선순위 상승; 다중 종목 가격은 사용하지 않음"
+          },
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15549",
+            "affected_field": "research_priority",
+            "direction": "up_conditional",
+            "reason": "공급계약·거래량 주장은 공시와 거래소 확인 대상으로 격상; 당일 종가 표현은 보류"
+          },
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15555",
+            "affected_field": "confidence",
+            "direction": "down",
+            "reason": "후행 미진입과 지지선 거리 약 12%가 추격 thesis 확신을 낮춤"
+          }
+        ],
+        "excluded_event_keys": [
+          "stock_ai_agent:15551",
+          "stock_ai_agent:15553"
+        ]
+      },
+      {
+        "ticker": "010170.KS",
+        "display_name": "대한광통신",
+        "rank": 2,
+        "thesis": {
+          "stance": "RESEARCH",
+          "horizon": "다음 공식 일봉·분기 공시 확인까지",
+          "confidence": 0.2,
+          "research_priority": 2,
+          "rationale": "광케이블 수요·갭 상승 서술은 확인 대상이나 후행 미진입과 오전 확정 일봉 표현이 신뢰도를 낮춤.",
+          "entry_conditions": [
+            "거래소 확정 일봉·거래량 확인",
+            "분기 영업손익·부채비율 공시 원문 확인"
+          ],
+          "invalidation_conditions": [
+            "공시 성장성 또는 재무 수치 불일치",
+            "거래소 일봉이 게시물 수치와 불일치",
+            "횡보장 미진입 조건 지속"
+          ],
+          "invalidation_action": "관찰 우선순위를 더 낮추고 신규 주문을 보류한 뒤 공식 자료로 재평가",
+          "position_sizing": "신규 실행 배분 0%; 별도 위험 한도·실시간 게이트 확인 전 산정하지 않음"
+        },
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action_now": null,
+          "action_if_triggered": null,
+          "blockers": [
+            "후행 NO_ENTRY",
+            "공식 일봉·실적 미검증",
+            "실시간 시장·계좌·위험 게이트 없음"
+          ]
+        },
+        "source_contributions": [
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15548",
+            "affected_field": "research_priority",
+            "direction": "up",
+            "reason": "오전 관심목록 편입은 독립 검증할 관찰 이유"
+          },
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15550",
+            "affected_field": "confidence",
+            "direction": "down",
+            "reason": "당일 확정 일봉 표현이 게시 시각과 맞지 않아 시세 근거 보류"
+          },
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15556",
+            "affected_field": "ranking",
+            "direction": "down",
+            "reason": "후행 미진입 2/10과 성장성 조건 미달로 추격 우선순위 하향"
+          }
+        ],
+        "excluded_event_keys": [
+          "stock_ai_agent:15552",
+          "stock_ai_agent:15554"
+        ]
+      },
+      {
+        "ticker": "252990.KS",
+        "display_name": "샘씨엔에스",
+        "rank": 3,
+        "thesis": {
+          "stance": "RESEARCH",
+          "horizon": "별도 실제 계좌·시장 전략 확인 전",
+          "confidence": 0.1,
+          "research_priority": 3,
+          "rationale": "가상 포트폴리오 스냅샷만 있으며 실제 보유·주문 근거가 아님.",
+          "entry_conditions": [
+            "독립적인 실제 계좌 스냅샷과 KR 시장 전략 확인"
+          ],
+          "invalidation_conditions": [
+            "가상 보유 수익률을 실제 계좌 성과로 혼동"
+          ],
+          "invalidation_action": "가상 수익률을 실행 근거에서 제외하고 실제 계좌 확인 전 주문 보류",
+          "position_sizing": "신규 실행 배분 0%"
+        },
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action_now": null,
+          "action_if_triggered": null,
+          "blockers": [
+            "simulation_only",
+            "실제 계좌·시장·위험 게이트 없음"
+          ]
+        },
+        "source_contributions": [
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15557",
+            "affected_field": "position_size_within_existing_risk_limits",
+            "direction": "no_increase",
+            "reason": "가상 1/10 보유 및 +27.38%는 실제 신규 배분을 늘리지 않음"
+          }
+        ]
+      }
+    ],
+    "coverage_receipt": {
+      "event_id": "prism:9b2aa37574b7901c3d8f5b35efe6d3b3",
+      "status": "COMPLETE",
+      "window_events": 10,
+      "transmitted_events": 10,
+      "truncated": false,
+      "new_events": 10,
+      "revised_events": 0
+    },
+    "model_receipt": {
+      "schema": "tradingagents.model-provenance/v1",
+      "work_synthesis": {
+        "execution_mode": "local",
+        "requested_model": "gpt-6-sol",
+        "requested_reasoning_effort": "xhigh",
+        "task_id": "tradingagents-work-prism",
+        "verification_status": "CONFIGURED_NOT_RUNTIME_VERIFIED",
+        "observed_model": null,
+        "observed_reasoning_effort": null,
+        "note": "The local task contract is verified; the Work host does not expose a signed per-response model receipt."
+      }
+    },
+    "source_summary": {
+      "producer": {
+        "health": "OK",
+        "run_id": "prism_telegram_20261002_132921",
+        "last_run_at": "2026-10-02T13:29:31.997675+09:00",
+        "status": "success",
+        "stale_after_hours": 30
+      },
+      "window_hours": 24,
+      "coverage": {
+        "total_unique_events": 112,
+        "window_events": 10,
+        "transmitted_events": 10,
+        "truncated": false,
+        "oldest_occurred_at": "2026-10-02T00:45:50+00:00",
+        "newest_occurred_at": "2026-10-02T01:02:28+00:00"
+      },
+      "delta": {
+        "new_events": 10,
+        "revised_events": 0,
+        "unchanged_events": 0,
+        "delivered_event_keys": [
+          "stock_ai_agent:15557",
+          "stock_ai_agent:15556",
+          "stock_ai_agent:15555",
+          "stock_ai_agent:15554",
+          "stock_ai_agent:15553",
+          "stock_ai_agent:15552",
+          "stock_ai_agent:15551",
+          "stock_ai_agent:15550",
+          "stock_ai_agent:15549",
+          "stock_ai_agent:15548"
+        ]
+      },
+      "evidence_policy": {
+        "profile": "balanced_external",
+        "material_thesis_effects": [
+          "ranking",
+          "confidence",
+          "position_size_within_existing_risk_limits",
+          "research_priority"
+        ],
+        "supported_evidence_weight": "MEDIUM",
+        "partially_supported_evidence_weight": "LOW_TO_MEDIUM",
+        "unverified_evidence_weight": "LOW_LABELED",
+        "user_primary_channels": [
+          "@kpunch",
+          "@sosumonkey"
+        ],
+        "user_primary_source_tier": "USER_PRIMARY",
+        "user_primary_evidence_weight": "HIGH",
+        "user_primary_validation_policy": "USER_ACCEPTED",
+        "matching_multi_source_signal_may_raise_thesis_priority": true,
+        "conflicting_signal_must_be_visible": true,
+        "may_bypass_market_or_portfolio_execution_gate": false
+      },
+      "relevant_new_evidence": [
+        "stock_ai_agent:15548",
+        "stock_ai_agent:15549",
+        "stock_ai_agent:15550",
+        "stock_ai_agent:15551",
+        "stock_ai_agent:15552",
+        "stock_ai_agent:15553",
+        "stock_ai_agent:15554",
+        "stock_ai_agent:15555",
+        "stock_ai_agent:15556",
+        "stock_ai_agent:15557"
+      ],
+      "excluded_evidence": [
+        {
+          "event_key": "stock_ai_agent:15551",
+          "reason": "PDF 본문 미전송"
+        },
+        {
+          "event_key": "stock_ai_agent:15552",
+          "reason": "PDF 본문 미전송"
+        },
+        {
+          "event_key": "stock_ai_agent:15553",
+          "reason": "O'Neil 차트 원본·피벗·RS 미검증"
+        },
+        {
+          "event_key": "stock_ai_agent:15554",
+          "reason": "O'Neil 차트 원본·피벗·RS 미검증"
+        }
+      ],
+      "data_quality": [
+        "오전 게시물 15549·15550의 당일 종가/확정 일봉 표현은 시점 모순",
+        "Telegram 점수·confidence는 독립 검증 신뢰도가 아님",
+        "다중 종목 알럿 15548의 가격은 종목별 재검증 전 사용하지 않음"
+      ],
+      "source_health_scope": "정제 생산자와 이벤트 시각만 확인; 실시간 시세·계좌·외부 전달 미검증",
+      "market_data_status": "UNVERIFIED",
+      "market_data_asof": null,
+      "valid_until": null,
+      "kr_handoff": "RF 계약·가격 공식 확인 1순위, 대한광통신 후행 미진입으로 2순위; 신규 배분 0%, 실행 게이트 유지",
+      "us_handoff": "직접 일치 종목 없음; US thesis 조정 근거 없음"
+    },
+    "next_checkpoint": {
+      "at": "2026-10-03T00:45:50+00:00",
+      "trigger": "다음 성공한 정제 생산 결과 또는 현재 창 최오래 이벤트 만료 중 먼저 도래",
+      "current_window_expires_at": "2026-10-03T00:45:50+00:00",
+      "required_evidence": [
+        "DART 공급계약 원문",
+        "거래소 확정 일봉·거래량",
+        "분기 실적·기업 IR",
+        "실시간 시장·계좌·위험 게이트"
+      ]
+    },
+    "mobile_handoff": {
+      "owner": "external_github_notification_pipeline",
+      "status": "PENDING_EXTERNAL_VERIFICATION",
+      "work_sent_notification": false
+    },
+    "external_delivery_verified": false
+  },
+  "report_id": "prism:c5281b9b938ca0dc14b9f810aa2b5642",
+  "report_sha256": "c5281b9b938ca0dc14b9f810aa2b56425e2b54d75e2a5dad4423b62d0e5d869c",
+  "published_at": "2026-10-03T08:40:51.412547+09:00"
+}

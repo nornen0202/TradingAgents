@@ -1,0 +1,116 @@
+{
+  "schema": "tradingagents.work-report/v1",
+  "surface": "youtube",
+  "event_id": "youtube:f4e9d9d98086f7565824be0a07921960",
+  "source_sha256": "ca83dea247c44d0b17901a0580a3758566ce4fecd9abde6d5ba9204ab39836a2",
+  "prompt_contract_version": "youtube-work-v5",
+  "workflow_contract_sha256": "f4c5d26ccdc8a46fd292e6f2b5aa9647d922328ecba67957c80aca88fbdbca4d",
+  "policy": {
+    "visibility": "investor_safe_no_credentials",
+    "external_evidence_profile": "balanced_external",
+    "external_evidence_may_affect": [
+      "ranking",
+      "confidence",
+      "position_size_within_existing_risk_limits",
+      "research_priority"
+    ],
+    "external_evidence_may_bypass_execution_gate": false,
+    "thesis_is_independent_from_execution_readiness": true
+  },
+  "report_markdown": "# YouTube 검증 델타 · 새 근거 없음\n\n작성 2026-09-30T08:33:29+09:00 · 생산자 수집 완료 2026-09-29T07:38:41.320018+09:00 · 소스 OK (24.91시간 경과 / 36시간 한도).\n\n**NO_ACTIONABLE_DELTA.** 새 영상 0건, 수정 0건입니다. 기존 43건은 중복 제외했습니다. 이번 정본 로컬 패킷에는 새 이벤트 본문과 event key가 없어 이전 주장을 다시 평가하거나 새 근거로 집계하지 않았습니다.\n\n## 범위와 검증\n\n- 패킷 메타데이터: 72시간 범위 43건, 전송 43건, 잘림 false. 생략 건수는 별도 제공되지 않았습니다. 개별 이벤트를 이번 패킷에서 대조할 수 없으므로 범위 검증은 **UNVERIFIED**입니다.\n- 생산자 완료 시각과 범위 양 끝 시각은 파싱 가능하며 순서가 맞고 미래 시각이 아닙니다. 가장 오래된 범위 시각은 작성 시점 기준 72시간 이내입니다. 개별 발생·게시 시각, 시장 시세, 계좌 상태, 실행 유효기간은 이번 델타에 없습니다.\n- 새로 분류할 supported·partially supported·unverified·ASR uncertain 주장이 없습니다. 공식 원자료로 새로 확인한 변화나 반증도 없습니다.\n\n## KR·US 연구와 실행\n\n- 새롭거나 수정된 정확한 event key가 없어 이번 balanced_external 반영으로 종목 순위·가설 신뢰도·기존 위험 한도 내 크기·연구 우선순위를 바꾸지 않습니다. 기존 가설은 유지하되 이전 영상을 현재 근거로 재사용하지 않습니다.\n- 허용 액션은 **NO_ACTIONABLE_DELTA**입니다. YouTube 패킷은 실행 적격이 아니며, 현재 주문·목표가·손절가를 만들지 않았습니다. 시장·계좌·위험 검증이 필요합니다.\n- 이전 영상의 과장된 숫자, ASR 오류, 오래된 주장도 이번에 재검증하지 않았으므로 최신 사실이나 즉시 매매 근거로 쓰지 않습니다.\n\n다음 공식 검증: 새/수정 정본 이벤트가 들어오면 정확한 event key·content hash와 발생·게시 시각을 먼저 확인하고, 관련 핵심 수치만 공시·회사 발표·공식 통계 원자료로 대조합니다. 실행 판단은 별도 시장·계좌·위험·유효기간 검증 후에만 가능합니다.\n\nCOVERAGE_RECEIPT {\"event_id\":\"youtube:f4e9d9d98086f7565824be0a07921960\",\"status\":\"UNVERIFIED\",\"window_events\":43,\"transmitted_events\":43,\"truncated\":false,\"new_events\":0,\"revised_events\":0}\nMOBILE_HANDOFF {\"owner\":\"external_github_notification_pipeline\",\"status\":\"PENDING_EXTERNAL_VERIFICATION\",\"work_sent_notification\":false}",
+  "structured_report": {
+    "binding": {
+      "surface": "youtube",
+      "event_id": "youtube:f4e9d9d98086f7565824be0a07921960",
+      "source_sha256": "ca83dea247c44d0b17901a0580a3758566ce4fecd9abde6d5ba9204ab39836a2"
+    },
+    "title": "YouTube 검증 델타 · 새 근거 없음",
+    "generated_at": "2026-09-30T08:33:29+09:00",
+    "as_of": "2026-09-29T07:38:41.320018+09:00",
+    "source_health": "OK",
+    "report_mode": "NO_ACTIONABLE_DELTA",
+    "summary": [
+      "신규 0·수정 0·중복 제외 43; 새 전송 이벤트 본문 없음.",
+      "생산자는 24.91시간 경과로 36시간 한도 내이나 개별 이벤트 범위는 UNVERIFIED.",
+      "새 balanced_external 연구 영향 없음; 실행 gate와 신규 집행 0 유지."
+    ],
+    "top_actions": [],
+    "strategies": [],
+    "coverage_receipt": {
+      "event_id": "youtube:f4e9d9d98086f7565824be0a07921960",
+      "status": "UNVERIFIED",
+      "window_events": 43,
+      "transmitted_events": 43,
+      "truncated": false,
+      "new_events": 0,
+      "revised_events": 0
+    },
+    "model_receipt": {
+      "schema": "tradingagents.model-provenance/v1",
+      "work_synthesis": {
+        "execution_mode": "local",
+        "requested_model": "gpt-6-sol",
+        "requested_reasoning_effort": "xhigh",
+        "task_id": "tradingagents-work-youtube",
+        "verification_status": "CONFIGURED_NOT_RUNTIME_VERIFIED",
+        "observed_model": null,
+        "observed_reasoning_effort": null,
+        "note": "The local task contract is verified; the Work host does not expose a signed per-response model receipt."
+      }
+    },
+    "source_summary": {
+      "run_id": "youtube_20260929_065426",
+      "source_status": "success",
+      "source_health": "OK",
+      "last_run_at": "2026-09-29T07:38:41.320018+09:00",
+      "stale_after_hours": 36,
+      "age_hours_at_generation": 24.9135,
+      "coverage": {
+        "total_unique_events": 301,
+        "window_events": 43,
+        "transmitted_events": 43,
+        "truncated": false,
+        "oldest_occurred_at": "2026-09-27T01:00:24+00:00",
+        "newest_occurred_at": "2026-09-28T12:10:04+00:00"
+      },
+      "omitted_events": null,
+      "delta": {
+        "new_events": 0,
+        "revised_events": 0,
+        "unchanged_events": 43,
+        "delivered_event_keys": []
+      },
+      "events_received": 0,
+      "new_claims_verified": 0,
+      "no_relevant_evidence_reason": "새롭거나 수정된 정본 이벤트가 없어 종목별 연구 영향 없음",
+      "execution_eligible": false,
+      "execution_gate_override": false,
+      "time_validation": {
+        "producer_and_coverage_parseable": true,
+        "ordered": true,
+        "future_dated": false,
+        "oldest_within_window_hours": true,
+        "individual_event_timestamps_available": false,
+        "market_and_validity_timestamps_available": false
+      }
+    },
+    "next_checkpoint": {
+      "focus": "새/수정 정본 수집과 공식 원자료 대조",
+      "required_rechecks": [
+        "생산자 성공 및 36시간 신선도",
+        "정확한 event key·content hash와 개별 발생/게시 시각",
+        "관련 핵심 수치의 공식 원자료",
+        "시장·계좌·위험·유효기간 실행 gate"
+      ]
+    },
+    "mobile_handoff": {
+      "owner": "external_github_notification_pipeline",
+      "status": "PENDING_EXTERNAL_VERIFICATION",
+      "work_sent_notification": false
+    },
+    "external_delivery_verified": false
+  },
+  "report_id": "youtube:0093b9afe9f4501908414f2e203687ee",
+  "report_sha256": "0093b9afe9f4501908414f2e203687eef18456610c959254adfa428f0b452a1c",
+  "published_at": "2026-09-30T08:33:38.430598+09:00"
+}

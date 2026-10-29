@@ -1,0 +1,1684 @@
+{
+  "schema": "tradingagents.work-report/v1",
+  "surface": "youtube",
+  "event_id": "youtube:cfe799bc3c5aeb0c647a134289622fb9",
+  "source_sha256": "cd2574367fbe02eafc5b7846be1ca1bf59a78e9acf3d6a5a068654011aff41be",
+  "prompt_contract_version": "youtube-work-v5",
+  "workflow_contract_sha256": "bc33d7680318d3200a3ef2fd2cc1f830d41fd1ba019e4f20ed6d1951cd6dc343",
+  "policy": {
+    "visibility": "investor_safe_no_credentials",
+    "external_evidence_profile": "balanced_external",
+    "external_evidence_may_affect": [
+      "ranking",
+      "confidence",
+      "position_size_within_existing_risk_limits",
+      "research_priority"
+    ],
+    "external_evidence_may_bypass_execution_gate": false,
+    "thesis_is_independent_from_execution_readiness": true
+  },
+  "report_markdown": "# YouTube 검증 델타 — 2026-10-02 08:36 KST\n\n**연구 우선순위만 조정 · 신규 실행 0**\n\n생산자 `youtube_20261002_070408` 성공, 0.71시간 경과 / 36시간 한도. 신규 **32건**, 수정 **0건**, 동일 **28건** 제외. 신규 32건 모두 최근 24시간 이내.\n\n## 한 화면 핵심 변화\n\n1. **GOOGL 연구 1순위:** [Google 공식 발표](https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-4-argon/)로 Gemini 4 Argon의 제한 배포, 100만 출력 토큰, 출시 예정 입출력 100만 토큰당 2·10달러를 확인했다. 대중 출시·수익 기여는 미확인이다.\n2. **MU 연구 2순위:** [Micron 공식 실적](https://investors.micron.com/news/press-release/2026/Micron-Technology-Inc--Reports-Record-Fiscal-Fourth-Quarter-and-Full-Year-2026-Results/default.aspx)의 4분기 매출 542.29억 달러·비GAAP 총마진 87.0%, 다음 분기 매출 615억±15억 달러 가이던스를 확인했다. 영상의 컨센서스 상회율·HBM 가격은 별도 검증이 필요하다.\n3. **TLT 위험 점검 상향:** 소수몽키 USER_PRIMARY/HIGH 영상의 7~8% 장기금리 가정은 시나리오다. 원문과 실제 국채금리 확인 전 규모 확대 근거로 쓰지 않는다.\n4. **시장 위험:** [ISM 9월 원자료](https://www.ismworld.org/supply-management-news-and-reports/reports/ism-pmi-reports/pmi/september/)는 제조업 PMI 54.5, 가격지수 77.9(8월 71.1)를 보여준다. 영상의 금리 확률·한국 장중 수급을 그대로 주문 신호로 옮기지 않는다.\n5. **검증 범위 제한:** 72시간 창 99건 중 60건 전송·truncated=true. coverage 최종 시각이 실제 신규 이벤트 2건보다 앞서고 근거 연결도 손상돼 전수성은 UNVERIFIED다.\n\n## 출처·범위\n\n- 원천 상태 OK, 마지막 생산 시각 `2026-10-02T07:53:51.311718+09:00`. 이벤트 발생·게시 시각은 모두 파싱 가능하고 비미래·생산 시각 이전이다. 나이는 1.57~23.46시간.\n- 전송 60 / 창 99; 신규 32·수정 0·동일 28 제외. 전송 밖 실제 이벤트 구성과 생략 수는 증명하지 못한다.\n- 선언된 최신 `2026-10-01T12:02:43+00:00`보다 실제 신규 최신 `2026-10-01T22:02:01+00:00`가 늦다. 특히 `d8jrvR1VuAo`, `Z5N-cLEAcjU`가 범위 시각 밖이다.\n- 신규 주장 상태: 미검증 153, ASR 불확실 26, 부분 지지 12, 반증 1. 근거 179행 중 잘못 연결된 주장 참조 7건, 시각을 읽을 수 없는 근거 2건은 독립 확인 근거로 사용하지 않는다.\n\n## 확인된 변화와 남은 반증\n\n- **공식 확인:** [Google](https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-4-argon/)은 Gemini 4 Argon을 신뢰된 사이버 방어자에게 우선 배포하고 개발자·기업·소비자 공개를 단계적으로 추진한다. 이는 영상 `Z5N-cLEAcjU`의 발표 존재를 뒷받침하지만 영상의 외부 벤치마크·비용 추정은 증명하지 않는다.\n- **공식 확인:** [Micron](https://investors.micron.com/news/press-release/2026/Micron-Technology-Inc--Reports-Record-Fiscal-Fourth-Quarter-and-Full-Year-2026-Results/default.aspx)의 위 실적과 가이던스는 확인된다. `d8jrvR1VuAo`, `QRnPK_PbT-w` 등의 HBM 완판·가격 120% 상승, 국내 업체 목표주가는 원자료 검증 전 미확인이다.\n- **공식 확인:** [ISM](https://www.ismworld.org/supply-management-news-and-reports/reports/ism-pmi-reports/pmi/september/)의 제조업 PMI는 54.5(전월 54.6), 가격지수는 77.9(전월 71.1)다. 방송의 연준 확률 74%·25%와 유가 93달러는 시점·원자료 미확인이다.\n- **반증/과장 회피:** `2VRcnEHujo0`의 HBM 가격 상승률 121% 주장은 packet에서 contradicted. `XRBG7RMONlw`의 삼성전자 PER·목표가와 AI API 가격 발화는 ASR 불확실이며 투자 가정으로 사용하지 않는다.\n\n## KR·US 연구 영향\n\n| 순위 | 대상 | 허용 액션 | 근거/신뢰도 | 조건부 위험 한도 비율* |\n|---:|---|---|---|---:|\n| 1 | Alphabet `GOOGL` | `UPGRADE_RESEARCH` | Gemini 4 Argon 공식 발표가 신규 확인됐다. 제한 배포·1M 출력 토큰·출시 예정 입출력 단가는 확인되지만 대중 출시와 수익 기여는 미확인이다. 점수 0.68 | 12% |\n| 2 | Micron `MU` | `UPGRADE_RESEARCH` | Micron 공식 FY26 4분기 매출 542.29억 달러·비GAAP 총마진 87.0%, 다음 분기 매출 가이던스 615억±15억 달러를 확인했다. 영상의 시장 예상치 상회율·HBM 가격 급등은 별도 검증이 필요하다. 점수 0.64 | 15% |\n| 3 | 미국 장기국채 ETF `TLT` | `UPGRADE_RESEARCH` | 소수몽키 USER_PRIMARY/HIGH의 7~8% 장기금리 시나리오를 위험 연구 우선순위에 반영한다. 예측치·ARK 인용과 현물금리 수치는 원자료 미확인으로 사실 판단은 보류한다. 점수 0.32 | 2% |\n| 4 | 삼성전자 `005930.KS` | `UPGRADE_WATCH` | 새 영상들이 반도체 수급·HBM 확대를 반복한다. Micron의 공식 실적은 수요 배경일 뿐 삼성전자 이익·목표가로 전이할 근거는 부족하다. 점수 0.43 | 6% |\n| 5 | SK하이닉스 `000660.KS` | `UPGRADE_WATCH` | Micron 실적과 국내 메모리 영상의 방향은 일치하지만 HBM 완판·가격·국내 이익 전이는 검증되지 않았다. 점수 0.40 | 5% |\n| 6 | 한국 증시 `^KS11` | `DOWNGRADE_RISK` | 방송의 당일 수급·지수 숫자는 원시세와 불일치 가능성이 있다. ISM 9월 가격지수 77.9는 공식 확인돼 인플레이션 위험 점검을 앞당긴다. 점수 0.44 | 0% |\n| 7 | 원유 위험 지표 `CL=F` | `REQUIRES_PRIMARY_VERIFICATION` | 방송의 유가 93달러·병력 증강·비축유 방출 주장은 원시세와 정부 발표를 확인하지 못했다. 지정학 위험 점검만 남긴다. 점수 0.28 | 0% |\n\n\\* 기존 종목·섹터·총 위험 한도가 **별도 확인되고 모든 시장·계좌·위험 게이트가 통과된 이후에만** 적용할 연구 상한이다. 현재 한도·보유·미체결·시세 유효 시각이 없으므로 현재 신규 실행은 모두 0이다. 점수는 연구 근거 충족도이며 수익 확률이 아니다.\n\n## 다음 공식 확인\n\n- Google 출시·실사용·수익화 공지, Micron HBM 계약·다음 가이던스, 삼성전자·SK하이닉스 고객·마진 공시.\n- 미 재무부 수익률과 ARK 원문으로 TLT 7~8% 시나리오 검증. EIA·정부 발표로 유가·비축유 주장 검증.\n- KRX 종가·현선물 수급, 영상의 금리 확률 원시점, coverage newest·절단 사유와 근거 ID 정정.\n\n## 처리된 신규 이벤트 32건\n\n이 목록은 받은 32건의 식별자·영상·상태를 모두 보존한다. 상세 주장은 위에서 관련성·공식 근거에 따라 선별했다.\n\n1. `2cduC5_rK9I` [초고금리 뉴노멀 시대에 대비하라? 월가 초고수의 깜짝 예언, 적중할까](https://www.youtube.com/watch?v=2cduC5_rK9I) — asr_uncertain, USER_PRIMARY/HIGH\n2. `d8jrvR1VuAo` [마이크론, 호실적 재평가에 3%↑...10월 금리인상 전망 25%로 하락 [월가 뉴스레터]](https://www.youtube.com/watch?v=d8jrvR1VuAo) — contradicted, STANDARD/STANDARD\n3. `Z5N-cLEAcjU` [제미나이 4와 구글의 전략, 전부 뜯어왔습니다](https://www.youtube.com/watch?v=Z5N-cLEAcjU) — unverified, STANDARD/STANDARD\n4. `d1MJpyjuRTU` [\"오르든 떨어지든 10월 중순까지 모아가세요\" 연말까지 가져갈 포트폴리오 짜는 법ㅣ명민준, 박가영, 유창희 [주린이 구조대]](https://www.youtube.com/watch?v=d1MJpyjuRTU) — asr_uncertain, STANDARD/STANDARD\n5. `TNcFcPkOKnA` [호실적에도 주가가 밀리는 이유…주도주 '실적 발표 후 조정'을 매수 기회로 보는 이유ㅣ명민준, 박가영, 이지환 [주린이 구조대]](https://www.youtube.com/watch?v=TNcFcPkOKnA) — unverified, STANDARD/STANDARD\n6. `ewRjCYhBooE` [[#찐시황]  지금은 중요한 판단을 해야 할 때… 외인·기관이 오전 10시부터 코스닥을 ‘폭풍 매수’한 진짜 이유 (주가급등) 황유현 팀장](https://www.youtube.com/watch?v=ewRjCYhBooE) — asr_uncertain, STANDARD/STANDARD\n7. `rd77d96IFNQ` [오늘 코스피가 바닥에서 주가 '끌어올린' 진짜 이유](https://www.youtube.com/watch?v=rd77d96IFNQ) — unverified, STANDARD/STANDARD\n8. `EnWJ_wX_mh0` [[#긴급인터뷰]  반도체 다음은 로봇주?  현대차 언제 다시 터질까? /  반도체 소부장, 팔 주식·살 주식 이렇게 나누세요 ㅣ김대준 대표](https://www.youtube.com/watch?v=EnWJ_wX_mh0) — asr_uncertain, STANDARD/STANDARD\n9. `VvZ21JSmsMk` [AI 투자도 결국 '돈'…상승하는 국채금리 속 10월 증시가 확인해야 할 '약한 고리'ㅣ홍선애, 장우진 금시공 대표 [여의도 인사이트]](https://www.youtube.com/watch?v=VvZ21JSmsMk) — asr_uncertain, STANDARD/STANDARD\n10. `sJf7zex09lU` [월가에서 지금 '삼전·닉스' 가장 싸게 살 기회라는 이유](https://www.youtube.com/watch?v=sJf7zex09lU) — unverified, STANDARD/STANDARD\n11. `nM4lkpDlZ7U` [271조 대미투자 한국한테 이득일까 손해일까](https://www.youtube.com/watch?v=nM4lkpDlZ7U) — unverified, STANDARD/STANDARD\n12. `JVTrllgMcnc` [[#긴급시황] 오후 들어 증시 급반등… 바닥 신호 나왔나? / 코스닥이 갑자기 급등한 진짜 이유ㅣ 이권희 대표](https://www.youtube.com/watch?v=JVTrllgMcnc) — asr_uncertain, STANDARD/STANDARD\n13. `OyoOIVj2oi4` [30년 아시아 투자자의 시선으로 보는 한국 시장의 새로운 기회](https://www.youtube.com/watch?v=OyoOIVj2oi4) — asr_uncertain, STANDARD/STANDARD\n14. `P7hhvY49uGY` [[10월 1일 마감시황] 코스닥 4% 급등의 중심은 반도체…소부장 전반으로 번진 매수세ㅣ홍선애, 이권희, 김장열 [클로징벨 라이브]](https://www.youtube.com/watch?v=P7hhvY49uGY) — asr_uncertain, STANDARD/STANDARD\n15. `2VRcnEHujo0` [[#글로벌인사이트]  AI 버블이라고? 아직 반도 안 왔다 / 휴머노이드 로봇에서 ‘진짜 큰 돈’ 벌어줄 핵심 부품주는 ‘여기’ ㅣ 세미콘 리서치랩 노근창 대표](https://www.youtube.com/watch?v=2VRcnEHujo0) — contradicted, STANDARD/STANDARD\n16. `riSXei3ngz8` [오늘 트럼프가 공개한 '271조 대미투자', 한국 수혜주는?](https://www.youtube.com/watch?v=riSXei3ngz8) — unverified, STANDARD/STANDARD\n17. `4txSymuswco` [\"상승장에 속지 마세요\" 지금 당장 수익 챙기고 갈아탈 덜 오른 대장주 공개ㅣ권다영, 김태성 아이에셋 본부장 [2시 마켓워치]](https://www.youtube.com/watch?v=4txSymuswco) — asr_uncertain, STANDARD/STANDARD\n18. `XRBG7RMONlw` [삼성전자 PER 4배… 목표가 27만 vs 63만, 누가 맞나? / 반도체 30% 폭락? 사실상 불가능한 이유 ㅣ유니스토리자산운용 김장열 센터장](https://www.youtube.com/watch?v=XRBG7RMONlw) — asr_uncertain, STANDARD/STANDARD\n19. `P57Gh76CCOw` [삼전닉스만 붙잡지 마라…지금은 시장 전체의 힘을 받아야 할 때ㅣ권다영, 차영주 와이즈경제연구소 소장](https://www.youtube.com/watch?v=P57Gh76CCOw) — asr_uncertain, STANDARD/STANDARD\n20. `XUDkSgOxTIo` ['매크로 환경'이 뭐길래, 외국인이 빠져나가는 걸까?](https://www.youtube.com/watch?v=XUDkSgOxTIo) — unverified, STANDARD/STANDARD\n21. `HtZlJPSkS2Y` [전고점 향해 달리는 마이크론 PER 7배... 삼전·SK하닉은 4배, 언제 따라갈까? / 코스피 ‘전약후강’ 겁먹지 마세요 이권희 대표](https://www.youtube.com/watch?v=HtZlJPSkS2Y) — asr_uncertain, STANDARD/STANDARD\n22. `YLKqcNKB5c4` [클래리티 법안 좌초에도 기업들은 미국으로 몰렸다  | 서동주, 김동환, 김준우 쟁글 대표 [크립토 PLUS]](https://www.youtube.com/watch?v=YLKqcNKB5c4) — asr_uncertain, STANDARD/STANDARD\n23. `1KBur1Z64AA` [절대 사지 말아야 할 '주식 타이밍 & 습관' | [하나증권 대규모 세미나 영상]](https://www.youtube.com/watch?v=1KBur1Z64AA) — asr_uncertain, STANDARD/STANDARD\n24. `QMDTZ4X5Qlk` [7년 만에 한국 찾은 조셉 루빈, 글로벌 거장들이 한국 시장을 찾는 이유 | 서동주, 김동환, 박현영 뉴스1 기자 [크립토 PLUS]](https://www.youtube.com/watch?v=QMDTZ4X5Qlk) — asr_uncertain, STANDARD/STANDARD\n25. `Nf3fc2UTsfc` [마이크론이 AI 상승을 확신하는 이유](https://www.youtube.com/watch?v=Nf3fc2UTsfc) — asr_uncertain, STANDARD/STANDARD\n26. `XjIIS_HydZs` [커버드콜ETF 지금이 적기? 코스피200 vs 코스닥150 선택은? | 여도은, 허재무,임주명, 차진호 [아침N투자]](https://www.youtube.com/watch?v=XjIIS_HydZs) — asr_uncertain, STANDARD/STANDARD\n27. `BCnufl6yRqE` [\"10월 중심이 될 곳\" 수급 이쪽으로 간다 | 권택중 하나증권 더센터필드W 부지점장 [더블 크루]](https://www.youtube.com/watch?v=BCnufl6yRqE) — asr_uncertain, STANDARD/STANDARD\n28. `43roYkzGjm4` [\"삼전닉스에서 소부장으로\" 수급 변수 어떻게 될까 | 김록호 하나증권 리서치센터 팀장 [더블 업]](https://www.youtube.com/watch?v=43roYkzGjm4) — asr_uncertain, STANDARD/STANDARD\n29. `QRnPK_PbT-w` [마이크론 실적 터졌다… HBM 내년까지 완판·가격도 오른다 / 그런데 삼전·SK하닉 왜 주가 급등 못하나? ㅣ 이주연 대표](https://www.youtube.com/watch?v=QRnPK_PbT-w) — asr_uncertain, STANDARD/STANDARD\n30. `ppjafgxLZNU` [\"너무나 좋은 신호\" 반도체 소부장 돌파의 의미 | 하창완 하보노의 주식 이야기 대표 [더블 체크]](https://www.youtube.com/watch?v=ppjafgxLZNU) — asr_uncertain, STANDARD/STANDARD\n31. `m70tbr6SMa0` [마이크론 실적 발표, 10월1일 코스피 상승장 온다](https://www.youtube.com/watch?v=m70tbr6SMa0) — asr_uncertain, STANDARD/STANDARD\n32. `7423mEzaC68` [4분기 증시, 박스권 벗어날까? 외국인 매도가 관건 | 박병창 MP파트너스 대표 [마켓 인사이드]](https://www.youtube.com/watch?v=7423mEzaC68) — unverified, STANDARD/STANDARD\n\n## 영수증\n\nCOVERAGE_RECEIPT {\"event_id\":\"youtube:cfe799bc3c5aeb0c647a134289622fb9\",\"status\":\"UNVERIFIED\",\"window_events\":99,\"transmitted_events\":60,\"truncated\":true,\"new_events\":32,\"revised_events\":0}\nMOBILE_HANDOFF {\"owner\":\"external_github_notification_pipeline\",\"status\":\"PENDING_EXTERNAL_VERIFICATION\",\"work_sent_notification\":false}\n\n모델 설정은 local `gpt-6-sol`/`xhigh`이나 응답별 실행 모델은 확인되지 않았다. 로컬 ACK는 이 이벤트의 렌더링만 증명하며 Telegram·Pages 외부 전달은 미확인이다.",
+  "structured_report": {
+    "binding": {
+      "surface": "youtube",
+      "event_id": "youtube:cfe799bc3c5aeb0c647a134289622fb9",
+      "source_sha256": "cd2574367fbe02eafc5b7846be1ca1bf59a78e9acf3d6a5a068654011aff41be"
+    },
+    "title": "YouTube 검증 델타 — 2026-10-02",
+    "generated_at": "2026-10-02T08:36:14+09:00",
+    "as_of": "2026-10-02T07:53:51.311718+09:00",
+    "source_health": "OK",
+    "report_mode": "VERIFICATION_DELTA",
+    "summary": [
+      "신규 32건·수정 0건·동일 28건 제외. 생산자 성공, 모든 신규 이벤트 최근 24시간 이내.",
+      "Google의 Gemini 4 Argon 제한 배포·출시 예정 가격, Micron 실적, ISM 제조업 물가지수를 공식 원자료로 확인했다.",
+      "소수몽키 USER_PRIMARY/HIGH 금리 시나리오는 TLT 위험 연구를 높이지만 7~8% 예측을 현재 사실로 사용하지 않는다.",
+      "coverage 절단·newest 시각 역전과 근거 ID·시각 결함으로 전수성 UNVERIFIED. 신규 실행은 0."
+    ],
+    "top_actions": [
+      {
+        "ticker": "GOOGL",
+        "rank": 1,
+        "action": "UPGRADE_RESEARCH",
+        "readiness": "RESEARCH_ONLY",
+        "reason": "Gemini 4 Argon 공식 발표가 신규 확인됐다. 제한 배포·1M 출력 토큰·출시 예정 입출력 단가는 확인되지만 대중 출시와 수익 기여는 미확인이다."
+      },
+      {
+        "ticker": "MU",
+        "rank": 2,
+        "action": "UPGRADE_RESEARCH",
+        "readiness": "RESEARCH_ONLY",
+        "reason": "Micron 공식 FY26 4분기 매출 542.29억 달러·비GAAP 총마진 87.0%, 다음 분기 매출 가이던스 615억±15억 달러를 확인했다. 영상의 시장 예상치 상회율·HBM 가격 급등은 별도 검증이 필요하다."
+      },
+      {
+        "ticker": "TLT",
+        "rank": 3,
+        "action": "UPGRADE_RESEARCH",
+        "readiness": "RESEARCH_ONLY",
+        "reason": "소수몽키 USER_PRIMARY/HIGH의 7~8% 장기금리 시나리오를 위험 연구 우선순위에 반영한다. 예측치·ARK 인용과 현물금리 수치는 원자료 미확인으로 사실 판단은 보류한다."
+      },
+      {
+        "ticker": "005930.KS",
+        "rank": 4,
+        "action": "UPGRADE_WATCH",
+        "readiness": "RESEARCH_ONLY",
+        "reason": "새 영상들이 반도체 수급·HBM 확대를 반복한다. Micron의 공식 실적은 수요 배경일 뿐 삼성전자 이익·목표가로 전이할 근거는 부족하다."
+      },
+      {
+        "ticker": "000660.KS",
+        "rank": 5,
+        "action": "UPGRADE_WATCH",
+        "readiness": "RESEARCH_ONLY",
+        "reason": "Micron 실적과 국내 메모리 영상의 방향은 일치하지만 HBM 완판·가격·국내 이익 전이는 검증되지 않았다."
+      }
+    ],
+    "strategies": [
+      {
+        "ticker": "GOOGL",
+        "name": "Alphabet",
+        "market": "US",
+        "rank": 1,
+        "rank_scope": "THIS_DELTA_RESEARCH_PRIORITY",
+        "portfolio_role": "DISCOVERY",
+        "portfolio_membership_verified": false,
+        "action": "UPGRADE_RESEARCH",
+        "thesis": {
+          "stance": "RESEARCH",
+          "confidence": 0.68,
+          "confidence_semantics": "근거 충족도에 대한 0~1 연구 점수이며 수익 확률이 아님",
+          "rationale": "Gemini 4 Argon 공식 발표가 신규 확인됐다. 제한 배포·1M 출력 토큰·출시 예정 입출력 단가는 확인되지만 대중 출시와 수익 기여는 미확인이다.",
+          "entry_conditions": [
+            "개발자·기업 공개 일정과 실제 채택·매출 공시 확인"
+          ],
+          "invalidation_conditions": [
+            "출시 지연 또는 사용량·단위경제성 악화 확인"
+          ],
+          "invalidation_action": "DOWNGRADE_WATCH",
+          "horizon": "다음 공식 발표·공시 이후 1~4주 재평가",
+          "position_sizing": {
+            "current_new_execution": 0,
+            "existing_verified_risk_limit": null,
+            "existing_verified_risk_limit_required": true,
+            "proposed_max_fraction_of_existing_risk_limit_after_all_gates": 0.12,
+            "formula": "min(verified_ticker_limit * fraction, remaining_sector_limit, remaining_total_risk_capacity); missing input means zero new execution",
+            "is_conditional_research_proposal": true
+          }
+        },
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action": "UPGRADE_RESEARCH",
+          "execution_eligible": false,
+          "valid_until": null,
+          "required_rechecks": [
+            "최신 시장 시세와 유효 시각 확인",
+            "계좌 보유·미체결 주문 확인",
+            "종목·섹터·총 위험 한도 확인",
+            "개발자·기업 공개 일정과 실제 채택·매출 공시 확인"
+          ],
+          "blockers": [
+            "YouTube packet execution_eligible=false",
+            "시장·계좌·위험 게이트와 유효 시각 미제공"
+          ]
+        },
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "Z5N-cLEAcjU",
+            "content_sha256": "15c340fae7487a7118b111d78aab9fa683900d8a03d93e5f73da4bfacd90eb7c",
+            "claim_ids": [
+              "C1",
+              "C3",
+              "C5"
+            ],
+            "source_health": "OK",
+            "event_status": "unverified",
+            "strategy_source_tier": "STANDARD",
+            "strategy_evidence_weight": "STANDARD",
+            "affected_field": "research_priority",
+            "direction": "UP",
+            "reason": "Gemini 4 Argon 공식 발표가 신규 확인됐다. 제한 배포·1M 출력 토큰·출시 예정 입출력 단가는 확인되지만 대중 출시와 수익 기여는 미확인이다.",
+            "source_urls": [
+              "https://www.youtube.com/watch?v=Z5N-cLEAcjU"
+            ],
+            "execution_gate_override": false
+          }
+        ]
+      },
+      {
+        "ticker": "MU",
+        "name": "Micron",
+        "market": "US",
+        "rank": 2,
+        "rank_scope": "THIS_DELTA_RESEARCH_PRIORITY",
+        "portfolio_role": "DISCOVERY",
+        "portfolio_membership_verified": false,
+        "action": "UPGRADE_RESEARCH",
+        "thesis": {
+          "stance": "RESEARCH",
+          "confidence": 0.64,
+          "confidence_semantics": "근거 충족도에 대한 0~1 연구 점수이며 수익 확률이 아님",
+          "rationale": "Micron 공식 FY26 4분기 매출 542.29억 달러·비GAAP 총마진 87.0%, 다음 분기 매출 가이던스 615억±15억 달러를 확인했다. 영상의 시장 예상치 상회율·HBM 가격 급등은 별도 검증이 필요하다.",
+          "entry_conditions": [
+            "다음 공시에서 HBM 계약·가이던스 이행과 고객 수요 확인"
+          ],
+          "invalidation_conditions": [
+            "다음 공시의 가이던스 하향 또는 HBM 수익성 악화 확인"
+          ],
+          "invalidation_action": "DOWNGRADE_WATCH",
+          "horizon": "다음 공식 발표·공시 이후 1~4주 재평가",
+          "position_sizing": {
+            "current_new_execution": 0,
+            "existing_verified_risk_limit": null,
+            "existing_verified_risk_limit_required": true,
+            "proposed_max_fraction_of_existing_risk_limit_after_all_gates": 0.15,
+            "formula": "min(verified_ticker_limit * fraction, remaining_sector_limit, remaining_total_risk_capacity); missing input means zero new execution",
+            "is_conditional_research_proposal": true
+          }
+        },
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action": "UPGRADE_RESEARCH",
+          "execution_eligible": false,
+          "valid_until": null,
+          "required_rechecks": [
+            "최신 시장 시세와 유효 시각 확인",
+            "계좌 보유·미체결 주문 확인",
+            "종목·섹터·총 위험 한도 확인",
+            "다음 공시에서 HBM 계약·가이던스 이행과 고객 수요 확인"
+          ],
+          "blockers": [
+            "YouTube packet execution_eligible=false",
+            "시장·계좌·위험 게이트와 유효 시각 미제공"
+          ]
+        },
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "d8jrvR1VuAo",
+            "content_sha256": "0eeebfc013d9a21041b79d8e4eff8b134218f86cc449db3e473c83b4dee94c3e",
+            "claim_ids": [
+              "C4"
+            ],
+            "source_health": "OK",
+            "event_status": "contradicted",
+            "strategy_source_tier": "STANDARD",
+            "strategy_evidence_weight": "STANDARD",
+            "affected_field": "research_priority",
+            "direction": "UP",
+            "reason": "Micron 공식 FY26 4분기 매출 542.29억 달러·비GAAP 총마진 87.0%, 다음 분기 매출 가이던스 615억±15억 달러를 확인했다. 영상의 시장 예상치 상회율·HBM 가격 급등은 별도 검증이 필요하다.",
+            "source_urls": [
+              "https://www.youtube.com/watch?v=d8jrvR1VuAo"
+            ],
+            "execution_gate_override": false
+          },
+          {
+            "source": "youtube",
+            "event_key": "QRnPK_PbT-w",
+            "content_sha256": "dbf67fb7dcc04643e6992bcf11cf75a4d8e57a2fb9b0eaf43f3d81ef7066fcac",
+            "claim_ids": [
+              "C1",
+              "C4"
+            ],
+            "source_health": "OK",
+            "event_status": "asr_uncertain",
+            "strategy_source_tier": "STANDARD",
+            "strategy_evidence_weight": "STANDARD",
+            "affected_field": "confidence",
+            "direction": "UP",
+            "reason": "Micron 공식 FY26 4분기 매출 542.29억 달러·비GAAP 총마진 87.0%, 다음 분기 매출 가이던스 615억±15억 달러를 확인했다. 영상의 시장 예상치 상회율·HBM 가격 급등은 별도 검증이 필요하다.",
+            "source_urls": [
+              "https://www.youtube.com/watch?v=QRnPK_PbT-w"
+            ],
+            "execution_gate_override": false
+          }
+        ]
+      },
+      {
+        "ticker": "TLT",
+        "name": "미국 장기국채 ETF",
+        "market": "US",
+        "rank": 3,
+        "rank_scope": "THIS_DELTA_RESEARCH_PRIORITY",
+        "portfolio_role": "DISCOVERY",
+        "portfolio_membership_verified": false,
+        "action": "UPGRADE_RESEARCH",
+        "thesis": {
+          "stance": "RESEARCH",
+          "confidence": 0.32,
+          "confidence_semantics": "근거 충족도에 대한 0~1 연구 점수이며 수익 확률이 아님",
+          "rationale": "소수몽키 USER_PRIMARY/HIGH의 7~8% 장기금리 시나리오를 위험 연구 우선순위에 반영한다. 예측치·ARK 인용과 현물금리 수치는 원자료 미확인으로 사실 판단은 보류한다.",
+          "entry_conditions": [
+            "미 재무부 수익률과 ARK 원문·기간 조건을 대조"
+          ],
+          "invalidation_conditions": [
+            "원문과 금리 추이가 시나리오의 전제를 부정하면 축소"
+          ],
+          "invalidation_action": "DOWNGRADE_WATCH",
+          "horizon": "다음 공식 발표·공시 이후 1~4주 재평가",
+          "position_sizing": {
+            "current_new_execution": 0,
+            "existing_verified_risk_limit": null,
+            "existing_verified_risk_limit_required": true,
+            "proposed_max_fraction_of_existing_risk_limit_after_all_gates": 0.02,
+            "formula": "min(verified_ticker_limit * fraction, remaining_sector_limit, remaining_total_risk_capacity); missing input means zero new execution",
+            "is_conditional_research_proposal": true
+          }
+        },
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action": "UPGRADE_RESEARCH",
+          "execution_eligible": false,
+          "valid_until": null,
+          "required_rechecks": [
+            "최신 시장 시세와 유효 시각 확인",
+            "계좌 보유·미체결 주문 확인",
+            "종목·섹터·총 위험 한도 확인",
+            "미 재무부 수익률과 ARK 원문·기간 조건을 대조"
+          ],
+          "blockers": [
+            "YouTube packet execution_eligible=false",
+            "시장·계좌·위험 게이트와 유효 시각 미제공"
+          ]
+        },
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "2cduC5_rK9I",
+            "content_sha256": "d1e9f679f6e278b163c2cece7a9676bd732dc7cdf5a716c9009cd5decafc8eb1",
+            "claim_ids": [
+              "C2",
+              "C3"
+            ],
+            "source_health": "OK",
+            "event_status": "asr_uncertain",
+            "strategy_source_tier": "USER_PRIMARY",
+            "strategy_evidence_weight": "HIGH",
+            "affected_field": "research_priority",
+            "direction": "UP",
+            "reason": "소수몽키 USER_PRIMARY/HIGH의 7~8% 장기금리 시나리오를 위험 연구 우선순위에 반영한다. 예측치·ARK 인용과 현물금리 수치는 원자료 미확인으로 사실 판단은 보류한다.",
+            "source_urls": [
+              "https://www.youtube.com/watch?v=2cduC5_rK9I"
+            ],
+            "execution_gate_override": false
+          }
+        ]
+      },
+      {
+        "ticker": "005930.KS",
+        "name": "삼성전자",
+        "market": "KR",
+        "rank": 4,
+        "rank_scope": "THIS_DELTA_RESEARCH_PRIORITY",
+        "portfolio_role": "DISCOVERY",
+        "portfolio_membership_verified": false,
+        "action": "UPGRADE_WATCH",
+        "thesis": {
+          "stance": "RESEARCH",
+          "confidence": 0.43,
+          "confidence_semantics": "근거 충족도에 대한 0~1 연구 점수이며 수익 확률이 아님",
+          "rationale": "새 영상들이 반도체 수급·HBM 확대를 반복한다. Micron의 공식 실적은 수요 배경일 뿐 삼성전자 이익·목표가로 전이할 근거는 부족하다.",
+          "entry_conditions": [
+            "삼성전자 고객 인증·HBM 공급·영업이익 공시 확인"
+          ],
+          "invalidation_conditions": [
+            "고객 인증 지연이나 메모리 마진 악화 확인"
+          ],
+          "invalidation_action": "DOWNGRADE_WATCH",
+          "horizon": "다음 공식 발표·공시 이후 1~4주 재평가",
+          "position_sizing": {
+            "current_new_execution": 0,
+            "existing_verified_risk_limit": null,
+            "existing_verified_risk_limit_required": true,
+            "proposed_max_fraction_of_existing_risk_limit_after_all_gates": 0.06,
+            "formula": "min(verified_ticker_limit * fraction, remaining_sector_limit, remaining_total_risk_capacity); missing input means zero new execution",
+            "is_conditional_research_proposal": true
+          }
+        },
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action": "UPGRADE_WATCH",
+          "execution_eligible": false,
+          "valid_until": null,
+          "required_rechecks": [
+            "최신 시장 시세와 유효 시각 확인",
+            "계좌 보유·미체결 주문 확인",
+            "종목·섹터·총 위험 한도 확인",
+            "삼성전자 고객 인증·HBM 공급·영업이익 공시 확인"
+          ],
+          "blockers": [
+            "YouTube packet execution_eligible=false",
+            "시장·계좌·위험 게이트와 유효 시각 미제공"
+          ]
+        },
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "XRBG7RMONlw",
+            "content_sha256": "199fc040ae447d33cc2d113b82d534164833171a8ca97d2f64c1ecb9fa42a677",
+            "claim_ids": [
+              "C1",
+              "C4"
+            ],
+            "source_health": "OK",
+            "event_status": "asr_uncertain",
+            "strategy_source_tier": "STANDARD",
+            "strategy_evidence_weight": "STANDARD",
+            "affected_field": "research_priority",
+            "direction": "UP",
+            "reason": "새 영상들이 반도체 수급·HBM 확대를 반복한다. Micron의 공식 실적은 수요 배경일 뿐 삼성전자 이익·목표가로 전이할 근거는 부족하다.",
+            "source_urls": [
+              "https://www.youtube.com/watch?v=XRBG7RMONlw"
+            ],
+            "execution_gate_override": false
+          },
+          {
+            "source": "youtube",
+            "event_key": "43roYkzGjm4",
+            "content_sha256": "5fd844c7dfe6e958e8d9d55207b2fdce6a839cd0af5c51a40a05e17162c88e9f",
+            "claim_ids": [
+              "C4",
+              "C5"
+            ],
+            "source_health": "OK",
+            "event_status": "asr_uncertain",
+            "strategy_source_tier": "STANDARD",
+            "strategy_evidence_weight": "STANDARD",
+            "affected_field": "confidence",
+            "direction": "DOWN",
+            "reason": "새 영상들이 반도체 수급·HBM 확대를 반복한다. Micron의 공식 실적은 수요 배경일 뿐 삼성전자 이익·목표가로 전이할 근거는 부족하다.",
+            "source_urls": [
+              "https://www.youtube.com/watch?v=43roYkzGjm4"
+            ],
+            "execution_gate_override": false
+          }
+        ]
+      },
+      {
+        "ticker": "000660.KS",
+        "name": "SK하이닉스",
+        "market": "KR",
+        "rank": 5,
+        "rank_scope": "THIS_DELTA_RESEARCH_PRIORITY",
+        "portfolio_role": "DISCOVERY",
+        "portfolio_membership_verified": false,
+        "action": "UPGRADE_WATCH",
+        "thesis": {
+          "stance": "RESEARCH",
+          "confidence": 0.4,
+          "confidence_semantics": "근거 충족도에 대한 0~1 연구 점수이며 수익 확률이 아님",
+          "rationale": "Micron 실적과 국내 메모리 영상의 방향은 일치하지만 HBM 완판·가격·국내 이익 전이는 검증되지 않았다.",
+          "entry_conditions": [
+            "SK하이닉스 HBM 고객·공급·마진 공시 확인"
+          ],
+          "invalidation_conditions": [
+            "계약 축소 또는 HBM 수익성 악화 확인"
+          ],
+          "invalidation_action": "DOWNGRADE_WATCH",
+          "horizon": "다음 공식 발표·공시 이후 1~4주 재평가",
+          "position_sizing": {
+            "current_new_execution": 0,
+            "existing_verified_risk_limit": null,
+            "existing_verified_risk_limit_required": true,
+            "proposed_max_fraction_of_existing_risk_limit_after_all_gates": 0.05,
+            "formula": "min(verified_ticker_limit * fraction, remaining_sector_limit, remaining_total_risk_capacity); missing input means zero new execution",
+            "is_conditional_research_proposal": true
+          }
+        },
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action": "UPGRADE_WATCH",
+          "execution_eligible": false,
+          "valid_until": null,
+          "required_rechecks": [
+            "최신 시장 시세와 유효 시각 확인",
+            "계좌 보유·미체결 주문 확인",
+            "종목·섹터·총 위험 한도 확인",
+            "SK하이닉스 HBM 고객·공급·마진 공시 확인"
+          ],
+          "blockers": [
+            "YouTube packet execution_eligible=false",
+            "시장·계좌·위험 게이트와 유효 시각 미제공"
+          ]
+        },
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "QRnPK_PbT-w",
+            "content_sha256": "dbf67fb7dcc04643e6992bcf11cf75a4d8e57a2fb9b0eaf43f3d81ef7066fcac",
+            "claim_ids": [
+              "C4",
+              "C5"
+            ],
+            "source_health": "OK",
+            "event_status": "asr_uncertain",
+            "strategy_source_tier": "STANDARD",
+            "strategy_evidence_weight": "STANDARD",
+            "affected_field": "research_priority",
+            "direction": "UP",
+            "reason": "Micron 실적과 국내 메모리 영상의 방향은 일치하지만 HBM 완판·가격·국내 이익 전이는 검증되지 않았다.",
+            "source_urls": [
+              "https://www.youtube.com/watch?v=QRnPK_PbT-w"
+            ],
+            "execution_gate_override": false
+          },
+          {
+            "source": "youtube",
+            "event_key": "TNcFcPkOKnA",
+            "content_sha256": "69edb0d72f1b5916b16db07da827e50efd8a417146f37133764665f24068b386",
+            "claim_ids": [
+              "C4"
+            ],
+            "source_health": "OK",
+            "event_status": "unverified",
+            "strategy_source_tier": "STANDARD",
+            "strategy_evidence_weight": "STANDARD",
+            "affected_field": "confidence",
+            "direction": "DOWN",
+            "reason": "Micron 실적과 국내 메모리 영상의 방향은 일치하지만 HBM 완판·가격·국내 이익 전이는 검증되지 않았다.",
+            "source_urls": [
+              "https://www.youtube.com/watch?v=TNcFcPkOKnA"
+            ],
+            "execution_gate_override": false
+          }
+        ]
+      },
+      {
+        "ticker": "^KS11",
+        "name": "한국 증시",
+        "market": "KR",
+        "rank": 6,
+        "rank_scope": "THIS_DELTA_RESEARCH_PRIORITY",
+        "portfolio_role": "DISCOVERY",
+        "portfolio_membership_verified": false,
+        "action": "DOWNGRADE_RISK",
+        "thesis": {
+          "stance": "RESEARCH",
+          "confidence": 0.44,
+          "confidence_semantics": "근거 충족도에 대한 0~1 연구 점수이며 수익 확률이 아님",
+          "rationale": "방송의 당일 수급·지수 숫자는 원시세와 불일치 가능성이 있다. ISM 9월 가격지수 77.9는 공식 확인돼 인플레이션 위험 점검을 앞당긴다.",
+          "entry_conditions": [
+            "KRX 종가·외국인 현선물 수급과 다음 물가자료 확인"
+          ],
+          "invalidation_conditions": [
+            "물가 압력이 둔화하고 수급이 안정되면 위험 축소 판단 재검토"
+          ],
+          "invalidation_action": "DOWNGRADE_WATCH",
+          "horizon": "다음 공식 발표·공시 이후 1~4주 재평가",
+          "position_sizing": {
+            "current_new_execution": 0,
+            "existing_verified_risk_limit": null,
+            "existing_verified_risk_limit_required": true,
+            "proposed_max_fraction_of_existing_risk_limit_after_all_gates": 0,
+            "formula": "min(verified_ticker_limit * fraction, remaining_sector_limit, remaining_total_risk_capacity); missing input means zero new execution",
+            "is_conditional_research_proposal": true
+          }
+        },
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action": "DOWNGRADE_RISK",
+          "execution_eligible": false,
+          "valid_until": null,
+          "required_rechecks": [
+            "최신 시장 시세와 유효 시각 확인",
+            "계좌 보유·미체결 주문 확인",
+            "종목·섹터·총 위험 한도 확인",
+            "KRX 종가·외국인 현선물 수급과 다음 물가자료 확인"
+          ],
+          "blockers": [
+            "YouTube packet execution_eligible=false",
+            "시장·계좌·위험 게이트와 유효 시각 미제공"
+          ]
+        },
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "P7hhvY49uGY",
+            "content_sha256": "c07362aac5cb239a78dae6ceb17e61a1072e9f7cee3d7a64acea8e134dc6a2f1",
+            "claim_ids": [
+              "C1",
+              "C2"
+            ],
+            "source_health": "OK",
+            "event_status": "asr_uncertain",
+            "strategy_source_tier": "STANDARD",
+            "strategy_evidence_weight": "STANDARD",
+            "affected_field": "research_priority",
+            "direction": "UP",
+            "reason": "방송의 당일 수급·지수 숫자는 원시세와 불일치 가능성이 있다. ISM 9월 가격지수 77.9는 공식 확인돼 인플레이션 위험 점검을 앞당긴다.",
+            "source_urls": [
+              "https://www.youtube.com/watch?v=P7hhvY49uGY"
+            ],
+            "execution_gate_override": false
+          },
+          {
+            "source": "youtube",
+            "event_key": "ewRjCYhBooE",
+            "content_sha256": "d46dcf2d5218e1ce16d02c873f0ab292d12d2c8cc607690b0004578ba06f14e1",
+            "claim_ids": [
+              "C1"
+            ],
+            "source_health": "OK",
+            "event_status": "asr_uncertain",
+            "strategy_source_tier": "STANDARD",
+            "strategy_evidence_weight": "STANDARD",
+            "affected_field": "confidence",
+            "direction": "DOWN",
+            "reason": "방송의 당일 수급·지수 숫자는 원시세와 불일치 가능성이 있다. ISM 9월 가격지수 77.9는 공식 확인돼 인플레이션 위험 점검을 앞당긴다.",
+            "source_urls": [
+              "https://www.youtube.com/watch?v=ewRjCYhBooE"
+            ],
+            "execution_gate_override": false
+          }
+        ]
+      },
+      {
+        "ticker": "CL=F",
+        "name": "원유 위험 지표",
+        "market": "US",
+        "rank": 7,
+        "rank_scope": "THIS_DELTA_RESEARCH_PRIORITY",
+        "portfolio_role": "DISCOVERY",
+        "portfolio_membership_verified": false,
+        "action": "REQUIRES_PRIMARY_VERIFICATION",
+        "thesis": {
+          "stance": "RESEARCH",
+          "confidence": 0.28,
+          "confidence_semantics": "근거 충족도에 대한 0~1 연구 점수이며 수익 확률이 아님",
+          "rationale": "방송의 유가 93달러·병력 증강·비축유 방출 주장은 원시세와 정부 발표를 확인하지 못했다. 지정학 위험 점검만 남긴다.",
+          "entry_conditions": [
+            "EIA 원유 가격·정부 비축유 발표와 해사 공지 확인"
+          ],
+          "invalidation_conditions": [
+            "원자료가 영상 시나리오를 부정하면 관심 우선순위 하향"
+          ],
+          "invalidation_action": "DOWNGRADE_WATCH",
+          "horizon": "다음 공식 발표·공시 이후 1~4주 재평가",
+          "position_sizing": {
+            "current_new_execution": 0,
+            "existing_verified_risk_limit": null,
+            "existing_verified_risk_limit_required": true,
+            "proposed_max_fraction_of_existing_risk_limit_after_all_gates": 0,
+            "formula": "min(verified_ticker_limit * fraction, remaining_sector_limit, remaining_total_risk_capacity); missing input means zero new execution",
+            "is_conditional_research_proposal": true
+          }
+        },
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action": "REQUIRES_PRIMARY_VERIFICATION",
+          "execution_eligible": false,
+          "valid_until": null,
+          "required_rechecks": [
+            "최신 시장 시세와 유효 시각 확인",
+            "계좌 보유·미체결 주문 확인",
+            "종목·섹터·총 위험 한도 확인",
+            "EIA 원유 가격·정부 비축유 발표와 해사 공지 확인"
+          ],
+          "blockers": [
+            "YouTube packet execution_eligible=false",
+            "시장·계좌·위험 게이트와 유효 시각 미제공"
+          ]
+        },
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "d8jrvR1VuAo",
+            "content_sha256": "0eeebfc013d9a21041b79d8e4eff8b134218f86cc449db3e473c83b4dee94c3e",
+            "claim_ids": [
+              "C3"
+            ],
+            "source_health": "OK",
+            "event_status": "contradicted",
+            "strategy_source_tier": "STANDARD",
+            "strategy_evidence_weight": "STANDARD",
+            "affected_field": "research_priority",
+            "direction": "UP",
+            "reason": "방송의 유가 93달러·병력 증강·비축유 방출 주장은 원시세와 정부 발표를 확인하지 못했다. 지정학 위험 점검만 남긴다.",
+            "source_urls": [
+              "https://www.youtube.com/watch?v=d8jrvR1VuAo"
+            ],
+            "execution_gate_override": false
+          }
+        ]
+      }
+    ],
+    "coverage_receipt": {
+      "event_id": "youtube:cfe799bc3c5aeb0c647a134289622fb9",
+      "status": "UNVERIFIED",
+      "window_events": 99,
+      "transmitted_events": 60,
+      "truncated": true,
+      "new_events": 32,
+      "revised_events": 0
+    },
+    "model_receipt": {
+      "schema": "tradingagents.model-provenance/v1",
+      "work_synthesis": {
+        "execution_mode": "local",
+        "requested_model": "gpt-6-sol",
+        "requested_reasoning_effort": "xhigh",
+        "task_id": "tradingagents-work-youtube",
+        "verification_status": "CONFIGURED_NOT_RUNTIME_VERIFIED",
+        "observed_model": null,
+        "observed_reasoning_effort": null,
+        "note": "The local task contract is verified; the Work host does not expose a signed per-response model receipt."
+      }
+    },
+    "source_summary": {
+      "canonical_source": {
+        "health": "OK",
+        "run_id": "youtube_20261002_070408",
+        "last_run_at": "2026-10-02T07:53:51.311718+09:00",
+        "status": "success",
+        "stale_after_hours": 36
+      },
+      "coverage": {
+        "total_unique_events": 367,
+        "window_events": 99,
+        "transmitted_events": 60,
+        "truncated": true,
+        "oldest_occurred_at": "2026-09-30T05:15:05+00:00",
+        "newest_occurred_at": "2026-10-01T12:02:43+00:00"
+      },
+      "delta": {
+        "new_events": 32,
+        "revised_events": 0,
+        "unchanged_events": 28,
+        "delivered_event_keys": [
+          "2cduC5_rK9I",
+          "d8jrvR1VuAo",
+          "Z5N-cLEAcjU",
+          "d1MJpyjuRTU",
+          "TNcFcPkOKnA",
+          "ewRjCYhBooE",
+          "rd77d96IFNQ",
+          "EnWJ_wX_mh0",
+          "VvZ21JSmsMk",
+          "sJf7zex09lU",
+          "nM4lkpDlZ7U",
+          "JVTrllgMcnc",
+          "OyoOIVj2oi4",
+          "P7hhvY49uGY",
+          "2VRcnEHujo0",
+          "riSXei3ngz8",
+          "4txSymuswco",
+          "XRBG7RMONlw",
+          "P57Gh76CCOw",
+          "XUDkSgOxTIo",
+          "HtZlJPSkS2Y",
+          "YLKqcNKB5c4",
+          "1KBur1Z64AA",
+          "QMDTZ4X5Qlk",
+          "Nf3fc2UTsfc",
+          "XjIIS_HydZs",
+          "BCnufl6yRqE",
+          "43roYkzGjm4",
+          "QRnPK_PbT-w",
+          "ppjafgxLZNU",
+          "m70tbr6SMa0",
+          "7423mEzaC68"
+        ]
+      },
+      "source_snapshot_sha256": "a45100624ca699a5dddcfcccd5952597d691c88c274baad3f0f72ce752689d7f",
+      "balanced_external_policy": {
+        "profile": "balanced_external",
+        "material_thesis_effects": [
+          "ranking",
+          "confidence",
+          "position_size_within_existing_risk_limits",
+          "research_priority"
+        ],
+        "supported_evidence_weight": "MEDIUM",
+        "partially_supported_evidence_weight": "LOW_TO_MEDIUM",
+        "unverified_evidence_weight": "LOW_LABELED",
+        "user_primary_channels": [
+          "@kpunch",
+          "@sosumonkey"
+        ],
+        "user_primary_source_tier": "USER_PRIMARY",
+        "user_primary_evidence_weight": "HIGH",
+        "user_primary_validation_policy": "USER_ACCEPTED",
+        "matching_multi_source_signal_may_raise_thesis_priority": true,
+        "conflicting_signal_must_be_visible": true,
+        "may_bypass_market_or_portfolio_execution_gate": false
+      },
+      "execution_eligible": false,
+      "omitted_events": null,
+      "freshness_receipt": {
+        "checked_at": "2026-10-02T08:36:14+09:00",
+        "source_age_hours": 0.71,
+        "event_age_min_hours": 1.57,
+        "event_age_max_hours": 23.46,
+        "recent_24h_new_events": 32,
+        "all_event_clocks_parse_nonfuture_ordered": true,
+        "evidence_clock_exclusions": [
+          [
+            "XRBG7RMONlw",
+            "E1"
+          ],
+          [
+            "XRBG7RMONlw",
+            "E2"
+          ]
+        ],
+        "market_account_validity_available": false
+      },
+      "coverage_metadata_discrepancy": {
+        "declared_newest_occurred_at": "2026-10-01T12:02:43+00:00",
+        "transmitted_newest_occurred_at": "2026-10-01T22:02:01+00:00",
+        "affected_events": [
+          "d8jrvR1VuAo",
+          "Z5N-cLEAcjU"
+        ],
+        "effect": "UNVERIFIED_FULL_WINDOW"
+      },
+      "claim_quality_new_events": {
+        "unverified": 153,
+        "partially_supported": 12,
+        "asr_uncertain": 26,
+        "contradicted": 1
+      },
+      "summary_status_new_events": {
+        "asr_uncertain": 22,
+        "contradicted": 2,
+        "unverified": 8
+      },
+      "evidence_hygiene_new_events": {
+        "evidence_rows": 179,
+        "claim_reference_count": 13,
+        "invalid_claim_references": [
+          [
+            "d8jrvR1VuAo",
+            "C1",
+            "E7"
+          ],
+          [
+            "VvZ21JSmsMk",
+            "C2",
+            "E6"
+          ],
+          [
+            "XRBG7RMONlw",
+            "C1",
+            "E3"
+          ],
+          [
+            "XRBG7RMONlw",
+            "C4",
+            "E8"
+          ],
+          [
+            "BCnufl6yRqE",
+            "C6",
+            "E9"
+          ],
+          [
+            "BCnufl6yRqE",
+            "C6",
+            "E10"
+          ],
+          [
+            "BCnufl6yRqE",
+            "C6",
+            "E11"
+          ]
+        ],
+        "unusable_evidence_clock_rows": [
+          [
+            "XRBG7RMONlw",
+            "E1"
+          ],
+          [
+            "XRBG7RMONlw",
+            "E2"
+          ]
+        ]
+      },
+      "independent_primary_verification": [
+        {
+          "publisher": "Google",
+          "source_url": "https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-4-argon/",
+          "verified_scope": "Gemini 4 Argon announcement, restricted rollout, 1M output tokens, introductory planned pricing"
+        },
+        {
+          "publisher": "Micron",
+          "source_url": "https://investors.micron.com/news/press-release/2026/Micron-Technology-Inc--Reports-Record-Fiscal-Fourth-Quarter-and-Full-Year-2026-Results/default.aspx",
+          "verified_scope": "FQ4-26 revenue/non-GAAP gross margin and FQ1-27 outlook"
+        },
+        {
+          "publisher": "ISM",
+          "source_url": "https://www.ismworld.org/supply-management-news-and-reports/reports/ism-pmi-reports/pmi/september/",
+          "verified_scope": "September 2026 manufacturing PMI and prices index"
+        }
+      ],
+      "processed_new_event_manifest": [
+        {
+          "event_key": "2cduC5_rK9I",
+          "content_sha256": "d1e9f679f6e278b163c2cece7a9676bd732dc7cdf5a716c9009cd5decafc8eb1",
+          "occurred_at": "2026-10-01T12:02:43+00:00",
+          "published_at": "2026-10-01T12:02:43+00:00",
+          "title": "초고금리 뉴노멀 시대에 대비하라? 월가 초고수의 깜짝 예언, 적중할까",
+          "source_url": "https://www.youtube.com/watch?v=2cduC5_rK9I",
+          "summary_status": "asr_uncertain",
+          "strategy_source_tier": "USER_PRIMARY",
+          "strategy_evidence_weight": "HIGH",
+          "relevance": {
+            "tickers": [
+              "TLT"
+            ],
+            "markets": [
+              "US"
+            ],
+            "themes": [],
+            "match_basis": "verified_entities"
+          },
+          "claim_status_counts": {
+            "unverified": 8,
+            "asr_uncertain": 2
+          }
+        },
+        {
+          "event_key": "d8jrvR1VuAo",
+          "content_sha256": "0eeebfc013d9a21041b79d8e4eff8b134218f86cc449db3e473c83b4dee94c3e",
+          "occurred_at": "2026-10-01T22:02:01+00:00",
+          "published_at": "2026-10-01T22:02:01+00:00",
+          "title": "마이크론, 호실적 재평가에 3%↑...10월 금리인상 전망 25%로 하락 [월가 뉴스레터]",
+          "source_url": "https://www.youtube.com/watch?v=d8jrvR1VuAo",
+          "summary_status": "contradicted",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "relevance": {
+            "tickers": [
+              "MU",
+              "AVGO",
+              "AMZN",
+              "ORCL",
+              "ACN",
+              "AAPL",
+              "RKLB",
+              "NKE",
+              "NFLX"
+            ],
+            "markets": [
+              "US"
+            ],
+            "themes": [],
+            "match_basis": "verified_entities"
+          },
+          "claim_status_counts": {
+            "partially_supported": 4,
+            "unverified": 4,
+            "asr_uncertain": 1,
+            "contradicted": 1
+          }
+        },
+        {
+          "event_key": "Z5N-cLEAcjU",
+          "content_sha256": "15c340fae7487a7118b111d78aab9fa683900d8a03d93e5f73da4bfacd90eb7c",
+          "occurred_at": "2026-10-01T15:14:07+00:00",
+          "published_at": "2026-10-01T15:14:07+00:00",
+          "title": "제미나이 4와 구글의 전략, 전부 뜯어왔습니다",
+          "source_url": "https://www.youtube.com/watch?v=Z5N-cLEAcjU",
+          "summary_status": "unverified",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "relevance": {
+            "tickers": [
+              "GOOGL"
+            ],
+            "markets": [
+              "US"
+            ],
+            "themes": [],
+            "match_basis": "verified_entities"
+          },
+          "claim_status_counts": {
+            "unverified": 9
+          }
+        },
+        {
+          "event_key": "d1MJpyjuRTU",
+          "content_sha256": "b00de4ba01031e72edc15d0c589442cb41e42e937f97996a8af1308624ad2e65",
+          "occurred_at": "2026-10-01T12:00:37+00:00",
+          "published_at": "2026-10-01T12:00:37+00:00",
+          "title": "\"오르든 떨어지든 10월 중순까지 모아가세요\" 연말까지 가져갈 포트폴리오 짜는 법ㅣ명민준, 박가영, 유창희 [주린이 구조대]",
+          "source_url": "https://www.youtube.com/watch?v=d1MJpyjuRTU",
+          "summary_status": "asr_uncertain",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "relevance": {
+            "tickers": [
+              "CL=F",
+              "^KS11"
+            ],
+            "markets": [
+              "US"
+            ],
+            "themes": [],
+            "match_basis": "verified_entities"
+          },
+          "claim_status_counts": {
+            "unverified": 8,
+            "asr_uncertain": 2
+          }
+        },
+        {
+          "event_key": "TNcFcPkOKnA",
+          "content_sha256": "69edb0d72f1b5916b16db07da827e50efd8a417146f37133764665f24068b386",
+          "occurred_at": "2026-10-01T11:00:30+00:00",
+          "published_at": "2026-10-01T11:00:30+00:00",
+          "title": "호실적에도 주가가 밀리는 이유…주도주 '실적 발표 후 조정'을 매수 기회로 보는 이유ㅣ명민준, 박가영, 이지환 [주린이 구조대]",
+          "source_url": "https://www.youtube.com/watch?v=TNcFcPkOKnA",
+          "summary_status": "unverified",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "relevance": {
+            "tickers": [
+              "KOSPI/KOSDAQ",
+              "005930",
+              "000660",
+              "MU",
+              "CL=F"
+            ],
+            "markets": [
+              "US",
+              "KR"
+            ],
+            "themes": [],
+            "match_basis": "verified_entities"
+          },
+          "claim_status_counts": {
+            "unverified": 9,
+            "partially_supported": 1
+          }
+        },
+        {
+          "event_key": "ewRjCYhBooE",
+          "content_sha256": "d46dcf2d5218e1ce16d02c873f0ab292d12d2c8cc607690b0004578ba06f14e1",
+          "occurred_at": "2026-10-01T11:00:09+00:00",
+          "published_at": "2026-10-01T11:00:09+00:00",
+          "title": "[#찐시황]  지금은 중요한 판단을 해야 할 때… 외인·기관이 오전 10시부터 코스닥을 ‘폭풍 매수’한 진짜 이유 (주가급등) 황유현 팀장",
+          "source_url": "https://www.youtube.com/watch?v=ewRjCYhBooE",
+          "summary_status": "asr_uncertain",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "relevance": {
+            "tickers": [
+              "^KS11"
+            ],
+            "markets": [
+              "US"
+            ],
+            "themes": [],
+            "match_basis": "verified_entities"
+          },
+          "claim_status_counts": {
+            "unverified": 6,
+            "partially_supported": 2,
+            "asr_uncertain": 2
+          }
+        },
+        {
+          "event_key": "rd77d96IFNQ",
+          "content_sha256": "b5b53ee31e042cce5c488f2e88ad327b1821819c9e67d5f3701a3553927f28de",
+          "occurred_at": "2026-10-01T10:10:58+00:00",
+          "published_at": "2026-10-01T10:10:58+00:00",
+          "title": "오늘 코스피가 바닥에서 주가 '끌어올린' 진짜 이유",
+          "source_url": "https://www.youtube.com/watch?v=rd77d96IFNQ",
+          "summary_status": "unverified",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "relevance": {
+            "tickers": [
+              "^KS11"
+            ],
+            "markets": [
+              "US"
+            ],
+            "themes": [],
+            "match_basis": "verified_entities"
+          },
+          "claim_status_counts": {
+            "partially_supported": 1,
+            "unverified": 9
+          }
+        },
+        {
+          "event_key": "EnWJ_wX_mh0",
+          "content_sha256": "4e9e66df191fbbc4095e18c8b01dd571d71915bb74ab81271949162fa5784cf2",
+          "occurred_at": "2026-10-01T10:00:38+00:00",
+          "published_at": "2026-10-01T10:00:38+00:00",
+          "title": "[#긴급인터뷰]  반도체 다음은 로봇주?  현대차 언제 다시 터질까? /  반도체 소부장, 팔 주식·살 주식 이렇게 나누세요 ㅣ김대준 대표",
+          "source_url": "https://www.youtube.com/watch?v=EnWJ_wX_mh0",
+          "summary_status": "asr_uncertain",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "relevance": {
+            "tickers": [],
+            "markets": [],
+            "themes": [],
+            "match_basis": "title_and_claim_context"
+          },
+          "claim_status_counts": {
+            "asr_uncertain": 3,
+            "unverified": 7
+          }
+        },
+        {
+          "event_key": "VvZ21JSmsMk",
+          "content_sha256": "1514b504e0f093722822183e679ff466b060506351b1c0e8c778b3fdb2c2764c",
+          "occurred_at": "2026-10-01T09:07:24+00:00",
+          "published_at": "2026-10-01T09:07:24+00:00",
+          "title": "AI 투자도 결국 '돈'…상승하는 국채금리 속 10월 증시가 확인해야 할 '약한 고리'ㅣ홍선애, 장우진 금시공 대표 [여의도 인사이트]",
+          "source_url": "https://www.youtube.com/watch?v=VvZ21JSmsMk",
+          "summary_status": "asr_uncertain",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "relevance": {
+            "tickers": [
+              "^KS11"
+            ],
+            "markets": [
+              "US"
+            ],
+            "themes": [],
+            "match_basis": "verified_entities"
+          },
+          "claim_status_counts": {
+            "unverified": 8,
+            "asr_uncertain": 2
+          }
+        },
+        {
+          "event_key": "sJf7zex09lU",
+          "content_sha256": "11fea56b8fe52baa8132fc4a744cde94d6e40ab6ff8014b8dcf1dbadbc356294",
+          "occurred_at": "2026-10-01T09:00:16+00:00",
+          "published_at": "2026-10-01T09:00:16+00:00",
+          "title": "월가에서 지금 '삼전·닉스' 가장 싸게 살 기회라는 이유",
+          "source_url": "https://www.youtube.com/watch?v=sJf7zex09lU",
+          "summary_status": "unverified",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "relevance": {
+            "tickers": [],
+            "markets": [],
+            "themes": [],
+            "match_basis": "title_and_claim_context"
+          },
+          "claim_status_counts": {
+            "unverified": 10
+          }
+        },
+        {
+          "event_key": "nM4lkpDlZ7U",
+          "content_sha256": "49a4072d32f10dbfec2b1768b8a9ee228f1f443f758338e3b7ae0214bd16f49d",
+          "occurred_at": "2026-10-01T08:35:12+00:00",
+          "published_at": "2026-10-01T08:35:12+00:00",
+          "title": "271조 대미투자 한국한테 이득일까 손해일까",
+          "source_url": "https://www.youtube.com/watch?v=nM4lkpDlZ7U",
+          "summary_status": "unverified",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "relevance": {
+            "tickers": [],
+            "markets": [],
+            "themes": [],
+            "match_basis": "title_and_claim_context"
+          },
+          "claim_status_counts": {
+            "unverified": 10
+          }
+        },
+        {
+          "event_key": "JVTrllgMcnc",
+          "content_sha256": "e208dd8c097462417a5ac44d1e32df4e69650202049aff0520ad2dbbac9c5db9",
+          "occurred_at": "2026-10-01T08:30:19+00:00",
+          "published_at": "2026-10-01T08:30:19+00:00",
+          "title": "[#긴급시황] 오후 들어 증시 급반등… 바닥 신호 나왔나? / 코스닥이 갑자기 급등한 진짜 이유ㅣ 이권희 대표",
+          "source_url": "https://www.youtube.com/watch?v=JVTrllgMcnc",
+          "summary_status": "asr_uncertain",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "relevance": {
+            "tickers": [
+              "^KS11"
+            ],
+            "markets": [
+              "US"
+            ],
+            "themes": [],
+            "match_basis": "verified_entities"
+          },
+          "claim_status_counts": {
+            "unverified": 8,
+            "asr_uncertain": 2
+          }
+        },
+        {
+          "event_key": "OyoOIVj2oi4",
+          "content_sha256": "070acccebe66007b793b8e306a5e336c372b3b3ddd4a42e8790600c66b267ab1",
+          "occurred_at": "2026-10-01T08:00:03+00:00",
+          "published_at": "2026-10-01T08:00:03+00:00",
+          "title": "30년 아시아 투자자의 시선으로 보는 한국 시장의 새로운 기회",
+          "source_url": "https://www.youtube.com/watch?v=OyoOIVj2oi4",
+          "summary_status": "asr_uncertain",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "relevance": {
+            "tickers": [
+              "^KS11"
+            ],
+            "markets": [
+              "US"
+            ],
+            "themes": [],
+            "match_basis": "verified_entities"
+          },
+          "claim_status_counts": {
+            "asr_uncertain": 2,
+            "unverified": 8
+          }
+        },
+        {
+          "event_key": "P7hhvY49uGY",
+          "content_sha256": "c07362aac5cb239a78dae6ceb17e61a1072e9f7cee3d7a64acea8e134dc6a2f1",
+          "occurred_at": "2026-10-01T07:59:54+00:00",
+          "published_at": "2026-10-01T07:59:54+00:00",
+          "title": "[10월 1일 마감시황] 코스닥 4% 급등의 중심은 반도체…소부장 전반으로 번진 매수세ㅣ홍선애, 이권희, 김장열 [클로징벨 라이브]",
+          "source_url": "https://www.youtube.com/watch?v=P7hhvY49uGY",
+          "summary_status": "asr_uncertain",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "relevance": {
+            "tickers": [
+              "^KS11"
+            ],
+            "markets": [
+              "US"
+            ],
+            "themes": [],
+            "match_basis": "verified_entities"
+          },
+          "claim_status_counts": {
+            "partially_supported": 1,
+            "unverified": 6,
+            "asr_uncertain": 3
+          }
+        },
+        {
+          "event_key": "2VRcnEHujo0",
+          "content_sha256": "73b65fc5aa2afac77f766a13e3e244c01a7b80c12e2eacbaf4d83c3b4188ec5e",
+          "occurred_at": "2026-10-01T07:00:20+00:00",
+          "published_at": "2026-10-01T07:00:20+00:00",
+          "title": "[#글로벌인사이트]  AI 버블이라고? 아직 반도 안 왔다 / 휴머노이드 로봇에서 ‘진짜 큰 돈’ 벌어줄 핵심 부품주는 ‘여기’ ㅣ 세미콘 리서치랩 노근창 대표",
+          "source_url": "https://www.youtube.com/watch?v=2VRcnEHujo0",
+          "summary_status": "contradicted",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "relevance": {
+            "tickers": [
+              "MU",
+              "TSLA",
+              "005380",
+              "277810",
+              "NVDA",
+              "9984.T"
+            ],
+            "markets": [
+              "US",
+              "KR"
+            ],
+            "themes": [],
+            "match_basis": "verified_entities"
+          },
+          "claim_status_counts": {
+            "unverified": 8,
+            "contradicted": 1,
+            "asr_uncertain": 1
+          }
+        },
+        {
+          "event_key": "riSXei3ngz8",
+          "content_sha256": "134a5f4ddbb481dbc0bf50e184fc5c80b4f41266851ae0aa1494a5d96d7fb80d",
+          "occurred_at": "2026-10-01T06:53:59+00:00",
+          "published_at": "2026-10-01T06:53:59+00:00",
+          "title": "오늘 트럼프가 공개한 '271조 대미투자', 한국 수혜주는?",
+          "source_url": "https://www.youtube.com/watch?v=riSXei3ngz8",
+          "summary_status": "unverified",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "relevance": {
+            "tickers": [],
+            "markets": [],
+            "themes": [],
+            "match_basis": "title_and_claim_context"
+          },
+          "claim_status_counts": {
+            "unverified": 9
+          }
+        },
+        {
+          "event_key": "4txSymuswco",
+          "content_sha256": "a0f9f351d0b89b45131648a9eced5399bf8aa63104b6e7a45cb2d1095d5a3737",
+          "occurred_at": "2026-10-01T06:43:43+00:00",
+          "published_at": "2026-10-01T06:43:43+00:00",
+          "title": "\"상승장에 속지 마세요\" 지금 당장 수익 챙기고 갈아탈 덜 오른 대장주 공개ㅣ권다영, 김태성 아이에셋 본부장 [2시 마켓워치]",
+          "source_url": "https://www.youtube.com/watch?v=4txSymuswco",
+          "summary_status": "asr_uncertain",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "relevance": {
+            "tickers": [
+              "^KS11"
+            ],
+            "markets": [
+              "US"
+            ],
+            "themes": [],
+            "match_basis": "verified_entities"
+          },
+          "claim_status_counts": {
+            "unverified": 8,
+            "asr_uncertain": 2
+          }
+        },
+        {
+          "event_key": "XRBG7RMONlw",
+          "content_sha256": "199fc040ae447d33cc2d113b82d534164833171a8ca97d2f64c1ecb9fa42a677",
+          "occurred_at": "2026-10-01T06:00:05+00:00",
+          "published_at": "2026-10-01T06:00:05+00:00",
+          "title": "삼성전자 PER 4배… 목표가 27만 vs 63만, 누가 맞나? / 반도체 30% 폭락? 사실상 불가능한 이유 ㅣ유니스토리자산운용 김장열 센터장",
+          "source_url": "https://www.youtube.com/watch?v=XRBG7RMONlw",
+          "summary_status": "asr_uncertain",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "relevance": {
+            "tickers": [
+              "005930",
+              "ORCL"
+            ],
+            "markets": [
+              "KR",
+              "US"
+            ],
+            "themes": [],
+            "match_basis": "verified_entities"
+          },
+          "claim_status_counts": {
+            "partially_supported": 2,
+            "asr_uncertain": 4,
+            "unverified": 4
+          }
+        },
+        {
+          "event_key": "P57Gh76CCOw",
+          "content_sha256": "ce1564145f8e198ee711d32fca1712c6fc4601689d92f1096f7c3d66e6505cc9",
+          "occurred_at": "2026-10-01T05:55:14+00:00",
+          "published_at": "2026-10-01T05:55:14+00:00",
+          "title": "삼전닉스만 붙잡지 마라…지금은 시장 전체의 힘을 받아야 할 때ㅣ권다영, 차영주 와이즈경제연구소 소장",
+          "source_url": "https://www.youtube.com/watch?v=P57Gh76CCOw",
+          "summary_status": "asr_uncertain",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "relevance": {
+            "tickers": [
+              "MU",
+              "ORCL"
+            ],
+            "markets": [
+              "US"
+            ],
+            "themes": [],
+            "match_basis": "verified_entities"
+          },
+          "claim_status_counts": {
+            "unverified": 5,
+            "asr_uncertain": 5
+          }
+        },
+        {
+          "event_key": "XUDkSgOxTIo",
+          "content_sha256": "fdca1f02d1b53d741c3fc9fc828fe42b0f830715171eae957b56aae67fc89c60",
+          "occurred_at": "2026-10-01T05:47:09+00:00",
+          "published_at": "2026-10-01T05:47:09+00:00",
+          "title": "'매크로 환경'이 뭐길래, 외국인이 빠져나가는 걸까?",
+          "source_url": "https://www.youtube.com/watch?v=XUDkSgOxTIo",
+          "summary_status": "unverified",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "relevance": {
+            "tickers": [
+              "^KS11"
+            ],
+            "markets": [
+              "US"
+            ],
+            "themes": [],
+            "match_basis": "verified_entities"
+          },
+          "claim_status_counts": {
+            "unverified": 9,
+            "partially_supported": 1
+          }
+        },
+        {
+          "event_key": "HtZlJPSkS2Y",
+          "content_sha256": "9537b30b3a88c2868ca04cbbaea7a286d759e6d4cebe858ee7952c3f457778d9",
+          "occurred_at": "2026-10-01T04:00:18+00:00",
+          "published_at": "2026-10-01T04:00:18+00:00",
+          "title": "전고점 향해 달리는 마이크론 PER 7배... 삼전·SK하닉은 4배, 언제 따라갈까? / 코스피 ‘전약후강’ 겁먹지 마세요 이권희 대표",
+          "source_url": "https://www.youtube.com/watch?v=HtZlJPSkS2Y",
+          "summary_status": "asr_uncertain",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "relevance": {
+            "tickers": [
+              "^KS11"
+            ],
+            "markets": [
+              "US"
+            ],
+            "themes": [],
+            "match_basis": "verified_entities"
+          },
+          "claim_status_counts": {
+            "unverified": 8,
+            "asr_uncertain": 2
+          }
+        },
+        {
+          "event_key": "YLKqcNKB5c4",
+          "content_sha256": "988fcacea7865575f0cc0bfe2bd167d571741a716eb021a808cb81c2d5062565",
+          "occurred_at": "2026-10-01T03:12:07+00:00",
+          "published_at": "2026-10-01T03:12:07+00:00",
+          "title": "클래리티 법안 좌초에도 기업들은 미국으로 몰렸다  | 서동주, 김동환, 김준우 쟁글 대표 [크립토 PLUS]",
+          "source_url": "https://www.youtube.com/watch?v=YLKqcNKB5c4",
+          "summary_status": "asr_uncertain",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "relevance": {
+            "tickers": [],
+            "markets": [],
+            "themes": [],
+            "match_basis": "title_and_claim_context"
+          },
+          "claim_status_counts": {
+            "unverified": 8,
+            "asr_uncertain": 2
+          }
+        },
+        {
+          "event_key": "1KBur1Z64AA",
+          "content_sha256": "c98eba630a84f06c7bcb7ce68b202f13865a4abfb4d1ec4b9b93db139a26a979",
+          "occurred_at": "2026-10-01T02:56:50+00:00",
+          "published_at": "2026-10-01T02:56:50+00:00",
+          "title": "절대 사지 말아야 할 '주식 타이밍 & 습관' | [하나증권 대규모 세미나 영상]",
+          "source_url": "https://www.youtube.com/watch?v=1KBur1Z64AA",
+          "summary_status": "asr_uncertain",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "relevance": {
+            "tickers": [
+              "^KS11"
+            ],
+            "markets": [
+              "US"
+            ],
+            "themes": [],
+            "match_basis": "verified_entities"
+          },
+          "claim_status_counts": {
+            "unverified": 5,
+            "asr_uncertain": 3
+          }
+        },
+        {
+          "event_key": "QMDTZ4X5Qlk",
+          "content_sha256": "4dddac492a15152e4f8a26a15b5c12ffd0997729fde876d4f51364afcc0b1eab",
+          "occurred_at": "2026-10-01T02:48:11+00:00",
+          "published_at": "2026-10-01T02:48:11+00:00",
+          "title": "7년 만에 한국 찾은 조셉 루빈, 글로벌 거장들이 한국 시장을 찾는 이유 | 서동주, 김동환, 박현영 뉴스1 기자 [크립토 PLUS]",
+          "source_url": "https://www.youtube.com/watch?v=QMDTZ4X5Qlk",
+          "summary_status": "asr_uncertain",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "relevance": {
+            "tickers": [
+              "BTC"
+            ],
+            "markets": [
+              "US"
+            ],
+            "themes": [],
+            "match_basis": "verified_entities"
+          },
+          "claim_status_counts": {
+            "asr_uncertain": 1,
+            "unverified": 8,
+            "partially_supported": 1
+          }
+        },
+        {
+          "event_key": "Nf3fc2UTsfc",
+          "content_sha256": "b171012c20d1215e492028e1a1ac190e9d786c96401e3e1cd79750e0d2097d89",
+          "occurred_at": "2026-10-01T02:39:41+00:00",
+          "published_at": "2026-10-01T02:39:41+00:00",
+          "title": "마이크론이 AI 상승을 확신하는 이유",
+          "source_url": "https://www.youtube.com/watch?v=Nf3fc2UTsfc",
+          "summary_status": "asr_uncertain",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "relevance": {
+            "tickers": [],
+            "markets": [],
+            "themes": [],
+            "match_basis": "title_and_claim_context"
+          },
+          "claim_status_counts": {
+            "asr_uncertain": 1,
+            "unverified": 8
+          }
+        },
+        {
+          "event_key": "XjIIS_HydZs",
+          "content_sha256": "1a049f71849841a0cbce5e5b3227e29822d73034d1c17e970fde35111109aa9f",
+          "occurred_at": "2026-10-01T02:19:09+00:00",
+          "published_at": "2026-10-01T02:19:09+00:00",
+          "title": "커버드콜ETF 지금이 적기? 코스피200 vs 코스닥150 선택은? | 여도은, 허재무,임주명, 차진호 [아침N투자]",
+          "source_url": "https://www.youtube.com/watch?v=XjIIS_HydZs",
+          "summary_status": "asr_uncertain",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "relevance": {
+            "tickers": [
+              "^KS11"
+            ],
+            "markets": [
+              "US"
+            ],
+            "themes": [],
+            "match_basis": "verified_entities"
+          },
+          "claim_status_counts": {
+            "unverified": 8,
+            "asr_uncertain": 2
+          }
+        },
+        {
+          "event_key": "BCnufl6yRqE",
+          "content_sha256": "b77257ae052eef0e3388cbceba885eed963b79edf7fb5062f611a904f889d8fa",
+          "occurred_at": "2026-10-01T01:30:04+00:00",
+          "published_at": "2026-10-01T01:30:04+00:00",
+          "title": "\"10월 중심이 될 곳\" 수급 이쪽으로 간다 | 권택중 하나증권 더센터필드W 부지점장 [더블 크루]",
+          "source_url": "https://www.youtube.com/watch?v=BCnufl6yRqE",
+          "summary_status": "asr_uncertain",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "relevance": {
+            "tickers": [
+              "^KS11"
+            ],
+            "markets": [
+              "US"
+            ],
+            "themes": [],
+            "match_basis": "verified_entities"
+          },
+          "claim_status_counts": {
+            "unverified": 8,
+            "partially_supported": 1,
+            "asr_uncertain": 1
+          }
+        },
+        {
+          "event_key": "43roYkzGjm4",
+          "content_sha256": "5fd844c7dfe6e958e8d9d55207b2fdce6a839cd0af5c51a40a05e17162c88e9f",
+          "occurred_at": "2026-10-01T01:18:46+00:00",
+          "published_at": "2026-10-01T01:18:46+00:00",
+          "title": "\"삼전닉스에서 소부장으로\" 수급 변수 어떻게 될까 | 김록호 하나증권 리서치센터 팀장 [더블 업]",
+          "source_url": "https://www.youtube.com/watch?v=43roYkzGjm4",
+          "summary_status": "asr_uncertain",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "relevance": {
+            "tickers": [
+              "MU",
+              "005930",
+              "000660"
+            ],
+            "markets": [
+              "US",
+              "KR"
+            ],
+            "themes": [],
+            "match_basis": "verified_entities"
+          },
+          "claim_status_counts": {
+            "unverified": 7,
+            "asr_uncertain": 2,
+            "partially_supported": 1
+          }
+        },
+        {
+          "event_key": "QRnPK_PbT-w",
+          "content_sha256": "dbf67fb7dcc04643e6992bcf11cf75a4d8e57a2fb9b0eaf43f3d81ef7066fcac",
+          "occurred_at": "2026-10-01T01:15:17+00:00",
+          "published_at": "2026-10-01T01:15:17+00:00",
+          "title": "마이크론 실적 터졌다… HBM 내년까지 완판·가격도 오른다 / 그런데 삼전·SK하닉 왜 주가 급등 못하나? ㅣ 이주연 대표",
+          "source_url": "https://www.youtube.com/watch?v=QRnPK_PbT-w",
+          "summary_status": "asr_uncertain",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "relevance": {
+            "tickers": [
+              "MU",
+              "005930.KS",
+              "000660.KS",
+              "HPE",
+              "BE",
+              "GOOGL",
+              "INTC"
+            ],
+            "markets": [
+              "US",
+              "KR"
+            ],
+            "themes": [],
+            "match_basis": "verified_entities"
+          },
+          "claim_status_counts": {
+            "partially_supported": 4,
+            "unverified": 5,
+            "asr_uncertain": 1
+          }
+        },
+        {
+          "event_key": "ppjafgxLZNU",
+          "content_sha256": "e60f0978cd205434ae1cc85d0fda74720ec8e67c79200851c4c04ee628b8221a",
+          "occurred_at": "2026-10-01T01:01:52+00:00",
+          "published_at": "2026-10-01T01:01:52+00:00",
+          "title": "\"너무나 좋은 신호\" 반도체 소부장 돌파의 의미 | 하창완 하보노의 주식 이야기 대표 [더블 체크]",
+          "source_url": "https://www.youtube.com/watch?v=ppjafgxLZNU",
+          "summary_status": "asr_uncertain",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "relevance": {
+            "tickers": [],
+            "markets": [],
+            "themes": [],
+            "match_basis": "title_and_claim_context"
+          },
+          "claim_status_counts": {
+            "unverified": 8,
+            "partially_supported": 1,
+            "asr_uncertain": 1
+          }
+        },
+        {
+          "event_key": "m70tbr6SMa0",
+          "content_sha256": "5d1509ab718924dc4421eb688202ec5e6d03dae283ccbbe24021a2da69fb6a70",
+          "occurred_at": "2026-10-01T00:19:34+00:00",
+          "published_at": "2026-10-01T00:19:34+00:00",
+          "title": "마이크론 실적 발표, 10월1일 코스피 상승장 온다",
+          "source_url": "https://www.youtube.com/watch?v=m70tbr6SMa0",
+          "summary_status": "asr_uncertain",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "relevance": {
+            "tickers": [
+              "^KS11"
+            ],
+            "markets": [
+              "US"
+            ],
+            "themes": [],
+            "match_basis": "verified_entities"
+          },
+          "claim_status_counts": {
+            "unverified": 8,
+            "asr_uncertain": 2
+          }
+        },
+        {
+          "event_key": "7423mEzaC68",
+          "content_sha256": "4ad6499d392f8bbd47a737d3d1ea2e22e1e2c8afb6222b0c1937720d363672a0",
+          "occurred_at": "2026-10-01T00:08:47+00:00",
+          "published_at": "2026-10-01T00:08:47+00:00",
+          "title": "4분기 증시, 박스권 벗어날까? 외국인 매도가 관건 | 박병창 MP파트너스 대표 [마켓 인사이드]",
+          "source_url": "https://www.youtube.com/watch?v=7423mEzaC68",
+          "summary_status": "unverified",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "relevance": {
+            "tickers": [
+              "^KS11"
+            ],
+            "markets": [
+              "US"
+            ],
+            "themes": [],
+            "match_basis": "verified_entities"
+          },
+          "claim_status_counts": {
+            "unverified": 9
+          }
+        }
+      ]
+    },
+    "next_checkpoint": [
+      "다음 생산자 실행에서 coverage newest 역전과 60/99 절단 사유 확인",
+      "근거 ID 7건과 시각 불명 근거 2건의 원천 데이터 정정 확인",
+      "Google 출시·실사용·수익화, Micron HBM 계약과 한국 기업 전이 원공시 확인",
+      "TLT 장기금리 시나리오는 미 재무부 시계열·ARK 원문으로 검증",
+      "모든 실행 전 시장·계좌·위험 게이트 및 데이터 유효 시각 재확인"
+    ],
+    "mobile_handoff": {
+      "owner": "external_github_notification_pipeline",
+      "status": "PENDING_EXTERNAL_VERIFICATION",
+      "work_sent_notification": false
+    },
+    "external_delivery_verified": false
+  },
+  "report_id": "youtube:5ea63e49b99d5487a6f662dda9d978dd",
+  "report_sha256": "5ea63e49b99d5487a6f662dda9d978ddcd1cdb3673c69883cb320d994077f8c0",
+  "published_at": "2026-10-02T08:36:42.290159+09:00"
+}

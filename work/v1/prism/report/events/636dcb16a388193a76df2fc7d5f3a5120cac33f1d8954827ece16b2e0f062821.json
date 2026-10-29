@@ -1,0 +1,151 @@
+{
+  "schema": "tradingagents.work-report/v1",
+  "surface": "prism",
+  "event_id": "prism:bde6273abb8904e70b6cad2b734dde97",
+  "source_sha256": "281070c44d5420e2598a2c2fb6d26eb75ede210f81511b8f140e47cfe2086790",
+  "prompt_contract_version": "prism-work-v5",
+  "workflow_contract_sha256": "affa33ed518a96ac60bff25950a3fe646a7ff652ceb8d1ab5a9f50dde0362c75",
+  "policy": {
+    "visibility": "investor_safe_no_credentials",
+    "external_evidence_profile": "balanced_external",
+    "external_evidence_may_affect": [
+      "ranking",
+      "confidence",
+      "position_size_within_existing_risk_limits",
+      "research_priority"
+    ],
+    "external_evidence_may_bypass_execution_gate": false,
+    "thesis_is_independent_from_execution_readiness": true
+  },
+  "report_markdown": "# PRISM 연구 델타 · 10월 11일\n\n**핵심:** 삼표시멘트(038500.KS) 위험 근거의 확인 순서를 높입니다. 현재 매매 신호는 없습니다.\n\n- **근거 상태:** OK. 생산 성공 10/11 10:13 KST, 최근 이벤트 10:00 KST. 이벤트 5건 모두 현재 24시간 범위입니다.\n- **주식 1건:** 주간 인사이트의 삼표시멘트 매도 회고([stock_ai_agent:15932](https://t.me/stock_ai_agent/15932))입니다. 패킷의 정규화 신호는 WATCH입니다. 과거 매도·손익·비중 언급을 현재 주문이나 개인 계좌 상태로 해석하지 않습니다.\n- **기타 4건:** BTC 데모 진입·보호 변경·정산 기록(15928–15931)입니다. 주식 후보 순위·포지션 크기·실행 판단에 반영하지 않습니다.\n\n## 범위와 판단\n\n신규 5건, 수정 0건, 기존 중복 0건. 최근 24시간 범위의 5/5건 전송, 생략 0건, truncation 없음. **COMPLETE는 패킷 전송 범위의 완전성만 뜻하며 독립 사실 검증은 아닙니다.** 단일 채널 자료는 `balanced_external`의 LOW_LABELED 가중치로 사용합니다.\n\n| 시장·종목 | 연구 영향 | 검증 상태·실행 |\n|---|---|---|\n| KR · 038500.KS | 주간 매도 회고 사유와 기존 투자 논리의 충돌 여부를 후속 KR 브리핑의 **위험 검증 우선순위 상단**에 둠. 유리한 후보 순위 상향은 보류 | 원공시, KRX 시세·거래량·수급, 현 보유/관심 목록 및 기존 위험 한도 재확인 필요. 현재 신규 매도·매수 배분 0% |\n| US 주식 | 이번 패킷에서 검증된 신규 개별 주식 신호 없음 | 기존 순위·thesis 확신도·비중 유지 |\n| BTC 데모 | 주식 전략에서 제외 | 실제 계좌·주식 체결 근거 아님 |\n\n## 다음 확인\n\n10/11 11:15 KST 전후 새 **sanitized 생산 run**과 038500.KS의 DART/KIND 공시, KRX 가격·거래량·수급을 대조합니다. 당일 시장·계좌·위험 gate를 통과하기 전에는 어떤 PRISM 문구도 주문으로 승격하지 않습니다. 외부 Telegram 또는 Pages 전달 영수증은 없습니다.\n\nCOVERAGE_RECEIPT {\"event_id\":\"prism:bde6273abb8904e70b6cad2b734dde97\",\"status\":\"COMPLETE\",\"window_events\":5,\"transmitted_events\":5,\"truncated\":false,\"new_events\":5,\"revised_events\":0}\nMOBILE_HANDOFF {\"owner\":\"external_github_notification_pipeline\",\"status\":\"PENDING_EXTERNAL_VERIFICATION\",\"work_sent_notification\":false}",
+  "structured_report": {
+    "binding": {
+      "surface": "prism",
+      "event_id": "prism:bde6273abb8904e70b6cad2b734dde97",
+      "source_sha256": "281070c44d5420e2598a2c2fb6d26eb75ede210f81511b8f140e47cfe2086790"
+    },
+    "title": "PRISM 연구 델타 · 삼표시멘트 위험 근거 확인",
+    "generated_at": "2026-10-11T10:36:44.030352+09:00",
+    "as_of": "2026-10-11T01:00:08+00:00",
+    "source_health": "OK",
+    "report_mode": "RESEARCH_ONLY",
+    "summary": "신규 5건 중 주식 매핑은 038500.KS의 주간 매도 회고 1건이다. 해당 종목의 위험 근거 확인 순서를 높이고, BTC 데모 4건은 주식 전략에서 제외한다. 현재 주문·thesis 확신도·비중 변경은 없다.",
+    "top_actions": [
+      {
+        "ticker": "038500.KS",
+        "action": "VERIFY_RISK_CONTEXT",
+        "readiness": "RESEARCH_ONLY",
+        "rationale": "주간 매도 회고의 원인과 현재 위험 조건을 공식 자료로 재검증"
+      }
+    ],
+    "strategies": [
+      {
+        "ticker": "038500.KS",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action_now": false,
+          "blockers": [
+            "단일 외부 채널 회고",
+            "현재 시장·계좌·위험 조건 미검증"
+          ],
+          "required_rechecks": [
+            "DART/KIND 공시",
+            "KRX 현 시세·거래량·수급",
+            "현재 보유 및 기존 thesis·위험 한도"
+          ]
+        },
+        "research_impact": "KR 후속 브리핑의 위험 검증 우선순위를 상향한다. 긍정 후보 순위·thesis 확신도·포지션 크기는 변경하지 않는다.",
+        "source_contributions": [
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15932",
+            "content_sha256": "648d7682dea2093085d38ace2df0c1f220f8b250944617777b2b3fdb150371dc",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "주간 매도 회고는 단일 채널의 연구 자료이며 현재 매도 주문이나 개인 보유를 뜻하지 않는다. 정규화 신호는 WATCH이고 원공시·실시간 시장 데이터 검증이 없다.",
+            "execution_gate_override": false
+          }
+        ]
+      }
+    ],
+    "coverage_receipt": {
+      "event_id": "prism:bde6273abb8904e70b6cad2b734dde97",
+      "status": "COMPLETE",
+      "window_events": 5,
+      "transmitted_events": 5,
+      "truncated": false,
+      "new_events": 5,
+      "revised_events": 0
+    },
+    "model_receipt": {
+      "schema": "tradingagents.model-provenance/v1",
+      "work_synthesis": {
+        "execution_mode": "local",
+        "requested_model": "gpt-6.1-sol",
+        "requested_reasoning_effort": "xhigh",
+        "task_id": "tradingagents-work-prism",
+        "verification_status": "CONFIGURED_NOT_RUNTIME_VERIFIED",
+        "observed_model": null,
+        "observed_reasoning_effort": null,
+        "note": "The local task contract is verified; the Work host does not expose a signed per-response model receipt."
+      }
+    },
+    "source_summary": {
+      "producer": {
+        "health": "OK",
+        "run_id": "prism_telegram_20261011_101338",
+        "last_run_at": "2026-10-11T10:13:43.343512+09:00",
+        "status": "success",
+        "stale_after_hours": 30
+      },
+      "coverage": {
+        "total_unique_events": 155,
+        "window_events": 5,
+        "transmitted_events": 5,
+        "truncated": false,
+        "oldest_occurred_at": "2026-10-10T20:41:27+00:00",
+        "newest_occurred_at": "2026-10-11T01:00:08+00:00"
+      },
+      "delta": {
+        "new_events": 5,
+        "revised_events": 0,
+        "unchanged_events": 0,
+        "delivered_event_keys": [
+          "stock_ai_agent:15932",
+          "stock_ai_agent:15931",
+          "stock_ai_agent:15930",
+          "stock_ai_agent:15929",
+          "stock_ai_agent:15928"
+        ]
+      },
+      "source_contributions": [
+        {
+          "source": "prism",
+          "event_key": "stock_ai_agent:15932",
+          "content_sha256": "648d7682dea2093085d38ace2df0c1f220f8b250944617777b2b3fdb150371dc",
+          "affected_fields": [
+            "research_priority"
+          ],
+          "evidence_weight": "LOW_LABELED",
+          "rationale": "주간 매도 회고는 단일 채널의 연구 자료이며 현재 매도 주문이나 개인 보유를 뜻하지 않는다. 정규화 신호는 WATCH이고 원공시·실시간 시장 데이터 검증이 없다.",
+          "execution_gate_override": false
+        }
+      ],
+      "excluded_event_keys": [
+        "stock_ai_agent:15928",
+        "stock_ai_agent:15929",
+        "stock_ai_agent:15930",
+        "stock_ai_agent:15931"
+      ],
+      "independent_verification_performed": false,
+      "external_evidence_profile": "balanced_external",
+      "execution_eligible": false
+    },
+    "next_checkpoint": "2026-10-11T11:15:43.343512+09:00"
+  },
+  "report_id": "prism:636dcb16a388193a76df2fc7d5f3a512",
+  "report_sha256": "636dcb16a388193a76df2fc7d5f3a5120cac33f1d8954827ece16b2e0f062821",
+  "published_at": "2026-10-11T10:36:55.028742+09:00"
+}

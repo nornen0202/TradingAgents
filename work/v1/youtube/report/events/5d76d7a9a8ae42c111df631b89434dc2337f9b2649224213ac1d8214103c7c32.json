@@ -1,0 +1,701 @@
+{
+  "schema": "tradingagents.work-report/v1",
+  "surface": "youtube",
+  "event_id": "youtube:3f2627535bfee15da559376dc325aad9",
+  "source_sha256": "75ea255ac83ad17ba428d4d460a9068cceeda52ef0855f347d68e6bed4aa93eb",
+  "prompt_contract_version": "youtube-work-v5",
+  "workflow_contract_sha256": "bc33d7680318d3200a3ef2fd2cc1f830d41fd1ba019e4f20ed6d1951cd6dc343",
+  "policy": {
+    "visibility": "investor_safe_no_credentials",
+    "external_evidence_profile": "balanced_external",
+    "external_evidence_may_affect": [
+      "ranking",
+      "confidence",
+      "position_size_within_existing_risk_limits",
+      "research_priority"
+    ],
+    "external_evidence_may_bypass_execution_gate": false,
+    "thesis_is_independent_from_execution_readiness": true
+  },
+  "report_markdown": "# YouTube 검증 델타 | 2026-10-05 KST\n\n**확인 시각:** 2026-10-05T09:36:04+09:00 · **생산자:** youtube_20261005_081843 / 성공 / 0.94시간 경과(한도 36시간) · **실행:** 연구 전용, 신규 주문 0건\n\n## 먼저 볼 변화\n\n1. **프랑스 국채·유럽 금리 위험** — 사용자 우선 채널 `hl1bFB6AZWg`는 전략 가중치 HIGH. 금리·재정 수치는 6건 모두 미검증이므로 사실로 채택하지 않고, EUR/장기금리 노출 점검을 **연구 우선순위 1**로 올린다. 종목 매매 판단과 규모 변경은 보류.\n2. **삼성 AI 인프라** — `rxV0UVS5pWM`의 핵심인 삼성 6개사의 Helix **총 10억 달러 투자**는 [삼성 공식 발표](https://news.samsung.com/global/samsung-to-invest-usd-1-billion-in-ai-infrastructure-company-helix)로 확인. 공급 매출, HBM 점유율, 내년 추월 전망은 확인되지 않아 삼성전자(005930) 연구 우선순위만 상향하고 이익 전망·포지션 크기는 유지.\n3. **SK하이닉스 주주환원** — `c-YUkrMBylE`의 **40조 원 자사주 매입·전량 소각 결의, 2025~2027 누적 FCF 50% 초과 환원 목표**는 [회사 발표](https://news.skhynix.com/en/share-buyback-and-retirement/)로 확인. 진행률·종료일·추가 환원 시점은 별도 확인 전까지 반영하지 않고 000660 공시 점검을 우선한다.\n\n## 범위와 근거 상태\n\n- 신규 **14**, 수정 **0**, 기존과 동일해 제외 **44**. 72시간 창 **58/58** 전송, 생략 **0**, 절단 없음. 가장 오래된 커버리지 시각은 71.64시간 전으로 경계에 근접한다.\n- 84개 주장: 미검증 **66**, ASR 불확실 **9**, 부분 지지 **7**, 지지 **2**. 원 패킷의 지지 표기는 주장 전체의 공식 검증을 뜻하지 않는다. 근거 ID 연결 오류 **7개**는 근거로 사용하지 않았다.\n- 영상의 프랑스 금리·재정 수치, 마이크론 실적·설비투자 수치, 고용·금리 수치, HBM 점유율과 반도체·전력·유가 전망은 원자료 확인 전 단정하지 않는다. `HXrsRH9EY3A`는 패킷 전체 상태가 contradicted이며 증액 근거에서 제외한다.\n\n## KR·US 연구 영향\n\n| 우선 | 대상 | 델타와 허용 액션 | 실행 경계 |\n|---|---|---|---|\n| 1 | 유럽 국채·장기금리 노출 | `hl1bFB6AZWg` 사용자 우선 HIGH → **UPGRADE_RESEARCH**; 공식 금리·재정·보유 비중 대조 | 매매·규모 변경 없음 |\n| 2 | 005930 삼성전자 | `rxV0UVS5pWM` 공식 투자 사실로 **UPGRADE_RESEARCH**; `s7oQAD83OvA`의 HBM4·수급 해석은 낮은 신뢰도로 병기 | 실적·수주 확인 전 RESEARCH_ONLY |\n| 3 | 000660 SK하이닉스 | `c-YUkrMBylE` 공식 환원 정책으로 **UPGRADE_RESEARCH**; `s7oQAD83OvA`의 HBM4 전망은 미검증 | 진행 공시와 실적 확인 전 RESEARCH_ONLY |\n| 4 | MU·ORCL 및 AI 전력 | `0ag6lKsq57w`, `dONn3eEEvuE`의 숫자·전원 전환은 ASR/미검증 → **REQUIRES_PRIMARY_VERIFICATION** | 신뢰도 상향·규모 변경 없음 |\n| 5 | 유가·SOXS 등 | `EjQZKj9WnuQ`, `HXrsRH9EY3A`는 상충/미검증 주장 → **MAINTAIN** 또는 위험 점검 | 주문 신호 아님 |\n\n후속 KR·US 종합에서는 확인된 투자·환원 **사실**에만 중간 가중치, 부분 지지는 낮음~중간, 미검증·ASR은 낮은 표시 가중치를 적용한다. 사용자 우선 프랑스 위험은 연구 순위를 높이되 주장 수치의 진위를 보증하지 않는다. 기존 위험 한도 내 크기 조정도 시장·계좌·주문·위험 게이트의 별도 최신 검증 후에만 검토한다.\n\n## 과장·오류 회피\n\n- 영상 제목의 “초대형 사이클”, “폭탄”, “주가 방어”는 예측 또는 수사다. 회사 발표가 미래 수주·실적을 보장하지 않는다.\n- 패킷에서 `supported`인 SK하이닉스 소각 방향과 레버리지 상품의 경로 의존성은 좁은 범위로만 해석한다. SK하이닉스 소각 후 주식 수 감소율, 매입 완료 시각 등 부가 수치는 재확인한다.\n- 실시간 시세·계좌·포지션·주문 유효성은 이 YouTube 패킷에 없다. 매수·매도·축소의 현재 지시로 사용하지 않는다.\n\n## 다음 공식 확인 과제\n\n1. 프랑스 국채 수익률·재정·외국인 보유 비중: 프랑스 재무당국, ECB/Eurostat 원자료와 발표일 대조.\n2. SK하이닉스 자사주 취득 진행 공시와 삼성 Helix 투자 이후 수주·매출 인식 여부를 회사 IR/공시로 확인.\n3. 마이크론 실적·설비투자, 미국 고용·국채금리, 삼성·SK HBM 점유율은 각 회사 IR 및 공식 통계로 확인. 근거 ID 누락 7개도 생산자에서 보정.\n\n## 신규 이벤트 기록\n\n1. [`hl1bFB6AZWg`](https://www.youtube.com/watch?v=hl1bFB6AZWg) · 박종훈의 지식한방 · 사용자 우선 HIGH · 고금리 폭탄에 무너질 첫번째 나라는 프랑스? (박종훈의 지식한방)\n2. [`0ag6lKsq57w`](https://www.youtube.com/watch?v=0ag6lKsq57w) · 삼프로TV 3PROTV · asr_uncertain · 5% 고금리 뚫고 올라갈 하반기 주가 방어 전략은?ㅣ장우진 금시공 대표, 박명석 큐레이터 [주말인터뷰]\n3. [`4QYtyQnR_eM`](https://www.youtube.com/watch?v=4QYtyQnR_eM) · 경제사냥꾼 · asr_uncertain · 10월 5일 투자자들이 꼭 알아야 하는 오늘의 투자 포인트\n4. [`rxV0UVS5pWM`](https://www.youtube.com/watch?v=rxV0UVS5pWM) · 경제사냥꾼 · unverified · 이재용이 '삼성전자' 역대급 상승장 준비하는 방법\n5. [`HXrsRH9EY3A`](https://www.youtube.com/watch?v=HXrsRH9EY3A) · 815Money talk · contradicted · [#찐시황]  금리 5%에도 AI는 안 죽는다… AI發 MLCC·기판 ‘초대형 공급 부족’ 시작? / 10월 주도주는 ‘여기’  | 미래에셋자산운용 최창규 이사\n6. [`c-YUkrMBylE`](https://www.youtube.com/watch?v=c-YUkrMBylE) · 경제사냥꾼 · unverified · SK하이닉스는 '40조 자사주 매입' 끝나면, 뭐부터 할까?\n7. [`dONn3eEEvuE`](https://www.youtube.com/watch?v=dONn3eEEvuE) · 815Money talk · asr_uncertain · AI데이터센터 전력난이 돈을 만든다… 신재생에너지 내년 실적 폭발 / 가장 먼저 움직일 주식은 ‘여기’  ㅣ유진투자증권 한병화 이사\n8. [`imhcllFNVMI`](https://www.youtube.com/watch?v=imhcllFNVMI) · 경제사냥꾼 · unverified · 투자자들이 꼭 알아야 할 '10월' 새로운 '매도 기준' 3가지\n9. [`mbd_XtJTs3k`](https://www.youtube.com/watch?v=mbd_XtJTs3k) · 삼프로TV 3PROTV · asr_uncertain · [한국어] 뉴욕증권거래소에서 만난 켄 피셔! 투자 거장이 내년 상반기까지 증시를 낙관하는 이유 [Global Money Talk]\n10. [`yyfCTQ2LAZQ`](https://www.youtube.com/watch?v=yyfCTQ2LAZQ) · 경제사냥꾼 · asr_uncertain · 10월 현시점, 월가가 바라보는 '코스피+나스닥' 연말 전망\n11. [`zyG3-yP-O6w`](https://www.youtube.com/watch?v=zyG3-yP-O6w) · 815Money talk · asr_uncertain · 삼전·SK하닉 다음은 ‘여기’다… 현대차, ESS, 바이오주 ‘대반전’ 온다ㅣ장인투자클럽 이창대 대표\n12. [`EjQZKj9WnuQ`](https://www.youtube.com/watch?v=EjQZKj9WnuQ) · 삼프로TV 3PROTV · asr_uncertain · 이란이 정말 한계에 몰렸나? 지금 공격을 멈춘 진짜 이유 | 성일광·박현도 서강대 유로메나연구소 교수 [신과대화]\n13. [`Mkf-2Bq75kk`](https://www.youtube.com/watch?v=Mkf-2Bq75kk) · 경제사냥꾼 · asr_uncertain · 삼전·닉스'가 없었다면, 누가 코스피 대장주였을까?\n14. [`s7oQAD83OvA`](https://www.youtube.com/watch?v=s7oQAD83OvA) · 815Money talk · asr_uncertain · 삼전·SK하닉 지금 팔 때 아니다…외국인 돌아오는 결정적 신호…HBM4가 만드는 2027년 ‘초대형 사이클’ㅣ미래에셋자산운용 최창규 이사\n\nCOVERAGE_RECEIPT {\"event_id\":\"youtube:3f2627535bfee15da559376dc325aad9\",\"status\":\"COMPLETE\",\"window_events\":58,\"transmitted_events\":58,\"truncated\":false,\"new_events\":14,\"revised_events\":0}\nMOBILE_HANDOFF {\"owner\":\"external_github_notification_pipeline\",\"status\":\"PENDING_EXTERNAL_VERIFICATION\",\"work_sent_notification\":false}",
+  "structured_report": {
+    "binding": {
+      "surface": "youtube",
+      "event_id": "youtube:3f2627535bfee15da559376dc325aad9",
+      "source_sha256": "75ea255ac83ad17ba428d4d460a9068cceeda52ef0855f347d68e6bed4aa93eb"
+    },
+    "title": "YouTube 검증 델타 — 2026-10-05",
+    "generated_at": "2026-10-05T09:36:04+09:00",
+    "as_of": "2026-10-05T08:39:39.688569+09:00",
+    "source_health": "OK",
+    "report_mode": "VERIFICATION_DELTA",
+    "summary": [
+      "신규 14건·수정 0건·동일 44건 제외; 72시간 창 58/58 전송, 절단 없음.",
+      "프랑스 국채 위험 사용자 우선 영상은 연구 최우선; 6개 수치는 미검증.",
+      "삼성 Helix 10억 달러 투자와 SK하이닉스 40조 원 매입·소각 정책은 회사 발표로 범위 한정 확인.",
+      "84개 주장 중 미검증 66·ASR 불확실 9·부분 지지 7·지지 2; 근거 ID 연결 오류 7개.",
+      "현재 주문 0건, 후속 시장·계좌·위험 게이트 별도 필요."
+    ],
+    "top_actions": [
+      {
+        "rank": 1,
+        "target": "FR_SOVEREIGN_RISK",
+        "action": "UPGRADE_RESEARCH",
+        "readiness": "RESEARCH_ONLY",
+        "event_key": "hl1bFB6AZWg",
+        "reason": "사용자 우선 HIGH. 수치 진위는 공식 원자료 대조 전 보류."
+      },
+      {
+        "rank": 2,
+        "ticker": "005930",
+        "action": "UPGRADE_RESEARCH",
+        "readiness": "RESEARCH_ONLY",
+        "event_key": "rxV0UVS5pWM",
+        "reason": "삼성 공식 Helix 투자 사실 확인; 실적 추정은 보류."
+      },
+      {
+        "rank": 3,
+        "ticker": "000660",
+        "action": "UPGRADE_RESEARCH",
+        "readiness": "RESEARCH_ONLY",
+        "event_key": "c-YUkrMBylE",
+        "reason": "회사 공식 매입·소각 정책 확인; 진행률은 보류."
+      }
+    ],
+    "strategies": [
+      {
+        "ticker": "005930",
+        "name": "삼성전자",
+        "market": "KR",
+        "research_rank": 2,
+        "action": "UPGRADE_RESEARCH",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "sizing_effect": "NONE_PENDING_LIVE_GATES"
+        },
+        "source_contributions": [
+          {
+            "surface": "youtube",
+            "event_key": "rxV0UVS5pWM",
+            "affected_field": "research_priority",
+            "evidence_weight": "MEDIUM",
+            "effect": "Helix 투자 사실은 삼성 공식 발표로 확인; 공급 매출·HBM 전망은 미확인.",
+            "execution_gate_override": false
+          },
+          {
+            "surface": "youtube",
+            "event_key": "s7oQAD83OvA",
+            "affected_field": "thesis_confidence",
+            "evidence_weight": "LOW_LABELED",
+            "effect": "HBM4·외국인 수급 주장은 부분 지지 또는 미검증으로 신뢰도 상향 보류.",
+            "execution_gate_override": false
+          }
+        ]
+      },
+      {
+        "ticker": "000660",
+        "name": "SK하이닉스",
+        "market": "KR",
+        "research_rank": 3,
+        "action": "UPGRADE_RESEARCH",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "sizing_effect": "NONE_PENDING_LIVE_GATES"
+        },
+        "source_contributions": [
+          {
+            "surface": "youtube",
+            "event_key": "c-YUkrMBylE",
+            "affected_field": "research_priority",
+            "evidence_weight": "MEDIUM",
+            "effect": "40조 원 매입·소각과 FCF 환원 정책은 회사 발표로 확인; 진행률·종료일 미확인.",
+            "execution_gate_override": false
+          },
+          {
+            "surface": "youtube",
+            "event_key": "s7oQAD83OvA",
+            "affected_field": "thesis_confidence",
+            "evidence_weight": "LOW_LABELED",
+            "effect": "HBM4 공급 병목 수치는 미검증이라 확신 상향 금지.",
+            "execution_gate_override": false
+          }
+        ]
+      },
+      {
+        "ticker": "MU",
+        "name": "Micron",
+        "market": "US",
+        "research_rank": 4,
+        "action": "REQUIRES_PRIMARY_VERIFICATION",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "sizing_effect": "NONE_PENDING_LIVE_GATES"
+        },
+        "source_contributions": [
+          {
+            "surface": "youtube",
+            "event_key": "0ag6lKsq57w",
+            "affected_field": "thesis_confidence",
+            "evidence_weight": "LOW_LABELED",
+            "effect": "영상의 실적·설비투자 수치가 ASR 불확실; 회사 IR 재확인 우선.",
+            "execution_gate_override": false
+          }
+        ]
+      },
+      {
+        "ticker": "ORCL",
+        "name": "Oracle",
+        "market": "US",
+        "research_rank": 5,
+        "action": "REQUIRES_PRIMARY_VERIFICATION",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "sizing_effect": "NONE_PENDING_LIVE_GATES"
+        },
+        "source_contributions": [
+          {
+            "surface": "youtube",
+            "event_key": "dONn3eEEvuE",
+            "affected_field": "research_priority",
+            "evidence_weight": "LOW_LABELED",
+            "effect": "데이터센터 전원 전환 주장은 미검증; 인허가와 회사 공시 점검.",
+            "execution_gate_override": false
+          }
+        ]
+      }
+    ],
+    "coverage_receipt": {
+      "event_id": "youtube:3f2627535bfee15da559376dc325aad9",
+      "status": "COMPLETE",
+      "window_events": 58,
+      "transmitted_events": 58,
+      "truncated": false,
+      "new_events": 14,
+      "revised_events": 0
+    },
+    "model_receipt": {
+      "schema": "tradingagents.model-provenance/v1",
+      "work_synthesis": {
+        "execution_mode": "local",
+        "requested_model": "gpt-6-sol",
+        "requested_reasoning_effort": "xhigh",
+        "task_id": "tradingagents-work-youtube",
+        "verification_status": "CONFIGURED_NOT_RUNTIME_VERIFIED",
+        "observed_model": null,
+        "observed_reasoning_effort": null,
+        "note": "The local task contract is verified; the Work host does not expose a signed per-response model receipt."
+      }
+    },
+    "source_summary": {
+      "canonical_source": {
+        "health": "OK",
+        "run_id": "youtube_20261005_081843",
+        "last_run_at": "2026-10-05T08:39:39.688569+09:00",
+        "status": "success",
+        "stale_after_hours": 36
+      },
+      "coverage": {
+        "total_unique_events": 335,
+        "window_events": 58,
+        "transmitted_events": 58,
+        "truncated": false,
+        "oldest_occurred_at": "2026-10-02T00:57:27+00:00",
+        "newest_occurred_at": "2026-10-04T23:00:26+00:00"
+      },
+      "delta": {
+        "new_events": 14,
+        "revised_events": 0,
+        "unchanged_events": 44,
+        "delivered_event_keys": [
+          "hl1bFB6AZWg",
+          "0ag6lKsq57w",
+          "4QYtyQnR_eM",
+          "rxV0UVS5pWM",
+          "HXrsRH9EY3A",
+          "c-YUkrMBylE",
+          "dONn3eEEvuE",
+          "imhcllFNVMI",
+          "mbd_XtJTs3k",
+          "yyfCTQ2LAZQ",
+          "zyG3-yP-O6w",
+          "EjQZKj9WnuQ",
+          "Mkf-2Bq75kk",
+          "s7oQAD83OvA"
+        ]
+      },
+      "source_snapshot_sha256": "8326d5cfa7f80f5614942e6a3b066af4bc4f8a3b999f7bf1a5f05d6520d3fb1c",
+      "balanced_external_policy": {
+        "profile": "balanced_external",
+        "material_thesis_effects": [
+          "ranking",
+          "confidence",
+          "position_size_within_existing_risk_limits",
+          "research_priority"
+        ],
+        "supported_evidence_weight": "MEDIUM",
+        "partially_supported_evidence_weight": "LOW_TO_MEDIUM",
+        "unverified_evidence_weight": "LOW_LABELED",
+        "user_primary_channels": [
+          "@kpunch",
+          "@sosumonkey"
+        ],
+        "user_primary_source_tier": "USER_PRIMARY",
+        "user_primary_evidence_weight": "HIGH",
+        "user_primary_validation_policy": "USER_ACCEPTED",
+        "matching_multi_source_signal_may_raise_thesis_priority": true,
+        "conflicting_signal_must_be_visible": true,
+        "may_bypass_market_or_portfolio_execution_gate": false
+      },
+      "execution_eligible": false,
+      "omitted_events": 0,
+      "freshness_receipt": {
+        "checked_at": "2026-10-05T09:36:04+09:00",
+        "source_age_hours": 0.94,
+        "coverage_oldest_age_hours": 71.644,
+        "coverage_newest_age_hours": 1.594,
+        "available_clocks_parse_nonfuture_ordered": true,
+        "event_clocks_available": true,
+        "market_account_validity_available": false
+      },
+      "claim_status_counts": {
+        "unverified": 66,
+        "asr_uncertain": 9,
+        "partially_supported": 7,
+        "supported": 2
+      },
+      "missing_evidence_bindings": [
+        {
+          "event_key": "rxV0UVS5pWM",
+          "claim_id": "C1",
+          "evidence_id": "E8"
+        },
+        {
+          "event_key": "rxV0UVS5pWM",
+          "claim_id": "C4",
+          "evidence_id": "E8"
+        },
+        {
+          "event_key": "c-YUkrMBylE",
+          "claim_id": "C1",
+          "evidence_id": "E9"
+        },
+        {
+          "event_key": "c-YUkrMBylE",
+          "claim_id": "C3",
+          "evidence_id": "E9"
+        },
+        {
+          "event_key": "c-YUkrMBylE",
+          "claim_id": "C4",
+          "evidence_id": "E13"
+        },
+        {
+          "event_key": "c-YUkrMBylE",
+          "claim_id": "C5",
+          "evidence_id": "E11"
+        },
+        {
+          "event_key": "c-YUkrMBylE",
+          "claim_id": "C5",
+          "evidence_id": "E10"
+        }
+      ],
+      "official_crosschecks": [
+        {
+          "event_key": "rxV0UVS5pWM",
+          "claim_id": "C1",
+          "source_url": "https://news.samsung.com/global/samsung-to-invest-usd-1-billion-in-ai-infrastructure-company-helix",
+          "confirmed_scope": "삼성 6개사 Helix 총 10억 달러 투자 발표",
+          "not_confirmed": "미래 공급 매출·HBM 점유율"
+        },
+        {
+          "event_key": "c-YUkrMBylE",
+          "claim_id": "C3",
+          "source_url": "https://news.skhynix.com/en/share-buyback-and-retirement/",
+          "confirmed_scope": "40조 원 자사주 매입·전량 소각 결의와 2025~2027 누적 FCF 50% 초과 환원 목표",
+          "not_confirmed": "매입 진행률·종료 시각·추가 환원 시점"
+        }
+      ],
+      "event_manifest": [
+        {
+          "event_key": "hl1bFB6AZWg",
+          "content_sha256": "0c1bc0f84abcc14729de031c10b91f0ed3e5f9531e866800c81a7bb360c30893",
+          "occurred_at": "2026-10-04T10:30:13+00:00",
+          "published_at": "2026-10-04T10:30:13+00:00",
+          "source_url": "https://www.youtube.com/watch?v=hl1bFB6AZWg",
+          "title": "고금리 폭탄에 무너질 첫번째 나라는 프랑스? (박종훈의 지식한방)",
+          "channel": "박종훈의 지식한방",
+          "status": "unverified",
+          "strategy_source_tier": "USER_PRIMARY",
+          "strategy_evidence_weight": "HIGH",
+          "relevance": {
+            "tickers": [],
+            "markets": [],
+            "themes": [],
+            "match_basis": "title_and_claim_context"
+          },
+          "claim_statuses": {
+            "unverified": 6
+          }
+        },
+        {
+          "event_key": "0ag6lKsq57w",
+          "content_sha256": "1894a572a3d27d75564bce8e4d6c44ddcc5217f9dadaa528e15f3828aa477ddf",
+          "occurred_at": "2026-10-04T23:00:26+00:00",
+          "published_at": "2026-10-04T23:00:26+00:00",
+          "source_url": "https://www.youtube.com/watch?v=0ag6lKsq57w",
+          "title": "5% 고금리 뚫고 올라갈 하반기 주가 방어 전략은?ㅣ장우진 금시공 대표, 박명석 큐레이터 [주말인터뷰]",
+          "channel": "삼프로TV 3PROTV",
+          "status": "asr_uncertain",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "relevance": {
+            "tickers": [
+              "MU",
+              "NVDA",
+              "MSFT",
+              "META",
+              "GOOGL",
+              "ORCL",
+              "SKM"
+            ],
+            "markets": [
+              "US"
+            ],
+            "themes": [],
+            "match_basis": "verified_entities"
+          },
+          "claim_statuses": {
+            "asr_uncertain": 4,
+            "unverified": 2
+          }
+        },
+        {
+          "event_key": "4QYtyQnR_eM",
+          "content_sha256": "52af8fec72beb07609737cbb5ec1abf473be2be57679fe291d5645786d97038e",
+          "occurred_at": "2026-10-04T22:04:50+00:00",
+          "published_at": "2026-10-04T22:04:50+00:00",
+          "source_url": "https://www.youtube.com/watch?v=4QYtyQnR_eM",
+          "title": "10월 5일 투자자들이 꼭 알아야 하는 오늘의 투자 포인트",
+          "channel": "경제사냥꾼",
+          "status": "asr_uncertain",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "relevance": {
+            "tickers": [
+              "^KS11",
+              "CL=F"
+            ],
+            "markets": [
+              "US"
+            ],
+            "themes": [],
+            "match_basis": "verified_entities"
+          },
+          "claim_statuses": {
+            "unverified": 6
+          }
+        },
+        {
+          "event_key": "rxV0UVS5pWM",
+          "content_sha256": "59f6e205e01e10d46bb040c71ef6428e11376ae5bb86373e8de9583c585c3cb4",
+          "occurred_at": "2026-10-04T12:00:11+00:00",
+          "published_at": "2026-10-04T12:00:11+00:00",
+          "source_url": "https://www.youtube.com/watch?v=rxV0UVS5pWM",
+          "title": "이재용이 '삼성전자' 역대급 상승장 준비하는 방법",
+          "channel": "경제사냥꾼",
+          "status": "unverified",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "relevance": {
+            "tickers": [],
+            "markets": [],
+            "themes": [],
+            "match_basis": "title_and_claim_context"
+          },
+          "claim_statuses": {
+            "partially_supported": 2,
+            "unverified": 4
+          }
+        },
+        {
+          "event_key": "HXrsRH9EY3A",
+          "content_sha256": "4b569886dca3b998563d0caca65f1fce91311fc0612c948f6b711e81877e6386",
+          "occurred_at": "2026-10-04T11:00:05+00:00",
+          "published_at": "2026-10-04T11:00:05+00:00",
+          "source_url": "https://www.youtube.com/watch?v=HXrsRH9EY3A",
+          "title": "[#찐시황]  금리 5%에도 AI는 안 죽는다… AI發 MLCC·기판 ‘초대형 공급 부족’ 시작? / 10월 주도주는 ‘여기’  | 미래에셋자산운용 최창규 이사",
+          "channel": "815Money talk",
+          "status": "contradicted",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "relevance": {
+            "tickers": [
+              "SOXS"
+            ],
+            "markets": [
+              "US"
+            ],
+            "themes": [],
+            "match_basis": "verified_entities"
+          },
+          "claim_statuses": {
+            "unverified": 5,
+            "asr_uncertain": 1
+          }
+        },
+        {
+          "event_key": "c-YUkrMBylE",
+          "content_sha256": "f3596c9983f8779d9348a2c25b7f7989f23aa60ab7160b67457058f4f3ff2307",
+          "occurred_at": "2026-10-04T10:00:20+00:00",
+          "published_at": "2026-10-04T10:00:20+00:00",
+          "source_url": "https://www.youtube.com/watch?v=c-YUkrMBylE",
+          "title": "SK하이닉스는 '40조 자사주 매입' 끝나면, 뭐부터 할까?",
+          "channel": "경제사냥꾼",
+          "status": "unverified",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "relevance": {
+            "tickers": [],
+            "markets": [],
+            "themes": [],
+            "match_basis": "title_and_claim_context"
+          },
+          "claim_statuses": {
+            "partially_supported": 3,
+            "unverified": 2,
+            "supported": 1
+          }
+        },
+        {
+          "event_key": "dONn3eEEvuE",
+          "content_sha256": "475584ec4afcbb80ea20552bde7775dcdd75c2748fde12a2c0863f7a401a21c7",
+          "occurred_at": "2026-10-04T08:00:07+00:00",
+          "published_at": "2026-10-04T08:00:07+00:00",
+          "source_url": "https://www.youtube.com/watch?v=dONn3eEEvuE",
+          "title": "AI데이터센터 전력난이 돈을 만든다… 신재생에너지 내년 실적 폭발 / 가장 먼저 움직일 주식은 ‘여기’  ㅣ유진투자증권 한병화 이사",
+          "channel": "815Money talk",
+          "status": "asr_uncertain",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "relevance": {
+            "tickers": [
+              "ORCL"
+            ],
+            "markets": [
+              "US"
+            ],
+            "themes": [],
+            "match_basis": "verified_entities"
+          },
+          "claim_statuses": {
+            "unverified": 4,
+            "asr_uncertain": 2
+          }
+        },
+        {
+          "event_key": "imhcllFNVMI",
+          "content_sha256": "2e08c0a3f68951809ec9669cc0112a1fb7ed7a2ebfa1c7429b0b280da414e46c",
+          "occurred_at": "2026-10-04T08:00:03+00:00",
+          "published_at": "2026-10-04T08:00:03+00:00",
+          "source_url": "https://www.youtube.com/watch?v=imhcllFNVMI",
+          "title": "투자자들이 꼭 알아야 할 '10월' 새로운 '매도 기준' 3가지",
+          "channel": "경제사냥꾼",
+          "status": "unverified",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "relevance": {
+            "tickers": [],
+            "markets": [],
+            "themes": [],
+            "match_basis": "title_and_claim_context"
+          },
+          "claim_statuses": {
+            "unverified": 4,
+            "partially_supported": 1,
+            "supported": 1
+          }
+        },
+        {
+          "event_key": "mbd_XtJTs3k",
+          "content_sha256": "790f9f03838ed0bdf93807cf992e1b663a6c0642350831c386e6e9c969678c91",
+          "occurred_at": "2026-10-04T06:00:16+00:00",
+          "published_at": "2026-10-04T06:00:16+00:00",
+          "source_url": "https://www.youtube.com/watch?v=mbd_XtJTs3k",
+          "title": "[한국어] 뉴욕증권거래소에서 만난 켄 피셔! 투자 거장이 내년 상반기까지 증시를 낙관하는 이유 [Global Money Talk]",
+          "channel": "삼프로TV 3PROTV",
+          "status": "asr_uncertain",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "relevance": {
+            "tickers": [
+              "SPX",
+              "NVDA"
+            ],
+            "markets": [
+              "US"
+            ],
+            "themes": [],
+            "match_basis": "verified_entities"
+          },
+          "claim_statuses": {
+            "unverified": 6
+          }
+        },
+        {
+          "event_key": "yyfCTQ2LAZQ",
+          "content_sha256": "c13355a5f4781f39b4d070b9eba250fc18f6797b971f54e7c671036f01819ca5",
+          "occurred_at": "2026-10-04T03:00:35+00:00",
+          "published_at": "2026-10-04T03:00:35+00:00",
+          "source_url": "https://www.youtube.com/watch?v=yyfCTQ2LAZQ",
+          "title": "10월 현시점, 월가가 바라보는 '코스피+나스닥' 연말 전망",
+          "channel": "경제사냥꾼",
+          "status": "asr_uncertain",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "relevance": {
+            "tickers": [
+              "^KS11"
+            ],
+            "markets": [
+              "US"
+            ],
+            "themes": [],
+            "match_basis": "verified_entities"
+          },
+          "claim_statuses": {
+            "unverified": 5,
+            "asr_uncertain": 1
+          }
+        },
+        {
+          "event_key": "zyG3-yP-O6w",
+          "content_sha256": "3245b3318b41c0d8e2f463ee0fd8cf5b14bba4c5906e3b1c3ab661683efd6432",
+          "occurred_at": "2026-10-04T03:00:11+00:00",
+          "published_at": "2026-10-04T03:00:11+00:00",
+          "source_url": "https://www.youtube.com/watch?v=zyG3-yP-O6w",
+          "title": "삼전·SK하닉 다음은 ‘여기’다… 현대차, ESS, 바이오주 ‘대반전’ 온다ㅣ장인투자클럽 이창대 대표",
+          "channel": "815Money talk",
+          "status": "asr_uncertain",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "relevance": {
+            "tickers": [],
+            "markets": [],
+            "themes": [],
+            "match_basis": "title_and_claim_context"
+          },
+          "claim_statuses": {
+            "unverified": 6
+          }
+        },
+        {
+          "event_key": "EjQZKj9WnuQ",
+          "content_sha256": "5f6d23fe57f6a12915ca4fbd64ba42218db717125eca9c0f279db953bb926d1b",
+          "occurred_at": "2026-10-04T02:00:22+00:00",
+          "published_at": "2026-10-04T02:00:22+00:00",
+          "source_url": "https://www.youtube.com/watch?v=EjQZKj9WnuQ",
+          "title": "이란이 정말 한계에 몰렸나? 지금 공격을 멈춘 진짜 이유 | 성일광·박현도 서강대 유로메나연구소 교수 [신과대화]",
+          "channel": "삼프로TV 3PROTV",
+          "status": "asr_uncertain",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "relevance": {
+            "tickers": [
+              "CL=F"
+            ],
+            "markets": [
+              "US"
+            ],
+            "themes": [],
+            "match_basis": "verified_entities"
+          },
+          "claim_statuses": {
+            "unverified": 5,
+            "asr_uncertain": 1
+          }
+        },
+        {
+          "event_key": "Mkf-2Bq75kk",
+          "content_sha256": "24b77ee657e55c7b39190cd529c5a38f6192829a771027eb58ad0b970dbdc9c6",
+          "occurred_at": "2026-10-04T01:00:38+00:00",
+          "published_at": "2026-10-04T01:00:38+00:00",
+          "source_url": "https://www.youtube.com/watch?v=Mkf-2Bq75kk",
+          "title": "삼전·닉스'가 없었다면, 누가 코스피 대장주였을까?",
+          "channel": "경제사냥꾼",
+          "status": "asr_uncertain",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "relevance": {
+            "tickers": [],
+            "markets": [],
+            "themes": [],
+            "match_basis": "title_and_claim_context"
+          },
+          "claim_statuses": {
+            "unverified": 6
+          }
+        },
+        {
+          "event_key": "s7oQAD83OvA",
+          "content_sha256": "d2ca3d1625103ad48a1ae80148d7dcc3bf6805b3d94a4214cfb98463fae1480e",
+          "occurred_at": "2026-10-03T23:30:05+00:00",
+          "published_at": "2026-10-03T23:30:05+00:00",
+          "source_url": "https://www.youtube.com/watch?v=s7oQAD83OvA",
+          "title": "삼전·SK하닉 지금 팔 때 아니다…외국인 돌아오는 결정적 신호…HBM4가 만드는 2027년 ‘초대형 사이클’ㅣ미래에셋자산운용 최창규 이사",
+          "channel": "815Money talk",
+          "status": "asr_uncertain",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "relevance": {
+            "tickers": [
+              "005930",
+              "000660"
+            ],
+            "markets": [
+              "KR"
+            ],
+            "themes": [],
+            "match_basis": "verified_entities"
+          },
+          "claim_statuses": {
+            "unverified": 5,
+            "partially_supported": 1
+          }
+        }
+      ],
+      "external_evidence_receipt": {
+        "new_relevant_event_keys": [
+          "hl1bFB6AZWg",
+          "rxV0UVS5pWM",
+          "c-YUkrMBylE",
+          "s7oQAD83OvA",
+          "0ag6lKsq57w",
+          "dONn3eEEvuE"
+        ],
+        "status": "MIXED_VERIFICATION",
+        "affected_fields": [
+          "research_priority",
+          "thesis_confidence"
+        ],
+        "sizing_effect": "NONE_PENDING_LIVE_GATES",
+        "execution_gate_override": false
+      }
+    },
+    "next_checkpoint": [
+      "프랑스 금리·재정·보유 비중 공식 원자료 대조",
+      "삼성 Helix 후속 수주·실적과 SK하이닉스 자사주 진행 공시 점검",
+      "MU·ORCL·미국 고용/금리·HBM 수치 원자료 확인과 누락 근거 ID 보정",
+      "실행 전 시장·계좌·주문·위험 한도 별도 재검증"
+    ],
+    "mobile_handoff": {
+      "owner": "external_github_notification_pipeline",
+      "status": "PENDING_EXTERNAL_VERIFICATION",
+      "work_sent_notification": false
+    },
+    "external_delivery_verified": false
+  },
+  "report_id": "youtube:5d76d7a9a8ae42c111df631b89434dc2",
+  "report_sha256": "5d76d7a9a8ae42c111df631b89434dc2337f9b2649224213ac1d8214103c7c32",
+  "published_at": "2026-10-05T09:36:25.774173+09:00"
+}

@@ -1,0 +1,3827 @@
+{
+  "schema": "tradingagents.work-report/v1",
+  "surface": "youtube",
+  "event_id": "youtube:f544c35823ea897ee31cf2b88fa0e18a",
+  "source_sha256": "b9911109cb2ab3ceabadf22d8d102ebef12dc200cd2a753f0beeb7172905b3dd",
+  "prompt_contract_version": "youtube-work-v5",
+  "workflow_contract_sha256": "4982d0db0e5a97f3b0f392bdff489a6940be0d2d88e7ea94533edbdb009b4556",
+  "policy": {
+    "visibility": "investor_safe_no_credentials",
+    "external_evidence_profile": "balanced_external",
+    "external_evidence_may_affect": [
+      "ranking",
+      "confidence",
+      "position_size_within_existing_risk_limits",
+      "research_priority"
+    ],
+    "external_evidence_may_bypass_execution_gate": false,
+    "thesis_is_independent_from_execution_readiness": true
+  },
+  "report_markdown": "# 10월 22일 YouTube 검증 델타 — 신규 36건, 원자료 검증 우선\n\n검증 시각 2026-10-22 09:31 KST · 출처 상태 정상 · 현재 주문 권한 없음\n\n- 신규 36건·수정 0건, 동일 24건 제외. 전송 60/범위 109건으로 부분 범위이며 생략 49건을 이번 분석으로 표시하지 않는다.\n- 원문·ACK 해시 대조에서 이번 36건 외 미처리 신규·수정 backlog 0건.\n- 반도체 반등론과 신용·현금흐름 경고가 공존해 원공시 검증 우선순위를 높인다. 사실 신뢰도·포지션 수치는 변경하지 않는다.\n- CEVA는 과거 Q2 공식 자료와 영상 수치를 구분해 정정한다.\n- 모든 후보는 연구 전용이며 외부 전달은 미확인이다.\n\n수집 실행 `youtube_20261022_080610` · 완료 2026-10-22T09:08:16.586275+09:00. 전송 자료 범위 2026-10-19T11:01:11+00:00~2026-10-21T22:56:36+00:00. 시계 파싱·미래·역전·36시간/72시간 검사를 통과했다. 가장 이른 유효 경계는 2026-10-22T20:01:11+09:00이며 이후 재검증한다.\n\nCEVA 공식 발표(2026-08-10, 회계기간 종료 2026-06-30)는 라이선스 매출 18.221백만 달러를 제시한다. 영상 C5의 약 18.82백만 달러와 차이가 있다. C6의 약 2.1백만 달러 손실은 영업손실이며 GAAP 순손실은 2.910백만 달러다. 과거 회계 수치 정정으로만 사용하고 현재 수익성·저평가를 확정하지 않는다. [공식 원문](https://www.ceva-ip.com/press/ceva-inc-announces-second-quarter-2026-financial-results/)\n\n메타·삼성전기·NVIDIA 원문 직접 열람이 실패했다. 검색 요약을 확정 근거로 승격하지 않았다. SK하이닉스 자사주 완료, HBM 수율, 장기계약 비중, 반도체 지수·국채금리·유가·신용확률은 직접 증거가 없어 미검증이다. SpaceX/AI 사업 주체와 SPCX, CoreWeave/Coherent, 430%포인트 및 5.1%→1% 초반 같은 자막은 자동 종목 매핑·투자 계산에서 제외한다.\n\nbalanced_external: 전송된 USER_PRIMARY/HIGH 신규 기여는 0건이다. 표준 채널 미검증 내용은 LOW_LABELED로 연구 순위에 반영한다. 부분 지지 표시는 유지하되 연결 증거 부재·불일치를 확인하기 전 confidence나 크기를 높이지 않는다. CEVA 공식 과거 수치는 해당 정정에만 중간 가중치를 적용한다. 매수/매도 방향·시장/계좌/위험 gate를 변경하지 않는다.\n\n패킷 요약 상태 합계 {'unverified': 327, 'partially_supported': 19, 'asr_uncertain': 61, 'contradicted': 1}; 상세 제공 주장 216건 {'unverified': 182, 'partially_supported': 9, 'asr_uncertain': 25}. 요약 합계와 상세 행 수가 다르므로 미제공 주장을 검증했다고 보지 않는다.\n\n| 연구 대상 | 허용 액션·후속 영향 |\n|---|---|\n| CEVA | UPGRADE_RESEARCH · 공식 8월 10일 Q2 자료로 라이선스 매출 18.221백만 달러와 GAAP 순손실 2.910백만 달러를 확인. 과거 수치 정정 검토를 우선하며 현재 실적·저평가 근거로 승격하지 않는다. |\n| 000660 | UPGRADE_RESEARCH · HBM 수율·장기계약·자사주 종료·Solidigm 지배구조를 원공시로 대조하는 연구 순위를 높인다. 반등 매수론과 수급·공급과잉 경고를 함께 보존한다. |\n| 000660.KS | UPGRADE_RESEARCH · HBM 수율·장기계약·자사주 종료·Solidigm 지배구조를 원공시로 대조하는 연구 순위를 높인다. 반등 매수론과 수급·공급과잉 경고를 함께 보존한다. |\n| 005380 | UPGRADE_RESEARCH · 미검증 주장 원문·기간·기업 식별을 우선 대조한다. 사실 확정 및 수치 신뢰도 상향을 보류한다. |\n| 005930 | UPGRADE_RESEARCH · HBM 수율·장기계약·자사주 종료·Solidigm 지배구조를 원공시로 대조하는 연구 순위를 높인다. 반등 매수론과 수급·공급과잉 경고를 함께 보존한다. |\n| 005930.KS | UPGRADE_RESEARCH · HBM 수율·장기계약·자사주 종료·Solidigm 지배구조를 원공시로 대조하는 연구 순위를 높인다. 반등 매수론과 수급·공급과잉 경고를 함께 보존한다. |\n| 005935 | UPGRADE_RESEARCH · HBM 수율·장기계약·자사주 종료·Solidigm 지배구조를 원공시로 대조하는 연구 순위를 높인다. 반등 매수론과 수급·공급과잉 경고를 함께 보존한다. |\n| 009150 | UPGRADE_RESEARCH · 발표 원문과 가이던스·CAPEX·매출 인식·수익화 검증 순위를 높인다. 직접 원문 열람 실패 항목과 기업명 ASR 오류는 사실 근거에서 제외한다. |\n| 010120 | UPGRADE_RESEARCH · 미검증 주장 원문·기간·기업 식별을 우선 대조한다. 사실 확정 및 수치 신뢰도 상향을 보류한다. |\n| 034220 | UPGRADE_RESEARCH · 미검증 주장 원문·기간·기업 식별을 우선 대조한다. 사실 확정 및 수치 신뢰도 상향을 보류한다. |\n| 064350 | UPGRADE_RESEARCH · 미검증 주장 원문·기간·기업 식별을 우선 대조한다. 사실 확정 및 수치 신뢰도 상향을 보류한다. |\n| 9984.T | UPGRADE_RESEARCH · 차환비용·임대계약 해지권·현금흐름 검증 연구를 우선한다. 수주잔고 방어론과 신용위험 경고를 함께 비교하며 미검증 금리·부도확률은 제외한다. |\n| AAPL | UPGRADE_RESEARCH · 미검증 주장 원문·기간·기업 식별을 우선 대조한다. 사실 확정 및 수치 신뢰도 상향을 보류한다. |\n| BTC | UPGRADE_RESEARCH · 미검증 주장 원문·기간·기업 식별을 우선 대조한다. 사실 확정 및 수치 신뢰도 상향을 보류한다. |\n| BZ=F | UPGRADE_RESEARCH · 미검증 주장 원문·기간·기업 식별을 우선 대조한다. 사실 확정 및 수치 신뢰도 상향을 보류한다. |\n| CL=F | UPGRADE_RESEARCH · 미검증 주장 원문·기간·기업 식별을 우선 대조한다. 사실 확정 및 수치 신뢰도 상향을 보류한다. |\n| CRWV | UPGRADE_RESEARCH · 차환비용·임대계약 해지권·현금흐름 검증 연구를 우선한다. 수주잔고 방어론과 신용위험 경고를 함께 비교하며 미검증 금리·부도확률은 제외한다. |\n| ETH | UPGRADE_RESEARCH · 미검증 주장 원문·기간·기업 식별을 우선 대조한다. 사실 확정 및 수치 신뢰도 상향을 보류한다. |\n| IBIT | UPGRADE_RESEARCH · 미검증 주장 원문·기간·기업 식별을 우선 대조한다. 사실 확정 및 수치 신뢰도 상향을 보류한다. |\n| IBM | UPGRADE_RESEARCH · 미검증 주장 원문·기간·기업 식별을 우선 대조한다. 사실 확정 및 수치 신뢰도 상향을 보류한다. |\n| JPM | UPGRADE_RESEARCH · 미검증 주장 원문·기간·기업 식별을 우선 대조한다. 사실 확정 및 수치 신뢰도 상향을 보류한다. |\n| LRCX | UPGRADE_RESEARCH · 발표 원문과 가이던스·CAPEX·매출 인식·수익화 검증 순위를 높인다. 직접 원문 열람 실패 항목과 기업명 ASR 오류는 사실 근거에서 제외한다. |\n| META | UPGRADE_RESEARCH · 발표 원문과 가이던스·CAPEX·매출 인식·수익화 검증 순위를 높인다. 직접 원문 열람 실패 항목과 기업명 ASR 오류는 사실 근거에서 제외한다. |\n| MU | UPGRADE_RESEARCH · HBM 수율·장기계약·자사주 종료·Solidigm 지배구조를 원공시로 대조하는 연구 순위를 높인다. 반등 매수론과 수급·공급과잉 경고를 함께 보존한다. |\n| NVDA | UPGRADE_RESEARCH · 발표 원문과 가이던스·CAPEX·매출 인식·수익화 검증 순위를 높인다. 직접 원문 열람 실패 항목과 기업명 ASR 오류는 사실 근거에서 제외한다. |\n| ORCL | UPGRADE_RESEARCH · 차환비용·임대계약 해지권·현금흐름 검증 연구를 우선한다. 수주잔고 방어론과 신용위험 경고를 함께 비교하며 미검증 금리·부도확률은 제외한다. |\n| SMCI | UPGRADE_RESEARCH · 발표 원문과 가이던스·CAPEX·매출 인식·수익화 검증 순위를 높인다. 직접 원문 열람 실패 항목과 기업명 ASR 오류는 사실 근거에서 제외한다. |\n| SOL | UPGRADE_RESEARCH · 미검증 주장 원문·기간·기업 식별을 우선 대조한다. 사실 확정 및 수치 신뢰도 상향을 보류한다. |\n| TSLA | UPGRADE_RESEARCH · 발표 원문과 가이던스·CAPEX·매출 인식·수익화 검증 순위를 높인다. 직접 원문 열람 실패 항목과 기업명 ASR 오류는 사실 근거에서 제외한다. |\n| TSM | UPGRADE_RESEARCH · 미검증 주장 원문·기간·기업 식별을 우선 대조한다. 사실 확정 및 수치 신뢰도 상향을 보류한다. |\n| TXN | UPGRADE_RESEARCH · 미검증 주장 원문·기간·기업 식별을 우선 대조한다. 사실 확정 및 수치 신뢰도 상향을 보류한다. |\n| XBI | UPGRADE_RESEARCH · 미검증 주장 원문·기간·기업 식별을 우선 대조한다. 사실 확정 및 수치 신뢰도 상향을 보류한다. |\n| ^KS11 | UPGRADE_RESEARCH · 미검증 주장 원문·기간·기업 식별을 우선 대조한다. 사실 확정 및 수치 신뢰도 상향을 보류한다. |\n\n각 행은 RESEARCH_ONLY다. 복합 ticker는 원문 표기를 보존하고 개별 상장종목으로 자동 분해하지 않았다. 지수의 US/KR 태그 혼재는 시장 식별 검증 대상으로 남겼다.\n\n| 신규 event·원문 | 원발행 시각 | 검토 결과 |\n|---|---|---|\n| [GJ4qhsYAO6M](https://www.youtube.com/watch?v=GJ4qhsYAO6M) 10월 22일 오늘 코스피, 과연 어떻게 흘러갈까? | 2026-10-21T22:56:36+00:00 | 원자료 검증 필요·연구 참고; 주문 근거 승격 없음 |\n| [KLY4_VCgqe4](https://www.youtube.com/watch?v=KLY4_VCgqe4) \"지금은 분할 매수할 타이밍\"…삼성전자·SK하이닉스 반등, 다음 주 빅테크 실적에 달렸다? / 김장열 유니스토리자산운용 리서치센터 센터장 [글로벌 인터뷰] | 2026-10-21T22:53:03+00:00 | 원자료 검증 필요·연구 참고; 주문 근거 승격 없음 |\n| [AVqXPwaziYo](https://www.youtube.com/watch?v=AVqXPwaziYo) 메타, 소송 비용 반영에도 서프라이즈…테슬라, FSD 호조에 마진 개선 [월가 뉴스레터] | 2026-10-21T21:57:56+00:00 | 원자료 검증 필요·연구 참고; 주문 근거 승격 없음 |\n| [2NVBahZ9rGU](https://www.youtube.com/watch?v=2NVBahZ9rGU) 10월 22일 투자자들이 꼭 알아야 하는 투자 포인트 | 2026-10-21T21:45:02+00:00 | 원자료 검증 필요·연구 참고; 주문 근거 승격 없음 |\n| [lhYvgDJUKNM](https://www.youtube.com/watch?v=lhYvgDJUKNM) 코스피 바닥에서 시작된 '실적 시즌' 투자 포인트는? | 2026-10-21T13:30:18+00:00 | 원자료 검증 필요·연구 참고; 주문 근거 승격 없음 |\n| [aI52gGQQCC8](https://www.youtube.com/watch?v=aI52gGQQCC8) 8조 적자 ‘미운 오리’가 100조 백조로…솔리다임 상장, SK하이닉스는 주주에게 뭘 설명해야 하나ㅣ명민준, 서수진, 송재경 [주린이 구조대] | 2026-10-21T12:00:29+00:00 | 원자료 검증 필요·연구 참고; 주문 근거 승격 없음 |\n| [mKbboQXLmQ0](https://www.youtube.com/watch?v=mKbboQXLmQ0) 스페이스X가 로켓보다 AI 사업에 더 많은 돈을 쓰는 이유 | 2026-10-21T11:02:05+00:00 | 원자료 검증 필요·연구 참고; 주문 근거 승격 없음 |\n| [akEJ_RecjWA](https://www.youtube.com/watch?v=akEJ_RecjWA) [#찐시황] “외국인 9,300억 폭풍 매수!” 삼성전자 4일 연속 순매수… 반도체 주도주 부활하나? / 내일 증시 판 바꿀 결정적 변수ㅣ오로라 투자자문 이지환 대표 | 2026-10-21T11:00:38+00:00 | 원자료 검증 필요·연구 참고; 주문 근거 승격 없음 |\n| [f4_0pdU5CTs](https://www.youtube.com/watch?v=f4_0pdU5CTs) 코스피 급반등에도 추세 전환은 아직…이번 주 저점 확인이 다음 주 상승의 관건ㅣ명민준, 서수진, 유창희 [주린이 구조대] | 2026-10-21T11:00:33+00:00 | 원자료 검증 필요·연구 참고; 주문 근거 승격 없음 |\n| [ZEtSs7901nU](https://www.youtube.com/watch?v=ZEtSs7901nU) 10월 21일 외국인이 한국인 몰래 매수한 종목 정체 | 2026-10-21T10:02:16+00:00 | 원자료 검증 필요·연구 참고; 주문 근거 승격 없음 |\n| [_xhMKReKqD4](https://www.youtube.com/watch?v=_xhMKReKqD4) [#긴급인터뷰]  “코스피 급반등, 진짜 바닥은 아직 아니다?” 삼성전자·SK하이닉스 다시 주도주 될까 / 코어위브 신용위험 아직 안 끝났다  / KB증권  유영화 차장 | 2026-10-21T10:00:37+00:00 | 원자료 검증 필요·연구 참고; 주문 근거 승격 없음 |\n| [ZPF7UdMncFs](https://www.youtube.com/watch?v=ZPF7UdMncFs) \"남은 현금은 '이때' 씁니다\"…손익비 생각하면 흔들려도 지금은 버틸 구간!ㅣ홍선애, 민재기 KB증권 PRIME CLUB 팀장 [여의도 인사이트] | 2026-10-21T09:08:40+00:00 | 원자료 검증 필요·연구 참고; 주문 근거 승격 없음 |\n| [3qFC-2RxSis](https://www.youtube.com/watch?v=3qFC-2RxSis) 삼성전자 HBM4 대반격 시작..  SK하이닉스 독주 끝나나 / 영업이익 500조 가능할까? ㅣ메리츠증권 이화진 차장 | 2026-10-21T09:00:22+00:00 | 원자료 검증 필요·연구 참고; 주문 근거 승격 없음 |\n| [f_EUpVZ2BSw](https://www.youtube.com/watch?v=f_EUpVZ2BSw) 주가가 다시 오르기 시작할 때, 절대 놓치면 안 되는 것 | 2026-10-21T08:23:57+00:00 | 원자료 검증 필요·연구 참고; 주문 근거 승격 없음 |\n| [Nrrl0CMzIXM](https://www.youtube.com/watch?v=Nrrl0CMzIXM) [10월 21일 마감시황] “오늘 반등은 할 만큼 했다”…코스피 3% 급등 이후 시장이 확인해야 할 신호ㅣ홍선애, 이권희, 차영주 [클로징벨 라이브] | 2026-10-21T08:11:25+00:00 | 원자료 검증 필요·연구 참고; 주문 근거 승격 없음 |\n| [FaAgdmOGdhA](https://www.youtube.com/watch?v=FaAgdmOGdhA) 지금은 공포에 살 때? 반도체 급락장에서 확인할 가격의 기준 | 2026-10-21T08:00:05+00:00 | 원자료 검증 필요·연구 참고; 주문 근거 승격 없음 |\n| [VYYm8S5XFpU](https://www.youtube.com/watch?v=VYYm8S5XFpU) “지금 1억 있다면 이 주식 삽니다!” 코스피 폭락 후 대반등… 진짜 큰 돈은 급락장에서 버는 이유ㅣ김민수 대표 | 2026-10-21T07:30:08+00:00 | 원자료 검증 필요·연구 참고; 주문 근거 승격 없음 |\n| [e3WRUs1O8UM](https://www.youtube.com/watch?v=e3WRUs1O8UM) 월가에서 스페이스X 역대급 실적에도 아직 '저평가'라는 이유 | 2026-10-21T06:52:18+00:00 | 원자료 검증 필요·연구 참고; 주문 근거 승격 없음 |\n| [u-9XWm2U3Rk](https://www.youtube.com/watch?v=u-9XWm2U3Rk) 삼성전자 vs SK하이닉스, 지금은 어디에 비중을 둘까?…반등장에서 달라지는 투자 전략ㅣ권다영, 김태성 아이에셋 본부장 [2시 마켓워치] | 2026-10-21T06:42:23+00:00 | 원자료 검증 필요·연구 참고; 주문 근거 승격 없음 |\n| [rUG_SjCM5Go](https://www.youtube.com/watch?v=rUG_SjCM5Go) [#긴급시황] “지금 반등에 덥석 사지 마세요!”  조금씩 현금 확보하고 ‘이 신호’ 나올 때 매수하세요  (주가상승) 이건희 대표 | 2026-10-21T06:30:23+00:00 | 원자료 검증 필요·연구 참고; 주문 근거 승격 없음 |\n| [k686F8SVfEk](https://www.youtube.com/watch?v=k686F8SVfEk) 내려올 만큼 내려왔지만 매수는 아직 이르다…현금 투입보다 교체매매를 선택해야 하는 이유ㅣ권다영, 이지환 오로라투자자문 대표 [2시 마켓워치] | 2026-10-21T05:55:48+00:00 | 원자료 검증 필요·연구 참고; 주문 근거 승격 없음 |\n| [EwIuHwwAxlg](https://www.youtube.com/watch?v=EwIuHwwAxlg) [#글로벌인사이트]  AI 끝났다더니 코어위브 급등!  삼성전자·SK하이닉스 실적은 거짓말 안 한다 / 램리서치가 중요한 이유ㅣ세미콘리서치 랩 노근창 대표 | 2026-10-21T05:30:14+00:00 | 원자료 검증 필요·연구 참고; 주문 근거 승격 없음 |\n| [ZIAmv-svE70](https://www.youtube.com/watch?v=ZIAmv-svE70) 10월 21일 미국장 열리기 전 꼭 알아야 하는 '미장 시황' 투자 포인트 | 2026-10-21T05:08:45+00:00 | 원자료 검증 필요·연구 참고; 주문 근거 승격 없음 |\n| [8ootY32OxY0](https://www.youtube.com/watch?v=8ootY32OxY0) 10월 21일 우리가 꼭 알고 있어야 할, 저평가 'AI 반도체' 소형주 | 2026-10-21T04:00:31+00:00 | CEVA 과거 수치 정정·현재 평가는 보류 |\n| [Ihz5lQ8aPXs](https://www.youtube.com/watch?v=Ihz5lQ8aPXs) “욕까지 나왔던 어제의 급락장!” 외국인은 왜 삼성전자는 사고 SK하이닉스는 팔았나? / 반도체 주가 흐름 달라질까? ㅣ 이권희 대표 | 2026-10-21T04:00:08+00:00 | 원자료 검증 필요·연구 참고; 주문 근거 승격 없음 |\n| [RbrDrLBVTi8](https://www.youtube.com/watch?v=RbrDrLBVTi8) 클래리티 법안 부결 이후, 미국 중간선거와 한국 디지털자산 기본법의 향방 / 서동주, 김동환, 한서희 법무법인 광장 변호사 [크립토 PLUS] | 2026-10-21T03:40:44+00:00 | 원자료 검증 필요·연구 참고; 주문 근거 승격 없음 |\n| [_f4WO4vilxM](https://www.youtube.com/watch?v=_f4WO4vilxM) 금리·환율·AI 혼조세까지, 비트코인 호재의 연속! 글로벌 거물들 들어올까? / 서동주, 김동환, 박상혁 디지털애셋 편집장 [크립토 PLUS] | 2026-10-21T02:59:25+00:00 | 원자료 검증 필요·연구 참고; 주문 근거 승격 없음 |\n| [Pum27tW9534](https://www.youtube.com/watch?v=Pum27tW9534) 머스크가 스페이스X와 테슬라를 합치려는 진짜 이유 | 2026-10-21T02:48:57+00:00 | 원자료 검증 필요·연구 참고; 주문 근거 승격 없음 |\n| [KWH0_uW8zJQ](https://www.youtube.com/watch?v=KWH0_uW8zJQ) 코스피 20% 폭락, 지금 손절하면 후회한다? / 팔더라도 7,000선에서 팔아야 하는 이유ㅣ 한지영 연구위원 | 2026-10-21T02:30:31+00:00 | 원자료 검증 필요·연구 참고; 주문 근거 승격 없음 |\n| [mVeruSbWAu4](https://www.youtube.com/watch?v=mVeruSbWAu4) 중간선거 전 기술적 반등 기대해도 되나? / 장재영 NH투자증권 차장 [아침N투자] | 2026-10-21T02:24:40+00:00 | 원자료 검증 필요·연구 참고; 주문 근거 승격 없음 |\n| [fXSqM_OpPbo](https://www.youtube.com/watch?v=fXSqM_OpPbo) 이 상승이 계속 되려면 필요한 것ㅣ이성희 하나증권 전주금융센터 PB [더블 크루] | 2026-10-21T02:21:39+00:00 | 원자료 검증 필요·연구 참고; 주문 근거 승격 없음 |\n| [s6SFBZHVncQ](https://www.youtube.com/watch?v=s6SFBZHVncQ) 원전 당분간 쳐다보지 말까요? / 유재선 하나증권 리서치센터 수석연구위원 [더블 업] | 2026-10-21T01:52:50+00:00 | 원자료 검증 필요·연구 참고; 주문 근거 승격 없음 |\n| [pEcF6UhXJZA](https://www.youtube.com/watch?v=pEcF6UhXJZA) 코스피 드디어 바닥 찍었나? 반등장 어디까지 오를까? / 스페이스X 흑자 전환에 빅테크 투자 지속론 힘 받나ㅣ 이주연 대표 | 2026-10-21T01:30:04+00:00 | 원자료 검증 필요·연구 참고; 주문 근거 승격 없음 |\n| [7tGh0zvzfxY](https://www.youtube.com/watch?v=7tGh0zvzfxY) 강한 반등의 시작? 이번주 천천히 봐라 / 하창완 하보노의 주식 이야기 대표 [더블 체크] | 2026-10-21T01:27:24+00:00 | 원자료 검증 필요·연구 참고; 주문 근거 승격 없음 |\n| [qj5F8MHFNKs](https://www.youtube.com/watch?v=qj5F8MHFNKs) 코스피 폭락, 정말 위기일까? \"급등 후유증 겪는 중\"…외국인 매도세와 반등 조건 / 박병창 MP파트너스 대표 [마켓 인사이드] | 2026-10-21T00:21:07+00:00 | 원자료 검증 필요·연구 참고; 주문 근거 승격 없음 |\n| [yTzxfHZ0MwQ](https://www.youtube.com/watch?v=yTzxfHZ0MwQ) 삼전닉스 반토막 개미 10명 중 7명 물려…의무공개매수 청원 촉구 / 한국 AI데이터센터 엘리스 상장 후 32% 폭락…AI 투자 우려 / 권순우 삼프로TV 취재팀장 [뉴스3] | 2026-10-20T23:13:18+00:00 | 원자료 검증 필요·연구 참고; 주문 근거 승격 없음 |\n\n다음 검증: KRX 수급·매입 완료 공시, 메타/LRCX/삼성전기/NVIDIA 공식 발표, Solidigm 상장 공시, CRWV/SoftBank 차입 조건. 입법·세금·정책 일정은 공식 의결·법문 확인 전 미검증으로 유지한다. 계좌·실시간 가격 입력이 없으므로 연구 결과를 주문으로 전환하지 않는다.\n\nCOVERAGE_RECEIPT {\"event_id\":\"youtube:f544c35823ea897ee31cf2b88fa0e18a\",\"status\":\"PARTIAL\",\"window_events\":109,\"transmitted_events\":60,\"truncated\":true,\"new_events\":36,\"revised_events\":0}\n\nMOBILE_HANDOFF {\"owner\":\"external_github_notification_pipeline\",\"status\":\"PENDING_EXTERNAL_VERIFICATION\",\"work_sent_notification\":false}\n\n로컬 보고서 작성과 외부 전달은 별개다. Telegram·Pages 완료 증거는 없다.",
+  "structured_report": {
+    "binding": {
+      "surface": "youtube",
+      "event_id": "youtube:f544c35823ea897ee31cf2b88fa0e18a",
+      "source_sha256": "b9911109cb2ab3ceabadf22d8d102ebef12dc200cd2a753f0beeb7172905b3dd"
+    },
+    "title": "10월 22일 YouTube 검증 델타 — 신규 36건, 원자료 검증 우선",
+    "generated_at": "2026-10-22T09:31:57.568778+09:00",
+    "as_of": "2026-10-22T09:08:16.586275+09:00",
+    "source_health": "OK",
+    "report_mode": "RESEARCH",
+    "summary": [
+      "신규 36건·수정 0건, 동일 24건 제외. 전송 60/범위 109건으로 부분 범위이며 생략 49건을 이번 분석으로 표시하지 않는다.",
+      "원문·ACK 해시 대조에서 이번 36건 외 미처리 신규·수정 backlog 0건.",
+      "반도체 반등론과 신용·현금흐름 경고가 공존해 원공시 검증 우선순위를 높인다. 사실 신뢰도·포지션 수치는 변경하지 않는다.",
+      "CEVA는 과거 Q2 공식 자료와 영상 수치를 구분해 정정한다.",
+      "모든 후보는 연구 전용이며 외부 전달은 미확인이다."
+    ],
+    "top_actions": [
+      {
+        "action": "UPGRADE_RESEARCH",
+        "ticker": "CEVA",
+        "readiness": "RESEARCH_ONLY",
+        "reason": "과거 공식 실적과 영상 수치 차이 정정"
+      },
+      {
+        "action": "REQUIRES_PRIMARY_VERIFICATION",
+        "ticker": "005930",
+        "readiness": "RESEARCH_ONLY",
+        "reason": "HBM·자사주·외국인 수급의 상반된 주장 대조"
+      },
+      {
+        "action": "REQUIRES_PRIMARY_VERIFICATION",
+        "ticker": "CRWV",
+        "readiness": "RESEARCH_ONLY",
+        "reason": "차환 위험과 수주잔고 방어론 대조"
+      }
+    ],
+    "strategies": [
+      {
+        "ticker": "CEVA",
+        "rank": 1,
+        "action": "UPGRADE_RESEARCH",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "execution_eligible": false
+        },
+        "research_effect": "공식 8월 10일 Q2 자료로 라이선스 매출 18.221백만 달러와 GAAP 순손실 2.910백만 달러를 확인. 과거 수치 정정 검토를 우선하며 현재 실적·저평가 근거로 승격하지 않는다.",
+        "confidence_change": 0,
+        "position_size_change": 0,
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "8ootY32OxY0",
+            "content_sha256": "db861496b8122d937ecd1da1f4be5bcdac22367b1ad33b34c49f5b577a72be41",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "공식 8월 10일 Q2 자료로 라이선스 매출 18.221백만 달러와 GAAP 순손실 2.910백만 달러를 확인. 과거 수치 정정 검토를 우선하며 현재 실적·저평가 근거로 승격하지 않는다."
+          }
+        ]
+      },
+      {
+        "ticker": "000660",
+        "rank": 2,
+        "action": "UPGRADE_RESEARCH",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "execution_eligible": false
+        },
+        "research_effect": "HBM 수율·장기계약·자사주 종료·Solidigm 지배구조를 원공시로 대조하는 연구 순위를 높인다. 반등 매수론과 수급·공급과잉 경고를 함께 보존한다.",
+        "confidence_change": 0,
+        "position_size_change": 0,
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "GJ4qhsYAO6M",
+            "content_sha256": "becefee00b2dbdc43c49008bcaf9af0172d83efa1c7d5a45d4a115f57393aae6",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "HBM 수율·장기계약·자사주 종료·Solidigm 지배구조를 원공시로 대조하는 연구 순위를 높인다. 반등 매수론과 수급·공급과잉 경고를 함께 보존한다."
+          },
+          {
+            "source": "youtube",
+            "event_key": "2NVBahZ9rGU",
+            "content_sha256": "779181f311972569181993193329c13398c106c7ef012fa18e05553a51dba4b9",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "HBM 수율·장기계약·자사주 종료·Solidigm 지배구조를 원공시로 대조하는 연구 순위를 높인다. 반등 매수론과 수급·공급과잉 경고를 함께 보존한다."
+          },
+          {
+            "source": "youtube",
+            "event_key": "aI52gGQQCC8",
+            "content_sha256": "50fc7c37d93eddbfc4f47031efd3ead6058c6bb2c7d73a2e35611eb90ae70e6a",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "HBM 수율·장기계약·자사주 종료·Solidigm 지배구조를 원공시로 대조하는 연구 순위를 높인다. 반등 매수론과 수급·공급과잉 경고를 함께 보존한다."
+          },
+          {
+            "source": "youtube",
+            "event_key": "akEJ_RecjWA",
+            "content_sha256": "d1efbb3479fe2c6ad3e433df9b5ccf2d08e0b18bdf4658e2b0cc66dfc28d6a5a",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "HBM 수율·장기계약·자사주 종료·Solidigm 지배구조를 원공시로 대조하는 연구 순위를 높인다. 반등 매수론과 수급·공급과잉 경고를 함께 보존한다."
+          },
+          {
+            "source": "youtube",
+            "event_key": "ZPF7UdMncFs",
+            "content_sha256": "1dbeacea617b7a1084207c06a493c14086fbbf77263e727c620f2e04b42eb0bd",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "HBM 수율·장기계약·자사주 종료·Solidigm 지배구조를 원공시로 대조하는 연구 순위를 높인다. 반등 매수론과 수급·공급과잉 경고를 함께 보존한다."
+          },
+          {
+            "source": "youtube",
+            "event_key": "3qFC-2RxSis",
+            "content_sha256": "2cf8a6baae469b3f1418b4837a1a99014724293935e2def860ca3cb15559a7b4",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "HBM 수율·장기계약·자사주 종료·Solidigm 지배구조를 원공시로 대조하는 연구 순위를 높인다. 반등 매수론과 수급·공급과잉 경고를 함께 보존한다."
+          },
+          {
+            "source": "youtube",
+            "event_key": "f_EUpVZ2BSw",
+            "content_sha256": "91241fd036d02be42860bfaa6b9dcce298548f5b6c637a27864ebb67e22af69f",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "HBM 수율·장기계약·자사주 종료·Solidigm 지배구조를 원공시로 대조하는 연구 순위를 높인다. 반등 매수론과 수급·공급과잉 경고를 함께 보존한다."
+          },
+          {
+            "source": "youtube",
+            "event_key": "FaAgdmOGdhA",
+            "content_sha256": "b766aee59be776d287a62cd8f8ddc1d90d444fdbb0c61545b15144e14a43a28f",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "HBM 수율·장기계약·자사주 종료·Solidigm 지배구조를 원공시로 대조하는 연구 순위를 높인다. 반등 매수론과 수급·공급과잉 경고를 함께 보존한다."
+          },
+          {
+            "source": "youtube",
+            "event_key": "k686F8SVfEk",
+            "content_sha256": "c7b814507d0702d70a0c0e422632acf7f2fe1326d5ec22c54d618b20340e7218",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "HBM 수율·장기계약·자사주 종료·Solidigm 지배구조를 원공시로 대조하는 연구 순위를 높인다. 반등 매수론과 수급·공급과잉 경고를 함께 보존한다."
+          },
+          {
+            "source": "youtube",
+            "event_key": "mVeruSbWAu4",
+            "content_sha256": "21df0d6c04f26521aa915d77d2f4a5d6a130631adb38a00bfc473c1958eeb77b",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "HBM 수율·장기계약·자사주 종료·Solidigm 지배구조를 원공시로 대조하는 연구 순위를 높인다. 반등 매수론과 수급·공급과잉 경고를 함께 보존한다."
+          }
+        ]
+      },
+      {
+        "ticker": "000660.KS",
+        "rank": 3,
+        "action": "UPGRADE_RESEARCH",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "execution_eligible": false
+        },
+        "research_effect": "HBM 수율·장기계약·자사주 종료·Solidigm 지배구조를 원공시로 대조하는 연구 순위를 높인다. 반등 매수론과 수급·공급과잉 경고를 함께 보존한다.",
+        "confidence_change": 0,
+        "position_size_change": 0,
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "_xhMKReKqD4",
+            "content_sha256": "40b5c1d342bad53135ddd6c90f6a980eca841ef2e1ef48512b2d81b1f1bbe184",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "HBM 수율·장기계약·자사주 종료·Solidigm 지배구조를 원공시로 대조하는 연구 순위를 높인다. 반등 매수론과 수급·공급과잉 경고를 함께 보존한다."
+          }
+        ]
+      },
+      {
+        "ticker": "005380",
+        "rank": 4,
+        "action": "UPGRADE_RESEARCH",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "execution_eligible": false
+        },
+        "research_effect": "미검증 주장 원문·기간·기업 식별을 우선 대조한다. 사실 확정 및 수치 신뢰도 상향을 보류한다.",
+        "confidence_change": 0,
+        "position_size_change": 0,
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "ZPF7UdMncFs",
+            "content_sha256": "1dbeacea617b7a1084207c06a493c14086fbbf77263e727c620f2e04b42eb0bd",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "미검증 주장 원문·기간·기업 식별을 우선 대조한다. 사실 확정 및 수치 신뢰도 상향을 보류한다."
+          }
+        ]
+      },
+      {
+        "ticker": "005930",
+        "rank": 5,
+        "action": "UPGRADE_RESEARCH",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "execution_eligible": false
+        },
+        "research_effect": "HBM 수율·장기계약·자사주 종료·Solidigm 지배구조를 원공시로 대조하는 연구 순위를 높인다. 반등 매수론과 수급·공급과잉 경고를 함께 보존한다.",
+        "confidence_change": 0,
+        "position_size_change": 0,
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "GJ4qhsYAO6M",
+            "content_sha256": "becefee00b2dbdc43c49008bcaf9af0172d83efa1c7d5a45d4a115f57393aae6",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "HBM 수율·장기계약·자사주 종료·Solidigm 지배구조를 원공시로 대조하는 연구 순위를 높인다. 반등 매수론과 수급·공급과잉 경고를 함께 보존한다."
+          },
+          {
+            "source": "youtube",
+            "event_key": "2NVBahZ9rGU",
+            "content_sha256": "779181f311972569181993193329c13398c106c7ef012fa18e05553a51dba4b9",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "HBM 수율·장기계약·자사주 종료·Solidigm 지배구조를 원공시로 대조하는 연구 순위를 높인다. 반등 매수론과 수급·공급과잉 경고를 함께 보존한다."
+          },
+          {
+            "source": "youtube",
+            "event_key": "aI52gGQQCC8",
+            "content_sha256": "50fc7c37d93eddbfc4f47031efd3ead6058c6bb2c7d73a2e35611eb90ae70e6a",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "HBM 수율·장기계약·자사주 종료·Solidigm 지배구조를 원공시로 대조하는 연구 순위를 높인다. 반등 매수론과 수급·공급과잉 경고를 함께 보존한다."
+          },
+          {
+            "source": "youtube",
+            "event_key": "akEJ_RecjWA",
+            "content_sha256": "d1efbb3479fe2c6ad3e433df9b5ccf2d08e0b18bdf4658e2b0cc66dfc28d6a5a",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "HBM 수율·장기계약·자사주 종료·Solidigm 지배구조를 원공시로 대조하는 연구 순위를 높인다. 반등 매수론과 수급·공급과잉 경고를 함께 보존한다."
+          },
+          {
+            "source": "youtube",
+            "event_key": "ZPF7UdMncFs",
+            "content_sha256": "1dbeacea617b7a1084207c06a493c14086fbbf77263e727c620f2e04b42eb0bd",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "HBM 수율·장기계약·자사주 종료·Solidigm 지배구조를 원공시로 대조하는 연구 순위를 높인다. 반등 매수론과 수급·공급과잉 경고를 함께 보존한다."
+          },
+          {
+            "source": "youtube",
+            "event_key": "3qFC-2RxSis",
+            "content_sha256": "2cf8a6baae469b3f1418b4837a1a99014724293935e2def860ca3cb15559a7b4",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "HBM 수율·장기계약·자사주 종료·Solidigm 지배구조를 원공시로 대조하는 연구 순위를 높인다. 반등 매수론과 수급·공급과잉 경고를 함께 보존한다."
+          },
+          {
+            "source": "youtube",
+            "event_key": "f_EUpVZ2BSw",
+            "content_sha256": "91241fd036d02be42860bfaa6b9dcce298548f5b6c637a27864ebb67e22af69f",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "HBM 수율·장기계약·자사주 종료·Solidigm 지배구조를 원공시로 대조하는 연구 순위를 높인다. 반등 매수론과 수급·공급과잉 경고를 함께 보존한다."
+          },
+          {
+            "source": "youtube",
+            "event_key": "FaAgdmOGdhA",
+            "content_sha256": "b766aee59be776d287a62cd8f8ddc1d90d444fdbb0c61545b15144e14a43a28f",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "HBM 수율·장기계약·자사주 종료·Solidigm 지배구조를 원공시로 대조하는 연구 순위를 높인다. 반등 매수론과 수급·공급과잉 경고를 함께 보존한다."
+          },
+          {
+            "source": "youtube",
+            "event_key": "k686F8SVfEk",
+            "content_sha256": "c7b814507d0702d70a0c0e422632acf7f2fe1326d5ec22c54d618b20340e7218",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "HBM 수율·장기계약·자사주 종료·Solidigm 지배구조를 원공시로 대조하는 연구 순위를 높인다. 반등 매수론과 수급·공급과잉 경고를 함께 보존한다."
+          }
+        ]
+      },
+      {
+        "ticker": "005930.KS",
+        "rank": 6,
+        "action": "UPGRADE_RESEARCH",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "execution_eligible": false
+        },
+        "research_effect": "HBM 수율·장기계약·자사주 종료·Solidigm 지배구조를 원공시로 대조하는 연구 순위를 높인다. 반등 매수론과 수급·공급과잉 경고를 함께 보존한다.",
+        "confidence_change": 0,
+        "position_size_change": 0,
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "_xhMKReKqD4",
+            "content_sha256": "40b5c1d342bad53135ddd6c90f6a980eca841ef2e1ef48512b2d81b1f1bbe184",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "HBM 수율·장기계약·자사주 종료·Solidigm 지배구조를 원공시로 대조하는 연구 순위를 높인다. 반등 매수론과 수급·공급과잉 경고를 함께 보존한다."
+          }
+        ]
+      },
+      {
+        "ticker": "005935",
+        "rank": 7,
+        "action": "UPGRADE_RESEARCH",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "execution_eligible": false
+        },
+        "research_effect": "HBM 수율·장기계약·자사주 종료·Solidigm 지배구조를 원공시로 대조하는 연구 순위를 높인다. 반등 매수론과 수급·공급과잉 경고를 함께 보존한다.",
+        "confidence_change": 0,
+        "position_size_change": 0,
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "3qFC-2RxSis",
+            "content_sha256": "2cf8a6baae469b3f1418b4837a1a99014724293935e2def860ca3cb15559a7b4",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "HBM 수율·장기계약·자사주 종료·Solidigm 지배구조를 원공시로 대조하는 연구 순위를 높인다. 반등 매수론과 수급·공급과잉 경고를 함께 보존한다."
+          }
+        ]
+      },
+      {
+        "ticker": "009150",
+        "rank": 8,
+        "action": "UPGRADE_RESEARCH",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "execution_eligible": false
+        },
+        "research_effect": "발표 원문과 가이던스·CAPEX·매출 인식·수익화 검증 순위를 높인다. 직접 원문 열람 실패 항목과 기업명 ASR 오류는 사실 근거에서 제외한다.",
+        "confidence_change": 0,
+        "position_size_change": 0,
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "KLY4_VCgqe4",
+            "content_sha256": "98289ca6a1fc9bb76f9e34e7381251912ba176b16788eaf7cc19f653e1b23aa2",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "발표 원문과 가이던스·CAPEX·매출 인식·수익화 검증 순위를 높인다. 직접 원문 열람 실패 항목과 기업명 ASR 오류는 사실 근거에서 제외한다."
+          },
+          {
+            "source": "youtube",
+            "event_key": "AVqXPwaziYo",
+            "content_sha256": "a2a18fb19c758fda7c00a301d0ec1a34fffdf497bcd852656a8a39101e4b00f3",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "발표 원문과 가이던스·CAPEX·매출 인식·수익화 검증 순위를 높인다. 직접 원문 열람 실패 항목과 기업명 ASR 오류는 사실 근거에서 제외한다."
+          },
+          {
+            "source": "youtube",
+            "event_key": "2NVBahZ9rGU",
+            "content_sha256": "779181f311972569181993193329c13398c106c7ef012fa18e05553a51dba4b9",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "발표 원문과 가이던스·CAPEX·매출 인식·수익화 검증 순위를 높인다. 직접 원문 열람 실패 항목과 기업명 ASR 오류는 사실 근거에서 제외한다."
+          }
+        ]
+      },
+      {
+        "ticker": "010120",
+        "rank": 9,
+        "action": "UPGRADE_RESEARCH",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "execution_eligible": false
+        },
+        "research_effect": "미검증 주장 원문·기간·기업 식별을 우선 대조한다. 사실 확정 및 수치 신뢰도 상향을 보류한다.",
+        "confidence_change": 0,
+        "position_size_change": 0,
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "2NVBahZ9rGU",
+            "content_sha256": "779181f311972569181993193329c13398c106c7ef012fa18e05553a51dba4b9",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "미검증 주장 원문·기간·기업 식별을 우선 대조한다. 사실 확정 및 수치 신뢰도 상향을 보류한다."
+          }
+        ]
+      },
+      {
+        "ticker": "034220",
+        "rank": 10,
+        "action": "UPGRADE_RESEARCH",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "execution_eligible": false
+        },
+        "research_effect": "미검증 주장 원문·기간·기업 식별을 우선 대조한다. 사실 확정 및 수치 신뢰도 상향을 보류한다.",
+        "confidence_change": 0,
+        "position_size_change": 0,
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "2NVBahZ9rGU",
+            "content_sha256": "779181f311972569181993193329c13398c106c7ef012fa18e05553a51dba4b9",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "미검증 주장 원문·기간·기업 식별을 우선 대조한다. 사실 확정 및 수치 신뢰도 상향을 보류한다."
+          }
+        ]
+      },
+      {
+        "ticker": "064350",
+        "rank": 11,
+        "action": "UPGRADE_RESEARCH",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "execution_eligible": false
+        },
+        "research_effect": "미검증 주장 원문·기간·기업 식별을 우선 대조한다. 사실 확정 및 수치 신뢰도 상향을 보류한다.",
+        "confidence_change": 0,
+        "position_size_change": 0,
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "ZPF7UdMncFs",
+            "content_sha256": "1dbeacea617b7a1084207c06a493c14086fbbf77263e727c620f2e04b42eb0bd",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "미검증 주장 원문·기간·기업 식별을 우선 대조한다. 사실 확정 및 수치 신뢰도 상향을 보류한다."
+          }
+        ]
+      },
+      {
+        "ticker": "9984.T",
+        "rank": 12,
+        "action": "UPGRADE_RESEARCH",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "execution_eligible": false
+        },
+        "research_effect": "차환비용·임대계약 해지권·현금흐름 검증 연구를 우선한다. 수주잔고 방어론과 신용위험 경고를 함께 비교하며 미검증 금리·부도확률은 제외한다.",
+        "confidence_change": 0,
+        "position_size_change": 0,
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "_xhMKReKqD4",
+            "content_sha256": "40b5c1d342bad53135ddd6c90f6a980eca841ef2e1ef48512b2d81b1f1bbe184",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "차환비용·임대계약 해지권·현금흐름 검증 연구를 우선한다. 수주잔고 방어론과 신용위험 경고를 함께 비교하며 미검증 금리·부도확률은 제외한다."
+          }
+        ]
+      },
+      {
+        "ticker": "AAPL",
+        "rank": 13,
+        "action": "UPGRADE_RESEARCH",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "execution_eligible": false
+        },
+        "research_effect": "미검증 주장 원문·기간·기업 식별을 우선 대조한다. 사실 확정 및 수치 신뢰도 상향을 보류한다.",
+        "confidence_change": 0,
+        "position_size_change": 0,
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "3qFC-2RxSis",
+            "content_sha256": "2cf8a6baae469b3f1418b4837a1a99014724293935e2def860ca3cb15559a7b4",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "미검증 주장 원문·기간·기업 식별을 우선 대조한다. 사실 확정 및 수치 신뢰도 상향을 보류한다."
+          }
+        ]
+      },
+      {
+        "ticker": "BTC",
+        "rank": 14,
+        "action": "UPGRADE_RESEARCH",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "execution_eligible": false
+        },
+        "research_effect": "미검증 주장 원문·기간·기업 식별을 우선 대조한다. 사실 확정 및 수치 신뢰도 상향을 보류한다.",
+        "confidence_change": 0,
+        "position_size_change": 0,
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "_f4WO4vilxM",
+            "content_sha256": "5e71cdd05fc16f0717e5da4320343bdf1ea8bb85cbb1f2d633feefe15236a475",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "미검증 주장 원문·기간·기업 식별을 우선 대조한다. 사실 확정 및 수치 신뢰도 상향을 보류한다."
+          }
+        ]
+      },
+      {
+        "ticker": "BZ=F",
+        "rank": 15,
+        "action": "UPGRADE_RESEARCH",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "execution_eligible": false
+        },
+        "research_effect": "미검증 주장 원문·기간·기업 식별을 우선 대조한다. 사실 확정 및 수치 신뢰도 상향을 보류한다.",
+        "confidence_change": 0,
+        "position_size_change": 0,
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "_f4WO4vilxM",
+            "content_sha256": "5e71cdd05fc16f0717e5da4320343bdf1ea8bb85cbb1f2d633feefe15236a475",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "미검증 주장 원문·기간·기업 식별을 우선 대조한다. 사실 확정 및 수치 신뢰도 상향을 보류한다."
+          }
+        ]
+      },
+      {
+        "ticker": "CL=F",
+        "rank": 16,
+        "action": "UPGRADE_RESEARCH",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "execution_eligible": false
+        },
+        "research_effect": "미검증 주장 원문·기간·기업 식별을 우선 대조한다. 사실 확정 및 수치 신뢰도 상향을 보류한다.",
+        "confidence_change": 0,
+        "position_size_change": 0,
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "AVqXPwaziYo",
+            "content_sha256": "a2a18fb19c758fda7c00a301d0ec1a34fffdf497bcd852656a8a39101e4b00f3",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "미검증 주장 원문·기간·기업 식별을 우선 대조한다. 사실 확정 및 수치 신뢰도 상향을 보류한다."
+          },
+          {
+            "source": "youtube",
+            "event_key": "akEJ_RecjWA",
+            "content_sha256": "d1efbb3479fe2c6ad3e433df9b5ccf2d08e0b18bdf4658e2b0cc66dfc28d6a5a",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "미검증 주장 원문·기간·기업 식별을 우선 대조한다. 사실 확정 및 수치 신뢰도 상향을 보류한다."
+          },
+          {
+            "source": "youtube",
+            "event_key": "_xhMKReKqD4",
+            "content_sha256": "40b5c1d342bad53135ddd6c90f6a980eca841ef2e1ef48512b2d81b1f1bbe184",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "미검증 주장 원문·기간·기업 식별을 우선 대조한다. 사실 확정 및 수치 신뢰도 상향을 보류한다."
+          },
+          {
+            "source": "youtube",
+            "event_key": "mVeruSbWAu4",
+            "content_sha256": "21df0d6c04f26521aa915d77d2f4a5d6a130631adb38a00bfc473c1958eeb77b",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "미검증 주장 원문·기간·기업 식별을 우선 대조한다. 사실 확정 및 수치 신뢰도 상향을 보류한다."
+          },
+          {
+            "source": "youtube",
+            "event_key": "7tGh0zvzfxY",
+            "content_sha256": "f8eeb8c08fea2547e5342667ba8060e9f5b626adcb771aa587f876d8d66de4d8",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "미검증 주장 원문·기간·기업 식별을 우선 대조한다. 사실 확정 및 수치 신뢰도 상향을 보류한다."
+          }
+        ]
+      },
+      {
+        "ticker": "CRWV",
+        "rank": 17,
+        "action": "UPGRADE_RESEARCH",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "execution_eligible": false
+        },
+        "research_effect": "차환비용·임대계약 해지권·현금흐름 검증 연구를 우선한다. 수주잔고 방어론과 신용위험 경고를 함께 비교하며 미검증 금리·부도확률은 제외한다.",
+        "confidence_change": 0,
+        "position_size_change": 0,
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "_xhMKReKqD4",
+            "content_sha256": "40b5c1d342bad53135ddd6c90f6a980eca841ef2e1ef48512b2d81b1f1bbe184",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "차환비용·임대계약 해지권·현금흐름 검증 연구를 우선한다. 수주잔고 방어론과 신용위험 경고를 함께 비교하며 미검증 금리·부도확률은 제외한다."
+          },
+          {
+            "source": "youtube",
+            "event_key": "_f4WO4vilxM",
+            "content_sha256": "5e71cdd05fc16f0717e5da4320343bdf1ea8bb85cbb1f2d633feefe15236a475",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "차환비용·임대계약 해지권·현금흐름 검증 연구를 우선한다. 수주잔고 방어론과 신용위험 경고를 함께 비교하며 미검증 금리·부도확률은 제외한다."
+          }
+        ]
+      },
+      {
+        "ticker": "ETH",
+        "rank": 18,
+        "action": "UPGRADE_RESEARCH",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "execution_eligible": false
+        },
+        "research_effect": "미검증 주장 원문·기간·기업 식별을 우선 대조한다. 사실 확정 및 수치 신뢰도 상향을 보류한다.",
+        "confidence_change": 0,
+        "position_size_change": 0,
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "_f4WO4vilxM",
+            "content_sha256": "5e71cdd05fc16f0717e5da4320343bdf1ea8bb85cbb1f2d633feefe15236a475",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "미검증 주장 원문·기간·기업 식별을 우선 대조한다. 사실 확정 및 수치 신뢰도 상향을 보류한다."
+          }
+        ]
+      },
+      {
+        "ticker": "IBIT",
+        "rank": 19,
+        "action": "UPGRADE_RESEARCH",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "execution_eligible": false
+        },
+        "research_effect": "미검증 주장 원문·기간·기업 식별을 우선 대조한다. 사실 확정 및 수치 신뢰도 상향을 보류한다.",
+        "confidence_change": 0,
+        "position_size_change": 0,
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "_f4WO4vilxM",
+            "content_sha256": "5e71cdd05fc16f0717e5da4320343bdf1ea8bb85cbb1f2d633feefe15236a475",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "미검증 주장 원문·기간·기업 식별을 우선 대조한다. 사실 확정 및 수치 신뢰도 상향을 보류한다."
+          }
+        ]
+      },
+      {
+        "ticker": "IBM",
+        "rank": 20,
+        "action": "UPGRADE_RESEARCH",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "execution_eligible": false
+        },
+        "research_effect": "미검증 주장 원문·기간·기업 식별을 우선 대조한다. 사실 확정 및 수치 신뢰도 상향을 보류한다.",
+        "confidence_change": 0,
+        "position_size_change": 0,
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "ZIAmv-svE70",
+            "content_sha256": "0064bc5c5e7049b32a11c80871a668bcf1fc9b1c8a3ab61fc82a770df432e14a",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "미검증 주장 원문·기간·기업 식별을 우선 대조한다. 사실 확정 및 수치 신뢰도 상향을 보류한다."
+          }
+        ]
+      },
+      {
+        "ticker": "JPM",
+        "rank": 21,
+        "action": "UPGRADE_RESEARCH",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "execution_eligible": false
+        },
+        "research_effect": "미검증 주장 원문·기간·기업 식별을 우선 대조한다. 사실 확정 및 수치 신뢰도 상향을 보류한다.",
+        "confidence_change": 0,
+        "position_size_change": 0,
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "_f4WO4vilxM",
+            "content_sha256": "5e71cdd05fc16f0717e5da4320343bdf1ea8bb85cbb1f2d633feefe15236a475",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "미검증 주장 원문·기간·기업 식별을 우선 대조한다. 사실 확정 및 수치 신뢰도 상향을 보류한다."
+          }
+        ]
+      },
+      {
+        "ticker": "LRCX",
+        "rank": 22,
+        "action": "UPGRADE_RESEARCH",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "execution_eligible": false
+        },
+        "research_effect": "발표 원문과 가이던스·CAPEX·매출 인식·수익화 검증 순위를 높인다. 직접 원문 열람 실패 항목과 기업명 ASR 오류는 사실 근거에서 제외한다.",
+        "confidence_change": 0,
+        "position_size_change": 0,
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "AVqXPwaziYo",
+            "content_sha256": "a2a18fb19c758fda7c00a301d0ec1a34fffdf497bcd852656a8a39101e4b00f3",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "발표 원문과 가이던스·CAPEX·매출 인식·수익화 검증 순위를 높인다. 직접 원문 열람 실패 항목과 기업명 ASR 오류는 사실 근거에서 제외한다."
+          },
+          {
+            "source": "youtube",
+            "event_key": "2NVBahZ9rGU",
+            "content_sha256": "779181f311972569181993193329c13398c106c7ef012fa18e05553a51dba4b9",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "발표 원문과 가이던스·CAPEX·매출 인식·수익화 검증 순위를 높인다. 직접 원문 열람 실패 항목과 기업명 ASR 오류는 사실 근거에서 제외한다."
+          }
+        ]
+      },
+      {
+        "ticker": "META",
+        "rank": 23,
+        "action": "UPGRADE_RESEARCH",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "execution_eligible": false
+        },
+        "research_effect": "발표 원문과 가이던스·CAPEX·매출 인식·수익화 검증 순위를 높인다. 직접 원문 열람 실패 항목과 기업명 ASR 오류는 사실 근거에서 제외한다.",
+        "confidence_change": 0,
+        "position_size_change": 0,
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "GJ4qhsYAO6M",
+            "content_sha256": "becefee00b2dbdc43c49008bcaf9af0172d83efa1c7d5a45d4a115f57393aae6",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "발표 원문과 가이던스·CAPEX·매출 인식·수익화 검증 순위를 높인다. 직접 원문 열람 실패 항목과 기업명 ASR 오류는 사실 근거에서 제외한다."
+          },
+          {
+            "source": "youtube",
+            "event_key": "KLY4_VCgqe4",
+            "content_sha256": "98289ca6a1fc9bb76f9e34e7381251912ba176b16788eaf7cc19f653e1b23aa2",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "발표 원문과 가이던스·CAPEX·매출 인식·수익화 검증 순위를 높인다. 직접 원문 열람 실패 항목과 기업명 ASR 오류는 사실 근거에서 제외한다."
+          },
+          {
+            "source": "youtube",
+            "event_key": "AVqXPwaziYo",
+            "content_sha256": "a2a18fb19c758fda7c00a301d0ec1a34fffdf497bcd852656a8a39101e4b00f3",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "발표 원문과 가이던스·CAPEX·매출 인식·수익화 검증 순위를 높인다. 직접 원문 열람 실패 항목과 기업명 ASR 오류는 사실 근거에서 제외한다."
+          },
+          {
+            "source": "youtube",
+            "event_key": "2NVBahZ9rGU",
+            "content_sha256": "779181f311972569181993193329c13398c106c7ef012fa18e05553a51dba4b9",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "발표 원문과 가이던스·CAPEX·매출 인식·수익화 검증 순위를 높인다. 직접 원문 열람 실패 항목과 기업명 ASR 오류는 사실 근거에서 제외한다."
+          },
+          {
+            "source": "youtube",
+            "event_key": "3qFC-2RxSis",
+            "content_sha256": "2cf8a6baae469b3f1418b4837a1a99014724293935e2def860ca3cb15559a7b4",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "발표 원문과 가이던스·CAPEX·매출 인식·수익화 검증 순위를 높인다. 직접 원문 열람 실패 항목과 기업명 ASR 오류는 사실 근거에서 제외한다."
+          },
+          {
+            "source": "youtube",
+            "event_key": "f_EUpVZ2BSw",
+            "content_sha256": "91241fd036d02be42860bfaa6b9dcce298548f5b6c637a27864ebb67e22af69f",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "발표 원문과 가이던스·CAPEX·매출 인식·수익화 검증 순위를 높인다. 직접 원문 열람 실패 항목과 기업명 ASR 오류는 사실 근거에서 제외한다."
+          },
+          {
+            "source": "youtube",
+            "event_key": "ZIAmv-svE70",
+            "content_sha256": "0064bc5c5e7049b32a11c80871a668bcf1fc9b1c8a3ab61fc82a770df432e14a",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "발표 원문과 가이던스·CAPEX·매출 인식·수익화 검증 순위를 높인다. 직접 원문 열람 실패 항목과 기업명 ASR 오류는 사실 근거에서 제외한다."
+          },
+          {
+            "source": "youtube",
+            "event_key": "mVeruSbWAu4",
+            "content_sha256": "21df0d6c04f26521aa915d77d2f4a5d6a130631adb38a00bfc473c1958eeb77b",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "발표 원문과 가이던스·CAPEX·매출 인식·수익화 검증 순위를 높인다. 직접 원문 열람 실패 항목과 기업명 ASR 오류는 사실 근거에서 제외한다."
+          }
+        ]
+      },
+      {
+        "ticker": "MU",
+        "rank": 24,
+        "action": "UPGRADE_RESEARCH",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "execution_eligible": false
+        },
+        "research_effect": "HBM 수율·장기계약·자사주 종료·Solidigm 지배구조를 원공시로 대조하는 연구 순위를 높인다. 반등 매수론과 수급·공급과잉 경고를 함께 보존한다.",
+        "confidence_change": 0,
+        "position_size_change": 0,
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "ZPF7UdMncFs",
+            "content_sha256": "1dbeacea617b7a1084207c06a493c14086fbbf77263e727c620f2e04b42eb0bd",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "HBM 수율·장기계약·자사주 종료·Solidigm 지배구조를 원공시로 대조하는 연구 순위를 높인다. 반등 매수론과 수급·공급과잉 경고를 함께 보존한다."
+          },
+          {
+            "source": "youtube",
+            "event_key": "3qFC-2RxSis",
+            "content_sha256": "2cf8a6baae469b3f1418b4837a1a99014724293935e2def860ca3cb15559a7b4",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "HBM 수율·장기계약·자사주 종료·Solidigm 지배구조를 원공시로 대조하는 연구 순위를 높인다. 반등 매수론과 수급·공급과잉 경고를 함께 보존한다."
+          },
+          {
+            "source": "youtube",
+            "event_key": "k686F8SVfEk",
+            "content_sha256": "c7b814507d0702d70a0c0e422632acf7f2fe1326d5ec22c54d618b20340e7218",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "HBM 수율·장기계약·자사주 종료·Solidigm 지배구조를 원공시로 대조하는 연구 순위를 높인다. 반등 매수론과 수급·공급과잉 경고를 함께 보존한다."
+          }
+        ]
+      },
+      {
+        "ticker": "NVDA",
+        "rank": 25,
+        "action": "UPGRADE_RESEARCH",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "execution_eligible": false
+        },
+        "research_effect": "발표 원문과 가이던스·CAPEX·매출 인식·수익화 검증 순위를 높인다. 직접 원문 열람 실패 항목과 기업명 ASR 오류는 사실 근거에서 제외한다.",
+        "confidence_change": 0,
+        "position_size_change": 0,
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "KLY4_VCgqe4",
+            "content_sha256": "98289ca6a1fc9bb76f9e34e7381251912ba176b16788eaf7cc19f653e1b23aa2",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "발표 원문과 가이던스·CAPEX·매출 인식·수익화 검증 순위를 높인다. 직접 원문 열람 실패 항목과 기업명 ASR 오류는 사실 근거에서 제외한다."
+          },
+          {
+            "source": "youtube",
+            "event_key": "AVqXPwaziYo",
+            "content_sha256": "a2a18fb19c758fda7c00a301d0ec1a34fffdf497bcd852656a8a39101e4b00f3",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "발표 원문과 가이던스·CAPEX·매출 인식·수익화 검증 순위를 높인다. 직접 원문 열람 실패 항목과 기업명 ASR 오류는 사실 근거에서 제외한다."
+          },
+          {
+            "source": "youtube",
+            "event_key": "ZPF7UdMncFs",
+            "content_sha256": "1dbeacea617b7a1084207c06a493c14086fbbf77263e727c620f2e04b42eb0bd",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "발표 원문과 가이던스·CAPEX·매출 인식·수익화 검증 순위를 높인다. 직접 원문 열람 실패 항목과 기업명 ASR 오류는 사실 근거에서 제외한다."
+          },
+          {
+            "source": "youtube",
+            "event_key": "ZIAmv-svE70",
+            "content_sha256": "0064bc5c5e7049b32a11c80871a668bcf1fc9b1c8a3ab61fc82a770df432e14a",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "발표 원문과 가이던스·CAPEX·매출 인식·수익화 검증 순위를 높인다. 직접 원문 열람 실패 항목과 기업명 ASR 오류는 사실 근거에서 제외한다."
+          },
+          {
+            "source": "youtube",
+            "event_key": "pEcF6UhXJZA",
+            "content_sha256": "897268dfef22ad8d00799d36eed0038ab403aa67dfd59b188338958c4d4dec42",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "발표 원문과 가이던스·CAPEX·매출 인식·수익화 검증 순위를 높인다. 직접 원문 열람 실패 항목과 기업명 ASR 오류는 사실 근거에서 제외한다."
+          },
+          {
+            "source": "youtube",
+            "event_key": "7tGh0zvzfxY",
+            "content_sha256": "f8eeb8c08fea2547e5342667ba8060e9f5b626adcb771aa587f876d8d66de4d8",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "발표 원문과 가이던스·CAPEX·매출 인식·수익화 검증 순위를 높인다. 직접 원문 열람 실패 항목과 기업명 ASR 오류는 사실 근거에서 제외한다."
+          }
+        ]
+      },
+      {
+        "ticker": "ORCL",
+        "rank": 26,
+        "action": "UPGRADE_RESEARCH",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "execution_eligible": false
+        },
+        "research_effect": "차환비용·임대계약 해지권·현금흐름 검증 연구를 우선한다. 수주잔고 방어론과 신용위험 경고를 함께 비교하며 미검증 금리·부도확률은 제외한다.",
+        "confidence_change": 0,
+        "position_size_change": 0,
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "Nrrl0CMzIXM",
+            "content_sha256": "2e877f0f18dbd72afb1194cd4b6e38153a80d1041867b29f29f54e167cb4adbc",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "차환비용·임대계약 해지권·현금흐름 검증 연구를 우선한다. 수주잔고 방어론과 신용위험 경고를 함께 비교하며 미검증 금리·부도확률은 제외한다."
+          },
+          {
+            "source": "youtube",
+            "event_key": "e3WRUs1O8UM",
+            "content_sha256": "1a9829158d777fdd6b32454519a5edf1e59dda1ffa3ca95991cb6b70f4dc666b",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "차환비용·임대계약 해지권·현금흐름 검증 연구를 우선한다. 수주잔고 방어론과 신용위험 경고를 함께 비교하며 미검증 금리·부도확률은 제외한다."
+          },
+          {
+            "source": "youtube",
+            "event_key": "EwIuHwwAxlg",
+            "content_sha256": "491987c31314547fdbaf4e2b6c4418c2fa96b882858706ce23892999b31863d0",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "차환비용·임대계약 해지권·현금흐름 검증 연구를 우선한다. 수주잔고 방어론과 신용위험 경고를 함께 비교하며 미검증 금리·부도확률은 제외한다."
+          }
+        ]
+      },
+      {
+        "ticker": "SMCI",
+        "rank": 27,
+        "action": "UPGRADE_RESEARCH",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "execution_eligible": false
+        },
+        "research_effect": "발표 원문과 가이던스·CAPEX·매출 인식·수익화 검증 순위를 높인다. 직접 원문 열람 실패 항목과 기업명 ASR 오류는 사실 근거에서 제외한다.",
+        "confidence_change": 0,
+        "position_size_change": 0,
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "f_EUpVZ2BSw",
+            "content_sha256": "91241fd036d02be42860bfaa6b9dcce298548f5b6c637a27864ebb67e22af69f",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "발표 원문과 가이던스·CAPEX·매출 인식·수익화 검증 순위를 높인다. 직접 원문 열람 실패 항목과 기업명 ASR 오류는 사실 근거에서 제외한다."
+          },
+          {
+            "source": "youtube",
+            "event_key": "mVeruSbWAu4",
+            "content_sha256": "21df0d6c04f26521aa915d77d2f4a5d6a130631adb38a00bfc473c1958eeb77b",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "발표 원문과 가이던스·CAPEX·매출 인식·수익화 검증 순위를 높인다. 직접 원문 열람 실패 항목과 기업명 ASR 오류는 사실 근거에서 제외한다."
+          },
+          {
+            "source": "youtube",
+            "event_key": "pEcF6UhXJZA",
+            "content_sha256": "897268dfef22ad8d00799d36eed0038ab403aa67dfd59b188338958c4d4dec42",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "발표 원문과 가이던스·CAPEX·매출 인식·수익화 검증 순위를 높인다. 직접 원문 열람 실패 항목과 기업명 ASR 오류는 사실 근거에서 제외한다."
+          }
+        ]
+      },
+      {
+        "ticker": "SOL",
+        "rank": 28,
+        "action": "UPGRADE_RESEARCH",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "execution_eligible": false
+        },
+        "research_effect": "미검증 주장 원문·기간·기업 식별을 우선 대조한다. 사실 확정 및 수치 신뢰도 상향을 보류한다.",
+        "confidence_change": 0,
+        "position_size_change": 0,
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "_f4WO4vilxM",
+            "content_sha256": "5e71cdd05fc16f0717e5da4320343bdf1ea8bb85cbb1f2d633feefe15236a475",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "미검증 주장 원문·기간·기업 식별을 우선 대조한다. 사실 확정 및 수치 신뢰도 상향을 보류한다."
+          }
+        ]
+      },
+      {
+        "ticker": "TSLA",
+        "rank": 29,
+        "action": "UPGRADE_RESEARCH",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "execution_eligible": false
+        },
+        "research_effect": "발표 원문과 가이던스·CAPEX·매출 인식·수익화 검증 순위를 높인다. 직접 원문 열람 실패 항목과 기업명 ASR 오류는 사실 근거에서 제외한다.",
+        "confidence_change": 0,
+        "position_size_change": 0,
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "KLY4_VCgqe4",
+            "content_sha256": "98289ca6a1fc9bb76f9e34e7381251912ba176b16788eaf7cc19f653e1b23aa2",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "발표 원문과 가이던스·CAPEX·매출 인식·수익화 검증 순위를 높인다. 직접 원문 열람 실패 항목과 기업명 ASR 오류는 사실 근거에서 제외한다."
+          },
+          {
+            "source": "youtube",
+            "event_key": "AVqXPwaziYo",
+            "content_sha256": "a2a18fb19c758fda7c00a301d0ec1a34fffdf497bcd852656a8a39101e4b00f3",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "발표 원문과 가이던스·CAPEX·매출 인식·수익화 검증 순위를 높인다. 직접 원문 열람 실패 항목과 기업명 ASR 오류는 사실 근거에서 제외한다."
+          },
+          {
+            "source": "youtube",
+            "event_key": "mKbboQXLmQ0",
+            "content_sha256": "6747d0fe2492bb63bfaeccafc7aad7c3f29b63bd3d1ec00327ccf46cf4c9501d",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "발표 원문과 가이던스·CAPEX·매출 인식·수익화 검증 순위를 높인다. 직접 원문 열람 실패 항목과 기업명 ASR 오류는 사실 근거에서 제외한다."
+          },
+          {
+            "source": "youtube",
+            "event_key": "f_EUpVZ2BSw",
+            "content_sha256": "91241fd036d02be42860bfaa6b9dcce298548f5b6c637a27864ebb67e22af69f",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "발표 원문과 가이던스·CAPEX·매출 인식·수익화 검증 순위를 높인다. 직접 원문 열람 실패 항목과 기업명 ASR 오류는 사실 근거에서 제외한다."
+          },
+          {
+            "source": "youtube",
+            "event_key": "FaAgdmOGdhA",
+            "content_sha256": "b766aee59be776d287a62cd8f8ddc1d90d444fdbb0c61545b15144e14a43a28f",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "발표 원문과 가이던스·CAPEX·매출 인식·수익화 검증 순위를 높인다. 직접 원문 열람 실패 항목과 기업명 ASR 오류는 사실 근거에서 제외한다."
+          },
+          {
+            "source": "youtube",
+            "event_key": "ZIAmv-svE70",
+            "content_sha256": "0064bc5c5e7049b32a11c80871a668bcf1fc9b1c8a3ab61fc82a770df432e14a",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "발표 원문과 가이던스·CAPEX·매출 인식·수익화 검증 순위를 높인다. 직접 원문 열람 실패 항목과 기업명 ASR 오류는 사실 근거에서 제외한다."
+          },
+          {
+            "source": "youtube",
+            "event_key": "Pum27tW9534",
+            "content_sha256": "f15cb59f208558d7568cec8beeed3d7cfb030d8a5f0325c8daf82490f3c38137",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "발표 원문과 가이던스·CAPEX·매출 인식·수익화 검증 순위를 높인다. 직접 원문 열람 실패 항목과 기업명 ASR 오류는 사실 근거에서 제외한다."
+          }
+        ]
+      },
+      {
+        "ticker": "TSM",
+        "rank": 30,
+        "action": "UPGRADE_RESEARCH",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "execution_eligible": false
+        },
+        "research_effect": "미검증 주장 원문·기간·기업 식별을 우선 대조한다. 사실 확정 및 수치 신뢰도 상향을 보류한다.",
+        "confidence_change": 0,
+        "position_size_change": 0,
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "ZPF7UdMncFs",
+            "content_sha256": "1dbeacea617b7a1084207c06a493c14086fbbf77263e727c620f2e04b42eb0bd",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "미검증 주장 원문·기간·기업 식별을 우선 대조한다. 사실 확정 및 수치 신뢰도 상향을 보류한다."
+          }
+        ]
+      },
+      {
+        "ticker": "TXN",
+        "rank": 31,
+        "action": "UPGRADE_RESEARCH",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "execution_eligible": false
+        },
+        "research_effect": "미검증 주장 원문·기간·기업 식별을 우선 대조한다. 사실 확정 및 수치 신뢰도 상향을 보류한다.",
+        "confidence_change": 0,
+        "position_size_change": 0,
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "AVqXPwaziYo",
+            "content_sha256": "a2a18fb19c758fda7c00a301d0ec1a34fffdf497bcd852656a8a39101e4b00f3",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "미검증 주장 원문·기간·기업 식별을 우선 대조한다. 사실 확정 및 수치 신뢰도 상향을 보류한다."
+          }
+        ]
+      },
+      {
+        "ticker": "XBI",
+        "rank": 32,
+        "action": "UPGRADE_RESEARCH",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "execution_eligible": false
+        },
+        "research_effect": "미검증 주장 원문·기간·기업 식별을 우선 대조한다. 사실 확정 및 수치 신뢰도 상향을 보류한다.",
+        "confidence_change": 0,
+        "position_size_change": 0,
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "pEcF6UhXJZA",
+            "content_sha256": "897268dfef22ad8d00799d36eed0038ab403aa67dfd59b188338958c4d4dec42",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "미검증 주장 원문·기간·기업 식별을 우선 대조한다. 사실 확정 및 수치 신뢰도 상향을 보류한다."
+          }
+        ]
+      },
+      {
+        "ticker": "^KS11",
+        "rank": 33,
+        "action": "UPGRADE_RESEARCH",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "execution_eligible": false
+        },
+        "research_effect": "미검증 주장 원문·기간·기업 식별을 우선 대조한다. 사실 확정 및 수치 신뢰도 상향을 보류한다.",
+        "confidence_change": 0,
+        "position_size_change": 0,
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "GJ4qhsYAO6M",
+            "content_sha256": "becefee00b2dbdc43c49008bcaf9af0172d83efa1c7d5a45d4a115f57393aae6",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "미검증 주장 원문·기간·기업 식별을 우선 대조한다. 사실 확정 및 수치 신뢰도 상향을 보류한다."
+          },
+          {
+            "source": "youtube",
+            "event_key": "lhYvgDJUKNM",
+            "content_sha256": "80ce44d224f279abff1b1abd5fd0b7354e691a1b59b2bb033b947f4fb64c7d79",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "미검증 주장 원문·기간·기업 식별을 우선 대조한다. 사실 확정 및 수치 신뢰도 상향을 보류한다."
+          },
+          {
+            "source": "youtube",
+            "event_key": "aI52gGQQCC8",
+            "content_sha256": "50fc7c37d93eddbfc4f47031efd3ead6058c6bb2c7d73a2e35611eb90ae70e6a",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "미검증 주장 원문·기간·기업 식별을 우선 대조한다. 사실 확정 및 수치 신뢰도 상향을 보류한다."
+          },
+          {
+            "source": "youtube",
+            "event_key": "akEJ_RecjWA",
+            "content_sha256": "d1efbb3479fe2c6ad3e433df9b5ccf2d08e0b18bdf4658e2b0cc66dfc28d6a5a",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "미검증 주장 원문·기간·기업 식별을 우선 대조한다. 사실 확정 및 수치 신뢰도 상향을 보류한다."
+          },
+          {
+            "source": "youtube",
+            "event_key": "f4_0pdU5CTs",
+            "content_sha256": "e67d148cd965c02389d6fc6a313ac2cd44beefca84151400596920243852ad11",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "미검증 주장 원문·기간·기업 식별을 우선 대조한다. 사실 확정 및 수치 신뢰도 상향을 보류한다."
+          },
+          {
+            "source": "youtube",
+            "event_key": "ZEtSs7901nU",
+            "content_sha256": "8584881b7ebdebdaefb6dfaca1eecb4025be9201839a824202c104455803fcd3",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "미검증 주장 원문·기간·기업 식별을 우선 대조한다. 사실 확정 및 수치 신뢰도 상향을 보류한다."
+          },
+          {
+            "source": "youtube",
+            "event_key": "_xhMKReKqD4",
+            "content_sha256": "40b5c1d342bad53135ddd6c90f6a980eca841ef2e1ef48512b2d81b1f1bbe184",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "미검증 주장 원문·기간·기업 식별을 우선 대조한다. 사실 확정 및 수치 신뢰도 상향을 보류한다."
+          },
+          {
+            "source": "youtube",
+            "event_key": "ZPF7UdMncFs",
+            "content_sha256": "1dbeacea617b7a1084207c06a493c14086fbbf77263e727c620f2e04b42eb0bd",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "미검증 주장 원문·기간·기업 식별을 우선 대조한다. 사실 확정 및 수치 신뢰도 상향을 보류한다."
+          },
+          {
+            "source": "youtube",
+            "event_key": "f_EUpVZ2BSw",
+            "content_sha256": "91241fd036d02be42860bfaa6b9dcce298548f5b6c637a27864ebb67e22af69f",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "미검증 주장 원문·기간·기업 식별을 우선 대조한다. 사실 확정 및 수치 신뢰도 상향을 보류한다."
+          },
+          {
+            "source": "youtube",
+            "event_key": "k686F8SVfEk",
+            "content_sha256": "c7b814507d0702d70a0c0e422632acf7f2fe1326d5ec22c54d618b20340e7218",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "미검증 주장 원문·기간·기업 식별을 우선 대조한다. 사실 확정 및 수치 신뢰도 상향을 보류한다."
+          },
+          {
+            "source": "youtube",
+            "event_key": "KWH0_uW8zJQ",
+            "content_sha256": "5ab14ed1cbcb862fc35dab7c7343cf5cf4d651b19d36b33d28997b3a7f889951",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "미검증 주장 원문·기간·기업 식별을 우선 대조한다. 사실 확정 및 수치 신뢰도 상향을 보류한다."
+          },
+          {
+            "source": "youtube",
+            "event_key": "pEcF6UhXJZA",
+            "content_sha256": "897268dfef22ad8d00799d36eed0038ab403aa67dfd59b188338958c4d4dec42",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "미검증 주장 원문·기간·기업 식별을 우선 대조한다. 사실 확정 및 수치 신뢰도 상향을 보류한다."
+          },
+          {
+            "source": "youtube",
+            "event_key": "qj5F8MHFNKs",
+            "content_sha256": "b2902bf2d7d43aaeea674d033eced815c665e3325b127a934dd61c8d424ba6a4",
+            "affected_field": "research_priority",
+            "direction": "increase_verification_priority",
+            "weight": "LOW_LABELED",
+            "reason": "미검증 주장 원문·기간·기업 식별을 우선 대조한다. 사실 확정 및 수치 신뢰도 상향을 보류한다."
+          }
+        ]
+      }
+    ],
+    "coverage_receipt": {
+      "event_id": "youtube:f544c35823ea897ee31cf2b88fa0e18a",
+      "status": "PARTIAL",
+      "window_events": 109,
+      "transmitted_events": 60,
+      "truncated": true,
+      "new_events": 36,
+      "revised_events": 0
+    },
+    "model_receipt": {
+      "schema": "tradingagents.model-provenance/v1",
+      "work_synthesis": {
+        "execution_mode": "local",
+        "requested_model": "gpt-6.1-sol",
+        "requested_reasoning_effort": "medium",
+        "task_id": "tradingagents-work-youtube",
+        "verification_status": "CONFIGURED_NOT_RUNTIME_VERIFIED",
+        "observed_model": null,
+        "observed_reasoning_effort": null,
+        "note": "The local task contract is verified; the Work host does not expose a signed per-response model receipt."
+      }
+    },
+    "source_summary": {
+      "source": {
+        "health": "OK",
+        "run_id": "youtube_20261022_080610",
+        "last_run_at": "2026-10-22T09:08:16.586275+09:00",
+        "status": "success",
+        "stale_after_hours": 36
+      },
+      "coverage": {
+        "total_unique_events": 436,
+        "window_events": 109,
+        "transmitted_events": 60,
+        "truncated": true,
+        "oldest_occurred_at": "2026-10-19T11:01:11+00:00",
+        "newest_occurred_at": "2026-10-21T22:56:36+00:00"
+      },
+      "delta": {
+        "new_events": 36,
+        "revised_events": 0,
+        "unchanged_events": 24,
+        "delivered_event_keys": [
+          "GJ4qhsYAO6M",
+          "KLY4_VCgqe4",
+          "AVqXPwaziYo",
+          "2NVBahZ9rGU",
+          "lhYvgDJUKNM",
+          "aI52gGQQCC8",
+          "mKbboQXLmQ0",
+          "akEJ_RecjWA",
+          "f4_0pdU5CTs",
+          "ZEtSs7901nU",
+          "_xhMKReKqD4",
+          "ZPF7UdMncFs",
+          "3qFC-2RxSis",
+          "f_EUpVZ2BSw",
+          "Nrrl0CMzIXM",
+          "FaAgdmOGdhA",
+          "VYYm8S5XFpU",
+          "e3WRUs1O8UM",
+          "u-9XWm2U3Rk",
+          "rUG_SjCM5Go",
+          "k686F8SVfEk",
+          "EwIuHwwAxlg",
+          "ZIAmv-svE70",
+          "8ootY32OxY0",
+          "Ihz5lQ8aPXs",
+          "RbrDrLBVTi8",
+          "_f4WO4vilxM",
+          "Pum27tW9534",
+          "KWH0_uW8zJQ",
+          "mVeruSbWAu4",
+          "fXSqM_OpPbo",
+          "s6SFBZHVncQ",
+          "pEcF6UhXJZA",
+          "7tGh0zvzfxY",
+          "qj5F8MHFNKs",
+          "yTzxfHZ0MwQ"
+        ]
+      },
+      "evidence_policy": {
+        "profile": "balanced_external",
+        "material_thesis_effects": [
+          "ranking",
+          "confidence",
+          "position_size_within_existing_risk_limits",
+          "research_priority"
+        ],
+        "supported_evidence_weight": "MEDIUM",
+        "partially_supported_evidence_weight": "LOW_TO_MEDIUM",
+        "unverified_evidence_weight": "LOW_LABELED",
+        "user_primary_channels": [
+          "@kpunch",
+          "@sosumonkey"
+        ],
+        "user_primary_source_tier": "USER_PRIMARY",
+        "user_primary_evidence_weight": "HIGH",
+        "user_primary_validation_policy": "USER_ACCEPTED",
+        "matching_multi_source_signal_may_raise_thesis_priority": true,
+        "conflicting_signal_must_be_visible": true,
+        "may_bypass_market_or_portfolio_execution_gate": false
+      },
+      "freshness_checked_at": "2026-10-22T09:31:57.568778+09:00",
+      "earliest_expiry": "2026-10-22T11:01:11+00:00",
+      "event_manifest": [
+        {
+          "event_key": "GJ4qhsYAO6M",
+          "content_sha256": "becefee00b2dbdc43c49008bcaf9af0172d83efa1c7d5a45d4a115f57393aae6",
+          "occurred_at": "2026-10-21T22:56:36+00:00",
+          "published_at": "2026-10-21T22:56:36+00:00",
+          "source_url": "https://www.youtube.com/watch?v=GJ4qhsYAO6M",
+          "title": "10월 22일 오늘 코스피, 과연 어떻게 흘러갈까?",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "relevance": {
+            "tickers": [
+              "^KS11",
+              "005930",
+              "000660",
+              "META"
+            ],
+            "markets": [
+              "US",
+              "KR"
+            ],
+            "themes": [],
+            "match_basis": "verified_entities"
+          },
+          "claims": [
+            {
+              "claim_id": "C1",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C2",
+              "packet_status": "partially_supported",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C3",
+              "packet_status": "partially_supported",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C4",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C5",
+              "packet_status": "asr_uncertain",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C6",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            }
+          ],
+          "treatment": "REQUIRES_PRIMARY_VERIFICATION",
+          "correction_lineage": "new canonical event; no revision in packet"
+        },
+        {
+          "event_key": "KLY4_VCgqe4",
+          "content_sha256": "98289ca6a1fc9bb76f9e34e7381251912ba176b16788eaf7cc19f653e1b23aa2",
+          "occurred_at": "2026-10-21T22:53:03+00:00",
+          "published_at": "2026-10-21T22:53:03+00:00",
+          "source_url": "https://www.youtube.com/watch?v=KLY4_VCgqe4",
+          "title": "\"지금은 분할 매수할 타이밍\"…삼성전자·SK하이닉스 반등, 다음 주 빅테크 실적에 달렸다? | 김장열 유니스토리자산운용 리서치센터 센터장 [글로벌 인터뷰]",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "relevance": {
+            "tickers": [
+              "005930/000660",
+              "TSLA",
+              "META",
+              "STX/WDC/MU",
+              "LRCX/AMAT/ASML",
+              "009150",
+              "NVDA",
+              "GOOGL/AMZN/MSFT"
+            ],
+            "markets": [
+              "US",
+              "KR"
+            ],
+            "themes": [],
+            "match_basis": "verified_entities"
+          },
+          "claims": [
+            {
+              "claim_id": "C1",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C2",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C3",
+              "packet_status": "partially_supported",
+              "supporting_evidence_audit": [
+                {
+                  "evidence_id": "E7",
+                  "assessment": "requires semantic primary-source verification"
+                }
+              ],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C4",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C5",
+              "packet_status": "asr_uncertain",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C6",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            }
+          ],
+          "treatment": "REQUIRES_PRIMARY_VERIFICATION",
+          "correction_lineage": "new canonical event; no revision in packet"
+        },
+        {
+          "event_key": "AVqXPwaziYo",
+          "content_sha256": "a2a18fb19c758fda7c00a301d0ec1a34fffdf497bcd852656a8a39101e4b00f3",
+          "occurred_at": "2026-10-21T21:57:56+00:00",
+          "published_at": "2026-10-21T21:57:56+00:00",
+          "source_url": "https://www.youtube.com/watch?v=AVqXPwaziYo",
+          "title": "메타, 소송 비용 반영에도 서프라이즈…테슬라, FSD 호조에 마진 개선 [월가 뉴스레터]",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "relevance": {
+            "tickers": [
+              "CL=F",
+              "META",
+              "TSLA",
+              "LRCX",
+              "TXN",
+              "NVDA",
+              "009150"
+            ],
+            "markets": [
+              "US",
+              "KR"
+            ],
+            "themes": [],
+            "match_basis": "verified_entities"
+          },
+          "claims": [
+            {
+              "claim_id": "C1",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [
+                {
+                  "evidence_id": "E5",
+                  "assessment": "requires semantic primary-source verification"
+                }
+              ],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C2",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C3",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C4",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C5",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C6",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            }
+          ],
+          "treatment": "REQUIRES_PRIMARY_VERIFICATION",
+          "correction_lineage": "new canonical event; no revision in packet"
+        },
+        {
+          "event_key": "2NVBahZ9rGU",
+          "content_sha256": "779181f311972569181993193329c13398c106c7ef012fa18e05553a51dba4b9",
+          "occurred_at": "2026-10-21T21:45:02+00:00",
+          "published_at": "2026-10-21T21:45:02+00:00",
+          "source_url": "https://www.youtube.com/watch?v=2NVBahZ9rGU",
+          "title": "10월 22일 투자자들이 꼭 알아야 하는 투자 포인트",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "relevance": {
+            "tickers": [
+              "META",
+              "005930",
+              "000660",
+              "009150",
+              "LRCX",
+              "010120",
+              "034220"
+            ],
+            "markets": [
+              "US",
+              "KR"
+            ],
+            "themes": [],
+            "match_basis": "verified_entities"
+          },
+          "claims": [
+            {
+              "claim_id": "C1",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C2",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C3",
+              "packet_status": "partially_supported",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C4",
+              "packet_status": "partially_supported",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C5",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C6",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            }
+          ],
+          "treatment": "REQUIRES_PRIMARY_VERIFICATION",
+          "correction_lineage": "new canonical event; no revision in packet"
+        },
+        {
+          "event_key": "lhYvgDJUKNM",
+          "content_sha256": "80ce44d224f279abff1b1abd5fd0b7354e691a1b59b2bb033b947f4fb64c7d79",
+          "occurred_at": "2026-10-21T13:30:18+00:00",
+          "published_at": "2026-10-21T13:30:18+00:00",
+          "source_url": "https://www.youtube.com/watch?v=lhYvgDJUKNM",
+          "title": "코스피 바닥에서 시작된 '실적 시즌' 투자 포인트는?",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "relevance": {
+            "tickers": [
+              "^KS11"
+            ],
+            "markets": [
+              "US"
+            ],
+            "themes": [],
+            "match_basis": "verified_entities"
+          },
+          "claims": [
+            {
+              "claim_id": "C1",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C2",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C3",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C4",
+              "packet_status": "asr_uncertain",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C5",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C6",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            }
+          ],
+          "treatment": "REQUIRES_PRIMARY_VERIFICATION",
+          "correction_lineage": "new canonical event; no revision in packet"
+        },
+        {
+          "event_key": "aI52gGQQCC8",
+          "content_sha256": "50fc7c37d93eddbfc4f47031efd3ead6058c6bb2c7d73a2e35611eb90ae70e6a",
+          "occurred_at": "2026-10-21T12:00:29+00:00",
+          "published_at": "2026-10-21T12:00:29+00:00",
+          "source_url": "https://www.youtube.com/watch?v=aI52gGQQCC8",
+          "title": "8조 적자 ‘미운 오리’가 100조 백조로…솔리다임 상장, SK하이닉스는 주주에게 뭘 설명해야 하나ㅣ명민준, 서수진, 송재경 [주린이 구조대]",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "relevance": {
+            "tickers": [
+              "^KS11",
+              "000660",
+              "005930"
+            ],
+            "markets": [
+              "US",
+              "KR"
+            ],
+            "themes": [],
+            "match_basis": "verified_entities"
+          },
+          "claims": [
+            {
+              "claim_id": "C1",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C2",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C3",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C4",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C5",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C6",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            }
+          ],
+          "treatment": "REQUIRES_PRIMARY_VERIFICATION",
+          "correction_lineage": "new canonical event; no revision in packet"
+        },
+        {
+          "event_key": "mKbboQXLmQ0",
+          "content_sha256": "6747d0fe2492bb63bfaeccafc7aad7c3f29b63bd3d1ec00327ccf46cf4c9501d",
+          "occurred_at": "2026-10-21T11:02:05+00:00",
+          "published_at": "2026-10-21T11:02:05+00:00",
+          "source_url": "https://www.youtube.com/watch?v=mKbboQXLmQ0",
+          "title": "스페이스X가 로켓보다 AI 사업에 더 많은 돈을 쓰는 이유",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "relevance": {
+            "tickers": [
+              "TSLA"
+            ],
+            "markets": [
+              "US"
+            ],
+            "themes": [],
+            "match_basis": "verified_entities"
+          },
+          "claims": [
+            {
+              "claim_id": "C1",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C2",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C3",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C4",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C5",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C6",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            }
+          ],
+          "treatment": "REQUIRES_PRIMARY_VERIFICATION",
+          "correction_lineage": "new canonical event; no revision in packet"
+        },
+        {
+          "event_key": "akEJ_RecjWA",
+          "content_sha256": "d1efbb3479fe2c6ad3e433df9b5ccf2d08e0b18bdf4658e2b0cc66dfc28d6a5a",
+          "occurred_at": "2026-10-21T11:00:38+00:00",
+          "published_at": "2026-10-21T11:00:38+00:00",
+          "source_url": "https://www.youtube.com/watch?v=akEJ_RecjWA",
+          "title": "[#찐시황] “외국인 9,300억 폭풍 매수!” 삼성전자 4일 연속 순매수… 반도체 주도주 부활하나? / 내일 증시 판 바꿀 결정적 변수ㅣ오로라 투자자문 이지환 대표",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "relevance": {
+            "tickers": [
+              "005930",
+              "000660",
+              "^KS11",
+              "CL=F"
+            ],
+            "markets": [
+              "KR",
+              "US"
+            ],
+            "themes": [],
+            "match_basis": "verified_entities"
+          },
+          "claims": [
+            {
+              "claim_id": "C1",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C2",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C3",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C4",
+              "packet_status": "asr_uncertain",
+              "supporting_evidence_audit": [
+                {
+                  "evidence_id": "E7",
+                  "assessment": "requires semantic primary-source verification"
+                },
+                {
+                  "evidence_id": "E11",
+                  "assessment": "missing evidence ID"
+                }
+              ],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C5",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C6",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            }
+          ],
+          "treatment": "REQUIRES_PRIMARY_VERIFICATION",
+          "correction_lineage": "new canonical event; no revision in packet"
+        },
+        {
+          "event_key": "f4_0pdU5CTs",
+          "content_sha256": "e67d148cd965c02389d6fc6a313ac2cd44beefca84151400596920243852ad11",
+          "occurred_at": "2026-10-21T11:00:33+00:00",
+          "published_at": "2026-10-21T11:00:33+00:00",
+          "source_url": "https://www.youtube.com/watch?v=f4_0pdU5CTs",
+          "title": "코스피 급반등에도 추세 전환은 아직…이번 주 저점 확인이 다음 주 상승의 관건ㅣ명민준, 서수진, 유창희 [주린이 구조대]",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "relevance": {
+            "tickers": [
+              "^KS11"
+            ],
+            "markets": [
+              "US"
+            ],
+            "themes": [],
+            "match_basis": "verified_entities"
+          },
+          "claims": [
+            {
+              "claim_id": "C1",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C2",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C3",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C4",
+              "packet_status": "asr_uncertain",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C5",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C6",
+              "packet_status": "asr_uncertain",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            }
+          ],
+          "treatment": "REQUIRES_PRIMARY_VERIFICATION",
+          "correction_lineage": "new canonical event; no revision in packet"
+        },
+        {
+          "event_key": "ZEtSs7901nU",
+          "content_sha256": "8584881b7ebdebdaefb6dfaca1eecb4025be9201839a824202c104455803fcd3",
+          "occurred_at": "2026-10-21T10:02:16+00:00",
+          "published_at": "2026-10-21T10:02:16+00:00",
+          "source_url": "https://www.youtube.com/watch?v=ZEtSs7901nU",
+          "title": "10월 21일 외국인이 한국인 몰래 매수한 종목 정체",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "relevance": {
+            "tickers": [
+              "^KS11"
+            ],
+            "markets": [
+              "US"
+            ],
+            "themes": [],
+            "match_basis": "verified_entities"
+          },
+          "claims": [
+            {
+              "claim_id": "C1",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C2",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C3",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C4",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C5",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C6",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            }
+          ],
+          "treatment": "REQUIRES_PRIMARY_VERIFICATION",
+          "correction_lineage": "new canonical event; no revision in packet"
+        },
+        {
+          "event_key": "_xhMKReKqD4",
+          "content_sha256": "40b5c1d342bad53135ddd6c90f6a980eca841ef2e1ef48512b2d81b1f1bbe184",
+          "occurred_at": "2026-10-21T10:00:37+00:00",
+          "published_at": "2026-10-21T10:00:37+00:00",
+          "source_url": "https://www.youtube.com/watch?v=_xhMKReKqD4",
+          "title": "[#긴급인터뷰]  “코스피 급반등, 진짜 바닥은 아직 아니다?” 삼성전자·SK하이닉스 다시 주도주 될까 / 코어위브 신용위험 아직 안 끝났다  | KB증권  유영화 차장",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "relevance": {
+            "tickers": [
+              "^KS11",
+              "CRWV",
+              "9984.T",
+              "CL=F",
+              "000660.KS",
+              "005930.KS"
+            ],
+            "markets": [
+              "US",
+              "KR"
+            ],
+            "themes": [],
+            "match_basis": "verified_entities"
+          },
+          "claims": [
+            {
+              "claim_id": "C1",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C2",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C3",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C4",
+              "packet_status": "asr_uncertain",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C5",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C6",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            }
+          ],
+          "treatment": "REQUIRES_PRIMARY_VERIFICATION",
+          "correction_lineage": "new canonical event; no revision in packet"
+        },
+        {
+          "event_key": "ZPF7UdMncFs",
+          "content_sha256": "1dbeacea617b7a1084207c06a493c14086fbbf77263e727c620f2e04b42eb0bd",
+          "occurred_at": "2026-10-21T09:08:40+00:00",
+          "published_at": "2026-10-21T09:08:40+00:00",
+          "source_url": "https://www.youtube.com/watch?v=ZPF7UdMncFs",
+          "title": "\"남은 현금은 '이때' 씁니다\"…손익비 생각하면 흔들려도 지금은 버틸 구간!ㅣ홍선애, 민재기 KB증권 PRIME CLUB 팀장 [여의도 인사이트]",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "relevance": {
+            "tickers": [
+              "^KS11",
+              "005930",
+              "000660",
+              "TSM",
+              "NVDA",
+              "MU",
+              "005380",
+              "064350"
+            ],
+            "markets": [
+              "US",
+              "KR"
+            ],
+            "themes": [],
+            "match_basis": "verified_entities"
+          },
+          "claims": [
+            {
+              "claim_id": "C1",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C2",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C3",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C4",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C5",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C6",
+              "packet_status": "partially_supported",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            }
+          ],
+          "treatment": "REQUIRES_PRIMARY_VERIFICATION",
+          "correction_lineage": "new canonical event; no revision in packet"
+        },
+        {
+          "event_key": "3qFC-2RxSis",
+          "content_sha256": "2cf8a6baae469b3f1418b4837a1a99014724293935e2def860ca3cb15559a7b4",
+          "occurred_at": "2026-10-21T09:00:22+00:00",
+          "published_at": "2026-10-21T09:00:22+00:00",
+          "source_url": "https://www.youtube.com/watch?v=3qFC-2RxSis",
+          "title": "삼성전자 HBM4 대반격 시작..  SK하이닉스 독주 끝나나 / 영업이익 500조 가능할까? ㅣ메리츠증권 이화진 차장",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "relevance": {
+            "tickers": [
+              "005930",
+              "005935",
+              "000660",
+              "MU",
+              "META",
+              "AAPL"
+            ],
+            "markets": [
+              "KR",
+              "US"
+            ],
+            "themes": [],
+            "match_basis": "verified_entities"
+          },
+          "claims": [
+            {
+              "claim_id": "C1",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C2",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C3",
+              "packet_status": "asr_uncertain",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C4",
+              "packet_status": "asr_uncertain",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C5",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C6",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            }
+          ],
+          "treatment": "REQUIRES_PRIMARY_VERIFICATION",
+          "correction_lineage": "new canonical event; no revision in packet"
+        },
+        {
+          "event_key": "f_EUpVZ2BSw",
+          "content_sha256": "91241fd036d02be42860bfaa6b9dcce298548f5b6c637a27864ebb67e22af69f",
+          "occurred_at": "2026-10-21T08:23:57+00:00",
+          "published_at": "2026-10-21T08:23:57+00:00",
+          "source_url": "https://www.youtube.com/watch?v=f_EUpVZ2BSw",
+          "title": "주가가 다시 오르기 시작할 때, 절대 놓치면 안 되는 것",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "relevance": {
+            "tickers": [
+              "^KS11",
+              "005930",
+              "000660",
+              "SMCI",
+              "META",
+              "TSLA"
+            ],
+            "markets": [
+              "US",
+              "KR"
+            ],
+            "themes": [],
+            "match_basis": "verified_entities"
+          },
+          "claims": [
+            {
+              "claim_id": "C1",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [
+                {
+                  "evidence_id": "E1",
+                  "assessment": "requires semantic primary-source verification"
+                }
+              ],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C2",
+              "packet_status": "partially_supported",
+              "supporting_evidence_audit": [
+                {
+                  "evidence_id": "E1",
+                  "assessment": "requires semantic primary-source verification"
+                }
+              ],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C3",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C4",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C5",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C6",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            }
+          ],
+          "treatment": "REQUIRES_PRIMARY_VERIFICATION",
+          "correction_lineage": "new canonical event; no revision in packet"
+        },
+        {
+          "event_key": "Nrrl0CMzIXM",
+          "content_sha256": "2e877f0f18dbd72afb1194cd4b6e38153a80d1041867b29f29f54e167cb4adbc",
+          "occurred_at": "2026-10-21T08:11:25+00:00",
+          "published_at": "2026-10-21T08:11:25+00:00",
+          "source_url": "https://www.youtube.com/watch?v=Nrrl0CMzIXM",
+          "title": "[10월 21일 마감시황] “오늘 반등은 할 만큼 했다”…코스피 3% 급등 이후 시장이 확인해야 할 신호ㅣ홍선애, 이권희, 차영주 [클로징벨 라이브]",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "relevance": {
+            "tickers": [
+              "ORCL"
+            ],
+            "markets": [
+              "US"
+            ],
+            "themes": [],
+            "match_basis": "verified_entities"
+          },
+          "claims": [
+            {
+              "claim_id": "C1",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C2",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C3",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C4",
+              "packet_status": "asr_uncertain",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C5",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C6",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            }
+          ],
+          "treatment": "REQUIRES_PRIMARY_VERIFICATION",
+          "correction_lineage": "new canonical event; no revision in packet"
+        },
+        {
+          "event_key": "FaAgdmOGdhA",
+          "content_sha256": "b766aee59be776d287a62cd8f8ddc1d90d444fdbb0c61545b15144e14a43a28f",
+          "occurred_at": "2026-10-21T08:00:05+00:00",
+          "published_at": "2026-10-21T08:00:05+00:00",
+          "source_url": "https://www.youtube.com/watch?v=FaAgdmOGdhA",
+          "title": "지금은 공포에 살 때? 반도체 급락장에서 확인할 가격의 기준",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "relevance": {
+            "tickers": [
+              "000660",
+              "005930",
+              "TSLA"
+            ],
+            "markets": [
+              "KR",
+              "US"
+            ],
+            "themes": [],
+            "match_basis": "verified_entities"
+          },
+          "claims": [
+            {
+              "claim_id": "C1",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C2",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C3",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C4",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C5",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C6",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            }
+          ],
+          "treatment": "REQUIRES_PRIMARY_VERIFICATION",
+          "correction_lineage": "new canonical event; no revision in packet"
+        },
+        {
+          "event_key": "VYYm8S5XFpU",
+          "content_sha256": "6c4e8c586ae8d6ed14f28a8a45146867fc873c0e2818d53a0fae43905eca3487",
+          "occurred_at": "2026-10-21T07:30:08+00:00",
+          "published_at": "2026-10-21T07:30:08+00:00",
+          "source_url": "https://www.youtube.com/watch?v=VYYm8S5XFpU",
+          "title": "“지금 1억 있다면 이 주식 삽니다!” 코스피 폭락 후 대반등… 진짜 큰 돈은 급락장에서 버는 이유ㅣ김민수 대표",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "relevance": {
+            "tickers": [],
+            "markets": [],
+            "themes": [],
+            "match_basis": "title_and_claim_context"
+          },
+          "claims": [
+            {
+              "claim_id": "C1",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C2",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C3",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C4",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C5",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C6",
+              "packet_status": "asr_uncertain",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            }
+          ],
+          "treatment": "MAINTAIN",
+          "correction_lineage": "new canonical event; no revision in packet"
+        },
+        {
+          "event_key": "e3WRUs1O8UM",
+          "content_sha256": "1a9829158d777fdd6b32454519a5edf1e59dda1ffa3ca95991cb6b70f4dc666b",
+          "occurred_at": "2026-10-21T06:52:18+00:00",
+          "published_at": "2026-10-21T06:52:18+00:00",
+          "source_url": "https://www.youtube.com/watch?v=e3WRUs1O8UM",
+          "title": "월가에서 스페이스X 역대급 실적에도 아직 '저평가'라는 이유",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "relevance": {
+            "tickers": [
+              "SPCX",
+              "ORCL"
+            ],
+            "markets": [
+              "US"
+            ],
+            "themes": [],
+            "match_basis": "verified_entities"
+          },
+          "claims": [
+            {
+              "claim_id": "C1",
+              "packet_status": "asr_uncertain",
+              "supporting_evidence_audit": [
+                {
+                  "evidence_id": "E4",
+                  "assessment": "unverifiable evidence date excluded"
+                },
+                {
+                  "evidence_id": "E6",
+                  "assessment": "missing evidence ID"
+                }
+              ],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C2",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C3",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C4",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C5",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C6",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            }
+          ],
+          "treatment": "REQUIRES_PRIMARY_VERIFICATION",
+          "correction_lineage": "new canonical event; no revision in packet"
+        },
+        {
+          "event_key": "u-9XWm2U3Rk",
+          "content_sha256": "5f0a6791f0001f339fdb9c54e1496e86d6e9407eec4f9809ea879c038e9c0b32",
+          "occurred_at": "2026-10-21T06:42:23+00:00",
+          "published_at": "2026-10-21T06:42:23+00:00",
+          "source_url": "https://www.youtube.com/watch?v=u-9XWm2U3Rk",
+          "title": "삼성전자 vs SK하이닉스, 지금은 어디에 비중을 둘까?…반등장에서 달라지는 투자 전략ㅣ권다영, 김태성 아이에셋 본부장 [2시 마켓워치]",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "relevance": {
+            "tickers": [],
+            "markets": [],
+            "themes": [],
+            "match_basis": "title_and_claim_context"
+          },
+          "claims": [
+            {
+              "claim_id": "C1",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C2",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C3",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C4",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C5",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C6",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            }
+          ],
+          "treatment": "MAINTAIN",
+          "correction_lineage": "new canonical event; no revision in packet"
+        },
+        {
+          "event_key": "rUG_SjCM5Go",
+          "content_sha256": "b413474822cdcca447d9a48f2cbe8191b054fd8cdd938a98c0b30a5d03cab8ec",
+          "occurred_at": "2026-10-21T06:30:23+00:00",
+          "published_at": "2026-10-21T06:30:23+00:00",
+          "source_url": "https://www.youtube.com/watch?v=rUG_SjCM5Go",
+          "title": "[#긴급시황] “지금 반등에 덥석 사지 마세요!”  조금씩 현금 확보하고 ‘이 신호’ 나올 때 매수하세요  (주가상승) 이건희 대표",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "relevance": {
+            "tickers": [],
+            "markets": [],
+            "themes": [],
+            "match_basis": "title_and_claim_context"
+          },
+          "claims": [
+            {
+              "claim_id": "C1",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C2",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C3",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C4",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C5",
+              "packet_status": "asr_uncertain",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C6",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            }
+          ],
+          "treatment": "MAINTAIN",
+          "correction_lineage": "new canonical event; no revision in packet"
+        },
+        {
+          "event_key": "k686F8SVfEk",
+          "content_sha256": "c7b814507d0702d70a0c0e422632acf7f2fe1326d5ec22c54d618b20340e7218",
+          "occurred_at": "2026-10-21T05:55:48+00:00",
+          "published_at": "2026-10-21T05:55:48+00:00",
+          "source_url": "https://www.youtube.com/watch?v=k686F8SVfEk",
+          "title": "내려올 만큼 내려왔지만 매수는 아직 이르다…현금 투입보다 교체매매를 선택해야 하는 이유ㅣ권다영, 이지환 오로라투자자문 대표 [2시 마켓워치]",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "relevance": {
+            "tickers": [
+              "^KS11",
+              "005930",
+              "000660",
+              "MU",
+              "USD/KRW"
+            ],
+            "markets": [
+              "US",
+              "KR"
+            ],
+            "themes": [],
+            "match_basis": "verified_entities"
+          },
+          "claims": [
+            {
+              "claim_id": "C1",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C2",
+              "packet_status": "partially_supported",
+              "supporting_evidence_audit": [
+                {
+                  "evidence_id": "ME_NEWS_20261022",
+                  "assessment": "missing evidence ID"
+                }
+              ],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C3",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C4",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C5",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C6",
+              "packet_status": "asr_uncertain",
+              "supporting_evidence_audit": [
+                {
+                  "evidence_id": "E5",
+                  "assessment": "requires semantic primary-source verification"
+                }
+              ],
+              "fact_promoted": false
+            }
+          ],
+          "treatment": "REQUIRES_PRIMARY_VERIFICATION",
+          "correction_lineage": "new canonical event; no revision in packet"
+        },
+        {
+          "event_key": "EwIuHwwAxlg",
+          "content_sha256": "491987c31314547fdbaf4e2b6c4418c2fa96b882858706ce23892999b31863d0",
+          "occurred_at": "2026-10-21T05:30:14+00:00",
+          "published_at": "2026-10-21T05:30:14+00:00",
+          "source_url": "https://www.youtube.com/watch?v=EwIuHwwAxlg",
+          "title": "[#글로벌인사이트]  AI 끝났다더니 코어위브 급등!  삼성전자·SK하이닉스 실적은 거짓말 안 한다 / 램리서치가 중요한 이유ㅣ세미콘리서치 랩 노근창 대표",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "relevance": {
+            "tickers": [
+              "ORCL"
+            ],
+            "markets": [
+              "US"
+            ],
+            "themes": [],
+            "match_basis": "verified_entities"
+          },
+          "claims": [
+            {
+              "claim_id": "C1",
+              "packet_status": "asr_uncertain",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C2",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C3",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C4",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C5",
+              "packet_status": "asr_uncertain",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C6",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            }
+          ],
+          "treatment": "REQUIRES_PRIMARY_VERIFICATION",
+          "correction_lineage": "new canonical event; no revision in packet"
+        },
+        {
+          "event_key": "ZIAmv-svE70",
+          "content_sha256": "0064bc5c5e7049b32a11c80871a668bcf1fc9b1c8a3ab61fc82a770df432e14a",
+          "occurred_at": "2026-10-21T05:08:45+00:00",
+          "published_at": "2026-10-21T05:08:45+00:00",
+          "source_url": "https://www.youtube.com/watch?v=ZIAmv-svE70",
+          "title": "10월 21일 미국장 열리기 전 꼭 알아야 하는 '미장 시황' 투자 포인트",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "relevance": {
+            "tickers": [
+              "META",
+              "NVDA",
+              "IBM",
+              "TSLA"
+            ],
+            "markets": [
+              "US"
+            ],
+            "themes": [],
+            "match_basis": "verified_entities"
+          },
+          "claims": [
+            {
+              "claim_id": "C1",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C2",
+              "packet_status": "asr_uncertain",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C3",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C4",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C5",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C6",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            }
+          ],
+          "treatment": "REQUIRES_PRIMARY_VERIFICATION",
+          "correction_lineage": "new canonical event; no revision in packet"
+        },
+        {
+          "event_key": "8ootY32OxY0",
+          "content_sha256": "db861496b8122d937ecd1da1f4be5bcdac22367b1ad33b34c49f5b577a72be41",
+          "occurred_at": "2026-10-21T04:00:31+00:00",
+          "published_at": "2026-10-21T04:00:31+00:00",
+          "source_url": "https://www.youtube.com/watch?v=8ootY32OxY0",
+          "title": "10월 21일 우리가 꼭 알고 있어야 할, 저평가 'AI 반도체' 소형주",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "relevance": {
+            "tickers": [
+              "CEVA"
+            ],
+            "markets": [
+              "US"
+            ],
+            "themes": [],
+            "match_basis": "verified_entities"
+          },
+          "claims": [
+            {
+              "claim_id": "C1",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C2",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C3",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C4",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C5",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C6",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            }
+          ],
+          "treatment": "REQUIRES_PRIMARY_VERIFICATION",
+          "correction_lineage": "new canonical event; no revision in packet"
+        },
+        {
+          "event_key": "Ihz5lQ8aPXs",
+          "content_sha256": "e9aaccae55729b9a2d75fd0d51fd70b3be396ca749d4d9f384f4b1c62adce60d",
+          "occurred_at": "2026-10-21T04:00:08+00:00",
+          "published_at": "2026-10-21T04:00:08+00:00",
+          "source_url": "https://www.youtube.com/watch?v=Ihz5lQ8aPXs",
+          "title": "“욕까지 나왔던 어제의 급락장!” 외국인은 왜 삼성전자는 사고 SK하이닉스는 팔았나? / 반도체 주가 흐름 달라질까? ㅣ 이권희 대표",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "relevance": {
+            "tickers": [],
+            "markets": [],
+            "themes": [],
+            "match_basis": "title_and_claim_context"
+          },
+          "claims": [
+            {
+              "claim_id": "C1",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C2",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C3",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C4",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C5",
+              "packet_status": "asr_uncertain",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C6",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            }
+          ],
+          "treatment": "MAINTAIN",
+          "correction_lineage": "new canonical event; no revision in packet"
+        },
+        {
+          "event_key": "RbrDrLBVTi8",
+          "content_sha256": "c07eba3d554589eeba3470385f3e29c736a03392dd3fb616bd4ccc0710ee866b",
+          "occurred_at": "2026-10-21T03:40:44+00:00",
+          "published_at": "2026-10-21T03:40:44+00:00",
+          "source_url": "https://www.youtube.com/watch?v=RbrDrLBVTi8",
+          "title": "클래리티 법안 부결 이후, 미국 중간선거와 한국 디지털자산 기본법의 향방 | 서동주, 김동환, 한서희 법무법인 광장 변호사 [크립토 PLUS]",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "relevance": {
+            "tickers": [],
+            "markets": [],
+            "themes": [],
+            "match_basis": "title_and_claim_context"
+          },
+          "claims": [
+            {
+              "claim_id": "C1",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C2",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C3",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C4",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C5",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C6",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [
+                {
+                  "evidence_id": "E7",
+                  "assessment": "historical evidence excluded from current grounds"
+                }
+              ],
+              "fact_promoted": false
+            }
+          ],
+          "treatment": "MAINTAIN",
+          "correction_lineage": "new canonical event; no revision in packet"
+        },
+        {
+          "event_key": "_f4WO4vilxM",
+          "content_sha256": "5e71cdd05fc16f0717e5da4320343bdf1ea8bb85cbb1f2d633feefe15236a475",
+          "occurred_at": "2026-10-21T02:59:25+00:00",
+          "published_at": "2026-10-21T02:59:25+00:00",
+          "source_url": "https://www.youtube.com/watch?v=_f4WO4vilxM",
+          "title": "금리·환율·AI 혼조세까지, 비트코인 호재의 연속! 글로벌 거물들 들어올까? | 서동주, 김동환, 박상혁 디지털애셋 편집장 [크립토 PLUS]",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "relevance": {
+            "tickers": [
+              "BTC",
+              "BZ=F",
+              "CRWV",
+              "IBIT",
+              "JPM",
+              "ETH",
+              "SOL"
+            ],
+            "markets": [
+              "US"
+            ],
+            "themes": [],
+            "match_basis": "verified_entities"
+          },
+          "claims": [
+            {
+              "claim_id": "C1_1",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C1_2",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C1_3",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C1_4",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C2_1",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C2_2",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            }
+          ],
+          "treatment": "REQUIRES_PRIMARY_VERIFICATION",
+          "correction_lineage": "new canonical event; no revision in packet"
+        },
+        {
+          "event_key": "Pum27tW9534",
+          "content_sha256": "f15cb59f208558d7568cec8beeed3d7cfb030d8a5f0325c8daf82490f3c38137",
+          "occurred_at": "2026-10-21T02:48:57+00:00",
+          "published_at": "2026-10-21T02:48:57+00:00",
+          "source_url": "https://www.youtube.com/watch?v=Pum27tW9534",
+          "title": "머스크가 스페이스X와 테슬라를 합치려는 진짜 이유",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "relevance": {
+            "tickers": [
+              "TSLA"
+            ],
+            "markets": [
+              "US"
+            ],
+            "themes": [],
+            "match_basis": "verified_entities"
+          },
+          "claims": [
+            {
+              "claim_id": "C1",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C2",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C3",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C4",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C5",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C6",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            }
+          ],
+          "treatment": "REQUIRES_PRIMARY_VERIFICATION",
+          "correction_lineage": "new canonical event; no revision in packet"
+        },
+        {
+          "event_key": "KWH0_uW8zJQ",
+          "content_sha256": "5ab14ed1cbcb862fc35dab7c7343cf5cf4d651b19d36b33d28997b3a7f889951",
+          "occurred_at": "2026-10-21T02:30:31+00:00",
+          "published_at": "2026-10-21T02:30:31+00:00",
+          "source_url": "https://www.youtube.com/watch?v=KWH0_uW8zJQ",
+          "title": "코스피 20% 폭락, 지금 손절하면 후회한다? / 팔더라도 7,000선에서 팔아야 하는 이유ㅣ 한지영 연구위원",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "relevance": {
+            "tickers": [
+              "^KS11"
+            ],
+            "markets": [
+              "US"
+            ],
+            "themes": [],
+            "match_basis": "verified_entities"
+          },
+          "claims": [
+            {
+              "claim_id": "C1",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C2",
+              "packet_status": "asr_uncertain",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C3",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C4",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C5",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C6",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            }
+          ],
+          "treatment": "REQUIRES_PRIMARY_VERIFICATION",
+          "correction_lineage": "new canonical event; no revision in packet"
+        },
+        {
+          "event_key": "mVeruSbWAu4",
+          "content_sha256": "21df0d6c04f26521aa915d77d2f4a5d6a130631adb38a00bfc473c1958eeb77b",
+          "occurred_at": "2026-10-21T02:24:40+00:00",
+          "published_at": "2026-10-21T02:24:40+00:00",
+          "source_url": "https://www.youtube.com/watch?v=mVeruSbWAu4",
+          "title": "중간선거 전 기술적 반등 기대해도 되나? | 장재영 NH투자증권 차장 [아침N투자]",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "relevance": {
+            "tickers": [
+              "SMCI",
+              "META",
+              "CL=F",
+              "000660"
+            ],
+            "markets": [
+              "US",
+              "KR"
+            ],
+            "themes": [],
+            "match_basis": "verified_entities"
+          },
+          "claims": [
+            {
+              "claim_id": "C1",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C2",
+              "packet_status": "asr_uncertain",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C3",
+              "packet_status": "partially_supported",
+              "supporting_evidence_audit": [
+                {
+                  "evidence_id": "E5",
+                  "assessment": "requires semantic primary-source verification"
+                }
+              ],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C4",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C5",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C6",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            }
+          ],
+          "treatment": "REQUIRES_PRIMARY_VERIFICATION",
+          "correction_lineage": "new canonical event; no revision in packet"
+        },
+        {
+          "event_key": "fXSqM_OpPbo",
+          "content_sha256": "8e0e3a4af87a4ac13bc7caec1942da4745b79fd1183c6be3b92f01ac33289799",
+          "occurred_at": "2026-10-21T02:21:39+00:00",
+          "published_at": "2026-10-21T02:21:39+00:00",
+          "source_url": "https://www.youtube.com/watch?v=fXSqM_OpPbo",
+          "title": "이 상승이 계속 되려면 필요한 것ㅣ이성희 하나증권 전주금융센터 PB [더블 크루]",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "relevance": {
+            "tickers": [],
+            "markets": [],
+            "themes": [],
+            "match_basis": "title_and_claim_context"
+          },
+          "claims": [
+            {
+              "claim_id": "C1",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C2",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C3",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C4",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C5",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C6",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            }
+          ],
+          "treatment": "MAINTAIN",
+          "correction_lineage": "new canonical event; no revision in packet"
+        },
+        {
+          "event_key": "s6SFBZHVncQ",
+          "content_sha256": "e87bffa2ba17e275c4333f06392ed881d33205359cff723d93ca124a8d90d61e",
+          "occurred_at": "2026-10-21T01:52:50+00:00",
+          "published_at": "2026-10-21T01:52:50+00:00",
+          "source_url": "https://www.youtube.com/watch?v=s6SFBZHVncQ",
+          "title": "원전 당분간 쳐다보지 말까요? | 유재선 하나증권 리서치센터 수석연구위원 [더블 업]",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "relevance": {
+            "tickers": [],
+            "markets": [],
+            "themes": [],
+            "match_basis": "title_and_claim_context"
+          },
+          "claims": [
+            {
+              "claim_id": "C1",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C2",
+              "packet_status": "asr_uncertain",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C3",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C4",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C5",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C6",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            }
+          ],
+          "treatment": "MAINTAIN",
+          "correction_lineage": "new canonical event; no revision in packet"
+        },
+        {
+          "event_key": "pEcF6UhXJZA",
+          "content_sha256": "897268dfef22ad8d00799d36eed0038ab403aa67dfd59b188338958c4d4dec42",
+          "occurred_at": "2026-10-21T01:30:04+00:00",
+          "published_at": "2026-10-21T01:30:04+00:00",
+          "source_url": "https://www.youtube.com/watch?v=pEcF6UhXJZA",
+          "title": "코스피 드디어 바닥 찍었나? 반등장 어디까지 오를까? / 스페이스X 흑자 전환에 빅테크 투자 지속론 힘 받나ㅣ 이주연 대표",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "relevance": {
+            "tickers": [
+              "^KS11",
+              "SMCI",
+              "NVDA",
+              "XBI"
+            ],
+            "markets": [
+              "US"
+            ],
+            "themes": [],
+            "match_basis": "verified_entities"
+          },
+          "claims": [
+            {
+              "claim_id": "C1",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C2",
+              "packet_status": "asr_uncertain",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C3",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C4",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C5",
+              "packet_status": "asr_uncertain",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C6",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            }
+          ],
+          "treatment": "REQUIRES_PRIMARY_VERIFICATION",
+          "correction_lineage": "new canonical event; no revision in packet"
+        },
+        {
+          "event_key": "7tGh0zvzfxY",
+          "content_sha256": "f8eeb8c08fea2547e5342667ba8060e9f5b626adcb771aa587f876d8d66de4d8",
+          "occurred_at": "2026-10-21T01:27:24+00:00",
+          "published_at": "2026-10-21T01:27:24+00:00",
+          "source_url": "https://www.youtube.com/watch?v=7tGh0zvzfxY",
+          "title": "강한 반등의 시작? 이번주 천천히 봐라 | 하창완 하보노의 주식 이야기 대표 [더블 체크]",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "relevance": {
+            "tickers": [
+              "CL=F",
+              "NVDA"
+            ],
+            "markets": [
+              "US"
+            ],
+            "themes": [],
+            "match_basis": "verified_entities"
+          },
+          "claims": [
+            {
+              "claim_id": "C1",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C2",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C3",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C4",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C5",
+              "packet_status": "asr_uncertain",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C6",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            }
+          ],
+          "treatment": "REQUIRES_PRIMARY_VERIFICATION",
+          "correction_lineage": "new canonical event; no revision in packet"
+        },
+        {
+          "event_key": "qj5F8MHFNKs",
+          "content_sha256": "b2902bf2d7d43aaeea674d033eced815c665e3325b127a934dd61c8d424ba6a4",
+          "occurred_at": "2026-10-21T00:21:07+00:00",
+          "published_at": "2026-10-21T00:21:07+00:00",
+          "source_url": "https://www.youtube.com/watch?v=qj5F8MHFNKs",
+          "title": "코스피 폭락, 정말 위기일까? \"급등 후유증 겪는 중\"…외국인 매도세와 반등 조건 | 박병창 MP파트너스 대표 [마켓 인사이드]",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "relevance": {
+            "tickers": [
+              "^KS11"
+            ],
+            "markets": [
+              "US"
+            ],
+            "themes": [],
+            "match_basis": "verified_entities"
+          },
+          "claims": [
+            {
+              "claim_id": "C1",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C2",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C3",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C4",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C5",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C6",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            }
+          ],
+          "treatment": "REQUIRES_PRIMARY_VERIFICATION",
+          "correction_lineage": "new canonical event; no revision in packet"
+        },
+        {
+          "event_key": "yTzxfHZ0MwQ",
+          "content_sha256": "8ebd1c10e1b0ce7c5ca524c0714a9d42dd0f06c6376cc5a621c3a05ee305592f",
+          "occurred_at": "2026-10-20T23:13:18+00:00",
+          "published_at": "2026-10-20T23:13:18+00:00",
+          "source_url": "https://www.youtube.com/watch?v=yTzxfHZ0MwQ",
+          "title": "삼전닉스 반토막 개미 10명 중 7명 물려…의무공개매수 청원 촉구 | 한국 AI데이터센터 엘리스 상장 후 32% 폭락…AI 투자 우려 | 권순우 삼프로TV 취재팀장 [뉴스3]",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "relevance": {
+            "tickers": [],
+            "markets": [],
+            "themes": [],
+            "match_basis": "title_and_claim_context"
+          },
+          "claims": [
+            {
+              "claim_id": "C1",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C2",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C3",
+              "packet_status": "asr_uncertain",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C4",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C5",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            },
+            {
+              "claim_id": "C6",
+              "packet_status": "unverified",
+              "supporting_evidence_audit": [],
+              "fact_promoted": false
+            }
+          ],
+          "treatment": "MAINTAIN",
+          "correction_lineage": "new canonical event; no revision in packet"
+        }
+      ],
+      "claim_status_summary": {
+        "unverified": 327,
+        "partially_supported": 19,
+        "asr_uncertain": 61,
+        "contradicted": 1
+      },
+      "detailed_claim_status": {
+        "unverified": 182,
+        "partially_supported": 9,
+        "asr_uncertain": 25
+      },
+      "instrument_mapping_exclusions": [
+        {
+          "event_key": "KLY4_VCgqe4",
+          "ticker": "005930/000660",
+          "assessment": "ambiguous/composite; no automatic instrument mapping"
+        },
+        {
+          "event_key": "KLY4_VCgqe4",
+          "ticker": "STX/WDC/MU",
+          "assessment": "ambiguous/composite; no automatic instrument mapping"
+        },
+        {
+          "event_key": "KLY4_VCgqe4",
+          "ticker": "LRCX/AMAT/ASML",
+          "assessment": "ambiguous/composite; no automatic instrument mapping"
+        },
+        {
+          "event_key": "KLY4_VCgqe4",
+          "ticker": "GOOGL/AMZN/MSFT",
+          "assessment": "ambiguous/composite; no automatic instrument mapping"
+        },
+        {
+          "event_key": "e3WRUs1O8UM",
+          "ticker": "SPCX",
+          "assessment": "ambiguous/composite; no automatic instrument mapping"
+        },
+        {
+          "event_key": "k686F8SVfEk",
+          "ticker": "USD/KRW",
+          "assessment": "ambiguous/composite; no automatic instrument mapping"
+        }
+      ],
+      "backlog_audit": {
+        "canonical_archive_unique_events": 436,
+        "unacknowledged_events_outside_this_packet": 0,
+        "window_omitted_events": 49,
+        "method": "exact canonical event key/content hash against acked_event_hashes; no unseen event completion"
+      },
+      "primary_checks": [
+        {
+          "evidence_id": "OFFICIAL_CEVA_Q2_2026",
+          "source_url": "https://www.ceva-ip.com/press/ceva-inc-announces-second-quarter-2026-financial-results/",
+          "published_at": "2026-08-10",
+          "period_end": "2026-06-30",
+          "event_key": "8ootY32OxY0",
+          "claim_ids": [
+            "C5",
+            "C6"
+          ],
+          "assessment": "historical correction only; licensing 18.221m, operating loss 2.076m, net loss 2.910m USD; current valuation not established"
+        }
+      ],
+      "unavailable_primary_sources": [
+        "Meta Q3 release direct open unavailable",
+        "Samsung Electro-Mechanics October 21 partnership direct open unavailable",
+        "NVIDIA October 21 supply-chain release direct open unavailable"
+      ],
+      "external_delivery_verified": false,
+      "mobile_handoff": {
+        "owner": "external_github_notification_pipeline",
+        "status": "PENDING_EXTERNAL_VERIFICATION",
+        "work_sent_notification": false
+      }
+    },
+    "next_checkpoint": "차기 정상 수집기의 신규·수정 event와 직접 원공시 확보 시 재평가. 기간 만료 또는 소스 장애 시 현재 근거 사용 중단."
+  },
+  "report_id": "youtube:505432f646b7504f17ec35f1be99bc00",
+  "report_sha256": "505432f646b7504f17ec35f1be99bc00596e2a85dbfc023faefb3bd809dc2b8c",
+  "published_at": "2026-10-22T09:32:07.679144+09:00"
+}

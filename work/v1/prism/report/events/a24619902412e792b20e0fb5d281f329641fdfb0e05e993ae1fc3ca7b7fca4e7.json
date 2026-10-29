@@ -1,0 +1,609 @@
+{
+  "schema": "tradingagents.work-report/v1",
+  "surface": "prism",
+  "event_id": "prism:7aaaeceacb875ba6b10151e2ec2ad143",
+  "source_sha256": "64d4bcd17ee64490a0d7d4f2d06013b4edf1a88e41b5261f12041c93f03f16e9",
+  "prompt_contract_version": "prism-work-v5",
+  "workflow_contract_sha256": "affa33ed518a96ac60bff25950a3fe646a7ff652ceb8d1ab5a9f50dde0362c75",
+  "policy": {
+    "visibility": "investor_safe_no_credentials",
+    "external_evidence_profile": "balanced_external",
+    "external_evidence_may_affect": [
+      "ranking",
+      "confidence",
+      "position_size_within_existing_risk_limits",
+      "research_priority"
+    ],
+    "external_evidence_may_bypass_execution_gate": false,
+    "thesis_is_independent_from_execution_readiness": true
+  },
+  "report_markdown": "# PRISM 연구 델타 — 2026-10-08\n\n확인 2026-10-08 10:33 KST · 소스 OK · producer 성공 10-08 10:06 KST · 원문 10-08 03:37–10-08 10:02 KST\n\n## 한 화면 요약\n\n1. 신규 27건·수정 0건. 27/27건 전송, 생략 0건, 범위 잘림 없음. COMPLETE는 전송 범위만 확인하며 주장·가격의 독립 검증은 뜻하지 않습니다.\n2. KR 삼성SDI·주성엔지니어링·LG에너지솔루션은 관심 신호 뒤 모두 미진입 판단이 나왔습니다. 매수 후보 승격 없이 검증 우선순위만 올립니다.\n3. US MU·SNDK·BSP도 관심 신호 뒤 손익비·섹터 집중·추세 조건으로 각각 미진입입니다. 메모리 테마 추격 근거로 쓰지 않습니다.\n4. KR 09:49 게시 메시지의 같은 날 ‘종가’ 표현은 시각상 성립하지 않습니다. 본문 없는 PDF 6건과 일부 잘못 추출된 티커는 논거·가격에서 제외합니다.\n5. 신규 실행 비중 0%. PRISM 점수는 독립 검증 confidence가 아니며 시장·계좌·위험 실행 게이트는 그대로 적용됩니다.\n\n## 실제 주식: 후속 연구 검증 순서\n\n| 순서 | 종목 | 확인할 델타 | 근거 이벤트 |\n|---:|---|---|---|\n| 1 | 주성엔지니어링 036930.KQ | 관심·미진입 충돌. 손익비, 거래량, 시각 확인 | 15818·15809·15807 |\n| 2 | MU | 관심·미진입 충돌. 손익비와 기술주 집중 확인 | 15803·15795·15794 |\n| 3 | SNDK | 관심·미진입 충돌. 섹터 집중과 가격 단위 확인 | 15804·15796·15794 |\n| 4 | 삼성SDI 006400.KS | 약세 국면·성장성 미달; 공시와 종가 시각 확인 | 15817·15808·15807 |\n| 5 | LG에너지솔루션 373220.KS | 성장성 미달; 잠정 실적과 종가 시각 확인 | 15819·15810·15807 |\n| 6 | BSP | 50일선 미회복; 상장 매핑·공식 가격 확인 | 15805·15797·15794 |\n\n순서는 투자 매수 순위가 아니라 자료 확인 순서입니다. 각 행의 이벤트 키 접두사는 `stock_ai_agent:`이며, 해당 자료의 가중치는 모두 미검증 단일 채널 `LOW_LABELED`입니다. 후속 KR·US thesis confidence는 공식 근거 전 상향하지 않고, 위험 한도 내 신규 배정도 0%로 둡니다.\n\n## 시뮬레이션·기타 자료\n\n- `stock_ai_agent:15820`: KR 가상 보유 252990.KS·038500.KS. `stock_ai_agent:15806`: US 가상 보유 NVDA·SPCX·FRSH·BKH. 실제 계좌 보유나 매매 신호로 전이하지 않습니다.\n- PDF 이벤트 15813·15812·15811·15800·15799·15798은 본문이 없어 독립 논거로 사용하지 않았습니다. 차트 안내는 피벗·RS 원본 값이 없습니다. PDF 추출의 AMPC·R·SMA 등은 종목 확정 근거로 쓰지 않습니다.\n- US XLU·XRT·IHI는 15794 알림의 업종 참고이며 공식 ETF 시세 검증 전 시장 국면 확정에 쓰지 않습니다.\n\n## KR·US 브리핑으로 넘길 확인 항목\n\n- KR: KRX 시세·거래량과 게시/관측시각, DART/KIND 공시·잠정 실적, 손익비와 약세 국면의 시장 게이트를 각각 재검증합니다.\n- US: 거래소 종가·기업 IR/SEC, MU 손익비, SNDK 기술주 집중 한도, BSP 50일선과 종목 매핑을 재검증합니다.\n- 차트·PDF 원문과 계좌·시장 자료가 없으므로 포지션 크기 또는 주문 조건을 산출하지 않습니다. 소스가 오래되거나 누락되면 현재 근거로 승격하지 않습니다.\n\n다음 확인: 새 sanitized producer 성공 시 또는 2026-10-09 03:37:06 KST 전. 현 이벤트에 실행 가능한 델타 없음.\n\nCOVERAGE_RECEIPT {\"event_id\":\"prism:7aaaeceacb875ba6b10151e2ec2ad143\",\"status\":\"COMPLETE\",\"window_events\":27,\"transmitted_events\":27,\"truncated\":false,\"new_events\":27,\"revised_events\":0}\nMOBILE_HANDOFF {\"owner\":\"external_github_notification_pipeline\",\"status\":\"PENDING_EXTERNAL_VERIFICATION\",\"work_sent_notification\":false}",
+  "structured_report": {
+    "binding": {
+      "surface": "prism",
+      "event_id": "prism:7aaaeceacb875ba6b10151e2ec2ad143",
+      "source_sha256": "64d4bcd17ee64490a0d7d4f2d06013b4edf1a88e41b5261f12041c93f03f16e9"
+    },
+    "title": "PRISM 연구 델타 — 2026-10-08",
+    "generated_at": "2026-10-08T10:33:05+09:00",
+    "as_of": "2026-10-08T01:02:28+00:00",
+    "source_health": "OK",
+    "report_mode": "RESEARCH_ONLY",
+    "summary": "신규 27건은 KR·US 관심 신호와 후속 미진입 판단이 충돌한다. 검증 순서만 조정하고 투자 thesis confidence·비중·실행 적격성을 상향하지 않는다.",
+    "top_actions": [],
+    "strategies": [
+      {
+        "ticker": "036930.KQ",
+        "name": "주성엔지니어링",
+        "market": "KR",
+        "research_rank": 1,
+        "research_impact": "손익비 미달에 따른 미진입. 모멘텀 포착과 실제 갭 상승은 구분; 거래량 감소 주장과 당일 종가 시각 모순을 검증",
+        "thesis_effect": "공식 검증 전 confidence 상향 보류; 기존 매수·매도 방향이나 투자 비중을 생성하지 않음",
+        "sizing_effect": "신규 실행 비중 0%; 후속 시장·계좌·위험 한도 검증 전 배정 없음",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action_now": false,
+          "required_rechecks": [
+            "공식 시세와 관측시각",
+            "공시·기업 IR",
+            "시장·계좌·위험 게이트"
+          ],
+          "blockers": [
+            "단일 채널의 연구 전용 자료",
+            "실행 적격성 false"
+          ]
+        },
+        "source_contributions": [
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15818",
+            "content_sha256": "93b978d3531319cb43f18bcdf0e58abebd94b30c39a15c235bfd1b18af492b7d",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "미진입 판단은 관심 신호와 충돌하므로 연구 검증 순서를 높이고 thesis confidence 상향을 보류한다.",
+            "execution_gate_override": false
+          },
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15815",
+            "content_sha256": "b3cd9174108a6f1ade393fc755f94cafb325ef2039361c7147dc9ea55b306f38",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "차트 안내만 있으며 피벗·RS 수치와 원본 차트는 확인되지 않았다.",
+            "execution_gate_override": false
+          },
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15812",
+            "content_sha256": "5285635819600b9e588d53d9e4637b62197ec0129fd4d686313514acc4f177e1",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "PDF 본문이 packet에 없어 논거·가격을 사용하지 않고 자료 확인 과제로만 남긴다.",
+            "execution_gate_override": false
+          },
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15809",
+            "content_sha256": "2f705caf454780a2b28f3407bb00d6c7bddfa768fb4721dff079ee1e4c7a22a0",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "메시지의 모멘텀·가격 주장은 공식 시세·공시와 관측시각 확인 전 미검증이다.",
+            "execution_gate_override": false
+          },
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15807",
+            "content_sha256": "b6209017a7c52fac141aa3cc38898bb6279575128d25bbfb4184cd98e58bfbac",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "관심 신호이며 점수는 독립 검증 신뢰도가 아니다. 다중 종목 가격도 재검증한다.",
+            "execution_gate_override": false
+          }
+        ]
+      },
+      {
+        "ticker": "MU",
+        "name": "Micron",
+        "market": "US",
+        "research_rank": 2,
+        "research_impact": "관심 신호와 손익비 미달·기술주 집중에 따른 미진입을 함께 기록; 확정 종가와 섹터 한도 재검증",
+        "thesis_effect": "공식 검증 전 confidence 상향 보류; 기존 매수·매도 방향이나 투자 비중을 생성하지 않음",
+        "sizing_effect": "신규 실행 비중 0%; 후속 시장·계좌·위험 한도 검증 전 배정 없음",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action_now": false,
+          "required_rechecks": [
+            "공식 시세와 관측시각",
+            "공시·기업 IR",
+            "시장·계좌·위험 게이트"
+          ],
+          "blockers": [
+            "단일 채널의 연구 전용 자료",
+            "실행 적격성 false"
+          ]
+        },
+        "source_contributions": [
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15803",
+            "content_sha256": "98435f965137d72cf838ba63d2d99cfe41759895f28b6e0f2709d4e377efd8e2",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "미진입 판단은 관심 신호와 충돌하므로 연구 검증 순서를 높이고 thesis confidence 상향을 보류한다.",
+            "execution_gate_override": false
+          },
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15801",
+            "content_sha256": "2ac65e648aef1a799c77ac9214c92db922e62499ac3c82167aa3a3a49bc05ef0",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "차트 안내만 있으며 피벗·RS 수치와 원본 차트는 확인되지 않았다.",
+            "execution_gate_override": false
+          },
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15798",
+            "content_sha256": "322d366da86c4176326f2418604003c0b2a2e5f8e1f778cece03787a2bca8e3a",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "PDF 본문이 packet에 없어 논거·가격을 사용하지 않고 자료 확인 과제로만 남긴다.",
+            "execution_gate_override": false
+          },
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15795",
+            "content_sha256": "be266861d487c19ffdd2313ab907dcc4dead505d400fd6f316f5e181a833d4eb",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "메시지의 모멘텀·가격 주장은 공식 시세·공시와 관측시각 확인 전 미검증이다.",
+            "execution_gate_override": false
+          },
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15794",
+            "content_sha256": "7edac12ca8967d4b90b436d8387a0d3d076493663d222c745e1cd532f4f65125",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "관심 신호이며 점수는 독립 검증 신뢰도가 아니다. 다중 종목 가격도 재검증한다.",
+            "execution_gate_override": false
+          }
+        ]
+      },
+      {
+        "ticker": "SNDK",
+        "name": "Sandisk",
+        "market": "US",
+        "research_rank": 3,
+        "research_impact": "관심 신호보다 기술주 집중에 따른 미진입을 우선 기록; 표기 가격의 단위와 종가를 공식 시세로 검증",
+        "thesis_effect": "공식 검증 전 confidence 상향 보류; 기존 매수·매도 방향이나 투자 비중을 생성하지 않음",
+        "sizing_effect": "신규 실행 비중 0%; 후속 시장·계좌·위험 한도 검증 전 배정 없음",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action_now": false,
+          "required_rechecks": [
+            "공식 시세와 관측시각",
+            "공시·기업 IR",
+            "시장·계좌·위험 게이트"
+          ],
+          "blockers": [
+            "단일 채널의 연구 전용 자료",
+            "실행 적격성 false"
+          ]
+        },
+        "source_contributions": [
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15804",
+            "content_sha256": "da67d75d83e6cd1c04db848277ec980dd671fe003685d7c26f6ebca4f99fbd47",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "미진입 판단은 관심 신호와 충돌하므로 연구 검증 순서를 높이고 thesis confidence 상향을 보류한다.",
+            "execution_gate_override": false
+          },
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15802",
+            "content_sha256": "e7dc0c89189b8c402654d233bec6cfa00c78404c6f3591d657b7072631ae7b7a",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "차트 안내만 있으며 피벗·RS 수치와 원본 차트는 확인되지 않았다.",
+            "execution_gate_override": false
+          },
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15799",
+            "content_sha256": "b508c598c5a978941e52da535c341fa73971746eeed2501a5b017639ac5cbfa5",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "PDF 본문이 packet에 없어 논거·가격을 사용하지 않고 자료 확인 과제로만 남긴다.",
+            "execution_gate_override": false
+          },
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15798",
+            "content_sha256": "322d366da86c4176326f2418604003c0b2a2e5f8e1f778cece03787a2bca8e3a",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "PDF 본문이 packet에 없어 논거·가격을 사용하지 않고 자료 확인 과제로만 남긴다.",
+            "execution_gate_override": false
+          },
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15796",
+            "content_sha256": "7c396d9070c35ec34a1c3450f4c46dc4e50dd4e85f952ced4670c928da3262b2",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "메시지의 모멘텀·가격 주장은 공식 시세·공시와 관측시각 확인 전 미검증이다.",
+            "execution_gate_override": false
+          },
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15794",
+            "content_sha256": "7edac12ca8967d4b90b436d8387a0d3d076493663d222c745e1cd532f4f65125",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "관심 신호이며 점수는 독립 검증 신뢰도가 아니다. 다중 종목 가격도 재검증한다.",
+            "execution_gate_override": false
+          }
+        ]
+      },
+      {
+        "ticker": "006400.KS",
+        "name": "삼성SDI",
+        "market": "KR",
+        "research_rank": 4,
+        "research_impact": "성장성 기준 미달·약세 국면으로 미진입; ESS 수주 전망과 확정 계약을 분리하고 당일 종가 시각 확인",
+        "thesis_effect": "공식 검증 전 confidence 상향 보류; 기존 매수·매도 방향이나 투자 비중을 생성하지 않음",
+        "sizing_effect": "신규 실행 비중 0%; 후속 시장·계좌·위험 한도 검증 전 배정 없음",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action_now": false,
+          "required_rechecks": [
+            "공식 시세와 관측시각",
+            "공시·기업 IR",
+            "시장·계좌·위험 게이트"
+          ],
+          "blockers": [
+            "단일 채널의 연구 전용 자료",
+            "실행 적격성 false"
+          ]
+        },
+        "source_contributions": [
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15817",
+            "content_sha256": "5a30c5bdd7beca6e2943bc8b28ed1170496f93b716c0c93a6aea4fa85abb7f96",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "미진입 판단은 관심 신호와 충돌하므로 연구 검증 순서를 높이고 thesis confidence 상향을 보류한다.",
+            "execution_gate_override": false
+          },
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15814",
+            "content_sha256": "68ae1e3e2f75ec4c74e9373f2aaf8bd62d6609620f5eedb36871808923de62b2",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "차트 안내만 있으며 피벗·RS 수치와 원본 차트는 확인되지 않았다.",
+            "execution_gate_override": false
+          },
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15811",
+            "content_sha256": "a1fd21cc652ef836107f1448d3b5e818080b7f7d7e20f7b4748a103b13059a56",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "PDF 본문이 packet에 없어 논거·가격을 사용하지 않고 자료 확인 과제로만 남긴다.",
+            "execution_gate_override": false
+          },
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15808",
+            "content_sha256": "288eafffac015f8251d71c078f1667d4299bbc67e9d83465e204616e9bd5da98",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "메시지의 모멘텀·가격 주장은 공식 시세·공시와 관측시각 확인 전 미검증이다.",
+            "execution_gate_override": false
+          },
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15807",
+            "content_sha256": "b6209017a7c52fac141aa3cc38898bb6279575128d25bbfb4184cd98e58bfbac",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "관심 신호이며 점수는 독립 검증 신뢰도가 아니다. 다중 종목 가격도 재검증한다.",
+            "execution_gate_override": false
+          }
+        ]
+      },
+      {
+        "ticker": "373220.KS",
+        "name": "LG에너지솔루션",
+        "market": "KR",
+        "research_rank": 5,
+        "research_impact": "성장성 점수 미달로 미진입; 잠정 실적·공시와 당일 종가 시각을 확인할 때까지 모멘텀 신뢰도 상향 금지",
+        "thesis_effect": "공식 검증 전 confidence 상향 보류; 기존 매수·매도 방향이나 투자 비중을 생성하지 않음",
+        "sizing_effect": "신규 실행 비중 0%; 후속 시장·계좌·위험 한도 검증 전 배정 없음",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action_now": false,
+          "required_rechecks": [
+            "공식 시세와 관측시각",
+            "공시·기업 IR",
+            "시장·계좌·위험 게이트"
+          ],
+          "blockers": [
+            "단일 채널의 연구 전용 자료",
+            "실행 적격성 false"
+          ]
+        },
+        "source_contributions": [
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15819",
+            "content_sha256": "34748ab384b01208a3e52ad6a35170cd5081dab0106ec1ee883cec8c0d700550",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "미진입 판단은 관심 신호와 충돌하므로 연구 검증 순서를 높이고 thesis confidence 상향을 보류한다.",
+            "execution_gate_override": false
+          },
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15816",
+            "content_sha256": "c4f58353efe8d52aabadb6cd8ab4231f7f5368542219d4bb212b9ff69f3eed02",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "차트 안내만 있으며 피벗·RS 수치와 원본 차트는 확인되지 않았다.",
+            "execution_gate_override": false
+          },
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15813",
+            "content_sha256": "5d9fff876c345af87dc2866a6a176a8210779741ec46709e266f36d4d956660b",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "PDF 본문이 packet에 없어 논거·가격을 사용하지 않고 자료 확인 과제로만 남긴다.",
+            "execution_gate_override": false
+          },
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15810",
+            "content_sha256": "4747cc50e183ebaff3e707d19e131ca665f95219410c0616bc2f2301e42d33ed",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "메시지의 모멘텀·가격 주장은 공식 시세·공시와 관측시각 확인 전 미검증이다.",
+            "execution_gate_override": false
+          },
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15807",
+            "content_sha256": "b6209017a7c52fac141aa3cc38898bb6279575128d25bbfb4184cd98e58bfbac",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "관심 신호이며 점수는 독립 검증 신뢰도가 아니다. 다중 종목 가격도 재검증한다.",
+            "execution_gate_override": false
+          }
+        ]
+      },
+      {
+        "ticker": "BSP",
+        "name": "Bending Spoons",
+        "market": "US",
+        "research_rank": 6,
+        "research_impact": "50일선 미회복에 따른 미진입; 종목·상장 매핑 및 장중 가격을 공식 자료로 확인",
+        "thesis_effect": "공식 검증 전 confidence 상향 보류; 기존 매수·매도 방향이나 투자 비중을 생성하지 않음",
+        "sizing_effect": "신규 실행 비중 0%; 후속 시장·계좌·위험 한도 검증 전 배정 없음",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action_now": false,
+          "required_rechecks": [
+            "공식 시세와 관측시각",
+            "공시·기업 IR",
+            "시장·계좌·위험 게이트"
+          ],
+          "blockers": [
+            "단일 채널의 연구 전용 자료",
+            "실행 적격성 false"
+          ]
+        },
+        "source_contributions": [
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15805",
+            "content_sha256": "d40494ed9a9a5fff6d5a1ff8dc9773cf8158af2ba790bb46a56913ac7763e1d8",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "미진입 판단은 관심 신호와 충돌하므로 연구 검증 순서를 높이고 thesis confidence 상향을 보류한다.",
+            "execution_gate_override": false
+          },
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15800",
+            "content_sha256": "d53f3bc0b9080fcf9f963c11ec8537ad428dd8033c98f3a81304d23d763a9b7f",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "PDF 본문이 packet에 없어 논거·가격을 사용하지 않고 자료 확인 과제로만 남긴다.",
+            "execution_gate_override": false
+          },
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15797",
+            "content_sha256": "b27ea47c47d2bd84dce47b87122a3bb45c92748b75667df56f31ef6ca098d1f3",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "메시지의 모멘텀·가격 주장은 공식 시세·공시와 관측시각 확인 전 미검증이다.",
+            "execution_gate_override": false
+          },
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15794",
+            "content_sha256": "7edac12ca8967d4b90b436d8387a0d3d076493663d222c745e1cd532f4f65125",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "관심 신호이며 점수는 독립 검증 신뢰도가 아니다. 다중 종목 가격도 재검증한다.",
+            "execution_gate_override": false
+          }
+        ]
+      }
+    ],
+    "coverage_receipt": {
+      "event_id": "prism:7aaaeceacb875ba6b10151e2ec2ad143",
+      "status": "COMPLETE",
+      "window_events": 27,
+      "transmitted_events": 27,
+      "truncated": false,
+      "new_events": 27,
+      "revised_events": 0
+    },
+    "model_receipt": {
+      "schema": "tradingagents.model-provenance/v1",
+      "work_synthesis": {
+        "execution_mode": "local",
+        "requested_model": "gpt-6.1-sol",
+        "requested_reasoning_effort": "xhigh",
+        "task_id": "tradingagents-work-prism",
+        "verification_status": "CONFIGURED_NOT_RUNTIME_VERIFIED",
+        "observed_model": null,
+        "observed_reasoning_effort": null,
+        "note": "The local task contract is verified; the Work host does not expose a signed per-response model receipt."
+      }
+    },
+    "source_summary": {
+      "producer": {
+        "health": "OK",
+        "run_id": "prism_telegram_20261008_100613",
+        "last_run_at": "2026-10-08T10:06:34.293856+09:00",
+        "status": "success",
+        "stale_after_hours": 30
+      },
+      "coverage": {
+        "total_unique_events": 141,
+        "window_events": 27,
+        "transmitted_events": 27,
+        "truncated": false,
+        "oldest_occurred_at": "2026-10-07T18:37:06+00:00",
+        "newest_occurred_at": "2026-10-08T01:02:28+00:00"
+      },
+      "delta": {
+        "new_events": 27,
+        "revised_events": 0,
+        "unchanged_events": 0,
+        "delivered_event_keys": [
+          "stock_ai_agent:15820",
+          "stock_ai_agent:15819",
+          "stock_ai_agent:15818",
+          "stock_ai_agent:15817",
+          "stock_ai_agent:15816",
+          "stock_ai_agent:15815",
+          "stock_ai_agent:15814",
+          "stock_ai_agent:15813",
+          "stock_ai_agent:15812",
+          "stock_ai_agent:15811",
+          "stock_ai_agent:15810",
+          "stock_ai_agent:15809",
+          "stock_ai_agent:15808",
+          "stock_ai_agent:15807",
+          "stock_ai_agent:15806",
+          "stock_ai_agent:15805",
+          "stock_ai_agent:15804",
+          "stock_ai_agent:15803",
+          "stock_ai_agent:15802",
+          "stock_ai_agent:15801",
+          "stock_ai_agent:15800",
+          "stock_ai_agent:15799",
+          "stock_ai_agent:15798",
+          "stock_ai_agent:15797",
+          "stock_ai_agent:15796",
+          "stock_ai_agent:15795",
+          "stock_ai_agent:15794"
+        ]
+      },
+      "source_contributions": [
+        {
+          "event_key": "stock_ai_agent:15820",
+          "effect": "simulation_only_no_market_action"
+        },
+        {
+          "event_key": "stock_ai_agent:15806",
+          "effect": "simulation_only_no_market_action"
+        }
+      ],
+      "unavailable_pdf_event_keys": [
+        "stock_ai_agent:15813",
+        "stock_ai_agent:15812",
+        "stock_ai_agent:15811",
+        "stock_ai_agent:15800",
+        "stock_ai_agent:15799",
+        "stock_ai_agent:15798"
+      ],
+      "independent_verification_performed": false,
+      "source_scores_are_not_verified_confidence": true,
+      "execution_eligible": false
+    },
+    "next_checkpoint": "2026-10-09T03:37:06+09:00"
+  },
+  "report_id": "prism:a24619902412e792b20e0fb5d281f329",
+  "report_sha256": "a24619902412e792b20e0fb5d281f329641fdfb0e05e993ae1fc3ca7b7fca4e7",
+  "published_at": "2026-10-08T10:33:12.454469+09:00"
+}

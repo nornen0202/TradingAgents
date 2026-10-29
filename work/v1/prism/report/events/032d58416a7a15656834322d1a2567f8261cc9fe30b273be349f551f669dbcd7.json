@@ -1,0 +1,206 @@
+{
+  "schema": "tradingagents.work-report/v1",
+  "surface": "prism",
+  "event_id": "prism:99a123dcdbb824d8afa95ae40d30c0b0",
+  "source_sha256": "3c421cba1a9360b138870809492fc4c405968aeab3bd8482b332d5bd0e596169",
+  "prompt_contract_version": "prism-work-v5",
+  "workflow_contract_sha256": "54544c5a6bb3eb17cc24908ceef2377403d48fb6a6c258e4c33d8891923bc403",
+  "policy": {
+    "visibility": "investor_safe_no_credentials",
+    "external_evidence_profile": "balanced_external",
+    "external_evidence_may_affect": [
+      "ranking",
+      "confidence",
+      "position_size_within_existing_risk_limits",
+      "research_priority"
+    ],
+    "external_evidence_may_bypass_execution_gate": false,
+    "thesis_is_independent_from_execution_readiness": true
+  },
+  "report_markdown": "# PRISM 연구 델타 · 2026-10-05\n\n**소스 OK · 새 이벤트 2건 · 연구 전용**  \n작성 10-05 08:37 KST · 정제 생산 10-04 10:57 KST · 최신 이벤트 10-04 10:00 KST\n\n## 핵심 델타\n\n1. **RF머트리얼즈(327260): 매수 논거 재검증 우선.** 주간 회고에는 과거 매도와 손실이 서술됩니다. 현재 매도 주문이나 실제 계좌 내역으로 해석하지 않습니다. 기존 상승 논거의 confidence를 낮추고 KR 후속 연구 우선순위를 공식 시세·매매 근거 대조로 돌립니다. 근거 `stock_ai_agent:15603`; 신규 실행 배분 0%.\n2. **BTC 데모 체결: 실제 주식 전략 제외.** 10배 교차 레버리지 데모의 체결 서술은 실제 계좌나 KR·US 주식 신호가 아닙니다. 포지션 크기와 주문 판단에 반영하지 않습니다. 근거 `stock_ai_agent:15602`.\n\n## 범위·신선도\n\n- 정제 스냅샷 전체 고유 94건 중 최근 24시간 창 2건을 2건 모두 전송했습니다. 새 2건, 수정 0건, 이미 전달된 중복 0건, 생략 0건, 전송 잘림 없음. `COMPLETE`는 정제 패킷의 이벤트 전송 범위에 한하며 게시물 전문·가격 검증 완료를 뜻하지 않습니다.\n- 생산 성공 시각과 이벤트·게시·신호 및 coverage 시각은 작성 시각보다 앞서고 순서가 맞습니다. 가장 오래된 이벤트는 **10-05 09:27:24 KST**에 24시간 창을 벗어납니다. 그때까지 새 정제 결과가 없으면 이를 현재 근거로 재사용하지 않습니다.\n- 주간 회고는 짧은 전송 미리보기이며 매도 사유·체결 증빙·종목별 시점과 가격의 독립 확인이 없습니다. Telegram 점수 0.45는 독립 검증 신뢰도가 아닙니다. 회고에 언급된 NVDA는 정규화된 종목 신호로 전송되지 않아 US thesis를 조정하지 않습니다.\n\n## 종목별 연구 영향\n\n| 대상 | `balanced_external` 적용 | 공식 확인·무효화 |\n|---|---|---|\n| RF머트리얼즈 | 주간 매도 회고 때문에 기존 낙관 논거의 신뢰도 하향. 연구 1순위는 신규 매수 검토가 아닌 이전 매수·매도 근거의 대조. 새 실행 배분 0%. | 거래소 확정 일봉·거래량과 DART/기업 공시, 과거 신호의 시점·사유 확인. 회고의 매도·가격이 맞지 않으면 해당 외부 논거 폐기. |\n| BTC 데모 | 주식 종목 순위·confidence·크기 변경 없음. 데모 거래를 실제 보유로 전이하지 않음. | 별도 실제 계좌·위험 자료가 있더라도 주식 전략과 독립적으로 취급. |\n\n**KR 전달:** `stock_ai_agent:15603`을 RF머트리얼즈의 과거 논거 재평가에 연결하고 낙관 confidence를 낮춥니다. 공식 근거가 나올 때까지 추격 연구 순위를 낮추며 신규 배분은 0%입니다. 현재 시장·계좌·위험 실행 게이트는 확인되지 않았습니다.  \n**US 전달:** NVDA 언급은 전송된 정규화 종목 신호가 아니므로 US 순위·confidence·크기를 바꾸지 않습니다. BTC 데모도 주식 전략에서 제외합니다.\n\n**다음 확인:** 새 성공 정제 생산 결과 또는 **10-05 09:27:24 KST** 창 만료 중 먼저 도래하는 시점. 필요한 근거는 거래소 확정 시세, RF 관련 공시·매매 근거, 그리고 별도 실시간 시장·계좌·위험 점검입니다.\n\nCOVERAGE_RECEIPT {\"event_id\":\"prism:99a123dcdbb824d8afa95ae40d30c0b0\",\"status\":\"COMPLETE\",\"window_events\":2,\"transmitted_events\":2,\"truncated\":false,\"new_events\":2,\"revised_events\":0}\nMOBILE_HANDOFF {\"owner\":\"external_github_notification_pipeline\",\"status\":\"PENDING_EXTERNAL_VERIFICATION\",\"work_sent_notification\":false}",
+  "structured_report": {
+    "binding": {
+      "surface": "prism",
+      "event_id": "prism:99a123dcdbb824d8afa95ae40d30c0b0",
+      "source_sha256": "3c421cba1a9360b138870809492fc4c405968aeab3bd8482b332d5bd0e596169"
+    },
+    "title": "PRISM 연구 델타 · 2026-10-05",
+    "generated_at": "2026-10-04T23:37:23.737027+00:00",
+    "as_of": "2026-10-04T01:00:06+00:00",
+    "source_health": "OK",
+    "report_mode": "RESEARCH",
+    "summary": "새 PRISM 2건. RF머트리얼즈 주간 매도 회고로 기존 낙관 신뢰도를 낮추고 공식 근거 재검증을 우선한다. BTC 데모는 실제 주식 실행에서 제외. 신규 배분 0%.",
+    "top_actions": [
+      {
+        "type": "RESEARCH",
+        "ticker": "327260.KS",
+        "priority": 1,
+        "readiness": "RESEARCH_ONLY",
+        "action": "과거 매수·매도 근거와 거래소 시세·공시를 대조; 신규 주문 보류",
+        "event_keys": [
+          "stock_ai_agent:15603"
+        ]
+      }
+    ],
+    "strategies": [
+      {
+        "ticker": "327260.KS",
+        "display_name": "RF머트리얼즈",
+        "rank": 1,
+        "thesis": {
+          "stance": "RESEARCH",
+          "horizon": "다음 공식 시세·공시 및 과거 매매 근거 확인까지",
+          "confidence": 0.25,
+          "research_priority": 1,
+          "rationale": "주간 매도 회고가 기존 낙관 논거와 충돌할 수 있으나 미리보기만으로 사유·체결을 확인할 수 없어 신뢰도를 하향하고 검증을 우선함.",
+          "entry_conditions": [
+            "거래소 확정 일봉·거래량과 과거 신호 시점 대조",
+            "DART 또는 기업 공시에서 당시 사업·계약 가정 확인"
+          ],
+          "invalidation_conditions": [
+            "매도·가격 서술이 거래소 시세나 원 신호와 불일치",
+            "기존 상승 논거의 사업·계약 가정이 공시와 불일치"
+          ],
+          "invalidation_action": "충돌한 외부 논거를 폐기하고 신규 주문을 보류한 채 thesis를 다시 작성",
+          "position_sizing": "신규 실행 배분 0%; 향후 크기는 별도 실시간 시장·계좌·위험 한도 안에서만 결정"
+        },
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action_now": null,
+          "action_if_triggered": null,
+          "blockers": [
+            "주간 회고는 현재 주문 신호가 아님",
+            "체결·시세·공시 독립 검증 없음",
+            "실시간 시장·계좌·위험 게이트 없음"
+          ]
+        },
+        "source_contributions": [
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15603",
+            "affected_field": "confidence",
+            "direction": "down",
+            "reason": "과거 RF 매도 및 손실 회고가 이전 낙관 논거의 확신을 낮추지만 전문과 체결 증빙이 없어 낮은 가중치로 제한"
+          },
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15603",
+            "affected_field": "research_priority",
+            "direction": "up_for_verification",
+            "reason": "이전 매수 논거와 매도 회고의 시점·사유 충돌 가능성을 공식 자료로 우선 대조"
+          }
+        ]
+      }
+    ],
+    "coverage_receipt": {
+      "event_id": "prism:99a123dcdbb824d8afa95ae40d30c0b0",
+      "status": "COMPLETE",
+      "window_events": 2,
+      "transmitted_events": 2,
+      "truncated": false,
+      "new_events": 2,
+      "revised_events": 0
+    },
+    "model_receipt": {
+      "schema": "tradingagents.model-provenance/v1",
+      "work_synthesis": {
+        "execution_mode": "local",
+        "requested_model": "gpt-6-sol",
+        "requested_reasoning_effort": "xhigh",
+        "task_id": "tradingagents-work-prism",
+        "verification_status": "CONFIGURED_NOT_RUNTIME_VERIFIED",
+        "observed_model": null,
+        "observed_reasoning_effort": null,
+        "note": "The local task contract is verified; the Work host does not expose a signed per-response model receipt."
+      }
+    },
+    "source_summary": {
+      "producer": {
+        "health": "OK",
+        "run_id": "prism_telegram_20261004_105659",
+        "last_run_at": "2026-10-04T10:57:04.468205+09:00",
+        "status": "success",
+        "stale_after_hours": 30
+      },
+      "window_hours": 24,
+      "coverage": {
+        "total_unique_events": 94,
+        "window_events": 2,
+        "transmitted_events": 2,
+        "truncated": false,
+        "oldest_occurred_at": "2026-10-04T00:27:24+00:00",
+        "newest_occurred_at": "2026-10-04T01:00:06+00:00"
+      },
+      "delta": {
+        "new_events": 2,
+        "revised_events": 0,
+        "unchanged_events": 0,
+        "delivered_event_keys": [
+          "stock_ai_agent:15603",
+          "stock_ai_agent:15602"
+        ]
+      },
+      "evidence_policy": {
+        "profile": "balanced_external",
+        "material_thesis_effects": [
+          "ranking",
+          "confidence",
+          "position_size_within_existing_risk_limits",
+          "research_priority"
+        ],
+        "supported_evidence_weight": "MEDIUM",
+        "partially_supported_evidence_weight": "LOW_TO_MEDIUM",
+        "unverified_evidence_weight": "LOW_LABELED",
+        "user_primary_channels": [
+          "@kpunch",
+          "@sosumonkey"
+        ],
+        "user_primary_source_tier": "USER_PRIMARY",
+        "user_primary_evidence_weight": "HIGH",
+        "user_primary_validation_policy": "USER_ACCEPTED",
+        "matching_multi_source_signal_may_raise_thesis_priority": true,
+        "conflicting_signal_must_be_visible": true,
+        "may_bypass_market_or_portfolio_execution_gate": false
+      },
+      "relevant_new_evidence": [
+        "stock_ai_agent:15603"
+      ],
+      "excluded_evidence": [
+        {
+          "event_key": "stock_ai_agent:15602",
+          "reason": "본문상 BTC 데모 체결; 실제 주식 전략·계좌 신호가 아님"
+        }
+      ],
+      "data_quality": [
+        "주간 회고는 전송 미리보기라 매도 사유·체결·가격의 독립 검증 불가",
+        "NVDA는 회고에 언급되지만 정규화 종목 신호로 전송되지 않음",
+        "Telegram 점수는 독립 검증 신뢰도가 아님"
+      ],
+      "source_health_scope": "정제 생산자·이벤트 시각 확인; 실시간 시세·실제 계좌·외부 전달 미검증",
+      "market_data_status": "UNVERIFIED",
+      "market_data_asof": null,
+      "valid_until": null,
+      "kr_handoff": "RF 과거 매도 회고로 낙관 confidence 하향, 공식 시세·공시 재검증 우선; 신규 배분 0%",
+      "us_handoff": "정규화된 US 종목 신호 없음; NVDA 회고 및 BTC 데모만으로 US thesis 변경 없음"
+    },
+    "next_checkpoint": {
+      "at": "2026-10-05T00:27:24+00:00",
+      "trigger": "다음 성공한 정제 생산 결과 또는 현재 창 최오래 이벤트 만료 중 먼저 도래",
+      "current_window_expires_at": "2026-10-05T00:27:24+00:00",
+      "required_evidence": [
+        "거래소 확정 일봉·거래량",
+        "RF 관련 DART·기업 공시 및 과거 매매 근거",
+        "실시간 시장·계좌·위험 게이트"
+      ]
+    },
+    "mobile_handoff": {
+      "owner": "external_github_notification_pipeline",
+      "status": "PENDING_EXTERNAL_VERIFICATION",
+      "work_sent_notification": false
+    },
+    "external_delivery_verified": false
+  },
+  "report_id": "prism:032d58416a7a15656834322d1a2567f8",
+  "report_sha256": "032d58416a7a15656834322d1a2567f8261cc9fe30b273be349f551f669dbcd7",
+  "published_at": "2026-10-05T08:38:03.470991+09:00"
+}

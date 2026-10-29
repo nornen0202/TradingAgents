@@ -1,0 +1,94 @@
+{
+  "schema": "tradingagents.work-report/v1",
+  "surface": "youtube",
+  "event_id": "youtube:c29adedb59e6928475e331c5df114c76",
+  "source_sha256": "46b5a71886da1666690f77061075887dc30e82cdd27a634bdf19af59c8e52c7b",
+  "prompt_contract_version": "youtube-work-v5",
+  "workflow_contract_sha256": "bc33d7680318d3200a3ef2fd2cc1f830d41fd1ba019e4f20ed6d1951cd6dc343",
+  "policy": {
+    "visibility": "investor_safe_no_credentials",
+    "external_evidence_profile": "balanced_external",
+    "external_evidence_may_affect": [
+      "ranking",
+      "confidence",
+      "position_size_within_existing_risk_limits",
+      "research_priority"
+    ],
+    "external_evidence_may_bypass_execution_gate": false,
+    "thesis_is_independent_from_execution_readiness": true
+  },
+  "report_markdown": "# YouTube 검증 델타 | 2026-10-07 KST\n\n**판정: NO_ACTIONABLE_DELTA** · 확인 2026-10-07T08:33:41+09:00 · 생산자 `youtube_20261006_120139` 성공, 20.08시간 경과(허용 36시간) · 현재 주문 신호 없음\n\n## 한 화면 요약\n\n- 신규 **0건**, 수정 **0건**. 동일 이벤트 **32건**은 중복 제외했습니다. 새로 검증할 핵심 변화나 반증이 없습니다.\n- 최근 72시간 창의 **32/32건**이 전송됐고 패킷 절단과 생략은 없습니다. 가장 오래된 커버리지 시각은 확인 시점 기준 70.55시간 전입니다. 이 완전성 판정은 패킷 수치에 한정하며 기존 32건의 영상 주장이나 근거를 재검증했다는 뜻은 아닙니다.\n- KR·US 연구 순위, thesis 확신도, 기존 위험 한도 안의 크기, 연구 우선순위에 **이번 델타로 인한 변경 없음**. 신규 관련 YouTube 근거가 없어 `balanced_external` 가중치를 추가 적용할 대상이 없습니다. 시장·계좌·위험 실행 게이트는 별도로 충족해야 합니다.\n\n## 검증과 다음 확인\n\n이번 패킷에 새 주장이 없어 supported·partially supported·unverified·ASR uncertain을 새로 분류하지 않았습니다. 이전 영상의 수치나 전망을 현재 사실 또는 주문 지시로 승격하지 않습니다. 다음 정본 생산자 실행에서 신규·수정 이벤트의 시각, 근거 ID 및 중요한 숫자의 공식 원자료를 확인합니다. 72시간 커버리지 경계를 다음 실행 시 다시 검증합니다.\n\nCOVERAGE_RECEIPT {\"event_id\":\"youtube:c29adedb59e6928475e331c5df114c76\",\"status\":\"COMPLETE\",\"window_events\":32,\"transmitted_events\":32,\"truncated\":false,\"new_events\":0,\"revised_events\":0}\nMOBILE_HANDOFF {\"owner\":\"external_github_notification_pipeline\",\"status\":\"PENDING_EXTERNAL_VERIFICATION\",\"work_sent_notification\":false}",
+  "structured_report": {
+    "binding": {
+      "surface": "youtube",
+      "event_id": "youtube:c29adedb59e6928475e331c5df114c76",
+      "source_sha256": "46b5a71886da1666690f77061075887dc30e82cdd27a634bdf19af59c8e52c7b"
+    },
+    "title": "YouTube 검증 델타 — 2026-10-07",
+    "generated_at": "2026-10-07T08:33:41+09:00",
+    "as_of": "2026-10-06T12:28:36.568391+09:00",
+    "source_health": "OK",
+    "report_mode": "NO_ACTIONABLE_DELTA",
+    "summary": [
+      "신규 0건, 수정 0건, 동일 32건 중복 제외; 이번 패킷의 새 검증 변화 없음.",
+      "72시간 창 32/32건 전송, 절단 없음; 커버리지 완전성은 패킷 수치에 한정.",
+      "새 관련 근거가 없어 balanced_external에 따른 KR·US 순위, thesis 확신도, 위험 한도 내 크기, 연구 우선순위 변경 없음.",
+      "현재 주문 신호 없음; 시장·계좌·위험 실행 게이트 별도 필요."
+    ],
+    "top_actions": [],
+    "strategies": [],
+    "coverage_receipt": {
+      "event_id": "youtube:c29adedb59e6928475e331c5df114c76",
+      "status": "COMPLETE",
+      "window_events": 32,
+      "transmitted_events": 32,
+      "truncated": false,
+      "new_events": 0,
+      "revised_events": 0
+    },
+    "model_receipt": {
+      "schema": "tradingagents.model-provenance/v1",
+      "work_synthesis": {
+        "execution_mode": "local",
+        "requested_model": "gpt-6-sol",
+        "requested_reasoning_effort": "xhigh",
+        "task_id": "tradingagents-work-youtube",
+        "verification_status": "CONFIGURED_NOT_RUNTIME_VERIFIED",
+        "observed_model": null,
+        "observed_reasoning_effort": null,
+        "note": "The local task contract is verified; the Work host does not expose a signed per-response model receipt."
+      }
+    },
+    "source_summary": {
+      "canonical_source": {
+        "health": "OK",
+        "run_id": "youtube_20261006_120139",
+        "last_run_at": "2026-10-06T12:28:36.568391+09:00",
+        "status": "success",
+        "stale_after_hours": 36
+      },
+      "coverage": {
+        "total_unique_events": 333,
+        "window_events": 32,
+        "transmitted_events": 32,
+        "truncated": false,
+        "oldest_occurred_at": "2026-10-04T01:00:38+00:00",
+        "newest_occurred_at": "2026-10-06T02:37:14+00:00"
+      },
+      "delta": {
+        "new_events": 0,
+        "revised_events": 0,
+        "unchanged_events": 32,
+        "delivered_event_keys": []
+      },
+      "external_evidence_profile": "balanced_external",
+      "external_evidence_assessment": "No new or revised relevant YouTube events; no incremental ranking, confidence, risk-bounded sizing, or research-priority effect.",
+      "execution_eligible": false,
+      "external_delivery_verified": false
+    },
+    "next_checkpoint": "다음 정본 생산자 실행의 신규·수정 이벤트, 시각, 근거 ID와 공식 원자료를 확인하고 72시간 커버리지 경계를 재검증."
+  },
+  "report_id": "youtube:be8b2172f3a66a086a749f6c201a0a19",
+  "report_sha256": "be8b2172f3a66a086a749f6c201a0a194a101296a6f079b709dcfce311a1dbb8",
+  "published_at": "2026-10-07T08:33:47.878954+09:00"
+}

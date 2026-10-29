@@ -1,0 +1,403 @@
+{
+  "schema": "tradingagents.work-report/v1",
+  "surface": "youtube",
+  "event_id": "youtube:b6864d3ae31ad5aedf7ddc4eb2460804",
+  "source_sha256": "a4df7ae2d065c190435dda6fe1e9b046ab64427cadd92d52f1991c8cf5d32a63",
+  "prompt_contract_version": "youtube-work-v5",
+  "workflow_contract_sha256": "f5ba656baa3255d8d08768ab816048f458ac176a41169461691a2454a685df37",
+  "policy": {
+    "visibility": "investor_safe_no_credentials",
+    "external_evidence_profile": "balanced_external",
+    "external_evidence_may_affect": [
+      "ranking",
+      "confidence",
+      "position_size_within_existing_risk_limits",
+      "research_priority"
+    ],
+    "external_evidence_may_bypass_execution_gate": false,
+    "thesis_is_independent_from_execution_readiness": true
+  },
+  "report_markdown": "# YouTube 검증 델타 | 2026-10-08 KST\n\n**판정: 연구 우선순위 조정만** · 확인 2026-10-07T23:32:23.064546Z · 원천 상태 OK · 생산자 `youtube_20261008_075820` 성공, 0.28시간 경과(허용 36시간). **현재 주문 신호 없음.**\n\n## 한 화면 핵심\n\n1. **반도체 공식 대조:** [신규 영상](https://www.youtube.com/watch?v=jvs7I0j1oSE)의 C2에 나온 NVIDIA 지난 분기 매출 962억 달러, 데이터센터 890억 달러, 다음 분기 매출 전망 1,080억 달러와 중국 데이터센터 연산 매출 제외는 [회사 발표](https://investor.nvidia.com/news/press-release-details/2026/NVIDIA-Announces-Financial-Results-for-Second-Quarter-Fiscal-2027/)와 일치합니다. 회사 발표의 매출총이익률은 직전 75.0%, 다음 분기 전망 74.0%±0.5%p입니다. **수치 부분만 공식 확인**했으며 영상의 시장 타이밍·상승 기간 추론은 확인되지 않았습니다.\n2. **AMD·한국 메모리:** [신규 영상](https://www.youtube.com/watch?v=Obpkla5tfQU) C6의 10월 7일 증산 요청·3~5년 계약은 미검증입니다. [AMD의 5월 발표](https://ir.amd.com/news-events/press-releases/detail/1284/amd-reports-first-quarter-2026-financial-results)는 삼성과 HBM4·DRAM 협력만 확인합니다. 새 주문 규모·SK하이닉스 계약까지 입증하지 않습니다.\n3. **연구 영향:** `balanced_external`로 NVDA 공식 실적 대조, AMD·삼성의 새 주장 검증, 이마트 배송 수익성 확인의 **연구 순서**를 올립니다. 영상 4건 모두 STANDARD이며 USER_PRIMARY/HIGH는 없습니다. 미검증 수치로 thesis 확신도나 기존 위험 한도 내 투자 크기를 올리지 않습니다. 시장·계좌·위험 실행 게이트는 별도입니다.\n\n## 범위와 증거 상태\n\n- 신규 4건 · 수정 0건 · 동일 내용 56건 제외. 72시간 창 74건 중 60건 전송, 14건 생략, `truncated=true`입니다. 전수 분석으로 해석하지 않습니다.\n- 생산자 완료 2026-10-08T08:15:30.462906+09:00, 커버리지 최오래 2026-10-05T12:07:39+00:00로 각각 0.28시간·59.41시간 경과했습니다. 네 신규 이벤트의 발생·게시 시각은 일치하고 미래 시각이 아닙니다. 커버리지의 최신 시각은 2026-10-07T22:01:44+00:00입니다.\n- 생산자 주장 상태 요약은 미검증 42개, 부분 지원 3개, ASR 불확실 3개입니다. 패킷에 실제 펼쳐진 핵심 주장 24개의 `supporting_evidence_ids`는 모두 비어 있습니다. 자동 수집 근거 5건은 표시된 claim ID와 연결되지 않고, 여러 링크는 주장과 주제가 맞지 않습니다. 생산자 분류를 공식 검증으로 승격하지 않습니다.\n\n## 새 이벤트별 판단\n\n| 이벤트 · 영상 | 주장과 반증/공백 | KR·US 영향 · 허용 액션 |\n|---|---|---|\n| `Obpkla5tfQU` · [장 전 투자 포인트](https://www.youtube.com/watch?v=Obpkla5tfQU) | C2 삼성 실적 예상치, C3 종가 ETF 자금, C5 대만 파업, C6 AMD 증산 요청은 미검증. AMD의 기존 삼성 협력은 새 주문과 별개. | 삼성전자·SK하이닉스·AMD 공식 공시·거래 일정 확인 우선. **REQUIRES_PRIMARY_VERIFICATION** |\n| `pp5NwUqYh64` · [AI 에이전트·CPU](https://www.youtube.com/watch?v=pp5NwUqYh64) | C4의 서버 CPU 시장 규모는 ASR 불확실. C6의 NVIDIA 에이전트용 CPU 제품 언급은 [NVIDIA 발표](https://investor.nvidia.com/news/press-release-details/2026/NVIDIA-Announces-Financial-Results-for-Second-Quarter-Fiscal-2027/)의 Vera 소개와 부분 대조되지만 샌드박스 매출·AMD TAM 수치는 입증되지 않음. | AMD의 실제 서버 CPU 매출·TAM 정의 확인 우선. **UPGRADE_RESEARCH** |\n| `A4WQPHFEJug` · [이마트 배송](https://www.youtube.com/watch?v=A4WQPHFEJug) | C1 점포 확대, C3 배송 매출·식품 비중, C6 쿠팡 과징금은 미검증. 자동 근거는 관련성이 약함. | 종목 매매 판단 없이 점포 범위·주문당 비용·공식 처분 문서 조사. **REQUIRES_PRIMARY_VERIFICATION** |\n| `jvs7I0j1oSE` · [AI 주식 매수 타이밍](https://www.youtube.com/watch?v=jvs7I0j1oSE) | C2 NVIDIA 수치 일부는 공식 확인. C3 마이크론 수치, C4 하이퍼스케일러 지출은 미검증/ASR 불확실. 신고가·과거 상승장으로 현재 진입 시점을 추정할 수 없음. | NVDA 실적 연구 우선, MU·AMZN·한국 메모리의 추가 공식 검증. **UPGRADE_RESEARCH** |\n\n## 다음 공식 확인과 실행 경계\n\n삼성 잠정실적·거래소 일정과 ETF 리밸런싱 공지, AMD·삼성·SK하이닉스 계약 발표, AMD CPU TAM 원문, 이마트 배송 점포·경제성, 마이크론 IR을 같은 시점과 단위로 대조합니다. ASR이 흐린 2030년 시장 규모와 2028년 설비투자 전망은 계산·목표가에 사용하지 않습니다. 새 근거가 쌓이면 후속 KR·US 종합에서 event key를 묶어 순위·thesis 확신도·위험 한도 내 크기를 다시 평가합니다. 이 패킷은 `execution_eligible=false`이며 주문·목표가·손절가를 생성하지 않습니다.\n\nCOVERAGE_RECEIPT {\"event_id\":\"youtube:b6864d3ae31ad5aedf7ddc4eb2460804\",\"status\":\"PARTIAL\",\"window_events\":74,\"transmitted_events\":60,\"truncated\":true,\"new_events\":4,\"revised_events\":0}\nMOBILE_HANDOFF {\"owner\":\"external_github_notification_pipeline\",\"status\":\"PENDING_EXTERNAL_VERIFICATION\",\"work_sent_notification\":false}",
+  "structured_report": {
+    "binding": {
+      "surface": "youtube",
+      "event_id": "youtube:b6864d3ae31ad5aedf7ddc4eb2460804",
+      "source_sha256": "a4df7ae2d065c190435dda6fe1e9b046ab64427cadd92d52f1991c8cf5d32a63"
+    },
+    "title": "YouTube 검증 델타 | 2026-10-08 KST",
+    "generated_at": "2026-10-07T23:32:23.064546Z",
+    "as_of": "2026-10-07T22:01:44+00:00",
+    "source_health": "OK",
+    "report_mode": "RESEARCH_DELTA",
+    "summary": [
+      "신규 4건, 수정 0건, 동일 56건. 72시간 창 74건 중 60건 전송·14건 생략.",
+      "NVIDIA 공식 IR로 영상 C2의 매출·데이터센터·가이던스 수치 일부 확인; 다른 매수 타이밍 추론은 미검증.",
+      "AMD·삼성의 기존 협력은 공식 확인되지만 신규 증산 요청·장기 계약은 미검증.",
+      "balanced_external은 연구 우선순위만 조정; thesis 확신도·포지션 크기·실행 게이트 변화 없음."
+    ],
+    "top_actions": [],
+    "strategies": [
+      {
+        "ticker": "NVDA",
+        "display_name": "엔비디아",
+        "rank": 1,
+        "research_priority": "HIGH",
+        "thesis_confidence_effect": 0,
+        "position_size_effect": 0,
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action_now": null,
+          "required_rechecks": [
+            "공식 원자료",
+            "실시간 시장·계좌·위험 게이트"
+          ]
+        },
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "jvs7I0j1oSE",
+            "content_sha256": "5772d476fbc83db3d1013c1422d6cf6a372e45001df054e6e9a1965350370189",
+            "claim_id": "C2",
+            "affected_field": "research_priority",
+            "direction": "UP_FOR_VERIFICATION",
+            "evidence_weight": "MEDIUM_FOR_OFFICIAL_NUMERIC_SUBSET_ONLY",
+            "reason": "공식 IR과 매출·가이던스 수치 일부 일치; 영상의 매수 타이밍 추론은 미검증",
+            "execution_gate_override": false
+          }
+        ]
+      },
+      {
+        "ticker": "AMD",
+        "display_name": "AMD",
+        "rank": 2,
+        "research_priority": "HIGH",
+        "thesis_confidence_effect": 0,
+        "position_size_effect": 0,
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action_now": null,
+          "required_rechecks": [
+            "공식 원자료",
+            "실시간 시장·계좌·위험 게이트"
+          ]
+        },
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "Obpkla5tfQU",
+            "content_sha256": "489bfcc3b385b0edff742eb77c3af0ba4d019b73cdf0ca826981fe63fddd56b0",
+            "claim_id": "C6",
+            "affected_field": "research_priority",
+            "direction": "UP_FOR_VERIFICATION",
+            "evidence_weight": "LOW_LABELED",
+            "reason": "기존 삼성 협력과 10월 7일 새 증산 요청·장기계약 주장을 분리 검증",
+            "execution_gate_override": false
+          },
+          {
+            "source": "youtube",
+            "event_key": "pp5NwUqYh64",
+            "content_sha256": "89349a5ae61ed955a9f52ae7ae62a2e48f79ecf70ceda5410888edcc4a831ea3",
+            "claim_id": "C4",
+            "affected_field": "research_priority",
+            "direction": "UP_FOR_VERIFICATION",
+            "evidence_weight": "LOW_LABELED",
+            "reason": "ASR 불확실한 서버 CPU TAM 금액의 원문·범위 확인",
+            "execution_gate_override": false
+          }
+        ]
+      },
+      {
+        "ticker": "005930",
+        "display_name": "삼성전자",
+        "rank": 3,
+        "research_priority": "HIGH",
+        "thesis_confidence_effect": 0,
+        "position_size_effect": 0,
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action_now": null,
+          "required_rechecks": [
+            "공식 원자료",
+            "실시간 시장·계좌·위험 게이트"
+          ]
+        },
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "Obpkla5tfQU",
+            "content_sha256": "489bfcc3b385b0edff742eb77c3af0ba4d019b73cdf0ca826981fe63fddd56b0",
+            "claim_id": "C2",
+            "affected_field": "research_priority",
+            "direction": "UP_FOR_VERIFICATION",
+            "evidence_weight": "LOW_LABELED",
+            "reason": "실제 잠정실적과 발표 전 컨센서스 대조",
+            "execution_gate_override": false
+          },
+          {
+            "source": "youtube",
+            "event_key": "jvs7I0j1oSE",
+            "content_sha256": "5772d476fbc83db3d1013c1422d6cf6a372e45001df054e6e9a1965350370189",
+            "claim_id": "C2",
+            "affected_field": "research_priority",
+            "direction": "UP_FOR_VERIFICATION",
+            "evidence_weight": "MEDIUM_FOR_OFFICIAL_NUMERIC_SUBSET_ONLY",
+            "reason": "AI 메모리 수요와 삼성 실적의 연결은 회사 자료로 확인 필요",
+            "execution_gate_override": false
+          }
+        ]
+      },
+      {
+        "ticker": "000660",
+        "display_name": "SK하이닉스",
+        "rank": 4,
+        "research_priority": "MEDIUM",
+        "thesis_confidence_effect": 0,
+        "position_size_effect": 0,
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action_now": null,
+          "required_rechecks": [
+            "공식 원자료",
+            "실시간 시장·계좌·위험 게이트"
+          ]
+        },
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "Obpkla5tfQU",
+            "content_sha256": "489bfcc3b385b0edff742eb77c3af0ba4d019b73cdf0ca826981fe63fddd56b0",
+            "claim_id": "C3",
+            "affected_field": "research_priority",
+            "direction": "UP_FOR_VERIFICATION",
+            "evidence_weight": "LOW_LABELED",
+            "reason": "ETF 리밸런싱 유입액은 공식 공지로 검증 필요",
+            "execution_gate_override": false
+          },
+          {
+            "source": "youtube",
+            "event_key": "jvs7I0j1oSE",
+            "content_sha256": "5772d476fbc83db3d1013c1422d6cf6a372e45001df054e6e9a1965350370189",
+            "claim_id": "C3",
+            "affected_field": "research_priority",
+            "direction": "UP_FOR_VERIFICATION",
+            "evidence_weight": "MEDIUM_FOR_OFFICIAL_NUMERIC_SUBSET_ONLY",
+            "reason": "메모리 업황 숫자와 개별 수급 구분",
+            "execution_gate_override": false
+          }
+        ]
+      },
+      {
+        "ticker": "MU",
+        "display_name": "마이크론",
+        "rank": 5,
+        "research_priority": "MEDIUM",
+        "thesis_confidence_effect": 0,
+        "position_size_effect": 0,
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action_now": null,
+          "required_rechecks": [
+            "공식 원자료",
+            "실시간 시장·계좌·위험 게이트"
+          ]
+        },
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "jvs7I0j1oSE",
+            "content_sha256": "5772d476fbc83db3d1013c1422d6cf6a372e45001df054e6e9a1965350370189",
+            "claim_id": "C3",
+            "affected_field": "research_priority",
+            "direction": "UP_FOR_VERIFICATION",
+            "evidence_weight": "MEDIUM_FOR_OFFICIAL_NUMERIC_SUBSET_ONLY",
+            "reason": "영상 실적·가이던스 숫자를 Micron IR로 확인",
+            "execution_gate_override": false
+          }
+        ]
+      },
+      {
+        "ticker": "AMZN",
+        "display_name": "아마존",
+        "rank": 6,
+        "research_priority": "MEDIUM",
+        "thesis_confidence_effect": 0,
+        "position_size_effect": 0,
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action_now": null,
+          "required_rechecks": [
+            "공식 원자료",
+            "실시간 시장·계좌·위험 게이트"
+          ]
+        },
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "jvs7I0j1oSE",
+            "content_sha256": "5772d476fbc83db3d1013c1422d6cf6a372e45001df054e6e9a1965350370189",
+            "claim_id": "C4",
+            "affected_field": "research_priority",
+            "direction": "UP_FOR_VERIFICATION",
+            "evidence_weight": "MEDIUM_FOR_OFFICIAL_NUMERIC_SUBSET_ONLY",
+            "reason": "ASR 불확실한 복수 기업 설비투자 총액을 개별 공시로 분해",
+            "execution_gate_override": false
+          }
+        ]
+      },
+      {
+        "ticker": "^KS11",
+        "display_name": "코스피",
+        "rank": 7,
+        "research_priority": "MEDIUM",
+        "thesis_confidence_effect": 0,
+        "position_size_effect": 0,
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action_now": null,
+          "required_rechecks": [
+            "공식 원자료",
+            "실시간 시장·계좌·위험 게이트"
+          ]
+        },
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "jvs7I0j1oSE",
+            "content_sha256": "5772d476fbc83db3d1013c1422d6cf6a372e45001df054e6e9a1965350370189",
+            "claim_id": "C1",
+            "affected_field": "research_priority",
+            "direction": "UP_FOR_VERIFICATION",
+            "evidence_weight": "MEDIUM_FOR_OFFICIAL_NUMERIC_SUBSET_ONLY",
+            "reason": "신고가·역사적 상승장으로 현재 진입 시점 추론 금지; 지수 자료만 확인",
+            "execution_gate_override": false
+          }
+        ]
+      }
+    ],
+    "coverage_receipt": {
+      "event_id": "youtube:b6864d3ae31ad5aedf7ddc4eb2460804",
+      "status": "PARTIAL",
+      "window_events": 74,
+      "transmitted_events": 60,
+      "truncated": true,
+      "new_events": 4,
+      "revised_events": 0
+    },
+    "model_receipt": {
+      "schema": "tradingagents.model-provenance/v1",
+      "work_synthesis": {
+        "execution_mode": "local",
+        "requested_model": "gpt-6.1-sol",
+        "requested_reasoning_effort": "xhigh",
+        "task_id": "tradingagents-work-youtube",
+        "verification_status": "CONFIGURED_NOT_RUNTIME_VERIFIED",
+        "observed_model": null,
+        "observed_reasoning_effort": null,
+        "note": "The local task contract is verified; the Work host does not expose a signed per-response model receipt."
+      }
+    },
+    "source_summary": {
+      "canonical_source": {
+        "health": "OK",
+        "run_id": "youtube_20261008_075820",
+        "last_run_at": "2026-10-08T08:15:30.462906+09:00",
+        "status": "success",
+        "stale_after_hours": 36
+      },
+      "coverage": {
+        "total_unique_events": 388,
+        "window_events": 74,
+        "transmitted_events": 60,
+        "truncated": true,
+        "oldest_occurred_at": "2026-10-05T12:07:39+00:00",
+        "newest_occurred_at": "2026-10-07T22:01:44+00:00"
+      },
+      "delta": {
+        "new_events": 4,
+        "revised_events": 0,
+        "unchanged_events": 56,
+        "delivered_event_keys": [
+          "Obpkla5tfQU",
+          "pp5NwUqYh64",
+          "A4WQPHFEJug",
+          "jvs7I0j1oSE"
+        ]
+      },
+      "external_evidence_profile": "balanced_external",
+      "source_claim_status_summary": {
+        "unverified": 42,
+        "asr_uncertain": 3,
+        "partially_supported": 3
+      },
+      "visible_claim_count": 24,
+      "official_crosschecks": [
+        {
+          "event_key": "jvs7I0j1oSE",
+          "claim_id": "C2",
+          "status": "NUMERIC_SUBSET_CONFIRMED",
+          "url": "https://investor.nvidia.com/news/press-release-details/2026/NVIDIA-Announces-Financial-Results-for-Second-Quarter-Fiscal-2027/",
+          "finding": "FY27 Q2 revenue $96.2B, data center $89.0B, FY27 Q3 outlook $108.0B ±2%, no China Data Center compute assumed; prior 75.0% vs outlook 74.0% ±0.5pp gross margin"
+        },
+        {
+          "event_key": "Obpkla5tfQU",
+          "claim_id": "C6",
+          "status": "PRIOR_COLLABORATION_ONLY",
+          "url": "https://ir.amd.com/news-events/press-releases/detail/1284/amd-reports-first-quarter-2026-financial-results",
+          "finding": "May 2026 AMD announcement confirms Samsung HBM4/DRAM collaboration, not alleged October request or multiyear order"
+        }
+      ],
+      "event_manifest": [
+        {
+          "event_key": "Obpkla5tfQU",
+          "content_sha256": "489bfcc3b385b0edff742eb77c3af0ba4d019b73cdf0ca826981fe63fddd56b0",
+          "occurred_at": "2026-10-07T22:01:44+00:00",
+          "published_at": "2026-10-07T22:01:44+00:00",
+          "source_url": "https://www.youtube.com/watch?v=Obpkla5tfQU",
+          "source_tier": "STANDARD"
+        },
+        {
+          "event_key": "pp5NwUqYh64",
+          "content_sha256": "89349a5ae61ed955a9f52ae7ae62a2e48f79ecf70ceda5410888edcc4a831ea3",
+          "occurred_at": "2026-10-07T14:30:31+00:00",
+          "published_at": "2026-10-07T14:30:31+00:00",
+          "source_url": "https://www.youtube.com/watch?v=pp5NwUqYh64",
+          "source_tier": "STANDARD"
+        },
+        {
+          "event_key": "A4WQPHFEJug",
+          "content_sha256": "107b58dc12683d5cf2806f067ac024dec84a02e5851335f7eb052d8f4d0ef100",
+          "occurred_at": "2026-10-07T14:00:09+00:00",
+          "published_at": "2026-10-07T14:00:09+00:00",
+          "source_url": "https://www.youtube.com/watch?v=A4WQPHFEJug",
+          "source_tier": "STANDARD"
+        },
+        {
+          "event_key": "jvs7I0j1oSE",
+          "content_sha256": "5772d476fbc83db3d1013c1422d6cf6a372e45001df054e6e9a1965350370189",
+          "occurred_at": "2026-10-07T13:23:24+00:00",
+          "published_at": "2026-10-07T13:23:24+00:00",
+          "source_url": "https://www.youtube.com/watch?v=jvs7I0j1oSE",
+          "source_tier": "STANDARD"
+        }
+      ],
+      "evidence_integrity": {
+        "visible_claims_have_supporting_ids": false,
+        "unmatched_evidence_records": 5,
+        "producer_classification_not_promoted": true
+      },
+      "external_evidence_assessment": "Relevant STANDARD video evidence raises primary-source research priority for named tickers. No USER_PRIMARY/HIGH events. Unverified or ASR-uncertain claims do not raise thesis confidence or risk-bounded sizing.",
+      "execution_eligible": false,
+      "external_delivery_verified": false,
+      "timestamp_review": {
+        "producer_age_hours": 0.281,
+        "oldest_coverage_age_hours": 59.412,
+        "transmitted_event_clocks_valid": true,
+        "future_or_reversed_clocks": false
+      }
+    },
+    "next_checkpoint": "다음 정본 실행에서 생략 14건과 새·수정 키 확인; 삼성·AMD·SK하이닉스·마이크론·이마트 공식 자료의 숫자·계약·비용을 대조."
+  },
+  "report_id": "youtube:e65c4498faa0dbd23ba8fb688b65ea11",
+  "report_sha256": "e65c4498faa0dbd23ba8fb688b65ea11e7e9a3c784ac65c3e321f5d9013bd134",
+  "published_at": "2026-10-08T08:32:27.528474+09:00"
+}

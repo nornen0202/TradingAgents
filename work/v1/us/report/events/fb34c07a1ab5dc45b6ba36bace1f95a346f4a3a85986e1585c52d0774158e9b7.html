@@ -1,0 +1,261 @@
+<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>TradingAgents 미국 투자 브리핑 — 시세 만료, 실행 재확인 필요</title><style>body{font:16px/1.65 system-ui;max-width:960px;margin:auto;padding:24px;overflow-wrap:anywhere}pre{white-space:pre-wrap;font:inherit}dt{font-weight:bold}dd{margin:0 0 14px}</style><body><main><h1>TradingAgents 미국 투자 브리핑 — 시세 만료, 실행 재확인 필요</h1><p><a href="../index.html">지난 보고서 목록</a></p><p>원본 작성: 2026-10-14T01:16:15.820276+09:00</p><p>입력 기준: 2026-10-13T11:40:00-04:00</p><p>게시: 2026-10-14T01:16:24.477419+09:00</p><p>과거 기록입니다. 게시 시각은 입력 갱신 시각이 아니며 현재 주문 지시가 아닙니다.</p><pre data-report-markdown># 미국 주식 투자 브리핑
+
+**시세와 행별 유효시간이 만료됐습니다. 30개 종목의 현재 주문 판단은 모두 실시간 재확인이 필요합니다.** 원분석 GLDM 축소 방향과 나머지 29개 보유 방향, 조건부 진입 검토는 분석 시점 논지로 유지합니다.
+
+- 원본 연구 거래일: **2026-10-12**. 최신 전체 분석 성공: `20261013T175359_local-scheduler-us-full`. 최신 전체 분석 시도: `20261013T175359_local-scheduler-us-full` (SUCCESS). 이번 생산 실행은 `20261014T004358_local-scheduler-us-overlay_only` 시세·계좌 overlay이며 새 기업분석 30건이 아닙니다.
+- 시세 관측: **2026-10-13 11:40 ET–2026-10-13 11:45 ET**, 30/30 확보. 가장 오래된 관측은 작성 시점 약 **0.6시간** 전입니다. 원래 행 유효기한은 2026-10-13 12:10–12:15 ET이며 발행으로 연장되지 않습니다.
+- 계좌 관측: **2026-10-14 00:46:50 KST**, 작성 시점 약 **29.4분** 전. 작성 시각: **2026-10-14 01:16:15 KST**. 시세·계좌의 서로 다른 시점을 합쳐 현재 가용 현금을 산출하지 않습니다.
+- 생산 완료: 2026-10-14 00:46:56 KST. 원분석 완료 기록: 2026-10-13 22:51:45 KST. 원본 패킷의 자료 상태는 OK였지만 게시 시점의 실행 자료는 만료돼 **STALE**로 판정합니다. 이벤트 `us:f7385b083e77ab0e4b98d7754d592811`.
+
+## 지금 볼 것
+
+1. **GLDM — 원분석 REDUCE / 실행 재확인 필요.** 11:40 ET 관측가 82.2699는 원분석의 82.57 기준 아래지만 지난 시세입니다. 10:30 ET 이후 완성된 15분봉 두 개, VWAP와 계좌 위험을 최신 자료로 확인해 축소 조건을 재평가합니다. 80.75 정규장 종가 이탈은 별도의 위험 기준입니다.
+2. **AVGO — 원분석 HOLD / 실행 재확인 필요.** 11:40 ET 관측가 353.37은 원분석의 354.22 지지보다 낮습니다. 최신 지지·회복과 고객 투자재원, 현금흐름 자료를 우선 검증합니다. 저항 367.14–370.71 지지 전환과 비용 후 손익비 확인 전 신규 진입은 원논지에서도 보류입니다.
+3. **CEG — 원분석 HOLD / 실행 재확인 필요.** 사용자 우선 소수몽키 영상 `ILs31CN-_VA`로 조사 순위는 원래 27위에서 4위입니다. Google 연계 계약의 가격·비용 보호·용량·자금조달은 공식 원문 확인 전 미검증이며, 280.16 아래 확정 일봉은 전술 논지의 무효화 기준입니다.
+
+## 커버리지와 시점 구분
+
+보유 14/14, 필수 관심 27/27(보유와 중복 11), 생산 분석 30/30, 전송 30/30입니다. 보유·관심·분석 누락이나 실패 종목은 없습니다. 이 커버리지는 시세 신선도나 주문 가능성을 뜻하지 않습니다. 아래 모든 순위는 위험 점검과 연구의 순서이며 매수·매도 순서가 아닙니다.
+
+## 전체 행동표
+
+가격선과 조건은 10월 12일 **원분석 시점의 thesis**입니다. 현재 충족 여부는 미확인입니다. 관심종목의 HOLD는 보유 사실이 아닌 원분석 방향입니다. 구분 열에서 실제 보유 여부를 확인하십시오.
+
+|순위·종목|구분·방향·신뢰도|실행 준비도|진입 관찰·무효화|외부 근거 효과|
+|---|---|---|---|---|
+|1. SPDR Gold MiniShares Trust (GLDM)|보유 · 축소 · 0.70|실시간 재확인 필요|82.57~82.64 회복, 83.11 돌파와 82.99~83.11 지지 전환을 순서대로 관찰한다. 전일 평균 수준과 갱신된 평균·가격 구조를 구분한다.&lt;br&gt;무효화: 회복·안정화 시나리오: 80.75 정규장 종가 이탈. 거래량 증가는 확증일 뿐 손절의 필수 조건이 아니다.|직접 매칭 자료 미전달; 원분석 유지|
+|2. Broadcom (AVGO)|보유 · 유지 · 0.55|실시간 재확인 필요|354.22와 349~350 지지, 실패 시 343.29와 335.20을 점검한다. 반등 실패 감축과 지지 실패 감축은 누적 수량으로 관리한다.&lt;br&gt;무효화: 고객 자금조달 우려가 공식적으로 확인된 중대한 주문 취소·지연 또는 AVGO 전망 하향으로 연결됨.|영상 관련 이슈의 검증 우선순위 상향|
+|3. NVIDIA (NVDA)|보유 · 유지 · 0.57|실시간 재확인 필요|일봉·기술지표 기준일은 2026-10-12다. 지지·회복 구조와 최신 이동평균을 재검증하며, 기존의 확정된 손절을 손실 회피 목적으로 낮추지 않는다.&lt;br&gt;무효화: 222.46 정규장 지지 실패 또는 진입 후 해당 돌파 기준이나 정규장 거래량가중평균가격 상실과 회복 실패.|영상 관련 이슈의 검증 우선순위 상향|
+|4. Constellation Energy (CEG)|관심 · 유지 · 0.55|실시간 재확인 필요|291.00 회복 후 290.40~291.00 재시험 유지, 당일 정규장 거래량가중평균가격 상회, 같은 경과시간 기준 상대거래량 1.2 이상과 반등 봉 거래량 증가를 확인한다. 현재 충족 여부는 미확인이다.&lt;br&gt;무효화: 280.16 아래 확정 정규장 일봉 마감은 전술 상승 구조를 무효화한다.|소수몽키 우선 근거: 조사 순위 27→4, 높은 조사 우선순위|
+|5. Meta Platforms (META)|관심 · 유지 · 0.60|실시간 재확인 필요|727.64~728.07 지지 재시험과 739.39·742.96 순차 회복을 관찰한다. 회복 뒤 첫 저항 752.24까지 비용 차감 후 보상·위험이 2배 미만이면 계속 대기한다.&lt;br&gt;무효화: 711.68 아래 검증된 정규장 종가와 다음 실제 거래일의 회복 실패는 전술 반등 전략을 무효화한다.|영상 관련 이슈의 검증 우선순위 상향|
+|6. Taiwan Semiconductor Manufacturing (TSM)|보유 · 유지 · 0.56|실시간 재확인 필요|지지 반전: 432.58~434.67 시험 후 저점 상승, 434.67 위 정규장 5분봉 두 개 연속 종가, 반등 거래량 증가, 정규장 거래량가중평균가격 상회와 검증된 동시간대 상대거래량 1.2 이상을 확인한다.&lt;br&gt;무효화: 432.58 아래 정규장 종가와 정해진 후속 평가 구간의 회복 실패는 전술 보유 유지 판단을 무효화한다.|영상 관련 이슈의 검증 우선순위 상향|
+|7. Apple (AAPL)|보유 · 유지 · 0.60|실시간 재확인 필요|335.44~336.51에서 저점 형성 후 336.51 위 연속 5분봉 두 개와 반등 거래량 증가를 관찰한다. 단순 지지 접촉은 진입 신호가 아니다.&lt;br&gt;무효화: 335.44 아래 정규장 종가는 전술 위험 축소, 328.70 아래 종가는 전술 손절 사유다.|영상 관련 이슈의 검증 우선순위 상향|
+|8. Invesco S&amp;P 500 Equal Weight ETF (RSP)|보유 · 유지 · 0.61|실시간 재확인 필요|211.50~211.80 지지, 완성 5분봉의 211.80 회복·재시험, 정규장 거래량가중평균가격 상회와 시간대 보정 상대거래량 1.2 이상을 관찰한다. 실제 체결 가능성과 전체 청산계획의 비용 후 손익비 2.0 이상까지 충족해야 소규모 최초 진입을 재검토한다.&lt;br&gt;무효화: 211.68과 210.57의 순차적 종가 이탈 또는 209.81 아래 정규장 완성 5분봉 2개 연속 마감.|직접 매칭 자료 미전달; 원분석 유지|
+|9. Amazon (AMZN)|보유 · 유지 · 0.58|실시간 재확인 필요|258.85–259.27 회복을 완성된 정규장 5분봉 두 개에서 확인한다. 이 회복만으로 신규 매수를 승인하지 않는다.&lt;br&gt;무효화: 253.78 아래 검증된 정규장 종가는 단기 반등 논거 약화와 첫 전술 위험 축소 조건이다.|직접 매칭 자료 미전달; 원분석 유지|
+|10. Eaton (ETN)|보유 · 유지 · 0.58|실시간 재확인 필요|실제 거래일정, 정상 거래 여부, 최신 매수·매도호가, 정규장 5분봉, 당일 거래량가중평균가격 및 동시간대 상대거래량을 확인한다.&lt;br&gt;무효화: 420.00 지지 실패와 정의된 회복 실패가 확인되면 현재 범위 지지 가설이 약화된다.|직접 매칭 자료 미전달; 원분석 유지|
+|11. GE Vernova (GEV)|보유 · 유지 · 0.58|실시간 재확인 필요|973.36–989.92에서 저점 상승, 지지 안정화, 정규장 거래량가중평균가격 회복과 반등 거래 참여 개선을 확인한다. 가격 접촉만으로 매수하지 않는다.&lt;br&gt;무효화: 968.84 아래 종가, 979.70 회복 실패와 하락 거래량 확대의 결합.|직접 매칭 자료 미전달; 원분석 유지|
+|12. Eli Lilly (LLY)|보유 · 유지 · 0.56|실시간 재확인 필요|1168–1174에서 정규장 안정화와 지지 확인, 해당 정규장 거래량가중평균가격 회복 및 비용 차감 후 2:1 이상 손익비가 확인되면 재검토한다.&lt;br&gt;무효화: 정규장 종가 1163.53 하회는 반등 약화, 1131 하회는 단기 지지 무효화, 1113 하회는 잔여 보유 계획 무효화다.|직접 매칭 자료 미전달; 원분석 유지|
+|13. Monolithic Power Systems (MPWR)|보유 · 유지 · 0.56|실시간 재확인 필요|1311~1315 재시험 방어와 1315 상회 유지, 저점 상승, 정규장 거래량가중평균가격 상회 및 동시간대 상대거래량 1.2 이상을 확인한다. 마지막 종가가 1315 위라는 사실만으로 재시험 방어가 확인된 것은 아니다.&lt;br&gt;무효화: 1293.70 아래 정규장 종가와 후속 회복 실패는 기존 보유 위험 축소 조건이다.|직접 매칭 자료 미전달; 원분석 유지|
+|14. iShares 0-3 Month Treasury Bond ETF (SGOV)|보유 · 유지 · 0.62|실시간 재확인 필요|수익률 필드 3.69는 단위와 산식이 불명확해 계산에 사용하지 않는다. 시장 보고서의 50일 평균 100.1615와 개요 자료의 100.5424는 기준일·조정 방식을 대조해야 한다. 개요 조회시각 19:37:57은 시간대가 없어 결정시점 이전 자료인지 확인할 수 없다.&lt;br&gt;무효화: 검증된 금리 하락이나 비용 증가로 보유기간 순편익이 투자 목적에 미달하거나 비교 가능한 현금성 대안보다 지속적으로 불리해지는 경우.|직접 매칭 자료 미전달; 원분석 유지|
+|15. Dell Technologies (DELL)|보유 · 유지 · 0.58|실시간 재확인 필요|565~568 지지 후 576.76 회복 여부. 회복만으로 매수하지 않는다.&lt;br&gt;무효화: 556.77 아래 정규장 종가 확인과 다음 실제 거래일까지의 회복 실패.|직접 매칭 자료 미전달; 원분석 유지|
+|16. Alphabet Class A (GOOGL)|보유 · 유지 · 0.58|실시간 재확인 필요|345.14~346.08 재시험 후 5분봉 두 개의 346.08 이상 마감, 정규장 거래량가중평균가격 상회, 동일 시간대 상대거래량 1.2 이상을 확인한다. 단순 가격 도달은 매수 신호가 아니다.&lt;br&gt;무효화: 345.14 아래 정규장 종가와 정해진 회복 구간 내 346.08 회복 실패는 단기 반등 논거를 훼손한다.|직접 매칭 자료 미전달; 원분석 유지|
+|17. Exxon Mobil (XOM)|관심 · 유지 · 0.64|실시간 재확인 필요|170.29~171.01에서 두 개의 완료된 5분봉으로 지지를 확인하고 정규장 거래량가중평균가격 회복, 동시간대 상대거래량 1.2 이상, 비용 차감 보상·위험 2배 이상을 함께 검증한다. 구간 전체가 매수 가능하지는 않다.&lt;br&gt;무효화: 172.55 돌파 후 돌파선 또는 정규장 거래량가중평균가격을 잃고 두 개의 완료된 5분봉에서도 회복하지 못하면 해당 전술적 진입이 무효화된다.|직접 매칭 자료 미전달; 원분석 유지|
+|18. AbbVie (ABBV)|관심 · 유지 · 0.63|실시간 재확인 필요|281.30 위 연속 5분봉 두 개, 재시험 지지, 최신 정규장 거래량가중평균가격 상회와 같은 시간대 상대거래량 1.2 이상을 함께 확인한다. 전일 일봉 거래량의 평균 대비 약 1.22배와 구분한다.&lt;br&gt;무효화: 276.01 아래 확인된 정규장 종가: 전술 보유 위험축소 조건.|직접 매칭 자료 미전달; 원분석 유지|
+|19. State Street SPDR Portfolio S&amp;P 500 ETF (SPYM)|관심 · 유지 · 0.63|실시간 재확인 필요|미국 동부시간 10:30은 제안된 가장 이른 시험 진입 검토 시각이며 만료나 자동 실행 시각이 아니다. 확인된 유효기한이 없어 만료 또는 다음 거래일 이월을 주장하지 않는다. 향후 활성화 시 시간대가 포함된 만료 시각을 명시한다.&lt;br&gt;무효화: 90.67 아래 정규장 종가와 다음 확인된 거래일 초반 회복 실패는 전술 보유 감축 근거다.|직접 매칭 자료 미전달; 원분석 유지|
+|20. Chevron (CVX)|관심 · 유지 · 0.62|실시간 재확인 필요|CVX의 211.55~213.75에서 연속 두 개의 15분봉 지지와 저점 상승, 정규장 거래량가중평균가격 회복, 동시간대 상대 거래량 1.2 이상을 확인한다. 첫 장애물 216.67까지 비용 차감 후 손익비를 다시 계산한다.&lt;br&gt;무효화: CVX의 209.37 정규장 종가 이탈, 이후 204.23 지지 붕괴, 특히 200.78까지 하회하는 추세 무효화.|직접 매칭 자료 미전달; 원분석 유지|
+|21. Shell (SHEL)|관심 · 유지 · 0.62|실시간 재확인 필요|SHEL 100.03~100.87에서 하락 거래량 둔화, 정규장 5분봉 반등과 당일 거래량가중평균가격 회복을 함께 확인한다.&lt;br&gt;무효화: SHEL 99.29 지지 실패와 회복 실패는 갭 상승 논거를 약화시키고, 98.07 아래 정규장 종가는 전술적 상승 논거를 무효화한다.|직접 매칭 자료 미전달; 원분석 유지|
+|22. Costco Wholesale (COST)|관심 · 유지 · 0.60|실시간 재확인 필요|거래소 달력·정규장 여부·거래정지·호가 시각·매매호가 차이·완성된 5분봉·현재 거래량가중평균가격·동일 시각 상대거래량을 확인한다.&lt;br&gt;무효화: 돌파 실패 이후 946.70 아래 5분봉 2개 연속 마감과 현재 정규장 거래량가중평균가격 이탈.|직접 매칭 자료 미전달; 원분석 유지|
+|23. Procter &amp; Gamble (PG)|관심 · 유지 · 0.60|실시간 재확인 필요|153.68 돌파·재시험, 정규장 거래량가중평균가격 상회, 시간대 보정 상대거래량 1.2 이상을 함께 관찰한다. 이는 미래 확인 기준이지 현재 충족된 조건이 아니다.&lt;br&gt;무효화: 151.60 아래 정규장 종가와 마지막 두 완성 5분봉의 회복 실패는 매매 트랜치 위험 축소 조건이다.|직접 매칭 자료 미전달; 원분석 유지|
+|24. Visa (V)|관심 · 유지 · 0.60|실시간 재확인 필요|384.65~386.84 재시험 또는 391.81 돌파·재시험에서 두 개 완료 5분봉의 지지, 당일 거래량가중평균가격 상회, 동일 시간대 거래량 조건을 확인한다. 관찰 신호를 자동 주문으로 전환하지 않는다.&lt;br&gt;무효화: 384.65 아래 종가와 정해진 회복 실패는 첫 위험 축소 조건이다. 갱신된 10일 지수이동평균 이탈에 거래량 증가·상승 동력 둔화가 겹치면 추가 축소한다.|직접 매칭 자료 미전달; 원분석 유지|
+|25. Walmart (WMT)|관심 · 유지 · 0.59|실시간 재확인 필요|눌림목은 111.23–111.51 재시험 후 완료된 5분 봉 2개가 111.51 위에서 마감하고 정규장 거래량가중평균가격과 비교 가능한 동일 시간대 상대거래량 1.2 이상을 유지해야 한다.&lt;br&gt;무효화: 회복 실패 후 정규장 종가 111.23 하회는 단기 돌파 지지 가설을 훼손한다.|직접 매칭 자료 미전달; 원분석 유지|
+|26. American Tower (AMT)|관심 · 유지 · 0.58|실시간 재확인 필요|확인된 정규장에서 미국 동부시간 10:30 이후 183.31 돌파, 182.52~183.31 재시험 지지와 183.31 재회복을 관찰한다.&lt;br&gt;무효화: 180.03·175.02·173.31 아래 정규장 종가에 따른 단계적 기술적 훼손.|직접 매칭 자료 미전달; 원분석 유지|
+|27. Medtronic (MDT)|관심 · 유지 · 0.58|실시간 재확인 필요|90.71–90.76 또는 89.67–89.81에서 안정화와 지지 회복을 감시한다. 단순 가격 접촉은 매수 신호가 아니며 실제 손절 집행 가능성과 비용 차감 후 최소 2배의 보상 대비 위험을 검증해야 한다.&lt;br&gt;무효화: 89.67 아래의 검증된 일봉 종가: 최근 회복 실패로 전술 보유분 50% 축소 및 핵심 보유분 재심사.|직접 매칭 자료 미전달; 원분석 유지|
+|28. Nu Holdings (NU)|관심 · 유지 · 0.57|실시간 재확인 필요|15.43~15.58에서 하락 거래량 감소, 저점 방어, 반등 거래량 회복과 정규장 거래량가중평균가격 회복을 확인한다. 가격 접촉만으로 매수하지 않는다.&lt;br&gt;무효화: 15.18 아래 정규장 종가는 급등 후 가격 유지 가설을 약화시킨다.|직접 매칭 자료 미전달; 원분석 유지|
+|29. Alphabet Class C (GOOG)|관심 · 유지 · 0.58|실시간 재확인 필요|343.13–344.59 접촉 후 344.59 위 5분봉 마감, 성공적인 재시험, 정규장 거래량가중평균가격 지지와 동일 경과시간 상대거래량 1.2 이상을 확인한다.&lt;br&gt;무효화: 정규장 일봉 종가의 338.19 하회는 현재 기술적 회복 가설을 무효화한다.|직접 매칭 자료 미전달; 원분석 유지|
+|30. Hewlett Packard Enterprise (HPE)|관심 · 유지 · 0.60|실시간 재확인 필요|HPE 68.72~69.51 부근의 하락 정지와 69.51·정규장 거래량가중평균가격 회복 및 재시험을 관찰한다. 상대거래량 확인과 별개로 유리한 목표·손절 구조가 필요하다.&lt;br&gt;무효화: HPE 68.87 미만 정규장 종가는 단기 추세 경고, 67.10 미만 종가는 지지 회복 실패, 66.95 미만 종가는 추적관리 물량 손절, 65.48 미만 종가는 잔여 포지션 전량 무효화다.|직접 매칭 자료 미전달; 원분석 유지|
+
+## 시세와 실행 자료
+
+아래 가격은 10월 13일 정규장 과거 관측이며 현재 호가가 아닙니다. 모든 행의 유효시간이 작성 전 만료됐습니다. 거래정지·LULD·뉴스 정지의 공급자 제한은 실행 재검증 대상입니다.
+
+|종목|과거 가격 / 관측 ET|VWAP|상대거래량|스프레드 / feed|정지·LULD·뉴스|원래 유효기한 ET|
+|---|---|---|---|---|---|---|
+|GLDM|$82.2699 / 10-13 11:40|82.51|0.36|1.22bp / kis_microstructure, 지연 280초|unknown · not_available_by_provider · not_available_by_provider|10-13 12:10|
+|AVGO|$353.3700 / 10-13 11:40|352.99|0.52|2.55bp / kis_microstructure, 지연 272초|unknown · not_available_by_provider · not_available_by_provider|10-13 12:10|
+|NVDA|$224.9800 / 10-13 11:40|224.99|0.52|1.34bp / kis_microstructure, 지연 285초|unknown · not_available_by_provider · not_available_by_provider|10-13 12:10|
+|CEG|$294.0900 / 10-13 11:45|292.64|0.51|10.84bp / kis_microstructure, 지연 7초|unknown · not_available_by_provider · not_available_by_provider|10-13 12:15|
+|META|$761.4500 / 10-13 11:45|759.36|1.16|3.27bp / kis_microstructure, 지연 1초|unknown · not_available_by_provider · not_available_by_provider|10-13 12:15|
+|TSM|$441.6150 / 10-13 11:40|441.37|0.37|4.08bp / kis_microstructure, 지연 288초|unknown · not_available_by_provider · not_available_by_provider|10-13 12:10|
+|AAPL|$344.9800 / 10-13 11:40|345.40|0.96|1.16bp / kis_microstructure, 지연 272초|unknown · not_available_by_provider · not_available_by_provider|10-13 12:10|
+|RSP|$212.4100 / 10-13 11:40|212.93|0.74|0.47bp / kis_microstructure, 지연 286초|unknown · not_available_by_provider · not_available_by_provider|10-13 12:10|
+|AMZN|$260.6350 / 10-13 11:40|261.02|0.57|1.15bp / kis_microstructure, 지연 272초|unknown · not_available_by_provider · not_available_by_provider|10-13 12:10|
+|ETN|$418.9750 / 10-13 11:40|423.36|0.51|14.09bp / kis_microstructure, 지연 279초|unknown · not_available_by_provider · not_available_by_provider|10-13 12:10|
+|GEV|$980.5800 / 10-13 11:40|991.97|0.48|8.85bp / kis_microstructure, 지연 280초|unknown · not_available_by_provider · not_available_by_provider|10-13 12:10|
+|LLY|$1175.0950 / 10-13 11:40|1178.08|0.27|14.23bp / kis_microstructure, 지연 283초|unknown · not_available_by_provider · not_available_by_provider|10-13 12:10|
+|MPWR|$1292.7050 / 10-13 11:40|1296.71|0.29|9.62bp / kis_microstructure, 지연 284초|unknown · not_available_by_provider · not_available_by_provider|10-13 12:10|
+|SGOV|$100.5250 / 10-13 11:40|100.53|1.10|0.99bp / kis_microstructure, 지연 287초|unknown · not_available_by_provider · not_available_by_provider|10-13 12:10|
+|DELL|$562.7200 / 10-13 11:40|567.72|0.64|16.30bp / kis_microstructure, 지연 272초|unknown · not_available_by_provider · not_available_by_provider|10-13 12:10|
+|GOOGL|$356.2850 / 10-13 11:40|355.60|0.62|1.12bp / kis_microstructure, 지연 280초|unknown · not_available_by_provider · not_available_by_provider|10-13 12:10|
+|XOM|$174.8300 / 10-13 11:40|173.70|0.44|2.87bp / kis_microstructure, 지연 295초|unknown · not_available_by_provider · not_available_by_provider|10-13 12:10|
+|ABBV|$278.3250 / 10-13 11:40|278.84|0.48|9.03bp / kis_microstructure, 지연 297초|unknown · not_available_by_provider · not_available_by_provider|10-13 12:10|
+|SPYM|$91.3650 / 10-13 11:40|91.55|0.45|1.09bp / kis_microstructure, 지연 300초|unknown · not_available_by_provider · not_available_by_provider|10-13 12:10|
+|CVX|$218.7050 / 10-13 11:40|217.56|0.48|3.21bp / kis_microstructure, 지연 296초|unknown · not_available_by_provider · not_available_by_provider|10-13 12:10|
+|SHEL|$102.9300 / 10-13 11:45|102.60|0.74|0.97bp / kis_microstructure, 지연 8초|unknown · not_available_by_provider · not_available_by_provider|10-13 12:15|
+|COST|$956.9200 / 10-13 11:40|960.28|0.40|5.11bp / kis_microstructure, 지연 291초|unknown · not_available_by_provider · not_available_by_provider|10-13 12:10|
+|PG|$152.9917 / 10-13 11:45|152.91|0.27|1.31bp / kis_microstructure, 지연 3초|unknown · not_available_by_provider · not_available_by_provider|10-13 12:15|
+|V|$393.2600 / 10-13 11:45|392.76|0.49|1.78bp / kis_microstructure, 지연 2초|unknown · not_available_by_provider · not_available_by_provider|10-13 12:15|
+|WMT|$113.7500 / 10-13 11:40|113.97|0.58|0.88bp / kis_microstructure, 지연 293초|unknown · not_available_by_provider · not_available_by_provider|10-13 12:10|
+|AMT|$180.5600 / 10-13 11:45|180.88|0.43|11.09bp / kis_microstructure, 지연 8초|unknown · not_available_by_provider · not_available_by_provider|10-13 12:15|
+|MDT|$91.9550 / 10-13 11:45|91.31|0.92|2.18bp / kis_microstructure, 지연 5초|unknown · not_available_by_provider · not_available_by_provider|10-13 12:15|
+|NU|$15.7750 / 10-13 11:40|15.74|0.42|6.34bp / kis_microstructure, 지연 299초|unknown · not_available_by_provider · not_available_by_provider|10-13 12:10|
+|GOOG|$352.3750 / 10-13 11:40|351.48|0.53|0.57bp / kis_microstructure, 지연 295초|unknown · not_available_by_provider · not_available_by_provider|10-13 12:10|
+|HPE|$68.4350 / 10-13 11:40|69.39|0.87|4.37bp / kis_microstructure, 지연 289초|unknown · not_available_by_provider · not_available_by_provider|10-13 12:10|
+
+## 원분석 근거와 외부 자료
+
+원분석의 가격 기준일은 대부분 10월 12일이며 각 종목의 `decision_asof`와 `price_reference_date`는 구조화 보고서에 따로 보존했습니다. 공시·실적·고객 계약의 확인 시각과 일봉 가격을 혼동하지 않습니다. 원분석의 촉매와 반증 조건은 시세 만료만으로 삭제되지 않습니다.
+
+YouTube는 전달 12건 중 직접 일치 10건이 AVGO·NVDA·CEG·META·TSM·AAPL 조사 우선순위를 바꿨습니다. 특히 사용자 우선 소수몽키 CEG 이벤트는 순위 27→4로 반영했습니다. `TtFx3S0N_wM`(AAPL·META·TSM), `lD0frse8o_U`(AVGO·META·NVDA), `ILs31CN-_VA`(CEG) 등은 종목과 exact event key로 구조화 보고서에 묶었습니다. 대부분 주장은 미검증이거나 ASR 불확실성이 있어 방향성 신뢰도·위험 한도·실행 준비도를 높이지 않았습니다. PRISM 전달 12건에는 전송된 US 종목과 직접 일치하는 이벤트가 없습니다.
+
+GLDM의 약세·축소 논지와 ETF 구조·추적 품질 확인, AVGO의 고객 투자재원과 현금흐름 대조, CEG의 계약 경제성, NVDA·TSM의 반도체 수요와 최신 가격·거래량을 우선 조사합니다. 주장과 반대 근거가 충돌하면 공식 실적·공시와 같은 기준시점의 시세로 검증합니다. 모든 종목의 원래 진입·무효화·위험축소 행동·포지션 상한은 구조화 논지에 보존했습니다.
+
+## 다음 확인
+
+최신 정규장 시세·호가·VWAP·동시간대 상대거래량·스프레드·정지/LULD·원공시와 30분 이내 계좌 관측을 확보한 뒤 원분석 조건과 위험 한도를 다시 판정한다.
+
+COVERAGE_RECEIPT {&quot;event_id&quot;:&quot;us:f7385b083e77ab0e4b98d7754d592811&quot;,&quot;status&quot;:&quot;COMPLETE&quot;,&quot;holdings&quot;:{&quot;expected&quot;:14,&quot;missing_count&quot;:0,&quot;missing&quot;:[]},&quot;watchlist&quot;:{&quot;expected&quot;:27,&quot;missing_count&quot;:0,&quot;missing&quot;:[],&quot;all_rendered&quot;:true},&quot;analysis&quot;:{&quot;total&quot;:30,&quot;successful&quot;:30,&quot;failed&quot;:0,&quot;failed_tickers&quot;:[]},&quot;response_scanner_limit&quot;:10}
+MOBILE_HANDOFF {&quot;owner&quot;:&quot;external_github_notification_pipeline&quot;,&quot;status&quot;:&quot;PENDING_EXTERNAL_VERIFICATION&quot;,&quot;work_sent_notification&quot;:false}</pre></main><style>
+.reader-contents { margin: 16px 0; padding: 12px 16px; border: 1px solid var(--line, #64748b); border-radius: 12px; }
+.reader-contents > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-weight: 750; }
+.reader-contents nav { display: grid; gap: 4px; max-height: 45vh; overflow: auto; margin: 8px 0; }
+.reader-contents a { display: block; min-height: 44px; padding: 10px; border-radius: 6px; color: inherit; overflow-wrap: anywhere; }
+.reader-contents a:hover { background: #80808020; }
+.reader-contents .reader-subsection { padding-inline-start: 24px; font-size: .92em; }
+.reader-prose, .report { overflow-wrap: anywhere; line-height: 1.8; }
+.reader-prose p, .reader-prose li { max-width: 85ch; }
+.reader-prose h2, .reader-prose h3, .reader-prose h4, [data-reader-heading] { scroll-margin-top: 100px; line-height: 1.45; }
+.reader-prose h2 { margin-top: 1.8em; padding-bottom: 8px; border-bottom: 1px solid var(--line, #64748b); }
+.reader-prose h3 { margin-top: 1.5em; }
+.reader-prose li { margin: .5em 0; }
+.reader-prose pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.reader-prose blockquote { margin: 16px 0; padding: 4px 16px; border-left: 3px solid var(--accent, #64748b); }
+.reader-table { overflow: auto; max-width: 100%; margin: 16px 0; border: 1px solid var(--line, #64748b); border-radius: 10px; }
+.reader-table table { border-collapse: collapse; width: 100%; margin: 0; font-size: .92rem; }
+.reader-table th, .reader-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line, #64748b); min-width: 110px; max-width: 400px; overflow-wrap: anywhere; white-space: normal; }
+.reader-table th { background: #80808018; }
+.reader-table tr:nth-child(even) { background: #80808008; }
+.reader-search { display: grid; gap: 8px; margin: 16px 0; }
+.reader-search label { font-weight: 700; }
+.reader-search input { box-sizing: border-box; width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line, #64748b); border-radius: 10px; background: var(--panel, #fff); color: var(--text, #132238); font: inherit; }
+.reader-search p { margin: 0; font-size: .86rem; }
+.reader-back { position: fixed; bottom: max(14px, env(safe-area-inset-bottom)); right: 14px; z-index: 30; min-height: 44px; border: 1px solid #778899; border-radius: 99px; padding: 10px 16px; background: #18344a; color: #fff; font: 700 14px system-ui; cursor: pointer; box-shadow: 0 3px 12px #0003; }
+[data-reader-source] { margin-top: 20px; }
+[data-reader-source] > summary { min-height: 44px; cursor: pointer; }
+[data-reader-source] pre { font-size: .85rem; }
+[data-reader-source] pre, .reader-prose { min-width: 0; }
+.reader-contents :focus-visible, .reader-search :focus-visible, .reader-back:focus-visible, .reader-table:focus-visible { outline: 3px solid var(--accent, #008c95); outline-offset: 3px; }
+.reader-search + .grid > [hidden] { display: none !important; }
+@media (max-width: 600px) { .reader-prose { font-size: 1rem; } .reader-contents { padding: 8px 12px; } }
+@media print { .reader-back, .reader-search, .reader-contents, [data-reader-source] { display: none !important; } .reader-table { overflow: visible; } .reader-prose { color: #000; background: #fff; } }
+</style><script>
+(() => {
+  'use strict';
+  let serial = 0;
+  const rendered = new WeakMap();
+  const node = (tag, text) => { const el = document.createElement(tag); if (text != null) el.textContent = text; return el; };
+  function inline(parent, text) {
+    const pattern = /(`[^`]+`|\*\*[^*]+\*\*|\[[^\]]+\]\(https?:\/\/[^\s)]+\))/g;
+    let start = 0;
+    for (const match of String(text).matchAll(pattern)) {
+      parent.append(document.createTextNode(text.slice(start, match.index)));
+      const value = match[0];
+      if (value.startsWith('`')) parent.append(node('code', value.slice(1, -1)));
+      else if (value.startsWith('**')) parent.append(node('strong', value.slice(2, -2)));
+      else {
+        const link = value.match(/^\[([^\]]+)\]\((.+)\)$/);
+        const a = node('a', link[1]); a.href = link[2]; a.rel = 'noopener noreferrer'; parent.append(a);
+      }
+      start = match.index + value.length;
+    }
+    parent.append(document.createTextNode(text.slice(start)));
+  }
+  const cells = line => line.trim().replace(/^\|/, '').replace(/\|$/, '').split(/(?<!\\)\|/).map(v => v.trim().replace(/\\\|/g, '|'));
+  function markdown(source) {
+    const article = node('article'); article.className = 'reader-prose';
+    const lines = source.split(/\r?\n/); let list = null;
+    for (let i = 0; i < lines.length; i += 1) {
+      const line = lines[i], value = line.trim();
+      if (!value) { list = null; continue; }
+      if (/^```/.test(value)) {
+        const code = []; i += 1;
+        while (i < lines.length && !/^```/.test(lines[i].trim())) code.push(lines[i++]);
+        const pre = node('pre'); pre.append(node('code', code.join('\n'))); article.append(pre); list = null; continue;
+      }
+      if (i + 1 < lines.length && value.includes('|') && cells(lines[i + 1]).every(v => /^:?-{3,}:?$/.test(v))) {
+        const table = node('table'), head = node('thead'), body = node('tbody');
+        const row = (values, tag) => { const tr = node('tr'); values.forEach(v => { const cell = node(tag); if (tag === 'th') cell.scope = 'col'; inline(cell, v); tr.append(cell); }); return tr; };
+        head.append(row(cells(line), 'th')); i += 2;
+        while (i < lines.length && lines[i].trim() && lines[i].includes('|')) body.append(row(cells(lines[i++]), 'td'));
+        i -= 1; table.append(head, body); article.append(table); list = null; continue;
+      }
+      const heading = value.match(/^(#{1,6})\s+(.+)$/);
+      if (heading) { const h = node('h' + Math.min(4, heading[1].length + 1)); inline(h, heading[2]); article.append(h); list = null; continue; }
+      const bullet = value.match(/^(?:[-*+] |\d+\. )(.+)$/);
+      if (bullet) {
+        const tag = /^\d/.test(value) ? 'ol' : 'ul';
+        if (!list || list.tagName.toLowerCase() !== tag) { list = node(tag); if (tag === 'ol') list.start = parseInt(value, 10); article.append(list); }
+        const li = node('li'); inline(li, bullet[1]); list.append(li); continue;
+      }
+      list = null;
+      if (/^(---+|\*\*\*+)$/.test(value)) { article.append(node('hr')); continue; }
+      const p = node(value.startsWith('> ') ? 'blockquote' : 'p'); inline(p, value.startsWith('> ') ? value.slice(2) : line); article.append(p);
+    }
+    return article;
+  }
+  function contents(root) {
+    root.querySelectorAll(':scope > .reader-contents').forEach(el => el.remove());
+    const headings = [...root.querySelectorAll('h2,h3,h4')].filter(h => !h.closest('.card,.run-card,.reader-contents,[data-reader-source],[hidden]'));
+    if (headings.length < 2) return;
+    const details = node('details'); details.className = 'reader-contents';
+    details.append(node('summary', '이 리포트 목차 · ' + headings.length + '개 항목'));
+    const nav = node('nav'); nav.setAttribute('aria-label', '리포트 목차');
+    headings.forEach(h => {
+      if (!h.id) h.id = 'reader-section-' + (++serial);
+      h.dataset.readerHeading = ''; h.tabIndex = -1;
+      const a = node('a', h.textContent); a.href = '#' + h.id;
+      if (h.tagName !== 'H2') a.className = 'reader-subsection';
+      a.addEventListener('click', event => {
+        event.preventDefault();
+        for (let ancestor = h.parentElement; ancestor; ancestor = ancestor.parentElement) if (ancestor.tagName === 'DETAILS') ancestor.open = true;
+        h.scrollIntoView({block: 'start'}); h.focus({preventScroll: true});
+      }); nav.append(a);
+    });
+    details.append(nav); root.prepend(details);
+  }
+  function enhance(root) {
+    if (!root) return;
+    root.querySelectorAll('pre[data-report-markdown]').forEach(pre => {
+      const previous = rendered.get(pre);
+      if (previous && previous.source === pre.textContent) return;
+      const article = markdown(pre.textContent);
+      if (previous) previous.article.replaceWith(article);
+      else {
+        const details = node('details'); details.dataset.readerSource = '';
+        details.append(node('summary', 'Markdown 원문 보기'));
+        pre.before(article, details); details.append(pre);
+      }
+      rendered.set(pre, {source: pre.textContent, article});
+    });
+    root.querySelectorAll('table').forEach(table => {
+      if (table.closest('.reader-table,.account-table-wrap,.summary-scroll')) return;
+      const wrap = node('div'); wrap.className = 'reader-table'; wrap.tabIndex = 0;
+      wrap.setAttribute('role', 'region'); wrap.setAttribute('aria-label', '리포트 표 · 가로로 스크롤하여 전체 보기');
+      table.before(wrap); wrap.append(table);
+    });
+    root.querySelectorAll('.grid').forEach(grid => {
+      const cards = [...grid.querySelectorAll(':scope > a.card')];
+      if (cards.length < 2 || grid.dataset.readerSearch) return;
+      grid.dataset.readerSearch = 'true';
+      const box = node('div'); box.className = 'reader-search';
+      const input = node('input'); input.type = 'search'; input.placeholder = '제목 · 종목 · 채널 · 키워드'; input.id = 'report-search-' + (++serial);
+      const label = node('label', '리포트 찾기'); label.htmlFor = input.id;
+      const status = node('p'); status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
+      const update = () => {
+        const terms = input.value.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean); let count = 0;
+        cards.forEach(card => { card.hidden = !terms.every(t => card.textContent.toLocaleLowerCase().includes(t)); if (!card.hidden) count += 1; });
+        status.textContent = cards.length + '개 중 ' + count + '개 표시' + (count ? '' : ' · 검색어를 지우거나 다른 키워드를 입력하세요.');
+      };
+      input.addEventListener('input', update); box.append(label, input, status); grid.before(box); update();
+    });
+    contents(root);
+  }
+  window.TradingAgentsReader = {enhance};
+  const main = document.querySelector('main');
+  if (main && !main.hasAttribute('data-reader-dynamic')) enhance(main);
+  if (main) {
+    const top = node('button', '↑ 맨 위'); top.type = 'button'; top.className = 'reader-back'; top.setAttribute('aria-label', '리포트 맨 위로 이동');
+    top.addEventListener('click', () => { const target = document.querySelector('h1') || main; target.tabIndex = -1; target.scrollIntoView({block: 'start'}); target.focus({preventScroll: true}); });
+    document.body.append(top);
+  }
+})();
+</script></body></html>

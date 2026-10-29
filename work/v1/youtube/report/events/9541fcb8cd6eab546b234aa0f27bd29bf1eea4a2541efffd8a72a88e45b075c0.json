@@ -1,0 +1,625 @@
+{
+  "schema": "tradingagents.work-report/v1",
+  "surface": "youtube",
+  "event_id": "youtube:848def4ad50496671724a7e9472e40a0",
+  "source_sha256": "86df87dae80910c9f763d090e578eacae93d3e50a77ba27328a945c5100ce0d4",
+  "prompt_contract_version": "youtube-work-v5",
+  "workflow_contract_sha256": "f5ba656baa3255d8d08768ab816048f458ac176a41169461691a2454a685df37",
+  "policy": {
+    "visibility": "investor_safe_no_credentials",
+    "external_evidence_profile": "balanced_external",
+    "external_evidence_may_affect": [
+      "ranking",
+      "confidence",
+      "position_size_within_existing_risk_limits",
+      "research_priority"
+    ],
+    "external_evidence_may_bypass_execution_gate": false,
+    "thesis_is_independent_from_execution_readiness": true
+  },
+  "report_markdown": "# YouTube 검증 델타 · 2026-10-09 09:30 KST\n\n**출처 상태 OK.** 정본 생산자 `youtube_20261009_065806`는 2026-10-09T08:33:38.173853+09:00 정상 완료했습니다. 확인 시점 생산자 경과 0.96시간(허용 36시간), 커버리지 최장 경과 64.01시간(허용 72시간)입니다. 새 이벤트 33건의 게시·발생 시각은 파싱 가능하고 역전·미래 시각이 없습니다.\n\n**이번 변화:** 신규 **33건**, 수정 **0건**, 동일 내용 **27건**. 신규 중 최근 24시간 29건, 24시간 초과 4건은 배경으로만 사용했습니다. 72시간 창 93건 중 60건 전송, **33건 생략**으로 전체 창을 대표하지 않습니다.\n\n## 먼저 볼 검증 델타\n\n1. **AI 서버 MLCC · 연구 우선순위 상향.** 사용자 우선 영상 [소수몽키](https://www.youtube.com/watch?v=MjEc_J9gYko) (`MjEc_J9gYko`)의 수요 논점에 HIGH 전략 가중치를 적용합니다. [삼성전기 공식 발표](https://www.samsungsem.com/global/newsroom/news/view.do?id=10502)는 2027년 약 1.0722조 원 공급계약, AI 서버용 MLCC 점유율 40% 이상 및 일반 서버 대비 탑재량 10배 이상을 제시합니다. 영상의 무라타·삼성전기 주문/출하 비율, 16~40주 납기와 판가 인상은 이 자료로 확인되지 않았습니다. **삼성전기 연구 순위 1위**, 실적 기여 검증 우선. thesis 확신도는 확인된 계약·수요 범위에서만 소폭 상향하며 위험 한도 내 크기는 현재 변경하지 않습니다.\n2. **삼성전자 잠정실적 · 숫자와 매수 판단 분리.** `MCu7HRunY4s`·`252GJnx2Jd4` 등 신규 영상의 107조 원대 실적 언급은 [삼성전자 공식 잠정실적](https://news.samsung.com/global/samsung-electronics-announces-earnings-guidance-for-third-quarter-2026)의 2026년 3분기 연결 영업이익 약 **107.4조 원**과 부합합니다. 다만 최종 부문별 실적, 외국인 수급, PER 및 주가 반응의 원인과 저가 매수 결론은 별도 확인이 필요합니다. 005930 연구 우선순위를 높이되 thesis 확신도와 포지션 크기는 올리지 않습니다.\n3. **테슬라 세액공제 시점 바로잡기.** `uPBX-bnt2MU`의 “지난 9월 종료”는 2026년 9월을 가리킨다면 틀립니다. [미국 IRS](https://www.irs.gov/credits-deductions/credits-for-new-clean-vehicles-purchased-in-2023-or-after)는 새 적격 전기차 공제가 **2025년 9월 30일 이후 취득 차량**에는 적용되지 않는다고 명시합니다. 정책 시점을 잘못 둔 영상 서사의 신뢰도를 낮추고, 2026년 판매·마진은 별도 원자료로 확인합니다.\n4. **장기 자산 비교 · 검증 연구로만 반영.** 사용자 우선 [박종훈의 지식한방](https://www.youtube.com/watch?v=YgMO4F-o37U) (`YgMO4F-o37U`)은 HIGH 가중치로 장기 실질수익률·차입 위험 연구를 앞당깁니다. 다만 영상의 예금금리, 금·주식·아파트 수익률 배수와 통화정책의 부의 이전 인과는 패킷상 미검증/자막 불확실입니다. 이를 차입 확대나 자산 비중 변경 근거로 쓰지 않습니다.\n\n## 나머지 신규 묶음과 검증 상태\n\n| 범위 | 확인 결과 | 후속 영향 |\n|---|---|---|\n| 국내 반도체·수급 (`bshkOr2fJgk`, `y_lv2XLpFSU`, `A8Hgs2MnPqQ`, `jzR2FVavbpQ`, `MpZjwIU5mqE` 등) | 영상의 일부 실적·지수 방향은 부분 지지, 외국인 흐름의 원인과 목표가는 미검증 | KRX 수급·공시·실적 원문 확인 전 순위/크기 조정 없음 |\n| 2차전지·바이오·보안 (`GdnFY2FfjlU`, `YHF9soni-WI`, `q7wtgr4EIW8` 등) | 핵심 성장·저평가 주장은 대부분 미검증 | 관찰·원자료 확인에 한정 |\n| 코인·정책·기타 (`K2TtqgVZa5E`, `z8JkxSU9OHM`, `4lCG0aVtPHo` 등) | 자막 불확실성과 증거 부족 | 현재 시장 주문 근거로 사용하지 않음 |\n\n**과장 회피:** 마이크론 3,000달러 목표가(`x6YCDGkBpvs`, `252GJnx2Jd4`)는 증권사 원문·적용 EPS와 분할 조정 여부가 확인되지 않아 상승여력 계산에서 제외합니다. 자막상 불명확한 코스피 수치, 종목명, 과거 아파트 가격과 보유기간도 인용하지 않습니다. 영상의 `partially_supported`는 해당 주장 전체의 검증 완료를 뜻하지 않습니다.\n\n**KR·US 후속:** 009150은 `UPGRADE_RESEARCH`, 005930·TSLA·^KS11은 `REQUIRES_PRIMARY_VERIFICATION`. 모든 후보는 **RESEARCH_ONLY**이며 신규 주문·목표가·손절가를 만들지 않습니다. 현재 시장 시세·계좌·위험 한도 게이트를 우회하지 않고, 크기 변경도 보류합니다.\n\n**다음 공식 확인:** 삼성전기 공시의 2027년 계약 이행·마진, 삼성전자 최종 부문별 실적과 KRX 수급, IRS 종료일을 반영한 2026년 EV 판매, 무라타/삼성전기 주문·납기 원자료, 72시간 창에서 생략된 33건.\n\nCOVERAGE_RECEIPT {\"event_id\":\"youtube:848def4ad50496671724a7e9472e40a0\",\"status\":\"PARTIAL\",\"window_events\":93,\"transmitted_events\":60,\"truncated\":true,\"new_events\":33,\"revised_events\":0}\nMOBILE_HANDOFF {\"owner\":\"external_github_notification_pipeline\",\"status\":\"PENDING_EXTERNAL_VERIFICATION\",\"work_sent_notification\":false}",
+  "structured_report": {
+    "binding": {
+      "surface": "youtube",
+      "event_id": "youtube:848def4ad50496671724a7e9472e40a0",
+      "source_sha256": "86df87dae80910c9f763d090e578eacae93d3e50a77ba27328a945c5100ce0d4"
+    },
+    "title": "YouTube 검증 델타 | 2026-10-09 09:30 KST",
+    "generated_at": "2026-10-09T09:30:58+09:00",
+    "as_of": "2026-10-08T16:00:30+00:00",
+    "source_health": "OK",
+    "report_mode": "VERIFICATION_DELTA",
+    "summary": [
+      "신규 33건·수정 0건·동일 27건; 신규 중 최근 24시간 29건.",
+      "72시간 창 93건 중 60건 전송, 33건 생략; 부분 커버리지.",
+      "사용자 우선 MLCC 영상은 연구 우선순위를 상향한다. 공식 삼성전기 계약은 확인되나 영상의 세부 비율·납기·판가는 미검증이다.",
+      "삼성전자 잠정 영업이익은 공식 발표로 확인; 최근 미국 전기차 공제 종료 서술은 IRS 종료연도와 불일치한다.",
+      "모든 영향은 연구용이며 현재 주문·포지션 증액은 허용하지 않는다."
+    ],
+    "top_actions": [
+      {
+        "ticker": "009150",
+        "action": "UPGRADE_RESEARCH",
+        "readiness": "RESEARCH_ONLY",
+        "event_key": "MjEc_J9gYko"
+      },
+      {
+        "ticker": "005930",
+        "action": "REQUIRES_PRIMARY_VERIFICATION",
+        "readiness": "RESEARCH_ONLY",
+        "event_key": "MCu7HRunY4s"
+      },
+      {
+        "ticker": "TSLA",
+        "action": "REQUIRES_PRIMARY_VERIFICATION",
+        "readiness": "RESEARCH_ONLY",
+        "event_key": "uPBX-bnt2MU"
+      }
+    ],
+    "strategies": [
+      {
+        "ticker": "009150",
+        "display_name": "삼성전기 / AI 서버 MLCC",
+        "rank": 1,
+        "research_priority": "HIGH",
+        "allowed_action": "UPGRADE_RESEARCH",
+        "research_question": "2027년 공급계약의 매출·마진 기여와 납기·가동률·증설 계획을 공시와 실적으로 대조",
+        "thesis_impact": {
+          "ranking": "KR 부품 연구 후보의 우선 검토로 상향",
+          "confidence": "AI 서버 MLCC 수요와 계약 존재에 한해 소폭 상향; 영상의 주문/출하 비율·납기·판가는 미검증",
+          "position_size_within_existing_risk_limits": "변경 제안 없음; 최신 시장·계좌·위험 게이트 및 밸류에이션 확인 전 주문 금지"
+        },
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action_now": null
+        },
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "MjEc_J9gYko",
+            "source_tier": "USER_PRIMARY",
+            "affected_field": "research_priority",
+            "direction": "UP",
+            "reason": "사용자 우선 영상의 MLCC 논점을 공식 공급계약과 대조해 기업별 수익성 검증을 앞당김",
+            "official_source_url": "https://www.samsungsem.com/global/newsroom/news/view.do?id=10502"
+          }
+        ]
+      },
+      {
+        "ticker": "005930",
+        "display_name": "삼성전자",
+        "rank": 2,
+        "research_priority": "HIGH",
+        "allowed_action": "REQUIRES_PRIMARY_VERIFICATION",
+        "research_question": "잠정 영업이익 107.4조 원의 부문별 구성, 최종 실적, 외국인 수급과 주가 반응을 각각 확인",
+        "thesis_impact": {
+          "ranking": "실적 검증 우선순위 상향",
+          "confidence": "잠정 연결 실적 숫자만 확인; 저평가·매수 주장에 대한 확신도 상향 없음",
+          "position_size_within_existing_risk_limits": "변경 없음; 실시간 시세·계좌·위험 한도 별도 확인 필요"
+        },
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action_now": null
+        },
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "MCu7HRunY4s",
+            "source_tier": "STANDARD",
+            "affected_field": "research_priority",
+            "direction": "UP",
+            "reason": "저가 매수 주장이 공식 잠정실적 발표와 섞여 있어 숫자와 투자 판단을 분리 검증",
+            "official_source_url": "https://news.samsung.com/global/samsung-electronics-announces-earnings-guidance-for-third-quarter-2026"
+          },
+          {
+            "source": "youtube",
+            "event_key": "252GJnx2Jd4",
+            "source_tier": "STANDARD",
+            "affected_field": "confidence",
+            "direction": "UNCHANGED",
+            "reason": "호실적과 주가 하락의 병존은 별도 수급·밸류에이션 검증이 필요",
+            "official_source_url": "https://news.samsung.com/global/samsung-electronics-announces-earnings-guidance-for-third-quarter-2026"
+          }
+        ]
+      },
+      {
+        "ticker": "TSLA",
+        "display_name": "테슬라",
+        "rank": 3,
+        "research_priority": "MEDIUM",
+        "allowed_action": "REQUIRES_PRIMARY_VERIFICATION",
+        "research_question": "정책 변화의 실제 적용연도와 2026년 판매·마진 자료를 확인",
+        "thesis_impact": {
+          "ranking": "정책 사실 확인을 선행",
+          "confidence": "영상의 최근 세액공제 종료 서술에 대한 확신도 하향",
+          "position_size_within_existing_risk_limits": "변경 없음; 영상 정치 서사를 주문 근거로 사용 금지"
+        },
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action_now": null
+        },
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "uPBX-bnt2MU",
+            "source_tier": "STANDARD",
+            "affected_field": "confidence",
+            "direction": "DOWN",
+            "reason": "영상의 지난 9월 종료 서술과 달리 IRS는 2025-09-30 이후 취득 차량의 공제 종료를 명시",
+            "official_source_url": "https://www.irs.gov/credits-deductions/credits-for-new-clean-vehicles-purchased-in-2023-or-after"
+          }
+        ]
+      },
+      {
+        "ticker": "^KS11",
+        "display_name": "한국 주식과 실질수익률 비교",
+        "rank": 4,
+        "research_priority": "HIGH",
+        "allowed_action": "REQUIRES_PRIMARY_VERIFICATION",
+        "research_question": "자산별 동일 기간·통화·배당·물가 반영 수익률과 통화정책 분배 효과를 원자료로 재산출",
+        "thesis_impact": {
+          "ranking": "교차자산 위험 시나리오 연구 우선순위 상향",
+          "confidence": "영상의 정밀 수치·인과관계는 검증 전이라 투자 thesis 확신도 상향 없음",
+          "position_size_within_existing_risk_limits": "변경 없음; 차입 확대 또는 금·주식 비중 변경 근거로 사용 금지"
+        },
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action_now": null
+        },
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "YgMO4F-o37U",
+            "source_tier": "USER_PRIMARY",
+            "affected_field": "research_priority",
+            "direction": "UP",
+            "reason": "사용자 우선 거시 영상의 장기 실질수익률·차입 위험 논점을 우선 검증하되 미검증 수치로 투자 크기를 늘리지 않음"
+          }
+        ]
+      }
+    ],
+    "coverage_receipt": {
+      "event_id": "youtube:848def4ad50496671724a7e9472e40a0",
+      "status": "PARTIAL",
+      "window_events": 93,
+      "transmitted_events": 60,
+      "truncated": true,
+      "new_events": 33,
+      "revised_events": 0
+    },
+    "model_receipt": {
+      "schema": "tradingagents.model-provenance/v1",
+      "work_synthesis": {
+        "execution_mode": "local",
+        "requested_model": "gpt-6.1-sol",
+        "requested_reasoning_effort": "xhigh",
+        "task_id": "tradingagents-work-youtube",
+        "verification_status": "CONFIGURED_NOT_RUNTIME_VERIFIED",
+        "observed_model": null,
+        "observed_reasoning_effort": null,
+        "note": "The local task contract is verified; the Work host does not expose a signed per-response model receipt."
+      }
+    },
+    "source_summary": {
+      "canonical_source": {
+        "health": "OK",
+        "run_id": "youtube_20261009_065806",
+        "last_run_at": "2026-10-09T08:33:38.173853+09:00",
+        "status": "success",
+        "stale_after_hours": 36
+      },
+      "coverage": {
+        "total_unique_events": 357,
+        "window_events": 93,
+        "transmitted_events": 60,
+        "truncated": true,
+        "oldest_occurred_at": "2026-10-06T08:30:29+00:00",
+        "newest_occurred_at": "2026-10-08T16:00:30+00:00"
+      },
+      "delta": {
+        "new_events": 33,
+        "revised_events": 0,
+        "unchanged_events": 27,
+        "delivered_event_keys": [
+          "YgMO4F-o37U",
+          "MjEc_J9gYko",
+          "uPBX-bnt2MU",
+          "vBjCs2MEVXE",
+          "MCu7HRunY4s",
+          "n6km8MqR_NY",
+          "q7wtgr4EIW8",
+          "RzkUZfUfNRA",
+          "bshkOr2fJgk",
+          "UiZvIe8I-VY",
+          "y_lv2XLpFSU",
+          "xcKCkQF5I04",
+          "GdnFY2FfjlU",
+          "N-DmjglU-Ac",
+          "252GJnx2Jd4",
+          "gLq3q920sn4",
+          "2SDrNaW4Fmc",
+          "uYdhtMZkpJw",
+          "dRRXdJWfNaw",
+          "Jm6ac4637KU",
+          "jzR2FVavbpQ",
+          "A8Hgs2MnPqQ",
+          "z8JkxSU9OHM",
+          "K2TtqgVZa5E",
+          "YHF9soni-WI",
+          "SfA_jWUXu6c",
+          "RDVEdqb2lbA",
+          "SEXxprbqsKA",
+          "8tfZm115qJ4",
+          "MpZjwIU5mqE",
+          "4lCG0aVtPHo",
+          "YNp4zrldaEY",
+          "x6YCDGkBpvs"
+        ]
+      },
+      "event_manifest": [
+        {
+          "event_key": "YgMO4F-o37U",
+          "content_sha256": "180ebbaa4dc272f296647fec758d2a356aeb682c367a7af37f67df9ed9790c59",
+          "occurred_at": "2026-10-08T10:45:18+00:00",
+          "published_at": "2026-10-08T10:45:18+00:00",
+          "source_url": "https://www.youtube.com/watch?v=YgMO4F-o37U",
+          "title": "돈은 당신을 두번 배신했다...뒤집힌 40년 부의 법칙 (박종훈의 지식한방)",
+          "verification_status": "contradicted",
+          "strategy_source_tier": "USER_PRIMARY"
+        },
+        {
+          "event_key": "MjEc_J9gYko",
+          "content_sha256": "6bcf74f8c64497a9e4b486d3c99353f686c4dc0dbad3363d8c69191a8a18ac8f",
+          "occurred_at": "2026-10-08T10:17:57+00:00",
+          "published_at": "2026-10-08T10:17:57+00:00",
+          "source_url": "https://www.youtube.com/watch?v=MjEc_J9gYko",
+          "title": "올해 메모리 놓친 사람 주목? AI 반도체 다음 격전지가 될 투자처",
+          "verification_status": "unverified",
+          "strategy_source_tier": "USER_PRIMARY"
+        },
+        {
+          "event_key": "uPBX-bnt2MU",
+          "content_sha256": "11a81e5c4331e8de8a0fd2d8bf93dc9165ec03a9e1761ec51d4b0d3877cfa511",
+          "occurred_at": "2026-10-08T16:00:30+00:00",
+          "published_at": "2026-10-08T16:00:30+00:00",
+          "source_url": "https://www.youtube.com/watch?v=uPBX-bnt2MU",
+          "title": "1년만에 화해한 트럼프·머스크, 주가 앞으로 어떻게 될까?",
+          "verification_status": "unverified",
+          "strategy_source_tier": "STANDARD"
+        },
+        {
+          "event_key": "vBjCs2MEVXE",
+          "content_sha256": "8ecc9b40c2248b85682961c9b791803653bfe7b74f563df2d12d8e98cb82c4b4",
+          "occurred_at": "2026-10-08T14:35:39+00:00",
+          "published_at": "2026-10-08T14:35:39+00:00",
+          "source_url": "https://www.youtube.com/watch?v=vBjCs2MEVXE",
+          "title": "금융권 해킹에 시작된 집단소송, 배상금은 얼마일까?",
+          "verification_status": "unverified",
+          "strategy_source_tier": "STANDARD"
+        },
+        {
+          "event_key": "MCu7HRunY4s",
+          "content_sha256": "13d061f90b636caf5c64aaeb4c1ef93b23bc756e77354a29ef9f512b78537bdd",
+          "occurred_at": "2026-10-08T13:34:15+00:00",
+          "published_at": "2026-10-08T13:34:15+00:00",
+          "source_url": "https://www.youtube.com/watch?v=MCu7HRunY4s",
+          "title": "삼성전자, 지금이 저가 매수 기회일까?!",
+          "verification_status": "unverified",
+          "strategy_source_tier": "STANDARD"
+        },
+        {
+          "event_key": "n6km8MqR_NY",
+          "content_sha256": "db789e2b5d2b35abc5b5545ebe5b5eb052c3196d7e192df66a36f36e7312745c",
+          "occurred_at": "2026-10-08T13:00:17+00:00",
+          "published_at": "2026-10-08T13:00:17+00:00",
+          "source_url": "https://www.youtube.com/watch?v=n6km8MqR_NY",
+          "title": "10월 8일 외국인이 한국인 몰래 매수한 종목 정체",
+          "verification_status": "unverified",
+          "strategy_source_tier": "STANDARD"
+        },
+        {
+          "event_key": "q7wtgr4EIW8",
+          "content_sha256": "7d491eda2a306b5818cdbf5f13b4069116b38cefcc2dbf4471b513007ee40755",
+          "occurred_at": "2026-10-08T12:31:21+00:00",
+          "published_at": "2026-10-08T12:31:21+00:00",
+          "source_url": "https://www.youtube.com/watch?v=q7wtgr4EIW8",
+          "title": "10월 8일 우리가 현시점 꼭 알고 있어야 하는 저평가 ai 보안 소형주",
+          "verification_status": "unverified",
+          "strategy_source_tier": "STANDARD"
+        },
+        {
+          "event_key": "RzkUZfUfNRA",
+          "content_sha256": "9c91832fb0fe28b0f1ff09ddf065b624f9994b6f7289fe638730617bffb96455",
+          "occurred_at": "2026-10-08T11:00:39+00:00",
+          "published_at": "2026-10-08T11:00:39+00:00",
+          "source_url": "https://www.youtube.com/watch?v=RzkUZfUfNRA",
+          "title": "[#찐시황] 짜증 폭발한 하루… 결국 주도주는 갈렸다 / 10월 증시.. 돈은 ‘여기’로 몰린다 | 황유현 팀장",
+          "verification_status": "asr_uncertain",
+          "strategy_source_tier": "STANDARD"
+        },
+        {
+          "event_key": "bshkOr2fJgk",
+          "content_sha256": "d0d2a5b957532994892eb2ac7c77e13fdfcdd7be00c6dacc3c6b065e59026447",
+          "occurred_at": "2026-10-08T11:00:17+00:00",
+          "published_at": "2026-10-08T11:00:17+00:00",
+          "source_url": "https://www.youtube.com/watch?v=bshkOr2fJgk",
+          "title": "나스닥은 신고가인데 한국 반도체만 왜?…증시 '디커플링' 만든 수급의 정체ㅣ명민준, 박가영, 이지환 [주린이 구조대]",
+          "verification_status": "asr_uncertain",
+          "strategy_source_tier": "STANDARD"
+        },
+        {
+          "event_key": "UiZvIe8I-VY",
+          "content_sha256": "5c64a620ee4da32b60b0d8670dd4ab03bf5599558fcc53b10d807c375c7544d1",
+          "occurred_at": "2026-10-08T11:00:09+00:00",
+          "published_at": "2026-10-08T11:00:09+00:00",
+          "source_url": "https://www.youtube.com/watch?v=UiZvIe8I-VY",
+          "title": "경제사냥꾼 '종목 분석기', 내 종목 하나만 끝까지 파고듭니다",
+          "verification_status": "unverified",
+          "strategy_source_tier": "STANDARD"
+        },
+        {
+          "event_key": "y_lv2XLpFSU",
+          "content_sha256": "0a54f61bc24735ff0a0659c12b227c63b17bcfdf27e7b0ea922bb59e429f7408",
+          "occurred_at": "2026-10-08T10:00:35+00:00",
+          "published_at": "2026-10-08T10:00:35+00:00",
+          "source_url": "https://www.youtube.com/watch?v=y_lv2XLpFSU",
+          "title": "미 국채 금리만 볼 때가 아니다…글로벌 증시에 새로 등장한 위험 변수ㅣ명민준, 박가영, 유영화 [주린이 구조대]",
+          "verification_status": "unverified",
+          "strategy_source_tier": "STANDARD"
+        },
+        {
+          "event_key": "xcKCkQF5I04",
+          "content_sha256": "7e846c9c3fcd89d53b424c83d8fb45dbe127bfc37c9045594aa5d6c049dcd973",
+          "occurred_at": "2026-10-08T10:00:25+00:00",
+          "published_at": "2026-10-08T10:00:25+00:00",
+          "source_url": "https://www.youtube.com/watch?v=xcKCkQF5I04",
+          "title": "경제사냥꾼 종목 분석기, 내 종목 하나만 끝까지 파고듭니다",
+          "verification_status": "unverified",
+          "strategy_source_tier": "STANDARD"
+        },
+        {
+          "event_key": "GdnFY2FfjlU",
+          "content_sha256": "e48689bb13c264787fafdc992256673bb630d74680703bef0acf0622900a17e7",
+          "occurred_at": "2026-10-08T10:00:22+00:00",
+          "published_at": "2026-10-08T10:00:22+00:00",
+          "source_url": "https://www.youtube.com/watch?v=GdnFY2FfjlU",
+          "title": "2차전지 끝났다고? 삼성SDI·LG엔솔 진짜 승부는 지금부터… 美 ESS·유럽 전기차 ‘K배터리 대반격’ 온다  ㅣ윤석천 평론가",
+          "verification_status": "unverified",
+          "strategy_source_tier": "STANDARD"
+        },
+        {
+          "event_key": "N-DmjglU-Ac",
+          "content_sha256": "7eab99eb965af7940d7a931d70ac7f696c4e0aab81363821b702882641dd807d",
+          "occurred_at": "2026-10-08T08:55:15+00:00",
+          "published_at": "2026-10-08T08:55:15+00:00",
+          "source_url": "https://www.youtube.com/watch?v=N-DmjglU-Ac",
+          "title": "월가에서 현시점 엔비디아가 저평가 됐다는 이유",
+          "verification_status": "unverified",
+          "strategy_source_tier": "STANDARD"
+        },
+        {
+          "event_key": "252GJnx2Jd4",
+          "content_sha256": "d9e4e03839ae61b068d920a36f4d76e5098894615d3a2db3cd4988a9062a4d1f",
+          "occurred_at": "2026-10-08T08:26:07+00:00",
+          "published_at": "2026-10-08T08:26:07+00:00",
+          "source_url": "https://www.youtube.com/watch?v=252GJnx2Jd4",
+          "title": "[10월 8일 마감시황] 실적보다 중요한 건 내년 이후…삼성전자·SK하이닉스 저평가가 풀리지 않는 이유ㅣ홍선애, 이권희, 김장열 [클로징벨 라이브]",
+          "verification_status": "unverified",
+          "strategy_source_tier": "STANDARD"
+        },
+        {
+          "event_key": "gLq3q920sn4",
+          "content_sha256": "e1b8a1c832289d7e85fd169bf4d5052fa08791ae55d9dfeda13aa31f752a591f",
+          "occurred_at": "2026-10-08T08:15:07+00:00",
+          "published_at": "2026-10-08T08:15:07+00:00",
+          "source_url": "https://www.youtube.com/watch?v=gLq3q920sn4",
+          "title": "[#긴급시황] 외국인 매도 폭탄에 코스피 침몰… 투자심리 무너진 지금, 반등은 언제 올까? (급락장) 이권희 대표",
+          "verification_status": "asr_uncertain",
+          "strategy_source_tier": "STANDARD"
+        },
+        {
+          "event_key": "2SDrNaW4Fmc",
+          "content_sha256": "1b4b2ff13d4b688fd376a3d0b1cfe443e4be9d185cef070c1baa420296e933e5",
+          "occurred_at": "2026-10-08T08:00:05+00:00",
+          "published_at": "2026-10-08T08:00:05+00:00",
+          "source_url": "https://www.youtube.com/watch?v=2SDrNaW4Fmc",
+          "title": "골드만삭스·JP모건은 왜 이 블록체인을 골랐을까",
+          "verification_status": "asr_uncertain",
+          "strategy_source_tier": "STANDARD"
+        },
+        {
+          "event_key": "uYdhtMZkpJw",
+          "content_sha256": "dcf3309e0ec6ab1c08e2abd6ce6ba6271f5d0318a55090f04a243f2a28fe275b",
+          "occurred_at": "2026-10-08T07:37:11+00:00",
+          "published_at": "2026-10-08T07:37:11+00:00",
+          "source_url": "https://www.youtube.com/watch?v=uYdhtMZkpJw",
+          "title": "삼성전자 영업이익 107조에, '노조'가 받는 보너스 얼마일까?",
+          "verification_status": "asr_uncertain",
+          "strategy_source_tier": "STANDARD"
+        },
+        {
+          "event_key": "dRRXdJWfNaw",
+          "content_sha256": "82f1ac1c1a25f0ce5d5e9682b588e0c28503ea02a93e544e85f887febf9fbada",
+          "occurred_at": "2026-10-08T06:38:51+00:00",
+          "published_at": "2026-10-08T06:38:51+00:00",
+          "source_url": "https://www.youtube.com/watch?v=dRRXdJWfNaw",
+          "title": "\"대형주 저가매수 서두르지 마세요\"…지금은 코스닥 중소형주 볼 때ㅣ권다영, 이주연 M인베스트먼트 대표 [2시 마켓워치]",
+          "verification_status": "asr_uncertain",
+          "strategy_source_tier": "STANDARD"
+        },
+        {
+          "event_key": "Jm6ac4637KU",
+          "content_sha256": "1e12e36e38590836ffa9e58945ec11832a5c81c726804baa8ac31ca02256bc9c",
+          "occurred_at": "2026-10-08T06:15:27+00:00",
+          "published_at": "2026-10-08T06:15:27+00:00",
+          "source_url": "https://www.youtube.com/watch?v=Jm6ac4637KU",
+          "title": "\"대형주 자리가 핵심\" 삼전닉스 쉬어갈 때 소부장이 날아가는 조건ㅣ권다영, 민재기 KB증권 PRIME CLUB 팀장 [2시 마켓워치]",
+          "verification_status": "asr_uncertain",
+          "strategy_source_tier": "STANDARD"
+        },
+        {
+          "event_key": "jzR2FVavbpQ",
+          "content_sha256": "aa66af971e3df18197ebbab5275747b8d87f47eaff27b1d77717b06c0f3c0935",
+          "occurred_at": "2026-10-08T06:00:36+00:00",
+          "published_at": "2026-10-08T06:00:36+00:00",
+          "source_url": "https://www.youtube.com/watch?v=jzR2FVavbpQ",
+          "title": "[#글로벌인사이트]  다음 주부터 외국인 매도 줄어드나? 내년 삼성전자 실적은 더 무섭다… 오늘이 매수 기회인 이유ㅣ노근창 대표",
+          "verification_status": "asr_uncertain",
+          "strategy_source_tier": "STANDARD"
+        },
+        {
+          "event_key": "A8Hgs2MnPqQ",
+          "content_sha256": "c63d22967401bf339f7d3150c78669ac94430308efc5bcf2e8b3690a2db66661",
+          "occurred_at": "2026-10-08T04:00:24+00:00",
+          "published_at": "2026-10-08T04:00:24+00:00",
+          "source_url": "https://www.youtube.com/watch?v=A8Hgs2MnPqQ",
+          "title": "삼성전자 역대급 실적에도 외국인은 왜 팔까? / 오늘도 시작된 외인 ‘선물 흔들기’… 진짜 속내는? | 이권희 대표",
+          "verification_status": "asr_uncertain",
+          "strategy_source_tier": "STANDARD"
+        },
+        {
+          "event_key": "z8JkxSU9OHM",
+          "content_sha256": "ba3bc5cc23c49a4653e3f0d99d75bd7c8bca987e43855b9ac585fc2278c0a1d6",
+          "occurred_at": "2026-10-08T03:30:23+00:00",
+          "published_at": "2026-10-08T03:30:23+00:00",
+          "source_url": "https://www.youtube.com/watch?v=z8JkxSU9OHM",
+          "title": "'앵커리지 디지털'이 말하는 기관 금융·스테이블코인의 미래 | 서동주, 김동환, 모제스 리(Moses Lee) APAC 총괄, 진동욱 APAC 스테이블코인 담당 [크립토 PLUS]",
+          "verification_status": "asr_uncertain",
+          "strategy_source_tier": "STANDARD"
+        },
+        {
+          "event_key": "K2TtqgVZa5E",
+          "content_sha256": "e4b56128c88d2b161992b08a06482ac53ed5eb4f9e57f08c55ca3155b3ca52db",
+          "occurred_at": "2026-10-08T03:05:37+00:00",
+          "published_at": "2026-10-08T03:05:37+00:00",
+          "source_url": "https://www.youtube.com/watch?v=K2TtqgVZa5E",
+          "title": "비트코인 급락, 이더리움은 더 아팠다 | 서동주, 김동환, 박현영 뉴스1 기자 [크립토 PLUS]",
+          "verification_status": "asr_uncertain",
+          "strategy_source_tier": "STANDARD"
+        },
+        {
+          "event_key": "YHF9soni-WI",
+          "content_sha256": "77187a4146b75b4832eb348e7fb08507c1c9e0cdd5b49726ac89eec82fadd79e",
+          "occurred_at": "2026-10-08T02:25:31+00:00",
+          "published_at": "2026-10-08T02:25:31+00:00",
+          "source_url": "https://www.youtube.com/watch?v=YHF9soni-WI",
+          "title": "템퍼스 AI 질주에 다시 뜨는 미국 바이오, 최대 수혜주는? | 박현지, 강하나 여도은, 허재무 [아침N투자]",
+          "verification_status": "asr_uncertain",
+          "strategy_source_tier": "STANDARD"
+        },
+        {
+          "event_key": "SfA_jWUXu6c",
+          "content_sha256": "0c065bb94dc444f75170b6df214e11494f0b6dd1e4249903bfdd1478bcc9f189",
+          "occurred_at": "2026-10-08T01:52:56+00:00",
+          "published_at": "2026-10-08T01:52:56+00:00",
+          "source_url": "https://www.youtube.com/watch?v=SfA_jWUXu6c",
+          "title": "\"반도체가 아닌 코스피의 문제\" 싹 바꿔야 한다 | 이형수 HSL파트너스 대표 [더블 업]",
+          "verification_status": "asr_uncertain",
+          "strategy_source_tier": "STANDARD"
+        },
+        {
+          "event_key": "RDVEdqb2lbA",
+          "content_sha256": "13c79a0ffb3b3a8bd92d83479039edf1987d1cbdaadef05f2817fa87558dcbfe",
+          "occurred_at": "2026-10-08T01:52:13+00:00",
+          "published_at": "2026-10-08T01:52:13+00:00",
+          "source_url": "https://www.youtube.com/watch?v=RDVEdqb2lbA",
+          "title": "10월 8일 오늘 코스피 어떻게 흘러갈까?",
+          "verification_status": "unverified",
+          "strategy_source_tier": "STANDARD"
+        },
+        {
+          "event_key": "SEXxprbqsKA",
+          "content_sha256": "457a197587c0f867db81dabb3c2bbaa757160860fbdf221141b93515c91ad1b9",
+          "occurred_at": "2026-10-08T01:00:31+00:00",
+          "published_at": "2026-10-08T01:00:31+00:00",
+          "source_url": "https://www.youtube.com/watch?v=SEXxprbqsKA",
+          "title": "마이크론은 급등, 삼성전자 107조 호실적… 외인 매수 들어올까? 오후장 대반전 나오나 ㅣ이주연 대표",
+          "verification_status": "asr_uncertain",
+          "strategy_source_tier": "STANDARD"
+        },
+        {
+          "event_key": "8tfZm115qJ4",
+          "content_sha256": "a40690f330f93568195158f059eb12b37e49b6236d7d68eb910c0ab60ce66eaa",
+          "occurred_at": "2026-10-08T00:59:38+00:00",
+          "published_at": "2026-10-08T00:59:38+00:00",
+          "source_url": "https://www.youtube.com/watch?v=8tfZm115qJ4",
+          "title": "실적 나와도...'시들' 대체 어떻게 해야 할까? | 하창완 하보노의 주식 이야기 대표 [더블 체크]",
+          "verification_status": "asr_uncertain",
+          "strategy_source_tier": "STANDARD"
+        },
+        {
+          "event_key": "MpZjwIU5mqE",
+          "content_sha256": "3839c415574b8b153ff4a548682cc857f9fc2f7971c6d4eb158356cd30cadb8b",
+          "occurred_at": "2026-10-08T00:18:03+00:00",
+          "published_at": "2026-10-08T00:18:03+00:00",
+          "source_url": "https://www.youtube.com/watch?v=MpZjwIU5mqE",
+          "title": "삼성전자 3분기 영업익 107조…좋은 실적에도 주가는 왜? | 박병창 MP파트너스 대표 [마켓 인사이드]",
+          "verification_status": "asr_uncertain",
+          "strategy_source_tier": "STANDARD"
+        },
+        {
+          "event_key": "4lCG0aVtPHo",
+          "content_sha256": "57ca0f9a81606811cdd594773c1fe4ba41f6c0b0ee537788f17d284cfb874c28",
+          "occurred_at": "2026-10-07T23:20:52+00:00",
+          "published_at": "2026-10-07T23:20:52+00:00",
+          "source_url": "https://www.youtube.com/watch?v=4lCG0aVtPHo",
+          "title": "위성 15기 싣고 날아오른 누리호…주가는 시들 | 월 10만 원대 한국판 위고비 출격 | 권순우 삼프로TV 취재팀장 [뉴스3]",
+          "verification_status": "asr_uncertain",
+          "strategy_source_tier": "STANDARD"
+        },
+        {
+          "event_key": "YNp4zrldaEY",
+          "content_sha256": "d0bf3e6dcaa616f6e00aac86ff45d052075df34c28c01a2abbe9f1d110f36588",
+          "occurred_at": "2026-10-07T22:35:14+00:00",
+          "published_at": "2026-10-07T22:35:14+00:00",
+          "source_url": "https://www.youtube.com/watch?v=YNp4zrldaEY",
+          "title": "삼성전자, 3분기 실적발표…'영업익 100조' 돌파하나? | 김장열 유니스토리자산운용 리서치센터장 [글로벌 인터뷰]",
+          "verification_status": "asr_uncertain",
+          "strategy_source_tier": "STANDARD"
+        },
+        {
+          "event_key": "x6YCDGkBpvs",
+          "content_sha256": "c1815c00f977b6c5aa5dfb4014b71fb7544b907aa6d30b2c0e8502ca9fc9ae80",
+          "occurred_at": "2026-10-07T22:00:33+00:00",
+          "published_at": "2026-10-07T22:00:33+00:00",
+          "source_url": "https://www.youtube.com/watch?v=x6YCDGkBpvs",
+          "title": "금리 불안 속 10년물 국채 입찰 호조...DA데이비슨, 마이크론 목표가 $3,000 상향 [월가 뉴스레터]",
+          "verification_status": "asr_uncertain",
+          "strategy_source_tier": "STANDARD"
+        }
+      ],
+      "external_evidence_profile": "balanced_external",
+      "external_evidence_assessment": "USER_PRIMARY는 연구 우선순위에 HIGH로 반영. 공식 원자료가 확인한 범위만 사실로 채택하고 미검증·ASR 주장은 thesis 확신도/크기 상향에 사용하지 않음.",
+      "official_checks": [
+        {
+          "topic": "AI server MLCC",
+          "url": "https://www.samsungsem.com/global/newsroom/news/view.do?id=10502",
+          "finding": "삼성전기 2027년 약 1.0722조 원 공급계약, AI 서버용 시장점유율 40% 이상 및 일반 서버 대비 탑재량 10배 이상이라는 회사 발표; 영상의 정확한 주문/출하 비율·납기 수치까지 입증하지는 않음"
+        },
+        {
+          "topic": "Samsung Electronics 2026 Q3 guidance",
+          "url": "https://news.samsung.com/global/samsung-electronics-announces-earnings-guidance-for-third-quarter-2026",
+          "finding": "잠정 연결 매출 약 195조 원, 영업이익 약 107.4조 원; 최종 실적과 저평가 판단은 별개"
+        },
+        {
+          "topic": "US clean vehicle credit",
+          "url": "https://www.irs.gov/credits-deductions/credits-for-new-clean-vehicles-purchased-in-2023-or-after",
+          "finding": "2025-09-30 이후 취득한 신규 적격 차량에는 공제 불가; 영상의 '지난 9월 종료' 시점은 2026년 9월로 읽으면 오류"
+        }
+      ],
+      "execution_eligible": false,
+      "external_delivery_verified": false,
+      "timestamp_review": {
+        "checked_at": "2026-10-09T09:30:58+09:00",
+        "producer_age_hours": 0.956,
+        "oldest_coverage_age_hours": 64.008,
+        "new_event_clocks_reviewed": 33,
+        "future_or_reversed_clocks": false
+      }
+    },
+    "next_checkpoint": "다음 생산자 실행에서 신규·수정 키와 생략 33건을 확인하고 삼성전기 수익 기여·삼성전자 최종실적·미국 EV 판매를 공식 자료로 재검증."
+  },
+  "report_id": "youtube:9541fcb8cd6eab546b234aa0f27bd29b",
+  "report_sha256": "9541fcb8cd6eab546b234aa0f27bd29bf1eea4a2541efffd8a72a88e45b075c0",
+  "published_at": "2026-10-09T09:31:07.488340+09:00"
+}

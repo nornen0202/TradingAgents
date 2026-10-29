@@ -1,0 +1,414 @@
+{
+  "schema": "tradingagents.work-report/v1",
+  "surface": "prism",
+  "event_id": "prism:cf99e09f11244d5fc6ba9e81607038cb",
+  "source_sha256": "b278cd742bdde5b77a35bc4cfa7a3c77fbdd35dbb9ce676cc823454212f02522",
+  "prompt_contract_version": "prism-work-v5",
+  "workflow_contract_sha256": "54544c5a6bb3eb17cc24908ceef2377403d48fb6a6c258e4c33d8891923bc403",
+  "policy": {
+    "visibility": "investor_safe_no_credentials",
+    "external_evidence_profile": "balanced_external",
+    "external_evidence_may_affect": [
+      "ranking",
+      "confidence",
+      "position_size_within_existing_risk_limits",
+      "research_priority"
+    ],
+    "external_evidence_may_bypass_execution_gate": false,
+    "thesis_is_independent_from_execution_readiness": true
+  },
+  "report_markdown": "# PRISM 누락 자료 복구 — 2026-10-07\n\n보고 시각: 2026-10-07T19:08:32.128135+09:00 · producer 완료: 2026-10-07T10:46:50.200171+09:00 · source health: OK.\n대상 게시 시각: 10월 7일 09:44:19–09:55:40 KST. 보고서 작성은 자료의 관측 시각을 갱신하지 않는다.\n\n신규 10건을 모두 검토했다. 빛과전자·제이앤티씨는 기술적 관심과 이후 미진입 판단의 충돌 검증을 우선한다. 샘씨엔에스는 가상 보유 자료다. 원문 시각·가격 표현 불일치와 PDF 본문 부재로 실행 가능한 신규 신호는 없다.\n\n- **검증 우선:** 빛과전자·제이앤티씨의 관심 신호와 수익성 관련 미진입 판단을 공시·공식 시세로 대조한다.\n- **시각 불일치:** 오전 게시물의 당일 종가 표현은 수정 시각 또는 정규화 시점 확인 전 가격 근거에서 제외한다.\n- **가상 자료:** 샘씨엔에스 보유와 오전 가상 포트폴리오 안내는 실제 계좌·체결로 취급하지 않는다.\n\n신규 10건, 수정 0건, 동일 내용 중복 제외 0건. 최근 24시간 window 10건 중 10건 전송, 생략 0건, truncation=false. COMPLETE는 전송된 delta의 검토 범위이며 독립 사실 검증 완료를 뜻하지 않는다.\n\n| 사건 | 시각(KST) | 연구 검토와 제한 |\n| --- | --- | --- |\n| [stock_ai_agent:15758](https://t.me/stock_ai_agent/15758) | 09:55:40 | 샘씨엔에스 가상 보유 스냅샷. 실제 계좌 보유나 체결로 해석하지 않으며 목표·손절 가격을 실행 조건에 복사하지 않는다. |\n| [stock_ai_agent:15757](https://t.me/stock_ai_agent/15757) | 09:55:37 | 빛과전자 미진입 판단. 원문이 주장한 수익성 부진은 공시 대조 전 미검증이며, 앞선 기술적 관심 신호와 충돌하는 검증 과제로 남긴다. |\n| [stock_ai_agent:15756](https://t.me/stock_ai_agent/15756) | 09:55:35 | 제이앤티씨 미진입 판단. 원문이 주장한 수익성·성장성 부족은 공시 대조 전 미검증이며, 모멘텀 관심만으로 진입 근거를 상향하지 않는다. |\n| [stock_ai_agent:15755](https://t.me/stock_ai_agent/15755) | 09:50:39 | 빛과전자 O’Neil 차트 참고 안내. 차트 이미지와 실제 베이스·피벗·상대강도 값이 packet에 없어 기술적 돌파를 확인했다고 표시할 수 없다. |\n| [stock_ai_agent:15754](https://t.me/stock_ai_agent/15754) | 09:50:22 | 제이앤티씨 O’Neil 차트 참고 안내. 차트 이미지와 가격 조건이 packet에 없어 별도 차트 확인을 연구 과제로 둔다. |\n| [stock_ai_agent:15753](https://t.me/stock_ai_agent/15753) | 09:49:56 | 빛과전자 PDF 링크 신호. NO_ARCHIVED_TEXT로 본문을 읽지 못했으므로 PDF의 논거나 수치를 추정하지 않는다. |\n| [stock_ai_agent:15752](https://t.me/stock_ai_agent/15752) | 09:49:48 | 제이앤티씨 PDF 링크 신호. NO_ARCHIVED_TEXT로 본문을 읽지 못했으므로 PDF의 논거나 수치를 추정하지 않는다. |\n| [stock_ai_agent:15751](https://t.me/stock_ai_agent/15751) | 09:49:40 | 빛과전자 자금 유입 관련 원문 주장. 09:49 게시 시각인데 당일 마감값을 언급해 원문 수정 시각 또는 정규화 시점 확인이 필요하다. 가격은 현재 종가로 사용하지 않는다. |\n| [stock_ai_agent:15750](https://t.me/stock_ai_agent/15750) | 09:49:36 | 제이앤티씨 모멘텀·투자계획 관련 원문 주장. 09:49 게시 시각과 당일 종가 표현이 충돌한다. 시세와 투자계획 공시를 확인하기 전 숫자·자금조달 효과를 확정하지 않는다. |\n| [stock_ai_agent:15749](https://t.me/stock_ai_agent/15749) | 09:44:19 | 오전 관심종목 2개 안내. simulation_only=false이지만 preview는 가상 포트폴리오라고 명시한다. 모순을 기록하고 가상·연구 참고로 제한한다. 다중 종목 가격은 매핑하지 않는다. |\n\n후속 KR 종합에는 두 종목의 리서치 검증 우선순위를 높이고, 상충 신호와 시각 불일치를 명시한다. 단일 채널의 반복 게시물을 독립된 여러 근거로 세지 않으며, 원문의 점수·confidence를 검증 신뢰도로 전환하지 않는다. 실제 비중 확대나 매수·매도 방향 변경은 제안하지 않는다.\nUS 종합에 직접 대응하는 미국 종목 신호는 이 delta에 없다. 모든 항목은 RESEARCH_ONLY이고 기존 시장·계좌·위험 제한을 유지한다.\n필요한 후속 자료: 해당 종목의 최신 공식 실적 공시와 투자계획 공시, KRX/KIS의 관측시각이 있는 시세, 원문 수정시각, PDF 및 차트 원본. 이번 복구는 canonical packet의 운영상 누락 처리이며 독립 외부 사실검증은 수행하지 않았다.\n다음 확인: 2026-10-07 19:55 KST 운영 점검과 이후 신규 producer 완료 시. NO_ACTIONABLE_DELTA.\n\nCOVERAGE_RECEIPT {\"event_id\": \"prism:cf99e09f11244d5fc6ba9e81607038cb\", \"status\": \"COMPLETE\", \"window_events\": 10, \"transmitted_events\": 10, \"truncated\": false, \"new_events\": 10, \"revised_events\": 0}\nMOBILE_HANDOFF {\"owner\": \"external_github_notification_pipeline\", \"status\": \"PENDING_EXTERNAL_VERIFICATION\", \"work_sent_notification\": false}",
+  "structured_report": {
+    "binding": {
+      "surface": "prism",
+      "event_id": "prism:cf99e09f11244d5fc6ba9e81607038cb",
+      "source_sha256": "b278cd742bdde5b77a35bc4cfa7a3c77fbdd35dbb9ce676cc823454212f02522"
+    },
+    "title": "PRISM 누락 자료 복구 — 2026-10-07",
+    "generated_at": "2026-10-07T19:08:32.128135+09:00",
+    "as_of": "2026-10-07T00:55:40+00:00",
+    "source_health": "OK",
+    "report_mode": "RESEARCH_ONLY",
+    "summary": "신규 10건을 모두 검토했다. 빛과전자·제이앤티씨는 기술적 관심과 이후 미진입 판단의 충돌 검증을 우선한다. 샘씨엔에스는 가상 보유 자료다. 원문 시각·가격 표현 불일치와 PDF 본문 부재로 실행 가능한 신규 신호는 없다.",
+    "top_actions": [
+      {
+        "action": "VERIFY_SOURCE_TIMES",
+        "rationale": "오전 게시시각과 당일 종가 표현의 모순 확인",
+        "readiness": "RESEARCH_ONLY"
+      },
+      {
+        "action": "VERIFY_CONFLICTING_EVIDENCE",
+        "rationale": "기술적 관심과 미진입 판단을 공식 공시로 대조",
+        "readiness": "RESEARCH_ONLY"
+      }
+    ],
+    "strategies": [
+      {
+        "ticker": "069540.KS",
+        "name": "빛과전자",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action_now": false,
+          "required_rechecks": [
+            "공식 종목·시장 매핑",
+            "원문 시각과 시세 관측시각",
+            "공시 또는 차트/PDF 원본"
+          ],
+          "blockers": [
+            "단일 채널 미검증 자료",
+            "연구 전용 packet"
+          ]
+        },
+        "research_impact": "상충하는 기술적 관심·미진입 신호 및 시각 불일치의 검증 우선순위 상향",
+        "source_contributions": [
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15757",
+            "content_sha256": "6f893cd194de1930f5888b46ede22f9b92df218e04edaa8fff4958707ea35ce8",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "빛과전자 미진입 판단. 원문이 주장한 수익성 부진은 공시 대조 전 미검증이며, 앞선 기술적 관심 신호와 충돌하는 검증 과제로 남긴다.",
+            "execution_gate_override": false
+          },
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15755",
+            "content_sha256": "aca39de055e49769021cf2d417c3fb665e6ee8ed562cc3fb4e7ce37ff8606ed6",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "빛과전자 O’Neil 차트 참고 안내. 차트 이미지와 실제 베이스·피벗·상대강도 값이 packet에 없어 기술적 돌파를 확인했다고 표시할 수 없다.",
+            "execution_gate_override": false
+          },
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15753",
+            "content_sha256": "188eba657d9c6b3a26c542a49aaffaaf7784d37beddecc411065f15200745456",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "빛과전자 PDF 링크 신호. NO_ARCHIVED_TEXT로 본문을 읽지 못했으므로 PDF의 논거나 수치를 추정하지 않는다.",
+            "execution_gate_override": false
+          },
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15751",
+            "content_sha256": "47993347ee3bc157367600b998536425e9fa4a33fc061e767ced67d2a75cdce4",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "빛과전자 자금 유입 관련 원문 주장. 09:49 게시 시각인데 당일 마감값을 언급해 원문 수정 시각 또는 정규화 시점 확인이 필요하다. 가격은 현재 종가로 사용하지 않는다.",
+            "execution_gate_override": false
+          },
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15749",
+            "content_sha256": "6ce646d8b860e011ee227226c22ae5d6fc571d0aa0a001c172eac0b5b4f09ed0",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "오전 관심종목 2개 안내. simulation_only=false이지만 preview는 가상 포트폴리오라고 명시한다. 모순을 기록하고 가상·연구 참고로 제한한다. 다중 종목 가격은 매핑하지 않는다.",
+            "execution_gate_override": false
+          }
+        ]
+      },
+      {
+        "ticker": "204270.KS",
+        "name": "제이앤티씨",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action_now": false,
+          "required_rechecks": [
+            "공식 종목·시장 매핑",
+            "원문 시각과 시세 관측시각",
+            "공시 또는 차트/PDF 원본"
+          ],
+          "blockers": [
+            "단일 채널 미검증 자료",
+            "연구 전용 packet"
+          ]
+        },
+        "research_impact": "상충하는 기술적 관심·미진입 신호 및 시각 불일치의 검증 우선순위 상향",
+        "source_contributions": [
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15756",
+            "content_sha256": "10e0d038194c92af07624f4f900a0244a0be445405c3cfb904e0d78fdb770b93",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "제이앤티씨 미진입 판단. 원문이 주장한 수익성·성장성 부족은 공시 대조 전 미검증이며, 모멘텀 관심만으로 진입 근거를 상향하지 않는다.",
+            "execution_gate_override": false
+          },
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15754",
+            "content_sha256": "383935eaa13d46313474d295f1cb184212ef5e5a52afd9f29d6fc5d393fac174",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "제이앤티씨 O’Neil 차트 참고 안내. 차트 이미지와 가격 조건이 packet에 없어 별도 차트 확인을 연구 과제로 둔다.",
+            "execution_gate_override": false
+          },
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15752",
+            "content_sha256": "5cb579779181d7c67f8ab10d7664a623e9e4e81c5d12eba43cc4bf26a9cf4aa5",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "제이앤티씨 PDF 링크 신호. NO_ARCHIVED_TEXT로 본문을 읽지 못했으므로 PDF의 논거나 수치를 추정하지 않는다.",
+            "execution_gate_override": false
+          },
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15750",
+            "content_sha256": "2a7c6f69efb14f26a58eebb439f588cc606b7a5da738f4c4086186736c4a557b",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "제이앤티씨 모멘텀·투자계획 관련 원문 주장. 09:49 게시 시각과 당일 종가 표현이 충돌한다. 시세와 투자계획 공시를 확인하기 전 숫자·자금조달 효과를 확정하지 않는다.",
+            "execution_gate_override": false
+          },
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15749",
+            "content_sha256": "6ce646d8b860e011ee227226c22ae5d6fc571d0aa0a001c172eac0b5b4f09ed0",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "오전 관심종목 2개 안내. simulation_only=false이지만 preview는 가상 포트폴리오라고 명시한다. 모순을 기록하고 가상·연구 참고로 제한한다. 다중 종목 가격은 매핑하지 않는다.",
+            "execution_gate_override": false
+          }
+        ]
+      },
+      {
+        "ticker": "252990.KS",
+        "name": "샘씨엔에스",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action_now": false,
+          "required_rechecks": [
+            "공식 종목·시장 매핑",
+            "원문 시각과 시세 관측시각",
+            "공시 또는 차트/PDF 원본"
+          ],
+          "blockers": [
+            "단일 채널 미검증 자료",
+            "연구 전용 packet"
+          ]
+        },
+        "research_impact": "가상 보유 참고로 분리; 실제 전략 비중·확신도 상향 없음",
+        "source_contributions": [
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15758",
+            "content_sha256": "6e4809c46ecf277bdaf82e7b7dd882c39743aceaa9b391802759f63680c2cf6b",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "샘씨엔에스 가상 보유 스냅샷. 실제 계좌 보유나 체결로 해석하지 않으며 목표·손절 가격을 실행 조건에 복사하지 않는다.",
+            "execution_gate_override": false
+          }
+        ]
+      }
+    ],
+    "coverage_receipt": {
+      "event_id": "prism:cf99e09f11244d5fc6ba9e81607038cb",
+      "status": "COMPLETE",
+      "window_events": 10,
+      "transmitted_events": 10,
+      "truncated": false,
+      "new_events": 10,
+      "revised_events": 0
+    },
+    "model_receipt": {
+      "schema": "tradingagents.model-provenance/v1",
+      "work_synthesis": {
+        "execution_mode": "local",
+        "requested_model": "gpt-6-sol",
+        "requested_reasoning_effort": "xhigh",
+        "task_id": "tradingagents-work-prism",
+        "verification_status": "CONFIGURED_NOT_RUNTIME_VERIFIED",
+        "observed_model": null,
+        "observed_reasoning_effort": null,
+        "note": "The local task contract is verified; the Work host does not expose a signed per-response model receipt."
+      }
+    },
+    "source_summary": {
+      "producer": {
+        "health": "OK",
+        "run_id": "prism_telegram_20261007_104638",
+        "last_run_at": "2026-10-07T10:46:50.200171+09:00",
+        "status": "success",
+        "stale_after_hours": 30
+      },
+      "coverage": {
+        "total_unique_events": 114,
+        "window_events": 10,
+        "transmitted_events": 10,
+        "truncated": false,
+        "oldest_occurred_at": "2026-10-07T00:44:19+00:00",
+        "newest_occurred_at": "2026-10-07T00:55:40+00:00"
+      },
+      "delta": {
+        "new_events": 10,
+        "revised_events": 0,
+        "unchanged_events": 0,
+        "delivered_event_keys": [
+          "stock_ai_agent:15758",
+          "stock_ai_agent:15757",
+          "stock_ai_agent:15756",
+          "stock_ai_agent:15755",
+          "stock_ai_agent:15754",
+          "stock_ai_agent:15753",
+          "stock_ai_agent:15752",
+          "stock_ai_agent:15751",
+          "stock_ai_agent:15750",
+          "stock_ai_agent:15749"
+        ]
+      },
+      "independent_verification_performed": false,
+      "source_scores_are_not_verified_confidence": true,
+      "source_contributions": [
+        {
+          "source": "prism",
+          "event_key": "stock_ai_agent:15757",
+          "content_sha256": "6f893cd194de1930f5888b46ede22f9b92df218e04edaa8fff4958707ea35ce8",
+          "affected_fields": [
+            "research_priority"
+          ],
+          "evidence_weight": "LOW_LABELED",
+          "rationale": "빛과전자 미진입 판단. 원문이 주장한 수익성 부진은 공시 대조 전 미검증이며, 앞선 기술적 관심 신호와 충돌하는 검증 과제로 남긴다.",
+          "execution_gate_override": false
+        },
+        {
+          "source": "prism",
+          "event_key": "stock_ai_agent:15755",
+          "content_sha256": "aca39de055e49769021cf2d417c3fb665e6ee8ed562cc3fb4e7ce37ff8606ed6",
+          "affected_fields": [
+            "research_priority"
+          ],
+          "evidence_weight": "LOW_LABELED",
+          "rationale": "빛과전자 O’Neil 차트 참고 안내. 차트 이미지와 실제 베이스·피벗·상대강도 값이 packet에 없어 기술적 돌파를 확인했다고 표시할 수 없다.",
+          "execution_gate_override": false
+        },
+        {
+          "source": "prism",
+          "event_key": "stock_ai_agent:15753",
+          "content_sha256": "188eba657d9c6b3a26c542a49aaffaaf7784d37beddecc411065f15200745456",
+          "affected_fields": [
+            "research_priority"
+          ],
+          "evidence_weight": "LOW_LABELED",
+          "rationale": "빛과전자 PDF 링크 신호. NO_ARCHIVED_TEXT로 본문을 읽지 못했으므로 PDF의 논거나 수치를 추정하지 않는다.",
+          "execution_gate_override": false
+        },
+        {
+          "source": "prism",
+          "event_key": "stock_ai_agent:15751",
+          "content_sha256": "47993347ee3bc157367600b998536425e9fa4a33fc061e767ced67d2a75cdce4",
+          "affected_fields": [
+            "research_priority"
+          ],
+          "evidence_weight": "LOW_LABELED",
+          "rationale": "빛과전자 자금 유입 관련 원문 주장. 09:49 게시 시각인데 당일 마감값을 언급해 원문 수정 시각 또는 정규화 시점 확인이 필요하다. 가격은 현재 종가로 사용하지 않는다.",
+          "execution_gate_override": false
+        },
+        {
+          "source": "prism",
+          "event_key": "stock_ai_agent:15749",
+          "content_sha256": "6ce646d8b860e011ee227226c22ae5d6fc571d0aa0a001c172eac0b5b4f09ed0",
+          "affected_fields": [
+            "research_priority"
+          ],
+          "evidence_weight": "LOW_LABELED",
+          "rationale": "오전 관심종목 2개 안내. simulation_only=false이지만 preview는 가상 포트폴리오라고 명시한다. 모순을 기록하고 가상·연구 참고로 제한한다. 다중 종목 가격은 매핑하지 않는다.",
+          "execution_gate_override": false
+        },
+        {
+          "source": "prism",
+          "event_key": "stock_ai_agent:15756",
+          "content_sha256": "10e0d038194c92af07624f4f900a0244a0be445405c3cfb904e0d78fdb770b93",
+          "affected_fields": [
+            "research_priority"
+          ],
+          "evidence_weight": "LOW_LABELED",
+          "rationale": "제이앤티씨 미진입 판단. 원문이 주장한 수익성·성장성 부족은 공시 대조 전 미검증이며, 모멘텀 관심만으로 진입 근거를 상향하지 않는다.",
+          "execution_gate_override": false
+        },
+        {
+          "source": "prism",
+          "event_key": "stock_ai_agent:15754",
+          "content_sha256": "383935eaa13d46313474d295f1cb184212ef5e5a52afd9f29d6fc5d393fac174",
+          "affected_fields": [
+            "research_priority"
+          ],
+          "evidence_weight": "LOW_LABELED",
+          "rationale": "제이앤티씨 O’Neil 차트 참고 안내. 차트 이미지와 가격 조건이 packet에 없어 별도 차트 확인을 연구 과제로 둔다.",
+          "execution_gate_override": false
+        },
+        {
+          "source": "prism",
+          "event_key": "stock_ai_agent:15752",
+          "content_sha256": "5cb579779181d7c67f8ab10d7664a623e9e4e81c5d12eba43cc4bf26a9cf4aa5",
+          "affected_fields": [
+            "research_priority"
+          ],
+          "evidence_weight": "LOW_LABELED",
+          "rationale": "제이앤티씨 PDF 링크 신호. NO_ARCHIVED_TEXT로 본문을 읽지 못했으므로 PDF의 논거나 수치를 추정하지 않는다.",
+          "execution_gate_override": false
+        },
+        {
+          "source": "prism",
+          "event_key": "stock_ai_agent:15750",
+          "content_sha256": "2a7c6f69efb14f26a58eebb439f588cc606b7a5da738f4c4086186736c4a557b",
+          "affected_fields": [
+            "research_priority"
+          ],
+          "evidence_weight": "LOW_LABELED",
+          "rationale": "제이앤티씨 모멘텀·투자계획 관련 원문 주장. 09:49 게시 시각과 당일 종가 표현이 충돌한다. 시세와 투자계획 공시를 확인하기 전 숫자·자금조달 효과를 확정하지 않는다.",
+          "execution_gate_override": false
+        },
+        {
+          "source": "prism",
+          "event_key": "stock_ai_agent:15749",
+          "content_sha256": "6ce646d8b860e011ee227226c22ae5d6fc571d0aa0a001c172eac0b5b4f09ed0",
+          "affected_fields": [
+            "research_priority"
+          ],
+          "evidence_weight": "LOW_LABELED",
+          "rationale": "오전 관심종목 2개 안내. simulation_only=false이지만 preview는 가상 포트폴리오라고 명시한다. 모순을 기록하고 가상·연구 참고로 제한한다. 다중 종목 가격은 매핑하지 않는다.",
+          "execution_gate_override": false
+        },
+        {
+          "source": "prism",
+          "event_key": "stock_ai_agent:15758",
+          "content_sha256": "6e4809c46ecf277bdaf82e7b7dd882c39743aceaa9b391802759f63680c2cf6b",
+          "affected_fields": [
+            "research_priority"
+          ],
+          "evidence_weight": "LOW_LABELED",
+          "rationale": "샘씨엔에스 가상 보유 스냅샷. 실제 계좌 보유나 체결로 해석하지 않으며 목표·손절 가격을 실행 조건에 복사하지 않는다.",
+          "execution_gate_override": false
+        }
+      ]
+    },
+    "next_checkpoint": "2026-10-07T19:55:00+09:00"
+  },
+  "report_id": "prism:8607d404a3bbc1fd9593bdf9469b4282",
+  "report_sha256": "8607d404a3bbc1fd9593bdf9469b4282a0f4c6792c8b8eb310eb4289d60a4247",
+  "published_at": "2026-10-07T19:08:32.350392+09:00"
+}

@@ -1,0 +1,868 @@
+{
+  "schema": "tradingagents.work-report/v1",
+  "surface": "prism",
+  "event_id": "prism:939b9b96c08100923e0e0b43be9b0185",
+  "source_sha256": "5733fbc3280881503b7e5d5c4815ad2029e5c6bb259682d9a40d230f58fc18ea",
+  "prompt_contract_version": "prism-work-v5",
+  "workflow_contract_sha256": "54544c5a6bb3eb17cc24908ceef2377403d48fb6a6c258e4c33d8891923bc403",
+  "policy": {
+    "visibility": "investor_safe_no_credentials",
+    "external_evidence_profile": "balanced_external",
+    "external_evidence_may_affect": [
+      "ranking",
+      "confidence",
+      "position_size_within_existing_risk_limits",
+      "research_priority"
+    ],
+    "external_evidence_may_bypass_execution_gate": false,
+    "thesis_is_independent_from_execution_readiness": true
+  },
+  "report_markdown": "# PRISM 연구 델타 · 2026-10-01\n\n**소스 OK · 연구 전용**  \n작성 10-01 10:40:22 KST · 생산 성공 10-01 10:28:45 KST · 이벤트 10-01 09:06:13 KST~10-01 10:02:38 KST\n\n- **RF머트리얼즈:** 전일 BUY 설명 뒤 오늘 손절 매도 문구가 나왔지만 정규화는 UNKNOWN입니다. 매수 후보 신뢰도 하향, 사건 순서·원장 확인은 1순위입니다.\n- **디아이:** 거래량 급증 주장은 연구하되 최신 미진입이 우선입니다. 오전 '종가' 표기의 시각과 현금흐름·가치평가를 검증합니다.\n- **NC:** 갭 상승·신작 판매 주장은 최신 미진입과 오전 '종가' 시각 모순을 감안해 추격 후보 순위를 낮춥니다.\n- **샘씨엔에스:** 1/10 보유·+30.23%와 손절 조정은 가상 운용 설명입니다. 실제 계좌나 주문에 연결하지 않습니다.\n- **실행:** 같은 채널 13건, 독립 공식 확인과 실시간 시장·계좌·위험 게이트 없음. 신규 주문 배분 **0%**.\n\n## 범위·신선도\n\n신규 **13건**, 수정 **0건**, 동일 이벤트 중복 제외 **0건**. 최근 24시간 창 **13/13건 전송**, 생략 **0건**, 잘림 **false**. 전체 고유 111건을 이번 델타로 재분석한 뜻은 아닙니다. COMPLETE는 정제 이벤트 전송 범위에만 적용됩니다.\n\n생산자는 성공이며 30시간 한도 안에 있습니다. 발생·게시·신호 시각과 범위 시각의 순서는 일치하고 현재 24시간 창에 있습니다. 그러나 메시지 가격의 관측시각·유효시간은 검증되지 않았습니다. 가장 오래된 이벤트는 **10-02 09:06:13 KST**에 창을 벗어납니다.\n\n## 이벤트별 델타\n\n| event key | 발생 시각 | 연구 처리 |\n|---|---|---|\n| stock_ai_agent:15499 | 10-01 09:06:13 KST | RF 매도·손절 문구, 정규화 UNKNOWN 충돌 |\n| stock_ai_agent:15500 | 10-01 09:06:17 KST | 샘씨엔에스 가상 1/10 보유·+24.97% |\n| stock_ai_agent:15501 | 10-01 09:43:18 KST | 디아이·NC 오전 WATCH; 다종목 가격은 재확인 |\n| stock_ai_agent:15502 | 10-01 09:51:39 KST | 디아이 거래량 급증 주장, 오전 '종가' 시각 모순 |\n| stock_ai_agent:15503 | 10-01 09:51:43 KST | NC 갭 상승·신작 주장, 오전 '종가' 시각 모순 |\n| stock_ai_agent:15504 | 10-01 09:51:48 KST | 디아이 PDF WATCH, preview 공백 |\n| stock_ai_agent:15505 | 10-01 09:51:52 KST | NC PDF WATCH, preview 공백 |\n| stock_ai_agent:15506 | 10-01 09:52:31 KST | 디아이 O'Neil 보조 차트, 원본 미검증 |\n| stock_ai_agent:15507 | 10-01 09:52:54 KST | NC O'Neil 보조 차트, 원본 미검증 |\n| stock_ai_agent:15508 | 10-01 10:02:31 KST | 샘씨엔에스 가상 손절 19,522원 조정, 정규화 UNKNOWN |\n| stock_ai_agent:15509 | 10-01 10:02:34 KST | 디아이 최신 NO_ENTRY; 현금흐름·PER 검증 필요 |\n| stock_ai_agent:15510 | 10-01 10:02:36 KST | NC 최신 NO_ENTRY; 신작 실적·시장 상태 검증 필요 |\n| stock_ai_agent:15511 | 10-01 10:02:38 KST | 샘씨엔에스 가상 1/10 보유·+30.23% |\n\n## 종목별 연구 영향\n\n순위는 **공식 근거와 위험 검증 우선순위**입니다. confidence는 정제 요약을 검증한 정도에 관한 연구 판단이며 PRISM 점수나 수익 확률이 아닙니다.\n\n| 순위 | 종목 | 영향·다음 확인 |\n|---|---|---|\n| 1 | RF머트리얼즈 · 327260.KS | confidence **0.15**. 전일 BUY→당일 손절 문구·UNKNOWN 충돌로 매수 후보 하향, 원장·공시·새 시세 대조. |\n| 2 | 디아이 · 003160.KS | confidence **0.18**. 최신 미진입으로 추격 순위 하향; 오전 종가·현금흐름 -158억원·상대 PER 약 10.1배 주장 확인. |\n| 3 | NC · 036570.KS | confidence **0.16**. 최신 미진입으로 추격 순위 하향; 오전 종가·신작 판매의 지속 실적 연결 확인. |\n| 4 | 샘씨엔에스 · 252990.KS | confidence **0.09**. 가상 보유·손절 조정 의미만 확인; 실제 매매 후보에서 제외. |\n\nPDF 15504·15505는 본문이 없어 확인 근거로 가중하지 않았습니다. O'Neil 이미지는 원본을 검증하지 못했습니다. 같은 채널 반복은 독립 다중 출처가 아닙니다. 디아이·NC의 Telegram 점수는 신뢰도 수치가 아닙니다. RF의 5.83% 손실과 샘씨엔에스의 성과는 실제 계좌 결과로 보지 않습니다.\n\n**KR 전달:** RF 손절·정규화 충돌을 위험 확인 1순위로, 디아이·NC는 최신 미진입을 반영해 매수 후보 순위와 confidence 하향. 샘씨엔에스는 가상 상태만 참고. 공식 근거와 실시간 시장·계좌·위험 게이트 확인 전 전 종목 실행 제외.\n\n**US 전달:** 직접 US 종목 이벤트가 없어 US thesis·순위·크기 변경 근거가 없습니다.\n\n**다음 확인:** 다음 성공한 정제 생산 결과 또는 10-02 09:06:13 KST 창 만료 중 먼저 도래할 때. RF 원장, 거래소 새 시세·거래량·관측시각, DART 공시와 기업 IR, 디아이·NC 오전 '종가' 표기, 시장·계좌·위험 게이트가 필요합니다. 자동 재확인 완료를 뜻하지 않습니다.\n\nCOVERAGE_RECEIPT {\"event_id\":\"prism:939b9b96c08100923e0e0b43be9b0185\",\"status\":\"COMPLETE\",\"window_events\":13,\"transmitted_events\":13,\"truncated\":false,\"new_events\":13,\"revised_events\":0}\nMOBILE_HANDOFF {\"owner\":\"external_github_notification_pipeline\",\"status\":\"PENDING_EXTERNAL_VERIFICATION\",\"work_sent_notification\":false}",
+  "structured_report": {
+    "binding": {
+      "surface": "prism",
+      "event_id": "prism:939b9b96c08100923e0e0b43be9b0185",
+      "source_sha256": "5733fbc3280881503b7e5d5c4815ad2029e5c6bb259682d9a40d230f58fc18ea"
+    },
+    "title": "PRISM 연구 델타 · 2026-10-01",
+    "generated_at": "2026-10-01T10:40:22.602197+09:00",
+    "as_of": "2026-10-01T10:40:22.602197+09:00",
+    "source_health": "OK",
+    "report_mode": "RESEARCH",
+    "summary": "정제 신규 13건. RF는 전일 BUY 뒤 손절 문구와 UNKNOWN 정규화 충돌로 위험 검증 1순위. 디아이·NC는 최신 미진입 및 오전 종가 시각 모순으로 추격 후보 하향. 샘씨엔에스는 가상 포트폴리오. 신규 실행 배분 0%.",
+    "top_actions": [
+      {
+        "ticker": "327260.KS",
+        "readiness": "RESEARCH_ONLY",
+        "priority": 1,
+        "research_action": "15499 매도 문구와 UNKNOWN 정규화 충돌"
+      },
+      {
+        "ticker": "003160.KS",
+        "readiness": "RESEARCH_ONLY",
+        "priority": 2,
+        "research_action": "15502 오전 '종가' 표현과 장중 41,250원 기준 충돌"
+      },
+      {
+        "ticker": "036570.KS",
+        "readiness": "RESEARCH_ONLY",
+        "priority": 3,
+        "research_action": "15503 오전 '종가'와 +12.44% 가격 서술의 시각"
+      },
+      {
+        "ticker": "252990.KS",
+        "readiness": "RESEARCH_ONLY",
+        "priority": 4,
+        "research_action": "15500·15511은 시뮬레이터 스냅샷"
+      }
+    ],
+    "strategies": [
+      {
+        "ticker": "327260.KS",
+        "display_name": "RF머트리얼즈",
+        "rank": 1,
+        "rank_basis": "공식 근거 대조 및 위험 확인의 연구 우선순위; 매수 순위 아님",
+        "portfolio_role": "DISCOVERY",
+        "personal_portfolio_membership": "UNVERIFIED",
+        "simulation_only": false,
+        "thesis": {
+          "stance": "RESEARCH",
+          "confidence": 0.15,
+          "confidence_basis": "동일 채널 정제 요약의 연구 성숙도; Telegram score나 투자 확률 아님",
+          "rationale": "전일 정제 BUY 설명 뒤 이번에는 당일 매도·손절 문구가 나왔다. 그러나 15499의 정규화 행동은 UNKNOWN이라 매도 자체도 원문과 정규화 결과를 대조해야 한다. 위험 재검증의 우선순위를 올리고 매수 후보 순위와 thesis 신뢰도를 낮춘다.",
+          "entry_conditions": [
+            "15499 원문 매도·정규화 UNKNOWN 불일치 해소",
+            "DART·거래소에서 공급계약과 새 시세·거래량 확인",
+            "다음 성공한 분석에서 진입 조건·손절·유효시간 재산출"
+          ],
+          "invalidation_conditions": [
+            "15499 매도 또는 손절 처리의 공식 원장 근거가 불명확",
+            "새 거래소 시세가 메시지의 과거 48,750원 손절 기준 이하",
+            "공시·실적이 기존 BUY 근거와 불일치"
+          ],
+          "invalidation_action": "공식 근거 불일치 또는 최신 미진입·손절 상태 지속 시 후보 승격을 멈추고 근거를 다시 대조한다.",
+          "horizon": "다음 성공한 생산 결과 및 공식 자료 확인까지의 단기 연구",
+          "position_sizing": {
+            "incremental_execution_allocation_pct": 0,
+            "existing_position_size": null,
+            "existing_risk_limit_change": false,
+            "reason": "실시간 시장·실제 계좌·위험 게이트 미확인; 신규 실행 배분 0%"
+          },
+          "research_priority": 1,
+          "data_needed_reason": "정제 preview 중심이며 공식 자료와 실시간 게이트 미검증"
+        },
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action": "VERIFY",
+          "execution_eligible": false,
+          "as_of": null,
+          "valid_until": null,
+          "required_rechecks": [
+            "15499 매도 문구와 UNKNOWN 정규화 충돌",
+            "전일 BUY 뒤 0일 보유·손절 설명의 사건 순서",
+            "새 공식 거래소 시세·DART 공시·시장 및 계좌 위험 게이트",
+            "다음 성공한 정제 생산 결과로 24시간 창 재검증"
+          ],
+          "blockers": [
+            "PRISM advisory-only; execution_eligible=false",
+            "유효시간 있는 최신 시장 시세·거래량과 공식 자료 검증 없음",
+            "실제 계좌 보유·위험 한도·유동성 게이트 없음"
+          ]
+        },
+        "source_contributions": [
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15499",
+            "content_sha256": "d3da7eb96a857776d06de61dc1661a119378e8ca0bf2bb18a0d987aa2af43960",
+            "occurred_at": "2026-10-01T00:06:13+00:00",
+            "source_health": "OK",
+            "affected_field": "ranking",
+            "direction": "DECREASE",
+            "reason": "매도·손절 문구와 UNKNOWN 정규화가 충돌해 매수 후보 순위 하향",
+            "evidence_weight": "LOW_LABELED",
+            "execution_gate_override": false
+          },
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15499",
+            "content_sha256": "d3da7eb96a857776d06de61dc1661a119378e8ca0bf2bb18a0d987aa2af43960",
+            "occurred_at": "2026-10-01T00:06:13+00:00",
+            "source_health": "OK",
+            "affected_field": "research_priority",
+            "direction": "INCREASE",
+            "reason": "전일 BUY에서 당일 손절로 바뀐 경위를 위험 검증 1순위로",
+            "evidence_weight": "LOW_TO_MEDIUM",
+            "execution_gate_override": false
+          },
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15499",
+            "content_sha256": "d3da7eb96a857776d06de61dc1661a119378e8ca0bf2bb18a0d987aa2af43960",
+            "occurred_at": "2026-10-01T00:06:13+00:00",
+            "source_health": "OK",
+            "affected_field": "confidence",
+            "direction": "DECREASE",
+            "reason": "0일 보유·5.83% 손실 주장은 실제 체결과 독립 검증이 없음",
+            "evidence_weight": "LOW_LABELED",
+            "execution_gate_override": false
+          }
+        ]
+      },
+      {
+        "ticker": "003160.KS",
+        "display_name": "디아이",
+        "rank": 2,
+        "rank_basis": "공식 근거 대조 및 위험 확인의 연구 우선순위; 매수 순위 아님",
+        "portfolio_role": "DISCOVERY",
+        "personal_portfolio_membership": "UNVERIFIED",
+        "simulation_only": false,
+        "thesis": {
+          "stance": "RESEARCH",
+          "confidence": 0.18,
+          "confidence_basis": "동일 채널 정제 요약의 연구 성숙도; Telegram score나 투자 확률 아님",
+          "rationale": "오전 관심·거래량 급증 주장 뒤 최신 판단은 미진입이다. 15502는 오전 시점인데도 '10/1 종가'라고 기술해 가격 시각이 모순되고, 15509는 영업현금흐름 음수와 높은 상대 PER을 제시한다. 연구 확인은 유지하되 매수 순위와 신뢰도를 낮춘다.",
+          "entry_conditions": [
+            "거래소에서 003160의 정확한 가격 관측시각과 거래량 확인",
+            "DART에서 현금흐름·영업이익·공급계약 공시 대조",
+            "새 분석에서 미진입 사유 해소 및 시장·위험 게이트 확인"
+          ],
+          "invalidation_conditions": [
+            "15502의 '종가'와 실제 거래소 관측시각 불일치",
+            "공식 현금흐름·PER 또는 계약 자료가 메시지와 불일치",
+            "새 분석에서도 미진입 또는 가치평가 부담 지속"
+          ],
+          "invalidation_action": "공식 근거 불일치 또는 최신 미진입·손절 상태 지속 시 후보 승격을 멈추고 근거를 다시 대조한다.",
+          "horizon": "다음 성공한 생산 결과 및 공식 자료 확인까지의 단기 연구",
+          "position_sizing": {
+            "incremental_execution_allocation_pct": 0,
+            "existing_position_size": null,
+            "existing_risk_limit_change": false,
+            "reason": "실시간 시장·실제 계좌·위험 게이트 미확인; 신규 실행 배분 0%"
+          },
+          "research_priority": 2,
+          "data_needed_reason": "정제 preview 중심이며 공식 자료와 실시간 게이트 미검증"
+        },
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action": "VERIFY",
+          "execution_eligible": false,
+          "as_of": null,
+          "valid_until": null,
+          "required_rechecks": [
+            "15502 오전 '종가' 표현과 장중 41,250원 기준 충돌",
+            "15509 영업현금흐름 -158억원·상대 PER 약 10.1배의 공식 산식",
+            "PDF 15504 본문 부재 및 O'Neil 이미지 15506 원본 미검증",
+            "거래소·계좌·위험 게이트",
+            "다음 성공한 정제 생산 결과로 24시간 창 재검증"
+          ],
+          "blockers": [
+            "PRISM advisory-only; execution_eligible=false",
+            "유효시간 있는 최신 시장 시세·거래량과 공식 자료 검증 없음",
+            "실제 계좌 보유·위험 한도·유동성 게이트 없음"
+          ]
+        },
+        "source_contributions": [
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15501",
+            "content_sha256": "bc466b2493a59714c57fd2c05f271345b0298b60ba075937b4a0999c08771d04",
+            "occurred_at": "2026-10-01T00:43:18+00:00",
+            "source_health": "OK",
+            "affected_field": "research_priority",
+            "direction": "INCREASE",
+            "reason": "오전 WATCH로 공시·거래량 검증 큐에 포함",
+            "evidence_weight": "LOW_LABELED",
+            "execution_gate_override": false
+          },
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15502",
+            "content_sha256": "879504b9907293e364ced1fe614fcff80b581ece1b331ba3eaa450cb0f51fcac",
+            "occurred_at": "2026-10-01T00:51:39+00:00",
+            "source_health": "OK",
+            "affected_field": "confidence",
+            "direction": "DECREASE",
+            "reason": "오전 메시지의 종가 표기가 시간상 모순",
+            "evidence_weight": "LOW_LABELED",
+            "execution_gate_override": false
+          },
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15504",
+            "content_sha256": "d2871c0c45d6aa32574f0e0994f8668fbc3be5ecbe0c352c1e9089a44df42567",
+            "occurred_at": "2026-10-01T00:51:48+00:00",
+            "source_health": "OK",
+            "affected_field": "confidence",
+            "direction": "NO_INCREASE",
+            "reason": "PDF preview 공백으로 보고서 본문 확인 불가",
+            "evidence_weight": "LOW_LABELED",
+            "execution_gate_override": false
+          },
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15506",
+            "content_sha256": "f0bb4c2e6c0f46c8f5090fe7a0022e11e61df0f5c64587b49804d3bd824ae480",
+            "occurred_at": "2026-10-01T00:52:31+00:00",
+            "source_health": "OK",
+            "affected_field": "confidence",
+            "direction": "NO_INCREASE",
+            "reason": "O'Neil 차트 주석은 원본 확인 전 보조 자료",
+            "evidence_weight": "LOW_LABELED",
+            "execution_gate_override": false
+          },
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15509",
+            "content_sha256": "0fe6e8ba9fa3bd645a696fcb8340f9dd5977f08913083e1c47a46fd9bbd7dc96",
+            "occurred_at": "2026-10-01T01:02:34+00:00",
+            "source_health": "OK",
+            "affected_field": "ranking",
+            "direction": "DECREASE",
+            "reason": "최신 미진입과 현금흐름·가치평가 부담을 후보 순위에 반영",
+            "evidence_weight": "LOW_TO_MEDIUM",
+            "execution_gate_override": false
+          }
+        ]
+      },
+      {
+        "ticker": "036570.KS",
+        "display_name": "NC",
+        "rank": 3,
+        "rank_basis": "공식 근거 대조 및 위험 확인의 연구 우선순위; 매수 순위 아님",
+        "portfolio_role": "DISCOVERY",
+        "personal_portfolio_membership": "UNVERIFIED",
+        "simulation_only": false,
+        "thesis": {
+          "stance": "RESEARCH",
+          "confidence": 0.16,
+          "confidence_basis": "동일 채널 정제 요약의 연구 성숙도; Telegram score나 투자 확률 아님",
+          "rationale": "갭 상승·게임 IP 모멘텀 주장 이후 최신 판단은 미진입이다. 15503의 오전 '10/1 종가'는 관측시각이 맞지 않고, 스팀 판매 1위 보도와 실적 연결도 확인되지 않았다. 추격 후보 순위와 thesis 신뢰도를 낮춘다.",
+          "entry_conditions": [
+            "거래소에서 036570의 관측시각·가격·거래량 확인",
+            "기업 IR에서 신작 판매와 지속 매출·영업이익 연결 확인",
+            "새 분석에서 미진입 사유 해소 확인"
+          ],
+          "invalidation_conditions": [
+            "15503의 종가·거래량이 거래소 자료와 불일치",
+            "신작 판매 순위가 지속 매출·이익으로 연결되지 않음",
+            "새 분석에서도 미진입 판단 지속"
+          ],
+          "invalidation_action": "공식 근거 불일치 또는 최신 미진입·손절 상태 지속 시 후보 승격을 멈추고 근거를 다시 대조한다.",
+          "horizon": "다음 성공한 생산 결과 및 공식 자료 확인까지의 단기 연구",
+          "position_sizing": {
+            "incremental_execution_allocation_pct": 0,
+            "existing_position_size": null,
+            "existing_risk_limit_change": false,
+            "reason": "실시간 시장·실제 계좌·위험 게이트 미확인; 신규 실행 배분 0%"
+          },
+          "research_priority": 3,
+          "data_needed_reason": "정제 preview 중심이며 공식 자료와 실시간 게이트 미검증"
+        },
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action": "VERIFY",
+          "execution_eligible": false,
+          "as_of": null,
+          "valid_until": null,
+          "required_rechecks": [
+            "15503 오전 '종가'와 +12.44% 가격 서술의 시각",
+            "15510 6/10 점수와 미진입 사유",
+            "PDF 15505 본문 부재 및 O'Neil 이미지 15507 원본 미검증",
+            "공식 IR·거래소·계좌 위험 게이트",
+            "다음 성공한 정제 생산 결과로 24시간 창 재검증"
+          ],
+          "blockers": [
+            "PRISM advisory-only; execution_eligible=false",
+            "유효시간 있는 최신 시장 시세·거래량과 공식 자료 검증 없음",
+            "실제 계좌 보유·위험 한도·유동성 게이트 없음"
+          ]
+        },
+        "source_contributions": [
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15501",
+            "content_sha256": "bc466b2493a59714c57fd2c05f271345b0298b60ba075937b4a0999c08771d04",
+            "occurred_at": "2026-10-01T00:43:18+00:00",
+            "source_health": "OK",
+            "affected_field": "research_priority",
+            "direction": "INCREASE",
+            "reason": "오전 WATCH로 공식 가격·신작 근거 검증 대상에 편입",
+            "evidence_weight": "LOW_LABELED",
+            "execution_gate_override": false
+          },
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15503",
+            "content_sha256": "4d9f0186223bb36c0de7e03334f3f7c0fd209c69f5c4fc184d37597b6715265e",
+            "occurred_at": "2026-10-01T00:51:43+00:00",
+            "source_health": "OK",
+            "affected_field": "confidence",
+            "direction": "DECREASE",
+            "reason": "오전 종가 표현 및 판매 순위의 실적 연결 미검증",
+            "evidence_weight": "LOW_LABELED",
+            "execution_gate_override": false
+          },
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15505",
+            "content_sha256": "c751e65271f605a5f1ae49913a60a8586bd765afca0f9e9906669774d00d6b83",
+            "occurred_at": "2026-10-01T00:51:52+00:00",
+            "source_health": "OK",
+            "affected_field": "confidence",
+            "direction": "NO_INCREASE",
+            "reason": "PDF preview 공백",
+            "evidence_weight": "LOW_LABELED",
+            "execution_gate_override": false
+          },
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15507",
+            "content_sha256": "b259dcac3e6aa8d67c716be61136d729ba0dc4de8192dfb13736bdbf63450f11",
+            "occurred_at": "2026-10-01T00:52:54+00:00",
+            "source_health": "OK",
+            "affected_field": "confidence",
+            "direction": "NO_INCREASE",
+            "reason": "차트 주석 원본 미검증",
+            "evidence_weight": "LOW_LABELED",
+            "execution_gate_override": false
+          },
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15510",
+            "content_sha256": "6fbb14fb3e7c447bccbb78bbf3c3b5d4a38553ee9f457d4e82e583d29975cb78",
+            "occurred_at": "2026-10-01T01:02:36+00:00",
+            "source_health": "OK",
+            "affected_field": "ranking",
+            "direction": "DECREASE",
+            "reason": "최신 미진입이 오전 WATCH보다 우선",
+            "evidence_weight": "LOW_TO_MEDIUM",
+            "execution_gate_override": false
+          }
+        ]
+      },
+      {
+        "ticker": "252990.KS",
+        "display_name": "샘씨엔에스",
+        "rank": 4,
+        "rank_basis": "공식 근거 대조 및 위험 확인의 연구 우선순위; 매수 순위 아님",
+        "portfolio_role": "DISCOVERY",
+        "personal_portfolio_membership": "UNVERIFIED",
+        "simulation_only": true,
+        "thesis": {
+          "stance": "RESEARCH",
+          "confidence": 0.09,
+          "confidence_basis": "동일 채널 정제 요약의 연구 성숙도; Telegram score나 투자 확률 아님",
+          "rationale": "가상 포트폴리오 1/10 보유와 24.97%→30.23% 성과·손절가 조정 설명이다. 15508은 simulation_only 필드가 false여도 본문상 가상 전략 원장 조정이며 정규화 행동 UNKNOWN이다. 실제 개인 보유·손절·수익으로 연결하지 않는다.",
+          "entry_conditions": [
+            "시뮬레이터 기록과 실제 계좌를 명확히 분리",
+            "거래소에서 새 시세와 가격 단위 확인",
+            "가상 손절 조정과 정규화 UNKNOWN 의미 재검증"
+          ],
+          "invalidation_conditions": [
+            "가상 1/10 보유를 실제 계좌 보유로 연결할 근거가 없음",
+            "가상 손절가 19,522원 변경 처리의 원장 근거 불일치",
+            "새 정제 결과에서 가상 상태가 변경"
+          ],
+          "invalidation_action": "공식 근거 불일치 또는 최신 미진입·손절 상태 지속 시 후보 승격을 멈추고 근거를 다시 대조한다.",
+          "horizon": "다음 성공한 생산 결과 및 공식 자료 확인까지의 단기 연구",
+          "position_sizing": {
+            "incremental_execution_allocation_pct": 0,
+            "existing_position_size": null,
+            "existing_risk_limit_change": false,
+            "reason": "실시간 시장·실제 계좌·위험 게이트 미확인; 신규 실행 배분 0%"
+          },
+          "research_priority": 4,
+          "data_needed_reason": "정제 preview 중심이며 공식 자료와 실시간 게이트 미검증"
+        },
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action": "VERIFY",
+          "execution_eligible": false,
+          "as_of": null,
+          "valid_until": null,
+          "required_rechecks": [
+            "15500·15511은 시뮬레이터 스냅샷",
+            "15508 가상 손절 18,136→19,522원 조정과 UNKNOWN 정규화",
+            "실제 계좌·거래소·위험 게이트",
+            "다음 성공한 정제 생산 결과로 24시간 창 재검증"
+          ],
+          "blockers": [
+            "PRISM advisory-only; execution_eligible=false",
+            "유효시간 있는 최신 시장 시세·거래량과 공식 자료 검증 없음",
+            "실제 계좌 보유·위험 한도·유동성 게이트 없음"
+          ]
+        },
+        "source_contributions": [
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15500",
+            "content_sha256": "fc70231c1ff3b7e344e7400dc55455270ea05f7591208381c34e95cdc8798cf5",
+            "occurred_at": "2026-10-01T00:06:17+00:00",
+            "source_health": "OK",
+            "affected_field": "ranking",
+            "direction": "EXCLUDE_EXECUTION",
+            "reason": "가상 보유·성과를 실제 투자 순위에서 제외",
+            "evidence_weight": "LOW_LABELED",
+            "execution_gate_override": false
+          },
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15508",
+            "content_sha256": "4ff45ca712aa7e541943ee2b8f798aacc2e160a34f17a514840fca8bcbe1c786",
+            "occurred_at": "2026-10-01T01:02:31+00:00",
+            "source_health": "OK",
+            "affected_field": "research_priority",
+            "direction": "INCREASE",
+            "reason": "가상 손절 조정과 UNKNOWN 정규화 불일치 점검",
+            "evidence_weight": "LOW_LABELED",
+            "execution_gate_override": false
+          },
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15511",
+            "content_sha256": "1e73118e070deaff457b756a3ba5a1ea55e50b7c50e07aca56b81760b384fb60",
+            "occurred_at": "2026-10-01T01:02:38+00:00",
+            "source_health": "OK",
+            "affected_field": "confidence",
+            "direction": "NO_INCREASE",
+            "reason": "가상 +30.23% 성과는 실제 보유·가격 독립 검증이 아님",
+            "evidence_weight": "LOW_LABELED",
+            "execution_gate_override": false
+          },
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15511",
+            "content_sha256": "1e73118e070deaff457b756a3ba5a1ea55e50b7c50e07aca56b81760b384fb60",
+            "occurred_at": "2026-10-01T01:02:38+00:00",
+            "source_health": "OK",
+            "affected_field": "position_size_within_existing_risk_limits",
+            "direction": "NO_INCREASE",
+            "reason": "가상 포트폴리오 크기를 실제 위험 예산에 반영하지 않음",
+            "evidence_weight": "LOW_LABELED",
+            "execution_gate_override": false
+          }
+        ]
+      }
+    ],
+    "coverage_receipt": {
+      "event_id": "prism:939b9b96c08100923e0e0b43be9b0185",
+      "status": "COMPLETE",
+      "window_events": 13,
+      "transmitted_events": 13,
+      "truncated": false,
+      "new_events": 13,
+      "revised_events": 0
+    },
+    "model_receipt": {
+      "schema": "tradingagents.model-provenance/v1",
+      "work_synthesis": {
+        "execution_mode": "local",
+        "requested_model": "gpt-6-sol",
+        "requested_reasoning_effort": "xhigh",
+        "task_id": "tradingagents-work-prism",
+        "verification_status": "CONFIGURED_NOT_RUNTIME_VERIFIED",
+        "observed_model": null,
+        "observed_reasoning_effort": null,
+        "note": "The local task contract is verified; the Work host does not expose a signed per-response model receipt."
+      }
+    },
+    "source_summary": {
+      "source": {
+        "health": "OK",
+        "run_id": "prism_telegram_20261001_102833",
+        "last_run_at": "2026-10-01T10:28:45.003805+09:00",
+        "status": "success",
+        "stale_after_hours": 30
+      },
+      "coverage": {
+        "total_unique_events": 111,
+        "window_events": 13,
+        "transmitted_events": 13,
+        "truncated": false,
+        "oldest_occurred_at": "2026-10-01T00:06:13+00:00",
+        "newest_occurred_at": "2026-10-01T01:02:38+00:00"
+      },
+      "delta": {
+        "new_events": 13,
+        "revised_events": 0,
+        "unchanged_events": 0,
+        "delivered_event_keys": [
+          "stock_ai_agent:15511",
+          "stock_ai_agent:15510",
+          "stock_ai_agent:15509",
+          "stock_ai_agent:15508",
+          "stock_ai_agent:15507",
+          "stock_ai_agent:15506",
+          "stock_ai_agent:15505",
+          "stock_ai_agent:15504",
+          "stock_ai_agent:15503",
+          "stock_ai_agent:15502",
+          "stock_ai_agent:15501",
+          "stock_ai_agent:15500",
+          "stock_ai_agent:15499"
+        ]
+      },
+      "evidence_policy": {
+        "profile": "balanced_external",
+        "material_thesis_effects": [
+          "ranking",
+          "confidence",
+          "position_size_within_existing_risk_limits",
+          "research_priority"
+        ],
+        "supported_evidence_weight": "MEDIUM",
+        "partially_supported_evidence_weight": "LOW_TO_MEDIUM",
+        "unverified_evidence_weight": "LOW_LABELED",
+        "user_primary_channels": [
+          "@kpunch",
+          "@sosumonkey"
+        ],
+        "user_primary_source_tier": "USER_PRIMARY",
+        "user_primary_evidence_weight": "HIGH",
+        "user_primary_validation_policy": "USER_ACCEPTED",
+        "matching_multi_source_signal_may_raise_thesis_priority": true,
+        "conflicting_signal_must_be_visible": true,
+        "may_bypass_market_or_portfolio_execution_gate": false
+      },
+      "validated_at": "2026-10-01T10:40:22.602197+09:00",
+      "event_inventory": [
+        {
+          "event_key": "stock_ai_agent:15511",
+          "content_sha256": "1e73118e070deaff457b756a3ba5a1ea55e50b7c50e07aca56b81760b384fb60",
+          "occurred_at": "2026-10-01T01:02:38+00:00",
+          "relevance": {
+            "tickers": [
+              "252990.KS"
+            ],
+            "markets": [
+              "KR"
+            ],
+            "themes": [],
+            "match_basis": "normalized_prism_signals"
+          },
+          "simulation_only": true,
+          "preview_available": true,
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false
+        },
+        {
+          "event_key": "stock_ai_agent:15510",
+          "content_sha256": "6fbb14fb3e7c447bccbb78bbf3c3b5d4a38553ee9f457d4e82e583d29975cb78",
+          "occurred_at": "2026-10-01T01:02:36+00:00",
+          "relevance": {
+            "tickers": [
+              "036570.KS"
+            ],
+            "markets": [
+              "KR"
+            ],
+            "themes": [],
+            "match_basis": "normalized_prism_signals"
+          },
+          "simulation_only": false,
+          "preview_available": true,
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false
+        },
+        {
+          "event_key": "stock_ai_agent:15509",
+          "content_sha256": "0fe6e8ba9fa3bd645a696fcb8340f9dd5977f08913083e1c47a46fd9bbd7dc96",
+          "occurred_at": "2026-10-01T01:02:34+00:00",
+          "relevance": {
+            "tickers": [
+              "003160.KS"
+            ],
+            "markets": [
+              "KR"
+            ],
+            "themes": [],
+            "match_basis": "normalized_prism_signals"
+          },
+          "simulation_only": false,
+          "preview_available": true,
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false
+        },
+        {
+          "event_key": "stock_ai_agent:15508",
+          "content_sha256": "4ff45ca712aa7e541943ee2b8f798aacc2e160a34f17a514840fca8bcbe1c786",
+          "occurred_at": "2026-10-01T01:02:31+00:00",
+          "relevance": {
+            "tickers": [
+              "252990.KS"
+            ],
+            "markets": [
+              "KR"
+            ],
+            "themes": [],
+            "match_basis": "normalized_prism_signals"
+          },
+          "simulation_only": false,
+          "preview_available": true,
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false
+        },
+        {
+          "event_key": "stock_ai_agent:15507",
+          "content_sha256": "b259dcac3e6aa8d67c716be61136d729ba0dc4de8192dfb13736bdbf63450f11",
+          "occurred_at": "2026-10-01T00:52:54+00:00",
+          "relevance": {
+            "tickers": [
+              "036570.KS"
+            ],
+            "markets": [
+              "KR"
+            ],
+            "themes": [],
+            "match_basis": "normalized_prism_signals"
+          },
+          "simulation_only": false,
+          "preview_available": true,
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false
+        },
+        {
+          "event_key": "stock_ai_agent:15506",
+          "content_sha256": "f0bb4c2e6c0f46c8f5090fe7a0022e11e61df0f5c64587b49804d3bd824ae480",
+          "occurred_at": "2026-10-01T00:52:31+00:00",
+          "relevance": {
+            "tickers": [
+              "003160.KS"
+            ],
+            "markets": [
+              "KR"
+            ],
+            "themes": [],
+            "match_basis": "normalized_prism_signals"
+          },
+          "simulation_only": false,
+          "preview_available": true,
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false
+        },
+        {
+          "event_key": "stock_ai_agent:15505",
+          "content_sha256": "c751e65271f605a5f1ae49913a60a8586bd765afca0f9e9906669774d00d6b83",
+          "occurred_at": "2026-10-01T00:51:52+00:00",
+          "relevance": {
+            "tickers": [
+              "036570.KS"
+            ],
+            "markets": [
+              "KR"
+            ],
+            "themes": [],
+            "match_basis": "normalized_prism_signals"
+          },
+          "simulation_only": false,
+          "preview_available": false,
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false
+        },
+        {
+          "event_key": "stock_ai_agent:15504",
+          "content_sha256": "d2871c0c45d6aa32574f0e0994f8668fbc3be5ecbe0c352c1e9089a44df42567",
+          "occurred_at": "2026-10-01T00:51:48+00:00",
+          "relevance": {
+            "tickers": [
+              "003160.KS"
+            ],
+            "markets": [
+              "KR"
+            ],
+            "themes": [],
+            "match_basis": "normalized_prism_signals"
+          },
+          "simulation_only": false,
+          "preview_available": false,
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false
+        },
+        {
+          "event_key": "stock_ai_agent:15503",
+          "content_sha256": "4d9f0186223bb36c0de7e03334f3f7c0fd209c69f5c4fc184d37597b6715265e",
+          "occurred_at": "2026-10-01T00:51:43+00:00",
+          "relevance": {
+            "tickers": [
+              "036570.KS"
+            ],
+            "markets": [
+              "KR"
+            ],
+            "themes": [],
+            "match_basis": "normalized_prism_signals"
+          },
+          "simulation_only": false,
+          "preview_available": true,
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false
+        },
+        {
+          "event_key": "stock_ai_agent:15502",
+          "content_sha256": "879504b9907293e364ced1fe614fcff80b581ece1b331ba3eaa450cb0f51fcac",
+          "occurred_at": "2026-10-01T00:51:39+00:00",
+          "relevance": {
+            "tickers": [
+              "003160.KS"
+            ],
+            "markets": [
+              "KR"
+            ],
+            "themes": [],
+            "match_basis": "normalized_prism_signals"
+          },
+          "simulation_only": false,
+          "preview_available": true,
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false
+        },
+        {
+          "event_key": "stock_ai_agent:15501",
+          "content_sha256": "bc466b2493a59714c57fd2c05f271345b0298b60ba075937b4a0999c08771d04",
+          "occurred_at": "2026-10-01T00:43:18+00:00",
+          "relevance": {
+            "tickers": [
+              "003160.KS",
+              "036570.KS"
+            ],
+            "markets": [
+              "KR"
+            ],
+            "themes": [],
+            "match_basis": "normalized_prism_signals"
+          },
+          "simulation_only": false,
+          "preview_available": true,
+          "signals_total": 2,
+          "signals_transmitted": 2,
+          "signals_truncated": false
+        },
+        {
+          "event_key": "stock_ai_agent:15500",
+          "content_sha256": "fc70231c1ff3b7e344e7400dc55455270ea05f7591208381c34e95cdc8798cf5",
+          "occurred_at": "2026-10-01T00:06:17+00:00",
+          "relevance": {
+            "tickers": [
+              "252990.KS"
+            ],
+            "markets": [
+              "KR"
+            ],
+            "themes": [],
+            "match_basis": "normalized_prism_signals"
+          },
+          "simulation_only": true,
+          "preview_available": true,
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false
+        },
+        {
+          "event_key": "stock_ai_agent:15499",
+          "content_sha256": "d3da7eb96a857776d06de61dc1661a119378e8ca0bf2bb18a0d987aa2af43960",
+          "occurred_at": "2026-10-01T00:06:13+00:00",
+          "relevance": {
+            "tickers": [
+              "327260.KS"
+            ],
+            "markets": [
+              "KR"
+            ],
+            "themes": [],
+            "match_basis": "normalized_prism_signals"
+          },
+          "simulation_only": false,
+          "preview_available": true,
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false
+        }
+      ],
+      "source_health_scope": "생산자·정제 이벤트 시각에 한함; 시장·계좌·외부 전달은 별도 검증",
+      "source_independence": "13건 모두 동일 stock_ai_agent 채널; 독립 다중 출처 확인 0건",
+      "market_data_status": "UNVERIFIED",
+      "market_data_asof": null,
+      "valid_until": null,
+      "content_limitations": [
+        "PDF preview 2건 공백",
+        "O'Neil 원본 미검증",
+        "디아이·NC 오전 '종가' 표현의 시각 모순",
+        "RF 매도 문구와 UNKNOWN 정규화 충돌",
+        "시뮬레이터를 실제 계좌에 전이할 수 없음"
+      ],
+      "kr_handoff": "RF 손절·정규화 충돌을 위험 검증 1순위로; 디아이·NC 최신 미진입으로 추격 순위 하향; 샘씨엔에스는 가상 상태만 참고",
+      "us_handoff": "직접 US 이벤트 없음; US thesis·순위·크기 변경 근거 없음"
+    },
+    "next_checkpoint": {
+      "at": "2026-10-02T09:06:13+09:00",
+      "trigger": "다음 성공한 정제 생산 결과 또는 현재 창의 가장 오래된 이벤트 만료 중 먼저 도래하는 시점; 예약된 자동 확인을 뜻하지 않음",
+      "current_window_expires_at": "2026-10-02T09:06:13+09:00",
+      "required_evidence": [
+        "RF 매도 원장·정규화 대조",
+        "거래소 새 시세·거래량·관측시각",
+        "DART 공시·기업 IR",
+        "디아이·NC 오전 종가 표기 검증",
+        "시장·계좌·위험 게이트"
+      ]
+    },
+    "mobile_handoff": {
+      "owner": "external_github_notification_pipeline",
+      "status": "PENDING_EXTERNAL_VERIFICATION",
+      "work_sent_notification": false
+    },
+    "external_delivery_verified": false
+  },
+  "report_id": "prism:1d41a07012c7556a6fdd75a6a0a61109",
+  "report_sha256": "1d41a07012c7556a6fdd75a6a0a61109ef2f52e9cf7cbf92e60b8a01bd38eee3",
+  "published_at": "2026-10-01T10:40:54.031781+09:00"
+}

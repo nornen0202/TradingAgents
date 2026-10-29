@@ -1,0 +1,276 @@
+<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>미국 투자 브리핑 — 10월 2일 원연구와 만료된 10월 5일 시세</title><style>body{font:16px/1.65 system-ui;max-width:960px;margin:auto;padding:24px;overflow-wrap:anywhere}pre{white-space:pre-wrap;font:inherit}dt{font-weight:bold}dd{margin:0 0 14px}</style><body><main><h1>미국 투자 브리핑 — 10월 2일 원연구와 만료된 10월 5일 시세</h1><p><a href="../index.html">지난 보고서 목록</a></p><p>원본 작성: 2026-10-06T03:17:41.472652+09:00</p><p>입력 기준: 2026-10-05T10:25:00-04:00</p><p>게시: 2026-10-06T03:17:42.267341+09:00</p><p>과거 기록입니다. 게시 시각은 입력 갱신 시각이 아니며 현재 주문 지시가 아닙니다.</p><pre data-report-markdown># 미국 투자 브리핑
+
+- **원본 연구 거래일:** 2026-10-02~2026-10-02 (미국 거래일)
+- **원결정일 / 일봉 가격 기준일:** 성공한 29종목의 각 `decision_asof`·`price_reference_date`를 종목별 구조화 논지에 별도 보존; SGOV 원분석 실패
+- **시세 관측시각:** 최초 2026-10-05T10:25:00-04:00 / 최종 2026-10-05T13:40:00-04:00 (연구용 관측 30/30, 누락 0; 최초 약 233분 전, 최종 약 38분 전)
+- **계좌 관측시각:** 2026-10-06T02:57:10.253818+09:00 (작성 시 약 21분 전; 현재 실행에는 재확인 필요)
+- **보고서 작성시각:** 2026-10-06T03:17:41.472652+09:00 (KST). 게시로 입력 시각은 갱신되지 않습니다.
+- **세션 / 이벤트 / 데이터 상태:** US:2026-10-05 / us:c2a03a5be863f4ca1a7f31d20be9911c / STALE·OUTAGE. 행별 유효시간이 모두 만료되어 현재 주문은 보류합니다.
+- **생산 결손:** 보유 **SGOV** 공급자 오류 `PROVIDER_ERROR`; 보유 14종목·필수 관심 27종목은 전송됐지만 생산 분석은 29/30 성공입니다.
+- **분석 이력:** 최신 시도 20261005T232730_github-actions-us (PARTIAL_FAILURE, 완료 2026-10-05T18:10:52.259462+00:00); 최신 완료 분석 20261005T232730_github-actions-us (partial_failure, 완료 2026-10-06T03:10:52.170695+09:00). 부분 실패를 전 종목 성공으로 보지 않습니다.
+
+## 지금 볼 것
+
+### SGOV · iShares 0-3 Month Treasury Bond ETF
+원분석 **RESEARCH** / 실행 **실시간 재확인 필요** / 조사 1위 / 신뢰도 0.30. 현재 주문 없음.
+- 할 일: 공급자 오류를 복구하고 보유 위험과 실시간 호가를 재검증.
+- 발동 조건: 생산 분석 성공·정규장 실시간 호가·가격 조건 재확립
+- 무효화: 생산 분석 실패로 무효화 가격 미확정
+- 가격 시각: 2026-10-05T11:35:00-04:00; 해당 연구용 가격과 조건은 만료됐습니다.
+
+### GEV · GE Vernova
+원분석 **BUY** / 실행 **실시간 재확인 필요** / 조사 2위 / 신뢰도 0.58. 현재 주문 없음.
+- 할 일: 원분석 조건부 진입 의도를 보존하고 돌파·위험 한도를 재확인.
+- 발동 조건: 실시간 가격 $1,001.53 돌파 및 종가; 계좌·스프레드·LULD 재검증
+- 무효화: $1,001.53 아래 종가 이탈 시 원분석 재평가
+- 가격 시각: 2026-10-05T10:50:00-04:00; 해당 연구용 가격과 조건은 만료됐습니다.
+
+### GLDM · SPDR Gold MiniShares Trust
+원분석 **HOLD** / 실행 **실시간 재확인 필요** / 조사 3위 / 신뢰도 0.64. 현재 주문 없음.
+- 할 일: 원분석의 위험 축소 신호와 종가 이탈 여부를 재검증.
+- 발동 조건: 실시간 가격 $82.16 돌파 및 거래량 확인; 계좌·스프레드·LULD 재검증
+- 무효화: $81.59 아래 종가 이탈 시 원분석 재평가
+- 가격 시각: 2026-10-05T10:50:00-04:00; 해당 연구용 가격과 조건은 만료됐습니다.
+
+## 커버리지 영수증
+
+**INCOMPLETE** — 계좌 snapshot 로드. 보유 기대 14·생산 결손 **SGOV 1**, 필수 관심 기대 27·누락 0, 분석 29/30 성공. 30개 고유 전략을 모두 전송했으며 목록 전송과 생산 분석 성공은 다릅니다.
+
+## 전체 보유·관심 전략
+
+방향은 원분석 시점의 `thesis.stance`입니다. GEV의 `BUY`는 구 등급 `HOLD`와 별도로 보존한 조건부 진입 의도이며 현재 주문 승인이 아닙니다. 모든 행의 실행은 **실시간 재확인 필요**이고 신규 배분은 0입니다.
+
+| 조사 | 종목·역할 | 원분석 방향 / 신뢰도 | 분석 시점 발동 / 무효화 | 외부 근거 |
+|---:|---|---|---|---|
+| 1 | SGOV 보유 | RESEARCH / 0.30 · 재확인 | 생산 분석 성공·정규장 실시간 호가·가격 조건 재확립 / 생산 분석 실패로 무효화 가격 미확정 | 직접 일치 없음 |
+| 2 | GEV 보유 | BUY / 0.58 · 재확인 | 실시간 가격 $1,001.53 돌파 및 종가; 계좌·스프레드·LULD 재검증 / $1,001.53 아래 종가 이탈 시 원분석 재평가 | 직접 일치 없음 |
+| 3 | GLDM 보유 | HOLD / 0.64 · 재확인 | 실시간 가격 $82.16 돌파 및 거래량 확인; 계좌·스프레드·LULD 재검증 / $81.59 아래 종가 이탈 시 원분석 재평가 | 직접 일치 없음 |
+| 4 | LLY 보유 | HOLD / 0.57 · 재확인 | 실시간 가격 $1,152.66 돌파 및 장중 확인; 계좌·스프레드·LULD 재검증 / $1,136.66 아래 종가 이탈 시 원분석 재평가 | 직접 일치 없음 |
+| 5 | NVDA 보유 | HOLD / 0.59 · 재확인 | 실시간 가격 $236.54 돌파 및 종가; 계좌·스프레드·LULD 재검증 / $233.60 아래 종가 이탈 시 원분석 재평가 | Pk0vZoWct7U, 0ag6lKsq57w, 9zhiFR1o60s, mbd_XtJTs3k |
+| 6 | TSM 보유 | HOLD / 0.57 · 재확인 | 실시간 가격 $485.71 돌파 및 거래량 확인; 계좌·스프레드·LULD 재검증 / $474.79 아래 종가 이탈 시 원분석 재평가 | Pk0vZoWct7U, HIkjEswrB-g |
+| 7 | GOOGL 보유 | HOLD / 0.52 · 재확인 | 실시간 가격 $345.96 돌파 및 거래량 확인; 계좌·스프레드·LULD 재검증 / $341.16 아래 종가 이탈 시 원분석 재평가 | Pk0vZoWct7U, 0ag6lKsq57w |
+| 8 | AMZN 보유 | HOLD / 0.54 · 재확인 | 실시간 가격 $253.56 돌파 및 거래량 확인; 계좌·스프레드·LULD 재검증 / $243.72 아래 종가 이탈 시 원분석 재평가 | Pk0vZoWct7U |
+| 9 | META 관심 | HOLD / 0.56 · 재확인 | 실시간 가격 $746.70 돌파 및 거래량 확인; 계좌·스프레드·LULD 재검증 / $722.86 아래 종가 이탈 시 원분석 재평가 | 0ag6lKsq57w |
+| 10 | TSLA 관심 | HOLD / 0.53 · 재확인 | 실시간 가격 $379.79 돌파 및 거래량 확인; 계좌·스프레드·LULD 재검증 / $364.91 아래 종가 이탈 시 원분석 재평가 | 9zhiFR1o60s |
+| 11 | AVGO 보유 | HOLD / 0.57 · 재확인 | 실시간 가격 $361.56 돌파 및 장중 확인; 계좌·스프레드·LULD 재검증 / $347.42 아래 종가 이탈 시 원분석 재평가 | 직접 일치 없음 |
+| 12 | MPWR 보유 | HOLD / 0.55 · 재확인 | 실시간 가격 $1,455.99 돌파 및 거래량 확인; 계좌·스프레드·LULD 재검증 / $1,393.13 아래 종가 이탈 시 원분석 재평가 | 직접 일치 없음 |
+| 13 | ETN 보유 | HOLD / 0.55 · 재확인 | 실시간 가격 $438.61 돌파 및 거래량 확인; 계좌·스프레드·LULD 재검증 / $421.73 아래 종가 이탈 시 원분석 재평가 | 직접 일치 없음 |
+| 14 | RSP 보유 | HOLD / 0.55 · 재확인 | 실시간 가격 $210.74 돌파 및 거래량 확인; 계좌·스프레드·LULD 재검증 / $207.97 아래 종가 이탈 시 원분석 재평가 | 직접 일치 없음 |
+| 15 | DELL 보유 | HOLD / 0.59 · 재확인 | 실시간 가격 $560.10 돌파 및 거래량 확인; 계좌·스프레드·LULD 재검증 / $546.00 아래 종가 이탈 시 원분석 재평가 | 직접 일치 없음 |
+| 16 | AAPL 보유 | HOLD / 0.55 · 재확인 | 실시간 가격 $334.13 재확인 및 장중 확인; 계좌·스프레드·LULD 재검증 / $330.61 아래 종가 이탈 시 원분석 재평가 | 직접 일치 없음 |
+| 17 | STX 관심 | HOLD / 0.56 · 재확인 | 실시간 가격 $889.41 재확인 및 장중 확인; 계좌·스프레드·LULD 재검증 / $852.29 아래 종가 이탈 시 원분석 재평가 | 직접 일치 없음 |
+| 18 | SCCO 관심 | HOLD / 0.61 · 재확인 | 실시간 가격 $206.99 돌파 및 장중 확인; 계좌·스프레드·LULD 재검증 / $196.78 아래 종가 이탈 시 원분석 재평가 | 직접 일치 없음 |
+| 19 | CAT 관심 | HOLD / 0.61 · 재확인 | 실시간 가격 $858.87 돌파 및 거래량 확인; 계좌·스프레드·LULD 재검증 / $823.45 아래 종가 이탈 시 원분석 재평가 | 직접 일치 없음 |
+| 20 | XOM 관심 | HOLD / 0.57 · 재확인 | 실시간 가격 $164.61 돌파 및 거래량 확인; 계좌·스프레드·LULD 재검증 / $162.33 아래 종가 이탈 시 원분석 재평가 | 직접 일치 없음 |
+| 21 | ABBV 관심 | HOLD / 0.55 · 재확인 | 실시간 가격 $264.06 돌파 및 거래량 확인; 계좌·스프레드·LULD 재검증 / $259.00 아래 종가 이탈 시 원분석 재평가 | 직접 일치 없음 |
+| 22 | SHEL 관심 | HOLD / 0.55 · 재확인 | 실시간 가격 $95.52 재확인 및 장중 확인; 계좌·스프레드·LULD 재검증 / $94.34 아래 종가 이탈 시 원분석 재평가 | 직접 일치 없음 |
+| 23 | PM 관심 | HOLD / 0.54 · 재확인 | 실시간 가격 $188.38 재확인 및 종가; 계좌·스프레드·LULD 재검증 / $184.11 아래 종가 이탈 시 원분석 재평가 | 직접 일치 없음 |
+| 24 | BRK-B 관심 | HOLD / 0.55 · 재확인 | 실시간 가격 $507.38 돌파 및 거래량 확인; 계좌·스프레드·LULD 재검증 / $495.85 아래 종가 이탈 시 원분석 재평가 | 직접 일치 없음 |
+| 25 | CVX 관심 | HOLD / 0.55 · 재확인 | 실시간 가격 $208.25 돌파 및 거래량 확인; 계좌·스프레드·LULD 재검증 / $201.94 아래 종가 이탈 시 원분석 재평가 | 직접 일치 없음 |
+| 26 | MRK 관심 | HOLD / 0.53 · 재확인 | 실시간 가격 $141.70 돌파 및 거래량 확인; 계좌·스프레드·LULD 재검증 / $138.80 아래 종가 이탈 시 원분석 재평가 | 직접 일치 없음 |
+| 27 | NU 관심 | HOLD / 0.50 · 재확인 | 실시간 가격 $15.23 재확인 및 장중 확인; 계좌·스프레드·LULD 재검증 / $14.86 아래 종가 이탈 시 원분석 재평가 | 직접 일치 없음 |
+| 28 | SPYM 관심 | HOLD / 0.59 · 재확인 | 실시간 가격 $91.29 돌파 및 거래량 확인; 계좌·스프레드·LULD 재검증 / $89.71 아래 종가 이탈 시 원분석 재평가 | 직접 일치 없음 |
+| 29 | WBD 관심 | AVOID / 0.70 · 재확인 | 실시간 가격 $30.97 돌파 및 거래량 확인; 계좌·스프레드·LULD 재검증 / $30.42 아래 장중 이탈 시 원분석 재평가 | 직접 일치 없음 |
+| 30 | SMCI 관심 | HOLD / 0.57 · 재확인 | 실시간 가격 $44.51 돌파 및 장중 확인; 계좌·스프레드·LULD 재검증 / $42.28 아래 종가 이탈 시 원분석 재평가 | 직접 일치 없음 |
+
+## 관측 데이터 · 주문 전 재확인
+
+가격은 10월 5일 연구용 관측이며 현재 체결 가능 호가가 아닙니다. feed 지연·스프레드·LULD·뉴스 halt가 확인되지 않아 실행을 막습니다.
+
+| 종목 | 과거 가격 / 시각 | VWAP / RVOL | feed 지연 / 스프레드 | LULD / 뉴스 halt | 행 유효시각 |
+|---|---|---|---|---|---|
+| LLY | $1,142.90 / 2026-10-05T11:10:00-04:00 | 1,152.66 / 0.55 | 116.0초 / 미제공 | 미확인 / 미확인 | 2026-10-05T11:40:00-04:00 |
+| TSM | $485.48 / 2026-10-05T11:40:00-04:00 | 480.88 / 0.77 | 240.0초 / 미제공 | 미확인 / 미확인 | 2026-10-05T12:10:00-04:00 |
+| GLDM | $81.92 / 2026-10-05T10:50:00-04:00 | 81.95 / 0.31 | 112.0초 / 미제공 | 미확인 / 미확인 | 2026-10-05T11:20:00-04:00 |
+| AVGO | $360.92 / 2026-10-05T10:25:00-04:00 | 358.07 / 0.75 | 189.0초 / 미제공 | 미확인 / 미확인 | 2026-10-05T10:55:00-04:00 |
+| AMZN | $251.38 / 2026-10-05T10:25:00-04:00 | 252.92 / 0.96 | 193.0초 / 미제공 | 미확인 / 미확인 | 2026-10-05T10:55:00-04:00 |
+| GEV | $983.53 / 2026-10-05T10:50:00-04:00 | 982.27 / 0.45 | 5.0초 / 미제공 | 미확인 / 미확인 | 2026-10-05T11:20:00-04:00 |
+| MPWR | $1,441.29 / 2026-10-05T11:15:00-04:00 | 1,450.27 / 0.51 | 3.0초 / 미제공 | 미확인 / 미확인 | 2026-10-05T11:45:00-04:00 |
+| ETN | $437.54 / 2026-10-05T10:45:00-04:00 | 435.22 / 0.43 | 160.0초 / 미제공 | 미확인 / 미확인 | 2026-10-05T11:15:00-04:00 |
+| RSP | $210.41 / 2026-10-05T11:35:00-04:00 | 209.85 / 0.52 | 32.0초 / 미제공 | 미확인 / 미확인 | 2026-10-05T12:05:00-04:00 |
+| SGOV | $100.44 / 2026-10-05T11:35:00-04:00 | 100.45 / 1.04 | 271.0초 / 미제공 | 미확인 / 미확인 | 2026-10-05T12:05:00-04:00 |
+| DELL | $556.27 / 2026-10-05T10:25:00-04:00 | 555.20 / 0.48 | 193.0초 / 미제공 | 미확인 / 미확인 | 2026-10-05T10:55:00-04:00 |
+| NVDA | $236.68 / 2026-10-05T11:30:00-04:00 | 236.87 / 0.75 | 235.0초 / 미제공 | 미확인 / 미확인 | 2026-10-05T12:00:00-04:00 |
+| AAPL | $333.45 / 2026-10-05T10:25:00-04:00 | 334.13 / 0.65 | 195.0초 / 미제공 | 미확인 / 미확인 | 2026-10-05T10:55:00-04:00 |
+| GOOGL | $344.90 / 2026-10-05T11:10:00-04:00 | 344.29 / 0.54 | 64.0초 / 미제공 | 미확인 / 미확인 | 2026-10-05T11:40:00-04:00 |
+| STX | $889.34 / 2026-10-05T12:15:00-04:00 | 889.41 / 1.24 | 125.0초 / 미제공 | 미확인 / 미확인 | 2026-10-05T12:45:00-04:00 |
+| SCCO | $206.72 / 2026-10-05T12:50:00-04:00 | 205.72 / 0.29 | 180.0초 / 미제공 | 미확인 / 미확인 | 2026-10-05T13:20:00-04:00 |
+| CAT | $852.76 / 2026-10-05T13:00:00-04:00 | 841.78 / 0.48 | 151.0초 / 미제공 | 미확인 / 미확인 | 2026-10-05T13:30:00-04:00 |
+| XOM | $164.20 / 2026-10-05T12:15:00-04:00 | 163.28 / 0.32 | 223.0초 / 미제공 | 미확인 / 미확인 | 2026-10-05T12:45:00-04:00 |
+| ABBV | $263.48 / 2026-10-05T12:40:00-04:00 | 262.30 / 0.36 | 39.0초 / 미제공 | 미확인 / 미확인 | 2026-10-05T13:10:00-04:00 |
+| SHEL | $96.63 / 2026-10-05T12:50:00-04:00 | 95.86 / 0.52 | 157.0초 / 미제공 | 미확인 / 미확인 | 2026-10-05T13:20:00-04:00 |
+| PM | $189.91 / 2026-10-05T13:20:00-04:00 | 188.77 / 0.55 | 111.0초 / 미제공 | 미확인 / 미확인 | 2026-10-05T13:50:00-04:00 |
+| BRK-B | $505.42 / 2026-10-05T13:15:00-04:00 | 503.60 / 0.44 | 138.0초 / 미제공 | 미확인 / 미확인 | 2026-10-05T13:45:00-04:00 |
+| CVX | $206.75 / 2026-10-05T12:20:00-04:00 | 204.83 / 0.33 | 67.0초 / 미제공 | 미확인 / 미확인 | 2026-10-05T12:50:00-04:00 |
+| MRK | $140.39 / 2026-10-05T13:40:00-04:00 | 140.75 / 0.48 | 61.0초 / 미제공 | 미확인 / 미확인 | 2026-10-05T14:10:00-04:00 |
+| NU | $15.17 / 2026-10-05T11:50:00-04:00 | 15.23 / 1.84 | 273.0초 / 미제공 | 미확인 / 미확인 | 2026-10-05T12:20:00-04:00 |
+| SPYM | $91.00 / 2026-10-05T12:20:00-04:00 | 90.87 / 0.30 | 156.0초 / 미제공 | 미확인 / 미확인 | 2026-10-05T12:50:00-04:00 |
+| TSLA | $379.60 / 2026-10-05T13:20:00-04:00 | 375.21 / 0.80 | 254.0초 / 미제공 | 미확인 / 미확인 | 2026-10-05T13:50:00-04:00 |
+| WBD | $30.97 / 2026-10-05T12:35:00-04:00 | 30.95 / 0.55 | 214.0초 / 미제공 | 미확인 / 미확인 | 2026-10-05T13:05:00-04:00 |
+| SMCI | $43.58 / 2026-10-05T11:55:00-04:00 | 43.51 / 0.53 | 137.0초 / 미제공 | 미확인 / 미확인 | 2026-10-05T12:25:00-04:00 |
+| META | $743.51 / 2026-10-05T13:15:00-04:00 | 739.90 / 0.41 | 79.0초 / 미제공 | 미확인 / 미확인 | 2026-10-05T13:45:00-04:00 |
+
+## 근거·반대 근거와 다음 확인
+
+- 원분석의 GEV BUY·조건부 소규모 진입 의도와 GLDM 위험 검토를 구 등급과 분리해 보존했습니다. 시세 만료는 방향 변경의 근거가 아닙니다.
+- YouTube는 최근 창 32건 중 12건 전송, 5건이 AMZN·GOOGL·NVDA·TSM·META·TSLA와 직접 일치합니다. 이 6종목 조사 순위를 앞당겼습니다. 주장은 대체로 미검증 또는 음성 인식 불확실이므로 신뢰도와 배분 한도는 올리지 않았습니다.
+- PRISM은 8건 모두 전송됐지만 정규화된 US 티커 직접 일치가 없습니다. 종목 방향이나 실행 상태에 반영하지 않았습니다.
+- 생산 분석 성공과 공식 공시·거시·감성 근거 충족은 별개입니다. 각 종목의 원 `source_coverage`와 가격 기준일을 구조화 논지에 보존했습니다.
+- 다음 확인: SGOV 생산 분석 공급자 오류를 복구하고 미국 정규장 실시간 호가·거래량·VWAP·스프레드·LULD/뉴스 halt, 30분 이내 계좌 관측과 원분석의 가격·위험 한도를 다시 확인한다.
+
+COVERAGE_RECEIPT {&quot;event_id&quot;:&quot;us:c2a03a5be863f4ca1a7f31d20be9911c&quot;,&quot;status&quot;:&quot;INCOMPLETE&quot;,&quot;holdings&quot;:{&quot;expected&quot;:14,&quot;missing_count&quot;:1,&quot;missing&quot;:[&quot;SGOV&quot;]},&quot;watchlist&quot;:{&quot;expected&quot;:27,&quot;missing_count&quot;:0,&quot;missing&quot;:[],&quot;all_rendered&quot;:true},&quot;analysis&quot;:{&quot;total&quot;:30,&quot;successful&quot;:29,&quot;failed&quot;:1,&quot;failed_tickers&quot;:[&quot;SGOV&quot;]},&quot;response_scanner_limit&quot;:10}
+MOBILE_HANDOFF {&quot;owner&quot;:&quot;external_github_notification_pipeline&quot;,&quot;status&quot;:&quot;PENDING_EXTERNAL_VERIFICATION&quot;,&quot;work_sent_notification&quot;:false}</pre></main><style>
+.reader-contents { margin: 16px 0; padding: 12px 16px; border: 1px solid var(--line, #64748b); border-radius: 12px; }
+.reader-contents > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-weight: 750; }
+.reader-contents nav { display: grid; gap: 4px; max-height: 45vh; overflow: auto; margin: 8px 0; }
+.reader-contents a { display: block; min-height: 44px; padding: 10px; border-radius: 6px; color: inherit; overflow-wrap: anywhere; }
+.reader-contents a:hover { background: #80808020; }
+.reader-contents .reader-subsection { padding-inline-start: 24px; font-size: .92em; }
+.reader-prose, .report { overflow-wrap: anywhere; line-height: 1.8; }
+.reader-prose p, .reader-prose li { max-width: 85ch; }
+.reader-prose h2, .reader-prose h3, .reader-prose h4, [data-reader-heading] { scroll-margin-top: 100px; line-height: 1.45; }
+.reader-prose h2 { margin-top: 1.8em; padding-bottom: 8px; border-bottom: 1px solid var(--line, #64748b); }
+.reader-prose h3 { margin-top: 1.5em; }
+.reader-prose li { margin: .5em 0; }
+.reader-prose pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.reader-prose blockquote { margin: 16px 0; padding: 4px 16px; border-left: 3px solid var(--accent, #64748b); }
+.reader-table { overflow: auto; max-width: 100%; margin: 16px 0; border: 1px solid var(--line, #64748b); border-radius: 10px; }
+.reader-table table { border-collapse: collapse; width: 100%; margin: 0; font-size: .92rem; }
+.reader-table th, .reader-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line, #64748b); min-width: 110px; max-width: 400px; overflow-wrap: anywhere; white-space: normal; }
+.reader-table th { background: #80808018; }
+.reader-table tr:nth-child(even) { background: #80808008; }
+.reader-search { display: grid; gap: 8px; margin: 16px 0; }
+.reader-search label { font-weight: 700; }
+.reader-search input { box-sizing: border-box; width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line, #64748b); border-radius: 10px; background: var(--panel, #fff); color: var(--text, #132238); font: inherit; }
+.reader-search p { margin: 0; font-size: .86rem; }
+.reader-back { position: fixed; bottom: max(14px, env(safe-area-inset-bottom)); right: 14px; z-index: 30; min-height: 44px; border: 1px solid #778899; border-radius: 99px; padding: 10px 16px; background: #18344a; color: #fff; font: 700 14px system-ui; cursor: pointer; box-shadow: 0 3px 12px #0003; }
+[data-reader-source] { margin-top: 20px; }
+[data-reader-source] > summary { min-height: 44px; cursor: pointer; }
+[data-reader-source] pre { font-size: .85rem; }
+[data-reader-source] pre, .reader-prose { min-width: 0; }
+.reader-contents :focus-visible, .reader-search :focus-visible, .reader-back:focus-visible, .reader-table:focus-visible { outline: 3px solid var(--accent, #008c95); outline-offset: 3px; }
+.reader-search + .grid > [hidden] { display: none !important; }
+@media (max-width: 600px) { .reader-prose { font-size: 1rem; } .reader-contents { padding: 8px 12px; } }
+@media print { .reader-back, .reader-search, .reader-contents, [data-reader-source] { display: none !important; } .reader-table { overflow: visible; } .reader-prose { color: #000; background: #fff; } }
+</style><script>
+(() => {
+  'use strict';
+  let serial = 0;
+  const rendered = new WeakMap();
+  const node = (tag, text) => { const el = document.createElement(tag); if (text != null) el.textContent = text; return el; };
+  function inline(parent, text) {
+    const pattern = /(`[^`]+`|\*\*[^*]+\*\*|\[[^\]]+\]\(https?:\/\/[^\s)]+\))/g;
+    let start = 0;
+    for (const match of String(text).matchAll(pattern)) {
+      parent.append(document.createTextNode(text.slice(start, match.index)));
+      const value = match[0];
+      if (value.startsWith('`')) parent.append(node('code', value.slice(1, -1)));
+      else if (value.startsWith('**')) parent.append(node('strong', value.slice(2, -2)));
+      else {
+        const link = value.match(/^\[([^\]]+)\]\((.+)\)$/);
+        const a = node('a', link[1]); a.href = link[2]; a.rel = 'noopener noreferrer'; parent.append(a);
+      }
+      start = match.index + value.length;
+    }
+    parent.append(document.createTextNode(text.slice(start)));
+  }
+  const cells = line => line.trim().replace(/^\|/, '').replace(/\|$/, '').split(/(?<!\\)\|/).map(v => v.trim().replace(/\\\|/g, '|'));
+  function markdown(source) {
+    const article = node('article'); article.className = 'reader-prose';
+    const lines = source.split(/\r?\n/); let list = null;
+    for (let i = 0; i < lines.length; i += 1) {
+      const line = lines[i], value = line.trim();
+      if (!value) { list = null; continue; }
+      if (/^```/.test(value)) {
+        const code = []; i += 1;
+        while (i < lines.length && !/^```/.test(lines[i].trim())) code.push(lines[i++]);
+        const pre = node('pre'); pre.append(node('code', code.join('\n'))); article.append(pre); list = null; continue;
+      }
+      if (i + 1 < lines.length && value.includes('|') && cells(lines[i + 1]).every(v => /^:?-{3,}:?$/.test(v))) {
+        const table = node('table'), head = node('thead'), body = node('tbody');
+        const row = (values, tag) => { const tr = node('tr'); values.forEach(v => { const cell = node(tag); if (tag === 'th') cell.scope = 'col'; inline(cell, v); tr.append(cell); }); return tr; };
+        head.append(row(cells(line), 'th')); i += 2;
+        while (i < lines.length && lines[i].trim() && lines[i].includes('|')) body.append(row(cells(lines[i++]), 'td'));
+        i -= 1; table.append(head, body); article.append(table); list = null; continue;
+      }
+      const heading = value.match(/^(#{1,6})\s+(.+)$/);
+      if (heading) { const h = node('h' + Math.min(4, heading[1].length + 1)); inline(h, heading[2]); article.append(h); list = null; continue; }
+      const bullet = value.match(/^(?:[-*+] |\d+\. )(.+)$/);
+      if (bullet) {
+        const tag = /^\d/.test(value) ? 'ol' : 'ul';
+        if (!list || list.tagName.toLowerCase() !== tag) { list = node(tag); if (tag === 'ol') list.start = parseInt(value, 10); article.append(list); }
+        const li = node('li'); inline(li, bullet[1]); list.append(li); continue;
+      }
+      list = null;
+      if (/^(---+|\*\*\*+)$/.test(value)) { article.append(node('hr')); continue; }
+      const p = node(value.startsWith('> ') ? 'blockquote' : 'p'); inline(p, value.startsWith('> ') ? value.slice(2) : line); article.append(p);
+    }
+    return article;
+  }
+  function contents(root) {
+    root.querySelectorAll(':scope > .reader-contents').forEach(el => el.remove());
+    const headings = [...root.querySelectorAll('h2,h3,h4')].filter(h => !h.closest('.card,.run-card,.reader-contents,[data-reader-source],[hidden]'));
+    if (headings.length < 2) return;
+    const details = node('details'); details.className = 'reader-contents';
+    details.append(node('summary', '이 리포트 목차 · ' + headings.length + '개 항목'));
+    const nav = node('nav'); nav.setAttribute('aria-label', '리포트 목차');
+    headings.forEach(h => {
+      if (!h.id) h.id = 'reader-section-' + (++serial);
+      h.dataset.readerHeading = ''; h.tabIndex = -1;
+      const a = node('a', h.textContent); a.href = '#' + h.id;
+      if (h.tagName !== 'H2') a.className = 'reader-subsection';
+      a.addEventListener('click', event => {
+        event.preventDefault();
+        for (let ancestor = h.parentElement; ancestor; ancestor = ancestor.parentElement) if (ancestor.tagName === 'DETAILS') ancestor.open = true;
+        h.scrollIntoView({block: 'start'}); h.focus({preventScroll: true});
+      }); nav.append(a);
+    });
+    details.append(nav); root.prepend(details);
+  }
+  function enhance(root) {
+    if (!root) return;
+    root.querySelectorAll('pre[data-report-markdown]').forEach(pre => {
+      const previous = rendered.get(pre);
+      if (previous && previous.source === pre.textContent) return;
+      const article = markdown(pre.textContent);
+      if (previous) previous.article.replaceWith(article);
+      else {
+        const details = node('details'); details.dataset.readerSource = '';
+        details.append(node('summary', 'Markdown 원문 보기'));
+        pre.before(article, details); details.append(pre);
+      }
+      rendered.set(pre, {source: pre.textContent, article});
+    });
+    root.querySelectorAll('table').forEach(table => {
+      if (table.closest('.reader-table,.account-table-wrap,.summary-scroll')) return;
+      const wrap = node('div'); wrap.className = 'reader-table'; wrap.tabIndex = 0;
+      wrap.setAttribute('role', 'region'); wrap.setAttribute('aria-label', '리포트 표 · 가로로 스크롤하여 전체 보기');
+      table.before(wrap); wrap.append(table);
+    });
+    root.querySelectorAll('.grid').forEach(grid => {
+      const cards = [...grid.querySelectorAll(':scope > a.card')];
+      if (cards.length < 2 || grid.dataset.readerSearch) return;
+      grid.dataset.readerSearch = 'true';
+      const box = node('div'); box.className = 'reader-search';
+      const input = node('input'); input.type = 'search'; input.placeholder = '제목 · 종목 · 채널 · 키워드'; input.id = 'report-search-' + (++serial);
+      const label = node('label', '리포트 찾기'); label.htmlFor = input.id;
+      const status = node('p'); status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
+      const update = () => {
+        const terms = input.value.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean); let count = 0;
+        cards.forEach(card => { card.hidden = !terms.every(t => card.textContent.toLocaleLowerCase().includes(t)); if (!card.hidden) count += 1; });
+        status.textContent = cards.length + '개 중 ' + count + '개 표시' + (count ? '' : ' · 검색어를 지우거나 다른 키워드를 입력하세요.');
+      };
+      input.addEventListener('input', update); box.append(label, input, status); grid.before(box); update();
+    });
+    contents(root);
+  }
+  window.TradingAgentsReader = {enhance};
+  const main = document.querySelector('main');
+  if (main && !main.hasAttribute('data-reader-dynamic')) enhance(main);
+  if (main) {
+    const top = node('button', '↑ 맨 위'); top.type = 'button'; top.className = 'reader-back'; top.setAttribute('aria-label', '리포트 맨 위로 이동');
+    top.addEventListener('click', () => { const target = document.querySelector('h1') || main; target.tabIndex = -1; target.scrollIntoView({block: 'start'}); target.focus({preventScroll: true}); });
+    document.body.append(top);
+  }
+})();
+</script></body></html>

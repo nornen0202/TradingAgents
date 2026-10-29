@@ -1,0 +1,403 @@
+{
+  "schema": "tradingagents.work-report/v1",
+  "surface": "prism",
+  "event_id": "prism:51cec6316220b508aaabc5bd6d0d9b8b",
+  "source_sha256": "da41b875015c85cc8bce5ee918fe9997cb2dcc2c597504c8f75c0af7e4e97d80",
+  "prompt_contract_version": "prism-work-v5",
+  "workflow_contract_sha256": "affa33ed518a96ac60bff25950a3fe646a7ff652ceb8d1ab5a9f50dde0362c75",
+  "policy": {
+    "visibility": "investor_safe_no_credentials",
+    "external_evidence_profile": "balanced_external",
+    "external_evidence_may_affect": [
+      "ranking",
+      "confidence",
+      "position_size_within_existing_risk_limits",
+      "research_priority"
+    ],
+    "external_evidence_may_bypass_execution_gate": false,
+    "thesis_is_independent_from_execution_readiness": true
+  },
+  "report_markdown": "# PRISM 연구 델타 · 2026-10-09\n\n**소스 정상 · 연구 전용 · 확인 2026-10-09 09:38 KST**  \n정제 생산 08:54 KST; 최신 사건 04:10 KST. 신규 17건, 수정 0건.\n\n## 한 화면 요약\n\n1. **GFS, TEVA, MANE 모두 관심 뒤 미진입.** 후속 보류 판단을 우선 기록하고 US 연구 검증 순서를 GFS → TEVA → MANE로 조정합니다. 매수 순위가 아닙니다.\n2. **GFS:** 손익비·섹터 집중 사유, TEVA: 영업흑자·부채 기준, MANE: 수익성·성장성 및 임상 위험을 공식 자료로 확인합니다.\n3. **신뢰도·비중 상향 없음.** 관심 점수와 같은 채널의 반복은 독립 확인이 아닙니다. `balanced_external` 가중치는 미검증 `LOW_LABELED`; 신규 실행 배분 0%입니다.\n4. **가상 운용·BTC 데모 분리.** US 가상 보유 5종목과 BTC 데모 종료·보호 변경은 실제 주식 계좌의 주문 신호가 아닙니다.\n\n## 범위와 신선도\n\n최근 24시간 창 33/33건 전송, 생략 0건, 잘림 없음. 이번 변경은 신규 17건·수정 0건이며 기존과 동일한 16건은 다시 분석하지 않았습니다. COMPLETE는 정제 패킷의 전송 범위만 나타냅니다. 생산 성공 시각, 사건 시각, 창 양끝의 순서는 현재 시각 기준 정상이며 생산 신선도는 허용 30시간 안입니다. 주장·장중 가격·차트 내용은 독립 검증 전입니다.\n\n## 실제 주식: 연구 검증 순서\n\n| 순서 | 종목 | 새 델타와 필요한 확인 | 사건 키 |\n|---:|---|---|---|\n| 1 | GFS | 관심 뒤 손익비·섹터 집중으로 미진입. 공급계약 주장, 종가·저항선, 집중 한도 확인 | 15866·15867·15870·15873·15875 |\n| 2 | TEVA | 높은 관심 점수 뒤 영업흑자·부채 기준 미달로 미진입. 공식 재무제표 확인 | 15866·15869·15872·15874·15877 |\n| 3 | MANE | 임상 단계·제품 매출 부재 주장 뒤 수익성·성장성 미달로 미진입. 임상·자금조달 확인 | 15866·15868·15871·15876 |\n\n모든 사건 키의 접두사는 `stock_ai_agent:`입니다. 관심과 미진입은 한 생산자의 연속 메시지이므로 다중 출처 합의로 취급하지 않습니다. GFS·TEVA의 차트 안내 2건은 피벗·RS 원본 값이 없고, GFS·TEVA·MANE PDF 3건은 본문이 없어 투자 논거·가격에서 제외합니다. PDF에서 부수적으로 추출된 HIMS·BHC·TSEM·SKYT도 별도 후보로 승격하지 않습니다. 장중 가격은 확정 종가가 아닙니다.\n\n## 시뮬레이션·기타 자료\n\n- `stock_ai_agent:15878`: FRO·SPCX·NVDA·FRSH·BKH의 US 가상 포트폴리오 스냅샷. 실제 보유·목표가·손절가로 전이하지 않습니다.\n- `stock_ai_agent:15862`–`15865`: BTC 데모 보호 변경과 종료. 암호자산 가상 결과로 분리하며 주식 실행 또는 성과 근거로 쓰지 않습니다.\n\n## KR·US 후속 브리핑\n\nUS는 공식 거래소 시세, SEC/기업 IR의 GFS 계약·TEVA 재무·MANE 임상 및 자금조달을 확인한 후 thesis 순위·confidence·위험 한도 내 크기를 재평가합니다. KR 종목에는 이번 신규 사건의 직접 매핑이 없어 순위나 비중을 변경하지 않습니다. 현재 시장·계좌·위험 실행 게이트는 그대로 적용합니다.\n\n**다음 확인:** 다음 성공한 정제 생산 결과 또는 2026-10-09 09:44:16 KST의 첫 24시간 창 만료 전. 이후에는 새 packet으로 범위와 신선도를 다시 검증해야 합니다.\n\nCOVERAGE_RECEIPT {\"event_id\":\"prism:51cec6316220b508aaabc5bd6d0d9b8b\",\"status\":\"COMPLETE\",\"window_events\":33,\"transmitted_events\":33,\"truncated\":false,\"new_events\":17,\"revised_events\":0}\nMOBILE_HANDOFF {\"owner\":\"external_github_notification_pipeline\",\"status\":\"PENDING_EXTERNAL_VERIFICATION\",\"work_sent_notification\":false}",
+  "structured_report": {
+    "binding": {
+      "surface": "prism",
+      "event_id": "prism:51cec6316220b508aaabc5bd6d0d9b8b",
+      "source_sha256": "da41b875015c85cc8bce5ee918fe9997cb2dcc2c597504c8f75c0af7e4e97d80"
+    },
+    "title": "PRISM 연구 델타 · 2026-10-09",
+    "generated_at": "2026-10-09T09:38:30.289142+09:00",
+    "as_of": "2026-10-09T09:38:30.289142+09:00",
+    "source_health": "OK",
+    "report_mode": "RESEARCH_ONLY",
+    "summary": "신규 17건·수정 0건. GFS·TEVA·MANE 관심 뒤 미진입 충돌을 반영해 US 연구 검증 순서만 조정. 신뢰도·비중 상향이나 실행 지시 없음.",
+    "top_actions": [],
+    "strategies": [
+      {
+        "ticker": "GFS",
+        "name": "GlobalFoundries",
+        "market": "US",
+        "research_rank": 1,
+        "research_impact": "관심 신호 뒤 손익비·섹터 집중 사유로 미진입. TSMC 공급계약 주장, 확정 종가·저항선·섹터 한도를 우선 대조.",
+        "thesis_effect": "충돌 신호 확인을 US 연구 검증 1순위로 올림. 단일 채널 점수로 thesis 신뢰도를 높이지 않음.",
+        "sizing_effect": "기존 위험 한도 내 신규 실행 배분 0%; 공식 근거와 시장·계좌·위험 게이트 검증 전 크기 변경 없음",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action_now": false,
+          "required_rechecks": [
+            "공식 거래소 종가·관측시각",
+            "SEC 공시·기업 IR와 재무 또는 임상 원문",
+            "실제 계좌·시장·위험 한도"
+          ],
+          "blockers": [
+            "단일 채널의 미검증 연구 전용 자료",
+            "패킷 실행 적격성 false",
+            "후속 미진입 판단"
+          ]
+        },
+        "source_contributions": [
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15875",
+            "content_sha256": "8693626ef293b80a4ec24dd6c2fd94a462b0824dcbf9e6810d938309479e9dd8",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "후속 미진입 판단을 관심 신호보다 우선 확인한다. 단일 채널의 검증 전 주장이다.",
+            "execution_gate_override": false
+          },
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15873",
+            "content_sha256": "56d47aeb743b82f2deda4e0a7a75319719d06595ed55647b911812c5ac38a11b",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "차트 안내에 피벗·RS 원본 값이 없어 기술적 확인 대상으로만 둔다.",
+            "execution_gate_override": false
+          },
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15870",
+            "content_sha256": "757095f8d5dc28dca85891c1bb14e2a88d4d174d6e38a7e7a9f6d2633025e25c",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "PDF 본문이 packet에 없으므로 가격·논거로 쓰지 않고 원문 검증 대상으로만 둔다.",
+            "execution_gate_override": false
+          },
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15867",
+            "content_sha256": "6f9ff439135523b18c9d8efdad36e6d71763044fa84466ad955611242205cb40",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "장중 가격과 기업 주장을 공식 시세·공시로 확인해야 한다.",
+            "execution_gate_override": false
+          },
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15866",
+            "content_sha256": "a07151361d2fb2524670efbe9685d02ec93d295b49eda8789ccb18ebbc4eb6e2",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "가상 운용 관심 신호이며 점수는 독립 검증 신뢰도가 아니다.",
+            "execution_gate_override": false
+          }
+        ]
+      },
+      {
+        "ticker": "TEVA",
+        "name": "Teva",
+        "market": "US",
+        "research_rank": 2,
+        "research_impact": "높은 관심 점수 뒤 연속 영업흑자·부채 기준 미달로 미진입. 공식 재무제표와 차트 원본 확인.",
+        "thesis_effect": "펀더멘털 결격 가능성 확인을 US 연구 검증 2순위로 올림. thesis 신뢰도 상향 보류.",
+        "sizing_effect": "기존 위험 한도 내 신규 실행 배분 0%; 공식 근거와 시장·계좌·위험 게이트 검증 전 크기 변경 없음",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action_now": false,
+          "required_rechecks": [
+            "공식 거래소 종가·관측시각",
+            "SEC 공시·기업 IR와 재무 또는 임상 원문",
+            "실제 계좌·시장·위험 한도"
+          ],
+          "blockers": [
+            "단일 채널의 미검증 연구 전용 자료",
+            "패킷 실행 적격성 false",
+            "후속 미진입 판단"
+          ]
+        },
+        "source_contributions": [
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15877",
+            "content_sha256": "92afb29cd1fbf4a64a4541ccb4cd15a5376931fee1e7ac6ae56c4b936ecdfbf3",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "후속 미진입 판단을 관심 신호보다 우선 확인한다. 단일 채널의 검증 전 주장이다.",
+            "execution_gate_override": false
+          },
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15874",
+            "content_sha256": "96887f6c2397d84dfa386be90040b9c247f79a1c2f7dbae607df47f13f3f4cdf",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "차트 안내에 피벗·RS 원본 값이 없어 기술적 확인 대상으로만 둔다.",
+            "execution_gate_override": false
+          },
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15872",
+            "content_sha256": "cfa38e394fb439d7f7530ab0e986917b9feb500972674a6a1b5bac35401203fc",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "PDF 본문이 packet에 없으므로 가격·논거로 쓰지 않고 원문 검증 대상으로만 둔다.",
+            "execution_gate_override": false
+          },
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15869",
+            "content_sha256": "6260c243af8293b588fda1b70ef6f63c775ed4dd51f77d0c6955686c34e9271e",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "장중 가격과 기업 주장을 공식 시세·공시로 확인해야 한다.",
+            "execution_gate_override": false
+          },
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15866",
+            "content_sha256": "a07151361d2fb2524670efbe9685d02ec93d295b49eda8789ccb18ebbc4eb6e2",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "가상 운용 관심 신호이며 점수는 독립 검증 신뢰도가 아니다.",
+            "execution_gate_override": false
+          }
+        ]
+      },
+      {
+        "ticker": "MANE",
+        "name": "Veradermics",
+        "market": "US",
+        "research_rank": 3,
+        "research_impact": "임상 단계·제품 매출 부재 주장과 수익성·성장성 미달의 미진입. 임상 공시·현금 소진·자금조달 확인.",
+        "thesis_effect": "임상·자금조달 위험 확인을 US 연구 검증 3순위로 둠. 관심 점수로 투자 thesis를 강화하지 않음.",
+        "sizing_effect": "기존 위험 한도 내 신규 실행 배분 0%; 공식 근거와 시장·계좌·위험 게이트 검증 전 크기 변경 없음",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action_now": false,
+          "required_rechecks": [
+            "공식 거래소 종가·관측시각",
+            "SEC 공시·기업 IR와 재무 또는 임상 원문",
+            "실제 계좌·시장·위험 한도"
+          ],
+          "blockers": [
+            "단일 채널의 미검증 연구 전용 자료",
+            "패킷 실행 적격성 false",
+            "후속 미진입 판단"
+          ]
+        },
+        "source_contributions": [
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15876",
+            "content_sha256": "c71ae69f867edb55634c331359b308ac6b7294433dcc3508faa2de34baf33d86",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "후속 미진입 판단을 관심 신호보다 우선 확인한다. 단일 채널의 검증 전 주장이다.",
+            "execution_gate_override": false
+          },
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15871",
+            "content_sha256": "9c55ad194d3a81f429add79479a4fbd4cc9d449d90b371bee14ffe896bd4eff6",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "PDF 본문이 packet에 없으므로 가격·논거로 쓰지 않고 원문 검증 대상으로만 둔다.",
+            "execution_gate_override": false
+          },
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15868",
+            "content_sha256": "f07c45edab09b6006ab55f8917c1ed2d7746d93f0ed444bcc6a7f35f4610daa1",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "장중 가격과 기업 주장을 공식 시세·공시로 확인해야 한다.",
+            "execution_gate_override": false
+          },
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15866",
+            "content_sha256": "a07151361d2fb2524670efbe9685d02ec93d295b49eda8789ccb18ebbc4eb6e2",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "가상 운용 관심 신호이며 점수는 독립 검증 신뢰도가 아니다.",
+            "execution_gate_override": false
+          }
+        ]
+      }
+    ],
+    "coverage_receipt": {
+      "event_id": "prism:51cec6316220b508aaabc5bd6d0d9b8b",
+      "status": "COMPLETE",
+      "window_events": 33,
+      "transmitted_events": 33,
+      "truncated": false,
+      "new_events": 17,
+      "revised_events": 0
+    },
+    "model_receipt": {
+      "schema": "tradingagents.model-provenance/v1",
+      "work_synthesis": {
+        "execution_mode": "local",
+        "requested_model": "gpt-6.1-sol",
+        "requested_reasoning_effort": "xhigh",
+        "task_id": "tradingagents-work-prism",
+        "verification_status": "CONFIGURED_NOT_RUNTIME_VERIFIED",
+        "observed_model": null,
+        "observed_reasoning_effort": null,
+        "note": "The local task contract is verified; the Work host does not expose a signed per-response model receipt."
+      }
+    },
+    "source_summary": {
+      "producer": {
+        "health": "OK",
+        "run_id": "prism_telegram_20261009_085436",
+        "last_run_at": "2026-10-09T08:54:48.808200+09:00",
+        "status": "success",
+        "stale_after_hours": 30
+      },
+      "coverage": {
+        "total_unique_events": 148,
+        "window_events": 33,
+        "transmitted_events": 33,
+        "truncated": false,
+        "oldest_occurred_at": "2026-10-08T00:44:16+00:00",
+        "newest_occurred_at": "2026-10-08T19:10:55+00:00"
+      },
+      "delta": {
+        "new_events": 17,
+        "revised_events": 0,
+        "unchanged_events": 16,
+        "delivered_event_keys": [
+          "stock_ai_agent:15878",
+          "stock_ai_agent:15877",
+          "stock_ai_agent:15876",
+          "stock_ai_agent:15875",
+          "stock_ai_agent:15874",
+          "stock_ai_agent:15873",
+          "stock_ai_agent:15872",
+          "stock_ai_agent:15871",
+          "stock_ai_agent:15870",
+          "stock_ai_agent:15869",
+          "stock_ai_agent:15868",
+          "stock_ai_agent:15867",
+          "stock_ai_agent:15866",
+          "stock_ai_agent:15865",
+          "stock_ai_agent:15864",
+          "stock_ai_agent:15863",
+          "stock_ai_agent:15862"
+        ]
+      },
+      "guardrails": {
+        "untrusted_content": true,
+        "advisory_only": true,
+        "may_promote_market_execution": false,
+        "multi_ticker_message_prices_require_recheck": true
+      },
+      "evidence_policy": {
+        "profile": "balanced_external",
+        "material_thesis_effects": [
+          "ranking",
+          "confidence",
+          "position_size_within_existing_risk_limits",
+          "research_priority"
+        ],
+        "supported_evidence_weight": "MEDIUM",
+        "partially_supported_evidence_weight": "LOW_TO_MEDIUM",
+        "unverified_evidence_weight": "LOW_LABELED",
+        "user_primary_channels": [
+          "@kpunch",
+          "@sosumonkey"
+        ],
+        "user_primary_source_tier": "USER_PRIMARY",
+        "user_primary_evidence_weight": "HIGH",
+        "user_primary_validation_policy": "USER_ACCEPTED",
+        "matching_multi_source_signal_may_raise_thesis_priority": true,
+        "conflicting_signal_must_be_visible": true,
+        "may_bypass_market_or_portfolio_execution_gate": false
+      },
+      "event_keys": [
+        "stock_ai_agent:15878",
+        "stock_ai_agent:15877",
+        "stock_ai_agent:15876",
+        "stock_ai_agent:15875",
+        "stock_ai_agent:15874",
+        "stock_ai_agent:15873",
+        "stock_ai_agent:15872",
+        "stock_ai_agent:15871",
+        "stock_ai_agent:15870",
+        "stock_ai_agent:15869",
+        "stock_ai_agent:15868",
+        "stock_ai_agent:15867",
+        "stock_ai_agent:15866",
+        "stock_ai_agent:15865",
+        "stock_ai_agent:15864",
+        "stock_ai_agent:15863",
+        "stock_ai_agent:15862"
+      ],
+      "actual_delta_event_count": 17,
+      "omitted_window_events": 0,
+      "simulation_event_keys": [
+        "stock_ai_agent:15878"
+      ],
+      "crypto_demo_event_keys": [
+        "stock_ai_agent:15862",
+        "stock_ai_agent:15863",
+        "stock_ai_agent:15864",
+        "stock_ai_agent:15865"
+      ],
+      "unavailable_pdf_event_keys": [
+        "stock_ai_agent:15870",
+        "stock_ai_agent:15871",
+        "stock_ai_agent:15872"
+      ],
+      "independent_verification_performed": false,
+      "source_scores_are_not_verified_confidence": true,
+      "execution_eligible": false
+    },
+    "next_checkpoint": {
+      "at": "2026-10-09T09:44:16+09:00",
+      "trigger": "다음 성공한 정제 생산 결과 또는 첫 24시간 창 만료",
+      "required_evidence": "새·수정 정제 사건, 공식 시세·공시·IR, 실제 계좌와 위험 게이트"
+    }
+  },
+  "report_id": "prism:328332e51cbb0a995a1e44b8575ed23f",
+  "report_sha256": "328332e51cbb0a995a1e44b8575ed23f4e7843b4cc545579b66cd222a903f425",
+  "published_at": "2026-10-09T09:38:36.178108+09:00"
+}

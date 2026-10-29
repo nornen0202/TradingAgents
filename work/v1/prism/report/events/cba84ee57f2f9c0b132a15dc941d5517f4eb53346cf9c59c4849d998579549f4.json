@@ -1,0 +1,237 @@
+{
+  "schema": "tradingagents.work-report/v1",
+  "surface": "prism",
+  "event_id": "prism:c19ee0166a5cab8baff8a61f304632e8",
+  "source_sha256": "7ccbf34f6e70ec522c8afb65848bfcb818064f34a28ca64ff477ed131a95464a",
+  "prompt_contract_version": "prism-work-v5",
+  "workflow_contract_sha256": "54544c5a6bb3eb17cc24908ceef2377403d48fb6a6c258e4c33d8891923bc403",
+  "policy": {
+    "visibility": "investor_safe_no_credentials",
+    "external_evidence_profile": "balanced_external",
+    "external_evidence_may_affect": [
+      "ranking",
+      "confidence",
+      "position_size_within_existing_risk_limits",
+      "research_priority"
+    ],
+    "external_evidence_may_bypass_execution_gate": false,
+    "thesis_is_independent_from_execution_readiness": true
+  },
+  "report_markdown": "# PRISM 연구 델타 | 2026-10-07 08:38 KST\n\n**소스 상태: OK(현재 시각 기준)** · 프로듀서 성공 10/06 12:32 KST · 메시지 범위 10/06 09:47–10:01 KST. 전일 오전 자료이며 현재 시세·공시 검증은 포함되지 않았습니다. **모든 항목은 연구 전용이며 신규 실행 배분 0%**입니다.\n\n## 한 화면 요약\n\n1. **대한광통신(010170) 검증 우선순위 1:** 관심 신호 뒤 2/10 매수 보류가 이어졌습니다. AI 데이터센터·흑자 전환 서사는 관찰하되, 거래량 둔화와 실적 지속성을 확인하기 전 확신을 낮춥니다. `stock_ai_agent:15686`, `:15688`, `:15694`.\n2. **두산(000150) 검증 우선순위 2:** 갭 상승 관심과 2/10 미진입이 충돌합니다. 패킷상 PER 220.26배와 비교 업종 32.39배의 큰 격차가 핵심 검증 대상입니다. 단기 추격·크기 상향을 보류합니다. `stock_ai_agent:15686`, `:15687`, `:15693`.\n3. **샘씨엔에스(252990)는 가상 운용 관찰:** 주도주 전환 문구와 시뮬레이터 보유 스냅샷이 함께 전송됐습니다. 손절 기준 변화와 실제 계좌 편입은 확인되지 않았으므로 매매 근거로 쓰지 않습니다. `stock_ai_agent:15692`, `:15695`.\n\n## 범위와 증거\n\n- 현재 24시간 창 10건 중 10건 전송, 생략 0건, 절단 없음. 신규 10건·수정 0건·동일건 제외 0건. 전체 고유 104건은 누적 수치이며 현재 델타가 아닙니다.\n- 주식 관련 신호는 모두 PRISM의 연구용 알림입니다. `NO_ENTRY`는 매수 보류 기록이지 당일 주문 지시가 아닙니다. Telegram 점수 2/10, 0.66, 0.84는 독립 검증 신뢰도가 아닙니다.\n- 두산·대한광통신 PDF 알림(`stock_ai_agent:15689`, `:15690`)은 패킷에 본문이 없습니다. O'Neil 차트 알림(`:15691`)은 보조 자료로만 취급합니다. 가격·PER·실적·수주 정보는 원문 공시 및 최신 거래소 자료로 재확인해야 합니다.\n- 샘씨엔에스 스냅샷은 `simulation_only=true`이며, 전환 메시지의 플래그는 false입니다. 동일한 실제 계좌 상태로 합치지 않았습니다. 가상 수익률 +24.14%도 실현 성과가 아닙니다.\n\n## KR·US 후속 브리핑 반영\n\n| 종목 | 연구 영향 | 검증 전 제한 |\n|---|---|---|\n| 대한광통신 010170 | KR 검증 우선순위 1. 성장 서사는 유지하되 매수 가설 확신을 하향 | 10/6 거래량·종가, 분기 흑자 지속성, DART/KRX 확인 전 신규 크기 0% |\n| 두산 000150 | KR 검증 우선순위 2. 모멘텀보다 가치평가 충돌 검토 | PER 산식·계열 수주 귀속·최신 가격 확인 전 추격 및 크기 상향 보류 |\n| 샘씨엔에스 252990 | KR 시뮬레이션 검증 우선순위 3 | 실제 보유·손절 변경으로 전이 금지; 최신 종가·가상 규칙 출처 확인 |\n\nUS 종목의 직접 신규 근거는 없습니다. KR 신호를 US 종목 순위나 확신으로 전이하지 않습니다. 후속 종합에서는 위 3개 종목의 **연구 우선순위와 가설 확신**에만 이 증거를 반영하고, 시장·계좌·위험 실행 게이트와 기존 위험 한도는 유지합니다.\n\n## 다음 확인\n\n**2026-10-07 09:45 KST 이전**: 가장 이른 메시지가 현재 24시간 창에서 만료됩니다. 새 프로듀서 실행과 최신 시세·KRX/DART/기업 IR을 확인하세요. 신선한 근거가 없으면 이 델타를 현재 신호로 재사용하지 않습니다.\n\nCOVERAGE_RECEIPT {\"event_id\":\"prism:c19ee0166a5cab8baff8a61f304632e8\",\"status\":\"COMPLETE\",\"window_events\":10,\"transmitted_events\":10,\"truncated\":false,\"new_events\":10,\"revised_events\":0}\nMOBILE_HANDOFF {\"owner\":\"external_github_notification_pipeline\",\"status\":\"PENDING_EXTERNAL_VERIFICATION\",\"work_sent_notification\":false}",
+  "structured_report": {
+    "binding": {
+      "surface": "prism",
+      "event_id": "prism:c19ee0166a5cab8baff8a61f304632e8",
+      "source_sha256": "7ccbf34f6e70ec522c8afb65848bfcb818064f34a28ca64ff477ed131a95464a"
+    },
+    "title": "PRISM 연구 델타 | 2026-10-07 08:38 KST",
+    "generated_at": "2026-10-07T08:38:13.234943+09:00",
+    "as_of": "2026-10-06T09:47:32+09:00",
+    "source_health": "OK",
+    "report_mode": "RESEARCH_ONLY",
+    "summary": "신규 10건. 대한광통신·두산은 매수 보류와 검증 우선, 샘씨엔에스는 가상 운용 관찰. 실행 배분 0%.",
+    "top_actions": [
+      {
+        "ticker": "010170.KS",
+        "action": "VERIFY",
+        "readiness": "RESEARCH_ONLY",
+        "reason": "성장 서사와 매수 보류·거래량 둔화 충돌 확인"
+      },
+      {
+        "ticker": "000150.KS",
+        "action": "VERIFY",
+        "readiness": "RESEARCH_ONLY",
+        "reason": "갭 상승과 고평가 매수 보류 충돌 확인"
+      },
+      {
+        "ticker": "252990.KS",
+        "action": "VERIFY",
+        "readiness": "RESEARCH_ONLY",
+        "reason": "시뮬레이터와 전환 메시지의 관계 확인"
+      }
+    ],
+    "strategies": [
+      {
+        "ticker": "010170.KS",
+        "name": "대한광통신",
+        "research_rank": 1,
+        "research_effect": "검증 우선순위 상향, 매수 가설 확신 하향. 실제 크기 상향 없음.",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "new_allocation_pct": 0
+        },
+        "source_contributions": [
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15686",
+            "content_sha256": "179cbdb3b736d9be2817931c63fc7158497d79c7f6d972af3ce4cda41d6675c4",
+            "affected_field": "research_priority",
+            "effect": "관심종목 포착",
+            "evidence_weight": "LOW_TO_MEDIUM",
+            "execution_gate_override": false
+          },
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15688",
+            "content_sha256": "04eba42ec1adbb3c701adb2bb330992eb36568181d0014478bb139698968a338",
+            "affected_field": "thesis_confidence",
+            "effect": "성장 서사와 거래량 둔화 병존",
+            "evidence_weight": "LOW_TO_MEDIUM",
+            "execution_gate_override": false
+          },
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15694",
+            "content_sha256": "a03e4c442fc7e6e0fb328c3a32cc540104c1ce957dc0a513f4c765385b3812cc",
+            "affected_field": "thesis_confidence",
+            "effect": "2/10 매수 보류로 하향",
+            "evidence_weight": "MEDIUM",
+            "execution_gate_override": false
+          },
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15690",
+            "content_sha256": "e463b969b7f125be7bd7b21a1c315f0bbf1f0768a28f8f3325933daf024a8a4c",
+            "affected_field": "research_priority",
+            "effect": "PDF 본문 부재로 공식자료 확인 필요",
+            "evidence_weight": "LOW_LABELED",
+            "execution_gate_override": false
+          }
+        ]
+      },
+      {
+        "ticker": "000150.KS",
+        "name": "두산",
+        "research_rank": 2,
+        "research_effect": "가치평가 검증 우선순위 상향, 추격 가설 확신 하향. 실제 크기 상향 없음.",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "new_allocation_pct": 0
+        },
+        "source_contributions": [
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15686",
+            "content_sha256": "179cbdb3b736d9be2817931c63fc7158497d79c7f6d972af3ce4cda41d6675c4",
+            "affected_field": "research_priority",
+            "effect": "갭 상승 관심",
+            "evidence_weight": "LOW_TO_MEDIUM",
+            "execution_gate_override": false
+          },
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15687",
+            "content_sha256": "c29370dde060ace6e874789d643d73ee577f3e03963667aab5caf75cf4d17ba0",
+            "affected_field": "research_priority",
+            "effect": "모멘텀과 거래량 둔화 검증",
+            "evidence_weight": "LOW_TO_MEDIUM",
+            "execution_gate_override": false
+          },
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15693",
+            "content_sha256": "859041a1acdbd5434534315bd69f9016b2c36f98bac1803e245493590f824152",
+            "affected_field": "thesis_confidence",
+            "effect": "PER 격차 및 2/10 매수 보류로 하향",
+            "evidence_weight": "MEDIUM",
+            "execution_gate_override": false
+          },
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15691",
+            "content_sha256": "d05ea0979866b9e0e03c0cce18315aedd49733a944ce16684664259b37fa71b7",
+            "affected_field": "research_priority",
+            "effect": "차트 주석 보조 참고",
+            "evidence_weight": "LOW_LABELED",
+            "execution_gate_override": false
+          },
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15689",
+            "content_sha256": "6389f5a45ee86972bd42994c4644cb4ba0ea9983c35f959a4601b5069bfb5834",
+            "affected_field": "research_priority",
+            "effect": "PDF 본문 부재로 공식자료 확인 필요",
+            "evidence_weight": "LOW_LABELED",
+            "execution_gate_override": false
+          }
+        ]
+      },
+      {
+        "ticker": "252990.KS",
+        "name": "샘씨엔에스",
+        "research_rank": 3,
+        "research_effect": "가상 운용 규칙과 실제 보유 구분을 위한 검증 우선순위만 부여.",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "new_allocation_pct": 0
+        },
+        "source_contributions": [
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15692",
+            "content_sha256": "781ce8d36ed8d1fe9c0437869660ed6e143d4d81fcd2f8c22404ed6840e35857",
+            "affected_field": "research_priority",
+            "effect": "주도주 전환과 손절 기준 문구 확인",
+            "evidence_weight": "LOW_LABELED",
+            "execution_gate_override": false
+          },
+          {
+            "source": "prism",
+            "event_key": "stock_ai_agent:15695",
+            "content_sha256": "6868f53bcbe12752319cd81b033016cacf62acd7187dff0989212e497f4234bc",
+            "affected_field": "research_priority",
+            "effect": "시뮬레이터 보유 스냅샷 확인",
+            "evidence_weight": "LOW_LABELED",
+            "execution_gate_override": false
+          }
+        ]
+      }
+    ],
+    "coverage_receipt": {
+      "event_id": "prism:c19ee0166a5cab8baff8a61f304632e8",
+      "status": "COMPLETE",
+      "window_events": 10,
+      "transmitted_events": 10,
+      "truncated": false,
+      "new_events": 10,
+      "revised_events": 0
+    },
+    "model_receipt": {
+      "schema": "tradingagents.model-provenance/v1",
+      "work_synthesis": {
+        "execution_mode": "local",
+        "requested_model": "gpt-6-sol",
+        "requested_reasoning_effort": "xhigh",
+        "task_id": "tradingagents-work-prism",
+        "verification_status": "CONFIGURED_NOT_RUNTIME_VERIFIED",
+        "observed_model": null,
+        "observed_reasoning_effort": null,
+        "note": "The local task contract is verified; the Work host does not expose a signed per-response model receipt."
+      }
+    },
+    "source_summary": {
+      "producer_run_at": "2026-10-06T12:32:53.392847+09:00",
+      "producer_status": "success",
+      "window_oldest_at": "2026-10-06T00:47:32+00:00",
+      "window_newest_at": "2026-10-06T01:01:45+00:00",
+      "transmitted_event_keys": [
+        "stock_ai_agent:15695",
+        "stock_ai_agent:15694",
+        "stock_ai_agent:15693",
+        "stock_ai_agent:15692",
+        "stock_ai_agent:15691",
+        "stock_ai_agent:15690",
+        "stock_ai_agent:15689",
+        "stock_ai_agent:15688",
+        "stock_ai_agent:15687",
+        "stock_ai_agent:15686"
+      ],
+      "simulation_note": "시뮬레이터 스냅샷과 전환 메시지는 실제 계좌 증거가 아님",
+      "external_delivery_verified": false
+    },
+    "next_checkpoint": "2026-10-07T09:45:32+09:00"
+  },
+  "report_id": "prism:cba84ee57f2f9c0b132a15dc941d5517",
+  "report_sha256": "cba84ee57f2f9c0b132a15dc941d5517f4eb53346cf9c59c4849d998579549f4",
+  "published_at": "2026-10-07T08:38:17.354812+09:00"
+}

@@ -1,0 +1,2397 @@
+{
+  "schema": "tradingagents.work-report/v1",
+  "surface": "youtube",
+  "event_id": "youtube:45c37a54cbb16776dc6fdfee97a8dbf8",
+  "source_sha256": "e4964d6cdefbeeb8dbbd3dafb992e17e93a2710ec5cc42c4783ef24f6e1d4e64",
+  "prompt_contract_version": "youtube-work-v5",
+  "workflow_contract_sha256": "bc33d7680318d3200a3ef2fd2cc1f830d41fd1ba019e4f20ed6d1951cd6dc343",
+  "policy": {
+    "visibility": "investor_safe_no_credentials",
+    "external_evidence_profile": "balanced_external",
+    "external_evidence_may_affect": [
+      "ranking",
+      "confidence",
+      "position_size_within_existing_risk_limits",
+      "research_priority"
+    ],
+    "external_evidence_may_bypass_execution_gate": false,
+    "thesis_is_independent_from_execution_readiness": true
+  },
+  "report_markdown": "# YouTube 복구 브리핑 — 2026-10-07\n\n작성: 2026-10-07T23:03:57.816844+09:00 · producer 완료: 2026-10-07T22:24:37.741407+09:00 · source health: OK · RESEARCH_ONLY.\n원본 producer는 영상 58건을 처리했다. 이는 처리 성공이며 58건의 주장이 모두 사실이라는 뜻이 아니다. 아래는 로컬 미전달 델타 51건이다.\n\n신규 51건의 누락 델타를 검토했다. 우선 채널의 AI 에이전트·EDA 협업과 국민연금 수급 주제를 높은 연구 우선순위로 반영한다. HOOD·SNPS는 공식 발표로 사업 실체를 일부 확인했다. TSLA 정책 수혜, 시장 수치와 자막 충돌은 검증 과제로 남기며 주문 가능성을 높이지 않는다.\n\n1. **HOOD·SNPS 연구 상향:** 소수몽키의 HIGH 근거를 우선 검토하고 공식 제품·협업 발표와 연결한다. 수익화·고객 도입 확인을 다음 과제로 둔다.\n2. **KR 자산배분 위험 점검 상향:** 박종훈의 지식한방 HIGH 근거를 통해 국민연금 비중·리밸런싱과 반도체 자사주 수급 확인을 우선한다. 예상 매도액은 산출하지 않는다.\n3. **TSLA 정책 검증 상향:** 우선 채널의 규제·정부사업 시나리오를 별도 확인한다. 관계 개선과 사업 수혜는 같은 사실이 아니다.\n4. **금리·지수 충돌 보류:** 영상마다 미국 금리와 국내 지수 숫자가 다르다. 공식 시계열 대조 전 실행 조건에서 제외한다.\n5. **상충·오래된 자료 제한:** 상충 판정 3건과 stale 2건을 유지한다. ASR 불확실 40건·미검증 6건도 사실확인 완료로 바꾸지 않는다.\n\n최근 72시간 window 72건 중 후보 전송 60건, window 생략 12건, truncation=true. 후보 60건에서 동일 내용 9건을 제외해 신규 51건·수정 0건을 렌더링했다. 이 중 현재 기준 24시간 이내 28건, 이전 배경 23건이다. 72시간 전수 검토를 완료했다고 표현할 수 없다.\n\n## 공식 원자료로 보완한 핵심 주장\n\n- **HOOD (OFFICIAL-RH-20260929):** 9월 29일 회사 발표는 에이전트 계좌 15만 초과와 일 약 3천만 도구 사용을 명시한다. 신규 Agents/Apps는 출시 예정이며 미래 매출을 보장하지 않는다. 영상의 암호화폐 선물 4배는 주식 일중마진 4배와 구별해야 한다. [공식 발표](https://robinhood.com/newsroom/hood-summit-2026/)\n- **SNPS (OFFICIAL-SNPS-20260930):** GPT-Synopsys 공동 개발·다년 계약·수익배분을 확인했다. 구체적 설계기간 단축과 실현 매출 규모는 확인하지 못했다. [공식 발표](https://news.synopsys.com/2026-09-30-OpenAI-and-Synopsys-Announce-GPT-Synopsys-Frontier-Intelligence-to-Revolutionize-Chip-Design)\n- **국민연금 (OFFICIAL-NPS-202607):** 공식 페이지의 7월 말 적립금은 1,684.2조 원, 국내주식 비중은 24.9%, 표시된 연간 목표는 20.8%다. 전월 대비 감소액의 손익 성격이나 향후 매도 일정은 이 비교만으로 확정할 수 없다. [공식 운용현황](https://fund.nps.or.kr/main.do)\n\n원 packet의 주장 판정·hash는 변경하지 않았다. 위 보완 검증은 이 보고서의 별도 근거이며, 관련 없는 일반 뉴스 제목이나 높은 모델 confidence를 사실확인 근거로 세지 않았다.\n\n## 신규 델타 전체 검토\n\n| 사건·원영상 | 게시 KST / 범위 | 원판정 / 가중치 | 연구 영향과 제한 |\n| --- | --- | --- | --- |\n| [끌로드, 챗GPT가 주식투자도 대신해준다? AI 실생활 침투 가속화의 수혜주들](https://www.youtube.com/watch?v=bL2q1ZfwdJA) · bL2q1ZfwdJA | 10/07 21:05 / 최근 24시간 | ASR 불확실 / HIGH | HOOD·SNPS 연구 우선순위를 최상위로 올린다. 공식 발표로 AI 제품·협업 실체를 확인했다. 신규 서비스의 출시 예정과 실적 기여는 분리한다. DASH·AAPL·ACN의 수익 영향은 추가 검증한다. |\n| [국민연금 181조원 증발? 더 큰 문제가 있습니다 (박종훈의 지식한방)](https://www.youtube.com/watch?v=i6RO9FTUuKQ) · i6RO9FTUuKQ | 10/06 19:15 / 이전 배경 | ASR 불확실 / HIGH | 국민연금 자산배분·국내 대형주 수급의 검증 우선순위를 상향한다. 공식 7월 말 적립금과 비중을 일부 확인했으나 전체 감소액을 실현손실로 보거나 향후 매도액으로 환산하지 않는다. |\n| [2년만에 재결합한 머스크와 트럼프, 두 거물 화해의 수혜주들](https://www.youtube.com/watch?v=ha4-lyhvafM) · ha4-lyhvafM | 10/06 17:30 / 이전 배경 | ASR 불확실 / HIGH | TSLA 정책 민감도와 규제·예산 원문 확인을 높은 우선순위로 올린다. 정치적 관계 회복을 수주·규제완화 확정으로 해석하지 않는다. |\n| [\"아직 도망갈 자리는 아닙니다\"…다음 주까지 지금 전략을 고수해야 하는 이유ㅣ명민준, 박가영, 유창희 [주린이 구조대]](https://www.youtube.com/watch?v=WuWAjehIbgg) · WuWAjehIbgg | 10/07 21:00 / 최근 24시간 | ASR 불확실 / STANDARD | 삼성전자 실적 발표와 ETF 구성·만기 일정을 확인한다. 자동자막의 실적 규모를 전망치에 복사하지 않는다. |\n| [[#찐시황]  또 3시부터 외인이 돌변했다… 선물 5,000억 말아올린 이유 / 내일 삼성전자 실적 발표 후 이렇게 대응하세요ㅣ오로라투자자문 이지환 대표](https://www.youtube.com/watch?v=hnZaB99hVG8) · hnZaB99hVG8 | 10/07 20:00 / 최근 24시간 | ASR 불확실 / STANDARD | 장 막판 외국인 선물 변화와 현물 흐름을 별도로 확인한다. 장중 순매수 전환만으로 다음 세션 방향을 확정하지 않는다. |\n| [4분기 랠리 기대감 속 숨은 함정… 결국 시장을 흔들 단 하나의 핵심은?ㅣ명민준, 박가영, 송재경 [주린이 구조대]](https://www.youtube.com/watch?v=nzDnc9h0bI8) · nzDnc9h0bI8 | 10/07 20:00 / 최근 24시간 | ASR 불확실 / STANDARD | AI 주도 강세와 한국 저평가 내러티브를 분리한다. 일드갭 수치·계산 기준이 확인되기 전 할인율 근거로 사용하지 않는다. |\n| [테슬라 지금 사는게 기회일까?](https://www.youtube.com/watch?v=zvP9u8N1U00) · zvP9u8N1U00 | 10/07 18:48 / 최근 24시간 | ASR 불확실 / STANDARD | TSLA 인도량과 애널리스트 목표주가는 원발표 시점부터 검증한다. 제목의 매수 기회 표현을 진입 신호로 승격하지 않는다. |\n| [AI 투자에서 놓치고 있는 위험…빅테크보다 채권시장을 보세요ㅣ홍선애, 이은택 KB증권 자산배분전략 이사 [여의도 인사이트]](https://www.youtube.com/watch?v=HEKkMZD0aYU) · HEKkMZD0aYU | 10/07 18:02 / 최근 24시간 | ASR 불확실 / STANDARD | AI 기업의 자금조달 위험과 금리·물가 동반 상승을 연구 체크포인트로 올린다. 금리 수준은 다른 영상과 충돌하므로 공식 관측값 확인 전 배제한다. |\n| [[#글로벌인사이트]  SK하이닉스 하락 이유 딱 2가지… 하지만 판 뒤집을 ‘대형 호재’가 있다 ㅣ노근창 대표](https://www.youtube.com/watch?v=s2IhKAd8QGY) · s2IhKAd8QGY | 10/07 18:00 / 최근 24시간 | ASR 불확실 / STANDARD | SK하이닉스 ADR과 현지 상장 상품을 구별하고 솔리디그 상장설을 확인한다. 일부 가격 관련 근거가 전체 상장·수혜 논리를 증명하지 않는다. |\n| [[10월 7일 마감시황] 미국·일본·대만과 벌어지는 증시 격차…외국인이 한국을 떠나는 이유ㅣ홍선애, 이권희, 장우진 [클로징벨 라이브]](https://www.youtube.com/watch?v=6E_PQvDGRa4) · 6E_PQvDGRa4 | 10/07 17:10 / 최근 24시간 | ASR 불확실 / STANDARD | 한국 상대약세와 외국인 매도·달러·유가의 동시 변화를 점검한다. 상관관계를 확정 원인으로 사용하지 않는다. |\n| [금리 상승마저 성장의 증거라는 시장, AI 기대감은 어디까지 고금리를 이길까?](https://www.youtube.com/watch?v=VhvHTl6MVh8) · VhvHTl6MVh8 | 10/07 17:00 / 최근 24시간 | ASR 불확실 / STANDARD | META의 AI 접점 확대와 AAPL 플랫폼 위험을 비교 연구한다. 점유율·조달비용 예측은 미검증으로 남긴다. |\n| [젠슨황이 '사위'를 부사장으로 앉힌 이유는 뭘까?](https://www.youtube.com/watch?v=aeDjqFadkHs) · aeDjqFadkHs | 10/07 16:46 / 최근 24시간 | ASR 불확실 / STANDARD | NVDA 고객금융과 데이터센터 고객의 신용위험을 연구한다. 인사 관계나 직함에 관한 자동자막을 기업 실적 논거로 쓰지 않는다. |\n| [실적 발표 앞두고 하락하는 코스피… 손절할까, 추매할까? / 조선·방산·원전 상승 타이밍은 ‘이때’ ㅣ 김민수 대표](https://www.youtube.com/watch?v=zIwhnaBjqNw) · zIwhnaBjqNw | 10/07 16:30 / 최근 24시간 | ASR 불확실 / STANDARD | 실적·환율 민감도와 업종 순환을 점검한다. 조 원과 달러, 지수 단위가 섞인 수치는 인용 대상에서 제외한다. |\n| [실적 시즌 다가올수록 종목은 압축…지금 버틸 소부장 고르는 법ㅣ권다영, 김태성 아이에셋 본부장 [2시 마켓워치]](https://www.youtube.com/watch?v=cu6xJFOb-m0) · cu6xJFOb-m0 | 10/07 15:37 / 최근 24시간 | ASR 불확실 / STANDARD | 반도체 소부장 압축 논리는 공시·실제 실적으로 대조한다. 일정과 지수 경계선은 공식 자료로 재확인한다. |\n| ['금 vs 달러' 지금 뭘 사야 기회일까?](https://www.youtube.com/watch?v=hMV3KV4Sanc) · hMV3KV4Sanc | 10/07 15:26 / 최근 24시간 | 상충 / STANDARD | 금·달러 상대매력의 상충 판정을 유지한다. 전송된 대표 주장에 반증 근거가 충분히 드러나지 않아 반증 내용을 새로 만들어 설명하지 않는다. |\n| [실적 시즌 앞둔 증시…코스닥은 '추세 반등'까지 갈 수 있을까ㅣ권다영, 이지환 오로라투자자문 대표 [2시 마켓워치]](https://www.youtube.com/watch?v=V3bFEMRwteY) · V3bFEMRwteY | 10/07 15:02 / 최근 24시간 | ASR 불확실 / STANDARD | 삼성전자 실적 기대와 외국인 수급을 분리 확인한다. 실적 규모·지수 자막의 단위 이상을 해소하기 전 수치를 사용하지 않는다. |\n| [[#긴급시황] 공매도 주의… 오전 10시부터 외인이 집어던진 이유 / 지금은 관망, 매수 매도는 내일 이후 하세요 (주가하락) 이건희 대표](https://www.youtube.com/watch?v=kNCZ7VJ76RM) · kNCZ7VJ76RM | 10/07 15:00 / 최근 24시간 | 미검증 / STANDARD | ETF 리밸런싱·옵션 만기와 매도 압력을 검증한다. 관망 의견은 출연자의 시나리오이며 현재 포트폴리오 매매 지시가 아니다. |\n| [삼성전자 실적 발표 전날 美 반도체주 급락… 겁먹어야 하나? / 오히려 오늘은 사고 싶었던 주식 담을 기회?ㅣ이권희 대표](https://www.youtube.com/watch?v=GCQ5ZKoUNZs) · GCQ5ZKoUNZs | 10/07 13:15 / 최근 24시간 | 상충 / STANDARD | 원자료의 상충 판정을 보존한다. 미국·한국 상품과 관측 시각을 대조하며, 실적 전 매수 기회라는 제목만으로 관심도를 높이지 않는다. |\n| [변수의 시대, 시장은 어디로 향할까? / 서동주, 김동환, 이윤수 에릭의 거장연구소 대표 [크립토 PLUS]](https://www.youtube.com/watch?v=FxODK6IMn_Q) · FxODK6IMn_Q | 10/07 12:47 / 최근 24시간 | ASR 불확실 / STANDARD | 유가·금리·인플레이션 전이 위험의 연구 우선순위를 올린다. 제시된 상관계수와 경계 금리는 원시 시계열 확인 전 배제한다. |\n| [DAT 기업들의 비트코인 매집 확대…삼성·LG도 디지털자산 사업 나선다 / 김동환, 서동주, 박상혁 디지털애셋 편집장 [크립토 PLUS]](https://www.youtube.com/watch?v=BrHnGU5Sz3k) · BrHnGU5Sz3k | 10/07 12:06 / 최근 24시간 | ASR 불확실 / STANDARD | BTC 보유기업·ETF 흐름·우선주 구조를 구분한다. 현물 가격과 ETF 순유출입을 같은 날짜의 공식 자료로 확인한다. |\n| [AI 경쟁 격화…네이버, 토종 AI로 반전 모색 나선다 / 여도은, 허재무, 박지훈 [아침N투자]](https://www.youtube.com/watch?v=ybLz66vTZRo) · ybLz66vTZRo | 10/07 11:33 / 최근 24시간 | ASR 불확실 / STANDARD | NAVER AI 사업과 메모리 장기계약 내러티브를 각각 검증한다. 여러 종목이 언급됐다는 이유로 동일 수혜를 부여하지 않는다. |\n| [\" 발표나면 떨어지는 국룰\" 이럴 때 숫자가 반전 만들 것 / 김록호 하나증권 리서치센터 팀장 [더블 업]](https://www.youtube.com/watch?v=3CKtq9InEN4) · 3CKtq9InEN4 | 10/07 11:29 / 최근 24시간 | ASR 불확실 / STANDARD | 메모리 가격과 환율 가정이 실적 전망에 주는 영향을 구분한다. 전망 변경은 원보고서의 이전·현재 가정을 비교한다. |\n| [\"꿈의 영업이익 온다\" 하지만 시장은 경계 중? / 하창완 하보노의 주식 이야기 대표 [더블 체크]](https://www.youtube.com/watch?v=AJs04lc6rEA) · AJs04lc6rEA | 10/07 10:44 / 최근 24시간 | 미검증 / STANDARD | 실적 기대·자사주 종료·프로그램 수급의 설명을 별도로 확인한다. 같은 날 장 초반·후반 시각 혼합에 유의한다. |\n| [소외된 삼전·SK하닉, 오후장 반등할까? / 빅테크 ‘원전 장기계약’ 본격화… 진짜 수혜주는 ‘이것’ ㅣ이주연 대표](https://www.youtube.com/watch?v=toEF93oEd3Q) · toEF93oEd3Q | 10/07 10:00 / 최근 24시간 | ASR 불확실 / STANDARD | AI 인프라와 전력 장기계약을 연구 주제로 유지한다. 구체적 기업 발주가 확인되지 않으면 원전주 매출로 연결하지 않는다. |\n| [삼성전자·SK하이닉스 왜 못 가나? 지금 강한 곳은 따로 있다 / 박병창 MP파트너스 대표 [마켓 인사이드]](https://www.youtube.com/watch?v=Lacr3C3biDY) · Lacr3C3biDY | 10/07 09:11 / 최근 24시간 | ASR 불확실 / STANDARD | MRVL·ASIC·광통신의 실제 가이던스와 메모리 공급 우려를 비교한다. 자막 매출 수치와 지수 밴드는 재인용하지 않는다. |\n| [\"나스닥·S&P500 최고가?!\"10월 7일 오늘 코스피 어떻게 흘러갈까?](https://www.youtube.com/watch?v=6A1yI_eWNT4) · 6A1yI_eWNT4 | 10/07 08:38 / 최근 24시간 | ASR 불확실 / STANDARD | 미국 최고가와 국내 반등의 기계적 연결을 피한다. 국내 지수의 서로 다른 자릿수와 AMD 방한·협력 주장은 별도 확인한다. |\n| [노란봉투법이 낳은 기현상…삼성바이오 노조 \"삼성전자와 교섭\" / 신세계, 워너브라더스 인수에 10억 달러 투자 / 권순우 삼프로TV 취재팀장 [뉴스3]](https://www.youtube.com/watch?v=kCIAfXCh5WA) · kCIAfXCh5WA | 10/07 08:32 / 최근 24시간 | ASR 불확실 / STANDARD | 자사주 종료, 노동관계, 인수 투자금의 서로 다른 사건을 분리한다. 법적 교섭 의무와 투자 확정 여부는 원공시 없이 단정하지 않는다. |\n| [\"미국 금리 쉽게 안 떨어진다\"…국채 수요에 생긴 구조적 변화 / 신영증권 김효진 박사 [글로벌 인터뷰]](https://www.youtube.com/watch?v=7Gw-WumkJdQ) · 7Gw-WumkJdQ | 10/07 07:51 / 최근 24시간 | ASR 불확실 / STANDARD | 국채 헤지 효용과 해외 수요의 구조 변화를 검증한다. 상관관계의 기간·빈도와 외환보유액 원시 자료를 우선한다. |\n| [10월 7일 투자자들이 꼭 알아야 하는 투자 포인트](https://www.youtube.com/watch?v=S2wyWIUH1hM) · S2wyWIUH1hM | 10/07 07:04 / 최근 24시간 | ASR 불확실 / STANDARD | 같은 거래일의 미국 금리가 다른 영상과 크게 다른 점을 표시한다. 지수 자릿수 충돌도 해소되기 전 전략 가격에 사용하지 않는다. |\n| [10년물 국채 금리 불안 완화…AMD 사상 최고가 등 종목 순환매 [월가 뉴스레터]](https://www.youtube.com/watch?v=45C717bFiE8) · 45C717bFiE8 | 10/07 07:00 / 최근 24시간 | 오래된 주장 / STANDARD | stale 판정을 유지해 TLT 진입 수준과 업종 순환 수치는 현재 전략에서 제외한다. 과거 내러티브의 배경으로만 사용한다. |\n| [미국 금리인상이 '장기 상승장' 시작 신호라는 진짜 이유](https://www.youtube.com/watch?v=a2xNf3_sH70) · a2xNf3_sH70 | 10/06 23:00 / 이전 배경 | 미검증 / STANDARD | 성장에 따른 장기금리 상승과 긴축 정책금리를 구분하는 가설을 유지한다. 과거 한 사례로 장기 상승장을 보장하지 않는다. |\n| [초보자도 알기 쉽게 전부 분석해 왔습니다](https://www.youtube.com/watch?v=7qQyi7I3gGM) · 7qQyi7I3gGM | 10/06 22:00 / 이전 배경 | 미검증 / STANDARD | 선거 계절성 수치는 표본·수익률 구간을 검증하기 전 활용하지 않는다. 행사 일정은 공식 달력으로 확인한다. |\n| [미국 중간선거 공화당이 이기면 좋을까 민주당이 이기면 좋을까?](https://www.youtube.com/watch?v=UqMzO3SUJxg) · UqMzO3SUJxg | 10/06 21:30 / 이전 배경 | 미검증 / STANDARD | 의회 구성별 정책 시나리오를 연구 배경으로 둔다. 정치 전망을 특정 자산 상승의 확정 원인으로 해석하지 않는다. |\n| [소부장 급등에 FOMO 오지만 지금은 다르다…“삼전닉스 줄이고 따라가면 추격매수”ㅣ명민준, 서수진, 이지환 [주린이 구조대]](https://www.youtube.com/watch?v=7ISq8xon_5c) · 7ISq8xon_5c | 10/06 21:00 / 이전 배경 | ASR 불확실 / STANDARD | 메모리 대형주에서 소부장으로의 순환은 24시간 이전 배경이다. 기존 종목 축소·급등주 추격을 지시하지 않는다. |\n| [[#찐시황] “지수 찍어 누르더니 3시부터 돌변했다!” 외국인이 장 막판 선물 7,000억 말아 올린 진짜 이유 / 10월 한국 증시 방향? / 박현상 이사](https://www.youtube.com/watch?v=2bMWLDREDrs) · 2bMWLDREDrs | 10/06 20:00 / 이전 배경 | ASR 불확실 / STANDARD | 10월 6일 장 막판 선물 흐름을 배경으로만 쓴다. 선물 반등과 현물 방향의 차이를 확인한다. |\n| [외국인 수급 멈춘 코스피 vs 불뿜는 코스닥, 소부장 수익률 게임 전략ㅣ명민준, 서수진, 황유현 [주린이 구조대]](https://www.youtube.com/watch?v=lElNLk_Vc3w) · lElNLk_Vc3w | 10/06 20:00 / 이전 배경 | ASR 불확실 / STANDARD | 업종 확산과 단기 순환 가설을 보존한다. 현재 거래대금과 이익 전망 확인 전 지속 추세로 승격하지 않는다. |\n| [SK하이닉스 투자자라면 꼭 봐야하는 '단기,장기' 전망](https://www.youtube.com/watch?v=UugiydREUKg) · UugiydREUKg | 10/06 19:30 / 이전 배경 | ASR 불확실 / STANDARD | SK하이닉스 자사주 규모·진행률은 ASR 불확실성을 유지한다. 매입 잔량을 향후 확정 매수세로 계산하지 않는다. |\n| [“사과 대신 극 초음속 미사일 쐈다” 합참, 북한 지뢰 직접 제거 시작… 추가 도발 이어지나 / 평양24시 강철환 대표](https://www.youtube.com/watch?v=PQj4yqVJ_ok) · PQj4yqVJ_ok | 10/06 19:00 / 이전 배경 | ASR 불확실 / STANDARD | 군사 사건은 공식 발표 전 미검증으로 둔다. 확인되지 않은 사건을 방산주 매수 신호로 연결하지 않는다. |\n| [젠슨황 수혜주 중, 'LG전자'만 주가 153% 오른 진짜 이유](https://www.youtube.com/watch?v=7Ua2mdttWUU) · 7Ua2mdttWUU | 10/06 18:19 / 이전 배경 | 미검증 / STANDARD | LG전자·NAVER·NVDA의 실제 사업 연계를 확인한다. 서로 다른 기간의 상승률을 상대가치 판단에 섞지 않는다. |\n| [이제는 소부장 다음을 볼 때…태양광·ESS '에너지주'가 꿈틀대기 시작했다ㅣ홍선애, 박병창 MP파트너스 대표 [여의도 인사이트]](https://www.youtube.com/watch?v=SfN6Ax1vVY0) · SfN6Ax1vVY0 | 10/06 18:06 / 이전 배경 | ASR 불확실 / STANDARD | ESS·에너지로 확산되는 가설을 과거 배경으로 둔다. 달러지수 경계선과 외국인 복귀를 확정 조건으로 사용하지 않는다. |\n| [3억원으로 월 300만원 평생 받는 법 (커버드콜 vs 나스닥100)](https://www.youtube.com/watch?v=XbXfph9KUXY) · XbXfph9KUXY | 10/06 18:00 / 이전 배경 | ASR 불확실 / STANDARD | 커버드콜의 분배 재원·원금 변동·세후 현금흐름을 확인한다. 제목의 평생 월수익을 보장수익으로 쓰지 않는다. |\n| [[#긴급인터뷰]  답답한 코스피… 실적은 좋은데 왜 안 가나? / 돈은 이미 삼전·하닉에서 반도체 소부장으로 이동 중 ㅣ김민수 대표](https://www.youtube.com/watch?v=gSy9RYunYkE) · gSy9RYunYkE | 10/06 17:30 / 이전 배경 | ASR 불확실 / STANDARD | 반도체 대형주와 소부장 상대강도 가설을 유지한다. 국가별 금리와 날짜 혼합을 해소한 뒤 비교한다. |\n| [AI가 은행까지 해킹하는 시대, 내 자산은 안전할까? BitGo CEO가 비트코인 100개를 내건 이유](https://www.youtube.com/watch?v=sk26GkZL8sM) · sk26GkZL8sM | 10/06 17:00 / 이전 배경 | 상충 / STANDARD | 해킹 보상액의 산술 불일치를 확인했다. 해킹 도전은 보안감사 대체 근거가 아니며 BTC·ETH 수탁 연구에서 증거 신뢰도를 낮춘다. |\n| [[10월 6일 마감시황] 지수는 막혔지만 수익률 게임은 계속된다…소부장·2차전지로 향한 오늘의 수급ㅣ홍선애, 이권희, 김장열 [클로징벨 라이브]](https://www.youtube.com/watch?v=G9sIwQRMl0E) · G9sIwQRMl0E | 10/06 16:57 / 이전 배경 | ASR 불확실 / STANDARD | 전일 코스닥 수급과 자사주 종료 설명을 배경으로 둔다. 대형주에서 중소형주로의 이동을 현재 추세로 단정하지 않는다. |\n| [[#글로벌인사이트]  빅테크 내부자가 말했다 “메모리 더 비싸게 살 수밖에 없다” / 답답해도 삼전·SK하이닉스 팔면 안되는 이유ㅣ세미콘 리서치랩 노근창 대표](https://www.youtube.com/watch?v=paZADAQnd2o) · paZADAQnd2o | 10/06 16:30 / 이전 배경 | 오래된 주장 / STANDARD | stale 판정과 익명 구매 담당자 출처를 명시한다. 장기계약·가격 전망을 확정 매출 또는 보유 지속 명령으로 사용하지 않는다. |\n| [\"삼전닉스 답답할 때 '이곳' 보세요\" 심텍부터 이수페타시스·두산까지 기판 종목 눌림목 매수 전략ㅣ권다영, 이재규 SK증권 WM1 영업본부 차장 [2시 마켓워치]](https://www.youtube.com/watch?v=wlJy5v1ikFc) · wlJy5v1ikFc | 10/06 15:41 / 이전 배경 | ASR 불확실 / STANDARD | 기판 관련주는 원실적·공급계약 검증 대상으로 유지한다. 과도한 실적·목표가 및 자막 단위 오류를 가격선에 복사하지 않는다. |\n| [덜 오른 종목엔 이유가 있다…연말까지 가져갈 종목은 '신고가'에서ㅣ권다영, 유창희 유스탁 대표 [2시 마켓워치]](https://www.youtube.com/watch?v=E8S2DZYeQ5E) · E8S2DZYeQ5E | 10/06 15:07 / 이전 배경 | ASR 불확실 / STANDARD | 신고가 종목 선호는 출연자 전략으로 표시한다. 과거 시세·금리 수치로 현재 강도를 판정하지 않는다. |\n| [[#긴급시황] 외국인이 삼성전자·SK하이닉스 17조 던지고 산 것은? / 역대급 ‘채권 숏’ 청산 되면 증시 판 뒤집힌다 / 박근형 부장](https://www.youtube.com/watch?v=8uq4srVsgbU) · 8uq4srVsgbU | 10/06 15:00 / 이전 배경 | ASR 불확실 / STANDARD | 외국인 보유 평가액과 순매매를 구분한다. 채권 숏 청산과 증시 반전은 검증되지 않은 시나리오다. |\n| ['나스닥'은 최고점인데 '코스피' 주가만 안 오르는 진짜 이유](https://www.youtube.com/watch?v=qMysq1fBe8w) · qMysq1fBe8w | 10/06 14:37 / 이전 배경 | ASR 불확실 / STANDARD | 미국 지수·개별 종목 상대강도는 같은 관측 시점으로 맞춘다. 한국 부진의 단일 원인을 추정하지 않는다. |\n| [지수는 답답한데 돈은 이미 움직였다… 지금 시장의 ‘진짜 주도주’는 어디?ㅣ이권희 대표](https://www.youtube.com/watch?v=_v8UI8HKq4s) · _v8UI8HKq4s | 10/06 13:09 / 이전 배경 | ASR 불확실 / STANDARD | 금·주식·유가·환율 시점이 혼합된 설명은 배경으로 제한한다. 주도주 판단은 현재 시장 packet의 별도 검증이 필요하다. |\n| [기관 금융으로 들어오는 디지털자산…BitGo가 말하는 새로운 인프라 / 김동환, 서동주, 마이크 벨시(Mike Belshe) BitGo CEO [크립토 PLUS]](https://www.youtube.com/watch?v=UIhZeFfg63A) · UIhZeFfg63A | 10/06 12:10 / 이전 배경 | ASR 불확실 / STANDARD | BitGo의 인가 범위·상장·기관 실사는 원자료 확인 대상으로 둔다. 기관 진출 내러티브를 BTC 가격 상승 근거로 확정하지 않는다. |\n\n## 후속 종합에 반영할 방향\n\nHOOD·SNPS는 연구 우선순위를 일반 검토에서 최우선으로, TSLA는 정책 검증 우선순위로 상향한다. AAPL·DASH·ACN은 앱 우회와 수익화의 반대 가설까지 검토한다. KR은 국민연금 비중과 반도체 기업의 자사주 집행·실적 원문을 다음 세션 전에 확인한다. 이는 근거에 따른 연구 순서 조정이며, 시장 packet의 thesis·보유 비중·실행 readiness를 이 보고서에서 변경하지 않는다.\n금리와 시장 수치가 충돌하므로 TLT·성장주·금·달러의 현재 매매 가격은 제시하지 않는다. BitGo 보안 도전의 보상액에는 산술 불일치가 있어 보안 우수성의 증거에서 제외한다. 커버드콜 분배금은 수익 보장으로 해석하지 않는다.\n다음 공식 검증: HOOD 신규 서비스 실제 출시와 수익화 공시, SNPS 고객 도입·계약 매출, 국민연금 월별 자산 증감과 허용비중·리밸런싱 의결, TSLA 관련 규제·예산 원문, 미 재무부 금리와 KRX 시세의 동일 시점 대조. 원가격·현재 계좌 자료가 없는 영상은 실행 근거가 아니다.\n다음 운영 확인은 23:55 KST. US 23:10 정규 Work 종합에서 최신 시장 packet과 함께 반영할 연구 자료이며, 시장·계좌·위험 gate를 유지한다.\n\nCOVERAGE_RECEIPT {\"event_id\": \"youtube:45c37a54cbb16776dc6fdfee97a8dbf8\", \"status\": \"PARTIAL\", \"window_events\": 72, \"transmitted_events\": 60, \"truncated\": true, \"new_events\": 51, \"revised_events\": 0}\nMOBILE_HANDOFF {\"owner\": \"external_github_notification_pipeline\", \"status\": \"PENDING_EXTERNAL_VERIFICATION\", \"work_sent_notification\": false}",
+  "structured_report": {
+    "binding": {
+      "surface": "youtube",
+      "event_id": "youtube:45c37a54cbb16776dc6fdfee97a8dbf8",
+      "source_sha256": "e4964d6cdefbeeb8dbbd3dafb992e17e93a2710ec5cc42c4783ef24f6e1d4e64"
+    },
+    "title": "YouTube 복구 브리핑 — 2026-10-07",
+    "generated_at": "2026-10-07T23:03:57.816844+09:00",
+    "as_of": "2026-10-07T12:05:04+00:00",
+    "source_health": "OK",
+    "report_mode": "RESEARCH_ONLY",
+    "summary": "신규 51건의 누락 델타를 검토했다. 우선 채널의 AI 에이전트·EDA 협업과 국민연금 수급 주제를 높은 연구 우선순위로 반영한다. HOOD·SNPS는 공식 발표로 사업 실체를 일부 확인했다. TSLA 정책 수혜, 시장 수치와 자막 충돌은 검증 과제로 남기며 주문 가능성을 높이지 않는다.",
+    "top_actions": [
+      {
+        "ticker": "HOOD",
+        "action": "UPGRADE_RESEARCH",
+        "readiness": "RESEARCH_ONLY",
+        "rationale": "공식 제품 발표와 HIGH 채널 근거; 출시·수익화 확인 우선"
+      },
+      {
+        "ticker": "SNPS",
+        "action": "UPGRADE_RESEARCH",
+        "readiness": "RESEARCH_ONLY",
+        "rationale": "공식 공동 개발 확인; 고객 도입·매출 연결 확인"
+      },
+      {
+        "ticker": "TSLA",
+        "action": "UPGRADE_RESEARCH",
+        "readiness": "RESEARCH_ONLY",
+        "rationale": "HIGH 채널의 정책 시나리오를 공식 규제·예산과 대조"
+      },
+      {
+        "action": "REQUIRES_PRIMARY_VERIFICATION",
+        "readiness": "RESEARCH_ONLY",
+        "rationale": "국민연금 자산배분·반도체 자사주 수급 검증"
+      },
+      {
+        "action": "REQUIRES_PRIMARY_VERIFICATION",
+        "readiness": "RESEARCH_ONLY",
+        "rationale": "금리·지수와 ASR 숫자 충돌을 동일 시점 원자료로 해소"
+      }
+    ],
+    "strategies": [
+      {
+        "ticker": "000660",
+        "research_action": "REQUIRES_PRIMARY_VERIFICATION",
+        "research_priority": "VERIFY",
+        "research_impact": "상충·시점·공식 원자료 검증",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action_now": false,
+          "blockers": [
+            "영상은 실행 전용 자료가 아님",
+            "현재 시세·계좌·위험 gate 별도 필요"
+          ],
+          "required_rechecks": [
+            "현재 시장 packet",
+            "관측 시각과 원공시"
+          ]
+        },
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "V3bFEMRwteY",
+            "content_sha256": "be5888876f092d3016aa075811225a0552b84b3aafa29de388cb8bdb3053f83f",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "삼성전자 실적 기대와 외국인 수급을 분리 확인한다. 실적 규모·지수 자막의 단위 이상을 해소하기 전 수치를 사용하지 않는다.",
+            "execution_gate_override": false
+          },
+          {
+            "source": "youtube",
+            "event_key": "ybLz66vTZRo",
+            "content_sha256": "1a00e12a3e4e2e8dacc02d71d1cb1f94a7d9a63f6315c0dbe4dd93c94619bfd6",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "NAVER AI 사업과 메모리 장기계약 내러티브를 각각 검증한다. 여러 종목이 언급됐다는 이유로 동일 수혜를 부여하지 않는다.",
+            "execution_gate_override": false
+          },
+          {
+            "source": "youtube",
+            "event_key": "AJs04lc6rEA",
+            "content_sha256": "af07346c85b5310dec7662ac1df61b3e24d8bb585a7de7c04d11ed3c5e98fc66",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "실적 기대·자사주 종료·프로그램 수급의 설명을 별도로 확인한다. 같은 날 장 초반·후반 시각 혼합에 유의한다.",
+            "execution_gate_override": false
+          }
+        ]
+      },
+      {
+        "ticker": "000660.KS",
+        "research_action": "REQUIRES_PRIMARY_VERIFICATION",
+        "research_priority": "VERIFY",
+        "research_impact": "상충·시점·공식 원자료 검증",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action_now": false,
+          "blockers": [
+            "영상은 실행 전용 자료가 아님",
+            "현재 시세·계좌·위험 gate 별도 필요"
+          ],
+          "required_rechecks": [
+            "현재 시장 packet",
+            "관측 시각과 원공시"
+          ]
+        },
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "nzDnc9h0bI8",
+            "content_sha256": "301beec6d740b559539cdfced7b4c35946672a018aa038c918f1b5da7651d05e",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "AI 주도 강세와 한국 저평가 내러티브를 분리한다. 일드갭 수치·계산 기준이 확인되기 전 할인율 근거로 사용하지 않는다.",
+            "execution_gate_override": false
+          }
+        ]
+      },
+      {
+        "ticker": "005380",
+        "research_action": "REQUIRES_PRIMARY_VERIFICATION",
+        "research_priority": "VERIFY",
+        "research_impact": "상충·시점·공식 원자료 검증",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action_now": false,
+          "blockers": [
+            "영상은 실행 전용 자료가 아님",
+            "현재 시세·계좌·위험 gate 별도 필요"
+          ],
+          "required_rechecks": [
+            "현재 시장 packet",
+            "관측 시각과 원공시"
+          ]
+        },
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "ybLz66vTZRo",
+            "content_sha256": "1a00e12a3e4e2e8dacc02d71d1cb1f94a7d9a63f6315c0dbe4dd93c94619bfd6",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "NAVER AI 사업과 메모리 장기계약 내러티브를 각각 검증한다. 여러 종목이 언급됐다는 이유로 동일 수혜를 부여하지 않는다.",
+            "execution_gate_override": false
+          }
+        ]
+      },
+      {
+        "ticker": "005380.KS",
+        "research_action": "REQUIRES_PRIMARY_VERIFICATION",
+        "research_priority": "VERIFY",
+        "research_impact": "상충·시점·공식 원자료 검증",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action_now": false,
+          "blockers": [
+            "영상은 실행 전용 자료가 아님",
+            "현재 시세·계좌·위험 gate 별도 필요"
+          ],
+          "required_rechecks": [
+            "현재 시장 packet",
+            "관측 시각과 원공시"
+          ]
+        },
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "nzDnc9h0bI8",
+            "content_sha256": "301beec6d740b559539cdfced7b4c35946672a018aa038c918f1b5da7651d05e",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "AI 주도 강세와 한국 저평가 내러티브를 분리한다. 일드갭 수치·계산 기준이 확인되기 전 할인율 근거로 사용하지 않는다.",
+            "execution_gate_override": false
+          },
+          {
+            "source": "youtube",
+            "event_key": "VhvHTl6MVh8",
+            "content_sha256": "2691616c279facf6fc030c69aa28f63d417e9eb7ce58a25d279b63172c9b633f",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "META의 AI 접점 확대와 AAPL 플랫폼 위험을 비교 연구한다. 점유율·조달비용 예측은 미검증으로 남긴다.",
+            "execution_gate_override": false
+          }
+        ]
+      },
+      {
+        "ticker": "005930",
+        "research_action": "REQUIRES_PRIMARY_VERIFICATION",
+        "research_priority": "VERIFY",
+        "research_impact": "상충·시점·공식 원자료 검증",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action_now": false,
+          "blockers": [
+            "영상은 실행 전용 자료가 아님",
+            "현재 시세·계좌·위험 gate 별도 필요"
+          ],
+          "required_rechecks": [
+            "현재 시장 packet",
+            "관측 시각과 원공시"
+          ]
+        },
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "V3bFEMRwteY",
+            "content_sha256": "be5888876f092d3016aa075811225a0552b84b3aafa29de388cb8bdb3053f83f",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "삼성전자 실적 기대와 외국인 수급을 분리 확인한다. 실적 규모·지수 자막의 단위 이상을 해소하기 전 수치를 사용하지 않는다.",
+            "execution_gate_override": false
+          },
+          {
+            "source": "youtube",
+            "event_key": "ybLz66vTZRo",
+            "content_sha256": "1a00e12a3e4e2e8dacc02d71d1cb1f94a7d9a63f6315c0dbe4dd93c94619bfd6",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "NAVER AI 사업과 메모리 장기계약 내러티브를 각각 검증한다. 여러 종목이 언급됐다는 이유로 동일 수혜를 부여하지 않는다.",
+            "execution_gate_override": false
+          },
+          {
+            "source": "youtube",
+            "event_key": "AJs04lc6rEA",
+            "content_sha256": "af07346c85b5310dec7662ac1df61b3e24d8bb585a7de7c04d11ed3c5e98fc66",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "실적 기대·자사주 종료·프로그램 수급의 설명을 별도로 확인한다. 같은 날 장 초반·후반 시각 혼합에 유의한다.",
+            "execution_gate_override": false
+          },
+          {
+            "source": "youtube",
+            "event_key": "45C717bFiE8",
+            "content_sha256": "dab5b04608867be65600fd85f701e2e83f220e9f354824ca2be66e118829386c",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "stale 판정을 유지해 TLT 진입 수준과 업종 순환 수치는 현재 전략에서 제외한다. 과거 내러티브의 배경으로만 사용한다.",
+            "execution_gate_override": false
+          }
+        ]
+      },
+      {
+        "ticker": "005930.KS",
+        "research_action": "REQUIRES_PRIMARY_VERIFICATION",
+        "research_priority": "VERIFY",
+        "research_impact": "상충·시점·공식 원자료 검증",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action_now": false,
+          "blockers": [
+            "영상은 실행 전용 자료가 아님",
+            "현재 시세·계좌·위험 gate 별도 필요"
+          ],
+          "required_rechecks": [
+            "현재 시장 packet",
+            "관측 시각과 원공시"
+          ]
+        },
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "nzDnc9h0bI8",
+            "content_sha256": "301beec6d740b559539cdfced7b4c35946672a018aa038c918f1b5da7651d05e",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "AI 주도 강세와 한국 저평가 내러티브를 분리한다. 일드갭 수치·계산 기준이 확인되기 전 할인율 근거로 사용하지 않는다.",
+            "execution_gate_override": false
+          },
+          {
+            "source": "youtube",
+            "event_key": "VhvHTl6MVh8",
+            "content_sha256": "2691616c279facf6fc030c69aa28f63d417e9eb7ce58a25d279b63172c9b633f",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "META의 AI 접점 확대와 AAPL 플랫폼 위험을 비교 연구한다. 점유율·조달비용 예측은 미검증으로 남긴다.",
+            "execution_gate_override": false
+          }
+        ]
+      },
+      {
+        "ticker": "017670",
+        "research_action": "REQUIRES_PRIMARY_VERIFICATION",
+        "research_priority": "VERIFY",
+        "research_impact": "상충·시점·공식 원자료 검증",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action_now": false,
+          "blockers": [
+            "영상은 실행 전용 자료가 아님",
+            "현재 시세·계좌·위험 gate 별도 필요"
+          ],
+          "required_rechecks": [
+            "현재 시장 packet",
+            "관측 시각과 원공시"
+          ]
+        },
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "ybLz66vTZRo",
+            "content_sha256": "1a00e12a3e4e2e8dacc02d71d1cb1f94a7d9a63f6315c0dbe4dd93c94619bfd6",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "NAVER AI 사업과 메모리 장기계약 내러티브를 각각 검증한다. 여러 종목이 언급됐다는 이유로 동일 수혜를 부여하지 않는다.",
+            "execution_gate_override": false
+          }
+        ]
+      },
+      {
+        "ticker": "035420",
+        "research_action": "REQUIRES_PRIMARY_VERIFICATION",
+        "research_priority": "VERIFY",
+        "research_impact": "상충·시점·공식 원자료 검증",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action_now": false,
+          "blockers": [
+            "영상은 실행 전용 자료가 아님",
+            "현재 시세·계좌·위험 gate 별도 필요"
+          ],
+          "required_rechecks": [
+            "현재 시장 packet",
+            "관측 시각과 원공시"
+          ]
+        },
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "ybLz66vTZRo",
+            "content_sha256": "1a00e12a3e4e2e8dacc02d71d1cb1f94a7d9a63f6315c0dbe4dd93c94619bfd6",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "NAVER AI 사업과 메모리 장기계약 내러티브를 각각 검증한다. 여러 종목이 언급됐다는 이유로 동일 수혜를 부여하지 않는다.",
+            "execution_gate_override": false
+          },
+          {
+            "source": "youtube",
+            "event_key": "7Ua2mdttWUU",
+            "content_sha256": "a529b850521ba361db730d6c724fe2dbabb709142ebac77ac80a0baba6639a05",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "LG전자·NAVER·NVDA의 실제 사업 연계를 확인한다. 서로 다른 기간의 상승률을 상대가치 판단에 섞지 않는다.",
+            "execution_gate_override": false
+          }
+        ]
+      },
+      {
+        "ticker": "036930",
+        "research_action": "REQUIRES_PRIMARY_VERIFICATION",
+        "research_priority": "VERIFY",
+        "research_impact": "상충·시점·공식 원자료 검증",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action_now": false,
+          "blockers": [
+            "영상은 실행 전용 자료가 아님",
+            "현재 시세·계좌·위험 gate 별도 필요"
+          ],
+          "required_rechecks": [
+            "현재 시장 packet",
+            "관측 시각과 원공시"
+          ]
+        },
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "AJs04lc6rEA",
+            "content_sha256": "af07346c85b5310dec7662ac1df61b3e24d8bb585a7de7c04d11ed3c5e98fc66",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "실적 기대·자사주 종료·프로그램 수급의 설명을 별도로 확인한다. 같은 날 장 초반·후반 시각 혼합에 유의한다.",
+            "execution_gate_override": false
+          }
+        ]
+      },
+      {
+        "ticker": "066570",
+        "research_action": "REQUIRES_PRIMARY_VERIFICATION",
+        "research_priority": "VERIFY",
+        "research_impact": "상충·시점·공식 원자료 검증",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action_now": false,
+          "blockers": [
+            "영상은 실행 전용 자료가 아님",
+            "현재 시세·계좌·위험 gate 별도 필요"
+          ],
+          "required_rechecks": [
+            "현재 시장 packet",
+            "관측 시각과 원공시"
+          ]
+        },
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "ybLz66vTZRo",
+            "content_sha256": "1a00e12a3e4e2e8dacc02d71d1cb1f94a7d9a63f6315c0dbe4dd93c94619bfd6",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "NAVER AI 사업과 메모리 장기계약 내러티브를 각각 검증한다. 여러 종목이 언급됐다는 이유로 동일 수혜를 부여하지 않는다.",
+            "execution_gate_override": false
+          },
+          {
+            "source": "youtube",
+            "event_key": "7Ua2mdttWUU",
+            "content_sha256": "a529b850521ba361db730d6c724fe2dbabb709142ebac77ac80a0baba6639a05",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "LG전자·NAVER·NVDA의 실제 사업 연계를 확인한다. 서로 다른 기간의 상승률을 상대가치 판단에 섞지 않는다.",
+            "execution_gate_override": false
+          }
+        ]
+      },
+      {
+        "ticker": "090430",
+        "research_action": "REQUIRES_PRIMARY_VERIFICATION",
+        "research_priority": "VERIFY",
+        "research_impact": "상충·시점·공식 원자료 검증",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action_now": false,
+          "blockers": [
+            "영상은 실행 전용 자료가 아님",
+            "현재 시세·계좌·위험 gate 별도 필요"
+          ],
+          "required_rechecks": [
+            "현재 시장 packet",
+            "관측 시각과 원공시"
+          ]
+        },
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "ybLz66vTZRo",
+            "content_sha256": "1a00e12a3e4e2e8dacc02d71d1cb1f94a7d9a63f6315c0dbe4dd93c94619bfd6",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "NAVER AI 사업과 메모리 장기계약 내러티브를 각각 검증한다. 여러 종목이 언급됐다는 이유로 동일 수혜를 부여하지 않는다.",
+            "execution_gate_override": false
+          }
+        ]
+      },
+      {
+        "ticker": "192820",
+        "research_action": "REQUIRES_PRIMARY_VERIFICATION",
+        "research_priority": "VERIFY",
+        "research_impact": "상충·시점·공식 원자료 검증",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action_now": false,
+          "blockers": [
+            "영상은 실행 전용 자료가 아님",
+            "현재 시세·계좌·위험 gate 별도 필요"
+          ],
+          "required_rechecks": [
+            "현재 시장 packet",
+            "관측 시각과 원공시"
+          ]
+        },
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "ybLz66vTZRo",
+            "content_sha256": "1a00e12a3e4e2e8dacc02d71d1cb1f94a7d9a63f6315c0dbe4dd93c94619bfd6",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "NAVER AI 사업과 메모리 장기계약 내러티브를 각각 검증한다. 여러 종목이 언급됐다는 이유로 동일 수혜를 부여하지 않는다.",
+            "execution_gate_override": false
+          }
+        ]
+      },
+      {
+        "ticker": "AAPL",
+        "research_action": "UPGRADE_RESEARCH",
+        "research_priority": "HIGH",
+        "research_impact": "우선 채널 근거에 따른 연구 순서 상향; 실행·비중 변경 없음",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action_now": false,
+          "blockers": [
+            "영상은 실행 전용 자료가 아님",
+            "현재 시세·계좌·위험 gate 별도 필요"
+          ],
+          "required_rechecks": [
+            "현재 시장 packet",
+            "관측 시각과 원공시"
+          ]
+        },
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "bL2q1ZfwdJA",
+            "content_sha256": "c5f9d8736aa1d5f7d1b87821bc9867d8da2ae2d799e523bff8f86a3072c2de37",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "HIGH",
+            "rationale": "HOOD·SNPS 연구 우선순위를 최상위로 올린다. 공식 발표로 AI 제품·협업 실체를 확인했다. 신규 서비스의 출시 예정과 실적 기여는 분리한다. DASH·AAPL·ACN의 수익 영향은 추가 검증한다.",
+            "execution_gate_override": false
+          },
+          {
+            "source": "youtube",
+            "event_key": "VhvHTl6MVh8",
+            "content_sha256": "2691616c279facf6fc030c69aa28f63d417e9eb7ce58a25d279b63172c9b633f",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "META의 AI 접점 확대와 AAPL 플랫폼 위험을 비교 연구한다. 점유율·조달비용 예측은 미검증으로 남긴다.",
+            "execution_gate_override": false
+          }
+        ]
+      },
+      {
+        "ticker": "ACN",
+        "research_action": "UPGRADE_RESEARCH",
+        "research_priority": "HIGH",
+        "research_impact": "우선 채널 근거에 따른 연구 순서 상향; 실행·비중 변경 없음",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action_now": false,
+          "blockers": [
+            "영상은 실행 전용 자료가 아님",
+            "현재 시세·계좌·위험 gate 별도 필요"
+          ],
+          "required_rechecks": [
+            "현재 시장 packet",
+            "관측 시각과 원공시"
+          ]
+        },
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "bL2q1ZfwdJA",
+            "content_sha256": "c5f9d8736aa1d5f7d1b87821bc9867d8da2ae2d799e523bff8f86a3072c2de37",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "HIGH",
+            "rationale": "HOOD·SNPS 연구 우선순위를 최상위로 올린다. 공식 발표로 AI 제품·협업 실체를 확인했다. 신규 서비스의 출시 예정과 실적 기여는 분리한다. DASH·AAPL·ACN의 수익 영향은 추가 검증한다.",
+            "execution_gate_override": false
+          }
+        ]
+      },
+      {
+        "ticker": "AMD",
+        "research_action": "REQUIRES_PRIMARY_VERIFICATION",
+        "research_priority": "VERIFY",
+        "research_impact": "상충·시점·공식 원자료 검증",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action_now": false,
+          "blockers": [
+            "영상은 실행 전용 자료가 아님",
+            "현재 시세·계좌·위험 gate 별도 필요"
+          ],
+          "required_rechecks": [
+            "현재 시장 packet",
+            "관측 시각과 원공시"
+          ]
+        },
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "Lacr3C3biDY",
+            "content_sha256": "873cda9b44570473a9977abca85151857c1030bfa27fba28f705151a203aef27",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "MRVL·ASIC·광통신의 실제 가이던스와 메모리 공급 우려를 비교한다. 자막 매출 수치와 지수 밴드는 재인용하지 않는다.",
+            "execution_gate_override": false
+          },
+          {
+            "source": "youtube",
+            "event_key": "6A1yI_eWNT4",
+            "content_sha256": "008df1aec7a253531d5262f2c5f889ec795f4c2e98b5e16f6eaa48597cba5e28",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "미국 최고가와 국내 반등의 기계적 연결을 피한다. 국내 지수의 서로 다른 자릿수와 AMD 방한·협력 주장은 별도 확인한다.",
+            "execution_gate_override": false
+          },
+          {
+            "source": "youtube",
+            "event_key": "45C717bFiE8",
+            "content_sha256": "dab5b04608867be65600fd85f701e2e83f220e9f354824ca2be66e118829386c",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "stale 판정을 유지해 TLT 진입 수준과 업종 순환 수치는 현재 전략에서 제외한다. 과거 내러티브의 배경으로만 사용한다.",
+            "execution_gate_override": false
+          }
+        ]
+      },
+      {
+        "ticker": "AVGO",
+        "research_action": "REQUIRES_PRIMARY_VERIFICATION",
+        "research_priority": "VERIFY",
+        "research_impact": "상충·시점·공식 원자료 검증",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action_now": false,
+          "blockers": [
+            "영상은 실행 전용 자료가 아님",
+            "현재 시세·계좌·위험 gate 별도 필요"
+          ],
+          "required_rechecks": [
+            "현재 시장 packet",
+            "관측 시각과 원공시"
+          ]
+        },
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "45C717bFiE8",
+            "content_sha256": "dab5b04608867be65600fd85f701e2e83f220e9f354824ca2be66e118829386c",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "stale 판정을 유지해 TLT 진입 수준과 업종 순환 수치는 현재 전략에서 제외한다. 과거 내러티브의 배경으로만 사용한다.",
+            "execution_gate_override": false
+          }
+        ]
+      },
+      {
+        "ticker": "BTC",
+        "research_action": "REQUIRES_PRIMARY_VERIFICATION",
+        "research_priority": "VERIFY",
+        "research_impact": "상충·시점·공식 원자료 검증",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action_now": false,
+          "blockers": [
+            "영상은 실행 전용 자료가 아님",
+            "현재 시세·계좌·위험 gate 별도 필요"
+          ],
+          "required_rechecks": [
+            "현재 시장 packet",
+            "관측 시각과 원공시"
+          ]
+        },
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "FxODK6IMn_Q",
+            "content_sha256": "612d264f03c735bb27008bf13dd36874f11c70cda8af8073f52a0b46786ca8ae",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "유가·금리·인플레이션 전이 위험의 연구 우선순위를 올린다. 제시된 상관계수와 경계 금리는 원시 시계열 확인 전 배제한다.",
+            "execution_gate_override": false
+          },
+          {
+            "source": "youtube",
+            "event_key": "sk26GkZL8sM",
+            "content_sha256": "ba90a741bea3faf69d9d196d8fad619d388d19cf63a5bbde67dd3fd17d85c942",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "해킹 보상액의 산술 불일치를 확인했다. 해킹 도전은 보안감사 대체 근거가 아니며 BTC·ETH 수탁 연구에서 증거 신뢰도를 낮춘다.",
+            "execution_gate_override": false
+          },
+          {
+            "source": "youtube",
+            "event_key": "UIhZeFfg63A",
+            "content_sha256": "8e6a5bb3662f2005b5ea6dae33e6d2ff7ab71d125161f7ba9de168678c1fb626",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "BitGo의 인가 범위·상장·기관 실사는 원자료 확인 대상으로 둔다. 기관 진출 내러티브를 BTC 가격 상승 근거로 확정하지 않는다.",
+            "execution_gate_override": false
+          }
+        ]
+      },
+      {
+        "ticker": "CEG",
+        "research_action": "REQUIRES_PRIMARY_VERIFICATION",
+        "research_priority": "VERIFY",
+        "research_impact": "상충·시점·공식 원자료 검증",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action_now": false,
+          "blockers": [
+            "영상은 실행 전용 자료가 아님",
+            "현재 시세·계좌·위험 gate 별도 필요"
+          ],
+          "required_rechecks": [
+            "현재 시장 packet",
+            "관측 시각과 원공시"
+          ]
+        },
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "45C717bFiE8",
+            "content_sha256": "dab5b04608867be65600fd85f701e2e83f220e9f354824ca2be66e118829386c",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "stale 판정을 유지해 TLT 진입 수준과 업종 순환 수치는 현재 전략에서 제외한다. 과거 내러티브의 배경으로만 사용한다.",
+            "execution_gate_override": false
+          }
+        ]
+      },
+      {
+        "ticker": "CL=F",
+        "research_action": "REQUIRES_PRIMARY_VERIFICATION",
+        "research_priority": "VERIFY",
+        "research_impact": "상충·시점·공식 원자료 검증",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action_now": false,
+          "blockers": [
+            "영상은 실행 전용 자료가 아님",
+            "현재 시세·계좌·위험 gate 별도 필요"
+          ],
+          "required_rechecks": [
+            "현재 시장 packet",
+            "관측 시각과 원공시"
+          ]
+        },
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "6E_PQvDGRa4",
+            "content_sha256": "8f2e4c433c9d5d26c1c96ef6c87cb248673fedca9461b5ec3eb0c4c56820032c",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "한국 상대약세와 외국인 매도·달러·유가의 동시 변화를 점검한다. 상관관계를 확정 원인으로 사용하지 않는다.",
+            "execution_gate_override": false
+          },
+          {
+            "source": "youtube",
+            "event_key": "zIwhnaBjqNw",
+            "content_sha256": "a809ad160ae8cd4ad949c01e1751fc0ceafcc4b933cf3e40bad631201e0de52f",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "실적·환율 민감도와 업종 순환을 점검한다. 조 원과 달러, 지수 단위가 섞인 수치는 인용 대상에서 제외한다.",
+            "execution_gate_override": false
+          },
+          {
+            "source": "youtube",
+            "event_key": "FxODK6IMn_Q",
+            "content_sha256": "612d264f03c735bb27008bf13dd36874f11c70cda8af8073f52a0b46786ca8ae",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "유가·금리·인플레이션 전이 위험의 연구 우선순위를 올린다. 제시된 상관계수와 경계 금리는 원시 시계열 확인 전 배제한다.",
+            "execution_gate_override": false
+          }
+        ]
+      },
+      {
+        "ticker": "CRWD",
+        "research_action": "REQUIRES_PRIMARY_VERIFICATION",
+        "research_priority": "VERIFY",
+        "research_impact": "상충·시점·공식 원자료 검증",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action_now": false,
+          "blockers": [
+            "영상은 실행 전용 자료가 아님",
+            "현재 시세·계좌·위험 gate 별도 필요"
+          ],
+          "required_rechecks": [
+            "현재 시장 packet",
+            "관측 시각과 원공시"
+          ]
+        },
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "45C717bFiE8",
+            "content_sha256": "dab5b04608867be65600fd85f701e2e83f220e9f354824ca2be66e118829386c",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "stale 판정을 유지해 TLT 진입 수준과 업종 순환 수치는 현재 전략에서 제외한다. 과거 내러티브의 배경으로만 사용한다.",
+            "execution_gate_override": false
+          }
+        ]
+      },
+      {
+        "ticker": "DASH",
+        "research_action": "UPGRADE_RESEARCH",
+        "research_priority": "HIGH",
+        "research_impact": "우선 채널 근거에 따른 연구 순서 상향; 실행·비중 변경 없음",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action_now": false,
+          "blockers": [
+            "영상은 실행 전용 자료가 아님",
+            "현재 시세·계좌·위험 gate 별도 필요"
+          ],
+          "required_rechecks": [
+            "현재 시장 packet",
+            "관측 시각과 원공시"
+          ]
+        },
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "bL2q1ZfwdJA",
+            "content_sha256": "c5f9d8736aa1d5f7d1b87821bc9867d8da2ae2d799e523bff8f86a3072c2de37",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "HIGH",
+            "rationale": "HOOD·SNPS 연구 우선순위를 최상위로 올린다. 공식 발표로 AI 제품·협업 실체를 확인했다. 신규 서비스의 출시 예정과 실적 기여는 분리한다. DASH·AAPL·ACN의 수익 영향은 추가 검증한다.",
+            "execution_gate_override": false
+          }
+        ]
+      },
+      {
+        "ticker": "ETH",
+        "research_action": "REQUIRES_PRIMARY_VERIFICATION",
+        "research_priority": "VERIFY",
+        "research_impact": "상충·시점·공식 원자료 검증",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action_now": false,
+          "blockers": [
+            "영상은 실행 전용 자료가 아님",
+            "현재 시세·계좌·위험 gate 별도 필요"
+          ],
+          "required_rechecks": [
+            "현재 시장 packet",
+            "관측 시각과 원공시"
+          ]
+        },
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "sk26GkZL8sM",
+            "content_sha256": "ba90a741bea3faf69d9d196d8fad619d388d19cf63a5bbde67dd3fd17d85c942",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "해킹 보상액의 산술 불일치를 확인했다. 해킹 도전은 보안감사 대체 근거가 아니며 BTC·ETH 수탁 연구에서 증거 신뢰도를 낮춘다.",
+            "execution_gate_override": false
+          }
+        ]
+      },
+      {
+        "ticker": "HOOD",
+        "research_action": "UPGRADE_RESEARCH",
+        "research_priority": "HIGHEST",
+        "research_impact": "우선 채널 근거에 따른 연구 순서 상향; 실행·비중 변경 없음",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action_now": false,
+          "blockers": [
+            "영상은 실행 전용 자료가 아님",
+            "현재 시세·계좌·위험 gate 별도 필요"
+          ],
+          "required_rechecks": [
+            "현재 시장 packet",
+            "관측 시각과 원공시"
+          ]
+        },
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "bL2q1ZfwdJA",
+            "content_sha256": "c5f9d8736aa1d5f7d1b87821bc9867d8da2ae2d799e523bff8f86a3072c2de37",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "HIGH",
+            "rationale": "HOOD·SNPS 연구 우선순위를 최상위로 올린다. 공식 발표로 AI 제품·협업 실체를 확인했다. 신규 서비스의 출시 예정과 실적 기여는 분리한다. DASH·AAPL·ACN의 수익 영향은 추가 검증한다.",
+            "execution_gate_override": false
+          }
+        ]
+      },
+      {
+        "ticker": "KOSDAQ",
+        "research_action": "REQUIRES_PRIMARY_VERIFICATION",
+        "research_priority": "VERIFY",
+        "research_impact": "상충·시점·공식 원자료 검증",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action_now": false,
+          "blockers": [
+            "영상은 실행 전용 자료가 아님",
+            "현재 시세·계좌·위험 gate 별도 필요"
+          ],
+          "required_rechecks": [
+            "현재 시장 packet",
+            "관측 시각과 원공시"
+          ]
+        },
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "V3bFEMRwteY",
+            "content_sha256": "be5888876f092d3016aa075811225a0552b84b3aafa29de388cb8bdb3053f83f",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "삼성전자 실적 기대와 외국인 수급을 분리 확인한다. 실적 규모·지수 자막의 단위 이상을 해소하기 전 수치를 사용하지 않는다.",
+            "execution_gate_override": false
+          },
+          {
+            "source": "youtube",
+            "event_key": "2bMWLDREDrs",
+            "content_sha256": "8ee35a7d15d22e9a273699f386f5633c6c1a75ce24ee59a4f5f656020229f74c",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "10월 6일 장 막판 선물 흐름을 배경으로만 쓴다. 선물 반등과 현물 방향의 차이를 확인한다.",
+            "execution_gate_override": false
+          },
+          {
+            "source": "youtube",
+            "event_key": "E8S2DZYeQ5E",
+            "content_sha256": "54b986e578b5baf9985f7327531100b20ea89cc3a4c3bedd0a084daab5b80bcd",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "신고가 종목 선호는 출연자 전략으로 표시한다. 과거 시세·금리 수치로 현재 강도를 판정하지 않는다.",
+            "execution_gate_override": false
+          }
+        ]
+      },
+      {
+        "ticker": "META",
+        "research_action": "REQUIRES_PRIMARY_VERIFICATION",
+        "research_priority": "VERIFY",
+        "research_impact": "상충·시점·공식 원자료 검증",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action_now": false,
+          "blockers": [
+            "영상은 실행 전용 자료가 아님",
+            "현재 시세·계좌·위험 gate 별도 필요"
+          ],
+          "required_rechecks": [
+            "현재 시장 packet",
+            "관측 시각과 원공시"
+          ]
+        },
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "VhvHTl6MVh8",
+            "content_sha256": "2691616c279facf6fc030c69aa28f63d417e9eb7ce58a25d279b63172c9b633f",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "META의 AI 접점 확대와 AAPL 플랫폼 위험을 비교 연구한다. 점유율·조달비용 예측은 미검증으로 남긴다.",
+            "execution_gate_override": false
+          },
+          {
+            "source": "youtube",
+            "event_key": "45C717bFiE8",
+            "content_sha256": "dab5b04608867be65600fd85f701e2e83f220e9f354824ca2be66e118829386c",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "stale 판정을 유지해 TLT 진입 수준과 업종 순환 수치는 현재 전략에서 제외한다. 과거 내러티브의 배경으로만 사용한다.",
+            "execution_gate_override": false
+          }
+        ]
+      },
+      {
+        "ticker": "MRVL",
+        "research_action": "REQUIRES_PRIMARY_VERIFICATION",
+        "research_priority": "VERIFY",
+        "research_impact": "상충·시점·공식 원자료 검증",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action_now": false,
+          "blockers": [
+            "영상은 실행 전용 자료가 아님",
+            "현재 시세·계좌·위험 gate 별도 필요"
+          ],
+          "required_rechecks": [
+            "현재 시장 packet",
+            "관측 시각과 원공시"
+          ]
+        },
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "45C717bFiE8",
+            "content_sha256": "dab5b04608867be65600fd85f701e2e83f220e9f354824ca2be66e118829386c",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "stale 판정을 유지해 TLT 진입 수준과 업종 순환 수치는 현재 전략에서 제외한다. 과거 내러티브의 배경으로만 사용한다.",
+            "execution_gate_override": false
+          }
+        ]
+      },
+      {
+        "ticker": "MU",
+        "research_action": "REQUIRES_PRIMARY_VERIFICATION",
+        "research_priority": "VERIFY",
+        "research_impact": "상충·시점·공식 원자료 검증",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action_now": false,
+          "blockers": [
+            "영상은 실행 전용 자료가 아님",
+            "현재 시세·계좌·위험 gate 별도 필요"
+          ],
+          "required_rechecks": [
+            "현재 시장 packet",
+            "관측 시각과 원공시"
+          ]
+        },
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "nzDnc9h0bI8",
+            "content_sha256": "301beec6d740b559539cdfced7b4c35946672a018aa038c918f1b5da7651d05e",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "AI 주도 강세와 한국 저평가 내러티브를 분리한다. 일드갭 수치·계산 기준이 확인되기 전 할인율 근거로 사용하지 않는다.",
+            "execution_gate_override": false
+          },
+          {
+            "source": "youtube",
+            "event_key": "VhvHTl6MVh8",
+            "content_sha256": "2691616c279facf6fc030c69aa28f63d417e9eb7ce58a25d279b63172c9b633f",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "META의 AI 접점 확대와 AAPL 플랫폼 위험을 비교 연구한다. 점유율·조달비용 예측은 미검증으로 남긴다.",
+            "execution_gate_override": false
+          },
+          {
+            "source": "youtube",
+            "event_key": "45C717bFiE8",
+            "content_sha256": "dab5b04608867be65600fd85f701e2e83f220e9f354824ca2be66e118829386c",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "stale 판정을 유지해 TLT 진입 수준과 업종 순환 수치는 현재 전략에서 제외한다. 과거 내러티브의 배경으로만 사용한다.",
+            "execution_gate_override": false
+          }
+        ]
+      },
+      {
+        "ticker": "NVDA",
+        "research_action": "REQUIRES_PRIMARY_VERIFICATION",
+        "research_priority": "VERIFY",
+        "research_impact": "상충·시점·공식 원자료 검증",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action_now": false,
+          "blockers": [
+            "영상은 실행 전용 자료가 아님",
+            "현재 시세·계좌·위험 gate 별도 필요"
+          ],
+          "required_rechecks": [
+            "현재 시장 packet",
+            "관측 시각과 원공시"
+          ]
+        },
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "nzDnc9h0bI8",
+            "content_sha256": "301beec6d740b559539cdfced7b4c35946672a018aa038c918f1b5da7651d05e",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "AI 주도 강세와 한국 저평가 내러티브를 분리한다. 일드갭 수치·계산 기준이 확인되기 전 할인율 근거로 사용하지 않는다.",
+            "execution_gate_override": false
+          },
+          {
+            "source": "youtube",
+            "event_key": "aeDjqFadkHs",
+            "content_sha256": "1cb406ae7018e69a4539332a4b4ef1bc04aceb62ca2a60b25a23cc75e63005b4",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "NVDA 고객금융과 데이터센터 고객의 신용위험을 연구한다. 인사 관계나 직함에 관한 자동자막을 기업 실적 논거로 쓰지 않는다.",
+            "execution_gate_override": false
+          },
+          {
+            "source": "youtube",
+            "event_key": "7Ua2mdttWUU",
+            "content_sha256": "a529b850521ba361db730d6c724fe2dbabb709142ebac77ac80a0baba6639a05",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "LG전자·NAVER·NVDA의 실제 사업 연계를 확인한다. 서로 다른 기간의 상승률을 상대가치 판단에 섞지 않는다.",
+            "execution_gate_override": false
+          },
+          {
+            "source": "youtube",
+            "event_key": "XbXfph9KUXY",
+            "content_sha256": "0ab7e159dc66da095d5494cb6b35915a4a0fd7efa7a63b966d88983c1e9bbcb1",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "커버드콜의 분배 재원·원금 변동·세후 현금흐름을 확인한다. 제목의 평생 월수익을 보장수익으로 쓰지 않는다.",
+            "execution_gate_override": false
+          }
+        ]
+      },
+      {
+        "ticker": "ORCL",
+        "research_action": "REQUIRES_PRIMARY_VERIFICATION",
+        "research_priority": "VERIFY",
+        "research_impact": "상충·시점·공식 원자료 검증",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action_now": false,
+          "blockers": [
+            "영상은 실행 전용 자료가 아님",
+            "현재 시세·계좌·위험 gate 별도 필요"
+          ],
+          "required_rechecks": [
+            "현재 시장 packet",
+            "관측 시각과 원공시"
+          ]
+        },
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "Lacr3C3biDY",
+            "content_sha256": "873cda9b44570473a9977abca85151857c1030bfa27fba28f705151a203aef27",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "MRVL·ASIC·광통신의 실제 가이던스와 메모리 공급 우려를 비교한다. 자막 매출 수치와 지수 밴드는 재인용하지 않는다.",
+            "execution_gate_override": false
+          }
+        ]
+      },
+      {
+        "ticker": "SCHD",
+        "research_action": "REQUIRES_PRIMARY_VERIFICATION",
+        "research_priority": "VERIFY",
+        "research_impact": "상충·시점·공식 원자료 검증",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action_now": false,
+          "blockers": [
+            "영상은 실행 전용 자료가 아님",
+            "현재 시세·계좌·위험 gate 별도 필요"
+          ],
+          "required_rechecks": [
+            "현재 시장 packet",
+            "관측 시각과 원공시"
+          ]
+        },
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "XbXfph9KUXY",
+            "content_sha256": "0ab7e159dc66da095d5494cb6b35915a4a0fd7efa7a63b966d88983c1e9bbcb1",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "커버드콜의 분배 재원·원금 변동·세후 현금흐름을 확인한다. 제목의 평생 월수익을 보장수익으로 쓰지 않는다.",
+            "execution_gate_override": false
+          }
+        ]
+      },
+      {
+        "ticker": "SNPS",
+        "research_action": "UPGRADE_RESEARCH",
+        "research_priority": "HIGHEST",
+        "research_impact": "우선 채널 근거에 따른 연구 순서 상향; 실행·비중 변경 없음",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action_now": false,
+          "blockers": [
+            "영상은 실행 전용 자료가 아님",
+            "현재 시세·계좌·위험 gate 별도 필요"
+          ],
+          "required_rechecks": [
+            "현재 시장 packet",
+            "관측 시각과 원공시"
+          ]
+        },
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "bL2q1ZfwdJA",
+            "content_sha256": "c5f9d8736aa1d5f7d1b87821bc9867d8da2ae2d799e523bff8f86a3072c2de37",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "HIGH",
+            "rationale": "HOOD·SNPS 연구 우선순위를 최상위로 올린다. 공식 발표로 AI 제품·협업 실체를 확인했다. 신규 서비스의 출시 예정과 실적 기여는 분리한다. DASH·AAPL·ACN의 수익 영향은 추가 검증한다.",
+            "execution_gate_override": false
+          }
+        ]
+      },
+      {
+        "ticker": "SPX",
+        "research_action": "REQUIRES_PRIMARY_VERIFICATION",
+        "research_priority": "VERIFY",
+        "research_impact": "상충·시점·공식 원자료 검증",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action_now": false,
+          "blockers": [
+            "영상은 실행 전용 자료가 아님",
+            "현재 시세·계좌·위험 gate 별도 필요"
+          ],
+          "required_rechecks": [
+            "현재 시장 packet",
+            "관측 시각과 원공시"
+          ]
+        },
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "nzDnc9h0bI8",
+            "content_sha256": "301beec6d740b559539cdfced7b4c35946672a018aa038c918f1b5da7651d05e",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "AI 주도 강세와 한국 저평가 내러티브를 분리한다. 일드갭 수치·계산 기준이 확인되기 전 할인율 근거로 사용하지 않는다.",
+            "execution_gate_override": false
+          },
+          {
+            "source": "youtube",
+            "event_key": "FxODK6IMn_Q",
+            "content_sha256": "612d264f03c735bb27008bf13dd36874f11c70cda8af8073f52a0b46786ca8ae",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "유가·금리·인플레이션 전이 위험의 연구 우선순위를 올린다. 제시된 상관계수와 경계 금리는 원시 시계열 확인 전 배제한다.",
+            "execution_gate_override": false
+          },
+          {
+            "source": "youtube",
+            "event_key": "7qQyi7I3gGM",
+            "content_sha256": "60a062ec5f55d1004d058384a9cb89f428311b855cf19d2860f6b785627538a6",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "선거 계절성 수치는 표본·수익률 구간을 검증하기 전 활용하지 않는다. 행사 일정은 공식 달력으로 확인한다.",
+            "execution_gate_override": false
+          }
+        ]
+      },
+      {
+        "ticker": "STRC",
+        "research_action": "REQUIRES_PRIMARY_VERIFICATION",
+        "research_priority": "VERIFY",
+        "research_impact": "상충·시점·공식 원자료 검증",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action_now": false,
+          "blockers": [
+            "영상은 실행 전용 자료가 아님",
+            "현재 시세·계좌·위험 gate 별도 필요"
+          ],
+          "required_rechecks": [
+            "현재 시장 packet",
+            "관측 시각과 원공시"
+          ]
+        },
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "BrHnGU5Sz3k",
+            "content_sha256": "c29fa7fd896bc0c59044d3915f85a0c510f103f4740a78b2119c7025b83c1939",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "BTC 보유기업·ETF 흐름·우선주 구조를 구분한다. 현물 가격과 ETF 순유출입을 같은 날짜의 공식 자료로 확인한다.",
+            "execution_gate_override": false
+          }
+        ]
+      },
+      {
+        "ticker": "TLT",
+        "research_action": "REQUIRES_PRIMARY_VERIFICATION",
+        "research_priority": "VERIFY",
+        "research_impact": "상충·시점·공식 원자료 검증",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action_now": false,
+          "blockers": [
+            "영상은 실행 전용 자료가 아님",
+            "현재 시세·계좌·위험 gate 별도 필요"
+          ],
+          "required_rechecks": [
+            "현재 시장 packet",
+            "관측 시각과 원공시"
+          ]
+        },
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "45C717bFiE8",
+            "content_sha256": "dab5b04608867be65600fd85f701e2e83f220e9f354824ca2be66e118829386c",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "stale 판정을 유지해 TLT 진입 수준과 업종 순환 수치는 현재 전략에서 제외한다. 과거 내러티브의 배경으로만 사용한다.",
+            "execution_gate_override": false
+          }
+        ]
+      },
+      {
+        "ticker": "TSLA",
+        "research_action": "UPGRADE_RESEARCH",
+        "research_priority": "HIGH",
+        "research_impact": "우선 채널 근거에 따른 연구 순서 상향; 실행·비중 변경 없음",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action_now": false,
+          "blockers": [
+            "영상은 실행 전용 자료가 아님",
+            "현재 시세·계좌·위험 gate 별도 필요"
+          ],
+          "required_rechecks": [
+            "현재 시장 packet",
+            "관측 시각과 원공시"
+          ]
+        },
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "ha4-lyhvafM",
+            "content_sha256": "398cf902773ffefccfbd8d3b30b622504110e513db3664e3a1723ed0385e8168",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "HIGH",
+            "rationale": "TSLA 정책 민감도와 규제·예산 원문 확인을 높은 우선순위로 올린다. 정치적 관계 회복을 수주·규제완화 확정으로 해석하지 않는다.",
+            "execution_gate_override": false
+          },
+          {
+            "source": "youtube",
+            "event_key": "zvP9u8N1U00",
+            "content_sha256": "4e5431e643cec2a311148a7faa7e3374b1cd3ac8b91accd81975802f26de953a",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "TSLA 인도량과 애널리스트 목표주가는 원발표 시점부터 검증한다. 제목의 매수 기회 표현을 진입 신호로 승격하지 않는다.",
+            "execution_gate_override": false
+          },
+          {
+            "source": "youtube",
+            "event_key": "VhvHTl6MVh8",
+            "content_sha256": "2691616c279facf6fc030c69aa28f63d417e9eb7ce58a25d279b63172c9b633f",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "META의 AI 접점 확대와 AAPL 플랫폼 위험을 비교 연구한다. 점유율·조달비용 예측은 미검증으로 남긴다.",
+            "execution_gate_override": false
+          }
+        ]
+      },
+      {
+        "ticker": "US10Y",
+        "research_action": "REQUIRES_PRIMARY_VERIFICATION",
+        "research_priority": "VERIFY",
+        "research_impact": "상충·시점·공식 원자료 검증",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action_now": false,
+          "blockers": [
+            "영상은 실행 전용 자료가 아님",
+            "현재 시세·계좌·위험 gate 별도 필요"
+          ],
+          "required_rechecks": [
+            "현재 시장 packet",
+            "관측 시각과 원공시"
+          ]
+        },
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "7qQyi7I3gGM",
+            "content_sha256": "60a062ec5f55d1004d058384a9cb89f428311b855cf19d2860f6b785627538a6",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "선거 계절성 수치는 표본·수익률 구간을 검증하기 전 활용하지 않는다. 행사 일정은 공식 달력으로 확인한다.",
+            "execution_gate_override": false
+          }
+        ]
+      },
+      {
+        "ticker": "VST",
+        "research_action": "REQUIRES_PRIMARY_VERIFICATION",
+        "research_priority": "VERIFY",
+        "research_impact": "상충·시점·공식 원자료 검증",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action_now": false,
+          "blockers": [
+            "영상은 실행 전용 자료가 아님",
+            "현재 시세·계좌·위험 gate 별도 필요"
+          ],
+          "required_rechecks": [
+            "현재 시장 packet",
+            "관측 시각과 원공시"
+          ]
+        },
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "45C717bFiE8",
+            "content_sha256": "dab5b04608867be65600fd85f701e2e83f220e9f354824ca2be66e118829386c",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "stale 판정을 유지해 TLT 진입 수준과 업종 순환 수치는 현재 전략에서 제외한다. 과거 내러티브의 배경으로만 사용한다.",
+            "execution_gate_override": false
+          }
+        ]
+      },
+      {
+        "ticker": "^KS11",
+        "research_action": "REQUIRES_PRIMARY_VERIFICATION",
+        "research_priority": "VERIFY",
+        "research_impact": "상충·시점·공식 원자료 검증",
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action_now": false,
+          "blockers": [
+            "영상은 실행 전용 자료가 아님",
+            "현재 시세·계좌·위험 gate 별도 필요"
+          ],
+          "required_rechecks": [
+            "현재 시장 packet",
+            "관측 시각과 원공시"
+          ]
+        },
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "hnZaB99hVG8",
+            "content_sha256": "2d0cac34fab6fd6c9a487c0e7e847cc50a1a34f2ab7857419c5c594153abf98e",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "장 막판 외국인 선물 변화와 현물 흐름을 별도로 확인한다. 장중 순매수 전환만으로 다음 세션 방향을 확정하지 않는다.",
+            "execution_gate_override": false
+          },
+          {
+            "source": "youtube",
+            "event_key": "nzDnc9h0bI8",
+            "content_sha256": "301beec6d740b559539cdfced7b4c35946672a018aa038c918f1b5da7651d05e",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "AI 주도 강세와 한국 저평가 내러티브를 분리한다. 일드갭 수치·계산 기준이 확인되기 전 할인율 근거로 사용하지 않는다.",
+            "execution_gate_override": false
+          },
+          {
+            "source": "youtube",
+            "event_key": "6E_PQvDGRa4",
+            "content_sha256": "8f2e4c433c9d5d26c1c96ef6c87cb248673fedca9461b5ec3eb0c4c56820032c",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "한국 상대약세와 외국인 매도·달러·유가의 동시 변화를 점검한다. 상관관계를 확정 원인으로 사용하지 않는다.",
+            "execution_gate_override": false
+          },
+          {
+            "source": "youtube",
+            "event_key": "cu6xJFOb-m0",
+            "content_sha256": "95f444fcc7a4c15be7332fc1b03ede23d8f1fc96eb33e46e10dd6c382dd7996c",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "반도체 소부장 압축 논리는 공시·실제 실적으로 대조한다. 일정과 지수 경계선은 공식 자료로 재확인한다.",
+            "execution_gate_override": false
+          },
+          {
+            "source": "youtube",
+            "event_key": "V3bFEMRwteY",
+            "content_sha256": "be5888876f092d3016aa075811225a0552b84b3aafa29de388cb8bdb3053f83f",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "삼성전자 실적 기대와 외국인 수급을 분리 확인한다. 실적 규모·지수 자막의 단위 이상을 해소하기 전 수치를 사용하지 않는다.",
+            "execution_gate_override": false
+          },
+          {
+            "source": "youtube",
+            "event_key": "kNCZ7VJ76RM",
+            "content_sha256": "b41415e8945f7490cfa60d74db0a06e02b0be60cd9d45021f35581957bb2da27",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "ETF 리밸런싱·옵션 만기와 매도 압력을 검증한다. 관망 의견은 출연자의 시나리오이며 현재 포트폴리오 매매 지시가 아니다.",
+            "execution_gate_override": false
+          },
+          {
+            "source": "youtube",
+            "event_key": "Lacr3C3biDY",
+            "content_sha256": "873cda9b44570473a9977abca85151857c1030bfa27fba28f705151a203aef27",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "MRVL·ASIC·광통신의 실제 가이던스와 메모리 공급 우려를 비교한다. 자막 매출 수치와 지수 밴드는 재인용하지 않는다.",
+            "execution_gate_override": false
+          },
+          {
+            "source": "youtube",
+            "event_key": "6A1yI_eWNT4",
+            "content_sha256": "008df1aec7a253531d5262f2c5f889ec795f4c2e98b5e16f6eaa48597cba5e28",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "미국 최고가와 국내 반등의 기계적 연결을 피한다. 국내 지수의 서로 다른 자릿수와 AMD 방한·협력 주장은 별도 확인한다.",
+            "execution_gate_override": false
+          },
+          {
+            "source": "youtube",
+            "event_key": "S2wyWIUH1hM",
+            "content_sha256": "566bbfb7e5a25db0c3266bcabde972f7af7a420ba9e6755229e869765bc5e88f",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "같은 거래일의 미국 금리가 다른 영상과 크게 다른 점을 표시한다. 지수 자릿수 충돌도 해소되기 전 전략 가격에 사용하지 않는다.",
+            "execution_gate_override": false
+          },
+          {
+            "source": "youtube",
+            "event_key": "7ISq8xon_5c",
+            "content_sha256": "f5df63d29e62c556e2a4fae622789e0fd3ef8c6b60fc8b138f5690b272582fd2",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "메모리 대형주에서 소부장으로의 순환은 24시간 이전 배경이다. 기존 종목 축소·급등주 추격을 지시하지 않는다.",
+            "execution_gate_override": false
+          },
+          {
+            "source": "youtube",
+            "event_key": "2bMWLDREDrs",
+            "content_sha256": "8ee35a7d15d22e9a273699f386f5633c6c1a75ce24ee59a4f5f656020229f74c",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "10월 6일 장 막판 선물 흐름을 배경으로만 쓴다. 선물 반등과 현물 방향의 차이를 확인한다.",
+            "execution_gate_override": false
+          },
+          {
+            "source": "youtube",
+            "event_key": "lElNLk_Vc3w",
+            "content_sha256": "82fce47a00ae07a7faf9eec548e6e1daecb107e5af693b9249fa56589b431c58",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "업종 확산과 단기 순환 가설을 보존한다. 현재 거래대금과 이익 전망 확인 전 지속 추세로 승격하지 않는다.",
+            "execution_gate_override": false
+          },
+          {
+            "source": "youtube",
+            "event_key": "SfN6Ax1vVY0",
+            "content_sha256": "3709d0a92b96179e34920fbb4419f2b8996a4591566394675deaff149ac3f56e",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "ESS·에너지로 확산되는 가설을 과거 배경으로 둔다. 달러지수 경계선과 외국인 복귀를 확정 조건으로 사용하지 않는다.",
+            "execution_gate_override": false
+          },
+          {
+            "source": "youtube",
+            "event_key": "gSy9RYunYkE",
+            "content_sha256": "cc7a81ca77d408d2878aa333ae4a244dff5fcfbd6f137133d567573ae50c842d",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "반도체 대형주와 소부장 상대강도 가설을 유지한다. 국가별 금리와 날짜 혼합을 해소한 뒤 비교한다.",
+            "execution_gate_override": false
+          },
+          {
+            "source": "youtube",
+            "event_key": "G9sIwQRMl0E",
+            "content_sha256": "a2e31255035ec5b4ea87b1d6d8737ea055960c3a728247cf151f039fe98bdb47",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "전일 코스닥 수급과 자사주 종료 설명을 배경으로 둔다. 대형주에서 중소형주로의 이동을 현재 추세로 단정하지 않는다.",
+            "execution_gate_override": false
+          },
+          {
+            "source": "youtube",
+            "event_key": "E8S2DZYeQ5E",
+            "content_sha256": "54b986e578b5baf9985f7327531100b20ea89cc3a4c3bedd0a084daab5b80bcd",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "신고가 종목 선호는 출연자 전략으로 표시한다. 과거 시세·금리 수치로 현재 강도를 판정하지 않는다.",
+            "execution_gate_override": false
+          },
+          {
+            "source": "youtube",
+            "event_key": "qMysq1fBe8w",
+            "content_sha256": "ff7c87daef4410984742e900f7deccf930d3bbbad751916a0feb88a172b0fda9",
+            "affected_fields": [
+              "research_priority"
+            ],
+            "evidence_weight": "LOW_LABELED",
+            "rationale": "미국 지수·개별 종목 상대강도는 같은 관측 시점으로 맞춘다. 한국 부진의 단일 원인을 추정하지 않는다.",
+            "execution_gate_override": false
+          }
+        ]
+      }
+    ],
+    "coverage_receipt": {
+      "event_id": "youtube:45c37a54cbb16776dc6fdfee97a8dbf8",
+      "status": "PARTIAL",
+      "window_events": 72,
+      "transmitted_events": 60,
+      "truncated": true,
+      "new_events": 51,
+      "revised_events": 0
+    },
+    "model_receipt": {
+      "schema": "tradingagents.model-provenance/v1",
+      "work_synthesis": {
+        "execution_mode": "local",
+        "requested_model": "gpt-6-sol",
+        "requested_reasoning_effort": "xhigh",
+        "task_id": "tradingagents-work-youtube",
+        "verification_status": "CONFIGURED_NOT_RUNTIME_VERIFIED",
+        "observed_model": null,
+        "observed_reasoning_effort": null,
+        "note": "The local task contract is verified; the Work host does not expose a signed per-response model receipt."
+      }
+    },
+    "source_summary": {
+      "producer": {
+        "health": "OK",
+        "run_id": "youtube_20261007_211326",
+        "last_run_at": "2026-10-07T22:24:37.741407+09:00",
+        "status": "success",
+        "stale_after_hours": 36
+      },
+      "coverage": {
+        "total_unique_events": 384,
+        "window_events": 72,
+        "transmitted_events": 60,
+        "truncated": true,
+        "oldest_occurred_at": "2026-10-05T12:07:39+00:00",
+        "newest_occurred_at": "2026-10-07T12:05:04+00:00"
+      },
+      "delta": {
+        "new_events": 51,
+        "revised_events": 0,
+        "unchanged_events": 9,
+        "delivered_event_keys": [
+          "bL2q1ZfwdJA",
+          "i6RO9FTUuKQ",
+          "ha4-lyhvafM",
+          "WuWAjehIbgg",
+          "hnZaB99hVG8",
+          "nzDnc9h0bI8",
+          "zvP9u8N1U00",
+          "HEKkMZD0aYU",
+          "s2IhKAd8QGY",
+          "6E_PQvDGRa4",
+          "VhvHTl6MVh8",
+          "aeDjqFadkHs",
+          "zIwhnaBjqNw",
+          "cu6xJFOb-m0",
+          "hMV3KV4Sanc",
+          "V3bFEMRwteY",
+          "kNCZ7VJ76RM",
+          "GCQ5ZKoUNZs",
+          "FxODK6IMn_Q",
+          "BrHnGU5Sz3k",
+          "ybLz66vTZRo",
+          "3CKtq9InEN4",
+          "AJs04lc6rEA",
+          "toEF93oEd3Q",
+          "Lacr3C3biDY",
+          "6A1yI_eWNT4",
+          "kCIAfXCh5WA",
+          "7Gw-WumkJdQ",
+          "S2wyWIUH1hM",
+          "45C717bFiE8",
+          "a2xNf3_sH70",
+          "7qQyi7I3gGM",
+          "UqMzO3SUJxg",
+          "7ISq8xon_5c",
+          "2bMWLDREDrs",
+          "lElNLk_Vc3w",
+          "UugiydREUKg",
+          "PQj4yqVJ_ok",
+          "7Ua2mdttWUU",
+          "SfN6Ax1vVY0",
+          "XbXfph9KUXY",
+          "gSy9RYunYkE",
+          "sk26GkZL8sM",
+          "G9sIwQRMl0E",
+          "paZADAQnd2o",
+          "wlJy5v1ikFc",
+          "E8S2DZYeQ5E",
+          "8uq4srVsgbU",
+          "qMysq1fBe8w",
+          "_v8UI8HKq4s",
+          "UIhZeFfg63A"
+        ]
+      },
+      "event_reviews": [
+        {
+          "event_key": "bL2q1ZfwdJA",
+          "content_sha256": "c5f9d8736aa1d5f7d1b87821bc9867d8da2ae2d799e523bff8f86a3072c2de37",
+          "occurred_at": "2026-10-07T12:05:04+00:00",
+          "source_url": "https://www.youtube.com/watch?v=bL2q1ZfwdJA",
+          "original_status": "asr_uncertain",
+          "strategy_evidence_weight": "HIGH",
+          "review": "HOOD·SNPS 연구 우선순위를 최상위로 올린다. 공식 발표로 AI 제품·협업 실체를 확인했다. 신규 서비스의 출시 예정과 실적 기여는 분리한다. DASH·AAPL·ACN의 수익 영향은 추가 검증한다.",
+          "time_scope": "최근 24시간"
+        },
+        {
+          "event_key": "i6RO9FTUuKQ",
+          "content_sha256": "52373ffcbcd9a226a13786b299022785fbe31ed60a592ac9b3a9834ec774c6e4",
+          "occurred_at": "2026-10-06T10:15:09+00:00",
+          "source_url": "https://www.youtube.com/watch?v=i6RO9FTUuKQ",
+          "original_status": "asr_uncertain",
+          "strategy_evidence_weight": "HIGH",
+          "review": "국민연금 자산배분·국내 대형주 수급의 검증 우선순위를 상향한다. 공식 7월 말 적립금과 비중을 일부 확인했으나 전체 감소액을 실현손실로 보거나 향후 매도액으로 환산하지 않는다.",
+          "time_scope": "이전 배경"
+        },
+        {
+          "event_key": "ha4-lyhvafM",
+          "content_sha256": "398cf902773ffefccfbd8d3b30b622504110e513db3664e3a1723ed0385e8168",
+          "occurred_at": "2026-10-06T08:30:29+00:00",
+          "source_url": "https://www.youtube.com/watch?v=ha4-lyhvafM",
+          "original_status": "asr_uncertain",
+          "strategy_evidence_weight": "HIGH",
+          "review": "TSLA 정책 민감도와 규제·예산 원문 확인을 높은 우선순위로 올린다. 정치적 관계 회복을 수주·규제완화 확정으로 해석하지 않는다.",
+          "time_scope": "이전 배경"
+        },
+        {
+          "event_key": "WuWAjehIbgg",
+          "content_sha256": "9bd4d53cefe5cce65204dcbe1baf3b2b6972e1bdd6eb4bf37ec7948e3292ae47",
+          "occurred_at": "2026-10-07T12:00:06+00:00",
+          "source_url": "https://www.youtube.com/watch?v=WuWAjehIbgg",
+          "original_status": "asr_uncertain",
+          "strategy_evidence_weight": "STANDARD",
+          "review": "삼성전자 실적 발표와 ETF 구성·만기 일정을 확인한다. 자동자막의 실적 규모를 전망치에 복사하지 않는다.",
+          "time_scope": "최근 24시간"
+        },
+        {
+          "event_key": "hnZaB99hVG8",
+          "content_sha256": "2d0cac34fab6fd6c9a487c0e7e847cc50a1a34f2ab7857419c5c594153abf98e",
+          "occurred_at": "2026-10-07T11:00:33+00:00",
+          "source_url": "https://www.youtube.com/watch?v=hnZaB99hVG8",
+          "original_status": "asr_uncertain",
+          "strategy_evidence_weight": "STANDARD",
+          "review": "장 막판 외국인 선물 변화와 현물 흐름을 별도로 확인한다. 장중 순매수 전환만으로 다음 세션 방향을 확정하지 않는다.",
+          "time_scope": "최근 24시간"
+        },
+        {
+          "event_key": "nzDnc9h0bI8",
+          "content_sha256": "301beec6d740b559539cdfced7b4c35946672a018aa038c918f1b5da7651d05e",
+          "occurred_at": "2026-10-07T11:00:12+00:00",
+          "source_url": "https://www.youtube.com/watch?v=nzDnc9h0bI8",
+          "original_status": "asr_uncertain",
+          "strategy_evidence_weight": "STANDARD",
+          "review": "AI 주도 강세와 한국 저평가 내러티브를 분리한다. 일드갭 수치·계산 기준이 확인되기 전 할인율 근거로 사용하지 않는다.",
+          "time_scope": "최근 24시간"
+        },
+        {
+          "event_key": "zvP9u8N1U00",
+          "content_sha256": "4e5431e643cec2a311148a7faa7e3374b1cd3ac8b91accd81975802f26de953a",
+          "occurred_at": "2026-10-07T09:48:26+00:00",
+          "source_url": "https://www.youtube.com/watch?v=zvP9u8N1U00",
+          "original_status": "asr_uncertain",
+          "strategy_evidence_weight": "STANDARD",
+          "review": "TSLA 인도량과 애널리스트 목표주가는 원발표 시점부터 검증한다. 제목의 매수 기회 표현을 진입 신호로 승격하지 않는다.",
+          "time_scope": "최근 24시간"
+        },
+        {
+          "event_key": "HEKkMZD0aYU",
+          "content_sha256": "05fe516f746b431c50f8bfa19981c73acaf3b62827d13056d59a654e2bf29eca",
+          "occurred_at": "2026-10-07T09:02:16+00:00",
+          "source_url": "https://www.youtube.com/watch?v=HEKkMZD0aYU",
+          "original_status": "asr_uncertain",
+          "strategy_evidence_weight": "STANDARD",
+          "review": "AI 기업의 자금조달 위험과 금리·물가 동반 상승을 연구 체크포인트로 올린다. 금리 수준은 다른 영상과 충돌하므로 공식 관측값 확인 전 배제한다.",
+          "time_scope": "최근 24시간"
+        },
+        {
+          "event_key": "s2IhKAd8QGY",
+          "content_sha256": "4e5fabb62ed3bea1dcdb4ee2db0e9460e89cfed5aab4c916b17a75d541328c46",
+          "occurred_at": "2026-10-07T09:00:26+00:00",
+          "source_url": "https://www.youtube.com/watch?v=s2IhKAd8QGY",
+          "original_status": "asr_uncertain",
+          "strategy_evidence_weight": "STANDARD",
+          "review": "SK하이닉스 ADR과 현지 상장 상품을 구별하고 솔리디그 상장설을 확인한다. 일부 가격 관련 근거가 전체 상장·수혜 논리를 증명하지 않는다.",
+          "time_scope": "최근 24시간"
+        },
+        {
+          "event_key": "6E_PQvDGRa4",
+          "content_sha256": "8f2e4c433c9d5d26c1c96ef6c87cb248673fedca9461b5ec3eb0c4c56820032c",
+          "occurred_at": "2026-10-07T08:10:33+00:00",
+          "source_url": "https://www.youtube.com/watch?v=6E_PQvDGRa4",
+          "original_status": "asr_uncertain",
+          "strategy_evidence_weight": "STANDARD",
+          "review": "한국 상대약세와 외국인 매도·달러·유가의 동시 변화를 점검한다. 상관관계를 확정 원인으로 사용하지 않는다.",
+          "time_scope": "최근 24시간"
+        },
+        {
+          "event_key": "VhvHTl6MVh8",
+          "content_sha256": "2691616c279facf6fc030c69aa28f63d417e9eb7ce58a25d279b63172c9b633f",
+          "occurred_at": "2026-10-07T08:00:42+00:00",
+          "source_url": "https://www.youtube.com/watch?v=VhvHTl6MVh8",
+          "original_status": "asr_uncertain",
+          "strategy_evidence_weight": "STANDARD",
+          "review": "META의 AI 접점 확대와 AAPL 플랫폼 위험을 비교 연구한다. 점유율·조달비용 예측은 미검증으로 남긴다.",
+          "time_scope": "최근 24시간"
+        },
+        {
+          "event_key": "aeDjqFadkHs",
+          "content_sha256": "1cb406ae7018e69a4539332a4b4ef1bc04aceb62ca2a60b25a23cc75e63005b4",
+          "occurred_at": "2026-10-07T07:46:50+00:00",
+          "source_url": "https://www.youtube.com/watch?v=aeDjqFadkHs",
+          "original_status": "asr_uncertain",
+          "strategy_evidence_weight": "STANDARD",
+          "review": "NVDA 고객금융과 데이터센터 고객의 신용위험을 연구한다. 인사 관계나 직함에 관한 자동자막을 기업 실적 논거로 쓰지 않는다.",
+          "time_scope": "최근 24시간"
+        },
+        {
+          "event_key": "zIwhnaBjqNw",
+          "content_sha256": "a809ad160ae8cd4ad949c01e1751fc0ceafcc4b933cf3e40bad631201e0de52f",
+          "occurred_at": "2026-10-07T07:30:42+00:00",
+          "source_url": "https://www.youtube.com/watch?v=zIwhnaBjqNw",
+          "original_status": "asr_uncertain",
+          "strategy_evidence_weight": "STANDARD",
+          "review": "실적·환율 민감도와 업종 순환을 점검한다. 조 원과 달러, 지수 단위가 섞인 수치는 인용 대상에서 제외한다.",
+          "time_scope": "최근 24시간"
+        },
+        {
+          "event_key": "cu6xJFOb-m0",
+          "content_sha256": "95f444fcc7a4c15be7332fc1b03ede23d8f1fc96eb33e46e10dd6c382dd7996c",
+          "occurred_at": "2026-10-07T06:37:10+00:00",
+          "source_url": "https://www.youtube.com/watch?v=cu6xJFOb-m0",
+          "original_status": "asr_uncertain",
+          "strategy_evidence_weight": "STANDARD",
+          "review": "반도체 소부장 압축 논리는 공시·실제 실적으로 대조한다. 일정과 지수 경계선은 공식 자료로 재확인한다.",
+          "time_scope": "최근 24시간"
+        },
+        {
+          "event_key": "hMV3KV4Sanc",
+          "content_sha256": "2832568fde575be168355c3a1d6cf69d2a96e389a9baaf217f9394b4dc97ca94",
+          "occurred_at": "2026-10-07T06:26:03+00:00",
+          "source_url": "https://www.youtube.com/watch?v=hMV3KV4Sanc",
+          "original_status": "contradicted",
+          "strategy_evidence_weight": "STANDARD",
+          "review": "금·달러 상대매력의 상충 판정을 유지한다. 전송된 대표 주장에 반증 근거가 충분히 드러나지 않아 반증 내용을 새로 만들어 설명하지 않는다.",
+          "time_scope": "최근 24시간"
+        },
+        {
+          "event_key": "V3bFEMRwteY",
+          "content_sha256": "be5888876f092d3016aa075811225a0552b84b3aafa29de388cb8bdb3053f83f",
+          "occurred_at": "2026-10-07T06:02:01+00:00",
+          "source_url": "https://www.youtube.com/watch?v=V3bFEMRwteY",
+          "original_status": "asr_uncertain",
+          "strategy_evidence_weight": "STANDARD",
+          "review": "삼성전자 실적 기대와 외국인 수급을 분리 확인한다. 실적 규모·지수 자막의 단위 이상을 해소하기 전 수치를 사용하지 않는다.",
+          "time_scope": "최근 24시간"
+        },
+        {
+          "event_key": "kNCZ7VJ76RM",
+          "content_sha256": "b41415e8945f7490cfa60d74db0a06e02b0be60cd9d45021f35581957bb2da27",
+          "occurred_at": "2026-10-07T06:00:14+00:00",
+          "source_url": "https://www.youtube.com/watch?v=kNCZ7VJ76RM",
+          "original_status": "unverified",
+          "strategy_evidence_weight": "STANDARD",
+          "review": "ETF 리밸런싱·옵션 만기와 매도 압력을 검증한다. 관망 의견은 출연자의 시나리오이며 현재 포트폴리오 매매 지시가 아니다.",
+          "time_scope": "최근 24시간"
+        },
+        {
+          "event_key": "GCQ5ZKoUNZs",
+          "content_sha256": "21f173fa2db58701302b1b12c25035c538213787bcd7a7817c0aa83f441a5e6f",
+          "occurred_at": "2026-10-07T04:15:31+00:00",
+          "source_url": "https://www.youtube.com/watch?v=GCQ5ZKoUNZs",
+          "original_status": "contradicted",
+          "strategy_evidence_weight": "STANDARD",
+          "review": "원자료의 상충 판정을 보존한다. 미국·한국 상품과 관측 시각을 대조하며, 실적 전 매수 기회라는 제목만으로 관심도를 높이지 않는다.",
+          "time_scope": "최근 24시간"
+        },
+        {
+          "event_key": "FxODK6IMn_Q",
+          "content_sha256": "612d264f03c735bb27008bf13dd36874f11c70cda8af8073f52a0b46786ca8ae",
+          "occurred_at": "2026-10-07T03:47:38+00:00",
+          "source_url": "https://www.youtube.com/watch?v=FxODK6IMn_Q",
+          "original_status": "asr_uncertain",
+          "strategy_evidence_weight": "STANDARD",
+          "review": "유가·금리·인플레이션 전이 위험의 연구 우선순위를 올린다. 제시된 상관계수와 경계 금리는 원시 시계열 확인 전 배제한다.",
+          "time_scope": "최근 24시간"
+        },
+        {
+          "event_key": "BrHnGU5Sz3k",
+          "content_sha256": "c29fa7fd896bc0c59044d3915f85a0c510f103f4740a78b2119c7025b83c1939",
+          "occurred_at": "2026-10-07T03:06:09+00:00",
+          "source_url": "https://www.youtube.com/watch?v=BrHnGU5Sz3k",
+          "original_status": "asr_uncertain",
+          "strategy_evidence_weight": "STANDARD",
+          "review": "BTC 보유기업·ETF 흐름·우선주 구조를 구분한다. 현물 가격과 ETF 순유출입을 같은 날짜의 공식 자료로 확인한다.",
+          "time_scope": "최근 24시간"
+        },
+        {
+          "event_key": "ybLz66vTZRo",
+          "content_sha256": "1a00e12a3e4e2e8dacc02d71d1cb1f94a7d9a63f6315c0dbe4dd93c94619bfd6",
+          "occurred_at": "2026-10-07T02:33:59+00:00",
+          "source_url": "https://www.youtube.com/watch?v=ybLz66vTZRo",
+          "original_status": "asr_uncertain",
+          "strategy_evidence_weight": "STANDARD",
+          "review": "NAVER AI 사업과 메모리 장기계약 내러티브를 각각 검증한다. 여러 종목이 언급됐다는 이유로 동일 수혜를 부여하지 않는다.",
+          "time_scope": "최근 24시간"
+        },
+        {
+          "event_key": "3CKtq9InEN4",
+          "content_sha256": "4d6f1fd7220144dc89df155c73fd2f27e7d625e64278fbb3da505f712bb772e4",
+          "occurred_at": "2026-10-07T02:29:59+00:00",
+          "source_url": "https://www.youtube.com/watch?v=3CKtq9InEN4",
+          "original_status": "asr_uncertain",
+          "strategy_evidence_weight": "STANDARD",
+          "review": "메모리 가격과 환율 가정이 실적 전망에 주는 영향을 구분한다. 전망 변경은 원보고서의 이전·현재 가정을 비교한다.",
+          "time_scope": "최근 24시간"
+        },
+        {
+          "event_key": "AJs04lc6rEA",
+          "content_sha256": "af07346c85b5310dec7662ac1df61b3e24d8bb585a7de7c04d11ed3c5e98fc66",
+          "occurred_at": "2026-10-07T01:44:25+00:00",
+          "source_url": "https://www.youtube.com/watch?v=AJs04lc6rEA",
+          "original_status": "unverified",
+          "strategy_evidence_weight": "STANDARD",
+          "review": "실적 기대·자사주 종료·프로그램 수급의 설명을 별도로 확인한다. 같은 날 장 초반·후반 시각 혼합에 유의한다.",
+          "time_scope": "최근 24시간"
+        },
+        {
+          "event_key": "toEF93oEd3Q",
+          "content_sha256": "6a805aaf4e89b0a3a5e7727640c22f907c70c155a7ab6e01f82ae36ac3f0109c",
+          "occurred_at": "2026-10-07T01:00:56+00:00",
+          "source_url": "https://www.youtube.com/watch?v=toEF93oEd3Q",
+          "original_status": "asr_uncertain",
+          "strategy_evidence_weight": "STANDARD",
+          "review": "AI 인프라와 전력 장기계약을 연구 주제로 유지한다. 구체적 기업 발주가 확인되지 않으면 원전주 매출로 연결하지 않는다.",
+          "time_scope": "최근 24시간"
+        },
+        {
+          "event_key": "Lacr3C3biDY",
+          "content_sha256": "873cda9b44570473a9977abca85151857c1030bfa27fba28f705151a203aef27",
+          "occurred_at": "2026-10-07T00:11:15+00:00",
+          "source_url": "https://www.youtube.com/watch?v=Lacr3C3biDY",
+          "original_status": "asr_uncertain",
+          "strategy_evidence_weight": "STANDARD",
+          "review": "MRVL·ASIC·광통신의 실제 가이던스와 메모리 공급 우려를 비교한다. 자막 매출 수치와 지수 밴드는 재인용하지 않는다.",
+          "time_scope": "최근 24시간"
+        },
+        {
+          "event_key": "6A1yI_eWNT4",
+          "content_sha256": "008df1aec7a253531d5262f2c5f889ec795f4c2e98b5e16f6eaa48597cba5e28",
+          "occurred_at": "2026-10-06T23:38:19+00:00",
+          "source_url": "https://www.youtube.com/watch?v=6A1yI_eWNT4",
+          "original_status": "asr_uncertain",
+          "strategy_evidence_weight": "STANDARD",
+          "review": "미국 최고가와 국내 반등의 기계적 연결을 피한다. 국내 지수의 서로 다른 자릿수와 AMD 방한·협력 주장은 별도 확인한다.",
+          "time_scope": "최근 24시간"
+        },
+        {
+          "event_key": "kCIAfXCh5WA",
+          "content_sha256": "425f268ba62b430455fb80315902187e37928ddaef1294d4a1eaff028039d4a1",
+          "occurred_at": "2026-10-06T23:32:56+00:00",
+          "source_url": "https://www.youtube.com/watch?v=kCIAfXCh5WA",
+          "original_status": "asr_uncertain",
+          "strategy_evidence_weight": "STANDARD",
+          "review": "자사주 종료, 노동관계, 인수 투자금의 서로 다른 사건을 분리한다. 법적 교섭 의무와 투자 확정 여부는 원공시 없이 단정하지 않는다.",
+          "time_scope": "최근 24시간"
+        },
+        {
+          "event_key": "7Gw-WumkJdQ",
+          "content_sha256": "d41a096885b18c80f55c58e3aa4ed308deceb4c41735ea1754b33e53b372e776",
+          "occurred_at": "2026-10-06T22:51:43+00:00",
+          "source_url": "https://www.youtube.com/watch?v=7Gw-WumkJdQ",
+          "original_status": "asr_uncertain",
+          "strategy_evidence_weight": "STANDARD",
+          "review": "국채 헤지 효용과 해외 수요의 구조 변화를 검증한다. 상관관계의 기간·빈도와 외환보유액 원시 자료를 우선한다.",
+          "time_scope": "최근 24시간"
+        },
+        {
+          "event_key": "S2wyWIUH1hM",
+          "content_sha256": "566bbfb7e5a25db0c3266bcabde972f7af7a420ba9e6755229e869765bc5e88f",
+          "occurred_at": "2026-10-06T22:04:54+00:00",
+          "source_url": "https://www.youtube.com/watch?v=S2wyWIUH1hM",
+          "original_status": "asr_uncertain",
+          "strategy_evidence_weight": "STANDARD",
+          "review": "같은 거래일의 미국 금리가 다른 영상과 크게 다른 점을 표시한다. 지수 자릿수 충돌도 해소되기 전 전략 가격에 사용하지 않는다.",
+          "time_scope": "최근 24시간"
+        },
+        {
+          "event_key": "45C717bFiE8",
+          "content_sha256": "dab5b04608867be65600fd85f701e2e83f220e9f354824ca2be66e118829386c",
+          "occurred_at": "2026-10-06T22:00:40+00:00",
+          "source_url": "https://www.youtube.com/watch?v=45C717bFiE8",
+          "original_status": "stale",
+          "strategy_evidence_weight": "STANDARD",
+          "review": "stale 판정을 유지해 TLT 진입 수준과 업종 순환 수치는 현재 전략에서 제외한다. 과거 내러티브의 배경으로만 사용한다.",
+          "time_scope": "최근 24시간"
+        },
+        {
+          "event_key": "a2xNf3_sH70",
+          "content_sha256": "a84de12c72dc6a31d5a58581084057b1aba5ab2af2fe9c72d429450ac576f32d",
+          "occurred_at": "2026-10-06T14:00:26+00:00",
+          "source_url": "https://www.youtube.com/watch?v=a2xNf3_sH70",
+          "original_status": "unverified",
+          "strategy_evidence_weight": "STANDARD",
+          "review": "성장에 따른 장기금리 상승과 긴축 정책금리를 구분하는 가설을 유지한다. 과거 한 사례로 장기 상승장을 보장하지 않는다.",
+          "time_scope": "이전 배경"
+        },
+        {
+          "event_key": "7qQyi7I3gGM",
+          "content_sha256": "60a062ec5f55d1004d058384a9cb89f428311b855cf19d2860f6b785627538a6",
+          "occurred_at": "2026-10-06T13:00:28+00:00",
+          "source_url": "https://www.youtube.com/watch?v=7qQyi7I3gGM",
+          "original_status": "unverified",
+          "strategy_evidence_weight": "STANDARD",
+          "review": "선거 계절성 수치는 표본·수익률 구간을 검증하기 전 활용하지 않는다. 행사 일정은 공식 달력으로 확인한다.",
+          "time_scope": "이전 배경"
+        },
+        {
+          "event_key": "UqMzO3SUJxg",
+          "content_sha256": "be4491f28f6577986b1ac9b94ff45bdacbe5bc8b7c31696dca7b6e94b9bcf104",
+          "occurred_at": "2026-10-06T12:30:22+00:00",
+          "source_url": "https://www.youtube.com/watch?v=UqMzO3SUJxg",
+          "original_status": "unverified",
+          "strategy_evidence_weight": "STANDARD",
+          "review": "의회 구성별 정책 시나리오를 연구 배경으로 둔다. 정치 전망을 특정 자산 상승의 확정 원인으로 해석하지 않는다.",
+          "time_scope": "이전 배경"
+        },
+        {
+          "event_key": "7ISq8xon_5c",
+          "content_sha256": "f5df63d29e62c556e2a4fae622789e0fd3ef8c6b60fc8b138f5690b272582fd2",
+          "occurred_at": "2026-10-06T12:00:07+00:00",
+          "source_url": "https://www.youtube.com/watch?v=7ISq8xon_5c",
+          "original_status": "asr_uncertain",
+          "strategy_evidence_weight": "STANDARD",
+          "review": "메모리 대형주에서 소부장으로의 순환은 24시간 이전 배경이다. 기존 종목 축소·급등주 추격을 지시하지 않는다.",
+          "time_scope": "이전 배경"
+        },
+        {
+          "event_key": "2bMWLDREDrs",
+          "content_sha256": "8ee35a7d15d22e9a273699f386f5633c6c1a75ce24ee59a4f5f656020229f74c",
+          "occurred_at": "2026-10-06T11:00:30+00:00",
+          "source_url": "https://www.youtube.com/watch?v=2bMWLDREDrs",
+          "original_status": "asr_uncertain",
+          "strategy_evidence_weight": "STANDARD",
+          "review": "10월 6일 장 막판 선물 흐름을 배경으로만 쓴다. 선물 반등과 현물 방향의 차이를 확인한다.",
+          "time_scope": "이전 배경"
+        },
+        {
+          "event_key": "lElNLk_Vc3w",
+          "content_sha256": "82fce47a00ae07a7faf9eec548e6e1daecb107e5af693b9249fa56589b431c58",
+          "occurred_at": "2026-10-06T11:00:08+00:00",
+          "source_url": "https://www.youtube.com/watch?v=lElNLk_Vc3w",
+          "original_status": "asr_uncertain",
+          "strategy_evidence_weight": "STANDARD",
+          "review": "업종 확산과 단기 순환 가설을 보존한다. 현재 거래대금과 이익 전망 확인 전 지속 추세로 승격하지 않는다.",
+          "time_scope": "이전 배경"
+        },
+        {
+          "event_key": "UugiydREUKg",
+          "content_sha256": "c2296803de5c3678ea4dcceb36e6311932b17f2407c18de61539f7e9f45058d9",
+          "occurred_at": "2026-10-06T10:30:36+00:00",
+          "source_url": "https://www.youtube.com/watch?v=UugiydREUKg",
+          "original_status": "asr_uncertain",
+          "strategy_evidence_weight": "STANDARD",
+          "review": "SK하이닉스 자사주 규모·진행률은 ASR 불확실성을 유지한다. 매입 잔량을 향후 확정 매수세로 계산하지 않는다.",
+          "time_scope": "이전 배경"
+        },
+        {
+          "event_key": "PQj4yqVJ_ok",
+          "content_sha256": "c8d7fec77a92127dc21ae259c8fcb7df0552cac305b554f83b5ecec2e39ef412",
+          "occurred_at": "2026-10-06T10:00:39+00:00",
+          "source_url": "https://www.youtube.com/watch?v=PQj4yqVJ_ok",
+          "original_status": "asr_uncertain",
+          "strategy_evidence_weight": "STANDARD",
+          "review": "군사 사건은 공식 발표 전 미검증으로 둔다. 확인되지 않은 사건을 방산주 매수 신호로 연결하지 않는다.",
+          "time_scope": "이전 배경"
+        },
+        {
+          "event_key": "7Ua2mdttWUU",
+          "content_sha256": "a529b850521ba361db730d6c724fe2dbabb709142ebac77ac80a0baba6639a05",
+          "occurred_at": "2026-10-06T09:19:36+00:00",
+          "source_url": "https://www.youtube.com/watch?v=7Ua2mdttWUU",
+          "original_status": "unverified",
+          "strategy_evidence_weight": "STANDARD",
+          "review": "LG전자·NAVER·NVDA의 실제 사업 연계를 확인한다. 서로 다른 기간의 상승률을 상대가치 판단에 섞지 않는다.",
+          "time_scope": "이전 배경"
+        },
+        {
+          "event_key": "SfN6Ax1vVY0",
+          "content_sha256": "3709d0a92b96179e34920fbb4419f2b8996a4591566394675deaff149ac3f56e",
+          "occurred_at": "2026-10-06T09:06:34+00:00",
+          "source_url": "https://www.youtube.com/watch?v=SfN6Ax1vVY0",
+          "original_status": "asr_uncertain",
+          "strategy_evidence_weight": "STANDARD",
+          "review": "ESS·에너지로 확산되는 가설을 과거 배경으로 둔다. 달러지수 경계선과 외국인 복귀를 확정 조건으로 사용하지 않는다.",
+          "time_scope": "이전 배경"
+        },
+        {
+          "event_key": "XbXfph9KUXY",
+          "content_sha256": "0ab7e159dc66da095d5494cb6b35915a4a0fd7efa7a63b966d88983c1e9bbcb1",
+          "occurred_at": "2026-10-06T09:00:15+00:00",
+          "source_url": "https://www.youtube.com/watch?v=XbXfph9KUXY",
+          "original_status": "asr_uncertain",
+          "strategy_evidence_weight": "STANDARD",
+          "review": "커버드콜의 분배 재원·원금 변동·세후 현금흐름을 확인한다. 제목의 평생 월수익을 보장수익으로 쓰지 않는다.",
+          "time_scope": "이전 배경"
+        },
+        {
+          "event_key": "gSy9RYunYkE",
+          "content_sha256": "cc7a81ca77d408d2878aa333ae4a244dff5fcfbd6f137133d567573ae50c842d",
+          "occurred_at": "2026-10-06T08:30:32+00:00",
+          "source_url": "https://www.youtube.com/watch?v=gSy9RYunYkE",
+          "original_status": "asr_uncertain",
+          "strategy_evidence_weight": "STANDARD",
+          "review": "반도체 대형주와 소부장 상대강도 가설을 유지한다. 국가별 금리와 날짜 혼합을 해소한 뒤 비교한다.",
+          "time_scope": "이전 배경"
+        },
+        {
+          "event_key": "sk26GkZL8sM",
+          "content_sha256": "ba90a741bea3faf69d9d196d8fad619d388d19cf63a5bbde67dd3fd17d85c942",
+          "occurred_at": "2026-10-06T08:00:02+00:00",
+          "source_url": "https://www.youtube.com/watch?v=sk26GkZL8sM",
+          "original_status": "contradicted",
+          "strategy_evidence_weight": "STANDARD",
+          "review": "해킹 보상액의 산술 불일치를 확인했다. 해킹 도전은 보안감사 대체 근거가 아니며 BTC·ETH 수탁 연구에서 증거 신뢰도를 낮춘다.",
+          "time_scope": "이전 배경"
+        },
+        {
+          "event_key": "G9sIwQRMl0E",
+          "content_sha256": "a2e31255035ec5b4ea87b1d6d8737ea055960c3a728247cf151f039fe98bdb47",
+          "occurred_at": "2026-10-06T07:57:48+00:00",
+          "source_url": "https://www.youtube.com/watch?v=G9sIwQRMl0E",
+          "original_status": "asr_uncertain",
+          "strategy_evidence_weight": "STANDARD",
+          "review": "전일 코스닥 수급과 자사주 종료 설명을 배경으로 둔다. 대형주에서 중소형주로의 이동을 현재 추세로 단정하지 않는다.",
+          "time_scope": "이전 배경"
+        },
+        {
+          "event_key": "paZADAQnd2o",
+          "content_sha256": "d1820e98f2800ae67847e80a47464dc381062d98ed4ce96e25aa6716c9bc8ebf",
+          "occurred_at": "2026-10-06T07:30:39+00:00",
+          "source_url": "https://www.youtube.com/watch?v=paZADAQnd2o",
+          "original_status": "stale",
+          "strategy_evidence_weight": "STANDARD",
+          "review": "stale 판정과 익명 구매 담당자 출처를 명시한다. 장기계약·가격 전망을 확정 매출 또는 보유 지속 명령으로 사용하지 않는다.",
+          "time_scope": "이전 배경"
+        },
+        {
+          "event_key": "wlJy5v1ikFc",
+          "content_sha256": "cc54bc7d38fdd19313415e5e0ac7af0f31e9f7a5daf6fafc2ae0d0c70a10a071",
+          "occurred_at": "2026-10-06T06:41:49+00:00",
+          "source_url": "https://www.youtube.com/watch?v=wlJy5v1ikFc",
+          "original_status": "asr_uncertain",
+          "strategy_evidence_weight": "STANDARD",
+          "review": "기판 관련주는 원실적·공급계약 검증 대상으로 유지한다. 과도한 실적·목표가 및 자막 단위 오류를 가격선에 복사하지 않는다.",
+          "time_scope": "이전 배경"
+        },
+        {
+          "event_key": "E8S2DZYeQ5E",
+          "content_sha256": "54b986e578b5baf9985f7327531100b20ea89cc3a4c3bedd0a084daab5b80bcd",
+          "occurred_at": "2026-10-06T06:07:05+00:00",
+          "source_url": "https://www.youtube.com/watch?v=E8S2DZYeQ5E",
+          "original_status": "asr_uncertain",
+          "strategy_evidence_weight": "STANDARD",
+          "review": "신고가 종목 선호는 출연자 전략으로 표시한다. 과거 시세·금리 수치로 현재 강도를 판정하지 않는다.",
+          "time_scope": "이전 배경"
+        },
+        {
+          "event_key": "8uq4srVsgbU",
+          "content_sha256": "c47e87a7de21a517f1a5b22aa24ff69456ad19399c0740dc0d01467e9a073a2e",
+          "occurred_at": "2026-10-06T06:00:36+00:00",
+          "source_url": "https://www.youtube.com/watch?v=8uq4srVsgbU",
+          "original_status": "asr_uncertain",
+          "strategy_evidence_weight": "STANDARD",
+          "review": "외국인 보유 평가액과 순매매를 구분한다. 채권 숏 청산과 증시 반전은 검증되지 않은 시나리오다.",
+          "time_scope": "이전 배경"
+        },
+        {
+          "event_key": "qMysq1fBe8w",
+          "content_sha256": "ff7c87daef4410984742e900f7deccf930d3bbbad751916a0feb88a172b0fda9",
+          "occurred_at": "2026-10-06T05:37:25+00:00",
+          "source_url": "https://www.youtube.com/watch?v=qMysq1fBe8w",
+          "original_status": "asr_uncertain",
+          "strategy_evidence_weight": "STANDARD",
+          "review": "미국 지수·개별 종목 상대강도는 같은 관측 시점으로 맞춘다. 한국 부진의 단일 원인을 추정하지 않는다.",
+          "time_scope": "이전 배경"
+        },
+        {
+          "event_key": "_v8UI8HKq4s",
+          "content_sha256": "de55938caa5d1e40a6e2d95e92bc3c1696770f9534dd0190f2b6ab332aeb10e6",
+          "occurred_at": "2026-10-06T04:09:44+00:00",
+          "source_url": "https://www.youtube.com/watch?v=_v8UI8HKq4s",
+          "original_status": "asr_uncertain",
+          "strategy_evidence_weight": "STANDARD",
+          "review": "금·주식·유가·환율 시점이 혼합된 설명은 배경으로 제한한다. 주도주 판단은 현재 시장 packet의 별도 검증이 필요하다.",
+          "time_scope": "이전 배경"
+        },
+        {
+          "event_key": "UIhZeFfg63A",
+          "content_sha256": "8e6a5bb3662f2005b5ea6dae33e6d2ff7ab71d125161f7ba9de168678c1fb626",
+          "occurred_at": "2026-10-06T03:10:34+00:00",
+          "source_url": "https://www.youtube.com/watch?v=UIhZeFfg63A",
+          "original_status": "asr_uncertain",
+          "strategy_evidence_weight": "STANDARD",
+          "review": "BitGo의 인가 범위·상장·기관 실사는 원자료 확인 대상으로 둔다. 기관 진출 내러티브를 BTC 가격 상승 근거로 확정하지 않는다.",
+          "time_scope": "이전 배경"
+        }
+      ],
+      "original_status_counts": {
+        "asr_uncertain": 40,
+        "contradicted": 3,
+        "unverified": 6,
+        "stale": 2
+      },
+      "independent_verification_performed": true,
+      "independent_verification_scope": "Selected material claims only; not all videos",
+      "official_verification": [
+        {
+          "id": "OFFICIAL-RH-20260929",
+          "event_key": "bL2q1ZfwdJA",
+          "claim_ids": [
+            "C1",
+            "C2"
+          ],
+          "url": "https://robinhood.com/newsroom/hood-summit-2026/",
+          "result": "PARTIALLY_SUPPORTED",
+          "finding": "회사 발표는 에이전트 계좌 15만 초과와 일 약 3천만 도구 사용, 신제품 계획을 명시한다. 신규 Agents/Apps는 출시 예정이다. 암호화폐 선물 4배라는 영상 주장은 주식 일중마진 4배와 구별해야 한다. 실제 수익성은 미검증."
+        },
+        {
+          "id": "OFFICIAL-SNPS-20260930",
+          "event_key": "bL2q1ZfwdJA",
+          "claim_ids": [
+            "C6"
+          ],
+          "url": "https://news.synopsys.com/2026-09-30-OpenAI-and-Synopsys-Announce-GPT-Synopsys-Frontier-Intelligence-to-Revolutionize-Chip-Design",
+          "result": "PARTIALLY_SUPPORTED",
+          "finding": "GPT-Synopsys 공동 개발, 다년 계약과 수익배분을 공식 발표에서 확인했다. 설계기간 단축의 구체적 수치와 실현 매출은 확인하지 못했다."
+        },
+        {
+          "id": "OFFICIAL-NPS-202607",
+          "event_key": "i6RO9FTUuKQ",
+          "claim_ids": [
+            "C1",
+            "C2"
+          ],
+          "url": "https://fund.nps.or.kr/main.do",
+          "result": "PARTIALLY_SUPPORTED",
+          "finding": "7월 말 적립금 1,684.2조 원, 국내주식 비중 24.9%, 표시된 연간 목표 20.8%를 확인했다. 전월 대비 181조 감소·실현손익 구분·강제 리밸런싱 일정은 이 자료만으로 확정하지 않았다."
+        }
+      ],
+      "source_contributions": [
+        {
+          "source": "youtube",
+          "event_key": "i6RO9FTUuKQ",
+          "content_sha256": "52373ffcbcd9a226a13786b299022785fbe31ed60a592ac9b3a9834ec774c6e4",
+          "affected_fields": [
+            "research_priority"
+          ],
+          "evidence_weight": "HIGH",
+          "rationale": "국민연금 자산배분·국내 대형주 수급의 검증 우선순위를 상향한다. 공식 7월 말 적립금과 비중을 일부 확인했으나 전체 감소액을 실현손실로 보거나 향후 매도액으로 환산하지 않는다.",
+          "execution_gate_override": false
+        }
+      ],
+      "source_confidence_is_not_investment_probability": true
+    },
+    "next_checkpoint": "2026-10-07T23:55:00+09:00"
+  },
+  "report_id": "youtube:c190d50bfe4bc9043ff8d114db9f1b62",
+  "report_sha256": "c190d50bfe4bc9043ff8d114db9f1b62c6fc21c9ce4adc0e1e12f6cce3f2bb71",
+  "published_at": "2026-10-07T23:03:58.106406+09:00"
+}

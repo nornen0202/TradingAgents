@@ -1,0 +1,1007 @@
+{
+  "schema": "tradingagents.work-report/v1",
+  "surface": "youtube",
+  "event_id": "youtube:4e98f573f4b33dcf9753fa338d773d20",
+  "source_sha256": "4ae98445b8c8baa8d06653e1a4050904cbd31175c920df87a41c1416cf718ee9",
+  "prompt_contract_version": "youtube-work-v5",
+  "workflow_contract_sha256": "bc33d7680318d3200a3ef2fd2cc1f830d41fd1ba019e4f20ed6d1951cd6dc343",
+  "policy": {
+    "visibility": "investor_safe_no_credentials",
+    "external_evidence_profile": "balanced_external",
+    "external_evidence_may_affect": [
+      "ranking",
+      "confidence",
+      "position_size_within_existing_risk_limits",
+      "research_priority"
+    ],
+    "external_evidence_may_bypass_execution_gate": false,
+    "thesis_is_independent_from_execution_readiness": true
+  },
+  "report_markdown": "# YouTube 검증 델타 — 2026-10-04 09:39 KST\n\n**신규 16건 · 현재 주문/증액 0**\n\n- **소스:** youtube_20261004_081046 성공, 마지막 실행 후 0.94시간 / 허용 36시간. 이벤트 시각 16건은 파싱·순서·미래 여부 정상.\n- **변화:** 신규 16 · 수정 0 · 동일 44 제외. 새 사용자 최우선 채널 신호는 없다.\n- **범위:** 72시간 창 77건 중 60건 전송, 17건 세부 미전송. 전수 분석 아님.\n- **연구 순위:** MU → ORCL → 삼성전자 → SK하이닉스 → TSLA → 삼성전기. 16건 모두 STANDARD이며 공식 대조된 일부 수치에만 중간 가중치, 미검증·ASR에는 낮은 가중치를 적용했다.\n- **실행:** YouTube는 실행 부적격. 최신 시장·계좌·주문·위험 한도가 없어 모든 신규 실행과 증액은 0이다.\n\n## 검증된 변화와 남은 의문\n\n- **Micron:** [공식 FY26 Q4 발표](https://investors.micron.com/news/press-release/2026/Micron-Technology-Inc--Reports-Record-Fiscal-Fourth-Quarter-and-Full-Year-2026-Results/)에서 매출 542.29억 달러, 비GAAP 매출총이익률 87.0%, FQ1-27 매출 가이던스 615억 ±15억 달러를 확인했다. 86.25%는 다음 분기 비GAAP 마진 *가이던스*다. 영상의 컨센서스 상회율·HBM 가격·고객 계약은 확인되지 않았다. 관련 [영상](https://www.youtube.com/watch?v=HIkjEswrB-g) C1, [영상](https://www.youtube.com/watch?v=Pk0vZoWct7U) C1.\n- **Oracle:** [공식 FY27 Q1 발표](https://investor.oracle.com/investor-news/news-details/2026/Oracle-Announces-Q1-Results-Driven-by-Triple-Digit-Growth-in-Cloud-Infrastructure-Revenues/)에서 OCI 매출 전년 대비 121% 증가, RPO 6,640억 달러, 신규 AI 계약 300억 달러 초과, 자유현금흐름 -50억 달러를 확인했다. 영상의 주가 경로·프로젝트 지연 인과와 추가 희석 전망은 별개다. [영상](https://www.youtube.com/watch?v=6fFTN9aif5Q) C2~C4.\n- **Tesla:** [공식 3분기 발표](https://ir.tesla.com/press-release/tesla-third-quarter-2026-production-deliveries-and-deployments)의 인도량은 486,532대, 저장장치 배치는 13.7GWh다. 컨센서스 대비 6%·주가 반응·로봇 메모리 수요는 미검증이다. [영상](https://www.youtube.com/watch?v=Qrx6D_b0Ko4) C5~C6.\n- **KR 반도체:** [삼성전자 IR](https://www.samsung.com/sec/ir/financial-information/earnings-release/)에서 영상의 3분기 이익·HBM4 3배 제안가·2나노 수율 70%를 확인하지 못했다. 삼성전자·SK하이닉스 전망은 공식 수주·실적 전에 투자 사실로 사용하지 않는다.\n\n## KR·US 연구 영향\n\n| 순위 | 대상 | 이번 허용 액션 | 근거 충족도 | 조건부 상한* | 핵심 재확인 |\n|---:|---|---|---:|---:|---|\n| 1 | Micron (MU) | UPGRADE_RESEARCH | 0.58 | 기존 확인된 위험 한도의 20% | 다음 Micron 공식 발표에서 HBM 공급·계약과 FY27 투자 가이던스를 대조 |\n| 2 | Oracle (ORCL) | UPGRADE_RESEARCH | 0.53 | 기존 확인된 위험 한도의 15% | 다음 Oracle 공식 현금흐름·자본조달 공시에서 AI 계약의 현금 전환과 희석 확인 |\n| 3 | 삼성전자 (005930) | REQUIRES_PRIMARY_VERIFICATION | 0.34 | 기존 확인된 위험 한도의 8% | 삼성전자 공식 잠정·확정 실적과 HBM4 고객 인증·판매 공시 대조 |\n| 4 | SK하이닉스 (000660) | REQUIRES_PRIMARY_VERIFICATION | 0.31 | 기존 확인된 위험 한도의 7% | SK하이닉스 IR·공시에서 HBM 계약, 실적, 자사주 및 솔리다임 의사결정 확인 |\n| 5 | Tesla (TSLA) | MAINTAIN | 0.42 | 기존 확인된 위험 한도의 8% | 10월 21일 Tesla 공식 실적에서 차량 마진·저장장치 매출과 로봇 계획 확인 |\n| 6 | 삼성전기 (009150) | REQUIRES_PRIMARY_VERIFICATION | 0.20 | 기존 확인된 위험 한도의 5% | 삼성전기 IR·공시에서 MLCC/FC-BGA 매출 비중, CAPEX, 납기와 고객 선수금 확인 |\n\n* 조건부 상한은 후속 연구 제안이다. 현재 적용액은 모두 0이며 공식 근거와 실시간 시장·계좌·주문·위험 게이트를 별도로 통과해야 한다. 근거 충족도는 수익 확률이 아니다.\n\n## 과장·오류 회피\n\n- 보이는 대표 주장 96개 중 부분지원 6개, 미검증 68개, ASR 불확실 22개다. 영상의 요약 상태 숫자는 대표 주장 목록보다 넓으므로 혼합하지 않았다.\n- 주장에 연결되지 않은 evidence ID 12개, 존재하지 않는 evidence ID 인용 2개, 파싱 불가 evidence 시각 1개를 증거에서 제외했다. 링크가 있어도 주장을 직접 뒷받침하지 않으면 검증으로 세지 않는다.\n- 삼성전자 3분기 이익 110조 원, HBM4 가격 3배, 삼성전기 목표가 200만~300만 원, 코스피 9,385, 미국 10년물 5.3% 등은 원자료·단위·시각 검증 전까지 실행 가정에서 제외한다.\n- 한화 우주·우크라이나·산업기술 유출·전력기기 전망은 산업 연구 배경으로만 두고, 계약·공시와 투자 인과를 확인하기 전 종목 실행에 연결하지 않는다.\n\n## 새 정규 이벤트 목록\n\n1. [p61QUjftYr0](https://www.youtube.com/watch?v=p61QUjftYr0) · 삼프로TV 3PROTV · 2026-10-03T23:00:29+00:00 · 삼성전기 MLCC·FC-BGA 수치와 목표가 미검증\n2. [JauYuNtbxVY](https://www.youtube.com/watch?v=JauYuNtbxVY) · 경제사냥꾼 · 2026-10-03T23:00:12+00:00 · 코스피 수치·레버리지 ETF 판매액 재확인 필요\n3. [6fFTN9aif5Q](https://www.youtube.com/watch?v=6fFTN9aif5Q) · 경제사냥꾼 · 2026-10-03T12:15:21+00:00 · Oracle OCI/RPO 일부 공식 확인, 조달·현금흐름 해석 분리\n4. [qJ_aVbec7NM](https://www.youtube.com/watch?v=qJ_aVbec7NM) · 경제사냥꾼 · 2026-10-03T12:00:23+00:00 · 전력기기 수주·PER·금리 인과 미검증\n5. [Qrx6D_b0Ko4](https://www.youtube.com/watch?v=Qrx6D_b0Ko4) · 815Money talk · 2026-10-03T11:00:12+00:00 · Tesla 인도량 공식 확인, HBM4·로봇 전망 미검증\n6. [9zhiFR1o60s](https://www.youtube.com/watch?v=9zhiFR1o60s) · 수페TV · 2026-10-03T10:00:21+00:00 · Micron 수치·미국 금리·AI 정책 발화 혼재\n7. [dkf1IwJS5r4](https://www.youtube.com/watch?v=dkf1IwJS5r4) · 815Money talk · 2026-10-03T08:00:34+00:00 · 미국 국채 금리·원달러 수치 기준시각 없음\n8. [9c9Ou8MjZQQ](https://www.youtube.com/watch?v=9c9Ou8MjZQQ) · 경제사냥꾼 · 2026-10-03T08:00:08+00:00 · 지수 비교·자금 이동 인과 미검증\n9. [PvgLmRPUPCQ](https://www.youtube.com/watch?v=PvgLmRPUPCQ) · 경제사냥꾼 · 2026-10-03T06:17:19+00:00 · 반도체 기술유출 손실액·판결 수치 미검증\n10. [Pk0vZoWct7U](https://www.youtube.com/watch?v=Pk0vZoWct7U) · 삼프로TV 3PROTV · 2026-10-03T06:00:06+00:00 · Micron 공식 실적 기준으로 삼성·SK HBM 전망 검증 필요\n11. [nUu_ND9xuM4](https://www.youtube.com/watch?v=nUu_ND9xuM4) · 815Money talk · 2026-10-03T06:00:01+00:00 · KR 지수·외국인 수급·성장률 수치 미검증\n12. [pJ_HVxR-rXs](https://www.youtube.com/watch?v=pJ_HVxR-rXs) · 경제사냥꾼 · 2026-10-03T04:00:09+00:00 · 한화 우주 투자 규모·일정 원공시 필요\n13. [DvDDhl_2xZ4](https://www.youtube.com/watch?v=DvDDhl_2xZ4) · 경제사냥꾼 · 2026-10-03T03:52:15+00:00 · 미국 경제지표·입찰 일정 공식 달력 확인 필요\n14. [5O-7ZQ0FNAQ](https://www.youtube.com/watch?v=5O-7ZQ0FNAQ) · 삼프로TV 3PROTV · 2026-10-03T02:00:26+00:00 · 우크라이나·방산 주장과 투자 인과 미검증\n15. [PhUsDfTW_JQ](https://www.youtube.com/watch?v=PhUsDfTW_JQ) · 815Money talk · 2026-10-03T01:00:29+00:00 · HBM4 3배 가격·삼성 이익 수치 ASR 위험\n16. [HIkjEswrB-g](https://www.youtube.com/watch?v=HIkjEswrB-g) · 815Money talk · 2026-10-02T23:45:27+00:00 · 삼성 2나노 수율·파운드리 수주 미검증\n\n## 다음 공식 검증\n\n- 삼성전자·SK하이닉스·삼성전기 IR/공시로 HBM4 가격·수율·수주·실적·자사주 주장 재확인\n- Oracle 다음 공시에서 RPO의 매출·현금흐름 전환과 추가 자본조달 확인\n- Micron 공식 발표에서 HBM 계약·FY27 투자와 Tesla 10월 21일 실적 확인\n- KRX·연준·미 재무부 원자료로 지수·수급·금리·일정 대조; 절단 범위 세부 항목 확인\n\nCOVERAGE_RECEIPT {\"event_id\":\"youtube:4e98f573f4b33dcf9753fa338d773d20\",\"status\":\"PARTIAL\",\"window_events\":77,\"transmitted_events\":60,\"truncated\":true,\"new_events\":16,\"revised_events\":0}\nMOBILE_HANDOFF {\"owner\":\"external_github_notification_pipeline\",\"status\":\"PENDING_EXTERNAL_VERIFICATION\",\"work_sent_notification\":false}",
+  "structured_report": {
+    "binding": {
+      "surface": "youtube",
+      "event_id": "youtube:4e98f573f4b33dcf9753fa338d773d20",
+      "source_sha256": "4ae98445b8c8baa8d06653e1a4050904cbd31175c920df87a41c1416cf718ee9"
+    },
+    "title": "YouTube 검증 델타 — 2026-10-04",
+    "generated_at": "2026-10-04T09:39:02+09:00",
+    "as_of": "2026-10-04T08:42:25.520654+09:00",
+    "source_health": "OK",
+    "report_mode": "VERIFICATION_DELTA",
+    "summary": [
+      "신규 16건·수정 0건만 처리, 동일 44건 제외. 16건 모두 STANDARD이며 새 USER_PRIMARY 이벤트는 없다.",
+      "생산자 성공·신선도 정상. 72시간 창 77건 중 60건 전송으로 부분 범위이며 17건 세부 내용은 미전송이다.",
+      "Micron·Oracle·Tesla 공식 자료로 일부 수치만 확인했다. 전송된 대표 주장 96개는 부분지원 6, 미검증 68, ASR 불확실 22이며 검증 완료로 단정할 수 없다.",
+      "연구 순위 MU → ORCL → 삼성전자 → SK하이닉스 → TSLA → 삼성전기. 현재 신규 실행은 0이며 조건부 위험 한도 제안은 모든 시장·계좌 게이트 이후에만 유효하다."
+    ],
+    "top_actions": [
+      {
+        "ticker": "MU",
+        "rank": 1,
+        "action": "UPGRADE_RESEARCH",
+        "readiness": "RESEARCH_ONLY",
+        "reason": "공식 실적·가이던스는 메모리 수요의 기준점을 제공한다. 영상의 HBM 가격·컨센서스·설비투자 인과는 미확인이다."
+      },
+      {
+        "ticker": "ORCL",
+        "rank": 2,
+        "action": "UPGRADE_RESEARCH",
+        "readiness": "RESEARCH_ONLY",
+        "reason": "OCI 121% 성장과 RPO 6,640억 달러는 공식 확인됐다. 성장에서 현금흐름·희석으로 이어지는 경로는 별도 검증이 필요하다."
+      },
+      {
+        "ticker": "005930",
+        "rank": 3,
+        "action": "REQUIRES_PRIMARY_VERIFICATION",
+        "readiness": "RESEARCH_ONLY",
+        "reason": "HBM4 가격 3배·2나노 수율 70%·3분기 영업이익 수치는 검증되지 않았다. 실적과 고객 인증 확인이 우선이다."
+      },
+      {
+        "ticker": "000660",
+        "rank": 4,
+        "action": "REQUIRES_PRIMARY_VERIFICATION",
+        "readiness": "RESEARCH_ONLY",
+        "reason": "HBM 경쟁·자사주 종료·솔리다임 관련 서술은 방향성만 참고한다. 확정 계약과 공시가 없다."
+      }
+    ],
+    "strategies": [
+      {
+        "ticker": "MU",
+        "name": "Micron",
+        "market": "US",
+        "rank": 1,
+        "rank_scope": "THIS_DELTA_RESEARCH_PRIORITY",
+        "portfolio_role": "DISCOVERY",
+        "portfolio_membership_verified": false,
+        "action": "UPGRADE_RESEARCH",
+        "thesis": {
+          "stance": "RESEARCH",
+          "confidence": 0.58,
+          "confidence_semantics": "이번 델타의 연구 근거 충족도 0~1이며 수익 확률 또는 기존 시장 전략의 stance가 아님",
+          "rationale": "공식 실적·가이던스는 메모리 수요의 기준점을 제공한다. 영상의 HBM 가격·컨센서스·설비투자 인과는 미확인이다.",
+          "entry_conditions": [
+            "다음 Micron 공식 발표에서 HBM 공급·계약과 FY27 투자 가이던스를 대조"
+          ],
+          "invalidation_conditions": [
+            "공식 가이던스에서 메모리 수요 또는 투자 전망이 후퇴"
+          ],
+          "invalidation_action": "신규 주문 보류, 관련 공식 자료를 다시 검증한 뒤 연구 우선순위 하향",
+          "horizon": "다음 공식 실적·공시와 최신 시장 패킷 이후 재평가",
+          "position_sizing": {
+            "current_new_execution": 0,
+            "existing_verified_risk_limit": null,
+            "existing_verified_risk_limit_required": true,
+            "proposed_max_fraction_of_existing_risk_limit_after_all_gates": 0.2,
+            "formula": "현 시점 0. 공식 근거·실시간 시세·계좌·주문·위험 한도 게이트가 모두 통과한 이후 독립적으로 확인된 기존 위험 한도의 제안 비율 이내에서만 별도 판단.",
+            "is_conditional_research_proposal": true
+          }
+        },
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action": "UPGRADE_RESEARCH",
+          "execution_eligible": false,
+          "valid_until": null,
+          "required_rechecks": [
+            "다음 Micron 공식 발표에서 HBM 공급·계약과 FY27 투자 가이던스를 대조",
+            "현재 시세·유효 시각, 계좌·미체결 주문, 종목·섹터·총 위험 한도 재확인"
+          ],
+          "blockers": [
+            "YouTube packet execution_eligible=false",
+            "실시간 시장·계좌·위험 게이트가 패킷에 없음"
+          ]
+        },
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "Pk0vZoWct7U",
+            "content_sha256": "0a72c3b78cdbe062cd8bfa1b21f740226b53fd86297b02e69f4a42add7c80d3f",
+            "claim_ids": [
+              "C1"
+            ],
+            "source_health": "OK",
+            "event_status": "asr_uncertain",
+            "strategy_source_tier": "STANDARD",
+            "strategy_evidence_weight": "STANDARD",
+            "affected_field": "research_priority",
+            "direction": "UP",
+            "reason": "Micron 실적과 HBM 논의를 공식 수치 대조의 우선 과제로 격상",
+            "source_urls": [
+              "https://www.youtube.com/watch?v=Pk0vZoWct7U"
+            ],
+            "execution_gate_override": false
+          },
+          {
+            "source": "youtube",
+            "event_key": "9zhiFR1o60s",
+            "content_sha256": "69701a50421fcd9273e256e6ff9166ab6893cb27a9e26906fd7471d1c86d59a3",
+            "claim_ids": [
+              "C5"
+            ],
+            "source_health": "OK",
+            "event_status": "asr_uncertain",
+            "strategy_source_tier": "STANDARD",
+            "strategy_evidence_weight": "STANDARD",
+            "affected_field": "confidence",
+            "direction": "CONSTRAINED",
+            "reason": "메모리 가격·장기계약 발화는 ASR 불확실로 확신도를 제한",
+            "source_urls": [
+              "https://www.youtube.com/watch?v=9zhiFR1o60s"
+            ],
+            "execution_gate_override": false
+          },
+          {
+            "source": "youtube",
+            "event_key": "HIkjEswrB-g",
+            "content_sha256": "1f76b2fcd90bc8f38955382bc8fbe53d6eb1884fe740ae199092dc450cfa0597",
+            "claim_ids": [
+              "C1"
+            ],
+            "source_health": "OK",
+            "event_status": "asr_uncertain",
+            "strategy_source_tier": "STANDARD",
+            "strategy_evidence_weight": "STANDARD",
+            "affected_field": "research_priority",
+            "direction": "UP",
+            "reason": "공식 실적의 매출·EPS·가이던스 구분 필요",
+            "source_urls": [
+              "https://www.youtube.com/watch?v=HIkjEswrB-g"
+            ],
+            "execution_gate_override": false
+          }
+        ]
+      },
+      {
+        "ticker": "ORCL",
+        "name": "Oracle",
+        "market": "US",
+        "rank": 2,
+        "rank_scope": "THIS_DELTA_RESEARCH_PRIORITY",
+        "portfolio_role": "DISCOVERY",
+        "portfolio_membership_verified": false,
+        "action": "UPGRADE_RESEARCH",
+        "thesis": {
+          "stance": "RESEARCH",
+          "confidence": 0.53,
+          "confidence_semantics": "이번 델타의 연구 근거 충족도 0~1이며 수익 확률 또는 기존 시장 전략의 stance가 아님",
+          "rationale": "OCI 121% 성장과 RPO 6,640억 달러는 공식 확인됐다. 성장에서 현금흐름·희석으로 이어지는 경로는 별도 검증이 필요하다.",
+          "entry_conditions": [
+            "다음 Oracle 공식 현금흐름·자본조달 공시에서 AI 계약의 현금 전환과 희석 확인"
+          ],
+          "invalidation_conditions": [
+            "공식 RPO 전환·자유현금흐름 전망이 악화하거나 추가 희석이 커짐"
+          ],
+          "invalidation_action": "신규 주문 보류, 관련 공식 자료를 다시 검증한 뒤 연구 우선순위 하향",
+          "horizon": "다음 공식 실적·공시와 최신 시장 패킷 이후 재평가",
+          "position_sizing": {
+            "current_new_execution": 0,
+            "existing_verified_risk_limit": null,
+            "existing_verified_risk_limit_required": true,
+            "proposed_max_fraction_of_existing_risk_limit_after_all_gates": 0.15,
+            "formula": "현 시점 0. 공식 근거·실시간 시세·계좌·주문·위험 한도 게이트가 모두 통과한 이후 독립적으로 확인된 기존 위험 한도의 제안 비율 이내에서만 별도 판단.",
+            "is_conditional_research_proposal": true
+          }
+        },
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action": "UPGRADE_RESEARCH",
+          "execution_eligible": false,
+          "valid_until": null,
+          "required_rechecks": [
+            "다음 Oracle 공식 현금흐름·자본조달 공시에서 AI 계약의 현금 전환과 희석 확인",
+            "현재 시세·유효 시각, 계좌·미체결 주문, 종목·섹터·총 위험 한도 재확인"
+          ],
+          "blockers": [
+            "YouTube packet execution_eligible=false",
+            "실시간 시장·계좌·위험 게이트가 패킷에 없음"
+          ]
+        },
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "6fFTN9aif5Q",
+            "content_sha256": "c72dbd936462d30b73eeea2e7dd8b9f664496cafd721c525c945f44c6458e007",
+            "claim_ids": [
+              "C2",
+              "C3",
+              "C4"
+            ],
+            "source_health": "OK",
+            "event_status": "asr_uncertain",
+            "strategy_source_tier": "STANDARD",
+            "strategy_evidence_weight": "STANDARD",
+            "affected_field": "ranking",
+            "direction": "UP",
+            "reason": "공식 확인된 OCI/RPO 성장과 미검증 재무 위험을 함께 연구 순위에 반영",
+            "source_urls": [
+              "https://www.youtube.com/watch?v=6fFTN9aif5Q"
+            ],
+            "execution_gate_override": false
+          }
+        ]
+      },
+      {
+        "ticker": "005930",
+        "name": "삼성전자",
+        "market": "KR",
+        "rank": 3,
+        "rank_scope": "THIS_DELTA_RESEARCH_PRIORITY",
+        "portfolio_role": "DISCOVERY",
+        "portfolio_membership_verified": false,
+        "action": "REQUIRES_PRIMARY_VERIFICATION",
+        "thesis": {
+          "stance": "RESEARCH",
+          "confidence": 0.34,
+          "confidence_semantics": "이번 델타의 연구 근거 충족도 0~1이며 수익 확률 또는 기존 시장 전략의 stance가 아님",
+          "rationale": "HBM4 가격 3배·2나노 수율 70%·3분기 영업이익 수치는 검증되지 않았다. 실적과 고객 인증 확인이 우선이다.",
+          "entry_conditions": [
+            "삼성전자 공식 잠정·확정 실적과 HBM4 고객 인증·판매 공시 대조"
+          ],
+          "invalidation_conditions": [
+            "공식 실적 또는 고객 인증에서 영상의 성장·가격 가정이 확인되지 않음"
+          ],
+          "invalidation_action": "신규 주문 보류, 관련 공식 자료를 다시 검증한 뒤 연구 우선순위 하향",
+          "horizon": "다음 공식 실적·공시와 최신 시장 패킷 이후 재평가",
+          "position_sizing": {
+            "current_new_execution": 0,
+            "existing_verified_risk_limit": null,
+            "existing_verified_risk_limit_required": true,
+            "proposed_max_fraction_of_existing_risk_limit_after_all_gates": 0.08,
+            "formula": "현 시점 0. 공식 근거·실시간 시세·계좌·주문·위험 한도 게이트가 모두 통과한 이후 독립적으로 확인된 기존 위험 한도의 제안 비율 이내에서만 별도 판단.",
+            "is_conditional_research_proposal": true
+          }
+        },
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action": "REQUIRES_PRIMARY_VERIFICATION",
+          "execution_eligible": false,
+          "valid_until": null,
+          "required_rechecks": [
+            "삼성전자 공식 잠정·확정 실적과 HBM4 고객 인증·판매 공시 대조",
+            "현재 시세·유효 시각, 계좌·미체결 주문, 종목·섹터·총 위험 한도 재확인"
+          ],
+          "blockers": [
+            "YouTube packet execution_eligible=false",
+            "실시간 시장·계좌·위험 게이트가 패킷에 없음"
+          ]
+        },
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "Pk0vZoWct7U",
+            "content_sha256": "0a72c3b78cdbe062cd8bfa1b21f740226b53fd86297b02e69f4a42add7c80d3f",
+            "claim_ids": [
+              "C3",
+              "C4"
+            ],
+            "source_health": "OK",
+            "event_status": "asr_uncertain",
+            "strategy_source_tier": "STANDARD",
+            "strategy_evidence_weight": "STANDARD",
+            "affected_field": "research_priority",
+            "direction": "UP",
+            "reason": "실적 전망과 HBM4 경쟁 주장 검증을 KR 우선 과제로 둠",
+            "source_urls": [
+              "https://www.youtube.com/watch?v=Pk0vZoWct7U"
+            ],
+            "execution_gate_override": false
+          },
+          {
+            "source": "youtube",
+            "event_key": "PhUsDfTW_JQ",
+            "content_sha256": "58708f08e5ae6bd492b714ebbf447e029b205bb02086865137200b434c2e4aa6",
+            "claim_ids": [
+              "C1",
+              "C6"
+            ],
+            "source_health": "OK",
+            "event_status": "asr_uncertain",
+            "strategy_source_tier": "STANDARD",
+            "strategy_evidence_weight": "STANDARD",
+            "affected_field": "confidence",
+            "direction": "DOWN",
+            "reason": "HBM4 가격과 이익 수치가 미검증이며 ASR 오류 가능성 큼",
+            "source_urls": [
+              "https://www.youtube.com/watch?v=PhUsDfTW_JQ"
+            ],
+            "execution_gate_override": false
+          },
+          {
+            "source": "youtube",
+            "event_key": "HIkjEswrB-g",
+            "content_sha256": "1f76b2fcd90bc8f38955382bc8fbe53d6eb1884fe740ae199092dc450cfa0597",
+            "claim_ids": [
+              "C2"
+            ],
+            "source_health": "OK",
+            "event_status": "asr_uncertain",
+            "strategy_source_tier": "STANDARD",
+            "strategy_evidence_weight": "STANDARD",
+            "affected_field": "confidence",
+            "direction": "CONSTRAINED",
+            "reason": "2나노 수율은 영상 자체가 내부 확인 불가라고 언급",
+            "source_urls": [
+              "https://www.youtube.com/watch?v=HIkjEswrB-g"
+            ],
+            "execution_gate_override": false
+          }
+        ]
+      },
+      {
+        "ticker": "000660",
+        "name": "SK하이닉스",
+        "market": "KR",
+        "rank": 4,
+        "rank_scope": "THIS_DELTA_RESEARCH_PRIORITY",
+        "portfolio_role": "DISCOVERY",
+        "portfolio_membership_verified": false,
+        "action": "REQUIRES_PRIMARY_VERIFICATION",
+        "thesis": {
+          "stance": "RESEARCH",
+          "confidence": 0.31,
+          "confidence_semantics": "이번 델타의 연구 근거 충족도 0~1이며 수익 확률 또는 기존 시장 전략의 stance가 아님",
+          "rationale": "HBM 경쟁·자사주 종료·솔리다임 관련 서술은 방향성만 참고한다. 확정 계약과 공시가 없다.",
+          "entry_conditions": [
+            "SK하이닉스 IR·공시에서 HBM 계약, 실적, 자사주 및 솔리다임 의사결정 확인"
+          ],
+          "invalidation_conditions": [
+            "공식 HBM 출하·수익성 또는 자본정책이 영상 전망에 미달"
+          ],
+          "invalidation_action": "신규 주문 보류, 관련 공식 자료를 다시 검증한 뒤 연구 우선순위 하향",
+          "horizon": "다음 공식 실적·공시와 최신 시장 패킷 이후 재평가",
+          "position_sizing": {
+            "current_new_execution": 0,
+            "existing_verified_risk_limit": null,
+            "existing_verified_risk_limit_required": true,
+            "proposed_max_fraction_of_existing_risk_limit_after_all_gates": 0.07,
+            "formula": "현 시점 0. 공식 근거·실시간 시세·계좌·주문·위험 한도 게이트가 모두 통과한 이후 독립적으로 확인된 기존 위험 한도의 제안 비율 이내에서만 별도 판단.",
+            "is_conditional_research_proposal": true
+          }
+        },
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action": "REQUIRES_PRIMARY_VERIFICATION",
+          "execution_eligible": false,
+          "valid_until": null,
+          "required_rechecks": [
+            "SK하이닉스 IR·공시에서 HBM 계약, 실적, 자사주 및 솔리다임 의사결정 확인",
+            "현재 시세·유효 시각, 계좌·미체결 주문, 종목·섹터·총 위험 한도 재확인"
+          ],
+          "blockers": [
+            "YouTube packet execution_eligible=false",
+            "실시간 시장·계좌·위험 게이트가 패킷에 없음"
+          ]
+        },
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "Pk0vZoWct7U",
+            "content_sha256": "0a72c3b78cdbe062cd8bfa1b21f740226b53fd86297b02e69f4a42add7c80d3f",
+            "claim_ids": [
+              "C4",
+              "C5"
+            ],
+            "source_health": "OK",
+            "event_status": "asr_uncertain",
+            "strategy_source_tier": "STANDARD",
+            "strategy_evidence_weight": "STANDARD",
+            "affected_field": "research_priority",
+            "direction": "UP",
+            "reason": "HBM 경쟁 및 자본정책을 삼성전자와 병행 검증",
+            "source_urls": [
+              "https://www.youtube.com/watch?v=Pk0vZoWct7U"
+            ],
+            "execution_gate_override": false
+          },
+          {
+            "source": "youtube",
+            "event_key": "Qrx6D_b0Ko4",
+            "content_sha256": "7ec1cec8f82683a5556f0a323e6b5345bd73abf55ca13812d6f4e9e03d2bc9cc",
+            "claim_ids": [
+              "C4"
+            ],
+            "source_health": "OK",
+            "event_status": "asr_uncertain",
+            "strategy_source_tier": "STANDARD",
+            "strategy_evidence_weight": "STANDARD",
+            "affected_field": "confidence",
+            "direction": "CONSTRAINED",
+            "reason": "자사주·HBM4 가격 촉매는 미검증",
+            "source_urls": [
+              "https://www.youtube.com/watch?v=Qrx6D_b0Ko4"
+            ],
+            "execution_gate_override": false
+          }
+        ]
+      },
+      {
+        "ticker": "TSLA",
+        "name": "Tesla",
+        "market": "US",
+        "rank": 5,
+        "rank_scope": "THIS_DELTA_RESEARCH_PRIORITY",
+        "portfolio_role": "DISCOVERY",
+        "portfolio_membership_verified": false,
+        "action": "MAINTAIN",
+        "thesis": {
+          "stance": "RESEARCH",
+          "confidence": 0.42,
+          "confidence_semantics": "이번 델타의 연구 근거 충족도 0~1이며 수익 확률 또는 기존 시장 전략의 stance가 아님",
+          "rationale": "486,532대 인도와 13.7GWh 저장장치 배치는 공식 확인됐다. 컨센서스·로봇 생산·메모리 수요 전이는 미확인이다.",
+          "entry_conditions": [
+            "10월 21일 Tesla 공식 실적에서 차량 마진·저장장치 매출과 로봇 계획 확인"
+          ],
+          "invalidation_conditions": [
+            "공식 실적에서 인도 성장에도 수익성과 저장장치 현금 창출이 약화"
+          ],
+          "invalidation_action": "신규 주문 보류, 관련 공식 자료를 다시 검증한 뒤 연구 우선순위 하향",
+          "horizon": "다음 공식 실적·공시와 최신 시장 패킷 이후 재평가",
+          "position_sizing": {
+            "current_new_execution": 0,
+            "existing_verified_risk_limit": null,
+            "existing_verified_risk_limit_required": true,
+            "proposed_max_fraction_of_existing_risk_limit_after_all_gates": 0.08,
+            "formula": "현 시점 0. 공식 근거·실시간 시세·계좌·주문·위험 한도 게이트가 모두 통과한 이후 독립적으로 확인된 기존 위험 한도의 제안 비율 이내에서만 별도 판단.",
+            "is_conditional_research_proposal": true
+          }
+        },
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action": "MAINTAIN",
+          "execution_eligible": false,
+          "valid_until": null,
+          "required_rechecks": [
+            "10월 21일 Tesla 공식 실적에서 차량 마진·저장장치 매출과 로봇 계획 확인",
+            "현재 시세·유효 시각, 계좌·미체결 주문, 종목·섹터·총 위험 한도 재확인"
+          ],
+          "blockers": [
+            "YouTube packet execution_eligible=false",
+            "실시간 시장·계좌·위험 게이트가 패킷에 없음"
+          ]
+        },
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "Qrx6D_b0Ko4",
+            "content_sha256": "7ec1cec8f82683a5556f0a323e6b5345bd73abf55ca13812d6f4e9e03d2bc9cc",
+            "claim_ids": [
+              "C5",
+              "C6"
+            ],
+            "source_health": "OK",
+            "event_status": "asr_uncertain",
+            "strategy_source_tier": "STANDARD",
+            "strategy_evidence_weight": "STANDARD",
+            "affected_field": "research_priority",
+            "direction": "UP",
+            "reason": "공식 인도량과 분리해 로봇 메모리 수요 주장을 검증",
+            "source_urls": [
+              "https://www.youtube.com/watch?v=Qrx6D_b0Ko4"
+            ],
+            "execution_gate_override": false
+          }
+        ]
+      },
+      {
+        "ticker": "009150",
+        "name": "삼성전기",
+        "market": "KR",
+        "rank": 6,
+        "rank_scope": "THIS_DELTA_RESEARCH_PRIORITY",
+        "portfolio_role": "DISCOVERY",
+        "portfolio_membership_verified": false,
+        "action": "REQUIRES_PRIMARY_VERIFICATION",
+        "thesis": {
+          "stance": "RESEARCH",
+          "confidence": 0.2,
+          "confidence_semantics": "이번 델타의 연구 근거 충족도 0~1이며 수익 확률 또는 기존 시장 전략의 stance가 아님",
+          "rationale": "AI 서버 MLCC·FC-BGA 기회는 연구 가설이다. 탑재량·납기·목표가는 영상 수치로만 확인돼 낮은 가중치다.",
+          "entry_conditions": [
+            "삼성전기 IR·공시에서 MLCC/FC-BGA 매출 비중, CAPEX, 납기와 고객 선수금 확인"
+          ],
+          "invalidation_conditions": [
+            "공식 출하·수주 또는 투자 집행이 영상의 성장 가정에 미달"
+          ],
+          "invalidation_action": "신규 주문 보류, 관련 공식 자료를 다시 검증한 뒤 연구 우선순위 하향",
+          "horizon": "다음 공식 실적·공시와 최신 시장 패킷 이후 재평가",
+          "position_sizing": {
+            "current_new_execution": 0,
+            "existing_verified_risk_limit": null,
+            "existing_verified_risk_limit_required": true,
+            "proposed_max_fraction_of_existing_risk_limit_after_all_gates": 0.05,
+            "formula": "현 시점 0. 공식 근거·실시간 시세·계좌·주문·위험 한도 게이트가 모두 통과한 이후 독립적으로 확인된 기존 위험 한도의 제안 비율 이내에서만 별도 판단.",
+            "is_conditional_research_proposal": true
+          }
+        },
+        "execution": {
+          "readiness": "RESEARCH_ONLY",
+          "action": "REQUIRES_PRIMARY_VERIFICATION",
+          "execution_eligible": false,
+          "valid_until": null,
+          "required_rechecks": [
+            "삼성전기 IR·공시에서 MLCC/FC-BGA 매출 비중, CAPEX, 납기와 고객 선수금 확인",
+            "현재 시세·유효 시각, 계좌·미체결 주문, 종목·섹터·총 위험 한도 재확인"
+          ],
+          "blockers": [
+            "YouTube packet execution_eligible=false",
+            "실시간 시장·계좌·위험 게이트가 패킷에 없음"
+          ]
+        },
+        "source_contributions": [
+          {
+            "source": "youtube",
+            "event_key": "p61QUjftYr0",
+            "content_sha256": "0e5552125dccc138c815216b6eee5da59f6d011d4ad2f1e59d86444b3577b3ff",
+            "claim_ids": [
+              "C1",
+              "C3",
+              "C4"
+            ],
+            "source_health": "OK",
+            "event_status": "asr_uncertain",
+            "strategy_source_tier": "STANDARD",
+            "strategy_evidence_weight": "STANDARD",
+            "affected_field": "research_priority",
+            "direction": "UP",
+            "reason": "AI 서버 부품 가설의 1차 자료 검증을 새 과제로 추가",
+            "source_urls": [
+              "https://www.youtube.com/watch?v=p61QUjftYr0"
+            ],
+            "execution_gate_override": false
+          }
+        ]
+      }
+    ],
+    "coverage_receipt": {
+      "event_id": "youtube:4e98f573f4b33dcf9753fa338d773d20",
+      "status": "PARTIAL",
+      "window_events": 77,
+      "transmitted_events": 60,
+      "truncated": true,
+      "new_events": 16,
+      "revised_events": 0
+    },
+    "model_receipt": {
+      "schema": "tradingagents.model-provenance/v1",
+      "work_synthesis": {
+        "execution_mode": "local",
+        "requested_model": "gpt-6-sol",
+        "requested_reasoning_effort": "xhigh",
+        "task_id": "tradingagents-work-youtube",
+        "verification_status": "CONFIGURED_NOT_RUNTIME_VERIFIED",
+        "observed_model": null,
+        "observed_reasoning_effort": null,
+        "note": "The local task contract is verified; the Work host does not expose a signed per-response model receipt."
+      }
+    },
+    "source_summary": {
+      "canonical_source": {
+        "health": "OK",
+        "run_id": "youtube_20261004_081046",
+        "last_run_at": "2026-10-04T08:42:25.520654+09:00",
+        "status": "success",
+        "stale_after_hours": 36
+      },
+      "coverage": {
+        "total_unique_events": 350,
+        "window_events": 77,
+        "transmitted_events": 60,
+        "truncated": true,
+        "oldest_occurred_at": "2026-10-01T08:00:03+00:00",
+        "newest_occurred_at": "2026-10-03T23:00:29+00:00"
+      },
+      "delta": {
+        "new_events": 16,
+        "revised_events": 0,
+        "unchanged_events": 44,
+        "delivered_event_keys": [
+          "p61QUjftYr0",
+          "JauYuNtbxVY",
+          "6fFTN9aif5Q",
+          "qJ_aVbec7NM",
+          "Qrx6D_b0Ko4",
+          "9zhiFR1o60s",
+          "dkf1IwJS5r4",
+          "9c9Ou8MjZQQ",
+          "PvgLmRPUPCQ",
+          "Pk0vZoWct7U",
+          "nUu_ND9xuM4",
+          "pJ_HVxR-rXs",
+          "DvDDhl_2xZ4",
+          "5O-7ZQ0FNAQ",
+          "PhUsDfTW_JQ",
+          "HIkjEswrB-g"
+        ]
+      },
+      "source_snapshot_sha256": "06921abbbca3d51d369d91f430893b06840ae88b17a81eec68cebb3ae86c4092",
+      "balanced_external_policy": {
+        "profile": "balanced_external",
+        "material_thesis_effects": [
+          "ranking",
+          "confidence",
+          "position_size_within_existing_risk_limits",
+          "research_priority"
+        ],
+        "supported_evidence_weight": "MEDIUM",
+        "partially_supported_evidence_weight": "LOW_TO_MEDIUM",
+        "unverified_evidence_weight": "LOW_LABELED",
+        "user_primary_channels": [
+          "@kpunch",
+          "@sosumonkey"
+        ],
+        "user_primary_source_tier": "USER_PRIMARY",
+        "user_primary_evidence_weight": "HIGH",
+        "user_primary_validation_policy": "USER_ACCEPTED",
+        "matching_multi_source_signal_may_raise_thesis_priority": true,
+        "conflicting_signal_must_be_visible": true,
+        "may_bypass_market_or_portfolio_execution_gate": false
+      },
+      "execution_eligible": false,
+      "event_audit": [
+        {
+          "event_key": "p61QUjftYr0",
+          "content_sha256": "0e5552125dccc138c815216b6eee5da59f6d011d4ad2f1e59d86444b3577b3ff",
+          "occurred_at": "2026-10-03T23:00:29+00:00",
+          "published_at": "2026-10-03T23:00:29+00:00",
+          "source_url": "https://www.youtube.com/watch?v=p61QUjftYr0",
+          "status": "asr_uncertain",
+          "strategy_source_tier": "STANDARD",
+          "claim_status_summary": {
+            "unverified": 4,
+            "asr_uncertain": 5
+          },
+          "verification_note": "삼성전기 MLCC·FC-BGA 수치와 목표가 미검증"
+        },
+        {
+          "event_key": "JauYuNtbxVY",
+          "content_sha256": "630df6f7fa4057f94ed45f8ecc9d352deaa0a2d57ba6976e06c39b84e607a8ae",
+          "occurred_at": "2026-10-03T23:00:12+00:00",
+          "published_at": "2026-10-03T23:00:12+00:00",
+          "source_url": "https://www.youtube.com/watch?v=JauYuNtbxVY",
+          "status": "asr_uncertain",
+          "strategy_source_tier": "STANDARD",
+          "claim_status_summary": {
+            "partially_supported": 3,
+            "unverified": 6,
+            "asr_uncertain": 1
+          },
+          "verification_note": "코스피 수치·레버리지 ETF 판매액 재확인 필요"
+        },
+        {
+          "event_key": "6fFTN9aif5Q",
+          "content_sha256": "c72dbd936462d30b73eeea2e7dd8b9f664496cafd721c525c945f44c6458e007",
+          "occurred_at": "2026-10-03T12:15:21+00:00",
+          "published_at": "2026-10-03T12:15:21+00:00",
+          "source_url": "https://www.youtube.com/watch?v=6fFTN9aif5Q",
+          "status": "asr_uncertain",
+          "strategy_source_tier": "STANDARD",
+          "claim_status_summary": {
+            "unverified": 9,
+            "asr_uncertain": 1
+          },
+          "verification_note": "Oracle OCI/RPO 일부 공식 확인, 조달·현금흐름 해석 분리"
+        },
+        {
+          "event_key": "qJ_aVbec7NM",
+          "content_sha256": "6078e5c47a3c583a8cd57d22cbef24a20d26ee97fa330cd25bb2d95b9e5dd3e4",
+          "occurred_at": "2026-10-03T12:00:23+00:00",
+          "published_at": "2026-10-03T12:00:23+00:00",
+          "source_url": "https://www.youtube.com/watch?v=qJ_aVbec7NM",
+          "status": "asr_uncertain",
+          "strategy_source_tier": "STANDARD",
+          "claim_status_summary": {
+            "unverified": 8,
+            "asr_uncertain": 2
+          },
+          "verification_note": "전력기기 수주·PER·금리 인과 미검증"
+        },
+        {
+          "event_key": "Qrx6D_b0Ko4",
+          "content_sha256": "7ec1cec8f82683a5556f0a323e6b5345bd73abf55ca13812d6f4e9e03d2bc9cc",
+          "occurred_at": "2026-10-03T11:00:12+00:00",
+          "published_at": "2026-10-03T11:00:12+00:00",
+          "source_url": "https://www.youtube.com/watch?v=Qrx6D_b0Ko4",
+          "status": "asr_uncertain",
+          "strategy_source_tier": "STANDARD",
+          "claim_status_summary": {
+            "unverified": 9,
+            "asr_uncertain": 1
+          },
+          "verification_note": "Tesla 인도량 공식 확인, HBM4·로봇 전망 미검증"
+        },
+        {
+          "event_key": "9zhiFR1o60s",
+          "content_sha256": "69701a50421fcd9273e256e6ff9166ab6893cb27a9e26906fd7471d1c86d59a3",
+          "occurred_at": "2026-10-03T10:00:21+00:00",
+          "published_at": "2026-10-03T10:00:21+00:00",
+          "source_url": "https://www.youtube.com/watch?v=9zhiFR1o60s",
+          "status": "asr_uncertain",
+          "strategy_source_tier": "STANDARD",
+          "claim_status_summary": {
+            "unverified": 6,
+            "asr_uncertain": 3,
+            "partially_supported": 1
+          },
+          "verification_note": "Micron 수치·미국 금리·AI 정책 발화 혼재"
+        },
+        {
+          "event_key": "dkf1IwJS5r4",
+          "content_sha256": "470293db6e4f46c43adc4e832c6c5f8a506bb50af0ba9a1f99ed859ef3324874",
+          "occurred_at": "2026-10-03T08:00:34+00:00",
+          "published_at": "2026-10-03T08:00:34+00:00",
+          "source_url": "https://www.youtube.com/watch?v=dkf1IwJS5r4",
+          "status": "asr_uncertain",
+          "strategy_source_tier": "STANDARD",
+          "claim_status_summary": {
+            "unverified": 9,
+            "asr_uncertain": 1
+          },
+          "verification_note": "미국 국채 금리·원달러 수치 기준시각 없음"
+        },
+        {
+          "event_key": "9c9Ou8MjZQQ",
+          "content_sha256": "0a1138a54d78aa662afc748dafe7e907c4d98041a8990a5cc724ebd94a257a4f",
+          "occurred_at": "2026-10-03T08:00:08+00:00",
+          "published_at": "2026-10-03T08:00:08+00:00",
+          "source_url": "https://www.youtube.com/watch?v=9c9Ou8MjZQQ",
+          "status": "asr_uncertain",
+          "strategy_source_tier": "STANDARD",
+          "claim_status_summary": {
+            "unverified": 7,
+            "asr_uncertain": 3,
+            "supported": 1
+          },
+          "verification_note": "지수 비교·자금 이동 인과 미검증"
+        },
+        {
+          "event_key": "PvgLmRPUPCQ",
+          "content_sha256": "c7d0e4afc3a7cc68cffeb872ec23107effc5e2ff5287dc362c35af927be3e9a9",
+          "occurred_at": "2026-10-03T06:17:19+00:00",
+          "published_at": "2026-10-03T06:17:19+00:00",
+          "source_url": "https://www.youtube.com/watch?v=PvgLmRPUPCQ",
+          "status": "unverified",
+          "strategy_source_tier": "STANDARD",
+          "claim_status_summary": {
+            "unverified": 10
+          },
+          "verification_note": "반도체 기술유출 손실액·판결 수치 미검증"
+        },
+        {
+          "event_key": "Pk0vZoWct7U",
+          "content_sha256": "0a72c3b78cdbe062cd8bfa1b21f740226b53fd86297b02e69f4a42add7c80d3f",
+          "occurred_at": "2026-10-03T06:00:06+00:00",
+          "published_at": "2026-10-03T06:00:06+00:00",
+          "source_url": "https://www.youtube.com/watch?v=Pk0vZoWct7U",
+          "status": "asr_uncertain",
+          "strategy_source_tier": "STANDARD",
+          "claim_status_summary": {
+            "asr_uncertain": 3,
+            "unverified": 5,
+            "partially_supported": 2
+          },
+          "verification_note": "Micron 공식 실적 기준으로 삼성·SK HBM 전망 검증 필요"
+        },
+        {
+          "event_key": "nUu_ND9xuM4",
+          "content_sha256": "986bd7b6829acd307e101e0b112c35a634a56d1bb24c0d649b0ac00d2b53979f",
+          "occurred_at": "2026-10-03T06:00:01+00:00",
+          "published_at": "2026-10-03T06:00:01+00:00",
+          "source_url": "https://www.youtube.com/watch?v=nUu_ND9xuM4",
+          "status": "asr_uncertain",
+          "strategy_source_tier": "STANDARD",
+          "claim_status_summary": {
+            "unverified": 6,
+            "asr_uncertain": 4
+          },
+          "verification_note": "KR 지수·외국인 수급·성장률 수치 미검증"
+        },
+        {
+          "event_key": "pJ_HVxR-rXs",
+          "content_sha256": "6a99bfc07dca0a39e384b0d0a39f54137a35820981ca6f8f90a878e480576d7a",
+          "occurred_at": "2026-10-03T04:00:09+00:00",
+          "published_at": "2026-10-03T04:00:09+00:00",
+          "source_url": "https://www.youtube.com/watch?v=pJ_HVxR-rXs",
+          "status": "asr_uncertain",
+          "strategy_source_tier": "STANDARD",
+          "claim_status_summary": {
+            "asr_uncertain": 1,
+            "unverified": 7,
+            "partially_supported": 2
+          },
+          "verification_note": "한화 우주 투자 규모·일정 원공시 필요"
+        },
+        {
+          "event_key": "DvDDhl_2xZ4",
+          "content_sha256": "c8532ed1e775718be415122e78642dc9e6d4fca31b320d5a1a835e5106b2bb4f",
+          "occurred_at": "2026-10-03T03:52:15+00:00",
+          "published_at": "2026-10-03T03:52:15+00:00",
+          "source_url": "https://www.youtube.com/watch?v=DvDDhl_2xZ4",
+          "status": "asr_uncertain",
+          "strategy_source_tier": "STANDARD",
+          "claim_status_summary": {
+            "unverified": 6,
+            "asr_uncertain": 1,
+            "partially_supported": 1
+          },
+          "verification_note": "미국 경제지표·입찰 일정 공식 달력 확인 필요"
+        },
+        {
+          "event_key": "5O-7ZQ0FNAQ",
+          "content_sha256": "e31fc0376936d074031ad03b75eeef9ad4c23aacd61d0d8216e21bf6a61bc424",
+          "occurred_at": "2026-10-03T02:00:26+00:00",
+          "published_at": "2026-10-03T02:00:26+00:00",
+          "source_url": "https://www.youtube.com/watch?v=5O-7ZQ0FNAQ",
+          "status": "asr_uncertain",
+          "strategy_source_tier": "STANDARD",
+          "claim_status_summary": {
+            "unverified": 9,
+            "asr_uncertain": 1
+          },
+          "verification_note": "우크라이나·방산 주장과 투자 인과 미검증"
+        },
+        {
+          "event_key": "PhUsDfTW_JQ",
+          "content_sha256": "58708f08e5ae6bd492b714ebbf447e029b205bb02086865137200b434c2e4aa6",
+          "occurred_at": "2026-10-03T01:00:29+00:00",
+          "published_at": "2026-10-03T01:00:29+00:00",
+          "source_url": "https://www.youtube.com/watch?v=PhUsDfTW_JQ",
+          "status": "asr_uncertain",
+          "strategy_source_tier": "STANDARD",
+          "claim_status_summary": {
+            "unverified": 8,
+            "asr_uncertain": 2
+          },
+          "verification_note": "HBM4 3배 가격·삼성 이익 수치 ASR 위험"
+        },
+        {
+          "event_key": "HIkjEswrB-g",
+          "content_sha256": "1f76b2fcd90bc8f38955382bc8fbe53d6eb1884fe740ae199092dc450cfa0597",
+          "occurred_at": "2026-10-02T23:45:27+00:00",
+          "published_at": "2026-10-02T23:45:27+00:00",
+          "source_url": "https://www.youtube.com/watch?v=HIkjEswrB-g",
+          "status": "asr_uncertain",
+          "strategy_source_tier": "STANDARD",
+          "claim_status_summary": {
+            "asr_uncertain": 2,
+            "unverified": 8
+          },
+          "verification_note": "삼성 2나노 수율·파운드리 수주 미검증"
+        }
+      ],
+      "omitted_events": null,
+      "freshness_receipt": {
+        "checked_at": "2026-10-04T09:39:02+09:00",
+        "source_age_hours": 0.944,
+        "coverage_oldest_age_hours": 64.65,
+        "coverage_newest_age_hours": 1.643,
+        "event_ages_hours": {
+          "p61QUjftYr0": 1.643,
+          "JauYuNtbxVY": 1.647,
+          "6fFTN9aif5Q": 12.395,
+          "qJ_aVbec7NM": 12.644,
+          "Qrx6D_b0Ko4": 13.647,
+          "9zhiFR1o60s": 14.645,
+          "dkf1IwJS5r4": 16.641,
+          "9c9Ou8MjZQQ": 16.649,
+          "PvgLmRPUPCQ": 18.362,
+          "Pk0vZoWct7U": 18.649,
+          "nUu_ND9xuM4": 18.65,
+          "pJ_HVxR-rXs": 20.648,
+          "DvDDhl_2xZ4": 20.78,
+          "5O-7ZQ0FNAQ": 22.644,
+          "PhUsDfTW_JQ": 23.643,
+          "HIkjEswrB-g": 24.893
+        },
+        "available_clocks_parse_nonfuture_ordered": true,
+        "market_account_validity_available": false
+      },
+      "quality_exclusions": {
+        "unbound_claim_id": 12,
+        "missing_evidence_id": 2,
+        "invalid_evidence_clock": 1
+      },
+      "representative_claim_statuses": {
+        "unverified": 68,
+        "asr_uncertain": 22,
+        "partially_supported": 6
+      },
+      "external_evidence_receipt": {
+        "new_relevant_event_keys": [
+          "p61QUjftYr0",
+          "JauYuNtbxVY",
+          "6fFTN9aif5Q",
+          "qJ_aVbec7NM",
+          "Qrx6D_b0Ko4",
+          "9zhiFR1o60s",
+          "dkf1IwJS5r4",
+          "9c9Ou8MjZQQ",
+          "PvgLmRPUPCQ",
+          "Pk0vZoWct7U",
+          "nUu_ND9xuM4",
+          "pJ_HVxR-rXs",
+          "DvDDhl_2xZ4",
+          "5O-7ZQ0FNAQ",
+          "PhUsDfTW_JQ",
+          "HIkjEswrB-g"
+        ],
+        "status": "PARTIAL_PRIMARY_VERIFICATION",
+        "effect": "New STANDARD signals changed research ranking and confidence; conditional fractions remain within independently verified future risk limits; no execution promotion.",
+        "user_primary_new_events": 0
+      },
+      "independent_primary_checks": [
+        {
+          "source": "Micron FY26 Q4 IR, 2026-09-30",
+          "url": "https://investors.micron.com/news/press-release/2026/Micron-Technology-Inc--Reports-Record-Fiscal-Fourth-Quarter-and-Full-Year-2026-Results/",
+          "finding": "FQ4 revenue $54.229bn, non-GAAP gross margin 87.0%; FQ1-27 revenue guidance $61.5bn ± $1.5bn and non-GAAP gross-margin guide 86.25%. 영상의 컨센서스 상회율·HBM 계약가격은 미확인.",
+          "event_keys": [
+            "p61QUjftYr0",
+            "9zhiFR1o60s",
+            "Pk0vZoWct7U",
+            "HIkjEswrB-g"
+          ]
+        },
+        {
+          "source": "Oracle FY27 Q1 IR, 2026-09-10",
+          "url": "https://investor.oracle.com/investor-news/news-details/2026/Oracle-Announces-Q1-Results-Driven-by-Triple-Digit-Growth-in-Cloud-Infrastructure-Revenues/",
+          "finding": "OCI 매출 전년 대비 121% 증가, RPO $664bn, 신규 AI 클라우드 계약 $30bn 초과, Q1 자유현금흐름 -$5bn. 영상의 주가 구간·추가 자금조달/지연 인과는 미확인.",
+          "event_keys": [
+            "6fFTN9aif5Q"
+          ]
+        },
+        {
+          "source": "Tesla Q3 2026 deliveries IR, 2026-10-02",
+          "url": "https://ir.tesla.com/press-release/tesla-third-quarter-2026-production-deliveries-and-deployments",
+          "finding": "차량 인도 486,532대, 저장장치 배치 13.7GWh. 영상의 컨센서스 대비 6%·주가 반응·로봇 메모리 전망은 미확인.",
+          "event_keys": [
+            "Qrx6D_b0Ko4"
+          ]
+        },
+        {
+          "source": "Samsung Electronics IR",
+          "url": "https://www.samsung.com/sec/ir/financial-information/earnings-release/",
+          "finding": "확인 시점에 2026년 3분기 확정 실적 수치를 확인하지 못했다. 영상의 HBM4 제안가·수율·3분기 이익과 자사주 종료 전망은 미검증.",
+          "event_keys": [
+            "Pk0vZoWct7U",
+            "PhUsDfTW_JQ",
+            "HIkjEswrB-g"
+          ]
+        }
+      ]
+    },
+    "next_checkpoint": [
+      "삼성전자·SK하이닉스·삼성전기 IR/공시로 HBM4 가격·수율·수주·실적·자사주 주장 재확인",
+      "Oracle 다음 공시에서 RPO의 매출·현금흐름 전환과 추가 자본조달 확인",
+      "Micron 공식 발표에서 HBM 계약·FY27 투자와 Tesla 10월 21일 실적 확인",
+      "KRX·연준·미 재무부 원자료로 지수·수급·금리·일정 대조; 절단 범위 세부 항목 확인"
+    ],
+    "mobile_handoff": {
+      "owner": "external_github_notification_pipeline",
+      "status": "PENDING_EXTERNAL_VERIFICATION",
+      "work_sent_notification": false
+    },
+    "external_delivery_verified": false
+  },
+  "report_id": "youtube:37280e2ad1f4f5dce7277c37c4eb56f4",
+  "report_sha256": "37280e2ad1f4f5dce7277c37c4eb56f4b71b2a73f383df2eb6867ed943572772",
+  "published_at": "2026-10-04T09:39:19.004193+09:00"
+}

@@ -1,0 +1,205 @@
+<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>PRISM 연구 델타: 삼성전기·삼화콘덴서 미진입 충돌, 샘씨엔에스 가상 신호 분리</title><style>body{font:16px/1.65 system-ui;max-width:960px;margin:auto;padding:24px;overflow-wrap:anywhere}pre{white-space:pre-wrap;font:inherit}dt{font-weight:bold}dd{margin:0 0 14px}</style><body><main><h1>PRISM 연구 델타: 삼성전기·삼화콘덴서 미진입 충돌, 샘씨엔에스 가상 신호 분리</h1><p><a href="../index.html">지난 보고서 목록</a></p><p>원본 작성: 2026-09-30T08:40:27.870712+09:00</p><p>입력 기준: 2026-09-29T00:41:26+00:00</p><p>게시: 2026-09-30T08:40:38.199905+09:00</p><p>과거 기록입니다. 게시 시각은 입력 갱신 시각이 아니며 현재 주문 지시가 아닙니다.</p><pre data-report-markdown># PRISM 연구 델타 · 2026-09-30
+
+**소스 OK · 연구 전용**  
+작성 09-30 08:40:27 KST · 이벤트 09-29 09:41:26 KST~09-29 09:53:43 KST · 생산 완료 09-29 11:14:40 KST
+
+- **삼성전기:** 갭 상승 BUY 추출 뒤 최신 미진입. 후속 KR 매수 후보 순위와 상방 thesis 신뢰도를 낮추고 가격 단위·실적 확인을 1순위로 둡니다.
+- **삼화콘덴서:** 최신 본문은 미진입이지만 정규화 행동은 STOP_LOSS입니다. 매수·손절 해석을 보류하고 충돌 원인과 공식 수급·재무 확인을 2순위로 둡니다.
+- **샘씨엔에스:** 가상 포트폴리오의 1/10 보유·+20.98% 설명과 STOP_LOSS 추출이 충돌합니다. 실제 보유·매도 신호로 전이하지 않습니다.
+- **가중치:** 9건 모두 같은 채널이며 독립 다중 출처 확인은 0건입니다. 비어 있는 PDF 2건, 미검증 시세·재무 주장과 가상 성과의 신뢰도 가중치를 낮춥니다.
+- **실행:** 현재 시장 가격·관측시각·유효시간·실제 계좌·위험 한도가 없습니다. 이번 델타의 신규 주문 배분은 **0%**이고 후속 시장 실행 게이트를 통과하기 전 승격하지 않습니다.
+
+## 범위와 신선도
+
+신규 **9**, 수정 **0**, 동일 이벤트 중복 제외 **0**. 최근 24시간 창의 이벤트 **9/9 전송**, 생략 **0**, 범위 잘림 **false**. 아카이브 고유 이벤트 100건 중 이번에 전달된 새 이벤트만 처리했습니다. `COVERAGE_RECEIPT`의 COMPLETE는 이 이벤트 전송 범위에 한하며 PDF 전문, 모든 시장 데이터, 개인 보유·관심종목 범위까지 검증했다는 뜻은 아닙니다.
+
+생산자 `prism_telegram_20260929_111429`의 성공 시각은 09-29 11:14:40 KST으로 작성 시점에 30시간 기준 이내입니다. 가장 오래된 이벤트는 09-29 09:41:26 KST으로 24시간 기준 이내이며, 이벤트·요약 posted_at·신호 source_asof·범위 시각의 순서가 일치합니다. 생산자 OK와 이 로컬 보고서의 ACK는 시장 시세의 현재성 또는 외부 전송을 증명하지 않습니다. 현재 이벤트 창은 **09-30 09:41:26 KST**부터 만료되므로 그 뒤에는 새 정제 생산 결과가 필요합니다.
+
+## 이벤트별 델타
+
+모든 event key는 정제 패킷의 `stock_ai_agent` 채널을 가리킵니다. 본문은 요약·미리보기이며 공시·첨부 원문이나 실제 거래기록이 아닙니다. 가격·목표·손절 수치는 과거 서술로만 취급합니다.
+
+| event key | 시각 KST | 분류 | 처리 |
+|---|---|---|---|
+| stock_ai_agent:15414 | 09:41:26 | 삼성전기·삼화콘덴서 WATCH | 다중 종목 가격은 개별 매핑·시세 단위 검증 전 사용 보류 |
+| stock_ai_agent:15415 | 09:49:36 | 삼성전기 갭 상승·BUY 추출 | 거래량 감소·수급 혼조 서술; 최신 미진입과 대조 |
+| stock_ai_agent:15416 | 09:49:40 | 삼화콘덴서 자금 유입 표제 | 거래량 전일 대비 -16.08% 요약과 병존; 공식 수급 확인 |
+| stock_ai_agent:15417 | 09:49:49 | 삼성전기 PDF WATCH | 본문 공백; 첨부 전문 확인 불가 |
+| stock_ai_agent:15418 | 09:49:58 | 삼화콘덴서 PDF WATCH | 본문 공백; 첨부 전문 확인 불가 |
+| stock_ai_agent:15419 | 09:53:36 | 샘씨엔에스 손절 조정 | 가상 전략의 손절가 상향 설명; 실제 주문·체결 아님 |
+| stock_ai_agent:15420 | 09:53:39 | 삼성전기 미진입 | 앞선 BUY 추출보다 최신; 매수 순위·신뢰도 하향 |
+| stock_ai_agent:15421 | 09:53:41 | 삼화콘덴서 미진입 | 본문 미진입 ↔ STOP_LOSS 추출 충돌; 손절 신호로 사용 금지 |
+| stock_ai_agent:15422 | 09:53:43 | 샘씨엔에스 가상 보유 | 1/10 보유·+20.98% 설명 ↔ STOP_LOSS 추출 충돌 |
+
+## 종목별 후속 연구
+
+아래 순위는 **검증 우선순위**이며 투자·매수 순위가 아닙니다. confidence는 PRISM 점수가 아닌 Work의 미검증 thesis 성숙도입니다. 코드 suffix와 가격 단위는 공식 거래소 대조 전 확정하지 않습니다.
+
+| 검증 순위 | 종목 · 패킷 코드 | 연구 영향 | 다음 근거 |
+|---|---|---|---|
+| 1 | 삼성전기 · 009150.KS | 매수 후보 순위↓, confidence 0.18 | 거래소 시세·단위, 반기 실적·EPS 산식, 증설 투자 공시·IR, 새 시장 수급 |
+| 2 | 삼화콘덴서 · 001820.KS | 매수 후보 순위↓, confidence 0.16 | 미진입/STOP_LOSS 추출 충돌, 실제 거래량·수급, 실적·부채·ROE |
+| 3 | 샘씨엔에스 · 252990.KS | 실제 실행 후보 제외, confidence 0.10 | 가상 보유/손절 조정/STOP_LOSS 추출 의미 분리, 거래소 코드 확인 |
+
+삼성전기 패킷의 1,509,000~1,532,000원 표기는 시세 단위 검증 전 현재가·진입 조건으로 사용하지 않습니다. 삼화콘덴서의 자금 유입 표제와 거래량 감소 요약도 별도 수급 확인 전 상승 근거로 가중하지 않습니다. 샘씨엔에스의 18,136원 추적 손절은 가상 전략 조정의 과거 수치로만 기록합니다.
+
+**KR 전달:** 삼성전기·삼화콘덴서의 신규 매수 순위와 thesis confidence를 하향하고 공식 가격·수급·재무 검증을 우선합니다. 샘씨엔에스는 시뮬레이터/추출 검증만 전달합니다. **US 전달:** 직접 US 종목 이벤트가 없으므로 미국 종목의 thesis나 포지션 크기를 변경하지 않습니다.
+
+**다음 확인:** 새 성공 정제 producer run 또는 09-30 09:41:26 KST 이벤트 만료 중 먼저 도착하는 시점에 재검증합니다. 필요한 근거는 거래소 시세·단위와 관측시각, 공시/IR 실적·증설 근거, 새 본문과 정규화 행동의 일치, TradingAgents 시장·계좌·위험 게이트입니다. 이 확인은 예약된 별도 작업을 뜻하지 않습니다.
+
+COVERAGE_RECEIPT {&quot;event_id&quot;:&quot;prism:e439d70014d359b9b0458b83a25affef&quot;,&quot;status&quot;:&quot;COMPLETE&quot;,&quot;window_events&quot;:9,&quot;transmitted_events&quot;:9,&quot;truncated&quot;:false,&quot;new_events&quot;:9,&quot;revised_events&quot;:0}
+MOBILE_HANDOFF {&quot;owner&quot;:&quot;external_github_notification_pipeline&quot;,&quot;status&quot;:&quot;PENDING_EXTERNAL_VERIFICATION&quot;,&quot;work_sent_notification&quot;:false}</pre></main><style>
+.reader-contents { margin: 16px 0; padding: 12px 16px; border: 1px solid var(--line, #64748b); border-radius: 12px; }
+.reader-contents > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-weight: 750; }
+.reader-contents nav { display: grid; gap: 4px; max-height: 45vh; overflow: auto; margin: 8px 0; }
+.reader-contents a { display: block; min-height: 44px; padding: 10px; border-radius: 6px; color: inherit; overflow-wrap: anywhere; }
+.reader-contents a:hover { background: #80808020; }
+.reader-contents .reader-subsection { padding-inline-start: 24px; font-size: .92em; }
+.reader-prose, .report { overflow-wrap: anywhere; line-height: 1.8; }
+.reader-prose p, .reader-prose li { max-width: 85ch; }
+.reader-prose h2, .reader-prose h3, .reader-prose h4, [data-reader-heading] { scroll-margin-top: 100px; line-height: 1.45; }
+.reader-prose h2 { margin-top: 1.8em; padding-bottom: 8px; border-bottom: 1px solid var(--line, #64748b); }
+.reader-prose h3 { margin-top: 1.5em; }
+.reader-prose li { margin: .5em 0; }
+.reader-prose pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.reader-prose blockquote { margin: 16px 0; padding: 4px 16px; border-left: 3px solid var(--accent, #64748b); }
+.reader-table { overflow: auto; max-width: 100%; margin: 16px 0; border: 1px solid var(--line, #64748b); border-radius: 10px; }
+.reader-table table { border-collapse: collapse; width: 100%; margin: 0; font-size: .92rem; }
+.reader-table th, .reader-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line, #64748b); min-width: 110px; max-width: 400px; overflow-wrap: anywhere; white-space: normal; }
+.reader-table th { background: #80808018; }
+.reader-table tr:nth-child(even) { background: #80808008; }
+.reader-search { display: grid; gap: 8px; margin: 16px 0; }
+.reader-search label { font-weight: 700; }
+.reader-search input { box-sizing: border-box; width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line, #64748b); border-radius: 10px; background: var(--panel, #fff); color: var(--text, #132238); font: inherit; }
+.reader-search p { margin: 0; font-size: .86rem; }
+.reader-back { position: fixed; bottom: max(14px, env(safe-area-inset-bottom)); right: 14px; z-index: 30; min-height: 44px; border: 1px solid #778899; border-radius: 99px; padding: 10px 16px; background: #18344a; color: #fff; font: 700 14px system-ui; cursor: pointer; box-shadow: 0 3px 12px #0003; }
+[data-reader-source] { margin-top: 20px; }
+[data-reader-source] > summary { min-height: 44px; cursor: pointer; }
+[data-reader-source] pre { font-size: .85rem; }
+[data-reader-source] pre, .reader-prose { min-width: 0; }
+.reader-contents :focus-visible, .reader-search :focus-visible, .reader-back:focus-visible, .reader-table:focus-visible { outline: 3px solid var(--accent, #008c95); outline-offset: 3px; }
+.reader-search + .grid > [hidden] { display: none !important; }
+@media (max-width: 600px) { .reader-prose { font-size: 1rem; } .reader-contents { padding: 8px 12px; } }
+@media print { .reader-back, .reader-search, .reader-contents, [data-reader-source] { display: none !important; } .reader-table { overflow: visible; } .reader-prose { color: #000; background: #fff; } }
+</style><script>
+(() => {
+  'use strict';
+  let serial = 0;
+  const rendered = new WeakMap();
+  const node = (tag, text) => { const el = document.createElement(tag); if (text != null) el.textContent = text; return el; };
+  function inline(parent, text) {
+    const pattern = /(`[^`]+`|\*\*[^*]+\*\*|\[[^\]]+\]\(https?:\/\/[^\s)]+\))/g;
+    let start = 0;
+    for (const match of String(text).matchAll(pattern)) {
+      parent.append(document.createTextNode(text.slice(start, match.index)));
+      const value = match[0];
+      if (value.startsWith('`')) parent.append(node('code', value.slice(1, -1)));
+      else if (value.startsWith('**')) parent.append(node('strong', value.slice(2, -2)));
+      else {
+        const link = value.match(/^\[([^\]]+)\]\((.+)\)$/);
+        const a = node('a', link[1]); a.href = link[2]; a.rel = 'noopener noreferrer'; parent.append(a);
+      }
+      start = match.index + value.length;
+    }
+    parent.append(document.createTextNode(text.slice(start)));
+  }
+  const cells = line => line.trim().replace(/^\|/, '').replace(/\|$/, '').split(/(?<!\\)\|/).map(v => v.trim().replace(/\\\|/g, '|'));
+  function markdown(source) {
+    const article = node('article'); article.className = 'reader-prose';
+    const lines = source.split(/\r?\n/); let list = null;
+    for (let i = 0; i < lines.length; i += 1) {
+      const line = lines[i], value = line.trim();
+      if (!value) { list = null; continue; }
+      if (/^```/.test(value)) {
+        const code = []; i += 1;
+        while (i < lines.length && !/^```/.test(lines[i].trim())) code.push(lines[i++]);
+        const pre = node('pre'); pre.append(node('code', code.join('\n'))); article.append(pre); list = null; continue;
+      }
+      if (i + 1 < lines.length && value.includes('|') && cells(lines[i + 1]).every(v => /^:?-{3,}:?$/.test(v))) {
+        const table = node('table'), head = node('thead'), body = node('tbody');
+        const row = (values, tag) => { const tr = node('tr'); values.forEach(v => { const cell = node(tag); if (tag === 'th') cell.scope = 'col'; inline(cell, v); tr.append(cell); }); return tr; };
+        head.append(row(cells(line), 'th')); i += 2;
+        while (i < lines.length && lines[i].trim() && lines[i].includes('|')) body.append(row(cells(lines[i++]), 'td'));
+        i -= 1; table.append(head, body); article.append(table); list = null; continue;
+      }
+      const heading = value.match(/^(#{1,6})\s+(.+)$/);
+      if (heading) { const h = node('h' + Math.min(4, heading[1].length + 1)); inline(h, heading[2]); article.append(h); list = null; continue; }
+      const bullet = value.match(/^(?:[-*+] |\d+\. )(.+)$/);
+      if (bullet) {
+        const tag = /^\d/.test(value) ? 'ol' : 'ul';
+        if (!list || list.tagName.toLowerCase() !== tag) { list = node(tag); if (tag === 'ol') list.start = parseInt(value, 10); article.append(list); }
+        const li = node('li'); inline(li, bullet[1]); list.append(li); continue;
+      }
+      list = null;
+      if (/^(---+|\*\*\*+)$/.test(value)) { article.append(node('hr')); continue; }
+      const p = node(value.startsWith('> ') ? 'blockquote' : 'p'); inline(p, value.startsWith('> ') ? value.slice(2) : line); article.append(p);
+    }
+    return article;
+  }
+  function contents(root) {
+    root.querySelectorAll(':scope > .reader-contents').forEach(el => el.remove());
+    const headings = [...root.querySelectorAll('h2,h3,h4')].filter(h => !h.closest('.card,.run-card,.reader-contents,[data-reader-source],[hidden]'));
+    if (headings.length < 2) return;
+    const details = node('details'); details.className = 'reader-contents';
+    details.append(node('summary', '이 리포트 목차 · ' + headings.length + '개 항목'));
+    const nav = node('nav'); nav.setAttribute('aria-label', '리포트 목차');
+    headings.forEach(h => {
+      if (!h.id) h.id = 'reader-section-' + (++serial);
+      h.dataset.readerHeading = ''; h.tabIndex = -1;
+      const a = node('a', h.textContent); a.href = '#' + h.id;
+      if (h.tagName !== 'H2') a.className = 'reader-subsection';
+      a.addEventListener('click', event => {
+        event.preventDefault();
+        for (let ancestor = h.parentElement; ancestor; ancestor = ancestor.parentElement) if (ancestor.tagName === 'DETAILS') ancestor.open = true;
+        h.scrollIntoView({block: 'start'}); h.focus({preventScroll: true});
+      }); nav.append(a);
+    });
+    details.append(nav); root.prepend(details);
+  }
+  function enhance(root) {
+    if (!root) return;
+    root.querySelectorAll('pre[data-report-markdown]').forEach(pre => {
+      const previous = rendered.get(pre);
+      if (previous && previous.source === pre.textContent) return;
+      const article = markdown(pre.textContent);
+      if (previous) previous.article.replaceWith(article);
+      else {
+        const details = node('details'); details.dataset.readerSource = '';
+        details.append(node('summary', 'Markdown 원문 보기'));
+        pre.before(article, details); details.append(pre);
+      }
+      rendered.set(pre, {source: pre.textContent, article});
+    });
+    root.querySelectorAll('table').forEach(table => {
+      if (table.closest('.reader-table,.account-table-wrap,.summary-scroll')) return;
+      const wrap = node('div'); wrap.className = 'reader-table'; wrap.tabIndex = 0;
+      wrap.setAttribute('role', 'region'); wrap.setAttribute('aria-label', '리포트 표 · 가로로 스크롤하여 전체 보기');
+      table.before(wrap); wrap.append(table);
+    });
+    root.querySelectorAll('.grid').forEach(grid => {
+      const cards = [...grid.querySelectorAll(':scope > a.card')];
+      if (cards.length < 2 || grid.dataset.readerSearch) return;
+      grid.dataset.readerSearch = 'true';
+      const box = node('div'); box.className = 'reader-search';
+      const input = node('input'); input.type = 'search'; input.placeholder = '제목 · 종목 · 채널 · 키워드'; input.id = 'report-search-' + (++serial);
+      const label = node('label', '리포트 찾기'); label.htmlFor = input.id;
+      const status = node('p'); status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
+      const update = () => {
+        const terms = input.value.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean); let count = 0;
+        cards.forEach(card => { card.hidden = !terms.every(t => card.textContent.toLocaleLowerCase().includes(t)); if (!card.hidden) count += 1; });
+        status.textContent = cards.length + '개 중 ' + count + '개 표시' + (count ? '' : ' · 검색어를 지우거나 다른 키워드를 입력하세요.');
+      };
+      input.addEventListener('input', update); box.append(label, input, status); grid.before(box); update();
+    });
+    contents(root);
+  }
+  window.TradingAgentsReader = {enhance};
+  const main = document.querySelector('main');
+  if (main && !main.hasAttribute('data-reader-dynamic')) enhance(main);
+  if (main) {
+    const top = node('button', '↑ 맨 위'); top.type = 'button'; top.className = 'reader-back'; top.setAttribute('aria-label', '리포트 맨 위로 이동');
+    top.addEventListener('click', () => { const target = document.querySelector('h1') || main; target.tabIndex = -1; target.scrollIntoView({block: 'start'}); target.focus({preventScroll: true}); });
+    document.body.append(top);
+  }
+})();
+</script></body></html>
