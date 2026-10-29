@@ -29,8 +29,9 @@ class WorkRuntimeError(RuntimeError):
 
 
 class FreshReportSourceError(WorkRuntimeError):
-    def __init__(self, blockers):
+    def __init__(self, blockers, *, retryable_expiry=False):
         self.blockers = tuple(dict.fromkeys(blockers))
+        self.retryable_expiry = retryable_expiry is True
         super().__init__('Fresh report source failed revalidation: ' + ','.join(self.blockers))
 
 
@@ -90,7 +91,16 @@ class WorkRuntime:
                 if not session.get("is_open") or (close is not None and effective_now >= close):
                     blockers.append("SESSION_ENDED_DURING_PREPARE")
                 if blockers:
-                    raise FreshReportSourceError(blockers)
+                    rows = ((source_packet.get('body') or {}).get('current') or {}).get('bundle', {}).get('strategy_table') or []
+                    clocks = [(aware_datetime((row.get('execution') or {}).get('as_of')),
+                               aware_datetime((row.get('execution') or {}).get('valid_until')))
+                              for row in rows if isinstance(row, dict)]
+                    retryable = (set(blockers) == {'ROW_VALIDITY_EXPIRED_OR_MISSING'}
+                        and bool(clocks) and len(clocks) == len(rows)
+                        and all(observed is not None and expires is not None
+                                and observed < expires and observed <= effective_now for observed, expires in clocks)
+                        and any(expires <= effective_now for _, expires in clocks))
+                    raise FreshReportSourceError(blockers, retryable_expiry=retryable)
             state = self._load_state()
             surface_state = state["surfaces"].setdefault(key, {})
             if surface_state.get("pending_event_id") and (

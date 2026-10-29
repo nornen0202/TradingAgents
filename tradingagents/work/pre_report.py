@@ -11,6 +11,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 import json
 from zoneinfo import ZoneInfo
+from uuid import uuid4
 
 from tradingagents.atomic_io import atomic_write_json, interprocess_file_lock
 from tradingagents.scheduled.config import load_scheduled_config
@@ -135,6 +136,41 @@ def completed_busy_source(surface: str, *, archive: Path, config,
 def prepare_market_report(runtime, surface: str, *, producer_state_dir: Path,
                           archive_dir: Path | None = None, youtube_archive_dir: Path | None = None,
                           prism_archive_dir: Path | None = None, report_context_v1: bool = False) -> dict:
+    """Retry actual broker collection once only for verified row expiry.
+
+    Slow cold reads may consume a valid producer's short row lifetime. The
+    second attempt uses the same producer lock, calendar checks and immutable
+    runtime validation; it never renews the first input or reruns research.
+    """
+    options = dict(producer_state_dir=producer_state_dir, archive_dir=archive_dir,
+        youtube_archive_dir=youtube_archive_dir, prism_archive_dir=prism_archive_dir,
+        report_context_v1=report_context_v1)
+    first = _prepare_market_report_once(runtime, surface, **options)
+    if not (first.get('status') == 'FRESH_INPUT_UNAVAILABLE'
+            and set(first.get('blockers') or []) == {'ROW_VALIDITY_EXPIRED_OR_MISSING'}
+            and first.get('retryable_expiry') is True and first.get('event_created') is False):
+        return first
+    receipt_id = uuid4().hex
+    history_path = Path(producer_state_dir) / 'pre-report' / 'refresh-attempts' / f'{surface}-{receipt_id}.json'
+    history = {'schema': 'tradingagents.pre-report-attempts/v1', 'surface': surface,
+        'refresh_attempt_limit': 2, 'attempts': [first], 'status': 'RETRYING_ACTUAL_BROKER_REFRESH',
+        'research_rerun': False, 'live_orders_submitted': False}
+    # Preserve the failed observation even if the process stops during retry.
+    atomic_write_json(history_path, history)
+    second = _prepare_market_report_once(runtime, surface, **options)
+    current = dict(second.get('pre_report_refresh') or second)
+    history.update(status=current.get('status'), attempts=[first, dict(current)],
+        finished_at=datetime.now(timezone.utc).isoformat())
+    atomic_write_json(history_path, history)
+    current.update(refresh_attempt_count=2, refresh_attempt_limit=2,
+        refresh_attempt_receipt_id=receipt_id, refresh_attempts=history['attempts'])
+    atomic_write_json(Path(producer_state_dir) / 'pre-report' / f'{surface}.json', current)
+    return {**second, 'pre_report_refresh': current} if 'pre_report_refresh' in second else current
+
+
+def _prepare_market_report_once(runtime, surface: str, *, producer_state_dir: Path,
+                          archive_dir: Path | None = None, youtube_archive_dir: Path | None = None,
+                          prism_archive_dir: Path | None = None, report_context_v1: bool = False) -> dict:
     if surface not in {"kr", "us"}:
         raise ValueError("Broker refresh only supports kr/us")
     from .runtime import FreshReportSourceError
@@ -191,6 +227,7 @@ def prepare_market_report(runtime, surface: str, *, producer_state_dir: Path,
                 with redirect_stdout(log), redirect_stderr(log):
                     manifest = execute_scheduled_run(config, run_label=f"pre-report-{surface}-overlay",
                         skip_site_build=True, paper_state_dir=state, defer_execution_handoff=True)
+                    receipt['producer_run_id'] = manifest.get('run_id')
         # Completed producer artifacts are immutable. Release writer ownership
         # before the expensive read-only packet builds and Work state lock.
         # Runtime.prepare checks the exact run and clocks again before allocation.
@@ -218,7 +255,8 @@ def prepare_market_report(runtime, surface: str, *, producer_state_dir: Path,
                        event_created=result.get("result") in {"NEW", "RESUME"})
         return {**result, "pre_report_refresh": saved}
     except FreshReportSourceError as exc:
-        return finish(status='FRESH_INPUT_UNAVAILABLE', blockers=list(exc.blockers))
+        return finish(status='FRESH_INPUT_UNAVAILABLE', blockers=list(exc.blockers),
+                      retryable_expiry=exc.retryable_expiry)
     except ProducerBusy:
         # A minute producer may own the writer lock while its previous immutable
         # result is still fresh. Reuse only verified observations; no TTL renewal,

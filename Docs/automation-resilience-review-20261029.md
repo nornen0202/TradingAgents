@@ -292,3 +292,14 @@ reference. Ordinary discovery is unchanged. Missing or non-boolean readiness,
 pointer changes, unsuccessful attempts and invalid clocks still use the guarded
 fallback. Account/coverage/session/freshness checks still run before event creation
 and at publish; row gates, actions and original expiry are never promoted.
+
+Concurrent archive publication also produced a cold packet read of 55.6 seconds,
+followed by an 11.3-second read of the same immutable source. A verified row can
+therefore expire during input construction even after historical discovery is
+removed. Fresh preparation now permits one additional actual broker refresh only
+when the runtime proves that well-formed row lifetimes expired and no other gate
+failed. It preserves both attempts in a separate durable receipt. It stops after
+two refresh attempts, respects a new producer owner or a closing market, and does
+not retry missing/future/reversed clocks, account failures or other invalid input.
+Each attempt remains overlay-only without research, LLM reruns or live orders;
+research attempt budgets and every original source timestamp remain unchanged.
