@@ -51,6 +51,9 @@ def initialize_lifecycle(conn: sqlite3.Connection) -> None:
     if "ingested_at" not in columns:
         conn.execute("ALTER TABLE lifecycle_events ADD COLUMN ingested_at TEXT")
     conn.execute("CREATE INDEX IF NOT EXISTS idx_lifecycle_signal ON lifecycle_events(signal_id)")
+    conn.execute("CREATE INDEX IF NOT EXISTS idx_lifecycle_kind ON lifecycle_events(kind)")
+    conn.execute("""CREATE INDEX IF NOT EXISTS idx_lifecycle_ticker ON lifecycle_events(
+        CASE WHEN json_valid(payload_json) THEN upper(json_extract(payload_json, '$.ticker')) END)""")
     conn.execute("""CREATE TRIGGER IF NOT EXISTS lifecycle_no_update BEFORE UPDATE ON lifecycle_events
         BEGIN SELECT RAISE(ABORT, 'Lifecycle evidence is immutable'); END""")
     conn.execute("""CREATE TRIGGER IF NOT EXISTS lifecycle_no_delete BEFORE DELETE ON lifecycle_events

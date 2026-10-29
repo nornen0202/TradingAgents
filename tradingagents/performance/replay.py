@@ -92,7 +92,7 @@ def replay_action_history(
             params = ()
             if ticker:
                 query += (" WHERE kind='ACCOUNT_SEED' OR CASE WHEN json_valid(payload_json) THEN "
-                          "upper(json_extract(payload_json, '$.ticker')) = ? ELSE 0 END")
+                          "upper(json_extract(payload_json, '$.ticker')) END = ?")
                 params = (ticker.upper(),)
             for row in conn.execute(query, params):
                 _include_visible_row(visible, row, cutoff)
