@@ -493,6 +493,46 @@ def test_corrupt_history_does_not_starve_valid_market_notice(tmp_path, bad):
     assert len(events) == 1 and local.read(events[0])["run_id"] == good["run_id"]
 
 
+def test_notification_scan_bounds_parallel_reads_and_serializes_outbox(tmp_path, monkeypatch):
+    from threading import Barrier, Lock, get_ident
+    archive, state = tmp_path / "archive", tmp_path / "state"
+    good = completed(archive)
+    for i in range(7):
+        completed(archive, run_id=f"old-{i}", finished_at=(NOW - timedelta(days=2)).isoformat())
+    published_strategy(state, good)
+    write(state / "publication.json", {"status": "DELIVERY_VERIFIED"})
+    original = local.read
+    barrier, guard = Barrier(4), Lock()
+    active = maximum = 0
+    owners = set()
+    def parallel_read(path):
+        nonlocal active, maximum
+        if path.name != "run.json":
+            return original(path)
+        with guard:
+            active += 1
+            maximum = max(maximum, active)
+            owners.add(get_ident())
+        try:
+            barrier.wait(timeout=10)
+            return original(path)
+        finally:
+            with guard:
+                active -= 1
+    monkeypatch.setattr(local, "read", parallel_read)
+    outbox_owner = get_ident()
+    original_queue = local.queue
+    def serial_queue(*args, **kwargs):
+        assert get_ident() == outbox_owner
+        return original_queue(*args, **kwargs)
+    monkeypatch.setattr(local, "queue", serial_queue)
+    local.queue_completed(archive, state, now=NOW)
+    assert maximum == 4 and len(owners) == 4
+    assert len(list((state / "notifications/events").glob("*.json"))) == 1
+    health = original(state / "notifications/health/market_sources.json")
+    assert health["scanned_manifests"] == 8 and health["invalid_manifests"] == 0 and health["scan_seconds"] >= 0
+
+
 def test_corrupt_outbox_receipt_cannot_starve_an_independent_failure(tmp_path):
     root = tmp_path / "notifications"
     write(root / "events/0000.json", {"kind":"failure"})

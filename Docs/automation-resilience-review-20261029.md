@@ -49,6 +49,54 @@ never manufacture a successful owner from a failed workflow or a no-work retry.
 The October 29 PRISM collection succeeded, but its owning workflow failed later.
 Its public report was recovered; that does not authorize a false success receipt.
 
+### Verified publication recovery after a successful collection
+
+The remaining PRISM notice exposed a separate recovery gap. The original
+collection step succeeded, and the sole failed step was the publish-enabled
+merged-site build. A later local publication recovered the exact source, but
+the original workflow correctly remained failed. A skipped collection in a
+later successful no-op cannot replace that owner.
+
+The notification path now admits this specific recovery only with the original
+trusted main workflow and exact attempt, one successful collection containing
+the canonical clocks, exactly one failed merged-site build, a skipped snapshot
+and native deployment, no other failed/cancelled steps or jobs, and a verified
+local publication after the failed stage. The sender rechecks canonical hashes,
+the local owner, current publication lock, and exact live packet/site bytes.
+Collection failures, unknown failures, publish-disabled runs, ambiguous owners,
+future or missing clocks, changed originals, and pending publication remain
+ineligible. The message explicitly describes publication recovery and the
+receipt preserves the upstream failure. It uses the original advisory event
+identity and existing retry budget; no source is recollected or relabeled.
+
+Live observation also found the minute producer reading about 736 MB while
+scanning notification history and holding the publication lock for over a
+minute. The scan now reads at most four originals concurrently, preserves
+every validation and a fixed cutoff, and queues results serially in original
+order. Durable diagnostics record scan count and duration. Tests verify the
+concurrency bound, serial outbox writes, corrupt-neighbor isolation, and
+duplicate suppression even after a newer publication of the same source.
+
+### Operational acceptance recorded during the review
+
+- PR 494 merged as `fae53db7acd95506f96fdd116e24e754afa7218d`.
+  Final CI 40831831947 passed 6,484 tests and 131 subtests (one platform skip),
+  mobile/report/chart checks and CodeQL. Production and installed launcher
+  hashes were adopted at 16:10 KST; untracked user work was preserved.
+- The live Python environment now has LangGraph 1.2.14, SDK 0.4.10 and filelock
+  4.2.4. Imports and dependency checks passed; open Dependabot alerts became zero.
+- US recovery notification event
+  `68a3015618a53a3c51ca84d209867c1ebef41d47472c703535939916137729c2`
+  was SENT once by successful workflow 40833908824, message 825, verified at
+  16:13:19 KST. The original research attempt budget remains exhausted.
+- KR recovery `20261029T161248_local-scheduler-kr-full` started at 16:12:48 KST
+  against the original October 29 04:30 window, attempt one of four, after a
+  successful dry run. Its completion and delivery remain pending.
+- The operational latest ledger was an October 9 CP949 document. Exact original
+  bytes and a strictly decoded, equality-checked copy were preserved. Current
+  review records now use atomic UTF-8 JSON. The existing operations automation
+  prompt was updated without changing its schedule, model or effort.
+
 ## Remaining acceptance work and limits
 
 At review start, KR had no full production on October 28/29; the last was
