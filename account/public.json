@@ -1,6 +1,6 @@
 {
   "schema": "tradingagents.public-account-snapshot/v1",
-  "generated_at": "2026-10-29T11:16:50.098966+00:00",
+  "generated_at": "2026-10-29T14:32:41.724611+00:00",
   "page_url": "https://nornen0202.github.io/TradingAgents/account/",
   "json_url": "https://nornen0202.github.io/TradingAgents/account/public.json",
   "currency_note": "All monetary values are normalized to KRW by the KIS account adapter.",
@@ -226,20 +226,20 @@
       "label_ko": "해외",
       "label_en": "Overseas",
       "status": "available",
-      "as_of": "2026-10-29T13:15:38.892216+09:00",
-      "run_id": "20261029T124921_manual-us-failed-recovery",
+      "as_of": "2026-10-29T22:46:17.553876+09:00",
+      "run_id": "20261029T224530_local-freshness-us-overlay",
       "snapshot_health": "VALID",
       "currency": "KRW",
       "summary": {
         "position_count": 14,
         "total_purchase_amount_krw": 23581184,
-        "total_market_value_krw": 23724266,
-        "total_unrealized_pnl_krw": 143082,
-        "total_unrealized_return_pct": 0.6068,
+        "total_market_value_krw": 23352352,
+        "total_unrealized_pnl_krw": -228832,
+        "total_unrealized_return_pct": -0.9704,
         "settled_cash_krw": 0,
         "available_cash_krw": 976652,
         "buying_power_krw": 107064,
-        "total_equity_krw": 24807982
+        "total_equity_krw": 24436140
       },
       "positions": [
         {
@@ -249,11 +249,11 @@
           "quantity": 12.0,
           "sellable_quantity": 12.0,
           "average_cost_krw": 544769,
-          "current_price_krw": 587317,
+          "current_price_krw": 582706,
           "purchase_amount_krw": 6537228,
-          "market_value_krw": 7047806,
-          "unrealized_pnl_krw": 510573,
-          "unrealized_return_pct": 7.8102
+          "market_value_krw": 6992483,
+          "unrealized_pnl_krw": 455250,
+          "unrealized_return_pct": 6.964
         },
         {
           "ticker": "RSP",
@@ -262,11 +262,11 @@
           "quantity": 11.0,
           "sellable_quantity": 11.0,
           "average_cost_krw": 291988,
-          "current_price_krw": 290551,
+          "current_price_krw": 292663,
           "purchase_amount_krw": 3211868,
-          "market_value_krw": 3196068,
-          "unrealized_pnl_krw": -15807,
-          "unrealized_return_pct": -0.4921
+          "market_value_krw": 3219293,
+          "unrealized_pnl_krw": 7418,
+          "unrealized_return_pct": 0.231
         },
         {
           "ticker": "GOOGL",
@@ -275,11 +275,11 @@
           "quantity": 6.0,
           "sellable_quantity": 6.0,
           "average_cost_krw": 423511,
-          "current_price_krw": 434150,
+          "current_price_krw": 378881,
           "purchase_amount_krw": 2541066,
-          "market_value_krw": 2604903,
-          "unrealized_pnl_krw": 63832,
-          "unrealized_return_pct": 2.512
+          "market_value_krw": 2273286,
+          "unrealized_pnl_krw": -267785,
+          "unrealized_return_pct": -10.5383
         },
         {
           "ticker": "NVDA",
@@ -288,24 +288,11 @@
           "quantity": 6.0,
           "sellable_quantity": 6.0,
           "average_cost_krw": 266841,
-          "current_price_krw": 287812,
+          "current_price_krw": 285714,
           "purchase_amount_krw": 1601046,
-          "market_value_krw": 1726873,
-          "unrealized_pnl_krw": 125826,
-          "unrealized_return_pct": 7.859
-        },
-        {
-          "ticker": "MPWR",
-          "code": "MPWR",
-          "name": "모놀리식 파워 시스템",
-          "quantity": 1.0,
-          "sellable_quantity": 1.0,
-          "average_cost_krw": 1877154,
-          "current_price_krw": 1618553,
-          "purchase_amount_krw": 1877154,
-          "market_value_krw": 1618553,
-          "unrealized_pnl_krw": -258601,
-          "unrealized_return_pct": -13.7762
+          "market_value_krw": 1714285,
+          "unrealized_pnl_krw": 113238,
+          "unrealized_return_pct": 7.0728
         },
         {
           "ticker": "ETN",
@@ -314,11 +301,24 @@
           "quantity": 3.0,
           "sellable_quantity": 3.0,
           "average_cost_krw": 555095,
-          "current_price_krw": 525005,
+          "current_price_krw": 526635,
           "purchase_amount_krw": 1665285,
-          "market_value_krw": 1575016,
-          "unrealized_pnl_krw": -90271,
-          "unrealized_return_pct": -5.4208
+          "market_value_krw": 1579907,
+          "unrealized_pnl_krw": -85380,
+          "unrealized_return_pct": -5.1271
+        },
+        {
+          "ticker": "MPWR",
+          "code": "MPWR",
+          "name": "모놀리식 파워 시스템",
+          "quantity": 1.0,
+          "sellable_quantity": 1.0,
+          "average_cost_krw": 1877154,
+          "current_price_krw": 1576513,
+          "purchase_amount_krw": 1877154,
+          "market_value_krw": 1576513,
+          "unrealized_pnl_krw": -300641,
+          "unrealized_return_pct": -16.0158
         },
         {
           "ticker": "SGOV",
@@ -327,11 +327,11 @@
           "quantity": 9.0,
           "sellable_quantity": 9.0,
           "average_cost_krw": 134313,
-          "current_price_krw": 134565,
+          "current_price_krw": 134578,
           "purchase_amount_krw": 1208817,
-          "market_value_krw": 1211088,
-          "unrealized_pnl_krw": 2267,
-          "unrealized_return_pct": 0.1875
+          "market_value_krw": 1211208,
+          "unrealized_pnl_krw": 2387,
+          "unrealized_return_pct": 0.1975
         },
         {
           "ticker": "GEV",
@@ -340,11 +340,11 @@
           "quantity": 1.0,
           "sellable_quantity": 1.0,
           "average_cost_krw": 1470651,
-          "current_price_krw": 1173311,
+          "current_price_krw": 1178870,
           "purchase_amount_krw": 1470651,
-          "market_value_krw": 1173311,
-          "unrealized_pnl_krw": -297340,
-          "unrealized_return_pct": -20.2183
+          "market_value_krw": 1178870,
+          "unrealized_pnl_krw": -291781,
+          "unrealized_return_pct": -19.8403
         },
         {
           "ticker": "AAPL",
@@ -353,11 +353,11 @@
           "quantity": 2.0,
           "sellable_quantity": 2.0,
           "average_cost_krw": 364026,
-          "current_price_krw": 459460,
+          "current_price_krw": 466108,
           "purchase_amount_krw": 728052,
-          "market_value_krw": 918920,
-          "unrealized_pnl_krw": 190868,
-          "unrealized_return_pct": 26.2163
+          "market_value_krw": 932216,
+          "unrealized_pnl_krw": 204164,
+          "unrealized_return_pct": 28.0425
         },
         {
           "ticker": "LLY",
@@ -366,11 +366,11 @@
           "quantity": 0.436065,
           "sellable_quantity": 0.436065,
           "average_cost_krw": 1417827,
-          "current_price_krw": 1721555,
+          "current_price_krw": 1853802,
           "purchase_amount_krw": 618265,
-          "market_value_krw": 750710,
-          "unrealized_pnl_krw": 132445,
-          "unrealized_return_pct": 21.422
+          "market_value_krw": 808378,
+          "unrealized_pnl_krw": 190113,
+          "unrealized_return_pct": 30.7494
         },
         {
           "ticker": "DELL",
@@ -379,11 +379,11 @@
           "quantity": 1.0,
           "sellable_quantity": 1.0,
           "average_cost_krw": 661742,
-          "current_price_krw": 659851,
+          "current_price_krw": 654265,
           "purchase_amount_krw": 661742,
-          "market_value_krw": 659851,
-          "unrealized_pnl_krw": -1891,
-          "unrealized_return_pct": -0.2858
+          "market_value_krw": 654265,
+          "unrealized_pnl_krw": -7477,
+          "unrealized_return_pct": -1.1299
         },
         {
           "ticker": "AVGO",
@@ -392,11 +392,11 @@
           "quantity": 1.0,
           "sellable_quantity": 1.0,
           "average_cost_krw": 568762,
-          "current_price_krw": 470123,
+          "current_price_krw": 458537,
           "purchase_amount_krw": 568762,
-          "market_value_krw": 470123,
-          "unrealized_pnl_krw": -98639,
-          "unrealized_return_pct": -17.3428
+          "market_value_krw": 458537,
+          "unrealized_pnl_krw": -110225,
+          "unrealized_return_pct": -19.3798
         },
         {
           "ticker": "GLDM",
@@ -405,11 +405,11 @@
           "quantity": 4.0,
           "sellable_quantity": 4.0,
           "average_cost_krw": 136006,
-          "current_price_krw": 107705,
+          "current_price_krw": 106422,
           "purchase_amount_krw": 544024,
-          "market_value_krw": 430823,
-          "unrealized_pnl_krw": -113202,
-          "unrealized_return_pct": -20.8083
+          "market_value_krw": 425691,
+          "unrealized_pnl_krw": -118334,
+          "unrealized_return_pct": -21.7516
         },
         {
           "ticker": "AMZN",
@@ -418,18 +418,18 @@
           "quantity": 1.0,
           "sellable_quantity": 1.0,
           "average_cost_krw": 347224,
-          "current_price_krw": 340221,
+          "current_price_krw": 327420,
           "purchase_amount_krw": 347224,
-          "market_value_krw": 340221,
-          "unrealized_pnl_krw": -7003,
-          "unrealized_return_pct": -2.0169
+          "market_value_krw": 327420,
+          "unrealized_pnl_krw": -19804,
+          "unrealized_return_pct": -5.7035
         }
       ],
       "latest_attempt": {
         "status": "VALID",
-        "account_as_of": "2026-10-29T13:15:38.892216+09:00",
-        "run_started_at": "2026-10-29T12:49:21.009364+09:00",
-        "run_finished_at": "2026-10-29T14:14:07.115277+09:00",
+        "account_as_of": "2026-10-29T22:46:17.553876+09:00",
+        "run_started_at": "2026-10-29T22:45:30.110912+09:00",
+        "run_finished_at": "2026-10-29T22:46:29.870982+09:00",
         "selected_for_public_account": true
       }
     }
