@@ -547,7 +547,7 @@ def test_price_history_loader_filters_recommendations_to_run_market(tmp_path, mo
     fake_yfinance = SimpleNamespace(download=lambda ticker, **kwargs: downloaded.append(ticker) or SimpleNamespace(empty=True))
     monkeypatch.setitem(sys.modules, "yfinance", fake_yfinance)
 
-    result = load_price_history_for_recommendations(db_path, provider="yfinance", market="US")
+    result = load_price_history_for_recommendations(db_path, provider="yfinance", market="US", asof_date="2026-04-02")
 
     assert downloaded == ["AAPL"]
     assert "performance_price_history_market_filter:US:skipped=1" in result.warnings
@@ -587,7 +587,7 @@ def test_price_history_loader_filters_us_recommendations_out_of_kr_run(tmp_path,
     fake_yfinance = SimpleNamespace(download=lambda ticker, **kwargs: downloaded.append(ticker) or SimpleNamespace(empty=True))
     monkeypatch.setitem(sys.modules, "yfinance", fake_yfinance)
 
-    result = load_price_history_for_recommendations(db_path, provider="yfinance", market="KR")
+    result = load_price_history_for_recommendations(db_path, provider="yfinance", market="KR", asof_date="2026-04-02")
 
     assert downloaded == ["000660.KS"]
     assert "performance_price_history_market_filter:KR:skipped=1" in result.warnings

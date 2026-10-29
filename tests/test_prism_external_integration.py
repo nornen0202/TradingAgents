@@ -454,6 +454,7 @@ def test_price_history_loader_adds_benchmark_and_updates_outcomes(tmp_path):
         provider="local_json",
         price_history_path=FIXTURES / "performance" / "price_history_with_benchmark.json",
         benchmark_ticker="SPY",
+        asof_date="2026-04-30",
     )
     update_action_outcomes(db_path, "2026-04-30", price_history=price_result.price_history)
 
