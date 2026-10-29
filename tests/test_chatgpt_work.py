@@ -2872,3 +2872,54 @@ def test_work_skill_and_operations_doc_state_local_and_mobile_delivery_boundarie
     assert "Plaintext 전략 Pages" in operations
     assert "tradingagents.work-report/v1" in operations
     assert "외부 GitHub workflow가 임의의 개인 ChatGPT 대화에 결과를 주입" in operations
+
+def test_historical_draft_cannot_advance_current_delivery(tmp_path):
+    archive = tmp_path / 'archive'
+    _write_market_run(archive, run_id='past', market='us', started_at='2026-07-14T14:00:00Z')
+    runtime = WorkRuntime(tmp_path / 'runtime')
+    prepared = runtime.prepare('us', archive_dir=archive, now=datetime(2026,7,14,14,5,tzinfo=timezone.utc))
+    draft = _structured_report(prepared)
+    state = runtime._load_state()
+    state['surfaces']['us']['requires_fresh_publish'] = True
+    runtime._save_state(state)
+    before = runtime.state_path.read_bytes()
+    kwargs = dict(report_markdown='# 과거 분석\n원래 분석과 시각을 보존합니다.', structured_report=draft,
+                  archive_dir=archive, now=datetime(2026,7,23,tzinfo=timezone.utc))
+    with pytest.raises(WorkRuntimeError, match='Fresh report inputs'):
+        runtime.publish('us', prepared['event_id'], prepared['source_sha256'], **kwargs)
+    result = runtime.publish('us', prepared['event_id'], prepared['source_sha256'], historical=True, **kwargs)
+    assert result['status'] == 'ARCHIVED_HISTORICAL'
+    assert runtime.state_path.read_bytes() == before
+    assert not (archive / 'work-reports/us/latest.json').exists()
+    assert not (archive / 'work-reports/us/events').exists()
+    report = json.loads(Path(result['report_path']).read_text(encoding='utf-8'))
+    validate_work_report(report)
+    assert report['structured_report']['generated_at'] == draft['generated_at']
+    assert '현재 투자 지시 아님' in report['report_markdown']
+    assert runtime.publish('us', prepared['event_id'], prepared['source_sha256'], historical=True, **kwargs) == result
+    with pytest.raises(WorkRuntimeError, match='publish the final'):
+        runtime.acknowledge('us', prepared['event_id'])
+    draft['strategies'][0]['execution']['readiness'] = 'READY_NOW'
+    with pytest.raises(WorkRuntimeError, match='no executable actions'):
+        runtime.publish('us', prepared['event_id'], prepared['source_sha256'], historical=True, **kwargs)
+
+
+def test_report_history_keeps_exact_bytes_and_rejects_tampering(tmp_path):
+    from tradingagents.work.site import publish_report_history
+    archive = tmp_path / 'archive'
+    _write_market_run(archive, run_id='history', market='us', started_at='2026-07-14T14:00:00Z')
+    runtime = WorkRuntime(tmp_path / 'runtime')
+    prepared = runtime.prepare('us', archive_dir=archive, now=datetime(2026,7,14,14,5,tzinfo=timezone.utc))
+    result = _publish_market(runtime, prepared, archive=archive)
+    latest = archive / 'work-reports/us/latest.json'
+    original = latest.read_bytes()
+    events = archive / 'work-reports/us/events'
+    bad = json.loads(original)
+    bad['report_markdown'] = 'tampered'
+    (events / ('0'*64+'.json')).write_text(json.dumps(bad), encoding='utf-8')
+    catalog = publish_report_history(root=tmp_path/'site', archive_dir=archive, surface='us', url_prefix='/work/v1',
+                                     now=datetime(2026,7,23,tzinfo=timezone.utc))
+    assert len(catalog['reports']) == 1 and catalog['rejected_count'] == 1
+    assert latest.read_bytes() == original
+    assert (tmp_path/'site/us/report/events'/f"{result['report_sha256']}.json").read_bytes() == original
+    assert '과거 기록' in (tmp_path/'site/us/report/events'/f"{result['report_sha256']}.html").read_text(encoding='utf-8')

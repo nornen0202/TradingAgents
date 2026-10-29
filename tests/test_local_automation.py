@@ -637,3 +637,36 @@ def test_pending_generation_survives_new_inputs_but_not_partial_build(
         assert calls["handoff"][-1]["commit"] == ("commit-1" if mutated else "already-pushed")
     else:
         assert not calls["handoff"] and calls["sleep"] == [15] * 6
+
+def test_history_only_publication_does_not_accept_new_research(monkeypatch, delayed_publication):
+    archive, state, runtime, calls = delayed_publication
+    local.atomic_write_json(state/'publication.json', {'status':'DELIVERY_VERIFIED','commit':'base','fingerprint':'old-research'})
+    (state/'site/ai').mkdir(parents=True)
+    (state/'site/ai/manifest.json').write_text('{}')
+    history = []
+    monkeypatch.setattr(local, 'archive_fingerprint', lambda _: 'new-research')
+    monkeypatch.setattr(local, 'refresh_report_history', lambda *args: history.append(args))
+    monkeypatch.setattr(local, 'verify_live', lambda _: True)
+    result = local.publish(archive, state, runtime, publication_locked=True, reports_only=True)
+    assert result['fingerprint'] == 'old-research'
+    assert result['status'] == 'DELIVERY_VERIFIED'
+    assert len(history) == len(calls['push']) == 1 and not calls['build']
+
+
+@pytest.mark.parametrize('failure', ['unverified','dirty','untracked','changed-latest'])
+def test_history_refresh_rejects_unverified_or_changed_base(tmp_path, monkeypatch, failure):
+    state, archive = tmp_path/'state', tmp_path/'archive'
+    receipt = {'status':'DELIVERY_VERIFIED','commit':'base'}
+    writes = []
+    from tradingagents.work import site
+    monkeypatch.setattr(site, '_publish_latest_report', lambda **kw: writes.append(kw))
+    def git(args, **kwargs):
+        if failure == 'dirty' and 'diff' in args:
+            raise RuntimeError('dirty')
+        return 'extra-file' if failure == 'untracked' and 'ls-files' in args else ''
+    monkeypatch.setattr(local, 'git_run', git)
+    if failure == 'unverified': receipt['status'] = 'PAGES_PENDING'
+    if failure == 'changed-latest': local.atomic_write_json(archive/'work-reports/us/latest.json', {'changed':True})
+    with pytest.raises((ValueError,RuntimeError)):
+        local.refresh_report_history(archive,state,receipt)
+    assert not writes

@@ -233,6 +233,7 @@ class WorkRuntime:
         structured_report: dict[str, Any],
         archive_dir: Path | None = None,
         now: datetime | None = None,
+        historical: bool = False,
     ) -> dict[str, Any]:
         """Bind a final model report to an immutable packet and archive it by content hash."""
 
@@ -256,7 +257,25 @@ class WorkRuntime:
             if surface_state.get("pending_source_sha256") != source_sha256:
                 raise WorkRuntimeError("Publish source SHA-256 does not match canonical pending state")
 
-            if surface_state.get("requires_fresh_publish"):
+            if historical:
+                if key not in {"kr", "us"}:
+                    raise WorkRuntimeError("Historical draft publication requires a market surface")
+                for field in ("generated_at", "as_of"):
+                    try:
+                        clock = datetime.fromisoformat(str(structured_report.get(field) or "").replace("Z", "+00:00"))
+                    except ValueError:
+                        clock = None
+                    if clock is None or clock.tzinfo is None or clock > effective_now:
+                        raise WorkRuntimeError("Historical report has an invalid or future source clock")
+                if any((row.get("execution") or {}).get("readiness") != "NEEDS_LIVE_RECHECK"
+                       or (row.get("execution") or {}).get("action_now")
+                       or (row.get("execution") or {}).get("action_if_triggered")
+                       for row in structured_report.get("strategies", [])):
+                    raise WorkRuntimeError("Historical reports must contain no executable actions")
+                if any(row.get("readiness") != "NEEDS_LIVE_RECHECK" or row.get("action")
+                       for row in structured_report.get("top_actions", [])):
+                    raise WorkRuntimeError("Historical reports must contain no executable actions")
+            elif surface_state.get("requires_fresh_publish"):
                 from .pre_report import publish_freshness_blockers
                 blockers = publish_freshness_blockers(packet, now=effective_now)
                 if blockers:
@@ -272,6 +291,10 @@ class WorkRuntime:
             )
             _validate_report_packet_coverage(draft, packet, now=effective_now)
             markdown = str(report_markdown or "").strip()
+            if historical:
+                markdown = ("# 과거 분석 보관본 — 현재 투자 지시 아님\n\n"
+                            "미발행 초안을 원래 분석 시각 그대로 보관합니다. 현재 시세·계좌 검증과 "
+                            "새 보고서 전달 확인을 대체하지 않습니다.\n\n" + markdown)
             material = {
                 "schema": WORK_REPORT_SCHEMA,
                 "surface": key,
@@ -296,7 +319,7 @@ class WorkRuntime:
 
             archive_root = resolve_archive_roots(archive_dir=archive_dir)["market"]
             report_root = archive_root / "work-reports" / key
-            report_path = report_root / "events" / f"{report_sha256}.json"
+            report_path = report_root / ("historical-events" if historical else "events") / f"{report_sha256}.json"
             if report_path.exists():
                 existing = _load_json_object(report_path, label="content-addressed Work report")
                 validate_work_report(existing)
@@ -306,6 +329,10 @@ class WorkRuntime:
                 published_at = str(existing.get("published_at") or published_at)
             else:
                 _atomic_write_json(report_path, report)
+            if historical:
+                return {"status": "ARCHIVED_HISTORICAL", "surface": key, "event_id": event_id,
+                        "report_sha256": report_sha256, "report_path": str(report_path.resolve()),
+                        "published_at": published_at, "current_delivery_advanced": False}
             latest_path = report_root / "latest.json"
             _atomic_write_bytes(latest_path, report_path.read_bytes())
 

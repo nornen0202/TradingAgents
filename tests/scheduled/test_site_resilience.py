@@ -86,3 +86,27 @@ def test_repeated_research_is_shared_without_changing_rendered_values(tmp_path, 
             public[0]["decision"]["reason"] = "modified public copy"
     assert json.dumps(manifests) == before
     assert all(path.read_bytes() == data for path, data in original)
+
+def test_daily_history_survives_overlay_limit_and_rejects_invalid_clocks(tmp_path, monkeypatch):
+    from datetime import datetime, timezone
+    base={'run_id':'daily','started_at':'2026-10-23T09:00:00+09:00','finished_at':'2026-10-23T10:00:00+09:00',
+          'status':'partial_failure','settings':{'market':'us','run_mode':'full'},
+          'summary':{'total_tickers':30,'successful_tickers':29,'failed_tickers':1}}
+    rows=[base, {**base,'run_id':'overlay','settings':{'run_mode':'overlay_only'}},
+          {**base,'run_id':'future','finished_at':'2099-01-01T00:00:00Z'},
+          {**base,'run_id':'unknown','finished_at':None},
+          {**base,'run_id':'reversed','finished_at':'2026-10-22T00:00:00Z'}]
+    writes=[]
+    def render(site_dir, manifest, settings, manifests):
+        writes.append(manifest['run_id'])
+        target=site_dir/'runs'/manifest['run_id']/'index.html'
+        target.parent.mkdir(parents=True,exist_ok=True)
+        target.write_text('verified render')
+    monkeypatch.setattr(site,'_write_run_pages',render)
+    result=site.publish_daily_report_history(tmp_path/'archive',tmp_path/'site',SiteSettings(),manifests=rows,
+                                             now=datetime(2026,10,29,tzinfo=timezone.utc))
+    assert writes==['daily'] and len(result)==1
+    assert result[0]['failed']==1 and result[0]['status']=='partial_failure'
+    site.publish_daily_report_history(tmp_path/'archive',tmp_path/'site',SiteSettings(),manifests=rows,
+                                       now=datetime(2026,10,29,tzinfo=timezone.utc))
+    assert writes==['daily']

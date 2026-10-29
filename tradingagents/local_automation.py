@@ -525,6 +525,7 @@ def archive_fingerprint(archive):
         paths = list((root / "runs").glob(f"*/*/{manifest_names[label]}"))
         if label == "research":
             paths += list((root / "work-reports").glob("*/latest.json"))
+            paths += list((root / "work-reports").glob("*/historical-events/*.json"))
         for path in sorted(paths):
             digest.update(f"{label}:{path.relative_to(root).as_posix()}".encode())
             digest.update(path.read_bytes())
@@ -580,7 +581,11 @@ def verify_live(site):
     if snapshot != read_json(site / "pages-snapshot.json"):
         return False
     # Check exact report and strategy bytes; a successful push is not delivery.
-    for relative in ("mobile/strategy.json", "work/v1/kr/report/latest.json", "work/v1/us/report/latest.json"):
+    relatives = ["mobile/strategy.json", "work/v1/kr/report/latest.json", "work/v1/us/report/latest.json",
+                 "reports/history.json", "reports/index.html"]
+    relatives.extend(f"work/v1/{surface}/report/{name}" for surface in ("kr", "us", "youtube", "prism")
+                     for name in ("history.json", "index.html"))
+    for relative in relatives:
         path = site / relative
         if path.is_file():
             from urllib.request import Request, urlopen
@@ -620,7 +625,7 @@ def ensure_branch_pages(state):
         raise ValueError("Independent Pages publishing source was not applied")
 
 
-def publish(archive, state, runtime_dir, *, rebuild=False, publication_locked=False):
+def publish(archive, state, runtime_dir, *, rebuild=False, publication_locked=False, reports_only=False):
     from tradingagents.notifications.local import reconcile_safely
     reconcile_safely(archive, state, publication_locked=publication_locked)
     fingerprint = archive_fingerprint(archive)
@@ -638,15 +643,18 @@ def publish(archive, state, runtime_dir, *, rebuild=False, publication_locked=Fa
             resume_pending = all(json.loads(git_run([
                 f"--git-dir={state / 'pages.git'}", "show", f"{receipt['commit']}:{relative}"]))
                 == read_json(site / relative) for relative in relatives)
-    if receipt.get("fingerprint") == fingerprint and receipt.get("status") == "DELIVERY_VERIFIED" and not rebuild:
+    if receipt.get("fingerprint") == fingerprint and receipt.get("status") == "DELIVERY_VERIFIED" and not rebuild and not reports_only:
         complete_handoffs(site, runtime_dir, receipt)
         return receipt
-    if not resume_pending and (receipt.get("fingerprint") != fingerprint or not receipt.get("commit") or rebuild):
+    if not resume_pending and (receipt.get("fingerprint") != fingerprint or not receipt.get("commit") or rebuild or reports_only):
         from tradingagents.scheduled.config import load_scheduled_config
         from tradingagents.scheduled.site import build_site
 
         config = load_scheduled_config(ROOT / "config" / "scheduled_analysis.toml")
-        build_site(archive, site, config.site)
+        if reports_only:
+            refresh_report_history(archive, state, receipt)
+        else:
+            build_site(archive, site, config.site)
         # Preserve exact Work hashes and existing reference-only lineage rules.
         verifier = script("verify_work_pages_handoff")
         for market in ("kr", "us"):
@@ -663,7 +671,10 @@ def publish(archive, state, runtime_dir, *, rebuild=False, publication_locked=Fa
         if not script("pages_snapshot").should_deploy(read_json(site / "pages-snapshot.json"), live)[0]:
             raise ValueError("Publication would roll back the live site")
         commit = push_site(site, state)
-        receipt = {"status": "PAGES_PENDING", "fingerprint": fingerprint, "commit": commit, "pushed_at": datetime.now(timezone.utc).isoformat()}
+        # A history-only publication must not acknowledge newer research inputs
+        # that were not rebuilt. The normal publisher will still observe them.
+        receipt = {"status": "PAGES_PENDING", "fingerprint": receipt["fingerprint"] if reports_only else fingerprint,
+                   "commit": commit, "pushed_at": datetime.now(timezone.utc).isoformat()}
         atomic_write_json(receipt_path, receipt)
     ensure_branch_pages(state)
     # The public AI mirror is also independent of Actions/Pages edge availability.
@@ -689,6 +700,30 @@ def publish(archive, state, runtime_dir, *, rebuild=False, publication_locked=Fa
     return receipt
 
 
+def refresh_report_history(archive, state, receipt):
+    """Extend an exactly committed site under the existing publication lock."""
+    if receipt.get("status") != "DELIVERY_VERIFIED" or not receipt.get("commit"):
+        raise ValueError("History publication requires a verified base publication")
+    site = state / "site"
+    prefix = [f"--git-dir={state / 'pages.git'}", f"--work-tree={site}"]
+    env = {**os.environ, "GIT_INDEX_FILE": str(state / "pages.index")}
+    git_run(["-c", "core.autocrlf=false", *prefix, "diff", "--exit-code", "--no-ext-diff", receipt["commit"], "--"], env=env)
+    if git_run([*prefix, "ls-files", "--others", "--exclude-standard"], env=env).strip():
+        raise ValueError("History publication base has uncommitted files")
+    for surface in ("kr", "us", "youtube", "prism"):
+        original = archive / "work-reports" / surface / "latest.json"
+        current = site / "work" / "v1" / surface / "report" / "latest.json"
+        if original.exists() != current.exists() or (original.exists() and original.read_bytes() != current.read_bytes()):
+            raise ValueError("History publication cannot advance a changed latest report")
+    from tradingagents.work.site import _publish_latest_report
+    for surface in ("kr", "us", "youtube", "prism"):
+        _publish_latest_report(root=site / "work" / "v1", archive_dir=archive,
+                               surface=surface, url_prefix=f"{PUBLIC_BASE}/work/v1")
+    from tradingagents.scheduled.config import load_scheduled_config
+    from tradingagents.scheduled.site import publish_daily_report_history
+    publish_daily_report_history(archive, site, load_scheduled_config(ROOT / "config" / "scheduled_analysis.toml").site)
+
+
 def complete_handoffs(site, runtime_dir, publication):
     for path in (runtime_dir / "handoffs").glob("*/*.json"):
         receipt = read_json(path)
@@ -708,6 +743,8 @@ def main():
     parser.add_argument("--state-dir", type=Path, required=True)
     parser.add_argument("--runtime-dir", type=Path, required=True)
     parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument("--reports-only", action="store_true",
+                        help="Publish validated report history from an unchanged verified site.")
     parser.add_argument("--rebuild", action="store_true")
     parser.add_argument("--review-port", type=int, default=8766)
     args = parser.parse_args()
@@ -819,7 +856,8 @@ def main():
             else:
                 try:
                     result = publish(args.archive_dir, args.state_dir, args.runtime_dir,
-                                     rebuild=args.rebuild, publication_locked=True)
+                                     rebuild=args.rebuild, publication_locked=True,
+                                     **({"reports_only": True} if args.reports_only else {}))
                 except Exception as exc:
                     from tradingagents.notifications.local import queue_failure, reconcile_safely
                     # Daily identity and incident cooldown prevent a five-minute
