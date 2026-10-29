@@ -247,6 +247,13 @@ NVDA = "NVIDIA Override"
                 row = next(item for item in manifest["tickers"] if item["ticker"] == ticker)
                 assert row["research_market_observation"] == receipt
                 assert receipt["market_data_asof"] == "2026-04-02T10:00:00-04:00"
+            self.assertEqual(manifest["terminal_failure"]["reason"], "incomplete_ticker_research")
+            self.assertFalse((run_dir / "decision_bundle_v2.json").exists())
+            self.assertFalse((site_dir / "index.html").exists())
+            # Independent consumers may render the saved diagnostic cohort;
+            # their work must not delay its terminal recovery checkpoint.
+            scheduled_runner.build_and_write_decision_bundle(run_dir=run_dir, manifest=manifest)
+            scheduled_runner.build_site(archive_dir, site_dir, config.site)
             bundle = json.loads((run_dir / "decision_bundle_v2.json").read_text(encoding="utf-8"))
             assert all(row["market_data_basis"] == "RESEARCH_OBSERVATION" for row in bundle["strategy_table"])
             assert all(row["quality"]["execution_ready"] is False for row in bundle["strategy_table"])
@@ -369,7 +376,8 @@ site_dir = "{site_dir.as_posix()}"
             self.assertTrue(any("run_time_budget_exhausted" in item for item in manifest["warnings"]))
             run_dir = archive_dir / "runs" / manifest["started_at"][:4] / manifest["run_id"]
             self.assertTrue((run_dir / "run.json").exists())
-            self.assertTrue((site_dir / "index.html").exists())
+            self.assertEqual(manifest["terminal_failure"]["reason"], "incomplete_ticker_research")
+            self.assertFalse((site_dir / "index.html").exists())
 
     def test_load_scheduled_config_parses_parallel_and_circuit_breaker_settings(self):
         with tempfile.TemporaryDirectory() as tmpdir:
