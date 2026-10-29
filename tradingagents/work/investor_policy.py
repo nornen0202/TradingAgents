@@ -138,7 +138,9 @@ def project_investor_body(body: dict, *, now: datetime) -> dict:
                              "data_needed_reason": "원분석 기준시각이 없거나 잘못됐거나 미래여서 근거에서 제외"}
         elif quote is None or quote > now:
             for field in ("last_price", "session_vwap", "relative_volume", "day_high", "day_low",
-                          "price_change_pct", "vwap_distance_pct", "spread_bps", "trading_value"):
+                          "price_change_pct", "vwap_distance_pct", "spread_bps", "trading_value",
+                          "execution_condition_ko", "risk_condition_ko", "reason_codes_ko",
+                          "sync_summary_ko", "vwap_position_ko"):
                 row.pop(field, None)
             row["data_status_ko"] = "시각 미검증 시세 제외; 별도 날짜가 검증된 분석만 사용"
         plan = investment_plan(row, now=now)
