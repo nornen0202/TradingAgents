@@ -52,7 +52,9 @@ def test_actual_watchdog_uses_same_slots_for_equivalent_instants(tmp_path, offli
             now=now, dry_run=True, research_only=True))
     assert observations[0] == observations[1] == observations[2]
     assert {row["target"] for row in observations[0]} == expected
-    assert all(row["status"] == "DUE" for row in observations[0])
+    assert {row["target"]: row["status"] for row in observations[0]} == {
+        name: ("DEFERRED_FOR_NEXT_MARKET_RESEARCH" if name == "daily-codex-us" and "daily-codex-kr" in expected else "DUE")
+        for name in expected}
     assert all(now == kst and getattr(now.tzinfo, "key", None) == "Asia/Seoul"
         for _, now in offline_scheduler)
     assert not (tmp_path / "state").exists()
@@ -129,6 +131,43 @@ def test_independent_research_delegation_reaches_actual_daily_watchdog(tmp_path,
         executor=lambda *a, **kw: pytest.fail("Research execution in a dry run"),
         session_resolver=lambda **kw: pytest.fail("Daily research was lost before the slot lane"))
     assert actual == [{"status": "DAILY_RESEARCH_DUE", "decisions": [
-        {"target": row["target"], "status": "DUE"} for row in delegated]}]
+        {"target": row["target"], "status": ("DEFERRED_FOR_NEXT_MARKET_RESEARCH"
+         if row["target"] == "daily-codex-us" and len(delegated) == 2 else "DUE")} for row in delegated]}]
     assert {path: path.read_bytes() for path in state.rglob("*.json")} == before
     assert not (state / "attempts").exists()
+
+
+@pytest.mark.parametrize("market,window",[("kr","2026-10-22T04:30:00+09:00"),("us","2026-10-21T17:45:00+09:00")])
+def test_explicit_missed_daily_recovery_preserves_slot_budget_and_actual_start(tmp_path,offline_scheduler,monkeypatch,market,window):
+    import hashlib,json
+    from types import SimpleNamespace
+    from tradingagents.scheduled import config
+    now=datetime.fromisoformat("2026-10-22T15:40:00+09:00")
+    state=tmp_path / "state"
+    key=hashlib.sha256(f"daily-codex-{market}:{window}".encode()).hexdigest()
+    path=state / "attempts" / f"{key}.json"
+    atomic_write_json(path,{"attempts":2,"started_at":"2026-10-22T06:00:00+09:00","exit_code":1})
+    before=path.read_bytes()
+    result=local.run_due(tmp_path / "archive",state,now=now,research_only=True,dry_run=True,catch_up_market=market)
+    assert result==[{"target":f"daily-codex-{market}","status":"DUE"}]
+    assert path.read_bytes()==before
+    monkeypatch.setattr(config,"load_scheduled_config",lambda _:SimpleNamespace(llm=SimpleNamespace(codex_workspace_dir="unused")))
+    monkeypatch.setattr(local,"preflight",lambda _:None)
+    monkeypatch.setattr(local,"require_storage_headroom",lambda *a:None)
+    calls=[]
+    monkeypatch.setattr(local.subprocess,"run",lambda args,**kw:calls.append(args) or SimpleNamespace(returncode=0))
+    local.run_due(tmp_path / "archive",state,now=now,research_only=True,catch_up_market=market)
+    receipt=json.loads(path.read_text())
+    assert receipt["attempts"]==3 and receipt["started_at"]==now.isoformat()
+    assert receipt["original_window_start"]==window and receipt["recovery"]=="MISSED_WINDOW_CATCHUP"
+    assert "--disable-execution-refresh" in calls[0]
+    atomic_write_json(path,{**receipt,"attempts":4})
+    assert local.run_due(tmp_path / "archive",state,now=now,research_only=True,catch_up_market=market)[0]["status"]=="RETRY_BUDGET_OR_COOLDOWN"
+    assert len(calls)==1
+
+
+@pytest.mark.parametrize("clock,market",[("2026-10-22T09:00:00+09:00","kr"),("2026-10-22T17:45:00+09:00","us"),("2026-10-25T15:00:00+09:00","kr")])
+def test_catchup_never_invents_a_new_slot(tmp_path,offline_scheduler,clock,market):
+    with pytest.raises(ValueError):
+        local.run_due(tmp_path / "archive",tmp_path / "state",now=datetime.fromisoformat(clock),research_only=True,catch_up_market=market)
+    assert not (tmp_path / "state").exists()

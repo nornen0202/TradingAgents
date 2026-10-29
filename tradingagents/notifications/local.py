@@ -55,7 +55,12 @@ def queue(state, event):
 def queue_failure(state, *, stage, source_key, error_type, finished_at):
     # Exception text, native stderr, paths and credentials never enter the outbox.
     for path in (state / "notifications" / "events").glob("*.json"):
-        event = read(path)
+        try:
+            event = read(path)
+            if not isinstance(event, dict):
+                continue
+        except (OSError, ValueError):
+            continue
         if (event.get("kind"), event.get("stage"), event.get("source_key"), event.get("error_type")) == (
                 "failure", stage, source_key, error_type):
             return path.stem
@@ -63,12 +68,15 @@ def queue_failure(state, *, stage, source_key, error_type, finished_at):
                          "error_type": error_type, "finished_at": finished_at})
 
 
-def _local_market_producer(manifest):
+def _local_market_producer(manifest, archive=None, *, now=None):
     settings = manifest.get("settings") or {}
     market = str(settings.get("market", "")).lower()
     label = str(manifest.get("label", ""))
     if market not in {"kr", "us"}:
         return False
+    if archive is not None and manifest.get("research_recovery") and "manual" in label.lower():
+        from tradingagents.scheduled.research_recovery import verified_completed_recovery
+        return verified_completed_recovery(archive, manifest, now=now or datetime.now(timezone.utc))
     # Work's read-only freshness barrier is a real overlay producer. Its
     # completion still requires exact published lineage and live verification;
     # this does not turn a Work ACK into a notification event.
@@ -124,24 +132,42 @@ def _queue_completed_locked(archive, state, *, now=None):
     if not marker:
         marker = {"started_at": now.isoformat()}
         atomic_write_json(marker_path, marker)
+    marker_started = timestamp(marker["started_at"])
+    invalid = 0
     for path in (archive / "runs").glob("*/*/run.json"):
-        manifest = read(path)
-        settings = manifest.get("settings") or {}
-        market = str(settings.get("market", "")).lower()
-        if not _local_market_producer(manifest):
+        try:
+            event = _completion_event(read(path), archive, strategy, marker_started, now)
+        except (OSError, ValueError, TypeError, KeyError, AttributeError, NotificationError):
+            invalid += 1
             continue
-        if manifest.get("status") != "success" or (manifest.get("summary") or {}).get("failed_tickers") != 0:
-            continue
-        started, finished = timestamp(manifest["started_at"]), timestamp(manifest["finished_at"])
-        if finished < started or finished > now or now - finished > timedelta(hours=24):
-            continue
-        # Bootstrap the current daily result; never replay old overlay notices.
-        if settings.get("run_mode", "full") != "full" and finished < timestamp(marker["started_at"]):
-            continue
-        if not published_strategy_covers(manifest, strategy):
-            continue
-        queue(state, {"kind": "success", "run_id": manifest["run_id"], "market": market,
-                      "finished_at": manifest["finished_at"]})
+        if event:
+            queue(state, event)
+    atomic_write_json(state / "notifications/health/market_sources.json", {
+        "notification_status": "DEGRADED" if invalid else "CHECKED",
+        "invalid_manifests": invalid, "checked_at": now.isoformat()})
+
+
+def _completion_event(manifest, archive, strategy, marker_started, now):
+    if not isinstance(manifest, dict):
+        raise ValueError("Invalid manifest")
+    if manifest.get("status") != "success":
+        return None
+    summary, settings = manifest.get("summary") or {}, manifest.get("settings") or {}
+    if (summary.get("failed_tickers") != 0 or summary.get("total_tickers", 0) <= 0
+            or summary.get("total_tickers") != summary.get("successful_tickers")
+            or ((manifest.get("active_universe") or {}).get("coverage") or {}).get("complete") is not True):
+        return None
+    started, finished = timestamp(manifest.get("started_at")), timestamp(manifest.get("finished_at"))
+    if finished < started or finished > now or now - finished > timedelta(hours=24):
+        return None
+    if not _local_market_producer(manifest, archive, now=now):
+        return None
+    if settings.get("run_mode", "full") != "full" and finished < marker_started:
+        return None
+    if not published_strategy_covers(manifest, strategy):
+        return None
+    return {"kind": "success", "run_id": manifest["run_id"], "market": str(settings["market"]).lower(),
+            "finished_at": manifest["finished_at"]}
 
 
 def reconcile(state, *, now=None, runner=subprocess.run, completions_allowed=True):
@@ -149,57 +175,80 @@ def reconcile(state, *, now=None, runner=subprocess.run, completions_allowed=Tru
     root = state / "notifications"
     with interprocess_file_lock(root / "dispatch.lock", timeout=0):
         for path in sorted((root / "events").glob("*.json")):
-            key = path.stem
-            result = read(root / "results" / f"{key}.json")
-            receipt_path = root / "dispatches" / f"{key}.json"
-            receipt = read(receipt_path)
-            if result.get("status") in {"SENT", "NOOP"} and result.get("local_event_id") == key:
-                status = ("POLICY_SKIPPED" if result.get("reason") in {
-                    "INCIDENT_COOLDOWN", "SUPERSEDED_BY_VERIFIED_PUBLICATION"} else "DELIVERY_VERIFIED")
-                if receipt.get("status") != status:
-                    atomic_write_json(receipt_path, {**receipt, "status": status, "result": result})
-                continue
-            if read(path).get("kind") in {"success", "advisory_success"} and (not completions_allowed or read(
-                    state / "publication.json").get("status") != "DELIVERY_VERIFIED"):
-                # Preserve attempts while the known prerequisite is pending.
-                # Failure notifications remain independent of Pages health.
-                continue
-            if int(receipt.get("attempts", 0)) >= 3:
-                continue
-            if receipt.get("dispatched_at") and now - timestamp(receipt["dispatched_at"]) < timedelta(minutes=15):
-                continue
-            # A workflow still owns this event even after its dispatch cooldown.
-            history = runner(["gh", "run", "list", "--repo", REPOSITORY, "--workflow", WORKFLOW,
-                              "--limit", "100", "--json", "databaseId,displayTitle,status,conclusion"],
-                             capture_output=True, text=True, check=True, timeout=30)
-            matches = [r for r in json.loads(history.stdout) if f"[local={key}]" in r["displayTitle"]]
-            if any(r["status"] != "completed" for r in matches):
-                continue
-            # Successful workflow without a Telegram receipt must be diagnosed,
-            # rather than automatically retransmitted as a new success.
-            if any(r["conclusion"] == "success" for r in matches) and not result:
-                atomic_write_json(receipt_path, {**receipt, "status": "MISSING_DELIVERY_RECEIPT"})
-                continue
-            attempt = max(int(receipt.get("attempts", 0)), len(matches)) + 1
-            if attempt > 3:
-                continue
-            atomic_write_json(receipt_path, {"status": "DISPATCHING", "attempts": attempt,
-                                            "dispatched_at": now.isoformat()})
-            sent = runner(["gh", "workflow", "run", WORKFLOW, "--repo", REPOSITORY, "--ref", "main",
-                           "-f", f"local_event_id={key}"], capture_output=True, text=True, check=False, timeout=30)
-            atomic_write_json(receipt_path, {"status": "DISPATCH_ACCEPTED" if sent.returncode == 0 else "DISPATCH_FAILED",
-                                            "attempts": attempt, "dispatched_at": now.isoformat()})
+            try:
+                _reconcile_event(state, path, now=now, runner=runner, completions_allowed=completions_allowed)
+            except (OSError, ValueError, TypeError, KeyError, NotificationError) as exc:
+                atomic_write_json(root / "health" / f"event-{path.stem}.json", {
+                    "notification_status": "PENDING", "error_type": type(exc).__name__,
+                    "checked_at": now.isoformat()})
 
+
+def _reconcile_event(state, path, *, now, runner, completions_allowed):
+    root = state / "notifications"
+    key = path.stem
+    result = read(root / "results" / f"{key}.json")
+    receipt_path = root / "dispatches" / f"{key}.json"
+    receipt = read(receipt_path)
+    if result.get("status") in {"SENT", "NOOP"} and result.get("local_event_id") == key:
+        status = ("POLICY_SKIPPED" if result.get("reason") in {
+            "INCIDENT_COOLDOWN", "SUPERSEDED_BY_VERIFIED_PUBLICATION"} else "DELIVERY_VERIFIED")
+        if receipt.get("status") != status:
+            atomic_write_json(receipt_path, {**receipt, "status": status, "result": result})
+        return
+    if read(path).get("kind") in {"success", "advisory_success"} and (not completions_allowed or read(
+            state / "publication.json").get("status") != "DELIVERY_VERIFIED"):
+        # Preserve attempts while the known prerequisite is pending.
+        # Failure notifications remain independent of Pages health.
+        return
+    if int(receipt.get("attempts", 0)) >= 3:
+        return
+    if receipt.get("dispatched_at") and now - timestamp(receipt["dispatched_at"]) < timedelta(minutes=15):
+        return
+    # A workflow still owns this event even after its dispatch cooldown.
+    history = runner(["gh", "run", "list", "--repo", REPOSITORY, "--workflow", WORKFLOW,
+                      "--limit", "100", "--json", "databaseId,displayTitle,status,conclusion"],
+                     capture_output=True, text=True, check=True, timeout=30)
+    matches = [r for r in json.loads(history.stdout) if f"[local={key}]" in r["displayTitle"]]
+    if any(r["status"] != "completed" for r in matches):
+        return
+    # Successful workflow without a Telegram receipt must be diagnosed,
+    # rather than automatically retransmitted as a new success.
+    if any(r["conclusion"] == "success" for r in matches) and not result:
+        atomic_write_json(receipt_path, {**receipt, "status": "MISSING_DELIVERY_RECEIPT"})
+        return
+    attempt = max(int(receipt.get("attempts", 0)), len(matches)) + 1
+    if attempt > 3:
+        return
+    atomic_write_json(receipt_path, {"status": "DISPATCHING", "attempts": attempt,
+                                    "dispatched_at": now.isoformat()})
+    sent = runner(["gh", "workflow", "run", WORKFLOW, "--repo", REPOSITORY, "--ref", "main",
+                   "-f", f"local_event_id={key}"], capture_output=True, text=True, check=False, timeout=30)
+    atomic_write_json(receipt_path, {"status": "DISPATCH_ACCEPTED" if sent.returncode == 0 else "DISPATCH_FAILED",
+                                    "attempts": attempt, "dispatched_at": now.isoformat()})
 
 def reconcile_safely(archive, state, *, publication_locked=False):
     from .advisory import queue_completed as queue_advisory_completed
     # One unavailable advisory/API must not starve independent failures or
     # already queued market completions of their notification dispatch.
-    for prepare in (queue_completed, queue_advisory_completed):
+    def health(stage, exc=None):
+        payload = {"notification_stage": stage, "notification_status": "PENDING" if exc else "CHECKED",
+                   "checked_at": datetime.now(timezone.utc).isoformat()}
+        if exc:
+            payload["error_type"] = type(exc).__name__
+            print(json.dumps(payload))
+        # A diagnostic write failure must not turn a delivery failure into a
+        # research/publisher failure. CHECKED means reconciliation, not delivery.
+        try:
+            atomic_write_json(state / "notifications" / "health" / f"{stage}.json", payload)
+        except OSError:
+            pass
+
+    for stage, prepare in (("market_queue", queue_completed), ("advisory_queue", queue_advisory_completed)):
         try:
             prepare(archive, state, publication_locked=publication_locked)
+            health(stage)
         except Exception as exc:
-            print(json.dumps({"notification_status": "PENDING", "error_type": type(exc).__name__}))
+            health(stage, exc)
     try:
         if publication_locked:
             reconcile(state)
@@ -211,9 +260,10 @@ def reconcile_safely(archive, state, *, publication_locked=False):
                 # The old verified receipt may remain while its owner rebuilds.
                 # Do not dispatch a completion into that known lock contention.
                 reconcile(state, completions_allowed=False)
+        health("dispatch")
     except Exception as exc:
         # Notification transport cannot terminate successful research/publication.
-        print(json.dumps({"notification_status": "PENDING", "error_type": type(exc).__name__}))
+        health("dispatch", exc)
 
 
 def compose(event, archive, state):
@@ -253,7 +303,7 @@ def compose(event, archive, state):
             or str(settings.get("market", "")).lower() != event["market"]
             or manifest.get("finished_at") != event["finished_at"]
             or not ((manifest.get("active_universe") or {}).get("coverage") or {}).get("complete")
-            or not _local_market_producer(manifest)):
+            or not _local_market_producer(manifest, archive)):
         raise NotificationError("Canonical local analysis did not complete successfully.")
     # Verify the actual site again in the credential-owning workflow, not merely
     # the scheduler's earlier push/dispatch receipt.

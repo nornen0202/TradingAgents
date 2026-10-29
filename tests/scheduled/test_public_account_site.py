@@ -161,3 +161,25 @@ def test_unverified_account_clock_or_health_fails_closed(tmp_path, asof, health)
     result = build_public_account_site(site_dir=tmp_path / "site", manifests=[manifest])
     assert result["markets"]["kr"]["status"] == "unavailable"
     assert result["markets"]["kr"]["summary"]["available_cash_krw"] is None
+
+
+
+def test_parallel_account_reads_preserve_ties_and_contain_io_errors(tmp_path,monkeypatch):
+    from threading import Barrier,Lock
+    from tradingagents.scheduled import account_site
+    records=[_manifest(tmp_path,market="KR",run_id=f"20260813T08300{i}_kr",account_id="secret") for i in range(4)]
+    barrier=Barrier(4,timeout=5)
+    original=account_site._read_account_snapshot
+    workers=set()
+    import threading
+    guard=Lock()
+    def read(manifest):
+        with guard: workers.add(threading.get_ident())
+        barrier.wait()
+        return original(manifest)
+    monkeypatch.setattr(account_site,"_read_account_snapshot",read)
+    result=account_site._latest_public_market_snapshot(records,market="kr")
+    assert len(workers)==4 and result["run_id"]==records[0]["run_id"]
+    monkeypatch.setattr(account_site,"_read_account_snapshot",original)
+    (Path(records[0]["_run_dir"])/"portfolio-private/account_snapshot.json").write_text("broken")
+    assert account_site._latest_public_market_snapshot(records,market="kr")["run_id"]==records[1]["run_id"]

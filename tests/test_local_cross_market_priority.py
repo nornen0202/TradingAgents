@@ -202,3 +202,24 @@ def test_existing_budget_and_cooldown_are_decided_before_session_hold(tmp_path, 
     assert local.run_due(tmp_path / "archive", tmp_path, now=NOW)[0]["status"] == "RETRY_BUDGET_OR_COOLDOWN"
     assert calls["workers"] == calls["preflights"] == []
     assert path.read_bytes() == before
+
+
+@pytest.mark.parametrize("us_open", [False, True])
+def test_current_kr_window_precedes_overnight_us_retry(tmp_path, monkeypatch, us_open):
+    kr, us = target(), target("us")
+    us.window_start_kst = NOW - timedelta(hours=11)
+    enable(tmp_path)
+    calls = wire(monkeypatch, kr)
+    monkeypatch.setattr(local, "script", lambda _: SimpleNamespace(due_targets=lambda *a, **k: [us, kr]))
+    monkeypatch.setattr(paper_runtime, "_runtime_session", lambda **kw: {
+        "is_open": us_open and kw["market"] == "us",
+        "phase": "regular" if us_open and kw["market"] == "us" else "closed"})
+    result = local.run_due(tmp_path / "archive", tmp_path, now=NOW, research_only=True)
+    if us_open:
+        assert result == [{"target":kr.name,"status":"DEFERRED_FOR_OTHER_MARKET_SESSION"},
+                          {"target":us.name,"status":"DEFERRED_FOR_NEXT_MARKET_RESEARCH"}]
+        assert not calls["workers"]
+    else:
+        assert result == [{"target":kr.name,"status":"DUE"}]
+        assert "local-scheduler-kr-full" in calls["workers"][0]
+    assert not receipt_path(tmp_path, us).exists()

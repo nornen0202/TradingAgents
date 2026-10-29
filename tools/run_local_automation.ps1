@@ -4,9 +4,11 @@ param(
     [string] $ArchiveRoot = "C:\TradingAgentsData\archive",
     [string] $RuntimeRoot = "",
     [ValidateRange(1024, 65535)][int] $ReviewPort = 8766,
+    [ValidateSet("", "kr", "us")][string] $CatchUpMarket = "",
     [switch] $DryRun
 )
 $ErrorActionPreference = "Stop"
+if ($CatchUpMarket -and $Command -ne 'research-kis') { throw 'Daily catch-up requires the research-kis lane.' }
 if ([string]::IsNullOrWhiteSpace($RuntimeRoot)) { $RuntimeRoot = Join-Path $RepositoryRoot '.runtime' }
 $stateRoot = Join-Path $RuntimeRoot "local-automation"
 $pythonPath = Join-Path $RepositoryRoot ".venv\Scripts\python.exe"
@@ -115,11 +117,14 @@ try {
     Set-Location $sourceRoot
     # A read-only probe can overlap a scheduled worker. Windows native
     # redirection keeps its file handle open for the worker's whole lifetime.
-    $logName = if ($DryRun) { "$Command-dry-run-$PID.log" } else { "$Command.log" }
+    $logName = if ($DryRun) { "$Command-dry-run-$PID.log" } elseif ($CatchUpMarket) {
+        "$Command-catchup-$CatchUpMarket-$PID.log"
+    } else { "$Command.log" }
     $logPath = Join-Path $stateRoot $logName
     $arguments = @("-u", "-m", "tradingagents.local_automation", $Command,
         "--archive-dir", $ArchiveRoot, "--state-dir", $stateRoot,
         "--runtime-dir", (Join-Path $RuntimeRoot "chatgpt-work"))
+    if ($CatchUpMarket) { $arguments += @("--catch-up-market", $CatchUpMarket) }
     if ($DryRun) { $arguments += "--dry-run" }
     if ($Command -eq 'review') { $arguments += @('--review-port', [string]$ReviewPort) }
     # Windows PowerShell converts redirected native stderr to error records.

@@ -692,3 +692,24 @@ def test_history_refresh_accepts_new_advisories_without_advancing_market_generat
     local.refresh_report_history(archive, state, {'status': 'DELIVERY_VERIFIED', 'commit': 'base'})
     assert writes == ['kr', 'us', 'youtube', 'prism', 'daily-history']
     assert local.read_json(state / 'site/work/v1/us/report/latest.json')['generation'] == 'committed-market'
+
+
+@pytest.mark.parametrize("crash", [RuntimeError, KeyboardInterrupt])
+def test_interrupted_build_invalidates_local_verification_and_rebuilds_same_input(monkeypatch, delayed_publication, crash):
+    from tradingagents.scheduled import site
+    archive,state,runtime,calls=delayed_publication
+    monkeypatch.setattr(local,"archive_fingerprint",lambda _: "same")
+    monkeypatch.setattr(local,"verify_live",lambda _: True)
+    first=local.publish(archive,state,runtime,publication_locked=True)
+    original_build=site.build_site
+    def interrupted(*a,**kw):
+        assert local.read_json(state / "publication.json")["status"]=="BUILDING"
+        raise crash("interrupted local build")
+    monkeypatch.setattr(site,"build_site",interrupted)
+    with pytest.raises(crash): local.publish(archive,state,runtime,publication_locked=True,rebuild=True)
+    receipt=local.read_json(state / "publication.json")
+    assert receipt["status"]=="BUILDING" and receipt["commit"]==first["commit"]
+    monkeypatch.setattr(site,"build_site",original_build)
+    repaired=local.publish(archive,state,runtime,publication_locked=True)
+    assert repaired["status"]=="DELIVERY_VERIFIED" and repaired["commit"]!=first["commit"]
+    assert len(calls["build"])==2

@@ -477,3 +477,40 @@ def test_workflow_keeps_cloud_path_and_uses_bound_main_local_receipt():
     assert "$env:LOCAL_PYTHON_UNAVAILABLE -eq 'true'" in sender['run']
     assert "Join-Path $env:pythonLocation 'python.exe'" in sender['run']
     assert len(jobs['notify_remote']['steps']) == 6
+
+
+@pytest.mark.parametrize("bad", ["{malformed", "null", "[]", '{"status":"success","started_at":"invalid"}'])
+def test_corrupt_history_does_not_starve_valid_market_notice(tmp_path, bad):
+    archive, state = tmp_path / "archive", tmp_path / "state"
+    path = archive / "runs/2026/0000_broken/run.json"
+    path.parent.mkdir(parents=True)
+    path.write_text(bad)
+    good = completed(archive)
+    published_strategy(state, good)
+    write(state / "publication.json", {"status":"DELIVERY_VERIFIED"})
+    local.queue_completed(archive, state, now=NOW)
+    events = list((state / "notifications/events").glob("*.json"))
+    assert len(events) == 1 and local.read(events[0])["run_id"] == good["run_id"]
+
+
+def test_corrupt_outbox_receipt_cannot_starve_an_independent_failure(tmp_path):
+    root = tmp_path / "notifications"
+    write(root / "events/0000.json", {"kind":"failure"})
+    write(root / "dispatches/0000.json", {"attempts":"malformed"})
+    key = local.queue_failure(tmp_path, stage="analysis",source_key="current",error_type="WorkerExitError",finished_at=NOW.isoformat())
+    calls=[]
+    local.reconcile(tmp_path,now=NOW,runner=lambda args,**kw: calls.append(args) or SimpleNamespace(returncode=0,stdout="[]"))
+    assert sum(c[1]=="workflow" for c in calls)==1
+    assert local.read(root / "dispatches" / f"{key}.json")["attempts"]==1
+    assert local.read(root / "health/event-0000.json")["error_type"]=="ValueError"
+
+
+def test_health_records_name_stage_and_exclude_exception_contents(tmp_path,monkeypatch):
+    from tradingagents.notifications import advisory
+    def fail(*a,**kw): raise RuntimeError("secret should not be recorded")
+    monkeypatch.setattr(advisory,"queue_completed",fail)
+    monkeypatch.setattr(local,"reconcile",lambda *a,**kw: None)
+    local.reconcile_safely(tmp_path,tmp_path)
+    health=local.read(tmp_path / "notifications/health/advisory_queue.json")
+    assert health["notification_status"]=="PENDING" and health["error_type"]=="RuntimeError"
+    assert "secret" not in json.dumps(health)

@@ -111,7 +111,7 @@ def select_targets(source_dir, source, observation_dir, *, market, now, allowed,
 
 
 def research_due(archive, state, *, now=None, dry_run=False, executor=None, session_resolver=None,
-                 prepare=None, universe_loader=None):
+                 prepare=None, universe_loader=None, catch_up_market=None):
     archive, state = Path(archive), Path(state)
     now = instant(now or datetime.now(timezone.utc))
     if now is None:
@@ -130,9 +130,14 @@ def research_due(archive, state, *, now=None, dry_run=False, executor=None, sess
         # preflight and failed-only recovery. Only ownership of the long call
         # moves to this independent research lock.
         from tradingagents.local_automation import run_due
-        daily = run_due(archive, state, now=now, dry_run=dry_run, research_only=True)
+        daily = run_due(archive, state, now=now, dry_run=dry_run, research_only=True,
+                        **({"catch_up_market": catch_up_market} if catch_up_market else {}))
         if any(row.get("status") == "DUE" for row in daily):
             return [{"status": "DAILY_RESEARCH_DUE" if dry_run else "DAILY_RESEARCH_ATTEMPTED", "decisions": daily}]
+        if catch_up_market:
+            return [{"status": "DAILY_RESEARCH_CATCHUP_HELD", "decisions": daily}]
+    elif catch_up_market:
+        return [{"status": "INDEPENDENT_RESEARCH_LANE_NOT_ENABLED"}]
     from .demo_runtime import CAPS, universe
     from tradingagents.scheduled.config import load_scheduled_config
     from tradingagents.scheduled.runner import (

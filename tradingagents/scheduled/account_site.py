@@ -3,6 +3,7 @@ from __future__ import annotations
 import html
 import json
 import math
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -105,6 +106,20 @@ def build_public_account_site(
     return payload
 
 
+def _read_account_snapshot(manifest):
+    run_dir = manifest.get("_run_dir")
+    if not run_dir:
+        return None, "SNAPSHOT_NOT_PUBLISHED"
+    path = Path(str(run_dir)) / "portfolio-private" / "account_snapshot.json"
+    try:
+        value = json.loads(path.read_text(encoding="utf-8"))
+        return (value, "READ") if isinstance(value, dict) else (None, "SNAPSHOT_UNREADABLE")
+    except FileNotFoundError:
+        return None, "SNAPSHOT_NOT_PUBLISHED"
+    except (OSError, ValueError):
+        return None, "SNAPSHOT_UNREADABLE"
+
+
 def _latest_public_market_snapshot(
     manifests: list[dict[str, Any]],
     *,
@@ -114,23 +129,12 @@ def _latest_public_market_snapshot(
     candidates = []
     attempts = []
     now = datetime.now(timezone.utc)
-    for manifest in manifests:
-        if _manifest_market(manifest) != meta["code"]:
-            continue
-        run_dir_value = manifest.get("_run_dir")
-        snapshot = None
-        read_status = "SNAPSHOT_NOT_PUBLISHED"
-        if run_dir_value:
-            snapshot_path = Path(str(run_dir_value)) / "portfolio-private" / "account_snapshot.json"
-            if snapshot_path.is_file():
-                try:
-                    value = json.loads(snapshot_path.read_text(encoding="utf-8"))
-                    if isinstance(value, dict):
-                        snapshot = value
-                    else:
-                        read_status = "SNAPSHOT_UNREADABLE"
-                except (OSError, json.JSONDecodeError):
-                    read_status = "SNAPSHOT_UNREADABLE"
+    matching = [manifest for manifest in manifests if _manifest_market(manifest) == meta["code"]]
+    # Ordered, bounded reads preserve tie-breaking and every source/date check.
+    # No persistent snapshot cache can hide account repairs or source corruption.
+    with ThreadPoolExecutor(max_workers=4) as workers:
+        snapshots = list(workers.map(_read_account_snapshot, matching))
+    for manifest, (snapshot, read_status) in zip(matching, snapshots):
         diagnostic = _account_attempt_diagnostic(manifest, snapshot, read_status=read_status, now=now)
         # This clock orders completed pipeline attempts, not account freshness.
         # Account selection below remains strictly VALID and observation-based.
@@ -145,7 +149,7 @@ def _latest_public_market_snapshot(
             observed = datetime.fromisoformat(str(snapshot.get("as_of")).replace("Z", "+00:00"))
         except (ValueError, TypeError):
             continue
-        if health != "VALID" or observed.tzinfo is None or observed > datetime.now(timezone.utc):
+        if health != "VALID" or observed.tzinfo is None or observed > now:
             continue
         candidates.append((observed, snapshot, manifest))
     if candidates:
