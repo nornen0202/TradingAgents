@@ -60,9 +60,9 @@ function New-ScheduledTaskPrincipal { param($UserId,$LogonType,$RunLevel) return
 function New-ScheduledTaskAction { param($Execute,$Argument) return @{Execute=$Execute;Argument=$Argument} }
 function New-ScheduledTaskTrigger { param([switch]$Once,$At,$RepetitionInterval) return @{Interval=$RepetitionInterval.TotalMinutes} }
 function New-ScheduledTaskSettingsSet {
-    param($MultipleInstances,[switch]$StartWhenAvailable,[switch]$AllowStartIfOnBatteries,
+    param($Priority,$MultipleInstances,[switch]$StartWhenAvailable,[switch]$AllowStartIfOnBatteries,
         [switch]$DontStopIfGoingOnBatteries,[switch]$Hidden,$ExecutionTimeLimit)
-    return @{Instances=$MultipleInstances;Hidden=[bool]$Hidden;Hours=$ExecutionTimeLimit.TotalHours}
+    return @{Priority=$Priority;Instances=$MultipleInstances;Hidden=[bool]$Hidden;Hours=$ExecutionTimeLimit.TotalHours}
 }
 function Register-ScheduledTask {
     param($TaskPath,$TaskName,$Action,$Trigger,$Principal,$Settings,[switch]$Force)
@@ -81,7 +81,7 @@ function Unregister-ScheduledTask { throw 'Existing task must be preserved' }
     task = row["registered"][0]
     assert task["TaskName"] == "LocalAutomation-research-kis"
     assert "-Command research-kis" in task["Action"]["Argument"]
-    assert task["Settings"] == {"Instances": "IgnoreNew", "Hidden": True, "Hours": 13}
+    assert task["Settings"] == {"Priority": 4, "Instances": "IgnoreNew", "Hidden": True, "Hours": 13}
     assert task["Trigger"]["Interval"] == 5
     assert row["started"] == ([] if no_start else ["LocalAutomation-research-kis"])
     marker = json.loads((tmp_path / "repo/.runtime/local-automation/research-lane-enabled.json").read_text(encoding="utf-8-sig"))

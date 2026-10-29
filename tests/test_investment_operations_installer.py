@@ -20,7 +20,7 @@ $PSModuleAutoLoadingPreference='None'
 $ErrorActionPreference='Stop'
 function global:Register-ScheduledTask {
  param($TaskPath,$TaskName,$Action,$Trigger,$Principal,$Settings,[switch]$Force)
- @{name=$TaskName;path=$TaskPath;exe=$Action.Execute;arguments=$Action.Arguments;limit=$Settings.ExecutionTimeLimit;multiple=[string]$Settings.MultipleInstances;period=$Trigger[0].Repetition.Interval} |
+ @{name=$TaskName;path=$TaskPath;exe=$Action.Execute;arguments=$Action.Arguments;limit=$Settings.ExecutionTimeLimit;priority=$Settings.Priority;multiple=[string]$Settings.MultipleInstances;period=$Trigger[0].Repetition.Interval} |
  ConvertTo-Json -Compress | Add-Content -LiteralPath $env:TA_RECEIPT -Encoding utf8
 }
 & $env:TA_INSTALLER -RepositoryRoot $env:TA_REPO -ArchiveRoot $env:TA_ARCHIVE -InstallRoot $env:TA_INSTALL -ReviewPort 18766 -NoStart
@@ -40,6 +40,7 @@ function global:Register-ScheduledTask {
         assert "run_powershell_hidden.vbs" in task["arguments"]
         assert task["multiple"] == "IgnoreNew"
         assert task["path"] == "\\TradingAgents\\"
+        assert task["priority"] == 4
     enabled = json.loads((Path(env["TA_REPO"]) / ".runtime/local-automation/paper/enabled.json").read_text(encoding="utf-8-sig"))
     assert enabled["mode"] == "LOCAL_PAPER_ONLY"
     assert enabled["real_orders_enabled"] is False

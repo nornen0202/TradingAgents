@@ -88,7 +88,7 @@ $PSModuleAutoLoadingPreference='None'
 $ErrorActionPreference='Stop'
 function global:Register-ScheduledTask {
  param($TaskPath,$TaskName,$Action,$Trigger,$Principal,$Settings,[switch]$Force)
- @{name=$TaskName;path=$TaskPath;exe=$Action.Execute;arguments=$Action.Arguments;limit=$Settings.ExecutionTimeLimit;multiple=[string]$Settings.MultipleInstances;period=$Trigger[0].Repetition.Interval} |
+ @{name=$TaskName;path=$TaskPath;exe=$Action.Execute;arguments=$Action.Arguments;limit=$Settings.ExecutionTimeLimit;priority=$Settings.Priority;multiple=[string]$Settings.MultipleInstances;period=$Trigger[0].Repetition.Interval} |
  ConvertTo-Json -Compress | Add-Content -LiteralPath $env:TA_RECEIPT -Encoding utf8
 }
 $opt = @{}; $opt[$env:TA_SWITCH] = ($env:TA_ENABLE -eq 'True')
@@ -107,6 +107,7 @@ $opt = @{}; $opt[$env:TA_SWITCH] = ($env:TA_ENABLE -eq 'True')
     task = tasks[0]
     assert task["name"] == ("LocalAutomation-strategy-kis" if strategy else "LocalAutomation-validate-kis")
     assert task["path"] == "\\TradingAgents\\"
+    assert task["priority"] == 4
     assert task["exe"].lower().endswith("wscript.exe")
     assert "run_powershell_hidden.vbs" in task["arguments"]
     assert ("-Command strategy-kis" if strategy else "-Command validate-kis") in task["arguments"]

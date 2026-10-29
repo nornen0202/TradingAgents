@@ -340,7 +340,7 @@ function global:Get-ScheduledTask { param($TaskPath, $ErrorAction) @() }
 function global:Register-ScheduledTask {
     param($TaskPath, $TaskName, $Action, $Trigger, $Principal, $Settings, [switch]$Force)
     $triggers=@($Trigger | ForEach-Object { @{type=$_.CimClass.CimClassName;at=$_.StartBoundary;interval=$_.Repetition.Interval;delay=$_.Delay;days=$_.DaysOfWeek} })
-    @{name=$TaskName;execute=$Action.Execute;arguments=$Action.Arguments;multiple=[string]$Settings.MultipleInstances;limit=$Settings.ExecutionTimeLimit;triggers=$triggers} | ConvertTo-Json -Depth 6 -Compress | Add-Content -LiteralPath $env:TA_ACTIONS -Encoding UTF8
+    @{name=$TaskName;execute=$Action.Execute;arguments=$Action.Arguments;multiple=[string]$Settings.MultipleInstances;limit=$Settings.ExecutionTimeLimit;priority=$Settings.Priority;triggers=$triggers} | ConvertTo-Json -Depth 6 -Compress | Add-Content -LiteralPath $env:TA_ACTIONS -Encoding UTF8
 }
 $options=@{}
 if($env:TA_INTERVAL -ne '5'){$options.PollIntervalMinutes=[int]$env:TA_INTERVAL}
@@ -357,6 +357,7 @@ if($env:TA_INTERVAL -ne '5'){$options.PollIntervalMinutes=[int]$env:TA_INTERVAL}
         assert action['name'] == f'LocalAutomation-{command}'
         assert action['multiple'] == ('Queue' if command == 'run-due' else 'IgnoreNew')
         assert action['limit'] == 'PT13H'
+        assert action['priority'] == 4
         timer, logon, *critical = action['triggers']
         assert timer['type'] == 'MSFT_TaskTimeTrigger'
         assert timer['interval'] == f'PT{interval if command == "publish" else 1}M'
