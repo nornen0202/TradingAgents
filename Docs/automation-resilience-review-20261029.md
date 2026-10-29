@@ -124,6 +124,16 @@ failures, attempt counters and successful research clocks are preserved.
   establish a **new operating-company security**, ISIN `KR7443670005`, first
   trading February 15, 2024. This is an explicit reviewed event; neither an
   ordinary SPAC reverse merger nor predecessor IBKS 19 prices are admitted.
+- Prechecking the eight not-yet-started tickers found the same unverified history
+  boundary for `419050.KQ` (Samkee Energy Solutions, originally Samkee EV).
+  The [original KRX listing](https://kind.krx.co.kr/external/2023/02/01/000811/20230201002370/70760.htm)
+  binds ISIN `KR7419050000` to February 3, 2023; a
+  [separate first-session reference](https://kind.krx.co.kr/external/2023/02/02/000412/20230202001250/70793.htm)
+  corroborates the day. The [exchange rename notice](https://kind.krx.co.kr/external/2025/04/15/000602/20250415001572/70765.htm)
+  explains the current master name without replacing security identity. Its
+  actual review clock is October 29 08:54 UTC. Read-only corrected validation at
+  17:55 KST verified all 909 required sessions in ten KIS calls. The other seven
+  remaining tickers passed actual price and six-indicator input checks.
 
 The reviewed-event registry stores the original source hashes and actual October
 29 08:34 UTC collection clocks. It cannot qualify earlier historical analyses.
