@@ -309,7 +309,7 @@ def test_scheduled_event_capture_survives_institutional_failure_and_persists_ren
     config_path = tmp_path / "config.toml"
     config_path.write_text('[run]\ntickers=["AAPL"]\n', encoding="utf-8")
     config = load_scheduled_config(config_path)
-    graph = SimpleNamespace(propagate=lambda *args, **kwargs: ({}, "HOLD"), close=lambda: None)
+    graph = SimpleNamespace(propagate=lambda *args, **kwargs: ({"company_of_interest":"AAPL"}, "HOLD"), close=lambda: None)
     monkeypatch.setattr(runner, "TradingAgentsGraph", lambda *args, **kwargs: graph)
     monkeypatch.setattr(runner, "StatsCallbackHandler", lambda: SimpleNamespace(get_stats=lambda: {"llm_calls": 0, "tool_calls": 0}))
     monkeypatch.setattr(runner, "polish_ticker_report", lambda state, **kwargs: (state, {}))

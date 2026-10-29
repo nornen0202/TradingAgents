@@ -218,7 +218,7 @@ def main(argv: list[str] | None = None) -> int:
         help="Return non-zero when a ticker fails or required full-universe coverage is incomplete.",
     )
     parser.add_argument("--label", default="github-actions", help="Run label for archived metadata.")
-    parser.add_argument("--resume-from-run", help="Recover failed tickers from a completed full run into a new cohort, preserving successful research provenance.")
+    parser.add_argument("--resume-from-run", help="Recover failed or proven wrong-company ticker research into a new cohort, preserving valid research provenance.")
     parser.add_argument("--finalize-from-run", help="Reuse a fully completed ticker phase after interrupted postprocessing, without running research again.")
     parser.add_argument("--finalization-source-config", type=Path, help="Original config in its immutable Git source snapshot.")
     parser.add_argument("--lightweight-execution-refresh", action="store_true",
@@ -968,11 +968,17 @@ def _execute_run_body(config, *, run_label, skip_site_build, tz, started_at,
     return manifest
 
 
+def _resolve_run_instrument(ticker, config):
+    if getattr(config.run, "market_declared", False):
+        return resolve_instrument(ticker, market=config.run.market)
+    return resolve_instrument(ticker)
+
+
 def resolve_trade_date(
     ticker: str,
     config: ScheduledAnalysisConfig,
 ) -> str:
-    normalized_symbol = resolve_instrument(ticker).primary_symbol
+    normalized_symbol = _resolve_run_instrument(ticker, config).primary_symbol
     mode = config.run.trade_date_mode
     if mode == "explicit" and config.run.explicit_trade_date:
         return config.run.explicit_trade_date
@@ -1793,7 +1799,7 @@ def _worker_failed_summary(
 ) -> dict[str, Any]:
     ticker = str(state.get("ticker") or "")
     try:
-        resolved_name = resolve_instrument(ticker).display_name
+        resolved_name = _resolve_run_instrument(ticker, config).display_name
     except Exception:
         resolved_name = ticker
     resolved_name = config.run.ticker_name_overrides.get(ticker, resolved_name)
@@ -1826,7 +1832,7 @@ def _worker_start_failed_summary(
 ) -> dict[str, Any]:
     now = datetime.now(ZoneInfo(config.run.timezone))
     try:
-        resolved_name = resolve_instrument(ticker).display_name
+        resolved_name = _resolve_run_instrument(ticker, config).display_name
     except Exception:
         resolved_name = ticker
     resolved_name = config.run.ticker_name_overrides.get(ticker, resolved_name)
@@ -2034,7 +2040,7 @@ def _run_single_ticker(
     ticker_dir.mkdir(parents=True, exist_ok=True)
     resolved_name = ticker
     try:
-        resolved_name = resolve_instrument(ticker).display_name
+        resolved_name = _resolve_run_instrument(ticker, config).display_name
     except Exception:
         resolved_name = ticker
     resolved_name = config.run.ticker_name_overrides.get(ticker, resolved_name)
@@ -2059,7 +2065,7 @@ def _run_single_ticker(
         # Archive/run timestamps use the operator timezone. Research cutoffs
         # use the instrument's calendar date: KST midnight is still the prior
         # US regular session and must not advance its information cutoff.
-        analysis_date = ticker_started.astimezone(ZoneInfo(resolve_instrument(ticker).timezone)).date().isoformat()
+        analysis_date = ticker_started.astimezone(ZoneInfo(_resolve_run_instrument(ticker, config).timezone)).date().isoformat()
         trade_date = trade_date_override or resolve_trade_date(ticker, config)
         stats_handler = StatsCallbackHandler()
         graph_config = _graph_config(config, engine_results_dir)
@@ -2077,6 +2083,8 @@ def _run_single_ticker(
             )
         if stats_handler.get_stats().get("llm_fallback_calls", 0):
             raise RuntimeError("Research graph returned an LLM fallback response; full analysis is incomplete.")
+        if final_state.get("company_of_interest") != _resolve_run_instrument(ticker, config).primary_symbol:
+            raise ValueError("Research graph company differs from the required instrument and market")
         structured_decision = _select_public_decision(final_state, decision)
         decision_trace.bind_selected(structured_decision, final_state)
         final_state, report_writer_payload = polish_ticker_report(
@@ -2448,7 +2456,7 @@ def _skipped_ticker_summary(
     reason: str,
 ) -> dict[str, Any]:
     try:
-        resolved_name = resolve_instrument(ticker).display_name
+        resolved_name = _resolve_run_instrument(ticker, config).display_name
     except Exception:
         resolved_name = ticker
     resolved_name = config.run.ticker_name_overrides.get(ticker, resolved_name)
@@ -2472,6 +2480,7 @@ def _skipped_ticker_summary(
 
 def _graph_config(config: ScheduledAnalysisConfig, engine_results_dir: Path) -> dict[str, Any]:
     graph_config = deepcopy(DEFAULT_CONFIG)
+    graph_config["instrument_market"] = config.run.market if config.run.market_declared else None
     graph_config["results_dir"] = str(engine_results_dir)
     graph_config["llm_provider"] = config.llm.provider
     for tier in ("quick", "deep", "output"):
@@ -4877,7 +4886,7 @@ def _manifest_is_complete_overlay_baseline(
         return False
     if _manifest_production_priority(manifest) == 0:
         from .research_recovery import verified_completed_recovery
-        if (archive_dir is None or not manifest.get("research_recovery")
+        if (archive_dir is None
                 or not verified_completed_recovery(archive_dir, manifest, now=now or datetime.now(timezone.utc))):
             return False
     if not _manifest_market_matches(manifest, market=market):
@@ -4899,6 +4908,17 @@ def _manifest_is_complete_overlay_baseline(
     configured_count = int(summary.get("configured_ticker_count") or len(rows))
     if configured_count > len(successful):
         return False
+    if archive_dir is not None and any((row.get("artifacts") or {}).get("final_state_json") for row in rows):
+        from .research_recovery import _identity_failures
+        try:
+            run_id = manifest["run_id"]
+            if not isinstance(run_id, str) or not re.fullmatch(r"\d{8}T\d{6}_[A-Za-z0-9_-]+", run_id):
+                return False
+            directory = (Path(archive_dir) / "runs" / run_id[:4] / run_id).resolve()
+            if not directory.is_relative_to(Path(archive_dir).resolve()) or _identity_failures(manifest, directory):
+                return False
+        except (OSError, ValueError, TypeError, KeyError, AttributeError):
+            return False
     if requested_tickers and not _manifest_has_bootstrap_ready_ticker(
         manifest,
         tickers=requested_tickers,

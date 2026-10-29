@@ -200,3 +200,47 @@ logged-in host; the Codex operations schedule additionally requires the desktop
 app running. AC/DC automatic sleep was disabled at inspection. No login policy,
 privilege, real-order permission, disabled legacy schedule, original data or
 backup retention rule was changed as part of this review.
+
+### Fresh operator research after pre-worker identity failure
+
+A full manual restart after a terminal pre-worker failure has no failed ticker
+cohort to inherit. It therefore cannot use failed-only recovery lineage. Such a
+run remains excluded until an operator explicitly certifies its canonical bytes:
+
+```powershell
+python tools/certify_operator_research.py --archive-dir <archive> --state-dir <scheduler-state> --run-id <completed-run> --target-key <original-target-key>
+```
+
+The certificate requires complete full Codex research, exact paired model roles,
+fresh successful artifacts, aware original clocks, immutable failed attempt
+hashes, no original worker results, and the original combined retry limit of
+four. It accepts only the identity-repair path, never ordinary smoke/test runs.
+The existing research, source revision and scheduler attempt counters remain
+unchanged. Research baseline selection, scheduler completion and notifications
+revalidate the certificate, and its creation changes the publication fingerprint.
+Mutated evidence revokes admission. Certification grants no execution freshness,
+order permission or extension of research age.
+
+The SPG incident also exposed a semantic failure: a worker can complete while
+its graph researches Korean SPG (`058610.KQ`) instead of US Simon Property Group
+(`SPG`). Declared scheduled market now reaches the graph's scoped resolver and
+trade-date/name resolution. Qualified Korean symbols remain distinct. Recovery
+compares each stored graph's `company_of_interest` with its required instrument;
+a deterministic mismatch is a retry target even if the original run says
+success. The original status and files remain immutable.
+
+An operator source certificate with such a mismatch is lineage evidence only:
+it cannot become a baseline or public report. A separate, terminal correction
+certificate requires the actual corrected cohort, unchanged valid research,
+original failed-attempt hashes and the combined original/manual/correction
+budget at most four. Reserved correction attempts also block automatic excess
+retries. Use `--integrity-correction` with the certification tool only after the
+new repair has actually completed. Unverified operator cohorts are excluded from
+public history, pages and bundles while the corrected cohort is pending.
+
+The local review catalog and direct replay snapshots also reject a known
+wrong-company graph, falling back to another valid producer when available.
+Only research already available at the requested cutoff can establish that
+mismatch; future or undated identity evidence cannot alter a past chart view.
+Original archive files remain available for audit without becoming valid UI
+research or order authority.

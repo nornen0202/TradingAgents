@@ -414,6 +414,10 @@ def run_due(archive, state, *, now=None, dry_run=False, research_only=False, cat
         manual_attempts = manual_receipt.get("attempts", 0)
         if isinstance(manual_attempts, bool) or not isinstance(manual_attempts, int) or manual_attempts < 0:
             raise ValueError("Invalid finalization recovery attempt budget")
+        integrity_attempts = read_json(state / "research-integrity-recovery" / f"{key}.json", {}).get("attempts", 0)
+        if isinstance(integrity_attempts, bool) or not isinstance(integrity_attempts, int) or integrity_attempts < 0:
+            raise ValueError("Invalid research integrity recovery attempt budget")
+        manual_attempts += integrity_attempts
         last = receipt.get("started_at")
         last_started = datetime.fromisoformat(last) if last else None
         # Preserve the original slot key and cumulative budget. A legacy successful
@@ -568,6 +572,8 @@ def archive_fingerprint(archive):
     for label, root in roots.items():
         paths = list((root / "runs").glob(f"*/*/{manifest_names[label]}"))
         if label == "research":
+            paths += list((root / "runs").glob("*/*/operator-production-admission.json"))
+            paths += list((root / "runs").glob("*/*/operator-integrity-budget.json"))
             paths += list((root / "work-reports").glob("*/latest.json"))
             paths += list((root / "work-reports").glob("*/historical-events/*.json"))
         for path in sorted(paths):

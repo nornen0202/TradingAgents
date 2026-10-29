@@ -43,6 +43,31 @@ def _market_date(value, settings):
     return _instant(value).astimezone(ZoneInfo(zone)).date()
 
 
+def _identity_failures(source, directory):
+    """Deterministic semantic failures without rewriting a successful manifest."""
+    from tradingagents.agents.utils.instrument_resolver import resolve_instrument
+    market = source["settings"]["market"]
+    failures = {}
+    for row in source["tickers"]:
+        if row.get("status") != "success":
+            continue
+        relative = (row.get("artifacts") or {}).get("final_state_json")
+        if not isinstance(relative, str):
+            raise ValueError("Research identity artifact is missing")
+        path = (directory / relative).resolve()
+        if not path.is_relative_to(directory.resolve()) or not path.is_file():
+            raise ValueError("Research identity artifact is missing or escapes source")
+        state = _read(path)
+        expected = resolve_instrument(row["ticker"], market=market).primary_symbol
+        observed = state.get("company_of_interest")
+        if not isinstance(observed, str) or not re.fullmatch(r"[A-Z0-9][A-Z0-9.-]*", observed):
+            raise ValueError("Research company identity is unverified")
+        if observed != expected:
+            failures[row["ticker"]] = {"expected": expected, "observed": observed,
+                "final_state_sha256": hashlib.sha256(path.read_bytes()).hexdigest()}
+    return failures
+
+
 def _load_one_terminal_source(*, archive_dir: Path, source_run_id: str, now: datetime, completed_head=False):
     if not isinstance(source_run_id, str) or not re.fullmatch(r"\d{8}T\d{6}_[A-Za-z0-9_-]+", source_run_id):
         raise ValueError("Invalid recovery source run ID")
@@ -55,14 +80,17 @@ def _load_one_terminal_source(*, archive_dir: Path, source_run_id: str, now: dat
         attempt = _read(source_dir / "attempt.json")
     except (OSError, ValueError) as exc:
         raise ValueError("Recovery source manifest or attempt is missing or malformed") from exc
-    statuses = {"success"} if completed_head else {"partial_failure", "failed"}
+    statuses = {"success"} if completed_head else {"partial_failure", "failed", "success"}
     if not isinstance(source, dict) or source.get("run_id") != source_run_id or source.get("status") not in statuses:
         raise ValueError("Recovery requires a completed failed or partial full run")
     if (any(not isinstance(source.get(key), dict) for key in ("settings", "active_universe", "summary"))
             or not isinstance(source.get("tickers"), list)
             or any(not isinstance(row, dict) for row in source["tickers"])):
         raise ValueError("Recovery source cohort is malformed")
-    attempt_statuses = {"SUCCESS"} if completed_head else {"FAILED", "PARTIAL_FAILURE"}
+    semantic_failure = not completed_head and source["status"] == "success"
+    if semantic_failure and not _identity_failures(source, source_dir):
+        raise ValueError("Successful research has no proven instrument identity failure")
+    attempt_statuses = {"SUCCESS"} if completed_head or semantic_failure else {"FAILED", "PARTIAL_FAILURE"}
     if not isinstance(attempt, dict) or attempt.get("status") not in attempt_statuses:
         raise ValueError("Recovery source attempt is still active or unverified")
     if any(key in attempt and attempt[key] != value for key, value in (
@@ -146,11 +174,12 @@ def _load_recovery_lineage(*, archive_dir, source_run_id, now, completed_head=Fa
         child_rows = child.get("tickers") or []
         if _tickers([row.get("ticker") for row in child_rows]) != list(parent_rows):
             raise ValueError("Recovery lineage ticker cohort changed")
-        inherited = [ticker for ticker, row in parent_rows.items() if row.get("status") == "success"]
-        retry = [ticker for ticker, row in parent_rows.items() if row.get("status") in {"failed", "skipped"}]
+        inherited = [row["ticker"] for row in parent_plan["successful_rows"]]
+        retry = parent_plan["retry_tickers"]
         if (receipt.get("reused_tickers") != inherited or receipt.get("retry_tickers") != retry
                 or not isinstance(receipt.get("reused_research"), dict)
-                or set(receipt["reused_research"]) != set(inherited)):
+                or set(receipt["reused_research"]) != set(inherited)
+                or receipt.get("invalid_research", {}) != parent_plan["invalid_research"]):
             raise ValueError("Recovery lineage reuse membership changed")
         for row in child_rows:
             ticker = row["ticker"]
@@ -180,6 +209,11 @@ def verified_completed_recovery(archive_dir, manifest, *, now):
     Check the recovery at its real completion clock; later readers still apply
     the original research age and session limits. No source file is rewritten.
     """
+    if not isinstance(manifest, dict):
+        return False
+    if not manifest.get("research_recovery"):
+        from .operator_admission import verified_operator_research
+        return verified_operator_research(archive_dir, manifest, now=now)
     try:
         run_id = manifest["run_id"]
         if not isinstance(run_id, str) or not re.fullmatch(r"\d{8}T\d{6}_[A-Za-z0-9_-]+", run_id):
@@ -199,10 +233,19 @@ def verified_completed_recovery(archive_dir, manifest, *, now):
         if len(chain) < 2:
             return False
         market = manifest["settings"]["market"].lower()
-        if market not in {"kr", "us"} or any(
-                parent.get("label") != f"local-scheduler-{market}-full" for parent, _ in chain[1:]):
+        if market not in {"kr", "us"}:
             return False
+        for parent, _ in chain[1:]:
+            if parent.get("label") == f"local-scheduler-{market}-full":
+                continue
+            from .operator_admission import verified_operator_lineage_source, verified_integrity_budget
+            if (parent.get("label") != f"manual-{market}-identity-recovery"
+                    or not verified_operator_lineage_source(archive_dir, parent, now=now)
+                    or not verified_integrity_budget(archive_dir, manifest, parent, now=now)):
+                return False
         rows, summary = manifest["tickers"], manifest["summary"]
+        if _identity_failures(manifest, directory):
+            return False
         if (not rows or summary.get("total_tickers") != len(rows)
                 or summary.get("successful_tickers") != len(rows) or summary.get("failed_tickers") != 0
                 or (manifest["active_universe"].get("coverage") or {}).get("complete") is not True):
@@ -351,13 +394,14 @@ def _cohort_plan(source, source_dir, *, settings, holding_tickers, account_statu
         raise ValueError("New account holdings require a new full universe selection")
     if settings["ticker_universe_mode"] != "config_only" and account_status != "loaded":
         raise ValueError("Recovery requires a current loaded account snapshot")
-    success = [r for r in rows if r.get("status") == "success"]
-    retry = [r["ticker"] for r in rows if r.get("status") in {"failed", "skipped"}]
+    invalid = _identity_failures(source, source_dir)
+    success = [r for r in rows if r.get("status") == "success" and r["ticker"] not in invalid]
+    retry = [r["ticker"] for r in rows if r.get("status") in {"failed", "skipped"} or r["ticker"] in invalid]
     summary = source.get("summary") or {}
     if (not retry or len(success) + len(retry) != len(rows)
             or summary.get("total_tickers") != len(rows)
-            or summary.get("successful_tickers") != len(success)
-            or summary.get("failed_tickers") != len(retry)):
+            or summary.get("successful_tickers") != sum(r.get("status") == "success" for r in rows)
+            or summary.get("failed_tickers") != sum(r.get("status") in {"failed", "skipped"} for r in rows)):
         raise ValueError("Recovery source summary does not match ticker results")
     trade_date = source.get("daily_thesis_trade_date")
     if _research_date(trade_date) > _market_date(source["started_at"], source_settings):
@@ -370,7 +414,7 @@ def _cohort_plan(source, source_dir, *, settings, holding_tickers, account_statu
     active["coverage"].update(holding_expected_count=len(holding_tickers), holding_selected_count=len(holding_tickers), holding_missing_count=0)
     active["recovery_source_run_id"] = source["run_id"]
     return {"source": source, "source_dir": source_dir, "tickers": tickers,
-            "successful_rows": success, "retry_tickers": retry, "active_universe": active,
+            "successful_rows": success, "retry_tickers": retry, "active_universe": active, "invalid_research": invalid,
             "trade_date": trade_date, "source_manifest_sha256": hashlib.sha256((source_dir / "run.json").read_bytes()).hexdigest(),
             "source_selection_sha256": source_selection_sha256}
 
@@ -462,7 +506,7 @@ def copy_recovered_research(plan: dict, *, run_dir: Path):
         item["execution_update"] = None
         summaries.append(item)
         receipts[row["ticker"]] = receipt
-    return summaries, {"schema": "tradingagents.research-recovery/v1", "source_run_id": source["run_id"],
+    receipt = {"schema": "tradingagents.research-recovery/v1", "source_run_id": source["run_id"],
                        "source_manifest_sha256": plan.get("source_manifest_sha256"),
                        "source_selection_sha256": plan.get("source_selection_sha256"),
                        "finalization_only": bool(plan.get("finalization_only")),
@@ -473,6 +517,9 @@ def copy_recovered_research(plan: dict, *, run_dir: Path):
                        "retry_tickers": plan["retry_tickers"], "reused_research": receipts,
                        "universe_scope": "Frozen source selection; research settings and configured ticker count matched. This is not a fresh scanner selection.",
                        "usage_scope": "This run's LLM usage excludes reused source calls; original per-ticker artifacts and source_llm_usage preserve them."}
+    if plan.get("invalid_research"):
+        receipt["invalid_research"] = plan["invalid_research"]
+    return summaries, receipt
 
 
 def load_finalization_source(*, archive_dir: Path, source_run_id: str, settings: dict,

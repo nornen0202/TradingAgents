@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 
 from .bars import finite, instant
 from .report import build_review
+from .identity import research_company_matches
 
 
 def get_replay_snapshot(ticker, as_of_ts, *, ticker_dir, db_paths=(), anchor=None, clock=None, phase_hook=None,
@@ -17,6 +18,8 @@ def get_replay_snapshot(ticker, as_of_ts, *, ticker_dir, db_paths=(), anchor=Non
     now = instant(clock() if clock is not None else datetime.now(timezone.utc))
     if now is None or cutoff > now:
         raise ValueError("Snapshot cutoff cannot be in the future")
+    if not research_company_matches(ticker_dir, ticker, cutoff=cutoff):
+        raise ValueError("Snapshot research company does not match the requested instrument")
     if phase_hook is not None:
         phase_hook("REPLAY")
     proof_args = {"proof_hook": journal_proof_hook} if journal_proof_hook is not None else {}
