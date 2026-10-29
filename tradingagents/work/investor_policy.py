@@ -168,7 +168,8 @@ def validate_investor_draft(draft: dict, packet: dict, *, now: datetime) -> None
         row = rows.get(strategy.get("ticker"), {})
         if strategy.get("investment_plan") != row.get("investment_plan"):
             raise WorkRuntimeError("Investor plan must match the dated packet price zones and review window")
-        for field in ("entry_conditions", "invalidation_conditions", "execution_levels"):
+        for field in ("stance", "risk_action", "conditional_entry_valid_until",
+                      "entry_conditions", "invalidation_conditions", "execution_levels"):
             if (strategy.get("thesis") or {}).get(field) != (row.get("thesis") or {}).get(field):
                 raise WorkRuntimeError("Investor plan source conditions and levels must match the prepared packet")
         execution = strategy.get("execution") or {}

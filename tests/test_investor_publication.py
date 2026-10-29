@@ -96,7 +96,7 @@ def test_bad_quote_does_not_erase_independently_dated_thesis(tmp_path, clock):
     assert row["investment_plan"]["price_zones"][0]["low"] == 98
 
 
-@pytest.mark.parametrize("tamper", ["order", "zone", "window", "policy", "future_generation"])
+@pytest.mark.parametrize("tamper", ["order", "zone", "window", "policy", "future_generation", "stance"])
 def test_investor_plan_cannot_change_bound_levels_or_enable_orders(tmp_path, tamper):
     source(tmp_path / "archive")
     runtime = WorkRuntime(tmp_path / "runtime")
@@ -112,6 +112,8 @@ def test_investor_plan_cannot_change_bound_levels_or_enable_orders(tmp_path, tam
         row["investment_plan"]["review_window"]["review_by"] = "2099-01-01T00:00:00Z"
     elif tamper == "policy":
         draft["source_summary"].pop("publication_policy")
+    elif tamper == "stance":
+        row["thesis"]["stance"] = "SELL"
     else:
         draft["generated_at"] = (AT + timedelta(days=1)).isoformat()
     with pytest.raises(WorkRuntimeError):
