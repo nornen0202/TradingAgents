@@ -712,7 +712,10 @@ def refresh_report_history(archive, state, receipt):
     git_run(["-c", "core.autocrlf=false", *prefix, "diff", "--exit-code", "--no-ext-diff", receipt["commit"], "--"], env=env)
     if git_run([*prefix, "ls-files", "--others", "--exclude-standard"], env=env).strip():
         raise ValueError("History publication base has uncommitted files")
-    for surface in ("kr", "us", "youtube", "prism"):
+    # Market reports are bound to the committed execution/strategy generation.
+    # Advisory reports have independent canonical publication and validation;
+    # their arrival must not prevent delivery of the requested report history.
+    for surface in ("kr", "us"):
         original = archive / "work-reports" / surface / "latest.json"
         current = site / "work" / "v1" / surface / "report" / "latest.json"
         if original.exists() != current.exists() or (original.exists() and original.read_bytes() != current.read_bytes()):
