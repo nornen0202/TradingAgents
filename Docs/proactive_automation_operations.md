@@ -761,6 +761,22 @@ Record actual before/after versions and observation clocks in the operations
 ledger. Do not add a dependency scan or package installation to the minute
 observation producer.
 
+### Explicit CI acceptance
+
+Do not infer successful CI from the exit status of `gh pr checks --watch` alone.
+Its cancelled-check classification allowed the review's PR 498 wait procedure to
+merge after a job timeout. Inspect the exact current head and every required
+check's explicit terminal conclusion; only SUCCESS qualifies. Pending, cancelled,
+skipped, neutral, missing and failed checks are not successful acceptance. Keep
+that timeout in history and require verified follow-up validation before adoption.
+
+That run passed 6,567 tests and 131 subtests in 41 minutes 33 seconds, then reached
+the old 45-minute job limit during the last browser probe. CI now runs unit and
+browser checks in separate bounded jobs. The existing `test` check is an always-run
+aggregate that fails unless both jobs explicitly succeed; all four browser probes
+remain required. Unit-duration output identifies slow tests for later diagnosis
+without weakening production analysis timeouts or retry budgets.
+
 ### Hidden Windows review-service instances
 
 Include hidden tasks when checking the installed persistent review service:

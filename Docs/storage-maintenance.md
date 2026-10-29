@@ -104,3 +104,33 @@ order or duplicate consumer handoff, and it does not extend any TTL.
 Use `--health-only --apply` to persist current domain/capacity health without
 starting retention I/O. This receipt is labelled health-only, never cleanup success.
 The wrapper records its cleanup summary before propagating a degraded final exit.
+
+## Long backup runs and truthful task status
+
+The October 29 run exceeded the installed two-hour limit while verifying a second
+41,583-file worker backup. Task Scheduler ended its hidden launcher at 18:30 KST
+with result `0x41306`, while its PowerShell/Python children continued working.
+The first backup had already finalized; the second remained in its verified
+`prepared` journal phase. A scheduler end was therefore not cleanup completion.
+Keep the surviving owner and journals intact; do not launch a competing cleanup.
+
+The installer now uses `PT0S` so that the scheduler waits for the guarded worker's
+real result. This is the documented [no execution time limit](https://learn.microsoft.com/en-us/windows/win32/taskschd/tasksettings-executiontimelimit)
+setting. Daily timing, `IgnoreNew`, the maintenance mutex, retention and backup
+validation remain in force. Python output streams into the maintenance log while
+the process runs, with its original nonzero exit propagated after the summary.
+Inspect process ownership, current journal phase, file I/O and log progress before
+diagnosing a long run. Absence of new copy messages during a hash-verification
+stage is not by itself evidence of a hang. An unrelated blocked storage domain
+must still produce a failed aggregate result.
+
+Read-only checks later distinguished a false Repair-path alarm from a missing
+drive: D: retained its configured NTFS volume identity and about 602.5 GB free.
+The alias and intended destination had the same nonzero volume/file identifiers,
+but Windows final-path resolution returned error 433 for both. For this specific
+error only, alias health may use those exact directory identities. Missing paths,
+zero/unknown IDs, different targets, changed volumes and other errors still fail.
+Capacity may use the existing directory directly after the same identity check;
+the receipt retains error 433 and a null resolved path instead of claiming a
+canonical path was resolved. This observes metadata only and does not modify,
+repair, relocate or delete the unrelated project.

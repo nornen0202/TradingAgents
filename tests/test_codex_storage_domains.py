@@ -91,3 +91,79 @@ def test_health_only_can_save_receipt_without_running_retention(monkeypatch, tmp
     assert policy.domain_policy(cfg, apply=True, health_only=True) == 0
     assert all(call.kwargs["preflight_only"] for call in run.call_args_list)
     assert json.loads(Path(cfg["health_receipt"]).read_text())["mode"] == "health-only"
+
+
+def _fail_final_path(monkeypatch, paths, winerror=433):
+    original = Path.resolve
+    def resolve(path, *args, **kwargs):
+        if path in paths:
+            error = OSError("Final path query failed")
+            error.winerror = winerror
+            raise error
+        return original(path, *args, **kwargs)
+    monkeypatch.setattr(Path, "resolve", resolve)
+
+
+@pytest.mark.parametrize("same_target", [True, False])
+def test_windows_final_path_error_uses_exact_directory_identity_only(monkeypatch, tmp_path, same_target):
+    target = tmp_path / "target"; target.mkdir()
+    other = tmp_path / "other"; other.mkdir()
+    alias = tmp_path / "alias"
+    policy.storage.make_junction(alias, target if same_target else other)
+    _fail_final_path(monkeypatch, {alias, target})
+    events = []
+    monkeypatch.setattr(policy.storage, "emit", lambda event, **values: events.append(values))
+    assert policy.audit_relocations({"relocations": [{"id": "fixture", "source": str(alias),
+                                                      "destination": str(target)}]}) is same_target
+    assert events[0]["verification_method"] == "directory_file_identity"
+    assert events[0]["path_resolution_error"] == 433
+
+
+@pytest.mark.parametrize("winerror", [5, 2, None])
+def test_other_resolution_errors_do_not_enable_identity_fallback(monkeypatch, tmp_path, winerror):
+    target = tmp_path / "target"; target.mkdir()
+    alias = tmp_path / "alias"; policy.storage.make_junction(alias, target)
+    _fail_final_path(monkeypatch, {alias}, winerror)
+    identity = Mock(side_effect=AssertionError("Fallback must not run"))
+    monkeypatch.setattr(policy, "directory_identity", identity)
+    assert not policy.audit_relocations({"relocations": [{"id": "fixture", "source": str(alias),
+                                                          "destination": str(target)}]})
+    identity.assert_not_called()
+
+
+@pytest.mark.parametrize("field", ["st_dev", "st_ino"])
+def test_unknown_directory_identity_is_not_verification(monkeypatch, tmp_path, field):
+    from types import SimpleNamespace
+    monkeypatch.setattr(Path, "is_dir", lambda p: True)
+    values = {"st_dev": 42, "st_ino": 72}; values[field] = 0
+    monkeypatch.setattr(Path, "stat", lambda p: SimpleNamespace(**values))
+    with pytest.raises(OSError, match="identity unavailable"):
+        policy.directory_identity(tmp_path)
+
+
+@pytest.mark.parametrize("free,expected", [(200, 0), (50, 2)])
+def test_capacity_after_final_path_433_retains_real_measurement_and_limits(monkeypatch, tmp_path, free, expected):
+    from types import SimpleNamespace
+    _fail_final_path(monkeypatch, {tmp_path})
+    monkeypatch.setattr(policy.storage, "validate_volumes", lambda c: None)
+    monkeypatch.setattr(policy.shutil, "disk_usage", lambda p: SimpleNamespace(free=free))
+    events = []
+    monkeypatch.setattr(policy.storage, "emit", lambda event, **values: events.append((event, values)))
+    cfg = {"domains": [], "capacity_checks": [{"id": "fixture", "path": str(tmp_path),
+            "critical_free_bytes": 100, "required_for_shared": True}]}
+    assert policy.domain_policy(cfg, apply=False) == expected
+    row = next(row for event, row in events if event == "capacity-health")
+    assert row["available"] and row["free_bytes"] == free
+    assert row["resolved_path"] is None and row["path_resolution_error"] == 433
+
+
+def test_final_path_error_does_not_make_a_missing_capacity_path_available(monkeypatch, tmp_path):
+    missing = tmp_path / "missing"
+    _fail_final_path(monkeypatch, {missing})
+    monkeypatch.setattr(policy.storage, "validate_volumes", lambda c: None)
+    usage = Mock(side_effect=AssertionError("Unavailable path must not be measured"))
+    monkeypatch.setattr(policy.shutil, "disk_usage", usage)
+    cfg = {"domains": [], "capacity_checks": [{"id": "fixture", "path": str(missing),
+                                               "required_for_shared": True}]}
+    assert policy.domain_policy(cfg, apply=False) == 2
+    usage.assert_not_called()

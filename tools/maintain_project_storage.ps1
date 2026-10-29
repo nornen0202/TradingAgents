@@ -272,12 +272,11 @@ try {
         if (-not (Test-Path -LiteralPath $preflightScript -PathType Leaf)) {
             throw "Configured Codex storage policy helper is missing."
         }
-        $preflightOutput = & $extendedConfig.python_executable $preflightScript --config $ExtendedPolicyPath --preflight-only
-        $preflightExitCode = $LASTEXITCODE
-        foreach ($line in @($preflightOutput)) {
-            Write-Output $line
-            Write-MaintenanceLog "CODEX_STORAGE_PREFLIGHT $line"
+        & $extendedConfig.python_executable -u $preflightScript --config $ExtendedPolicyPath --preflight-only | ForEach-Object {
+            Write-MaintenanceLog "CODEX_STORAGE_PREFLIGHT $_"
+            Write-Output $_
         }
+        $preflightExitCode = $LASTEXITCODE
         if ($preflightExitCode -eq 3 -and ($extendedConfig.PSObject.Properties.Name -contains "domains")) {
             Write-Warning "An isolated storage domain is blocked; shared preflight passed. Final result will retain the domain failure."
         }
@@ -450,12 +449,13 @@ try {
         }
         $extendedArguments = @($extendedScript, "--config", $ExtendedPolicyPath)
         if ($Apply) { $extendedArguments += "--apply" }
-        $extendedOutput = & $extendedConfig.python_executable @extendedArguments
-        $extendedExitCode = $LASTEXITCODE
-        foreach ($line in @($extendedOutput)) {
-            Write-Output $line
-            Write-MaintenanceLog "CODEX_STORAGE $line"
+        # Stream progress while the helper is alive, including copy/verification
+        # stages. Capturing the whole pipeline hides healthy work for hours.
+        & $extendedConfig.python_executable -u @extendedArguments | ForEach-Object {
+            Write-MaintenanceLog "CODEX_STORAGE $_"
+            Write-Output $_
         }
+        $extendedExitCode = $LASTEXITCODE
         if ($extendedExitCode -ne 0) { $extendedFailure = "Codex storage policy returned $extendedExitCode; inspect relocation-health, storage-headroom, or the helper error. Unverified originals were preserved." }
     }
 

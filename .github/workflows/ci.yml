@@ -14,9 +14,9 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
-  test:
+  unit:
     runs-on: windows-latest
-    timeout-minutes: 45
+    timeout-minutes: 60
     env:
       TRANSFORMERS_NO_ADVISORY_WARNINGS: "1"
 
@@ -41,7 +41,29 @@ jobs:
         run: ruff check . --select E9,F63,F7,F82
 
       - name: Run unit tests
-        run: python -m pytest -q
+        run: python -m pytest -q --durations=25
+
+  browser:
+    runs-on: windows-latest
+    timeout-minutes: 15
+    env:
+      TRANSFORMERS_NO_ADVISORY_WARNINGS: "1"
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+
+      - name: Set up Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.13"
+
+      - name: Install TradingAgents
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install "uv==0.11.28"
+          uv export --frozen --no-dev --all-extras --no-hashes --no-emit-project --output-file "$env:RUNNER_TEMP/tradingagents-constraints.txt"
+          python -m pip install -e ".[telegram]" -c "$env:RUNNER_TEMP/tradingagents-constraints.txt"
+          python -m pip install "websockets>=15,<17"
 
       - name: Verify mobile layout at 360, 390, and 430px
         run: python .github/scripts/mobile_layout_regression.py
@@ -54,3 +76,20 @@ jobs:
 
       - name: Verify integrated archive charts and point-in-time replay
         run: python .github/scripts/investment_review_regression.py
+
+  # Keep the existing required check name while making every validation lane
+  # mandatory. A failed, cancelled or skipped dependency must never look green.
+  test:
+    needs: [unit, browser]
+    if: ${{ always() }}
+    runs-on: windows-latest
+    timeout-minutes: 5
+    steps:
+      - name: Require every validation job to succeed
+        env:
+          UNIT_RESULT: ${{ needs.unit.result }}
+          BROWSER_RESULT: ${{ needs.browser.result }}
+        run: |
+          if ($env:UNIT_RESULT -cne 'success' -or $env:BROWSER_RESULT -cne 'success') {
+            throw "Every required CI job must explicitly succeed. Unit=$env:UNIT_RESULT Browser=$env:BROWSER_RESULT"
+          }

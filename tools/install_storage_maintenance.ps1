@@ -50,7 +50,10 @@ $taskXml = @"
     <StopIfGoingOnBatteries>true</StopIfGoingOnBatteries>
     <MultipleInstancesPolicy>IgnoreNew</MultipleInstancesPolicy>
     <StartWhenAvailable>true</StartWhenAvailable>
-    <ExecutionTimeLimit>PT2H</ExecutionTimeLimit>
+    <!-- Verified backup/finalization can exceed two hours. Keep the launcher
+         attached until the guarded worker exits; IgnoreNew and its mutex
+         prevent overlap. Monitor progress instead of killing the launcher. -->
+    <ExecutionTimeLimit>PT0S</ExecutionTimeLimit>
   </Settings>
   <Triggers>
     <CalendarTrigger>
