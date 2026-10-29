@@ -28,6 +28,12 @@ class WorkRuntimeError(RuntimeError):
     pass
 
 
+class FreshReportSourceError(WorkRuntimeError):
+    def __init__(self, blockers):
+        self.blockers = tuple(dict.fromkeys(blockers))
+        super().__init__('Fresh report source failed revalidation: ' + ','.join(self.blockers))
+
+
 class WorkRuntime:
     def __init__(self, root: Path) -> None:
         self.root = Path(root)
@@ -66,6 +72,7 @@ class WorkRuntime:
                 now=now,
                 public=False,
                 report_context_v1=report_context_v1,
+                **({'expected_producer_run_id': expected_producer_run_id} if guarded_refresh else {}),
             )
             if guarded_refresh:
                 from .pre_report import (
@@ -83,7 +90,7 @@ class WorkRuntime:
                 if not session.get("is_open") or (close is not None and effective_now >= close):
                     blockers.append("SESSION_ENDED_DURING_PREPARE")
                 if blockers:
-                    raise WorkRuntimeError("Fresh report source failed revalidation: " + ",".join(blockers))
+                    raise FreshReportSourceError(blockers)
             state = self._load_state()
             surface_state = state["surfaces"].setdefault(key, {})
             if surface_state.get("pending_event_id") and (
@@ -212,6 +219,11 @@ class WorkRuntime:
             self._save_state(state)
             return {
                 **latest,
+                **({'verified_refresh_observations': {
+                    field: (source_packet['body']['current']['freshness_receipt']).get(field)
+                    for field in ('producer_run_id', 'analysis_run_id', 'market_data_oldest_at',
+                                  'market_data_latest_at', 'market_data_status', 'account_as_of',
+                                  'account_snapshot_health')}} if guarded_refresh else {}),
                 "prompt_path": str(prompt_path(key, packet.get("prompt_contract_version")).resolve()),
                 "packet_chars": len(event_path.read_text(encoding="utf-8")),
                 "publish_required": key in {"kr", "us"},
