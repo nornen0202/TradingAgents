@@ -1203,11 +1203,14 @@ def _apply_market_row_validity(bundle: dict[str, Any], *, now: datetime,
         bundle["quality"] = bundle_quality
 
 
-def _guarded_current_source(archive_dir: Path, market: str, run_id: str, now: datetime) -> dict[str, Any] | None:
+def _guarded_current_source(archive_dir: Path, market: str, run_id: str, now: datetime,
+                            *, allow_non_executable: bool = False) -> dict[str, Any] | None:
     """Use only the exact terminal producer acknowledged by the live pointer.
 
     This shortcut is for guarded fresh-input preparation. It has no cache and
-    retains full canonical reads. Unready sources need the historical fallback.
+    retains full canonical reads. An explicitly non-executable current bundle
+    can be read without discovering historical references when requested. This
+    does not change its quality, row gates, or subsequent freshness validation.
     """
     if not run_id or Path(run_id).name != run_id or any(c in run_id for c in "/*?[]\\") or now.utcoffset() is None:
         return None
@@ -1232,8 +1235,9 @@ def _guarded_current_source(archive_dir: Path, market: str, run_id: str, now: da
         return None
     artifact = ((manifest.get('decision_bundle') or {}).get('artifacts') or {}).get('decision_bundle_v2_json')
     bundle = load_json(_safe_artifact(run_dir, artifact) if artifact else run_dir / 'decision_bundle_v2.json')
+    readiness = (bundle.get('quality') or {}).get('decision_ready')
     if (bundle.get('run_id') != run_id or str(bundle.get('market') or '').lower() != market
-            or (bundle.get('quality') or {}).get('decision_ready') is not True
+            or not (readiness is True or (allow_non_executable and readiness is False))
             or load_json(archive / 'latest-run.json') != pointer):
         return None
     return {'manifest': manifest, 'bundle': bundle, 'run_dir': run_dir}
@@ -1242,7 +1246,8 @@ def _guarded_current_source(archive_dir: Path, market: str, run_id: str, now: da
 def _market_sources(archive_dir: Path, market: str, *, expected_producer_run_id: str | None = None,
                     now: datetime | None = None) -> list[dict[str, Any]]:
     if expected_producer_run_id and now is not None:
-        current = _guarded_current_source(archive_dir, market, expected_producer_run_id, now)
+        current = _guarded_current_source(archive_dir, market, expected_producer_run_id, now,
+                                          allow_non_executable=True)
         if current is not None:
             return [current]
     sources: list[dict[str, Any]] = []

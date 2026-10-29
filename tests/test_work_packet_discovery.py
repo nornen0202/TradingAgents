@@ -86,6 +86,74 @@ def test_changed_pointer_uses_full_discovery_instead_of_pinning_old_source(curre
     assert selected[0]["manifest"]["run_id"] == newer
 
 
+def test_exact_non_executable_current_avoids_historical_scan_without_promotion(current, monkeypatch):
+    root, directory, manifest, attempt, bundle, save = current
+    bundle["quality"]["decision_ready"] = False
+    bundle["strategy_table"] = [{"ticker": "SPG", "action_ready": False,
+        "execution": {"readiness": "NEEDS_LIVE_RECHECK", "action_now": None}}]
+    save()
+    monkeypatch.setattr(Path, "glob", lambda *args: pytest.fail("historical references must not age fresh inputs"))
+    selected = packet._market_sources(root, "us", expected_producer_run_id=RUN, now=AT)
+    assert selected == [{"manifest": manifest, "bundle": bundle, "run_dir": directory.resolve()}]
+    assert selected[0]["bundle"]["quality"]["decision_ready"] is False
+    assert selected[0]["bundle"]["strategy_table"][0]["execution"]["action_now"] is None
+
+
+@pytest.mark.parametrize("readiness", [None, "false", 0])
+def test_non_boolean_readiness_never_qualifies_for_exact_non_executable_read(current, readiness):
+    root, directory, manifest, attempt, bundle, save = current
+    bundle["quality"]["decision_ready"] = readiness
+    save()
+    assert packet._guarded_current_source(root, "us", RUN, AT, allow_non_executable=True) is None
+
+
+@pytest.mark.parametrize("case", ["failed", "running", "future", "changed_pointer"])
+def test_non_executable_read_still_requires_exact_terminal_source(current, case):
+    root, directory, manifest, attempt, bundle, save = current
+    bundle["quality"]["decision_ready"] = False
+    pointer = None
+    if case == "failed":
+        manifest["status"] = "failed"
+    elif case == "running":
+        attempt["status"] = "RUNNING"
+    elif case == "future":
+        attempt["finished_at"] = (AT + timedelta(seconds=1)).isoformat()
+    elif case == "changed_pointer":
+        pointer = {**manifest, "run_id": "newer"}
+    save(pointer=pointer)
+    assert packet._guarded_current_source(root, "us", RUN, AT, allow_non_executable=True) is None
+
+
+@pytest.mark.parametrize("elapsed", [119, 120])
+def test_exact_non_executable_packet_preserves_expiry_and_does_not_select_past_ready(tmp_path, elapsed):
+    from tests.test_chatgpt_work import _write_market_run
+    run_id = "20261029T170000_current"
+    directory = _write_market_run(tmp_path, run_id=run_id, market="us",
+        started_at=AT.isoformat(), row_mode="CONDITIONAL")
+    manifest_path = directory / "run.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest.update(status="success", finished_at=(AT + timedelta(seconds=1)).isoformat())
+    manifest["settings"]["execution_max_data_age_seconds"] = 120
+    for path in (manifest_path, tmp_path / "latest-run.json"):
+        path.write_text(json.dumps(manifest), encoding="utf-8")
+    (directory / "attempt.json").write_text(json.dumps({"run_id": run_id, "status": "SUCCESS",
+        "market": "US", "run_mode": "overlay_only", "started_at": manifest["started_at"],
+        "finished_at": manifest["finished_at"]}), encoding="utf-8")
+    _write_market_run(tmp_path, run_id="20261029T165900_previous", market="us",
+        started_at=(AT - timedelta(minutes=1)).isoformat(), row_mode="IMMEDIATE")
+    before = (directory / "decision_bundle_v2.json").read_bytes()
+    body = packet.build_surface_packet("us", archive_dir=tmp_path,
+        youtube_archive_dir=tmp_path / "youtube", prism_archive_dir=tmp_path / "prism",
+        expected_producer_run_id=run_id, now=AT + timedelta(seconds=elapsed))["body"]
+    assert body["current"]["run_id"] == run_id and body["last_ready"] == {}
+    row = body["current"]["bundle"]["strategy_table"][0]
+    assert row["execution"]["valid_until"] == (AT + timedelta(seconds=120)).isoformat()
+    assert row["quality"]["execution_ready"] is False
+    assert row["execution"]["action_now"] is None
+    assert body["guardrails"]["expired_at_build"] is (elapsed == 120)
+    assert (directory / "decision_bundle_v2.json").read_bytes() == before
+
+
 def test_supporting_sources_read_independently_at_exact_same_cutoff(monkeypatch):
     barrier = Barrier(2)
     def read(path, *, now):
