@@ -41,6 +41,13 @@ def test_archive_candidate_without_quote_is_not_cached_as_none_security(tmp_path
     assert cached == {}
 
 
+@pytest.mark.parametrize('invalid', [None, '', 123, {}, []])
+def test_invalid_mandatory_holding_fails_instead_of_disappearing(tmp_path, invalid):
+    config, universe = setup(tmp_path, holdings=(invalid,))
+    with pytest.raises(RuntimeError, match='HOLDING_MARKET_MISMATCH'):
+        select(config, universe, {})
+
+
 def setup(tmp_path, *, holdings=("HOLD",), market="US", **settings):
     config = SimpleNamespace(universe=replace(UniverseSettings(enabled=True), **settings),
         run=SimpleNamespace(market=market, run_mode="full", explicit_trade_date=None),

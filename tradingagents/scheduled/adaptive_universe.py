@@ -309,9 +309,10 @@ def select_adaptive_universe(*, config, universe, tickers, asof, requested_limit
         raise ValueError("Adaptive universe requires an explicit US or KR market")
     if universe.account_snapshot_status != "loaded":
         raise RuntimeError("ADAPTIVE_ACCOUNT_UNAVAILABLE: cannot guarantee mandatory holding coverage")
-    holdings = unique(universe.holding_tickers)
-    if any(not in_market(t, market) for t in holdings):
+    holding_inputs = tuple(universe.holding_tickers)
+    if any(not isinstance(t, str) or not in_market(t.strip(), market) for t in holding_inputs):
         raise RuntimeError("ADAPTIVE_HOLDING_MARKET_MISMATCH: verify account market configuration")
+    holdings = unique(holding_inputs)
     if len(holdings) > settings.max_tickers:
         raise RuntimeError("ADAPTIVE_HOLDINGS_EXCEED_CAP: all holdings cannot fit within the 30-ticker cap")
     asof = stamp(asof)
