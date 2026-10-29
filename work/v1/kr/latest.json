@@ -1,43 +1,43 @@
 {
   "schema": "tradingagents.work-context/v1",
   "surface": "kr",
-  "event_id": "kr:630f6d3124bb26a265bff8a9d1e608a7",
+  "event_id": "kr:fa3124fdcbdd73a4fe81a6e2ac797db0",
   "prompt_contract_version": "market-work-v12-kr",
   "prompt_sha256": "ce58e681561b3a6ddb646ea4fc0c4aabaf4bbf140a3894b895f30f0f954092dc",
-  "skill_sha256": "4dffe28b3721557cc2517b5afff2f94045832606e71ff61461df969f6abb53c7",
-  "task_manifest_sha256": "c0992fa275c9961bc91c679030c0b4d9b8b06f3d164226776421f1e354b5c22e",
-  "workflow_contract_sha256": "ddf0892f9079721a3c716f1f1aab8216028890c541e722a0ec83feef9c09b18c",
-  "source_sha256": "2c91eb88059595eb72d4d6c10287efdc9124cf32071496f4186f7b915f8676a3",
+  "skill_sha256": "1ff16777e84d43f33fbf97c9a3390b5baf6b3708afefce2497ceaf50fc5984a3",
+  "task_manifest_sha256": "9e6e3caa6895706b3a3712e0866de1f74d70765a125c60e5ee20fdfd9761b972",
+  "workflow_contract_sha256": "2955953e3fdd100b81639894dd8729dcae71821d272ac2bf99bb16b0920cc73b",
+  "source_sha256": "6d2cc52821aa068e18be641941fd46b51d709f6d6224ea04ba1c8f5e0a1da741",
   "body": {
     "kind": "market",
     "market": "KR",
-    "session_id": "KR:2026-10-28",
+    "session_id": "KR:2026-10-29",
     "source_health": "STALE",
     "source": {
-      "run_id": "20261028T152855_local-freshness-kr-overlay",
-      "last_run_at": "2026-10-28T15:30:39.689390+09:00",
+      "run_id": "20261029T190350_manual-kr-failed-recovery",
+      "last_run_at": "2026-10-29T20:03:23.991423+09:00",
       "status": "success"
     },
     "report_mode": "OUTAGE",
     "current": {
-      "run_id": "20261028T152855_local-freshness-kr-overlay",
-      "started_at": "2026-10-28T15:28:55.352705+09:00",
-      "run_mode": "overlay_only",
+      "run_id": "20261029T190350_manual-kr-failed-recovery",
+      "started_at": "2026-10-29T19:03:50.296784+09:00",
+      "run_mode": "full",
       "freshness_receipt": {
         "schema": "tradingagents.source-freshness/v1",
-        "producer_run_id": "20261028T152855_local-freshness-kr-overlay",
-        "producer_started_at": "2026-10-28T15:28:55.352705+09:00",
-        "producer_finished_at": "2026-10-28T15:30:39.689390+09:00",
-        "analysis_run_id": "20261027T050051_local-scheduler-kr-full",
+        "producer_run_id": "20261029T190350_manual-kr-failed-recovery",
+        "producer_started_at": "2026-10-29T19:03:50.296784+09:00",
+        "producer_finished_at": "2026-10-29T20:03:23.991423+09:00",
+        "analysis_run_id": "20261029T190350_manual-kr-failed-recovery",
         "analysis_lineage_status": "RESOLVED",
-        "analysis_completed_at": "2026-10-27T08:02:30.648772+09:00",
-        "analysis_trade_date_oldest": "2026-10-26",
-        "analysis_trade_date_latest": "2026-10-26",
-        "market_data_oldest_at": "2026-10-28T15:29:00+09:00",
-        "market_data_latest_at": "2026-10-28T15:30:00+09:00",
+        "analysis_completed_at": "2026-10-29T19:27:18.341954+09:00",
+        "analysis_trade_date_oldest": "2026-10-29",
+        "analysis_trade_date_latest": "2026-10-29",
+        "market_data_oldest_at": "2026-10-29T16:14:00+09:00",
+        "market_data_latest_at": "2026-10-29T19:04:00+09:00",
         "market_data_status": "STALE",
         "publication_does_not_refresh_inputs": true,
-        "execution_max_age_seconds": 120.0,
+        "execution_max_age_seconds": 180.0,
         "research_market_data_status": "UNVERIFIED",
         "research_market_data_receipts": [
           {
@@ -47,13 +47,19 @@
             "execution_eligible": false
           },
           {
-            "ticker": "267260.KS",
+            "ticker": "278470.KS",
             "research_valid": false,
             "category": "UNVERIFIED_RESEARCH_INPUT",
             "execution_eligible": false
           },
           {
-            "ticker": "278470.KS",
+            "ticker": "010120.KS",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "267260.KS",
             "research_valid": false,
             "category": "UNVERIFIED_RESEARCH_INPUT",
             "execution_eligible": false
@@ -71,25 +77,7 @@
             "execution_eligible": false
           },
           {
-            "ticker": "353200.KS",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
-            "execution_eligible": false
-          },
-          {
             "ticker": "058470.KQ",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
-            "execution_eligible": false
-          },
-          {
-            "ticker": "000660.KS",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
-            "execution_eligible": false
-          },
-          {
-            "ticker": "010120.KS",
             "research_valid": false,
             "category": "UNVERIFIED_RESEARCH_INPUT",
             "execution_eligible": false
@@ -101,31 +89,7 @@
             "execution_eligible": false
           },
           {
-            "ticker": "006400.KS",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
-            "execution_eligible": false
-          },
-          {
-            "ticker": "064400.KS",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
-            "execution_eligible": false
-          },
-          {
-            "ticker": "018880.KS",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
-            "execution_eligible": false
-          },
-          {
-            "ticker": "411080.KQ",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
-            "execution_eligible": false
-          },
-          {
-            "ticker": "096770.KS",
+            "ticker": "353200.KS",
             "research_valid": false,
             "category": "UNVERIFIED_RESEARCH_INPUT",
             "execution_eligible": false
@@ -143,31 +107,7 @@
             "execution_eligible": false
           },
           {
-            "ticker": "036460.KS",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
-            "execution_eligible": false
-          },
-          {
-            "ticker": "068270.KS",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
-            "execution_eligible": false
-          },
-          {
-            "ticker": "000100.KS",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
-            "execution_eligible": false
-          },
-          {
-            "ticker": "009150.KS",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
-            "execution_eligible": false
-          },
-          {
-            "ticker": "131290.KQ",
+            "ticker": "000810.KS",
             "research_valid": false,
             "category": "UNVERIFIED_RESEARCH_INPUT",
             "execution_eligible": false
@@ -179,25 +119,85 @@
             "execution_eligible": false
           },
           {
+            "ticker": "064400.KS",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "036460.KS",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false
+          },
+          {
             "ticker": "207940.KS",
             "research_valid": false,
             "category": "UNVERIFIED_RESEARCH_INPUT",
             "execution_eligible": false
           },
           {
-            "ticker": "067290.KQ",
+            "ticker": "443670.KQ",
             "research_valid": false,
             "category": "UNVERIFIED_RESEARCH_INPUT",
             "execution_eligible": false
           },
           {
-            "ticker": "079650.KQ",
+            "ticker": "010170.KQ",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "000660.KS",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "017900.KS",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "131290.KQ",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "179880.KQ",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "000100.KS",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "419050.KQ",
             "research_valid": false,
             "category": "UNVERIFIED_RESEARCH_INPUT",
             "execution_eligible": false
           },
           {
             "ticker": "011200.KS",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "068270.KS",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "006400.KS",
             "research_valid": false,
             "category": "UNVERIFIED_RESEARCH_INPUT",
             "execution_eligible": false
@@ -209,248 +209,201 @@
       },
       "latest_attempt": {
         "schema": "tradingagents.analysis-attempt/v1",
-        "run_id": "20261029T161248_local-scheduler-kr-full",
+        "run_id": "20261029T190350_manual-kr-failed-recovery",
         "market": "KR",
         "run_mode": "full",
-        "started_at": "2026-10-29T16:12:48.666737+09:00",
-        "status": "INTERRUPTED",
-        "heartbeat_at": "2026-10-29T08:11:37.051933+00:00"
+        "started_at": "2026-10-29T19:03:50.296784+09:00",
+        "status": "SUCCESS",
+        "heartbeat_at": "2026-10-29T11:03:24.387932+00:00",
+        "finished_at": "2026-10-29T11:03:24.387921+00:00",
+        "completed_tickers": 30,
+        "error_type": null
       },
       "latest_completed_analysis": {
-        "run_id": "20261027T050051_local-scheduler-kr-full",
+        "run_id": "20261029T190350_manual-kr-failed-recovery",
         "status": "success",
-        "finished_at": "2026-10-27T09:10:26.870647+09:00"
+        "finished_at": "2026-10-29T20:03:23.991423+09:00"
       },
       "analysis_receipt": {
-        "analysis_run_id": "20261027T050051_local-scheduler-kr-full",
-        "decisions": {}
+        "analysis_run_id": "20261029T190350_manual-kr-failed-recovery",
+        "decisions": {},
+        "research_recovery": {
+          "schema": "tradingagents.research-recovery/v1",
+          "source_run_id": "20261029T161248_local-scheduler-kr-full",
+          "source_manifest_sha256": "427b0985ccaad5eb92ea2a23cb3bcb7eb296c815efe01b0180c9c328e1c55bd9",
+          "source_status": "partial_failure",
+          "usage_scope": "This run's LLM usage excludes reused source calls; original per-ticker artifacts and source_llm_usage preserve them."
+        }
       },
       "bundle": {
         "artifact_type": "decision_bundle",
         "version": 2,
-        "run_id": "20261028T152855_local-freshness-kr-overlay",
+        "run_id": "20261029T190350_manual-kr-failed-recovery",
         "market": "KR",
-        "generated_at": "2026-10-28T15:30:38.565184+09:00",
-        "analysis_source_run_id": "20261028T152559_local-freshness-kr-overlay",
-        "execution_source_run_id": "20261028T152855_local-freshness-kr-overlay",
-        "checkpoint": "15:28",
-        "checkpoint_timezone": "Asia/Seoul",
+        "generated_at": "2026-10-29T19:59:18.800825+09:00",
+        "analysis_source_run_id": "20261029T190350_manual-kr-failed-recovery",
         "quality": {
           "report_mode": "OUTAGE",
           "decision_ready": false,
           "conditional_strategy_ready": false,
-          "quality_label_ko": "일부 종목 장중 판단 가능, 종목별 데이터 상태 확인",
-          "fresh_row_ratio": 0.5333,
-          "conditional_row_ratio": 1.0,
+          "quality_label_ko": "연구 자료만 제공, 장중 데이터 대기",
+          "fresh_row_ratio": 0.0,
+          "conditional_row_ratio": 0.0,
           "portfolio_membership_omitted": true
         },
         "strategy_table": [
           {
             "ticker": "005930.KS",
             "display_name": "삼성전자",
-            "last_price": 242250.0,
-            "market_data_asof": "2026-10-28T15:29:00+09:00",
-            "session_vwap": 238690.9582201539,
-            "vwap_distance_pct": 1.4910668616795464,
-            "vwap_position_ko": "VWAP 위 +1.49%",
-            "relative_volume": 0.8696013407063314,
-            "trading_value": 3597711000000.0,
-            "price_change_pct": 9.12,
-            "spread_bps": 20.639834881320947,
-            "day_high": 243000.0,
-            "day_low": 228000.0,
-            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
+            "last_price": 230500.0,
+            "market_data_asof": "2026-10-29T16:14:00+09:00",
+            "session_vwap": 234962.35194749405,
+            "vwap_distance_pct": -1.8991774258759753,
+            "vwap_position_ko": "VWAP 아래 -1.90%",
+            "relative_volume": 1.3555156462560092,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 비교 지표 미수집",
             "data_status_ko": "시세 유효기간 만료",
-            "reason_codes_ko": [
-              "relative volume unconfirmed"
-            ],
+            "reason_codes_ko": [],
             "quality": {
-              "row_mode": "MISSING",
+              "row_mode": "BLOCKED_STALE",
               "execution_ready": false,
               "data_ready": false,
               "action_ready": false,
               "action_status": "DATA_RECHECK_REQUIRED",
               "conditional_strategy_ready": false,
               "current_execution_promotion": "BLOCKED",
-              "generated_in_current_run": true,
-              "freshness_class": "LIVE_CHECKPOINT",
-              "execution_eligibility": "LIVE_EXECUTION_READY",
-              "row_valid_until": "2026-10-28T15:31:00+09:00",
+              "generated_in_current_run": false,
+              "row_valid_until": "2026-10-29T16:17:00+09:00",
               "expired_at_build": true
             },
             "display_priority": 1
           },
           {
-            "ticker": "267260.KS",
-            "display_name": "HD현대일렉트릭",
-            "last_price": 464000.0,
-            "market_data_asof": "2026-10-28T15:29:00+09:00",
-            "session_vwap": 456813.75649544253,
-            "vwap_distance_pct": 1.5731232701240216,
-            "vwap_position_ko": "VWAP 위 +1.57%",
-            "relative_volume": 1.0497328248114772,
-            "trading_value": 85800587000.0,
-            "price_change_pct": 3.11,
-            "spread_bps": 10.804970286331713,
-            "day_high": 467000.0,
-            "day_low": 438000.0,
-            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
+            "ticker": "278470.KS",
+            "display_name": "에이피알",
+            "last_price": 279500.0,
+            "market_data_asof": "2026-10-29T16:59:00+09:00",
+            "session_vwap": 281173.5384912213,
+            "vwap_distance_pct": -0.595197720312346,
+            "vwap_position_ko": "VWAP 아래 -0.60%",
+            "relative_volume": 0.5446434710186504,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 비교 지표 미수집",
             "data_status_ko": "시세 유효기간 만료",
-            "reason_codes_ko": [
-              "돌파 후 안착 실패"
-            ],
+            "reason_codes_ko": [],
             "quality": {
-              "row_mode": "MISSING",
+              "row_mode": "BLOCKED_STALE",
               "execution_ready": false,
               "data_ready": false,
               "action_ready": false,
               "action_status": "DATA_RECHECK_REQUIRED",
               "conditional_strategy_ready": false,
               "current_execution_promotion": "BLOCKED",
-              "generated_in_current_run": true,
-              "freshness_class": "LIVE_CHECKPOINT",
-              "execution_eligibility": "LIVE_EXECUTION_READY",
-              "row_valid_until": "2026-10-28T15:31:00+09:00",
+              "generated_in_current_run": false,
+              "row_valid_until": "2026-10-29T17:02:00+09:00",
               "expired_at_build": true
             },
             "display_priority": 2
           },
           {
-            "ticker": "278470.KS",
-            "display_name": "에이피알",
-            "last_price": 288500.0,
-            "market_data_asof": "2026-10-28T15:29:00+09:00",
-            "session_vwap": 283011.69788610545,
-            "vwap_distance_pct": 1.9392492094454816,
-            "vwap_position_ko": "VWAP 위 +1.94%",
-            "relative_volume": 0.5238713409117105,
-            "trading_value": 48906968500.0,
-            "price_change_pct": 3.78,
-            "spread_bps": 17.28608470181504,
-            "day_high": 289500.0,
-            "day_low": 272000.0,
-            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
+            "ticker": "010120.KS",
+            "display_name": "LS ELECTRIC",
+            "last_price": 157100.0,
+            "market_data_asof": "2026-10-29T16:14:00+09:00",
+            "session_vwap": 157769.7350333904,
+            "vwap_distance_pct": -0.42450158976856667,
+            "vwap_position_ko": "VWAP 아래 -0.42%",
+            "relative_volume": 0.918680534127768,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 비교 지표 미수집",
             "data_status_ko": "시세 유효기간 만료",
-            "reason_codes_ko": [
-              "waiting for trigger"
-            ],
+            "reason_codes_ko": [],
             "quality": {
-              "row_mode": "MISSING",
+              "row_mode": "BLOCKED_STALE",
               "execution_ready": false,
               "data_ready": false,
               "action_ready": false,
               "action_status": "DATA_RECHECK_REQUIRED",
               "conditional_strategy_ready": false,
               "current_execution_promotion": "BLOCKED",
-              "generated_in_current_run": true,
-              "freshness_class": "LIVE_CHECKPOINT",
-              "execution_eligibility": "LIVE_EXECUTION_READY",
-              "row_valid_until": "2026-10-28T15:31:00+09:00",
+              "generated_in_current_run": false,
+              "row_valid_until": "2026-10-29T16:17:00+09:00",
               "expired_at_build": true
             },
             "display_priority": 3
           },
           {
-            "ticker": "042700.KS",
-            "display_name": "한미반도체",
-            "last_price": 203500.0,
-            "market_data_asof": "2026-10-28T15:29:00+09:00",
-            "session_vwap": 201093.60754286687,
-            "vwap_distance_pct": 1.1966528854579161,
-            "vwap_position_ko": "VWAP 위 +1.20%",
-            "relative_volume": 0.602284850367428,
-            "trading_value": 80417534750.0,
-            "price_change_pct": 6.32,
-            "spread_bps": 24.539877300613497,
-            "day_high": 204500.0,
-            "day_low": 195300.0,
-            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
+            "ticker": "267260.KS",
+            "display_name": "HD현대일렉트릭",
+            "last_price": 437500.0,
+            "market_data_asof": "2026-10-29T16:56:00+09:00",
+            "session_vwap": 440334.262188153,
+            "vwap_distance_pct": -0.6436615161556358,
+            "vwap_position_ko": "VWAP 아래 -0.64%",
+            "relative_volume": 0.9499617118963455,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 비교 지표 미수집",
             "data_status_ko": "시세 유효기간 만료",
-            "reason_codes_ko": [
-              "relative volume unconfirmed"
-            ],
+            "reason_codes_ko": [],
             "quality": {
-              "row_mode": "MISSING",
+              "row_mode": "BLOCKED_STALE",
               "execution_ready": false,
               "data_ready": false,
               "action_ready": false,
               "action_status": "DATA_RECHECK_REQUIRED",
               "conditional_strategy_ready": false,
               "current_execution_promotion": "BLOCKED",
-              "generated_in_current_run": true,
-              "freshness_class": "LIVE_CHECKPOINT",
-              "execution_eligibility": "LIVE_EXECUTION_READY",
-              "row_valid_until": "2026-10-28T15:31:00+09:00",
+              "generated_in_current_run": false,
+              "row_valid_until": "2026-10-29T16:59:00+09:00",
               "expired_at_build": true
             },
             "display_priority": 4
           },
           {
-            "ticker": "035420.KS",
-            "display_name": "NAVER",
-            "last_price": 178700.0,
-            "market_data_asof": "2026-10-28T15:29:00+09:00",
-            "session_vwap": 181692.57239317082,
-            "vwap_distance_pct": -1.6470526856183665,
-            "vwap_position_ko": "VWAP 아래 -1.65%",
-            "relative_volume": 1.7301750763153905,
-            "trading_value": 189759904300.0,
-            "price_change_pct": 2.52,
-            "spread_bps": 5.61955605507165,
-            "day_high": 186900.0,
-            "day_low": 178000.0,
-            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
+            "ticker": "042700.KS",
+            "display_name": "한미반도체",
+            "last_price": 194100.0,
+            "market_data_asof": "2026-10-29T16:36:00+09:00",
+            "session_vwap": 195831.79365057603,
+            "vwap_distance_pct": -0.8843271147615961,
+            "vwap_position_ko": "VWAP 아래 -0.88%",
+            "relative_volume": 0.884867217066776,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 비교 지표 미수집",
             "data_status_ko": "시세 유효기간 만료",
-            "reason_codes_ko": [
-              "vwap unconfirmed"
-            ],
+            "reason_codes_ko": [],
             "quality": {
-              "row_mode": "MISSING",
+              "row_mode": "BLOCKED_STALE",
               "execution_ready": false,
               "data_ready": false,
               "action_ready": false,
               "action_status": "DATA_RECHECK_REQUIRED",
               "conditional_strategy_ready": false,
               "current_execution_promotion": "BLOCKED",
-              "generated_in_current_run": true,
-              "freshness_class": "LIVE_CHECKPOINT",
-              "execution_eligibility": "LIVE_EXECUTION_READY",
-              "row_valid_until": "2026-10-28T15:31:00+09:00",
+              "generated_in_current_run": false,
+              "row_valid_until": "2026-10-29T16:39:00+09:00",
               "expired_at_build": true
             },
             "display_priority": 5
           },
           {
-            "ticker": "353200.KS",
-            "display_name": "대덕전자",
-            "last_price": 138100.0,
-            "market_data_asof": "2026-10-28T15:29:00+09:00",
-            "session_vwap": 134937.81975037602,
-            "vwap_distance_pct": 2.3434351136499387,
-            "vwap_position_ko": "VWAP 위 +2.34%",
-            "relative_volume": 0.967320051659725,
-            "trading_value": 150093091100.0,
-            "price_change_pct": 8.14,
-            "spread_bps": 7.249003262051468,
-            "day_high": 139000.0,
-            "day_low": 127200.0,
-            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
+            "ticker": "035420.KS",
+            "display_name": "NAVER",
+            "last_price": 174200.0,
+            "market_data_asof": "2026-10-29T16:36:00+09:00",
+            "session_vwap": 174130.52725598635,
+            "vwap_distance_pct": 0.03989693542449935,
+            "vwap_position_ko": "VWAP 위 +0.04%",
+            "relative_volume": 1.094411391406094,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 비교 지표 미수집",
             "data_status_ko": "시세 유효기간 만료",
-            "reason_codes_ko": [
-              "relative volume unconfirmed"
-            ],
+            "reason_codes_ko": [],
             "quality": {
-              "row_mode": "MISSING",
+              "row_mode": "BLOCKED_STALE",
               "execution_ready": false,
               "data_ready": false,
               "action_ready": false,
               "action_status": "DATA_RECHECK_REQUIRED",
               "conditional_strategy_ready": false,
               "current_execution_promotion": "BLOCKED",
-              "generated_in_current_run": true,
-              "freshness_class": "LIVE_CHECKPOINT",
-              "execution_eligibility": "LIVE_EXECUTION_READY",
-              "row_valid_until": "2026-10-28T15:31:00+09:00",
+              "generated_in_current_run": false,
+              "row_valid_until": "2026-10-29T16:39:00+09:00",
               "expired_at_build": true
             },
             "display_priority": 6
@@ -458,738 +411,545 @@
           {
             "ticker": "058470.KQ",
             "display_name": "리노공업",
-            "last_price": 63700.0,
-            "market_data_asof": "2026-10-28T15:29:00+09:00",
-            "session_vwap": 63687.06724970254,
-            "vwap_distance_pct": 0.02030671352279967,
-            "vwap_position_ko": "VWAP 위 +0.02%",
-            "relative_volume": 0.7249366949845043,
-            "trading_value": 46781080500.0,
-            "price_change_pct": 3.75,
-            "day_high": 65400.0,
-            "day_low": 62400.0,
-            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
+            "last_price": 61400.0,
+            "market_data_asof": "2026-10-29T16:37:00+09:00",
+            "session_vwap": 61819.21367569654,
+            "vwap_distance_pct": -0.6781284503160068,
+            "vwap_position_ko": "VWAP 아래 -0.68%",
+            "relative_volume": 0.5277167701863354,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 비교 지표 미수집",
             "data_status_ko": "시세 유효기간 만료",
-            "reason_codes_ko": [
-              "delayed or invalid market data"
-            ],
+            "reason_codes_ko": [],
             "quality": {
-              "row_mode": "MISSING",
+              "row_mode": "BLOCKED_STALE",
               "execution_ready": false,
               "data_ready": false,
               "action_ready": false,
               "action_status": "DATA_RECHECK_REQUIRED",
               "conditional_strategy_ready": false,
               "current_execution_promotion": "BLOCKED",
-              "generated_in_current_run": true,
-              "freshness_class": "DELAYED_CHECKPOINT",
-              "execution_eligibility": "DELAYED_ANALYSIS_ONLY",
-              "row_valid_until": "2026-10-28T15:31:00+09:00",
+              "generated_in_current_run": false,
+              "row_valid_until": "2026-10-29T16:40:00+09:00",
               "expired_at_build": true
             },
             "display_priority": 7
           },
           {
-            "ticker": "000660.KS",
-            "display_name": "SK하이닉스",
-            "last_price": 1494000.0,
-            "market_data_asof": "2026-10-28T15:29:00+09:00",
-            "session_vwap": 1436958.9942388148,
-            "vwap_distance_pct": 3.9695639186559273,
-            "vwap_position_ko": "VWAP 위 +3.97%",
-            "relative_volume": 1.0290599170622001,
-            "trading_value": 5134076303500.0,
-            "price_change_pct": 11.41,
-            "spread_bps": 6.691201070592171,
-            "day_high": 1495000.0,
-            "day_low": 1358000.0,
-            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
+            "ticker": "034020.KS",
+            "display_name": "두산에너빌리티",
+            "last_price": 55900.0,
+            "market_data_asof": "2026-10-29T16:33:00+09:00",
+            "session_vwap": 55397.9827410579,
+            "vwap_distance_pct": 0.9062013346020859,
+            "vwap_position_ko": "VWAP 위 +0.91%",
+            "relative_volume": 3.133726692314026,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 비교 지표 미수집",
             "data_status_ko": "시세 유효기간 만료",
-            "reason_codes_ko": [
-              "close confirmation required"
-            ],
+            "reason_codes_ko": [],
             "quality": {
-              "row_mode": "MISSING",
+              "row_mode": "BLOCKED_STALE",
               "execution_ready": false,
               "data_ready": false,
               "action_ready": false,
               "action_status": "DATA_RECHECK_REQUIRED",
               "conditional_strategy_ready": false,
               "current_execution_promotion": "BLOCKED",
-              "generated_in_current_run": true,
-              "freshness_class": "LIVE_CHECKPOINT",
-              "execution_eligibility": "LIVE_EXECUTION_READY",
-              "row_valid_until": "2026-10-28T15:31:00+09:00",
+              "generated_in_current_run": false,
+              "row_valid_until": "2026-10-29T16:36:00+09:00",
               "expired_at_build": true
             },
             "display_priority": 8
           },
           {
-            "ticker": "010120.KS",
-            "display_name": "LS ELECTRIC",
-            "last_price": 164900.0,
-            "market_data_asof": "2026-10-28T15:29:00+09:00",
-            "session_vwap": 163384.86494824608,
-            "vwap_distance_pct": 0.9273411293230005,
-            "vwap_position_ko": "VWAP 위 +0.93%",
-            "relative_volume": 0.6794958376855652,
-            "trading_value": 62491933300.0,
-            "price_change_pct": 4.3,
-            "spread_bps": 6.0734892195566355,
-            "day_high": 165900.0,
-            "day_low": 159300.0,
-            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
+            "ticker": "353200.KS",
+            "display_name": "대덕전자",
+            "last_price": 136000.0,
+            "market_data_asof": "2026-10-29T16:59:00+09:00",
+            "session_vwap": 135298.21928327202,
+            "vwap_distance_pct": 0.5186917613887232,
+            "vwap_position_ko": "VWAP 위 +0.52%",
+            "relative_volume": 0.8558371900039645,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 비교 지표 미수집",
             "data_status_ko": "시세 유효기간 만료",
-            "reason_codes_ko": [
-              "close confirmation required"
-            ],
+            "reason_codes_ko": [],
             "quality": {
-              "row_mode": "MISSING",
+              "row_mode": "BLOCKED_STALE",
               "execution_ready": false,
               "data_ready": false,
               "action_ready": false,
               "action_status": "DATA_RECHECK_REQUIRED",
               "conditional_strategy_ready": false,
               "current_execution_promotion": "BLOCKED",
-              "generated_in_current_run": true,
-              "freshness_class": "LIVE_CHECKPOINT",
-              "execution_eligibility": "LIVE_EXECUTION_READY",
-              "row_valid_until": "2026-10-28T15:31:00+09:00",
+              "generated_in_current_run": false,
+              "row_valid_until": "2026-10-29T17:02:00+09:00",
               "expired_at_build": true
             },
             "display_priority": 9
           },
           {
-            "ticker": "034020.KS",
-            "display_name": "두산에너빌리티",
-            "last_price": 61500.0,
-            "market_data_asof": "2026-10-28T15:29:00+09:00",
-            "session_vwap": 61120.639806305306,
-            "vwap_distance_pct": 0.6206744479392068,
-            "vwap_position_ko": "VWAP 위 +0.62%",
-            "relative_volume": 0.6556231064498129,
-            "trading_value": 89616610100.0,
-            "price_change_pct": 4.41,
-            "spread_bps": 16.273393002441008,
-            "day_high": 62100.0,
-            "day_low": 60100.0,
-            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
+            "ticker": "028050.KS",
+            "display_name": "028050",
+            "last_price": 62000.0,
+            "market_data_asof": "2026-10-29T17:51:00+09:00",
+            "session_vwap": 63433.112268473415,
+            "vwap_distance_pct": -2.259249494818938,
+            "vwap_position_ko": "VWAP 아래 -2.26%",
+            "relative_volume": 1.01902564840395,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 비교 지표 미수집",
             "data_status_ko": "시세 유효기간 만료",
-            "reason_codes_ko": [
-              "risk action confirmation required"
-            ],
+            "reason_codes_ko": [],
             "quality": {
-              "row_mode": "MISSING",
+              "row_mode": "BLOCKED_STALE",
               "execution_ready": false,
               "data_ready": false,
               "action_ready": false,
               "action_status": "DATA_RECHECK_REQUIRED",
               "conditional_strategy_ready": false,
               "current_execution_promotion": "BLOCKED",
-              "generated_in_current_run": true,
-              "freshness_class": "LIVE_CHECKPOINT",
-              "execution_eligibility": "LIVE_EXECUTION_READY",
-              "row_valid_until": "2026-10-28T15:31:00+09:00",
+              "generated_in_current_run": false,
+              "row_valid_until": "2026-10-29T17:54:00+09:00",
               "expired_at_build": true
             },
             "display_priority": 10
           },
           {
-            "ticker": "006400.KS",
-            "display_name": "삼성SDI",
-            "last_price": 534000.0,
-            "market_data_asof": "2026-10-28T15:30:00+09:00",
-            "session_vwap": 527514.4324841351,
-            "vwap_distance_pct": 1.2294578340394269,
-            "vwap_position_ko": "VWAP 위 +1.23%",
-            "relative_volume": 0.7366273508924577,
-            "trading_value": 217292690000.0,
-            "price_change_pct": 5.12,
-            "spread_bps": 18.744142455482663,
-            "day_high": 536000.0,
-            "day_low": 508000.0,
-            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
+            "ticker": "033780.KS",
+            "display_name": "033780",
+            "last_price": 192000.0,
+            "market_data_asof": "2026-10-29T17:22:00+09:00",
+            "session_vwap": 191442.08047587812,
+            "vwap_distance_pct": 0.2914299315672997,
+            "vwap_position_ko": "VWAP 위 +0.29%",
+            "relative_volume": 1.3118809363805417,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 비교 지표 미수집",
             "data_status_ko": "시세 유효기간 만료",
-            "reason_codes_ko": [
-              "close confirmation required"
-            ],
+            "reason_codes_ko": [],
             "quality": {
-              "row_mode": "MISSING",
+              "row_mode": "BLOCKED_STALE",
               "execution_ready": false,
               "data_ready": false,
               "action_ready": false,
               "action_status": "DATA_RECHECK_REQUIRED",
               "conditional_strategy_ready": false,
               "current_execution_promotion": "BLOCKED",
-              "generated_in_current_run": true,
-              "freshness_class": "CURRENT_SESSION",
-              "execution_eligibility": "ASOF_EXECUTION_READY",
-              "row_valid_until": "2026-10-28T15:32:00+09:00",
+              "generated_in_current_run": false,
+              "row_valid_until": "2026-10-29T17:25:00+09:00",
               "expired_at_build": true
             },
             "display_priority": 11
           },
           {
-            "ticker": "064400.KS",
-            "display_name": "LG CNS",
-            "last_price": 79000.0,
-            "market_data_asof": "2026-10-28T15:29:00+09:00",
-            "session_vwap": 78332.09080377915,
-            "vwap_distance_pct": 0.8526635627458923,
-            "vwap_position_ko": "VWAP 위 +0.85%",
-            "relative_volume": 1.6973072480393487,
-            "trading_value": 89865942850.0,
-            "price_change_pct": 5.19,
-            "spread_bps": 12.66624445851805,
-            "day_high": 79100.0,
-            "day_low": 75400.0,
-            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
+            "ticker": "000810.KS",
+            "display_name": "000810",
+            "last_price": 652000.0,
+            "market_data_asof": "2026-10-29T18:18:00+09:00",
+            "session_vwap": 643586.2686707891,
+            "vwap_distance_pct": 1.3073198945943831,
+            "vwap_position_ko": "VWAP 위 +1.31%",
+            "relative_volume": 1.4272321423565124,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 비교 지표 미수집",
             "data_status_ko": "시세 유효기간 만료",
-            "reason_codes_ko": [
-              "close confirmation required"
-            ],
+            "reason_codes_ko": [],
             "quality": {
-              "row_mode": "MISSING",
+              "row_mode": "BLOCKED_STALE",
               "execution_ready": false,
               "data_ready": false,
               "action_ready": false,
               "action_status": "DATA_RECHECK_REQUIRED",
               "conditional_strategy_ready": false,
               "current_execution_promotion": "BLOCKED",
-              "generated_in_current_run": true,
-              "freshness_class": "LIVE_CHECKPOINT",
-              "execution_eligibility": "LIVE_EXECUTION_READY",
-              "row_valid_until": "2026-10-28T15:31:00+09:00",
+              "generated_in_current_run": false,
+              "row_valid_until": "2026-10-29T18:21:00+09:00",
               "expired_at_build": true
             },
             "display_priority": 12
           },
           {
-            "ticker": "018880.KS",
-            "display_name": "018880",
-            "last_price": 3710.0,
-            "market_data_asof": "2026-10-28T15:30:00+09:00",
-            "session_vwap": 3760.670316861605,
-            "vwap_distance_pct": -1.3473746059157632,
-            "vwap_position_ko": "VWAP 아래 -1.35%",
-            "relative_volume": 0.5064570996398565,
-            "trading_value": 16677252860.0,
-            "price_change_pct": 0.68,
-            "spread_bps": 13.486176668914363,
-            "day_high": 3845.0,
-            "day_low": 3680.0,
-            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
+            "ticker": "003230.KS",
+            "display_name": "003230",
+            "last_price": 1143000.0,
+            "market_data_asof": "2026-10-29T18:39:00+09:00",
+            "session_vwap": 1147420.5642633229,
+            "vwap_distance_pct": -0.3852610281706914,
+            "vwap_position_ko": "VWAP 아래 -0.39%",
+            "relative_volume": 1.078063999826969,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 비교 지표 미수집",
             "data_status_ko": "시세 유효기간 만료",
-            "reason_codes_ko": [
-              "close confirmation required"
-            ],
+            "reason_codes_ko": [],
             "quality": {
-              "row_mode": "MISSING",
+              "row_mode": "BLOCKED_STALE",
               "execution_ready": false,
               "data_ready": false,
               "action_ready": false,
               "action_status": "DATA_RECHECK_REQUIRED",
               "conditional_strategy_ready": false,
               "current_execution_promotion": "BLOCKED",
-              "generated_in_current_run": true,
-              "freshness_class": "CURRENT_SESSION",
-              "execution_eligibility": "ASOF_EXECUTION_READY",
-              "row_valid_until": "2026-10-28T15:32:00+09:00",
+              "generated_in_current_run": false,
+              "row_valid_until": "2026-10-29T18:42:00+09:00",
               "expired_at_build": true
             },
             "display_priority": 13
           },
           {
-            "ticker": "411080.KQ",
-            "display_name": "411080",
-            "last_price": 8680.0,
-            "market_data_asof": "2026-10-28T15:30:00+09:00",
-            "session_vwap": 8917.415725504168,
-            "vwap_distance_pct": -2.6623826096292658,
-            "vwap_position_ko": "VWAP 아래 -2.66%",
-            "relative_volume": 4.482929224938341,
-            "trading_value": 127397857195.0,
-            "price_change_pct": 5.85,
-            "spread_bps": 11.42204454597373,
-            "day_high": 9780.0,
-            "day_low": 8100.0,
-            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
+            "ticker": "064400.KS",
+            "display_name": "LG CNS",
+            "last_price": 76900.0,
+            "market_data_asof": "2026-10-29T17:23:00+09:00",
+            "session_vwap": 78230.50711267821,
+            "vwap_distance_pct": -1.7007522535445574,
+            "vwap_position_ko": "VWAP 아래 -1.70%",
+            "relative_volume": 1.916564663941102,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 비교 지표 미수집",
             "data_status_ko": "시세 유효기간 만료",
-            "reason_codes_ko": [
-              "close confirmation required"
-            ],
+            "reason_codes_ko": [],
             "quality": {
-              "row_mode": "MISSING",
+              "row_mode": "BLOCKED_STALE",
               "execution_ready": false,
               "data_ready": false,
               "action_ready": false,
               "action_status": "DATA_RECHECK_REQUIRED",
               "conditional_strategy_ready": false,
               "current_execution_promotion": "BLOCKED",
-              "generated_in_current_run": true,
-              "freshness_class": "CURRENT_SESSION",
-              "execution_eligibility": "ASOF_EXECUTION_READY",
-              "row_valid_until": "2026-10-28T15:32:00+09:00",
+              "generated_in_current_run": false,
+              "row_valid_until": "2026-10-29T17:26:00+09:00",
               "expired_at_build": true
             },
             "display_priority": 14
           },
           {
-            "ticker": "096770.KS",
-            "display_name": "096770",
-            "last_price": 140000.0,
-            "market_data_asof": "2026-10-28T15:30:00+09:00",
-            "session_vwap": 137310.75489629884,
-            "vwap_distance_pct": 1.9585101733161192,
-            "vwap_position_ko": "VWAP 위 +1.96%",
-            "relative_volume": 0.8531033122394166,
-            "trading_value": 97956943300.0,
-            "price_change_pct": 1.08,
-            "spread_bps": 7.155635062611807,
-            "day_high": 140400.0,
-            "day_low": 130600.0,
-            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
+            "ticker": "036460.KS",
+            "display_name": "036460",
+            "last_price": 36850.0,
+            "market_data_asof": "2026-10-29T17:46:00+09:00",
+            "session_vwap": 36750.03860219423,
+            "vwap_distance_pct": 0.2720035178406466,
+            "vwap_position_ko": "VWAP 위 +0.27%",
+            "relative_volume": 1.021404558608798,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 비교 지표 미수집",
             "data_status_ko": "시세 유효기간 만료",
-            "reason_codes_ko": [
-              "risk action close confirmation required"
-            ],
+            "reason_codes_ko": [],
             "quality": {
-              "row_mode": "MISSING",
+              "row_mode": "BLOCKED_STALE",
               "execution_ready": false,
               "data_ready": false,
               "action_ready": false,
               "action_status": "DATA_RECHECK_REQUIRED",
               "conditional_strategy_ready": false,
               "current_execution_promotion": "BLOCKED",
-              "generated_in_current_run": true,
-              "freshness_class": "CURRENT_SESSION",
-              "execution_eligibility": "ASOF_EXECUTION_READY",
-              "row_valid_until": "2026-10-28T15:32:00+09:00",
+              "generated_in_current_run": false,
+              "row_valid_until": "2026-10-29T17:49:00+09:00",
               "expired_at_build": true
             },
             "display_priority": 15
           },
           {
-            "ticker": "028050.KS",
-            "display_name": "028050",
-            "last_price": 64200.0,
-            "market_data_asof": "2026-10-28T15:29:00+09:00",
-            "session_vwap": 63837.064298649544,
-            "vwap_distance_pct": 0.5685344483457699,
-            "vwap_position_ko": "VWAP 위 +0.57%",
-            "relative_volume": 1.2507798529543261,
-            "trading_value": 245486962850.0,
-            "price_change_pct": 3.22,
-            "spread_bps": 15.564202334630352,
-            "day_high": 64900.0,
-            "day_low": 62200.0,
-            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
+            "ticker": "207940.KS",
+            "display_name": "207940",
+            "last_price": 1364000.0,
+            "market_data_asof": "2026-10-29T18:37:00+09:00",
+            "session_vwap": 1366188.5716335461,
+            "vwap_distance_pct": -0.16019542828771272,
+            "vwap_position_ko": "VWAP 아래 -0.16%",
+            "relative_volume": 0.510676805219975,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 비교 지표 미수집",
             "data_status_ko": "시세 유효기간 만료",
-            "reason_codes_ko": [
-              "pilot ready",
-              "entry not authorized"
-            ],
+            "reason_codes_ko": [],
             "quality": {
-              "row_mode": "MISSING",
+              "row_mode": "BLOCKED_STALE",
               "execution_ready": false,
               "data_ready": false,
               "action_ready": false,
               "action_status": "DATA_RECHECK_REQUIRED",
               "conditional_strategy_ready": false,
               "current_execution_promotion": "BLOCKED",
-              "generated_in_current_run": true,
-              "freshness_class": "LIVE_CHECKPOINT",
-              "execution_eligibility": "LIVE_EXECUTION_READY",
-              "row_valid_until": "2026-10-28T15:31:00+09:00",
+              "generated_in_current_run": false,
+              "row_valid_until": "2026-10-29T18:40:00+09:00",
               "expired_at_build": true
             },
             "display_priority": 16
           },
           {
-            "ticker": "033780.KS",
-            "display_name": "033780",
-            "last_price": 188900.0,
-            "market_data_asof": "2026-10-28T15:30:00+09:00",
-            "session_vwap": 188900.94311458504,
-            "vwap_distance_pct": -0.0004992640954992744,
-            "vwap_position_ko": "VWAP 아래 -0.00%",
-            "relative_volume": 0.7299475410875319,
-            "trading_value": 34801220750.0,
-            "price_change_pct": 1.18,
-            "spread_bps": 10.626992561105206,
-            "day_high": 191000.0,
-            "day_low": 186100.0,
-            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
+            "ticker": "443670.KQ",
+            "display_name": "443670",
+            "last_price": 4985.0,
+            "market_data_asof": "2026-10-29T19:04:00+09:00",
+            "session_vwap": 5032.008968862854,
+            "vwap_distance_pct": -0.9341988290111791,
+            "vwap_position_ko": "VWAP 아래 -0.93%",
+            "relative_volume": 9.056317092829136,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 비교 지표 미수집",
             "data_status_ko": "시세 유효기간 만료",
-            "reason_codes_ko": [
-              "돌파 후 안착 실패"
-            ],
+            "reason_codes_ko": [],
             "quality": {
-              "row_mode": "MISSING",
+              "row_mode": "BLOCKED_STALE",
               "execution_ready": false,
               "data_ready": false,
               "action_ready": false,
               "action_status": "DATA_RECHECK_REQUIRED",
               "conditional_strategy_ready": false,
               "current_execution_promotion": "BLOCKED",
-              "generated_in_current_run": true,
-              "freshness_class": "CURRENT_SESSION",
-              "execution_eligibility": "ASOF_EXECUTION_READY",
-              "row_valid_until": "2026-10-28T15:32:00+09:00",
+              "generated_in_current_run": false,
+              "row_valid_until": "2026-10-29T19:07:00+09:00",
               "expired_at_build": true
             },
             "display_priority": 17
           },
           {
-            "ticker": "036460.KS",
-            "display_name": "036460",
-            "last_price": 37000.0,
-            "market_data_asof": "2026-10-28T15:30:00+09:00",
-            "session_vwap": 36955.768054770844,
-            "vwap_distance_pct": 0.11968888094437968,
-            "vwap_position_ko": "VWAP 위 +0.12%",
-            "relative_volume": 1.1430996315290196,
-            "trading_value": 5559810525.0,
-            "price_change_pct": 1.09,
-            "spread_bps": 13.559322033898306,
-            "day_high": 37100.0,
-            "day_low": 36450.0,
-            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
+            "ticker": "010170.KQ",
+            "display_name": "010170",
+            "last_price": 14940.0,
+            "market_data_asof": "2026-10-29T18:09:00+09:00",
+            "session_vwap": 15182.546992479409,
+            "vwap_distance_pct": -1.5975382299132868,
+            "vwap_position_ko": "VWAP 아래 -1.60%",
+            "relative_volume": 1.3273834784731988,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 비교 지표 미수집",
             "data_status_ko": "시세 유효기간 만료",
-            "reason_codes_ko": [
-              "relative volume unconfirmed"
-            ],
+            "reason_codes_ko": [],
             "quality": {
-              "row_mode": "MISSING",
+              "row_mode": "BLOCKED_STALE",
               "execution_ready": false,
               "data_ready": false,
               "action_ready": false,
               "action_status": "DATA_RECHECK_REQUIRED",
               "conditional_strategy_ready": false,
               "current_execution_promotion": "BLOCKED",
-              "generated_in_current_run": true,
-              "freshness_class": "CURRENT_SESSION",
-              "execution_eligibility": "ASOF_EXECUTION_READY",
-              "row_valid_until": "2026-10-28T15:32:00+09:00",
+              "generated_in_current_run": false,
+              "row_valid_until": "2026-10-29T18:12:00+09:00",
               "expired_at_build": true
             },
             "display_priority": 18
           },
           {
-            "ticker": "068270.KS",
-            "display_name": "068270",
-            "last_price": 190300.0,
-            "market_data_asof": "2026-10-28T15:30:00+09:00",
-            "session_vwap": 191534.3701316143,
-            "vwap_distance_pct": -0.6444640357582299,
-            "vwap_position_ko": "VWAP 아래 -0.64%",
-            "relative_volume": 0.747541801250461,
-            "trading_value": 71308246000.0,
-            "price_change_pct": 0.9,
-            "spread_bps": 5.267316302343956,
-            "day_high": 194200.0,
-            "day_low": 189200.0,
-            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
+            "ticker": "000660.KS",
+            "display_name": "SK하이닉스",
+            "last_price": 1515000.0,
+            "market_data_asof": "2026-10-29T16:14:00+09:00",
+            "session_vwap": 1527323.6271277918,
+            "vwap_distance_pct": -0.8068772661473766,
+            "vwap_position_ko": "VWAP 아래 -0.81%",
+            "relative_volume": 1.2229531840179415,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 비교 지표 미수집",
             "data_status_ko": "시세 유효기간 만료",
-            "reason_codes_ko": [
-              "relative volume unconfirmed",
-              "vwap unconfirmed"
-            ],
+            "reason_codes_ko": [],
             "quality": {
-              "row_mode": "MISSING",
+              "row_mode": "BLOCKED_STALE",
               "execution_ready": false,
               "data_ready": false,
               "action_ready": false,
               "action_status": "DATA_RECHECK_REQUIRED",
               "conditional_strategy_ready": false,
               "current_execution_promotion": "BLOCKED",
-              "generated_in_current_run": true,
-              "freshness_class": "CURRENT_SESSION",
-              "execution_eligibility": "ASOF_EXECUTION_READY",
-              "row_valid_until": "2026-10-28T15:32:00+09:00",
+              "generated_in_current_run": false,
+              "row_valid_until": "2026-10-29T16:17:00+09:00",
               "expired_at_build": true
             },
             "display_priority": 19
           },
           {
-            "ticker": "000100.KS",
-            "display_name": "000100",
-            "last_price": 77300.0,
-            "market_data_asof": "2026-10-28T15:30:00+09:00",
-            "session_vwap": 79510.94153708652,
-            "vwap_distance_pct": -2.7806758344765203,
-            "vwap_position_ko": "VWAP 아래 -2.78%",
-            "relative_volume": 1.0722503668854537,
-            "trading_value": 25265158250.0,
-            "price_change_pct": -3.38,
-            "spread_bps": 12.944983818770227,
-            "day_high": 82500.0,
-            "day_low": 76800.0,
-            "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
+            "ticker": "017900.KS",
+            "display_name": "017900",
+            "last_price": 9380.0,
+            "market_data_asof": "2026-10-29T17:22:00+09:00",
+            "session_vwap": 9608.036779351627,
+            "vwap_distance_pct": -2.373396195169597,
+            "vwap_position_ko": "VWAP 아래 -2.37%",
+            "relative_volume": 7.623053846001409,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 비교 지표 미수집",
             "data_status_ko": "시세 유효기간 만료",
-            "reason_codes_ko": [
-              "support zone failed"
-            ],
+            "reason_codes_ko": [],
             "quality": {
-              "row_mode": "MISSING",
+              "row_mode": "BLOCKED_STALE",
               "execution_ready": false,
               "data_ready": false,
               "action_ready": false,
               "action_status": "DATA_RECHECK_REQUIRED",
               "conditional_strategy_ready": false,
               "current_execution_promotion": "BLOCKED",
-              "generated_in_current_run": true,
-              "freshness_class": "CURRENT_SESSION",
-              "execution_eligibility": "ASOF_EXECUTION_READY",
-              "row_valid_until": "2026-10-28T15:32:00+09:00",
+              "generated_in_current_run": false,
+              "row_valid_until": "2026-10-29T17:25:00+09:00",
               "expired_at_build": true
             },
             "display_priority": 20
           },
           {
-            "ticker": "009150.KS",
-            "display_name": "삼성전기",
-            "last_price": 1311000.0,
-            "market_data_asof": "2026-10-28T15:30:00+09:00",
-            "session_vwap": 1291656.5752758246,
-            "vwap_distance_pct": 1.497567162544322,
-            "vwap_position_ko": "VWAP 위 +1.50%",
-            "relative_volume": 1.2289238033627161,
-            "trading_value": 1125766538000.0,
-            "price_change_pct": 9.16,
-            "spread_bps": 7.659900421294523,
-            "day_high": 1338000.0,
-            "day_low": 1208000.0,
-            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
+            "ticker": "131290.KQ",
+            "display_name": "티에스이",
+            "last_price": 260000.0,
+            "market_data_asof": "2026-10-29T18:10:00+09:00",
+            "session_vwap": 259751.46056786366,
+            "vwap_distance_pct": 0.09568355519271599,
+            "vwap_position_ko": "VWAP 위 +0.10%",
+            "relative_volume": 0.6456064419510894,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 비교 지표 미수집",
             "data_status_ko": "시세 유효기간 만료",
-            "reason_codes_ko": [
-              "pilot ready",
-              "entry not authorized",
-              "next day followthrough pending"
-            ],
+            "reason_codes_ko": [],
             "quality": {
-              "row_mode": "MISSING",
+              "row_mode": "BLOCKED_STALE",
               "execution_ready": false,
               "data_ready": false,
               "action_ready": false,
               "action_status": "DATA_RECHECK_REQUIRED",
               "conditional_strategy_ready": false,
               "current_execution_promotion": "BLOCKED",
-              "generated_in_current_run": true,
-              "freshness_class": "CURRENT_SESSION",
-              "execution_eligibility": "ASOF_EXECUTION_READY",
-              "row_valid_until": "2026-10-28T15:32:00+09:00",
+              "generated_in_current_run": false,
+              "row_valid_until": "2026-10-29T18:13:00+09:00",
               "expired_at_build": true
             },
             "display_priority": 21
           },
           {
-            "ticker": "131290.KQ",
-            "display_name": "티에스이",
-            "last_price": 275000.0,
-            "market_data_asof": "2026-10-28T15:30:00+09:00",
-            "session_vwap": 270695.91733186314,
-            "vwap_distance_pct": 1.5900064953178417,
-            "vwap_position_ko": "VWAP 위 +1.59%",
-            "relative_volume": 1.0185448556978034,
-            "trading_value": 33877864750.0,
-            "price_change_pct": 5.77,
-            "spread_bps": 36.42987249544627,
-            "day_high": 276500.0,
-            "day_low": 261500.0,
-            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
+            "ticker": "179880.KQ",
+            "display_name": "179880",
+            "last_price": 16410.0,
+            "market_data_asof": "2026-10-29T19:04:00+09:00",
+            "session_vwap": 18168.137658614683,
+            "vwap_distance_pct": -9.677038404544657,
+            "vwap_position_ko": "VWAP 아래 -9.68%",
+            "relative_volume": 0.6734767274290383,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 비교 지표 미수집",
             "data_status_ko": "시세 유효기간 만료",
-            "reason_codes_ko": [
-              "relative volume unconfirmed"
-            ],
+            "reason_codes_ko": [],
             "quality": {
-              "row_mode": "MISSING",
+              "row_mode": "BLOCKED_STALE",
               "execution_ready": false,
               "data_ready": false,
               "action_ready": false,
               "action_status": "DATA_RECHECK_REQUIRED",
               "conditional_strategy_ready": false,
               "current_execution_promotion": "BLOCKED",
-              "generated_in_current_run": true,
-              "freshness_class": "CURRENT_SESSION",
-              "execution_eligibility": "ASOF_EXECUTION_READY",
-              "row_valid_until": "2026-10-28T15:32:00+09:00",
+              "generated_in_current_run": false,
+              "row_valid_until": "2026-10-29T19:07:00+09:00",
               "expired_at_build": true
             },
             "display_priority": 22
           },
           {
-            "ticker": "003230.KS",
-            "display_name": "003230",
-            "last_price": 1194000.0,
-            "market_data_asof": "2026-10-28T15:30:00+09:00",
-            "session_vwap": 1167187.5874657743,
-            "vwap_distance_pct": 2.297181089154776,
-            "vwap_position_ko": "VWAP 위 +2.30%",
-            "relative_volume": 0.9111232150702607,
-            "trading_value": 38365456000.0,
-            "price_change_pct": 5.38,
-            "spread_bps": 16.79261125104954,
-            "day_high": 1197000.0,
-            "day_low": 1126000.0,
-            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
+            "ticker": "000100.KS",
+            "display_name": "000100",
+            "last_price": 74400.0,
+            "market_data_asof": "2026-10-29T18:37:00+09:00",
+            "session_vwap": 74526.07585099878,
+            "vwap_distance_pct": -0.16917011872574772,
+            "vwap_position_ko": "VWAP 아래 -0.17%",
+            "relative_volume": 1.0350656237024964,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 비교 지표 미수집",
             "data_status_ko": "시세 유효기간 만료",
-            "reason_codes_ko": [
-              "relative volume unconfirmed"
-            ],
+            "reason_codes_ko": [],
             "quality": {
-              "row_mode": "MISSING",
+              "row_mode": "BLOCKED_STALE",
               "execution_ready": false,
               "data_ready": false,
               "action_ready": false,
               "action_status": "DATA_RECHECK_REQUIRED",
               "conditional_strategy_ready": false,
               "current_execution_promotion": "BLOCKED",
-              "generated_in_current_run": true,
-              "freshness_class": "CURRENT_SESSION",
-              "execution_eligibility": "ASOF_EXECUTION_READY",
-              "row_valid_until": "2026-10-28T15:32:00+09:00",
+              "generated_in_current_run": false,
+              "row_valid_until": "2026-10-29T18:40:00+09:00",
               "expired_at_build": true
             },
             "display_priority": 23
           },
           {
-            "ticker": "207940.KS",
-            "display_name": "207940",
-            "last_price": 1370000.0,
-            "market_data_asof": "2026-10-28T15:29:00+09:00",
-            "session_vwap": 1373066.171829085,
-            "vwap_distance_pct": -0.22330838032377232,
-            "vwap_position_ko": "VWAP 아래 -0.22%",
-            "relative_volume": 0.5663202026514975,
-            "trading_value": 63080033000.0,
-            "price_change_pct": -0.29,
-            "spread_bps": 14.587892049598834,
-            "day_high": 1399000.0,
-            "day_low": 1360000.0,
-            "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
+            "ticker": "419050.KQ",
+            "display_name": "419050",
+            "last_price": 2080.0,
+            "market_data_asof": "2026-10-29T19:04:00+09:00",
+            "session_vwap": 2265.026678531268,
+            "vwap_distance_pct": -8.168852061877097,
+            "vwap_position_ko": "VWAP 아래 -8.17%",
+            "relative_volume": 0.7214565373943389,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 비교 지표 미수집",
             "data_status_ko": "시세 유효기간 만료",
-            "reason_codes_ko": [
-              "support zone failed"
-            ],
+            "reason_codes_ko": [],
             "quality": {
-              "row_mode": "MISSING",
+              "row_mode": "BLOCKED_STALE",
               "execution_ready": false,
               "data_ready": false,
               "action_ready": false,
               "action_status": "DATA_RECHECK_REQUIRED",
               "conditional_strategy_ready": false,
               "current_execution_promotion": "BLOCKED",
-              "generated_in_current_run": true,
-              "freshness_class": "LIVE_CHECKPOINT",
-              "execution_eligibility": "LIVE_EXECUTION_READY",
-              "row_valid_until": "2026-10-28T15:31:00+09:00",
+              "generated_in_current_run": false,
+              "row_valid_until": "2026-10-29T19:07:00+09:00",
               "expired_at_build": true
             },
             "display_priority": 24
           },
           {
-            "ticker": "067290.KQ",
-            "display_name": "067290",
-            "last_price": 2375.0,
-            "market_data_asof": "2026-10-28T15:29:00+09:00",
-            "session_vwap": 2381.200580933265,
-            "vwap_distance_pct": -0.2603972543478328,
-            "vwap_position_ko": "VWAP 아래 -0.26%",
-            "relative_volume": 0.4403775538746546,
-            "trading_value": 2411806152.0,
-            "price_change_pct": 0.64,
-            "spread_bps": 21.07481559536354,
-            "day_high": 2420.0,
-            "day_low": 2360.0,
-            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
+            "ticker": "011200.KS",
+            "display_name": "011200",
+            "last_price": 22350.0,
+            "market_data_asof": "2026-10-29T17:44:00+09:00",
+            "session_vwap": 22107.69055669797,
+            "vwap_distance_pct": 1.096041410026971,
+            "vwap_position_ko": "VWAP 위 +1.10%",
+            "relative_volume": 0.5347283208084259,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 비교 지표 미수집",
             "data_status_ko": "시세 유효기간 만료",
-            "reason_codes_ko": [
-              "돌파 후 안착 실패"
-            ],
+            "reason_codes_ko": [],
             "quality": {
-              "row_mode": "MISSING",
+              "row_mode": "BLOCKED_STALE",
               "execution_ready": false,
               "data_ready": false,
               "action_ready": false,
               "action_status": "DATA_RECHECK_REQUIRED",
               "conditional_strategy_ready": false,
               "current_execution_promotion": "BLOCKED",
-              "generated_in_current_run": true,
-              "freshness_class": "LIVE_CHECKPOINT",
-              "execution_eligibility": "LIVE_EXECUTION_READY",
-              "row_valid_until": "2026-10-28T15:31:00+09:00",
+              "generated_in_current_run": false,
+              "row_valid_until": "2026-10-29T17:47:00+09:00",
               "expired_at_build": true
             },
             "display_priority": 25
           },
           {
-            "ticker": "079650.KQ",
-            "display_name": "079650",
-            "last_price": 7440.0,
-            "market_data_asof": "2026-10-28T15:30:00+09:00",
-            "session_vwap": 7432.067861312846,
-            "vwap_distance_pct": 0.10672855570177386,
-            "vwap_position_ko": "VWAP 위 +0.11%",
-            "relative_volume": 0.5875353553766988,
-            "trading_value": 14525545575.0,
-            "price_change_pct": -1.2,
-            "spread_bps": 13.41381623071764,
-            "day_high": 8050.0,
-            "day_low": 7100.0,
-            "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
+            "ticker": "068270.KS",
+            "display_name": "068270",
+            "last_price": 188700.0,
+            "market_data_asof": "2026-10-29T17:47:00+09:00",
+            "session_vwap": 189518.58610625603,
+            "vwap_distance_pct": -0.43192919653647355,
+            "vwap_position_ko": "VWAP 아래 -0.43%",
+            "relative_volume": 0.719268678070749,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 비교 지표 미수집",
             "data_status_ko": "시세 유효기간 만료",
-            "reason_codes_ko": [
-              "delayed or invalid market data"
-            ],
+            "reason_codes_ko": [],
             "quality": {
-              "row_mode": "MISSING",
+              "row_mode": "BLOCKED_STALE",
               "execution_ready": false,
               "data_ready": false,
               "action_ready": false,
               "action_status": "DATA_RECHECK_REQUIRED",
               "conditional_strategy_ready": false,
               "current_execution_promotion": "BLOCKED",
-              "generated_in_current_run": true,
-              "freshness_class": "DELAYED_CHECKPOINT",
-              "execution_eligibility": "DELAYED_ANALYSIS_ONLY",
-              "row_valid_until": "2026-10-28T15:32:00+09:00",
+              "generated_in_current_run": false,
+              "row_valid_until": "2026-10-29T17:50:00+09:00",
               "expired_at_build": true
             },
             "display_priority": 26
           },
           {
-            "ticker": "011200.KS",
-            "display_name": "011200",
-            "last_price": 22150.0,
-            "market_data_asof": "2026-10-28T15:30:00+09:00",
-            "session_vwap": 22365.769800334256,
-            "vwap_distance_pct": -0.9647322773170597,
-            "vwap_position_ko": "VWAP 아래 -0.96%",
-            "relative_volume": 0.5823947840653408,
-            "trading_value": 22669810075.0,
-            "price_change_pct": -1.12,
-            "spread_bps": 22.547914317925592,
-            "day_high": 22850.0,
-            "day_low": 22100.0,
-            "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
+            "ticker": "006400.KS",
+            "display_name": "삼성SDI",
+            "last_price": 537000.0,
+            "market_data_asof": "2026-10-29T18:13:00+09:00",
+            "session_vwap": 537683.5319327739,
+            "vwap_distance_pct": -0.12712532413199362,
+            "vwap_position_ko": "VWAP 아래 -0.13%",
+            "relative_volume": 1.870500403783576,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 비교 지표 미수집",
             "data_status_ko": "시세 유효기간 만료",
-            "reason_codes_ko": [
-              "돌파 후 안착 실패",
-              "support zone failed"
-            ],
+            "reason_codes_ko": [],
             "quality": {
-              "row_mode": "MISSING",
+              "row_mode": "BLOCKED_STALE",
               "execution_ready": false,
               "data_ready": false,
               "action_ready": false,
               "action_status": "DATA_RECHECK_REQUIRED",
               "conditional_strategy_ready": false,
               "current_execution_promotion": "BLOCKED",
-              "generated_in_current_run": true,
-              "freshness_class": "CURRENT_SESSION",
-              "execution_eligibility": "ASOF_EXECUTION_READY",
-              "row_valid_until": "2026-10-28T15:32:00+09:00",
+              "generated_in_current_run": false,
+              "row_valid_until": "2026-10-29T18:16:00+09:00",
               "expired_at_build": true
             },
             "display_priority": 27
@@ -1206,7 +966,7 @@
       "universe_coverage": {
         "status": "COMPLETE",
         "complete": true,
-        "source_run_id": "20261028T152855_local-freshness-kr-overlay",
+        "source_run_id": "20261029T190350_manual-kr-failed-recovery",
         "ticker_universe_mode": "config_plus_account",
         "expected_watchlist_count": 27,
         "missing_watchlist_count": 0,
@@ -1217,7 +977,7 @@
       "run_id": "20261028T152559_local-freshness-kr-overlay",
       "started_at": "2026-10-28T15:25:59.466429+09:00",
       "same_as_current": false,
-      "same_session": true,
+      "same_session": false,
       "reference_only": true
     },
     "supporting_context": {
@@ -1282,12 +1042,11 @@
               "matched_tickers": [
                 "000660",
                 "005930",
-                "009150",
                 "035420",
                 "267260"
               ],
               "market_match": true,
-              "score": 520
+              "score": 420
             },
             "summary": {
               "video_id": "Wd2jXQClEbk",
@@ -1562,11 +1321,10 @@
               "matched_tickers": [
                 "000660",
                 "005930",
-                "009150",
                 "035420"
               ],
               "market_match": true,
-              "score": 420
+              "score": 320
             },
             "summary": {
               "video_id": "ytsRGIP_NEU",
@@ -1693,152 +1451,6 @@
             }
           },
           {
-            "event_key": "HoJvid2LcSA",
-            "content_sha256": "df43c630f984c1348b1b0294a673f6e960805927695e407a6a6c814cae1d1b48",
-            "occurred_at": "2026-10-27T08:30:37+00:00",
-            "relevance": {
-              "tickers": [
-                "005930",
-                "000660",
-                "009150",
-                "373220",
-                "006400",
-                "092870",
-                "080580",
-                "097520",
-                "108490"
-              ],
-              "markets": [
-                "KR"
-              ],
-              "themes": [],
-              "match_basis": "verified_entities",
-              "matched_tickers": [
-                "000660",
-                "005930",
-                "006400",
-                "009150"
-              ],
-              "market_match": true,
-              "score": 420
-            },
-            "summary": {
-              "video_id": "HoJvid2LcSA",
-              "title": "[#긴급인터뷰]  “지금 팔면 후회, 사면 물린다?” 삼성전자·SK하이닉스 진짜 매수 타이밍은 언제?ㅣ김민수 대표",
-              "channel": "815Money talk",
-              "source_url": "https://www.youtube.com/watch?v=HoJvid2LcSA",
-              "claim_status_summary": {
-                "unverified": 9,
-                "asr_uncertain": 2,
-                "partially_supported": 1
-              },
-              "claims": [
-                {
-                  "claim_id": "C1",
-                  "claim_text": "미국 중간선거 종료에 따른 안도감이라는 발언이 영상 게시일 및 실제 촬영일과 일치하는지 확인해야 한다.",
-                  "status": "unverified",
-                  "confidence": 0.99,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "선거 종료를 확인된 시장 반등 원인으로 제시할 수 없다."
-                },
-                {
-                  "claim_id": "C2",
-                  "claim_text": "국내 지수가 5,550 부근 박스권을 거쳐 5,750에 안착하고 상단 저항으로 회복할 수 있으며 외국인·기관 수급도 나쁘지 않다는 주장이다.",
-                  "status": "unverified",
-                  "confidence": 0.99,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "제시된 수치를 특정 지수의 매매 기준으로 사용할 근거가 부족하다."
-                },
-                {
-                  "claim_id": "C3",
-                  "claim_text": "삼성전자·SK하이닉스·삼성전기·삼성SDI·로보티즈의 이동평균선과 제시 가격 수준을 확인해야 한다.",
-                  "status": "asr_uncertain",
-                  "confidence": 0.98,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "원음·차트 대조 전 목표가, 저항선 또는 200일선 돌파 여부를 확정해서는 안 된다."
-                },
-                {
-                  "claim_id": "C4",
-                  "claim_text": "솔리디그로 인식된 회사 관련 사건이 SK하이닉스 낙폭 확대의 배경이라는 주장이다.",
-                  "status": "unverified",
-                  "confidence": 0.98,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "미확인 사건을 악재 해소나 반등 매수의 근거로 삼을 수 없다."
-                }
-              ],
-              "entities": [
-                {
-                  "ticker": "005930",
-                  "name": "삼성전자",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "시장 데이터 조회 실패: no_usable_market_fields"
-                  ]
-                },
-                {
-                  "ticker": "000660",
-                  "name": "SK하이닉스",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "시장 데이터 조회 실패: no_usable_market_fields"
-                  ]
-                },
-                {
-                  "ticker": "009150",
-                  "name": "삼성전기",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "시장 데이터 조회 실패: no_usable_market_fields"
-                  ]
-                },
-                {
-                  "ticker": "373220",
-                  "name": "LG에너지솔루션 및 전기차 경쟁 환경",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "시장 데이터 조회 실패: no_usable_market_fields"
-                  ]
-                },
-                {
-                  "ticker": "006400",
-                  "name": "삼성SDI",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "시장 데이터 조회 실패: no_usable_market_fields"
-                  ]
-                },
-                {
-                  "ticker": "092870",
-                  "name": "엑시콘",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "시장 데이터 조회 실패: no_usable_market_fields"
-                  ]
-                },
-                {
-                  "ticker": "080580",
-                  "name": "오킨스전자",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "시장 데이터 조회 실패: no_usable_market_fields"
-                  ]
-                },
-                {
-                  "ticker": "097520",
-                  "name": "엠씨넥스 및 옵티머스 카메라 가치사슬",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "시장 데이터 조회 실패: no_usable_market_fields"
-                  ]
-                }
-              ]
-            }
-          },
-          {
             "event_key": "UUG9y8OzB70",
             "content_sha256": "93311af7d95d2d344ebdff85de01784ff1711349f2b2ef0cba7bdb63ee44325a",
             "occurred_at": "2026-10-27T23:56:21+00:00",
@@ -1950,6 +1562,151 @@
                 {
                   "ticker": "035720",
                   "name": "카카오",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "시장 데이터 조회 실패: no_usable_market_fields"
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "event_key": "HoJvid2LcSA",
+            "content_sha256": "df43c630f984c1348b1b0294a673f6e960805927695e407a6a6c814cae1d1b48",
+            "occurred_at": "2026-10-27T08:30:37+00:00",
+            "relevance": {
+              "tickers": [
+                "005930",
+                "000660",
+                "009150",
+                "373220",
+                "006400",
+                "092870",
+                "080580",
+                "097520",
+                "108490"
+              ],
+              "markets": [
+                "KR"
+              ],
+              "themes": [],
+              "match_basis": "verified_entities",
+              "matched_tickers": [
+                "000660",
+                "005930",
+                "006400"
+              ],
+              "market_match": true,
+              "score": 320
+            },
+            "summary": {
+              "video_id": "HoJvid2LcSA",
+              "title": "[#긴급인터뷰]  “지금 팔면 후회, 사면 물린다?” 삼성전자·SK하이닉스 진짜 매수 타이밍은 언제?ㅣ김민수 대표",
+              "channel": "815Money talk",
+              "source_url": "https://www.youtube.com/watch?v=HoJvid2LcSA",
+              "claim_status_summary": {
+                "unverified": 9,
+                "asr_uncertain": 2,
+                "partially_supported": 1
+              },
+              "claims": [
+                {
+                  "claim_id": "C1",
+                  "claim_text": "미국 중간선거 종료에 따른 안도감이라는 발언이 영상 게시일 및 실제 촬영일과 일치하는지 확인해야 한다.",
+                  "status": "unverified",
+                  "confidence": 0.99,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "선거 종료를 확인된 시장 반등 원인으로 제시할 수 없다."
+                },
+                {
+                  "claim_id": "C2",
+                  "claim_text": "국내 지수가 5,550 부근 박스권을 거쳐 5,750에 안착하고 상단 저항으로 회복할 수 있으며 외국인·기관 수급도 나쁘지 않다는 주장이다.",
+                  "status": "unverified",
+                  "confidence": 0.99,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "제시된 수치를 특정 지수의 매매 기준으로 사용할 근거가 부족하다."
+                },
+                {
+                  "claim_id": "C3",
+                  "claim_text": "삼성전자·SK하이닉스·삼성전기·삼성SDI·로보티즈의 이동평균선과 제시 가격 수준을 확인해야 한다.",
+                  "status": "asr_uncertain",
+                  "confidence": 0.98,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "원음·차트 대조 전 목표가, 저항선 또는 200일선 돌파 여부를 확정해서는 안 된다."
+                },
+                {
+                  "claim_id": "C4",
+                  "claim_text": "솔리디그로 인식된 회사 관련 사건이 SK하이닉스 낙폭 확대의 배경이라는 주장이다.",
+                  "status": "unverified",
+                  "confidence": 0.98,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "미확인 사건을 악재 해소나 반등 매수의 근거로 삼을 수 없다."
+                }
+              ],
+              "entities": [
+                {
+                  "ticker": "005930",
+                  "name": "삼성전자",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "시장 데이터 조회 실패: no_usable_market_fields"
+                  ]
+                },
+                {
+                  "ticker": "000660",
+                  "name": "SK하이닉스",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "시장 데이터 조회 실패: no_usable_market_fields"
+                  ]
+                },
+                {
+                  "ticker": "009150",
+                  "name": "삼성전기",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "시장 데이터 조회 실패: no_usable_market_fields"
+                  ]
+                },
+                {
+                  "ticker": "373220",
+                  "name": "LG에너지솔루션 및 전기차 경쟁 환경",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "시장 데이터 조회 실패: no_usable_market_fields"
+                  ]
+                },
+                {
+                  "ticker": "006400",
+                  "name": "삼성SDI",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "시장 데이터 조회 실패: no_usable_market_fields"
+                  ]
+                },
+                {
+                  "ticker": "092870",
+                  "name": "엑시콘",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "시장 데이터 조회 실패: no_usable_market_fields"
+                  ]
+                },
+                {
+                  "ticker": "080580",
+                  "name": "오킨스전자",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "시장 데이터 조회 실패: no_usable_market_fields"
+                  ]
+                },
+                {
+                  "ticker": "097520",
+                  "name": "엠씨넥스 및 옵티머스 카메라 가치사슬",
                   "status": "unverified",
                   "verification_notes": [
                     "시장 데이터 조회 실패: no_usable_market_fields"
@@ -3533,8 +3290,8 @@
               "Wd2jXQClEbk",
               "MvMsNcj80dk",
               "ytsRGIP_NEU",
-              "HoJvid2LcSA",
               "UUG9y8OzB70",
+              "HoJvid2LcSA",
               "s7sXOG8EtGs",
               "GAPD-RQXyhg",
               "pS_xJ_sKTwE",
@@ -3596,8 +3353,8 @@
       "untrusted_external_context": true,
       "global_mode_cannot_promote_a_row": true,
       "immediate_requires_row_mode": "IMMEDIATE",
-      "market_data_asof": "2026-10-28T15:30:00+09:00",
-      "valid_until": "2026-10-28T15:31:00+09:00",
+      "market_data_asof": "2026-10-29T19:04:00+09:00",
+      "valid_until": "2026-10-29T16:17:00+09:00",
       "expired_at_build": true,
       "decision_ready": false,
       "conditional_strategy_ready": false,
@@ -3637,7 +3394,7 @@
       "work_synthesis": {
         "execution_mode": "local",
         "requested_model": "gpt-6.1-sol",
-        "requested_reasoning_effort": "xhigh",
+        "requested_reasoning_effort": "high",
         "task_id": "tradingagents-work-kr",
         "verification_status": "CONFIGURED_NOT_RUNTIME_VERIFIED",
         "observed_model": null,
@@ -3645,7 +3402,7 @@
         "note": "The local task contract is verified; the Work host does not expose a signed per-response model receipt."
       },
       "market_analysis": {
-        "source_run_id": "20261027T050051_local-scheduler-kr-full",
+        "source_run_id": "20261029T190350_manual-kr-failed-recovery",
         "provider": "codex",
         "requested_models": {
           "quick": "gpt-6.1-sol",
@@ -3663,35 +3420,22 @@
           "judge": "xhigh"
         },
         "verification_status": "RUNTIME_USAGE_OBSERVED",
-        "observed_calls": 644,
+        "observed_calls": 93,
         "observed_models": {
           "gpt-6.1-sol": {
-            "calls": 644,
-            "input_tokens": 18386325,
-            "output_tokens": 1572070,
-            "total_tokens": 19958395
+            "calls": 93,
+            "input_tokens": 3411515,
+            "output_tokens": 199852,
+            "total_tokens": 3611367
           }
         },
         "usage_available": true
       },
       "overlay": {
-        "source_run_id": "20261028T152855_local-freshness-kr-overlay",
-        "provider": "codex",
-        "requested_models": {
-          "quick": "gpt-6.1-sol",
-          "deep": "gpt-6.1-sol",
-          "output": "gpt-6.1-sol",
-          "writer": "gpt-6.1-sol",
-          "judge": "gpt-6.1-sol"
-        },
-        "requested_reasoning_effort": {
-          "default": "medium",
-          "quick": "medium",
-          "deep": "xhigh",
-          "output": "medium",
-          "writer": "medium",
-          "judge": "xhigh"
-        },
+        "source_run_id": "20261029T190350_manual-kr-failed-recovery",
+        "provider": null,
+        "requested_models": {},
+        "requested_reasoning_effort": {},
         "verification_status": "CONFIGURED_ONLY",
         "observed_calls": 0,
         "observed_models": {},

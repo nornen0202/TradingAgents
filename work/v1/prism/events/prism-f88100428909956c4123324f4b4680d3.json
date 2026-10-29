@@ -1,0 +1,931 @@
+{
+  "schema": "tradingagents.work-context/v1",
+  "surface": "prism",
+  "event_id": "prism:f88100428909956c4123324f4b4680d3",
+  "prompt_contract_version": "prism-work-v5",
+  "prompt_sha256": "2d6e6a207021f5126507994f77ca7850fa9bf42701a32286227ca874c1f535df",
+  "skill_sha256": "1ff16777e84d43f33fbf97c9a3390b5baf6b3708afefce2497ceaf50fc5984a3",
+  "task_manifest_sha256": "9e6e3caa6895706b3a3712e0866de1f74d70765a125c60e5ee20fdfd9761b972",
+  "workflow_contract_sha256": "fb45db0245144ccbcaa473fdbfec6b78f152299d7f49d22b97f627438fcf4cbf",
+  "source_sha256": "f41a7c17b82c1fc1d8b33d89abb5a9e2f35680850ef7bece59e771d1663a16ef",
+  "body": {
+    "kind": "prism",
+    "source_health": "OK",
+    "source": {
+      "health": "OK",
+      "run_id": "prism_telegram_20261029_091203",
+      "last_run_at": "2026-10-29T09:12:25.014783+09:00",
+      "status": "success",
+      "stale_after_hours": 30
+    },
+    "window_hours": 24,
+    "execution_eligible": false,
+    "evidence_policy": {
+      "profile": "balanced_external",
+      "material_thesis_effects": [
+        "ranking",
+        "confidence",
+        "position_size_within_existing_risk_limits",
+        "research_priority"
+      ],
+      "supported_evidence_weight": "MEDIUM",
+      "partially_supported_evidence_weight": "LOW_TO_MEDIUM",
+      "unverified_evidence_weight": "LOW_LABELED",
+      "user_primary_channels": [
+        "@kpunch",
+        "@sosumonkey"
+      ],
+      "user_primary_source_tier": "USER_PRIMARY",
+      "user_primary_evidence_weight": "HIGH",
+      "user_primary_validation_policy": "USER_ACCEPTED",
+      "matching_multi_source_signal_may_raise_thesis_priority": true,
+      "conflicting_signal_must_be_visible": true,
+      "may_bypass_market_or_portfolio_execution_gate": false
+    },
+    "coverage": {
+      "total_unique_events": 317,
+      "window_events": 14,
+      "transmitted_events": 14,
+      "truncated": false,
+      "oldest_occurred_at": "2026-10-28T18:38:25+00:00",
+      "newest_occurred_at": "2026-10-28T18:53:32+00:00"
+    },
+    "events": [
+      {
+        "event_key": "stock_ai_agent:16834",
+        "content_sha256": "914ae90d4984c27669628b087e3e449846dda0c869c420a7aaad5e372c7f2301",
+        "occurred_at": "2026-10-28T18:53:32+00:00",
+        "relevance": {
+          "tickers": [
+            "HALO",
+            "CRGY",
+            "FRSH",
+            "BKH",
+            "BP",
+            "LLY",
+            "QCOM",
+            "IOVA"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "16834",
+          "posted_at": "2026-10-28T18:53:32+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16834",
+          "preview": "📊 프리즘 US 시뮬레이터 | 실시간 포트폴리오 (2026-10-29 03:53) 🔸 현재 보유: 8/10개 🔸 사용 비중: 5.50/10 슬롯 (분할 매수·시험매수 반영) ✅ 최고 수익: Halozyme Therapeutics, Inc.(HALO) +9.78% ⚠️ 최저 수익: Crescent Energy Company(CRGY) +1.68% 🔸 보유 종목: - Freshworks I...",
+          "signals": [
+            {
+              "canonical_ticker": "HALO",
+              "display_name": "Halozyme Therapeutics, Inc.",
+              "market": "US",
+              "source_asof": "2026-10-28T18:53:32+00:00",
+              "signal_action": "HOLD",
+              "trigger_type": "telegram_portfolio_snapshot",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            },
+            {
+              "canonical_ticker": "CRGY",
+              "display_name": "Crescent Energy Company",
+              "market": "US",
+              "source_asof": "2026-10-28T18:53:32+00:00",
+              "signal_action": "HOLD",
+              "trigger_type": "telegram_portfolio_snapshot",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            },
+            {
+              "canonical_ticker": "FRSH",
+              "display_name": "Freshworks Inc.",
+              "market": "US",
+              "source_asof": "2026-10-28T18:53:32+00:00",
+              "signal_action": "HOLD",
+              "trigger_type": "telegram_portfolio_snapshot",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "stop_loss_price": 14.48,
+              "target_price": 16.43,
+              "confidence": 0.45,
+              "warnings": [
+                "multi_ticker_prices_scoped_to_mention_block"
+              ]
+            },
+            {
+              "canonical_ticker": "BKH",
+              "display_name": "Black Hills Corporation",
+              "market": "US",
+              "source_asof": "2026-10-28T18:53:32+00:00",
+              "signal_action": "HOLD",
+              "trigger_type": "telegram_portfolio_snapshot",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "stop_loss_price": 73.5,
+              "target_price": 91.88,
+              "confidence": 0.45,
+              "warnings": [
+                "multi_ticker_prices_scoped_to_mention_block"
+              ]
+            },
+            {
+              "canonical_ticker": "BP",
+              "display_name": "BP p.l.c.",
+              "market": "US",
+              "source_asof": "2026-10-28T18:53:32+00:00",
+              "signal_action": "HOLD",
+              "trigger_type": "telegram_portfolio_snapshot",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "stop_loss_price": 48.67,
+              "target_price": 58.12,
+              "confidence": 0.45,
+              "warnings": [
+                "multi_ticker_prices_scoped_to_mention_block"
+              ]
+            },
+            {
+              "canonical_ticker": "LLY",
+              "display_name": "Eli Lilly and Company",
+              "market": "US",
+              "source_asof": "2026-10-28T18:53:32+00:00",
+              "signal_action": "HOLD",
+              "trigger_type": "telegram_portfolio_snapshot",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "stop_loss_price": 1208.74,
+              "target_price": 1514.05,
+              "confidence": 0.45,
+              "warnings": [
+                "multi_ticker_prices_scoped_to_mention_block"
+              ]
+            },
+            {
+              "canonical_ticker": "QCOM",
+              "display_name": "QUALCOMM Incorporated",
+              "market": "US",
+              "source_asof": "2026-10-28T18:53:32+00:00",
+              "signal_action": "HOLD",
+              "trigger_type": "telegram_portfolio_snapshot",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "stop_loss_price": 172.18,
+              "target_price": 194.0,
+              "confidence": 0.45,
+              "warnings": [
+                "multi_ticker_prices_scoped_to_mention_block"
+              ]
+            },
+            {
+              "canonical_ticker": "IOVA",
+              "display_name": "Iovance Biotherapeutics, Inc.",
+              "market": "US",
+              "source_asof": "2026-10-28T18:53:32+00:00",
+              "signal_action": "HOLD",
+              "trigger_type": "telegram_portfolio_snapshot",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "stop_loss_price": 13.5,
+              "target_price": 14.99,
+              "confidence": 0.45,
+              "warnings": [
+                "multi_ticker_prices_scoped_to_mention_block"
+              ]
+            }
+          ],
+          "signals_total": 8,
+          "signals_transmitted": 8,
+          "signals_truncated": false,
+          "simulation_only": true,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 1200,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:16833",
+        "content_sha256": "1651262915c567c563aaed726771ba357f4f4f4ad876ac226895691c55799498",
+        "occurred_at": "2026-10-28T18:53:29+00:00",
+        "relevance": {
+          "tickers": [
+            "BSX"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "16833",
+          "posted_at": "2026-10-28T18:53:29+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16833",
+          "preview": "⚠️ 매수 보류: Boston Scientific Corporation(BSX) 현재가: $43.22 매수 점수: 4/10 결정: 미진입 시장 상황: 보통 강세장 산업군: Healthcare 보류 사유: AI 판단: 미진입 — 현재가 43.01이 하락 중인 50일선보다 4.7% 낮아 개별 종목 하락 추세 차단 조건에 해당합니다. / 점수 부족 (4/5) — AI 사유: 현재가 43.01...",
+          "signals": [
+            {
+              "canonical_ticker": "BSX",
+              "display_name": "Boston Scientific Corporation",
+              "market": "US",
+              "source_asof": "2026-10-28T18:53:29+00:00",
+              "signal_action": "NO_ENTRY",
+              "trigger_type": "telegram_buy_skip",
+              "trigger_score": 0.4,
+              "composite_score": 0.4,
+              "stop_loss_price": 41.11,
+              "confidence": 0.4,
+              "warnings": []
+            }
+          ],
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 945,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:16832",
+        "content_sha256": "b04e21baa795e2646f0b4c6b69e285f29977dbf3104983b08959baf59503605a",
+        "occurred_at": "2026-10-28T18:53:27+00:00",
+        "relevance": {
+          "tickers": [
+            "MU"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "16832",
+          "posted_at": "2026-10-28T18:53:27+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16832",
+          "preview": "⚠️ 매수 보류: Micron Technology, Inc.(MU) 현재가: $981.05 매수 점수: 6/10 결정: 미진입 시장 상황: 보통 강세장 산업군: Technology 보류 사유: AI 판단: 미진입 — AI 사유: 구조적 목표가 1032.40달러까지 기대수익률은 5.13%이고, 온건 강세의 최대 허용 손절폭 7%를 적용한 손절가는 913.27달러입니다. 이에 따른 손익비는...",
+          "signals": [
+            {
+              "canonical_ticker": "MU",
+              "display_name": "Micron Technology, Inc.",
+              "market": "US",
+              "source_asof": "2026-10-28T18:53:27+00:00",
+              "signal_action": "NO_ENTRY",
+              "trigger_type": "telegram_buy_skip",
+              "trigger_score": 0.6,
+              "composite_score": 0.6,
+              "target_price": 1032.4,
+              "confidence": 0.6,
+              "warnings": []
+            }
+          ],
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 1068,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:16831",
+        "content_sha256": "5407d4815311d2cfb900316b36e9bf8ba331004635f3af43791efd4e39be5682",
+        "occurred_at": "2026-10-28T18:53:23+00:00",
+        "relevance": {
+          "tickers": [
+            "SDGR"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "16831",
+          "posted_at": "2026-10-28T18:53:23+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16831",
+          "preview": "⚠️ 매수 보류: Schrodinger, Inc.(SDGR) 현재가: $30.39 매수 점수: 2/10 결정: 미진입 시장 상황: 보통 강세장 산업군: Healthcare 보류 사유: AI 판단: 미진입 — 최근 2개 분기 영업손실로 수익성 기준을 충족하지 못했고, 유효 점수 3점이 분할 최소 5점보다 낮습니다. / 점수 부족 (3/5) — AI 사유: 최근 2개 분기 영업손실로 수익성...",
+          "signals": [
+            {
+              "canonical_ticker": "SDGR",
+              "display_name": "Schrodinger, Inc.",
+              "market": "US",
+              "source_asof": "2026-10-28T18:53:23+00:00",
+              "signal_action": "NO_ENTRY",
+              "trigger_type": "telegram_buy_skip",
+              "trigger_score": 0.2,
+              "composite_score": 0.2,
+              "confidence": 0.2,
+              "warnings": []
+            }
+          ],
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 810,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:16830",
+        "content_sha256": "4453a105cd41fddca1b7ff9c8c33970bc3110bef0c5b73886bd9289510a4b8d0",
+        "occurred_at": "2026-10-28T18:46:39+00:00",
+        "relevance": {
+          "tickers": [
+            "BSX"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "16830",
+          "posted_at": "2026-10-28T18:46:39+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16830",
+          "preview": "📊 Boston Scientific Corporation (BSX) O'Neil 인사이트 차트의 베이스/피벗/RS 주석을 함께 참고하세요. ※ 보조 참고용 · 투자 권유 아님",
+          "signals": [
+            {
+              "canonical_ticker": "BSX",
+              "display_name": "Boston Scientific Corporation",
+              "market": "US",
+              "source_asof": "2026-10-28T18:46:39+00:00",
+              "signal_action": "WATCH",
+              "trigger_type": "telegram_oneil_insight",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            }
+          ],
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 97,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:16829",
+        "content_sha256": "deb862973cc71b4e26c4a7ad18bc0bd10fca287f5f5d6f92600dc6abddba338c",
+        "occurred_at": "2026-10-28T18:46:26+00:00",
+        "relevance": {
+          "tickers": [
+            "MU"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "16829",
+          "posted_at": "2026-10-28T18:46:26+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16829",
+          "preview": "📊 Micron Technology, Inc. (MU) O'Neil 인사이트 차트의 베이스/피벗/RS 주석을 함께 참고하세요. ※ 보조 참고용 · 투자 권유 아님",
+          "signals": [
+            {
+              "canonical_ticker": "MU",
+              "display_name": "Micron Technology, Inc.",
+              "market": "US",
+              "source_asof": "2026-10-28T18:46:26+00:00",
+              "signal_action": "WATCH",
+              "trigger_type": "telegram_oneil_insight",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            }
+          ],
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 90,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:16828",
+        "content_sha256": "5385d0fa3c3c3d0b99bf546fef042dcb0421b352ef75f87f790496617ebfa292",
+        "occurred_at": "2026-10-28T18:46:10+00:00",
+        "relevance": {
+          "tickers": [
+            "SDGR"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "16828",
+          "posted_at": "2026-10-28T18:46:10+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16828",
+          "preview": "📊 Schrodinger, Inc. (SDGR) O'Neil 인사이트 차트의 베이스/피벗/RS 주석을 함께 참고하세요. ※ 보조 참고용 · 투자 권유 아님",
+          "signals": [
+            {
+              "canonical_ticker": "SDGR",
+              "display_name": "Schrodinger, Inc.",
+              "market": "US",
+              "source_asof": "2026-10-28T18:46:10+00:00",
+              "signal_action": "WATCH",
+              "trigger_type": "telegram_oneil_insight",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            }
+          ],
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 86,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:16827",
+        "content_sha256": "91d34b5aa702210257b3df67d0933070d104ac37e17875bb9f05cbda85639482",
+        "occurred_at": "2026-10-28T18:45:50+00:00",
+        "relevance": {
+          "tickers": [
+            "BSX"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "16827",
+          "posted_at": "2026-10-28T18:45:50+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16827",
+          "preview": "",
+          "signals": [
+            {
+              "canonical_ticker": "BSX",
+              "display_name": "Boston Scientific Corporation",
+              "market": "US",
+              "source_asof": "2026-10-28T18:45:50+00:00",
+              "signal_action": "WATCH",
+              "trigger_type": "telegram_pdf_report",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            }
+          ],
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "NO_ARCHIVED_TEXT"
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:16826",
+        "content_sha256": "44e2801e358f7c56ca59e1e805d0bee4ed9218a57c5cf4288fe87e97ba3dbcb2",
+        "occurred_at": "2026-10-28T18:45:43+00:00",
+        "relevance": {
+          "tickers": [
+            "MU",
+            "SNDK",
+            "INTC"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "16826",
+          "posted_at": "2026-10-28T18:45:43+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16826",
+          "preview": "",
+          "signals": [
+            {
+              "canonical_ticker": "MU",
+              "display_name": "Micron Technology,  Inc.",
+              "market": "US",
+              "source_asof": "2026-10-28T18:45:43+00:00",
+              "signal_action": "WATCH",
+              "trigger_type": "telegram_pdf_report",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            },
+            {
+              "canonical_ticker": "SNDK",
+              "display_name": "Sandisk",
+              "market": "US",
+              "source_asof": "2026-10-28T18:45:43+00:00",
+              "signal_action": "WATCH",
+              "trigger_type": "telegram_pdf_report",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            },
+            {
+              "canonical_ticker": "INTC",
+              "display_name": "와 Intel",
+              "market": "US",
+              "source_asof": "2026-10-28T18:45:43+00:00",
+              "signal_action": "WATCH",
+              "trigger_type": "telegram_pdf_report",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            }
+          ],
+          "signals_total": 3,
+          "signals_transmitted": 3,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "NO_ARCHIVED_TEXT"
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:16825",
+        "content_sha256": "a200989950efd613a4389266f9cd5a97978d4c8687991e76f31ef128cd87d0f7",
+        "occurred_at": "2026-10-28T18:45:35+00:00",
+        "relevance": {
+          "tickers": [
+            "SDGR"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "16825",
+          "posted_at": "2026-10-28T18:45:35+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16825",
+          "preview": "",
+          "signals": [
+            {
+              "canonical_ticker": "SDGR",
+              "display_name": "Schrodinger,  Inc.",
+              "market": "US",
+              "source_asof": "2026-10-28T18:45:35+00:00",
+              "signal_action": "WATCH",
+              "trigger_type": "telegram_pdf_report",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            }
+          ],
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "NO_ARCHIVED_TEXT"
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:16824",
+        "content_sha256": "42d568c885e64d74af9d68d4423b42319a7717b57146d89c77463a72bf8f7214",
+        "occurred_at": "2026-10-28T18:45:26+00:00",
+        "relevance": {
+          "tickers": [
+            "BSX"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "16824",
+          "posted_at": "2026-10-28T18:45:26+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16824",
+          "preview": "📊 Boston Scientific (BSX) — 심혈관 및 의료기기 기업으로, Cardiovascular와 MedSurg 두 부문에서 진단·치료 기기를 판매합니다. 💰 가격: $43.83 관측값(10/28, 종가 확정 여부 미확인). 전일 확정 종가 $45.06 대비 약 -2.7%입니다. 📈 거래량: 약 4,358만 주로 직전 거래일들(약 878만~1,639만 주)보다 크게 늘었지만,...",
+          "signals": [
+            {
+              "canonical_ticker": "BSX",
+              "display_name": "Boston Scientific",
+              "market": "US",
+              "source_asof": "2026-10-28T18:45:26+00:00",
+              "signal_action": "UNKNOWN",
+              "trigger_type": "telegram_message",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            }
+          ],
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 804,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:16823",
+        "content_sha256": "64027f88b2ea7b7b580e2b45d2fe5ff4220ab57e9ad2cc9164cda4213feed3ad",
+        "occurred_at": "2026-10-28T18:45:17+00:00",
+        "relevance": {
+          "tickers": [
+            "MU"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "16823",
+          "posted_at": "2026-10-28T18:45:17+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16823",
+          "preview": "📊 Micron Technology (MU) | 2026.10.29 미국 나스닥 상장 반도체 기업으로 DRAM·HBM·NAND 메모리를 설계·생산합니다. AI·데이터센터 메모리 수요가 실적 개선의 주요 동력입니다. 💰 거래 현황 - 관측가: $978.58 (10/28, 마감 확정 여부 미확인) - 전일 대비 등락률: 보고서에 비교 가능한 전일 가격이 없어 확인 불가 - 거래량: 약 1,...",
+          "signals": [
+            {
+              "canonical_ticker": "MU",
+              "display_name": "Micron Technology",
+              "market": "US",
+              "source_asof": "2026-10-28T18:45:17+00:00",
+              "signal_action": "UNKNOWN",
+              "trigger_type": "telegram_message",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            }
+          ],
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 891,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:16822",
+        "content_sha256": "b8279a87878431b539ca8d71648086b1e516fec62ce9e1c238a573cb2189a468",
+        "occurred_at": "2026-10-28T18:45:11+00:00",
+        "relevance": {
+          "tickers": [
+            "SDGR"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "16822",
+          "posted_at": "2026-10-28T18:45:11+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16822",
+          "preview": "📊 Schrödinger, Inc. (SDGR) 계산화학 소프트웨어로 신약·소재 개발을 지원하며, 자체 신약개발 사업도 운영합니다. 💵 거래 현황 | 2026.10.28 관측치 - 현재가: $30.385 - 전일 대비: 보고서에 등락률 미제공 - 거래량: 234만 주. 당일 수치는 마감 확정 전 관측값이며, 최근 급등·하락 구간에는 거래량이 크게 늘었습니다(9/17 약 903만 주)....",
+          "signals": [
+            {
+              "canonical_ticker": "SDGR",
+              "display_name": "Schrödinger, Inc.",
+              "market": "US",
+              "source_asof": "2026-10-28T18:45:11+00:00",
+              "signal_action": "UNKNOWN",
+              "trigger_type": "telegram_message",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            }
+          ],
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 869,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:16821",
+        "content_sha256": "39761274eab98334b9326f86a50afba016656aa92c5d81d75f0e7a5d43638f19",
+        "occurred_at": "2026-10-28T18:38:25+00:00",
+        "relevance": {
+          "tickers": [
+            "EMS",
+            "SDGR",
+            "MU",
+            "BSX"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "16821",
+          "posted_at": "2026-10-28T18:38:25+00:00",
+          "source_url": "https://t.me/stock_ai_agent/16821",
+          "preview": "🔔 미국주식 오후 프리즘 시그널 얼럿 📅 2026.10.28 오후 분석 포착된 관심종목 🤖 프리즘봇의 가상 포트폴리오 운용 과정을 투명하게 공개합니다. 실제 매수 권유가 아닙니다. 🧭 장기추세: 온건 강세 | 스윙: 횡보·숨고르기 | 실행기준: 온건 강세 | 선정: 탑다운 1종목 + 바텀업 2종목 🧭 오늘 테마 흐름 미국 1,019종목 · 전일 종가 대비 · 테마별 중앙값 📈 강한 테마...",
+          "signals": [
+            {
+              "canonical_ticker": "EMS",
+              "display_name": "1. 전자제품 위탁생산",
+              "market": "US",
+              "source_asof": "2026-10-28T18:38:25+00:00",
+              "signal_action": "WATCH",
+              "trigger_type": "telegram_signal_alert",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            },
+            {
+              "canonical_ticker": "SDGR",
+              "display_name": "Schrodinger, Inc.",
+              "market": "US",
+              "source_asof": "2026-10-28T18:38:25+00:00",
+              "signal_action": "WATCH",
+              "trigger_type": "telegram_signal_alert",
+              "trigger_score": 0.82,
+              "composite_score": 0.82,
+              "confidence": 0.82,
+              "warnings": []
+            },
+            {
+              "canonical_ticker": "MU",
+              "display_name": "Micron Technology, Inc.",
+              "market": "US",
+              "source_asof": "2026-10-28T18:38:25+00:00",
+              "signal_action": "WATCH",
+              "trigger_type": "telegram_signal_alert",
+              "trigger_score": 0.75,
+              "composite_score": 0.75,
+              "confidence": 0.75,
+              "warnings": []
+            },
+            {
+              "canonical_ticker": "BSX",
+              "display_name": "Boston Scientific Corporation",
+              "market": "US",
+              "source_asof": "2026-10-28T18:38:25+00:00",
+              "signal_action": "WATCH",
+              "trigger_type": "telegram_signal_alert",
+              "trigger_score": 0.7,
+              "composite_score": 0.7,
+              "confidence": 0.7,
+              "warnings": []
+            }
+          ],
+          "signals_total": 4,
+          "signals_transmitted": 4,
+          "signals_truncated": false,
+          "simulation_only": true,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 1092,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      }
+    ],
+    "guardrails": {
+      "untrusted_content": true,
+      "advisory_only": true,
+      "may_promote_market_execution": false,
+      "multi_ticker_message_prices_require_recheck": true
+    },
+    "model_provenance": {
+      "schema": "tradingagents.model-provenance/v1",
+      "work_synthesis": {
+        "execution_mode": "local",
+        "requested_model": "gpt-6.1-sol",
+        "requested_reasoning_effort": "medium",
+        "task_id": "tradingagents-work-prism",
+        "verification_status": "CONFIGURED_NOT_RUNTIME_VERIFIED",
+        "observed_model": null,
+        "observed_reasoning_effort": null,
+        "note": "The local task contract is verified; the Work host does not expose a signed per-response model receipt."
+      }
+    }
+  }
+}
