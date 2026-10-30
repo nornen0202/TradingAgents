@@ -1,10 +1,10 @@
 {
   "schema": "tradingagents.work-report/v1",
   "surface": "prism",
-  "event_id": "prism:b9a53084763e4deef386e27adbc3bc0f",
-  "source_sha256": "9e96c04d1a0f054e8fb63948f985386628df3b63359c65bae79df1f462c50679",
+  "event_id": "prism:ff3590b4b1b6cb0657dd3705c4f58921",
+  "source_sha256": "19335d767f391822d84d1a192e01597f9a6229bf538c267d7f85a77f7b0cff37",
   "prompt_contract_version": "prism-work-v5",
-  "workflow_contract_sha256": "6e9bacf847e1ea3fede5d24780fde443897da2d480119b5ef7dfdc873bb87103",
+  "workflow_contract_sha256": "62868eed0c6d6743a1e951025d1d74566423c35248aaffa4ebdaef6efed4f455",
   "policy": {
     "visibility": "investor_safe_no_credentials",
     "external_evidence_profile": "balanced_external",
@@ -17,27 +17,27 @@
     "external_evidence_may_bypass_execution_gate": false,
     "thesis_is_independent_from_execution_readiness": true
   },
-  "report_markdown": "# PRISM 연구 델타 · 2026-10-29\n\n기준 2026-10-29T10:33:20.541404+09:00 · 소스 정상. 생산 성공 2026-10-29T09:12:25.014783+09:00, 경과 1.35시간(허용 30시간). 원본 범위 10/28 14:49:17–10/29 03:53:32 KST. 모든 이벤트·게시·신호 시각을 실제 현재 시각의 최근 24시간 이내로 검증했습니다.\n\n- **KR:** SK하이닉스·디아이·에이치브이엠 관심 이후 미진입. 추세·분산일·모멘텀 조건 검증을 우선합니다.\n- **US:** SDGR·MU·BSX 관심 이후 미진입. 수익성·손익비·하락 추세 차단을 각각 확인합니다.\n- **반영:** balanced_external LOW_LABELED로 공식 위험 검증의 연구 우선순위를 높입니다. 독립 확인 전 순위·thesis 확신·기존 위험 한도 내 크기를 높이지 않습니다. 시장·계좌·위험 실행 게이트를 유지합니다.\n- **한계:** 같은 채널 반복은 독립 다중 근거가 아닙니다. PDF 16796–16798·16825–16827 전문이 없어 내용은 검증하지 못했습니다. 원문 점수는 독립 검증 확률이 아닙니다.\n- **누적 미처리:** 현재 패킷 밖 수정 45건, 미수신 신규 18건은 PENDING_CANONICAL_BACKLOG_PACKET. 정본 패킷이 없어 ACK하지 않았으며 전체 처리는 미완료입니다.\n\n현재 구간 신규 28·수정 0·동일 제외 0, 28/28 전송, 생략 0, 잘림 없음. 범위 완전성은 현재 구간에 한정합니다.\n\n|종목별 연구 영향|근거 stock_ai_agent 이벤트|\n|---|---|\n|SK하이닉스: 관심 뒤 미진입. 하락 중인 50일선 아래라는 출처 주장과 종가 강세가 공존하므로 공식 조정주가·추세 확인 우선.|16792, 16795, 16798, 16801, 16804|\n|디아이: 관심 뒤 미진입. 높은 원문 점수보다 분산일·약세장 신규 진입 제약을 우선 검증.|16792, 16794, 16797, 16800, 16803|\n|에이치브이엠: 관심 뒤 미진입. 분산일과 모멘텀 보강 조건을 우선 확인; 개별 상승 재료는 확인되지 않음.|16792, 16793, 16796, 16799, 16802|\n|SDGR: 관심 뒤 미진입. 최근 분기 영업손실·점수 부족 주장을 공시로 확인.|16821, 16822, 16825, 16828, 16831|\n|MU: 관심 뒤 미진입. 목표 기대수익 대비 손익비 부족 주장 검증 우선; 관측가는 마감 확정치가 아님.|16821, 16823, 16826, 16829, 16832|\n|BSX: 관심 뒤 미진입. 하락 중인 50일선 아래라는 차단과 거래량 증가가 공존; 공식 추세 확인 우선.|16821, 16824, 16827, 16830, 16833|\n\n실제 주식 관련 메시지도 출처의 연구 신호로만 해석합니다. 원문 가격·목표·손절을 현재 주문값으로 전용하지 않습니다. 특히 다중 종목 가격은 매핑 재확인 전 사용하지 않습니다.\n\n시뮬레이션: 16792·16821은 가상 운용 관심 알림. 16805는 KR 가상 보유 0개, 16834는 US 가상 보유 HALO·CRGY·FRSH·BKH·BP·LLY·QCOM·IOVA 8개를 표시합니다. 이 기록과 수익 통계는 실제 보유·성과·가용 위험 한도의 근거가 아닙니다. 이번 패킷에 BTC 신호는 없습니다.\n\nKR·US 브리핑에는 위 6종목의 검증 우선순위를 전달합니다. 거래소 확정·조정 시세와 거래량, 실제 공시일이 확인되는 기업 공시·IR, 수익성 및 진입 손익비를 확인해야 합니다. 신규매수 제약을 위험 축소 매도에 자동 적용하지 않습니다. 현재 주문 지시는 없습니다.\n\n다음 확인: 다음 성공한 정제 수집 또는 신규·수정 이벤트. 첫 이벤트의 24시간 경과는 10/29 14:49:17 KST입니다. 과거 누적분은 독립 복구 운영자의 정본 backlog 패킷 지원이 필요합니다.\n\nCOVERAGE_RECEIPT {\"event_id\": \"prism:b9a53084763e4deef386e27adbc3bc0f\", \"status\": \"COMPLETE\", \"window_events\": 28, \"transmitted_events\": 28, \"truncated\": false, \"new_events\": 28, \"revised_events\": 0}\n\nMOBILE_HANDOFF {\"owner\": \"external_github_notification_pipeline\", \"status\": \"PENDING_EXTERNAL_VERIFICATION\", \"work_sent_notification\": false}\n\n외부 Telegram·Pages 전달 영수증은 확인되지 않았습니다.",
+  "report_markdown": "# PRISM 연구 델타 · 2026-10-30\n\n신규 21건. ATI·BMO·PURR 미진입 검증 우선순위 상향. 시뮬레이터 위험 축소는 실제 주문과 분리; 과거 63건 미처리 유지.\n\n- 소스 정상: 생산 성공 08:05:12 KST, 검증 10:38:53 KST. 사건 범위 02:52:55–04:56:55 KST, 모든 전송 사건·게시·신호 시각이 최근 24시간 이내이며 미래 시각 없음.\n- ATI·BMO·PURR: 관심 이후 미진입. 공식 추세·재무·손익비 확인을 다음 US 연구의 우선 과제로 올림.\n- LITE 매수 후 매도, LLY 매도, HALO·BKH 손절선 상향은 가상 포트폴리오 맥락. 실제 보유·확정 손익·현재 매도 지시로 해석하지 않음.\n- 현재 창 21/21건, 신규 21·정정 0·동일 제외 0·전송 생략 0, 잘림 없음. 전체 과거 처리는 미완료: 현재 패킷 밖 신규 18·정정 45건은 ACK하지 않음.\n\n## 종목별 연구 영향\n\n| 종목 | 연구 영향 | 근거 event key |\n|---|---|---|\n| ATI | 관심 뒤 미진입. 하락하는 50일선 아래라는 출처 주장을 공식 조정주가와 대조하고 추세 회복 여부 확인을 우선한다. | stock_ai_agent:16913, stock_ai_agent:16907, stock_ai_agent:16901, stock_ai_agent:16900 |\n| BMO | 관심 뒤 미진입. 최근 두 분기 영업흑자·재무 건전성이 검증되지 않았다는 출처 주장을 실제 공시와 대조한다. 원문 목표값이 관측가 아래인 충돌도 있어 수치 사용을 보류한다. | stock_ai_agent:16914, stock_ai_agent:16908, stock_ai_agent:16902, stock_ai_agent:16900 |\n| PURR | 관심 뒤 미진입. 손익비 하한 미달 주장과 HYPE 가격 의존·스테이킹 수익 구조를 공식 공시로 검증한다. 높은 원문 점수는 신뢰도 상향 근거가 아니다. | stock_ai_agent:16915, stock_ai_agent:16909, stock_ai_agent:16903, stock_ai_agent:16900 |\n\n동일 채널의 관심·차트·미진입은 독립 다중 출처가 아니다. balanced_external LOW_LABELED로 공식 위험 검증 우선순위만 상향하고 순위·thesis confidence·비중은 상향하지 않는다. PDF 16904–16906은 보관 본문이 없어 확인 근거로 쓰지 않으며 SBET·BLSH는 비교기업 언급만으로 신규 후보에 편입하지 않는다.\n\n## 시뮬레이션과 분류 주의\n\n16898 LITE BUY는 자체 simulation_only=false이나 16899 가상 보유, 16916 보유 점검, 16917 시뮬레이터 매도와 연결된다. 이를 실제 매수 추천으로 승격하지 않는다. 16912 LLY 매도는 시뮬레이터 성과이며, 16910 BKH·16911 HALO 조정 역시 16918 가상 보유와 연결된 연구 참고다. 포트폴리오 스냅샷의 HALO·CRGY·FRSH·BKH·BP·QCOM 및 과거 LLY·LITE는 사용자 보유 목록이 아니다. 다중 종목 가격·손절·목표와 성과는 실제 전략에 전사하지 않는다.\n\n## KR·US 인계와 미처리\n\nUS는 ATI 추세, BMO 공시 재무, PURR 디지털자산 노출·손익비를 공식 자료로 확인한 후 재평가한다. KR에 직접 매핑된 신규 근거는 없다. 위험 축소 매도 연구는 신규 매수 자금·진입 판단과 별도로 유지한다. 현재 실행 권한은 없으며 시장·계좌·리스크·현재 가격의 모든 게이트를 재확인해야 한다.\n\n정본 전체 338개 대조 결과 현재 창 밖 미열람 신규 18건과 정정 45건이 남았다. prepare는 24시간 창만 전송하므로 해당 과거 이벤트를 안전하게 묶을 정본 패킷 지원 전까지 PENDING_CANONICAL_BACKLOG_PACKET을 유지한다. 이번 ACK는 전송된 21건에만 적용하며 전체 완료를 뜻하지 않는다.\n\n다음 확인: 다음 정상 생산 이벤트 또는 독립 복구 운영자 확인. 현재 첫 이벤트는 2026-10-31 02:52:55 KST에 24시간 경계를 넘음. 과거 18 신규·45 정정은 canonical backlog packet 지원 전까지 ACK 금지.\n\nCOVERAGE_RECEIPT {\"event_id\": \"prism:ff3590b4b1b6cb0657dd3705c4f58921\", \"status\": \"COMPLETE\", \"window_events\": 21, \"transmitted_events\": 21, \"truncated\": false, \"new_events\": 21, \"revised_events\": 0}\n\nMOBILE_HANDOFF {\"owner\": \"external_github_notification_pipeline\", \"status\": \"PENDING_EXTERNAL_VERIFICATION\", \"work_sent_notification\": false}\n\n로컬 발행·ACK는 외부 Telegram 또는 Pages 전달 완료를 뜻하지 않는다. 외부 영수증은 확인되지 않았다.",
   "structured_report": {
     "binding": {
       "surface": "prism",
-      "event_id": "prism:b9a53084763e4deef386e27adbc3bc0f",
-      "source_sha256": "9e96c04d1a0f054e8fb63948f985386628df3b63359c65bae79df1f462c50679"
+      "event_id": "prism:ff3590b4b1b6cb0657dd3705c4f58921",
+      "source_sha256": "19335d767f391822d84d1a192e01597f9a6229bf538c267d7f85a77f7b0cff37"
     },
-    "title": "PRISM 한미 6종목 미진입 검증",
-    "generated_at": "2026-10-29T10:33:20.541404+09:00",
-    "as_of": "2026-10-29T10:33:20.541404+09:00",
+    "title": "PRISM 미국 3종목 미진입 검증",
+    "generated_at": "2026-10-30T10:38:53.494927+09:00",
+    "as_of": "2026-10-30T10:38:53.494927+09:00",
     "source_health": "OK",
     "report_mode": "RESEARCH_DELTA",
-    "summary": "신규 28건. 한·미 6종목 관심 뒤 미진입: 공식 위험 검증 우선순위 상향, 실제 주문·비중 상향 없음.",
+    "summary": "신규 21건. ATI·BMO·PURR 미진입 검증 우선순위 상향. 시뮬레이터 위험 축소는 실제 주문과 분리; 과거 63건 미처리 유지.",
     "top_actions": [],
     "strategies": [
       {
-        "ticker": "000660.KS",
+        "ticker": "ATI",
         "execution": {
           "readiness": "RESEARCH_ONLY"
         },
-        "research_impact": "SK하이닉스: 관심 뒤 미진입. 하락 중인 50일선 아래라는 출처 주장과 종가 강세가 공존하므로 공식 조정주가·추세 확인 우선.",
+        "research_impact": "관심 뒤 미진입. 하락하는 50일선 아래라는 출처 주장을 공식 조정주가와 대조하고 추세 회복 여부 확인을 우선한다.",
         "evidence_weight": "LOW_LABELED",
         "affected_field": "research_priority",
         "ranking_effect": "NO_UPGRADE",
@@ -46,52 +46,44 @@
         "source_contributions": [
           {
             "source": "prism",
-            "event_key": "stock_ai_agent:16804",
-            "content_sha256": "94d8366dd2c67a973ef43bacc4cd4c707b69b0ad4354e418d4bfdcf6495638e1",
+            "event_key": "stock_ai_agent:16913",
+            "content_sha256": "914bbed10c7a0a6f61075fb59ef234c1ade8faf4134c5aecc8eb9b84b81ca5e9",
             "affected_field": "research_priority",
             "direction": "INCREASE_VERIFICATION_PRIORITY",
-            "effect": "SK하이닉스: 관심 뒤 미진입. 하락 중인 50일선 아래라는 출처 주장과 종가 강세가 공존하므로 공식 조정주가·추세 확인 우선."
+            "effect": "관심 뒤 미진입. 하락하는 50일선 아래라는 출처 주장을 공식 조정주가와 대조하고 추세 회복 여부 확인을 우선한다."
           },
           {
             "source": "prism",
-            "event_key": "stock_ai_agent:16801",
-            "content_sha256": "62bf627e23ac4182f173596dcfe0b721481622dc2f2cd7c6b21c1a27b8d0b3bc",
+            "event_key": "stock_ai_agent:16907",
+            "content_sha256": "ea6ba2dd0c84e65f47e4b24e1c40041683596ad18ef63bb13d9987ccb3a146a9",
             "affected_field": "research_priority",
             "direction": "INCREASE_VERIFICATION_PRIORITY",
-            "effect": "SK하이닉스: 관심 뒤 미진입. 하락 중인 50일선 아래라는 출처 주장과 종가 강세가 공존하므로 공식 조정주가·추세 확인 우선."
+            "effect": "관심 뒤 미진입. 하락하는 50일선 아래라는 출처 주장을 공식 조정주가와 대조하고 추세 회복 여부 확인을 우선한다."
           },
           {
             "source": "prism",
-            "event_key": "stock_ai_agent:16798",
-            "content_sha256": "3c55baccbf536d592b9dab4cd4d752ec7374b4bd3ae169c5e6825f22afcdaed6",
+            "event_key": "stock_ai_agent:16901",
+            "content_sha256": "0eefb7e3a0563f892cfc18843cb5a7065726c6018c4c7b50639b0aa4ae02944c",
             "affected_field": "research_priority",
             "direction": "INCREASE_VERIFICATION_PRIORITY",
-            "effect": "SK하이닉스: 관심 뒤 미진입. 하락 중인 50일선 아래라는 출처 주장과 종가 강세가 공존하므로 공식 조정주가·추세 확인 우선."
+            "effect": "관심 뒤 미진입. 하락하는 50일선 아래라는 출처 주장을 공식 조정주가와 대조하고 추세 회복 여부 확인을 우선한다."
           },
           {
             "source": "prism",
-            "event_key": "stock_ai_agent:16795",
-            "content_sha256": "9c2a7f19ea880182e2742b711117f27f65c06651e5e8ad1a32a8f52d2b16e6dc",
+            "event_key": "stock_ai_agent:16900",
+            "content_sha256": "12eadf0c076a692158e2457ad7ed924e5009507b2884ef7bd49f634f1decfc99",
             "affected_field": "research_priority",
             "direction": "INCREASE_VERIFICATION_PRIORITY",
-            "effect": "SK하이닉스: 관심 뒤 미진입. 하락 중인 50일선 아래라는 출처 주장과 종가 강세가 공존하므로 공식 조정주가·추세 확인 우선."
-          },
-          {
-            "source": "prism",
-            "event_key": "stock_ai_agent:16792",
-            "content_sha256": "a8d3f81ca4c478b7652f3b7b8d7d04cb61a2591efba71d61c88c6e65bb839480",
-            "affected_field": "research_priority",
-            "direction": "INCREASE_VERIFICATION_PRIORITY",
-            "effect": "SK하이닉스: 관심 뒤 미진입. 하락 중인 50일선 아래라는 출처 주장과 종가 강세가 공존하므로 공식 조정주가·추세 확인 우선."
+            "effect": "관심 뒤 미진입. 하락하는 50일선 아래라는 출처 주장을 공식 조정주가와 대조하고 추세 회복 여부 확인을 우선한다."
           }
         ]
       },
       {
-        "ticker": "003160.KS",
+        "ticker": "BMO",
         "execution": {
           "readiness": "RESEARCH_ONLY"
         },
-        "research_impact": "디아이: 관심 뒤 미진입. 높은 원문 점수보다 분산일·약세장 신규 진입 제약을 우선 검증.",
+        "research_impact": "관심 뒤 미진입. 최근 두 분기 영업흑자·재무 건전성이 검증되지 않았다는 출처 주장을 실제 공시와 대조한다. 원문 목표값이 관측가 아래인 충돌도 있어 수치 사용을 보류한다.",
         "evidence_weight": "LOW_LABELED",
         "affected_field": "research_priority",
         "ranking_effect": "NO_UPGRADE",
@@ -100,52 +92,44 @@
         "source_contributions": [
           {
             "source": "prism",
-            "event_key": "stock_ai_agent:16803",
-            "content_sha256": "cc03e96fc3c1477269e60ff83c5a6ea4ea3c2baa0d57a6f2dedc47b733596599",
+            "event_key": "stock_ai_agent:16914",
+            "content_sha256": "a7dbe5e5642d2ab29c4369ce378744bdeac57929e7aa6629ff2e963c53e0599d",
             "affected_field": "research_priority",
             "direction": "INCREASE_VERIFICATION_PRIORITY",
-            "effect": "디아이: 관심 뒤 미진입. 높은 원문 점수보다 분산일·약세장 신규 진입 제약을 우선 검증."
+            "effect": "관심 뒤 미진입. 최근 두 분기 영업흑자·재무 건전성이 검증되지 않았다는 출처 주장을 실제 공시와 대조한다. 원문 목표값이 관측가 아래인 충돌도 있어 수치 사용을 보류한다."
           },
           {
             "source": "prism",
-            "event_key": "stock_ai_agent:16800",
-            "content_sha256": "06cc4b92746d4209b2d76826e9add91725885409d4e577cebd69ec48dee300ea",
+            "event_key": "stock_ai_agent:16908",
+            "content_sha256": "44b3286880182d1471d37a62baeaa5838d754fe0ac38b7fc7a08cf38c9d07de8",
             "affected_field": "research_priority",
             "direction": "INCREASE_VERIFICATION_PRIORITY",
-            "effect": "디아이: 관심 뒤 미진입. 높은 원문 점수보다 분산일·약세장 신규 진입 제약을 우선 검증."
+            "effect": "관심 뒤 미진입. 최근 두 분기 영업흑자·재무 건전성이 검증되지 않았다는 출처 주장을 실제 공시와 대조한다. 원문 목표값이 관측가 아래인 충돌도 있어 수치 사용을 보류한다."
           },
           {
             "source": "prism",
-            "event_key": "stock_ai_agent:16797",
-            "content_sha256": "35024c2b02cc6f94cdf7b06a3b97e0af24cea9d1bfc0af5feea6a9c16299dec8",
+            "event_key": "stock_ai_agent:16902",
+            "content_sha256": "fd4c11fdc011b4be949e0c956a6412447adb93634d1767c8c8a08dfc18db0c15",
             "affected_field": "research_priority",
             "direction": "INCREASE_VERIFICATION_PRIORITY",
-            "effect": "디아이: 관심 뒤 미진입. 높은 원문 점수보다 분산일·약세장 신규 진입 제약을 우선 검증."
+            "effect": "관심 뒤 미진입. 최근 두 분기 영업흑자·재무 건전성이 검증되지 않았다는 출처 주장을 실제 공시와 대조한다. 원문 목표값이 관측가 아래인 충돌도 있어 수치 사용을 보류한다."
           },
           {
             "source": "prism",
-            "event_key": "stock_ai_agent:16794",
-            "content_sha256": "140a1734d52dbb9b577cdc67cc76e7b00f96685d7c0eb4d3f82b6e2f2047172f",
+            "event_key": "stock_ai_agent:16900",
+            "content_sha256": "12eadf0c076a692158e2457ad7ed924e5009507b2884ef7bd49f634f1decfc99",
             "affected_field": "research_priority",
             "direction": "INCREASE_VERIFICATION_PRIORITY",
-            "effect": "디아이: 관심 뒤 미진입. 높은 원문 점수보다 분산일·약세장 신규 진입 제약을 우선 검증."
-          },
-          {
-            "source": "prism",
-            "event_key": "stock_ai_agent:16792",
-            "content_sha256": "a8d3f81ca4c478b7652f3b7b8d7d04cb61a2591efba71d61c88c6e65bb839480",
-            "affected_field": "research_priority",
-            "direction": "INCREASE_VERIFICATION_PRIORITY",
-            "effect": "디아이: 관심 뒤 미진입. 높은 원문 점수보다 분산일·약세장 신규 진입 제약을 우선 검증."
+            "effect": "관심 뒤 미진입. 최근 두 분기 영업흑자·재무 건전성이 검증되지 않았다는 출처 주장을 실제 공시와 대조한다. 원문 목표값이 관측가 아래인 충돌도 있어 수치 사용을 보류한다."
           }
         ]
       },
       {
-        "ticker": "295310.KS",
+        "ticker": "PURR",
         "execution": {
           "readiness": "RESEARCH_ONLY"
         },
-        "research_impact": "에이치브이엠: 관심 뒤 미진입. 분산일과 모멘텀 보강 조건을 우선 확인; 개별 상승 재료는 확인되지 않음.",
+        "research_impact": "관심 뒤 미진입. 손익비 하한 미달 주장과 HYPE 가격 의존·스테이킹 수익 구조를 공식 공시로 검증한다. 높은 원문 점수는 신뢰도 상향 근거가 아니다.",
         "evidence_weight": "LOW_LABELED",
         "affected_field": "research_priority",
         "ranking_effect": "NO_UPGRADE",
@@ -154,216 +138,46 @@
         "source_contributions": [
           {
             "source": "prism",
-            "event_key": "stock_ai_agent:16802",
-            "content_sha256": "4a4f4061610f9d511518dea31fb32df93d596c97d602a47d3e942c5b3ed5087f",
+            "event_key": "stock_ai_agent:16915",
+            "content_sha256": "dbd12eda289b4b521726a7eed9f073677c67deb072056ddc6f8f88cdc1dec82d",
             "affected_field": "research_priority",
             "direction": "INCREASE_VERIFICATION_PRIORITY",
-            "effect": "에이치브이엠: 관심 뒤 미진입. 분산일과 모멘텀 보강 조건을 우선 확인; 개별 상승 재료는 확인되지 않음."
+            "effect": "관심 뒤 미진입. 손익비 하한 미달 주장과 HYPE 가격 의존·스테이킹 수익 구조를 공식 공시로 검증한다. 높은 원문 점수는 신뢰도 상향 근거가 아니다."
           },
           {
             "source": "prism",
-            "event_key": "stock_ai_agent:16799",
-            "content_sha256": "751c66913a10137012cdf9b72b76a854bf3d224013c5e80aeaf3521e945ad881",
+            "event_key": "stock_ai_agent:16909",
+            "content_sha256": "d3498cc23e4a710c95a51b37ebca4514190423b64e3905bec147f9e0fe4978ca",
             "affected_field": "research_priority",
             "direction": "INCREASE_VERIFICATION_PRIORITY",
-            "effect": "에이치브이엠: 관심 뒤 미진입. 분산일과 모멘텀 보강 조건을 우선 확인; 개별 상승 재료는 확인되지 않음."
+            "effect": "관심 뒤 미진입. 손익비 하한 미달 주장과 HYPE 가격 의존·스테이킹 수익 구조를 공식 공시로 검증한다. 높은 원문 점수는 신뢰도 상향 근거가 아니다."
           },
           {
             "source": "prism",
-            "event_key": "stock_ai_agent:16796",
-            "content_sha256": "2d74156ef2c2a1f9e159e8b858b34203d2dc87b8c47db05892f087e2261ceef9",
+            "event_key": "stock_ai_agent:16903",
+            "content_sha256": "d98d4e79361cf7356a7d7da3ec8c94980b51e835a558e533b15a2d44ea804650",
             "affected_field": "research_priority",
             "direction": "INCREASE_VERIFICATION_PRIORITY",
-            "effect": "에이치브이엠: 관심 뒤 미진입. 분산일과 모멘텀 보강 조건을 우선 확인; 개별 상승 재료는 확인되지 않음."
+            "effect": "관심 뒤 미진입. 손익비 하한 미달 주장과 HYPE 가격 의존·스테이킹 수익 구조를 공식 공시로 검증한다. 높은 원문 점수는 신뢰도 상향 근거가 아니다."
           },
           {
             "source": "prism",
-            "event_key": "stock_ai_agent:16793",
-            "content_sha256": "59bda530fcf46324521880a8fb3d0166886ca327cc526ec493b35063886dd70e",
+            "event_key": "stock_ai_agent:16900",
+            "content_sha256": "12eadf0c076a692158e2457ad7ed924e5009507b2884ef7bd49f634f1decfc99",
             "affected_field": "research_priority",
             "direction": "INCREASE_VERIFICATION_PRIORITY",
-            "effect": "에이치브이엠: 관심 뒤 미진입. 분산일과 모멘텀 보강 조건을 우선 확인; 개별 상승 재료는 확인되지 않음."
-          },
-          {
-            "source": "prism",
-            "event_key": "stock_ai_agent:16792",
-            "content_sha256": "a8d3f81ca4c478b7652f3b7b8d7d04cb61a2591efba71d61c88c6e65bb839480",
-            "affected_field": "research_priority",
-            "direction": "INCREASE_VERIFICATION_PRIORITY",
-            "effect": "에이치브이엠: 관심 뒤 미진입. 분산일과 모멘텀 보강 조건을 우선 확인; 개별 상승 재료는 확인되지 않음."
-          }
-        ]
-      },
-      {
-        "ticker": "SDGR",
-        "execution": {
-          "readiness": "RESEARCH_ONLY"
-        },
-        "research_impact": "SDGR: 관심 뒤 미진입. 최근 분기 영업손실·점수 부족 주장을 공시로 확인.",
-        "evidence_weight": "LOW_LABELED",
-        "affected_field": "research_priority",
-        "ranking_effect": "NO_UPGRADE",
-        "confidence_effect": "NO_UPGRADE",
-        "sizing_effect": "NO_INCREASE",
-        "source_contributions": [
-          {
-            "source": "prism",
-            "event_key": "stock_ai_agent:16831",
-            "content_sha256": "5407d4815311d2cfb900316b36e9bf8ba331004635f3af43791efd4e39be5682",
-            "affected_field": "research_priority",
-            "direction": "INCREASE_VERIFICATION_PRIORITY",
-            "effect": "SDGR: 관심 뒤 미진입. 최근 분기 영업손실·점수 부족 주장을 공시로 확인."
-          },
-          {
-            "source": "prism",
-            "event_key": "stock_ai_agent:16828",
-            "content_sha256": "5385d0fa3c3c3d0b99bf546fef042dcb0421b352ef75f87f790496617ebfa292",
-            "affected_field": "research_priority",
-            "direction": "INCREASE_VERIFICATION_PRIORITY",
-            "effect": "SDGR: 관심 뒤 미진입. 최근 분기 영업손실·점수 부족 주장을 공시로 확인."
-          },
-          {
-            "source": "prism",
-            "event_key": "stock_ai_agent:16825",
-            "content_sha256": "a200989950efd613a4389266f9cd5a97978d4c8687991e76f31ef128cd87d0f7",
-            "affected_field": "research_priority",
-            "direction": "INCREASE_VERIFICATION_PRIORITY",
-            "effect": "SDGR: 관심 뒤 미진입. 최근 분기 영업손실·점수 부족 주장을 공시로 확인."
-          },
-          {
-            "source": "prism",
-            "event_key": "stock_ai_agent:16822",
-            "content_sha256": "b8279a87878431b539ca8d71648086b1e516fec62ce9e1c238a573cb2189a468",
-            "affected_field": "research_priority",
-            "direction": "INCREASE_VERIFICATION_PRIORITY",
-            "effect": "SDGR: 관심 뒤 미진입. 최근 분기 영업손실·점수 부족 주장을 공시로 확인."
-          },
-          {
-            "source": "prism",
-            "event_key": "stock_ai_agent:16821",
-            "content_sha256": "39761274eab98334b9326f86a50afba016656aa92c5d81d75f0e7a5d43638f19",
-            "affected_field": "research_priority",
-            "direction": "INCREASE_VERIFICATION_PRIORITY",
-            "effect": "SDGR: 관심 뒤 미진입. 최근 분기 영업손실·점수 부족 주장을 공시로 확인."
-          }
-        ]
-      },
-      {
-        "ticker": "MU",
-        "execution": {
-          "readiness": "RESEARCH_ONLY"
-        },
-        "research_impact": "MU: 관심 뒤 미진입. 목표 기대수익 대비 손익비 부족 주장 검증 우선; 관측가는 마감 확정치가 아님.",
-        "evidence_weight": "LOW_LABELED",
-        "affected_field": "research_priority",
-        "ranking_effect": "NO_UPGRADE",
-        "confidence_effect": "NO_UPGRADE",
-        "sizing_effect": "NO_INCREASE",
-        "source_contributions": [
-          {
-            "source": "prism",
-            "event_key": "stock_ai_agent:16832",
-            "content_sha256": "b04e21baa795e2646f0b4c6b69e285f29977dbf3104983b08959baf59503605a",
-            "affected_field": "research_priority",
-            "direction": "INCREASE_VERIFICATION_PRIORITY",
-            "effect": "MU: 관심 뒤 미진입. 목표 기대수익 대비 손익비 부족 주장 검증 우선; 관측가는 마감 확정치가 아님."
-          },
-          {
-            "source": "prism",
-            "event_key": "stock_ai_agent:16829",
-            "content_sha256": "deb862973cc71b4e26c4a7ad18bc0bd10fca287f5f5d6f92600dc6abddba338c",
-            "affected_field": "research_priority",
-            "direction": "INCREASE_VERIFICATION_PRIORITY",
-            "effect": "MU: 관심 뒤 미진입. 목표 기대수익 대비 손익비 부족 주장 검증 우선; 관측가는 마감 확정치가 아님."
-          },
-          {
-            "source": "prism",
-            "event_key": "stock_ai_agent:16826",
-            "content_sha256": "44e2801e358f7c56ca59e1e805d0bee4ed9218a57c5cf4288fe87e97ba3dbcb2",
-            "affected_field": "research_priority",
-            "direction": "INCREASE_VERIFICATION_PRIORITY",
-            "effect": "MU: 관심 뒤 미진입. 목표 기대수익 대비 손익비 부족 주장 검증 우선; 관측가는 마감 확정치가 아님."
-          },
-          {
-            "source": "prism",
-            "event_key": "stock_ai_agent:16823",
-            "content_sha256": "64027f88b2ea7b7b580e2b45d2fe5ff4220ab57e9ad2cc9164cda4213feed3ad",
-            "affected_field": "research_priority",
-            "direction": "INCREASE_VERIFICATION_PRIORITY",
-            "effect": "MU: 관심 뒤 미진입. 목표 기대수익 대비 손익비 부족 주장 검증 우선; 관측가는 마감 확정치가 아님."
-          },
-          {
-            "source": "prism",
-            "event_key": "stock_ai_agent:16821",
-            "content_sha256": "39761274eab98334b9326f86a50afba016656aa92c5d81d75f0e7a5d43638f19",
-            "affected_field": "research_priority",
-            "direction": "INCREASE_VERIFICATION_PRIORITY",
-            "effect": "MU: 관심 뒤 미진입. 목표 기대수익 대비 손익비 부족 주장 검증 우선; 관측가는 마감 확정치가 아님."
-          }
-        ]
-      },
-      {
-        "ticker": "BSX",
-        "execution": {
-          "readiness": "RESEARCH_ONLY"
-        },
-        "research_impact": "BSX: 관심 뒤 미진입. 하락 중인 50일선 아래라는 차단과 거래량 증가가 공존; 공식 추세 확인 우선.",
-        "evidence_weight": "LOW_LABELED",
-        "affected_field": "research_priority",
-        "ranking_effect": "NO_UPGRADE",
-        "confidence_effect": "NO_UPGRADE",
-        "sizing_effect": "NO_INCREASE",
-        "source_contributions": [
-          {
-            "source": "prism",
-            "event_key": "stock_ai_agent:16833",
-            "content_sha256": "1651262915c567c563aaed726771ba357f4f4f4ad876ac226895691c55799498",
-            "affected_field": "research_priority",
-            "direction": "INCREASE_VERIFICATION_PRIORITY",
-            "effect": "BSX: 관심 뒤 미진입. 하락 중인 50일선 아래라는 차단과 거래량 증가가 공존; 공식 추세 확인 우선."
-          },
-          {
-            "source": "prism",
-            "event_key": "stock_ai_agent:16830",
-            "content_sha256": "4453a105cd41fddca1b7ff9c8c33970bc3110bef0c5b73886bd9289510a4b8d0",
-            "affected_field": "research_priority",
-            "direction": "INCREASE_VERIFICATION_PRIORITY",
-            "effect": "BSX: 관심 뒤 미진입. 하락 중인 50일선 아래라는 차단과 거래량 증가가 공존; 공식 추세 확인 우선."
-          },
-          {
-            "source": "prism",
-            "event_key": "stock_ai_agent:16827",
-            "content_sha256": "91d34b5aa702210257b3df67d0933070d104ac37e17875bb9f05cbda85639482",
-            "affected_field": "research_priority",
-            "direction": "INCREASE_VERIFICATION_PRIORITY",
-            "effect": "BSX: 관심 뒤 미진입. 하락 중인 50일선 아래라는 차단과 거래량 증가가 공존; 공식 추세 확인 우선."
-          },
-          {
-            "source": "prism",
-            "event_key": "stock_ai_agent:16824",
-            "content_sha256": "42d568c885e64d74af9d68d4423b42319a7717b57146d89c77463a72bf8f7214",
-            "affected_field": "research_priority",
-            "direction": "INCREASE_VERIFICATION_PRIORITY",
-            "effect": "BSX: 관심 뒤 미진입. 하락 중인 50일선 아래라는 차단과 거래량 증가가 공존; 공식 추세 확인 우선."
-          },
-          {
-            "source": "prism",
-            "event_key": "stock_ai_agent:16821",
-            "content_sha256": "39761274eab98334b9326f86a50afba016656aa92c5d81d75f0e7a5d43638f19",
-            "affected_field": "research_priority",
-            "direction": "INCREASE_VERIFICATION_PRIORITY",
-            "effect": "BSX: 관심 뒤 미진입. 하락 중인 50일선 아래라는 차단과 거래량 증가가 공존; 공식 추세 확인 우선."
+            "effect": "관심 뒤 미진입. 손익비 하한 미달 주장과 HYPE 가격 의존·스테이킹 수익 구조를 공식 공시로 검증한다. 높은 원문 점수는 신뢰도 상향 근거가 아니다."
           }
         ]
       }
     ],
     "coverage_receipt": {
-      "event_id": "prism:b9a53084763e4deef386e27adbc3bc0f",
+      "event_id": "prism:ff3590b4b1b6cb0657dd3705c4f58921",
       "status": "COMPLETE",
-      "window_events": 28,
-      "transmitted_events": 28,
+      "window_events": 21,
+      "transmitted_events": 21,
       "truncated": false,
-      "new_events": 28,
+      "new_events": 21,
       "revised_events": 0
     },
     "model_receipt": {
@@ -382,52 +196,45 @@
     "source_summary": {
       "source": {
         "health": "OK",
-        "run_id": "prism_telegram_20261029_091203",
-        "last_run_at": "2026-10-29T09:12:25.014783+09:00",
+        "run_id": "prism_telegram_20261030_080500",
+        "last_run_at": "2026-10-30T08:05:12.559362+09:00",
         "status": "success",
         "stale_after_hours": 30
       },
       "coverage": {
-        "total_unique_events": 317,
-        "window_events": 28,
-        "transmitted_events": 28,
+        "total_unique_events": 338,
+        "window_events": 21,
+        "transmitted_events": 21,
         "truncated": false,
-        "oldest_occurred_at": "2026-10-28T05:49:17+00:00",
-        "newest_occurred_at": "2026-10-28T18:53:32+00:00"
+        "oldest_occurred_at": "2026-10-29T17:52:55+00:00",
+        "newest_occurred_at": "2026-10-29T19:56:55+00:00"
       },
       "delta": {
-        "new_events": 28,
+        "new_events": 21,
         "revised_events": 0,
         "unchanged_events": 0,
         "delivered_event_keys": [
-          "stock_ai_agent:16834",
-          "stock_ai_agent:16833",
-          "stock_ai_agent:16832",
-          "stock_ai_agent:16831",
-          "stock_ai_agent:16830",
-          "stock_ai_agent:16829",
-          "stock_ai_agent:16828",
-          "stock_ai_agent:16827",
-          "stock_ai_agent:16826",
-          "stock_ai_agent:16825",
-          "stock_ai_agent:16824",
-          "stock_ai_agent:16823",
-          "stock_ai_agent:16822",
-          "stock_ai_agent:16821",
-          "stock_ai_agent:16805",
-          "stock_ai_agent:16804",
-          "stock_ai_agent:16803",
-          "stock_ai_agent:16802",
-          "stock_ai_agent:16801",
-          "stock_ai_agent:16800",
-          "stock_ai_agent:16799",
-          "stock_ai_agent:16798",
-          "stock_ai_agent:16797",
-          "stock_ai_agent:16796",
-          "stock_ai_agent:16795",
-          "stock_ai_agent:16794",
-          "stock_ai_agent:16793",
-          "stock_ai_agent:16792"
+          "stock_ai_agent:16918",
+          "stock_ai_agent:16917",
+          "stock_ai_agent:16916",
+          "stock_ai_agent:16915",
+          "stock_ai_agent:16914",
+          "stock_ai_agent:16913",
+          "stock_ai_agent:16912",
+          "stock_ai_agent:16911",
+          "stock_ai_agent:16910",
+          "stock_ai_agent:16909",
+          "stock_ai_agent:16908",
+          "stock_ai_agent:16907",
+          "stock_ai_agent:16906",
+          "stock_ai_agent:16905",
+          "stock_ai_agent:16904",
+          "stock_ai_agent:16903",
+          "stock_ai_agent:16902",
+          "stock_ai_agent:16901",
+          "stock_ai_agent:16900",
+          "stock_ai_agent:16899",
+          "stock_ai_agent:16898"
         ]
       },
       "evidence_policy": {
@@ -454,83 +261,22 @@
       },
       "backlog": {
         "status": "PENDING_CANONICAL_BACKLOG_PACKET",
-        "unacknowledged_events": 63,
-        "unseen_new_events": 18,
-        "event_keys": [
-          "stock_ai_agent:16791",
-          "stock_ai_agent:16790",
-          "stock_ai_agent:16789",
-          "stock_ai_agent:16788",
-          "stock_ai_agent:16787",
-          "stock_ai_agent:16786",
-          "stock_ai_agent:16785",
-          "stock_ai_agent:16784",
-          "stock_ai_agent:16783",
-          "stock_ai_agent:16782",
-          "stock_ai_agent:16781",
-          "stock_ai_agent:16780",
-          "stock_ai_agent:16779",
-          "stock_ai_agent:16778",
-          "stock_ai_agent:16777",
-          "stock_ai_agent:16776",
-          "stock_ai_agent:16775",
-          "stock_ai_agent:16774",
-          "stock_ai_agent:16335",
-          "stock_ai_agent:16287",
-          "stock_ai_agent:16286",
-          "stock_ai_agent:16285",
-          "stock_ai_agent:16284",
-          "stock_ai_agent:16283",
-          "stock_ai_agent:16282",
-          "stock_ai_agent:16281",
-          "stock_ai_agent:16280",
-          "stock_ai_agent:16279",
-          "stock_ai_agent:16266",
-          "stock_ai_agent:16265",
-          "stock_ai_agent:16264",
-          "stock_ai_agent:16263",
-          "stock_ai_agent:16262",
-          "stock_ai_agent:16233",
-          "stock_ai_agent:16232",
-          "stock_ai_agent:16231",
-          "stock_ai_agent:16230",
-          "stock_ai_agent:16229",
-          "stock_ai_agent:16164",
-          "stock_ai_agent:16112",
-          "stock_ai_agent:16098",
-          "stock_ai_agent:16045",
-          "stock_ai_agent:16009",
-          "stock_ai_agent:16008",
-          "stock_ai_agent:16005",
-          "stock_ai_agent:16003",
-          "stock_ai_agent:16002",
-          "stock_ai_agent:16001",
-          "stock_ai_agent:16000",
-          "stock_ai_agent:15999",
-          "stock_ai_agent:15998",
-          "stock_ai_agent:15931",
-          "stock_ai_agent:15930",
-          "stock_ai_agent:15929",
-          "stock_ai_agent:15928",
-          "stock_ai_agent:15905",
-          "stock_ai_agent:15866",
-          "stock_ai_agent:15865",
-          "stock_ai_agent:15864",
-          "stock_ai_agent:15863",
-          "stock_ai_agent:15862",
-          "stock_ai_agent:15807",
-          "stock_ai_agent:15794"
-        ]
+        "unseen_events": 18,
+        "revised_events": 45,
+        "overall_processing": "INCOMPLETE"
       },
+      "external_delivery_verified": false,
       "mobile_handoff": {
         "owner": "external_github_notification_pipeline",
         "status": "PENDING_EXTERNAL_VERIFICATION",
         "work_sent_notification": false
-      }
+      },
+      "validation_at": "2026-10-30T10:38:53.494927+09:00",
+      "all_transmitted_dates_valid": true
     },
-    "next_checkpoint": "다음 성공 수집 및 정본 backlog 패킷 지원"
+    "next_checkpoint": "다음 정상 생산 이벤트 또는 독립 복구 운영자 확인. 현재 첫 이벤트는 2026-10-31 02:52:55 KST에 24시간 경계를 넘음. 과거 18 신규·45 정정은 canonical backlog packet 지원 전까지 ACK 금지."
   },
-  "report_id": "prism:cd747c757ca62920f1ace66654fb5d77",
-  "report_sha256": "cd747c757ca62920f1ace66654fb5d77dadb7f7735b5e83fe2d2573f36570853",
-  "published_at": "2026-10-29T10:33:36.644014+09:00"
+  "report_id": "prism:0cba13b761ede017556dd4165011a077",
+  "report_sha256": "0cba13b761ede017556dd4165011a0772f182a219220279daf8e24aff5d7b0d7",
+  "published_at": "2026-10-30T10:38:57.810271+09:00"
 }
