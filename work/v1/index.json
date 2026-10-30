@@ -4,9 +4,9 @@
     "kr": {
       "schema": "tradingagents.work-context/v1",
       "surface": "kr",
-      "event_id": "kr:9d83ed118562bf723bab42bc9803be8d",
-      "source_sha256": "9e9abe60bdee983ec7ae3afc603cbd77c312e736f68e475a1f4a5a6b12ef48cd",
-      "packet_sha256": "054a1917deb51eabcaccf294fcfe87a2fa2be7604cfd4f04b55e0d01e6123184",
+      "event_id": "kr:9af62ad4bea8dcf316cd63c67b7e3986",
+      "source_sha256": "7a7e46805032882a398dfa92cca4e2ac6a865b023aa150729e8b54d8fa82a020",
+      "packet_sha256": "023b8d3f3a84b4393e9e67d822d95fa84d623a631f6fe6d87690995d5d21dc6e",
       "prompt_contract_version": "market-work-v12-kr",
       "prompt_sha256": "ae80093efe2dcfe7f6131b8b09100f75e77b0ca0242b5340d15eb6ec3fd81274",
       "skill_sha256": "2fc508d85fe6afb80608a3d2ca1ada647cb71254d0e38d7828f498908f28e99a",
@@ -14,187 +14,187 @@
       "workflow_contract_sha256": "d98bbbc62f089ef51d2e8aa759dbed033bf917a0d6ad721d6c3153f35f296904",
       "status_url": "https://nornen0202.github.io/TradingAgents/work/v1/kr/status.json",
       "latest_url": "https://nornen0202.github.io/TradingAgents/work/v1/kr/latest.json",
-      "event_url": "https://nornen0202.github.io/TradingAgents/work/v1/kr/events/kr-9d83ed118562bf723bab42bc9803be8d.json",
+      "event_url": "https://nornen0202.github.io/TradingAgents/work/v1/kr/events/kr-9af62ad4bea8dcf316cd63c67b7e3986.json",
       "prompt_url": "https://nornen0202.github.io/TradingAgents/work/v1/prompts/market_kr.md",
-      "source_health": "STALE",
-      "report_mode": "OUTAGE",
+      "source_health": "OK",
+      "report_mode": "CONDITIONAL",
       "freshness_receipt": {
         "schema": "tradingagents.source-freshness/v1",
-        "producer_run_id": "20261030T050115_local-scheduler-kr-full",
-        "producer_started_at": "2026-10-30T05:01:15.744858+09:00",
-        "producer_finished_at": "2026-10-30T08:26:03.554659+09:00",
+        "producer_run_id": "20261030T091653_local-freshness-kr-overlay",
+        "producer_started_at": "2026-10-30T09:16:53.310622+09:00",
+        "producer_finished_at": "2026-10-30T09:18:06.349241+09:00",
         "analysis_run_id": "20261030T050115_local-scheduler-kr-full",
         "analysis_lineage_status": "RESOLVED",
         "analysis_completed_at": "2026-10-30T07:45:48.480457+09:00",
         "analysis_trade_date_oldest": "2026-10-29",
         "analysis_trade_date_latest": "2026-10-29",
-        "market_data_oldest_at": "2026-10-29T20:00:00+09:00",
-        "market_data_latest_at": "2026-10-29T20:00:00+09:00",
-        "market_data_status": "STALE",
+        "market_data_oldest_at": "2026-10-30T09:17:00+09:00",
+        "market_data_latest_at": "2026-10-30T09:17:00+09:00",
+        "market_data_status": "FRESH",
         "publication_does_not_refresh_inputs": true,
-        "execution_max_age_seconds": 180.0,
-        "research_market_data_status": "UNVERIFIED",
+        "execution_max_age_seconds": 120.0,
+        "research_market_data_status": "VALID",
         "research_market_data_receipts": [
           {
             "ticker": "005930.KS",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
-            "execution_eligible": false
-          },
-          {
-            "ticker": "278470.KS",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
-            "execution_eligible": false
-          },
-          {
-            "ticker": "010120.KS",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
             "execution_eligible": false
           },
           {
             "ticker": "267260.KS",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
             "execution_eligible": false
           },
           {
-            "ticker": "035420.KS",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "ticker": "278470.KS",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
             "execution_eligible": false
           },
           {
             "ticker": "042700.KS",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "035420.KS",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "010120.KS",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
             "execution_eligible": false
           },
           {
             "ticker": "058470.KQ",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
             "execution_eligible": false
           },
           {
             "ticker": "034020.KS",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
             "execution_eligible": false
           },
           {
             "ticker": "353200.KS",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
             "execution_eligible": false
           },
           {
             "ticker": "000660.KS",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
             "execution_eligible": false
           },
           {
             "ticker": "028050.KS",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
             "execution_eligible": false
           },
           {
             "ticker": "033780.KS",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
             "execution_eligible": false
           },
           {
             "ticker": "000810.KS",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
             "execution_eligible": false
           },
           {
             "ticker": "064400.KS",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
-            "execution_eligible": false
-          },
-          {
-            "ticker": "017670.KS",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
             "execution_eligible": false
           },
           {
             "ticker": "072950.KQ",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
-            "execution_eligible": false
-          },
-          {
-            "ticker": "131290.KQ",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
             "execution_eligible": false
           },
           {
             "ticker": "036460.KS",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
             "execution_eligible": false
           },
           {
             "ticker": "010170.KQ",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
             "execution_eligible": false
           },
           {
             "ticker": "207940.KS",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
-            "execution_eligible": false
-          },
-          {
-            "ticker": "000270.KS",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
-            "execution_eligible": false
-          },
-          {
-            "ticker": "065450.KQ",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
-            "execution_eligible": false
-          },
-          {
-            "ticker": "001210.KS",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
-            "execution_eligible": false
-          },
-          {
-            "ticker": "039980.KQ",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
             "execution_eligible": false
           },
           {
             "ticker": "006400.KS",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
             "execution_eligible": false
           },
           {
             "ticker": "011200.KS",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
             "execution_eligible": false
           },
           {
             "ticker": "068270.KS",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "017670.KS",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "131290.KQ",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "000270.KS",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "001210.KS",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "065450.KQ",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "039980.KQ",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
             "execution_eligible": false
           }
         ],
