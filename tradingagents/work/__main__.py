@@ -24,6 +24,8 @@ def main() -> int:
                          help="Require new broker quotes and a VALID account before preparing KR/US.")
     prepare.add_argument("--report-policy", choices=("investor", "execution"),
                          help="Default: investor plans; --refresh-market alone retains strict execution preparation.")
+    prepare.add_argument("--scheduled-market", action="store_true",
+                         help="Skip confirmed market-local weekends/holidays for scheduled KR/US briefings.")
     prepare.add_argument("--producer-state-dir", type=Path, default=Path(".runtime/local-automation"))
     prepare.add_argument("--report-context-v1", action="store_true",
                          help="Explicitly opt KR/US into sealed prior-ACK and public readiness context.")
@@ -81,6 +83,15 @@ def main() -> int:
             return 2
         print(json.dumps(result, ensure_ascii=False, indent=2))
         return 0 if result["status"] == "VERIFIED_CURRENT_INPUT" else 2
+    schedule_receipt = None
+    if args.command == "prepare" and args.scheduled_market:
+        if args.surface not in {"kr", "us"} or args.refresh_market or args.report_policy == "execution":
+            parser.error("--scheduled-market requires an archive-only KR/US investor report")
+        from .schedule import scheduled_report_session
+        schedule_receipt = scheduled_report_session(args.surface)
+        if schedule_receipt["status"] == "SKIP_NON_TRADING_DAY":
+            print(json.dumps(schedule_receipt, ensure_ascii=False, indent=2))
+            return 0
     runtime = WorkRuntime(args.runtime_dir)
     try:
         if args.command == "prepare":
@@ -148,6 +159,8 @@ def main() -> int:
     except WorkRuntimeError as exc:
         print(json.dumps({"status": "ERROR", "error": str(exc)}, ensure_ascii=False))
         return 2
+    if schedule_receipt is not None:
+        result["schedule_receipt"] = schedule_receipt
     print(json.dumps(result, ensure_ascii=False, indent=2))
     return 2 if result.get("status") in {"FRESH_INPUT_UNAVAILABLE", "CALENDAR_UNVERIFIED"} else 0
 
