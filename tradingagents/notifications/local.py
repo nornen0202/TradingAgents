@@ -208,7 +208,7 @@ def _reconcile_event(state, path, *, now, runner, completions_allowed):
         if receipt.get("status") != status:
             atomic_write_json(receipt_path, {**receipt, "status": status, "result": result})
         return
-    if read(path).get("kind") in {"success", "advisory_success"} and (not completions_allowed or read(
+    if read(path).get("kind") in {"success", "advisory_success", "work_report"} and (not completions_allowed or read(
             state / "publication.json").get("status") != "DELIVERY_VERIFIED"):
         # Preserve attempts while the known prerequisite is pending.
         # Failure notifications remain independent of Pages health.
@@ -241,6 +241,7 @@ def _reconcile_event(state, path, *, now, runner, completions_allowed):
 
 def reconcile_safely(archive, state, *, publication_locked=False, discover_completions=True):
     from .advisory import queue_completed as queue_advisory_completed
+    from .work_reports import queue_completed as queue_work_reports
     # One unavailable advisory/API must not starve independent failures or
     # already queued market completions of their notification dispatch.
     def health(stage, exc=None):
@@ -256,7 +257,8 @@ def reconcile_safely(archive, state, *, publication_locked=False, discover_compl
         except OSError:
             pass
 
-    discovery = (("market_queue", queue_completed), ("advisory_queue", queue_advisory_completed)) if discover_completions else ()
+    discovery = (("work_report_queue", queue_work_reports), ("market_queue", queue_completed),
+                 ("advisory_queue", queue_advisory_completed)) if discover_completions else ()
     for stage, prepare in discovery:
         try:
             prepare(archive, state, publication_locked=publication_locked)
@@ -281,6 +283,9 @@ def reconcile_safely(archive, state, *, publication_locked=False, discover_compl
 
 
 def compose(event, archive, state):
+    if event.get("kind") == "work_report":
+        from .work_reports import compose as compose_work_report
+        return compose_work_report(event, archive, state)
     if event.get("kind") == "advisory_success":
         from .advisory import compose as compose_advisory
         return compose_advisory(event, archive, state)
@@ -413,6 +418,9 @@ def notify(key, archive, state, *, dry_run=False):
         incident_key=incident, incident_cooldown_seconds=6 * 3600,
     )
     result.update(local_event_id=key, workflow_run_id=os.getenv("GITHUB_RUN_ID"), verified_at=datetime.now(timezone.utc).isoformat())
+    if event["kind"] == "work_report":
+        result.update({field: metadata[field] for field in (
+            "report_event_id", "report_sha256", "report_published_at")})
     if event["kind"] == "advisory_success":
         result.update({field: metadata[field] for field in (
             "upstream_run_id", "upstream_run_attempt", "upstream_conclusion",
