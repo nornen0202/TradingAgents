@@ -1,9 +1,9 @@
 {
   "schema": "tradingagents.work-context/v1",
   "surface": "us",
-  "event_id": "us:1e6bf4aa49b247a7c144aba557c0bf13",
-  "source_sha256": "5f463993792ebb76a05795294463e2176dd20be522d5696dea2329f6922a9d1b",
-  "packet_sha256": "55c2a56310ccc6261f4b5135cdb89e566af7dd297e05ce5a02db86226c784657",
+  "event_id": "us:3b5fd28e5b1e20ff4ad6a1a989009808",
+  "source_sha256": "3f4136f4e0c979c3fcb6f325935c8f06840b8b6fe0f3c8731339e3135f1a674e",
+  "packet_sha256": "94a61f20334d526a4d2f0b46980d7fa1aea2ec731a943606cd907446adff9c05",
   "prompt_contract_version": "market-work-v13-us",
   "prompt_sha256": "a577e06278002eebd491db51786019336a00da570d5c47886bad031cf01cf7fe",
   "skill_sha256": "2fef99f1af403675549a13813e0fe5597a241a964affeada56e9f64e9f398fe9",
@@ -11,29 +11,53 @@
   "workflow_contract_sha256": "f94e3c24b3aabfa9c77de5abfe65add303754c210dc6470b626a2bd212718912",
   "status_url": "https://nornen0202.github.io/TradingAgents/work/v1/us/status.json",
   "latest_url": "https://nornen0202.github.io/TradingAgents/work/v1/us/latest.json",
-  "event_url": "https://nornen0202.github.io/TradingAgents/work/v1/us/events/us-1e6bf4aa49b247a7c144aba557c0bf13.json",
+  "event_url": "https://nornen0202.github.io/TradingAgents/work/v1/us/events/us-3b5fd28e5b1e20ff4ad6a1a989009808.json",
   "prompt_url": "https://nornen0202.github.io/TradingAgents/work/v1/prompts/market_us.md",
   "source_health": "STALE",
   "report_mode": "OUTAGE",
   "freshness_receipt": {
     "schema": "tradingagents.source-freshness/v1",
-    "producer_run_id": "20261030T045829_local-freshness-us-overlay",
-    "producer_started_at": "2026-10-30T04:58:29.601048+09:00",
-    "producer_finished_at": "2026-10-30T05:00:22.510972+09:00",
-    "analysis_run_id": "20261030T015121_manual-us-integrity-recovery",
+    "producer_run_id": "20261030T175058_local-scheduler-us-full",
+    "producer_started_at": "2026-10-30T17:50:58.472568+09:00",
+    "producer_finished_at": "2026-10-30T21:34:50.323836+09:00",
+    "analysis_run_id": "20261030T175058_local-scheduler-us-full",
     "analysis_lineage_status": "RESOLVED",
-    "analysis_completed_at": "2026-10-30T02:15:17.669923+09:00",
-    "analysis_trade_date_oldest": "2026-10-28",
-    "analysis_trade_date_latest": "2026-10-28",
-    "market_data_oldest_at": "2026-10-29T15:59:00-04:00",
-    "market_data_latest_at": "2026-10-29T15:59:00-04:00",
+    "analysis_completed_at": "2026-10-30T21:03:21.361439+09:00",
+    "analysis_trade_date_oldest": "2026-10-29",
+    "analysis_trade_date_latest": "2026-10-29",
+    "market_data_oldest_at": "2026-10-29T15:55:00-04:00",
+    "market_data_latest_at": "2026-10-30T07:35:00-04:00",
     "market_data_status": "STALE",
     "publication_does_not_refresh_inputs": true,
-    "execution_max_age_seconds": 120.0,
+    "execution_max_age_seconds": 180.0,
     "research_market_data_status": "UNVERIFIED",
     "research_market_data_receipts": [
       {
+        "ticker": "NVDA",
+        "research_valid": false,
+        "category": "UNVERIFIED_RESEARCH_INPUT",
+        "execution_eligible": false
+      },
+      {
+        "ticker": "GOOGL",
+        "research_valid": false,
+        "category": "UNVERIFIED_RESEARCH_INPUT",
+        "execution_eligible": false
+      },
+      {
+        "ticker": "DELL",
+        "research_valid": false,
+        "category": "UNVERIFIED_RESEARCH_INPUT",
+        "execution_eligible": false
+      },
+      {
         "ticker": "GEV",
+        "research_valid": false,
+        "category": "UNVERIFIED_RESEARCH_INPUT",
+        "execution_eligible": false
+      },
+      {
+        "ticker": "ETN",
         "research_valid": false,
         "category": "UNVERIFIED_RESEARCH_INPUT",
         "execution_eligible": false
@@ -51,31 +75,13 @@
         "execution_eligible": false
       },
       {
-        "ticker": "TSM",
-        "research_valid": false,
-        "category": "UNVERIFIED_RESEARCH_INPUT",
-        "execution_eligible": false
-      },
-      {
-        "ticker": "NVDA",
-        "research_valid": false,
-        "category": "UNVERIFIED_RESEARCH_INPUT",
-        "execution_eligible": false
-      },
-      {
-        "ticker": "ETN",
-        "research_valid": false,
-        "category": "UNVERIFIED_RESEARCH_INPUT",
-        "execution_eligible": false
-      },
-      {
-        "ticker": "LLY",
-        "research_valid": false,
-        "category": "UNVERIFIED_RESEARCH_INPUT",
-        "execution_eligible": false
-      },
-      {
         "ticker": "AAPL",
+        "research_valid": false,
+        "category": "UNVERIFIED_RESEARCH_INPUT",
+        "execution_eligible": false
+      },
+      {
+        "ticker": "TSM",
         "research_valid": false,
         "category": "UNVERIFIED_RESEARCH_INPUT",
         "execution_eligible": false
@@ -87,25 +93,7 @@
         "execution_eligible": false
       },
       {
-        "ticker": "DELL",
-        "research_valid": false,
-        "category": "UNVERIFIED_RESEARCH_INPUT",
-        "execution_eligible": false
-      },
-      {
-        "ticker": "GOOGL",
-        "research_valid": false,
-        "category": "UNVERIFIED_RESEARCH_INPUT",
-        "execution_eligible": false
-      },
-      {
-        "ticker": "PM",
-        "research_valid": false,
-        "category": "UNVERIFIED_RESEARCH_INPUT",
-        "execution_eligible": false
-      },
-      {
-        "ticker": "MA",
+        "ticker": "CVX",
         "research_valid": false,
         "category": "UNVERIFIED_RESEARCH_INPUT",
         "execution_eligible": false
@@ -117,7 +105,19 @@
         "execution_eligible": false
       },
       {
-        "ticker": "URI",
+        "ticker": "ABBV",
+        "research_valid": false,
+        "category": "UNVERIFIED_RESEARCH_INPUT",
+        "execution_eligible": false
+      },
+      {
+        "ticker": "MA",
+        "research_valid": false,
+        "category": "UNVERIFIED_RESEARCH_INPUT",
+        "execution_eligible": false
+      },
+      {
+        "ticker": "EQIX",
         "research_valid": false,
         "category": "UNVERIFIED_RESEARCH_INPUT",
         "execution_eligible": false
@@ -129,7 +129,7 @@
         "execution_eligible": false
       },
       {
-        "ticker": "RTX",
+        "ticker": "BRK-B",
         "research_valid": false,
         "category": "UNVERIFIED_RESEARCH_INPUT",
         "execution_eligible": false
@@ -141,19 +141,19 @@
         "execution_eligible": false
       },
       {
+        "ticker": "COST",
+        "research_valid": false,
+        "category": "UNVERIFIED_RESEARCH_INPUT",
+        "execution_eligible": false
+      },
+      {
         "ticker": "UNH",
         "research_valid": false,
         "category": "UNVERIFIED_RESEARCH_INPUT",
         "execution_eligible": false
       },
       {
-        "ticker": "CVX",
-        "research_valid": false,
-        "category": "UNVERIFIED_RESEARCH_INPUT",
-        "execution_eligible": false
-      },
-      {
-        "ticker": "SPG",
+        "ticker": "RHHBY",
         "research_valid": false,
         "category": "UNVERIFIED_RESEARCH_INPUT",
         "execution_eligible": false
@@ -165,31 +165,31 @@
         "execution_eligible": false
       },
       {
-        "ticker": "BRK-B",
+        "ticker": "SPG",
         "research_valid": false,
         "category": "UNVERIFIED_RESEARCH_INPUT",
         "execution_eligible": false
       },
       {
-        "ticker": "ABBV",
+        "ticker": "RTX",
         "research_valid": false,
         "category": "UNVERIFIED_RESEARCH_INPUT",
         "execution_eligible": false
       },
       {
-        "ticker": "COST",
+        "ticker": "PM",
         "research_valid": false,
         "category": "UNVERIFIED_RESEARCH_INPUT",
         "execution_eligible": false
       },
       {
-        "ticker": "MU",
+        "ticker": "INTC",
         "research_valid": false,
         "category": "UNVERIFIED_RESEARCH_INPUT",
         "execution_eligible": false
       },
       {
-        "ticker": "SNOW",
+        "ticker": "LLY",
         "research_valid": false,
         "category": "UNVERIFIED_RESEARCH_INPUT",
         "execution_eligible": false

@@ -1,13 +1,13 @@
 {
   "schema": "tradingagents.work-context/v1",
   "surface": "youtube",
-  "event_id": "youtube:833dbaf9c2b385e1f36d33d9ac738889",
+  "event_id": "youtube:a3539214f294cc86c9370330546c0e25",
   "prompt_contract_version": "youtube-work-v5",
   "prompt_sha256": "82a87727ec636b928ccb90cfe8cd823d86347e254ed0b204903699e34e35ef0b",
   "skill_sha256": "2fef99f1af403675549a13813e0fe5597a241a964affeada56e9f64e9f398fe9",
   "task_manifest_sha256": "0ea8b7511042a3aa7d6fa8447d97032d4be515f69526190a4c9556d01067c6df",
   "workflow_contract_sha256": "c75e155a8e30b5d22921bad39fde87022a6bd8d52c5ac56585369ed84d3f1eaf",
-  "source_sha256": "bf4e4af62ee334d87ec0059ed3cbfa1c9e41c1897db7a48a4490a9945b7c1de7",
+  "source_sha256": "153cfaff53414538ef4c4456ab14033916dc59d613c29137866f40414f514087",
   "body": {
     "kind": "youtube",
     "source_health": "OK",
@@ -44,10 +44,10 @@
     },
     "coverage": {
       "total_unique_events": 601,
-      "window_events": 94,
+      "window_events": 79,
       "transmitted_events": 24,
       "truncated": true,
-      "oldest_occurred_at": "2026-10-27T11:27:25+00:00",
+      "oldest_occurred_at": "2026-10-28T05:52:27+00:00",
       "newest_occurred_at": "2026-10-29T21:44:06+00:00",
       "omitted_due_to_packet_budget": 36
     },
@@ -365,151 +365,6 @@
               "publisher": "TMX Newsfile",
               "published_at": "2026-10-28T13:00:00+00:00",
               "source_tier": "market_or_news"
-            }
-          ]
-        }
-      },
-      {
-        "event_key": "WM76m1GByyg",
-        "content_sha256": "feb806407fc6a74cfc098fbec2e64d19baa7ab01f3cccbb5754f30e6638e9ac7",
-        "occurred_at": "2026-10-27T11:27:25+00:00",
-        "relevance": {
-          "tickers": [],
-          "markets": [],
-          "themes": [],
-          "match_basis": "title_and_claim_context"
-        },
-        "strategy_source_tier": "USER_PRIMARY",
-        "strategy_evidence_weight": "HIGH",
-        "summary": {
-          "video_id": "WM76m1GByyg",
-          "title": "큰 손들의 강제 주식 매도는 기회? 월가 변곡점 족집게 전망, 적중할까",
-          "channel": "소수몽키",
-          "source_url": "https://www.youtube.com/watch?v=WM76m1GByyg",
-          "published_at": "2026-10-27T11:27:25+00:00",
-          "status": "asr_uncertain",
-          "strategy_source_tier": "USER_PRIMARY",
-          "strategy_evidence_weight": "HIGH",
-          "strategy_validation_policy": "USER_ACCEPTED",
-          "transcript_quality": {
-            "status": "good",
-            "score": 1.0,
-            "warnings": [],
-            "source": "automatic",
-            "language": "Korean (Original)",
-            "model_or_format": "json3",
-            "chars": 8069,
-            "segments": 417,
-            "duration_seconds": 808,
-            "repeated_ngram_ratio": 0.0
-          },
-          "claim_status_summary": {
-            "unverified": 8,
-            "partially_supported": 1,
-            "asr_uncertain": 2
-          },
-          "claims": [
-            {
-              "claim_id": "C1",
-              "claim_text": "‘스콜 업로’로 들리는 전문가가 골드만삭스에서 10년 이상 근무한 뒤 2025년 영입됐으며, 소속 회사가 개인 매매의 35~40%를 처리한다는 주장.",
-              "status": "unverified",
-              "confidence": 0.99,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "전문가의 신원과 데이터 접근 범위가 확인되기 전에는 인용자의 권위를 수급 전망의 근거로 삼기 어렵다."
-            },
-            {
-              "claim_id": "C2",
-              "claim_text": "기관이 선거 불확실성과 모멘텀 약화 때문에 규칙 기반 매도를 하고 있으며, 기술주 비중이 하위 5%이자 최근 1·3·5년 기준 극저점이라는 주장.",
-              "status": "unverified",
-              "confidence": 0.99,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "기관의 강제 매도가 약세의 주원인이라는 해석이나 저보유에 따른 반등 여력을 확인된 사실로 사용하기 어렵다."
-            },
-            {
-              "claim_id": "C3",
-              "claim_text": "개인 저가 매수가 인터뷰 주간 최근 16주 중 최대 수준이며, 로빈후드 자료에서는 최근 10일 매수가 역대 최대라는 주장.",
-              "status": "unverified",
-              "confidence": 0.99,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "개인 순매수 확대나 시장 바닥을 확인하는 신호로 사용할 근거가 부족하다."
-            },
-            {
-              "claim_id": "C4",
-              "claim_text": "약 13개 도시에서 만난 기관 고객들은 매수를 일시 중단했을 뿐이며, 선거·지정학 불확실성이 해소되면 재진입해 AI와 소외 업종의 반등을 이끌 수 있다는 조건부 전망.",
-              "status": "unverified",
-              "confidence": 0.99,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "기관 재진입과 업종 반등은 조건부 시나리오이며, 확정된 매수 수요나 장기 AI 가치 검증으로 해석할 수 없다."
-            },
-            {
-              "claim_id": "C5",
-              "claim_text": "영상 시점은 2026년 4분기이고 중간선거까지 약 일주일 남았으며, 11월 선거 전후가 수급 청산·불확실성 해소 시점이라는 설명.",
-              "status": "partially_supported",
-              "confidence": 0.98,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "게시 시점은 확인되지만, 선거 전후를 확정적인 매매 전환점으로 사용할 근거는 없다."
-            },
-            {
-              "claim_id": "C6",
-              "claim_text": "마이크 윌슨은 선거 후까지 관망하고, 마이클 하트넷은 중간선거·AI 신용조달 위험·프랑스 금리 우려를 확인하며 11월 중순까지 기다리자고 제안했다는 인용.",
-              "status": "unverified",
-              "confidence": 0.99,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "두 기관의 공식 투자전략이나 공통된 시장 타이밍 권고로 받아들이기 어렵다."
-            }
-          ],
-          "entities": [],
-          "evidence": [
-            {
-              "evidence_id": "E1",
-              "claim_id": "C1",
-              "title": "Dow Jones Futures: Growth Stocks Rally, Tesla Clears Buy Point; Fed, Microsoft, Google On Tap",
-              "source_url": "https://finance.yahoo.com/m/7066a700-b33b-3fa1-858d-f75f49b920da/dow-jones-futures%3A-growth.html",
-              "publisher": "Investor's Business Daily",
-              "published_at": "2026-10-27T22:12:13+00:00",
-              "source_tier": "market_or_news"
-            },
-            {
-              "evidence_id": "E2",
-              "claim_id": "C1",
-              "title": "What the Aluminum Tariff Has Meant for U.S. Prices",
-              "source_url": "https://finance.yahoo.com/m/bbdab404-8386-3b0a-938e-4333f4284a0b/what-the-aluminum-tariff-has.html",
-              "publisher": "The Wall Street Journal",
-              "published_at": "2026-10-27T21:30:02+00:00",
-              "source_tier": "market_or_news"
-            },
-            {
-              "evidence_id": "E4",
-              "claim_id": "C2",
-              "title": "UACJ (TSE:5741) Stock May Still Be Below Fair Value",
-              "source_url": "https://finance.yahoo.com/markets/stocks/articles/uacj-tse-5741-stock-may-181222630.html",
-              "publisher": "Simply Wall St.",
-              "published_at": "2026-10-27T18:12:22+00:00",
-              "source_tier": "market_or_news"
-            },
-            {
-              "evidence_id": "E5",
-              "claim_id": "C8",
-              "title": "EIA Boosts Oil Price Forecast by $5 in 2026, $10 in 2027",
-              "source_url": "https://finance.yahoo.com/energy/articles/eia-boosts-oil-price-forecast-173246436.html",
-              "publisher": "Rigzone.com",
-              "published_at": "2026-10-08T17:32:46+00:00",
-              "source_tier": "news"
-            },
-            {
-              "evidence_id": "E6",
-              "claim_id": "C8",
-              "title": "Dubai International Electric Vehicles Exhibition and Conference (EV World 2026), 10–12 November 2026, Positions Dubai as a Global EV Investment Hub",
-              "source_url": "https://finance.yahoo.com/energy/articles/dubai-international-electric-vehicles-exhibition-140800385.html",
-              "publisher": "GlobeNewswire",
-              "published_at": "2026-09-28T14:08:00+00:00",
-              "source_tier": "news"
             }
           ]
         }
@@ -4216,6 +4071,159 @@
               "source_url": "https://finance.yahoo.com/markets/stocks/articles/stock-market-today-oct-29-214330390.html",
               "publisher": "Motley Fool",
               "published_at": "2026-10-29T21:43:30+00:00",
+              "source_tier": "news"
+            }
+          ]
+        }
+      },
+      {
+        "event_key": "A0EbSfABZvc",
+        "content_sha256": "1bf9e539c00ae0c5db417a8a4808dae9501d7abc1a2232bf95572f13c6c701a6",
+        "occurred_at": "2026-10-29T06:09:20+00:00",
+        "relevance": {
+          "tickers": [],
+          "markets": [],
+          "themes": [],
+          "match_basis": "title_and_claim_context"
+        },
+        "strategy_source_tier": "STANDARD",
+        "strategy_evidence_weight": "STANDARD",
+        "summary": {
+          "video_id": "A0EbSfABZvc",
+          "title": "“삼성전자 실적은 대박인데 주가는 급락!” SK하이닉스와 주주환원 뭐가 달랐나? ㅣ김장열 센터장",
+          "channel": "815Money talk",
+          "source_url": "https://www.youtube.com/watch?v=A0EbSfABZvc",
+          "published_at": "2026-10-29T06:09:20+00:00",
+          "status": "asr_uncertain",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "strategy_validation_policy": "STANDARD_REVIEW",
+          "transcript_quality": {
+            "status": "good",
+            "score": 1.0,
+            "warnings": [],
+            "source": "automatic",
+            "language": "Korean",
+            "model_or_format": "json3",
+            "chars": 12247,
+            "segments": 631,
+            "duration_seconds": 1467,
+            "repeated_ngram_ratio": 0.0
+          },
+          "claim_status_summary": {
+            "asr_uncertain": 2,
+            "unverified": 8
+          },
+          "claims": [
+            {
+              "claim_id": "C1",
+              "claim_text": "게시일은 2026-10-29이나 발화에는 2024년 말까지 3개월이라는 표현이 있어 녹화일과 실적 대상 기간이 불명확하다.",
+              "status": "asr_uncertain",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "오늘·어제·올해·3분기를 특정 거래일이나 회계기간에 연결하지 않아야 한다."
+            },
+            {
+              "claim_id": "C2",
+              "claim_text": "삼성전자는 현금배당 30조 원 외 추가 환원 50조~75조 원 또는 55조~75조 원, 총 85조~105조 원과 FCF 50% 활용·우선주 우선 매입을 제시했으며 배당 기대에 못 미쳤다는 주장이다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "배당과 자사주 매입·소각의 중복 여부, 적용 기간과 집행 일정을 확인하기 전에는 총환원액이나 예상 배당수익률을 투자 근거로 쓰기 어렵다."
+            },
+            {
+              "claim_id": "C3",
+              "claim_text": "삼성전자의 DX 적자는 8,000억~8,400억 원이고 전체 실적 10조7,000억 원·반도체 6조5,000억 원, 연간 투자 84조 원·반도체 투자 76조 원이라는 주장이다. 메모리 호조와 모바일 협력업체 부담도 제시된다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "메모리 실적과 DX·MX·비메모리 손익을 분리하고, 계획 투자액과 실제 집행액을 대조해야 한다."
+            },
+            {
+              "claim_id": "C4",
+              "claim_text": "SK하이닉스가 전날 100조 원 규모 주주환원을 발표했고 자사주 관련 60조·30조·40조·20조 및 추가분이 언급된다. 미국 상장 여부에 관한 발화도 서로 일치하지 않는다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "100조 원을 신규 현금 지출이나 확정 환원액으로 간주하지 말고 공식 구성·기간·통화와 상장 상태를 확인해야 한다."
+            },
+            {
+              "claim_id": "C5",
+              "claim_text": "SK하이닉스의 HBM 주문은 생산의 약 2배이고 2028년까지 목표 생산능력 약 50%가 LTA로 계약됐으며 2029년까지 사실상 매진이라는 주장이다. 용인·미국·중국 및 삼성전자 평택 증설 계획도 언급된다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "주문, 계약, 실제 출하를 구분하고 제품별 공급 증가와 계약 이행을 확인해야 증설의 수익성 영향을 평가할 수 있다."
+            },
+            {
+              "claim_id": "C6",
+              "claim_text": "알파벳의 FCF는 2분기 -50억 달러에서 이번 분기 -90억 달러로 악화됐고 CAPEX는 예상 550억 대비 실제 510억 달러지만 연간 계획은 유지됐다는 주장이다. 핵심 사업 성장 부진과 추가 현금흐름 악화 전망도 제시된다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "해당 회계기간의 영업현금흐름과 동일 정의의 CAPEX로 FCF를 재계산하기 전에는 적자 확대나 투자 이연을 확정해서는 안 된다."
+            }
+          ],
+          "entities": [],
+          "evidence": [
+            {
+              "evidence_id": "E1",
+              "claim_id": "C1",
+              "title": "3 low-volatility stocks with questionable fundamentals",
+              "source_url": "https://finance.yahoo.com/markets/stocks/articles/3-low-volatility-stocks-questionable-100325387.html",
+              "publisher": "StockStory",
+              "published_at": "2026-10-29T10:03:25+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E2",
+              "claim_id": "C1",
+              "title": "KAP Minerals, Cymat to advance scandium-aluminium alloy JV in Canada",
+              "source_url": "https://finance.yahoo.com/news/kap-minerals-cymat-advance-scandium-085650950.html",
+              "publisher": "Mining Technology",
+              "published_at": "2026-10-29T08:56:50+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E4",
+              "claim_id": "C2",
+              "title": "Dow Jones Futures: Amazon, Intel Lead Earnings Losers After Google, ServiceNow, Fortinet Hit Nasdaq",
+              "source_url": "https://finance.yahoo.com/m/0a5ce393-a6df-312b-af64-1893a264d0df/dow-jones-futures%3A-amazon%2C.html",
+              "publisher": "Investor's Business Daily",
+              "published_at": "2026-10-29T22:08:49+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E5",
+              "claim_id": "C6",
+              "title": "First Google Search, Now Amazon Retail. Tech’s Moneymakers Are Stumbling.",
+              "source_url": "https://finance.yahoo.com/m/bb88d801-1531-35c7-b240-1916a90d4301/first-google-search%2C-now.html",
+              "publisher": "Barrons.com",
+              "published_at": "2026-10-29T21:43:00+00:00",
+              "source_tier": "news"
+            },
+            {
+              "evidence_id": "E6",
+              "claim_id": "C8",
+              "title": "Sandisk and Micron Slide 5% as Samsung Miss Cools Memory Rally Ahead of Sandisk Earnings; SK Hynix Falls 3%, Western Digital Dips",
+              "source_url": "https://finance.yahoo.com/markets/stocks/articles/sandisk-micron-slide-5-samsung-190932273.html",
+              "publisher": "24/7 Wall St.",
+              "published_at": "2026-10-29T19:09:32+00:00",
+              "source_tier": "news"
+            },
+            {
+              "evidence_id": "E7",
+              "claim_id": "C9",
+              "title": "Big Tech Earnings Couldn’t Ignite Chip Stocks. What The Semis Need Now.",
+              "source_url": "https://finance.yahoo.com/m/792cbf7a-885c-3a76-8cf5-7e84ab8048cf/big-tech-earnings-couldn%E2%80%99t.html",
+              "publisher": "Barrons.com",
+              "published_at": "2026-10-29T21:40:00+00:00",
               "source_tier": "news"
             }
           ]
