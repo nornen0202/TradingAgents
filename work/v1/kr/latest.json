@@ -1,13 +1,13 @@
 {
   "schema": "tradingagents.work-context/v1",
   "surface": "kr",
-  "event_id": "kr:5160914dd8f0e542f1797097c0e467fc",
+  "event_id": "kr:86902902ee68db8b29730f8e1a07cce9",
   "prompt_contract_version": "market-work-v12-kr",
   "prompt_sha256": "ae80093efe2dcfe7f6131b8b09100f75e77b0ca0242b5340d15eb6ec3fd81274",
   "skill_sha256": "2fef99f1af403675549a13813e0fe5597a241a964affeada56e9f64e9f398fe9",
   "task_manifest_sha256": "0ea8b7511042a3aa7d6fa8447d97032d4be515f69526190a4c9556d01067c6df",
   "workflow_contract_sha256": "4f1b419a091e9fe8868628ed6d18499341f5c8830a0873302fa24e8ead61182e",
-  "source_sha256": "f62447fe8dfe2499aa48704efdc4c130a393b674ad2aa6dc7bb44a4d2f40ff4c",
+  "source_sha256": "43242542983ee32aabeda33ea5698f5a3b9a6f384130fac3ba7f646eef1adfe8",
   "body": {
     "kind": "market",
     "market": "KR",
@@ -837,17 +837,17 @@
       "youtube": {
         "source_health": "OK",
         "coverage": {
-          "total_unique_events": 630,
-          "window_events": 93,
+          "total_unique_events": 640,
+          "window_events": 78,
           "transmitted_events": 12,
           "truncated": true,
-          "oldest_occurred_at": "2026-10-29T09:00:01+00:00",
-          "newest_occurred_at": "2026-10-31T01:10:43+00:00",
+          "oldest_occurred_at": "2026-10-29T10:00:37+00:00",
+          "newest_occurred_at": "2026-10-31T09:00:02+00:00",
           "available_events_before_context_cap": 60,
           "context_event_cap": 12,
-          "omitted_events": 81,
+          "omitted_events": 66,
           "omitted_due_to_context_cap": 48,
-          "omitted_before_context_selection": 33
+          "omitted_before_context_selection": 18
         },
         "events": [
           {
@@ -1133,6 +1133,122 @@
                   "status": "unverified",
                   "verification_notes": [
                     "시장 데이터 조회 실패: no_usable_market_fields"
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "event_key": "ET41_ENzq7w",
+            "content_sha256": "14485b4d0f455d1a5a26b897f995878cc73871a33dc67d570f62a00882bcaebe",
+            "occurred_at": "2026-10-31T09:00:02+00:00",
+            "relevance": {
+              "tickers": [
+                "000660",
+                "GOOGL",
+                "NVDA",
+                "005930",
+                "CL=F"
+              ],
+              "markets": [
+                "KR",
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "verified_entities",
+              "matched_tickers": [
+                "000660",
+                "005930"
+              ],
+              "market_match": true,
+              "score": 220
+            },
+            "summary": {
+              "video_id": "ET41_ENzq7w",
+              "title": "“AI 호황 뒤에 숨겨진 돈줄 위기!” 빅테크 현금흐름 둔화… 증시 폭락의 진짜 이유 | 이영훈 이사",
+              "channel": "815Money talk",
+              "source_url": "https://www.youtube.com/watch?v=ET41_ENzq7w",
+              "claim_status_summary": {
+                "unverified": 8,
+                "asr_uncertain": 4
+              },
+              "claims": [
+                {
+                  "claim_id": "C1",
+                  "claim_text": "모든 하이퍼스케일러의 잉여현금흐름이 마이너스로 전환됐고 CAPEX 증가는 아마존만 두드러졌다는 주장.",
+                  "status": "unverified",
+                  "confidence": 0.0,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "AI 투자 재원 고갈을 확정적 사실이나 반도체 투자 축소의 근거로 사용하기 어렵다."
+                },
+                {
+                  "claim_id": "C2",
+                  "claim_text": "알파벳의 최근 분기 FCF가 10년 만에 처음 마이너스로 전환됐고 검색 대체 및 실적 충격이 반도체 약세를 유발했다는 해석.",
+                  "status": "unverified",
+                  "confidence": 0.0,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "검색사업 악화와 AI 투자 지속성은 분기 실적 및 현금흐름 확인 전까지 미검증 시나리오로 다뤄야 한다."
+                },
+                {
+                  "claim_id": "C3",
+                  "claim_text": "SK하이닉스 실적이 시장 예상을 크게 웃돌았으며 회사가 장기 공급계약으로 2030년까지 물량을 확보했다고 설명했다는 주장.",
+                  "status": "unverified",
+                  "confidence": 0.0,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "2030년까지 매출이나 출하량이 보장된 것으로 해석해서는 안 된다."
+                },
+                {
+                  "claim_id": "C4",
+                  "claim_text": "자체 ASIC도 외부 파운드리와 HBM을 필요로 하므로 공급망에는 부정적이지 않지만 경쟁은 엔비디아 마진을 압박할 수 있다는 주장.",
+                  "status": "unverified",
+                  "confidence": 0.0,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "자체 칩 확대가 모든 HBM·파운드리 업체의 이익 증가로 이어진다고 단정할 수 없다."
+                }
+              ],
+              "entities": [
+                {
+                  "ticker": "000660",
+                  "name": "SK하이닉스",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "시장 데이터 조회 실패: no_usable_market_fields"
+                  ]
+                },
+                {
+                  "ticker": "GOOGL",
+                  "name": "알파벳·구글",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                },
+                {
+                  "ticker": "NVDA",
+                  "name": "엔비디아·AI 반도체 공급망",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                },
+                {
+                  "ticker": "005930",
+                  "name": "삼성전자 파운드리",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "시장 데이터 조회 실패: no_usable_market_fields"
+                  ]
+                },
+                {
+                  "ticker": "CL=F",
+                  "name": "미국 국채·유가·정치 변수",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
                   ]
                 }
               ]
@@ -2193,123 +2309,6 @@
                 }
               ]
             }
-          },
-          {
-            "event_key": "TYFlo5nOMZc",
-            "content_sha256": "5ac3ddcf7b2c7ab9d3b0c5005baccf55c6f6600d0e20c1f13e69783b18fb92e8",
-            "occurred_at": "2026-10-29T09:00:01+00:00",
-            "relevance": {
-              "tickers": [
-                "005930",
-                "000660",
-                "GOOGL",
-                "META",
-                "AVGO"
-              ],
-              "markets": [
-                "KR",
-                "US"
-              ],
-              "themes": [],
-              "match_basis": "verified_entities",
-              "matched_tickers": [
-                "000660",
-                "005930"
-              ],
-              "market_match": true,
-              "score": 220
-            },
-            "summary": {
-              "video_id": "TYFlo5nOMZc",
-              "title": "110조 뿌리는데 왜? 삼성전자 급락의 진실 / 2028년 반도체 공급 부족 전망, 지금은 싸게 살 기회다! ㅣ김장열 센터장",
-              "channel": "815Money talk",
-              "source_url": "https://www.youtube.com/watch?v=TYFlo5nOMZc",
-              "claim_status_summary": {
-                "unverified": 6,
-                "partially_supported": 3,
-                "asr_uncertain": 2
-              },
-              "claims": [
-                {
-                  "claim_id": "C1",
-                  "claim_text": "삼성전자·SK하이닉스의 비교일 대비 하락률, 전일 SK하이닉스 약 11% 상승, 외국인 매수 재개와 미국 거래 약 13% 상승 주장",
-                  "status": "unverified",
-                  "confidence": 0.98,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "하락폭이나 외국인 매수 재개를 확인된 반등 근거로 사용하기 어렵다."
-                },
-                {
-                  "claim_id": "C2",
-                  "claim_text": "투자 예금 37% 감소와 실적 개선 계수 1.45를 주가에 적용하면 삼성전자 약 27.5만원·SK하이닉스 약 210만원으로 저평가라는 주장",
-                  "status": "partially_supported",
-                  "confidence": 0.99,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "산출값은 발언자의 가정 기반 시나리오이며 검증된 적정주가나 매수 근거가 아니다."
-                },
-                {
-                  "claim_id": "C3",
-                  "claim_text": "두 회사의 대규모 실적 개선과 삼성전자 설비투자 84.4조원·주주환원 110조원 및 배당·자사주 매입·소각 계획 주장",
-                  "status": "partially_supported",
-                  "confidence": 0.95,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "84.4조원 설비투자는 제한적으로 뒷받침되지만, 이를 110조원 주주환원과 합산하거나 확정 지급액으로 해석해서는 안 된다."
-                },
-                {
-                  "claim_id": "C4",
-                  "claim_text": "삼성전자 HBM4 내년 상반기 양산·하반기 확대, 8nm 이하 가동률 100%, 2nm 주문 두 배 이상 증가 및 파운드리 적자·4분기 DRAM 가격 강세 주장",
-                  "status": "unverified",
-                  "confidence": 0.98,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "양산·고객 인증·출하 및 손익 개선을 구분해 확인하기 전 기술 경쟁력 회복을 확정하기 어렵다."
-                }
-              ],
-              "entities": [
-                {
-                  "ticker": "005930",
-                  "name": "삼성전자",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "시장 데이터 조회 실패: no_usable_market_fields"
-                  ]
-                },
-                {
-                  "ticker": "000660",
-                  "name": "SK하이닉스",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "시장 데이터 조회 실패: no_usable_market_fields"
-                  ]
-                },
-                {
-                  "ticker": "GOOGL",
-                  "name": "알파벳",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                },
-                {
-                  "ticker": "META",
-                  "name": "메타",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                },
-                {
-                  "ticker": "AVGO",
-                  "name": "브로드컴·TPU 금융 구조",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                }
-              ]
-            }
           }
         ],
         "execution_eligible": false
@@ -2340,6 +2339,7 @@
             "event_keys": [
               "6Z8tsk-zIVo",
               "jIq6dsZ-yQ8",
+              "ET41_ENzq7w",
               "mW7c9jFN6VY",
               "AyN3mFL3WAE",
               "3V_IaOHKyXY",
@@ -2348,21 +2348,20 @@
               "hqUbRKYT_Oc",
               "9JAv6eHUUG8",
               "DFuuPZ9qI1E",
-              "fKb-mxpwg9M",
-              "TYFlo5nOMZc"
+              "fKb-mxpwg9M"
             ],
             "coverage": {
-              "total_unique_events": 630,
-              "window_events": 93,
+              "total_unique_events": 640,
+              "window_events": 78,
               "transmitted_events": 12,
               "truncated": true,
-              "oldest_occurred_at": "2026-10-29T09:00:01+00:00",
-              "newest_occurred_at": "2026-10-31T01:10:43+00:00",
+              "oldest_occurred_at": "2026-10-29T10:00:37+00:00",
+              "newest_occurred_at": "2026-10-31T09:00:02+00:00",
               "available_events_before_context_cap": 60,
               "context_event_cap": 12,
-              "omitted_events": 81,
+              "omitted_events": 66,
               "omitted_due_to_context_cap": 48,
-              "omitted_before_context_selection": 33
+              "omitted_before_context_selection": 18
             }
           },
           "prism": {

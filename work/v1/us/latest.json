@@ -1,13 +1,13 @@
 {
   "schema": "tradingagents.work-context/v1",
   "surface": "us",
-  "event_id": "us:76e6e4224b8596dc282c781ec1edb266",
+  "event_id": "us:604126d001e53e1eaea835b23e1add90",
   "prompt_contract_version": "market-work-v13-us",
   "prompt_sha256": "a577e06278002eebd491db51786019336a00da570d5c47886bad031cf01cf7fe",
   "skill_sha256": "2fef99f1af403675549a13813e0fe5597a241a964affeada56e9f64e9f398fe9",
   "task_manifest_sha256": "0ea8b7511042a3aa7d6fa8447d97032d4be515f69526190a4c9556d01067c6df",
   "workflow_contract_sha256": "f94e3c24b3aabfa9c77de5abfe65add303754c210dc6470b626a2bd212718912",
-  "source_sha256": "1ffb46c2808f3f3197809177774a965e4fc06ad67b81c338790dd5e641737f2e",
+  "source_sha256": "3fdeb2af9f735417438cc4ccfd0ec610b79fae2cb74ad21a02b994243064da32",
   "body": {
     "kind": "market",
     "market": "US",
@@ -1244,17 +1244,17 @@
       "youtube": {
         "source_health": "OK",
         "coverage": {
-          "total_unique_events": 630,
-          "window_events": 93,
+          "total_unique_events": 640,
+          "window_events": 78,
           "transmitted_events": 12,
           "truncated": true,
           "oldest_occurred_at": "2026-10-29T09:00:01+00:00",
-          "newest_occurred_at": "2026-10-30T11:00:15+00:00",
+          "newest_occurred_at": "2026-10-31T11:00:35+00:00",
           "available_events_before_context_cap": 60,
           "context_event_cap": 12,
-          "omitted_events": 81,
+          "omitted_events": 66,
           "omitted_due_to_context_cap": 48,
-          "omitted_before_context_selection": 33
+          "omitted_before_context_selection": 18
         },
         "events": [
           {
@@ -1393,6 +1393,110 @@
                 {
                   "ticker": "PLTR",
                   "name": "팔란티어·AI 활용 기업",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "event_key": "2uZN3S41GL8",
+            "content_sha256": "a51ab6a7faa840f6eb08ba28c94901bff360d9f4d1c1b027e973eabcf4f49a01",
+            "occurred_at": "2026-10-31T08:42:17+00:00",
+            "relevance": {
+              "tickers": [
+                "AAPL",
+                "AMD",
+                "QCOM",
+                "ARM"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "verified_entities",
+              "matched_tickers": [
+                "AAPL"
+              ],
+              "market_match": true,
+              "score": 120
+            },
+            "summary": {
+              "video_id": "2uZN3S41GL8",
+              "title": "다음주 미국 투자자들이 꼭 알고 있어야 할 미국 투자포인트(11.2~6)",
+              "channel": "경제사냥꾼",
+              "source_url": "https://www.youtube.com/watch?v=2uZN3S41GL8",
+              "claim_status_summary": {
+                "unverified": 10
+              },
+              "claims": [
+                {
+                  "claim_id": "C1",
+                  "claim_text": "서머타임 종료로 2026년 11월 2일부터 미국 정규장이 한국시간 23:30~다음 날 06:00에 열린다.",
+                  "status": "unverified",
+                  "confidence": 0.99,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "영상의 거래시간을 주문 일정에 적용하기 전에 거래소·증권사의 한국시간 안내를 확인해야 한다."
+                },
+                {
+                  "claim_id": "C2",
+                  "claim_text": "서머타임 종료 후 미국 경제지표는 한국시간 22:30에 발표된다.",
+                  "status": "unverified",
+                  "confidence": 0.99,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "각 지표의 발표일·현지시간·한국시간을 개별 확인해야 한다."
+                },
+                {
+                  "claim_id": "C3",
+                  "claim_text": "애플은 한국시간 11월 3일 06:30에 실적을 발표하며 해당 주 시장 분위기를 연다.",
+                  "status": "unverified",
+                  "confidence": 0.99,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "Apple IR에서 실적 공개와 설명회 시간을 구분해 확인하고 시장 주도 전망은 시나리오로 취급해야 한다."
+                },
+                {
+                  "claim_id": "C4",
+                  "claim_text": "AMD 설명회는 한국시간 11월 4일 07:00에 열리며 다음 분기 AI 수요 전망이 AI 반도체 투자심리를 좌우할 수 있다.",
+                  "status": "unverified",
+                  "confidence": 0.98,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "AMD IR 일정과 실제 AI 수요·매출 전망을 확인한 뒤 업종 파급 여부를 평가해야 한다."
+                }
+              ],
+              "entities": [
+                {
+                  "ticker": "AAPL",
+                  "name": "애플",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                },
+                {
+                  "ticker": "AMD",
+                  "name": "AMD",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                },
+                {
+                  "ticker": "QCOM",
+                  "name": "퀄컴",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                },
+                {
+                  "ticker": "ARM",
+                  "name": "Arm",
                   "status": "unverified",
                   "verification_notes": [
                     "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
@@ -1784,6 +1888,247 @@
             }
           },
           {
+            "event_key": "FgMNYoPEenQ",
+            "content_sha256": "93a6f785e95938c2c84844bc653bf1d645dc8d8487f3e458fce53c6e0f340535",
+            "occurred_at": "2026-10-31T07:30:12+00:00",
+            "relevance": {
+              "tickers": [
+                "INTC",
+                "META",
+                "ORCL",
+                "GOOGL",
+                "AMZN",
+                "^KS11"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "verified_entities",
+              "matched_tickers": [
+                "AMZN",
+                "GOOGL",
+                "INTC"
+              ],
+              "market_match": true,
+              "score": 320
+            },
+            "summary": {
+              "video_id": "FgMNYoPEenQ",
+              "title": "[#긴급시황]  “월요일 한국 증시 정말 두렵다!” 인텔 악재에 美 반도체주 폭락… 삼전·하닉 매수는 ‘이때’  ㅣ 이주연 대표",
+              "channel": "815Money talk",
+              "source_url": "https://www.youtube.com/watch?v=FgMNYoPEenQ",
+              "claim_status_summary": {
+                "unverified": 10,
+                "asr_uncertain": 2
+              },
+              "claims": [
+                {
+                  "claim_id": "C1",
+                  "claim_text": "인텔 주가가 29% 하락했고 4분기 매출 전망이 컨센서스보다 약 10% 낮았으며, PC 부진과 이스라엘 공장 화재에 따른 2주 중단이 원인이고 AI 서버 증가가 이를 상쇄한다는 주장.",
+                  "status": "unverified",
+                  "confidence": 0.98,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "급락 원인을 AI 수요와 무관하다고 확정하거나 해당 설명만으로 매수 근거를 삼기 어렵다."
+                },
+                {
+                  "claim_id": "C2",
+                  "claim_text": "키옥시아의 다음 분기 영업이익 전망이 컨센서스보다 약 15% 낮고, CXMT로 인식된 기업의 분기 성장 둔화는 이미 공개된 정보라는 주장.",
+                  "status": "asr_uncertain",
+                  "confidence": 0.98,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "회사 식별과 가이던스 검증 전에는 반도체 업종 전반의 이익 하향 근거로 사용하기 어렵다."
+                },
+                {
+                  "claim_id": "C3",
+                  "claim_text": "메타의 신용 전망이 부정적으로 변경되었으며 빅테크 현금 창출과 AI 투자 지속성에 대한 우려를 키웠다는 주장.",
+                  "status": "unverified",
+                  "confidence": 0.99,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "신용위험 악화를 확인된 사건으로 반영하기 전에 평가사 원문과 변경 사유를 확인해야 한다."
+                },
+                {
+                  "claim_id": "C4",
+                  "claim_text": "오라클이 수익화 목표를 2030년에서 2028년 하반기로 앞당겼다는 주장.",
+                  "status": "unverified",
+                  "confidence": 0.99,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "투자 회수나 현금흐름 개선 시점을 앞당겨 추정할 검증 근거가 없다."
+                }
+              ],
+              "entities": [
+                {
+                  "ticker": "INTC",
+                  "name": "인텔",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                },
+                {
+                  "ticker": "META",
+                  "name": "메타",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                },
+                {
+                  "ticker": "ORCL",
+                  "name": "오라클",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                },
+                {
+                  "ticker": "GOOGL",
+                  "name": "알파벳",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                },
+                {
+                  "ticker": "AMZN",
+                  "name": "아마존",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                },
+                {
+                  "ticker": "^KS11",
+                  "name": "코스피·한국 증시",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "event_key": "ET41_ENzq7w",
+            "content_sha256": "14485b4d0f455d1a5a26b897f995878cc73871a33dc67d570f62a00882bcaebe",
+            "occurred_at": "2026-10-31T09:00:02+00:00",
+            "relevance": {
+              "tickers": [
+                "000660",
+                "GOOGL",
+                "NVDA",
+                "005930",
+                "CL=F"
+              ],
+              "markets": [
+                "KR",
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "verified_entities",
+              "matched_tickers": [
+                "GOOGL",
+                "NVDA"
+              ],
+              "market_match": true,
+              "score": 220
+            },
+            "summary": {
+              "video_id": "ET41_ENzq7w",
+              "title": "“AI 호황 뒤에 숨겨진 돈줄 위기!” 빅테크 현금흐름 둔화… 증시 폭락의 진짜 이유 | 이영훈 이사",
+              "channel": "815Money talk",
+              "source_url": "https://www.youtube.com/watch?v=ET41_ENzq7w",
+              "claim_status_summary": {
+                "unverified": 8,
+                "asr_uncertain": 4
+              },
+              "claims": [
+                {
+                  "claim_id": "C1",
+                  "claim_text": "모든 하이퍼스케일러의 잉여현금흐름이 마이너스로 전환됐고 CAPEX 증가는 아마존만 두드러졌다는 주장.",
+                  "status": "unverified",
+                  "confidence": 0.0,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "AI 투자 재원 고갈을 확정적 사실이나 반도체 투자 축소의 근거로 사용하기 어렵다."
+                },
+                {
+                  "claim_id": "C2",
+                  "claim_text": "알파벳의 최근 분기 FCF가 10년 만에 처음 마이너스로 전환됐고 검색 대체 및 실적 충격이 반도체 약세를 유발했다는 해석.",
+                  "status": "unverified",
+                  "confidence": 0.0,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "검색사업 악화와 AI 투자 지속성은 분기 실적 및 현금흐름 확인 전까지 미검증 시나리오로 다뤄야 한다."
+                },
+                {
+                  "claim_id": "C3",
+                  "claim_text": "SK하이닉스 실적이 시장 예상을 크게 웃돌았으며 회사가 장기 공급계약으로 2030년까지 물량을 확보했다고 설명했다는 주장.",
+                  "status": "unverified",
+                  "confidence": 0.0,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "2030년까지 매출이나 출하량이 보장된 것으로 해석해서는 안 된다."
+                },
+                {
+                  "claim_id": "C4",
+                  "claim_text": "자체 ASIC도 외부 파운드리와 HBM을 필요로 하므로 공급망에는 부정적이지 않지만 경쟁은 엔비디아 마진을 압박할 수 있다는 주장.",
+                  "status": "unverified",
+                  "confidence": 0.0,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "자체 칩 확대가 모든 HBM·파운드리 업체의 이익 증가로 이어진다고 단정할 수 없다."
+                }
+              ],
+              "entities": [
+                {
+                  "ticker": "000660",
+                  "name": "SK하이닉스",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "시장 데이터 조회 실패: no_usable_market_fields"
+                  ]
+                },
+                {
+                  "ticker": "GOOGL",
+                  "name": "알파벳·구글",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                },
+                {
+                  "ticker": "NVDA",
+                  "name": "엔비디아·AI 반도체 공급망",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                },
+                {
+                  "ticker": "005930",
+                  "name": "삼성전자 파운드리",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "시장 데이터 조회 실패: no_usable_market_fields"
+                  ]
+                },
+                {
+                  "ticker": "CL=F",
+                  "name": "미국 국채·유가·정치 변수",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                }
+              ]
+            }
+          },
+          {
             "event_key": "jIq6dsZ-yQ8",
             "content_sha256": "85367c0c9ca7e30a03efaa03680b31490a1249ffd9e93d957b5f97688d3550c3",
             "occurred_at": "2026-10-30T07:58:45+00:00",
@@ -1923,6 +2268,255 @@
                   "status": "unverified",
                   "verification_notes": [
                     "시장 데이터 조회 실패: no_usable_market_fields"
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "event_key": "SCFvaPwtFfs",
+            "content_sha256": "3da3dc4771b60dc98962e16bd379783d04dba95a9741e0023e6606f582f4498c",
+            "occurred_at": "2026-10-31T11:00:35+00:00",
+            "relevance": {
+              "tickers": [
+                "INTC",
+                "AMZN",
+                "ORCL",
+                "^KS11"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "verified_entities",
+              "matched_tickers": [
+                "AMZN",
+                "INTC"
+              ],
+              "market_match": true,
+              "score": 220
+            },
+            "summary": {
+              "video_id": "SCFvaPwtFfs",
+              "title": "[#찐시황]  “월요일 검은 폭락장 오나?” 나스닥 급락, 반도체 슈퍼사이클 끝났나? / 그런데 외국인은 왜 선물을 쓸어담았을까?   | 이주연 대표",
+              "channel": "815Money talk",
+              "source_url": "https://www.youtube.com/watch?v=SCFvaPwtFfs",
+              "claim_status_summary": {
+                "unverified": 10
+              },
+              "claims": [
+                {
+                  "claim_id": "C1",
+                  "claim_text": "나스닥 종가 약 -2.8%·장중 약 -4%, 다우·S&P500 각각 -1% 초과, SOX -7% 초과 등 급락과 유가 약 104달러·미국 10년물 4.9% 초반대, 나스닥 200일선 지지 주장.",
+                  "status": "unverified",
+                  "confidence": 0.99,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "급락 규모나 기술적 지지 확인을 전제로 투자 판단하기에는 근거가 부족하다."
+                },
+                {
+                  "claim_id": "C2",
+                  "claim_text": "인텔의 4분기 매출 전망이 예상보다 약 10% 낮은 원인은 수요 감소가 아니라 이스라엘 공장 화재·2주 폐쇄 및 기판·서버 DRAM 공급 병목이며, 주가가 종가 약 28%·장중 30% 초과 하락했다는 주장과 65달러 지지선 해석.",
+                  "status": "unverified",
+                  "confidence": 0.97,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "공급 차질을 일시적 문제로 단정하거나 65달러를 검증된 매수 기준으로 삼을 수 없다."
+                },
+                {
+                  "claim_id": "C3",
+                  "claim_text": "키옥시아의 다음 분기 영업이익 전망이 예상보다 약 15% 낮고 NAND ASP 상승률이 1분기 약 70%에서 3분기 3~4%로 둔화하며, 하반기 부진과 내년 개선은 이미 예상됐다는 주장.",
+                  "status": "unverified",
+                  "confidence": 0.99,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "NAND 업황 정점이나 회복 시점을 해당 수치만으로 판단할 수 없다."
+                },
+                {
+                  "claim_id": "C4",
+                  "claim_text": "CXMT의 3분기 매출은 전년 대비 613% 증가했으나 분기 성장률은 95% 초과에서 19%로 둔화했으며, 중국 IT기업의 한국 업체 서버 DRAM 장기공급계약 요청이 기술 격차를 보여준다는 주장. CXMT·YMTC의 DRAM 생산 설명도 포함된다.",
+                  "status": "unverified",
+                  "confidence": 0.99,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "후발업체 성장 둔화를 업종 전체 수요 둔화로, 계약 요청을 한국 업체의 확정 수주나 기술 우위로 해석할 근거가 부족하다."
+                }
+              ],
+              "entities": [
+                {
+                  "ticker": "INTC",
+                  "name": "인텔",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                },
+                {
+                  "ticker": "AMZN",
+                  "name": "아마존",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                },
+                {
+                  "ticker": "ORCL",
+                  "name": "오라클",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                },
+                {
+                  "ticker": "^KS11",
+                  "name": "한국 증시·외국인 및 연기금 수급",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "event_key": "xf3RTTfU-kk",
+            "content_sha256": "a835742269bbab19828b6b9ffe42bb57faa709f6e3e9d2d589bf01987d15133b",
+            "occurred_at": "2026-10-31T05:00:03+00:00",
+            "relevance": {
+              "tickers": [
+                "CL=F",
+                "GOOGL",
+                "MSFT",
+                "AMZN",
+                "SOXX, INTC, SNDK",
+                "KO, NESN",
+                "ICE, NDAQ, CME, HOOD, COIN, IBKR, SCHW",
+                "BTC, ETH",
+                "FTNT, CIBR"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "verified_entities",
+              "matched_tickers": [
+                "AMZN",
+                "GOOGL"
+              ],
+              "market_match": true,
+              "score": 220
+            },
+            "summary": {
+              "video_id": "xf3RTTfU-kk",
+              "title": "반도체 쇼크 속에서 드러켄밀러는 이곳을 선택했다!",
+              "channel": "수페TV",
+              "source_url": "https://www.youtube.com/watch?v=xf3RTTfU-kk",
+              "claim_status_summary": {
+                "unverified": 8,
+                "partially_supported": 1,
+                "asr_uncertain": 1
+              },
+              "claims": [
+                {
+                  "claim_id": "C1",
+                  "claim_text": "주간 다우 -0.8%, S&P 500 -0.5%, 나스닥100 -2%, 장기채 +0.6%, 동일가중 +0.8%와 방어주·가치주 신고가는 순환매를 보여준다. 환율 +0.8%로 원화 수익률은 약 +0.3%이며, 개별 기업 실적·주가와 월간 자산 성과도 제시한다.",
+                  "status": "unverified",
+                  "confidence": 0.99,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "순환매와 개별 종목 호재를 확인된 투자 근거로 사용하기에는 자료가 부족하다."
+                },
+                {
+                  "claim_id": "C2",
+                  "claim_text": "10월 FOMC는 동결했으나 2명이 0.2%포인트 인상을 요구했고, 금리 결정 회의를 2027년 7회·2028년 6회로 줄인다. 10년물 금리는 4%대로 하락했으며 다음 회의는 12월 9일이고 인상 가능성이 높다.",
+                  "status": "unverified",
+                  "confidence": 0.99,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "인상 전망이나 회의 축소 주장을 금리·채권 포지션의 확정 전제로 삼기 어렵다."
+                },
+                {
+                  "claim_id": "C3",
+                  "claim_text": "WTI 선물은 103달러대이며 카타르 중재에도 이란 반발과 군사충돌 우려가 유가를 지지한다. 밴스의 이란 접촉 목적을 트럼프가 의료물자 지원이라고 설명했다.",
+                  "status": "unverified",
+                  "confidence": 0.97,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "조회 가격만으로 외교 사건이나 유가 상승 원인을 확인할 수 없다."
+                },
+                {
+                  "claim_id": "C4",
+                  "claim_text": "Alphabet 실적·현금흐름·성장률이 악화되고 주가가 급락했다. MSFT는 실적이 견조하지만 투자 부담이 있으며 AMZN은 실적이 기대에 미달했다. 수주잔고·설비투자와 TPU 공급 확대가 향후 수익성을 좌우한다.",
+                  "status": "partially_supported",
+                  "confidence": 0.96,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "일부 주가 하락폭만 수치상 확인된다. AI 투자 부담·실적 우열·투자 회수기간은 별도 확인이 필요하다."
+                }
+              ],
+              "entities": [
+                {
+                  "ticker": "CL=F",
+                  "name": "연준·금리·유가",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                },
+                {
+                  "ticker": "GOOGL",
+                  "name": "알파벳·구글",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                },
+                {
+                  "ticker": "MSFT",
+                  "name": "마이크로소프트",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                },
+                {
+                  "ticker": "AMZN",
+                  "name": "아마존",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                },
+                {
+                  "ticker": "SOXX, INTC, SNDK",
+                  "name": "반도체 ETF·인텔·샌디스크",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                },
+                {
+                  "ticker": "KO, NESN",
+                  "name": "코카콜라·네슬레",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                },
+                {
+                  "ticker": "ICE, NDAQ, CME, HOOD, COIN, IBKR, SCHW",
+                  "name": "드러켄밀러의 24시간 거래 플랫폼 투자·거래소 및 증권 플랫폼",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                },
+                {
+                  "ticker": "BTC, ETH",
+                  "name": "바이낸스 보안 사고·비트코인·이더리움",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
                   ]
                 }
               ]
@@ -2116,633 +2710,6 @@
                 }
               ]
             }
-          },
-          {
-            "event_key": "ixmxesWm4sA",
-            "content_sha256": "5f51a18ef2dbb0d893ae6e8af6b8b90dcf7e42020f6500319edf411070b043f3",
-            "occurred_at": "2026-10-30T02:45:27+00:00",
-            "relevance": {
-              "tickers": [
-                "GOOGL",
-                "005930/000660",
-                "CRWV",
-                "ORCL",
-                "INTC",
-                "CL=F"
-              ],
-              "markets": [
-                "US"
-              ],
-              "themes": [],
-              "match_basis": "verified_entities",
-              "matched_tickers": [
-                "GOOGL",
-                "INTC"
-              ],
-              "market_match": true,
-              "score": 220
-            },
-            "summary": {
-              "video_id": "ixmxesWm4sA",
-              "title": "'알파벳 쇼크'로 급락한 반도체, 삼전닉스 영향 어디까지? | 김영환 NH투자증권 차장 [아침N투자]",
-              "channel": "삼프로TV 3PROTV",
-              "source_url": "https://www.youtube.com/watch?v=ixmxesWm4sA",
-              "claim_status_summary": {
-                "unverified": 12
-              },
-              "claims": [
-                {
-                  "claim_id": "C1",
-                  "claim_text": "전일 알파벳 주가가 12% 이상 하락하고 시가총액 약 670조 원이 감소했다.",
-                  "status": "unverified",
-                  "confidence": 0.0,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "급락 규모를 확정 수치로 인용하거나 국내 반도체 하락의 직접 원인으로 단정할 근거가 부족하다."
-                },
-                {
-                  "claim_id": "C2",
-                  "claim_text": "알파벳의 클라우드 성장에도 광고 성장 둔화와 SpaceX 평가손실이 실적에 영향을 주었으며, AI 투자와 수익화의 시차로 2027~2028년 현금흐름 공백이 생길 수 있다.",
-                  "status": "unverified",
-                  "confidence": 0.0,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "매출 성장 둔화, 비현금 평가손익, 실제 현금흐름 부담을 분리해 판단해야 한다."
-                },
-                {
-                  "claim_id": "C3",
-                  "claim_text": "방송 중 국내 지수와 반도체가 급락하고 외국인이 약 7,400억 원을 순매도했으며, 최근 주가는 8~9월 고점보다 크게 낮았다.",
-                  "status": "unverified",
-                  "confidence": 0.0,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "제시된 가격을 매수 기준이나 과거 지지선으로 사용하기 전에 개별 종목 시세와 숫자 단위를 확인해야 한다."
-                },
-                {
-                  "claim_id": "C4",
-                  "claim_text": "SK하이닉스는 자사주 매입을 발표했지만 삼성전자 주주환원은 기대에 못 미쳤으며, 고객 빅테크의 조달 차질은 메모리 수요와 매출을 위축시킬 수 있다.",
-                  "status": "unverified",
-                  "confidence": 0.0,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "주주환원의 실제 규모·집행 여부와 고객 설비투자 계획을 각각 확인해야 한다."
-                }
-              ],
-              "entities": [
-                {
-                  "ticker": "GOOGL",
-                  "name": "알파벳",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                },
-                {
-                  "ticker": "005930/000660",
-                  "name": "삼성전자·SK하이닉스",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "시장 데이터 조회 실패: Failed to parse json response from Yahoo Finance: {'code': 'Not Found', 'description': 'HTTP 404 Not Found'}"
-                  ]
-                },
-                {
-                  "ticker": "CRWV",
-                  "name": "코어위브",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                },
-                {
-                  "ticker": "ORCL",
-                  "name": "오라클",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                },
-                {
-                  "ticker": "INTC",
-                  "name": "인텔",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                },
-                {
-                  "ticker": "CL=F",
-                  "name": "반도체 소부장·전력 인프라·고유가 수혜 업종",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                }
-              ]
-            }
-          },
-          {
-            "event_key": "6Z8tsk-zIVo",
-            "content_sha256": "aa3f8af7285a33917ab26bf1cd988173fbd28a5b2d1294cedd912907637d830e",
-            "occurred_at": "2026-10-30T02:20:48+00:00",
-            "relevance": {
-              "tickers": [
-                "AMZN",
-                "GOOGL",
-                "ORCL",
-                "CRWV",
-                "005930",
-                "000660",
-                "006400",
-                "373220"
-              ],
-              "markets": [
-                "US",
-                "KR"
-              ],
-              "themes": [],
-              "match_basis": "verified_entities",
-              "matched_tickers": [
-                "AMZN",
-                "GOOGL"
-              ],
-              "market_match": true,
-              "score": 220
-            },
-            "summary": {
-              "video_id": "6Z8tsk-zIVo",
-              "title": "29년까지 완판인데, 왜 의심할까? | 김태균 하나증권 광주금융센터 PB [더블 크루]",
-              "channel": "삼프로TV 3PROTV",
-              "source_url": "https://www.youtube.com/watch?v=6Z8tsk-zIVo",
-              "claim_status_summary": {
-                "unverified": 9,
-                "asr_uncertain": 2,
-                "partially_supported": 1
-              },
-              "claims": [
-                {
-                  "claim_id": "C1",
-                  "claim_text": "영상은 다음 주 미국 중간선거와 하원 민주당 소폭 우세를 언급하고, 당일을 10월 마지막 날·마지막 거래일로 표현한다. 공화당 승리 이후 전쟁·유가 상승은 조건부 시나리오다.",
-                  "status": "unverified",
-                  "confidence": 0.98,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "정치 시나리오를 확정 전망으로 사용하지 말고 촬영일과 정책·시장 반응을 별도로 확인해야 한다."
-                },
-                {
-                  "claim_id": "C2",
-                  "claim_text": "아마존은 CAPEX 가이던스를 대체로 충족했지만 잉여현금흐름이 기대에 못 미쳤고, 알파벳은 CAPEX가 가이던스보다 소폭 낮아 주가가 압박받았다.",
-                  "status": "unverified",
-                  "confidence": 0.99,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "양사 실적 발표 원문과 발표 이전 컨센서스를 확보하기 전에는 AI 투자 축소나 자금 부족을 확정할 수 없다."
-                },
-                {
-                  "claim_id": "C3",
-                  "claim_text": "메타가 선제적으로 유상증자를 실행했고 앤트로픽도 자금조달이 필요하며, 동시 조달 수요가 위험자산 선호를 약화시켰다.",
-                  "status": "unverified",
-                  "confidence": 0.99,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "증자에 따른 희석과 채권 발행에 따른 부채 부담을 구분하기 전에는 투자 영향을 산정하기 어렵다."
-                },
-                {
-                  "claim_id": "C4",
-                  "claim_text": "마이크로소프트를 제외한 빅테크의 잉여현금흐름 적자가 2027년 말까지 지속된다는 전망이 있다.",
-                  "status": "unverified",
-                  "confidence": 0.99,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "빅테크 전반의 현금 부족을 전제로 투자 판단하기에는 근거가 부족하다."
-                }
-              ],
-              "entities": [
-                {
-                  "ticker": "AMZN",
-                  "name": "아마존",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                },
-                {
-                  "ticker": "GOOGL",
-                  "name": "알파벳·구글",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                },
-                {
-                  "ticker": "ORCL",
-                  "name": "오라클",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                },
-                {
-                  "ticker": "CRWV",
-                  "name": "코어위브로 추정되는 기업",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                },
-                {
-                  "ticker": "005930",
-                  "name": "삼성전자",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "시장 데이터 조회 실패: no_usable_market_fields"
-                  ]
-                },
-                {
-                  "ticker": "000660",
-                  "name": "SK하이닉스",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "시장 데이터 조회 실패: no_usable_market_fields"
-                  ]
-                },
-                {
-                  "ticker": "006400",
-                  "name": "삼성SDI",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "시장 데이터 조회 실패: no_usable_market_fields"
-                  ]
-                },
-                {
-                  "ticker": "373220",
-                  "name": "LG에너지솔루션",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "시장 데이터 조회 실패: no_usable_market_fields"
-                  ]
-                }
-              ]
-            }
-          },
-          {
-            "event_key": "hqUbRKYT_Oc",
-            "content_sha256": "9a3c489636bb6ca7d335b073abb2595bf885318942ab0cae46d3b3f3269c07c7",
-            "occurred_at": "2026-10-30T04:39:57+00:00",
-            "relevance": {
-              "tickers": [
-                "NVDA",
-                "005930",
-                "000660"
-              ],
-              "markets": [
-                "US",
-                "KR"
-              ],
-              "themes": [],
-              "match_basis": "verified_entities",
-              "matched_tickers": [
-                "NVDA"
-              ],
-              "market_match": true,
-              "score": 120
-            },
-            "summary": {
-              "video_id": "hqUbRKYT_Oc",
-              "title": "투자자들이 '젠슨황 중국 스파이' 사건을 꼭 알아야 하는 이유",
-              "channel": "경제사냥꾼",
-              "source_url": "https://www.youtube.com/watch?v=hqUbRKYT_Oc",
-              "claim_status_summary": {
-                "unverified": 8,
-                "partially_supported": 2
-              },
-              "claims": [
-                {
-                  "claim_id": "C1",
-                  "claim_text": "뉴욕타임스가 메가 스피드 임원 앨리스 황과 젠슨 황의 만남 및 앨리스 황에 대한 미국 정보 당국의 의심을 보도했다는 주장이다.",
-                  "status": "unverified",
-                  "confidence": 0.99,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "간첩 의혹이나 관련자의 위법 행위를 확정 사실로 투자 판단에 반영할 근거가 없다."
-                },
-                {
-                  "claim_id": "C2",
-                  "claim_text": "메가 스피드가 재작년 여름부터 올해 초까지 6조 원 초과 장비를 구매했고, 미국 조사관이 미설치·미개봉 장비를 확인해 중국 우회 유입을 의심했다는 주장이다.",
-                  "status": "unverified",
-                  "confidence": 0.99,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "우회 수출과 제재 위험을 확정하거나 구매액을 매출 손실 규모로 환산할 수 없다."
-                },
-                {
-                  "claim_id": "C3",
-                  "claim_text": "엔비디아는 일상적인 고객 미팅이었으며 자체 조사에서 칩 유용 문제를 발견하지 못했다고 밝혔고, 중국 측도 의혹을 부인했다는 주장이다.",
-                  "status": "unverified",
-                  "confidence": 0.99,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "부인 발언을 확인하거나 이를 규제 위험 해소의 근거로 사용할 수 없다."
-                },
-                {
-                  "claim_id": "C4",
-                  "claim_text": "지난해 말 젠슨 황의 설득으로 수익의 25%를 미국 정부에 귀속시키는 조건의 일부 고급 반도체 대중 판매 허가를 얻었다는 주장이다.",
-                  "status": "unverified",
-                  "confidence": 0.99,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "25%를 엔비디아 이익률이나 중국 매출 추정에 적용할 수 없다."
-                }
-              ],
-              "entities": [
-                {
-                  "ticker": "NVDA",
-                  "name": "엔비디아",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                },
-                {
-                  "ticker": "005930",
-                  "name": "삼성전자",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "시장 데이터 조회 실패: no_usable_market_fields"
-                  ]
-                },
-                {
-                  "ticker": "000660",
-                  "name": "SK하이닉스",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "시장 데이터 조회 실패: no_usable_market_fields"
-                  ]
-                }
-              ]
-            }
-          },
-          {
-            "event_key": "DFuuPZ9qI1E",
-            "content_sha256": "e98f0781561c09588ee76fdf299e10cbdd9d30687ded4d332db12f2b74ea122f",
-            "occurred_at": "2026-10-29T12:00:29+00:00",
-            "relevance": {
-              "tickers": [
-                "005930",
-                "000660",
-                "^KS11",
-                "CRWV",
-                "MSFT",
-                "GOOGL",
-                "AMZN"
-              ],
-              "markets": [
-                "KR",
-                "US"
-              ],
-              "themes": [],
-              "match_basis": "verified_entities",
-              "matched_tickers": [
-                "AMZN",
-                "GOOGL"
-              ],
-              "market_match": true,
-              "score": 220
-            },
-            "summary": {
-              "video_id": "DFuuPZ9qI1E",
-              "title": "추가 급락 가능성은 줄었지만 12월까지 길어질 조정에 대비하는 법ㅣ명민준, 박가영, 이지환 [주린이 구조대]",
-              "channel": "삼프로TV 3PROTV",
-              "source_url": "https://www.youtube.com/watch?v=DFuuPZ9qI1E",
-              "claim_status_summary": {
-                "unverified": 7,
-                "partially_supported": 1,
-                "asr_uncertain": 4
-              },
-              "claims": [
-                {
-                  "claim_id": "C1",
-                  "claim_text": "삼성전자 배당 약 30조원, 2024~2026년 FCF 50% 주주환원 및 다음 해 1월 추가 발표 주장.",
-                  "status": "unverified",
-                  "confidence": 0.98,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "배당 규모와 추가 환원을 확정된 투자수익으로 반영할 근거가 부족하다."
-                },
-                {
-                  "claim_id": "C2",
-                  "claim_text": "삼성전자·SK하이닉스의 장중 등락 차이와 외국인 매수 전환, 10월 말 현물·선물 수급 개선 주장.",
-                  "status": "partially_supported",
-                  "confidence": 0.94,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "당일 주가 차이는 일부 확인되지만 외국인 매집이나 수급 개선에 따른 매수 판단은 미검증이다."
-                },
-                {
-                  "claim_id": "C3",
-                  "claim_text": "대차잔고 고점과 차월물 하방 포지션 부재가 추가 급락 위험 축소 및 숏커버링 반등을 시사한다는 주장.",
-                  "status": "unverified",
-                  "confidence": 0.99,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "추가 급락 가능성이 낮아졌다는 결론은 검증된 위험지표가 아니라 출연자의 전망으로 취급해야 한다."
-                },
-                {
-                  "claim_id": "C4",
-                  "claim_text": "코어위브가 이틀간 약 8%, 7% 상승했으며 공매도 관련 23.7~24% 수치와 함께 숏커버링 신호라는 주장.",
-                  "status": "unverified",
-                  "confidence": 0.98,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "네오클라우드 하방 압력 완화나 실제 숏커버링이 확인됐다고 해석할 근거가 부족하다."
-                }
-              ],
-              "entities": [
-                {
-                  "ticker": "005930",
-                  "name": "삼성전자",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "시장 데이터 조회 실패: no_usable_market_fields"
-                  ]
-                },
-                {
-                  "ticker": "000660",
-                  "name": "SK하이닉스",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "시장 데이터 조회 실패: no_usable_market_fields"
-                  ]
-                },
-                {
-                  "ticker": "^KS11",
-                  "name": "한국 증시·미국 통화정책 및 정치 변수",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                },
-                {
-                  "ticker": "CRWV",
-                  "name": "코어위브·네오클라우드",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                },
-                {
-                  "ticker": "MSFT",
-                  "name": "마이크로소프트",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                },
-                {
-                  "ticker": "GOOGL",
-                  "name": "알파벳·구글",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                },
-                {
-                  "ticker": "AMZN",
-                  "name": "아마존",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                }
-              ]
-            }
-          },
-          {
-            "event_key": "GMfV1tBQPcE",
-            "content_sha256": "1a88a6e456c526362b3bcd3da35c65397bea69aa571180c06aee951d7411a7d1",
-            "occurred_at": "2026-10-30T06:13:06+00:00",
-            "relevance": {
-              "tickers": [
-                "^KS11",
-                "GOOGL, AMZN, MSFT",
-                "005930, 000660",
-                "INTC",
-                "CRWV",
-                "CL=F"
-              ],
-              "markets": [
-                "US"
-              ],
-              "themes": [],
-              "match_basis": "verified_entities",
-              "matched_tickers": [
-                "INTC"
-              ],
-              "market_match": true,
-              "score": 120
-            },
-            "summary": {
-              "video_id": "GMfV1tBQPcE",
-              "title": "\"금리 발작 아닌 정상화\" 빅테크 회사채와 채권 시장 흔들리는 진짜 이유ㅣ권다영, 이지환 오로라투자자문 대표 [2시 마켓워치]",
-              "channel": "삼프로TV 3PROTV",
-              "source_url": "https://www.youtube.com/watch?v=GMfV1tBQPcE",
-              "claim_status_summary": {
-                "partially_supported": 2,
-                "unverified": 7,
-                "asr_uncertain": 1
-              },
-              "claims": [
-                {
-                  "claim_id": "C1",
-                  "claim_text": "방송 당시 국내 지수·반도체 주가가 급락하고 외국인 매도가 이어졌으며, 최근 한 달 코스닥 약 50%·코스피 40% 이상 하락과 수급 주도의 약세가 나타났다는 주장.",
-                  "status": "partially_supported",
-                  "confidence": 0.9,
-                  "supporting_evidence_ids": [
-                    "E1"
-                  ],
-                  "manual_check_required": true,
-                  "investor_implication": "당일 약세라는 방향만 일부 확인된다. 월간 낙폭과 외국인 매수 전환을 반등 판단의 확정 근거로 사용하기 어렵다."
-                },
-                {
-                  "claim_id": "C2",
-                  "claim_text": "알파벳·아마존·마이크로소프트의 AI·클라우드 실적이 양호했고, 구글은 15%대 급락했으며 AI 투자 지속과 다음 주 재평가가 가능하다는 주장.",
-                  "status": "unverified",
-                  "confidence": 0.98,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "AI·클라우드 성장과 투자 현금유출을 기업별로 확인하기 전에는 실적 우려가 과도하다고 결론 내리기 어렵다."
-                },
-                {
-                  "claim_id": "C3",
-                  "claim_text": "SK하이닉스 장기 계약률이 약 50%이고 2029~2030년까지 발주가 확보됐으며, 삼성전자 주주환원 정책이 내년 1월로 연기됐다는 주장.",
-                  "status": "partially_supported",
-                  "confidence": 0.93,
-                  "supporting_evidence_ids": [
-                    "E5"
-                  ],
-                  "manual_check_required": true,
-                  "investor_implication": "장기 수요와 주주환원 결정 일정에는 일부 보도 근거가 있지만, 계약 기간·비중·취소 조건을 확인하지 않고 실적 가시성을 확대 해석하면 안 된다."
-                },
-                {
-                  "claim_id": "C4",
-                  "claim_text": "메모리 가격이 약 11배·15배 상승하고 10월에도 15%·30% 올랐으며, 생산 전환에 따른 공급 축소·인텔의 2027년까지 PC 수요 감소 전망·모건스탠리 전망 수정이 있었다는 주장.",
-                  "status": "unverified",
-                  "confidence": 0.98,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "가격 상승폭과 수요 지속성을 수익 전망에 반영하려면 제품별 가격 시계열과 최종 수요 전망을 먼저 확인해야 한다."
-                }
-              ],
-              "entities": [
-                {
-                  "ticker": "^KS11",
-                  "name": "한국 증시·외국인 수급",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                },
-                {
-                  "ticker": "GOOGL, AMZN, MSFT",
-                  "name": "알파벳·아마존·마이크로소프트",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                },
-                {
-                  "ticker": "005930, 000660",
-                  "name": "삼성전자·SK하이닉스 및 메모리 반도체",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "시장 데이터 조회 실패: no_usable_market_fields"
-                  ]
-                },
-                {
-                  "ticker": "INTC",
-                  "name": "인텔",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                },
-                {
-                  "ticker": "CRWV",
-                  "name": "코어위브",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                },
-                {
-                  "ticker": "CL=F",
-                  "name": "미국 경기·유가·통화정책·중간선거",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                }
-              ]
-            }
           }
         ],
         "execution_eligible": false
@@ -2772,30 +2739,30 @@
             "source_health": "OK",
             "event_keys": [
               "9aLC5CXbVK0",
+              "2uZN3S41GL8",
               "TYFlo5nOMZc",
               "FmNz4cnxhuA",
               "9JAv6eHUUG8",
+              "FgMNYoPEenQ",
+              "ET41_ENzq7w",
               "jIq6dsZ-yQ8",
+              "SCFvaPwtFfs",
+              "xf3RTTfU-kk",
               "lE2zaItUmoQ",
-              "DBm1cqv3avc",
-              "ixmxesWm4sA",
-              "6Z8tsk-zIVo",
-              "hqUbRKYT_Oc",
-              "DFuuPZ9qI1E",
-              "GMfV1tBQPcE"
+              "DBm1cqv3avc"
             ],
             "coverage": {
-              "total_unique_events": 630,
-              "window_events": 93,
+              "total_unique_events": 640,
+              "window_events": 78,
               "transmitted_events": 12,
               "truncated": true,
               "oldest_occurred_at": "2026-10-29T09:00:01+00:00",
-              "newest_occurred_at": "2026-10-30T11:00:15+00:00",
+              "newest_occurred_at": "2026-10-31T11:00:35+00:00",
               "available_events_before_context_cap": 60,
               "context_event_cap": 12,
-              "omitted_events": 81,
+              "omitted_events": 66,
               "omitted_due_to_context_cap": 48,
-              "omitted_before_context_selection": 33
+              "omitted_before_context_selection": 18
             }
           },
           "prism": {
