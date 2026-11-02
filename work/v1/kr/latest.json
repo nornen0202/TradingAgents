@@ -1,13 +1,13 @@
 {
   "schema": "tradingagents.work-context/v1",
   "surface": "kr",
-  "event_id": "kr:78e8b0b0817b978401868a80bf37a8be",
+  "event_id": "kr:723ea24f089c5f9f9ef5da8409325710",
   "prompt_contract_version": "market-work-v12-kr",
   "prompt_sha256": "ae80093efe2dcfe7f6131b8b09100f75e77b0ca0242b5340d15eb6ec3fd81274",
   "skill_sha256": "2fef99f1af403675549a13813e0fe5597a241a964affeada56e9f64e9f398fe9",
   "task_manifest_sha256": "0ea8b7511042a3aa7d6fa8447d97032d4be515f69526190a4c9556d01067c6df",
   "workflow_contract_sha256": "4f1b419a091e9fe8868628ed6d18499341f5c8830a0873302fa24e8ead61182e",
-  "source_sha256": "1410bcfbcaf54034a9d78b37aef136ff3dd3460e489d9c2303a48db7b41ee933",
+  "source_sha256": "a9329bc935d7344c0738ef0ee91c6ff0a94c7c3505b8475019a3d5c8cb024433",
   "body": {
     "kind": "market",
     "market": "KR",
@@ -209,15 +209,15 @@
       },
       "latest_attempt": {
         "schema": "tradingagents.analysis-attempt/v1",
-        "run_id": "20261030T050115_local-scheduler-kr-full",
+        "run_id": "20261102T101109_local-scheduler-kr-full",
         "market": "KR",
         "run_mode": "full",
-        "started_at": "2026-10-30T05:01:15.744858+09:00",
-        "status": "SUCCESS",
-        "heartbeat_at": "2026-10-29T23:26:03.889005+00:00",
-        "finished_at": "2026-10-29T23:26:03.888993+00:00",
-        "completed_tickers": 30,
-        "error_type": null
+        "started_at": "2026-11-02T10:11:09.864480+09:00",
+        "status": "FAILED",
+        "heartbeat_at": "2026-11-02T01:11:13.945514+00:00",
+        "finished_at": "2026-11-02T01:11:13.945498+00:00",
+        "completed_tickers": null,
+        "error_type": "ValueError"
       },
       "latest_completed_analysis": {
         "run_id": "20261030T050115_local-scheduler-kr-full",
@@ -838,16 +838,16 @@
         "source_health": "OK",
         "coverage": {
           "total_unique_events": 640,
-          "window_events": 72,
+          "window_events": 39,
           "transmitted_events": 12,
           "truncated": true,
-          "oldest_occurred_at": "2026-10-29T10:00:37+00:00",
-          "newest_occurred_at": "2026-10-31T09:00:02+00:00",
-          "available_events_before_context_cap": 60,
+          "oldest_occurred_at": "2026-10-30T02:20:48+00:00",
+          "newest_occurred_at": "2026-10-31T13:23:28+00:00",
+          "available_events_before_context_cap": 39,
           "context_event_cap": 12,
-          "omitted_events": 60,
-          "omitted_due_to_context_cap": 48,
-          "omitted_before_context_selection": 12
+          "omitted_events": 27,
+          "omitted_due_to_context_cap": 27,
+          "omitted_before_context_selection": 0
         },
         "events": [
           {
@@ -1906,270 +1906,150 @@
             }
           },
           {
-            "event_key": "9JAv6eHUUG8",
-            "content_sha256": "05913eabfb73948d25cd7f21846337b4cc30116d7c73951b1a0f9832b11a7f5d",
-            "occurred_at": "2026-10-29T14:00:36+00:00",
+            "event_key": "Fb5BSULdWAc",
+            "content_sha256": "78a9ade0e8164f92418c30b05696f14fe81459724941cfd49a1ca00a9dbeea7b",
+            "occurred_at": "2026-10-31T13:23:28+00:00",
             "relevance": {
               "tickers": [
-                "SPX",
-                "SOX",
-                "MSFT",
-                "GOOGL",
-                "NVDA",
-                "TSM",
-                "MU",
-                "005930",
-                "000660",
-                "AMZN"
+                "^KS11"
               ],
               "markets": [
-                "US",
-                "KR"
+                "US"
               ],
               "themes": [],
               "match_basis": "verified_entities",
-              "matched_tickers": [
-                "000660",
-                "005930"
-              ],
-              "market_match": true,
-              "score": 220
+              "matched_tickers": [],
+              "market_match": false,
+              "score": 0
             },
             "summary": {
-              "video_id": "9JAv6eHUUG8",
-              "title": "12월 금리 인상 확률 85%, 미국 증시가 오르는 이유",
+              "video_id": "Fb5BSULdWAc",
+              "title": "맨날 전기 부족하다면서, 전력·원전주는 왜 폭락할까?!",
               "channel": "경제사냥꾼",
-              "source_url": "https://www.youtube.com/watch?v=9JAv6eHUUG8",
+              "source_url": "https://www.youtube.com/watch?v=Fb5BSULdWAc",
               "claim_status_summary": {
-                "unverified": 8,
-                "asr_uncertain": 1,
-                "partially_supported": 1
+                "unverified": 12
               },
               "claims": [
                 {
                   "claim_id": "C1",
-                  "claim_text": "9월 25bp 인상으로 정책금리가 3.75~4.00%가 됐고, 10월 동결 표결은 10대 2이며 반대자 모두 인상을 요구했다. 9월 점도표에서 18명 중 16명이 연내 추가 인상을 전망했고 성장률·물가 전망은 상향, 실업률 전망은 하향됐다. 의장·위원 신원과 경기 표현 변경도 검증 대상이다.",
+                  "claim_text": "IEA数据显示世界数据中心用电量由485增至2030年的950；整体及AI数据中心用电分别增长17%、50%；大型科技企业资本开支超过4000亿美元并预计增长75%，电网、设备及芯片瓶颈限制投运。",
                   "status": "unverified",
-                  "confidence": 0.0,
+                  "confidence": 0.99,
                   "supporting_evidence_ids": [],
                   "manual_check_required": true,
-                  "investor_implication": "금리 인상 경로와 연준 인사 설명을 확인된 투자 전제로 사용할 수 없다."
+                  "investor_implication": "不能据此量化电力需求增幅或推导相关企业订单、利润增长。"
                 },
                 {
                   "claim_id": "C2",
-                  "claim_text": "한국시간 10월 29일 07:04 보도 기준 CME FedWatch의 12월 25bp 인상 확률이 전날 약 78%에서 85%로 상승했으며, 이는 연준 확약이 아닌 선물가격 기반 기대다.",
+                  "claim_text": "美国能源部2024年末预测，美国数据中心用电量从2023年的176增至2028年的325—580，单位未确认。",
                   "status": "unverified",
-                  "confidence": 0.0,
+                  "confidence": 0.99,
                   "supporting_evidence_ids": [],
                   "manual_check_required": true,
-                  "investor_implication": "85%를 확인된 인상 가능성으로 제시하거나 포지션의 확률 근거로 삼을 수 없다."
+                  "investor_implication": "预测区间的规模及其对美国电力设备需求的含义尚不能量化。"
                 },
                 {
                   "claim_id": "C3",
-                  "claim_text": "9월 CPI 3.7%·근원 CPI 2.6%, 휘발유 전월비 9% 초과 및 물가 상승분 절반 초과 기여, 8월 실질소비 0.6% 증가, 9월 고용 2.9만 명 증가와 이전 두 달 6만 명 하향을 주장한다. GDP·PCE·CPI·고용·FOMC 일정과 11월 10일 CPI가 12월 회의 전 마지막이라는 설명도 검증 대상이다.",
+                  "claim_text": "微软在美国当地10月28日发布的业绩中，Azure收入增长48%。",
                   "status": "unverified",
-                  "confidence": 0.0,
+                  "confidence": 0.99,
                   "supporting_evidence_ids": [],
                   "manual_check_required": true,
-                  "investor_implication": "물가 재가속·고용 약화 판단과 이벤트 대응 시점은 공식 발표 원문 확인 전까지 유보해야 한다."
+                  "investor_implication": "不能以48%作为已核实的云业务增长率或电力需求代理指标。"
                 },
                 {
                   "claim_id": "C4",
-                  "claim_text": "S&P 500·SOX의 일간·연초·고점·저점 대비 수익률, MU·NVDA의 FOMC 당일 등락과 미국 10년물 금리 5% 돌파를 주장한다. FOMC 결정일 상승 이력 및 2004~2006·2017·2018·2022년 긴축·물가·주가 비교도 검증 대상이다.",
+                  "claim_text": "韩水原于10月29日终止捷克杜科瓦尼施工谈判，但斗山设备合同保持有效；两座机组主合同约27万亿韩元，施工份额大宇55%、斗山45%；设备合同约5.64万亿韩元、截至2038年4月，无预付款并按进度收费，新施工合同目标为次年7月。",
                   "status": "unverified",
-                  "confidence": 0.0,
+                  "confidence": 0.99,
                   "supporting_evidence_ids": [],
                   "manual_check_required": true,
-                  "investor_implication": "검증되지 않은 수익률이나 과거 긴축 사례로 현재 증시의 상승 여력을 추정할 수 없다."
+                  "investor_implication": "不能确认设备收入保障、施工机会损失或回款时间；合同总额不能直接作为当期收入和现金流。"
                 }
               ],
               "entities": [
                 {
-                  "ticker": "SPX",
-                  "name": "S&P 500",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "시장 데이터 조회 실패: no_usable_market_fields"
-                  ]
-                },
-                {
-                  "ticker": "SOX",
-                  "name": "필라델피아 반도체 지수·메모리 시장",
+                  "ticker": "^KS11",
+                  "name": "전력·원전주 및 코스피",
                   "status": "unverified",
                   "verification_notes": [
                     "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                },
-                {
-                  "ticker": "MSFT",
-                  "name": "마이크로소프트",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                },
-                {
-                  "ticker": "GOOGL",
-                  "name": "알파벳",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                },
-                {
-                  "ticker": "NVDA",
-                  "name": "엔비디아",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                },
-                {
-                  "ticker": "TSM",
-                  "name": "TSMC",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                },
-                {
-                  "ticker": "MU",
-                  "name": "마이크론",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                },
-                {
-                  "ticker": "005930",
-                  "name": "삼성전자",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "시장 데이터 조회 실패: no_usable_market_fields"
                   ]
                 }
               ]
             }
           },
           {
-            "event_key": "DFuuPZ9qI1E",
-            "content_sha256": "e98f0781561c09588ee76fdf299e10cbdd9d30687ded4d332db12f2b74ea122f",
-            "occurred_at": "2026-10-29T12:00:29+00:00",
+            "event_key": "SCFvaPwtFfs",
+            "content_sha256": "3da3dc4771b60dc98962e16bd379783d04dba95a9741e0023e6606f582f4498c",
+            "occurred_at": "2026-10-31T11:00:35+00:00",
             "relevance": {
               "tickers": [
-                "005930",
-                "000660",
-                "^KS11",
-                "CRWV",
-                "MSFT",
-                "GOOGL",
-                "AMZN"
+                "INTC",
+                "AMZN",
+                "ORCL",
+                "^KS11"
               ],
               "markets": [
-                "KR",
                 "US"
               ],
               "themes": [],
               "match_basis": "verified_entities",
-              "matched_tickers": [
-                "000660",
-                "005930"
-              ],
-              "market_match": true,
-              "score": 220
+              "matched_tickers": [],
+              "market_match": false,
+              "score": 0
             },
             "summary": {
-              "video_id": "DFuuPZ9qI1E",
-              "title": "추가 급락 가능성은 줄었지만 12월까지 길어질 조정에 대비하는 법ㅣ명민준, 박가영, 이지환 [주린이 구조대]",
-              "channel": "삼프로TV 3PROTV",
-              "source_url": "https://www.youtube.com/watch?v=DFuuPZ9qI1E",
+              "video_id": "SCFvaPwtFfs",
+              "title": "[#찐시황]  “월요일 검은 폭락장 오나?” 나스닥 급락, 반도체 슈퍼사이클 끝났나? / 그런데 외국인은 왜 선물을 쓸어담았을까?   | 이주연 대표",
+              "channel": "815Money talk",
+              "source_url": "https://www.youtube.com/watch?v=SCFvaPwtFfs",
               "claim_status_summary": {
-                "unverified": 7,
-                "partially_supported": 1,
-                "asr_uncertain": 4
+                "unverified": 10
               },
               "claims": [
                 {
                   "claim_id": "C1",
-                  "claim_text": "삼성전자 배당 약 30조원, 2024~2026년 FCF 50% 주주환원 및 다음 해 1월 추가 발표 주장.",
-                  "status": "unverified",
-                  "confidence": 0.98,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "배당 규모와 추가 환원을 확정된 투자수익으로 반영할 근거가 부족하다."
-                },
-                {
-                  "claim_id": "C2",
-                  "claim_text": "삼성전자·SK하이닉스의 장중 등락 차이와 외국인 매수 전환, 10월 말 현물·선물 수급 개선 주장.",
-                  "status": "partially_supported",
-                  "confidence": 0.94,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "당일 주가 차이는 일부 확인되지만 외국인 매집이나 수급 개선에 따른 매수 판단은 미검증이다."
-                },
-                {
-                  "claim_id": "C3",
-                  "claim_text": "대차잔고 고점과 차월물 하방 포지션 부재가 추가 급락 위험 축소 및 숏커버링 반등을 시사한다는 주장.",
+                  "claim_text": "나스닥 종가 약 -2.8%·장중 약 -4%, 다우·S&P500 각각 -1% 초과, SOX -7% 초과 등 급락과 유가 약 104달러·미국 10년물 4.9% 초반대, 나스닥 200일선 지지 주장.",
                   "status": "unverified",
                   "confidence": 0.99,
                   "supporting_evidence_ids": [],
                   "manual_check_required": true,
-                  "investor_implication": "추가 급락 가능성이 낮아졌다는 결론은 검증된 위험지표가 아니라 출연자의 전망으로 취급해야 한다."
+                  "investor_implication": "급락 규모나 기술적 지지 확인을 전제로 투자 판단하기에는 근거가 부족하다."
+                },
+                {
+                  "claim_id": "C2",
+                  "claim_text": "인텔의 4분기 매출 전망이 예상보다 약 10% 낮은 원인은 수요 감소가 아니라 이스라엘 공장 화재·2주 폐쇄 및 기판·서버 DRAM 공급 병목이며, 주가가 종가 약 28%·장중 30% 초과 하락했다는 주장과 65달러 지지선 해석.",
+                  "status": "unverified",
+                  "confidence": 0.97,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "공급 차질을 일시적 문제로 단정하거나 65달러를 검증된 매수 기준으로 삼을 수 없다."
+                },
+                {
+                  "claim_id": "C3",
+                  "claim_text": "키옥시아의 다음 분기 영업이익 전망이 예상보다 약 15% 낮고 NAND ASP 상승률이 1분기 약 70%에서 3분기 3~4%로 둔화하며, 하반기 부진과 내년 개선은 이미 예상됐다는 주장.",
+                  "status": "unverified",
+                  "confidence": 0.99,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "NAND 업황 정점이나 회복 시점을 해당 수치만으로 판단할 수 없다."
                 },
                 {
                   "claim_id": "C4",
-                  "claim_text": "코어위브가 이틀간 약 8%, 7% 상승했으며 공매도 관련 23.7~24% 수치와 함께 숏커버링 신호라는 주장.",
+                  "claim_text": "CXMT의 3분기 매출은 전년 대비 613% 증가했으나 분기 성장률은 95% 초과에서 19%로 둔화했으며, 중국 IT기업의 한국 업체 서버 DRAM 장기공급계약 요청이 기술 격차를 보여준다는 주장. CXMT·YMTC의 DRAM 생산 설명도 포함된다.",
                   "status": "unverified",
-                  "confidence": 0.98,
+                  "confidence": 0.99,
                   "supporting_evidence_ids": [],
                   "manual_check_required": true,
-                  "investor_implication": "네오클라우드 하방 압력 완화나 실제 숏커버링이 확인됐다고 해석할 근거가 부족하다."
+                  "investor_implication": "후발업체 성장 둔화를 업종 전체 수요 둔화로, 계약 요청을 한국 업체의 확정 수주나 기술 우위로 해석할 근거가 부족하다."
                 }
               ],
               "entities": [
                 {
-                  "ticker": "005930",
-                  "name": "삼성전자",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "시장 데이터 조회 실패: no_usable_market_fields"
-                  ]
-                },
-                {
-                  "ticker": "000660",
-                  "name": "SK하이닉스",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "시장 데이터 조회 실패: no_usable_market_fields"
-                  ]
-                },
-                {
-                  "ticker": "^KS11",
-                  "name": "한국 증시·미국 통화정책 및 정치 변수",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                },
-                {
-                  "ticker": "CRWV",
-                  "name": "코어위브·네오클라우드",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                },
-                {
-                  "ticker": "MSFT",
-                  "name": "마이크로소프트",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                },
-                {
-                  "ticker": "GOOGL",
-                  "name": "알파벳·구글",
+                  "ticker": "INTC",
+                  "name": "인텔",
                   "status": "unverified",
                   "verification_notes": [
                     "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
@@ -2182,110 +2062,10 @@
                   "verification_notes": [
                     "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
                   ]
-                }
-              ]
-            }
-          },
-          {
-            "event_key": "fKb-mxpwg9M",
-            "content_sha256": "580e838b8941d8215730da517e7a38f3c5db6bf76434b9fa3e8dafb697963f65",
-            "occurred_at": "2026-10-29T10:00:37+00:00",
-            "relevance": {
-              "tickers": [
-                "000660",
-                "GOOGL",
-                "MSFT",
-                "META",
-                "^KS11",
-                "005930"
-              ],
-              "markets": [
-                "KR",
-                "US"
-              ],
-              "themes": [],
-              "match_basis": "verified_entities",
-              "matched_tickers": [
-                "000660",
-                "005930"
-              ],
-              "market_match": true,
-              "score": 220
-            },
-            "summary": {
-              "video_id": "fKb-mxpwg9M",
-              "title": "이번 실적발표로 확인된, 반도체 전망 진짜 역대급입니다",
-              "channel": "경제사냥꾼",
-              "source_url": "https://www.youtube.com/watch?v=fKb-mxpwg9M",
-              "claim_status_summary": {
-                "unverified": 12
-              },
-              "claims": [
-                {
-                  "claim_id": "C1",
-                  "claim_text": "SK하이닉스가 6월 22일~10월 26일 56% 하락한 뒤 전일 약 11% 상승해 148만7,000원에 마감했고, 코스피는 6월 종가 고점 대비 34% 낮았으며 알파벳은 실적 발표 후 시간외 약 10% 하락했다.",
-                  "status": "unverified",
-                  "confidence": 0.99,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "정확한 낙폭과 반등률을 확인하기 전에는 이를 저평가나 추세 반전의 근거로 사용하지 않는다."
                 },
                 {
-                  "claim_id": "C2",
-                  "claim_text": "SK하이닉스 3분기 영업이익은 83조3,000억원, 영업이익률은 약 80%, 2019년 연간 이익의 30배 초과이며 삼성전자 잠정 영업이익은 107조4,000억원이다.",
-                  "status": "unverified",
-                  "confidence": 0.99,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "원음과 공식 실적표에서 금액·단위를 확인하기 전에는 이익 규모나 이익률을 가치평가에 반영하지 않는다."
-                },
-                {
-                  "claim_id": "C3",
-                  "claim_text": "과거 메모리 하강기에는 공급 증가·주문 감소·재고 누적·가격 하락이 겹쳤고, SK하이닉스는 2018~2019년 이익 급감과 2023년 연간 적자를 겪었다. 당시 출하량·ASP·서버 재고·가격 수치도 이를 뒷받침한다.",
-                  "status": "unverified",
-                  "confidence": 0.99,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "과거 사이클을 현재와 비교하려면 같은 제품·기간·회계 기준의 가격, 재고, 출하량을 먼저 맞춰야 한다."
-                },
-                {
-                  "claim_id": "C4",
-                  "claim_text": "고객 14곳과 통상 5년 계약을 맺어 2027~2028년 생산능력 절반 이상을 확보했고, 협의 물량까지 포함하면 2029년까지 사실상 판매됐다. HBM 요구량은 공급량의 2배를 넘으며 경영진은 공급 부족이 2030년까지 지속될 것으로 전망했다.",
-                  "status": "unverified",
-                  "confidence": 0.99,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "장기 수요 가시성을 평가할 때 확정계약과 협의 물량을 분리하고 계약가격·취소권을 확인해야 한다."
-                }
-              ],
-              "entities": [
-                {
-                  "ticker": "000660",
-                  "name": "SK하이닉스",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "시장 데이터 조회 실패: no_usable_market_fields"
-                  ]
-                },
-                {
-                  "ticker": "GOOGL",
-                  "name": "알파벳·구글 클라우드",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                },
-                {
-                  "ticker": "MSFT",
-                  "name": "마이크로소프트",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                },
-                {
-                  "ticker": "META",
-                  "name": "메타",
+                  "ticker": "ORCL",
+                  "name": "오라클",
                   "status": "unverified",
                   "verification_notes": [
                     "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
@@ -2293,18 +2073,95 @@
                 },
                 {
                   "ticker": "^KS11",
-                  "name": "메모리 산업·마이크론·코스피",
+                  "name": "한국 증시·외국인 및 연기금 수급",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "event_key": "QePWyuBAS9E",
+            "content_sha256": "29db191b9cd73255ec450d17d299a6bc2976a909d14309a1f31e36f189ef9b92",
+            "occurred_at": "2026-10-31T10:45:19+00:00",
+            "relevance": {
+              "tickers": [
+                "^KS11",
+                "INTC"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "verified_entities",
+              "matched_tickers": [],
+              "market_match": false,
+              "score": 0
+            },
+            "summary": {
+              "video_id": "QePWyuBAS9E",
+              "title": "최악의 폭락장에서도 내 돈을 지키는 방법 (박종훈의 지식한방)",
+              "channel": "박종훈의 지식한방",
+              "source_url": "https://www.youtube.com/watch?v=QePWyuBAS9E",
+              "claim_status_summary": {
+                "unverified": 10,
+                "partially_supported": 1
+              },
+              "claims": [
+                {
+                  "claim_id": "C1",
+                  "claim_text": "코스피가 83일간 약 80% 올라 9,114에 도달한 뒤 40일 만에 5,594로 하락했으며, 7월 반등 고점은 7,100, 7월 31일 상승률은 17.9%, 10월 말 하루 상승률은 약 6%였다는 주장.",
+                  "status": "unverified",
+                  "confidence": 0.15,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "주요 지수 수준과 급등락 날짜를 확인하기 전에는 이 경로를 매매 판단의 검증된 전제로 사용하지 않는다."
+                },
+                {
+                  "claim_id": "C2",
+                  "claim_text": "국민연금과 개별 종목 레버리지가 급등의 주요 원인이며, 외국인 매수는 숏커버링이나 물량 이전 목적이라는 해석.",
+                  "status": "unverified",
+                  "confidence": 0.05,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "수급에 대한 발화자의 해석을 확인된 사실이나 추세 전환 신호로 취급하지 않는다."
+                },
+                {
+                  "claim_id": "C3",
+                  "claim_text": "고점에 1억 원을 투자하면 보유 시 6,287만 원, 매도·재매수 두 번이면 5,300만 원, 반복 매매하면 2,000만 원 미만이 된다는 예시.",
+                  "status": "unverified",
+                  "confidence": 0.2,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "손실 확대를 설명하는 가상 시나리오로만 다루고 실제 전략별 성과 비교로 제시하지 않는다."
+                },
+                {
+                  "claim_id": "C4",
+                  "claim_text": "한국 투자자의 평균 주식 보유기간은 약 15일, 젊은 투자자는 약 5일이라는 주장.",
+                  "status": "unverified",
+                  "confidence": 0.05,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "이 수치를 한국 투자자 전체의 대표적 행동 통계로 인용하지 않는다."
+                }
+              ],
+              "entities": [
+                {
+                  "ticker": "^KS11",
+                  "name": "코스피 및 한국 주식시장",
                   "status": "unverified",
                   "verification_notes": [
                     "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
                   ]
                 },
                 {
-                  "ticker": "005930",
-                  "name": "삼성전자",
+                  "ticker": "INTC",
+                  "name": "인텔",
                   "status": "unverified",
                   "verification_notes": [
-                    "시장 데이터 조회 실패: no_usable_market_fields"
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
                   ]
                 }
               ]
@@ -2314,183 +2171,21 @@
         "execution_eligible": false
       },
       "prism": {
-        "source_health": "OK",
+        "source_health": "EMPTY",
         "coverage": {
           "total_unique_events": 345,
-          "window_events": 7,
-          "transmitted_events": 7,
+          "window_events": 0,
+          "transmitted_events": 0,
           "truncated": false,
-          "oldest_occurred_at": "2026-10-31T17:56:30+00:00",
-          "newest_occurred_at": "2026-10-31T19:01:33+00:00",
-          "available_events_before_context_cap": 7,
+          "oldest_occurred_at": null,
+          "newest_occurred_at": null,
+          "available_events_before_context_cap": 0,
           "context_event_cap": 20,
           "omitted_events": 0,
           "omitted_due_to_context_cap": 0,
           "omitted_before_context_selection": 0
         },
-        "events": [
-          {
-            "event_key": "stock_ai_agent:17016",
-            "content_sha256": "bd6f8145baad847230f76a7cc1f71ddcf95dcbec777a2407287c0db045a265b3",
-            "occurred_at": "2026-10-31T19:01:33+00:00",
-            "relevance": {
-              "tickers": [],
-              "markets": [],
-              "themes": [],
-              "match_basis": "message_context",
-              "matched_tickers": [],
-              "market_match": false,
-              "score": 0
-            },
-            "summary": {
-              "message_id": "17016",
-              "posted_at": "2026-10-31T19:01:33+00:00",
-              "source_url": "https://t.me/stock_ai_agent/17016",
-              "preview": "🏁 BTC 데모 시나리오 종료 · 정산 확인 🕐 11/01 04:01:14 KST 💵 청산 결과 정리 수량: 0.028 BTC 진입 → 청산: 77,684.40 USDT → 77,602.32 USDT 보유 시간: 65.0분 확정 순손익: -3.93 USDT • 시작 계좌 9,396.66 USDT 대비 -0.04% • 수수료 1.63 USDT · 펀딩 0.00 USDT 반영 💰 종료 후...",
-              "signals": [],
-              "simulation_only": true,
-              "actionability": "research_only"
-            }
-          },
-          {
-            "event_key": "stock_ai_agent:17015",
-            "content_sha256": "6283171eb9de3b9c4c904017876de474940c4562e46fcd6df55ef6aa0a10847c",
-            "occurred_at": "2026-10-31T18:56:55+00:00",
-            "relevance": {
-              "tickers": [],
-              "markets": [],
-              "themes": [],
-              "match_basis": "message_context",
-              "matched_tickers": [],
-              "market_match": false,
-              "score": 0
-            },
-            "summary": {
-              "message_id": "17015",
-              "posted_at": "2026-10-31T18:56:55+00:00",
-              "source_url": "https://t.me/stock_ai_agent/17015",
-              "preview": "✂️ BTC 데모 부분 청산 체결 · 롱 🕐 11/01 03:56:07 KST 사유: 즉시 일부 감축 🧾 이번 체결: 0.004 BTC · 77,563.30 USDT • 체결금액(명목): 310.25 USDT · 증거금 아님 • 이번 청산 가격손익: -0.48 USDT · 계좌 -0.01% 수수료·펀딩 전 · 확정 순손익 아님 손익·비용 정산 미확정: 확정 수익으로 집계하지 않음 📦 전...",
-              "signals": [],
-              "simulation_only": true,
-              "actionability": "research_only"
-            }
-          },
-          {
-            "event_key": "stock_ai_agent:17014",
-            "content_sha256": "f0754820e08d272a9db14dc427fa36dd30194dc56c242e24dabbdbf324ff6e2e",
-            "occurred_at": "2026-10-31T18:52:33+00:00",
-            "relevance": {
-              "tickers": [],
-              "markets": [],
-              "themes": [],
-              "match_basis": "message_context",
-              "matched_tickers": [],
-              "market_match": false,
-              "score": 0
-            },
-            "summary": {
-              "message_id": "17014",
-              "posted_at": "2026-10-31T18:52:33+00:00",
-              "source_url": "https://t.me/stock_ai_agent/17014",
-              "preview": "🛡 BTC 데모 보호 변경 확인 · 롱 🕐 11/01 03:52:25 KST 📦 보유량 0.019 BTC → 0.014 BTC · 평단 77,684.40 USDT 💰 계좌 순자산: 9,393.57 USDT • 총 증거금 109.17 USDT(계좌 1.16%) · 10배 · 교차 🛡 손절 SL 77,440.00 USDT · 남은 전량 • 예상 손익: -3.42 USDT · 계좌 -0.04...",
-              "signals": [],
-              "simulation_only": true,
-              "actionability": "research_only"
-            }
-          },
-          {
-            "event_key": "stock_ai_agent:17013",
-            "content_sha256": "d4f8c991f170a5296d6c952d5a5896e1b68d42a890be49fd4d96a4e7deb7ea00",
-            "occurred_at": "2026-10-31T18:51:55+00:00",
-            "relevance": {
-              "tickers": [],
-              "markets": [],
-              "themes": [],
-              "match_basis": "message_context",
-              "matched_tickers": [],
-              "market_match": false,
-              "score": 0
-            },
-            "summary": {
-              "message_id": "17013",
-              "posted_at": "2026-10-31T18:51:55+00:00",
-              "source_url": "https://t.me/stock_ai_agent/17013",
-              "preview": "✂️ BTC 데모 청산 체결 · 잔량 확인 중 🕐 11/01 03:51:15 KST 사유: 즉시 일부 감축 💵 청산 결과 정리 수량: 0.005 BTC 진입 → 청산: 미확인 → 77,600.20 USDT 보유 시간: 55.1분 손익·비용 정산 미확정: 확정 수익으로 집계하지 않음",
-              "signals": [],
-              "simulation_only": true,
-              "actionability": "research_only"
-            }
-          },
-          {
-            "event_key": "stock_ai_agent:17012",
-            "content_sha256": "144be93c0c0bf15b700989b9fa83c855113f80223a5f7f2f14d126034b9d1664",
-            "occurred_at": "2026-10-31T18:41:53+00:00",
-            "relevance": {
-              "tickers": [],
-              "markets": [],
-              "themes": [],
-              "match_basis": "message_context",
-              "matched_tickers": [],
-              "market_match": false,
-              "score": 0
-            },
-            "summary": {
-              "message_id": "17012",
-              "posted_at": "2026-10-31T18:41:53+00:00",
-              "source_url": "https://t.me/stock_ai_agent/17012",
-              "preview": "✂️ BTC 데모 부분 청산 체결 · 롱 🕐 11/01 03:41:09 KST 사유: 즉시 일부 감축 🧾 이번 체결: 0.009 BTC · 77,643.20 USDT • 체결금액(명목): 698.79 USDT · 증거금 아님 • 이번 청산 가격손익: -0.37 USDT · 계좌 -0.00% 수수료·펀딩 전 · 확정 순손익 아님 손익·비용 정산 미확정: 확정 수익으로 집계하지 않음 📦 전...",
-              "signals": [],
-              "simulation_only": true,
-              "actionability": "research_only"
-            }
-          },
-          {
-            "event_key": "stock_ai_agent:17011",
-            "content_sha256": "e0eee7158f13ec4aa39a2d261f3f5ada596bbeda706731d259fd6d678f94dc3c",
-            "occurred_at": "2026-10-31T18:06:32+00:00",
-            "relevance": {
-              "tickers": [],
-              "markets": [],
-              "themes": [],
-              "match_basis": "message_context",
-              "matched_tickers": [],
-              "market_match": false,
-              "score": 0
-            },
-            "summary": {
-              "message_id": "17011",
-              "posted_at": "2026-10-31T18:06:32+00:00",
-              "source_url": "https://t.me/stock_ai_agent/17011",
-              "preview": "🛡 BTC 데모 보호 변경 확인 · 롱 🕐 11/01 03:06:23 KST 📦 보유량 0.028 BTC · 평단 77,684.40 USDT 💰 계좌 순자산: 9,395.36 USDT • 총 증거금 218.50 USDT(계좌 2.33%) · 10배 · 교차 🛡 손절 SL 77,440.00 USDT · 남은 전량 • 예상 손익: -6.84 USDT · 계좌 -0.07% (1배 -0.31%...",
-              "signals": [],
-              "simulation_only": true,
-              "actionability": "research_only"
-            }
-          },
-          {
-            "event_key": "stock_ai_agent:17010",
-            "content_sha256": "c64c622662c6fa7e5955b985d19d106f7c66e23f0569209e69bf56359fce4f41",
-            "occurred_at": "2026-10-31T17:56:30+00:00",
-            "relevance": {
-              "tickers": [],
-              "markets": [],
-              "themes": [],
-              "match_basis": "message_context",
-              "matched_tickers": [],
-              "market_match": false,
-              "score": 0
-            },
-            "summary": {
-              "message_id": "17010",
-              "posted_at": "2026-10-31T17:56:30+00:00",
-              "source_url": "https://t.me/stock_ai_agent/17010",
-              "preview": "📌 BTC 데모 첫 진입 체결 · 롱 🕐 11/01 02:56:11 KST 🧾 이번 체결: 0.028 BTC · 77,684.40 USDT • 체결금액(명목): 2,175.16 USDT · 증거금 아님 📦 전체 포지션 • 누적 보유 0.028 BTC · 관측 기준 • 평단 77,684.40 USDT 💰 계좌 순자산: 9,396.24 USDT • 총 증거금 218.59 USDT(계좌 2....",
-              "signals": [],
-              "simulation_only": true,
-              "actionability": "research_only"
-            }
-          }
-        ],
+        "events": [],
         "execution_eligible": false
       },
       "receipt_contract": {
@@ -2508,43 +2203,35 @@
               "tTfkMgMCA6U",
               "Ra7IhYhywKE",
               "hqUbRKYT_Oc",
-              "9JAv6eHUUG8",
-              "DFuuPZ9qI1E",
-              "fKb-mxpwg9M"
+              "Fb5BSULdWAc",
+              "SCFvaPwtFfs",
+              "QePWyuBAS9E"
             ],
             "coverage": {
               "total_unique_events": 640,
-              "window_events": 72,
+              "window_events": 39,
               "transmitted_events": 12,
               "truncated": true,
-              "oldest_occurred_at": "2026-10-29T10:00:37+00:00",
-              "newest_occurred_at": "2026-10-31T09:00:02+00:00",
-              "available_events_before_context_cap": 60,
+              "oldest_occurred_at": "2026-10-30T02:20:48+00:00",
+              "newest_occurred_at": "2026-10-31T13:23:28+00:00",
+              "available_events_before_context_cap": 39,
               "context_event_cap": 12,
-              "omitted_events": 60,
-              "omitted_due_to_context_cap": 48,
-              "omitted_before_context_selection": 12
+              "omitted_events": 27,
+              "omitted_due_to_context_cap": 27,
+              "omitted_before_context_selection": 0
             }
           },
           "prism": {
-            "source_health": "OK",
-            "event_keys": [
-              "stock_ai_agent:17016",
-              "stock_ai_agent:17015",
-              "stock_ai_agent:17014",
-              "stock_ai_agent:17013",
-              "stock_ai_agent:17012",
-              "stock_ai_agent:17011",
-              "stock_ai_agent:17010"
-            ],
+            "source_health": "EMPTY",
+            "event_keys": [],
             "coverage": {
               "total_unique_events": 345,
-              "window_events": 7,
-              "transmitted_events": 7,
+              "window_events": 0,
+              "transmitted_events": 0,
               "truncated": false,
-              "oldest_occurred_at": "2026-10-31T17:56:30+00:00",
-              "newest_occurred_at": "2026-10-31T19:01:33+00:00",
-              "available_events_before_context_cap": 7,
+              "oldest_occurred_at": null,
+              "newest_occurred_at": null,
+              "available_events_before_context_cap": 0,
               "context_event_cap": 20,
               "omitted_events": 0,
               "omitted_due_to_context_cap": 0,

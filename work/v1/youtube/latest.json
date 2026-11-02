@@ -1,13 +1,13 @@
 {
   "schema": "tradingagents.work-context/v1",
   "surface": "youtube",
-  "event_id": "youtube:ac4bd0e2e0b60102a8cabc7f466e9d46",
+  "event_id": "youtube:da1ec93d3fef12be74f9a0b8d2912ae7",
   "prompt_contract_version": "youtube-work-v5",
   "prompt_sha256": "82a87727ec636b928ccb90cfe8cd823d86347e254ed0b204903699e34e35ef0b",
   "skill_sha256": "2fef99f1af403675549a13813e0fe5597a241a964affeada56e9f64e9f398fe9",
   "task_manifest_sha256": "0ea8b7511042a3aa7d6fa8447d97032d4be515f69526190a4c9556d01067c6df",
   "workflow_contract_sha256": "c75e155a8e30b5d22921bad39fde87022a6bd8d52c5ac56585369ed84d3f1eaf",
-  "source_sha256": "cd762834f051f6dd41eac996c91783a129b92463528f1894f21c6e6002174396",
+  "source_sha256": "048e01b658ac18b9b33bdb08e0f5ae62eb5077c5856c4a8d1912c04295b315bb",
   "body": {
     "kind": "youtube",
     "source_health": "OK",
@@ -44,12 +44,12 @@
     },
     "coverage": {
       "total_unique_events": 640,
-      "window_events": 72,
+      "window_events": 39,
       "transmitted_events": 24,
       "truncated": true,
-      "oldest_occurred_at": "2026-10-29T06:30:16+00:00",
+      "oldest_occurred_at": "2026-10-30T02:11:40+00:00",
       "newest_occurred_at": "2026-10-31T13:23:28+00:00",
-      "omitted_due_to_packet_budget": 36
+      "omitted_due_to_packet_budget": 15
     },
     "events": [
       {
@@ -397,158 +397,6 @@
               "source_url": "https://finance.yahoo.com/markets/commodities/articles/compania-minas-buenaventura-saa-bvn-011112569.html",
               "publisher": "GuruFocus.com",
               "published_at": "2026-10-31T01:11:12+00:00",
-              "source_tier": "news"
-            }
-          ]
-        }
-      },
-      {
-        "event_key": "MXwB5P9mJxA",
-        "content_sha256": "013154d15e110056da09fce5fe49ba0e6fa326098fa6864a8ac30200adcbaa1c",
-        "occurred_at": "2026-10-29T10:40:19+00:00",
-        "relevance": {
-          "tickers": [],
-          "markets": [],
-          "themes": [],
-          "match_basis": "title_and_claim_context"
-        },
-        "strategy_source_tier": "USER_PRIMARY",
-        "strategy_evidence_weight": "HIGH",
-        "summary": {
-          "video_id": "MXwB5P9mJxA",
-          "title": "큰 손이 된 키덜트 덕에 주식도 부활? 장난감 사는 어른 시대의 수혜주들",
-          "channel": "소수몽키",
-          "source_url": "https://www.youtube.com/watch?v=MXwB5P9mJxA",
-          "published_at": "2026-10-29T10:40:19+00:00",
-          "status": "unverified",
-          "strategy_source_tier": "USER_PRIMARY",
-          "strategy_evidence_weight": "HIGH",
-          "strategy_validation_policy": "USER_ACCEPTED",
-          "transcript_quality": {
-            "status": "good",
-            "score": 1.0,
-            "warnings": [],
-            "source": "automatic",
-            "language": "Korean (Original)",
-            "model_or_format": "json3",
-            "chars": 9235,
-            "segments": 480,
-            "duration_seconds": 944,
-            "repeated_ngram_ratio": 0.0
-          },
-          "claim_status_summary": {
-            "unverified": 12
-          },
-          "claims": [
-            {
-              "claim_id": "C1",
-              "claim_text": "성인 팬덤·수집 수요가 미국 완구시장 성장을 견인하며, 상반기 성장률은 최근 6년 내 최고이고 성인용 제품은 아동용보다 강하며 연중 구매된다.",
-              "status": "unverified",
-              "confidence": 0.0,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "성인 수집 수요를 완구기업 전반의 실적 개선 근거로 확정할 수 없다."
-            },
-            {
-              "claim_id": "C2",
-              "claim_text": "한국에서 포켓몬 카드가 K팝 포토카드를 제치고 점유율 47.1%로 1위이며, 30대 34.4%·20대 40.2%라는 소비 비중이 제시됐다.",
-              "status": "unverified",
-              "confidence": 0.0,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "특정 플랫폼 통계를 전국 시장점유율이나 전체 소비자 구성으로 일반화하지 않아야 한다."
-            },
-            {
-              "claim_id": "C3",
-              "claim_text": "해즈브로의 전통 완구는 사업의 약 절반이지만 정체됐고, 고마진 카드·게임이 전체 '번 돈'의 약 70%를 차지하며 관세·원재료비가 완구 마진에 부담이다.",
-              "status": "unverified",
-              "confidence": 0.0,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "70%를 매출 비중이나 카드 단독 이익 기여도로 사용하거나 이를 근거로 기업가치를 산정할 수 없다."
-            },
-            {
-              "claim_id": "C4",
-              "claim_text": "해즈브로 CEO가 카드의 완구·게임 분야 1위 부상과 세대적 구조 변화를 언급하고 내년 신제품 확대에 자신감을 보였다고 한다.",
-              "status": "unverified",
-              "confidence": 0.0,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "경영진의 구조적 성장 전망과 실제 수요 지속성은 구분해 판단해야 한다."
-            },
-            {
-              "claim_id": "C5",
-              "claim_text": "올해 해즈브로 주가는 43% 상승하고 반다이남코도 상승한 반면 마텔·닌텐도는 하락했다고 한다. 해즈브로의 지수 내 순위는 진행자의 추정이다.",
-              "status": "unverified",
-              "confidence": 0.0,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "제시된 수익률과 종목 간 성과 차이를 투자 비교에 사용하기 전에 동일 기준으로 재계산해야 한다."
-            },
-            {
-              "claim_id": "C6",
-              "claim_text": "자기돌봄·상담 대체·놀이의 희망·저축 대신 소비·향수·실물 수집·디지털 피로 관련 소비자 설문 수치들이 성인 완구 수요의 배경으로 제시됐다.",
-              "status": "unverified",
-              "confidence": 0.0,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "설문 수치를 시장규모·매출 증가율·지속적인 구매전환의 근거로 직접 사용하지 않아야 한다."
-            }
-          ],
-          "entities": [],
-          "evidence": [
-            {
-              "evidence_id": "E1",
-              "claim_id": "C1",
-              "title": "Emerita Announces Positive IBW Pre-Feasibility Study Results Highlighting US$776 Million After-Tax NPV (8%), 23.51% IRR and 21-Year Mine Life",
-              "source_url": "https://finance.yahoo.com/markets/commodities/articles/emerita-announces-positive-ibw-pre-200200269.html",
-              "publisher": "TMX Newsfile",
-              "published_at": "2026-10-29T20:02:00+00:00",
-              "source_tier": "market_or_news"
-            },
-            {
-              "evidence_id": "E2",
-              "claim_id": "C1",
-              "title": "GoldHaven Resources' Maiden Drilling Program at Magno Project Reaches 3,000 Meters",
-              "source_url": "https://finance.yahoo.com/markets/commodities/articles/goldhaven-resources-apos-maiden-drilling-165613649.html",
-              "publisher": "MT Newswires",
-              "published_at": "2026-10-29T16:56:13+00:00",
-              "source_tier": "market_or_news"
-            },
-            {
-              "evidence_id": "E3",
-              "claim_id": "C2",
-              "title": "3 low-volatility stocks with questionable fundamentals",
-              "source_url": "https://finance.yahoo.com/markets/stocks/articles/3-low-volatility-stocks-questionable-100325387.html",
-              "publisher": "StockStory",
-              "published_at": "2026-10-29T10:03:25+00:00",
-              "source_tier": "market_or_news"
-            },
-            {
-              "evidence_id": "E4",
-              "claim_id": "C2",
-              "title": "KAP Minerals, Cymat to advance scandium-aluminium alloy JV in Canada",
-              "source_url": "https://finance.yahoo.com/news/kap-minerals-cymat-advance-scandium-085650950.html",
-              "publisher": "Mining Technology",
-              "published_at": "2026-10-29T08:56:50+00:00",
-              "source_tier": "market_or_news"
-            },
-            {
-              "evidence_id": "E5",
-              "claim_id": "C5",
-              "title": "Stock Market Today, Oct. 29: Marvell Falls on Lumentum Acquisition Talks",
-              "source_url": "https://finance.yahoo.com/markets/stocks/articles/stock-market-today-oct-29-214330390.html",
-              "publisher": "Motley Fool",
-              "published_at": "2026-10-29T21:43:30+00:00",
-              "source_tier": "news"
-            },
-            {
-              "evidence_id": "E6",
-              "claim_id": "C5",
-              "title": "Chip Stocks Silicon Motion, Others Advance On Earnings News",
-              "source_url": "https://finance.yahoo.com/m/880d82e2-6c6b-32ce-931c-33b82a0d81cb/chip-stocks-silicon-motion%2C.html",
-              "publisher": "Investor's Business Daily",
-              "published_at": "2026-10-29T21:41:22+00:00",
               "source_tier": "news"
             }
           ]
@@ -4192,6 +4040,245 @@
               "source_url": "https://www.bntnews.co.kr/article/view/bnt202406200025",
               "publisher": "Naver News",
               "published_at": "2024-06-20T09:28:00+09:00",
+              "source_tier": "news"
+            }
+          ]
+        }
+      },
+      {
+        "event_key": "jIq6dsZ-yQ8",
+        "content_sha256": "85367c0c9ca7e30a03efaa03680b31490a1249ffd9e93d957b5f97688d3550c3",
+        "occurred_at": "2026-10-30T07:58:45+00:00",
+        "relevance": {
+          "tickers": [
+            "^KS11",
+            "GOOGL",
+            "AMZN",
+            "INTC",
+            "MSFT",
+            "MRVL",
+            "009150",
+            "329180",
+            "034020"
+          ],
+          "markets": [
+            "US",
+            "KR"
+          ],
+          "themes": [],
+          "match_basis": "verified_entities"
+        },
+        "strategy_source_tier": "STANDARD",
+        "strategy_evidence_weight": "STANDARD",
+        "summary": {
+          "video_id": "jIq6dsZ-yQ8",
+          "title": "[10월 30일 마감시황] AI 산업의 성장통인가, 본격적인 위기의 시작인가…실적 쇼크 이후 시장이 확인해야 할 것들ㅣ홍선애, 이권희, 김장열 [클로징벨 라이브]",
+          "channel": "삼프로TV 3PROTV",
+          "source_url": "https://www.youtube.com/watch?v=jIq6dsZ-yQ8",
+          "published_at": "2026-10-30T07:58:45+00:00",
+          "status": "unverified",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "strategy_validation_policy": "STANDARD_REVIEW",
+          "transcript_quality": {
+            "status": "good",
+            "score": 1.0,
+            "warnings": [],
+            "source": "automatic",
+            "language": "Korean",
+            "model_or_format": "json3",
+            "chars": 34803,
+            "segments": 2061,
+            "duration_seconds": 4333,
+            "repeated_ngram_ratio": 0.0
+          },
+          "claim_status_summary": {
+            "partially_supported": 4,
+            "unverified": 8
+          },
+          "claims": [
+            {
+              "claim_id": "C1",
+              "claim_text": "코스피·코스닥 급락, 사이드카 발동과 외국인 현물 매도·선물 매수 수치가 맞으며 AI 투자 지속성 우려가 약세를 주도했다는 주장.",
+              "status": "partially_supported",
+              "confidence": 0.98,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "지수 수준 일부만 대조됐다. 수급 방향과 AI발 위기라는 설명을 확정 사실로 제시하지 말고 5400·6400은 조건부 시나리오로 구분해야 한다."
+            },
+            {
+              "claim_id": "C2",
+              "claim_text": "알파벳의 두 분기 연속 음수 FCF와 실적 후 시간외 약 10%·본장 12% 이상 하락이 AI 투자 여력 우려를 보여준다는 주장.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "FCF 악화와 주가 급락을 확인된 실적 쇼크로 인용하기 전에 두 분기 현금흐름표와 발표 전후 가격을 확보해야 한다."
+            },
+            {
+              "claim_id": "C3",
+              "claim_text": "AWS 성장률이 예상 및 전분기보다 개선됐지만 대규모 투자에 따른 음수 FCF가 아마존 주가의 부정적 반응을 유발했다는 주장.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "AWS 성장과 현금 소진의 상충 여부는 실적 원문으로 확인해야 하며 FCF를 주가 하락의 확정 원인으로 제시할 수 없다."
+            },
+            {
+              "claim_id": "C4",
+              "claim_text": "인텔은 데이터센터 사업이 양호했지만 PC 부진·약한 매출과 이익률 전망·음수 FCF 때문에 시간외에서 20% 이상 하락했다는 주장.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "실적 부진과 전망 부진을 구분하고 시간외 거래 시각·기준 가격을 확인하기 전까지 급락 수치를 미검증으로 표시해야 한다."
+            },
+            {
+              "claim_id": "C5",
+              "claim_text": "마이크로소프트 FCF는 180억 달러였고 9년 만에 250억 달러 회사채를 발행했으며 시간외 상승폭이 3~4%에서 거의 보합으로 줄었다는 주장.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "발행 목적과 자금 용도를 확인하지 않은 채 회사채를 자금난 신호로 해석해서는 안 된다."
+            },
+            {
+              "claim_id": "C6",
+              "claim_text": "마벨의 루멘텀 인수 추진에 따른 주식 발행·희석 우려가 약 12% 하락을 설명하며 루멘텀 시총은 800억 달러, 마벨 현금은 40억 달러 미만이라는 주장.",
+              "status": "partially_supported",
+              "confidence": 0.96,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "인수설과 확정 거래를 분리하고 신주 수·교환비율·인수가격을 확인해야 한다. 희석률을 주가 하락률과 동일시하면 안 된다."
+            }
+          ],
+          "entities": [
+            {
+              "ticker": "^KS11",
+              "name": "한국 증시·AI 투자 사이클",
+              "status": "unverified",
+              "verification_notes": [
+                "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+              ]
+            },
+            {
+              "ticker": "GOOGL",
+              "name": "알파벳",
+              "status": "unverified",
+              "verification_notes": [
+                "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+              ]
+            },
+            {
+              "ticker": "AMZN",
+              "name": "아마존",
+              "status": "unverified",
+              "verification_notes": [
+                "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+              ]
+            },
+            {
+              "ticker": "INTC",
+              "name": "인텔",
+              "status": "unverified",
+              "verification_notes": [
+                "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+              ]
+            },
+            {
+              "ticker": "MSFT",
+              "name": "마이크로소프트",
+              "status": "unverified",
+              "verification_notes": [
+                "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+              ]
+            },
+            {
+              "ticker": "MRVL",
+              "name": "마벨 테크놀로지·루멘텀 인수 언급",
+              "status": "unverified",
+              "verification_notes": [
+                "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+              ]
+            },
+            {
+              "ticker": "009150",
+              "name": "삼성전기·AI 부품 공급망",
+              "status": "unverified",
+              "verification_notes": [
+                "시장 데이터 조회 실패: no_usable_market_fields"
+              ]
+            },
+            {
+              "ticker": "329180",
+              "name": "HD현대중공업·조선업",
+              "status": "unverified",
+              "verification_notes": [
+                "시장 데이터 조회 실패: no_usable_market_fields"
+              ]
+            },
+            {
+              "ticker": "034020",
+              "name": "두산에너빌리티·원전업",
+              "status": "unverified",
+              "verification_notes": [
+                "시장 데이터 조회 실패: no_usable_market_fields"
+              ]
+            }
+          ],
+          "evidence": [
+            {
+              "evidence_id": "E1",
+              "claim_id": "C1",
+              "title": "Is the market too bearish on aluminium?",
+              "source_url": "https://finance.yahoo.com/markets/commodities/articles/market-too-bearish-aluminium-011008511.html",
+              "publisher": "Investing.com",
+              "published_at": "2026-10-31T01:10:08+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E2",
+              "claim_id": "C1",
+              "title": "5 Non-Ferrous Metal Mining Stocks to Watch in a Challenging Industry",
+              "source_url": "https://finance.yahoo.com/markets/commodities/articles/5-non-ferrous-metal-mining-153100018.html",
+              "publisher": "Zacks",
+              "published_at": "2026-10-30T15:31:00+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E4",
+              "claim_id": "C2",
+              "title": "US oil companies aim to squeeze more out of refineries",
+              "source_url": "https://finance.yahoo.com/energy/articles/us-oil-companies-aim-squeeze-011348682.html",
+              "publisher": "AFP",
+              "published_at": "2026-10-31T01:13:48+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E5",
+              "claim_id": "C2",
+              "title": "Compania De Minas Buenaventura SAA (BVN) Q3 2026 Earnings Call Highlights: Revenue Jumps 27% to ...",
+              "source_url": "https://finance.yahoo.com/markets/commodities/articles/compania-minas-buenaventura-saa-bvn-011112569.html",
+              "publisher": "GuruFocus.com",
+              "published_at": "2026-10-31T01:11:12+00:00",
+              "source_tier": "news"
+            },
+            {
+              "evidence_id": "E6",
+              "claim_id": "C5",
+              "title": "Big Homes, Big Loans",
+              "source_url": "https://finance.yahoo.com/m/9aa518a9-bace-3e02-a215-82b14364d8d4/big-homes%2C-big-loans.html",
+              "publisher": "Barrons.com",
+              "published_at": "2026-10-30T22:51:00+00:00",
+              "source_tier": "news"
+            },
+            {
+              "evidence_id": "E7",
+              "claim_id": "C6",
+              "title": "IBM vs. ServiceNow: Which Technology Stock Is a Better Buy in 2026?",
+              "source_url": "https://finance.yahoo.com/markets/stocks/articles/ibm-vs-servicenow-technology-stock-203501226.html",
+              "publisher": "Motley Fool",
+              "published_at": "2026-10-30T20:35:01+00:00",
               "source_tier": "news"
             }
           ]
