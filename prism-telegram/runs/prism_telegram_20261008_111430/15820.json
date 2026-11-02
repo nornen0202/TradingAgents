@@ -1,0 +1,38 @@
+{
+  "version": 1,
+  "run_id": "prism_telegram_20261008_111430",
+  "channel": "stock_ai_agent",
+  "message_id": "15820",
+  "posted_at": "2026-10-08T01:02:28+00:00",
+  "source_url": "https://t.me/stock_ai_agent/15820",
+  "preview": "📊 프리즘 시뮬레이터 | 실시간 포트폴리오 (2026-10-08 10:02) 🔸 현재 보유: 2/10개 🔸 사용 비중: 1.68/10 슬롯 (분할 매수·시험매수 반영) ✅ 최고 수익: 샘씨엔에스(252990) +19.14% ⚠️ 최저 수익: 삼표시멘트(038500) -0.90% 🔸 보유 종목: - 샘씨엔에스(252990) [전기·전자] 매수가: 15,780원 / 현재가: 18,800원...",
+  "signals": [
+    {
+      "canonical_ticker": "252990.KS",
+      "display_name": "샘씨엔에스",
+      "market": "KR",
+      "source_asof": "2026-10-08T01:02:28+00:00",
+      "signal_action": "HOLD",
+      "trigger_type": "telegram_portfolio_snapshot",
+      "trigger_score": 0.45,
+      "composite_score": 0.45,
+      "confidence": 0.45,
+      "warnings": []
+    },
+    {
+      "canonical_ticker": "038500.KS",
+      "display_name": "삼표시멘트",
+      "market": "KR",
+      "source_asof": "2026-10-08T01:02:28+00:00",
+      "signal_action": "HOLD",
+      "trigger_type": "telegram_portfolio_snapshot",
+      "trigger_score": 0.45,
+      "composite_score": 0.45,
+      "confidence": 0.45,
+      "warnings": []
+    }
+  ],
+  "simulation_only": true,
+  "actionability": "research_only",
+  "execution_eligible": false
+}
