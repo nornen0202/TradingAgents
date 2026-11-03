@@ -1,13 +1,13 @@
 {
   "schema": "tradingagents.work-context/v1",
   "surface": "us",
-  "event_id": "us:5a876911a0eaec96a02dae01c5351187",
+  "event_id": "us:331c327b2f185a730ed3bcb756929148",
   "prompt_contract_version": "market-work-v13-us",
   "prompt_sha256": "a577e06278002eebd491db51786019336a00da570d5c47886bad031cf01cf7fe",
   "skill_sha256": "2fef99f1af403675549a13813e0fe5597a241a964affeada56e9f64e9f398fe9",
   "task_manifest_sha256": "0ea8b7511042a3aa7d6fa8447d97032d4be515f69526190a4c9556d01067c6df",
   "workflow_contract_sha256": "f94e3c24b3aabfa9c77de5abfe65add303754c210dc6470b626a2bd212718912",
-  "source_sha256": "12c2e07f643ac1d31f7ce76393a7d9acc4d667372c0f646b76c7034cf1cccbd5",
+  "source_sha256": "1c84db5e93fd8d058713049a2701c2c8e5f8d4f688787620520de8c4e9ea7ddb",
   "body": {
     "kind": "market",
     "market": "US",
@@ -1245,12 +1245,12 @@
         "source_health": "STALE",
         "coverage": {
           "total_unique_events": 640,
-          "window_events": 8,
-          "transmitted_events": 8,
+          "window_events": 6,
+          "transmitted_events": 6,
           "truncated": false,
-          "oldest_occurred_at": "2026-10-31T06:00:23+00:00",
+          "oldest_occurred_at": "2026-10-31T07:30:12+00:00",
           "newest_occurred_at": "2026-10-31T13:23:28+00:00",
-          "available_events_before_context_cap": 8,
+          "available_events_before_context_cap": 6,
           "context_event_cap": 12,
           "omitted_events": 0,
           "omitted_due_to_context_cap": 0,
@@ -1864,155 +1864,6 @@
                 }
               ]
             }
-          },
-          {
-            "event_key": "uOJVtQunlZA",
-            "content_sha256": "bcc5b0518bf22dfd3eb6cc7112e3953b82f2d943df4ca45d42560c5bc4b7d605",
-            "occurred_at": "2026-10-31T06:04:39+00:00",
-            "relevance": {
-              "tickers": [
-                "^KS11"
-              ],
-              "markets": [
-                "US"
-              ],
-              "themes": [],
-              "match_basis": "verified_entities",
-              "matched_tickers": [],
-              "market_match": true,
-              "score": 20
-            },
-            "summary": {
-              "video_id": "uOJVtQunlZA",
-              "title": "투자자들이 꼭 알고 있어야 할 다음주 '한국' 투자 포인트(11.02~11.06)",
-              "channel": "경제사냥꾼",
-              "source_url": "https://www.youtube.com/watch?v=uOJVtQunlZA",
-              "claim_status_summary": {
-                "unverified": 12
-              },
-              "claims": [
-                {
-                  "claim_id": "C1",
-                  "claim_text": "2026년 11월 2일 한국거래소가 저PBR 기업 명단을 최초 공개하며, 배당 확대·자사주 소각 계획이 재평가 요인이 될 수 있다는 주장.",
-                  "status": "unverified",
-                  "confidence": 0.0,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "공식 공개 일정·선정 기준과 해당 기업의 배당·소각 공시를 확인하기 전에는 명단 편입을 매수 근거로 삼기 어렵다."
-                },
-                {
-                  "claim_id": "C2",
-                  "claim_text": "한국의 2026년 10월 소비자물가가 11월 3일 발표될 예정이라는 주장.",
-                  "status": "unverified",
-                  "confidence": 0.0,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "공식 통계 공표 일정에서 날짜·시각을 확인해야 한다. 제공 자료에는 물가 수치나 시장 예상치도 없다."
-                },
-                {
-                  "claim_id": "C3",
-                  "claim_text": "LG에너지솔루션의 11월 3일 실적 설명회가 예정돼 있고, 지난 분기 이익의 절반 초과가 미국 정부 세금 혜택에서 발생했다는 주장.",
-                  "status": "unverified",
-                  "confidence": 0.0,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "동일 분기·연결 범위의 보고 이익과 세액공제 반영액을 확보한 뒤 지원 제외 수익성을 비교해야 한다."
-                },
-                {
-                  "claim_id": "C4",
-                  "claim_text": "AMD 실적 설명회가 11월 4일 오전 7시에 열린다는 주장.",
-                  "status": "unverified",
-                  "confidence": 0.0,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "공식 웹캐스트 시작 시각과 시간대를 확인해 한국 시각으로 변환한 뒤 일정에 반영해야 한다."
-                }
-              ],
-              "entities": [
-                {
-                  "ticker": "^KS11",
-                  "name": "한국 증시·한국거래소 저PBR 기업",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                },
-                {
-                  "ticker": "^KS11",
-                  "name": "미국 중간선거·코스피",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                }
-              ]
-            }
-          },
-          {
-            "event_key": "T3NkFvkAmJs",
-            "content_sha256": "07fcaf44bd03afea8696a0ca6d28de682f060c3ee58a664918b467297d4f86cf",
-            "occurred_at": "2026-10-31T06:00:23+00:00",
-            "relevance": {
-              "tickers": [],
-              "markets": [],
-              "themes": [],
-              "match_basis": "title_and_claim_context",
-              "matched_tickers": [],
-              "market_match": false,
-              "score": 0
-            },
-            "summary": {
-              "video_id": "T3NkFvkAmJs",
-              "title": "EMR 1위 넘어 제약 마케팅·국민건강비서까지 노리는 '의료 AI'ㅣ김진태 GC메디아이 대표 [주말인터뷰]",
-              "channel": "삼프로TV 3PROTV",
-              "source_url": "https://www.youtube.com/watch?v=T3NkFvkAmJs",
-              "claim_status_summary": {
-                "partially_supported": 2,
-                "unverified": 8
-              },
-              "claims": [
-                {
-                  "claim_id": "C1",
-                  "claim_text": "녹십자 계열 코스닥 상장 의료 IT 기업으로, 발화 기준 올해 사명을 변경했으며 1994년 사업을 시작했다는 설명.",
-                  "status": "partially_supported",
-                  "confidence": 0.35,
-                  "supporting_evidence_ids": [
-                    "E1",
-                    "E2"
-                  ],
-                  "manual_check_required": true,
-                  "investor_implication": "브랜드 변경 정황은 있으나 투자 대상 법인과 종목코드는 공시로 확인해야 한다."
-                },
-                {
-                  "claim_id": "C2",
-                  "claim_text": "EMR 점유율 약 50% 또는 초과, 2위 20% 미만, 의원 고객 약 1만6천 처이며 2만 처로 확대할 계획이라는 주장.",
-                  "status": "unverified",
-                  "confidence": 0.1,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "시장 지배력과 확장 여력을 확정 사실로 사용하지 말고 동일 기준의 고객·시장 통계를 확인해야 한다."
-                },
-                {
-                  "claim_id": "C3",
-                  "claim_text": "9월 출시한 무료 AI 시험판에 한 달 만에 약 1,300처가 가입하고 700~800처가 사용했으며, 진료기록·대화 요약과 진료 참고정보를 제공하고 차세대 제품·CRM으로 확장한다는 설명.",
-                  "status": "unverified",
-                  "confidence": 0.15,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "무료 시험판의 가입·사용을 유료 고객, 반복 매출 또는 임상적 효과로 해석할 수 없다."
-                },
-                {
-                  "claim_id": "C4",
-                  "claim_text": "EMR 진료 흐름에 맞춘 개인화 마케팅 매출이 이미 발생하며, 외부 사업자에 인프라를 개방하고 서비스 연동·데이터 활용 수수료를 받겠다는 설명.",
-                  "status": "unverified",
-                  "confidence": 0.15,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "플랫폼 수익화는 매출 기여, 반복성 및 비용을 확인하기 전까지 실현 이익으로 반영하기 어렵다."
-                }
-              ],
-              "entities": []
-            }
           }
         ],
         "execution_eligible": false
@@ -2046,18 +1897,16 @@
               "ET41_ENzq7w",
               "SCFvaPwtFfs",
               "Fb5BSULdWAc",
-              "QePWyuBAS9E",
-              "uOJVtQunlZA",
-              "T3NkFvkAmJs"
+              "QePWyuBAS9E"
             ],
             "coverage": {
               "total_unique_events": 640,
-              "window_events": 8,
-              "transmitted_events": 8,
+              "window_events": 6,
+              "transmitted_events": 6,
               "truncated": false,
-              "oldest_occurred_at": "2026-10-31T06:00:23+00:00",
+              "oldest_occurred_at": "2026-10-31T07:30:12+00:00",
               "newest_occurred_at": "2026-10-31T13:23:28+00:00",
-              "available_events_before_context_cap": 8,
+              "available_events_before_context_cap": 6,
               "context_event_cap": 12,
               "omitted_events": 0,
               "omitted_due_to_context_cap": 0,
