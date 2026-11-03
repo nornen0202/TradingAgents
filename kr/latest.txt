@@ -1,7 +1,7 @@
 # TradingAgents KR 최신 공개 입력
 
 schema: tradingagents.ai-context/v1
-문서 생성: 2026-11-03T06:35:45.955037+00:00
+문서 생성: 2026-11-03T07:02:00.256402+00:00
 
 이 문서는 이미 공개된 자료의 축약 전사이며 새 분석·주문 승인이 아닙니다. 원분석 거래일(완료 일봉), 분석 완료, 장중 시세, 계좌 관측, 문서 생성은 서로 다른 시각입니다. 휴장·주말의 마지막 완료 거래일을 장애로 단정하지 마세요. null은 미확인이지 0이 아닙니다. 빌드 당시 실행 상태는 현재 상태가 아니며 row_valid_until과 현재 세션을 다시 확인해야 합니다. 현재 문서를 읽지 못하면 과거 대화의 계좌·한도를 최신 사실로 재사용하지 마세요.
 
@@ -33,25 +33,25 @@ schema: tradingagents.ai-context/v1
 ```json
 {
   "status": "available",
-  "as_of": "2026-11-03T15:16:25.152076+09:00",
+  "as_of": "2026-11-03T15:29:48.272417+09:00",
   "snapshot_health": "VALID",
   "currency": "KRW",
   "latest_attempt": {
     "status": "VALID",
-    "account_as_of": "2026-11-03T15:16:25.152076+09:00",
-    "run_started_at": "2026-11-03T15:15:28.225873+09:00",
-    "run_finished_at": "2026-11-03T15:16:29.810005+09:00",
+    "account_as_of": "2026-11-03T15:29:48.272417+09:00",
+    "run_started_at": "2026-11-03T15:29:06.202274+09:00",
+    "run_finished_at": "2026-11-03T15:29:52.962702+09:00",
     "selected_for_public_account": true
   },
   "summary": {
     "position_count": 13,
     "total_purchase_amount_krw": 14944236,
-    "total_market_value_krw": 8337730,
-    "total_unrealized_pnl_krw": -6606506,
+    "total_market_value_krw": 8325440,
+    "total_unrealized_pnl_krw": -6618796,
     "settled_cash_krw": 976652,
     "available_cash_krw": 976652,
     "buying_power_krw": 976652,
-    "total_equity_krw": 9314382
+    "total_equity_krw": 9302092
   },
   "positions": [
     {
@@ -60,9 +60,9 @@ schema: tradingagents.ai-context/v1
       "quantity": 2.0,
       "sellable_quantity": 2.0,
       "average_cost_krw": 2717500,
-      "current_price_krw": 1390000,
-      "market_value_krw": 2780000,
-      "unrealized_pnl_krw": -2655000
+      "current_price_krw": 1388000,
+      "market_value_krw": 2776000,
+      "unrealized_pnl_krw": -2659000
     },
     {
       "ticker": "005930.KS",
@@ -70,9 +70,9 @@ schema: tradingagents.ai-context/v1
       "quantity": 10.0,
       "sellable_quantity": 10.0,
       "average_cost_krw": 332385,
-      "current_price_krw": 219500,
-      "market_value_krw": 2195000,
-      "unrealized_pnl_krw": -1128851
+      "current_price_krw": 218500,
+      "market_value_krw": 2185000,
+      "unrealized_pnl_krw": -1138851
     },
     {
       "ticker": "278470.KS",
@@ -80,9 +80,9 @@ schema: tradingagents.ai-context/v1
       "quantity": 5.0,
       "sellable_quantity": 5.0,
       "average_cost_krw": 414928,
-      "current_price_krw": 245500,
-      "market_value_krw": 1227500,
-      "unrealized_pnl_krw": -847143
+      "current_price_krw": 246000,
+      "market_value_krw": 1230000,
+      "unrealized_pnl_krw": -844643
     },
     {
       "ticker": "010120.KS",
@@ -100,9 +100,9 @@ schema: tradingagents.ai-context/v1
       "quantity": 1.0,
       "sellable_quantity": 1.0,
       "average_cost_krw": 1153000,
-      "current_price_krw": 438500,
-      "market_value_krw": 438500,
-      "unrealized_pnl_krw": -714500
+      "current_price_krw": 437000,
+      "market_value_krw": 437000,
+      "unrealized_pnl_krw": -716000
     },
     {
       "ticker": "010140.KS",
@@ -110,9 +110,9 @@ schema: tradingagents.ai-context/v1
       "quantity": 18.0,
       "sellable_quantity": 18.0,
       "average_cost_krw": 31573,
-      "current_price_krw": 17285,
-      "market_value_krw": 311130,
-      "unrealized_pnl_krw": -257185
+      "current_price_krw": 17280,
+      "market_value_krw": 311040,
+      "unrealized_pnl_krw": -257275
     },
     {
       "ticker": "042700.KS",
@@ -120,9 +120,9 @@ schema: tradingagents.ai-context/v1
       "quantity": 1.0,
       "sellable_quantity": 1.0,
       "average_cost_krw": 374167,
-      "current_price_krw": 179100,
-      "market_value_krw": 179100,
-      "unrealized_pnl_krw": -195067
+      "current_price_krw": 179500,
+      "market_value_krw": 179500,
+      "unrealized_pnl_krw": -194667
     },
     {
       "ticker": "035420.KS",
@@ -130,9 +130,9 @@ schema: tradingagents.ai-context/v1
       "quantity": 1.0,
       "sellable_quantity": 1.0,
       "average_cost_krw": 282334,
-      "current_price_krw": 169150,
-      "market_value_krw": 169150,
-      "unrealized_pnl_krw": -113184
+      "current_price_krw": 169000,
+      "market_value_krw": 169000,
+      "unrealized_pnl_krw": -113334
     },
     {
       "ticker": "058470.KQ",
@@ -140,9 +140,9 @@ schema: tradingagents.ai-context/v1
       "quantity": 3.0,
       "sellable_quantity": 3.0,
       "average_cost_krw": 100000,
-      "current_price_krw": 53500,
-      "market_value_krw": 160500,
-      "unrealized_pnl_krw": -139500
+      "current_price_krw": 53400,
+      "market_value_krw": 160200,
+      "unrealized_pnl_krw": -139800
     },
     {
       "ticker": "353200.KS",
@@ -150,9 +150,9 @@ schema: tradingagents.ai-context/v1
       "quantity": 1.0,
       "sellable_quantity": 1.0,
       "average_cost_krw": 172300,
-      "current_price_krw": 100300,
-      "market_value_krw": 100300,
-      "unrealized_pnl_krw": -72000
+      "current_price_krw": 101000,
+      "market_value_krw": 101000,
+      "unrealized_pnl_krw": -71300
     },
     {
       "ticker": "083450.KQ",
@@ -160,9 +160,9 @@ schema: tradingagents.ai-context/v1
       "quantity": 2.0,
       "sellable_quantity": 2.0,
       "average_cost_krw": 59100,
-      "current_price_krw": 40900,
-      "market_value_krw": 81800,
-      "unrealized_pnl_krw": -36400
+      "current_price_krw": 41000,
+      "market_value_krw": 82000,
+      "unrealized_pnl_krw": -36200
     },
     {
       "ticker": "034020.KS",
@@ -170,9 +170,9 @@ schema: tradingagents.ai-context/v1
       "quantity": 1.0,
       "sellable_quantity": 1.0,
       "average_cost_krw": 112931,
-      "current_price_krw": 52050,
-      "market_value_krw": 52050,
-      "unrealized_pnl_krw": -60881
+      "current_price_krw": 51900,
+      "market_value_krw": 51900,
+      "unrealized_pnl_krw": -61031
     },
     {
       "ticker": "403870.KQ",
@@ -180,9 +180,9 @@ schema: tradingagents.ai-context/v1
       "quantity": 1.0,
       "sellable_quantity": 1.0,
       "average_cost_krw": 54500,
-      "current_price_krw": 39500,
-      "market_value_krw": 39500,
-      "unrealized_pnl_krw": -15000
+      "current_price_krw": 39600,
+      "market_value_krw": 39600,
+      "unrealized_pnl_krw": -14900
     }
   ]
 }
