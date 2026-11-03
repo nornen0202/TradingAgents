@@ -1,13 +1,13 @@
 {
   "schema": "tradingagents.work-context/v1",
   "surface": "youtube",
-  "event_id": "youtube:60de941a062178e7beb13fa20d5e3be0",
+  "event_id": "youtube:2071004ff57f6067a8755a597e110cad",
   "prompt_contract_version": "youtube-work-v5",
   "prompt_sha256": "82a87727ec636b928ccb90cfe8cd823d86347e254ed0b204903699e34e35ef0b",
   "skill_sha256": "2fef99f1af403675549a13813e0fe5597a241a964affeada56e9f64e9f398fe9",
   "task_manifest_sha256": "0ea8b7511042a3aa7d6fa8447d97032d4be515f69526190a4c9556d01067c6df",
   "workflow_contract_sha256": "c75e155a8e30b5d22921bad39fde87022a6bd8d52c5ac56585369ed84d3f1eaf",
-  "source_sha256": "aaf398aad24fe1467c885a6b9a2a64c39dd1c97ebc6e5b3a78146d18d2d0aacf",
+  "source_sha256": "553ac8dac341df03b082a9f4a10aa60015dbb194d21e862c6e6257a06cebe194",
   "body": {
     "kind": "youtube",
     "source_health": "STALE",
@@ -44,10 +44,10 @@
     },
     "coverage": {
       "total_unique_events": 640,
-      "window_events": 11,
-      "transmitted_events": 11,
+      "window_events": 10,
+      "transmitted_events": 10,
       "truncated": false,
-      "oldest_occurred_at": "2026-10-31T01:10:43+00:00",
+      "oldest_occurred_at": "2026-10-31T04:49:13+00:00",
       "newest_occurred_at": "2026-10-31T13:23:28+00:00"
     },
     "events": [
@@ -1828,145 +1828,6 @@
               "source_url": "//duckduckgo.com/l/?uddg=https%3A%2F%2Fctext.org%2Fwiki.pl%3Fif%3Dgb%26res%3D339496&rut=3cba459bb07b64f90abf731ee3289a374b1e444d26c67221c08f11f3aee258a6",
               "publisher": "duckduckgo.com",
               "source_tier": "web"
-            }
-          ]
-        }
-      },
-      {
-        "event_key": "mW7c9jFN6VY",
-        "content_sha256": "d2bca9f040c88574a7f9ee37e68c5fc86daa6d5927be976602491f5ecd778e3a",
-        "occurred_at": "2026-10-31T01:10:43+00:00",
-        "relevance": {
-          "tickers": [
-            "005930",
-            "000660",
-            "MU"
-          ],
-          "markets": [
-            "KR",
-            "US"
-          ],
-          "themes": [],
-          "match_basis": "verified_entities"
-        },
-        "strategy_source_tier": "STANDARD",
-        "strategy_evidence_weight": "STANDARD",
-        "summary": {
-          "video_id": "mW7c9jFN6VY",
-          "title": "\"1억 생기면 뭐 살래?\" 주식 전문가들의 유쾌한 투자 수다 | 정프로 장우진 빈센트 박가영 이형수 [여의도 투자회담]",
-          "channel": "삼프로TV 3PROTV",
-          "source_url": "https://www.youtube.com/watch?v=mW7c9jFN6VY",
-          "published_at": "2026-10-31T01:10:43+00:00",
-          "status": "unverified",
-          "strategy_source_tier": "STANDARD",
-          "strategy_evidence_weight": "STANDARD",
-          "strategy_validation_policy": "STANDARD_REVIEW",
-          "transcript_quality": {
-            "status": "good",
-            "score": 1.0,
-            "warnings": [],
-            "source": "automatic",
-            "language": "Korean",
-            "model_or_format": "json3",
-            "chars": 24318,
-            "segments": 1528,
-            "duration_seconds": 2725,
-            "repeated_ngram_ratio": 0.003
-          },
-          "claim_status_summary": {
-            "unverified": 10
-          },
-          "claims": [
-            {
-              "claim_id": "C1_1",
-              "claim_text": "한국 주식의 가치저장 기능과 정부의 ‘머니무브·생산적 금융’ 정책 설계에 아쉬움을 표하며 미국 기술주·부동산과 대비했다.",
-              "status": "unverified",
-              "confidence": 0.0,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "한국 주식의 가치저장 능력이 열위라는 결론을 검증된 사실로 사용하지 않는다."
-            },
-            {
-              "claim_id": "C1_2",
-              "claim_text": "다른 출연자는 AI가 노동력 감소를 보완해 한국 잠재성장률을 반전시키면 장기투자가 가능해질 수 있다고 주장했다.",
-              "status": "unverified",
-              "confidence": 0.0,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "잠재성장률 반전을 확정된 투자 전제로 삼지 않고 조건부 시나리오로 구분한다."
-            },
-            {
-              "claim_id": "C1_3",
-              "claim_text": "부동산 가격이 10~20% 하락하면 정부가 대응 정책을 내놓는다는 발언.",
-              "status": "unverified",
-              "confidence": 0.0,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "10~20% 하락을 정부 개입이 보장되는 기준이나 투자 손실의 하한으로 해석하지 않는다."
-            },
-            {
-              "claim_id": "C2_1",
-              "claim_text": "1억 원 투자 가정에서 SK하이닉스와 함께 매수 대상으로 제시됐으며, 반도체 주가가 바닥권이라는 의견이 나왔다.",
-              "status": "unverified",
-              "confidence": 0.0,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "매수 선호와 주가 바닥 확인을 구분하고, 바닥권 판단을 검증된 매수 신호로 제시하지 않는다."
-            },
-            {
-              "claim_id": "C2_2",
-              "claim_text": "한 출연자는 1억 원을 1천만 원씩 10회 분할매수하는 방식을 제안했다.",
-              "status": "unverified",
-              "confidence": 0.0,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "출연자의 투자 방식 제안으로만 소개하고 손실 방지나 수익 개선이 검증된 전략으로 표현하지 않는다."
-            },
-            {
-              "claim_id": "C3_1",
-              "claim_text": "여러 출연자가 핵심 매수 대상으로 제시했으며, 중국의 추격에도 이번 업황 사이클에서는 영향이 제한적이라고 평가했다.",
-              "status": "unverified",
-              "confidence": 0.0,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "중국 경쟁 위험이 단기적으로 제한된다는 판단은 확인되지 않은 투자 가정으로 남긴다."
-            }
-          ],
-          "entities": [
-            {
-              "ticker": "005930",
-              "name": "삼성전자",
-              "status": "unverified",
-              "verification_notes": [
-                "시장 데이터 조회 실패: no_usable_market_fields"
-              ]
-            },
-            {
-              "ticker": "000660",
-              "name": "SK하이닉스",
-              "status": "unverified",
-              "verification_notes": [
-                "시장 데이터 조회 실패: no_usable_market_fields"
-              ]
-            },
-            {
-              "ticker": "MU",
-              "name": "마이크론",
-              "status": "unverified",
-              "verification_notes": [
-                "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-              ]
-            }
-          ],
-          "evidence": [
-            {
-              "evidence_id": "E1",
-              "claim_id": "C1_3",
-              "title": "S&P 500 at 10,000 or bust: New ETF offers investors all-or-nothing bet on the index",
-              "source_url": "https://finance.yahoo.com/markets/options/articles/p-500-10-000-bust-110000631.html",
-              "publisher": "MarketWatch",
-              "published_at": "2026-10-10T11:00:00+00:00",
-              "source_tier": "news"
             }
           ]
         }
