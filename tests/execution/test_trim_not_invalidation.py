@@ -122,6 +122,7 @@ def test_overlay_rebuilds_only_affected_cached_contract_without_research_or_cloc
     manifest = {
         "run_id": "source-full", "status": "success",
         "started_at": (datetime.now(timezone.utc) - timedelta(hours=1)).isoformat(),
+        "finished_at": (datetime.now(timezone.utc) - timedelta(minutes=30)).isoformat(),
         "settings": {"run_mode": "full", "market": "KR"},
         "summary": {"total_tickers": 1, "successful_tickers": 1, "failed_tickers": 0},
         "tickers": [{"ticker": "278470.KS", "status": "success", "decision": payload["decision"],

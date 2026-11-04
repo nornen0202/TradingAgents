@@ -54,7 +54,7 @@ def config(archive, *, lightweight=True, mode="overlay_only"):
                                                      execution_max_data_age_seconds=120))
 
 
-def bootstrap(evidence, monkeypatch, *, lightweight=True, mode="overlay_only", label="overlay"):
+def bootstrap(evidence, monkeypatch, *, lightweight=True, mode="overlay_only", label="overlay", now=None):
     from tradingagents.scheduled import runner
     archive, _, manifest, _ = evidence
     monkeypatch.setattr(runner, "_copy_latest_microstructure_artifacts", lambda **_: {})
@@ -62,7 +62,7 @@ def bootstrap(evidence, monkeypatch, *, lightweight=True, mode="overlay_only", l
     destination = archive / "runs/2026" / label
     rows, _ = runner._bootstrap_overlay_inputs_from_latest_run(
         config=config(archive, lightweight=lightweight, mode=mode), run_dir=destination,
-        tickers=["AAPL"], source_manifest=manifest)
+        tickers=["AAPL"], source_manifest=manifest, now=now)
     return destination, rows[0]
 
 
@@ -450,6 +450,65 @@ def test_invalid_query_clock_is_rejected(evidence):
     for value in ("bad", datetime(2026, 5, 30), False):
         with pytest.raises(ValueError):
             ResearchArtifactStore(archive, now=value)
+
+
+@pytest.mark.parametrize("lightweight", [False, True])
+@pytest.mark.parametrize("explicit_cutoff", [False, True])
+def test_bootstrap_rejects_source_completed_after_run_cutoff_before_writing(evidence, monkeypatch, lightweight, explicit_cutoff):
+    from tradingagents.scheduled import runner
+    archive, *_ = evidence
+    cutoff = datetime(2026, 5, 30, 9, 2, tzinfo=timezone.utc)
+    class Clock(datetime):
+        @classmethod
+        def now(cls, tz=None):
+            return cutoff
+    monkeypatch.setattr(runner, "datetime", Clock)
+    with pytest.raises(ValueError, match="source_run_id=.*cutoff="):
+        bootstrap(evidence, monkeypatch, lightweight=lightweight, now=cutoff if explicit_cutoff else None)
+    assert not (archive / "runs/2026/overlay").exists()
+    assert not (archive / "research-snapshots").exists()
+
+
+@pytest.mark.parametrize("finish", [None, "bad", "2026-05-30T09:03:00", "2026-05-30T08:59:00",
+                                   "2026-05-30T12:00:01+00:00"])
+def test_overlay_selection_excludes_missing_malformed_naive_reversed_and_future_clocks(evidence, finish):
+    from tradingagents.scheduled import runner
+    archive, source, manifest, _ = evidence
+    manifest["finished_at"] = finish
+    write(source / "run.json", manifest)
+    write(archive / "latest-run.json", manifest)
+    assert runner._resolve_latest_overlay_source_manifest(archive, tickers=["AAPL"], market="US", now=NOW) is None
+
+
+def test_overlay_selection_does_not_adopt_full_published_during_run(evidence):
+    from tradingagents.scheduled import runner
+    archive, _, original, _ = evidence
+    new = deepcopy(original)
+    new.update(run_id="20260530T090300_full", started_at="2026-05-30T09:03:00+00:00",
+               finished_at="2026-05-30T09:05:00+00:00")
+    write(archive / "runs/2026" / new["run_id"] / "run.json", new)
+    write(archive / "latest-run.json", new)
+    assert runner._resolve_latest_overlay_source_manifest(
+        archive, tickers=["AAPL"], market="US", now=datetime(2026, 5, 30, 9, 4, tzinfo=timezone.utc)) == original
+    assert runner._resolve_latest_overlay_source_manifest(archive, tickers=["AAPL"], market="US", now=NOW) == new
+
+
+def test_preexisting_late_reference_chain_is_skipped_without_changing_evidence(evidence, monkeypatch):
+    from tradingagents.scheduled import runner
+    archive, _, original, _ = evidence
+    destination, row = bootstrap(evidence, monkeypatch)
+    manifest = publish_overlay(destination, row)
+    # The old producer selected research finishing 17 seconds after its start.
+    manifest.update(started_at="2026-05-30T09:02:43+00:00", finished_at="2026-05-30T09:04:00+00:00",
+                    overlay_source_run_id=original["run_id"])
+    manifest["tickers"][0]["artifacts"]["microstructure_snapshot_json"] = "microstructure.json"
+    write(destination / "run.json", manifest)
+    write(archive / "latest-run.json", manifest)
+    before = (destination / "run.json").read_bytes()
+    assert runner._resolve_latest_overlay_source_manifest(archive, tickers=["AAPL"], market="US", now=NOW) == original
+    with pytest.raises(ValueError, match="unavailable"):
+        bootstrap((archive, destination, manifest, row), monkeypatch, now=NOW, label="rejected")
+    assert (destination / "run.json").read_bytes() == before
 
 
 def test_only_existing_intraday_append_fields_may_differ(evidence, monkeypatch):

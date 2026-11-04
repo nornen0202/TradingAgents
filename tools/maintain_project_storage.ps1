@@ -234,6 +234,36 @@ function Test-TradingAgentsRunnerBusy {
     return $false
 }
 
+function Test-RunnerBackupInactive {
+    param([string]$Root, [string]$Alias, [string]$Backup)
+
+    # The updater keeps bin/externals as junctions to versioned directories.
+    # Modification order never proves that a versioned directory is inactive.
+    # Resolve the live alias again immediately before each proposed removal.
+    try {
+        $entry = Get-Item -LiteralPath (Join-Path $Root $Alias) -Force -ErrorAction Stop
+        if (-not $entry.PSIsContainer) { return $false }
+        for ($depth = 0; $depth -lt 16 -and ($entry.Attributes -band [IO.FileAttributes]::ReparsePoint); $depth++) {
+            # Target is supported by both Windows PowerShell 5.1 (the task
+            # launcher) and PowerShell 7. ResolveLinkTarget requires newer .NET.
+            $targets = @($entry.Target)
+            if ($targets.Count -ne 1 -or [string]::IsNullOrWhiteSpace([string]$targets[0])) { return $false }
+            $targetPath = [string]$targets[0]
+            if (-not [IO.Path]::IsPathRooted($targetPath)) { $targetPath = Join-Path $entry.Parent.FullName $targetPath }
+            $entry = Get-Item -LiteralPath $targetPath -Force -ErrorAction Stop
+            if (-not $entry.PSIsContainer) { return $false }
+        }
+        if ($entry.Attributes -band [IO.FileAttributes]::ReparsePoint) { return $false }
+        $active = Assert-ChildPath -Path $entry.FullName -Root $Root
+        $candidate = Assert-ChildPath -Path $Backup -Root $Root
+        return (-not $candidate.Equals($active, [StringComparison]::OrdinalIgnoreCase) -and
+            -not $active.StartsWith($candidate + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase))
+    } catch {
+        Write-Warning "Runner active $Alias target is unverified; preserving versioned directories."
+        return $false
+    }
+}
+
 function Write-MaintenanceLog {
     param([Parameter(Mandatory = $true)][string]$Message)
 
@@ -383,6 +413,10 @@ try {
                 if ($backup.LastWriteTime -lt $runnerUpdateCutoff) {
                     if (Test-TradingAgentsRunnerBusy -Root $RunnerRoot) {
                         throw "TradingAgents Runner.Worker started during backup cleanup."
+                    }
+                    if (-not (Test-RunnerBackupInactive -Root $RunnerRoot -Alias $prefix.TrimEnd('.') -Backup $backup.FullName)) {
+                        Write-Output "PRESERVED root=$($backup.FullName) reason=active or unverified runner target"
+                        continue
                     }
                     Remove-ValidatedTree -Path $backup.FullName -Root $RunnerRoot -Reason "superseded runner backup older than $RunnerUpdateRetentionDays days"
                 }

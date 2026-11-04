@@ -518,6 +518,7 @@ def _execute_run_body(config, *, run_label, skip_site_build, tz, started_at,
             config=config,
             run_dir=run_dir,
             tickers=run_tickers,
+            now=started_at,
             **({"source_manifest": refresh_source, "preserve_thesis_bytes": True} if refresh_source is not None else {}),
         )
         if refresh_source is not None:
@@ -4256,11 +4257,14 @@ def _bootstrap_overlay_inputs_from_latest_run(
     tickers: list[str],
     source_manifest: dict[str, Any] | None = None,
     preserve_thesis_bytes: bool = False,
+    now: datetime | None = None,
 ) -> tuple[list[dict[str, Any]], str | None]:
+    cutoff = now or datetime.now(timezone.utc)
     source_manifest = source_manifest or _resolve_latest_overlay_source_manifest(
         config.storage.archive_dir,
         tickers=tickers,
         market=config.run.market,
+        now=cutoff,
     )
     if source_manifest is None:
         raise RuntimeError(
@@ -4271,8 +4275,10 @@ def _bootstrap_overlay_inputs_from_latest_run(
     source_started_at = str(source_manifest.get("started_at") or "")
     if not source_run_id or len(source_started_at) < 4:
         raise RuntimeError("latest-run.json is missing run_id/started_at required for overlay bootstrap.")
+    if not _manifest_available_for_bootstrap(source_manifest, now=cutoff):
+        raise ValueError(f"Overlay source unavailable at analysis cutoff: source_run_id={source_run_id} cutoff={cutoff.isoformat()}")
     source_run_dir = config.storage.archive_dir / "runs" / source_started_at[:4] / source_run_id
-    research_store = ResearchArtifactStore(config.storage.archive_dir)
+    research_store = ResearchArtifactStore(config.storage.archive_dir, now=cutoff)
     reference_research = (config.execution.execution_lightweight_refresh
                           and config.run.run_mode == "overlay_only" and not preserve_thesis_bytes)
     summaries: list[dict[str, Any]] = []
@@ -4731,7 +4737,9 @@ def _resolve_latest_overlay_source_manifest(
     *,
     tickers: list[str] | None = None,
     market: str | None = None,
+    now: datetime | None = None,
 ) -> dict[str, Any] | None:
+    cutoff = now or datetime.now(timezone.utc)
     latest_manifest_path = archive_dir / "latest-run.json"
     if not latest_manifest_path.exists():
         return None
@@ -4741,10 +4749,11 @@ def _resolve_latest_overlay_source_manifest(
     from .research_refresh import verified_revision
     candidate_revision_ok = ("research_refresh" not in candidate
         and not str(candidate.get("label") or "").startswith("local-thesis-refresh-")) or verified_revision(
-            archive_dir, candidate, market=market, now=datetime.now(timezone.utc))
-    candidate_market_ok = _manifest_market_matches(candidate, market=market) and candidate_revision_ok
+            archive_dir, candidate, market=market, now=cutoff)
+    candidate_market_ok = (_manifest_market_matches(candidate, market=market) and candidate_revision_ok
+                           and _manifest_available_for_bootstrap(candidate, now=cutoff))
     if candidate_market_ok and run_mode == "full" and _manifest_has_bootstrap_ready_ticker(candidate, tickers=tickers):
-        return _prefer_newer_completed_full_source(archive_dir, candidate, tickers=tickers, market=market)
+        return _prefer_newer_completed_full_source(archive_dir, candidate, tickers=tickers, market=market, now=cutoff)
 
     if (
         candidate_market_ok
@@ -4755,7 +4764,7 @@ def _resolve_latest_overlay_source_manifest(
             tickers=tickers,
         )
     ):
-        return _prefer_newer_completed_full_source(archive_dir, candidate, tickers=tickers, market=market)
+        return _prefer_newer_completed_full_source(archive_dir, candidate, tickers=tickers, market=market, now=cutoff)
 
     source_run_id = str(candidate.get("overlay_source_run_id") or "").strip()
     if source_run_id:
@@ -4764,21 +4773,22 @@ def _resolve_latest_overlay_source_manifest(
             resolved = json.loads(source_manifest_path.read_text(encoding="utf-8"))
             resolved_revision_ok = ("research_refresh" not in resolved
                 and not str(resolved.get("label") or "").startswith("local-thesis-refresh-")) or verified_revision(
-                    archive_dir, resolved, market=market, now=datetime.now(timezone.utc))
-            if resolved_revision_ok and _manifest_market_matches(resolved, market=market) and _manifest_has_bootstrap_ready_ticker(
+                    archive_dir, resolved, market=market, now=cutoff)
+            if resolved_revision_ok and _manifest_available_for_bootstrap(resolved, now=cutoff) and _manifest_market_matches(resolved, market=market) and _manifest_has_bootstrap_ready_ticker(
                 resolved,
                 tickers=tickers,
             ):
-                return _prefer_newer_completed_full_source(archive_dir, resolved, tickers=tickers, market=market)
+                return _prefer_newer_completed_full_source(archive_dir, resolved, tickers=tickers, market=market, now=cutoff)
 
-    latest_full = _find_latest_full_run_manifest(archive_dir, tickers=tickers, market=market)
+    latest_full = _find_latest_full_run_manifest(archive_dir, tickers=tickers, market=market, now=cutoff)
     if latest_full is not None:
-        return _prefer_newer_completed_full_source(archive_dir, latest_full, tickers=tickers, market=market)
+        return _prefer_newer_completed_full_source(archive_dir, latest_full, tickers=tickers, market=market, now=cutoff)
     return None
 
 
 def _prefer_newer_completed_full_source(
     archive_dir: Path, candidate: dict[str, Any], *, tickers: list[str] | None, market: str | None,
+    now: datetime | None = None,
 ) -> dict[str, Any]:
     """Do not let a later overlay hide a full thesis that completed afterwards.
 
@@ -4786,6 +4796,7 @@ def _prefer_newer_completed_full_source(
     overlay quote clocks. A replacement is one complete same-market baseline;
     no overlay data or fields are transplanted into that baseline.
     """
+    cutoff = now or datetime.now(timezone.utc)
     lineage = candidate
     seen: set[str] = set()
     lineage_key = None
@@ -4825,6 +4836,7 @@ def _prefer_newer_completed_full_source(
             or not _manifest_is_complete_overlay_baseline(
                 full, market=market, requested_tickers=tickers, required_holding_tickers=tickers,
                 archive_dir=archive_dir,
+                now=cutoff,
             )
         ):
             continue
@@ -4834,7 +4846,7 @@ def _prefer_newer_completed_full_source(
             if (
                 finished.tzinfo is None
                 or finished.astimezone(timezone.utc) < key[0]
-                or finished.astimezone(timezone.utc) > datetime.now(timezone.utc)
+                or finished.astimezone(timezone.utc) > cutoff
             ):
                 continue
         except (TypeError, ValueError):
@@ -4844,7 +4856,7 @@ def _prefer_newer_completed_full_source(
     selected = max(eligible, key=lambda item: item[0])[1] if eligible else candidate
     from .research_refresh import prefer_completed_revision
     return prefer_completed_revision(archive_dir, selected, market=market, tickers=tickers,
-                                     now=datetime.now(timezone.utc))
+                                     now=cutoff)
 
 
 def _resolve_latest_full_overlay_baseline_manifest(
@@ -5298,6 +5310,34 @@ def _manifest_market_matches(manifest: dict[str, Any], *, market: str | None) ->
     return not actual or actual == expected
 
 
+def _manifest_available_for_bootstrap(manifest: dict[str, Any], *, now: datetime) -> bool:
+    """Exclude late publications and previously created invalid reference chains."""
+    def instant(value):
+        parsed = datetime.fromisoformat(str(value).replace("Z", "+00:00"))
+        if parsed.tzinfo is None or parsed.utcoffset() is None:
+            raise ValueError("Aware bootstrap publication clock required")
+        return parsed
+
+    try:
+        cutoff = instant(now.isoformat())
+        started = instant(manifest.get("started_at"))
+        finished = instant(manifest.get("finished_at"))
+        if not started <= finished <= cutoff:
+            return False
+        for row in manifest.get("tickers", []):
+            if row.get("status") != "success":
+                continue
+            for key in RESEARCH_REFERENCE_KEYS:
+                reference = (row.get("artifacts") or {}).get(key)
+                if isinstance(reference, dict) and not (
+                        instant(reference.get("source_started_at"))
+                        <= instant(reference.get("source_finished_at")) <= started):
+                    return False
+        return True
+    except (TypeError, ValueError, AttributeError):
+        return False
+
+
 def _manifest_has_bootstrap_ready_ticker(
     manifest: dict[str, Any],
     *,
@@ -5335,6 +5375,7 @@ def _find_latest_full_run_manifest(
     tickers: list[str] | None = None,
     market: str | None = None,
     require_all_tickers: bool = True,
+    now: datetime | None = None,
 ) -> dict[str, Any] | None:
     runs_dir = archive_dir / "runs"
     if not runs_dir.exists():
@@ -5347,6 +5388,8 @@ def _find_latest_full_run_manifest(
             if not manifest_path.exists():
                 continue
             manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+            if now is not None and not _manifest_available_for_bootstrap(manifest, now=now):
+                continue
             if not _manifest_market_matches(manifest, market=market):
                 continue
             run_mode = str((((manifest.get("settings") or {}).get("run_mode")) or "full")).strip().lower()

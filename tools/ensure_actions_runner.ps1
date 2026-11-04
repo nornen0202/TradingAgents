@@ -24,6 +24,12 @@ if (-not (Test-Path -LiteralPath $listenerPath -PathType Leaf)) {
 if (-not (Test-Path -LiteralPath $runCommand -PathType Leaf)) {
     throw "GitHub Actions run command not found: $runCommand"
 }
+foreach ($required in @("Runner.Worker.exe", "Runner.Worker.dll", "Runner.Worker.deps.json", "Runner.Worker.runtimeconfig.json")) {
+    $requiredPath = Join-Path $resolvedRunnerRoot "bin\$required"
+    if (-not (Test-Path -LiteralPath $requiredPath -PathType Leaf)) {
+        throw "GitHub Actions runner installation is incomplete: $requiredPath. Restore the verified same-version package before accepting jobs."
+    }
+}
 
 function Get-TargetRunnerListener {
     @(Get-CimInstance Win32_Process -Filter "Name='Runner.Listener.exe'" -ErrorAction SilentlyContinue) |
