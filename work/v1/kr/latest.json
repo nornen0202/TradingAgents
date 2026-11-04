@@ -1,13 +1,13 @@
 {
   "schema": "tradingagents.work-context/v1",
   "surface": "kr",
-  "event_id": "kr:67803599dd9b71ff0e7974e806b182ac",
+  "event_id": "kr:386785b0a5ace4ac35dbba315cb58858",
   "prompt_contract_version": "market-work-v12-kr",
   "prompt_sha256": "ae80093efe2dcfe7f6131b8b09100f75e77b0ca0242b5340d15eb6ec3fd81274",
   "skill_sha256": "2fef99f1af403675549a13813e0fe5597a241a964affeada56e9f64e9f398fe9",
   "task_manifest_sha256": "0ea8b7511042a3aa7d6fa8447d97032d4be515f69526190a4c9556d01067c6df",
   "workflow_contract_sha256": "4f1b419a091e9fe8868628ed6d18499341f5c8830a0873302fa24e8ead61182e",
-  "source_sha256": "748c23866a141fcfdf864675fc0783bd373b0a39a7df70e832e2fbb9de1162bf",
+  "source_sha256": "ee465d7a378f1c15073c7103b49b6d3f083ab17682438db662e0bda7e4d3b473",
   "body": {
     "kind": "market",
     "market": "KR",
@@ -1262,21 +1262,803 @@
         "execution_eligible": false
       },
       "prism": {
-        "source_health": "MISSING",
+        "source_health": "OK",
         "coverage": {
-          "total_unique_events": 0,
-          "window_events": 0,
-          "transmitted_events": 0,
-          "truncated": false,
-          "oldest_occurred_at": null,
-          "newest_occurred_at": null,
-          "available_events_before_context_cap": 0,
+          "total_unique_events": 391,
+          "window_events": 46,
+          "transmitted_events": 20,
+          "truncated": true,
+          "oldest_occurred_at": "2026-11-03T22:06:53+00:00",
+          "newest_occurred_at": "2026-11-04T06:09:37+00:00",
+          "available_events_before_context_cap": 46,
           "context_event_cap": 20,
-          "omitted_events": 0,
-          "omitted_due_to_context_cap": 0,
+          "omitted_events": 26,
+          "omitted_due_to_context_cap": 26,
           "omitted_before_context_selection": 0
         },
-        "events": [],
+        "events": [
+          {
+            "event_key": "stock_ai_agent:17241",
+            "content_sha256": "5c4eeae1201e5d32d80a04a955ea36e39b011c5f9ac2fbaa804e32446eeea616",
+            "occurred_at": "2026-11-04T01:16:40+00:00",
+            "relevance": {
+              "tickers": [
+                "006400.KS"
+              ],
+              "markets": [
+                "KR"
+              ],
+              "themes": [],
+              "match_basis": "normalized_prism_signals",
+              "matched_tickers": [
+                "006400"
+              ],
+              "market_match": true,
+              "score": 120
+            },
+            "summary": {
+              "message_id": "17241",
+              "posted_at": "2026-11-04T01:16:40+00:00",
+              "source_url": "https://t.me/stock_ai_agent/17241",
+              "preview": "📉 매도: 삼성SDI(006400) 매수가: 493,500원 매도가: 466,000원 수익률: ⬇️ -5.57% (실제 투입 비중 35% 반영 시 -1.95%) 보유기간: 20시간 15분 매도이유: 손절선 이탈 — 손절선 472,390원(장중 0.5% 여유 470,028원) 아래로 내려가 466,000원에 매도했습니다. 🔁 재진입 종목 (기준 가격 눌림 지지 매수, 2/3번째 시도) 📡...",
+              "signals": [
+                {
+                  "canonical_ticker": "006400.KS",
+                  "display_name": "매도: 삼성SDI",
+                  "market": "KR",
+                  "source_asof": "2026-11-04T01:16:40+00:00",
+                  "signal_action": "UNKNOWN",
+                  "trigger_type": "telegram_message",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "confidence": 0.45,
+                  "warnings": []
+                }
+              ],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:17255",
+            "content_sha256": "dc4c8a83f8d5c1ed2411970936302cef5f43011fb9bbfee25d21a79667e37672",
+            "occurred_at": "2026-11-04T06:09:34+00:00",
+            "relevance": {
+              "tickers": [
+                "008830.KS"
+              ],
+              "markets": [
+                "KR"
+              ],
+              "themes": [],
+              "match_basis": "normalized_prism_signals",
+              "matched_tickers": [],
+              "market_match": true,
+              "score": 20
+            },
+            "summary": {
+              "message_id": "17255",
+              "posted_at": "2026-11-04T06:09:34+00:00",
+              "source_url": "https://t.me/stock_ai_agent/17255",
+              "preview": "⚠️ 매수 보류: 대동기어(008830) 현재가: 6,130원 매수 점수: 2/10 결정: 미진입 시장 상황: 횡보장 산업군: 기계·장비 보류 사유: AI 판단: 미진입 — 재무 건전성과 성장성 기준이 미달해 횡보·약세 국면의 필수 펀더멘털 기준을 통과하지 못했습니다. / 점수 부족 (3/5.0) 분석 의견: 보고서 2-1의 2026년 2분기 별도 영업흑자 전환에도 부채비율 277.49...",
+              "signals": [
+                {
+                  "canonical_ticker": "008830.KS",
+                  "display_name": "대동기어",
+                  "market": "KR",
+                  "source_asof": "2026-11-04T06:09:34+00:00",
+                  "signal_action": "NO_ENTRY",
+                  "trigger_type": "telegram_buy_skip",
+                  "trigger_score": 0.2,
+                  "composite_score": 0.2,
+                  "confidence": 0.2,
+                  "warnings": []
+                }
+              ],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:17254",
+            "content_sha256": "14eb8bf9a5a14f4b2e128c6187d02945f1900ee32b9f0948c6a84a6b0c0c3a24",
+            "occurred_at": "2026-11-04T06:09:32+00:00",
+            "relevance": {
+              "tickers": [
+                "032640.KS"
+              ],
+              "markets": [
+                "KR"
+              ],
+              "themes": [],
+              "match_basis": "normalized_prism_signals",
+              "matched_tickers": [],
+              "market_match": true,
+              "score": 20
+            },
+            "summary": {
+              "message_id": "17254",
+              "posted_at": "2026-11-04T06:09:32+00:00",
+              "source_url": "https://t.me/stock_ai_agent/17254",
+              "preview": "⚠️ 매수 보류: LG유플러스(032640) 현재가: 15,590원 매수 점수: 7/10 결정: 미진입 시장 상황: 횡보장 산업군: 통신 보류 사유: AI 판단: 미진입 — 손익비 하한 미달입니다. 분석 의견: 보고서 2-1·2-2·5의 2025년·2026년 연결 실적에서 통신·기업인프라 사업과 네 가지 품질 기준을 확인했습니다. 다만 2분기 주당순이익 증가율 2.4%와 3분기 이익 증...",
+              "signals": [
+                {
+                  "canonical_ticker": "032640.KS",
+                  "display_name": "LG유플러스",
+                  "market": "KR",
+                  "source_asof": "2026-11-04T06:09:32+00:00",
+                  "signal_action": "NO_ENTRY",
+                  "trigger_type": "telegram_buy_skip",
+                  "trigger_score": 0.7,
+                  "composite_score": 0.7,
+                  "confidence": 0.7,
+                  "warnings": []
+                }
+              ],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:17253",
+            "content_sha256": "caa955309900b1852f574833b3bd5474f9c5d4806cbd464711faac5a718543e8",
+            "occurred_at": "2026-11-04T06:09:30+00:00",
+            "relevance": {
+              "tickers": [
+                "024850.KS"
+              ],
+              "markets": [
+                "KR"
+              ],
+              "themes": [],
+              "match_basis": "normalized_prism_signals",
+              "matched_tickers": [],
+              "market_match": true,
+              "score": 20
+            },
+            "summary": {
+              "message_id": "17253",
+              "posted_at": "2026-11-04T06:09:30+00:00",
+              "source_url": "https://t.me/stock_ai_agent/17253",
+              "preview": "⚠️ 매수 보류: HLB이노베이션(024850) 현재가: 16,290원 매수 점수: 2/10 결정: 미진입 시장 상황: 횡보장 산업군: 전기·전자 보류 사유: AI 판단: 미진입 — 수익성 기준 미달입니다. / 점수 부족 (3/5.0) 분석 의견: 보고서 2-1의 2026년 1·2분기 연결 영업손실이 각각 104억원·92억원으로 이어져 수익성 기준 미달로 미진입합니다. 보고서 2-2에서...",
+              "signals": [
+                {
+                  "canonical_ticker": "024850.KS",
+                  "display_name": "HLB이노베이션",
+                  "market": "KR",
+                  "source_asof": "2026-11-04T06:09:30+00:00",
+                  "signal_action": "NO_ENTRY",
+                  "trigger_type": "telegram_buy_skip",
+                  "trigger_score": 0.2,
+                  "composite_score": 0.2,
+                  "confidence": 0.2,
+                  "warnings": []
+                }
+              ],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:17252",
+            "content_sha256": "7fe5e83bf740f7c552d290c429293229de822e5da3042e27cf51d7b546f44982",
+            "occurred_at": "2026-11-04T06:05:18+00:00",
+            "relevance": {
+              "tickers": [
+                "008830.KS"
+              ],
+              "markets": [
+                "KR"
+              ],
+              "themes": [],
+              "match_basis": "normalized_prism_signals",
+              "matched_tickers": [],
+              "market_match": true,
+              "score": 20
+            },
+            "summary": {
+              "message_id": "17252",
+              "posted_at": "2026-11-04T06:05:18+00:00",
+              "source_url": "https://t.me/stock_ai_agent/17252",
+              "preview": "📊 대동기어 (008830) O'Neil 인사이트 차트의 베이스/피벗/RS 주석을 함께 참고하세요. ※ 보조 참고용 · 투자 권유 아님",
+              "signals": [
+                {
+                  "canonical_ticker": "008830.KS",
+                  "display_name": "대동기어",
+                  "market": "KR",
+                  "source_asof": "2026-11-04T06:05:18+00:00",
+                  "signal_action": "WATCH",
+                  "trigger_type": "telegram_oneil_insight",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "confidence": 0.45,
+                  "warnings": []
+                }
+              ],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:17251",
+            "content_sha256": "2afb15ce647bb5eeb6988c20b5a31f0bac5022c49d64cf5841bf09379811b1a3",
+            "occurred_at": "2026-11-04T06:04:55+00:00",
+            "relevance": {
+              "tickers": [
+                "032640.KS"
+              ],
+              "markets": [
+                "KR"
+              ],
+              "themes": [],
+              "match_basis": "normalized_prism_signals",
+              "matched_tickers": [],
+              "market_match": true,
+              "score": 20
+            },
+            "summary": {
+              "message_id": "17251",
+              "posted_at": "2026-11-04T06:04:55+00:00",
+              "source_url": "https://t.me/stock_ai_agent/17251",
+              "preview": "📊 LG유플러스 (032640) O'Neil 인사이트 차트의 베이스/피벗/RS 주석을 함께 참고하세요. ※ 보조 참고용 · 투자 권유 아님",
+              "signals": [
+                {
+                  "canonical_ticker": "032640.KS",
+                  "display_name": "LG유플러스",
+                  "market": "KR",
+                  "source_asof": "2026-11-04T06:04:55+00:00",
+                  "signal_action": "WATCH",
+                  "trigger_type": "telegram_oneil_insight",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "confidence": 0.45,
+                  "warnings": []
+                }
+              ],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:17250",
+            "content_sha256": "fdf81f7d37afe6eb3932c22c2c7b17e077e0523046348aa6733899267ee191be",
+            "occurred_at": "2026-11-04T06:04:32+00:00",
+            "relevance": {
+              "tickers": [
+                "024850.KS"
+              ],
+              "markets": [
+                "KR"
+              ],
+              "themes": [],
+              "match_basis": "normalized_prism_signals",
+              "matched_tickers": [],
+              "market_match": true,
+              "score": 20
+            },
+            "summary": {
+              "message_id": "17250",
+              "posted_at": "2026-11-04T06:04:32+00:00",
+              "source_url": "https://t.me/stock_ai_agent/17250",
+              "preview": "📊 HLB이노베이션 (024850) O'Neil 인사이트 차트의 베이스/피벗/RS 주석을 함께 참고하세요. ※ 보조 참고용 · 투자 권유 아님",
+              "signals": [
+                {
+                  "canonical_ticker": "024850.KS",
+                  "display_name": "HLB이노베이션",
+                  "market": "KR",
+                  "source_asof": "2026-11-04T06:04:32+00:00",
+                  "signal_action": "WATCH",
+                  "trigger_type": "telegram_oneil_insight",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "confidence": 0.45,
+                  "warnings": []
+                }
+              ],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:17249",
+            "content_sha256": "12d54576c1bdb09c82fb6b1cd4d5ae6d9da49cf5d64434044ce52bd641213b80",
+            "occurred_at": "2026-11-04T06:04:04+00:00",
+            "relevance": {
+              "tickers": [
+                "008830.KS",
+                "FCF",
+                "EYOU"
+              ],
+              "markets": [
+                "KR",
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "normalized_prism_signals",
+              "matched_tickers": [],
+              "market_match": true,
+              "score": 20
+            },
+            "summary": {
+              "message_id": "17249",
+              "posted_at": "2026-11-04T06:04:04+00:00",
+              "source_url": "https://t.me/stock_ai_agent/17249",
+              "preview": "",
+              "signals": [
+                {
+                  "canonical_ticker": "008830.KS",
+                  "display_name": "대동기어",
+                  "market": "KR",
+                  "source_asof": "2026-11-04T06:04:04+00:00",
+                  "signal_action": "WATCH",
+                  "trigger_type": "telegram_pdf_report",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "confidence": 0.45,
+                  "warnings": []
+                },
+                {
+                  "canonical_ticker": "FCF",
+                  "display_name": "보다 72.7% 줄었고 분기별 현금흐름",
+                  "market": "US",
+                  "source_asof": "2026-11-04T06:04:04+00:00",
+                  "signal_action": "WATCH",
+                  "trigger_type": "telegram_pdf_report",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "confidence": 0.45,
+                  "warnings": []
+                },
+                {
+                  "canonical_ticker": "EYOU",
+                  "display_name": "[3] 아시아투데이, 2026-10-29, 대동기어, 中 이유",
+                  "market": "US",
+                  "source_asof": "2026-11-04T06:04:04+00:00",
+                  "signal_action": "WATCH",
+                  "trigger_type": "telegram_pdf_report",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "confidence": 0.45,
+                  "warnings": []
+                }
+              ],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:17248",
+            "content_sha256": "de4770181d75f841f173e55940de3b3d3d68d95307b37451f5d9b9bb5b3ed772",
+            "occurred_at": "2026-11-04T06:03:57+00:00",
+            "relevance": {
+              "tickers": [
+                "032640.KS"
+              ],
+              "markets": [
+                "KR"
+              ],
+              "themes": [],
+              "match_basis": "normalized_prism_signals",
+              "matched_tickers": [],
+              "market_match": true,
+              "score": 20
+            },
+            "summary": {
+              "message_id": "17248",
+              "posted_at": "2026-11-04T06:03:57+00:00",
+              "source_url": "https://t.me/stock_ai_agent/17248",
+              "preview": "",
+              "signals": [
+                {
+                  "canonical_ticker": "032640.KS",
+                  "display_name": "LG유플러스",
+                  "market": "KR",
+                  "source_asof": "2026-11-04T06:03:57+00:00",
+                  "signal_action": "WATCH",
+                  "trigger_type": "telegram_pdf_report",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "confidence": 0.45,
+                  "warnings": []
+                }
+              ],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:17247",
+            "content_sha256": "ee0e0e1f986590fc21e8464733b00f0ad067ad6c4081349c9e7c5e1f6d078378",
+            "occurred_at": "2026-11-04T06:03:51+00:00",
+            "relevance": {
+              "tickers": [
+                "024850.KS"
+              ],
+              "markets": [
+                "KR"
+              ],
+              "themes": [],
+              "match_basis": "normalized_prism_signals",
+              "matched_tickers": [],
+              "market_match": true,
+              "score": 20
+            },
+            "summary": {
+              "message_id": "17247",
+              "posted_at": "2026-11-04T06:03:51+00:00",
+              "source_url": "https://t.me/stock_ai_agent/17247",
+              "preview": "",
+              "signals": [
+                {
+                  "canonical_ticker": "024850.KS",
+                  "display_name": "HLB이노베이션",
+                  "market": "KR",
+                  "source_asof": "2026-11-04T06:03:51+00:00",
+                  "signal_action": "WATCH",
+                  "trigger_type": "telegram_pdf_report",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "confidence": 0.45,
+                  "warnings": []
+                }
+              ],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:17246",
+            "content_sha256": "27eb800913ce01e7c3e8d46759fb3121bb740d1f08d098dfeb0fd1d20edebf4c",
+            "occurred_at": "2026-11-04T06:03:44+00:00",
+            "relevance": {
+              "tickers": [
+                "008830.KS",
+                "KIS"
+              ],
+              "markets": [
+                "KR",
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "normalized_prism_signals",
+              "matched_tickers": [],
+              "market_match": true,
+              "score": 20
+            },
+            "summary": {
+              "message_id": "17246",
+              "posted_at": "2026-11-04T06:03:44+00:00",
+              "source_url": "https://t.me/stock_ai_agent/17246",
+              "preview": "📈 매크로 섹터 리더 트리거 | 대동기어(008830) 농기계·자동차·산업기계용 변속기와 동력전달 부품을 제조합니다. 📊 11/4 종가 6,100원(+16.63%); 거래량 12,460,642주로 전일보다 약 6,557% 급증. 시총 1,168억원(KIS). 📰 머니투데이는 3분기 말 수주잔고 약 1.9조원, 전동화 부품 비중 약 80%를 보도했습니다. 수익 전환 시점은 미확인입니다....",
+              "signals": [
+                {
+                  "canonical_ticker": "008830.KS",
+                  "display_name": "매크로 섹터 리더 트리거 | 대동기어",
+                  "market": "KR",
+                  "source_asof": "2026-11-04T06:03:44+00:00",
+                  "signal_action": "UNKNOWN",
+                  "trigger_type": "telegram_message",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "confidence": 0.45,
+                  "warnings": []
+                },
+                {
+                  "canonical_ticker": "KIS",
+                  "display_name": "11/4 종가 6,100원(+16.63%); 거래량 12,460,642주로 전일보다 약 6,557% 급증. 시총 1,168억원",
+                  "market": "US",
+                  "source_asof": "2026-11-04T06:03:44+00:00",
+                  "signal_action": "UNKNOWN",
+                  "trigger_type": "telegram_message",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "confidence": 0.45,
+                  "warnings": []
+                }
+              ],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:17245",
+            "content_sha256": "0b1ec5ed3381bf79430c7f92961f2ac17f2a9eb9285e92614449fadc8ca761ec",
+            "occurred_at": "2026-11-04T06:03:39+00:00",
+            "relevance": {
+              "tickers": [
+                "032640.KS",
+                "AIDC"
+              ],
+              "markets": [
+                "KR",
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "normalized_prism_signals",
+              "matched_tickers": [],
+              "market_match": true,
+              "score": 20
+            },
+            "summary": {
+              "message_id": "17245",
+              "posted_at": "2026-11-04T06:03:39+00:00",
+              "source_url": "https://t.me/stock_ai_agent/17245",
+              "preview": "📈 마감 강도 상위주 | LG유플러스(032640) 모바일·IPTV·기업 인프라를 운영하는 통신사로, AI 데이터센터(AIDC) 사업도 확대 중입니다. 📊 11/04 종가 15,580원(+7.60%). 거래량 3,097,544주로 전일보다 470.5% 증가. 시가총액 약 6.62조원(KIS 기준). 📰 3분기 영업이익 2,976억원(+84.1%), AIDC 수익 +27.7% 발표. 다만...",
+              "signals": [
+                {
+                  "canonical_ticker": "032640.KS",
+                  "display_name": "마감 강도 상위주 | LG유플러스",
+                  "market": "KR",
+                  "source_asof": "2026-11-04T06:03:39+00:00",
+                  "signal_action": "UNKNOWN",
+                  "trigger_type": "telegram_message",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "confidence": 0.45,
+                  "warnings": []
+                },
+                {
+                  "canonical_ticker": "AIDC",
+                  "display_name": "모바일·IPTV·기업 인프라를 운영하는 통신사로, AI 데이터센터",
+                  "market": "US",
+                  "source_asof": "2026-11-04T06:03:39+00:00",
+                  "signal_action": "UNKNOWN",
+                  "trigger_type": "telegram_message",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "confidence": 0.45,
+                  "warnings": []
+                }
+              ],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:17244",
+            "content_sha256": "251e1a3b4538087ffa9137f0bada2c0cd068c822d9e5d093c30c3bb788145bb6",
+            "occurred_at": "2026-11-04T06:03:35+00:00",
+            "relevance": {
+              "tickers": [
+                "024850.KS"
+              ],
+              "markets": [
+                "KR"
+              ],
+              "themes": [],
+              "match_basis": "normalized_prism_signals",
+              "matched_tickers": [],
+              "market_match": true,
+              "score": 20
+            },
+            "summary": {
+              "message_id": "17244",
+              "posted_at": "2026-11-04T06:03:35+00:00",
+              "source_url": "https://t.me/stock_ai_agent/17244",
+              "preview": "📈 일중 급등 트리거 | HLB이노베이션(024850) 반도체 리드프레임·컨택핀 제조와 바이오 자회사 베리스모의 CAR-T 개발을 병행합니다. 📊 2026.11.04 종가 16,310원(+10.95%), 거래량 497,775주(+274.1% 전일 대비). 시총 5,650억원. 📰 베리스모의 SynKIR-110 전임상 데이터 공개와 SITC 발표가 기대 요인이나, 전임상은 환자 효능을 입...",
+              "signals": [
+                {
+                  "canonical_ticker": "024850.KS",
+                  "display_name": "일중 급등 트리거 | HLB이노베이션",
+                  "market": "KR",
+                  "source_asof": "2026-11-04T06:03:35+00:00",
+                  "signal_action": "UNKNOWN",
+                  "trigger_type": "telegram_message",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "confidence": 0.45,
+                  "warnings": []
+                }
+              ],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:17243",
+            "content_sha256": "ce315c9de9d5a9243e6a5775357696b752ef28eda3855beb3260e7e3f52fde5b",
+            "occurred_at": "2026-11-04T05:55:32+00:00",
+            "relevance": {
+              "tickers": [
+                "024850.KS",
+                "032640.KS",
+                "008830.KS"
+              ],
+              "markets": [
+                "KR"
+              ],
+              "themes": [],
+              "match_basis": "normalized_prism_signals",
+              "matched_tickers": [],
+              "market_match": true,
+              "score": 20
+            },
+            "summary": {
+              "message_id": "17243",
+              "posted_at": "2026-11-04T05:55:32+00:00",
+              "source_url": "https://t.me/stock_ai_agent/17243",
+              "preview": "🔔 오후 프리즘 시그널 얼럿 📅 2026.11.04 오후 분석 포착된 관심종목 🤖 프리즘봇의 가상 포트폴리오 운용 과정을 투명하게 공개합니다. 실제 매수 권유가 아닙니다. 🧭 장기추세: 횡보 | 실행기준: 횡보 | 선정: 탑다운 0종목 + 바텀업 3종목 🧭 오늘 돈이 몰린 테마 (상승 상위 종목 + KIS 뉴스 제목 기준) 1) LFP 양극재: 엘앤에프 +12.7%, 포스코퓨처엠 +9....",
+              "signals": [
+                {
+                  "canonical_ticker": "024850.KS",
+                  "display_name": "HLB이노베이션",
+                  "market": "KR",
+                  "source_asof": "2026-11-04T05:55:32+00:00",
+                  "signal_action": "WATCH",
+                  "trigger_type": "telegram_signal_alert",
+                  "trigger_score": 0.95,
+                  "composite_score": 0.95,
+                  "confidence": 0.95,
+                  "warnings": []
+                },
+                {
+                  "canonical_ticker": "032640.KS",
+                  "display_name": "LG유플러스",
+                  "market": "KR",
+                  "source_asof": "2026-11-04T05:55:32+00:00",
+                  "signal_action": "WATCH",
+                  "trigger_type": "telegram_signal_alert",
+                  "trigger_score": 0.85,
+                  "composite_score": 0.85,
+                  "confidence": 0.85,
+                  "warnings": []
+                },
+                {
+                  "canonical_ticker": "008830.KS",
+                  "display_name": "대동기어",
+                  "market": "KR",
+                  "source_asof": "2026-11-04T05:55:32+00:00",
+                  "signal_action": "WATCH",
+                  "trigger_type": "telegram_signal_alert",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "confidence": 0.45,
+                  "warnings": []
+                }
+              ],
+              "simulation_only": true,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:17256",
+            "content_sha256": "b4766bdc79c8d982e2ea42b62c10553f4c7c4df5d0cd2b7f77ebbde856d8b552",
+            "occurred_at": "2026-11-04T06:09:37+00:00",
+            "relevance": {
+              "tickers": [],
+              "markets": [],
+              "themes": [],
+              "match_basis": "message_context",
+              "matched_tickers": [],
+              "market_match": false,
+              "score": 0
+            },
+            "summary": {
+              "message_id": "17256",
+              "posted_at": "2026-11-04T06:09:37+00:00",
+              "source_url": "https://t.me/stock_ai_agent/17256",
+              "preview": "📊 프리즘 시뮬레이터 | 실시간 포트폴리오 (2026-11-04 15:09) 🔸 현재 보유: 0/10개 현재 보유 종목이 없습니다. 🔸 매매 이력 통계 - 총 거래: 220건 - 수익 거래: 86건 - 손실 거래: 134건 - 승률: 39.09% - 누적 수익률: 339.48% 📝 주의사항: - 본 리포트는 AI 기반 시뮬레이션 결과이며 실제 매매와 무관합니다. - 본 정보는 참고용이며...",
+              "signals": [],
+              "simulation_only": true,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:17242",
+            "content_sha256": "b1569b7c452f13b9b6218ea2446fbf9c49c1c2784977a30d553249249c2d9dfb",
+            "occurred_at": "2026-11-04T01:16:47+00:00",
+            "relevance": {
+              "tickers": [],
+              "markets": [],
+              "themes": [],
+              "match_basis": "message_context",
+              "matched_tickers": [],
+              "market_match": false,
+              "score": 0
+            },
+            "summary": {
+              "message_id": "17242",
+              "posted_at": "2026-11-04T01:16:47+00:00",
+              "source_url": "https://t.me/stock_ai_agent/17242",
+              "preview": "📊 프리즘 시뮬레이터 | 실시간 포트폴리오 (2026-11-04 10:16) 🔸 현재 보유: 0/10개 현재 보유 종목이 없습니다. 🔸 매매 이력 통계 - 총 거래: 220건 - 수익 거래: 86건 - 손실 거래: 134건 - 승률: 39.09% - 누적 수익률: 339.48% 📝 주의사항: - 본 리포트는 AI 기반 시뮬레이션 결과이며 실제 매매와 무관합니다. - 본 정보는 참고용이며...",
+              "signals": [],
+              "simulation_only": true,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:17240",
+            "content_sha256": "8d64f948d10c73bb5a978f0393aee0035ac044bfd4386b290b95cab667052d86",
+            "occurred_at": "2026-11-04T00:30:19+00:00",
+            "relevance": {
+              "tickers": [],
+              "markets": [],
+              "themes": [],
+              "match_basis": "message_context",
+              "matched_tickers": [],
+              "market_match": false,
+              "score": 0
+            },
+            "summary": {
+              "message_id": "17240",
+              "posted_at": "2026-11-04T00:30:19+00:00",
+              "source_url": "https://t.me/stock_ai_agent/17240",
+              "preview": "📉 시장 조정 구간 감지 — 이번 오전 분석은 쉬어갑니다. 시장이 고점 대비 크게 하락한 조정 구간이라, 무리한 신규 진입을 줄이기 위해 오늘은 하루 한 번(종가 확인 시간대)만 분석을 진행합니다. 보유 종목의 손절·청산 모니터링은 평소처럼 계속 가동 중입니다. 시장 회복 신호가 확인되면 자동으로 재개됩니다. 🙏",
+              "signals": [],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:17239",
+            "content_sha256": "fb82be78390f75b4aae8e18a1f52316ec237f4a0da1b6ef93283c91fb4651804",
+            "occurred_at": "2026-11-03T22:11:32+00:00",
+            "relevance": {
+              "tickers": [],
+              "markets": [],
+              "themes": [],
+              "match_basis": "message_context",
+              "matched_tickers": [],
+              "market_match": false,
+              "score": 0
+            },
+            "summary": {
+              "message_id": "17239",
+              "posted_at": "2026-11-03T22:11:32+00:00",
+              "source_url": "https://t.me/stock_ai_agent/17239",
+              "preview": "🏁 BTC 데모 시나리오 종료 · 정산 확인 🕐 11/04 07:10:29 KST 💵 청산 결과 정리 수량: 0.025 BTC 진입 → 청산: 78,033.80 USDT → 77,834.11 USDT 보유 시간: 24.8분 확정 순손익: -7.14 USDT • 시작 계좌 9,358.81 USDT 대비 -0.08% • 수수료 2.14 USDT · 펀딩 0.00 USDT 반영 💰 종료 후...",
+              "signals": [],
+              "simulation_only": true,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:17238",
+            "content_sha256": "603cf47ac7dfe18b3baca4933c249a50f25c42a7c2611f11da643b3bf9a0c4c1",
+            "occurred_at": "2026-11-03T22:09:32+00:00",
+            "relevance": {
+              "tickers": [],
+              "markets": [],
+              "themes": [],
+              "match_basis": "message_context",
+              "matched_tickers": [],
+              "market_match": false,
+              "score": 0
+            },
+            "summary": {
+              "message_id": "17238",
+              "posted_at": "2026-11-03T22:09:32+00:00",
+              "source_url": "https://t.me/stock_ai_agent/17238",
+              "preview": "✂️ BTC 데모 부분 청산 체결 · 롱 🕐 11/04 07:08:32 KST 사유: 부분 손절 🧾 이번 체결: 0.003 BTC · 77,792.30 USDT • 체결금액(명목): 233.38 USDT · 증거금 아님 • 이번 청산 가격손익: -0.72 USDT · 계좌 -0.01% 수수료·펀딩 전 · 확정 순손익 아님 손익·비용 정산 미확정: 확정 수익으로 집계하지 않음 📦 전체 포...",
+              "signals": [],
+              "simulation_only": true,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:17237",
+            "content_sha256": "c63df5422d6f19368bb3892638cc774ee54a141df912817a0ae6b603ca22d3f8",
+            "occurred_at": "2026-11-03T22:06:53+00:00",
+            "relevance": {
+              "tickers": [],
+              "markets": [],
+              "themes": [],
+              "match_basis": "message_context",
+              "matched_tickers": [],
+              "market_match": false,
+              "score": 0
+            },
+            "summary": {
+              "message_id": "17237",
+              "posted_at": "2026-11-03T22:06:53+00:00",
+              "source_url": "https://t.me/stock_ai_agent/17237",
+              "preview": "✂️ BTC 데모 부분 청산 체결 · 롱 🕐 11/04 07:06:15 KST 사유: 즉시 일부 감축 🧾 이번 체결: 0.006 BTC · 77,815.90 USDT • 체결금액(명목): 466.90 USDT · 증거금 아님 • 이번 청산 가격손익: -1.31 USDT · 계좌 -0.01% 수수료·펀딩 전 · 확정 순손익 아님 손익·비용 정산 미확정: 확정 수익으로 집계하지 않음 📦 전...",
+              "signals": [],
+              "simulation_only": true,
+              "actionability": "research_only"
+            }
+          }
+        ],
         "execution_eligible": false
       },
       "receipt_contract": {
@@ -1300,19 +2082,40 @@
             }
           },
           "prism": {
-            "source_health": "MISSING",
-            "event_keys": [],
+            "source_health": "OK",
+            "event_keys": [
+              "stock_ai_agent:17241",
+              "stock_ai_agent:17255",
+              "stock_ai_agent:17254",
+              "stock_ai_agent:17253",
+              "stock_ai_agent:17252",
+              "stock_ai_agent:17251",
+              "stock_ai_agent:17250",
+              "stock_ai_agent:17249",
+              "stock_ai_agent:17248",
+              "stock_ai_agent:17247",
+              "stock_ai_agent:17246",
+              "stock_ai_agent:17245",
+              "stock_ai_agent:17244",
+              "stock_ai_agent:17243",
+              "stock_ai_agent:17256",
+              "stock_ai_agent:17242",
+              "stock_ai_agent:17240",
+              "stock_ai_agent:17239",
+              "stock_ai_agent:17238",
+              "stock_ai_agent:17237"
+            ],
             "coverage": {
-              "total_unique_events": 0,
-              "window_events": 0,
-              "transmitted_events": 0,
-              "truncated": false,
-              "oldest_occurred_at": null,
-              "newest_occurred_at": null,
-              "available_events_before_context_cap": 0,
+              "total_unique_events": 391,
+              "window_events": 46,
+              "transmitted_events": 20,
+              "truncated": true,
+              "oldest_occurred_at": "2026-11-03T22:06:53+00:00",
+              "newest_occurred_at": "2026-11-04T06:09:37+00:00",
+              "available_events_before_context_cap": 46,
               "context_event_cap": 20,
-              "omitted_events": 0,
-              "omitted_due_to_context_cap": 0,
+              "omitted_events": 26,
+              "omitted_due_to_context_cap": 26,
               "omitted_before_context_selection": 0
             }
           }
