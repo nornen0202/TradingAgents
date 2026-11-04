@@ -453,11 +453,18 @@ def test_invalid_query_clock_is_rejected(evidence):
 
 
 @pytest.mark.parametrize("lightweight", [False, True])
-def test_bootstrap_rejects_source_completed_after_run_cutoff_before_writing(evidence, monkeypatch, lightweight):
+@pytest.mark.parametrize("explicit_cutoff", [False, True])
+def test_bootstrap_rejects_source_completed_after_run_cutoff_before_writing(evidence, monkeypatch, lightweight, explicit_cutoff):
+    from tradingagents.scheduled import runner
     archive, *_ = evidence
     cutoff = datetime(2026, 5, 30, 9, 2, tzinfo=timezone.utc)
+    class Clock(datetime):
+        @classmethod
+        def now(cls, tz=None):
+            return cutoff
+    monkeypatch.setattr(runner, "datetime", Clock)
     with pytest.raises(ValueError, match="source_run_id=.*cutoff="):
-        bootstrap(evidence, monkeypatch, lightweight=lightweight, now=cutoff)
+        bootstrap(evidence, monkeypatch, lightweight=lightweight, now=cutoff if explicit_cutoff else None)
     assert not (archive / "runs/2026/overlay").exists()
     assert not (archive / "research-snapshots").exists()
 

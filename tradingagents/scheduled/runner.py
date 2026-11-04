@@ -4259,11 +4259,12 @@ def _bootstrap_overlay_inputs_from_latest_run(
     preserve_thesis_bytes: bool = False,
     now: datetime | None = None,
 ) -> tuple[list[dict[str, Any]], str | None]:
+    cutoff = now or datetime.now(timezone.utc)
     source_manifest = source_manifest or _resolve_latest_overlay_source_manifest(
         config.storage.archive_dir,
         tickers=tickers,
         market=config.run.market,
-        now=now,
+        now=cutoff,
     )
     if source_manifest is None:
         raise RuntimeError(
@@ -4274,10 +4275,10 @@ def _bootstrap_overlay_inputs_from_latest_run(
     source_started_at = str(source_manifest.get("started_at") or "")
     if not source_run_id or len(source_started_at) < 4:
         raise RuntimeError("latest-run.json is missing run_id/started_at required for overlay bootstrap.")
-    if now is not None and not _manifest_available_for_bootstrap(source_manifest, now=now):
-        raise ValueError(f"Overlay source unavailable at analysis cutoff: source_run_id={source_run_id} cutoff={now.isoformat()}")
+    if not _manifest_available_for_bootstrap(source_manifest, now=cutoff):
+        raise ValueError(f"Overlay source unavailable at analysis cutoff: source_run_id={source_run_id} cutoff={cutoff.isoformat()}")
     source_run_dir = config.storage.archive_dir / "runs" / source_started_at[:4] / source_run_id
-    research_store = ResearchArtifactStore(config.storage.archive_dir, now=now)
+    research_store = ResearchArtifactStore(config.storage.archive_dir, now=cutoff)
     reference_research = (config.execution.execution_lightweight_refresh
                           and config.run.run_mode == "overlay_only" and not preserve_thesis_bytes)
     summaries: list[dict[str, Any]] = []
