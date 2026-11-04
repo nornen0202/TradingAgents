@@ -1,0 +1,2348 @@
+{
+  "schema": "tradingagents.work-context/v1",
+  "surface": "us",
+  "event_id": "us:958227de2e140c0b1363b497f7e6baa0",
+  "prompt_contract_version": "market-work-v13-us",
+  "prompt_sha256": "a577e06278002eebd491db51786019336a00da570d5c47886bad031cf01cf7fe",
+  "skill_sha256": "2fef99f1af403675549a13813e0fe5597a241a964affeada56e9f64e9f398fe9",
+  "task_manifest_sha256": "0ea8b7511042a3aa7d6fa8447d97032d4be515f69526190a4c9556d01067c6df",
+  "workflow_contract_sha256": "f94e3c24b3aabfa9c77de5abfe65add303754c210dc6470b626a2bd212718912",
+  "source_sha256": "fc1ea590519d1bf084892d7c5149c415627acec59780f47f54b9212d22a5f63f",
+  "body": {
+    "kind": "market",
+    "market": "US",
+    "session_id": "US:2026-11-04",
+    "source_health": "STALE",
+    "source": {
+      "run_id": "20261105T032402_local-freshness-us-overlay",
+      "last_run_at": "2026-11-05T03:26:46.285920+09:00",
+      "status": "success"
+    },
+    "report_mode": "MIXED",
+    "current": {
+      "run_id": "20261105T032402_local-freshness-us-overlay",
+      "started_at": "2026-11-05T03:24:02.219438+09:00",
+      "run_mode": "overlay_only",
+      "freshness_receipt": {
+        "schema": "tradingagents.source-freshness/v1",
+        "producer_run_id": "20261105T032402_local-freshness-us-overlay",
+        "producer_started_at": "2026-11-05T03:24:02.219438+09:00",
+        "producer_finished_at": "2026-11-05T03:26:46.285920+09:00",
+        "analysis_run_id": "20261104T175053_local-scheduler-us-full",
+        "analysis_lineage_status": "RESOLVED",
+        "analysis_completed_at": "2026-11-04T21:07:57.017629+09:00",
+        "analysis_trade_date_oldest": "2026-11-03",
+        "analysis_trade_date_latest": "2026-11-03",
+        "market_data_oldest_at": "2026-11-04T13:10:00-05:00",
+        "market_data_latest_at": "2026-11-04T18:25:35+00:00",
+        "market_data_status": "STALE",
+        "publication_does_not_refresh_inputs": true,
+        "execution_max_age_seconds": 120.0,
+        "research_market_data_status": "PARTIAL",
+        "research_market_data_receipts": [
+          {
+            "ticker": "TSM",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "NVDA",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "MPWR",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "GEV",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "ETN",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "AMZN",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "BRK-A",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "PM",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "PG",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "BRK-B",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "MDT",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "UNH",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "ABBV",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "KO",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "MA",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "SPG",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "V",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "LIN",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "SO",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "RTX",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "CVX",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "LLY",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "AVGO",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "DELL",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "AAPL",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "GOOGL",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "COST",
+            "research_valid": true,
+            "category": "FRESH_REGULAR_SESSION",
+            "execution_eligible": false
+          }
+        ],
+        "research_calendar_verified": true,
+        "latest_regular_close_at": "2026-11-03T21:00:00+00:00",
+        "research_does_not_enable_execution": true
+      },
+      "latest_attempt": {
+        "schema": "tradingagents.analysis-attempt/v1",
+        "run_id": "20261104T175053_local-scheduler-us-full",
+        "market": "US",
+        "run_mode": "full",
+        "started_at": "2026-11-04T17:50:53.870652+09:00",
+        "status": "SUCCESS",
+        "heartbeat_at": "2026-11-04T12:43:37.664157+00:00",
+        "finished_at": "2026-11-04T12:43:37.664139+00:00",
+        "completed_tickers": 30,
+        "error_type": null
+      },
+      "latest_completed_analysis": {
+        "run_id": "20261104T175053_local-scheduler-us-full",
+        "status": "success",
+        "finished_at": "2026-11-04T21:43:37.324771+09:00"
+      },
+      "analysis_receipt": {
+        "analysis_run_id": "20261104T175053_local-scheduler-us-full",
+        "decisions": {}
+      },
+      "bundle": {
+        "artifact_type": "decision_bundle",
+        "version": 2,
+        "run_id": "20261105T032402_local-freshness-us-overlay",
+        "market": "US",
+        "generated_at": "2026-11-05T03:26:45.713763+09:00",
+        "analysis_source_run_id": "20261105T032134_local-freshness-us-overlay",
+        "execution_source_run_id": "20261105T032402_local-freshness-us-overlay",
+        "checkpoint": "13:23",
+        "checkpoint_timezone": "America/New_York",
+        "quality": {
+          "report_mode": "MIXED",
+          "decision_ready": false,
+          "conditional_strategy_ready": false,
+          "quality_label_ko": "장중 투자 판단 가능",
+          "fresh_row_ratio": 0.9667,
+          "conditional_row_ratio": 1.0,
+          "portfolio_membership_omitted": true
+        },
+        "strategy_table": [
+          {
+            "ticker": "TSM",
+            "display_name": "Taiwan Semiconductor Manufacturing",
+            "last_price": 397.205,
+            "market_data_asof": "2026-11-04T18:25:35+00:00",
+            "session_vwap": 399.56092015234935,
+            "vwap_distance_pct": -0.5896272717189399,
+            "vwap_position_ko": "VWAP 아래 -0.59%",
+            "relative_volume": 0.6764813782505142,
+            "trading_value": 1989761839.0,
+            "price_change_pct": -1.88,
+            "spread_bps": 3.7763875077095523,
+            "day_high": 410.5899,
+            "day_low": 391.6103,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
+            "data_status_ko": "현재 세션 데이터 사용 가능",
+            "reason_codes_ko": [
+              "돌파 후 안착 실패",
+              "support zone failed"
+            ],
+            "quality": {
+              "row_mode": "IMMEDIATE",
+              "execution_ready": true,
+              "data_ready": true,
+              "action_ready": false,
+              "action_status": "NO_EXECUTION_ACTION",
+              "conditional_strategy_ready": true,
+              "current_execution_promotion": "POSSIBLE",
+              "generated_in_current_run": true,
+              "freshness_class": "LIVE_CHECKPOINT",
+              "execution_eligibility": "LIVE_EXECUTION_READY",
+              "row_valid_until": "2026-11-04T18:27:35+00:00",
+              "expired_at_build": false
+            },
+            "display_priority": 1
+          },
+          {
+            "ticker": "NVDA",
+            "display_name": "NVIDIA",
+            "last_price": 204.04,
+            "market_data_asof": "2026-11-04T18:25:35+00:00",
+            "session_vwap": 203.88313840119326,
+            "vwap_distance_pct": 0.07693701403499453,
+            "vwap_position_ko": "VWAP 위 +0.08%",
+            "relative_volume": 0.8858753927112738,
+            "trading_value": 10961679480.0,
+            "price_change_pct": -1.28,
+            "spread_bps": 0.490111990589404,
+            "day_high": 206.79,
+            "day_low": 200.94,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
+            "data_status_ko": "현재 세션 데이터 사용 가능",
+            "reason_codes_ko": [
+              "support zone failed"
+            ],
+            "quality": {
+              "row_mode": "IMMEDIATE",
+              "execution_ready": true,
+              "data_ready": true,
+              "action_ready": false,
+              "action_status": "NO_EXECUTION_ACTION",
+              "conditional_strategy_ready": true,
+              "current_execution_promotion": "POSSIBLE",
+              "generated_in_current_run": true,
+              "freshness_class": "LIVE_CHECKPOINT",
+              "execution_eligibility": "LIVE_EXECUTION_READY",
+              "row_valid_until": "2026-11-04T18:27:35+00:00",
+              "expired_at_build": false
+            },
+            "display_priority": 2
+          },
+          {
+            "ticker": "MPWR",
+            "display_name": "Monolithic Power Systems",
+            "last_price": 1270.855,
+            "market_data_asof": "2026-11-04T18:25:35+00:00",
+            "session_vwap": 1297.0265426270907,
+            "vwap_distance_pct": -2.01781087487084,
+            "vwap_position_ko": "VWAP 아래 -2.02%",
+            "relative_volume": 0.7036648731401193,
+            "trading_value": 506933745.0,
+            "price_change_pct": -4.32,
+            "spread_bps": 14.320447553327432,
+            "day_high": 1335.1,
+            "day_low": 1213.5,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
+            "data_status_ko": "현재 세션 데이터 사용 가능",
+            "reason_codes_ko": [
+              "conditional entry confirmation unavailable"
+            ],
+            "quality": {
+              "row_mode": "IMMEDIATE",
+              "execution_ready": true,
+              "data_ready": true,
+              "action_ready": false,
+              "action_status": "WAITING_TRIGGER",
+              "conditional_strategy_ready": true,
+              "current_execution_promotion": "POSSIBLE",
+              "generated_in_current_run": true,
+              "freshness_class": "LIVE_CHECKPOINT",
+              "execution_eligibility": "LIVE_EXECUTION_READY",
+              "row_valid_until": "2026-11-04T18:27:35+00:00",
+              "expired_at_build": false
+            },
+            "display_priority": 3
+          },
+          {
+            "ticker": "GEV",
+            "display_name": "GE Vernova",
+            "last_price": 818.89,
+            "market_data_asof": "2026-11-04T18:25:35+00:00",
+            "session_vwap": 831.0243060279494,
+            "vwap_distance_pct": -1.46016258970183,
+            "vwap_position_ko": "VWAP 아래 -1.46%",
+            "relative_volume": 1.3092587099924582,
+            "trading_value": 2076806195.0,
+            "price_change_pct": -10.82,
+            "spread_bps": 8.790242830458524,
+            "day_high": 879.0365,
+            "day_low": 806.4001,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
+            "data_status_ko": "현재 세션 데이터 사용 가능",
+            "reason_codes_ko": [
+              "conditional entry confirmation unavailable"
+            ],
+            "quality": {
+              "row_mode": "IMMEDIATE",
+              "execution_ready": true,
+              "data_ready": true,
+              "action_ready": false,
+              "action_status": "WAITING_TRIGGER",
+              "conditional_strategy_ready": true,
+              "current_execution_promotion": "POSSIBLE",
+              "generated_in_current_run": true,
+              "freshness_class": "LIVE_CHECKPOINT",
+              "execution_eligibility": "LIVE_EXECUTION_READY",
+              "row_valid_until": "2026-11-04T18:27:35+00:00",
+              "expired_at_build": false
+            },
+            "display_priority": 4
+          },
+          {
+            "ticker": "ETN",
+            "display_name": "Eaton",
+            "last_price": 352.93,
+            "market_data_asof": "2026-11-04T18:25:35+00:00",
+            "session_vwap": 358.3034513685188,
+            "vwap_distance_pct": -1.499692885456505,
+            "vwap_position_ko": "VWAP 아래 -1.50%",
+            "relative_volume": 1.1554716332268689,
+            "trading_value": 679157026.0,
+            "price_change_pct": -9.9,
+            "spread_bps": 5.667970299835306,
+            "day_high": 378.23,
+            "day_low": 351.29,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
+            "data_status_ko": "현재 세션 데이터 사용 가능",
+            "reason_codes_ko": [
+              "conditional entry confirmation unavailable"
+            ],
+            "quality": {
+              "row_mode": "IMMEDIATE",
+              "execution_ready": true,
+              "data_ready": true,
+              "action_ready": false,
+              "action_status": "WAITING_TRIGGER",
+              "conditional_strategy_ready": true,
+              "current_execution_promotion": "POSSIBLE",
+              "generated_in_current_run": true,
+              "freshness_class": "LIVE_CHECKPOINT",
+              "execution_eligibility": "LIVE_EXECUTION_READY",
+              "row_valid_until": "2026-11-04T18:27:35+00:00",
+              "expired_at_build": false
+            },
+            "display_priority": 5
+          },
+          {
+            "ticker": "AMZN",
+            "display_name": "Amazon",
+            "last_price": 269.45,
+            "market_data_asof": "2026-11-04T18:25:35+00:00",
+            "session_vwap": 267.6149419130058,
+            "vwap_distance_pct": 0.6857083815561937,
+            "vwap_position_ko": "VWAP 위 +0.69%",
+            "relative_volume": 1.4727998834949105,
+            "trading_value": 10221309712.0,
+            "price_change_pct": 7.48,
+            "spread_bps": 0.7422251911244211,
+            "day_high": 271.49,
+            "day_low": 263.85,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
+            "data_status_ko": "현재 세션 데이터 사용 가능",
+            "reason_codes_ko": [
+              "conditional entry confirmation unavailable"
+            ],
+            "quality": {
+              "row_mode": "IMMEDIATE",
+              "execution_ready": true,
+              "data_ready": true,
+              "action_ready": false,
+              "action_status": "WAITING_TRIGGER",
+              "conditional_strategy_ready": true,
+              "current_execution_promotion": "POSSIBLE",
+              "generated_in_current_run": true,
+              "freshness_class": "LIVE_CHECKPOINT",
+              "execution_eligibility": "LIVE_EXECUTION_READY",
+              "row_valid_until": "2026-11-04T18:27:35+00:00",
+              "expired_at_build": false
+            },
+            "display_priority": 6
+          },
+          {
+            "ticker": "BRK-A",
+            "display_name": "BRK-A",
+            "last_price": 859924.875,
+            "market_data_asof": "2026-11-04T13:10:00-05:00",
+            "session_vwap": 853742.6178294572,
+            "vwap_distance_pct": 0.7241359446551465,
+            "vwap_position_ko": "VWAP 위 +0.72%",
+            "relative_volume": 1.7661555312157722,
+            "trading_value": 183554662.83333334,
+            "price_change_pct": 1.7252212014472912,
+            "day_high": 861264.8125,
+            "day_low": 844952.75,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
+            "data_status_ko": "시세 유효기간 만료",
+            "reason_codes_ko": [
+              "delayed or invalid market data"
+            ],
+            "quality": {
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "data_ready": false,
+              "action_ready": false,
+              "action_status": "DATA_RECHECK_REQUIRED",
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
+              "generated_in_current_run": true,
+              "freshness_class": "DELAYED_CHECKPOINT",
+              "execution_eligibility": "DELAYED_ANALYSIS_ONLY",
+              "row_valid_until": "2026-11-04T13:12:00-05:00",
+              "expired_at_build": true
+            },
+            "display_priority": 7
+          },
+          {
+            "ticker": "PM",
+            "display_name": "PM",
+            "last_price": 210.58,
+            "market_data_asof": "2026-11-04T18:25:35+00:00",
+            "session_vwap": 210.7290443687437,
+            "vwap_distance_pct": -0.07072796689709948,
+            "vwap_position_ko": "VWAP 아래 -0.07%",
+            "relative_volume": 0.3430500426198758,
+            "trading_value": 201169532.0,
+            "price_change_pct": 1.23,
+            "spread_bps": 4.27218569767182,
+            "day_high": 214.26,
+            "day_low": 209.095,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
+            "data_status_ko": "현재 세션 데이터 사용 가능",
+            "reason_codes_ko": [
+              "conditional entry confirmation unavailable"
+            ],
+            "quality": {
+              "row_mode": "IMMEDIATE",
+              "execution_ready": true,
+              "data_ready": true,
+              "action_ready": false,
+              "action_status": "WAITING_TRIGGER",
+              "conditional_strategy_ready": true,
+              "current_execution_promotion": "POSSIBLE",
+              "generated_in_current_run": true,
+              "freshness_class": "LIVE_CHECKPOINT",
+              "execution_eligibility": "LIVE_EXECUTION_READY",
+              "row_valid_until": "2026-11-04T18:27:35+00:00",
+              "expired_at_build": false
+            },
+            "display_priority": 8
+          },
+          {
+            "ticker": "PG",
+            "display_name": "PG",
+            "last_price": 167.07,
+            "market_data_asof": "2026-11-04T18:25:35+00:00",
+            "session_vwap": 166.93135834126744,
+            "vwap_distance_pct": 0.08305309446361431,
+            "vwap_position_ko": "VWAP 위 +0.08%",
+            "relative_volume": 0.5956798409325311,
+            "trading_value": 614535260.0,
+            "price_change_pct": 3.09,
+            "spread_bps": 2.3942060214276677,
+            "day_high": 168.16,
+            "day_low": 164.82,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
+            "data_status_ko": "현재 세션 데이터 사용 가능",
+            "reason_codes_ko": [
+              "conditional entry confirmation unavailable"
+            ],
+            "quality": {
+              "row_mode": "IMMEDIATE",
+              "execution_ready": true,
+              "data_ready": true,
+              "action_ready": false,
+              "action_status": "WAITING_TRIGGER",
+              "conditional_strategy_ready": true,
+              "current_execution_promotion": "POSSIBLE",
+              "generated_in_current_run": true,
+              "freshness_class": "LIVE_CHECKPOINT",
+              "execution_eligibility": "LIVE_EXECUTION_READY",
+              "row_valid_until": "2026-11-04T18:27:35+00:00",
+              "expired_at_build": false
+            },
+            "display_priority": 9
+          },
+          {
+            "ticker": "BRK-B",
+            "display_name": "BRK-B",
+            "last_price": 573.79,
+            "market_data_asof": "2026-11-04T18:25:35+00:00",
+            "session_vwap": 569.7669920459122,
+            "vwap_distance_pct": 0.7060795044728785,
+            "vwap_position_ko": "VWAP 위 +0.71%",
+            "relative_volume": 0.7244704063477343,
+            "trading_value": 1131785153.0,
+            "price_change_pct": 3.0,
+            "spread_bps": 1.7427675148139201,
+            "day_high": 574.575,
+            "day_low": 562.5,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
+            "data_status_ko": "현재 세션 데이터 사용 가능",
+            "reason_codes_ko": [
+              "conditional entry confirmation unavailable"
+            ],
+            "quality": {
+              "row_mode": "IMMEDIATE",
+              "execution_ready": true,
+              "data_ready": true,
+              "action_ready": false,
+              "action_status": "WAITING_TRIGGER",
+              "conditional_strategy_ready": true,
+              "current_execution_promotion": "POSSIBLE",
+              "generated_in_current_run": true,
+              "freshness_class": "LIVE_CHECKPOINT",
+              "execution_eligibility": "LIVE_EXECUTION_READY",
+              "row_valid_until": "2026-11-04T18:27:35+00:00",
+              "expired_at_build": false
+            },
+            "display_priority": 10
+          },
+          {
+            "ticker": "MDT",
+            "display_name": "MDT",
+            "last_price": 104.99,
+            "market_data_asof": "2026-11-04T18:25:35+00:00",
+            "session_vwap": 104.32549735492837,
+            "vwap_distance_pct": 0.6369513320515496,
+            "vwap_position_ko": "VWAP 위 +0.64%",
+            "relative_volume": 0.26027490837366424,
+            "trading_value": 422615287.0,
+            "price_change_pct": 6.18,
+            "spread_bps": 1.9051247856730829,
+            "day_high": 105.57,
+            "day_low": 99.8,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
+            "data_status_ko": "현재 세션 데이터 사용 가능",
+            "reason_codes_ko": [
+              "conditional entry confirmation unavailable"
+            ],
+            "quality": {
+              "row_mode": "IMMEDIATE",
+              "execution_ready": true,
+              "data_ready": true,
+              "action_ready": false,
+              "action_status": "WAITING_TRIGGER",
+              "conditional_strategy_ready": true,
+              "current_execution_promotion": "POSSIBLE",
+              "generated_in_current_run": true,
+              "freshness_class": "LIVE_CHECKPOINT",
+              "execution_eligibility": "LIVE_EXECUTION_READY",
+              "row_valid_until": "2026-11-04T18:27:35+00:00",
+              "expired_at_build": false
+            },
+            "display_priority": 11
+          },
+          {
+            "ticker": "UNH",
+            "display_name": "UNH",
+            "last_price": 408.78,
+            "market_data_asof": "2026-11-04T18:25:35+00:00",
+            "session_vwap": 401.698985345074,
+            "vwap_distance_pct": 1.7627663781234482,
+            "vwap_position_ko": "VWAP 위 +1.76%",
+            "relative_volume": 1.01446259872347,
+            "trading_value": 1486910486.0,
+            "price_change_pct": 1.07,
+            "spread_bps": 3.180311425880285,
+            "day_high": 409.705,
+            "day_low": 392.5,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
+            "data_status_ko": "현재 세션 데이터 사용 가능",
+            "reason_codes_ko": [
+              "conditional entry confirmation unavailable"
+            ],
+            "quality": {
+              "row_mode": "IMMEDIATE",
+              "execution_ready": true,
+              "data_ready": true,
+              "action_ready": false,
+              "action_status": "WAITING_TRIGGER",
+              "conditional_strategy_ready": true,
+              "current_execution_promotion": "POSSIBLE",
+              "generated_in_current_run": true,
+              "freshness_class": "LIVE_CHECKPOINT",
+              "execution_eligibility": "LIVE_EXECUTION_READY",
+              "row_valid_until": "2026-11-04T18:27:35+00:00",
+              "expired_at_build": false
+            },
+            "display_priority": 12
+          },
+          {
+            "ticker": "ABBV",
+            "display_name": "ABBV",
+            "last_price": 290.91,
+            "market_data_asof": "2026-11-04T18:25:35+00:00",
+            "session_vwap": 287.48106403107187,
+            "vwap_distance_pct": 1.1927519401965014,
+            "vwap_position_ko": "VWAP 위 +1.19%",
+            "relative_volume": 0.6439771142706636,
+            "trading_value": 604719293.0,
+            "price_change_pct": 1.72,
+            "spread_bps": 7.905274192717462,
+            "day_high": 292.33,
+            "day_low": 283.32,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
+            "data_status_ko": "현재 세션 데이터 사용 가능",
+            "reason_codes_ko": [
+              "conditional entry confirmation unavailable"
+            ],
+            "quality": {
+              "row_mode": "IMMEDIATE",
+              "execution_ready": true,
+              "data_ready": true,
+              "action_ready": false,
+              "action_status": "WAITING_TRIGGER",
+              "conditional_strategy_ready": true,
+              "current_execution_promotion": "POSSIBLE",
+              "generated_in_current_run": true,
+              "freshness_class": "LIVE_CHECKPOINT",
+              "execution_eligibility": "LIVE_EXECUTION_READY",
+              "row_valid_until": "2026-11-04T18:27:35+00:00",
+              "expired_at_build": false
+            },
+            "display_priority": 13
+          },
+          {
+            "ticker": "KO",
+            "display_name": "KO",
+            "last_price": 95.915,
+            "market_data_asof": "2026-11-04T18:25:35+00:00",
+            "session_vwap": 95.53061194545877,
+            "vwap_distance_pct": 0.40237160289593454,
+            "vwap_position_ko": "VWAP 위 +0.40%",
+            "relative_volume": 0.739161515989002,
+            "trading_value": 716193762.0,
+            "price_change_pct": 1.18,
+            "spread_bps": 1.0425897930464596,
+            "day_high": 96.39,
+            "day_low": 94.35,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
+            "data_status_ko": "현재 세션 데이터 사용 가능",
+            "reason_codes_ko": [
+              "conditional entry confirmation unavailable"
+            ],
+            "quality": {
+              "row_mode": "IMMEDIATE",
+              "execution_ready": true,
+              "data_ready": true,
+              "action_ready": false,
+              "action_status": "WAITING_TRIGGER",
+              "conditional_strategy_ready": true,
+              "current_execution_promotion": "POSSIBLE",
+              "generated_in_current_run": true,
+              "freshness_class": "LIVE_CHECKPOINT",
+              "execution_eligibility": "LIVE_EXECUTION_READY",
+              "row_valid_until": "2026-11-04T18:27:35+00:00",
+              "expired_at_build": false
+            },
+            "display_priority": 14
+          },
+          {
+            "ticker": "MA",
+            "display_name": "MA",
+            "last_price": 667.5,
+            "market_data_asof": "2026-11-04T18:25:35+00:00",
+            "session_vwap": 665.5363219846197,
+            "vwap_distance_pct": 0.2950519679413732,
+            "vwap_position_ko": "VWAP 위 +0.30%",
+            "relative_volume": 0.6610870844016137,
+            "trading_value": 887247768.0,
+            "price_change_pct": 3.14,
+            "spread_bps": 6.74485704650102,
+            "day_high": 673.5,
+            "day_low": 655.0,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
+            "data_status_ko": "현재 세션 데이터 사용 가능",
+            "reason_codes_ko": [
+              "conditional entry confirmation unavailable"
+            ],
+            "quality": {
+              "row_mode": "IMMEDIATE",
+              "execution_ready": true,
+              "data_ready": true,
+              "action_ready": false,
+              "action_status": "WAITING_TRIGGER",
+              "conditional_strategy_ready": true,
+              "current_execution_promotion": "POSSIBLE",
+              "generated_in_current_run": true,
+              "freshness_class": "LIVE_CHECKPOINT",
+              "execution_eligibility": "LIVE_EXECUTION_READY",
+              "row_valid_until": "2026-11-04T18:27:35+00:00",
+              "expired_at_build": false
+            },
+            "display_priority": 15
+          },
+          {
+            "ticker": "SPG",
+            "display_name": "Simon Property Group",
+            "last_price": 227.77,
+            "market_data_asof": "2026-11-04T18:25:35+00:00",
+            "session_vwap": 226.7068195228863,
+            "vwap_distance_pct": 0.46896713532977863,
+            "vwap_position_ko": "VWAP 위 +0.47%",
+            "relative_volume": 0.4491502281464837,
+            "trading_value": 80682690.0,
+            "price_change_pct": 2.56,
+            "spread_bps": 9.220434238546156,
+            "day_high": 228.035,
+            "day_low": 224.61,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
+            "data_status_ko": "현재 세션 데이터 사용 가능",
+            "reason_codes_ko": [
+              "conditional entry confirmation unavailable"
+            ],
+            "quality": {
+              "row_mode": "IMMEDIATE",
+              "execution_ready": true,
+              "data_ready": true,
+              "action_ready": false,
+              "action_status": "WAITING_TRIGGER",
+              "conditional_strategy_ready": true,
+              "current_execution_promotion": "POSSIBLE",
+              "generated_in_current_run": true,
+              "freshness_class": "LIVE_CHECKPOINT",
+              "execution_eligibility": "LIVE_EXECUTION_READY",
+              "row_valid_until": "2026-11-04T18:27:35+00:00",
+              "expired_at_build": false
+            },
+            "display_priority": 16
+          },
+          {
+            "ticker": "V",
+            "display_name": "V",
+            "last_price": 432.105,
+            "market_data_asof": "2026-11-04T18:25:35+00:00",
+            "session_vwap": 430.3939095512109,
+            "vwap_distance_pct": 0.39756381556916853,
+            "vwap_position_ko": "VWAP 위 +0.40%",
+            "relative_volume": 0.6108606825071571,
+            "trading_value": 1041448245.0,
+            "price_change_pct": 2.78,
+            "spread_bps": 2.776942123898006,
+            "day_high": 434.9922,
+            "day_low": 423.28,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
+            "data_status_ko": "현재 세션 데이터 사용 가능",
+            "reason_codes_ko": [
+              "conditional entry confirmation unavailable"
+            ],
+            "quality": {
+              "row_mode": "IMMEDIATE",
+              "execution_ready": true,
+              "data_ready": true,
+              "action_ready": false,
+              "action_status": "WAITING_TRIGGER",
+              "conditional_strategy_ready": true,
+              "current_execution_promotion": "POSSIBLE",
+              "generated_in_current_run": true,
+              "freshness_class": "LIVE_CHECKPOINT",
+              "execution_eligibility": "LIVE_EXECUTION_READY",
+              "row_valid_until": "2026-11-04T18:27:35+00:00",
+              "expired_at_build": false
+            },
+            "display_priority": 17
+          },
+          {
+            "ticker": "LIN",
+            "display_name": "LIN",
+            "last_price": 525.82,
+            "market_data_asof": "2026-11-04T18:25:35+00:00",
+            "session_vwap": 520.9958296128998,
+            "vwap_distance_pct": 0.9259518239684628,
+            "vwap_position_ko": "VWAP 위 +0.93%",
+            "relative_volume": 0.5425291003819886,
+            "trading_value": 347173386.0,
+            "price_change_pct": 2.79,
+            "spread_bps": 2.662153682328744,
+            "day_high": 526.13,
+            "day_low": 513.26,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
+            "data_status_ko": "현재 세션 데이터 사용 가능",
+            "reason_codes_ko": [
+              "conditional entry confirmation unavailable"
+            ],
+            "quality": {
+              "row_mode": "IMMEDIATE",
+              "execution_ready": true,
+              "data_ready": true,
+              "action_ready": false,
+              "action_status": "WAITING_TRIGGER",
+              "conditional_strategy_ready": true,
+              "current_execution_promotion": "POSSIBLE",
+              "generated_in_current_run": true,
+              "freshness_class": "LIVE_CHECKPOINT",
+              "execution_eligibility": "LIVE_EXECUTION_READY",
+              "row_valid_until": "2026-11-04T18:27:35+00:00",
+              "expired_at_build": false
+            },
+            "display_priority": 18
+          },
+          {
+            "ticker": "SO",
+            "display_name": "SO",
+            "last_price": 93.23,
+            "market_data_asof": "2026-11-04T18:25:35+00:00",
+            "session_vwap": 91.85430675668732,
+            "vwap_distance_pct": 1.4976905187001677,
+            "vwap_position_ko": "VWAP 위 +1.50%",
+            "relative_volume": 1.8075508269383873,
+            "trading_value": 566740246.0,
+            "price_change_pct": -0.55,
+            "spread_bps": 2.1454623471369056,
+            "day_high": 93.34,
+            "day_low": 90.405,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
+            "data_status_ko": "현재 세션 데이터 사용 가능",
+            "reason_codes_ko": [
+              "conditional entry confirmation unavailable"
+            ],
+            "quality": {
+              "row_mode": "IMMEDIATE",
+              "execution_ready": true,
+              "data_ready": true,
+              "action_ready": false,
+              "action_status": "WAITING_TRIGGER",
+              "conditional_strategy_ready": true,
+              "current_execution_promotion": "POSSIBLE",
+              "generated_in_current_run": true,
+              "freshness_class": "LIVE_CHECKPOINT",
+              "execution_eligibility": "LIVE_EXECUTION_READY",
+              "row_valid_until": "2026-11-04T18:27:35+00:00",
+              "expired_at_build": false
+            },
+            "display_priority": 19
+          },
+          {
+            "ticker": "RTX",
+            "display_name": "RTX",
+            "last_price": 197.59,
+            "market_data_asof": "2026-11-04T18:25:35+00:00",
+            "session_vwap": 196.9172965784666,
+            "vwap_distance_pct": 0.34161723384484866,
+            "vwap_position_ko": "VWAP 위 +0.34%",
+            "relative_volume": 0.7008711204602974,
+            "trading_value": 475324878.0,
+            "price_change_pct": -3.06,
+            "spread_bps": 3.5434964185386417,
+            "day_high": 201.26,
+            "day_low": 194.9101,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
+            "data_status_ko": "현재 세션 데이터 사용 가능",
+            "reason_codes_ko": [
+              "conditional entry confirmation unavailable"
+            ],
+            "quality": {
+              "row_mode": "IMMEDIATE",
+              "execution_ready": true,
+              "data_ready": true,
+              "action_ready": false,
+              "action_status": "WAITING_TRIGGER",
+              "conditional_strategy_ready": true,
+              "current_execution_promotion": "POSSIBLE",
+              "generated_in_current_run": true,
+              "freshness_class": "LIVE_CHECKPOINT",
+              "execution_eligibility": "LIVE_EXECUTION_READY",
+              "row_valid_until": "2026-11-04T18:27:35+00:00",
+              "expired_at_build": false
+            },
+            "display_priority": 20
+          },
+          {
+            "ticker": "CVX",
+            "display_name": "CVX",
+            "last_price": 215.9,
+            "market_data_asof": "2026-11-04T18:25:35+00:00",
+            "session_vwap": 217.7230707140539,
+            "vwap_distance_pct": -0.8373346508823709,
+            "vwap_position_ko": "VWAP 아래 -0.84%",
+            "relative_volume": 0.6985312147931492,
+            "trading_value": 710482851.0,
+            "price_change_pct": -4.16,
+            "spread_bps": 1.3896287375223448,
+            "day_high": 223.01,
+            "day_low": 214.61,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
+            "data_status_ko": "현재 세션 데이터 사용 가능",
+            "reason_codes_ko": [
+              "conditional entry confirmation unavailable"
+            ],
+            "quality": {
+              "row_mode": "IMMEDIATE",
+              "execution_ready": true,
+              "data_ready": true,
+              "action_ready": false,
+              "action_status": "WAITING_TRIGGER",
+              "conditional_strategy_ready": true,
+              "current_execution_promotion": "POSSIBLE",
+              "generated_in_current_run": true,
+              "freshness_class": "LIVE_CHECKPOINT",
+              "execution_eligibility": "LIVE_EXECUTION_READY",
+              "row_valid_until": "2026-11-04T18:27:35+00:00",
+              "expired_at_build": false
+            },
+            "display_priority": 21
+          },
+          {
+            "ticker": "LLY",
+            "display_name": "Eli Lilly",
+            "last_price": 1420.96,
+            "market_data_asof": "2026-11-04T18:25:35+00:00",
+            "session_vwap": 1423.688486894047,
+            "vwap_distance_pct": -0.1916491507211293,
+            "vwap_position_ko": "VWAP 아래 -0.19%",
+            "relative_volume": 0.6918738744208994,
+            "trading_value": 1586854577.0,
+            "price_change_pct": 0.82,
+            "spread_bps": 9.568368100748584,
+            "day_high": 1445.96,
+            "day_low": 1401.59,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
+            "data_status_ko": "현재 세션 데이터 사용 가능",
+            "reason_codes_ko": [
+              "conditional entry confirmation unavailable"
+            ],
+            "quality": {
+              "row_mode": "IMMEDIATE",
+              "execution_ready": true,
+              "data_ready": true,
+              "action_ready": false,
+              "action_status": "WAITING_TRIGGER",
+              "conditional_strategy_ready": true,
+              "current_execution_promotion": "POSSIBLE",
+              "generated_in_current_run": true,
+              "freshness_class": "LIVE_CHECKPOINT",
+              "execution_eligibility": "LIVE_EXECUTION_READY",
+              "row_valid_until": "2026-11-04T18:27:35+00:00",
+              "expired_at_build": false
+            },
+            "display_priority": 22
+          },
+          {
+            "ticker": "AVGO",
+            "display_name": "Broadcom",
+            "last_price": 328.42,
+            "market_data_asof": "2026-11-04T18:25:35+00:00",
+            "session_vwap": 328.4173828910701,
+            "vwap_distance_pct": 0.0007968850207928924,
+            "vwap_position_ko": "VWAP 위 +0.00%",
+            "relative_volume": 0.6573595185152289,
+            "trading_value": 2809205772.0,
+            "price_change_pct": -1.12,
+            "spread_bps": 3.958767909618145,
+            "day_high": 334.12,
+            "day_low": 321.74,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
+            "data_status_ko": "현재 세션 데이터 사용 가능",
+            "reason_codes_ko": [
+              "waiting for trigger"
+            ],
+            "quality": {
+              "row_mode": "IMMEDIATE",
+              "execution_ready": true,
+              "data_ready": true,
+              "action_ready": false,
+              "action_status": "NO_EXECUTION_ACTION",
+              "conditional_strategy_ready": true,
+              "current_execution_promotion": "POSSIBLE",
+              "generated_in_current_run": true,
+              "freshness_class": "LIVE_CHECKPOINT",
+              "execution_eligibility": "LIVE_EXECUTION_READY",
+              "row_valid_until": "2026-11-04T18:27:35+00:00",
+              "expired_at_build": false
+            },
+            "display_priority": 23
+          },
+          {
+            "ticker": "DELL",
+            "display_name": "Dell Technologies",
+            "last_price": 375.065,
+            "market_data_asof": "2026-11-04T18:25:35+00:00",
+            "session_vwap": 379.5692327129577,
+            "vwap_distance_pct": -1.1866696045840897,
+            "vwap_position_ko": "VWAP 아래 -1.19%",
+            "relative_volume": 0.9212165288694198,
+            "trading_value": 1403005171.0,
+            "price_change_pct": -8.16,
+            "spread_bps": 11.194626579240873,
+            "day_high": 394.485,
+            "day_low": 366.96,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
+            "data_status_ko": "현재 세션 데이터 사용 가능",
+            "reason_codes_ko": [
+              "risk action close confirmation required"
+            ],
+            "quality": {
+              "row_mode": "IMMEDIATE",
+              "execution_ready": true,
+              "data_ready": true,
+              "action_ready": false,
+              "action_status": "NO_EXECUTION_ACTION",
+              "conditional_strategy_ready": true,
+              "current_execution_promotion": "POSSIBLE",
+              "generated_in_current_run": true,
+              "freshness_class": "LIVE_CHECKPOINT",
+              "execution_eligibility": "LIVE_EXECUTION_READY",
+              "row_valid_until": "2026-11-04T18:27:35+00:00",
+              "expired_at_build": false
+            },
+            "display_priority": 24
+          },
+          {
+            "ticker": "AAPL",
+            "display_name": "Apple",
+            "last_price": 352.92,
+            "market_data_asof": "2026-11-04T18:25:35+00:00",
+            "session_vwap": 350.96749448577225,
+            "vwap_distance_pct": 0.5563208972068745,
+            "vwap_position_ko": "VWAP 위 +0.56%",
+            "relative_volume": 1.2553159153721023,
+            "trading_value": 11623010871.0,
+            "price_change_pct": 6.33,
+            "spread_bps": 0.5667006687062737,
+            "day_high": 354.47,
+            "day_low": 340.99,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
+            "data_status_ko": "현재 세션 데이터 사용 가능",
+            "reason_codes_ko": [
+              "close confirmation required"
+            ],
+            "quality": {
+              "row_mode": "IMMEDIATE",
+              "execution_ready": true,
+              "data_ready": true,
+              "action_ready": false,
+              "action_status": "NO_EXECUTION_ACTION",
+              "conditional_strategy_ready": true,
+              "current_execution_promotion": "POSSIBLE",
+              "generated_in_current_run": true,
+              "freshness_class": "LIVE_CHECKPOINT",
+              "execution_eligibility": "LIVE_EXECUTION_READY",
+              "row_valid_until": "2026-11-04T18:27:35+00:00",
+              "expired_at_build": false
+            },
+            "display_priority": 25
+          },
+          {
+            "ticker": "GOOGL",
+            "display_name": "Alphabet",
+            "last_price": 292.03,
+            "market_data_asof": "2026-11-04T18:25:35+00:00",
+            "session_vwap": 290.7186808490478,
+            "vwap_distance_pct": 0.4510611932891484,
+            "vwap_position_ko": "VWAP 위 +0.45%",
+            "relative_volume": 1.0625259637133284,
+            "trading_value": 6541343006.0,
+            "price_change_pct": 4.29,
+            "spread_bps": 0.6848611444042959,
+            "day_high": 296.49,
+            "day_low": 283.51,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
+            "data_status_ko": "현재 세션 데이터 사용 가능",
+            "reason_codes_ko": [
+              "risk action close confirmation required"
+            ],
+            "quality": {
+              "row_mode": "IMMEDIATE",
+              "execution_ready": true,
+              "data_ready": true,
+              "action_ready": false,
+              "action_status": "NO_EXECUTION_ACTION",
+              "conditional_strategy_ready": true,
+              "current_execution_promotion": "POSSIBLE",
+              "generated_in_current_run": true,
+              "freshness_class": "LIVE_CHECKPOINT",
+              "execution_eligibility": "LIVE_EXECUTION_READY",
+              "row_valid_until": "2026-11-04T18:27:35+00:00",
+              "expired_at_build": false
+            },
+            "display_priority": 26
+          },
+          {
+            "ticker": "COST",
+            "display_name": "Costco Wholesale",
+            "last_price": 1046.36,
+            "market_data_asof": "2026-11-04T18:25:35+00:00",
+            "session_vwap": 1044.528739289182,
+            "vwap_distance_pct": 0.17531932267023098,
+            "vwap_position_ko": "VWAP 위 +0.18%",
+            "relative_volume": 0.5872397376992268,
+            "trading_value": 820760392.0,
+            "price_change_pct": 2.66,
+            "spread_bps": 3.536490367843918,
+            "day_high": 1053.6599,
+            "day_low": 1028.5,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
+            "data_status_ko": "현재 세션 데이터 사용 가능",
+            "reason_codes_ko": [
+              "close confirmation required"
+            ],
+            "quality": {
+              "row_mode": "IMMEDIATE",
+              "execution_ready": true,
+              "data_ready": true,
+              "action_ready": false,
+              "action_status": "NO_EXECUTION_ACTION",
+              "conditional_strategy_ready": true,
+              "current_execution_promotion": "POSSIBLE",
+              "generated_in_current_run": true,
+              "freshness_class": "LIVE_CHECKPOINT",
+              "execution_eligibility": "LIVE_EXECUTION_READY",
+              "row_valid_until": "2026-11-04T18:27:35+00:00",
+              "expired_at_build": false
+            },
+            "display_priority": 27
+          }
+        ],
+        "benchmark_context": {},
+        "transmission_scope": {
+          "public_recovery_only": true,
+          "portfolio_membership_omitted": true,
+          "transmitted_research_candidate_count": 27,
+          "raw_codes_omitted": true
+        }
+      },
+      "universe_coverage": {
+        "status": "COMPLETE",
+        "complete": true,
+        "source_run_id": "20261105T032402_local-freshness-us-overlay",
+        "ticker_universe_mode": "config_plus_account",
+        "expected_watchlist_count": 27,
+        "missing_watchlist_count": 0,
+        "portfolio_coverage_details_omitted": true
+      }
+    },
+    "last_ready": {
+      "run_id": "20261105T032402_local-freshness-us-overlay",
+      "started_at": "2026-11-05T03:24:02.219438+09:00",
+      "same_as_current": true,
+      "same_session": true,
+      "reference_only": false
+    },
+    "supporting_context": {
+      "policy": {
+        "profile": "balanced_external",
+        "material_thesis_effects": [
+          "ranking",
+          "confidence",
+          "position_size_within_existing_risk_limits",
+          "research_priority"
+        ],
+        "supported_evidence_weight": "MEDIUM",
+        "partially_supported_evidence_weight": "LOW_TO_MEDIUM",
+        "unverified_evidence_weight": "LOW_LABELED",
+        "user_primary_channels": [
+          "@kpunch",
+          "@sosumonkey"
+        ],
+        "user_primary_source_tier": "USER_PRIMARY",
+        "user_primary_evidence_weight": "HIGH",
+        "user_primary_validation_policy": "USER_ACCEPTED",
+        "matching_multi_source_signal_may_raise_thesis_priority": true,
+        "conflicting_signal_must_be_visible": true,
+        "may_bypass_market_or_portfolio_execution_gate": false
+      },
+      "youtube": {
+        "source_health": "STALE",
+        "coverage": {
+          "total_unique_events": 640,
+          "window_events": 0,
+          "transmitted_events": 0,
+          "truncated": false,
+          "oldest_occurred_at": null,
+          "newest_occurred_at": null,
+          "available_events_before_context_cap": 0,
+          "context_event_cap": 12,
+          "omitted_events": 0,
+          "omitted_due_to_context_cap": 0,
+          "omitted_before_context_selection": 0
+        },
+        "events": [],
+        "execution_eligible": false
+      },
+      "prism": {
+        "source_health": "OK",
+        "coverage": {
+          "total_unique_events": 391,
+          "window_events": 38,
+          "transmitted_events": 20,
+          "truncated": true,
+          "oldest_occurred_at": "2026-11-03T19:39:13+00:00",
+          "newest_occurred_at": "2026-11-04T06:09:37+00:00",
+          "available_events_before_context_cap": 38,
+          "context_event_cap": 20,
+          "omitted_events": 18,
+          "omitted_due_to_context_cap": 18,
+          "omitted_before_context_selection": 0
+        },
+        "events": [
+          {
+            "event_key": "stock_ai_agent:17249",
+            "content_sha256": "12d54576c1bdb09c82fb6b1cd4d5ae6d9da49cf5d64434044ce52bd641213b80",
+            "occurred_at": "2026-11-04T06:04:04+00:00",
+            "relevance": {
+              "tickers": [
+                "008830.KS",
+                "FCF",
+                "EYOU"
+              ],
+              "markets": [
+                "KR",
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "normalized_prism_signals",
+              "matched_tickers": [],
+              "market_match": true,
+              "score": 20
+            },
+            "summary": {
+              "message_id": "17249",
+              "posted_at": "2026-11-04T06:04:04+00:00",
+              "source_url": "https://t.me/stock_ai_agent/17249",
+              "preview": "",
+              "signals": [
+                {
+                  "canonical_ticker": "008830.KS",
+                  "display_name": "대동기어",
+                  "market": "KR",
+                  "source_asof": "2026-11-04T06:04:04+00:00",
+                  "signal_action": "WATCH",
+                  "trigger_type": "telegram_pdf_report",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "confidence": 0.45,
+                  "warnings": []
+                },
+                {
+                  "canonical_ticker": "FCF",
+                  "display_name": "보다 72.7% 줄었고 분기별 현금흐름",
+                  "market": "US",
+                  "source_asof": "2026-11-04T06:04:04+00:00",
+                  "signal_action": "WATCH",
+                  "trigger_type": "telegram_pdf_report",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "confidence": 0.45,
+                  "warnings": []
+                },
+                {
+                  "canonical_ticker": "EYOU",
+                  "display_name": "[3] 아시아투데이, 2026-10-29, 대동기어, 中 이유",
+                  "market": "US",
+                  "source_asof": "2026-11-04T06:04:04+00:00",
+                  "signal_action": "WATCH",
+                  "trigger_type": "telegram_pdf_report",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "confidence": 0.45,
+                  "warnings": []
+                }
+              ],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:17246",
+            "content_sha256": "27eb800913ce01e7c3e8d46759fb3121bb740d1f08d098dfeb0fd1d20edebf4c",
+            "occurred_at": "2026-11-04T06:03:44+00:00",
+            "relevance": {
+              "tickers": [
+                "008830.KS",
+                "KIS"
+              ],
+              "markets": [
+                "KR",
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "normalized_prism_signals",
+              "matched_tickers": [],
+              "market_match": true,
+              "score": 20
+            },
+            "summary": {
+              "message_id": "17246",
+              "posted_at": "2026-11-04T06:03:44+00:00",
+              "source_url": "https://t.me/stock_ai_agent/17246",
+              "preview": "📈 매크로 섹터 리더 트리거 | 대동기어(008830) 농기계·자동차·산업기계용 변속기와 동력전달 부품을 제조합니다. 📊 11/4 종가 6,100원(+16.63%); 거래량 12,460,642주로 전일보다 약 6,557% 급증. 시총 1,168억원(KIS). 📰 머니투데이는 3분기 말 수주잔고 약 1.9조원, 전동화 부품 비중 약 80%를 보도했습니다. 수익 전환 시점은 미확인입니다....",
+              "signals": [
+                {
+                  "canonical_ticker": "008830.KS",
+                  "display_name": "매크로 섹터 리더 트리거 | 대동기어",
+                  "market": "KR",
+                  "source_asof": "2026-11-04T06:03:44+00:00",
+                  "signal_action": "UNKNOWN",
+                  "trigger_type": "telegram_message",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "confidence": 0.45,
+                  "warnings": []
+                },
+                {
+                  "canonical_ticker": "KIS",
+                  "display_name": "11/4 종가 6,100원(+16.63%); 거래량 12,460,642주로 전일보다 약 6,557% 급증. 시총 1,168억원",
+                  "market": "US",
+                  "source_asof": "2026-11-04T06:03:44+00:00",
+                  "signal_action": "UNKNOWN",
+                  "trigger_type": "telegram_message",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "confidence": 0.45,
+                  "warnings": []
+                }
+              ],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:17245",
+            "content_sha256": "0b1ec5ed3381bf79430c7f92961f2ac17f2a9eb9285e92614449fadc8ca761ec",
+            "occurred_at": "2026-11-04T06:03:39+00:00",
+            "relevance": {
+              "tickers": [
+                "032640.KS",
+                "AIDC"
+              ],
+              "markets": [
+                "KR",
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "normalized_prism_signals",
+              "matched_tickers": [],
+              "market_match": true,
+              "score": 20
+            },
+            "summary": {
+              "message_id": "17245",
+              "posted_at": "2026-11-04T06:03:39+00:00",
+              "source_url": "https://t.me/stock_ai_agent/17245",
+              "preview": "📈 마감 강도 상위주 | LG유플러스(032640) 모바일·IPTV·기업 인프라를 운영하는 통신사로, AI 데이터센터(AIDC) 사업도 확대 중입니다. 📊 11/04 종가 15,580원(+7.60%). 거래량 3,097,544주로 전일보다 470.5% 증가. 시가총액 약 6.62조원(KIS 기준). 📰 3분기 영업이익 2,976억원(+84.1%), AIDC 수익 +27.7% 발표. 다만...",
+              "signals": [
+                {
+                  "canonical_ticker": "032640.KS",
+                  "display_name": "마감 강도 상위주 | LG유플러스",
+                  "market": "KR",
+                  "source_asof": "2026-11-04T06:03:39+00:00",
+                  "signal_action": "UNKNOWN",
+                  "trigger_type": "telegram_message",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "confidence": 0.45,
+                  "warnings": []
+                },
+                {
+                  "canonical_ticker": "AIDC",
+                  "display_name": "모바일·IPTV·기업 인프라를 운영하는 통신사로, AI 데이터센터",
+                  "market": "US",
+                  "source_asof": "2026-11-04T06:03:39+00:00",
+                  "signal_action": "UNKNOWN",
+                  "trigger_type": "telegram_message",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "confidence": 0.45,
+                  "warnings": []
+                }
+              ],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:17233",
+            "content_sha256": "fcb6b190440feaef7fddb8a48d6f7c71f498ec698f7b9a13b7160a73d8c22ee0",
+            "occurred_at": "2026-11-03T19:57:05+00:00",
+            "relevance": {
+              "tickers": [
+                "HALO",
+                "VRSN",
+                "BKH"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "normalized_prism_signals",
+              "matched_tickers": [],
+              "market_match": true,
+              "score": 20
+            },
+            "summary": {
+              "message_id": "17233",
+              "posted_at": "2026-11-03T19:57:05+00:00",
+              "source_url": "https://t.me/stock_ai_agent/17233",
+              "preview": "📊 프리즘 US 시뮬레이터 | 실시간 포트폴리오 (2026-11-04 04:56) 🔸 현재 보유: 3/10개 🔸 사용 비중: 2.40/10 슬롯 (분할 매수·시험매수 반영) ✅ 최고 수익: Halozyme Therapeutics, Inc.(HALO) +10.10% ⚠️ 최저 수익: VeriSign, Inc.(VRSN) 0.00% 🔸 보유 종목: - Black Hills Corporati...",
+              "signals": [
+                {
+                  "canonical_ticker": "HALO",
+                  "display_name": "Halozyme Therapeutics, Inc.",
+                  "market": "US",
+                  "source_asof": "2026-11-03T19:57:05+00:00",
+                  "signal_action": "HOLD",
+                  "trigger_type": "telegram_portfolio_snapshot",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "confidence": 0.45,
+                  "warnings": []
+                },
+                {
+                  "canonical_ticker": "VRSN",
+                  "display_name": "VeriSign, Inc.",
+                  "market": "US",
+                  "source_asof": "2026-11-03T19:57:05+00:00",
+                  "signal_action": "HOLD",
+                  "trigger_type": "telegram_portfolio_snapshot",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "confidence": 0.45,
+                  "warnings": []
+                },
+                {
+                  "canonical_ticker": "BKH",
+                  "display_name": "Black Hills Corporation",
+                  "market": "US",
+                  "source_asof": "2026-11-03T19:57:05+00:00",
+                  "signal_action": "HOLD",
+                  "trigger_type": "telegram_portfolio_snapshot",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "stop_loss_price": 77.2,
+                  "target_price": 91.88,
+                  "confidence": 0.45,
+                  "warnings": [
+                    "multi_ticker_prices_scoped_to_mention_block"
+                  ]
+                }
+              ],
+              "simulation_only": true,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:17232",
+            "content_sha256": "03bd5a2db88bd112fd6bde97b468e0a595d40f0b4bb74031740b592625f7edbd",
+            "occurred_at": "2026-11-03T19:57:02+00:00",
+            "relevance": {
+              "tickers": [
+                "AMD"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "normalized_prism_signals",
+              "matched_tickers": [],
+              "market_match": true,
+              "score": 20
+            },
+            "summary": {
+              "message_id": "17232",
+              "posted_at": "2026-11-03T19:57:02+00:00",
+              "source_url": "https://t.me/stock_ai_agent/17232",
+              "preview": "⚠️ 매수 보류: Advanced Micro Devices, Inc.(AMD) 현재가: $486.29 매수 점수: 4/10 결정: 미진입 시장 상황: 횡보장 산업군: Technology 보류 사유: AI 판단: 미진입 / 점수 부족 (3/5) — AI 사유: 현재가 486.31달러가 50일선보다 11.4% 낮고, 하락 중인 20일선보다 12.2% 낮아 두 가지 하락 추세 차단 조건에 모...",
+              "signals": [
+                {
+                  "canonical_ticker": "AMD",
+                  "display_name": "Advanced Micro Devices, Inc.",
+                  "market": "US",
+                  "source_asof": "2026-11-03T19:57:02+00:00",
+                  "signal_action": "NO_ENTRY",
+                  "trigger_type": "telegram_buy_skip",
+                  "trigger_score": 0.4,
+                  "composite_score": 0.4,
+                  "stop_loss_price": 464.0,
+                  "target_price": 502.46,
+                  "confidence": 0.4,
+                  "warnings": []
+                }
+              ],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:17231",
+            "content_sha256": "47f75116a3ce805f354a374e2a19bcfa9ef5ef7f79badd56ed051e1c77a74b4f",
+            "occurred_at": "2026-11-03T19:57:00+00:00",
+            "relevance": {
+              "tickers": [
+                "WULF"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "normalized_prism_signals",
+              "matched_tickers": [],
+              "market_match": true,
+              "score": 20
+            },
+            "summary": {
+              "message_id": "17231",
+              "posted_at": "2026-11-03T19:57:00+00:00",
+              "source_url": "https://t.me/stock_ai_agent/17231",
+              "preview": "⚠️ 매수 보류: TeraWulf Inc.(WULF) 현재가: $12.47 매수 점수: 2/10 결정: 미진입 시장 상황: 횡보장 산업군: Financial Services 보류 사유: AI 판단: 미진입 / 점수 부족 (2/5) — AI 사유: 횡보장에서 수익성과 재무 건전성 기준이 미달했습니다. 판단 가격 12.47은 하락하는 50일선보다 14.2% 낮아 개별 종목 추세 게이트에도...",
+              "signals": [
+                {
+                  "canonical_ticker": "WULF",
+                  "display_name": "TeraWulf Inc.",
+                  "market": "US",
+                  "source_asof": "2026-11-03T19:57:00+00:00",
+                  "signal_action": "NO_ENTRY",
+                  "trigger_type": "telegram_buy_skip",
+                  "trigger_score": 0.2,
+                  "composite_score": 0.2,
+                  "confidence": 0.2,
+                  "warnings": []
+                }
+              ],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:17230",
+            "content_sha256": "a55946b1f89c6ff2a8c88d7c5ce5d02429dbe57ac2ff50211dd8b9836b44a551",
+            "occurred_at": "2026-11-03T19:56:57+00:00",
+            "relevance": {
+              "tickers": [
+                "VRSN"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "normalized_prism_signals",
+              "matched_tickers": [],
+              "market_match": true,
+              "score": 20
+            },
+            "summary": {
+              "message_id": "17230",
+              "posted_at": "2026-11-03T19:56:57+00:00",
+              "source_url": "https://t.me/stock_ai_agent/17230",
+              "preview": "📈 신규 매수 | VeriSign, Inc. (VRSN) 💵 매수가 $314.22 🎯 목표가 $377.63 (+20.2%) ⛔ 손절가 $304.44 (-3.1%, 장중 이탈 시 즉시 매도) 🏷 Technology · 중기 🧩 분할 매수: 1슬롯의 80%로 시작, 조건 확인 시 증액 • 돌파 $312.78 → 100% • 눌림 회복 $314.69 → 100% • 손절 시 전량 매도 📡 같...",
+              "signals": [
+                {
+                  "canonical_ticker": "VRSN",
+                  "display_name": "신규 매수 | VeriSign, Inc.",
+                  "market": "US",
+                  "source_asof": "2026-11-03T19:56:57+00:00",
+                  "signal_action": "BUY",
+                  "trigger_type": "telegram_message",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "stop_loss_price": 304.44,
+                  "target_price": 377.63,
+                  "confidence": 0.45,
+                  "warnings": []
+                }
+              ],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:17229",
+            "content_sha256": "5a5e67f66156ce089ec0f7623c3d2dcbcbf10a311de5da31035575831b954bdc",
+            "occurred_at": "2026-11-03T19:50:58+00:00",
+            "relevance": {
+              "tickers": [
+                "AMD"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "normalized_prism_signals",
+              "matched_tickers": [],
+              "market_match": true,
+              "score": 20
+            },
+            "summary": {
+              "message_id": "17229",
+              "posted_at": "2026-11-03T19:50:58+00:00",
+              "source_url": "https://t.me/stock_ai_agent/17229",
+              "preview": "📊 Advanced Micro Devices, Inc. (AMD) O'Neil 인사이트 차트의 베이스/피벗/RS 주석을 함께 참고하세요. ※ 보조 참고용 · 투자 권유 아님",
+              "signals": [
+                {
+                  "canonical_ticker": "AMD",
+                  "display_name": "Advanced Micro Devices, Inc.",
+                  "market": "US",
+                  "source_asof": "2026-11-03T19:50:58+00:00",
+                  "signal_action": "WATCH",
+                  "trigger_type": "telegram_oneil_insight",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "confidence": 0.45,
+                  "warnings": []
+                }
+              ],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:17228",
+            "content_sha256": "d60dfc632122705262c12c1c4ea9dc4f31960692d3937a4ca7e0cd8be8eab1cd",
+            "occurred_at": "2026-11-03T19:50:38+00:00",
+            "relevance": {
+              "tickers": [
+                "VRSN"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "normalized_prism_signals",
+              "matched_tickers": [],
+              "market_match": true,
+              "score": 20
+            },
+            "summary": {
+              "message_id": "17228",
+              "posted_at": "2026-11-03T19:50:38+00:00",
+              "source_url": "https://t.me/stock_ai_agent/17228",
+              "preview": "📊 VeriSign, Inc. (VRSN) O'Neil 인사이트 차트의 베이스/피벗/RS 주석을 함께 참고하세요. ※ 보조 참고용 · 투자 권유 아님",
+              "signals": [
+                {
+                  "canonical_ticker": "VRSN",
+                  "display_name": "VeriSign, Inc.",
+                  "market": "US",
+                  "source_asof": "2026-11-03T19:50:38+00:00",
+                  "signal_action": "WATCH",
+                  "trigger_type": "telegram_oneil_insight",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "confidence": 0.45,
+                  "warnings": []
+                }
+              ],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:17227",
+            "content_sha256": "85ac06ddd087bc2ebb2b591f6f33e31268121dd5836ad206e49495791e1c0d60",
+            "occurred_at": "2026-11-03T19:50:16+00:00",
+            "relevance": {
+              "tickers": [
+                "WULF"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "normalized_prism_signals",
+              "matched_tickers": [],
+              "market_match": true,
+              "score": 20
+            },
+            "summary": {
+              "message_id": "17227",
+              "posted_at": "2026-11-03T19:50:16+00:00",
+              "source_url": "https://t.me/stock_ai_agent/17227",
+              "preview": "📊 TeraWulf Inc. (WULF) O'Neil 인사이트 차트의 베이스/피벗/RS 주석을 함께 참고하세요. ※ 보조 참고용 · 투자 권유 아님",
+              "signals": [
+                {
+                  "canonical_ticker": "WULF",
+                  "display_name": "TeraWulf Inc.",
+                  "market": "US",
+                  "source_asof": "2026-11-03T19:50:16+00:00",
+                  "signal_action": "WATCH",
+                  "trigger_type": "telegram_oneil_insight",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "confidence": 0.45,
+                  "warnings": []
+                }
+              ],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:17226",
+            "content_sha256": "aae7e02749b618344011869906f95ff240190b2e64493c3d95fe1321b0727a4b",
+            "occurred_at": "2026-11-03T19:49:56+00:00",
+            "relevance": {
+              "tickers": [
+                "AMD"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "normalized_prism_signals",
+              "matched_tickers": [],
+              "market_match": true,
+              "score": 20
+            },
+            "summary": {
+              "message_id": "17226",
+              "posted_at": "2026-11-03T19:49:56+00:00",
+              "source_url": "https://t.me/stock_ai_agent/17226",
+              "preview": "",
+              "signals": [
+                {
+                  "canonical_ticker": "AMD",
+                  "display_name": "Advanced Micro Devices,  Inc",
+                  "market": "US",
+                  "source_asof": "2026-11-03T19:49:56+00:00",
+                  "signal_action": "WATCH",
+                  "trigger_type": "telegram_pdf_report",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "confidence": 0.45,
+                  "warnings": []
+                }
+              ],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:17225",
+            "content_sha256": "0b34072589395cd65199984b14b7c192f3138bd74ccedd14a1d1395f7ed61ecc",
+            "occurred_at": "2026-11-03T19:49:48+00:00",
+            "relevance": {
+              "tickers": [
+                "VRSN"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "normalized_prism_signals",
+              "matched_tickers": [],
+              "market_match": true,
+              "score": 20
+            },
+            "summary": {
+              "message_id": "17225",
+              "posted_at": "2026-11-03T19:49:48+00:00",
+              "source_url": "https://t.me/stock_ai_agent/17225",
+              "preview": "",
+              "signals": [
+                {
+                  "canonical_ticker": "VRSN",
+                  "display_name": "VeriSign,  Inc.",
+                  "market": "US",
+                  "source_asof": "2026-11-03T19:49:48+00:00",
+                  "signal_action": "WATCH",
+                  "trigger_type": "telegram_pdf_report",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "confidence": 0.45,
+                  "warnings": []
+                }
+              ],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:17224",
+            "content_sha256": "83af31bfba38e51e02132455eb334c414271d6379b1e1dc13c62cc00482865ae",
+            "occurred_at": "2026-11-03T19:49:44+00:00",
+            "relevance": {
+              "tickers": [
+                "WULF"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "normalized_prism_signals",
+              "matched_tickers": [],
+              "market_match": true,
+              "score": 20
+            },
+            "summary": {
+              "message_id": "17224",
+              "posted_at": "2026-11-03T19:49:44+00:00",
+              "source_url": "https://t.me/stock_ai_agent/17224",
+              "preview": "",
+              "signals": [
+                {
+                  "canonical_ticker": "WULF",
+                  "display_name": "TeraWulf Inc.",
+                  "market": "US",
+                  "source_asof": "2026-11-03T19:49:44+00:00",
+                  "signal_action": "WATCH",
+                  "trigger_type": "telegram_pdf_report",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "confidence": 0.45,
+                  "warnings": []
+                }
+              ],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:17223",
+            "content_sha256": "5ebf0850ca9b7be42386b184785ca40ba8cd8b2eceaef91c91069a6117453668",
+            "occurred_at": "2026-11-03T19:49:35+00:00",
+            "relevance": {
+              "tickers": [
+                "AMD"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "normalized_prism_signals",
+              "matched_tickers": [],
+              "market_match": true,
+              "score": 20
+            },
+            "summary": {
+              "message_id": "17223",
+              "posted_at": "2026-11-03T19:49:35+00:00",
+              "source_url": "https://t.me/stock_ai_agent/17223",
+              "preview": "📊 Advanced Micro Devices(AMD) AI 가속기와 서버 CPU를 포함한 반도체를 설계·판매합니다. 2026년 2분기 매출의 58%가 데이터센터 사업에서 나왔습니다. 💰 주가: $487.32 (11월 3일 관측값; 마감 확정 전) 📉 전일 대비: 약 +4.4% vs. 전일 $466.84 📊 거래량: 약 1,796만 주로 관측됐으나 당일 미확정. 직전 하락일에는 10월 3...",
+              "signals": [
+                {
+                  "canonical_ticker": "AMD",
+                  "display_name": "Advanced Micro Devices",
+                  "market": "US",
+                  "source_asof": "2026-11-03T19:49:35+00:00",
+                  "signal_action": "UNKNOWN",
+                  "trigger_type": "telegram_message",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "confidence": 0.45,
+                  "warnings": []
+                }
+              ],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:17222",
+            "content_sha256": "ca61509d94f4cd25ee1e3fe691daa5e63a39e106ff3867f67fa6e9b17046a743",
+            "occurred_at": "2026-11-03T19:49:30+00:00",
+            "relevance": {
+              "tickers": [
+                "VRSN"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "normalized_prism_signals",
+              "matched_tickers": [],
+              "market_match": true,
+              "score": 20
+            },
+            "summary": {
+              "message_id": "17222",
+              "posted_at": "2026-11-03T19:49:30+00:00",
+              "source_url": "https://t.me/stock_ai_agent/17222",
+              "preview": "📊 VeriSign, Inc. (VRSN) .com·.net 도메인 등록·갱신과 인터넷 주소 인프라를 운영하는 기업입니다. 💰 거래 현황 (11월 3일 관측값, 마감 확정 여부 미확인) - 가격: $314.315 - 전일 종가 $308.40 대비 +1.92% - 거래량: 1,569,711주. 평균 거래량과의 비교 자료는 없습니다. 20거래일 CMF는 +0.096으로 가격·거래량 흐름은...",
+              "signals": [
+                {
+                  "canonical_ticker": "VRSN",
+                  "display_name": "VeriSign, Inc.",
+                  "market": "US",
+                  "source_asof": "2026-11-03T19:49:30+00:00",
+                  "signal_action": "UNKNOWN",
+                  "trigger_type": "telegram_message",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "confidence": 0.45,
+                  "warnings": []
+                }
+              ],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:17221",
+            "content_sha256": "ccde791d8c149869f696a1a160429c8d6b3150fbf7be669b9e83c0f3b5a13cf5",
+            "occurred_at": "2026-11-03T19:49:26+00:00",
+            "relevance": {
+              "tickers": [
+                "WULF"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "normalized_prism_signals",
+              "matched_tickers": [],
+              "market_match": true,
+              "score": 20
+            },
+            "summary": {
+              "message_id": "17221",
+              "posted_at": "2026-11-03T19:49:26+00:00",
+              "source_url": "https://t.me/stock_ai_agent/17221",
+              "preview": "📊 TeraWulf (WULF) — 비트코인 채굴과 HPC(고성능 컴퓨팅) 시설 임대 사업을 병행합니다. HPC 전환은 성장 동력이 될 수 있지만, 현금흐름과 수익성 개선은 아직 확인이 필요합니다. 💵 현재가: $12.42 (11월 3일 장중 관측가, 확정 종가 아님) 📈 전일 대비: 약 +13.5% (11월 2일 종가 $10.94 기준) 📊 거래량: 약 3,293만 주로 활발했으나,...",
+              "signals": [
+                {
+                  "canonical_ticker": "WULF",
+                  "display_name": "TeraWulf",
+                  "market": "US",
+                  "source_asof": "2026-11-03T19:49:26+00:00",
+                  "signal_action": "UNKNOWN",
+                  "trigger_type": "telegram_message",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "confidence": 0.45,
+                  "warnings": []
+                }
+              ],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:17220",
+            "content_sha256": "fcfb026015cc639ce35031303f1fa8f72f8b7f1d851e85357540d4b4a5a575ce",
+            "occurred_at": "2026-11-03T19:39:13+00:00",
+            "relevance": {
+              "tickers": [
+                "WULF",
+                "VRSN",
+                "AMD"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "normalized_prism_signals",
+              "matched_tickers": [],
+              "market_match": true,
+              "score": 20
+            },
+            "summary": {
+              "message_id": "17220",
+              "posted_at": "2026-11-03T19:39:13+00:00",
+              "source_url": "https://t.me/stock_ai_agent/17220",
+              "preview": "🔔 미국주식 오후 프리즘 시그널 얼럿 📅 2026.11.03 오후 분석 포착된 관심종목 🤖 프리즘봇의 가상 포트폴리오 운용 과정을 투명하게 공개합니다. 실제 매수 권유가 아닙니다. 🧭 장기추세: 횡보 | 스윙: 횡보·숨고르기 | 실행기준: 횡보 | 선정: 탑다운 0종목 + 바텀업 3종목 🧭 오늘 테마 흐름 미국 1,019종목 · 전일 종가 대비 · 테마별 중앙값 📈 강한 테마 1. 비트...",
+              "signals": [
+                {
+                  "canonical_ticker": "WULF",
+                  "display_name": "TeraWulf Inc.",
+                  "market": "US",
+                  "source_asof": "2026-11-03T19:39:13+00:00",
+                  "signal_action": "WATCH",
+                  "trigger_type": "telegram_signal_alert",
+                  "trigger_score": 0.81,
+                  "composite_score": 0.81,
+                  "confidence": 0.81,
+                  "warnings": []
+                },
+                {
+                  "canonical_ticker": "VRSN",
+                  "display_name": "VeriSign, Inc.",
+                  "market": "US",
+                  "source_asof": "2026-11-03T19:39:13+00:00",
+                  "signal_action": "WATCH",
+                  "trigger_type": "telegram_signal_alert",
+                  "trigger_score": 0.94,
+                  "composite_score": 0.94,
+                  "confidence": 0.94,
+                  "warnings": []
+                },
+                {
+                  "canonical_ticker": "AMD",
+                  "display_name": "Advanced Micro Devices, Inc.",
+                  "market": "US",
+                  "source_asof": "2026-11-03T19:39:13+00:00",
+                  "signal_action": "WATCH",
+                  "trigger_type": "telegram_signal_alert",
+                  "trigger_score": 0.87,
+                  "composite_score": 0.87,
+                  "confidence": 0.87,
+                  "warnings": []
+                }
+              ],
+              "simulation_only": true,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:17256",
+            "content_sha256": "b4766bdc79c8d982e2ea42b62c10553f4c7c4df5d0cd2b7f77ebbde856d8b552",
+            "occurred_at": "2026-11-04T06:09:37+00:00",
+            "relevance": {
+              "tickers": [],
+              "markets": [],
+              "themes": [],
+              "match_basis": "message_context",
+              "matched_tickers": [],
+              "market_match": false,
+              "score": 0
+            },
+            "summary": {
+              "message_id": "17256",
+              "posted_at": "2026-11-04T06:09:37+00:00",
+              "source_url": "https://t.me/stock_ai_agent/17256",
+              "preview": "📊 프리즘 시뮬레이터 | 실시간 포트폴리오 (2026-11-04 15:09) 🔸 현재 보유: 0/10개 현재 보유 종목이 없습니다. 🔸 매매 이력 통계 - 총 거래: 220건 - 수익 거래: 86건 - 손실 거래: 134건 - 승률: 39.09% - 누적 수익률: 339.48% 📝 주의사항: - 본 리포트는 AI 기반 시뮬레이션 결과이며 실제 매매와 무관합니다. - 본 정보는 참고용이며...",
+              "signals": [],
+              "simulation_only": true,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:17255",
+            "content_sha256": "dc4c8a83f8d5c1ed2411970936302cef5f43011fb9bbfee25d21a79667e37672",
+            "occurred_at": "2026-11-04T06:09:34+00:00",
+            "relevance": {
+              "tickers": [
+                "008830.KS"
+              ],
+              "markets": [
+                "KR"
+              ],
+              "themes": [],
+              "match_basis": "normalized_prism_signals",
+              "matched_tickers": [],
+              "market_match": false,
+              "score": 0
+            },
+            "summary": {
+              "message_id": "17255",
+              "posted_at": "2026-11-04T06:09:34+00:00",
+              "source_url": "https://t.me/stock_ai_agent/17255",
+              "preview": "⚠️ 매수 보류: 대동기어(008830) 현재가: 6,130원 매수 점수: 2/10 결정: 미진입 시장 상황: 횡보장 산업군: 기계·장비 보류 사유: AI 판단: 미진입 — 재무 건전성과 성장성 기준이 미달해 횡보·약세 국면의 필수 펀더멘털 기준을 통과하지 못했습니다. / 점수 부족 (3/5.0) 분석 의견: 보고서 2-1의 2026년 2분기 별도 영업흑자 전환에도 부채비율 277.49...",
+              "signals": [
+                {
+                  "canonical_ticker": "008830.KS",
+                  "display_name": "대동기어",
+                  "market": "KR",
+                  "source_asof": "2026-11-04T06:09:34+00:00",
+                  "signal_action": "NO_ENTRY",
+                  "trigger_type": "telegram_buy_skip",
+                  "trigger_score": 0.2,
+                  "composite_score": 0.2,
+                  "confidence": 0.2,
+                  "warnings": []
+                }
+              ],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:17254",
+            "content_sha256": "14eb8bf9a5a14f4b2e128c6187d02945f1900ee32b9f0948c6a84a6b0c0c3a24",
+            "occurred_at": "2026-11-04T06:09:32+00:00",
+            "relevance": {
+              "tickers": [
+                "032640.KS"
+              ],
+              "markets": [
+                "KR"
+              ],
+              "themes": [],
+              "match_basis": "normalized_prism_signals",
+              "matched_tickers": [],
+              "market_match": false,
+              "score": 0
+            },
+            "summary": {
+              "message_id": "17254",
+              "posted_at": "2026-11-04T06:09:32+00:00",
+              "source_url": "https://t.me/stock_ai_agent/17254",
+              "preview": "⚠️ 매수 보류: LG유플러스(032640) 현재가: 15,590원 매수 점수: 7/10 결정: 미진입 시장 상황: 횡보장 산업군: 통신 보류 사유: AI 판단: 미진입 — 손익비 하한 미달입니다. 분석 의견: 보고서 2-1·2-2·5의 2025년·2026년 연결 실적에서 통신·기업인프라 사업과 네 가지 품질 기준을 확인했습니다. 다만 2분기 주당순이익 증가율 2.4%와 3분기 이익 증...",
+              "signals": [
+                {
+                  "canonical_ticker": "032640.KS",
+                  "display_name": "LG유플러스",
+                  "market": "KR",
+                  "source_asof": "2026-11-04T06:09:32+00:00",
+                  "signal_action": "NO_ENTRY",
+                  "trigger_type": "telegram_buy_skip",
+                  "trigger_score": 0.7,
+                  "composite_score": 0.7,
+                  "confidence": 0.7,
+                  "warnings": []
+                }
+              ],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          }
+        ],
+        "execution_eligible": false
+      },
+      "receipt_contract": {
+        "schema": "tradingagents.external-evidence-receipt/v1",
+        "sources": {
+          "youtube": {
+            "source_health": "STALE",
+            "event_keys": [],
+            "coverage": {
+              "total_unique_events": 640,
+              "window_events": 0,
+              "transmitted_events": 0,
+              "truncated": false,
+              "oldest_occurred_at": null,
+              "newest_occurred_at": null,
+              "available_events_before_context_cap": 0,
+              "context_event_cap": 12,
+              "omitted_events": 0,
+              "omitted_due_to_context_cap": 0,
+              "omitted_before_context_selection": 0
+            }
+          },
+          "prism": {
+            "source_health": "OK",
+            "event_keys": [
+              "stock_ai_agent:17249",
+              "stock_ai_agent:17246",
+              "stock_ai_agent:17245",
+              "stock_ai_agent:17233",
+              "stock_ai_agent:17232",
+              "stock_ai_agent:17231",
+              "stock_ai_agent:17230",
+              "stock_ai_agent:17229",
+              "stock_ai_agent:17228",
+              "stock_ai_agent:17227",
+              "stock_ai_agent:17226",
+              "stock_ai_agent:17225",
+              "stock_ai_agent:17224",
+              "stock_ai_agent:17223",
+              "stock_ai_agent:17222",
+              "stock_ai_agent:17221",
+              "stock_ai_agent:17220",
+              "stock_ai_agent:17256",
+              "stock_ai_agent:17255",
+              "stock_ai_agent:17254"
+            ],
+            "coverage": {
+              "total_unique_events": 391,
+              "window_events": 38,
+              "transmitted_events": 20,
+              "truncated": true,
+              "oldest_occurred_at": "2026-11-03T19:39:13+00:00",
+              "newest_occurred_at": "2026-11-04T06:09:37+00:00",
+              "available_events_before_context_cap": 38,
+              "context_event_cap": 20,
+              "omitted_events": 18,
+              "omitted_due_to_context_cap": 18,
+              "omitted_before_context_selection": 0
+            }
+          }
+        }
+      }
+    },
+    "guardrails": {
+      "untrusted_external_context": true,
+      "global_mode_cannot_promote_a_row": true,
+      "immediate_requires_row_mode": "IMMEDIATE",
+      "market_data_asof": "2026-11-04T18:25:35+00:00",
+      "valid_until": "2026-11-04T18:27:35+00:00",
+      "expired_at_build": false,
+      "decision_ready": false,
+      "conditional_strategy_ready": false,
+      "report_mode": "MIXED",
+      "required_rechecks": [
+        "실시간 호가와 주문 가능 상태 재확인",
+        "계좌 현금·미체결 주문 재확인",
+        "NBBO/스프레드·LULD·뉴스 halt·feed 지연 상태 재확인"
+      ],
+      "stale_buy_sell_reduce_is_reference_only": true,
+      "supporting_context_may_promote_execution": false,
+      "external_evidence_policy": {
+        "profile": "balanced_external",
+        "material_thesis_effects": [
+          "ranking",
+          "confidence",
+          "position_size_within_existing_risk_limits",
+          "research_priority"
+        ],
+        "supported_evidence_weight": "MEDIUM",
+        "partially_supported_evidence_weight": "LOW_TO_MEDIUM",
+        "unverified_evidence_weight": "LOW_LABELED",
+        "user_primary_channels": [
+          "@kpunch",
+          "@sosumonkey"
+        ],
+        "user_primary_source_tier": "USER_PRIMARY",
+        "user_primary_evidence_weight": "HIGH",
+        "user_primary_validation_policy": "USER_ACCEPTED",
+        "matching_multi_source_signal_may_raise_thesis_priority": true,
+        "conflicting_signal_must_be_visible": true,
+        "may_bypass_market_or_portfolio_execution_gate": false
+      }
+    },
+    "model_provenance": {
+      "schema": "tradingagents.model-provenance/v1",
+      "work_synthesis": {
+        "execution_mode": "local",
+        "requested_model": "gpt-6.1-sol",
+        "requested_reasoning_effort": "high",
+        "task_id": "tradingagents-work-us",
+        "verification_status": "CONFIGURED_NOT_RUNTIME_VERIFIED",
+        "observed_model": null,
+        "observed_reasoning_effort": null,
+        "note": "The local task contract is verified; the Work host does not expose a signed per-response model receipt."
+      },
+      "market_analysis": {
+        "source_run_id": "20261104T175053_local-scheduler-us-full",
+        "provider": "codex",
+        "requested_models": {
+          "quick": "gpt-6.1-sol",
+          "deep": "gpt-6.1-sol",
+          "output": "gpt-6.1-sol",
+          "writer": "gpt-6.1-sol",
+          "judge": "gpt-6.1-sol"
+        },
+        "requested_reasoning_effort": {
+          "default": "medium",
+          "quick": "medium",
+          "deep": "xhigh",
+          "output": "medium",
+          "writer": "medium",
+          "judge": "xhigh"
+        },
+        "verification_status": "RUNTIME_USAGE_OBSERVED",
+        "observed_calls": 736,
+        "observed_models": {
+          "gpt-6.1-sol": {
+            "calls": 736,
+            "input_tokens": 19749000,
+            "output_tokens": 1503073,
+            "total_tokens": 21252073
+          }
+        },
+        "usage_available": true
+      },
+      "overlay": {
+        "source_run_id": "20261105T032402_local-freshness-us-overlay",
+        "provider": "codex",
+        "requested_models": {
+          "quick": "gpt-6.1-sol",
+          "deep": "gpt-6.1-sol",
+          "output": "gpt-6.1-sol",
+          "writer": "gpt-6.1-sol",
+          "judge": "gpt-6.1-sol"
+        },
+        "requested_reasoning_effort": {
+          "default": "medium",
+          "quick": "medium",
+          "deep": "xhigh",
+          "output": "medium",
+          "writer": "medium",
+          "judge": "xhigh"
+        },
+        "verification_status": "CONFIGURED_ONLY",
+        "observed_calls": 0,
+        "observed_models": {},
+        "usage_available": false
+      }
+    }
+  }
+}
