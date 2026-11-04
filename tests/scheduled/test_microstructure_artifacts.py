@@ -517,6 +517,7 @@ def _write_source_run(
         "version": 1,
         "run_id": run_id,
         "started_at": started_at,
+        "finished_at": started_at,
         "settings": {"run_mode": run_mode, "market": market},
         "summary": {"total_tickers": len(ticker_items), "successful_tickers": len(ticker_items), "failed_tickers": 0},
         "tickers": ticker_items,

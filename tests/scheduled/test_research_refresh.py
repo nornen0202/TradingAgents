@@ -93,6 +93,22 @@ def test_completed_revision_is_found_when_a_later_quote_wins_pointer(tmp_path):
     assert runner._resolve_latest_overlay_source_manifest(tmp_path, market="US", tickers=["AAPL"]) == quote
 
 
+def test_revision_finishing_during_overlay_is_available_only_to_the_next_run(tmp_path):
+    _, full = cohort(tmp_path)
+    _, new = revision(tmp_path, full)
+    _, quote = cohort(tmp_path, "20261022T141500-overlay", mode="overlay_only", parent=full["run_id"],
+                      start=NOW + timedelta(minutes=5))
+    for row in quote["tickers"]:
+        row["artifacts"]["microstructure_snapshot_json"] = "microstructure.json"
+        row["artifacts"]["microstructure_report_md"] = "microstructure.md"
+    atomic_write_json(tmp_path / "latest-run.json", quote)
+    cutoff = NOW + timedelta(minutes=9, seconds=43)
+    assert runner._resolve_latest_overlay_source_manifest(
+        tmp_path, market="US", tickers=["AAPL"], now=cutoff) == quote
+    assert runner._resolve_latest_overlay_source_manifest(
+        tmp_path, market="US", tickers=["AAPL"], now=NOW + timedelta(minutes=11)) == new
+
+
 @pytest.mark.parametrize("change", ["carried", "new", "contract", "receipt", "missing", "future", "market", "failed", "parent"])
 def test_missing_corrupt_mismatched_or_unfinished_revision_is_not_adopted(tmp_path, change):
     _, full = cohort(tmp_path)

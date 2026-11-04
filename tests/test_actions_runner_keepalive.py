@@ -32,6 +32,28 @@ def test_runner_keepalive_installer_is_recurring_and_least_privilege() -> None:
     assert "Copy-Item" in script
 
 
+@pytest.mark.parametrize("missing", ["Runner.Worker.exe", "Runner.Worker.dll",
+                                    "Runner.Worker.deps.json", "Runner.Worker.runtimeconfig.json"])
+def test_online_listener_cannot_hide_incomplete_worker_installation(tmp_path, missing):
+    pwsh = shutil.which("pwsh")
+    if not pwsh:
+        pytest.skip("PowerShell runtime unavailable")
+    binary = tmp_path / "bin"
+    binary.mkdir()
+    for filename in ("Runner.Listener.exe", "Runner.Worker.exe", "Runner.Worker.dll",
+                     "Runner.Worker.deps.json", "Runner.Worker.runtimeconfig.json"):
+        if filename != missing:
+            (binary / filename).write_bytes(b"fixture")
+    (tmp_path / "run.cmd").write_text("@exit /b 0", encoding="utf-8")
+    result = subprocess.run([pwsh, "-NoProfile", "-NonInteractive", "-File",
+                             str(ROOT / "tools/ensure_actions_runner.ps1"), "-RunnerRoot", str(tmp_path)],
+                            capture_output=True, text=True, encoding="utf-8", timeout=30)
+    assert result.returncode != 0
+    assert "installation is incomplete" in result.stderr
+    assert missing in result.stderr
+    assert "HEALTHY" not in result.stdout
+
+
 @pytest.mark.parametrize("status", ["Running", "StartPending"])
 def test_invisible_service_listener_never_launches_a_duplicate(status):
     pwsh = shutil.which("pwsh")

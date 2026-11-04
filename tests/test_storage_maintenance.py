@@ -45,6 +45,32 @@ def _directory(path: Path, *, modified: datetime | None = None) -> Path:
     return path
 
 
+@pytest.mark.skipif(os.name != 'nt' or PWSH is None, reason='Windows PowerShell required')
+@pytest.mark.parametrize("alias", ["bin", "externals"])
+@pytest.mark.parametrize("target_state", ["active", "missing", "outside"])
+def test_runner_cleanup_protects_live_version_target_regardless_of_modification_order(tmp_path, alias, target_state):
+    runner = tmp_path / "runner"
+    active = _directory(runner / f"{alias}.active", modified=datetime.now() - timedelta(days=40))
+    obsolete = _directory(runner / f"{alias}.obsolete", modified=datetime.now() - timedelta(days=60))
+    _directory(runner / f"{alias}.newest", modified=datetime.now() - timedelta(days=20))
+    if target_state != "missing":
+        target = active if target_state == "active" else _directory(tmp_path / "external")
+        result = subprocess.run(
+            [PWSH, '-NoProfile', '-NonInteractive', '-Command',
+             'New-Item -ItemType Junction -Path $env:TEST_LINK -Target $env:TEST_TARGET | Out-Null'],
+            env={**os.environ, 'TEST_LINK': str(runner / alias), 'TEST_TARGET': str(target)},
+            capture_output=True, text=True, encoding="utf-8", timeout=30)
+        assert result.returncode == 0, result.stderr
+    result = _run_maintenance(tmp_path, apply=True)
+    assert result.returncode == 0, result.stderr
+    assert (active / "payload.txt").read_text() == "generated"
+    if target_state == "active":
+        assert not obsolete.exists(), "Proven inactive backups should still be reclaimed"
+    else:
+        assert (obsolete / "payload.txt").read_text() == "generated"
+    assert "PRESERVED" in result.stdout
+
+
 def _maintenance_invocation(tmp_path: Path, *, apply: bool, extended_policy=None):
     # These fixtures model an idle temporary runner, regardless of unrelated
     # production Runner.Worker processes on the machine running the tests.
@@ -263,6 +289,13 @@ def test_storage_maintenance_dry_run_and_guarded_cleanup(tmp_path: Path) -> None
     old_externals_backup = _directory(runner_root / "externals.1.0.0", modified=old)
     current_bin_backup = _directory(runner_root / "bin.2.0.0", modified=recent)
     current_externals_backup = _directory(runner_root / "externals.2.0.0", modified=recent)
+    for alias, target in (("bin", current_bin_backup), ("externals", current_externals_backup)):
+        linked = subprocess.run(
+            [PWSH, "-NoProfile", "-NonInteractive", "-Command",
+             "New-Item -ItemType Junction -Path $env:TEST_LINK -Target $env:TEST_TARGET | Out-Null"],
+            env={**os.environ, "TEST_LINK": str(runner_root / alias), "TEST_TARGET": str(target)},
+            capture_output=True, text=True, encoding="utf-8", timeout=30)
+        assert linked.returncode == 0, linked.stderr
     old_installer = runner_root / "actions-runner-win-x64-1.0.0.zip"
     old_installer.write_text("old", encoding="utf-8")
     os.utime(old_installer, (old.timestamp(), old.timestamp()))
