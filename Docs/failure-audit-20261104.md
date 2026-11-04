@@ -88,8 +88,8 @@ version 폴더 정리를 생략한다. 실제 Windows junction fixture로 검증
 
 ## 검증
 
-- 수정 관련 오프라인 테스트: 280 passed, 2 skipped. 별도 revision 시점
-  회귀 테스트 포함. Windows junction·실제 PowerShell 실행을 사용했다.
+- 수정 관련 오프라인 테스트: 290 passed, 2 skipped. 별도 revision 시점
+  회귀 테스트 포함. Windows junction·실제 PowerShell 5.1/7 실행을 사용했다.
 - Ruff `E9,F63,F7,F82`와 `git diff --check` 통과.
 - 병합 전 필수 Windows CI의 unit/browser/test 및 CodeQL 결과를 확인한다.
   전체 CI 결과와 운영 채택 영수증은 PR과 후속 점검에 기록한다.

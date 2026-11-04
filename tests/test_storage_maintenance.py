@@ -47,14 +47,24 @@ def _directory(path: Path, *, modified: datetime | None = None) -> Path:
 
 @pytest.mark.skipif(os.name != 'nt' or PWSH is None, reason='Windows PowerShell required')
 @pytest.mark.parametrize("alias", ["bin", "externals"])
-@pytest.mark.parametrize("target_state", ["active", "missing", "outside"])
-def test_runner_cleanup_protects_live_version_target_regardless_of_modification_order(tmp_path, alias, target_state):
+@pytest.mark.parametrize("target_state", ["active", "nested", "missing", "outside"])
+@pytest.mark.parametrize("shell", ["pwsh", "windows-powershell"])
+def test_runner_cleanup_protects_live_version_target_regardless_of_modification_order(tmp_path, monkeypatch, alias, target_state, shell):
+    if shell == "windows-powershell":
+        legacy = Path(os.environ["SystemRoot"]) / "System32/WindowsPowerShell/v1.0/powershell.exe"
+        if not legacy.exists():
+            pytest.skip("Windows PowerShell 5.1 unavailable")
+        monkeypatch.setattr(sys.modules[__name__], "PWSH", str(legacy))
     runner = tmp_path / "runner"
     active = _directory(runner / f"{alias}.active", modified=datetime.now() - timedelta(days=40))
     obsolete = _directory(runner / f"{alias}.obsolete", modified=datetime.now() - timedelta(days=60))
     _directory(runner / f"{alias}.newest", modified=datetime.now() - timedelta(days=20))
     if target_state != "missing":
         target = active if target_state == "active" else _directory(tmp_path / "external")
+        if target_state == "nested":
+            target = _directory(active / "nested")
+            old = (datetime.now() - timedelta(days=40)).timestamp()
+            os.utime(active, (old, old))
         result = subprocess.run(
             [PWSH, '-NoProfile', '-NonInteractive', '-Command',
              'New-Item -ItemType Junction -Path $env:TEST_LINK -Target $env:TEST_TARGET | Out-Null'],
@@ -64,7 +74,7 @@ def test_runner_cleanup_protects_live_version_target_regardless_of_modification_
     result = _run_maintenance(tmp_path, apply=True)
     assert result.returncode == 0, result.stderr
     assert (active / "payload.txt").read_text() == "generated"
-    if target_state == "active":
+    if target_state in {"active", "nested"}:
         assert not obsolete.exists(), "Proven inactive backups should still be reclaimed"
     else:
         assert (obsolete / "payload.txt").read_text() == "generated"

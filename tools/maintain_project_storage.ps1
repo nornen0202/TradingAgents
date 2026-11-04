@@ -243,13 +243,18 @@ function Test-RunnerBackupInactive {
     try {
         $entry = Get-Item -LiteralPath (Join-Path $Root $Alias) -Force -ErrorAction Stop
         if (-not $entry.PSIsContainer) { return $false }
-        $active = $entry.FullName
-        if ($entry.Attributes -band [IO.FileAttributes]::ReparsePoint) {
-            $target = $entry.ResolveLinkTarget($true)
-            if ($null -eq $target -or -not $target.Exists) { return $false }
-            $active = $target.FullName
+        for ($depth = 0; $depth -lt 16 -and ($entry.Attributes -band [IO.FileAttributes]::ReparsePoint); $depth++) {
+            # Target is supported by both Windows PowerShell 5.1 (the task
+            # launcher) and PowerShell 7. ResolveLinkTarget requires newer .NET.
+            $targets = @($entry.Target)
+            if ($targets.Count -ne 1 -or [string]::IsNullOrWhiteSpace([string]$targets[0])) { return $false }
+            $targetPath = [string]$targets[0]
+            if (-not [IO.Path]::IsPathRooted($targetPath)) { $targetPath = Join-Path $entry.Parent.FullName $targetPath }
+            $entry = Get-Item -LiteralPath $targetPath -Force -ErrorAction Stop
+            if (-not $entry.PSIsContainer) { return $false }
         }
-        $active = Assert-ChildPath -Path $active -Root $Root
+        if ($entry.Attributes -band [IO.FileAttributes]::ReparsePoint) { return $false }
+        $active = Assert-ChildPath -Path $entry.FullName -Root $Root
         $candidate = Assert-ChildPath -Path $Backup -Root $Root
         return (-not $candidate.Equals($active, [StringComparison]::OrdinalIgnoreCase) -and
             -not $active.StartsWith($candidate + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase))
