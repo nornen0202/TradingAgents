@@ -1,7 +1,7 @@
 # TradingAgents KR 최신 공개 입력
 
 schema: tradingagents.ai-context/v1
-문서 생성: 2026-11-04T23:41:33.531831+00:00
+문서 생성: 2026-11-05T03:38:53.927575+00:00
 
 이 문서는 이미 공개된 자료의 축약 전사이며 새 분석·주문 승인이 아닙니다. 원분석 거래일(완료 일봉), 분석 완료, 장중 시세, 계좌 관측, 문서 생성은 서로 다른 시각입니다. 휴장·주말의 마지막 완료 거래일을 장애로 단정하지 마세요. null은 미확인이지 0이 아닙니다. 빌드 당시 실행 상태는 현재 상태가 아니며 row_valid_until과 현재 세션을 다시 확인해야 합니다. 현재 문서를 읽지 못하면 과거 대화의 계좌·한도를 최신 사실로 재사용하지 마세요.
 
@@ -39,8 +39,8 @@ schema: tradingagents.ai-context/v1
   "latest_attempt": {
     "status": "PIPELINE_SKIPPED",
     "account_as_of": null,
-    "run_started_at": "2026-11-05T08:22:46.647990+09:00",
-    "run_finished_at": "2026-11-05T08:23:06.130167+09:00",
+    "run_started_at": "2026-11-05T09:27:22.354872+09:00",
+    "run_finished_at": "2026-11-05T09:27:44.094902+09:00",
     "selected_for_public_account": false
   },
   "summary": {
@@ -313,7 +313,7 @@ schema: tradingagents.ai-context/v1
 ## 별도로 발행된 Work 보고서 — 현재 입력과 시각이 다를 수 있음
 ```json
 {
-  "published_at": "2026-11-04T14:38:55.218009+09:00",
+  "published_at": "2026-11-05T10:41:45.745288+09:00",
   "as_of": "2026-11-04T14:31:00+09:00",
   "markdown_url": "https://nornen0202.github.io/TradingAgents/work/v1/kr/report/latest.md",
   "readable_url": "https://nornen0202.github.io/TradingAgents/work/v1/kr/report/latest.html"

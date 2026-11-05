@@ -1,0 +1,398 @@
+{
+  "version": 4,
+  "video_id": "rRWO8GQ0zpY",
+  "title": "11월 4일 오늘 코스피 어떻게 흘러갈까?",
+  "url": "https://www.youtube.com/watch?v=rRWO8GQ0zpY",
+  "channel": "경제사냥꾼",
+  "channel_id": "UC7usMJDHmtbs_oegmzQKKMA",
+  "source_url": "https://www.youtube.com/@%EA%B2%BD%EC%A0%9C%EC%82%AC%EB%83%A5%EA%BE%BC/shorts",
+  "thumbnail_url": "https://i.ytimg.com/vi/rRWO8GQ0zpY/maxresdefault.jpg",
+  "published_at": "2026-11-03T22:38:41+00:00",
+  "status": "asr_uncertain",
+  "strategy_source_tier": "STANDARD",
+  "strategy_evidence_weight": "STANDARD",
+  "strategy_validation_policy": "STANDARD_REVIEW",
+  "transcript_status": "available",
+  "transcript_source": "automatic",
+  "transcript_chars": 1797,
+  "transcript_quality": {
+    "status": "good",
+    "score": 1.0,
+    "warnings": [],
+    "source": "automatic",
+    "language": "Korean",
+    "model_or_format": "json3",
+    "chars": 1797,
+    "segments": 83,
+    "duration_seconds": 118,
+    "repeated_ngram_ratio": 0.0
+  },
+  "generated_at": "2026-11-05T07:28:56.832561+09:00",
+  "llm_status": "success",
+  "research_status": "success",
+  "claim_verification_status": "success",
+  "research_pipeline_version": 4,
+  "evidence_count": 12,
+  "claim_status_summary": {
+    "partially_supported": 1,
+    "asr_uncertain": 2,
+    "unverified": 9
+  },
+  "claims": [
+    {
+      "claim_id": "C1",
+      "claim_text": "영상은 11월 4일 당일 전망으로, 미국 중간선거 개표와 AMD 3분기 실적 발표가 같은 한국 거래일에 겹친다고 전제한다.",
+      "status": "partially_supported",
+      "confidence": 0.97,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:01",
+      "source_confidence": 0.7,
+      "asr_confidence": 0.7,
+      "numeric_parse": {
+        "claimed": "11월 4일 전망",
+        "observed": "게시 메타데이터: 2026-11-04 07:38:41 KST; 실제 사건 연도는 미확인"
+      },
+      "investor_implication": "게시일을 모든 시장 수치의 기준일로 확정하지 말고 공식 사건 일정과 대조해야 한다."
+    },
+    {
+      "claim_id": "C2",
+      "claim_text": "전날 코스피는 3% 이상 하락하고 장중 2,560선 초반까지 밀렸으며, 예상 개장 상단 2,570선은 전날 종가 수준이다. 말미에는 전날 무너진 5,700선을 언급한다.",
+      "status": "asr_uncertain",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:01",
+      "source_confidence": 0.7,
+      "asr_confidence": 0.35,
+      "numeric_parse": {
+        "claimed": "전일 하락률 3% 초과; 장중 2,560선 초반; 전일 종가 수준 2,570; 붕괴선 5,700",
+        "observed": "전일 OHLC·등락률 없음; 조회시점 스냅샷 5,683.8만 제공"
+      },
+      "investor_implication": "원음과 해당 거래일 KRX 자료를 확인하기 전에는 제시된 지수선을 매매 기준으로 사용할 수 없다."
+    },
+    {
+      "claim_id": "C3",
+      "claim_text": "야간 코스피200 선물이 한때 3% 이상 상승한 뒤 1.7% 상승 마감했다.",
+      "status": "unverified",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:01",
+      "source_confidence": 0.7,
+      "asr_confidence": 0.7,
+      "numeric_parse": {
+        "claimed": "장중 상승률 3% 초과; 마감 상승률 1.7%",
+        "observed": "해당 세션 가격 및 기준가격 없음"
+      },
+      "investor_implication": "야간선물 강세를 근거로 한 상승 출발 전망의 핵심 입력값이 확인되지 않았다."
+    },
+    {
+      "claim_id": "C4",
+      "claim_text": "외국인은 전날 1조 5천억 원 이상, 나흘간 3조 5천억 원 이상 순매도했고 삼성전자·SK하이닉스 매도가 코스피 하락을 주도했다.",
+      "status": "unverified",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:01",
+      "source_confidence": 0.7,
+      "asr_confidence": 0.6,
+      "numeric_parse": {
+        "claimed": "전일 순매도 1.5조 원 이상; 4거래일 누적 순매도 3.5조 원 이상",
+        "observed": "수급 원자료 없음"
+      },
+      "investor_implication": "외국인 매도 중단을 반등 조건으로 적용하려면 현물 수급과 두 종목의 지수 기여도를 먼저 확인해야 한다."
+    },
+    {
+      "claim_id": "C5",
+      "claim_text": "AMD는 오전 6시 15분 3분기 실적을 발표했고 데이터센터 매출은 전년 대비 거의 두 배이며 다음 분기 매출 전망은 예상치를 웃돌았다. 이를 메모리 수요 증가의 근거로 제시한다.",
+      "status": "unverified",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:01",
+      "source_confidence": 0.85,
+      "asr_confidence": 0.85,
+      "numeric_parse": {
+        "claimed": "06:15 발표; 데이터센터 매출 전년 대비 거의 두 배; 다음 분기 가이던스 예상 상회",
+        "observed": "발표 타임스탬프·당기 및 전년 매출·가이던스·컨센서스 없음"
+      },
+      "investor_implication": "공식 매출·가이던스와 동시점 컨센서스를 확인하기 전에는 실적 서프라이즈나 국내 메모리 수혜를 확정할 수 없다."
+    },
+    {
+      "claim_id": "C6",
+      "claim_text": "오전 6시 20분 현재 AMD 시간외 주가가 7% 상승했다.",
+      "status": "unverified",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:01",
+      "source_confidence": 0.85,
+      "asr_confidence": 0.85,
+      "numeric_parse": {
+        "claimed": "06:20 시간외 상승률 7%",
+        "observed": "해당 분봉·체결가·기준 종가 없음; 다른 시점 가격 약 488.78만 제공"
+      },
+      "investor_implication": "특정 시각의 시간외 급등을 확인된 사실로 인용하거나 국내 개장 방향의 확정 근거로 사용할 수 없다."
+    },
+    {
+      "claim_id": "C7",
+      "claim_text": "미국 반도체 지수가 2.6% 상승했으며 부진했던 반도체주에 저가매수가 유입됐다.",
+      "status": "unverified",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:01",
+      "source_confidence": 0.75,
+      "asr_confidence": 0.65,
+      "numeric_parse": {
+        "claimed": "미국 반도체 지수 상승률 2.6%",
+        "observed": "지수 식별정보 및 종가 자료 없음"
+      },
+      "investor_implication": "미국 반도체 업종의 실제 상승폭과 상승 원인을 구분해 확인해야 한다."
+    },
+    {
+      "claim_id": "C8",
+      "claim_text": "미국에서 하이닉스 ADR이 2% 이상 올랐고 AMD 실적 발표 후 시간외에도 추가 상승했다.",
+      "status": "asr_uncertain",
+      "confidence": 0.98,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:01",
+      "source_confidence": 0.75,
+      "asr_confidence": 0.45,
+      "numeric_parse": {
+        "claimed": "정규장 2% 이상 상승; AMD 발표 후 시간외 추가 상승",
+        "observed": "상품 식별정보·가격·체결시각 없음"
+      },
+      "investor_implication": "상품을 식별하기 전에는 이 수익률을 SK하이닉스 국내 주가의 선행 신호로 사용할 수 없다."
+    },
+    {
+      "claim_id": "C9",
+      "claim_text": "월스트리트 분석가들은 외국인 외 뚜렷한 매수자가 없다고 보고 외국인 매도 배경으로 AI 투자 부담과 미국 중간선거 경계심을 지적했다.",
+      "status": "unverified",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:01",
+      "source_confidence": 0.7,
+      "asr_confidence": 0.7,
+      "numeric_parse": {
+        "claimed": "정량 주장 없음",
+        "observed": "인용 원출처 없음"
+      },
+      "investor_implication": "출처 불명의 시장 해석이며 검증된 기관 견해나 확인된 매도 원인으로 제시할 수 없다."
+    },
+    {
+      "claim_id": "C10",
+      "claim_text": "미국 중간선거 개표가 한국 거래시간 중 진행되며 동부 대부분의 투표 종료는 오전 10시경, 서부는 오후 1시경이다.",
+      "status": "unverified",
+      "confidence": 0.98,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:01",
+      "source_confidence": 0.7,
+      "asr_confidence": 0.7,
+      "numeric_parse": {
+        "claimed": "동부 대부분 10:00경; 서부 13:00경 투표 종료",
+        "observed": "공식 지역별 일정 및 시간대 대조 자료 없음"
+      },
+      "investor_implication": "제시된 시각을 확정적인 선거 결과 발표나 주가 변동 시점으로 받아들일 수 없다."
+    },
+    {
+      "claim_id": "C11",
+      "claim_text": "민주당이 상·하원을 모두 장악하면 AI 데이터센터 규제 우려와 AI 관련주 매도가 커질 수 있다.",
+      "status": "unverified",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:01",
+      "source_confidence": 0.7,
+      "asr_confidence": 0.7,
+      "numeric_parse": {
+        "claimed": "민주당 양원 장악을 조건으로 제시",
+        "observed": "관련 법안·시행 조건·시장 영향 자료 없음"
+      },
+      "investor_implication": "정책 근거가 확인되지 않은 조건부 시나리오이며 선거 결과만으로 규제 강화나 주가 하락을 확정할 수 없다."
+    },
+    {
+      "claim_id": "C12",
+      "claim_text": "야간선물·미국 반도체주·AMD 실적으로 코스피 상승 출발을 예상하며 장중 흐름은 외국인 반도체주 매도 중단과 선거 개표에 달렸다고 주장한다.",
+      "status": "unverified",
+      "confidence": 0.99,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:01",
+      "source_confidence": 0.7,
+      "asr_confidence": 0.6,
+      "numeric_parse": {
+        "claimed": "상승 출발 및 수급·선거에 따른 장중 조건부 흐름",
+        "observed": "당일 시가·장중 지수·수급·선거 발표 타임라인 없음"
+      },
+      "investor_implication": "전망의 실제 적중 여부와 설명한 원인의 타당성 모두 판단을 보류해야 한다."
+    }
+  ],
+  "entities": [
+    {
+      "ticker": "^KS11",
+      "name": "코스피·코스피200 선물",
+      "status": "unverified",
+      "claims": [
+        "야간 코스피200 선물 상승을 근거로 코스피 상승 출발을 예상한다.",
+        "외국인의 대형 반도체주 매도가 지수 하락을 주도하며, 순매수 전환 시 추가 상승이 가능하다고 주장한다."
+      ],
+      "numeric_claims": [
+        "전날 코스피가 3% 이상 하락했다고 설명한다.",
+        "코스피200 선물은 한때 3% 이상 상승한 뒤 1.7% 상승 마감했다고 설명한다.",
+        "예상 개장 상단 2,570선이 전날 종가 수준이라고 언급한다."
+      ],
+      "verification_notes": [
+        "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+      ],
+      "market_snapshot": {
+        "ticker": "^KS11",
+        "as_of": "2026-11-04T22:48:46.278548+00:00",
+        "current_price": 5683.8,
+        "market_cap": null,
+        "forward_pe": null,
+        "trailing_pe": null,
+        "fifty_two_week_high": 9385.59,
+        "fifty_two_week_low": 0.0,
+        "average_target_price": null,
+        "source": "yfinance",
+        "status": "verified"
+      },
+      "external_context_status": "verified"
+    },
+    {
+      "ticker": "AMD",
+      "name": "AMD",
+      "status": "unverified",
+      "claims": [
+        "데이터센터 매출 증가와 시장 예상을 웃도는 다음 분기 매출 전망을 데이터센터 칩 사업 호황의 근거로 제시한다."
+      ],
+      "numeric_claims": [
+        "선물시장 마감 후 오전 6시 15분에 3분기 실적을 발표했다고 설명한다.",
+        "데이터센터 매출이 전년 대비 거의 두 배 증가했다고 설명한다.",
+        "오전 6시 20분 현재 시간외 주가가 7% 상승했다고 언급한다."
+      ],
+      "verification_notes": [
+        "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+      ],
+      "market_snapshot": {
+        "ticker": "AMD",
+        "as_of": "2026-11-04T22:48:47.047625+00:00",
+        "current_price": 488.7799987792969,
+        "market_cap": 797921149035.9927,
+        "forward_pe": 30.042128,
+        "trailing_pe": 124.688774,
+        "fifty_two_week_high": 658.52,
+        "fifty_two_week_low": 188.22,
+        "average_target_price": 648.2375,
+        "source": "yfinance",
+        "status": "verified"
+      },
+      "external_context_status": "verified"
+    }
+  ],
+  "evidence": [
+    {
+      "evidence_id": "E1",
+      "claim_id": "C2",
+      "title": "Reynolds Consumer Products Q3 Earnings Call Highlights",
+      "source_url": "https://finance.yahoo.com/markets/stocks/articles/reynolds-consumer-products-q3-earnings-191454502.html",
+      "publisher": "MarketBeat",
+      "published_at": "2026-11-04T19:14:54+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "Reynolds Consumer Products Q3 Earnings Call Highlights Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 2026 Elections Weather Newsletters Fin..."
+    },
+    {
+      "evidence_id": "E2",
+      "claim_id": "C2",
+      "title": "BC-Sugar Futures",
+      "source_url": "https://finance.yahoo.com/markets/commodities/articles/bc-sugar-futures-150033833.html",
+      "publisher": "Associated Press",
+      "published_at": "2026-11-04T15:00:33+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "BC-Sugar Futures Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 2026 Elections Weather Newsletters Finance My portfolio News Markets Researc..."
+    },
+    {
+      "evidence_id": "E4",
+      "claim_id": "C3",
+      "title": "What Ball (BALL) Said on Its Q3 Earnings Call",
+      "source_url": "https://finance.yahoo.com/markets/stocks/articles/ball-ball-said-q3-earnings-221417755.html",
+      "publisher": "MarketBeat",
+      "published_at": "2026-11-03T22:14:17+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "What Ball (BALL) Said on Its Q3 Earnings Call Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 2026 Elections Weather Newsletters Finance My p..."
+    },
+    {
+      "evidence_id": "E5",
+      "claim_id": "C5",
+      "title": "Dow Jones Futures: Elections, Plunging Oil Fuel Big Rally; Apple, Microsoft, Amazon Flash Buy Signals. CoreWeave, SpaceX Skid.",
+      "source_url": "https://finance.yahoo.com/m/a147bf9a-4218-3171-97a4-fb80fda211eb/dow-jones-futures%3A-elections%2C.html",
+      "publisher": "Investor's Business Daily",
+      "published_at": "2026-11-04T22:29:27+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    },
+    {
+      "evidence_id": "E6",
+      "claim_id": "C5",
+      "title": "Stock Market Today, Nov. 4: Amazon Jumps 6% From New Perspective on AWS Growth and AI Strategy Following Election Results",
+      "source_url": "https://finance.yahoo.com/markets/stocks/articles/stock-market-today-nov-4-221328496.html",
+      "publisher": "Motley Fool",
+      "published_at": "2026-11-04T22:13:28+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    },
+    {
+      "evidence_id": "E8",
+      "claim_id": "C8",
+      "title": "SpaceX, Tesla, Micron, AMD, Lockheed, CVS, DJT, and More Stocks That Explain Today’s Market",
+      "source_url": "https://finance.yahoo.com/m/a945593c-d697-3ab1-a864-eea8376eb6d4/spacex%2C-tesla%2C-micron%2C-amd%2C.html",
+      "publisher": "Barrons.com",
+      "published_at": "2026-11-04T21:51:00+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    },
+    {
+      "evidence_id": "E9",
+      "claim_id": "C8",
+      "title": "Stock Market Today: Dow Soars 1,569 Points In postelection Rally; Microsoft Leaps Nearly 7% Off New Entry",
+      "source_url": "https://finance.yahoo.com/m/762d358c-ec5a-3821-a3f9-e47c4e4c3f0c/stock-market-today%3A-dow-soars.html",
+      "publisher": "Investor's Business Daily",
+      "published_at": "2026-11-04T21:47:54+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    },
+    {
+      "evidence_id": "E11",
+      "claim_id": "C11",
+      "title": "Lundin Mining Reports Third Quarter 2026 Results, Delivering Strong Financial Performance Amidst Record Copper Prices",
+      "source_url": "https://finance.yahoo.com/markets/commodities/articles/lundin-mining-reports-third-quarter-223000734.html",
+      "publisher": "CNW Group",
+      "published_at": "2026-11-04T22:30:00+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    },
+    {
+      "evidence_id": "E12",
+      "claim_id": "C11",
+      "title": "Erdene Announces Q3 2026 Results",
+      "source_url": "https://finance.yahoo.com/markets/commodities/articles/erdene-announces-q3-2026-results-221500509.html",
+      "publisher": "GlobeNewswire",
+      "published_at": "2026-11-04T22:15:00+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    }
+  ],
+  "source_policy": {
+    "raw_transcript_published": false,
+    "raw_transcript_in_evidence": false,
+    "research_pipeline_version": 4,
+    "closed_source_claims": "unverified_external_source",
+    "auto_caption_warning": true,
+    "local_asr_warning": false
+  }
+}
