@@ -26,6 +26,25 @@ _MASTER = {
 }
 _TAIL_FIELDS = {"kospi": (105, 113, 67), "kosdaq": (100, 108, 62)}
 _REVIEWED = {
+    "396470.KQ": {
+        "symbol": "396470.KQ", "short_code": "396470", "board": "kosdaq",
+        "exchange": "KRX", "currency": "KRW", "isin": "KR7396470007",
+        "issuer": "워트 주식회사", "provider_name": "워트",
+        "security_class": "COMMON_STOCK", "event_kind": "IPO_FIRST_REGULAR_COMMON_STOCK",
+        "first_regular_session": "2023-10-26",
+        "evidence_available_at": "2026-11-06T16:28:14.733134+00:00",
+        "sources": [
+            {"url": "https://kind.krx.co.kr/external/2026/03/18/000105/20260318000362/11011.htm",
+             "sha256": "b6a0eaa923624e8f8976f19fada8aec39acd73aed323dd0b6e5cce9af614ea91",
+             "role": "ISSUER_FILED_KOSDAQ_FIRST_LISTING_DATE"},
+            {"url": "https://kind.krx.co.kr/external/2023/10/31/000530/20231031001094/00636.htm",
+             "sha256": "35999466b0be7cf1c22749ee3df4a5a537935639bd071a2261f1a8bdf30b4947",
+             "role": "FILED_COMMON_SHARE_LISTING_EVENT_CORROBORATION"},
+            {"url": "https://new.real.download.dws.co.kr/common/master/kosdaq_code.mst.zip",
+             "sha256": "7854414b516046d63f99903ec08ffec0616f7d2a8869bab6f15f6ce304f3df1b",
+             "role": "REVIEWED_CURRENT_MASTER_IDENTITY_NOT_HISTORICAL_LISTING"},
+        ],
+    },
     "278470.KS": {
         "symbol": "278470.KS", "short_code": "278470", "board": "kospi",
         "exchange": "KRX", "currency": "KRW", "isin": "KR7278470000",

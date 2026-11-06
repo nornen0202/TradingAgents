@@ -567,10 +567,10 @@ def test_mobile_build_writes_plaintext_action_strategy_without_raw_account_ids(
     assert "BLOCKED_STALE" not in private_js
     assert "AES" not in private_html
     assert "복호화" not in private_html
-    assert "guardrails.expired_at_build" in private_js
-    assert "!Number.isFinite(marketValid)" in private_js
+    assert "expired_at_build === true" in private_js
+    assert "marketDataDeadline(item) > Date.now()" in private_js
     assert "!Number.isFinite(valid)" in private_js
-    assert "sourceHealth !== 'OK'" in private_js
+    assert "item.source_health !== 'OK'" in private_js
     assert "coverage.status === 'COMPLETE'" in private_js
     assert "accountReady" in private_js
     assert "quality.decision_ready === true" in private_js
@@ -588,7 +588,7 @@ def test_mobile_build_writes_plaintext_action_strategy_without_raw_account_ids(
     assert "알 수 없는 Work 준비 상태" in private_js
     assert "function marketHealth(item, rows)" in private_js
     assert "className: 'missing', label: '전략 행 없음'" in private_js
-    assert "className: 'degraded', label: expired ? '주문 전 실시간 확인'" in private_js
+    assert "className: 'degraded', label: '장중 적용 보류'" in private_js
     assert "CHATGPT WORK · 분석 시점 참고 전략" in private_js
     assert "CHATGPT WORK · 통합 전략" in private_js
     assert "외부 근거 포함·누락 영수증" in private_js

@@ -12,11 +12,12 @@ from tradingagents.dataflows.daily_history_selection import activate_daily_histo
 from tradingagents.dataflows.vendor_exceptions import VendorInputError, VendorMalformedResponseError
 
 
-NOW = datetime(2026, 10, 29, 9, 0, tzinfo=timezone.utc)
+NOW = datetime(2026, 11, 7, 0, 0, tzinfo=timezone.utc)
 START, END = "2021-10-28", "2026-10-28"
 CASES = [("179880.KQ", "2026-10-15", "KR7179880000"),
          ("443670.KQ", "2024-02-15", "KR7443670005"),
-         ("419050.KQ", "2023-02-03", "KR7419050000")]
+         ("419050.KQ", "2023-02-03", "KR7419050000"),
+         ("396470.KQ", "2023-10-26", "KR7396470007")]
 
 
 def metadata(symbol, now=NOW):
@@ -46,7 +47,7 @@ def clock(monkeypatch):
         monkeypatch.setattr(module, "datetime", Clock)
     kr._CACHE.clear()
     token = activate_daily_history_selection()
-    with run_config({"analysis_as_of": "2026-10-29"}):
+    with run_config({"analysis_as_of": "2026-11-07"}):
         yield
     reset_daily_history_selection(token)
     kr._CACHE.clear()

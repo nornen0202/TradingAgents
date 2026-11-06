@@ -1860,16 +1860,53 @@ _PRIVATE_JS = READER_JS + r"""
       && runId !== ''
       && boundRunIds.every((value) => value === runId);
   }
+  function sourceTime(value) {
+    if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/.test(value)) return NaN;
+    const day = new Date(value.slice(0, 10) + 'T00:00:00Z');
+    return Number.isFinite(day.getTime()) && day.toISOString().startsWith(value.slice(0, 10)) ? Date.parse(value) : NaN;
+  }
+  function marketDataDeadline(item) {
+    const receipt = item.freshness_receipt || {};
+    const oldest = sourceTime(receipt.market_data_oldest_at);
+    const latest = sourceTime(receipt.market_data_latest_at);
+    const maxAge = receipt.execution_max_age_seconds;
+    if (receipt.market_data_status !== 'FRESH' || !(oldest <= latest && latest <= Date.now())
+        || !Number.isFinite(maxAge) || maxAge <= 0) return NaN;
+    return Math.min(sourceTime((item.guardrails || {}).valid_until), oldest + Math.min(maxAge, 600) * 1000);
+  }
+  function analysisVerified(item) {
+    const attempt = item.latest_attempt || {};
+    const complete = item.latest_completed_analysis || {};
+    const started = sourceTime(attempt.started_at);
+    const finished = sourceTime(complete.finished_at);
+    return Boolean(attempt.run_id && attempt.run_id === complete.run_id
+      && complete.run_id === (item.freshness_receipt || {}).analysis_run_id
+      && String(attempt.status).toUpperCase() === 'SUCCESS'
+      && String(complete.status).toUpperCase() === 'SUCCESS'
+      && started <= finished && finished <= Date.now());
+  }
+  function marketExecutionBlocked(item) {
+    return !analysisVerified(item) || item.source_health !== 'OK'
+      || (item.universe_coverage || {}).complete !== true
+      || (item.guardrails || {}).expired_at_build === true || !(marketDataDeadline(item) > Date.now());
+  }
+  function planAccountDeadline(item) {
+    const plan = item.trade_plan || {};
+    const receipt = item.freshness_receipt || {};
+    const account = sourceTime(plan.account_asof);
+    return plan.account_fresh === true && receipt.account_snapshot_health === 'VALID'
+      && account === sourceTime(receipt.account_as_of) && account <= Date.now()
+      ? account + 86400000 : NaN;
+  }
+  function planBlocked(item) {
+    return marketExecutionBlocked(item) || !(planAccountDeadline(item) > Date.now());
+  }
   function baseLiveReadiness(row, market) {
     const quality = row.quality || {};
-    const sourceHealth = String((market || {}).source_health || 'MISSING').toUpperCase();
-    const guardrails = (market || {}).guardrails || {};
-    const marketValid = Date.parse(guardrails.valid_until || '');
-    if (sourceHealth !== 'OK') return {code: 'RECHECK', label: '주문 전 실시간 확인', note: '원천 데이터 상태를 다시 확인하세요.'};
-    if (guardrails.expired_at_build === true || !Number.isFinite(marketValid) || marketValid <= Date.now()) {
-      return {code: 'RECHECK', label: '주문 전 실시간 확인', note: '분석 시점 이후 가격이 변했을 수 있습니다.'};
+    if (marketExecutionBlocked(market)) {
+      return {code: 'RECHECK', label: '장중 적용 보류', note: '최신 전체 분석과 시세가 확인되면 장중 조건을 다시 평가합니다.'};
     }
-    const valid = Date.parse(quality.row_valid_until || '');
+    const valid = sourceTime(quality.row_valid_until);
     if (quality.expired_at_build === true || !Number.isFinite(valid) || valid <= Date.now()) {
       return {code: 'RECHECK', label: '주문 전 실시간 확인', note: '이 종목의 실시간 조건을 다시 확인하세요.'};
     }
@@ -2106,13 +2143,14 @@ _PRIVATE_JS = READER_JS + r"""
     const role = normalizeRole(row.universe_role || row.portfolio_role, row.is_held === true);
     const baseConclusion = valueText(row.strategy_ko) || (action.action_now ? actionLabel(action.action_now) : '');
     const direction = analysisDirection(row, strategy);
-    const executionAction = currentExecutionAction(row, action);
+    const sizingBlocked = planBlocked(market) || readinessSeverity(readiness.code) >= readinessSeverity('RECHECK');
+    const executionAction = sizingBlocked ? '현재 주문 없음 · 장중 조건 재확인' : currentExecutionAction(row, action);
     const guidance = accountGuidance(row, action);
     const workEntryConditions = fullConditions(thesis.entry_conditions);
     const riskDirected = ['SELL', 'REDUCE', 'AVOID'].includes(row.strategy_code);
     const baseEntryConditions = fullConditions(row.execution_condition_ko, riskDirected ? null : action.trigger_conditions);
     const entryCondition = (hasThesis ? workEntryConditions : baseEntryConditions) || '조건 정보 없음';
-    const triggeredAction = strategyActivationAction(thesis, workExecution, action, hasThesis);
+    const triggeredAction = sizingBlocked ? '최신 시세·계좌 확인 후 재산정' : strategyActivationAction(thesis, workExecution, action, hasThesis);
     const workInvalidation = fullConditions(thesis.invalidation_conditions);
     const baseInvalidation = fullConditions(row.risk_condition_ko, action.invalidation_condition, action.risk_condition);
     const invalidation = fullConditions(row.risk_condition_ko, hasThesis ? workInvalidation : baseInvalidation) || '무효화 조건 정보 없음';
@@ -2150,7 +2188,7 @@ _PRIVATE_JS = READER_JS + r"""
     return `<article class="action-card" id="strategy-${esc(marketId)}-${esc(encodeURIComponent(tickerIdentity))}" tabindex="-1" data-ticker="${esc(tickerIdentity)}" data-name="${esc(displayName)}" data-direction="${esc(direction.kind)}" data-search="${esc(`${displayName} ${row.ticker || ''} ${row.sector || ''}`.toLocaleLowerCase())}" data-change="${numeric(row.price_change_pct)}" data-readiness="${esc(readiness.code)}" data-group="${esc(role)}" data-top="${topTickers.has(tickerIdentity) ? 'true' : 'false'}">
       <button type="button" class="back-to-overview">↑ 전략 요약표로</button>
       <div class="card-title"><div><strong>${esc(displayName)} <span class="role-badge">${esc(roleLabel(role))}</span></strong><span class="ticker-code">${esc(row.ticker || '-')}</span></div><span class="row-mode mode-${esc(readiness.code.toLowerCase())}">${esc(readiness.label)}</span></div>
-      <div class="price-line"><strong>${fmt(row.last_price)}</strong><span>시세 ${esc(dateTime(row.market_data_asof || workExecution.as_of))}</span></div>
+      <div class="price-line"><strong>${fmt(row.last_price)}</strong><span>입력 시세 ${esc(dateTime(row.market_data_asof || workExecution.as_of))}${sizingBlocked ? ' · 분석 참고' : ''}</span></div>
       <div class="private-action" data-direction="${esc(direction.kind)}"><strong>분석 시점 전략 방향</strong><span class="strategy-direction">${esc(direction.text)}</span></div>
       ${axes}
       <div class="execution-status"><div><strong>현재 실행 상태·행동</strong><span class="row-mode mode-${esc(readiness.code.toLowerCase())}">${esc(readiness.label)}</span></div><span class="execution-action">${esc(executionAction)}</span><p class="readiness-note">${esc(readiness.note)}</p></div>
@@ -2173,9 +2211,9 @@ _PRIVATE_JS = READER_JS + r"""
       <details><summary>금액·비중·출처 세부 보기</summary><dl>
         <div><dt>근거 수집 상태</dt><dd>${esc(sources || '미확인')}</dd></div>
         <div><dt>시세 공급자 제한</dt><dd>${esc(valueText((row.quality || {}).provider_limitations) || '제공 정보 없음')}</dd></div>
-        <div><dt>현재 증감</dt><dd>${esc(won(action.delta_krw_now))}</dd></div>
+        ${sizingBlocked ? '' : `<div><dt>현재 증감</dt><dd>${esc(won(action.delta_krw_now))}</dd></div>
         <div><dt>조건부 증감</dt><dd>${esc(won(action.delta_krw_if_triggered))}</dd></div>
-        <div><dt>목표 비중</dt><dd>${esc(percent(action.target_weight_now ?? action.target_weight_if_triggered))}</dd></div>
+        <div><dt>목표 비중</dt><dd>${esc(percent(action.target_weight_now ?? action.target_weight_if_triggered))}</dd></div>`}
         <div><dt>이익 실현 계획</dt><dd>${esc(humanPlan(action.profit_taking_plan) || '-')}</dd></div>
       </dl><div class="source-chips">${sourceChips(strategy.source_contributions)}</div></details>
     </article>`;
@@ -2205,11 +2243,10 @@ _PRIVATE_JS = READER_JS + r"""
   }
   function attemptStatus(item) {
     const attempt = item.latest_attempt || {};
-    if (!attempt.run_id) return '';
     const labels = {SUCCESS: '완료', FAILED: '실패', FAILURE: '실패', INTERRUPTED: '연결 중단·심박 만료', RUNNING: '진행 중', PARTIAL_FAILURE: '일부 실패', UNVERIFIED: '확인 필요'};
     const complete = item.latest_completed_analysis || {};
     const status = String(attempt.status || 'UNVERIFIED').toUpperCase();
-    return `<p class="analysis-attempt ${status === 'SUCCESS' ? 'readiness-note' : 'expiry-warning'}">최근 전체 분석 시도(사이트 생성 시점): ${esc(labels[status] || status)} · 시작 ${esc(dateTime(attempt.started_at))}<br>현재 참조하는 전체 분석: ${esc(complete.run_id || '미확인')} · 완료 ${esc(dateTime(complete.finished_at))}</p>`;
+    return `<p class="analysis-attempt ${analysisVerified(item) ? 'readiness-note' : 'expiry-warning'}">최근 전체 분석 시도(사이트 생성 시점) · ${esc(labels[status] || '확인 필요')} · 시작 ${esc(dateTime(attempt.started_at))}<br>페이지가 참조하는 전체 분석 · ${esc(complete.run_id || '미확인')} · 완료 ${esc(dateTime(complete.finished_at))}</p>`;
   }
   function evidenceAudit(sourceSummary) {
     const receipt = ((sourceSummary || {}).external_evidence_receipt || {});
@@ -2253,6 +2290,7 @@ _PRIVATE_JS = READER_JS + r"""
       <p class="eyebrow">${isReference ? 'CHATGPT WORK · 분석 시점 참고 전략' : 'CHATGPT WORK · 통합 전략'}</p>
       <h3>${esc(title)}</h3>
       ${isReference ? '<p class="expiry-warning">이 Work 내용은 과거 분석 시점의 참고 보고서입니다. 현재 카드의 방향·순위·분류에는 적용하지 않습니다.</p>' : ''}
+      ${isReference ? '' : '<p class="expiry-warning report-snapshot-warning" hidden>장중 적용 보류 중입니다. 이 보고서의 가격·수량은 분석 시점 참고값입니다.</p>'}
       ${analysisOnly ? '<p class="readiness-note">Work 종합 전략 전문과 투자 논지·순위·출처를 유지했습니다. 핵심 액션은 분석 시점 참고이며, 카드의 실행 행동과 준비 상태는 현재 장중 갱신 분석을 사용합니다.</p>' : ''}
       <div class="source-meta"><span>입력 시세 기준 ${esc(dateTime(structured.as_of))}</span><span>Work 게시 ${esc(dateTime(report.published_at || structured.generated_at))}</span></div>
       ${summary ? `<p class="summary">${esc(summary)}</p>` : ''}
@@ -2270,8 +2308,6 @@ _PRIVATE_JS = READER_JS + r"""
     const sourceHealth = String((item || {}).source_health || 'MISSING').toUpperCase();
     const sourceStatus = String(((item || {}).source || {}).status || (item || {}).manifest_status || '').toLowerCase();
     const coverage = (item || {}).universe_coverage || (item || {}).coverage || {};
-    const validUntil = Date.parse(((item || {}).guardrails || {}).valid_until || '');
-    const expired = ((item || {}).guardrails || {}).expired_at_build === true || !Number.isFinite(validUntil) || validUntil <= Date.now();
     if (!rows.length) return {className: 'missing', label: '전략 행 없음', empty: '현재 확인 가능한 전략 행이 없습니다. 분석 커버리지가 복구된 뒤 다시 확인하세요.'};
     if (sourceHealth === 'MISSING' || sourceHealth === 'FAILED' || ['failed', 'error'].includes(sourceStatus)) {
       return {className: 'missing', label: '원천 분석 사용 불가', empty: '원천 분석을 사용할 수 없어 현재 전략을 실행 판단에 쓰지 마세요.'};
@@ -2279,8 +2315,8 @@ _PRIVATE_JS = READER_JS + r"""
     if (coverage.status !== 'COMPLETE' || coverage.complete !== true) {
       return {className: 'missing', label: '커버리지 불완전', empty: '필수 종목 분석이 불완전합니다. 누락 분석이 복구될 때까지 기다리세요.'};
     }
-    if (sourceHealth !== 'OK' || expired) {
-      return {className: 'degraded', label: expired ? '주문 전 실시간 확인' : '원천 상태 재확인', empty: ''};
+    if (planBlocked(item)) {
+      return {className: 'degraded', label: '장중 적용 보류', empty: ''};
     }
     if (immediateContractComplete(item)) return {className: 'ok', label: '실행 데이터 확인됨', empty: ''};
     return {className: 'degraded', label: '전략 제공 · 주문 전 확인', empty: ''};
@@ -2348,7 +2384,7 @@ const groups = ['TOP', 'HOLDING', 'WATCHLIST', 'NEW_CANDIDATE', 'ALL'];
   }
   function fundedRebalance(item) {
     const plan = item.funded_rebalance;
-    if (!plan) return '';
+    if (!plan || planBlocked(item)) return '';
     let body = '<p>' + esc(plan.reason || '동일 실행의 계좌와 가격을 확인합니다.') + '</p>';
     if (plan.cash_ledger) {
       const c = plan.cash_ledger;
@@ -2380,8 +2416,14 @@ const groups = ['TOP', 'HOLDING', 'WATCHLIST', 'NEW_CANDIDATE', 'ALL'];
     const readiness = entry.querySelector('.card-title .row-mode').textContent;
     const inputPrice = entry.querySelector('.price-line strong').textContent;
     let plans = tradePlans(item, ticker);
-    if (!plans.length) plans = [{phase: 'OBSERVE', action: 'WAIT', quantity: null, currency: panelCurrency(item), reasons: ['수량·가격 계획 자료를 다시 생성해야 합니다.'], conditions: []}];
+    const hasPlan = plans.length > 0;
+    if (!hasPlan) plans = [{phase: 'OBSERVE', action: 'WAIT', quantity: null, currency: panelCurrency(item), reasons: ['수량·가격 계획 자료를 다시 생성해야 합니다.'], conditions: []}];
+    const sizingBlocked = planBlocked(item);
+    const rowBlocked = sizingBlocked || ['RECHECK', 'RESEARCH'].includes(entry.dataset.readiness);
+    const planRecheck = (plan) => hasPlan && (rowBlocked || (plan.phase !== 'OBSERVE' && (plan.status === 'RECHECK' || !(sourceTime(plan.valid_until) > Date.now()))));
+    const withheld = '<strong class="plan-value">표시 보류</strong>';
     let quantities = planParts(plans, (plan) => {
+      if (planRecheck(plan)) return withheld;
       const qty = numeric(plan.quantity);
       const valid = Number.isInteger(qty) && qty >= 0;
       const labels = {NO_TRADE_INTENT:'관망·추가 매매 없음', ZERO_ALLOCATION:'추가 배정 없음', CASH_BUFFER_SHORTFALL:'현금 보유 기준 부족', NO_BUYING_POWER:'주문가능금액 없음', ALLOCATION_BELOW_ONE_SHARE:'목표 수량 1주 미만', NO_SELLABLE_WHOLE_SHARE:'매도가능 정수 수량 없음', REMAINING_CASH_BELOW_ONE_SHARE:'잔여 예산 부족'};
@@ -2393,9 +2435,10 @@ const groups = ['TOP', 'HOLDING', 'WATCHLIST', 'NEW_CANDIDATE', 'ALL'];
     });
     const rotation = item.funded_rebalance || {};
     const rotationLeg = [...(rotation.sell_legs || []), ...(rotation.buy_legs || [])].find((leg) => tickerKeys(leg.ticker).some((key) => tickerKeys(ticker).includes(key)));
-    if (rotationLeg) quantities += '<small class="funded-quantity"><a href="#funded-' + esc(String(rotation.market).toLowerCase()) + '">별도 교체안 ' + esc(rotationLeg.side === 'SELL' ? '매도 ' : '매수 ') + esc(rotationLeg.quantity) + '주</a> · 위 계획과 합산 금지</small>';
-    const prices = planParts(plans, (plan) => '<strong class="plan-value">' + esc(planPrice(plan)) + '</strong><small>' + esc(['TRIGGER', 'TRIGGER_RANGE', 'REFERENCE'].includes(plan.price_kind) ? '발동 기준 · 체결 범위 아님' : plan.price_kind === 'NONE' ? '추가 거래 계획 없음' : '분석의 가격 범위') + '</small>' + (plan.price_confirmation ? '<small>확인 방식: ' + esc(({close:'종가 확인', intraday:'장중 확인', two_bar:'2개 봉 확인'})[String(plan.price_confirmation).toLowerCase()] || plan.price_confirmation) + '</small>' : ''));
+    if (rotationLeg && !sizingBlocked) quantities += '<small class="funded-quantity"><a href="#funded-' + esc(String(rotation.market).toLowerCase()) + '">별도 교체안 ' + esc(rotationLeg.side === 'SELL' ? '매도 ' : '매수 ') + esc(rotationLeg.quantity) + '주</a> · 위 계획과 합산 금지</small>';
+    const prices = planParts(plans, (plan) => planRecheck(plan) ? withheld : '<strong class="plan-value">' + esc(planPrice(plan)) + '</strong><small>' + esc(['TRIGGER', 'TRIGGER_RANGE', 'REFERENCE'].includes(plan.price_kind) ? '발동 기준 · 체결 범위 아님' : plan.price_kind === 'NONE' ? '추가 거래 계획 없음' : '분석의 가격 범위') + '</small>' + (plan.price_confirmation ? '<small>확인 방식: ' + esc(({close:'종가 확인', intraday:'장중 확인', two_bar:'2개 봉 확인'})[String(plan.price_confirmation).toLowerCase()] || plan.price_confirmation) + '</small>' : ''));
     const amounts = planParts(plans, (plan) => {
+      if (planRecheck(plan)) return withheld;
       const amount = plan.estimated_net_cash ?? plan.estimated_gross_high;
       const fee = numeric(plan.estimated_fees);
       const costKnown = Number.isFinite(numeric(plan.estimated_net_cash));
@@ -2405,14 +2448,13 @@ const groups = ['TOP', 'HOLDING', 'WATCHLIST', 'NEW_CANDIDATE', 'ALL'];
     });
     const conditions = planParts(plans, (plan) => {
       const quantity = numeric(plan.quantity);
-      const deadline = Date.parse(plan.valid_until || '');
-      const planRecheck = plan.status === 'RECHECK' || !Number.isFinite(deadline) || deadline <= Date.now() || (item.trade_plan || {}).account_fresh !== true;
-      const current = entry.dataset.readiness === 'READY' && plan.phase === 'NOW' && quantity > 0 && plan.status === 'CONDITIONAL' && !planRecheck;
-      const state = current ? '검토 가능 · 주문 전 최종 확인' : plan.phase === 'OBSERVE' ? '현재 주문 없음' : planRecheck || entry.dataset.readiness === 'RECHECK' || entry.dataset.readiness === 'RESEARCH' ? '현재 주문 없음 · 시세·계좌 재확인' : !Number.isFinite(quantity) ? '현재 주문 없음 · 수량 산정 보류' : quantity === 0 ? '현재 주문 없음 · 수량·배정 재검토' : '조건 충족 전 주문 없음';
-      const reasons = fullConditions(plan.reasons);
+      const recheck = planRecheck(plan);
+      const current = entry.dataset.readiness === 'READY' && plan.phase === 'NOW' && quantity > 0 && plan.status === 'CONDITIONAL' && !recheck;
+      const state = current ? '검토 가능 · 주문 전 최종 확인' : plan.phase === 'OBSERVE' ? '현재 주문 없음' : recheck ? '현재 주문 없음 · 최신 자료 재확인' : !Number.isFinite(quantity) ? '현재 주문 없음 · 수량 산정 보류' : quantity === 0 ? '현재 주문 없음 · 수량·배정 재검토' : '조건 충족 전 주문 없음';
+      const reasons = recheck ? '' : fullConditions(plan.reasons);
       const trigger = fullConditions(plan.condition, plan.trigger_conditions);
-      const issue = Array.isArray(plan.reasons) ? plan.reasons[0] : '';
-      return '<span class="plan-status">' + esc(state) + '</span>' + (issue ? '<small>' + esc(issue) + '</small>' : '') + (trigger || reasons ? '<details class="plan-details" data-plan-id="' + esc(plan.id || ticker + ':' + plan.phase) + '"><summary>발동 조건·산출 근거 전체 보기</summary>' + (trigger ? '<span class="plan-condition">' + esc(trigger) + '</span>' : '') + (reasons ? '<small>' + esc(reasons) + '</small>' : '') + (plan.valid_until ? '<small>기한 ' + esc(dateTime(plan.valid_until)) + '</small>' : '') + '</details>' : '');
+      const issue = !recheck && Array.isArray(plan.reasons) ? plan.reasons[0] : '';
+      return '<span class="plan-status">' + esc(state) + '</span>' + (issue ? '<small>' + esc(issue) + '</small>' : '') + (trigger || reasons ? '<details class="plan-details" data-plan-id="' + esc(plan.id || ticker + ':' + plan.phase) + '"><summary>' + (recheck ? '분석 당시 발동 조건 참고' : '발동 조건·산출 근거 전체 보기') + '</summary>' + (trigger ? '<span class="plan-condition">' + esc(trigger) + '</span>' : '') + (reasons ? '<small>' + esc(reasons) + '</small>' : '') + (plan.valid_until ? '<small>기한 ' + esc(dateTime(plan.valid_until)) + '</small>' : '') + '</details>' : '');
     });
     return `<tr data-ticker="${esc(ticker)}"><td class="plan-symbol" data-label="종목"><button type="button" class="summary-detail" data-detail-target="${esc(entry.id)}" aria-label="${esc(entry.dataset.name)} 전략 조건·위험 상세 보기">${esc(entry.dataset.name)}</button><small>${esc(ticker)} · ${esc(roleLabel(entry.dataset.group))}</small><small>입력 시세 ${esc(inputPrice)}${panelCurrency(item) === 'USD' ? ' USD' : '원'}</small></td><td class="plan-action" data-label="전략"><span class="summary-direction" data-direction="${esc(entry.dataset.direction)}">${esc(direction)}</span><small>${esc(readiness)}</small></td><td class="plan-quantity" data-label="검토 수량">${quantities}</td><td class="plan-price" data-label="가격 범위·기준">${prices}</td><td class="plan-amount" data-label="예상 금액">${amounts}</td><td class="plan-check" data-label="발동 조건·현재 상태">${conditions}</td></tr>`;
   }
@@ -2473,8 +2515,14 @@ const groups = ['TOP', 'HOLDING', 'WATCHLIST', 'NEW_CANDIDATE', 'ALL'];
     const health = marketHealth(item, rows);
     panel.querySelector('.market-health').className = 'health market-health health-' + health.className;
     panel.querySelector('.market-health').textContent = health.label;
+    const sizingBlocked = planBlocked(item);
+    panel.querySelector('.execution-warning').hidden = !sizingBlocked;
+    const reportWarning = panel.querySelector('.report-snapshot-warning');
+    if (reportWarning) reportWarning.hidden = !sizingBlocked;
+    panel.querySelector('.plan-method').hidden = sizingBlocked;
     panel.querySelector('.overview-container').innerHTML = marketOverview(rows, item);
     panel.querySelector('.funded-container').innerHTML = fundedRebalance(item);
+    panel.querySelector('.plan-overview-container').innerHTML = sizingBlocked ? '' : planOverview(item.trade_plan);
     panel.querySelector('.cards').innerHTML = ranked.map((row) => card(row, item, topTickers, panel.dataset.market)).join('') || '<p class="empty">' + esc(health.empty || '현재 표시할 전략 데이터가 없습니다.') + '</p>';
     const counts = {TOP: topTickers.size, ALL: rows.length};
     panel.querySelectorAll('.action-card').forEach((entry, index) => {
@@ -2501,14 +2549,19 @@ const groups = ['TOP', 'HOLDING', 'WATCHLIST', 'NEW_CANDIDATE', 'ALL'];
     const sourceLabel = item.integrated_report
       ? item.integrated_report.analysis_only === true ? 'Work 분석 결합 · 현재 실행 우선' : '현재 Work 종합 완료'
       : item.reference_report ? '기본 전략 · 분석 시점 Work 참고' : '기본 전략';
-    panel.innerHTML = '<div class="market-head"><div><p class="eyebrow">' + market.toUpperCase() + ' STRATEGY</p><h2>' + market.toUpperCase() + ' 투자 액션</h2></div><div><span class="health health-neutral">' + sourceLabel + '</span><span class="health market-health"></span></div></div><p class="snapshot-clock">입력 시세 ' + esc(dateTime((item.freshness_receipt || {}).market_data_oldest_at)) + '</p><details class="source-disclosure"><summary>자료 시점·분석 상태 확인</summary>' + attemptStatus(item)
-      + '<div class="source-meta"><span>일봉 가격 기준일 ' + esc((item.freshness_receipt || {}).analysis_trade_date_oldest || '미확인') + '</span><span>시세 기준 ' + esc(dateTime((item.freshness_receipt || {}).market_data_oldest_at)) + '</span><span>계좌 기준 ' + esc(dateTime((item.freshness_receipt || {}).account_as_of)) + '</span><span>자료 갱신 실행 ' + esc(dateTime(item.started_at)) + '</span><span>실행 ID ' + esc(item.run_id || '-') + '</span></div></details><div class="overview-container"></div>'
+    const receipt = item.freshness_receipt || {};
+    panel.innerHTML = '<div class="market-head"><div><p class="eyebrow">' + market.toUpperCase() + ' STRATEGY</p><h2>' + market.toUpperCase() + ' 투자 액션</h2></div><div><span class="health health-neutral">' + sourceLabel + '</span><span class="health market-health"></span></div></div>'
+      + '<p class="snapshot-clock">입력 시세 기준 ' + esc(dateTime(receipt.market_data_oldest_at)) + ' · 입력 계좌 기준 ' + esc(dateTime(receipt.account_as_of)) + '</p>'
+      + attemptStatus(item)
+      + '<p class="expiry-warning execution-warning" role="status" hidden><strong>장중 적용 보류</strong> · 최신 전체 분석, 시세, 계좌가 확인될 때까지 매매 가격·수량·예상 금액 표시를 보류합니다. 아래 전략과 발동 조건은 분석 당시 참고 자료입니다.</p>'
+      + '<details class="source-disclosure"><summary>분석 기준일·갱신 실행 상세</summary>'
+      + '<div class="source-meta"><span>일봉 가격 기준일 ' + esc(receipt.analysis_trade_date_oldest || '미확인') + '</span><span>자료 갱신 실행 ' + esc(dateTime(item.started_at)) + '</span><span>실행 ID ' + esc(item.run_id || '-') + '</span></div></details><div class="overview-container"></div>'
       + '<div class="strategy-toolbar"><label for="search-' + market + '">종목 검색<input id="search-' + market + '" type="search" maxlength="100" placeholder="종목명 · 티커 · 업종" value="' + esc(view.search) + '" autocomplete="off" aria-controls="cards-' + market + '"></label>'
       + '<label for="sort-' + market + '">정렬<select id="sort-' + market + '"><option value="priority">우선순위</option><option value="name">종목명순</option><option value="change">등락률순 ↓</option></select></label></div>'
       + '<nav class="strategy-filters" aria-label="종목 유형">' + groups.map((group, index) => '<button type="button" data-group-target="' + group + '" data-label="' + ['핵심','보유','관심','신규','전체'][index] + '" aria-pressed="false"></button>').join('') + '</nav>'
       + '<p class="result-count" role="status" aria-live="polite" aria-atomic="true"></p>'
-      + '<div class="funded-container">' + fundedRebalance(item) + '</div>'
-      + '<section class="strategy-summary" id="summary-' + market + '" tabindex="-1"><h3>전체 전략 한눈에</h3><p class="readiness-note">매매 전략표 · 수량 → 가격 → 발동 조건 순서로 확인하세요. 종목명을 누르면 상세 근거가 열립니다.</p><p class="plan-source-note">' + esc((item.trade_plan || {}).account_asof ? '수량 기준 계좌 ' + dateTime(item.trade_plan.account_asof) : '수량 기준 계좌 확인 불가') + ' · KR 원화 / US 달러</p>' + planOverview(item.trade_plan) + '<details class="plan-method"><summary>수량·비용 계산 기준</summary><p>' + esc(fullConditions((item.trade_plan || {}).assumptions) || '정수 수량과 수수료를 반영한 검토안입니다. 자료가 부족하면 수량·가격을 임의로 만들지 않습니다.') + '</p><p>조건부 계획은 현재 주문과 구분합니다. 여러 계획은 동시에 실행하는 주문 묶음이 아닙니다. 매도 예정 대금을 미리 매수 예산으로 쓰지 않으며, 종목별 상세 근거와 현재 상태를 함께 확인하세요.</p></details><div class="filter-empty" hidden><p>검색 조건에 맞는 종목이 없습니다.</p><button type="button" class="reset-filters">검색·필터 초기화</button></div><div class="summary-scroll" role="region" aria-label="종목별 매매 전략표 · 스크롤하여 전체 보기" tabindex="0"><table><thead><tr><th scope="col">종목</th><th scope="col">전략</th><th scope="col">검토 수량</th><th scope="col">가격 범위·기준</th><th scope="col">예상 금액</th><th scope="col">발동 조건·현재 상태</th></tr></thead><tbody></tbody></table></div></section>'
+      + '<div class="funded-container"></div>'
+      + '<section class="strategy-summary" id="summary-' + market + '" tabindex="-1"><h3>전체 전략 한눈에</h3><p class="readiness-note">종목명을 누르면 상세 근거가 열립니다.</p><p class="plan-source-note">' + esc((item.trade_plan || {}).account_asof ? '수량 기준 계좌 ' + dateTime(item.trade_plan.account_asof) : '수량 기준 계좌 확인 불가') + ' · KR 원화 / US 달러</p><div class="plan-overview-container"></div><details class="plan-method"><summary>수량·비용 계산 기준</summary><p>' + esc(fullConditions((item.trade_plan || {}).assumptions) || '정수 수량과 수수료를 반영한 검토안입니다.') + '</p><p>조건부 계획은 현재 주문과 구분합니다. 여러 계획은 동시에 실행하는 주문 묶음이 아닙니다. 매도 예정 대금을 미리 매수 예산으로 쓰지 않으며, 종목별 상세 근거와 현재 상태를 함께 확인하세요.</p></details><div class="filter-empty" hidden><p>검색 조건에 맞는 종목이 없습니다.</p><button type="button" class="reset-filters">검색·필터 초기화</button></div><div class="summary-scroll" role="region" aria-label="종목별 매매 전략표 · 스크롤하여 전체 보기" tabindex="0"><table><thead><tr><th scope="col">종목</th><th scope="col">전략</th><th scope="col">검토 수량</th><th scope="col">가격 범위·기준</th><th scope="col">예상 금액</th><th scope="col">발동 조건·현재 상태</th></tr></thead><tbody></tbody></table></div></section>'
       + '<div class="cards" id="cards-' + market + '"></div>' + integratedReport(item) + integratedReport(item, 'reference_report');
     const search = panel.querySelector('input');
     const sort = panel.querySelector('select');
@@ -2560,8 +2613,10 @@ const groups = ['TOP', 'HOLDING', 'WATCHLIST', 'NEW_CANDIDATE', 'ALL'];
     clearTimeout(expiryTimer);
     const now = Date.now();
     const deadlines = Object.values(currentPayload.markets).flatMap((item) => [
-      Date.parse((item.guardrails || {}).valid_until || ''),
-      ...(item.rows || []).map((row) => Date.parse((row.quality || {}).row_valid_until || '')),
+      marketDataDeadline(item),
+      planAccountDeadline(item),
+      ...(item.rows || []).map((row) => sourceTime((row.quality || {}).row_valid_until)),
+      ...(Array.isArray(item.trade_plan?.rows) ? item.trade_plan.rows : []).map((plan) => sourceTime(plan?.valid_until)),
     ]).filter((deadline) => Number.isFinite(deadline) && deadline > now);
     if (deadlines.length) expiryTimer = setTimeout(refreshExpiry, Math.min(2147483647, Math.max(50, Math.min(...deadlines) - now + 50)));
   }
@@ -2669,7 +2724,8 @@ def _llms_text(*, public_base_url: str, generated_at: str) -> str:
         f"Site build time: {generated_at}\n\n"
         "The HTML is a human-readable view of the same public JSON. `as_of` is the "
         "oldest input quote time in Work reports; the freshness receipt separately records the original research trade date, quote range and account snapshot. `generated_at`/`published_at` identify report publication. "
-        "Do not infer current order eligibility from an old analysis timestamp.\n\n"
+        "Strategy JSON trade plans and funded rebalances are point-in-time review estimates. Their prices and quantities do not authorize orders. "
+        "Verify that the latest full analysis matches the completed analysis, and that the input quote, account and validity clocks are current.\n\n"
         f"{rendered}\n\n"
         "Mutable latest URLs may be cached. Resolve the public-context Git ref with a new request_id for every execution, then read manifest.json and market/latest.txt + latest.json at that immutable commit. Verify hashes and all original timestamps.\n"
         "https://api.github.com/repos/nornen0202/TradingAgents/git/ref/heads/public-context\n"
