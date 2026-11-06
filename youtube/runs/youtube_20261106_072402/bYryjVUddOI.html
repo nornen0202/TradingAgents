@@ -1,0 +1,585 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YouTube 투자자용 검증 리포트 - 220년 전통 스위스 프라이빗 뱅크가 본 부자들의 자산관리 원칙</title>
+  <style>
+:root {
+  color-scheme: light;
+  --bg: #f7f8fb;
+  --panel: #ffffff;
+  --text: #172033;
+  --muted: #667085;
+  --line: #d9dee8;
+  --accent: #0f766e;
+  --accent-2: #2563eb;
+  --warn: #b45309;
+  --bad: #b42318;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0 56px; }
+a { color: var(--accent-2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.hero { padding: 28px 0 22px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+.hero.compact { padding-top: 12px; }
+.hero h1 { margin: 0; font-size: clamp(28px, 4vw, 44px); line-height: 1.15; letter-spacing: 0; }
+.hero p { max-width: 760px; color: var(--muted); margin: 12px 0 0; }
+.eyebrow { color: var(--accent); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0; margin: 0 0 8px; }
+section { margin: 28px 0; }
+h2, h3, h4, h5 { letter-spacing: 0; line-height: 1.25; }
+.synthesis-callout { padding: clamp(20px, 4vw, 34px); border: 1px solid #6ee7d8; border-radius: 18px; background: linear-gradient(135deg, #ecfdf9 0%, #eff6ff 100%); box-shadow: 0 18px 44px rgba(15, 118, 110, .12); }
+.synthesis-callout.unavailable { border-color: var(--line); background: var(--panel); box-shadow: none; }
+.synthesis-callout h2 { margin: 0; font-size: clamp(24px, 3.2vw, 36px); }
+.synthesis-callout .lead { max-width: 900px; font-size: 17px; color: #334155; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.primary-link, .secondary-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border-radius: 999px; font-weight: 800; }
+.primary-link { color: white; background: var(--accent); }
+.secondary-link { color: var(--accent-2); border: 1px solid #93c5fd; background: white; }
+.primary-link:hover, .secondary-link:hover { text-decoration: none; filter: brightness(.97); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.card, .run { display: flex; flex-direction: column; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; color: var(--text); min-height: 128px; }
+.run { padding: 16px; }
+.card:hover, .run:hover { border-color: var(--accent-2); text-decoration: none; }
+.thumb { display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #e9edf5; border-radius: 8px 8px 0 0; color: var(--muted); font-size: 13px; font-weight: 700; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb-empty span { padding: 0 14px; text-align: center; }
+.card-body { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 16px; }
+.card strong { line-height: 1.35; }
+.source-line { color: #3f4a5f; font-weight: 600; }
+.runs { display: grid; gap: 10px; }
+.badge { display: inline-flex; width: fit-content; border-radius: 999px; padding: 2px 9px; background: #e6f4f1; color: var(--accent); font-size: 12px; font-weight: 700; }
+.status-contradicted, .status-llm_failed { background: #fee4e2; color: var(--bad); }
+.status-unverified, .status-stale { background: #fff4d6; color: var(--warn); }
+small, .muted { color: var(--muted); }
+.topnav { display: flex; gap: 14px; margin-bottom: 16px; font-size: 14px; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px; }
+.stats span { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
+.report { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: min(5vw, 36px); }
+.report-head { border-bottom: 1px solid var(--line); margin-bottom: 24px; padding-bottom: 20px; }
+.report-head h1 { margin: 0; font-size: clamp(24px, 3.5vw, 38px); line-height: 1.2; }
+.meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+.scope-note { padding: 12px 14px; border-left: 4px solid var(--warn); border-radius: 6px; background: #fff7ed; color: #7c2d12; }
+.synthesis-report h2 { margin-top: 34px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.synthesis-report h3 { margin: 24px 0 8px; color: #0f4c5c; }
+.synthesis-report p, .synthesis-report li { overflow-wrap: anywhere; }
+pre { overflow: auto; background: #111827; color: #f9fafb; border-radius: 8px; padding: 14px; }
+code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+details { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 18px; }
+@media (max-width: 640px) {
+  main { width: min(100% - 20px, 1120px); padding-top: 18px; }
+  .report { padding: 18px; }
+  .synthesis-callout { border-radius: 14px; padding: 18px; }
+  .cta-row a { width: 100%; }
+  .mobile-report { border-radius: 12px; }
+}
+</style>
+</head>
+<body>
+  <main>
+<nav class="topnav"><a href="index.html">실행 목록</a><a href="../../index.html">YouTube 홈</a></nav>
+<article class="report">
+  <header class="report-head">
+    <p class="eyebrow">youtube_20261106_072402</p>
+    <h1>220년 전통 스위스 프라이빗 뱅크가 본 부자들의 자산관리 원칙</h1>
+    <div class="meta">
+      <span class="badge status-asr_uncertain">asr_uncertain</span>
+      <a href="https://www.youtube.com/watch?v=bYryjVUddOI">원본 영상</a>
+    </div>
+  </header>
+  <h2>장기 자산관리 원칙과 AI·토큰화·한국 주식 전망</h2>
+<p><strong>분석 대상:</strong> <a href="https://www.youtube.com/watch?v=bYryjVUddOI">PLUS TV 영상</a>, 2026년 11월 5일 게시, 30분 27초. 촬영일은 확인되지 않았다.</p>
+<h3>1. 핵심 판단</h3>
+<p>영상의 중심은 특정 종목 추천이 아니라 <strong>세대 간 부의 보존을 위한 위험관리와 장기 투자 관점</strong>이다. 출연자는 AI의 이익 확대, 토큰화의 금융 효율성 개선, 한국의 주주환원 강화에 긍정적이다. 반면 장기채 공급 부담과 금융혁신의 안전장치 부족을 경계한다.</p>
+<p>다만 <strong>제공된 외부 자료로 확인된 투자 관련 사실은 없다.</strong> 세부 검증 결과는 12개 항목 모두 미검증 또는 음성인식 불확실로 분류했다. 이는 주장이 거짓이라는 뜻이 아니라, 투자 판단을 뒷받침할 관련 근거가 확보되지 않았다는 뜻이다.</p>
+<h3>2. 확인된 사실·근거의 범위</h3>
+<p>수집된 외부 증거 E1~E4는 음료·알루미늄 기업 실적과 대형 기술주 관련 기사로, 배정된 금융그룹 규모·지배구조·ETF 출시 주장과 무관하다. E1은 오류·탐색 문구 중심이고 E2~E4는 발췌가 비어 있어, 어느 자료도 지지·반박 근거로 채택되지 않았다.</p>
+<p>따라서 증거 묶음의 <code>verified</code> 표시는 <strong>개별 영상 주장의 사실 확인을 의미하지 않는다.</strong> 관련 공식 공시, 상품 설명서, 시장 시계열, 연구 원문이 없어 강한 외부 근거 링크를 제시할 수 없다. 아래 영상 링크는 발언 위치를 찾기 위한 것이며 독립적인 검증 자료가 아니다.</p>
+<h3>3. 영상 주장과 검증 결과</h3>
+<p>| 주제·근거 청크 | 영상 주장 | 확인된 사실/근거 및 한계 |</p>
+<p>|---|---|---|</p>
+<p>| 그룹 역사·규모 — <a href="https://www.youtube.com/watch?v=bYryjVUddOI&amp;t=0s">00:00</a> | 1805년 설립, 220년 이상 독립 민간 소유·인수합병 없는 성장. 자산 1조 달러, 20개국·31개 지사, 직원 5,600명 이상 | 그룹·출연자 신원부터 미확정이다. Pictet은 검색 후보이지 확인된 신원이 아니다. 자산의 정의·기준일·환율도 없다. 후반의 30개 도시는 지사 수와 집계 단위가 달라 숫자 차이만으로 모순은 아니다. |</p>
+<p>| 고객 보호·장기 원칙 — <a href="https://www.youtube.com/watch?v=bYryjVUddOI&amp;t=0s">00:00</a>, <a href="https://www.youtube.com/watch?v=bYryjVUddOI&amp;t=1564s">26:04</a> | 펀드 수용 한도에서 유입을 제한했으며, 레버리지·집중위험 관리와 시나리오 대비, 확신에 맞는 규모, 오류 대응이 중요 | 유입 제한은 펀드명·공지·시점이 없는 개인 회고다. 위험관리 원칙은 규범적 견해이며 실제 성과나 손실 방지 효과가 입증된 것은 아니다. |</p>
+<p>| 파트너십 — <a href="https://www.youtube.com/watch?v=bYryjVUddOI&amp;t=1189s">19:49</a> | 현재 파트너 7명, 역사적으로 7~9명, 주 3회 회의와 중요 결정 만장일치 | 공식 명단·회의 관행·만장일치 적용 범위가 확인되지 않았다. 이런 구조가 고객 이익을 더 잘 보호한다는 성과 근거도 없다. |</p>
+<p>| AI 기업이익 — <a href="https://www.youtube.com/watch?v=bYryjVUddOI&amp;t=388s">06:28</a> | 실제 이익이 발생하고 있으며 AI 생산성 개선이 여러 업종으로 확산될 것 | 기업 공시·생산성 통계가 없다. 공급업체 이익과 도입 기업의 비용절감 효과를 구분할 수 없다. 이익 존재만으로 거품 가능성이 배제되지는 않는다. |</p>
+<p>| 하이퍼스케일러 회사채 — <a href="https://www.youtube.com/watch?v=bYryjVUddOI&amp;t=388s">06:28</a> | 지난 한 해 수십억 달러 발행과 장기물 공급이 국채와 자금을 놓고 경쟁해 수익률에 상승 압력 | 기업별 발행액·만기·순발행 자료와 국채 수요 자료가 없다. 촬영일도 없어 기준 기간을 확정할 수 없으며 금리 영향의 인과관계는 미검증이다. |</p>
+<p>| 토큰화·MMF — <a href="https://www.youtube.com/watch?v=bYryjVUddOI&amp;t=388s">06:28</a>, <a href="https://www.youtube.com/watch?v=bYryjVUddOI&amp;t=796s">13:16</a> | 사모자산의 잠재적 2차 유동성과 디지털 생태계의 수익 창출 자산을 제공 | 실제 거래량·스프레드·환매 조건·법적 권리 자료가 없다. 상용화 효과가 확인된 사실이 아닌 조건부 가능성이다. |</p>
+<p>| 토큰화 시장 전망 — <a href="https://www.youtube.com/watch?v=bYryjVUddOI&amp;t=388s">06:28</a> | 2030년 3조~13조 달러, 하단은 액티브 ETF 시장과 유사 | 발표기관·산정 방식·포함 자산이 없는 미출처 전망이다. 두 끝값이 같은 시장 정의인지, ETF 비교가 동등한 기준인지도 미확인이다. |</p>
+<p>| 액티브 ETF — <a href="https://www.youtube.com/watch?v=bYryjVUddOI&amp;t=796s">13:16</a>, <a href="https://www.youtube.com/watch?v=bYryjVUddOI&amp;t=1189s">19:49</a> | 3년 전 구상하고 2년 준비해 작년 출시 | 상품명·ISIN·상장 공지와 촬영일이 없다. 게시일에서 역산한 연도를 확정 출시 이력으로 사용할 수 없다. |</p>
+<p>| 한국 주주환원 — <a href="https://www.youtube.com/watch?v=bYryjVUddOI&amp;t=796s">13:16</a> | 한국이 아시아의 지배구조 개선을 선도하고 배당·자사주 매입이 할인 축소에 기여 | 정책·집행 공시와 아시아 비교 통계가 없다. ‘선도’는 출연자의 평가이며 할인 축소는 조건부 전망이다. |</p>
+<p>| 중국 채권 추정 사례 — <a href="https://www.youtube.com/watch?v=bYryjVUddOI&amp;t=1189s">19:49</a>, <a href="https://www.youtube.com/watch?v=bYryjVUddOI&amp;t=1564s">26:04</a> | 장기간 유지한 채권 전략이 중국 국채 지수 편입 이후 거의 4배 성장 | 전략·지수·기간과 증가 지표가 불명확하다. 중국·일본 시장 표현도 충돌한다. <strong>거의 4배를 투자수익률로 해석해서는 안 된다.</strong> |</p>
+<h3>4. 상승 논리와 반론</h3>
+<p>다음은 영상 주장을 투자 관찰 가설로 정리한 것이며, 확인된 시장 진단은 아니다.</p>
+<ul>
+<li><strong>AI:</strong> 도입 확대가 생산성·이익 개선으로 이어지면 수혜가 인프라 공급업체 밖으로 확산될 수 있다는 논리다. 반론은 실현 이익보다 투자지출과 가격 기대가 앞설 수 있다는 점이다. 공급업체 매출 증가만으로 고객사의 투자수익성을 입증할 수 없다.</li>
+<li><strong>토큰화:</strong> 이전·접근성 개선이 거래 참여와 자산 활용을 높일 수 있다는 논리다. 그러나 토큰 이전 가능성은 실제 매각·환매 가능성과 다르다. 기초자산 비유동성, 법적 권리, 이전 제한이 핵심이다.</li>
+<li><strong>한국 주식:</strong> 기업이익이 배당·자사주 소각으로 전달되면 할인 축소를 기대할 수 있다는 논리다. 반면 발표만 있고 집행이 부족하거나 재매각·희석이 상쇄하면 논거가 약해진다. 시장 할인 변화에는 수익성·업종구성·금리·환율도 함께 검토해야 한다.</li>
+<li><strong>장기 자산관리:</strong> 장기 시계와 위험 규율을 결합한다는 관점이다. 다만 장기 보유와 잘못된 가설의 방치는 구분해야 한다. 확신 자체는 객관적 위험 한도를 대신하지 못한다.</li>
+</ul>
+<h3>5. 단기 확인 일정과 논거 무효화 조건</h3>
+<p>| 확인 계기 | 구체적 관찰 항목 | 해당 논거가 약해지거나 무효화되는 조건 |</p>
+<p>|---|---|---|</p>
+<p>| 다음 기업 실적 발표 | AI 매출, 도입 기업의 비용절감·이익 기여, 투자지출, 잉여현금흐름 | 생산성 효과가 반복적으로 확인되지 않고 투자 부담만 확대될 경우 AI 이익 확산 논거 약화 |</p>
+<p>| 다음 회사채 발행·국채 입찰 | 발행액·만기·차환/순발행, 국채 입찰 수요, 만기 대응 금리·스프레드 | 순공급 증가나 수요 경쟁이 관찰되지 않으면 회사채발 금리 상승 설명 재검토 |</p>
+<p>| 토큰화 상품 공시·거래 자료 확보 시 | 매수·매도 호가, 거래량, 환매 소요시간, 이전 제한, 수탁·투자자 권리 | 거래 상대방 부재나 지속적 환매 제약이 확인되면 실질 유동성 개선 논거 약화 |</p>
+<p>| 한국 기업의 다음 환원 집행 공시 | 배당 지급, 매입 완료, 소각, 재매각, 신주 발행을 함께 확인 | 환원 미집행 또는 재매각·희석으로 효과가 상쇄되면 주주가치 전달 논거 약화 |</p>
+<p>| 원음·공식 자료 확보 시 | 신원·자산 정의·ETF 식별자·채권 전략과 증가 지표 | 공식 자료가 서술과 다르거나 핵심 지표를 끝내 특정하지 못하면 해당 사례의 근거 사용 중단 |</p>
+<p>포트폴리오 차원에서는 단일 자산·테마 집중도, 차입·담보 조건, 현금화 기간, 시나리오별 손실과 가설 재검토 기준을 기록해 관찰할 수 있다. 이는 영상 원칙을 점검 항목으로 옮긴 것이며 특정 비중이나 거래를 지시하는 내용은 아니다.</p>
+<h3>6. 데이터 품질과 수동 확인 사항</h3>
+<ul>
+<li><strong>자막 품질:</strong> <code>transcript_quality</code>는 good·1.0이며 한국어 자동자막 669개 세그먼트다. 그러나 이번 작성 입력에는 원음과 자막 본문이 없고 추출 요약·메타데이터만 있어, 이 점수는 고유명사·번역·수치 의미의 정확성을 보증하지 않는다.</li>
+<li><strong>출처 신뢰도:</strong> 추출 단계의 <code>source_confidence</code> 0.65~0.94와 달리, 검증 단계에서는 전 항목이 0.0이다. 후자는 채택 가능한 관련 외부 증거가 없다는 뜻이지 주장이 거짓일 확률을 뜻하지 않는다.</li>
+<li><strong>음성인식 신뢰도:</strong> 검증 단계 <code>asr_confidence</code>는 0.30~0.85의 정성적 추정이다. 특히 그룹 신원 0.35, 중국 채권 사례 0.30으로 낮다. 검증 결과의 높은 <code>confidence</code>는 미검증 판정에 대한 확신이지 발언의 사실성 점수가 아니다.</li>
+<li><strong>시점·범위:</strong> 타임스탬프는 정확한 개별 발화가 아닌 청크 시작점이다. 자막은 약 30분 18초까지로 보고돼 영상 끝부분과 차이가 있다. 촬영일 미확인으로 ‘작년’·‘지난 한 해’를 절대 날짜로 바꿀 수 없다. 분석은 연구계획의 12개 항목을 기준으로 했다.</li>
+<li><strong>비공개·유료 자료:</strong> Bloomberg·Morningstar 원문은 제공되지 않았다. 이들에 의존하는 지수·성과 주장은 <strong>미검증·수동 확인 필요</strong>다. 헤지펀드 유입 제한, 내부 회의 관행, ETF 준비 과정, 채권 전략의 거의 4배 증가도 공개 문서나 적법하게 확보한 원자료 확인이 필요하다.</li>
+</ul>
+<h3>결론</h3>
+<p>이 영상은 <strong>장기 관점과 오류 대응을 함께 강조하는 투자 철학</strong>으로 읽을 수 있다. 다만 그룹의 역사·규모, 시장 전망 수치, 과거 성과 사례는 현재 자료만으로 투자 신뢰의 근거가 되지 못한다. 후속 판단의 핵심은 이야기의 설득력보다 AI의 실제 현금흐름, 토큰화 상품의 거래·환매 가능성, 한국 기업의 환원 집행, 그리고 원음·공식 자료와의 일치 여부다.</p>
+  <details>
+    <summary>공개 요약 JSON</summary>
+    <pre>{
+  &quot;version&quot;: 4,
+  &quot;video_id&quot;: &quot;bYryjVUddOI&quot;,
+  &quot;title&quot;: &quot;220년 전통 스위스 프라이빗 뱅크가 본 부자들의 자산관리 원칙&quot;,
+  &quot;url&quot;: &quot;https://www.youtube.com/watch?v=bYryjVUddOI&quot;,
+  &quot;channel&quot;: &quot;PLUS TV (플러스 TV)&quot;,
+  &quot;channel_id&quot;: &quot;UCuHUaZo43N9PgOCjs3Hg2Uw&quot;,
+  &quot;source_url&quot;: &quot;https://www.youtube.com/@plus_tv_official/videos&quot;,
+  &quot;thumbnail_url&quot;: &quot;https://i.ytimg.com/vi/bYryjVUddOI/maxresdefault.jpg&quot;,
+  &quot;published_at&quot;: &quot;2026-11-05T08:00:01+00:00&quot;,
+  &quot;status&quot;: &quot;asr_uncertain&quot;,
+  &quot;strategy_source_tier&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_evidence_weight&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_validation_policy&quot;: &quot;STANDARD_REVIEW&quot;,
+  &quot;transcript_status&quot;: &quot;available&quot;,
+  &quot;transcript_source&quot;: &quot;automatic&quot;,
+  &quot;transcript_chars&quot;: 15019,
+  &quot;transcript_quality&quot;: {
+    &quot;status&quot;: &quot;good&quot;,
+    &quot;score&quot;: 1.0,
+    &quot;warnings&quot;: [],
+    &quot;source&quot;: &quot;automatic&quot;,
+    &quot;language&quot;: &quot;Korean&quot;,
+    &quot;model_or_format&quot;: &quot;json3&quot;,
+    &quot;chars&quot;: 15019,
+    &quot;segments&quot;: 669,
+    &quot;duration_seconds&quot;: 1827,
+    &quot;repeated_ngram_ratio&quot;: 0.008
+  },
+  &quot;generated_at&quot;: &quot;2026-11-06T07:24:02.434446+09:00&quot;,
+  &quot;llm_status&quot;: &quot;success&quot;,
+  &quot;research_status&quot;: &quot;success&quot;,
+  &quot;claim_verification_status&quot;: &quot;success&quot;,
+  &quot;research_pipeline_version&quot;: 4,
+  &quot;evidence_count&quot;: 4,
+  &quot;claim_status_summary&quot;: {
+    &quot;asr_uncertain&quot;: 2,
+    &quot;unverified&quot;: 10
+  },
+  &quot;claims&quot;: [
+    {
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;claim_text&quot;: &quot;해당 그룹은 1805년 제네바에서 설립돼 220년 이상 독립 민간 소유로 인수합병 없이 성장했다.&quot;,
+      &quot;status&quot;: &quot;asr_uncertain&quot;,
+      &quot;confidence&quot;: 0.98,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.35,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;1805년 설립, 220년 이상&quot;,
+        &quot;observed&quot;: &quot;외부 확인값 없음. 자막 요약에 ‘1221년’이라는 상충 표현도 보고됨.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;그룹의 역사와 독립성을 검증된 투자 신뢰 근거로 사용하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;claim_text&quot;: &quot;그룹 자산은 1조 달러, 거점은 20개국 31개 지사, 직원은 5,600명 이상이며 후반에는 30개 도시·20개국 이상이라고 설명한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.8,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;자산 1조 달러; 20개국·31개 지사; 직원 5,600명 이상; 후반 30개 도시·20개국 이상&quot;,
+        &quot;observed&quot;: &quot;동일 기준일의 공식 수치 없음.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;자산 규모를 비교하기 전에 AUM·수탁·관리자산과 재무제표 총자산을 구분해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;claim_text&quot;: &quot;현재 경영 파트너는 7명, 역사적으로 7~9명이며 월·목·금 주 3회 회의하고 중요 결정은 만장일치로 정한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:19:49&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.7,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;현재 7명; 역사적으로 7~9명; 주 3회, 월·목·금 회의&quot;,
+        &quot;observed&quot;: &quot;공식 인원 및 회의 기록 없음.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;파트너 수나 회의 관행만으로 고객 이익 보호 또는 의사결정의 우수성을 단정하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;claim_text&quot;: &quot;운용했던 헤지펀드가 수용 한도에 도달하자 기존 고객 수익률 보호를 위해 추가 자금 유입을 제한했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.7,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;수용 한도 도달 후 추가 유입 제한; 금액·시점 미제시&quot;,
+        &quot;observed&quot;: &quot;확인 가능한 펀드 및 제한 수치 없음.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;출연자의 회고를 검증된 고객 보호 실적이나 운용성과로 제시하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;claim_text&quot;: &quot;장기 자산관리에서는 레버리지·집중위험 관리, 시나리오 대비, 확신에 맞는 포지션 규모, 오류 발생 시 신속한 위험 축소와 행동 이해가 중요하다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.97,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.85,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;정량 주장 없음&quot;,
+        &quot;observed&quot;: &quot;위험관리 효과를 측정한 자료 없음.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;투자 원칙에 대한 견해로만 전달하고 수익 보장이나 검증된 손실 방지 효과로 확대하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;claim_text&quot;: &quot;AI 관련 실제 이익이 발생하고 있으며 생산성 개선이 여러 업종으로 확산되면 기업이익에 지속적인 기반을 제공할 것이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:06:28&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.7,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;이익·생산성 개선 규모 미제시&quot;,
+        &quot;observed&quot;: &quot;관련 기업 공시와 통계 없음.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;AI 낙관론은 전망으로 표시하고 실현 이익·현금흐름·투자지출·밸류에이션을 별도로 확인한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;claim_text&quot;: &quot;지난 한 해 하이퍼스케일러의 수십억 달러 규모 부채 발행과 장기물 공급이 미국 국채와 자금을 놓고 경쟁하며 수익률 상승 압력을 준다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:06:28&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.75,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;지난 한 해 수십억 달러 발행; 장기물 비중 미제시&quot;,
+        &quot;observed&quot;: &quot;발행 원장 및 대응 시장 시계열 없음.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;발행 증가만으로 장기금리 상승을 단정하거나 채권 매매 신호로 사용하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;claim_text&quot;: &quot;토큰화는 사모자산에 잠재적 2차 유동성을 제공하고 토큰화 MMF는 디지털 생태계에 수익 창출 자산을 제공할 수 있지만 기초자산 비유동성과 안전장치 문제는 남는다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:06:28&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.75,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;정량 주장 없음&quot;,
+        &quot;observed&quot;: &quot;유동성·수익·위험에 관한 상품별 관측자료 없음.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;토큰 이전 가능성을 실제 매각·환매 가능성과 동일시하지 말고 상품별 권리와 유동성을 확인한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;claim_text&quot;: &quot;2030년 토큰화 시장은 3조~13조 달러에 이를 수 있으며 하단 규모는 같은 시점 액티브 ETF 시장과 비슷하다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:06:28&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.8,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;2030년 3조~13조 달러; 하단이 액티브 ETF 시장 규모와 유사&quot;,
+        &quot;observed&quot;: &quot;원출처와 동등한 정의의 ETF 비교값 없음.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;시장 규모 수치를 확인된 사실이나 확정 성장 경로로 인용하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C10&quot;,
+      &quot;claim_text&quot;: &quot;그룹은 액티브 ETF를 3년 전 구상하고 운영 인프라·안전장치 구축에 2년을 들여 작년에 출시했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:13:16&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.8,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;3년 전 구상; 2년 준비; 작년 출시&quot;,
+        &quot;observed&quot;: &quot;절대 날짜 미확인. 게시일을 기준으로 한 2023년 구상·2025년 출시는 잠정 가설일 뿐임.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;상품 출시 이력과 준비 기간을 확인하기 전에는 운영 안정성이 입증된 사례로 소개하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C11&quot;,
+      &quot;claim_text&quot;: &quot;한국이 아시아 지배구조·주주환원 개선을 선도하며 자사주 매입·배당 확대가 주식시장 할인 축소에 기여할 수 있다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:13:16&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.8,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;환원액·할인율·비교 순위 수치 미제시&quot;,
+        &quot;observed&quot;: &quot;정책·집행 공시 및 시장 비교 수치 없음.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;출연자의 평가와 조건부 전망으로 표시하고 실제 환원 집행 및 할인 변화와 구분한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C12&quot;,
+      &quot;claim_text&quot;: &quot;홍콩에서 10년도 더 전에 시작한 채권 전략을 유지했으며 중국 국채의 글로벌 지수 편입 후 펀드가 거의 4배가 됐다.&quot;,
+      &quot;status&quot;: &quot;asr_uncertain&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:19:49&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.3,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;10년도 더 전 출시; 당시 세계 2위 시장; 지수 편입 후 거의 4배&quot;,
+        &quot;observed&quot;: &quot;출시일·시장 순위·증가 지표·측정 기간 모두 미확인.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;‘거의 4배’를 투자수익률로 제시하지 말고 전략과 지표를 확인하기 전 성과 사례 인용을 보류한다.&quot;
+    }
+  ],
+  &quot;entities&quot;: [],
+  &quot;evidence&quot;: [
+    {
+      &quot;evidence_id&quot;: &quot;E1&quot;,
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;title&quot;: &quot;Molson Coors Beverage Co (TAP) (Q3 2026) Earnings Call Highlights: Guidance Cut as Cost ...&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/molson-coors-beverage-co-tap-231838183.html&quot;,
+      &quot;publisher&quot;: &quot;GuruFocus.com&quot;,
+      &quot;published_at&quot;: &quot;2026-11-05T23:18:38+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Molson Coors Beverage Co (TAP) (Q3 2026) Earnings Call Highlights: Guidance Cut as Cost ... Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 2...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E2&quot;,
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;title&quot;: &quot;Century Aluminum Company Reports Third Quarter 2026 Results&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/century-aluminum-company-reports-third-210500429.html&quot;,
+      &quot;publisher&quot;: &quot;GlobeNewswire&quot;,
+      &quot;published_at&quot;: &quot;2026-11-05T21:05:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E3&quot;,
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;title&quot;: &quot;Best Mag7 dip buys: NVIDIA leads on valuation, Alphabet on RSI&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/best-mag7-dip-buys-nvidia-210653656.html&quot;,
+      &quot;publisher&quot;: &quot;Investing.com&quot;,
+      &quot;published_at&quot;: &quot;2026-11-05T21:06:53+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E4&quot;,
+      &quot;claim_id&quot;: &quot;C10&quot;,
+      &quot;title&quot;: &quot;Century: Q3 Earnings Snapshot&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/century-q3-earnings-snapshot-224706676.html&quot;,
+      &quot;publisher&quot;: &quot;Associated Press&quot;,
+      &quot;published_at&quot;: &quot;2026-11-05T22:47:06+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    }
+  ],
+  &quot;source_policy&quot;: {
+    &quot;raw_transcript_published&quot;: false,
+    &quot;raw_transcript_in_evidence&quot;: false,
+    &quot;research_pipeline_version&quot;: 4,
+    &quot;closed_source_claims&quot;: &quot;unverified_external_source&quot;,
+    &quot;auto_caption_warning&quot;: true,
+    &quot;local_asr_warning&quot;: false
+  }
+}</pre>
+  </details>
+</article>
+</main>
+  <style>
+.reader-contents { margin: 16px 0; padding: 12px 16px; border: 1px solid var(--line, #64748b); border-radius: 12px; }
+.reader-contents > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-weight: 750; }
+.reader-contents nav { display: grid; gap: 4px; max-height: 45vh; overflow: auto; margin: 8px 0; }
+.reader-contents a { display: block; min-height: 44px; padding: 10px; border-radius: 6px; color: inherit; overflow-wrap: anywhere; }
+.reader-contents a:hover { background: #80808020; }
+.reader-contents .reader-subsection { padding-inline-start: 24px; font-size: .92em; }
+.reader-prose, .report { overflow-wrap: anywhere; line-height: 1.8; }
+.reader-prose p, .reader-prose li { max-width: 85ch; }
+.reader-prose h2, .reader-prose h3, .reader-prose h4, [data-reader-heading] { scroll-margin-top: 100px; line-height: 1.45; }
+.reader-prose h2 { margin-top: 1.8em; padding-bottom: 8px; border-bottom: 1px solid var(--line, #64748b); }
+.reader-prose h3 { margin-top: 1.5em; }
+.reader-prose li { margin: .5em 0; }
+.reader-prose pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.reader-prose blockquote { margin: 16px 0; padding: 4px 16px; border-left: 3px solid var(--accent, #64748b); }
+.reader-table { overflow: auto; max-width: 100%; margin: 16px 0; border: 1px solid var(--line, #64748b); border-radius: 10px; }
+.reader-table table { border-collapse: collapse; width: 100%; margin: 0; font-size: .92rem; }
+.reader-table th, .reader-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line, #64748b); min-width: 110px; max-width: 400px; overflow-wrap: anywhere; white-space: normal; }
+.reader-table th { background: #80808018; }
+.reader-table tr:nth-child(even) { background: #80808008; }
+.reader-search { display: grid; gap: 8px; margin: 16px 0; }
+.reader-search label { font-weight: 700; }
+.reader-search input { box-sizing: border-box; width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line, #64748b); border-radius: 10px; background: var(--panel, #fff); color: var(--text, #132238); font: inherit; }
+.reader-search p { margin: 0; font-size: .86rem; }
+.reader-back { position: fixed; bottom: max(14px, env(safe-area-inset-bottom)); right: 14px; z-index: 30; min-height: 44px; border: 1px solid #778899; border-radius: 99px; padding: 10px 16px; background: #18344a; color: #fff; font: 700 14px system-ui; cursor: pointer; box-shadow: 0 3px 12px #0003; }
+[data-reader-source] { margin-top: 20px; }
+[data-reader-source] > summary { min-height: 44px; cursor: pointer; }
+[data-reader-source] pre { font-size: .85rem; }
+[data-reader-source] pre, .reader-prose { min-width: 0; }
+.reader-contents :focus-visible, .reader-search :focus-visible, .reader-back:focus-visible, .reader-table:focus-visible { outline: 3px solid var(--accent, #008c95); outline-offset: 3px; }
+.reader-search + .grid > [hidden] { display: none !important; }
+@media (max-width: 600px) { .reader-prose { font-size: 1rem; } .reader-contents { padding: 8px 12px; } }
+@media print { .reader-back, .reader-search, .reader-contents, [data-reader-source] { display: none !important; } .reader-table { overflow: visible; } .reader-prose { color: #000; background: #fff; } }
+</style><script>
+(() => {
+  'use strict';
+  let serial = 0;
+  const rendered = new WeakMap();
+  const node = (tag, text) => { const el = document.createElement(tag); if (text != null) el.textContent = text; return el; };
+  function inline(parent, text) {
+    const pattern = /(`[^`]+`|\*\*[^*]+\*\*|\[[^\]]+\]\(https?:\/\/[^\s)]+\))/g;
+    let start = 0;
+    for (const match of String(text).matchAll(pattern)) {
+      parent.append(document.createTextNode(text.slice(start, match.index)));
+      const value = match[0];
+      if (value.startsWith('`')) parent.append(node('code', value.slice(1, -1)));
+      else if (value.startsWith('**')) parent.append(node('strong', value.slice(2, -2)));
+      else {
+        const link = value.match(/^\[([^\]]+)\]\((.+)\)$/);
+        const a = node('a', link[1]); a.href = link[2]; a.rel = 'noopener noreferrer'; parent.append(a);
+      }
+      start = match.index + value.length;
+    }
+    parent.append(document.createTextNode(text.slice(start)));
+  }
+  const cells = line => line.trim().replace(/^\|/, '').replace(/\|$/, '').split(/(?<!\\)\|/).map(v => v.trim().replace(/\\\|/g, '|'));
+  function markdown(source) {
+    const article = node('article'); article.className = 'reader-prose';
+    const lines = source.split(/\r?\n/); let list = null;
+    for (let i = 0; i < lines.length; i += 1) {
+      const line = lines[i], value = line.trim();
+      if (!value) { list = null; continue; }
+      if (/^```/.test(value)) {
+        const code = []; i += 1;
+        while (i < lines.length && !/^```/.test(lines[i].trim())) code.push(lines[i++]);
+        const pre = node('pre'); pre.append(node('code', code.join('\n'))); article.append(pre); list = null; continue;
+      }
+      if (i + 1 < lines.length && value.includes('|') && cells(lines[i + 1]).every(v => /^:?-{3,}:?$/.test(v))) {
+        const table = node('table'), head = node('thead'), body = node('tbody');
+        const row = (values, tag) => { const tr = node('tr'); values.forEach(v => { const cell = node(tag); if (tag === 'th') cell.scope = 'col'; inline(cell, v); tr.append(cell); }); return tr; };
+        head.append(row(cells(line), 'th')); i += 2;
+        while (i < lines.length && lines[i].trim() && lines[i].includes('|')) body.append(row(cells(lines[i++]), 'td'));
+        i -= 1; table.append(head, body); article.append(table); list = null; continue;
+      }
+      const heading = value.match(/^(#{1,6})\s+(.+)$/);
+      if (heading) { const h = node('h' + Math.min(4, heading[1].length + 1)); inline(h, heading[2]); article.append(h); list = null; continue; }
+      const bullet = value.match(/^(?:[-*+] |\d+\. )(.+)$/);
+      if (bullet) {
+        const tag = /^\d/.test(value) ? 'ol' : 'ul';
+        if (!list || list.tagName.toLowerCase() !== tag) { list = node(tag); if (tag === 'ol') list.start = parseInt(value, 10); article.append(list); }
+        const li = node('li'); inline(li, bullet[1]); list.append(li); continue;
+      }
+      list = null;
+      if (/^(---+|\*\*\*+)$/.test(value)) { article.append(node('hr')); continue; }
+      const p = node(value.startsWith('> ') ? 'blockquote' : 'p'); inline(p, value.startsWith('> ') ? value.slice(2) : line); article.append(p);
+    }
+    return article;
+  }
+  function contents(root) {
+    root.querySelectorAll(':scope > .reader-contents').forEach(el => el.remove());
+    const headings = [...root.querySelectorAll('h2,h3,h4')].filter(h => !h.closest('.card,.run-card,.reader-contents,[data-reader-source],[hidden]'));
+    if (headings.length < 2) return;
+    const details = node('details'); details.className = 'reader-contents';
+    details.append(node('summary', '이 리포트 목차 · ' + headings.length + '개 항목'));
+    const nav = node('nav'); nav.setAttribute('aria-label', '리포트 목차');
+    headings.forEach(h => {
+      if (!h.id) h.id = 'reader-section-' + (++serial);
+      h.dataset.readerHeading = ''; h.tabIndex = -1;
+      const a = node('a', h.textContent); a.href = '#' + h.id;
+      if (h.tagName !== 'H2') a.className = 'reader-subsection';
+      a.addEventListener('click', event => {
+        event.preventDefault();
+        for (let ancestor = h.parentElement; ancestor; ancestor = ancestor.parentElement) if (ancestor.tagName === 'DETAILS') ancestor.open = true;
+        h.scrollIntoView({block: 'start'}); h.focus({preventScroll: true});
+      }); nav.append(a);
+    });
+    details.append(nav); root.prepend(details);
+  }
+  function enhance(root) {
+    if (!root) return;
+    root.querySelectorAll('pre[data-report-markdown]').forEach(pre => {
+      const previous = rendered.get(pre);
+      if (previous && previous.source === pre.textContent) return;
+      const article = markdown(pre.textContent);
+      if (previous) previous.article.replaceWith(article);
+      else {
+        const details = node('details'); details.dataset.readerSource = '';
+        details.append(node('summary', 'Markdown 원문 보기'));
+        pre.before(article, details); details.append(pre);
+      }
+      rendered.set(pre, {source: pre.textContent, article});
+    });
+    root.querySelectorAll('table').forEach(table => {
+      if (table.closest('.reader-table,.account-table-wrap,.summary-scroll')) return;
+      const wrap = node('div'); wrap.className = 'reader-table'; wrap.tabIndex = 0;
+      wrap.setAttribute('role', 'region'); wrap.setAttribute('aria-label', '리포트 표 · 가로로 스크롤하여 전체 보기');
+      table.before(wrap); wrap.append(table);
+    });
+    root.querySelectorAll('.grid').forEach(grid => {
+      const cards = [...grid.querySelectorAll(':scope > a.card')];
+      if (cards.length < 2 || grid.dataset.readerSearch) return;
+      grid.dataset.readerSearch = 'true';
+      const box = node('div'); box.className = 'reader-search';
+      const input = node('input'); input.type = 'search'; input.placeholder = '제목 · 종목 · 채널 · 키워드'; input.id = 'report-search-' + (++serial);
+      const label = node('label', '리포트 찾기'); label.htmlFor = input.id;
+      const status = node('p'); status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
+      const update = () => {
+        const terms = input.value.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean); let count = 0;
+        cards.forEach(card => { card.hidden = !terms.every(t => card.textContent.toLocaleLowerCase().includes(t)); if (!card.hidden) count += 1; });
+        status.textContent = cards.length + '개 중 ' + count + '개 표시' + (count ? '' : ' · 검색어를 지우거나 다른 키워드를 입력하세요.');
+      };
+      input.addEventListener('input', update); box.append(label, input, status); grid.before(box); update();
+    });
+    contents(root);
+  }
+  window.TradingAgentsReader = {enhance};
+  const main = document.querySelector('main');
+  if (main && !main.hasAttribute('data-reader-dynamic')) enhance(main);
+  if (main) {
+    const top = node('button', '↑ 맨 위'); top.type = 'button'; top.className = 'reader-back'; top.setAttribute('aria-label', '리포트 맨 위로 이동');
+    top.addEventListener('click', () => { const target = document.querySelector('h1') || main; target.tabIndex = -1; target.scrollIntoView({block: 'start'}); target.focus({preventScroll: true}); });
+    document.body.append(top);
+  }
+})();
+</script>
+</body>
+</html>

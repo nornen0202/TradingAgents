@@ -1,0 +1,642 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YouTube 투자자용 검증 리포트 - 반도체 빠지자 바이오·2차전지 급등...돈의 흐름 바뀌었나 | 하창완 하보노의 주식 이야기 대표 [더블 체크]</title>
+  <style>
+:root {
+  color-scheme: light;
+  --bg: #f7f8fb;
+  --panel: #ffffff;
+  --text: #172033;
+  --muted: #667085;
+  --line: #d9dee8;
+  --accent: #0f766e;
+  --accent-2: #2563eb;
+  --warn: #b45309;
+  --bad: #b42318;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0 56px; }
+a { color: var(--accent-2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.hero { padding: 28px 0 22px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+.hero.compact { padding-top: 12px; }
+.hero h1 { margin: 0; font-size: clamp(28px, 4vw, 44px); line-height: 1.15; letter-spacing: 0; }
+.hero p { max-width: 760px; color: var(--muted); margin: 12px 0 0; }
+.eyebrow { color: var(--accent); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0; margin: 0 0 8px; }
+section { margin: 28px 0; }
+h2, h3, h4, h5 { letter-spacing: 0; line-height: 1.25; }
+.synthesis-callout { padding: clamp(20px, 4vw, 34px); border: 1px solid #6ee7d8; border-radius: 18px; background: linear-gradient(135deg, #ecfdf9 0%, #eff6ff 100%); box-shadow: 0 18px 44px rgba(15, 118, 110, .12); }
+.synthesis-callout.unavailable { border-color: var(--line); background: var(--panel); box-shadow: none; }
+.synthesis-callout h2 { margin: 0; font-size: clamp(24px, 3.2vw, 36px); }
+.synthesis-callout .lead { max-width: 900px; font-size: 17px; color: #334155; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.primary-link, .secondary-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border-radius: 999px; font-weight: 800; }
+.primary-link { color: white; background: var(--accent); }
+.secondary-link { color: var(--accent-2); border: 1px solid #93c5fd; background: white; }
+.primary-link:hover, .secondary-link:hover { text-decoration: none; filter: brightness(.97); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.card, .run { display: flex; flex-direction: column; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; color: var(--text); min-height: 128px; }
+.run { padding: 16px; }
+.card:hover, .run:hover { border-color: var(--accent-2); text-decoration: none; }
+.thumb { display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #e9edf5; border-radius: 8px 8px 0 0; color: var(--muted); font-size: 13px; font-weight: 700; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb-empty span { padding: 0 14px; text-align: center; }
+.card-body { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 16px; }
+.card strong { line-height: 1.35; }
+.source-line { color: #3f4a5f; font-weight: 600; }
+.runs { display: grid; gap: 10px; }
+.badge { display: inline-flex; width: fit-content; border-radius: 999px; padding: 2px 9px; background: #e6f4f1; color: var(--accent); font-size: 12px; font-weight: 700; }
+.status-contradicted, .status-llm_failed { background: #fee4e2; color: var(--bad); }
+.status-unverified, .status-stale { background: #fff4d6; color: var(--warn); }
+small, .muted { color: var(--muted); }
+.topnav { display: flex; gap: 14px; margin-bottom: 16px; font-size: 14px; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px; }
+.stats span { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
+.report { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: min(5vw, 36px); }
+.report-head { border-bottom: 1px solid var(--line); margin-bottom: 24px; padding-bottom: 20px; }
+.report-head h1 { margin: 0; font-size: clamp(24px, 3.5vw, 38px); line-height: 1.2; }
+.meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+.scope-note { padding: 12px 14px; border-left: 4px solid var(--warn); border-radius: 6px; background: #fff7ed; color: #7c2d12; }
+.synthesis-report h2 { margin-top: 34px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.synthesis-report h3 { margin: 24px 0 8px; color: #0f4c5c; }
+.synthesis-report p, .synthesis-report li { overflow-wrap: anywhere; }
+pre { overflow: auto; background: #111827; color: #f9fafb; border-radius: 8px; padding: 14px; }
+code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+details { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 18px; }
+@media (max-width: 640px) {
+  main { width: min(100% - 20px, 1120px); padding-top: 18px; }
+  .report { padding: 18px; }
+  .synthesis-callout { border-radius: 14px; padding: 18px; }
+  .cta-row a { width: 100%; }
+  .mobile-report { border-radius: 12px; }
+}
+</style>
+</head>
+<body>
+  <main>
+<nav class="topnav"><a href="index.html">실행 목록</a><a href="../../index.html">YouTube 홈</a></nav>
+<article class="report">
+  <header class="report-head">
+    <p class="eyebrow">youtube_20261106_072402</p>
+    <h1>반도체 빠지자 바이오·2차전지 급등...돈의 흐름 바뀌었나 | 하창완 하보노의 주식 이야기 대표 [더블 체크]</h1>
+    <div class="meta">
+      <span class="badge status-unverified">unverified</span>
+      <a href="https://www.youtube.com/watch?v=r3bx1jiY7Qs">원본 영상</a>
+    </div>
+  </header>
+  <h2>반도체 약세와 소외 업종 반등: 주도주 교체는 아직 미확인</h2>
+<h3>1. 핵심 판단</h3>
+<p><a href="https://www.youtube.com/watch?v=r3bx1jiY7Qs">삼프로TV 영상</a>은 반도체·전력 인프라에서 바이오·2차전지·소비주 등으로 단기 수급이 이동한다는 해석을 제시한다. 다만 출연자도 이를 지속적인 주도주 교체로 단정하지 않으며, 외국인 수급과 정책 구체화를 중요하게 본다.</p>
+<p><strong>제공 자료만으로는 수급 이동의 규모·지속성이나 정책 원인을 확인할 수 없다.</strong> 개별 주장 12건의 검증 결과는 모두 <code>unverified</code>다. 이는 거짓이라는 뜻이 아니라, 판단에 필요한 시세·공시·공식 문서가 부족하다는 뜻이다. 현재 결론은 ‘주도주 교체 확인’이 아니라 <strong>실적에 기반한 업종 확산과 낙폭 과대 반등을 구분해야 하는 단계</strong>다.</p>
+<p>영상 업로드는 2026년 11월 5일이며, 실제 방송 거래일은 확정되지 않았다. 아래 시각은 정확한 발화 시점이 아닌 관련 자막 청크의 시작점이다.</p>
+<h3>2. 확인된 사실과 외부 근거의 범위</h3>
+<h4>제한적으로 확인된 사항</h4>
+<ul>
+<li><strong>산술:</strong> 영상 수치를 +3.37%와 정확히 -8%로 가정하면 차이는 -11.37%포인트다. 실제 시세나 두 시점 사이 투자수익률을 검증한 결과는 아니다.</li>
+<li><strong>산술:</strong> 기관 순매수 1,500억원과 9,000억원의 차이는 7,500억원이다. 입력 수치 자체는 확인되지 않았다.</li>
+<li><strong>시장 스냅샷:</strong> 호스트가 수집한 yfinance 자료는 2026년 11월 6일 08:21경 한국시간 기준 CL=F 가격을 약 91.34로 보고한다. 단일 사후 관측치이며, 영상의 ‘유가 두 차례 급락’을 입증하지 않는다. 계약월도 특정되지 않았다.</li>
+</ul>
+<h4>가장 관련성 높은 기사도 제목 수준의 정황</h4>
+<p><a href="https://finance.yahoo.com/technology/ai/articles/midterms-could-deepen-k-shaped-225501186.html">IBT의 데이터센터 규제 관련 기사</a>는 제목상 규제가 대형 기술기업에 유리할 가능성을 다룬다. 그러나 확보된 발췌는 오류 문구와 메뉴가 대부분이어서 선거 의석수, 규제 도입, 적용 범위나 시행일을 확인할 수 없다.</p>
+<p><a href="https://finance.yahoo.com/m/0cd2227b-7753-3d54-a8c5-286efe82ac39/dow-jones-futures%3A-nasdaq.html">IBD의 기술주 매도 관련 기사</a> 역시 제목에 나스닥과 AI 관련주 약세가 나타나지만, 영상 당시 반도체 상품의 수익률이나 정책과 주가의 인과를 검증하지 못한다.</p>
+<p><strong>기사 7건은 모두 영상 업로드 이후 발행됐다.</strong> 당시 발언의 근거로 소급할 수 없으며, 이후 확인 자료로 사용하기에도 본문이 부족하다. 나머지 항목에는 알루미늄·음료기업 실적이나 투자은행 거래처럼 배정된 주장과 관련성이 낮은 자료가 포함됐다. 증거 묶음의 <code>verified</code> 표시는 영상 주장이 검증됐다는 의미가 아니다.</p>
+<h3>3. 영상 주장과 투자 논리의 대조</h3>
+<p>| 주제·청크 시작점 | 영상 주장 | 확인된 근거·반론 |</p>
+<p>|---|---|---|</p>
+<p>| 미국 선거·정책 · 00:00 | 민주당 우세와 상원 51석 확보가 데이터센터 규제·관세 되돌리기 기대를 자극 | 공식 선거 결과, 법안·행정문서가 없다. 개표 전망과 확정 결과, 정책 제안과 발효를 구분해야 한다. |</p>
+<p>| 반도체·인프라 · 00:00, 17:38 | 데이터센터 투자 지연이 약세 요인이지만 메모리 초과수요·LTA·HBM 수율 개선이 완충할 수 있음 | 수율 70~75%의 회사·제품·공정이 불명확하다. 계약 물량·가격·취소 조건과 기업 IR도 없다. 투자 지연은 비용 절감뿐 아니라 미래 매출 지연도 초래할 수 있다. |</p>
+<p>| 국내 지수·수급 · 06:10, 29:22 | 기관 중심 반등보다 외국인 복귀가 중요하고 반도체 집중도가 지수 상승을 제한 | KRX 시세·수급·구성비 자료가 없다. 반도체 합산 비중 47% 및 관련 종목 포함 50% 이상은 미확인이다. 외국인 복귀가 상승의 필수조건이라는 해석도 가설이다. |</p>
+<p>| 자동차·현대차 · 00:00, 23:22 | 관세 완화 기대가 반등을 유도하되 추세 전환은 별도 확인 필요 | 관세 변경 원문과 장중 시세가 없다. 영상의 32만원대 등 가격 구간은 기술적 의견이며 확인된 가치평가가 아니다. |</p>
+<p>| 비만 치료제·바이오 · 11:56, 23:22 | 릴리·노보노디스크 실적·비만 데이터와 의약품 지원 기대가 강세 배경 | 실적·임상·지원 정책 원문이 없다. 한미약품의 처방 개시는 제품명과 시점부터 확인해야 한다. 이를 바이오 전체의 실적 개선으로 일반화할 수 없다. |</p>
+<p>| 2차전지·리튬 · 00:00, 17:38 | 앨버말·퀀텀스케이프 강세가 국내로 이어졌지만 탄산리튬 선물은 하락 | 동일 시간창의 주가·선물 자료가 없다. 괴리 자체와 미국 종목이 국내 상승을 유발했다는 인과 모두 미확인이다. |</p>
+<p>| NAVER·소비주 · 17:38, 29:22 | NAVER·APR·HYBE 반등에도 기존 매물과 중장기 약세 부담이 남음 | NAVER 약 +6%, APR 약 +8%, HYBE 146,000원 등은 장중 발언일 뿐 검증된 시세가 아니다. NAVER의 로봇·언어모델 촉매도 구체적 사업 성과 확인이 필요하다. |</p>
+<p>| 비트코인·관련주 · 06:10 | BTC 약 +4%는 현물 유입·숏커버 영향이며 관련주 반응은 약함 | 거래소·관측 구간·순유입·청산 자료가 없다. BTC +3~4%에 관련주가 통상 10%대 중반 상승한다는 비교 통계도 출처가 없다. |</p>
+<p>| 국채·금리 · 11:56 | 장기금리 하락은 금리 인하 기대보다 입찰 강세·안전자산 수요 영향 | 10·20·30년물 입찰 결과와 정책금리 기대 자료가 없어 원인을 분리할 수 없다. 기자회견 인물도 불명확하다. |</p>
+<p>| 원유·항공·재건·신재생 · 00:00, 35:40 | 유가 하락과 정책 기대로 순환매가 확산하고 선런은 시간외 10% 이상 상승 | 원유 연속 정산가, 선런 실적·시간외 시세, 업종 거래대금이 없다. 테마주 반등은 전쟁 종료의 증거가 아니다. |</p>
+<p>| 방산·조선 · 06:10, 11:56 | 선거 이후 방위비 확대 추진력 약화 우려가 약세에 반영 | 예산·계약 변경과 업종 시세가 없다. 실제 수주 감소와 정치적 우려를 구분해야 한다. |</p>
+<p>| 경영권·계절성 통계 · 17:38, 35:40 | 깨끗한나라·한진칼의 지배구조 이슈, 중간선거 이후 평균 약 20% 상승 등을 언급 | 회사별 공시와 통계 원문이 없다. 두 회사 사건은 별개로 확인해야 하며, 출처 없는 평균 수익률을 기대수익률로 사용할 수 없다. |</p>
+<h4>강세 논리가 성립하려면</h4>
+<p>반도체 약세에도 다른 업종의 실적 전망이 개선되고 거래대금이 지속된다면, 시장 내부의 상승 기반이 넓어지는 시나리오는 가능하다. 메모리 공급계약과 수율 개선이 실제 이익으로 연결된다면 투자 지연 우려를 일부 완충할 수도 있다. 비만 치료제 역시 제품별 실적과 임상 진전이 확인된다면 단순 테마와 구분할 여지가 있다.</p>
+<p>다만 이는 모두 <strong>조건부 논리</strong>다. 제공 자료에는 이를 입증할 실적·계약·임상·수급 근거가 없다. 소외 업종 상승이 숏커버나 일시적 낙폭 회복에 그치거나, 반도체 약세가 시장 전반의 위험 축소로 확산되는 대안 시나리오도 열려 있다.</p>
+<h3>4. 단기 체크포인트와 논리 무효화 조건</h3>
+<p>| 확인 순서 | 구체적 관찰 항목 | 해당 해석이 약해지는 조건 |</p>
+<p>|---|---|---|</p>
+<p>| 먼저 기준일 확정 | 방송 화면·실적 발표 일정으로 거래일 확인, 한국·미국 시간대와 가격 기준 통일 | 관측일이 다르면 영상 수치 간 비교부터 재구성해야 함 |</p>
+<p>| 다음 거래일 이후 수급 | KRX 외국인·기관 현물 순매수, 프로그램 매매, 업종별 거래대금·상승 종목 수를 여러 거래일 비교 | 바이오·2차전지 거래대금과 상승 폭이 빠르게 소멸하면 지속적 주도주 교체 해석 약화 |</p>
+<p>| 정책 원문 공개 시 | 공식 의석 기록, 규제 관할·대상·시행일, 관세 변경 문서 | 규제가 제안에 머물거나 적용 범위가 제한적이면 정책발 수요 충격 해석 약화 |</p>
+<p>| 반도체 실적·IR | HBM 세대별 출하·수율 공개치, LTA 조건, 고객 CAPEX·매출·현금흐름 | 주문 연기·취소나 가격 하락이 확인되면 계약·초과수요에 의한 방어 논리 약화 |</p>
+<p>| 바이오·2차전지 후속 발표 | 비만 제품별 매출·임상 평가변수·허가·출시, 리튬 선물 계약월별 정산가와 기업 실적 전망 | 제품·정책 진전 부재, 실적 전망 악화 속 주가만 상승하면 펀더멘털 기반 강세 해석 약화 |</p>
+<p>| 금리·원유·가상자산 | 국채 입찰 결과와 금리선물, 동일 원유 계약 정산가, BTC 현물 순유입·청산·관련주 수익률 | 유가 재상승, 지속적 현물 유입 부재 등은 각각 비용 개선·자금 유입 논리를 약화 |</p>
+<p>| 개별 이벤트 | 깨끗한나라·한진칼 각각의 DART·KIND 공시, 선런 실적 발표와 시간외 체결 기록 | 관련 공시나 시세가 발언과 맞지 않으면 이벤트 설명 재평가 |</p>
+<p>영상의 지수 5,400·5,600은 대상 지수와 거래일이 확정되지 않았다. 현재 시장의 지지선으로 전용할 수 없다. 현대차·NAVER의 언급 가격도 목표주가나 검증된 판단 기준으로 해석하지 않는다.</p>
+<h3>5. 데이터 품질과 해석 한계</h3>
+<ul>
+<li><strong>transcript_quality:</strong> 자동 평가 <code>good</code>, 점수 1.0이며 한국어 자동자막 1,150개 세그먼트를 사용했다. 이는 수치·고유명사나 주장의 정확도 100%를 뜻하지 않는다. 이번 입력에는 원음·방송 화면이 없다.</li>
+<li><strong>source_confidence:</strong> 추출 주제별 약 0.89~0.94는 발언 요약의 명확성이지 외부 사실의 신뢰도가 아니다. 검증표 C1·C12의 0.0은 대응 수치 미제공 표시다.</li>
+<li><strong>asr_confidence:</strong> 주장별 점수가 제공되지 않아 모두 0.0으로 기록됐다. 음성인식 정확도가 0%라는 뜻은 아니다. 기관 초기 수급, 항공 종목명, 기자회견 인물, 한미약품 제품·처방 발언은 원음 확인이 필요하다.</li>
+<li><strong>검증 confidence:</strong> 각 주장의 0.99는 ‘증거 부족으로 미확인’이라는 판정에 대한 신뢰도이며 주장 진실성 99%가 아니다.</li>
+<li><strong>시각 정밀도:</strong> 청크가 일부 중첩되고 마지막 종료 37:26은 영상 길이 37:24보다 약 2초 길다. 정확한 발화 위치로 취급하지 않는다.</li>
+<li><strong>비공개·폐쇄형 자료:</strong> 분 단위 수급·시간외 호가, 비공개 LTA, 출처 불명 숏커버 분석·역사적 통계는 미검증·수동 확인 필요다. Bloomberg·Morningstar 원문도 제공되지 않았으므로 이들 자료로 검증됐다고 볼 수 없다.</li>
+</ul>
+<p><strong>종합하면, 이 영상의 투자상 효용은 확정된 시장 진단보다 관찰 가설을 제공한다는 데 있다.</strong> 판단의 분기점은 소외 업종의 거래대금·실적 개선이 이어지는지, 반도체 수요 방어가 실제 숫자로 확인되는지, 정책 기대가 효력 있는 문서로 구체화되는지다.</p>
+  <details>
+    <summary>공개 요약 JSON</summary>
+    <pre>{
+  &quot;version&quot;: 4,
+  &quot;video_id&quot;: &quot;r3bx1jiY7Qs&quot;,
+  &quot;title&quot;: &quot;반도체 빠지자 바이오·2차전지 급등...돈의 흐름 바뀌었나 | 하창완 하보노의 주식 이야기 대표 [더블 체크]&quot;,
+  &quot;url&quot;: &quot;https://www.youtube.com/watch?v=r3bx1jiY7Qs&quot;,
+  &quot;channel&quot;: &quot;삼프로TV 3PROTV&quot;,
+  &quot;channel_id&quot;: &quot;UChlv4GSd7OQl3js-jkLOnFA&quot;,
+  &quot;source_url&quot;: &quot;https://www.youtube.com/@3protv/videos&quot;,
+  &quot;thumbnail_url&quot;: &quot;https://i.ytimg.com/vi/r3bx1jiY7Qs/maxresdefault.jpg&quot;,
+  &quot;published_at&quot;: &quot;2026-11-05T02:26:43+00:00&quot;,
+  &quot;status&quot;: &quot;unverified&quot;,
+  &quot;strategy_source_tier&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_evidence_weight&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_validation_policy&quot;: &quot;STANDARD_REVIEW&quot;,
+  &quot;transcript_status&quot;: &quot;available&quot;,
+  &quot;transcript_source&quot;: &quot;automatic&quot;,
+  &quot;transcript_chars&quot;: 20155,
+  &quot;transcript_quality&quot;: {
+    &quot;status&quot;: &quot;good&quot;,
+    &quot;score&quot;: 1.0,
+    &quot;warnings&quot;: [],
+    &quot;source&quot;: &quot;automatic&quot;,
+    &quot;language&quot;: &quot;Korean&quot;,
+    &quot;model_or_format&quot;: &quot;json3&quot;,
+    &quot;chars&quot;: 20155,
+    &quot;segments&quot;: 1150,
+    &quot;duration_seconds&quot;: 2244,
+    &quot;repeated_ngram_ratio&quot;: 0.001
+  },
+  &quot;generated_at&quot;: &quot;2026-11-06T07:24:02.434446+09:00&quot;,
+  &quot;llm_status&quot;: &quot;success&quot;,
+  &quot;research_status&quot;: &quot;success&quot;,
+  &quot;claim_verification_status&quot;: &quot;success&quot;,
+  &quot;research_pipeline_version&quot;: 4,
+  &quot;evidence_count&quot;: 7,
+  &quot;claim_status_summary&quot;: {
+    &quot;unverified&quot;: 12
+  },
+  &quot;claims&quot;: [
+    {
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;claim_text&quot;: &quot;민주당의 양원 장악·상원 51석 확보 이후 데이터센터 신규 규제와 관세 되돌리기 기대가 부각됐다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;민주당 상원 51석 및 양원 장악&quot;,
+        &quot;observed&quot;: &quot;확인 가능한 선거 결과 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;선거 전망과 정책 기대를 확정 결과 또는 발효된 규제로 간주할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;claim_text&quot;: &quot;반도체 3배 상품이 +3.37%에서 -8%대로 변했고, 이를 기초지수 약 4% 하락과 국내 반도체 3~5% 하락으로 설명한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.89,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;+3.37%→-8%대, 약 12%포인트 변화; 기초지수 약 -4%; 국내 반도체 -3~-5%&quot;,
+        &quot;observed&quot;: &quot;조건부 산술 차이 -11.37%포인트; 실제 상품·지수·종목 수익률 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;레버리지 상품 변동을 국내 반도체의 적정 하락폭으로 직접 적용하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;claim_text&quot;: &quot;메모리 초과수요와 장기공급계약이 투자 지연을 완충하고 HBM 수율 개선이 이익률을 높이며, 하이퍼스케일러 투자 지연은 현금흐름에 유리할 수 있다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.89,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;초기 HBM 수율 약 70~75%&quot;,
+        &quot;observed&quot;: &quot;회사·제품·측정 기준이 명시된 수율 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;공급계약과 수율 개선을 실적 방어의 확정 근거로 반영하기 어렵다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;claim_text&quot;: &quot;기관 중심 반등과 외국인 매도가 이어졌으며 반도체 비중이 지수 상승을 제한한다. 현대차·NAVER·APR·HYBE의 장중 가격 및 반등 수치도 제시한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:06:10&quot;,
+      &quot;source_confidence&quot;: 0.9,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;지수 5,600·5,400; 코스닥 680대; 기관 1,500억→9,000억원; 외국인 -2.5조→-2.7~-2.8조원; 금융투자 5~6조원; 반도체 비중 47%, 관련 종목 포함 50% 이상; 나스닥 선물 약 +1%; 현대차 약 +4%·30만원 재돌파; NAVER 약 +6%·이전 대비 약 -20%; APR 약 +8%; HYBE 146,000원&quot;,
+        &quot;observed&quot;: &quot;기관 증가액의 조건부 산술 확인 외 지수·수급·분봉·구성비·종목 시세 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;미확인 지수·수급·가격 수준을 매매 기준으로 채택하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;claim_text&quot;: &quot;비만 치료제 실적·임상 데이터와 의약품 지원 기대가 바이오 강세를 이끌었으며 한미약품은 최근 처방을 시작했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:11:56&quot;,
+      &quot;source_confidence&quot;: 0.91,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;비만 관련 일부 종목 10%대 이상 상승&quot;,
+        &quot;observed&quot;: &quot;종목별 귀속·기준시각·시세 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;비만 테마의 강세를 바이오 전체 실적 개선이나 정책 수혜로 일반화할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;claim_text&quot;: &quot;앨버말·퀀텀스케이프 상승이 국내 리튬·2차전지주로 이어졌고 탄산리튬 선물은 하락했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.9,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;미국·국내 관련주 상승, 탄산리튬 선물 하락; 구체적 수치 없음&quot;,
+        &quot;observed&quot;: &quot;동일 시간창의 비교 시세 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;주가 반등과 리튬 가격의 괴리 및 테마 지속성은 아직 확인되지 않았다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;claim_text&quot;: &quot;비트코인이 약 4% 상승했고 현물 유입·숏커버가 배경이지만 관련 주식의 상승 반응은 평소보다 약했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:06:10&quot;,
+      &quot;source_confidence&quot;: 0.92,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;BTC 약 +4%; 통상 BTC +3~4%에 관련주 +10%대 중반&quot;,
+        &quot;observed&quot;: &quot;BTC·관련주 수익률 및 과거 반응 통계 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;숏커버 주도 반등인지 또는 지속적 자금 유입인지 판단할 근거가 부족하다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;claim_text&quot;: &quot;미국 장기국채 금리 하락의 주원인은 강한 입찰과 안전자산 수요이며 정책금리 인하 기대와 구분해야 한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:11:56&quot;,
+      &quot;source_confidence&quot;: 0.89,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;10·20·30년물 입찰 수요 강세; 유가 1~2주 하락만으로 정책 반영 어려움&quot;,
+        &quot;observed&quot;: &quot;입찰 결과·금리 경로·정책 발언 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;장기금리 하락을 금리 인하 또는 안전자산 수요 중 하나로 단정하기 어렵다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;claim_text&quot;: &quot;유가가 두 차례 연속 급락했고 항공·여행·재건·신재생으로 수급이 순환했으며 선런은 실적 발표 후 시간외 10% 이상 상승했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.89,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;유가 두 차례 연속 급락; 일부 항공주 약 +10%; 선런 시간외 +10% 이상&quot;,
+        &quot;observed&quot;: &quot;CL=F 단일 스냅샷 약 91.34만 제공; 비교 수익률 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;유가 하락 지속과 관련 업종의 실적 수혜·수급 순환은 별도 확인이 필요하다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C10&quot;,
+      &quot;claim_text&quot;: &quot;깨끗한나라와 한진칼의 주가 움직임이 각각 지배구조·경영권 분쟁 뉴스와 관련 있다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:35:40&quot;,
+      &quot;source_confidence&quot;: 0.92,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;정량 수치 없음&quot;,
+        &quot;observed&quot;: &quot;관련 공시·사건·시세 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;각 회사 사건을 독립적으로 확인하기 전에는 경영권 분쟁 테마로 묶기 어렵다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C11&quot;,
+      &quot;claim_text&quot;: &quot;선거 이후 트럼프의 방위비 증액 등 정책 추진력 약화 우려가 미국·한국 방산 및 조선 약세에 반영됐다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:06:10&quot;,
+      &quot;source_confidence&quot;: 0.92,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;정량 수치 없음&quot;,
+        &quot;observed&quot;: &quot;예산·계약·업종 수익률 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;정책 추진력 약화 전망을 실제 국방지출 축소나 수주 감소로 간주하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C12&quot;,
+      &quot;claim_text&quot;: &quot;중간선거 이후 평균 약 20% 상승은 9개월 이상 관측해야 하며, 100년 통계·산타랠리 보고서와 ARM·필립스·퀄컴의 당일 실적 일정이 언급됐다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:17:38&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;평균 약 +20%, 관측기간 9개월 이상, 100년 통계; ARM 2분기·필립스 3분기·퀄컴 4분기 실적 당일 예정&quot;,
+        &quot;observed&quot;: &quot;통계 원문·재현 자료·실적 발표 일정 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;출처와 표본이 없는 평균 상승률을 향후 기대수익률이나 단기 매수 근거로 사용하기 어렵다.&quot;
+    }
+  ],
+  &quot;entities&quot;: [
+    {
+      &quot;ticker&quot;: &quot;CL=F&quot;,
+      &quot;name&quot;: &quot;유가 민감주·재건·항공·여행·신재생에너지&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;유가 하락과 정책 기대 속에 재건·항공·여행 및 태양광·풍력으로 단기 수급이 순환하며, 초반 부진했던 재건주도 후반에는 움직였다고 설명한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;유가가 두 차례 연속 급락했다고 언급.&quot;,
+        &quot;항공주와 ASR상 ‘제조항공’이 약 10% 상승했다고 언급.&quot;,
+        &quot;선런은 실적 발표 후 애프터마켓에서 10% 이상 급등했다고 설명.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;CL=F&quot;,
+        &quot;as_of&quot;: &quot;2026-11-05T23:21:39.903133+00:00&quot;,
+        &quot;current_price&quot;: 91.33999633789062,
+        &quot;market_cap&quot;: null,
+        &quot;forward_pe&quot;: null,
+        &quot;trailing_pe&quot;: null,
+        &quot;fifty_two_week_high&quot;: 119.48,
+        &quot;fifty_two_week_low&quot;: 54.98,
+        &quot;average_target_price&quot;: null,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    }
+  ],
+  &quot;evidence&quot;: [
+    {
+      &quot;evidence_id&quot;: &quot;E1&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;Dow Jones Futures: Nasdaq Dives 5.5%, Nvidia, Sandisk, CoreWeave, SpaceX Plunge, But Sell-Off Spreads Beyond AI&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/m/0cd2227b-7753-3d54-a8c5-286efe82ac39/dow-jones-futures%3A-nasdaq.html&quot;,
+      &quot;publisher&quot;: &quot;Investor&#x27;s Business Daily&quot;,
+      &quot;published_at&quot;: &quot;2026-11-05T23:11:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Dow Jones Futures: Nasdaq Dives 5.5%, Nvidia, Sandisk, CoreWeave, SpaceX Plunge, But Sell-Off Spreads Beyond AI Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E2&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;Midterms Could Deepen the K-Shaped AI Trade as Data Center Curbs Favor Big Tech Companies&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/technology/ai/articles/midterms-could-deepen-k-shaped-225501186.html&quot;,
+      &quot;publisher&quot;: &quot;International Business Times&quot;,
+      &quot;published_at&quot;: &quot;2026-11-05T22:55:01+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Midterms Could Deepen the K-Shaped AI Trade as Data Center Curbs Favor Big Tech Companies Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 202...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E4&quot;,
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;title&quot;: &quot;Century Aluminum Company Reports Third Quarter 2026 Results&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/century-aluminum-company-reports-third-210500429.html&quot;,
+      &quot;publisher&quot;: &quot;GlobeNewswire&quot;,
+      &quot;published_at&quot;: &quot;2026-11-05T21:05:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Century Aluminum Company Reports Third Quarter 2026 Results Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 2026 Elections Weather Newsletter...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E5&quot;,
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;title&quot;: &quot;Celsius Q3 Earnings Call Highlights&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/celsius-q3-earnings-call-highlights-171452999.html&quot;,
+      &quot;publisher&quot;: &quot;MarketBeat&quot;,
+      &quot;published_at&quot;: &quot;2026-11-05T17:14:52+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E6&quot;,
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;title&quot;: &quot;Wells Fargo’s Top Investment Banker Sees ‘Now or Never’ Window for Dealmaking&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/m/b15fa4a9-432c-33eb-9d48-8b4abe7ab8e6/wells-fargo%E2%80%99s-top-investment.html&quot;,
+      &quot;publisher&quot;: &quot;Barrons.com&quot;,
+      &quot;published_at&quot;: &quot;2026-11-05T23:05:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E7&quot;,
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;title&quot;: &quot;Stock Market Today, Nov. 5: Amazon Shares Slide as Technology Selloff Erases Early Gains&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/stock-market-today-nov-5-225937741.html&quot;,
+      &quot;publisher&quot;: &quot;Motley Fool&quot;,
+      &quot;published_at&quot;: &quot;2026-11-05T22:59:37+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    }
+  ],
+  &quot;source_policy&quot;: {
+    &quot;raw_transcript_published&quot;: false,
+    &quot;raw_transcript_in_evidence&quot;: false,
+    &quot;research_pipeline_version&quot;: 4,
+    &quot;closed_source_claims&quot;: &quot;unverified_external_source&quot;,
+    &quot;auto_caption_warning&quot;: true,
+    &quot;local_asr_warning&quot;: false
+  }
+}</pre>
+  </details>
+</article>
+</main>
+  <style>
+.reader-contents { margin: 16px 0; padding: 12px 16px; border: 1px solid var(--line, #64748b); border-radius: 12px; }
+.reader-contents > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-weight: 750; }
+.reader-contents nav { display: grid; gap: 4px; max-height: 45vh; overflow: auto; margin: 8px 0; }
+.reader-contents a { display: block; min-height: 44px; padding: 10px; border-radius: 6px; color: inherit; overflow-wrap: anywhere; }
+.reader-contents a:hover { background: #80808020; }
+.reader-contents .reader-subsection { padding-inline-start: 24px; font-size: .92em; }
+.reader-prose, .report { overflow-wrap: anywhere; line-height: 1.8; }
+.reader-prose p, .reader-prose li { max-width: 85ch; }
+.reader-prose h2, .reader-prose h3, .reader-prose h4, [data-reader-heading] { scroll-margin-top: 100px; line-height: 1.45; }
+.reader-prose h2 { margin-top: 1.8em; padding-bottom: 8px; border-bottom: 1px solid var(--line, #64748b); }
+.reader-prose h3 { margin-top: 1.5em; }
+.reader-prose li { margin: .5em 0; }
+.reader-prose pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.reader-prose blockquote { margin: 16px 0; padding: 4px 16px; border-left: 3px solid var(--accent, #64748b); }
+.reader-table { overflow: auto; max-width: 100%; margin: 16px 0; border: 1px solid var(--line, #64748b); border-radius: 10px; }
+.reader-table table { border-collapse: collapse; width: 100%; margin: 0; font-size: .92rem; }
+.reader-table th, .reader-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line, #64748b); min-width: 110px; max-width: 400px; overflow-wrap: anywhere; white-space: normal; }
+.reader-table th { background: #80808018; }
+.reader-table tr:nth-child(even) { background: #80808008; }
+.reader-search { display: grid; gap: 8px; margin: 16px 0; }
+.reader-search label { font-weight: 700; }
+.reader-search input { box-sizing: border-box; width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line, #64748b); border-radius: 10px; background: var(--panel, #fff); color: var(--text, #132238); font: inherit; }
+.reader-search p { margin: 0; font-size: .86rem; }
+.reader-back { position: fixed; bottom: max(14px, env(safe-area-inset-bottom)); right: 14px; z-index: 30; min-height: 44px; border: 1px solid #778899; border-radius: 99px; padding: 10px 16px; background: #18344a; color: #fff; font: 700 14px system-ui; cursor: pointer; box-shadow: 0 3px 12px #0003; }
+[data-reader-source] { margin-top: 20px; }
+[data-reader-source] > summary { min-height: 44px; cursor: pointer; }
+[data-reader-source] pre { font-size: .85rem; }
+[data-reader-source] pre, .reader-prose { min-width: 0; }
+.reader-contents :focus-visible, .reader-search :focus-visible, .reader-back:focus-visible, .reader-table:focus-visible { outline: 3px solid var(--accent, #008c95); outline-offset: 3px; }
+.reader-search + .grid > [hidden] { display: none !important; }
+@media (max-width: 600px) { .reader-prose { font-size: 1rem; } .reader-contents { padding: 8px 12px; } }
+@media print { .reader-back, .reader-search, .reader-contents, [data-reader-source] { display: none !important; } .reader-table { overflow: visible; } .reader-prose { color: #000; background: #fff; } }
+</style><script>
+(() => {
+  'use strict';
+  let serial = 0;
+  const rendered = new WeakMap();
+  const node = (tag, text) => { const el = document.createElement(tag); if (text != null) el.textContent = text; return el; };
+  function inline(parent, text) {
+    const pattern = /(`[^`]+`|\*\*[^*]+\*\*|\[[^\]]+\]\(https?:\/\/[^\s)]+\))/g;
+    let start = 0;
+    for (const match of String(text).matchAll(pattern)) {
+      parent.append(document.createTextNode(text.slice(start, match.index)));
+      const value = match[0];
+      if (value.startsWith('`')) parent.append(node('code', value.slice(1, -1)));
+      else if (value.startsWith('**')) parent.append(node('strong', value.slice(2, -2)));
+      else {
+        const link = value.match(/^\[([^\]]+)\]\((.+)\)$/);
+        const a = node('a', link[1]); a.href = link[2]; a.rel = 'noopener noreferrer'; parent.append(a);
+      }
+      start = match.index + value.length;
+    }
+    parent.append(document.createTextNode(text.slice(start)));
+  }
+  const cells = line => line.trim().replace(/^\|/, '').replace(/\|$/, '').split(/(?<!\\)\|/).map(v => v.trim().replace(/\\\|/g, '|'));
+  function markdown(source) {
+    const article = node('article'); article.className = 'reader-prose';
+    const lines = source.split(/\r?\n/); let list = null;
+    for (let i = 0; i < lines.length; i += 1) {
+      const line = lines[i], value = line.trim();
+      if (!value) { list = null; continue; }
+      if (/^```/.test(value)) {
+        const code = []; i += 1;
+        while (i < lines.length && !/^```/.test(lines[i].trim())) code.push(lines[i++]);
+        const pre = node('pre'); pre.append(node('code', code.join('\n'))); article.append(pre); list = null; continue;
+      }
+      if (i + 1 < lines.length && value.includes('|') && cells(lines[i + 1]).every(v => /^:?-{3,}:?$/.test(v))) {
+        const table = node('table'), head = node('thead'), body = node('tbody');
+        const row = (values, tag) => { const tr = node('tr'); values.forEach(v => { const cell = node(tag); if (tag === 'th') cell.scope = 'col'; inline(cell, v); tr.append(cell); }); return tr; };
+        head.append(row(cells(line), 'th')); i += 2;
+        while (i < lines.length && lines[i].trim() && lines[i].includes('|')) body.append(row(cells(lines[i++]), 'td'));
+        i -= 1; table.append(head, body); article.append(table); list = null; continue;
+      }
+      const heading = value.match(/^(#{1,6})\s+(.+)$/);
+      if (heading) { const h = node('h' + Math.min(4, heading[1].length + 1)); inline(h, heading[2]); article.append(h); list = null; continue; }
+      const bullet = value.match(/^(?:[-*+] |\d+\. )(.+)$/);
+      if (bullet) {
+        const tag = /^\d/.test(value) ? 'ol' : 'ul';
+        if (!list || list.tagName.toLowerCase() !== tag) { list = node(tag); if (tag === 'ol') list.start = parseInt(value, 10); article.append(list); }
+        const li = node('li'); inline(li, bullet[1]); list.append(li); continue;
+      }
+      list = null;
+      if (/^(---+|\*\*\*+)$/.test(value)) { article.append(node('hr')); continue; }
+      const p = node(value.startsWith('> ') ? 'blockquote' : 'p'); inline(p, value.startsWith('> ') ? value.slice(2) : line); article.append(p);
+    }
+    return article;
+  }
+  function contents(root) {
+    root.querySelectorAll(':scope > .reader-contents').forEach(el => el.remove());
+    const headings = [...root.querySelectorAll('h2,h3,h4')].filter(h => !h.closest('.card,.run-card,.reader-contents,[data-reader-source],[hidden]'));
+    if (headings.length < 2) return;
+    const details = node('details'); details.className = 'reader-contents';
+    details.append(node('summary', '이 리포트 목차 · ' + headings.length + '개 항목'));
+    const nav = node('nav'); nav.setAttribute('aria-label', '리포트 목차');
+    headings.forEach(h => {
+      if (!h.id) h.id = 'reader-section-' + (++serial);
+      h.dataset.readerHeading = ''; h.tabIndex = -1;
+      const a = node('a', h.textContent); a.href = '#' + h.id;
+      if (h.tagName !== 'H2') a.className = 'reader-subsection';
+      a.addEventListener('click', event => {
+        event.preventDefault();
+        for (let ancestor = h.parentElement; ancestor; ancestor = ancestor.parentElement) if (ancestor.tagName === 'DETAILS') ancestor.open = true;
+        h.scrollIntoView({block: 'start'}); h.focus({preventScroll: true});
+      }); nav.append(a);
+    });
+    details.append(nav); root.prepend(details);
+  }
+  function enhance(root) {
+    if (!root) return;
+    root.querySelectorAll('pre[data-report-markdown]').forEach(pre => {
+      const previous = rendered.get(pre);
+      if (previous && previous.source === pre.textContent) return;
+      const article = markdown(pre.textContent);
+      if (previous) previous.article.replaceWith(article);
+      else {
+        const details = node('details'); details.dataset.readerSource = '';
+        details.append(node('summary', 'Markdown 원문 보기'));
+        pre.before(article, details); details.append(pre);
+      }
+      rendered.set(pre, {source: pre.textContent, article});
+    });
+    root.querySelectorAll('table').forEach(table => {
+      if (table.closest('.reader-table,.account-table-wrap,.summary-scroll')) return;
+      const wrap = node('div'); wrap.className = 'reader-table'; wrap.tabIndex = 0;
+      wrap.setAttribute('role', 'region'); wrap.setAttribute('aria-label', '리포트 표 · 가로로 스크롤하여 전체 보기');
+      table.before(wrap); wrap.append(table);
+    });
+    root.querySelectorAll('.grid').forEach(grid => {
+      const cards = [...grid.querySelectorAll(':scope > a.card')];
+      if (cards.length < 2 || grid.dataset.readerSearch) return;
+      grid.dataset.readerSearch = 'true';
+      const box = node('div'); box.className = 'reader-search';
+      const input = node('input'); input.type = 'search'; input.placeholder = '제목 · 종목 · 채널 · 키워드'; input.id = 'report-search-' + (++serial);
+      const label = node('label', '리포트 찾기'); label.htmlFor = input.id;
+      const status = node('p'); status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
+      const update = () => {
+        const terms = input.value.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean); let count = 0;
+        cards.forEach(card => { card.hidden = !terms.every(t => card.textContent.toLocaleLowerCase().includes(t)); if (!card.hidden) count += 1; });
+        status.textContent = cards.length + '개 중 ' + count + '개 표시' + (count ? '' : ' · 검색어를 지우거나 다른 키워드를 입력하세요.');
+      };
+      input.addEventListener('input', update); box.append(label, input, status); grid.before(box); update();
+    });
+    contents(root);
+  }
+  window.TradingAgentsReader = {enhance};
+  const main = document.querySelector('main');
+  if (main && !main.hasAttribute('data-reader-dynamic')) enhance(main);
+  if (main) {
+    const top = node('button', '↑ 맨 위'); top.type = 'button'; top.className = 'reader-back'; top.setAttribute('aria-label', '리포트 맨 위로 이동');
+    top.addEventListener('click', () => { const target = document.querySelector('h1') || main; target.tabIndex = -1; target.scrollIntoView({block: 'start'}); target.focus({preventScroll: true}); });
+    document.body.append(top);
+  }
+})();
+</script>
+</body>
+</html>

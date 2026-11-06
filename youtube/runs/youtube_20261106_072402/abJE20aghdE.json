@@ -1,0 +1,209 @@
+{
+  "version": 4,
+  "video_id": "abJE20aghdE",
+  "title": "-50% 손실일 때, GPT에 꼭 물어봐야 하는 질문 한 가지",
+  "url": "https://www.youtube.com/watch?v=abJE20aghdE",
+  "channel": "경제사냥꾼",
+  "channel_id": "UC7usMJDHmtbs_oegmzQKKMA",
+  "source_url": "https://www.youtube.com/@%EA%B2%BD%EC%A0%9C%EC%82%AC%EB%83%A5%EA%BE%BC/shorts",
+  "thumbnail_url": "https://i.ytimg.com/vi/abJE20aghdE/maxresdefault.jpg",
+  "published_at": "2026-11-05T14:14:05+00:00",
+  "status": "asr_uncertain",
+  "strategy_source_tier": "STANDARD",
+  "strategy_evidence_weight": "STANDARD",
+  "strategy_validation_policy": "STANDARD_REVIEW",
+  "transcript_status": "available",
+  "transcript_source": "automatic",
+  "transcript_chars": 775,
+  "transcript_quality": {
+    "status": "good",
+    "score": 1.0,
+    "warnings": [],
+    "source": "automatic",
+    "language": "Korean",
+    "model_or_format": "json3",
+    "chars": 775,
+    "segments": 35,
+    "duration_seconds": 62,
+    "repeated_ngram_ratio": 0.0
+  },
+  "generated_at": "2026-11-06T07:24:02.434446+09:00",
+  "llm_status": "success",
+  "research_status": "success",
+  "claim_verification_status": "success",
+  "research_pipeline_version": 4,
+  "evidence_count": 3,
+  "claim_status_summary": {
+    "supported": 1,
+    "unverified": 4,
+    "partially_supported": 2,
+    "asr_uncertain": 1
+  },
+  "claims": [
+    {
+      "claim_id": "C1",
+      "claim_text": "평균 매입가 대비 50% 하락한 주식은 추가 매수 없이 매입가를 회복하려면 100% 상승해야 한다.",
+      "status": "supported",
+      "confidence": 1.0,
+      "supporting_evidence_ids": [],
+      "manual_check_required": false,
+      "timestamp": "00:00:02",
+      "source_confidence": 1.0,
+      "asr_confidence": 0.9,
+      "numeric_parse": {
+        "claimed": "50% 하락 후 회복에 100% 상승 필요",
+        "observed": "가정값 100→50→100으로 직접 계산한 필요 상승률 100%; 실제 시장 관측값은 아님"
+      },
+      "investor_implication": "손실률과 회복에 필요한 수익률의 기준 가격이 다르다는 점을 구분해야 한다."
+    },
+    {
+      "claim_id": "C2",
+      "claim_text": "본전 회복 시점보다 기업의 재성장 가능성을 중심으로 판단해야 한다는 투자 원칙을 제안한다.",
+      "status": "unverified",
+      "confidence": 0.4,
+      "supporting_evidence_ids": [
+        "E1"
+      ],
+      "manual_check_required": true,
+      "timestamp": "00:00:02",
+      "source_confidence": 0.25,
+      "asr_confidence": 0.85,
+      "numeric_parse": {
+        "claimed": "수치 주장 없음",
+        "observed": "기업별 관측 자료 없음"
+      },
+      "investor_implication": "과거 매입가와 별개로 현재 기업 상태를 검토하되, 제공 자료만으로 특정 종목의 매매 결론을 내릴 수 없다."
+    },
+    {
+      "claim_id": "C3",
+      "claim_text": "기업 상태를 확인하지 않고 평균 매입 단가를 낮추면 추가 투자금까지 잃을 수 있다고 경고한다.",
+      "status": "partially_supported",
+      "confidence": 0.85,
+      "supporting_evidence_ids": [
+        "E1",
+        "E2",
+        "E3"
+      ],
+      "manual_check_required": true,
+      "timestamp": "00:00:02",
+      "source_confidence": 0.3,
+      "asr_confidence": 0.85,
+      "numeric_parse": {
+        "claimed": "추가 투자금까지 손실 가능",
+        "observed": "설명용 계산: 총 투입금 100→150, 평균 단가 100→75; 실제 종목 관측값 아님"
+      },
+      "investor_implication": "평균 단가 하락과 총 투자금 증가를 따로 확인하고 추가 자금의 손실 가능성을 평가해야 한다."
+    },
+    {
+      "claim_id": "C4",
+      "claim_text": "영상은 종목 코드·평균 매입 가격·투자 금액을 입력하는 손실 주식 분석용 프롬프트를 준비했다고 설명한다.",
+      "status": "unverified",
+      "confidence": 0.3,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:02",
+      "source_confidence": 0.25,
+      "asr_confidence": 0.85,
+      "numeric_parse": {
+        "claimed": "수치 주장 없음",
+        "observed": "프롬프트 원문 미제공"
+      },
+      "investor_implication": "실제 프롬프트 원문을 확보하기 전에는 소개된 구성과 사용 가능 여부를 확정하지 않아야 한다."
+    },
+    {
+      "claim_id": "C5",
+      "claim_text": "해당 프롬프트가 최신 실적·공시를 확인하고 기업 위험 변화, 추가 매수·보유·매도 위험 및 판단 변경 조건을 보고한다고 설명한다.",
+      "status": "unverified",
+      "confidence": 0.15,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:02",
+      "source_confidence": 0.15,
+      "asr_confidence": 0.85,
+      "numeric_parse": {
+        "claimed": "최신 실적·공시 확인 및 세 가지 행동 비교",
+        "observed": "실행 보고서와 원문 대조 자료 없음"
+      },
+      "investor_implication": "생성 보고서를 투자 판단에 사용하기 전에 원문 공시와 자료 기준일, 수치 및 인용의 일치 여부를 확인해야 한다."
+    },
+    {
+      "claim_id": "C6",
+      "claim_text": "프롬프트 사용이 감정적인 투자 실수를 줄이는 데 확실히 도움이 된다고 주장한다.",
+      "status": "unverified",
+      "confidence": 0.1,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:02",
+      "source_confidence": 0.1,
+      "asr_confidence": 0.7,
+      "numeric_parse": {
+        "claimed": "실수 감소 효과를 정성적으로 주장",
+        "observed": "효과 측정값 없음"
+      },
+      "investor_implication": "감정적 실수 감소나 투자 성과 개선을 검증된 효과로 전제해서는 안 된다."
+    },
+    {
+      "claim_id": "C7",
+      "claim_text": "제작자는 특별 프롬프트를 커뮤니티 탭에 무료로 공유하겠다고 예고한다.",
+      "status": "partially_supported",
+      "confidence": 0.65,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:02",
+      "source_confidence": 0.4,
+      "asr_confidence": 0.85,
+      "numeric_parse": {
+        "claimed": "무료 공유 예고",
+        "observed": "실제 게시 및 이용 조건 자료 없음"
+      },
+      "investor_implication": "공유 예고와 실제 공개를 구분하고 동일 채널 게시물에서 접근 가능 여부 및 이용 조건을 확인해야 한다."
+    },
+    {
+      "claim_id": "C8",
+      "claim_text": "자동자막의 ‘사재기’가 감정적 추가 매수를 의미하는지 원음 확인이 필요하다.",
+      "status": "asr_uncertain",
+      "confidence": 0.3,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:02",
+      "source_confidence": 0.2,
+      "asr_confidence": 0.3,
+      "numeric_parse": {
+        "claimed": "수치 주장 없음",
+        "observed": "의심 단어의 원음 확인 자료 없음"
+      },
+      "investor_implication": "해당 단어를 확정 인용하거나 구체적인 매매 행동을 권유한 표현으로 해석하지 않아야 한다."
+    }
+  ],
+  "entities": [],
+  "evidence": [
+    {
+      "evidence_id": "E1",
+      "claim_id": "C3",
+      "title": "주식 물타기 전략: 추가 매수 금액과 중단 기준 정하는 법 - AlphaScope",
+      "source_url": "//duckduckgo.com/l/?uddg=https%3A%2F%2Falphascopenote.com%2F2026%2F10%2Faveraging%2Ddown%2Dguide%2F&rut=ca5b18dbe313f5d4472eeb6ad0446e83c7316b05f47ebb1b415cc7583a42cc4a",
+      "publisher": "duckduckgo.com",
+      "published_at": null,
+      "source_tier": "web",
+      "excerpt": "추가 매수를 결정할 때는 새로 투입할 자금이 앞으로 어떤 수익과 위험을 가져오는지 살펴봐야 합니다. 평균단가를 낮출 수 있다는 사실은 계산의 결과이고, 그 가격에서 더 살 만한 이유는 현재 정보로 판단할 문제입니다. 최초에 주당 10만 원에 샀던 주식이 9만 원으로 내려왔다고 하겠습니다. 10만 원은 과거에 지출한 가격이고, 새로운 자금은 9만 원에서 출발합니다. 추가 매수금의 성과는 이후 주가가 9만 원에서 얼마나 움직이는지에 달려 있습니다. 기존 매수가..."
+    },
+    {
+      "evidence_id": "E2",
+      "claim_id": "C3",
+      "title": "주식 물타기, 지금 해도 될까? 추가 매수의 유혹과 치명적인 ...",
+      "source_url": "//duckduckgo.com/l/?uddg=https%3A%2F%2Fquantpro.co.kr%2F%25EC%25A3%25BC%25EC%258B%259D%2D%25EB%25AC%25BC%25ED%2583%2580%25EA%25B8%25B0%2D%25EC%25A7%2580%25EA%25B8%2588%2D%25ED%2595%25B4%25EB%258F%2584%2D%25EB%2590%25A0%25EA%25B9%258C%2D%25EC%25B6%2594%25EA%25B0%2580%2D%25EB%25A7%25A4%25EC%2588%2598%25EC%259D%2598%2D%25EC%259C%25A0%25ED%2598%25B9%25EA%25B3%25BC%2D%25EC%25B9%2598%25EB%25AA%2585%2F&rut=1b23b157feaf5f62b416f06270fcbe6c5291a32c415a8e5ea24fbb5221dae294",
+      "publisher": "duckduckgo.com",
+      "published_at": null,
+      "source_tier": "web",
+      "excerpt": "물타기란 보유 종목의 주가가 하락했을 때 추가 매수를 통해 평균 단가를 낮추는 투자 기법을 말합니다. 하지만 단순히 평단가를 낮추기 위한 무분별한 물타기는 손실 규모를 키우고 자금을 묶이게 하는 심각한 위험을 초래할 수 있습니다. 물타기는 주식 투자에서 보유하고 있는 종목의 가격이 매수 가격보다 하락했을 때, 같은 종목을 낮은 가격에 추가로 매수하여 전체 보유 물량의 평균 단가를 낮추는 행위를 뜻합니다. 투자자들은 이를 통해 주가가 반등했을 때 더 빠르게..."
+    }
+  ],
+  "source_policy": {
+    "raw_transcript_published": false,
+    "raw_transcript_in_evidence": false,
+    "research_pipeline_version": 4,
+    "closed_source_claims": "unverified_external_source",
+    "auto_caption_warning": true,
+    "local_asr_warning": false
+  }
+}

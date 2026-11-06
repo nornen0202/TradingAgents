@@ -1,0 +1,766 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YouTube 투자자용 검증 리포트 - 블루웨이브에도 비트코인 8만 달러 회복, 민주당판 클래리티 법안이 가져올 크립토 시장의 향방은? | 서동주, 김동환, 함지현 블록미디어 기자 [크립토 PLUS]</title>
+  <style>
+:root {
+  color-scheme: light;
+  --bg: #f7f8fb;
+  --panel: #ffffff;
+  --text: #172033;
+  --muted: #667085;
+  --line: #d9dee8;
+  --accent: #0f766e;
+  --accent-2: #2563eb;
+  --warn: #b45309;
+  --bad: #b42318;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0 56px; }
+a { color: var(--accent-2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.hero { padding: 28px 0 22px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+.hero.compact { padding-top: 12px; }
+.hero h1 { margin: 0; font-size: clamp(28px, 4vw, 44px); line-height: 1.15; letter-spacing: 0; }
+.hero p { max-width: 760px; color: var(--muted); margin: 12px 0 0; }
+.eyebrow { color: var(--accent); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0; margin: 0 0 8px; }
+section { margin: 28px 0; }
+h2, h3, h4, h5 { letter-spacing: 0; line-height: 1.25; }
+.synthesis-callout { padding: clamp(20px, 4vw, 34px); border: 1px solid #6ee7d8; border-radius: 18px; background: linear-gradient(135deg, #ecfdf9 0%, #eff6ff 100%); box-shadow: 0 18px 44px rgba(15, 118, 110, .12); }
+.synthesis-callout.unavailable { border-color: var(--line); background: var(--panel); box-shadow: none; }
+.synthesis-callout h2 { margin: 0; font-size: clamp(24px, 3.2vw, 36px); }
+.synthesis-callout .lead { max-width: 900px; font-size: 17px; color: #334155; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.primary-link, .secondary-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border-radius: 999px; font-weight: 800; }
+.primary-link { color: white; background: var(--accent); }
+.secondary-link { color: var(--accent-2); border: 1px solid #93c5fd; background: white; }
+.primary-link:hover, .secondary-link:hover { text-decoration: none; filter: brightness(.97); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.card, .run { display: flex; flex-direction: column; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; color: var(--text); min-height: 128px; }
+.run { padding: 16px; }
+.card:hover, .run:hover { border-color: var(--accent-2); text-decoration: none; }
+.thumb { display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #e9edf5; border-radius: 8px 8px 0 0; color: var(--muted); font-size: 13px; font-weight: 700; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb-empty span { padding: 0 14px; text-align: center; }
+.card-body { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 16px; }
+.card strong { line-height: 1.35; }
+.source-line { color: #3f4a5f; font-weight: 600; }
+.runs { display: grid; gap: 10px; }
+.badge { display: inline-flex; width: fit-content; border-radius: 999px; padding: 2px 9px; background: #e6f4f1; color: var(--accent); font-size: 12px; font-weight: 700; }
+.status-contradicted, .status-llm_failed { background: #fee4e2; color: var(--bad); }
+.status-unverified, .status-stale { background: #fff4d6; color: var(--warn); }
+small, .muted { color: var(--muted); }
+.topnav { display: flex; gap: 14px; margin-bottom: 16px; font-size: 14px; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px; }
+.stats span { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
+.report { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: min(5vw, 36px); }
+.report-head { border-bottom: 1px solid var(--line); margin-bottom: 24px; padding-bottom: 20px; }
+.report-head h1 { margin: 0; font-size: clamp(24px, 3.5vw, 38px); line-height: 1.2; }
+.meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+.scope-note { padding: 12px 14px; border-left: 4px solid var(--warn); border-radius: 6px; background: #fff7ed; color: #7c2d12; }
+.synthesis-report h2 { margin-top: 34px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.synthesis-report h3 { margin: 24px 0 8px; color: #0f4c5c; }
+.synthesis-report p, .synthesis-report li { overflow-wrap: anywhere; }
+pre { overflow: auto; background: #111827; color: #f9fafb; border-radius: 8px; padding: 14px; }
+code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+details { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 18px; }
+@media (max-width: 640px) {
+  main { width: min(100% - 20px, 1120px); padding-top: 18px; }
+  .report { padding: 18px; }
+  .synthesis-callout { border-radius: 14px; padding: 18px; }
+  .cta-row a { width: 100%; }
+  .mobile-report { border-radius: 12px; }
+}
+</style>
+</head>
+<body>
+  <main>
+<nav class="topnav"><a href="index.html">실행 목록</a><a href="../../index.html">YouTube 홈</a></nav>
+<article class="report">
+  <header class="report-head">
+    <p class="eyebrow">youtube_20261106_072402</p>
+    <h1>블루웨이브에도 비트코인 8만 달러 회복, 민주당판 클래리티 법안이 가져올 크립토 시장의 향방은? | 서동주, 김동환, 함지현 블록미디어 기자 [크립토 PLUS]</h1>
+    <div class="meta">
+      <span class="badge status-unverified">unverified</span>
+      <a href="https://www.youtube.com/watch?v=XWBnwZHqzus">원본 영상</a>
+    </div>
+  </header>
+  <h2>크립토 시장 점검: ‘블루웨이브’보다 확인해야 할 규제·유동성·자금흐름</h2>
+<p>분석 대상: 삼프로TV <a href="https://www.youtube.com/watch?v=XWBnwZHqzus">크립토 PLUS 영상</a>, 2026년 11월 5일 게시, 32분 26초. 아래 평가는 제공된 자막 분석·호스트 수집 자료·주장별 검증 결과에 한정한다.</p>
+<h3>1. 핵심 판단</h3>
+<p><strong>영상의 강세 논리는 이해할 수 있지만, 이를 뒷받침하는 핵심 사실은 모두 미검증 상태다.</strong> 주장별 검증 C1~C10에는 직접 지지하거나 반박하는 적합한 증거가 확보되지 않았다. 미검증은 거짓이라는 뜻이 아니라, 현재 자료로 투자 전제를 확정할 수 없다는 뜻이다.</p>
+<p>영상은 민주당의 의회 장악이 규제 부담을 높이더라도 친가상자산 의원, 기존 제도화, 금리·달러 움직임이 시장을 지지할 수 있다고 해석한다. 여기에 과거 중간선거 이후 BTC 상승과 반도체 대비 상대적 선방을 연결한다. 그러나 선거 결과, 법안 원문, 동일 시간대 가격, 보고서 산식과 실제 자금흐름이 빠져 있어 <strong>정치 변화 → 기술주 이탈 → 크립토 유입</strong>이라는 연결고리는 아직 가설이다.</p>
+<h3>2. 영상 주장과 확인된 사실/근거</h3>
+<p>아래 시각은 정확한 개별 발언 시점이 아니라 자막 청크 시작점이다.</p>
+<p>| 주제·영상 시각 | 영상 주장 | 확인된 사실/근거 및 한계 |</p>
+<p>|---|---|---|</p>
+<p>| 선거·친가상자산 의원, 00:00:10~00:12:57 | 민주당 상원 54석·하원 238석·주지사 28명, 친가상자산 당선자 245명·68.2% | 공식 개표와 후보 명단·집계 분모가 없다. 238−218=20이라는 산술만 일치하며 실제 의석을 검증한 것은 아니다. |</p>
+<p>| 정치자금, 00:06:35 | 브라운 낙선 지원 약 5,500만 달러, 머스크의 팩스턴 지원 약 1억7,000만 달러, Fairshake 후보별 지원 | FEC 공시가 없다. 선거 주기, 직접 기부·독립지출, 지지·반대 대상과 후보별 당락 모두 확인 필요다. |</p>
+<p>| 클래리티·디파이, 00:12:57 | 민주당판 법안의 SEC 권한·소비자 보호·윤리 조항 강화가 디파이에 부담 | 법안 번호·초안·입법 단계와 위원회 지도부 확정 자료가 없다. 전망을 확정 규제로 볼 수 없다. |</p>
+<p>| BTC 반등, 00:19:23 | 7만5,000달러대 하락 후 8만 달러 회복, 나스닥 반등·금리 하락·달러 약세가 배경 | 자산 식별과 시간대가 정렬된 가격·금리·환율 자료가 없다. 반등 사실과 원인 모두 미확인이다. |</p>
+<p>| 선거 주기, 00:25:41 | DWF Labs 분석상 과거 세 차례 중간선거 1년 후 상승, 2022년 +92% | 원보고서·가격 이력·산식이 없다. 사실로 확인되더라도 세 사례만으로 미래 상승을 일반화하기 어렵다. |</p>
+<p>| 탈동조화, 00:25:41 | Coinbase 보고서상 6월 이후 BTC 약 −3%, 반도체지수 −29%; 기술주 자금의 크립토 이동 가능성 | 비교 연도·종료일·지수명이 없다. 상대수익률 차이는 상관관계 변화나 실제 자금 이동의 증명이 아니다. |</p>
+<p>| 제도화·거시, 00:25:41~00:31:51 | GENIUS Act 2027년 1월 발효, 제도화 후퇴 제한, 고용·물가가 12월 연준 판단에 영향 | 법률 발효 조건·기관 문서·공식 발표 일정이 없다. 시행 시점과 정책 전망을 확정할 수 없다. |</p>
+<h4>수집된 외부 자료가 실제로 말해주는 것</h4>
+<p>수집 항목의 <code>verified</code> 표시는 영상 주장의 검증 완료를 뜻하지 않는다. 11개 자료 중 다수는 기업 실적·광산 기사로 해당 주장과 무관하며, E1~E4 발췌는 오류 안내·사이트 메뉴 중심, E5~E11 발췌는 비어 있다.</p>
+<p>상대적으로 주제가 가까운 자료는 다음 두 건이지만, <strong>기사 제목 수준의 보조 정황</strong>으로만 사용할 수 있다.</p>
+<ul>
+<li><a href="https://finance.yahoo.com/m/0cd2227b-7753-3d54-a8c5-286efe82ac39/dow-jones-futures%3A-nasdaq.html">IBD의 나스닥 급락 관련 기사(E6)</a>: 제목에 나스닥 5.5% 하락이 제시돼 있으나 본문·지수 시계열은 제공되지 않았다.</li>
+<li><a href="https://finance.yahoo.com/markets/article/micron-declines-12-as-chip-sell-off-deepens-163137019.html">Yahoo Finance의 마이크론·반도체 약세 기사(E3)</a>: 반도체 매도라는 주제는 관련되지만, Coinbase의 누적수익률이나 크립토 자금 유입을 입증하지 않는다.</li>
+</ul>
+<p>두 자료 모두 영상 게시 이후에 발행됐다. 방송 당시 반등과 이후 하락은 양립할 수 있으므로, 이를 영상의 직접 반증으로 사용하지 않았다. 핵심 주장을 검증할 수 있는 공식 원문 링크는 제공 자료에서 확보되지 않았다.</p>
+<h3>3. 강세 논리와 반론</h3>
+<h4>① 정당 구도보다 실제 규제 내용이 중요하다는 논리</h4>
+<p>영상의 관점은 민주당 승리가 곧 업계 전면 후퇴를 뜻하지는 않는다는 것이다. 친가상자산 의원과 기존 제도화가 유지된다면 정치적 불확실성이 줄어들 수 있다는 조건부 해석이다.</p>
+<p>반론은 두 가지다. 우선 선거 결과와 친가상자산 비중부터 미확인이다. 또한 친가상자산 성향이 투자자 보호·이해충돌·디파이 감독 강화에 대한 반대를 뜻하지는 않는다. 정당별 의석보다 <strong>실제 조문과 의원별 표결</strong>이 중요하다. 기존 제도화를 되돌리기 어렵다는 의견도 법적 철회 불가능성과는 다르다.</p>
+<h4>② 금리·달러가 정치 충격을 상쇄한다는 논리</h4>
+<p>단기금리 하락과 달러 약세가 함께 나타난다면 크립토 반등을 설명하는 후보 요인이 될 수 있다. 다만 제공 자료에는 해당 관측값이 없다. 가격 동행이 확인되더라도 단일 원인을 입증하는 것은 아니다.</p>
+<p>이 논리를 점검하려면 BTC, 나스닥, 단기 국채금리, 달러지수를 동일 시간대에 놓고 봐야 한다. 금리·달러가 반등하는 가운데 BTC 상승도 멈춘다면 영상의 거시적 지지 논리는 약해진다.</p>
+<h4>③ 기술주 대비 방어력과 선거 이후 회복이라는 논리</h4>
+<p>BTC가 반도체보다 덜 하락했다면 상대적 방어력의 단서가 될 수 있다. 그러나 두 자산이 모두 하락하면서 낙폭만 달랐을 가능성도 있다. 단기 나스닥 동조화와 중기 반도체 탈동조화는 관찰 기간을 나누면 양립할 수 있지만, 이를 검증할 시계열이 없다.</p>
+<p>과거 선거 이후 상승 주장도 측정 시작·종료일과 가격원을 통일해 재계산해야 한다. 선거와 반감기·유동성·개별 위기 요인을 분리하지 않으면 선거 자체의 효과를 판단하기 어렵다. 기술주 이탈 자금은 크립토가 아니라 현금·국채 등으로 이동할 수도 있다.</p>
+<h3>4. 자산별 위험은 분리해서 봐야 한다</h3>
+<p>| 자산 | 영상의 해석 | 투자자가 확인할 사항 |</p>
+<p>|---|---|---|</p>
+<p>| BTC | 정치 충격에도 회복하고 중기 상승 가능 | 거래소·호가 통화·측정 시각을 확인한 가격 이력, ETF 순유입, 거래량, 금리·달러와의 동행 |</p>
+<p>| UNI | 법인 등록·준법 움직임이 상대적 방어 요인 | 등록 법인명·관할·유형·날짜. 법인 설립은 금융업 인가나 UNI의 법적 분류와 별개이며 약 2% 상승도 미확인 |</p>
+<p>| CAKE | SEC 관할 확대 시 증권성 판단 부담 | 디파이·토큰에 적용되는 구체적 조문과 기관 결정. 현재 자료만으로 UNI보다 불리하다고 확정할 수 없음 |</p>
+<p>| HYPE | 주식 관련 상품 승인 소송·취소 우려 | CFTC 조치의 대상 법인·상품, 사건번호와 청구 내용, Hyperliquid의 직접 연관성. 소송 제기는 승인 취소가 아님 |</p>
+<p>| WLFI | 트럼프 일가 조사·윤리 규정 강화 부담 | 소유·수익배분 문서, 의원실 요구서, 실제 조사 개시 여부와 가족 적용 조항. 조사 요구와 조사 착수를 구별 |</p>
+<p>HYPE의 상품 규제 위험과 WLFI의 정치·이해충돌 위험을 같은 사건으로 묶어서는 안 된다. 관련 발표가 실제 가격 변동의 원인이었는지도 별도 검증 대상이다.</p>
+<h3>5. 가까운 관찰 일정과 가설 무효화 조건</h3>
+<h4>일정부터 재확인할 항목</h4>
+<p>영상은 2026년 11월 6일 고용·실업률, 11월 10일 CPI, 11월 13일 PPI 발표와 11월 FOMC 부재를 제시한다. <strong>모두 공식 캘린더와 대조되지 않은 방송 일정</strong>이며 실제 발표 수치도 제공되지 않았다. 대상 월, 미국 동부 발표 시각, 한국 날짜, 일정 변경 공지를 먼저 확인해야 한다. ‘케빈 의장’의 성명·직책·발언 원문도 미확인이다.</p>
+<p>2027년 1월 역시 새 의회 시작과 GENIUS Act 발효를 하나의 확정 촉매로 묶을 수 없다. 법률상 발효 조건·시행규칙과 의회 일정을 각각 확인해야 하며, 2027년 부채한도 협상 필요성도 현행법·재무부 자료 확인이 필요하다.</p>
+<h4>구체적인 관찰표</h4>
+<p>| 가설 | 관찰할 자료 | 가설을 약화·무효화하는 조건 |</p>
+<p>|---|---|---|</p>
+<p>| 친가상자산 의회가 규제 충격 완화 | 공식 개표 시각, 후보별 성향 기준·분모, 위원회 인선, 법안 표결 | 방송의 선거 수치가 다르거나 실제 조문·표결이 예상보다 제한적일 때 |</p>
+<p>| 기술주 자금이 크립토로 이동 | 동일 기간 상대수익률, 기간별 상관계수, ETF·펀드 순유입 | 기술주 약세에도 크립토 유출이 이어지면 유입 가설 약화. 유입만 확인돼도 자금 출처까지 입증되지는 않음 |</p>
+<p>| UNI 준법 움직임이 방어력 제공 | 등록 원문, 인가 범위, 토큰·프로토콜 적용 규정 | 등록이 해당 규제와 무관하거나 UNI에 제한 조치가 적용될 때 |</p>
+<p>| HYPE·WLFI에 특정 규제 사건 영향 | 기관 명령·법원 문서·조사 원문, 자산과의 직접 관계 | 사건 대상과 해당 자산의 연결이 성립하지 않으면 그 사건에 기초한 해석은 무효 |</p>
+<p>| 선거 후 BTC 상승 패턴 재현 | DWF 원보고서, 동일 가격원으로 재계산한 수익률·저점 | 원수치가 재현되지 않으면 통계적 전제가 무효. 재현돼도 미래 상승을 보장하지 않음 |</p>
+<p>영상의 BTC 8만2,000달러·7만6,800달러는 익명 분석가의 조건부 전망이며, 58,524달러는 연도·거래소·저가 기준이 불명확한 저점이다. <strong>현재 유효한 지지·저항이나 매매 기준으로 채택할 근거는 없다.</strong> 원문과 유효기간이 확인될 때에만 해당 전망의 성립 여부를 추적할 수 있다.</p>
+<h3>6. 데이터 품질과 신뢰도 해석</h3>
+<ul>
+<li><strong>자막 품질:</strong> <code>transcript_quality</code>는 good·1.0이지만 자동 한국어 자막이다. 이는 개별 숫자·인명·법률명의 정확도가 100%라는 뜻이 아니다. WLFI 표기 혼용, 정치인 이름, ‘제임스톤’, ‘케빈’ 등은 원음·원문 확인이 필요하다.</li>
+<li><strong>주장 추출 확신도:</strong> <code>source_confidence</code>는 사실 여부가 아니라 자막에서 해당 주장을 읽어낸 확신도다. C5·C6의 0.94도 가격·수익률 검증을 뜻하지 않는다. C2의 0.0은 별도 값이 없어 표시된 값이다.</li>
+<li><strong>음성인식 확신도:</strong> 모든 주장별 <code>asr_confidence</code> 0.0은 산출 불가를 뜻하며, 발언이 모두 잘못 인식됐다는 뜻이 아니다. 검증 <code>confidence</code> 0.99 역시 미검증 판정에 대한 확신이다.</li>
+<li><strong>시장 자료:</strong> BTC·CAKE 조회는 전체 자산명·거래소·호가 통화가 불명확해 코드 충돌·오매핑 가능성이 있다. 반환 가격·시가총액·PER는 해당 토큰 분석에서 제외한다. UNI·HYPE·WLFI에는 사용 가능한 시세가 없다.</li>
+<li><strong>뉴스·공시:</strong> 뉴스 장애와 공시 제공자 불가는 관련 사건이나 규제 위험이 없다는 증거가 아니다. 게시일 기준 상대 날짜 해석에도 실제 녹화 시각이 불명확하다는 한계가 있다.</li>
+<li><strong>외부 인용:</strong> DWF·Coinbase 원보고서, 정치 구도별 S&amp;P 500 연구, 익명 분석가·‘제임스톤’ 인용은 미검증·수동 확인 필요다. Bloomberg·Morningstar의 확인 가능한 자료도 제공되지 않았다. 유료·폐쇄형 자료는 원문 또는 정식 제공본 없이 검증 완료로 표시할 수 없으며, 공개 원문을 찾지 못했다는 이유만으로 비공개 자료라고 단정하지 않는다.</li>
+</ul>
+<h3>결론</h3>
+<p>이 영상에서 얻을 수 있는 유용한 틀은 <strong>정치 구호보다 실제 규제 문구, 거시 가격, 자금흐름을 나눠 보자는 것</strong>이다. 다만 현재 증거로는 선거 결과·BTC 반등·탈동조화·제도화 일정을 확인된 사실로 제시할 수 없다.</p>
+<p>우선순위는 공식 선거·법률 자료 확보, 자산 식별과 동일 시간대 시세 복원, DWF·Coinbase 수치 재계산, 실제 순유입 확인이다. 그 전까지 강세·약세 해석은 모두 조건부 시나리오로 유지하는 것이 이 자료에 부합한다.</p>
+  <details>
+    <summary>공개 요약 JSON</summary>
+    <pre>{
+  &quot;version&quot;: 4,
+  &quot;video_id&quot;: &quot;XWBnwZHqzus&quot;,
+  &quot;title&quot;: &quot;블루웨이브에도 비트코인 8만 달러 회복, 민주당판 클래리티 법안이 가져올 크립토 시장의 향방은? | 서동주, 김동환, 함지현 블록미디어 기자 [크립토 PLUS]&quot;,
+  &quot;url&quot;: &quot;https://www.youtube.com/watch?v=XWBnwZHqzus&quot;,
+  &quot;channel&quot;: &quot;삼프로TV 3PROTV&quot;,
+  &quot;channel_id&quot;: &quot;UChlv4GSd7OQl3js-jkLOnFA&quot;,
+  &quot;source_url&quot;: &quot;https://www.youtube.com/@3protv/videos&quot;,
+  &quot;thumbnail_url&quot;: &quot;https://i.ytimg.com/vi/XWBnwZHqzus/maxresdefault.jpg&quot;,
+  &quot;published_at&quot;: &quot;2026-11-05T04:33:41+00:00&quot;,
+  &quot;status&quot;: &quot;unverified&quot;,
+  &quot;strategy_source_tier&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_evidence_weight&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_validation_policy&quot;: &quot;STANDARD_REVIEW&quot;,
+  &quot;transcript_status&quot;: &quot;available&quot;,
+  &quot;transcript_source&quot;: &quot;automatic&quot;,
+  &quot;transcript_chars&quot;: 16267,
+  &quot;transcript_quality&quot;: {
+    &quot;status&quot;: &quot;good&quot;,
+    &quot;score&quot;: 1.0,
+    &quot;warnings&quot;: [],
+    &quot;source&quot;: &quot;automatic&quot;,
+    &quot;language&quot;: &quot;Korean&quot;,
+    &quot;model_or_format&quot;: &quot;json3&quot;,
+    &quot;chars&quot;: 16267,
+    &quot;segments&quot;: 907,
+    &quot;duration_seconds&quot;: 1946,
+    &quot;repeated_ngram_ratio&quot;: 0.0
+  },
+  &quot;generated_at&quot;: &quot;2026-11-06T07:24:02.434446+09:00&quot;,
+  &quot;llm_status&quot;: &quot;success&quot;,
+  &quot;research_status&quot;: &quot;success&quot;,
+  &quot;claim_verification_status&quot;: &quot;success&quot;,
+  &quot;research_pipeline_version&quot;: 4,
+  &quot;evidence_count&quot;: 11,
+  &quot;claim_status_summary&quot;: {
+    &quot;unverified&quot;: 10
+  },
+  &quot;claims&quot;: [
+    {
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;claim_text&quot;: &quot;민주당이 상원 54석·하원 238석·주지사 28명을 확보했고 공화당 우세 7개 주가 바뀌었으며, 친가상자산 후보 245명·당선자의 68.2%가 당선됐다는 주장이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:10&quot;,
+      &quot;source_confidence&quot;: 0.9,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;상원 54석; 하원 237→238석; 과반 대비 20석; 주지사 28명; 정당 우세 변화 7개 주; 친가상자산 당선자 245명·68.2%&quot;,
+        &quot;observed&quot;: &quot;독립 관측값 없음. 245명과 68.2%의 모집단·집계 범위 불명.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;민주당 의회 장악과 친가상자산 의원 비중을 확정된 투자 전제로 사용할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;claim_text&quot;: &quot;브라운 낙선 지원 약 5,500만 달러, 머스크의 팩스턴 지원 약 1억7,000만 달러 및 Fairshake의 후보별 약 100만 달러 지원과 관련 후보 당락에 관한 주장이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:06:35&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;브라운 낙선 지원 약 55,000,000달러; 팩스턴 지원 약 170,000,000달러; Fairshake 각 약 1,000,000달러·총 약 3,000,000달러&quot;,
+        &quot;observed&quot;: &quot;검증 가능한 지출·기부·당락 자료 없음.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;정치자금 규모와 친가상자산 진영의 선거 성과를 규제 영향력의 증거로 채택하기 어렵다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;claim_text&quot;: &quot;2027년 민주당판 클래리티 법안의 SEC 권한·소비자 보호·윤리 규정 강화가 디파이에 불리하고, 유니스왑의 법인 등록·규제 준수는 상대적 방어 요인이라는 전망이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:12:57&quot;,
+      &quot;source_confidence&quot;: 0.87,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;2027년 회기 법안·지도부 변화 예상&quot;,
+        &quot;observed&quot;: &quot;해당 회기 전망을 뒷받침하는 초안·공식 인사 자료 없음.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;UNI의 상대적 안전성이나 CAKE의 규제상 불이익을 확정적으로 평가할 근거가 부족하다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;claim_text&quot;: &quot;트럼프 일가 사업 조사·윤리 규정이 WLFI에 부담이고, CFTC의 주식 관련 상품 승인에 대한 소송·취소 가능성이 HYPE 투자심리를 압박했다는 주장이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:19:23&quot;,
+      &quot;source_confidence&quot;: 0.77,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;WLFI 홍보 2024년 10월; 가르시아·워런 관련 발언 2026년 11월 3일 전후&quot;,
+        &quot;observed&quot;: &quot;발언·홍보 원본과 날짜를 확인할 자료 없음.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;WLFI의 정치적 위험과 HYPE의 상품 규제 위험은 별개 경로로 확인해야 하며, 현재 자료로 실제 조사나 승인 취소를 단정할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;claim_text&quot;: &quot;BTC가 75,000달러대에서 80,000달러를 회복하고 UNI가 약 2% 상승했으며, 나스닥 반등·단기금리 하락·달러 약세가 이를 설명한다는 주장과 조건부 가격 전망이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:19:23&quot;,
+      &quot;source_confidence&quot;: 0.94,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;BTC 75,000달러대→80,000달러 회복; 82,000달러 미돌파 시 76,800달러 전망; UNI 약 +2%&quot;,
+        &quot;observed&quot;: &quot;BTC라는 조회 코드의 단일 값 33.630001은 자산·단위 미확인으로 제외. UNI 가격과 등락률은 제공되지 않음.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;80,000달러 회복과 UNI 상승을 확인된 시장 사실로 제시하거나 82,000·76,800달러를 검증된 매매 기준으로 사용할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;claim_text&quot;: &quot;DWF Labs 분석상 과거 세 차례 중간선거 1년 뒤 BTC가 모두 상승했고 2022년에는 92% 상승했으며, 선거 전후 하락폭과 저점 패턴이 이번 전망에 참고가 된다는 주장이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:25:41&quot;,
+      &quot;source_confidence&quot;: 0.94,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;2014·2018·2022년 12개월 후 상승; 2022년 +92%; 선거 후 약세 3~6개월; FTX 사태 +3일·저점 +13일; 과거 하락폭 -67%~-73%·이번 10월 26일 -36%; 6월 30일 저점 58,524달러&quot;,
+        &quot;observed&quot;: &quot;원보고서와 재계산용 가격 이력이 없어 모든 수익률·기간·저점 수치 미확인.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;선거 후 상승 패턴과 58,524달러 지지 조건을 검증된 예측 모형이나 확정 지지선으로 취급하기 어렵다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;claim_text&quot;: &quot;Coinbase 보고서의 6월 이후 BTC 약 -3%·반도체지수 -29%가 탈동조화를 보여주고 기술주 자금이 크립토로 이동할 수 있으며, 민주당의 데이터센터 억제 정책이 기술주에 부담이라는 주장이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:25:41&quot;,
+      &quot;source_confidence&quot;: 0.86,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;6월 이후 BTC 약 -3%; 반도체지수 약 -29%&quot;,
+        &quot;observed&quot;: &quot;동일 기간 수익률 자료 없음. 비교 연도·지수·가격수익률 또는 총수익률 여부 불명.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;크립토의 기술주 대비 방어력과 자금 유입은 미검증 가설이며, 실제 자금흐름과 기간별 상관관계 확인이 필요하다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;claim_text&quot;: &quot;공화당 대통령·민주당 의회 조합에서 S&amp;P 500 상승률이 가장 높았다는 역사적 연구를 소개한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:25:41&quot;,
+      &quot;source_confidence&quot;: 0.86,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;해당 정치 조합의 S&amp;P 500 수익률 순위가 가장 높음&quot;,
+        &quot;observed&quot;: &quot;비교 수익률·순위·표본 수 자료 없음.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;정치 구도만을 근거로 미국 주식의 초과수익을 예상할 검증 근거가 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;claim_text&quot;: &quot;GENIUS Act 발효와 새 의회 시작이 모두 2027년 1월이고, 기존 ETF·SEC·CFTC 조치의 전면 후퇴는 어렵고 2027년 부채한도 협상이 필요하다는 주장이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:25:41&quot;,
+      &quot;source_confidence&quot;: 0.82,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;GENIUS Act 발효·새 의회 시작 2027년 1월; 부채한도 협상 2027년&quot;,
+        &quot;observed&quot;: &quot;각 일정과 법률 조건을 대조할 공식 자료 없음.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;2027년 1월을 확정 시행 촉매로 삼거나 기존 제도화가 되돌릴 수 없는 상태라고 전제하기 어렵다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C10&quot;,
+      &quot;claim_text&quot;: &quot;2026년 11월에는 FOMC가 없고 고용·CPI·PPI 발표가 각각 11월 6일·10일·13일이며, 높은 물가가 매파 대응 가능성을 높이고 &#x27;케빈 의장&#x27;이 데이터 의존적 발언을 했다는 주장이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:25:41&quot;,
+      &quot;source_confidence&quot;: 0.91,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;10월 고용·실업률 2026-11-06; CPI 2026-11-10; PPI 2026-11-13; 11월 FOMC 없음&quot;,
+        &quot;observed&quot;: &quot;공식 발표·회의 일정 및 실제 지표 수치 없음.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;발표일을 확정 이벤트 일정으로 사용하기 전에 공식 캘린더를 확인해야 하며, 12월 금리 결정은 확인되지 않은 전망으로 남는다.&quot;
+    }
+  ],
+  &quot;entities&quot;: [
+    {
+      &quot;ticker&quot;: &quot;BTC&quot;,
+      &quot;name&quot;: &quot;비트코인&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;방송은 비트코인의 급락 후 반등을 나스닥 반등과의 동조화, 단기 국채금리 하락 및 달러 약세 압력으로 설명하며, 정치 결과만으로 가격을 해석하기 어렵다고 본다.&quot;,
+        &quot;DWF Labs의 과거 중간선거 분석을 근거로 중기 상승 가능성을 제시하지만, 반등 전 추가 하락과 단기 가격 저항을 경계한다.&quot;,
+        &quot;Coinbase 보고서와 최근 상대수익률을 근거로 AI·반도체와의 탈동조화 및 기술주에서 크립토로의 자금 이동 가능성을 제시한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;방송 기준 전날 7만5,000달러대까지 하락한 뒤 8만 달러를 회복했다고 언급한다.&quot;,
+        &quot;일부 분석가의 조건부 전망으로 당일 8만2,000달러를 넘지 못하면 7만6,800달러까지 밀릴 수 있다고 소개한다.&quot;,
+        &quot;DWF Labs를 인용해 2014·2018·2022년 중간선거 모두 1년 뒤 상승했으며, 2022년에는 12개월 뒤 92% 상승했다고 주장한다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;BTC&quot;,
+        &quot;as_of&quot;: &quot;2026-11-05T23:12:35.834785+00:00&quot;,
+        &quot;current_price&quot;: 33.630001068115234,
+        &quot;market_cap&quot;: null,
+        &quot;forward_pe&quot;: null,
+        &quot;trailing_pe&quot;: null,
+        &quot;fifty_two_week_high&quot;: 47.07,
+        &quot;fifty_two_week_low&quot;: 25.65,
+        &quot;average_target_price&quot;: null,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;UNI&quot;,
+      &quot;name&quot;: &quot;유니스왑&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;SEC 역할 확대는 디파이에 불리할 수 있지만, 방송은 유니스왑의 법인 등록과 규제 준수 움직임을 상대적 방어 요인으로 해석한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;진행자는 유니스왑이 약 2% 상승한 것으로 알고 있다고 언급한다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;시장 데이터 조회 실패: no_usable_market_fields&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;UNI&quot;,
+        &quot;as_of&quot;: &quot;2026-11-05T23:12:38.177003+00:00&quot;,
+        &quot;current_price&quot;: null,
+        &quot;market_cap&quot;: null,
+        &quot;forward_pe&quot;: null,
+        &quot;trailing_pe&quot;: null,
+        &quot;fifty_two_week_high&quot;: null,
+        &quot;fifty_two_week_low&quot;: null,
+        &quot;average_target_price&quot;: null,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;unverified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;CAKE&quot;,
+      &quot;name&quot;: &quot;팬케이크스왑&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;방송은 민주당판 클래리티 법안에서 SEC 권한이 확대되면 팬케이크스왑 등 디파이 토큰의 증권성 판단이 엄격해져 불리할 수 있다고 전망한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;CAKE&quot;,
+        &quot;as_of&quot;: &quot;2026-11-05T23:12:40.626805+00:00&quot;,
+        &quot;current_price&quot;: 110.70999908447266,
+        &quot;market_cap&quot;: 5519492727.586006,
+        &quot;forward_pe&quot;: 21.165062,
+        &quot;trailing_pe&quot;: 26.234598,
+        &quot;fifty_two_week_high&quot;: 118.63,
+        &quot;fifty_two_week_low&quot;: 43.07,
+        &quot;average_target_price&quot;: 106.26667,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;HYPE&quot;,
+      &quot;name&quot;: &quot;하이퍼리퀴드&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;방송은 주식 토큰화·주식 무기한 선물 관련 CFTC 승인에 대한 소송과 취소 가능성, 민주당의 비판이 하이퍼리퀴드 투자심리를 압박했다고 설명한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;워런 의원의 관련 발언 시점을 11월 3일로 언급한다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;시장 데이터 조회 실패: no_usable_market_fields&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;HYPE&quot;,
+        &quot;as_of&quot;: &quot;2026-11-05T23:12:43.599973+00:00&quot;,
+        &quot;current_price&quot;: null,
+        &quot;market_cap&quot;: null,
+        &quot;forward_pe&quot;: null,
+        &quot;trailing_pe&quot;: null,
+        &quot;fifty_two_week_high&quot;: null,
+        &quot;fifty_two_week_low&quot;: null,
+        &quot;average_target_price&quot;: null,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;unverified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;WLFI&quot;,
+      &quot;name&quot;: &quot;월드 리버티 파이낸셜&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;출연진은 민주당의 트럼프 일가 디지털자산 사업 조사와 이해충돌 규정 강화가 트럼프 일가와 직접 연계된 WLFI에 타격을 줄 수 있다고 전망한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;트럼프가 2024년 10월 WLFI 토큰을 홍보했다고 주장한다.&quot;,
+        &quot;로버트 가르시아 민주당 의원이 11월 3일 트럼프 일가 디지털자산 사업을 조사 대상으로 지목했다고 전한다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;시장 데이터 조회 실패: no_usable_market_fields&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;WLFI&quot;,
+        &quot;as_of&quot;: &quot;2026-11-05T23:12:46.973074+00:00&quot;,
+        &quot;current_price&quot;: null,
+        &quot;market_cap&quot;: null,
+        &quot;forward_pe&quot;: null,
+        &quot;trailing_pe&quot;: null,
+        &quot;fifty_two_week_high&quot;: null,
+        &quot;fifty_two_week_low&quot;: null,
+        &quot;average_target_price&quot;: null,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;unverified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    }
+  ],
+  &quot;evidence&quot;: [
+    {
+      &quot;evidence_id&quot;: &quot;E1&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;Century: Q3 Earnings Snapshot&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/century-q3-earnings-snapshot-224706676.html&quot;,
+      &quot;publisher&quot;: &quot;Associated Press&quot;,
+      &quot;published_at&quot;: &quot;2026-11-05T22:47:06+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Century: Q3 Earnings Snapshot Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 2026 Elections Weather Newsletters Finance My portfolio News Ma...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E2&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;Stock Market Today: Nasdaq Slammed By Big Tech Sell-Off; Nvidia Hits Bear Territory (Live Coverage)&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/m/38cb0654-6e49-3715-b4e4-f2f830876d7a/stock-market-today%3A-nasdaq.html&quot;,
+      &quot;publisher&quot;: &quot;Investor&#x27;s Business Daily&quot;,
+      &quot;published_at&quot;: &quot;2026-11-05T21:34:45+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Stock Market Today: Nasdaq Slammed By Big Tech Sell-Off; Nvidia Hits Bear Territory (Live Coverage) Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Ori...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E4&quot;,
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;title&quot;: &quot;Century Aluminum Company Reports Third Quarter 2026 Results&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/century-aluminum-company-reports-third-210500429.html&quot;,
+      &quot;publisher&quot;: &quot;GlobeNewswire&quot;,
+      &quot;published_at&quot;: &quot;2026-11-05T21:05:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Century Aluminum Company Reports Third Quarter 2026 Results Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 2026 Elections Weather Newsletter...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E5&quot;,
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;title&quot;: &quot;Celsius Q3 Earnings Call Highlights&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/celsius-q3-earnings-call-highlights-171452999.html&quot;,
+      &quot;publisher&quot;: &quot;MarketBeat&quot;,
+      &quot;published_at&quot;: &quot;2026-11-05T17:14:52+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E6&quot;,
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;title&quot;: &quot;Dow Jones Futures: Nasdaq Dives 5.5%, Nvidia, Sandisk, CoreWeave, SpaceX Plunge, But Sell-Off Spreads Beyond AI&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/m/0cd2227b-7753-3d54-a8c5-286efe82ac39/dow-jones-futures%3A-nasdaq.html&quot;,
+      &quot;publisher&quot;: &quot;Investor&#x27;s Business Daily&quot;,
+      &quot;published_at&quot;: &quot;2026-11-05T23:07:44+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E7&quot;,
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;title&quot;: &quot;Stock Market Today, Nov. 5: Amazon Shares Slide as Technology Selloff Erases Early Gains&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/stock-market-today-nov-5-225937741.html&quot;,
+      &quot;publisher&quot;: &quot;Motley Fool&quot;,
+      &quot;published_at&quot;: &quot;2026-11-05T22:59:37+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E8&quot;,
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;title&quot;: &quot;Galiano Gold: Q3 Earnings Snapshot&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/galiano-gold-q3-earnings-snapshot-230521741.html&quot;,
+      &quot;publisher&quot;: &quot;Associated Press&quot;,
+      &quot;published_at&quot;: &quot;2026-11-05T23:05:21+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E9&quot;,
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;title&quot;: &quot;Genesis Energy, L.P. Q3 2026 Earnings Call Summary&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/genesis-energy-l-p-q3-225945418.html&quot;,
+      &quot;publisher&quot;: &quot;Moby&quot;,
+      &quot;published_at&quot;: &quot;2026-11-05T22:59:45+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E11&quot;,
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;title&quot;: &quot;Honey Badger Silver Confirms Silver-Bearing Massive Pyrite and Reports Over 500 PPM Germanium at Nanisivik Mine, Nunavut&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/commodities/articles/honey-badger-silver-confirms-silver-202800536.html&quot;,
+      &quot;publisher&quot;: &quot;TMX Newsfile&quot;,
+      &quot;published_at&quot;: &quot;2026-11-05T20:28:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    }
+  ],
+  &quot;source_policy&quot;: {
+    &quot;raw_transcript_published&quot;: false,
+    &quot;raw_transcript_in_evidence&quot;: false,
+    &quot;research_pipeline_version&quot;: 4,
+    &quot;closed_source_claims&quot;: &quot;unverified_external_source&quot;,
+    &quot;auto_caption_warning&quot;: true,
+    &quot;local_asr_warning&quot;: false
+  }
+}</pre>
+  </details>
+</article>
+</main>
+  <style>
+.reader-contents { margin: 16px 0; padding: 12px 16px; border: 1px solid var(--line, #64748b); border-radius: 12px; }
+.reader-contents > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-weight: 750; }
+.reader-contents nav { display: grid; gap: 4px; max-height: 45vh; overflow: auto; margin: 8px 0; }
+.reader-contents a { display: block; min-height: 44px; padding: 10px; border-radius: 6px; color: inherit; overflow-wrap: anywhere; }
+.reader-contents a:hover { background: #80808020; }
+.reader-contents .reader-subsection { padding-inline-start: 24px; font-size: .92em; }
+.reader-prose, .report { overflow-wrap: anywhere; line-height: 1.8; }
+.reader-prose p, .reader-prose li { max-width: 85ch; }
+.reader-prose h2, .reader-prose h3, .reader-prose h4, [data-reader-heading] { scroll-margin-top: 100px; line-height: 1.45; }
+.reader-prose h2 { margin-top: 1.8em; padding-bottom: 8px; border-bottom: 1px solid var(--line, #64748b); }
+.reader-prose h3 { margin-top: 1.5em; }
+.reader-prose li { margin: .5em 0; }
+.reader-prose pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.reader-prose blockquote { margin: 16px 0; padding: 4px 16px; border-left: 3px solid var(--accent, #64748b); }
+.reader-table { overflow: auto; max-width: 100%; margin: 16px 0; border: 1px solid var(--line, #64748b); border-radius: 10px; }
+.reader-table table { border-collapse: collapse; width: 100%; margin: 0; font-size: .92rem; }
+.reader-table th, .reader-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line, #64748b); min-width: 110px; max-width: 400px; overflow-wrap: anywhere; white-space: normal; }
+.reader-table th { background: #80808018; }
+.reader-table tr:nth-child(even) { background: #80808008; }
+.reader-search { display: grid; gap: 8px; margin: 16px 0; }
+.reader-search label { font-weight: 700; }
+.reader-search input { box-sizing: border-box; width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line, #64748b); border-radius: 10px; background: var(--panel, #fff); color: var(--text, #132238); font: inherit; }
+.reader-search p { margin: 0; font-size: .86rem; }
+.reader-back { position: fixed; bottom: max(14px, env(safe-area-inset-bottom)); right: 14px; z-index: 30; min-height: 44px; border: 1px solid #778899; border-radius: 99px; padding: 10px 16px; background: #18344a; color: #fff; font: 700 14px system-ui; cursor: pointer; box-shadow: 0 3px 12px #0003; }
+[data-reader-source] { margin-top: 20px; }
+[data-reader-source] > summary { min-height: 44px; cursor: pointer; }
+[data-reader-source] pre { font-size: .85rem; }
+[data-reader-source] pre, .reader-prose { min-width: 0; }
+.reader-contents :focus-visible, .reader-search :focus-visible, .reader-back:focus-visible, .reader-table:focus-visible { outline: 3px solid var(--accent, #008c95); outline-offset: 3px; }
+.reader-search + .grid > [hidden] { display: none !important; }
+@media (max-width: 600px) { .reader-prose { font-size: 1rem; } .reader-contents { padding: 8px 12px; } }
+@media print { .reader-back, .reader-search, .reader-contents, [data-reader-source] { display: none !important; } .reader-table { overflow: visible; } .reader-prose { color: #000; background: #fff; } }
+</style><script>
+(() => {
+  'use strict';
+  let serial = 0;
+  const rendered = new WeakMap();
+  const node = (tag, text) => { const el = document.createElement(tag); if (text != null) el.textContent = text; return el; };
+  function inline(parent, text) {
+    const pattern = /(`[^`]+`|\*\*[^*]+\*\*|\[[^\]]+\]\(https?:\/\/[^\s)]+\))/g;
+    let start = 0;
+    for (const match of String(text).matchAll(pattern)) {
+      parent.append(document.createTextNode(text.slice(start, match.index)));
+      const value = match[0];
+      if (value.startsWith('`')) parent.append(node('code', value.slice(1, -1)));
+      else if (value.startsWith('**')) parent.append(node('strong', value.slice(2, -2)));
+      else {
+        const link = value.match(/^\[([^\]]+)\]\((.+)\)$/);
+        const a = node('a', link[1]); a.href = link[2]; a.rel = 'noopener noreferrer'; parent.append(a);
+      }
+      start = match.index + value.length;
+    }
+    parent.append(document.createTextNode(text.slice(start)));
+  }
+  const cells = line => line.trim().replace(/^\|/, '').replace(/\|$/, '').split(/(?<!\\)\|/).map(v => v.trim().replace(/\\\|/g, '|'));
+  function markdown(source) {
+    const article = node('article'); article.className = 'reader-prose';
+    const lines = source.split(/\r?\n/); let list = null;
+    for (let i = 0; i < lines.length; i += 1) {
+      const line = lines[i], value = line.trim();
+      if (!value) { list = null; continue; }
+      if (/^```/.test(value)) {
+        const code = []; i += 1;
+        while (i < lines.length && !/^```/.test(lines[i].trim())) code.push(lines[i++]);
+        const pre = node('pre'); pre.append(node('code', code.join('\n'))); article.append(pre); list = null; continue;
+      }
+      if (i + 1 < lines.length && value.includes('|') && cells(lines[i + 1]).every(v => /^:?-{3,}:?$/.test(v))) {
+        const table = node('table'), head = node('thead'), body = node('tbody');
+        const row = (values, tag) => { const tr = node('tr'); values.forEach(v => { const cell = node(tag); if (tag === 'th') cell.scope = 'col'; inline(cell, v); tr.append(cell); }); return tr; };
+        head.append(row(cells(line), 'th')); i += 2;
+        while (i < lines.length && lines[i].trim() && lines[i].includes('|')) body.append(row(cells(lines[i++]), 'td'));
+        i -= 1; table.append(head, body); article.append(table); list = null; continue;
+      }
+      const heading = value.match(/^(#{1,6})\s+(.+)$/);
+      if (heading) { const h = node('h' + Math.min(4, heading[1].length + 1)); inline(h, heading[2]); article.append(h); list = null; continue; }
+      const bullet = value.match(/^(?:[-*+] |\d+\. )(.+)$/);
+      if (bullet) {
+        const tag = /^\d/.test(value) ? 'ol' : 'ul';
+        if (!list || list.tagName.toLowerCase() !== tag) { list = node(tag); if (tag === 'ol') list.start = parseInt(value, 10); article.append(list); }
+        const li = node('li'); inline(li, bullet[1]); list.append(li); continue;
+      }
+      list = null;
+      if (/^(---+|\*\*\*+)$/.test(value)) { article.append(node('hr')); continue; }
+      const p = node(value.startsWith('> ') ? 'blockquote' : 'p'); inline(p, value.startsWith('> ') ? value.slice(2) : line); article.append(p);
+    }
+    return article;
+  }
+  function contents(root) {
+    root.querySelectorAll(':scope > .reader-contents').forEach(el => el.remove());
+    const headings = [...root.querySelectorAll('h2,h3,h4')].filter(h => !h.closest('.card,.run-card,.reader-contents,[data-reader-source],[hidden]'));
+    if (headings.length < 2) return;
+    const details = node('details'); details.className = 'reader-contents';
+    details.append(node('summary', '이 리포트 목차 · ' + headings.length + '개 항목'));
+    const nav = node('nav'); nav.setAttribute('aria-label', '리포트 목차');
+    headings.forEach(h => {
+      if (!h.id) h.id = 'reader-section-' + (++serial);
+      h.dataset.readerHeading = ''; h.tabIndex = -1;
+      const a = node('a', h.textContent); a.href = '#' + h.id;
+      if (h.tagName !== 'H2') a.className = 'reader-subsection';
+      a.addEventListener('click', event => {
+        event.preventDefault();
+        for (let ancestor = h.parentElement; ancestor; ancestor = ancestor.parentElement) if (ancestor.tagName === 'DETAILS') ancestor.open = true;
+        h.scrollIntoView({block: 'start'}); h.focus({preventScroll: true});
+      }); nav.append(a);
+    });
+    details.append(nav); root.prepend(details);
+  }
+  function enhance(root) {
+    if (!root) return;
+    root.querySelectorAll('pre[data-report-markdown]').forEach(pre => {
+      const previous = rendered.get(pre);
+      if (previous && previous.source === pre.textContent) return;
+      const article = markdown(pre.textContent);
+      if (previous) previous.article.replaceWith(article);
+      else {
+        const details = node('details'); details.dataset.readerSource = '';
+        details.append(node('summary', 'Markdown 원문 보기'));
+        pre.before(article, details); details.append(pre);
+      }
+      rendered.set(pre, {source: pre.textContent, article});
+    });
+    root.querySelectorAll('table').forEach(table => {
+      if (table.closest('.reader-table,.account-table-wrap,.summary-scroll')) return;
+      const wrap = node('div'); wrap.className = 'reader-table'; wrap.tabIndex = 0;
+      wrap.setAttribute('role', 'region'); wrap.setAttribute('aria-label', '리포트 표 · 가로로 스크롤하여 전체 보기');
+      table.before(wrap); wrap.append(table);
+    });
+    root.querySelectorAll('.grid').forEach(grid => {
+      const cards = [...grid.querySelectorAll(':scope > a.card')];
+      if (cards.length < 2 || grid.dataset.readerSearch) return;
+      grid.dataset.readerSearch = 'true';
+      const box = node('div'); box.className = 'reader-search';
+      const input = node('input'); input.type = 'search'; input.placeholder = '제목 · 종목 · 채널 · 키워드'; input.id = 'report-search-' + (++serial);
+      const label = node('label', '리포트 찾기'); label.htmlFor = input.id;
+      const status = node('p'); status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
+      const update = () => {
+        const terms = input.value.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean); let count = 0;
+        cards.forEach(card => { card.hidden = !terms.every(t => card.textContent.toLocaleLowerCase().includes(t)); if (!card.hidden) count += 1; });
+        status.textContent = cards.length + '개 중 ' + count + '개 표시' + (count ? '' : ' · 검색어를 지우거나 다른 키워드를 입력하세요.');
+      };
+      input.addEventListener('input', update); box.append(label, input, status); grid.before(box); update();
+    });
+    contents(root);
+  }
+  window.TradingAgentsReader = {enhance};
+  const main = document.querySelector('main');
+  if (main && !main.hasAttribute('data-reader-dynamic')) enhance(main);
+  if (main) {
+    const top = node('button', '↑ 맨 위'); top.type = 'button'; top.className = 'reader-back'; top.setAttribute('aria-label', '리포트 맨 위로 이동');
+    top.addEventListener('click', () => { const target = document.querySelector('h1') || main; target.tabIndex = -1; target.scrollIntoView({block: 'start'}); target.focus({preventScroll: true}); });
+    document.body.append(top);
+  }
+})();
+</script>
+</body>
+</html>

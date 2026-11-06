@@ -1,0 +1,776 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YouTube 투자자용 검증 리포트 - “AI 투자 지연이 정말 악재일까?” AI 데이터센터 병목의 진실 / 주가 급락하는 삼전·하닉 지금 팔아야 하나? ㅣ이권희 대표</title>
+  <style>
+:root {
+  color-scheme: light;
+  --bg: #f7f8fb;
+  --panel: #ffffff;
+  --text: #172033;
+  --muted: #667085;
+  --line: #d9dee8;
+  --accent: #0f766e;
+  --accent-2: #2563eb;
+  --warn: #b45309;
+  --bad: #b42318;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0 56px; }
+a { color: var(--accent-2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.hero { padding: 28px 0 22px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+.hero.compact { padding-top: 12px; }
+.hero h1 { margin: 0; font-size: clamp(28px, 4vw, 44px); line-height: 1.15; letter-spacing: 0; }
+.hero p { max-width: 760px; color: var(--muted); margin: 12px 0 0; }
+.eyebrow { color: var(--accent); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0; margin: 0 0 8px; }
+section { margin: 28px 0; }
+h2, h3, h4, h5 { letter-spacing: 0; line-height: 1.25; }
+.synthesis-callout { padding: clamp(20px, 4vw, 34px); border: 1px solid #6ee7d8; border-radius: 18px; background: linear-gradient(135deg, #ecfdf9 0%, #eff6ff 100%); box-shadow: 0 18px 44px rgba(15, 118, 110, .12); }
+.synthesis-callout.unavailable { border-color: var(--line); background: var(--panel); box-shadow: none; }
+.synthesis-callout h2 { margin: 0; font-size: clamp(24px, 3.2vw, 36px); }
+.synthesis-callout .lead { max-width: 900px; font-size: 17px; color: #334155; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.primary-link, .secondary-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border-radius: 999px; font-weight: 800; }
+.primary-link { color: white; background: var(--accent); }
+.secondary-link { color: var(--accent-2); border: 1px solid #93c5fd; background: white; }
+.primary-link:hover, .secondary-link:hover { text-decoration: none; filter: brightness(.97); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.card, .run { display: flex; flex-direction: column; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; color: var(--text); min-height: 128px; }
+.run { padding: 16px; }
+.card:hover, .run:hover { border-color: var(--accent-2); text-decoration: none; }
+.thumb { display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #e9edf5; border-radius: 8px 8px 0 0; color: var(--muted); font-size: 13px; font-weight: 700; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb-empty span { padding: 0 14px; text-align: center; }
+.card-body { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 16px; }
+.card strong { line-height: 1.35; }
+.source-line { color: #3f4a5f; font-weight: 600; }
+.runs { display: grid; gap: 10px; }
+.badge { display: inline-flex; width: fit-content; border-radius: 999px; padding: 2px 9px; background: #e6f4f1; color: var(--accent); font-size: 12px; font-weight: 700; }
+.status-contradicted, .status-llm_failed { background: #fee4e2; color: var(--bad); }
+.status-unverified, .status-stale { background: #fff4d6; color: var(--warn); }
+small, .muted { color: var(--muted); }
+.topnav { display: flex; gap: 14px; margin-bottom: 16px; font-size: 14px; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px; }
+.stats span { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
+.report { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: min(5vw, 36px); }
+.report-head { border-bottom: 1px solid var(--line); margin-bottom: 24px; padding-bottom: 20px; }
+.report-head h1 { margin: 0; font-size: clamp(24px, 3.5vw, 38px); line-height: 1.2; }
+.meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+.scope-note { padding: 12px 14px; border-left: 4px solid var(--warn); border-radius: 6px; background: #fff7ed; color: #7c2d12; }
+.synthesis-report h2 { margin-top: 34px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.synthesis-report h3 { margin: 24px 0 8px; color: #0f4c5c; }
+.synthesis-report p, .synthesis-report li { overflow-wrap: anywhere; }
+pre { overflow: auto; background: #111827; color: #f9fafb; border-radius: 8px; padding: 14px; }
+code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+details { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 18px; }
+@media (max-width: 640px) {
+  main { width: min(100% - 20px, 1120px); padding-top: 18px; }
+  .report { padding: 18px; }
+  .synthesis-callout { border-radius: 14px; padding: 18px; }
+  .cta-row a { width: 100%; }
+  .mobile-report { border-radius: 12px; }
+}
+</style>
+</head>
+<body>
+  <main>
+<nav class="topnav"><a href="index.html">실행 목록</a><a href="../../index.html">YouTube 홈</a></nav>
+<article class="report">
+  <header class="report-head">
+    <p class="eyebrow">youtube_20261106_072402</p>
+    <h1>“AI 투자 지연이 정말 악재일까?” AI 데이터센터 병목의 진실 / 주가 급락하는 삼전·하닉 지금 팔아야 하나? ㅣ이권희 대표</h1>
+    <div class="meta">
+      <span class="badge status-asr_uncertain">asr_uncertain</span>
+      <a href="https://www.youtube.com/watch?v=7RoQPtjidOM">원본 영상</a>
+    </div>
+  </header>
+  <h2>AI 데이터센터 투자 지연: 수요 소멸인가, 공급 병목인가</h2>
+<p><strong>분석 기준: 2026년 11월 6일 제공 자료</strong> · <a href="https://www.youtube.com/watch?v=7RoQPtjidOM">815Money talk 영상</a> · 게시일 2026년 11월 5일</p>
+<h3>1. 핵심 판단</h3>
+<p>영상의 중심 논리는 <strong>“AI 투자 지연이 수요 취소가 아니라 공급 제약에 따른 집행 이연이라면, 메모리 공급 부족과 투자 주기가 길어질 수 있다”</strong>는 조건부 시나리오다. 그러나 제공 자료에는 이를 입증할 제품별 주문·취소 조건·재고·가격·전력 확보 자료가 없다. 따라서 삼성전자·SK하이닉스의 실적에 긍정적이라고 확정할 단계는 아니다.</p>
+<p>주장별 검증 결과는 10개 중 <strong>미검증 7개, 자막 식별 불확실 2개, 부분 지지 1개</strong>다. 부분 지지는 현대백화점의 실적 증가 보도에 한정된다. 전체 판정은 <strong>미검증</strong>이며, 이는 주장이 틀렸다는 뜻이 아니라 직접적인 근거가 부족하다는 의미다.</p>
+<p>투자자가 구분해야 할 것은 다음 세 가지다.</p>
+<ul>
+<li><strong>투자 지연과 주문 취소:</strong> 집행 시점만 늦어졌는지, 최종 수요 자체가 축소됐는지.</li>
+<li><strong>공급 부족과 실적 실현:</strong> 주문이 유지되더라도 출하·검수·매출 인식이 지연되는지.</li>
+<li><strong>산업 수혜와 개별 기업 수혜:</strong> 시설이나 기술을 보유했다는 사실이 실제 계약·이익으로 연결되는지.</li>
+</ul>
+<h3>2. 영상 주장과 확인된 근거</h3>
+<p>아래 시각은 개별 발언의 정확한 위치가 아니라 <strong>관련 자막 청크의 시작 시각</strong>이다.</p>
+<p>| 주제·관련 시각 | 영상 주장 | 확인된 사실·근거와 판정 |</p>
+<p>|---|---|---|</p>
+<p>| 메모리·삼성전자·SK하이닉스 · 00:05·06:20·17:56 | 공급 병목이 투자 주기를 연장하며 메모리가 2029년까지 선주문됐다는 설명 | <strong>미검증.</strong> 기업·제품별 계약기간, 취소 조건, 생산능력 자료가 없다. HBM 관련 계약인지 전체 메모리인지도 불명확하다. 계획 100·공급 50·축소 후 70은 실제 통계가 아닌 설명용 가정이다. |</p>
+<p>| 빅테크 CAPEX · 00:05·06:20·17:56 | 투자 속도 조절이 현금흐름 부담을 완화하며 MS·메타가 신규 주식을 발행했다는 주장 | <strong>미검증.</strong> CAPEX 변경, 현금흐름, 주식·채권 발행을 확인할 공시가 없다. 뱅크오브아메리카 보고서 인용도 원문 미확보다. |</p>
+<p>| 선거·금리·유가 · 00:05·06:20 | 민주당 54석, 유가 약 8% 하락·88달러, 국채 수익률 4.9% 미만을 소비 개선과 연결 | <strong>미검증.</strong> 공식 선거 결과와 국채 만기·유종·비교 거래일이 없다. 후속 CL=F 스냅샷 약 91.20달러는 영상 당시 수치를 검증하거나 반박하지 못한다. |</p>
+<p>| 주가·순환매 · 00:05~23:57 관련 청크 | 미국 반도체와 SK하이닉스 하락, 네이버·현대차 상승 및 바이오·화장품으로의 자금 이동 | <strong>미검증.</strong> 동일 거래일의 장중·종가·투자자별 거래 자료가 부족하다. 업종별 등락만으로 동일 자금의 이동을 입증할 수 없다. |</p>
+<p>| 한국 지수·ETF · 00:05·06:20·12:11 | 삼성전자·SK하이닉스 비중 64%, 관련 기업 포함 약 66%, 지지 구간 5,000~5,200 등 | <strong>자막 식별 불확실.</strong> 대상 상품·분모·기준일과 ‘EWI’, ‘7,000’의 단위가 불명확하다. 해당 수치를 특정 지수의 구성비·가격 기준으로 적용할 근거가 없다. |</p>
+<p>| YMTC·중국 IPO · 06:20·12:11 | 상장 지연과 비공식 IPO 속도 조절이 국내 반도체에 유리하다는 해석 | <strong>미검증.</strong> 심사·연기 자료, 지침 원출처, 동일 기준 NAND 점유율이 없다. 자금조달 지연이 실제 증설 축소로 이어졌는지도 확인되지 않았다. |</p>
+<p>| SK텔레콤·코어위브·네비우스 · 12:11·17:56 | 미국의 전력·건설 제약이 한국·영국으로 수요를 이전시키고 기존 시설의 임대료를 높일 가능성 | <strong>미검증.</strong> 실제 이전 계약, 확보 전력, 가동률·임대단가 자료가 없다. 시설 소유와 임차도 구분되지 않았다. |</p>
+<p>| 네이버 · 12:11·23:57 | 데이터센터 투자와 회계상 부채 부담, 선행 투자의 재평가 가능성 | <strong>자막 식별 불확실.</strong> 정정 공시 목록은 있으나 프로젝트명·거래 당사자·회계 처리를 확인할 본문이 없다. |</p>
+<p>| 현대백화점 · 17:56 | 실적 호조, PBR 0.38배, 목표주가 15만 원 | <strong>실적 증가 보도만 부분 지지.</strong> 영업이익 946억 원·전년 대비 30.1% 증가가 보도됐다. 컨센서스 상회 여부와 PBR 산식, 15만 원 보고서는 미확인이다. |</p>
+<p>| 프로텍·현대차·셀트리온 · 06:20·17:56·23:57 | 패키징 장비 성장, 금리 하락 수혜, 미국 공장·CMO 사업 기회 | <strong>미검증.</strong> 수주·이익, 실제 자동차 금융 여건, 공장 거래 종결·CMO 손익 자료가 없다. 현대차 50만 원은 근거가 제시된 목표가가 아닌 희망 가격이다. |</p>
+<h4>상대적으로 직접적인 외부 근거</h4>
+<p><strong>현대백화점:</strong> 제공 뉴스는 3분기 영업이익 <strong>946억 원, 전년 동기 대비 30.1% 증가</strong>를 보도한다. OpenDART 목록에는 11월 4일 연결 기준 잠정실적 공시가 있다. 다만 공시 본문을 직접 대조한 결과는 제공되지 않았다. <a href="http://www.kjdaily.com/article.php?aid=1793849441691336276">실적 보도</a>, <a href="https://dart.fss.or.kr/dsaf001/main.do?rcpNo=20261104800269">잠정실적 공시</a></p>
+<p>한편 11월 5일 보도는 신한투자증권이 목표주가를 <strong>17% 낮춘 12만 원</strong>으로 제시했다고 전한다. 이익 증가와 별개로 ROE 개선 제한·성장 둔화에 대한 반론이 존재한다. 영상의 15만 원은 다른 보고서일 수 있어 직접적인 오류로 판정할 수 없다. <a href="https://www.vegannews.co.kr/news/article.html?no=400912">목표주가 조정 보도</a></p>
+<p><strong>네이버:</strong> 11월 3일 장래사업·경영계획 정정 및 유상증자결정 정정 공시의 존재는 확인된다. 그러나 공시 제목만으로 영상의 데이터센터 프로젝트나 엔비디아·브룩필드의 자금 제공을 입증하지는 못한다. <a href="https://dart.fss.or.kr/dsaf001/main.do?rcpNo=20261103800603">경영계획 정정 공시</a>, <a href="https://dart.fss.or.kr/dsaf001/main.do?rcpNo=20261103000311">유상증자결정 정정 공시</a></p>
+<p><strong>현대차 시세:</strong> 11월 6일 후속 기사는 전날 애프터마켓 가격을 29만3,000원, 정규장 종가 대비 -0.17%, 전 거래일 대비 +3.35%로 보도했다. 영상의 장중 +5% 이상 주장과 관측 시점이 달라 이를 직접 반박하지 않는다. <a href="https://www.etoday.co.kr/news/view/2644841">애프터마켓 보도</a></p>
+<h3>3. 강세 논리와 핵심 반론</h3>
+<h4>강세 시나리오: 최종 수요가 유지되는 집행 이연</h4>
+<p>영상의 설명이 성립하려면 <strong>취소 가능한 계획이 아니라 실제 주문이 유지되고, 공급 증가보다 유효 수요가 커야 한다.</strong> 이 경우 투자 일정이 분산되면서 메모리 가격과 설비 가동의 지속성이 유지될 가능성이 있다. 빅테크에는 당장의 현금지출 부담 완화, 이미 전력을 확보한 데이터센터에는 희소성 부각이라는 경로도 생각할 수 있다.</p>
+<p>다만 이 경로들은 제공 자료로 확인된 결과가 아닌 <strong>조건부 해석</strong>이다. 특히 특정 HBM 제품의 장기 계약을 DRAM·NAND 전체의 공급 부족으로 확대해서는 안 된다.</p>
+<h4>반론: 병목은 수요를 유지해도 매출을 늦출 수 있다</h4>
+<p>전력이나 건설 지연이 있으면 고객의 도입 일정과 반도체 출하·매출 인식도 늦어질 수 있다. 장기 예약에 물량 변경·취소 조건이 있다면 ‘선주문’만으로 미래 매출이 보장되지 않는다. 공급이 늘어나는 사이 고객 투자 계획이 줄어들 경우에는 공급 부족 논리가 약화될 수 있다.</p>
+<p>빅테크의 CAPEX 이연 역시 단기 현금지출을 줄일 수 있지만, 가동·매출도 함께 늦어지면 수익성 개선과 같은 의미가 아니다. 기존 데이터센터도 확보 전력, 냉각 성능, 고객 요구 사양, 계약 비용에 따라 수혜가 달라질 수 있다.</p>
+<p>금리·유가 하락의 소비 개선 효과도 원인 확인이 필요하다. 비용 부담 완화인지 경기 둔화 신호인지에 따라 자동차·소비재 해석은 달라질 수 있으며, 제공 자료는 어느 쪽도 입증하지 못한다.</p>
+<h3>4. 단기 확인 항목과 논리 무효화 조건</h3>
+<p>아래는 확인된 예정 일정이 아니라 <strong>다음 공시·실적 발표·계약 발표에서 점검할 항목</strong>이다.</p>
+<p>| 관찰 대상 | 구체적인 확인 항목 | 강세 논리를 약화·무효화하는 신호 |</p>
+<p>|---|---|---|</p>
+<p>| 메모리 업체 | HBM·DRAM·NAND별 확정 물량, 계약기간·취소권, 출하량·재고·판매가격, 증설 일정 | 주문 취소·축소와 재고 증가·가격 하락이 함께 나타나거나, 공급 증가를 수요가 흡수하지 못함 |</p>
+<p>| 빅테크 | 기존 대비 CAPEX 변경액, 현금지출·리스 구분, 영업·잉여현금흐름, 지연 사유 | 공급 제약이 아니라 수요·수익성 악화로 계획이 축소되거나 반복 연기됨 |</p>
+<p>| 데이터센터 | 전력 접속·인허가, 실제 가동 MW, 고객 계약, 가동률·임대단가, 소유·임차 구조 | 발표된 전력이 가동으로 이어지지 않거나 고객 계약·임대단가·수익성이 기대에 못 미침 |</p>
+<p>| 중국 경쟁사 | YMTC 심사 상태, 조달액, 실제 설비투자·생산능력 변화 | 다른 조달 수단으로 증설이 유지돼 상장 지연의 경쟁 완화 효과가 사라짐 |</p>
+<p>| 네이버 | 프로젝트 실명, 계약 당사자, 출자·대여·리스·보증, 연결·부채 인식 주석 | 영상에서 추정한 거래가 다른 기업의 거래이거나 회계 설명과 공시가 불일치함 |</p>
+<p>| 현대백화점 | 공시 실제치와 당시 컨센서스, 자회사별 손익, ROE·BPS·PBR 산식 | 실적 증가가 지속적 수익성 개선으로 연결되지 않거나 자산가치 할인 근거가 유지됨 |</p>
+<p>| 프로텍·셀트리온·현대차 | 각각 장비 수주·이익, 공장 거래 종결·CMO 매출 및 이익, 할부금리·판매·보조금 시행 내용 | 사업 기대가 실제 매출·이익으로 이어지지 않거나 비용·정책 부담이 효과를 상쇄함 |</p>
+<p>| 시장·순환매 | 동일 기간 업종 수익률·거래대금·투자자별 순매수, 지수 구성비 원본 | 단발성 반등에 그치거나 수급이 영상에서 설명한 방향과 일치하지 않음 |</p>
+<p>선거·거시 수치 검증에서는 먼저 <strong>녹화일과 기준 거래일</strong>을 특정해야 한다. 이어 공식 의석 집계·미확정 여부, 국채 만기, 유종·계약월, 장중·종가 기준을 맞춰야 한다. 서로 다른 시점의 수치를 결합하면 정책과 주가의 인과관계를 잘못 해석할 수 있다.</p>
+<h3>5. 신뢰도와 자료 한계</h3>
+<h4>자막 품질은 사실 정확도가 아니다</h4>
+<p><code>transcript_quality</code>는 <strong>good·1.0</strong>이지만, 한국어 자동자막 922개 세그먼트의 수집 품질 지표다. 수동 자막과 원음은 제공되지 않았다. 기업명·숫자·단위가 정확하다는 보증으로 해석할 수 없다.</p>
+<p>주장 추출 단계의 <code>source_confidence</code>와 검증 단계의 같은 이름 지표도 의미가 다르다. 예를 들어 메모리 관련 발언 추출 확신도는 <strong>0.90</strong>이지만, C5의 외부 근거 직접성은 <strong>0.00</strong>, <code>asr_confidence</code>는 <strong>0.80</strong>이다. 발언의 취지는 식별되더라도 그 사실관계는 확인되지 않았다는 뜻이다.</p>
+<p>특히 지수·ETF C4와 네이버 프로젝트 C9의 <code>asr_confidence</code>는 각각 <strong>0.35·0.30</strong>으로 낮다. 반면 부분 지지된 C10도 외부 근거 <code>source_confidence</code>는 <strong>0.45</strong>, <code>asr_confidence</code>는 <strong>0.70</strong>이며, 지지는 현대백화점 실적 증가 보도에만 해당한다. 이 수치들은 독립 측정된 정확도나 주장 자체가 참일 확률이 아니다.</p>
+<h4>수집 성공과 주장 검증은 구분해야 한다</h4>
+<p>외부 증거 E1~E11은 대부분 무관한 기사 제목, 빈 발췌 또는 오류·탐색 메뉴 중심이다. <strong>해당 항목에서 핵심 주장을 직접 지지하거나 반박하는 근거는 확인되지 않았다.</strong> 수집 상태의 ‘verified’를 투자 주장 검증 완료로 읽어서는 안 된다.</p>
+<p>네이버·현대백화점·프로텍·현대차 시세 조회도 유효 가격 필드가 없어 실패했다. 프로텍의 짧은 조회 기간 내 공시 부재는 과거 분쟁이나 이익 증가가 없었다는 증거가 아니다. 대상이 불명확한 영업이익 <strong>5,523억 원</strong>, 가격 <strong>14만 원</strong>, 외국인 매수 금액 등은 특정 기업에 배정하지 않았다.</p>
+<h4>비공개·폐쇄형 출처</h4>
+<p>뱅크오브아메리카 보고서, CSRC 비공식 지침, 비공개 메모리 장기계약은 <strong>미검증·원문 수동 확인 필요</strong>다. Bloomberg·Morningstar 원문도 제공되지 않아 확인 근거로 사용할 수 없다. 원문 미확보 자체가 해당 주장의 반증은 아니다.</p>
+<h3>6. 결론</h3>
+<p>영상은 AI 투자 지연을 공급 병목에 따른 속도 조절로 해석하는 강세 시나리오를 제시한다. 그러나 핵심 전제인 <strong>수요 유지·장기 주문·공급 부족은 제공 증거로 확인되지 않았다.</strong> 현대백화점의 실적 증가 보도만 제한적으로 뒷받침되며, 이를 다른 기업이나 AI 산업 전체로 확장할 수 없다.</p>
+<p>향후 판단을 바꿀 핵심 자료는 가격 등락 자체보다 <strong>주문 취소 여부, 제품별 재고·가격·출하, 빅테크 투자 변경 사유, 실제 가동 전력과 고객 계약</strong>이다. 이 항목들이 확인돼야 ‘지연이 주기를 연장한다’는 설명과 ‘수요 약화가 실적을 늦춘다’는 반론을 구분할 수 있다.</p>
+  <details>
+    <summary>공개 요약 JSON</summary>
+    <pre>{
+  &quot;version&quot;: 4,
+  &quot;video_id&quot;: &quot;7RoQPtjidOM&quot;,
+  &quot;title&quot;: &quot;“AI 투자 지연이 정말 악재일까?” AI 데이터센터 병목의 진실 / 주가 급락하는 삼전·하닉 지금 팔아야 하나? ㅣ이권희 대표&quot;,
+  &quot;url&quot;: &quot;https://www.youtube.com/watch?v=7RoQPtjidOM&quot;,
+  &quot;channel&quot;: &quot;815Money talk&quot;,
+  &quot;channel_id&quot;: &quot;UCCG6BEYjfQMGzypJw2EJCDQ&quot;,
+  &quot;source_url&quot;: &quot;https://www.youtube.com/@815moneytalk/videos&quot;,
+  &quot;thumbnail_url&quot;: &quot;https://i.ytimg.com/vi/7RoQPtjidOM/maxresdefault.jpg&quot;,
+  &quot;published_at&quot;: &quot;2026-11-05T03:30:01+00:00&quot;,
+  &quot;status&quot;: &quot;asr_uncertain&quot;,
+  &quot;strategy_source_tier&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_evidence_weight&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_validation_policy&quot;: &quot;STANDARD_REVIEW&quot;,
+  &quot;transcript_status&quot;: &quot;available&quot;,
+  &quot;transcript_source&quot;: &quot;automatic&quot;,
+  &quot;transcript_chars&quot;: 15814,
+  &quot;transcript_quality&quot;: {
+    &quot;status&quot;: &quot;good&quot;,
+    &quot;score&quot;: 1.0,
+    &quot;warnings&quot;: [],
+    &quot;source&quot;: &quot;automatic&quot;,
+    &quot;language&quot;: &quot;Korean&quot;,
+    &quot;model_or_format&quot;: &quot;json3&quot;,
+    &quot;chars&quot;: 15814,
+    &quot;segments&quot;: 922,
+    &quot;duration_seconds&quot;: 1770,
+    &quot;repeated_ngram_ratio&quot;: 0.0
+  },
+  &quot;generated_at&quot;: &quot;2026-11-06T07:24:02.434446+09:00&quot;,
+  &quot;llm_status&quot;: &quot;success&quot;,
+  &quot;research_status&quot;: &quot;success&quot;,
+  &quot;claim_verification_status&quot;: &quot;success&quot;,
+  &quot;research_pipeline_version&quot;: 4,
+  &quot;evidence_count&quot;: 11,
+  &quot;claim_status_summary&quot;: {
+    &quot;unverified&quot;: 7,
+    &quot;asr_uncertain&quot;: 2,
+    &quot;partially_supported&quot;: 1
+  },
+  &quot;claims&quot;: [
+    {
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;claim_text&quot;: &quot;민주당이 54석을 확보하고 텍사스 상원의원·주지사 선거에서 승리했으며 알래스카 결과 확정에는 약 2주가 걸린다는 발언과 2006~2008년 선거의 역사적 비교.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:05&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.64,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;민주당 54석; 알래스카 약 2주&quot;,
+        &quot;observed&quot;: &quot;대응하는 공식 결과·일정 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;미확인 선거 결과를 데이터센터 규제나 업종 투자 판단의 확정 전제로 사용하기 어렵다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;claim_text&quot;: &quot;유가가 약 8% 하락해 88달러가 되고 국채 수익률이 4.9% 아래로 내려갔으며 재정·정책 기대 변화가 소비 여력을 개선했다는 해석.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.97,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:05&quot;,
+      &quot;source_confidence&quot;: 0.2,
+      &quot;asr_confidence&quot;: 0.64,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;유가 약 -8%, 88달러; 국채 수익률 4.9% 미만&quot;,
+        &quot;observed&quot;: &quot;후속 CL=F 스냅샷 약 91.20달러; 일간 변동률·국채 수익률 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;유가와 금리의 수준·변동률을 같은 시점으로 맞추기 전에는 소비재 수혜 논리를 검증된 투자 근거로 보기 어렵다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;claim_text&quot;: &quot;다우 약 +3%, 마이크론 -7%, 엔비디아 -3.7%, AMD 종가 +1%·장중 +10%, 중국 증시 +3%, SK하이닉스 개장 -6% 이상, 네이버 +3%·17만 원, 현대차 +5% 이상 및 바이오·화장품 순환매 주장.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.98,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:05&quot;,
+      &quot;source_confidence&quot;: 0.15,
+      &quot;asr_confidence&quot;: 0.75,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;다우 +3%; MU -7%; NVDA -3.7%; AMD +1%·장중 +10%; 중국 +3%; SK하이닉스 -6% 이상; 네이버 +3%·170,000원; 현대차 +5% 이상&quot;,
+        &quot;observed&quot;: &quot;현대차 후속 기사상 애프터마켓 293,000원·전 거래일 대비 +3.35%; 나머지 대응 시세 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;정확한 거래일과 장중·종가 기준을 확인하기 전에는 언급된 등락률이나 순환매를 추격매매 근거로 삼기 어렵다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;claim_text&quot;: &quot;삼성전자·SK하이닉스 비중 64%, 관련 기업 포함 65.6~66%, ‘EWI’ -1.8%, 야간선물 -1.6% 및 지수 5,000~5,200 지지·추가 10% 하락·7,000 미만 미매도 발언.&quot;,
+      &quot;status&quot;: &quot;asr_uncertain&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:05&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.35,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;64%; 65.6~66%; -1.8%; -1.6%; 5,000~5,200; 추가 -10%; 7,000&quot;,
+        &quot;observed&quot;: &quot;대상 상품·단위와 대응 구성비·가격 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;상품과 단위 확인 전에는 구성비 및 매매 기준 수치를 투자 판단에 적용하지 않아야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;claim_text&quot;: &quot;메모리 칩이 2029년까지 선주문됐으며 전력·기판·반도체 공급 부족 때문에 데이터센터 투자 지연이 공급과잉보다 반도체 주기 연장으로 이어질 수 있다는 주장.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:05&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.8,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;2029년까지 선주문; 설명용 계획 100·공급 50·축소 후 70&quot;,
+        &quot;observed&quot;: &quot;계약·공급 통계 없음; 100·50·70은 가정&quot;
+      },
+      &quot;investor_implication&quot;: &quot;공급 부족과 장기 주문을 확인하지 않은 상태에서 투자 지연을 반도체 보유·추가 매수의 호재로 단정하기 어렵다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;claim_text&quot;: &quot;빅테크가 향후 3년의 투자를 공급 증가에 맞춰 늦추면 현금흐름 부담이 줄어든다는 주장과 MS·메타의 신규 주식 발행 및 뱅크오브아메리카 분석 인용.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:05&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.7,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;향후 3년 투자 조절; 대규모 신규 주식 발행&quot;,
+        &quot;observed&quot;: &quot;CAPEX 일정·발행 수단·조달 금액 확인 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;투자 집행 지연의 단기 현금흐름 효과와 사업 수익성·수요의 지속성을 구분해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;claim_text&quot;: &quot;YMTC 상장이 지연되고 중국 증권감독관리위원회가 AI 반도체 IPO 속도 조절을 비공식 지시했으며 YMTC와 키옥시아가 NAND 시장 3~4위를 경쟁한다는 발언.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:06:20&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.65,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;NAND 시장 3~4위 경쟁&quot;,
+        &quot;observed&quot;: &quot;분기별 점유율·순위 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;경쟁사의 상장 지연을 국내 메모리 업체의 실적 수혜로 연결하려면 실제 자금조달·증설 변화를 확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;claim_text&quot;: &quot;미국의 전력·건설 제약이 한국·영국으로 데이터센터 수요를 이전시키고 SK텔레콤·코어위브·네비우스 등 기존 시설 보유 기업의 임대료와 자산가치를 높일 수 있다는 주장.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.98,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:12:11&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.7,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;수혜 규모 수치 미제시&quot;,
+        &quot;observed&quot;: &quot;이전 계약·가동 MW·임대단가 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;데이터센터 보유만으로 수혜가 확정되지 않으며 전력 확보·가동 시점·고객 계약·수익 조건이 핵심 확인 사항이다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;claim_text&quot;: &quot;‘1단계 W 프로젝트’의 투자 부담과 한국 회계상 부채 분류가 네이버 주가 부진을 초래했으며 엔비디아·브룩필드가 자금을 제공했다는 취지의 발언.&quot;,
+      &quot;status&quot;: &quot;asr_uncertain&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:12:11&quot;,
+      &quot;source_confidence&quot;: 0.1,
+      &quot;asr_confidence&quot;: 0.3,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;‘1단계 W 프로젝트’; 금액 미제시&quot;,
+        &quot;observed&quot;: &quot;관련 가능성을 판단할 공시 제목만 있으며 거래 조건·회계 금액 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;거래 당사자와 회계 구조가 확인되기 전에는 네이버의 부채 부담이나 선행 투자 재평가를 사실로 제시하기 어렵다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C10&quot;,
+      &quot;claim_text&quot;: &quot;현대백화점의 3분기 호실적·PBR 0.38배·목표가 15만 원, 프로텍의 언더필 디스펜서 수요·이익 증가·과거 분쟁, 셀트리온의 미국 공장 인수·CMO 수익 발생 및 현대차의 금리 하락 수혜·전기차 보조금 축소 가능성.&quot;,
+      &quot;status&quot;: &quot;partially_supported&quot;,
+      &quot;confidence&quot;: 0.94,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:17:56&quot;,
+      &quot;source_confidence&quot;: 0.45,
+      &quot;asr_confidence&quot;: 0.7,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;현대백화점 PBR 0.38배·목표가 150,000원; 프로텍 과거 약 4년 전 분쟁; 현대차 희망 가격 500,000원&quot;,
+        &quot;observed&quot;: &quot;뉴스상 현대백화점 영업이익 946억 원·전년 대비 +30.1%, 신한투자증권 목표가 120,000원; 나머지 대응 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;현대백화점의 이익 증가 보도는 일부 근거가 있지만 저평가·목표가격과 나머지 기업의 투자 논거는 별도 확인이 필요하다.&quot;
+    }
+  ],
+  &quot;entities&quot;: [
+    {
+      &quot;ticker&quot;: &quot;CL=F&quot;,
+      &quot;name&quot;: &quot;미국 시장·금리·유가&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;미국 선거 이후 금리와 유가 하락이 소비 여력 개선 및 소비재·바이오 상승으로 이어졌다고 해석한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;다우지수 약 3% 상승, 유가 약 8% 하락 및 88달러 언급.&quot;,
+        &quot;국채 수익률이 4.9% 아래로 하락했다고 발언하나 만기는 명시하지 않음.&quot;,
+        &quot;민주당이 54석을 확보했고 알래스카 결과에는 약 2주가 걸릴 수 있다고 발언.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;CL=F&quot;,
+        &quot;as_of&quot;: &quot;2026-11-05T22:54:19.688085+00:00&quot;,
+        &quot;current_price&quot;: 91.19999694824219,
+        &quot;market_cap&quot;: null,
+        &quot;forward_pe&quot;: null,
+        &quot;trailing_pe&quot;: null,
+        &quot;fifty_two_week_high&quot;: 119.48,
+        &quot;fifty_two_week_low&quot;: 54.98,
+        &quot;average_target_price&quot;: null,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;035420&quot;,
+      &quot;name&quot;: &quot;네이버&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;데이터센터 관련 투자 부담과 회계상 부채 분류가 주가 부진에 영향을 줬으며, 공급 병목 환경에서는 선행 투자의 가치가 재평가될 가능성을 제시한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;영상 후반 네이버 주가가 약 3% 올라 17만 원에 도달했다고 언급.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;시장 데이터 조회 실패: no_usable_market_fields&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;035420&quot;,
+        &quot;as_of&quot;: &quot;2026-11-05T22:54:20.765083+00:00&quot;,
+        &quot;current_price&quot;: null,
+        &quot;market_cap&quot;: null,
+        &quot;forward_pe&quot;: null,
+        &quot;trailing_pe&quot;: null,
+        &quot;fifty_two_week_high&quot;: null,
+        &quot;fifty_two_week_low&quot;: null,
+        &quot;average_target_price&quot;: null,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;unverified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;069960&quot;,
+      &quot;name&quot;: &quot;현대백화점&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;3분기 실적 전망이 시장 예상을 웃돌고 자회사 실적도 양호하다며 낮은 자산가치 대비 주가에 주목한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;PBR 약 0.38배 언급.&quot;,
+        &quot;목표주가 15만 원 언급. 보고서 발행사·기준일은 미제시.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;시장 데이터 조회 실패: no_usable_market_fields&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;069960&quot;,
+        &quot;as_of&quot;: &quot;2026-11-05T22:54:23.718048+00:00&quot;,
+        &quot;current_price&quot;: null,
+        &quot;market_cap&quot;: null,
+        &quot;forward_pe&quot;: null,
+        &quot;trailing_pe&quot;: null,
+        &quot;fifty_two_week_high&quot;: null,
+        &quot;fifty_two_week_low&quot;: null,
+        &quot;average_target_price&quot;: null,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;unverified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;053610&quot;,
+      &quot;name&quot;: &quot;프로텍&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;첨단 패키징의 언더필 공정용 디스펜서 수요가 성장 요인이며 이익이 증가하고 있다고 설명하지만, 단기 주가는 반도체 소부장 조정의 영향을 받을 수 있다고 본다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;주가가 36,000원에서 100,000원으로 거의 세 배 상승한 뒤 조정됐다고 언급.&quot;,
+        &quot;약 4년 전 주요 주주 이탈·주주 구성 변화와 내부 분쟁이 있었다고 회고.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;시장 데이터 조회 실패: no_usable_market_fields&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;053610&quot;,
+        &quot;as_of&quot;: &quot;2026-11-05T22:54:26.236170+00:00&quot;,
+        &quot;current_price&quot;: null,
+        &quot;market_cap&quot;: null,
+        &quot;forward_pe&quot;: null,
+        &quot;trailing_pe&quot;: null,
+        &quot;fifty_two_week_high&quot;: null,
+        &quot;fifty_two_week_low&quot;: null,
+        &quot;average_target_price&quot;: null,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;unverified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;005380&quot;,
+      &quot;name&quot;: &quot;현대자동차&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;금리 하락에 따른 할부 부담 완화와 소비 개선을 자동차 업종 상승 배경으로 해석한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;영상 후반 현대자동차 주가 5% 이상 상승 언급.&quot;,
+        &quot;50만 원까지 가야 한다는 희망적 발언이 있으나 공식 목표주가 근거는 제시되지 않음.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;시장 데이터 조회 실패: no_usable_market_fields&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;005380&quot;,
+        &quot;as_of&quot;: &quot;2026-11-05T22:54:30.222231+00:00&quot;,
+        &quot;current_price&quot;: null,
+        &quot;market_cap&quot;: null,
+        &quot;forward_pe&quot;: null,
+        &quot;trailing_pe&quot;: null,
+        &quot;fifty_two_week_high&quot;: null,
+        &quot;fifty_two_week_low&quot;: null,
+        &quot;average_target_price&quot;: null,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;unverified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    }
+  ],
+  &quot;evidence&quot;: [
+    {
+      &quot;evidence_id&quot;: &quot;E1&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;Century: Q3 Earnings Snapshot&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/century-q3-earnings-snapshot-224706676.html&quot;,
+      &quot;publisher&quot;: &quot;Associated Press&quot;,
+      &quot;published_at&quot;: &quot;2026-11-05T22:47:06+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Century: Q3 Earnings Snapshot Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 2026 Elections Weather Newsletters Finance My portfolio News Ma...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E2&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;Earnings live updates: Airbnb stock jumps as Wall Street cheers &#x27;growth mode,&#x27; upbeat outlook&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/live/earnings-live-updates-apple-palantir-roku-and-more-212856249.html&quot;,
+      &quot;publisher&quot;: &quot;Yahoo Finance&quot;,
+      &quot;published_at&quot;: &quot;2026-11-05T22:09:34+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Earnings live updates: Airbnb stock jumps as Wall Street cheers &#x27;growth mode,&#x27; upbeat outlook Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E4&quot;,
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;title&quot;: &quot;Cardinal Energy earnings surge 323% as Reford expansion drives production growth&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/energy/articles/cardinal-energy-earnings-surge-323-225010850.html&quot;,
+      &quot;publisher&quot;: &quot;Investing.com&quot;,
+      &quot;published_at&quot;: &quot;2026-11-05T22:50:10+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Cardinal Energy earnings surge 323% as Reford expansion drives production growth Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 2026 Electio...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E5&quot;,
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;title&quot;: &quot;Devon Energy (NYSE:DVN) misses Q3 2026 sales expectations&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/energy/articles/devon-energy-nyse-dvn-misses-224139154.html&quot;,
+      &quot;publisher&quot;: &quot;StockStory&quot;,
+      &quot;published_at&quot;: &quot;2026-11-05T22:41:39+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E6&quot;,
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;title&quot;: &quot;Century Aluminum Company Reports Third Quarter 2026 Results&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/century-aluminum-company-reports-third-210500429.html&quot;,
+      &quot;publisher&quot;: &quot;GlobeNewswire&quot;,
+      &quot;published_at&quot;: &quot;2026-11-05T21:05:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E7&quot;,
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;title&quot;: &quot;Amazon’s Ad Auctions in the Spotlight&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/m/c2f9f2e0-dab9-3e8b-90cf-1317749bd278/amazon%E2%80%99s-ad-auctions-in-the.html&quot;,
+      &quot;publisher&quot;: &quot;The Wall Street Journal&quot;,
+      &quot;published_at&quot;: &quot;2026-11-05T22:15:02+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E8&quot;,
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;title&quot;: &quot;CoreWeave vs. Nebius: Which Is the Better AI Neocloud Stock to Own for the Next 3 Years?&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/coreweave-vs-nebius-better-ai-222000495.html&quot;,
+      &quot;publisher&quot;: &quot;Motley Fool&quot;,
+      &quot;published_at&quot;: &quot;2026-11-05T22:20:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E9&quot;,
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;title&quot;: &quot;WW International, Inc. Q3 2026 Earnings Call Summary&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/healthcare/articles/ww-international-inc-q3-2026-224834584.html&quot;,
+      &quot;publisher&quot;: &quot;Moby&quot;,
+      &quot;published_at&quot;: &quot;2026-11-05T22:48:34+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E10&quot;,
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;title&quot;: &quot;Xeris Biopharma Holdings, Inc. Q3 2026 Earnings Call Summary&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/healthcare/articles/xeris-biopharma-holdings-inc-q3-224736003.html&quot;,
+      &quot;publisher&quot;: &quot;Moby&quot;,
+      &quot;published_at&quot;: &quot;2026-11-05T22:47:36+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E11&quot;,
+      &quot;claim_id&quot;: &quot;C10&quot;,
+      &quot;title&quot;: &quot;Celsius Q3 Earnings Call Highlights&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/celsius-q3-earnings-call-highlights-171452999.html&quot;,
+      &quot;publisher&quot;: &quot;MarketBeat&quot;,
+      &quot;published_at&quot;: &quot;2026-11-05T17:14:52+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    }
+  ],
+  &quot;source_policy&quot;: {
+    &quot;raw_transcript_published&quot;: false,
+    &quot;raw_transcript_in_evidence&quot;: false,
+    &quot;research_pipeline_version&quot;: 4,
+    &quot;closed_source_claims&quot;: &quot;unverified_external_source&quot;,
+    &quot;auto_caption_warning&quot;: true,
+    &quot;local_asr_warning&quot;: false
+  }
+}</pre>
+  </details>
+</article>
+</main>
+  <style>
+.reader-contents { margin: 16px 0; padding: 12px 16px; border: 1px solid var(--line, #64748b); border-radius: 12px; }
+.reader-contents > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-weight: 750; }
+.reader-contents nav { display: grid; gap: 4px; max-height: 45vh; overflow: auto; margin: 8px 0; }
+.reader-contents a { display: block; min-height: 44px; padding: 10px; border-radius: 6px; color: inherit; overflow-wrap: anywhere; }
+.reader-contents a:hover { background: #80808020; }
+.reader-contents .reader-subsection { padding-inline-start: 24px; font-size: .92em; }
+.reader-prose, .report { overflow-wrap: anywhere; line-height: 1.8; }
+.reader-prose p, .reader-prose li { max-width: 85ch; }
+.reader-prose h2, .reader-prose h3, .reader-prose h4, [data-reader-heading] { scroll-margin-top: 100px; line-height: 1.45; }
+.reader-prose h2 { margin-top: 1.8em; padding-bottom: 8px; border-bottom: 1px solid var(--line, #64748b); }
+.reader-prose h3 { margin-top: 1.5em; }
+.reader-prose li { margin: .5em 0; }
+.reader-prose pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.reader-prose blockquote { margin: 16px 0; padding: 4px 16px; border-left: 3px solid var(--accent, #64748b); }
+.reader-table { overflow: auto; max-width: 100%; margin: 16px 0; border: 1px solid var(--line, #64748b); border-radius: 10px; }
+.reader-table table { border-collapse: collapse; width: 100%; margin: 0; font-size: .92rem; }
+.reader-table th, .reader-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line, #64748b); min-width: 110px; max-width: 400px; overflow-wrap: anywhere; white-space: normal; }
+.reader-table th { background: #80808018; }
+.reader-table tr:nth-child(even) { background: #80808008; }
+.reader-search { display: grid; gap: 8px; margin: 16px 0; }
+.reader-search label { font-weight: 700; }
+.reader-search input { box-sizing: border-box; width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line, #64748b); border-radius: 10px; background: var(--panel, #fff); color: var(--text, #132238); font: inherit; }
+.reader-search p { margin: 0; font-size: .86rem; }
+.reader-back { position: fixed; bottom: max(14px, env(safe-area-inset-bottom)); right: 14px; z-index: 30; min-height: 44px; border: 1px solid #778899; border-radius: 99px; padding: 10px 16px; background: #18344a; color: #fff; font: 700 14px system-ui; cursor: pointer; box-shadow: 0 3px 12px #0003; }
+[data-reader-source] { margin-top: 20px; }
+[data-reader-source] > summary { min-height: 44px; cursor: pointer; }
+[data-reader-source] pre { font-size: .85rem; }
+[data-reader-source] pre, .reader-prose { min-width: 0; }
+.reader-contents :focus-visible, .reader-search :focus-visible, .reader-back:focus-visible, .reader-table:focus-visible { outline: 3px solid var(--accent, #008c95); outline-offset: 3px; }
+.reader-search + .grid > [hidden] { display: none !important; }
+@media (max-width: 600px) { .reader-prose { font-size: 1rem; } .reader-contents { padding: 8px 12px; } }
+@media print { .reader-back, .reader-search, .reader-contents, [data-reader-source] { display: none !important; } .reader-table { overflow: visible; } .reader-prose { color: #000; background: #fff; } }
+</style><script>
+(() => {
+  'use strict';
+  let serial = 0;
+  const rendered = new WeakMap();
+  const node = (tag, text) => { const el = document.createElement(tag); if (text != null) el.textContent = text; return el; };
+  function inline(parent, text) {
+    const pattern = /(`[^`]+`|\*\*[^*]+\*\*|\[[^\]]+\]\(https?:\/\/[^\s)]+\))/g;
+    let start = 0;
+    for (const match of String(text).matchAll(pattern)) {
+      parent.append(document.createTextNode(text.slice(start, match.index)));
+      const value = match[0];
+      if (value.startsWith('`')) parent.append(node('code', value.slice(1, -1)));
+      else if (value.startsWith('**')) parent.append(node('strong', value.slice(2, -2)));
+      else {
+        const link = value.match(/^\[([^\]]+)\]\((.+)\)$/);
+        const a = node('a', link[1]); a.href = link[2]; a.rel = 'noopener noreferrer'; parent.append(a);
+      }
+      start = match.index + value.length;
+    }
+    parent.append(document.createTextNode(text.slice(start)));
+  }
+  const cells = line => line.trim().replace(/^\|/, '').replace(/\|$/, '').split(/(?<!\\)\|/).map(v => v.trim().replace(/\\\|/g, '|'));
+  function markdown(source) {
+    const article = node('article'); article.className = 'reader-prose';
+    const lines = source.split(/\r?\n/); let list = null;
+    for (let i = 0; i < lines.length; i += 1) {
+      const line = lines[i], value = line.trim();
+      if (!value) { list = null; continue; }
+      if (/^```/.test(value)) {
+        const code = []; i += 1;
+        while (i < lines.length && !/^```/.test(lines[i].trim())) code.push(lines[i++]);
+        const pre = node('pre'); pre.append(node('code', code.join('\n'))); article.append(pre); list = null; continue;
+      }
+      if (i + 1 < lines.length && value.includes('|') && cells(lines[i + 1]).every(v => /^:?-{3,}:?$/.test(v))) {
+        const table = node('table'), head = node('thead'), body = node('tbody');
+        const row = (values, tag) => { const tr = node('tr'); values.forEach(v => { const cell = node(tag); if (tag === 'th') cell.scope = 'col'; inline(cell, v); tr.append(cell); }); return tr; };
+        head.append(row(cells(line), 'th')); i += 2;
+        while (i < lines.length && lines[i].trim() && lines[i].includes('|')) body.append(row(cells(lines[i++]), 'td'));
+        i -= 1; table.append(head, body); article.append(table); list = null; continue;
+      }
+      const heading = value.match(/^(#{1,6})\s+(.+)$/);
+      if (heading) { const h = node('h' + Math.min(4, heading[1].length + 1)); inline(h, heading[2]); article.append(h); list = null; continue; }
+      const bullet = value.match(/^(?:[-*+] |\d+\. )(.+)$/);
+      if (bullet) {
+        const tag = /^\d/.test(value) ? 'ol' : 'ul';
+        if (!list || list.tagName.toLowerCase() !== tag) { list = node(tag); if (tag === 'ol') list.start = parseInt(value, 10); article.append(list); }
+        const li = node('li'); inline(li, bullet[1]); list.append(li); continue;
+      }
+      list = null;
+      if (/^(---+|\*\*\*+)$/.test(value)) { article.append(node('hr')); continue; }
+      const p = node(value.startsWith('> ') ? 'blockquote' : 'p'); inline(p, value.startsWith('> ') ? value.slice(2) : line); article.append(p);
+    }
+    return article;
+  }
+  function contents(root) {
+    root.querySelectorAll(':scope > .reader-contents').forEach(el => el.remove());
+    const headings = [...root.querySelectorAll('h2,h3,h4')].filter(h => !h.closest('.card,.run-card,.reader-contents,[data-reader-source],[hidden]'));
+    if (headings.length < 2) return;
+    const details = node('details'); details.className = 'reader-contents';
+    details.append(node('summary', '이 리포트 목차 · ' + headings.length + '개 항목'));
+    const nav = node('nav'); nav.setAttribute('aria-label', '리포트 목차');
+    headings.forEach(h => {
+      if (!h.id) h.id = 'reader-section-' + (++serial);
+      h.dataset.readerHeading = ''; h.tabIndex = -1;
+      const a = node('a', h.textContent); a.href = '#' + h.id;
+      if (h.tagName !== 'H2') a.className = 'reader-subsection';
+      a.addEventListener('click', event => {
+        event.preventDefault();
+        for (let ancestor = h.parentElement; ancestor; ancestor = ancestor.parentElement) if (ancestor.tagName === 'DETAILS') ancestor.open = true;
+        h.scrollIntoView({block: 'start'}); h.focus({preventScroll: true});
+      }); nav.append(a);
+    });
+    details.append(nav); root.prepend(details);
+  }
+  function enhance(root) {
+    if (!root) return;
+    root.querySelectorAll('pre[data-report-markdown]').forEach(pre => {
+      const previous = rendered.get(pre);
+      if (previous && previous.source === pre.textContent) return;
+      const article = markdown(pre.textContent);
+      if (previous) previous.article.replaceWith(article);
+      else {
+        const details = node('details'); details.dataset.readerSource = '';
+        details.append(node('summary', 'Markdown 원문 보기'));
+        pre.before(article, details); details.append(pre);
+      }
+      rendered.set(pre, {source: pre.textContent, article});
+    });
+    root.querySelectorAll('table').forEach(table => {
+      if (table.closest('.reader-table,.account-table-wrap,.summary-scroll')) return;
+      const wrap = node('div'); wrap.className = 'reader-table'; wrap.tabIndex = 0;
+      wrap.setAttribute('role', 'region'); wrap.setAttribute('aria-label', '리포트 표 · 가로로 스크롤하여 전체 보기');
+      table.before(wrap); wrap.append(table);
+    });
+    root.querySelectorAll('.grid').forEach(grid => {
+      const cards = [...grid.querySelectorAll(':scope > a.card')];
+      if (cards.length < 2 || grid.dataset.readerSearch) return;
+      grid.dataset.readerSearch = 'true';
+      const box = node('div'); box.className = 'reader-search';
+      const input = node('input'); input.type = 'search'; input.placeholder = '제목 · 종목 · 채널 · 키워드'; input.id = 'report-search-' + (++serial);
+      const label = node('label', '리포트 찾기'); label.htmlFor = input.id;
+      const status = node('p'); status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
+      const update = () => {
+        const terms = input.value.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean); let count = 0;
+        cards.forEach(card => { card.hidden = !terms.every(t => card.textContent.toLocaleLowerCase().includes(t)); if (!card.hidden) count += 1; });
+        status.textContent = cards.length + '개 중 ' + count + '개 표시' + (count ? '' : ' · 검색어를 지우거나 다른 키워드를 입력하세요.');
+      };
+      input.addEventListener('input', update); box.append(label, input, status); grid.before(box); update();
+    });
+    contents(root);
+  }
+  window.TradingAgentsReader = {enhance};
+  const main = document.querySelector('main');
+  if (main && !main.hasAttribute('data-reader-dynamic')) enhance(main);
+  if (main) {
+    const top = node('button', '↑ 맨 위'); top.type = 'button'; top.className = 'reader-back'; top.setAttribute('aria-label', '리포트 맨 위로 이동');
+    top.addEventListener('click', () => { const target = document.querySelector('h1') || main; target.tabIndex = -1; target.scrollIntoView({block: 'start'}); target.focus({preventScroll: true}); });
+    document.body.append(top);
+  }
+})();
+</script>
+</body>
+</html>
