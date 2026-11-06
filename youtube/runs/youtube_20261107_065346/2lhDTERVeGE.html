@@ -1,0 +1,690 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YouTube 투자자용 검증 리포트 - “민주당 압승이 불러올 대반전!” 트럼프 결국 전쟁 끝내나? 삼성전자·SK하이닉스 폭락은 과도한 공포일까?ㅣ소현철 교수</title>
+  <style>
+:root {
+  color-scheme: light;
+  --bg: #f7f8fb;
+  --panel: #ffffff;
+  --text: #172033;
+  --muted: #667085;
+  --line: #d9dee8;
+  --accent: #0f766e;
+  --accent-2: #2563eb;
+  --warn: #b45309;
+  --bad: #b42318;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0 56px; }
+a { color: var(--accent-2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.hero { padding: 28px 0 22px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+.hero.compact { padding-top: 12px; }
+.hero h1 { margin: 0; font-size: clamp(28px, 4vw, 44px); line-height: 1.15; letter-spacing: 0; }
+.hero p { max-width: 760px; color: var(--muted); margin: 12px 0 0; }
+.eyebrow { color: var(--accent); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0; margin: 0 0 8px; }
+section { margin: 28px 0; }
+h2, h3, h4, h5 { letter-spacing: 0; line-height: 1.25; }
+.synthesis-callout { padding: clamp(20px, 4vw, 34px); border: 1px solid #6ee7d8; border-radius: 18px; background: linear-gradient(135deg, #ecfdf9 0%, #eff6ff 100%); box-shadow: 0 18px 44px rgba(15, 118, 110, .12); }
+.synthesis-callout.unavailable { border-color: var(--line); background: var(--panel); box-shadow: none; }
+.synthesis-callout h2 { margin: 0; font-size: clamp(24px, 3.2vw, 36px); }
+.synthesis-callout .lead { max-width: 900px; font-size: 17px; color: #334155; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.primary-link, .secondary-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border-radius: 999px; font-weight: 800; }
+.primary-link { color: white; background: var(--accent); }
+.secondary-link { color: var(--accent-2); border: 1px solid #93c5fd; background: white; }
+.primary-link:hover, .secondary-link:hover { text-decoration: none; filter: brightness(.97); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.card, .run { display: flex; flex-direction: column; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; color: var(--text); min-height: 128px; }
+.run { padding: 16px; }
+.card:hover, .run:hover { border-color: var(--accent-2); text-decoration: none; }
+.thumb { display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #e9edf5; border-radius: 8px 8px 0 0; color: var(--muted); font-size: 13px; font-weight: 700; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb-empty span { padding: 0 14px; text-align: center; }
+.card-body { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 16px; }
+.card strong { line-height: 1.35; }
+.source-line { color: #3f4a5f; font-weight: 600; }
+.runs { display: grid; gap: 10px; }
+.badge { display: inline-flex; width: fit-content; border-radius: 999px; padding: 2px 9px; background: #e6f4f1; color: var(--accent); font-size: 12px; font-weight: 700; }
+.status-contradicted, .status-llm_failed { background: #fee4e2; color: var(--bad); }
+.status-unverified, .status-stale { background: #fff4d6; color: var(--warn); }
+small, .muted { color: var(--muted); }
+.topnav { display: flex; gap: 14px; margin-bottom: 16px; font-size: 14px; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px; }
+.stats span { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
+.report { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: min(5vw, 36px); }
+.report-head { border-bottom: 1px solid var(--line); margin-bottom: 24px; padding-bottom: 20px; }
+.report-head h1 { margin: 0; font-size: clamp(24px, 3.5vw, 38px); line-height: 1.2; }
+.meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+.scope-note { padding: 12px 14px; border-left: 4px solid var(--warn); border-radius: 6px; background: #fff7ed; color: #7c2d12; }
+.synthesis-report h2 { margin-top: 34px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.synthesis-report h3 { margin: 24px 0 8px; color: #0f4c5c; }
+.synthesis-report p, .synthesis-report li { overflow-wrap: anywhere; }
+pre { overflow: auto; background: #111827; color: #f9fafb; border-radius: 8px; padding: 14px; }
+code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+details { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 18px; }
+@media (max-width: 640px) {
+  main { width: min(100% - 20px, 1120px); padding-top: 18px; }
+  .report { padding: 18px; }
+  .synthesis-callout { border-radius: 14px; padding: 18px; }
+  .cta-row a { width: 100%; }
+  .mobile-report { border-radius: 12px; }
+}
+</style>
+</head>
+<body>
+  <main>
+<nav class="topnav"><a href="index.html">실행 목록</a><a href="../../index.html">YouTube 홈</a></nav>
+<article class="report">
+  <header class="report-head">
+    <p class="eyebrow">youtube_20261107_065346</p>
+    <h1>“민주당 압승이 불러올 대반전!” 트럼프 결국 전쟁 끝내나? 삼성전자·SK하이닉스 폭락은 과도한 공포일까?ㅣ소현철 교수</h1>
+    <div class="meta">
+      <span class="badge status-asr_uncertain">asr_uncertain</span>
+      <a href="https://www.youtube.com/watch?v=2lhDTERVeGE">원본 영상</a>
+    </div>
+  </header>
+  <h2>종전 기대와 AI 투자 공포: 투자 논리를 뒷받침할 증거는 충분한가</h2>
+<p>분석 대상: <a href="https://www.youtube.com/watch?v=2lhDTERVeGE">815Money talk 영상</a> · 2026년 11월 6일 게시</p>
+<p>자료 범위: 제공된 자동자막 분석, 외부 기사 발췌, 시장 조회 및 주장별 검증 결과</p>
+<h3>1. 핵심 결론</h3>
+<p>영상은 <strong>선거 이후 종전 압력 확대 → 에너지 비용 하락 → 위험자산 개선</strong>, 그리고 <strong>미·중 경쟁과 빅테크 현금창출력 → AI 투자 지속</strong>이라는 낙관론을 제시한다.</p>
+<p>그러나 제공 자료에서는 이 논리의 출발점인 민주당 압승·텍사스 선거 결과부터 종전, 에너지 가격, 기업 투자 집행까지 핵심 연결고리가 확인되지 않았다. <strong>12개 검증 항목 중 11개는 미검증, 1개는 자동자막 불확실</strong> 판정이다. 미검증은 거짓이라는 뜻이 아니라, 투자 전제로 채택할 직접 근거가 부족하다는 의미다.</p>
+<p>확인 가능한 외부 근거는 주로 데이터센터 투자 둔화에 대한 시장 우려와 한국전력의 요금·전력공급 관련 보도다. 이는 영상의 문제의식과 연결되지만, ‘공포가 과도하다’거나 ‘주가 반등이 정당하다’는 결론까지 입증하지는 않는다.</p>
+<h3>2. 영상 주장과 확인된 사실/근거</h3>
+<p>아래 시각은 정확한 발언 시점이 아닌 <strong>해당 자막 청크의 시작점</strong>이다.</p>
+<p>| 주제·참조 시각 | 영상 주장 | 확인된 사실/근거와 판정 |</p>
+<p>|---|---|---|</p>
+<p>| 선거·정책 전환 · 06:34 | 민주당 압승과 텍사스 공화당 패배가 행정부의 대응을 바꿀 수 있다. | 공식 개표·의석수·당선 결과가 없다. E1은 정치 해석, E2는 선거 전 기사여서 결과를 입증하지 못한다. <strong>미검증</strong> |</p>
+<p>| 종전·위험자산 · 00:05, 13:24, 19:51 | 종전 압력이 유가·전력비를 낮춰 한국 증시에 유리하다. | 협상·이행 자료와 역사적 시장 수익률이 없다. 2006년 선거·2011년 철군 사례도 검증되지 않았다. <strong>조건부 전망</strong> |</p>
+<p>| 에너지·한국전력 · 13:24 | 원유가 100달러에서 90달러 미만으로 하락했고, 원화 강세와 함께 한국전력 상승을 이끌었다. | 가격·환율 시계열이 없고 한국전력 주가 조회도 실패했다. 관련 요금 보도는 있으나 당일 상승과 원인을 입증하지 않는다. <strong>미검증</strong> |</p>
+<p>| AI 투자 · 06:34, 13:24 | 하이퍼스케일러의 현금창출력과 미·중 경쟁을 고려하면 투자 둔화 공포는 과도하다. | E3는 데이터센터 건설 둔화 우려에 따른 반도체주 약세와 하이퍼스케일러 강세를 보도한다. 투자 지속이나 저평가를 입증하는 실적 원문은 없다. <strong>시장 우려의 존재만 제한적으로 뒷받침</strong> |</p>
+<p>| 스테이블코인 · 00:05, 06:34 | 초당적 정책이 국채 수요를 만들고 달러 패권을 지탱한다. | 법안 조문·표결·시행 상태와 준비금 자료가 없다. 달러 페그와 국채 준비자산 설명도 혼재한다. <strong>미검증</strong> |</p>
+<p>| 네오클라우드 · 13:24 | 하이퍼스케일러보다 구조조정 위험이 크며 머스크도 이를 언급했다. | 발언 원문, 대상 기업, 비교 재무자료가 없다. <strong>미검증·수동 확인 필요</strong> |</p>
+<h4>가장 유용한 외부 근거의 범위</h4>
+<ul>
+<li><strong>AI 업종 내 차별화:</strong> <a href="https://finance.yahoo.com/markets/stocks/articles/etf-zoo-election-splits-big-220244256.html">etf.com 기사·Yahoo Finance 게재(E3)</a>는 투자 둔화 우려와 업종별 주가 차별화를 보도한다. 다만 영상 게시 이후 발행된 기사이며, 당시 영상 논거와 사후 관찰을 구분해야 한다.</li>
+<li><strong>한국전력 요금 변수:</strong> <a href="https://news.einfomax.co.kr/news/articleView.html?idxno=4443458">연합인포맥스의 요금·연료비 관련 보도</a>는 연료비와 전기요금의 연동 문제를 다룬다. 비용 하락만이 아니라 요금 반영도 확인할 필요성을 보여주지만, 실적 개선 폭은 제시된 발췌로 계산할 수 없다.</li>
+<li><strong>전력 인프라 일정:</strong> <a href="https://www.news1.kr/economy/env-policy/6344622">뉴스1 보도</a>는 한국전력이 호남 반도체 클러스터에 2028년 말까지 전력을 공급할 계획이라고 전한다. 이는 회사의 계획·설명이며, 준공이나 실제 공급 완료의 증거는 아니다.</li>
+<li><strong>공시 확인 경로:</strong> <a href="https://dart.fss.or.kr/dsaf001/main.do?rcpNo=20261102800697">한국전력 11월 2일 기타경영사항 공시</a>는 접수 정보만 제공됐다. 본문이 없어 내용을 추정하거나 영상 주장과 연결하지 않았다.</li>
+</ul>
+<p>E4는 음료기업 기사로 해당 주장과 무관하고, E5는 관련 본문 발췌가 없어 검증 근거에서 제외한다.</p>
+<h3>3. 낙관론의 논리와 반론</h3>
+<h4>종전·에너지 비용 경로</h4>
+<p><strong>영상의 낙관 논리:</strong> 정치적 압력이 실제 긴장 완화로 이어지고 에너지 수입비용까지 낮아진다면 한국 기업의 비용 부담과 시장 불확실성이 줄어들 수 있다는 시나리오다.</p>
+<p><strong>반론:</strong> 선거 결과가 곧 종전을 뜻하지 않으며, 협상 발표와 이행도 다르다. 유가 하락이 발생하더라도 수요 둔화 때문이라면 기업 매출에는 불리할 수 있다. 또한 원유 가격에서 전력비로 이어지는 경로는 발전원 구성·연료 계약·환율·요금 조정에 따라 달라진다. 제공 자료로는 이 경로의 크기와 시차를 확인할 수 없다.</p>
+<h4>AI 투자 지속 경로</h4>
+<p><strong>영상의 낙관 논리:</strong> 기존 사업에서 현금을 창출하는 대형 플랫폼은 전략적 경쟁 때문에 AI 투자를 급격히 줄이기 어렵다는 주장이다.</p>
+<p><strong>반론:</strong> 투자 여력과 투자 수익성은 별개다. 총투자 계획이 유지돼도 전력·용수·장비 확보 지연으로 집행과 반도체 주문 시점이 늦어질 수 있다. E3의 업종 차별화 보도 역시 하이퍼스케일러와 반도체 공급업체가 같은 영향을 받는다고 보기 어렵다는 점을 시사한다. 기업별 CAPEX·현금흐름·수주 자료는 미제공 상태다.</p>
+<h4>스테이블코인·국채 수요 경로</h4>
+<p><strong>영상의 낙관 논리:</strong> 준비자산 보유가 국채 수요를 늘리고 달러 사용 범위를 확대한다는 해석이다.</p>
+<p><strong>반론:</strong> 준비자산 증가와 국채의 순신규 수요 증가는 구분해야 한다. 기존 자금이 이동한 것인지 확인할 자료가 없다. 달러 페그·상환권·준비자산은 서로 다른 확인 항목이며, 페트로달러 역할의 대체라는 결론도 별도 근거가 필요하다.</p>
+<h3>4. 종목별 해석 한계</h3>
+<ul>
+<li><strong>삼성전자·SK하이닉스:</strong> 제목에 등장하지만 종목별 가격·낙폭·실적·주문 자료가 없다. ‘폭락’의 정도나 ‘과도한 공포’ 여부를 판정할 수 없다.</li>
+<li><strong>한국전력:</strong> 연료비 개선 가능성과 주가 상승의 원인을 분리해야 한다. LNG·석탄 등 연료 구성, 원달러 환율, 요금, 비용 반영 시차와 실제 실적 민감도가 우선 확인 대상이다.</li>
+<li><strong>META:</strong> Movie Gen 관련 제품명·회사 맥락이 불명확하다. 제품 인기나 에이전트 기능, 매출 기여를 확인할 자료가 없다.</li>
+<li><strong>PLTR:</strong> 군사적 중요성에 대한 평가를 계약 매출·수익성으로 바로 연결할 수 없다. 서비스가 없었다면 전선이 후퇴했을 것이라는 설명은 직접 검증하기 어려운 반사실적 평가다.</li>
+</ul>
+<p>META·PLTR 시장 스냅샷은 확보됐으나 제품 주장이나 군사적 기여를 검증하지 못한다. 뉴스·공시 공급자 장애도 관련 사건이나 공시가 없다는 뜻은 아니다.</p>
+<h3>5. 추가 미검증 항목</h3>
+<p>미국 부채 <strong>40조 달러 초과</strong>, 이자 지급액의 국방 예산 초과, 휘발유 <strong>2.80달러→4달러 초과</strong>, 미국 실업률 <strong>4%</strong>는 대조할 공식 통계가 없다. 부채 범위, 순이자·총이자, 예산·실제 지출, 가격 지역·등급, 고용 기준월을 맞춰야 한다.</p>
+<p>삼성 스마트폰의 스테이블코인 송금 지원과 ‘은행 이틀·스테이블코인 즉시’ 비교도 서비스·네트워크·최종 결제·환전·출금 조건이 확인되지 않았다.</p>
+<p>키몬다 파산 연도와 CXMT 기술 이전 경로, 북러 협력·북한 해킹, 미어샤이머·월트 인용은 원문 근거가 없다. 이 중 군사 운용·개인적 관계 등 비공개 부분은 <strong>미검증·수동 확인 필요</strong>다. Bloomberg·Morningstar 원문이나 기타 폐쇄형 출처의 검증 자료도 제공되지 않았으므로 해당 출처에 기대는 주장을 확인된 사실로 취급하지 않는다.</p>
+<h3>6. 데이터 품질과 신뢰도 해석</h3>
+<p>자동자막은 516개 세그먼트이며 <code>transcript_quality</code>는 good, 점수는 1.0이다. 이는 법안명·제품명·숫자·인명까지 정확하다는 보장이 아니다.</p>
+<p>| 항목 | source_confidence | asr_confidence | 해석상 주의 |</p>
+<p>|---|---:|---:|---|</p>
+<p>| 선거 주장 | 0.95 | 0.75 | 선거 표현·밴스 직함 혼선 |</p>
+<p>| 한국전력·가격 | 0.96 | 0.90 | 발언 추출과 외부 가격 검증은 별개 |</p>
+<p>| 재정·스테이블코인 법안 | 0.91 | 0.65 | 법칙명·법안명·페그 설명 재확인 필요 |</p>
+<p>| AI 투자 | 0.96 | 0.90 | 높은 추출 신뢰도가 전망의 타당성을 뜻하지 않음 |</p>
+<p>| Movie Gen | 0.75 | 0.40 | 원음 청취가 우선 |</p>
+<p><code>source_confidence</code>는 자막에서 주장을 추출한 신뢰도이며 사실성 점수가 아니다. <code>asr_confidence</code>는 자막 혼선에 대한 정성적 추정이다. 검증 결과의 <code>confidence</code>도 해당 판정의 확신도이지 주장이나 투자 성과의 확률이 아니다. C10·C12의 source_confidence 0.0은 개별 값 미제공 표시다.</p>
+<p>녹화일은 미상이며 일부 기사는 영상 게시 이후 자료다. 상위 처리 상태가 성공 또는 verified로 표시됐더라도 개별 주장이 검증됐다는 뜻으로 해석해서는 안 된다.</p>
+<h3>7. 가까운 시일의 관찰 항목과 무효화 조건</h3>
+<p>| 확인 시점 | 구체적 관찰 항목 | 낙관 시나리오가 약화되는 조건 |</p>
+<p>|---|---|---|</p>
+<p>| 공식 선거 결과·정책 발표 | 전국 의석수, 텍사스 당선 결과, 밴스 발언 원문·직함 | 영상의 선거 전제가 확인되지 않거나 정책 전환이 나타나지 않음 |</p>
+<p>| 종전 관련 발표와 후속 이행 | 당사국 발표, 합의 이행, 충돌 재개 여부 | 협상이 실제 긴장 완화로 이어지지 않음 |</p>
+<p>| 동일 기준일 가격 대조 | WTI·브렌트 계약월, 휘발유 등급·지역, 원달러, 한국전력 등락률 | 에너지·환율의 비용 개선 효과가 나타나지 않음 |</p>
+<p>| 다음 기업 실적·투자 공시 | CAPEX 계획 대비 집행, 영업현금흐름, 투자 가이던스, 반도체 주문·출하 | 투자 축소·집행 지연·주문 약화가 반복됨 |</p>
+<p>| 인프라 사업 진행 공지 | 전력 인입·용수·송전선로 승인 및 착공·준공 일정 | 공급 일정 지연으로 가동 시점이 밀림 |</p>
+<p>| 네오클라우드 재무 공시 | 차입 만기, 현금흐름, 고객 집중도, 계약 취소·변경 | 자금 조달 악화나 핵심 고객 이탈이 확인됨 |</p>
+<p>| 법령·준비금 보고서 | 법안별 상태, 상환 요건, 준비자산 구성·만기, 국채 보유 변화 | 정책·준비금 자료가 영상의 수요 확대 해석을 뒷받침하지 못함 |</p>
+<h3>결론</h3>
+<p>이 영상은 종전과 AI 투자 지속을 연결한 낙관 시나리오를 제시하지만, 현재 증거는 그 시나리오를 투자 사실로 확정하기에 부족하다. 특히 <strong>공식 선거 결과, 실제 종전 이행, 동일 시점의 에너지·환율 자료, 기업별 투자 집행과 현금흐름</strong>이 핵심 검증 순서다. 삼성전자·SK하이닉스의 가격 하락이 과도했는지는 제공 자료만으로 판단할 수 없다.</p>
+  <details>
+    <summary>공개 요약 JSON</summary>
+    <pre>{
+  &quot;version&quot;: 4,
+  &quot;video_id&quot;: &quot;2lhDTERVeGE&quot;,
+  &quot;title&quot;: &quot;“민주당 압승이 불러올 대반전!” 트럼프 결국 전쟁 끝내나? 삼성전자·SK하이닉스 폭락은 과도한 공포일까?ㅣ소현철 교수&quot;,
+  &quot;url&quot;: &quot;https://www.youtube.com/watch?v=2lhDTERVeGE&quot;,
+  &quot;channel&quot;: &quot;815Money talk&quot;,
+  &quot;channel_id&quot;: &quot;UCCG6BEYjfQMGzypJw2EJCDQ&quot;,
+  &quot;source_url&quot;: &quot;https://www.youtube.com/@815moneytalk/videos&quot;,
+  &quot;thumbnail_url&quot;: &quot;https://i.ytimg.com/vi/2lhDTERVeGE/maxresdefault.jpg&quot;,
+  &quot;published_at&quot;: &quot;2026-11-06T07:30:14+00:00&quot;,
+  &quot;status&quot;: &quot;asr_uncertain&quot;,
+  &quot;strategy_source_tier&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_evidence_weight&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_validation_policy&quot;: &quot;STANDARD_REVIEW&quot;,
+  &quot;transcript_status&quot;: &quot;available&quot;,
+  &quot;transcript_source&quot;: &quot;automatic&quot;,
+  &quot;transcript_chars&quot;: 9955,
+  &quot;transcript_quality&quot;: {
+    &quot;status&quot;: &quot;good&quot;,
+    &quot;score&quot;: 1.0,
+    &quot;warnings&quot;: [],
+    &quot;source&quot;: &quot;automatic&quot;,
+    &quot;language&quot;: &quot;Korean&quot;,
+    &quot;model_or_format&quot;: &quot;json3&quot;,
+    &quot;chars&quot;: 9955,
+    &quot;segments&quot;: 516,
+    &quot;duration_seconds&quot;: 1241,
+    &quot;repeated_ngram_ratio&quot;: 0.0
+  },
+  &quot;generated_at&quot;: &quot;2026-11-07T06:53:46.593660+09:00&quot;,
+  &quot;llm_status&quot;: &quot;success&quot;,
+  &quot;research_status&quot;: &quot;success&quot;,
+  &quot;claim_verification_status&quot;: &quot;success&quot;,
+  &quot;research_pipeline_version&quot;: 4,
+  &quot;evidence_count&quot;: 5,
+  &quot;claim_status_summary&quot;: {
+    &quot;unverified&quot;: 11,
+    &quot;asr_uncertain&quot;: 1
+  },
+  &quot;claims&quot;: [
+    {
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;claim_text&quot;: &quot;민주당이 압승하고 공화당이 텍사스 상원·주지사 선거에서 패배했으며, 텍사스는 1988년 이후 공화당 텃밭이었다. 밴스가 선거 패배와 전쟁에 관해 발언했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:06:34&quot;,
+      &quot;source_confidence&quot;: 0.95,
+      &quot;asr_confidence&quot;: 0.75,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;2026년 민주당 압승; 텍사스는 1988년 이후 공화당 텃밭&quot;,
+        &quot;observed&quot;: &quot;공식 개표 결과·역대 선거 이력 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;선거 결과와 정책 전환을 확정된 투자 전제로 사용하기 어렵다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;claim_text&quot;: &quot;휘발유가 갤런당 2.80달러에서 4달러 이상으로 장기간 상승했고 원유는 배럴당 100달러에서 90달러 미만으로 하락했으며, 당일 한국전력 상승은 원화 강세와 연료 수입비 감소 때문이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:13:24&quot;,
+      &quot;source_confidence&quot;: 0.96,
+      &quot;asr_confidence&quot;: 0.9,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;휘발유 2.80달러/갤런→4달러 초과; 원유 100달러/배럴→90달러 미만&quot;,
+        &quot;observed&quot;: &quot;대조 가능한 가격·환율 시계열과 한국전력 등락률 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;연료비 개선이나 주가 반등을 확인된 사실로 반영할 수 없다. 연료 구성·환율·요금·반영 시차를 함께 확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;claim_text&quot;: &quot;선거 패배가 종전 압력을 높이고 종전이 유가·전력비를 낮춰 위험자산과 한국 증시에 호재가 된다. 2006년 선거 이후와 2011년 이라크 철군 이후 시장이 역사적 근거다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.98,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:05&quot;,
+      &quot;source_confidence&quot;: 0.95,
+      &quot;asr_confidence&quot;: 0.9,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;2006년 선거·2007년 시장·2008년 금융위기·2011년 철군 사례; 2028년 대선 전망&quot;,
+        &quot;observed&quot;: &quot;정책 원문·비교 기간별 시장 수익률·종전 이행 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;확정된 호재가 아니라 조건부 시나리오로 취급해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;claim_text&quot;: &quot;미국 부채가 40조 달러를 넘고 이자가 국방 예산을 초과했으며, 이자가 국방비를 넘으면 패권이 약화된다는 학자의 법칙이 있다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:06:34&quot;,
+      &quot;source_confidence&quot;: 0.91,
+      &quot;asr_confidence&quot;: 0.65,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;미국 부채 40조 달러 초과; 이자 지급액&gt;국방 예산&quot;,
+        &quot;observed&quot;: &quot;동일 기준일·회계연도·회계 범위의 대조 수치 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;해당 수치를 근거로 국채 위험이나 달러 패권 약화를 확정할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;claim_text&quot;: &quot;스테이블코인 관련 법안은 초당적 의제이며 달러 페그와 국채 준비자산을 통해 국채 수요를 만들고 페트로달러의 역할을 일부 대체한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:06:34&quot;,
+      &quot;source_confidence&quot;: 0.91,
+      &quot;asr_confidence&quot;: 0.65,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;스테이블코인은 국채 1개 또는 1달러에 고정&quot;,
+        &quot;observed&quot;: &quot;페그·상환권·준비자산 요건을 대조할 법령·발행사 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;법안의 실체·적용 대상·준비자산 요건을 확인하기 전 국채 수요 증가를 확정적으로 반영하기 어렵다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;claim_text&quot;: &quot;은행 송금은 이틀 걸리지만 스테이블코인은 즉시 거래되며 미국 삼성 스마트폰에서 스테이블코인 송금이 가능하다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:06:34&quot;,
+      &quot;source_confidence&quot;: 0.91,
+      &quot;asr_confidence&quot;: 0.8,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;은행 송금 2일; 스테이블코인 즉시&quot;,
+        &quot;observed&quot;: &quot;동일 조건의 처리시간·최종 결제 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;속도 우위나 서비스 보급을 사업 가치의 검증된 근거로 사용하기 어렵다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;claim_text&quot;: &quot;미중 경쟁과 하이퍼스케일러 현금창출력 때문에 AI 투자 공포는 과도하지만 전력·용수 제약으로 집행이 조절될 수 있고 태양광·가스가 단기 대안이다. 미국 실업률은 4%다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.97,
+      &quot;supporting_evidence_ids&quot;: [
+        &quot;E3&quot;
+      ],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:06:34&quot;,
+      &quot;source_confidence&quot;: 0.96,
+      &quot;asr_confidence&quot;: 0.9,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;미국 실업률 4%&quot;,
+        &quot;observed&quot;: &quot;BLS 대조 수치 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;투자 지속과 반도체 수요 회복을 단정하지 말고 기업별 투자 집행·현금흐름·인프라 확보를 확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;claim_text&quot;: &quot;하이퍼스케일러보다 네오클라우드의 구조조정 위험이 크며 머스크가 관련 구조조정을 언급했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:13:24&quot;,
+      &quot;source_confidence&quot;: 0.9,
+      &quot;asr_confidence&quot;: 0.85,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;정량 주장 없음&quot;,
+        &quot;observed&quot;: &quot;비교 가능한 재무 수치 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;기업군 전체의 위험을 일괄 확정하거나 특정 기업의 구조조정을 기정사실화할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;claim_text&quot;: &quot;메타 Movie Gen이 인기를 얻었고 구글 실적발표와 연결되며 에이전트형 AI의 발전 방향을 보여준다.&quot;,
+      &quot;status&quot;: &quot;asr_uncertain&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:06:34&quot;,
+      &quot;source_confidence&quot;: 0.75,
+      &quot;asr_confidence&quot;: 0.4,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;인기 주장에 정량 수치 없음&quot;,
+        &quot;observed&quot;: &quot;제품 사용량·매출 기여 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;제품의 실체와 기능을 먼저 확인해야 하며, 해당 설명을 META 실적 성장의 근거로 사용할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C10&quot;,
+      &quot;claim_text&quot;: &quot;키몬다가 2008년 파산했고 그 기술이 중국 CXMT로 이전됐다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:13:24&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.75,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;키몬다 파산 연도 2008년&quot;,
+        &quot;observed&quot;: &quot;도산 신청일·절차 기록 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;중국 DRAM 경쟁력의 기원이나 현재 경쟁 강도를 설명하는 확인된 근거로 사용할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C11&quot;,
+      &quot;claim_text&quot;: &quot;팔란티르·스타링크가 우크라이나 전쟁 수행의 핵심이며 북한군 쿠르스크 파병, 러시아의 석유·군사기술 제공, 북한의 비트코인 해킹이 있었다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:05&quot;,
+      &quot;source_confidence&quot;: 0.95,
+      &quot;asr_confidence&quot;: 0.9,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;정량 주장 없음&quot;,
+        &quot;observed&quot;: &quot;계약 규모·파병 규모·지원량·탈취액 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;군사적 중요성을 PLTR 매출·수익성·기업가치와 직접 연결할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C12&quot;,
+      &quot;claim_text&quot;: &quot;미어샤이머와 스티븐 월트는 우크라이나 전쟁 종식이 미국 국익에 부합한다는 견해를 공유하며 출연자의 논문 작성 관련 개인적 설명도 있다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:05&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.6,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;정량 주장 없음&quot;,
+        &quot;observed&quot;: &quot;인용 문헌·발행일 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;학자 인용을 종전 가능성이나 시장 전망의 독립적인 검증 근거로 사용할 수 없다.&quot;
+    }
+  ],
+  &quot;entities&quot;: [
+    {
+      &quot;ticker&quot;: &quot;META&quot;,
+      &quot;name&quot;: &quot;메타&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;Movie Gen이 궁극적으로 에이전트형 AI의 발전 방향을 보여준다는 개인적 견해를 제시한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;META&quot;,
+        &quot;as_of&quot;: &quot;2026-11-06T22:13:40.384001+00:00&quot;,
+        &quot;current_price&quot;: 610.1500244140625,
+        &quot;market_cap&quot;: 1560051738117.7815,
+        &quot;forward_pe&quot;: 17.144897,
+        &quot;trailing_pe&quot;: 20.81713,
+        &quot;fifty_two_week_high&quot;: 779.82,
+        &quot;fifty_two_week_low&quot;: 520.26,
+        &quot;average_target_price&quot;: 848.3765,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;PLTR&quot;,
+      &quot;name&quot;: &quot;팔란티르&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;팔란티르와 스타링크가 우크라이나군의 전쟁 수행을 뒷받침하는 핵심 역할을 하며, 두 서비스가 없었다면 전선이 더 후퇴했을 것이라고 평가한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;PLTR&quot;,
+        &quot;as_of&quot;: &quot;2026-11-06T22:13:42.730027+00:00&quot;,
+        &quot;current_price&quot;: 160.3800048828125,
+        &quot;market_cap&quot;: 386435216645.2444,
+        &quot;forward_pe&quot;: 64.42542,
+        &quot;trailing_pe&quot;: 112.94367,
+        &quot;fifty_two_week_high&quot;: 212.94,
+        &quot;fifty_two_week_low&quot;: 106.37,
+        &quot;average_target_price&quot;: 217.96786,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;015760&quot;,
+      &quot;name&quot;: &quot;한국전력&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;영상에서 당일 주가 상승을 유가 하락에 따른 수입 비용 감소와 원화 강세의 결합으로 해석한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;유가가 배럴당 100달러에서 90달러 아래로 하락했다고 발언한다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;시장 데이터 조회 실패: no_usable_market_fields&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;015760&quot;,
+        &quot;as_of&quot;: &quot;2026-11-06T22:13:44.986960+00:00&quot;,
+        &quot;current_price&quot;: null,
+        &quot;market_cap&quot;: null,
+        &quot;forward_pe&quot;: null,
+        &quot;trailing_pe&quot;: null,
+        &quot;fifty_two_week_high&quot;: null,
+        &quot;fifty_two_week_low&quot;: null,
+        &quot;average_target_price&quot;: null,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;unverified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    }
+  ],
+  &quot;evidence&quot;: [
+    {
+      &quot;evidence_id&quot;: &quot;E1&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;Slow Letter: November 05, 2026.&quot;,
+      &quot;source_url&quot;: &quot;https://slownews.kr/169110&quot;,
+      &quot;publisher&quot;: &quot;Naver News&quot;,
+      &quot;published_at&quot;: &quot;2026-11-05T09:50:00+09:00&quot;,
+      &quot;source_tier&quot;: &quot;web&quot;,
+      &quot;excerpt&quot;: &quot;“The Republican Party will enter election mode.” If the 2018 midterms marked the end of Trump’s beginning, the 2026 midterms are the beginning of the end. Cracks in the MAGA Coalition: What... Slow Letter: November 05, 2026. - 슬로우뉴스. 컨텐츠로 넘어가기 PRO. 펼치기 슬로우뉴...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E2&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;Slow Letter: October 20, 2026.&quot;,
+      &quot;source_url&quot;: &quot;https://slownews.kr/168189&quot;,
+      &quot;publisher&quot;: &quot;Naver News&quot;,
+      &quot;published_at&quot;: &quot;2026-10-20T09:54:00+09:00&quot;,
+      &quot;source_tier&quot;: &quot;web&quot;,
+      &quot;excerpt&quot;: &quot;In Texas, a fabricated video emerged of James Talarico (Democratic Senate candidate) scribbling... Trump and JD Vance support data-center construction, but Mike Rogers (Republican Senate... Slow Letter: October 20, 2026. - 슬로우뉴스. 컨텐츠로 넘어가기 PRO. 펼치기 슬로우뉴스프로...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E4&quot;,
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;title&quot;: &quot;Monster Beverage Strong Sales Momentum Offset by Margin Pressure, RBC Says&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/monster-beverage-strong-sales-momentum-202719672.html&quot;,
+      &quot;publisher&quot;: &quot;MT Newswires&quot;,
+      &quot;published_at&quot;: &quot;2026-11-06T20:27:19+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Monster Beverage Strong Sales Momentum Offset by Margin Pressure, RBC Says Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 2026 Elections Wea...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E5&quot;,
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;title&quot;: &quot;Bank of America’s Holly O’Neill: “I’m Very Bullish on What AI Has in Store for Us”&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/m/0fe1b654-506e-36e4-be0f-117e9c500990/bank-of-america%E2%80%99s-holly.html&quot;,
+      &quot;publisher&quot;: &quot;Barrons.com&quot;,
+      &quot;published_at&quot;: &quot;2026-11-06T19:39:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    }
+  ],
+  &quot;source_policy&quot;: {
+    &quot;raw_transcript_published&quot;: false,
+    &quot;raw_transcript_in_evidence&quot;: false,
+    &quot;research_pipeline_version&quot;: 4,
+    &quot;closed_source_claims&quot;: &quot;unverified_external_source&quot;,
+    &quot;auto_caption_warning&quot;: true,
+    &quot;local_asr_warning&quot;: false
+  }
+}</pre>
+  </details>
+</article>
+</main>
+  <style>
+.reader-contents { margin: 16px 0; padding: 12px 16px; border: 1px solid var(--line, #64748b); border-radius: 12px; }
+.reader-contents > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-weight: 750; }
+.reader-contents nav { display: grid; gap: 4px; max-height: 45vh; overflow: auto; margin: 8px 0; }
+.reader-contents a { display: block; min-height: 44px; padding: 10px; border-radius: 6px; color: inherit; overflow-wrap: anywhere; }
+.reader-contents a:hover { background: #80808020; }
+.reader-contents .reader-subsection { padding-inline-start: 24px; font-size: .92em; }
+.reader-prose, .report { overflow-wrap: anywhere; line-height: 1.8; }
+.reader-prose p, .reader-prose li { max-width: 85ch; }
+.reader-prose h2, .reader-prose h3, .reader-prose h4, [data-reader-heading] { scroll-margin-top: 100px; line-height: 1.45; }
+.reader-prose h2 { margin-top: 1.8em; padding-bottom: 8px; border-bottom: 1px solid var(--line, #64748b); }
+.reader-prose h3 { margin-top: 1.5em; }
+.reader-prose li { margin: .5em 0; }
+.reader-prose pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.reader-prose blockquote { margin: 16px 0; padding: 4px 16px; border-left: 3px solid var(--accent, #64748b); }
+.reader-table { overflow: auto; max-width: 100%; margin: 16px 0; border: 1px solid var(--line, #64748b); border-radius: 10px; }
+.reader-table table { border-collapse: collapse; width: 100%; margin: 0; font-size: .92rem; }
+.reader-table th, .reader-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line, #64748b); min-width: 110px; max-width: 400px; overflow-wrap: anywhere; white-space: normal; }
+.reader-table th { background: #80808018; }
+.reader-table tr:nth-child(even) { background: #80808008; }
+.reader-search { display: grid; gap: 8px; margin: 16px 0; }
+.reader-search label { font-weight: 700; }
+.reader-search input { box-sizing: border-box; width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line, #64748b); border-radius: 10px; background: var(--panel, #fff); color: var(--text, #132238); font: inherit; }
+.reader-search p { margin: 0; font-size: .86rem; }
+.reader-back { position: fixed; bottom: max(14px, env(safe-area-inset-bottom)); right: 14px; z-index: 30; min-height: 44px; border: 1px solid #778899; border-radius: 99px; padding: 10px 16px; background: #18344a; color: #fff; font: 700 14px system-ui; cursor: pointer; box-shadow: 0 3px 12px #0003; }
+[data-reader-source] { margin-top: 20px; }
+[data-reader-source] > summary { min-height: 44px; cursor: pointer; }
+[data-reader-source] pre { font-size: .85rem; }
+[data-reader-source] pre, .reader-prose { min-width: 0; }
+.reader-contents :focus-visible, .reader-search :focus-visible, .reader-back:focus-visible, .reader-table:focus-visible { outline: 3px solid var(--accent, #008c95); outline-offset: 3px; }
+.reader-search + .grid > [hidden] { display: none !important; }
+@media (max-width: 600px) { .reader-prose { font-size: 1rem; } .reader-contents { padding: 8px 12px; } }
+@media print { .reader-back, .reader-search, .reader-contents, [data-reader-source] { display: none !important; } .reader-table { overflow: visible; } .reader-prose { color: #000; background: #fff; } }
+</style><script>
+(() => {
+  'use strict';
+  let serial = 0;
+  const rendered = new WeakMap();
+  const node = (tag, text) => { const el = document.createElement(tag); if (text != null) el.textContent = text; return el; };
+  function inline(parent, text) {
+    const pattern = /(`[^`]+`|\*\*[^*]+\*\*|\[[^\]]+\]\(https?:\/\/[^\s)]+\))/g;
+    let start = 0;
+    for (const match of String(text).matchAll(pattern)) {
+      parent.append(document.createTextNode(text.slice(start, match.index)));
+      const value = match[0];
+      if (value.startsWith('`')) parent.append(node('code', value.slice(1, -1)));
+      else if (value.startsWith('**')) parent.append(node('strong', value.slice(2, -2)));
+      else {
+        const link = value.match(/^\[([^\]]+)\]\((.+)\)$/);
+        const a = node('a', link[1]); a.href = link[2]; a.rel = 'noopener noreferrer'; parent.append(a);
+      }
+      start = match.index + value.length;
+    }
+    parent.append(document.createTextNode(text.slice(start)));
+  }
+  const cells = line => line.trim().replace(/^\|/, '').replace(/\|$/, '').split(/(?<!\\)\|/).map(v => v.trim().replace(/\\\|/g, '|'));
+  function markdown(source) {
+    const article = node('article'); article.className = 'reader-prose';
+    const lines = source.split(/\r?\n/); let list = null;
+    for (let i = 0; i < lines.length; i += 1) {
+      const line = lines[i], value = line.trim();
+      if (!value) { list = null; continue; }
+      if (/^```/.test(value)) {
+        const code = []; i += 1;
+        while (i < lines.length && !/^```/.test(lines[i].trim())) code.push(lines[i++]);
+        const pre = node('pre'); pre.append(node('code', code.join('\n'))); article.append(pre); list = null; continue;
+      }
+      if (i + 1 < lines.length && value.includes('|') && cells(lines[i + 1]).every(v => /^:?-{3,}:?$/.test(v))) {
+        const table = node('table'), head = node('thead'), body = node('tbody');
+        const row = (values, tag) => { const tr = node('tr'); values.forEach(v => { const cell = node(tag); if (tag === 'th') cell.scope = 'col'; inline(cell, v); tr.append(cell); }); return tr; };
+        head.append(row(cells(line), 'th')); i += 2;
+        while (i < lines.length && lines[i].trim() && lines[i].includes('|')) body.append(row(cells(lines[i++]), 'td'));
+        i -= 1; table.append(head, body); article.append(table); list = null; continue;
+      }
+      const heading = value.match(/^(#{1,6})\s+(.+)$/);
+      if (heading) { const h = node('h' + Math.min(4, heading[1].length + 1)); inline(h, heading[2]); article.append(h); list = null; continue; }
+      const bullet = value.match(/^(?:[-*+] |\d+\. )(.+)$/);
+      if (bullet) {
+        const tag = /^\d/.test(value) ? 'ol' : 'ul';
+        if (!list || list.tagName.toLowerCase() !== tag) { list = node(tag); if (tag === 'ol') list.start = parseInt(value, 10); article.append(list); }
+        const li = node('li'); inline(li, bullet[1]); list.append(li); continue;
+      }
+      list = null;
+      if (/^(---+|\*\*\*+)$/.test(value)) { article.append(node('hr')); continue; }
+      const p = node(value.startsWith('> ') ? 'blockquote' : 'p'); inline(p, value.startsWith('> ') ? value.slice(2) : line); article.append(p);
+    }
+    return article;
+  }
+  function contents(root) {
+    root.querySelectorAll(':scope > .reader-contents').forEach(el => el.remove());
+    const headings = [...root.querySelectorAll('h2,h3,h4')].filter(h => !h.closest('.card,.run-card,.reader-contents,[data-reader-source],[hidden]'));
+    if (headings.length < 2) return;
+    const details = node('details'); details.className = 'reader-contents';
+    details.append(node('summary', '이 리포트 목차 · ' + headings.length + '개 항목'));
+    const nav = node('nav'); nav.setAttribute('aria-label', '리포트 목차');
+    headings.forEach(h => {
+      if (!h.id) h.id = 'reader-section-' + (++serial);
+      h.dataset.readerHeading = ''; h.tabIndex = -1;
+      const a = node('a', h.textContent); a.href = '#' + h.id;
+      if (h.tagName !== 'H2') a.className = 'reader-subsection';
+      a.addEventListener('click', event => {
+        event.preventDefault();
+        for (let ancestor = h.parentElement; ancestor; ancestor = ancestor.parentElement) if (ancestor.tagName === 'DETAILS') ancestor.open = true;
+        h.scrollIntoView({block: 'start'}); h.focus({preventScroll: true});
+      }); nav.append(a);
+    });
+    details.append(nav); root.prepend(details);
+  }
+  function enhance(root) {
+    if (!root) return;
+    root.querySelectorAll('pre[data-report-markdown]').forEach(pre => {
+      const previous = rendered.get(pre);
+      if (previous && previous.source === pre.textContent) return;
+      const article = markdown(pre.textContent);
+      if (previous) previous.article.replaceWith(article);
+      else {
+        const details = node('details'); details.dataset.readerSource = '';
+        details.append(node('summary', 'Markdown 원문 보기'));
+        pre.before(article, details); details.append(pre);
+      }
+      rendered.set(pre, {source: pre.textContent, article});
+    });
+    root.querySelectorAll('table').forEach(table => {
+      if (table.closest('.reader-table,.account-table-wrap,.summary-scroll')) return;
+      const wrap = node('div'); wrap.className = 'reader-table'; wrap.tabIndex = 0;
+      wrap.setAttribute('role', 'region'); wrap.setAttribute('aria-label', '리포트 표 · 가로로 스크롤하여 전체 보기');
+      table.before(wrap); wrap.append(table);
+    });
+    root.querySelectorAll('.grid').forEach(grid => {
+      const cards = [...grid.querySelectorAll(':scope > a.card')];
+      if (cards.length < 2 || grid.dataset.readerSearch) return;
+      grid.dataset.readerSearch = 'true';
+      const box = node('div'); box.className = 'reader-search';
+      const input = node('input'); input.type = 'search'; input.placeholder = '제목 · 종목 · 채널 · 키워드'; input.id = 'report-search-' + (++serial);
+      const label = node('label', '리포트 찾기'); label.htmlFor = input.id;
+      const status = node('p'); status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
+      const update = () => {
+        const terms = input.value.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean); let count = 0;
+        cards.forEach(card => { card.hidden = !terms.every(t => card.textContent.toLocaleLowerCase().includes(t)); if (!card.hidden) count += 1; });
+        status.textContent = cards.length + '개 중 ' + count + '개 표시' + (count ? '' : ' · 검색어를 지우거나 다른 키워드를 입력하세요.');
+      };
+      input.addEventListener('input', update); box.append(label, input, status); grid.before(box); update();
+    });
+    contents(root);
+  }
+  window.TradingAgentsReader = {enhance};
+  const main = document.querySelector('main');
+  if (main && !main.hasAttribute('data-reader-dynamic')) enhance(main);
+  if (main) {
+    const top = node('button', '↑ 맨 위'); top.type = 'button'; top.className = 'reader-back'; top.setAttribute('aria-label', '리포트 맨 위로 이동');
+    top.addEventListener('click', () => { const target = document.querySelector('h1') || main; target.tabIndex = -1; target.scrollIntoView({block: 'start'}); target.focus({preventScroll: true}); });
+    document.body.append(top);
+  }
+})();
+</script>
+</body>
+</html>

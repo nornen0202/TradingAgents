@@ -1,20 +1,20 @@
 {
   "schema": "tradingagents.work-context/v1",
   "surface": "prism",
-  "event_id": "prism:0a8a5579d4e8189e31e686aa96c94348",
+  "event_id": "prism:5fd92ed7cd7fb553df0240562b71e462",
   "prompt_contract_version": "prism-work-v5",
   "prompt_sha256": "2d6e6a207021f5126507994f77ca7850fa9bf42701a32286227ca874c1f535df",
   "skill_sha256": "2fef99f1af403675549a13813e0fe5597a241a964affeada56e9f64e9f398fe9",
   "task_manifest_sha256": "0ea8b7511042a3aa7d6fa8447d97032d4be515f69526190a4c9556d01067c6df",
   "workflow_contract_sha256": "62868eed0c6d6743a1e951025d1d74566423c35248aaffa4ebdaef6efed4f455",
-  "source_sha256": "512ff3e74351be48779b06444a03f18a34c1692e3d6b7dd3c18f6b2643a79ff7",
+  "source_sha256": "ca319ae6dd1cebf410c5e939ca04d1b13bceb7822adac3dca2fffa1eb3d56bf0",
   "body": {
     "kind": "prism",
     "source_health": "OK",
     "source": {
       "health": "OK",
-      "run_id": "prism_telegram_20261106_084311",
-      "last_run_at": "2026-11-06T08:43:24.060060+09:00",
+      "run_id": "prism_telegram_20261107_080249",
+      "last_run_at": "2026-11-07T08:02:59.824075+09:00",
       "status": "success",
       "stale_after_hours": 30
     },
@@ -43,24 +43,24 @@
       "may_bypass_market_or_portfolio_execution_gate": false
     },
     "coverage": {
-      "total_unique_events": 420,
-      "window_events": 13,
-      "transmitted_events": 13,
+      "total_unique_events": 434,
+      "window_events": 14,
+      "transmitted_events": 14,
       "truncated": false,
-      "oldest_occurred_at": "2026-11-05T19:40:48+00:00",
-      "newest_occurred_at": "2026-11-05T20:02:22+00:00"
+      "oldest_occurred_at": "2026-11-06T19:49:43+00:00",
+      "newest_occurred_at": "2026-11-06T20:06:50+00:00"
     },
     "events": [
       {
-        "event_key": "stock_ai_agent:17332",
-        "content_sha256": "7c0c06fe3fb9814055041db16cfda09c98fc912fffc7ae80f8f122a1e4fe47e2",
-        "occurred_at": "2026-11-05T20:02:22+00:00",
+        "event_key": "stock_ai_agent:17385",
+        "content_sha256": "e968018984d2a3577bc1c33c5c78f1cc80af461150e131f71091bb37347a72d1",
+        "occurred_at": "2026-11-06T20:06:50+00:00",
         "relevance": {
           "tickers": [
             "BKH",
-            "MSFT",
+            "AAPL",
             "VRSN",
-            "AAPL"
+            "ELF"
           ],
           "markets": [
             "US"
@@ -70,16 +70,16 @@
         },
         "summary": {
           "channel": "stock_ai_agent",
-          "message_id": "17332",
-          "posted_at": "2026-11-05T20:02:22+00:00",
-          "source_url": "https://t.me/stock_ai_agent/17332",
-          "preview": "📊 프리즘 US 시뮬레이터 | 실시간 포트폴리오 (2026-11-06 05:01) 🔸 현재 보유: 4/10개 🔸 사용 비중: 3.30/10 슬롯 (분할 매수·시험매수 반영) ✅ 최고 수익: Black Hills Corporation(BKH) +8.94% ⚠️ 최저 수익: Microsoft Corporation(MSFT) -2.69% 🔸 보유 종목: - Black Hills Corpora...",
+          "message_id": "17385",
+          "posted_at": "2026-11-06T20:06:50+00:00",
+          "source_url": "https://t.me/stock_ai_agent/17385",
+          "preview": "📊 프리즘 US 시뮬레이터 | 실시간 포트폴리오 (2026-11-07 05:06) 🔸 현재 보유: 4/10개 🔸 사용 비중: 3.28/10 슬롯 (분할 매수·시험매수 반영) ✅ 최고 수익: Black Hills Corporation(BKH) +10.43% ⚠️ 최저 수익: Apple Inc.(AAPL) -2.50% 🔸 보유 종목: - Black Hills Corporation(BKH)...",
           "signals": [
             {
               "canonical_ticker": "BKH",
               "display_name": "Black Hills Corporation",
               "market": "US",
-              "source_asof": "2026-11-05T20:02:22+00:00",
+              "source_asof": "2026-11-06T20:06:50+00:00",
               "signal_action": "HOLD",
               "trigger_type": "telegram_portfolio_snapshot",
               "trigger_score": 0.45,
@@ -88,10 +88,10 @@
               "warnings": []
             },
             {
-              "canonical_ticker": "MSFT",
-              "display_name": "Microsoft Corporation",
+              "canonical_ticker": "AAPL",
+              "display_name": "Apple Inc.",
               "market": "US",
-              "source_asof": "2026-11-05T20:02:22+00:00",
+              "source_asof": "2026-11-06T20:06:50+00:00",
               "signal_action": "HOLD",
               "trigger_type": "telegram_portfolio_snapshot",
               "trigger_score": 0.45,
@@ -103,7 +103,7 @@
               "canonical_ticker": "VRSN",
               "display_name": "VeriSign, Inc.",
               "market": "US",
-              "source_asof": "2026-11-05T20:02:22+00:00",
+              "source_asof": "2026-11-06T20:06:50+00:00",
               "signal_action": "HOLD",
               "trigger_type": "telegram_portfolio_snapshot",
               "trigger_score": 0.45,
@@ -116,16 +116,16 @@
               ]
             },
             {
-              "canonical_ticker": "AAPL",
-              "display_name": "Apple Inc.",
+              "canonical_ticker": "ELF",
+              "display_name": "ELF",
               "market": "US",
-              "source_asof": "2026-11-05T20:02:22+00:00",
+              "source_asof": "2026-11-06T20:06:50+00:00",
               "signal_action": "HOLD",
               "trigger_type": "telegram_portfolio_snapshot",
               "trigger_score": 0.45,
               "composite_score": 0.45,
-              "stop_loss_price": 334.0,
-              "target_price": 422.86,
+              "stop_loss_price": 112.5,
+              "target_price": 141.52,
               "confidence": 0.45,
               "warnings": [
                 "multi_ticker_prices_scoped_to_mention_block"
@@ -140,7 +140,7 @@
           "normalization": {
             "version": "prism-telegram/v3",
             "status": "ARCHIVED_TEXT_RECHECKED",
-            "text_chars": 1137,
+            "text_chars": 1131,
             "text_source": "public_metadata",
             "action_changes": [],
             "recovered_tickers": []
@@ -148,12 +148,12 @@
         }
       },
       {
-        "event_key": "stock_ai_agent:17331",
-        "content_sha256": "d697a94c07b045e44fb537d34009a3835621b14d03da7758fd2e8533382c6f3b",
-        "occurred_at": "2026-11-05T20:02:19+00:00",
+        "event_key": "stock_ai_agent:17384",
+        "content_sha256": "f19a5bce9ad4747e284ed0eea2ab82137288c0fec2d2c0b1718c1d3105446b58",
+        "occurred_at": "2026-11-06T20:06:47+00:00",
         "relevance": {
           "tickers": [
-            "QCOM"
+            "MRNA"
           ],
           "markets": [
             "US"
@@ -163,67 +163,16 @@
         },
         "summary": {
           "channel": "stock_ai_agent",
-          "message_id": "17331",
-          "posted_at": "2026-11-05T20:02:19+00:00",
-          "source_url": "https://t.me/stock_ai_agent/17331",
-          "preview": "⚠️ 매수 보류: QUALCOMM Incorporated(QCOM) 현재가: $158.73 매수 점수: 4/10 결정: 미진입 시장 상황: 횡보장 산업군: Technology 보류 사유: AI 판단: 미진입 / 점수 부족 (3/5) — AI 사유: 현재가 158.68이 50일선보다 10.9% 낮고, 하락 중인 20일선보다 8.8% 낮아 두 하락 추세 차단 조건에 해당합니다. 유효점수 3...",
+          "message_id": "17384",
+          "posted_at": "2026-11-06T20:06:47+00:00",
+          "source_url": "https://t.me/stock_ai_agent/17384",
+          "preview": "⚠️ 매수 보류: MRNA(MRNA) 현재가: $263.42 매수 점수: 2/10 결정: 미진입 시장 상황: 횡보장 산업군: Healthcare 보류 사유: AI 판단: 미진입 / 점수 부족 (3/5) — AI 사유: 성장성 기준 미달로 횡보·약세 국면의 펀더멘털 게이트를 통과하지 못했습니다. 또한 실효점수 3점이 분할 최소 기준 5점에 미달합니다. 손익비·손절폭·모멘텀·추가 확인 개수...",
           "signals": [
             {
-              "canonical_ticker": "QCOM",
-              "display_name": "QUALCOMM Incorporated",
+              "canonical_ticker": "MRNA",
+              "display_name": "MRNA",
               "market": "US",
-              "source_asof": "2026-11-05T20:02:19+00:00",
-              "signal_action": "NO_ENTRY",
-              "trigger_type": "telegram_buy_skip",
-              "trigger_score": 0.4,
-              "composite_score": 0.4,
-              "stop_loss_price": 150.0,
-              "target_price": 167.46,
-              "confidence": 0.4,
-              "warnings": []
-            }
-          ],
-          "signals_total": 1,
-          "signals_transmitted": 1,
-          "signals_truncated": false,
-          "simulation_only": false,
-          "actionability": "research_only",
-          "normalization": {
-            "version": "prism-telegram/v3",
-            "status": "ARCHIVED_TEXT_RECHECKED",
-            "text_chars": 819,
-            "text_source": "public_metadata",
-            "action_changes": [],
-            "recovered_tickers": []
-          }
-        }
-      },
-      {
-        "event_key": "stock_ai_agent:17330",
-        "content_sha256": "8075a192e97682be46837ac740ed960f7e015545e7d455c5b979a3ff1dd9349b",
-        "occurred_at": "2026-11-05T20:01:59+00:00",
-        "relevance": {
-          "tickers": [
-            "JAN"
-          ],
-          "markets": [
-            "US"
-          ],
-          "themes": [],
-          "match_basis": "normalized_prism_signals"
-        },
-        "summary": {
-          "channel": "stock_ai_agent",
-          "message_id": "17330",
-          "posted_at": "2026-11-05T20:01:59+00:00",
-          "source_url": "https://t.me/stock_ai_agent/17330",
-          "preview": "⚠️ 매수 보류: Janus Living, Inc.(JAN) 현재가: $30.59 매수 점수: 2/10 결정: 미진입 시장 상황: 횡보장 산업군: Real Estate 보류 사유: AI 판단: 미진입 / 점수 부족 (3/5) — AI 사유: 횡보장에서 최근 두 분기 연속 영업적자로 수익성 게이트에 미달합니다. 거시 보정 후 점수도 3점으로 최소 5점 미만입니다. 다음 확정 저항을 적용한...",
-          "signals": [
-            {
-              "canonical_ticker": "JAN",
-              "display_name": "Janus Living, Inc.",
-              "market": "US",
-              "source_asof": "2026-11-05T20:01:59+00:00",
+              "source_asof": "2026-11-06T20:06:47+00:00",
               "signal_action": "NO_ENTRY",
               "trigger_type": "telegram_buy_skip",
               "trigger_score": 0.2,
@@ -240,7 +189,7 @@
           "normalization": {
             "version": "prism-telegram/v3",
             "status": "ARCHIVED_TEXT_RECHECKED",
-            "text_chars": 681,
+            "text_chars": 607,
             "text_source": "public_metadata",
             "action_changes": [],
             "recovered_tickers": []
@@ -248,12 +197,12 @@
         }
       },
       {
-        "event_key": "stock_ai_agent:17329",
-        "content_sha256": "01a127fe2ea7a12e95c66c1a81680f26faf9f351144d094fb7a9696510485c01",
-        "occurred_at": "2026-11-05T20:01:51+00:00",
+        "event_key": "stock_ai_agent:17383",
+        "content_sha256": "beec91f422f26b91e1de98ac0a1b65bd10a3c4f414c7600a61b167cfe540f18f",
+        "occurred_at": "2026-11-06T20:06:45+00:00",
         "relevance": {
           "tickers": [
-            "SPHR"
+            "COMP"
           ],
           "markets": [
             "US"
@@ -263,16 +212,16 @@
         },
         "summary": {
           "channel": "stock_ai_agent",
-          "message_id": "17329",
-          "posted_at": "2026-11-05T20:01:51+00:00",
-          "source_url": "https://t.me/stock_ai_agent/17329",
-          "preview": "⚠️ 매수 보류: Sphere Entertainment Co.(SPHR) 현재가: $112.81 매수 점수: 2/10 결정: 미진입 시장 상황: 횡보장 산업군: Communication Services 보류 사유: AI 판단: 미진입 / 점수 부족 (2/5) — AI 사유: 횡보장에서 최근 두 분기 연결 영업적자로 수익성 기준이 미달하며, 성장성 기준도 충족이 검증되지 않았습니다. 판단...",
+          "message_id": "17383",
+          "posted_at": "2026-11-06T20:06:45+00:00",
+          "source_url": "https://t.me/stock_ai_agent/17383",
+          "preview": "⚠️ 매수 보류: COMP(COMP) 현재가: $10.32 매수 점수: 2/10 결정: 미진입 시장 상황: 횡보장 산업군: Real Estate 보류 사유: AI 판단: 미진입 / 점수 부족 (3/5) — AI 사유: 신규매수 적용 국면인 보통 약세장에서 수익성 기준 미달로 펀더멘털 게이트를 통과하지 못합니다. 실효 점수도 3점으로 분할 최소 5점에 미달합니다. 모멘텀 2개·추가 확인...",
           "signals": [
             {
-              "canonical_ticker": "SPHR",
-              "display_name": "Sphere Entertainment Co.",
+              "canonical_ticker": "COMP",
+              "display_name": "COMP",
               "market": "US",
-              "source_asof": "2026-11-05T20:01:51+00:00",
+              "source_asof": "2026-11-06T20:06:45+00:00",
               "signal_action": "NO_ENTRY",
               "trigger_type": "telegram_buy_skip",
               "trigger_score": 0.2,
@@ -289,7 +238,7 @@
           "normalization": {
             "version": "prism-telegram/v3",
             "status": "ARCHIVED_TEXT_RECHECKED",
-            "text_chars": 868,
+            "text_chars": 690,
             "text_source": "public_metadata",
             "action_changes": [],
             "recovered_tickers": []
@@ -297,12 +246,12 @@
         }
       },
       {
-        "event_key": "stock_ai_agent:17328",
-        "content_sha256": "a91b950df4cb024c6725b4f48a4dab69625c736b4fa4028bc0bdb84812602ed8",
-        "occurred_at": "2026-11-05T19:53:09+00:00",
+        "event_key": "stock_ai_agent:17382",
+        "content_sha256": "0e0da0235d96f323dcd71c1d33971d9890d03409c4e2c74e0dd49beb4ac1fd94",
+        "occurred_at": "2026-11-06T20:06:42+00:00",
         "relevance": {
           "tickers": [
-            "QCOM"
+            "ELF"
           ],
           "markets": [
             "US"
@@ -312,16 +261,67 @@
         },
         "summary": {
           "channel": "stock_ai_agent",
-          "message_id": "17328",
-          "posted_at": "2026-11-05T19:53:09+00:00",
-          "source_url": "https://t.me/stock_ai_agent/17328",
-          "preview": "📊 QUALCOMM Incorporated (QCOM) O'Neil 인사이트 차트의 베이스/피벗/RS 주석을 함께 참고하세요. ※ 보조 참고용 · 투자 권유 아님",
+          "message_id": "17382",
+          "posted_at": "2026-11-06T20:06:42+00:00",
+          "source_url": "https://t.me/stock_ai_agent/17382",
+          "preview": "📈 신규 매수 | ELF (ELF) 💵 매수가 $118.30 🎯 목표가 $141.52 (+19.6%) ⛔ 손절가 $112.50 (-4.9%, 장중 이탈 시 즉시 매도) 🏷 Consumer Defensive · 중기 🧩 분할 매수: 1슬롯의 78%로 시작 (상위 셋업 가중, 기본 58%에서 상향), 조건 확인 시 증액 • 돌파 $123.13 → 95% • 종가 신고가 $117.93 → 9...",
           "signals": [
             {
-              "canonical_ticker": "QCOM",
-              "display_name": "QUALCOMM Incorporated",
+              "canonical_ticker": "ELF",
+              "display_name": "신규 매수 | ELF",
               "market": "US",
-              "source_asof": "2026-11-05T19:53:09+00:00",
+              "source_asof": "2026-11-06T20:06:42+00:00",
+              "signal_action": "BUY",
+              "trigger_type": "telegram_message",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "stop_loss_price": 112.5,
+              "target_price": 141.52,
+              "confidence": 0.45,
+              "warnings": []
+            }
+          ],
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 1200,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:17381",
+        "content_sha256": "0d7c0e598efeef657869b0c6d9e4b28a783c1a3bebdf84680433c014ab063bd6",
+        "occurred_at": "2026-11-06T19:59:45+00:00",
+        "relevance": {
+          "tickers": [
+            "MRNA"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "17381",
+          "posted_at": "2026-11-06T19:59:45+00:00",
+          "source_url": "https://t.me/stock_ai_agent/17381",
+          "preview": "📊 MRNA (MRNA) O'Neil 인사이트 차트의 베이스/피벗/RS 주석을 함께 참고하세요. ※ 보조 참고용 · 투자 권유 아님",
+          "signals": [
+            {
+              "canonical_ticker": "MRNA",
+              "display_name": "MRNA",
+              "market": "US",
+              "source_asof": "2026-11-06T19:59:45+00:00",
               "signal_action": "WATCH",
               "trigger_type": "telegram_oneil_insight",
               "trigger_score": 0.45,
@@ -338,7 +338,7 @@
           "normalization": {
             "version": "prism-telegram/v3",
             "status": "ARCHIVED_TEXT_RECHECKED",
-            "text_chars": 90,
+            "text_chars": 73,
             "text_source": "public_metadata",
             "action_changes": [],
             "recovered_tickers": []
@@ -346,12 +346,12 @@
         }
       },
       {
-        "event_key": "stock_ai_agent:17327",
-        "content_sha256": "64699b34f16a54db586d4b283b055c7c4a623942b84015db702e7d25b7830d3d",
-        "occurred_at": "2026-11-05T19:52:49+00:00",
+        "event_key": "stock_ai_agent:17380",
+        "content_sha256": "5c28ed9bf465f520aa04a7171b93e497de177baf71d49c040f89b5f8a74075e9",
+        "occurred_at": "2026-11-06T19:59:27+00:00",
         "relevance": {
           "tickers": [
-            "SPHR"
+            "COMP"
           ],
           "markets": [
             "US"
@@ -361,16 +361,16 @@
         },
         "summary": {
           "channel": "stock_ai_agent",
-          "message_id": "17327",
-          "posted_at": "2026-11-05T19:52:49+00:00",
-          "source_url": "https://t.me/stock_ai_agent/17327",
-          "preview": "📊 Sphere Entertainment Co. (SPHR) O'Neil 인사이트 차트의 베이스/피벗/RS 주석을 함께 참고하세요. ※ 보조 참고용 · 투자 권유 아님",
+          "message_id": "17380",
+          "posted_at": "2026-11-06T19:59:27+00:00",
+          "source_url": "https://t.me/stock_ai_agent/17380",
+          "preview": "📊 COMP (COMP) O'Neil 인사이트 차트의 베이스/피벗/RS 주석을 함께 참고하세요. ※ 보조 참고용 · 투자 권유 아님",
           "signals": [
             {
-              "canonical_ticker": "SPHR",
-              "display_name": "Sphere Entertainment Co.",
+              "canonical_ticker": "COMP",
+              "display_name": "COMP",
               "market": "US",
-              "source_asof": "2026-11-05T19:52:49+00:00",
+              "source_asof": "2026-11-06T19:59:27+00:00",
               "signal_action": "WATCH",
               "trigger_type": "telegram_oneil_insight",
               "trigger_score": 0.45,
@@ -387,7 +387,7 @@
           "normalization": {
             "version": "prism-telegram/v3",
             "status": "ARCHIVED_TEXT_RECHECKED",
-            "text_chars": 93,
+            "text_chars": 73,
             "text_source": "public_metadata",
             "action_changes": [],
             "recovered_tickers": []
@@ -395,12 +395,12 @@
         }
       },
       {
-        "event_key": "stock_ai_agent:17326",
-        "content_sha256": "1d754cd2e569231c8a0bcf8cf14774e6226f531d23f7e10260f4f4f0a99ad932",
-        "occurred_at": "2026-11-05T19:52:26+00:00",
+        "event_key": "stock_ai_agent:17379",
+        "content_sha256": "71409b80de5ed7db1484bb90dee43a69fef0eb253a88422ceed4ab0ae3b7f9a1",
+        "occurred_at": "2026-11-06T19:59:10+00:00",
         "relevance": {
           "tickers": [
-            "QCOM"
+            "ELF"
           ],
           "markets": [
             "US"
@@ -410,16 +410,65 @@
         },
         "summary": {
           "channel": "stock_ai_agent",
-          "message_id": "17326",
-          "posted_at": "2026-11-05T19:52:26+00:00",
-          "source_url": "https://t.me/stock_ai_agent/17326",
+          "message_id": "17379",
+          "posted_at": "2026-11-06T19:59:10+00:00",
+          "source_url": "https://t.me/stock_ai_agent/17379",
+          "preview": "📊 ELF (ELF) O'Neil 인사이트 차트의 베이스/피벗/RS 주석을 함께 참고하세요. ※ 보조 참고용 · 투자 권유 아님",
+          "signals": [
+            {
+              "canonical_ticker": "ELF",
+              "display_name": "ELF",
+              "market": "US",
+              "source_asof": "2026-11-06T19:59:10+00:00",
+              "signal_action": "WATCH",
+              "trigger_type": "telegram_oneil_insight",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            }
+          ],
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 71,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:17378",
+        "content_sha256": "4230cd01e5fca0e7c5ac28e9a2fdc641792130ead401e5ee75459e58e0605933",
+        "occurred_at": "2026-11-06T19:58:50+00:00",
+        "relevance": {
+          "tickers": [
+            "MRNA"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "17378",
+          "posted_at": "2026-11-06T19:58:50+00:00",
+          "source_url": "https://t.me/stock_ai_agent/17378",
           "preview": "",
           "signals": [
             {
-              "canonical_ticker": "QCOM",
-              "display_name": "QUALCOMM Incorporated",
+              "canonical_ticker": "MRNA",
+              "display_name": "MRNA",
               "market": "US",
-              "source_asof": "2026-11-05T19:52:26+00:00",
+              "source_asof": "2026-11-06T19:58:50+00:00",
               "signal_action": "WATCH",
               "trigger_type": "telegram_pdf_report",
               "trigger_score": 0.45,
@@ -440,12 +489,12 @@
         }
       },
       {
-        "event_key": "stock_ai_agent:17325",
-        "content_sha256": "e1d20fb313f1430600009ba167df73a00a6c31d2de932881c25aaad69a38fa60",
-        "occurred_at": "2026-11-05T19:52:22+00:00",
+        "event_key": "stock_ai_agent:17377",
+        "content_sha256": "3cfc956c5f3fae50e993f0cd7cae6b100547f811f513b106c128fb05534d33de",
+        "occurred_at": "2026-11-06T19:58:46+00:00",
         "relevance": {
           "tickers": [
-            "JAN"
+            "COMP"
           ],
           "markets": [
             "US"
@@ -455,16 +504,16 @@
         },
         "summary": {
           "channel": "stock_ai_agent",
-          "message_id": "17325",
-          "posted_at": "2026-11-05T19:52:22+00:00",
-          "source_url": "https://t.me/stock_ai_agent/17325",
+          "message_id": "17377",
+          "posted_at": "2026-11-06T19:58:46+00:00",
+          "source_url": "https://t.me/stock_ai_agent/17377",
           "preview": "",
           "signals": [
             {
-              "canonical_ticker": "JAN",
-              "display_name": "Janus Living,  Inc.",
+              "canonical_ticker": "COMP",
+              "display_name": "COMP",
               "market": "US",
-              "source_asof": "2026-11-05T19:52:22+00:00",
+              "source_asof": "2026-11-06T19:58:46+00:00",
               "signal_action": "WATCH",
               "trigger_type": "telegram_pdf_report",
               "trigger_score": 0.45,
@@ -485,12 +534,12 @@
         }
       },
       {
-        "event_key": "stock_ai_agent:17324",
-        "content_sha256": "292edc52e2d4a45413e3570e9ebbed257ddc51ada85a1544c39518717feaa8b7",
-        "occurred_at": "2026-11-05T19:52:18+00:00",
+        "event_key": "stock_ai_agent:17376",
+        "content_sha256": "d7d5fa2613fa464af03fb908bb87fb3b0bf910149aec1fbadd7966f31ebbbe8c",
+        "occurred_at": "2026-11-06T19:58:38+00:00",
         "relevance": {
           "tickers": [
-            "SPHR"
+            "ELF"
           ],
           "markets": [
             "US"
@@ -500,16 +549,16 @@
         },
         "summary": {
           "channel": "stock_ai_agent",
-          "message_id": "17324",
-          "posted_at": "2026-11-05T19:52:18+00:00",
-          "source_url": "https://t.me/stock_ai_agent/17324",
+          "message_id": "17376",
+          "posted_at": "2026-11-06T19:58:38+00:00",
+          "source_url": "https://t.me/stock_ai_agent/17376",
           "preview": "",
           "signals": [
             {
-              "canonical_ticker": "SPHR",
-              "display_name": "Sphere Entertainment Co.",
+              "canonical_ticker": "ELF",
+              "display_name": "ELF",
               "market": "US",
-              "source_asof": "2026-11-05T19:52:18+00:00",
+              "source_asof": "2026-11-06T19:58:38+00:00",
               "signal_action": "WATCH",
               "trigger_type": "telegram_pdf_report",
               "trigger_score": 0.45,
@@ -530,12 +579,12 @@
         }
       },
       {
-        "event_key": "stock_ai_agent:17323",
-        "content_sha256": "df557318ea80eef1738c770c0ac819b80bc39e5a55debe097208eed85261b8ff",
-        "occurred_at": "2026-11-05T19:52:09+00:00",
+        "event_key": "stock_ai_agent:17375",
+        "content_sha256": "286e9b30529565becd50aac0d7d378987398b03fa7d3ed128148c8fb8b681542",
+        "occurred_at": "2026-11-06T19:58:31+00:00",
         "relevance": {
           "tickers": [
-            "QCOM"
+            "MRNA"
           ],
           "markets": [
             "US"
@@ -545,16 +594,16 @@
         },
         "summary": {
           "channel": "stock_ai_agent",
-          "message_id": "17323",
-          "posted_at": "2026-11-05T19:52:09+00:00",
-          "source_url": "https://t.me/stock_ai_agent/17323",
-          "preview": "📊 QUALCOMM Incorporated (QCOM) — 스마트폰용 칩과 통신 특허 라이선스가 핵심인 반도체 기업입니다. 자동차·IoT·데이터센터 등 비핸드셋 사업 확대를 추진하고 있습니다. 💰 가격: $158.56 (11월 5일 관측값; 마감 확정 여부 미확인), 전일 종가 $173.19 대비 약 -8.4%. 거래량은 약 2,492만 주로 전일 2,227만 주보다 증가해 하락 중 매...",
+          "message_id": "17375",
+          "posted_at": "2026-11-06T19:58:31+00:00",
+          "source_url": "https://t.me/stock_ai_agent/17375",
+          "preview": "📊 모더나 (MRNA) — mRNA 기반 백신·치료제를 개발·판매하는 바이오기업입니다. 3분기 흑자 전환과 연간 매출 전망 상향으로 기대가 커졌지만, 실적 회복의 지속성은 더 확인해야 합니다. 💰 거래 현황 (2026.11.06 관측치) - 현재가: $262.99 — 당일 마감 확정치는 아닐 수 있음 - 전일 대비: 약 +8.8% (보도 시점 기준) - 거래량: 최근 거래일 약 1,20...",
           "signals": [
             {
-              "canonical_ticker": "QCOM",
-              "display_name": "QUALCOMM Incorporated",
+              "canonical_ticker": "MRNA",
+              "display_name": "모더나",
               "market": "US",
-              "source_asof": "2026-11-05T19:52:09+00:00",
+              "source_asof": "2026-11-06T19:58:31+00:00",
               "signal_action": "UNKNOWN",
               "trigger_type": "telegram_message",
               "trigger_score": 0.45,
@@ -571,7 +620,7 @@
           "normalization": {
             "version": "prism-telegram/v3",
             "status": "ARCHIVED_TEXT_RECHECKED",
-            "text_chars": 818,
+            "text_chars": 840,
             "text_source": "public_metadata",
             "action_changes": [],
             "recovered_tickers": []
@@ -579,12 +628,12 @@
         }
       },
       {
-        "event_key": "stock_ai_agent:17322",
-        "content_sha256": "0802b4ca790967a841f521d8e7710cd11819cf2cd7ba4a43d16ded28aee2132b",
-        "occurred_at": "2026-11-05T19:52:04+00:00",
+        "event_key": "stock_ai_agent:17374",
+        "content_sha256": "34c79e20dd1dea704054f7c33ee41d2490d807d880dbc62cdc5a1bcf349675e0",
+        "occurred_at": "2026-11-06T19:58:27+00:00",
         "relevance": {
           "tickers": [
-            "JAN"
+            "COMP"
           ],
           "markets": [
             "US"
@@ -594,16 +643,16 @@
         },
         "summary": {
           "channel": "stock_ai_agent",
-          "message_id": "17322",
-          "posted_at": "2026-11-05T19:52:04+00:00",
-          "source_url": "https://t.me/stock_ai_agent/17322",
-          "preview": "📊 Janus Living (JAN) — 시니어 주거 커뮤니티를 보유·운영하는 미국 REIT입니다. 매출과 동일매장 NOI가 성장하고 연간 전망도 상향됐지만, 영업적자와 신주 발행에 따른 희석 부담이 남아 있습니다. 💵 거래 현황 (2026.11.05 기준) - 관측가: $30.43 (정규장 중 관측치로, 확정 종가 아님) - 전일 관측가 $30.07 대비 약 +1.2% - 거래량 약...",
+          "message_id": "17374",
+          "posted_at": "2026-11-06T19:58:27+00:00",
+          "source_url": "https://t.me/stock_ai_agent/17374",
+          "preview": "📊 Compass, Inc. (COMP) — 미국 주택 중개업체로, 부동산 중개인에게 기술 플랫폼과 마케팅·거래 지원 서비스를 제공합니다. 💰 관측 가격: $10.245 (11월 6일, 마감 확정 여부 미확인) 📈 전일 대비: 보고서에 등락률 자료가 없어 확인 불가 📊 거래량: 약 1,587만 주. 11월 4~5일에도 약 1,680만·1,959만 주로 거래가 활발했지만, 거래량만으로 매...",
           "signals": [
             {
-              "canonical_ticker": "JAN",
-              "display_name": "Janus Living",
+              "canonical_ticker": "COMP",
+              "display_name": "Compass, Inc.",
               "market": "US",
-              "source_asof": "2026-11-05T19:52:04+00:00",
+              "source_asof": "2026-11-06T19:58:27+00:00",
               "signal_action": "UNKNOWN",
               "trigger_type": "telegram_message",
               "trigger_score": 0.45,
@@ -620,7 +669,7 @@
           "normalization": {
             "version": "prism-telegram/v3",
             "status": "ARCHIVED_TEXT_RECHECKED",
-            "text_chars": 855,
+            "text_chars": 723,
             "text_source": "public_metadata",
             "action_changes": [],
             "recovered_tickers": []
@@ -628,12 +677,12 @@
         }
       },
       {
-        "event_key": "stock_ai_agent:17321",
-        "content_sha256": "279bf632fb87ab8b782b301650388065ce6bc6246e8521ed427a3ed24cd22cd6",
-        "occurred_at": "2026-11-05T19:51:59+00:00",
+        "event_key": "stock_ai_agent:17373",
+        "content_sha256": "a1103b3e803f93b4b9690d22ab7f7f0ddf5b1fb7400d989e6fc9ed0c02dbd63e",
+        "occurred_at": "2026-11-06T19:58:23+00:00",
         "relevance": {
           "tickers": [
-            "SPHR"
+            "ELF"
           ],
           "markets": [
             "US"
@@ -643,16 +692,16 @@
         },
         "summary": {
           "channel": "stock_ai_agent",
-          "message_id": "17321",
-          "posted_at": "2026-11-05T19:51:59+00:00",
-          "source_url": "https://t.me/stock_ai_agent/17321",
-          "preview": "📊 Sphere Entertainment Co. (SPHR) 대형 몰입형 공연장 Sphere와 지역 스포츠·엔터테인먼트 방송 사업 MSG Networks를 운영합니다. Sphere가 성장하는 반면 네트워크 부문은 부진해, 연결 실적 개선 여부가 관건입니다. 💰 주가·거래 (11월 5일 장중 관측치, 종가 미확정) - 현재가 $111.96, 전일 대비 +2.9% - 거래량 약 131만 주...",
+          "message_id": "17373",
+          "posted_at": "2026-11-06T19:58:23+00:00",
+          "source_url": "https://t.me/stock_ai_agent/17373",
+          "preview": "📊 e.l.f. Beauty (ELF) 화장품·스킨케어 브랜드를 운영하며 소매점과 온라인을 통해 제품을 판매합니다. 11월 4일 발표에서 회계연도 2분기 매출이 전년 대비 51% 증가했고, 연간 매출·조정 EPS 전망을 상향했습니다. 💰 거래 현황 (11월 6일 관측값; 최종 종가 미확인) • 주가: $117.72 • 전일 대비 등락률: 보고서에 확정 수치 없음 • 거래량: 약 136만...",
           "signals": [
             {
-              "canonical_ticker": "SPHR",
-              "display_name": "Sphere Entertainment Co.",
+              "canonical_ticker": "ELF",
+              "display_name": "e.l.f. Beauty",
               "market": "US",
-              "source_asof": "2026-11-05T19:51:59+00:00",
+              "source_asof": "2026-11-06T19:58:23+00:00",
               "signal_action": "UNKNOWN",
               "trigger_type": "telegram_message",
               "trigger_score": 0.45,
@@ -669,7 +718,7 @@
           "normalization": {
             "version": "prism-telegram/v3",
             "status": "ARCHIVED_TEXT_RECHECKED",
-            "text_chars": 948,
+            "text_chars": 887,
             "text_source": "public_metadata",
             "action_changes": [],
             "recovered_tickers": []
@@ -677,14 +726,14 @@
         }
       },
       {
-        "event_key": "stock_ai_agent:17320",
-        "content_sha256": "61bac8e5f70c29397e8cb3cee9a825a642d823a9083985472b58a3e8c9ce998e",
-        "occurred_at": "2026-11-05T19:40:48+00:00",
+        "event_key": "stock_ai_agent:17372",
+        "content_sha256": "e915ace8a0c918c23cf4561b6a142e4284b983c0f81bce3c0c040c6db2a335d3",
+        "occurred_at": "2026-11-06T19:49:43+00:00",
         "relevance": {
           "tickers": [
-            "SPHR",
-            "JAN",
-            "QCOM"
+            "ELF",
+            "COMP",
+            "MRNA"
           ],
           "markets": [
             "US"
@@ -694,45 +743,42 @@
         },
         "summary": {
           "channel": "stock_ai_agent",
-          "message_id": "17320",
-          "posted_at": "2026-11-05T19:40:48+00:00",
-          "source_url": "https://t.me/stock_ai_agent/17320",
-          "preview": "🔔 미국주식 오후 프리즘 시그널 얼럿 📅 2026.11.05 오후 분석 포착된 관심종목 🤖 프리즘봇의 가상 포트폴리오 운용 과정을 투명하게 공개합니다. 실제 매수 권유가 아닙니다. 🧭 장기추세: 횡보 | 스윙: 단기 조정 | 실행기준: 횡보 | 선정: 탑다운 0종목 + 바텀업 3종목 🧭 오늘 테마 흐름 미국 1,019종목 · 전일 종가 대비 · 테마별 중앙값 📈 강한 테마 1. 중국 이...",
+          "message_id": "17372",
+          "posted_at": "2026-11-06T19:49:43+00:00",
+          "source_url": "https://t.me/stock_ai_agent/17372",
+          "preview": "🔔 미국주식 오후 프리즘 시그널 얼럿 📅 2026.11.06 오후 분석 포착된 관심종목 🤖 프리즘봇의 가상 포트폴리오 운용 과정을 투명하게 공개합니다. 실제 매수 권유가 아닙니다. 🧭 장기추세: 횡보 | 스윙: 단기 조정 | 실행기준: 횡보 | 선정: 탑다운 0종목 + 바텀업 3종목 🧭 오늘 테마 흐름 미국 1,018종목 · 전일 종가 대비 · 테마별 중앙값 📈 강한 테마 1. 양자컴퓨...",
           "signals": [
             {
-              "canonical_ticker": "SPHR",
-              "display_name": "Sphere Entertainment Co.",
+              "canonical_ticker": "ELF",
               "market": "US",
-              "source_asof": "2026-11-05T19:40:48+00:00",
+              "source_asof": "2026-11-06T19:49:43+00:00",
               "signal_action": "WATCH",
               "trigger_type": "telegram_signal_alert",
-              "trigger_score": 0.83,
-              "composite_score": 0.83,
-              "confidence": 0.83,
+              "trigger_score": 0.71,
+              "composite_score": 0.71,
+              "confidence": 0.71,
               "warnings": []
             },
             {
-              "canonical_ticker": "JAN",
-              "display_name": "Janus Living, Inc.",
+              "canonical_ticker": "COMP",
               "market": "US",
-              "source_asof": "2026-11-05T19:40:48+00:00",
+              "source_asof": "2026-11-06T19:49:43+00:00",
+              "signal_action": "WATCH",
+              "trigger_type": "telegram_signal_alert",
+              "trigger_score": 0.71,
+              "composite_score": 0.71,
+              "confidence": 0.71,
+              "warnings": []
+            },
+            {
+              "canonical_ticker": "MRNA",
+              "market": "US",
+              "source_asof": "2026-11-06T19:49:43+00:00",
               "signal_action": "WATCH",
               "trigger_type": "telegram_signal_alert",
               "trigger_score": 0.86,
               "composite_score": 0.86,
               "confidence": 0.86,
-              "warnings": []
-            },
-            {
-              "canonical_ticker": "QCOM",
-              "display_name": "QUALCOMM Incorporated",
-              "market": "US",
-              "source_asof": "2026-11-05T19:40:48+00:00",
-              "signal_action": "WATCH",
-              "trigger_type": "telegram_signal_alert",
-              "trigger_score": 0.82,
-              "composite_score": 0.82,
-              "confidence": 0.82,
               "warnings": []
             }
           ],
@@ -744,7 +790,7 @@
           "normalization": {
             "version": "prism-telegram/v3",
             "status": "ARCHIVED_TEXT_RECHECKED",
-            "text_chars": 914,
+            "text_chars": 985,
             "text_source": "public_metadata",
             "action_changes": [],
             "recovered_tickers": []

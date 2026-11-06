@@ -1,0 +1,4295 @@
+{
+  "schema": "tradingagents.work-context/v1",
+  "surface": "youtube",
+  "event_id": "youtube:abe5987ba7a4b2156178ec54467f9750",
+  "prompt_contract_version": "youtube-work-v5",
+  "prompt_sha256": "82a87727ec636b928ccb90cfe8cd823d86347e254ed0b204903699e34e35ef0b",
+  "skill_sha256": "2fef99f1af403675549a13813e0fe5597a241a964affeada56e9f64e9f398fe9",
+  "task_manifest_sha256": "0ea8b7511042a3aa7d6fa8447d97032d4be515f69526190a4c9556d01067c6df",
+  "workflow_contract_sha256": "c75e155a8e30b5d22921bad39fde87022a6bd8d52c5ac56585369ed84d3f1eaf",
+  "source_sha256": "d8c423b3613f7aa80a1f6c8dea696db09b43cda8ce0cd8020f76fbd1b3e34367",
+  "body": {
+    "kind": "youtube",
+    "source_health": "OK",
+    "source": {
+      "health": "OK",
+      "run_id": "youtube_20261107_065346",
+      "last_run_at": "2026-11-07T07:56:41.158560+09:00",
+      "status": "success",
+      "stale_after_hours": 36
+    },
+    "window_hours": 72,
+    "execution_eligible": false,
+    "evidence_policy": {
+      "profile": "balanced_external",
+      "material_thesis_effects": [
+        "ranking",
+        "confidence",
+        "position_size_within_existing_risk_limits",
+        "research_priority"
+      ],
+      "supported_evidence_weight": "MEDIUM",
+      "partially_supported_evidence_weight": "LOW_TO_MEDIUM",
+      "unverified_evidence_weight": "LOW_LABELED",
+      "user_primary_channels": [
+        "@kpunch",
+        "@sosumonkey"
+      ],
+      "user_primary_source_tier": "USER_PRIMARY",
+      "user_primary_evidence_weight": "HIGH",
+      "user_primary_validation_policy": "USER_ACCEPTED",
+      "matching_multi_source_signal_may_raise_thesis_priority": true,
+      "conflicting_signal_must_be_visible": true,
+      "may_bypass_market_or_portfolio_execution_gate": false
+    },
+    "coverage": {
+      "total_unique_events": 758,
+      "window_events": 115,
+      "transmitted_events": 26,
+      "truncated": true,
+      "oldest_occurred_at": "2026-11-05T05:08:41+00:00",
+      "newest_occurred_at": "2026-11-06T13:30:28+00:00",
+      "omitted_due_to_packet_budget": 34
+    },
+    "events": [
+      {
+        "event_key": "XIXAJJ0cywc",
+        "content_sha256": "e92c7c0ef31feddea204706103189e455809109a7b103e46dc5f2fe44c317a74",
+        "occurred_at": "2026-11-06T13:30:28+00:00",
+        "relevance": {
+          "tickers": [
+            "^KS11"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "verified_entities"
+        },
+        "strategy_source_tier": "STANDARD",
+        "strategy_evidence_weight": "STANDARD",
+        "summary": {
+          "video_id": "XIXAJJ0cywc",
+          "title": "투자자들이 꼭 알아야 하는 다음 주 투자 포인트(11월 9일~13일)",
+          "channel": "경제사냥꾼",
+          "source_url": "https://www.youtube.com/watch?v=XIXAJJ0cywc",
+          "published_at": "2026-11-06T13:30:28+00:00",
+          "status": "asr_uncertain",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "strategy_validation_policy": "STANDARD_REVIEW",
+          "transcript_quality": {
+            "status": "good",
+            "score": 1.0,
+            "warnings": [],
+            "source": "automatic",
+            "language": "Korean (Original)",
+            "model_or_format": "json3",
+            "chars": 8898,
+            "segments": 461,
+            "duration_seconds": 867,
+            "repeated_ngram_ratio": 0.0
+          },
+          "claim_status_summary": {
+            "partially_supported": 2,
+            "unverified": 8,
+            "asr_uncertain": 2
+          },
+          "claims": [
+            {
+              "claim_id": "C1",
+              "claim_text": "11월 5일 나스닥이 5.5%, 반도체지수가 12% 넘게 하락하고 VIX가 16대에서 28대로 상승했으며, 선거 이후 데이터센터 규제 우려 등이 급락 원인이었다는 주장.",
+              "status": "partially_supported",
+              "confidence": 0.25,
+              "supporting_evidence_ids": [
+                "E2",
+                "E3"
+              ],
+              "manual_check_required": true,
+              "investor_implication": "선거와 AI 투자 우려라는 보도 맥락만 제한적으로 참고하고, 낙폭과 역사적 기록은 원시 가격자료 확인 전 인용하지 않는다."
+            },
+            {
+              "claim_id": "C2",
+              "claim_text": "11월 5일 코스피가 5% 넘게, SK하이닉스가 9% 넘게 하락했고 삼성전자는 코스피보다 크게 하락했으며, 6일 장중 8% 초과 하락과 20분 서킷브레이커가 있었다는 주장.",
+              "status": "unverified",
+              "confidence": 0.05,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "가격 급락, 거래 중단 및 외국인 수급을 각각 KRX 자료로 확인한 뒤 판단한다."
+            },
+            {
+              "claim_id": "C3",
+              "claim_text": "연준이 9월 16일 25bp 인상하고 10월 28일 동결했으며 인상 주장 반대위원이 2명이었다는 주장. 다음 결정은 한국시간 12월 10일 04시이고 시장의 다음 인상 예상은 12월에서 다음 해 3월로 이동했다는 설명.",
+              "status": "unverified",
+              "confidence": 0.05,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "정책 결정과 시장 기대를 구분하고, 공식 결정문과 시점이 명시된 선물 확률 확인 전 추가 인상을 전제로 삼지 않는다."
+            },
+            {
+              "claim_id": "C4",
+              "claim_text": "10월 CPI·PPI·고용 발표 일정, 9월 물가 수치와 휘발유 기여도, 셧다운 관련 전년 비교 공백 및 이번 CPI가 12월 금리 결정 전 마지막이라는 주장.",
+              "status": "unverified",
+              "confidence": 0.05,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "발표 일정과 물가 수치를 미확정 정보로 취급하고, 실제치·직전치·시장 예상 및 계절조정 기준을 구분한다."
+            },
+            {
+              "claim_id": "C5",
+              "claim_text": "국제유가가 10월 말 배럴당 104달러대에서 11월 5일 90달러대로 하락했으며, 11월 하락을 10월 CPI에 곧바로 반영하면 안 된다는 주장.",
+              "status": "unverified",
+              "confidence": 0.05,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "동일 유종·동일 가격 기준으로 하락 폭을 확인하고 조사 대상 월과 가격 전가 시차를 구분한다."
+            },
+            {
+              "claim_id": "C6",
+              "claim_text": "코어위브의 실적 설명회 일정, 2분기 수주잔고 1,042억 달러, 주가 급락과 채권 수익률 상승을 근거로 AI 수요와 자금조달 위험을 분리하자는 주장.",
+              "status": "unverified",
+              "confidence": 0.05,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "수주잔고와 매출 전망, 현금·설비투자·차입 조건을 별도로 확인하되 제시 수치는 검증 전 투자 근거로 사용하지 않는다."
+            }
+          ],
+          "entities": [
+            {
+              "ticker": "^KS11",
+              "name": "MSCI 지수 리뷰·코스피200 옵션",
+              "status": "unverified",
+              "verification_notes": [
+                "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+              ]
+            }
+          ],
+          "evidence": [
+            {
+              "evidence_id": "E1",
+              "claim_id": "C1",
+              "title": "Crude gains on worries about renewed US attacks on Iran",
+              "source_url": "https://finance.yahoo.com/news/oil-set-sharp-weekly-drop-052924519.html",
+              "publisher": "Reuters",
+              "published_at": "2026-11-06T21:47:23+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E2",
+              "claim_id": "C1",
+              "title": "S&P 500 Posts Weekly Drop as Energy, Technology Slide in Election Aftermath",
+              "source_url": "https://finance.yahoo.com/markets/stocks/articles/p-500-posts-weekly-drop-214616427.html",
+              "publisher": "MT Newswires",
+              "published_at": "2026-11-06T21:46:16+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E4",
+              "claim_id": "C3",
+              "title": "Update: US Equity Indexes Mixed After Blowout Jobs Report Pushes Treasury Yields Higher",
+              "source_url": "https://finance.yahoo.com/economy/articles/us-equity-indexes-mixed-blowout-214822243.html",
+              "publisher": "MT Newswires",
+              "published_at": "2026-11-06T21:48:22+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E5",
+              "claim_id": "C7",
+              "title": "SovAI Joins NVIDIA Inception to Build Behind-the-Meter AI Factories to the NVIDIA DSX Reference Architecture",
+              "source_url": "https://finance.yahoo.com/technology/ai/articles/sovai-joins-nvidia-inception-build-215200802.html",
+              "publisher": "Business Wire",
+              "published_at": "2026-11-06T21:52:00+00:00",
+              "source_tier": "news"
+            },
+            {
+              "evidence_id": "E6",
+              "claim_id": "C7",
+              "title": "Dow Jones Futures: Market Needs Repair But Sandisk, Micron Broken; Apple, Amazon, Microsoft Strong",
+              "source_url": "https://finance.yahoo.com/m/283e1bd9-349e-390b-a32b-b4ed9a9034f3/dow-jones-futures%3A-market.html",
+              "publisher": "Investor's Business Daily",
+              "published_at": "2026-11-06T21:45:10+00:00",
+              "source_tier": "news"
+            },
+            {
+              "evidence_id": "E7",
+              "claim_id": "C11",
+              "title": "Slow Letter: August 20, 2026.",
+              "source_url": "https://slownews.kr/165193",
+              "publisher": "Naver News",
+              "published_at": "2026-08-20T09:30:00+09:00",
+              "source_tier": "news"
+            }
+          ]
+        }
+      },
+      {
+        "event_key": "iYbEpUYCdfk",
+        "content_sha256": "b57fdb0d477d8673267248c8370538e168dd77b15f1cfff2ddccb96332f0cd4d",
+        "occurred_at": "2026-11-06T12:00:33+00:00",
+        "relevance": {
+          "tickers": [
+            "005930"
+          ],
+          "markets": [
+            "KR"
+          ],
+          "themes": [],
+          "match_basis": "verified_entities"
+        },
+        "strategy_source_tier": "STANDARD",
+        "strategy_evidence_weight": "STANDARD",
+        "summary": {
+          "video_id": "iYbEpUYCdfk",
+          "title": "\"차익실현이 아니라 강제 매도?\"…외국인 2.7조 매도 폭탄, 다음 주에도 쏟아질까ㅣ명민준, 박가영, 차영주 [주린이 구조대]",
+          "channel": "삼프로TV 3PROTV",
+          "source_url": "https://www.youtube.com/watch?v=iYbEpUYCdfk",
+          "published_at": "2026-11-06T12:00:33+00:00",
+          "status": "asr_uncertain",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "strategy_validation_policy": "STANDARD_REVIEW",
+          "transcript_quality": {
+            "status": "good",
+            "score": 1.0,
+            "warnings": [],
+            "source": "automatic",
+            "language": "Korean",
+            "model_or_format": "json3",
+            "chars": 22166,
+            "segments": 1302,
+            "duration_seconds": 2584,
+            "repeated_ngram_ratio": 0.001
+          },
+          "claim_status_summary": {
+            "unverified": 10,
+            "asr_uncertain": 2
+          },
+          "claims": [
+            {
+              "claim_id": "C1",
+              "claim_text": "방송 당일 외국인 매도 2.7조원, 기관 매수 1.8조원이라는 주장.",
+              "status": "unverified",
+              "confidence": 0.0,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "매도 규모를 투자 판단에 사용하기 전에 동일 거래일의 거래소 원자료로 집계 기준을 확인해야 한다."
+            },
+            {
+              "claim_id": "C2",
+              "claim_text": "외국인 매도가 차익실현보다 펀드 로스컷·강제매도 때문일 수 있으며 헤지펀드 청산설도 있다는 추정.",
+              "status": "unverified",
+              "confidence": 0.0,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "강제매도 종료나 다음 주 추가 출회를 전제한 매매 근거로 사용하기 어렵다."
+            },
+            {
+              "claim_id": "C3",
+              "claim_text": "지수의 5000 이탈 후 회복과 과거 7000·6000·5200·6300 수준, 삼성전자 17만~19만원, US테크 약 1.5% 상승 및 20만원 부근 매수 기준에 관한 주장.",
+              "status": "asr_uncertain",
+              "confidence": 0.0,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "미확인 가격대를 지지선이나 주문 기준으로 사용하지 말고 거래소별 시세와 발언 원음을 먼저 확인해야 한다."
+            },
+            {
+              "claim_id": "C4",
+              "claim_text": "메타 FCF 적자와 950억달러 조달, 아마존 FCF 악화, 애플 가이던스 및 코어위브 회사채 변동이 시장 불안을 키웠다는 주장.",
+              "status": "unverified",
+              "confidence": 0.0,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "AI 투자 재원과 수익성 우려는 검증 과제로 남겨야 하며, 확정된 유동성 위기나 하락 원인으로 단정할 수 없다."
+            },
+            {
+              "claim_id": "C5",
+              "claim_text": "텍사스에서 애벗 후임 인호사가 당선됐고 데이터센터 승인 중단·전력비 기업 부담·수자원 및 주민 보호 강화가 추진된다는 주장.",
+              "status": "asr_uncertain",
+              "confidence": 0.0,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "데이터센터 투자 중단이나 지역 이전을 확정 시나리오로 반영하기 전에 인물과 정책 원문을 확인해야 한다."
+            },
+            {
+              "claim_id": "C6",
+              "claim_text": "민주당의 의회 장악, 새 의회의 내년 1월 구성, 트럼프 300% 관세 발언 및 데이터센터 전력비 기업 부담 행정명령에 관한 주장.",
+              "status": "unverified",
+              "confidence": 0.0,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "정치 발언과 법적 시행을 구분하고 확인되지 않은 관세율이나 의회 구도를 기업 이익 전망에 직접 반영하지 않아야 한다."
+            }
+          ],
+          "entities": [
+            {
+              "ticker": "005930",
+              "name": "삼성전자·국내 반도체",
+              "status": "unverified",
+              "verification_notes": [
+                "시장 데이터 조회 실패: no_usable_market_fields"
+              ]
+            }
+          ],
+          "evidence": [
+            {
+              "evidence_id": "E1",
+              "claim_id": "C1",
+              "title": "Monster Beverage Strong Sales Momentum Offset by Margin Pressure, RBC Says",
+              "source_url": "https://finance.yahoo.com/markets/stocks/articles/monster-beverage-strong-sales-momentum-202719672.html",
+              "publisher": "MT Newswires",
+              "published_at": "2026-11-06T20:27:19+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E2",
+              "claim_id": "C1",
+              "title": "PS Logistics expands Tennessee flatbed presence with Roane acquisition",
+              "source_url": "https://finance.yahoo.com/small-business/articles/ps-logistics-expands-tennessee-flatbed-182158554.html",
+              "publisher": "FreightWaves",
+              "published_at": "2026-11-06T18:21:58+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E4",
+              "claim_id": "C6",
+              "title": "Trump Media And Technology Group (DJT) Stock Looks Overvalued Despite A 93% Slide",
+              "source_url": "https://finance.yahoo.com/markets/stocks/articles/trump-media-technology-group-djt-161227351.html",
+              "publisher": "Simply Wall St.",
+              "published_at": "2026-11-06T16:12:27+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E5",
+              "claim_id": "C7",
+              "title": "Bitcoin Tumbles On ETF Flows, Liquidations. IREN Leads Miner Rebound Attempt.",
+              "source_url": "https://finance.yahoo.com/m/1bb59cf7-9dbb-3c72-aa16-34a903263558/bitcoin-tumbles-on-etf-flows%2C.html",
+              "publisher": "Investor's Business Daily",
+              "published_at": "2026-11-06T21:30:44+00:00",
+              "source_tier": "news"
+            },
+            {
+              "evidence_id": "E6",
+              "claim_id": "C11",
+              "title": "The Chip Stock Bloodbath Is a Case Study in the Risks of Leveraged ETFs",
+              "source_url": "https://finance.yahoo.com/m/e1cc3675-f7f1-37df-be78-62a32fbe2487/the-chip-stock-bloodbath-is-a.html",
+              "publisher": "Barrons.com",
+              "published_at": "2026-11-06T21:28:00+00:00",
+              "source_tier": "news"
+            }
+          ]
+        }
+      },
+      {
+        "event_key": "1vLWKG4IQqk",
+        "content_sha256": "debffede2f150ac5e41e93f37729e571633db1f18c0b250f4f83f1a3521b469e",
+        "occurred_at": "2026-11-06T12:00:23+00:00",
+        "relevance": {
+          "tickers": [
+            "NVDA"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "verified_entities"
+        },
+        "strategy_source_tier": "STANDARD",
+        "strategy_evidence_weight": "STANDARD",
+        "summary": {
+          "video_id": "1vLWKG4IQqk",
+          "title": "엔비디아 CEO 젠슨 황이 공개한 충격적인 AI 활용법",
+          "channel": "경제사냥꾼",
+          "source_url": "https://www.youtube.com/watch?v=1vLWKG4IQqk",
+          "published_at": "2026-11-06T12:00:23+00:00",
+          "status": "unverified",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "strategy_validation_policy": "STANDARD_REVIEW",
+          "transcript_quality": {
+            "status": "good",
+            "score": 1.0,
+            "warnings": [],
+            "source": "automatic",
+            "language": "Korean",
+            "model_or_format": "json3",
+            "chars": 664,
+            "segments": 29,
+            "duration_seconds": 56,
+            "repeated_ngram_ratio": 0.0
+          },
+          "claim_status_summary": {
+            "unverified": 7
+          },
+          "claims": [
+            {
+              "claim_id": "C1",
+              "claim_text": "젠슨 황이 최근 공개 강연에서 자신의 AI 활용 기법을 공개했다.",
+              "status": "unverified",
+              "confidence": 0.1,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "원출처를 확인하기 전에는 젠슨 황이 공개한 방법이라고 확정해 인용할 수 없다."
+            },
+            {
+              "claim_id": "C2",
+              "claim_text": "젠슨 황은 질문을 한꺼번에 입력하여 다양한 방법을 비교하고 성장률과 변화를 분석한다.",
+              "status": "unverified",
+              "confidence": 0.1,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "일반적인 분석 아이디어와 젠슨 황의 실제 사용법이라는 귀속을 구분해야 한다."
+            },
+            {
+              "claim_id": "C3",
+              "claim_text": "기존 8시간 또는 4~8시간 걸리던 연구 작업을 약 3분 만에 끝낼 수 있다는 설명을 젠슨 황에게 귀속한다.",
+              "status": "unverified",
+              "confidence": 0.05,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "이 수치를 투자 조사 전반의 생산성 향상이나 검증까지 마친 보고서의 완성 시간으로 적용할 근거가 없다."
+            },
+            {
+              "claim_id": "C4",
+              "claim_text": "채널 운영자는 젠슨 황의 방식을 GPT에서 사용하도록 전용 명령어를 제작했다고 주장한다.",
+              "status": "unverified",
+              "confidence": 0.2,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "프롬프트의 존재·내용·제작자 귀속을 확인하기 전에는 검증된 분석 도구로 소개할 근거가 부족하다."
+            },
+            {
+              "claim_id": "C5",
+              "claim_text": "관심 주제만 입력하면 데이터를 조사하고 주제를 비교하며 숫자·그래프가 포함된 보고서를 작성하도록 설계했다.",
+              "status": "unverified",
+              "confidence": 0.15,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "보고서 형식을 생성하는 능력이 정확한 데이터 조사와 투자 분석을 보장하지는 않는다. 실제 산출물 대조가 필요하다."
+            },
+            {
+              "claim_id": "C6",
+              "claim_text": "이 프롬프트는 주식 투자에서 기업의 실적과 성장 잠재력을 비교하는 데 유용하다.",
+              "status": "unverified",
+              "confidence": 0.05,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "해당 프롬프트의 효용이나 투자 성과 개선을 입증된 것으로 취급할 수 없다. 기업 비교 결과는 당시 공시와 동일 기준으로 대조해야 한다."
+            }
+          ],
+          "entities": [
+            {
+              "ticker": "NVDA",
+              "name": "엔비디아·젠슨 황",
+              "status": "unverified",
+              "verification_notes": [
+                "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+              ]
+            }
+          ],
+          "evidence": [
+            {
+              "evidence_id": "E1",
+              "claim_id": "C1",
+              "title": "SoundHound Sinks 8% as It Gives Up Upfront License Revenue for “Quality of Earnings”",
+              "source_url": "https://finance.yahoo.com/markets/stocks/articles/soundhound-sinks-8-gives-upfront-183556785.html",
+              "publisher": "TIKR",
+              "published_at": "2026-11-06T18:35:56+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E2",
+              "claim_id": "C3",
+              "title": "Nvidia, Intel, Tesla, AMD, Coherent, Lam Research, Moderna, and More Stocks That Explain Today’s Market",
+              "source_url": "https://finance.yahoo.com/m/13933ac1-ca44-3c66-87e0-08f5c6b276e8/nvidia%2C-intel%2C-tesla%2C-amd%2C.html",
+              "publisher": "Barrons.com",
+              "published_at": "2026-11-06T21:28:00+00:00",
+              "source_tier": "news"
+            }
+          ]
+        }
+      },
+      {
+        "event_key": "RBwnQi1ZHic",
+        "content_sha256": "31cb1e33a42651e7490b645282bcd0824df98c0861d0d1cb4e0ca2b050cf63ed",
+        "occurred_at": "2026-11-06T11:30:20+00:00",
+        "relevance": {
+          "tickers": [
+            "SPX",
+            "IXIC",
+            "NVDA",
+            "AAPL",
+            "CL=F"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "verified_entities"
+        },
+        "strategy_source_tier": "STANDARD",
+        "strategy_evidence_weight": "STANDARD",
+        "summary": {
+          "video_id": "RBwnQi1ZHic",
+          "title": "2018년 트럼프 1기 중간선거와, 연말 증시 급락, 전부 뜯어봤습니다",
+          "channel": "경제사냥꾼",
+          "source_url": "https://www.youtube.com/watch?v=RBwnQi1ZHic",
+          "published_at": "2026-11-06T11:30:20+00:00",
+          "status": "unverified",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "strategy_validation_policy": "STANDARD_REVIEW",
+          "transcript_quality": {
+            "status": "good",
+            "score": 1.0,
+            "warnings": [],
+            "source": "automatic",
+            "language": "Korean (Original)",
+            "model_or_format": "json3",
+            "chars": 8829,
+            "segments": 457,
+            "duration_seconds": 894,
+            "repeated_ngram_ratio": 0.002
+          },
+          "claim_status_summary": {
+            "unverified": 12
+          },
+          "claims": [
+            {
+              "claim_id": "C1",
+              "claim_text": "2018년 선거 다음 날 S&P 500·나스닥 상승과 VIX 하락, 10~12월 급락, 2019년 반등·고점 회복 및 선거 후 수익률에 관한 주장이다.",
+              "status": "unverified",
+              "confidence": 0.0,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "등락률·최대낙폭·회복 기간을 검증된 투자 근거로 사용할 수 없다."
+            },
+            {
+              "claim_id": "C2",
+              "claim_text": "엔비디아는 2018년 10월 초부터 12월 24일까지 절반 넘게, 애플은 10월 초 고점부터 2019년 1월 3일까지 약 39% 하락했다.",
+              "status": "unverified",
+              "confidence": 0.0,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "과거 개별 종목 낙폭을 현재 종목의 예상 손실이나 회복 가능성으로 연결할 근거가 없다."
+            },
+            {
+              "claim_id": "C3",
+              "claim_text": "2018년 파월의 중립금리 발언, 네 번째 금리 인상·전망 조정·대차대조표 발언과 3년·5년물 역전, 2019년 인내심 표현·축소 종료 계획·첫 금리 인하에 관한 주장이다.",
+              "status": "unverified",
+              "confidence": 0.0,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "정책 전환의 시점과 내용을 확인하기 전에는 이를 시장 반등의 검증된 선행 신호로 간주할 수 없다."
+            },
+            {
+              "claim_id": "C4",
+              "claim_text": "2018년 12월 미중 무역휴전과 90일 협상, 관세맨 발언·화웨이 CFO 체포 공개, 2019년 관세 인상 연기 및 재인상·중국 보복에 관한 주장이다.",
+              "status": "unverified",
+              "confidence": 0.0,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "휴전 조건과 실제 관세 시행 범위를 확인하지 않고 무역 위험이 해소됐다고 판단할 수 없다."
+            },
+            {
+              "claim_id": "C5",
+              "claim_text": "2018년 의석 변화와 35일 셧다운·CBO 경제손실 추산, 2025년 43일 셧다운 및 2026년 12월 11일 예산 시한에 관한 주장이다.",
+              "status": "unverified",
+              "confidence": 0.0,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "예산 시한과 손실 추산을 확인하기 전에는 셧다운 위험의 시점·규모를 수치화할 수 없다."
+            },
+            {
+              "claim_id": "C6",
+              "claim_text": "2018년 10월 초 유가가 약 76달러에서 12월 24일 약 42달러로 44% 넘게 하락했으며 공급 증가와 수요 둔화 우려가 겹쳤다.",
+              "status": "unverified",
+              "confidence": 0.0,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "유종과 계약·가격 기준을 식별하기 전에는 해당 하락률을 투자 비교에 사용할 수 없다."
+            }
+          ],
+          "entities": [
+            {
+              "ticker": "SPX",
+              "name": "S&P 500",
+              "status": "unverified",
+              "verification_notes": [
+                "시장 데이터 조회 실패: no_usable_market_fields"
+              ]
+            },
+            {
+              "ticker": "IXIC",
+              "name": "나스닥 종합지수",
+              "status": "unverified",
+              "verification_notes": [
+                "시장 데이터 조회 실패: no_usable_market_fields"
+              ]
+            },
+            {
+              "ticker": "NVDA",
+              "name": "엔비디아",
+              "status": "unverified",
+              "verification_notes": [
+                "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+              ]
+            },
+            {
+              "ticker": "AAPL",
+              "name": "애플",
+              "status": "unverified",
+              "verification_notes": [
+                "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+              ]
+            },
+            {
+              "ticker": "CL=F",
+              "name": "국제유가",
+              "status": "unverified",
+              "verification_notes": [
+                "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+              ]
+            }
+          ],
+          "evidence": [
+            {
+              "evidence_id": "E1",
+              "claim_id": "C3",
+              "title": "Own a Semiconductor ETF? Lam Research’s Buyback Move Affects You",
+              "source_url": "https://finance.yahoo.com/markets/stocks/articles/own-semiconductor-etf-lam-research-200309029.html",
+              "publisher": "24/7 Wall St.",
+              "published_at": "2026-11-06T20:03:09+00:00",
+              "source_tier": "news"
+            },
+            {
+              "evidence_id": "E2",
+              "claim_id": "C6",
+              "title": "Crude gains on worries about renewed US attacks on Iran",
+              "source_url": "https://finance.yahoo.com/news/oil-set-sharp-weekly-drop-052924519.html",
+              "publisher": "Reuters",
+              "published_at": "2026-11-06T21:47:23+00:00",
+              "source_tier": "news"
+            }
+          ]
+        }
+      },
+      {
+        "event_key": "KDcZetfBb-s",
+        "content_sha256": "b55ccddd178bc7ac017c246c653d0a78126aedbd12c974724e7f9ab8558d21f5",
+        "occurred_at": "2026-11-06T11:00:15+00:00",
+        "relevance": {
+          "tickers": [
+            "^KS11",
+            "CL=F"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "verified_entities"
+        },
+        "strategy_source_tier": "STANDARD",
+        "strategy_evidence_weight": "STANDARD",
+        "summary": {
+          "video_id": "KDcZetfBb-s",
+          "title": "\"반도체 여기서 끝난다고?\"…폭락에도 대세 상승 전망 유지, 다음 주 반등의 진짜 변수ㅣ명민준, 박가영, 유창희 [주린이 구조대]",
+          "channel": "삼프로TV 3PROTV",
+          "source_url": "https://www.youtube.com/watch?v=KDcZetfBb-s",
+          "published_at": "2026-11-06T11:00:15+00:00",
+          "status": "unverified",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "strategy_validation_policy": "STANDARD_REVIEW",
+          "transcript_quality": {
+            "status": "good",
+            "score": 1.0,
+            "warnings": [],
+            "source": "automatic",
+            "language": "Korean",
+            "model_or_format": "json3",
+            "chars": 24201,
+            "segments": 1490,
+            "duration_seconds": 3008,
+            "repeated_ngram_ratio": 0.0
+          },
+          "claim_status_summary": {
+            "partially_supported": 1,
+            "unverified": 11
+          },
+          "claims": [
+            {
+              "claim_id": "C1",
+              "claim_text": "게시일은 2026-11-06이나 방송의 오늘·어제·다음 주에 대응하는 녹화일과 거래일은 미확인이다.",
+              "status": "partially_supported",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "녹화 기준일을 확정하기 전에는 당일 등락률·전일 종가·다음 주 일정을 특정 거래일에 연결할 수 없다."
+            },
+            {
+              "claim_id": "C2",
+              "claim_text": "한국 증시가 당일 약 5~6% 하락했고 외국인이 2.7조원을 순매도했으며 최근 누적 순매도는 수정 발언 기준 약 9.3조원이라는 주장이다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "급락 규모와 외국인 매도 중단 여부를 투자 근거로 사용하려면 동일 시장·동일 기간의 거래소 원자료가 필요하다."
+            },
+            {
+              "claim_id": "C3",
+              "claim_text": "전일 미국 증시 약 5.5%·장중 약 6% 하락이 코로나 이후 처음이고 반도체지수는 12% 하락했으며 미국·일본 증시는 7월 저점을 이탈했다는 주장이다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "폭락의 역사적 규모나 글로벌 저점 이탈을 확정된 시장 신호로 제시할 근거가 부족하다."
+            },
+            {
+              "claim_id": "C4",
+              "claim_text": "블루웨이브 이후 민주당의 데이터센터 발언이 급락을 촉발했고 텍사스 관계자가 기존 사업 허용을 시사했으며 메타·구글은 대체 입지를 언급했다는 주장이다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "정책 완화를 반등 촉매로 평가하기 전에 실제 발언자·정책 단계·적용 대상을 확인해야 한다."
+            },
+            {
+              "claim_id": "C5",
+              "claim_text": "미국 10년물 금리가 4.829%이고 과거 5.3% 이후 횡보했으며 유가는 하락하고 엔비디아 CDS 프리미엄은 상승했다는 주장이다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "금리·유가 안정과 신용위험 완화를 이미 확인된 반등 근거로 간주할 수 없다."
+            },
+            {
+              "claim_id": "C6",
+              "claim_text": "미국인 50% 이상이 주식을 보유하고 퇴직연금 관련 비율은 80%, 주식 비중은 60~70% 이상이라는 주장이다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "이 비율들로 미국 가계의 손실 노출이나 정책 대응 압력을 정량화할 수 없다."
+            }
+          ],
+          "entities": [
+            {
+              "ticker": "^KS11",
+              "name": "한국 증시·외국인 수급",
+              "status": "unverified",
+              "verification_notes": [
+                "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+              ]
+            },
+            {
+              "ticker": "CL=F",
+              "name": "미국 데이터센터 정책·금리·유가",
+              "status": "unverified",
+              "verification_notes": [
+                "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+              ]
+            }
+          ],
+          "evidence": [
+            {
+              "evidence_id": "E1",
+              "claim_id": "C1",
+              "title": "Coeur to Participate in RBC Capital Markets London Precious Metals Conference",
+              "source_url": "https://finance.yahoo.com/markets/commodities/articles/coeur-participate-rbc-capital-markets-213000159.html",
+              "publisher": "Business Wire",
+              "published_at": "2026-11-06T21:30:00+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E2",
+              "claim_id": "C1",
+              "title": "Monster Beverage Strong Sales Momentum Offset by Margin Pressure, RBC Says",
+              "source_url": "https://finance.yahoo.com/markets/stocks/articles/monster-beverage-strong-sales-momentum-202719672.html",
+              "publisher": "MT Newswires",
+              "published_at": "2026-11-06T20:27:19+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E4",
+              "claim_id": "C2",
+              "title": "PS Logistics expands Tennessee flatbed presence with Roane acquisition",
+              "source_url": "https://finance.yahoo.com/small-business/articles/ps-logistics-expands-tennessee-flatbed-182158554.html",
+              "publisher": "FreightWaves",
+              "published_at": "2026-11-06T18:21:58+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E5",
+              "claim_id": "C4",
+              "title": "Tech Stock Sell-Off 'Golden Buying Opportunity,' Says Dan Ives",
+              "source_url": "https://finance.yahoo.com/m/aeb920dc-4bcd-3531-8458-6a642b7135df/tech-stock-sell-off-%27golden.html",
+              "publisher": "Investor's Business Daily",
+              "published_at": "2026-11-06T21:46:35+00:00",
+              "source_tier": "news"
+            }
+          ]
+        }
+      },
+      {
+        "event_key": "K-9W77Ub-08",
+        "content_sha256": "2853b98427d31aee276b01a7856036e3566596f9688a88680c795bc5c772a2d0",
+        "occurred_at": "2026-11-06T11:00:12+00:00",
+        "relevance": {
+          "tickers": [],
+          "markets": [],
+          "themes": [],
+          "match_basis": "title_and_claim_context"
+        },
+        "strategy_source_tier": "STANDARD",
+        "strategy_evidence_weight": "STANDARD",
+        "summary": {
+          "video_id": "K-9W77Ub-08",
+          "title": "[#찐시황] “지금은 쇠심줄처럼 버텨야 한다!” 비정상적인 주가폭락, 결국 정상화된다..  외국인 오늘도 선물 1.5조 매수한 진짜 이유! | 김동엽 대표",
+          "channel": "815Money talk",
+          "source_url": "https://www.youtube.com/watch?v=K-9W77Ub-08",
+          "published_at": "2026-11-06T11:00:12+00:00",
+          "status": "unverified",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "strategy_validation_policy": "STANDARD_REVIEW",
+          "transcript_quality": {
+            "status": "good",
+            "score": 1.0,
+            "warnings": [],
+            "source": "automatic",
+            "language": "Korean",
+            "model_or_format": "json3",
+            "chars": 11081,
+            "segments": 566,
+            "duration_seconds": 1576,
+            "repeated_ngram_ratio": 0.0
+          },
+          "claim_status_summary": {
+            "unverified": 12
+          },
+          "claims": [
+            {
+              "claim_id": "C1",
+              "claim_text": "국내 지수 5,000 이탈·4,911 부근·종가 약 -6%, 09:03 서킷브레이커와 장중 약 4% 반등, 미국 전일 나스닥 -5.5%·반도체지수 -12%·시총 3조 달러 감소, 선거 직후 다우 +1,500포인트 및 방송 당시 나스닥 선물 +0.8% 주장.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "급락 규모나 거래중단 유형을 확정 사실로 인용하거나 이를 저점 판단의 근거로 삼기 어렵다."
+            },
+            {
+              "claim_id": "C2",
+              "claim_text": "민주당 압승, 텍사스 신임 공무원의 데이터센터 건설 중단 명령, 약 40개 지역 승인 투표 및 내년 1월 3일 의원·주지사 취임을 주장하며 규제 우려를 급락 원인으로 해석한다. 머스크 외 기술업계 인사 대부분의 민주당 후원 주장도 포함한다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "AI 규제 충격의 범위와 지속기간은 실제 정책 원문을 확인한 뒤 판단해야 한다."
+            },
+            {
+              "claim_id": "C3",
+              "claim_text": "긴급 F4 회의에서 신용거래 관련 조치를 3개월 유예했고 통상 담보비율은 약 140%라는 주장이다. 120~130% 완화를 가정하고 대만 공매도 제한과 한국 MSCI 평가 영향을 거론한다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "신용계좌의 반대매매 유예 여부와 담보 기준은 해당 증권사의 실제 적용 조건을 확인해야 한다."
+            },
+            {
+              "claim_id": "C4",
+              "claim_text": "외국인 연초 이후 매도 210조 원 초과, 전일 현물 3.4조 원과 당일 예상 2.5조 원·후반 2.7조 원 초과 매도, NXT 포함 초기 2억 원 순매수 후 순매도 전환, 전일·당일 14시 이후 선물 각각 2조·1.5조 원 매수 주장이다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "선물 매수를 방향성 상승 신호로 단정할 수 없으며 현물·선물의 범위와 구간을 맞춰 확인해야 한다."
+            },
+            {
+              "claim_id": "C5",
+              "claim_text": "삼성전자·SK하이닉스의 다음 달 또는 다음 분기 실적은 AI 규제 우려로 훼손되지 않으며 11일경 월초 10일 수출 발표가 이를 뒷받침할 것이라는 전망이다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "실적 방어는 확정 사실이 아닌 전망이며 수출과 기업별 수익성·수주를 따로 점검해야 한다."
+            },
+            {
+              "claim_id": "C6",
+              "claim_text": "노태문 약 6억 원 매입, 지난 7월 최태원 40억 원 초과 매입과 다음 날 상한가, 작년 봄 삼성전자 경영진 매입 이후 2~3개월 정체 및 8월 상승 주장이다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "매입 주체·대상·규모와 당시 주가 반응을 확인하기 전에는 내부자 확신의 증거로 사용하기 어렵다."
+            }
+          ],
+          "entities": [],
+          "evidence": [
+            {
+              "evidence_id": "E1",
+              "claim_id": "C1",
+              "title": "Stock market today: Nasdaq and S&P 500 rebound, Dow slips to cap bruising week for AI stocks",
+              "source_url": "https://finance.yahoo.com/markets/live/stock-market-today-friday-november-6-dow-sp-500-nasdaq-jobs-report-earnings-135953863.html",
+              "publisher": "Yahoo Finance",
+              "published_at": "2026-11-06T21:59:10+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E2",
+              "claim_id": "C1",
+              "title": "Stock Market Today: Nasdaq Rallies In Tech Turnaround; Airbnb Rockets Higher",
+              "source_url": "https://finance.yahoo.com/m/259a2432-7041-3624-978f-9a7336f10b31/stock-market-today%3A-nasdaq.html",
+              "publisher": "Investor's Business Daily",
+              "published_at": "2026-11-06T21:52:14+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E4",
+              "claim_id": "C2",
+              "title": "Monster Beverage Strong Sales Momentum Offset by Margin Pressure, RBC Says",
+              "source_url": "https://finance.yahoo.com/markets/stocks/articles/monster-beverage-strong-sales-momentum-202719672.html",
+              "publisher": "MT Newswires",
+              "published_at": "2026-11-06T20:27:19+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E5",
+              "claim_id": "C4",
+              "title": "Liberty Gold Reports Q3 2026 Financial and Operating Results",
+              "source_url": "https://finance.yahoo.com/markets/commodities/articles/liberty-gold-reports-q3-2026-220000709.html",
+              "publisher": "GlobeNewswire",
+              "published_at": "2026-11-06T22:00:00+00:00",
+              "source_tier": "news"
+            },
+            {
+              "evidence_id": "E6",
+              "claim_id": "C4",
+              "title": "Plains All American Pipeline, L.P. Q3 2026 Earnings Call Summary",
+              "source_url": "https://finance.yahoo.com/markets/stocks/articles/plains-american-pipeline-l-p-215337799.html",
+              "publisher": "Moby",
+              "published_at": "2026-11-06T21:53:37+00:00",
+              "source_tier": "news"
+            }
+          ]
+        }
+      },
+      {
+        "event_key": "kx3F4X6skkA",
+        "content_sha256": "31da36a843f84dec4d554e03d44aeccb4cd6472f6adeec6a17e72082a5a58d61",
+        "occurred_at": "2026-11-06T09:30:03+00:00",
+        "relevance": {
+          "tickers": [
+            "PLTR",
+            "AMZN",
+            "AAPL",
+            "CL=F"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "verified_entities"
+        },
+        "strategy_source_tier": "STANDARD",
+        "strategy_evidence_weight": "STANDARD",
+        "summary": {
+          "video_id": "kx3F4X6skkA",
+          "title": "현재 월가에서 준비 중인 '트럼프 탄핵' 시나리오",
+          "channel": "경제사냥꾼",
+          "source_url": "https://www.youtube.com/watch?v=kx3F4X6skkA",
+          "published_at": "2026-11-06T09:30:03+00:00",
+          "status": "unverified",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "strategy_validation_policy": "STANDARD_REVIEW",
+          "transcript_quality": {
+            "status": "good",
+            "score": 1.0,
+            "warnings": [],
+            "source": "automatic",
+            "language": "Korean (Original)",
+            "model_or_format": "json3",
+            "chars": 8936,
+            "segments": 466,
+            "duration_seconds": 886,
+            "repeated_ngram_ratio": 0.003
+          },
+          "claim_status_summary": {
+            "unverified": 10
+          },
+          "claims": [
+            {
+              "claim_id": "C1_1",
+              "claim_text": "칼시의 탄핵 소추 계약 가격과 파면까지 포함한 계약 가격은 서로 다른 사건을 반영하며, 영상은 파면보다 조사 확대 가능성을 강조한다.",
+              "status": "unverified",
+              "confidence": 0.0,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "탄핵 소추와 파면을 구분하되, 확인되지 않은 계약 가격을 투자 판단의 정량 근거로 사용하지 않는다."
+            },
+            {
+              "claim_id": "C1_2",
+              "claim_text": "영상은 민주당의 양원 장악으로 새 의회에서 조사·청문회·소환장 활용과 인준·예산을 통한 행정부 견제가 강화될 것으로 본다.",
+              "status": "unverified",
+              "confidence": 0.0,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "정부 거래 기업의 위험을 평가하기 전에 최종 의석수와 공식 위원회 조치를 확인한다."
+            },
+            {
+              "claim_id": "C1_3",
+              "claim_text": "영상이 인용한 월가 자료들은 탄핵 소추 가능성 상승과 낮은 파면 가능성을 구분하며, 정치적 교착에도 의회 조사·행정명령·기관 결정이 주가를 흔들 수 있다고 본다.",
+              "status": "unverified",
+              "confidence": 0.0,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "‘월가의 탄핵 시나리오’를 확인된 기관 공통 전망으로 취급하지 않는다."
+            },
+            {
+              "claim_id": "C2_1",
+              "claim_text": "정부 거래 관련 조사 대상으로 보도에 거론됐으며, 정부 매출 비중이 크지만 미국 민간 기업 고객 매출도 더 빠르게 성장하고 있다고 설명한다.",
+              "status": "unverified",
+              "confidence": 0.0,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "공식 부문별 실적과 조사 관련 원문을 확보하기 전에는 정부 의존도와 민간 성장의 상쇄 효과를 확정하지 않는다."
+            },
+            {
+              "claim_id": "C2_2",
+              "claim_text": "이번 3분기 전체 매출 23억 달러 중 미국 정부 매출 비중은 약 41%, 해당 정부 매출 증가율은 전년 대비 96%로 제시한다.",
+              "status": "unverified",
+              "confidence": 0.0,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "정부 매출 의존도와 성장률에 근거한 평가는 동일 분기·동일 매출 범주의 공시 확인 후 수행한다."
+            },
+            {
+              "claim_id": "C2_3",
+              "claim_text": "같은 분기 미국 기업 고객 매출은 미국 정부 매출보다 조금 많고 전년 대비 148% 증가했다고 설명한다.",
+              "status": "unverified",
+              "confidence": 0.0,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "미국 상업 부문의 매출 금액·성장률·총매출 기여도를 함께 확인한다."
+            }
+          ],
+          "entities": [
+            {
+              "ticker": "PLTR",
+              "name": "팔란티어",
+              "status": "unverified",
+              "verification_notes": [
+                "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+              ]
+            },
+            {
+              "ticker": "AMZN",
+              "name": "아마존",
+              "status": "unverified",
+              "verification_notes": [
+                "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+              ]
+            },
+            {
+              "ticker": "AAPL",
+              "name": "애플",
+              "status": "unverified",
+              "verification_notes": [
+                "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+              ]
+            },
+            {
+              "ticker": "CL=F",
+              "name": "이란·원유·물가·연준",
+              "status": "unverified",
+              "verification_notes": [
+                "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+              ]
+            }
+          ],
+          "evidence": [
+            {
+              "evidence_id": "E1",
+              "claim_id": "C2_1",
+              "title": "Palantir Technologies Inc. (PLTR) Delivered Explosive AI Growth: Is the Stock Still Worth Watching?",
+              "source_url": "https://finance.yahoo.com/markets/stocks/articles/palantir-technologies-inc-pltr-delivered-173014252.html",
+              "publisher": "Insider Monkey",
+              "published_at": "2026-11-06T17:30:14+00:00",
+              "source_tier": "market_or_news"
+            }
+          ]
+        }
+      },
+      {
+        "event_key": "3p46zdKHT9I",
+        "content_sha256": "9e66bcf7c79fed42cc562f6db44c09665bb58690a3cde5250ee2d058293c9a9d",
+        "occurred_at": "2026-11-06T09:30:03+00:00",
+        "relevance": {
+          "tickers": [
+            "MSFT",
+            "005930,000660",
+            "^KS11"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "verified_entities"
+        },
+        "strategy_source_tier": "STANDARD",
+        "strategy_evidence_weight": "STANDARD",
+        "summary": {
+          "video_id": "3p46zdKHT9I",
+          "title": "[#긴급시황] AI 반도체 폭락장, 펀더멘털 붕괴인가? 헤지펀드 강제 청산으로 인한 노이즈인가? | 이슬이 대표",
+          "channel": "815Money talk",
+          "source_url": "https://www.youtube.com/watch?v=3p46zdKHT9I",
+          "published_at": "2026-11-06T09:30:03+00:00",
+          "status": "asr_uncertain",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "strategy_validation_policy": "STANDARD_REVIEW",
+          "transcript_quality": {
+            "status": "good",
+            "score": 1.0,
+            "warnings": [],
+            "source": "automatic",
+            "language": "Korean",
+            "model_or_format": "json3",
+            "chars": 9119,
+            "segments": 473,
+            "duration_seconds": 1248,
+            "repeated_ngram_ratio": 0.0
+          },
+          "claim_status_summary": {
+            "unverified": 9,
+            "partially_supported": 1,
+            "asr_uncertain": 2
+          },
+          "claims": [
+            {
+              "claim_id": "C1",
+              "claim_text": "SOX가 약 9% 하락 마감했고 코스피가 장중 4,923으로 5,000선·7월 말 저점을 하회했으며 서킷브레이커가 발동했다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "급락 규모와 거래중단 여부를 확인된 사실로 제시하지 말고 Nasdaq·KRX 원자료를 확인해야 한다."
+            },
+            {
+              "claim_id": "C2",
+              "claim_text": "AI 반도체 집중 포지션과 과도한 레버리지의 기계적 청산이 미국 급락의 주원인이며 한국으로 전이됐다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "급락을 일시적 강제청산으로 단정하면 실적·투자 둔화 위험을 과소평가할 수 있다."
+            },
+            {
+              "claim_id": "C3",
+              "claim_text": "민주당 양원 장악 가능성 확대와 텍사스 규제 지지 후보 승리로 데이터센터 전력망 규제가 현실화되며 내년 1월 새 정부가 출범한다.",
+              "status": "unverified",
+              "confidence": 0.98,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "선거 관련 우려와 실제 시행되는 규제를 구분하고, 확인된 정책만 투자 가정에 반영해야 한다."
+            },
+            {
+              "claim_id": "C4",
+              "claim_text": "마이크로소프트가 데이터센터 추가 확장을 취소·보류했지만 기존 장기계약은 파기하지 않았다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "신규 계획 조정과 기존 확정계약 해지를 구분하기 전에는 투자 축소 규모나 공급망 영향을 추정하기 어렵다."
+            },
+            {
+              "claim_id": "C5",
+              "claim_text": "반도체 급락 대비 알파벳·MSFT 약 2~3%, 애플 약 1~2% 하락 및 전일 하이퍼스케일러 상승은 하드웨어에서 소프트웨어로의 자금 순환을 보여준다.",
+              "status": "partially_supported",
+              "confidence": 0.93,
+              "supporting_evidence_ids": [
+                "E4"
+              ],
+              "manual_check_required": true,
+              "investor_implication": "업종 간 차별화에는 제한적 보도 근거가 있지만 구체적 등락률과 순환매 결론은 추가 검증이 필요하다."
+            },
+            {
+              "claim_id": "C6",
+              "claim_text": "아마존·인텔 전망 발표 이후 ROI 논란이 이어졌으며 규제로 설비투자 증가율이 둔화될 수 있다. 투자와 차년도 지출 예시도 제시했다.",
+              "status": "unverified",
+              "confidence": 0.98,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "투자 둔화는 확인된 사실이 아니라 위험 시나리오로 다루고, 예시 금액을 확정 가이던스로 인용하지 않아야 한다."
+            }
+          ],
+          "entities": [
+            {
+              "ticker": "MSFT",
+              "name": "마이크로소프트",
+              "status": "unverified",
+              "verification_notes": [
+                "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+              ]
+            },
+            {
+              "ticker": "005930,000660",
+              "name": "삼성전자·SK하이닉스",
+              "status": "unverified",
+              "verification_notes": [
+                "시장 데이터 조회 실패: no_usable_market_fields"
+              ]
+            },
+            {
+              "ticker": "^KS11",
+              "name": "코스피 지지선·반대매매 관련 조치",
+              "status": "unverified",
+              "verification_notes": [
+                "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+              ]
+            }
+          ],
+          "evidence": [
+            {
+              "evidence_id": "E1",
+              "claim_id": "C1",
+              "title": "Monster Beverage Strong Sales Momentum Offset by Margin Pressure, RBC Says",
+              "source_url": "https://finance.yahoo.com/markets/stocks/articles/monster-beverage-strong-sales-momentum-202719672.html",
+              "publisher": "MT Newswires",
+              "published_at": "2026-11-06T20:27:19+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E2",
+              "claim_id": "C1",
+              "title": "PS Logistics expands Tennessee flatbed presence with Roane acquisition",
+              "source_url": "https://finance.yahoo.com/small-business/articles/ps-logistics-expands-tennessee-flatbed-182158554.html",
+              "publisher": "FreightWaves",
+              "published_at": "2026-11-06T18:21:58+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E4",
+              "claim_id": "C2",
+              "title": "ETF Zoo: How the Election Splits Big Tech",
+              "source_url": "https://finance.yahoo.com/markets/stocks/articles/etf-zoo-election-splits-big-220244256.html",
+              "publisher": "etf.com",
+              "published_at": "2026-11-06T22:02:44+00:00",
+              "source_tier": "market_or_news"
+            }
+          ]
+        }
+      },
+      {
+        "event_key": "4Z5wNpIrOLs",
+        "content_sha256": "b5e9274de2b15154aa0ec662f6112291da1773b58fa15530389746a227f98aba",
+        "occurred_at": "2026-11-06T09:03:51+00:00",
+        "relevance": {
+          "tickers": [
+            "005930",
+            "000660",
+            "^KS11",
+            "259960"
+          ],
+          "markets": [
+            "KR",
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "verified_entities"
+        },
+        "strategy_source_tier": "STANDARD",
+        "strategy_evidence_weight": "STANDARD",
+        "summary": {
+          "video_id": "4Z5wNpIrOLs",
+          "title": "반도체 폭락 부른 AI 투자 불확실성…5,500 아래는 '극심한 바닥', 내년 1월이 반등의 분기점?ㅣ홍선애, 박승영 한화투자증권 PLUS자산전략팀장 [여의도 인사이트]",
+          "channel": "삼프로TV 3PROTV",
+          "source_url": "https://www.youtube.com/watch?v=4Z5wNpIrOLs",
+          "published_at": "2026-11-06T09:03:51+00:00",
+          "status": "asr_uncertain",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "strategy_validation_policy": "STANDARD_REVIEW",
+          "transcript_quality": {
+            "status": "good",
+            "score": 1.0,
+            "warnings": [],
+            "source": "automatic",
+            "language": "Korean",
+            "model_or_format": "json3",
+            "chars": 18281,
+            "segments": 1014,
+            "duration_seconds": 2144,
+            "repeated_ngram_ratio": 0.0
+          },
+          "claim_status_summary": {
+            "unverified": 9,
+            "asr_uncertain": 1,
+            "partially_supported": 2
+          },
+          "claims": [
+            {
+              "claim_id": "C1",
+              "claim_text": "텍사스 주지사가 민주당으로 교체됐고 기존 주지사 연임 확률은 77%였으며, 이로 인한 데이터센터 정책 불확실성이 반도체 급락의 핵심 원인이다. 2027년 1월 취임·가이드라인이 반등 계기가 될 수 있다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "선거 결과와 실제 허가 정책을 확인하기 전에는 텍사스 정치 변화나 1월 반등을 투자 판단의 확정 전제로 삼기 어렵다."
+            },
+            {
+              "claim_id": "C2",
+              "claim_text": "2030년 미국 데이터센터 계획 중 텍사스 비중은 30%, 현재 진척률은 35%이며 미국 100GW·중국 50GW, 향후 1GW급 약 100개가 계획돼 있다. 건설에는 3년 또는 1.5년이 걸린다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "계획·접속신청 용량을 확정 건설이나 반도체 주문으로 환산하지 말고 허가·착공·가동 단계별 실현 가능성을 확인해야 한다."
+            },
+            {
+              "claim_id": "C3",
+              "claim_text": "18홀 골프장이 1GW 데이터센터보다 물을 30% 더 쓰며 미국에는 약 1만 개, 텍사스에는 약 900개가 있으므로 물 부족 우려는 주로 정치적 수사다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "물 부족의 실질적 영향은 개별 프로젝트의 용수 허가·냉각설계·지역 공급능력으로 판단해야 한다."
+            },
+            {
+              "claim_id": "C4",
+              "claim_text": "데이터센터가 전기요금을 평균 9% 높일 수 있고 OpenAI가 비용을 부담하겠다고 했으며 기존 AI 전력수요 전망은 과소평가됐다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "요금 인상 전망과 특정 사업자의 비용 부담 약속을 전력회사 수익 증가나 주민 부담 해소로 바로 연결할 수 없다."
+            },
+            {
+              "claim_id": "C5",
+              "claim_text": "AI·데이터센터·IT 투자가 한 분기 빠지면 미국 성장 증분 약 30%가 사라진다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "30%를 미국 경제 규모의 손실로 읽지 말고 대상 분기·실질 성장기여도·수입 차감 여부를 확인해야 한다."
+            },
+            {
+              "claim_id": "C6",
+              "claim_text": "2027년 잉여현금흐름은 삼성전자 300빌리언 달러로 세계 최대, 애플 130빌리언 달러, 마이크로소프트 30빌리언 달러이며 SK하이닉스 수치는 자막에서 식별되지 않는다.",
+              "status": "asr_uncertain",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "금액·단위와 추정 원문을 확인하기 전에는 이 수치로 저평가나 기업 간 현금창출력 순위를 계산하지 않아야 한다."
+            }
+          ],
+          "entities": [
+            {
+              "ticker": "005930",
+              "name": "삼성전자",
+              "status": "unverified",
+              "verification_notes": [
+                "시장 데이터 조회 실패: no_usable_market_fields"
+              ]
+            },
+            {
+              "ticker": "000660",
+              "name": "SK하이닉스",
+              "status": "unverified",
+              "verification_notes": [
+                "시장 데이터 조회 실패: no_usable_market_fields"
+              ]
+            },
+            {
+              "ticker": "^KS11",
+              "name": "한국 주식시장·코스피",
+              "status": "unverified",
+              "verification_notes": [
+                "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+              ]
+            },
+            {
+              "ticker": "259960",
+              "name": "크래프톤",
+              "status": "unverified",
+              "verification_notes": [
+                "시장 데이터 조회 실패: no_usable_market_fields"
+              ]
+            }
+          ],
+          "evidence": [
+            {
+              "evidence_id": "E1",
+              "claim_id": "C1",
+              "title": "Monster Beverage Strong Sales Momentum Offset by Margin Pressure, RBC Says",
+              "source_url": "https://finance.yahoo.com/markets/stocks/articles/monster-beverage-strong-sales-momentum-202719672.html",
+              "publisher": "MT Newswires",
+              "published_at": "2026-11-06T20:27:19+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E2",
+              "claim_id": "C1",
+              "title": "PS Logistics expands Tennessee flatbed presence with Roane acquisition",
+              "source_url": "https://finance.yahoo.com/small-business/articles/ps-logistics-expands-tennessee-flatbed-182158554.html",
+              "publisher": "FreightWaves",
+              "published_at": "2026-11-06T18:21:58+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E4",
+              "claim_id": "C2",
+              "title": "Charlie Bilello Says “Some Sanity Has Returned to the Market.” What That Means for Your Portfolio",
+              "source_url": "https://finance.yahoo.com/markets/stocks/articles/charlie-bilello-says-sanity-returned-220728855.html",
+              "publisher": "24/7 Wall St.",
+              "published_at": "2026-11-06T22:07:28+00:00",
+              "source_tier": "news"
+            },
+            {
+              "evidence_id": "E5",
+              "claim_id": "C8",
+              "title": "Canadian Natural Resources Q3 Earnings Call Highlights",
+              "source_url": "https://finance.yahoo.com/energy/articles/canadian-natural-resources-q3-earnings-221436034.html",
+              "publisher": "MarketBeat",
+              "published_at": "2026-11-06T22:14:36+00:00",
+              "source_tier": "news"
+            },
+            {
+              "evidence_id": "E6",
+              "claim_id": "C8",
+              "title": "Liberty Gold Reports Q3 2026 Financial and Operating Results",
+              "source_url": "https://finance.yahoo.com/markets/commodities/articles/liberty-gold-reports-q3-2026-220000709.html",
+              "publisher": "GlobeNewswire",
+              "published_at": "2026-11-06T22:00:00+00:00",
+              "source_tier": "news"
+            },
+            {
+              "evidence_id": "E8",
+              "claim_id": "C11",
+              "title": "Ondas Surges 15% as Drone Stocks Rebound Ahead of Its Earnings Report; Red Cat Jumps 14%, AeroVironment Surges 9%",
+              "source_url": "https://finance.yahoo.com/markets/stocks/articles/ondas-surges-15-drone-stocks-180530952.html",
+              "publisher": "24/7 Wall St.",
+              "published_at": "2026-11-06T18:05:30+00:00",
+              "source_tier": "news"
+            }
+          ]
+        }
+      },
+      {
+        "event_key": "YfCWFPKMFSw",
+        "content_sha256": "c3925e9fff2cb76586c6a7846db4b53a649c4a007098daf642bc5728a65c7ac5",
+        "occurred_at": "2026-11-06T08:30:11+00:00",
+        "relevance": {
+          "tickers": [],
+          "markets": [],
+          "themes": [],
+          "match_basis": "title_and_claim_context"
+        },
+        "strategy_source_tier": "STANDARD",
+        "strategy_evidence_weight": "STANDARD",
+        "summary": {
+          "video_id": "YfCWFPKMFSw",
+          "title": "[#긴급시황] “공매도 압박, 결국 선 넘었다!” 한시적 공매도 제한 필요..  삼성전자·SK하이닉스  손절하기 전 반드시 확인할 ‘이 신호’!   | 주식황금돼지 이건희 대표",
+          "channel": "815Money talk",
+          "source_url": "https://www.youtube.com/watch?v=YfCWFPKMFSw",
+          "published_at": "2026-11-06T08:30:11+00:00",
+          "status": "asr_uncertain",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "strategy_validation_policy": "STANDARD_REVIEW",
+          "transcript_quality": {
+            "status": "good",
+            "score": 1.0,
+            "warnings": [],
+            "source": "automatic",
+            "language": "Korean",
+            "model_or_format": "json3",
+            "chars": 11752,
+            "segments": 584,
+            "duration_seconds": 1299,
+            "repeated_ngram_ratio": 0.0
+          },
+          "claim_status_summary": {
+            "unverified": 9,
+            "asr_uncertain": 2,
+            "partially_supported": 1
+          },
+          "claims": [
+            {
+              "claim_id": "C1",
+              "claim_text": "외국인 현물 매도·레버리지 인버스 매수와 공매도가 국내 증시 하락을 증폭시켰으며, 현대차·한미반도체·SM·카카오·하이브 등의 공매도 비율이 높았다는 주장.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "제시된 공매도 수치를 매매 근거나 숏커버링 예측에 사용하기 어렵다."
+            },
+            {
+              "claim_id": "C2",
+              "claim_text": "한시적 공매도 제한이 필요하다는 제안, 금융당국 대응 관련 발언 및 코스닥 5거래일 45%·10거래일 85% 상승의 시장경보 기준 관련 주장.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "공매도 제한 시행이나 제시된 상승률만으로 경보 지정 여부를 전제할 수 없다."
+            },
+            {
+              "claim_id": "C3",
+              "claim_text": "하나마이크론은 이익 대비 저평가, 한미반도체는 고평가이며 네이버는 보유·매수 가치가 있다는 평가.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "상대가치 비교나 네이버 매수 판단을 재현할 근거가 부족하다."
+            },
+            {
+              "claim_id": "C4",
+              "claim_text": "삼성전자·SK하이닉스의 주문 취소가 없고 메모리 수요가 공급을 초과하며 투자·생산계획이 유지되고, 2028년 공급 협상과 엄격한 위약 조항이 확보됐다는 주장.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "장기계약이 매출과 이익의 하방을 보장한다는 전제로 보유 판단을 내리기 어렵다."
+            },
+            {
+              "claim_id": "C5",
+              "claim_text": "삼성 HBM 비중 60% 이상, 천안 시설의 엑시노스 생산 중단·HBM 전환, 내년 HBM 출하 확대, 올해 380조 달러·내년 600조 달러 및 1월 말 배당·실적 발표 관련 주장.",
+              "status": "asr_uncertain",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "원음 복원 전에는 해당 수치를 실적 추정이나 가치평가 입력으로 사용하지 않아야 한다."
+            },
+            {
+              "claim_id": "C6",
+              "claim_text": "삼성이 고객에게 2030년까지 8인치 사업 철수를 통보했고, 물리적 AI·데이터센터 수요가 DB하이텍 수혜와 당일 반등을 유발했다는 주장.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "철수 일정과 DB하이텍 실적 수혜를 확정된 투자 촉매로 취급하기 어렵다."
+            }
+          ],
+          "entities": [],
+          "evidence": [
+            {
+              "evidence_id": "E1",
+              "claim_id": "C1",
+              "title": "Monster Beverage Strong Sales Momentum Offset by Margin Pressure, RBC Says",
+              "source_url": "https://finance.yahoo.com/markets/stocks/articles/monster-beverage-strong-sales-momentum-202719672.html",
+              "publisher": "MT Newswires",
+              "published_at": "2026-11-06T20:27:19+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E2",
+              "claim_id": "C1",
+              "title": "PS Logistics expands Tennessee flatbed presence with Roane acquisition",
+              "source_url": "https://finance.yahoo.com/small-business/articles/ps-logistics-expands-tennessee-flatbed-182158554.html",
+              "publisher": "FreightWaves",
+              "published_at": "2026-11-06T18:21:58+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E4",
+              "claim_id": "C3",
+              "title": "Did ETF Investors Buy the Dip Last Month?",
+              "source_url": "https://finance.yahoo.com/markets/options/articles/did-etf-investors-buy-dip-161000554.html",
+              "publisher": "Zacks",
+              "published_at": "2026-11-06T16:10:00+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E5",
+              "claim_id": "C8",
+              "title": "Vistra Corp. Q3 2026 Earnings Call Summary",
+              "source_url": "https://finance.yahoo.com/energy/articles/vistra-corp-q3-2026-earnings-220501061.html",
+              "publisher": "Moby",
+              "published_at": "2026-11-06T22:05:01+00:00",
+              "source_tier": "news"
+            },
+            {
+              "evidence_id": "E6",
+              "claim_id": "C8",
+              "title": "Nvidia Stock, Other AI Names Rebound After Sell-Off",
+              "source_url": "https://finance.yahoo.com/m/870e9d6a-dbbb-3380-9680-17f32e5017a1/nvidia-stock%2C-other-ai-names.html",
+              "publisher": "Investor's Business Daily",
+              "published_at": "2026-11-06T22:00:32+00:00",
+              "source_tier": "news"
+            }
+          ]
+        }
+      },
+      {
+        "event_key": "-6ktwDvP4vM",
+        "content_sha256": "cce17e9aeb259617b1a453be5a3dced0cad063ef8acecaab33c7ddd6b50f62d5",
+        "occurred_at": "2026-11-06T08:07:52+00:00",
+        "relevance": {
+          "tickers": [
+            "005930",
+            "000660"
+          ],
+          "markets": [
+            "KR"
+          ],
+          "themes": [],
+          "match_basis": "verified_entities"
+        },
+        "strategy_source_tier": "STANDARD",
+        "strategy_evidence_weight": "STANDARD",
+        "summary": {
+          "video_id": "-6ktwDvP4vM",
+          "title": "[11월 6일 마감시황] 업황이 정말 그만큼 나빠졌나…당장 실적보다 무서운 미래 투자 축소 우려ㅣ홍선애, 이권희, 하창완 [클로징벨 라이브]",
+          "channel": "삼프로TV 3PROTV",
+          "source_url": "https://www.youtube.com/watch?v=-6ktwDvP4vM",
+          "published_at": "2026-11-06T08:07:52+00:00",
+          "status": "unverified",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "strategy_validation_policy": "STANDARD_REVIEW",
+          "transcript_quality": {
+            "status": "good",
+            "score": 1.0,
+            "warnings": [],
+            "source": "automatic",
+            "language": "Korean",
+            "model_or_format": "json3",
+            "chars": 35249,
+            "segments": 2035,
+            "duration_seconds": 4184,
+            "repeated_ngram_ratio": 0.0
+          },
+          "claim_status_summary": {
+            "unverified": 9,
+            "partially_supported": 1
+          },
+          "claims": [
+            {
+              "claim_id": "C1",
+              "claim_text": "코스피·코스닥 급락과 서킷브레이커, 외국인 현물 대규모 순매도 및 선물 순매수가 발생했다는 주장.",
+              "status": "unverified",
+              "confidence": 0.98,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "외국인 현물 매도와 선물 매수의 규모·지속성을 확인하기 전 수급 반전을 확정하지 않는다."
+            },
+            {
+              "claim_id": "C2",
+              "claim_text": "미국 주지사 선거 이후 데이터센터 신규 허가·건설 규제 우려가 커졌고 기존 계획은 진행한다는 완화 발언이 있었다는 주장.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "규제 확정과 정치적 발언을 구분하고 기존 사업 예외를 공식 문서로 확인해야 한다."
+            },
+            {
+              "claim_id": "C3",
+              "claim_text": "미국 데이터센터 용량·프로젝트 집계를 근거로 미착공 물량이 주된 위험이며 반도체 공급 부족으로 실물 타격은 제한적이라는 주장.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "검증되지 않은 용량 집계를 반도체 장기 수요나 실적 추정의 입력값으로 사용하지 않는다."
+            },
+            {
+              "claim_id": "C4",
+              "claim_text": "삼성전자·SK하이닉스 급락, 국내 일부 종목 상대강세, 외국인 보유비율 및 반도체 시가총액 비중에 관한 주장.",
+              "status": "partially_supported",
+              "confidence": 0.9,
+              "supporting_evidence_ids": [
+                "M1"
+              ],
+              "manual_check_required": true,
+              "investor_implication": "삼성전자 하락률 일부만 보도와 부합한다. 종가·저점·보유비율·업종 비중은 매매 판단에 쓰기 전 거래소 자료로 확인해야 한다."
+            },
+            {
+              "claim_id": "C5",
+              "claim_text": "미국 기술주·반도체 지지선 붕괴, 12월 초 풋옵션 집중, 2029년 수주, 메모리 가격 약화 및 주주환원 일정과 추가 하락 시나리오에 관한 주장.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "풋옵션 집중이나 기술적 목표가를 확인된 하락 신호로 제시하지 않는다. 좋은 실적과 주가 반등의 관계도 조건부 해석으로 유지한다."
+            },
+            {
+              "claim_id": "C6",
+              "claim_text": "메타 경영진의 미국 규제에 따른 해외 데이터센터 검토 발언이 국내 데이터센터 관련주 강세를 촉발했다는 주장.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "해외 입지 검토와 국내 업체의 확정 수주를 구분해야 한다."
+            }
+          ],
+          "entities": [
+            {
+              "ticker": "005930",
+              "name": "삼성전자",
+              "status": "unverified",
+              "verification_notes": [
+                "시장 데이터 조회 실패: no_usable_market_fields"
+              ]
+            },
+            {
+              "ticker": "000660",
+              "name": "SK하이닉스",
+              "status": "unverified",
+              "verification_notes": [
+                "시장 데이터 조회 실패: no_usable_market_fields"
+              ]
+            }
+          ],
+          "evidence": [
+            {
+              "evidence_id": "E1",
+              "claim_id": "C1",
+              "title": "Monster Beverage Strong Sales Momentum Offset by Margin Pressure, RBC Says",
+              "source_url": "https://finance.yahoo.com/markets/stocks/articles/monster-beverage-strong-sales-momentum-202719672.html",
+              "publisher": "MT Newswires",
+              "published_at": "2026-11-06T20:27:19+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E2",
+              "claim_id": "C1",
+              "title": "PS Logistics expands Tennessee flatbed presence with Roane acquisition",
+              "source_url": "https://finance.yahoo.com/small-business/articles/ps-logistics-expands-tennessee-flatbed-182158554.html",
+              "publisher": "FreightWaves",
+              "published_at": "2026-11-06T18:21:58+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E4",
+              "claim_id": "C4",
+              "title": "Liberty Gold Reports Q3 2026 Financial and Operating Results",
+              "source_url": "https://finance.yahoo.com/markets/commodities/articles/liberty-gold-reports-q3-2026-220000709.html",
+              "publisher": "GlobeNewswire",
+              "published_at": "2026-11-06T22:00:00+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E5",
+              "claim_id": "C6",
+              "title": "Plains All American Pipeline, L.P. Q3 2026 Earnings Call Summary",
+              "source_url": "https://finance.yahoo.com/markets/stocks/articles/plains-american-pipeline-l-p-215337799.html",
+              "publisher": "Moby",
+              "published_at": "2026-11-06T21:53:37+00:00",
+              "source_tier": "news"
+            }
+          ]
+        }
+      },
+      {
+        "event_key": "5hh4zCU5bGk",
+        "content_sha256": "a66cfae3a7df91d7cef2a38bc893b27f3258ad0662f381d15500a2f09800b332",
+        "occurred_at": "2026-11-06T08:00:35+00:00",
+        "relevance": {
+          "tickers": [
+            "^KS11"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "verified_entities"
+        },
+        "strategy_source_tier": "STANDARD",
+        "strategy_evidence_weight": "STANDARD",
+        "summary": {
+          "video_id": "5hh4zCU5bGk",
+          "title": "\"다시 오를 수 있다고?!\" 월가 족집게가 콕 집은 폭락장 증시 전망",
+          "channel": "경제사냥꾼",
+          "source_url": "https://www.youtube.com/watch?v=5hh4zCU5bGk",
+          "published_at": "2026-11-06T08:00:35+00:00",
+          "status": "unverified",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "strategy_validation_policy": "STANDARD_REVIEW",
+          "transcript_quality": {
+            "status": "good",
+            "score": 1.0,
+            "warnings": [],
+            "source": "automatic",
+            "language": "Korean (Original)",
+            "model_or_format": "json3",
+            "chars": 8939,
+            "segments": 466,
+            "duration_seconds": 888,
+            "repeated_ngram_ratio": 0.002
+          },
+          "claim_status_summary": {
+            "unverified": 9,
+            "partially_supported": 1
+          },
+          "claims": [
+            {
+              "claim_id": "C1",
+              "claim_text": "윌슨이 10월 19일 위험자산 확대와 11월 1일 하락 시 매수를 권고했고, S&P 500의 7,100 조정 후 연말 8,000, AI 자금조달 부담의 약 30일 내 완화 및 반도체 지수의 11월 중순까지 추가 10~15% 하락을 전망했다는 주장.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "7,100·8,000을 검증된 투자 기준으로 사용하지 말고 발언 원문, 대상 연도와 조건을 먼저 확인해야 한다."
+            },
+            {
+              "claim_id": "C2",
+              "claim_text": "윌슨의 2022년 말 목표 4,400과 실제 종가 3,839, 2023년 초 전망 3,000~3,300과 실제 1분기 최저 종가 3,808·연말 4,769, 2025년 4월 14일 저점 재시험 경고 및 회복 전망에 관한 주장.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "제시된 사례만으로 예측 정확도나 현재 전망의 신뢰도를 산정할 수 없다."
+            },
+            {
+              "claim_id": "C3",
+              "claim_text": "10월 19일 보도에 인용된 블룸버그 인텔리전스의 S&P 500 기업 3분기 순이익 증가율 전망이 전년 대비 약 25%였다는 주장.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "약 25% 이익 증가를 반등의 검증된 근거로 반영하기에는 자료가 부족하다."
+            },
+            {
+              "claim_id": "C4",
+              "claim_text": "민주당의 중간선거 압승 이후 데이터센터 규제 우려가 반도체·AI 주식 급락과 한국 외국인 매도로 전이됐고, 11월 4일 미국장 상승 뒤 분위기가 반전됐다는 주장.",
+              "status": "partially_supported",
+              "confidence": 0.85,
+              "supporting_evidence_ids": [
+                "E2",
+                "E3"
+              ],
+              "manual_check_required": true,
+              "investor_implication": "선거·AI 투자 우려라는 배경은 일부 부합하지만 규제 시행과 한국 시장 전이 경로는 별도로 확인해야 한다."
+            },
+            {
+              "claim_id": "C5",
+              "claim_text": "중간선거 이후 6개월~1년 수익률은 매번 양수였고 최소 6개월의 양호한 흐름을 기대할 수 있지만, 선거 직후 11~12월에는 2018년 같은 하락 사례가 있다는 주장.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "선거 계절성만으로 매수 시점이나 보유 기간을 결정할 근거는 부족하다."
+            },
+            {
+              "claim_id": "C6",
+              "claim_text": "직전 미국장 S&P 500 7,353, 나스닥 -5.5%·고점 대비 -10% 초과, 반도체 지수 -12% 초과, VIX 28 및 한국 국고채 10년물 3.9% 하회가 관측됐다는 주장.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "급락 규모와 안전자산 선호 강도는 해당 거래일의 원자료 확인 전까지 확정할 수 없다."
+            }
+          ],
+          "entities": [
+            {
+              "ticker": "^KS11",
+              "name": "코스피·외국인 수급",
+              "status": "unverified",
+              "verification_notes": [
+                "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+              ]
+            }
+          ],
+          "evidence": [
+            {
+              "evidence_id": "E1",
+              "claim_id": "C1",
+              "title": "Crude gains on worries about renewed US attacks on Iran",
+              "source_url": "https://finance.yahoo.com/news/oil-set-sharp-weekly-drop-052924519.html",
+              "publisher": "Reuters",
+              "published_at": "2026-11-06T21:47:23+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E2",
+              "claim_id": "C1",
+              "title": "S&P 500 Posts Weekly Drop as Energy, Technology Slide in Election Aftermath",
+              "source_url": "https://finance.yahoo.com/markets/stocks/articles/p-500-posts-weekly-drop-214616427.html",
+              "publisher": "MT Newswires",
+              "published_at": "2026-11-06T21:46:16+00:00",
+              "source_tier": "market_or_news"
+            }
+          ]
+        }
+      },
+      {
+        "event_key": "2lhDTERVeGE",
+        "content_sha256": "f5abbe945d62e5de853f571360b83fc3dad465db6dd802acb1b2173a031aebd2",
+        "occurred_at": "2026-11-06T07:30:14+00:00",
+        "relevance": {
+          "tickers": [
+            "META",
+            "PLTR",
+            "015760"
+          ],
+          "markets": [
+            "US",
+            "KR"
+          ],
+          "themes": [],
+          "match_basis": "verified_entities"
+        },
+        "strategy_source_tier": "STANDARD",
+        "strategy_evidence_weight": "STANDARD",
+        "summary": {
+          "video_id": "2lhDTERVeGE",
+          "title": "“민주당 압승이 불러올 대반전!” 트럼프 결국 전쟁 끝내나? 삼성전자·SK하이닉스 폭락은 과도한 공포일까?ㅣ소현철 교수",
+          "channel": "815Money talk",
+          "source_url": "https://www.youtube.com/watch?v=2lhDTERVeGE",
+          "published_at": "2026-11-06T07:30:14+00:00",
+          "status": "asr_uncertain",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "strategy_validation_policy": "STANDARD_REVIEW",
+          "transcript_quality": {
+            "status": "good",
+            "score": 1.0,
+            "warnings": [],
+            "source": "automatic",
+            "language": "Korean",
+            "model_or_format": "json3",
+            "chars": 9955,
+            "segments": 516,
+            "duration_seconds": 1241,
+            "repeated_ngram_ratio": 0.0
+          },
+          "claim_status_summary": {
+            "unverified": 11,
+            "asr_uncertain": 1
+          },
+          "claims": [
+            {
+              "claim_id": "C1",
+              "claim_text": "민주당이 압승하고 공화당이 텍사스 상원·주지사 선거에서 패배했으며, 텍사스는 1988년 이후 공화당 텃밭이었다. 밴스가 선거 패배와 전쟁에 관해 발언했다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "선거 결과와 정책 전환을 확정된 투자 전제로 사용하기 어렵다."
+            },
+            {
+              "claim_id": "C2",
+              "claim_text": "휘발유가 갤런당 2.80달러에서 4달러 이상으로 장기간 상승했고 원유는 배럴당 100달러에서 90달러 미만으로 하락했으며, 당일 한국전력 상승은 원화 강세와 연료 수입비 감소 때문이다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "연료비 개선이나 주가 반등을 확인된 사실로 반영할 수 없다. 연료 구성·환율·요금·반영 시차를 함께 확인해야 한다."
+            },
+            {
+              "claim_id": "C3",
+              "claim_text": "선거 패배가 종전 압력을 높이고 종전이 유가·전력비를 낮춰 위험자산과 한국 증시에 호재가 된다. 2006년 선거 이후와 2011년 이라크 철군 이후 시장이 역사적 근거다.",
+              "status": "unverified",
+              "confidence": 0.98,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "확정된 호재가 아니라 조건부 시나리오로 취급해야 한다."
+            },
+            {
+              "claim_id": "C4",
+              "claim_text": "미국 부채가 40조 달러를 넘고 이자가 국방 예산을 초과했으며, 이자가 국방비를 넘으면 패권이 약화된다는 학자의 법칙이 있다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "해당 수치를 근거로 국채 위험이나 달러 패권 약화를 확정할 수 없다."
+            },
+            {
+              "claim_id": "C5",
+              "claim_text": "스테이블코인 관련 법안은 초당적 의제이며 달러 페그와 국채 준비자산을 통해 국채 수요를 만들고 페트로달러의 역할을 일부 대체한다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "법안의 실체·적용 대상·준비자산 요건을 확인하기 전 국채 수요 증가를 확정적으로 반영하기 어렵다."
+            },
+            {
+              "claim_id": "C6",
+              "claim_text": "은행 송금은 이틀 걸리지만 스테이블코인은 즉시 거래되며 미국 삼성 스마트폰에서 스테이블코인 송금이 가능하다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "속도 우위나 서비스 보급을 사업 가치의 검증된 근거로 사용하기 어렵다."
+            }
+          ],
+          "entities": [
+            {
+              "ticker": "META",
+              "name": "메타",
+              "status": "unverified",
+              "verification_notes": [
+                "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+              ]
+            },
+            {
+              "ticker": "PLTR",
+              "name": "팔란티르",
+              "status": "unverified",
+              "verification_notes": [
+                "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+              ]
+            },
+            {
+              "ticker": "015760",
+              "name": "한국전력",
+              "status": "unverified",
+              "verification_notes": [
+                "시장 데이터 조회 실패: no_usable_market_fields"
+              ]
+            }
+          ],
+          "evidence": [
+            {
+              "evidence_id": "E1",
+              "claim_id": "C1",
+              "title": "Slow Letter: November 05, 2026.",
+              "source_url": "https://slownews.kr/169110",
+              "publisher": "Naver News",
+              "published_at": "2026-11-05T09:50:00+09:00",
+              "source_tier": "web"
+            },
+            {
+              "evidence_id": "E2",
+              "claim_id": "C1",
+              "title": "Slow Letter: October 20, 2026.",
+              "source_url": "https://slownews.kr/168189",
+              "publisher": "Naver News",
+              "published_at": "2026-10-20T09:54:00+09:00",
+              "source_tier": "web"
+            },
+            {
+              "evidence_id": "E4",
+              "claim_id": "C2",
+              "title": "Monster Beverage Strong Sales Momentum Offset by Margin Pressure, RBC Says",
+              "source_url": "https://finance.yahoo.com/markets/stocks/articles/monster-beverage-strong-sales-momentum-202719672.html",
+              "publisher": "MT Newswires",
+              "published_at": "2026-11-06T20:27:19+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E5",
+              "claim_id": "C6",
+              "title": "Bank of America’s Holly O’Neill: “I’m Very Bullish on What AI Has in Store for Us”",
+              "source_url": "https://finance.yahoo.com/m/0fe1b654-506e-36e4-be0f-117e9c500990/bank-of-america%E2%80%99s-holly.html",
+              "publisher": "Barrons.com",
+              "published_at": "2026-11-06T19:39:00+00:00",
+              "source_tier": "news"
+            }
+          ]
+        }
+      },
+      {
+        "event_key": "5QmeVKpGzXk",
+        "content_sha256": "86efd3ca35e06b9443b39c78aebefc72f9ac0f398569ec2e94e75d7ba43380e3",
+        "occurred_at": "2026-11-06T07:05:06+00:00",
+        "relevance": {
+          "tickers": [
+            "^KS11"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "verified_entities"
+        },
+        "strategy_source_tier": "STANDARD",
+        "strategy_evidence_weight": "STANDARD",
+        "summary": {
+          "video_id": "5QmeVKpGzXk",
+          "title": "코스피 급락에 더 빚내서 투자하라는 '한국정부'",
+          "channel": "경제사냥꾼",
+          "source_url": "https://www.youtube.com/watch?v=5QmeVKpGzXk",
+          "published_at": "2026-11-06T07:05:06+00:00",
+          "status": "unverified",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "strategy_validation_policy": "STANDARD_REVIEW",
+          "transcript_quality": {
+            "status": "good",
+            "score": 1.0,
+            "warnings": [],
+            "source": "automatic",
+            "language": "Korean",
+            "model_or_format": "json3",
+            "chars": 1968,
+            "segments": 102,
+            "duration_seconds": 131,
+            "repeated_ngram_ratio": 0.0
+          },
+          "claim_status_summary": {
+            "unverified": 9,
+            "supported": 1
+          },
+          "claims": [
+            {
+              "claim_id": "C1",
+              "claim_text": "코스피가 개장 3분 만에 8% 이상 하락하여 20분간 거래가 중단됐고, 4,900선까지 하락했다가 오전 11시경 5,050으로 회복했다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "급락 규모와 회복 속도를 투자 판단에 사용하기 전 KRX 장중 지수와 거래중단 공지를 확인해야 한다."
+            },
+            {
+              "claim_id": "C2",
+              "claim_text": "기획재정부·한국은행·금융위원회·금융감독원 수장이 오전 10시 30분 긴급회의를 열었으며 이틀 연속 회의했다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "회의 개최 사실과 실제 발표·집행된 조치를 구분해야 한다."
+            },
+            {
+              "claim_id": "C3",
+              "claim_text": "월요일 9일부터 3개월간 신용거래 담보비율 유지의무를 해제하며 기존 기준은 차입금의 최소 140%다. 증권사별 자체 기준은 남을 수 있고, 반대매매 유예가 부채를 없애지는 않는다.",
+              "status": "unverified",
+              "confidence": 0.98,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "영상만으로 반대매매가 중단되거나 상환의무가 바뀐다고 판단하지 말고 이용 증권사의 적용 조건을 확인해야 한다."
+            },
+            {
+              "claim_id": "C4",
+              "claim_text": "증시안정기금은 가동하지 않았고 공매도 금지는 이번 논의에서 제외됐다. '이형일 부총리'는 변동성 확대 시 추가 조치를 예고했다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "정책 미가동이나 논의 제외를 확정된 정책 상태로 받아들이기 어렵다."
+            },
+            {
+              "claim_id": "C5",
+              "claim_text": "2022년 7월 코스피 2,300선 당시 담보비율 요건을 3개월간 해제하고 이후 연말까지 연장했다.",
+              "status": "supported",
+              "confidence": 0.83,
+              "supporting_evidence_ids": [
+                "E4"
+              ],
+              "manual_check_required": true,
+              "investor_implication": "과거 유사 조치의 존재는 뒷받침되지만 이번 조치의 적용 범위나 시장 효과까지 입증하지는 않는다."
+            },
+            {
+              "claim_id": "C6",
+              "claim_text": "2020년 10조 원 넘는 증시안정기금을 조성했으나 발표 직후 시장 반등으로 실제 사용액은 0원이었다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "미집행 사례나 정책 발표의 반등 효과를 확정된 선례로 사용하기 어렵다."
+            }
+          ],
+          "entities": [
+            {
+              "ticker": "^KS11",
+              "name": "코스피·한국 주식시장",
+              "status": "unverified",
+              "verification_notes": [
+                "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+              ]
+            }
+          ],
+          "evidence": [
+            {
+              "evidence_id": "E1",
+              "claim_id": "C1",
+              "title": "Monster Beverage Strong Sales Momentum Offset by Margin Pressure, RBC Says",
+              "source_url": "https://finance.yahoo.com/markets/stocks/articles/monster-beverage-strong-sales-momentum-202719672.html",
+              "publisher": "MT Newswires",
+              "published_at": "2026-11-06T20:27:19+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E2",
+              "claim_id": "C1",
+              "title": "PS Logistics expands Tennessee flatbed presence with Roane acquisition",
+              "source_url": "https://finance.yahoo.com/small-business/articles/ps-logistics-expands-tennessee-flatbed-182158554.html",
+              "publisher": "FreightWaves",
+              "published_at": "2026-11-06T18:21:58+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E4",
+              "claim_id": "C5",
+              "title": "美國발 '블루 쇼크'...빚투 조이던 당국, 반대매매를 풀다",
+              "source_url": "https://www.eroun.net/news/articleView.html?idxno=94690",
+              "publisher": "Naver News",
+              "published_at": "2026-11-06T17:30:00+09:00",
+              "source_tier": "web"
+            },
+            {
+              "evidence_id": "E5",
+              "claim_id": "C9",
+              "title": "ACCESS Newswire to Present at the 20th Annual LD Micro Main Event XX - Tuesday October 20, 2026 - 11:00AM PT (2:00PM ET)",
+              "source_url": "https://finance.yahoo.com/media-advertising/articles/access-newswire-present-20th-annual-210800912.html",
+              "publisher": "ACCESS Newswire",
+              "published_at": "2026-10-15T21:08:00+00:00",
+              "source_tier": "news"
+            },
+            {
+              "evidence_id": "E6",
+              "claim_id": "C9",
+              "title": "COS Readers' Choice 2026: 11 consecutive years of recognition for Veriforce Canada",
+              "source_url": "https://finance.yahoo.com/technology/articles/cos-readers-choice-2026-11-125600838.html",
+              "publisher": "CNW Group",
+              "published_at": "2026-09-18T12:56:00+00:00",
+              "source_tier": "news"
+            }
+          ]
+        }
+      },
+      {
+        "event_key": "t4gNabMSnt8",
+        "content_sha256": "cf02ff69ec001da95d8ee12da9c46e1153f82bbc4e1a39ca76db026a093ed42c",
+        "occurred_at": "2026-11-06T06:44:26+00:00",
+        "relevance": {
+          "tickers": [
+            "^KS11"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "verified_entities"
+        },
+        "strategy_source_tier": "STANDARD",
+        "strategy_evidence_weight": "STANDARD",
+        "summary": {
+          "video_id": "t4gNabMSnt8",
+          "title": "\"오늘은 아무것도 하지 마세요\"…폭락장에서 손절도 추가매수도 서두르면 안 되는 이유ㅣ권다영, 김태성 아이에셋 본부장 [2시 마켓워치]",
+          "channel": "삼프로TV 3PROTV",
+          "source_url": "https://www.youtube.com/watch?v=t4gNabMSnt8",
+          "published_at": "2026-11-06T06:44:26+00:00",
+          "status": "asr_uncertain",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "strategy_validation_policy": "STANDARD_REVIEW",
+          "transcript_quality": {
+            "status": "good",
+            "score": 1.0,
+            "warnings": [],
+            "source": "automatic",
+            "language": "Korean",
+            "model_or_format": "json3",
+            "chars": 16588,
+            "segments": 958,
+            "duration_seconds": 2098,
+            "repeated_ngram_ratio": 0.0
+          },
+          "claim_status_summary": {
+            "unverified": 9,
+            "asr_uncertain": 1
+          },
+          "claims": [
+            {
+              "claim_id": "C1",
+              "claim_text": "방송 중 코스피 5,135에서 5,000선 하회·약 6% 하락, 코스닥 654에서 644·약 4.9% 하락, 외국인 순매도 약 2조원대에서 2조7천억원대를 언급했다. 개별 종목 급락, 닛케이 약 6% 하락, 미국 기술주·마이크론 반등 및 유가 약 91달러도 주장했다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "낙폭과 수급 규모를 확정된 사실로 사용하지 말고 방송 시각별 시장 자료를 확인해야 한다."
+            },
+            {
+              "claim_id": "C2",
+              "claim_text": "담보유지비율 140%→130% 완화는 증권사별 재량·한시 조치이며 스탁론·CFD 반대매매까지 해소하지 않는다는 설명이다. 다음 주 월·화 반대매매 집중 가능성, 저녁 8시 거래 가능 및 미발표 코스닥 부양책을 언급했다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "신용계좌 대응은 실제 적용 담보비율과 추가납부 기한·반대매매 통지로 판단해야 하며, 방송 설명만으로 유예를 전제할 수 없다."
+            },
+            {
+              "claim_id": "C3",
+              "claim_text": "미국 중간선거에서 민주당이 상·하원을 장악했다고 발언했으며, FT가 트럼프 선거 결과 이후 중동 국가들의 협상 가능성과 이란 반응을 보도했다고 인용했다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "선거·중동 협상 관련 설명을 검증된 시장 촉매로 단정할 수 없다."
+            },
+            {
+              "claim_id": "C4",
+              "claim_text": "외국인 현물 매수를 확인하면서 반도체 소부장에서 삼성전자·SK하이닉스로 분할 교체하자는 의견이다. 기판의 최근 이틀 상대강도와 대덕전자의 투자비용·수급에 관한 의문도 제시했다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "교체 전략은 투자 의견이며, 실행 전 비중의 분모와 대덕전자 관련 공식 자료를 확인해야 한다."
+            },
+            {
+              "claim_id": "C5",
+              "claim_text": "삼성SDI의 실적 개선과 ESS 기여가 확인됐으며, 시장 반등 시 관련 밸류체인보다 먼저 움직이거나 바이오 대형주보다 반등 탄력이 클 수 있다는 의견이다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "실적 개선 및 ESS 기여의 규모를 확인하기 전에는 이를 확정된 매수 근거로 사용할 수 없다."
+            },
+            {
+              "claim_id": "C6",
+              "claim_text": "네이버·카카오의 광고·커머스 실적이 양호하며, 카카오 콘텐츠 적자는 환차손 때문에 일시적일 가능성이 높다고 설명했다. 네이버 AI의 독립적인 수익 규모는 불명확하다고 평가했다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "광고·커머스 성장률, 콘텐츠 손익과 외환손익의 연결 관계를 공시로 확인해야 한다."
+            }
+          ],
+          "entities": [
+            {
+              "ticker": "^KS11",
+              "name": "한국 증시·신용거래",
+              "status": "unverified",
+              "verification_notes": [
+                "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+              ]
+            }
+          ],
+          "evidence": [
+            {
+              "evidence_id": "E1",
+              "claim_id": "C1",
+              "title": "Monster Beverage Strong Sales Momentum Offset by Margin Pressure, RBC Says",
+              "source_url": "https://finance.yahoo.com/markets/stocks/articles/monster-beverage-strong-sales-momentum-202719672.html",
+              "publisher": "MT Newswires",
+              "published_at": "2026-11-06T20:27:19+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E2",
+              "claim_id": "C1",
+              "title": "PS Logistics expands Tennessee flatbed presence with Roane acquisition",
+              "source_url": "https://finance.yahoo.com/small-business/articles/ps-logistics-expands-tennessee-flatbed-182158554.html",
+              "publisher": "FreightWaves",
+              "published_at": "2026-11-06T18:21:58+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E4",
+              "claim_id": "C3",
+              "title": "Popular Bitcoin miner seeks $6 billion for AI expansion",
+              "source_url": "https://finance.yahoo.com/markets/crypto/articles/popular-bitcoin-miner-seeks-6-222003039.html",
+              "publisher": "TheStreet",
+              "published_at": "2026-11-06T22:20:03+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E5",
+              "claim_id": "C3",
+              "title": "Stock Market Today, Nov. 6: Iren Soars 20% on Strong AI Cloud Revenue Growth",
+              "source_url": "https://finance.yahoo.com/markets/stocks/articles/stock-market-today-nov-6-221801072.html",
+              "publisher": "Motley Fool",
+              "published_at": "2026-11-06T22:18:01+00:00",
+              "source_tier": "news"
+            },
+            {
+              "evidence_id": "E7",
+              "claim_id": "C5",
+              "title": "Emerald Resources And 2 Other Australian Growth Stocks To Watch",
+              "source_url": "https://finance.yahoo.com/markets/stocks/articles/emerald-resources-2-other-australian-221444491.html",
+              "publisher": "Simply Wall St.",
+              "published_at": "2026-11-06T22:14:44+00:00",
+              "source_tier": "news"
+            },
+            {
+              "evidence_id": "E8",
+              "claim_id": "C5",
+              "title": "Canadian Natural Resources Q3 Earnings Call Highlights",
+              "source_url": "https://finance.yahoo.com/energy/articles/canadian-natural-resources-q3-earnings-221436034.html",
+              "publisher": "MarketBeat",
+              "published_at": "2026-11-06T22:14:36+00:00",
+              "source_tier": "news"
+            }
+          ]
+        }
+      },
+      {
+        "event_key": "UNHKfXmq1w4",
+        "content_sha256": "d21afc268b7378b7fe95eb98f6afabcf165fa399e6c0c8d414332441b83b546b",
+        "occurred_at": "2026-11-06T06:37:28+00:00",
+        "relevance": {
+          "tickers": [
+            "CRWV",
+            "NVDA",
+            "AMD, MU",
+            "MSFT, AMZN",
+            "005930",
+            "000660",
+            "INTC"
+          ],
+          "markets": [
+            "US",
+            "KR"
+          ],
+          "themes": [],
+          "match_basis": "verified_entities"
+        },
+        "strategy_source_tier": "STANDARD",
+        "strategy_evidence_weight": "STANDARD",
+        "summary": {
+          "video_id": "UNHKfXmq1w4",
+          "title": "전례 없는 나스닥 대폭락, 왜 떨어졌을까",
+          "channel": "경제사냥꾼",
+          "source_url": "https://www.youtube.com/watch?v=UNHKfXmq1w4",
+          "published_at": "2026-11-06T06:37:28+00:00",
+          "status": "asr_uncertain",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "strategy_validation_policy": "STANDARD_REVIEW",
+          "transcript_quality": {
+            "status": "good",
+            "score": 1.0,
+            "warnings": [],
+            "source": "automatic",
+            "language": "Korean",
+            "model_or_format": "json3",
+            "chars": 10914,
+            "segments": 477,
+            "duration_seconds": 891,
+            "repeated_ngram_ratio": 0.0
+          },
+          "claim_status_summary": {
+            "unverified": 11,
+            "asr_uncertain": 1
+          },
+          "claims": [
+            {
+              "claim_id": "C1",
+              "claim_text": "11월 4~5일 미국 지수·개별주의 등락률과 역사적 급락 순위가 영상 설명과 일치한다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "급락 규모와 역사적 순위를 확인하기 전 이를 매매 판단의 확정 근거로 사용하기 어렵다."
+            },
+            {
+              "claim_id": "C2",
+              "claim_text": "11월 3일 민주당이 의회를 석권하고 지나 히노호사가 텍사스 주지사 선거에서 승리했다.",
+              "status": "asr_uncertain",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "선거 결과를 전제로 한 규제 강화 해석은 원음과 공식 결과 확인까지 유보해야 한다."
+            },
+            {
+              "claim_id": "C3",
+              "claim_text": "애벗의 조사·용수 보고·허가 중단 지시와 지역 주민투표, 히노호사의 건설 유예 요구가 데이터센터 건설을 제약했다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "시설별 적용 범위와 해제 조건 확인 전 건설 지연이나 매출 지연 규모를 산정하기 어렵다."
+            },
+            {
+              "claim_id": "C4",
+              "claim_text": "UBS는 건설 유예 시행 시 2028년 예정 미국 데이터센터 용량 약 30%가 영향을 받을 수 있다고 추정했다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "30%를 확정 취소율이나 전체 산업 매출 감소율로 사용할 근거가 없다."
+            },
+            {
+              "claim_id": "C5",
+              "claim_text": "CoreWeave의 총부채는 약 500억 달러이고 일부 채권 수익률은 약 15%여서 시설 가동 지연에 따른 금융 부담이 크다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "부채 범위·현금잔액·만기·시설별 가동 일정을 확인해야 차환 및 현금흐름 위험을 평가할 수 있다."
+            },
+            {
+              "claim_id": "C6",
+              "claim_text": "NVIDIA는 CoreWeave의 약 10% 지분을 가진 두 번째 투자자이며 63억 달러 규모의 미판매 컴퓨팅 용량 구매 약정 상대방이다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "지분·구매 의무·주문 이연 경로별 노출을 분리하고 실제 계약 조건으로 평가해야 한다."
+            }
+          ],
+          "entities": [
+            {
+              "ticker": "CRWV",
+              "name": "CoreWeave",
+              "status": "unverified",
+              "verification_notes": [
+                "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+              ]
+            },
+            {
+              "ticker": "NVDA",
+              "name": "엔비디아",
+              "status": "unverified",
+              "verification_notes": [
+                "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+              ]
+            },
+            {
+              "ticker": "AMD, MU",
+              "name": "AMD·마이크론",
+              "status": "unverified",
+              "verification_notes": [
+                "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+              ]
+            },
+            {
+              "ticker": "MSFT, AMZN",
+              "name": "마이크로소프트·아마존",
+              "status": "unverified",
+              "verification_notes": [
+                "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+              ]
+            },
+            {
+              "ticker": "005930",
+              "name": "삼성전자",
+              "status": "unverified",
+              "verification_notes": [
+                "시장 데이터 조회 실패: no_usable_market_fields"
+              ]
+            },
+            {
+              "ticker": "000660",
+              "name": "SK하이닉스",
+              "status": "unverified",
+              "verification_notes": [
+                "시장 데이터 조회 실패: no_usable_market_fields"
+              ]
+            },
+            {
+              "ticker": "INTC",
+              "name": "인텔",
+              "status": "unverified",
+              "verification_notes": [
+                "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+              ]
+            }
+          ],
+          "evidence": [
+            {
+              "evidence_id": "E1",
+              "claim_id": "C1",
+              "title": "Coeur to Participate in RBC Capital Markets London Precious Metals Conference",
+              "source_url": "https://finance.yahoo.com/markets/commodities/articles/coeur-participate-rbc-capital-markets-213000159.html",
+              "publisher": "Business Wire",
+              "published_at": "2026-11-06T21:30:00+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E2",
+              "claim_id": "C1",
+              "title": "BC-Gold-Silver",
+              "source_url": "https://finance.yahoo.com/markets/commodities/articles/bc-gold-silver-200014783.html",
+              "publisher": "Associated Press",
+              "published_at": "2026-11-06T20:00:14+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E4",
+              "claim_id": "C2",
+              "title": "Monster Beverage Strong Sales Momentum Offset by Margin Pressure, RBC Says",
+              "source_url": "https://finance.yahoo.com/markets/stocks/articles/monster-beverage-strong-sales-momentum-202719672.html",
+              "publisher": "MT Newswires",
+              "published_at": "2026-11-06T20:27:19+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E5",
+              "claim_id": "C5",
+              "title": "Stock market today: Nasdaq and S&P 500 rebound, Dow slips to cap bruising week for AI stocks",
+              "source_url": "https://finance.yahoo.com/markets/live/stock-market-today-friday-november-6-dow-sp-500-nasdaq-jobs-report-earnings-135953863.html",
+              "publisher": "Yahoo Finance",
+              "published_at": "2026-11-06T21:59:10+00:00",
+              "source_tier": "news"
+            },
+            {
+              "evidence_id": "E6",
+              "claim_id": "C6",
+              "title": "inTEST Corporation Q3 2026 Earnings Call Summary",
+              "source_url": "https://finance.yahoo.com/markets/stocks/articles/intest-corporation-q3-2026-earnings-215338024.html",
+              "publisher": "Moby",
+              "published_at": "2026-11-06T21:53:38+00:00",
+              "source_tier": "news"
+            },
+            {
+              "evidence_id": "E7",
+              "claim_id": "C7",
+              "title": "Stock Market Today: Nasdaq Bounces After Jobs Report; Moderna Races Higher (Live Coverage)",
+              "source_url": "https://finance.yahoo.com/m/259a2432-7041-3624-978f-9a7336f10b31/stock-market-today%3A-nasdaq.html",
+              "publisher": "Investor's Business Daily",
+              "published_at": "2026-11-06T20:19:32+00:00",
+              "source_tier": "news"
+            }
+          ]
+        }
+      },
+      {
+        "event_key": "XGNLuRPiKg0",
+        "content_sha256": "5bfcacfd79bfc558ce244b93fb3cda86cbcfda776ee5ee7b9ba99f66fa6a801c",
+        "occurred_at": "2026-11-06T06:36:55+00:00",
+        "relevance": {
+          "tickers": [
+            "^KS11"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "verified_entities"
+        },
+        "strategy_source_tier": "STANDARD",
+        "strategy_evidence_weight": "STANDARD",
+        "summary": {
+          "video_id": "XGNLuRPiKg0",
+          "title": "[#긴급시황]  “외국인 200조 매도, 진짜 이유는 따로 있다” 삼성전자·SK하이닉스 주가 폭락 후 밑 꼬리… 바닥 확인한걸까? | 박근형 부장",
+          "channel": "815Money talk",
+          "source_url": "https://www.youtube.com/watch?v=XGNLuRPiKg0",
+          "published_at": "2026-11-06T06:36:55+00:00",
+          "status": "unverified",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "strategy_validation_policy": "STANDARD_REVIEW",
+          "transcript_quality": {
+            "status": "good",
+            "score": 1.0,
+            "warnings": [],
+            "source": "automatic",
+            "language": "Korean",
+            "model_or_format": "json3",
+            "chars": 13979,
+            "segments": 697,
+            "duration_seconds": 1648,
+            "repeated_ngram_ratio": 0.002
+          },
+          "claim_status_summary": {
+            "unverified": 10
+          },
+          "claims": [
+            {
+              "claim_id": "C1",
+              "claim_text": "2024년 이후 외국인 순매도 약 235조 원과 종목별·국적별 매도액, 미국계 매수 전환 및 외국인 선물·연기금 매수 전환이 주장된다. 매도 원인으로 리밸런싱이 제시된다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "외국인 매도 종료나 미국계 자금 복귀를 전제로 매매하기에는 근거가 부족하다."
+            },
+            {
+              "claim_id": "C2",
+              "claim_text": "영국 미사용 연금의 상속세 적용이 2027년 4월 시작되고 2026년 3월·5월 관련 발표가 있었으며, 이것이 영국계 한국 주식 매도를 유발했다는 설명이다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "세제 개편에 따른 일시적 매도라는 설명으로 수급 정상화 시점을 예측하기 어렵다."
+            },
+            {
+              "claim_id": "C3",
+              "claim_text": "텍사스 주지사 당선인의 조건부 데이터센터 허용, OpenAI의 지역사회 기준 수용 및 트럼프의 비용 부담 요구가 규제 우려를 완화하고 반등에 기여했다는 해석이다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "규제 불확실성 해소를 확정된 투자 근거로 사용할 수 없다."
+            },
+            {
+              "claim_id": "C4",
+              "claim_text": "마이크로소프트의 네오클라우드 계약 재검토와 헤지펀드 AI 포지션 축소가 급락을 유발했고, 미식별 기업의 계약 유지·납품 지연 해명이 불안을 완화했다는 주장이다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "실제 계약 취소와 일정 지연을 구분하기 전에는 AI 수요 훼손 또는 우려 해소를 단정하기 어렵다."
+            },
+            {
+              "claim_id": "C5",
+              "claim_text": "11월 6일 코스피 저점 4911과 선물 반등, 국내외 종목의 고점 대비 하락률 및 오전 11시경 상승률이 제시된다.",
+              "status": "unverified",
+              "confidence": 0.98,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "낙폭과 반등률을 매수 신호로 사용하려면 동일 시각·동일 가격 기준으로 재계산해야 한다."
+            },
+            {
+              "claim_id": "C6",
+              "claim_text": "VIX 급등 및 코스피·코스닥 서킷브레이커 이후의 과거 평균 수익률이 반등 참고 근거로 제시된다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "제시된 평균 반등률을 이번 시장의 바닥 확률이나 기대수익률로 사용할 수 없다."
+            }
+          ],
+          "entities": [
+            {
+              "ticker": "^KS11",
+              "name": "한국 증시·외국인 수급",
+              "status": "unverified",
+              "verification_notes": [
+                "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+              ]
+            }
+          ],
+          "evidence": [
+            {
+              "evidence_id": "E1",
+              "claim_id": "C1",
+              "title": "Monster Beverage Strong Sales Momentum Offset by Margin Pressure, RBC Says",
+              "source_url": "https://finance.yahoo.com/markets/stocks/articles/monster-beverage-strong-sales-momentum-202719672.html",
+              "publisher": "MT Newswires",
+              "published_at": "2026-11-06T20:27:19+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E2",
+              "claim_id": "C1",
+              "title": "PS Logistics expands Tennessee flatbed presence with Roane acquisition",
+              "source_url": "https://finance.yahoo.com/small-business/articles/ps-logistics-expands-tennessee-flatbed-182158554.html",
+              "publisher": "FreightWaves",
+              "published_at": "2026-11-06T18:21:58+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E4",
+              "claim_id": "C3",
+              "title": "Sector Update: Energy Stocks Lower Late Afternoon",
+              "source_url": "https://finance.yahoo.com/energy/articles/sector-energy-stocks-lower-afternoon-205956608.html",
+              "publisher": "MT Newswires",
+              "published_at": "2026-11-06T20:59:56+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E5",
+              "claim_id": "C10",
+              "title": "IPOs Struggle in Tech Selloff. Berkshire Has a Winner.",
+              "source_url": "https://finance.yahoo.com/m/a6e64e40-fcac-36ae-90d3-af4f85a83748/ipos-struggle-in-tech.html",
+              "publisher": "Barrons.com",
+              "published_at": "2026-11-06T21:43:00+00:00",
+              "source_tier": "news"
+            }
+          ]
+        }
+      },
+      {
+        "event_key": "uiBxAx4xH_I",
+        "content_sha256": "fd210974fdc96f68baecbb85353142730898c0ad40be94e8295c943be67bc50a",
+        "occurred_at": "2026-11-06T06:06:18+00:00",
+        "relevance": {
+          "tickers": [
+            "005930",
+            "000660",
+            "GOOGL"
+          ],
+          "markets": [
+            "KR",
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "verified_entities"
+        },
+        "strategy_source_tier": "STANDARD",
+        "strategy_evidence_weight": "STANDARD",
+        "summary": {
+          "video_id": "uiBxAx4xH_I",
+          "title": "\"다 살릴 생각 버리세요\"…핵심 압축과 경기소비재 분산으로 버티는 법ㅣ권다영, 이지환 오로라투자자문 대표 [2시 마켓워치]",
+          "channel": "삼프로TV 3PROTV",
+          "source_url": "https://www.youtube.com/watch?v=uiBxAx4xH_I",
+          "published_at": "2026-11-06T06:06:18+00:00",
+          "status": "asr_uncertain",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "strategy_validation_policy": "STANDARD_REVIEW",
+          "transcript_quality": {
+            "status": "good",
+            "score": 1.0,
+            "warnings": [],
+            "source": "automatic",
+            "language": "Korean",
+            "model_or_format": "json3",
+            "chars": 20387,
+            "segments": 1084,
+            "duration_seconds": 2473,
+            "repeated_ngram_ratio": 0.001
+          },
+          "claim_status_summary": {
+            "partially_supported": 2,
+            "unverified": 9,
+            "asr_uncertain": 1
+          },
+          "claims": [
+            {
+              "claim_id": "C1",
+              "claim_text": "코스피 장중 약 8% 하락·4,900선 접촉, 이후 5,108→5,150, 코스닥 약 655, 상승 종목 약 140→150개이며 외국인 현물 순매도 1.7조→2조원 초과·선물 순매수 약 1,500억원이었다. 삼성전자 약 19만원→192,400원, SK하이닉스 약 114만원·9%대 하락도 언급한다.",
+              "status": "partially_supported",
+              "confidence": 0.88,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "급락 방향과 구체적인 장중 수치의 검증 수준을 구별해야 하며, 외국인 선물 매수만으로 반등의 원인이나 지속성을 확정할 수 없다."
+            },
+            {
+              "claim_id": "C2",
+              "claim_text": "전일 나스닥이 5% 이상 하락했고 방송 중 나스닥 선물은 약 0.8%→0.73% 반등했다. 마이크론 추정 종목 약 3.6%, 미식별 '아이' 실적 후 약 12% 상승 및 에어비앤비 실적 호조·시간외 상승을 언급한다.",
+              "status": "unverified",
+              "confidence": 0.98,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "후속 반등 기사와 방송 당시 시간외·선물 수치를 혼합해 반등 강도를 판단하지 않아야 한다."
+            },
+            {
+              "claim_id": "C3",
+              "claim_text": "AI 주가 급락의 주요 원인은 확정적 실적 훼손보다 펀드 강제청산이며 레버리지는 최소 4배, 일부 20배였다. 10월 초 공매도가 8조원을 넘었고 이번 하락에는 파생 하방 포지션이 부족했다고 주장한다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "청산 종료와 빠른 회복을 전제로 한 투자 판단의 핵심 근거가 확인되지 않았다."
+            },
+            {
+              "claim_id": "C4",
+              "claim_text": "삼성전자 약 185,000원에서 2027년 예상 PBR 1.13배, SK하이닉스 약 1,130,000원에서 약 1배이며, SK하이닉스 400만원 이상 목표가는 PER 기반이었다. 두 회사 모두 과매도라는 평가다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "추정 실적과 평가배수를 재현하기 전에는 제시된 배수를 매수 근거로 확정할 수 없다."
+            },
+            {
+              "claim_id": "C5",
+              "claim_text": "미국 경기소비재는 중간선거 이후 강했고 자동차·휴대폰·화장품·백화점 관련 주가는 약 2년 우상향했다. 호텔주 신고가 근접과 국내 백화점·화장품의 상대강도를 분산 근거로 제시한다.",
+              "status": "unverified",
+              "confidence": 0.98,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "백화점·화장품으로의 분산은 검증된 상대수익률·상관관계와 기업 실적을 확인해야 평가할 수 있다."
+            },
+            {
+              "claim_id": "C6",
+              "claim_text": "담보비율 140% 관련 신용거래 담보유지 의무를 3개월 한시 면제·유예하는 조치로 일부 반대매매를 줄인다고 설명한다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "반대매매 위험이 사라졌다고 전제하지 말고 해당 증권사의 실제 적용 조건을 확인해야 한다."
+            }
+          ],
+          "entities": [
+            {
+              "ticker": "005930",
+              "name": "삼성전자",
+              "status": "unverified",
+              "verification_notes": [
+                "시장 데이터 조회 실패: no_usable_market_fields"
+              ]
+            },
+            {
+              "ticker": "000660",
+              "name": "SK하이닉스",
+              "status": "unverified",
+              "verification_notes": [
+                "시장 데이터 조회 실패: no_usable_market_fields"
+              ]
+            },
+            {
+              "ticker": "GOOGL",
+              "name": "알파벳·구글",
+              "status": "unverified",
+              "verification_notes": [
+                "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+              ]
+            }
+          ],
+          "evidence": [
+            {
+              "evidence_id": "E1",
+              "claim_id": "C1",
+              "title": "Monster Beverage Strong Sales Momentum Offset by Margin Pressure, RBC Says",
+              "source_url": "https://finance.yahoo.com/markets/stocks/articles/monster-beverage-strong-sales-momentum-202719672.html",
+              "publisher": "MT Newswires",
+              "published_at": "2026-11-06T20:27:19+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E2",
+              "claim_id": "C1",
+              "title": "PS Logistics expands Tennessee flatbed presence with Roane acquisition",
+              "source_url": "https://finance.yahoo.com/small-business/articles/ps-logistics-expands-tennessee-flatbed-182158554.html",
+              "publisher": "FreightWaves",
+              "published_at": "2026-11-06T18:21:58+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E4",
+              "claim_id": "C5",
+              "title": "Charlie Bilello Says “Some Sanity Has Returned to the Market.” What That Means for Your Portfolio",
+              "source_url": "https://finance.yahoo.com/markets/stocks/articles/charlie-bilello-says-sanity-returned-220728855.html",
+              "publisher": "24/7 Wall St.",
+              "published_at": "2026-11-06T22:07:28+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E5",
+              "claim_id": "C10",
+              "title": "Stock Market Today, Nov. 6: AMD Surges 11% on Record Quarterly Revenue and Stronger Growth Outlook",
+              "source_url": "https://finance.yahoo.com/markets/stocks/articles/stock-market-today-nov-6-222502683.html",
+              "publisher": "Motley Fool",
+              "published_at": "2026-11-06T22:25:02+00:00",
+              "source_tier": "news"
+            },
+            {
+              "evidence_id": "E6",
+              "claim_id": "C10",
+              "title": "Stock Market Today, Nov. 6: Iren Soars 20% on Strong AI Cloud Revenue Growth",
+              "source_url": "https://finance.yahoo.com/markets/stocks/articles/stock-market-today-nov-6-221801072.html",
+              "publisher": "Motley Fool",
+              "published_at": "2026-11-06T22:18:01+00:00",
+              "source_tier": "news"
+            }
+          ]
+        }
+      },
+      {
+        "event_key": "BS8qiTjCZHY",
+        "content_sha256": "e5e8fd34f01524451eef93ed9a77aa89d5e36fdff603aa27606141012afa458f",
+        "occurred_at": "2026-11-06T05:30:08+00:00",
+        "relevance": {
+          "tickers": [
+            "CL=F"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "verified_entities"
+        },
+        "strategy_source_tier": "STANDARD",
+        "strategy_evidence_weight": "STANDARD",
+        "summary": {
+          "video_id": "BS8qiTjCZHY",
+          "title": "현재 월가에서 준비중인 '트럼프 탄핵' 시나리오",
+          "channel": "경제사냥꾼",
+          "source_url": "https://www.youtube.com/watch?v=BS8qiTjCZHY",
+          "published_at": "2026-11-06T05:30:08+00:00",
+          "status": "asr_uncertain",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "strategy_validation_policy": "STANDARD_REVIEW",
+          "transcript_quality": {
+            "status": "good",
+            "score": 1.0,
+            "warnings": [],
+            "source": "automatic",
+            "language": "Korean",
+            "model_or_format": "json3",
+            "chars": 1947,
+            "segments": 101,
+            "duration_seconds": 138,
+            "repeated_ngram_ratio": 0.0
+          },
+          "claim_status_summary": {
+            "unverified": 9,
+            "asr_uncertain": 1
+          },
+          "claims": [
+            {
+              "claim_id": "C1",
+              "claim_text": "2026년 중간선거에서 민주당이 상·하원 과반과 상원 최소 54석을 확보했다.",
+              "status": "unverified",
+              "confidence": 0.0,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "민주당의 의회 장악과 조사 권한 확대를 확정된 투자 전제로 사용하기 어렵다."
+            },
+            {
+              "claim_id": "C2",
+              "claim_text": "유권자의 거의 절반이 정부 부패를 주요 투표 이유로 꼽았다.",
+              "status": "unverified",
+              "confidence": 0.0,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "해당 수치를 탄핵이나 특정 조사에 대한 유권자 지지율로 해석할 근거가 없다."
+            },
+            {
+              "claim_id": "C3",
+              "claim_text": "로이터는 민주당이 즉각적인 탄핵보다 트럼프 가족 사업·거래·정부 계약과 기업·금융회사 조사를 우선할 계획이라고 보도했다.",
+              "status": "unverified",
+              "confidence": 0.0,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "조사 계획 보도와 실제 조사 착수·소환·청문회를 구분하고, 원문 확보 전 특정 기업에 연결하지 않아야 한다."
+            },
+            {
+              "claim_id": "C4",
+              "claim_text": "Kalshi의 임기 중 탄핵 가격이 70%에서 76.6%로 오른 뒤 약 74%가 됐으며, 별도의 탄핵·파면 관련 가격은 20%대였다.",
+              "status": "unverified",
+              "confidence": 0.0,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "서로 다른 계약 가격을 혼합하거나 시장 가격을 대통령 파면의 객관적 확률로 단정할 수 없다."
+            },
+            {
+              "claim_id": "C5",
+              "claim_text": "하원 과반으로 탄핵안이 통과되고 상원 3분의 2 찬성으로 파면되며, 100명 전원 참여 시 67표가 필요하다.",
+              "status": "unverified",
+              "confidence": 0.0,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "하원 탄핵과 대통령 파면을 동일한 사건으로 취급해서는 안 되며, 실제 절차와 표결 구성을 확인해야 한다."
+            },
+            {
+              "claim_id": "C6",
+              "claim_text": "2019년 첫 트럼프 탄핵안 하원 통과 다음 거래일 미국 증시가 사상 최고치를 기록했고, 그해 S&P 500은 약 29% 상승했다.",
+              "status": "unverified",
+              "confidence": 0.0,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "해당 사례를 현재 주식 보유나 매수의 독립적인 근거로 사용하기 어렵다."
+            }
+          ],
+          "entities": [
+            {
+              "ticker": "CL=F",
+              "name": "이란·유가 및 대통령 행정권 관련 시장 변수",
+              "status": "unverified",
+              "verification_notes": [
+                "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+              ]
+            }
+          ],
+          "evidence": [
+            {
+              "evidence_id": "E1",
+              "claim_id": "C1",
+              "title": "Tech Stock Sell-Off 'Golden Buying Opportunity,' Says Dan Ives",
+              "source_url": "https://finance.yahoo.com/m/aeb920dc-4bcd-3531-8458-6a642b7135df/tech-stock-sell-off-%27golden.html",
+              "publisher": "Investor's Business Daily",
+              "published_at": "2026-11-06T21:46:35+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E2",
+              "claim_id": "C1",
+              "title": "Dow Jones Futures: Market Needs Repair But Sandisk, Micron Broken; Apple, Amazon, Microsoft Strong",
+              "source_url": "https://finance.yahoo.com/m/283e1bd9-349e-390b-a32b-b4ed9a9034f3/dow-jones-futures%3A-market.html",
+              "publisher": "Investor's Business Daily",
+              "published_at": "2026-11-06T21:45:10+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E4",
+              "claim_id": "C3",
+              "title": "Monster Beverage Strong Sales Momentum Offset by Margin Pressure, RBC Says",
+              "source_url": "https://finance.yahoo.com/markets/stocks/articles/monster-beverage-strong-sales-momentum-202719672.html",
+              "publisher": "MT Newswires",
+              "published_at": "2026-11-06T20:27:19+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E5",
+              "claim_id": "C4",
+              "title": "The Chip Stock Bloodbath Is a Case Study in the Risks of Leveraged ETFs",
+              "source_url": "https://finance.yahoo.com/m/e1cc3675-f7f1-37df-be78-62a32fbe2487/the-chip-stock-bloodbath-is-a.html",
+              "publisher": "Barrons.com",
+              "published_at": "2026-11-06T21:28:00+00:00",
+              "source_tier": "news"
+            },
+            {
+              "evidence_id": "E6",
+              "claim_id": "C9",
+              "title": "Fluor Corp (FLR) Q3 2026 Earnings Call Highlights: Record $10.9 Billion in New Awards and $34. ...",
+              "source_url": "https://finance.yahoo.com/markets/stocks/articles/fluor-corp-flr-q3-2026-211753687.html",
+              "publisher": "GuruFocus.com",
+              "published_at": "2026-11-06T21:17:53+00:00",
+              "source_tier": "news"
+            }
+          ]
+        }
+      },
+      {
+        "event_key": "_8hhFxpqabM",
+        "content_sha256": "6b60080b85392ae5e95f7c8a72c38b395e99457c976a15ee7c11878b7f1b7c4e",
+        "occurred_at": "2026-11-06T05:00:13+00:00",
+        "relevance": {
+          "tickers": [],
+          "markets": [],
+          "themes": [],
+          "match_basis": "title_and_claim_context"
+        },
+        "strategy_source_tier": "STANDARD",
+        "strategy_evidence_weight": "STANDARD",
+        "summary": {
+          "video_id": "_8hhFxpqabM",
+          "title": "[#긴급시황] “삼성전자·SK하이닉스 반등에 속지 마라!” 하락 추세는 아직 끝나지 않았다… 진짜 상승 전환은 외국인 매수에 달렸다!ㅣ이주현 대표",
+          "channel": "815Money talk",
+          "source_url": "https://www.youtube.com/watch?v=_8hhFxpqabM",
+          "published_at": "2026-11-06T05:00:13+00:00",
+          "status": "asr_uncertain",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "strategy_validation_policy": "STANDARD_REVIEW",
+          "transcript_quality": {
+            "status": "good",
+            "score": 1.0,
+            "warnings": [],
+            "source": "automatic",
+            "language": "Korean",
+            "model_or_format": "json3",
+            "chars": 7530,
+            "segments": 389,
+            "duration_seconds": 1325,
+            "repeated_ngram_ratio": 0.0
+          },
+          "claim_status_summary": {
+            "unverified": 10,
+            "asr_uncertain": 2
+          },
+          "claims": [
+            {
+              "claim_id": "C1",
+              "claim_text": "삼성전자 당일 저점 175,000원, 전일 약 10% 하락, 200,000원 지지선 갭 이탈 및 삼성전자·SK하이닉스의 이전 저점 이탈 주장.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "제시 가격을 확인된 매매 기준으로 사용하기 전에 녹화 거래일과 해당 시점 OHLC를 대조해야 한다."
+            },
+            {
+              "claim_id": "C2",
+              "claim_text": "기관 방어와 외국인 프로그램 매도 완화가 반등을 도왔고 약 7,000억 원의 매도가 있었으며, 지속 상승에는 외국인 매수 확대가 중요하다는 주장.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "시장·시각·매매 유형이 같은 기준에서 순매수 지속 여부를 확인해야 한다."
+            },
+            {
+              "claim_id": "C3",
+              "claim_text": "선물 가격이 0.3~0.5 하락했고 전일 선물 매수는 숏커버링보다 신규 매수 또는 스프레드 차익거래일 가능성이 있다는 주장.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "선물 순매수를 방향성 강세 신호로 단정하지 말고 거래 구조를 먼저 확인해야 한다."
+            },
+            {
+              "claim_id": "C4",
+              "claim_text": "의료·재생에너지·식음료의 상대적 선방, 삼성바이오로직스·셀트리온의 상승 추세, KT&G 강세와 미국 의료주 방어력 및 나스닥 전일 저점 이탈 주장.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "상대적 선방을 절대수익이나 지속 상승으로 해석하지 말고 종목·업종별 수익률을 대조해야 한다."
+            },
+            {
+              "claim_id": "C5",
+              "claim_text": "삼성SDI가 저점 경신과 반등을 반복하는 하락 추세라는 주장.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "반등과 추세 전환을 구분하려면 해당 기간의 고점·저점과 가격 조정 여부를 확인해야 한다."
+            },
+            {
+              "claim_id": "C6",
+              "claim_text": "현대차가 300,000원을 하향 이탈하고 5주선을 회복하지 못했으며, 과거 고점·장기 저항선이 지지 근거이고 5주선이 일봉 20일선에 해당한다는 주장.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "300,000원과 이동평균을 검증된 지지·저항으로 취급하기 전에 일봉·주봉을 각각 재계산해야 한다."
+            }
+          ],
+          "entities": [],
+          "evidence": [
+            {
+              "evidence_id": "E1",
+              "claim_id": "C1",
+              "title": "Monster Beverage Strong Sales Momentum Offset by Margin Pressure, RBC Says",
+              "source_url": "https://finance.yahoo.com/markets/stocks/articles/monster-beverage-strong-sales-momentum-202719672.html",
+              "publisher": "MT Newswires",
+              "published_at": "2026-11-06T20:27:19+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E2",
+              "claim_id": "C1",
+              "title": "PS Logistics expands Tennessee flatbed presence with Roane acquisition",
+              "source_url": "https://finance.yahoo.com/small-business/articles/ps-logistics-expands-tennessee-flatbed-182158554.html",
+              "publisher": "FreightWaves",
+              "published_at": "2026-11-06T18:21:58+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E4",
+              "claim_id": "C4",
+              "title": "Liberty Gold Reports Q3 2026 Financial and Operating Results",
+              "source_url": "https://finance.yahoo.com/markets/commodities/articles/liberty-gold-reports-q3-2026-220000709.html",
+              "publisher": "GlobeNewswire",
+              "published_at": "2026-11-06T22:00:00+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E5",
+              "claim_id": "C6",
+              "title": "Starwood Property Trust, Inc. Q3 2026 Earnings Call Summary",
+              "source_url": "https://finance.yahoo.com/real-estate/articles/starwood-property-trust-inc-q3-220541676.html",
+              "publisher": "Moby",
+              "published_at": "2026-11-06T22:05:41+00:00",
+              "source_tier": "news"
+            },
+            {
+              "evidence_id": "E6",
+              "claim_id": "C9",
+              "title": "U.S. Natural Gas Futures Settle Higher",
+              "source_url": "https://finance.yahoo.com/m/ad8c7ca2-4fd8-36aa-9c72-3c2499bcb5d5/u.s.-natural-gas-futures.html",
+              "publisher": "The Wall Street Journal",
+              "published_at": "2026-11-06T20:47:00+00:00",
+              "source_tier": "news"
+            }
+          ]
+        }
+      },
+      {
+        "event_key": "eb8_a0kfsfg",
+        "content_sha256": "d7c89d3aa093fe874e87cf046192dee194edf41b37bd2e3c5261098cbb74d402",
+        "occurred_at": "2026-11-06T04:11:13+00:00",
+        "relevance": {
+          "tickers": [
+            "^KS11"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "verified_entities"
+        },
+        "strategy_source_tier": "STANDARD",
+        "strategy_evidence_weight": "STANDARD",
+        "summary": {
+          "video_id": "eb8_a0kfsfg",
+          "title": "삼전·닉스는 왜 이렇게 폭락한 걸까?",
+          "channel": "경제사냥꾼",
+          "source_url": "https://www.youtube.com/watch?v=eb8_a0kfsfg",
+          "published_at": "2026-11-06T04:11:13+00:00",
+          "status": "unverified",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "strategy_validation_policy": "STANDARD_REVIEW",
+          "transcript_quality": {
+            "status": "good",
+            "score": 1.0,
+            "warnings": [],
+            "source": "automatic",
+            "language": "Korean",
+            "model_or_format": "json3",
+            "chars": 1914,
+            "segments": 95,
+            "duration_seconds": 139,
+            "repeated_ngram_ratio": 0.0
+          },
+          "claim_status_summary": {
+            "unverified": 10
+          },
+          "claims": [
+            {
+              "claim_id": "C1",
+              "claim_text": "11월 5일 삼성전자와 SK하이닉스 주가가 각각 7.57%, 9.46% 하락했다.",
+              "status": "unverified",
+              "confidence": 0.0,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "하락률과 거래일을 확인하기 전에는 급락 규모를 투자 판단의 확정 근거로 사용하기 어렵다."
+            },
+            {
+              "claim_id": "C2",
+              "claim_text": "11월 5일 외국인이 코스피에서 약 3조 4천억 원을 순매도했고 매도가 삼성전자·SK하이닉스에 집중됐다.",
+              "status": "unverified",
+              "confidence": 0.0,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "외국인 수급을 하락 원인으로 판단하려면 시장 전체와 두 종목의 동일 기준 순매도 자료가 필요하다."
+            },
+            {
+              "claim_id": "C3",
+              "claim_text": "현재는 트럼프 임기 2년 차이며 중간선거에서 민주당이 상·하원 다수당을 모두 확보했다.",
+              "status": "unverified",
+              "confidence": 0.0,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "정치적 전제가 검증되지 않아 이를 바탕으로 한 규제·주가 해석도 확정할 수 없다."
+            },
+            {
+              "claim_id": "C4",
+              "claim_text": "민주당의 의회 장악으로 데이터센터 규제 강화 우려가 발생했고 AI 투자 둔화 예상이 반도체 매도를 촉발했다.",
+              "status": "unverified",
+              "confidence": 0.0,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "확정 규제와 시장의 추측을 구분하고, 급락 원인은 검증되지 않은 가설로 취급해야 한다."
+            },
+            {
+              "claim_id": "C5",
+              "claim_text": "지난 9월 미국이 금리를 인상했고 향후 주목할 연준 회의는 12월 9일이다.",
+              "status": "unverified",
+              "confidence": 0.0,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "금리 방향과 회의 날짜를 확인하기 전에는 이를 매매 일정이나 정책 전망의 근거로 삼기 어렵다."
+            },
+            {
+              "claim_id": "C6",
+              "claim_text": "2018년 SK하이닉스 영업이익률은 사상 최고인 52%였지만 주가는 고점 대비 거의 40% 하락했고 미래 메모리 가격 하락 우려가 압박 요인이었다.",
+              "status": "unverified",
+              "confidence": 0.0,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "역사적 사례의 수치와 측정 기간을 검증하기 전에는 현재 상황과의 비교 근거로 사용하기 어렵다."
+            }
+          ],
+          "entities": [
+            {
+              "ticker": "^KS11",
+              "name": "코스피·외국인 수급",
+              "status": "unverified",
+              "verification_notes": [
+                "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+              ]
+            }
+          ],
+          "evidence": [
+            {
+              "evidence_id": "E1",
+              "claim_id": "C1",
+              "title": "Monster Beverage Strong Sales Momentum Offset by Margin Pressure, RBC Says",
+              "source_url": "https://finance.yahoo.com/markets/stocks/articles/monster-beverage-strong-sales-momentum-202719672.html",
+              "publisher": "MT Newswires",
+              "published_at": "2026-11-06T20:27:19+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E2",
+              "claim_id": "C1",
+              "title": "PS Logistics expands Tennessee flatbed presence with Roane acquisition",
+              "source_url": "https://finance.yahoo.com/small-business/articles/ps-logistics-expands-tennessee-flatbed-182158554.html",
+              "publisher": "FreightWaves",
+              "published_at": "2026-11-06T18:21:58+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E4",
+              "claim_id": "C3",
+              "title": "Did ETF Investors Buy the Dip Last Month?",
+              "source_url": "https://finance.yahoo.com/markets/options/articles/did-etf-investors-buy-dip-161000554.html",
+              "publisher": "Zacks",
+              "published_at": "2026-11-06T16:10:00+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E5",
+              "claim_id": "C9",
+              "title": "The Chip Stock Bloodbath Is a Case Study in the Risks of Leveraged ETFs",
+              "source_url": "https://finance.yahoo.com/m/e1cc3675-f7f1-37df-be78-62a32fbe2487/the-chip-stock-bloodbath-is-a.html",
+              "publisher": "Barrons.com",
+              "published_at": "2026-11-06T21:28:00+00:00",
+              "source_tier": "news"
+            },
+            {
+              "evidence_id": "E6",
+              "claim_id": "C9",
+              "title": "Broadcom Is Still Down 22% in the Past Month: Is AVGO Stock Really on a Road to Recovery?",
+              "source_url": "https://finance.yahoo.com/markets/stocks/articles/broadcom-still-down-22-past-200319828.html",
+              "publisher": "24/7 Wall St.",
+              "published_at": "2026-11-06T20:03:19+00:00",
+              "source_tier": "news"
+            },
+            {
+              "evidence_id": "E7",
+              "claim_id": "C10",
+              "title": "Dow Jones Futures: Market Needs Repair But Sandisk, Micron Broken; Apple, Amazon, Microsoft Strong",
+              "source_url": "https://finance.yahoo.com/m/283e1bd9-349e-390b-a32b-b4ed9a9034f3/dow-jones-futures%3A-market.html",
+              "publisher": "Investor's Business Daily",
+              "published_at": "2026-11-06T21:45:10+00:00",
+              "source_tier": "news"
+            }
+          ]
+        }
+      },
+      {
+        "event_key": "sC2umN6KQjo",
+        "content_sha256": "246db807f8976ffbf36ca6427d2325cb76e5e01e44e028970f76e4c11ceacc40",
+        "occurred_at": "2026-11-06T03:45:20+00:00",
+        "relevance": {
+          "tickers": [
+            "HYPE",
+            "BTC",
+            "COIN",
+            "HOOD"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "verified_entities"
+        },
+        "strategy_source_tier": "STANDARD",
+        "strategy_evidence_weight": "STANDARD",
+        "summary": {
+          "video_id": "sC2umN6KQjo",
+          "title": "CFTC 무기한 선물 시장 확대에 법적 분쟁, 내년 비트코인 가격 회복 기대해도 될까? | 서동주, 김동환, 최윤영 한화투자증권 팀장 [크립토 PLUS]",
+          "channel": "삼프로TV 3PROTV",
+          "source_url": "https://www.youtube.com/watch?v=sC2umN6KQjo",
+          "published_at": "2026-11-06T03:45:20+00:00",
+          "status": "unverified",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "strategy_validation_policy": "STANDARD_REVIEW",
+          "transcript_quality": {
+            "status": "good",
+            "score": 1.0,
+            "warnings": [],
+            "source": "automatic",
+            "language": "Korean",
+            "model_or_format": "json3",
+            "chars": 12870,
+            "segments": 739,
+            "duration_seconds": 1560,
+            "repeated_ngram_ratio": 0.001
+          },
+          "claim_status_summary": {
+            "unverified": 12
+          },
+          "claims": [
+            {
+              "claim_id": "C1",
+              "claim_text": "CFTC가 미국 무기한 선물을 허용했으며 상품의 선물·스왑 분류에 따라 감독권과 개인 판매 요건이 달라진다는 설명.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "규제 허용을 모든 무기한 상품이나 미국 개인투자자 접근 허용으로 확대 해석할 수 없다."
+            },
+            {
+              "claim_id": "C2",
+              "claim_text": "CME의 비트코인 무기한 선물 소송과 별도 주식 기반 상품 소송이 있으며, 긴급 신청 기각 후 11월 10일 서면 제출과 예비적 금지명령 판단이 예정됐다는 설명.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "거래 중단이나 스왑 분류가 이미 확정됐다는 전제로 판단할 수 없다."
+            },
+            {
+              "claim_id": "C3",
+              "claim_text": "칼시로 전사된 플랫폼에서 11월 3일 주식 기반 무기한 선물이 처음 시작됐다는 설명.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "플랫폼과 상품의 실제 정체 및 최초의 적용 범위를 확인하기 전에는 시장 선점 근거로 사용할 수 없다."
+            },
+            {
+              "claim_id": "C4",
+              "claim_text": "Trade XYZ를 통한 미국 진출 기대가 HYPE에 긍정적으로 작용했고 주식 기반 무기한 선물 소송 뉴스가 가격 약세의 배경이라는 해석.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "미국 진출 기대를 인허가 확보로, 소송 보도를 가격 하락의 입증된 원인으로 취급할 수 없다."
+            },
+            {
+              "claim_id": "C5",
+              "claim_text": "CLARITY 법안은 상원 본안 심의 전 절차에서 멈췄으며 2026년 통과 가능성이 낮고 2027년 보호 조항·별도 입법 논의로 지연될 수 있다는 설명과 전망.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "입법 지연을 확정 일정으로 반영하거나 행정 해석의 지속성을 보장된 것으로 볼 수 없다."
+            },
+            {
+              "claim_id": "C6",
+              "claim_text": "민주당의 다음 해 의회 주도권과 Brown·Warren의 역할 변화 가능성, 초당적 가상자산 입법 수요 및 대통령 거부권 재의결에 3분의 2 찬성이 필요하다는 발언.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "정당 주도권 변화나 특정 인사의 역할을 확인된 정책 경로로 사용할 수 없다."
+            }
+          ],
+          "entities": [
+            {
+              "ticker": "HYPE",
+              "name": "하이퍼리퀴드",
+              "status": "unverified",
+              "verification_notes": [
+                "시장 데이터 조회 실패: no_usable_market_fields"
+              ]
+            },
+            {
+              "ticker": "BTC",
+              "name": "비트코인·가상자산 시장",
+              "status": "unverified",
+              "verification_notes": [
+                "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+              ]
+            },
+            {
+              "ticker": "COIN",
+              "name": "코인베이스",
+              "status": "unverified",
+              "verification_notes": [
+                "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+              ]
+            },
+            {
+              "ticker": "HOOD",
+              "name": "로빈후드",
+              "status": "unverified",
+              "verification_notes": [
+                "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+              ]
+            }
+          ],
+          "evidence": [
+            {
+              "evidence_id": "E1",
+              "claim_id": "C2",
+              "title": "Monster Beverage Strong Sales Momentum Offset by Margin Pressure, RBC Says",
+              "source_url": "https://finance.yahoo.com/markets/stocks/articles/monster-beverage-strong-sales-momentum-202719672.html",
+              "publisher": "MT Newswires",
+              "published_at": "2026-11-06T20:27:19+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E2",
+              "claim_id": "C2",
+              "title": "PS Logistics expands Tennessee flatbed presence with Roane acquisition",
+              "source_url": "https://finance.yahoo.com/small-business/articles/ps-logistics-expands-tennessee-flatbed-182158554.html",
+              "publisher": "FreightWaves",
+              "published_at": "2026-11-06T18:21:58+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E4",
+              "claim_id": "C4",
+              "title": "Charlie Bilello Says “Some Sanity Has Returned to the Market.” What That Means for Your Portfolio",
+              "source_url": "https://finance.yahoo.com/markets/stocks/articles/charlie-bilello-says-sanity-returned-220728855.html",
+              "publisher": "24/7 Wall St.",
+              "published_at": "2026-11-06T22:07:28+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E5",
+              "claim_id": "C6",
+              "title": "Emerald Resources And 2 Other Australian Growth Stocks To Watch",
+              "source_url": "https://finance.yahoo.com/markets/stocks/articles/emerald-resources-2-other-australian-221444491.html",
+              "publisher": "Simply Wall St.",
+              "published_at": "2026-11-06T22:14:44+00:00",
+              "source_tier": "news"
+            },
+            {
+              "evidence_id": "E6",
+              "claim_id": "C6",
+              "title": "Canadian Natural Resources Q3 Earnings Call Highlights",
+              "source_url": "https://finance.yahoo.com/energy/articles/canadian-natural-resources-q3-earnings-221436034.html",
+              "publisher": "MarketBeat",
+              "published_at": "2026-11-06T22:14:36+00:00",
+              "source_tier": "news"
+            }
+          ]
+        }
+      },
+      {
+        "event_key": "AGbwUB_T3sw",
+        "content_sha256": "342b332bb27e89ca2a2bdb7ca3fccf9fb1ff66bfd36e727ae8886b1074d3585f",
+        "occurred_at": "2026-11-06T03:30:06+00:00",
+        "relevance": {
+          "tickers": [],
+          "markets": [],
+          "themes": [],
+          "match_basis": "title_and_claim_context"
+        },
+        "strategy_source_tier": "STANDARD",
+        "strategy_evidence_weight": "STANDARD",
+        "summary": {
+          "video_id": "AGbwUB_T3sw",
+          "title": "“급락장에 섣불리 덤비지 마라!” 헤지펀드 청산 충격… 지금은 매수보다 관망할 때 ㅣ이권희 대표",
+          "channel": "815Money talk",
+          "source_url": "https://www.youtube.com/watch?v=AGbwUB_T3sw",
+          "published_at": "2026-11-06T03:30:06+00:00",
+          "status": "asr_uncertain",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "strategy_validation_policy": "STANDARD_REVIEW",
+          "transcript_quality": {
+            "status": "good",
+            "score": 1.0,
+            "warnings": [],
+            "source": "automatic",
+            "language": "Korean",
+            "model_or_format": "json3",
+            "chars": 10976,
+            "segments": 638,
+            "duration_seconds": 1343,
+            "repeated_ngram_ratio": 0.0
+          },
+          "claim_status_summary": {
+            "unverified": 11,
+            "asr_uncertain": 1
+          },
+          "claims": [
+            {
+              "claim_id": "C1",
+              "claim_text": "나스닥 -5%, EWI -13%, 야간선물 -7.8%와 추가 약 -1%, 선물 가격제한 8%, 국내 지수 수준·낙폭 및 2008년 급락 비교를 제시한다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "제시된 낙폭과 가격제한을 매매 기준으로 사용하기 전에 거래일·상품·원자료를 확인해야 한다."
+            },
+            {
+              "claim_id": "C2",
+              "claim_text": "민주당 블루 웨이브와 샌더스의 AI 규제 발언이 기술주·알고리즘·소비재 매도를 유발했으며 미국 당국이 대응할 것으로 예상한다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "정치·규제 원인론과 당국의 시장 안정화 기대를 확정된 투자 전제로 삼을 근거가 부족하다."
+            },
+            {
+              "claim_id": "C3",
+              "claim_text": "미국 국채 수익률이 4.8% 초반으로 최근 0.1% 하락했으며 한국의 미국채 매입이 영향을 줬고 유가·환율은 상승했다고 설명한다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "금리·환율 전망이나 자산배분 판단에 사용하기 전에 기준물과 발표 원문을 확인해야 한다."
+            },
+            {
+              "claim_id": "C4",
+              "claim_text": "SOX와 주요 반도체주가 큰 폭으로 하락했고 기존 저점을 이탈했으며 대규모 시가총액 감소가 발생했다고 주장한다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "하락률과 저점 이탈을 근거로 손절·저가매수를 판단하려면 동일 기준의 가격 자료가 필요하다."
+            },
+            {
+              "claim_id": "C5",
+              "claim_text": "JP모건의 10월 보고서에서 AI 반도체 포지션 청산이 7월보다 많았으며 11월 말 재구성 후 매수가 재개될 수 있다고 설명한다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "청산 종료일이나 재매수 시점을 예측하는 근거로 사용할 수 없다."
+            },
+            {
+              "claim_id": "C6",
+              "claim_text": "불명확한 펀드가 파산 신청했고 마이크론을 100달러 이상에 매수한 뒤 40% 넘는 손실로 처분했으며 시타델의 하락 공격이 영향을 줬다고 주장·추정한다.",
+              "status": "asr_uncertain",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "해당 사건이나 특정 운용사의 행위를 반도체 급락의 확인된 원인으로 제시해서는 안 된다."
+            }
+          ],
+          "entities": [],
+          "evidence": [
+            {
+              "evidence_id": "E1",
+              "claim_id": "C1",
+              "title": "Monster Beverage Strong Sales Momentum Offset by Margin Pressure, RBC Says",
+              "source_url": "https://finance.yahoo.com/markets/stocks/articles/monster-beverage-strong-sales-momentum-202719672.html",
+              "publisher": "MT Newswires",
+              "published_at": "2026-11-06T20:27:19+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E2",
+              "claim_id": "C1",
+              "title": "PS Logistics expands Tennessee flatbed presence with Roane acquisition",
+              "source_url": "https://finance.yahoo.com/small-business/articles/ps-logistics-expands-tennessee-flatbed-182158554.html",
+              "publisher": "FreightWaves",
+              "published_at": "2026-11-06T18:21:58+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E4",
+              "claim_id": "C2",
+              "title": "Nvidia Stock, Other AI Names Rebound After Sell-Off",
+              "source_url": "https://finance.yahoo.com/m/870e9d6a-dbbb-3380-9680-17f32e5017a1/nvidia-stock%2C-other-ai-names.html",
+              "publisher": "Investor's Business Daily",
+              "published_at": "2026-11-06T22:00:32+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E5",
+              "claim_id": "C2",
+              "title": "Dow Jones Futures: Market Needs Repair But Sandisk, Micron Broken; Apple, Amazon, Microsoft Strong",
+              "source_url": "https://finance.yahoo.com/m/283e1bd9-349e-390b-a32b-b4ed9a9034f3/dow-jones-futures%3A-market.html",
+              "publisher": "Investor's Business Daily",
+              "published_at": "2026-11-06T21:45:10+00:00",
+              "source_tier": "news"
+            },
+            {
+              "evidence_id": "E6",
+              "claim_id": "C4",
+              "title": "Charlie Bilello Says “Some Sanity Has Returned to the Market.” What That Means for Your Portfolio",
+              "source_url": "https://finance.yahoo.com/markets/stocks/articles/charlie-bilello-says-sanity-returned-220728855.html",
+              "publisher": "24/7 Wall St.",
+              "published_at": "2026-11-06T22:07:28+00:00",
+              "source_tier": "news"
+            },
+            {
+              "evidence_id": "E7",
+              "claim_id": "C4",
+              "title": "Starwood Property Trust, Inc. Q3 2026 Earnings Call Summary",
+              "source_url": "https://finance.yahoo.com/real-estate/articles/starwood-property-trust-inc-q3-220541676.html",
+              "publisher": "Moby",
+              "published_at": "2026-11-06T22:05:41+00:00",
+              "source_tier": "news"
+            }
+          ]
+        }
+      },
+      {
+        "event_key": "nUMZoO_XT6k",
+        "content_sha256": "5491120ee5401bf92872ddd0ab63888ffffff4474aff1172c11ab63276511522",
+        "occurred_at": "2026-11-06T03:20:15+00:00",
+        "relevance": {
+          "tickers": [
+            "BTC",
+            "IBIT",
+            "FBTC",
+            "005930",
+            "000660",
+            "USDT"
+          ],
+          "markets": [
+            "US",
+            "KR"
+          ],
+          "themes": [],
+          "match_basis": "verified_entities"
+        },
+        "strategy_source_tier": "STANDARD",
+        "strategy_evidence_weight": "STANDARD",
+        "summary": {
+          "video_id": "nUMZoO_XT6k",
+          "title": "가상자산 과세 2년 미룬다? 코인 과세 유예와 글로벌 증시 변동 속 비트코인 동향 | 서동주, 김동환, 박상혁 디지털애셋 편집장 [크립토 PLUS]",
+          "channel": "삼프로TV 3PROTV",
+          "source_url": "https://www.youtube.com/watch?v=nUMZoO_XT6k",
+          "published_at": "2026-11-06T03:20:15+00:00",
+          "status": "asr_uncertain",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "strategy_validation_policy": "STANDARD_REVIEW",
+          "transcript_quality": {
+            "status": "good",
+            "score": 1.0,
+            "warnings": [],
+            "source": "automatic",
+            "language": "Korean",
+            "model_or_format": "json3",
+            "chars": 16810,
+            "segments": 949,
+            "duration_seconds": 2011,
+            "repeated_ngram_ratio": 0.001
+          },
+          "claim_status_summary": {
+            "unverified": 10,
+            "asr_uncertain": 2
+          },
+          "claims": [
+            {
+              "claim_id": "C1",
+              "claim_text": "정부·여당이 가상자산 과세를 2년 유예해 2029년 시행하고 11월 법안 처리를 추진한다.",
+              "status": "unverified",
+              "confidence": 0.0,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "2029년 시행을 확정된 세무 전제로 사용하지 말고 공포 법률과 시행일을 확인해야 한다."
+            },
+            {
+              "claim_id": "C2",
+              "claim_text": "가상자산 손실의 3년 이월공제, 시행 전 확정손실 제외, 실제 취득가액과 2028년 말 시가 중 높은 금액 적용 및 기본공제 250만원·5000만원 상향 논의를 설명한다.",
+              "status": "unverified",
+              "confidence": 0.0,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "손실 실현이나 취득가액 산정 결정에 앞서 적용연도·대상 자산·경과규정을 확인해야 한다."
+            },
+            {
+              "claim_id": "C3",
+              "claim_text": "나스닥·BTC·마이크론 급락과 이후 반등, 코스피 서킷브레이커, 삼성전자·SK하이닉스 장중 낙폭 축소 및 미국 증시 하루 시가총액 감소 역대 최대를 주장한다.",
+              "status": "unverified",
+              "confidence": 0.1,
+              "supporting_evidence_ids": [
+                "E3",
+                "E4",
+                "E5"
+              ],
+              "manual_check_required": true,
+              "investor_implication": "급락 규모나 상대적 방어력을 투자 근거로 사용하려면 거래일·지수·세션을 맞춘 가격 자료가 필요하다."
+            },
+            {
+              "claim_id": "C4",
+              "claim_text": "BTC가 약 75000달러에서 76000달러 위로 반등하고 50주 이동평균선 부근에 있으며, 나스닥 -6%일 때 통상 BTC는 -9~-10%라는 비교와 이전 바이낸스 해킹 영향을 제시한다.",
+              "status": "asr_uncertain",
+              "confidence": 0.0,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "76000달러를 검증된 지지선이나 손실 한도로 간주할 근거가 없다."
+            },
+            {
+              "claim_id": "C5",
+              "claim_text": "블룸버그가 9월 데이터센터 대출채권의 약 10% 할인 매각과 익명 보유자의 약 5억달러 경매를 보도했으며, 관련 금융조달 불안이 주가 하락을 키웠다.",
+              "status": "unverified",
+              "confidence": 0.0,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "데이터센터 신용위험 확대를 확정된 시장 하락 원인으로 제시할 수 없다."
+            },
+            {
+              "claim_id": "C6",
+              "claim_text": "OpenAI의 데이터센터 전력비 전액 부담 발표와 텍사스 등 지역 당국의 비용 부담 조건부 승인 방침 이후 시장 반등이 시작됐다.",
+              "status": "unverified",
+              "confidence": 0.0,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "전력비 정책을 확인된 반등 촉매나 데이터센터 승인 리스크 해소로 해석할 수 없다."
+            }
+          ],
+          "entities": [
+            {
+              "ticker": "BTC",
+              "name": "비트코인",
+              "status": "unverified",
+              "verification_notes": [
+                "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+              ]
+            },
+            {
+              "ticker": "IBIT",
+              "name": "블랙록 비트코인 현물 ETF",
+              "status": "unverified",
+              "verification_notes": [
+                "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+              ]
+            },
+            {
+              "ticker": "FBTC",
+              "name": "피델리티 비트코인 현물 ETF",
+              "status": "unverified",
+              "verification_notes": [
+                "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+              ]
+            },
+            {
+              "ticker": "005930",
+              "name": "삼성전자",
+              "status": "unverified",
+              "verification_notes": [
+                "시장 데이터 조회 실패: no_usable_market_fields"
+              ]
+            },
+            {
+              "ticker": "000660",
+              "name": "SK하이닉스",
+              "status": "unverified",
+              "verification_notes": [
+                "시장 데이터 조회 실패: no_usable_market_fields"
+              ]
+            },
+            {
+              "ticker": "USDT",
+              "name": "테더·파라과이 은행 불안",
+              "status": "unverified",
+              "verification_notes": [
+                "시장 데이터 조회 실패: no_usable_market_fields"
+              ]
+            }
+          ],
+          "evidence": [
+            {
+              "evidence_id": "E1",
+              "claim_id": "C1",
+              "title": "Emerald Resources And 2 Other Australian Growth Stocks To Watch",
+              "source_url": "https://finance.yahoo.com/markets/stocks/articles/emerald-resources-2-other-australian-221444491.html",
+              "publisher": "Simply Wall St.",
+              "published_at": "2026-11-06T22:14:44+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E2",
+              "claim_id": "C1",
+              "title": "Canadian Natural Resources Q3 Earnings Call Highlights",
+              "source_url": "https://finance.yahoo.com/energy/articles/canadian-natural-resources-q3-earnings-221436034.html",
+              "publisher": "MarketBeat",
+              "published_at": "2026-11-06T22:14:36+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E3",
+              "claim_id": "C3",
+              "title": "Nvidia Stock, Other AI Names Rebound After Sell-Off",
+              "source_url": "https://finance.yahoo.com/m/870e9d6a-dbbb-3380-9680-17f32e5017a1/nvidia-stock%2C-other-ai-names.html",
+              "publisher": "Investor's Business Daily",
+              "published_at": "2026-11-06T22:00:32+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E4",
+              "claim_id": "C3",
+              "title": "Stock market today: Nasdaq and S&P 500 rebound, Dow slips to cap bruising week for AI stocks",
+              "source_url": "https://finance.yahoo.com/markets/live/stock-market-today-friday-november-6-dow-sp-500-nasdaq-jobs-report-earnings-135953863.html",
+              "publisher": "Yahoo Finance",
+              "published_at": "2026-11-06T21:59:10+00:00",
+              "source_tier": "news"
+            }
+          ]
+        }
+      },
+      {
+        "event_key": "oBJe0uI0WTc",
+        "content_sha256": "72fc49ee9acd2811029e1d52c838c979142d20486b85ecffcd78700e920d95ed",
+        "occurred_at": "2026-11-06T03:00:18+00:00",
+        "relevance": {
+          "tickers": [
+            "^KS11"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "verified_entities"
+        },
+        "strategy_source_tier": "STANDARD",
+        "strategy_evidence_weight": "STANDARD",
+        "summary": {
+          "video_id": "oBJe0uI0WTc",
+          "title": "미국 선거 이후, 시장의 판도가 바뀐다…2027년 투자 대전망 | 백찬규 NH투자증권 센터장 [아침N투자]",
+          "channel": "삼프로TV 3PROTV",
+          "source_url": "https://www.youtube.com/watch?v=oBJe0uI0WTc",
+          "published_at": "2026-11-06T03:00:18+00:00",
+          "status": "asr_uncertain",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "strategy_validation_policy": "STANDARD_REVIEW",
+          "transcript_quality": {
+            "status": "good",
+            "score": 1.0,
+            "warnings": [],
+            "source": "automatic",
+            "language": "Korean",
+            "model_or_format": "json3",
+            "chars": 27096,
+            "segments": 1466,
+            "duration_seconds": 3432,
+            "repeated_ngram_ratio": 0.0
+          },
+          "claim_status_summary": {
+            "unverified": 10,
+            "asr_uncertain": 1
+          },
+          "claims": [
+            {
+              "claim_id": "C1",
+              "claim_text": "민주당의 중간선거 압승과 텍사스 상원의원·주지사 확보 이후 제임스 탈라리코 당선인이 데이터센터 모라토리움을 요청했으며 별도 전력위원회 판단이 필요하다.",
+              "status": "unverified",
+              "confidence": 0.98,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "정책 요청을 시행 확정으로 간주하거나 이를 급락의 단일 원인으로 단정할 근거가 없다."
+            },
+            {
+              "claim_id": "C2",
+              "claim_text": "텍사스의 2030년 데이터센터 비중은 25~30%, 증설 용량의 지연·취소 가능성은 45%이며 기업 전력비 100% 부담과 건설기간 2~3년에서 5년 연장이 가능하다. 블룸버그 대출채권 매각 보도도 있었다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "설비투자 지연률이나 전력비 부담을 실적 추정에 확정적으로 반영할 근거가 부족하다."
+            },
+            {
+              "claim_id": "C3",
+              "claim_text": "방송 중 한국 증시가 6~8%대 급락하고 전일 나스닥은 5% 이상 하락했다. 로스컷 이후 반대매매를 경계해야 하며 과거 저점과 쌍바닥을 비교할 수 있다.",
+              "status": "unverified",
+              "confidence": 0.98,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "장중 급락률·서킷브레이커·강제청산 종료 시점을 확인하기 전에는 저점 확정 신호로 사용할 수 없다."
+            },
+            {
+              "claim_id": "C4",
+              "claim_text": "전력·공간 제약은 HBM·저전력 메모리와 자체 전력조달 수요를 촉진하고 ESS가 가장 빨리 도입될 수 있다. 2027년까지 용인에 SK하이닉스와 삼성전자가 순차 진입하며 기존 데이터센터를 보유한 구글·아마존이 상대적으로 유리하다.",
+              "status": "unverified",
+              "confidence": 0.98,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "수혜 테마를 실제 수주·매출·현금흐름 증가와 동일시할 수 없다."
+            },
+            {
+              "claim_id": "C5",
+              "claim_text": "미국 10년물 금리는 약 4.83%이고 12월 9~10일 FOMC에서 추가 인상 가능성이 있다. 연준의 올해·내년 금리 전망은 같으며 한미 금리 인상은 2026년 말~2027년 초 종료될 수 있다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "회의 날짜와 금리 수준을 검증하기 전에는 정책 이벤트나 할인율 가정으로 확정할 수 없다."
+            },
+            {
+              "claim_id": "C6",
+              "claim_text": "2026년 3월 전쟁과 유가 충격 이후 2027년 2분기 기저효과로 물가가 둔화하며 미국 근원 물가는 2%대 초반, 한국 연간 물가는 2.2%가 될 수 있다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "물가 둔화와 이에 따른 주식·채권 개선은 검증된 경로가 아니라 조건부 전망으로 다뤄야 한다."
+            }
+          ],
+          "entities": [
+            {
+              "ticker": "^KS11",
+              "name": "한국 증시·단기 수급",
+              "status": "unverified",
+              "verification_notes": [
+                "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+              ]
+            }
+          ],
+          "evidence": [
+            {
+              "evidence_id": "E1",
+              "claim_id": "C1",
+              "title": "ETF Zoo: How the Election Splits Big Tech",
+              "source_url": "https://finance.yahoo.com/markets/stocks/articles/etf-zoo-election-splits-big-220244256.html",
+              "publisher": "etf.com",
+              "published_at": "2026-11-06T22:02:44+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E2",
+              "claim_id": "C1",
+              "title": "Monster Beverage Strong Sales Momentum Offset by Margin Pressure, RBC Says",
+              "source_url": "https://finance.yahoo.com/markets/stocks/articles/monster-beverage-strong-sales-momentum-202719672.html",
+              "publisher": "MT Newswires",
+              "published_at": "2026-11-06T20:27:19+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E4",
+              "claim_id": "C2",
+              "title": "Century Aluminum CEO says Oklahoma project ‘on track’ despite community concerns",
+              "source_url": "https://finance.yahoo.com/economy/articles/century-aluminum-ceo-says-oklahoma-160000619.html",
+              "publisher": "Manufacturing Dive",
+              "published_at": "2026-11-06T16:00:00+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E5",
+              "claim_id": "C5",
+              "title": "Stock Market Today, Nov. 6: AMD Surges 11% on Record Quarterly Revenue and Stronger Growth Outlook",
+              "source_url": "https://finance.yahoo.com/markets/stocks/articles/stock-market-today-nov-6-222502683.html",
+              "publisher": "Motley Fool",
+              "published_at": "2026-11-06T22:25:02+00:00",
+              "source_tier": "news"
+            },
+            {
+              "evidence_id": "E6",
+              "claim_id": "C5",
+              "title": "Stock Market Today, Nov. 6: Iren Soars 20% on Strong AI Cloud Revenue Growth",
+              "source_url": "https://finance.yahoo.com/markets/stocks/articles/stock-market-today-nov-6-221801072.html",
+              "publisher": "Motley Fool",
+              "published_at": "2026-11-06T22:18:01+00:00",
+              "source_tier": "news"
+            },
+            {
+              "evidence_id": "E7",
+              "claim_id": "C6",
+              "title": "Canadian Natural Resources Q3 Earnings Call Highlights",
+              "source_url": "https://finance.yahoo.com/energy/articles/canadian-natural-resources-q3-earnings-221436034.html",
+              "publisher": "MarketBeat",
+              "published_at": "2026-11-06T22:14:36+00:00",
+              "source_tier": "news"
+            }
+          ]
+        }
+      },
+      {
+        "event_key": "NIsxY7_H7CY",
+        "content_sha256": "ae421ca68db40cff02c4c21e354497616cff6f5e8eb7e4df118ca8b6e1d715ac",
+        "occurred_at": "2026-11-06T02:43:10+00:00",
+        "relevance": {
+          "tickers": [
+            "MU"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "verified_entities"
+        },
+        "strategy_source_tier": "STANDARD",
+        "strategy_evidence_weight": "STANDARD",
+        "summary": {
+          "video_id": "NIsxY7_H7CY",
+          "title": "'AI에게는 재앙' 빅테크들 어떻게 대처할까 | 송재경 디멘젼투자자문 대표 [더블 업]",
+          "channel": "삼프로TV 3PROTV",
+          "source_url": "https://www.youtube.com/watch?v=NIsxY7_H7CY",
+          "published_at": "2026-11-06T02:43:10+00:00",
+          "status": "asr_uncertain",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "strategy_validation_policy": "STANDARD_REVIEW",
+          "transcript_quality": {
+            "status": "good",
+            "score": 1.0,
+            "warnings": [],
+            "source": "automatic",
+            "language": "Korean",
+            "model_or_format": "json3",
+            "chars": 11261,
+            "segments": 653,
+            "duration_seconds": 1311,
+            "repeated_ngram_ratio": 0.0
+          },
+          "claim_status_summary": {
+            "unverified": 11,
+            "asr_uncertain": 1
+          },
+          "claims": [
+            {
+              "claim_id": "C1",
+              "claim_text": "코스피 약 5.5% 하락·5,100선과 장중 5,000선 이탈, 코스닥 약 4.98% 하락·644선, 삼성전자·SK하이닉스 각각 7%대 하락 및 외국인·기관 수급 변화를 언급했다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "지수 수준·낙폭·매매 주체를 확인하기 전에는 급락 규모나 저점 판단의 근거로 사용하기 어렵다."
+            },
+            {
+              "claim_id": "C2",
+              "claim_text": "미국 시간외 거래에서 마이크론이 약 4% 상승하고 나스닥 선물이 플러스였다고 말했다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "이 스냅샷만으로 방송 당시 반등이나 반등 지속성을 판단할 수 없다."
+            },
+            {
+              "claim_id": "C3",
+              "claim_text": "급락은 펀더멘털 붕괴보다 선거 이후 리스크오프와 레버리지 강제청산이 주도했으며, AI 투자 중단·구조적 침체를 단정하기 어렵고 즉각적인 V자 반등도 쉽지 않다는 해석이다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "청산 중심의 일시적 조정이라는 설명을 확정된 원인이나 회복 보장으로 받아들이기 어렵다."
+            },
+            {
+              "claim_id": "C4",
+              "claim_text": "민주당이 중간선거에서 연방 상하원과 주요 주지사 선거에 압승했고, 현 공화당 주지사는 12월까지 재임하며 민주당 당선자·주의원은 1월부터 활동한다고 주장했다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "선거 결과와 정책 권한 이전이 확인되기 전에는 이를 AI 규제 변화의 확정 전제로 사용할 수 없다."
+            },
+            {
+              "claim_id": "C5",
+              "claim_text": "트럼프의 거부권 때문에 민주당이 연방 상하원을 장악해도 AI 규제 법제화 가능성은 거의 제로라고 평가했다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "거의 제로라는 표현을 규제 위험이 사라졌다는 의미로 반영하기 어렵다."
+            },
+            {
+              "claim_id": "C6",
+              "claim_text": "텍사스의 지나 이노호사로 지칭한 인물이 데이터센터 전면 금지 대신 신규 세제지원 철회·지역 고용·노조 활동 보장·주민 전기 및 수도요금 부담 방지를 조건으로 제시했으며, 버니 샌더스는 데이터센터에 절대 반대한다고 표현했다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "사업비 증가나 인허가 지연을 추정하려면 실제 적용 조건과 시행 권한부터 확인해야 한다."
+            }
+          ],
+          "entities": [
+            {
+              "ticker": "MU",
+              "name": "마이크론",
+              "status": "unverified",
+              "verification_notes": [
+                "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+              ]
+            }
+          ],
+          "evidence": [
+            {
+              "evidence_id": "E1",
+              "claim_id": "C1",
+              "title": "Monster Beverage Strong Sales Momentum Offset by Margin Pressure, RBC Says",
+              "source_url": "https://finance.yahoo.com/markets/stocks/articles/monster-beverage-strong-sales-momentum-202719672.html",
+              "publisher": "MT Newswires",
+              "published_at": "2026-11-06T20:27:19+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E2",
+              "claim_id": "C1",
+              "title": "PS Logistics expands Tennessee flatbed presence with Roane acquisition",
+              "source_url": "https://finance.yahoo.com/small-business/articles/ps-logistics-expands-tennessee-flatbed-182158554.html",
+              "publisher": "FreightWaves",
+              "published_at": "2026-11-06T18:21:58+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E4",
+              "claim_id": "C4",
+              "title": "Charlie Bilello Says “Some Sanity Has Returned to the Market.” What That Means for Your Portfolio",
+              "source_url": "https://finance.yahoo.com/markets/stocks/articles/charlie-bilello-says-sanity-returned-220728855.html",
+              "publisher": "24/7 Wall St.",
+              "published_at": "2026-11-06T22:07:28+00:00",
+              "source_tier": "market_or_news"
+            }
+          ]
+        }
+      }
+    ],
+    "guardrails": {
+      "untrusted_content": true,
+      "user_primary_override": {
+        "channels": [
+          "@kpunch",
+          "@sosumonkey"
+        ],
+        "strategy_source_tier": "USER_PRIMARY",
+        "strategy_evidence_weight": "HIGH",
+        "preserve_execution_gates": true
+      },
+      "may_promote_market_execution": false,
+      "allowed_actions": [
+        "UPGRADE_RESEARCH",
+        "UPGRADE_WATCH",
+        "MAINTAIN",
+        "DOWNGRADE_WATCH",
+        "DOWNGRADE_RISK",
+        "EXCLUDE",
+        "REQUIRES_PRIMARY_VERIFICATION",
+        "NO_ACTIONABLE_DELTA"
+      ]
+    },
+    "model_provenance": {
+      "schema": "tradingagents.model-provenance/v1",
+      "work_synthesis": {
+        "execution_mode": "local",
+        "requested_model": "gpt-6.1-sol",
+        "requested_reasoning_effort": "medium",
+        "task_id": "tradingagents-work-youtube",
+        "verification_status": "CONFIGURED_NOT_RUNTIME_VERIFIED",
+        "observed_model": null,
+        "observed_reasoning_effort": null,
+        "note": "The local task contract is verified; the Work host does not expose a signed per-response model receipt."
+      }
+    }
+  }
+}

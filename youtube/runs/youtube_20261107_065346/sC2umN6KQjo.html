@@ -1,0 +1,719 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YouTube 투자자용 검증 리포트 - CFTC 무기한 선물 시장 확대에 법적 분쟁, 내년 비트코인 가격 회복 기대해도 될까? | 서동주, 김동환, 최윤영 한화투자증권 팀장 [크립토 PLUS]</title>
+  <style>
+:root {
+  color-scheme: light;
+  --bg: #f7f8fb;
+  --panel: #ffffff;
+  --text: #172033;
+  --muted: #667085;
+  --line: #d9dee8;
+  --accent: #0f766e;
+  --accent-2: #2563eb;
+  --warn: #b45309;
+  --bad: #b42318;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0 56px; }
+a { color: var(--accent-2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.hero { padding: 28px 0 22px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+.hero.compact { padding-top: 12px; }
+.hero h1 { margin: 0; font-size: clamp(28px, 4vw, 44px); line-height: 1.15; letter-spacing: 0; }
+.hero p { max-width: 760px; color: var(--muted); margin: 12px 0 0; }
+.eyebrow { color: var(--accent); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0; margin: 0 0 8px; }
+section { margin: 28px 0; }
+h2, h3, h4, h5 { letter-spacing: 0; line-height: 1.25; }
+.synthesis-callout { padding: clamp(20px, 4vw, 34px); border: 1px solid #6ee7d8; border-radius: 18px; background: linear-gradient(135deg, #ecfdf9 0%, #eff6ff 100%); box-shadow: 0 18px 44px rgba(15, 118, 110, .12); }
+.synthesis-callout.unavailable { border-color: var(--line); background: var(--panel); box-shadow: none; }
+.synthesis-callout h2 { margin: 0; font-size: clamp(24px, 3.2vw, 36px); }
+.synthesis-callout .lead { max-width: 900px; font-size: 17px; color: #334155; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.primary-link, .secondary-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border-radius: 999px; font-weight: 800; }
+.primary-link { color: white; background: var(--accent); }
+.secondary-link { color: var(--accent-2); border: 1px solid #93c5fd; background: white; }
+.primary-link:hover, .secondary-link:hover { text-decoration: none; filter: brightness(.97); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.card, .run { display: flex; flex-direction: column; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; color: var(--text); min-height: 128px; }
+.run { padding: 16px; }
+.card:hover, .run:hover { border-color: var(--accent-2); text-decoration: none; }
+.thumb { display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #e9edf5; border-radius: 8px 8px 0 0; color: var(--muted); font-size: 13px; font-weight: 700; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb-empty span { padding: 0 14px; text-align: center; }
+.card-body { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 16px; }
+.card strong { line-height: 1.35; }
+.source-line { color: #3f4a5f; font-weight: 600; }
+.runs { display: grid; gap: 10px; }
+.badge { display: inline-flex; width: fit-content; border-radius: 999px; padding: 2px 9px; background: #e6f4f1; color: var(--accent); font-size: 12px; font-weight: 700; }
+.status-contradicted, .status-llm_failed { background: #fee4e2; color: var(--bad); }
+.status-unverified, .status-stale { background: #fff4d6; color: var(--warn); }
+small, .muted { color: var(--muted); }
+.topnav { display: flex; gap: 14px; margin-bottom: 16px; font-size: 14px; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px; }
+.stats span { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
+.report { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: min(5vw, 36px); }
+.report-head { border-bottom: 1px solid var(--line); margin-bottom: 24px; padding-bottom: 20px; }
+.report-head h1 { margin: 0; font-size: clamp(24px, 3.5vw, 38px); line-height: 1.2; }
+.meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+.scope-note { padding: 12px 14px; border-left: 4px solid var(--warn); border-radius: 6px; background: #fff7ed; color: #7c2d12; }
+.synthesis-report h2 { margin-top: 34px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.synthesis-report h3 { margin: 24px 0 8px; color: #0f4c5c; }
+.synthesis-report p, .synthesis-report li { overflow-wrap: anywhere; }
+pre { overflow: auto; background: #111827; color: #f9fafb; border-radius: 8px; padding: 14px; }
+code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+details { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 18px; }
+@media (max-width: 640px) {
+  main { width: min(100% - 20px, 1120px); padding-top: 18px; }
+  .report { padding: 18px; }
+  .synthesis-callout { border-radius: 14px; padding: 18px; }
+  .cta-row a { width: 100%; }
+  .mobile-report { border-radius: 12px; }
+}
+</style>
+</head>
+<body>
+  <main>
+<nav class="topnav"><a href="index.html">실행 목록</a><a href="../../index.html">YouTube 홈</a></nav>
+<article class="report">
+  <header class="report-head">
+    <p class="eyebrow">youtube_20261107_065346</p>
+    <h1>CFTC 무기한 선물 시장 확대에 법적 분쟁, 내년 비트코인 가격 회복 기대해도 될까? | 서동주, 김동환, 최윤영 한화투자증권 팀장 [크립토 PLUS]</h1>
+    <div class="meta">
+      <span class="badge status-unverified">unverified</span>
+      <a href="https://www.youtube.com/watch?v=sC2umN6KQjo">원본 영상</a>
+    </div>
+  </header>
+  <h2>가상자산 규제와 2027년 회복 전망: 기대보다 검증이 먼저</h2>
+<p><strong>분석 기준: 2026년 11월 7일 · 영상 게시: 2026년 11월 6일</strong></p>
+<p>출처: <a href="https://www.youtube.com/watch?v=sC2umN6KQjo">삼프로TV 크립토 PLUS 영상</a></p>
+<h3>1. 핵심 판단</h3>
+<p>영상의 투자 논리는 <strong>미국 파생상품 시장의 제도권 편입 → 시장 확대 → 비트코인 중심 회복 → 거래 플랫폼 수익 개선</strong>으로 정리된다. 다만 법적 분쟁과 입법 지연이 이 경로를 제약할 수 있다는 조건이 붙는다.</p>
+<p><strong>제공된 검증 결과에서는 핵심 주장 12개 모두 미검증이다.</strong> 관련 공식 발표·법원 문서·기업 공시가 확보되지 않았기 때문이다. 이는 주장이 거짓이라는 뜻도, 반증됐다는 뜻도 아니다. 현재 자료로는 영상의 전망을 뒷받침하는 외부 사실을 확정할 수 없다는 의미다.</p>
+<p>따라서 이 영상은 확인된 투자 촉매의 목록보다, 앞으로 검증할 규제·시장·실적 가설의 목록으로 읽는 것이 적절하다.</p>
+<h3>2. 영상 주장과 확인된 사실·근거</h3>
+<p>아래 시각은 개별 발언의 정확한 시작점이 아니라 관련 내용을 포함하는 청크의 시작점이다.</p>
+<p>| 주제·시각 | 영상 주장 | 확인된 사실·근거 및 한계 |</p>
+<p>|---|---|---|</p>
+<p>| 무기한 파생상품 규제·00:00:10 | CFTC의 허용 이후 선물·스왑 분류와 감독권을 둘러싼 분쟁이 발생했다. | 관련 발표·상품 신고서·법령이 없다. 포괄적 허용인지 개별 상품의 자기인증·승인인지 확인되지 않았다. 미국 개인투자자의 모든 상품 접근이 허용됐다고 해석할 수 없다. |</p>
+<p>| 소송과 일정·00:00:10 | CME 관련 소송과 별도 주식 기반 상품 소송이 있으며, 11월 10일 서면 제출이 중요하다. | 사건번호·소장·명령문이 없어 당사자, 신청 기각 여부, 제출기한을 확인하지 못했다. 기한을 확정된 법원 일정으로 사용할 수 없다. |</p>
+<p>| 플랫폼 출시·00:00:10 | ‘칼시’로 전사된 플랫폼이 11월 3일 주식 기반 무기한 선물을 처음 시작했다. | 플랫폼명부터 원음 확인이 필요하다. 공식 출시 자료가 없고, 진행자도 최초 여부를 확인하지 않았다고 밝혔다. |</p>
+<p>| HYPE·00:06:38 | Trade XYZ를 통한 미국 진출 기대가 긍정적으로 작용했으나 소송 뉴스가 가격 약세를 유발했다. | 미국 고객 접근·인허가 구조가 확인되지 않았다. HYPE 시세 조회도 실패해 가격 약세와 뉴스의 인과관계를 검증할 수 없다. |</p>
+<p>| CLARITY·00:06:38~00:13:00 | 2026년 통과 가능성이 낮고 2027년에도 보호 조항·별도 입법 논의로 지연될 수 있다. | 법안번호·문안·의사진행 이력이 없다. 현재 절차 단계와 정치적 전제는 미검증이고, 통과 가능성은 출연자의 전망이다. |</p>
+<p>| 예측 시장·00:13:00, 00:19:25 | 연방·주 관할 및 도박 해당 여부에 관한 소송이 사업에 영향을 줄 수 있다. | 사건별 판결과 적용 지역은 확인되지 않았다. 출연자는 후반부에 이를 확정적인 규제 강화 전망으로 해석하는 것을 정정했다. |</p>
+<p>| BTC·00:19:25 | 2027년에는 2026년보다 비트코인 중심으로 회복하고 알트코인은 차별화될 것이다. | 미래 시나리오다. 목표 가격, 연말·연평균 등 비교 기준, 알트코인 평가 표본이 제시되지 않았다. |</p>
+<p>| COIN·HOOD·00:19:25 | 시장 회복에 따른 거래 수수료 증가가 예측 시장 차질의 영향을 웃돌 수 있다. | 사업별 매출·거래량·수수료율 공시가 없어 상쇄 규모를 계산할 수 없다. 코인베이스의 사업 비중 평가를 로빈후드에 그대로 적용해서는 안 된다. |</p>
+<p>주요 발언 구간: <a href="https://www.youtube.com/watch?v=sC2umN6KQjo&amp;t=10s">규제·소송</a>, <a href="https://www.youtube.com/watch?v=sC2umN6KQjo&amp;t=398s">HYPE·입법</a>, <a href="https://www.youtube.com/watch?v=sC2umN6KQjo&amp;t=780s">예측 시장</a>, <a href="https://www.youtube.com/watch?v=sC2umN6KQjo&amp;t=1165s">시장 전망·플랫폼</a>. 이 링크들은 <strong>영상 주장 출처</strong>이며 외부 사실의 입증 자료는 아니다.</p>
+<h4>외부 증거 묶음의 실제 유용성</h4>
+<p>수집된 E1~E6 중 주장 검증에 채택된 자료는 없다. E1~E3는 음료·물류·알루미늄 기업 기사이고, E4는 제공된 내용에서 HYPE 관련성이 확인되지 않는다. E5~E6는 호주 성장주·캐나다 자원기업 기사로 미국 의회 주장과 무관하다. 일부 발췌문은 비어 있거나 웹페이지 메뉴 위주다.</p>
+<p>따라서 수집 상태의 <code>verified</code> 표시는 주장 검증 완료를 의미하지 않는다. 이 기사들은 지지·반박 근거 모두에서 제외해야 한다. 또한 모두 영상 게시 이후 기사이므로, 관련성이 있더라도 방송 당시 정보와 사후 정보를 구분해야 한다. <strong>이번 자료에는 핵심 주장을 직접 뒷받침하는 강한 외부 출처 링크가 없다.</strong></p>
+<h3>3. 상승 논리와 반론</h3>
+<h4>상승 시나리오가 성립하려면</h4>
+<ul>
+<li><strong>제도권 편입:</strong> 실제 허용 범위와 고객 접근성이 확인되고, 법적 분쟁이 사업 운영을 크게 제약하지 않아야 한다.</li>
+<li><strong>BTC 중심 회복:</strong> 비트코인 수익률이 개선되는 동시에 시장 내 상대적 강세가 관찰돼야 한다. BTC만 상승했다고 알트코인 전반의 회복을 뜻하지는 않는다.</li>
+<li><strong>플랫폼 수익 개선:</strong> 가격 회복이 유료 거래량 증가로 이어지고, 실효 수수료율이 유지돼야 한다.</li>
+</ul>
+<h4>주요 반론</h4>
+<ul>
+<li>제도권 편입이 모든 상품의 허용이나 모든 사업자의 수혜를 의미하지 않는다. 적용 상품·고객·사업 주체를 따로 확인해야 한다.</li>
+<li>긴급 신청 기각과 본안 승소는 다르다. 제출기한과 실제 거래 중단 명령도 구분해야 한다.</li>
+<li>가격 상승만으로 거래 수수료 수익 증가를 단정할 수 없다. 거래량, 수수료율, 상품 구성과 비용이 함께 영향을 준다.</li>
+<li>예측 시장의 법적 제한은 주·계약·사건별로 다를 수 있다. 개별 사건을 전국적 금지나 일괄적인 규제 강화로 일반화할 근거는 없다.</li>
+<li>나스닥과 BTC의 동반 하락은 인과관계의 입증이 아니다. 기관 자금조달 문제라는 대안 설명 역시 현재는 추정에 머문다.</li>
+</ul>
+<p>플랫폼 상쇄 논리는 기업별로 <strong>암호자산 거래 수익 증가분 − 예측 시장 수익 감소분 − 추가 관련 비용</strong>을 비교해야 검토할 수 있다. 현재는 필요한 수치가 없어 계산이 불가능하다.</p>
+<h3>4. 수치·비공개 출처의 취급</h3>
+<ul>
+<li><strong>방송 중 등락률:</strong> BTC 약 +0.2%, 삼성전자 약 +3%, SK하이닉스 약 +5%는 녹화 시각과 비교 기준이 없어 재현되지 않았다. 전날 -6% 발언은 대상도 불명확하므로 특정 자산의 하락률로 인용할 수 없다.</li>
+<li><strong>BTC 조회값:</strong> 호스트가 조회한 ‘BTC’ 값 33.5는 기초자산·통화·거래쌍이 식별되지 않는다. 비트코인 현물 가격으로 사용하지 않는다.</li>
+<li><strong>COIN·HOOD 시세:</strong> 조회 시점의 주가 스냅샷은 존재하지만 사업별 매출 비중이나 손실 상쇄 전망을 입증하지 않는다. 현재 시세로도 제시하지 않는다.</li>
+<li><strong>Bloomberg:</strong> 기사 URL·제목·보도 시각·관련 기관이 없어 <strong>미검증·수동 확인 필요</strong>다. 특정 기관 부실이 확인된 것으로 전달할 수 없다.</li>
+<li><strong>바이낸스 해킹:</strong> 공식 사고 공지가 없어 사건 자체와 침해 대상을 확인하지 못했다. Bloomberg 언급과 같은 사건이라고 연결하지 않는다.</li>
+<li><strong>미공개 보고서·폐쇄형 출처:</strong> 준비 중인 알트코인 보고서와 텔레그램 재전달·익명 전문가 견해는 <strong>미검증·수동 확인 필요</strong>다. Morningstar 자료는 제공되지 않았다.</li>
+</ul>
+<h3>5. 데이터 품질과 신뢰도 해석</h3>
+<p>자동자막의 <code>transcript_quality</code>는 good, 점수는 1.0이다. 그러나 이는 인명·법률 용어·날짜의 정확성 보증이 아니다. ‘CMA’, ‘칼시’, ‘서명/서면 제출’, ‘10월/11월 10일’ 및 출연자 이름에 불일치가 있다. 원음 대조 자료는 제공되지 않았다.</p>
+<p>주장 추출 단계의 <code>source_confidence</code> 0.87~0.96은 영상 내용의 추출 신뢰도이며 외부 사실의 진실 확률이 아니다. 검증 단계의 <code>source_confidence</code>와 <code>asr_confidence</code>는 모두 0.0으로, 각각 관련 외부 근거 부재와 원음 대조 미실시에 따른 미산정 대체값이다. 개별 미검증 판정의 confidence 0.99 역시 <strong>주장이 사실일 확률이 아니라 미검증 판정에 대한 신뢰도</strong>다.</p>
+<p>‘올해=2026년, 내년=2027년’은 게시일을 기준으로 한 해석이다. 실제 녹화일은 확인되지 않았다. 뉴스 조회 실패와 공시 제공자 사용 불가는 관련 뉴스·공시가 존재하지 않는다는 뜻이 아니다.</p>
+<h3>6. 단기 체크포인트와 전망 무효화 조건</h3>
+<p>| 관찰 항목 | 구체적으로 확인할 자료·지표 | 영상 논리를 약화시키는 조건 |</p>
+<p>|---|---|---|</p>
+<p>| 방송상 11월 10일 일정 | 사건번호, 법원 일정표, 제출 문서, 실제 명령의 적용 상품·기간 | 일정·사건이 다르게 확인되면 해당 촉매 해석을 수정해야 한다. 거래 제한 명령이 확인되면 시장 확대 가설이 약해진다. |</p>
+<p>| 출시·미국 진출 | 플랫폼명 원음, 공식 출시일·계약 명세, Trade XYZ의 사업 주체·고객 제한·인허가 | 미국 접근이 제한되거나 예상 사업 구조와 다르면 진출 기대의 전제가 약해진다. |</p>
+<p>| CLARITY·정치 전제 | 정확한 법안번호·의사진행 이력, 양원 구성과 위원회 인선 | 공식 기록이 영상 설명과 다르면 입법 일정 시나리오를 재작성해야 한다. |</p>
+<p>| 예측 시장 | 사건별 대상 계약·적용 주·금지 범위·항소·집행정지 | 실제 영업 제한이 수익원에 미치는 영향이 확인되면 플랫폼별 손익을 다시 계산해야 한다. |</p>
+<p>| 유동성·보안 | Bloomberg 원기사, 당사자 공시, 공식 사고 공지 | 원문 확보 전에는 해당 사건을 확정 촉매로 반영하지 않는다. |</p>
+<p>| COIN·HOOD 실적 | 각사 거래량, 실효 수수료율, 거래 수익, 예측 시장 매출·관련 비용 | 거래 수익 증가분이 관련 손실·추가 비용에 못 미치면 상쇄 논리가 성립하지 않는다. |</p>
+<p>| 2027년 회복 | 예컨대 2027년 말 대비 2026년 말 BTC 수익률로 기준을 사전 고정하고, BTC 도미넌스·고정 알트코인 표본을 함께 관찰 | 선택한 기준에서 BTC가 회복하지 못하면 회복 전망은 불성립한다. BTC 상대 우위가 없으면 ‘BTC 주도’ 부분은 별도로 재평가한다. |</p>
+<h3>결론</h3>
+<p>영상이 제시한 회복 경로는 조건부 가설로 검토할 수 있지만, 규제 허용 범위·법원 일정·미국 진출 구조·플랫폼 매출 비중은 아직 입증되지 않았다. 가장 중요한 관찰 순서는 <strong>공식 규제·법원 문서로 사업 가능 범위를 확인하고, 이후 실제 거래량과 기업별 수익으로 기대의 실현 여부를 점검하는 것</strong>이다. 자료 부족 자체를 악재로 단정하거나, 영상의 낙관적 전망을 확인된 사실로 취급해서는 안 된다.</p>
+  <details>
+    <summary>공개 요약 JSON</summary>
+    <pre>{
+  &quot;version&quot;: 4,
+  &quot;video_id&quot;: &quot;sC2umN6KQjo&quot;,
+  &quot;title&quot;: &quot;CFTC 무기한 선물 시장 확대에 법적 분쟁, 내년 비트코인 가격 회복 기대해도 될까? | 서동주, 김동환, 최윤영 한화투자증권 팀장 [크립토 PLUS]&quot;,
+  &quot;url&quot;: &quot;https://www.youtube.com/watch?v=sC2umN6KQjo&quot;,
+  &quot;channel&quot;: &quot;삼프로TV 3PROTV&quot;,
+  &quot;channel_id&quot;: &quot;UChlv4GSd7OQl3js-jkLOnFA&quot;,
+  &quot;source_url&quot;: &quot;https://www.youtube.com/@3protv/videos&quot;,
+  &quot;thumbnail_url&quot;: &quot;https://i.ytimg.com/vi/sC2umN6KQjo/maxresdefault.jpg&quot;,
+  &quot;published_at&quot;: &quot;2026-11-06T03:45:20+00:00&quot;,
+  &quot;status&quot;: &quot;unverified&quot;,
+  &quot;strategy_source_tier&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_evidence_weight&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_validation_policy&quot;: &quot;STANDARD_REVIEW&quot;,
+  &quot;transcript_status&quot;: &quot;available&quot;,
+  &quot;transcript_source&quot;: &quot;automatic&quot;,
+  &quot;transcript_chars&quot;: 12870,
+  &quot;transcript_quality&quot;: {
+    &quot;status&quot;: &quot;good&quot;,
+    &quot;score&quot;: 1.0,
+    &quot;warnings&quot;: [],
+    &quot;source&quot;: &quot;automatic&quot;,
+    &quot;language&quot;: &quot;Korean&quot;,
+    &quot;model_or_format&quot;: &quot;json3&quot;,
+    &quot;chars&quot;: 12870,
+    &quot;segments&quot;: 739,
+    &quot;duration_seconds&quot;: 1560,
+    &quot;repeated_ngram_ratio&quot;: 0.001
+  },
+  &quot;generated_at&quot;: &quot;2026-11-07T06:53:46.593660+09:00&quot;,
+  &quot;llm_status&quot;: &quot;success&quot;,
+  &quot;research_status&quot;: &quot;success&quot;,
+  &quot;claim_verification_status&quot;: &quot;success&quot;,
+  &quot;research_pipeline_version&quot;: 4,
+  &quot;evidence_count&quot;: 6,
+  &quot;claim_status_summary&quot;: {
+    &quot;unverified&quot;: 12
+  },
+  &quot;claims&quot;: [
+    {
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;claim_text&quot;: &quot;CFTC가 미국 무기한 선물을 허용했으며 상품의 선물·스왑 분류에 따라 감독권과 개인 판매 요건이 달라진다는 설명.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:10&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;허용 발표일 미제시&quot;,
+        &quot;observed&quot;: &quot;관련 공식 발표·효력 발생일 확인 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;규제 허용을 모든 무기한 상품이나 미국 개인투자자 접근 허용으로 확대 해석할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;claim_text&quot;: &quot;CME의 비트코인 무기한 선물 소송과 별도 주식 기반 상품 소송이 있으며, 긴급 신청 기각 후 11월 10일 서면 제출과 예비적 금지명령 판단이 예정됐다는 설명.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:10&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;CME 소송 시점은 &#x27;6월인가&#x27;; 서면 제출은 11월 10일; 10월 발화도 존재&quot;,
+        &quot;observed&quot;: &quot;연도·접수일·제출기한 확인 불가; 60일은 확정 기간이 아닌 예시&quot;
+      },
+      &quot;investor_implication&quot;: &quot;거래 중단이나 스왑 분류가 이미 확정됐다는 전제로 판단할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;claim_text&quot;: &quot;칼시로 전사된 플랫폼에서 11월 3일 주식 기반 무기한 선물이 처음 시작됐다는 설명.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:10&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;11월 3일 개시; 게시일 기준 잠정적으로 2026년&quot;,
+        &quot;observed&quot;: &quot;출시일·연도·최초 여부 확인 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;플랫폼과 상품의 실제 정체 및 최초의 적용 범위를 확인하기 전에는 시장 선점 근거로 사용할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;claim_text&quot;: &quot;Trade XYZ를 통한 미국 진출 기대가 HYPE에 긍정적으로 작용했고 주식 기반 무기한 선물 소송 뉴스가 가격 약세의 배경이라는 해석.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:06:38&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;가격 약세의 구체적 수치 없음&quot;,
+        &quot;observed&quot;: &quot;HYPE 가격·거래량·사건 전후 수익률 사용 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;미국 진출 기대를 인허가 확보로, 소송 보도를 가격 하락의 입증된 원인으로 취급할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;claim_text&quot;: &quot;CLARITY 법안은 상원 본안 심의 전 절차에서 멈췄으며 2026년 통과 가능성이 낮고 2027년 보호 조항·별도 입법 논의로 지연될 수 있다는 설명과 전망.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:06:38&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;연내 2026년 통과 가능성 낮음; 내년 2027년 지연 가능성&quot;,
+        &quot;observed&quot;: &quot;게시일을 이용한 연도 해석만 가능; 실제 녹화일·법안 단계·통과일 확인 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;입법 지연을 확정 일정으로 반영하거나 행정 해석의 지속성을 보장된 것으로 볼 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;claim_text&quot;: &quot;민주당의 다음 해 의회 주도권과 Brown·Warren의 역할 변화 가능성, 초당적 가상자산 입법 수요 및 대통령 거부권 재의결에 3분의 2 찬성이 필요하다는 발언.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:06:38&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;거부권 재의결에 3분의 2 찬성; 다음 해는 잠정적으로 2027년&quot;,
+        &quot;observed&quot;: &quot;제공 자료에 재의결 요건의 법적 원문 및 양원별 적용 근거 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;정당 주도권 변화나 특정 인사의 역할을 확인된 정책 경로로 사용할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;claim_text&quot;: &quot;예측 시장은 연방·주 관할 및 도박 해당 여부 소송 결과에 따라 영업이 제한될 수 있으며, 출연자는 이를 2027년 규제 강화의 확정 전망으로 해석하는 것을 정정했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:13:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;2027년 소송·판결 관찰&quot;,
+        &quot;observed&quot;: &quot;구체적 판결 예정일·적용 지역 확인 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;전국적 금지나 확정적인 규제 강화를 가정하지 말고 주·계약·사건별 효력을 확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;claim_text&quot;: &quot;BTC 조정이 전날 나스닥 급락의 영향을 받았다는 해석과 방송 중 BTC 약 0.2%, 삼성전자 약 3%, SK하이닉스 약 5% 상승 및 전날 대상 불명의 6% 하락 발언.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:19:25&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;BTC 약 +0.2%; 삼성전자 약 +3%; SK하이닉스 약 +5%; 전날 대상 불명 -6%&quot;,
+        &quot;observed&quot;: &quot;2026-11-06T22:32:46.452054+00:00 조회의 BTC 표기 값 33.5만 존재; 기초자산과 비교 기준 미확인으로 대조 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;방송 수치를 현재 시세나 검증된 수익률로 재사용할 수 없고 6%를 특정 자산에 귀속할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;claim_text&quot;: &quot;Bloomberg 자금조달 보도를 바탕으로 기관 유동성 문제 가능성을 추정하고 바이낸스 해킹을 단기 가격 요인으로 언급했다는 내용.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:06:38&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;보도일·사건일·손실액 미제시&quot;,
+        &quot;observed&quot;: &quot;관련 수치 및 사건 식별 정보 확인 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;특정 기관 부실이나 바이낸스 침해가 확인됐다는 사실로 전달하거나 매매 전제로 사용할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C10&quot;,
+      &quot;claim_text&quot;: &quot;2027년에는 2026년보다 비트코인 주도의 회복과 알트코인 차별화가 나타날 것이며 알트코인 전망 보고서는 준비 중이라는 발언.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:19:25&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;2027년이 2026년보다 회복&quot;,
+        &quot;observed&quot;: &quot;연말·연평균 등 비교 기준 및 목표 가격 없음; 미래 결과 미관측&quot;
+      },
+      &quot;investor_implication&quot;: &quot;확정 수익 전망으로 취급하지 말고 평가 기간·BTC 주도 기준·알트코인 표본을 먼저 정의해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C11&quot;,
+      &quot;claim_text&quot;: &quot;코인베이스의 예측 시장 매출 비중이 증가했지만 전체 실적에 큰 타격을 줄 수준은 아니며 시장 회복에 따른 거래 수수료 증가가 관련 손실보다 클 수 있다는 평가.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:19:25&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;예측 시장 매출 비중 증가; 구체적 금액·비중 없음&quot;,
+        &quot;observed&quot;: &quot;COIN 주가 134.75999450683594만 조회됐으며 관련 매출·손실 수치는 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;사업 비중이 작다는 평가와 손실 상쇄 전망은 회사 공시 및 거래량·수수료율 시나리오 확인 전까지 미검증이다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C12&quot;,
+      &quot;claim_text&quot;: &quot;로빈후드도 예측 시장과 암호자산 거래 수수료에 노출되며 시장 회복 시 수수료 증가가 예측 시장 차질의 영향을 웃돌 수 있다는 전망.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:19:25&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;수수료 증가가 예측 시장 차질을 상쇄할 가능성; 금액·비중 없음&quot;,
+        &quot;observed&quot;: &quot;HOOD 주가 80.91000366210938만 조회됐으며 관련 매출·손실 수치는 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;로빈후드 자체 매출 구조와 법적 제약에 근거한 독립적인 상쇄 시나리오가 필요하다.&quot;
+    }
+  ],
+  &quot;entities&quot;: [
+    {
+      &quot;ticker&quot;: &quot;HYPE&quot;,
+      &quot;name&quot;: &quot;하이퍼리퀴드&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;진행자는 Trade XYZ를 통한 미국 진출 기대가 긍정적 분위기를 만들었으나, 주식 기반 무기한 선물 소송 뉴스가 하이퍼리퀴드 가격 약세의 배경이라고 해석한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [],
+      &quot;verification_notes&quot;: [
+        &quot;시장 데이터 조회 실패: no_usable_market_fields&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;HYPE&quot;,
+        &quot;as_of&quot;: &quot;2026-11-06T22:32:43.168435+00:00&quot;,
+        &quot;current_price&quot;: null,
+        &quot;market_cap&quot;: null,
+        &quot;forward_pe&quot;: null,
+        &quot;trailing_pe&quot;: null,
+        &quot;fifty_two_week_high&quot;: null,
+        &quot;fifty_two_week_low&quot;: null,
+        &quot;average_target_price&quot;: null,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;unverified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;BTC&quot;,
+      &quot;name&quot;: &quot;비트코인·가상자산 시장&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;출연자는 최근 조정에 전날 나스닥 급락의 영향이 컸다고 보면서도, 2027년에는 2026년보다 가격이 회복되는 비트코인 주도 장세와 알트코인별 차별화를 예상한다.&quot;,
+        &quot;진행자는 급락이 단순한 자연 조정보다 특정 기관의 자금조달 문제를 반영할 가능성이 있다고 추정하며 추가 하락 가능성을 제기한다. 확인된 기관 부실 사건으로 제시한 것은 아니다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;방송 후반 진행자는 비트코인이 약 0.2% 상승 중이라고 언급한다. 비교 기준은 명시하지 않는다.&quot;,
+        &quot;진행자는 전날 6% 하락을 언급하지만 해당 문장에서 자산·지수와 산정 기준을 명확히 특정하지 않는다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;BTC&quot;,
+        &quot;as_of&quot;: &quot;2026-11-06T22:32:46.452054+00:00&quot;,
+        &quot;current_price&quot;: 33.5,
+        &quot;market_cap&quot;: null,
+        &quot;forward_pe&quot;: null,
+        &quot;trailing_pe&quot;: null,
+        &quot;fifty_two_week_high&quot;: 47.07,
+        &quot;fifty_two_week_low&quot;: 25.65,
+        &quot;average_target_price&quot;: null,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;COIN&quot;,
+      &quot;name&quot;: &quot;코인베이스&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;출연자는 코인베이스의 예측 시장 매출 비중이 증가했지만 아직 전체 매출에 큰 타격을 줄 정도는 아니라고 평가한다. 시장 회복에 따른 거래 수수료 증가가 예측 시장 관련 감소분보다 클 수 있다고 전망한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;COIN&quot;,
+        &quot;as_of&quot;: &quot;2026-11-06T22:32:48.805880+00:00&quot;,
+        &quot;current_price&quot;: 134.75999450683594,
+        &quot;market_cap&quot;: 35679516755.29111,
+        &quot;forward_pe&quot;: 54.56312,
+        &quot;trailing_pe&quot;: null,
+        &quot;fifty_two_week_high&quot;: 324.8,
+        &quot;fifty_two_week_low&quot;: 131.55,
+        &quot;average_target_price&quot;: 197.50294,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;HOOD&quot;,
+      &quot;name&quot;: &quot;로빈후드&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;로빈후드도 예측 시장과 코인 거래 수수료 노출이 있는 플랫폼으로 거론되며, 출연자는 이들 플랫폼에서 시장 회복에 따른 수수료 증가가 예측 시장 차질의 영향을 웃돌 수 있다고 전망한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;HOOD&quot;,
+        &quot;as_of&quot;: &quot;2026-11-06T22:32:50.674900+00:00&quot;,
+        &quot;current_price&quot;: 80.91000366210938,
+        &quot;market_cap&quot;: 72858752519.76755,
+        &quot;forward_pe&quot;: 23.702806,
+        &quot;trailing_pe&quot;: 37.285713,
+        &quot;fifty_two_week_high&quot;: 139.75,
+        &quot;fifty_two_week_low&quot;: 63.515,
+        &quot;average_target_price&quot;: 130.67133,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    }
+  ],
+  &quot;evidence&quot;: [
+    {
+      &quot;evidence_id&quot;: &quot;E1&quot;,
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;title&quot;: &quot;Monster Beverage Strong Sales Momentum Offset by Margin Pressure, RBC Says&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/monster-beverage-strong-sales-momentum-202719672.html&quot;,
+      &quot;publisher&quot;: &quot;MT Newswires&quot;,
+      &quot;published_at&quot;: &quot;2026-11-06T20:27:19+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Monster Beverage Strong Sales Momentum Offset by Margin Pressure, RBC Says Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 2026 Elections Wea...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E2&quot;,
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;title&quot;: &quot;PS Logistics expands Tennessee flatbed presence with Roane acquisition&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/small-business/articles/ps-logistics-expands-tennessee-flatbed-182158554.html&quot;,
+      &quot;publisher&quot;: &quot;FreightWaves&quot;,
+      &quot;published_at&quot;: &quot;2026-11-06T18:21:58+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;PS Logistics expands Tennessee flatbed presence with Roane acquisition Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 2026 Elections Weather...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E4&quot;,
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;title&quot;: &quot;Charlie Bilello Says “Some Sanity Has Returned to the Market.” What That Means for Your Portfolio&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/charlie-bilello-says-sanity-returned-220728855.html&quot;,
+      &quot;publisher&quot;: &quot;24/7 Wall St.&quot;,
+      &quot;published_at&quot;: &quot;2026-11-06T22:07:28+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Charlie Bilello Says “Some Sanity Has Returned to the Market.” What That Means for Your Portfolio Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Origi...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E5&quot;,
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;title&quot;: &quot;Emerald Resources And 2 Other Australian Growth Stocks To Watch&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/emerald-resources-2-other-australian-221444491.html&quot;,
+      &quot;publisher&quot;: &quot;Simply Wall St.&quot;,
+      &quot;published_at&quot;: &quot;2026-11-06T22:14:44+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E6&quot;,
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;title&quot;: &quot;Canadian Natural Resources Q3 Earnings Call Highlights&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/energy/articles/canadian-natural-resources-q3-earnings-221436034.html&quot;,
+      &quot;publisher&quot;: &quot;MarketBeat&quot;,
+      &quot;published_at&quot;: &quot;2026-11-06T22:14:36+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    }
+  ],
+  &quot;source_policy&quot;: {
+    &quot;raw_transcript_published&quot;: false,
+    &quot;raw_transcript_in_evidence&quot;: false,
+    &quot;research_pipeline_version&quot;: 4,
+    &quot;closed_source_claims&quot;: &quot;unverified_external_source&quot;,
+    &quot;auto_caption_warning&quot;: true,
+    &quot;local_asr_warning&quot;: false
+  }
+}</pre>
+  </details>
+</article>
+</main>
+  <style>
+.reader-contents { margin: 16px 0; padding: 12px 16px; border: 1px solid var(--line, #64748b); border-radius: 12px; }
+.reader-contents > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-weight: 750; }
+.reader-contents nav { display: grid; gap: 4px; max-height: 45vh; overflow: auto; margin: 8px 0; }
+.reader-contents a { display: block; min-height: 44px; padding: 10px; border-radius: 6px; color: inherit; overflow-wrap: anywhere; }
+.reader-contents a:hover { background: #80808020; }
+.reader-contents .reader-subsection { padding-inline-start: 24px; font-size: .92em; }
+.reader-prose, .report { overflow-wrap: anywhere; line-height: 1.8; }
+.reader-prose p, .reader-prose li { max-width: 85ch; }
+.reader-prose h2, .reader-prose h3, .reader-prose h4, [data-reader-heading] { scroll-margin-top: 100px; line-height: 1.45; }
+.reader-prose h2 { margin-top: 1.8em; padding-bottom: 8px; border-bottom: 1px solid var(--line, #64748b); }
+.reader-prose h3 { margin-top: 1.5em; }
+.reader-prose li { margin: .5em 0; }
+.reader-prose pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.reader-prose blockquote { margin: 16px 0; padding: 4px 16px; border-left: 3px solid var(--accent, #64748b); }
+.reader-table { overflow: auto; max-width: 100%; margin: 16px 0; border: 1px solid var(--line, #64748b); border-radius: 10px; }
+.reader-table table { border-collapse: collapse; width: 100%; margin: 0; font-size: .92rem; }
+.reader-table th, .reader-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line, #64748b); min-width: 110px; max-width: 400px; overflow-wrap: anywhere; white-space: normal; }
+.reader-table th { background: #80808018; }
+.reader-table tr:nth-child(even) { background: #80808008; }
+.reader-search { display: grid; gap: 8px; margin: 16px 0; }
+.reader-search label { font-weight: 700; }
+.reader-search input { box-sizing: border-box; width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line, #64748b); border-radius: 10px; background: var(--panel, #fff); color: var(--text, #132238); font: inherit; }
+.reader-search p { margin: 0; font-size: .86rem; }
+.reader-back { position: fixed; bottom: max(14px, env(safe-area-inset-bottom)); right: 14px; z-index: 30; min-height: 44px; border: 1px solid #778899; border-radius: 99px; padding: 10px 16px; background: #18344a; color: #fff; font: 700 14px system-ui; cursor: pointer; box-shadow: 0 3px 12px #0003; }
+[data-reader-source] { margin-top: 20px; }
+[data-reader-source] > summary { min-height: 44px; cursor: pointer; }
+[data-reader-source] pre { font-size: .85rem; }
+[data-reader-source] pre, .reader-prose { min-width: 0; }
+.reader-contents :focus-visible, .reader-search :focus-visible, .reader-back:focus-visible, .reader-table:focus-visible { outline: 3px solid var(--accent, #008c95); outline-offset: 3px; }
+.reader-search + .grid > [hidden] { display: none !important; }
+@media (max-width: 600px) { .reader-prose { font-size: 1rem; } .reader-contents { padding: 8px 12px; } }
+@media print { .reader-back, .reader-search, .reader-contents, [data-reader-source] { display: none !important; } .reader-table { overflow: visible; } .reader-prose { color: #000; background: #fff; } }
+</style><script>
+(() => {
+  'use strict';
+  let serial = 0;
+  const rendered = new WeakMap();
+  const node = (tag, text) => { const el = document.createElement(tag); if (text != null) el.textContent = text; return el; };
+  function inline(parent, text) {
+    const pattern = /(`[^`]+`|\*\*[^*]+\*\*|\[[^\]]+\]\(https?:\/\/[^\s)]+\))/g;
+    let start = 0;
+    for (const match of String(text).matchAll(pattern)) {
+      parent.append(document.createTextNode(text.slice(start, match.index)));
+      const value = match[0];
+      if (value.startsWith('`')) parent.append(node('code', value.slice(1, -1)));
+      else if (value.startsWith('**')) parent.append(node('strong', value.slice(2, -2)));
+      else {
+        const link = value.match(/^\[([^\]]+)\]\((.+)\)$/);
+        const a = node('a', link[1]); a.href = link[2]; a.rel = 'noopener noreferrer'; parent.append(a);
+      }
+      start = match.index + value.length;
+    }
+    parent.append(document.createTextNode(text.slice(start)));
+  }
+  const cells = line => line.trim().replace(/^\|/, '').replace(/\|$/, '').split(/(?<!\\)\|/).map(v => v.trim().replace(/\\\|/g, '|'));
+  function markdown(source) {
+    const article = node('article'); article.className = 'reader-prose';
+    const lines = source.split(/\r?\n/); let list = null;
+    for (let i = 0; i < lines.length; i += 1) {
+      const line = lines[i], value = line.trim();
+      if (!value) { list = null; continue; }
+      if (/^```/.test(value)) {
+        const code = []; i += 1;
+        while (i < lines.length && !/^```/.test(lines[i].trim())) code.push(lines[i++]);
+        const pre = node('pre'); pre.append(node('code', code.join('\n'))); article.append(pre); list = null; continue;
+      }
+      if (i + 1 < lines.length && value.includes('|') && cells(lines[i + 1]).every(v => /^:?-{3,}:?$/.test(v))) {
+        const table = node('table'), head = node('thead'), body = node('tbody');
+        const row = (values, tag) => { const tr = node('tr'); values.forEach(v => { const cell = node(tag); if (tag === 'th') cell.scope = 'col'; inline(cell, v); tr.append(cell); }); return tr; };
+        head.append(row(cells(line), 'th')); i += 2;
+        while (i < lines.length && lines[i].trim() && lines[i].includes('|')) body.append(row(cells(lines[i++]), 'td'));
+        i -= 1; table.append(head, body); article.append(table); list = null; continue;
+      }
+      const heading = value.match(/^(#{1,6})\s+(.+)$/);
+      if (heading) { const h = node('h' + Math.min(4, heading[1].length + 1)); inline(h, heading[2]); article.append(h); list = null; continue; }
+      const bullet = value.match(/^(?:[-*+] |\d+\. )(.+)$/);
+      if (bullet) {
+        const tag = /^\d/.test(value) ? 'ol' : 'ul';
+        if (!list || list.tagName.toLowerCase() !== tag) { list = node(tag); if (tag === 'ol') list.start = parseInt(value, 10); article.append(list); }
+        const li = node('li'); inline(li, bullet[1]); list.append(li); continue;
+      }
+      list = null;
+      if (/^(---+|\*\*\*+)$/.test(value)) { article.append(node('hr')); continue; }
+      const p = node(value.startsWith('> ') ? 'blockquote' : 'p'); inline(p, value.startsWith('> ') ? value.slice(2) : line); article.append(p);
+    }
+    return article;
+  }
+  function contents(root) {
+    root.querySelectorAll(':scope > .reader-contents').forEach(el => el.remove());
+    const headings = [...root.querySelectorAll('h2,h3,h4')].filter(h => !h.closest('.card,.run-card,.reader-contents,[data-reader-source],[hidden]'));
+    if (headings.length < 2) return;
+    const details = node('details'); details.className = 'reader-contents';
+    details.append(node('summary', '이 리포트 목차 · ' + headings.length + '개 항목'));
+    const nav = node('nav'); nav.setAttribute('aria-label', '리포트 목차');
+    headings.forEach(h => {
+      if (!h.id) h.id = 'reader-section-' + (++serial);
+      h.dataset.readerHeading = ''; h.tabIndex = -1;
+      const a = node('a', h.textContent); a.href = '#' + h.id;
+      if (h.tagName !== 'H2') a.className = 'reader-subsection';
+      a.addEventListener('click', event => {
+        event.preventDefault();
+        for (let ancestor = h.parentElement; ancestor; ancestor = ancestor.parentElement) if (ancestor.tagName === 'DETAILS') ancestor.open = true;
+        h.scrollIntoView({block: 'start'}); h.focus({preventScroll: true});
+      }); nav.append(a);
+    });
+    details.append(nav); root.prepend(details);
+  }
+  function enhance(root) {
+    if (!root) return;
+    root.querySelectorAll('pre[data-report-markdown]').forEach(pre => {
+      const previous = rendered.get(pre);
+      if (previous && previous.source === pre.textContent) return;
+      const article = markdown(pre.textContent);
+      if (previous) previous.article.replaceWith(article);
+      else {
+        const details = node('details'); details.dataset.readerSource = '';
+        details.append(node('summary', 'Markdown 원문 보기'));
+        pre.before(article, details); details.append(pre);
+      }
+      rendered.set(pre, {source: pre.textContent, article});
+    });
+    root.querySelectorAll('table').forEach(table => {
+      if (table.closest('.reader-table,.account-table-wrap,.summary-scroll')) return;
+      const wrap = node('div'); wrap.className = 'reader-table'; wrap.tabIndex = 0;
+      wrap.setAttribute('role', 'region'); wrap.setAttribute('aria-label', '리포트 표 · 가로로 스크롤하여 전체 보기');
+      table.before(wrap); wrap.append(table);
+    });
+    root.querySelectorAll('.grid').forEach(grid => {
+      const cards = [...grid.querySelectorAll(':scope > a.card')];
+      if (cards.length < 2 || grid.dataset.readerSearch) return;
+      grid.dataset.readerSearch = 'true';
+      const box = node('div'); box.className = 'reader-search';
+      const input = node('input'); input.type = 'search'; input.placeholder = '제목 · 종목 · 채널 · 키워드'; input.id = 'report-search-' + (++serial);
+      const label = node('label', '리포트 찾기'); label.htmlFor = input.id;
+      const status = node('p'); status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
+      const update = () => {
+        const terms = input.value.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean); let count = 0;
+        cards.forEach(card => { card.hidden = !terms.every(t => card.textContent.toLocaleLowerCase().includes(t)); if (!card.hidden) count += 1; });
+        status.textContent = cards.length + '개 중 ' + count + '개 표시' + (count ? '' : ' · 검색어를 지우거나 다른 키워드를 입력하세요.');
+      };
+      input.addEventListener('input', update); box.append(label, input, status); grid.before(box); update();
+    });
+    contents(root);
+  }
+  window.TradingAgentsReader = {enhance};
+  const main = document.querySelector('main');
+  if (main && !main.hasAttribute('data-reader-dynamic')) enhance(main);
+  if (main) {
+    const top = node('button', '↑ 맨 위'); top.type = 'button'; top.className = 'reader-back'; top.setAttribute('aria-label', '리포트 맨 위로 이동');
+    top.addEventListener('click', () => { const target = document.querySelector('h1') || main; target.tabIndex = -1; target.scrollIntoView({block: 'start'}); target.focus({preventScroll: true}); });
+    document.body.append(top);
+  }
+})();
+</script>
+</body>
+</html>
