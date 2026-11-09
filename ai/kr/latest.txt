@@ -1,7 +1,7 @@
 # TradingAgents KR 최신 공개 입력
 
 schema: tradingagents.ai-context/v1
-문서 생성: 2026-11-09T17:16:35.817605+00:00
+문서 생성: 2026-11-09T23:43:20.654201+00:00
 
 이 문서는 이미 공개된 자료의 축약 전사이며 새 분석·주문 승인이 아닙니다. 원분석 거래일(완료 일봉), 분석 완료, 장중 시세, 계좌 관측, 문서 생성은 서로 다른 시각입니다. 휴장·주말의 마지막 완료 거래일을 장애로 단정하지 마세요. null은 미확인이지 0이 아닙니다. 빌드 당시 실행 상태는 현재 상태가 아니며 row_valid_until과 현재 세션을 다시 확인해야 합니다. 현재 문서를 읽지 못하면 과거 대화의 계좌·한도를 최신 사실로 재사용하지 마세요.
 
@@ -37,11 +37,11 @@ schema: tradingagents.ai-context/v1
   "snapshot_health": "VALID",
   "currency": "KRW",
   "latest_attempt": {
-    "status": "VALID",
-    "account_as_of": "2026-11-09T11:05:56.477459+09:00",
-    "run_started_at": "2026-11-09T10:32:55.740294+09:00",
-    "run_finished_at": "2026-11-09T11:06:01.240628+09:00",
-    "selected_for_public_account": true
+    "status": "PIPELINE_SKIPPED",
+    "account_as_of": null,
+    "run_started_at": "2026-11-10T08:23:26.318916+09:00",
+    "run_finished_at": "2026-11-10T08:23:42.407492+09:00",
+    "selected_for_public_account": false
   },
   "summary": {
     "position_count": 13,
