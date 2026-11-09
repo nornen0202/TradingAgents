@@ -1,0 +1,91 @@
+{
+  "schema": "tradingagents.work-context/v1",
+  "surface": "youtube",
+  "event_id": "youtube:b0a3ae1dd8d1688545ceb3a2b02b67f0",
+  "prompt_contract_version": "youtube-work-v5",
+  "prompt_sha256": "82a87727ec636b928ccb90cfe8cd823d86347e254ed0b204903699e34e35ef0b",
+  "skill_sha256": "2fef99f1af403675549a13813e0fe5597a241a964affeada56e9f64e9f398fe9",
+  "task_manifest_sha256": "0ea8b7511042a3aa7d6fa8447d97032d4be515f69526190a4c9556d01067c6df",
+  "workflow_contract_sha256": "c75e155a8e30b5d22921bad39fde87022a6bd8d52c5ac56585369ed84d3f1eaf",
+  "source_sha256": "51a1619c44a597fcf95c29085219f0b65b258b98b32d17e1a7043988f5eb530f",
+  "body": {
+    "kind": "youtube",
+    "source_health": "STALE",
+    "source": {
+      "health": "STALE",
+      "run_id": "youtube_20261107_065346",
+      "last_run_at": "2026-11-07T07:56:41.158560+09:00",
+      "status": "success",
+      "stale_after_hours": 36
+    },
+    "window_hours": 72,
+    "execution_eligible": false,
+    "evidence_policy": {
+      "profile": "balanced_external",
+      "material_thesis_effects": [
+        "ranking",
+        "confidence",
+        "position_size_within_existing_risk_limits",
+        "research_priority"
+      ],
+      "supported_evidence_weight": "MEDIUM",
+      "partially_supported_evidence_weight": "LOW_TO_MEDIUM",
+      "unverified_evidence_weight": "LOW_LABELED",
+      "user_primary_channels": [
+        "@kpunch",
+        "@sosumonkey"
+      ],
+      "user_primary_source_tier": "USER_PRIMARY",
+      "user_primary_evidence_weight": "HIGH",
+      "user_primary_validation_policy": "USER_ACCEPTED",
+      "matching_multi_source_signal_may_raise_thesis_priority": true,
+      "conflicting_signal_must_be_visible": true,
+      "may_bypass_market_or_portfolio_execution_gate": false
+    },
+    "coverage": {
+      "total_unique_events": 758,
+      "window_events": 0,
+      "transmitted_events": 0,
+      "truncated": false,
+      "oldest_occurred_at": null,
+      "newest_occurred_at": null
+    },
+    "events": [],
+    "guardrails": {
+      "untrusted_content": true,
+      "user_primary_override": {
+        "channels": [
+          "@kpunch",
+          "@sosumonkey"
+        ],
+        "strategy_source_tier": "USER_PRIMARY",
+        "strategy_evidence_weight": "HIGH",
+        "preserve_execution_gates": true
+      },
+      "may_promote_market_execution": false,
+      "allowed_actions": [
+        "UPGRADE_RESEARCH",
+        "UPGRADE_WATCH",
+        "MAINTAIN",
+        "DOWNGRADE_WATCH",
+        "DOWNGRADE_RISK",
+        "EXCLUDE",
+        "REQUIRES_PRIMARY_VERIFICATION",
+        "NO_ACTIONABLE_DELTA"
+      ]
+    },
+    "model_provenance": {
+      "schema": "tradingagents.model-provenance/v1",
+      "work_synthesis": {
+        "execution_mode": "local",
+        "requested_model": "gpt-6.1-sol",
+        "requested_reasoning_effort": "medium",
+        "task_id": "tradingagents-work-youtube",
+        "verification_status": "CONFIGURED_NOT_RUNTIME_VERIFIED",
+        "observed_model": null,
+        "observed_reasoning_effort": null,
+        "note": "The local task contract is verified; the Work host does not expose a signed per-response model receipt."
+      }
+    }
+  }
+}
