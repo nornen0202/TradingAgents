@@ -222,9 +222,9 @@
     "us": {
       "schema": "tradingagents.work-context/v1",
       "surface": "us",
-      "event_id": "us:0a68fcf52474b943e0d6162c4681e8cd",
-      "source_sha256": "505268dead6491bce77030adefa41c900de50ee3089b4d9b2b59f080234677c9",
-      "packet_sha256": "f04ed5e1433900bfe989b895b7f782665f48bd67961e070c4a56baf6fb77a160",
+      "event_id": "us:5f184aaa6f9515a66cdd07687243e2f7",
+      "source_sha256": "0d85d3455087424a3a9a3c6b9f27c128017fe0f88daeebe0cce2e4d87d194ae2",
+      "packet_sha256": "c3dc93c4f19dba305aa6b227778d54cf90a8f179602d7d18196df8c845745160",
       "prompt_contract_version": "market-work-v13-us",
       "prompt_sha256": "a577e06278002eebd491db51786019336a00da570d5c47886bad031cf01cf7fe",
       "skill_sha256": "2fef99f1af403675549a13813e0fe5597a241a964affeada56e9f64e9f398fe9",
@@ -232,22 +232,22 @@
       "workflow_contract_sha256": "f94e3c24b3aabfa9c77de5abfe65add303754c210dc6470b626a2bd212718912",
       "status_url": "https://nornen0202.github.io/TradingAgents/work/v1/us/status.json",
       "latest_url": "https://nornen0202.github.io/TradingAgents/work/v1/us/latest.json",
-      "event_url": "https://nornen0202.github.io/TradingAgents/work/v1/us/events/us-0a68fcf52474b943e0d6162c4681e8cd.json",
+      "event_url": "https://nornen0202.github.io/TradingAgents/work/v1/us/events/us-5f184aaa6f9515a66cdd07687243e2f7.json",
       "prompt_url": "https://nornen0202.github.io/TradingAgents/work/v1/prompts/market_us.md",
       "source_health": "STALE",
       "report_mode": "OUTAGE",
       "freshness_receipt": {
         "schema": "tradingagents.source-freshness/v1",
-        "producer_run_id": "20261110T022226_local-scheduler-us-full",
-        "producer_started_at": "2026-11-10T02:22:26.174438+09:00",
-        "producer_finished_at": "2026-11-10T05:43:34.484106+09:00",
-        "analysis_run_id": "20261110T022226_local-scheduler-us-full",
+        "producer_run_id": "20261110T175022_local-scheduler-us-full",
+        "producer_started_at": "2026-11-10T17:50:22.213699+09:00",
+        "producer_finished_at": "2026-11-10T21:08:30.645921+09:00",
+        "analysis_run_id": "20261110T175022_local-scheduler-us-full",
         "analysis_lineage_status": "RESOLVED",
-        "analysis_completed_at": "2026-11-10T05:12:20.114745+09:00",
-        "analysis_trade_date_oldest": "2026-11-06",
-        "analysis_trade_date_latest": "2026-11-06",
-        "market_data_oldest_at": "2026-11-09T12:20:00-05:00",
-        "market_data_latest_at": "2026-11-09T14:50:00-05:00",
+        "analysis_completed_at": "2026-11-10T20:34:00.440522+09:00",
+        "analysis_trade_date_oldest": "2026-11-09",
+        "analysis_trade_date_latest": "2026-11-09",
+        "market_data_oldest_at": "2026-11-09T15:55:00-05:00",
+        "market_data_latest_at": "2026-11-10T05:50:00-05:00",
         "market_data_status": "STALE",
         "publication_does_not_refresh_inputs": true,
         "execution_max_age_seconds": 180.0,
@@ -260,7 +260,13 @@
             "execution_eligible": false
           },
           {
-            "ticker": "ETN",
+            "ticker": "NVDA",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "GEV",
             "research_valid": false,
             "category": "UNVERIFIED_RESEARCH_INPUT",
             "execution_eligible": false
@@ -272,19 +278,7 @@
             "execution_eligible": false
           },
           {
-            "ticker": "NVDA",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
-            "execution_eligible": false
-          },
-          {
-            "ticker": "AVGO",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
-            "execution_eligible": false
-          },
-          {
-            "ticker": "GEV",
+            "ticker": "ETN",
             "research_valid": false,
             "category": "UNVERIFIED_RESEARCH_INPUT",
             "execution_eligible": false
@@ -302,6 +296,12 @@
             "execution_eligible": false
           },
           {
+            "ticker": "AVGO",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false
+          },
+          {
             "ticker": "AMZN",
             "research_valid": false,
             "category": "UNVERIFIED_RESEARCH_INPUT",
@@ -314,37 +314,7 @@
             "execution_eligible": false
           },
           {
-            "ticker": "COST",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
-            "execution_eligible": false
-          },
-          {
             "ticker": "BRK-B",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
-            "execution_eligible": false
-          },
-          {
-            "ticker": "MA",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
-            "execution_eligible": false
-          },
-          {
-            "ticker": "PG",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
-            "execution_eligible": false
-          },
-          {
-            "ticker": "SPG",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
-            "execution_eligible": false
-          },
-          {
-            "ticker": "V",
             "research_valid": false,
             "category": "UNVERIFIED_RESEARCH_INPUT",
             "execution_eligible": false
@@ -356,7 +326,25 @@
             "execution_eligible": false
           },
           {
-            "ticker": "LIN",
+            "ticker": "V",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "PG",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "MA",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "SPG",
             "research_valid": false,
             "category": "UNVERIFIED_RESEARCH_INPUT",
             "execution_eligible": false
@@ -368,13 +356,13 @@
             "execution_eligible": false
           },
           {
-            "ticker": "ABBV",
+            "ticker": "LIN",
             "research_valid": false,
             "category": "UNVERIFIED_RESEARCH_INPUT",
             "execution_eligible": false
           },
           {
-            "ticker": "SO",
+            "ticker": "COST",
             "research_valid": false,
             "category": "UNVERIFIED_RESEARCH_INPUT",
             "execution_eligible": false
@@ -386,7 +374,25 @@
             "execution_eligible": false
           },
           {
-            "ticker": "CDNS",
+            "ticker": "SO",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "ABBV",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "SIEGY",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false
+          },
+          {
+            "ticker": "ANET",
             "research_valid": false,
             "category": "UNVERIFIED_RESEARCH_INPUT",
             "execution_eligible": false
@@ -398,19 +404,13 @@
             "execution_eligible": false
           },
           {
-            "ticker": "SNPS",
+            "ticker": "CRM",
             "research_valid": false,
             "category": "UNVERIFIED_RESEARCH_INPUT",
             "execution_eligible": false
           },
           {
             "ticker": "LLY",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
-            "execution_eligible": false
-          },
-          {
-            "ticker": "AMD",
             "research_valid": false,
             "category": "UNVERIFIED_RESEARCH_INPUT",
             "execution_eligible": false
