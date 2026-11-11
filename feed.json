@@ -1,6 +1,62 @@
 {
-  "generated_at": "2026-11-12T00:42:53.272292",
+  "generated_at": "2026-11-12T01:30:42.317085",
   "runs": [
+    {
+      "run_id": "20261112T004301_local-scheduler-us-overlay_only",
+      "label": "local-scheduler-us-overlay_only",
+      "started_at": "2026-11-12T00:43:01.787569+09:00",
+      "finished_at": "2026-11-12T01:00:49.826720+09:00",
+      "status": "success",
+      "market": "US",
+      "run_mode": "overlay_only",
+      "settings": {
+        "market": "US",
+        "run_mode": "overlay_only"
+      },
+      "summary": {
+        "total_tickers": 27
+      },
+      "ticker_count": 27,
+      "success_count": 27,
+      "decision_bundle": {
+        "version": 2,
+        "decision_ready": true,
+        "conditional_strategy_ready": true,
+        "quality_label_ko": "장중 투자 판단 가능",
+        "fresh_row_ratio": 1.0,
+        "conditional_row_ratio": 1.0
+      },
+      "published_to_site": true,
+      "run_url": "runs/20261112T004301_local-scheduler-us-overlay_only/index.html"
+    },
+    {
+      "run_id": "20261111T205119_local-scheduler-us-full",
+      "label": "local-scheduler-us-full",
+      "started_at": "2026-11-11T20:51:19.191386+09:00",
+      "finished_at": "2026-11-12T00:38:37.166994+09:00",
+      "status": "success",
+      "market": "US",
+      "run_mode": "full",
+      "settings": {
+        "market": "US",
+        "run_mode": "full"
+      },
+      "summary": {
+        "total_tickers": 27
+      },
+      "ticker_count": 27,
+      "success_count": 27,
+      "decision_bundle": {
+        "version": 2,
+        "decision_ready": false,
+        "conditional_strategy_ready": false,
+        "quality_label_ko": "연구 자료만 제공, 장중 데이터 대기",
+        "fresh_row_ratio": 0.0,
+        "conditional_row_ratio": 0.0
+      },
+      "published_to_site": true,
+      "run_url": "runs/20261111T205119_local-scheduler-us-full/index.html"
+    },
     {
       "run_id": "20261111T103225_local-scheduler-kr-overlay_only",
       "label": "local-scheduler-kr-overlay_only",
@@ -3253,8 +3309,8 @@
         "fresh_row_ratio": 0.9667,
         "conditional_row_ratio": 1.0
       },
-      "published_to_site": true,
-      "run_url": "runs/20261105T021605_local-freshness-us-overlay/index.html"
+      "published_to_site": false,
+      "run_url": null
     },
     {
       "run_id": "20261105T021453_local-freshness-us-overlay",
@@ -3281,8 +3337,8 @@
         "fresh_row_ratio": 0.9333,
         "conditional_row_ratio": 1.0
       },
-      "published_to_site": true,
-      "run_url": "runs/20261105T021453_local-freshness-us-overlay/index.html"
+      "published_to_site": false,
+      "run_url": null
     },
     {
       "run_id": "20261105T021335_local-freshness-us-overlay",
