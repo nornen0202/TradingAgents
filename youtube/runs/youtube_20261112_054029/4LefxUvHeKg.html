@@ -1,0 +1,605 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YouTube 투자자용 검증 리포트 - 새로워진 2027 연말정산, &#x27;370만원&#x27; 더 받을 수 있는 방법</title>
+  <style>
+:root {
+  color-scheme: light;
+  --bg: #f7f8fb;
+  --panel: #ffffff;
+  --text: #172033;
+  --muted: #667085;
+  --line: #d9dee8;
+  --accent: #0f766e;
+  --accent-2: #2563eb;
+  --warn: #b45309;
+  --bad: #b42318;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0 56px; }
+a { color: var(--accent-2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.hero { padding: 28px 0 22px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+.hero.compact { padding-top: 12px; }
+.hero h1 { margin: 0; font-size: clamp(28px, 4vw, 44px); line-height: 1.15; letter-spacing: 0; }
+.hero p { max-width: 760px; color: var(--muted); margin: 12px 0 0; }
+.eyebrow { color: var(--accent); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0; margin: 0 0 8px; }
+section { margin: 28px 0; }
+h2, h3, h4, h5 { letter-spacing: 0; line-height: 1.25; }
+.synthesis-callout { padding: clamp(20px, 4vw, 34px); border: 1px solid #6ee7d8; border-radius: 18px; background: linear-gradient(135deg, #ecfdf9 0%, #eff6ff 100%); box-shadow: 0 18px 44px rgba(15, 118, 110, .12); }
+.synthesis-callout.unavailable { border-color: var(--line); background: var(--panel); box-shadow: none; }
+.synthesis-callout h2 { margin: 0; font-size: clamp(24px, 3.2vw, 36px); }
+.synthesis-callout .lead { max-width: 900px; font-size: 17px; color: #334155; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.primary-link, .secondary-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border-radius: 999px; font-weight: 800; }
+.primary-link { color: white; background: var(--accent); }
+.secondary-link { color: var(--accent-2); border: 1px solid #93c5fd; background: white; }
+.primary-link:hover, .secondary-link:hover { text-decoration: none; filter: brightness(.97); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.card, .run { display: flex; flex-direction: column; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; color: var(--text); min-height: 128px; }
+.run { padding: 16px; }
+.card:hover, .run:hover { border-color: var(--accent-2); text-decoration: none; }
+.thumb { display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #e9edf5; border-radius: 8px 8px 0 0; color: var(--muted); font-size: 13px; font-weight: 700; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb-empty span { padding: 0 14px; text-align: center; }
+.card-body { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 16px; }
+.card strong { line-height: 1.35; }
+.source-line { color: #3f4a5f; font-weight: 600; }
+.runs { display: grid; gap: 10px; }
+.badge { display: inline-flex; width: fit-content; border-radius: 999px; padding: 2px 9px; background: #e6f4f1; color: var(--accent); font-size: 12px; font-weight: 700; }
+.status-contradicted, .status-llm_failed { background: #fee4e2; color: var(--bad); }
+.status-unverified, .status-stale { background: #fff4d6; color: var(--warn); }
+small, .muted { color: var(--muted); }
+.topnav { display: flex; gap: 14px; margin-bottom: 16px; font-size: 14px; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px; }
+.stats span { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
+.report { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: min(5vw, 36px); }
+.report-head { border-bottom: 1px solid var(--line); margin-bottom: 24px; padding-bottom: 20px; }
+.report-head h1 { margin: 0; font-size: clamp(24px, 3.5vw, 38px); line-height: 1.2; }
+.meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+.scope-note { padding: 12px 14px; border-left: 4px solid var(--warn); border-radius: 6px; background: #fff7ed; color: #7c2d12; }
+.synthesis-report h2 { margin-top: 34px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.synthesis-report h3 { margin: 24px 0 8px; color: #0f4c5c; }
+.synthesis-report p, .synthesis-report li { overflow-wrap: anywhere; }
+pre { overflow: auto; background: #111827; color: #f9fafb; border-radius: 8px; padding: 14px; }
+code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+details { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 18px; }
+@media (max-width: 640px) {
+  main { width: min(100% - 20px, 1120px); padding-top: 18px; }
+  .report { padding: 18px; }
+  .synthesis-callout { border-radius: 14px; padding: 18px; }
+  .cta-row a { width: 100%; }
+  .mobile-report { border-radius: 12px; }
+}
+</style>
+</head>
+<body>
+  <main>
+<nav class="topnav"><a href="index.html">실행 목록</a><a href="../../index.html">YouTube 홈</a></nav>
+<article class="report">
+  <header class="report-head">
+    <p class="eyebrow">youtube_20261112_054029</p>
+    <h1>새로워진 2027 연말정산, &#x27;370만원&#x27; 더 받을 수 있는 방법</h1>
+    <div class="meta">
+      <span class="badge status-unverified">unverified</span>
+      <a href="https://www.youtube.com/watch?v=4LefxUvHeKg">원본 영상</a>
+    </div>
+  </header>
+  <h2>‘2027 연말정산, 370만 원 추가 환급’ 검증 보고서</h2>
+<p><strong>분석 기준일: 2026년 11월 12일</strong></p>
+<p>대상: 경제사냥꾼, 2026년 11월 11일 게시 <a href="https://www.youtube.com/watch?v=4LefxUvHeKg">영상</a></p>
+<h3>1. 핵심 결론</h3>
+<p><strong>‘370만 원을 더 환급받는다’는 핵심 주장은 미검증이다.</strong> 카드 공제 한도 확대와 혼인 세액공제 일부는 관련 보도로 뒷받침되지만, 월세·교육비 확대와 각 제도의 2026년 귀속 적용 여부를 확인할 공식 자료는 제공되지 않았다.</p>
+<p>이 영상은 종목 추천이나 시장 전망이 아니라 <strong>가계 세후소득에 관한 정책 설명</strong>이다. 공제 확대가 실제 적용된다면 가처분소득 개선에 도움이 될 수 있지만, 이를 특정 기업의 실적이나 주가 상승으로 연결할 근거는 없다.</p>
+<p>검증 결과는 9개 주장 중 <strong>부분 지지 2개, 미검증 7개</strong>다. 증거 수집 단계의 ‘verified’ 표시는 정책 전체가 확인됐다는 뜻이 아니며, 주장 검증의 종합 판정은 ‘unverified’다.</p>
+<h3>2. 영상 주장과 확인된 근거</h3>
+<p>아래 모든 주장 시각은 <strong>00:00으로 기록</strong>돼 있다. 이는 단일 자막 청크의 시작점으로, 실제 개별 발화 위치를 의미하지 않는다.</p>
+<p>| 항목 | 영상 주장 | 확인된 사실·근거 및 한계 | 판정 |</p>
+<p>|---|---|---|---|</p>
+<p>| 적용연도 | 2027년 정산에서 올해 지출과 소개된 개정 혜택을 반영 | 게시일상 ‘올해’는 2026년이다. 다만 제도별 시행일·적용 귀속연도 자료는 없다. | 미검증 |</p>
+<p>| 추가 환급액 | 370만 원을 더 받을 수 있음 | 제시된 월세 170만 원·등록금 135만 원·학원비 45만 원·카드 약 15만 원의 합계는 <strong>365만 원</strong>이다. 반올림 여부, 기존 대비 증가분, 동시 적용 가능성은 확인되지 않았다. | 미검증 |</p>
+<p>| 월세 | 다자녀 주택 면적 85㎡→100㎡, 소득 5,500만 원 이하에서 연 월세 1,000만 원의 17% 공제 | 1,000만 원×17%=170만 원이라는 산술만 확인된다. 다자녀 정의, 면적·소득·무주택 요건과 적용연도는 확인되지 않았다. | 미검증 |</p>
+<p>| 별거 부부 월세 | 다른 시·군·구에 거주하는 부부가 각각 공제, 합산 월세 한도 1,000만 원 | 특례의 존재·자격·한도 배분 및 계약서·이체 내역 제출 절차를 확인할 관련 증거가 없다. | 미검증 |</p>
+<p>| 대학생 교육비 | 자녀 소득 요건 폐지, 900만 원 한도에 15% 공제 | 900만 원×15%=135만 원이라는 산식만 일치한다. 소득 요건 변경과 실제 부담액·장학금 등 제한은 확인되지 않았다. | 미검증 |</p>
+<p>| 어린이 학원비 | 초등학교 2학년까지 확대, 300만 원 한도·최대 45만 원, 정기 수강 요건 | 300만 원×15%=45만 원이라는 산식 외에 학년·기관·과정·수강 빈도·특강 제외 근거가 없다. 다른 교육비와 합산하는 한도인지도 불명확하다. | 미검증 |</p>
+<p>| 카드 소득공제 | 1명당 50만 원·최대 100만 원 한도 확대, 약 15만 원 환급 증가, 2028년 말까지 연장 | 국회 의결 보도는 부양가족에 따른 한도 확대를 설명하지만 <strong>총급여 7,000만 원 초과 시 1명당 25만 원</strong>이라는 차등 조건이 있다. 연장 주장은 개편안 보도로만 확인된다. | 부분 지지 |</p>
+<p>| 혼인 세액공제 | 2024~2026년 혼인신고 시 1인당 50만 원, 2026년이 마지막 | 과거 보도에서 2026년 말 종료일·50만 원·1회·신고 과세기간 적용은 확인된다. 시작일과 게시일까지의 추가 연장 여부는 확인되지 않았다. | 부분 지지 |</p>
+<p>| 홈택스 미리보기 | 게시 시점에 예상세액과 소개된 혜택 확인 가능 | 2026년 개통일 및 개정 항목 반영 범위를 입증할 자료가 없다. | 미검증 |</p>
+<h4>가장 관련성 높은 외부 근거</h4>
+<ul>
+<li><strong>카드 공제:</strong> <a href="http://www.intn.co.kr/news/articleView.html?idxno=2047657">국회 본회의 의결 내용을 정리한 2025년 12월 보도</a>는 자녀·손자녀 등 부양가족에 따른 한도 확대와 총급여별 차등을 설명한다. 다만 제공된 발췌만으로 최종 법률의 모든 요건·적용례를 확인할 수는 없다.</li>
+<li><strong>카드 일몰 연장:</strong> <a href="http://www.joseilbo.com/news/news_read.php?uid=549483&amp;class=7&amp;grp=">2025년 7월 세제개편안 보도</a>는 2025년 말에서 2028년 말로 3년 연장을 설명한다. <strong>개편안 단계의 근거</strong>이므로 확정 법률과 구분해야 한다.</li>
+<li><strong>혼인 공제:</strong> <a href="https://www.taxtimes.co.kr/news/article.html?no=267567">2024년 세법개정안 국회 통과 보도</a>와 <a href="http://www.intn.co.kr/news/articleView.html?idxno=2040621">관련 세금제도 정리</a>는 2026년 말 이전 혼인신고, 50만 원, 1회 및 신고 과세기간 적용을 설명한다. 과거 보도만으로 2026년 11월 현재 연장 여부까지 확정할 수는 없다.</li>
+</ul>
+<h3>3. ‘370만 원’ 해석에서 주의할 점</h3>
+<p>영상 수치를 합산하면 다음과 같다.</p>
+<p><strong>170만 원 + 135만 원 + 45만 원 + 약 15만 원 = 약 365만 원</strong></p>
+<p>이는 영상 수치의 산술적 합계일 뿐, 실제 추가 환급액을 입증하지 않는다.</p>
+<ul>
+<li><strong>총 혜택과 신규 증가분이 다르다.</strong> 기존에도 받을 수 있었던 공제를 포함했다면 전액을 ‘더 받는 금액’으로 볼 수 없다.</li>
+<li><strong>공제 한도와 환급액이 다르다.</strong> 특히 카드 항목은 소득공제다. 추가 소득공제액 100만 원에 15%를 적용하면 15만 원이지만, 해당 세율과 한도 활용을 전제한 계산이다.</li>
+<li><strong>최대액의 동시 적용이 입증되지 않았다.</strong> 월세·대학생 등록금·어린이 학원비 요건을 같은 가구가 충족하는지, 누가 비용을 부담했는지 확인이 필요하다.</li>
+<li><strong>개인별 세액 자료가 없다.</strong> 산출세액·다른 공제·기납부세액을 반영한 계산이 없어 현금 환급액을 확정할 수 없다.</li>
+<li><strong>혼인 공제 포함 여부도 불명확하다.</strong> 이를 위 합계에 추가해 새로운 총액을 제시할 근거는 없다.</li>
+</ul>
+<h3>4. 긍정 논리와 반론</h3>
+<h4>긍정 시나리오</h4>
+<p>공제 확대가 최종 법령에 반영되고 해당 가구가 요건을 충족한다면 세금 부담 감소를 통해 생활비·저축·투자에 사용할 여력이 늘 수 있다. 카드 공제 확대는 관련 보도가 있어, 개인별 소득구간과 부양가족 조건을 확인할 실익이 있다. 혼인 공제도 신고연도와 1회 적용 조건을 점검할 가치가 있다.</p>
+<h4>반론과 무효화 조건</h4>
+<ul>
+<li><strong>귀속연도가 다르면</strong> 해당 혜택을 2026년 소득에 대한 절세 효과로 반영하는 가정은 성립하지 않는다.</li>
+<li><strong>최종 법령이 개편안과 다르면</strong> 영상의 대상·한도·일몰 설명을 수정해야 한다.</li>
+<li><strong>자격이나 실제 지출 요건을 충족하지 못하면</strong> 영상의 최대액은 해당 가구에 적용되지 않는다.</li>
+<li><strong>기존 혜택이 대부분이거나 한도를 활용하지 못하면</strong> ‘370만 원 추가’라는 해석은 성립하지 않는다.</li>
+<li><strong>과거 혼인신고를 근거로 매년 공제를 기대하면</strong> 보도된 1회·신고 과세기간 조건과 맞지 않는다.</li>
+</ul>
+<p>공제 가능성이 소비 확대의 순편익을 보장하지도 않는다. 추가 지출액과 실제 절세액을 분리해서 판단해야 한다.</p>
+<h3>5. 데이터 품질과 신뢰도</h3>
+<p>자막은 한국어 자동자막 82개 세그먼트이며, 수동 자막은 없다. <code>transcript_quality</code>는 <strong>good·1.0</strong>이지만 이는 정책의 사실성이나 개별 숫자의 정확도를 보장하지 않는다. 자막 범위는 02:04, 영상 메타데이터는 02:02로 약 2초 차이가 있다.</p>
+<p><strong>신뢰도 지표는 서로 다른 의미다.</strong></p>
+<ul>
+<li>주장 추출 단계 <code>source_confidence</code> <strong>0.90~0.96</strong>은 자막에서 해당 주장을 읽어낸 확신도다. 외부 검증을 통과했다는 뜻이 아니다.</li>
+<li>검증 단계 <code>source_confidence</code>는 외부 근거의 신뢰·충분성을 나타낸다. 카드·혼인은 <strong>0.65</strong>, 나머지는 <strong>0.0</strong>이다. 근거 부족이지 거짓일 확률을 의미하지 않는다.</li>
+<li><code>asr_confidence</code>는 발화 해석의 추정치다. 월세 주장은 <strong>0.60</strong>으로, 특히 다자녀 수 표현에 불확실성이 있다. 카드 주장은 <strong>0.75</strong>로 추가 한도의 대상 인원이 불명확하다. 나머지는 <strong>0.90~0.96</strong>이다.</li>
+<li>주장 지지 정도인 검증 <code>confidence</code>는 카드 <strong>0.60</strong>, 혼인 <strong>0.65</strong>, 나머지는 <strong>0.05~0.10</strong>이다.</li>
+</ul>
+<p>외부 증거 12개 중 실질적으로 관련된 발췌는 <strong>4개</strong>다. 나머지 8개는 무관하거나 본문이 없어 판단에서 제외했다. 공식 법령·국세청 안내, 관련 시장·공시 자료는 제공되지 않았다. 초기 추출 메모의 ‘외부 자료 없음’은 후속 증거 수집 이전 상태로 보고, 본 보고서는 후속 발췌와 최종 검증 결과를 기준으로 했다.</p>
+<p>Bloomberg·Morningstar 등 폐쇄형 출처에 의존하는 특정 주장은 제시되지 않았다. 해당 서비스의 자료도 제공되지 않았으므로 그 출처를 통한 확인은 <strong>미검증·필요시 수동 확인 대상</strong>이다.</p>
+<h3>6. 단기 체크포인트와 관찰 항목</h3>
+<p>| 확인 시점 | 구체적 관찰 항목 | 판단에 미치는 영향 |</p>
+<p>|---|---|---|</p>
+<p>| 연말 지출 계획 전 | 국세청 2026년 귀속 안내와 최종 법령·시행령 부칙의 시행일·적용례 | 올해 적용되는 혜택과 향후 제도를 분리 |</p>
+<p>| 월세 자료 정리 시 | 다자녀 정의, 면적·주택가액, 소득·무주택·주소 요건, 별거 배우자 특례와 제출서류 | 가구별 자격과 실제 인정액 확인 |</p>
+<p>| 교육비 확인 시 | 대학생 소득 요건 변경, 실제 부담액·장학금 처리, 학원 기관·과정·학년·수강 요건 및 통합 한도 | 단순 결제액과 공제 대상액 구분 |</p>
+<p>| 카드 사용액 점검 시 | 총급여 7,000만 원 경계, 부양가족 판정, 최소 사용액, 실제 한도 활용과 최종 일몰 | 한도 확대가 세금 감소로 이어지는지 확인 |</p>
+<p>| 2026년 말 이전 | 혼인 공제 대상 신고 기간, 과거 적용 여부, 1회 제한과 추가 연장 여부 | 일회성 혜택의 반복 반영 방지 |</p>
+<p>| 미리보기·정산 시 | 서비스 개통과 개정 항목 반영 여부, 실제 지출 입력값, 공제 전후 세액·기납부세액 | 예상치와 실제 환급액의 차이 확인 |</p>
+<p><strong>최종 판단:</strong> 이 영상은 절세 항목을 찾아보는 출발점으로는 활용할 수 있다. 그러나 현재 증거만으로 ‘2027년 정산에서 370만 원이 추가로 생긴다’는 가정을 가계 예산이나 투자 재원에 확정 반영하기는 어렵다. 핵심은 제목의 최대금액이 아니라 <strong>해당 귀속연도·개인별 자격·실제 세액 감소분</strong>이다.</p>
+  <details>
+    <summary>공개 요약 JSON</summary>
+    <pre>{
+  &quot;version&quot;: 4,
+  &quot;video_id&quot;: &quot;4LefxUvHeKg&quot;,
+  &quot;title&quot;: &quot;새로워진 2027 연말정산, &#x27;370만원&#x27; 더 받을 수 있는 방법&quot;,
+  &quot;url&quot;: &quot;https://www.youtube.com/watch?v=4LefxUvHeKg&quot;,
+  &quot;channel&quot;: &quot;경제사냥꾼&quot;,
+  &quot;channel_id&quot;: &quot;UC7usMJDHmtbs_oegmzQKKMA&quot;,
+  &quot;source_url&quot;: &quot;https://www.youtube.com/@%EA%B2%BD%EC%A0%9C%EC%82%AC%EB%83%A5%EA%BE%BC/shorts&quot;,
+  &quot;thumbnail_url&quot;: &quot;https://i.ytimg.com/vi/4LefxUvHeKg/maxresdefault.jpg&quot;,
+  &quot;published_at&quot;: &quot;2026-11-11T07:40:23+00:00&quot;,
+  &quot;status&quot;: &quot;unverified&quot;,
+  &quot;strategy_source_tier&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_evidence_weight&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_validation_policy&quot;: &quot;STANDARD_REVIEW&quot;,
+  &quot;transcript_status&quot;: &quot;available&quot;,
+  &quot;transcript_source&quot;: &quot;automatic&quot;,
+  &quot;transcript_chars&quot;: 1558,
+  &quot;transcript_quality&quot;: {
+    &quot;status&quot;: &quot;good&quot;,
+    &quot;score&quot;: 1.0,
+    &quot;warnings&quot;: [],
+    &quot;source&quot;: &quot;automatic&quot;,
+    &quot;language&quot;: &quot;Korean&quot;,
+    &quot;model_or_format&quot;: &quot;json3&quot;,
+    &quot;chars&quot;: 1558,
+    &quot;segments&quot;: 82,
+    &quot;duration_seconds&quot;: 122,
+    &quot;repeated_ngram_ratio&quot;: 0.0
+  },
+  &quot;generated_at&quot;: &quot;2026-11-12T05:40:29.815179+09:00&quot;,
+  &quot;llm_status&quot;: &quot;success&quot;,
+  &quot;research_status&quot;: &quot;success&quot;,
+  &quot;claim_verification_status&quot;: &quot;success&quot;,
+  &quot;research_pipeline_version&quot;: 4,
+  &quot;evidence_count&quot;: 12,
+  &quot;claim_status_summary&quot;: {
+    &quot;unverified&quot;: 7,
+    &quot;partially_supported&quot;: 2
+  },
+  &quot;claims&quot;: [
+    {
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;claim_text&quot;: &quot;‘2027 연말정산’은 2026년 1~12월 지출을 대상으로 하며 영상에서 소개한 개정 혜택이 적용된다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.1,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.9,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;2027년 정산; 올해 1~12월 지출&quot;,
+        &quot;observed&quot;: &quot;게시일 기준 ‘올해’는 2026년이나, 제도별 적용 귀속연도는 확인되지 않음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;소개된 혜택을 2026년 세후소득 증가분으로 일괄 반영할 근거가 부족하다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;claim_text&quot;: &quot;소개된 공제 혜택을 활용하면 370만 원을 더 환급받을 수 있다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.1,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.96,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;370만 원 추가 환급&quot;,
+        &quot;observed&quot;: &quot;제시된 네 항목의 산술 합계는 365만 원; 실제 추가 환급액은 확인 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;370만 원을 확정 환급액이나 신규 가처분소득으로 예산에 반영하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;claim_text&quot;: &quot;월세 공제 주택 면적이 다자녀 가구에는 85㎡에서 100㎡로 확대되며, 연간 월급 5,500만 원 이하이면 연 월세 1,000만 원에 17%, 최대 170만 원을 공제한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.1,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.6,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;85㎡→100㎡; 5,500만 원 이하; 연 월세 1,000만 원×17%=170만 원&quot;,
+        &quot;observed&quot;: &quot;곱셈만 일치; 정책 수치·자녀 수 요건·적용연도는 확인 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;최대 170만 원을 예상 절세액으로 반영하기 전에 해당 연도 자격요건을 확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;claim_text&quot;: &quot;직장 때문에 다른 시·군·구에 사는 부부는 각각 월세 공제를 받을 수 있고 합산 인정액은 연 1,000만 원이며, 계약서와 이체 내역을 회사에 직접 제출해야 한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.05,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.9,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;부부 합산 연 월세 인정액 1,000만 원&quot;,
+        &quot;observed&quot;: &quot;검증 가능한 관련 증거 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;부부 각각의 공제나 합산 절세액을 확정하지 말고 특례 적용과 증빙 절차를 확인한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;claim_text&quot;: &quot;대학생 자녀 교육비 공제의 자녀 소득 요건이 폐지되고, 연 900만 원 한도에 15%, 최대 135만 원을 공제한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.1,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.94,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;900만 원×15%=135만 원&quot;,
+        &quot;observed&quot;: &quot;산식은 일치; 법정 한도·공제율·소득 요건 변경은 확인 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;자녀의 근로 여부만으로 공제 가능성을 판단하거나 최대액을 예상 환급에 반영할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;claim_text&quot;: &quot;학원비 공제가 초등학교 2학년까지 확대돼 태권도·피아노·미술도 인정되며, 연 300만 원 한도에 최대 45만 원을 공제한다. 매월 주 1회 이상 수강해야 하고 일회성 방학 특강은 제외된다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.1,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.94,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;초등학교 2학년까지; 연 300만 원; 최대 45만 원; 매월 주 1회 이상&quot;,
+        &quot;observed&quot;: &quot;300만 원×15%=45만 원이라는 산식 외 정책 요건은 확인 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;공제를 기대한 추가 학원 지출은 인정 기관·과정과 개인별 공제 가능액 확인 후 판단한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;claim_text&quot;: &quot;카드 소득공제 한도가 1명당 50만 원씩 최대 100만 원 확대돼 환급이 약 15만 원 늘고, 제도는 2028년 말까지 3년 연장됐다.&quot;,
+      &quot;status&quot;: &quot;partially_supported&quot;,
+      &quot;confidence&quot;: 0.6,
+      &quot;supporting_evidence_ids&quot;: [
+        &quot;E4&quot;,
+        &quot;E5&quot;
+      ],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00&quot;,
+      &quot;source_confidence&quot;: 0.65,
+      &quot;asr_confidence&quot;: 0.75,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;1명당 50만 원·최대 100만 원; 약 15만 원 환급 증가; 2028년 말까지 연장&quot;,
+        &quot;observed&quot;: &quot;E4는 소득별 차등 확대를 보도; 100만 원×15%=15만 원은 조건부 산식; 2028년 말 연장은 E5 개편안 보도에서만 확인&quot;
+      },
+      &quot;investor_implication&quot;: &quot;한도 확대액을 환급액으로 간주하지 말고 소득구간·실제 사용액·적용 세율로 개인별 절세액을 계산한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;claim_text&quot;: &quot;2024년부터 2026년까지 혼인신고한 부부는 1인당 50만 원의 혼인 세액공제를 받을 수 있고 2026년이 마지막 신고연도다.&quot;,
+      &quot;status&quot;: &quot;partially_supported&quot;,
+      &quot;confidence&quot;: 0.65,
+      &quot;supporting_evidence_ids&quot;: [
+        &quot;E1&quot;,
+        &quot;E6&quot;
+      ],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00&quot;,
+      &quot;source_confidence&quot;: 0.65,
+      &quot;asr_confidence&quot;: 0.95,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;2024~2026년 혼인신고; 1인당 50만 원; 2026년 마지막&quot;,
+        &quot;observed&quot;: &quot;2024년 보도에서 2026-12-31 종료일·50만 원·1회·혼인신고 과세기간 확인; 시작일과 게시일 당시 연장 여부는 확인 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;혼인신고 연도와 1회 적용 조건을 확인하고, 과거 혼인신고를 근거로 매년 받을 혜택으로 계산하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;claim_text&quot;: &quot;영상 게시 시점에 홈택스 연말정산 미리보기로 예상 세금과 소개된 혜택을 확인할 수 있다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.05,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.94,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;2026-11-11 게시 시점 이용 가능&quot;,
+        &quot;observed&quot;: &quot;해당 연도 개통일·반영 범위 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;실제 서비스 개통과 공제 반영 범위를 확인하기 전 미리보기로 모든 혜택을 검증할 수 있다고 가정하지 않는다.&quot;
+    }
+  ],
+  &quot;entities&quot;: [],
+  &quot;evidence&quot;: [
+    {
+      &quot;evidence_id&quot;: &quot;E1&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;2025년 새해 달라지는 세금제도&quot;,
+      &quot;source_url&quot;: &quot;http://www.intn.co.kr/news/articleView.html?idxno=2040621&quot;,
+      &quot;publisher&quot;: &quot;Naver News&quot;,
+      &quot;published_at&quot;: &quot;2024-12-16T08:48:00+09:00&quot;,
+      &quot;source_tier&quot;: &quot;web&quot;,
+      &quot;excerpt&quot;: &quot;ㅇ거주자가 2026년 12월 31일 이전에 혼인신고를 한 경우에는 1회에 한정하여 혼인신고를 한 날이 속하는 과세기간의 종합소득산출세액에서 50만원을 공제한다. 적용시기&gt; &#x27;25.1.1. 이후 과세표준을 신고하거나 연말정산하... 2025년 새해 달라지는 세금제도 --&gt; 주요서비스 바로가기 본문 바로가기 매체정보 바로가기 로그인 바로가기 기사검색 바로가기 로그인 회원가입 정책 재정 /예산 / 결산 금융/증권/보험 건설 /주택/ 부동산 자원/에너지/환경 보건...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E2&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;DIVEVOLK Returns as Mobile Photography Sponsor of Underwater Photo Awards 2026–2027&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/media-advertising/articles/divevolk-returns-mobile-photography-sponsor-154800354.html&quot;,
+      &quot;publisher&quot;: &quot;GlobeNewswire&quot;,
+      &quot;published_at&quot;: &quot;2026-11-11T15:48:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;DIVEVOLK Returns as Mobile Photography Sponsor of Underwater Photo Awards 2026–2027 Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 2026 Elec...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E4&quot;,
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;title&quot;: &quot;&#x27;2025 핵심 개정 세법&#x27; 총정리 - 국회 본회의 의결(2025. 12. 2.)&quot;,
+      &quot;source_url&quot;: &quot;http://www.intn.co.kr/news/articleView.html?idxno=2047657&quot;,
+      &quot;publisher&quot;: &quot;Naver News&quot;,
+      &quot;published_at&quot;: &quot;2025-12-04T15:26:00+09:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;등 소득공제 한도 확대(조특법 §126의2) ㅇ 신용카드 등 사용금액 기본공제 한도 금액을 자녀 및 손자녀 등 부양가족 1명당 50만원(총급여액이 7천만원 초과인 경우 25만원) 씩 최대 100만원(총급여액이 7천만원 초과인...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E5&quot;,
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;title&quot;: &quot;[2025년 세제개편안] [전문] 서민·중산층·다자녀가구 등 세제지원 확대&quot;,
+      &quot;source_url&quot;: &quot;http://www.joseilbo.com/news/news_read.php?uid=549483&amp;class=7&amp;grp=&quot;,
+      &quot;publisher&quot;: &quot;Naver News&quot;,
+      &quot;published_at&quot;: &quot;2025-07-31T17:36:00+09:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;1명당 25만원씩 최대 50만원까지 상향된다. 예를 들어 총급여 5천만원인 2자녀 가구는 기존 300만원에서 400만원으로 공제한도가 늘어난다. 적용기한은 기존 2025년 12월 31일에서 2028년 12월 31일까지 3년 연장되며, 2026년...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E7&quot;,
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;title&quot;: &quot;ACCESS Newswire to Present at the 20th Annual LD Micro Main Event XX - Tuesday October 20, 2026 - 11:00AM PT (2:00PM ET)&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/media-advertising/articles/access-newswire-present-20th-annual-210800912.html&quot;,
+      &quot;publisher&quot;: &quot;ACCESS Newswire&quot;,
+      &quot;published_at&quot;: &quot;2026-10-15T21:08:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E8&quot;,
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;title&quot;: &quot;COS Readers&#x27; Choice 2026: 11 consecutive years of recognition for Veriforce Canada&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/technology/articles/cos-readers-choice-2026-11-125600838.html&quot;,
+      &quot;publisher&quot;: &quot;CNW Group&quot;,
+      &quot;published_at&quot;: &quot;2026-09-18T12:56:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E10&quot;,
+      &quot;claim_id&quot;: &quot;GLOBAL&quot;,
+      &quot;title&quot;: &quot;NextNRG Announces Nasdaq Delisting Determination; Trading to Be Suspended at Market Open on November 12, 2026&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/nextnrg-announces-nasdaq-delisting-determination-205000921.html&quot;,
+      &quot;publisher&quot;: &quot;GlobeNewswire&quot;,
+      &quot;published_at&quot;: &quot;2026-11-11T20:50:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E11&quot;,
+      &quot;claim_id&quot;: &quot;GLOBAL&quot;,
+      &quot;title&quot;: &quot;uCloudlink (UCL) Q3 2026 Earnings Call Transcript&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/ucloudlink-ucl-q3-2026-earnings-203754053.html&quot;,
+      &quot;publisher&quot;: &quot;Motley Fool&quot;,
+      &quot;published_at&quot;: &quot;2026-11-11T20:37:54+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    }
+  ],
+  &quot;source_policy&quot;: {
+    &quot;raw_transcript_published&quot;: false,
+    &quot;raw_transcript_in_evidence&quot;: false,
+    &quot;research_pipeline_version&quot;: 4,
+    &quot;closed_source_claims&quot;: &quot;unverified_external_source&quot;,
+    &quot;auto_caption_warning&quot;: true,
+    &quot;local_asr_warning&quot;: false
+  }
+}</pre>
+  </details>
+</article>
+</main>
+  <style>
+.reader-contents { margin: 16px 0; padding: 12px 16px; border: 1px solid var(--line, #64748b); border-radius: 12px; }
+.reader-contents > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-weight: 750; }
+.reader-contents nav { display: grid; gap: 4px; max-height: 45vh; overflow: auto; margin: 8px 0; }
+.reader-contents a { display: block; min-height: 44px; padding: 10px; border-radius: 6px; color: inherit; overflow-wrap: anywhere; }
+.reader-contents a:hover { background: #80808020; }
+.reader-contents .reader-subsection { padding-inline-start: 24px; font-size: .92em; }
+.reader-prose, .report { overflow-wrap: anywhere; line-height: 1.8; }
+.reader-prose p, .reader-prose li { max-width: 85ch; }
+.reader-prose h2, .reader-prose h3, .reader-prose h4, [data-reader-heading] { scroll-margin-top: 100px; line-height: 1.45; }
+.reader-prose h2 { margin-top: 1.8em; padding-bottom: 8px; border-bottom: 1px solid var(--line, #64748b); }
+.reader-prose h3 { margin-top: 1.5em; }
+.reader-prose li { margin: .5em 0; }
+.reader-prose pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.reader-prose blockquote { margin: 16px 0; padding: 4px 16px; border-left: 3px solid var(--accent, #64748b); }
+.reader-table { overflow: auto; max-width: 100%; margin: 16px 0; border: 1px solid var(--line, #64748b); border-radius: 10px; }
+.reader-table table { border-collapse: collapse; width: 100%; margin: 0; font-size: .92rem; }
+.reader-table th, .reader-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line, #64748b); min-width: 110px; max-width: 400px; overflow-wrap: anywhere; white-space: normal; }
+.reader-table th { background: #80808018; }
+.reader-table tr:nth-child(even) { background: #80808008; }
+.reader-search { display: grid; gap: 8px; margin: 16px 0; }
+.reader-search label { font-weight: 700; }
+.reader-search input { box-sizing: border-box; width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line, #64748b); border-radius: 10px; background: var(--panel, #fff); color: var(--text, #132238); font: inherit; }
+.reader-search p { margin: 0; font-size: .86rem; }
+.reader-back { position: fixed; bottom: max(14px, env(safe-area-inset-bottom)); right: 14px; z-index: 30; min-height: 44px; border: 1px solid #778899; border-radius: 99px; padding: 10px 16px; background: #18344a; color: #fff; font: 700 14px system-ui; cursor: pointer; box-shadow: 0 3px 12px #0003; }
+[data-reader-source] { margin-top: 20px; }
+[data-reader-source] > summary { min-height: 44px; cursor: pointer; }
+[data-reader-source] pre { font-size: .85rem; }
+[data-reader-source] pre, .reader-prose { min-width: 0; }
+.reader-contents :focus-visible, .reader-search :focus-visible, .reader-back:focus-visible, .reader-table:focus-visible { outline: 3px solid var(--accent, #008c95); outline-offset: 3px; }
+.reader-search + .grid > [hidden] { display: none !important; }
+@media (max-width: 600px) { .reader-prose { font-size: 1rem; } .reader-contents { padding: 8px 12px; } }
+@media print { .reader-back, .reader-search, .reader-contents, [data-reader-source] { display: none !important; } .reader-table { overflow: visible; } .reader-prose { color: #000; background: #fff; } }
+</style><script>
+(() => {
+  'use strict';
+  let serial = 0;
+  const rendered = new WeakMap();
+  const node = (tag, text) => { const el = document.createElement(tag); if (text != null) el.textContent = text; return el; };
+  function inline(parent, text) {
+    const pattern = /(`[^`]+`|\*\*[^*]+\*\*|\[[^\]]+\]\(https?:\/\/[^\s)]+\))/g;
+    let start = 0;
+    for (const match of String(text).matchAll(pattern)) {
+      parent.append(document.createTextNode(text.slice(start, match.index)));
+      const value = match[0];
+      if (value.startsWith('`')) parent.append(node('code', value.slice(1, -1)));
+      else if (value.startsWith('**')) parent.append(node('strong', value.slice(2, -2)));
+      else {
+        const link = value.match(/^\[([^\]]+)\]\((.+)\)$/);
+        const a = node('a', link[1]); a.href = link[2]; a.rel = 'noopener noreferrer'; parent.append(a);
+      }
+      start = match.index + value.length;
+    }
+    parent.append(document.createTextNode(text.slice(start)));
+  }
+  const cells = line => line.trim().replace(/^\|/, '').replace(/\|$/, '').split(/(?<!\\)\|/).map(v => v.trim().replace(/\\\|/g, '|'));
+  function markdown(source) {
+    const article = node('article'); article.className = 'reader-prose';
+    const lines = source.split(/\r?\n/); let list = null;
+    for (let i = 0; i < lines.length; i += 1) {
+      const line = lines[i], value = line.trim();
+      if (!value) { list = null; continue; }
+      if (/^```/.test(value)) {
+        const code = []; i += 1;
+        while (i < lines.length && !/^```/.test(lines[i].trim())) code.push(lines[i++]);
+        const pre = node('pre'); pre.append(node('code', code.join('\n'))); article.append(pre); list = null; continue;
+      }
+      if (i + 1 < lines.length && value.includes('|') && cells(lines[i + 1]).every(v => /^:?-{3,}:?$/.test(v))) {
+        const table = node('table'), head = node('thead'), body = node('tbody');
+        const row = (values, tag) => { const tr = node('tr'); values.forEach(v => { const cell = node(tag); if (tag === 'th') cell.scope = 'col'; inline(cell, v); tr.append(cell); }); return tr; };
+        head.append(row(cells(line), 'th')); i += 2;
+        while (i < lines.length && lines[i].trim() && lines[i].includes('|')) body.append(row(cells(lines[i++]), 'td'));
+        i -= 1; table.append(head, body); article.append(table); list = null; continue;
+      }
+      const heading = value.match(/^(#{1,6})\s+(.+)$/);
+      if (heading) { const h = node('h' + Math.min(4, heading[1].length + 1)); inline(h, heading[2]); article.append(h); list = null; continue; }
+      const bullet = value.match(/^(?:[-*+] |\d+\. )(.+)$/);
+      if (bullet) {
+        const tag = /^\d/.test(value) ? 'ol' : 'ul';
+        if (!list || list.tagName.toLowerCase() !== tag) { list = node(tag); if (tag === 'ol') list.start = parseInt(value, 10); article.append(list); }
+        const li = node('li'); inline(li, bullet[1]); list.append(li); continue;
+      }
+      list = null;
+      if (/^(---+|\*\*\*+)$/.test(value)) { article.append(node('hr')); continue; }
+      const p = node(value.startsWith('> ') ? 'blockquote' : 'p'); inline(p, value.startsWith('> ') ? value.slice(2) : line); article.append(p);
+    }
+    return article;
+  }
+  function contents(root) {
+    root.querySelectorAll(':scope > .reader-contents').forEach(el => el.remove());
+    const headings = [...root.querySelectorAll('h2,h3,h4')].filter(h => !h.closest('.card,.run-card,.reader-contents,[data-reader-source],[hidden]'));
+    if (headings.length < 2) return;
+    const details = node('details'); details.className = 'reader-contents';
+    details.append(node('summary', '이 리포트 목차 · ' + headings.length + '개 항목'));
+    const nav = node('nav'); nav.setAttribute('aria-label', '리포트 목차');
+    headings.forEach(h => {
+      if (!h.id) h.id = 'reader-section-' + (++serial);
+      h.dataset.readerHeading = ''; h.tabIndex = -1;
+      const a = node('a', h.textContent); a.href = '#' + h.id;
+      if (h.tagName !== 'H2') a.className = 'reader-subsection';
+      a.addEventListener('click', event => {
+        event.preventDefault();
+        for (let ancestor = h.parentElement; ancestor; ancestor = ancestor.parentElement) if (ancestor.tagName === 'DETAILS') ancestor.open = true;
+        h.scrollIntoView({block: 'start'}); h.focus({preventScroll: true});
+      }); nav.append(a);
+    });
+    details.append(nav); root.prepend(details);
+  }
+  function enhance(root) {
+    if (!root) return;
+    root.querySelectorAll('pre[data-report-markdown]').forEach(pre => {
+      const previous = rendered.get(pre);
+      if (previous && previous.source === pre.textContent) return;
+      const article = markdown(pre.textContent);
+      if (previous) previous.article.replaceWith(article);
+      else {
+        const details = node('details'); details.dataset.readerSource = '';
+        details.append(node('summary', 'Markdown 원문 보기'));
+        pre.before(article, details); details.append(pre);
+      }
+      rendered.set(pre, {source: pre.textContent, article});
+    });
+    root.querySelectorAll('table').forEach(table => {
+      if (table.closest('.reader-table,.account-table-wrap,.summary-scroll')) return;
+      const wrap = node('div'); wrap.className = 'reader-table'; wrap.tabIndex = 0;
+      wrap.setAttribute('role', 'region'); wrap.setAttribute('aria-label', '리포트 표 · 가로로 스크롤하여 전체 보기');
+      table.before(wrap); wrap.append(table);
+    });
+    root.querySelectorAll('.grid').forEach(grid => {
+      const cards = [...grid.querySelectorAll(':scope > a.card')];
+      if (cards.length < 2 || grid.dataset.readerSearch) return;
+      grid.dataset.readerSearch = 'true';
+      const box = node('div'); box.className = 'reader-search';
+      const input = node('input'); input.type = 'search'; input.placeholder = '제목 · 종목 · 채널 · 키워드'; input.id = 'report-search-' + (++serial);
+      const label = node('label', '리포트 찾기'); label.htmlFor = input.id;
+      const status = node('p'); status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
+      const update = () => {
+        const terms = input.value.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean); let count = 0;
+        cards.forEach(card => { card.hidden = !terms.every(t => card.textContent.toLocaleLowerCase().includes(t)); if (!card.hidden) count += 1; });
+        status.textContent = cards.length + '개 중 ' + count + '개 표시' + (count ? '' : ' · 검색어를 지우거나 다른 키워드를 입력하세요.');
+      };
+      input.addEventListener('input', update); box.append(label, input, status); grid.before(box); update();
+    });
+    contents(root);
+  }
+  window.TradingAgentsReader = {enhance};
+  const main = document.querySelector('main');
+  if (main && !main.hasAttribute('data-reader-dynamic')) enhance(main);
+  if (main) {
+    const top = node('button', '↑ 맨 위'); top.type = 'button'; top.className = 'reader-back'; top.setAttribute('aria-label', '리포트 맨 위로 이동');
+    top.addEventListener('click', () => { const target = document.querySelector('h1') || main; target.tabIndex = -1; target.scrollIntoView({block: 'start'}); target.focus({preventScroll: true}); });
+    document.body.append(top);
+  }
+})();
+</script>
+</body>
+</html>

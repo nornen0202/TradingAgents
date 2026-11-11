@@ -1,0 +1,763 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YouTube 투자자용 검증 리포트 - 기관 간 블록체인 금융 시작됐다, 다음 단계는 퍼블릭 네트워크 확장? | 서동주, 김동환, 김준우 쟁글 대표 [크립토 PLUS]</title>
+  <style>
+:root {
+  color-scheme: light;
+  --bg: #f7f8fb;
+  --panel: #ffffff;
+  --text: #172033;
+  --muted: #667085;
+  --line: #d9dee8;
+  --accent: #0f766e;
+  --accent-2: #2563eb;
+  --warn: #b45309;
+  --bad: #b42318;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0 56px; }
+a { color: var(--accent-2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.hero { padding: 28px 0 22px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+.hero.compact { padding-top: 12px; }
+.hero h1 { margin: 0; font-size: clamp(28px, 4vw, 44px); line-height: 1.15; letter-spacing: 0; }
+.hero p { max-width: 760px; color: var(--muted); margin: 12px 0 0; }
+.eyebrow { color: var(--accent); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0; margin: 0 0 8px; }
+section { margin: 28px 0; }
+h2, h3, h4, h5 { letter-spacing: 0; line-height: 1.25; }
+.synthesis-callout { padding: clamp(20px, 4vw, 34px); border: 1px solid #6ee7d8; border-radius: 18px; background: linear-gradient(135deg, #ecfdf9 0%, #eff6ff 100%); box-shadow: 0 18px 44px rgba(15, 118, 110, .12); }
+.synthesis-callout.unavailable { border-color: var(--line); background: var(--panel); box-shadow: none; }
+.synthesis-callout h2 { margin: 0; font-size: clamp(24px, 3.2vw, 36px); }
+.synthesis-callout .lead { max-width: 900px; font-size: 17px; color: #334155; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.primary-link, .secondary-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border-radius: 999px; font-weight: 800; }
+.primary-link { color: white; background: var(--accent); }
+.secondary-link { color: var(--accent-2); border: 1px solid #93c5fd; background: white; }
+.primary-link:hover, .secondary-link:hover { text-decoration: none; filter: brightness(.97); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.card, .run { display: flex; flex-direction: column; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; color: var(--text); min-height: 128px; }
+.run { padding: 16px; }
+.card:hover, .run:hover { border-color: var(--accent-2); text-decoration: none; }
+.thumb { display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #e9edf5; border-radius: 8px 8px 0 0; color: var(--muted); font-size: 13px; font-weight: 700; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb-empty span { padding: 0 14px; text-align: center; }
+.card-body { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 16px; }
+.card strong { line-height: 1.35; }
+.source-line { color: #3f4a5f; font-weight: 600; }
+.runs { display: grid; gap: 10px; }
+.badge { display: inline-flex; width: fit-content; border-radius: 999px; padding: 2px 9px; background: #e6f4f1; color: var(--accent); font-size: 12px; font-weight: 700; }
+.status-contradicted, .status-llm_failed { background: #fee4e2; color: var(--bad); }
+.status-unverified, .status-stale { background: #fff4d6; color: var(--warn); }
+small, .muted { color: var(--muted); }
+.topnav { display: flex; gap: 14px; margin-bottom: 16px; font-size: 14px; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px; }
+.stats span { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
+.report { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: min(5vw, 36px); }
+.report-head { border-bottom: 1px solid var(--line); margin-bottom: 24px; padding-bottom: 20px; }
+.report-head h1 { margin: 0; font-size: clamp(24px, 3.5vw, 38px); line-height: 1.2; }
+.meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+.scope-note { padding: 12px 14px; border-left: 4px solid var(--warn); border-radius: 6px; background: #fff7ed; color: #7c2d12; }
+.synthesis-report h2 { margin-top: 34px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.synthesis-report h3 { margin: 24px 0 8px; color: #0f4c5c; }
+.synthesis-report p, .synthesis-report li { overflow-wrap: anywhere; }
+pre { overflow: auto; background: #111827; color: #f9fafb; border-radius: 8px; padding: 14px; }
+code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+details { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 18px; }
+@media (max-width: 640px) {
+  main { width: min(100% - 20px, 1120px); padding-top: 18px; }
+  .report { padding: 18px; }
+  .synthesis-callout { border-radius: 14px; padding: 18px; }
+  .cta-row a { width: 100%; }
+  .mobile-report { border-radius: 12px; }
+}
+</style>
+</head>
+<body>
+  <main>
+<nav class="topnav"><a href="index.html">실행 목록</a><a href="../../index.html">YouTube 홈</a></nav>
+<article class="report">
+  <header class="report-head">
+    <p class="eyebrow">youtube_20261112_054029</p>
+    <h1>기관 간 블록체인 금융 시작됐다, 다음 단계는 퍼블릭 네트워크 확장? | 서동주, 김동환, 김준우 쟁글 대표 [크립토 PLUS]</h1>
+    <div class="meta">
+      <span class="badge status-asr_uncertain">asr_uncertain</span>
+      <a href="https://www.youtube.com/watch?v=awwLs7hR3ag">원본 영상</a>
+    </div>
+  </header>
+  <h2>기관 블록체인 금융과 퍼블릭 토큰: 채택과 투자자 수혜 사이의 검증 공백</h2>
+<p><strong>분석 기준: 2026년 11월 12일 · 영상 업로드: 2026년 11월 11일</strong></p>
+<p>출처: <a href="https://www.youtube.com/watch?v=awwLs7hR3ag">삼프로TV 크립토 PLUS 영상</a></p>
+<h3>1. 핵심 판단</h3>
+<p>영상의 핵심 논지는 <strong>기관의 블록체인 활용 → 퍼블릭 네트워크 확장 → 거래 규모 증가 → 토큰 가치 부각</strong>이다. 다만 제공된 자료로는 이 연결고리 가운데 어느 단계도 충분히 실증되지 않았다. 특히 <strong>기관의 기술 채택과 기존 토큰 보유자의 경제적 수혜는 별개</strong>다.</p>
+<p>개별 주장 검증 결과는 10건 중 <strong>8건 미검증, 2건 음성인식 불확실</strong>이다. 이를 거짓으로 판정한 것은 아니다. 외부 검색 결과가 관련성이 낮거나 본문·공식 자료를 확보하지 못해 판단을 유보한 것이다. 상위 처리 상태의 ‘검증 완료·주의사항 있음’ 표시는 개별 주장이 사실로 확인됐다는 뜻이 아니다.</p>
+<p>현재 가장 중요한 관찰 대상은 가격 전망보다 <strong>공식 사업 발표, 실제 운영 규모, 유동성 개선, 비용 차감 후 수익, 토큰 보유자에게 귀속되는 가치</strong>다.</p>
+<h3>2. 영상 주장과 확인된 사실·근거</h3>
+<p>아래 시각은 정확한 발언 시점이 아니라 제공된 자막 청크의 시작점이다.</p>
+<p>| 항목·근거 시각 | 영상 주장 | 확인된 사실·근거 및 판정 |</p>
+<p>|---|---|---|</p>
+<p>| BTC·시장 흐름 · 00:09 | BTC 약 73,500달러, 나스닥 선물 약 0.7% 상승, 상관계수 0.74. 중장기 리테일 중심 시장이라는 설명 | <strong>미검증.</strong> 촬영일·거래소·선물 계약월·상관계수 산정 기간이 없다. ETF 흐름과 투자자 구성 자료도 미확보 |</p>
+<p>| MSTR·MSCI · 00:09 | 지수에서 제외되면 BTC 매수 여력이 줄어들 수 있다는 우려 | <strong>조건부 주장·미검증.</strong> MSCI 검토·결정 원문이 없다. 지수 제외가 확정됐다는 발언으로 해석할 수 없음 |</p>
+<p>| 우버 · 06:19·12:32 | 주말 블록체인 자금 운용 방침을 발표했으며 재무 효율 개선이 참여 동기라는 설명 | <strong>발표·집행 모두 미검증.</strong> 운용액·통화·네트워크·금리 미확인. 제시된 수익 예시의 조건부 산술만 확인 가능 |</p>
+<p>| DTCC·캔톤·예금 토큰화 · 06:19 이후 | 기관 활용이 실행 단계이며 DTCC가 ‘내년’ 퍼블릭 지원 확대 방향을 제시했다는 설명 | <strong>미검증.</strong> 공식 계획·승인 조건·상용 실적이 없다. ‘SC’의 정확한 기관명도 불명확 |</p>
+<p>| ETH·SOL · 12:32 | 낮은 수수료 아래에서 대규모 사용이 수익과 인프라 가치 확대에 필요하다는 논리 | <strong>미검증 가설.</strong> 수수료·소각·보상 시계열과 보유자 권리 자료가 없다. 채택 증가가 가격 상승을 보장하지 않음 |</p>
+<p>| 미국 주식 토큰화 · 12:32·18:55 | ‘OKX ICE’로 전사된 주체의 약 60종·24시간 거래 계획, 60개 초과 기업의 사용 거부 | <strong>음성인식 불확실.</strong> 관련 제목만 발견됐으며 플랫폼명·상품·수치·거부 명단은 확인되지 않음 |</p>
+<p>| 한국 제도·주식 연계 상품 · 18:55 | 토큰증권법 ‘내년 2월’ 시행, SK하이닉스의 바이낸스 거래 관련 설명 | <strong>미검증.</strong> 법률 부칙과 상품 공지가 없다. 실제 주식과 가격 추종 토큰·파생상품을 구분해야 함 |</p>
+<p>| 보안·유럽 규제 · 18:55 | 최근 바이낸스 해킹과 유럽 미인가 거래소 차단 언급 | <strong>음성인식 불확실.</strong> 사건·거래소·국가·감독기관을 특정할 자료가 없음 |</p>
+<p>| ONDO·업계 로드맵 · 24:58 | 실행에 6개월~1년이 필요하며 ‘내년’ 선별·파일럿, ‘내후년’ 대중화 가능성 | <strong>전망·미검증.</strong> 온도 플랫폼의 공식 출범 계획과 토큰 가치 귀속 자료가 없다. 특정 토큰의 수혜를 확정하지 않음 |</p>
+<h4>확인 가능한 수치: 우버 사례의 조건부 계산</h4>
+<p>같은 통화로 원금 1조와 연간 수익 70억~80억을 가정하면 원금 대비 수익은 <strong>0.7~0.8%</strong>다. 이를 연간 주말 104일, 365일 기준 단리로 환산하면 필요한 연율은 약 <strong>2.46~2.81%</strong>다.</p>
+<p>이 계산은 우버의 발표나 실제 수익을 입증하지 않는다. 기존 운용 상품에서도 주말 이자가 발생하는지, 이동·환매 비용과 신용·유동성 위험을 반영해도 추가 수익이 남는지가 핵심이다. 예시 금액을 우버의 실제 운용 규모나 실적에 반영할 근거는 없다.</p>
+<h3>3. 외부 근거의 실제 강도</h3>
+<p><strong>핵심 투자 논지를 직접 지지하는 외부 원문은 이번 자료에서 확보되지 않았다.</strong></p>
+<ul>
+<li><strong>E1~E6:</strong> 철강·관세·금속·AI 주식·은퇴자금 등 관련성이 낮은 자료이거나 본문이 없다. BTC 가격, ETF 흐름, DTCC 사업의 근거로 사용할 수 없다.</li>
+<li><strong>E7:</strong> <a href="https://finance.yahoo.com/markets/crypto/articles/okxice-gets-ready-24-7-183607111.html">「OKXICE Gets Ready for 24/7 Markets」 검색 결과</a>는 제목 수준의 후속 확인 단서다. 본문이 없어 정확한 플랫폼명, 약 60종이라는 수치, 기업들의 거부, 규제 승인 여부를 입증하지 못한다.</li>
+<li><strong>공시 자료:</strong> <a href="https://www.sec.gov/Archives/edgar/data/1050446/000119312526455407/0001193125-26-455407-index.html">MSTR의 SEC 제출 목록</a>은 확보됐지만 본문은 수집되지 않았다. 이 목록만으로 MSCI 관련 영향이나 조달·BTC 매입 내용을 확인할 수 없다.</li>
+</ul>
+<p>E1~E7의 게시 시각은 모두 영상 업로드 이후다. 촬영 당시의 공개 정보나 시장 상태를 확인하는 자료로도 한계가 있다. 조회 결과의 ‘verified’ 표시는 자료 수집 상태이지 영상 주장에 대한 지지 판정이 아니다.</p>
+<h3>4. 강세 논리가 성립하려면</h3>
+<p>영상이 제시한 긍정적 시나리오는 다음 조건을 전제로 한다.</p>
+<p>1. <strong>경제적 유인이 실제로 존재해야 한다.</strong> 기관이 결제 시간·자금 활용·담보 운영을 개선하고 비용 차감 후 편익을 얻어야 한다.</p>
+<p>2. <strong>퍼블릭 연결이 유동성 개선으로 이어져야 한다.</strong> 네트워크 지원 발표를 넘어 실제 거래 상대방·거래 규모·시장 깊이가 증가해야 한다.</p>
+<p>3. <strong>사용 증가가 순수익으로 전환돼야 한다.</strong> 거래 건수가 늘더라도 수수료 하락이나 보조금으로 경제적 성과가 제한될 수 있다.</p>
+<p>4. <strong>성과가 해당 토큰에 귀속돼야 한다.</strong> 서비스 운영사·검증자·일반 토큰 보유자에게 돌아가는 가치를 각각 확인해야 한다.</p>
+<p>따라서 사업 진전과 토큰 수혜를 함께 평가하려면 <strong>계약 → 파일럿 → 상용 운영 → 반복 거래·수익 → 토큰 귀속</strong>을 단계별로 추적해야 한다. 현재 자료는 이 경로를 확인하기에 부족하다.</p>
+<h3>5. 주요 반론과 논지 무효화 조건</h3>
+<p>| 반론 | 논지를 약화하거나 무효화하는 관찰 결과 |</p>
+<p>|---|---|</p>
+<p>| 기관망만 성장할 수 있다 | 거래가 폐쇄형·허가형 환경에 머물고 퍼블릭 유동성과 연결되지 않음 |</p>
+<p>| 네트워크 성장과 토큰 수혜가 다를 수 있다 | 거래량은 늘지만 순수수료·소각·보유자 귀속 가치가 개선되지 않음 |</p>
+<p>| 주말 운용의 추가 이익이 과장될 수 있다 | 기존 상품의 주말 이자와 비용·위험을 반영하면 순증 편익이 사라짐 |</p>
+<p>| 규제와 권리 구조가 확장을 제한할 수 있다 | 접근 대상·유통·상환이 제한되거나 기대한 배당·의결권이 제공되지 않음 |</p>
+<p>| 기대와 실행 사이 공백이 길어질 수 있다 | 발표 이후 계약·파일럿·실거래 지표가 나오지 않거나 일정이 반복 지연됨 |</p>
+<p>공식 자료가 영상의 플랫폼·법률·확장 일정 설명과 다르게 확인되면 해당 세부 주장은 수정해야 한다. 다만 개별 사례의 불일치만으로 블록체인 금융 전체의 가능성까지 부정할 수는 없다.</p>
+<h3>6. 단기 체크포인트와 구체적 관찰 항목</h3>
+<p>| 대상 | 먼저 확인할 자료 | 지속 관찰할 항목 |</p>
+<p>|---|---|---|</p>
+<p>| BTC·ETF | 촬영일, 동일 시각 현물·선물 자료, 상관계수 원자료, ETF별 발행·환매 자료 | 일별 및 5·20거래일 누적 순유입, 투자자 구성 자료의 보고 시차. ETF 흐름과 전체 투자자 구성을 분리 |</p>
+<p>| MSTR | MSCI 검토·최종 결정·효력일, 회사 공시 본문 | 실제 발행·차입 조건과 BTC 매입액. 패시브 투자자의 주식 매도와 회사 현금 유출을 구분 |</p>
+<p>| 우버 | 회사·거래 금융기관의 공식 발표와 개시일 | 실제 운용액·통화·자산·네트워크, 주말 환매 조건, 기존 운용 대비 비용 차감 후 수익 |</p>
+<p>| DTCC·기관망 | 사업명, 승인 조건, 접근 권한, 네트워크 확장 원문 | 파일럿과 상용 거래 구분, 실거래 잔액·거래량·반복 이용, 유동성·슬리피지 변화 |</p>
+<p>| ETH·SOL | 당시 수수료·소각·검증자 보상 규칙과 온체인 원자료 | 동일 기준의 거래량·총수수료·보상·소각. 일반 보유자의 가치 귀속과 별도 비교 |</p>
+<p>| 주식 토큰·제도 | 정확한 플랫폼명, 상품 약관, 미국 법안·면제 단계, 한국 법률 부칙 | 담보·상환·배당·의결권·거래 가능 지역. 발표·제안·채택·시행을 구분 |</p>
+<p>| ONDO | 운영 법인, 대상 고객·관할, 인가·등록, 공식 출범 계획 | 계약·파일럿·상용화·잔액·거래량·수익과 ONDO 보유자 권리의 연결 |</p>
+<p>영상의 상대연도를 업로드 연도에 적용하면 <strong>2027년 상반기 선별, 하반기 실행·초기 수치, 2028년 대중화 가능성</strong>으로 읽힌다. 그러나 촬영일이 없으므로 이는 잠정 해석이며 공식 일정이 아니다. 제시된 6개월~1년의 실행 시차도 프로젝트별 자료로 검증되지 않았다.</p>
+<h3>7. 자막·시장 데이터의 한계</h3>
+<ul>
+<li><strong>transcript_quality:</strong> 자동자막 818개 세그먼트, 상태 ‘good’, 점수 1.0이다. 전체적인 처리 품질이 양호하다는 뜻이며 개별 기관명·숫자의 정확성을 보장하지 않는다.</li>
+<li><strong>source_confidence:</strong> 주요 발언은 0.85~0.94 수준이지만, 이는 자막에서 발언을 식별한 확신도다. 사실성이나 투자 성과 확률이 아니다. C9의 0.0은 개별 값 미제공 표기다.</li>
+<li><strong>asr_confidence:</strong> 전 항목 0.0은 개별 음성인식 확률의 결측 표기이며 정확도가 0%라는 뜻이 아니다. ‘OKX ICE’, ‘SC’, 해킹 관련 거래소명 등은 원음 확인이 필요하다.</li>
+<li><strong>시각·날짜:</strong> 청크 경계 중복과 영상 길이 대비 약 1.5초의 자막 정렬 차이가 보고됐다. 촬영일이 없어 ‘오늘’, ‘약 1주 반 전’, ‘내년’을 확정 날짜로 바꿀 수 없다.</li>
+<li><strong>시장 데이터:</strong> BTC·ETH 조회값은 암호자산 현물 식별이 확인되지 않았고 기업 공시 메타데이터까지 연결돼 분석에서 제외했다. SOL·ONDO는 유효 시장 필드를 확보하지 못했다. 비교 가능한 현재 암호자산 가격은 이번 자료에서 사용할 수 없다.</li>
+<li><strong>누락의 해석:</strong> 종목 뉴스 조회에는 오류가 있었고 공시는 목록 중심이다. 우버의 조회 기간 내 공시 0건이나 SOL·ONDO의 상품 미매핑은 사업 부재의 증거가 아니다.</li>
+<li><strong>비공개 자료:</strong> 비공개 면담의 업계 합의, 발행 수요, 기업 준비 상황은 <strong>미검증·수동 확인 필요</strong>다. Bloomberg·Morningstar 자료도 제공되지 않아 해당 출처에 근거한 검증은 불가능하다.</li>
+</ul>
+<h3>결론</h3>
+<p>이 영상은 기관 블록체인 금융의 <strong>사업화 경로를 관찰하기 위한 가설</strong>을 제시하지만, 제공된 외부 자료는 그 실행 상태와 기존 토큰의 수혜를 확인하지 못했다.</p>
+<p>투자자가 구분해야 할 것은 <strong>발표와 집행, 기관망과 퍼블릭 유통, 거래량과 순수익, 사업 성과와 토큰 보유자 권리</strong>다. 향후 공식 문서와 실제 운영 수치가 이 간극을 좁히는지가 핵심 판단 기준이다.</p>
+  <details>
+    <summary>공개 요약 JSON</summary>
+    <pre>{
+  &quot;version&quot;: 4,
+  &quot;video_id&quot;: &quot;awwLs7hR3ag&quot;,
+  &quot;title&quot;: &quot;기관 간 블록체인 금융 시작됐다, 다음 단계는 퍼블릭 네트워크 확장? | 서동주, 김동환, 김준우 쟁글 대표 [크립토 PLUS]&quot;,
+  &quot;url&quot;: &quot;https://www.youtube.com/watch?v=awwLs7hR3ag&quot;,
+  &quot;channel&quot;: &quot;삼프로TV 3PROTV&quot;,
+  &quot;channel_id&quot;: &quot;UChlv4GSd7OQl3js-jkLOnFA&quot;,
+  &quot;source_url&quot;: &quot;https://www.youtube.com/@3protv/videos&quot;,
+  &quot;thumbnail_url&quot;: &quot;https://i.ytimg.com/vi/awwLs7hR3ag/maxresdefault.jpg&quot;,
+  &quot;published_at&quot;: &quot;2026-11-11T03:45:57+00:00&quot;,
+  &quot;status&quot;: &quot;asr_uncertain&quot;,
+  &quot;strategy_source_tier&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_evidence_weight&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_validation_policy&quot;: &quot;STANDARD_REVIEW&quot;,
+  &quot;transcript_status&quot;: &quot;available&quot;,
+  &quot;transcript_source&quot;: &quot;automatic&quot;,
+  &quot;transcript_chars&quot;: 14355,
+  &quot;transcript_quality&quot;: {
+    &quot;status&quot;: &quot;good&quot;,
+    &quot;score&quot;: 1.0,
+    &quot;warnings&quot;: [],
+    &quot;source&quot;: &quot;automatic&quot;,
+    &quot;language&quot;: &quot;Korean&quot;,
+    &quot;model_or_format&quot;: &quot;json3&quot;,
+    &quot;chars&quot;: 14355,
+    &quot;segments&quot;: 818,
+    &quot;duration_seconds&quot;: 1674,
+    &quot;repeated_ngram_ratio&quot;: 0.001
+  },
+  &quot;generated_at&quot;: &quot;2026-11-12T05:40:29.815179+09:00&quot;,
+  &quot;llm_status&quot;: &quot;success&quot;,
+  &quot;research_status&quot;: &quot;success&quot;,
+  &quot;claim_verification_status&quot;: &quot;success&quot;,
+  &quot;research_pipeline_version&quot;: 4,
+  &quot;evidence_count&quot;: 7,
+  &quot;claim_status_summary&quot;: {
+    &quot;unverified&quot;: 8,
+    &quot;asr_uncertain&quot;: 2
+  },
+  &quot;claims&quot;: [
+    {
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;claim_text&quot;: &quot;촬영 당시 비트코인은 약 73,500달러로 75,000달러를 하회했고, 나스닥 선물은 약 0.7% 상승했으며, 11월 5일 언급된 상관계수는 0.74였다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:09&quot;,
+      &quot;source_confidence&quot;: 0.9,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;BTC 약 73,500달러, 75,000달러 미만; 나스닥 선물 +0.7%; 상관계수 0.74&quot;,
+        &quot;observed&quot;: &quot;대조 가능한 BTC 현물·나스닥 선물 시계열과 상관계수 원자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;제시된 가격과 상관계수를 매매 판단이나 가격 회복의 근거로 사용하기 전에 동일 시각의 원시 시계열을 확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;claim_text&quot;: &quot;비트코인 시장은 중장기 리테일 중심이며 은행·보험사의 장기 자금 진입은 규제로 제한되고, 최근 ETF 자금 유출이 있었다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:09&quot;,
+      &quot;source_confidence&quot;: 0.9,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;향후 2~3개월 급등 관점은 없다는 출연자의 전망&quot;,
+        &quot;observed&quot;: &quot;ETF 흐름과 투자자 구성 수치 없음; 전망 검증 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;ETF 흐름, 투자자 구성, 기관별 규제는 각각 확인해야 하며 리테일의 장기 보유가 단기 가격 안정성을 보장하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;claim_text&quot;: &quot;MSTR이 MSCI 지수에서 제외될 경우 비트코인 매수 여력이 줄어들 수 있다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:09&quot;,
+      &quot;source_confidence&quot;: 0.92,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;정량적 매수 여력 감소액은 제시되지 않음&quot;,
+        &quot;observed&quot;: &quot;MSCI 결정 및 조달·매입 영향 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;제외 확정으로 해석하지 말고 MSCI 결정과 회사의 실제 조달 조건·비트코인 매입 공시를 확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;claim_text&quot;: &quot;우버가 주말 블록체인 자금 운용 방침을 발표했으며, 1조를 주말 이틀씩 추가 운용하면 연간 70억~80억의 추가 수익이 가능하다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:06:19&quot;,
+      &quot;source_confidence&quot;: 0.88,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;원금 1조; 주말 2일 추가 운용; 연 70억~80억; 촬영 약 1주 반 전 발표&quot;,
+        &quot;observed&quot;: &quot;가정하의 필요 연율 약 2.46~2.81%만 계산 가능. 통화·실제 금리·집행액·발표일 미확인&quot;
+      },
+      &quot;investor_implication&quot;: &quot;계산 예시를 우버의 실제 운용액이나 실적으로 반영해서는 안 된다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;claim_text&quot;: &quot;국채·채권·MMF·예금의 기관 간 블록체인 활용은 실행 단계이며, DTCC는 내년 퍼블릭 네트워크 지원 확대 방향을 명확히 했다. 홍콩 기반 SC의 예금 발표도 사례다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:06:19&quot;,
+      &quot;source_confidence&quot;: 0.91,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;DTCC의 내년 퍼블릭 네트워크 확대&quot;,
+        &quot;observed&quot;: &quot;공식 확장 일정 없음. 2027년은 업로드 연도를 적용한 잠정 해석&quot;
+      },
+      &quot;investor_implication&quot;: &quot;기관 도입과 기존 퍼블릭 토큰의 수혜를 분리하고 실제 네트워크·거래량·접근 권한·가치 귀속을 확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;claim_text&quot;: &quot;이더리움·솔라나는 낮은 수수료율 때문에 수익 확대에 대규모 사용이 필요하고, 사용 확대가 인프라 통제·거버넌스 가치를 높일 수 있다. 토큰 가격 상승은 가설이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:12:32&quot;,
+      &quot;source_confidence&quot;: 0.91,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;수수료율·사용량·매출에 관한 구체적 수치 없음&quot;,
+        &quot;observed&quot;: &quot;수수료 구조와 실적을 대조할 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;거래량 증가만으로 가격 상승을 추론하지 말고 순수수료·소각·보상과 토큰 보유자의 실제 권리를 확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;claim_text&quot;: &quot;OKX ICE로 전사된 주체가 미국 주식 약 60종의 24시간 거래를 추진하지만 60개 초과 상장사가 사용을 거부했으며, 혁신 면제 프로그램·클라리티·주식 면제 법안이 제도적 배경이다.&quot;,
+      &quot;status&quot;: &quot;asr_uncertain&quot;,
+      &quot;confidence&quot;: 0.98,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:12:32&quot;,
+      &quot;source_confidence&quot;: 0.85,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;미국 주식 약 60종; 24시간 거래; 60개 초과 상장사 거부&quot;,
+        &quot;observed&quot;: &quot;E7 제목에 24/7 언급만 존재. 종목 수·거부 기업 수·법적 상태 미확인&quot;
+      },
+      &quot;investor_implication&quot;: &quot;플랫폼명과 법적 권리를 먼저 식별해야 하며, 24시간 거래 계획을 실제 주식 소유권이나 규제 승인으로 해석해서는 안 된다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;claim_text&quot;: &quot;한국 토큰증권법이 내년 2월 시행되며 SK하이닉스의 바이낸스 상장·거래가 해외 인지도 확대에 기여했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:18:55&quot;,
+      &quot;source_confidence&quot;: 0.85,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;내년 2월 시행&quot;,
+        &quot;observed&quot;: &quot;2027년 2월은 업로드 연도를 적용한 잠정 해석이며 법정 시행일 미확인&quot;
+      },
+      &quot;investor_implication&quot;: &quot;시행일과 상품의 법적 권리를 확인하기 전에는 정식 주식 상장이나 배당·의결권 보유를 전제로 판단해서는 안 된다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;claim_text&quot;: &quot;최근 바이낸스 해킹과 유럽 어느 국가의 미인가 거래소 차단이 있었다.&quot;,
+      &quot;status&quot;: &quot;asr_uncertain&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:18:55&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;최근 사건이라는 표현 외 날짜·피해액·국가 수 없음&quot;,
+        &quot;observed&quot;: &quot;사건 식별과 정량 대조 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;특정 거래소의 보안 사고나 규제 위험으로 인용하기 전에 원음과 공식 사건 기록을 확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C10&quot;,
+      &quot;claim_text&quot;: &quot;내년 상반기 수혜 후보 선별, 하반기 파일럿·초기 실적, 내후년 대중화 가능성이 있으며 실행까지 최소 6개월~1년이 걸릴 수 있다. 온도의 미국 거래 플랫폼 출범 계획도 언급됐다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:24:58&quot;,
+      &quot;source_confidence&quot;: 0.94,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;잠정적으로 2027년 상반기 선별·하반기 실행, 2028년 대중화; 실행 시차 최소 6개월~1년; 미팅 조율 2~3주 및 후속 2~3주~1개월&quot;,
+        &quot;observed&quot;: &quot;공식 로드맵과 실행 실적 없음. 연도는 촬영일 확인 전 확정 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;특정 토큰을 확정 수혜주로 간주하지 말고 계약·파일럿·실거래·수익과 토큰 가치 귀속을 단계별로 확인해야 한다.&quot;
+    }
+  ],
+  &quot;entities&quot;: [
+    {
+      &quot;ticker&quot;: &quot;BTC&quot;,
+      &quot;name&quot;: &quot;비트코인&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;출연자는 중장기 보유 성향의 리테일이 시장의 중심이며, 향후 단기간 급등이나 급락을 예상하지 않는다고 밝혔다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;진행자는 촬영 당시 비트코인이 75,000달러 아래인 약 73,500달러라고 언급했다.&quot;,
+        &quot;진행자는 당일 나스닥 선물이 약 0.7% 상승했으며, 11월 5일 언급된 상관계수가 0.74였다고 말했다. 상관관계의 산정 대상·기간은 제시하지 않았다.&quot;,
+        &quot;출연자는 향후 2~3개월 급등 관점은 없다고 밝혔다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;BTC&quot;,
+        &quot;as_of&quot;: &quot;2026-11-11T21:36:36.244439+00:00&quot;,
+        &quot;current_price&quot;: 32.970001220703125,
+        &quot;market_cap&quot;: null,
+        &quot;forward_pe&quot;: null,
+        &quot;trailing_pe&quot;: null,
+        &quot;fifty_two_week_high&quot;: 46.445,
+        &quot;fifty_two_week_low&quot;: 25.65,
+        &quot;average_target_price&quot;: null,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;MSTR&quot;,
+      &quot;name&quot;: &quot;마이크로스트래티지(영상 호칭)&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;진행자는 MSCI 지수에서 제외될 경우 비트코인 매수 여력이 줄어들 수 있다고 우려했다. 제외가 확정됐다는 발언은 아니다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;MSTR&quot;,
+        &quot;as_of&quot;: &quot;2026-11-11T21:36:39.703554+00:00&quot;,
+        &quot;current_price&quot;: 122.3499984741211,
+        &quot;market_cap&quot;: 51788508375.17347,
+        &quot;forward_pe&quot;: 7.0968676,
+        &quot;trailing_pe&quot;: null,
+        &quot;fifty_two_week_high&quot;: 234.84,
+        &quot;fifty_two_week_low&quot;: 81.81,
+        &quot;average_target_price&quot;: 233.26666,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;UBER&quot;,
+      &quot;name&quot;: &quot;우버&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;출연자는 우버가 주말 자금 운용에 블록체인을 활용하겠다고 밝혔으며, 기관의 참여 동기가 기술 체험보다 재무적 효율 개선이라고 설명했다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;출연자는 약 1주 반 전에 우버의 주말 블록체인 자금 운용 방침을 확인했다고 말했다.&quot;,
+        &quot;평일 5일에 더해 주말 2일간 1조를 운용하면 연간 약 70억~80억의 추가 수익이 가능하다는 예시를 들었다. 통화·적용 금리·계산 조건은 명시하지 않았다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;UBER&quot;,
+        &quot;as_of&quot;: &quot;2026-11-11T21:36:42.819197+00:00&quot;,
+        &quot;current_price&quot;: 70.68000030517578,
+        &quot;market_cap&quot;: 144321356210.73785,
+        &quot;forward_pe&quot;: 16.127193,
+        &quot;trailing_pe&quot;: 41.57647,
+        &quot;fifty_two_week_high&quot;: 95.18,
+        &quot;fifty_two_week_low&quot;: 64.04,
+        &quot;average_target_price&quot;: 98.87913,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;ETH&quot;,
+      &quot;name&quot;: &quot;이더리움&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;출연자는 낮은 수수료율 아래에서 매출 확대를 위해 대규모 사용량이 필요하며, 인프라 통제·거버넌스의 가치 역시 사용 규모가 커져야 부각된다고 설명했다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;ETH&quot;,
+        &quot;as_of&quot;: &quot;2026-11-11T21:36:45.618825+00:00&quot;,
+        &quot;current_price&quot;: 19.829999923706055,
+        &quot;market_cap&quot;: null,
+        &quot;forward_pe&quot;: null,
+        &quot;trailing_pe&quot;: null,
+        &quot;fifty_two_week_high&quot;: 33.65,
+        &quot;fifty_two_week_low&quot;: 14.53,
+        &quot;average_target_price&quot;: null,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;SOL&quot;,
+      &quot;name&quot;: &quot;솔라나&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;출연자는 솔라나도 확장과 채택을 전제로 수수료율을 낮춰 놓았으므로, 수익 확대에는 사용 규모 증가가 필요하다고 설명했다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [],
+      &quot;verification_notes&quot;: [
+        &quot;시장 데이터 조회 실패: no_usable_market_fields&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;SOL&quot;,
+        &quot;as_of&quot;: &quot;2026-11-11T21:36:48.852714+00:00&quot;,
+        &quot;current_price&quot;: null,
+        &quot;market_cap&quot;: null,
+        &quot;forward_pe&quot;: null,
+        &quot;trailing_pe&quot;: null,
+        &quot;fifty_two_week_high&quot;: null,
+        &quot;fifty_two_week_low&quot;: null,
+        &quot;average_target_price&quot;: null,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;unverified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;ONDO&quot;,
+      &quot;name&quot;: &quot;온도 파이낸스&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;출연자는 테마 주목 이후 기업 협의와 실행까지 시간이 필요하므로, 초기 기대만으로 접근하기보다 중장기 계획과 실제 진행 상황을 확인하는 관점을 제시했다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;출연자는 초기 미팅 조율에 2~3주, 후속 미팅에 2~3주~1개월이 걸릴 수 있으며 관심 형성부터 실행까지 최소 6개월~1년의 시차를 예상했다.&quot;,
+        &quot;테마 시작 후 약 1개월이 지나 중장기 계획을 검토하는 접근을 제안했고, &#x27;내년&#x27; 1~2분기 뉴스를 보고 판단해도 늦지 않다는 질문에 동의했다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;시장 데이터 조회 실패: no_usable_market_fields&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;ONDO&quot;,
+        &quot;as_of&quot;: &quot;2026-11-11T21:36:51.863137+00:00&quot;,
+        &quot;current_price&quot;: null,
+        &quot;market_cap&quot;: null,
+        &quot;forward_pe&quot;: null,
+        &quot;trailing_pe&quot;: null,
+        &quot;fifty_two_week_high&quot;: null,
+        &quot;fifty_two_week_low&quot;: null,
+        &quot;average_target_price&quot;: null,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;unverified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    }
+  ],
+  &quot;evidence&quot;: [
+    {
+      &quot;evidence_id&quot;: &quot;E1&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;Mexico says crackdown on Asian steel shipments is paying off as US tariff talks advance&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/economy/policy/articles/mexico-says-crackdown-asian-steel-200538752.html&quot;,
+      &quot;publisher&quot;: &quot;Reuters&quot;,
+      &quot;published_at&quot;: &quot;2026-11-11T20:05:38+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Mexico says crackdown on Asian steel shipments is paying off as US tariff talks advance Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 2026...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E2&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;Manufacturing advocates make case for tariffs following midterm results&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/economy/policy/articles/manufacturing-advocates-case-tariffs-following-170200662.html&quot;,
+      &quot;publisher&quot;: &quot;Manufacturing Dive&quot;,
+      &quot;published_at&quot;: &quot;2026-11-11T17:02:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Manufacturing advocates make case for tariffs following midterm results Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 2026 Elections Weathe...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E4&quot;,
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;title&quot;: &quot;Stocks end higher as CoreWeave results ease AI spending worries&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/p-500-nasdaq-futures-rise-104431138.html&quot;,
+      &quot;publisher&quot;: &quot;Reuters&quot;,
+      &quot;published_at&quot;: &quot;2026-11-11T21:25:25+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Stocks end higher as CoreWeave results ease AI spending worries Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 2026 Elections Weather Newsle...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E5&quot;,
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;title&quot;: &quot;Teradyne Stock Surges On Fresh Buy Rating, Called AI Play&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/m/6b377220-7cdf-3f3b-9aca-7e1dc8268833/teradyne-stock-surges-on.html&quot;,
+      &quot;publisher&quot;: &quot;Investor&#x27;s Business Daily&quot;,
+      &quot;published_at&quot;: &quot;2026-11-11T21:25:24+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E6&quot;,
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;title&quot;: &quot;How Much Does a 59-Year-Old Need in a 401(k) Rollover to Collect $8,200 a Month for Life Without Buying an Annuity?&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/options/articles/much-does-59-old-401-181205079.html&quot;,
+      &quot;publisher&quot;: &quot;24/7 Wall St.&quot;,
+      &quot;published_at&quot;: &quot;2026-11-11T18:12:05+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E7&quot;,
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;title&quot;: &quot;OKXICE Gets Ready for 24/7 Markets&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/crypto/articles/okxice-gets-ready-24-7-183607111.html&quot;,
+      &quot;publisher&quot;: &quot;Moby&quot;,
+      &quot;published_at&quot;: &quot;2026-11-11T18:36:07+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    }
+  ],
+  &quot;source_policy&quot;: {
+    &quot;raw_transcript_published&quot;: false,
+    &quot;raw_transcript_in_evidence&quot;: false,
+    &quot;research_pipeline_version&quot;: 4,
+    &quot;closed_source_claims&quot;: &quot;unverified_external_source&quot;,
+    &quot;auto_caption_warning&quot;: true,
+    &quot;local_asr_warning&quot;: false
+  }
+}</pre>
+  </details>
+</article>
+</main>
+  <style>
+.reader-contents { margin: 16px 0; padding: 12px 16px; border: 1px solid var(--line, #64748b); border-radius: 12px; }
+.reader-contents > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-weight: 750; }
+.reader-contents nav { display: grid; gap: 4px; max-height: 45vh; overflow: auto; margin: 8px 0; }
+.reader-contents a { display: block; min-height: 44px; padding: 10px; border-radius: 6px; color: inherit; overflow-wrap: anywhere; }
+.reader-contents a:hover { background: #80808020; }
+.reader-contents .reader-subsection { padding-inline-start: 24px; font-size: .92em; }
+.reader-prose, .report { overflow-wrap: anywhere; line-height: 1.8; }
+.reader-prose p, .reader-prose li { max-width: 85ch; }
+.reader-prose h2, .reader-prose h3, .reader-prose h4, [data-reader-heading] { scroll-margin-top: 100px; line-height: 1.45; }
+.reader-prose h2 { margin-top: 1.8em; padding-bottom: 8px; border-bottom: 1px solid var(--line, #64748b); }
+.reader-prose h3 { margin-top: 1.5em; }
+.reader-prose li { margin: .5em 0; }
+.reader-prose pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.reader-prose blockquote { margin: 16px 0; padding: 4px 16px; border-left: 3px solid var(--accent, #64748b); }
+.reader-table { overflow: auto; max-width: 100%; margin: 16px 0; border: 1px solid var(--line, #64748b); border-radius: 10px; }
+.reader-table table { border-collapse: collapse; width: 100%; margin: 0; font-size: .92rem; }
+.reader-table th, .reader-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line, #64748b); min-width: 110px; max-width: 400px; overflow-wrap: anywhere; white-space: normal; }
+.reader-table th { background: #80808018; }
+.reader-table tr:nth-child(even) { background: #80808008; }
+.reader-search { display: grid; gap: 8px; margin: 16px 0; }
+.reader-search label { font-weight: 700; }
+.reader-search input { box-sizing: border-box; width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line, #64748b); border-radius: 10px; background: var(--panel, #fff); color: var(--text, #132238); font: inherit; }
+.reader-search p { margin: 0; font-size: .86rem; }
+.reader-back { position: fixed; bottom: max(14px, env(safe-area-inset-bottom)); right: 14px; z-index: 30; min-height: 44px; border: 1px solid #778899; border-radius: 99px; padding: 10px 16px; background: #18344a; color: #fff; font: 700 14px system-ui; cursor: pointer; box-shadow: 0 3px 12px #0003; }
+[data-reader-source] { margin-top: 20px; }
+[data-reader-source] > summary { min-height: 44px; cursor: pointer; }
+[data-reader-source] pre { font-size: .85rem; }
+[data-reader-source] pre, .reader-prose { min-width: 0; }
+.reader-contents :focus-visible, .reader-search :focus-visible, .reader-back:focus-visible, .reader-table:focus-visible { outline: 3px solid var(--accent, #008c95); outline-offset: 3px; }
+.reader-search + .grid > [hidden] { display: none !important; }
+@media (max-width: 600px) { .reader-prose { font-size: 1rem; } .reader-contents { padding: 8px 12px; } }
+@media print { .reader-back, .reader-search, .reader-contents, [data-reader-source] { display: none !important; } .reader-table { overflow: visible; } .reader-prose { color: #000; background: #fff; } }
+</style><script>
+(() => {
+  'use strict';
+  let serial = 0;
+  const rendered = new WeakMap();
+  const node = (tag, text) => { const el = document.createElement(tag); if (text != null) el.textContent = text; return el; };
+  function inline(parent, text) {
+    const pattern = /(`[^`]+`|\*\*[^*]+\*\*|\[[^\]]+\]\(https?:\/\/[^\s)]+\))/g;
+    let start = 0;
+    for (const match of String(text).matchAll(pattern)) {
+      parent.append(document.createTextNode(text.slice(start, match.index)));
+      const value = match[0];
+      if (value.startsWith('`')) parent.append(node('code', value.slice(1, -1)));
+      else if (value.startsWith('**')) parent.append(node('strong', value.slice(2, -2)));
+      else {
+        const link = value.match(/^\[([^\]]+)\]\((.+)\)$/);
+        const a = node('a', link[1]); a.href = link[2]; a.rel = 'noopener noreferrer'; parent.append(a);
+      }
+      start = match.index + value.length;
+    }
+    parent.append(document.createTextNode(text.slice(start)));
+  }
+  const cells = line => line.trim().replace(/^\|/, '').replace(/\|$/, '').split(/(?<!\\)\|/).map(v => v.trim().replace(/\\\|/g, '|'));
+  function markdown(source) {
+    const article = node('article'); article.className = 'reader-prose';
+    const lines = source.split(/\r?\n/); let list = null;
+    for (let i = 0; i < lines.length; i += 1) {
+      const line = lines[i], value = line.trim();
+      if (!value) { list = null; continue; }
+      if (/^```/.test(value)) {
+        const code = []; i += 1;
+        while (i < lines.length && !/^```/.test(lines[i].trim())) code.push(lines[i++]);
+        const pre = node('pre'); pre.append(node('code', code.join('\n'))); article.append(pre); list = null; continue;
+      }
+      if (i + 1 < lines.length && value.includes('|') && cells(lines[i + 1]).every(v => /^:?-{3,}:?$/.test(v))) {
+        const table = node('table'), head = node('thead'), body = node('tbody');
+        const row = (values, tag) => { const tr = node('tr'); values.forEach(v => { const cell = node(tag); if (tag === 'th') cell.scope = 'col'; inline(cell, v); tr.append(cell); }); return tr; };
+        head.append(row(cells(line), 'th')); i += 2;
+        while (i < lines.length && lines[i].trim() && lines[i].includes('|')) body.append(row(cells(lines[i++]), 'td'));
+        i -= 1; table.append(head, body); article.append(table); list = null; continue;
+      }
+      const heading = value.match(/^(#{1,6})\s+(.+)$/);
+      if (heading) { const h = node('h' + Math.min(4, heading[1].length + 1)); inline(h, heading[2]); article.append(h); list = null; continue; }
+      const bullet = value.match(/^(?:[-*+] |\d+\. )(.+)$/);
+      if (bullet) {
+        const tag = /^\d/.test(value) ? 'ol' : 'ul';
+        if (!list || list.tagName.toLowerCase() !== tag) { list = node(tag); if (tag === 'ol') list.start = parseInt(value, 10); article.append(list); }
+        const li = node('li'); inline(li, bullet[1]); list.append(li); continue;
+      }
+      list = null;
+      if (/^(---+|\*\*\*+)$/.test(value)) { article.append(node('hr')); continue; }
+      const p = node(value.startsWith('> ') ? 'blockquote' : 'p'); inline(p, value.startsWith('> ') ? value.slice(2) : line); article.append(p);
+    }
+    return article;
+  }
+  function contents(root) {
+    root.querySelectorAll(':scope > .reader-contents').forEach(el => el.remove());
+    const headings = [...root.querySelectorAll('h2,h3,h4')].filter(h => !h.closest('.card,.run-card,.reader-contents,[data-reader-source],[hidden]'));
+    if (headings.length < 2) return;
+    const details = node('details'); details.className = 'reader-contents';
+    details.append(node('summary', '이 리포트 목차 · ' + headings.length + '개 항목'));
+    const nav = node('nav'); nav.setAttribute('aria-label', '리포트 목차');
+    headings.forEach(h => {
+      if (!h.id) h.id = 'reader-section-' + (++serial);
+      h.dataset.readerHeading = ''; h.tabIndex = -1;
+      const a = node('a', h.textContent); a.href = '#' + h.id;
+      if (h.tagName !== 'H2') a.className = 'reader-subsection';
+      a.addEventListener('click', event => {
+        event.preventDefault();
+        for (let ancestor = h.parentElement; ancestor; ancestor = ancestor.parentElement) if (ancestor.tagName === 'DETAILS') ancestor.open = true;
+        h.scrollIntoView({block: 'start'}); h.focus({preventScroll: true});
+      }); nav.append(a);
+    });
+    details.append(nav); root.prepend(details);
+  }
+  function enhance(root) {
+    if (!root) return;
+    root.querySelectorAll('pre[data-report-markdown]').forEach(pre => {
+      const previous = rendered.get(pre);
+      if (previous && previous.source === pre.textContent) return;
+      const article = markdown(pre.textContent);
+      if (previous) previous.article.replaceWith(article);
+      else {
+        const details = node('details'); details.dataset.readerSource = '';
+        details.append(node('summary', 'Markdown 원문 보기'));
+        pre.before(article, details); details.append(pre);
+      }
+      rendered.set(pre, {source: pre.textContent, article});
+    });
+    root.querySelectorAll('table').forEach(table => {
+      if (table.closest('.reader-table,.account-table-wrap,.summary-scroll')) return;
+      const wrap = node('div'); wrap.className = 'reader-table'; wrap.tabIndex = 0;
+      wrap.setAttribute('role', 'region'); wrap.setAttribute('aria-label', '리포트 표 · 가로로 스크롤하여 전체 보기');
+      table.before(wrap); wrap.append(table);
+    });
+    root.querySelectorAll('.grid').forEach(grid => {
+      const cards = [...grid.querySelectorAll(':scope > a.card')];
+      if (cards.length < 2 || grid.dataset.readerSearch) return;
+      grid.dataset.readerSearch = 'true';
+      const box = node('div'); box.className = 'reader-search';
+      const input = node('input'); input.type = 'search'; input.placeholder = '제목 · 종목 · 채널 · 키워드'; input.id = 'report-search-' + (++serial);
+      const label = node('label', '리포트 찾기'); label.htmlFor = input.id;
+      const status = node('p'); status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
+      const update = () => {
+        const terms = input.value.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean); let count = 0;
+        cards.forEach(card => { card.hidden = !terms.every(t => card.textContent.toLocaleLowerCase().includes(t)); if (!card.hidden) count += 1; });
+        status.textContent = cards.length + '개 중 ' + count + '개 표시' + (count ? '' : ' · 검색어를 지우거나 다른 키워드를 입력하세요.');
+      };
+      input.addEventListener('input', update); box.append(label, input, status); grid.before(box); update();
+    });
+    contents(root);
+  }
+  window.TradingAgentsReader = {enhance};
+  const main = document.querySelector('main');
+  if (main && !main.hasAttribute('data-reader-dynamic')) enhance(main);
+  if (main) {
+    const top = node('button', '↑ 맨 위'); top.type = 'button'; top.className = 'reader-back'; top.setAttribute('aria-label', '리포트 맨 위로 이동');
+    top.addEventListener('click', () => { const target = document.querySelector('h1') || main; target.tabIndex = -1; target.scrollIntoView({block: 'start'}); target.focus({preventScroll: true}); });
+    document.body.append(top);
+  }
+})();
+</script>
+</body>
+</html>
