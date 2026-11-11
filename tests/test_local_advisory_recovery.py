@@ -140,6 +140,29 @@ def test_visible_run_admission_retains_active_ownership(tmp_path, watchdog):
     assert len(client.dispatched) == 1
 
 
+@pytest.mark.parametrize("code", [401, 403, 404, 422])
+def test_rejected_dispatch_can_recover_without_erasing_budget(tmp_path, watchdog, code):
+    import urllib.error
+    client = Client()
+    client.error = urllib.error.HTTPError("https://api.github.com", code, "private error", {}, None)
+    targets = [target for target in watchdog.due_targets(NOW) if target.workflow_file == YT]
+    assert recover(tmp_path, watchdog, client, targets=targets)[0]["status"] == "ADVISORY_DISPATCH_REJECTED"
+    assert recover(tmp_path, watchdog, client, targets=targets, now=NOW + timedelta(minutes=10))[0]["status"] == "ADVISORY_RETRY_BUDGET_OR_COOLDOWN"
+    client.error = None
+    assert recover(tmp_path, watchdog, client, targets=targets, now=NOW + timedelta(hours=1))[0]["status"] == "ADVISORY_DISPATCH_ACCEPTED"
+    receipt = next((tmp_path / "state/advisory-recovery/attempts").glob("*.json"))
+    assert len(json.loads(receipt.read_text())["attempts"]) == 2
+
+
+def test_server_error_remains_unresolved(tmp_path, watchdog):
+    import urllib.error
+    client = Client()
+    client.error = urllib.error.HTTPError("https://api.github.com", 503, "unknown", {}, None)
+    assert recover(tmp_path, watchdog, client)[0]["status"] == "ADVISORY_DISPATCH_UNRESOLVED"
+    recover(tmp_path, watchdog, client, now=NOW + timedelta(hours=2))
+    assert len(client.dispatched) == 1
+
+
 @pytest.mark.parametrize("surface", ["youtube", "prism"])
 def test_jobless_native_advisory_blocks_other_surface(tmp_path, watchdog, surface):
     run = run_record(surface, status="queued", conclusion=None)
