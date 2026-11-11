@@ -28,6 +28,10 @@ SCHEMA = "tradingagents.local-notification/v1"
 PUBLICATION_LOCK_TIMEOUT_SECONDS = 300
 
 
+class ActionsDisabledError(NotificationError):
+    """Repository-wide rejection; no workflow owns the delivery."""
+
+
 def read(path):
     return json.loads(path.read_text(encoding="utf-8-sig")) if path.exists() else {}
 
@@ -187,9 +191,14 @@ def reconcile(state, *, now=None, runner=subprocess.run, completions_allowed=Tru
     now = now or datetime.now(timezone.utc)
     root = state / "notifications"
     with interprocess_file_lock(root / "dispatch.lock", timeout=0):
+        blocked = read(root / "actions-blocked.json")
+        if blocked and now - timestamp(blocked["checked_at"]) < timedelta(hours=1):
+            raise ActionsDisabledError("GitHub Actions is disabled for this repository.")
         for path in sorted((root / "events").glob("*.json")):
             try:
                 _reconcile_event(state, path, now=now, runner=runner, completions_allowed=completions_allowed)
+            except ActionsDisabledError:
+                raise
             except (OSError, ValueError, TypeError, KeyError, NotificationError) as exc:
                 atomic_write_json(root / "health" / f"event-{path.stem}.json", {
                     "notification_status": "PENDING", "error_type": type(exc).__name__,
@@ -236,6 +245,14 @@ def _reconcile_event(state, path, *, now, runner, completions_allowed):
                                     "dispatched_at": now.isoformat()})
     sent = runner(["gh", "workflow", "run", WORKFLOW, "--repo", REPOSITORY, "--ref", "main",
                    "-f", f"local_event_id={key}"], capture_output=True, text=True, check=False, timeout=30)
+    if sent.returncode and "Actions has been disabled for this repository" in getattr(sent, "stderr", ""):
+        atomic_write_json(receipt_path, {"status": "ACTIONS_DISABLED", "attempts": int(receipt.get("attempts", 0)),
+                                        "dispatched_at": now.isoformat()})
+        atomic_write_json(root / "actions-blocked.json", {"checked_at": now.isoformat(),
+                                                        "reason": "ACTIONS_DISABLED"})
+        raise ActionsDisabledError("GitHub Actions is disabled for this repository.")
+    if sent.returncode == 0:
+        (root / "actions-blocked.json").unlink(missing_ok=True)
     atomic_write_json(receipt_path, {"status": "DISPATCH_ACCEPTED" if sent.returncode == 0 else "DISPATCH_FAILED",
                                     "attempts": attempt, "dispatched_at": now.isoformat()})
 

@@ -303,6 +303,23 @@ def test_incident_cooldown_is_policy_skip_not_delivery(tmp_path):
     assert local.read(tmp_path / 'notifications/dispatches' / f'{key}.json')['status'] == 'POLICY_SKIPPED'
 
 
+def test_actions_disabled_stops_batch_preserves_budget_and_recovers(tmp_path, monkeypatch):
+    _, state, _, key = prepared(tmp_path, monkeypatch)
+    calls = []
+    def disabled(args, **kwargs):
+        calls.append(args)
+        return SimpleNamespace(returncode=1, stdout='[]', stderr='HTTP 422: Actions has been disabled for this repository.')
+    with pytest.raises(local.ActionsDisabledError):
+        local.reconcile(state, now=NOW, runner=disabled)
+    receipt = local.read(state / 'notifications/dispatches' / f'{key}.json')
+    assert receipt['attempts'] == 0 and receipt['status'] == 'ACTIONS_DISABLED'
+    with pytest.raises(local.ActionsDisabledError):
+        local.reconcile(state, now=NOW + timedelta(minutes=30), runner=lambda *a, **k: pytest.fail('blocked request'))
+    local.reconcile(state, now=NOW + timedelta(hours=1), runner=lambda *a, **k: SimpleNamespace(returncode=0, stdout='[]'))
+    assert local.read(state / 'notifications/dispatches' / f'{key}.json')['status'] == 'DISPATCH_ACCEPTED'
+    assert not (state / 'notifications/actions-blocked.json').exists()
+
+
 def test_canonical_validation_and_telegram_receipt_deduplicate(tmp_path, monkeypatch):
     archive, state, _, key = prepared(tmp_path, monkeypatch)
     sent = []
