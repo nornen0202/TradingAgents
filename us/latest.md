@@ -1,7 +1,7 @@
 # TradingAgents US 최신 공개 입력
 
 schema: tradingagents.ai-context/v1
-문서 생성: 2026-11-12T18:41:06.168407+00:00
+문서 생성: 2026-11-12T19:43:30.849716+00:00
 
 이 문서는 이미 공개된 자료의 축약 전사이며 새 분석·주문 승인이 아닙니다. 원분석 거래일(완료 일봉), 분석 완료, 장중 시세, 계좌 관측, 문서 생성은 서로 다른 시각입니다. 휴장·주말의 마지막 완료 거래일을 장애로 단정하지 마세요. null은 미확인이지 0이 아닙니다. 빌드 당시 실행 상태는 현재 상태가 아니며 row_valid_until과 현재 세션을 다시 확인해야 합니다. 현재 문서를 읽지 못하면 과거 대화의 계좌·한도를 최신 사실로 재사용하지 마세요.
 
@@ -33,25 +33,25 @@ schema: tradingagents.ai-context/v1
 ```json
 {
   "status": "available",
-  "as_of": "2026-11-13T01:45:43.715873+09:00",
+  "as_of": "2026-11-13T03:38:16.140005+09:00",
   "snapshot_health": "VALID",
   "currency": "KRW",
   "latest_attempt": {
     "status": "VALID",
-    "account_as_of": "2026-11-13T01:45:43.715873+09:00",
-    "run_started_at": "2026-11-13T01:02:23.792720+09:00",
-    "run_finished_at": "2026-11-13T01:45:50.095395+09:00",
+    "account_as_of": "2026-11-13T03:38:16.140005+09:00",
+    "run_started_at": "2026-11-13T03:02:26.022733+09:00",
+    "run_finished_at": "2026-11-13T03:38:23.153890+09:00",
     "selected_for_public_account": true
   },
   "summary": {
     "position_count": 14,
     "total_purchase_amount_krw": 23588248,
-    "total_market_value_krw": 22750952,
-    "total_unrealized_pnl_krw": -837296,
+    "total_market_value_krw": 22801626,
+    "total_unrealized_pnl_krw": -786622,
     "settled_cash_krw": 0,
     "available_cash_krw": 976652,
     "buying_power_krw": 111774,
-    "total_equity_krw": 23839378
+    "total_equity_krw": 23890052
   },
   "positions": [
     {
@@ -60,9 +60,9 @@ schema: tradingagents.ai-context/v1
       "quantity": 12.0,
       "sellable_quantity": 12.0,
       "average_cost_krw": 544932,
-      "current_price_krw": 544330,
-      "market_value_krw": 6531971,
-      "unrealized_pnl_krw": -7219
+      "current_price_krw": 545346,
+      "market_value_krw": 6544162,
+      "unrealized_pnl_krw": 4972
     },
     {
       "ticker": "RSP",
@@ -70,9 +70,9 @@ schema: tradingagents.ai-context/v1
       "quantity": 11.0,
       "sellable_quantity": 11.0,
       "average_cost_krw": 292076,
-      "current_price_krw": 297041,
-      "market_value_krw": 3267454,
-      "unrealized_pnl_krw": 54617
+      "current_price_krw": 296600,
+      "market_value_krw": 3262603,
+      "unrealized_pnl_krw": 49766
     },
     {
       "ticker": "GOOGL",
@@ -80,9 +80,9 @@ schema: tradingagents.ai-context/v1
       "quantity": 6.0,
       "sellable_quantity": 6.0,
       "average_cost_krw": 423638,
-      "current_price_krw": 399913,
-      "market_value_krw": 2399483,
-      "unrealized_pnl_krw": -142349
+      "current_price_krw": 403208,
+      "market_value_krw": 2419253,
+      "unrealized_pnl_krw": -122579
     },
     {
       "ticker": "MPWR",
@@ -90,9 +90,9 @@ schema: tradingagents.ai-context/v1
       "quantity": 1.0,
       "sellable_quantity": 1.0,
       "average_cost_krw": 1877715,
-      "current_price_krw": 1920236,
-      "market_value_krw": 1920236,
-      "unrealized_pnl_krw": 42521
+      "current_price_krw": 1932935,
+      "market_value_krw": 1932935,
+      "unrealized_pnl_krw": 55220
     },
     {
       "ticker": "ETN",
@@ -100,9 +100,9 @@ schema: tradingagents.ai-context/v1
       "quantity": 3.0,
       "sellable_quantity": 3.0,
       "average_cost_krw": 555261,
-      "current_price_krw": 480877,
-      "market_value_krw": 1442633,
-      "unrealized_pnl_krw": -223152
+      "current_price_krw": 481091,
+      "market_value_krw": 1443275,
+      "unrealized_pnl_krw": -222510
     },
     {
       "ticker": "NVDA",
@@ -110,9 +110,9 @@ schema: tradingagents.ai-context/v1
       "quantity": 6.0,
       "sellable_quantity": 6.0,
       "average_cost_krw": 266921,
-      "current_price_krw": 219652,
-      "market_value_krw": 1317917,
-      "unrealized_pnl_krw": -283609
+      "current_price_krw": 221892,
+      "market_value_krw": 1331354,
+      "unrealized_pnl_krw": -270172
     },
     {
       "ticker": "SGOV",
@@ -120,9 +120,9 @@ schema: tradingagents.ai-context/v1
       "quantity": 9.0,
       "sellable_quantity": 9.0,
       "average_cost_krw": 134353,
-      "current_price_krw": 134371,
-      "market_value_krw": 1209345,
-      "unrealized_pnl_krw": 162
+      "current_price_krw": 134370,
+      "market_value_krw": 1209332,
+      "unrealized_pnl_krw": 149
     },
     {
       "ticker": "GEV",
@@ -130,9 +130,9 @@ schema: tradingagents.ai-context/v1
       "quantity": 1.0,
       "sellable_quantity": 1.0,
       "average_cost_krw": 1471091,
-      "current_price_krw": 1103278,
-      "market_value_krw": 1103278,
-      "unrealized_pnl_krw": -367813
+      "current_price_krw": 1104221,
+      "market_value_krw": 1104221,
+      "unrealized_pnl_krw": -366870
     },
     {
       "ticker": "AAPL",
@@ -140,9 +140,9 @@ schema: tradingagents.ai-context/v1
       "quantity": 2.0,
       "sellable_quantity": 2.0,
       "average_cost_krw": 364135,
-      "current_price_krw": 477596,
-      "market_value_krw": 955192,
-      "unrealized_pnl_krw": 226922
+      "current_price_krw": 475771,
+      "market_value_krw": 951543,
+      "unrealized_pnl_krw": 223273
     },
     {
       "ticker": "LLY",
@@ -150,9 +150,9 @@ schema: tradingagents.ai-context/v1
       "quantity": 0.436065,
       "sellable_quantity": 0.436065,
       "average_cost_krw": 1418251,
-      "current_price_krw": 1941423,
-      "market_value_krw": 846586,
-      "unrealized_pnl_krw": 228136
+      "current_price_krw": 1926585,
+      "market_value_krw": 840116,
+      "unrealized_pnl_krw": 221666
     },
     {
       "ticker": "DELL",
@@ -160,9 +160,9 @@ schema: tradingagents.ai-context/v1
       "quantity": 1.0,
       "sellable_quantity": 1.0,
       "average_cost_krw": 661940,
-      "current_price_krw": 499237,
-      "market_value_krw": 499237,
-      "unrealized_pnl_krw": -162703
+      "current_price_krw": 504016,
+      "market_value_krw": 504016,
+      "unrealized_pnl_krw": -157924
     },
     {
       "ticker": "AVGO",
@@ -170,9 +170,9 @@ schema: tradingagents.ai-context/v1
       "quantity": 1.0,
       "sellable_quantity": 1.0,
       "average_cost_krw": 568932,
-      "current_price_krw": 488296,
-      "market_value_krw": 488296,
-      "unrealized_pnl_krw": -80636
+      "current_price_krw": 487775,
+      "market_value_krw": 487775,
+      "unrealized_pnl_krw": -81157
     },
     {
       "ticker": "GLDM",
@@ -180,9 +180,9 @@ schema: tradingagents.ai-context/v1
       "quantity": 4.0,
       "sellable_quantity": 4.0,
       "average_cost_krw": 136047,
-      "current_price_krw": 102311,
-      "market_value_krw": 409244,
-      "unrealized_pnl_krw": -134944
+      "current_price_krw": 102671,
+      "market_value_krw": 410687,
+      "unrealized_pnl_krw": -133501
     },
     {
       "ticker": "AMZN",
@@ -190,9 +190,9 @@ schema: tradingagents.ai-context/v1
       "quantity": 1.0,
       "sellable_quantity": 1.0,
       "average_cost_krw": 347328,
-      "current_price_krw": 360080,
-      "market_value_krw": 360080,
-      "unrealized_pnl_krw": 12752
+      "current_price_krw": 360354,
+      "market_value_krw": 360354,
+      "unrealized_pnl_krw": 13026
     }
   ]
 }
