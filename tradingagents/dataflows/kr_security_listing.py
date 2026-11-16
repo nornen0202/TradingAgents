@@ -26,6 +26,26 @@ _MASTER = {
 }
 _TAIL_FIELDS = {"kospi": (105, 113, 67), "kosdaq": (100, 108, 62)}
 _REVIEWED = {
+    "402340.KS": {
+        "symbol": "402340.KS", "short_code": "402340", "board": "kospi",
+        "exchange": "KRX", "currency": "KRW", "isin": "KR7402340004",
+        "issuer": "SK스퀘어 주식회사", "provider_name": "SK스퀘어",
+        "security_class": "COMMON_STOCK", "event_kind": "SPINOFF_FIRST_REGULAR_COMMON_STOCK",
+        "first_regular_session": "2021-11-29",
+        "evidence_available_at": "2026-11-16T08:55:56.012054+00:00",
+        "predecessor_history_allowed": False,
+        "sources": [
+            {"url": "https://kind.krx.co.kr/external/2021/11/26/000325/20211126000976/99334.htm",
+             "sha256": "069940a51a6e55e646b3ebc7383e0c596316113700969870d8312487c5253f70",
+             "role": "EXCHANGE_SPINOFF_FIRST_TRADING_REFERENCE"},
+            {"url": "https://kind.krx.co.kr/external/2026/02/27/001098/20260227002532/00660.htm",
+             "sha256": "f28a78496566d6ad2927a14565b8d5cb83b7095d4f756afc83973ca84a9b13a5",
+             "role": "ISSUER_FILED_SPINOFF_AND_LISTING_DATE"},
+            {"url": "https://new.real.download.dws.co.kr/common/master/kospi_code.mst.zip",
+             "sha256": "c060508a31bcf5031a48ed4145045a3d41324e24b2c963476ca2131b9b4ed778",
+             "role": "REVIEWED_CURRENT_MASTER_IDENTITY_NOT_HISTORICAL_LISTING"},
+        ],
+    },
     "396470.KQ": {
         "symbol": "396470.KQ", "short_code": "396470", "board": "kosdaq",
         "exchange": "KRX", "currency": "KRW", "isin": "KR7396470007",
@@ -311,8 +331,12 @@ def verify_listing_contract(symbol, snapshot, *, requested_start, end_date, anal
         and {"EXCHANGE_SPAC_DISSOLUTION_NEW_COMMON_DATE_AND_ISIN",
              "EXCHANGE_SPAC_DISSOLUTION_TRADING_REFERENCE_CORROBORATION"}
             <= {row.get("role") for row in issue.get("sources", [])})
+    spinoff_first_listing = (event == "SPINOFF_FIRST_REGULAR_COMMON_STOCK"
+        and issue.get("predecessor_history_allowed") is False
+        and {"EXCHANGE_SPINOFF_FIRST_TRADING_REFERENCE", "ISSUER_FILED_SPINOFF_AND_LISTING_DATE"}
+            <= {row.get("role") for row in issue.get("sources", [])})
     if (issue["security_class"] != "COMMON_STOCK"
-            or not (event == "IPO_FIRST_REGULAR_COMMON_STOCK" or spac_new_issue)
+            or not (event == "IPO_FIRST_REGULAR_COMMON_STOCK" or spac_new_issue or spinoff_first_listing)
             or issue["exchange"] != "KRX" or issue["currency"] != "KRW"
             or cutoff > datetime.now(timezone.utc) or _instant(issue["evidence_available_at"]) > cutoff
             or not start < first <= end or end > cutoff.astimezone(ZoneInfo("Asia/Seoul")).date()):
