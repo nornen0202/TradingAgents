@@ -48,14 +48,38 @@ def source_freshness_receipt(
     market = str(bundle.get("market") or manifest.get("market") or "").upper()
     calendar = latest_regular_session_context(market, as_of=now)
     research_receipts = []
+    original_by_ticker = {}
+    for summary in summaries:
+        original_by_ticker.setdefault(summary.get("ticker"), []).append(summary)
+    calendars = {}
     for row in rows:
-        interval = str(row.get("interval") or row.get("market_data_interval") or
-                       ("1d" if row.get("level_basis") == "daily_close" else "unknown"))
-        policy = research_observation_policy(row.get("market_data_asof"), as_of=now,
-            session=calendar["session"], interval=interval,
-            latest_regular_close_at=calendar["latest_regular_close_at"], verified_session=calendar["verified_session"])
+        # Execution overlays are not the inputs used by the original research.
+        # A date-only daily label does not prove the bar's observation clock.
+        originals = original_by_ticker.get(row.get("ticker"), [])
+        original = originals[0] if len(originals) == 1 else {}
+        contract = original.get("execution_contract") or {}
+        if not isinstance(contract, dict):
+            contract = {}
+        started = aware_datetime(original.get("started_at"))
+        finished = aware_datetime(original.get("finished_at"))
+        observed = aware_datetime(contract.get("market_data_asof"))
+        bound = (original.get("status") == "success" and started is not None and finished is not None
+                 and started <= finished <= now and contract.get("ticker") == row.get("ticker")
+                 and aware_datetime(contract.get("analysis_asof")) == finished
+                 and observed is not None and observed <= finished)
+        cutoff = finished if bound else now
+        if cutoff not in calendars:
+            calendars[cutoff] = latest_regular_session_context(market, as_of=cutoff)
+        research_calendar = calendars[cutoff]
+        policy = research_observation_policy(observed if bound else None, as_of=cutoff,
+            session=research_calendar["session"],
+            interval="1d" if contract.get("level_basis") == "daily_close" else "unknown",
+            latest_regular_close_at=research_calendar["latest_regular_close_at"],
+            verified_session=research_calendar["verified_session"])
         research_receipts.append({"ticker": row.get("ticker"), "research_valid": policy["research_valid"],
-                                  "category": policy["category"], "execution_eligible": False})
+                                  "category": policy["category"], "execution_eligible": False,
+                                  "basis": "ORIGINAL_RESEARCH_CONTRACT",
+                                  "market_data_asof": observed.isoformat() if bound else None})
     research_valid = sum(row["research_valid"] for row in research_receipts)
     receipt = {
         "schema": "tradingagents.source-freshness/v1",
