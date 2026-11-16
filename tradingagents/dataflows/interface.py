@@ -22,6 +22,8 @@ from .alpha_vantage import (
     get_stock as get_alpha_vantage_stock,
 )
 from .alpha_vantage_common import AlphaVantageRateLimitError
+from .alpaca_news import get_company_news_alpaca
+from .massive_news import get_company_news_massive
 from .config import get_config
 from .ecos import get_macro_news_ecos
 from .fred import get_macro_data
@@ -99,6 +101,8 @@ TOOLS_CATEGORIES = {
 }
 
 VENDOR_LIST = [
+    "alpaca",
+    "massive",
     "fred",
     "alpha_vantage",
     "yfinance",
@@ -138,11 +142,15 @@ VENDOR_METHODS = {
         "yfinance": get_yfinance_income_statement,
     },
     "get_news": {
+        "alpaca": get_company_news_alpaca,
+        "massive": get_company_news_massive,
         "alpha_vantage": get_company_news_alpha_vantage,
         "yfinance": get_company_news_yfinance,
         "naver": get_company_news_naver,
     },
     "get_company_news": {
+        "alpaca": get_company_news_alpaca,
+        "massive": get_company_news_massive,
         "alpha_vantage": get_company_news_alpha_vantage,
         "yfinance": get_company_news_yfinance,
         "naver": get_company_news_naver,
@@ -293,6 +301,8 @@ def _prioritize_market_specific_vendors(method: str, vendor_chain: list[str], ar
             if isinstance(symbol, str):
                 profile = resolve_instrument(symbol)
                 if profile.country == "KR":
+                    remove("alpaca")
+                    remove("massive")
                     if method in statements:
                         remove("sec_edgar")
                     if method in {"get_news", "get_company_news", "get_social_sentiment"}:

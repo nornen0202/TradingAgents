@@ -103,7 +103,7 @@ DEFAULT_CONFIG = {
         "core_stock_apis": "yfinance",       # Options: alpha_vantage, yfinance
         "technical_indicators": "yfinance",  # Options: alpha_vantage, yfinance
         "fundamental_data": "yfinance",      # Options: alpha_vantage, yfinance
-        "news_data": "alpha_vantage,yfinance",  # Options: alpha_vantage, yfinance, naver
+        "news_data": "alpaca,massive,alpha_vantage,yfinance",  # US news; KR prioritizes naver
         "macro_data": "alpha_vantage,yfinance",  # Options: alpha_vantage, yfinance, ecos
         "disclosure_data": "opendart",  # Options: opendart
         "social_data": "yfinance",  # Options: yfinance, naver

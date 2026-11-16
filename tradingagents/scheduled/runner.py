@@ -2571,7 +2571,7 @@ def _graph_config(config: ScheduledAnalysisConfig, engine_results_dir: Path) -> 
     else:
         graph_config["market_country"] = "US"
         graph_config["tool_vendors"] = {
-            "get_company_news": "alpha_vantage,yfinance",
+            "get_company_news": "alpaca,massive,alpha_vantage,yfinance",
             "get_social_sentiment": "yfinance",
         }
     if config.llm.codex_workspace_dir:
