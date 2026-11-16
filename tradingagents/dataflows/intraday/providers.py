@@ -1,14 +1,57 @@
 from __future__ import annotations
 
-from datetime import datetime, time
+from datetime import datetime, time, timedelta, timezone
+import math
 from typing import Protocol
 from zoneinfo import ZoneInfo
 
 import yfinance as yf
+import pandas as pd
 
 from tradingagents.schemas import IntradayMarketSnapshot
 
 from ..stockstats_utils import yf_retry
+from ..config import get_config
+
+
+def _dated_bars(frame, cutoff, *, before_date=None, market_timezone="US/Eastern"):
+    """Exclude unverifiable/future rows before any price or volume aggregate."""
+    valid = []
+    stamps = []
+    for position, (index, row) in enumerate(frame.iterrows()):
+        try:
+            stamp = pd.Timestamp(index)
+            if pd.isna(stamp) or stamp.tzinfo is None or stamp > cutoff:
+                continue
+            if before_date and stamp.tz_convert(market_timezone).date() >= before_date:
+                continue
+            values = {key: float(row[key]) for key in ("Close", "High", "Low", "Volume")}
+            if (any(not math.isfinite(value) or value < 0 for value in values.values())
+                    or values["Low"] <= 0 or not values["Low"] <= values["Close"] <= values["High"]):
+                continue
+        except (TypeError, ValueError, KeyError, OverflowError):
+            continue
+        valid.append(position)
+        stamps.append(stamp.tz_convert("UTC"))
+    result = frame.iloc[valid].copy()
+    result.index = pd.DatetimeIndex(stamps)
+    for column in ("Close", "High", "Low", "Volume"):
+        if column in result:
+            result[column] = pd.to_numeric(result[column], errors="raise")
+    return result.sort_index().loc[lambda rows: ~rows.index.duplicated(keep=False)]
+
+
+def _analysis_cutoff(market_timezone):
+    cutoff = datetime.now(timezone.utc)
+    requested = get_config().get("analysis_as_of")
+    if requested:
+        stamp = datetime.fromisoformat(str(requested).replace("Z", "+00:00"))
+        if len(str(requested)) == 10:
+            stamp = stamp.replace(tzinfo=ZoneInfo(market_timezone)) + timedelta(days=1) - timedelta(microseconds=1)
+        elif stamp.tzinfo is None:
+            raise ValueError("Intraday analysis cutoff requires a timezone")
+        cutoff = min(cutoff, stamp)
+    return cutoff
 
 
 class IntradaySnapshotProvider(Protocol):
@@ -38,23 +81,26 @@ class YFinanceIntradayProvider:
         market_timezone: str = "US/Eastern",
         checkpoint_id: str | None = None,
     ) -> IntradayMarketSnapshot:
+        cutoff = _analysis_cutoff(market_timezone)
         ticker_obj = yf.Ticker(ticker)
         history = yf_retry(lambda: ticker_obj.history(period="1d", interval=interval, auto_adjust=False))
         if history.empty:
             raise RuntimeError(f"No intraday data available for ticker '{ticker}'.")
 
-        history = history.dropna(subset=["Close"])
+        history = _dated_bars(history, cutoff)
         if history.empty:
             raise RuntimeError(f"Intraday dataset for '{ticker}' is empty after cleanup.")
 
+        # A reference snapshot describes one exchange-local day. Do not sum
+        # previous sessions returned unexpectedly by the upstream API.
+        latest_date = history.index[-1].tz_convert(market_timezone).date()
+        history = history.loc[history.index.tz_convert(market_timezone).date == latest_date]
         closes = history["Close"]
         highs = history["High"]
         lows = history["Low"]
         volumes = history["Volume"]
 
         last_ts = history.index[-1].to_pydatetime()
-        if last_ts.tzinfo is None:
-            last_ts = last_ts.replace(tzinfo=ZoneInfo(market_timezone))
 
         typical_price = (highs + lows + closes) / 3.0
         cumulative_volume = volumes.cumsum()
@@ -67,7 +113,9 @@ class YFinanceIntradayProvider:
         except Exception:
             daily = None
         if daily is not None and not daily.empty and "Volume" in daily:
-            avg20_volume = float(daily["Volume"].tail(20).mean())
+            daily = _dated_bars(daily, cutoff, before_date=latest_date, market_timezone=market_timezone)
+            if not daily.empty:
+                avg20_volume = float(daily["Volume"].tail(20).mean())
 
         intraday_volume = int(volumes.sum())
         intraday_trading_value = float((typical_price * volumes).sum())

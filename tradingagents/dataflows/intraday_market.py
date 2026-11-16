@@ -22,16 +22,17 @@ def fetch_intraday_market_snapshot(
     provider: str | None = None,
     checkpoint_id: str | None = None,
 ) -> IntradayMarketSnapshot:
-    """Fetch an execution-grade intraday snapshot through the configured provider.
+    """Fetch a classified intraday snapshot through the configured provider chain.
 
-    KR symbols prefer KIS quotes when credentials and provider configuration are
-    available, then fall back to yfinance so scheduled runs still produce an
-    explicit degraded/freshness signal instead of failing silently.
+    Default US and KR chains prefer KIS and allow a delayed Yahoo reference.
+    Fallback provenance is retained; obtaining a price does not make delayed
+    data execution-ready. An explicit provider selection remains authoritative.
     """
 
     market_tz = market_timezone or _default_market_timezone(ticker)
     provider_chain = _provider_chain(ticker=ticker, provider=provider)
     last_exc: Exception | None = None
+    failures: dict[str, str] = {}
     for provider_name in provider_chain:
         try:
             snapshot = get_intraday_provider(provider_name).fetch(
@@ -42,12 +43,16 @@ def fetch_intraday_market_snapshot(
             )
             return replace(
                 snapshot,
+                missing_reason={**snapshot.missing_reason, **failures},
                 execution_data_quality=classify_execution_market_data(
                     snapshot,
                 ),
             )
         except Exception as exc:
             last_exc = exc
+            # Retain degraded-path provenance without logging provider messages
+            # that may contain credentials, account identifiers or request URLs.
+            failures[f"provider:{provider_name}"] = f"unavailable:{type(exc).__name__}"
             if provider_name == provider_chain[-1]:
                 break
             continue
