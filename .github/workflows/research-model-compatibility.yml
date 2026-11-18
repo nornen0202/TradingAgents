@@ -15,12 +15,15 @@ jobs:
         with:
           path: model-probe-${{ github.run_id }}
           persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.13'
       - name: Verify exact research model and cutoff
         shell: powershell
         working-directory: model-probe-${{ github.run_id }}
         run: |
           $env:PYTHONPATH = (Get-Location).Path
           $receipt = Join-Path $env:RUNNER_TEMP "model-probe-${{ github.run_id }}.json"
-          & C:/Projects/TradingAgents/.venv/Scripts/python.exe .github/scripts/probe_research_models.py $env:CODEX_BINARY $receipt
+          & python .github/scripts/probe_research_models.py $env:CODEX_BINARY $receipt
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           Get-Content -LiteralPath $receipt
