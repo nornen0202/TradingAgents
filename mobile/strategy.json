@@ -1,28 +1,28 @@
 {
   "schema": "tradingagents.mobile-strategy/v1",
-  "generated_at": "2026-11-18T14:02:16.591129+09:00",
+  "generated_at": "2026-11-18T16:41:41.354613+09:00",
   "privacy": "PLAINTEXT_ACTION_DATA_NO_RAW_ACCOUNT_IDENTIFIERS",
   "markets": {
     "kr": {
       "market": "KR",
-      "event_id": "kr:eb26848669d81a555c16ed18e7dfc225",
+      "event_id": "kr:cd7efef74792ad1821226147fd8f0ad9",
       "source_health": "STALE",
       "report_mode": "OUTAGE",
-      "run_id": "20261118T131252_local-scheduler-kr-overlay_only",
-      "started_at": "2026-11-18T13:12:52.900281+09:00",
+      "run_id": "20261118T143232_local-scheduler-kr-overlay_only",
+      "started_at": "2026-11-18T14:32:32.211993+09:00",
       "manifest_status": "success",
       "freshness_receipt": {
         "schema": "tradingagents.source-freshness/v1",
-        "producer_run_id": "20261118T131252_local-scheduler-kr-overlay_only",
-        "producer_started_at": "2026-11-18T13:12:52.900281+09:00",
-        "producer_finished_at": "2026-11-18T13:31:42.522895+09:00",
+        "producer_run_id": "20261118T143232_local-scheduler-kr-overlay_only",
+        "producer_started_at": "2026-11-18T14:32:32.211993+09:00",
+        "producer_finished_at": "2026-11-18T14:49:43.128198+09:00",
         "analysis_run_id": "20261118T044737_local-scheduler-kr-full",
         "analysis_lineage_status": "RESOLVED",
         "analysis_completed_at": "2026-11-18T07:26:58.735506+09:00",
         "analysis_trade_date_oldest": "2026-11-16",
         "analysis_trade_date_latest": "2026-11-16",
-        "market_data_oldest_at": "2026-11-18T13:29:00+09:00",
-        "market_data_latest_at": "2026-11-18T13:30:00+09:00",
+        "market_data_oldest_at": "2026-11-18T14:48:00+09:00",
+        "market_data_latest_at": "2026-11-18T14:48:00+09:00",
         "market_data_status": "STALE",
         "publication_does_not_refresh_inputs": true,
         "execution_max_age_seconds": 180.0,
@@ -270,14 +270,14 @@
           }
         ],
         "research_calendar_verified": true,
-        "latest_regular_close_at": "2026-11-17T06:30:00+00:00",
+        "latest_regular_close_at": "2026-11-18T06:30:00+00:00",
         "research_does_not_enable_execution": true,
         "market_data_row_count": 30,
         "market_data_observed_count": 30,
         "market_data_missing_count": 0,
         "market_data_future_count": 0,
         "market_data_research_observation_count": 0,
-        "account_as_of": "2026-11-18T13:31:38.246609+09:00",
+        "account_as_of": "2026-11-18T14:49:37.459348+09:00",
         "account_snapshot_health": "VALID"
       },
       "latest_attempt": {
@@ -299,12 +299,12 @@
       },
       "decision_ready": false,
       "source": {
-        "run_id": "20261118T131252_local-scheduler-kr-overlay_only",
-        "last_run_at": "2026-11-18T13:31:42.522895+09:00",
+        "run_id": "20261118T143232_local-scheduler-kr-overlay_only",
+        "last_run_at": "2026-11-18T14:49:43.128198+09:00",
         "status": "success"
       },
       "guardrails": {
-        "valid_until": "2026-11-18T13:32:00+09:00",
+        "valid_until": "2026-11-18T14:51:00+09:00",
         "expired_at_build": true,
         "decision_ready": false,
         "conditional_strategy_ready": false
@@ -320,7 +320,7 @@
       "universe_coverage": {
         "status": "COMPLETE",
         "complete": true,
-        "source_run_id": "20261118T131252_local-scheduler-kr-overlay_only",
+        "source_run_id": "20261118T143232_local-scheduler-kr-overlay_only",
         "ticker_universe_mode": "config_plus_account",
         "account_snapshot_status": "loaded",
         "expected_holding_count": 13,
@@ -334,12 +334,12 @@
         "analysis_failed_count": 0
       },
       "provenance": {
-        "surface_run_id": "20261118T131252_local-scheduler-kr-overlay_only",
-        "manifest_run_id": "20261118T131252_local-scheduler-kr-overlay_only",
-        "universe_source_run_id": "20261118T131252_local-scheduler-kr-overlay_only",
-        "decision_bundle_run_id": "20261118T131252_local-scheduler-kr-overlay_only",
-        "analysis_source_run_id": "20261118T125233_local-scheduler-kr-overlay_only",
-        "execution_source_run_id": "20261118T131252_local-scheduler-kr-overlay_only"
+        "surface_run_id": "20261118T143232_local-scheduler-kr-overlay_only",
+        "manifest_run_id": "20261118T143232_local-scheduler-kr-overlay_only",
+        "universe_source_run_id": "20261118T143232_local-scheduler-kr-overlay_only",
+        "decision_bundle_run_id": "20261118T143232_local-scheduler-kr-overlay_only",
+        "analysis_source_run_id": "20261118T131252_local-scheduler-kr-overlay_only",
+        "execution_source_run_id": "20261118T143232_local-scheduler-kr-overlay_only"
       },
       "portfolio_action_count": 30,
       "rows": [
@@ -348,7 +348,7 @@
             "strategy_code": "REDUCE",
             "strategy_ko": "비중 축소 검토",
             "decision_state_ko": "실행 조건 감시 중",
-            "market_data_asof": "2026-11-18T13:29:00+09:00"
+            "market_data_asof": "2026-11-18T14:48:00+09:00"
           },
           "thesis": {
             "stance": "REDUCE",
@@ -571,8 +571,8 @@
           "execution": {
             "readiness": "NEEDS_LIVE_RECHECK",
             "source_row_mode": "IMMEDIATE",
-            "as_of": "2026-11-18T13:29:00+09:00",
-            "valid_until": "2026-11-18T13:32:00+09:00",
+            "as_of": "2026-11-18T14:48:00+09:00",
+            "valid_until": "2026-11-18T14:51:00+09:00",
             "action_now": null,
             "action_if_triggered": null,
             "required_rechecks": [
@@ -592,14 +592,14 @@
           "is_held": true,
           "strategy_code": "DATA_CHECK",
           "strategy_ko": "데이터 확인 전 대기",
-          "last_price": 170200.0,
-          "market_data_asof": "2026-11-18T13:29:00+09:00",
-          "session_vwap": 169899.2760107262,
-          "vwap_distance_pct": 0.17700133651823435,
-          "vwap_position_ko": "VWAP 위 +0.18%",
-          "relative_volume": 0.5640769045119696,
-          "trading_value": 59430426950.0,
-          "price_change_pct": 0.12,
+          "last_price": 170100.0,
+          "market_data_asof": "2026-11-18T14:48:00+09:00",
+          "session_vwap": 169892.88204001414,
+          "vwap_distance_pct": 0.12191091086268813,
+          "vwap_position_ko": "VWAP 위 +0.12%",
+          "relative_volume": 0.5315120490509211,
+          "trading_value": 72527101450.0,
+          "price_change_pct": 0.06,
           "spread_bps": 5.8771672054069946,
           "day_high": 172700.0,
           "day_low": 168000.0,
@@ -629,7 +629,7 @@
             "provider_blockers": [
               "work_packet_row_expired"
             ],
-            "row_valid_until": "2026-11-18T13:32:00+09:00",
+            "row_valid_until": "2026-11-18T14:51:00+09:00",
             "expired_at_build": true,
             "investor_state": "RECHECK",
             "investor_label": "주문 전 재확인"
@@ -639,7 +639,7 @@
             "confidence": 0.72,
             "action_now": "HOLD",
             "delta_krw_now": 0,
-            "target_weight_now": 0.0206,
+            "target_weight_now": 0.0207,
             "action_if_triggered": "REDUCE_IF_TRIGGERED",
             "trigger_conditions": [
               {
@@ -671,7 +671,7 @@
                 "thesis_ref": "/execution_levels/failed_breakout_rule"
               }
             ],
-            "delta_krw_if_triggered": -169900,
+            "delta_krw_if_triggered": -170100,
             "target_weight_if_triggered": 0.0,
             "strategy_state": "reduce_or_exit",
             "execution_feasibility_now": "not_actionable_now",
@@ -695,17 +695,17 @@
             "position_metrics": {
               "entry_price": 282334.0,
               "avg_cost_krw": 282334.0,
-              "current_price": 170200.0,
-              "market_price_krw": 169900.0,
-              "market_value_krw": 169900,
-              "unrealized_pnl_krw": -112434,
-              "unrealized_return_pct": -39.823,
+              "current_price": 170100.0,
+              "market_price_krw": 170100.0,
+              "market_value_krw": 170100,
+              "unrealized_pnl_krw": -112234,
+              "unrealized_return_pct": -39.7522,
               "holding_days": null,
               "last_partial_sell_date": null,
               "realized_profit_locked_pct": 0.0,
-              "position_extension_pct_from_entry": -39.823,
-              "distance_to_target_pct": 25.9812,
-              "distance_to_trailing_stop_pct": -7.2268,
+              "position_extension_pct_from_entry": -39.7522,
+              "distance_to_target_pct": 26.0553,
+              "distance_to_trailing_stop_pct": -7.2898,
               "profit_protection_score": 0.0
             },
             "profit_taking_plan": {
@@ -719,9 +719,9 @@
               "keep_core_fraction": 0.0,
               "reentry_condition": "이익실현 계획이 아니다. 이후 매수는 기술적 회복과 공시 검증을 거친 별도 배분 판단이 필요하다.",
               "reason_codes": [
-                "DOWNTREND",
-                "CONDITIONAL_SUPPORT_FAILURE",
                 "FADING_MOMENTUM",
+                "CONDITIONAL_SUPPORT_FAILURE",
+                "DOWNTREND",
                 "FAILED_RECOVERY_RISK",
                 "UNFAVORABLE_REWARD_RISK",
                 "SUPPORT_BROKEN"
@@ -745,7 +745,7 @@
             "strategy_code": "REDUCE",
             "strategy_ko": "비중 축소 검토",
             "decision_state_ko": "실행 조건 감시 중",
-            "market_data_asof": "2026-11-18T13:29:00+09:00"
+            "market_data_asof": "2026-11-18T14:48:00+09:00"
           },
           "thesis": {
             "stance": "REDUCE",
@@ -972,8 +972,8 @@
           "execution": {
             "readiness": "NEEDS_LIVE_RECHECK",
             "source_row_mode": "IMMEDIATE",
-            "as_of": "2026-11-18T13:29:00+09:00",
-            "valid_until": "2026-11-18T13:32:00+09:00",
+            "as_of": "2026-11-18T14:48:00+09:00",
+            "valid_until": "2026-11-18T14:51:00+09:00",
             "action_now": null,
             "action_if_triggered": null,
             "required_rechecks": [
@@ -993,15 +993,15 @@
           "is_held": true,
           "strategy_code": "DATA_CHECK",
           "strategy_ko": "데이터 확인 전 대기",
-          "last_price": 116100.0,
-          "market_data_asof": "2026-11-18T13:29:00+09:00",
-          "session_vwap": 115244.21928533213,
-          "vwap_distance_pct": 0.7425801658207609,
-          "vwap_position_ko": "VWAP 위 +0.74%",
-          "relative_volume": 0.6267040042556415,
-          "trading_value": 34679636200.0,
-          "price_change_pct": 2.2,
-          "spread_bps": 8.609556607834696,
+          "last_price": 115600.0,
+          "market_data_asof": "2026-11-18T14:48:00+09:00",
+          "session_vwap": 115232.85887596953,
+          "vwap_distance_pct": 0.31860801477263667,
+          "vwap_position_ko": "VWAP 위 +0.32%",
+          "relative_volume": 0.589561410543923,
+          "trading_value": 42267988800.0,
+          "price_change_pct": 1.76,
+          "spread_bps": 8.654262224145391,
           "day_high": 118700.0,
           "day_low": 112100.0,
           "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
@@ -1030,7 +1030,7 @@
             "provider_blockers": [
               "work_packet_row_expired"
             ],
-            "row_valid_until": "2026-11-18T13:32:00+09:00",
+            "row_valid_until": "2026-11-18T14:51:00+09:00",
             "expired_at_build": true,
             "investor_state": "RECHECK",
             "investor_label": "주문 전 재확인"
@@ -1072,7 +1072,7 @@
                 "thesis_ref": "/execution_levels/failed_breakout_rule"
               }
             ],
-            "delta_krw_if_triggered": -116000,
+            "delta_krw_if_triggered": -115500,
             "target_weight_if_triggered": 0.0421,
             "strategy_state": "reduce_or_exit",
             "execution_feasibility_now": "not_actionable_now",
@@ -1096,15 +1096,15 @@
             "position_metrics": {
               "entry_price": 243750.0,
               "avg_cost_krw": 243750.0,
-              "current_price": 116100.0,
-              "market_price_krw": 116000.0,
-              "market_value_krw": 464000,
-              "unrealized_pnl_krw": -511000,
-              "unrealized_return_pct": -52.4103,
+              "current_price": 115600.0,
+              "market_price_krw": 115500.0,
+              "market_value_krw": 462000,
+              "unrealized_pnl_krw": -513000,
+              "unrealized_return_pct": -52.6154,
               "holding_days": null,
               "last_partial_sell_date": null,
               "realized_profit_locked_pct": 0.0,
-              "position_extension_pct_from_entry": -52.4103,
+              "position_extension_pct_from_entry": -52.6154,
               "distance_to_target_pct": null,
               "distance_to_trailing_stop_pct": null,
               "profit_protection_score": 0.0
@@ -1121,10 +1121,10 @@
               "reentry_condition": "010120.KS의 가격 회복과 최신 수익성·현금 전환을 재평가한 뒤 별도로 결정한다. 현재 재진입 승인은 없다.",
               "reason_codes": [
                 "DOWNTREND",
-                "SECTOR_HEADWIND",
                 "FAILED_REBOUND",
-                "DAILY_CLOSE_INVALIDATION",
                 "HIGH_VOLATILITY",
+                "SECTOR_HEADWIND",
+                "DAILY_CLOSE_INVALIDATION",
                 "SUPPORT_BROKEN"
               ]
             },
@@ -1146,7 +1146,7 @@
             "strategy_code": "REDUCE",
             "strategy_ko": "비중 축소 검토",
             "decision_state_ko": "실행 조건 감시 중",
-            "market_data_asof": "2026-11-18T13:29:00+09:00"
+            "market_data_asof": "2026-11-18T14:48:00+09:00"
           },
           "thesis": {
             "stance": "HOLD",
@@ -1398,8 +1398,8 @@
           "execution": {
             "readiness": "NEEDS_LIVE_RECHECK",
             "source_row_mode": "IMMEDIATE",
-            "as_of": "2026-11-18T13:29:00+09:00",
-            "valid_until": "2026-11-18T13:32:00+09:00",
+            "as_of": "2026-11-18T14:48:00+09:00",
+            "valid_until": "2026-11-18T14:51:00+09:00",
             "action_now": null,
             "action_if_triggered": null,
             "required_rechecks": [
@@ -1419,15 +1419,15 @@
           "is_held": true,
           "strategy_code": "DATA_CHECK",
           "strategy_ko": "데이터 확인 전 대기",
-          "last_price": 15770.0,
-          "market_data_asof": "2026-11-18T13:29:00+09:00",
-          "session_vwap": 15706.643375431328,
-          "vwap_distance_pct": 0.40337469346107824,
-          "vwap_position_ko": "VWAP 위 +0.40%",
-          "relative_volume": 0.6444496267191688,
-          "trading_value": 27447516365.0,
-          "price_change_pct": -1.44,
-          "spread_bps": 6.3391442155309035,
+          "last_price": 15740.0,
+          "market_data_asof": "2026-11-18T14:48:00+09:00",
+          "session_vwap": 15704.626175740697,
+          "vwap_distance_pct": 0.22524461176889332,
+          "vwap_position_ko": "VWAP 위 +0.23%",
+          "relative_volume": 0.5913129599981458,
+          "trading_value": 32609980955.0,
+          "price_change_pct": -1.62,
+          "spread_bps": 6.355258976803305,
           "day_high": 16380.0,
           "day_low": 15360.0,
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
@@ -1456,7 +1456,7 @@
             "provider_blockers": [
               "work_packet_row_expired"
             ],
-            "row_valid_until": "2026-11-18T13:32:00+09:00",
+            "row_valid_until": "2026-11-18T14:51:00+09:00",
             "expired_at_build": true,
             "investor_state": "RECHECK",
             "investor_label": "주문 전 재확인"
@@ -1466,7 +1466,7 @@
             "confidence": 0.55,
             "action_now": "HOLD",
             "delta_krw_now": 0,
-            "target_weight_now": 0.0343,
+            "target_weight_now": 0.0344,
             "action_if_triggered": "REDUCE_IF_TRIGGERED",
             "trigger_conditions": [
               "010140.KS의 계획 수립 이후 새로 확인된 정규장 종가가 16584원 이상인지, 다음 확인 거래일에 16470~16584원 지지가 유지되는지 관찰한다. 2026-11-16 종가만으로 새 조건 충족을 선언하지 않는다.",
@@ -1504,8 +1504,8 @@
                 "thesis_ref": "/execution_levels/failed_breakout_rule"
               }
             ],
-            "delta_krw_if_triggered": -47250,
-            "target_weight_if_triggered": 0.0286,
+            "delta_krw_if_triggered": -47160,
+            "target_weight_if_triggered": 0.0287,
             "strategy_state": "reduce_or_exit",
             "execution_feasibility_now": "not_actionable_now",
             "portfolio_relative_action": "REDUCE_RISK",
@@ -1528,15 +1528,15 @@
             "position_metrics": {
               "entry_price": 31573.0,
               "avg_cost_krw": 31573.0,
-              "current_price": 15770.0,
-              "market_price_krw": 15750.0,
-              "market_value_krw": 283500,
-              "unrealized_pnl_krw": -284815,
-              "unrealized_return_pct": -50.1157,
+              "current_price": 15740.0,
+              "market_price_krw": 15720.0,
+              "market_value_krw": 282960,
+              "unrealized_pnl_krw": -285355,
+              "unrealized_return_pct": -50.2107,
               "holding_days": null,
               "last_partial_sell_date": null,
               "realized_profit_locked_pct": 0.0,
-              "position_extension_pct_from_entry": -50.1157,
+              "position_extension_pct_from_entry": -50.2107,
               "distance_to_target_pct": null,
               "distance_to_trailing_stop_pct": null,
               "profit_protection_score": 0.0
@@ -1552,10 +1552,10 @@
               "keep_core_fraction": 1.0,
               "reentry_condition": "010140.KS의 익절·자동 재진입은 승인하지 않는다. 위험 한도 안에서만 기존 보유를 유지하며 신규 진입은 실적·가격·비용 차감 후 보상과 위험을 별도 재평가한다.",
               "reason_codes": [
-                "DOWNTREND",
-                "NO_CONFIRMED_PROFIT_TAKING_SETUP",
                 "SUPPORT_BREAK_UNCONFIRMED",
+                "NO_CONFIRMED_PROFIT_TAKING_SETUP",
                 "RECOVERY_THESIS_PROVISIONAL",
+                "DOWNTREND",
                 "RISK_BUDGET_CHECK_REQUIRED",
                 "SUPPORT_DETERIORATION",
                 "SUPPORT_BROKEN"
@@ -1580,7 +1580,7 @@
             "strategy_code": "BUY_ON_CONFIRMATION",
             "strategy_ko": "조건 확인 후 분할매수 검토",
             "decision_state_ko": "조건 충족 전 대기",
-            "market_data_asof": "2026-11-18T13:30:00+09:00"
+            "market_data_asof": "2026-11-18T14:48:00+09:00"
           },
           "thesis": {
             "stance": "BUY",
@@ -1843,8 +1843,8 @@
           "execution": {
             "readiness": "NEEDS_LIVE_RECHECK",
             "source_row_mode": "IMMEDIATE",
-            "as_of": "2026-11-18T13:30:00+09:00",
-            "valid_until": "2026-11-18T13:33:00+09:00",
+            "as_of": "2026-11-18T14:48:00+09:00",
+            "valid_until": "2026-11-18T14:51:00+09:00",
             "action_now": null,
             "action_if_triggered": null,
             "required_rechecks": [
@@ -1864,15 +1864,15 @@
           "is_held": true,
           "strategy_code": "DATA_CHECK",
           "strategy_ko": "데이터 확인 전 대기",
-          "last_price": 41300.0,
-          "market_data_asof": "2026-11-18T13:30:00+09:00",
-          "session_vwap": 41526.30256106545,
-          "vwap_distance_pct": -0.544961980982217,
-          "vwap_position_ko": "VWAP 아래 -0.54%",
-          "relative_volume": 1.6875994483386154,
-          "trading_value": 5749648800.0,
-          "price_change_pct": 0.73,
-          "spread_bps": 12.113870381586917,
+          "last_price": 41200.0,
+          "market_data_asof": "2026-11-18T14:48:00+09:00",
+          "session_vwap": 41455.37045958185,
+          "vwap_distance_pct": -0.6160129719039231,
+          "vwap_position_ko": "VWAP 아래 -0.62%",
+          "relative_volume": 1.4610513815085597,
+          "trading_value": 6453979350.0,
+          "price_change_pct": 0.49,
+          "spread_bps": 12.12856276531231,
           "day_high": 44250.0,
           "day_low": 39500.0,
           "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
@@ -1901,7 +1901,7 @@
             "provider_blockers": [
               "work_packet_row_expired"
             ],
-            "row_valid_until": "2026-11-18T13:33:00+09:00",
+            "row_valid_until": "2026-11-18T14:51:00+09:00",
             "expired_at_build": true,
             "investor_state": "RECHECK",
             "investor_label": "주문 전 재확인"
@@ -1911,7 +1911,7 @@
             "confidence": 0.54,
             "action_now": "HOLD",
             "delta_krw_now": 0,
-            "target_weight_now": 0.0099,
+            "target_weight_now": 0.01,
             "action_if_triggered": "ADD_IF_TRIGGERED",
             "trigger_conditions": [
               "2026-11-16 이후 정규장 일봉, 실제 거래 달력·거래 상태와 가격 조정 기준을 확인한다. 2026-11-17 20:00 KST의 지연 야간 가격은 진입 확인에 사용하지 않는다.",
@@ -1939,7 +1939,7 @@
               }
             ],
             "delta_krw_if_triggered": 0,
-            "target_weight_if_triggered": 0.0099,
+            "target_weight_if_triggered": 0.01,
             "strategy_state": "add_if_triggered",
             "execution_feasibility_now": "not_actionable_now",
             "portfolio_relative_action": "HOLD",
@@ -1962,15 +1962,15 @@
             "position_metrics": {
               "entry_price": 59100.0,
               "avg_cost_krw": 59100.0,
-              "current_price": 41300.0,
-              "market_price_krw": 40925.0,
-              "market_value_krw": 81850,
-              "unrealized_pnl_krw": -36350,
-              "unrealized_return_pct": -30.753,
+              "current_price": 41200.0,
+              "market_price_krw": 41175.0,
+              "market_value_krw": 82350,
+              "unrealized_pnl_krw": -35850,
+              "unrealized_return_pct": -30.3299,
               "holding_days": null,
               "last_partial_sell_date": null,
               "realized_profit_locked_pct": 0.0,
-              "position_extension_pct_from_entry": -30.753,
+              "position_extension_pct_from_entry": -30.3299,
               "distance_to_target_pct": null,
               "distance_to_trailing_stop_pct": null,
               "profit_protection_score": 0.0
@@ -1986,12 +1986,12 @@
               "keep_core_fraction": 1.0,
               "reentry_condition": "현재 단계별 익절은 승인하지 않는다. 보유 유지 비율은 손절 면제가 아니며, 재진입에는 새로운 돌파·재시험 및 재무 검증이 필요하다.",
               "reason_codes": [
+                "CURRENT_TRIGGER_STATUS_UNVERIFIED",
                 "ELEVATED_VOLATILITY",
-                "SUPPORT_FAILED_RECLAIM",
                 "NO_CONFIRMED_PROFIT_TAKING_SIGNAL",
-                "NO_CONFIRMED_SUPPORT_BREAK",
                 "DOWNTREND_RISK",
-                "CURRENT_TRIGGER_STATUS_UNVERIFIED"
+                "SUPPORT_FAILED_RECLAIM",
+                "NO_CONFIRMED_SUPPORT_BREAK"
               ]
             },
             "rationale": "논지는 우호적이지만 아직 실행 타이밍 확인이 부족해 조건부 후보로 두는 편이 안전합니다.",
@@ -2013,7 +2013,7 @@
             "strategy_code": "HOLD",
             "strategy_ko": "보유 유지",
             "decision_state_ko": "조건 충족 전 대기",
-            "market_data_asof": "2026-11-18T13:29:00+09:00"
+            "market_data_asof": "2026-11-18T14:48:00+09:00"
           },
           "thesis": {
             "stance": "REDUCE",
@@ -2225,8 +2225,8 @@
           "execution": {
             "readiness": "NEEDS_LIVE_RECHECK",
             "source_row_mode": "IMMEDIATE",
-            "as_of": "2026-11-18T13:29:00+09:00",
-            "valid_until": "2026-11-18T13:32:00+09:00",
+            "as_of": "2026-11-18T14:48:00+09:00",
+            "valid_until": "2026-11-18T14:51:00+09:00",
             "action_now": null,
             "action_if_triggered": null,
             "required_rechecks": [
@@ -2246,15 +2246,15 @@
           "is_held": true,
           "strategy_code": "DATA_CHECK",
           "strategy_ko": "데이터 확인 전 대기",
-          "last_price": 1158000.0,
-          "market_data_asof": "2026-11-18T13:29:00+09:00",
-          "session_vwap": 1143903.0180908088,
-          "vwap_distance_pct": 1.232358135807643,
-          "vwap_position_ko": "VWAP 위 +1.23%",
-          "relative_volume": 0.9262263962235798,
-          "trading_value": 2786218308000.0,
-          "price_change_pct": 5.46,
-          "spread_bps": 8.631851532153647,
+          "last_price": 1149000.0,
+          "market_data_asof": "2026-11-18T14:48:00+09:00",
+          "session_vwap": 1144136.1006401978,
+          "vwap_distance_pct": 0.4251154523557732,
+          "vwap_position_ko": "VWAP 위 +0.43%",
+          "relative_volume": 0.8569957206303267,
+          "trading_value": 3346636995000.0,
+          "price_change_pct": 4.64,
+          "spread_bps": 8.707009142359599,
           "day_high": 1173000.0,
           "day_low": 1108000.0,
           "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
@@ -2283,7 +2283,7 @@
             "provider_blockers": [
               "work_packet_row_expired"
             ],
-            "row_valid_until": "2026-11-18T13:32:00+09:00",
+            "row_valid_until": "2026-11-18T14:51:00+09:00",
             "expired_at_build": true,
             "investor_state": "RECHECK",
             "investor_label": "주문 전 재확인"
@@ -2293,7 +2293,7 @@
             "confidence": 0.72,
             "action_now": "HOLD",
             "delta_krw_now": 0,
-            "target_weight_now": 0.28,
+            "target_weight_now": 0.2792,
             "action_if_triggered": "REDUCE_IF_TRIGGERED",
             "trigger_conditions": [
               "최신 정규장 일봉으로 1089000~1113000원 지지 유지와 저점 상승을 확인한다. 지연 야간 가격으로 현재 지지 이탈을 선언하지 않는다.",
@@ -2319,8 +2319,8 @@
                 "thesis_ref": "/execution_levels/failed_breakout_rule"
               }
             ],
-            "delta_krw_if_triggered": -1156000,
-            "target_weight_if_triggered": 0.14,
+            "delta_krw_if_triggered": -1148000,
+            "target_weight_if_triggered": 0.1396,
             "strategy_state": "reduce_or_exit",
             "execution_feasibility_now": "not_actionable_now",
             "portfolio_relative_action": "REDUCE_RISK",
@@ -2343,17 +2343,17 @@
             "position_metrics": {
               "entry_price": 2717500.0,
               "avg_cost_krw": 2717500.0,
-              "current_price": 1158000.0,
-              "market_price_krw": 1156000.0,
-              "market_value_krw": 2312000,
-              "unrealized_pnl_krw": -3123000,
-              "unrealized_return_pct": -57.4609,
+              "current_price": 1149000.0,
+              "market_price_krw": 1148000.0,
+              "market_value_krw": 2296000,
+              "unrealized_pnl_krw": -3139000,
+              "unrealized_return_pct": -57.7553,
               "holding_days": null,
               "last_partial_sell_date": null,
               "realized_profit_locked_pct": 0.0,
-              "position_extension_pct_from_entry": -57.4609,
-              "distance_to_target_pct": 18.7737,
-              "distance_to_trailing_stop_pct": -4.7625,
+              "position_extension_pct_from_entry": -57.7553,
+              "distance_to_target_pct": 19.7041,
+              "distance_to_trailing_stop_pct": -5.5831,
               "profit_protection_score": 0.0
             },
             "profit_taking_plan": {
@@ -2367,10 +2367,10 @@
               "keep_core_fraction": null,
               "reentry_condition": "적용하지 않음",
               "reason_codes": [
+                "SUPPORT_FAILURE_TRIGGER",
                 "DOWNTREND",
-                "HIGH_VOLATILITY",
                 "DETERIORATED_REWARD_RISK",
-                "SUPPORT_FAILURE_TRIGGER"
+                "HIGH_VOLATILITY"
               ]
             },
             "rationale": "즉시 강한 액션보다 관찰 또는 유지 중심으로 해석했습니다.",
@@ -2391,7 +2391,7 @@
             "strategy_code": "HOLD",
             "strategy_ko": "보유 유지",
             "decision_state_ko": "실행 조건 감시 중",
-            "market_data_asof": "2026-11-18T13:29:00+09:00"
+            "market_data_asof": "2026-11-18T14:48:00+09:00"
           },
           "thesis": {
             "stance": "REDUCE",
@@ -2665,8 +2665,8 @@
           "execution": {
             "readiness": "NEEDS_LIVE_RECHECK",
             "source_row_mode": "IMMEDIATE",
-            "as_of": "2026-11-18T13:29:00+09:00",
-            "valid_until": "2026-11-18T13:32:00+09:00",
+            "as_of": "2026-11-18T14:48:00+09:00",
+            "valid_until": "2026-11-18T14:51:00+09:00",
             "action_now": null,
             "action_if_triggered": null,
             "required_rechecks": [
@@ -2686,15 +2686,15 @@
           "is_held": true,
           "strategy_code": "DATA_CHECK",
           "strategy_ko": "데이터 확인 전 대기",
-          "last_price": 194200.0,
-          "market_data_asof": "2026-11-18T13:29:00+09:00",
-          "session_vwap": 193973.9389827469,
-          "vwap_distance_pct": 0.11654195323280714,
-          "vwap_position_ko": "VWAP 위 +0.12%",
-          "relative_volume": 1.0016506308428643,
-          "trading_value": 2388409257600.0,
-          "price_change_pct": 2.05,
-          "spread_bps": 5.150656708730364,
+          "last_price": 193600.0,
+          "market_data_asof": "2026-11-18T14:48:00+09:00",
+          "session_vwap": 193761.1432502898,
+          "vwap_distance_pct": -0.08316592665932321,
+          "vwap_position_ko": "VWAP 아래 -0.08%",
+          "relative_volume": 0.9029945599981528,
+          "trading_value": 2789934343550.0,
+          "price_change_pct": 1.73,
+          "spread_bps": 5.1666236114699045,
           "day_high": 199950.0,
           "day_low": 188800.0,
           "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
@@ -2723,7 +2723,7 @@
             "provider_blockers": [
               "work_packet_row_expired"
             ],
-            "row_valid_until": "2026-11-18T13:32:00+09:00",
+            "row_valid_until": "2026-11-18T14:51:00+09:00",
             "expired_at_build": true,
             "investor_state": "RECHECK",
             "investor_label": "주문 전 재확인"
@@ -2733,7 +2733,7 @@
             "confidence": 0.8,
             "action_now": "HOLD",
             "delta_krw_now": 0,
-            "target_weight_now": 0.2347,
+            "target_weight_now": 0.2351,
             "action_if_triggered": "REDUCE_IF_TRIGGERED",
             "trigger_conditions": [
               "187,000~189,200원 방어와 저점 갱신 중단을 새 일봉에서 관찰한다. 단독 매수 신호는 아니다.",
@@ -2761,8 +2761,8 @@
                 "thesis_ref": "/execution_levels/failed_breakout_rule"
               }
             ],
-            "delta_krw_if_triggered": -387600,
-            "target_weight_if_triggered": 0.1878,
+            "delta_krw_if_triggered": -386600,
+            "target_weight_if_triggered": 0.1881,
             "strategy_state": "reduce_or_exit",
             "execution_feasibility_now": "not_actionable_now",
             "portfolio_relative_action": "REDUCE_RISK",
@@ -2785,15 +2785,15 @@
             "position_metrics": {
               "entry_price": 332385.0,
               "avg_cost_krw": 332385.0,
-              "current_price": 194200.0,
-              "market_price_krw": 193800.0,
-              "market_value_krw": 1938000,
-              "unrealized_pnl_krw": -1385851,
-              "unrealized_return_pct": -41.6941,
+              "current_price": 193600.0,
+              "market_price_krw": 193300.0,
+              "market_value_krw": 1933000,
+              "unrealized_pnl_krw": -1390851,
+              "unrealized_return_pct": -41.8446,
               "holding_days": null,
               "last_partial_sell_date": null,
               "realized_profit_locked_pct": 0.0,
-              "position_extension_pct_from_entry": -41.6941,
+              "position_extension_pct_from_entry": -41.8446,
               "distance_to_target_pct": null,
               "distance_to_trailing_stop_pct": null,
               "profit_protection_score": 0.0
@@ -2834,7 +2834,7 @@
             "strategy_code": "HOLD",
             "strategy_ko": "보유 유지",
             "decision_state_ko": "조건 충족 전 대기",
-            "market_data_asof": "2026-11-18T13:30:00+09:00"
+            "market_data_asof": "2026-11-18T14:48:00+09:00"
           },
           "thesis": {
             "stance": "REDUCE",
@@ -3060,8 +3060,8 @@
           "execution": {
             "readiness": "NEEDS_LIVE_RECHECK",
             "source_row_mode": "IMMEDIATE",
-            "as_of": "2026-11-18T13:30:00+09:00",
-            "valid_until": "2026-11-18T13:33:00+09:00",
+            "as_of": "2026-11-18T14:48:00+09:00",
+            "valid_until": "2026-11-18T14:51:00+09:00",
             "action_now": null,
             "action_if_triggered": null,
             "required_rechecks": [
@@ -3081,15 +3081,15 @@
           "is_held": true,
           "strategy_code": "DATA_CHECK",
           "strategy_ko": "데이터 확인 전 대기",
-          "last_price": 236000.0,
-          "market_data_asof": "2026-11-18T13:30:00+09:00",
-          "session_vwap": 236662.04248079858,
-          "vwap_distance_pct": -0.2797417253137646,
-          "vwap_position_ko": "VWAP 아래 -0.28%",
-          "relative_volume": 0.6453831274682867,
-          "trading_value": 37838474000.0,
-          "price_change_pct": 2.16,
-          "spread_bps": 21.164021164021165,
+          "last_price": 234000.0,
+          "market_data_asof": "2026-11-18T14:48:00+09:00",
+          "session_vwap": 236303.5977545929,
+          "vwap_distance_pct": -0.9748466703351832,
+          "vwap_position_ko": "VWAP 아래 -0.97%",
+          "relative_volume": 0.604468478411773,
+          "trading_value": 45841952750.0,
+          "price_change_pct": 1.3,
+          "spread_bps": 21.299254526091588,
           "day_high": 243500.0,
           "day_low": 231000.0,
           "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
@@ -3118,7 +3118,7 @@
             "provider_blockers": [
               "work_packet_row_expired"
             ],
-            "row_valid_until": "2026-11-18T13:33:00+09:00",
+            "row_valid_until": "2026-11-18T14:51:00+09:00",
             "expired_at_build": true,
             "investor_state": "RECHECK",
             "investor_label": "주문 전 재확인"
@@ -3128,7 +3128,7 @@
             "confidence": 0.74,
             "action_now": "HOLD",
             "delta_krw_now": 0,
-            "target_weight_now": 0.1429,
+            "target_weight_now": 0.142,
             "action_if_triggered": "REDUCE_IF_TRIGGERED",
             "trigger_conditions": [
               "231000~233000원 종가 회복과 다음 실제 정규거래일 재시험 유지 여부.",
@@ -3157,8 +3157,8 @@
                 "thesis_ref": "/execution_levels/failed_breakout_rule"
               }
             ],
-            "delta_krw_if_triggered": -236000,
-            "target_weight_if_triggered": 0.1143,
+            "delta_krw_if_triggered": -233500,
+            "target_weight_if_triggered": 0.1136,
             "strategy_state": "reduce_or_exit",
             "execution_feasibility_now": "not_actionable_now",
             "portfolio_relative_action": "REDUCE_RISK",
@@ -3181,17 +3181,17 @@
             "position_metrics": {
               "entry_price": 414928.0,
               "avg_cost_krw": 414928.0,
-              "current_price": 236000.0,
-              "market_price_krw": 236000.0,
-              "market_value_krw": 1180000,
-              "unrealized_pnl_krw": -894643,
-              "unrealized_return_pct": -43.1227,
+              "current_price": 234000.0,
+              "market_price_krw": 233500.0,
+              "market_value_krw": 1167500,
+              "unrealized_pnl_krw": -907143,
+              "unrealized_return_pct": -43.7253,
               "holding_days": null,
               "last_partial_sell_date": null,
               "realized_profit_locked_pct": 0.0,
-              "position_extension_pct_from_entry": -43.1227,
-              "distance_to_target_pct": 46.8432,
-              "distance_to_trailing_stop_pct": -31.5307,
+              "position_extension_pct_from_entry": -43.7253,
+              "distance_to_target_pct": 48.0983,
+              "distance_to_trailing_stop_pct": -32.6549,
               "profit_protection_score": 0.0
             },
             "profit_taking_plan": {
@@ -3206,10 +3206,10 @@
               "reentry_condition": "현재 감축은 수익실현이 아니다. 재진입은 원공시 검증과 가격 구조 개선 후 별도로 결정한다.",
               "reason_codes": [
                 "DOWNTREND",
-                "DISCLOSURE_UNCERTAINTY",
+                "HIGH_VOLATILITY",
                 "SUPPORT_FAILURE_CONDITIONAL",
                 "UNFAVORABLE_REWARD_RISK",
-                "HIGH_VOLATILITY"
+                "DISCLOSURE_UNCERTAINTY"
               ]
             },
             "rationale": "즉시 강한 액션보다 관찰 또는 유지 중심으로 해석했습니다.",
@@ -3230,7 +3230,7 @@
             "strategy_code": "HOLD",
             "strategy_ko": "보유 유지",
             "decision_state_ko": "조건 충족 전 대기",
-            "market_data_asof": "2026-11-18T13:29:00+09:00"
+            "market_data_asof": "2026-11-18T14:48:00+09:00"
           },
           "thesis": {
             "stance": "REDUCE",
@@ -3470,8 +3470,8 @@
           "execution": {
             "readiness": "NEEDS_LIVE_RECHECK",
             "source_row_mode": "IMMEDIATE",
-            "as_of": "2026-11-18T13:29:00+09:00",
-            "valid_until": "2026-11-18T13:32:00+09:00",
+            "as_of": "2026-11-18T14:48:00+09:00",
+            "valid_until": "2026-11-18T14:51:00+09:00",
             "action_now": null,
             "action_if_triggered": null,
             "required_rechecks": [
@@ -3491,15 +3491,15 @@
           "is_held": true,
           "strategy_code": "DATA_CHECK",
           "strategy_ko": "데이터 확인 전 대기",
-          "last_price": 42850.0,
-          "market_data_asof": "2026-11-18T13:29:00+09:00",
-          "session_vwap": 42607.773086907335,
-          "vwap_distance_pct": 0.5685040440827294,
-          "vwap_position_ko": "VWAP 위 +0.57%",
-          "relative_volume": 0.8527025261140898,
-          "trading_value": 71332825900.0,
-          "price_change_pct": 0.59,
-          "spread_bps": 11.661807580174926,
+          "last_price": 42800.0,
+          "market_data_asof": "2026-11-18T14:48:00+09:00",
+          "session_vwap": 42621.739534106775,
+          "vwap_distance_pct": 0.4182383634308895,
+          "vwap_position_ko": "VWAP 위 +0.42%",
+          "relative_volume": 0.769308252022125,
+          "trading_value": 83435166525.0,
+          "price_change_pct": 0.47,
+          "spread_bps": 11.675423234092236,
           "day_high": 43850.0,
           "day_low": 41550.0,
           "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
@@ -3528,7 +3528,7 @@
             "provider_blockers": [
               "work_packet_row_expired"
             ],
-            "row_valid_until": "2026-11-18T13:32:00+09:00",
+            "row_valid_until": "2026-11-18T14:51:00+09:00",
             "expired_at_build": true,
             "investor_state": "RECHECK",
             "investor_label": "주문 전 재확인"
@@ -3581,7 +3581,7 @@
                 "thesis_ref": "/execution_levels/failed_breakout_rule"
               }
             ],
-            "delta_krw_if_triggered": -42850,
+            "delta_krw_if_triggered": -42750,
             "target_weight_if_triggered": 0.0,
             "strategy_state": "reduce_or_exit",
             "execution_feasibility_now": "not_actionable_now",
@@ -3605,15 +3605,15 @@
             "position_metrics": {
               "entry_price": 112931.0,
               "avg_cost_krw": 112931.0,
-              "current_price": 42850.0,
-              "market_price_krw": 42850.0,
-              "market_value_krw": 42850,
-              "unrealized_pnl_krw": -70081,
-              "unrealized_return_pct": -62.0565,
+              "current_price": 42800.0,
+              "market_price_krw": 42750.0,
+              "market_value_krw": 42750,
+              "unrealized_pnl_krw": -70181,
+              "unrealized_return_pct": -62.145,
               "holding_days": null,
               "last_partial_sell_date": null,
               "realized_profit_locked_pct": 0.0,
-              "position_extension_pct_from_entry": -62.0565,
+              "position_extension_pct_from_entry": -62.145,
               "distance_to_target_pct": null,
               "distance_to_trailing_stop_pct": null,
               "profit_protection_score": 0.0
@@ -3629,11 +3629,11 @@
               "keep_core_fraction": null,
               "reentry_condition": "현재는 수익실현이 아니라 위험 축소 계획이다. 재진입은 새 가격 구조, 계약 조건, 현금 회수·차환 대응 및 비용 차감 보상위험을 별도로 심사한다.",
               "reason_codes": [
-                "DOWNTREND",
-                "FUNDAMENTAL_VERIFICATION_GAP",
                 "DETERIORATED_REWARD_RISK",
-                "SUPPORT_FAILURE_RISK",
-                "HIGH_VOLATILITY"
+                "DOWNTREND",
+                "HIGH_VOLATILITY",
+                "FUNDAMENTAL_VERIFICATION_GAP",
+                "SUPPORT_FAILURE_RISK"
               ]
             },
             "rationale": "즉시 강한 액션보다 관찰 또는 유지 중심으로 해석했습니다.",
@@ -3654,7 +3654,7 @@
             "strategy_code": "WAIT_CLOSE",
             "strategy_ko": "종가 확인 후 판단",
             "decision_state_ko": "조건 충족, 종가 확인 대기",
-            "market_data_asof": "2026-11-18T13:30:00+09:00"
+            "market_data_asof": "2026-11-18T14:48:00+09:00"
           },
           "thesis": {
             "stance": "HOLD",
@@ -3917,8 +3917,8 @@
           "execution": {
             "readiness": "NEEDS_LIVE_RECHECK",
             "source_row_mode": "IMMEDIATE",
-            "as_of": "2026-11-18T13:30:00+09:00",
-            "valid_until": "2026-11-18T13:33:00+09:00",
+            "as_of": "2026-11-18T14:48:00+09:00",
+            "valid_until": "2026-11-18T14:51:00+09:00",
             "action_now": null,
             "action_if_triggered": null,
             "required_rechecks": [
@@ -3938,15 +3938,15 @@
           "is_held": true,
           "strategy_code": "DATA_CHECK",
           "strategy_ko": "데이터 확인 전 대기",
-          "last_price": 380500.0,
-          "market_data_asof": "2026-11-18T13:30:00+09:00",
-          "session_vwap": 381084.2975066815,
-          "vwap_distance_pct": -0.15332500197579035,
-          "vwap_position_ko": "VWAP 아래 -0.15%",
-          "relative_volume": 0.466942989643947,
-          "trading_value": 22528941500.0,
-          "price_change_pct": 0.53,
-          "spread_bps": 13.149243918474689,
+          "last_price": 381500.0,
+          "market_data_asof": "2026-11-18T14:48:00+09:00",
+          "session_vwap": 380678.8193992132,
+          "vwap_distance_pct": 0.21571481231417167,
+          "vwap_position_ko": "VWAP 위 +0.22%",
+          "relative_volume": 0.46795866677614467,
+          "trading_value": 29223190250.0,
+          "price_change_pct": 0.79,
+          "spread_bps": 13.097576948264571,
           "day_high": 391500.0,
           "day_low": 370000.0,
           "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
@@ -3975,7 +3975,7 @@
             "provider_blockers": [
               "work_packet_row_expired"
             ],
-            "row_valid_until": "2026-11-18T13:33:00+09:00",
+            "row_valid_until": "2026-11-18T14:51:00+09:00",
             "expired_at_build": true,
             "investor_state": "RECHECK",
             "investor_label": "주문 전 재확인"
@@ -3985,7 +3985,7 @@
             "confidence": 0.56,
             "action_now": "HOLD",
             "delta_krw_now": 0,
-            "target_weight_now": 0.046,
+            "target_weight_now": 0.0463,
             "action_if_triggered": "REDUCE_IF_TRIGGERED",
             "trigger_conditions": [
               "267260.KS의 최신 정규장 종가와 거래 가능 상태를 먼저 확인한다. 가격 기준은 2026-11-16 일봉이며 채택된 뉴스는 2026-11-17까지다.",
@@ -4015,7 +4015,7 @@
                 "thesis_ref": "/execution_levels/failed_breakout_rule"
               }
             ],
-            "delta_krw_if_triggered": -380000,
+            "delta_krw_if_triggered": -381000,
             "target_weight_if_triggered": 0.0,
             "strategy_state": "reduce_or_exit",
             "execution_feasibility_now": "not_actionable_now",
@@ -4039,15 +4039,15 @@
             "position_metrics": {
               "entry_price": 1153000.0,
               "avg_cost_krw": 1153000.0,
-              "current_price": 380500.0,
-              "market_price_krw": 380000.0,
-              "market_value_krw": 380000,
-              "unrealized_pnl_krw": -773000,
-              "unrealized_return_pct": -67.0425,
+              "current_price": 381500.0,
+              "market_price_krw": 381000.0,
+              "market_value_krw": 381000,
+              "unrealized_pnl_krw": -772000,
+              "unrealized_return_pct": -66.9558,
               "holding_days": null,
               "last_partial_sell_date": null,
               "realized_profit_locked_pct": 0.0,
-              "position_extension_pct_from_entry": -67.0425,
+              "position_extension_pct_from_entry": -66.9558,
               "distance_to_target_pct": null,
               "distance_to_trailing_stop_pct": null,
               "profit_protection_score": 0.0
@@ -4064,10 +4064,10 @@
               "reentry_condition": "267260.KS는 이익실현 계획을 적용하지 않는다. 재진입은 위험축소 사유 해소 후 별도로 판단한다.",
               "reason_codes": [
                 "DOWNTREND",
-                "SUPPORT_BREAK_CONDITIONAL",
                 "RECOVERY_FADED",
+                "UNFAVORABLE_REWARD_RISK",
                 "GAP_RISK",
-                "UNFAVORABLE_REWARD_RISK"
+                "SUPPORT_BREAK_CONDITIONAL"
               ]
             },
             "rationale": "논지는 우호적이지만 아직 실행 타이밍 확인이 부족해 조건부 후보로 두는 편이 안전합니다.",
@@ -4089,7 +4089,7 @@
             "strategy_code": "WAIT_CLOSE",
             "strategy_ko": "종가 확인 후 판단",
             "decision_state_ko": "조건 충족, 종가 확인 대기",
-            "market_data_asof": "2026-11-18T13:30:00+09:00"
+            "market_data_asof": "2026-11-18T14:48:00+09:00"
           },
           "thesis": {
             "stance": "REDUCE",
@@ -4340,8 +4340,8 @@
           "execution": {
             "readiness": "NEEDS_LIVE_RECHECK",
             "source_row_mode": "IMMEDIATE",
-            "as_of": "2026-11-18T13:30:00+09:00",
-            "valid_until": "2026-11-18T13:33:00+09:00",
+            "as_of": "2026-11-18T14:48:00+09:00",
+            "valid_until": "2026-11-18T14:51:00+09:00",
             "action_now": null,
             "action_if_triggered": null,
             "required_rechecks": [
@@ -4361,15 +4361,15 @@
           "is_held": true,
           "strategy_code": "DATA_CHECK",
           "strategy_ko": "데이터 확인 전 대기",
-          "last_price": 166600.0,
-          "market_data_asof": "2026-11-18T13:30:00+09:00",
-          "session_vwap": 167184.96790579666,
-          "vwap_distance_pct": -0.3498926447300432,
-          "vwap_position_ko": "VWAP 아래 -0.35%",
-          "relative_volume": 0.8297281963434147,
-          "trading_value": 62796847350.0,
-          "price_change_pct": 0.79,
-          "spread_bps": 6.004202942059441,
+          "last_price": 166100.0,
+          "market_data_asof": "2026-11-18T14:48:00+09:00",
+          "session_vwap": 166901.29733488258,
+          "vwap_distance_pct": -0.48010252027868017,
+          "vwap_position_ko": "VWAP 아래 -0.48%",
+          "relative_volume": 0.7455063426708001,
+          "trading_value": 72969914800.0,
+          "price_change_pct": 0.48,
+          "spread_bps": 6.022282445046673,
           "day_high": 172200.0,
           "day_low": 161900.0,
           "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
@@ -4398,7 +4398,7 @@
             "provider_blockers": [
               "work_packet_row_expired"
             ],
-            "row_valid_until": "2026-11-18T13:33:00+09:00",
+            "row_valid_until": "2026-11-18T14:51:00+09:00",
             "expired_at_build": true,
             "investor_state": "RECHECK",
             "investor_label": "주문 전 재확인"
@@ -4434,7 +4434,7 @@
               },
               "회복 후 178,200원 미만 종가면 회복 가정을 취소하고 매수 재평가를 중단한다. 168,300원 미만 종가 이후 다음 확인된 거래일에도 종가 회복 실패 시 추가 위험축소한다. 현재 발동 여부는 미확인이다."
             ],
-            "delta_krw_if_triggered": -166400,
+            "delta_krw_if_triggered": -165900,
             "target_weight_if_triggered": 0.0,
             "strategy_state": "reduce_or_exit",
             "execution_feasibility_now": "not_actionable_now",
@@ -4458,15 +4458,15 @@
             "position_metrics": {
               "entry_price": 374167.0,
               "avg_cost_krw": 374167.0,
-              "current_price": 166600.0,
-              "market_price_krw": 166400.0,
-              "market_value_krw": 166400,
-              "unrealized_pnl_krw": -207767,
-              "unrealized_return_pct": -55.5279,
+              "current_price": 166100.0,
+              "market_price_krw": 165900.0,
+              "market_value_krw": 165900,
+              "unrealized_pnl_krw": -208267,
+              "unrealized_return_pct": -55.6615,
               "holding_days": null,
               "last_partial_sell_date": null,
               "realized_profit_locked_pct": 0.0,
-              "position_extension_pct_from_entry": -55.5279,
+              "position_extension_pct_from_entry": -55.6615,
               "distance_to_target_pct": null,
               "distance_to_trailing_stop_pct": null,
               "profit_protection_score": 0.0
@@ -4482,11 +4482,11 @@
               "keep_core_fraction": null,
               "reentry_condition": "이익실현 계획은 적용하지 않는다. 재진입은 기업 자료·가격·가치평가·손익비를 별도로 재검증한 뒤 판단한다.",
               "reason_codes": [
-                "DOWNTREND",
                 "CASH_CONVERSION_RISK",
                 "DETERIORATED_REWARD_RISK",
-                "SUPPORT_BREAK_RISK",
-                "HIGH_VOLATILITY"
+                "DOWNTREND",
+                "HIGH_VOLATILITY",
+                "SUPPORT_BREAK_RISK"
               ]
             },
             "rationale": "즉시 강한 액션보다 관찰 또는 유지 중심으로 해석했습니다.",
@@ -4507,7 +4507,7 @@
             "strategy_code": "WAIT_CLOSE",
             "strategy_ko": "종가 확인 후 판단",
             "decision_state_ko": "조건 충족, 종가 확인 대기",
-            "market_data_asof": "2026-11-18T13:30:00+09:00"
+            "market_data_asof": "2026-11-18T14:48:00+09:00"
           },
           "thesis": {
             "stance": "HOLD",
@@ -4746,8 +4746,8 @@
           "execution": {
             "readiness": "NEEDS_LIVE_RECHECK",
             "source_row_mode": "IMMEDIATE",
-            "as_of": "2026-11-18T13:30:00+09:00",
-            "valid_until": "2026-11-18T13:33:00+09:00",
+            "as_of": "2026-11-18T14:48:00+09:00",
+            "valid_until": "2026-11-18T14:51:00+09:00",
             "action_now": null,
             "action_if_triggered": null,
             "required_rechecks": [
@@ -4767,18 +4767,18 @@
           "is_held": true,
           "strategy_code": "DATA_CHECK",
           "strategy_ko": "데이터 확인 전 대기",
-          "last_price": 80600.0,
-          "market_data_asof": "2026-11-18T13:30:00+09:00",
-          "session_vwap": 82038.47035260142,
-          "vwap_distance_pct": -1.7534095241157899,
-          "vwap_position_ko": "VWAP 아래 -1.75%",
-          "relative_volume": 0.9241309354010893,
-          "trading_value": 88064196000.0,
-          "price_change_pct": -0.12,
-          "spread_bps": 24.81389578163772,
+          "last_price": 80700.0,
+          "market_data_asof": "2026-11-18T14:48:00+09:00",
+          "session_vwap": 81751.03998401033,
+          "vwap_distance_pct": -1.2856594658806841,
+          "vwap_position_ko": "VWAP 아래 -1.29%",
+          "relative_volume": 0.8115370527258102,
+          "trading_value": 99800688600.0,
+          "price_change_pct": 0.0,
+          "spread_bps": 12.38390092879257,
           "day_high": 88300.0,
           "day_low": 77500.0,
-          "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
+          "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
           "execution_condition_ko": "92100원 초과 정규장 종가 후 다음 실제 거래일 91800~92100원 지지와 종가 91800원 이상 유지 여부. 충족만으로 매수하지 않는다. / 81600원 및 78200~80100원 구간의 방어·이탈·회복 실패 여부. 이미 충족된 손절은 재평가일까지 유예하지 않는다.",
           "risk_condition_ko": "81,600 이하 하락, 종가 확인 후 리스크 축소",
           "data_status_ko": "시세 유효기간 만료",
@@ -4804,7 +4804,7 @@
             "provider_blockers": [
               "work_packet_row_expired"
             ],
-            "row_valid_until": "2026-11-18T13:33:00+09:00",
+            "row_valid_until": "2026-11-18T14:51:00+09:00",
             "expired_at_build": true,
             "investor_state": "RECHECK",
             "investor_label": "주문 전 재확인"
@@ -4814,7 +4814,7 @@
             "confidence": 0.61,
             "action_now": "HOLD",
             "delta_krw_now": 0,
-            "target_weight_now": 0.0097,
+            "target_weight_now": 0.0098,
             "action_if_triggered": "REDUCE_IF_TRIGGERED",
             "trigger_conditions": [
               "92100원 초과 정규장 종가 후 다음 실제 거래일 91800~92100원 지지와 종가 91800원 이상 유지 여부. 충족만으로 매수하지 않는다.",
@@ -4840,7 +4840,7 @@
               },
               "회복 시도 후 종가 91800원 미만이면 회복 가설을 취소한다. 종가 81600원 미만이면 매수 재심사를 중단하고 추가 위험 축소를 적용한다. 기존 손절·청산이 이미 충족됐다면 이를 우선한다."
             ],
-            "delta_krw_if_triggered": -80400,
+            "delta_krw_if_triggered": -80900,
             "target_weight_if_triggered": 0.0,
             "strategy_state": "reduce_or_exit",
             "execution_feasibility_now": "not_actionable_now",
@@ -4864,17 +4864,17 @@
             "position_metrics": {
               "entry_price": 172300.0,
               "avg_cost_krw": 172300.0,
-              "current_price": 80600.0,
-              "market_price_krw": 80400.0,
-              "market_value_krw": 80400,
-              "unrealized_pnl_krw": -91900,
-              "unrealized_return_pct": -53.3372,
+              "current_price": 80700.0,
+              "market_price_krw": 80900.0,
+              "market_value_krw": 80900,
+              "unrealized_pnl_krw": -91400,
+              "unrealized_return_pct": -53.047,
               "holding_days": null,
               "last_partial_sell_date": null,
               "realized_profit_locked_pct": 0.0,
-              "position_extension_pct_from_entry": -53.3372,
-              "distance_to_target_pct": 22.134,
-              "distance_to_trailing_stop_pct": -7.4938,
+              "position_extension_pct_from_entry": -53.047,
+              "distance_to_target_pct": 21.9827,
+              "distance_to_trailing_stop_pct": -7.3606,
               "profit_protection_score": 0.0
             },
             "profit_taking_plan": {
@@ -4890,9 +4890,9 @@
               "reason_codes": [
                 "DOWNTREND",
                 "FAILED_REBOUND",
-                "SUPPORT_BREAK_RISK",
+                "HIGH_VOLATILITY",
                 "UNFAVORABLE_REWARD_RISK",
-                "HIGH_VOLATILITY"
+                "SUPPORT_BREAK_RISK"
               ]
             },
             "rationale": "논지는 우호적이지만 아직 실행 타이밍 확인이 부족해 조건부 후보로 두는 편이 안전합니다.",
@@ -4914,7 +4914,7 @@
             "strategy_code": "WAIT_CLOSE",
             "strategy_ko": "종가 확인 후 판단",
             "decision_state_ko": "조건 충족, 종가 확인 대기",
-            "market_data_asof": "2026-11-18T13:30:00+09:00"
+            "market_data_asof": "2026-11-18T14:48:00+09:00"
           },
           "thesis": {
             "stance": "REDUCE",
@@ -5127,8 +5127,8 @@
           "execution": {
             "readiness": "NEEDS_LIVE_RECHECK",
             "source_row_mode": "IMMEDIATE",
-            "as_of": "2026-11-18T13:30:00+09:00",
-            "valid_until": "2026-11-18T13:33:00+09:00",
+            "as_of": "2026-11-18T14:48:00+09:00",
+            "valid_until": "2026-11-18T14:51:00+09:00",
             "action_now": null,
             "action_if_triggered": null,
             "required_rechecks": [
@@ -5148,15 +5148,15 @@
           "is_held": true,
           "strategy_code": "DATA_CHECK",
           "strategy_ko": "데이터 확인 전 대기",
-          "last_price": 48150.0,
-          "market_data_asof": "2026-11-18T13:30:00+09:00",
-          "session_vwap": 47961.31548268149,
-          "vwap_distance_pct": 0.3934098041715295,
-          "vwap_position_ko": "VWAP 위 +0.39%",
-          "relative_volume": 0.7316754449852898,
-          "trading_value": 14645803025.0,
-          "price_change_pct": 1.05,
-          "spread_bps": 10.378827192527243,
+          "last_price": 47950.0,
+          "market_data_asof": "2026-11-18T14:48:00+09:00",
+          "session_vwap": 47934.993532762746,
+          "vwap_distance_pct": 0.03130587099589022,
+          "vwap_position_ko": "VWAP 위 +0.03%",
+          "relative_volume": 0.6720328133958519,
+          "trading_value": 17418138600.0,
+          "price_change_pct": 0.63,
+          "spread_bps": 10.422094841063053,
           "day_high": 50100.0,
           "day_low": 46150.0,
           "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
@@ -5185,7 +5185,7 @@
             "provider_blockers": [
               "work_packet_row_expired"
             ],
-            "row_valid_until": "2026-11-18T13:33:00+09:00",
+            "row_valid_until": "2026-11-18T14:51:00+09:00",
             "expired_at_build": true,
             "investor_state": "RECHECK",
             "investor_label": "주문 전 재확인"
@@ -5221,7 +5221,7 @@
                 "thesis_ref": "/execution_levels/failed_breakout_rule"
               }
             ],
-            "delta_krw_if_triggered": -48100,
+            "delta_krw_if_triggered": -47950,
             "target_weight_if_triggered": 0.0117,
             "strategy_state": "reduce_or_exit",
             "execution_feasibility_now": "not_actionable_now",
@@ -5245,17 +5245,17 @@
             "position_metrics": {
               "entry_price": 100000.0,
               "avg_cost_krw": 100000.0,
-              "current_price": 48150.0,
-              "market_price_krw": 48100.0,
-              "market_value_krw": 144300,
-              "unrealized_pnl_krw": -155700,
-              "unrealized_return_pct": -51.9,
+              "current_price": 47950.0,
+              "market_price_krw": 47950.0,
+              "market_value_krw": 143850,
+              "unrealized_pnl_krw": -156150,
+              "unrealized_return_pct": -52.05,
               "holding_days": null,
               "last_partial_sell_date": null,
               "realized_profit_locked_pct": 0.0,
-              "position_extension_pct_from_entry": -51.9,
-              "distance_to_target_pct": 114.9533,
-              "distance_to_trailing_stop_pct": -40.1869,
+              "position_extension_pct_from_entry": -52.05,
+              "distance_to_target_pct": 115.8498,
+              "distance_to_trailing_stop_pct": -40.7716,
               "profit_protection_score": 0.0
             },
             "profit_taking_plan": {
@@ -5269,11 +5269,11 @@
               "keep_core_fraction": 0.0,
               "reentry_condition": "이번 매도는 이익실현이 아닌 위험축소다. 의무적으로 유지할 핵심비중은 정하지 않는다. 재진입은 재무 검증, 가격 회복과 비용 차감 후 보상·위험을 확인해 별도로 결정한다.",
               "reason_codes": [
+                "WEAK_REBOUND_VOLUME",
                 "DOWNTREND",
                 "SUPPORT_FAILURE_TRIGGER",
-                "REGIME_HEADWIND",
-                "WEAK_REBOUND_VOLUME",
-                "UNFAVORABLE_REWARD_RISK"
+                "UNFAVORABLE_REWARD_RISK",
+                "REGIME_HEADWIND"
               ]
             },
             "rationale": "즉시 강한 액션보다 관찰 또는 유지 중심으로 해석했습니다.",
@@ -5294,7 +5294,7 @@
             "strategy_code": "WAIT_CLOSE",
             "strategy_ko": "종가 확인 후 판단",
             "decision_state_ko": "조건 충족, 종가 확인 대기",
-            "market_data_asof": "2026-11-18T13:30:00+09:00"
+            "market_data_asof": "2026-11-18T14:48:00+09:00"
           },
           "thesis": {
             "stance": "REDUCE",
@@ -5519,8 +5519,8 @@
           "execution": {
             "readiness": "NEEDS_LIVE_RECHECK",
             "source_row_mode": "IMMEDIATE",
-            "as_of": "2026-11-18T13:30:00+09:00",
-            "valid_until": "2026-11-18T13:33:00+09:00",
+            "as_of": "2026-11-18T14:48:00+09:00",
+            "valid_until": "2026-11-18T14:51:00+09:00",
             "action_now": null,
             "action_if_triggered": null,
             "required_rechecks": [
@@ -5540,16 +5540,16 @@
           "is_held": true,
           "strategy_code": "DATA_CHECK",
           "strategy_ko": "데이터 확인 전 대기",
-          "last_price": 37100.0,
-          "market_data_asof": "2026-11-18T13:30:00+09:00",
-          "session_vwap": 36893.86553704731,
-          "vwap_distance_pct": 0.5587228661244392,
-          "vwap_position_ko": "VWAP 위 +0.56%",
-          "relative_volume": 0.844309650052413,
-          "trading_value": 29579472225.0,
-          "price_change_pct": 3.06,
-          "spread_bps": 13.486176668914363,
-          "day_high": 37800.0,
+          "last_price": 37650.0,
+          "market_data_asof": "2026-11-18T14:48:00+09:00",
+          "session_vwap": 36979.902355478574,
+          "vwap_distance_pct": 1.8120589883660054,
+          "vwap_position_ko": "VWAP 위 +1.81%",
+          "relative_volume": 0.8389258353714795,
+          "trading_value": 38303708900.0,
+          "price_change_pct": 4.58,
+          "spread_bps": 13.289036544850498,
+          "day_high": 37900.0,
           "day_low": 35900.0,
           "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
           "execution_condition_ko": "403870.KQ: 39,399~40,120원 회복 구간을 감시한다. 40,120원 초과 종가와 다음 실제 거래일의 구간 지지를 확인하고 이동평균 값을 갱신한다. 이는 최초 감축과 약세 판단의 재평가 조건이다. / 403870.KQ: 42,600원 초과 종가와 다음 실제 거래일의 42,600원 초과 종가를 확인하면 기업 근거와 비용 차감 후 손익비를 다시 평가한다. 현재 조건부 매수는 없다.",
@@ -5577,7 +5577,7 @@
             "provider_blockers": [
               "work_packet_row_expired"
             ],
-            "row_valid_until": "2026-11-18T13:33:00+09:00",
+            "row_valid_until": "2026-11-18T14:51:00+09:00",
             "expired_at_build": true,
             "investor_state": "RECHECK",
             "investor_label": "주문 전 재확인"
@@ -5587,7 +5587,7 @@
             "confidence": 0.9,
             "action_now": "HOLD",
             "delta_krw_now": 0,
-            "target_weight_now": 0.0045,
+            "target_weight_now": 0.0046,
             "action_if_triggered": "REDUCE_IF_TRIGGERED",
             "trigger_conditions": [
               "403870.KQ: 39,399~40,120원 회복 구간을 감시한다. 40,120원 초과 종가와 다음 실제 거래일의 구간 지지를 확인하고 이동평균 값을 갱신한다. 이는 최초 감축과 약세 판단의 재평가 조건이다.",
@@ -5616,7 +5616,7 @@
                 "thesis_ref": "/execution_levels/failed_breakout_rule"
               }
             ],
-            "delta_krw_if_triggered": -37200,
+            "delta_krw_if_triggered": -37650,
             "target_weight_if_triggered": 0.0,
             "strategy_state": "reduce_or_exit",
             "execution_feasibility_now": "not_actionable_now",
@@ -5640,15 +5640,15 @@
             "position_metrics": {
               "entry_price": 54500.0,
               "avg_cost_krw": 54500.0,
-              "current_price": 37100.0,
-              "market_price_krw": 37200.0,
-              "market_value_krw": 37200,
-              "unrealized_pnl_krw": -17300,
-              "unrealized_return_pct": -31.7431,
+              "current_price": 37650.0,
+              "market_price_krw": 37650.0,
+              "market_value_krw": 37650,
+              "unrealized_pnl_krw": -16850,
+              "unrealized_return_pct": -30.9174,
               "holding_days": 0,
               "last_partial_sell_date": null,
               "realized_profit_locked_pct": 0.0,
-              "position_extension_pct_from_entry": -31.7431,
+              "position_extension_pct_from_entry": -30.9174,
               "distance_to_target_pct": null,
               "distance_to_trailing_stop_pct": null,
               "profit_protection_score": 0.0,
@@ -5665,12 +5665,12 @@
               "keep_core_fraction": 0.0,
               "reentry_condition": "403870.KQ 감축은 이익 실현이나 자금 마련이 아닌 하방 위험 관리다. 잔여 보유비율을 의무화하지 않으며, 재진입은 별도 투자판단이 필요하다.",
               "reason_codes": [
-                "ELEVATED_VOLATILITY",
                 "DOWNTREND",
-                "DOWNSIDE_RISK_MANAGEMENT",
                 "FAILED_REBOUND",
+                "ELEVATED_VOLATILITY",
+                "UNFAVORABLE_REWARD_RISK",
                 "COMPETITION_RISK",
-                "UNFAVORABLE_REWARD_RISK"
+                "DOWNSIDE_RISK_MANAGEMENT"
               ]
             },
             "rationale": "즉시 강한 액션보다 관찰 또는 유지 중심으로 해석했습니다.",
@@ -5691,7 +5691,7 @@
             "strategy_code": "BUY_ON_CONFIRMATION",
             "strategy_ko": "조건 확인 후 분할매수 검토",
             "decision_state_ko": "조건 충족 전 대기",
-            "market_data_asof": "2026-11-18T13:30:00+09:00"
+            "market_data_asof": "2026-11-18T14:48:00+09:00"
           },
           "thesis": {
             "stance": "BUY",
@@ -5933,8 +5933,8 @@
           "execution": {
             "readiness": "NEEDS_LIVE_RECHECK",
             "source_row_mode": "IMMEDIATE",
-            "as_of": "2026-11-18T13:30:00+09:00",
-            "valid_until": "2026-11-18T13:33:00+09:00",
+            "as_of": "2026-11-18T14:48:00+09:00",
+            "valid_until": "2026-11-18T14:51:00+09:00",
             "action_now": null,
             "action_if_triggered": null,
             "required_rechecks": [
@@ -5954,18 +5954,18 @@
           "is_held": false,
           "strategy_code": "DATA_CHECK",
           "strategy_ko": "데이터 확인 전 대기",
-          "last_price": 1263000.0,
-          "market_data_asof": "2026-11-18T13:30:00+09:00",
-          "session_vwap": 1284928.2293213278,
-          "vwap_distance_pct": -1.7065723066034377,
-          "vwap_position_ko": "VWAP 아래 -1.71%",
-          "relative_volume": 0.6521939696075211,
-          "trading_value": 26828016500.0,
-          "price_change_pct": -0.63,
-          "spread_bps": 7.914523149980214,
+          "last_price": 1272000.0,
+          "market_data_asof": "2026-11-18T14:48:00+09:00",
+          "session_vwap": 1281445.121097578,
+          "vwap_distance_pct": -0.7370679354171683,
+          "vwap_position_ko": "VWAP 아래 -0.74%",
+          "relative_volume": 0.686922854291018,
+          "trading_value": 36613450000.0,
+          "price_change_pct": 0.08,
+          "spread_bps": 15.723270440251573,
           "day_high": 1307000.0,
           "day_low": 1256000.0,
-          "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
+          "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
           "execution_condition_ko": "최신 완료 일봉과 계획 이후 가격 경로를 확보해 1,212,000원 이탈 및 선행 돌파 이후 실패 여부부터 확인한다. 매도 조건이 있으면 매수 검토보다 우선한다. / 최소 재무 점검을 통과하고 1,218,000~1,234,000원에서 회복 종가와 후속 실제 거래일 지지 유지가 확인되면 범위 내 소액 진입을 검토한다. 확인할 수 없으면 해당 유효기간에는 매수하지 않는다.",
           "risk_condition_ko": "1,212,000 이하 하락, 종가 확인 후 신규 진입 보류·보유 위험 대응 계획 재확인",
           "data_status_ko": "시세 유효기간 만료",
@@ -5991,7 +5991,7 @@
             "provider_blockers": [
               "work_packet_row_expired"
             ],
-            "row_valid_until": "2026-11-18T13:33:00+09:00",
+            "row_valid_until": "2026-11-18T14:51:00+09:00",
             "expired_at_build": true,
             "investor_state": "RECHECK",
             "investor_label": "주문 전 재확인"
@@ -6070,13 +6070,13 @@
               "keep_core_fraction": 1.0,
               "reentry_condition": "현재 별도 이익 실현 주문은 없다. 손절이나 위험 축소 후에는 지지 회복, 후속 거래일 유지와 사업 근거를 재평가해 새 진입 계획을 수립한다.",
               "reason_codes": [
-                "CASH_CONVERSION_UNCERTAINTY",
-                "DAILY_CLOSE_BELOW_SUPPORT",
-                "OVERHEAD_RESISTANCE",
                 "NO_CONFIRMED_PROFIT_TAKING_TRIGGER",
+                "OVERHEAD_RESISTANCE",
                 "LATEST_DAILY_CONFIRMATION_REQUIRED",
+                "CASH_CONVERSION_UNCERTAINTY",
                 "NO_CONFIRMED_SELL_TRIGGER",
-                "HIGH_VOLATILITY"
+                "HIGH_VOLATILITY",
+                "DAILY_CLOSE_BELOW_SUPPORT"
               ]
             },
             "rationale": "논지는 우호적이지만 아직 실행 타이밍 확인이 부족해 조건부 후보로 두는 편이 안전합니다.",
@@ -6098,7 +6098,7 @@
             "strategy_code": "BUY_ON_CONFIRMATION",
             "strategy_ko": "조건 확인 후 분할매수 검토",
             "decision_state_ko": "조건 충족 전 대기",
-            "market_data_asof": "2026-11-18T13:30:00+09:00"
+            "market_data_asof": "2026-11-18T14:48:00+09:00"
           },
           "thesis": {
             "stance": "BUY",
@@ -6365,8 +6365,8 @@
           "execution": {
             "readiness": "NEEDS_LIVE_RECHECK",
             "source_row_mode": "IMMEDIATE",
-            "as_of": "2026-11-18T13:30:00+09:00",
-            "valid_until": "2026-11-18T13:33:00+09:00",
+            "as_of": "2026-11-18T14:48:00+09:00",
+            "valid_until": "2026-11-18T14:51:00+09:00",
             "action_now": null,
             "action_if_triggered": null,
             "required_rechecks": [
@@ -6386,15 +6386,15 @@
           "is_held": false,
           "strategy_code": "DATA_CHECK",
           "strategy_ko": "데이터 확인 전 대기",
-          "last_price": 63700.0,
-          "market_data_asof": "2026-11-18T13:30:00+09:00",
-          "session_vwap": 63920.91922909475,
-          "vwap_distance_pct": -0.34561334811685773,
-          "vwap_position_ko": "VWAP 아래 -0.35%",
-          "relative_volume": 1.2019804834145815,
-          "trading_value": 213331401700.0,
-          "price_change_pct": -6.19,
-          "spread_bps": 15.686274509803921,
+          "last_price": 64000.0,
+          "market_data_asof": "2026-11-18T14:48:00+09:00",
+          "session_vwap": 63864.12743574954,
+          "vwap_distance_pct": 0.21275255719597208,
+          "vwap_position_ko": "VWAP 위 +0.21%",
+          "relative_volume": 1.0980011028331376,
+          "trading_value": 252900156450.0,
+          "price_change_pct": -5.74,
+          "spread_bps": 15.63721657544957,
           "day_high": 69900.0,
           "day_low": 61500.0,
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
@@ -6423,7 +6423,7 @@
             "provider_blockers": [
               "work_packet_row_expired"
             ],
-            "row_valid_until": "2026-11-18T13:33:00+09:00",
+            "row_valid_until": "2026-11-18T14:51:00+09:00",
             "expired_at_build": true,
             "investor_state": "RECHECK",
             "investor_label": "주문 전 재확인"
@@ -6513,13 +6513,13 @@
               "keep_core_fraction": 1.0,
               "reentry_condition": "차익실현 계획은 적용하지 않는다. 위험 축소 후 재진입은 새로운 가격 확인과 원문 사업 점검을 거쳐 별도로 결정한다. 핵심 보유 유지 비율은 위험 축소 조건이 발생하기 전의 기준이다.",
               "reason_codes": [
+                "CURRENT_SESSION_UNVERIFIED",
                 "NO_CONFIRMED_PROFIT_TAKING_TRIGGER",
-                "NO_CONFIRMED_SUPPORT_BREAK",
-                "MOMENTUM_DECELERATION",
-                "SUPPORT_BROKEN",
                 "EXTENDED_MOVE",
                 "DATED_UPTREND_SUPPORT",
-                "CURRENT_SESSION_UNVERIFIED"
+                "NO_CONFIRMED_SUPPORT_BREAK",
+                "SUPPORT_BROKEN",
+                "MOMENTUM_DECELERATION"
               ]
             },
             "rationale": "논지는 우호적이지만 아직 실행 타이밍 확인이 부족해 조건부 후보로 두는 편이 안전합니다.",
@@ -6541,7 +6541,7 @@
             "strategy_code": "BUY_ON_CONFIRMATION",
             "strategy_ko": "조건 확인 후 분할매수 검토",
             "decision_state_ko": "조건 충족 전 대기",
-            "market_data_asof": "2026-11-18T13:30:00+09:00"
+            "market_data_asof": "2026-11-18T14:48:00+09:00"
           },
           "thesis": {
             "stance": "BUY",
@@ -6794,8 +6794,8 @@
           "execution": {
             "readiness": "NEEDS_LIVE_RECHECK",
             "source_row_mode": "IMMEDIATE",
-            "as_of": "2026-11-18T13:30:00+09:00",
-            "valid_until": "2026-11-18T13:33:00+09:00",
+            "as_of": "2026-11-18T14:48:00+09:00",
+            "valid_until": "2026-11-18T14:51:00+09:00",
             "action_now": null,
             "action_if_triggered": null,
             "required_rechecks": [
@@ -6815,16 +6815,16 @@
           "is_held": false,
           "strategy_code": "DATA_CHECK",
           "strategy_ko": "데이터 확인 전 대기",
-          "last_price": 38400.0,
-          "market_data_asof": "2026-11-18T13:30:00+09:00",
-          "session_vwap": 38255.47365453292,
-          "vwap_distance_pct": 0.3777925919104419,
-          "vwap_position_ko": "VWAP 위 +0.38%",
-          "relative_volume": 0.7011923434682159,
-          "trading_value": 3052978075.0,
-          "price_change_pct": 0.66,
-          "spread_bps": 13.012361743656475,
-          "day_high": 38450.0,
+          "last_price": 38500.0,
+          "market_data_asof": "2026-11-18T14:48:00+09:00",
+          "session_vwap": 38308.10918467398,
+          "vwap_distance_pct": 0.5009143479281608,
+          "vwap_position_ko": "VWAP 위 +0.50%",
+          "relative_volume": 0.7172244509890934,
+          "trading_value": 4063264525.0,
+          "price_change_pct": 0.92,
+          "spread_bps": 12.99545159194282,
+          "day_high": 38500.0,
           "day_low": 37700.0,
           "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
           "execution_condition_ko": "036460.KS의 누락된 2026-11-17 일봉과 최신 완료 정규장 자료를 확보한다. 실제 거래일·거래 가능 상태·호가 신선도를 별도로 확인하며 야간 지연 가격으로 조건 충족을 추정하지 않는다. / 37,300~37,600원 지지·반등과 다음 실제 거래일 종가 유지를 확인한다. 실제 비용·갭 여유와 유효 호가단위를 반영했을 때 허용 매수가 남는지 계산한다.",
@@ -6852,7 +6852,7 @@
             "provider_blockers": [
               "work_packet_row_expired"
             ],
-            "row_valid_until": "2026-11-18T13:33:00+09:00",
+            "row_valid_until": "2026-11-18T14:51:00+09:00",
             "expired_at_build": true,
             "investor_state": "RECHECK",
             "investor_label": "주문 전 재확인"
@@ -6927,12 +6927,12 @@
               "keep_core_fraction": 1.0,
               "reentry_condition": "현재 별도 익절 계획은 없다. 저항 접근만으로 자동 매도하지 않는다. 위험 축소 이후 재진입은 지지 회복과 투자논거를 검증한 별도 계획으로 판단한다.",
               "reason_codes": [
+                "RESISTANCE_OVERHEAD",
                 "CASH_CONVERSION_UNCERTAINTY",
                 "NO_CONFIRMED_PROFIT_TAKING_SIGNAL",
-                "NO_CONFIRMED_SUPPORT_BREAK",
-                "RESISTANCE_OVERHEAD",
-                "SUPPORT_BROKEN",
                 "STALE_DAILY_REFERENCE",
+                "NO_CONFIRMED_SUPPORT_BREAK",
+                "SUPPORT_BROKEN",
                 "THESIS_PROVISIONALLY_INTACT"
               ]
             },
@@ -6955,7 +6955,7 @@
             "strategy_code": "BUY_ON_CONFIRMATION",
             "strategy_ko": "조건 확인 후 분할매수 검토",
             "decision_state_ko": "조건 충족 전 대기",
-            "market_data_asof": "2026-11-18T13:30:00+09:00"
+            "market_data_asof": "2026-11-18T14:48:00+09:00"
           },
           "thesis": {
             "stance": "BUY",
@@ -7208,8 +7208,8 @@
           "execution": {
             "readiness": "NEEDS_LIVE_RECHECK",
             "source_row_mode": "IMMEDIATE",
-            "as_of": "2026-11-18T13:30:00+09:00",
-            "valid_until": "2026-11-18T13:33:00+09:00",
+            "as_of": "2026-11-18T14:48:00+09:00",
+            "valid_until": "2026-11-18T14:51:00+09:00",
             "action_now": null,
             "action_if_triggered": null,
             "required_rechecks": [
@@ -7229,15 +7229,15 @@
           "is_held": false,
           "strategy_code": "DATA_CHECK",
           "strategy_ko": "데이터 확인 전 대기",
-          "last_price": 124300.0,
-          "market_data_asof": "2026-11-18T13:30:00+09:00",
-          "session_vwap": 123547.37525055991,
-          "vwap_distance_pct": 0.6091790682835052,
-          "vwap_position_ko": "VWAP 위 +0.61%",
-          "relative_volume": 0.8249995867090317,
-          "trading_value": 43083317150.0,
-          "price_change_pct": -0.64,
-          "spread_bps": 8.048289738430583,
+          "last_price": 124100.0,
+          "market_data_asof": "2026-11-18T14:48:00+09:00",
+          "session_vwap": 123651.17211641268,
+          "vwap_distance_pct": 0.36297907727456113,
+          "vwap_position_ko": "VWAP 위 +0.36%",
+          "relative_volume": 0.7762334481330788,
+          "trading_value": 52620374550.0,
+          "price_change_pct": -0.8,
+          "spread_bps": 8.054772452678213,
           "day_high": 125200.0,
           "day_low": 122000.0,
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
@@ -7266,7 +7266,7 @@
             "provider_blockers": [
               "work_packet_row_expired"
             ],
-            "row_valid_until": "2026-11-18T13:33:00+09:00",
+            "row_valid_until": "2026-11-18T14:51:00+09:00",
             "expired_at_build": true,
             "investor_state": "RECHECK",
             "investor_label": "주문 전 재확인"
@@ -7338,14 +7338,14 @@
               "keep_core_fraction": 1.0,
               "reentry_condition": "설정 실패 후에는 새로운 지지 확인과 최신 자료 검토를 거쳐 재승인한다. 저항 접촉만으로 이익실현하거나 기존 매수 승인을 자동 재사용하지 않는다.",
               "reason_codes": [
-                "주요지지_이탈시축소",
-                "조건부_하방통제",
-                "확정된_매도조건없음",
-                "현재가격_미확인",
-                "조건부_손실통제유지",
                 "확정된_이익실현조건없음",
+                "저항도달_미확인",
+                "주요지지_이탈시축소",
+                "확정된_매도조건없음",
+                "조건부_손실통제유지",
+                "현재가격_미확인",
                 "과거자료_주요지지유지",
-                "저항도달_미확인"
+                "조건부_하방통제"
               ]
             },
             "rationale": "논지는 우호적이지만 아직 실행 타이밍 확인이 부족해 조건부 후보로 두는 편이 안전합니다.",
@@ -7367,7 +7367,7 @@
             "strategy_code": "BUY_ON_CONFIRMATION",
             "strategy_ko": "조건 확인 후 분할매수 검토",
             "decision_state_ko": "조건 충족 전 대기",
-            "market_data_asof": "2026-11-18T13:30:00+09:00"
+            "market_data_asof": "2026-11-18T14:48:00+09:00"
           },
           "thesis": {
             "stance": "BUY",
@@ -7640,8 +7640,8 @@
           "execution": {
             "readiness": "NEEDS_LIVE_RECHECK",
             "source_row_mode": "IMMEDIATE",
-            "as_of": "2026-11-18T13:30:00+09:00",
-            "valid_until": "2026-11-18T13:33:00+09:00",
+            "as_of": "2026-11-18T14:48:00+09:00",
+            "valid_until": "2026-11-18T14:51:00+09:00",
             "action_now": null,
             "action_if_triggered": null,
             "required_rechecks": [
@@ -7661,15 +7661,15 @@
           "is_held": false,
           "strategy_code": "DATA_CHECK",
           "strategy_ko": "데이터 확인 전 대기",
-          "last_price": 183700.0,
-          "market_data_asof": "2026-11-18T13:30:00+09:00",
-          "session_vwap": 182292.76410811092,
-          "vwap_distance_pct": 0.771964756129595,
-          "vwap_position_ko": "VWAP 위 +0.77%",
-          "relative_volume": 0.7100072733378378,
-          "trading_value": 28145455900.0,
-          "price_change_pct": 1.1,
-          "spread_bps": 5.442176870748299,
+          "last_price": 182200.0,
+          "market_data_asof": "2026-11-18T14:48:00+09:00",
+          "session_vwap": 182515.57953675344,
+          "vwap_distance_pct": -0.17290553362865335,
+          "vwap_position_ko": "VWAP 아래 -0.17%",
+          "relative_volume": 0.738946704971492,
+          "trading_value": 38138455500.0,
+          "price_change_pct": 0.28,
+          "spread_bps": 5.486968449931413,
           "day_high": 184500.0,
           "day_low": 177400.0,
           "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
@@ -7698,7 +7698,7 @@
             "provider_blockers": [
               "work_packet_row_expired"
             ],
-            "row_valid_until": "2026-11-18T13:33:00+09:00",
+            "row_valid_until": "2026-11-18T14:51:00+09:00",
             "expired_at_build": true,
             "investor_state": "RECHECK",
             "investor_label": "주문 전 재확인"
@@ -7767,11 +7767,11 @@
               "keep_core_fraction": 1.0,
               "reentry_condition": "별도 차익실현 계획은 적용하지 않는다. 청산 후 재진입은 새로운 지지 회복과 비용 반영 보상 대비 위험을 재평가한다.",
               "reason_codes": [
-                "ELEVATED_VOLATILITY",
                 "INVALIDATION_UNCONFIRMED",
+                "ELEVATED_VOLATILITY",
                 "NO_CONFIRMED_PROFIT_TAKING_SIGNAL",
-                "SUPPORT_BROKEN",
-                "LONG_TERM_SUPPORT_INTACT_AS_OF_REFERENCE"
+                "LONG_TERM_SUPPORT_INTACT_AS_OF_REFERENCE",
+                "SUPPORT_BROKEN"
               ]
             },
             "rationale": "논지는 우호적이지만 아직 실행 타이밍 확인이 부족해 조건부 후보로 두는 편이 안전합니다.",
@@ -7793,7 +7793,7 @@
             "strategy_code": "BUY_ON_CONFIRMATION",
             "strategy_ko": "조건 확인 후 분할매수 검토",
             "decision_state_ko": "조건 충족 전 대기",
-            "market_data_asof": "2026-11-18T13:30:00+09:00"
+            "market_data_asof": "2026-11-18T14:48:00+09:00"
           },
           "thesis": {
             "stance": "BUY",
@@ -8060,8 +8060,8 @@
           "execution": {
             "readiness": "NEEDS_LIVE_RECHECK",
             "source_row_mode": "IMMEDIATE",
-            "as_of": "2026-11-18T13:30:00+09:00",
-            "valid_until": "2026-11-18T13:33:00+09:00",
+            "as_of": "2026-11-18T14:48:00+09:00",
+            "valid_until": "2026-11-18T14:51:00+09:00",
             "action_now": null,
             "action_if_triggered": null,
             "required_rechecks": [
@@ -8081,17 +8081,17 @@
           "is_held": false,
           "strategy_code": "DATA_CHECK",
           "strategy_ko": "데이터 확인 전 대기",
-          "last_price": 210000.0,
-          "market_data_asof": "2026-11-18T13:30:00+09:00",
-          "session_vwap": 210245.2836665202,
-          "vwap_distance_pct": -0.1166654786460053,
-          "vwap_position_ko": "VWAP 아래 -0.12%",
-          "relative_volume": 0.6065022339150612,
-          "trading_value": 53594045750.0,
-          "price_change_pct": -1.41,
-          "spread_bps": 23.837902264600714,
+          "last_price": 207500.0,
+          "market_data_asof": "2026-11-18T14:48:00+09:00",
+          "session_vwap": 209698.83401151383,
+          "vwap_distance_pct": -1.0485675906968028,
+          "vwap_position_ko": "VWAP 아래 -1.05%",
+          "relative_volume": 0.621129052099662,
+          "trading_value": 71066305750.0,
+          "price_change_pct": -2.58,
+          "spread_bps": 24.1254523522316,
           "day_high": 213000.0,
-          "day_low": 208000.0,
+          "day_low": 206750.0,
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
           "execution_condition_ko": "2026-11-17 및 이후 완료된 모든 정규장 시가·고가·저가·종가·거래량, 거래일 달력과 가격조정 기준을 확인한다. 보도된 0.70% 하락만으로 종가를 역산하거나 지연된 야간 자료를 사용하지 않는다. / 2026-11-18 이후 검증된 정규장에서 205000–207200원 지지 시험과 매도 거래량 감소, 반등 거래량 개선 및 207200원 이상 종가를 확인한다. 다음 검증 거래일에도 지지대 유지와 207200원 이상 종가가 필요하다.",
           "risk_condition_ko": "203,500 이하 하락, 종가 확인 후 신규 진입 보류·보유 위험 대응 계획 재확인",
@@ -8118,7 +8118,7 @@
             "provider_blockers": [
               "work_packet_row_expired"
             ],
-            "row_valid_until": "2026-11-18T13:33:00+09:00",
+            "row_valid_until": "2026-11-18T14:51:00+09:00",
             "expired_at_build": true,
             "investor_state": "RECHECK",
             "investor_label": "주문 전 재확인"
@@ -8208,13 +8208,13 @@
               "keep_core_fraction": 1.0,
               "reentry_condition": "현재 이익실현 일정은 없다. 최신 자료로 저항대 거부와 상승 탄력 약화가 함께 확인되면 부분 이익실현을 재평가한다. 매도 후 재매수에는 새로운 지지 확인과 손익비 심사를 적용한다.",
               "reason_codes": [
-                "기준일_상승추세",
-                "확정_이익실현신호_부재",
                 "현재_과열상태_미확인",
-                "현재_지지상태_미확인",
-                "확정_매도신호_부재",
+                "지지선_약화_조건부",
                 "지지이탈_시_위험축소",
-                "지지선_약화_조건부"
+                "확정_이익실현신호_부재",
+                "현재_지지상태_미확인",
+                "기준일_상승추세",
+                "확정_매도신호_부재"
               ]
             },
             "rationale": "논지는 우호적이지만 아직 실행 타이밍 확인이 부족해 조건부 후보로 두는 편이 안전합니다.",
@@ -8236,7 +8236,7 @@
             "strategy_code": "BUY_ON_CONFIRMATION",
             "strategy_ko": "조건 확인 후 분할매수 검토",
             "decision_state_ko": "조건 충족 전 대기",
-            "market_data_asof": "2026-11-18T13:30:00+09:00"
+            "market_data_asof": "2026-11-18T14:48:00+09:00"
           },
           "thesis": {
             "stance": "BUY",
@@ -8465,8 +8465,8 @@
           "execution": {
             "readiness": "NEEDS_LIVE_RECHECK",
             "source_row_mode": "IMMEDIATE",
-            "as_of": "2026-11-18T13:30:00+09:00",
-            "valid_until": "2026-11-18T13:33:00+09:00",
+            "as_of": "2026-11-18T14:48:00+09:00",
+            "valid_until": "2026-11-18T14:51:00+09:00",
             "action_now": null,
             "action_if_triggered": null,
             "required_rechecks": [
@@ -8486,14 +8486,14 @@
           "is_held": false,
           "strategy_code": "DATA_CHECK",
           "strategy_ko": "데이터 확인 전 대기",
-          "last_price": 35150.0,
-          "market_data_asof": "2026-11-18T13:30:00+09:00",
-          "session_vwap": 34916.15145685596,
-          "vwap_distance_pct": 0.6697431801239606,
-          "vwap_position_ko": "VWAP 위 +0.67%",
-          "relative_volume": 3.187002895736968,
-          "trading_value": 297043118025.0,
-          "price_change_pct": 9.84,
+          "last_price": 35250.0,
+          "market_data_asof": "2026-11-18T14:48:00+09:00",
+          "session_vwap": 34931.182164751095,
+          "vwap_distance_pct": 0.9127026784985892,
+          "vwap_position_ko": "VWAP 위 +0.91%",
+          "relative_volume": 2.6538592063196167,
+          "trading_value": 321909217450.0,
+          "price_change_pct": 10.16,
           "spread_bps": 14.194464158977999,
           "day_high": 36750.0,
           "day_low": 32200.0,
@@ -8523,7 +8523,7 @@
             "provider_blockers": [
               "work_packet_row_expired"
             ],
-            "row_valid_until": "2026-11-18T13:33:00+09:00",
+            "row_valid_until": "2026-11-18T14:51:00+09:00",
             "expired_at_build": true,
             "investor_state": "RECHECK",
             "investor_label": "주문 전 재확인"
@@ -8592,13 +8592,13 @@
               "keep_core_fraction": 1.0,
               "reentry_condition": "현재 자동 익절은 적용하지 않는다. 향후 위험축소나 청산 후에는 지지 회복과 기업 위험을 다시 검증하며 자동 재매수하지 않는다.",
               "reason_codes": [
-                "SUPPORT_BREAK_CONDITIONAL",
-                "HIGH_GAP_RISK",
-                "DISCLOSURE_VERIFICATION_REQUIRED",
-                "CURRENT_BREAK_UNVERIFIED",
                 "CURRENT_PROFIT_TAKING_TRIGGER_UNVERIFIED",
                 "EXTENSION_AND_MOMENTUM_CAUTION",
-                "SUPPORT_INTACT_AT_DAILY_REFERENCE"
+                "CURRENT_BREAK_UNVERIFIED",
+                "SUPPORT_INTACT_AT_DAILY_REFERENCE",
+                "HIGH_GAP_RISK",
+                "DISCLOSURE_VERIFICATION_REQUIRED",
+                "SUPPORT_BREAK_CONDITIONAL"
               ]
             },
             "rationale": "논지는 우호적이지만 아직 실행 타이밍 확인이 부족해 조건부 후보로 두는 편이 안전합니다.",
@@ -8620,7 +8620,7 @@
             "strategy_code": "BUY_ON_CONFIRMATION",
             "strategy_ko": "조건 확인 후 분할매수 검토",
             "decision_state_ko": "조건 충족 전 대기",
-            "market_data_asof": "2026-11-18T13:30:00+09:00"
+            "market_data_asof": "2026-11-18T14:48:00+09:00"
           },
           "thesis": {
             "stance": "BUY",
@@ -8873,8 +8873,8 @@
           "execution": {
             "readiness": "NEEDS_LIVE_RECHECK",
             "source_row_mode": "IMMEDIATE",
-            "as_of": "2026-11-18T13:30:00+09:00",
-            "valid_until": "2026-11-18T13:33:00+09:00",
+            "as_of": "2026-11-18T14:48:00+09:00",
+            "valid_until": "2026-11-18T14:51:00+09:00",
             "action_now": null,
             "action_if_triggered": null,
             "required_rechecks": [
@@ -8894,16 +8894,16 @@
           "is_held": false,
           "strategy_code": "DATA_CHECK",
           "strategy_ko": "데이터 확인 전 대기",
-          "last_price": 227000.0,
-          "market_data_asof": "2026-11-18T13:30:00+09:00",
-          "session_vwap": 226492.13731883664,
-          "vwap_distance_pct": 0.22422971815945214,
-          "vwap_position_ko": "VWAP 위 +0.22%",
-          "relative_volume": 0.5238014103038726,
-          "trading_value": 20769102500.0,
-          "price_change_pct": 0.44,
-          "spread_bps": 22.05071664829107,
-          "day_high": 233500.0,
+          "last_price": 233500.0,
+          "market_data_asof": "2026-11-18T14:48:00+09:00",
+          "session_vwap": 227771.61398646128,
+          "vwap_distance_pct": 2.5149692331192908,
+          "vwap_position_ko": "VWAP 위 +2.51%",
+          "relative_volume": 0.5773991425495509,
+          "trading_value": 29912562750.0,
+          "price_change_pct": 3.32,
+          "spread_bps": 21.390374331550802,
+          "day_high": 234000.0,
           "day_low": 221500.0,
           "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
           "execution_condition_ko": "실행 전 2026-11-16 이후 최신 확정 정규장 일봉과 거래 가능 상태를 확인한다. 이미 지지 이탈이 확인되면 신규 매수보다 위험 축소가 우선이다. / 223,500~226,000원 시험과 226,000원 이상 회복 종가, 반등 거래량 개선, 다음 실제 거래일 재시험 지지를 순서대로 확인한다. 거래량 비교 날짜와 수치를 기록하고 미설정 상대거래량 기준을 충족했다고 주장하지 않는다.",
@@ -8931,7 +8931,7 @@
             "provider_blockers": [
               "work_packet_row_expired"
             ],
-            "row_valid_until": "2026-11-18T13:33:00+09:00",
+            "row_valid_until": "2026-11-18T14:51:00+09:00",
             "expired_at_build": true,
             "investor_state": "RECHECK",
             "investor_label": "주문 전 재확인"
@@ -9010,12 +9010,12 @@
               "keep_core_fraction": 1.0,
               "reentry_condition": "위험 축소 후에는 지지 회복과 새로운 확정 일봉, 사업 근거 및 비용 차감 후 보상구조를 확인해 별도 재심사한다. 기존 계획은 자동 재활성화하지 않는다.",
               "reason_codes": [
-                "SUPPORT_FAILURE_TRIGGER",
                 "NO_CONFIRMED_PROFIT_TAKING_TRIGGER",
-                "MOMENTUM_DECELERATION",
-                "STALE_DAILY_REFERENCE",
                 "HIGH_VOLATILITY",
-                "NO_CONFIRMED_INVALIDATION"
+                "SUPPORT_FAILURE_TRIGGER",
+                "NO_CONFIRMED_INVALIDATION",
+                "STALE_DAILY_REFERENCE",
+                "MOMENTUM_DECELERATION"
               ]
             },
             "rationale": "논지는 우호적이지만 아직 실행 타이밍 확인이 부족해 조건부 후보로 두는 편이 안전합니다.",
@@ -9037,7 +9037,7 @@
             "strategy_code": "BUY_ON_CONFIRMATION",
             "strategy_ko": "조건 확인 후 분할매수 검토",
             "decision_state_ko": "조건 충족 전 대기",
-            "market_data_asof": "2026-11-18T13:30:00+09:00"
+            "market_data_asof": "2026-11-18T14:48:00+09:00"
           },
           "thesis": {
             "stance": "BUY",
@@ -9277,8 +9277,8 @@
           "execution": {
             "readiness": "NEEDS_LIVE_RECHECK",
             "source_row_mode": "IMMEDIATE",
-            "as_of": "2026-11-18T13:30:00+09:00",
-            "valid_until": "2026-11-18T13:33:00+09:00",
+            "as_of": "2026-11-18T14:48:00+09:00",
+            "valid_until": "2026-11-18T14:51:00+09:00",
             "action_now": null,
             "action_if_triggered": null,
             "required_rechecks": [
@@ -9298,15 +9298,15 @@
           "is_held": false,
           "strategy_code": "DATA_CHECK",
           "strategy_ko": "데이터 확인 전 대기",
-          "last_price": 155900.0,
-          "market_data_asof": "2026-11-18T13:30:00+09:00",
-          "session_vwap": 154874.2234002756,
-          "vwap_distance_pct": 0.662328809277235,
-          "vwap_position_ko": "VWAP 위 +0.66%",
-          "relative_volume": 0.6695481768342278,
-          "trading_value": 65411747750.0,
-          "price_change_pct": -0.57,
-          "spread_bps": 6.412311638345623,
+          "last_price": 155400.0,
+          "market_data_asof": "2026-11-18T14:48:00+09:00",
+          "session_vwap": 154916.87172122154,
+          "vwap_distance_pct": 0.3118629193906486,
+          "vwap_position_ko": "VWAP 위 +0.31%",
+          "relative_volume": 0.6141083738715031,
+          "trading_value": 77664475300.0,
+          "price_change_pct": -0.89,
+          "spread_bps": 6.43707756678468,
           "day_high": 156700.0,
           "day_low": 152800.0,
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
@@ -9335,7 +9335,7 @@
             "provider_blockers": [
               "work_packet_row_expired"
             ],
-            "row_valid_until": "2026-11-18T13:33:00+09:00",
+            "row_valid_until": "2026-11-18T14:51:00+09:00",
             "expired_at_build": true,
             "investor_state": "RECHECK",
             "investor_label": "주문 전 재확인"
@@ -9408,12 +9408,12 @@
               "keep_core_fraction": 1.0,
               "reentry_condition": "현재 이익실현 계획은 없다. 위험 축소 후 재진입은 지지·수요·공시를 새로 평가하며 기존 조건부 계획을 자동 재활성화하지 않는다.",
               "reason_codes": [
-                "ELEVATED_VOLATILITY",
-                "SUPPORT_BREAK_UNCONFIRMED",
-                "NO_CONFIRMED_PROFIT_TAKING_SIGNAL",
                 "WEAK_REBOUND_VOLUME",
-                "SUPPORT_BROKEN",
-                "REGIME_HEADWIND"
+                "SUPPORT_BREAK_UNCONFIRMED",
+                "ELEVATED_VOLATILITY",
+                "NO_CONFIRMED_PROFIT_TAKING_SIGNAL",
+                "REGIME_HEADWIND",
+                "SUPPORT_BROKEN"
               ]
             },
             "rationale": "논지는 우호적이지만 아직 실행 타이밍 확인이 부족해 조건부 후보로 두는 편이 안전합니다.",
@@ -9435,7 +9435,7 @@
             "strategy_code": "BUY_ON_CONFIRMATION",
             "strategy_ko": "조건 확인 후 분할매수 검토",
             "decision_state_ko": "조건 충족 전 대기",
-            "market_data_asof": "2026-11-18T13:30:00+09:00"
+            "market_data_asof": "2026-11-18T14:48:00+09:00"
           },
           "thesis": {
             "stance": "BUY",
@@ -9696,8 +9696,8 @@
           "execution": {
             "readiness": "NEEDS_LIVE_RECHECK",
             "source_row_mode": "IMMEDIATE",
-            "as_of": "2026-11-18T13:30:00+09:00",
-            "valid_until": "2026-11-18T13:33:00+09:00",
+            "as_of": "2026-11-18T14:48:00+09:00",
+            "valid_until": "2026-11-18T14:51:00+09:00",
             "action_now": null,
             "action_if_triggered": null,
             "required_rechecks": [
@@ -9717,16 +9717,16 @@
           "is_held": false,
           "strategy_code": "DATA_CHECK",
           "strategy_ko": "데이터 확인 전 대기",
-          "last_price": 9400.0,
-          "market_data_asof": "2026-11-18T13:30:00+09:00",
-          "session_vwap": 9448.431129656592,
-          "vwap_distance_pct": -0.5125838246793912,
-          "vwap_position_ko": "VWAP 아래 -0.51%",
-          "relative_volume": 0.28339340843753114,
-          "trading_value": 5133228700.0,
-          "price_change_pct": 2.62,
-          "spread_bps": 21.231422505307854,
-          "day_high": 9700.0,
+          "last_price": 9630.0,
+          "market_data_asof": "2026-11-18T14:48:00+09:00",
+          "session_vwap": 9650.259307870252,
+          "vwap_distance_pct": -0.20993537296691844,
+          "vwap_position_ko": "VWAP 아래 -0.21%",
+          "relative_volume": 0.4571553312000264,
+          "trading_value": 11021541855.0,
+          "price_change_pct": 5.13,
+          "spread_bps": 10.378827192527243,
+          "day_high": 10160.0,
           "day_low": 9070.0,
           "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
           "execution_condition_ko": "최신 정규장 일봉을 확보해 9800원 이상 종가와 다음 실제 거래일의 9750~9800원 재시험·9800원 이상 종가 유지 여부를 확인한다. 충족 전 주문하지 않는다. / 10970~11000원 첫 저항과 11340~11480원 주요 저항을 구분한다. 10200원에서 첫 저항 11000원까지의 거리 800원은 제공 평균진폭 1086.3원보다 작으므로 허용 상한에서 기계적으로 매수하지 않는다.",
@@ -9754,7 +9754,7 @@
             "provider_blockers": [
               "work_packet_row_expired"
             ],
-            "row_valid_until": "2026-11-18T13:33:00+09:00",
+            "row_valid_until": "2026-11-18T14:51:00+09:00",
             "expired_at_build": true,
             "investor_state": "RECHECK",
             "investor_label": "주문 전 재확인"
@@ -9826,12 +9826,12 @@
               "keep_core_fraction": null,
               "reentry_condition": "",
               "reason_codes": [
-                "PRICE_FRESHNESS_UNVERIFIED",
                 "RESISTANCE_REJECTION_WATCH",
-                "LONG_TERM_DOWNTREND",
-                "SUPPORT_BROKEN",
+                "PRICE_FRESHNESS_UNVERIFIED",
+                "HIGH_VOLATILITY",
                 "SUPPORT_BREAK_WATCH",
-                "HIGH_VOLATILITY"
+                "SUPPORT_BROKEN",
+                "LONG_TERM_DOWNTREND"
               ]
             },
             "rationale": "논지는 우호적이지만 아직 실행 타이밍 확인이 부족해 조건부 후보로 두는 편이 안전합니다.",
@@ -9853,7 +9853,7 @@
             "strategy_code": "BUY_ON_CONFIRMATION",
             "strategy_ko": "조건 확인 후 분할매수 검토",
             "decision_state_ko": "조건 충족 전 대기",
-            "market_data_asof": "2026-11-18T13:30:00+09:00"
+            "market_data_asof": "2026-11-18T14:48:00+09:00"
           },
           "thesis": {
             "stance": "BUY",
@@ -10097,8 +10097,8 @@
           "execution": {
             "readiness": "NEEDS_LIVE_RECHECK",
             "source_row_mode": "IMMEDIATE",
-            "as_of": "2026-11-18T13:30:00+09:00",
-            "valid_until": "2026-11-18T13:33:00+09:00",
+            "as_of": "2026-11-18T14:48:00+09:00",
+            "valid_until": "2026-11-18T14:51:00+09:00",
             "action_now": null,
             "action_if_triggered": null,
             "required_rechecks": [
@@ -10118,15 +10118,15 @@
           "is_held": false,
           "strategy_code": "DATA_CHECK",
           "strategy_ko": "데이터 확인 전 대기",
-          "last_price": 31050.0,
-          "market_data_asof": "2026-11-18T13:30:00+09:00",
-          "session_vwap": 31479.76299851328,
-          "vwap_distance_pct": -1.365204047227353,
-          "vwap_position_ko": "VWAP 아래 -1.37%",
-          "relative_volume": 0.7700976005336381,
-          "trading_value": 45947547275.0,
-          "price_change_pct": -2.82,
-          "spread_bps": 16.116035455278002,
+          "last_price": 31300.0,
+          "market_data_asof": "2026-11-18T14:48:00+09:00",
+          "session_vwap": 31432.157554268848,
+          "vwap_distance_pct": -0.4204533336302885,
+          "vwap_position_ko": "VWAP 아래 -0.42%",
+          "relative_volume": 0.7016171254976614,
+          "trading_value": 54138653875.0,
+          "price_change_pct": -2.03,
+          "spread_bps": 15.987210231814547,
           "day_high": 32200.0,
           "day_low": 30700.0,
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
@@ -10155,7 +10155,7 @@
             "provider_blockers": [
               "work_packet_row_expired"
             ],
-            "row_valid_until": "2026-11-18T13:33:00+09:00",
+            "row_valid_until": "2026-11-18T14:51:00+09:00",
             "expired_at_build": true,
             "investor_state": "RECHECK",
             "investor_label": "주문 전 재확인"
@@ -10238,13 +10238,13 @@
               "keep_core_fraction": null,
               "reentry_condition": "위험 축소 이후에는 최신 일봉, 원공시와 잔여 손실예산으로 지지 회복 또는 유효한 돌파를 새로 심사한다. 기존 진입 계획을 자동 재활성화하지 않는다.",
               "reason_codes": [
-                "PORTFOLIO_LIMIT_RECHECK_REQUIRED",
+                "DATED_UPTREND_INTACT",
                 "SELL_TRIGGER_UNCONFIRMED",
                 "MOMENTUM_SLOWDOWN_WARNING",
-                "THESIS_INVALIDATION",
+                "PROFIT_TAKING_TRIGGER_UNCONFIRMED",
                 "FUNDAMENTAL_RECOVERY_UNVERIFIED",
-                "DATED_UPTREND_INTACT",
-                "PROFIT_TAKING_TRIGGER_UNCONFIRMED"
+                "PORTFOLIO_LIMIT_RECHECK_REQUIRED",
+                "THESIS_INVALIDATION"
               ]
             },
             "rationale": "논지는 우호적이지만 아직 실행 타이밍 확인이 부족해 조건부 후보로 두는 편이 안전합니다.",
@@ -10267,7 +10267,7 @@
             "strategy_code": "BUY_ON_CONFIRMATION",
             "strategy_ko": "조건 확인 후 분할매수 검토",
             "decision_state_ko": "조건 충족 전 대기",
-            "market_data_asof": "2026-11-18T13:30:00+09:00"
+            "market_data_asof": "2026-11-18T14:48:00+09:00"
           },
           "thesis": {
             "stance": "BUY",
@@ -10519,8 +10519,8 @@
           "execution": {
             "readiness": "NEEDS_LIVE_RECHECK",
             "source_row_mode": "IMMEDIATE",
-            "as_of": "2026-11-18T13:30:00+09:00",
-            "valid_until": "2026-11-18T13:33:00+09:00",
+            "as_of": "2026-11-18T14:48:00+09:00",
+            "valid_until": "2026-11-18T14:51:00+09:00",
             "action_now": null,
             "action_if_triggered": null,
             "required_rechecks": [
@@ -10540,18 +10540,18 @@
           "is_held": false,
           "strategy_code": "DATA_CHECK",
           "strategy_ko": "데이터 확인 전 대기",
-          "last_price": 77200.0,
-          "market_data_asof": "2026-11-18T13:30:00+09:00",
-          "session_vwap": 77812.67289281951,
-          "vwap_distance_pct": -0.7873690364851194,
-          "vwap_position_ko": "VWAP 아래 -0.79%",
-          "relative_volume": 0.7480893579599516,
-          "trading_value": 43200428800.0,
-          "price_change_pct": 0.0,
-          "spread_bps": 12.944983818770227,
+          "last_price": 76800.0,
+          "market_data_asof": "2026-11-18T14:48:00+09:00",
+          "session_vwap": 77685.75265290187,
+          "vwap_distance_pct": -1.1401738705672182,
+          "vwap_position_ko": "VWAP 아래 -1.14%",
+          "relative_volume": 0.651116116624359,
+          "trading_value": 48551730950.0,
+          "price_change_pct": -0.52,
+          "spread_bps": 13.012361743656475,
           "day_high": 80400.0,
           "day_low": 75450.0,
-          "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
+          "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
           "execution_condition_ko": "064400.KS의 누락된 2026-11-17 및 이후 정규장 일봉, 최신 가격, 실제 거래일·세션·거래정지 여부를 확인한다. / 76,500~76,800원 지지 시험과 76,800원 이상 종가 회복, 다음 확인된 정규장의 같은 구간 재시험을 관찰한다.",
           "risk_condition_ko": "75,400 이하 하락, 종가 확인 후 신규 진입 보류·보유 위험 대응 계획 재확인",
           "data_status_ko": "시세 유효기간 만료",
@@ -10577,7 +10577,7 @@
             "provider_blockers": [
               "work_packet_row_expired"
             ],
-            "row_valid_until": "2026-11-18T13:33:00+09:00",
+            "row_valid_until": "2026-11-18T14:51:00+09:00",
             "expired_at_build": true,
             "investor_state": "RECHECK",
             "investor_label": "주문 전 재확인"
@@ -10655,12 +10655,12 @@
               "keep_core_fraction": 1.0,
               "reentry_condition": "현재 이익실현 주문은 설정하지 않는다. 저항대 접근 시 최신 가격·보유원가·추세를 확인해 부분 이익실현 필요성을 재평가한다.",
               "reason_codes": [
-                "NO_ACTIVE_PROFIT_TAKING",
                 "PRICE_UPDATE_REQUIRED",
-                "SUPPORT_BROKEN",
-                "MOMENTUM_FADING",
                 "HIGH_VOLATILITY",
-                "NO_CONFIRMED_INVALIDATION"
+                "NO_CONFIRMED_INVALIDATION",
+                "MOMENTUM_FADING",
+                "NO_ACTIVE_PROFIT_TAKING",
+                "SUPPORT_BROKEN"
               ]
             },
             "rationale": "논지는 우호적이지만 아직 실행 타이밍 확인이 부족해 조건부 후보로 두는 편이 안전합니다.",
@@ -10683,7 +10683,7 @@
             "strategy_code": "WAIT_CLOSE",
             "strategy_ko": "종가 확인 후 판단",
             "decision_state_ko": "조건 충족, 종가 확인 대기",
-            "market_data_asof": "2026-11-18T13:30:00+09:00"
+            "market_data_asof": "2026-11-18T14:48:00+09:00"
           },
           "thesis": {
             "stance": "HOLD",
@@ -10944,8 +10944,8 @@
           "execution": {
             "readiness": "NEEDS_LIVE_RECHECK",
             "source_row_mode": "IMMEDIATE",
-            "as_of": "2026-11-18T13:30:00+09:00",
-            "valid_until": "2026-11-18T13:33:00+09:00",
+            "as_of": "2026-11-18T14:48:00+09:00",
+            "valid_until": "2026-11-18T14:51:00+09:00",
             "action_now": null,
             "action_if_triggered": null,
             "required_rechecks": [
@@ -10965,15 +10965,15 @@
           "is_held": false,
           "strategy_code": "DATA_CHECK",
           "strategy_ko": "데이터 확인 전 대기",
-          "last_price": 220750.0,
-          "market_data_asof": "2026-11-18T13:30:00+09:00",
-          "session_vwap": 222607.37446525565,
-          "vwap_distance_pct": -0.8343723875803288,
-          "vwap_position_ko": "VWAP 아래 -0.83%",
-          "relative_volume": 0.5576113901138605,
-          "trading_value": 55574376250.0,
-          "price_change_pct": 2.44,
-          "spread_bps": 22.650056625141563,
+          "last_price": 223000.0,
+          "market_data_asof": "2026-11-18T14:48:00+09:00",
+          "session_vwap": 222535.04481885335,
+          "vwap_distance_pct": 0.20893571236166864,
+          "vwap_position_ko": "VWAP 위 +0.21%",
+          "relative_volume": 0.4760554429414278,
+          "trading_value": 61245872500.0,
+          "price_change_pct": 3.48,
+          "spread_bps": 22.396416573348265,
           "day_high": 229000.0,
           "day_low": 209000.0,
           "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
@@ -11002,7 +11002,7 @@
             "provider_blockers": [
               "work_packet_row_expired"
             ],
-            "row_valid_until": "2026-11-18T13:33:00+09:00",
+            "row_valid_until": "2026-11-18T14:51:00+09:00",
             "expired_at_build": true,
             "investor_state": "RECHECK",
             "investor_label": "주문 전 재확인"
@@ -11081,8 +11081,8 @@
               "reentry_condition": "194200~195800원 지지 회복 또는 219500원 돌파 후 다음 확인된 거래일 지지 유지와 거래 개선을 확인한다. 익절·위험 축소 사유가 해소되고 비용 차감 손익비와 잔여 손실예산이 충족될 때 별도로 재평가한다. 자동 재매수는 없다.",
               "reason_codes": [
                 "PROFIT_TAKING",
-                "EXTENDED_MOVE",
-                "FADING_MOMENTUM"
+                "FADING_MOMENTUM",
+                "EXTENDED_MOVE"
               ]
             },
             "rationale": "논지는 우호적이지만 아직 실행 타이밍 확인이 부족해 조건부 후보로 두는 편이 안전합니다.",
@@ -11105,7 +11105,7 @@
             "strategy_code": "WAIT_CLOSE",
             "strategy_ko": "종가 확인 후 판단",
             "decision_state_ko": "조건 충족, 종가 확인 대기",
-            "market_data_asof": "2026-11-18T13:30:00+09:00"
+            "market_data_asof": "2026-11-18T14:48:00+09:00"
           },
           "thesis": {
             "stance": "HOLD",
@@ -11330,8 +11330,8 @@
           "execution": {
             "readiness": "NEEDS_LIVE_RECHECK",
             "source_row_mode": "IMMEDIATE",
-            "as_of": "2026-11-18T13:30:00+09:00",
-            "valid_until": "2026-11-18T13:33:00+09:00",
+            "as_of": "2026-11-18T14:48:00+09:00",
+            "valid_until": "2026-11-18T14:51:00+09:00",
             "action_now": null,
             "action_if_triggered": null,
             "required_rechecks": [
@@ -11351,15 +11351,15 @@
           "is_held": false,
           "strategy_code": "DATA_CHECK",
           "strategy_ko": "데이터 확인 전 대기",
-          "last_price": 10080.0,
-          "market_data_asof": "2026-11-18T13:30:00+09:00",
-          "session_vwap": 10364.590040763173,
-          "vwap_distance_pct": -2.7457915811807343,
-          "vwap_position_ko": "VWAP 아래 -2.75%",
-          "relative_volume": 0.9572733208713861,
-          "trading_value": 14739659695.0,
-          "price_change_pct": -3.72,
-          "spread_bps": 9.925558312655086,
+          "last_price": 10060.0,
+          "market_data_asof": "2026-11-18T14:48:00+09:00",
+          "session_vwap": 10337.607472413132,
+          "vwap_distance_pct": -2.685413168897677,
+          "vwap_position_ko": "VWAP 아래 -2.69%",
+          "relative_volume": 0.799057438227522,
+          "trading_value": 15856670025.0,
+          "price_change_pct": -3.92,
+          "spread_bps": 9.945300845350571,
           "day_high": 10940.0,
           "day_low": 9860.0,
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
@@ -11388,7 +11388,7 @@
             "provider_blockers": [
               "work_packet_row_expired"
             ],
-            "row_valid_until": "2026-11-18T13:33:00+09:00",
+            "row_valid_until": "2026-11-18T14:51:00+09:00",
             "expired_at_build": true,
             "investor_state": "RECHECK",
             "investor_label": "주문 전 재확인"
@@ -11461,8 +11461,8 @@
               "keep_core_fraction": null,
               "reentry_condition": "차익실현 계획은 없다. 위험축소 사유 해소와 가격 구조 개선 후 신규 진입을 별도로 재판단한다.",
               "reason_codes": [
-                "HIGH_VOLATILITY",
                 "DETERIORATED_REWARD_RISK",
+                "HIGH_VOLATILITY",
                 "RALLY_REJECTION"
               ]
             },
@@ -11485,7 +11485,7 @@
             "strategy_code": "WAIT_CLOSE",
             "strategy_ko": "종가 확인 후 판단",
             "decision_state_ko": "조건 충족, 종가 확인 대기",
-            "market_data_asof": "2026-11-18T13:30:00+09:00"
+            "market_data_asof": "2026-11-18T14:48:00+09:00"
           },
           "thesis": {
             "stance": "REDUCE",
@@ -11722,8 +11722,8 @@
           "execution": {
             "readiness": "NEEDS_LIVE_RECHECK",
             "source_row_mode": "IMMEDIATE",
-            "as_of": "2026-11-18T13:30:00+09:00",
-            "valid_until": "2026-11-18T13:33:00+09:00",
+            "as_of": "2026-11-18T14:48:00+09:00",
+            "valid_until": "2026-11-18T14:51:00+09:00",
             "action_now": null,
             "action_if_triggered": null,
             "required_rechecks": [
@@ -11743,15 +11743,15 @@
           "is_held": false,
           "strategy_code": "DATA_CHECK",
           "strategy_ko": "데이터 확인 전 대기",
-          "last_price": 4220.0,
-          "market_data_asof": "2026-11-18T13:30:00+09:00",
-          "session_vwap": 4470.029785513965,
-          "vwap_distance_pct": -5.59347023423059,
-          "vwap_position_ko": "VWAP 아래 -5.59%",
-          "relative_volume": 1.7157740973399318,
-          "trading_value": 6248028833.0,
-          "price_change_pct": -5.8,
-          "spread_bps": 11.855364552459987,
+          "last_price": 4185.0,
+          "market_data_asof": "2026-11-18T14:48:00+09:00",
+          "session_vwap": 4454.693020000756,
+          "vwap_distance_pct": -6.054132547178536,
+          "vwap_position_ko": "VWAP 아래 -6.05%",
+          "relative_volume": 1.4045898715865424,
+          "trading_value": 6594478084.0,
+          "price_change_pct": -6.58,
+          "spread_bps": 35.90664272890485,
           "day_high": 4815.0,
           "day_low": 4120.0,
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
@@ -11780,7 +11780,7 @@
             "provider_blockers": [
               "work_packet_row_expired"
             ],
-            "row_valid_until": "2026-11-18T13:33:00+09:00",
+            "row_valid_until": "2026-11-18T14:51:00+09:00",
             "expired_at_build": true,
             "investor_state": "RECHECK",
             "investor_label": "주문 전 재확인"
@@ -11851,11 +11851,11 @@
               "keep_core_fraction": null,
               "reentry_condition": "수익 실현 계획은 적용하지 않는다. 향후 매수는 투자 판단 상향과 별도 승인이 필요하다.",
               "reason_codes": [
-                "SUPPORT_BREAK_CONDITIONAL",
-                "LONG_TERM_DOWNTREND",
-                "WEAK_PROFITABILITY",
+                "NEGATIVE_CASH_FLOW",
                 "UNFAVORABLE_REWARD_RISK",
-                "NEGATIVE_CASH_FLOW"
+                "SUPPORT_BREAK_CONDITIONAL",
+                "WEAK_PROFITABILITY",
+                "LONG_TERM_DOWNTREND"
               ]
             },
             "rationale": "즉시 강한 액션보다 관찰 또는 유지 중심으로 해석했습니다.",
@@ -11876,7 +11876,7 @@
             "strategy_code": "WAIT_CLOSE",
             "strategy_ko": "종가 확인 후 판단",
             "decision_state_ko": "조건 충족, 종가 확인 대기",
-            "market_data_asof": "2026-11-18T13:30:00+09:00"
+            "market_data_asof": "2026-11-18T14:48:00+09:00"
           },
           "thesis": {
             "stance": "REDUCE",
@@ -12126,8 +12126,8 @@
           "execution": {
             "readiness": "NEEDS_LIVE_RECHECK",
             "source_row_mode": "IMMEDIATE",
-            "as_of": "2026-11-18T13:30:00+09:00",
-            "valid_until": "2026-11-18T13:33:00+09:00",
+            "as_of": "2026-11-18T14:48:00+09:00",
+            "valid_until": "2026-11-18T14:51:00+09:00",
             "action_now": null,
             "action_if_triggered": null,
             "required_rechecks": [
@@ -12147,15 +12147,15 @@
           "is_held": false,
           "strategy_code": "DATA_CHECK",
           "strategy_ko": "데이터 확인 전 대기",
-          "last_price": 12210.0,
-          "market_data_asof": "2026-11-18T13:30:00+09:00",
-          "session_vwap": 12214.183886977335,
-          "vwap_distance_pct": -0.03425433099787378,
-          "vwap_position_ko": "VWAP 아래 -0.03%",
-          "relative_volume": 0.5615927481212748,
-          "trading_value": 9982066210.0,
-          "price_change_pct": 1.58,
-          "spread_bps": 8.186655751125665,
+          "last_price": 12150.0,
+          "market_data_asof": "2026-11-18T14:48:00+09:00",
+          "session_vwap": 12204.176981468701,
+          "vwap_distance_pct": -0.44392163069222335,
+          "vwap_position_ko": "VWAP 아래 -0.44%",
+          "relative_volume": 0.4741779013717538,
+          "trading_value": 10876301505.0,
+          "price_change_pct": 1.08,
+          "spread_bps": 16.474464579901152,
           "day_high": 12790.0,
           "day_low": 11650.0,
           "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
@@ -12184,7 +12184,7 @@
             "provider_blockers": [
               "work_packet_row_expired"
             ],
-            "row_valid_until": "2026-11-18T13:33:00+09:00",
+            "row_valid_until": "2026-11-18T14:51:00+09:00",
             "expired_at_build": true,
             "investor_state": "RECHECK",
             "investor_label": "주문 전 재확인"
@@ -12253,10 +12253,10 @@
               "keep_core_fraction": null,
               "reentry_condition": "",
               "reason_codes": [
-                "WEAK_EARNINGS",
                 "SUPPORT_BROKEN",
                 "MOMENTUM_DETERIORATION",
-                "DETERIORATED_REWARD_RISK"
+                "DETERIORATED_REWARD_RISK",
+                "WEAK_EARNINGS"
               ]
             },
             "rationale": "즉시 강한 액션보다 관찰 또는 유지 중심으로 해석했습니다.",
@@ -12277,7 +12277,7 @@
             "strategy_code": "AVOID",
             "strategy_ko": "신규 매수 회피",
             "decision_state_ko": "실행 조건 감시 중",
-            "market_data_asof": "2026-11-18T13:30:00+09:00"
+            "market_data_asof": "2026-11-18T14:48:00+09:00"
           },
           "thesis": {
             "stance": "HOLD",
@@ -12530,8 +12530,8 @@
           "execution": {
             "readiness": "NEEDS_LIVE_RECHECK",
             "source_row_mode": "IMMEDIATE",
-            "as_of": "2026-11-18T13:30:00+09:00",
-            "valid_until": "2026-11-18T13:33:00+09:00",
+            "as_of": "2026-11-18T14:48:00+09:00",
+            "valid_until": "2026-11-18T14:51:00+09:00",
             "action_now": null,
             "action_if_triggered": null,
             "required_rechecks": [
@@ -12551,15 +12551,15 @@
           "is_held": false,
           "strategy_code": "DATA_CHECK",
           "strategy_ko": "데이터 확인 전 대기",
-          "last_price": 1380000.0,
-          "market_data_asof": "2026-11-18T13:30:00+09:00",
-          "session_vwap": 1384742.9943955163,
-          "vwap_distance_pct": -0.3425180278732398,
-          "vwap_position_ko": "VWAP 아래 -0.34%",
-          "relative_volume": 0.454130820489472,
-          "trading_value": 29402248000.0,
-          "price_change_pct": -2.4,
-          "spread_bps": 7.249003262051468,
+          "last_price": 1373000.0,
+          "market_data_asof": "2026-11-18T14:48:00+09:00",
+          "session_vwap": 1382960.3905953735,
+          "vwap_distance_pct": -0.7202224057252571,
+          "vwap_position_ko": "VWAP 아래 -0.72%",
+          "relative_volume": 0.4359279925240176,
+          "trading_value": 36468665500.0,
+          "price_change_pct": -2.9,
+          "spread_bps": 7.280669821623589,
           "day_high": 1403000.0,
           "day_low": 1373000.0,
           "sync_summary_ko": "섹터 비교 없음 / 지수 동반 하락",
@@ -12588,7 +12588,7 @@
             "provider_blockers": [
               "work_packet_row_expired"
             ],
-            "row_valid_until": "2026-11-18T13:33:00+09:00",
+            "row_valid_until": "2026-11-18T14:51:00+09:00",
             "expired_at_build": true,
             "investor_state": "RECHECK",
             "investor_label": "주문 전 재확인"
@@ -12665,11 +12665,11 @@
               "reentry_condition": "현재 이익실현 계획은 적용하지 않는다. 향후 매수는 공시 검증과 가격 구조 재심사를 거친 별도 결정이 필요하다.",
               "reason_codes": [
                 "현재_가격과_계좌위험_확인필요",
-                "상승과열_미확인",
-                "높은_변동성",
                 "이익실현_근거_부족",
-                "중대한_사업손상_미확인",
                 "지지선_이탈_미확인",
+                "상승과열_미확인",
+                "중대한_사업손상_미확인",
+                "높은_변동성",
                 "핵심_지지선_이탈"
               ]
             },
@@ -12689,7 +12689,7 @@
       "coverage": {
         "status": "COMPLETE",
         "complete": true,
-        "source_run_id": "20261118T131252_local-scheduler-kr-overlay_only",
+        "source_run_id": "20261118T143232_local-scheduler-kr-overlay_only",
         "ticker_universe_mode": "config_plus_account",
         "account_snapshot_status": "loaded",
         "expected_holding_count": 13,
@@ -25062,7 +25062,7 @@
           "report_ticker_count": 30,
           "current_ticker_count": 30,
           "report_source_run_id": "20261118T131252_local-scheduler-kr-overlay_only",
-          "current_analysis_source_run_id": "20261118T125233_local-scheduler-kr-overlay_only"
+          "current_analysis_source_run_id": "20261118T131252_local-scheduler-kr-overlay_only"
         },
         "analysis_only": true
       },
@@ -25075,7 +25075,7 @@
         "schema": "tradingagents.manual-trade-plan/v1",
         "market": "KR",
         "currency": "KRW",
-        "account_asof": "2026-11-18T13:31:38.246609+09:00",
+        "account_asof": "2026-11-18T14:49:37.459348+09:00",
         "account_fresh": true,
         "fx_krw_per_usd": null,
         "fx_asof": null,
@@ -25089,16 +25089,16 @@
           "soft_sell_rounding": "nearest_with_core",
           "evidence": "Docs/balanced_capital_policy_ko.md",
           "status": "provisional_balanced_policy_not_optimality_claim",
-          "calculated_at": "2026-11-18T14:02:16.591129+09:00"
+          "calculated_at": "2026-11-18T16:41:41.354613+09:00"
         },
         "capital_context": {
-          "account_value_krw": 8257052.0,
-          "previous_cash_buffer_krw": 1651411.0,
+          "account_value_krw": 8222612.0,
+          "previous_cash_buffer_krw": 1644523.0,
           "available_cash_krw": 976652.0,
           "buying_power_krw": 976652.0,
-          "min_cash_buffer_krw": 1651411,
+          "min_cash_buffer_krw": 1644523,
           "new_buy_budget_krw": 0.0,
-          "cash_buffer_shortfall_krw": 674759.0
+          "cash_buffer_shortfall_krw": 667871.0
         },
         "fee_evidence_asof": "2026-09-29",
         "rows": [
@@ -25115,16 +25115,16 @@
             "quantity_revision": {
               "policy_id": "balanced-capital-v1",
               "original_quantity": 1,
-              "target_shares": 1.061524334251607,
+              "target_shares": 1.054178145087236,
               "revised_quantity": 2,
               "holding_fraction": 1.0,
               "risk_reduction": true,
               "full_exit": true,
-              "recalculated_at": "2026-11-18T14:02:16.591129+09:00"
+              "recalculated_at": "2026-11-18T16:41:41.354613+09:00"
             },
             "zero_reason_code": null,
-            "allocated_amount_krw": -1156000.0,
-            "target_quantity": 1.061524334251607,
+            "allocated_amount_krw": -1148000.0,
+            "target_quantity": 1.054178145087236,
             "one_share_funding": null,
             "minimum_lot_review": null,
             "price_low": 1089000.0,
@@ -25150,13 +25150,13 @@
             "status": "RECHECK",
             "status_label": "최신 정보 재확인",
             "reasons": [
-              "정수 수량 전략: 목표 1.062주 → 2주, 보유량의 100.0% 감축. 위험 축소 최소 단위를 적용합니다.",
+              "정수 수량 전략: 목표 1.054주 → 2주, 보유량의 100.0% 감축. 위험 축소 최소 단위를 적용합니다.",
               "표시 가격은 조건 기준값이며 체결 보장 범위가 아닙니다. 조건 충족 후 호가와 수량을 다시 계산합니다."
             ],
-            "account_asof": "2026-11-18T13:31:38.246609+09:00",
+            "account_asof": "2026-11-18T14:49:37.459348+09:00",
             "price_asof": "2026-11-18T05:08:02.003660+09:00",
-            "quote_asof": "2026-11-18T13:29:00+09:00",
-            "valid_until": "2026-11-18T13:32:00+09:00",
+            "quote_asof": "2026-11-18T14:48:00+09:00",
+            "valid_until": "2026-11-18T14:51:00+09:00",
             "source": "CURRENT_PORTFOLIO_ALLOCATION_AND_STRUCTURED_THESIS",
             "order_ready": false
           },
@@ -25226,10 +25226,10 @@
             "reasons": [
               "진입 조건과 계좌 배정이 확정되지 않았습니다."
             ],
-            "account_asof": "2026-11-18T13:31:38.246609+09:00",
+            "account_asof": "2026-11-18T14:49:37.459348+09:00",
             "price_asof": "2026-11-18T07:05:52.745728+09:00",
-            "quote_asof": "2026-11-18T13:30:00+09:00",
-            "valid_until": "2026-11-18T13:33:00+09:00",
+            "quote_asof": "2026-11-18T14:48:00+09:00",
+            "valid_until": "2026-11-18T14:51:00+09:00",
             "source": "CURRENT_PORTFOLIO_ALLOCATION_AND_STRUCTURED_THESIS",
             "order_ready": false
           },
@@ -25302,13 +25302,13 @@
             "status": "NO_QUANTITY",
             "status_label": "계획 수량 0주",
             "reasons": [
-              "가용 현금에서 최소 보유 현금 1,651,411원을 확보하고 주문가능금액 한도를 적용하면 신규 매수 예산은 0원입니다.",
+              "가용 현금에서 최소 보유 현금 1,644,523원을 확보하고 주문가능금액 한도를 적용하면 신규 매수 예산은 0원입니다.",
               "분석 방향은 있으나 배정 금액이 0원입니다."
             ],
-            "account_asof": "2026-11-18T13:31:38.246609+09:00",
+            "account_asof": "2026-11-18T14:49:37.459348+09:00",
             "price_asof": "2026-11-18T07:26:58.735506+09:00",
-            "quote_asof": "2026-11-18T13:30:00+09:00",
-            "valid_until": "2026-11-18T13:33:00+09:00",
+            "quote_asof": "2026-11-18T14:48:00+09:00",
+            "valid_until": "2026-11-18T14:51:00+09:00",
             "source": "CURRENT_PORTFOLIO_ALLOCATION_AND_STRUCTURED_THESIS",
             "order_ready": false
           },
@@ -25385,13 +25385,13 @@
             "status": "NO_QUANTITY",
             "status_label": "계획 수량 0주",
             "reasons": [
-              "가용 현금에서 최소 보유 현금 1,651,411원을 확보하고 주문가능금액 한도를 적용하면 신규 매수 예산은 0원입니다.",
+              "가용 현금에서 최소 보유 현금 1,644,523원을 확보하고 주문가능금액 한도를 적용하면 신규 매수 예산은 0원입니다.",
               "분석 방향은 있으나 배정 금액이 0원입니다."
             ],
-            "account_asof": "2026-11-18T13:31:38.246609+09:00",
+            "account_asof": "2026-11-18T14:49:37.459348+09:00",
             "price_asof": "2026-11-18T06:46:21.774172+09:00",
-            "quote_asof": "2026-11-18T13:30:00+09:00",
-            "valid_until": "2026-11-18T13:33:00+09:00",
+            "quote_asof": "2026-11-18T14:48:00+09:00",
+            "valid_until": "2026-11-18T14:51:00+09:00",
             "source": "CURRENT_PORTFOLIO_ALLOCATION_AND_STRUCTURED_THESIS",
             "order_ready": false
           },
@@ -25408,16 +25408,16 @@
             "quantity_revision": {
               "policy_id": "balanced-capital-v1",
               "original_quantity": 2,
-              "target_shares": 2.0727272727272728,
+              "target_shares": 2.067379679144385,
               "revised_quantity": 3,
               "holding_fraction": 0.3,
               "risk_reduction": true,
               "full_exit": false,
-              "recalculated_at": "2026-11-18T14:02:16.591129+09:00"
+              "recalculated_at": "2026-11-18T16:41:41.354613+09:00"
             },
             "zero_reason_code": null,
-            "allocated_amount_krw": -387600.0,
-            "target_quantity": 2.0727272727272728,
+            "allocated_amount_krw": -386600.0,
+            "target_quantity": 2.067379679144385,
             "one_share_funding": null,
             "minimum_lot_review": null,
             "price_low": 187000.0,
@@ -25443,13 +25443,13 @@
             "status": "RECHECK",
             "status_label": "최신 정보 재확인",
             "reasons": [
-              "정수 수량 전략: 목표 2.073주 → 3주, 보유량의 30.0% 감축. 위험 축소 최소 단위를 적용합니다.",
+              "정수 수량 전략: 목표 2.067주 → 3주, 보유량의 30.0% 감축. 위험 축소 최소 단위를 적용합니다.",
               "표시 가격은 조건 기준값이며 체결 보장 범위가 아닙니다. 조건 충족 후 호가와 수량을 다시 계산합니다."
             ],
-            "account_asof": "2026-11-18T13:31:38.246609+09:00",
+            "account_asof": "2026-11-18T14:49:37.459348+09:00",
             "price_asof": "2026-11-18T05:05:48.375468+09:00",
-            "quote_asof": "2026-11-18T13:29:00+09:00",
-            "valid_until": "2026-11-18T13:32:00+09:00",
+            "quote_asof": "2026-11-18T14:48:00+09:00",
+            "valid_until": "2026-11-18T14:51:00+09:00",
             "source": "CURRENT_PORTFOLIO_ALLOCATION_AND_STRUCTURED_THESIS",
             "order_ready": false
           },
@@ -25466,16 +25466,16 @@
             "quantity_revision": {
               "policy_id": "balanced-capital-v1",
               "original_quantity": 1,
-              "target_shares": 1.0545454545454545,
+              "target_shares": 1.05,
               "revised_quantity": 2,
               "holding_fraction": 0.5,
               "risk_reduction": true,
               "full_exit": false,
-              "recalculated_at": "2026-11-18T14:02:16.591129+09:00"
+              "recalculated_at": "2026-11-18T16:41:41.354613+09:00"
             },
             "zero_reason_code": null,
-            "allocated_amount_krw": -116000.0,
-            "target_quantity": 1.0545454545454545,
+            "allocated_amount_krw": -115500.0,
+            "target_quantity": 1.05,
             "one_share_funding": null,
             "minimum_lot_review": null,
             "price_low": 110000.0,
@@ -25501,13 +25501,13 @@
             "status": "RECHECK",
             "status_label": "최신 정보 재확인",
             "reasons": [
-              "정수 수량 전략: 목표 1.055주 → 2주, 보유량의 50.0% 감축. 위험 축소 최소 단위를 적용합니다.",
+              "정수 수량 전략: 목표 1.050주 → 2주, 보유량의 50.0% 감축. 위험 축소 최소 단위를 적용합니다.",
               "표시 가격은 조건 기준값이며 체결 보장 범위가 아닙니다. 조건 충족 후 호가와 수량을 다시 계산합니다."
             ],
-            "account_asof": "2026-11-18T13:31:38.246609+09:00",
+            "account_asof": "2026-11-18T14:49:37.459348+09:00",
             "price_asof": "2026-11-18T05:06:59.621730+09:00",
-            "quote_asof": "2026-11-18T13:29:00+09:00",
-            "valid_until": "2026-11-18T13:32:00+09:00",
+            "quote_asof": "2026-11-18T14:48:00+09:00",
+            "valid_until": "2026-11-18T14:51:00+09:00",
             "source": "CURRENT_PORTFOLIO_ALLOCATION_AND_STRUCTURED_THESIS",
             "order_ready": false
           },
@@ -25524,16 +25524,16 @@
             "quantity_revision": {
               "policy_id": "balanced-capital-v1",
               "original_quantity": 3,
-              "target_shares": 3.0842036553524803,
+              "target_shares": 3.0783289817232378,
               "revised_quantity": 4,
               "holding_fraction": 0.2222222222222222,
               "risk_reduction": true,
               "full_exit": false,
-              "recalculated_at": "2026-11-18T14:02:16.591129+09:00"
+              "recalculated_at": "2026-11-18T16:41:41.354613+09:00"
             },
             "zero_reason_code": null,
-            "allocated_amount_krw": -47250.0,
-            "target_quantity": 3.0842036553524803,
+            "allocated_amount_krw": -47160.0,
+            "target_quantity": 3.0783289817232378,
             "one_share_funding": null,
             "minimum_lot_review": null,
             "price_low": 15320.0,
@@ -25559,13 +25559,13 @@
             "status": "RECHECK",
             "status_label": "최신 정보 재확인",
             "reasons": [
-              "정수 수량 전략: 목표 3.084주 → 4주, 보유량의 22.2% 감축. 위험 축소 최소 단위를 적용합니다.",
+              "정수 수량 전략: 목표 3.078주 → 4주, 보유량의 22.2% 감축. 위험 축소 최소 단위를 적용합니다.",
               "표시 가격은 조건 기준값이며 체결 보장 범위가 아닙니다. 조건 충족 후 호가와 수량을 다시 계산합니다."
             ],
-            "account_asof": "2026-11-18T13:31:38.246609+09:00",
+            "account_asof": "2026-11-18T14:49:37.459348+09:00",
             "price_asof": "2026-11-18T05:09:55.486871+09:00",
-            "quote_asof": "2026-11-18T13:29:00+09:00",
-            "valid_until": "2026-11-18T13:32:00+09:00",
+            "quote_asof": "2026-11-18T14:48:00+09:00",
+            "valid_until": "2026-11-18T14:51:00+09:00",
             "source": "CURRENT_PORTFOLIO_ALLOCATION_AND_STRUCTURED_THESIS",
             "order_ready": false
           },
@@ -25638,13 +25638,13 @@
             "status": "NO_QUANTITY",
             "status_label": "계획 수량 0주",
             "reasons": [
-              "가용 현금에서 최소 보유 현금 1,651,411원을 확보하고 주문가능금액 한도를 적용하면 신규 매수 예산은 0원입니다.",
+              "가용 현금에서 최소 보유 현금 1,644,523원을 확보하고 주문가능금액 한도를 적용하면 신규 매수 예산은 0원입니다.",
               "분석 방향은 있으나 배정 금액이 0원입니다."
             ],
-            "account_asof": "2026-11-18T13:31:38.246609+09:00",
+            "account_asof": "2026-11-18T14:49:37.459348+09:00",
             "price_asof": "2026-11-18T06:31:12.810519+09:00",
-            "quote_asof": "2026-11-18T13:30:00+09:00",
-            "valid_until": "2026-11-18T13:33:00+09:00",
+            "quote_asof": "2026-11-18T14:48:00+09:00",
+            "valid_until": "2026-11-18T14:51:00+09:00",
             "source": "CURRENT_PORTFOLIO_ALLOCATION_AND_STRUCTURED_THESIS",
             "order_ready": false
           },
@@ -25728,13 +25728,13 @@
             "status": "NO_QUANTITY",
             "status_label": "계획 수량 0주",
             "reasons": [
-              "가용 현금에서 최소 보유 현금 1,651,411원을 확보하고 주문가능금액 한도를 적용하면 신규 매수 예산은 0원입니다.",
+              "가용 현금에서 최소 보유 현금 1,644,523원을 확보하고 주문가능금액 한도를 적용하면 신규 매수 예산은 0원입니다.",
               "분석 방향은 있으나 배정 금액이 0원입니다."
             ],
-            "account_asof": "2026-11-18T13:31:38.246609+09:00",
+            "account_asof": "2026-11-18T14:49:37.459348+09:00",
             "price_asof": "2026-11-18T07:06:51.394038+09:00",
-            "quote_asof": "2026-11-18T13:30:00+09:00",
-            "valid_until": "2026-11-18T13:33:00+09:00",
+            "quote_asof": "2026-11-18T14:48:00+09:00",
+            "valid_until": "2026-11-18T14:51:00+09:00",
             "source": "CURRENT_PORTFOLIO_ALLOCATION_AND_STRUCTURED_THESIS",
             "order_ready": false
           },
@@ -25802,13 +25802,13 @@
             "status": "NO_QUANTITY",
             "status_label": "계획 수량 0주",
             "reasons": [
-              "가용 현금에서 최소 보유 현금 1,651,411원을 확보하고 주문가능금액 한도를 적용하면 신규 매수 예산은 0원입니다.",
+              "가용 현금에서 최소 보유 현금 1,644,523원을 확보하고 주문가능금액 한도를 적용하면 신규 매수 예산은 0원입니다.",
               "분석 방향은 있으나 배정 금액이 0원입니다."
             ],
-            "account_asof": "2026-11-18T13:31:38.246609+09:00",
+            "account_asof": "2026-11-18T14:49:37.459348+09:00",
             "price_asof": "2026-11-18T06:45:45.320723+09:00",
-            "quote_asof": "2026-11-18T13:30:00+09:00",
-            "valid_until": "2026-11-18T13:33:00+09:00",
+            "quote_asof": "2026-11-18T14:48:00+09:00",
+            "valid_until": "2026-11-18T14:51:00+09:00",
             "source": "CURRENT_PORTFOLIO_ALLOCATION_AND_STRUCTURED_THESIS",
             "order_ready": false
           },
@@ -25876,14 +25876,14 @@
             "status": "NO_QUANTITY",
             "status_label": "계획 수량 0주",
             "reasons": [
-              "가용 현금에서 최소 보유 현금 1,651,411원을 확보하고 주문가능금액 한도를 적용하면 신규 매수 예산은 0원입니다.",
+              "가용 현금에서 최소 보유 현금 1,644,523원을 확보하고 주문가능금액 한도를 적용하면 신규 매수 예산은 0원입니다.",
               "분석 방향은 있으나 배정 금액이 0원입니다.",
               "표시 가격은 조건 기준값이며 체결 보장 범위가 아닙니다. 조건 충족 후 호가와 수량을 다시 계산합니다."
             ],
-            "account_asof": "2026-11-18T13:31:38.246609+09:00",
+            "account_asof": "2026-11-18T14:49:37.459348+09:00",
             "price_asof": "2026-11-18T06:27:37.296463+09:00",
-            "quote_asof": "2026-11-18T13:30:00+09:00",
-            "valid_until": "2026-11-18T13:33:00+09:00",
+            "quote_asof": "2026-11-18T14:48:00+09:00",
+            "valid_until": "2026-11-18T14:51:00+09:00",
             "source": "CURRENT_PORTFOLIO_ALLOCATION_AND_STRUCTURED_THESIS",
             "order_ready": false
           },
@@ -25900,16 +25900,16 @@
             "quantity_revision": {
               "policy_id": "balanced-capital-v1",
               "original_quantity": 1,
-              "target_shares": 1.0035128805620608,
+              "target_shares": 1.0011709601873535,
               "revised_quantity": 1,
               "holding_fraction": 1.0,
               "risk_reduction": true,
               "full_exit": true,
-              "recalculated_at": "2026-11-18T14:02:16.591129+09:00"
+              "recalculated_at": "2026-11-18T16:41:41.354613+09:00"
             },
             "zero_reason_code": null,
-            "allocated_amount_krw": -42850.0,
-            "target_quantity": 1.0035128805620608,
+            "allocated_amount_krw": -42750.0,
+            "target_quantity": 1.0011709601873535,
             "one_share_funding": null,
             "minimum_lot_review": null,
             "price_low": 42700.0,
@@ -25935,13 +25935,13 @@
             "status": "RECHECK",
             "status_label": "최신 정보 재확인",
             "reasons": [
-              "정수 수량 전략: 목표 1.004주 → 1주, 보유량의 100.0% 감축. 위험 축소 최소 단위를 적용합니다.",
+              "정수 수량 전략: 목표 1.001주 → 1주, 보유량의 100.0% 감축. 위험 축소 최소 단위를 적용합니다.",
               "표시 가격은 조건 기준값이며 체결 보장 범위가 아닙니다. 조건 충족 후 호가와 수량을 다시 계산합니다."
             ],
-            "account_asof": "2026-11-18T13:31:38.246609+09:00",
+            "account_asof": "2026-11-18T14:49:37.459348+09:00",
             "price_asof": "2026-11-18T05:24:59.631472+09:00",
-            "quote_asof": "2026-11-18T13:29:00+09:00",
-            "valid_until": "2026-11-18T13:32:00+09:00",
+            "quote_asof": "2026-11-18T14:48:00+09:00",
+            "valid_until": "2026-11-18T14:51:00+09:00",
             "source": "CURRENT_PORTFOLIO_ALLOCATION_AND_STRUCTURED_THESIS",
             "order_ready": false
           },
@@ -25958,16 +25958,16 @@
             "quantity_revision": {
               "policy_id": "balanced-capital-v1",
               "original_quantity": 1,
-              "target_shares": 1.0077105575326215,
+              "target_shares": 1.008896797153025,
               "revised_quantity": 1,
               "holding_fraction": 1.0,
               "risk_reduction": true,
               "full_exit": true,
-              "recalculated_at": "2026-11-18T14:02:16.591129+09:00"
+              "recalculated_at": "2026-11-18T16:41:41.354613+09:00"
             },
             "zero_reason_code": null,
-            "allocated_amount_krw": -169900.0,
-            "target_quantity": 1.0077105575326215,
+            "allocated_amount_krw": -170100.0,
+            "target_quantity": 1.008896797153025,
             "one_share_funding": null,
             "minimum_lot_review": null,
             "price_low": 168600.0,
@@ -25993,13 +25993,13 @@
             "status": "RECHECK",
             "status_label": "최신 정보 재확인",
             "reasons": [
-              "정수 수량 전략: 목표 1.008주 → 1주, 보유량의 100.0% 감축. 위험 축소 최소 단위를 적용합니다.",
+              "정수 수량 전략: 목표 1.009주 → 1주, 보유량의 100.0% 감축. 위험 축소 최소 단위를 적용합니다.",
               "표시 가격은 조건 기준값이며 체결 보장 범위가 아닙니다. 조건 충족 후 호가와 수량을 다시 계산합니다."
             ],
-            "account_asof": "2026-11-18T13:31:38.246609+09:00",
+            "account_asof": "2026-11-18T14:49:37.459348+09:00",
             "price_asof": "2026-11-18T05:28:12.372889+09:00",
-            "quote_asof": "2026-11-18T13:29:00+09:00",
-            "valid_until": "2026-11-18T13:32:00+09:00",
+            "quote_asof": "2026-11-18T14:48:00+09:00",
+            "valid_until": "2026-11-18T14:51:00+09:00",
             "source": "CURRENT_PORTFOLIO_ALLOCATION_AND_STRUCTURED_THESIS",
             "order_ready": false
           },
@@ -26073,13 +26073,13 @@
             "status": "NO_QUANTITY",
             "status_label": "계획 수량 0주",
             "reasons": [
-              "가용 현금에서 최소 보유 현금 1,651,411원을 확보하고 주문가능금액 한도를 적용하면 신규 매수 예산은 0원입니다.",
+              "가용 현금에서 최소 보유 현금 1,644,523원을 확보하고 주문가능금액 한도를 적용하면 신규 매수 예산은 0원입니다.",
               "분석 방향은 있으나 배정 금액이 0원입니다."
             ],
-            "account_asof": "2026-11-18T13:31:38.246609+09:00",
+            "account_asof": "2026-11-18T14:49:37.459348+09:00",
             "price_asof": "2026-11-18T06:48:12.209563+09:00",
-            "quote_asof": "2026-11-18T13:30:00+09:00",
-            "valid_until": "2026-11-18T13:33:00+09:00",
+            "quote_asof": "2026-11-18T14:48:00+09:00",
+            "valid_until": "2026-11-18T14:51:00+09:00",
             "source": "CURRENT_PORTFOLIO_ALLOCATION_AND_STRUCTURED_THESIS",
             "order_ready": false
           },
@@ -26096,16 +26096,16 @@
             "quantity_revision": {
               "policy_id": "balanced-capital-v1",
               "original_quantity": 0,
-              "target_shares": 0.9887106357694593,
+              "target_shares": 0.9857397504456328,
               "revised_quantity": 1,
               "holding_fraction": 1.0,
               "risk_reduction": true,
               "full_exit": true,
-              "recalculated_at": "2026-11-18T14:02:16.591129+09:00"
+              "recalculated_at": "2026-11-18T16:41:41.354613+09:00"
             },
             "zero_reason_code": null,
-            "allocated_amount_krw": -166400.0,
-            "target_quantity": 0.9887106357694593,
+            "allocated_amount_krw": -165900.0,
+            "target_quantity": 0.9857397504456328,
             "one_share_funding": null,
             "minimum_lot_review": null,
             "price_low": 168300.0,
@@ -26131,13 +26131,13 @@
             "status": "RECHECK",
             "status_label": "최신 정보 재확인",
             "reasons": [
-              "정수 수량 전략: 목표 0.989주 → 1주, 보유량의 100.0% 감축. 위험 축소 최소 단위를 적용합니다.",
+              "정수 수량 전략: 목표 0.986주 → 1주, 보유량의 100.0% 감축. 위험 축소 최소 단위를 적용합니다.",
               "표시 가격은 조건 기준값이며 체결 보장 범위가 아닙니다. 조건 충족 후 호가와 수량을 다시 계산합니다."
             ],
-            "account_asof": "2026-11-18T13:31:38.246609+09:00",
+            "account_asof": "2026-11-18T14:49:37.459348+09:00",
             "price_asof": "2026-11-18T05:25:04.607762+09:00",
-            "quote_asof": "2026-11-18T13:30:00+09:00",
-            "valid_until": "2026-11-18T13:33:00+09:00",
+            "quote_asof": "2026-11-18T14:48:00+09:00",
+            "valid_until": "2026-11-18T14:51:00+09:00",
             "source": "CURRENT_PORTFOLIO_ALLOCATION_AND_STRUCTURED_THESIS",
             "order_ready": false
           },
@@ -26154,16 +26154,16 @@
             "quantity_revision": {
               "policy_id": "balanced-capital-v1",
               "original_quantity": 0,
-              "target_shares": 0.9958592132505176,
+              "target_shares": 0.9927536231884058,
               "revised_quantity": 1,
               "holding_fraction": 0.3333333333333333,
               "risk_reduction": true,
               "full_exit": false,
-              "recalculated_at": "2026-11-18T14:02:16.591129+09:00"
+              "recalculated_at": "2026-11-18T16:41:41.354613+09:00"
             },
             "zero_reason_code": null,
-            "allocated_amount_krw": -48100.0,
-            "target_quantity": 0.9958592132505176,
+            "allocated_amount_krw": -47950.0,
+            "target_quantity": 0.9927536231884058,
             "one_share_funding": null,
             "minimum_lot_review": null,
             "price_low": 48300.0,
@@ -26189,13 +26189,13 @@
             "status": "RECHECK",
             "status_label": "최신 정보 재확인",
             "reasons": [
-              "정수 수량 전략: 목표 0.996주 → 1주, 보유량의 33.3% 감축. 위험 축소 최소 단위를 적용합니다.",
+              "정수 수량 전략: 목표 0.993주 → 1주, 보유량의 33.3% 감축. 위험 축소 최소 단위를 적용합니다.",
               "표시 가격은 조건 기준값이며 체결 보장 범위가 아닙니다. 조건 충족 후 호가와 수량을 다시 계산합니다."
             ],
-            "account_asof": "2026-11-18T13:31:38.246609+09:00",
+            "account_asof": "2026-11-18T14:49:37.459348+09:00",
             "price_asof": "2026-11-18T05:31:03.632556+09:00",
-            "quote_asof": "2026-11-18T13:30:00+09:00",
-            "valid_until": "2026-11-18T13:33:00+09:00",
+            "quote_asof": "2026-11-18T14:48:00+09:00",
+            "valid_until": "2026-11-18T14:51:00+09:00",
             "source": "CURRENT_PORTFOLIO_ALLOCATION_AND_STRUCTURED_THESIS",
             "order_ready": false
           },
@@ -26267,13 +26267,13 @@
             "status": "NO_QUANTITY",
             "status_label": "계획 수량 0주",
             "reasons": [
-              "가용 현금에서 최소 보유 현금 1,651,411원을 확보하고 주문가능금액 한도를 적용하면 신규 매수 예산은 0원입니다.",
+              "가용 현금에서 최소 보유 현금 1,644,523원을 확보하고 주문가능금액 한도를 적용하면 신규 매수 예산은 0원입니다.",
               "분석 방향은 있으나 배정 금액이 0원입니다."
             ],
-            "account_asof": "2026-11-18T13:31:38.246609+09:00",
+            "account_asof": "2026-11-18T14:49:37.459348+09:00",
             "price_asof": "2026-11-18T06:25:43.780843+09:00",
-            "quote_asof": "2026-11-18T13:30:00+09:00",
-            "valid_until": "2026-11-18T13:33:00+09:00",
+            "quote_asof": "2026-11-18T14:48:00+09:00",
+            "valid_until": "2026-11-18T14:51:00+09:00",
             "source": "CURRENT_PORTFOLIO_ALLOCATION_AND_STRUCTURED_THESIS",
             "order_ready": false
           },
@@ -26357,13 +26357,13 @@
             "status": "NO_QUANTITY",
             "status_label": "계획 수량 0주",
             "reasons": [
-              "가용 현금에서 최소 보유 현금 1,651,411원을 확보하고 주문가능금액 한도를 적용하면 신규 매수 예산은 0원입니다.",
+              "가용 현금에서 최소 보유 현금 1,644,523원을 확보하고 주문가능금액 한도를 적용하면 신규 매수 예산은 0원입니다.",
               "분석 방향은 있으나 배정 금액이 0원입니다."
             ],
-            "account_asof": "2026-11-18T13:31:38.246609+09:00",
+            "account_asof": "2026-11-18T14:49:37.459348+09:00",
             "price_asof": "2026-11-18T06:27:40.994455+09:00",
-            "quote_asof": "2026-11-18T13:30:00+09:00",
-            "valid_until": "2026-11-18T13:33:00+09:00",
+            "quote_asof": "2026-11-18T14:48:00+09:00",
+            "valid_until": "2026-11-18T14:51:00+09:00",
             "source": "CURRENT_PORTFOLIO_ALLOCATION_AND_STRUCTURED_THESIS",
             "order_ready": false
           },
@@ -26401,7 +26401,7 @@
             "fx_budget_reserve_krw": 0.0,
             "commission_rate": 0.00147,
             "sell_levy_rate": 0.0,
-            "target_weight": 0.0099,
+            "target_weight": 0.01,
             "constraint_review_required": false,
             "condition": "2026-11-16 이후 정규장 일봉, 실제 거래 달력·거래 상태와 가격 조정 기준을 확인한다. 2026-11-17 20:00 KST의 지연 야간 가격은 진입 확인에 사용하지 않는다. / 40,600~40,700원 균형과 41,700~42,300원 저항 회복을 관찰하되 독립 매수 신호로 사용하지 않는다.",
             "trigger_conditions": [
@@ -26432,13 +26432,13 @@
             "status": "NO_QUANTITY",
             "status_label": "계획 수량 0주",
             "reasons": [
-              "가용 현금에서 최소 보유 현금 1,651,411원을 확보하고 주문가능금액 한도를 적용하면 신규 매수 예산은 0원입니다.",
+              "가용 현금에서 최소 보유 현금 1,644,523원을 확보하고 주문가능금액 한도를 적용하면 신규 매수 예산은 0원입니다.",
               "분석 방향은 있으나 배정 금액이 0원입니다."
             ],
-            "account_asof": "2026-11-18T13:31:38.246609+09:00",
+            "account_asof": "2026-11-18T14:49:37.459348+09:00",
             "price_asof": "2026-11-18T05:44:59.890414+09:00",
-            "quote_asof": "2026-11-18T13:30:00+09:00",
-            "valid_until": "2026-11-18T13:33:00+09:00",
+            "quote_asof": "2026-11-18T14:48:00+09:00",
+            "valid_until": "2026-11-18T14:51:00+09:00",
             "source": "CURRENT_PORTFOLIO_ALLOCATION_AND_STRUCTURED_THESIS",
             "order_ready": false
           },
@@ -26509,13 +26509,13 @@
             "status": "NO_QUANTITY",
             "status_label": "계획 수량 0주",
             "reasons": [
-              "가용 현금에서 최소 보유 현금 1,651,411원을 확보하고 주문가능금액 한도를 적용하면 신규 매수 예산은 0원입니다.",
+              "가용 현금에서 최소 보유 현금 1,644,523원을 확보하고 주문가능금액 한도를 적용하면 신규 매수 예산은 0원입니다.",
               "분석 방향은 있으나 배정 금액이 0원입니다."
             ],
-            "account_asof": "2026-11-18T13:31:38.246609+09:00",
+            "account_asof": "2026-11-18T14:49:37.459348+09:00",
             "price_asof": "2026-11-18T06:54:31.290897+09:00",
-            "quote_asof": "2026-11-18T13:30:00+09:00",
-            "valid_until": "2026-11-18T13:33:00+09:00",
+            "quote_asof": "2026-11-18T14:48:00+09:00",
+            "valid_until": "2026-11-18T14:51:00+09:00",
             "source": "CURRENT_PORTFOLIO_ALLOCATION_AND_STRUCTURED_THESIS",
             "order_ready": false
           },
@@ -26587,13 +26587,13 @@
             "status": "NO_QUANTITY",
             "status_label": "계획 수량 0주",
             "reasons": [
-              "가용 현금에서 최소 보유 현금 1,651,411원을 확보하고 주문가능금액 한도를 적용하면 신규 매수 예산은 0원입니다.",
+              "가용 현금에서 최소 보유 현금 1,644,523원을 확보하고 주문가능금액 한도를 적용하면 신규 매수 예산은 0원입니다.",
               "분석 방향은 있으나 배정 금액이 0원입니다."
             ],
-            "account_asof": "2026-11-18T13:31:38.246609+09:00",
+            "account_asof": "2026-11-18T14:49:37.459348+09:00",
             "price_asof": "2026-11-18T07:24:14.088014+09:00",
-            "quote_asof": "2026-11-18T13:30:00+09:00",
-            "valid_until": "2026-11-18T13:33:00+09:00",
+            "quote_asof": "2026-11-18T14:48:00+09:00",
+            "valid_until": "2026-11-18T14:51:00+09:00",
             "source": "CURRENT_PORTFOLIO_ALLOCATION_AND_STRUCTURED_THESIS",
             "order_ready": false
           },
@@ -26663,10 +26663,10 @@
             "reasons": [
               "진입 조건과 계좌 배정이 확정되지 않았습니다."
             ],
-            "account_asof": "2026-11-18T13:31:38.246609+09:00",
+            "account_asof": "2026-11-18T14:49:37.459348+09:00",
             "price_asof": "2026-11-18T07:15:19.534431+09:00",
-            "quote_asof": "2026-11-18T13:30:00+09:00",
-            "valid_until": "2026-11-18T13:33:00+09:00",
+            "quote_asof": "2026-11-18T14:48:00+09:00",
+            "valid_until": "2026-11-18T14:51:00+09:00",
             "source": "CURRENT_PORTFOLIO_ALLOCATION_AND_STRUCTURED_THESIS",
             "order_ready": false
           },
@@ -26734,10 +26734,10 @@
             "reasons": [
               "진입 조건과 계좌 배정이 확정되지 않았습니다."
             ],
-            "account_asof": "2026-11-18T13:31:38.246609+09:00",
+            "account_asof": "2026-11-18T14:49:37.459348+09:00",
             "price_asof": "2026-11-18T07:06:59.994053+09:00",
-            "quote_asof": "2026-11-18T13:30:00+09:00",
-            "valid_until": "2026-11-18T13:33:00+09:00",
+            "quote_asof": "2026-11-18T14:48:00+09:00",
+            "valid_until": "2026-11-18T14:51:00+09:00",
             "source": "CURRENT_PORTFOLIO_ALLOCATION_AND_STRUCTURED_THESIS",
             "order_ready": false
           },
@@ -26808,13 +26808,13 @@
             "status": "NO_QUANTITY",
             "status_label": "계획 수량 0주",
             "reasons": [
-              "가용 현금에서 최소 보유 현금 1,651,411원을 확보하고 주문가능금액 한도를 적용하면 신규 매수 예산은 0원입니다.",
+              "가용 현금에서 최소 보유 현금 1,644,523원을 확보하고 주문가능금액 한도를 적용하면 신규 매수 예산은 0원입니다.",
               "분석 방향은 있으나 배정 금액이 0원입니다."
             ],
-            "account_asof": "2026-11-18T13:31:38.246609+09:00",
+            "account_asof": "2026-11-18T14:49:37.459348+09:00",
             "price_asof": "2026-11-18T06:05:53.079704+09:00",
-            "quote_asof": "2026-11-18T13:30:00+09:00",
-            "valid_until": "2026-11-18T13:33:00+09:00",
+            "quote_asof": "2026-11-18T14:48:00+09:00",
+            "valid_until": "2026-11-18T14:51:00+09:00",
             "source": "CURRENT_PORTFOLIO_ALLOCATION_AND_STRUCTURED_THESIS",
             "order_ready": false
           },
@@ -26882,10 +26882,10 @@
             "reasons": [
               "진입 조건과 계좌 배정이 확정되지 않았습니다."
             ],
-            "account_asof": "2026-11-18T13:31:38.246609+09:00",
+            "account_asof": "2026-11-18T14:49:37.459348+09:00",
             "price_asof": "2026-11-18T06:05:37.960043+09:00",
-            "quote_asof": "2026-11-18T13:30:00+09:00",
-            "valid_until": "2026-11-18T13:33:00+09:00",
+            "quote_asof": "2026-11-18T14:48:00+09:00",
+            "valid_until": "2026-11-18T14:51:00+09:00",
             "source": "CURRENT_PORTFOLIO_ALLOCATION_AND_STRUCTURED_THESIS",
             "order_ready": false
           },
@@ -26902,16 +26902,16 @@
             "quantity_revision": {
               "policy_id": "balanced-capital-v1",
               "original_quantity": 0,
-              "target_shares": 0.96569250317662,
+              "target_shares": 0.9682337992376112,
               "revised_quantity": 1,
               "holding_fraction": 1.0,
               "risk_reduction": true,
               "full_exit": true,
-              "recalculated_at": "2026-11-18T14:02:16.591129+09:00"
+              "recalculated_at": "2026-11-18T16:41:41.354613+09:00"
             },
             "zero_reason_code": null,
-            "allocated_amount_krw": -380000.0,
-            "target_quantity": 0.96569250317662,
+            "allocated_amount_krw": -381000.0,
+            "target_quantity": 0.9682337992376112,
             "one_share_funding": null,
             "minimum_lot_review": null,
             "price_low": 393500.0,
@@ -26937,13 +26937,13 @@
             "status": "RECHECK",
             "status_label": "최신 정보 재확인",
             "reasons": [
-              "정수 수량 전략: 목표 0.966주 → 1주, 보유량의 100.0% 감축. 위험 축소 최소 단위를 적용합니다.",
+              "정수 수량 전략: 목표 0.968주 → 1주, 보유량의 100.0% 감축. 위험 축소 최소 단위를 적용합니다.",
               "표시 가격은 조건 기준값이며 체결 보장 범위가 아닙니다. 조건 충족 후 호가와 수량을 다시 계산합니다."
             ],
-            "account_asof": "2026-11-18T13:31:38.246609+09:00",
+            "account_asof": "2026-11-18T14:49:37.459348+09:00",
             "price_asof": "2026-11-18T05:43:13.288340+09:00",
-            "quote_asof": "2026-11-18T13:30:00+09:00",
-            "valid_until": "2026-11-18T13:33:00+09:00",
+            "quote_asof": "2026-11-18T14:48:00+09:00",
+            "valid_until": "2026-11-18T14:51:00+09:00",
             "source": "CURRENT_PORTFOLIO_ALLOCATION_AND_STRUCTURED_THESIS",
             "order_ready": false
           },
@@ -27009,10 +27009,10 @@
             "reasons": [
               "진입 조건과 계좌 배정이 확정되지 않았습니다."
             ],
-            "account_asof": "2026-11-18T13:31:38.246609+09:00",
+            "account_asof": "2026-11-18T14:49:37.459348+09:00",
             "price_asof": "2026-11-18T06:13:05.577290+09:00",
-            "quote_asof": "2026-11-18T13:30:00+09:00",
-            "valid_until": "2026-11-18T13:33:00+09:00",
+            "quote_asof": "2026-11-18T14:48:00+09:00",
+            "valid_until": "2026-11-18T14:51:00+09:00",
             "source": "CURRENT_PORTFOLIO_ALLOCATION_AND_STRUCTURED_THESIS",
             "order_ready": false
           },
@@ -27029,16 +27029,16 @@
             "quantity_revision": {
               "policy_id": "balanced-capital-v1",
               "original_quantity": 1,
-              "target_shares": 1.0216450216450217,
+              "target_shares": 1.0108225108225108,
               "revised_quantity": 2,
               "holding_fraction": 0.4,
               "risk_reduction": true,
               "full_exit": false,
-              "recalculated_at": "2026-11-18T14:02:16.591129+09:00"
+              "recalculated_at": "2026-11-18T16:41:41.354613+09:00"
             },
             "zero_reason_code": null,
-            "allocated_amount_krw": -236000.0,
-            "target_quantity": 1.0216450216450217,
+            "allocated_amount_krw": -233500.0,
+            "target_quantity": 1.0108225108225108,
             "one_share_funding": null,
             "minimum_lot_review": null,
             "price_low": 231000.0,
@@ -27064,13 +27064,13 @@
             "status": "RECHECK",
             "status_label": "최신 정보 재확인",
             "reasons": [
-              "정수 수량 전략: 목표 1.022주 → 2주, 보유량의 40.0% 감축. 위험 축소 최소 단위를 적용합니다.",
+              "정수 수량 전략: 목표 1.011주 → 2주, 보유량의 40.0% 감축. 위험 축소 최소 단위를 적용합니다.",
               "표시 가격은 조건 기준값이며 체결 보장 범위가 아닙니다. 조건 충족 후 호가와 수량을 다시 계산합니다."
             ],
-            "account_asof": "2026-11-18T13:31:38.246609+09:00",
+            "account_asof": "2026-11-18T14:49:37.459348+09:00",
             "price_asof": "2026-11-18T05:46:29.042657+09:00",
-            "quote_asof": "2026-11-18T13:30:00+09:00",
-            "valid_until": "2026-11-18T13:33:00+09:00",
+            "quote_asof": "2026-11-18T14:48:00+09:00",
+            "valid_until": "2026-11-18T14:51:00+09:00",
             "source": "CURRENT_PORTFOLIO_ALLOCATION_AND_STRUCTURED_THESIS",
             "order_ready": false
           },
@@ -27087,16 +27087,16 @@
             "quantity_revision": {
               "policy_id": "balanced-capital-v1",
               "original_quantity": 0,
-              "target_shares": 0.9852941176470589,
+              "target_shares": 0.991421568627451,
               "revised_quantity": 1,
               "holding_fraction": 1.0,
               "risk_reduction": true,
               "full_exit": true,
-              "recalculated_at": "2026-11-18T14:02:16.591129+09:00"
+              "recalculated_at": "2026-11-18T16:41:41.354613+09:00"
             },
             "zero_reason_code": null,
-            "allocated_amount_krw": -80400.0,
-            "target_quantity": 0.9852941176470589,
+            "allocated_amount_krw": -80900.0,
+            "target_quantity": 0.991421568627451,
             "one_share_funding": null,
             "minimum_lot_review": null,
             "price_low": 81600.0,
@@ -27122,13 +27122,13 @@
             "status": "RECHECK",
             "status_label": "최신 정보 재확인",
             "reasons": [
-              "정수 수량 전략: 목표 0.985주 → 1주, 보유량의 100.0% 감축. 위험 축소 최소 단위를 적용합니다.",
+              "정수 수량 전략: 목표 0.991주 → 1주, 보유량의 100.0% 감축. 위험 축소 최소 단위를 적용합니다.",
               "표시 가격은 조건 기준값이며 체결 보장 범위가 아닙니다. 조건 충족 후 호가와 수량을 다시 계산합니다."
             ],
-            "account_asof": "2026-11-18T13:31:38.246609+09:00",
+            "account_asof": "2026-11-18T14:49:37.459348+09:00",
             "price_asof": "2026-11-18T05:53:08.589938+09:00",
-            "quote_asof": "2026-11-18T13:30:00+09:00",
-            "valid_until": "2026-11-18T13:33:00+09:00",
+            "quote_asof": "2026-11-18T14:48:00+09:00",
+            "valid_until": "2026-11-18T14:51:00+09:00",
             "source": "CURRENT_PORTFOLIO_ALLOCATION_AND_STRUCTURED_THESIS",
             "order_ready": false
           },
@@ -27145,16 +27145,16 @@
             "quantity_revision": {
               "policy_id": "balanced-capital-v1",
               "original_quantity": 0,
-              "target_shares": 0.9441864006700678,
+              "target_shares": 0.9556080103555927,
               "revised_quantity": 1,
               "holding_fraction": 1.0,
               "risk_reduction": true,
               "full_exit": true,
-              "recalculated_at": "2026-11-18T14:02:16.591129+09:00"
+              "recalculated_at": "2026-11-18T16:41:41.354613+09:00"
             },
             "zero_reason_code": null,
-            "allocated_amount_krw": -37200.0,
-            "target_quantity": 0.9441864006700678,
+            "allocated_amount_krw": -37650.0,
+            "target_quantity": 0.9556080103555927,
             "one_share_funding": null,
             "minimum_lot_review": null,
             "price_low": 39399.0,
@@ -27180,13 +27180,13 @@
             "status": "RECHECK",
             "status_label": "최신 정보 재확인",
             "reasons": [
-              "정수 수량 전략: 목표 0.944주 → 1주, 보유량의 100.0% 감축. 위험 축소 최소 단위를 적용합니다.",
+              "정수 수량 전략: 목표 0.956주 → 1주, 보유량의 100.0% 감축. 위험 축소 최소 단위를 적용합니다.",
               "표시 가격은 조건 기준값이며 체결 보장 범위가 아닙니다. 조건 충족 후 호가와 수량을 다시 계산합니다."
             ],
-            "account_asof": "2026-11-18T13:31:38.246609+09:00",
+            "account_asof": "2026-11-18T14:49:37.459348+09:00",
             "price_asof": "2026-11-18T06:04:44.433371+09:00",
-            "quote_asof": "2026-11-18T13:30:00+09:00",
-            "valid_until": "2026-11-18T13:33:00+09:00",
+            "quote_asof": "2026-11-18T14:48:00+09:00",
+            "valid_until": "2026-11-18T14:51:00+09:00",
             "source": "CURRENT_PORTFOLIO_ALLOCATION_AND_STRUCTURED_THESIS",
             "order_ready": false
           }
@@ -27218,8 +27218,8 @@
       "funded_rebalance": {
         "version": "funded-rebalance-v1",
         "market": "KR",
-        "calculated_at": "2026-11-18T14:02:16.591129+09:00",
-        "account_asof": "2026-11-18T13:31:38.246609+09:00",
+        "calculated_at": "2026-11-18T16:41:41.354613+09:00",
+        "account_asof": "2026-11-18T14:49:37.459348+09:00",
         "order_ready": false,
         "status": "CONDITIONAL_FUNDED",
         "sell_legs": [
@@ -27227,19 +27227,19 @@
             "ticker": "005930.KS",
             "display_name": "삼성전자",
             "side": "SELL",
-            "price_low": 193300,
-            "price_high": 194200,
+            "price_low": 192700,
+            "price_high": 193600,
             "currency": "KRW",
-            "source_asof": "2026-11-18T13:29:00+09:00",
+            "source_asof": "2026-11-18T14:48:00+09:00",
             "holding_quantity": 10.0,
             "reason": "큰 보유 비중 분산",
             "quantity": 5,
             "full_exit": false,
-            "gross_krw": 966500.0,
-            "commission_krw": 1420.7549999999999,
-            "transaction_tax_krw": 1933.0,
+            "gross_krw": 963500.0,
+            "commission_krw": 1416.345,
+            "transaction_tax_krw": 1927.0,
             "capital_tax_reserve_krw": 0.0,
-            "net_funding_krw": 963146.245
+            "net_funding_krw": 960156.655
           }
         ],
         "buy_legs": [
@@ -27258,23 +27258,23 @@
             "conditions": [
               "033780.KS의 중기 방향은 완만한 강세로 유지하되 즉시 매수하지 않는다. 공격 측이 제시한 상승 중인 장기 이동평균과 2026-11-16 시장 대비 6.37%포인트 상대 강세는 보유·조건부 참여 근거다. 다만 하루 상대 강세는 지속적 수급을 입증하지 않으며, 보수·중립 측의 상대강도지수 46.67, 반등 거래량 약 평균의 1.05배, 단기 평균선 미회복 지적을 채택한다. 반등과 동력 개선을 독립된 안전장치로 중복 계산하지 않는다. 175900~177200원 지지 반응과 177200원 이상 정규장 종가 회복, 다음 거래 가능한 정규장의 175900~176400원 재시험 및 175900원 이상 마감을 순서대로 확인한다. 그 이후 정규장에서 같은 범위의 지정가로 소규모 첫 진입만 허용한다. 진입 전 공개시점이 확인된 원공시로 핵심 현금창출·환원·차환 위험을 점검하고, 중대한 악화가 발견되거나 핵심 위험을 평가할 수 없으면 보류한다. 현재 조건 충족은 확인되지 않았다."
             ],
-            "source_asof": "2026-11-18T13:30:00+09:00"
+            "source_asof": "2026-11-18T14:48:00+09:00"
           }
         ],
         "cash_ledger": {
           "initial_cash_krw": 976652.0,
-          "nav_krw": 8257052.0,
-          "reserve_krw": 1651411.0,
-          "sell_gross_krw": 966500.0,
-          "sell_fees_and_levy_krw": 3353.755,
+          "nav_krw": 8222612.0,
+          "reserve_krw": 1644523.0,
+          "sell_gross_krw": 963500.0,
+          "sell_fees_and_levy_krw": 3343.345,
           "capital_tax_reserve_krw": 0.0,
-          "net_sale_funding_krw": 963146.245,
-          "after_sales_cash_krw": 1939798.245,
+          "net_sale_funding_krw": 960156.655,
+          "after_sales_cash_krw": 1936808.655,
           "buy_total_krw": 176923.90800000002,
-          "after_buys_cash_krw": 1762874.337,
-          "reserve_surplus_krw": 111463.33700000006,
-          "turnover_ratio": 0.13841501785382967,
-          "extra_cash_margin_krw": 41285.26,
+          "after_buys_cash_krw": 1759884.747,
+          "reserve_surplus_krw": 115361.74699999997,
+          "turnover_ratio": 0.13862991467917982,
+          "extra_cash_margin_krw": 41113.06,
           "order_count": 2,
           "fx_conversion_cost_krw": 0,
           "tax_basis": "KR_LISTED_COMMON_STOCK_TRANSACTION_TAX"
@@ -52728,7 +52728,7 @@
           "soft_sell_rounding": "nearest_with_core",
           "evidence": "Docs/balanced_capital_policy_ko.md",
           "status": "provisional_balanced_policy_not_optimality_claim",
-          "calculated_at": "2026-11-18T14:02:16.591129+09:00"
+          "calculated_at": "2026-11-18T16:41:41.354613+09:00"
         },
         "capital_context": {
           "account_value_krw": 22199640.0,
@@ -52988,7 +52988,7 @@
               "holding_fraction": 1.0,
               "risk_reduction": true,
               "full_exit": true,
-              "recalculated_at": "2026-11-18T14:02:16.591129+09:00"
+              "recalculated_at": "2026-11-18T16:41:41.354613+09:00"
             },
             "zero_reason_code": null,
             "allocated_amount_krw": -450762.0,
@@ -53407,7 +53407,7 @@
               "holding_fraction": 1.0,
               "risk_reduction": true,
               "full_exit": true,
-              "recalculated_at": "2026-11-18T14:02:16.591129+09:00"
+              "recalculated_at": "2026-11-18T16:41:41.354613+09:00"
             },
             "zero_reason_code": null,
             "allocated_amount_krw": -420444.0,
@@ -53465,7 +53465,7 @@
               "holding_fraction": 0.3333333333333333,
               "risk_reduction": true,
               "full_exit": false,
-              "recalculated_at": "2026-11-18T14:02:16.591129+09:00"
+              "recalculated_at": "2026-11-18T16:41:41.354613+09:00"
             },
             "zero_reason_code": null,
             "allocated_amount_krw": -445783.0,
@@ -53604,7 +53604,7 @@
               "holding_fraction": 1.0,
               "risk_reduction": true,
               "full_exit": true,
-              "recalculated_at": "2026-11-18T14:02:16.591129+09:00"
+              "recalculated_at": "2026-11-18T16:41:41.354613+09:00"
             },
             "zero_reason_code": null,
             "allocated_amount_krw": -1020901.0,
@@ -53662,7 +53662,7 @@
               "holding_fraction": 0.5,
               "risk_reduction": true,
               "full_exit": false,
-              "recalculated_at": "2026-11-18T14:02:16.591129+09:00"
+              "recalculated_at": "2026-11-18T16:41:41.354613+09:00"
             },
             "zero_reason_code": null,
             "allocated_amount_krw": -101927.0,
@@ -53720,7 +53720,7 @@
               "holding_fraction": 0.3333333333333333,
               "risk_reduction": true,
               "full_exit": false,
-              "recalculated_at": "2026-11-18T14:02:16.591129+09:00"
+              "recalculated_at": "2026-11-18T16:41:41.354613+09:00"
             },
             "zero_reason_code": null,
             "allocated_amount_krw": -375755.0,
@@ -54202,7 +54202,7 @@
               "holding_fraction": 0.16666666666666666,
               "risk_reduction": true,
               "full_exit": false,
-              "recalculated_at": "2026-11-18T14:02:16.591129+09:00"
+              "recalculated_at": "2026-11-18T16:41:41.354613+09:00"
             },
             "zero_reason_code": null,
             "allocated_amount_krw": -205029.0,
@@ -54571,7 +54571,7 @@
               "holding_fraction": 0.16666666666666666,
               "risk_reduction": true,
               "full_exit": false,
-              "recalculated_at": "2026-11-18T14:02:16.591129+09:00"
+              "recalculated_at": "2026-11-18T16:41:41.354613+09:00"
             },
             "zero_reason_code": null,
             "allocated_amount_krw": -957622.0,
@@ -54871,7 +54871,7 @@
       "funded_rebalance": {
         "version": "funded-rebalance-v1",
         "market": "US",
-        "calculated_at": "2026-11-18T14:02:16.591129+09:00",
+        "calculated_at": "2026-11-18T16:41:41.354613+09:00",
         "account_asof": "2026-11-18T03:15:33.421585+09:00",
         "order_ready": false,
         "status": "CONDITIONAL_FUNDED",
