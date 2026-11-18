@@ -71,7 +71,7 @@ def preflight_models(fixture, **overrides):
     return recovery_preflight_models(**{
         "archive_dir": fixture["config"].storage.archive_dir,
         "source_run_id": fixture["source"]["run_id"], "now": fixture["now"],
-        "quick_model": "gpt-6.1-sol", "deep_model": "gpt-6.1-sol", "output_model": "gpt-6.1-sol",
+        "quick_model": "gpt-6.2-sol", "deep_model": "gpt-6.2-sol", "output_model": "gpt-6.2-sol",
         **overrides})
 
 
@@ -86,7 +86,7 @@ def test_recovery_preflight_preserves_cohort_after_default_model_migration(recov
     source_bytes = (recovery["root"] / "run.json").read_bytes()
     settings = deepcopy(recovery["source"]["settings"])
     for role in ("quick", "deep", "output", "writer", "judge"):
-        settings[f"{role}_model"] = "gpt-6.1-sol"
+        settings[f"{role}_model"] = "gpt-6.2-sol"
     with pytest.raises(ValueError, match="configuration changed: quick_model"):
         load(recovery, settings=settings)
     quick, deep, output = preflight_models(recovery)
@@ -103,7 +103,7 @@ def test_recovery_preflight_preserves_cohort_after_default_model_migration(recov
 
 
 def test_ordinary_preflight_keeps_new_defaults_without_reading_archive(recovery):
-    assert preflight_models(recovery, source_run_id="") == ("gpt-6.1-sol",) * 3
+    assert preflight_models(recovery, source_run_id="") == ("gpt-6.2-sol",) * 3
 
 
 @pytest.mark.parametrize("mutate", [

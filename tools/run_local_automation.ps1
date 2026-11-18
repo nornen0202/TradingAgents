@@ -107,6 +107,13 @@ try {
     $runtimeSettingsPath = Join-Path $stateRoot 'runtime-settings.json'
     if (Test-Path -LiteralPath $runtimeSettingsPath) {
         $runtimeSettings = Get-Content -LiteralPath $runtimeSettingsPath -Raw | ConvertFrom-Json
+        if ($runtimeSettings.codex_binary) {
+            $binaryPath = [string]$runtimeSettings.codex_binary
+            if (-not [IO.Path]::IsPathRooted($binaryPath) -or -not [IO.File]::Exists($binaryPath)) {
+                throw 'Configured Codex binary is unavailable.'
+            }
+            $env:CODEX_BINARY = $binaryPath
+        }
         if ($runtimeSettings.codex_workspace_dir) {
             $workspacePath = [string]$runtimeSettings.codex_workspace_dir
             if (-not [IO.Path]::IsPathRooted($workspacePath)) { throw 'Codex workspace must be an absolute local path.' }

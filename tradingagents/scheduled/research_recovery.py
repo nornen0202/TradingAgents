@@ -289,6 +289,8 @@ def recovery_preflight_models(*, archive_dir: Path, source_run_id: str, now: dat
     models = [settings.get(f"{role}_model") for role in ("quick", "deep", "output", "writer", "judge")]
     if not all(isinstance(m, str) and re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]{0,127}", m) for m in models):
         raise ValueError("Recovery source model roles are missing or invalid")
+    if any(model.startswith("gpt-6.1") for model in models):
+        raise ValueError("Recovery requires a fresh research cohort for retired GPT-6.1 models")
     if models[3] != models[2] or models[4] != models[1]:
         raise ValueError("Recovery preflight requires paired output/writer and deep/judge models")
     return tuple(models[:3])
