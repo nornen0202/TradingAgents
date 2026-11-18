@@ -318,6 +318,8 @@ class CodexAppServerSession:
         summary: str | None,
         personality: str | None,
     ) -> CodexInvocationResult:
+        if model.startswith("gpt-6.1"):
+            raise CodexModelUnavailableError(f"Retired TradingAgents model: {model}")
         with self._request_lock:
             self.start()
             thread_id = None
@@ -337,6 +339,8 @@ class CodexAppServerSession:
                     },
                 )
                 thread_id = thread["thread"]["id"]
+                if thread.get("model", model) != model:
+                    raise CodexModelUnavailableError(f"Codex did not select requested model {model}")
                 started = self.request(
                     "turn/start",
                     {
@@ -433,6 +437,8 @@ class CodexAppServerSession:
             method = message["method"]
             params = message.get("params", {})
             notifications.append(message)
+            if method == "model/rerouted":
+                raise CodexModelUnavailableError("Codex rerouted the requested research model")
 
             if (
                 method == "item/completed"

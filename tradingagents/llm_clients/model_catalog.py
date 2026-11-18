@@ -30,7 +30,7 @@ MODEL_OPTIONS: ProviderModeOptions = {
     },
     "codex": {
         "quick": [
-            ("GPT-6.1 Sol - Default investment analysis", "gpt-6.1-sol"),
+            ("GPT-6.2 Sol - Default investment analysis", "gpt-6.2-sol"),
             ("GPT-6 Sol - High-quality investment analysis", "gpt-6-sol"),
             ("GPT-5.6 Sol - Quality-first investment analysis", "gpt-5.6-sol"),
             ("GPT-5.6 Terra - Balanced Codex model", "gpt-5.6-terra"),
@@ -42,8 +42,8 @@ MODEL_OPTIONS: ProviderModeOptions = {
             ("GPT-4.1 - Strong non-reasoning fallback", "gpt-4.1"),
         ],
         "deep": [
-            ("GPT-6.1 Sol - Default investment decisions", "gpt-6.1-sol"),
-            ("GPT-6 Astra - Optional frontier reasoning", "gpt-6-astra"),
+            ("GPT-6.2 Sol - Default investment decisions", "gpt-6.2-sol"),
+            ("GPT-6.2 Astra - Optional frontier reasoning", "gpt-6.2-astra"),
             ("GPT-6 Sol - High-quality Codex reasoning", "gpt-6-sol"),
             ("GPT-5.6 Sol - Frontier Codex model", "gpt-5.6-sol"),
             ("GPT-5.6 Terra - Balanced Codex model", "gpt-5.6-terra"),

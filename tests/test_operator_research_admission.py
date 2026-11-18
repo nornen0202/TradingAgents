@@ -40,7 +40,7 @@ def operator(recovery, tmp_path):  # noqa: F811 -- imported pytest fixture
     m["settings"].update(
         provider="codex",
         **{
-            f"{role}_model": "gpt-6.1-sol"
+            f"{role}_model": "gpt-6.2-sol"
             for role in ("quick", "deep", "output", "writer", "judge")
         },
     )
