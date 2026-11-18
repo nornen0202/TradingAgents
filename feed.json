@@ -1,6 +1,34 @@
 {
-  "generated_at": "2026-11-19T01:37:46.109643",
+  "generated_at": "2026-11-19T02:44:26.415447",
   "runs": [
+    {
+      "run_id": "20261119T010253_local-scheduler-us-overlay_only",
+      "label": "local-scheduler-us-overlay_only",
+      "started_at": "2026-11-19T01:02:53.005800+09:00",
+      "finished_at": "2026-11-19T02:09:00.318652+09:00",
+      "status": "success",
+      "market": "US",
+      "run_mode": "overlay_only",
+      "settings": {
+        "market": "US",
+        "run_mode": "overlay_only"
+      },
+      "summary": {
+        "total_tickers": 30
+      },
+      "ticker_count": 30,
+      "success_count": 30,
+      "decision_bundle": {
+        "version": 2,
+        "decision_ready": false,
+        "conditional_strategy_ready": false,
+        "quality_label_ko": "일부 종목 장중 판단 가능, 종목별 데이터 상태 확인",
+        "fresh_row_ratio": 0.0333,
+        "conditional_row_ratio": 0.9333
+      },
+      "published_to_site": true,
+      "run_url": "runs/20261119T010253_local-scheduler-us-overlay_only/index.html"
+    },
     {
       "run_id": "20261119T000228_local-scheduler-us-overlay_only",
       "label": "local-scheduler-us-overlay_only",
@@ -3197,8 +3225,8 @@
         "fresh_row_ratio": 0.9667,
         "conditional_row_ratio": 1.0
       },
-      "published_to_site": true,
-      "run_url": "runs/20261105T032134_local-freshness-us-overlay/index.html"
+      "published_to_site": false,
+      "run_url": null
     },
     {
       "run_id": "20261105T031858_local-freshness-us-overlay",

@@ -276,9 +276,9 @@
     "us": {
       "schema": "tradingagents.work-context/v1",
       "surface": "us",
-      "event_id": "us:075fd85e5648be179900b94211ad20e3",
-      "source_sha256": "6617b7ec2d1871f33674b5f55eb81814cd8b9b9c20cda2bc4059dffe35be7ce4",
-      "packet_sha256": "518a1e43ae6b2739a3d2e80198d54e9b9407e2c49a8c05673acf2bb069c19990",
+      "event_id": "us:e1ca53f83ab7cb284712619a25060011",
+      "source_sha256": "0585e8215d186ff6c14f449e3e35eeeae3d91d7633a78b9e71dc6db75059e04c",
+      "packet_sha256": "575fe6e1852cbab11eb31985e0c6fecf1dd6d6435f5a76ef190d2202c16f8e5b",
       "prompt_contract_version": "market-work-v13-us",
       "prompt_sha256": "a577e06278002eebd491db51786019336a00da570d5c47886bad031cf01cf7fe",
       "skill_sha256": "2fef99f1af403675549a13813e0fe5597a241a964affeada56e9f64e9f398fe9",
@@ -286,22 +286,22 @@
       "workflow_contract_sha256": "c43e03e786420c6d542d346e0a06ae138ac11850adb820262e9f349ae6ce8b9a",
       "status_url": "https://nornen0202.github.io/TradingAgents/work/v1/us/status.json",
       "latest_url": "https://nornen0202.github.io/TradingAgents/work/v1/us/latest.json",
-      "event_url": "https://nornen0202.github.io/TradingAgents/work/v1/us/events/us-075fd85e5648be179900b94211ad20e3.json",
+      "event_url": "https://nornen0202.github.io/TradingAgents/work/v1/us/events/us-e1ca53f83ab7cb284712619a25060011.json",
       "prompt_url": "https://nornen0202.github.io/TradingAgents/work/v1/prompts/market_us.md",
       "source_health": "UNVERIFIED",
       "report_mode": "OUTAGE",
       "freshness_receipt": {
         "schema": "tradingagents.source-freshness/v1",
-        "producer_run_id": "20261119T000228_local-scheduler-us-overlay_only",
-        "producer_started_at": "2026-11-19T00:02:28.742017+09:00",
-        "producer_finished_at": "2026-11-19T00:32:38.129495+09:00",
+        "producer_run_id": "20261119T010253_local-scheduler-us-overlay_only",
+        "producer_started_at": "2026-11-19T01:02:53.005800+09:00",
+        "producer_finished_at": "2026-11-19T02:09:00.318652+09:00",
         "analysis_run_id": "20261118T175052_local-scheduler-us-full",
         "analysis_lineage_status": "RESOLVED",
         "analysis_completed_at": "2026-11-18T20:34:00.384193+09:00",
         "analysis_trade_date_oldest": "2026-11-17",
         "analysis_trade_date_latest": "2026-11-17",
-        "market_data_oldest_at": "2026-11-18T10:30:00-05:00",
-        "market_data_latest_at": "2026-11-18T15:31:00+00:00",
+        "market_data_oldest_at": "2026-11-18T15:52:00+00:00",
+        "market_data_latest_at": "2026-11-18T16:57:03+00:00",
         "market_data_status": "MISSING",
         "publication_does_not_refresh_inputs": true,
         "execution_max_age_seconds": 180.0,
@@ -332,6 +332,30 @@
             "market_data_asof": null
           },
           {
+            "ticker": "SGOV",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false,
+            "basis": "ORIGINAL_RESEARCH_CONTRACT",
+            "market_data_asof": null
+          },
+          {
+            "ticker": "RSP",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false,
+            "basis": "ORIGINAL_RESEARCH_CONTRACT",
+            "market_data_asof": null
+          },
+          {
+            "ticker": "MDT",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false,
+            "basis": "ORIGINAL_RESEARCH_CONTRACT",
+            "market_data_asof": null
+          },
+          {
             "ticker": "WELL",
             "research_valid": false,
             "category": "UNVERIFIED_RESEARCH_INPUT",
@@ -348,6 +372,14 @@
             "market_data_asof": null
           },
           {
+            "ticker": "PG",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false,
+            "basis": "ORIGINAL_RESEARCH_CONTRACT",
+            "market_data_asof": null
+          },
+          {
             "ticker": "COST",
             "research_valid": false,
             "category": "UNVERIFIED_RESEARCH_INPUT",
@@ -356,7 +388,7 @@
             "market_data_asof": null
           },
           {
-            "ticker": "WMT",
+            "ticker": "V",
             "research_valid": false,
             "category": "UNVERIFIED_RESEARCH_INPUT",
             "execution_eligible": false,
@@ -364,7 +396,7 @@
             "market_data_asof": null
           },
           {
-            "ticker": "V",
+            "ticker": "WMT",
             "research_valid": false,
             "category": "UNVERIFIED_RESEARCH_INPUT",
             "execution_eligible": false,
@@ -476,7 +508,7 @@
             "market_data_asof": null
           },
           {
-            "ticker": "GOOGL",
+            "ticker": "GLDM",
             "research_valid": false,
             "category": "UNVERIFIED_RESEARCH_INPUT",
             "execution_eligible": false,
@@ -500,15 +532,7 @@
             "market_data_asof": null
           },
           {
-            "ticker": "MDT",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
-            "execution_eligible": false,
-            "basis": "ORIGINAL_RESEARCH_CONTRACT",
-            "market_data_asof": null
-          },
-          {
-            "ticker": "PG",
+            "ticker": "GOOGL",
             "research_valid": false,
             "category": "UNVERIFIED_RESEARCH_INPUT",
             "execution_eligible": false,
