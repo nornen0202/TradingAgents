@@ -228,6 +228,10 @@ class Worker {
         git("commit", "-qam", f"new main {iteration}", cwd=writer)
         git("push", "-q", "fork", "main", cwd=writer)
         expected = git("rev-parse", "HEAD", cwd=writer)
+        source = runtime / "local-automation/source" / expected
+        if iteration == 0:
+            source.mkdir(parents=True)
+            (source / "incomplete.txt").write_text("previous interrupted extraction")
         workers = [subprocess.Popen(
             [POWERSHELL, "-NoProfile", "-NonInteractive", "-File", str(WRAPPER),
              "-Command", command, "-RepositoryRoot", str(repo), "-RuntimeRoot", str(runtime), "-DryRun"],
@@ -237,7 +241,9 @@ class Worker {
             _, stderr = worker.communicate(timeout=30)
             assert worker.returncode == 0, stderr
         assert all((results / command).read_text() == expected for command in ("run-due", "publish"))
-        assert (runtime / f"local-automation/source/{expected}/tracked.txt").read_text() == str(iteration)
+        assert (source / "tracked.txt").read_text() == str(iteration)
+        assert (source / ".source-ready").read_text().strip() == expected
+        assert not (source / "incomplete.txt").exists()
     assert not (runtime / "local-automation/notifications").exists()
     if external_runtime:
         assert not (repo / ".runtime").exists()

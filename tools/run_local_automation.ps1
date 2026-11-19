@@ -79,12 +79,39 @@ try {
         try { $sourceOwned = $sourceMutex.WaitOne(60000) } catch [Threading.AbandonedMutexException] { $sourceOwned = $true }
         if (-not $sourceOwned) { throw "Source snapshot preparation is still active." }
         if (-not (Test-Path -LiteralPath (Join-Path $sourceRoot ".source-ready"))) {
-            $zipPath = Join-Path $stateRoot "$revision-$Command.zip"
-            & git archive --format=zip "--output=$zipPath" $revision
-            if ($LASTEXITCODE -ne 0) { throw "Could not export trusted source." }
-            Expand-Archive -LiteralPath $zipPath -DestinationPath $sourceRoot -Force
-            Remove-Item -LiteralPath $zipPath -Force
-            Set-Content -LiteralPath (Join-Path $sourceRoot ".source-ready") -Value $revision
+            $sourceParent = [IO.Path]::GetFullPath((Split-Path -Parent $sourceRoot))
+            [IO.Directory]::CreateDirectory($sourceParent) | Out-Null
+            $sourceRoot = Join-Path $sourceParent $revision
+            $nonce = [Guid]::NewGuid().ToString('N')
+            $stagedSource = Join-Path $sourceParent "$revision-pending-$nonce"
+            $zipPath = Join-Path $stateRoot "$revision-$nonce.zip"
+            try {
+                & git archive --format=zip "--output=$zipPath" $revision
+                if ($LASTEXITCODE -ne 0) { throw "Could not export trusted source." }
+                # Use the two-argument .NET Framework overload supported by
+                # Windows PowerShell, independently of its Archive module.
+                Add-Type -AssemblyName System.IO.Compression.FileSystem
+                [IO.Compression.ZipFile]::ExtractToDirectory($zipPath, $stagedSource)
+                Set-Content -LiteralPath (Join-Path $stagedSource ".source-ready") -Value $revision
+                if ([IO.Directory]::Exists($sourceRoot)) {
+                    $incompleteSource = Get-Item -LiteralPath $sourceRoot -Force
+                    if ($incompleteSource.Attributes -band [IO.FileAttributes]::ReparsePoint) {
+                        throw 'Incomplete source cache is not an ordinary directory.'
+                    }
+                    [IO.Directory]::Move($sourceRoot, (Join-Path $sourceParent "$revision-incomplete-$nonce"))
+                }
+                [IO.Directory]::Move($stagedSource, $sourceRoot)
+            } finally {
+                [IO.File]::Delete($zipPath)
+                if ([IO.Directory]::Exists($stagedSource)) {
+                    $stagedItem = Get-Item -LiteralPath $stagedSource -Force
+                    if ($stagedItem.FullName -eq $stagedSource -and
+                        $stagedItem.Parent.FullName -eq $sourceParent -and
+                        -not ($stagedItem.Attributes -band [IO.FileAttributes]::ReparsePoint)) {
+                        Remove-Item -LiteralPath $stagedSource -Recurse -Force -ErrorAction SilentlyContinue
+                    }
+                }
+            }
         }
     } finally {
         if ($sourceOwned) { $sourceMutex.ReleaseMutex() }
