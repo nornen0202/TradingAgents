@@ -83,7 +83,9 @@ try {
             [IO.Directory]::CreateDirectory($sourceParent) | Out-Null
             $sourceRoot = Join-Path $sourceParent $revision
             $nonce = [Guid]::NewGuid().ToString('N')
-            $stagedSource = Join-Path $sourceParent "$revision-pending-$nonce"
+            # Keep the staging path shorter than the final revision path so
+            # extraction stays within the same Windows path-length envelope.
+            $stagedSource = Join-Path $sourceParent ".$nonce"
             $zipPath = Join-Path $stateRoot "$revision-$nonce.zip"
             try {
                 & git archive --format=zip "--output=$zipPath" $revision
