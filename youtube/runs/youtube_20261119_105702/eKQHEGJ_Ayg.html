@@ -1,0 +1,617 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YouTube 투자자용 검증 리포트 - 미국의 중국산 광통신 장비 규제, 한국 기업에 새로운 기회라는 이유</title>
+  <style>
+:root {
+  color-scheme: light;
+  --bg: #f7f8fb;
+  --panel: #ffffff;
+  --text: #172033;
+  --muted: #667085;
+  --line: #d9dee8;
+  --accent: #0f766e;
+  --accent-2: #2563eb;
+  --warn: #b45309;
+  --bad: #b42318;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0 56px; }
+a { color: var(--accent-2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.hero { padding: 28px 0 22px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+.hero.compact { padding-top: 12px; }
+.hero h1 { margin: 0; font-size: clamp(28px, 4vw, 44px); line-height: 1.15; letter-spacing: 0; }
+.hero p { max-width: 760px; color: var(--muted); margin: 12px 0 0; }
+.eyebrow { color: var(--accent); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0; margin: 0 0 8px; }
+section { margin: 28px 0; }
+h2, h3, h4, h5 { letter-spacing: 0; line-height: 1.25; }
+.synthesis-callout { padding: clamp(20px, 4vw, 34px); border: 1px solid #6ee7d8; border-radius: 18px; background: linear-gradient(135deg, #ecfdf9 0%, #eff6ff 100%); box-shadow: 0 18px 44px rgba(15, 118, 110, .12); }
+.synthesis-callout.unavailable { border-color: var(--line); background: var(--panel); box-shadow: none; }
+.synthesis-callout h2 { margin: 0; font-size: clamp(24px, 3.2vw, 36px); }
+.synthesis-callout .lead { max-width: 900px; font-size: 17px; color: #334155; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.primary-link, .secondary-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border-radius: 999px; font-weight: 800; }
+.primary-link { color: white; background: var(--accent); }
+.secondary-link { color: var(--accent-2); border: 1px solid #93c5fd; background: white; }
+.primary-link:hover, .secondary-link:hover { text-decoration: none; filter: brightness(.97); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.card, .run { display: flex; flex-direction: column; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; color: var(--text); min-height: 128px; }
+.run { padding: 16px; }
+.card:hover, .run:hover { border-color: var(--accent-2); text-decoration: none; }
+.thumb { display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #e9edf5; border-radius: 8px 8px 0 0; color: var(--muted); font-size: 13px; font-weight: 700; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb-empty span { padding: 0 14px; text-align: center; }
+.card-body { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 16px; }
+.card strong { line-height: 1.35; }
+.source-line { color: #3f4a5f; font-weight: 600; }
+.runs { display: grid; gap: 10px; }
+.badge { display: inline-flex; width: fit-content; border-radius: 999px; padding: 2px 9px; background: #e6f4f1; color: var(--accent); font-size: 12px; font-weight: 700; }
+.status-contradicted, .status-llm_failed { background: #fee4e2; color: var(--bad); }
+.status-unverified, .status-stale { background: #fff4d6; color: var(--warn); }
+small, .muted { color: var(--muted); }
+.topnav { display: flex; gap: 14px; margin-bottom: 16px; font-size: 14px; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px; }
+.stats span { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
+.report { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: min(5vw, 36px); }
+.report-head { border-bottom: 1px solid var(--line); margin-bottom: 24px; padding-bottom: 20px; }
+.report-head h1 { margin: 0; font-size: clamp(24px, 3.5vw, 38px); line-height: 1.2; }
+.meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+.scope-note { padding: 12px 14px; border-left: 4px solid var(--warn); border-radius: 6px; background: #fff7ed; color: #7c2d12; }
+.synthesis-report h2 { margin-top: 34px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.synthesis-report h3 { margin: 24px 0 8px; color: #0f4c5c; }
+.synthesis-report p, .synthesis-report li { overflow-wrap: anywhere; }
+pre { overflow: auto; background: #111827; color: #f9fafb; border-radius: 8px; padding: 14px; }
+code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+details { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 18px; }
+@media (max-width: 640px) {
+  main { width: min(100% - 20px, 1120px); padding-top: 18px; }
+  .report { padding: 18px; }
+  .synthesis-callout { border-radius: 14px; padding: 18px; }
+  .cta-row a { width: 100%; }
+  .mobile-report { border-radius: 12px; }
+}
+</style>
+</head>
+<body>
+  <main>
+<nav class="topnav"><a href="index.html">실행 목록</a><a href="../../index.html">YouTube 홈</a></nav>
+<article class="report">
+  <header class="report-head">
+    <p class="eyebrow">youtube_20261119_105702</p>
+    <h1>미국의 중국산 광통신 장비 규제, 한국 기업에 새로운 기회라는 이유</h1>
+    <div class="meta">
+      <span class="badge status-unverified">unverified</span>
+      <a href="https://www.youtube.com/watch?v=eKQHEGJ_Ayg">원본 영상</a>
+    </div>
+  </header>
+  <h2>중국산 광트랜시버 규제설: 한국 기업의 수혜를 확인하려면</h2>
+<p><strong>핵심 판단 | 2026년 11월 19일 제공 자료 기준:</strong> 미국이 데이터센터에서 쓰이는 중국산 광트랜시버의 신규 수입을 제한하면 한국 업체에 대체 공급 기회가 생길 수 있다. 그러나 이번 자료로는 <strong>규제의 확정 여부와 적용 범위, 한국 업체의 규제발 신규 수주, 매출 반영을 확인할 수 없다.</strong> 중국 업체의 시장점유율이나 관련주의 급등을 한국 기업의 예상 매출로 환산할 근거도 없다.</p>
+<p>분석 대상: 경제사냥꾼, <a href="https://www.youtube.com/watch?v=eKQHEGJ_Ayg">미국의 중국산 광통신 장비 규제, 한국 기업에 새로운 기회라는 이유</a> · 2026년 11월 18일 게시</p>
+<h3>확인된 사실과 근거의 한계</h3>
+<p>제공된 외부 검색 결과 10건 중 6건은 발췌가 비어 있고, 나머지 4건은 탐색 메뉴가 대부분이다. 모두 영상 게시 이후에 나온 자료이며, 제공된 제목과 발췌는 영상의 핵심 주장을 직접 뒷받침하거나 반박하지 않는다. 수집 상태가 <code>verified</code>로 표시됐지만, <strong>주장별 검증은 C1~C12 모두 미확인</strong>이다. 로이터 원문, FCC·의회 문서, 기업 공시, 시장조사 원표와 종목별 시세가 확보되지 않았다. 아래 링크는 <strong>영상에서 주장을 찾기 위한 위치</strong>이며 독립 근거가 아니다.</p>
+<p>한국어 자동 자막 521개 구간의 <code>transcript_quality</code>는 <code>good</code>(1.0)이다. 이는 전체 자막의 품질 평가이지 날짜·고유명사·숫자의 정확성 보증이 아니다. 타임스탬프는 문장 시각이 아닌 자막 청크 시작점이다. 주장별 검증의 <code>source_confidence</code>는 모두 0.00으로, 독립 근거가 없다는 뜻이지 주장이 거짓이라는 뜻은 아니다. 예를 들어 오이솔루션의 <code>asr_confidence</code>는 0.95로 주장 식별 신뢰도가 높지만 공시 수치는 미확인이다. 반면 보도일(0.70)과 미국 종목 시세(0.68)는 자막 안에서도 날짜나 비교 기준이 엇갈린다. 영상 요약 단계의 <code>source_confidence</code>는 자막에서 주장을 식별한 신뢰도로, 독립 검증 점수와 구분해야 한다.</p>
+<h3>영상 주장과 투자 해석</h3>
+<h4>규제와 시장: 공급 공백의 크기는 적용 범위에 달려 있다</h4>
+<ul>
+<li><strong>규제 — 영상 주장</strong> (<a href="https://www.youtube.com/watch?v=eKQHEGJ_Ayg&amp;t=0s">00:00</a>, <a href="https://www.youtube.com/watch?v=eKQHEGJ_Ayg&amp;t=781s">13:01</a>): 미국 행정부가 빅테크의 반대에도 중국산 광트랜시버의 신규 수입 제한을 추진했지만 영상 시점에 FCC 최종 규칙과 시행일은 없었다는 설명이다. 후속 로이터 보도일은 도입부의 미국 시간 <strong>11월 12일</strong>과 본문의 <strong>11월 17일</strong>이 충돌한다. 원문과 게시 시각이 없어 어느 쪽도 확정할 수 없다.</li>
+<li><strong>서로 다른 정책안을 합산하지 말아야 한다.</strong> 영상이 언급한 특정 모델 3종 검토, 9월 장비 승인 규정에서의 제외 보도, 모건스탠리 내부 문건의 3.2T 한정 제안은 모두 미확인이다. 800G·1.6T 제외는 3.2T 한정안이 채택될 경우의 해석이다. 연방 국가안보 시스템의 기존 장비 제거에 관한 별도 상원 법안의 5년 전환안은 신규 수입 제한과 다르며, 업계의 최대 10년 준수 추산도 확정 유예기간이 아니다.</li>
+<li><strong>시장 — 영상 주장</strong> (<a href="https://www.youtube.com/watch?v=eKQHEGJ_Ayg&amp;t=268s">04:28</a>): 카운터포인트 추정으로 중국 업체의 세계 판매량 비중은 약 3분의 2, 매출 비중은 약 60%다. 별도의 2025년 데이터센터용 시장 추정치는 이노라이트 약 27%, 코히런트 약 17%다. 영상은 서구 업체가 12~24개월 내 물량을 대체하기 어렵다는 분석도 인용한다. 분모와 산정 방식은 미확인이다. 라이트카운팅의 이더넷 광트랜시버 매출 전망으로 인용된 2026년 <strong>+120%</strong>, 2027년 <strong>+76%</strong>가 같은 시장의 연간 성장률이라면, 이는 매출 감소가 아니라 성장률 둔화다. 전망 원표와 엔비디아 장비의 800G 포트 512개 사양은 별도 확인이 필요하다.</li>
+<li><strong>상승 논리와 반론:</strong> 제한이 실제 발주되는 속도와 제품을 포함하고 기존 공급사의 물량이 줄면, 고객 인증과 양산 능력을 갖춘 한국 업체가 신규 발주를 받을 수 있다. 반대로 중국계 업체의 태국 생산·동남아 후공정 물량이 적용 대상 밖이거나 규제가 3.2T에만 적용되면, 800G·1.6T의 단기 대체 수요는 작을 수 있다. 비중국 업체가 제때 납품하지 못하면 발주가 한국으로 옮겨가기보다 데이터센터 건설이 늦어질 수도 있다. 영상이 거론한 보안 우려, AI 칩 유휴화, 인듐 수출 보복은 이번 자료에서 확인된 사건이나 조치가 아니다.</li>
+</ul>
+<h4>기업과 주가: 계약 품목과 매출 전환이 핵심이다</h4>
+<p>아래 수치와 제품 단계는 모두 <strong>영상이 제시한 미확인 주장</strong>이다.</p>
+<p>| 대상·영상 구간 | 영상 주장 | 투자자가 확인할 점 |</p>
+<p>|---|---|---|</p>
+<p>| 오이솔루션 · <a href="https://www.youtube.com/watch?v=eKQHEGJ_Ayg&amp;t=529s">08:49</a> | 3분기 영업이익 1억 원, 매출 전년 동기 대비 +66%, 수주잔고 472억 원(+136%). 100G 양산, 200G·400G 고객 테스트, 800G·1.6T 개발 단계라고 설명한다. | 분기보고서에서 실적 기준과 잔고의 고객·국가·제품 구성을 확인한다. 해외 통신 시스템용 고객 테스트에 통상 6~12개월이 걸린다는 설명을 특정 데이터센터 고객의 인증 일정으로 적용할 수 없다. 공시 미발견은 계약 부재를 뜻하지 않는다. |</p>
+<p>| 국내 케이블·부품 업체 · <a href="https://www.youtube.com/watch?v=eKQHEGJ_Ayg&amp;t=529s">08:49</a> | 자막상 ‘타이한 파이버옵틱스’의 2월·6월 광케이블 계약(두 번째 약 355억 원)은 최초 규제 보도 이전이라고 설명한다. ‘리콤’의 약 39억 원 계약은 800G용 광증폭기이며 북미 데이터센터 연계는 SK증권 분석으로 소개한다. 라이트론의 미국 주문은 케이블TV망용, RF Materials의 루멘텀 독점 공급은 매체 인용이다. | 정식 법인명, 체결일과 공시일, 계약 품목, 최종 사용처, 독점 범위를 확인한다. 케이블·광증폭기·패키지 소재와 케이블TV용 장비는 미국 AI 데이터센터용 완제품 수주와 구분한다. |</p>
+<p>| 우리로 · <a href="https://www.youtube.com/watch?v=eKQHEGJ_Ayg&amp;t=781s">13:01</a> | 중국향 데이터센터용 광반도체 약 228억 원 계약, 최종 납품일 2028년 12월 30일을 제시한다. | 계약 총액을 한 분기 매출로 보지 않는다. 공급 지역이 중국이라는 주장과 고객의 최종 판매처가 미국이라는 가정은 별개다. 중국 완제품 경로가 제한되면 부품사에는 간접 역풍일 수 있다. |</p>
+<p>| 코히런트·루멘텀·어플라이드 옵토일렉트로닉스 · <a href="https://www.youtube.com/watch?v=eKQHEGJ_Ayg&amp;t=268s">04:28</a>, <a href="https://www.youtube.com/watch?v=eKQHEGJ_Ayg&amp;t=529s">08:49</a> | 코히런트 분기 매출 +50%, 루멘텀 차세대 광부품 구매 약정 50억 달러 이상, 어플라이드의 3분기 매출 전년 동기의 두 배 이상과 2027년 말 800G·1.6T 월 100만 대 이상 생산 목표를 제시한다. | 미국 공시와 실적 발표에서 매출 비교 기준, 약정 구속력·납품 일정, 생산능력·실생산·출하를 각각 확인한다. 루멘텀 약정이 11월 후속 보도보다 앞섰다는 설명이 맞더라도 규제에 따른 수주라는 증거는 아니다. 마벨 인수 당사자와 교환비율은 양사 공시 확인 전 해석에서 제외한다. |</p>
+<p><strong>주가는 수주의 증거가 아니다.</strong> 영상은 미국 세 종목이 장중 고점을 반납했다고 설명하면서도, 정규장 종가는 전일 대비 코히런트 약 +4%, 루멘텀 +2.5% 이상, 어플라이드 약 +0.1%로 제시한다. 고점 대비 하락과 전일 대비 상승 마감은 양립한다. 다만 거래일과 시세 원자료가 없어 실제 경로는 미확인이다. 장전·정규장·시간외를 나누고, 로이터 기사와 엔비디아 실적, 어플라이드의 신주 발행 계약 발표 시각을 맞춰 보기 전에는 주가 변동을 규제 뉴스에 귀속하기 어렵다. 영상이 제시한 최대 5억 5천만 달러의 발행 계약 한도도 실제 발행액과 다르다.</p>
+<p><strong>비공개·유료 출처: 미확인, 수동 확인 필요.</strong> Bloomberg·Morningstar 원문이나 데이터는 제공되지 않았다. 로이터 익명 소식통의 진술, 모건스탠리 내부 문건, 시장조사 구독 원표, 하나증권·SK증권 원문, 고객별 수주잔고·인증 결과·계약 조건·독점 조항 역시 제공 자료로 확인할 수 없다. 재인용은 원문이나 계약 확인을 대신하지 못한다.</p>
+<h3>가까운 체크포인트와 수혜 가설이 약해지는 조건</h3>
+<p>| 시점 | 확인할 항목 | 수혜 가설이 약해지는 조건 |</p>
+<p>|---|---|---|</p>
+<p>| 다음 규제 문서 공개 시 | FCC 도켓·연방관보에서 대상 모델·속도, 생산국과 소유권 기준, 태국 생산·후공정 처리, 시행일을 확인한다. 상원 법안은 별도로 보고, 로이터 보도 시각은 미국 동부시간과 한국시간으로 대조한다. | 주력 속도나 주요 생산 경로가 제외되거나 시행이 미뤄져 기존 공급 물량이 유지된다. |</p>
+<p>| 다음 기업 공시·실적 발표 시 | DART·KIND와 회사 IR에서 속도별 고객 인증, 양산·출하, 공급 품목과 지역, 계약의 납품 기간을 확인한다. 미국 공급사의 증설은 목표가 아닌 실제 출하로 비교한다. | 고객 인증이 지연되거나 대체 물량이 경쟁사에 배정된다. 확인되는 계약이 부품·케이블 또는 중국향에 그치면 미국 데이터센터용 완제품 직접 수혜의 근거는 약하다. |</p>
+<p>| 계약 발표 이후 분기 | 수주잔고 중 미국 데이터센터용 완제품 비중이 공개되는지, 계약이 실제 출하와 분기 매출로 이어지는지, 수익성이 개선되는지 본다. | 납품 예정 시점이 지나도 출하나 매출 전환이 확인되지 않으면 단기 실적 수혜 가설이 약해진다. 고객·제품 정보가 비공개라면 수혜가 없다고 단정하지 않고 판단을 유보한다. |</p>
+<p>지금 가장 중요한 관찰 순서는 <strong>규제 범위·발효일 확정 → 고객 인증 → 미국 데이터센터용 완제품 계약 → 납품과 분기 매출 반영</strong>이다. 각 단계는 다음 단계를 보장하지 않으며, 이번 자료에서 확인된 한국 기업의 규제발 증분 수주는 없다.</p>
+  <details>
+    <summary>공개 요약 JSON</summary>
+    <pre>{
+  &quot;version&quot;: 4,
+  &quot;video_id&quot;: &quot;eKQHEGJ_Ayg&quot;,
+  &quot;title&quot;: &quot;미국의 중국산 광통신 장비 규제, 한국 기업에 새로운 기회라는 이유&quot;,
+  &quot;url&quot;: &quot;https://www.youtube.com/watch?v=eKQHEGJ_Ayg&quot;,
+  &quot;channel&quot;: &quot;경제사냥꾼&quot;,
+  &quot;channel_id&quot;: &quot;UC7usMJDHmtbs_oegmzQKKMA&quot;,
+  &quot;source_url&quot;: &quot;https://www.youtube.com/@%EA%B2%BD%EC%A0%9C%EC%82%AC%EB%83%A5%EA%BE%BC/videos&quot;,
+  &quot;thumbnail_url&quot;: &quot;https://i.ytimg.com/vi/eKQHEGJ_Ayg/maxresdefault.jpg&quot;,
+  &quot;published_at&quot;: &quot;2026-11-18T05:39:20+00:00&quot;,
+  &quot;status&quot;: &quot;unverified&quot;,
+  &quot;strategy_source_tier&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_evidence_weight&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_validation_policy&quot;: &quot;STANDARD_REVIEW&quot;,
+  &quot;transcript_status&quot;: &quot;available&quot;,
+  &quot;transcript_source&quot;: &quot;automatic&quot;,
+  &quot;transcript_chars&quot;: 11229,
+  &quot;transcript_quality&quot;: {
+    &quot;status&quot;: &quot;good&quot;,
+    &quot;score&quot;: 1.0,
+    &quot;warnings&quot;: [],
+    &quot;source&quot;: &quot;automatic&quot;,
+    &quot;language&quot;: &quot;Korean&quot;,
+    &quot;model_or_format&quot;: &quot;json3&quot;,
+    &quot;chars&quot;: 11229,
+    &quot;segments&quot;: 521,
+    &quot;duration_seconds&quot;: 912,
+    &quot;repeated_ngram_ratio&quot;: 0.001
+  },
+  &quot;generated_at&quot;: &quot;2026-11-19T10:57:02.116077+09:00&quot;,
+  &quot;llm_status&quot;: &quot;success&quot;,
+  &quot;research_status&quot;: &quot;success&quot;,
+  &quot;claim_verification_status&quot;: &quot;success&quot;,
+  &quot;research_pipeline_version&quot;: 4,
+  &quot;evidence_count&quot;: 10,
+  &quot;claim_status_summary&quot;: {
+    &quot;unverified&quot;: 12
+  },
+  &quot;claims&quot;: [
+    {
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;claim_text&quot;: &quot;영상은 빅테크의 반대에도 미국 행정부가 중국산 데이터센터용 광트랜시버의 신규 수입 제한을 계속 추진했다고 전한다. 업계의 최대 10년 준수 전망과 ITI의 건설 지연 우려도 인용한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.7,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;8월 4일 첫 보도, 11월 10일 반대 로비 보도, 11월 12일 또는 17일 후속 보도, 완전 준수 최대 10년&quot;,
+        &quot;observed&quot;: &quot;로이터 원문·게시 시각·인용문 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;보도일과 시간대를 확인하기 전에는 해당 보도를 특정 거래일의 주가 변동과 연결할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;claim_text&quot;: &quot;영상은 게시 시점에 FCC의 최종 규칙과 시행일이 없었다고 설명한다. 모델 3종의 신규 수입 제한 검토, 9월 장비 승인 규정에서의 제외 보도, 3.2T급만 제한하자는 내부 제안, 별도 상원 법안의 5년 전환안은 서로 다른 주장이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.84,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;모델 3종, 3.2T 한정 제안, 2028년 증산·2029년 보급 전망, 별도 법안의 5년 전환안&quot;,
+        &quot;observed&quot;: &quot;FCC 도켓·연방관보·상원 법안·인용된 내부 문건 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;공급 공백을 추정하려면 최종 문서에서 대상 제품·속도, 생산지·소유권 기준, 시행일과 기존 장비의 처리 방식을 확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;claim_text&quot;: &quot;영상은 중국 업체의 세계 광트랜시버 판매량 비중을 약 3분의 2, 매출 비중을 약 60%로 인용한다. 2025년 데이터센터용 시장 점유율은 이노라이트 약 27%, 코히런트 약 17%로 제시하고 서구 업체의 단기 대체가 어렵다고 설명한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:04:28&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.88,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;세계 판매량 약 3분의 2·매출 약 60%, 2025년 데이터센터용 이노라이트 약 27%·코히런트 약 17%, 대체가 어렵다는 분석의 기간 12~24개월&quot;,
+        &quot;observed&quot;: &quot;Counterpoint 원문·생산능력 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;중국 업체의 추정 시장 점유율을 한국 공급사가 확보할 수 있는 물량으로 환산할 근거가 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;claim_text&quot;: &quot;영상은 LightCounting의 이더넷 광트랜시버 매출 전망으로 2026년 +120%, 2027년 +76%를 인용하고, NVIDIA 장비의 예로 800G 포트 512개를 제시한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:04:28&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.91,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;2026년 +120%, 2027년 +76%, 800G 포트 512개&quot;,
+        &quot;observed&quot;: &quot;LightCounting 전망 원문·NVIDIA 모델별 사양서 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;시장 전망을 실현 매출이나 개별 회사의 수주로 취급하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;claim_text&quot;: &quot;영상은 규제 보도일에 코히런트·루멘텀·어플라이드 옵토일렉트로닉스가 장중 급등 후 고점을 반납했다고 전한다. 영상이 제시한 정규장 종가는 세 종목 모두 전일보다 높았고, 시간외 방향은 종목별로 달랐다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.68,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;정규장 전일 대비 코히런트 약 +4%·루멘텀 +2.5% 이상·어플라이드 옵토일렉트로닉스 약 +0.1%; 시간외 정규장 종가 대비 앞의 두 종목 약 +6%·마지막 종목 -7% 초과 하락. 코히런트 장전 +12% 초과, 장중 고점 코히런트·어플라이드 약 +7%·루멘텀 +5% 이상, 개장 15분 내 고점 및 10:50 ET경 전일 종가 하회, 나스닥 0.7% 초과 하락, 어플라이드 장중 고점 대비 6% 초과 하락. 11월 16일 최대 9% 하락, 8월 4일 9~19% 상승, 8월 대비 11월 코히런트·루멘텀 34% 이상 및 어플라이드 65% 이상 하락. 어플라이드 5월 13일 종가 전년 말의 6배 초과, 사상 최고 종가 대비 코히런트·루멘텀 절반 이상 및 어플라이드 약 80% 하락&quot;,
+        &quot;observed&quot;: &quot;일봉·분봉·장전·시간외 시세 및 상장 이력 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;정규장·시간외 수익률의 비교 기준을 나눠 보고, 단기 주가 반응을 신규 수주 증거로 쓰지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;claim_text&quot;: &quot;영상은 코히런트가 11월 4일 장 마감 후 발표한 분기 매출이 전년 동기 대비 50% 증가했으며 주가는 다음 두 거래일에 각각 약 13% 하락, 13% 초과 상승했다고 주장한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:08:49&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.92,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;11월 4일 장후, 분기 매출 +50%, 이후 약 -13% 및 +13% 초과&quot;,
+        &quot;observed&quot;: &quot;회사 실적 발표·SEC 자료·종가 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;주가 반응이 엇갈렸는지는 실적 발표 시각과 두 거래일 종가를 대조해 판단하며, 매출 성장 자체를 규제 수혜로 해석하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;claim_text&quot;: &quot;영상은 루멘텀이 11월 2일 차세대 광 인터커넥트 부품의 50억 달러 이상 구매 약정을 발표하고 11월 3일 분기 보고서에서 최종 규정 부재를 언급했다고 전한다. 마벨 인수 및 교환비율은 불확실한 자막 주장이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.7,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;11월 2일 구매 약정 50억 달러 이상, 11월 3일 분기 보고서, 자막상 루멘텀 1주당 마벨 4.5주&quot;,
+        &quot;observed&quot;: &quot;양사 IR·SEC 분기 보고서·거래 공시 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;약정의 매출 전환은 계약 조건과 납품 실적으로 판단하고, 인수 자막은 양사 원공시 확인 전 주가 해석에서 제외한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;claim_text&quot;: &quot;영상은 어플라이드 옵토일렉트로닉스의 3분기 매출이 전년 동기의 두 배 이상이었고, 전력·공사 지연에도 고속 광트랜시버 증설 목표를 유지했다고 전한다. 시간외 하락과 관련해 별도 신주 발행 계약도 거론한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:04:28&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.93,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;11월 5일 발표 3분기 매출 전년 동기의 두 배 이상, 기존 월 약 33만 대, 2027년 말 800G·1.6T 월 100만 대 이상 목표, 신주 발행 계약 최대 5억 5천만 달러&quot;,
+        &quot;observed&quot;: &quot;회사 실적·실적 콜·SEC 발행 계약·벤징가 원문 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;대체 공급 가능 물량은 증설 목표가 아닌 가동률과 실제 출하로 평가한다. 주가 해석에는 발행 구조와 시점도 구분해 반영한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;claim_text&quot;: &quot;영상은 오이솔루션의 3분기 흑자 전환, 매출·수주잔고 증가, 제품별 양산·고객 테스트·개발 단계를 제시한다. 수주잔고가 미국 규제와 연결됐다는 공개 확인은 없었다고 설명한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:08:49&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.95,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;3분기 영업이익 1억 원·23분기 만의 흑자, 매출 +66%, 수주잔고 472억 원(+136%), 11월 17일 주가 -3.28%, 해외 통신 시스템용 고객 테스트 통상 6~12개월&quot;,
+        &quot;observed&quot;: &quot;DART·KIND 공시, 하나증권 자료, KRX 시세 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;잔고 전액을 미국 데이터센터 수요로 보지 말고, 제품별 고객 인증과 완제품 계약, 매출 인식을 따로 확인한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C10&quot;,
+      &quot;claim_text&quot;: &quot;영상은 ‘타이한 파이버옵틱스’의 2월·6월 계약을 미국 AI 데이터센터용 광케이블 계약으로, ‘리콤’의 8월 계약을 800G 트랜시버용 광증폭기 계약으로 설명한다. 후자의 북미 AI 데이터센터 연계는 SK증권 분석으로 제시된다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:08:49&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.7,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;2월·6월 광케이블 계약, 두 번째 약 355억 원; 8월 800G용 광증폭기 계약 약 39억 원&quot;,
+        &quot;observed&quot;: &quot;발행 법인 식별 자료·계약 공시·SK증권 원문 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;두 계약을 규제로 발생한 미국 데이터센터용 완제품 수주 사례로 집계할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C11&quot;,
+      &quot;claim_text&quot;: &quot;영상은 라이트론의 미국 고객 첫 양산 주문이 케이블TV망용이라고 설명한다. RF Materials가 루멘텀에 광통신 패키지 소재를 독점 공급한다는 주장은 8월 Economic Times 보도에 귀속한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:08:49&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.85,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;10월 라이트론 미국 고객 첫 양산 주문, 8월 RF Materials 관련 보도&quot;,
+        &quot;observed&quot;: &quot;주문 공시·회사 확인·인용 기사 원문 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;케이블TV망용 주문과 패키지 소재 공급은 미국 AI 데이터센터용 트랜시버 완제품 수주와 구분한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C12&quot;,
+      &quot;claim_text&quot;: &quot;영상은 우리로의 중국향 데이터센터용 광반도체 계약을 사례로 든다. 중국산 완제품 제한에 따른 간접 노출과 한국사의 대체 공급 기회는 조건부이며, 영상 게시일까지 규제로 수주가 늘었다는 공개 확인이 없었다고 결론짓는다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:13:01&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.92,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;10월 중국향 약 228억 원 공급계약, 최종 납품일 2028-12-30&quot;,
+        &quot;observed&quot;: &quot;원공시·정정공시·납품 및 매출 인식 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;대체 공급 가능성과 중국 고객을 통한 간접 노출을 별도로 보고, 규제 확정에서 인증·계약·분기 매출까지 확인된 단계만 반영한다.&quot;
+    }
+  ],
+  &quot;entities&quot;: [],
+  &quot;evidence&quot;: [
+    {
+      &quot;evidence_id&quot;: &quot;E1&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;Dow Jones Futures Rise; Anthropic IPO Prices High, Palo Alto And Everpure Rally On Earnings&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/m/107e5a2c-4fba-3df3-b2fd-5d1160e65516/dow-jones-futures-rise%3B.html&quot;,
+      &quot;publisher&quot;: &quot;Investor&#x27;s Business Daily&quot;,
+      &quot;published_at&quot;: &quot;2026-11-19T02:08:17+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Dow Jones Futures Rise; Anthropic IPO Prices High, Palo Alto And Everpure Rally On Earnings Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 2...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E2&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;Wall Street futures climb ahead of Anthropic’s $1.5 trillion mega IPO&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/wall-street-futures-climb-ahead-020729605.html&quot;,
+      &quot;publisher&quot;: &quot;Investing.com&quot;,
+      &quot;published_at&quot;: &quot;2026-11-19T02:07:29+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Wall Street futures climb ahead of Anthropic’s $1.5 trillion mega IPO Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 2026 Elections Weather...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E4&quot;,
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;title&quot;: &quot;Top 3 Growth Stocks To Watch In November 2026&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/top-3-growth-stocks-watch-001756660.html&quot;,
+      &quot;publisher&quot;: &quot;Simply Wall St.&quot;,
+      &quot;published_at&quot;: &quot;2026-11-19T00:17:56+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Top 3 Growth Stocks To Watch In November 2026 Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 2026 Elections Weather Newsletters Finance My p...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E5&quot;,
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;title&quot;: &quot;The 5 Best Stocks in Nvidia’s Portfolio&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/5-best-stocks-nvidia-portfolio-222315004.html&quot;,
+      &quot;publisher&quot;: &quot;TIKR&quot;,
+      &quot;published_at&quot;: &quot;2026-11-18T22:23:15+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E6&quot;,
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;title&quot;: &quot;Gold Stocks, Silver, Copper, Platinum Pounded After This &#x27;Shock&#x27;&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/m/1ff49eed-03ac-370a-ad07-0143496c9a1c/gold-stocks%2C-silver%2C-copper%2C.html&quot;,
+      &quot;publisher&quot;: &quot;Investor&#x27;s Business Daily&quot;,
+      &quot;published_at&quot;: &quot;2026-11-18T21:50:30+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E7&quot;,
+      &quot;claim_id&quot;: &quot;C10&quot;,
+      &quot;title&quot;: &quot;JGBs Edge Higher Amid Mixed Developments&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/m/5fe5561f-bd06-3ee0-957a-b3c48a3395e2/jgbs-edge-higher-amid-mixed.html&quot;,
+      &quot;publisher&quot;: &quot;The Wall Street Journal&quot;,
+      &quot;published_at&quot;: &quot;2026-11-19T00:38:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E8&quot;,
+      &quot;claim_id&quot;: &quot;C10&quot;,
+      &quot;title&quot;: &quot;Stocks to Watch Recap: Palo Alto, Nvidia, Target&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/m/d06f4039-17ca-3b5c-8d4c-195520837b84/stocks-to-watch-recap%3A-palo.html&quot;,
+      &quot;publisher&quot;: &quot;The Wall Street Journal&quot;,
+      &quot;published_at&quot;: &quot;2026-11-18T22:45:52+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E9&quot;,
+      &quot;claim_id&quot;: &quot;GLOBAL&quot;,
+      &quot;title&quot;: &quot;Gold rebounds from 14-month low as bargain hunters emerge despite Fed hike risks&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/commodities/articles/gold-rebounds-14-month-low-020048872.html&quot;,
+      &quot;publisher&quot;: &quot;Investing.com&quot;,
+      &quot;published_at&quot;: &quot;2026-11-19T02:00:48+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E10&quot;,
+      &quot;claim_id&quot;: &quot;GLOBAL&quot;,
+      &quot;title&quot;: &quot;Stock Market Today, Nov. 18: S&amp;P 500 Breaks Key Support as Fed Minutes Signal More Rate Hikes Ahead&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/stock-market-today-nov-18-230002098.html&quot;,
+      &quot;publisher&quot;: &quot;Motley Fool&quot;,
+      &quot;published_at&quot;: &quot;2026-11-18T23:00:02+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    }
+  ],
+  &quot;source_policy&quot;: {
+    &quot;raw_transcript_published&quot;: false,
+    &quot;raw_transcript_in_evidence&quot;: false,
+    &quot;research_pipeline_version&quot;: 4,
+    &quot;closed_source_claims&quot;: &quot;unverified_external_source&quot;,
+    &quot;auto_caption_warning&quot;: true,
+    &quot;local_asr_warning&quot;: false
+  }
+}</pre>
+  </details>
+</article>
+</main>
+  <style>
+.reader-contents { margin: 16px 0; padding: 12px 16px; border: 1px solid var(--line, #64748b); border-radius: 12px; }
+.reader-contents > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-weight: 750; }
+.reader-contents nav { display: grid; gap: 4px; max-height: 45vh; overflow: auto; margin: 8px 0; }
+.reader-contents a { display: block; min-height: 44px; padding: 10px; border-radius: 6px; color: inherit; overflow-wrap: anywhere; }
+.reader-contents a:hover { background: #80808020; }
+.reader-contents .reader-subsection { padding-inline-start: 24px; font-size: .92em; }
+.reader-prose, .report { overflow-wrap: anywhere; line-height: 1.8; }
+.reader-prose p, .reader-prose li { max-width: 85ch; }
+.reader-prose h2, .reader-prose h3, .reader-prose h4, [data-reader-heading] { scroll-margin-top: 100px; line-height: 1.45; }
+.reader-prose h2 { margin-top: 1.8em; padding-bottom: 8px; border-bottom: 1px solid var(--line, #64748b); }
+.reader-prose h3 { margin-top: 1.5em; }
+.reader-prose li { margin: .5em 0; }
+.reader-prose pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.reader-prose blockquote { margin: 16px 0; padding: 4px 16px; border-left: 3px solid var(--accent, #64748b); }
+.reader-table { overflow: auto; max-width: 100%; margin: 16px 0; border: 1px solid var(--line, #64748b); border-radius: 10px; }
+.reader-table table { border-collapse: collapse; width: 100%; margin: 0; font-size: .92rem; }
+.reader-table th, .reader-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line, #64748b); min-width: 110px; max-width: 400px; overflow-wrap: anywhere; white-space: normal; }
+.reader-table th { background: #80808018; }
+.reader-table tr:nth-child(even) { background: #80808008; }
+.reader-search { display: grid; gap: 8px; margin: 16px 0; }
+.reader-search label { font-weight: 700; }
+.reader-search input { box-sizing: border-box; width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line, #64748b); border-radius: 10px; background: var(--panel, #fff); color: var(--text, #132238); font: inherit; }
+.reader-search p { margin: 0; font-size: .86rem; }
+.reader-back { position: fixed; bottom: max(14px, env(safe-area-inset-bottom)); right: 14px; z-index: 30; min-height: 44px; border: 1px solid #778899; border-radius: 99px; padding: 10px 16px; background: #18344a; color: #fff; font: 700 14px system-ui; cursor: pointer; box-shadow: 0 3px 12px #0003; }
+[data-reader-source] { margin-top: 20px; }
+[data-reader-source] > summary { min-height: 44px; cursor: pointer; }
+[data-reader-source] pre { font-size: .85rem; }
+[data-reader-source] pre, .reader-prose { min-width: 0; }
+.reader-contents :focus-visible, .reader-search :focus-visible, .reader-back:focus-visible, .reader-table:focus-visible { outline: 3px solid var(--accent, #008c95); outline-offset: 3px; }
+.reader-search + .grid > [hidden] { display: none !important; }
+@media (max-width: 600px) { .reader-prose { font-size: 1rem; } .reader-contents { padding: 8px 12px; } }
+@media print { .reader-back, .reader-search, .reader-contents, [data-reader-source] { display: none !important; } .reader-table { overflow: visible; } .reader-prose { color: #000; background: #fff; } }
+</style><script>
+(() => {
+  'use strict';
+  let serial = 0;
+  const rendered = new WeakMap();
+  const node = (tag, text) => { const el = document.createElement(tag); if (text != null) el.textContent = text; return el; };
+  function inline(parent, text) {
+    const pattern = /(`[^`]+`|\*\*[^*]+\*\*|\[[^\]]+\]\(https?:\/\/[^\s)]+\))/g;
+    let start = 0;
+    for (const match of String(text).matchAll(pattern)) {
+      parent.append(document.createTextNode(text.slice(start, match.index)));
+      const value = match[0];
+      if (value.startsWith('`')) parent.append(node('code', value.slice(1, -1)));
+      else if (value.startsWith('**')) parent.append(node('strong', value.slice(2, -2)));
+      else {
+        const link = value.match(/^\[([^\]]+)\]\((.+)\)$/);
+        const a = node('a', link[1]); a.href = link[2]; a.rel = 'noopener noreferrer'; parent.append(a);
+      }
+      start = match.index + value.length;
+    }
+    parent.append(document.createTextNode(text.slice(start)));
+  }
+  const cells = line => line.trim().replace(/^\|/, '').replace(/\|$/, '').split(/(?<!\\)\|/).map(v => v.trim().replace(/\\\|/g, '|'));
+  function markdown(source) {
+    const article = node('article'); article.className = 'reader-prose';
+    const lines = source.split(/\r?\n/); let list = null;
+    for (let i = 0; i < lines.length; i += 1) {
+      const line = lines[i], value = line.trim();
+      if (!value) { list = null; continue; }
+      if (/^```/.test(value)) {
+        const code = []; i += 1;
+        while (i < lines.length && !/^```/.test(lines[i].trim())) code.push(lines[i++]);
+        const pre = node('pre'); pre.append(node('code', code.join('\n'))); article.append(pre); list = null; continue;
+      }
+      if (i + 1 < lines.length && value.includes('|') && cells(lines[i + 1]).every(v => /^:?-{3,}:?$/.test(v))) {
+        const table = node('table'), head = node('thead'), body = node('tbody');
+        const row = (values, tag) => { const tr = node('tr'); values.forEach(v => { const cell = node(tag); if (tag === 'th') cell.scope = 'col'; inline(cell, v); tr.append(cell); }); return tr; };
+        head.append(row(cells(line), 'th')); i += 2;
+        while (i < lines.length && lines[i].trim() && lines[i].includes('|')) body.append(row(cells(lines[i++]), 'td'));
+        i -= 1; table.append(head, body); article.append(table); list = null; continue;
+      }
+      const heading = value.match(/^(#{1,6})\s+(.+)$/);
+      if (heading) { const h = node('h' + Math.min(4, heading[1].length + 1)); inline(h, heading[2]); article.append(h); list = null; continue; }
+      const bullet = value.match(/^(?:[-*+] |\d+\. )(.+)$/);
+      if (bullet) {
+        const tag = /^\d/.test(value) ? 'ol' : 'ul';
+        if (!list || list.tagName.toLowerCase() !== tag) { list = node(tag); if (tag === 'ol') list.start = parseInt(value, 10); article.append(list); }
+        const li = node('li'); inline(li, bullet[1]); list.append(li); continue;
+      }
+      list = null;
+      if (/^(---+|\*\*\*+)$/.test(value)) { article.append(node('hr')); continue; }
+      const p = node(value.startsWith('> ') ? 'blockquote' : 'p'); inline(p, value.startsWith('> ') ? value.slice(2) : line); article.append(p);
+    }
+    return article;
+  }
+  function contents(root) {
+    root.querySelectorAll(':scope > .reader-contents').forEach(el => el.remove());
+    const headings = [...root.querySelectorAll('h2,h3,h4')].filter(h => !h.closest('.card,.run-card,.reader-contents,[data-reader-source],[hidden]'));
+    if (headings.length < 2) return;
+    const details = node('details'); details.className = 'reader-contents';
+    details.append(node('summary', '이 리포트 목차 · ' + headings.length + '개 항목'));
+    const nav = node('nav'); nav.setAttribute('aria-label', '리포트 목차');
+    headings.forEach(h => {
+      if (!h.id) h.id = 'reader-section-' + (++serial);
+      h.dataset.readerHeading = ''; h.tabIndex = -1;
+      const a = node('a', h.textContent); a.href = '#' + h.id;
+      if (h.tagName !== 'H2') a.className = 'reader-subsection';
+      a.addEventListener('click', event => {
+        event.preventDefault();
+        for (let ancestor = h.parentElement; ancestor; ancestor = ancestor.parentElement) if (ancestor.tagName === 'DETAILS') ancestor.open = true;
+        h.scrollIntoView({block: 'start'}); h.focus({preventScroll: true});
+      }); nav.append(a);
+    });
+    details.append(nav); root.prepend(details);
+  }
+  function enhance(root) {
+    if (!root) return;
+    root.querySelectorAll('pre[data-report-markdown]').forEach(pre => {
+      const previous = rendered.get(pre);
+      if (previous && previous.source === pre.textContent) return;
+      const article = markdown(pre.textContent);
+      if (previous) previous.article.replaceWith(article);
+      else {
+        const details = node('details'); details.dataset.readerSource = '';
+        details.append(node('summary', 'Markdown 원문 보기'));
+        pre.before(article, details); details.append(pre);
+      }
+      rendered.set(pre, {source: pre.textContent, article});
+    });
+    root.querySelectorAll('table').forEach(table => {
+      if (table.closest('.reader-table,.account-table-wrap,.summary-scroll')) return;
+      const wrap = node('div'); wrap.className = 'reader-table'; wrap.tabIndex = 0;
+      wrap.setAttribute('role', 'region'); wrap.setAttribute('aria-label', '리포트 표 · 가로로 스크롤하여 전체 보기');
+      table.before(wrap); wrap.append(table);
+    });
+    root.querySelectorAll('.grid').forEach(grid => {
+      const cards = [...grid.querySelectorAll(':scope > a.card')];
+      if (cards.length < 2 || grid.dataset.readerSearch) return;
+      grid.dataset.readerSearch = 'true';
+      const box = node('div'); box.className = 'reader-search';
+      const input = node('input'); input.type = 'search'; input.placeholder = '제목 · 종목 · 채널 · 키워드'; input.id = 'report-search-' + (++serial);
+      const label = node('label', '리포트 찾기'); label.htmlFor = input.id;
+      const status = node('p'); status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
+      const update = () => {
+        const terms = input.value.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean); let count = 0;
+        cards.forEach(card => { card.hidden = !terms.every(t => card.textContent.toLocaleLowerCase().includes(t)); if (!card.hidden) count += 1; });
+        status.textContent = cards.length + '개 중 ' + count + '개 표시' + (count ? '' : ' · 검색어를 지우거나 다른 키워드를 입력하세요.');
+      };
+      input.addEventListener('input', update); box.append(label, input, status); grid.before(box); update();
+    });
+    contents(root);
+  }
+  window.TradingAgentsReader = {enhance};
+  const main = document.querySelector('main');
+  if (main && !main.hasAttribute('data-reader-dynamic')) enhance(main);
+  if (main) {
+    const top = node('button', '↑ 맨 위'); top.type = 'button'; top.className = 'reader-back'; top.setAttribute('aria-label', '리포트 맨 위로 이동');
+    top.addEventListener('click', () => { const target = document.querySelector('h1') || main; target.tabIndex = -1; target.scrollIntoView({block: 'start'}); target.focus({preventScroll: true}); });
+    document.body.append(top);
+  }
+})();
+</script>
+</body>
+</html>

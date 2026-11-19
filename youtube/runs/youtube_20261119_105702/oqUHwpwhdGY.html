@@ -1,0 +1,715 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YouTube 투자자용 검증 리포트 - 비트코인 약세에도 알트코인은 순환? 달라지는 크립토 시장의 투자 기준 | 서동주, 김동환, 박상혁 디지털애셋 편집장 [크립토 PLUS]</title>
+  <style>
+:root {
+  color-scheme: light;
+  --bg: #f7f8fb;
+  --panel: #ffffff;
+  --text: #172033;
+  --muted: #667085;
+  --line: #d9dee8;
+  --accent: #0f766e;
+  --accent-2: #2563eb;
+  --warn: #b45309;
+  --bad: #b42318;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0 56px; }
+a { color: var(--accent-2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.hero { padding: 28px 0 22px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+.hero.compact { padding-top: 12px; }
+.hero h1 { margin: 0; font-size: clamp(28px, 4vw, 44px); line-height: 1.15; letter-spacing: 0; }
+.hero p { max-width: 760px; color: var(--muted); margin: 12px 0 0; }
+.eyebrow { color: var(--accent); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0; margin: 0 0 8px; }
+section { margin: 28px 0; }
+h2, h3, h4, h5 { letter-spacing: 0; line-height: 1.25; }
+.synthesis-callout { padding: clamp(20px, 4vw, 34px); border: 1px solid #6ee7d8; border-radius: 18px; background: linear-gradient(135deg, #ecfdf9 0%, #eff6ff 100%); box-shadow: 0 18px 44px rgba(15, 118, 110, .12); }
+.synthesis-callout.unavailable { border-color: var(--line); background: var(--panel); box-shadow: none; }
+.synthesis-callout h2 { margin: 0; font-size: clamp(24px, 3.2vw, 36px); }
+.synthesis-callout .lead { max-width: 900px; font-size: 17px; color: #334155; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.primary-link, .secondary-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border-radius: 999px; font-weight: 800; }
+.primary-link { color: white; background: var(--accent); }
+.secondary-link { color: var(--accent-2); border: 1px solid #93c5fd; background: white; }
+.primary-link:hover, .secondary-link:hover { text-decoration: none; filter: brightness(.97); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.card, .run { display: flex; flex-direction: column; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; color: var(--text); min-height: 128px; }
+.run { padding: 16px; }
+.card:hover, .run:hover { border-color: var(--accent-2); text-decoration: none; }
+.thumb { display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #e9edf5; border-radius: 8px 8px 0 0; color: var(--muted); font-size: 13px; font-weight: 700; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb-empty span { padding: 0 14px; text-align: center; }
+.card-body { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 16px; }
+.card strong { line-height: 1.35; }
+.source-line { color: #3f4a5f; font-weight: 600; }
+.runs { display: grid; gap: 10px; }
+.badge { display: inline-flex; width: fit-content; border-radius: 999px; padding: 2px 9px; background: #e6f4f1; color: var(--accent); font-size: 12px; font-weight: 700; }
+.status-contradicted, .status-llm_failed { background: #fee4e2; color: var(--bad); }
+.status-unverified, .status-stale { background: #fff4d6; color: var(--warn); }
+small, .muted { color: var(--muted); }
+.topnav { display: flex; gap: 14px; margin-bottom: 16px; font-size: 14px; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px; }
+.stats span { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
+.report { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: min(5vw, 36px); }
+.report-head { border-bottom: 1px solid var(--line); margin-bottom: 24px; padding-bottom: 20px; }
+.report-head h1 { margin: 0; font-size: clamp(24px, 3.5vw, 38px); line-height: 1.2; }
+.meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+.scope-note { padding: 12px 14px; border-left: 4px solid var(--warn); border-radius: 6px; background: #fff7ed; color: #7c2d12; }
+.synthesis-report h2 { margin-top: 34px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.synthesis-report h3 { margin: 24px 0 8px; color: #0f4c5c; }
+.synthesis-report p, .synthesis-report li { overflow-wrap: anywhere; }
+pre { overflow: auto; background: #111827; color: #f9fafb; border-radius: 8px; padding: 14px; }
+code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+details { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 18px; }
+@media (max-width: 640px) {
+  main { width: min(100% - 20px, 1120px); padding-top: 18px; }
+  .report { padding: 18px; }
+  .synthesis-callout { border-radius: 14px; padding: 18px; }
+  .cta-row a { width: 100%; }
+  .mobile-report { border-radius: 12px; }
+}
+</style>
+</head>
+<body>
+  <main>
+<nav class="topnav"><a href="index.html">실행 목록</a><a href="../../index.html">YouTube 홈</a></nav>
+<article class="report">
+  <header class="report-head">
+    <p class="eyebrow">youtube_20261119_105702</p>
+    <h1>비트코인 약세에도 알트코인은 순환? 달라지는 크립토 시장의 투자 기준 | 서동주, 김동환, 박상혁 디지털애셋 편집장 [크립토 PLUS]</h1>
+    <div class="meta">
+      <span class="badge status-unverified">unverified</span>
+      <a href="https://www.youtube.com/watch?v=oqUHwpwhdGY">원본 영상</a>
+    </div>
+  </header>
+  <h2>비트코인 약세 속 알트코인 순환매: 덜 빠진 것과 자금이 들어온 것은 다르다</h2>
+<p><a href="https://www.youtube.com/watch?v=oqUHwpwhdGY">삼프로TV 3PROTV 원영상</a> · 2026년 11월 18일 업로드 · 2026년 11월 19일 제공 자료 기준</p>
+<p><strong>핵심 판단:</strong> 영상은 비트코인 반등이 약한 가운데 프라이버시·토큰화·거래소 관련 일부 자산으로 관심이 옮겨갔다고 해석한다. 하지만 방송이 제시한 알트코인 바스켓은 세 개 모두 하락했다. 수치가 재현되더라도 그것은 우선 <strong>비트코인 대비 낙폭이 작았다</strong>는 뜻이지, 순매수 유입이나 알트코인 전반의 회복을 입증하지는 않는다. 현재 자료로는 비트코인 추세 반전과 알트코인 순환매 모두 관찰할 가설이다.</p>
+<h3>확인된 사실과 근거의 한계</h3>
+<ul>
+<li><strong>12개 영상 주장 모두 독립 검증되지 않았다.</strong> 수집 기사 8건은 해당 주장과 직접 관련이 없다. 예를 들어 엔비디아 조회에는 스페이스X 보호예수 기사가, 비트코인 현물 ETF 조회에는 알코아 주식 기사가 반환됐다. 자료가 수집됐다는 것과 주장이 확인됐다는 것은 다르며, 직접 근거가 없다는 사실이 주장을 반박하는 것도 아니다.</li>
+<li><strong>시장 조회에서 확인된 것은 개별 반환값뿐이다.</strong> 11월 19일 03:05 UTC 무렵 yfinance는 NVDA 150.96, ICE 171.81을 반환했다. 둘 다 영상 업로드 이후의 단일 스냅샷이므로 실적 직후 주가 반응이나 제휴 사실을 확인해 주지 않는다. <code>BTC</code> 코드의 27.62는 상품·거래쌍·단위가 식별되지 않아 BTC/USD 현물과 비교할 수 없다. USDT는 사용 가능한 값이 없었다. 뉴스 조회 실패와 공시 공급자 부재는 뉴스나 공시가 없다는 뜻이 아니다.</li>
+<li><strong>자막 품질과 사실 검증은 별개다.</strong> 전체 자막 품질(<code>transcript_quality</code>)은 <code>good</code>, 1.00이지만, 수동 자막 없이 한국어 자동자막 1,060개를 사용했다. 아래 <code>source_confidence</code> / <code>asr_confidence</code>는 각각 영상에서 주장을 추출한 신뢰도와 음성 인식 신뢰도이며, 주장이 사실일 확률이 아니다. 타임스탬프는 발화의 정확한 순간이 아닌 근거 구간의 시작점이다. 업로드일은 확인된 녹화일이 아니므로 방송의 ‘어제’나 ‘다음 월요일’을 특정 거래일로 단정하지 않았다.</li>
+</ul>
+<h3>영상 주장과 검증 결과</h3>
+<p>| 영상 구간 | 영상 주장 — 모두 미검증 | 확인 결과와 투자 해석 |</p>
+<p>|---|---|---|</p>
+<p>| <a href="https://www.youtube.com/watch?v=oqUHwpwhdGY&amp;t=10s">00:00:10</a> · 엔비디아 (0.91 / 0.90) | 사상 최대 매출과 전년 대비 약 100% 성장, 차년도 수요에 대한 자신감에도 주가 반응이 미지근했다. 데이터센터 가동 준비가 네오클라우드 관련 약정의 전제라고 소개했다. | 해당 회계분기 실적·어닝콜·발표 전후 시세가 없다. 공식 수치 가이던스와 차년도 수요에 대한 정성 발언, 경영진 직책과 실제 계약 조건은 각각 확인해야 한다. |</p>
+<p>| <a href="https://www.youtube.com/watch?v=oqUHwpwhdGY&amp;t=10s">00:00:10</a> · BTC 가격·주봉 (0.93 / 0.62) | 나스닥 약세와 함께 6만4천 달러를 밑돈 뒤 엔비디아 실적 발표 무렵 6만5천 달러 부근으로 반등했다가 약 6만4,200달러로 밀렸다고 했다. 6주 연속 음봉은 확정, 7주째는 다음 주봉 마감에 달렸다고 설명했다. 200주선 약 6만8천 달러, 50주선 약 7만4천 달러와 2022년 200주선 하회 사례도 제시했다. | BTC/USD 분봉·나스닥 시계열·주봉 원자료가 없다. 고점이 정확히 6만5천 달러라면 낙폭은 800달러(약 1.23%)지만, 고점 자막이 불명확해 방송의 약 1,000달러(약 1.5%)를 이 차이만으로 반박할 수 없다. 동시 움직임도 인과관계의 증거가 아니다. |</p>
+<p>| <a href="https://www.youtube.com/watch?v=oqUHwpwhdGY&amp;t=374s">00:06:14</a> · 미국 현물 ETF (0.93 / 0.92), 윈터뮤트 (0.93 / 0.72) | 7거래일 연속 순유출 뒤 약 790만 달러 순유입을 언급했다. 6만8천 달러 미회복 시 5만 달러까지 밀릴 수 있다는 전망을 윈터뮤트에 귀속했고, 3만 달러는 이전 방송의 별도 시나리오로 소개했다. | 순유입은 기준 거래일과 포함 상품이 확인되지 않았다. 윈터뮤트 원문과 직전 회차 발언도 확보되지 않았다. 두 하방 수치는 확인된 목표가가 아니며 동일 기관 전망으로 묶을 수 없다. |</p>
+<p>| <a href="https://www.youtube.com/watch?v=oqUHwpwhdGY&amp;t=727s">00:12:07</a> · 그레이스케일 (0.90 / 0.80) | 유동성 위축에도 역사적 저점과 견조한 펀더멘털이 중장기 기회를 뒷받침한다는 견해를 소개했다. AI 주식으로의 자금 쏠림과 미국 스테이블코인 발행 확대 가능성도 거론했다. | 보고서 원문, 저점 판단 지표, 유동성 자료가 없다. 특히 방송에서 언급한 바이낸스 관련 사건은 특정되지 않았으며, 유동성 위축의 원인이나 스테이블코인 발행 확대의 수혜도 확인되지 않았다. |</p>
+<p>| <a href="https://www.youtube.com/watch?v=oqUHwpwhdGY&amp;t=727s">00:12:07</a> · 알트코인 (0.89 / 0.83) | 7일 수익률은 BTC −12.5%, 시총 상위 알트코인 50·100·300개 단순평균은 각각 −9.36%·−9.78%·−7.3%라고 했다. 1년 기준 HYPE·ZEC는 각각 50% 이상 상승, BTC·ETH·SOL·XRP는 각각 약 30%·40%·45%·50% 하락으로 제시했다. | 역사적 시총과 시세, 편입·제외 기준이 없어 재현 불가다. SOL·XRP는 방송 중 최종 정정된 순서를 반영했다. 대표 종목 두 개의 성과만으로 섹터 전체의 순환매를 확인할 수 없다. |</p>
+<p>| <a href="https://www.youtube.com/watch?v=oqUHwpwhdGY&amp;t=727s">00:12:07–00:24:17</a> · Backpack·tZERO (0.91 / 0.82) | CFTC 인가와 Backpack의 미국·해외 파생상품 오더북 연결 가능성을 소개했다. 인가 소식 뒤 Backpack 토큰이 하루 약 40% 올랐지만 플랫폼 거래량은 낮다고 평가했다. | 결정문·시세·운영 공지가 없다. 인가 범위, 오더북 연결 계획, 실제 가동은 별개다. FTX EU 인수만으로 MiCA 인가를 확인할 수 없으며, 토큰 거래량과 플랫폼 파생상품 거래량도 구분해야 한다. |</p>
+<p>| <a href="https://www.youtube.com/watch?v=oqUHwpwhdGY&amp;t=1088s">00:18:08</a> · ICE·Abra (0.92 / 0.92) | 미국 적격 투자자가 BTC·ETH·SOL을 담보로 달러를 빌리고 ICE 측은 수탁, Abra 측은 대출을 맡는다고 소개했다. | 양사 발표·약관이 없어 계약 주체, 이용 자격, 담보 목록, 달러 지급 및 출시 여부를 확인할 수 없다. 제휴 발표가 확인되더라도 실제 대출 이용이 늘었다는 뜻은 아니다. |</p>
+<p>| <a href="https://www.youtube.com/watch?v=oqUHwpwhdGY&amp;t=1455s">00:24:15</a> · Kalshi (0.88 / 0.65), 미국 CLARITY 법안 (0.90 / 0.85) | Kalshi가 SEC 등록 증권사 인수를 통해 미국 현물주식 거래를 추진한다고 했다. CLARITY 법안은 레임덕 회기 처리가 어렵지만 민주당 초선 비중이 차년도 재추진에 유리할 수 있다는 견해도 소개했다. | 자동자막만으로 인수 대상 법인명을 확정할 수 없다. 등록·인수 완료·서비스 출시는 각각 미확인이다. 법안의 공식 처리 상태, 민주당 당선자 4명 중 1명이 초선이라는 수치의 분모, 예측시장 관련 감독 조치도 확인되지 않았다. |</p>
+<p>| <a href="https://www.youtube.com/watch?v=oqUHwpwhdGY&amp;t=1455s">00:24:15</a> · 한국 가상자산 과세 (0.95 / 0.85) | 2년 유예는 당론 단계이며, 기본공제 250만 원 유지와 손실 이월공제 3년 또는 5년이 논의됐다고 했다. 22%는 이월공제가 없다는 가정에서 공제 초과분에 지방세를 포함한 수치로 설명했다. | 국회 의안·회의록·공포 자료가 없어 당시 당론과 심사안을 확정 법률과 대조할 수 없다. 유예, 시행일, 공제와 세율은 확정된 세후 수익 계산의 전제로 삼을 수 없다. |</p>
+<p>| <a href="https://www.youtube.com/watch?v=oqUHwpwhdGY&amp;t=1814s">00:30:14</a> · USDT 결제 사례 (0.95 / 0.82) | 디지털애셋이 접촉한 중국 판매상 한 곳이 시험 부정행위 장비에 대해 1,200위안 상당의 USDT만 받는다고 답했다고 소개했다. | 취재 원문·공개 증빙·당시 환율이 없어 결제 조건과 약 24만~25만 원이라는 방송 환산액을 확인할 수 없다. 호가는 실제 결제가 아니며, 단일 사례로 채택률이나 전체 수요를 추정할 수 없다. |</p>
+<p><strong>비공개 자료 — 미검증, 수동 확인 필요:</strong> Bloomberg·Morningstar 자료는 제공되지 않았다. 미공개 네오클라우드 계약서, 방송 제작진의 알트코인 원본 표본과 제외 규칙, 판매상과의 비공개 취재 대화 및 실제 거래 여부도 확인되지 않았다. 공개 어닝콜, 독립 재산출 수익률, 취재 기사 각각은 해당 비공개 원자료를 대신하지 못한다.</p>
+<h3>상승 논리와 무효화 조건</h3>
+<ul>
+<li><strong>BTC 반등:</strong> 동일 상품군의 미국 현물 ETF 순유입이 여러 거래일 이어져 직전 유출의 일부를 되돌리고, BTC/USD가 재계산한 200주선을 주봉 종가로 회복·유지한다면 반등 근거가 강해진다. 순유출이 재개되고 주봉이 해당 이동평균선 아래에 머물거나 재차 밀리면 추세 반전 해석은 약해진다. 방송의 6만8천·7만4천 달러는 검산 전까지 관찰 후보일 뿐이다.</li>
+<li><strong>알트코인 순환매:</strong> 같은 기준으로 재산출한 섹터 중간 수익률과 상승 종목 비중이 개선되고 현물 거래량도 동반 확대된다면, 몇몇 종목의 급등을 넘어선 움직임인지 판단할 수 있다. 반대로 초과수익이 소수 종목에 쏠리거나, 표본을 재현했을 때 상대 강세가 사라지거나, 중간 수익률이 계속 음수라면 시장 전반의 회복 해석을 지지하기 어렵다.</li>
+<li><strong>제도권 채택:</strong> 인가가 실제 상품 개시와 지속적인 거래·대출 이용으로 이어질 때 사업 효과를 평가할 수 있다. 인가 범위가 방송 설명보다 좁거나 출시가 지연되고 이용량이 늘지 않는다면, 토큰 가격 반등이나 제휴 발표만으로 채택 확대를 뒷받침할 수 없다.</li>
+</ul>
+<h3>가까운 시기에 확인할 항목</h3>
+<p>1. <strong>다음 미국 거래일과 주봉 마감:</strong> 녹화·미국장·엔비디아 발표 시각을 UTC로 맞춘 뒤 동일 거래소 BTC/USD 분봉과 나스닥 시세를 대조한다. 월요일 09:00 KST 기준으로 주봉 시가·종가, 연속 음봉 수, 50주·200주 단순이동평균을 재계산한다. ETF는 거래대금이나 운용자산 증감이 아니라 동일 펀드 집합의 일별 순설정·환매와 누적 순흐름을 확인한다.</p>
+<p>2. <strong>다음 7일 수익률 비교:</strong> 과거 시총 스냅샷과 동일 시각 USD 시세를 고정하고 스테이블코인·래핑 토큰·결측 종목의 처리 기준을 명시한다. 동일가중 평균에 더해 섹터별 중간 수익률, 상승 종목 비중, 현물 거래량, 상위 종목의 수익률 기여도를 본다.</p>
+<p>3. <strong>공식 발표와 운영 개시:</strong> NVIDIA IR·SEC 자료에서 실적, 가이던스, 경영진 발언을 구분한다. Backpack·tZERO는 CFTC 결정문과 유럽 등록부를, Kalshi는 SEC·FINRA 등록과 회사의 인수·출시 공지를 확인한다. ICE·Abra는 공개 약관에서 이용 자격, 담보인정비율, 청산 조건과 달러 지급을 본다. 발표 이후에는 Backpack 토큰의 거래량과 플랫폼의 실제 파생상품 거래량을 별도로 추적한다.</p>
+<p>4. <strong>정책과 장기 유동성:</strong> 미국 의회의 CLARITY 법안 마지막 조치와 한국 국회의 의안·의결·공포 기록을 각각 확인한다. 윈터뮤트·그레이스케일 전망은 날짜가 있는 원문에서 조건과 지표를 확인하고, 스테이블코인 수혜 가설은 개별 취재 사례가 아니라 발행사별 유통량과 실제 이용 지표로 따로 평가한다.</p>
+  <details>
+    <summary>공개 요약 JSON</summary>
+    <pre>{
+  &quot;version&quot;: 4,
+  &quot;video_id&quot;: &quot;oqUHwpwhdGY&quot;,
+  &quot;title&quot;: &quot;비트코인 약세에도 알트코인은 순환? 달라지는 크립토 시장의 투자 기준 | 서동주, 김동환, 박상혁 디지털애셋 편집장 [크립토 PLUS]&quot;,
+  &quot;url&quot;: &quot;https://www.youtube.com/watch?v=oqUHwpwhdGY&quot;,
+  &quot;channel&quot;: &quot;삼프로TV 3PROTV&quot;,
+  &quot;channel_id&quot;: &quot;UChlv4GSd7OQl3js-jkLOnFA&quot;,
+  &quot;source_url&quot;: &quot;https://www.youtube.com/@3protv/videos&quot;,
+  &quot;thumbnail_url&quot;: &quot;https://i.ytimg.com/vi/oqUHwpwhdGY/maxresdefault.jpg&quot;,
+  &quot;published_at&quot;: &quot;2026-11-18T03:30:17+00:00&quot;,
+  &quot;status&quot;: &quot;unverified&quot;,
+  &quot;strategy_source_tier&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_evidence_weight&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_validation_policy&quot;: &quot;STANDARD_REVIEW&quot;,
+  &quot;transcript_status&quot;: &quot;available&quot;,
+  &quot;transcript_source&quot;: &quot;automatic&quot;,
+  &quot;transcript_chars&quot;: 18232,
+  &quot;transcript_quality&quot;: {
+    &quot;status&quot;: &quot;good&quot;,
+    &quot;score&quot;: 1.0,
+    &quot;warnings&quot;: [],
+    &quot;source&quot;: &quot;automatic&quot;,
+    &quot;language&quot;: &quot;Korean&quot;,
+    &quot;model_or_format&quot;: &quot;json3&quot;,
+    &quot;chars&quot;: 18232,
+    &quot;segments&quot;: 1060,
+    &quot;duration_seconds&quot;: 2055,
+    &quot;repeated_ngram_ratio&quot;: 0.001
+  },
+  &quot;generated_at&quot;: &quot;2026-11-19T10:57:02.116077+09:00&quot;,
+  &quot;llm_status&quot;: &quot;success&quot;,
+  &quot;research_status&quot;: &quot;success&quot;,
+  &quot;claim_verification_status&quot;: &quot;success&quot;,
+  &quot;research_pipeline_version&quot;: 4,
+  &quot;evidence_count&quot;: 8,
+  &quot;claim_status_summary&quot;: {
+    &quot;unverified&quot;: 12
+  },
+  &quot;claims&quot;: [
+    {
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;claim_text&quot;: &quot;방송은 엔비디아가 사상 최대 매출과 전년 대비 약 100% 성장을 기록하고 차년도 수요에 자신감을 보였지만 주가 반응은 미지근했으며, CFO 겸 임시 CEO가 네오클라우드 약정의 전제로 데이터센터 가동 준비를 언급했다고 전했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.05,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:10&quot;,
+      &quot;source_confidence&quot;: 0.91,
+      &quot;asr_confidence&quot;: 0.9,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;매출 전년 대비 약 +100%, 사상 최대 매출&quot;,
+        &quot;observed&quot;: &quot;해당 분기 매출, 전년 동기 매출 및 비교 가능한 과거 분기 실적 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;매출 성장률, 다음 분기 수치 가이던스, 차년도 수요에 대한 정성 발언을 구분해서 봐야 한다. 가동 준비에 관한 경영진 설명도 실제 계약의 효력 조건이나 지원 제한을 확인해 주지는 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;claim_text&quot;: &quot;방송은 BTC가 나스닥 장 초반 약세와 함께 64,000달러를 하회한 뒤 엔비디아 실적 발표 무렵 65,000달러 부근까지 반등했다가 약 64,200달러로 되밀렸다고 했다. 화·수요일 범위는 약 64,000~65,000달러, 반등 고점 대비 낙폭은 약 1,000달러(1.5%)로 제시했다. 주봉 6연속 음봉, 다음 주봉도 음봉일 경우 2022년 이후 첫 7연속, 200주선 약 68,000달러 하회, 50주선 약 74,000달러, 2022년 200주선 아래 약...&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.05,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:10&quot;,
+      &quot;source_confidence&quot;: 0.93,
+      &quot;asr_confidence&quot;: 0.62,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;64,000달러 하회 → 약 65,000달러 → 약 64,200달러; 화·수요일 약 64,000~65,000달러; 약 -1,000달러(-1.5%); 주봉 6연속 음봉, 7번째 조건부; 200주선 약 68,000달러, 50주선 약 74,000달러; 2022년 약 6개월 하회&quot;,
+        &quot;observed&quot;: &quot;BTC 코드 스냅샷 27.62는 상품·단위 미확인으로 비교 불가. BTC/USD 분봉, 나스닥 장중 시세, 주봉과 이동평균 검산 자료 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;녹화 시각과 BTC/USD 원시 시세를 맞추고 주봉을 재계산하기 전에는 방송의 가격대나 이동평균선을 매매 기준으로 사용하기 어렵다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;claim_text&quot;: &quot;방송은 미국 비트코인 현물 자금이 7거래일 연속 순유출 뒤 약 790만 달러 순유입으로 전환했으나 강한 반등 신호로 보기 어렵다고 평가했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.05,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:06:14&quot;,
+      &quot;source_confidence&quot;: 0.93,
+      &quot;asr_confidence&quot;: 0.92,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;7거래일 연속 순유출 후 약 790만 달러 순유입&quot;,
+        &quot;observed&quot;: &quot;거래일별·상품별 순설정 및 순환매 자료 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;순유입 전환이 확인되더라도 하루치 수치만으로 추세 반전을 판단하기 어렵다. 이전 유출 규모와 후속 거래일 흐름을 함께 봐야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;claim_text&quot;: &quot;방송은 68,000달러를 회복하지 못하면 50,000달러까지 하락할 수 있다는 조건부 시나리오를 윈터뮤트에 귀속했다. 30,000달러는 앞선 방송에서 거론된 별도 시나리오로 소개했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.05,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:06:14&quot;,
+      &quot;source_confidence&quot;: 0.93,
+      &quot;asr_confidence&quot;: 0.72,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;68,000달러 미회복 시 50,000달러 가능; 30,000달러는 별도 시나리오&quot;,
+        &quot;observed&quot;: &quot;윈터뮤트 원문과 직전 방송 원음 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;50,000달러와 30,000달러를 확인된 목표가로 제시하거나 같은 기관의 전망으로 묶을 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;claim_text&quot;: &quot;방송은 그레이스케일이 단기 유동성 위축에도 역사적 저점과 견조한 펀더멘털을 근거로 중장기 진입 기회를 제시했다고 전했다. AI 주식으로의 유동성 쏠림, 바이낸스 해킹 이후의 유동성 위축, 미국 스테이블코인 발행 확대에 따른 수혜도 거론했으나 각각의 발언 주체와 근거는 확인이 필요하다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.04,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:12:07&quot;,
+      &quot;source_confidence&quot;: 0.9,
+      &quot;asr_confidence&quot;: 0.8,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;구체적 수치 없음&quot;,
+        &quot;observed&quot;: &quot;저점 판단에 사용된 지표와 비교 기간 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;그레이스케일의 견해와 출연진의 해석을 분리하고, 온체인·유동성 지표가 확인되기 전에는 중장기 진입 근거로 제시하지 않아야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;claim_text&quot;: &quot;방송의 7일 수익률은 BTC 약 -12.5%, 시총 상위 알트코인 50·100·300개 단순평균은 각각 -9.36%·-9.78%·-7.3%였다. 1년 수익률은 HYPE·ZEC 각각 +50% 이상, BTC 약 -30%, ETH -40%, SOL -45%, XRP -50%로 제시됐다. 프라이버시·토큰화·거래소 토큰 일부에 순환매가 나타났다는 해석이 뒤따랐다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.05,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:12:07&quot;,
+      &quot;source_confidence&quot;: 0.89,
+      &quot;asr_confidence&quot;: 0.83,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;7일: BTC -12.5%, 상위 50·100·300개 단순평균 -9.36%·-9.78%·-7.3%. 1년: HYPE·ZEC 각각 +50% 이상, BTC -30%, ETH -40%, SOL -45%, XRP -50%&quot;,
+        &quot;observed&quot;: &quot;과거 시총 순위, 바스켓 구성, 기준 시각별 USD 시세 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;일부 종목의 상대 강세를 알트코인 전반의 회복으로 해석하려면 상승 종목 비중, 섹터별 거래량, 수익률 분포를 함께 확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;claim_text&quot;: &quot;방송은 CFTC가 Backpack과 tZERO에 인가를 내주고 Backpack에 미국·해외 파생상품 오더북 연결 가능성이 생겼다고 전했다. 인가 보도 뒤 Backpack 토큰이 하루 약 40% 상승했으나 실제 거래량은 낮았다고 평가했고, FTX EU 인수와 유럽 인허가를 연결해 설명했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.05,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:12:07&quot;,
+      &quot;source_confidence&quot;: 0.91,
+      &quot;asr_confidence&quot;: 0.82,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;인가 보도 뒤 Backpack 토큰 하루 약 +40%; 플랫폼 거래량은 낮다는 평가&quot;,
+        &quot;observed&quot;: &quot;토큰 식별자·거래쌍·발표 전후 24시간 시세 및 플랫폼 거래량 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;토큰 가격 반응, 플랫폼 파생상품 거래량, 인가의 영업 범위는 별개다. 통합 오더북의 실제 개시 여부와 거래량 증가가 사업 효과를 판단하는 데 더 직접적이다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;claim_text&quot;: &quot;방송은 미국 적격 투자자가 BTC·ETH·SOL을 담보로 스테이블코인이 아닌 미국 달러를 빌리는 서비스에서 ICE 측이 수탁, Abra 측이 대출을 맡는다고 전했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.05,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:18:08&quot;,
+      &quot;source_confidence&quot;: 0.92,
+      &quot;asr_confidence&quot;: 0.92,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;구체적 수치 없음; 담보 BTC·ETH·SOL, 대출 USD&quot;,
+        &quot;observed&quot;: &quot;공식 담보 목록과 지급 조건 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;제휴 발표와 서비스 개시는 다르다. 실제 이용 자격과 담보·청산 조건이 확인되기 전에는 제도권 대출 수요 확대를 입증하는 사례로 볼 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;claim_text&quot;: &quot;방송은 Kalshi가 SEC 등록 증권사를 인수해 미국 현물주식 거래를 추진한다고 전했다. 인수 완료와 서비스 출시는 별도 확인이 필요하다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.04,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:24:15&quot;,
+      &quot;source_confidence&quot;: 0.88,
+      &quot;asr_confidence&quot;: 0.65,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;구체적 수치 없음&quot;,
+        &quot;observed&quot;: &quot;인수 대상 법인 식별자 및 등록 자료 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;인수 대상과 등록 상태가 확인되기 전에는 미국 현물주식 거래를 Kalshi의 현재 사업으로 반영할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C10&quot;,
+      &quot;claim_text&quot;: &quot;방송은 레임덕 회기 내 처리 가능성이 낮다는 견해와, 중간선거에서 선출된 민주당 의원 4명 중 1명이 초선이어서 차년도 재추진에 유리할 수 있다는 크리스틴 스미스의 견해를 소개했다. 민주당이 예측시장을 견제하고 있다는 주장도 나왔다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.04,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:24:15&quot;,
+      &quot;source_confidence&quot;: 0.9,
+      &quot;asr_confidence&quot;: 0.85,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;중간선거에서 선출된 민주당 의원 4명 중 1명(25%)이 초선&quot;,
+        &quot;observed&quot;: &quot;공식 선거 결과, 의회 명부 및 발언 원문 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;초선 비율이나 정치권 전망만으로 법안 통과 가능성을 높여 잡기 어렵다. 실제 입법 조치와 예측시장에 대한 구체적 감독 조치를 별도로 봐야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C11&quot;,
+      &quot;claim_text&quot;: &quot;방송은 2년 과세 유예가 당론 차원에서 정리됐으나 법안은 아직 통과되지 않았고, 손실 이월공제 3년 또는 5년이 논의됐다고 전했다. 기본공제 5,000만 원 상향안 대신 250만 원을 유지하며, 이월공제가 없다는 가정에서 공제 초과분에 지방세 포함 22%가 적용된다고 설명했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.05,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:24:15&quot;,
+      &quot;source_confidence&quot;: 0.95,
+      &quot;asr_confidence&quot;: 0.85,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;유예 2년; 손실 이월공제 3년 또는 5년 논의; 기본공제 250만 원 유지 및 5,000만 원 상향안; 이월공제 없다는 가정에서 지방세 포함 22%&quot;,
+        &quot;observed&quot;: &quot;조문, 의안 상태, 적용일 및 국세·지방세 구성 자료 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;유예 기간과 공제·세율을 확정된 세후 수익 계산에 반영하기 전에 공포 법률과 적용 시점을 확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C12&quot;,
+      &quot;claim_text&quot;: &quot;디지털애셋이 접촉한 중국 판매상 한 곳이 시험 부정행위 장비 대금으로 1,200위안 상당의 USDT만 받는다고 답했다는 취재 주장이다. 방송 환산액은 약 24만~25만 원이었다. 유동성과 가격 안정성은 출연진이 제시한 해석이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.05,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:30:14&quot;,
+      &quot;source_confidence&quot;: 0.95,
+      &quot;asr_confidence&quot;: 0.82,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;1,200위안 상당의 USDT; 약 24만~25만 원&quot;,
+        &quot;observed&quot;: &quot;취재일 또는 방송일 CNY/KRW 기준환율과 실제 거래 증빙 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;한 판매상의 미확인 호가를 스테이블코인 결제 채택률이나 전체 수요의 근거로 일반화할 수 없다.&quot;
+    }
+  ],
+  &quot;entities&quot;: [
+    {
+      &quot;ticker&quot;: &quot;NVDA&quot;,
+      &quot;name&quot;: &quot;엔비디아&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;매출 신기록과 자신감 있는 차년도 가이던스에도 시장 반응은 미지근했다. 출연진은 데이터센터 가동 준비가 네오클라우드 관련 약정의 전제라는 실적 발표 설명에 주목했다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;매출이 전년 대비 약 100% 증가했다고 방송에서 언급했다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;NVDA&quot;,
+        &quot;as_of&quot;: &quot;2026-11-19T03:05:29.870802+00:00&quot;,
+        &quot;current_price&quot;: 150.9600067138672,
+        &quot;market_cap&quot;: 3645231282119.751,
+        &quot;forward_pe&quot;: 9.0910845,
+        &quot;trailing_pe&quot;: 19.084703,
+        &quot;fifty_two_week_high&quot;: 243.37,
+        &quot;fifty_two_week_low&quot;: 148.8,
+        &quot;average_target_price&quot;: 253.67091,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;BTC&quot;,
+      &quot;name&quot;: &quot;비트코인&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;나스닥 장 초반 약세를 따라 하락했고, 엔비디아 실적 발표 뒤 잠시 반등했으나 상승분을 대부분 반납했다.&quot;,
+        &quot;미국 비트코인 현물 자금이 순유입으로 돌아섰지만 규모가 작아 강한 반등 신호로 보기 어렵다는 평가다.&quot;,
+        &quot;주봉 연속 하락과 200주 이동평균선 하회가 기술적 분기점으로 제시됐다. 출연진은 장기 저점 구간의 시작일 수 있지만 하락 폭과 지속 기간은 알 수 없다고 설명했다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;장중 64,000달러를 하회한 뒤 65,000달러 부근으로 반등했다가 방송 중 약 64,200달러로 밀렸다. 고점 대비 약 1,000달러(약 1.5%) 하락으로 설명했다.&quot;,
+        &quot;화·수요일 가격 범위는 약 64,000~65,000달러로 제시됐다.&quot;,
+        &quot;미국 현물 자금은 7거래일 연속 순유출 뒤 약 790만 달러 순유입으로 전환했다고 언급했다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;BTC&quot;,
+        &quot;as_of&quot;: &quot;2026-11-19T03:05:32.350211+00:00&quot;,
+        &quot;current_price&quot;: 27.6200008392334,
+        &quot;market_cap&quot;: null,
+        &quot;forward_pe&quot;: null,
+        &quot;trailing_pe&quot;: null,
+        &quot;fifty_two_week_high&quot;: 43.36,
+        &quot;fifty_two_week_low&quot;: 25.65,
+        &quot;average_target_price&quot;: null,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;ICE&quot;,
+      &quot;name&quot;: &quot;인터컨티넨털 익스체인지(ICE)·아브라(Abra)&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;ICE와 아브라는 미국 적격 투자자 대상 디지털 자산 담보 대출에 협력한다고 소개됐다. ICE가 수탁, 아브라가 대출을 맡으며, 비트코인·이더리움·솔라나를 담보로 스테이블코인이 아닌 미국 달러를 빌리는 구조다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;ICE&quot;,
+        &quot;as_of&quot;: &quot;2026-11-19T03:05:34.374468+00:00&quot;,
+        &quot;current_price&quot;: 171.80999755859375,
+        &quot;market_cap&quot;: 96017462401.31958,
+        &quot;forward_pe&quot;: 19.217455,
+        &quot;trailing_pe&quot;: 23.407356,
+        &quot;fifty_two_week_high&quot;: 181.38,
+        &quot;fifty_two_week_low&quot;: 121.79,
+        &quot;average_target_price&quot;: 193.53333,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;USDT&quot;,
+      &quot;name&quot;: &quot;테더(USDT)·스테이블코인 결제&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;디지털애셋이 취재한 중국 판매상은 시험 부정행위 장비 대금을 USDT로만 받는다고 답했다. 방송은 유동성과 가격 안정성을 결제에 쓰이는 이유로 해석했다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;제시 가격은 1,200위안 상당의 USDT로, 방송 환산 약 24만~25만 원이었다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;시장 데이터 조회 실패: no_usable_market_fields&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;USDT&quot;,
+        &quot;as_of&quot;: &quot;2026-11-19T03:05:36.720431+00:00&quot;,
+        &quot;current_price&quot;: null,
+        &quot;market_cap&quot;: null,
+        &quot;forward_pe&quot;: null,
+        &quot;trailing_pe&quot;: null,
+        &quot;fifty_two_week_high&quot;: null,
+        &quot;fifty_two_week_low&quot;: null,
+        &quot;average_target_price&quot;: null,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;unverified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    }
+  ],
+  &quot;evidence&quot;: [
+    {
+      &quot;evidence_id&quot;: &quot;E1&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;SpaceX’s December Lock-Up Frees Another 17% of Its Shares. Here’s What October’s Unlock Did to the Stock.&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/spacex-december-lock-frees-another-025502691.html&quot;,
+      &quot;publisher&quot;: &quot;Motley Fool&quot;,
+      &quot;published_at&quot;: &quot;2026-11-19T02:55:02+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;SpaceX’s December Lock-Up Frees Another 17% of Its Shares. Here’s What October’s Unlock Did to the Stock. Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Scien...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E2&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;Asian stocks drop as Anthropic&#x27;s record IPO fails to reassure&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/world-indices/articles/asian-stocks-drop-anthropics-record-025108034.html&quot;,
+      &quot;publisher&quot;: &quot;AFP&quot;,
+      &quot;published_at&quot;: &quot;2026-11-19T02:51:08+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Asian stocks drop as Anthropic&#x27;s record IPO fails to reassure Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 2026 Elections Weather Newslett...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E4&quot;,
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;title&quot;: &quot;Alcoa (AA) Stock Looks Reasonable Despite A 46% Three Year Gain&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/alcoa-aa-stock-looks-reasonable-221445665.html&quot;,
+      &quot;publisher&quot;: &quot;Simply Wall St.&quot;,
+      &quot;published_at&quot;: &quot;2026-11-18T22:14:45+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Alcoa (AA) Stock Looks Reasonable Despite A 46% Three Year Gain Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 2026 Elections Weather Newsle...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E5&quot;,
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;title&quot;: &quot;Rio Tinto to Restart Line 4 Operations With 50MW Electricity Contract&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/energy/articles/rio-tinto-restart-line-4-164100484.html&quot;,
+      &quot;publisher&quot;: &quot;Zacks&quot;,
+      &quot;published_at&quot;: &quot;2026-11-18T16:41:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E6&quot;,
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;title&quot;: &quot;3 Mining Giants Pay Big Dividends, but Their Yields Come With a Catch&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/commodities/articles/3-mining-giants-pay-big-171956256.html&quot;,
+      &quot;publisher&quot;: &quot;24/7 Wall St.&quot;,
+      &quot;published_at&quot;: &quot;2026-11-18T17:19:56+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E7&quot;,
+      &quot;claim_id&quot;: &quot;C10&quot;,
+      &quot;title&quot;: &quot;Q3 Earnings Strong, Q4 Estimates Slip: What the Latest Revisions Mean for 2027&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/q3-earnings-strong-q4-estimates-235100192.html&quot;,
+      &quot;publisher&quot;: &quot;Zacks&quot;,
+      &quot;published_at&quot;: &quot;2026-11-18T23:51:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E8&quot;,
+      &quot;claim_id&quot;: &quot;C10&quot;,
+      &quot;title&quot;: &quot;Q3 Earnings Strong, Q4 Estimates Slip: What the Latest Revisions Mean for 2027&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/q3-earnings-strong-q4-estimates-234800485.html&quot;,
+      &quot;publisher&quot;: &quot;Zacks&quot;,
+      &quot;published_at&quot;: &quot;2026-11-18T23:48:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    }
+  ],
+  &quot;source_policy&quot;: {
+    &quot;raw_transcript_published&quot;: false,
+    &quot;raw_transcript_in_evidence&quot;: false,
+    &quot;research_pipeline_version&quot;: 4,
+    &quot;closed_source_claims&quot;: &quot;unverified_external_source&quot;,
+    &quot;auto_caption_warning&quot;: true,
+    &quot;local_asr_warning&quot;: false
+  }
+}</pre>
+  </details>
+</article>
+</main>
+  <style>
+.reader-contents { margin: 16px 0; padding: 12px 16px; border: 1px solid var(--line, #64748b); border-radius: 12px; }
+.reader-contents > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-weight: 750; }
+.reader-contents nav { display: grid; gap: 4px; max-height: 45vh; overflow: auto; margin: 8px 0; }
+.reader-contents a { display: block; min-height: 44px; padding: 10px; border-radius: 6px; color: inherit; overflow-wrap: anywhere; }
+.reader-contents a:hover { background: #80808020; }
+.reader-contents .reader-subsection { padding-inline-start: 24px; font-size: .92em; }
+.reader-prose, .report { overflow-wrap: anywhere; line-height: 1.8; }
+.reader-prose p, .reader-prose li { max-width: 85ch; }
+.reader-prose h2, .reader-prose h3, .reader-prose h4, [data-reader-heading] { scroll-margin-top: 100px; line-height: 1.45; }
+.reader-prose h2 { margin-top: 1.8em; padding-bottom: 8px; border-bottom: 1px solid var(--line, #64748b); }
+.reader-prose h3 { margin-top: 1.5em; }
+.reader-prose li { margin: .5em 0; }
+.reader-prose pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.reader-prose blockquote { margin: 16px 0; padding: 4px 16px; border-left: 3px solid var(--accent, #64748b); }
+.reader-table { overflow: auto; max-width: 100%; margin: 16px 0; border: 1px solid var(--line, #64748b); border-radius: 10px; }
+.reader-table table { border-collapse: collapse; width: 100%; margin: 0; font-size: .92rem; }
+.reader-table th, .reader-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line, #64748b); min-width: 110px; max-width: 400px; overflow-wrap: anywhere; white-space: normal; }
+.reader-table th { background: #80808018; }
+.reader-table tr:nth-child(even) { background: #80808008; }
+.reader-search { display: grid; gap: 8px; margin: 16px 0; }
+.reader-search label { font-weight: 700; }
+.reader-search input { box-sizing: border-box; width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line, #64748b); border-radius: 10px; background: var(--panel, #fff); color: var(--text, #132238); font: inherit; }
+.reader-search p { margin: 0; font-size: .86rem; }
+.reader-back { position: fixed; bottom: max(14px, env(safe-area-inset-bottom)); right: 14px; z-index: 30; min-height: 44px; border: 1px solid #778899; border-radius: 99px; padding: 10px 16px; background: #18344a; color: #fff; font: 700 14px system-ui; cursor: pointer; box-shadow: 0 3px 12px #0003; }
+[data-reader-source] { margin-top: 20px; }
+[data-reader-source] > summary { min-height: 44px; cursor: pointer; }
+[data-reader-source] pre { font-size: .85rem; }
+[data-reader-source] pre, .reader-prose { min-width: 0; }
+.reader-contents :focus-visible, .reader-search :focus-visible, .reader-back:focus-visible, .reader-table:focus-visible { outline: 3px solid var(--accent, #008c95); outline-offset: 3px; }
+.reader-search + .grid > [hidden] { display: none !important; }
+@media (max-width: 600px) { .reader-prose { font-size: 1rem; } .reader-contents { padding: 8px 12px; } }
+@media print { .reader-back, .reader-search, .reader-contents, [data-reader-source] { display: none !important; } .reader-table { overflow: visible; } .reader-prose { color: #000; background: #fff; } }
+</style><script>
+(() => {
+  'use strict';
+  let serial = 0;
+  const rendered = new WeakMap();
+  const node = (tag, text) => { const el = document.createElement(tag); if (text != null) el.textContent = text; return el; };
+  function inline(parent, text) {
+    const pattern = /(`[^`]+`|\*\*[^*]+\*\*|\[[^\]]+\]\(https?:\/\/[^\s)]+\))/g;
+    let start = 0;
+    for (const match of String(text).matchAll(pattern)) {
+      parent.append(document.createTextNode(text.slice(start, match.index)));
+      const value = match[0];
+      if (value.startsWith('`')) parent.append(node('code', value.slice(1, -1)));
+      else if (value.startsWith('**')) parent.append(node('strong', value.slice(2, -2)));
+      else {
+        const link = value.match(/^\[([^\]]+)\]\((.+)\)$/);
+        const a = node('a', link[1]); a.href = link[2]; a.rel = 'noopener noreferrer'; parent.append(a);
+      }
+      start = match.index + value.length;
+    }
+    parent.append(document.createTextNode(text.slice(start)));
+  }
+  const cells = line => line.trim().replace(/^\|/, '').replace(/\|$/, '').split(/(?<!\\)\|/).map(v => v.trim().replace(/\\\|/g, '|'));
+  function markdown(source) {
+    const article = node('article'); article.className = 'reader-prose';
+    const lines = source.split(/\r?\n/); let list = null;
+    for (let i = 0; i < lines.length; i += 1) {
+      const line = lines[i], value = line.trim();
+      if (!value) { list = null; continue; }
+      if (/^```/.test(value)) {
+        const code = []; i += 1;
+        while (i < lines.length && !/^```/.test(lines[i].trim())) code.push(lines[i++]);
+        const pre = node('pre'); pre.append(node('code', code.join('\n'))); article.append(pre); list = null; continue;
+      }
+      if (i + 1 < lines.length && value.includes('|') && cells(lines[i + 1]).every(v => /^:?-{3,}:?$/.test(v))) {
+        const table = node('table'), head = node('thead'), body = node('tbody');
+        const row = (values, tag) => { const tr = node('tr'); values.forEach(v => { const cell = node(tag); if (tag === 'th') cell.scope = 'col'; inline(cell, v); tr.append(cell); }); return tr; };
+        head.append(row(cells(line), 'th')); i += 2;
+        while (i < lines.length && lines[i].trim() && lines[i].includes('|')) body.append(row(cells(lines[i++]), 'td'));
+        i -= 1; table.append(head, body); article.append(table); list = null; continue;
+      }
+      const heading = value.match(/^(#{1,6})\s+(.+)$/);
+      if (heading) { const h = node('h' + Math.min(4, heading[1].length + 1)); inline(h, heading[2]); article.append(h); list = null; continue; }
+      const bullet = value.match(/^(?:[-*+] |\d+\. )(.+)$/);
+      if (bullet) {
+        const tag = /^\d/.test(value) ? 'ol' : 'ul';
+        if (!list || list.tagName.toLowerCase() !== tag) { list = node(tag); if (tag === 'ol') list.start = parseInt(value, 10); article.append(list); }
+        const li = node('li'); inline(li, bullet[1]); list.append(li); continue;
+      }
+      list = null;
+      if (/^(---+|\*\*\*+)$/.test(value)) { article.append(node('hr')); continue; }
+      const p = node(value.startsWith('> ') ? 'blockquote' : 'p'); inline(p, value.startsWith('> ') ? value.slice(2) : line); article.append(p);
+    }
+    return article;
+  }
+  function contents(root) {
+    root.querySelectorAll(':scope > .reader-contents').forEach(el => el.remove());
+    const headings = [...root.querySelectorAll('h2,h3,h4')].filter(h => !h.closest('.card,.run-card,.reader-contents,[data-reader-source],[hidden]'));
+    if (headings.length < 2) return;
+    const details = node('details'); details.className = 'reader-contents';
+    details.append(node('summary', '이 리포트 목차 · ' + headings.length + '개 항목'));
+    const nav = node('nav'); nav.setAttribute('aria-label', '리포트 목차');
+    headings.forEach(h => {
+      if (!h.id) h.id = 'reader-section-' + (++serial);
+      h.dataset.readerHeading = ''; h.tabIndex = -1;
+      const a = node('a', h.textContent); a.href = '#' + h.id;
+      if (h.tagName !== 'H2') a.className = 'reader-subsection';
+      a.addEventListener('click', event => {
+        event.preventDefault();
+        for (let ancestor = h.parentElement; ancestor; ancestor = ancestor.parentElement) if (ancestor.tagName === 'DETAILS') ancestor.open = true;
+        h.scrollIntoView({block: 'start'}); h.focus({preventScroll: true});
+      }); nav.append(a);
+    });
+    details.append(nav); root.prepend(details);
+  }
+  function enhance(root) {
+    if (!root) return;
+    root.querySelectorAll('pre[data-report-markdown]').forEach(pre => {
+      const previous = rendered.get(pre);
+      if (previous && previous.source === pre.textContent) return;
+      const article = markdown(pre.textContent);
+      if (previous) previous.article.replaceWith(article);
+      else {
+        const details = node('details'); details.dataset.readerSource = '';
+        details.append(node('summary', 'Markdown 원문 보기'));
+        pre.before(article, details); details.append(pre);
+      }
+      rendered.set(pre, {source: pre.textContent, article});
+    });
+    root.querySelectorAll('table').forEach(table => {
+      if (table.closest('.reader-table,.account-table-wrap,.summary-scroll')) return;
+      const wrap = node('div'); wrap.className = 'reader-table'; wrap.tabIndex = 0;
+      wrap.setAttribute('role', 'region'); wrap.setAttribute('aria-label', '리포트 표 · 가로로 스크롤하여 전체 보기');
+      table.before(wrap); wrap.append(table);
+    });
+    root.querySelectorAll('.grid').forEach(grid => {
+      const cards = [...grid.querySelectorAll(':scope > a.card')];
+      if (cards.length < 2 || grid.dataset.readerSearch) return;
+      grid.dataset.readerSearch = 'true';
+      const box = node('div'); box.className = 'reader-search';
+      const input = node('input'); input.type = 'search'; input.placeholder = '제목 · 종목 · 채널 · 키워드'; input.id = 'report-search-' + (++serial);
+      const label = node('label', '리포트 찾기'); label.htmlFor = input.id;
+      const status = node('p'); status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
+      const update = () => {
+        const terms = input.value.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean); let count = 0;
+        cards.forEach(card => { card.hidden = !terms.every(t => card.textContent.toLocaleLowerCase().includes(t)); if (!card.hidden) count += 1; });
+        status.textContent = cards.length + '개 중 ' + count + '개 표시' + (count ? '' : ' · 검색어를 지우거나 다른 키워드를 입력하세요.');
+      };
+      input.addEventListener('input', update); box.append(label, input, status); grid.before(box); update();
+    });
+    contents(root);
+  }
+  window.TradingAgentsReader = {enhance};
+  const main = document.querySelector('main');
+  if (main && !main.hasAttribute('data-reader-dynamic')) enhance(main);
+  if (main) {
+    const top = node('button', '↑ 맨 위'); top.type = 'button'; top.className = 'reader-back'; top.setAttribute('aria-label', '리포트 맨 위로 이동');
+    top.addEventListener('click', () => { const target = document.querySelector('h1') || main; target.tabIndex = -1; target.scrollIntoView({block: 'start'}); target.focus({preventScroll: true}); });
+    document.body.append(top);
+  }
+})();
+</script>
+</body>
+</html>

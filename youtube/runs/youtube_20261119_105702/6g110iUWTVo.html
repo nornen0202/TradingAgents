@@ -1,0 +1,571 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YouTube 투자자용 검증 리포트 - “앤트로픽 상장이 AI 상승장 시즌2를 열까?”  다음 주도주가 바뀐다? 시장의 돈이 몰릴 ‘이 주식’!  | 테크밸리인사이트 손정우 대표</title>
+  <style>
+:root {
+  color-scheme: light;
+  --bg: #f7f8fb;
+  --panel: #ffffff;
+  --text: #172033;
+  --muted: #667085;
+  --line: #d9dee8;
+  --accent: #0f766e;
+  --accent-2: #2563eb;
+  --warn: #b45309;
+  --bad: #b42318;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0 56px; }
+a { color: var(--accent-2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.hero { padding: 28px 0 22px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+.hero.compact { padding-top: 12px; }
+.hero h1 { margin: 0; font-size: clamp(28px, 4vw, 44px); line-height: 1.15; letter-spacing: 0; }
+.hero p { max-width: 760px; color: var(--muted); margin: 12px 0 0; }
+.eyebrow { color: var(--accent); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0; margin: 0 0 8px; }
+section { margin: 28px 0; }
+h2, h3, h4, h5 { letter-spacing: 0; line-height: 1.25; }
+.synthesis-callout { padding: clamp(20px, 4vw, 34px); border: 1px solid #6ee7d8; border-radius: 18px; background: linear-gradient(135deg, #ecfdf9 0%, #eff6ff 100%); box-shadow: 0 18px 44px rgba(15, 118, 110, .12); }
+.synthesis-callout.unavailable { border-color: var(--line); background: var(--panel); box-shadow: none; }
+.synthesis-callout h2 { margin: 0; font-size: clamp(24px, 3.2vw, 36px); }
+.synthesis-callout .lead { max-width: 900px; font-size: 17px; color: #334155; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.primary-link, .secondary-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border-radius: 999px; font-weight: 800; }
+.primary-link { color: white; background: var(--accent); }
+.secondary-link { color: var(--accent-2); border: 1px solid #93c5fd; background: white; }
+.primary-link:hover, .secondary-link:hover { text-decoration: none; filter: brightness(.97); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.card, .run { display: flex; flex-direction: column; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; color: var(--text); min-height: 128px; }
+.run { padding: 16px; }
+.card:hover, .run:hover { border-color: var(--accent-2); text-decoration: none; }
+.thumb { display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #e9edf5; border-radius: 8px 8px 0 0; color: var(--muted); font-size: 13px; font-weight: 700; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb-empty span { padding: 0 14px; text-align: center; }
+.card-body { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 16px; }
+.card strong { line-height: 1.35; }
+.source-line { color: #3f4a5f; font-weight: 600; }
+.runs { display: grid; gap: 10px; }
+.badge { display: inline-flex; width: fit-content; border-radius: 999px; padding: 2px 9px; background: #e6f4f1; color: var(--accent); font-size: 12px; font-weight: 700; }
+.status-contradicted, .status-llm_failed { background: #fee4e2; color: var(--bad); }
+.status-unverified, .status-stale { background: #fff4d6; color: var(--warn); }
+small, .muted { color: var(--muted); }
+.topnav { display: flex; gap: 14px; margin-bottom: 16px; font-size: 14px; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px; }
+.stats span { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
+.report { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: min(5vw, 36px); }
+.report-head { border-bottom: 1px solid var(--line); margin-bottom: 24px; padding-bottom: 20px; }
+.report-head h1 { margin: 0; font-size: clamp(24px, 3.5vw, 38px); line-height: 1.2; }
+.meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+.scope-note { padding: 12px 14px; border-left: 4px solid var(--warn); border-radius: 6px; background: #fff7ed; color: #7c2d12; }
+.synthesis-report h2 { margin-top: 34px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.synthesis-report h3 { margin: 24px 0 8px; color: #0f4c5c; }
+.synthesis-report p, .synthesis-report li { overflow-wrap: anywhere; }
+pre { overflow: auto; background: #111827; color: #f9fafb; border-radius: 8px; padding: 14px; }
+code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+details { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 18px; }
+@media (max-width: 640px) {
+  main { width: min(100% - 20px, 1120px); padding-top: 18px; }
+  .report { padding: 18px; }
+  .synthesis-callout { border-radius: 14px; padding: 18px; }
+  .cta-row a { width: 100%; }
+  .mobile-report { border-radius: 12px; }
+}
+</style>
+</head>
+<body>
+  <main>
+<nav class="topnav"><a href="index.html">실행 목록</a><a href="../../index.html">YouTube 홈</a></nav>
+<article class="report">
+  <header class="report-head">
+    <p class="eyebrow">youtube_20261119_105702</p>
+    <h1>“앤트로픽 상장이 AI 상승장 시즌2를 열까?”  다음 주도주가 바뀐다? 시장의 돈이 몰릴 ‘이 주식’!  | 테크밸리인사이트 손정우 대표</h1>
+    <div class="meta">
+      <span class="badge status-asr_uncertain">asr_uncertain</span>
+      <a href="https://www.youtube.com/watch?v=6g110iUWTVo">원본 영상</a>
+    </div>
+  </header>
+  <h2>앤트로픽 IPO는 AI 상승장의 다음 촉매가 될까?</h2>
+<p><a href="https://www.youtube.com/watch?v=6g110iUWTVo">815Money talk 영상</a> · 2026년 11월 18일 공개 · 2026년 11월 19일 검증 기준</p>
+<p><strong>핵심 판단:</strong> 앤트로픽 IPO는 AI 서비스의 매출과 비용 구조를 점검할 계기가 될 수 있지만, 공모가나 첫날 주가가 AI 수익성을 입증하지는 않는다. 영상이 제시한 맞춤형 추론 칩, 국내 데이터센터 전력기기, 피지컬 AI 부품은 각각 <strong>후속 발주, 확정 수주, 양산 후 매출</strong>로 확인해야 할 가설이다.</p>
+<h3>확인된 사실과 근거의 범위</h3>
+<p>검증 대상 12개 중 <strong>11개는 미검증, 1개는 자동자막 불확실</strong>이다. 제공된 수집 결과 5건은 뉴스 제목과 불완전한 발췌뿐이며, 핵심 주장을 직접 뒷받침하거나 반박한 자료는 없었다. 공시·투자설명서·원조사·거래소 시계열도 제공되지 않았다.</p>
+<ul>
+<li><strong>가장 관련성 높은 외부 자료:</strong> <a href="https://finance.yahoo.com/m/107e5a2c-4fba-3df3-b2fd-5d1160e65516/dow-jones-futures-rise%3B.html">Investor’s Business Daily의 야후파이낸스 게재 기사</a> 제목은 앤트로픽 IPO 가격 책정을 보도한다. 확보된 본문에는 공모가나 거래 개시일이 없다. <a href="https://finance.yahoo.com/technology/ai/articles/anthropic-ipo-good-reason-buy-021627780.html">Motley Fool의 기사</a>도 IPO를 전제로 한 투자 논평 제목으로, 독립적인 상장 확인 자료가 아니다. 따라서 ‘19일’ 거래 개시는 확인되지 않았으며, 자료 부족이 상장 부재를 뜻하지도 않는다.</li>
+<li><strong>다른 검색 결과는 근거에서 제외:</strong> 일본 Datasection의 가이던스 하향 기사는 SemiAnalysis의 데이터센터 수요 전망 수정과 별개다. 리오틴토 전력 계약과 금 시황 역시 각각 HBM 공급과 앤트로픽 공모 조건을 검증하지 못한다.</li>
+<li><strong>자막 품질과 사실 검증은 별개:</strong> 한국어 자동자막 778개에 대한 <code>transcript_quality</code>는 <code>good</code>(1.0)으로, 개별 숫자·고유명사가 정확하다는 뜻은 아니다. 아래 <code>source_confidence</code>는 <strong>영상 주장 추출 확신도</strong>다. 구간별 <code>asr_confidence</code>는 미제공으로 기록값 <code>0.0</code>을 인식 정확도 0%로 해석하지 않는다. 타임스탬프는 발화가 포함된 구간의 시작점이며, ‘19일’, ‘어제’, ‘올해’, ‘내년 여름’은 녹화일 확인 전까지 달력 날짜로 확정하지 않는다.</li>
+</ul>
+<h3>영상 주장과 투자 가설</h3>
+<h4>1. 앤트로픽: 상장 수급과 사업 수익성은 별개</h4>
+<p><strong>영상 주장 — <a href="https://www.youtube.com/watch?v=6g110iUWTVo&amp;t=787s">13:07</a>, <code>source_confidence</code> 0.86.</strong> 출연자는 앤트로픽의 소프트웨어 중심 전략을 긍정적으로 평가했다. ‘19일’ 상장, 공모가 상단 기준 완전희석 가치 1.4조 달러와 종전에 거론된 2조 달러, 1~9월 매출 332억 달러와 전년 동기 대비 12배 성장을 언급했다. 베라 루빈 도입 시 토큰 비용이 6~7배 낮아지고 공모금으로 데이터센터 투자 약 3년치를 충당할 수 있다는 전망과, 가치가 1.2조~1조 달러로 내려가는 시나리오도 제시했다.</p>
+<p><strong>근거와 반론:</strong> 공모가·완전희석 주식 수·재무·비용 수치는 모두 미확인이다. 사모 평가와 공모 가치, 인식 매출과 연환산 매출, 칩 벤치마크와 앤트로픽의 실제 토큰 원가는 서로 대체할 수 없다. 유료 고객 확대와 추론 원가 개선이 함께 확인되면 강세 논리가 강화된다. 반대로 매출이 늘어도 마진이 개선되지 않거나 투자 약정이 순조달금에 비해 크다면 수익화 가설은 약해진다. ETF 편입과 락업 해제는 별도의 수급 변수다.</p>
+<h4>2. 반도체: 맞춤형 칩의 성장과 공급사 매출을 구분</h4>
+<p><strong>영상 주장 — <a href="https://www.youtube.com/watch?v=6g110iUWTVo&amp;t=5s">00:05</a>, <code>source_confidence</code> 0.88~0.93.</strong> 맞춤형 추론 칩이 엔비디아 점유율 일부를 가져가도 학습용 GPU와 통합 시스템의 경쟁력은 유지되고, 대체가 본격화하는 시점은 2029~2030년에 가깝다는 견해다. 구글 TPU·브로드컴과 이수페타시스의 기판 공급 가능성, SK하이닉스의 고객 다변화, 삼성전자의 맞춤형 HBM4 베이스 다이 경쟁력도 거론됐다.</p>
+<p><strong>근거와 반론:</strong> 엔비디아의 85~90%는 시장 범위와 측정 기준이 없고, 50%는 비교 전망의 <strong>도달 점유율</strong>이지 하락률이 아니다. SK하이닉스의 약 90%는 과거 엔비디아향 HBM <strong>매출</strong> 주장, 20% 이상은 비엔비디아향 <strong>공급</strong> 전망이어서 직접 비교할 수 없다. 일반 데이터센터용 PCB 납품도 TPU용 직접 공급을 입증하지 않는다. 동일 모델·정밀도·지연시간에서 맞춤형 칩의 토큰당 총비용이 낮고 반복 발주로 이어지면 추론 시장 분화 가설이 강해진다. 반대로 비용 우위가 사라지거나, 대체가 영상 예상보다 빨리 학습과 통합 시스템까지 번지면 각각 맞춤형 칩 또는 엔비디아 방어력에 대한 가정을 수정해야 한다.</p>
+<h4>3. AI 수요와 광고: 임대료와 주가만으로 수익성을 판단할 수 없다</h4>
+<p><strong>영상 주장 — <a href="https://www.youtube.com/watch?v=6g110iUWTVo&amp;t=407s">06:47</a>~<a href="https://www.youtube.com/watch?v=6g110iUWTVo&amp;t=787s">13:07</a> 시작 구간, <code>source_confidence</code> 0.86~0.90.</strong> 출연자는 GPU 임대료와 반도체 업체의 현금창출을 근거로 데이터센터 전망 하향을 수요 붕괴보다 기대 조정으로 해석했다. 앱러빈·유니티는 AI 광고 수익화 사례로 들었으며, AI 소프트웨어와 피지컬 AI 수익화가 2027년 하반기부터 가시화해 2028년에 본격화할 수 있다고 봤다.</p>
+<p><strong>근거와 반론:</strong> SemiAnalysis 전망의 두 판본, GPU 임대료 이력, 광고 실적과 수정주가는 확보되지 않았다. 고점 대비 40~50% 이상 하락이 필라델피아 반도체지수 자체인지 일부 종목인지도 불명확하다. 임대료 상승은 공급 부족으로도 설명할 수 있고, 실적 개선만으로 AI 광고의 증분 기여를 확인할 수 없다. 동일 조건의 체결 임대료와 가동률이 함께 약해지고, 수요 전망·EPS 추정치도 내려가거나 유료 고객 갱신이 부진하다면 단순한 기대 조정이라는 설명은 설득력을 잃는다.</p>
+<h4>4. 데이터센터 전력: 병목은 장비 수요를 만들 수도, 발주를 늦출 수도 있다</h4>
+<p><strong>영상 주장 — 미국 <a href="https://www.youtube.com/watch?v=6g110iUWTVo&amp;t=5s">00:05</a>·<a href="https://www.youtube.com/watch?v=6g110iUWTVo&amp;t=407s">06:47</a>, 국내 <a href="https://www.youtube.com/watch?v=6g110iUWTVo&amp;t=787s">13:07</a>·<a href="https://www.youtube.com/watch?v=6g110iUWTVo&amp;t=1178s">19:38</a>, <code>source_confidence</code> 각각 0.73·0.84.</strong> 미국에서는 인허가 간소화와 사업자의 비용 부담이 병행돼 미허가 사업 위주로 지연될 수 있다고 봤다. 국내에서는 수도권 가동 용량 약 663MW, 코로케이션 공실률 1% 미만, 투자 전망 136억 달러를 언급하며, 네이버·SK그룹 투자와 LS일렉트릭·비상발전기 업체의 수주 가능성을 제시했다.</p>
+<p><strong>근거와 반론:</strong> 자막상 ‘BAAJA’는 공식 법안명이 확인되지 않았다. 선거 결과의 범위, 인허가 2년·20MW 이상 전액 부담 조항, 전력비 70~100% 증가 추정 모두 미확인이다. 11월 4일 설명회에서 약 6GW·전력비 약 40% 부담을 제안했다는 주장도 사업 법인, 용량과 비용의 정의, 지자체 의사록이 없어 검증되지 않았다. 국내 역시 663MW의 용량 정의와 공실률 표본, 136억 달러의 전망 기간이 없고 원화 환산과 발전기 업체명은 자막이 불명확하다. 계통접속 승인과 장비 발주가 이어지면 수혜 가설이 강해지지만, 접속 지연이 착공 연기·취소로 이어지면 장비 매출 기대도 낮아진다.</p>
+<h4>5. 피지컬 AI: 생산능력보다 실제 유료 가동이 중요</h4>
+<p><strong>영상 주장 — <a href="https://www.youtube.com/watch?v=6g110iUWTVo&amp;t=1178s">19:38</a>·<a href="https://www.youtube.com/watch?v=6g110iUWTVo&amp;t=1583s">26:23</a>, <code>source_confidence</code> 0.86~0.92.</strong> 테슬라가 사이버트럭 생산라인을 사이버캡으로 전환하면 약 12만 대 생산이 가능하다고 가정했다. 현대차는 데이터 인프라와 자동차 업황 개선이 맞물릴 경우 2027년 하반기부터 기대가 가시화하고 2029년 무렵 상용화를 체감할 수 있다고 전망했다. 삼성전기·LG이노텍의 옵티머스 카메라 공급 가능성, 알레그로의 전류 센서, MLCC·전력반도체 및 RFHIC도 후보로 거론했다.</p>
+<p><strong>근거와 반론:</strong> 테슬라의 전면 생산 중단·라인 전환, 현대차 데이터 공장의 일정, 옵티머스 공급사 선정, RFHIC 실적은 모두 미확인이다. 명목 생산능력은 실제 생산·영업 허가·유료 탑승과 다르고, 샘플 공급이나 제품 적용 가능성은 양산 매출이 아니다. 유료 가동이 늘지 않거나 선정이 반복 발주로 이어지지 않으면 부품 수혜 가설은 약해진다. 현대차는 피지컬 AI 진척과 별도로 본업 판매·마진, 유가·금리·환율을 함께 봐야 한다.</p>
+<h3>단기 체크포인트</h3>
+<p>| 시점 | 관찰 항목 | 판단 기준 |</p>
+<p>|---|---|---|</p>
+<p>| 앤트로픽 공시·거래소 발표 시 | 최종 투자설명서, 거래 개시일, 공모가×완전희석 주식 수, 분기 인식 매출, 순조달금·투자 약정, 락업 | 상장 사실, 공모 가치, 사업 수익성을 분리한다. ETF 수요는 실제 편입·보유로 확인한다. |</p>
+<p>| 다음 분기 실적·가이던스 | GPU 체결 임대료·가동률, 추론 총비용, 고객별 후속 발주, TPU 기판·HBM 양산과 매출 인식, 광고 매출·마진·갱신 | 호가·인증·실증보다 실제 거래와 증분 이익을 우선한다. SOX와 개별주 낙폭은 동일 기준일로 따로 계산한다. |</p>
+<p>| 인허가·수주 공표 시 | 미국 법안 번호·원문·입법 단계, 6GW 사업 의사록과 비용 항목, 국내 계통접속 승인·착공·전력기기 및 발전기 수주 | 제안과 승인, 발표와 확정 수주를 구분한다. |</p>
+<p>| 생산·서비스 업데이트 시 | 테슬라 라인 전환·양산·영업 허가·유료 탑승, 현대차 예산·착공·가동, 옵티머스 양산 수주, RFHIC 매출·영업이익·수주 | 생산계획이 유료 가동과 반복 매출로 이어지는지 확인한다. |</p>
+<p><strong>비공개·유료 자료: 미검증 / 수동 확인 필요.</strong> Bloomberg·Morningstar 원문은 제공되지 않았다. SemiAnalysis 전망 수정 폭, 비공개 공급계약·고객별 HBM 비중·옵티머스 부품 배분, GPU 체결 임대료·가동률, 앤트로픽 내부 토큰 원가와 투자 약정, 개별 전력 계약은 원문이나 공식 확인이 필요하다. 제목·익명 보도·공개 호가를 원자료 대신 사용하지 않았다.</p>
+  <details>
+    <summary>공개 요약 JSON</summary>
+    <pre>{
+  &quot;version&quot;: 4,
+  &quot;video_id&quot;: &quot;6g110iUWTVo&quot;,
+  &quot;title&quot;: &quot;“앤트로픽 상장이 AI 상승장 시즌2를 열까?”  다음 주도주가 바뀐다? 시장의 돈이 몰릴 ‘이 주식’!  | 테크밸리인사이트 손정우 대표&quot;,
+  &quot;url&quot;: &quot;https://www.youtube.com/watch?v=6g110iUWTVo&quot;,
+  &quot;channel&quot;: &quot;815Money talk&quot;,
+  &quot;channel_id&quot;: &quot;UCCG6BEYjfQMGzypJw2EJCDQ&quot;,
+  &quot;source_url&quot;: &quot;https://www.youtube.com/@815moneytalk/videos&quot;,
+  &quot;thumbnail_url&quot;: &quot;https://i.ytimg.com/vi/6g110iUWTVo/maxresdefault.jpg&quot;,
+  &quot;published_at&quot;: &quot;2026-11-18T10:00:36+00:00&quot;,
+  &quot;status&quot;: &quot;asr_uncertain&quot;,
+  &quot;strategy_source_tier&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_evidence_weight&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_validation_policy&quot;: &quot;STANDARD_REVIEW&quot;,
+  &quot;transcript_status&quot;: &quot;available&quot;,
+  &quot;transcript_source&quot;: &quot;automatic&quot;,
+  &quot;transcript_chars&quot;: 13562,
+  &quot;transcript_quality&quot;: {
+    &quot;status&quot;: &quot;good&quot;,
+    &quot;score&quot;: 1.0,
+    &quot;warnings&quot;: [],
+    &quot;source&quot;: &quot;automatic&quot;,
+    &quot;language&quot;: &quot;Korean (Original)&quot;,
+    &quot;model_or_format&quot;: &quot;json3&quot;,
+    &quot;chars&quot;: 13562,
+    &quot;segments&quot;: 778,
+    &quot;duration_seconds&quot;: 1685,
+    &quot;repeated_ngram_ratio&quot;: 0.0
+  },
+  &quot;generated_at&quot;: &quot;2026-11-19T10:57:02.116077+09:00&quot;,
+  &quot;llm_status&quot;: &quot;success&quot;,
+  &quot;research_status&quot;: &quot;success&quot;,
+  &quot;claim_verification_status&quot;: &quot;success&quot;,
+  &quot;research_pipeline_version&quot;: 4,
+  &quot;evidence_count&quot;: 5,
+  &quot;claim_status_summary&quot;: {
+    &quot;unverified&quot;: 11,
+    &quot;asr_uncertain&quot;: 1
+  },
+  &quot;claims&quot;: [
+    {
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;claim_text&quot;: &quot;엔비디아 점유율은 85~90%이며, 맞춤형 추론 칩이 성장해도 50%까지 떨어지지 않고 학습용 GPU와 통합 시스템의 우위가 유지되며, 후속 투자에서 대체가 본격화하는 시점은 2029~2030년에 가깝다는 주장이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:05&quot;,
+      &quot;source_confidence&quot;: 0.93,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;현재 점유율 85~90%; 비교 전망 50%; 대체 본격화 2029~2030년&quot;,
+        &quot;observed&quot;: &quot;독립 점유율·성능·발주 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;학습과 추론을 분리하고, 동일 조건의 토큰당 총비용과 고객별 후속 발주로 대체 속도를 판단할 필요가 있다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;claim_text&quot;: &quot;구글 TPU와 브로드컴의 맞춤형 칩 사업이 성장하고 이수페타시스가 TPU용 기판을 공급한다면, 이수페타시스의 매출이 늘고 주가가 반등할 수 있다는 주장이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:05&quot;,
+      &quot;source_confidence&quot;: 0.93,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;정량 주장 없음&quot;,
+        &quot;observed&quot;: &quot;TPU 발주·기판 공급·수정주가 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;TPU 프로젝트별 공급과 매출 노출이 확인되기 전에는 이를 실적 추정치에 확정 반영하기 어렵다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;claim_text&quot;: &quot;SK하이닉스 HBM 매출의 약 90%가 전년 말까지 엔비디아향이었고 올해 말 비엔비디아 공급이 20% 이상일 수 있다는 발화다. 아마존·구글·AMD로의 다변화, 삼성전자의 기존 구글 공급과 고객 맞춤형 HBM4 베이스 다이의 파운드리 경쟁력도 거론했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:05&quot;,
+      &quot;source_confidence&quot;: 0.88,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;전년 말 엔비디아향 HBM 매출 약 90%; 올해 말 비엔비디아 공급 20% 이상 전망&quot;,
+        &quot;observed&quot;: &quot;고객별 비중·공급 단계·베이스 다이 사양 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;고객 다변화나 파운드리 수혜를 실적에 반영하려면 고객별 양산과 매출 인식을 확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;claim_text&quot;: &quot;민주당의 중간선거 승리로 규제 우려가 커졌고, 초당적 ‘BAAJA’ 법안이 전력망 인허가를 단축하면서 일정 규모 이상 데이터센터의 전력비를 사업자에게 전액 부담시킨다는 발화다. 비용 증가와 미허가 사업 지연은 출연자 전망이다.&quot;,
+      &quot;status&quot;: &quot;asr_uncertain&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:05&quot;,
+      &quot;source_confidence&quot;: 0.73,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;인허가 6년 이상→2년 이내; 20MW 이상 전액 부담; 사업자 비용 70~100% 증가 추정&quot;,
+        &quot;observed&quot;: &quot;선거 인증 기록·법안 원문·요금 산식 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;법안 원문과 적용 단계가 확인되기 전에는 미허가 사업의 지연이나 비용 증가를 확정된 규제 효과로 볼 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;claim_text&quot;: &quot;스페이스X가 11월 4일 주민 설명회에서 약 6GW 데이터센터와 전력비 약 40% 부담, 세수 공유안을 제시했다는 발화다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:05&quot;,
+      &quot;source_confidence&quot;: 0.73,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;11월 4일; 약 6GW; 전력비 약 40% 부담&quot;,
+        &quot;observed&quot;: &quot;설명회 의사록·사업자 서류·전력회사 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;주민 대상 제안을 인허가 승인이나 구속력 있는 전력비·세수 합의로 해석해서는 안 된다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;claim_text&quot;: &quot;SemiAnalysis가 약 한 달 전 상향한 데이터센터 건설 수요 전망을 녹화 전날 낮췄고, GPU 임대료는 상승했으며 AI 관련주는 고점 대비 약 40~50% 이상 하락했다는 발화다. 실제 수요와 반도체 업체의 현금창출 때문에 닷컴버블과 다르다는 것은 출연자 해석이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:06:47&quot;,
+      &quot;source_confidence&quot;: 0.86,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;약 한 달 전 상향·녹화 전날 하향; 고점 대비 약 40~50% 이상 하락&quot;,
+        &quot;observed&quot;: &quot;전망 원문·임대료 이력·종목 및 지수 시세 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;동일 모델·지역·계약 조건의 GPU 임대료와 가동률, 기업의 유료 도입, 반도체 업체의 현금흐름과 설비투자를 함께 봐야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;claim_text&quot;: &quot;앱러빈과 유니티의 실적 개선과 주가 강세가 AI 광고 수익화의 초기 사례이며, 피지컬 AI와 AI 소프트웨어 수익화가 2027년 하반기부터 나타나 2028년에 본격화한다는 주장이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:06:47&quot;,
+      &quot;source_confidence&quot;: 0.9,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;2027년 하반기 수익화 가시화; 2028년 본격화&quot;,
+        &quot;observed&quot;: &quot;분기 실적·AI 기여도·수정주가 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;광고 부문의 증분 매출·마진·현금흐름과 유료 고객의 갱신을 확인한 뒤 AI 기여도를 평가할 필요가 있다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;claim_text&quot;: &quot;앤트로픽의 ‘19일’ 상장, 완전희석 가치 1.4조 달러와 직전 거론 평가 2조 달러, 1~9월 매출 332억 달러와 성장률이 언급됐다. 하락 시나리오, 베라 루빈의 토큰 비용 절감, 공모금으로 약 3년치 데이터센터 투자 충당, 소프트웨어 중심 전략과 상장 후 수급 개선도 거론했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.05,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:13:07&quot;,
+      &quot;source_confidence&quot;: 0.86,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;‘19일’; 1.4조·2조 달러; 하락 시 1.2조~1조 달러 및 약 30%; 1~9월 매출 332억 달러·전년 동기의 12배·분기마다 2배 이상; 토큰 비용 6~7배 절감; 투자 약 3년치&quot;,
+        &quot;observed&quot;: &quot;E1 제목에 가격 책정 언급만 있음. 공모가·완전희석 주식수·상장일·재무·원가 비교 수치 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;거래소 공지와 최종 투자설명서로 거래 개시·공모 조건을 먼저 확인하고, 수익화는 인식 매출·토큰당 총비용·투자 약정으로 판단해야 한다. ETF 편입과 락업 효과도 별도 확인이 필요하다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;claim_text&quot;: &quot;한국 인구는 5천만 명 이상이고 상반기 수도권 데이터센터 가동 용량은 약 663MW, 코로케이션 공실률은 1% 미만이며 전국 투자 전망은 136억 달러라는 발화다. SK그룹·네이버 투자로 전망을 웃돌고 수도권 계통 제약이 전력기기·비상발전기 업체에 기회가 될 수 있다는 해석이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:13:07&quot;,
+      &quot;source_confidence&quot;: 0.84,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;인구 5천만 명 이상; 수도권 약 663MW; 공실률 1% 미만; 투자 136억 달러; 원화 환산 불명확&quot;,
+        &quot;observed&quot;: &quot;인구·가동 용량·공실률 원자료, 투자 전망 기간, 환산 기준 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;확정 국내 투자와 계통 접속 승인, LS일렉트릭 및 비상발전기 업체의 실제 수주를 구분해 추적할 필요가 있다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C10&quot;,
+      &quot;claim_text&quot;: &quot;테슬라가 ‘내년 여름’ 사이버트럭 생산을 전면 중단하고 라인을 사이버캡으로 전환한다는 발화다. 전년 미국 판매 약 2만 대와 라인 능력 약 12만 5천 대를 근거로 사이버캡 약 12만 대 생산을 가정했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:19:38&quot;,
+      &quot;source_confidence&quot;: 0.86,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;‘내년 여름’ 100% 중단; 전년 미국 판매 약 2만 대; 라인 약 12만 5천 대; 사이버캡 약 12만 대 가정&quot;,
+        &quot;observed&quot;: &quot;회사 생산계획·미국 등록 또는 판매·공장 능력 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;공식 공장 계획, 양산 속도, 영업 허가와 유료 탑승 수요가 확인되기 전에는 12만 대를 실적 추정의 기준으로 쓰기 어렵다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C11&quot;,
+      &quot;claim_text&quot;: &quot;현대차 데이터센터·데이터 공장·학습 로드맵과 자동차 업황 개선이 주가에 반영될 수 있으며, 피지컬 AI는 2027년 하반기 가시화하고 2029년 무렵 체감 상용화되며 자율주행·협동로봇이 휴머노이드보다 먼저 확산할 수 있다는 전망이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:19:38&quot;,
+      &quot;source_confidence&quot;: 0.89,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;2027년 하반기 가시화; 2029년 무렵 체감 상용화&quot;,
+        &quot;observed&quot;: &quot;회사 로드맵·판매 실적·거시 시계열·주가 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;예산·착공·가동과 유료 배치·매출을 단계별로 확인하고, 주가 반응은 업종 흐름 및 본업 실적과 비교할 필요가 있다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C12&quot;,
+      &quot;claim_text&quot;: &quot;삼성전기·LG이노텍이 옵티머스 카메라 공급 후보로 거론됐고 주가가 크게 하락했다는 발화다. 중국 업체의 액추에이터·센서 비중이 높고, 로봇·데이터센터의 전류 센서·전력반도체·MLCC 및 RF칩 수요가 늘 수 있으며 RFHIC 실적이 좋다는 주장도 제시했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:19:38&quot;,
+      &quot;source_confidence&quot;: 0.92,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;정량 수치 없음; 주가 큰 폭 하락·중국 업체 비중이 높다는 정성 표현&quot;,
+        &quot;observed&quot;: &quot;공급사 선정·시장점유율·기업 실적·주가 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;고객별 수주와 매출 인식, RFHIC의 비교 분기 매출·영업이익·수주, 각 업체의 지수 대비 수정주가를 따로 확인할 필요가 있다.&quot;
+    }
+  ],
+  &quot;entities&quot;: [],
+  &quot;evidence&quot;: [
+    {
+      &quot;evidence_id&quot;: &quot;E1&quot;,
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;title&quot;: &quot;Dow Jones Futures Rise; Anthropic IPO Prices High, Palo Alto And Everpure Rally On Earnings&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/m/107e5a2c-4fba-3df3-b2fd-5d1160e65516/dow-jones-futures-rise%3B.html&quot;,
+      &quot;publisher&quot;: &quot;Investor&#x27;s Business Daily&quot;,
+      &quot;published_at&quot;: &quot;2026-11-19T02:29:49+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Dow Jones Futures Rise; Anthropic IPO Prices High, Palo Alto And Everpure Rally On Earnings Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 2...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E2&quot;,
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;title&quot;: &quot;Japan’s Datasection slumps on big guidance cut amid U.S.-China chip access row&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/japan-datasection-slumps-big-guidance-022320105.html&quot;,
+      &quot;publisher&quot;: &quot;Investing.com&quot;,
+      &quot;published_at&quot;: &quot;2026-11-19T02:23:20+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Japan’s Datasection slumps on big guidance cut amid U.S.-China chip access row Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 2026 Elections...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E4&quot;,
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;title&quot;: &quot;Rio Tinto to Restart Line 4 Operations With 50MW Electricity Contract&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/energy/articles/rio-tinto-restart-line-4-164100484.html&quot;,
+      &quot;publisher&quot;: &quot;Zacks&quot;,
+      &quot;published_at&quot;: &quot;2026-11-18T16:41:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E5&quot;,
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;title&quot;: &quot;Gold Falls Towards $3,700. Schiff Says Fed Risks Financial Crisis in Inflation Fight&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/commodities/articles/gold-falls-towards-3-700-010500245.html&quot;,
+      &quot;publisher&quot;: &quot;BeInCrypto&quot;,
+      &quot;published_at&quot;: &quot;2026-11-19T01:05:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    }
+  ],
+  &quot;source_policy&quot;: {
+    &quot;raw_transcript_published&quot;: false,
+    &quot;raw_transcript_in_evidence&quot;: false,
+    &quot;research_pipeline_version&quot;: 4,
+    &quot;closed_source_claims&quot;: &quot;unverified_external_source&quot;,
+    &quot;auto_caption_warning&quot;: true,
+    &quot;local_asr_warning&quot;: false
+  }
+}</pre>
+  </details>
+</article>
+</main>
+  <style>
+.reader-contents { margin: 16px 0; padding: 12px 16px; border: 1px solid var(--line, #64748b); border-radius: 12px; }
+.reader-contents > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-weight: 750; }
+.reader-contents nav { display: grid; gap: 4px; max-height: 45vh; overflow: auto; margin: 8px 0; }
+.reader-contents a { display: block; min-height: 44px; padding: 10px; border-radius: 6px; color: inherit; overflow-wrap: anywhere; }
+.reader-contents a:hover { background: #80808020; }
+.reader-contents .reader-subsection { padding-inline-start: 24px; font-size: .92em; }
+.reader-prose, .report { overflow-wrap: anywhere; line-height: 1.8; }
+.reader-prose p, .reader-prose li { max-width: 85ch; }
+.reader-prose h2, .reader-prose h3, .reader-prose h4, [data-reader-heading] { scroll-margin-top: 100px; line-height: 1.45; }
+.reader-prose h2 { margin-top: 1.8em; padding-bottom: 8px; border-bottom: 1px solid var(--line, #64748b); }
+.reader-prose h3 { margin-top: 1.5em; }
+.reader-prose li { margin: .5em 0; }
+.reader-prose pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.reader-prose blockquote { margin: 16px 0; padding: 4px 16px; border-left: 3px solid var(--accent, #64748b); }
+.reader-table { overflow: auto; max-width: 100%; margin: 16px 0; border: 1px solid var(--line, #64748b); border-radius: 10px; }
+.reader-table table { border-collapse: collapse; width: 100%; margin: 0; font-size: .92rem; }
+.reader-table th, .reader-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line, #64748b); min-width: 110px; max-width: 400px; overflow-wrap: anywhere; white-space: normal; }
+.reader-table th { background: #80808018; }
+.reader-table tr:nth-child(even) { background: #80808008; }
+.reader-search { display: grid; gap: 8px; margin: 16px 0; }
+.reader-search label { font-weight: 700; }
+.reader-search input { box-sizing: border-box; width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line, #64748b); border-radius: 10px; background: var(--panel, #fff); color: var(--text, #132238); font: inherit; }
+.reader-search p { margin: 0; font-size: .86rem; }
+.reader-back { position: fixed; bottom: max(14px, env(safe-area-inset-bottom)); right: 14px; z-index: 30; min-height: 44px; border: 1px solid #778899; border-radius: 99px; padding: 10px 16px; background: #18344a; color: #fff; font: 700 14px system-ui; cursor: pointer; box-shadow: 0 3px 12px #0003; }
+[data-reader-source] { margin-top: 20px; }
+[data-reader-source] > summary { min-height: 44px; cursor: pointer; }
+[data-reader-source] pre { font-size: .85rem; }
+[data-reader-source] pre, .reader-prose { min-width: 0; }
+.reader-contents :focus-visible, .reader-search :focus-visible, .reader-back:focus-visible, .reader-table:focus-visible { outline: 3px solid var(--accent, #008c95); outline-offset: 3px; }
+.reader-search + .grid > [hidden] { display: none !important; }
+@media (max-width: 600px) { .reader-prose { font-size: 1rem; } .reader-contents { padding: 8px 12px; } }
+@media print { .reader-back, .reader-search, .reader-contents, [data-reader-source] { display: none !important; } .reader-table { overflow: visible; } .reader-prose { color: #000; background: #fff; } }
+</style><script>
+(() => {
+  'use strict';
+  let serial = 0;
+  const rendered = new WeakMap();
+  const node = (tag, text) => { const el = document.createElement(tag); if (text != null) el.textContent = text; return el; };
+  function inline(parent, text) {
+    const pattern = /(`[^`]+`|\*\*[^*]+\*\*|\[[^\]]+\]\(https?:\/\/[^\s)]+\))/g;
+    let start = 0;
+    for (const match of String(text).matchAll(pattern)) {
+      parent.append(document.createTextNode(text.slice(start, match.index)));
+      const value = match[0];
+      if (value.startsWith('`')) parent.append(node('code', value.slice(1, -1)));
+      else if (value.startsWith('**')) parent.append(node('strong', value.slice(2, -2)));
+      else {
+        const link = value.match(/^\[([^\]]+)\]\((.+)\)$/);
+        const a = node('a', link[1]); a.href = link[2]; a.rel = 'noopener noreferrer'; parent.append(a);
+      }
+      start = match.index + value.length;
+    }
+    parent.append(document.createTextNode(text.slice(start)));
+  }
+  const cells = line => line.trim().replace(/^\|/, '').replace(/\|$/, '').split(/(?<!\\)\|/).map(v => v.trim().replace(/\\\|/g, '|'));
+  function markdown(source) {
+    const article = node('article'); article.className = 'reader-prose';
+    const lines = source.split(/\r?\n/); let list = null;
+    for (let i = 0; i < lines.length; i += 1) {
+      const line = lines[i], value = line.trim();
+      if (!value) { list = null; continue; }
+      if (/^```/.test(value)) {
+        const code = []; i += 1;
+        while (i < lines.length && !/^```/.test(lines[i].trim())) code.push(lines[i++]);
+        const pre = node('pre'); pre.append(node('code', code.join('\n'))); article.append(pre); list = null; continue;
+      }
+      if (i + 1 < lines.length && value.includes('|') && cells(lines[i + 1]).every(v => /^:?-{3,}:?$/.test(v))) {
+        const table = node('table'), head = node('thead'), body = node('tbody');
+        const row = (values, tag) => { const tr = node('tr'); values.forEach(v => { const cell = node(tag); if (tag === 'th') cell.scope = 'col'; inline(cell, v); tr.append(cell); }); return tr; };
+        head.append(row(cells(line), 'th')); i += 2;
+        while (i < lines.length && lines[i].trim() && lines[i].includes('|')) body.append(row(cells(lines[i++]), 'td'));
+        i -= 1; table.append(head, body); article.append(table); list = null; continue;
+      }
+      const heading = value.match(/^(#{1,6})\s+(.+)$/);
+      if (heading) { const h = node('h' + Math.min(4, heading[1].length + 1)); inline(h, heading[2]); article.append(h); list = null; continue; }
+      const bullet = value.match(/^(?:[-*+] |\d+\. )(.+)$/);
+      if (bullet) {
+        const tag = /^\d/.test(value) ? 'ol' : 'ul';
+        if (!list || list.tagName.toLowerCase() !== tag) { list = node(tag); if (tag === 'ol') list.start = parseInt(value, 10); article.append(list); }
+        const li = node('li'); inline(li, bullet[1]); list.append(li); continue;
+      }
+      list = null;
+      if (/^(---+|\*\*\*+)$/.test(value)) { article.append(node('hr')); continue; }
+      const p = node(value.startsWith('> ') ? 'blockquote' : 'p'); inline(p, value.startsWith('> ') ? value.slice(2) : line); article.append(p);
+    }
+    return article;
+  }
+  function contents(root) {
+    root.querySelectorAll(':scope > .reader-contents').forEach(el => el.remove());
+    const headings = [...root.querySelectorAll('h2,h3,h4')].filter(h => !h.closest('.card,.run-card,.reader-contents,[data-reader-source],[hidden]'));
+    if (headings.length < 2) return;
+    const details = node('details'); details.className = 'reader-contents';
+    details.append(node('summary', '이 리포트 목차 · ' + headings.length + '개 항목'));
+    const nav = node('nav'); nav.setAttribute('aria-label', '리포트 목차');
+    headings.forEach(h => {
+      if (!h.id) h.id = 'reader-section-' + (++serial);
+      h.dataset.readerHeading = ''; h.tabIndex = -1;
+      const a = node('a', h.textContent); a.href = '#' + h.id;
+      if (h.tagName !== 'H2') a.className = 'reader-subsection';
+      a.addEventListener('click', event => {
+        event.preventDefault();
+        for (let ancestor = h.parentElement; ancestor; ancestor = ancestor.parentElement) if (ancestor.tagName === 'DETAILS') ancestor.open = true;
+        h.scrollIntoView({block: 'start'}); h.focus({preventScroll: true});
+      }); nav.append(a);
+    });
+    details.append(nav); root.prepend(details);
+  }
+  function enhance(root) {
+    if (!root) return;
+    root.querySelectorAll('pre[data-report-markdown]').forEach(pre => {
+      const previous = rendered.get(pre);
+      if (previous && previous.source === pre.textContent) return;
+      const article = markdown(pre.textContent);
+      if (previous) previous.article.replaceWith(article);
+      else {
+        const details = node('details'); details.dataset.readerSource = '';
+        details.append(node('summary', 'Markdown 원문 보기'));
+        pre.before(article, details); details.append(pre);
+      }
+      rendered.set(pre, {source: pre.textContent, article});
+    });
+    root.querySelectorAll('table').forEach(table => {
+      if (table.closest('.reader-table,.account-table-wrap,.summary-scroll')) return;
+      const wrap = node('div'); wrap.className = 'reader-table'; wrap.tabIndex = 0;
+      wrap.setAttribute('role', 'region'); wrap.setAttribute('aria-label', '리포트 표 · 가로로 스크롤하여 전체 보기');
+      table.before(wrap); wrap.append(table);
+    });
+    root.querySelectorAll('.grid').forEach(grid => {
+      const cards = [...grid.querySelectorAll(':scope > a.card')];
+      if (cards.length < 2 || grid.dataset.readerSearch) return;
+      grid.dataset.readerSearch = 'true';
+      const box = node('div'); box.className = 'reader-search';
+      const input = node('input'); input.type = 'search'; input.placeholder = '제목 · 종목 · 채널 · 키워드'; input.id = 'report-search-' + (++serial);
+      const label = node('label', '리포트 찾기'); label.htmlFor = input.id;
+      const status = node('p'); status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
+      const update = () => {
+        const terms = input.value.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean); let count = 0;
+        cards.forEach(card => { card.hidden = !terms.every(t => card.textContent.toLocaleLowerCase().includes(t)); if (!card.hidden) count += 1; });
+        status.textContent = cards.length + '개 중 ' + count + '개 표시' + (count ? '' : ' · 검색어를 지우거나 다른 키워드를 입력하세요.');
+      };
+      input.addEventListener('input', update); box.append(label, input, status); grid.before(box); update();
+    });
+    contents(root);
+  }
+  window.TradingAgentsReader = {enhance};
+  const main = document.querySelector('main');
+  if (main && !main.hasAttribute('data-reader-dynamic')) enhance(main);
+  if (main) {
+    const top = node('button', '↑ 맨 위'); top.type = 'button'; top.className = 'reader-back'; top.setAttribute('aria-label', '리포트 맨 위로 이동');
+    top.addEventListener('click', () => { const target = document.querySelector('h1') || main; target.tabIndex = -1; target.scrollIntoView({block: 'start'}); target.focus({preventScroll: true}); });
+    document.body.append(top);
+  }
+})();
+</script>
+</body>
+</html>

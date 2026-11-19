@@ -1,0 +1,571 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YouTube 투자자용 검증 리포트 - 한국 투자자들이 앤트로픽(ANT)에 투자하는 가장 쉬운 방법</title>
+  <style>
+:root {
+  color-scheme: light;
+  --bg: #f7f8fb;
+  --panel: #ffffff;
+  --text: #172033;
+  --muted: #667085;
+  --line: #d9dee8;
+  --accent: #0f766e;
+  --accent-2: #2563eb;
+  --warn: #b45309;
+  --bad: #b42318;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0 56px; }
+a { color: var(--accent-2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.hero { padding: 28px 0 22px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+.hero.compact { padding-top: 12px; }
+.hero h1 { margin: 0; font-size: clamp(28px, 4vw, 44px); line-height: 1.15; letter-spacing: 0; }
+.hero p { max-width: 760px; color: var(--muted); margin: 12px 0 0; }
+.eyebrow { color: var(--accent); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0; margin: 0 0 8px; }
+section { margin: 28px 0; }
+h2, h3, h4, h5 { letter-spacing: 0; line-height: 1.25; }
+.synthesis-callout { padding: clamp(20px, 4vw, 34px); border: 1px solid #6ee7d8; border-radius: 18px; background: linear-gradient(135deg, #ecfdf9 0%, #eff6ff 100%); box-shadow: 0 18px 44px rgba(15, 118, 110, .12); }
+.synthesis-callout.unavailable { border-color: var(--line); background: var(--panel); box-shadow: none; }
+.synthesis-callout h2 { margin: 0; font-size: clamp(24px, 3.2vw, 36px); }
+.synthesis-callout .lead { max-width: 900px; font-size: 17px; color: #334155; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.primary-link, .secondary-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border-radius: 999px; font-weight: 800; }
+.primary-link { color: white; background: var(--accent); }
+.secondary-link { color: var(--accent-2); border: 1px solid #93c5fd; background: white; }
+.primary-link:hover, .secondary-link:hover { text-decoration: none; filter: brightness(.97); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.card, .run { display: flex; flex-direction: column; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; color: var(--text); min-height: 128px; }
+.run { padding: 16px; }
+.card:hover, .run:hover { border-color: var(--accent-2); text-decoration: none; }
+.thumb { display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #e9edf5; border-radius: 8px 8px 0 0; color: var(--muted); font-size: 13px; font-weight: 700; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb-empty span { padding: 0 14px; text-align: center; }
+.card-body { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 16px; }
+.card strong { line-height: 1.35; }
+.source-line { color: #3f4a5f; font-weight: 600; }
+.runs { display: grid; gap: 10px; }
+.badge { display: inline-flex; width: fit-content; border-radius: 999px; padding: 2px 9px; background: #e6f4f1; color: var(--accent); font-size: 12px; font-weight: 700; }
+.status-contradicted, .status-llm_failed { background: #fee4e2; color: var(--bad); }
+.status-unverified, .status-stale { background: #fff4d6; color: var(--warn); }
+small, .muted { color: var(--muted); }
+.topnav { display: flex; gap: 14px; margin-bottom: 16px; font-size: 14px; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px; }
+.stats span { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
+.report { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: min(5vw, 36px); }
+.report-head { border-bottom: 1px solid var(--line); margin-bottom: 24px; padding-bottom: 20px; }
+.report-head h1 { margin: 0; font-size: clamp(24px, 3.5vw, 38px); line-height: 1.2; }
+.meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+.scope-note { padding: 12px 14px; border-left: 4px solid var(--warn); border-radius: 6px; background: #fff7ed; color: #7c2d12; }
+.synthesis-report h2 { margin-top: 34px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.synthesis-report h3 { margin: 24px 0 8px; color: #0f4c5c; }
+.synthesis-report p, .synthesis-report li { overflow-wrap: anywhere; }
+pre { overflow: auto; background: #111827; color: #f9fafb; border-radius: 8px; padding: 14px; }
+code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+details { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 18px; }
+@media (max-width: 640px) {
+  main { width: min(100% - 20px, 1120px); padding-top: 18px; }
+  .report { padding: 18px; }
+  .synthesis-callout { border-radius: 14px; padding: 18px; }
+  .cta-row a { width: 100%; }
+  .mobile-report { border-radius: 12px; }
+}
+</style>
+</head>
+<body>
+  <main>
+<nav class="topnav"><a href="index.html">실행 목록</a><a href="../../index.html">YouTube 홈</a></nav>
+<article class="report">
+  <header class="report-head">
+    <p class="eyebrow">youtube_20261119_105702</p>
+    <h1>한국 투자자들이 앤트로픽(ANT)에 투자하는 가장 쉬운 방법</h1>
+    <div class="meta">
+      <span class="badge status-asr_uncertain">asr_uncertain</span>
+      <a href="https://www.youtube.com/watch?v=-GJLRjjTEZc">원본 영상</a>
+    </div>
+  </header>
+  <h2>앤트로픽 IPO와 국내 AI ETF: 한국 투자자가 확인할 것</h2>
+<p><a href="https://www.youtube.com/watch?v=-GJLRjjTEZc">경제사냥꾼 영상</a> · 2026년 11월 18일 게시 · 근거 수집 기준: 2026년 11월 19일 11:26 KST</p>
+<p><strong>핵심 판단:</strong> 앤트로픽의 IPO 가격 결정이 보도됐다는 점은 기사 제목에서 확인된다. 그러나 공식 티커 <code>ANT</code>, 나스닥 상장일, 확정 공모가, 첫 체결, 국내 ETF의 실제 편입은 제공된 자료로 확인되지 않았다. 영상의 핵심인 ‘직접 매수와 국내 ETF 중 어느 쪽이 앤트로픽에 더 많이 노출되는가’는 상장과 상품별 보유 내역이 확인된 뒤에야 비교할 수 있다.</p>
+<h3>확인된 사실과 근거의 범위</h3>
+<p><a href="https://finance.yahoo.com/markets/stocks/articles/stocks-rise-anthropic-ipo-pricing-015339932.html">Reuters 보도</a>와 <a href="https://finance.yahoo.com/m/107e5a2c-4fba-3df3-b2fd-5d1160e65516/dow-jones-futures-rise%3B.html">Investor’s Business Daily 보도</a>의 제목은 앤트로픽 IPO 가격 결정을 다뤘다. 수집 자료에는 기사 본문이 없어 이를 확정 공모가나 상장 조건의 근거로 사용할 수 없다. <a href="https://finance.yahoo.com/m/e82fbe94-96bd-3f01-9a6d-8bc83fca71ad/review-%26-preview%3A-anthropic%E2%80%99s.html">Barron’s 기사</a>도 제목만으로는 구체적 조건을 뒷받침하지 않는다. 보호예수와 첫 거래에 연결된 나머지 두 검색 결과는 각각 기초소재·광산주 기사로, 검증 근거에서 제외했다.</p>
+<p>발행사·SEC·나스닥 원문은 확보되지 않았고, <code>ANT</code> 조회에서도 주가·시가총액·밸류에이션 등 사용 가능한 데이터가 없었다. 뉴스·공시 조회 오류나 데이터 부재는 미상장 또는 공시 부재의 증거가 아니다. 수집 상태와 별개로 <strong>개별 주장 검증의 종합 결과는 미확인</strong>이다.</p>
+<h3>영상 주장과 검증 결과</h3>
+<p>| 영상 주장 | 확인된 범위와 남은 쟁점 | 출처 / ASR 신뢰도 |</p>
+<p>|---|---|---:|</p>
+<p>| <strong>C1 · 상장:</strong> 클로드 개발사 앤트로픽이 미국 시간 19일 나스닥에 <code>ANT</code>로 상장하고 한국 시간 19일 밤늦게 거래를 시작한다. | IPO 가격 결정 보도 제목만 확인됐다. 클로드 개발사라는 설명을 포함해 발행사 공식 자료, 티커, 거래소, 상장일, 확정 공모가, 첫 체결은 확인되지 않았다. | 0.84 / 0.72 |</p>
+<p>| <strong>C2 · 청약:</strong> 한국 개인은 미국 현지 공모가 배정을 받을 수 없고, 상장 후 해외주식 계좌로 매수할 수 있다. | 포괄적 금지 근거는 확보되지 않았다. 해당 공모의 판매·배정 조건, 증권사별 청약 자격, 상장 후 주문 지원은 별개다. | 0.84 / 0.87 |</p>
+<p>| <strong>C3 · 상장 전 가격:</strong> 코인 거래소 연동상품이 16일 98달러를 넘어 공모가 대비 26% 높았다. | 거래소·계약·시간대·가격 유형·주당 환산 기준이 모두 미확인이다. 26%를 현물 첫 체결가의 프리미엄이나 예상 수익률로 볼 수 없다. | 0.84 / 0.82 |</p>
+<p>| <strong>C4 · KODEX:</strong> 영상에서 ‘KODEX 미국 AI 에이전트 액티브’로 지칭한 ETF가 상장 당일 매수·편입을 검토한다. | 공식 상품명·코드, 검토 발언, 실제 보유가 모두 미확인이다. 검토와 매수는 다르며 보유 기준일도 실제 체결일·취득단가를 입증하지 않는다. | 0.82 / 0.75 |</p>
+<p>| <strong>C5 · TIGER:</strong> 상품명이 불명확한 액티브 ETF가 앤트로픽을 담아 24일 상장하며 비중이 가장 클 전망이다. | 11월 24일로 추정되며 수집 기준 시점 이후다. 상장 예고·실제 상장·목표 비중·실제 비중 모두 미확인이다. ‘가장 크다’의 비교 범위도 불명이다. | 0.68 / 0.52 |</p>
+<p>| <strong>C6 · 지수형 ETF:</strong> 일부 상품이 상장 며칠 뒤 특별 편입하고 그 전에 주가가 오를 수 있다. | 해당 ETF·추종 지수·편입 공지·발효일·보유 내역이 없다. 조기 편입 규정이 있더라도 실제 적용이나 편입 전 상승을 뜻하지 않는다. | 0.90 / 0.86 |</p>
+<p>| <strong>C7 · 보호예수:</strong> 상장 6개월 뒤 내부자 주식을 팔 수 있어 매물이 늘 수 있다. | 6개월과 180일 중 어느 조건인지, 기산일·대상 물량·조기 또는 단계적 해제 여부가 미확인이다. 매도 가능 물량은 실제 매도량과 다르다. | 0.84 / 0.88 |</p>
+<p>| <strong>C8 · 매출:</strong> 영상 말미에 매출 성장 배수가 언급된다. | 자동자막으로 숫자와 비교 기간을 판독할 수 없다. 원음과 동일 기준의 재무자료를 대조하기 전에는 성장 배수를 인용하거나 밸류에이션 근거로 삼을 수 없다. | 미부여(0 표기) / 0.05 |</p>
+<p>| <strong>C9 · ETF 거래:</strong> 국내 AI ETF는 별도 환전 없이 원화로 거래할 수 있지만, 공모가 배정을 받는 것은 아니며 실제 노출은 상품마다 다르다. | 대상 상품의 거래 통화·환헤지·보유 비중·취득단가는 미확인이다. 원화 주문과 환위험은 별개이며 ETF 좌수 보유는 기초주식의 직접 배정과 다르다. | 0.90 / 0.85 |</p>
+<p>| <strong>C10 · 첫날 가격:</strong> 상장 첫날 시장가격이 공모가를 웃돌 수 있다는 경고다. | 공모가와 첫 체결가·장중 고저·종가가 없어 실제 격차를 산출할 수 없다. 영상의 손절 언급은 매매 의견이며 특정 가격에서의 체결을 보장하지 않는다. | 0.84 / 0.87 |</p>
+<p><strong>타임스탬프와 신뢰도:</strong> C1~C10의 <code>00:00:00</code>은 개별 발화 시각이 아니라 공통 자막 청크의 시작점이다. 청크는 <code>00:00~02:05</code>로 표기되지만 영상 길이는 <code>02:03</code>이며, C8은 말미라는 위치만 파악됐다. 한국어 자동자막의 전체 품질(<code>transcript_quality</code>)은 <code>good</code>, 1.0이지만 고유명사와 숫자의 정확성을 보장하지 않는다. 표의 <code>source_confidence</code>는 자막에서 주장을 추출한 확실성, <code>asr_confidence</code>는 발화 판독의 확실성이다. 사실 검증 신뢰도와는 별개다. 예를 들어 C1은 추출 0.84, 판독 0.72지만 사실 검증은 0.28이다.</p>
+<h3>상승 논리와 반론</h3>
+<ul>
+<li><strong>직접 노출:</strong> 상장과 거래 지원이 확인되고, 비교 가능한 재무자료가 성장 기대를 뒷받침한다면 직접 보유는 기업 실적과 가치 변화가 가장 직접적으로 반영되는 경로다. 반면 첫 체결가가 공모가보다 크게 높다면 좋은 기업이라는 평가와 별개로 진입 가격의 부담이 커진다. 확인되지 않은 매출 배수와 연동상품 가격으로 그 부담을 정량화할 수는 없다.</li>
+<li><strong>ETF 노출:</strong> 실제 편입이 확인되면 액티브 ETF는 보유 비중에 따라 더 큰 노출을, 지수형 ETF는 다른 종목과 함께 분산된 노출을 제공할 수 있다. 다만 비중이 클수록 해당 종목 하락의 영향도 커지고, 여러 AI 종목이 함께 움직이면 분산 효과가 제한될 수 있다. 편입이 늦거나 비중이 작으면 해당 종목이 먼저 오르더라도 그 수익률이 ETF에 그대로 반영되지 않는다.</li>
+<li><strong>전제가 무효가 되는 조건:</strong> 공식 자료가 영상의 티커·거래소·날짜와 다르면 영상의 상장 일정은 무효다. ETF가 편입하지 않거나 실제 비중이 미미하면 해당 ETF를 앤트로픽 노출 수단으로 보는 논리가 약해진다. 연동 계약을 주당 기준으로 환산할 수 없으면 26% 비교는 성립하지 않으며, 보호예수 계약의 기산일이나 해제 조건이 다르면 ‘상장 6개월 뒤 매물’ 가설도 다시 계산해야 한다.</li>
+</ul>
+<h3>단기 체크포인트와 관찰 항목</h3>
+<p>1. <strong>영상이 지목한 11월 19일 전후:</strong> 발행사 가격 결정 발표·SEC 최종 공모설명서·나스닥 공지에서 법인명, 티커, 거래소, 확정 공모가, 예정일을 대조한다. 실제 첫 체결이 확인되면 거래소 시각을 KST로 환산하고, 첫 체결가·장중 고저·종가·거래량을 기록한다. 정규장 개장 시각을 첫 체결로 간주하지 않는다. 청약·배정 자격과 상장 후 주문 지원은 증권사별로 따로 확인한다.</p>
+<p>2. <strong>11월 24일 전후와 첫 보유 공시:</strong> KRX와 운용사에서 TIGER·KODEX의 공식 명칭과 코드, 상장 예고와 실제 상장, 기준일별 구성종목·비중을 확인한다. 지수형 상품은 지수 제공사의 편입 발효일과 ETF의 실제 보유 기준일을 대조한다. 상품 간에는 같은 기준일의 실제 비중, 상위 종목 집중도, 환헤지 정책을 비교한다. 취득단가가 공개되지 않으면 당일 시장가격으로 대신하지 않는다.</p>
+<p>3. <strong>가격·성장·공급 가설:</strong> 연동상품은 계약 명세와 16일 거래 기록을 확보해 체결가·호가·기준가격을 구분한 뒤, 동일한 주당 단위에서 <code>(비교 가격 ÷ 확정 공모가 − 1) × 100</code>으로 다시 계산한다. 매출은 원음에서 배수와 비교 기간을 확인한 뒤 같은 기준의 인식 매출로 대조하고, 연환산 지표나 전망치와 섞지 않는다. 보호예수는 계약상 기산일·해제 일정·대상 주식 수를 확인하고 이후 실제 매도 기록과 구분해 추적한다.</p>
+<p><strong>비공개 자료 — 미검증·수동 확인 필요:</strong> Bloomberg·Morningstar 원문은 제공되지 않았다. 운용사의 비공개 주문 계획·체결 시각·취득단가·목표 비중, 비공개 또는 유료 거래 원장, 비공개 매출 수치는 공식 공개나 권한 있는 원자료가 없으면 검증할 수 없다.</p>
+  <details>
+    <summary>공개 요약 JSON</summary>
+    <pre>{
+  &quot;version&quot;: 4,
+  &quot;video_id&quot;: &quot;-GJLRjjTEZc&quot;,
+  &quot;title&quot;: &quot;한국 투자자들이 앤트로픽(ANT)에 투자하는 가장 쉬운 방법&quot;,
+  &quot;url&quot;: &quot;https://www.youtube.com/watch?v=-GJLRjjTEZc&quot;,
+  &quot;channel&quot;: &quot;경제사냥꾼&quot;,
+  &quot;channel_id&quot;: &quot;UC7usMJDHmtbs_oegmzQKKMA&quot;,
+  &quot;source_url&quot;: &quot;https://www.youtube.com/@%EA%B2%BD%EC%A0%9C%EC%82%AC%EB%83%A5%EA%BE%BC/shorts&quot;,
+  &quot;thumbnail_url&quot;: &quot;https://i.ytimg.com/vi/-GJLRjjTEZc/maxresdefault.jpg&quot;,
+  &quot;published_at&quot;: &quot;2026-11-18T06:00:00+00:00&quot;,
+  &quot;status&quot;: &quot;asr_uncertain&quot;,
+  &quot;strategy_source_tier&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_evidence_weight&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_validation_policy&quot;: &quot;STANDARD_REVIEW&quot;,
+  &quot;transcript_status&quot;: &quot;available&quot;,
+  &quot;transcript_source&quot;: &quot;automatic&quot;,
+  &quot;transcript_chars&quot;: 1509,
+  &quot;transcript_quality&quot;: {
+    &quot;status&quot;: &quot;good&quot;,
+    &quot;score&quot;: 1.0,
+    &quot;warnings&quot;: [],
+    &quot;source&quot;: &quot;automatic&quot;,
+    &quot;language&quot;: &quot;Korean (Original)&quot;,
+    &quot;model_or_format&quot;: &quot;json3&quot;,
+    &quot;chars&quot;: 1509,
+    &quot;segments&quot;: 80,
+    &quot;duration_seconds&quot;: 123,
+    &quot;repeated_ngram_ratio&quot;: 0.0
+  },
+  &quot;generated_at&quot;: &quot;2026-11-19T10:57:02.116077+09:00&quot;,
+  &quot;llm_status&quot;: &quot;success&quot;,
+  &quot;research_status&quot;: &quot;success&quot;,
+  &quot;claim_verification_status&quot;: &quot;success&quot;,
+  &quot;research_pipeline_version&quot;: 4,
+  &quot;evidence_count&quot;: 5,
+  &quot;claim_status_summary&quot;: {
+    &quot;unverified&quot;: 9,
+    &quot;asr_uncertain&quot;: 1
+  },
+  &quot;claims&quot;: [
+    {
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;claim_text&quot;: &quot;영상은 Claude 개발사인 앤트로픽이 미국 시간 19일 Nasdaq에 ANT로 상장하며 한국 시간 19일 밤늦게 첫 거래가 시작된다고 주장한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.28,
+      &quot;supporting_evidence_ids&quot;: [
+        &quot;E2&quot;,
+        &quot;E1&quot;
+      ],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.84,
+      &quot;asr_confidence&quot;: 0.72,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;미국 시간 19일 상장, 한국 시간 19일 밤늦게 첫 거래. 2026년 11월로 추정.&quot;,
+        &quot;observed&quot;: &quot;공식 상장일·첫 체결 시각·확정 공모가 미확인&quot;
+      },
+      &quot;investor_implication&quot;: &quot;주문 전 공식 티커와 거래 지원 여부를 확인하고, 예정된 거래 개시 시각과 실제 첫 체결 시각을 구분한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;claim_text&quot;: &quot;영상은 한국 개인투자자가 제도상 미국 현지 IPO에 직접 청약해 공모가에 배정받을 수 없지만, 해외주식 계좌로 상장 후 매수할 수 있다고 주장한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.05,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.84,
+      &quot;asr_confidence&quot;: 0.87,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;해당 없음&quot;,
+        &quot;observed&quot;: &quot;해당 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;청약 가능 여부와 상장 후 매매 가능 여부를 별도로 확인한다. 한 증권사의 미지원만으로 전체 투자자의 자격을 판단하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;claim_text&quot;: &quot;영상은 코인 거래소의 앤트로픽 상장 전 연동상품이 16일 98달러를 넘었고 공모가보다 26% 높았다고 주장한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.03,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.84,
+      &quot;asr_confidence&quot;: 0.82,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;16일 98달러 초과, 공모가 대비 26% 프리미엄. 2026년 11월로 추정.&quot;,
+        &quot;observed&quot;: &quot;연동상품 가격·확정 공모가·프리미엄 미확인&quot;
+      },
+      &quot;investor_implication&quot;: &quot;계약 가격의 단위를 공모가와 맞춰 재계산하기 전까지 26%를 현물 시초가나 예상 수익률로 인용하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;claim_text&quot;: &quot;영상은 KODEX 미국 AI 에이전트 액티브로 표기된 ETF가 앤트로픽의 상장 당일 매수·편입을 검토한다고 전한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.04,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.82,
+      &quot;asr_confidence&quot;: 0.75,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;앤트로픽 상장 당일 매수·편입 검토&quot;,
+        &quot;observed&quot;: &quot;검토 여부·매수일·편입일·비중 미확인&quot;
+      },
+      &quot;investor_implication&quot;: &quot;검토 발언이 확인되더라도 실제 편입을 뜻하지는 않는다. 공식 구성종목과 비중을 확인하기 전에는 이 ETF를 통한 노출을 전제하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;claim_text&quot;: &quot;영상은 상품명이 확인되지 않은 TIGER 계열 액티브 ETF가 앤트로픽을 담아 24일 신규 상장하고 앤트로픽 비중이 가장 클 것으로 전망한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.03,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.68,
+      &quot;asr_confidence&quot;: 0.52,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;24일 신규 상장, 앤트로픽 비중 최대 전망. 2026년 11월로 추정.&quot;,
+        &quot;observed&quot;: &quot;상장 예정일·실제 상장일·목표 및 실제 비중 미확인&quot;
+      },
+      &quot;investor_implication&quot;: &quot;공식 명칭·종목코드와 상장 일정을 확인하고, 비중을 비교할 때는 목표치와 실제 보유 비중을 분리해 같은 기준일·비교 범위를 적용한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;claim_text&quot;: &quot;영상은 일부 지수형 ETF가 앤트로픽 상장 며칠 뒤 특별 편입을 준비하고, 그 전에 주가가 오를 수 있다고 설명한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.04,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.9,
+      &quot;asr_confidence&quot;: 0.86,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;상장 며칠 뒤 특별 편입&quot;,
+        &quot;observed&quot;: &quot;첫 거래일·편입 발효일·경과 거래일·기간 수익률 미확인&quot;
+      },
+      &quot;investor_implication&quot;: &quot;지수 편입 발효일과 실제 ETF 보유 기준일을 따로 확인한다. 편입 전 주가 상승은 가능성이지 확인된 결과가 아니다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;claim_text&quot;: &quot;영상은 앤트로픽 상장 6개월 뒤부터 내부자 주식의 보호예수가 풀려 매물이 늘 수 있다고 주장한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.03,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.84,
+      &quot;asr_confidence&quot;: 0.88,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;상장 6개월 뒤부터&quot;,
+        &quot;observed&quot;: &quot;계약 기간·기산일·해제일·대상 주식수 미확인&quot;
+      },
+      &quot;investor_implication&quot;: &quot;공식 해제 일정과 매도 가능 물량을 확인하되, 해제를 실제 내부자 매도나 매도 압력으로 단정하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;claim_text&quot;: &quot;영상 말미의 매출 성장 배수는 자동자막에서 ‘열쇠배’로 인식돼 수치와 비교 기간을 알 수 없다.&quot;,
+      &quot;status&quot;: &quot;asr_uncertain&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.05,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;열쇠배로 전사됨. 숫자·비교 기간 판독 불가.&quot;,
+        &quot;observed&quot;: &quot;비교 가능한 매출 수치 미확인&quot;
+      },
+      &quot;investor_implication&quot;: &quot;원음으로 숫자와 비교 기간을 판독한 뒤 같은 매출 지표로 검증하기 전에는 배수를 인용하지 않는다. 인식 매출과 연환산 지표·전망치는 비교 기준을 달리한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;claim_text&quot;: &quot;영상은 국내 AI ETF를 별도 환전 없이 원화로 매매할 수 있지만 ETF 매수가 공모가 배정을 뜻하지는 않으며, 실제 앤트로픽 노출은 펀드별 편입일·매입가·비중과 분산도에 따라 다르다고 설명한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.1,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.9,
+      &quot;asr_confidence&quot;: 0.85,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;구체적인 편입일·매입가·비중은 제시하지 않음&quot;,
+        &quot;observed&quot;: &quot;상품별 편입일·취득단가·비중 미확인&quot;
+      },
+      &quot;investor_implication&quot;: &quot;원화 주문 가능 여부와 환위험, ETF 지분 보유와 기초주식 직접 배정을 구분한다. 같은 기준일의 앤트로픽 보유 비중과 포트폴리오 집중도를 비교하되, 분산이 낮은 변동성을 보장한다고 해석하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C10&quot;,
+      &quot;claim_text&quot;: &quot;영상은 앤트로픽 상장 첫날 시장 매수가 공모가를 웃돌 수 있다고 경고하며 단기 매매자에게 손절선을 권한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.03,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.84,
+      &quot;asr_confidence&quot;: 0.87,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;첫 거래일 시장 매수가 공모가를 웃돌 가능성. 구체적 격차 없음.&quot;,
+        &quot;observed&quot;: &quot;첫 체결가·장중 고저·종가·공모가 대비 격차 미확인&quot;
+      },
+      &quot;investor_implication&quot;: &quot;상장 전 연동상품 가격을 현물 체결가로 대체하지 않는다. 손절선은 영상의 매매 의견이지 특정 가격에 체결된다는 보장이 아니다.&quot;
+    }
+  ],
+  &quot;entities&quot;: [
+    {
+      &quot;ticker&quot;: &quot;ANT&quot;,
+      &quot;name&quot;: &quot;앤트로픽(Anthropic)&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;영상은 앤트로픽을 AI 서비스 클로드를 만든 회사로 소개한다.&quot;,
+        &quot;영상은 한국 개인투자자가 미국 현지 IPO 청약에 직접 참여해 공모가에 배정받을 수 없으며, 해외주식 계좌를 통해 상장 후 시장가로 직접 매수할 수 있다고 주장한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;영상이 제시한 나스닥 상장일은 미국 시간 19일이며, 거래는 한국 시간 19일 밤늦게 시작된다고 설명한다.&quot;,
+        &quot;영상에 따르면 코인 거래소의 앤트로픽 상장 전 가격 연동 상품이 16일 98달러를 넘었다.&quot;,
+        &quot;영상은 해당 상품이 공모가보다 26% 높게 거래됐다고 주장한다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;시장 데이터 조회 실패: no_usable_market_fields&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;ANT&quot;,
+        &quot;as_of&quot;: &quot;2026-11-19T02:25:07.973883+00:00&quot;,
+        &quot;current_price&quot;: null,
+        &quot;market_cap&quot;: null,
+        &quot;forward_pe&quot;: null,
+        &quot;trailing_pe&quot;: null,
+        &quot;fifty_two_week_high&quot;: null,
+        &quot;fifty_two_week_low&quot;: null,
+        &quot;average_target_price&quot;: null,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;unverified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    }
+  ],
+  &quot;evidence&quot;: [
+    {
+      &quot;evidence_id&quot;: &quot;E1&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;Dow Jones Futures Rise; Anthropic IPO Prices High, Palo Alto And Everpure Rally On Earnings&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/m/107e5a2c-4fba-3df3-b2fd-5d1160e65516/dow-jones-futures-rise%3B.html&quot;,
+      &quot;publisher&quot;: &quot;Investor&#x27;s Business Daily&quot;,
+      &quot;published_at&quot;: &quot;2026-11-19T02:17:34+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Dow Jones Futures Rise; Anthropic IPO Prices High, Palo Alto And Everpure Rally On Earnings Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 2...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E2&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;Stocks rise after Anthropic IPO pricing sets stage for blockbuster debut&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/stocks-rise-anthropic-ipo-pricing-015339932.html&quot;,
+      &quot;publisher&quot;: &quot;Reuters&quot;,
+      &quot;published_at&quot;: &quot;2026-11-19T01:53:39+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Stocks rise after Anthropic IPO pricing sets stage for blockbuster debut Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 2026 Elections Weath...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E4&quot;,
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;title&quot;: &quot;Basic Materials Roundup: Market Talk&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/m/436c6e69-a633-3fbe-be3d-3dcbbf551b2c/basic-materials-roundup%3A.html&quot;,
+      &quot;publisher&quot;: &quot;The Wall Street Journal&quot;,
+      &quot;published_at&quot;: &quot;2026-11-18T21:58:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E5&quot;,
+      &quot;claim_id&quot;: &quot;C10&quot;,
+      &quot;title&quot;: &quot;3 Mining Giants Pay Big Dividends, but Their Yields Come With a Catch&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/commodities/articles/3-mining-giants-pay-big-171956256.html&quot;,
+      &quot;publisher&quot;: &quot;24/7 Wall St.&quot;,
+      &quot;published_at&quot;: &quot;2026-11-18T17:19:56+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    }
+  ],
+  &quot;source_policy&quot;: {
+    &quot;raw_transcript_published&quot;: false,
+    &quot;raw_transcript_in_evidence&quot;: false,
+    &quot;research_pipeline_version&quot;: 4,
+    &quot;closed_source_claims&quot;: &quot;unverified_external_source&quot;,
+    &quot;auto_caption_warning&quot;: true,
+    &quot;local_asr_warning&quot;: false
+  }
+}</pre>
+  </details>
+</article>
+</main>
+  <style>
+.reader-contents { margin: 16px 0; padding: 12px 16px; border: 1px solid var(--line, #64748b); border-radius: 12px; }
+.reader-contents > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-weight: 750; }
+.reader-contents nav { display: grid; gap: 4px; max-height: 45vh; overflow: auto; margin: 8px 0; }
+.reader-contents a { display: block; min-height: 44px; padding: 10px; border-radius: 6px; color: inherit; overflow-wrap: anywhere; }
+.reader-contents a:hover { background: #80808020; }
+.reader-contents .reader-subsection { padding-inline-start: 24px; font-size: .92em; }
+.reader-prose, .report { overflow-wrap: anywhere; line-height: 1.8; }
+.reader-prose p, .reader-prose li { max-width: 85ch; }
+.reader-prose h2, .reader-prose h3, .reader-prose h4, [data-reader-heading] { scroll-margin-top: 100px; line-height: 1.45; }
+.reader-prose h2 { margin-top: 1.8em; padding-bottom: 8px; border-bottom: 1px solid var(--line, #64748b); }
+.reader-prose h3 { margin-top: 1.5em; }
+.reader-prose li { margin: .5em 0; }
+.reader-prose pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.reader-prose blockquote { margin: 16px 0; padding: 4px 16px; border-left: 3px solid var(--accent, #64748b); }
+.reader-table { overflow: auto; max-width: 100%; margin: 16px 0; border: 1px solid var(--line, #64748b); border-radius: 10px; }
+.reader-table table { border-collapse: collapse; width: 100%; margin: 0; font-size: .92rem; }
+.reader-table th, .reader-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line, #64748b); min-width: 110px; max-width: 400px; overflow-wrap: anywhere; white-space: normal; }
+.reader-table th { background: #80808018; }
+.reader-table tr:nth-child(even) { background: #80808008; }
+.reader-search { display: grid; gap: 8px; margin: 16px 0; }
+.reader-search label { font-weight: 700; }
+.reader-search input { box-sizing: border-box; width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line, #64748b); border-radius: 10px; background: var(--panel, #fff); color: var(--text, #132238); font: inherit; }
+.reader-search p { margin: 0; font-size: .86rem; }
+.reader-back { position: fixed; bottom: max(14px, env(safe-area-inset-bottom)); right: 14px; z-index: 30; min-height: 44px; border: 1px solid #778899; border-radius: 99px; padding: 10px 16px; background: #18344a; color: #fff; font: 700 14px system-ui; cursor: pointer; box-shadow: 0 3px 12px #0003; }
+[data-reader-source] { margin-top: 20px; }
+[data-reader-source] > summary { min-height: 44px; cursor: pointer; }
+[data-reader-source] pre { font-size: .85rem; }
+[data-reader-source] pre, .reader-prose { min-width: 0; }
+.reader-contents :focus-visible, .reader-search :focus-visible, .reader-back:focus-visible, .reader-table:focus-visible { outline: 3px solid var(--accent, #008c95); outline-offset: 3px; }
+.reader-search + .grid > [hidden] { display: none !important; }
+@media (max-width: 600px) { .reader-prose { font-size: 1rem; } .reader-contents { padding: 8px 12px; } }
+@media print { .reader-back, .reader-search, .reader-contents, [data-reader-source] { display: none !important; } .reader-table { overflow: visible; } .reader-prose { color: #000; background: #fff; } }
+</style><script>
+(() => {
+  'use strict';
+  let serial = 0;
+  const rendered = new WeakMap();
+  const node = (tag, text) => { const el = document.createElement(tag); if (text != null) el.textContent = text; return el; };
+  function inline(parent, text) {
+    const pattern = /(`[^`]+`|\*\*[^*]+\*\*|\[[^\]]+\]\(https?:\/\/[^\s)]+\))/g;
+    let start = 0;
+    for (const match of String(text).matchAll(pattern)) {
+      parent.append(document.createTextNode(text.slice(start, match.index)));
+      const value = match[0];
+      if (value.startsWith('`')) parent.append(node('code', value.slice(1, -1)));
+      else if (value.startsWith('**')) parent.append(node('strong', value.slice(2, -2)));
+      else {
+        const link = value.match(/^\[([^\]]+)\]\((.+)\)$/);
+        const a = node('a', link[1]); a.href = link[2]; a.rel = 'noopener noreferrer'; parent.append(a);
+      }
+      start = match.index + value.length;
+    }
+    parent.append(document.createTextNode(text.slice(start)));
+  }
+  const cells = line => line.trim().replace(/^\|/, '').replace(/\|$/, '').split(/(?<!\\)\|/).map(v => v.trim().replace(/\\\|/g, '|'));
+  function markdown(source) {
+    const article = node('article'); article.className = 'reader-prose';
+    const lines = source.split(/\r?\n/); let list = null;
+    for (let i = 0; i < lines.length; i += 1) {
+      const line = lines[i], value = line.trim();
+      if (!value) { list = null; continue; }
+      if (/^```/.test(value)) {
+        const code = []; i += 1;
+        while (i < lines.length && !/^```/.test(lines[i].trim())) code.push(lines[i++]);
+        const pre = node('pre'); pre.append(node('code', code.join('\n'))); article.append(pre); list = null; continue;
+      }
+      if (i + 1 < lines.length && value.includes('|') && cells(lines[i + 1]).every(v => /^:?-{3,}:?$/.test(v))) {
+        const table = node('table'), head = node('thead'), body = node('tbody');
+        const row = (values, tag) => { const tr = node('tr'); values.forEach(v => { const cell = node(tag); if (tag === 'th') cell.scope = 'col'; inline(cell, v); tr.append(cell); }); return tr; };
+        head.append(row(cells(line), 'th')); i += 2;
+        while (i < lines.length && lines[i].trim() && lines[i].includes('|')) body.append(row(cells(lines[i++]), 'td'));
+        i -= 1; table.append(head, body); article.append(table); list = null; continue;
+      }
+      const heading = value.match(/^(#{1,6})\s+(.+)$/);
+      if (heading) { const h = node('h' + Math.min(4, heading[1].length + 1)); inline(h, heading[2]); article.append(h); list = null; continue; }
+      const bullet = value.match(/^(?:[-*+] |\d+\. )(.+)$/);
+      if (bullet) {
+        const tag = /^\d/.test(value) ? 'ol' : 'ul';
+        if (!list || list.tagName.toLowerCase() !== tag) { list = node(tag); if (tag === 'ol') list.start = parseInt(value, 10); article.append(list); }
+        const li = node('li'); inline(li, bullet[1]); list.append(li); continue;
+      }
+      list = null;
+      if (/^(---+|\*\*\*+)$/.test(value)) { article.append(node('hr')); continue; }
+      const p = node(value.startsWith('> ') ? 'blockquote' : 'p'); inline(p, value.startsWith('> ') ? value.slice(2) : line); article.append(p);
+    }
+    return article;
+  }
+  function contents(root) {
+    root.querySelectorAll(':scope > .reader-contents').forEach(el => el.remove());
+    const headings = [...root.querySelectorAll('h2,h3,h4')].filter(h => !h.closest('.card,.run-card,.reader-contents,[data-reader-source],[hidden]'));
+    if (headings.length < 2) return;
+    const details = node('details'); details.className = 'reader-contents';
+    details.append(node('summary', '이 리포트 목차 · ' + headings.length + '개 항목'));
+    const nav = node('nav'); nav.setAttribute('aria-label', '리포트 목차');
+    headings.forEach(h => {
+      if (!h.id) h.id = 'reader-section-' + (++serial);
+      h.dataset.readerHeading = ''; h.tabIndex = -1;
+      const a = node('a', h.textContent); a.href = '#' + h.id;
+      if (h.tagName !== 'H2') a.className = 'reader-subsection';
+      a.addEventListener('click', event => {
+        event.preventDefault();
+        for (let ancestor = h.parentElement; ancestor; ancestor = ancestor.parentElement) if (ancestor.tagName === 'DETAILS') ancestor.open = true;
+        h.scrollIntoView({block: 'start'}); h.focus({preventScroll: true});
+      }); nav.append(a);
+    });
+    details.append(nav); root.prepend(details);
+  }
+  function enhance(root) {
+    if (!root) return;
+    root.querySelectorAll('pre[data-report-markdown]').forEach(pre => {
+      const previous = rendered.get(pre);
+      if (previous && previous.source === pre.textContent) return;
+      const article = markdown(pre.textContent);
+      if (previous) previous.article.replaceWith(article);
+      else {
+        const details = node('details'); details.dataset.readerSource = '';
+        details.append(node('summary', 'Markdown 원문 보기'));
+        pre.before(article, details); details.append(pre);
+      }
+      rendered.set(pre, {source: pre.textContent, article});
+    });
+    root.querySelectorAll('table').forEach(table => {
+      if (table.closest('.reader-table,.account-table-wrap,.summary-scroll')) return;
+      const wrap = node('div'); wrap.className = 'reader-table'; wrap.tabIndex = 0;
+      wrap.setAttribute('role', 'region'); wrap.setAttribute('aria-label', '리포트 표 · 가로로 스크롤하여 전체 보기');
+      table.before(wrap); wrap.append(table);
+    });
+    root.querySelectorAll('.grid').forEach(grid => {
+      const cards = [...grid.querySelectorAll(':scope > a.card')];
+      if (cards.length < 2 || grid.dataset.readerSearch) return;
+      grid.dataset.readerSearch = 'true';
+      const box = node('div'); box.className = 'reader-search';
+      const input = node('input'); input.type = 'search'; input.placeholder = '제목 · 종목 · 채널 · 키워드'; input.id = 'report-search-' + (++serial);
+      const label = node('label', '리포트 찾기'); label.htmlFor = input.id;
+      const status = node('p'); status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
+      const update = () => {
+        const terms = input.value.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean); let count = 0;
+        cards.forEach(card => { card.hidden = !terms.every(t => card.textContent.toLocaleLowerCase().includes(t)); if (!card.hidden) count += 1; });
+        status.textContent = cards.length + '개 중 ' + count + '개 표시' + (count ? '' : ' · 검색어를 지우거나 다른 키워드를 입력하세요.');
+      };
+      input.addEventListener('input', update); box.append(label, input, status); grid.before(box); update();
+    });
+    contents(root);
+  }
+  window.TradingAgentsReader = {enhance};
+  const main = document.querySelector('main');
+  if (main && !main.hasAttribute('data-reader-dynamic')) enhance(main);
+  if (main) {
+    const top = node('button', '↑ 맨 위'); top.type = 'button'; top.className = 'reader-back'; top.setAttribute('aria-label', '리포트 맨 위로 이동');
+    top.addEventListener('click', () => { const target = document.querySelector('h1') || main; target.tabIndex = -1; target.scrollIntoView({block: 'start'}); target.focus({preventScroll: true}); });
+    document.body.append(top);
+  }
+})();
+</script>
+</body>
+</html>

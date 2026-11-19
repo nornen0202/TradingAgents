@@ -661,7 +661,7 @@
     return `<article class="action-card" id="strategy-${esc(marketId)}-${esc(encodeURIComponent(tickerIdentity))}" tabindex="-1" data-ticker="${esc(tickerIdentity)}" data-name="${esc(displayName)}" data-direction="${esc(direction.kind)}" data-search="${esc(`${displayName} ${row.ticker || ''} ${row.sector || ''}`.toLocaleLowerCase())}" data-change="${numeric(row.price_change_pct)}" data-readiness="${esc(readiness.code)}" data-group="${esc(role)}" data-top="${topTickers.has(tickerIdentity) ? 'true' : 'false'}">
       <button type="button" class="back-to-overview">↑ 전략 요약표로</button>
       <div class="card-title"><div><strong>${esc(displayName)} <span class="role-badge">${esc(roleLabel(role))}</span></strong><span class="ticker-code">${esc(row.ticker || '-')}</span></div><span class="row-mode mode-${esc(readiness.code.toLowerCase())}">${esc(readiness.label)}</span></div>
-      <div class="price-line"><strong>${fmt(row.last_price)}</strong><span>입력 시세 ${esc(dateTime(row.market_data_asof || workExecution.as_of))}${sizingBlocked ? ' · 분석 참고' : ''}</span></div>
+      <div class="price-line"><strong>${fmt(row.last_price)}</strong><span>입력 시세 ${esc(dateTime(row.market_data_asof))}${sizingBlocked ? ' · 분석 참고' : ''}</span></div>
       <div class="private-action" data-direction="${esc(direction.kind)}"><strong>분석 시점 전략 방향</strong><span class="strategy-direction">${esc(direction.text)}</span></div>
       ${axes}
       <div class="execution-status"><div><strong>현재 실행 상태·행동</strong><span class="row-mode mode-${esc(readiness.code.toLowerCase())}">${esc(readiness.label)}</span></div><span class="execution-action">${esc(executionAction)}</span><p class="readiness-note">${esc(readiness.note)}</p></div>
