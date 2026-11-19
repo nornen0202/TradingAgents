@@ -6359,7 +6359,9 @@ def _build_failed_execution_update_payload(
             or ""
         ),
         "execution_asof": now.isoformat(),
-        "market_data_asof": contract_payload.get("market_data_asof"),
+        # Failed collection has no quote clock. The contract clock belongs to
+        # the analysis reference and can be a completed trading date only.
+        "market_data_asof": None,
         "source": {
             "provider": None,
             "interval": attempt_payload.get("interval"),
