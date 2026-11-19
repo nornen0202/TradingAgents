@@ -26,6 +26,22 @@ _MASTER = {
 }
 _TAIL_FIELDS = {"kospi": (105, 113, 67), "kosdaq": (100, 108, 62)}
 _REVIEWED = {
+    "460940.KQ": {
+        "symbol": "460940.KQ", "short_code": "460940", "board": "kosdaq",
+        "exchange": "KRX", "currency": "KRW", "isin": "KR7460940000",
+        "issuer": "주식회사 피앤에스미캐닉스", "provider_name": "피앤에스로보틱스",
+        "security_class": "COMMON_STOCK", "event_kind": "IPO_FIRST_REGULAR_COMMON_STOCK",
+        "first_regular_session": "2024-07-31",
+        "evidence_available_at": "2026-11-19T01:50:27.294638+00:00",
+        "sources": [
+            {"url": "https://kind.krx.co.kr/external/2024/07/29/000240/20240729000650/70760.htm",
+             "sha256": "d9061a5cfa8daa2645aa5b228db7bcef4cb2af3f05e38d54c17ce2adc054ab9b",
+             "role": "EXCHANGE_NEW_COMMON_LISTING_DATE_AND_ISIN"},
+            {"url": "https://new.real.download.dws.co.kr/common/master/kosdaq_code.mst.zip",
+             "sha256": "f61e00ffbaf5a9fd3e05a68f35aecff8ab6fa729fc0e3b813804f48c637b76cc",
+             "role": "REVIEWED_CURRENT_MASTER_IDENTITY_NOT_HISTORICAL_LISTING"},
+        ],
+    },
     "402340.KS": {
         "symbol": "402340.KS", "short_code": "402340", "board": "kospi",
         "exchange": "KRX", "currency": "KRW", "isin": "KR7402340004",

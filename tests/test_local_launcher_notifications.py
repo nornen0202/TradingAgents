@@ -192,6 +192,11 @@ def test_concurrent_launchers_share_new_main_revision_without_fetch_race(sandbox
     git("config", "user.name", "Isolated Fixture", cwd=writer)
     git("config", "user.email", "fixture@example.invalid", cwd=writer)
     (writer / "tracked.txt").write_text("base")
+    final_parent = runtime / "local-automation/source" / ("0" * 40)
+    room = max(1, min(100, 247 - len(str(final_parent / "nested" / "report.txt"))))
+    deep_file = Path("nested") / ("x" * room) / "report.txt"
+    (writer / deep_file).parent.mkdir(parents=True)
+    (writer / deep_file).write_text("deep tracked file")
     git("add", ".", cwd=writer)
     git("commit", "-qm", "base", cwd=writer)
     git("remote", "add", "fork", remote, cwd=writer)
@@ -228,6 +233,10 @@ class Worker {
         git("commit", "-qam", f"new main {iteration}", cwd=writer)
         git("push", "-q", "fork", "main", cwd=writer)
         expected = git("rev-parse", "HEAD", cwd=writer)
+        source = runtime / "local-automation/source" / expected
+        if iteration == 0:
+            source.mkdir(parents=True)
+            (source / "incomplete.txt").write_text("previous interrupted extraction")
         workers = [subprocess.Popen(
             [POWERSHELL, "-NoProfile", "-NonInteractive", "-File", str(WRAPPER),
              "-Command", command, "-RepositoryRoot", str(repo), "-RuntimeRoot", str(runtime), "-DryRun"],
@@ -237,7 +246,10 @@ class Worker {
             _, stderr = worker.communicate(timeout=30)
             assert worker.returncode == 0, stderr
         assert all((results / command).read_text() == expected for command in ("run-due", "publish"))
-        assert (runtime / f"local-automation/source/{expected}/tracked.txt").read_text() == str(iteration)
+        assert (source / "tracked.txt").read_text() == str(iteration)
+        assert (source / deep_file).read_text() == "deep tracked file"
+        assert (source / ".source-ready").read_text().strip() == expected
+        assert not (source / "incomplete.txt").exists()
     assert not (runtime / "local-automation/notifications").exists()
     if external_runtime:
         assert not (repo / ".runtime").exists()
