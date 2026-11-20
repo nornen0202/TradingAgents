@@ -1,0 +1,544 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YouTube 투자자용 검증 리포트 - 10년 차 창업가가 체감한 로보택시 전쟁의 조건</title>
+  <style>
+:root {
+  color-scheme: light;
+  --bg: #f7f8fb;
+  --panel: #ffffff;
+  --text: #172033;
+  --muted: #667085;
+  --line: #d9dee8;
+  --accent: #0f766e;
+  --accent-2: #2563eb;
+  --warn: #b45309;
+  --bad: #b42318;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0 56px; }
+a { color: var(--accent-2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.hero { padding: 28px 0 22px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+.hero.compact { padding-top: 12px; }
+.hero h1 { margin: 0; font-size: clamp(28px, 4vw, 44px); line-height: 1.15; letter-spacing: 0; }
+.hero p { max-width: 760px; color: var(--muted); margin: 12px 0 0; }
+.eyebrow { color: var(--accent); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0; margin: 0 0 8px; }
+section { margin: 28px 0; }
+h2, h3, h4, h5 { letter-spacing: 0; line-height: 1.25; }
+.synthesis-callout { padding: clamp(20px, 4vw, 34px); border: 1px solid #6ee7d8; border-radius: 18px; background: linear-gradient(135deg, #ecfdf9 0%, #eff6ff 100%); box-shadow: 0 18px 44px rgba(15, 118, 110, .12); }
+.synthesis-callout.unavailable { border-color: var(--line); background: var(--panel); box-shadow: none; }
+.synthesis-callout h2 { margin: 0; font-size: clamp(24px, 3.2vw, 36px); }
+.synthesis-callout .lead { max-width: 900px; font-size: 17px; color: #334155; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.primary-link, .secondary-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border-radius: 999px; font-weight: 800; }
+.primary-link { color: white; background: var(--accent); }
+.secondary-link { color: var(--accent-2); border: 1px solid #93c5fd; background: white; }
+.primary-link:hover, .secondary-link:hover { text-decoration: none; filter: brightness(.97); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.card, .run { display: flex; flex-direction: column; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; color: var(--text); min-height: 128px; }
+.run { padding: 16px; }
+.card:hover, .run:hover { border-color: var(--accent-2); text-decoration: none; }
+.thumb { display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #e9edf5; border-radius: 8px 8px 0 0; color: var(--muted); font-size: 13px; font-weight: 700; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb-empty span { padding: 0 14px; text-align: center; }
+.card-body { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 16px; }
+.card strong { line-height: 1.35; }
+.source-line { color: #3f4a5f; font-weight: 600; }
+.runs { display: grid; gap: 10px; }
+.badge { display: inline-flex; width: fit-content; border-radius: 999px; padding: 2px 9px; background: #e6f4f1; color: var(--accent); font-size: 12px; font-weight: 700; }
+.status-contradicted, .status-llm_failed { background: #fee4e2; color: var(--bad); }
+.status-unverified, .status-stale { background: #fff4d6; color: var(--warn); }
+small, .muted { color: var(--muted); }
+.topnav { display: flex; gap: 14px; margin-bottom: 16px; font-size: 14px; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px; }
+.stats span { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
+.report { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: min(5vw, 36px); }
+.report-head { border-bottom: 1px solid var(--line); margin-bottom: 24px; padding-bottom: 20px; }
+.report-head h1 { margin: 0; font-size: clamp(24px, 3.5vw, 38px); line-height: 1.2; }
+.meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+.scope-note { padding: 12px 14px; border-left: 4px solid var(--warn); border-radius: 6px; background: #fff7ed; color: #7c2d12; }
+.synthesis-report h2 { margin-top: 34px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.synthesis-report h3 { margin: 24px 0 8px; color: #0f4c5c; }
+.synthesis-report p, .synthesis-report li { overflow-wrap: anywhere; }
+pre { overflow: auto; background: #111827; color: #f9fafb; border-radius: 8px; padding: 14px; }
+code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+details { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 18px; }
+@media (max-width: 640px) {
+  main { width: min(100% - 20px, 1120px); padding-top: 18px; }
+  .report { padding: 18px; }
+  .synthesis-callout { border-radius: 14px; padding: 18px; }
+  .cta-row a { width: 100%; }
+  .mobile-report { border-radius: 12px; }
+}
+</style>
+</head>
+<body>
+  <main>
+<nav class="topnav"><a href="index.html">실행 목록</a><a href="../../index.html">YouTube 홈</a></nav>
+<article class="report">
+  <header class="report-head">
+    <p class="eyebrow">youtube_20261120_105002</p>
+    <h1>10년 차 창업가가 체감한 로보택시 전쟁의 조건</h1>
+    <div class="meta">
+      <span class="badge status-unverified">unverified</span>
+      <a href="https://www.youtube.com/watch?v=gzwL5zCAlII">원본 영상</a>
+    </div>
+  </header>
+  <h2>로보택시 경쟁과 산업용 자율주행: 실증이 매출로 이어지는 조건</h2>
+<p><a href="https://www.youtube.com/watch?v=gzwL5zCAlII">PLUS TV 영상</a> · 2026년 11월 19일 공개 · 2026년 11월 20일 검증 자료 기준</p>
+<h3>핵심 판단</h3>
+<p>서울로보틱스 이한빈 대표가 제시한 투자 가설은 <strong>공도 로보택시보다 운행 조건을 통제하기 쉬운 공장·공항에서, 고객이 당장 비용을 지불할 업무부터 자동화하는 편이 매출로 이어지기 쉽다</strong>는 것이다. 다만 이를 뒷받침할 고객 측 안전 승인, 유상 발주, 운영 실적, 인식 매출은 제공 자료에서 확인되지 않았다. 다음 판단 기준은 시연의 성공이 아니라 <strong>유상 운영을 시작한 고객이 추가 현장이나 차량에 반복 발주하는지</strong>다.</p>
+<h3>확인된 사실과 근거의 범위</h3>
+<p>영상은 아래 주장의 발언 출처이지, 그 내용이 사실임을 입증하는 독립 근거가 아니다. 외부 수집물은 10개 검색에서 2건이었으나, E1은 인도 종자기업 실적 기사, E2는 재활용 금속 시장 자료로 해당 주장과 무관해 근거에서 제외했다. <strong>관련 증거 0건, 12개 주장 모두 미검증</strong>이다. 이는 반증을 뜻하지 않는다. 관련 공시·규제 원문·시장 가격 자료가 없어 종목별 실적 영향이나 밸류에이션은 판단할 수 없다.</p>
+<h3>영상 주장과 검증 결과</h3>
+<p>| 쟁점·영상 구간 | 영상 주장 | 확인 상태와 투자상 해석 |</p>
+<p>|---|---|---|</p>
+<p>| 테슬라 기술·소비자용 FSD (C1–C2) · <a href="https://www.youtube.com/watch?v=gzwL5zCAlII&amp;t=0s">00:00</a>, <a href="https://www.youtube.com/watch?v=gzwL5zCAlII&amp;t=378s">06:18</a> | 2018년부터 카메라 기반 엔드투엔드를 개발했고, 센서를 줄이면 비용을 낮출 수 있으나 학습 데이터와 고성능 칩에 의존한다는 설명. 소비자용 FSD는 운전자 감독이 필요하며 유럽에서 명칭 변경 요구가 있었다는 주장. | 개발 착수·고객 배포·총비용 모두 미확인. 카메라 기반 인식 개발과 엔드투엔드 도입은 별개다. 국가·버전별 감독 요건과 명칭 요구의 주체·효력은 원문이 필요하다. 소비자용 주행보조의 감독 의무·사고 책임을 무인 로보택시 허가와 혼동하지 않는다. |</p>
+<p>| 웨이모·Zoox·테슬라, 한국 시장과 업계 생존 (C3·C4·C11) · <a href="https://www.youtube.com/watch?v=gzwL5zCAlII&amp;t=378s">06:18</a>, <a href="https://www.youtube.com/watch?v=gzwL5zCAlII&amp;t=767s">12:47</a>, <a href="https://www.youtube.com/watch?v=gzwL5zCAlII&amp;t=1566s">26:06</a> | 웨이모의 기술 접근법이 수렴하고 미국 내 서비스와 해외 활동이 확대됐다는 설명. 사람의 개입, 장기 자본·리더십의 중요성을 강조하고, 향후 5년 내 한국에서 여러 나라의 차량이 로보택시로 운행할 가능성과 산업 현장의 자동화 수요를 전망. | 웨이모의 상용 센서·모델 구성과 해외 운영 단계, 사업자별 개입 방식은 미확인. 지도 구축·시험·유상 서비스와 차내 개입·원격 조언·원격 조향을 각각 구분해야 한다. 한국의 5년 전망은 허가 일정이 아니며, 스타트업 약 90% 소멸은 분모·기간·산식이 없는 체감치다. |</p>
+<p>| 서울로보틱스 공장 사업·상장 (C6·C7·C12) · <a href="https://www.youtube.com/watch?v=gzwL5zCAlII&amp;t=1170s">19:30</a> | 교차로·사각지대의 인프라 센서와 차량을 연결하는 방식으로 독일·일본·한국에서 완성차 무인 이송을 검증했다고 설명. 당초 2022~2023년 상용화를 예상했으나 안전심사·사고 책임·단가 협상·공급사 존속 우려로 지연됐으며, 기술특례상장 추진은 매출 요건 변경 후 철회했다고 설명. | 국가별 고객 실증, 국내 유일 여부, 유상 전환·인식 매출은 미확인. 상용화에서 기술의 비중이 10~20%라는 수치는 대표의 경험적 평가다. 상장은 거래소 규정·시행일·경과조치와 개별 절차를 따로 확인해야 하며, 준비 중단과 정식 예비심사 청구 후 철회는 다르다. |</p>
+<p>| 인천공항 수하물 견인차 (C8) · <a href="https://www.youtube.com/watch?v=gzwL5zCAlII&amp;t=1949s">32:29</a> | 수하물 견인차 상용화를 준비 중이며, 인천공항에 특수차량 약 2,000대와 차량당 운전 인력 약 3~4명이 필요하다는 설명. 해외 물류센터·공항·항만 진출도 목표로 제시. | 차량 범위·기준일, 인력 산식, 실증·안전 승인·유상 발주 모두 미확인. 특수차량 전체가 수하물 견인차 도입 대상은 아니므로 두 수치를 곱해 절감 인력이나 시장 규모를 추정할 수 없다. 해외 진출은 수주가 아닌 목표다. |</p>
+<p>| 중국 자율주행·휴머노이드 (C5·C9) · <a href="https://www.youtube.com/watch?v=gzwL5zCAlII&amp;t=767s">12:47</a>, <a href="https://www.youtube.com/watch?v=gzwL5zCAlII&amp;t=1566s">26:06</a> | 도입 요구와 보조금이 초기 수요와 공급망을 키웠다고 평가. 보스턴 다이내믹스의 고도화된 공장 작업 접근과 중국 업체의 단순 기능 우선 판매를 대비하고, 일부 로봇이 수만 대 팔렸다고 주장. | 지원액과 기업 규모 수치는 통화·기간·지표가 불명확하다. 정책 효과는 실집행액·단가·보조금 없는 반복 구매를 대조해야 한다. 로봇 수만 대는 업체·모델·집계 기준이 없고, 생산·출하·예약·실판매의 구분과 Atlas의 공장 적용 단계도 미확인이다. |</p>
+<p>| 초기 무인운반차·쿠팡 (C10) · <a href="https://www.youtube.com/watch?v=gzwL5zCAlII&amp;t=378s">06:18 이후</a> | 1950년경 미국 공장에 무인운반차가 있었고 쿠팡에 무인 로봇이 수천 대 있다는 설명. | 특허나 발명 시점이 아닌 실제 설치·가동 기록, 쿠팡은 기준일·시설·장비 유형별 실가동 대수가 필요하다. 산업의 도입 연혁이나 보급률 근거로 사용하지 않는다. |</p>
+<h3>상승 논리, 반론과 무효화 조건</h3>
+<p><strong>상승 논리:</strong> 공장 내 완성차 이송과 공항 수하물 견인처럼 반복 경로가 있는 업무에서, 인프라 센서가 사각지대를 줄이고 예외 상황이 적어지면 같은 인원으로 처리량을 높일 여지가 있다. 고객의 실질 절감액이 설치·유지·관제 비용을 넘고, 첫 현장에 적용한 설계를 다른 현장에 재사용할 수 있다면 반복 발주와 매출 확대의 근거가 생긴다. 공도 로보택시는 별개다. 허가 지역이 늘더라도 유상 운행량이 늘고 운행당 감독·개입 비용이 낮아져야 경제성 개선으로 이어진다.</p>
+<p><strong>반론과 무효화 조건:</strong> 제한된 현장에서도 안전심사·사고 책임·보험·예외 대응이 남는다. 현장마다 센서·시스템을 재설치하고 관제 인력을 추가해야 한다면 차량 자동화가 운영비 절감으로 이어지지 않을 수 있다. 고객이 정한 승인·발주 일정이 반복해서 미뤄지거나, 유상 운영 후에도 개입률·처리량이 개선되지 않고 총비용이 기존 운영보다 높거나, 첫 현장 이후 추가 발주가 없다면 <strong>단기 매출 전환과 다현장 확장 가설</strong>을 낮춰 봐야 한다. 자료가 공개되지 않았다는 사실만으로 가설이 반증된 것은 아니다.</p>
+<h3>향후 1~2개 분기 관찰 항목</h3>
+<p>| 우선순위 | 확인할 자료와 지표 |</p>
+<p>|---|---|</p>
+<p>| 서울로보틱스 공장 상용화 | 고객 발표·조달 기록에서 안전 승인 → 유상 발주 → 운영 개시 → 매출 인식을 차례로 확인한다. 첫 계약의 규모보다 반복 발주, 운영 현장 수, 시간당 이송 대수, 100회 운행당 개입 건수, 현장당 설치·유지비를 본다. |</p>
+<p>| 공항 수하물 견인차 | 공항공사·조업사의 실증 공고, 안전 승인, 유상 발주 여부를 확인한다. 대상 견인차의 실운용 대수와 교대 인력의 상근환산 기준을 확인하고, 도입 전후 처리량과 관제 인력을 포함한 비용을 비교한다. |</p>
+<p>| 공도 로보택시 | 사업자·도시별 허가 조건, 차내 안전요원 유무, 공개 유상 서비스의 범위, 실제 유상 운행 건수와 원격 개입 권한을 대조한다. 국내에서는 유상운송 허가와 공장·항만·공항 자동화 발주를 별도로 추적한다. |</p>
+<p>| 자본 여력과 수요의 지속성 | 자료가 공개되면 현금 소진 속도·추가 조달 여력·유상 운영 실적을 함께 본다. 상장은 거래소와 회사의 공식 절차 기록으로, 중국 수요는 보조금 실집행과 보조금 없는 반복 구매·감사 매출로 확인한다. |</p>
+<h3>자막 품질과 수동 확인</h3>
+<p>한국어 자동자막 908개를 6개 청크로 분석했다. 표의 시각은 <strong>청크 시작점</strong>으로 정확한 발언 초가 아니며, 자막은 33:30까지, 영상은 33:35다. <code>transcript_quality</code>는 <code>good</code>(1.0)이지만 전체 자막 품질 지표이지 개별 숫자나 발언의 인식 정확도가 아니다. <code>source_confidence</code>는 발언 식별 확신도로 서울로보틱스 0.96, 테슬라 0.89, 웨이모 0.86이며, C10의 0.0은 직접 대응하는 식별 점수가 없다는 뜻이다. 주장별 <code>asr_confidence</code>는 모두 0.0으로 미제공·미측정이며, 오인식 판정이 아니다. 검증 판정 신뢰도 1.0도 <strong>제공 자료로 확인할 수 없다는 판단</strong>에 대한 값이지, 발언이 참이거나 거짓일 확률이 아니다.</p>
+<p>특히 원격 지원이 조언인지 직접 조향인지, 터그카가 어떤 장비를 뜻하는지, 중국 수치의 통화·집계 기준은 원음과 원자료를 대조해야 한다. 상대적 연도 표현은 촬영일 미확인으로 게시일 기준 각각 2026년과 2025년으로 잠정 해석했다. <strong>Bloomberg·Morningstar 및 비공개 자료: 미검증 / 수동 확인 필요.</strong> 테슬라 내부 개발·원가, 상장 중단의 개별 사유, 조업사별 인력 배치와 미공개 계약, 고객별 협상·계약 매출, 업체 미상의 실판매량은 접근 가능한 원문이나 당사자 기록이 나오기 전까지 확인된 사실로 다룰 수 없다.</p>
+  <details>
+    <summary>공개 요약 JSON</summary>
+    <pre>{
+  &quot;version&quot;: 4,
+  &quot;video_id&quot;: &quot;gzwL5zCAlII&quot;,
+  &quot;title&quot;: &quot;10년 차 창업가가 체감한 로보택시 전쟁의 조건&quot;,
+  &quot;url&quot;: &quot;https://www.youtube.com/watch?v=gzwL5zCAlII&quot;,
+  &quot;channel&quot;: &quot;PLUS TV (플러스 TV)&quot;,
+  &quot;channel_id&quot;: &quot;UCuHUaZo43N9PgOCjs3Hg2Uw&quot;,
+  &quot;source_url&quot;: &quot;https://www.youtube.com/@plus_tv_official/videos&quot;,
+  &quot;thumbnail_url&quot;: &quot;https://i.ytimg.com/vi/gzwL5zCAlII/maxresdefault.jpg&quot;,
+  &quot;published_at&quot;: &quot;2026-11-19T08:00:25+00:00&quot;,
+  &quot;status&quot;: &quot;unverified&quot;,
+  &quot;strategy_source_tier&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_evidence_weight&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_validation_policy&quot;: &quot;STANDARD_REVIEW&quot;,
+  &quot;transcript_status&quot;: &quot;available&quot;,
+  &quot;transcript_source&quot;: &quot;automatic&quot;,
+  &quot;transcript_chars&quot;: 16436,
+  &quot;transcript_quality&quot;: {
+    &quot;status&quot;: &quot;good&quot;,
+    &quot;score&quot;: 1.0,
+    &quot;warnings&quot;: [],
+    &quot;source&quot;: &quot;automatic&quot;,
+    &quot;language&quot;: &quot;Korean&quot;,
+    &quot;model_or_format&quot;: &quot;json3&quot;,
+    &quot;chars&quot;: 16436,
+    &quot;segments&quot;: 908,
+    &quot;duration_seconds&quot;: 2015,
+    &quot;repeated_ngram_ratio&quot;: 0.007
+  },
+  &quot;generated_at&quot;: &quot;2026-11-20T10:50:02.650390+09:00&quot;,
+  &quot;llm_status&quot;: &quot;success&quot;,
+  &quot;research_status&quot;: &quot;success&quot;,
+  &quot;claim_verification_status&quot;: &quot;success&quot;,
+  &quot;research_pipeline_version&quot;: 4,
+  &quot;evidence_count&quot;: 2,
+  &quot;claim_status_summary&quot;: {
+    &quot;unverified&quot;: 12
+  },
+  &quot;claims&quot;: [
+    {
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;claim_text&quot;: &quot;대표는 테슬라가 2018년부터 카메라 기반 엔드투엔드를 개발했고, 센서를 줄여 하드웨어 비용을 낮출 수 있지만 대규모 학습 데이터와 고성능 칩에 의존한다고 말했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 1.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.89,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;2018년 개발 착수&quot;,
+        &quot;observed&quot;: &quot;확인 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;센서·차량 연산장치 원가와 학습·검증 비용을 분리해 비교하기 전에는 비용 우위를 가정하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;claim_text&quot;: &quot;대표는 테슬라 소비자용 FSD가 운전자 감독이 필요한 주행보조이며 유럽에서 FSD 명칭 변경을 요구했다고 말했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 1.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:06:18&quot;,
+      &quot;source_confidence&quot;: 0.89,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;해당 없음&quot;,
+        &quot;observed&quot;: &quot;해당 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;소비자용 기능의 감독 의무, 사고 책임, 무인 로보택시 운행 허가는 별도로 판단한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;claim_text&quot;: &quot;영상은 웨이모의 기술이 다중 센서 엔드투엔드 또는 비전 중심 방식으로 수렴하고 미국 내 서비스와 해외 활동이 확대됐다고 설명했다. 대표는 사람의 모니터링과 직접 운전 개입도 언급했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 1.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:06:18&quot;,
+      &quot;source_confidence&quot;: 0.86,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;해외 활동 시점은 ‘올해’; 게시일 기준 2026년으로 잠정 해석&quot;,
+        &quot;observed&quot;: &quot;촬영일과 해외 운영 시작일 확인 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;사업자·도시별 유상 운행 범위와 인력 개입 방식을 확인하기 전에는 서비스 규모나 인력 비용을 추정하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;claim_text&quot;: &quot;대표는 향후 5년 안에 규제가 완화돼 한국에서 국산·중국산·미국산 로보택시가 운행할 수 있고, 물류센터·항만·공항에서는 추가 채용과 자동화 사이의 선택이 중요해질 것으로 전망했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 1.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:26:06&quot;,
+      &quot;source_confidence&quot;: 0.92,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;향후 5년; 게시일을 기준으로 잡으면 2031년 전후&quot;,
+        &quot;observed&quot;: &quot;전망 결과 및 현재 기준선 확인 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;국내 유상운송 허가와 산업 현장의 실제 발주를 별도 지표로 추적한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;claim_text&quot;: &quot;대표는 중국의 도입 요구와 수조 규모 보조금이 초기 수요를 만들고, 생산 확대와 단가 인하 경쟁이 부품 공급망을 키웠으며 일부 기업의 매출은 수백억~수천억 규모이고 ‘조 단위’ 기업도 여럿이라고 말했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 1.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:12:47&quot;,
+      &quot;source_confidence&quot;: 0.88,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;지원금 수조; 일부 기업 매출 수백억~수천억; ‘조 단위’ 기업 여럿&quot;,
+        &quot;observed&quot;: &quot;통화·기간·기업명·‘조 단위’ 지표 확인 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;지원금에 의존하는 수요와 보조금 없이 이어지는 구매를 구분하고, 기준이 불명확한 숫자는 시장 규모 산정에 쓰지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;claim_text&quot;: &quot;대표는 2016년 준비해 2017년 서울로보틱스를 창업했고, 교차로·사각지대의 인프라 센서와 차량을 연결하는 모듈형 기술로 독일·일본·한국 공장에서 완성차 무인 이송을 검증했다고 말했다. ‘국내 유일’도 대표의 주장이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 1.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:19:30&quot;,
+      &quot;source_confidence&quot;: 0.96,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;2016년 창업 준비, 2017년 창업&quot;,
+        &quot;observed&quot;: &quot;준비 시점과 법인 설립일 확인 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;국가별 실증과 반복 가능한 유상 운영을 구분하고, 안전성과 시간당 처리량은 현장별 비교 데이터로 판단한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;claim_text&quot;: &quot;대표는 코스닥 기술특례상장 준비 중 매출 요건이 바뀌어 새 요건을 충족하지 못해 철회했다고 말했다. 진행자는 ‘지난해’ 추진했다고 했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 1.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:19:30&quot;,
+      &quot;source_confidence&quot;: 0.96,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;‘지난해’ 추진; 게시일 기준 2025년으로 잠정 해석&quot;,
+        &quot;observed&quot;: &quot;촬영일, 추진·청구·중단 시점 및 변경 요건 확인 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;회사·주관사·거래소 자료 확인 전에는 상장 중단 사유나 향후 자금조달 가능성을 단정하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;claim_text&quot;: &quot;대표는 인천공항에 특수차량 약 2,000대가 있고 차량당 운전 인력이 약 3~4명 필요하며, 서울로보틱스가 자율주행 수하물 견인차 상용화를 준비한다고 말했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 1.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:32:29&quot;,
+      &quot;source_confidence&quot;: 0.96,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;특수차량 약 2,000대; 차량당 운전 인력 약 3~4명&quot;,
+        &quot;observed&quot;: &quot;재고·실운용 대수 및 인력 집계 확인 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;2,000대에 3~4명을 곱해 절감 가능한 인력이나 시장 규모로 제시하지 않는다. 구매 대상 차종과 유상 발주 대수를 확인한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;claim_text&quot;: &quot;대표는 현대 계열로 소개한 보스턴 다이내믹스의 고도화된 공장 작업 전략과 중국 업체의 단순 기능 우선 판매 전략을 대조하며, 업체명 없이 춤추는 로봇이 수만 대 팔렸다고 말했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 1.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:26:06&quot;,
+      &quot;source_confidence&quot;: 0.91,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;판매 수만 대; 2~3년 내 수익화에 신중, 3~4년 내 다수 소멸 및 약 10년 버틴 일부의 수익 가능성은 전망&quot;,
+        &quot;observed&quot;: &quot;실판매 대수 확인 불가; 전망은 실측값이 아님&quot;
+      },
+      &quot;investor_implication&quot;: &quot;시연과 출하는 유상 산업 현장 도입과 구분한다. 전략 비교에는 고객 인수 실적, 계약, 반복 매출이 필요하다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C10&quot;,
+      &quot;claim_text&quot;: &quot;대표는 1950년경부터 미국 공장에서 무인운반차가 운행했고 쿠팡에도 무인 로봇이 수천 대 있다고 말했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 1.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:06:18&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;미국 공장 1950년경; 쿠팡 로봇 수천 대&quot;,
+        &quot;observed&quot;: &quot;운행 개시 연도와 가동 대수 확인 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;두 사례를 산업 도입 연혁이나 현재 자동화 보급률의 근거로 사용하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C11&quot;,
+      &quot;claim_text&quot;: &quot;대표는 글로벌 자율주행 스타트업 약 90%가 사라졌다는 체감치를 제시하고, 장기 자본과 리더십을 생존의 핵심으로 봤다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 1.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:06:18&quot;,
+      &quot;source_confidence&quot;: 0.92,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;약 90% 소멸이라는 체감치&quot;,
+        &quot;observed&quot;: &quot;검증 가능한 코호트와 소멸 비율 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;90%는 업계 퇴출률로 사용하지 않는다. 개별 기업은 현금 소진 속도, 추가 조달 여력, 유상 운영 실적으로 평가한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C12&quot;,
+      &quot;claim_text&quot;: &quot;대표는 공장 기술 완성에 약 2~3년이 걸렸고 2022~2023년 상용화를 예상했으나, 안전 심사·사고 책임·단가 협상·공급사 존속 우려로 전환이 늦어 매출이 제한됐다고 설명했다. 기술 비중 10~20%는 경험적 평가다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 1.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:19:30&quot;,
+      &quot;source_confidence&quot;: 0.96,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;개발 약 2~3년; 상용화 목표 2022~2023년; 기술 비중 10~20%&quot;,
+        &quot;observed&quot;: &quot;완료일·계약일·매출 및 비중 산식 확인 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;당초 목표 연도를 실제 매출 발생 시점으로 보지 않는다. 안전 승인에서 계약·운영·매출 인식까지 어느 단계에서 지연됐는지 확인한다.&quot;
+    }
+  ],
+  &quot;entities&quot;: [],
+  &quot;evidence&quot;: [
+    {
+      &quot;evidence_id&quot;: &quot;E1&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;Nath Bio-Genes (India) Ltd (BOM:537291) (Q2 2027) Earnings Call Highlights: Revenue Climbs 12. ...&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/nath-bio-genes-india-ltd-170134256.html&quot;,
+      &quot;publisher&quot;: &quot;GuruFocus.com&quot;,
+      &quot;published_at&quot;: &quot;2026-11-18T17:01:34+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Nath Bio-Genes (India) Ltd (BOM:537291) (Q2 2027) Earnings Call Highlights: Revenue Climbs 12. ... Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Orig...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E2&quot;,
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;title&quot;: &quot;Recycled Metal - Global Market Size, Share, Industry Trends and Growth Forecast 2026-2031 | Decarbonization and Electrification Drive a $191.86 Billion Reven...&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/commodities/articles/recycled-metal-global-market-size-161600643.html&quot;,
+      &quot;publisher&quot;: &quot;GlobeNewswire&quot;,
+      &quot;published_at&quot;: &quot;2026-11-19T16:16:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    }
+  ],
+  &quot;source_policy&quot;: {
+    &quot;raw_transcript_published&quot;: false,
+    &quot;raw_transcript_in_evidence&quot;: false,
+    &quot;research_pipeline_version&quot;: 4,
+    &quot;closed_source_claims&quot;: &quot;unverified_external_source&quot;,
+    &quot;auto_caption_warning&quot;: true,
+    &quot;local_asr_warning&quot;: false
+  }
+}</pre>
+  </details>
+</article>
+</main>
+  <style>
+.reader-contents { margin: 16px 0; padding: 12px 16px; border: 1px solid var(--line, #64748b); border-radius: 12px; }
+.reader-contents > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-weight: 750; }
+.reader-contents nav { display: grid; gap: 4px; max-height: 45vh; overflow: auto; margin: 8px 0; }
+.reader-contents a { display: block; min-height: 44px; padding: 10px; border-radius: 6px; color: inherit; overflow-wrap: anywhere; }
+.reader-contents a:hover { background: #80808020; }
+.reader-contents .reader-subsection { padding-inline-start: 24px; font-size: .92em; }
+.reader-prose, .report { overflow-wrap: anywhere; line-height: 1.8; }
+.reader-prose p, .reader-prose li { max-width: 85ch; }
+.reader-prose h2, .reader-prose h3, .reader-prose h4, [data-reader-heading] { scroll-margin-top: 100px; line-height: 1.45; }
+.reader-prose h2 { margin-top: 1.8em; padding-bottom: 8px; border-bottom: 1px solid var(--line, #64748b); }
+.reader-prose h3 { margin-top: 1.5em; }
+.reader-prose li { margin: .5em 0; }
+.reader-prose pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.reader-prose blockquote { margin: 16px 0; padding: 4px 16px; border-left: 3px solid var(--accent, #64748b); }
+.reader-table { overflow: auto; max-width: 100%; margin: 16px 0; border: 1px solid var(--line, #64748b); border-radius: 10px; }
+.reader-table table { border-collapse: collapse; width: 100%; margin: 0; font-size: .92rem; }
+.reader-table th, .reader-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line, #64748b); min-width: 110px; max-width: 400px; overflow-wrap: anywhere; white-space: normal; }
+.reader-table th { background: #80808018; }
+.reader-table tr:nth-child(even) { background: #80808008; }
+.reader-search { display: grid; gap: 8px; margin: 16px 0; }
+.reader-search label { font-weight: 700; }
+.reader-search input { box-sizing: border-box; width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line, #64748b); border-radius: 10px; background: var(--panel, #fff); color: var(--text, #132238); font: inherit; }
+.reader-search p { margin: 0; font-size: .86rem; }
+.reader-back { position: fixed; bottom: max(14px, env(safe-area-inset-bottom)); right: 14px; z-index: 30; min-height: 44px; border: 1px solid #778899; border-radius: 99px; padding: 10px 16px; background: #18344a; color: #fff; font: 700 14px system-ui; cursor: pointer; box-shadow: 0 3px 12px #0003; }
+[data-reader-source] { margin-top: 20px; }
+[data-reader-source] > summary { min-height: 44px; cursor: pointer; }
+[data-reader-source] pre { font-size: .85rem; }
+[data-reader-source] pre, .reader-prose { min-width: 0; }
+.reader-contents :focus-visible, .reader-search :focus-visible, .reader-back:focus-visible, .reader-table:focus-visible { outline: 3px solid var(--accent, #008c95); outline-offset: 3px; }
+.reader-search + .grid > [hidden] { display: none !important; }
+@media (max-width: 600px) { .reader-prose { font-size: 1rem; } .reader-contents { padding: 8px 12px; } }
+@media print { .reader-back, .reader-search, .reader-contents, [data-reader-source] { display: none !important; } .reader-table { overflow: visible; } .reader-prose { color: #000; background: #fff; } }
+</style><script>
+(() => {
+  'use strict';
+  let serial = 0;
+  const rendered = new WeakMap();
+  const node = (tag, text) => { const el = document.createElement(tag); if (text != null) el.textContent = text; return el; };
+  function inline(parent, text) {
+    const pattern = /(`[^`]+`|\*\*[^*]+\*\*|\[[^\]]+\]\(https?:\/\/[^\s)]+\))/g;
+    let start = 0;
+    for (const match of String(text).matchAll(pattern)) {
+      parent.append(document.createTextNode(text.slice(start, match.index)));
+      const value = match[0];
+      if (value.startsWith('`')) parent.append(node('code', value.slice(1, -1)));
+      else if (value.startsWith('**')) parent.append(node('strong', value.slice(2, -2)));
+      else {
+        const link = value.match(/^\[([^\]]+)\]\((.+)\)$/);
+        const a = node('a', link[1]); a.href = link[2]; a.rel = 'noopener noreferrer'; parent.append(a);
+      }
+      start = match.index + value.length;
+    }
+    parent.append(document.createTextNode(text.slice(start)));
+  }
+  const cells = line => line.trim().replace(/^\|/, '').replace(/\|$/, '').split(/(?<!\\)\|/).map(v => v.trim().replace(/\\\|/g, '|'));
+  function markdown(source) {
+    const article = node('article'); article.className = 'reader-prose';
+    const lines = source.split(/\r?\n/); let list = null;
+    for (let i = 0; i < lines.length; i += 1) {
+      const line = lines[i], value = line.trim();
+      if (!value) { list = null; continue; }
+      if (/^```/.test(value)) {
+        const code = []; i += 1;
+        while (i < lines.length && !/^```/.test(lines[i].trim())) code.push(lines[i++]);
+        const pre = node('pre'); pre.append(node('code', code.join('\n'))); article.append(pre); list = null; continue;
+      }
+      if (i + 1 < lines.length && value.includes('|') && cells(lines[i + 1]).every(v => /^:?-{3,}:?$/.test(v))) {
+        const table = node('table'), head = node('thead'), body = node('tbody');
+        const row = (values, tag) => { const tr = node('tr'); values.forEach(v => { const cell = node(tag); if (tag === 'th') cell.scope = 'col'; inline(cell, v); tr.append(cell); }); return tr; };
+        head.append(row(cells(line), 'th')); i += 2;
+        while (i < lines.length && lines[i].trim() && lines[i].includes('|')) body.append(row(cells(lines[i++]), 'td'));
+        i -= 1; table.append(head, body); article.append(table); list = null; continue;
+      }
+      const heading = value.match(/^(#{1,6})\s+(.+)$/);
+      if (heading) { const h = node('h' + Math.min(4, heading[1].length + 1)); inline(h, heading[2]); article.append(h); list = null; continue; }
+      const bullet = value.match(/^(?:[-*+] |\d+\. )(.+)$/);
+      if (bullet) {
+        const tag = /^\d/.test(value) ? 'ol' : 'ul';
+        if (!list || list.tagName.toLowerCase() !== tag) { list = node(tag); if (tag === 'ol') list.start = parseInt(value, 10); article.append(list); }
+        const li = node('li'); inline(li, bullet[1]); list.append(li); continue;
+      }
+      list = null;
+      if (/^(---+|\*\*\*+)$/.test(value)) { article.append(node('hr')); continue; }
+      const p = node(value.startsWith('> ') ? 'blockquote' : 'p'); inline(p, value.startsWith('> ') ? value.slice(2) : line); article.append(p);
+    }
+    return article;
+  }
+  function contents(root) {
+    root.querySelectorAll(':scope > .reader-contents').forEach(el => el.remove());
+    const headings = [...root.querySelectorAll('h2,h3,h4')].filter(h => !h.closest('.card,.run-card,.reader-contents,[data-reader-source],[hidden]'));
+    if (headings.length < 2) return;
+    const details = node('details'); details.className = 'reader-contents';
+    details.append(node('summary', '이 리포트 목차 · ' + headings.length + '개 항목'));
+    const nav = node('nav'); nav.setAttribute('aria-label', '리포트 목차');
+    headings.forEach(h => {
+      if (!h.id) h.id = 'reader-section-' + (++serial);
+      h.dataset.readerHeading = ''; h.tabIndex = -1;
+      const a = node('a', h.textContent); a.href = '#' + h.id;
+      if (h.tagName !== 'H2') a.className = 'reader-subsection';
+      a.addEventListener('click', event => {
+        event.preventDefault();
+        for (let ancestor = h.parentElement; ancestor; ancestor = ancestor.parentElement) if (ancestor.tagName === 'DETAILS') ancestor.open = true;
+        h.scrollIntoView({block: 'start'}); h.focus({preventScroll: true});
+      }); nav.append(a);
+    });
+    details.append(nav); root.prepend(details);
+  }
+  function enhance(root) {
+    if (!root) return;
+    root.querySelectorAll('pre[data-report-markdown]').forEach(pre => {
+      const previous = rendered.get(pre);
+      if (previous && previous.source === pre.textContent) return;
+      const article = markdown(pre.textContent);
+      if (previous) previous.article.replaceWith(article);
+      else {
+        const details = node('details'); details.dataset.readerSource = '';
+        details.append(node('summary', 'Markdown 원문 보기'));
+        pre.before(article, details); details.append(pre);
+      }
+      rendered.set(pre, {source: pre.textContent, article});
+    });
+    root.querySelectorAll('table').forEach(table => {
+      if (table.closest('.reader-table,.account-table-wrap,.summary-scroll')) return;
+      const wrap = node('div'); wrap.className = 'reader-table'; wrap.tabIndex = 0;
+      wrap.setAttribute('role', 'region'); wrap.setAttribute('aria-label', '리포트 표 · 가로로 스크롤하여 전체 보기');
+      table.before(wrap); wrap.append(table);
+    });
+    root.querySelectorAll('.grid').forEach(grid => {
+      const cards = [...grid.querySelectorAll(':scope > a.card')];
+      if (cards.length < 2 || grid.dataset.readerSearch) return;
+      grid.dataset.readerSearch = 'true';
+      const box = node('div'); box.className = 'reader-search';
+      const input = node('input'); input.type = 'search'; input.placeholder = '제목 · 종목 · 채널 · 키워드'; input.id = 'report-search-' + (++serial);
+      const label = node('label', '리포트 찾기'); label.htmlFor = input.id;
+      const status = node('p'); status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
+      const update = () => {
+        const terms = input.value.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean); let count = 0;
+        cards.forEach(card => { card.hidden = !terms.every(t => card.textContent.toLocaleLowerCase().includes(t)); if (!card.hidden) count += 1; });
+        status.textContent = cards.length + '개 중 ' + count + '개 표시' + (count ? '' : ' · 검색어를 지우거나 다른 키워드를 입력하세요.');
+      };
+      input.addEventListener('input', update); box.append(label, input, status); grid.before(box); update();
+    });
+    contents(root);
+  }
+  window.TradingAgentsReader = {enhance};
+  const main = document.querySelector('main');
+  if (main && !main.hasAttribute('data-reader-dynamic')) enhance(main);
+  if (main) {
+    const top = node('button', '↑ 맨 위'); top.type = 'button'; top.className = 'reader-back'; top.setAttribute('aria-label', '리포트 맨 위로 이동');
+    top.addEventListener('click', () => { const target = document.querySelector('h1') || main; target.tabIndex = -1; target.scrollIntoView({block: 'start'}); target.focus({preventScroll: true}); });
+    document.body.append(top);
+  }
+})();
+</script>
+</body>
+</html>

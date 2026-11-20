@@ -1,0 +1,617 @@
+{
+  "version": 4,
+  "video_id": "22mEZYyDpZA",
+  "title": "[11월 19일 마감시황] 5,000선 깨고 장중 최고가 마감…코스피 바닥에 대한 인식이 달라질까ㅣ홍선애, 김장열, 차영주 [클로징벨 라이브]",
+  "url": "https://www.youtube.com/watch?v=22mEZYyDpZA",
+  "channel": "삼프로TV 3PROTV",
+  "channel_id": "UChlv4GSd7OQl3js-jkLOnFA",
+  "source_url": "https://www.youtube.com/@3protv/videos",
+  "thumbnail_url": "https://i.ytimg.com/vi/22mEZYyDpZA/maxresdefault.jpg",
+  "published_at": "2026-11-19T07:54:29+00:00",
+  "status": "asr_uncertain",
+  "strategy_source_tier": "STANDARD",
+  "strategy_evidence_weight": "STANDARD",
+  "strategy_validation_policy": "STANDARD_REVIEW",
+  "transcript_status": "available",
+  "transcript_source": "automatic",
+  "transcript_chars": 34684,
+  "transcript_quality": {
+    "status": "good",
+    "score": 1.0,
+    "warnings": [],
+    "source": "automatic",
+    "language": "Korean",
+    "model_or_format": "json3",
+    "chars": 34684,
+    "segments": 2009,
+    "duration_seconds": 3931,
+    "repeated_ngram_ratio": 0.0
+  },
+  "generated_at": "2026-11-20T10:50:02.650390+09:00",
+  "llm_status": "success",
+  "research_status": "success",
+  "claim_verification_status": "success",
+  "research_pipeline_version": 4,
+  "evidence_count": 7,
+  "claim_status_summary": {
+    "unverified": 10,
+    "partially_supported": 1,
+    "asr_uncertain": 1
+  },
+  "claims": [
+    {
+      "claim_id": "C1",
+      "claim_text": "코스피는 장중 4,963선까지 밀린 뒤 외국인 순매도에도 반등했고, 마감 약 5분 전 코스피 5,118선과 코스닥 683선이 방송에 나왔다. 5,000선의 지지력을 두고 패널 의견은 갈렸다.",
+      "status": "unverified",
+      "confidence": 0.08,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:59:58",
+      "source_confidence": 0.97,
+      "asr_confidence": 0.9,
+      "numeric_parse": {
+        "claimed": "코스피 저점 4,963선; 마감 약 5분 전 코스피 5,118선(+1%대), 코스닥 683선(+3%대); 장중 외국인 순매도 코스피 약 4,300억~4,400억 원, 코스닥 약 1,600억 원; 예정 마감 16:30 KST",
+        "observed": "별도 시점의 ^KS11 스냅샷 4,928.61만 제공됨. 11월 19일 분봉·공식 종가·투자자별 수급·거래시간 공지는 제공되지 않음."
+      },
+      "investor_implication": "장중 5,000선 회복을 바닥 확인으로 해석하지 말고, 공식 종가와 최종 외국인 현물 수급 및 이후 거래일의 지수 흐름을 함께 봐야 한다."
+    },
+    {
+      "claim_id": "C2",
+      "claim_text": "대만 가권지수가 4.6% 하락 마감했고, 3.5% 이상 하락한 종목의 익일 공매도 가격이 제한됐다고 방송은 전했다. 차입 공매도 한도 축소는 패널의 기억에 근거했다.",
+      "status": "unverified",
+      "confidence": 0.03,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:12:09",
+      "source_confidence": 0.88,
+      "asr_confidence": 0.88,
+      "numeric_parse": {
+        "claimed": "가권지수 -4.6%; 종가 3.5% 이상 하락 시 익일 전일 종가 미만 공매도 제한; 30일 평균 거래량 기준 차입 공매도 한도 3%→1%",
+        "observed": "대만 거래소 종가와 금융감독당국의 규제 문서가 제공되지 않음."
+      },
+      "investor_implication": "규제 범위와 시행일이 확인되기 전에는 급락 원인이나 다음 거래일의 수급 효과를 단정할 수 없다."
+    },
+    {
+      "claim_id": "C3",
+      "claim_text": "방송은 앤트로픽의 5월 28일 시리즈 H 가치 9,650억 달러와 상장 전후 약 1조 4,000억 달러대를 비교해 약 50% 프리미엄으로 해석했다. 82~83달러와 청약 경쟁률 7대 1도 언급됐다.",
+      "status": "partially_supported",
+      "confidence": 0.5,
+      "supporting_evidence_ids": [
+        "E5",
+        "E7"
+      ],
+      "manual_check_required": true,
+      "timestamp": "00:06:09",
+      "source_confidence": 0.86,
+      "asr_confidence": 0.73,
+      "numeric_parse": {
+        "claimed": "5월 28일 9,650억 달러→약 1조 4,000억 달러대, 약 50%; 82~83달러; 청약 7대 1",
+        "observed": "E5 제목: 첫날 종가 기준 1조 2,700억 달러, 초기 가격 대비 +17%. 방송의 두 가치 중 1조 4,000억 달러를 그대로 적용한 단순 계산은 약 +45.1%이며, 두 가치 자체를 검증한 것은 아님."
+      },
+      "investor_implication": "상장 첫날의 주가는 시장 반응을 보여줄 뿐, 토큰 사용량이나 GPU 투자 지속성을 입증하지 않는다. 수익성·현금흐름·사용량을 별도로 확인해야 한다."
+    },
+    {
+      "claim_id": "C4",
+      "claim_text": "패널은 엔비디아 실적을 긍정적으로 평가하면서 다음 해 성장률 75%와 네오클라우드 선별 지원 발언을 언급했다. 네오클라우드 비중 약 8%와 주가 영향 3~4%는 별도의 인용 또는 가정이다.",
+      "status": "unverified",
+      "confidence": 0.04,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:12:09",
+      "source_confidence": 0.84,
+      "asr_confidence": 0.81,
+      "numeric_parse": {
+        "claimed": "다음 해 성장률 75%; 네오클라우드 비중 약 8%; 주가 영향 3~4%",
+        "observed": "실적 발표문·콜 원문·비중 산출 자료·거래 시계열 미제공."
+      },
+      "investor_implication": "실적 발표와 콘퍼런스콜 원문을 확인하기 전에는 75%를 회사 가이던스로, 3~4%를 관측된 주가 영향으로 사용하지 않는다."
+    },
+    {
+      "claim_id": "C5",
+      "claim_text": "삼성전자·SK하이닉스 실적이 2~3배 늘고 영업이익이 30조~50조 원에서 100조~130조 원으로 증가했다는 비교가 나왔다. 당일 장중 삼성전자 +0.4%, SK하이닉스 +3%대가 언급됐다.",
+      "status": "unverified",
+      "confidence": 0.04,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:23:46",
+      "source_confidence": 0.86,
+      "asr_confidence": 0.76,
+      "numeric_parse": {
+        "claimed": "실적 2~3배; 영업이익 30조~50조 원→100조~130조 원; 삼성전자 +0.4%, SK하이닉스 +3%대",
+        "observed": "비교 가능한 양사 공시·투자계획과 동일 시각의 장중 시세 미제공."
+      },
+      "investor_implication": "같은 기준의 연결 영업이익과 최신 투자계획을 대조하기 전에는 해당 배수를 근거로 주가가 실적 개선을 반영하지 못했다고 판단할 수 없다."
+    },
+    {
+      "claim_id": "C6",
+      "claim_text": "패널은 4월 15일 대비 마이크론이 약 54% 올랐고 필라델피아 반도체지수는 오르지 않았다고 말했다.",
+      "status": "unverified",
+      "confidence": 0.05,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:17:45",
+      "source_confidence": 0.95,
+      "asr_confidence": 0.89,
+      "numeric_parse": {
+        "claimed": "2026년 4월 15일 대비 마이크론 약 +54%; 같은 기간 SOX 상승 없음",
+        "observed": "마이크론과 SOX의 비교일별 종가 및 기업행위 자료 미제공."
+      },
+      "investor_implication": "같은 미국 거래일의 가격과 주식 분할 조정 기준으로 재계산하기 전에는 마이크론의 지수 대비 강세 폭을 인용하지 않는다."
+    },
+    {
+      "claim_id": "C7",
+      "claim_text": "패널은 FOMC 의사록과 연준 인사 발언을 매파적으로 해석했고, 50bp 조정 확률이 약 10%이며 미국 국채 10년물 금리는 오르지 않았다고 설명했다.",
+      "status": "asr_uncertain",
+      "confidence": 0.03,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:29:38",
+      "source_confidence": 0.83,
+      "asr_confidence": 0.45,
+      "numeric_parse": {
+        "claimed": "50bp 조정 확률 약 10%; 미 국채 10년물 금리 상승 없음",
+        "observed": "대상 회의·조정 방향·확률 스냅샷·동시점 금리 미확인."
+      },
+      "investor_implication": "회의·방향·관측 시각이 확인되지 않은 10%를 금리 시나리오 확률로 쓰거나, 10년물의 반응을 근거로 시장 해석을 확정하지 않는다."
+    },
+    {
+      "claim_id": "C8",
+      "claim_text": "미국 원유 재고가 예상을 웃돌고 유가가 배럴당 80달러 초반으로 내려왔다고 방송은 전했다. 호르무즈 수송에 관한 미중 정상의 강한 공감대는 트럼프 대통령 발언으로 소개됐다.",
+      "status": "unverified",
+      "confidence": 0.12,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:29:38",
+      "source_confidence": 0.9,
+      "asr_confidence": 0.9,
+      "numeric_parse": {
+        "claimed": "유가 배럴당 80달러 초반; 70달러대는 패널이 제시한 기준",
+        "observed": "별도 시점의 CL=F 스냅샷 배럴당 82.79달러. 방송 시점 가격·재고 실측치·사전 예상치 미제공."
+      },
+      "investor_implication": "한 시점의 유가나 정상 발언만으로 공급 위험과 인플레이션 압력이 낮아졌다고 보지 않는다. 재고 실측치와 사전 예상치, 가격 추세, 통항을 따로 확인해야 한다."
+    },
+    {
+      "claim_id": "C9",
+      "claim_text": "삼성전기의 장중 8~9% 상승과 일본 부품주 대비 강세가 언급됐다. 패널은 성장 컨센서스 100% 이상, 전일까지 PER 20배 미만, 기판 납기 연장과 D램 납기 소폭 단축을 근거로 들었다.",
+      "status": "unverified",
+      "confidence": 0.04,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:41:51",
+      "source_confidence": 0.87,
+      "asr_confidence": 0.76,
+      "numeric_parse": {
+        "claimed": "삼성전기 장중 8% 이상~9% 근접; 성장률 100% 이상; 전일까지 PER 20배 미만",
+        "observed": "동시점 종목 시세, 제품별 납기 시계열, 성장률과 PER 산출 자료 미제공."
+      },
+      "investor_implication": "상대 강세, 납기 변화, 밸류에이션을 각각 확인하기 전에는 당일 상승을 구조적 이익 성장이나 저평가의 근거로 삼기 어렵다."
+    },
+    {
+      "claim_id": "C10",
+      "claim_text": "패널은 AI 서버의 CPU 1개당 GPU 수가 4개에서 2개, 장기적으로 1개로 줄면서 PCB·소켓 수요와 TLB·심텍에 유리할 수 있다고 전망했다.",
+      "status": "unverified",
+      "confidence": 0.03,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:41:51",
+      "source_confidence": 0.9,
+      "asr_confidence": 0.91,
+      "numeric_parse": {
+        "claimed": "CPU 1개당 GPU 4개→2개→장기 1개",
+        "observed": "제품별 구성, 시장 채택률, 업체별 수주·매출 자료 미제공."
+      },
+      "investor_implication": "서버 구성 변화와 두 회사의 납품·매출 반영을 별도로 확인하기 전에는 구조적 수혜를 이익 전망에 반영하기 어렵다."
+    },
+    {
+      "claim_id": "C11",
+      "claim_text": "방송은 한한령 완화 기대와 함께 11월 18일 SM 상한가, 19일 엔터·콘텐츠·여행·카지노·화장품·유통주의 장중 강세를 전했다.",
+      "status": "unverified",
+      "confidence": 0.04,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:47:50",
+      "source_confidence": 0.93,
+      "asr_confidence": 0.88,
+      "numeric_parse": {
+        "claimed": "11월 18일 SM 상한가; 19일 장중 하이브 +13% 이상, SM +7%대, CJ ENM +27% 이상, 스튜디오드래곤·에이스토리 상한가, 파라다이스 +10%, 하나투어 +17%, 아모레퍼시픽 +8%, 한국화장품제조 약 +15%, 신세계 +10%, 호텔신라 +9%대",
+        "observed": "양일 공식 종목 시세, 장중 거래량 및 거래시장별 가격 자료 미제공."
+      },
+      "investor_implication": "당일 순환매를 장기 주도주 신호로 보려면 실제 공연·콘텐츠 허가, 방한 수요, 기업별 중국 매출이 뒷받침돼야 한다."
+    },
+    {
+      "claim_id": "C12",
+      "claim_text": "방송은 APEC 정상회의에서 한중 FTA 서비스·투자 후속협상의 실질 타결이 발표됐지만 K팝 공연은 명시되지 않았다고 전했다.",
+      "status": "unverified",
+      "confidence": 0.03,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:53:44",
+      "source_confidence": 0.93,
+      "asr_confidence": 0.88,
+      "numeric_parse": {
+        "claimed": "정량 주장 없음",
+        "observed": "협정문·시행 일정·허가 자료 미제공."
+      },
+      "investor_implication": "협상 발표, 서명·발효, 실제 공연·콘텐츠 허가는 별개다. 공식 발표만으로 기업 매출이 발생했다고 볼 수 없다."
+    }
+  ],
+  "entities": [
+    {
+      "ticker": "^KS11",
+      "name": "코스피·코스닥",
+      "status": "unverified",
+      "claims": [
+        "코스피는 장중 5,000선을 이탈한 뒤 외국인 순매도에도 반등했고, 코스닥의 상승폭은 마감 직전까지 코스피보다 컸다.",
+        "한 패널은 5,000선 반복 회복을 지지력의 신호로 봤지만, 다른 패널은 수급과 반등의 지속성을 더 확인해야 한다고 봤다."
+      ],
+      "numeric_claims": [
+        "코스피 장중 저점 4,963선. 초반 방송 중 5,096선(+0.58%)과 5,093선(+0.52%)이 각각 언급됐다.",
+        "코스닥은 방송 초반 672선(+1.47%), 중간 점검 때 676선(+2%대)과 678선(+2.3%)이 언급됐다.",
+        "장중 중간 집계 외국인 순매도는 코스피 약 4,400억 원, 코스닥 약 1,600억 원이었다. 코스피 순매도는 앞서 약 4,300억 원으로 언급됐다."
+      ],
+      "verification_notes": [
+        "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+      ],
+      "market_snapshot": {
+        "ticker": "^KS11",
+        "as_of": "2026-11-20T02:35:16.913095+00:00",
+        "current_price": 4928.60986328125,
+        "market_cap": null,
+        "forward_pe": null,
+        "trailing_pe": null,
+        "fifty_two_week_high": 9385.59,
+        "fifty_two_week_low": 3833.35,
+        "average_target_price": null,
+        "source": "yfinance",
+        "status": "verified"
+      },
+      "external_context_status": "verified"
+    },
+    {
+      "ticker": "확인 불가",
+      "name": "대만 가권지수·공매도 규제",
+      "status": "unverified",
+      "claims": [
+        "대만 가권지수는 한국 증시 반등과 달리 급락했고, 방송 중 대만이 공매도 규제를 추가로 강화했다는 소식이 전해졌다."
+      ],
+      "numeric_claims": [
+        "가권지수는 4.6% 하락 마감했다고 방송에서 전했다.",
+        "종가가 3.5% 이상 하락한 종목은 다음 거래일에 전일 종가 미만으로 공매도할 수 없다고 소개됐다.",
+        "차입 공매도 한도가 30일 평균 거래량의 3%에서 1%로 축소됐다는 설명은 패널의 기억에 근거했다."
+      ],
+      "verification_notes": [
+        "시장 데이터 조회 실패: no_usable_market_fields"
+      ],
+      "market_snapshot": {
+        "ticker": "확인 불가",
+        "as_of": "2026-11-20T02:35:18.011232+00:00",
+        "current_price": null,
+        "market_cap": null,
+        "forward_pe": null,
+        "trailing_pe": null,
+        "fifty_two_week_high": null,
+        "fifty_two_week_low": null,
+        "average_target_price": null,
+        "source": "yfinance",
+        "status": "unverified"
+      },
+      "external_context_status": "unverified"
+    },
+    {
+      "ticker": "확인 불가",
+      "name": "앤트로픽",
+      "status": "unverified",
+      "claims": [
+        "패널은 앤트로픽의 상장 후 주가와 수익성이 AI 토큰 수요와 GPU 투자 지속성을 가늠할 지표라고 봤다."
+      ],
+      "numeric_claims": [
+        "5월 28일 시리즈 H 기업가치 9,650억 달러와 상장 전후 약 1조 4,000억 달러대가 비교됐으며, 패널은 약 6개월간 약 50% 프리미엄으로 해석했다."
+      ],
+      "verification_notes": [
+        "시장 데이터 조회 실패: no_usable_market_fields"
+      ],
+      "market_snapshot": {
+        "ticker": "확인 불가",
+        "as_of": "2026-11-20T02:35:20.543900+00:00",
+        "current_price": null,
+        "market_cap": null,
+        "forward_pe": null,
+        "trailing_pe": null,
+        "fifty_two_week_high": null,
+        "fifty_two_week_low": null,
+        "average_target_price": null,
+        "source": "yfinance",
+        "status": "unverified"
+      },
+      "external_context_status": "unverified"
+    },
+    {
+      "ticker": "확인 불가",
+      "name": "엔비디아",
+      "status": "unverified",
+      "claims": [
+        "실적과 다음 해 성장 전망은 긍정적으로 평가됐지만, 네오클라우드 업체를 선별 지원한다는 발언은 생태계 불확실성을 높인 요인으로 거론됐다."
+      ],
+      "numeric_claims": [
+        "다음 해 성장률 75%가 언급됐으나 전망 주체와 대상 지표는 자막에서 명확하지 않다.",
+        "네오클라우드 비중 약 8%와 주가 영향 3~4%는 패널이 인용하거나 가정한 수치다."
+      ],
+      "verification_notes": [
+        "시장 데이터 조회 실패: no_usable_market_fields"
+      ],
+      "market_snapshot": {
+        "ticker": "확인 불가",
+        "as_of": "2026-11-20T02:35:22.032459+00:00",
+        "current_price": null,
+        "market_cap": null,
+        "forward_pe": null,
+        "trailing_pe": null,
+        "fifty_two_week_high": null,
+        "fifty_two_week_low": null,
+        "average_target_price": null,
+        "source": "yfinance",
+        "status": "unverified"
+      },
+      "external_context_status": "unverified"
+    },
+    {
+      "ticker": "확인 불가",
+      "name": "삼성전자·SK하이닉스",
+      "status": "unverified",
+      "claims": [
+        "패널은 주가가 실적 개선을 반영하지 못하고 과거 수준으로 후퇴했다고 해석했다. 향후 투자계획 유지 여부를 이익 지속성의 단서로 봤으며, 당일 반등에서는 SK하이닉스가 주도했다고 평가했다."
+      ],
+      "numeric_claims": [
+        "실적이 2~3배 늘었다는 발언과 영업이익 30조~50조 원에서 100조~130조 원으로 늘었다는 비교가 나왔으나, 회사별 구분과 집계 기간은 불명확하다.",
+        "장중 한 시점에 삼성전자 +0.4%, SK하이닉스 +3%대가 언급됐다."
+      ],
+      "verification_notes": [
+        "시장 데이터 조회 실패: no_usable_market_fields"
+      ],
+      "market_snapshot": {
+        "ticker": "확인 불가",
+        "as_of": "2026-11-20T02:35:23.663800+00:00",
+        "current_price": null,
+        "market_cap": null,
+        "forward_pe": null,
+        "trailing_pe": null,
+        "fifty_two_week_high": null,
+        "fifty_two_week_low": null,
+        "average_target_price": null,
+        "source": "yfinance",
+        "status": "unverified"
+      },
+      "external_context_status": "unverified"
+    },
+    {
+      "ticker": "확인 불가",
+      "name": "마이크론·필라델피아 반도체지수",
+      "status": "unverified",
+      "claims": [
+        "패널의 4월 15일 대비 비교에서 마이크론은 당일 하락을 반영하고도 상승했지만, 필라델피아 반도체지수는 같은 비교에서 오르지 않았다고 했다."
+      ],
+      "numeric_claims": [
+        "마이크론 주가는 4월 15일 대비 +54%로 언급됐다."
+      ],
+      "verification_notes": [
+        "시장 데이터 조회 실패: no_usable_market_fields"
+      ],
+      "market_snapshot": {
+        "ticker": "확인 불가",
+        "as_of": "2026-11-20T02:35:25.381022+00:00",
+        "current_price": null,
+        "market_cap": null,
+        "forward_pe": null,
+        "trailing_pe": null,
+        "fifty_two_week_high": null,
+        "fifty_two_week_low": null,
+        "average_target_price": null,
+        "source": "yfinance",
+        "status": "unverified"
+      },
+      "external_context_status": "unverified"
+    },
+    {
+      "ticker": "확인 불가",
+      "name": "미국 연준·미 국채 10년물",
+      "status": "unverified",
+      "claims": [
+        "FOMC 의사록과 연준 인사의 발언은 매파적으로 해석됐지만, 패널은 FedWatch 확률이 오르지 않고 10년물 금리도 상승하지 않아 시장이 큰 폭의 금리 조정을 주된 시나리오로 보지 않는다고 해석했다."
+      ],
+      "numeric_claims": [
+        "50bp가 거론됐고 관련 확률로 약 10%가 언급됐다. 대상 회의와 금리 조정 방향은 자막만으로 확정하기 어렵다."
+      ],
+      "verification_notes": [
+        "시장 데이터 조회 실패: no_usable_market_fields"
+      ],
+      "market_snapshot": {
+        "ticker": "확인 불가",
+        "as_of": "2026-11-20T02:35:26.959458+00:00",
+        "current_price": null,
+        "market_cap": null,
+        "forward_pe": null,
+        "trailing_pe": null,
+        "fifty_two_week_high": null,
+        "fifty_two_week_low": null,
+        "average_target_price": null,
+        "source": "yfinance",
+        "status": "unverified"
+      },
+      "external_context_status": "unverified"
+    },
+    {
+      "ticker": "CL=F",
+      "name": "국제유가·호르무즈 해협",
+      "status": "unverified",
+      "claims": [
+        "미국 원유 재고가 예상을 웃돌았다는 소식과 함께 유가가 하락했고, 패널은 하락 추세와 실제 수송 여건이 확인돼야 인플레이션 완화 의미를 부여할 수 있다고 봤다."
+      ],
+      "numeric_claims": [
+        "유가는 배럴당 80달러 초반으로 소개됐다. 80달러 미만인 70달러대는 패널이 의미 있는 하락 구간으로 제시한 수준이다."
+      ],
+      "verification_notes": [
+        "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+      ],
+      "market_snapshot": {
+        "ticker": "CL=F",
+        "as_of": "2026-11-20T02:35:28.175712+00:00",
+        "current_price": 82.79000091552734,
+        "market_cap": null,
+        "forward_pe": null,
+        "trailing_pe": null,
+        "fifty_two_week_high": 119.48,
+        "fifty_two_week_low": 54.98,
+        "average_target_price": null,
+        "source": "yfinance",
+        "status": "verified"
+      },
+      "external_context_status": "verified"
+    },
+    {
+      "ticker": "확인 불가",
+      "name": "삼성전기·기판",
+      "status": "unverified",
+      "claims": [
+        "패널은 삼성전기가 일본 기판·부품주보다 강했던 배경으로 선행 주가 하락, 이익 성장 기대, 길어진 기판 납기를 들었다."
+      ],
+      "numeric_claims": [
+        "삼성전기 장중 8% 이상, 9%에 가까운 상승이 언급됐다.",
+        "성장률 컨센서스 100% 이상과 전일까지 PER 20배 미만이 언급됐으나 성장 지표와 전망 기간은 불명확하다."
+      ],
+      "verification_notes": [
+        "시장 데이터 조회 실패: no_usable_market_fields"
+      ],
+      "market_snapshot": {
+        "ticker": "확인 불가",
+        "as_of": "2026-11-20T02:35:29.106754+00:00",
+        "current_price": null,
+        "market_cap": null,
+        "forward_pe": null,
+        "trailing_pe": null,
+        "fifty_two_week_high": null,
+        "fifty_two_week_low": null,
+        "average_target_price": null,
+        "source": "yfinance",
+        "status": "unverified"
+      },
+      "external_context_status": "unverified"
+    },
+    {
+      "ticker": "확인 불가",
+      "name": "CPU 소켓·PCB 관련주(TLB·심텍)",
+      "status": "unverified",
+      "claims": [
+        "패널은 AI 시스템에서 GPU 대비 CPU 탑재 비율이 높아지면 PCB·소켓 수요가 GPU 공급업체 간 경쟁과 별개로 성장할 수 있다고 봤다. 관련주로 심텍과 TLB를 언급했다."
+      ],
+      "numeric_claims": [
+        "GPU 4개당 CPU 1개에서 2개당 1개, 장기적으로 1개당 1개가 될 수 있다는 패널 전망."
+      ],
+      "verification_notes": [
+        "시장 데이터 조회 실패: no_usable_market_fields"
+      ],
+      "market_snapshot": {
+        "ticker": "확인 불가",
+        "as_of": "2026-11-20T02:35:30.648721+00:00",
+        "current_price": null,
+        "market_cap": null,
+        "forward_pe": null,
+        "trailing_pe": null,
+        "fifty_two_week_high": null,
+        "fifty_two_week_low": null,
+        "average_target_price": null,
+        "source": "yfinance",
+        "status": "unverified"
+      },
+      "external_context_status": "unverified"
+    },
+    {
+      "ticker": "확인 불가",
+      "name": "한한령 완화 기대 관련주",
+      "status": "unverified",
+      "claims": [
+        "한한령 완화 기대에 엔터·콘텐츠·화장품·여행·카지노 등으로 매수세가 확산됐다. 패널은 반도체가 약하면 단기 순환매가 이어질 수 있지만, 이를 실적 개선이나 장기 주도주 신호로 보기에는 이르다고 봤다."
+      ],
+      "numeric_claims": [
+        "전날 SM 상한가가 언급됐다. 당일 장중 하이브 +13% 이상, SM +7%대, CJ ENM +27% 이상, 스튜디오드래곤·에이스토리 상한가.",
+        "당일 장중 파라다이스 +10%, 하나투어 +17%, 아모레퍼시픽 +8%, 한국화장품제조 약 +15%, 신세계 +10%, 호텔신라 +9%대."
+      ],
+      "verification_notes": [
+        "시장 데이터 조회 실패: no_usable_market_fields"
+      ],
+      "market_snapshot": {
+        "ticker": "확인 불가",
+        "as_of": "2026-11-20T02:35:32.364196+00:00",
+        "current_price": null,
+        "market_cap": null,
+        "forward_pe": null,
+        "trailing_pe": null,
+        "fifty_two_week_high": null,
+        "fifty_two_week_low": null,
+        "average_target_price": null,
+        "source": "yfinance",
+        "status": "unverified"
+      },
+      "external_context_status": "unverified"
+    }
+  ],
+  "evidence": [
+    {
+      "evidence_id": "E1",
+      "claim_id": "C1",
+      "title": "Brazilian Real Weakness Hammers Sugar Prices",
+      "source_url": "https://finance.yahoo.com/markets/commodities/articles/brazilian-real-weakness-hammers-sugar-192314318.html",
+      "publisher": "Barchart",
+      "published_at": "2026-11-19T19:23:14+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "Brazilian Real Weakness Hammers Sugar Prices Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 2026 Elections Weather Newsletters Finance My po..."
+    },
+    {
+      "evidence_id": "E2",
+      "claim_id": "C1",
+      "title": "Sugar Prices Plummet with the Brazilian Real",
+      "source_url": "https://finance.yahoo.com/markets/commodities/articles/sugar-prices-plummet-brazilian-real-172849298.html",
+      "publisher": "Barchart",
+      "published_at": "2026-11-19T17:28:49+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "Sugar Prices Plummet with the Brazilian Real Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 2026 Elections Weather Newsletters Finance My po..."
+    },
+    {
+      "evidence_id": "E4",
+      "claim_id": "C2",
+      "title": "Recycled Metal - Global Market Size, Share, Industry Trends and Growth Forecast 2026-2031 | Decarbonization and Electrification Drive a $191.86 Billion Reven...",
+      "source_url": "https://finance.yahoo.com/markets/commodities/articles/recycled-metal-global-market-size-161600643.html",
+      "publisher": "GlobeNewswire",
+      "published_at": "2026-11-19T16:16:00+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "Recycled Metal - Global Market Size, Share, Industry Trends and Growth Forecast 2026-2031 | Decarbonization and Electrification Drive a $191.86 Billion Revenue Opportunity Oops, something went wrong Skip to navigation Skip to main content Skip to right colu..."
+    },
+    {
+      "evidence_id": "E5",
+      "claim_id": "C3",
+      "title": "Anthropic IPO live: Anthropic stock closes up 17% from initial price for $1.27T valuation in first day of trading",
+      "source_url": "https://finance.yahoo.com/technology/live/anthropic-ipo-live-anthropic-stock-begins-trading-in-record-81b-raise-with-15t-valuation-192410598.html",
+      "publisher": "Yahoo Finance",
+      "published_at": "2026-11-20T02:30:46+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    },
+    {
+      "evidence_id": "E6",
+      "claim_id": "C3",
+      "title": "Dow Jones Futures: Techs Slide, Anthropic Retreats After Ugly Market Reversal To New Lows",
+      "source_url": "https://finance.yahoo.com/m/9e02231d-41cd-31ac-b37f-993325b8a4ca/dow-jones-futures%3A-techs.html",
+      "publisher": "Investor's Business Daily",
+      "published_at": "2026-11-20T02:25:42+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    }
+  ],
+  "source_policy": {
+    "raw_transcript_published": false,
+    "raw_transcript_in_evidence": false,
+    "research_pipeline_version": 4,
+    "closed_source_claims": "unverified_external_source",
+    "auto_caption_warning": true,
+    "local_asr_warning": false
+  }
+}

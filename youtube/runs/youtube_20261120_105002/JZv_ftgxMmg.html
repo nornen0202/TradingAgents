@@ -1,0 +1,576 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YouTube 투자자용 검증 리포트 - 앤트로픽 상장 그 이후, 아무도 말 안 하는 &#x27;날짜&#x27; 정체</title>
+  <style>
+:root {
+  color-scheme: light;
+  --bg: #f7f8fb;
+  --panel: #ffffff;
+  --text: #172033;
+  --muted: #667085;
+  --line: #d9dee8;
+  --accent: #0f766e;
+  --accent-2: #2563eb;
+  --warn: #b45309;
+  --bad: #b42318;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0 56px; }
+a { color: var(--accent-2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.hero { padding: 28px 0 22px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+.hero.compact { padding-top: 12px; }
+.hero h1 { margin: 0; font-size: clamp(28px, 4vw, 44px); line-height: 1.15; letter-spacing: 0; }
+.hero p { max-width: 760px; color: var(--muted); margin: 12px 0 0; }
+.eyebrow { color: var(--accent); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0; margin: 0 0 8px; }
+section { margin: 28px 0; }
+h2, h3, h4, h5 { letter-spacing: 0; line-height: 1.25; }
+.synthesis-callout { padding: clamp(20px, 4vw, 34px); border: 1px solid #6ee7d8; border-radius: 18px; background: linear-gradient(135deg, #ecfdf9 0%, #eff6ff 100%); box-shadow: 0 18px 44px rgba(15, 118, 110, .12); }
+.synthesis-callout.unavailable { border-color: var(--line); background: var(--panel); box-shadow: none; }
+.synthesis-callout h2 { margin: 0; font-size: clamp(24px, 3.2vw, 36px); }
+.synthesis-callout .lead { max-width: 900px; font-size: 17px; color: #334155; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.primary-link, .secondary-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border-radius: 999px; font-weight: 800; }
+.primary-link { color: white; background: var(--accent); }
+.secondary-link { color: var(--accent-2); border: 1px solid #93c5fd; background: white; }
+.primary-link:hover, .secondary-link:hover { text-decoration: none; filter: brightness(.97); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.card, .run { display: flex; flex-direction: column; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; color: var(--text); min-height: 128px; }
+.run { padding: 16px; }
+.card:hover, .run:hover { border-color: var(--accent-2); text-decoration: none; }
+.thumb { display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #e9edf5; border-radius: 8px 8px 0 0; color: var(--muted); font-size: 13px; font-weight: 700; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb-empty span { padding: 0 14px; text-align: center; }
+.card-body { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 16px; }
+.card strong { line-height: 1.35; }
+.source-line { color: #3f4a5f; font-weight: 600; }
+.runs { display: grid; gap: 10px; }
+.badge { display: inline-flex; width: fit-content; border-radius: 999px; padding: 2px 9px; background: #e6f4f1; color: var(--accent); font-size: 12px; font-weight: 700; }
+.status-contradicted, .status-llm_failed { background: #fee4e2; color: var(--bad); }
+.status-unverified, .status-stale { background: #fff4d6; color: var(--warn); }
+small, .muted { color: var(--muted); }
+.topnav { display: flex; gap: 14px; margin-bottom: 16px; font-size: 14px; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px; }
+.stats span { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
+.report { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: min(5vw, 36px); }
+.report-head { border-bottom: 1px solid var(--line); margin-bottom: 24px; padding-bottom: 20px; }
+.report-head h1 { margin: 0; font-size: clamp(24px, 3.5vw, 38px); line-height: 1.2; }
+.meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+.scope-note { padding: 12px 14px; border-left: 4px solid var(--warn); border-radius: 6px; background: #fff7ed; color: #7c2d12; }
+.synthesis-report h2 { margin-top: 34px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.synthesis-report h3 { margin: 24px 0 8px; color: #0f4c5c; }
+.synthesis-report p, .synthesis-report li { overflow-wrap: anywhere; }
+pre { overflow: auto; background: #111827; color: #f9fafb; border-radius: 8px; padding: 14px; }
+code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+details { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 18px; }
+@media (max-width: 640px) {
+  main { width: min(100% - 20px, 1120px); padding-top: 18px; }
+  .report { padding: 18px; }
+  .synthesis-callout { border-radius: 14px; padding: 18px; }
+  .cta-row a { width: 100%; }
+  .mobile-report { border-radius: 12px; }
+}
+</style>
+</head>
+<body>
+  <main>
+<nav class="topnav"><a href="index.html">실행 목록</a><a href="../../index.html">YouTube 홈</a></nav>
+<article class="report">
+  <header class="report-head">
+    <p class="eyebrow">youtube_20261120_105002</p>
+    <h1>앤트로픽 상장 그 이후, 아무도 말 안 하는 &#x27;날짜&#x27; 정체</h1>
+    <div class="meta">
+      <span class="badge status-unverified">unverified</span>
+      <a href="https://www.youtube.com/watch?v=JZv_ftgxMmg">원본 영상</a>
+    </div>
+  </header>
+  <h2>앤트로픽 IPO 이후: 보호예수 해제일보다 중요한 것은 실제 매도 물량</h2>
+<p>2026년 11월 20일 기준 · <a href="https://www.youtube.com/watch?v=JZv_ftgxMmg">경제사냥꾼 영상</a> · 2026년 11월 19일 공개</p>
+<p><strong>핵심 판단:</strong> 보호예수(락업) 해제는 주식을 팔 수 있게 되는 사건이지, 매도가 체결되는 사건이 아니다. 영상의 분석 틀은 유용하지만, 제공된 자료로 확인할 수 있는 것은 앤트로픽 IPO를 보도한 기사 제목까지다. 공식 티커·공모 조건과 핵심 해제 일정·물량은 미검증이므로, 아래 날짜는 확정 일정이 아니라 공시 대조가 필요한 가정이다.</p>
+<h3>확인된 사실과 근거</h3>
+<ul>
+<li><strong>IPO 보도:</strong> <a href="https://finance.yahoo.com/markets/stocks/articles/anthropic-joins-world-apos-most-005806406.html">MT Newswires의 IPO 보도</a>와 <a href="https://finance.yahoo.com/markets/article/retail-traders-pile-into-anthropic-ipo-but-net-buying-lags-spacex-212350846.html">Yahoo Finance의 IPO 거래 관련 보도</a>는 제목에서 앤트로픽 IPO를 다룬다. 본문과 공식 공시가 확보되지 않아 공모가, 공모 규모, 미국 최대 여부, 나스닥 첫 체결일은 확인되지 않았다.</li>
+<li><strong>시장 데이터의 한계:</strong> 11월 20일 10:58 한국시간 기준 yfinance 조회에서 <code>ANT</code>에 97.17달러가 반환됐다. 거래소 자료로 발행사와 티커의 연결을 확인하지 못했으므로 이 값을 앤트로픽의 현재가나 첫날 종가로 쓰지 않으며, 공모가 대비 수익률이나 밸류에이션도 산출하지 않는다. 뉴스·공시 제공처 오류는 관련 자료가 없다는 증거가 아니다.</li>
+<li><strong>검증 범위:</strong> 수집 항목 8건은 대부분 제목, 오류 페이지 또는 빈 발췌문이다. 항목의 <code>verified</code> 표시는 개별 주장의 사실 확인을 뜻하지 않는다. 주장 검증 결과는 IPO 보도(C1)만 부분 뒷받침이며, 직원 지분·락업·비교 사례·연구(C2~C9)는 미검증이다.</li>
+</ul>
+<h3>영상 주장: 공모 구조와 단계별 해제</h3>
+<p><strong>공모와 직원 지분 — 00:00:00.</strong> 영상은 미국 현지 11월 18일에 희망 범위 70~78달러를 웃도는 83달러로 9억 8,000만 주를 확정했고, 11월 19일 나스닥에서 <code>ANT</code>로 첫 거래할 예정이었다고 설명한다. 영상 수치의 곱은 813억 4,000만 달러, 구주 2,365만 주의 비중은 약 2.41%다. 이는 산술 검산일 뿐 공모 규모나 미국 최대 순위의 확인은 아니다. 공모 외 동일가 매입 약정 260억 달러와 이사회 구성원의 매입 의향 3억 300만 달러도 실제 체결이나 공모 본체와 구분해야 한다.</p>
+<p>영상은 비창업자 직원 598명이 각각 1억 달러 이상, 별도 모델에서는 전현직 직원 약 2,800명이 각각 세전 100만 달러 이상 지분을 보유한 것으로 추정했다고 전한다. 두 모델의 모집단과 평가 기준은 다르며, 로이터 원문과 모델은 확보되지 않았다. 옵션 평균 행사가 0.52·2.91달러, 내재가치 약 1,190억 달러 중 행사 가능분 약 730억 달러, 4월 텐더 오퍼 약 46억 6,000만 달러도 미검증이다. 옵션 행사 가능 여부, RSU 베스팅·결제, 락업 해제, 실제 매도는 서로 다른 단계다.</p>
+<p>| 구간 | 영상이 제시한 해제 조건·물량 | 확인할 점 |</p>
+<p>|---|---|---|</p>
+<p>| 첫 거래일 | 비창업자 이사·임원, 전현직 직원·자문 인력 등 각 최대 10%, 합계 최대 약 3억 1,500만 주 | 대상 범위, 비율의 분모, 첫 체결일 |</p>
+<p>| 투자설명서 기준 +27~76일 | 다른 투자자 물량 네 차례, 지분 0.5% 이하 그룹은 최대 6%·6%·7%·7%. 첫날 포함 누적 상한 약 16억 주 | 11월 18일을 0일로 놓으면 2026년 12월 15일~2027년 2월 2일. 계약상 날짜나 실제 매도량은 아님 |</p>
+<p>| 2026년 연간 실적 발표 후 두 번째 정규 거래일 | 첫날 대상자 몫 35% 추가, 다른 주주 포함 약 17억 주 추정 | 발표 시각과 거래일 정의, 앞선 물량과의 중복. 영상이 인용한 1월 예상은 회사 확정 일정이 아님 |</p>
+<p>| 2027년 1분기 실적 발표 후 두 번째 정규 거래일 아침과 약 180일 시점 장 마감 중 이른 때 | 일부 주주의 잔여분과 공동창업자 7명의 최대 29% 등 약 30억 주 추정 | 30억 주는 11월 10일 수정본 기반으로 소개됐으나 출처명·산식 미확인. +180일은 5월 17일, +181일은 5월 18일이지만 실제 해제·첫 거래 가능 시점은 최종 계약에 따름 |</p>
+<p>| 365일과 2027년 3분기 실적 발표 후 두 번째 거래일 중 이른 때 | 공동창업자와 지분 0.5% 초과 주주의 잔여분 | 같은 기준으로 +365일은 2027년 11월 18일이다. 자막의 1월 18일은 +61일로 365일 조건과 맞지 않음 |</p>
+<p>영상은 옵션·전환분 포함 약 155억 주가 묶였고 첫해에 해제 가능일이 23일이라고 주장한다. 예정 해제는 주가가 아닌 날짜·실적에 연동되고 골드만삭스와 모건스탠리가 조기 해제를 허용할 수 있다는 설명도 최종 계약으로 확인되지 않았다. 조기 해제 권한의 존재와 실제 행사는 별개이며, 표의 신규·누적 추정치를 합산하면 같은 주식이 중복될 수 있다.</p>
+<h3>상승 논리와 반론</h3>
+<p><strong>상승 논리:</strong> 일정이 사전에 알려져 매도 우려가 가격에 먼저 반영되고 실제 매도량이 예상보다 작다면, 큰 해제 자체가 추가 하락을 뜻하지 않는다. 직전 실적이 발표 전 시장 예상치를 웃돌고 매수 수요가 충분하면, 거래가 늘어도 가격은 버티거나 오를 수 있다.</p>
+<p><strong>반론:</strong> 낮은 행사가와 주가의 큰 격차는 이익 실현 유인을 높일 수 있다. 신규 해제 상한이 평소 거래량이나 유통주 수에 비해 크고 실적까지 기대를 밑돌면, 공급 증가를 흡수하기 어려울 수 있다. 반대로 거래량 증가만으로 내부자가 팔았다고 단정할 수 없고, 실적이나 시장 전반의 움직임을 빼지 않고 락업 효과를 추정할 수도 없다.</p>
+<p>영상은 SpaceX의 해제 전날 약 14% 하락과 당일 6.1% 반등, 페이스북의 첫 해제일 하락과 후속 대형 해제일 12.6% 상승, 우버의 해제일 장중 최대 8.7% 하락을 대조한다. 세 사례 모두 당시 공시·시세로 확인되지 않았다. 특히 SpaceX의 영상상 주식 수 6억 3,890만 주에 135달러를 곱하면 약 862억 5,150만 달러로, 영상의 공모액 750억 달러와 다르다. 집계 범위를 맞추기 전에는 IPO 순위 비교에 쓸 수 없다. 우버의 장중 낙폭과 비교군의 해제일 수익률도 같은 지표로 볼 수 없다. 영상이 인용한 1,948건의 IPO 연구 결과(4일 평균 초과수익률 약 −1.5%, 거래량 약 +40%) 역시 원문 미확인이며, 확인되더라도 개별 종목의 방향을 예측하지 않는다.</p>
+<h3>투자자가 확인할 순서와 가설 무효화 조건</h3>
+<p>1. <strong>먼저 종목과 계약을 확인한다.</strong> SEC 최종 투자설명서·효력 발생 통지와 나스닥 상장·첫 체결 기록을 대조한다. 공모가 확정일, 신고 효력일, 첫 체결일을 분리하고, 락업 기준일·장 마감·휴장일 조정·주주군별 분모·조기 해제 조항을 확인한다. 최종 계약의 조건이나 대상이 영상과 다르면 영상의 달력과 추정 물량은 폐기하고 다시 계산한다.</p>
+<p>2. <strong>가까운 일정부터 잠재 공급을 계산한다.</strong> 영상이 제시한 첫 달력상 후보인 12월 15일은 기준일과 계약이 확인될 때만 유효하다. 회사 IR의 실적 발표 날짜·시각과 주관사 공지를 반영해 신규 해제 상한을 중복 없이 계산한 뒤, <strong>직전 20거래일 일평균 거래량 대비 배수</strong>와 <strong>검증된 유통주 대비 비중</strong>으로 표시한다. 상장 초기 20거래일이 쌓이지 않았다면 관측 일수를 명시하고 잠정치로 구분한다.</p>
+<p>3. <strong>해제 뒤 1~5거래일에 실제 흡수 여부를 본다.</strong> 검증된 주가와 공모가·행사가의 격차, 발표 전 컨센서스 대비 실적 차이, 시장·동종주 대비 수익률, 평소 대비 거래량, 공개된 내부자 매도 신고(Form 4 등)의 체결일·수량을 함께 기록한다. 큰 상한에도 상대 주가가 안정적이면 ‘해제 규모만큼 하락한다’는 가설이 약해진다. 반대로 평소보다 높은 거래량과 상대 약세가 지속되고 공개 신고에서도 매도가 확인되면 ‘매도 물량을 무리 없이 흡수한다’는 가설이 약해진다. 전체 거래량은 내부자 매도량이 아니며, 공개 신고가 없다고 매도가 없었다고 볼 수도 없다.</p>
+<h3>데이터 품질과 수동 확인 항목</h3>
+<p>한국어 자동자막 464개를 영상 전체에서 수집했으며, <code>transcript_quality</code>는 양호(1.0)다. 이는 전사 품질 지표이지 사실 정확도 점수가 아니다. <code>00:00:00</code>, <code>00:05:13</code>, <code>00:10:29</code>는 개별 발언 시각이 아니라 자막 청크 시작점이다. 주장 검증 기준으로 공모(C1, 00:00:00)의 <code>source_confidence</code>는 0.30, <code>asr_confidence</code>는 0.82다. 초기 락업(C4, 00:00:00)은 각각 0.00·0.80, 실적 연동·만기(C5, 00:05:13)는 0.00·0.72다. 즉, 자막에서 비교적 명확히 읽히는 주장이라도 이를 입증할 원문은 없을 수 있다.</p>
+<p><strong>미검증·수동 확인 필요:</strong> 제공되지 않은 Bloomberg·Morningstar 원문, 직원 지분 모델의 원자료와 업체명, Major Holders·Mott Capital 및 약 30억 주 추정의 원문·산식, JP모건·미즈호·뱅크오브아메리카의 비공개 분석은 검증 근거로 쓰지 않았다. 자동자막이 옮긴 업체명·연구 저자명·365일 환산 날짜도 각각 원출처와 대조해야 한다.</p>
+  <details>
+    <summary>공개 요약 JSON</summary>
+    <pre>{
+  &quot;version&quot;: 4,
+  &quot;video_id&quot;: &quot;JZv_ftgxMmg&quot;,
+  &quot;title&quot;: &quot;앤트로픽 상장 그 이후, 아무도 말 안 하는 &#x27;날짜&#x27; 정체&quot;,
+  &quot;url&quot;: &quot;https://www.youtube.com/watch?v=JZv_ftgxMmg&quot;,
+  &quot;channel&quot;: &quot;경제사냥꾼&quot;,
+  &quot;channel_id&quot;: &quot;UC7usMJDHmtbs_oegmzQKKMA&quot;,
+  &quot;source_url&quot;: &quot;https://www.youtube.com/@%EA%B2%BD%EC%A0%9C%EC%82%AC%EB%83%A5%EA%BE%BC/videos&quot;,
+  &quot;thumbnail_url&quot;: &quot;https://i.ytimg.com/vi/JZv_ftgxMmg/maxresdefault.jpg&quot;,
+  &quot;published_at&quot;: &quot;2026-11-19T07:37:56+00:00&quot;,
+  &quot;status&quot;: &quot;unverified&quot;,
+  &quot;strategy_source_tier&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_evidence_weight&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_validation_policy&quot;: &quot;STANDARD_REVIEW&quot;,
+  &quot;transcript_status&quot;: &quot;available&quot;,
+  &quot;transcript_source&quot;: &quot;automatic&quot;,
+  &quot;transcript_chars&quot;: 8942,
+  &quot;transcript_quality&quot;: {
+    &quot;status&quot;: &quot;good&quot;,
+    &quot;score&quot;: 1.0,
+    &quot;warnings&quot;: [],
+    &quot;source&quot;: &quot;automatic&quot;,
+    &quot;language&quot;: &quot;Korean (Original)&quot;,
+    &quot;model_or_format&quot;: &quot;json3&quot;,
+    &quot;chars&quot;: 8942,
+    &quot;segments&quot;: 464,
+    &quot;duration_seconds&quot;: 882,
+    &quot;repeated_ngram_ratio&quot;: 0.008
+  },
+  &quot;generated_at&quot;: &quot;2026-11-20T10:50:02.650390+09:00&quot;,
+  &quot;llm_status&quot;: &quot;success&quot;,
+  &quot;research_status&quot;: &quot;success&quot;,
+  &quot;claim_verification_status&quot;: &quot;success&quot;,
+  &quot;research_pipeline_version&quot;: 4,
+  &quot;evidence_count&quot;: 8,
+  &quot;claim_status_summary&quot;: {
+    &quot;partially_supported&quot;: 1,
+    &quot;unverified&quot;: 8
+  },
+  &quot;claims&quot;: [
+    {
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;claim_text&quot;: &quot;앤트로픽은 2026년 11월 18일 희망 범위 70~78달러를 웃도는 83달러에 9억 8,000만 주를 확정해 813억 달러 규모의 미국 최대 IPO가 됐고, 11월 19일 나스닥에서 ANT로 첫 거래될 예정이었다. 공모량은 당초보다 1억 5,500만 주 늘었고, 구주매출은 약 2,365만 주, 공모 외 동일가 매입 약정은 260억 달러, 이사회 구성원의 공모 매입 의향은 3억 300만 달러였다.&quot;,
+      &quot;status&quot;: &quot;partially_supported&quot;,
+      &quot;confidence&quot;: 0.32,
+      &quot;supporting_evidence_ids&quot;: [
+        &quot;E4&quot;,
+        &quot;E6&quot;
+      ],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.3,
+      &quot;asr_confidence&quot;: 0.82,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;70~78달러 → 83달러; 9억 8,000만 주·813억 달러; 구주 2,365만 주; 공모 외 약정 260억 달러; 이사 매입 의향 3억 300만 달러&quot;,
+        &quot;observed&quot;: &quot;영상 수치로만 검산하면 83달러 × 9억 8,000만 주 = 813억 4,000만 달러, 구주 비중은 약 2.41%다. 외부에서 확인된 공모 수치는 없다.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;미국 최대 IPO나 ANT 첫 거래일은 확정 사실로 인용하지 않는다. 신주·구주·초과배정·공모 외 약정과 이사의 매입 의향을 구분하고, 약정이나 의향을 실제 체결로 집계하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;claim_text&quot;: &quot;영상이 인용한 로이터 기사에 따르면 자막상 ‘힐’은 비창업자 직원 598명의 지분이 각 1억 달러 이상이라고 모델링했고, ‘사크라’는 기업가치 1조 3,500억 달러를 가정해 베스팅 완료 지분의 세전 가치가 100만 달러 이상인 전현직 직원이 약 2,800명이라고 추정했다. 로이터는 두 수치를 독립 확인하지 못했다고 한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.08,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.72,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;598명·각 1억 달러 이상; 기업가치 1조 3,500억 달러 가정에서 약 2,800명·각 세전 100만 달러 이상&quot;,
+        &quot;observed&quot;: &quot;외부에서 확인된 인원·평가 기준 없음.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;두 수치를 직원의 실제 보유 지분, 현금화 수익 또는 예상 매도 인원으로 해석하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;claim_text&quot;: &quot;직원 수는 2024년 말 약 940명에서 2026년 9월 말 5,300명으로 늘었고, 옵션 평균 행사가격은 2023년 말 0.52달러, 2026년 9월 말 잔존 옵션은 2.91달러였다. 9월 말 옵션 평가이익 약 1,190억 달러 중 행사 가능분은 약 730억 달러였으며, 4월 텐더 오퍼에서 약 1억 8,000만 주가 주당 약 26달러에 총 약 46억 6,000만 달러어치 매각됐다고 한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.1,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.82,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;940명 → 5,300명; 행사가 0.52·2.91달러; 평가이익 1,190억 달러·행사 가능분 730억 달러; 텐더 약 46억 6,000만 달러&quot;,
+        &quot;observed&quot;: &quot;영상 수치로만 검산하면 83달러는 각 행사가의 약 159.6배와 28.5배다. 1억 8,000만 주 × 26달러는 약 46억 8,000만 달러로, 반올림을 감안하면 영상 총액과 가깝다.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;옵션 내재가치와 실현이익을 구분한다. 옵션 행사 가능 여부, RSU의 베스팅·결제, 락업 해제, 실제 매도는 별개의 단계다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;claim_text&quot;: &quot;10월 26일 최초 신고와 11월 17일 세 번째 수정본 기준 옵션·전환분을 포함한 약 155억 주가 묶였고, 첫해 해제 가능일은 23일이었다. 첫 거래일 비창업자 이사·임원, 전현직 직원과 자문 인력은 각 최대 10%, 합계 약 3억 1,500만 주가 해제된다. 투자설명서 기준 27~76일 사이 다른 투자자 물량이 네 차례 풀리며, 0.5% 이하 그룹 상한은 6%·6%·7%·7%, 초과 그룹 상한은 더 낮다. 76일까지 누적 최대 약 16억 주이며, 예정...&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.08,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.8,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;약 155억 주·23일; 첫날 최대 10%·3억 1,500만 주; 27~76일 네 차례, 6%·6%·7%·7%; 누적 약 16억 주&quot;,
+        &quot;observed&quot;: &quot;2026년 11월 18일을 0일로 놓으면 +27일은 12월 15일, +76일은 2027년 2월 2일이다. 이는 달력 검산일 뿐 계약상 해제일은 확인되지 않았다.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;3억 1,500만 주와 16억 주를 매도 예상치로 사용하지 않는다. 최종 계약에서 구간별 신규 상한과 누적 상한을 분리하고, 같은 주식의 중복을 제거한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;claim_text&quot;: &quot;2026년 연간 실적 발표 뒤 두 번째 정규 거래일에 첫날 대상자의 35%가 추가 해제되고 다른 주주를 합쳐 약 17억 주가 풀린다. 최대 구간은 2027년 1분기 실적 뒤 두 번째 정규 거래일 아침과 투자설명서 기준 약 180일 시점 장 마감 중 이른 때로, 첫날 대상자와 0.5% 이하 투자자의 잔여분 및 공동창업자 7명의 최대 29% 등 약 30억 주가 풀릴 수 있다. 공동창업자와 0.5% 초과 주주의 잔여분에는 365일 조건과 2027년 3분기 실적...&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.08,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:05:13&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.72,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;35%·약 17억 주; 약 180일·공동창업자 최대 29%·약 30억 주; 365일, 자막상 2027년 1월 18일&quot;,
+        &quot;observed&quot;: &quot;2026년 11월 18일을 0일로 놓으면 +180일은 2027년 5월 17일, +181일은 5월 18일, +365일은 11월 18일이다. 1월 18일은 +61일이다. 실제 해제일은 확인되지 않았다.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;1월 예상이나 5월 17~18일을 확정 해제일로 제시하지 않는다. 실적 발표 시각과 거래일을 계약에 대입하고, 이전 구간과 겹치는 물량을 제외한 뒤 규모를 비교한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;claim_text&quot;: &quot;SpaceX는 2026년 8월 6일 첫 대규모 해제에서 약 9억 1,150만 주가 풀려 유통주 비중이 4.9%에서 11.8%로 늘었다. 전일 종가 108.27달러 기준 약 987억 달러로, 전날 약 14% 하락한 주가는 당일 6.1% 올라 114.92달러에 마감했다. 영상은 6월 공모가 135달러, 상장 후 60일 내 200달러 돌파와 이후 고점 대비 최대 46% 하락, 10회 미만의 해제 일정, 공모가 대비 30% 상승 시 추가 10% 해제, 일반 주주...&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.09,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:05:13&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.78,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;9억 1,150만 주·유통주 4.9% → 11.8%; 전일 108.27달러 → 114.92달러·+6.1%; 공모 6억 3,890만 주·135달러·750억 달러&quot;,
+        &quot;observed&quot;: &quot;영상 수치로만 계산하면 해제 가능분 가치는 약 987억 달러, 두 종가의 차이는 +6.14%다. 공모 주식 수 × 135달러는 862억 5,150만 달러로, 제시한 750억 달러와 다르다.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;해제 당일의 반등 주장만으로 락업 효과나 사전 포지셔닝을 입증할 수 없다. SpaceX 공모액의 집계 범위가 확인되기 전에는 앤트로픽과의 IPO 규모 비교에도 쓰지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;claim_text&quot;: &quot;페이스북은 2012년 8월 16일 첫 해제일에 6% 넘게 하락했지만, 11월 14일 약 8억 주가 해제 가능해진 날에는 12.6% 상승하고 거래량이 직전 50거래일 평균의 4배를 넘었다. 약 4억 8,600만 주는 분석가 예상 매도량이며, 피터 틸은 8월 보유분 대부분을 약 4억 달러에 매각했다고 한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.08,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:05:13&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.87,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;8월 16일 −6% 초과; 11월 14일 약 8억 주·+12.6%·거래량 4배 초과; 예상 매도 4억 8,600만 주; 틸 매도 약 4억 달러&quot;,
+        &quot;observed&quot;: &quot;대조할 시세, 거래량 및 매도 신고 없음.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;두 해제일의 주가 방향이 달랐다는 사례는 당시 시세를 확인한 후 인용한다. 확인되더라도 다른 종목의 해제일 수익률을 예측하는 근거는 아니다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;claim_text&quot;: &quot;우버는 2019년 11월 6일 락업 해제일에 장중 최대 8.7% 하락해 당시 최저가 25.58달러를 기록했다. 11월 8일자 신고에 따르면 트래비스 캘러닉은 2,000만 주 넘게 약 5억 4,700만 달러어치를 팔았다. 뱅크오브아메리카 인터넷 IPO 비교군의 해제일 평균 하락률은 약 2%였다고 한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.08,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:05:13&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.87,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;장중 −8.7%·25.58달러; 2,000만 주 초과·약 5억 4,700만 달러; 비교군 평균 약 −2%&quot;,
+        &quot;observed&quot;: &quot;대조할 시세, 매도 신고 및 비교군 산식 없음.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;장중 저가와 종가 수익률을 구분하고, 캘러닉의 신고 매도량을 전체 내부자 매도량으로 일반화하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;claim_text&quot;: &quot;SEC는 락업을 계약상 매도 제한으로 설명하고, 비즈니스 인사이더 재팬은 통상 3~6개월, 인용된 연구에서는 다수 표본이 180일이었다고 한다. 2003년 연구는 락업의 지분 보유 약속 장치 해석을 지지했고, 2001년 연구는 미국 IPO 1,948건에서 해제 전후 4일 평균 초과수익률 약 −1.5%, 해제 뒤 지속적인 평균 거래량 약 40% 증가, 벤처캐피털 투자 기업에서 더 큰 효과와 적극적인 매도를 보고했다고 한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.08,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.72,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;통상 3~6개월·연구 표본 다수 180일; 1,948건·4일 평균 초과수익률 약 −1.5%·평균 거래량 약 +40%&quot;,
+        &quot;observed&quot;: &quot;대조할 연구 원문과 통계표 없음.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;연구의 평균값이 확인되더라도 개별 해제일 주가의 방향·낙폭 예측이나 인과관계의 증거로 사용하지 않는다.&quot;
+    }
+  ],
+  &quot;entities&quot;: [
+    {
+      &quot;ticker&quot;: &quot;ANT&quot;,
+      &quot;name&quot;: &quot;앤트로픽&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;11월 18일 공모가를 최초 희망 범위보다 높게 확정했고, 영상은 이를 미국 최대 IPO로 소개한다. 구주매출 비중은 낮았으며 공모 외 동일 가격 매입 약정도 있었다.&quot;,
+        &quot;직원 지분 가치와 옵션 평가이익은 현금화된 수익이 아니다. 낮은 행사가가 매도 유인을 높일 수 있지만, 옵션 행사·RSU 조건 충족과 실제 매도 가능 시점은 다르다.&quot;,
+        &quot;락업은 하루에 일괄 해제되지 않는다. 영상은 주가가 아닌 날짜와 실적 발표가 해제 조건이며, 대표 주관사 골드만삭스와 모건스탠리가 조기 해제를 허용할 수 있다고 설명한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;로이터가 11월 18일 전한 모델링: 자막상 ‘힐’은 비창업자 직원 598명이 각 1억 달러 이상 지분을 갖는다고 추정했다. Sacra로 지칭된 업체는 기업가치 1조 3,500억 달러를 가정해 베스팅을 마친 주식 가치가 세전 100만 달러 이상인 전현직 직원을 약 2,800명으로 추정했다. 로이터는 독립 확인하지 못했다고 전했다.&quot;,
+        &quot;2026년 11월 18일 공모가 주당 83달러(희망 범위 70~78달러), 9억 8,000만 주·813억 달러. 르네상스 캐피털 집계로 예상보다 1억 5,500만 주 늘었고, 영상이 제시한 6월 SpaceX 공모액 750억 달러를 넘었다. 11월 19일 나스닥 첫 거래 예정으로 소개됐다.&quot;,
+        &quot;구주매출 약 2,365만 주(영상 표현 약 2%); 공모 외 일부 투자자의 동일 가격 매입 약정 260억 달러; 이사회 구성원의 공모 매입 의향 3억 300만 달러(약 0.4%).&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;ANT&quot;,
+        &quot;as_of&quot;: &quot;2026-11-20T01:58:16.041146+00:00&quot;,
+        &quot;current_price&quot;: 97.16999816894531,
+        &quot;market_cap&quot;: 1271631951705.057,
+        &quot;forward_pe&quot;: -844.9565,
+        &quot;trailing_pe&quot;: null,
+        &quot;fifty_two_week_high&quot;: 115.1,
+        &quot;fifty_two_week_low&quot;: 92.72,
+        &quot;average_target_price&quot;: 103.28,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    }
+  ],
+  &quot;evidence&quot;: [
+    {
+      &quot;evidence_id&quot;: &quot;E1&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;Dollar near 19-month peak as AI jitters sap risk appetite&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/currencies/articles/dollar-near-19-month-peak-015038270.html&quot;,
+      &quot;publisher&quot;: &quot;Reuters&quot;,
+      &quot;published_at&quot;: &quot;2026-11-20T01:50:38+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Dollar near 19-month peak as AI jitters sap risk appetite Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 2026 Elections Weather Newsletters...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E2&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;Dow Jones Futures: Techs Slide, Anthropic Retreats After Ugly Market Reversal To New Lows&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/m/9e02231d-41cd-31ac-b37f-993325b8a4ca/dow-jones-futures%3A-techs.html&quot;,
+      &quot;publisher&quot;: &quot;Investor&#x27;s Business Daily&quot;,
+      &quot;published_at&quot;: &quot;2026-11-20T01:49:56+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Dow Jones Futures: Techs Slide, Anthropic Retreats After Ugly Market Reversal To New Lows Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 202...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E4&quot;,
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;title&quot;: &quot;Anthropic Joins World&#x27;s Most Valuable Public Companies After IPO&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/anthropic-joins-world-apos-most-005806406.html&quot;,
+      &quot;publisher&quot;: &quot;MT Newswires&quot;,
+      &quot;published_at&quot;: &quot;2026-11-20T00:58:06+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Anthropic Joins World&#x27;s Most Valuable Public Companies After IPO Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 2026 Elections Weather Newsl...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E5&quot;,
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;title&quot;: &quot;SpaceX&#x27;s Data Center Vote Should Be Delayed, Arizona AG Tells Cochise County&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/technology/articles/spacex-apos-data-center-vote-003116969.html&quot;,
+      &quot;publisher&quot;: &quot;MT Newswires&quot;,
+      &quot;published_at&quot;: &quot;2026-11-20T00:31:16+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E7&quot;,
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;title&quot;: &quot;GTA 6 lives up to its 99 score, but Take-Two stock stays stuck&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/gta-6-lives-99-score-235722971.html&quot;,
+      &quot;publisher&quot;: &quot;TheStreet&quot;,
+      &quot;published_at&quot;: &quot;2026-11-19T23:57:22+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E8&quot;,
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;title&quot;: &quot;1 Unstoppable Stock to Buy Before It Joins NVDA and AAPL in the $1 Trillion Club&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/1-unstoppable-stock-buy-joins-005202675.html&quot;,
+      &quot;publisher&quot;: &quot;Motley Fool&quot;,
+      &quot;published_at&quot;: &quot;2026-11-20T00:52:02+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    }
+  ],
+  &quot;source_policy&quot;: {
+    &quot;raw_transcript_published&quot;: false,
+    &quot;raw_transcript_in_evidence&quot;: false,
+    &quot;research_pipeline_version&quot;: 4,
+    &quot;closed_source_claims&quot;: &quot;unverified_external_source&quot;,
+    &quot;auto_caption_warning&quot;: true,
+    &quot;local_asr_warning&quot;: false
+  }
+}</pre>
+  </details>
+</article>
+</main>
+  <style>
+.reader-contents { margin: 16px 0; padding: 12px 16px; border: 1px solid var(--line, #64748b); border-radius: 12px; }
+.reader-contents > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-weight: 750; }
+.reader-contents nav { display: grid; gap: 4px; max-height: 45vh; overflow: auto; margin: 8px 0; }
+.reader-contents a { display: block; min-height: 44px; padding: 10px; border-radius: 6px; color: inherit; overflow-wrap: anywhere; }
+.reader-contents a:hover { background: #80808020; }
+.reader-contents .reader-subsection { padding-inline-start: 24px; font-size: .92em; }
+.reader-prose, .report { overflow-wrap: anywhere; line-height: 1.8; }
+.reader-prose p, .reader-prose li { max-width: 85ch; }
+.reader-prose h2, .reader-prose h3, .reader-prose h4, [data-reader-heading] { scroll-margin-top: 100px; line-height: 1.45; }
+.reader-prose h2 { margin-top: 1.8em; padding-bottom: 8px; border-bottom: 1px solid var(--line, #64748b); }
+.reader-prose h3 { margin-top: 1.5em; }
+.reader-prose li { margin: .5em 0; }
+.reader-prose pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.reader-prose blockquote { margin: 16px 0; padding: 4px 16px; border-left: 3px solid var(--accent, #64748b); }
+.reader-table { overflow: auto; max-width: 100%; margin: 16px 0; border: 1px solid var(--line, #64748b); border-radius: 10px; }
+.reader-table table { border-collapse: collapse; width: 100%; margin: 0; font-size: .92rem; }
+.reader-table th, .reader-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line, #64748b); min-width: 110px; max-width: 400px; overflow-wrap: anywhere; white-space: normal; }
+.reader-table th { background: #80808018; }
+.reader-table tr:nth-child(even) { background: #80808008; }
+.reader-search { display: grid; gap: 8px; margin: 16px 0; }
+.reader-search label { font-weight: 700; }
+.reader-search input { box-sizing: border-box; width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line, #64748b); border-radius: 10px; background: var(--panel, #fff); color: var(--text, #132238); font: inherit; }
+.reader-search p { margin: 0; font-size: .86rem; }
+.reader-back { position: fixed; bottom: max(14px, env(safe-area-inset-bottom)); right: 14px; z-index: 30; min-height: 44px; border: 1px solid #778899; border-radius: 99px; padding: 10px 16px; background: #18344a; color: #fff; font: 700 14px system-ui; cursor: pointer; box-shadow: 0 3px 12px #0003; }
+[data-reader-source] { margin-top: 20px; }
+[data-reader-source] > summary { min-height: 44px; cursor: pointer; }
+[data-reader-source] pre { font-size: .85rem; }
+[data-reader-source] pre, .reader-prose { min-width: 0; }
+.reader-contents :focus-visible, .reader-search :focus-visible, .reader-back:focus-visible, .reader-table:focus-visible { outline: 3px solid var(--accent, #008c95); outline-offset: 3px; }
+.reader-search + .grid > [hidden] { display: none !important; }
+@media (max-width: 600px) { .reader-prose { font-size: 1rem; } .reader-contents { padding: 8px 12px; } }
+@media print { .reader-back, .reader-search, .reader-contents, [data-reader-source] { display: none !important; } .reader-table { overflow: visible; } .reader-prose { color: #000; background: #fff; } }
+</style><script>
+(() => {
+  'use strict';
+  let serial = 0;
+  const rendered = new WeakMap();
+  const node = (tag, text) => { const el = document.createElement(tag); if (text != null) el.textContent = text; return el; };
+  function inline(parent, text) {
+    const pattern = /(`[^`]+`|\*\*[^*]+\*\*|\[[^\]]+\]\(https?:\/\/[^\s)]+\))/g;
+    let start = 0;
+    for (const match of String(text).matchAll(pattern)) {
+      parent.append(document.createTextNode(text.slice(start, match.index)));
+      const value = match[0];
+      if (value.startsWith('`')) parent.append(node('code', value.slice(1, -1)));
+      else if (value.startsWith('**')) parent.append(node('strong', value.slice(2, -2)));
+      else {
+        const link = value.match(/^\[([^\]]+)\]\((.+)\)$/);
+        const a = node('a', link[1]); a.href = link[2]; a.rel = 'noopener noreferrer'; parent.append(a);
+      }
+      start = match.index + value.length;
+    }
+    parent.append(document.createTextNode(text.slice(start)));
+  }
+  const cells = line => line.trim().replace(/^\|/, '').replace(/\|$/, '').split(/(?<!\\)\|/).map(v => v.trim().replace(/\\\|/g, '|'));
+  function markdown(source) {
+    const article = node('article'); article.className = 'reader-prose';
+    const lines = source.split(/\r?\n/); let list = null;
+    for (let i = 0; i < lines.length; i += 1) {
+      const line = lines[i], value = line.trim();
+      if (!value) { list = null; continue; }
+      if (/^```/.test(value)) {
+        const code = []; i += 1;
+        while (i < lines.length && !/^```/.test(lines[i].trim())) code.push(lines[i++]);
+        const pre = node('pre'); pre.append(node('code', code.join('\n'))); article.append(pre); list = null; continue;
+      }
+      if (i + 1 < lines.length && value.includes('|') && cells(lines[i + 1]).every(v => /^:?-{3,}:?$/.test(v))) {
+        const table = node('table'), head = node('thead'), body = node('tbody');
+        const row = (values, tag) => { const tr = node('tr'); values.forEach(v => { const cell = node(tag); if (tag === 'th') cell.scope = 'col'; inline(cell, v); tr.append(cell); }); return tr; };
+        head.append(row(cells(line), 'th')); i += 2;
+        while (i < lines.length && lines[i].trim() && lines[i].includes('|')) body.append(row(cells(lines[i++]), 'td'));
+        i -= 1; table.append(head, body); article.append(table); list = null; continue;
+      }
+      const heading = value.match(/^(#{1,6})\s+(.+)$/);
+      if (heading) { const h = node('h' + Math.min(4, heading[1].length + 1)); inline(h, heading[2]); article.append(h); list = null; continue; }
+      const bullet = value.match(/^(?:[-*+] |\d+\. )(.+)$/);
+      if (bullet) {
+        const tag = /^\d/.test(value) ? 'ol' : 'ul';
+        if (!list || list.tagName.toLowerCase() !== tag) { list = node(tag); if (tag === 'ol') list.start = parseInt(value, 10); article.append(list); }
+        const li = node('li'); inline(li, bullet[1]); list.append(li); continue;
+      }
+      list = null;
+      if (/^(---+|\*\*\*+)$/.test(value)) { article.append(node('hr')); continue; }
+      const p = node(value.startsWith('> ') ? 'blockquote' : 'p'); inline(p, value.startsWith('> ') ? value.slice(2) : line); article.append(p);
+    }
+    return article;
+  }
+  function contents(root) {
+    root.querySelectorAll(':scope > .reader-contents').forEach(el => el.remove());
+    const headings = [...root.querySelectorAll('h2,h3,h4')].filter(h => !h.closest('.card,.run-card,.reader-contents,[data-reader-source],[hidden]'));
+    if (headings.length < 2) return;
+    const details = node('details'); details.className = 'reader-contents';
+    details.append(node('summary', '이 리포트 목차 · ' + headings.length + '개 항목'));
+    const nav = node('nav'); nav.setAttribute('aria-label', '리포트 목차');
+    headings.forEach(h => {
+      if (!h.id) h.id = 'reader-section-' + (++serial);
+      h.dataset.readerHeading = ''; h.tabIndex = -1;
+      const a = node('a', h.textContent); a.href = '#' + h.id;
+      if (h.tagName !== 'H2') a.className = 'reader-subsection';
+      a.addEventListener('click', event => {
+        event.preventDefault();
+        for (let ancestor = h.parentElement; ancestor; ancestor = ancestor.parentElement) if (ancestor.tagName === 'DETAILS') ancestor.open = true;
+        h.scrollIntoView({block: 'start'}); h.focus({preventScroll: true});
+      }); nav.append(a);
+    });
+    details.append(nav); root.prepend(details);
+  }
+  function enhance(root) {
+    if (!root) return;
+    root.querySelectorAll('pre[data-report-markdown]').forEach(pre => {
+      const previous = rendered.get(pre);
+      if (previous && previous.source === pre.textContent) return;
+      const article = markdown(pre.textContent);
+      if (previous) previous.article.replaceWith(article);
+      else {
+        const details = node('details'); details.dataset.readerSource = '';
+        details.append(node('summary', 'Markdown 원문 보기'));
+        pre.before(article, details); details.append(pre);
+      }
+      rendered.set(pre, {source: pre.textContent, article});
+    });
+    root.querySelectorAll('table').forEach(table => {
+      if (table.closest('.reader-table,.account-table-wrap,.summary-scroll')) return;
+      const wrap = node('div'); wrap.className = 'reader-table'; wrap.tabIndex = 0;
+      wrap.setAttribute('role', 'region'); wrap.setAttribute('aria-label', '리포트 표 · 가로로 스크롤하여 전체 보기');
+      table.before(wrap); wrap.append(table);
+    });
+    root.querySelectorAll('.grid').forEach(grid => {
+      const cards = [...grid.querySelectorAll(':scope > a.card')];
+      if (cards.length < 2 || grid.dataset.readerSearch) return;
+      grid.dataset.readerSearch = 'true';
+      const box = node('div'); box.className = 'reader-search';
+      const input = node('input'); input.type = 'search'; input.placeholder = '제목 · 종목 · 채널 · 키워드'; input.id = 'report-search-' + (++serial);
+      const label = node('label', '리포트 찾기'); label.htmlFor = input.id;
+      const status = node('p'); status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
+      const update = () => {
+        const terms = input.value.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean); let count = 0;
+        cards.forEach(card => { card.hidden = !terms.every(t => card.textContent.toLocaleLowerCase().includes(t)); if (!card.hidden) count += 1; });
+        status.textContent = cards.length + '개 중 ' + count + '개 표시' + (count ? '' : ' · 검색어를 지우거나 다른 키워드를 입력하세요.');
+      };
+      input.addEventListener('input', update); box.append(label, input, status); grid.before(box); update();
+    });
+    contents(root);
+  }
+  window.TradingAgentsReader = {enhance};
+  const main = document.querySelector('main');
+  if (main && !main.hasAttribute('data-reader-dynamic')) enhance(main);
+  if (main) {
+    const top = node('button', '↑ 맨 위'); top.type = 'button'; top.className = 'reader-back'; top.setAttribute('aria-label', '리포트 맨 위로 이동');
+    top.addEventListener('click', () => { const target = document.querySelector('h1') || main; target.tabIndex = -1; target.scrollIntoView({block: 'start'}); target.focus({preventScroll: true}); });
+    document.body.append(top);
+  }
+})();
+</script>
+</body>
+</html>

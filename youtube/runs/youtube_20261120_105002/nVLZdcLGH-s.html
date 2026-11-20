@@ -1,0 +1,597 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YouTube 투자자용 검증 리포트 - 중국 &#x27;한한령&#x27; 해제되면, 주가 수혜 받는다는 산업분야 4가지</title>
+  <style>
+:root {
+  color-scheme: light;
+  --bg: #f7f8fb;
+  --panel: #ffffff;
+  --text: #172033;
+  --muted: #667085;
+  --line: #d9dee8;
+  --accent: #0f766e;
+  --accent-2: #2563eb;
+  --warn: #b45309;
+  --bad: #b42318;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0 56px; }
+a { color: var(--accent-2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.hero { padding: 28px 0 22px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+.hero.compact { padding-top: 12px; }
+.hero h1 { margin: 0; font-size: clamp(28px, 4vw, 44px); line-height: 1.15; letter-spacing: 0; }
+.hero p { max-width: 760px; color: var(--muted); margin: 12px 0 0; }
+.eyebrow { color: var(--accent); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0; margin: 0 0 8px; }
+section { margin: 28px 0; }
+h2, h3, h4, h5 { letter-spacing: 0; line-height: 1.25; }
+.synthesis-callout { padding: clamp(20px, 4vw, 34px); border: 1px solid #6ee7d8; border-radius: 18px; background: linear-gradient(135deg, #ecfdf9 0%, #eff6ff 100%); box-shadow: 0 18px 44px rgba(15, 118, 110, .12); }
+.synthesis-callout.unavailable { border-color: var(--line); background: var(--panel); box-shadow: none; }
+.synthesis-callout h2 { margin: 0; font-size: clamp(24px, 3.2vw, 36px); }
+.synthesis-callout .lead { max-width: 900px; font-size: 17px; color: #334155; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.primary-link, .secondary-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border-radius: 999px; font-weight: 800; }
+.primary-link { color: white; background: var(--accent); }
+.secondary-link { color: var(--accent-2); border: 1px solid #93c5fd; background: white; }
+.primary-link:hover, .secondary-link:hover { text-decoration: none; filter: brightness(.97); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.card, .run { display: flex; flex-direction: column; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; color: var(--text); min-height: 128px; }
+.run { padding: 16px; }
+.card:hover, .run:hover { border-color: var(--accent-2); text-decoration: none; }
+.thumb { display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #e9edf5; border-radius: 8px 8px 0 0; color: var(--muted); font-size: 13px; font-weight: 700; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb-empty span { padding: 0 14px; text-align: center; }
+.card-body { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 16px; }
+.card strong { line-height: 1.35; }
+.source-line { color: #3f4a5f; font-weight: 600; }
+.runs { display: grid; gap: 10px; }
+.badge { display: inline-flex; width: fit-content; border-radius: 999px; padding: 2px 9px; background: #e6f4f1; color: var(--accent); font-size: 12px; font-weight: 700; }
+.status-contradicted, .status-llm_failed { background: #fee4e2; color: var(--bad); }
+.status-unverified, .status-stale { background: #fff4d6; color: var(--warn); }
+small, .muted { color: var(--muted); }
+.topnav { display: flex; gap: 14px; margin-bottom: 16px; font-size: 14px; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px; }
+.stats span { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
+.report { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: min(5vw, 36px); }
+.report-head { border-bottom: 1px solid var(--line); margin-bottom: 24px; padding-bottom: 20px; }
+.report-head h1 { margin: 0; font-size: clamp(24px, 3.5vw, 38px); line-height: 1.2; }
+.meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+.scope-note { padding: 12px 14px; border-left: 4px solid var(--warn); border-radius: 6px; background: #fff7ed; color: #7c2d12; }
+.synthesis-report h2 { margin-top: 34px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.synthesis-report h3 { margin: 24px 0 8px; color: #0f4c5c; }
+.synthesis-report p, .synthesis-report li { overflow-wrap: anywhere; }
+pre { overflow: auto; background: #111827; color: #f9fafb; border-radius: 8px; padding: 14px; }
+code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+details { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 18px; }
+@media (max-width: 640px) {
+  main { width: min(100% - 20px, 1120px); padding-top: 18px; }
+  .report { padding: 18px; }
+  .synthesis-callout { border-radius: 14px; padding: 18px; }
+  .cta-row a { width: 100%; }
+  .mobile-report { border-radius: 12px; }
+}
+</style>
+</head>
+<body>
+  <main>
+<nav class="topnav"><a href="index.html">실행 목록</a><a href="../../index.html">YouTube 홈</a></nav>
+<article class="report">
+  <header class="report-head">
+    <p class="eyebrow">youtube_20261120_105002</p>
+    <h1>중국 &#x27;한한령&#x27; 해제되면, 주가 수혜 받는다는 산업분야 4가지</h1>
+    <div class="meta">
+      <span class="badge status-unverified">unverified</span>
+      <a href="https://www.youtube.com/watch?v=nVLZdcLGH-s">원본 영상</a>
+    </div>
+  </header>
+  <h2>한한령 완화 기대: 항공·관광, 드라마, K팝, 게임의 실적 확인 조건</h2>
+<p><strong>2026년 11월 20일 기준</strong> · <a href="https://www.youtube.com/watch?v=nVLZdcLGH-s">경제사냥꾼 영상</a> · 2026년 11월 19일 게시</p>
+<p>한중 FTA 서비스·투자 후속협상의 <strong>실질 타결은 복수 언론이 보도했지만, 한한령 전면 해제나 업종별 실적 개선은 확인되지 않았다.</strong> 영상은 항공·관광 → 드라마 → K팝 → 게임 순으로 수혜가 나타날 수 있다고 본다. 이 순서는 검증된 주가·실적 전망이 아니다. 투자 관점에서 먼저 볼 것은 관광객과 항공 수익 지표, 콘텐츠 업종에서 볼 것은 개별 허가·계약이 실제 매출로 이어지는지다.</p>
+<h3>정책과 수혜 순서: 보도로 확인되는 범위</h3>
+<ul>
+<li><strong>영상 주장:</strong> 8년 넘게 이어진 협상이 타결됐고, 중국이 한국 영화·게임을 다른 나라보다 차별하지 않겠다는 약속을 처음 문서화했다. 영상은 관광 → 드라마 → K팝 순서를 KB증권에 인용하고, 관광에 항공을 포함해 게임을 마지막에 놓았다.</li>
+<li><strong>확인된 사실·근거:</strong> <a href="https://www.jemin.com/news/articleView.html?idxno=847879">제민일보</a>, <a href="http://www.dailypop.kr/news/articleView.html?idxno=104770">데일리팝</a>, <a href="https://www.pinpointnews.co.kr/news/articleView.html?idxno=506167">핀포인트뉴스</a>는 약 8년 8개월 만의 실질 타결을 보도했다. 데일리팝과 핀포인트뉴스는 협상 개시를 2018년 3월로 제시했다. 다만 기사 발췌만으로는 비차별 조항의 문구·범위·예외, 최초 문서화 여부, 서명·발효·시행을 확인할 수 없다. KB증권의 수혜 순서와 그 기준이 주가인지 실적인지도 원문이 없어 미확인이다.</li>
+<li><strong>가까운 확인 지점:</strong> 양국 공식 합의문·부속서와 시행 공고에서 적용 대상, 예외, 발효일을 대조한다. 실제 시행이 지연되거나 적용 범위가 영상이 전제한 수준보다 좁으면, 네 업종이 순차적으로 수혜를 입는다는 가설은 약해진다.</li>
+</ul>
+<h3>업종별 상승 논리와 검증 기준</h3>
+<h4>1. 항공·관광 | 제주항공</h4>
+<p><strong>영상 주장:</strong> 중국 23개 지역에서 한국 여행사가 현지 고객을 직접 모집할 수 있게 됐고, ‘지난해’ 중국인 방한객은 548만 명으로 전체의 약 30%였다. 제주항공은 ‘지난 9월’ 베이징·창사 노선을 확보했다고 한다. 좌석 공급보다 수요가 빠르게 늘면 탑승률과 운임, 편당 매출이 함께 개선될 수 있다는 논리다.</p>
+<p><strong>확인된 사실·근거:</strong> 23개 지역의 명단·시행일·허가 요건, 548만 명의 기준연도와 전체 외래객 분모, 제주항공의 노선 확보는 모두 미확인이다. 현지 모집 허용은 방한 상품 판매나 단체관광 운영 허용과 다르고, 운수권 배정은 슬롯 확보나 실제 취항과 다르다.</p>
+<p><strong>관찰 지표·무효화 조건:</strong> 한국관광공사의 다음 월별 발표에서 중국인 방한객 수와 전체 대비 비중을 같은 기준으로 계산하고, 전년 동월 및 이후 수개월의 흐름을 비교한다. 국토교통부 자료와 제주항공 발표에서 노선별 실제 첫 운항일·편수·공급 좌석을, 공개되는 범위에서 탑승률·평균운임·편당 여객매출을 확인한다. 방한객이 늘어도 증편이나 할인으로 운임과 편당 매출이 개선되지 않으면 항공 수익성 개선 논리는 성립하지 않는다.</p>
+<h4>2. 드라마 | 스튜디오드래곤</h4>
+<p><strong>영상 주장:</strong> 한중 공동제작 대상이 영화에서 드라마·예능으로 넓어지고, 제작비 300억 원 규모 드라마를 중국에서 동시 방영하면 작품당 이익이 210억 원 늘 수 있다.</p>
+<p><strong>확인된 사실·근거:</strong> <a href="https://www.mk.co.kr/article/12213253">매일경제의 KB증권 인용 보도</a>는 <strong>중국 동시 방영과 제작비 회수율 70%를 전제로 작품당 영업이익이 210억 원 증가할 수 있다</strong>는 추정을 전한다. 확인된 것은 추정치가 보도됐다는 점이다. 공동제작 확대, KB증권 원자료, 실제 방영 허가·계약·실적은 확인되지 않았다. 공동제작 자격과 중국 내 방영 허가도 별개다.</p>
+<p><strong>관찰 지표·무효화 조건:</strong> 중국 당국의 방영 승인, 현지 플랫폼의 동시 편성, 회사 공시·IR의 계약과 수익 인식을 순서대로 본다. 계약이 성사돼도 라이선스료, 비용 또는 권리 배분이 회수율 70% 가정을 뒷받침하지 못하면 210억 원을 해당 작품에 적용할 수 없다.</p>
+<h4>3. K팝 | SM엔터테인먼트</h4>
+<p><strong>영상 주장:</strong> SK증권이 중국 팬층을 근거로 SM을 우선 수혜 후보로 꼽았다고 한다. 영상은 대형 엔터 3사의 중국 매출 비중 6%, 중국 공연 시장의 한국 대비 2.8배, K팝 음반 수출의 중국 비중 27%를 제시한다. 공연장 예약에 3~6개월의 시차가 있어 실적 반영은 빨라도 ‘내년 하반기’로 보고, ‘작년 11월’과 ‘올해 1월’에는 완화 기대에 엔터주가 올랐다가 반락했다고 설명한다.</p>
+<p><strong>확인된 사실·근거:</strong> SK증권 원문, 세 수치의 집계 기간·대상·분모, 공연장 예약 시차, 두 차례의 주가 움직임은 모두 미확인이다. 회사 매출, 공연 시장 규모, 음반 수출은 서로 다른 지표이며 팬층 규모도 공연 매출을 보장하지 않는다. 반락이 확인되더라도 실적 지표 부재가 원인이었는지는 별도 검증이 필요하다.</p>
+<p><strong>관찰 지표·무효화 조건:</strong> 중국 본토 공연 허가 → 공식 일정·예매 → 실제 개최 → 분기 실적 반영을 추적한다. 허가나 개최 없이 기대만 앞서거나, 개최 후에도 회사 실적에 유의미한 기여가 확인되지 않으면 단기 실적 개선 가설이 약해진다. 과거 두 사례는 사건일·종목을 특정한 뒤 KRX 조정주가의 시장 대비 수익률을 당시 실적 공시 및 다른 이슈와 대조한다.</p>
+<h4>4. 게임 | 중국 수입 게임 판호</h4>
+<p><strong>영상 주장:</strong> 중국 출시에는 판호가 필요하며, 외국 게임 판호 발급이 2017년 467건에서 최근 연간 100건 안팎으로 줄었다고 한다. 한국 게임을 차별하지 않더라도 수입 게임 전체의 심사·발급이 확대되는 것은 아니라는 논리다.</p>
+<p><strong>확인된 사실·근거:</strong> 제공 자료에는 적용 규정이나 공식 승인 목록이 없어 건수, ‘최근’의 기준연도, 한국 게임에 대한 대우 변화는 확인되지 않았다. 한국 개발사·IP의 승인 건수는 수입 게임 전체 발급 건수와 따로 봐야 한다.</p>
+<p><strong>관찰 지표·무효화 조건:</strong> 중국 국가신문출판서의 다음 수입 게임 승인 공고에서 한국 원개발사·IP를 중국 신청사와 구분해 확인한다. 전체 발급 추세는 같은 범위의 완결 연도끼리 비교하고, 개별 승인 이후 실제 출시와 매출 반영을 추적한다. 전체 발급이 늘어도 한국 게임 승인이나 출시가 뒤따르지 않으면 한국 게임사의 실적 수혜 근거는 부족하다.</p>
+<h3>검증 범위와 자료 한계</h3>
+<ul>
+<li><strong>12개 주장 중 1건은 조건부 추정치가 언론에 인용됐다는 범위에서 뒷받침됐고, 1건은 일부만 뒷받침됐으며, 10건은 미확인이다.</strong> 수집된 7개 항목 중 4개만 관련 근거로 사용했다. 미확인은 반증이 아니며, 제공 자료에 공식 합의문, 증권사 원문, 기업 공시, 공식 통계 원표나 조정주가가 없어 현재 주가에 기대가 얼마나 반영됐는지는 판단할 수 없다.</li>
+<li>모든 주장 타임스탬프는 <strong>00:00:00</strong>으로, 개별 발화가 아닌 단일 청크의 시작점이다. 청크 범위는 약 <strong>00:00–02:07</strong>, 영상 길이는 <strong>02:06</strong>이다. 자동자막 품질(<code>transcript_quality</code>)은 <strong>1.0/1.0</strong>이지만 개별 용어·수치의 판독이나 사실성을 보증하지 않는다. <code>source_confidence</code>는 자막에서 주장을 식별한 확신, <code>asr_confidence</code>는 판독 신뢰도다. 예를 들어 정책 주장은 각각 <strong>0.89/0.86</strong>이지만 외부 검증 신뢰도는 <strong>0.76(부분 뒷받침)</strong>이고, 드라마 추정치 인용은 <strong>0.94/0.94</strong>, 외부 검증 신뢰도는 <strong>0.83(인용 확인 범위)</strong>이다. 엔터 3개 수치의 판독 신뢰도는 <strong>0.82</strong>이며 원통계는 미확인이다.</li>
+<li>발화 기준일은 확인되지 않았다. 게시일을 기준으로 환산한 2025년 방한객, 2026년 9월 노선, 2025년 11월·2026년 1월 엔터주 사례, 2027년 하반기 실적 반영은 모두 <strong>검증용 가설</strong>이다.</li>
+<li><strong>미확인·수동 확인 필요:</strong> Bloomberg·Morningstar 등 접근할 수 없는 출처, 미제공 KB·SK증권 원문, 비공개일 수 있는 노선별 운임·편당 매출, 작품별 계약·이익, 공연장 예약일은 확인된 근거로 사용하지 않았다.</li>
+</ul>
+  <details>
+    <summary>공개 요약 JSON</summary>
+    <pre>{
+  &quot;version&quot;: 4,
+  &quot;video_id&quot;: &quot;nVLZdcLGH-s&quot;,
+  &quot;title&quot;: &quot;중국 &#x27;한한령&#x27; 해제되면, 주가 수혜 받는다는 산업분야 4가지&quot;,
+  &quot;url&quot;: &quot;https://www.youtube.com/watch?v=nVLZdcLGH-s&quot;,
+  &quot;channel&quot;: &quot;경제사냥꾼&quot;,
+  &quot;channel_id&quot;: &quot;UC7usMJDHmtbs_oegmzQKKMA&quot;,
+  &quot;source_url&quot;: &quot;https://www.youtube.com/@%EA%B2%BD%EC%A0%9C%EC%82%AC%EB%83%A5%EA%BE%BC/shorts&quot;,
+  &quot;thumbnail_url&quot;: &quot;https://i.ytimg.com/vi/nVLZdcLGH-s/maxresdefault.jpg&quot;,
+  &quot;published_at&quot;: &quot;2026-11-19T05:34:42+00:00&quot;,
+  &quot;status&quot;: &quot;unverified&quot;,
+  &quot;strategy_source_tier&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_evidence_weight&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_validation_policy&quot;: &quot;STANDARD_REVIEW&quot;,
+  &quot;transcript_status&quot;: &quot;available&quot;,
+  &quot;transcript_source&quot;: &quot;automatic&quot;,
+  &quot;transcript_chars&quot;: 1563,
+  &quot;transcript_quality&quot;: {
+    &quot;status&quot;: &quot;good&quot;,
+    &quot;score&quot;: 1.0,
+    &quot;warnings&quot;: [],
+    &quot;source&quot;: &quot;automatic&quot;,
+    &quot;language&quot;: &quot;Korean (Original)&quot;,
+    &quot;model_or_format&quot;: &quot;json3&quot;,
+    &quot;chars&quot;: 1563,
+    &quot;segments&quot;: 80,
+    &quot;duration_seconds&quot;: 126,
+    &quot;repeated_ngram_ratio&quot;: 0.0
+  },
+  &quot;generated_at&quot;: &quot;2026-11-20T10:50:02.650390+09:00&quot;,
+  &quot;llm_status&quot;: &quot;success&quot;,
+  &quot;research_status&quot;: &quot;success&quot;,
+  &quot;claim_verification_status&quot;: &quot;success&quot;,
+  &quot;research_pipeline_version&quot;: 4,
+  &quot;evidence_count&quot;: 7,
+  &quot;claim_status_summary&quot;: {
+    &quot;partially_supported&quot;: 1,
+    &quot;unverified&quot;: 10,
+    &quot;supported&quot;: 1
+  },
+  &quot;claims&quot;: [
+    {
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;claim_text&quot;: &quot;영상은 한중 정상회담에서 8년 넘게 이어진 무역 협상이 타결됐고, 중국이 한국 영화·게임을 다른 나라보다 차별하지 않겠다는 내용을 처음으로 문서화했다고 주장한다.&quot;,
+      &quot;status&quot;: &quot;partially_supported&quot;,
+      &quot;confidence&quot;: 0.76,
+      &quot;supporting_evidence_ids&quot;: [
+        &quot;E1&quot;,
+        &quot;E2&quot;,
+        &quot;E3&quot;
+      ],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.89,
+      &quot;asr_confidence&quot;: 0.86,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;8년 초과&quot;,
+        &quot;observed&quot;: &quot;언론 보도 약 8년 8개월, 2018년 3월 협상 개시&quot;
+      },
+      &quot;investor_implication&quot;: &quot;실질 타결 보도를 한한령 전면 해제나 개별 콘텐츠 허가로 해석하지 않는다. 적용 대상과 시행 시점은 공식 문서로 확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;claim_text&quot;: &quot;한국 여행사가 중국 23개 지역에서 중국인 관광객을 직접 모집할 수 있게 됐다는 주장이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.88,
+      &quot;asr_confidence&quot;: 0.88,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;중국 23개 지역&quot;,
+        &quot;observed&quot;: &quot;확인 가능한 지역 수 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;직접 모집, 방한 상품 판매, 단체관광 운영은 서로 다른 권한이다. 실제 방한객 증가를 판단하려면 허용 범위와 시행 이후 관광객 통계를 함께 확인한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;claim_text&quot;: &quot;한중 공동제작 대상이 영화에서 드라마·예능까지 확대됐다는 주장이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.94,
+      &quot;asr_confidence&quot;: 0.94,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;해당 없음&quot;,
+        &quot;observed&quot;: &quot;해당 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;공동제작 범위가 확대되더라도 방영 승인이나 계약이 확인되기 전에는 중국 매출을 전제하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;claim_text&quot;: &quot;영상은 KB증권이 관광 → 드라마 → K팝 순서로 수혜를 전망했다고 인용하고, 영상 자체는 항공을 관광의 초기 수혜로, 게임을 가장 뒤에 놓는다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.89,
+      &quot;asr_confidence&quot;: 0.88,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;KB증권 인용: 관광 → 드라마 → K팝. 영상 해석: 항공은 관광과 함께, 게임은 마지막.&quot;,
+        &quot;observed&quot;: &quot;해당 순위를 확인할 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;제시된 순서는 확인된 주가 반응이나 실적 전망이 아니다. 방한 수요, 방영 계약, 공연 일정, 게임 승인·출시를 각각 확인한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;claim_text&quot;: &quot;영상은 ‘지난해’ 중국인 방한객이 548만 명으로 전체 외래객의 약 30%였으며, 방한 수요가 늘어 좌석이 차면 항공사 운임과 편당 매출이 오를 수 있다고 본다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.88,
+      &quot;asr_confidence&quot;: 0.85,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;‘지난해’ 548만 명, 약 30%&quot;,
+        &quot;observed&quot;: &quot;공식 집계와 분모 미제공. 게시일 기준 2025년은 검증 가설이다.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;관광객 증가는 수요 지표다. 항공사 수혜는 노선별 공급 좌석, 탑승률, 평균 운임과 편당 여객매출로 별도 확인한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;claim_text&quot;: &quot;제주항공이 ‘지난 9월’ 베이징·창사행 신규 노선을 확보했다는 주장이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.88,
+      &quot;asr_confidence&quot;: 0.89,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;‘지난 9월’, 베이징·창사 2개 노선&quot;,
+        &quot;observed&quot;: &quot;노선·날짜 미확인. 2026년 9월은 게시일 기준 가설이다.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;배정 내역과 실제 운항 시작일·편수가 확인되기 전에는 추가 좌석 공급이나 매출을 추정하기 어렵다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;claim_text&quot;: &quot;KB증권 인용에 따르면 제작비 300억 원인 드라마가 중국에서 동시 방영되면 스튜디오드래곤의 작품당 이익이 210억 원 늘어날 수 있다.&quot;,
+      &quot;status&quot;: &quot;supported&quot;,
+      &quot;confidence&quot;: 0.83,
+      &quot;supporting_evidence_ids&quot;: [
+        &quot;E4&quot;
+      ],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.94,
+      &quot;asr_confidence&quot;: 0.94,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;제작비 300억 원, 작품당 추가 이익 210억 원&quot;,
+        &quot;observed&quot;: &quot;E4: 제작비 300억 원, 회수율 70% 가정, 작품당 영업이익 증가 210억 원 추정&quot;
+      },
+      &quot;investor_implication&quot;: &quot;210억 원은 특정 가정 아래의 작품당 영업이익 증가 추정치다. 방영 허가·계약과 수익 인식이 확인되기 전에는 확정 이익으로 보지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;claim_text&quot;: &quot;영상은 SK증권이 중국 팬층을 근거로 SM을 우선 수혜 후보로 선정했다고 인용한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.92,
+      &quot;asr_confidence&quot;: 0.92,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;해당 없음&quot;,
+        &quot;observed&quot;: &quot;해당 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;팬층 규모에 관한 평가와 실제 공연 매출은 구분한다. 증권사 원문과 비교 종목이 확인되기 전에는 SM의 수혜 우위를 단정하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;claim_text&quot;: &quot;대형 엔터 3사의 중국 매출 비중은 6%, 중국 공연 시장 규모는 한국의 2.8배, K팝 앨범 수출 중 중국 비중은 27%라는 주장이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.92,
+      &quot;asr_confidence&quot;: 0.82,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;3사, 6%, 2.8배, 27%&quot;,
+        &quot;observed&quot;: &quot;세 수치 모두 대조할 원자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;세 수치는 각각 기업 매출, 공연 시장, 음반 수출을 가리킨다. 집계 기준을 확인하지 않고 수혜 규모나 중국 노출도를 비교하는 데 쓰지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C10&quot;,
+      &quot;claim_text&quot;: &quot;영상은 공연장 예약이 통상 3~6개월 앞서 이뤄져 중국 공연 재개 효과가 빨라도 ‘내년 하반기’부터 실적에 반영될 것으로 본다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.92,
+      &quot;asr_confidence&quot;: 0.89,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;3~6개월, 빠르면 ‘내년 하반기’&quot;,
+        &quot;observed&quot;: &quot;예약 시차·실적 반영 시점 미확인. 2027년 하반기는 게시일 기준 가설이다.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;특정 반기에 실적이 반영된다고 가정하기보다 중국 본토 공연의 허가, 확정 일정, 실제 개최와 회사의 실적 인식을 순서대로 확인한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C11&quot;,
+      &quot;claim_text&quot;: &quot;중국에서 게임을 출시하려면 판호가 필요하고, 외국 게임 판호가 2017년 467건에서 최근 연간 약 100건으로 줄었으며, 한국 게임 비차별 대우가 전체 발급 확대를 뜻하지는 않는다는 주장이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.93,
+      &quot;asr_confidence&quot;: 0.88,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;2017년 467건 → 최근 연간 약 100건&quot;,
+        &quot;observed&quot;: &quot;공식 승인 건수 및 ‘최근’의 기준연도 미확인&quot;
+      },
+      &quot;investor_implication&quot;: &quot;전체 수입 게임 승인 추이와 한국 개발사·IP의 개별 승인을 분리해 보고, 개별 게임의 실제 출시도 확인한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C12&quot;,
+      &quot;claim_text&quot;: &quot;영상은 ‘작년 11월’과 ‘올해 1월’에 한한령 완화 기대에 엔터주가 상승했다가 실적 지표가 뒷받침되지 않아 하락했다고 주장한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.92,
+      &quot;asr_confidence&quot;: 0.88,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;두 차례: ‘작년 11월’, ‘올해 1월’&quot;,
+        &quot;observed&quot;: &quot;시세 미제공. 2025년 11월·2026년 1월은 게시일 기준 가설이다.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;두 사례를 반복 패턴으로 인용하기 전에 사건 전후 시장 대비 수익률과 실적 공시·동시 이슈를 대조한다.&quot;
+    }
+  ],
+  &quot;entities&quot;: [],
+  &quot;evidence&quot;: [
+    {
+      &quot;evidence_id&quot;: &quot;E1&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;[기획] 선전서 다시 만난 한중, 제주 협력의 새 길&quot;,
+      &quot;source_url&quot;: &quot;https://www.jemin.com/news/articleView.html?idxno=847879&quot;,
+      &quot;publisher&quot;: &quot;Naver News&quot;,
+      &quot;published_at&quot;: &quot;2026-11-20T10:56:00+09:00&quot;,
+      &quot;source_tier&quot;: &quot;web&quot;,
+      &quot;excerpt&quot;: &quot;정상회의를 계기로 열린 회담에서 양국은 8년 8개월간 이어온 자유무역협정(FTA) 서비스·투자 후속협상의 실질 타결을 선언했다. 2027년 수교 35주년을 앞두고 관광·문화·기업 교류를 확대하기로 하면서 30년 넘게 중국... [기획] 선전서 다시 만난 한중, 제주 협력의 새 길 주요서비스 바로가기 본문 바로가기 매체정보 바로가기 로그인 바로가기 기사검색 바로가기 전체서비스 바로가기 잠깐! 현재 Internet Explorer 8이하 버전을 이용중이십니다....&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E2&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;한중 FTA 8년 만에 실질 타결…K콘텐츠 중국 진출 확대 기대&quot;,
+      &quot;source_url&quot;: &quot;http://www.dailypop.kr/news/articleView.html?idxno=104770&quot;,
+      &quot;publisher&quot;: &quot;Naver News&quot;,
+      &quot;published_at&quot;: &quot;2026-11-20T09:00:00+09:00&quot;,
+      &quot;source_tier&quot;: &quot;web&quot;,
+      &quot;excerpt&quot;: &quot;국가주석의 정상회담을 계기로 FTA 서비스·투자 후속협상의 실질 타결을 선언했다. 2018년 3월 협상을 시작한 지 8년 8개월 만이다. 이번 합의의 핵심은 문화콘텐츠 분야의 시장 접근성 개선이다. 중국은 한국 영화와 게임... 한중 FTA 8년 만에 실질 타결…K콘텐츠 중국 진출 확대 기대 - 데일리팝 잠깐! 현재 Internet Explorer 8이하 버전을 이용중이십니다. 최신 브라우저(Browser) 사용을 권장드립니다! ie 인터넷 익스플로러 11...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E4&quot;,
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;title&quot;: &quot;“300억짜리 드라마, 210억 더 번다”…한한령 해제 수혜주라는데 [오늘...&quot;,
+      &quot;source_url&quot;: &quot;https://www.mk.co.kr/article/12213253&quot;,
+      &quot;publisher&quot;: &quot;Naver News&quot;,
+      &quot;published_at&quot;: &quot;2026-11-19T09:03:00+09:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;KB증권은 스튜디오드래곤이 제작비 300억원 규모의 드라마를 중국에서 동시 방영하고 제작비 회수율 70%를 달성할 경우 작품당 영업이익이 210억원 증가할 수 있다고 추정했다. 신한투자증권도 중국 동시 방영이...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E5&quot;,
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;title&quot;: &quot;Gold, Silver Futures Extend Losses&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/m/7d68abc9-d2ce-3a35-9209-a8716ce32d24/gold%2C-silver-futures-extend.html&quot;,
+      &quot;publisher&quot;: &quot;The Wall Street Journal&quot;,
+      &quot;published_at&quot;: &quot;2026-11-19T19:09:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E6&quot;,
+      &quot;claim_id&quot;: &quot;C10&quot;,
+      &quot;title&quot;: &quot;Tech, Media &amp; Telecom Roundup: Market Talk&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/m/863136c8-4a7f-3077-b241-49adbe7295d3/tech%2C-media-%26-telecom.html&quot;,
+      &quot;publisher&quot;: &quot;The Wall Street Journal&quot;,
+      &quot;published_at&quot;: &quot;2026-11-19T22:05:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E7&quot;,
+      &quot;claim_id&quot;: &quot;C11&quot;,
+      &quot;title&quot;: &quot;Recycled Metal - Global Market Size, Share, Industry Trends and Growth Forecast 2026-2031 | Decarbonization and Electrification Drive a $191.86 Billion Reven...&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/commodities/articles/recycled-metal-global-market-size-161600643.html&quot;,
+      &quot;publisher&quot;: &quot;GlobeNewswire&quot;,
+      &quot;published_at&quot;: &quot;2026-11-19T16:16:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    }
+  ],
+  &quot;source_policy&quot;: {
+    &quot;raw_transcript_published&quot;: false,
+    &quot;raw_transcript_in_evidence&quot;: false,
+    &quot;research_pipeline_version&quot;: 4,
+    &quot;closed_source_claims&quot;: &quot;unverified_external_source&quot;,
+    &quot;auto_caption_warning&quot;: true,
+    &quot;local_asr_warning&quot;: false
+  }
+}</pre>
+  </details>
+</article>
+</main>
+  <style>
+.reader-contents { margin: 16px 0; padding: 12px 16px; border: 1px solid var(--line, #64748b); border-radius: 12px; }
+.reader-contents > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-weight: 750; }
+.reader-contents nav { display: grid; gap: 4px; max-height: 45vh; overflow: auto; margin: 8px 0; }
+.reader-contents a { display: block; min-height: 44px; padding: 10px; border-radius: 6px; color: inherit; overflow-wrap: anywhere; }
+.reader-contents a:hover { background: #80808020; }
+.reader-contents .reader-subsection { padding-inline-start: 24px; font-size: .92em; }
+.reader-prose, .report { overflow-wrap: anywhere; line-height: 1.8; }
+.reader-prose p, .reader-prose li { max-width: 85ch; }
+.reader-prose h2, .reader-prose h3, .reader-prose h4, [data-reader-heading] { scroll-margin-top: 100px; line-height: 1.45; }
+.reader-prose h2 { margin-top: 1.8em; padding-bottom: 8px; border-bottom: 1px solid var(--line, #64748b); }
+.reader-prose h3 { margin-top: 1.5em; }
+.reader-prose li { margin: .5em 0; }
+.reader-prose pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.reader-prose blockquote { margin: 16px 0; padding: 4px 16px; border-left: 3px solid var(--accent, #64748b); }
+.reader-table { overflow: auto; max-width: 100%; margin: 16px 0; border: 1px solid var(--line, #64748b); border-radius: 10px; }
+.reader-table table { border-collapse: collapse; width: 100%; margin: 0; font-size: .92rem; }
+.reader-table th, .reader-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line, #64748b); min-width: 110px; max-width: 400px; overflow-wrap: anywhere; white-space: normal; }
+.reader-table th { background: #80808018; }
+.reader-table tr:nth-child(even) { background: #80808008; }
+.reader-search { display: grid; gap: 8px; margin: 16px 0; }
+.reader-search label { font-weight: 700; }
+.reader-search input { box-sizing: border-box; width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line, #64748b); border-radius: 10px; background: var(--panel, #fff); color: var(--text, #132238); font: inherit; }
+.reader-search p { margin: 0; font-size: .86rem; }
+.reader-back { position: fixed; bottom: max(14px, env(safe-area-inset-bottom)); right: 14px; z-index: 30; min-height: 44px; border: 1px solid #778899; border-radius: 99px; padding: 10px 16px; background: #18344a; color: #fff; font: 700 14px system-ui; cursor: pointer; box-shadow: 0 3px 12px #0003; }
+[data-reader-source] { margin-top: 20px; }
+[data-reader-source] > summary { min-height: 44px; cursor: pointer; }
+[data-reader-source] pre { font-size: .85rem; }
+[data-reader-source] pre, .reader-prose { min-width: 0; }
+.reader-contents :focus-visible, .reader-search :focus-visible, .reader-back:focus-visible, .reader-table:focus-visible { outline: 3px solid var(--accent, #008c95); outline-offset: 3px; }
+.reader-search + .grid > [hidden] { display: none !important; }
+@media (max-width: 600px) { .reader-prose { font-size: 1rem; } .reader-contents { padding: 8px 12px; } }
+@media print { .reader-back, .reader-search, .reader-contents, [data-reader-source] { display: none !important; } .reader-table { overflow: visible; } .reader-prose { color: #000; background: #fff; } }
+</style><script>
+(() => {
+  'use strict';
+  let serial = 0;
+  const rendered = new WeakMap();
+  const node = (tag, text) => { const el = document.createElement(tag); if (text != null) el.textContent = text; return el; };
+  function inline(parent, text) {
+    const pattern = /(`[^`]+`|\*\*[^*]+\*\*|\[[^\]]+\]\(https?:\/\/[^\s)]+\))/g;
+    let start = 0;
+    for (const match of String(text).matchAll(pattern)) {
+      parent.append(document.createTextNode(text.slice(start, match.index)));
+      const value = match[0];
+      if (value.startsWith('`')) parent.append(node('code', value.slice(1, -1)));
+      else if (value.startsWith('**')) parent.append(node('strong', value.slice(2, -2)));
+      else {
+        const link = value.match(/^\[([^\]]+)\]\((.+)\)$/);
+        const a = node('a', link[1]); a.href = link[2]; a.rel = 'noopener noreferrer'; parent.append(a);
+      }
+      start = match.index + value.length;
+    }
+    parent.append(document.createTextNode(text.slice(start)));
+  }
+  const cells = line => line.trim().replace(/^\|/, '').replace(/\|$/, '').split(/(?<!\\)\|/).map(v => v.trim().replace(/\\\|/g, '|'));
+  function markdown(source) {
+    const article = node('article'); article.className = 'reader-prose';
+    const lines = source.split(/\r?\n/); let list = null;
+    for (let i = 0; i < lines.length; i += 1) {
+      const line = lines[i], value = line.trim();
+      if (!value) { list = null; continue; }
+      if (/^```/.test(value)) {
+        const code = []; i += 1;
+        while (i < lines.length && !/^```/.test(lines[i].trim())) code.push(lines[i++]);
+        const pre = node('pre'); pre.append(node('code', code.join('\n'))); article.append(pre); list = null; continue;
+      }
+      if (i + 1 < lines.length && value.includes('|') && cells(lines[i + 1]).every(v => /^:?-{3,}:?$/.test(v))) {
+        const table = node('table'), head = node('thead'), body = node('tbody');
+        const row = (values, tag) => { const tr = node('tr'); values.forEach(v => { const cell = node(tag); if (tag === 'th') cell.scope = 'col'; inline(cell, v); tr.append(cell); }); return tr; };
+        head.append(row(cells(line), 'th')); i += 2;
+        while (i < lines.length && lines[i].trim() && lines[i].includes('|')) body.append(row(cells(lines[i++]), 'td'));
+        i -= 1; table.append(head, body); article.append(table); list = null; continue;
+      }
+      const heading = value.match(/^(#{1,6})\s+(.+)$/);
+      if (heading) { const h = node('h' + Math.min(4, heading[1].length + 1)); inline(h, heading[2]); article.append(h); list = null; continue; }
+      const bullet = value.match(/^(?:[-*+] |\d+\. )(.+)$/);
+      if (bullet) {
+        const tag = /^\d/.test(value) ? 'ol' : 'ul';
+        if (!list || list.tagName.toLowerCase() !== tag) { list = node(tag); if (tag === 'ol') list.start = parseInt(value, 10); article.append(list); }
+        const li = node('li'); inline(li, bullet[1]); list.append(li); continue;
+      }
+      list = null;
+      if (/^(---+|\*\*\*+)$/.test(value)) { article.append(node('hr')); continue; }
+      const p = node(value.startsWith('> ') ? 'blockquote' : 'p'); inline(p, value.startsWith('> ') ? value.slice(2) : line); article.append(p);
+    }
+    return article;
+  }
+  function contents(root) {
+    root.querySelectorAll(':scope > .reader-contents').forEach(el => el.remove());
+    const headings = [...root.querySelectorAll('h2,h3,h4')].filter(h => !h.closest('.card,.run-card,.reader-contents,[data-reader-source],[hidden]'));
+    if (headings.length < 2) return;
+    const details = node('details'); details.className = 'reader-contents';
+    details.append(node('summary', '이 리포트 목차 · ' + headings.length + '개 항목'));
+    const nav = node('nav'); nav.setAttribute('aria-label', '리포트 목차');
+    headings.forEach(h => {
+      if (!h.id) h.id = 'reader-section-' + (++serial);
+      h.dataset.readerHeading = ''; h.tabIndex = -1;
+      const a = node('a', h.textContent); a.href = '#' + h.id;
+      if (h.tagName !== 'H2') a.className = 'reader-subsection';
+      a.addEventListener('click', event => {
+        event.preventDefault();
+        for (let ancestor = h.parentElement; ancestor; ancestor = ancestor.parentElement) if (ancestor.tagName === 'DETAILS') ancestor.open = true;
+        h.scrollIntoView({block: 'start'}); h.focus({preventScroll: true});
+      }); nav.append(a);
+    });
+    details.append(nav); root.prepend(details);
+  }
+  function enhance(root) {
+    if (!root) return;
+    root.querySelectorAll('pre[data-report-markdown]').forEach(pre => {
+      const previous = rendered.get(pre);
+      if (previous && previous.source === pre.textContent) return;
+      const article = markdown(pre.textContent);
+      if (previous) previous.article.replaceWith(article);
+      else {
+        const details = node('details'); details.dataset.readerSource = '';
+        details.append(node('summary', 'Markdown 원문 보기'));
+        pre.before(article, details); details.append(pre);
+      }
+      rendered.set(pre, {source: pre.textContent, article});
+    });
+    root.querySelectorAll('table').forEach(table => {
+      if (table.closest('.reader-table,.account-table-wrap,.summary-scroll')) return;
+      const wrap = node('div'); wrap.className = 'reader-table'; wrap.tabIndex = 0;
+      wrap.setAttribute('role', 'region'); wrap.setAttribute('aria-label', '리포트 표 · 가로로 스크롤하여 전체 보기');
+      table.before(wrap); wrap.append(table);
+    });
+    root.querySelectorAll('.grid').forEach(grid => {
+      const cards = [...grid.querySelectorAll(':scope > a.card')];
+      if (cards.length < 2 || grid.dataset.readerSearch) return;
+      grid.dataset.readerSearch = 'true';
+      const box = node('div'); box.className = 'reader-search';
+      const input = node('input'); input.type = 'search'; input.placeholder = '제목 · 종목 · 채널 · 키워드'; input.id = 'report-search-' + (++serial);
+      const label = node('label', '리포트 찾기'); label.htmlFor = input.id;
+      const status = node('p'); status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
+      const update = () => {
+        const terms = input.value.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean); let count = 0;
+        cards.forEach(card => { card.hidden = !terms.every(t => card.textContent.toLocaleLowerCase().includes(t)); if (!card.hidden) count += 1; });
+        status.textContent = cards.length + '개 중 ' + count + '개 표시' + (count ? '' : ' · 검색어를 지우거나 다른 키워드를 입력하세요.');
+      };
+      input.addEventListener('input', update); box.append(label, input, status); grid.before(box); update();
+    });
+    contents(root);
+  }
+  window.TradingAgentsReader = {enhance};
+  const main = document.querySelector('main');
+  if (main && !main.hasAttribute('data-reader-dynamic')) enhance(main);
+  if (main) {
+    const top = node('button', '↑ 맨 위'); top.type = 'button'; top.className = 'reader-back'; top.setAttribute('aria-label', '리포트 맨 위로 이동');
+    top.addEventListener('click', () => { const target = document.querySelector('h1') || main; target.tabIndex = -1; target.scrollIntoView({block: 'start'}); target.focus({preventScroll: true}); });
+    document.body.append(top);
+  }
+})();
+</script>
+</body>
+</html>

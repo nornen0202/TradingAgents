@@ -1,0 +1,235 @@
+{
+  "schema": "tradingagents.work-context/v1",
+  "surface": "prism",
+  "event_id": "prism:a18d2a0b3f7b2ebacf87149adb80b24d",
+  "prompt_contract_version": "prism-work-v5",
+  "prompt_sha256": "2d6e6a207021f5126507994f77ca7850fa9bf42701a32286227ca874c1f535df",
+  "skill_sha256": "2fef99f1af403675549a13813e0fe5597a241a964affeada56e9f64e9f398fe9",
+  "task_manifest_sha256": "6fbafadc2971d1a908c1bbc1fa29e2adaf0ca6be956768f2f9eb0abf0061428e",
+  "workflow_contract_sha256": "46750ba4d87c3e127db704d362c736134d7df73054a6cc449472af03a14095af",
+  "source_sha256": "c6945d3ca91297f42a5cd2e486c5586a65bf9df918408523b2f33b225e7220ee",
+  "body": {
+    "kind": "prism",
+    "source_health": "OK",
+    "source": {
+      "health": "OK",
+      "run_id": "prism_telegram_20261120_124238",
+      "last_run_at": "2026-11-20T12:42:40.678385+09:00",
+      "status": "success",
+      "stale_after_hours": 30
+    },
+    "window_hours": 24,
+    "execution_eligible": false,
+    "evidence_policy": {
+      "profile": "balanced_external",
+      "material_thesis_effects": [
+        "ranking",
+        "confidence",
+        "position_size_within_existing_risk_limits",
+        "research_priority"
+      ],
+      "supported_evidence_weight": "MEDIUM",
+      "partially_supported_evidence_weight": "LOW_TO_MEDIUM",
+      "unverified_evidence_weight": "LOW_LABELED",
+      "user_primary_channels": [
+        "@kpunch",
+        "@sosumonkey"
+      ],
+      "user_primary_source_tier": "USER_PRIMARY",
+      "user_primary_evidence_weight": "HIGH",
+      "user_primary_validation_policy": "USER_ACCEPTED",
+      "matching_multi_source_signal_may_raise_thesis_priority": true,
+      "conflicting_signal_must_be_visible": true,
+      "may_bypass_market_or_portfolio_execution_gate": false
+    },
+    "coverage": {
+      "total_unique_events": 447,
+      "window_events": 5,
+      "transmitted_events": 5,
+      "truncated": false,
+      "oldest_occurred_at": "2026-11-19T22:07:42+00:00",
+      "newest_occurred_at": "2026-11-20T00:30:26+00:00"
+    },
+    "events": [
+      {
+        "event_key": "stock_ai_agent:17908",
+        "content_sha256": "737722f551c9fe3701325b9a7c3bdb9376a0f02e87adfcafce26c32565f96852",
+        "occurred_at": "2026-11-20T00:30:26+00:00",
+        "relevance": {
+          "tickers": [],
+          "markets": [],
+          "themes": [],
+          "match_basis": "message_context"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "17908",
+          "posted_at": "2026-11-20T00:30:26+00:00",
+          "source_url": "https://t.me/stock_ai_agent/17908",
+          "preview": "📉 시장 조정 구간 감지 — 이번 오전 분석은 쉬어갑니다. 시장이 고점 대비 크게 하락한 조정 구간이라, 무리한 신규 진입을 줄이기 위해 오늘은 하루 한 번(종가 확인 시간대)만 분석을 진행합니다. 보유 종목의 손절·청산 모니터링은 평소처럼 계속 가동 중입니다. 시장 회복 신호가 확인되면 자동으로 재개됩니다. 🙏",
+          "signals": [],
+          "signals_total": 0,
+          "signals_transmitted": 0,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 176,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:17907",
+        "content_sha256": "66c4391713c421936a9e80cc2e80b7122c4a5e2a6d6b537ae9ce9605a87fb5b6",
+        "occurred_at": "2026-11-19T22:32:30+00:00",
+        "relevance": {
+          "tickers": [],
+          "markets": [],
+          "themes": [],
+          "match_basis": "message_context"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "17907",
+          "posted_at": "2026-11-19T22:32:30+00:00",
+          "source_url": "https://t.me/stock_ai_agent/17907",
+          "preview": "🏁 BTC 데모 시나리오 종료 · 정산 확인 🕐 11/20 07:31:17 KST 💵 청산 결과 정리 수량: 0.014 BTC 진입 → 청산: 61,584.70 USDT → 61,889.76 USDT 보유 시간: 69.6분 확정 순손익: -4.98 USDT • 시작 계좌 9,282.09 USDT 대비 -0.05% • 수수료 0.71 USDT · 펀딩 0.00 USDT 반영 💰 종료 후...",
+          "signals": [],
+          "signals_total": 0,
+          "signals_transmitted": 0,
+          "signals_truncated": false,
+          "simulation_only": true,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 260,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:17906",
+        "content_sha256": "fa0f01f69bb972167eeda962b637525874f9909f98f757f3e82b579c61285756",
+        "occurred_at": "2026-11-19T22:27:41+00:00",
+        "relevance": {
+          "tickers": [],
+          "markets": [],
+          "themes": [],
+          "match_basis": "message_context"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "17906",
+          "posted_at": "2026-11-19T22:27:41+00:00",
+          "source_url": "https://t.me/stock_ai_agent/17906",
+          "preview": "✂️ BTC 데모 부분 청산 체결 · 숏 🕐 11/20 07:26:29 KST 사유: 즉시 일부 감축 🧾 이번 체결: 0.002 BTC · 61,993.10 USDT • 체결금액(명목): 123.99 USDT · 증거금 아님 • 이번 청산 가격손익: -0.82 USDT · 계좌 -0.01% 수수료·펀딩 전 · 확정 순손익 아님 손익·비용 정산 미확정: 확정 수익으로 집계하지 않음 📦 전...",
+          "signals": [],
+          "signals_total": 0,
+          "signals_transmitted": 0,
+          "signals_truncated": false,
+          "simulation_only": true,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 841,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:17905",
+        "content_sha256": "fa3871797436a1c074453a46d88b12b6dab8d7ee9b11b128906839c7cb6fae05",
+        "occurred_at": "2026-11-19T22:17:43+00:00",
+        "relevance": {
+          "tickers": [],
+          "markets": [],
+          "themes": [],
+          "match_basis": "message_context"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "17905",
+          "posted_at": "2026-11-19T22:17:43+00:00",
+          "source_url": "https://t.me/stock_ai_agent/17905",
+          "preview": "✂️ BTC 데모 부분 청산 체결 · 숏 🕐 11/20 07:16:26 KST 사유: 즉시 일부 감축 🧾 이번 체결: 0.002 BTC · 61,808.90 USDT • 체결금액(명목): 123.62 USDT · 증거금 아님 • 이번 청산 가격손익: -0.45 USDT · 계좌 -0.00% 수수료·펀딩 전 · 확정 순손익 아님 손익·비용 정산 미확정: 확정 수익으로 집계하지 않음 📦 전...",
+          "signals": [],
+          "signals_total": 0,
+          "signals_transmitted": 0,
+          "signals_truncated": false,
+          "simulation_only": true,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 936,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:17904",
+        "content_sha256": "60eeb938eede1a4d151c4387cdfb0f2f81e6023c7aff5cd26549042fcfb37786",
+        "occurred_at": "2026-11-19T22:07:42+00:00",
+        "relevance": {
+          "tickers": [],
+          "markets": [],
+          "themes": [],
+          "match_basis": "message_context"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "17904",
+          "posted_at": "2026-11-19T22:07:42+00:00",
+          "source_url": "https://t.me/stock_ai_agent/17904",
+          "preview": "✂️ BTC 데모 부분 청산 체결 · 숏 🕐 11/20 07:06:21 KST 사유: 즉시 일부 감축 🧾 이번 체결: 0.007 BTC · 61,771.50 USDT • 체결금액(명목): 432.40 USDT · 증거금 아님 • 이번 청산 가격손익: -1.31 USDT · 계좌 -0.01% 수수료·펀딩 전 · 확정 순손익 아님 손익·비용 정산 미확정: 확정 수익으로 집계하지 않음 📦 전...",
+          "signals": [],
+          "signals_total": 0,
+          "signals_transmitted": 0,
+          "signals_truncated": false,
+          "simulation_only": true,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 924,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      }
+    ],
+    "guardrails": {
+      "untrusted_content": true,
+      "advisory_only": true,
+      "may_promote_market_execution": false,
+      "multi_ticker_message_prices_require_recheck": true
+    },
+    "model_provenance": {
+      "schema": "tradingagents.model-provenance/v1",
+      "work_synthesis": {
+        "execution_mode": "local",
+        "requested_model": "gpt-6.2-sol",
+        "requested_reasoning_effort": "medium",
+        "task_id": "tradingagents-work-prism",
+        "verification_status": "CONFIGURED_NOT_RUNTIME_VERIFIED",
+        "observed_model": null,
+        "observed_reasoning_effort": null,
+        "note": "The local task contract is verified; the Work host does not expose a signed per-response model receipt."
+      }
+    }
+  }
+}

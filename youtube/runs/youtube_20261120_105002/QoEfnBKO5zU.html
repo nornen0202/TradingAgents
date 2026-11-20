@@ -1,0 +1,946 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YouTube 투자자용 검증 리포트 - &quot;또 5천 깨졌다&quot; 앤트로픽 상장 여파 어디까지? | 소현철 상지대학교 외래교수 [더블 업]</title>
+  <style>
+:root {
+  color-scheme: light;
+  --bg: #f7f8fb;
+  --panel: #ffffff;
+  --text: #172033;
+  --muted: #667085;
+  --line: #d9dee8;
+  --accent: #0f766e;
+  --accent-2: #2563eb;
+  --warn: #b45309;
+  --bad: #b42318;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0 56px; }
+a { color: var(--accent-2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.hero { padding: 28px 0 22px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+.hero.compact { padding-top: 12px; }
+.hero h1 { margin: 0; font-size: clamp(28px, 4vw, 44px); line-height: 1.15; letter-spacing: 0; }
+.hero p { max-width: 760px; color: var(--muted); margin: 12px 0 0; }
+.eyebrow { color: var(--accent); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0; margin: 0 0 8px; }
+section { margin: 28px 0; }
+h2, h3, h4, h5 { letter-spacing: 0; line-height: 1.25; }
+.synthesis-callout { padding: clamp(20px, 4vw, 34px); border: 1px solid #6ee7d8; border-radius: 18px; background: linear-gradient(135deg, #ecfdf9 0%, #eff6ff 100%); box-shadow: 0 18px 44px rgba(15, 118, 110, .12); }
+.synthesis-callout.unavailable { border-color: var(--line); background: var(--panel); box-shadow: none; }
+.synthesis-callout h2 { margin: 0; font-size: clamp(24px, 3.2vw, 36px); }
+.synthesis-callout .lead { max-width: 900px; font-size: 17px; color: #334155; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.primary-link, .secondary-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border-radius: 999px; font-weight: 800; }
+.primary-link { color: white; background: var(--accent); }
+.secondary-link { color: var(--accent-2); border: 1px solid #93c5fd; background: white; }
+.primary-link:hover, .secondary-link:hover { text-decoration: none; filter: brightness(.97); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.card, .run { display: flex; flex-direction: column; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; color: var(--text); min-height: 128px; }
+.run { padding: 16px; }
+.card:hover, .run:hover { border-color: var(--accent-2); text-decoration: none; }
+.thumb { display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #e9edf5; border-radius: 8px 8px 0 0; color: var(--muted); font-size: 13px; font-weight: 700; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb-empty span { padding: 0 14px; text-align: center; }
+.card-body { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 16px; }
+.card strong { line-height: 1.35; }
+.source-line { color: #3f4a5f; font-weight: 600; }
+.runs { display: grid; gap: 10px; }
+.badge { display: inline-flex; width: fit-content; border-radius: 999px; padding: 2px 9px; background: #e6f4f1; color: var(--accent); font-size: 12px; font-weight: 700; }
+.status-contradicted, .status-llm_failed { background: #fee4e2; color: var(--bad); }
+.status-unverified, .status-stale { background: #fff4d6; color: var(--warn); }
+small, .muted { color: var(--muted); }
+.topnav { display: flex; gap: 14px; margin-bottom: 16px; font-size: 14px; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px; }
+.stats span { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
+.report { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: min(5vw, 36px); }
+.report-head { border-bottom: 1px solid var(--line); margin-bottom: 24px; padding-bottom: 20px; }
+.report-head h1 { margin: 0; font-size: clamp(24px, 3.5vw, 38px); line-height: 1.2; }
+.meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+.scope-note { padding: 12px 14px; border-left: 4px solid var(--warn); border-radius: 6px; background: #fff7ed; color: #7c2d12; }
+.synthesis-report h2 { margin-top: 34px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.synthesis-report h3 { margin: 24px 0 8px; color: #0f4c5c; }
+.synthesis-report p, .synthesis-report li { overflow-wrap: anywhere; }
+pre { overflow: auto; background: #111827; color: #f9fafb; border-radius: 8px; padding: 14px; }
+code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+details { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 18px; }
+@media (max-width: 640px) {
+  main { width: min(100% - 20px, 1120px); padding-top: 18px; }
+  .report { padding: 18px; }
+  .synthesis-callout { border-radius: 14px; padding: 18px; }
+  .cta-row a { width: 100%; }
+  .mobile-report { border-radius: 12px; }
+}
+</style>
+</head>
+<body>
+  <main>
+<nav class="topnav"><a href="index.html">실행 목록</a><a href="../../index.html">YouTube 홈</a></nav>
+<article class="report">
+  <header class="report-head">
+    <p class="eyebrow">youtube_20261120_105002</p>
+    <h1>&quot;또 5천 깨졌다&quot; 앤트로픽 상장 여파 어디까지? | 소현철 상지대학교 외래교수 [더블 업]</h1>
+    <div class="meta">
+      <span class="badge status-llm_failed">llm_failed</span>
+      <a href="https://www.youtube.com/watch?v=QoEfnBKO5zU">원본 영상</a>
+    </div>
+  </header>
+  <h2>투자자용 YouTube 검증 리포트: &quot;또 5천 깨졌다&quot; 앤트로픽 상장 여파 어디까지? | 소현철 상지대학교 외래교수 [더블 업]</h2>
+<h3>핵심 결론</h3>
+<ul>
+<li>이 리포트는 영상 자막/ASR 기반 주장, 공개 시장 데이터, 웹/뉴스/공시 근거 묶음으로 자동 생성한 검증 결과입니다.</li>
+<li>LLM 정제 단계가 실패했거나 사용할 수 없어 deterministic 형식으로 작성했습니다.</li>
+<li>영상 속 주장과 검증된 사실은 구분해서 읽어야 하며, 매수/매도 지시가 아닙니다.</li>
+</ul>
+<h3>검증 상태</h3>
+<ul>
+<li>전체 상태: <code>verified_with_caveats</code></li>
+<li>LLM 상태: <code>llm_failed</code></li>
+<li>리서치 상태: <code>success</code></li>
+<li>주장 검증 상태: <code>success</code></li>
+<li>자막/ASR 품질: <code>good</code> (score=1.0)</li>
+<li>영상 URL: https://www.youtube.com/watch?v=QoEfnBKO5zU</li>
+</ul>
+<h3>주장별 검증</h3>
+<h4>C1</h4>
+<ul>
+<li>영상 주장: 앤트로픽의 나스닥 IPO 공모가는 83달러로 희망 범위 70~78달러를 넘었고, 기업가치는 2조→1조→1.5조 달러로 변했다. 방송은 청약 5,000억 달러, 공모 680억~700억 달러를 언급하며 미배정 자금의 증시 재유입을 예상했고, 후반에는 순현금 1,300억 달러와 조달액 960억 달러를 제시했다.</li>
+<li>근거 시각/신뢰도: <code>00:00:00</code> / source <code>0.47</code> / ASR <code>0.77</code></li>
+<li>상태: <code>partially_supported</code></li>
+<li>확인된 사실: E1과 E3의 기사 제목은 앤트로픽의 거래 개시를 보도했다. E3 제목은 첫날 주가가 초기 가격 대비 17% 상승해 시가총액 1.27조 달러로 마감했다고 전했다. 거래소 원자료로 확인된 수치는 아니다.</li>
+<li>반론/한계: E1·E2·E10의 제목은 기술주나 전체 시장의 약세를 전했다. 데뷔 직후 증시가 곧바로 개선됐다는 해석에는 불리하지만, 미배정 자금이 이후 재투자됐는지는 보여 주지 않는다. / 첫날 종가 기준 시가총액과 공모가 기준 기업가치는 비교 시점과 주식 수 기준이 다를 수 있어, 1.27조 달러가 방송의 1.5조 달러를 직접 반박하지는 않는다.</li>
+<li>투자 시사점: 공모 흥행 보도와 기존 주식시장 순유입은 별개다. 청약 주문액을 실제 예치액이나 환불 후 재투자액으로 간주하지 않는다.</li>
+</ul>
+<h4>C2</h4>
+<ul>
+<li>영상 주장: 방송은 골드만삭스의 앤트로픽 2026년 매출 추정치 500억 달러를 인용하며 2026년 PSR 약 30배, 2027년 약 11배를 제시했다.</li>
+<li>근거 시각/신뢰도: <code>00:00:00</code> / source <code>0.00</code> / ASR <code>0.45</code></li>
+<li>상태: <code>asr_uncertain</code></li>
+<li>확인된 사실: -</li>
+<li>반론/한계: 골드만삭스 원문이나 직접 인용이 없어 500억 달러의 출처와 연간 매출·연환산 매출 구분을 확인할 수 없다. / 2027년 매출 수치가 자막에서 불명확해 11배를 검산할 수 없다.</li>
+<li>투자 시사점: 30배와 11배를 확인된 밸류에이션 비교치로 인용하지 않는다.</li>
+</ul>
+<h4>C3</h4>
+<ul>
+<li>영상 주장: 출연자는 앤트로픽이 임대 중심에서 직접 데이터센터를 건설하는 방향으로 나아가며 엔비디아 GPU 외에 구글 TPU와 AMD GPU를 활용할 계획이 상장 보고서에 담겼다고 설명했다.</li>
+<li>근거 시각/신뢰도: <code>00:19:29</code> / source <code>0.00</code> / ASR <code>0.77</code></li>
+<li>상태: <code>unverified</code></li>
+<li>확인된 사실: -</li>
+<li>반론/한계: IPO 관련 기사 제목만으로는 시설 소유·임차 형태, 가속기 계약, 실제 도입 여부를 확인할 수 없다. 인허가 위험이 실제 일정 지연으로 이어졌는지도 자료가 없다.</li>
+<li>투자 시사점: 직접 건설과 가속기 다변화를 확정된 설비투자나 공급사별 수주로 반영하지 않는다.</li>
+</ul>
+<h4>C4</h4>
+<ul>
+<li>영상 주장: 방송은 민주당의 양원 승리, 상원 56석과 ‘38년 만’을 언급하고 데이터센터 모라토리엄 공약을 투자 축소 요인으로 꼽았다. 미상 기관의 하향률과 출연자 자신의 2028년 축소 전망, 한국 반도체주에 반영됐다는 투자 급감 우려도 제시했다.</li>
+<li>근거 시각/신뢰도: <code>00:06:38</code> / source <code>0.00</code> / ASR <code>0.85</code></li>
+<li>상태: <code>unverified</code></li>
+<li>확인된 사실: -</li>
+<li>반론/한계: E4는 인도 태양광 기업 실적, E5는 재활용 금속 시장 자료로 미국 선거·공약·데이터센터 투자 추정을 뒷받침하지 않는다. / 기관 전망의 이전 추정치 대비 하향률, 전년 대비 투자 증감률, 주가에 반영됐다는 가정은 기준이 서로 다르다.</li>
+<li>투자 시사점: 전국적 인허가 중단이나 2028년 투자 절벽을 기본 시나리오로 삼지 않는다. 2027년 기착수 사업과 2028년 신규 발주를 따로 본다.</li>
+</ul>
+<h4>C5</h4>
+<ul>
+<li>영상 주장: 앵커는 블룸버그인지 확신하지 못한 채 이란 관련 단기 공습 가능성 보도를 언급했다. 방송은 네타냐후 측 선거 패배, 차기 총리 미확정, 미·러·중 정상 회동을 전쟁 종결 전망과 연결했다.</li>
+<li>근거 시각/신뢰도: <code>00:00:00</code> / source <code>0.00</code> / ASR <code>0.72</code></li>
+<li>상태: <code>unverified</code></li>
+<li>확인된 사실: -</li>
+<li>반론/한계: 기사 원문·발행 시각, 이스라엘 개표·연정 기록, 정상 회동의 공식 확인 자료가 없다. 가능성 보도는 실제 공습을 입증하지 않는다.</li>
+<li>투자 시사점: 출처 미확인 속보나 연정·회동 추측을 전쟁 종결 또는 유가 전망의 확정 근거로 삼지 않는다.</li>
+</ul>
+<h4>C6</h4>
+<ul>
+<li>영상 주장: 출연자는 엔비디아가 2027년 매출 가이던스를 상향했다고 해석했고 자체 추정 7,400억 달러와 2026년 비교치 4,100억 달러를 제시했다.</li>
+<li>근거 시각/신뢰도: <code>00:06:38</code> / source <code>0.00</code> / ASR <code>0.83</code></li>
+<li>상태: <code>unverified</code></li>
+<li>확인된 사실: -</li>
+<li>반론/한계: E6은 IBM 관련 기사다. NVDA의 단일 시세 스냅샷은 매출 전망의 상향 여부를 입증하지 못하며, 기업 뉴스·공시 조회에서도 원문을 확보하지 못했다.</li>
+<li>투자 시사점: 7,400억 달러를 회사의 연간 가이던스로 인용하거나 2027년 데이터센터 투자 유지의 근거로 사용하지 않는다.</li>
+</ul>
+<h4>C7</h4>
+<ul>
+<li>영상 주장: 출연자는 삼성전자·SK하이닉스의 2027년 이익이 견조하며, 2028년 투자 둔화 시 장비 반입·양산을 늦출 수 있고 맞춤형 HBM 확대가 양사에 유리할 수 있다고 봤다. 이익 컨센서스와 가격 급락 스트레스 수치, 밸류에이션 배수도 제시했다.</li>
+<li>근거 시각/신뢰도: <code>00:06:38</code> / source <code>0.46</code> / ASR <code>0.67</code></li>
+<li>상태: <code>partially_supported</code></li>
+<li>확인된 사실: E7 발췌는 양사의 2027년 투자전략을 다루며 시장 상황에 따라 장비투자를 조절하는 전략을 보도했다. 2028년 장비 반입이나 양산 연기가 결정됐다는 뜻은 아니다.</li>
+<li>반론/한계: E8·E9는 2026년 3분기 실적 및 HBM·서버 DRAM 수요에 관한 배경자료다. 고객별 HBM 전환 제약, 2027~2028년 이익 추정, 가격 하락률 및 밸류에이션을 검증하지 못한다. / 650조 원에서 500조 원을 그대로 빼면 150조 원으로, 언급된 180조 원과 일치하지 않는다. 반올림·단위·산정 범위는 확인되지 않았다.</li>
+<li>투자 시사점: 설비투자 조절 가능성과 실제 감산·이익 방어를 구분한다. 고객 인증과 양산 일정, 가격·물량·이익 가정이 확인될 때까지 스트레스 수치나 저평가 배수를 투자 근거로 쓰지 않는다.</li>
+</ul>
+<h4>C8</h4>
+<ul>
+<li>영상 주장: 방송은 애플이 메모리 장기 공급계약을 추진한다고 전했고, 출연자는 그런 계약이 DRAM 하강기 재고 누적을 완화할 수 있다고 봤다.</li>
+<li>근거 시각/신뢰도: <code>00:19:29</code> / source <code>0.00</code> / ASR <code>0.79</code></li>
+<li>상태: <code>unverified</code></li>
+<li>확인된 사실: -</li>
+<li>반론/한계: E10 제목에 AAPL이 나오지만 메모리 계약을 언급하지 않는다. 주가 스냅샷도 계약 협상·체결이나 재고에 관한 근거가 아니다.</li>
+<li>투자 시사점: 협상과 체결을 구분하고, 장기계약이라는 이유만으로 구매 물량 보장, 고정가격 또는 재고 감소를 전제하지 않는다.</li>
+</ul>
+<h4>C9</h4>
+<ul>
+<li>영상 주장: 방송은 국제유가가 약 100달러에서 약 83달러로 내려온 이유로 미국 원유 재고 증가와 베네수엘라 공급 회복을 들었고, 호르무즈 사태 이후 중국이 이란산 원유 수입을 중단했다고 주장했다. 종전 후 70달러 미만 유가와 물가·금리 하락, 기술주 자금 유입은 조건부 전망이었다.</li>
+<li>근거 시각/신뢰도: <code>00:00:00</code> / source <code>0.36</code> / ASR <code>0.88</code></li>
+<li>상태: <code>unverified</code></li>
+<li>확인된 사실: 제공된 2026-11-20 02:49 UTC의 CL=F 스냅샷은 약 82.92달러다. 방송의 유종과 거래 시점이 불명확해 이는 근접한 참고값이다.</li>
+<li>반론/한계: 같은 유종·만기 기준으로 100→83달러가 하락했다는 시계열이나 재고·공급 원자료가 없다. 스냅샷은 하락 경로나 원인을 보여 주지 않는다. / 중국의 이란산 원유 수입 중단을 뒷받침하는 자료가 없고, 신고 물량이 0이더라도 실제 수입 중단과는 구분해야 한다.</li>
+<li>투자 시사점: 70달러 미만은 관측치가 아니다. 유가 하락이 물가·금리 하락이나 나스닥·반도체주 순유입으로 자동 연결된다고 보지 않는다.</li>
+</ul>
+<h4>C10</h4>
+<ul>
+<li>영상 주장: 방송은 NVDA의 시간외 상승 후 하락과 AMD·브로드컴 강세를 전하며 순환매와 옵션 만기 변동성을 논의했다. 2018년 4분기 나스닥·필라델피아 반도체·S&amp;P 500 하락과 2019년 반등을 금리 경로에 빗댔고, 제목의 ‘5천’은 대상을 특정할 수 없다.</li>
+<li>근거 시각/신뢰도: <code>00:00:00</code> / source <code>0.00</code> / ASR <code>0.83</code></li>
+<li>상태: <code>unverified</code></li>
+<li>확인된 사실: -</li>
+<li>반론/한계: E1·E2·E10 제목은 지수나 기술주 약세를 보도하지만, 세 종목의 세션별 주가 경로·상대수익률은 제시하지 않는다. 복합 티커 조회는 실패했고 NVDA 단일 스냅샷으로는 시간외 경로를 재현할 수 없다. / 옵션 만기 자료와 2018~2019년 지수·금리 시계열이 없고, 제목 ‘5천’의 지수·시점·방향은 확인되지 않는다.</li>
+<li>투자 시사점: 단기 상대강세를 순환매나 추세 전환으로 단정하지 않는다. 과거 반등 사례도 오늘의 반등 신호로 취급하지 않는다.</li>
+</ul>
+<h3>공개 근거</h3>
+<ul>
+<li><a href="https://finance.yahoo.com/markets/stocks/articles/nasdaq-dow-p-500-futures-024814072.html">Nasdaq, Dow, S&amp;P 500 Futures Slip As Anthropic’s Record Debut Fails To Lift AI Stocks: SLV, GLD, AMD, NVDA In Focus</a> - Nasdaq, Dow, S&amp;P 500 Futures Slip As Anthropic’s Record Debut Fails To Lift AI Stocks: SLV, GLD, AMD, NVDA In Focus Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World...</li>
+<li><a href="https://finance.yahoo.com/m/9e02231d-41cd-31ac-b37f-993325b8a4ca/dow-jones-futures%3A-techs.html">Dow Jones Futures: Techs Slide, Anthropic Retreats After Ugly Market Reversal To New Lows</a> - Dow Jones Futures: Techs Slide, Anthropic Retreats After Ugly Market Reversal To New Lows Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 202...</li>
+<li><a href="https://finance.yahoo.com/energy/articles/alpex-solar-ltd-nse-alpexsolar-170123828.html">Alpex Solar Ltd (NSE:ALPEXSOLAR) Q2 2027 Earnings Call Highlights: Solar Cell Trial Production ...</a> - Alpex Solar Ltd (NSE:ALPEXSOLAR) Q2 2027 Earnings Call Highlights: Solar Cell Trial Production ... Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Orig...</li>
+<li><a href="https://finance.yahoo.com/markets/commodities/articles/recycled-metal-global-market-size-161600643.html">Recycled Metal - Global Market Size, Share, Industry Trends and Growth Forecast 2026-2031 | Decarbonization and Electrification Drive a $191.86 Billion Reven...</a> - -</li>
+<li><a href="https://finance.yahoo.com/markets/stocks/articles/ibm-stock-down-23-2026-022401616.html">IBM Stock Is Down About 23% in 2026. Here&#x27;s Where I Think It Will Be in 2030.</a> - -</li>
+<li>[[분석] 삼성·SK하이닉스의 2027년 투자전략](https://www.datasom.co.kr/news/articleView.html?idxno=210578) - 구축하고 장비투자는 시장 상황에 따라 조절하는 전략을 추진하고 있다. 삼성전자는 29일, SK하이닉스는 28일 각각 2026년 3분기 실적발표와 컨퍼런스콜을 통해 내년도 반도체시장 전망과 투자계획을 공개했다. 두...</li>
+<li>[[셀럽의 한 수] HBM에서 영원한 1등은 없다? 삼성전자 맹추격, 하닉과 격...](https://biz.sbs.co.kr/article_hub/20000342384?division=NAVER) - 반도체 실적 신기록 예고 - 삼성전자 3분기 영업이익 107조원 돌파 - SK하이닉스 3분기 영업이익 77조원 전망 - AI 데이터센터 투자 확대에 메모리 수요 급증 - HBM4 공급 본격화에 반도체 수익성 개선 기대 - 엔비디아...</li>
+<li><a href="https://finance.yahoo.com/markets/stocks/articles/p-500-nasdaq-dow-end-230105109.html">S&amp;P 500, Nasdaq, Dow End Lower As Anthropic Trading Debut Fails To Provide Adequate Confidence — ANT, META, AAPL, GME In Focus</a> - -</li>
+</ul>
+<h3>종목별 공개 데이터 확인</h3>
+<h4>엔비디아 (NVDA)</h4>
+<ul>
+<li>검증 상태: <code>unverified</code></li>
+<li>현재가: <code>145.98</code></li>
+<li>52주 고점/저점: <code>243.37</code> / <code>145.71</code></li>
+<li>시가총액: <code>3524.98B</code></li>
+<li>확인 필요: 공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.</li>
+</ul>
+<h4>삼성전자·SK하이닉스 (005930 / 000660)</h4>
+<ul>
+<li>검증 상태: <code>unverified</code></li>
+<li>현재가: <code>-</code></li>
+<li>52주 고점/저점: <code>-</code> / <code>-</code></li>
+<li>시가총액: <code>-</code></li>
+<li>확인 필요: 시장 데이터 조회 실패: Failed to parse json response from Yahoo Finance: {&#x27;code&#x27;: &#x27;Not Found&#x27;, &#x27;description&#x27;: &#x27;HTTP 404 Not Found&#x27;}</li>
+</ul>
+<h4>애플 (AAPL)</h4>
+<ul>
+<li>검증 상태: <code>unverified</code></li>
+<li>현재가: <code>349.21</code></li>
+<li>52주 고점/저점: <code>360.83</code> / <code>243.42</code></li>
+<li>시가총액: <code>5074.78B</code></li>
+<li>확인 필요: 공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.</li>
+</ul>
+<h4>국제유가·이란 전쟁 (CL=F)</h4>
+<ul>
+<li>검증 상태: <code>unverified</code></li>
+<li>현재가: <code>82.92</code></li>
+<li>52주 고점/저점: <code>119.48</code> / <code>54.98</code></li>
+<li>시가총액: <code>-</code></li>
+<li>확인 필요: 공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.</li>
+</ul>
+<h4>미국 반도체주 (NVDA / AMD / AVGO)</h4>
+<ul>
+<li>검증 상태: <code>unverified</code></li>
+<li>현재가: <code>-</code></li>
+<li>52주 고점/저점: <code>-</code> / <code>-</code></li>
+<li>시가총액: <code>-</code></li>
+<li>확인 필요: 시장 데이터 조회 실패: Failed to parse json response from Yahoo Finance: {&#x27;code&#x27;: &#x27;Not Found&#x27;, &#x27;description&#x27;: &#x27;HTTP 404 Not Found&#x27;}</li>
+</ul>
+<h3>Deterministic 초안</h3>
+<h2>유튜브 영상 분석 리포트: &quot;또 5천 깨졌다&quot; 앤트로픽 상장 여파 어디까지? | 소현철 상지대학교 외래교수 [더블 업]</h2>
+<ul>
+<li>채널: 삼프로TV 3PROTV</li>
+<li>영상 URL: https://www.youtube.com/watch?v=QoEfnBKO5zU</li>
+<li>업로드일: 2026-11-19</li>
+<li>길이: 24:36</li>
+<li>조회수: 44,662</li>
+<li>생성 시각: 2026-11-20 10:50:02</li>
+</ul>
+<h3>1. 분석 가능 수준</h3>
+<ul>
+<li>자막 본문: 수집 성공 (automatic, Korean, json3)</li>
+<li>자막 세그먼트: 705개</li>
+<li>정규화 본문 길이: 12,094자</li>
+<li>사용 가능 수동 자막: 없음</li>
+<li>사용 가능 자동 자막: aa, ab, af, ak, am, ar, as, ay, az, ba, be, bg 외 145개</li>
+<li>주의: 자동자막은 인식 오류가 있을 수 있으므로 숫자와 고유명사는 원출처 재검증이 필요합니다.</li>
+</ul>
+<h3>2. 핵심 요약</h3>
+<ul>
+<li>영상은 <code>&quot;또 5천 깨졌다&quot; 앤트로픽 상장 여파 어디까지? | 소현철 상지대학교 외래교수 [더블 업]</code>라는 제목 아래 개별 종목보다 시장/매크로 이슈를 중심으로 다룹니다.</li>
+<li>자막 기준 반복 핵심어는 AI, 매출, 계약입니다.</li>
+<li>이 deterministic 초안은 영상 발화를 구조화한 1차 산출물이며, 최종 리포트에서는 LLM 검증 단계가 시장·자산 단위 주장과 재검증 필요 수치를 다시 분리합니다.</li>
+<li>투자 판단에는 영상 주장과 현재 시장 데이터, 원출처 확인을 별도로 대조해야 합니다.</li>
+</ul>
+<h3>3. 종목별 주장 요약</h3>
+<p>자막에서 사전 정의된 종목/티커를 식별하지 못했습니다.</p>
+<h3>4. 공통 투자 논리</h3>
+<ul>
+<li>어제 엔비디아가 오히려 가이던스 27년도 매출액을 더 올리지 않았습니까?</li>
+<li>가이던스 올리기 전에 27년도 매출 컨센서스가 7,억 달러가 안 됐거든요.</li>
+<li>근데 제가 가이던스를 딱 조정해 보니까 7,400억 달러가 매출이 나와요.</li>
+<li>뭐 올해 기준으로 보면 매출액이 한 500억 달러 정도 골드만 삭스가 예측을 했으니까 올해 기준하면 PSR 30배.</li>
+<li>그래서 그런 부분에서는 장기 공급 계약이 제고 문제 과거의 과잉 제고가 과거가 100이라면 그거를 좀 완화시킬 수 있는게 아닌 아닌가 그렇게 보고 있는 거죠.</li>
+</ul>
+<h3>5. 주요 리스크와 반론</h3>
+<ul>
+<li>그때 4분기 주가가 어 나스닥 지수고 플레델페 지수고 SP 5원들의 지수가 엄청 많이 빠졌어요.</li>
+<li>28년도에 시장에서 우려하는 50% 이상 데이터 센터 축소를 하기보단 2, 30% 정도 축소가 되지 않을까라고 보고 있고.</li>
+<li>&gt;&gt; 기적으로 &gt;&gt; 트럼프 대통령이 이란과 전쟁 추전을 함게 되면 &gt;&gt; 끝내는 순간이 &gt;&gt; 그게 왜냐면 유가가 &gt;&gt; 83불까지 빠졌잖아요.</li>
+<li>그게 지금 정상화 국면이 가니까 &gt;&gt; 음 &gt;&gt; 그 원유가 많아서 지금 중동의 이슈가 있음에도 불구하고 &gt;&gt; 그 유가가 빠졌거든요.</li>
+</ul>
+<h3>6. 후속 체크포인트</h3>
+<ul>
+<li>명시적 체크포인트를 충분히 추출하지 못했습니다.</li>
+</ul>
+<h3>7. 검증 필요 항목</h3>
+<ul>
+<li>아, [콧방귀] &gt;&gt; 좀 전에 뭐 블룸버그인가?</li>
+<li>83달러 &gt;&gt; 83달러 &gt;&gt; 원래 상담 78달러졌어요.</li>
+<li>&gt;&gt; 아 근데 원래 하단 70달러보다 &gt;&gt; 어 하단 70에서 78달러였는데 &gt;&gt; 예 그것도 &gt;&gt; 상단 뚫고 &gt;&gt; 상단도 뚫고 &gt;&gt; 예 그래서 이게 참 &gt;&gt; 저도 참 재밌는게 한 달 전만 해도 9월 말만 해도 2조 달러 얘기 나왔다가 &gt;&gt; 2주 전에 1조 달러까지 떨어졌다가 &gt;&gt; 그 1조 4조달러 오늘 클로징한게 1.5조달러로 예 그렇게...</li>
+<li>뭐 올해 기준으로 보면 매출액이 한 500억 달러 정도 골드만 삭스가 예측을 했으니까 올해 기준하면 PSR 30배.</li>
+<li>&gt;&gt; 근데 내년이 한 100300억 달러 매출한다라고 보면 대충 PSR 한 11배 그러면은 그 스펙x 상장보다 일단 상장 시점에서는 밸류에이션이 조금 &gt;&gt; 뭐 괜찮은 거죠.</li>
+<li>근데 이게 지금 공모를 모으는게 한 680억에서 700억 달러를 빼고 나면은 &gt;&gt; 어쨌든 4,억 달러라는 돈은 다시 어딘가론 가야 되지 않겠습니까?</li>
+<li>자동자막 기반 분석이므로 종목명, 티커, 숫자 단위, 날짜는 원영상/공시/실적 자료로 재확인해야 합니다.</li>
+</ul>
+<h3>8. 원문 근거 발췌</h3>
+<ul>
+<li>발췌할 종목별 근거가 없습니다.</li>
+</ul>
+<h3>9. 결론</h3>
+<p>자막 또는 ASR 본문은 수집됐지만 사전 정의된 종목/티커 중심 영상은 아닙니다. 이 경우 최종 리포트는 LLM 검증 단계에서 시장·자산·거시 이벤트 단위로 주장과 체크포인트를 재구성해야 합니다.</p>
+  <details>
+    <summary>공개 요약 JSON</summary>
+    <pre>{
+  &quot;version&quot;: 4,
+  &quot;video_id&quot;: &quot;QoEfnBKO5zU&quot;,
+  &quot;title&quot;: &quot;\&quot;또 5천 깨졌다\&quot; 앤트로픽 상장 여파 어디까지? | 소현철 상지대학교 외래교수 [더블 업]&quot;,
+  &quot;url&quot;: &quot;https://www.youtube.com/watch?v=QoEfnBKO5zU&quot;,
+  &quot;channel&quot;: &quot;삼프로TV 3PROTV&quot;,
+  &quot;channel_id&quot;: &quot;UChlv4GSd7OQl3js-jkLOnFA&quot;,
+  &quot;source_url&quot;: &quot;https://www.youtube.com/@3protv/videos&quot;,
+  &quot;thumbnail_url&quot;: &quot;https://i.ytimg.com/vi/QoEfnBKO5zU/maxresdefault.jpg&quot;,
+  &quot;published_at&quot;: &quot;2026-11-19T02:20:13+00:00&quot;,
+  &quot;status&quot;: &quot;llm_failed&quot;,
+  &quot;strategy_source_tier&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_evidence_weight&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_validation_policy&quot;: &quot;STANDARD_REVIEW&quot;,
+  &quot;transcript_status&quot;: &quot;available&quot;,
+  &quot;transcript_source&quot;: &quot;automatic&quot;,
+  &quot;transcript_chars&quot;: 12094,
+  &quot;transcript_quality&quot;: {
+    &quot;status&quot;: &quot;good&quot;,
+    &quot;score&quot;: 1.0,
+    &quot;warnings&quot;: [],
+    &quot;source&quot;: &quot;automatic&quot;,
+    &quot;language&quot;: &quot;Korean&quot;,
+    &quot;model_or_format&quot;: &quot;json3&quot;,
+    &quot;chars&quot;: 12094,
+    &quot;segments&quot;: 705,
+    &quot;duration_seconds&quot;: 1476,
+    &quot;repeated_ngram_ratio&quot;: 0.0
+  },
+  &quot;generated_at&quot;: &quot;2026-11-20T10:50:02.650390+09:00&quot;,
+  &quot;llm_status&quot;: &quot;llm_failed&quot;,
+  &quot;research_status&quot;: &quot;success&quot;,
+  &quot;claim_verification_status&quot;: &quot;success&quot;,
+  &quot;research_pipeline_version&quot;: 4,
+  &quot;evidence_count&quot;: 10,
+  &quot;claim_status_summary&quot;: {
+    &quot;partially_supported&quot;: 2,
+    &quot;asr_uncertain&quot;: 1,
+    &quot;unverified&quot;: 9
+  },
+  &quot;claims&quot;: [
+    {
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;claim_text&quot;: &quot;앤트로픽의 나스닥 IPO 공모가는 83달러로 희망 범위 70~78달러를 넘었고, 기업가치는 2조→1조→1.5조 달러로 변했다. 방송은 청약 5,000억 달러, 공모 680억~700억 달러를 언급하며 미배정 자금의 증시 재유입을 예상했고, 후반에는 순현금 1,300억 달러와 조달액 960억 달러를 제시했다.&quot;,
+      &quot;status&quot;: &quot;partially_supported&quot;,
+      &quot;confidence&quot;: 0.52,
+      &quot;supporting_evidence_ids&quot;: [
+        &quot;E1&quot;,
+        &quot;E3&quot;
+      ],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.47,
+      &quot;asr_confidence&quot;: 0.77,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;공모가 $83, 희망가 $70~78, 기업가치 $2조→$1조→$1.5조, 청약 $5,000억, 공모 $680억~700억, 순현금 $1,300억, 조달 $960억, 합계 약 $2,200억&quot;,
+        &quot;observed&quot;: &quot;E3 제목: 첫날 +17%, 종가 기준 $1.27조. 공모 조건·청약·순현금은 확인 불가.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;공모 흥행 보도와 기존 주식시장 순유입은 별개다. 청약 주문액을 실제 예치액이나 환불 후 재투자액으로 간주하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;claim_text&quot;: &quot;방송은 골드만삭스의 앤트로픽 2026년 매출 추정치 500억 달러를 인용하며 2026년 PSR 약 30배, 2027년 약 11배를 제시했다.&quot;,
+      &quot;status&quot;: &quot;asr_uncertain&quot;,
+      &quot;confidence&quot;: 0.17,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.45,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;2026년 매출 $500억, PSR 약 30배, 2027년 PSR 약 11배와 매출 판독 불가&quot;,
+        &quot;observed&quot;: &quot;외부 매출 추정치 없음. 방송 수치 $1.5조 ÷ $500억은 산술상 30배.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;30배와 11배를 확인된 밸류에이션 비교치로 인용하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;claim_text&quot;: &quot;출연자는 앤트로픽이 임대 중심에서 직접 데이터센터를 건설하는 방향으로 나아가며 엔비디아 GPU 외에 구글 TPU와 AMD GPU를 활용할 계획이 상장 보고서에 담겼다고 설명했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.08,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:19:29&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.77,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;해당 없음&quot;,
+        &quot;observed&quot;: &quot;해당 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;직접 건설과 가속기 다변화를 확정된 설비투자나 공급사별 수주로 반영하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;claim_text&quot;: &quot;방송은 민주당의 양원 승리, 상원 56석과 ‘38년 만’을 언급하고 데이터센터 모라토리엄 공약을 투자 축소 요인으로 꼽았다. 미상 기관의 하향률과 출연자 자신의 2028년 축소 전망, 한국 반도체주에 반영됐다는 투자 급감 우려도 제시했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.08,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:06:38&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.85,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;상원 56석·38년 만, 기관 전망 하향 2027년 10~15%·2028년 30%·2029~2030년 약 50%, 출연자 2028년 축소 전망 20~30%, 주가에 반영됐다는 2027년 대비 감소 우려 50% 이상&quot;,
+        &quot;observed&quot;: &quot;선거 결과, 역사적 비교 기준, 공약 원문, 전망 개정표 미제공.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;전국적 인허가 중단이나 2028년 투자 절벽을 기본 시나리오로 삼지 않는다. 2027년 기착수 사업과 2028년 신규 발주를 따로 본다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;claim_text&quot;: &quot;앵커는 블룸버그인지 확신하지 못한 채 이란 관련 단기 공습 가능성 보도를 언급했다. 방송은 네타냐후 측 선거 패배, 차기 총리 미확정, 미·러·중 정상 회동을 전쟁 종결 전망과 연결했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.06,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.72,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;해당 없음&quot;,
+        &quot;observed&quot;: &quot;해당 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;출처 미확인 속보나 연정·회동 추측을 전쟁 종결 또는 유가 전망의 확정 근거로 삼지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;claim_text&quot;: &quot;출연자는 엔비디아가 2027년 매출 가이던스를 상향했다고 해석했고 자체 추정 7,400억 달러와 2026년 비교치 4,100억 달러를 제시했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.08,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:06:38&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.83,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;2027년 자체 추정 $7,400억, 2026년 비교치 $4,100억. 상향 전 컨센서스 및 증가액은 판독 불가.&quot;,
+        &quot;observed&quot;: &quot;회사 공식 가이던스와 발표 전후 매출 컨센서스 자료 없음.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;7,400억 달러를 회사의 연간 가이던스로 인용하거나 2027년 데이터센터 투자 유지의 근거로 사용하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;claim_text&quot;: &quot;출연자는 삼성전자·SK하이닉스의 2027년 이익이 견조하며, 2028년 투자 둔화 시 장비 반입·양산을 늦출 수 있고 맞춤형 HBM 확대가 양사에 유리할 수 있다고 봤다. 이익 컨센서스와 가격 급락 스트레스 수치, 밸류에이션 배수도 제시했다.&quot;,
+      &quot;status&quot;: &quot;partially_supported&quot;,
+      &quot;confidence&quot;: 0.45,
+      &quot;supporting_evidence_ids&quot;: [
+        &quot;E7&quot;
+      ],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:06:38&quot;,
+      &quot;source_confidence&quot;: 0.46,
+      &quot;asr_confidence&quot;: 0.67,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;2027년 영업이익 각각 600조·400조 원으로 추정 판독, 삼성전자 2028년 기준 약 650조·감소 약 500조·스트레스 약 180조 원, 가격 하락 70~75%, 2028년 배수 2~2.5배&quot;,
+        &quot;observed&quot;: &quot;2027~2028년 컨센서스, 스트레스 모델, 배수 분모 확인 불가. 양사 복합 티커 시세 조회 실패.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;설비투자 조절 가능성과 실제 감산·이익 방어를 구분한다. 고객 인증과 양산 일정, 가격·물량·이익 가정이 확인될 때까지 스트레스 수치나 저평가 배수를 투자 근거로 쓰지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;claim_text&quot;: &quot;방송은 애플이 메모리 장기 공급계약을 추진한다고 전했고, 출연자는 그런 계약이 DRAM 하강기 재고 누적을 완화할 수 있다고 봤다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.07,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:19:29&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.79,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;계약 기간·물량·가격 수치 없음&quot;,
+        &quot;observed&quot;: &quot;계약 및 재고 원자료 없음.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;협상과 체결을 구분하고, 장기계약이라는 이유만으로 구매 물량 보장, 고정가격 또는 재고 감소를 전제하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;claim_text&quot;: &quot;방송은 국제유가가 약 100달러에서 약 83달러로 내려온 이유로 미국 원유 재고 증가와 베네수엘라 공급 회복을 들었고, 호르무즈 사태 이후 중국이 이란산 원유 수입을 중단했다고 주장했다. 종전 후 70달러 미만 유가와 물가·금리 하락, 기술주 자금 유입은 조건부 전망이었다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.2,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.36,
+      &quot;asr_confidence&quot;: 0.88,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;배럴당 약 $100→$83, 종전 후 $70 미만은 조건부&quot;,
+        &quot;observed&quot;: &quot;방송 이후 CL=F 단일 스냅샷 $82.92. $100의 시작점과 동일 기준 하락 경로는 미확인.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;70달러 미만은 관측치가 아니다. 유가 하락이 물가·금리 하락이나 나스닥·반도체주 순유입으로 자동 연결된다고 보지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C10&quot;,
+      &quot;claim_text&quot;: &quot;방송은 NVDA의 시간외 상승 후 하락과 AMD·브로드컴 강세를 전하며 순환매와 옵션 만기 변동성을 논의했다. 2018년 4분기 나스닥·필라델피아 반도체·S&amp;P 500 하락과 2019년 반등을 금리 경로에 빗댔고, 제목의 ‘5천’은 대상을 특정할 수 없다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.13,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.83,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;2018년 4분기 하락·2019년 반등, 제목 ‘5천’&quot;,
+        &quot;observed&quot;: &quot;검증 가능한 세션별 수익률·과거 기간 수익률·옵션 만기 자료 없음. ‘5천’ 대상 미상.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;단기 상대강세를 순환매나 추세 전환으로 단정하지 않는다. 과거 반등 사례도 오늘의 반등 신호로 취급하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C11&quot;,
+      &quot;claim_text&quot;: &quot;방송은 스페이스X 상장과 이후 시장 약세를 앤트로픽의 비교 사례로 들고, 별도 대목에서 스페이스X와 테슬라 주가가 버텼다고 말했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.06,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.63,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;구체적인 주가·수익률·거래일 없음&quot;,
+        &quot;observed&quot;: &quot;상장 기록과 비교 시세 없음.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;대상 종목과 비교 기간이 확인되기 전에는 IPO 이후 증시 약세 사례로 인용하지 않는다. 시간적 선후만으로 인과를 판단하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C12&quot;,
+      &quot;claim_text&quot;: &quot;방송은 오픈AI를 다음 대형 IPO 후보로 거론하며 상장 시기를 ‘내후년쯤’으로 추측했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.08,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:19:29&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.85,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;2026년 방송 기준 ‘내후년쯤’은 2028년경&quot;,
+        &quot;observed&quot;: &quot;공식 일정 자료 없음.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;2028년을 예정된 상장이나 투자 일정으로 반영하지 않는다.&quot;
+    }
+  ],
+  &quot;entities&quot;: [
+    {
+      &quot;ticker&quot;: &quot;NVDA&quot;,
+      &quot;name&quot;: &quot;엔비디아&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;출연자는 엔비디아의 2027년 매출 가이던스가 상향됐다고 해석하며, 이를 근거로 2027년까지 진행 중인 데이터센터 투자가 크게 흔들리지 않을 것으로 봤다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;출연자 자체 추정 2027년 매출 7,400억 달러, 비교치인 2026년 매출 4,100억 달러. 상향 전 컨센서스와 매출 증가액은 자막에서 숫자가 누락됨.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;NVDA&quot;,
+        &quot;as_of&quot;: &quot;2026-11-20T02:49:40.800039+00:00&quot;,
+        &quot;current_price&quot;: 145.97999572753906,
+        &quot;market_cap&quot;: 3524978956832.8857,
+        &quot;forward_pe&quot;: 8.79118,
+        &quot;trailing_pe&quot;: 15.679913,
+        &quot;fifty_two_week_high&quot;: 243.37,
+        &quot;fifty_two_week_low&quot;: 145.71,
+        &quot;average_target_price&quot;: 246.67091,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;005930 / 000660&quot;,
+      &quot;name&quot;: &quot;삼성전자·SK하이닉스&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;출연자는 두 회사의 2027년 이익은 크게 문제없고, 2028년 투자 둔화가 현실화돼도 장비 반입이나 양산 시점을 늦춰 공급을 조절할 수 있다고 봤다.&quot;,
+        &quot;출연자는 가속기 공급처가 다변화되면 고객별 맞춤형 HBM이 늘고 제품 간 전환이 어려워져, 메모리 업체에는 오히려 유리할 수 있다고 봤다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;출연자는 현 주가가 반도체 가격 약 70% 하락을 반영한다고 해석했고, 스트레스 시나리오에서 70~75% 가격 하락을 언급.&quot;,
+        &quot;삼성전자의 2028년 스트레스 시나리오 영업이익으로 약 180조 원을 언급. 같은 대목에서 기준 약 650조 원, 감소 약 500조 원도 제시해 산식은 불명확함.&quot;,
+        &quot;두 회사의 2028년 컨센서스 기준 배수로 2~2.5배를 언급했으나 배수 정의는 불명확함.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;시장 데이터 조회 실패: Failed to parse json response from Yahoo Finance: {&#x27;code&#x27;: &#x27;Not Found&#x27;, &#x27;description&#x27;: &#x27;HTTP 404 Not Found&#x27;}&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;005930 / 000660&quot;,
+        &quot;as_of&quot;: &quot;2026-11-20T02:49:43.427432+00:00&quot;,
+        &quot;current_price&quot;: null,
+        &quot;market_cap&quot;: null,
+        &quot;forward_pe&quot;: null,
+        &quot;trailing_pe&quot;: null,
+        &quot;fifty_two_week_high&quot;: null,
+        &quot;fifty_two_week_low&quot;: null,
+        &quot;average_target_price&quot;: null,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;unverified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;unverified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;AAPL&quot;,
+      &quot;name&quot;: &quot;애플&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;방송에서는 애플이 메모리 확보를 위해 장기 공급계약을 추진한다고 언급했다. 출연자는 이런 계약이 DRAM 하강기의 재고 누적을 완화할 수 있다고 봤다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;AAPL&quot;,
+        &quot;as_of&quot;: &quot;2026-11-20T02:49:43.927677+00:00&quot;,
+        &quot;current_price&quot;: 349.2099914550781,
+        &quot;market_cap&quot;: 5074783152043.641,
+        &quot;forward_pe&quot;: 33.029312,
+        &quot;trailing_pe&quot;: 38.887527,
+        &quot;fifty_two_week_high&quot;: 360.83,
+        &quot;fifty_two_week_low&quot;: 243.42,
+        &quot;average_target_price&quot;: 345.6313,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;CL=F&quot;,
+      &quot;name&quot;: &quot;국제유가·이란 전쟁&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;출연자는 중동 긴장에도 유가가 하락한 배경으로 미국 원유 재고 증가와 베네수엘라 원유 공급 정상화를 지목했다.&quot;,
+        &quot;출연자는 이란 전쟁이 끝나고 유가가 더 내려가면 물가·금리 하락 기대가 커져 나스닥과 필라델피아 반도체지수로 자금이 유입될 수 있다고 봤다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;방송에서 국제유가가 미국 중간선거 전 배럴당 약 100달러에서 약 83달러로 하락했다고 언급. 70달러 미만은 출연자가 제시한 조건부 시나리오이며 유종은 명시되지 않음.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;CL=F&quot;,
+        &quot;as_of&quot;: &quot;2026-11-20T02:49:45.969309+00:00&quot;,
+        &quot;current_price&quot;: 82.91999816894531,
+        &quot;market_cap&quot;: null,
+        &quot;forward_pe&quot;: null,
+        &quot;trailing_pe&quot;: null,
+        &quot;fifty_two_week_high&quot;: 119.48,
+        &quot;fifty_two_week_low&quot;: 54.98,
+        &quot;average_target_price&quot;: null,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;NVDA / AMD / AVGO&quot;,
+      &quot;name&quot;: &quot;미국 반도체주&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;방송은 엔비디아가 시간외 상승 후 하락한 반면 AMD와 브로드컴은 강세였다며 반도체주 내 순환매 가능성을 논의했다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [],
+      &quot;verification_notes&quot;: [
+        &quot;시장 데이터 조회 실패: Failed to parse json response from Yahoo Finance: {&#x27;code&#x27;: &#x27;Not Found&#x27;, &#x27;description&#x27;: &#x27;HTTP 404 Not Found&#x27;}&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;NVDA / AMD / AVGO&quot;,
+        &quot;as_of&quot;: &quot;2026-11-20T02:49:47.636174+00:00&quot;,
+        &quot;current_price&quot;: null,
+        &quot;market_cap&quot;: null,
+        &quot;forward_pe&quot;: null,
+        &quot;trailing_pe&quot;: null,
+        &quot;fifty_two_week_high&quot;: null,
+        &quot;fifty_two_week_low&quot;: null,
+        &quot;average_target_price&quot;: null,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;unverified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;unverified&quot;
+    }
+  ],
+  &quot;evidence&quot;: [
+    {
+      &quot;evidence_id&quot;: &quot;E1&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;Nasdaq, Dow, S&amp;P 500 Futures Slip As Anthropic’s Record Debut Fails To Lift AI Stocks: SLV, GLD, AMD, NVDA In Focus&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/nasdaq-dow-p-500-futures-024814072.html&quot;,
+      &quot;publisher&quot;: &quot;Stocktwits&quot;,
+      &quot;published_at&quot;: &quot;2026-11-20T02:48:14+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Nasdaq, Dow, S&amp;P 500 Futures Slip As Anthropic’s Record Debut Fails To Lift AI Stocks: SLV, GLD, AMD, NVDA In Focus Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E2&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;Dow Jones Futures: Techs Slide, Anthropic Retreats After Ugly Market Reversal To New Lows&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/m/9e02231d-41cd-31ac-b37f-993325b8a4ca/dow-jones-futures%3A-techs.html&quot;,
+      &quot;publisher&quot;: &quot;Investor&#x27;s Business Daily&quot;,
+      &quot;published_at&quot;: &quot;2026-11-20T02:42:22+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Dow Jones Futures: Techs Slide, Anthropic Retreats After Ugly Market Reversal To New Lows Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 202...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E4&quot;,
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;title&quot;: &quot;Alpex Solar Ltd (NSE:ALPEXSOLAR) Q2 2027 Earnings Call Highlights: Solar Cell Trial Production ...&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/energy/articles/alpex-solar-ltd-nse-alpexsolar-170123828.html&quot;,
+      &quot;publisher&quot;: &quot;GuruFocus.com&quot;,
+      &quot;published_at&quot;: &quot;2026-11-19T17:01:23+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Alpex Solar Ltd (NSE:ALPEXSOLAR) Q2 2027 Earnings Call Highlights: Solar Cell Trial Production ... Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Orig...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E5&quot;,
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;title&quot;: &quot;Recycled Metal - Global Market Size, Share, Industry Trends and Growth Forecast 2026-2031 | Decarbonization and Electrification Drive a $191.86 Billion Reven...&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/commodities/articles/recycled-metal-global-market-size-161600643.html&quot;,
+      &quot;publisher&quot;: &quot;GlobeNewswire&quot;,
+      &quot;published_at&quot;: &quot;2026-11-19T16:16:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E6&quot;,
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;title&quot;: &quot;IBM Stock Is Down About 23% in 2026. Here&#x27;s Where I Think It Will Be in 2030.&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/ibm-stock-down-23-2026-022401616.html&quot;,
+      &quot;publisher&quot;: &quot;Motley Fool&quot;,
+      &quot;published_at&quot;: &quot;2026-11-20T02:24:01+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E7&quot;,
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;title&quot;: &quot;[분석] 삼성·SK하이닉스의 2027년 투자전략&quot;,
+      &quot;source_url&quot;: &quot;https://www.datasom.co.kr/news/articleView.html?idxno=210578&quot;,
+      &quot;publisher&quot;: &quot;Naver News&quot;,
+      &quot;published_at&quot;: &quot;2026-10-30T08:00:00+09:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;구축하고 장비투자는 시장 상황에 따라 조절하는 전략을 추진하고 있다. 삼성전자는 29일, SK하이닉스는 28일 각각 2026년 3분기 실적발표와 컨퍼런스콜을 통해 내년도 반도체시장 전망과 투자계획을 공개했다. 두...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E8&quot;,
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;title&quot;: &quot;[셀럽의 한 수] HBM에서 영원한 1등은 없다? 삼성전자 맹추격, 하닉과 격...&quot;,
+      &quot;source_url&quot;: &quot;https://biz.sbs.co.kr/article_hub/20000342384?division=NAVER&quot;,
+      &quot;publisher&quot;: &quot;Naver News&quot;,
+      &quot;published_at&quot;: &quot;2026-10-27T16:00:00+09:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;반도체 실적 신기록 예고 - 삼성전자 3분기 영업이익 107조원 돌파 - SK하이닉스 3분기 영업이익 77조원 전망 - AI 데이터센터 투자 확대에 메모리 수요 급증 - HBM4 공급 본격화에 반도체 수익성 개선 기대 - 엔비디아...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E10&quot;,
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;title&quot;: &quot;S&amp;P 500, Nasdaq, Dow End Lower As Anthropic Trading Debut Fails To Provide Adequate Confidence — ANT, META, AAPL, GME In Focus&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/p-500-nasdaq-dow-end-230105109.html&quot;,
+      &quot;publisher&quot;: &quot;Stocktwits&quot;,
+      &quot;published_at&quot;: &quot;2026-11-19T23:01:05+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    }
+  ],
+  &quot;source_policy&quot;: {
+    &quot;raw_transcript_published&quot;: false,
+    &quot;raw_transcript_in_evidence&quot;: false,
+    &quot;research_pipeline_version&quot;: 4,
+    &quot;closed_source_claims&quot;: &quot;unverified_external_source&quot;,
+    &quot;auto_caption_warning&quot;: true,
+    &quot;local_asr_warning&quot;: false
+  }
+}</pre>
+  </details>
+</article>
+</main>
+  <style>
+.reader-contents { margin: 16px 0; padding: 12px 16px; border: 1px solid var(--line, #64748b); border-radius: 12px; }
+.reader-contents > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-weight: 750; }
+.reader-contents nav { display: grid; gap: 4px; max-height: 45vh; overflow: auto; margin: 8px 0; }
+.reader-contents a { display: block; min-height: 44px; padding: 10px; border-radius: 6px; color: inherit; overflow-wrap: anywhere; }
+.reader-contents a:hover { background: #80808020; }
+.reader-contents .reader-subsection { padding-inline-start: 24px; font-size: .92em; }
+.reader-prose, .report { overflow-wrap: anywhere; line-height: 1.8; }
+.reader-prose p, .reader-prose li { max-width: 85ch; }
+.reader-prose h2, .reader-prose h3, .reader-prose h4, [data-reader-heading] { scroll-margin-top: 100px; line-height: 1.45; }
+.reader-prose h2 { margin-top: 1.8em; padding-bottom: 8px; border-bottom: 1px solid var(--line, #64748b); }
+.reader-prose h3 { margin-top: 1.5em; }
+.reader-prose li { margin: .5em 0; }
+.reader-prose pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.reader-prose blockquote { margin: 16px 0; padding: 4px 16px; border-left: 3px solid var(--accent, #64748b); }
+.reader-table { overflow: auto; max-width: 100%; margin: 16px 0; border: 1px solid var(--line, #64748b); border-radius: 10px; }
+.reader-table table { border-collapse: collapse; width: 100%; margin: 0; font-size: .92rem; }
+.reader-table th, .reader-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line, #64748b); min-width: 110px; max-width: 400px; overflow-wrap: anywhere; white-space: normal; }
+.reader-table th { background: #80808018; }
+.reader-table tr:nth-child(even) { background: #80808008; }
+.reader-search { display: grid; gap: 8px; margin: 16px 0; }
+.reader-search label { font-weight: 700; }
+.reader-search input { box-sizing: border-box; width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line, #64748b); border-radius: 10px; background: var(--panel, #fff); color: var(--text, #132238); font: inherit; }
+.reader-search p { margin: 0; font-size: .86rem; }
+.reader-back { position: fixed; bottom: max(14px, env(safe-area-inset-bottom)); right: 14px; z-index: 30; min-height: 44px; border: 1px solid #778899; border-radius: 99px; padding: 10px 16px; background: #18344a; color: #fff; font: 700 14px system-ui; cursor: pointer; box-shadow: 0 3px 12px #0003; }
+[data-reader-source] { margin-top: 20px; }
+[data-reader-source] > summary { min-height: 44px; cursor: pointer; }
+[data-reader-source] pre { font-size: .85rem; }
+[data-reader-source] pre, .reader-prose { min-width: 0; }
+.reader-contents :focus-visible, .reader-search :focus-visible, .reader-back:focus-visible, .reader-table:focus-visible { outline: 3px solid var(--accent, #008c95); outline-offset: 3px; }
+.reader-search + .grid > [hidden] { display: none !important; }
+@media (max-width: 600px) { .reader-prose { font-size: 1rem; } .reader-contents { padding: 8px 12px; } }
+@media print { .reader-back, .reader-search, .reader-contents, [data-reader-source] { display: none !important; } .reader-table { overflow: visible; } .reader-prose { color: #000; background: #fff; } }
+</style><script>
+(() => {
+  'use strict';
+  let serial = 0;
+  const rendered = new WeakMap();
+  const node = (tag, text) => { const el = document.createElement(tag); if (text != null) el.textContent = text; return el; };
+  function inline(parent, text) {
+    const pattern = /(`[^`]+`|\*\*[^*]+\*\*|\[[^\]]+\]\(https?:\/\/[^\s)]+\))/g;
+    let start = 0;
+    for (const match of String(text).matchAll(pattern)) {
+      parent.append(document.createTextNode(text.slice(start, match.index)));
+      const value = match[0];
+      if (value.startsWith('`')) parent.append(node('code', value.slice(1, -1)));
+      else if (value.startsWith('**')) parent.append(node('strong', value.slice(2, -2)));
+      else {
+        const link = value.match(/^\[([^\]]+)\]\((.+)\)$/);
+        const a = node('a', link[1]); a.href = link[2]; a.rel = 'noopener noreferrer'; parent.append(a);
+      }
+      start = match.index + value.length;
+    }
+    parent.append(document.createTextNode(text.slice(start)));
+  }
+  const cells = line => line.trim().replace(/^\|/, '').replace(/\|$/, '').split(/(?<!\\)\|/).map(v => v.trim().replace(/\\\|/g, '|'));
+  function markdown(source) {
+    const article = node('article'); article.className = 'reader-prose';
+    const lines = source.split(/\r?\n/); let list = null;
+    for (let i = 0; i < lines.length; i += 1) {
+      const line = lines[i], value = line.trim();
+      if (!value) { list = null; continue; }
+      if (/^```/.test(value)) {
+        const code = []; i += 1;
+        while (i < lines.length && !/^```/.test(lines[i].trim())) code.push(lines[i++]);
+        const pre = node('pre'); pre.append(node('code', code.join('\n'))); article.append(pre); list = null; continue;
+      }
+      if (i + 1 < lines.length && value.includes('|') && cells(lines[i + 1]).every(v => /^:?-{3,}:?$/.test(v))) {
+        const table = node('table'), head = node('thead'), body = node('tbody');
+        const row = (values, tag) => { const tr = node('tr'); values.forEach(v => { const cell = node(tag); if (tag === 'th') cell.scope = 'col'; inline(cell, v); tr.append(cell); }); return tr; };
+        head.append(row(cells(line), 'th')); i += 2;
+        while (i < lines.length && lines[i].trim() && lines[i].includes('|')) body.append(row(cells(lines[i++]), 'td'));
+        i -= 1; table.append(head, body); article.append(table); list = null; continue;
+      }
+      const heading = value.match(/^(#{1,6})\s+(.+)$/);
+      if (heading) { const h = node('h' + Math.min(4, heading[1].length + 1)); inline(h, heading[2]); article.append(h); list = null; continue; }
+      const bullet = value.match(/^(?:[-*+] |\d+\. )(.+)$/);
+      if (bullet) {
+        const tag = /^\d/.test(value) ? 'ol' : 'ul';
+        if (!list || list.tagName.toLowerCase() !== tag) { list = node(tag); if (tag === 'ol') list.start = parseInt(value, 10); article.append(list); }
+        const li = node('li'); inline(li, bullet[1]); list.append(li); continue;
+      }
+      list = null;
+      if (/^(---+|\*\*\*+)$/.test(value)) { article.append(node('hr')); continue; }
+      const p = node(value.startsWith('> ') ? 'blockquote' : 'p'); inline(p, value.startsWith('> ') ? value.slice(2) : line); article.append(p);
+    }
+    return article;
+  }
+  function contents(root) {
+    root.querySelectorAll(':scope > .reader-contents').forEach(el => el.remove());
+    const headings = [...root.querySelectorAll('h2,h3,h4')].filter(h => !h.closest('.card,.run-card,.reader-contents,[data-reader-source],[hidden]'));
+    if (headings.length < 2) return;
+    const details = node('details'); details.className = 'reader-contents';
+    details.append(node('summary', '이 리포트 목차 · ' + headings.length + '개 항목'));
+    const nav = node('nav'); nav.setAttribute('aria-label', '리포트 목차');
+    headings.forEach(h => {
+      if (!h.id) h.id = 'reader-section-' + (++serial);
+      h.dataset.readerHeading = ''; h.tabIndex = -1;
+      const a = node('a', h.textContent); a.href = '#' + h.id;
+      if (h.tagName !== 'H2') a.className = 'reader-subsection';
+      a.addEventListener('click', event => {
+        event.preventDefault();
+        for (let ancestor = h.parentElement; ancestor; ancestor = ancestor.parentElement) if (ancestor.tagName === 'DETAILS') ancestor.open = true;
+        h.scrollIntoView({block: 'start'}); h.focus({preventScroll: true});
+      }); nav.append(a);
+    });
+    details.append(nav); root.prepend(details);
+  }
+  function enhance(root) {
+    if (!root) return;
+    root.querySelectorAll('pre[data-report-markdown]').forEach(pre => {
+      const previous = rendered.get(pre);
+      if (previous && previous.source === pre.textContent) return;
+      const article = markdown(pre.textContent);
+      if (previous) previous.article.replaceWith(article);
+      else {
+        const details = node('details'); details.dataset.readerSource = '';
+        details.append(node('summary', 'Markdown 원문 보기'));
+        pre.before(article, details); details.append(pre);
+      }
+      rendered.set(pre, {source: pre.textContent, article});
+    });
+    root.querySelectorAll('table').forEach(table => {
+      if (table.closest('.reader-table,.account-table-wrap,.summary-scroll')) return;
+      const wrap = node('div'); wrap.className = 'reader-table'; wrap.tabIndex = 0;
+      wrap.setAttribute('role', 'region'); wrap.setAttribute('aria-label', '리포트 표 · 가로로 스크롤하여 전체 보기');
+      table.before(wrap); wrap.append(table);
+    });
+    root.querySelectorAll('.grid').forEach(grid => {
+      const cards = [...grid.querySelectorAll(':scope > a.card')];
+      if (cards.length < 2 || grid.dataset.readerSearch) return;
+      grid.dataset.readerSearch = 'true';
+      const box = node('div'); box.className = 'reader-search';
+      const input = node('input'); input.type = 'search'; input.placeholder = '제목 · 종목 · 채널 · 키워드'; input.id = 'report-search-' + (++serial);
+      const label = node('label', '리포트 찾기'); label.htmlFor = input.id;
+      const status = node('p'); status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
+      const update = () => {
+        const terms = input.value.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean); let count = 0;
+        cards.forEach(card => { card.hidden = !terms.every(t => card.textContent.toLocaleLowerCase().includes(t)); if (!card.hidden) count += 1; });
+        status.textContent = cards.length + '개 중 ' + count + '개 표시' + (count ? '' : ' · 검색어를 지우거나 다른 키워드를 입력하세요.');
+      };
+      input.addEventListener('input', update); box.append(label, input, status); grid.before(box); update();
+    });
+    contents(root);
+  }
+  window.TradingAgentsReader = {enhance};
+  const main = document.querySelector('main');
+  if (main && !main.hasAttribute('data-reader-dynamic')) enhance(main);
+  if (main) {
+    const top = node('button', '↑ 맨 위'); top.type = 'button'; top.className = 'reader-back'; top.setAttribute('aria-label', '리포트 맨 위로 이동');
+    top.addEventListener('click', () => { const target = document.querySelector('h1') || main; target.tabIndex = -1; target.scrollIntoView({block: 'start'}); target.focus({preventScroll: true}); });
+    document.body.append(top);
+  }
+})();
+</script>
+</body>
+</html>

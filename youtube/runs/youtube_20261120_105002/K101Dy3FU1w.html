@@ -1,0 +1,653 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YouTube 투자자용 검증 리포트 - [#긴급인터뷰]  “하락 3파냐, 쌍바닥 대반등이냐!” 위기의 코스피 5,000… 한국증시 운명 가를 결정적 신호! (SK하이닉스) GFM투자연구소 이진우 소장</title>
+  <style>
+:root {
+  color-scheme: light;
+  --bg: #f7f8fb;
+  --panel: #ffffff;
+  --text: #172033;
+  --muted: #667085;
+  --line: #d9dee8;
+  --accent: #0f766e;
+  --accent-2: #2563eb;
+  --warn: #b45309;
+  --bad: #b42318;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0 56px; }
+a { color: var(--accent-2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.hero { padding: 28px 0 22px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+.hero.compact { padding-top: 12px; }
+.hero h1 { margin: 0; font-size: clamp(28px, 4vw, 44px); line-height: 1.15; letter-spacing: 0; }
+.hero p { max-width: 760px; color: var(--muted); margin: 12px 0 0; }
+.eyebrow { color: var(--accent); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0; margin: 0 0 8px; }
+section { margin: 28px 0; }
+h2, h3, h4, h5 { letter-spacing: 0; line-height: 1.25; }
+.synthesis-callout { padding: clamp(20px, 4vw, 34px); border: 1px solid #6ee7d8; border-radius: 18px; background: linear-gradient(135deg, #ecfdf9 0%, #eff6ff 100%); box-shadow: 0 18px 44px rgba(15, 118, 110, .12); }
+.synthesis-callout.unavailable { border-color: var(--line); background: var(--panel); box-shadow: none; }
+.synthesis-callout h2 { margin: 0; font-size: clamp(24px, 3.2vw, 36px); }
+.synthesis-callout .lead { max-width: 900px; font-size: 17px; color: #334155; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.primary-link, .secondary-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border-radius: 999px; font-weight: 800; }
+.primary-link { color: white; background: var(--accent); }
+.secondary-link { color: var(--accent-2); border: 1px solid #93c5fd; background: white; }
+.primary-link:hover, .secondary-link:hover { text-decoration: none; filter: brightness(.97); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.card, .run { display: flex; flex-direction: column; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; color: var(--text); min-height: 128px; }
+.run { padding: 16px; }
+.card:hover, .run:hover { border-color: var(--accent-2); text-decoration: none; }
+.thumb { display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #e9edf5; border-radius: 8px 8px 0 0; color: var(--muted); font-size: 13px; font-weight: 700; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb-empty span { padding: 0 14px; text-align: center; }
+.card-body { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 16px; }
+.card strong { line-height: 1.35; }
+.source-line { color: #3f4a5f; font-weight: 600; }
+.runs { display: grid; gap: 10px; }
+.badge { display: inline-flex; width: fit-content; border-radius: 999px; padding: 2px 9px; background: #e6f4f1; color: var(--accent); font-size: 12px; font-weight: 700; }
+.status-contradicted, .status-llm_failed { background: #fee4e2; color: var(--bad); }
+.status-unverified, .status-stale { background: #fff4d6; color: var(--warn); }
+small, .muted { color: var(--muted); }
+.topnav { display: flex; gap: 14px; margin-bottom: 16px; font-size: 14px; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px; }
+.stats span { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
+.report { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: min(5vw, 36px); }
+.report-head { border-bottom: 1px solid var(--line); margin-bottom: 24px; padding-bottom: 20px; }
+.report-head h1 { margin: 0; font-size: clamp(24px, 3.5vw, 38px); line-height: 1.2; }
+.meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+.scope-note { padding: 12px 14px; border-left: 4px solid var(--warn); border-radius: 6px; background: #fff7ed; color: #7c2d12; }
+.synthesis-report h2 { margin-top: 34px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.synthesis-report h3 { margin: 24px 0 8px; color: #0f4c5c; }
+.synthesis-report p, .synthesis-report li { overflow-wrap: anywhere; }
+pre { overflow: auto; background: #111827; color: #f9fafb; border-radius: 8px; padding: 14px; }
+code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+details { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 18px; }
+@media (max-width: 640px) {
+  main { width: min(100% - 20px, 1120px); padding-top: 18px; }
+  .report { padding: 18px; }
+  .synthesis-callout { border-radius: 14px; padding: 18px; }
+  .cta-row a { width: 100%; }
+  .mobile-report { border-radius: 12px; }
+}
+</style>
+</head>
+<body>
+  <main>
+<nav class="topnav"><a href="index.html">실행 목록</a><a href="../../index.html">YouTube 홈</a></nav>
+<article class="report">
+  <header class="report-head">
+    <p class="eyebrow">youtube_20261120_105002</p>
+    <h1>[#긴급인터뷰]  “하락 3파냐, 쌍바닥 대반등이냐!” 위기의 코스피 5,000… 한국증시 운명 가를 결정적 신호! (SK하이닉스) GFM투자연구소 이진우 소장</h1>
+    <div class="meta">
+      <span class="badge status-asr_uncertain">asr_uncertain</span>
+      <a href="https://www.youtube.com/watch?v=K101Dy3FU1w">원본 영상</a>
+    </div>
+  </header>
+  <h2>코스피 5,000선 공방: 쌍바닥과 하락 재개의 분기점</h2>
+<p><a href="https://www.youtube.com/watch?v=K101Dy3FU1w">815Money talk 인터뷰</a> · 2026년 11월 19일 공개</p>
+<p><strong>5,000선 부근은 확인됐지만, 바닥은 확인되지 않았다.</strong> 영상 공개 후 조회된 코스피 스냅샷은 4,905.70이었다. 이 한 점으로는 전저점 방어, 쌍바닥, 하락 추세 지속 중 어느 쪽도 판정할 수 없다. 투자자가 구분할 것은 <strong>반등이 나왔는지</strong>와 <strong>반등 이후에도 매수세가 이어지는지</strong>다. SK하이닉스 역시 영상의 PER 4.4배가 아니라, 그 배수의 분모인 이익이 유지될 수 있는지가 핵심이다.</p>
+<h3>확인된 사실과 근거의 범위</h3>
+<ul>
+<li><strong>코스피:</strong> 호스트가 2026년 11월 20일 02:14 UTC(한국시간 11:14)에 조회한 yfinance 스냅샷은 <strong>4,905.70</strong>이었다. 촬영 당시 지수나 확정 종가가 아니다. 함께 표시된 52주 고가 9,385.59와 저가 3,833.35에는 발생일이 없어 연초 수익률이나 고점 이후 하락 경로를 재현할 수 없다. 영상이 급락 시작일로 언급한 <strong>2026년 6월 20일은 토요일</strong>이므로, 실제 거래일은 인접 일별 시세와 원영상으로 다시 특정해야 한다.</li>
+<li><strong>미국 시장:</strong> <a href="https://finance.yahoo.com/markets/stocks/articles/us-equity-indexes-sink-widespread-223941525.html">MT Newswires의 미국 증시 약세·변동성 기사</a>와 <a href="https://finance.yahoo.com/markets/options/articles/wall-street-fear-gauge-went-170602257.html">24/7 Wall St.의 변동성 기사</a>는 영상 공개 후 게시된 <strong>제목만</strong> 확보됐다. 미국 시장의 변동성 확대가 보도됐다는 참고 자료이며, 촬영 당시 VIX의 수준이나 3월 고점 대비 방향, 한국 변동성과의 비교를 확인하지는 못한다.</li>
+<li><strong>검증 결과:</strong> 12개 주장 중 코스피 5,000선 부근만 부분 확인됐다. 10개는 미확인, 1개는 자막 판독 불확실로 분류됐다. 수집된 검색 결과 10건 가운데 주장을 직접 지지하거나 반박하는 자료는 없었다. KRX 일별 시세, 기업 공시·IR 원문, 비교 차트 원본도 제공되지 않았다.</li>
+</ul>
+<h3>영상 주장과 검증 상태</h3>
+<p>아래 링크는 <strong>관련 구간의 시작점</strong>이며 개별 발언의 정확한 시각은 아니다. 점수는 <code>source_confidence / asr_confidence</code> 순서로, 각각 영상 내 주장 추출의 신뢰도와 자막 판독의 신뢰도다. <strong>사실일 확률을 뜻하지 않는다.</strong></p>
+<p>| 영상 주장 | 확인된 사실·한계 |</p>
+<p>|---|---|</p>
+<p>| <strong>코스피 경로</strong> <a href="https://www.youtube.com/watch?v=K101Dy3FU1w&amp;t=5s">00:00:05</a> · 0.94 / 0.75 — 연초 대비 한때 100% 넘게 오른 뒤 7,000선에서 수 주~약 한 달 사이 약 2,000포인트 하락했다는 설명. 전저점을 지키면 쌍바닥, 반등이 추세선에 막히면 하락 C파가 이어질 수 있다는 해석. | 5,000선 부근만 부분 확인. 연초 수익률, 하락 기간, 앞선 장대 양봉 이후 경로는 미확인이다. 4,500선은 하방 시나리오, 3,000~4,000대는 추가 하락 우려, 최소 1년 조정은 출연자 전망이지 관측값이 아니다. |</p>
+<p>| <strong>시장 폭과 해외 비교</strong> <a href="https://www.youtube.com/watch?v=K101Dy3FU1w&amp;t=5s">00:00:05</a> · 제외 지수 0.94 / 0.83, 해외 비교 0.89 / 0.90 — 삼성전자·SK하이닉스를 빼면 연초 상승분이 없고, 최근 1년 수익률은 필라델피아 반도체지수 47% 초과, 대만 43%대, 코스피 28%라는 주장. | 제외 지수의 재가중 방식과 원본 차트가 없고, 해외 비교는 기준일·통화·가격수익률과 총수익률의 구분이 없다. 두 종목 쏠림의 크기나 국가별 순위를 확정할 수 없다. |</p>
+<p>| <strong>수급과 변동성</strong> <a href="https://www.youtube.com/watch?v=K101Dy3FU1w&amp;t=430s">00:07:10</a> · 0.94 / 0.74, <a href="https://www.youtube.com/watch?v=K101Dy3FU1w&amp;t=1306s">00:21:46</a> · 0.89 / 0.67 — 반도체 포지션 쏠림과 레버리지 청산이 낙폭을 키웠고, 한국 변동성이 6~7월 코로나 시기를 웃돌았다는 설명. | 현물·선물 수급, 공매도 잔고, 신용융자 및 한미 변동성 시계열이 없다. 한국 변동성 지표명과 외국인 매도 수치·단위도 불명확하다. 헤지펀드 청산이나 특정 주체의 투기적 의도를 지수 하락만으로 확인할 수 없다. |</p>
+<p>| <strong>SK하이닉스</strong> <a href="https://www.youtube.com/watch?v=K101Dy3FU1w&amp;t=879s">00:14:39</a> · 0.86 / 0.73 — PER 4.4배와 EPS 약 26만 원을 제시하고, 2023년 저점 이후 상승분의 61.8% 되돌림과 주봉 지지를 언급했다. | PER의 선행·후행 구분과 EPS 산정 기간이 없다. 제시된 매출 79.3조 원, 영업이익 60조 원, 순이익 약 94조 원은 동일 기간·동일 회계 기준으로 확인되지 않아 마진 계산에 쓸 수 없다. 수정주가와 기준 고점·저점이 없어 되돌림과 주봉 지지도 재현할 수 없다. |</p>
+<p>| <strong>엔비디아·AI 공급망</strong> <a href="https://www.youtube.com/watch?v=K101Dy3FU1w&amp;t=430s">00:07:10</a> · 0.86 / 0.75, <a href="https://www.youtube.com/watch?v=K101Dy3FU1w&amp;t=879s">00:14:39</a> · 0.86 / 0.78 — 엔비디아 매출 78% 증가 전망, 공급망의 70~80% 마진, 2028년까지 물량 소진을 언급했다. | 78%가 공식 가이던스인지, 분기·연간 중 어느 기간인지 확인되지 않았다. 마진은 지표 정의와 적용 범위가 없고, 물량은 대상 제품·고객·확정 계약 여부가 불명확하다. 실적 발표와 시장 하락의 시간 관계도 미확인이다. |</p>
+<p><strong>보조 사례와 정책:</strong> <a href="https://www.youtube.com/watch?v=K101Dy3FU1w&amp;t=430s">00:07:10 구간</a>의 에코프로비엠(0.89 / 0.74)은 고점 대비 낙폭이 저평가를 뜻하지 않는다는 사례이고, 위메이드맥스(0.91 / 0.84)는 테마성 급등이 실적 개선을 뜻하지 않는다는 사례다. 전자의 수정주가·반기 실적·밸류에이션과 후자의 장중 상한가·종가·3분기 실적·회담 일정은 미확인이다. <a href="https://www.youtube.com/watch?v=K101Dy3FU1w&amp;t=1306s">00:21:46 구간</a>의 10조 원 대비 100조 원 기금 발언(0.94 / 0.79)은 제안 원문과 공식 채택·집행 모두 확인되지 않았다. 4,500선 하락을 부정한 타 방송 인용도 <a href="https://www.youtube.com/watch?v=K101Dy3FU1w&amp;t=5s">00:00:05 구간</a>에서 소개됐지만, 자막 판독 신뢰도 0.56으로 화자와 맥락 확인이 필요하다.</p>
+<h3>상승 논리, 반론, 무효화 조건</h3>
+<ul>
+<li><strong>쌍바닥에 무게가 실리는 조건:</strong> 실제 전저점을 확인한 뒤 재시험에서 종가 기준으로 방어하고, 5일·20일 이동평균선과 하락 추세선을 회복한 뒤에도 지지가 유지되는 경우다. 외국인 현물 순매수가 여러 거래일 이어지고 상승 종목 수가 늘며 미국 반도체·메모리주도 안정된다면, 두 대형주의 단기 반등보다 설득력이 높다. 전저점 이탈 후 회복하지 못하면 이 가설은 약해진다.</li>
+<li><strong>하락 재개에 무게가 실리는 조건:</strong> 공매도 잔고가 줄며 지수가 반등해도 외국인 현물 매수나 시장 폭 개선이 뒤따르지 않고, 추세선 아래에서 반등이 꺾이면 숏커버에 그쳤을 가능성이 남는다. 영상의 5,500~5,600 반등 범위, 5,500~6,000·6,000~7,300 매물 구간 및 6,500 전후 저항은 검증된 가격대가 아니다. 반대로 추세선을 회복한 뒤 재차 밀리지 않고 더 높은 저점을 만들면 하락 재개 해석은 약해진다.</li>
+<li><strong>SK하이닉스의 이익 지속성:</strong> DRAM 가격과 빅테크 AI 설비투자 계획이 유지되고, 공시 실적과 이익 추정치가 이를 뒷받침한다면 낮은 배수가 의미를 가질 수 있다. 반대로 메모리 가격 약세나 설비투자 하향으로 이익 전망이 내려가면 주가가 그대로여도 PER은 높아진다. 낮은 배수나 주봉 지지만으로 이익 둔화 위험이 해소됐다고 볼 수 없다.</li>
+</ul>
+<h3>가까운 시일에 볼 지표</h3>
+<p>| 시점 | 관찰 항목과 판독 기준 |</p>
+<p>|---|---|</p>
+<p>| <strong>향후 수 거래일</strong> | KRX 일별 시세로 촬영 전후 전저점과 5일·20일선을 먼저 특정한다. 장중 돌파와 종가 회복을 구분하고, 다음 거래일에도 지지가 유지되는지 본다. 외국인 현물·선물 순매매, 상승·하락 종목 수, 삼성전자·SK하이닉스를 제외한 시장 흐름을 함께 비교한다. |</p>
+<p>| <strong>다음 잔고·변동성 자료 갱신</strong> | 공매도 순보유잔고·대차잔고·신용융자를 가격과 나란히 본다. 잔고 감소와 지수 반등이 겹쳐도 청산 주체나 원인을 단정하지 않는다. 미국 반도체지수와 VIX, 명칭을 확인한 국내 변동성 지표는 관측 시차를 맞춰 비교한다. |</p>
+<p>| <strong>다음 실적·가이던스 발표</strong> | SK하이닉스 공시·IR에서 연결 실적과 EPS 기준을 확인하고 같은 시점의 주가로 PER을 다시 계산한다. 엔비디아 IR·공시에서 실제 성장률과 공식 전망을 분리한다. DRAM 계약가와 현물가, 빅테크의 집행액과 향후 설비투자 계획, 공개된 확정 공급 물량을 따로 추적한다. |</p>
+<p><strong>데이터 품질 및 수동 확인:</strong> 한국어 자동자막 843개로 산정된 <code>transcript_quality</code>는 <code>good</code>(1.0)이지만, 이는 자막 자료의 품질 평가이지 날짜·단위·화자나 시장 수치의 정확성 보증이 아니다. <strong>Bloomberg·Morningstar 원자료와 당시 유료 컨센서스·조회 화면은 미확인(수동 확인 필요)</strong>이다. 비공개 차트 산식, 개별 펀드의 청산·장외 레버리지, 고객별 공급계약과 마진, 비공개·삭제 방송 및 회의 기록에 의존하는 주장도 원자료 확보 전까지 미확인으로 남는다.</p>
+  <details>
+    <summary>공개 요약 JSON</summary>
+    <pre>{
+  &quot;version&quot;: 4,
+  &quot;video_id&quot;: &quot;K101Dy3FU1w&quot;,
+  &quot;title&quot;: &quot;[#긴급인터뷰]  “하락 3파냐, 쌍바닥 대반등이냐!” 위기의 코스피 5,000… 한국증시 운명 가를 결정적 신호! (SK하이닉스) GFM투자연구소 이진우 소장&quot;,
+  &quot;url&quot;: &quot;https://www.youtube.com/watch?v=K101Dy3FU1w&quot;,
+  &quot;channel&quot;: &quot;815Money talk&quot;,
+  &quot;channel_id&quot;: &quot;UCCG6BEYjfQMGzypJw2EJCDQ&quot;,
+  &quot;source_url&quot;: &quot;https://www.youtube.com/@815moneytalk/videos&quot;,
+  &quot;thumbnail_url&quot;: &quot;https://i.ytimg.com/vi/K101Dy3FU1w/maxresdefault.jpg&quot;,
+  &quot;published_at&quot;: &quot;2026-11-19T08:00:11+00:00&quot;,
+  &quot;status&quot;: &quot;asr_uncertain&quot;,
+  &quot;strategy_source_tier&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_evidence_weight&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_validation_policy&quot;: &quot;STANDARD_REVIEW&quot;,
+  &quot;transcript_status&quot;: &quot;available&quot;,
+  &quot;transcript_source&quot;: &quot;automatic&quot;,
+  &quot;transcript_chars&quot;: 12282,
+  &quot;transcript_quality&quot;: {
+    &quot;status&quot;: &quot;good&quot;,
+    &quot;score&quot;: 1.0,
+    &quot;warnings&quot;: [],
+    &quot;source&quot;: &quot;automatic&quot;,
+    &quot;language&quot;: &quot;Korean (Original)&quot;,
+    &quot;model_or_format&quot;: &quot;json3&quot;,
+    &quot;chars&quot;: 12282,
+    &quot;segments&quot;: 843,
+    &quot;duration_seconds&quot;: 1671,
+    &quot;repeated_ngram_ratio&quot;: 0.001
+  },
+  &quot;generated_at&quot;: &quot;2026-11-20T10:50:02.650390+09:00&quot;,
+  &quot;llm_status&quot;: &quot;success&quot;,
+  &quot;research_status&quot;: &quot;success&quot;,
+  &quot;claim_verification_status&quot;: &quot;success&quot;,
+  &quot;research_pipeline_version&quot;: 4,
+  &quot;evidence_count&quot;: 10,
+  &quot;claim_status_summary&quot;: {
+    &quot;partially_supported&quot;: 1,
+    &quot;unverified&quot;: 10,
+    &quot;asr_uncertain&quot;: 1
+  },
+  &quot;claims&quot;: [
+    {
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;claim_text&quot;: &quot;방송은 코스피가 2026년 연초 대비 한때 100% 넘게 상승한 뒤 7,000선에서 횡보하다 수 주~약 한 달 만에 약 2,000포인트 하락했다고 설명했다. 6월 20일 급락 시작과 장대 양봉 이후 V자 반등 실패는 검증 대상이다. 전저점 방어에 따른 쌍바닥과 하락 추세선 저항에 따른 C파는 경쟁 시나리오이며, 4,500은 하방 가능성, 3,000~4,000대는 시장의 우려, 최소 1년 조정은 출연자의 전망이다.&quot;,
+      &quot;status&quot;: &quot;partially_supported&quot;,
+      &quot;confidence&quot;: 0.25,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:05&quot;,
+      &quot;source_confidence&quot;: 0.94,
+      &quot;asr_confidence&quot;: 0.75,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;연초 대비 100% 초과 상승; 7,000선에서 약 2,000포인트 하락; 6월 20일; 하방 4,500 및 3,000~4,000대 우려; 최소 1년 조정 전망&quot;,
+        &quot;observed&quot;: &quot;방송 공개 이후 조회 스냅샷 4,905.70; 52주 고가 9,385.59, 저가 3,833.35; 촬영일 및 일별 시세 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;전저점 유지와 5일·20일 이동평균 및 하락 추세선 돌파를 구분해 관찰하되, 영상의 지수 수준을 확정 목표치로 사용하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;claim_text&quot;: &quot;송재경 대표의 차트는 삼성전자·SK하이닉스를 제외한 코스피의 2026년 연초 이후 상승분이 없었다고 제시했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:05&quot;,
+      &quot;source_confidence&quot;: 0.94,
+      &quot;asr_confidence&quot;: 0.83,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;두 종목 제외 코스피의 연초 대비 상승분 없음&quot;,
+        &quot;observed&quot;: &quot;제외 지수 수익률 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;두 종목을 제외한 수익률을 재현하기 전에는 반도체 쏠림의 크기를 이 수치로 단정하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;claim_text&quot;: &quot;영상의 최근 1년 표본에서 필라델피아 반도체지수는 47% 초과로 1위, 대만은 43%대, 코스피는 28%였다. 코스닥은 인도네시아 다음으로 부진했고, 중국·홍콩의 해당 지수는 하락했으며 일본과 미국 주요 지수는 코스피를 밑돌았다고 설명했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:05&quot;,
+      &quot;source_confidence&quot;: 0.89,
+      &quot;asr_confidence&quot;: 0.9,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;최근 1년 필라델피아 반도체지수 47% 초과, 대만 43%대, 코스피 28%&quot;,
+        &quot;observed&quot;: &quot;비교 지수별 기간 수익률과 순위 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;공통 기준으로 재계산하기 전에는 영상의 순위를 국가·섹터 배분 근거로 쓰지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;claim_text&quot;: &quot;출연진은 빅테크 실적·설비투자 신호가 양호했는데도 급락한 배경으로 4~6월 반도체 포지션 쏠림, 과도한 레버리지와 수급을 지목했다. 헤지펀드 청산과 투기적 공매도는 미확인 주장이고, 숏스퀴즈와 외국인 순매수 전환은 반등 가설이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:07:10&quot;,
+      &quot;source_confidence&quot;: 0.94,
+      &quot;asr_confidence&quot;: 0.74,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;2026년 4~6월 반도체 포지션 쏠림; 외국인 매도 수치·단위 불명&quot;,
+        &quot;observed&quot;: &quot;포지션·수급·레버리지 시계열 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;외국인 순매수의 지속성과 공매도 잔고 변화를 별도로 확인해 숏커버성 반등과 추세 전환을 구분한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;claim_text&quot;: &quot;방송은 한국 변동성 지표가 2026년 6~7월 코로나 구간보다 높았고 이후 다시 상승했다고 설명했다. 미국 VIX는 2026년 3월 고점보다 낮지만 일간 상승 조짐이 있다고 봤으며, 2008년·코로나·2024년 급등·2025년 상호관세·2026년 3월 이란 관련 사건을 비교했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:21:46&quot;,
+      &quot;source_confidence&quot;: 0.89,
+      &quot;asr_confidence&quot;: 0.67,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;한국 2026년 6~7월 변동성 지표가 코로나 시기보다 높음; 미국 VIX는 2026년 3월 고점 미만이나 일간 상승 조짐&quot;,
+        &quot;observed&quot;: &quot;촬영 전후 및 비교 구간의 지표값 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;한미 지표를 같은 거래일·관측 기준으로 대조하기 전에는 변동성 격차나 추세 변화로 해석하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;claim_text&quot;: &quot;영상은 PER 4.4배, EPS 약 26만 원, 매출 79조 3,000억 원, 영업이익 60조 원, 순이익 약 94조 원을 제시했다. 기술적으로는 2023년 73,000원 저점 이후 랠리의 61.8% 되돌림과 주봉 지지·RSI를 언급했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:14:39&quot;,
+      &quot;source_confidence&quot;: 0.86,
+      &quot;asr_confidence&quot;: 0.73,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;PER 4.4배, EPS 약 26만 원, 매출 79조 3,000억 원, 영업이익 60조 원, 순이익 약 94조 원; 73,000원 저점, 61.8% 되돌림&quot;,
+        &quot;observed&quot;: &quot;해당 기업 공시·당시 주가·주봉 자료 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;4.4배의 선행·후행 구분과 EPS 기준을 먼저 확인한다. 선행 수치라면 메모리 가격과 AI 설비투자 변화에 따른 이익 추정 민감도를 따로 본다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;claim_text&quot;: &quot;방송은 직전 엔비디아 실적이 강했고 ‘내년도 매출 78% 증가’ 전망이 나왔다고 소개했다. 공식 가이던스인지, 분기·연간 중 어느 기간인지, 시장 급락과 실제로 같은 거래 구간인지는 확인되지 않았다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:07:10&quot;,
+      &quot;source_confidence&quot;: 0.86,
+      &quot;asr_confidence&quot;: 0.75,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;내년도 매출 78% 증가 전망&quot;,
+        &quot;observed&quot;: &quot;공식 전망치, 회계기간 및 전년 비교 기준 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;78%를 회사의 연간 가이던스로 인용하지 말고, 공식 전망·시장 컨센서스·실적 성장률을 구분한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;claim_text&quot;: &quot;출연진은 SK하이닉스와 엔비디아의 마진을 70~80%로 묘사하고 다른 대목에서 50%도 언급했다. 2028년까지 완판이라는 주장에는 제품·계약 범위가 없었다. 빅테크가 경쟁 때문에 투자를 멈추기 어렵다는 부분은 해석이며, DRAM 가격·설비투자가 이익 추정치에 미치는 영향은 조건부다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:14:39&quot;,
+      &quot;source_confidence&quot;: 0.86,
+      &quot;asr_confidence&quot;: 0.78,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;마진 70~80% 및 별도 대목 50%; 2028년까지 완판&quot;,
+        &quot;observed&quot;: &quot;마진 정의·회계기간·확정 계약 물량 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;공시된 설비투자와 계약 물량만 기본 전망에 반영하고, 고마진 지속과 공급 부족은 별도 시나리오로 본다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;claim_text&quot;: &quot;방송은 2023년 7월 고점 574,800원, 이후 8만 원대에서 23만~25만 원까지 반등했다가 방송 당시 약 83,000원으로 돌아왔다고 설명했다. 시총 약 9조 원, 6월 기준 순손실과 영업이익 180억 원도 언급했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:07:10&quot;,
+      &quot;source_confidence&quot;: 0.89,
+      &quot;asr_confidence&quot;: 0.74,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;574,800원; 8만 원대→23만~25만 원→약 83,000원; 시총 약 9조 원; 6월 순손실·영업이익 180억 원&quot;,
+        &quot;observed&quot;: &quot;해당 기업 주가·시총·실적 공시 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;고점 대비 하락률이 아니라 동일 기준의 실적과 시가총액으로 밸류에이션을 판단한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C10&quot;,
+      &quot;claim_text&quot;: &quot;방송은 한중 관계 개선 기대 속에 위메이드맥스가 방송 중 4,000원대에서 상한가였다고 전했다. 2021년 63,000원, EPS 약 -570원, 시총 3,549억 원, 9월 기준 영업·순손실과 PER 미표시도 검증 대상이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:07:10&quot;,
+      &quot;source_confidence&quot;: 0.91,
+      &quot;asr_confidence&quot;: 0.84,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;2021년 63,000원; 방송 중 4,000원대 상한가; EPS 약 -570원; 시총 3,549억 원; 9월 영업·순손실, PER 미표시&quot;,
+        &quot;observed&quot;: &quot;해당 기업 거래기록·실적 공시 및 회담 일정 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;테마에 따른 가격 움직임과 공시로 확인되는 이익 변화를 분리해 평가한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C11&quot;,
+      &quot;claim_text&quot;: &quot;박세익 대표가 10조 원 규모로는 부족하다며 100조 원 기금을 제안했다고 소개됐다. 제안과 공식 정책 채택은 별개다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:21:46&quot;,
+      &quot;source_confidence&quot;: 0.94,
+      &quot;asr_confidence&quot;: 0.79,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;10조 원으로 부족; 100조 원 규모 기금 제안&quot;,
+        &quot;observed&quot;: &quot;제안 및 공식 채택·집행 금액 미확인&quot;
+      },
+      &quot;investor_implication&quot;: &quot;제안 원문과 당국의 승인·재원·집행을 각각 확인하기 전에는 정책 수급을 기본 시나리오에 반영하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C12&quot;,
+      &quot;claim_text&quot;: &quot;방송은 10월 8일 이주한의 삼성전자 7만 원·SK하이닉스 20만 원 언급과 이후 재언급, 11월 3일경 성상현의 ‘최악 반영·2028년부터 기회’ 썸네일, 11월 14일로 보이는 염승환의 불확실성 완화 견해, 인포맥스 라이브의 4,500선 하락 부정 견해를 소개했다.&quot;,
+      &quot;status&quot;: &quot;asr_uncertain&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:05&quot;,
+      &quot;source_confidence&quot;: 0.94,
+      &quot;asr_confidence&quot;: 0.56,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;10월 8일, 11월 3일경, 11월 14일 추정; 삼성전자 7만 원, SK하이닉스 20만 원, 2028년, 코스피 4,500선&quot;,
+        &quot;observed&quot;: &quot;인용 원본과 게시일·발언 시각 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;원본에서 화자와 전후 문맥을 확인하기 전에는 가격 예시를 목표가로, 썸네일 문구를 직접 발언으로 인용하지 않는다.&quot;
+    }
+  ],
+  &quot;entities&quot;: [
+    {
+      &quot;ticker&quot;: &quot;^KS11&quot;,
+      &quot;name&quot;: &quot;코스피·한국 증시&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;송재경 대표의 비교 차트에 따르면 삼성전자와 SK하이닉스를 제외한 코스피에는 연초 대비 상승분이 없었다.&quot;,
+        &quot;출연진은 빅테크 실적과 설비투자 신호가 양호했는데도 급락했다며, 실적 악화보다 과도한 레버리지와 수급을 원인으로 지목했다.&quot;,
+        &quot;전저점 방어 시 쌍바닥이 가능하지만, 앞선 장대 양봉은 V자 반등으로 이어지지 않았다. 출연자는 5,000선 반등 뒤에도 4,500선을 하방 가능성으로 열어뒀다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;코스피는 연초 대비 한때 100% 넘게 상승했다고 소개됐다. 7,000선 횡보 뒤 수 주~약 한 달 사이 약 2,000포인트 하락했다는 발언이 나왔다.&quot;,
+        &quot;출연자는 6월 20일부터 급락했다고 설명했다. 3,000~4,000대는 시장 참여자의 추가 하락 우려로 언급됐으며, 인포맥스 라이브에서는 4,500선에 가지 않을 것이라는 반대 견해가 소개됐다.&quot;,
+        &quot;숏스퀴즈가 나오면 5,500~5,600까지 반등할 수 있다는 견해가 소개됐다. 5일선·20일선·하락 추세선과 6,500 전후, 5,500~6,000 및 6,000~7,300 구간의 매물 부담이 언급됐다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;^KS11&quot;,
+        &quot;as_of&quot;: &quot;2026-11-20T02:14:20.777476+00:00&quot;,
+        &quot;current_price&quot;: 4905.7001953125,
+        &quot;market_cap&quot;: null,
+        &quot;forward_pe&quot;: null,
+        &quot;trailing_pe&quot;: null,
+        &quot;fifty_two_week_high&quot;: 9385.59,
+        &quot;fifty_two_week_low&quot;: 3833.35,
+        &quot;average_target_price&quot;: null,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    }
+  ],
+  &quot;evidence&quot;: [
+    {
+      &quot;evidence_id&quot;: &quot;E1&quot;,
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;title&quot;: &quot;Brazilian Real Weakness Hammers Sugar Prices&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/commodities/articles/brazilian-real-weakness-hammers-sugar-192314318.html&quot;,
+      &quot;publisher&quot;: &quot;Barchart&quot;,
+      &quot;published_at&quot;: &quot;2026-11-19T19:23:14+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Brazilian Real Weakness Hammers Sugar Prices Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 2026 Elections Weather Newsletters Finance My po...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E2&quot;,
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;title&quot;: &quot;Sugar Prices Plummet with the Brazilian Real&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/commodities/articles/sugar-prices-plummet-brazilian-real-172849298.html&quot;,
+      &quot;publisher&quot;: &quot;Barchart&quot;,
+      &quot;published_at&quot;: &quot;2026-11-19T17:28:49+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Sugar Prices Plummet with the Brazilian Real Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 2026 Elections Weather Newsletters Finance My po...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E4&quot;,
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;title&quot;: &quot;Here&#x27;s Why Anthropic&#x27;s IPO Was a Historic Success&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/heres-why-anthropics-ipo-historic-020205223.html&quot;,
+      &quot;publisher&quot;: &quot;Motley Fool&quot;,
+      &quot;published_at&quot;: &quot;2026-11-20T02:02:05+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Here&#x27;s Why Anthropic&#x27;s IPO Was a Historic Success Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 2026 Elections Weather Newsletters Finance...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E5&quot;,
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;title&quot;: &quot;Update: US Equity Indexes Sink as Widespread Sell-Off, Volatility Spike Mar Anthropic&#x27;s Historic Debut on Nasdaq&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/us-equity-indexes-sink-widespread-223941525.html&quot;,
+      &quot;publisher&quot;: &quot;MT Newswires&quot;,
+      &quot;published_at&quot;: &quot;2026-11-19T22:39:41+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E6&quot;,
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;title&quot;: &quot;Wall Street’s Fear Gauge Went From 16.61 to 28.18 in a Single Day in November. Why It Keeps Snapping Back&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/options/articles/wall-street-fear-gauge-went-170602257.html&quot;,
+      &quot;publisher&quot;: &quot;24/7 Wall St.&quot;,
+      &quot;published_at&quot;: &quot;2026-11-19T17:06:02+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E7&quot;,
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;title&quot;: &quot;He’s 66 and Bought $250,000 of Gold to Live On Until Social Security at 70. With the Precious Metal at a New Low for the Year, Claiming at 67 Instead Costs H...&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/commodities/articles/66-bought-250-000-gold-020243335.html&quot;,
+      &quot;publisher&quot;: &quot;24/7 Wall St.&quot;,
+      &quot;published_at&quot;: &quot;2026-11-20T02:02:43+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E8&quot;,
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;title&quot;: &quot;If you invested $1,000 in Bitcoin or gold instead of GTA V, here&#x27;s what you&#x27;d have today&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/crypto/articles/invested-1-000-bitcoin-gold-013000550.html&quot;,
+      &quot;publisher&quot;: &quot;TheStreet&quot;,
+      &quot;published_at&quot;: &quot;2026-11-20T01:30:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E9&quot;,
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;title&quot;: &quot;Dow Jones Futures: Techs Slide, Anthropic Retreats After Ugly Market Reversal To New Lows&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/m/9e02231d-41cd-31ac-b37f-993325b8a4ca/dow-jones-futures%3A-techs.html&quot;,
+      &quot;publisher&quot;: &quot;Investor&#x27;s Business Daily&quot;,
+      &quot;published_at&quot;: &quot;2026-11-20T01:55:32+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E10&quot;,
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;title&quot;: &quot;Recycled Metal - Global Market Size, Share, Industry Trends and Growth Forecast 2026-2031 | Decarbonization and Electrification Drive a $191.86 Billion Reven...&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/commodities/articles/recycled-metal-global-market-size-161600643.html&quot;,
+      &quot;publisher&quot;: &quot;GlobeNewswire&quot;,
+      &quot;published_at&quot;: &quot;2026-11-19T16:16:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    }
+  ],
+  &quot;source_policy&quot;: {
+    &quot;raw_transcript_published&quot;: false,
+    &quot;raw_transcript_in_evidence&quot;: false,
+    &quot;research_pipeline_version&quot;: 4,
+    &quot;closed_source_claims&quot;: &quot;unverified_external_source&quot;,
+    &quot;auto_caption_warning&quot;: true,
+    &quot;local_asr_warning&quot;: false
+  }
+}</pre>
+  </details>
+</article>
+</main>
+  <style>
+.reader-contents { margin: 16px 0; padding: 12px 16px; border: 1px solid var(--line, #64748b); border-radius: 12px; }
+.reader-contents > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-weight: 750; }
+.reader-contents nav { display: grid; gap: 4px; max-height: 45vh; overflow: auto; margin: 8px 0; }
+.reader-contents a { display: block; min-height: 44px; padding: 10px; border-radius: 6px; color: inherit; overflow-wrap: anywhere; }
+.reader-contents a:hover { background: #80808020; }
+.reader-contents .reader-subsection { padding-inline-start: 24px; font-size: .92em; }
+.reader-prose, .report { overflow-wrap: anywhere; line-height: 1.8; }
+.reader-prose p, .reader-prose li { max-width: 85ch; }
+.reader-prose h2, .reader-prose h3, .reader-prose h4, [data-reader-heading] { scroll-margin-top: 100px; line-height: 1.45; }
+.reader-prose h2 { margin-top: 1.8em; padding-bottom: 8px; border-bottom: 1px solid var(--line, #64748b); }
+.reader-prose h3 { margin-top: 1.5em; }
+.reader-prose li { margin: .5em 0; }
+.reader-prose pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.reader-prose blockquote { margin: 16px 0; padding: 4px 16px; border-left: 3px solid var(--accent, #64748b); }
+.reader-table { overflow: auto; max-width: 100%; margin: 16px 0; border: 1px solid var(--line, #64748b); border-radius: 10px; }
+.reader-table table { border-collapse: collapse; width: 100%; margin: 0; font-size: .92rem; }
+.reader-table th, .reader-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line, #64748b); min-width: 110px; max-width: 400px; overflow-wrap: anywhere; white-space: normal; }
+.reader-table th { background: #80808018; }
+.reader-table tr:nth-child(even) { background: #80808008; }
+.reader-search { display: grid; gap: 8px; margin: 16px 0; }
+.reader-search label { font-weight: 700; }
+.reader-search input { box-sizing: border-box; width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line, #64748b); border-radius: 10px; background: var(--panel, #fff); color: var(--text, #132238); font: inherit; }
+.reader-search p { margin: 0; font-size: .86rem; }
+.reader-back { position: fixed; bottom: max(14px, env(safe-area-inset-bottom)); right: 14px; z-index: 30; min-height: 44px; border: 1px solid #778899; border-radius: 99px; padding: 10px 16px; background: #18344a; color: #fff; font: 700 14px system-ui; cursor: pointer; box-shadow: 0 3px 12px #0003; }
+[data-reader-source] { margin-top: 20px; }
+[data-reader-source] > summary { min-height: 44px; cursor: pointer; }
+[data-reader-source] pre { font-size: .85rem; }
+[data-reader-source] pre, .reader-prose { min-width: 0; }
+.reader-contents :focus-visible, .reader-search :focus-visible, .reader-back:focus-visible, .reader-table:focus-visible { outline: 3px solid var(--accent, #008c95); outline-offset: 3px; }
+.reader-search + .grid > [hidden] { display: none !important; }
+@media (max-width: 600px) { .reader-prose { font-size: 1rem; } .reader-contents { padding: 8px 12px; } }
+@media print { .reader-back, .reader-search, .reader-contents, [data-reader-source] { display: none !important; } .reader-table { overflow: visible; } .reader-prose { color: #000; background: #fff; } }
+</style><script>
+(() => {
+  'use strict';
+  let serial = 0;
+  const rendered = new WeakMap();
+  const node = (tag, text) => { const el = document.createElement(tag); if (text != null) el.textContent = text; return el; };
+  function inline(parent, text) {
+    const pattern = /(`[^`]+`|\*\*[^*]+\*\*|\[[^\]]+\]\(https?:\/\/[^\s)]+\))/g;
+    let start = 0;
+    for (const match of String(text).matchAll(pattern)) {
+      parent.append(document.createTextNode(text.slice(start, match.index)));
+      const value = match[0];
+      if (value.startsWith('`')) parent.append(node('code', value.slice(1, -1)));
+      else if (value.startsWith('**')) parent.append(node('strong', value.slice(2, -2)));
+      else {
+        const link = value.match(/^\[([^\]]+)\]\((.+)\)$/);
+        const a = node('a', link[1]); a.href = link[2]; a.rel = 'noopener noreferrer'; parent.append(a);
+      }
+      start = match.index + value.length;
+    }
+    parent.append(document.createTextNode(text.slice(start)));
+  }
+  const cells = line => line.trim().replace(/^\|/, '').replace(/\|$/, '').split(/(?<!\\)\|/).map(v => v.trim().replace(/\\\|/g, '|'));
+  function markdown(source) {
+    const article = node('article'); article.className = 'reader-prose';
+    const lines = source.split(/\r?\n/); let list = null;
+    for (let i = 0; i < lines.length; i += 1) {
+      const line = lines[i], value = line.trim();
+      if (!value) { list = null; continue; }
+      if (/^```/.test(value)) {
+        const code = []; i += 1;
+        while (i < lines.length && !/^```/.test(lines[i].trim())) code.push(lines[i++]);
+        const pre = node('pre'); pre.append(node('code', code.join('\n'))); article.append(pre); list = null; continue;
+      }
+      if (i + 1 < lines.length && value.includes('|') && cells(lines[i + 1]).every(v => /^:?-{3,}:?$/.test(v))) {
+        const table = node('table'), head = node('thead'), body = node('tbody');
+        const row = (values, tag) => { const tr = node('tr'); values.forEach(v => { const cell = node(tag); if (tag === 'th') cell.scope = 'col'; inline(cell, v); tr.append(cell); }); return tr; };
+        head.append(row(cells(line), 'th')); i += 2;
+        while (i < lines.length && lines[i].trim() && lines[i].includes('|')) body.append(row(cells(lines[i++]), 'td'));
+        i -= 1; table.append(head, body); article.append(table); list = null; continue;
+      }
+      const heading = value.match(/^(#{1,6})\s+(.+)$/);
+      if (heading) { const h = node('h' + Math.min(4, heading[1].length + 1)); inline(h, heading[2]); article.append(h); list = null; continue; }
+      const bullet = value.match(/^(?:[-*+] |\d+\. )(.+)$/);
+      if (bullet) {
+        const tag = /^\d/.test(value) ? 'ol' : 'ul';
+        if (!list || list.tagName.toLowerCase() !== tag) { list = node(tag); if (tag === 'ol') list.start = parseInt(value, 10); article.append(list); }
+        const li = node('li'); inline(li, bullet[1]); list.append(li); continue;
+      }
+      list = null;
+      if (/^(---+|\*\*\*+)$/.test(value)) { article.append(node('hr')); continue; }
+      const p = node(value.startsWith('> ') ? 'blockquote' : 'p'); inline(p, value.startsWith('> ') ? value.slice(2) : line); article.append(p);
+    }
+    return article;
+  }
+  function contents(root) {
+    root.querySelectorAll(':scope > .reader-contents').forEach(el => el.remove());
+    const headings = [...root.querySelectorAll('h2,h3,h4')].filter(h => !h.closest('.card,.run-card,.reader-contents,[data-reader-source],[hidden]'));
+    if (headings.length < 2) return;
+    const details = node('details'); details.className = 'reader-contents';
+    details.append(node('summary', '이 리포트 목차 · ' + headings.length + '개 항목'));
+    const nav = node('nav'); nav.setAttribute('aria-label', '리포트 목차');
+    headings.forEach(h => {
+      if (!h.id) h.id = 'reader-section-' + (++serial);
+      h.dataset.readerHeading = ''; h.tabIndex = -1;
+      const a = node('a', h.textContent); a.href = '#' + h.id;
+      if (h.tagName !== 'H2') a.className = 'reader-subsection';
+      a.addEventListener('click', event => {
+        event.preventDefault();
+        for (let ancestor = h.parentElement; ancestor; ancestor = ancestor.parentElement) if (ancestor.tagName === 'DETAILS') ancestor.open = true;
+        h.scrollIntoView({block: 'start'}); h.focus({preventScroll: true});
+      }); nav.append(a);
+    });
+    details.append(nav); root.prepend(details);
+  }
+  function enhance(root) {
+    if (!root) return;
+    root.querySelectorAll('pre[data-report-markdown]').forEach(pre => {
+      const previous = rendered.get(pre);
+      if (previous && previous.source === pre.textContent) return;
+      const article = markdown(pre.textContent);
+      if (previous) previous.article.replaceWith(article);
+      else {
+        const details = node('details'); details.dataset.readerSource = '';
+        details.append(node('summary', 'Markdown 원문 보기'));
+        pre.before(article, details); details.append(pre);
+      }
+      rendered.set(pre, {source: pre.textContent, article});
+    });
+    root.querySelectorAll('table').forEach(table => {
+      if (table.closest('.reader-table,.account-table-wrap,.summary-scroll')) return;
+      const wrap = node('div'); wrap.className = 'reader-table'; wrap.tabIndex = 0;
+      wrap.setAttribute('role', 'region'); wrap.setAttribute('aria-label', '리포트 표 · 가로로 스크롤하여 전체 보기');
+      table.before(wrap); wrap.append(table);
+    });
+    root.querySelectorAll('.grid').forEach(grid => {
+      const cards = [...grid.querySelectorAll(':scope > a.card')];
+      if (cards.length < 2 || grid.dataset.readerSearch) return;
+      grid.dataset.readerSearch = 'true';
+      const box = node('div'); box.className = 'reader-search';
+      const input = node('input'); input.type = 'search'; input.placeholder = '제목 · 종목 · 채널 · 키워드'; input.id = 'report-search-' + (++serial);
+      const label = node('label', '리포트 찾기'); label.htmlFor = input.id;
+      const status = node('p'); status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
+      const update = () => {
+        const terms = input.value.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean); let count = 0;
+        cards.forEach(card => { card.hidden = !terms.every(t => card.textContent.toLocaleLowerCase().includes(t)); if (!card.hidden) count += 1; });
+        status.textContent = cards.length + '개 중 ' + count + '개 표시' + (count ? '' : ' · 검색어를 지우거나 다른 키워드를 입력하세요.');
+      };
+      input.addEventListener('input', update); box.append(label, input, status); grid.before(box); update();
+    });
+    contents(root);
+  }
+  window.TradingAgentsReader = {enhance};
+  const main = document.querySelector('main');
+  if (main && !main.hasAttribute('data-reader-dynamic')) enhance(main);
+  if (main) {
+    const top = node('button', '↑ 맨 위'); top.type = 'button'; top.className = 'reader-back'; top.setAttribute('aria-label', '리포트 맨 위로 이동');
+    top.addEventListener('click', () => { const target = document.querySelector('h1') || main; target.tabIndex = -1; target.scrollIntoView({block: 'start'}); target.focus({preventScroll: true}); });
+    document.body.append(top);
+  }
+})();
+</script>
+</body>
+</html>
