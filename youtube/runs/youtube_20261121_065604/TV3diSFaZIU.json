@@ -1,0 +1,527 @@
+{
+  "version": 4,
+  "video_id": "TV3diSFaZIU",
+  "title": "이대로 갔다간...4,300까지도 열어 놔야 한다ㅣ이재규 SK증권 차장 [더블 체크]",
+  "url": "https://www.youtube.com/watch?v=TV3diSFaZIU",
+  "channel": "삼프로TV 3PROTV",
+  "channel_id": "UChlv4GSd7OQl3js-jkLOnFA",
+  "source_url": "https://www.youtube.com/@3protv/videos",
+  "thumbnail_url": "https://i.ytimg.com/vi/TV3diSFaZIU/maxresdefault.jpg",
+  "published_at": "2026-11-20T01:52:19+00:00",
+  "status": "asr_uncertain",
+  "strategy_source_tier": "STANDARD",
+  "strategy_evidence_weight": "STANDARD",
+  "strategy_validation_policy": "STANDARD_REVIEW",
+  "transcript_status": "available",
+  "transcript_source": "automatic",
+  "transcript_chars": 21183,
+  "transcript_quality": {
+    "status": "good",
+    "score": 1.0,
+    "warnings": [],
+    "source": "automatic",
+    "language": "Korean",
+    "model_or_format": "json3",
+    "chars": 21183,
+    "segments": 1181,
+    "duration_seconds": 2369,
+    "repeated_ngram_ratio": 0.001
+  },
+  "generated_at": "2026-11-20T22:03:01.278581+09:00",
+  "llm_status": "success",
+  "research_status": "success",
+  "claim_verification_status": "success",
+  "research_pipeline_version": 4,
+  "evidence_count": 6,
+  "claim_status_summary": {
+    "partially_supported": 5,
+    "unverified": 6,
+    "asr_uncertain": 1
+  },
+  "claims": [
+    {
+      "claim_id": "C1",
+      "claim_text": "출연자는 4,800을 코스피의 1차 지지선, 이탈 시 4,300을 기술적 하단으로 제시했다. 전일 종가를 5,000으로 가정해 14~15% 추가 하락을 설명했고, 과거 9,000에서 5,000으로 40% 넘게 내렸다고 발언했다. 현금 투자자는 투매보다 보유·매수 관점을 유지하되 레버리지와 업종 집중을 줄이자는 의견이다.",
+      "status": "partially_supported",
+      "confidence": 0.66,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.88,
+      "asr_confidence": 0.8,
+      "numeric_parse": {
+        "claimed": "4,800 → 4,300; 5,000 기준 -14~15%; 과거 9,000 → 5,000, 40% 초과 하락",
+        "observed": "스냅샷 4,869.96, 52주 고점 9,385.59; 가정값 기준 각각 -14.0%, -44.4%; 실제 전일 종가 미확인"
+      },
+      "investor_implication": "14%는 실제 전일 종가가 아닌 5,000을 기준으로 한 값이다. 4,800 이탈 여부를 판단하려면 방송에서 적용한 장중·종가 기준을 먼저 확인해야 한다."
+    },
+    {
+      "claim_id": "C2",
+      "claim_text": "장초반 지수는 약 4%, 삼성전자와 SK하이닉스는 각각 약 4.3%와 6% 하락했고, 이후 두 종목의 낙폭은 각각 약 4.5%와 6.2%로 언급됐다. 양 지수 약 3.7%·3.6% 하락, 직전 이틀 SK하이닉스 약 10%·삼성전기로 추정되는 종목 약 15% 상승, 주간 외국인 약 3조3천억 원 매도가 제시됐다. 출연자는 낮은 거래대금·예탁금, 얇은 호가와 레버리지가 낙폭을 키웠고, 소부장·2차전지는 약세인 반면 일부 바이오·소비·금융주는 상대적으로 버텼다고...",
+      "status": "partially_supported",
+      "confidence": 0.58,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.86,
+      "asr_confidence": 0.75,
+      "numeric_parse": {
+        "claimed": "지수 약 -4%, 양 지수 -3.7%·-3.6%; 삼성전자 -4.3%→-4.5%, SK하이닉스 -6%→-6.2%; 직전 이틀 +10%·+15%; 주간 외국인 매도 약 3.3조 원; 호가 예시 10억→1억 원",
+        "observed": "동반 하락 보도와 7%대·5%대 하락 기사 발췌만 확인. 동일 시각 지수·종목 수익률, 주간 합계 및 호가 수치는 미확인."
+      },
+      "investor_implication": "반도체 대형주의 동반 약세 보도와 시장 전체의 외국인 이탈·유동성 악화 주장은 구분해야 한다. 업종 이동은 동시각 업종별 수익률과 수급으로 확인할 필요가 있다."
+    },
+    {
+      "claim_id": "C3",
+      "claim_text": "방송은 앤트로픽이 공모가를 웃돌았으나 장중 상승폭을 반납했고 스페이스X보다 개인 매수세가 약했다고 전했다. 직전 미국장에서 나스닥·S&P 500·다우가 각각 2% 넘게 하락했고 한국 장중 나스닥 선물은 약 0.3% 하락했다고 언급했다. AMD의 동반 약세와 중국 관련 공매도 논거도 제시했다.",
+      "status": "partially_supported",
+      "confidence": 0.44,
+      "supporting_evidence_ids": [
+        "E4"
+      ],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.82,
+      "asr_confidence": 0.8,
+      "numeric_parse": {
+        "claimed": "미국 3대 지수 각각 -2% 초과; 한국 장중 나스닥 선물 약 -0.3%",
+        "observed": "E4 제목은 선물 약세 방향만 보도. 정규장 종가 수익률, 동시각 선물 수익률, IPO 가격은 미확인."
+      },
+      "investor_implication": "IPO가 AI주 매도를 촉발했다는 인과 해석이나 개인 매수세 비교는 투자 근거로 쓰기 어렵다. 정규장과 선물 데이터는 거래 세션을 분리해 확인해야 한다."
+    },
+    {
+      "claim_id": "C4",
+      "claim_text": "SK텔레콤이 앤트로픽에 약 2천억~3천억 원을 투자해 약 4조 원의 이익을 얻었다는 발언이 나왔다. 평가이익인지 실현이익인지는 불명확하며 상장 이후 모멘텀 약화는 전망이다.",
+      "status": "partially_supported",
+      "confidence": 0.43,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:11:54",
+      "source_confidence": 0.77,
+      "asr_confidence": 0.65,
+      "numeric_parse": {
+        "claimed": "투자 2,000억~3,000억 원; 차익 약 4조 원",
+        "observed": "뉴스 제목 2,700억 원→5조 원; 공시 기준 투자원가, 지분 평가액, 처분 여부 및 손익 미확인"
+      },
+      "investor_implication": "지분 평가액, 회계상 평가이익, 처분대금과 배당 재원은 서로 다르다. 약 4조 원을 실현이익이나 배당 여력으로 간주할 근거는 없다."
+    },
+    {
+      "claim_id": "C5",
+      "claim_text": "엔비디아의 호실적, 다음 해 성장률 상향 및 네오클라우드 적격 심사 강화가 언급됐다. 오픈AI 투자로 순환금융 우려가 줄었다는 것은 해석이다. 주가는 10월부터 약 한 달간 240→140달러, 실적 발표 직후 약 4~5% 상승 및 다음 정규장 약 2% 하락으로 제시됐으며, 화면상 명칭이 불명확한 지표는 약 10배로 2013~2014년 이후 최저라는 주장이 나왔다.",
+      "status": "partially_supported",
+      "confidence": 0.49,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:23:56",
+      "source_confidence": 0.86,
+      "asr_confidence": 0.65,
+      "numeric_parse": {
+        "claimed": "240→140달러, 약 -40%; 실적 직후 +4~5%, 다음 정규장 약 -2%; 약 10배, 2013~2014년 이후 최저",
+        "observed": "스냅샷 145.98달러, 52주 145.71~243.37달러, 선행 8.79배·후행 15.68배; 해당 구간·세션 수익률과 역사적 순위 미확인"
+      },
+      "investor_implication": "낮은 배수와 일부 가격대의 부합만으로 저평가나 추세 반전을 판단할 수 없다. 가이던스와 이익 추정치, 발표 전후 세션별 가격을 따로 확인해야 한다."
+    },
+    {
+      "claim_id": "C6",
+      "claim_text": "출연자는 소속 증권사 계산으로 삼성전자와 SK하이닉스의 선행 PER이 약 3배라고 말하고 저평가로 봤으나, 앤트로픽 상장이 주가를 끌어올릴지는 불확실하다고 봤다.",
+      "status": "unverified",
+      "confidence": 0.19,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:18:01",
+      "source_confidence": 0.87,
+      "asr_confidence": 0.8,
+      "numeric_parse": {
+        "claimed": "삼성전자·SK하이닉스 선행 PER 약 3배",
+        "observed": "두 종목의 선행 PER 및 산식에 필요한 기준 주가·예상 EPS 미확인"
+      },
+      "investor_implication": "가격 기준일과 향후 12개월 또는 차기 회계연도 EPS를 맞춰 종목별로 다시 계산하기 전에는 약 3배를 확인된 밸류에이션으로 인용하기 어렵다."
+    },
+    {
+      "claim_id": "C7",
+      "claim_text": "한한령 완화 기대가 엔터·콘텐츠·여행·화장품·미용주 반등을 뒷받침했다는 해석이다. 하이브는 절대 이익 수혜, SM은 매출 대비 중국 노출에서 더 클 수 있다고 봤고, 화장품의 현재 미국 매출이 과거 중국 고점을 넘었다고 말했다. 소외 업종 10~20% 편입은 의견이다.",
+      "status": "unverified",
+      "confidence": 0.15,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:06:03",
+      "source_confidence": 0.9,
+      "asr_confidence": 0.8,
+      "numeric_parse": {
+        "claimed": "소외 업종 10~20% 편입 제안; 화장품 미국 매출이 과거 중국 고점 상회",
+        "observed": "편입 비중은 출연자 의견. 비교 가능한 지역별 매출 수치와 업종 수익률은 미제공."
+      },
+      "investor_implication": "정책 기대를 확정 매출이나 이익에 반영하기 전에 적용 범위와 각 기업의 노출도를 확인해야 한다. 10~20%는 검증된 적정 비중이 아니다."
+    },
+    {
+      "claim_id": "C8",
+      "claim_text": "원화가 달러당 1,500원대에서 1,300원대로 강해졌는데도 외국인이 돌아오지 않았다고 진단했다. 방송 수치는 달러/원 1,336, 달러지수 103 상회, 엔화 836원과 2007년 약 750원이다. 유가가 100달러 위에서 약 80달러로 내렸으나 미 국채금리는 그만큼 내리지 않았다고 설명했다. 국채 5%와 반도체 수익률 100%는 예시다.",
+      "status": "unverified",
+      "confidence": 0.12,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:23:56",
+      "source_confidence": 0.81,
+      "asr_confidence": 0.7,
+      "numeric_parse": {
+        "claimed": "달러/원 1,500원대→1,300원대, 시점값 1,336원; DXY>103; 엔화 836원·2007년 약 750원; 유가 100달러 초과→약 80달러; 예시 5%·100%",
+        "observed": "동일 시각 환율·DXY 및 동일 구간 유가·금리 수치 미확인"
+      },
+      "investor_implication": "환율과 외국인 수급은 같은 기간에 맞춰 비교해야 한다. 국채 5%와 반도체 100%는 실제 수익률 관측값으로 사용하지 않아야 한다."
+    },
+    {
+      "claim_id": "C9",
+      "claim_text": "방송은 알테오젠에 유리한 유럽 특허 관련 소식이 전날 밤 나온 뒤 주가가 올랐다고 설명했다.",
+      "status": "unverified",
+      "confidence": 0.13,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:18:01",
+      "source_confidence": 0.85,
+      "asr_confidence": 0.7,
+      "numeric_parse": {
+        "claimed": "전날 밤 유리한 소식 이후 주가 상승; 상승률 미제시",
+        "observed": "발표 시각, 결정 내용 및 주가 변동 미확인"
+      },
+      "investor_implication": "권리의 범위나 효력, 최종 승소 여부를 확인하기 전에는 특허 관련 이익을 확정적으로 반영하기 어렵다."
+    },
+    {
+      "claim_id": "C10",
+      "claim_text": "방송 당일 이름이 불명확한 신규 상장주가 장중 약 92% 올랐다고 언급했다. 신규 상장주 강세를 자금이 방향을 탐색하는 신호로 본 것은 해석이다.",
+      "status": "asr_uncertain",
+      "confidence": 0.11,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:18:01",
+      "source_confidence": 0.4,
+      "asr_confidence": 0.3,
+      "numeric_parse": {
+        "claimed": "신규 상장주 장중 약 +92%",
+        "observed": "종목명·티커·기준가·동시각 체결가 미확인"
+      },
+      "investor_implication": "티커와 기준가가 확인되기 전에는 개별 종목이나 그 수익률을 인용하지 않는 편이 정확하다."
+    },
+    {
+      "claim_id": "C11",
+      "claim_text": "비트코인이 최근 저점대를 이탈했다는 발언과 이를 글로벌 유동성·변동성의 경고 신호로 본 해석이다. 한국 증시 하락의 원인으로 단정하지는 않았다.",
+      "status": "unverified",
+      "confidence": 0.16,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.92,
+      "asr_confidence": 0.9,
+      "numeric_parse": {
+        "claimed": "직전 저점대 이탈; 지지선 수치 미제시",
+        "observed": "BTC 표기 스냅샷 27.40은 매핑 미확인으로 제외. 비트코인 현물 지지선과 동시각 시세 미확인."
+      },
+      "investor_implication": "같은 거래쌍과 시간대에서 직전 저점 이탈·회복을 확인하더라도 코스피와의 동행은 유동성 참고 신호이지 인과의 증거가 아니다."
+    },
+    {
+      "claim_id": "C12",
+      "claim_text": "한국·대만 대비 일본의 외국인 주식 수급이 더 강했고, 펀드매니저의 기술주 비중이 줄었다는 발언이다. 11월 중순~12월 중순 해외 펀드 북클로징이 쇼트커버를 유발하고 연초 자금 집행이 재개될 수 있다는 가설도 나왔다.",
+      "status": "unverified",
+      "confidence": 0.12,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:35:53",
+      "source_confidence": 0.81,
+      "asr_confidence": 0.75,
+      "numeric_parse": {
+        "claimed": "11월 중순~12월 중순 북클로징; 연초 재집행 가능성; 일본 상대 우위·기술주 비중 축소 폭 미제시",
+        "observed": "국가별 비교 수급, 설문 변화 폭 및 펀드별 숏 포지션 변화 미확인"
+      },
+      "investor_implication": "일본 수급 우위나 연말 환매수를 전제로 포지션을 조정하기 전에 비교 가능한 거래소 집계와 순매수 전환 여부를 확인해야 한다."
+    }
+  ],
+  "entities": [
+    {
+      "ticker": "^KS11",
+      "name": "코스피",
+      "status": "unverified",
+      "claims": [
+        "4,800선이 무너지면 추가 하락을 감안해야 하지만, 장기 투자자가 현금으로 보유한 주식을 급히 손절할 실익은 낮다고 봤다.",
+        "외국인 매도를 받아줄 매수 주체가 부족하고 거래대금과 고객예탁금이 줄어, 적은 매도에도 낙폭이 커질 수 있다고 진단했다."
+      ],
+      "numeric_claims": [
+        "4,800선 이탈 시 기술적 하단은 약 4,300선. 전일 종가를 5,000으로 놓으면 추가 하락폭은 약 14~15%라는 설명.",
+        "과거 9,000선에서 5,000선으로 40% 넘게 밀렸다고 발언했으나 실제 지수 이력 확인이 필요하다.",
+        "방송 중 지수는 개장 무렵 약 4% 하락으로 언급됐고, 해당 주 외국인 매도액은 약 3조 3천억 원으로 추정했다."
+      ],
+      "verification_notes": [
+        "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+      ],
+      "market_snapshot": {
+        "ticker": "^KS11",
+        "as_of": "2026-11-20T13:45:13.523586+00:00",
+        "current_price": 4869.9599609375,
+        "market_cap": null,
+        "forward_pe": null,
+        "trailing_pe": null,
+        "fifty_two_week_high": 9385.59,
+        "fifty_two_week_low": 3833.35,
+        "average_target_price": null,
+        "source": "yfinance",
+        "status": "verified"
+      },
+      "external_context_status": "verified"
+    },
+    {
+      "ticker": "005930",
+      "name": "삼성전자",
+      "status": "unverified",
+      "claims": [
+        "삼성전자와 SK하이닉스를 실적 대비 저평가로 봤지만, 앤트로픽 상장 자체가 주가를 끌어올릴지는 불확실하다고 봤다."
+      ],
+      "numeric_claims": [
+        "개장 무렵 하락률 약 4.3%, 이후 화면에서는 약 4.5% 하락으로 언급.",
+        "출연자는 자사 증권사 추산으로 삼성전자와 SK하이닉스의 선행 PER이 약 3배 수준이라고 말했다."
+      ],
+      "verification_notes": [
+        "시장 데이터 조회 실패: no_usable_market_fields"
+      ],
+      "market_snapshot": {
+        "ticker": "005930",
+        "as_of": "2026-11-20T13:45:14.603384+00:00",
+        "current_price": null,
+        "market_cap": null,
+        "forward_pe": null,
+        "trailing_pe": null,
+        "fifty_two_week_high": null,
+        "fifty_two_week_low": null,
+        "average_target_price": null,
+        "source": "yfinance",
+        "status": "unverified"
+      },
+      "external_context_status": "verified"
+    },
+    {
+      "ticker": "000660",
+      "name": "SK하이닉스",
+      "status": "unverified",
+      "claims": [
+        "삼성전자·SK하이닉스가 밀리면 투자자들이 두 종목을 남기고 다른 보유주를 팔아 약세가 번질 수 있으며, 반대로 두 종목이 강하게 반등하면 다른 종목으로 자금이 풀릴 수 있다고 봤다."
+      ],
+      "numeric_claims": [
+        "개장 무렵 약 6%, 이후 약 6.2% 하락으로 언급. 앞선 이틀 동안 SK하이닉스 약 10%, 삼성전기로 추정되는 종목 약 15% 상승이라는 발언도 있었다."
+      ],
+      "verification_notes": [
+        "시장 데이터 조회 실패: no_usable_market_fields"
+      ],
+      "market_snapshot": {
+        "ticker": "000660",
+        "as_of": "2026-11-20T13:45:17.615408+00:00",
+        "current_price": null,
+        "market_cap": null,
+        "forward_pe": null,
+        "trailing_pe": null,
+        "fifty_two_week_high": null,
+        "fifty_two_week_low": null,
+        "average_target_price": null,
+        "source": "yfinance",
+        "status": "unverified"
+      },
+      "external_context_status": "verified"
+    },
+    {
+      "ticker": "NVDA",
+      "name": "엔비디아",
+      "status": "unverified",
+      "claims": [
+        "호실적과 내년 성장률 상향, 네오클라우드 적격 심사 강화, 오픈AI 투자금이 순환금융 우려를 완화한다는 해석을 소개했지만, 실적 이후 주가 약세는 AI 생태계에 대한 경계 신호로 봤다. 하락 추세가 굳어지면 AI주는 단기 매매 관점이 유리할 수 있다는 의견이다."
+      ],
+      "numeric_claims": [
+        "10월부터 약 한 달 사이 240달러에서 140달러로 약 40% 하락했다고 발언. 실적 직후 시간외로 보이는 거래에서 약 4~5% 상승했으나 다음 거래일 약 2% 하락하고 이후에도 밀렸다고 설명.",
+        "화면상 밸류에이션 지표를 약 10배, 2013~2014년 이후 최저 수준으로 설명했으나 자동자막상 지표명이 불명확하다."
+      ],
+      "verification_notes": [
+        "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+      ],
+      "market_snapshot": {
+        "ticker": "NVDA",
+        "as_of": "2026-11-20T13:45:20.101181+00:00",
+        "current_price": 145.97999572753906,
+        "market_cap": 3524978956832.8857,
+        "forward_pe": 8.79118,
+        "trailing_pe": 15.679913,
+        "fifty_two_week_high": 243.37,
+        "fifty_two_week_low": 145.71,
+        "average_target_price": 246.67091,
+        "source": "yfinance",
+        "status": "verified"
+      },
+      "external_context_status": "verified"
+    },
+    {
+      "ticker": "BTC",
+      "name": "비트코인",
+      "status": "unverified",
+      "claims": [
+        "비트코인이 최근 지지 구간을 이탈한 것을 글로벌 유동성과 변동성의 경고 신호로 해석했다. 한국 증시도 직전 저점을 깨면 단기 낙폭이 커질 수 있다고 봤다."
+      ],
+      "numeric_claims": [],
+      "verification_notes": [
+        "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+      ],
+      "market_snapshot": {
+        "ticker": "BTC",
+        "as_of": "2026-11-20T13:45:22.044946+00:00",
+        "current_price": 27.399999618530273,
+        "market_cap": null,
+        "forward_pe": null,
+        "trailing_pe": null,
+        "fifty_two_week_high": 43.36,
+        "fifty_two_week_low": 25.65,
+        "average_target_price": null,
+        "source": "yfinance",
+        "status": "verified"
+      },
+      "external_context_status": "verified"
+    },
+    {
+      "ticker": "017670",
+      "name": "SK텔레콤",
+      "status": "unverified",
+      "claims": [
+        "앤트로픽에 지분을 투자한 국내 직접 수혜 사례로 꼽았지만 상장 이후에는 모멘텀이 약해질 수 있다고 봤다."
+      ],
+      "numeric_claims": [
+        "투자액 약 2천억~3천억 원, 차익 약 4조 원이라는 발언. 실현차익인지 평가차익인지는 확인되지 않았다."
+      ],
+      "verification_notes": [
+        "시장 데이터 조회 실패: no_usable_market_fields"
+      ],
+      "market_snapshot": {
+        "ticker": "017670",
+        "as_of": "2026-11-20T13:45:24.103924+00:00",
+        "current_price": null,
+        "market_cap": null,
+        "forward_pe": null,
+        "trailing_pe": null,
+        "fifty_two_week_high": null,
+        "fifty_two_week_low": null,
+        "average_target_price": null,
+        "source": "yfinance",
+        "status": "unverified"
+      },
+      "external_context_status": "verified"
+    },
+    {
+      "ticker": "USD/KRW",
+      "name": "원화·엔화·미국 국채",
+      "status": "unverified",
+      "claims": [
+        "원화가 강해졌는데도 외국인이 한국 주식으로 돌아오지 않았다고 지적했다. 미국 국채와 선진국 주식의 상대 매력, 한국 반도체 대형주에서 이미 쌓인 수익이 외국인 매수 지연을 설명할 수 있다는 견해다."
+      ],
+      "numeric_claims": [
+        "달러/원은 1,500원대에서 1,300원대로 내려왔다고 설명했고, 방송 시점 수치로 1,336원, 달러지수 103선 상회, 엔화 836원을 언급했다. 엔화 비교치로 2007년 약 750원이 제시됐다.",
+        "유가는 100달러 위에서 약 80달러로 하락했는데 미국 국채금리는 그만큼 내리지 않았다고 설명했다. 국채 5%와 한국 반도체주 수익률 100%는 자금 배분 설명에 사용한 예시다."
+      ],
+      "verification_notes": [
+        "시장 데이터 조회 실패: Failed to parse json response from Yahoo Finance: {'code': 'Not Found', 'description': 'HTTP 404 Not Found'}"
+      ],
+      "market_snapshot": {
+        "ticker": "USD/KRW",
+        "as_of": "2026-11-20T13:45:26.957539+00:00",
+        "current_price": null,
+        "market_cap": null,
+        "forward_pe": null,
+        "trailing_pe": null,
+        "fifty_two_week_high": null,
+        "fifty_two_week_low": null,
+        "average_target_price": null,
+        "source": "yfinance",
+        "status": "unverified"
+      },
+      "external_context_status": "unverified"
+    },
+    {
+      "ticker": "KOSDAQ",
+      "name": "코스닥·바이오·방어주",
+      "status": "unverified",
+      "claims": [
+        "반도체 소부장과 2차전지 약세가 코스닥을 압박한 반면 일부 바이오·소비주와 금융지주 등 방어 성격 종목은 상대적으로 버텼다고 평가했다. 미국 국채금리 부담에도 바이오가 하방을 방어하면 연초 흐름이 개선될 수 있다는 견해다."
+      ],
+      "numeric_claims": [
+        "코스닥과 코스피 하락률로 약 3.7%와 3.6%를 언급했으나 지수별 대응은 원화면 확인이 필요하다. 일부 반도체 소부장주는 두 자릿수 하락으로 언급."
+      ],
+      "verification_notes": [
+        "시장 데이터 조회 실패: no_usable_market_fields"
+      ],
+      "market_snapshot": {
+        "ticker": "KOSDAQ",
+        "as_of": "2026-11-20T13:45:27.701863+00:00",
+        "current_price": null,
+        "market_cap": null,
+        "forward_pe": null,
+        "trailing_pe": null,
+        "fifty_two_week_high": null,
+        "fifty_two_week_low": null,
+        "average_target_price": null,
+        "source": "yfinance",
+        "status": "unverified"
+      },
+      "external_context_status": "verified"
+    }
+  ],
+  "evidence": [
+    {
+      "evidence_id": "E1",
+      "claim_id": "C2",
+      "title": "Sucro Announces Third Quarter 2026 Results",
+      "source_url": "https://finance.yahoo.com/markets/commodities/articles/sucro-announces-third-quarter-2026-120000011.html",
+      "publisher": "TMX Newsfile",
+      "published_at": "2026-11-20T12:00:00+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "Sucro Announces Third Quarter 2026 Results Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 2026 Elections Weather Newsletters Finance My port..."
+    },
+    {
+      "evidence_id": "E2",
+      "claim_id": "C2",
+      "title": "Reliance Inc's Dividend Analysis",
+      "source_url": "https://finance.yahoo.com/markets/stocks/articles/reliance-incs-dividend-analysis-100452196.html",
+      "publisher": "GuruFocus.com",
+      "published_at": "2026-11-20T10:04:52+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "Reliance Inc's Dividend Analysis Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 2026 Elections Weather Newsletters Finance My portfolio News..."
+    },
+    {
+      "evidence_id": "E4",
+      "claim_id": "C3",
+      "title": "Stock market today: Dow, S&P 500, Nasdaq futures continue to sell-off after Anthropic IPO fails to quell AI worries",
+      "source_url": "https://finance.yahoo.com/markets/live/stock-market-today-friday-november-19-dow-sp-500-nasdaq-anthropic-nvidia-volatility-092827348.html",
+      "publisher": "Yahoo Finance",
+      "published_at": "2026-11-20T13:43:01+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "Stock market today: Dow, S&P 500, Nasdaq futures continue to sell-off after Anthropic IPO fails to quell AI worries Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World..."
+    },
+    {
+      "evidence_id": "E5",
+      "claim_id": "C4",
+      "title": "Alpex Solar Ltd (NSE:ALPEXSOLAR) Q2 2027 Earnings Call Highlights: Solar Cell Trial Production ...",
+      "source_url": "https://finance.yahoo.com/energy/articles/alpex-solar-ltd-nse-alpexsolar-170123828.html",
+      "publisher": "GuruFocus.com",
+      "published_at": "2026-11-19T17:01:23+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    },
+    {
+      "evidence_id": "E6",
+      "claim_id": "C4",
+      "title": "Recycled Metal - Global Market Size, Share, Industry Trends and Growth Forecast 2026-2031 | Decarbonization and Electrification Drive a $191.86 Billion Reven...",
+      "source_url": "https://finance.yahoo.com/markets/commodities/articles/recycled-metal-global-market-size-161600643.html",
+      "publisher": "GlobeNewswire",
+      "published_at": "2026-11-19T16:16:00+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    }
+  ],
+  "source_policy": {
+    "raw_transcript_published": false,
+    "raw_transcript_in_evidence": false,
+    "research_pipeline_version": 4,
+    "closed_source_claims": "unverified_external_source",
+    "auto_caption_warning": true,
+    "local_asr_warning": false
+  }
+}
