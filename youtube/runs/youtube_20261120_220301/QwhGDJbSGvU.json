@@ -1,0 +1,386 @@
+{
+  "version": 4,
+  "video_id": "QwhGDJbSGvU",
+  "title": "\"이제 와서 왜?\" AI 버블 우려 속 반토막 난 주식, 어떻게 대응할까?  | 박병창 MP파트너스 대표 [마켓 인사이드]",
+  "url": "https://www.youtube.com/watch?v=QwhGDJbSGvU",
+  "channel": "삼프로TV 3PROTV",
+  "channel_id": "UChlv4GSd7OQl3js-jkLOnFA",
+  "source_url": "https://www.youtube.com/@3protv/videos",
+  "thumbnail_url": "https://i.ytimg.com/vi/QwhGDJbSGvU/maxresdefault.jpg",
+  "published_at": "2026-11-20T00:33:23+00:00",
+  "status": "asr_uncertain",
+  "strategy_source_tier": "STANDARD",
+  "strategy_evidence_weight": "STANDARD",
+  "strategy_validation_policy": "STANDARD_REVIEW",
+  "transcript_status": "available",
+  "transcript_source": "automatic",
+  "transcript_chars": 20111,
+  "transcript_quality": {
+    "status": "good",
+    "score": 1.0,
+    "warnings": [],
+    "source": "automatic",
+    "language": "Korean",
+    "model_or_format": "json3",
+    "chars": 20111,
+    "segments": 1207,
+    "duration_seconds": 2592,
+    "repeated_ngram_ratio": 0.001
+  },
+  "generated_at": "2026-11-20T10:50:02.650390+09:00",
+  "llm_status": "success",
+  "research_status": "success",
+  "claim_verification_status": "success",
+  "research_pipeline_version": 4,
+  "evidence_count": 6,
+  "claim_status_summary": {
+    "unverified": 10,
+    "asr_uncertain": 1,
+    "partially_supported": 1
+  },
+  "claims": [
+    {
+      "claim_id": "C1",
+      "claim_text": "방송은 나스닥 약 −2.2%, 장중 고저폭 약 4%, 아마존 −3.8%, 알파벳 −3.4%, 메타 −3.2%를 제시했다. 박병창 대표는 AI IPO·AMD 공매도·옵션 만기 중 하나로 급락을 설명하기 어렵다고 봤으며, 2025년 한 차례 이탈했다는 60주 이동평균선의 재이탈 가능성을 언급했다.",
+      "status": "unverified",
+      "confidence": 0.22,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.91,
+      "asr_confidence": 0.88,
+      "numeric_parse": {
+        "claimed": "나스닥 −2.2%, 장중 고저폭 약 4%; 아마존 −3.8%, 알파벳 −3.4%, 메타 −3.2%; 60주 이동평균선",
+        "observed": "정규장 OHLC·분봉·주봉과 옵션 만기 자료 미제공"
+      },
+      "investor_implication": "옵션 만기나 IPO를 단일 원인으로 단정하지 말고, 60주선의 장중 이탈과 주봉 종가 이탈을 구분해야 한다."
+    },
+    {
+      "claim_id": "C2",
+      "claim_text": "방송은 앤트로픽으로 추정되는 AI IPO의 공모가 83달러, 첫날 종가 97달러, 장중 시가총액 2조 달러를 언급했다. 111·115달러의 시초가·장중 고가 구분과 종가 시가총액은 불명확하다. 공모가를 웃돈 종가를 AI 수요 실망으로 단정하기 어렵다는 평가와 3~6개월 오버행 관찰은 발언자의 판단이다.",
+      "status": "asr_uncertain",
+      "confidence": 0.3,
+      "supporting_evidence_ids": [
+        "E2",
+        "E4"
+      ],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.78,
+      "asr_confidence": 0.5,
+      "numeric_parse": {
+        "claimed": "공모가 $83, 종가 $97, 약 +17%; $111·$115; 장중 시총 $2조; 3~6개월",
+        "observed": "입력값 기준 +16.87%; 공식 시초가·고가·종가와 발행주식 수 미제공; 종가 시총 발화 판독 불가"
+      },
+      "investor_implication": "발행사와 공모 조건을 확인하기 전에는 첫날 가격이나 추정 시가총액을 밸류에이션 근거로 쓰지 않는다."
+    },
+    {
+      "claim_id": "C3",
+      "claim_text": "방송은 AMD가 약 7% 하락했고 공매도 기관이 확인되지 않은 수출 의혹을 제기했으며 AMD가 이를 부인했다고 전했다. IPO 매수자금 마련을 위한 매도라는 설명은 별도 가설이다.",
+      "status": "unverified",
+      "confidence": 0.12,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.88,
+      "asr_confidence": 0.78,
+      "numeric_parse": {
+        "claimed": "AMD 약 −7%",
+        "observed": "AMD $489.19 조회값; 전일 종가와 비교 거래일 수익률 미제공"
+      },
+      "investor_implication": "수출 의혹은 확인된 위반이나 규제 조치로 다루지 않는다. 주가 변동과 의혹의 사실 여부는 별도로 확인해야 한다."
+    },
+    {
+      "claim_id": "C4",
+      "claim_text": "방송은 필라델피아 반도체지수 14,650→9,419, 마이크론 1,255→690달러, 샌디스크 2,350→755달러, 웨스턴디지털 800→296달러를 제시했다. 코어위브는 상장 가격대로 돌아왔고 AMD·브로드컴·메타는 상대적으로 덜 조정됐다는 비교가 뒤따랐다. 버블 우려의 선반영과 추가 하락 가능성은 발언자의 해석이다.",
+      "status": "unverified",
+      "confidence": 0.11,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:07:11",
+      "source_confidence": 0.87,
+      "asr_confidence": 0.74,
+      "numeric_parse": {
+        "claimed": "반도체지수 14,650→9,419; 마이크론 $1,255→$690; 샌디스크 $2,350→$755; 웨스턴디지털 $800→$296; 별도 장중 사례 약 7%·9%·11%",
+        "observed": "지수·종목별 기준일과 조정 시계열 미제공; 장중 사례의 대상·분모 미확인"
+      },
+      "investor_implication": "같은 기간과 가격 기준으로 낙폭을 비교하되, 낙폭만으로 저점 형성이나 밸류에이션 매력을 판단하지 않는다."
+    },
+    {
+      "claim_id": "C5",
+      "claim_text": "방송은 코스피 기준치 5,137과 앞선 저점 4,911을 제시하고 외국인 매도 완화가 반등을 이끌었다고 해석했다. 5,000선 이탈 후 외국인·연기금 수급과 정책 대응이 중요하다는 견해와 국내 종목 장중 등락도 전했다.",
+      "status": "partially_supported",
+      "confidence": 0.48,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:20:58",
+      "source_confidence": 0.93,
+      "asr_confidence": 0.88,
+      "numeric_parse": {
+        "claimed": "코스피 5,137·4,911·5,000; 3% 하락 시 약 4,940, 4% 하락 시 4,911 하회; 후반 장중 삼성전자 −4.2%, SK하이닉스 −5.9%, SK스퀘어 약 −6%, 삼성전기 약 −6.5%; 삼성전기 앞선 이틀 각각 약 +9%, 누적 약 +20%",
+        "observed": "코스피 조회값 4,909.27; 5,137 기준 −3%는 4,982.89, −4%는 4,931.52; 종목별 거래 자료 미제공"
+      },
+      "investor_implication": "5,000선 아래의 관측값을 저점 신호로 해석하지 말고, 외국인 매도액 감소와 신규 매수 증가를 구분해 연기금 수급 및 공식 정책과 함께 본다."
+    },
+    {
+      "claim_id": "C6",
+      "claim_text": "방송은 대만 증시가 한국보다 크게 하락했고 대만이 공매도 1% 한도와 하락 종목의 다음 날 공매도 가격 제한을 강화했다고 설명했다.",
+      "status": "unverified",
+      "confidence": 0.06,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:07:11",
+      "source_confidence": 0.72,
+      "asr_confidence": 0.79,
+      "numeric_parse": {
+        "claimed": "공매도 한도 1%; 특정 하락 종목의 다음 날 가격 제한",
+        "observed": "1%의 분모·발동 요건·기준가격·시행일 및 양국 비교 수익률 미제공"
+      },
+      "investor_implication": "공매도 제한의 시행과 적용 종목을 확인하기 전에는 해당 조치나 수급 효과를 대만 주식 판단에 반영하지 않는다."
+    },
+    {
+      "claim_id": "C7",
+      "claim_text": "방송은 연준 인사들이 AI·데이터센터 투자로 단기 물가 압력과 금융 불안이 커질 수 있고 생산성 효과는 불확실하다고 말했다고 전했다. 2% 물가 목표를 인용했으며, 2027년 금리 인하는 박병창 대표의 전망이다.",
+      "status": "unverified",
+      "confidence": 0.07,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:13:49",
+      "source_confidence": 0.89,
+      "asr_confidence": 0.79,
+      "numeric_parse": {
+        "claimed": "물가 목표 2%; 2027년 금리 인하 전망",
+        "observed": "공식 목표 문서·회의록·경제전망요약 미제공"
+      },
+      "investor_implication": "AI 투자에 대한 우려를 연준의 합의나 금리 경로로 받아들이지 않는다. 금리 인하 전망은 방송 출연자의 시나리오로 구분한다."
+    },
+    {
+      "claim_id": "C8",
+      "claim_text": "방송은 드러켄밀러가 미국 경제는 견조하지만 투자 여건은 악화됐다고 평가하고, 현금 보존·구리 숏·거의 없는 주식 순노출을 언급했으며 AI 인프라보다 실제 활용 기업에 관심을 돌렸다고 소개했다.",
+      "status": "unverified",
+      "confidence": 0.08,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:13:49",
+      "source_confidence": 0.87,
+      "asr_confidence": 0.73,
+      "numeric_parse": {
+        "claimed": "주식 순노출이 거의 없다는 정성 표현; 하반기 경기 전망의 대상 연도 불명확",
+        "observed": "수치·포지션 기준일·전망 대상 연도 미확인"
+      },
+      "investor_implication": "전해진 포지션을 거래 신호로 삼기보다 AI 활용이 각 기업의 비용, 매출, 현금흐름에 미치는 효과를 별도로 확인한다."
+    },
+    {
+      "claim_id": "C9",
+      "claim_text": "방송은 골드만삭스가 6월 코스피 목표 12,000을 5개월 뒤 7,500으로 낮췄고, 한국 주식 비중 확대와 반도체 공급 부족 전망은 유지했다고 전했다.",
+      "status": "unverified",
+      "confidence": 0.08,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:27:41",
+      "source_confidence": 0.94,
+      "asr_confidence": 0.92,
+      "numeric_parse": {
+        "claimed": "6월 12,000포인트 → 약 5개월 뒤 7,500포인트",
+        "observed": "두 전망 원문과 비교 기준 미제공; 코스피 스냅샷은 조사기관 목표치가 아님"
+      },
+      "investor_implication": "원문 확인 전에는 7,500을 확인된 목표나 기대수익률 산출에 사용하지 않는다."
+    },
+    {
+      "claim_id": "C10",
+      "claim_text": "방송은 데이터센터 증가로 세계 전력망에 병목이 생길 수 있다는 경고가 보도된 뒤 국내 변압기주가 올랐다고 전했다.",
+      "status": "unverified",
+      "confidence": 0.08,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:27:41",
+      "source_confidence": 0.8,
+      "asr_confidence": 0.66,
+      "numeric_parse": {
+        "claimed": "정량 수치 없음",
+        "observed": "보고서 발표 시각과 종목별 수익률 미제공"
+      },
+      "investor_implication": "전력망 병목이 변압기 수주를 늘릴 가능성과 데이터센터 투자 일정을 늦출 가능성을 구분해 본다."
+    },
+    {
+      "claim_id": "C11",
+      "claim_text": "방송은 KDI가 2027년 한국 성장세 강화를, IMF·OECD·ADB·한국은행은 둔화를 전망했다고 전했다. KDI의 차이는 반도체 가격·생산과 산업 비중이 성장 기여를 높인다는 설명으로 소개됐다.",
+      "status": "unverified",
+      "confidence": 0.07,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:34:26",
+      "source_confidence": 0.9,
+      "asr_confidence": 0.87,
+      "numeric_parse": {
+        "claimed": "2027년 성장 방향 비교; 구체적 성장률 없음",
+        "observed": "기관별 2026·2027년 실질 GDP 성장률 및 직전 전망치 미제공"
+      },
+      "investor_implication": "기관별 실질 성장률 전망을 같은 기준으로 맞춘 뒤 반도체 생산량과 가격 가정의 차이를 살핀다."
+    },
+    {
+      "claim_id": "C12",
+      "claim_text": "방송은 국내 공매도에서 외국인 비중이 약 92~95%, 일부 종목의 공매도 잔고 비율이 10~20%라고 인용하고 세부 제도 개선이 필요하다고 주장했다.",
+      "status": "unverified",
+      "confidence": 0.07,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:34:26",
+      "source_confidence": 0.84,
+      "asr_confidence": 0.86,
+      "numeric_parse": {
+        "claimed": "외국인 비중 약 92~95%; 일부 종목 공매도 잔고 비율 10~20%",
+        "observed": "기간·종목·거래대금 또는 거래량 기준·상장주식 또는 유통주식 분모 미제공"
+      },
+      "investor_implication": "해당 비율을 시장 전체의 외국인 쏠림이나 개별 종목의 쇼트커버 가능성에 그대로 적용하지 않는다."
+    }
+  ],
+  "entities": [
+    {
+      "ticker": "AMD",
+      "name": "AMD",
+      "status": "unverified",
+      "claims": [
+        "공매도 포지션을 공개한 기관이 AMD 수출 관련 의혹을 제기했으나, 방송에 따르면 기관도 사실 확인이 되지 않았다고 밝혔고 AMD는 부인했다."
+      ],
+      "numeric_claims": [
+        "AMD 주가 약 -7%로 언급됐다."
+      ],
+      "verification_notes": [
+        "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+      ],
+      "market_snapshot": {
+        "ticker": "AMD",
+        "as_of": "2026-11-20T02:21:43.285621+00:00",
+        "current_price": 489.19,
+        "market_cap": 809641527655.87,
+        "forward_pe": 27.73461,
+        "trailing_pe": 104.52778,
+        "fifty_two_week_high": 658.52,
+        "fifty_two_week_low": 188.22,
+        "average_target_price": 657.74286,
+        "source": "yfinance",
+        "status": "verified"
+      },
+      "external_context_status": "verified"
+    },
+    {
+      "ticker": "^KS11",
+      "name": "코스피·국내 주요 종목",
+      "status": "unverified",
+      "claims": [
+        "최근 코스피의 반등은 신규 매수세보다 외국인 매도 완화에 힘입었다는 해석이다. 5,000선 이탈 자체보다 이탈 후 수급과 정책 대응이 중요하다고 봤다."
+      ],
+      "numeric_claims": [
+        "코스피 기준치 5,137포인트, 앞선 저점 4,911포인트; 약 3% 하락 시 4,940 안팎, 약 4% 하락 시 앞선 저점 하회라는 설명은 가정이다.",
+        "방송 초반 삼성전자 4% 초과, SK하이닉스 5% 초과 하락; 후반 장중에는 각각 약 -4.2%, -5.9%, SK스퀘어 약 -6%, 삼성전기 약 -6.5%.",
+        "삼성전기는 그에 앞서 이틀간 각각 약 9%, 누적 약 20% 올랐다고 언급됐다."
+      ],
+      "verification_notes": [
+        "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+      ],
+      "market_snapshot": {
+        "ticker": "^KS11",
+        "as_of": "2026-11-20T02:21:45.579925+00:00",
+        "current_price": 4909.27001953125,
+        "market_cap": null,
+        "forward_pe": null,
+        "trailing_pe": null,
+        "fifty_two_week_high": 9385.59,
+        "fifty_two_week_low": 3833.35,
+        "average_target_price": null,
+        "source": "yfinance",
+        "status": "verified"
+      },
+      "external_context_status": "verified"
+    },
+    {
+      "ticker": "^KS11",
+      "name": "골드만삭스·코스피 전망",
+      "status": "unverified",
+      "claims": [
+        "방송은 골드만삭스가 변동성 확대, 기업 실적 전망 상향 속도 둔화, 실적 개선에 더 높은 밸류에이션을 부여하는 데 대한 투자자 신중론을 들어 코스피 목표를 내렸지만 한국 주식 비중 확대 의견과 반도체 공급 부족 전망은 유지했다고 전했다."
+      ],
+      "numeric_claims": [
+        "6월 12,000포인트에서 5개월 만에 7,500포인트로 하향했다고 언급됐다."
+      ],
+      "verification_notes": [
+        "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+      ],
+      "market_snapshot": {
+        "ticker": "^KS11",
+        "as_of": "2026-11-20T02:21:46.068076+00:00",
+        "current_price": 4909.27001953125,
+        "market_cap": null,
+        "forward_pe": null,
+        "trailing_pe": null,
+        "fifty_two_week_high": 9385.59,
+        "fifty_two_week_low": 3833.35,
+        "average_target_price": null,
+        "source": "yfinance",
+        "status": "verified"
+      },
+      "external_context_status": "verified"
+    }
+  ],
+  "evidence": [
+    {
+      "evidence_id": "E1",
+      "claim_id": "C1",
+      "title": "Dow Jones Futures: Techs Slide, Anthropic Retreats After Ugly Market Reversal To New Lows",
+      "source_url": "https://finance.yahoo.com/m/9e02231d-41cd-31ac-b37f-993325b8a4ca/dow-jones-futures%3A-techs.html",
+      "publisher": "Investor's Business Daily",
+      "published_at": "2026-11-20T02:25:42+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "Dow Jones Futures: Techs Slide, Anthropic Retreats After Ugly Market Reversal To New Lows Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 202..."
+    },
+    {
+      "evidence_id": "E2",
+      "claim_id": "C1",
+      "title": "How High Can ANT Stock Go? Wall Street Debut Sparks Valuation Debate – One Analyst Sees Amazon-Google Scale Opportunity In Anthropic",
+      "source_url": "https://finance.yahoo.com/markets/stocks/articles/high-ant-stock-wall-street-022355679.html",
+      "publisher": "Stocktwits",
+      "published_at": "2026-11-20T02:23:55+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "How High Can ANT Stock Go? Wall Street Debut Sparks Valuation Debate – One Analyst Sees Amazon-Google Scale Opportunity In Anthropic Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News U..."
+    },
+    {
+      "evidence_id": "E4",
+      "claim_id": "C2",
+      "title": "Here's Why Anthropic's IPO Was a Historic Success",
+      "source_url": "https://finance.yahoo.com/markets/stocks/articles/heres-why-anthropics-ipo-historic-020205223.html",
+      "publisher": "Motley Fool",
+      "published_at": "2026-11-20T02:02:05+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "Here's Why Anthropic's IPO Was a Historic Success Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 2026 Elections Weather Newsletters Finance..."
+    },
+    {
+      "evidence_id": "E5",
+      "claim_id": "C6",
+      "title": "Recycled Metal - Global Market Size, Share, Industry Trends and Growth Forecast 2026-2031 | Decarbonization and Electrification Drive a $191.86 Billion Reven...",
+      "source_url": "https://finance.yahoo.com/markets/commodities/articles/recycled-metal-global-market-size-161600643.html",
+      "publisher": "GlobeNewswire",
+      "published_at": "2026-11-19T16:16:00+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    },
+    {
+      "evidence_id": "E6",
+      "claim_id": "C7",
+      "title": "Alpex Solar Ltd (NSE:ALPEXSOLAR) Q2 2027 Earnings Call Highlights: Solar Cell Trial Production ...",
+      "source_url": "https://finance.yahoo.com/energy/articles/alpex-solar-ltd-nse-alpexsolar-170123828.html",
+      "publisher": "GuruFocus.com",
+      "published_at": "2026-11-19T17:01:23+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    }
+  ],
+  "source_policy": {
+    "raw_transcript_published": false,
+    "raw_transcript_in_evidence": false,
+    "research_pipeline_version": 4,
+    "closed_source_claims": "unverified_external_source",
+    "auto_caption_warning": true,
+    "local_asr_warning": false
+  }
+}

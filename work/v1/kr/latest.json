@@ -1,13 +1,13 @@
 {
   "schema": "tradingagents.work-context/v1",
   "surface": "kr",
-  "event_id": "kr:e67eb785d671131210256899640a7332",
+  "event_id": "kr:c82c4d2b3681c9cd756f93b54a194603",
   "prompt_contract_version": "market-work-v12-kr",
   "prompt_sha256": "ae80093efe2dcfe7f6131b8b09100f75e77b0ca0242b5340d15eb6ec3fd81274",
   "skill_sha256": "2fef99f1af403675549a13813e0fe5597a241a964affeada56e9f64e9f398fe9",
   "task_manifest_sha256": "6fbafadc2971d1a908c1bbc1fa29e2adaf0ca6be956768f2f9eb0abf0061428e",
   "workflow_contract_sha256": "3d89f852dda405d7c44afdbed158e622d8a748f194d9e44d0aca14a8bbe14de1",
-  "source_sha256": "c53834f1c17fdf2b698f2bdc747578d3d7e952a5b51c3eab96111ee60244093c",
+  "source_sha256": "3d0f1bab052bff8fcdb3a28fb54396db2196d067a6001545d58361cb122b4926",
   "body": {
     "kind": "market",
     "market": "KR",
@@ -1683,19 +1683,282 @@
       "youtube": {
         "source_health": "OK",
         "coverage": {
-          "total_unique_events": 881,
-          "window_events": 80,
+          "total_unique_events": 907,
+          "window_events": 106,
           "transmitted_events": 12,
           "truncated": true,
-          "oldest_occurred_at": "2026-11-18T09:04:08+00:00",
-          "newest_occurred_at": "2026-11-20T00:33:23+00:00",
+          "oldest_occurred_at": "2026-11-19T09:30:37+00:00",
+          "newest_occurred_at": "2026-11-20T12:00:30+00:00",
           "available_events_before_context_cap": 60,
           "context_event_cap": 12,
-          "omitted_events": 68,
+          "omitted_events": 94,
           "omitted_due_to_context_cap": 48,
-          "omitted_before_context_selection": 20
+          "omitted_before_context_selection": 46
         },
         "events": [
+          {
+            "event_key": "KopQpHNgc4k",
+            "content_sha256": "e63320e28837b0d4d1b944b0b4cdf6ab93d5ca9ea67d81ee3c71ad7557a2e782",
+            "occurred_at": "2026-11-20T11:00:06+00:00",
+            "relevance": {
+              "tickers": [
+                "^KS11",
+                "005930",
+                "000660",
+                "AMD",
+                "MU"
+              ],
+              "markets": [
+                "US",
+                "KR"
+              ],
+              "themes": [],
+              "match_basis": "verified_entities",
+              "matched_tickers": [
+                "000660",
+                "005930"
+              ],
+              "market_match": true,
+              "score": 220
+            },
+            "summary": {
+              "video_id": "KopQpHNgc4k",
+              "title": "역대급 급락에 개인은 2조 넘게 샀다…유창희 대표가 삼성전자·SK하이닉스 추가 매수를 경계하는 이유ㅣ명민준, 박가영, 유창희 [주린이 구조대]",
+              "channel": "삼프로TV 3PROTV",
+              "source_url": "https://www.youtube.com/watch?v=KopQpHNgc4k",
+              "claim_status_summary": {
+                "partially_supported": 1,
+                "unverified": 8,
+                "asr_uncertain": 1
+              },
+              "claims": [
+                {
+                  "claim_id": "C1",
+                  "claim_text": "방송은 코스피 4,869(-5.2%), 코스닥 645(-5.7%), 연초 대비 각각 약 +15%와 -3%를 언급했다. 개인이 약 2조 2,000억~2조 3,000억 원을 사들였고 장전부터 매수했다고 전했다. 한 달 공매도 금액은 삼성전자 1조 3,500억 원, SK하이닉스 1조 7,500억 원이라고 했다. 외국인 매도만으로 하락을 설명하기 어렵다는 부분은 출연자 해석이다.",
+                  "status": "partially_supported",
+                  "confidence": 0.3,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "개인 2조 원대 매수와 ‘역대급’ 급락은 확인된 사실로 쓰지 않는다. 개인 순매수가 확인되더라도 바닥 확인 신호는 아니다."
+                },
+                {
+                  "claim_id": "C2",
+                  "claim_text": "일본 약 -5%, 대만 -6.2%, 나스닥 -2.2%, 필라델피아 반도체지수 -2.4%를 국내 급락과 비교했다. 인도네시아 9,100→5,100, 상하이 약 4,250→3,500, 금 -40%, 은 -60%, 비트코인 약 -40~-50%도 언급했다.",
+                  "status": "unverified",
+                  "confidence": 0.05,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "기준일과 시장별 세션을 맞추기 전에는 동반 급락의 강도나 자산 간 상대 낙폭을 단정하지 않는다."
+                },
+                {
+                  "claim_id": "C3",
+                  "claim_text": "유창희는 삼성전자의 장기 저평가 여부와 별개로, 삼성전자·SK하이닉스 비중이 이미 높은 투자자의 추가 매수를 경계하고 미보유자의 신규 편입과 구분했다. 방송 언급 가격은 삼성전자 18만 2,000원, SK하이닉스 111만 원이며, 15만 원 미만·80만 원은 하방 가정이다. 애플과 삼성전자의 장기공급계약은 가능성 보도로 소개됐다.",
+                  "status": "unverified",
+                  "confidence": 0.16,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "기존 보유와 추가 집중을 구분한 의견으로 소개한다. 하방 가정이나 LTA 가능성을 확인된 가격 전망·수주로 제시하지 않는다."
+                },
+                {
+                  "claim_id": "C4",
+                  "claim_text": "Hunterbrook 공매도 보고서가 AMD 하락의 계기로 거론됐고 미국 상무부 승인 범위가 언급됐다. 앤트로픽 상장 관련 자금 이동과 AMD·브로드컴의 상대 강세가 AMD를 취약하게 했다는 설명은 가설이다.",
+                  "status": "unverified",
+                  "confidence": 0.12,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "공매도 측 주장, 승인 사실, 주가 반응을 별개로 다룬다. 어느 하나를 시장 전체 급락의 확인된 원인으로 제시하지 않는다."
+                }
+              ],
+              "entities": [
+                {
+                  "ticker": "^KS11",
+                  "name": "코스피·코스닥 및 글로벌 증시",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                },
+                {
+                  "ticker": "005930",
+                  "name": "삼성전자",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "시장 데이터 조회 실패: no_usable_market_fields"
+                  ]
+                },
+                {
+                  "ticker": "000660",
+                  "name": "SK하이닉스",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "시장 데이터 조회 실패: no_usable_market_fields"
+                  ]
+                },
+                {
+                  "ticker": "AMD",
+                  "name": "AMD",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                },
+                {
+                  "ticker": "MU",
+                  "name": "마이크론",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "event_key": "TV3diSFaZIU",
+            "content_sha256": "1858130d3476f61328bc885bd7980d57368ddad41a0f6958967909028b09b985",
+            "occurred_at": "2026-11-20T01:52:19+00:00",
+            "relevance": {
+              "tickers": [
+                "^KS11",
+                "005930",
+                "000660",
+                "NVDA",
+                "BTC",
+                "017670",
+                "USD/KRW",
+                "KOSDAQ"
+              ],
+              "markets": [
+                "US",
+                "KR"
+              ],
+              "themes": [],
+              "match_basis": "verified_entities",
+              "matched_tickers": [
+                "000660",
+                "005930"
+              ],
+              "market_match": true,
+              "score": 220
+            },
+            "summary": {
+              "video_id": "TV3diSFaZIU",
+              "title": "이대로 갔다간...4,300까지도 열어 놔야 한다ㅣ이재규 SK증권 차장 [더블 체크]",
+              "channel": "삼프로TV 3PROTV",
+              "source_url": "https://www.youtube.com/watch?v=TV3diSFaZIU",
+              "claim_status_summary": {
+                "partially_supported": 5,
+                "unverified": 6,
+                "asr_uncertain": 1
+              },
+              "claims": [
+                {
+                  "claim_id": "C1",
+                  "claim_text": "출연자는 4,800을 코스피의 1차 지지선, 이탈 시 4,300을 기술적 하단으로 제시했다. 전일 종가를 5,000으로 가정해 14~15% 추가 하락을 설명했고, 과거 9,000에서 5,000으로 40% 넘게 내렸다고 발언했다. 현금 투자자는 투매보다 보유·매수 관점을 유지하되 레버리지와 업종 집중을 줄이자는 의견이다.",
+                  "status": "partially_supported",
+                  "confidence": 0.66,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "14%는 실제 전일 종가가 아닌 5,000을 기준으로 한 값이다. 4,800 이탈 여부를 판단하려면 방송에서 적용한 장중·종가 기준을 먼저 확인해야 한다."
+                },
+                {
+                  "claim_id": "C2",
+                  "claim_text": "장초반 지수는 약 4%, 삼성전자와 SK하이닉스는 각각 약 4.3%와 6% 하락했고, 이후 두 종목의 낙폭은 각각 약 4.5%와 6.2%로 언급됐다. 양 지수 약 3.7%·3.6% 하락, 직전 이틀 SK하이닉스 약 10%·삼성전기로 추정되는 종목 약 15% 상승, 주간 외국인 약 3조3천억 원 매도가 제시됐다. 출연자는 낮은 거래대금·예탁금, 얇은 호가와 레버리지가 낙폭을 키웠고, 소부장·2차전지는 약세인 반면 일부 바이오·소비·금융주는 상대적으로 버텼다고...",
+                  "status": "partially_supported",
+                  "confidence": 0.58,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "반도체 대형주의 동반 약세 보도와 시장 전체의 외국인 이탈·유동성 악화 주장은 구분해야 한다. 업종 이동은 동시각 업종별 수익률과 수급으로 확인할 필요가 있다."
+                },
+                {
+                  "claim_id": "C3",
+                  "claim_text": "방송은 앤트로픽이 공모가를 웃돌았으나 장중 상승폭을 반납했고 스페이스X보다 개인 매수세가 약했다고 전했다. 직전 미국장에서 나스닥·S&P 500·다우가 각각 2% 넘게 하락했고 한국 장중 나스닥 선물은 약 0.3% 하락했다고 언급했다. AMD의 동반 약세와 중국 관련 공매도 논거도 제시했다.",
+                  "status": "partially_supported",
+                  "confidence": 0.44,
+                  "supporting_evidence_ids": [
+                    "E4"
+                  ],
+                  "manual_check_required": true,
+                  "investor_implication": "IPO가 AI주 매도를 촉발했다는 인과 해석이나 개인 매수세 비교는 투자 근거로 쓰기 어렵다. 정규장과 선물 데이터는 거래 세션을 분리해 확인해야 한다."
+                },
+                {
+                  "claim_id": "C4",
+                  "claim_text": "SK텔레콤이 앤트로픽에 약 2천억~3천억 원을 투자해 약 4조 원의 이익을 얻었다는 발언이 나왔다. 평가이익인지 실현이익인지는 불명확하며 상장 이후 모멘텀 약화는 전망이다.",
+                  "status": "partially_supported",
+                  "confidence": 0.43,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "지분 평가액, 회계상 평가이익, 처분대금과 배당 재원은 서로 다르다. 약 4조 원을 실현이익이나 배당 여력으로 간주할 근거는 없다."
+                }
+              ],
+              "entities": [
+                {
+                  "ticker": "^KS11",
+                  "name": "코스피",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                },
+                {
+                  "ticker": "005930",
+                  "name": "삼성전자",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "시장 데이터 조회 실패: no_usable_market_fields"
+                  ]
+                },
+                {
+                  "ticker": "000660",
+                  "name": "SK하이닉스",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "시장 데이터 조회 실패: no_usable_market_fields"
+                  ]
+                },
+                {
+                  "ticker": "NVDA",
+                  "name": "엔비디아",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                },
+                {
+                  "ticker": "BTC",
+                  "name": "비트코인",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                },
+                {
+                  "ticker": "017670",
+                  "name": "SK텔레콤",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "시장 데이터 조회 실패: no_usable_market_fields"
+                  ]
+                },
+                {
+                  "ticker": "USD/KRW",
+                  "name": "원화·엔화·미국 국채",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "시장 데이터 조회 실패: Failed to parse json response from Yahoo Finance: {'code': 'Not Found', 'description': 'HTTP 404 Not Found'}"
+                  ]
+                },
+                {
+                  "ticker": "KOSDAQ",
+                  "name": "코스닥·바이오·방어주",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "시장 데이터 조회 실패: no_usable_market_fields"
+                  ]
+                }
+              ]
+            }
+          },
           {
             "event_key": "vC7v55f8sdo",
             "content_sha256": "8ab5ebf6bcb7ee1e9813140112a094c771cb6bcc073603e30f64617bad8d08ae",
@@ -1902,318 +2165,359 @@
             }
           },
           {
-            "event_key": "znmu0vaHb10",
-            "content_sha256": "c2f0b1992fe2fb02983408b38c22ac55bdb6ceb1033284920f963839d7b9e24d",
-            "occurred_at": "2026-11-18T23:03:49+00:00",
+            "event_key": "tMfYOFMSLTs",
+            "content_sha256": "372133bcff54f6631d6071ae219cb6cd740ad916f85cb80eee451bd5a08530d8",
+            "occurred_at": "2026-11-20T12:00:30+00:00",
             "relevance": {
-              "tickers": [
-                "NVDA",
-                "005930",
-                "000660"
-              ],
-              "markets": [
-                "US",
-                "KR"
-              ],
+              "tickers": [],
+              "markets": [],
               "themes": [],
-              "match_basis": "verified_entities",
-              "matched_tickers": [
-                "000660",
-                "005930"
-              ],
-              "market_match": true,
-              "score": 220
+              "match_basis": "title_and_claim_context",
+              "matched_tickers": [],
+              "market_match": false,
+              "score": 0
             },
             "summary": {
-              "video_id": "znmu0vaHb10",
-              "title": "엔비디아·삼전닉스 급락에도 아직 희망은 있다? AI 시장의 결정적 변수 | 여도은, 김장열 유니스토리자산운용 리서치센터 센터장 [글로벌 인터뷰]",
+              "video_id": "tMfYOFMSLTs",
+              "title": "반도체 주춤한 사이 떠오른 투자 기회? 기대감으로 오른 종목과 실적이 따라올 종목의 차이ㅣ명민준, 박가영, 차영주 [주린이 구조대]",
               "channel": "삼프로TV 3PROTV",
-              "source_url": "https://www.youtube.com/watch?v=znmu0vaHb10",
+              "source_url": "https://www.youtube.com/watch?v=tMfYOFMSLTs",
               "claim_status_summary": {
-                "partially_supported": 2,
-                "unverified": 6,
-                "asr_uncertain": 2
+                "unverified": 11,
+                "asr_uncertain": 1
               },
               "claims": [
                 {
                   "claim_id": "C1",
-                  "claim_text": "엔비디아가 150달러까지 밀린 날 AMD·브로드컴·아마존은 올랐으며, 삼성전자와 SK하이닉스는 4월 수준으로 되돌아갔고 삼성전자는 그보다 더 낮아졌다는 주장이다.",
-                  "status": "partially_supported",
-                  "confidence": 0.45,
+                  "claim_text": "출연자는 엔비디아의 순환 출자 중단 보도와 네오클라우드주 급락을 연결하고, AI 자금 조달·회수 및 경영 연속성 우려를 증시 약세의 원인으로 해석했다.",
+                  "status": "unverified",
+                  "confidence": 0.0,
                   "supporting_evidence_ids": [],
                   "manual_check_required": true,
-                  "investor_implication": "엔비디아가 조회 시점에 150달러대였고 한국 두 종목의 하락이 보도됐다는 범위만 인용할 수 있다. 종목 간 주가 차이만으로 승계나 장기 이익 우려를 하락 원인으로 단정할 수 없다."
+                  "investor_implication": "신규 출자 중단, 기존 약정 변경, 투자금 회수는 재무적 의미가 다르다. 어느 조치인지 확인되기 전에는 AI 투자 위축이나 증시 하락의 원인으로 단정할 수 없다."
                 },
                 {
                   "claim_id": "C2",
-                  "claim_text": "젠슨 황의 부재와 이사회의 복귀 거부, CFO의 임시 CEO 역할, 이안 벅·르네 하스 후보설을 제기했다. 후보 경력과 Arm의 IP 중립성, 네오클라우드 선별 지원 및 보증 정책, 연말·연초 선임 시 2월 실적 발표에서 새 전략이 나올 가능성도 언급했다.",
+                  "claim_text": "출연자는 다른 방송을 인용해 6,800억 달러를 제시하며 ‘차입’을 ‘투자’로 고쳤으나 산출 근거는 밝히지 않았다.",
                   "status": "unverified",
-                  "confidence": 0.06,
+                  "confidence": 0.0,
                   "supporting_evidence_ids": [],
                   "manual_check_required": true,
-                  "investor_implication": "승계·이사회 갈등을 확정 사건으로 보도하지 말고, 공식 직책 변경과 실제 고객 지원 조건이 공개될 때 재평가한다."
+                  "investor_implication": "6,800억 달러를 미국 AI 투자 총액이나 부채 규모로 인용하지 않는다."
                 },
                 {
                   "claim_id": "C3",
-                  "claim_text": "엔비디아 실적과 가이던스가 양호했고 FY2028 성장 전망이 70%에서 75%로 상향됐으며 모건스탠리가 53%로 낮췄다는 설명이다. 약 10배에서 이익 하락 시 13~15배, 200~250달러로 빠른 복귀가 어렵다는 내용은 인터뷰 시나리오다.",
-                  "status": "unverified",
-                  "confidence": 0.18,
+                  "claim_text": "대만 증시가 전일부터 하락하고 ‘두 번째 공매도 금지’ 뉴스가 나왔다는 발언이 있다. ‘5,이 깨진’이 가리키는 지수와 수준은 불명확하다.",
+                  "status": "asr_uncertain",
+                  "confidence": 0.0,
                   "supporting_evidence_ids": [],
                   "manual_check_required": true,
-                  "investor_implication": "70%·75%·53%를 확인된 회사 또는 증권사 전망으로 인용하지 않는다. 200~250달러는 회사 목표가가 아니라 발언자의 견해다."
+                  "investor_implication": "대만 당국의 시장 개입이나 주요 지수선 이탈을 확인된 위험 신호로 사용하지 않는다."
                 },
                 {
                   "claim_id": "C4",
-                  "claim_text": "삼성전자·SK하이닉스의 2027년 이익 개선 전망은 유지되지만 2028년 이후 불확실성으로 목표주가가 내려갔다는 해석이다. 삼성전자 380→600, SK하이닉스 270 또는 280→400~450, 30만 원 목표가, DRAM 마진 80%대→30%, 하방 시나리오별 배수가 언급됐다.",
-                  "status": "asr_uncertain",
-                  "confidence": 0.08,
+                  "claim_text": "방송에서 나스닥 선물 약 −1.6%에서 −1.5%, 전일 방송 중 약 +2%, 유가 82달러 및 81달러대, 미국 10년물 금리와 비트코인 하락이 언급됐다. AI 불안을 원인으로 본 것은 출연자의 해석이다.",
+                  "status": "unverified",
+                  "confidence": 0.0,
                   "supporting_evidence_ids": [],
                   "manual_check_required": true,
-                  "investor_implication": "원음과 당시 추정치로 분모를 확인하기 전에는 이 수치를 확정 이익이나 저평가 근거로 사용하지 않는다."
+                  "investor_implication": "방송 수치를 종가나 확정 장중 시세로 사용하지 않는다. 원인을 평가하려면 같은 시각의 자산별 움직임과 뉴스 시점을 맞춰야 한다."
+                }
+              ],
+              "entities": []
+            }
+          },
+          {
+            "event_key": "uPfwN34xlpE",
+            "content_sha256": "7975033e23a42aea6991fc92348ebaad94867b28479994883bbcde93a76a130c",
+            "occurred_at": "2026-11-20T11:00:20+00:00",
+            "relevance": {
+              "tickers": [
+                "AMD",
+                "^KS11"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "verified_entities",
+              "matched_tickers": [],
+              "market_match": false,
+              "score": 0
+            },
+            "summary": {
+              "video_id": "uPfwN34xlpE",
+              "title": "[#찐시황]  “수급 괴멸, 증시 패닉!” 검은 금요일 아시아증시 동반 폭락장… 도대체 무슨 일이 벌어졌나? | 김동엽 대표",
+              "channel": "815Money talk",
+              "source_url": "https://www.youtube.com/watch?v=uPfwN34xlpE",
+              "claim_status_summary": {
+                "unverified": 10,
+                "partially_supported": 1,
+                "supported": 1
+              },
+              "claims": [
+                {
+                  "claim_id": "C1",
+                  "claim_text": "11월 20일 한국 증시가 5% 넘게, 주요 아시아 증시가 대체로 5~6% 하락했다. 한국이 앞서 더 크게 하락했고, 코스피는 연초 대비 약 20% 상승, 코스닥은 약 930에서 650으로 하락했으며, 앞선 코스피 4,911 저점에서 서킷브레이커가 발동했다.",
+                  "status": "unverified",
+                  "confidence": 0.99,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "동반 급락의 크기나 한국의 선행 하락을 확인된 사실로 전제하지 않는다. 국가별 낙폭은 같은 거래 기준으로 비교해야 한다."
+                },
+                {
+                  "claim_id": "C2",
+                  "claim_text": "당일 외국인 현물 매도 약 1.7조 원, 개인 순매수 약 2.4조 원, 외국인 누적 매도 240조 원 및 11월 포함 시 250조 원 이상, 공매도 역대 최대라는 발언이다.",
+                  "status": "unverified",
+                  "confidence": 0.99,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "누적 매도액을 외국인 자금의 순유출 규모로 인용하거나 공매도 기록을 급락 원인으로 단정하지 않는다."
+                },
+                {
+                  "claim_id": "C3",
+                  "claim_text": "일부 종목의 매수·매도 10단계 호가 잔량이 1천 주 미만이고 일부 호가에 5~10주만 있었다. 코스피 4,600대 장중 테스트와 반등, 개인 투매가 바닥 신호가 될 수 있다는 전망과 과거 급락 후 반등 통계도 제시했다.",
+                  "status": "unverified",
+                  "confidence": 0.99,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "4,600대를 매수 기준으로 삼거나 과거 통계의 반등 폭을 기대수익률로 사용하지 않는다."
+                },
+                {
+                  "claim_id": "C4",
+                  "claim_text": "공매도 업체가 AMD의 대중국 수출통제 위반 의혹을 제기했고, AMD 주가는 한국 시간 아침 약 7%, 미국 장중 한때 10% 넘게 하락했으며 관련 반도체주도 약세였다.",
+                  "status": "unverified",
+                  "confidence": 0.99,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "수출통제 위반이나 의혹과 주가 하락 사이의 인과를 사실로 전달하지 않는다."
                 }
               ],
               "entities": [
                 {
-                  "ticker": "NVDA",
-                  "name": "엔비디아",
+                  "ticker": "AMD",
+                  "name": "AMD",
                   "status": "unverified",
                   "verification_notes": [
                     "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
                   ]
                 },
                 {
-                  "ticker": "005930",
-                  "name": "삼성전자",
+                  "ticker": "^KS11",
+                  "name": "코스피·코스닥 및 국내 자본시장 정책",
                   "status": "unverified",
                   "verification_notes": [
-                    "시장 데이터 조회 실패: no_usable_market_fields"
-                  ]
-                },
-                {
-                  "ticker": "000660",
-                  "name": "SK하이닉스",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "시장 데이터 조회 실패: no_usable_market_fields"
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
                   ]
                 }
               ]
             }
           },
           {
-            "event_key": "TDGVrEKXU5M",
-            "content_sha256": "cae0d22ab9e264b1cecdbd06f13ed69ec3ad6847c439a06eced3866e1edd74e8",
-            "occurred_at": "2026-11-18T09:04:08+00:00",
+            "event_key": "3PTKmp5zdh8",
+            "content_sha256": "7a85889fe458904fc98ab7e439c20dc4ba1793d6b560a563dee8c08b804d3ac5",
+            "occurred_at": "2026-11-20T10:00:25+00:00",
             "relevance": {
               "tickers": [
-                "^KS11",
-                "NVDA",
-                "005930",
-                "000660"
+                "AMZN",
+                "CRM",
+                "^KS11"
               ],
               "markets": [
-                "US",
-                "KR"
+                "US"
               ],
               "themes": [],
               "match_basis": "verified_entities",
-              "matched_tickers": [
-                "000660",
-                "005930"
-              ],
-              "market_match": true,
-              "score": 220
+              "matched_tickers": [],
+              "market_match": false,
+              "score": 0
             },
             "summary": {
-              "video_id": "TDGVrEKXU5M",
-              "title": "\"5,000선 깨져도 여전히 산다\"…반도체를 저평가로 보는 3가지 근거ㅣ홍선애, 박승영 한화투자증권 PLUS자산전략팀장 [여의도 인사이트]",
-              "channel": "삼프로TV 3PROTV",
-              "source_url": "https://www.youtube.com/watch?v=TDGVrEKXU5M",
+              "video_id": "3PTKmp5zdh8",
+              "title": "“앤트로픽 상장 직후 AI 기술주가 흔들렸다?” 호재가 악재로 바뀐 이유… 나스닥 얼마나 더 떨어질까?  | 블랙퀀트에쿼티 윤진 대표",
+              "channel": "815Money talk",
+              "source_url": "https://www.youtube.com/watch?v=3PTKmp5zdh8",
               "claim_status_summary": {
                 "unverified": 12
               },
               "claims": [
                 {
                   "claim_id": "C1",
-                  "claim_text": "코스피가 장중 5,000선을 이탈했다가 회복했고 약 한 달 전에는 5,500선이었다. 진행자는 외국인 매도가 약 7개월 이어졌고 연초 이후 매도의 약 85%가 삼성전자·SK하이닉스에 집중됐다고 했다. 출연자는 두 종목의 외국인 지분율 하락이 매도금액이 주는 인상보다 작다고 봤다.",
+                  "claim_text": "앤트로픽이 상장 첫날 111.50달러에 개장해 97.17달러에 마감했고, 종가 시가총액은 약 1,800억 달러였으며, 높은 시초가가 초기 매도를 촉발했다는 주장이다.",
                   "status": "unverified",
-                  "confidence": 0.03,
+                  "confidence": 0.15,
                   "supporting_evidence_ids": [],
                   "manual_check_required": true,
-                  "investor_implication": "5,000선 회복이나 외국인 수급 개선을 투자 근거로 쓰기 전에 지수 장중 경로와 두 종목의 실제 보유율 변화를 확인한다."
+                  "investor_implication": "거래소와 공시에서 발행인·티커·첫 거래일을 먼저 확인하고, 공모가와 시초가를 구분한 뒤 종가와 상장 직후 주식 수로 시가총액을 재산출해야 한다."
                 },
                 {
                   "claim_id": "C2",
-                  "claim_text": "출연자는 방송 전일 거래대금을 25조로, 약 한 달간 예탁금과 신용 감소의 합계를 단위가 명확하지 않은 13.4로 언급하며 수급이 약해졌다고 봤다. 11~12월에 이런 약세가 나타나는 계절성도 제시했다.",
+                  "claim_text": "기관의 첫날 예상 종가는 93~94달러 또는 93~96달러, 출연자 측 평균은 94.60달러였으며, 별도 거래일의 예상 범위는 80달러대 초반~136달러, 95% 범위의 추정 하단은 약 77달러였다는 주장이다.",
                   "status": "unverified",
-                  "confidence": 0.02,
+                  "confidence": 0.0,
                   "supporting_evidence_ids": [],
                   "manual_check_required": true,
-                  "investor_implication": "거래대금과 잔고 변화를 동일 기간으로 맞추고 다년간 월별 자료를 대조하기 전에는 연말 수급 약화를 반복 패턴으로 전제하지 않는다."
+                  "investor_implication": "첫날 종가 예측과 후속 거래일의 가격 범위를 구분하고, 산출 시각과 검증 이력이 없는 하단 값을 가격 지지선으로 해석하지 않는다."
                 },
                 {
                   "claim_id": "C3",
-                  "claim_text": "방송은 다음 분기 매출 가이던스와 내년 전망을 긍정적으로 평가했다. AI 이전 매출총이익률 가이던스는 50%대 후반, 이번은 70% 초과이고, 메모리 가격이 오르면서 이번 가이던스가 직전 분기보다 약 2%포인트 낮아졌다고 설명했다. GPU 임대료 상승, 생산능력 확충, 시설·전력 준비 이후 네오클라우드 보증 지원도 실적 관련 발언으로 소개했다.",
+                  "claim_text": "앤트로픽이 주요 지수에 편입되고, 상장 후 첫 2거래일이 지나면 패시브 매수가 약해져 약 6개월간 주가가 침체할 수 있다는 주장이다.",
                   "status": "unverified",
-                  "confidence": 0.02,
+                  "confidence": 0.0,
                   "supporting_evidence_ids": [],
                   "manual_check_required": true,
-                  "investor_implication": "AI 수요 판단에는 공식 매출 전망과 비교 가능한 임대 데이터를, 수익성 판단에는 동일 회계 기준의 총마진과 비용 영향을 사용한다."
+                  "investor_implication": "지수 편입 발효일과 실제 보유량 변화를 먼저 확인하고, 6개월 전망은 기준 지수 대비 수익률과 낙폭으로 별도 평가한다."
                 },
                 {
                   "claim_id": "C4",
-                  "claim_text": "미국 일부 지역에서 데이터센터 신규 인허가를 멈췄고 승인됐으나 미착공인 사업도 재검토할 수 있다는 설명이다. 12월 협의 및 1월 인허가 재개, 전기료 비용 분담은 출연자가 제시한 확인 사항이다.",
+                  "claim_text": "아마존과 구글이 앤트로픽 지분을 각각 약 13% 보유하고, 투자와 상업계약이 순환금융으로 연결될 수 있으며, 세일즈포스의 관련 노출은 자체 가치의 약 6%로 주가 동조를 일으킬 수 있다는 주장이다.",
                   "status": "unverified",
-                  "confidence": 0.01,
+                  "confidence": 0.0,
                   "supporting_evidence_ids": [],
                   "manual_check_required": true,
-                  "investor_implication": "데이터센터 가동 시점을 추정할 때 프로젝트별 허가 상태, 전력 연결 일정, 비용 분담을 각각 확인한다."
+                  "investor_implication": "상장 전후 주주 공시에서 보유 주체·주식 종류·희석 기준을 확인하고, 계약 현금흐름과 세일즈포스 노출의 분모를 검증한 뒤 주가 민감도를 판단한다."
                 }
               ],
               "entities": [
                 {
+                  "ticker": "AMZN",
+                  "name": "아마존 (Amazon)",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                },
+                {
+                  "ticker": "CRM",
+                  "name": "세일즈포스 (Salesforce)",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                },
+                {
                   "ticker": "^KS11",
-                  "name": "코스피·국내 증시",
+                  "name": "코스피·시장 선택",
                   "status": "unverified",
                   "verification_notes": [
                     "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                },
-                {
-                  "ticker": "NVDA",
-                  "name": "엔비디아",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                },
-                {
-                  "ticker": "005930",
-                  "name": "삼성전자",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "시장 데이터 조회 실패: no_usable_market_fields"
-                  ]
-                },
-                {
-                  "ticker": "000660",
-                  "name": "SK하이닉스",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "시장 데이터 조회 실패: no_usable_market_fields"
                   ]
                 }
               ]
             }
           },
           {
-            "event_key": "4bVdRJVO7ng",
-            "content_sha256": "c65120312c0a1d65b635e37da95681b44967f38a8b410a29fdd4c3123941a105",
-            "occurred_at": "2026-11-18T23:13:52+00:00",
+            "event_key": "k-BTGBvzRtM",
+            "content_sha256": "c900ed09e01936fef01a240368d576e285d89d2cc934e331e8eba8658e21f6ea",
+            "occurred_at": "2026-11-20T09:24:10+00:00",
             "relevance": {
               "tickers": [
+                "DELL",
+                "HPQ",
+                "WDAY",
+                "ADI",
                 "^KS11",
-                "000660",
-                "NVDA",
-                "AMD",
-                "AVGO"
+                "AMZN"
               ],
               "markets": [
-                "US",
-                "KR"
+                "US"
               ],
               "themes": [],
               "match_basis": "verified_entities",
-              "matched_tickers": [
-                "000660"
-              ],
-              "market_match": true,
-              "score": 120
+              "matched_tickers": [],
+              "market_match": false,
+              "score": 0
             },
             "summary": {
-              "video_id": "4bVdRJVO7ng",
-              "title": "11월 19일 오늘 코스피 또 하락할까?",
+              "video_id": "k-BTGBvzRtM",
+              "title": "투자자들이 꼭 알아야 하는 다음 주 투자 포인트(11.23~27)",
               "channel": "경제사냥꾼",
-              "source_url": "https://www.youtube.com/watch?v=4bVdRJVO7ng",
+              "source_url": "https://www.youtube.com/watch?v=k-BTGBvzRtM",
               "claim_status_summary": {
-                "unverified": 5,
-                "partially_supported": 2,
-                "asr_uncertain": 3
+                "unverified": 12
               },
               "claims": [
                 {
                   "claim_id": "C1",
-                  "claim_text": "코스피200 야간선물이 장중 0.9% 상승했다가 약 2.7% 하락했고, 1.41% 하락 마감했다. 비슷한 낙폭이 나온 날에는 코스피가 약하게 출발하는 경우가 많았다.",
+                  "claim_text": "영상은 미국 주식 정규장이 11월 26일 추수감사절에 휴장하고 27일 13:00 ET(28일 03:00 KST)에 조기 폐장한다고 설명한다. 이에 따라 한국 증시는 26일 아침에는 미국 25일 종가를 참고할 수 있지만, 27일 아침에는 새 미국 정규장 종가가 없다는 주장이다.",
                   "status": "unverified",
                   "confidence": 0.0,
                   "supporting_evidence_ids": [],
                   "manual_check_required": true,
-                  "investor_implication": "야간선물 등락률과 과거 하락 출발 빈도를 확인하기 전에는 이를 당일 하락 출발의 근거로 쓰기 어렵다."
+                  "investor_implication": "영상의 거래 일정이 맞다면 26일과 27일 한국장 개장 전에 참고할 수 있는 미국 정규장 종가가 다르다. 장전 점검에서는 정규장·시간외·선물 시세를 구분한다."
                 },
                 {
                   "claim_id": "C2",
-                  "claim_text": "11월 18일까지 외국인은 코스피에서 4거래일 연속 3조 6,000억 원 넘게 순매도했고, 18일 기관의 4,926억 원 순매수가 5,000선 회복을 뒷받침했다. 직전 10거래일 중 전일 종가보다 0.2% 넘게 낮게 출발한 5일 가운데 시가 위 마감은 외국인이 순매수한 하루뿐이었다. 영상은 19일 하락 출발과 시가 아래 마감을 기본 전망으로 삼았다. 삼성전자·SK하이닉스 외국인 순매수 전환과 시가 회복 시 전일 종가에 재접근할 수 있고, 수출통제 완화 시...",
-                  "status": "partially_supported",
-                  "confidence": 0.38,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "오전 반도체주 약세를 하락 마감 전망의 적중으로 해석하지 말고, 정규장 시가·종가와 두 종목의 시간대별 외국인 수급을 따로 확인해야 한다."
-                },
-                {
-                  "claim_id": "C3",
-                  "claim_text": "11월 19일 수능으로 코스피 정규장이 평소보다 한 시간 늦은 오전 10시에 개장한다.",
-                  "status": "partially_supported",
-                  "confidence": 0.58,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "주문이나 장중 데이터 비교에 적용할 개장 시각은 한국거래소의 현물 정규장 공지로 확인해야 한다."
-                },
-                {
-                  "claim_id": "C4",
-                  "claim_text": "영상이 미국 거래 SK하이닉스 ADR로 지칭한 증권이 0.1% 하락했다.",
-                  "status": "asr_uncertain",
+                  "claim_text": "영상은 11월 25일 22:30 KST에 3분기 GDP 2차 추정치·기업이익 첫 발표·10월 PCE·내구재 주문이 집중되고, 보도에 따르면 실업수당 청구도 이날로 앞당겨졌다고 전한다. 비교치는 9월 PCE 전년비 3.6%, 근원 3.1%, 3분기 GDP 속보치 연율 3.4%다.",
+                  "status": "unverified",
                   "confidence": 0.0,
                   "supporting_evidence_ids": [],
                   "manual_check_required": true,
-                  "investor_implication": "증권의 정확한 유형과 거래 장소를 확인하기 전에는 -0.1%를 국내 SK하이닉스의 선행 지표로 쓰지 않는다."
+                  "investor_implication": "공식 일정에서 동시 발표가 확인되면 성장과 물가가 서로 다른 방향으로 나올 가능성도 고려한다. 금리와 주가 반응을 한 지표의 영향으로 단정하지 않는다."
+                },
+                {
+                  "claim_id": "C3",
+                  "claim_text": "영상은 연준 목표 범위가 3.75~4.00%, FOMC가 12월 8~9일 ET(결정 10일 04:00 KST)이며, 11월 20일 05:51 KST의 CME FedWatch에서 25bp 인상 확률이 96.4%였다고 인용한다. 강한 지표와 약한 국채 입찰이 금리 상승 및 성장주 부담으로 이어질 수 있다는 부분은 가설이다.",
+                  "status": "unverified",
+                  "confidence": 0.0,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "96.4%를 근거로 인상이 시장에 거의 반영됐다고 판단하지 않는다. 같은 회의와 목표금리 구간을 표시한 당시 기록을 확인한 뒤, 지표 발표와 입찰 전후의 금리 움직임을 따로 본다."
+                },
+                {
+                  "claim_id": "C4",
+                  "claim_text": "영상은 11월 26일이 올해 마지막 금통위이며 7·8월 인상 후 10월 22일 동결했다고 전한다. 11월 20일 연합인포맥스 설문은 19명 중 18명이 3.25%로 인상, 1명이 동결, 15명이 2027년 1분기 3.50%를 예상했다고 인용한다.",
+                  "status": "unverified",
+                  "confidence": 0.0,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "인상 여부뿐 아니라 새 성장·물가 전망과 결정문을 함께 본다. 설문 원문이 확인되기 전에는 시장의 압도적 인상 예상으로 표현하지 않는다."
                 }
               ],
               "entities": [
                 {
+                  "ticker": "DELL",
+                  "name": "델 테크놀로지스",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                },
+                {
+                  "ticker": "HPQ",
+                  "name": "HP",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                },
+                {
+                  "ticker": "WDAY",
+                  "name": "워크데이",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                },
+                {
+                  "ticker": "ADI",
+                  "name": "아날로그 디바이스",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                },
+                {
                   "ticker": "^KS11",
-                  "name": "코스피·코스피200 야간선물",
+                  "name": "MSCI·코스피200·삼성전자",
                   "status": "unverified",
                   "verification_notes": [
                     "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
                   ]
                 },
                 {
-                  "ticker": "000660",
-                  "name": "SK하이닉스",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "시장 데이터 조회 실패: no_usable_market_fields"
-                  ]
-                },
-                {
-                  "ticker": "NVDA",
-                  "name": "엔비디아",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                },
-                {
-                  "ticker": "AMD",
-                  "name": "AMD",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                },
-                {
-                  "ticker": "AVGO",
-                  "name": "브로드컴",
+                  "ticker": "AMZN",
+                  "name": "아마존 웹 서비스(AWS)",
                   "status": "unverified",
                   "verification_notes": [
                     "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
@@ -2223,9 +2527,9 @@
             }
           },
           {
-            "event_key": "QwhGDJbSGvU",
-            "content_sha256": "4f6501386e73e4e2502895b8f6539f1861f9cdb769d452982227efc1706373fc",
-            "occurred_at": "2026-11-20T00:33:23+00:00",
+            "event_key": "vxmjSpX5Cx8",
+            "content_sha256": "ff4ad5989336e7fae1803e5972356a702df20225f6b07e3f773e3242298e4284",
+            "occurred_at": "2026-11-20T09:16:33+00:00",
             "relevance": {
               "tickers": [
                 "AMD",
@@ -2241,54 +2545,50 @@
               "score": 0
             },
             "summary": {
-              "video_id": "QwhGDJbSGvU",
-              "title": "\"이제 와서 왜?\" AI 버블 우려 속 반토막 난 주식, 어떻게 대응할까?  | 박병창 MP파트너스 대표 [마켓 인사이드]",
-              "channel": "삼프로TV 3PROTV",
-              "source_url": "https://www.youtube.com/watch?v=QwhGDJbSGvU",
+              "video_id": "vxmjSpX5Cx8",
+              "title": "지금 '공매도' 때문에 시장 뒤집힌 진짜 이유",
+              "channel": "경제사냥꾼",
+              "source_url": "https://www.youtube.com/watch?v=vxmjSpX5Cx8",
               "claim_status_summary": {
-                "unverified": 10,
-                "asr_uncertain": 1,
+                "unverified": 11,
                 "partially_supported": 1
               },
               "claims": [
                 {
                   "claim_id": "C1",
-                  "claim_text": "방송은 나스닥 약 −2.2%, 장중 고저폭 약 4%, 아마존 −3.8%, 알파벳 −3.4%, 메타 −3.2%를 제시했다. 박병창 대표는 AI IPO·AMD 공매도·옵션 만기 중 하나로 급락을 설명하기 어렵다고 봤으며, 2025년 한 차례 이탈했다는 60주 이동평균선의 재이탈 가능성을 언급했다.",
+                  "claim_text": "AMD 하락에 베팅한 헌터브룩이 미국의 거래 제한 대상인 중국 서버 업체가 제한 이후에도 AMD 최신 소프트웨어를 사용했고 싱가포르 또는 미국 관계사를 통해 이를 받았을 가능성이 있다고 주장했다.",
                   "status": "unverified",
-                  "confidence": 0.22,
+                  "confidence": 0.05,
                   "supporting_evidence_ids": [],
                   "manual_check_required": true,
-                  "investor_implication": "옵션 만기나 IPO를 단일 원인으로 단정하지 말고, 60주선의 장중 이탈과 주봉 종가 이탈을 구분해야 한다."
+                  "investor_implication": "원보고서와 규제 대상 법인·품목이 확인되기 전에는 우회 이전 의혹을 규정 위반이나 확정적 매출 손실로 해석할 수 없다."
                 },
                 {
                   "claim_id": "C2",
-                  "claim_text": "방송은 앤트로픽으로 추정되는 AI IPO의 공모가 83달러, 첫날 종가 97달러, 장중 시가총액 2조 달러를 언급했다. 111·115달러의 시초가·장중 고가 구분과 종가 시가총액은 불명확하다. 공모가를 웃돈 종가를 AI 수요 실망으로 단정하기 어렵다는 평가와 3~6개월 오버행 관찰은 발언자의 판단이다.",
-                  "status": "asr_uncertain",
-                  "confidence": 0.3,
-                  "supporting_evidence_ids": [
-                    "E2",
-                    "E4"
-                  ],
+                  "claim_text": "AMD가 보고서를 즉각 반박하며 사실 왜곡이라고 했고, 헌터브룩은 실제 규정 위반을 확인한 것은 아니라고 밝혔다.",
+                  "status": "unverified",
+                  "confidence": 0.0,
+                  "supporting_evidence_ids": [],
                   "manual_check_required": true,
-                  "investor_implication": "발행사와 공모 조건을 확인하기 전에는 첫날 가격이나 추정 시가총액을 밸류에이션 근거로 쓰지 않는다."
+                  "investor_implication": "양측 발언이 확인되더라도 회사의 반박이나 보고서의 유보 문구가 당국의 위반 판단을 대신하지 않는다."
                 },
                 {
                   "claim_id": "C3",
-                  "claim_text": "방송은 AMD가 약 7% 하락했고 공매도 기관이 확인되지 않은 수출 의혹을 제기했으며 AMD가 이를 부인했다고 전했다. IPO 매수자금 마련을 위한 매도라는 설명은 별도 가설이다.",
+                  "claim_text": "보고서가 나온 날부터 미국이 싱가포르 등으로 향하는 AI 반도체 수출 심사를 강화했다.",
                   "status": "unverified",
-                  "confidence": 0.12,
+                  "confidence": 0.0,
                   "supporting_evidence_ids": [],
                   "manual_check_required": true,
-                  "investor_implication": "수출 의혹은 확인된 위반이나 규제 조치로 다루지 않는다. 주가 변동과 의혹의 사실 여부는 별도로 확인해야 한다."
+                  "investor_implication": "공식 기준과 적용 범위를 확인하기 전에는 심사 강화에 따른 출하 지연이나 지역 매출 감소를 기정사실로 볼 수 없다."
                 },
                 {
                   "claim_id": "C4",
-                  "claim_text": "방송은 필라델피아 반도체지수 14,650→9,419, 마이크론 1,255→690달러, 샌디스크 2,350→755달러, 웨스턴디지털 800→296달러를 제시했다. 코어위브는 상장 가격대로 돌아왔고 AMD·브로드컴·메타는 상대적으로 덜 조정됐다는 비교가 뒤따랐다. 버블 우려의 선반영과 추가 하락 가능성은 발언자의 해석이다.",
+                  "claim_text": "영상은 미국 정부의 공식 조사 착수 여부를 핵심 후속 확인 사항으로 제시하며, 착수가 확인됐다고 말하지 않는다.",
                   "status": "unverified",
-                  "confidence": 0.11,
+                  "confidence": 0.0,
                   "supporting_evidence_ids": [],
                   "manual_check_required": true,
-                  "investor_implication": "같은 기간과 가격 기준으로 낙폭을 비교하되, 낙폭만으로 저점 형성이나 밸류에이션 매력을 판단하지 않는다."
+                  "investor_implication": "조사 상태는 공개 자료로 확인되지 않았다. 자료 요청, 공식 조사 착수, 위반 확정은 별개의 단계다."
                 }
               ],
               "entities": [
@@ -2302,15 +2602,7 @@
                 },
                 {
                   "ticker": "^KS11",
-                  "name": "코스피·국내 주요 종목",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                },
-                {
-                  "ticker": "^KS11",
-                  "name": "골드만삭스·코스피 전망",
+                  "name": "코스피·삼성전자·SK하이닉스",
                   "status": "unverified",
                   "verification_notes": [
                     "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
@@ -2320,140 +2612,73 @@
             }
           },
           {
-            "event_key": "qu5RoRs0beQ",
-            "content_sha256": "72df85acd5fc8325fc8285e509f3df18aa8bcbdd46344d9e713907718f50da67",
-            "occurred_at": "2026-11-19T23:25:11+00:00",
+            "event_key": "kXGnjB4FYIk",
+            "content_sha256": "6660ccc900db96f7d0f4b68dc4256fa09b38c1688ca1b6292982316c7458c177",
+            "occurred_at": "2026-11-20T08:52:21+00:00",
             "relevance": {
-              "tickers": [],
-              "markets": [],
+              "tickers": [
+                "^KS11"
+              ],
+              "markets": [
+                "US"
+              ],
               "themes": [],
-              "match_basis": "title_and_claim_context",
+              "match_basis": "verified_entities",
               "matched_tickers": [],
               "market_match": false,
               "score": 0
             },
             "summary": {
-              "video_id": "qu5RoRs0beQ",
-              "title": "앤트로픽 상장 첫날 17% 상승…아마존·구글·SKT·LG 대박 | 트럼프 요구한 핵 군축, 중·러는 냉담…김정은 회담도 성사 안 돼 | 권순우 삼프로TV 취재팀장 [뉴스3]",
+              "video_id": "kXGnjB4FYIk",
+              "title": "삼전닉스가 '시대의 주식'으로 재평가받기 위해 반드시 필요한 조건ㅣ홍선애, 빈센트 하나증권 애널리스트 [여의도 인사이트]",
               "channel": "삼프로TV 3PROTV",
-              "source_url": "https://www.youtube.com/watch?v=qu5RoRs0beQ",
+              "source_url": "https://www.youtube.com/watch?v=kXGnjB4FYIk",
               "claim_status_summary": {
-                "partially_supported": 1,
-                "unverified": 8,
+                "unverified": 9,
                 "asr_uncertain": 1
               },
               "claims": [
                 {
                   "claim_id": "C1",
-                  "claim_text": "앤트로픽 공모가는 희망 범위 상단 78달러를 넘은 83달러였고 공모 물량은 19% 늘었다. 기본 공모액은 813억 달러로 스페이스X의 750억 달러보다 컸으며, 첫날 공모가 대비 장중 약 23%, 종가 17% 상승했고 시가총액은 약 1조 5,000억 달러였다는 주장이다.",
-                  "status": "partially_supported",
-                  "confidence": 0.87,
-                  "supporting_evidence_ids": [
-                    "E3"
-                  ],
+                  "claim_text": "방송은 2027년 매출 70% 이상 확정과 2027년까지 물량 약 75% 판매를 별도로 언급했다. 회사·제품별 적용 범위는 불명확하다. 2027년 4~5월부터 DRAM 가격이 하락할 수 있으며, 그때 LTA가 이익을 방어해야 구조 변화로 볼 수 있다는 전망이다.",
+                  "status": "unverified",
+                  "confidence": 0.0,
+                  "supporting_evidence_ids": [],
                   "manual_check_required": true,
-                  "investor_implication": "17%는 보도에 근거한 첫날 종가 수익률로 인용할 수 있다. 시가총액과 공모 규모 비교는 거래 시점, 발행주식 수, 초과배정 포함 여부를 맞춘 뒤 사용해야 한다."
+                  "investor_implication": "계약 커버리지 수치만으로 하락기 마진 방어를 가정하지 말고, 제품별 실현가격과 마진이 실제로 유지되는지 확인해야 한다."
                 },
                 {
                   "claim_id": "C2",
-                  "claim_text": "직전 12개월간 10만 달러 이상 지출한 고객이 2025년 말 약 1,500곳에서 2026년 9월 말 1만 1,900곳 이상으로 늘었고, 9월까지 매출은 332억 달러로 전년 대비 약 13배이며, 연산 자원 구매·임차 약정은 약 1,200조 원이라는 주장이다.",
+                  "claim_text": "방송은 SK하이닉스의 2026년 3분기 발표 뒤 이익 추정치가 올랐는데도 PER이 하락해 주가를 압박했다고 해석했다. 2018년 3분기 6조4,700억 원에서 다음 분기 약 4조3,000억~4조4,300억 원으로 약 32% 감익한 사례와 2004~2006년 코스피 선행이익 차트를 근거로, 양사의 최근 약 2개 분기 고이익이 3~4개 분기로 이어지고 AI 수요와 주주환원이 뒷받침되면 재평가될 수 있다고 봤다.",
                   "status": "unverified",
-                  "confidence": 0.97,
+                  "confidence": 0.0,
                   "supporting_evidence_ids": [],
                   "manual_check_required": true,
-                  "investor_implication": "고객과 매출 수치를 수익화의 근거로 쓰려면 지표 정의를 확인하고, 수익성은 마진과 현금흐름, 연산비 지급 일정으로 별도 판단해야 한다."
+                  "investor_implication": "재평가 가설은 2026년 4분기 이후 영업이익과 컨센서스의 지속성, 배당 및 자사주 매입·소각의 실제 집행으로 점검해야 한다."
                 },
                 {
                   "claim_id": "C3",
-                  "claim_text": "SK텔레콤이 초기 기업가치 약 50억 달러일 때 앤트로픽에 투자해 약 15배의 성과와 약 4조 3,000억 원의 지분 가치를 얻었다는 주장이다. 방송은 SK하이닉스의 키옥시아 투자 약 3조 원이 약 25조 원이 된 사례를 들며 특별배당을 거론했고, 제목은 아마존·구글·LG의 수혜도 주장했다.",
+                  "claim_text": "방송은 미국 반도체지수가 장 초반 4% 이상 상승했다가 한국 시각 01:20~01:30 무렵 급반전했고, 이후 한국 증시가 크게 하락했다고 설명했다. 코스피 과거 배증 구간의 외국인 평균 지분율을 각각 약 33%, 방송 시점을 약 35%로 제시했으며, 직전 주 13주 만의 순매수 후 방송 주 다시 순매도했다고 말했다.",
                   "status": "unverified",
-                  "confidence": 0.97,
+                  "confidence": 0.0,
                   "supporting_evidence_ids": [],
                   "manual_check_required": true,
-                  "investor_implication": "미확인 지분가치를 실현차익이나 배당 재원으로 반영하지 않는다. 투자 주체, 희석 후 지분율, 평가일, 매각 및 배당 결의를 각각 확인해야 한다."
+                  "investor_implication": "미국 반도체주 움직임이나 외국인 순매도 전환을 매매 근거로 쓰기 전에 지수 분봉과 KRX 주간 순매매 자료를 같은 거래일 기준으로 맞춰 확인해야 한다."
                 },
                 {
                   "claim_id": "C4",
-                  "claim_text": "앤트로픽이 상장 첫날 상승한 거래일에 나스닥은 하락했고 AMD 공매도 보고서가 있었다는 주장이다. 방송은 보고서 내용을 확인하지 않았고 지수 하락의 원인을 특정하지 않았다.",
+                  "claim_text": "방송은 AI 관련 투자가 주요국 성장에 기여하며 미국 데이터센터 투자 속도가 둔화해도 2027년까지 성장의 중심 역할을 할 가능성이 높다고 봤다. 송전 제약과 중간선거 이후 의회·행정부 정책은 하방 변수로 제시했다.",
                   "status": "unverified",
-                  "confidence": 0.96,
+                  "confidence": 0.0,
                   "supporting_evidence_ids": [],
                   "manual_check_required": true,
-                  "investor_implication": "지수 하락과 보고서 공개가 확인되더라도 동시 발생을 인과로 연결하지 않는다. 지수 움직임과 AMD 관련 사건을 별도로 판단한다."
-                }
-              ],
-              "entities": []
-            }
-          },
-          {
-            "event_key": "Ua9VA-NiUUM",
-            "content_sha256": "7e0ded589e5ca2569a1ffa31b8fb33b2875f0a13757f27bc200031cb1dadc0ec",
-            "occurred_at": "2026-11-19T22:52:33+00:00",
-            "relevance": {
-              "tickers": [
-                "^KS11"
-              ],
-              "markets": [
-                "US"
-              ],
-              "themes": [],
-              "match_basis": "verified_entities",
-              "matched_tickers": [],
-              "market_match": false,
-              "score": 0
-            },
-            "summary": {
-              "video_id": "Ua9VA-NiUUM",
-              "title": "11월 20일 오늘 코스피 어떻게 흘러갈까?",
-              "channel": "경제사냥꾼",
-              "source_url": "https://www.youtube.com/watch?v=Ua9VA-NiUUM",
-              "claim_status_summary": {
-                "unverified": 10,
-                "asr_uncertain": 1,
-                "partially_supported": 1
-              },
-              "claims": [
-                {
-                  "claim_id": "C1",
-                  "claim_text": "코스피200 야간선물이 한때 약 1% 상승했다가 4% 넘게 밀려 3.66% 하락 마감했고, 이 정도로 하락한 뒤에는 코스피가 약하게 출발하는 경우가 많았다.",
-                  "status": "unverified",
-                  "confidence": 0.99,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "야간선물 수치와 과거 빈도가 확인되기 전에는 이를 당일 하락 출발의 확률 근거로 쓰기 어렵다."
-                },
-                {
-                  "claim_id": "C2",
-                  "claim_text": "영상에서 앤트로픽으로 추정되는 기업이 공모가보다 34% 높게 첫 거래를 시작한 뒤 장중 100달러를 하회했다.",
-                  "status": "asr_uncertain",
-                  "confidence": 0.97,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "발행사와 상장 자체를 먼저 확인하기 전에는 첫 거래 수익률이나 해당 IPO를 시장 반전의 근거로 인용할 수 없다."
-                },
-                {
-                  "claim_id": "C3",
-                  "claim_text": "나스닥 지수가 장 초반 전일 종가 대비 1.9% 올랐다가 해당 IPO의 첫 거래 이후 하락으로 전환했다.",
-                  "status": "unverified",
-                  "confidence": 0.99,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "시간 순서가 확인되더라도 IPO가 지수 반전을 일으켰다고 단정할 수는 없다."
-                },
-                {
-                  "claim_id": "C4",
-                  "claim_text": "로이터는 IPO가 식어가던 AI 투자 열기를 되살리지 못했다고 보도했고, Miller Tabak 전략가는 상장 기대를 반영한 매수가 이미 이뤄졌을 가능성을 언급했다.",
-                  "status": "unverified",
-                  "confidence": 0.98,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "AI 투자심리의 일반적 약화와 특정 IPO에 대한 로이터 평가, 전략가의 선반영 해석을 구분해야 한다."
+                  "investor_implication": "투자 발표 규모보다 실제 건설 지출, 전력 연결 일정, 실질 GDP 기여도를 비교해야 AI 수요가 경기와 기업 실적으로 이어지는지 판단할 수 있다."
                 }
               ],
               "entities": [
                 {
                   "ticker": "^KS11",
-                  "name": "코스피·코스피200 야간선물",
+                  "name": "코스피·외국인 수급",
                   "status": "unverified",
                   "verification_notes": [
                     "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
@@ -2463,14 +2688,13 @@
             }
           },
           {
-            "event_key": "UlNBpokQfVk",
-            "content_sha256": "cda84e9ab0186159ebb0b0afd8cb31c8c44650b8404f45bc8663f2040779fe73",
-            "occurred_at": "2026-11-19T22:44:09+00:00",
+            "event_key": "JVtGCzfB7NA",
+            "content_sha256": "64bed884e38b8df2304ac78d900d5e1b17ee08241c490500cc8a6edced81cd3b",
+            "occurred_at": "2026-11-20T08:03:40+00:00",
             "relevance": {
               "tickers": [
                 "^KS11",
-                "AMD",
-                "NVDA"
+                "AMD"
               ],
               "markets": [
                 "US"
@@ -2482,59 +2706,57 @@
               "score": 0
             },
             "summary": {
-              "video_id": "UlNBpokQfVk",
-              "title": "\"연말랠리 여전히 기대한다\"…외국인 매도 끝나면 강한 반등 올까? | 여도은, 이건규 르네상스자산운용 대표 [글로벌 인터뷰]",
+              "video_id": "JVtGCzfB7NA",
+              "title": "[11월 20일 마감시황] AI 성장 기대에도 글로벌 증시가 무너지는 이유…연준의 금리 인상 우려와 성장주 투자심리 악화ㅣ홍선애, 김장열, 박명석 [클로징벨 라이브]",
               "channel": "삼프로TV 3PROTV",
-              "source_url": "https://www.youtube.com/watch?v=UlNBpokQfVk",
+              "source_url": "https://www.youtube.com/watch?v=JVtGCzfB7NA",
               "claim_status_summary": {
-                "unverified": 11,
-                "partially_supported": 1
+                "partially_supported": 1,
+                "unverified": 10,
+                "asr_uncertain": 1
               },
               "claims": [
                 {
                   "claim_id": "C1",
-                  "claim_text": "외국인 순매도가 한국 증시 낙폭을 키웠으나 최근 매도 강도는 약해졌고, 헤지펀드 매도·숏 포지션이 늘었다는 진단이다. 방송은 지수명 없이 연초 대비 약 20% 상승했다고 언급했다.",
-                  "status": "unverified",
-                  "confidence": 0.0,
+                  "claim_text": "코스피·코스닥에 각각 11:54와 13:28경 매도 사이드카가 발동했고, 두 지수는 장중 저점 부근에서 마감했다. 코스피에서는 외국인이 약 1.5조 원 순매도하고 개인이 2.3조 원 이상 순매수했다는 설명이다. 후속 반대매매가 낙폭을 키울 수 있다는 부분은 전망이다.",
+                  "status": "partially_supported",
+                  "confidence": 0.42,
                   "supporting_evidence_ids": [],
                   "manual_check_required": true,
-                  "investor_implication": "외국인 매도 압력이 줄었다고 전제하기 전에 현물·선물 순매매와 공매도 잔고가 같은 방향으로 움직이는지 확인할 필요가 있다."
+                  "investor_implication": "지수 수준만으로 매도 압력이 끝났거나 외국인 매수가 돌아왔다고 판단할 수 없다. 반대매매 우려도 실제 집계와 구분해야 한다."
                 },
                 {
                   "claim_id": "C2",
-                  "claim_text": "낙폭이 경제위기나 AI 버블 붕괴로 설명되기에는 과도하고 알려진 악재는 이미 반영됐다는 평가다. 위험선호 회복과 숏커버링이 2026년 말 반등을 키우고, 거시 충격이 완화되면 2027년 상반기까지 실적이 시장을 지지할 수 있다는 전망이다.",
+                  "claim_text": "닛케이·대만·중화권 증시가 동반 하락했고, 소프트뱅크가 장 초반 급락했다. 대만 가권지수의 주간 낙폭이 1991년 이후 최대였으며 공매도 제한이 3%에서 1%로 강화됐다는 설명이다.",
                   "status": "unverified",
-                  "confidence": 0.0,
+                  "confidence": 0.12,
                   "supporting_evidence_ids": [],
                   "manual_check_required": true,
-                  "investor_implication": "연말 랠리는 조건부 시나리오로 보고 위험선호, 공매도 잔고, 이익 추정치가 실제로 개선되는지 각각 확인하는 편이 적절하다."
+                  "investor_implication": "지역별 동반 약세와 공통 원인은 별개다. 현지 시세와 공매도 조치의 적용 범위를 확인하기 전에는 한국 수급 문제와 글로벌 요인을 구분하기 어렵다."
                 },
                 {
                   "claim_id": "C3",
-                  "claim_text": "방송은 앤트로픽 IPO가 사상 최대 규모로 약 140조 원을 조달했고, 첫날 초반 111.50달러를 기록한 뒤 시초가 아래에서 공모가 대비 약 17% 상승 마감했다고 전했다. 미국 반도체주도 동반 하락했으며, IPO 자금으로 데이터센터를 직접 구축하면 삼성전자·SK하이닉스 신규 주문이 가능하다는 전망이다.",
-                  "status": "partially_supported",
-                  "confidence": 0.47,
-                  "supporting_evidence_ids": [
-                    "E6",
-                    "E7"
-                  ],
+                  "claim_text": "S&P 500과 나스닥이 주요 기준선을 이탈하고 엔비디아·네비우스가 신저가를 기록했으며, 나스닥 선물과 금·비트코인·구리도 약세였다는 설명이다. 방송은 11월 20일 미국 옵션 만기를 언급하고 동반 약세를 광범위한 자금 이탈로 해석했다.",
+                  "status": "unverified",
+                  "confidence": 0.12,
+                  "supporting_evidence_ids": [],
                   "manual_check_required": true,
-                  "investor_implication": "첫날 주가 보도와 메모리 공급사의 매출 전망을 분리하고, 자금 용도와 실제 발주가 확인되기 전에는 수주를 실적에 반영하지 않는 편이 적절하다."
+                  "investor_implication": "저점 이탈 및 반등 여부는 동일한 거래 시간과 기준으로 비교해야 한다. 거래량 회복이나 숏커버링은 가격 움직임만으로 판별할 수 없다."
                 },
                 {
                   "claim_id": "C4",
-                  "claim_text": "텍사스의 데이터센터 인허가가 중간선거 전 멈췄다가 6월부터 언급된 환경평가를 거쳐 정상화됐고, 2027년 1월 새 주지사가 업무를 시작한다는 설명이다. 주민 반대는 양당 지지층에 걸쳤다고 했다.",
+                  "claim_text": "복수의 연준 인사가 AI 인프라 투자에 따른 물가 압력과 더 빠른 긴축 가능성을 언급했고, 방송은 JP모건의 세 차례 금리 인상 전망과 미 국채 10년물 금리 반등을 인용했다. 소비심리·소매 지표가 아직 악화하지 않았고 AI 투자가 성장에 크게 기여했다는 설명과 성장주 하락의 원인이라는 해석도 제시했다.",
                   "status": "unverified",
-                  "confidence": 0.0,
+                  "confidence": 0.09,
                   "supporting_evidence_ids": [],
                   "manual_check_required": true,
-                  "investor_implication": "환경평가와 최종 허가는 다른 단계이므로 실제 승인과 착공 일정이 나오기 전에는 데이터센터 수요의 실현 시점을 앞당겨 잡기 어렵다."
+                  "investor_implication": "인상 경로를 확정된 정책으로 전제하지 말고, 공식 발언과 당시 공개된 기대인플레이션·고용·소비 지표를 확인해야 한다."
                 }
               ],
               "entities": [
                 {
                   "ticker": "^KS11",
-                  "name": "한국 증시",
+                  "name": "코스피·코스닥",
                   "status": "unverified",
                   "verification_notes": [
                     "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
@@ -2547,28 +2769,17 @@
                   "verification_notes": [
                     "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
                   ]
-                },
-                {
-                  "ticker": "NVDA",
-                  "name": "엔비디아",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
                 }
               ]
             }
           },
           {
-            "event_key": "X1D0cQjwrkU",
-            "content_sha256": "bb884c81c93c460447c6232a806a8ce86a0396527913fb0ccf054507c35c3a9a",
-            "occurred_at": "2026-11-19T22:03:08+00:00",
+            "event_key": "ublOKjtSVzA",
+            "content_sha256": "b4673f5cd7eebe2c2e15d04a275a842e96c879fc7fc759a94def9c43193b6b4b",
+            "occurred_at": "2026-11-20T08:00:17+00:00",
             "relevance": {
               "tickers": [
-                "AMD",
-                "NVDA",
-                "PANW",
-                "WMT"
+                "ANT"
               ],
               "markets": [
                 "US"
@@ -2580,279 +2791,66 @@
               "score": 0
             },
             "summary": {
-              "video_id": "X1D0cQjwrkU",
-              "title": "앤트로픽 상장 첫 날 공모가 상회…시장은 대거 차익 실현 | 여도은, 박명석 큐레이터 [월가 뉴스레터]",
-              "channel": "삼프로TV 3PROTV",
-              "source_url": "https://www.youtube.com/watch?v=X1D0cQjwrkU",
+              "video_id": "ublOKjtSVzA",
+              "title": "앤트로픽 매수 전, 꼭 봐야 할 투자 포인트 5가지",
+              "channel": "경제사냥꾼",
+              "source_url": "https://www.youtube.com/watch?v=ublOKjtSVzA",
               "claim_status_summary": {
-                "unverified": 11,
+                "asr_uncertain": 1,
+                "unverified": 8,
                 "partially_supported": 1
               },
               "claims": [
                 {
                   "claim_id": "C1",
-                  "claim_text": "앤트로픽의 공모가 83달러, 첫 체결가 114달러, 종가 약 93~94달러, 첫 30분간 약 13% 하락, 사상 최대인 약 813억 달러 조달, 상장 전 약 1조 5천억 달러 가치평가, 약 1,200개 기관 청약 및 절반 이상 미배정, 골드만삭스·모건스탠리 예상 수수료 1억 1,000만 달러 이상. CNBC의 차익 실현 해석, 댄 아이브스의 평가, 울프·니덤·멜리우스 목표가, 회사의 과학·의학 발전 가속 전망과 컴퓨팅 약정 관련 발언.",
-                  "status": "unverified",
+                  "claim_text": "영상은 앤트로픽이 상장했으며 티커가 ANT라고 말한다.",
+                  "status": "asr_uncertain",
                   "confidence": 0.25,
-                  "supporting_evidence_ids": [],
+                  "supporting_evidence_ids": [
+                    "E1",
+                    "E2"
+                  ],
                   "manual_check_required": true,
-                  "investor_implication": "공모가 상회와 기관 수요를 확인하기 전에는 IPO 흥행이나 매도 압력의 원인으로 단정하지 않는다. 공모 총액과 회사에 귀속되는 순조달액은 별도로 봐야 한다."
+                  "investor_implication": "발행인이 확인되기 전에는 ANT의 가격이나 지수 일정을 앤트로픽에 귀속하지 않는다."
                 },
                 {
                   "claim_id": "C2",
-                  "claim_text": "미국 3대 지수 약 2% 하락 마감, 나스닥 장 초반 약 2% 상승 후 약 4~4.5% 반전, 인텔 1.9% 하락, 유가 배럴당 83달러, 금·구리·비트코인 약세. 시포트의 S&P 500 연말 목표 하향과 UBS의 구리 포지션 해석, 기술주 밸류에이션의 팬데믹 비교.",
+                  "claim_text": "상장 첫날 공모가는 83달러, 첫 체결가는 111.50달러, 종가는 약 97달러였고, 종가 기준 공모가 매수자는 이익, 첫 체결가 매수자는 손실이었다.",
                   "status": "unverified",
-                  "confidence": 0.12,
+                  "confidence": 0.05,
                   "supporting_evidence_ids": [],
                   "manual_check_required": true,
-                  "investor_implication": "동일 거래일의 지수·원자재 데이터를 맞춰 보기 전에는 광범위한 차익 실현이나 경기 둔화 신호로 결론 내릴 수 없다."
+                  "investor_implication": "수익률은 세 가격이 같은 발행인과 거래일의 공식 기록으로 확인될 때만 실제 상장 첫날 성과로 인용할 수 있다."
                 },
                 {
                   "claim_id": "C3",
-                  "claim_text": "오픈AI의 2027년 초 상장 가능성과 샘 올트먼 발언, 애플 시총 5조 달러 초과와 엔비디아 3조 달러 중반대 비교, AI 소프트웨어·클라우드 기업의 현금흐름 입증이 반도체 반등에 선행할 수 있으나 최근 실적은 이를 입증하지 못했다는 진행진 평가.",
-                  "status": "partially_supported",
-                  "confidence": 0.48,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "엔비디아 시총의 대략적인 규모 외에는 상대 밸류에이션이나 상장 일정의 근거로 삼기 어렵다. AI 수익성은 매출, 현금흐름, 설비투자를 구분해 봐야 한다."
-                },
-                {
-                  "claim_id": "C4",
-                  "claim_text": "헌터브룩은 블랙리스트에 오른 중국 서버 업체 및 관련사를 통해 AMD 펌웨어와 MI300X·MI325X 탑재 서버가 제공됐다는 의혹을 제기하고 공매도 입장을 밝혔다. AMD는 사업 관행과 관계가 왜곡됐다고 반박했다. 방송은 중국 매출 비중 22%를 언급했다.",
+                  "claim_text": "앤트로픽이 최근 연 환산 매출 810억 달러를 발표했으며, 이는 최근 사용량·구독료 수준이 이어진다는 가정에 따른 수치로 이미 실현된 12개월 매출이 아니다.",
                   "status": "unverified",
                   "confidence": 0.0,
                   "supporting_evidence_ids": [],
                   "manual_check_required": true,
-                  "investor_implication": "중국 매출 노출과 규제 위험을 평가하려면 법인·거래 시점·적용 규정과 지역별 매출 기준을 먼저 확인해야 한다."
-                }
-              ],
-              "entities": [
-                {
-                  "ticker": "AMD",
-                  "name": "AMD",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                },
-                {
-                  "ticker": "NVDA",
-                  "name": "엔비디아",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                },
-                {
-                  "ticker": "PANW",
-                  "name": "팔로알토 네트웍스",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                },
-                {
-                  "ticker": "WMT",
-                  "name": "월마트·미국 소매",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                }
-              ]
-            }
-          },
-          {
-            "event_key": "9PIse6rkUCA",
-            "content_sha256": "c236a56f51e54a979fb73a490d8e860a42904ab75a8fae25e179c9ebc8484ae7",
-            "occurred_at": "2026-11-19T21:56:22+00:00",
-            "relevance": {
-              "tickers": [
-                "확인 불가",
-                "^KS11"
-              ],
-              "markets": [
-                "US"
-              ],
-              "themes": [],
-              "match_basis": "verified_entities",
-              "matched_tickers": [],
-              "market_match": false,
-              "score": 0
-            },
-            "summary": {
-              "video_id": "9PIse6rkUCA",
-              "title": "11월 20일 투자자들이 꼭 알아야 하는 투자 포인트",
-              "channel": "경제사냥꾼",
-              "source_url": "https://www.youtube.com/watch?v=9PIse6rkUCA",
-              "claim_status_summary": {
-                "partially_supported": 1,
-                "asr_uncertain": 2,
-                "unverified": 9
-              },
-              "claims": [
-                {
-                  "claim_id": "C1",
-                  "claim_text": "영상은 앤트로픽으로 들리는 기업이 기준가보다 34% 높게 거래를 시작한 뒤 장중 100달러를 밑돌았다고 전했다.",
-                  "status": "partially_supported",
-                  "confidence": 0.5,
-                  "supporting_evidence_ids": [
-                    "E1",
-                    "E2",
-                    "E3"
-                  ],
-                  "manual_check_required": true,
-                  "investor_implication": "상장 첫날 주가가 밀렸다는 보도는 있었지만, 34%와 100달러는 검증된 수치로 인용하지 않는다."
-                },
-                {
-                  "claim_id": "C2",
-                  "claim_text": "영상이 인용한 미국 증권사 관계자는 상장을 앞둔 매수세가 이벤트 종료와 함께 사라졌을 가능성을 제기했다고 한다.",
-                  "status": "asr_uncertain",
-                  "confidence": 0.12,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "상장 전 매수세가 소진됐다는 설명은 실제 수급으로 확인된 원인이 아니라 영상이 전한 가설이다."
-                },
-                {
-                  "claim_id": "C3",
-                  "claim_text": "영상은 상승하던 미국 지수가 꺾였고, 새벽 5시 엔비디아와 SK하이닉스 미국 거래 증권이 각각 2.6%, 1.4% 하락했으며, 거래 중인 코스피200 야간선물은 3.8% 하락했다고 전했다.",
-                  "status": "unverified",
-                  "confidence": 0.17,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "세 하락률을 종가나 국내 개장 방향의 확정 근거로 사용하지 않는다."
+                  "investor_implication": "810억 달러를 실현 매출이나 반복매출(ARR)로 간주해 가치평가에 사용하지 않는다."
                 },
                 {
                   "claim_id": "C4",
-                  "claim_text": "영상은 11월 19일 외국인이 순매도하고 기타법인이 순매수한 가운데 SK하이닉스가 3.41% 올랐다고 전했다. 기타법인 순매수 금액은 자막에서 일부 누락됐다.",
-                  "status": "unverified",
-                  "confidence": 0.11,
+                  "claim_text": "3분기 실제 인식 매출은 약 170억 달러이며, 이를 네 배 한 680억 달러는 영상에서 제시한 연 환산 매출 810억 달러보다 낮다.",
+                  "status": "partially_supported",
+                  "confidence": 0.25,
                   "supporting_evidence_ids": [],
                   "manual_check_required": true,
-                  "investor_implication": "기타법인 매수의 규모나 지속 여부는 11월 19일과 20일의 같은 투자자 분류 자료를 비교해야 판단할 수 있다."
+                  "investor_implication": "두 수치의 차이를 실제 매출 둔화나 향후 매출 전망으로 해석하지 않는다. 성장률은 같은 회계 기준의 분기 실적으로 비교한다."
                 }
               ],
               "entities": [
                 {
-                  "ticker": "확인 불가",
+                  "ticker": "ANT",
                   "name": "앤트로픽",
                   "status": "unverified",
                   "verification_notes": [
-                    "시장 데이터 조회 실패: no_usable_market_fields"
-                  ]
-                },
-                {
-                  "ticker": "^KS11",
-                  "name": "미국 주가지수·코스피200 야간선물",
-                  "status": "unverified",
-                  "verification_notes": [
                     "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                },
-                {
-                  "ticker": "확인 불가",
-                  "name": "엔비디아",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "시장 데이터 조회 실패: no_usable_market_fields"
-                  ]
-                },
-                {
-                  "ticker": "확인 불가",
-                  "name": "SK하이닉스",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "시장 데이터 조회 실패: no_usable_market_fields"
-                  ]
-                },
-                {
-                  "ticker": "확인 불가",
-                  "name": "삼성전기",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "시장 데이터 조회 실패: no_usable_market_fields"
-                  ]
-                },
-                {
-                  "ticker": "확인 불가",
-                  "name": "한중 FTA 후속 협상·콘텐츠 수혜주(하이브·스튜디오드래곤·SM)",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "시장 데이터 조회 실패: no_usable_market_fields"
-                  ]
-                },
-                {
-                  "ticker": "확인 불가",
-                  "name": "LG전자",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "시장 데이터 조회 실패: no_usable_market_fields"
                   ]
                 }
               ]
-            }
-          },
-          {
-            "event_key": "zFq3V7Lmczo",
-            "content_sha256": "5394d8f09aed627f52a5e52250520b01108a28eff9344fd7be898d5977510417",
-            "occurred_at": "2026-11-19T13:30:15+00:00",
-            "relevance": {
-              "tickers": [],
-              "markets": [],
-              "themes": [],
-              "match_basis": "title_and_claim_context",
-              "matched_tickers": [],
-              "market_match": false,
-              "score": 0
-            },
-            "summary": {
-              "video_id": "zFq3V7Lmczo",
-              "title": "2027년 선반영 어디까지 됐을까?",
-              "channel": "경제사냥꾼",
-              "source_url": "https://www.youtube.com/watch?v=zFq3V7Lmczo",
-              "claim_status_summary": {
-                "partially_supported": 1,
-                "unverified": 11
-              },
-              "claims": [
-                {
-                  "claim_id": "C1",
-                  "claim_text": "영상은 2026년 11월의 12개월 선행 창을 2026년 12월~2027년 11월로 두고, 반도체·전력기기·조선은 계약, 방산은 계약의 실적 전환, 바이오는 2026년 실적, AI·원전·2차전지는 계획, 로봇은 계획 진입, 국내 우주항공은 꿈 단계로 분류한다. 호재 발표 후 주가 부진, 주가의 이익 전망 선행, 더 먼 해의 예상 이익을 쓰는 밸류에이션을 선반영 신호로 제시한다.",
-                  "status": "partially_supported",
-                  "confidence": 0.25,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "단계 분류는 점검 틀로 사용하되, 계획·협의·서명 계약·납품·매출 인식을 분리한다. 2026년 바이오 실적을 2027년 실적의 근거로 확대하지 않는다."
-                },
-                {
-                  "claim_id": "C2",
-                  "claim_text": "BuzzFeed 2023년 1월 26일 약 120% 상승, 코난테크놀로지 2023년 1월 30일 약 30% 상한가, Long Blockchain 2017년 12월 21일 종가 약 3배를 인용한다. 닷컴 사명 변경 연구의 열흘 초과수익률 약 74%, 이익 정보의 발표 전 반영분 약 85~90%, FactSet의 2026년 2분기 AI 언급 331/493곳, 미국·한국 경기선행지수의 주가지수 편입도 제시한다.",
-                  "status": "unverified",
-                  "confidence": 0.0,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "거래소 시세와 공시, 논문 원문, FactSet의 집계 기준, 한미 지수 편제표를 확인하기 전에는 사례와 인용 수치를 일반 법칙처럼 쓰지 않는다."
-                },
-                {
-                  "claim_id": "C3",
-                  "claim_text": "Alphabet의 2027년 설비투자 확대 예고와 4분기 실적 때 상세치 공개, Meta의 10월 22일 매출·전망 예상 상회와 장중 약 7% 하락, NVIDIA의 3월 16일 GTC 2028년 차세대 칩 로드맵을 주장한다.",
-                  "status": "unverified",
-                  "confidence": 0.0,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "Alphabet의 확정 투자 규모, AI 관련 매출, 메모리·전력기기 발주를 구분해 본다. NVIDIA 로드맵은 확정 출시 일정으로 취급하지 않는다."
-                },
-                {
-                  "claim_id": "C4",
-                  "claim_text": "삼성전자와 SK하이닉스 주가가 2027년 이익 전망 상향에 앞서 움직였다고 주장한다. 삼성전자 2분기 실적과 발표일 하락, SK하이닉스의 2027년 HBM 물량·가격 협의 완료와 전년도 판매 발표, 인디애나 공장 일정을 계약 단계의 근거로 제시한다.",
-                  "status": "unverified",
-                  "confidence": 0.0,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "2028년 HBM 물량·가격과 계약 범위, 패키징·검사 능력, 인디애나 클린룸 개방 및 양산을 각각 확인한다."
-                }
-              ],
-              "entities": []
             }
           }
         ],
@@ -2998,31 +2996,31 @@
           "youtube": {
             "source_health": "OK",
             "event_keys": [
+              "KopQpHNgc4k",
+              "TV3diSFaZIU",
               "vC7v55f8sdo",
               "S5V0tc-LkqA",
-              "znmu0vaHb10",
-              "TDGVrEKXU5M",
-              "4bVdRJVO7ng",
-              "QwhGDJbSGvU",
-              "qu5RoRs0beQ",
-              "Ua9VA-NiUUM",
-              "UlNBpokQfVk",
-              "X1D0cQjwrkU",
-              "9PIse6rkUCA",
-              "zFq3V7Lmczo"
+              "tMfYOFMSLTs",
+              "uPfwN34xlpE",
+              "3PTKmp5zdh8",
+              "k-BTGBvzRtM",
+              "vxmjSpX5Cx8",
+              "kXGnjB4FYIk",
+              "JVtGCzfB7NA",
+              "ublOKjtSVzA"
             ],
             "coverage": {
-              "total_unique_events": 881,
-              "window_events": 80,
+              "total_unique_events": 907,
+              "window_events": 106,
               "transmitted_events": 12,
               "truncated": true,
-              "oldest_occurred_at": "2026-11-18T09:04:08+00:00",
-              "newest_occurred_at": "2026-11-20T00:33:23+00:00",
+              "oldest_occurred_at": "2026-11-19T09:30:37+00:00",
+              "newest_occurred_at": "2026-11-20T12:00:30+00:00",
               "available_events_before_context_cap": 60,
               "context_event_cap": 12,
-              "omitted_events": 68,
+              "omitted_events": 94,
               "omitted_due_to_context_cap": 48,
-              "omitted_before_context_selection": 20
+              "omitted_before_context_selection": 46
             }
           },
           "prism": {
