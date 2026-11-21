@@ -1,0 +1,415 @@
+{
+  "version": 4,
+  "video_id": "1PvkBMtMkyk",
+  "title": "실적은 좋은데 주가는 왜? 삼전닉스에 무슨 일이...  |  김열매 더큐리어스 대표 [주말인터뷰]",
+  "url": "https://www.youtube.com/watch?v=1PvkBMtMkyk",
+  "channel": "삼프로TV 3PROTV",
+  "channel_id": "UChlv4GSd7OQl3js-jkLOnFA",
+  "source_url": "https://www.youtube.com/@3protv/videos",
+  "thumbnail_url": "https://i.ytimg.com/vi/1PvkBMtMkyk/maxresdefault.jpg",
+  "published_at": "2026-11-20T23:00:38+00:00",
+  "status": "asr_uncertain",
+  "strategy_source_tier": "STANDARD",
+  "strategy_evidence_weight": "STANDARD",
+  "strategy_validation_policy": "STANDARD_REVIEW",
+  "transcript_status": "available",
+  "transcript_source": "automatic",
+  "transcript_chars": 20489,
+  "transcript_quality": {
+    "status": "good",
+    "score": 1.0,
+    "warnings": [],
+    "source": "automatic",
+    "language": "Korean",
+    "model_or_format": "json3",
+    "chars": 20489,
+    "segments": 1137,
+    "duration_seconds": 2527,
+    "repeated_ngram_ratio": 0.0
+  },
+  "generated_at": "2026-11-22T06:56:02.618224+09:00",
+  "llm_status": "success",
+  "research_status": "success",
+  "claim_verification_status": "success",
+  "research_pipeline_version": 4,
+  "evidence_count": 4,
+  "claim_status_summary": {
+    "unverified": 10,
+    "asr_uncertain": 1,
+    "partially_supported": 1
+  },
+  "claims": [
+    {
+      "claim_id": "C1",
+      "claim_text": "영상은 앤트로픽이 상장해 공모가 83달러, 첫날 시초가 100달러 이상, 종가 90달러대를 기록했고, 목표 1,000억 달러 중 약 900억 달러를 조달했으며 보호예수가 거의 없었다고 설명한다.",
+      "status": "unverified",
+      "confidence": 0.15,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.84,
+      "asr_confidence": 0.85,
+      "numeric_parse": {
+        "claimed": "공모가 83달러, 시초가 100달러 이상, 종가 90달러대, 목표 1,000억 달러, 조달 약 900억 달러",
+        "observed": "최종 공모서류, 거래소 체결가, 발행사 순유입액 모두 미제공"
+      },
+      "investor_implication": "첫날 수익률, 공모 자금 유입, 보호예수 해제에 따른 매도 압력은 확인 전 투자 판단의 근거로 삼기 어렵다."
+    },
+    {
+      "claim_id": "C2",
+      "claim_text": "영상은 2025년 매출 45억 달러, 2026년 약 500억 달러, 2027년 예상 약 1,000억 달러, 2026년 10월 ARR 810억 달러, 연 100만 달러 이상 지출하는 기업 고객 1,900개 초과를 제시한다. 성장률 둔화가 2조 달러 공모 가치에 못 미친 이유였고, IPO가 약 1조 달러에 이르는 데이터센터 약정의 단기 부담을 덜었다는 해석도 제시한다.",
+      "status": "asr_uncertain",
+      "confidence": 0.05,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:06:57",
+      "source_confidence": 0.84,
+      "asr_confidence": 0.4,
+      "numeric_parse": {
+        "claimed": "2025·2026·2027년 매출 각각 45억·약 500억·예상 약 1,000억 달러, 2026년 10월 ARR 810억 달러, 연 100만 달러 이상 고객 1,900개 초과, 공모 가치 비교 기준 2조 달러, 약정 약 1조 달러, 자막상 12개월 내 7,800억 달러",
+        "observed": "감사 매출, 전망 산출 근거, ARR 정의, 고객 집계, 공모 가치, 약정 만기 및 금액 모두 미확인"
+      },
+      "investor_implication": "12개월 내 계약상 지급액과 공모 순유입액을 확인하기 전에는 추가 조달 필요성이 해소됐다고 볼 수 없다."
+    },
+    {
+      "claim_id": "C3",
+      "claim_text": "영상은 스페이스X가 6월에 상장해 녹화 시점에도 공모가를 웃돌았으나 나스닥은 상장 후 하락했고, 앤트로픽 상장 당일에도 하락했다고 설명한다. 대형 공모로 다른 종목의 수급이 약해졌다는 것은 별도의 인과 가설이다.",
+      "status": "unverified",
+      "confidence": 0.05,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.81,
+      "asr_confidence": 0.85,
+      "numeric_parse": {
+        "claimed": "2026년 6월 스페이스X 상장, 녹화 시점 주가가 공모가 상회, 두 공모 전후 나스닥 약세",
+        "observed": "정확한 상장·녹화 기준일, 지수 종류 및 비교 종가 미제공"
+      },
+      "investor_implication": "지수 하락을 IPO 수급 탓으로 돌리기 전에 거래대금·시장 폭·펀드 흐름을 살피고 금리·실적 등 같은 기간의 요인과 비교해야 한다."
+    },
+    {
+      "claim_id": "C4",
+      "claim_text": "영상은 다모다란의 2036년 기본 시나리오를 매출 1조 달러·영업이익률 20%대·가치 1.4조~1.5조 달러로 소개한다. 자기자본비용 상향 시 약 1조 달러, 최악은 영업이익률 약 10%와 존속 곤란, 최선은 매출 약 1.5조 달러·영업이익률 40%와 기업가치 4조 달러 이상이라고 전한다. 화이트칼라 임금 40조 달러의 2.5%는 시장 규모 비유다.",
+      "status": "unverified",
+      "confidence": 0.08,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:13:23",
+      "source_confidence": 0.84,
+      "asr_confidence": 0.63,
+      "numeric_parse": {
+        "claimed": "2036년 기본 매출 1조 달러·마진 20%대·가치 1.4조~1.5조 달러, 자기자본비용 상향 시 약 1조 달러, 최악 마진 약 10%, 최선 매출 약 1.5조 달러·마진 40%·기업가치 4조 달러 이상",
+        "observed": "원문·엑셀 수치 미확인, 임금 비유의 산술만 일치"
+      },
+      "investor_implication": "시나리오 수치를 목표가로 읽기보다 경쟁력 유지, 마진, 할인율과 실패 확률에 따라 가치가 얼마나 달라지는지 확인해야 한다."
+    },
+    {
+      "claim_id": "C5",
+      "claim_text": "영상은 오픈AI가 공개 S-1 없이 사모 조달 중이며 데이터센터 약정 총액은 공개되지 않았다고 설명한다. 소프트뱅크그룹은 엔비디아 지분 매각, Arm 주식 담보대출, 채권 발행으로 오픈AI를 지원했고, 지원 규모 약 650억 달러와 주가 고점 대비 60~70% 하락이 언급됐다.",
+      "status": "unverified",
+      "confidence": 0.05,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.83,
+      "asr_confidence": 0.76,
+      "numeric_parse": {
+        "claimed": "오픈AI 지원 약 650억 달러, 소프트뱅크 주가 고점 대비 60~70% 하락",
+        "observed": "납입액, 고점 기준 기간, 녹화 시점 조정주가 미확인"
+      },
+      "investor_implication": "오픈AI 투자 약정과 실제 납입을 나눠 보고, 소프트뱅크의 차입 만기·이자비용을 상장 지연 가능성과 함께 검토해야 한다."
+    },
+    {
+      "claim_id": "C6",
+      "claim_text": "영상은 xAI가 스페이스X에 합병됐고 앤트로픽과 오픈AI가 콜로서스 설비를 임차하며, IPO·회사채·GPU 담보대출로 콜로서스 2 투자 재원을 앞당겨 확보했다고 설명한다. 인허가가 나기 전에 작업하고 벌금을 물었다는 설명은 별도 주장이다.",
+      "status": "unverified",
+      "confidence": 0.05,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:19:58",
+      "source_confidence": 0.81,
+      "asr_confidence": 0.7,
+      "numeric_parse": {
+        "claimed": "구체적 조달액 미확정; 자막상 ‘1억 달러 이상’은 금액·범위가 불명확",
+        "observed": "발행·차입액, 담보, 자금 용도, 벌금 기록 미확인"
+      },
+      "investor_implication": "임차 수요와 투자비 충당 능력을 평가하려면 콜로서스 2의 계약 현금흐름, 부채 만기, 허가 일정을 각각 확인해야 한다."
+    },
+    {
+      "claim_id": "C7",
+      "claim_text": "영상은 실적 개선에도 두 종목 주가가 하락했고 삼성전자의 PER·PBR이 낮으며, 당시 지표로 2027년 감익을 예상할 근거가 없었다고 평가한다. 반도체의 데이터센터 건설비 비중이 약 20~30%에서 60~70%로 올랐다는 추정은 비용 설명의 전제다. 주가 바닥은 단정하지 않았다.",
+      "status": "partially_supported",
+      "confidence": 0.45,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:26:29",
+      "source_confidence": 0.86,
+      "asr_confidence": 0.73,
+      "numeric_parse": {
+        "claimed": "2027년 감익 근거 부재, 데이터센터 건설비 중 반도체 비중 약 20~30%에서 60~70%로 상승",
+        "observed": "주간 약세 정황만 확인. 양사 개별 수익률, 이익, 배수, 컨센서스 및 비용 비중 미확인"
+      },
+      "investor_implication": "낙폭을 저평가나 바닥 신호로 해석하기 전에 같은 기준일의 주가·이익 추정치·역사적 밸류에이션과 메모리 가격을 확인해야 한다."
+    },
+    {
+      "claim_id": "C8",
+      "claim_text": "영상은 대중국·동남아 출고 제한이 재고 증가, 중고 GPU 가격 하락, 신규 매출 둔화로 이어질 수 있다고 본다. 동남아향 매출 약 20%와 한국의 GPU 26만 장 요청을 언급한다. 미국이 칩 가격을 낮추려 한다는 설명은 정책 목표로 확인되지 않은 가설이며, AMD 공매도 보고서는 별도 출처 확인이 필요하다.",
+      "status": "unverified",
+      "confidence": 0.05,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:26:29",
+      "source_confidence": 0.82,
+      "asr_confidence": 0.68,
+      "numeric_parse": {
+        "claimed": "동남아향 매출 약 20%, 한국의 GPU 요청 26만 장, 자막상 출고 지연 비율 ‘1, 20%’",
+        "observed": "지역 매출의 집계 기준, 요청·배정·인도 수량, 출고 지연 비율 미확인"
+      },
+      "investor_implication": "수출 영향은 발효 규정과 실제 출고부터 확인하고, 대체 수요가 있는지 재고와 중고 실거래가로 따로 점검해야 한다."
+    },
+    {
+      "claim_id": "C9",
+      "claim_text": "영상은 엔비디아 장부상 지분투자 약 990억 달러와 별도 약정을 언급하고, 투자 집행이 둔화하면 부채로 GPU를 구입한 네오클라우드가 투자를 줄이거나 칩을 매각할 수 있다고 추정한다.",
+      "status": "unverified",
+      "confidence": 0.05,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:32:48",
+      "source_confidence": 0.82,
+      "asr_confidence": 0.65,
+      "numeric_parse": {
+        "claimed": "장부상 지분투자 약 990억 달러와 별도 약정, ‘분기 1,000억 달러 벌 수준’은 지표 불명",
+        "observed": "장부가, 집행액, 약정액, 해당 분기 재무 지표 및 상대방 거래 내역 미확인"
+      },
+      "investor_implication": "반도체 수요 둔화 위험은 투자 집행 추세와 고객의 차환 조건, GPU 매각 징후가 실제로 함께 나타나는지로 판단해야 한다."
+    },
+    {
+      "claim_id": "C10",
+      "claim_text": "오라클은 동남아 투자 사례로 언급됐다. 조호르바루 등 정확한 입지는 별도 확인 대상이며, 바이트댄스·알리바바·바이두·텐센트의 역내 임차 가능성은 출연자의 추정으로 오라클 고객이라는 확인이 아니다.",
+      "status": "unverified",
+      "confidence": 0.06,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:32:48",
+      "source_confidence": 0.88,
+      "asr_confidence": 0.83,
+      "numeric_parse": {
+        "claimed": "해당 없음",
+        "observed": "프로젝트 소재지, 투자 집행 및 임차 계약 미확인"
+      },
+      "investor_implication": "오라클의 동남아 사업을 평가할 때 공식 프로젝트와 확인된 고객 계약만 반영하고, 언급된 기업들의 임차 가능성은 별도 가설로 둬야 한다."
+    },
+    {
+      "claim_id": "C11",
+      "claim_text": "영상은 IMF와 미 연준이 최근 AI 관련 순환금융과 부외부채를 모두 지적했다고 인용한다.",
+      "status": "unverified",
+      "confidence": 0.05,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:32:48",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.73,
+      "numeric_parse": {
+        "claimed": "해당 없음",
+        "observed": "기관별 문서와 발행일 미제공"
+      },
+      "investor_implication": "기관의 공식 위험 평가로 인용하기 전에 문서별로 어떤 금융 구조와 위험을 다뤘는지 확인해야 한다."
+    },
+    {
+      "claim_id": "C12",
+      "claim_text": "AI 사용 비용이 하락하면 이를 실제 비용 절감이나 매출·마케팅 성과 개선으로 전환하는 도입 기업이 수혜를 볼 수 있다는 조건부 투자 가설이다.",
+      "status": "unverified",
+      "confidence": 0.08,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:39:26",
+      "source_confidence": 0.95,
+      "asr_confidence": 0.95,
+      "numeric_parse": {
+        "claimed": "해당 없음",
+        "observed": "기업별 비용·매출 성과 자료 없음"
+      },
+      "investor_implication": "기업이 특정되면 총비용을 차감한 단위 원가 개선과 매출·전환율 변화를 도입 전후 및 비교군으로 확인해야 한다."
+    }
+  ],
+  "entities": [
+    {
+      "ticker": "9984",
+      "name": "소프트뱅크그룹",
+      "status": "unverified",
+      "claims": [
+        "영상은 오픈AI가 아직 S-1을 제출하지 않은 채 사모시장에서 자금을 조달 중이라고 설명했다. 소프트뱅크는 엔비디아 지분 매각, ARM 주식 담보대출, 채권 발행 등으로 오픈AI를 지원해 이자 부담과 오픈AI 상장 일정에 대한 노출이 커졌다는 평가다."
+      ],
+      "numeric_claims": [
+        "오픈AI 지원 규모 약 650억 달러, 소프트뱅크 주가 고점 대비 60~70% 하락으로 언급됐다."
+      ],
+      "verification_notes": [
+        "시장 데이터 조회 실패: no_usable_market_fields"
+      ],
+      "market_snapshot": {
+        "ticker": "9984",
+        "as_of": "2026-11-21T22:16:56.908284+00:00",
+        "current_price": null,
+        "market_cap": null,
+        "forward_pe": null,
+        "trailing_pe": null,
+        "fifty_two_week_high": null,
+        "fifty_two_week_low": null,
+        "average_target_price": null,
+        "source": "yfinance",
+        "status": "unverified"
+      },
+      "external_context_status": "verified"
+    },
+    {
+      "ticker": "005930",
+      "name": "삼성전자",
+      "status": "unverified",
+      "claims": [
+        "실적이 개선되는 가운데 주가가 내려 PER·PBR상 저평가로 보이며, 내년 이익이 예상대로라면 반등 여지가 있다는 평가다. 다만 주가 바닥은 단정하지 않았다."
+      ],
+      "numeric_claims": [],
+      "verification_notes": [
+        "시장 데이터 조회 실패: no_usable_market_fields"
+      ],
+      "market_snapshot": {
+        "ticker": "005930",
+        "as_of": "2026-11-21T22:16:59.434786+00:00",
+        "current_price": null,
+        "market_cap": null,
+        "forward_pe": null,
+        "trailing_pe": null,
+        "fifty_two_week_high": null,
+        "fifty_two_week_low": null,
+        "average_target_price": null,
+        "source": "yfinance",
+        "status": "unverified"
+      },
+      "external_context_status": "verified"
+    },
+    {
+      "ticker": "000660",
+      "name": "SK하이닉스",
+      "status": "unverified",
+      "claims": [
+        "삼성전자와 함께 당시 지표로는 내년 감익을 전망할 근거가 없다는 평가를 받았다. 반도체 가격을 낮추려는 미국의 의도가 있다는 설명은 공식 정책이 아니라 인터뷰에서 제시한 가설이다."
+      ],
+      "numeric_claims": [
+        "데이터센터 건설비에서 반도체 비중이 2년 전 약 20~30%에서 최근 약 60~70%로 높아졌다는 추정이 제시됐다."
+      ],
+      "verification_notes": [
+        "시장 데이터 조회 실패: no_usable_market_fields"
+      ],
+      "market_snapshot": {
+        "ticker": "000660",
+        "as_of": "2026-11-21T22:17:02.401183+00:00",
+        "current_price": null,
+        "market_cap": null,
+        "forward_pe": null,
+        "trailing_pe": null,
+        "fifty_two_week_high": null,
+        "fifty_two_week_low": null,
+        "average_target_price": null,
+        "source": "yfinance",
+        "status": "unverified"
+      },
+      "external_context_status": "verified"
+    },
+    {
+      "ticker": "NVDA",
+      "name": "엔비디아",
+      "status": "unverified",
+      "claims": [
+        "중국·동남아향 출고가 지연되면 GPU 재고가 쌓이고 중고 가격이 내려가 신규 매출 증가세도 둔화할 수 있다는 시나리오가 제시됐다.",
+        "엔비디아의 지분투자 집행이 둔화하면 차입으로 최신 칩을 산 네오클라우드와 AI 연구기업이 투자를 늦추거나 칩을 매각해 반도체 수요에 추가 충격을 줄 수 있다."
+      ],
+      "numeric_claims": [
+        "동남아향 매출 비중 약 20% 및 한국의 GPU 26만 장 요청이 언급됐다. 실제 최종 사용처나 배정량을 뜻하지는 않는다.",
+        "장부상 지분투자 약 990억 달러, 별도 투자 약정이 있다고 언급됐다. ‘분기 1,000억 달러 벌 수준’은 매출·이익 중 무엇을 가리키는지 불명확하다."
+      ],
+      "verification_notes": [
+        "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+      ],
+      "market_snapshot": {
+        "ticker": "NVDA",
+        "as_of": "2026-11-21T22:17:04.878451+00:00",
+        "current_price": 125.52999877929688,
+        "market_cap": 3031172880523.6816,
+        "forward_pe": 7.5596437,
+        "trailing_pe": 13.483351,
+        "fifty_two_week_high": 243.37,
+        "fifty_two_week_low": 124.5,
+        "average_target_price": 244.18286,
+        "source": "yfinance",
+        "status": "verified"
+      },
+      "external_context_status": "verified"
+    },
+    {
+      "ticker": "ORCL",
+      "name": "오라클",
+      "status": "unverified",
+      "claims": [
+        "오라클은 해외 기업의 동남아 데이터센터 투자 사례로만 언급됐다. 바이트댄스·알리바바·바이두·텐센트의 동남아 설비 임차 가능성은 출연자의 추정이며 오라클 고객으로 확인된 것이 아니다."
+      ],
+      "numeric_claims": [],
+      "verification_notes": [
+        "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+      ],
+      "market_snapshot": {
+        "ticker": "ORCL",
+        "as_of": "2026-11-21T22:17:07.797173+00:00",
+        "current_price": 101.19000244140625,
+        "market_cap": 315480884786.3319,
+        "forward_pe": 9.15017,
+        "trailing_pe": 15.860501,
+        "fifty_two_week_high": 250.25,
+        "fifty_two_week_low": 100.25,
+        "average_target_price": 236.184,
+        "source": "yfinance",
+        "status": "verified"
+      },
+      "external_context_status": "verified"
+    }
+  ],
+  "evidence": [
+    {
+      "evidence_id": "E1",
+      "claim_id": "C1",
+      "title": "Cathie Wood Just Bought $154 Million of Anthropic in Its First 2 Days of Trading",
+      "source_url": "https://finance.yahoo.com/markets/stocks/articles/cathie-wood-just-bought-154-213819556.html",
+      "publisher": "TIKR",
+      "published_at": "2026-11-21T21:38:19+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "Cathie Wood Just Bought $154 Million of Anthropic in Its First 2 Days of Trading Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 2026 Electio..."
+    },
+    {
+      "evidence_id": "E2",
+      "claim_id": "C1",
+      "title": "Worried About Black Monday? What Wall Street Says Could Happen.",
+      "source_url": "https://finance.yahoo.com/m/32305bc8-6a1c-3b7f-af69-650d80df753a/worried-about-black-monday%3F.html",
+      "publisher": "Barrons.com",
+      "published_at": "2026-11-21T21:22:00+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "Worried About Black Monday? What Wall Street Says Could Happen. Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 2026 Elections Weather Newsle..."
+    },
+    {
+      "evidence_id": "E4",
+      "claim_id": "C2",
+      "title": "Oil Is Taking the Long Way Around, and $90,000 Across These 3 Tanker Stocks Pays More Than $10,000 a Year",
+      "source_url": "https://finance.yahoo.com/markets/stocks/articles/oil-taking-long-way-around-194944634.html",
+      "publisher": "24/7 Wall St.",
+      "published_at": "2026-11-21T19:49:44+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "Oil Is Taking the Long Way Around, and $90,000 Across These 3 Tanker Stocks Pays More Than $10,000 a Year Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Scien..."
+    }
+  ],
+  "source_policy": {
+    "raw_transcript_published": false,
+    "raw_transcript_in_evidence": false,
+    "research_pipeline_version": 4,
+    "closed_source_claims": "unverified_external_source",
+    "auto_caption_warning": true,
+    "local_asr_warning": false
+  }
+}
