@@ -1,15 +1,19 @@
-# PRISM 리서치 델타 · 2026-11-20
+# PRISM 리서치 델타 · 2026-11-22
 
-**수집 정상화 · 신규 2건 · 실행 가능한 변경 없음**
+**VRSN 확인 우선순위 상향.** VRSN의 20일선 회복 주장을 다음 US 브리핑에서 우선 검증합니다. 같은 채널의 시뮬레이터 기록은 독립 확인 근거로 집계하지 않습니다.
 
-- **KR 나무가(190510)** · 11월 19일 11:36:44 KST 게시물은 손절선 이탈과 매도를 서술한다. 정규화된 매매 유형은 UNKNOWN이며 실제 체결과 가격은 미확인이다. `stock_ai_agent:17847`에 balanced_external의 낮은 가중치(LOW_LABELED)를 적용해 다음 KR 브리핑의 공식 시세 검증 우선순위를 높인다. 투자 가설 순위, 확신도, 비중, 주문 상태는 이 근거로 조정하지 않는다.
-- **시뮬레이터** · 11:36:51 KST 포트폴리오 요약은 가상 보유 0건을 보고했다. `stock_ai_agent:17848`은 실제 보유나 앞선 매도의 확인 근거에서 제외한다.
-- **US** · 이번 패킷에서 종목별 검증 항목이 발생하지 않았다.
+수집 정상. 마지막 성공은 11월 21일 07:54 KST입니다. 최근 24시간 패킷의 이벤트 범위는 11월 21일 05:27:31~05:33:03 KST였습니다. 신규 3건, 수정 0건, 중복 제외 0건, 전송 3건, 생략 0건입니다.
 
-수집 성공 시각은 11월 19일 12:48:55 KST다. 최근 24시간 패킷은 2/2건으로 생략 0건, 정정 0건, 중복 제외 0건이다. 전체 정본에서 이 패킷으로 전송되지 않은 신규 71건과 정정 45건은 과거 이벤트용 정본 패킷을 기다린다.
+- **미국 주식 · VRSN** (stock_ai_agent:17965). 채널에 20일선 회복을 근거로 한 재진입 BUY가 게시됐습니다. 단일 출처이며 실제 체결과 가격 조건은 미확인입니다. `balanced_external`의 `LOW_LABELED`로 기록해 확인 우선순위에만 반영합니다.
+- **주식 시뮬레이터** (stock_ai_agent:17966). VRSN·AAPL·COST 보유 스냅샷입니다. VRSN 재진입 게시물과 같은 채널에서 3초 뒤에 나왔습니다. AAPL과 COST의 새 투자 판단 근거는 없습니다.
+- **암호자산 데모** (stock_ai_agent:17964). BTC 데모 정산 기록입니다.
 
-**다음 확인** · 다음 KR 브리핑에서 한국거래소 종목 식별과 11월 19일 장중 시세를 확인한다. 현재 패킷의 첫 이벤트는 11월 20일 11:36:44 KST에 24시간 범위를 벗어난다.
+KR 브리핑에 전달할 신규 항목은 없습니다. 투자 논지 순위·확신도·비중은 유지하며 모든 항목은 연구 전용입니다.
 
-COVERAGE_RECEIPT {"event_id":"prism:f085590bf53f2577743bbe48ef41a87f","status":"COMPLETE","window_events":2,"transmitted_events":2,"truncated":false,"new_events":2,"revised_events":0}
+**다음 확인:** 다음 US 브리핑에서 VRSN의 11월 20일 장중 시세와 20거래일 이동평균을 대조하고, 기업 IR·SEC 공시에서 당시 새 재료가 있었는지 확인합니다.
+
+과거 신규 96건과 수정 45건은 현재 패킷 범위 밖이며 정본 이력 패킷을 기다립니다.
+
+COVERAGE_RECEIPT {"event_id":"prism:7586778dcb66c80c2bb6c8287521bd66","status":"COMPLETE","window_events":3,"transmitted_events":3,"truncated":false,"new_events":3,"revised_events":0}
 
 MOBILE_HANDOFF {"owner":"external_github_notification_pipeline","status":"PENDING_EXTERNAL_VERIFICATION","work_sent_notification":false}

@@ -1,0 +1,166 @@
+{
+  "schema": "tradingagents.work-report/v1",
+  "surface": "prism",
+  "event_id": "prism:7586778dcb66c80c2bb6c8287521bd66",
+  "source_sha256": "34a400e66c8f9db19bc3ef967c389678967d371e0f452fa1863cbf1107965e62",
+  "prompt_contract_version": "prism-work-v5",
+  "workflow_contract_sha256": "46750ba4d87c3e127db704d362c736134d7df73054a6cc449472af03a14095af",
+  "policy": {
+    "visibility": "investor_safe_no_credentials",
+    "external_evidence_profile": "balanced_external",
+    "external_evidence_may_affect": [
+      "ranking",
+      "confidence",
+      "position_size_within_existing_risk_limits",
+      "research_priority"
+    ],
+    "external_evidence_may_bypass_execution_gate": false,
+    "thesis_is_independent_from_execution_readiness": true
+  },
+  "report_markdown": "# PRISM 리서치 델타 · 2026-11-22\n\n**VRSN 확인 우선순위 상향.** VRSN의 20일선 회복 주장을 다음 US 브리핑에서 우선 검증합니다. 같은 채널의 시뮬레이터 기록은 독립 확인 근거로 집계하지 않습니다.\n\n수집 정상. 마지막 성공은 11월 21일 07:54 KST입니다. 최근 24시간 패킷의 이벤트 범위는 11월 21일 05:27:31~05:33:03 KST였습니다. 신규 3건, 수정 0건, 중복 제외 0건, 전송 3건, 생략 0건입니다.\n\n- **미국 주식 · VRSN** (stock_ai_agent:17965). 채널에 20일선 회복을 근거로 한 재진입 BUY가 게시됐습니다. 단일 출처이며 실제 체결과 가격 조건은 미확인입니다. `balanced_external`의 `LOW_LABELED`로 기록해 확인 우선순위에만 반영합니다.\n- **주식 시뮬레이터** (stock_ai_agent:17966). VRSN·AAPL·COST 보유 스냅샷입니다. VRSN 재진입 게시물과 같은 채널에서 3초 뒤에 나왔습니다. AAPL과 COST의 새 투자 판단 근거는 없습니다.\n- **암호자산 데모** (stock_ai_agent:17964). BTC 데모 정산 기록입니다.\n\nKR 브리핑에 전달할 신규 항목은 없습니다. 투자 논지 순위·확신도·비중은 유지하며 모든 항목은 연구 전용입니다.\n\n**다음 확인:** 다음 US 브리핑에서 VRSN의 11월 20일 장중 시세와 20거래일 이동평균을 대조하고, 기업 IR·SEC 공시에서 당시 새 재료가 있었는지 확인합니다.\n\n과거 신규 96건과 수정 45건은 현재 패킷 범위 밖이며 정본 이력 패킷을 기다립니다.\n\nCOVERAGE_RECEIPT {\"event_id\":\"prism:7586778dcb66c80c2bb6c8287521bd66\",\"status\":\"COMPLETE\",\"window_events\":3,\"transmitted_events\":3,\"truncated\":false,\"new_events\":3,\"revised_events\":0}\n\nMOBILE_HANDOFF {\"owner\":\"external_github_notification_pipeline\",\"status\":\"PENDING_EXTERNAL_VERIFICATION\",\"work_sent_notification\":false}",
+  "structured_report": {
+    "binding": {
+      "surface": "prism",
+      "event_id": "prism:7586778dcb66c80c2bb6c8287521bd66",
+      "source_sha256": "34a400e66c8f9db19bc3ef967c389678967d371e0f452fa1863cbf1107965e62"
+    },
+    "title": "PRISM 리서치 델타 · 2026-11-22",
+    "generated_at": "2026-11-22T05:25:10.356928+09:00",
+    "as_of": "2026-11-22T05:25:10.356928+09:00",
+    "source_health": "OK",
+    "report_mode": "research_only",
+    "summary": "VRSN의 20일선 회복 주장을 다음 US 브리핑에서 우선 검증합니다. 같은 채널의 시뮬레이터 기록은 독립 확인 근거로 집계하지 않습니다.",
+    "top_actions": [],
+    "strategies": [
+      {
+        "ticker": "VRSN",
+        "display_name": "VeriSign",
+        "research_priority": "다음 US 브리핑에서 VRSN의 11월 20일 장중 시세와 20거래일 이동평균을 대조하고, 기업 IR·SEC 공시에서 당시 새 재료가 있었는지 확인합니다.",
+        "execution": {
+          "readiness": "RESEARCH_ONLY"
+        },
+        "source_contributions": [
+          {
+            "surface": "prism",
+            "event_key": "stock_ai_agent:17965",
+            "affected_field": "research_priority",
+            "evidence_weight": "LOW_LABELED",
+            "note": "단일 채널의 20일선 회복 주장. 대응 보유 기록은 동일 채널 시뮬레이터에서 나옴."
+          }
+        ]
+      }
+    ],
+    "coverage_receipt": {
+      "event_id": "prism:7586778dcb66c80c2bb6c8287521bd66",
+      "status": "COMPLETE",
+      "window_events": 3,
+      "transmitted_events": 3,
+      "truncated": false,
+      "new_events": 3,
+      "revised_events": 0
+    },
+    "model_receipt": {
+      "schema": "tradingagents.model-provenance/v1",
+      "work_synthesis": {
+        "execution_mode": "local",
+        "requested_model": "gpt-6.2-sol",
+        "requested_reasoning_effort": "medium",
+        "task_id": "tradingagents-work-prism",
+        "verification_status": "CONFIGURED_NOT_RUNTIME_VERIFIED",
+        "observed_model": null,
+        "observed_reasoning_effort": null,
+        "note": "The local task contract is verified; the Work host does not expose a signed per-response model receipt."
+      }
+    },
+    "source_summary": {
+      "source": {
+        "health": "OK",
+        "run_id": "prism_telegram_20261121_075349",
+        "last_run_at": "2026-11-21T07:54:01.842166+09:00",
+        "status": "success",
+        "stale_after_hours": 30
+      },
+      "coverage": {
+        "total_unique_events": 470,
+        "window_events": 3,
+        "transmitted_events": 3,
+        "truncated": false,
+        "oldest_occurred_at": "2026-11-20T20:27:31+00:00",
+        "newest_occurred_at": "2026-11-20T20:33:03+00:00"
+      },
+      "delta": {
+        "new_events": 3,
+        "revised_events": 0,
+        "unchanged_events": 0,
+        "delivered_event_keys": [
+          "stock_ai_agent:17966",
+          "stock_ai_agent:17965",
+          "stock_ai_agent:17964"
+        ]
+      },
+      "evidence_policy": {
+        "profile": "balanced_external",
+        "material_thesis_effects": [
+          "ranking",
+          "confidence",
+          "position_size_within_existing_risk_limits",
+          "research_priority"
+        ],
+        "supported_evidence_weight": "MEDIUM",
+        "partially_supported_evidence_weight": "LOW_TO_MEDIUM",
+        "unverified_evidence_weight": "LOW_LABELED",
+        "user_primary_channels": [
+          "@kpunch",
+          "@sosumonkey"
+        ],
+        "user_primary_source_tier": "USER_PRIMARY",
+        "user_primary_evidence_weight": "HIGH",
+        "user_primary_validation_policy": "USER_ACCEPTED",
+        "matching_multi_source_signal_may_raise_thesis_priority": true,
+        "conflicting_signal_must_be_visible": true,
+        "may_bypass_market_or_portfolio_execution_gate": false
+      },
+      "execution_eligible": false,
+      "canonical_backlog": {
+        "status": "PENDING_CANONICAL_BACKLOG_PACKET",
+        "new_events": 96,
+        "revised_events": 45
+      },
+      "mobile_handoff": {
+        "owner": "external_github_notification_pipeline",
+        "status": "PENDING_EXTERNAL_VERIFICATION",
+        "work_sent_notification": false
+      },
+      "events": [
+        {
+          "event_key": "stock_ai_agent:17966",
+          "content_sha256": "9f7b0437e653c5a03d1e5d2f2539521ec7658efbdcddbe333b41a902914d09c7",
+          "occurred_at": "2026-11-20T20:33:03+00:00",
+          "posted_at": "2026-11-20T20:33:03+00:00",
+          "source_url": "https://t.me/stock_ai_agent/17966",
+          "simulation_only": true
+        },
+        {
+          "event_key": "stock_ai_agent:17965",
+          "content_sha256": "a19664bad1a578786659cecc0aea99bca65bbd2923947c0673351a1948bdb79b",
+          "occurred_at": "2026-11-20T20:33:00+00:00",
+          "posted_at": "2026-11-20T20:33:00+00:00",
+          "source_url": "https://t.me/stock_ai_agent/17965",
+          "simulation_only": false
+        },
+        {
+          "event_key": "stock_ai_agent:17964",
+          "content_sha256": "1c4d4a30826dbc4a98e8b75c9bc2575dd0f648551cca79edc0d45324d2604081",
+          "occurred_at": "2026-11-20T20:27:31+00:00",
+          "posted_at": "2026-11-20T20:27:31+00:00",
+          "source_url": "https://t.me/stock_ai_agent/17964",
+          "simulation_only": true
+        }
+      ]
+    },
+    "next_checkpoint": "다음 US 브리핑에서 VRSN의 11월 20일 장중 시세와 20거래일 이동평균을 대조하고, 기업 IR·SEC 공시에서 당시 새 재료가 있었는지 확인합니다."
+  },
+  "report_id": "prism:e2cb34edd60a571a5b83de8e8574c2c0",
+  "report_sha256": "e2cb34edd60a571a5b83de8e8574c2c0f1e45072e0c854a7ac083bd4f148239a",
+  "published_at": "2026-11-22T05:25:10.535042+09:00"
+}

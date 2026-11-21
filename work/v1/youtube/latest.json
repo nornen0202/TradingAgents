@@ -1,13 +1,13 @@
 {
   "schema": "tradingagents.work-context/v1",
   "surface": "youtube",
-  "event_id": "youtube:2cf28fb0f9bd9eb9d3fc3cae0afa1158",
+  "event_id": "youtube:55cc7450e7a5779c7c24f1dbdc0eca0b",
   "prompt_contract_version": "youtube-work-v5",
   "prompt_sha256": "82a87727ec636b928ccb90cfe8cd823d86347e254ed0b204903699e34e35ef0b",
   "skill_sha256": "2fef99f1af403675549a13813e0fe5597a241a964affeada56e9f64e9f398fe9",
   "task_manifest_sha256": "6fbafadc2971d1a908c1bbc1fa29e2adaf0ca6be956768f2f9eb0abf0061428e",
   "workflow_contract_sha256": "6d7501fa20481c66d549b49f6892da6cf0afbc406ab35215a8c726e520d46db5",
-  "source_sha256": "7f86800a6ebbdf6f96b5298992ea72a9ec65a293be46518048f55b0413c9d510",
+  "source_sha256": "54e8dfa9ecee41a9fad54cdbb2c1fcafb3ca67eaa707091b35d775b39325d8e5",
   "body": {
     "kind": "youtube",
     "source_health": "OK",
@@ -44,10 +44,10 @@
     },
     "coverage": {
       "total_unique_events": 907,
-      "window_events": 106,
+      "window_events": 71,
       "transmitted_events": 23,
       "truncated": true,
-      "oldest_occurred_at": "2026-11-18T11:40:03+00:00",
+      "oldest_occurred_at": "2026-11-19T02:50:14+00:00",
       "newest_occurred_at": "2026-11-20T12:00:30+00:00",
       "omitted_due_to_packet_budget": 37
     },
@@ -217,176 +217,6 @@
               "source_url": "https://finance.yahoo.com/energy/articles/alpex-solar-ltd-nse-alpexsolar-170123828.html",
               "publisher": "GuruFocus.com",
               "published_at": "2026-11-19T17:01:23+00:00",
-              "source_tier": "news"
-            }
-          ]
-        }
-      },
-      {
-        "event_key": "Z4fzVAS4KCc",
-        "content_sha256": "da382558bd5488f812b4c5ea7b9a9f1de6915b96e179ae9c5925138865fb328e",
-        "occurred_at": "2026-11-18T11:40:03+00:00",
-        "relevance": {
-          "tickers": [
-            "ANT"
-          ],
-          "markets": [
-            "US"
-          ],
-          "themes": [],
-          "match_basis": "verified_entities"
-        },
-        "strategy_source_tier": "USER_PRIMARY",
-        "strategy_evidence_weight": "HIGH",
-        "summary": {
-          "video_id": "Z4fzVAS4KCc",
-          "title": "AI 끝판왕 앤트로픽 사려고 다른 주식 매도 중? 역대 IPO 패턴 반복될까",
-          "channel": "소수몽키",
-          "source_url": "https://www.youtube.com/watch?v=Z4fzVAS4KCc",
-          "published_at": "2026-11-18T11:40:03+00:00",
-          "status": "contradicted",
-          "strategy_source_tier": "USER_PRIMARY",
-          "strategy_evidence_weight": "HIGH",
-          "strategy_validation_policy": "USER_ACCEPTED",
-          "transcript_quality": {
-            "status": "good",
-            "score": 1.0,
-            "warnings": [],
-            "source": "automatic",
-            "language": "Korean",
-            "model_or_format": "json3",
-            "chars": 8712,
-            "segments": 416,
-            "duration_seconds": 846,
-            "repeated_ngram_ratio": 0.001
-          },
-          "claim_status_summary": {
-            "partially_supported": 1,
-            "unverified": 8,
-            "contradicted": 1
-          },
-          "claims": [
-            {
-              "claim_id": "C1",
-              "claim_text": "영상은 2026년 11월 19~20일 ANT 상장과 70~78달러 희망 공모 범위를 제시한다. 78~80달러 최종 공모가는 강한 수요의 신호라는 해석이며, 첫날 거래 집중·급등과 한 달 뒤 시초가 하회는 발표자의 전망이다.",
-              "status": "partially_supported",
-              "confidence": 0.92,
-              "supporting_evidence_ids": [
-                "E5",
-                "E6"
-              ],
-              "manual_check_required": true,
-              "investor_implication": "보도된 83달러는 최종 공모가로 보도된 가격이지 첫 체결가가 아니다. 상단 초과 가격만으로 첫날 급등이나 한 달 뒤 하락을 판단할 수 없다."
-            },
-            {
-              "claim_id": "C2",
-              "claim_text": "영상은 78달러에서 앤트로픽 시총 약 1조 4천억 달러와 세계 11위권을 제시한다. 90달러에서 테슬라를 넘어 10위권, 100달러에서 메타·스페이스X를 넘는다는 비교와 150달러·시총 2조~3조 달러는 가정이다.",
-              "status": "unverified",
-              "confidence": 0.98,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "공시의 상장 후 주식 수와 같은 날짜·통화·산정 기준으로 비교한 기업가치가 없으면 시총 순위를 투자 판단에 사용하기 어렵다."
-            },
-            {
-              "claim_id": "C3",
-              "claim_text": "영상은 구글과 아마존의 지분을 각각 10% 이상으로 추산하고, 첫날 내부자 보유 주식의 대량 매도 가능성을 제기한다.",
-              "status": "unverified",
-              "confidence": 0.98,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "전략적 투자자의 지분과 첫날 유통 물량을 추정치가 아닌 최종 투자설명서의 소유·매도 제한 항목으로 판단한다."
-            },
-            {
-              "claim_id": "C4",
-              "claim_text": "영상은 스페이스X 사례를 들어 앤트로픽이 12월 중순께 나스닥 지수에 편입될 수 있다고 전망하지만 지수명은 특정하지 않는다.",
-              "status": "unverified",
-              "confidence": 0.98,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "대상 지수와 공식 편입 효력일이 확인되기 전에는 지수 추종 자금 유입을 전제로 삼지 않는다."
-            },
-            {
-              "claim_id": "C5",
-              "claim_text": "영상은 스페이스X를 조달 규모 1위, 앤트로픽을 2위로 소개하다가 SK하이닉스 미국 상장을 포함하면 앤트로픽이 3위라고 말한다. 6·7·11월을 언급하면서 세 건 모두 하반기였다고 설명한다.",
-              "status": "contradicted",
-              "confidence": 0.92,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "영상의 순위를 최종 순위로 인용하지 않는다. 상장 유형, 신주·구주, 초과배정 포함 여부를 통일한 공식 수치가 필요하다."
-            },
-            {
-              "claim_id": "C6",
-              "claim_text": "발표자는 2000년대 이후 100개 이상을 분석해 첫날 종가가 공모가를 웃돈 비율 76%, 3개월 내 고점 비율 50% 초과, 고점 이후 평균 약 50% 하락, 가격 기준이 불명확한 하회 비율 75%를 제시한다. 첫날 종가 기준 6개월 이후 시장 대비 부진과 1년 후 상대성과 악화, 기술주의 더 큰 첫날 상승폭과 1년 후 하락폭도 주장한다. 별도로 통상 시초가는 공모가보다 약 20% 높다고 설명한다.",
-              "status": "unverified",
-              "confidence": 0.99,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "원표본과 산식이 공개되기 전에는 영상 수치를 앤트로픽의 상승·하락 확률이나 예상 낙폭으로 사용하지 않는다."
-            }
-          ],
-          "entities": [
-            {
-              "ticker": "ANT",
-              "name": "앤트로픽",
-              "status": "unverified",
-              "verification_notes": [
-                "시장 데이터 조회 실패: no_usable_market_fields"
-              ]
-            }
-          ],
-          "evidence": [
-            {
-              "evidence_id": "E1",
-              "claim_id": "C1",
-              "title": "Alcoa (AA) Stock Looks Reasonable Despite A 46% Three Year Gain",
-              "source_url": "https://finance.yahoo.com/markets/stocks/articles/alcoa-aa-stock-looks-reasonable-221445665.html",
-              "publisher": "Simply Wall St.",
-              "published_at": "2026-11-18T22:14:45+00:00",
-              "source_tier": "market_or_news"
-            },
-            {
-              "evidence_id": "E2",
-              "claim_id": "C1",
-              "title": "Basic Materials Roundup: Market Talk",
-              "source_url": "https://finance.yahoo.com/m/436c6e69-a633-3fbe-be3d-3dcbbf551b2c/basic-materials-roundup%3A.html",
-              "publisher": "The Wall Street Journal",
-              "published_at": "2026-11-18T21:58:00+00:00",
-              "source_tier": "market_or_news"
-            },
-            {
-              "evidence_id": "E4",
-              "claim_id": "C2",
-              "title": "Dow Jones Futures Rise; Anthropic IPO Prices High, Palo Alto And Everpure Rally On Earnings",
-              "source_url": "https://finance.yahoo.com/m/107e5a2c-4fba-3df3-b2fd-5d1160e65516/dow-jones-futures-rise%3B.html",
-              "publisher": "Investor's Business Daily",
-              "published_at": "2026-11-19T01:55:52+00:00",
-              "source_tier": "market_or_news"
-            },
-            {
-              "evidence_id": "E5",
-              "claim_id": "C2",
-              "title": "Anthropic Prices IPO at $83 a Share, Raising $81.3 Billion in Largest Listing on Record",
-              "source_url": "https://finance.yahoo.com/markets/stocks/articles/anthropic-prices-ipo-83-share-014000480.html",
-              "publisher": "CryptoProwl",
-              "published_at": "2026-11-19T01:40:00+00:00",
-              "source_tier": "news"
-            },
-            {
-              "evidence_id": "E7",
-              "claim_id": "C6",
-              "title": "Review & Preview: Anthropic’s Moment",
-              "source_url": "https://finance.yahoo.com/m/e82fbe94-96bd-3f01-9a6d-8bc83fca71ad/review-%26-preview%3A-anthropic%E2%80%99s.html",
-              "publisher": "Barrons.com",
-              "published_at": "2026-11-19T00:55:00+00:00",
-              "source_tier": "news"
-            },
-            {
-              "evidence_id": "E8",
-              "claim_id": "C8",
-              "title": "Two Retirees Each Hold $500,000 in a 401(k) Index Fund as Nvidia’s CFO Takes the Wheel. One Has About $28,950 Riding on a Single Stock. The Other Has About $...",
-              "source_url": "https://finance.yahoo.com/markets/options/articles/two-retirees-hold-500-000-230224622.html",
-              "publisher": "24/7 Wall St.",
-              "published_at": "2026-11-18T23:02:24+00:00",
               "source_tier": "news"
             }
           ]
@@ -3949,6 +3779,136 @@
               "publisher": "The Wall Street Journal",
               "published_at": "2026-11-20T09:31:26+00:00",
               "source_tier": "market_or_news"
+            }
+          ]
+        }
+      },
+      {
+        "event_key": "LaNmkC9HkS4",
+        "content_sha256": "d0173f5200867f5ca50db819626d792bece2a8ac2c73137ff5e01a375ed4163c",
+        "occurred_at": "2026-11-20T02:38:16+00:00",
+        "relevance": {
+          "tickers": [
+            "^KS11"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "verified_entities"
+        },
+        "strategy_source_tier": "STANDARD",
+        "strategy_evidence_weight": "STANDARD",
+        "summary": {
+          "video_id": "LaNmkC9HkS4",
+          "title": "\"이제는 AI가 당신의 자산을 관리할 것\" 놓치면 후회합니다 | 김창배 금융위 디지털금융총괄과 사무관 [더블 업]",
+          "channel": "삼프로TV 3PROTV",
+          "source_url": "https://www.youtube.com/watch?v=LaNmkC9HkS4",
+          "published_at": "2026-11-20T02:38:16+00:00",
+          "status": "asr_uncertain",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "strategy_validation_policy": "STANDARD_REVIEW",
+          "transcript_quality": {
+            "status": "good",
+            "score": 1.0,
+            "warnings": [],
+            "source": "automatic",
+            "language": "Korean",
+            "model_or_format": "json3",
+            "chars": 8724,
+            "segments": 471,
+            "duration_seconds": 987,
+            "repeated_ngram_ratio": 0.0
+          },
+          "claim_status_summary": {
+            "unverified": 10,
+            "asr_uncertain": 1
+          },
+          "claims": [
+            {
+              "claim_id": "C1",
+              "claim_text": "김창배 사무관은 금융 AI가 주로 시범 적용 단계이며, 신용정보를 실시간으로 조회해 금리인하요구권 행사 가능 여부를 확인하고 신청을 대행하는 시범 서비스가 있다고 설명했다.",
+              "status": "unverified",
+              "confidence": 0.12,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "운영 대상과 신청 권한이 확인되기 전에는 이 사례를 상용화나 금융권 전반의 도입 근거로 쓰기 어렵다."
+            },
+            {
+              "claim_id": "C2",
+              "claim_text": "해외 일부 금융 AI 에이전트는 이용자가 목표를 위임하면 달성 수단을 비교하고 실행까지 대행하는 기능을 시범 운영한다고 설명했다.",
+              "status": "unverified",
+              "confidence": 0.07,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "거래 실행 권한이 확인되기 전에는 자율 실행형 금융 서비스가 실증됐다고 볼 수 없다."
+            },
+            {
+              "claim_id": "C3",
+              "claim_text": "소비 패턴과 개인 목표를 반영한 추천이 고도화되면 PB·WM 접근성이 넓어질 수 있다고 전망했으며, 상용화 전 정확성, 거래 안전성, 보안, 소비자 피해 가능성과 국내 규범 적합성을 검토해야 한다고 설명했다.",
+              "status": "unverified",
+              "confidence": 0.18,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "접근성 확대는 실제 가입 요건, 총비용, 제공 기능과 소비자 보호 장치가 공개된 뒤 평가할 수 있다."
+            },
+            {
+              "claim_id": "C4",
+              "claim_text": "2019년에 시작된 행사의 제8회가 2026년 11월 25~27일 서울 양재에서 열릴 예정이라고 소개했다.",
+              "status": "unverified",
+              "confidence": 0.14,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "참석 일정을 잡으려면 주최 측 공지에서 날짜와 행사장 정식 명칭을 확인해야 한다."
+            },
+            {
+              "claim_id": "C5",
+              "claim_text": "행사 주제는 ‘다음 금융은 이미 시작되었다’이며, AI 에이전트·양자컴퓨팅·블록체인의 금융 활용을 다루고 연사 소속으로 OpenAI, LG AI연구원, IBM을 언급했다.",
+              "status": "unverified",
+              "confidence": 0.12,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "연사 소속 언급만으로 해당 기업의 참가 확정, 공식 제휴 또는 사업 협력을 추론할 수 없다."
+            },
+            {
+              "claim_id": "C6",
+              "claim_text": "2026년 행사에서 핀테크 스타트업과 투자기관 간 1대1 투자 밋업을 소개하며, 2025년에 약 100건의 매칭 상담을 진행했다고 말했다.",
+              "status": "unverified",
+              "confidence": 0.1,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "상담 건수가 확인되더라도 투자 계약 건수나 조달 실적으로 해석할 수 없다."
+            }
+          ],
+          "entities": [
+            {
+              "ticker": "^KS11",
+              "name": "코스피·코스닥",
+              "status": "unverified",
+              "verification_notes": [
+                "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+              ]
+            }
+          ],
+          "evidence": [
+            {
+              "evidence_id": "E1",
+              "claim_id": "C5",
+              "title": "Recycled Metal - Global Market Size, Share, Industry Trends and Growth Forecast 2026-2031 | Decarbonization and Electrification Drive a $191.86 Billion Reven...",
+              "source_url": "https://finance.yahoo.com/markets/commodities/articles/recycled-metal-global-market-size-161600643.html",
+              "publisher": "GlobeNewswire",
+              "published_at": "2026-11-19T16:16:00+00:00",
+              "source_tier": "news"
+            },
+            {
+              "evidence_id": "E2",
+              "claim_id": "C6",
+              "title": "Sucro Announces Third Quarter 2026 Results",
+              "source_url": "https://finance.yahoo.com/markets/commodities/articles/sucro-announces-third-quarter-2026-120000011.html",
+              "publisher": "TMX Newsfile",
+              "published_at": "2026-11-20T12:00:00+00:00",
+              "source_tier": "news"
             }
           ]
         }
