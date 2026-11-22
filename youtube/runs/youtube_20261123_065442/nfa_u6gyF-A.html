@@ -1,0 +1,620 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YouTube 투자자용 검증 리포트 - 월가는 못한다는, &#x27;시간&#x27;을 내 편으로 만드는 매수법</title>
+  <style>
+:root {
+  color-scheme: light;
+  --bg: #f7f8fb;
+  --panel: #ffffff;
+  --text: #172033;
+  --muted: #667085;
+  --line: #d9dee8;
+  --accent: #0f766e;
+  --accent-2: #2563eb;
+  --warn: #b45309;
+  --bad: #b42318;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0 56px; }
+a { color: var(--accent-2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.hero { padding: 28px 0 22px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+.hero.compact { padding-top: 12px; }
+.hero h1 { margin: 0; font-size: clamp(28px, 4vw, 44px); line-height: 1.15; letter-spacing: 0; }
+.hero p { max-width: 760px; color: var(--muted); margin: 12px 0 0; }
+.eyebrow { color: var(--accent); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0; margin: 0 0 8px; }
+section { margin: 28px 0; }
+h2, h3, h4, h5 { letter-spacing: 0; line-height: 1.25; }
+.synthesis-callout { padding: clamp(20px, 4vw, 34px); border: 1px solid #6ee7d8; border-radius: 18px; background: linear-gradient(135deg, #ecfdf9 0%, #eff6ff 100%); box-shadow: 0 18px 44px rgba(15, 118, 110, .12); }
+.synthesis-callout.unavailable { border-color: var(--line); background: var(--panel); box-shadow: none; }
+.synthesis-callout h2 { margin: 0; font-size: clamp(24px, 3.2vw, 36px); }
+.synthesis-callout .lead { max-width: 900px; font-size: 17px; color: #334155; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.primary-link, .secondary-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border-radius: 999px; font-weight: 800; }
+.primary-link { color: white; background: var(--accent); }
+.secondary-link { color: var(--accent-2); border: 1px solid #93c5fd; background: white; }
+.primary-link:hover, .secondary-link:hover { text-decoration: none; filter: brightness(.97); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.card, .run { display: flex; flex-direction: column; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; color: var(--text); min-height: 128px; }
+.run { padding: 16px; }
+.card:hover, .run:hover { border-color: var(--accent-2); text-decoration: none; }
+.thumb { display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #e9edf5; border-radius: 8px 8px 0 0; color: var(--muted); font-size: 13px; font-weight: 700; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb-empty span { padding: 0 14px; text-align: center; }
+.card-body { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 16px; }
+.card strong { line-height: 1.35; }
+.source-line { color: #3f4a5f; font-weight: 600; }
+.runs { display: grid; gap: 10px; }
+.badge { display: inline-flex; width: fit-content; border-radius: 999px; padding: 2px 9px; background: #e6f4f1; color: var(--accent); font-size: 12px; font-weight: 700; }
+.status-contradicted, .status-llm_failed { background: #fee4e2; color: var(--bad); }
+.status-unverified, .status-stale { background: #fff4d6; color: var(--warn); }
+small, .muted { color: var(--muted); }
+.topnav { display: flex; gap: 14px; margin-bottom: 16px; font-size: 14px; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px; }
+.stats span { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
+.report { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: min(5vw, 36px); }
+.report-head { border-bottom: 1px solid var(--line); margin-bottom: 24px; padding-bottom: 20px; }
+.report-head h1 { margin: 0; font-size: clamp(24px, 3.5vw, 38px); line-height: 1.2; }
+.meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+.scope-note { padding: 12px 14px; border-left: 4px solid var(--warn); border-radius: 6px; background: #fff7ed; color: #7c2d12; }
+.synthesis-report h2 { margin-top: 34px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.synthesis-report h3 { margin: 24px 0 8px; color: #0f4c5c; }
+.synthesis-report p, .synthesis-report li { overflow-wrap: anywhere; }
+pre { overflow: auto; background: #111827; color: #f9fafb; border-radius: 8px; padding: 14px; }
+code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+details { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 18px; }
+@media (max-width: 640px) {
+  main { width: min(100% - 20px, 1120px); padding-top: 18px; }
+  .report { padding: 18px; }
+  .synthesis-callout { border-radius: 14px; padding: 18px; }
+  .cta-row a { width: 100%; }
+  .mobile-report { border-radius: 12px; }
+}
+</style>
+</head>
+<body>
+  <main>
+<nav class="topnav"><a href="index.html">실행 목록</a><a href="../../index.html">YouTube 홈</a></nav>
+<article class="report">
+  <header class="report-head">
+    <p class="eyebrow">youtube_20261123_065442</p>
+    <h1>월가는 못한다는, &#x27;시간&#x27;을 내 편으로 만드는 매수법</h1>
+    <div class="meta">
+      <span class="badge status-asr_uncertain">asr_uncertain</span>
+      <a href="https://www.youtube.com/watch?v=nfa_u6gyF-A">원본 영상</a>
+    </div>
+  </header>
+  <h2>장기투자의 ‘시간 우위’: 수익률보다 먼저 확인할 것은 버틸 수 있는가</h2>
+<p><a href="https://www.youtube.com/watch?v=nfa_u6gyF-A">경제사냥꾼 원영상: 월가는 못한다는, ‘시간’을 내 편으로 만드는 매수법</a> · 2026년 11월 22일 게시</p>
+<p><strong>핵심 판단:</strong> 영상의 가장 설득력 있는 논리는 개인이 기관보다 높은 수익을 낸다는 것이 아니라, <strong>급전이나 차입 때문에 하락장에서 팔아야 하는 상황을 줄이면 장기 계획을 유지하기 쉬워진다</strong>는 것이다. 정액 적립과 분산은 그 계획을 지키는 수단이 될 수 있지만, 단일 시장의 장기 손실이나 중도 자금 수요를 없애지는 못한다. 이번 검증에서 확인된 것은 정액 매수 예시의 산술뿐이다. 역사적 수익률, 기관 연구와 설문, 투자자 행동 통계는 독립 확인되지 않았다.</p>
+<h3>영상 주장</h3>
+<p>| 주제 | 영상이 제시한 주장과 수치 — 외부 미검증 |</p>
+<p>|---|---|</p>
+<p>| 기관의 시간 제약 <a href="https://www.youtube.com/watch?v=nfa_u6gyF-A&amp;t=0s">00:00</a> | 환매에 대응하는 펀드의 매도가 공통 보유 종목에 가격 압력을 줄 수 있고, 짧은 평가 주기가 장기 운용을 어렵게 한다고 설명한다. 미국 기관 약 3,400곳의 운용사 선임·교체 연구와 CFA 관련 설문을 인용한다. 영상 속 52%는 성과 부진 시 해고를 <strong>예상</strong>한 응답 비율이지 실제 해고율이 아니다. 교체 후 유의한 개선이 없었다는 주장도 두 선택의 성과가 정확히 같다는 뜻은 아니다. |</p>
+<p>| 코스피 <a href="https://www.youtube.com/watch?v=nfa_u6gyF-A&amp;t=0s">00:00</a> · <a href="https://www.youtube.com/watch?v=nfa_u6gyF-A&amp;t=317s">05:17</a> · <a href="https://www.youtube.com/watch?v=nfa_u6gyF-A&amp;t=642s">10:42</a> | 채널의 배당 제외 백테스트에서 손실 시작일 비중은 1년 36.7%, 5년 10.5%, 10년 0.2%였으며 15년·20년 표본에서는 손실이 없었다고 한다. 그러면서도 최악의 10년 수익률은 -13.6%로 제시한다. 2007년과 2021년 고점 사례에서 적립식은 각각 22번째·24번째 달에 원금을 처음 회복했다고 하나, 2007년 사례의 중간 평가액은 누적 납입액의 54.5%까지 하락했다고 한다. |</p>
+<p>| 닛케이 225 <a href="https://www.youtube.com/watch?v=nfa_u6gyF-A&amp;t=317s">05:17</a> · <a href="https://www.youtube.com/watch?v=nfa_u6gyF-A&amp;t=642s">10:42</a> | 가격지수가 1989년 말 고점을 2024년 2월에 다시 넘었고, 채널의 정액 적립 사례는 1996년 1월 원금을 처음 회복했지만 2003년 4월에는 평가액이 납입액의 45%까지 다시 하락했다고 한다. 최초 원금 회복과 이후 손실 위험이 별개라는 사례로 제시된다. |</p>
+<p>| S&amp;P 500과 60/40 <a href="https://www.youtube.com/watch?v=nfa_u6gyF-A&amp;t=0s">00:00</a> · <a href="https://www.youtube.com/watch?v=nfa_u6gyF-A&amp;t=317s">05:17</a> · <a href="https://www.youtube.com/watch?v=nfa_u6gyF-A&amp;t=642s">10:42</a> | Morgan Stanley 자료에서 1일 손실 비중 46%, 20년 0%를, Hartford Funds 자료에서 배당 재투자와 복리 효과의 누적 총수익 기여율 85%를 인용한다. J.P. Morgan 자산운용 사례로 최고 수익일이 급락일 가까이에 나타날 수 있으며, 60/40 혼합은 주식 단독보다 최악의 1년 손실이 작았지만 연평균 수익률도 낮았다고 설명한다. |</p>
+<p>| 매매 행동과 목돈 투입 <a href="https://www.youtube.com/watch?v=nfa_u6gyF-A&amp;t=317s">05:17</a> · <a href="https://www.youtube.com/watch?v=nfa_u6gyF-A&amp;t=642s">10:42</a> | Morningstar의 펀드 수익률 연 9.9%와 투자자 자금 수익률 연 8.7%를 인용하고, 미국 가구와 한국 개인투자자의 거래 연구를 별도로 소개한다. 기존 목돈을 비교한 1976~2022년 사례에서는 3개월 분할보다 일시투자가 1년 뒤 앞선 비율이 68%였지만, 하위 5% 지점에서는 10만 달러의 평가액이 일시 82,947달러, 분할 85,906달러였다고 한다. |</p>
+<h3>확인된 사실과 근거의 한계</h3>
+<ul>
+<li><strong>직접 검산:</strong> 수수료가 없다면 10만원씩 주당 1만원과 5천원에 매수할 때 각각 10주와 20주를 산다. 평균 취득가는 20만원 ÷ 30주, 약 6,667원으로 두 가격의 단순 평균 7,500원보다 낮다. 이 계산은 <a href="https://www.youtube.com/watch?v=nfa_u6gyF-A&amp;t=317s">영상의 적립식 설명 구간</a>에 나온 예시를 확인한 것이며, 분할투자의 최종 평가액 우위를 입증하지 않는다.</li>
+<li><strong>외부 자료:</strong> 수집된 뉴스 3건은 모두 해당 주장과 무관해 근거에서 제외했다. 관련 논문·설문·운용사 도표 원문을 확보하지 못했으므로 영상 링크는 <strong>주장의 출처</strong>이지 독립 검증 링크가 아니다. 코스피 조회에 약 4,869.96이 반환됐지만 특정 날짜의 공식 종가나 일별 시계열이 아니다. 52주 저가 0.0은 사용하지 않았다. S&amp;P 500은 유효한 시세가 없었고 뉴스·공시 조회도 이용 불가로 기록됐다. 닛케이 일봉 역시 제공되지 않았다.</li>
+<li><strong>자막과 신뢰도:</strong> <code>transcript_quality</code>는 1.0이지만 한국어 자동자막 458개 구간에 대한 품질 지표이지 숫자·단위의 정확도 보증이 아니다. 링크 시각은 개별 발화가 아닌 관련 구간의 시작점이다. 주장 검증 단계의 <code>source_confidence</code>는 전 항목 0.00으로, 직접 대조할 외부 근거가 없다는 뜻이다. <code>asr_confidence</code>는 자막 해석의 명확성 추정치로, 예컨대 코스피 장기 백테스트는 0.90이지만 6월 22일~11월 19일 약 44% 하락 주장은 0.15, J.P. Morgan 도표 관련 주장은 0.65다. 자막이 명료해도 주장이 사실로 확인된 것은 아니다.</li>
+<li><strong>수동 확인 필요:</strong> 코스피 하락률은 연도와 두 공식 종가가 확인되기 전에는 시장 수치로 사용하지 않는다. J.P. Morgan의 최고 10일 제외 평가액 35,866달러와 계속 보유액의 자막 해석은 ‘절반 미만’이라는 설명과 양립하지 않아 보유액을 확정할 수 없다. 닛케이 최종 평가 비율과 미국 가구 연간 회전율도 단위를 확인해야 한다. Morningstar 수익률 격차, 제공되지 않은 Bloomberg 자료, 채널의 비공개 백테스트와 계좌 단위 원자료는 <strong>미검증·수동 확인 필요</strong>다. Morningstar의 1.2%p는 제시된 두 수치의 차이로만 검산되며, 보고서나 수익률 산식이 확인된 것은 아니다.</li>
+</ul>
+<h3>상승 논리와 반론</h3>
+<p>장기 노출이 유리해지는 시나리오는 투자한 시장의 총수익이 장기적으로 늘고, 그 기간에 생활비나 차입 조건 때문에 팔지 않아도 되는 경우다. 정액 적립은 하락기에 같은 돈으로 더 많은 수량을 쌓게 하고, 사전에 정한 일정은 매번 진입 시점을 판단해야 하는 부담을 줄인다. 다만 <strong>급여에서 새로 생기는 여유자금을 투자하는 것</strong>과 <strong>이미 있는 목돈 일부를 현금으로 대기시키는 것</strong>은 다르다. 후자는 초기에 하락하면 노출을 줄여 손실을 완화할 수 있지만, 상승이 이어지면 그만큼 상승분을 놓친다.</p>
+<p>선택된 고점에서의 빠른 원금 회복은 같은 시점에 같은 자본을 투입한 비교가 아니며, 다른 시작일의 성과나 최초 회복 이후의 안전성을 보여주지 않는다. 코스피·닛케이는 배당 제외 가격지수, 영상의 미국 장기 성과는 배당 포함 총수익 자료이므로 숫자를 그대로 놓고 국가 간 우열을 판단하기 어렵다. 최고 수익일만 사후에 제외한 비교도 실행 가능한 시장 타이밍 전략의 성과는 아니다. 분산은 한 시장에 대한 의존도를 낮출 수 있지만, 주식과 채권이 함께 하락하면 60/40 혼합도 손실을 볼 수 있다. 영상의 과거 최악 수치는 향후 손실의 한도가 아니다.</p>
+<h3>단기 체크포인트와 논리가 깨지는 조건</h3>
+<p>| 확인 시점 | 관찰할 항목과 판단 기준 |</p>
+<p>|---|---|</p>
+<p>| 다음 월 납입 전 | 향후 3~12개월 확정 지출, 비상자금으로 버틸 수 있는 개월 수, 대출 만기·금리 재설정·담보 조건을 확인한다. 하락 시 생활비나 담보 요건 때문에 매도가 필요하다면, ‘기다릴 수 있다’는 핵심 전제가 깨진다. |</p>
+<p>| 매월 말 | 누적 납입액 대비 평가액, 평가액의 고점 대비 하락폭, 납입 중단·인출 횟수, 거래비용을 기록한다. 시장 성과와 실제 현금흐름을 반영한 투자자 수익률을 분리해 보면, 전략 자체와 실행 과정 중 어디에서 차이가 났는지 판단하기 쉽다. |</p>
+<p>| 분기 말 | 국가·종목·자산별 실제 비중과 쏠림, 주식과 채권의 동반 하락 여부를 점검한다. 손실이 여러 자산에서 동시에 커지거나 한 시장이 전체 위험을 좌우하면, 분산이 기대만큼 손실을 완화하고 있다는 해석은 약해진다. |</p>
+<p>| 역사적 수치를 판단에 사용하기 전 | 거래소·지수 산출기관의 공식 일봉으로 코스피와 닛케이 사례를 다시 계산한다. 월별 매수일, 휴장일 처리, 배당·비용, 표본 종료일, 평가 주기를 명시하고 최초 원금 회복 뒤의 재하락도 본다. 여러 시작일과 동일한 가용 자금·현금흐름 조건에서 비교했을 때 영상의 우위가 사라진다면, 선택된 고점 사례를 일반적인 적립식 우위의 근거로 삼을 수 없다. |</p>
+<p>결국 이 영상에서 검토할 가설은 ‘오래 보유하면 이긴다’가 아니라 <strong>‘하락장에도 계획을 유지할 수 있도록 자금과 위험을 관리하면, 불리한 시점에 팔아야 할 가능성을 줄일 수 있다’</strong>는 것이다.</p>
+  <details>
+    <summary>공개 요약 JSON</summary>
+    <pre>{
+  &quot;version&quot;: 4,
+  &quot;video_id&quot;: &quot;nfa_u6gyF-A&quot;,
+  &quot;title&quot;: &quot;월가는 못한다는, &#x27;시간&#x27;을 내 편으로 만드는 매수법&quot;,
+  &quot;url&quot;: &quot;https://www.youtube.com/watch?v=nfa_u6gyF-A&quot;,
+  &quot;channel&quot;: &quot;경제사냥꾼&quot;,
+  &quot;channel_id&quot;: &quot;UC7usMJDHmtbs_oegmzQKKMA&quot;,
+  &quot;source_url&quot;: &quot;https://www.youtube.com/@%EA%B2%BD%EC%A0%9C%EC%82%AC%EB%83%A5%EA%BE%BC/videos&quot;,
+  &quot;thumbnail_url&quot;: &quot;https://i.ytimg.com/vi/nfa_u6gyF-A/maxresdefault.jpg&quot;,
+  &quot;published_at&quot;: &quot;2026-11-22T03:00:38+00:00&quot;,
+  &quot;status&quot;: &quot;asr_uncertain&quot;,
+  &quot;strategy_source_tier&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_evidence_weight&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_validation_policy&quot;: &quot;STANDARD_REVIEW&quot;,
+  &quot;transcript_status&quot;: &quot;available&quot;,
+  &quot;transcript_source&quot;: &quot;automatic&quot;,
+  &quot;transcript_chars&quot;: 8842,
+  &quot;transcript_quality&quot;: {
+    &quot;status&quot;: &quot;good&quot;,
+    &quot;score&quot;: 1.0,
+    &quot;warnings&quot;: [],
+    &quot;source&quot;: &quot;automatic&quot;,
+    &quot;language&quot;: &quot;Korean (Original)&quot;,
+    &quot;model_or_format&quot;: &quot;json3&quot;,
+    &quot;chars&quot;: 8842,
+    &quot;segments&quot;: 458,
+    &quot;duration_seconds&quot;: 887,
+    &quot;repeated_ngram_ratio&quot;: 0.003
+  },
+  &quot;generated_at&quot;: &quot;2026-11-23T06:54:42.556676+09:00&quot;,
+  &quot;llm_status&quot;: &quot;success&quot;,
+  &quot;research_status&quot;: &quot;success&quot;,
+  &quot;claim_verification_status&quot;: &quot;success&quot;,
+  &quot;research_pipeline_version&quot;: 4,
+  &quot;evidence_count&quot;: 3,
+  &quot;claim_status_summary&quot;: {
+    &quot;unverified&quot;: 10,
+    &quot;asr_uncertain&quot;: 1,
+    &quot;partially_supported&quot;: 1
+  },
+  &quot;claims&quot;: [
+    {
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;claim_text&quot;: &quot;대규모 환매로 현금이 부족한 미국 주식형 펀드는 보유 주식을 팔 수 있으며, 1980년부터 약 20년간의 연구에서 공통 보유 종목의 가격 압력, 매도 물량을 받아준 투자자의 후속 수익, 일부 거래의 예측 가능성이 관찰됐다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.9,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;1980년부터 약 20년간의 미국 펀드 거래&quot;,
+        &quot;observed&quot;: &quot;원 논문과 표본의 시작·종료일 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;환매가 운용 기간을 제약할 가능성과, 그 제약이 실제로 활용 가능한 투자 기회를 만들었는지는 구분한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;claim_text&quot;: &quot;1994~2003년 미국 기관 약 3,400곳은 과거 성과가 좋았던 운용사를 선임했으나 선임 후 벤치마크 대비 초과수익은 확인되지 않았고, 교체 사례에서도 기존 운용사를 유지했을 때보다 성과가 개선됐다는 근거가 없었다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.92,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;1994~2003년, 약 3,400개 기관&quot;,
+        &quot;observed&quot;: &quot;논문 표본, 벤치마크 및 성과 추정치 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;과거 성과만으로 운용사를 교체하면 성과가 좋아진다는 근거로 이 영상을 사용할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;claim_text&quot;: &quot;짧은 성과평가와 고용 압박이 장기 운용을 어렵게 한다. 영상은 2015년 자료의 분기 평가와 회원 응답 70%, 2016년 조사의 18개월 부진 시 해고 예상 52% 및 벤치마크 추종 압박 25%를 인용한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.9,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;2015년 자료: 분기 평가, 70%. 2016년 조사: 18개월, 52%, 25%&quot;,
+        &quot;observed&quot;: &quot;보고서 원문, 설문 문항 및 응답자 분모 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;설문 수치를 기관 전체에 적용하거나 개인 투자자가 항상 더 오래 보유할 수 있다는 증거로 해석하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;claim_text&quot;: &quot;채널의 배당 제외 코스피 계산에서 보유기간이 길수록 손실 시작일 비중이 낮았고, 15년·20년 표본에는 손실이 없었다. 2007년과 2021년 고점 사례에서는 월 정액 매수가 일시매수보다 먼저 원금을 회복했다고 한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.9,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;1일·1년·3년·5년·10년 손실 비중 46.4%·36.7%·23.3%·10.5%·0.2%; 15년 3,688건·20년 2,445건 중 손실 0건; 최악 1년 -64.5%, 10년 -13.6%, 15년 +6.5%; 2007년 일시 3년 2개월·적립 22번째 달, 중간 평가액 54.5%; 2021년 일시 4년 2개월·적립 24번째 달&quot;,
+        &quot;observed&quot;: &quot;코스피 조회 필드에 약 4,869.96이 반환됐으나 과거 일별 종가와 납입 내역은 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;장기 무손실이나 정액 매수의 우위를 확인된 코스피 결과로 인용하지 않는다. 적립 사례는 평가액을 그때까지 실제로 납입한 금액과 비교해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;claim_text&quot;: &quot;6월 22일 고점에서 11월 19일까지 코스피 종가가 약 44% 하락했다고 하나, 연도와 두 종가가 불명확하다.&quot;,
+      &quot;status&quot;: &quot;asr_uncertain&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.15,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;연도 미상 6월 22일~11월 19일 약 -44%; 자막 ‘9,11’, ‘51,37’&quot;,
+        &quot;observed&quot;: &quot;해당 날짜의 공식 종가와 발화 원음·화면 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;하락률과 두 종가를 확인된 시장 수치로 제시하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;claim_text&quot;: &quot;닛케이 225 가격지수는 1989년 말 고점 종가를 2024년 2월에 다시 넘었다. 채널의 월 정액 매수 사례는 1996년 1월에 처음 원금을 회복했지만 2003년 4월 다시 크게 하락했으며, 마지막 평가액 비율은 자막에서 불명확하다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.98,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:05:17&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.7,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;1989-12-29 약 38,915, 2024-02-22 재돌파; 1996년 1월 74번째 달에 원금 회복, 당시 지수는 고점의 53%; 2003년 4월 납입액의 45%; 11월 18일까지 444회, 최종 ‘3.600’&quot;,
+        &quot;observed&quot;: &quot;공식 종가·일봉·매수 내역과 최종 평가액 원문 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;원금 최초 회복과 그 이후 손실 위험은 별개다. 이 사례의 구체적인 회복일과 비율을 검증된 수치로 사용하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;claim_text&quot;: &quot;영상은 Morgan Stanley 자료의 S&amp;P 500 손실 비중이 1일 46%, 20년 0%였으며, Hartford Funds 자료는 1960~2025년 누적 총수익의 85%를 배당 재투자와 복리 효과에 귀속했다고 전한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.88,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;1989년~2025년 8월: 1일 46%, 20년 0%; 1960~2025년: 배당 재투자·복리 기여율 85%&quot;,
+        &quot;observed&quot;: &quot;원본 도표 및 계산에 필요한 가격·총수익 시계열 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;영상의 배당 제외 코스피 수치와 배당 재투자를 포함한 미국 수치를 그대로 비교해 시장의 우열을 판단하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;claim_text&quot;: &quot;영상은 1950~2025년 미국 주식과 60/40 포트폴리오의 장기 수익률을 비교하고, 2006~2025년 최고 수익률 10일을 놓친 경우의 평가액과 최고·최악 거래일이 가까이 나타났다는 사례를 제시한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.98,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:05:17&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.65,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;1950~2025년: 주식 1년 최고 +52%·최저 -37%, 최악 20년 연 +6%, 60/40 최악 1년 -2%, 연평균 주식 11.7%·혼합 9.4%. 2006~2025년: 1만 달러 투자, 최고 10일 제외 시 35,866달러, 최고 10일 중 6일이 최악 10일 중 하루와 2주 이내. 2020년 3월 12일과 다음 거래일은 그해 각각 두 번째 최악·최고&quot;,
+        &quot;observed&quot;: &quot;원본 도표와 일별 수익률 미제공. 35,866달러가 절반 미만이려면 계속 보유액은 71,732달러를 초과해야 하나, 이는 산술 조건이지 확인된 평가액이 아님&quot;
+      },
+      &quot;investor_implication&quot;: &quot;60/40의 역사적 최대 손실이나 시장 이탈 비용을 이 숫자로 단정하지 않는다. 두 도표의 조건과 계속 보유액이 확인돼야 비교할 수 있다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;claim_text&quot;: &quot;영상은 미국 펀드와 투자자의 수익률에 10년간 연 1.2%p 차이가 났다는 Morningstar 자료와, 1991~1996년 가장 자주 매매한 미국 가구가 시장보다 연 6.5%p 뒤졌다는 별도 연구를 인용한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:05:17&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.76,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;2025년 말까지 10년: 펀드 연 9.9%, 투자자 연 8.7%, 전체 격차 1.2%p, 미국 주식형 0.5%p, 유출입 변동 최대 집단 1.9%p. 1991~1996년 고회전 가구 시장 대비 연 -6.5%p; 연간 회전율 자막 ‘34’&quot;,
+        &quot;observed&quot;: &quot;보고서·논문 원표 및 회전율의 단위 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;펀드 자체 수익률과 실제 현금흐름을 반영한 투자자 수익률을 구분하고, 제시된 격차를 개인별 손실로 일반화하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C10&quot;,
+      &quot;claim_text&quot;: &quot;영상은 2020년 한국 개인 투자자 표본의 높은 회전율·일중거래와 신규 투자자의 종목 집중도를 제시하고, 별도의 2026년 10월 자료에서 개인의 하락 종목 매수 성향과 기관·외국인의 장기 보유 구간 초과수익을 인용한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:05:17&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.91,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;2020년 약 20만 명; 1,000만원 이하 집단 일일 회전율 약 30%, 환산 보유기간 3.4거래일, 일중거래 비중 55.4%, 신규 투자자 중 3종목 이하 73%. 별도 자료는 2026년 10월로 소개&quot;,
+        &quot;observed&quot;: &quot;두 보고서 원문, 표본·분모 및 벤치마크 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;특정 계좌 표본의 거래 성향을 한국 개인 투자자 전체에 적용하거나, 기관의 보유기간을 따라 하면 초과수익을 낸다고 해석하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C11&quot;,
+      &quot;claim_text&quot;: &quot;같은 금액을 정기 투자하면 낮은 가격에서 더 많이 산다. 영상은 1976~2022년 기존 목돈 비교에서 일시투자가 더 자주 앞섰지만 하위 5%에서는 분할투자 평가액이 더 높았다고 말한다. 급여 적립과 기존 목돈의 투입 지연을 구분하고, 급전·차입에 따른 중도 매도 가능성과 정기매수의 충동 거래 완화 가능성도 설명한다.&quot;,
+      &quot;status&quot;: &quot;partially_supported&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:05:17&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.81,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;10만원씩 두 번, 1만원·5천원에 매수해 30주, 평균 약 6,667원. 1976~2022년 3개월 분할과 비교해 일시투자가 1년 뒤 68%의 경우에 앞섰고, 하위 5%에서 10만 달러는 일시 82,947달러·분할 85,906달러&quot;,
+        &quot;observed&quot;: &quot;제시된 매입 수량과 단가는 직접 검산됨. 역사적 비교 수치와 연구·규제기관 원문은 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;이미 보유한 목돈의 투입을 늦추는 경우와 소득이 생길 때마다 투자하는 경우를 별도로 비교한다. 중도 매도 가능성은 생활자금 필요 시점과 차입 조건에 따라 달라진다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C12&quot;,
+      &quot;claim_text&quot;: &quot;영상은 케인스의 평판과 관행, 빌 밀러의 ‘시간 차익 거래’, 모건 하우절의 개인 투자자 시간 지평, 버핏의 1991년 보유 주식 수 유지와 인내에 관한 발언을 인용한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.86,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;케인스 1936년 저서 12장; 밀러 2006년 세미나, 12~18개월 대 2·3·5년; 하우절 2016년 인터뷰; 버핏 1991년 서한, 주요 7종목 중 6종목의 주식 수 유지&quot;,
+        &quot;observed&quot;: &quot;각 인용의 원문·원음·보유 내역 표 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;인용은 장기 투자에 관한 견해로 다루고, 출처와 문맥이 확인되기 전에는 직접 인용하거나 성과의 증거로 사용하지 않는다.&quot;
+    }
+  ],
+  &quot;entities&quot;: [
+    {
+      &quot;ticker&quot;: &quot;^KS11&quot;,
+      &quot;name&quot;: &quot;코스피 지수&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;채널이 1996년 12월 이후 배당을 제외한 코스피를 계산한 결과, 보유 기간이 길어질수록 손실을 본 시작일의 비중이 낮아졌다.&quot;,
+        &quot;2007년과 2021년 고점에서 시작한 사례에서는 매달 같은 금액을 산 쪽이 일시매수보다 먼저 원금을 회복했지만, 중간 평가액은 크게 줄어들 수 있었다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;손실 비중: 1일 46.4%, 1년 36.7%, 3년 23.3%, 5년 10.5%, 10년 0.2%. 15년 표본 3,688개와 20년 표본 2,445개에서는 손실 시작일이 없었다.&quot;,
+        &quot;1997년 6월 매수 후 1년 수익률은 -64.5%, 2010년 3월~2020년 3월의 최악 10년 수익률은 -13.6%, 2007년 10월 시작한 최악 15년 수익률은 +6.5%였다.&quot;,
+        &quot;2007년 10월 31일 종가 2,064에서 시작: 일시매수 회복에 3년 2개월, 적립매수는 2009년 7월 22번째 달에 회복. 당시 지수 1,478은 고점 대비 약 28% 낮았고 평균단가는 1,460이었다. 2008년 10월 24일 적립매수 평가액은 납입액의 54.5%까지 내려갔다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;^KS11&quot;,
+        &quot;as_of&quot;: &quot;2026-11-22T21:56:42.060758+00:00&quot;,
+        &quot;current_price&quot;: 4869.9599609375,
+        &quot;market_cap&quot;: null,
+        &quot;forward_pe&quot;: null,
+        &quot;trailing_pe&quot;: null,
+        &quot;fifty_two_week_high&quot;: 9385.59,
+        &quot;fifty_two_week_low&quot;: 0.0,
+        &quot;average_target_price&quot;: null,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;SPX&quot;,
+      &quot;name&quot;: &quot;S&amp;P 500 지수&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;영상이 제시한 배당 재투자 포함 미국 주식 기록에서는 장기 보유 구간의 성과 변동 폭이 단기보다 작았고, 배당 재투자가 장기 수익에 크게 기여했다.&quot;,
+        &quot;급락 직후 반등이 올 수 있어 시장을 나갔다 돌아오는 전략은 매도와 재매수 시점을 모두 맞춰야 한다고 설명한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;모건스탠리의 1989년~2025년 8월 기록으로 소개된 손실 비중은 1일 보유 46%, 20년 보유 0%였다.&quot;,
+        &quot;1950~2025년 총수익 기록에서 최고 1년은 +52%, 최악 1년은 -37%, 최악 20년은 연평균 +6%로 소개됐다.&quot;,
+        &quot;하트퍼드 펀드 자료에 따르면 1960~2025년 누적 총수익의 85%가 배당 재투자와 그 복리 효과에서 나왔다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;시장 데이터 조회 실패: no_usable_market_fields&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;SPX&quot;,
+        &quot;as_of&quot;: &quot;2026-11-22T21:56:43.119093+00:00&quot;,
+        &quot;current_price&quot;: null,
+        &quot;market_cap&quot;: null,
+        &quot;forward_pe&quot;: null,
+        &quot;trailing_pe&quot;: null,
+        &quot;fifty_two_week_high&quot;: null,
+        &quot;fifty_two_week_low&quot;: null,
+        &quot;average_target_price&quot;: null,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;unverified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    }
+  ],
+  &quot;evidence&quot;: [
+    {
+      &quot;evidence_id&quot;: &quot;E1&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;Turkey begins offshore oil and gas exploration in Pakistan, plans drilling in 2027&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/energy/articles/turkey-begins-offshore-oil-gas-162121750.html&quot;,
+      &quot;publisher&quot;: &quot;IntelliNews&quot;,
+      &quot;published_at&quot;: &quot;2026-11-22T16:21:21+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Turkey begins offshore oil and gas exploration in Pakistan, plans drilling in 2027 Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 2026 Elect...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E2&quot;,
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;title&quot;: &quot;Dow Jones Futures Due As Oracle, Korea Try To Ease Market Fears; Look For These Absolute Losers&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/m/9ef9da98-bccf-3565-9a30-9bc3e57ad4b9/dow-jones-futures-due-as.html&quot;,
+      &quot;publisher&quot;: &quot;Investor&#x27;s Business Daily&quot;,
+      &quot;published_at&quot;: &quot;2026-11-22T21:05:29+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Dow Jones Futures Due As Oracle, Korea Try To Ease Market Fears; Look For These Absolute Losers Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Origina...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E3&quot;,
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;title&quot;: &quot;Constellium: 3 Key Takeaways for Long-Term Investors&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/constellium-3-key-takeaways-long-185002654.html&quot;,
+      &quot;publisher&quot;: &quot;Motley Fool&quot;,
+      &quot;published_at&quot;: &quot;2026-11-20T18:50:02+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    }
+  ],
+  &quot;source_policy&quot;: {
+    &quot;raw_transcript_published&quot;: false,
+    &quot;raw_transcript_in_evidence&quot;: false,
+    &quot;research_pipeline_version&quot;: 4,
+    &quot;closed_source_claims&quot;: &quot;unverified_external_source&quot;,
+    &quot;auto_caption_warning&quot;: true,
+    &quot;local_asr_warning&quot;: false
+  }
+}</pre>
+  </details>
+</article>
+</main>
+  <style>
+.reader-contents { margin: 16px 0; padding: 12px 16px; border: 1px solid var(--line, #64748b); border-radius: 12px; }
+.reader-contents > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-weight: 750; }
+.reader-contents nav { display: grid; gap: 4px; max-height: 45vh; overflow: auto; margin: 8px 0; }
+.reader-contents a { display: block; min-height: 44px; padding: 10px; border-radius: 6px; color: inherit; overflow-wrap: anywhere; }
+.reader-contents a:hover { background: #80808020; }
+.reader-contents .reader-subsection { padding-inline-start: 24px; font-size: .92em; }
+.reader-prose, .report { overflow-wrap: anywhere; line-height: 1.8; }
+.reader-prose p, .reader-prose li { max-width: 85ch; }
+.reader-prose h2, .reader-prose h3, .reader-prose h4, [data-reader-heading] { scroll-margin-top: 100px; line-height: 1.45; }
+.reader-prose h2 { margin-top: 1.8em; padding-bottom: 8px; border-bottom: 1px solid var(--line, #64748b); }
+.reader-prose h3 { margin-top: 1.5em; }
+.reader-prose li { margin: .5em 0; }
+.reader-prose pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.reader-prose blockquote { margin: 16px 0; padding: 4px 16px; border-left: 3px solid var(--accent, #64748b); }
+.reader-table { overflow: auto; max-width: 100%; margin: 16px 0; border: 1px solid var(--line, #64748b); border-radius: 10px; }
+.reader-table table { border-collapse: collapse; width: 100%; margin: 0; font-size: .92rem; }
+.reader-table th, .reader-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line, #64748b); min-width: 110px; max-width: 400px; overflow-wrap: anywhere; white-space: normal; }
+.reader-table th { background: #80808018; }
+.reader-table tr:nth-child(even) { background: #80808008; }
+.reader-search { display: grid; gap: 8px; margin: 16px 0; }
+.reader-search label { font-weight: 700; }
+.reader-search input { box-sizing: border-box; width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line, #64748b); border-radius: 10px; background: var(--panel, #fff); color: var(--text, #132238); font: inherit; }
+.reader-search p { margin: 0; font-size: .86rem; }
+.reader-back { position: fixed; bottom: max(14px, env(safe-area-inset-bottom)); right: 14px; z-index: 30; min-height: 44px; border: 1px solid #778899; border-radius: 99px; padding: 10px 16px; background: #18344a; color: #fff; font: 700 14px system-ui; cursor: pointer; box-shadow: 0 3px 12px #0003; }
+[data-reader-source] { margin-top: 20px; }
+[data-reader-source] > summary { min-height: 44px; cursor: pointer; }
+[data-reader-source] pre { font-size: .85rem; }
+[data-reader-source] pre, .reader-prose { min-width: 0; }
+.reader-contents :focus-visible, .reader-search :focus-visible, .reader-back:focus-visible, .reader-table:focus-visible { outline: 3px solid var(--accent, #008c95); outline-offset: 3px; }
+.reader-search + .grid > [hidden] { display: none !important; }
+@media (max-width: 600px) { .reader-prose { font-size: 1rem; } .reader-contents { padding: 8px 12px; } }
+@media print { .reader-back, .reader-search, .reader-contents, [data-reader-source] { display: none !important; } .reader-table { overflow: visible; } .reader-prose { color: #000; background: #fff; } }
+</style><script>
+(() => {
+  'use strict';
+  let serial = 0;
+  const rendered = new WeakMap();
+  const node = (tag, text) => { const el = document.createElement(tag); if (text != null) el.textContent = text; return el; };
+  function inline(parent, text) {
+    const pattern = /(`[^`]+`|\*\*[^*]+\*\*|\[[^\]]+\]\(https?:\/\/[^\s)]+\))/g;
+    let start = 0;
+    for (const match of String(text).matchAll(pattern)) {
+      parent.append(document.createTextNode(text.slice(start, match.index)));
+      const value = match[0];
+      if (value.startsWith('`')) parent.append(node('code', value.slice(1, -1)));
+      else if (value.startsWith('**')) parent.append(node('strong', value.slice(2, -2)));
+      else {
+        const link = value.match(/^\[([^\]]+)\]\((.+)\)$/);
+        const a = node('a', link[1]); a.href = link[2]; a.rel = 'noopener noreferrer'; parent.append(a);
+      }
+      start = match.index + value.length;
+    }
+    parent.append(document.createTextNode(text.slice(start)));
+  }
+  const cells = line => line.trim().replace(/^\|/, '').replace(/\|$/, '').split(/(?<!\\)\|/).map(v => v.trim().replace(/\\\|/g, '|'));
+  function markdown(source) {
+    const article = node('article'); article.className = 'reader-prose';
+    const lines = source.split(/\r?\n/); let list = null;
+    for (let i = 0; i < lines.length; i += 1) {
+      const line = lines[i], value = line.trim();
+      if (!value) { list = null; continue; }
+      if (/^```/.test(value)) {
+        const code = []; i += 1;
+        while (i < lines.length && !/^```/.test(lines[i].trim())) code.push(lines[i++]);
+        const pre = node('pre'); pre.append(node('code', code.join('\n'))); article.append(pre); list = null; continue;
+      }
+      if (i + 1 < lines.length && value.includes('|') && cells(lines[i + 1]).every(v => /^:?-{3,}:?$/.test(v))) {
+        const table = node('table'), head = node('thead'), body = node('tbody');
+        const row = (values, tag) => { const tr = node('tr'); values.forEach(v => { const cell = node(tag); if (tag === 'th') cell.scope = 'col'; inline(cell, v); tr.append(cell); }); return tr; };
+        head.append(row(cells(line), 'th')); i += 2;
+        while (i < lines.length && lines[i].trim() && lines[i].includes('|')) body.append(row(cells(lines[i++]), 'td'));
+        i -= 1; table.append(head, body); article.append(table); list = null; continue;
+      }
+      const heading = value.match(/^(#{1,6})\s+(.+)$/);
+      if (heading) { const h = node('h' + Math.min(4, heading[1].length + 1)); inline(h, heading[2]); article.append(h); list = null; continue; }
+      const bullet = value.match(/^(?:[-*+] |\d+\. )(.+)$/);
+      if (bullet) {
+        const tag = /^\d/.test(value) ? 'ol' : 'ul';
+        if (!list || list.tagName.toLowerCase() !== tag) { list = node(tag); if (tag === 'ol') list.start = parseInt(value, 10); article.append(list); }
+        const li = node('li'); inline(li, bullet[1]); list.append(li); continue;
+      }
+      list = null;
+      if (/^(---+|\*\*\*+)$/.test(value)) { article.append(node('hr')); continue; }
+      const p = node(value.startsWith('> ') ? 'blockquote' : 'p'); inline(p, value.startsWith('> ') ? value.slice(2) : line); article.append(p);
+    }
+    return article;
+  }
+  function contents(root) {
+    root.querySelectorAll(':scope > .reader-contents').forEach(el => el.remove());
+    const headings = [...root.querySelectorAll('h2,h3,h4')].filter(h => !h.closest('.card,.run-card,.reader-contents,[data-reader-source],[hidden]'));
+    if (headings.length < 2) return;
+    const details = node('details'); details.className = 'reader-contents';
+    details.append(node('summary', '이 리포트 목차 · ' + headings.length + '개 항목'));
+    const nav = node('nav'); nav.setAttribute('aria-label', '리포트 목차');
+    headings.forEach(h => {
+      if (!h.id) h.id = 'reader-section-' + (++serial);
+      h.dataset.readerHeading = ''; h.tabIndex = -1;
+      const a = node('a', h.textContent); a.href = '#' + h.id;
+      if (h.tagName !== 'H2') a.className = 'reader-subsection';
+      a.addEventListener('click', event => {
+        event.preventDefault();
+        for (let ancestor = h.parentElement; ancestor; ancestor = ancestor.parentElement) if (ancestor.tagName === 'DETAILS') ancestor.open = true;
+        h.scrollIntoView({block: 'start'}); h.focus({preventScroll: true});
+      }); nav.append(a);
+    });
+    details.append(nav); root.prepend(details);
+  }
+  function enhance(root) {
+    if (!root) return;
+    root.querySelectorAll('pre[data-report-markdown]').forEach(pre => {
+      const previous = rendered.get(pre);
+      if (previous && previous.source === pre.textContent) return;
+      const article = markdown(pre.textContent);
+      if (previous) previous.article.replaceWith(article);
+      else {
+        const details = node('details'); details.dataset.readerSource = '';
+        details.append(node('summary', 'Markdown 원문 보기'));
+        pre.before(article, details); details.append(pre);
+      }
+      rendered.set(pre, {source: pre.textContent, article});
+    });
+    root.querySelectorAll('table').forEach(table => {
+      if (table.closest('.reader-table,.account-table-wrap,.summary-scroll')) return;
+      const wrap = node('div'); wrap.className = 'reader-table'; wrap.tabIndex = 0;
+      wrap.setAttribute('role', 'region'); wrap.setAttribute('aria-label', '리포트 표 · 가로로 스크롤하여 전체 보기');
+      table.before(wrap); wrap.append(table);
+    });
+    root.querySelectorAll('.grid').forEach(grid => {
+      const cards = [...grid.querySelectorAll(':scope > a.card')];
+      if (cards.length < 2 || grid.dataset.readerSearch) return;
+      grid.dataset.readerSearch = 'true';
+      const box = node('div'); box.className = 'reader-search';
+      const input = node('input'); input.type = 'search'; input.placeholder = '제목 · 종목 · 채널 · 키워드'; input.id = 'report-search-' + (++serial);
+      const label = node('label', '리포트 찾기'); label.htmlFor = input.id;
+      const status = node('p'); status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
+      const update = () => {
+        const terms = input.value.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean); let count = 0;
+        cards.forEach(card => { card.hidden = !terms.every(t => card.textContent.toLocaleLowerCase().includes(t)); if (!card.hidden) count += 1; });
+        status.textContent = cards.length + '개 중 ' + count + '개 표시' + (count ? '' : ' · 검색어를 지우거나 다른 키워드를 입력하세요.');
+      };
+      input.addEventListener('input', update); box.append(label, input, status); grid.before(box); update();
+    });
+    contents(root);
+  }
+  window.TradingAgentsReader = {enhance};
+  const main = document.querySelector('main');
+  if (main && !main.hasAttribute('data-reader-dynamic')) enhance(main);
+  if (main) {
+    const top = node('button', '↑ 맨 위'); top.type = 'button'; top.className = 'reader-back'; top.setAttribute('aria-label', '리포트 맨 위로 이동');
+    top.addEventListener('click', () => { const target = document.querySelector('h1') || main; target.tabIndex = -1; target.scrollIntoView({block: 'start'}); target.focus({preventScroll: true}); });
+    document.body.append(top);
+  }
+})();
+</script>
+</body>
+</html>
