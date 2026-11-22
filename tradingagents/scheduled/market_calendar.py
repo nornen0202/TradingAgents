@@ -126,18 +126,20 @@ def _exchange_calendar_state(*, calendar_name: str, now_local: datetime) -> dict
 
 
 def _fallback_is_open(market: str, now_local: datetime) -> bool:
-    if now_local.weekday() >= 5:
+    local = now_local.astimezone(ZoneInfo("Asia/Seoul" if market == "KR" else "America/New_York")) if now_local.tzinfo is not None else now_local
+    if local.weekday() >= 5:
         return False
-    current = now_local.time()
+    current = local.time()
     if market == "KR":
         return time(hour=9) <= current <= time(hour=15, minute=30)
     return time(hour=9, minute=30) <= current <= time(hour=16)
 
 
 def _fallback_phase(market: str, now_local: datetime) -> str:
-    if now_local.weekday() >= 5:
+    local = now_local.astimezone(ZoneInfo("Asia/Seoul" if market == "KR" else "America/New_York")) if now_local.tzinfo is not None else now_local
+    if local.weekday() >= 5:
         return "closed"
-    current = now_local.time()
+    current = local.time()
     if market == "KR":
         if current < time(hour=9):
             return "pre_open"

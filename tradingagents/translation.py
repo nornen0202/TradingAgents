@@ -67,7 +67,8 @@ _BACKEND_PRESETS: dict[str, _BackendPreset] = {
 _TRANSLATOR_CACHE: dict[tuple[str, str, str], Any] = {}
 _TOKENIZER_CACHE: dict[tuple[str, str], Any] = {}
 _CACHE_LOCK = threading.Lock()
-_CODE_FENCE_RE = re.compile(r"```.*?```", re.DOTALL)
+_CODE_FENCE_RE = re.compile(r"(?:```.*?```|~~~.*?~~~)", re.DOTALL)
+_FENCE_OPEN_RE = re.compile(r"^\s*(`{3,}|~{3,})")
 _HANGUL_RE = re.compile(r"[\uac00-\ud7a3]")
 _LATIN_RE = re.compile(r"[A-Za-z]")
 
@@ -275,20 +276,56 @@ def _decode_hypothesis(tokenizer: Any, tokens: list[str], *, drop_tokens: set[st
     return tokenizer.decode(token_ids, skip_special_tokens=True)
 
 
+def _advance_fence_state(
+    text: str, active_fence: tuple[str, int] | None
+) -> tuple[tuple[str, int] | None, bool]:
+    """Update active Markdown fence state across lines and report whether any fence appeared."""
+    saw_fence = active_fence is not None
+    for line in text.splitlines():
+        if active_fence is None:
+            match = _FENCE_OPEN_RE.match(line)
+            if match:
+                marker = match.group(1)
+                active_fence = (marker[0], len(marker))
+                saw_fence = True
+        else:
+            fence_char, fence_len = active_fence
+            if re.match(rf"^\s*{re.escape(fence_char)}{{{fence_len},}}\s*$", line):
+                active_fence = None
+    return active_fence, saw_fence
+
+
+def _split_blocks_preserving_fences(content: str) -> list[tuple[str, bool]]:
+    """Split markdown on blank-line boundaries while keeping fenced blocks intact."""
+    blocks: list[tuple[str, bool]] = []
+    fence_buffer: list[str] = []
+    active_fence: tuple[str, int] | None = None
+
+    for raw_block in re.split(r"(\n\n+)", content):
+        if not raw_block:
+            continue
+        active_fence, contains_fence = _advance_fence_state(raw_block, active_fence)
+        if fence_buffer or active_fence is not None:
+            fence_buffer.append(raw_block)
+            if active_fence is None:
+                blocks.append(("".join(fence_buffer), True))
+                fence_buffer.clear()
+        else:
+            blocks.append((raw_block, contains_fence))
+
+    if fence_buffer:
+        blocks.append(("".join(fence_buffer), True))
+    return blocks
+
+
 def _split_markdown_chunks(content: str, max_chunk_chars: int) -> list[str]:
     if len(content) <= max_chunk_chars:
         return [content]
 
     chunks: list[str] = []
     current = ""
-    in_code_fence = False
-    for block in re.split(r"(\n\n+)", content):
-        if not block:
-            continue
-        if "```" in block:
-            in_code_fence = not in_code_fence
-
-        if in_code_fence or len(block) > max_chunk_chars:
+    for block, is_fenced in _split_blocks_preserving_fences(content):
+        if is_fenced or len(block) > max_chunk_chars:
             if current:
                 chunks.append(current)
                 current = ""

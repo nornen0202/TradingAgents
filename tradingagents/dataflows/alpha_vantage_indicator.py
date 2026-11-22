@@ -1,4 +1,12 @@
-from .alpha_vantage_common import _make_api_request
+from .alpha_vantage_common import AlphaVantageRateLimitError, _make_api_request
+from .vendor_exceptions import (
+    InsufficientIndicatorHistoryError,
+    VendorConfigurationError,
+    VendorInputError,
+    VendorMalformedResponseError,
+    VendorTransientError,
+    VendorUnavailableError,
+)
 
 def get_indicator(
     symbol: str,
@@ -62,7 +70,10 @@ def get_indicator(
             f"Indicator {indicator} is not supported. Please choose from: {list(supported_indicators.keys())}"
         )
 
-    curr_date_dt = datetime.strptime(curr_date, "%Y-%m-%d")
+    try:
+        curr_date_dt = datetime.strptime(curr_date, "%Y-%m-%d")
+    except (ValueError, TypeError) as exc:
+        raise VendorInputError(f"Invalid date format for indicator '{indicator}': {curr_date!r}") from exc
     before = curr_date_dt - relativedelta(days=look_back_days)
 
     # Get the full data for the period instead of making individual calls
@@ -143,23 +154,25 @@ def get_indicator(
                 "datatype": "csv"
             })
         elif indicator == "vwma":
-            # Alpha Vantage doesn't have direct VWMA, so we'll return an informative message
-            # In a real implementation, this would need to be calculated from OHLCV data
-            return f"## VWMA (Volume Weighted Moving Average) for {symbol}:\n\nVWMA calculation requires OHLCV data and is not directly available from Alpha Vantage API.\nThis indicator would need to be calculated from the raw stock data using volume-weighted price averaging.\n\n{indicator_descriptions.get('vwma', 'No description available.')}"
+            raise VendorUnavailableError(
+                f"Alpha Vantage does not directly provide VWMA indicator data for {symbol}."
+            )
         else:
-            return f"Error: Indicator {indicator} not implemented yet."
+            raise VendorInputError(f"Indicator {indicator} is not implemented for Alpha Vantage.")
 
         # Parse CSV data and extract values for the date range
         lines = data.strip().split('\n')
         if len(lines) < 2:
-            return f"Error: No data returned for {indicator}"
+            raise VendorMalformedResponseError(f"No CSV rows returned for {indicator}.")
 
         # Parse header and data
         header = [col.strip() for col in lines[0].split(',')]
         try:
             date_col_idx = header.index('time')
-        except ValueError:
-            return f"Error: 'time' column not found in data for {indicator}. Available columns: {header}"
+        except ValueError as exc:
+            raise VendorMalformedResponseError(
+                f"'time' column not found in data for {indicator}. Available columns: {header}"
+            ) from exc
 
         # Map internal indicator names to expected CSV column names from Alpha Vantage
         col_name_map = {
@@ -177,8 +190,10 @@ def get_indicator(
         else:
             try:
                 value_col_idx = header.index(target_col_name)
-            except ValueError:
-                return f"Error: Column '{target_col_name}' not found for indicator '{indicator}'. Available columns: {header}"
+            except ValueError as exc:
+                raise VendorMalformedResponseError(
+                    f"Column '{target_col_name}' not found for indicator '{indicator}'. Available columns: {header}"
+                ) from exc
 
         result_data = []
         for line in lines[1:]:
@@ -206,7 +221,9 @@ def get_indicator(
             ind_string += f"{date_dt.strftime('%Y-%m-%d')}: {value}\n"
 
         if not ind_string:
-            ind_string = "No data available for the specified date range.\n"
+            raise VendorUnavailableError(
+                f"No {indicator} indicator data available for {symbol} between {before.strftime('%Y-%m-%d')} and {curr_date}."
+            )
 
         result_str = (
             f"## {indicator.upper()} values from {before.strftime('%Y-%m-%d')} to {curr_date}:\n\n"
@@ -217,6 +234,15 @@ def get_indicator(
 
         return result_str
 
+    except (
+        AlphaVantageRateLimitError,
+        InsufficientIndicatorHistoryError,
+        VendorConfigurationError,
+        VendorInputError,
+        VendorMalformedResponseError,
+        VendorTransientError,
+        VendorUnavailableError,
+    ):
+        raise
     except Exception as e:
-        print(f"Error getting Alpha Vantage indicator data for {indicator}: {e}")
-        return f"Error retrieving {indicator} data: {str(e)}"
+        raise VendorUnavailableError(f"Error retrieving {indicator} data: {e}") from e

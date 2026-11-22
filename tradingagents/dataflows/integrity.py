@@ -18,9 +18,26 @@ def safe_symbol(symbol: str) -> str:
     return symbol
 
 
-def is_historical(as_of: str | None) -> bool:
+def is_historical(as_of: str | date | datetime | None) -> bool:
     """Current snapshots cannot stand in for a prior day's information set."""
-    return bool(as_of and date.fromisoformat(as_of) < datetime.now(timezone.utc).date())
+    if not as_of:
+        return False
+    today = datetime.now(timezone.utc).date()
+    if isinstance(as_of, datetime):
+        if as_of.tzinfo is None or as_of.utcoffset() is None:
+            raise ValueError("Historical cutoff datetime requires a timezone")
+        return as_of.astimezone(timezone.utc).date() < today
+    if isinstance(as_of, date):
+        return as_of < today
+    raw = str(as_of).strip()
+    if not raw:
+        return False
+    if len(raw) == 10 and "T" not in raw and " " not in raw:
+        return date.fromisoformat(raw) < today
+    stamp = datetime.fromisoformat(raw.replace("Z", "+00:00"))
+    if stamp.tzinfo is None or stamp.utcoffset() is None:
+        raise ValueError("Historical cutoff datetime requires a timezone")
+    return stamp.astimezone(timezone.utc).date() < today
 
 
 def utc_window(start: str, end: str) -> tuple[datetime, datetime]:

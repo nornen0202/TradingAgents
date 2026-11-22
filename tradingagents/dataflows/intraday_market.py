@@ -29,18 +29,39 @@ def fetch_intraday_market_snapshot(
     data execution-ready. An explicit provider selection remains authoritative.
     """
 
+    from datetime import datetime, timedelta, timezone
+    from .config import get_config
+    from .intraday.providers import _analysis_cutoff, require_live_intraday_clock
+    from .market_policy import aware_datetime
+    from .vendor_exceptions import VendorUnavailableError
+
     market_tz = market_timezone or _default_market_timezone(ticker)
+    requested_as_of = get_config().get("analysis_as_of")
+    cutoff = _analysis_cutoff(market_tz) if requested_as_of else None
+    live_only_providers = {"kis", "kis_quote", "kis_microstructure", "kis_us_microstructure"}
     provider_chain = _provider_chain(ticker=ticker, provider=provider)
     last_exc: Exception | None = None
     failures: dict[str, str] = {}
     for provider_name in provider_chain:
         try:
+            if requested_as_of and provider_name.strip().lower() in live_only_providers:
+                require_live_intraday_clock(market_tz, provider_name=provider_name)
             snapshot = get_intraday_provider(provider_name).fetch(
                 ticker,
                 interval=interval,
                 market_timezone=market_tz,
                 checkpoint_id=checkpoint_id,
             )
+            if cutoff is not None:
+                snapshot_asof = aware_datetime(snapshot.asof)
+                if snapshot_asof is None and cutoff < datetime.now(timezone.utc) - timedelta(seconds=60):
+                    raise VendorUnavailableError(
+                        f"Intraday provider '{provider_name}' omitted snapshot asof under historical analysis_as_of."
+                    )
+                if snapshot_asof is not None and snapshot_asof > cutoff:
+                    raise VendorUnavailableError(
+                        f"Intraday provider '{provider_name}' snapshot asof '{snapshot.asof}' exceeds analysis_as_of."
+                    )
             return replace(
                 snapshot,
                 missing_reason={**snapshot.missing_reason, **failures},

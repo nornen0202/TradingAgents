@@ -108,8 +108,11 @@ def fetch_company_news_naver(symbol: str, start_date: str, end_date: str, displa
             raise
         except requests.RequestException as exc:
             raise VendorTransientError(f"Naver News request failed: {exc}") from exc
-        payload = response.json()
-        query_items = payload.get("items")
+        try:
+            payload = response.json()
+        except (ValueError, TypeError) as exc:
+            raise VendorMalformedResponseError("Naver News payload was not valid JSON.") from exc
+        query_items = payload.get("items") if isinstance(payload, dict) else None
         if not isinstance(query_items, list):
             raise VendorMalformedResponseError("Naver News payload did not include an items list.")
         items.extend(query_items)

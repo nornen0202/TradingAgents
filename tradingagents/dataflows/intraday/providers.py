@@ -41,17 +41,36 @@ def _dated_bars(frame, cutoff, *, before_date=None, market_timezone="US/Eastern"
     return result.sort_index().loc[lambda rows: ~rows.index.duplicated(keep=False)]
 
 
+def _parse_requested_cutoff(requested: object, market_timezone: str) -> datetime:
+    raw = str(requested).strip()
+    stamp = datetime.fromisoformat(raw.replace("Z", "+00:00"))
+    if len(raw) == 10:
+        stamp = stamp.replace(tzinfo=ZoneInfo(market_timezone)) + timedelta(days=1) - timedelta(microseconds=1)
+    elif stamp.tzinfo is None or stamp.utcoffset() is None:
+        raise ValueError("Intraday analysis cutoff requires a timezone")
+    return stamp.astimezone(timezone.utc)
+
+
 def _analysis_cutoff(market_timezone):
     cutoff = datetime.now(timezone.utc)
     requested = get_config().get("analysis_as_of")
     if requested:
-        stamp = datetime.fromisoformat(str(requested).replace("Z", "+00:00"))
-        if len(str(requested)) == 10:
-            stamp = stamp.replace(tzinfo=ZoneInfo(market_timezone)) + timedelta(days=1) - timedelta(microseconds=1)
-        elif stamp.tzinfo is None:
-            raise ValueError("Intraday analysis cutoff requires a timezone")
-        cutoff = min(cutoff, stamp)
+        cutoff = min(cutoff, _parse_requested_cutoff(requested, market_timezone))
     return cutoff
+
+
+def require_live_intraday_clock(market_timezone: str, *, provider_name: str = "kis") -> datetime:
+    now = datetime.now(timezone.utc)
+    requested = get_config().get("analysis_as_of")
+    if requested:
+        stamp = _parse_requested_cutoff(requested, market_timezone)
+        if stamp < now - timedelta(seconds=60):
+            from tradingagents.dataflows.vendor_exceptions import VendorUnavailableError
+
+            raise VendorUnavailableError(
+                f"Live intraday provider '{provider_name}' cannot serve historical analysis_as_of '{requested}'."
+            )
+    return now
 
 
 class IntradaySnapshotProvider(Protocol):

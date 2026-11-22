@@ -134,10 +134,7 @@ def dispatch_pages_handoff(
         "dispatched_at": datetime.now().astimezone().isoformat(),
         "external_delivery_verified": False,
     }
-    receipt_path.parent.mkdir(parents=True, exist_ok=True)
-    temporary = receipt_path.with_suffix(".tmp")
-    temporary.write_text(json.dumps(receipt, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    temporary.replace(receipt_path)
+    atomic_write_json(receipt_path, receipt)
     return receipt
 
 
