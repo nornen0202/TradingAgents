@@ -4,7 +4,6 @@ import os
 from copy import deepcopy
 from pathlib import Path
 import json
-from datetime import date
 import re
 import hashlib
 import sqlite3
@@ -384,10 +383,9 @@ class TradingAgentsGraph:
         current = dict(state or self.curr_state or {})
         if not current:
             raise ValueError("No completed decision to reflect on")
-        if outcome_known_at:
-            if date.fromisoformat(outcome_known_at) <= date.fromisoformat(current["trade_date"]):
-                raise ValueError("Outcome must become known after the decision date")
+        if outcome_known_at is not None:
             current["outcome_known_at"] = outcome_known_at
+        Reflector._outcome_metadata(current)
         self.reflector.reflect_bull_researcher(
             current, returns_losses, self.bull_memory
         )

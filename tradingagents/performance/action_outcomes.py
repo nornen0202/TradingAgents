@@ -245,7 +245,7 @@ def update_action_outcomes(
                 except ValueError:
                     continue
             ticker = str(row["ticker"])
-            series = prices.get(ticker)
+            series = prices.get(ticker.upper()) or prices.get(ticker)
             if not series:
                 continue
             returns = _compute_returns(row, series, horizons=horizons, benchmark_series=benchmark_series)

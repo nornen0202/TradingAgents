@@ -20,6 +20,9 @@ class KISQuoteProvider:
         market_timezone: str = "Asia/Seoul",
         checkpoint_id: str | None = None,
     ) -> IntradayMarketSnapshot:
+        from .providers import require_live_intraday_clock
+
+        require_live_intraday_clock(market_timezone, provider_name=getattr(self, "name", "kis"))
         identity = resolve_identity(ticker)
         code = identity.krx_code or identity.broker_symbol or ticker.split(".")[0]
         if not code or not str(code).isdigit():
