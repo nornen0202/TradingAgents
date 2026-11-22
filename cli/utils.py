@@ -359,10 +359,18 @@ def ask_output_language() -> str:
         ]),
     ).ask()
 
+    if not choice:
+        console.print("\n[red]No output language selected. Exiting...[/red]")
+        exit(1)
+
     if choice == "custom":
-        return questionary.text(
+        custom = questionary.text(
             "Enter language name (e.g. Turkish, Vietnamese, Thai, Indonesian):",
             validate=lambda x: len(x.strip()) > 0 or "Please enter a language name.",
-        ).ask().strip()
+        ).ask()
+        if not custom:
+            console.print("\n[red]No output language provided. Exiting...[/red]")
+            exit(1)
+        return custom.strip()
 
     return choice
