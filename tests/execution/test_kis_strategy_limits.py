@@ -117,6 +117,15 @@ def test_native_override_rejects_cap_increase_and_keeps_sell_authority(market):
     assert size_with_native_limits(market, {"side": "SELL", "limit_price": runtime.CAPS[market], "quantity": 1}, {}, limits) == 1
 
 
+def test_native_one_share_exception_only_reduces_a_valid_multi_share_request():
+    limits = configured_limits({"native_order_limits": {"KR": {"max_order_native": 100000,
+        "cash_floor_native": 100000, "max_order_nav": .03, "one_share_nav_ceiling": .05}}})["KR"]
+    terms = {"side": "BUY", "limit_price": 40000, "quantity": 2}
+    account = {"nav_krw": 1_000_000, "cash_krw": 200000}
+    assert size_with_native_limits("KR", terms, account, limits) == 1
+    assert size_with_native_limits("KR", terms, {**account, "cash_krw": 140000}, limits) == 0
+
+
 @pytest.mark.parametrize("case", ["stale", "wait", "within_band", "wrong_benchmark", "ready", "cash_unknown_after_buy"])
 def test_standard_strategy_uses_v2_only_after_scoped_evidence(tmp_path, case):
     h = Harness(tmp_path, "KR")

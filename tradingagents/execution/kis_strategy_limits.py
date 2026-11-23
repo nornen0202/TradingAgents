@@ -61,9 +61,13 @@ def size_with_native_limits(market, terms, account, limits):
         return quantity
     suffix = _SUFFIX[market]
     unit_cost = price * 1.003
-    qty_nav = account[f"nav_{suffix}"] * order_nav_limit(limits, "BUY", terms["quantity"]) / unit_cost
-    qty_cash = (account[f"cash_{suffix}"] - limits.cash_floor_native) / unit_cost
-    return max(0, min(quantity, math.floor(qty_nav), math.floor(qty_cash)))
+    nav = account[f"nav_{suffix}"]
+    qty_cash = math.floor((account[f"cash_{suffix}"] - limits.cash_floor_native) / unit_cost)
+    affordable = max(0, min(quantity, qty_cash))
+    qty_nav = math.floor(nav * order_nav_limit(limits, "BUY", affordable) / unit_cost)
+    if affordable > 1 and qty_nav == 0 and unit_cost <= nav * limits.one_share_nav_ceiling:
+        return 1
+    return max(0, min(affordable, qty_nav))
 
 
 def make_strategy_broker(market, path, client, clock, tickers, limits):
