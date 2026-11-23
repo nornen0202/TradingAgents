@@ -347,7 +347,9 @@ class BrokerDispatcher:
                 raise ValueError("Order cumulative quantity lacks matching durable fill identifiers")
             self._db.execute("INSERT INTO dispatch_observation_events VALUES (?,?,?)",
                              (intent_id, observed.isoformat(), encoded))
-            last_fill = observed.isoformat() if filled > previous_fill else row["last_fill_seen_at"]
+            # A broker can report only whole seconds. Local receipt time is
+            # the conservative barrier for a new account/inventory snapshot.
+            last_fill = self._now().isoformat() if filled > previous_fill else row["last_fill_seen_at"]
             self._db.execute("UPDATE dispatch_intents SET status=?,order_id=?,filled=?,observed_at=?,last_fill_seen_at=? WHERE id=?",
                              (status, order.order_id, str(filled), observed.isoformat(), last_fill, intent_id))
         return status
