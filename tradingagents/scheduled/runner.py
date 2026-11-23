@@ -3204,6 +3204,7 @@ def _run_performance_tracking(
                     market=performance_market,
                     lookback_days=config.performance.price_lookback_days,
                     asof_date=analysis_date,
+                    require_verified_price=True,
                 )
                 outcome_update.update(
                     {
@@ -3219,17 +3220,22 @@ def _run_performance_tracking(
                     outcome_update["updated"] = True
                     outcome_update["up_to_date"] = True
                 elif price_result.has_prices:
-                    update_action_outcomes(
+                    verified_updates = update_action_outcomes(
                         db_path,
-                        asof_date=analysis_date,
+                        asof_date=started_at.isoformat(),
                         horizons=config.performance.outcome_horizons,
                         price_history=price_result.price_history,
                         refresh_window_days=config.performance.price_lookback_days,
                         recommendation_ids=price_result.due_recommendation_ids,
+                        require_verified_price=True,
                     )
-                    outcome_update["updated"] = price_result.price_coverage_complete
-                    outcome_update["partially_updated"] = not price_result.price_coverage_complete
-                    if not price_result.price_coverage_complete:
+                    outcome_update["verified_revisions"] = int(verified_updates or 0)
+                    complete = verified_updates == price_result.due_recommendation_count and price_result.price_coverage_complete
+                    outcome_update["updated"] = complete
+                    outcome_update["partially_updated"] = bool(verified_updates) and not complete
+                    if not verified_updates:
+                        outcome_update["unavailable_reason"] = "no_new_outcome_with_verified_price_evidence"
+                    elif not complete:
                         outcome_update["unavailable_reason"] = "incomplete_price_coverage"
                 else:
                     outcome_update["unavailable_reason"] = "price_provider_unavailable_or_no_price_history"
@@ -3242,8 +3248,12 @@ def _run_performance_tracking(
                 outcome_update["warnings"] = warnings
         else:
             outcome_update["unavailable_reason"] = "outcome_update_disabled"
-        summary = summarize_action_performance(db_path)
+        reporting_as_of = datetime.now(timezone.utc).isoformat()
+        summary = summarize_action_performance(db_path, analysis_as_of=reporting_as_of, require_verified_price=True)
         summary_payload = summary.to_dict() if hasattr(summary, "to_dict") else summary
+        if outcome_update.get("up_to_date") and (summary_payload.get("data_quality") or {}).get("recommendations_without_verified_outcome"):
+            outcome_update.update(updated=False, up_to_date=False,
+                                  unavailable_reason="price_reference_evidence_unavailable")
         recommendations = (
             int(summary_payload.get("recommendations") or 0)
             if isinstance(summary_payload, dict)
@@ -3255,6 +3265,8 @@ def _run_performance_tracking(
         payload = {
             "enabled": True,
             "status": status,
+            "analysis_as_of": started_at.isoformat(),
+            "reporting_as_of": reporting_as_of,
             "store": {"backend": "sqlite", "location": "private_local_archive"},
             "outcome_update": outcome_update,
             "summary": summary_payload,
