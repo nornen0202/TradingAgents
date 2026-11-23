@@ -29,6 +29,10 @@ def _day(value):
 
 
 def _snapshot(symbol, end_date, source, frame):
+    return _snapshot_with_series(symbol, end_date, source, frame)[0]
+
+
+def _snapshot_with_series(symbol, end_date, source, frame):
     # Source-only routes cannot invent an observation clock or snapshot hash.
     entry = {"symbol": symbol, "source": source, "requested_end": end_date,
              "status": "UNVERIFIED", "historical_vintage_verified": False,
@@ -216,7 +220,7 @@ class DailyHistoryEvidenceRecorder:
             prior = self._entries.get(key)
             if prior is not None and prior.get("forward_capture") != "WRITE_FAILED":
                 return
-            entry, series = _snapshot(symbol, end_date, source, frame)
+            entry, series = _snapshot_with_series(symbol, end_date, source, frame)
             if prior is not None and entry.get("snapshot_id") != prior["snapshot_id"]:
                 return
             if self._capture is not None and series is not None:
