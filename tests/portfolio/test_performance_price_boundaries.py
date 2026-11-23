@@ -181,3 +181,24 @@ def test_performance_runner_rejects_naive_clock_before_recording_or_price_reques
     assert result['status'] == 'failed'
     record.assert_not_called()
     fetch.assert_not_called()
+
+
+def test_completed_run_is_in_its_report_denominator_without_advancing_analysis(tmp_path):
+    config_path = tmp_path / 'config.toml'
+    config_path.write_text('[run]\ntickers=["AAPL"]\nmarket="US"\n'
+                           '[storage]\narchive_dir="./archive"\nsite_dir="./site"\n'
+                           '[performance]\nenabled=true\nupdate_outcomes_on_run=false\n')
+    config = load_scheduled_config(config_path)
+    run = tmp_path / 'run-fixture'
+    assets = run / 'portfolio-private'
+    assets.mkdir(parents=True)
+    started = datetime.fromisoformat('2026-10-01T14:00:00+00:00')
+    finished = '2026-10-01T14:10:00+00:00'
+    (run / 'run.json').write_text(json.dumps({'run_id': 'report-fixture', 'finished_at': finished}))
+    (assets / 'portfolio_report.json').write_text(json.dumps({'actions': [
+        {'canonical_ticker': 'AAPL', 'action_now': 'WAIT'},
+    ]}))
+    result = runner._run_performance_tracking(config=config, run_dir=run, started_at=started)
+    assert result['recorded_recommendations'] == result['cumulative_recommendations'] == 1
+    assert result['summary']['data_quality']['recommendations_without_verified_outcome'] == 1
+    assert result['analysis_as_of'] == started.isoformat() and result['reporting_as_of'] >= finished

@@ -66,6 +66,7 @@ def initialize_action_tracker(db_path: Path) -> None:
             "missed_upside_20d": "REAL",
             "calculation_version": "INTEGER DEFAULT 1",
             "price_revision_id": "TEXT",
+            "outcome_event_id": "TEXT",
         })
         # Refresh eligibility needs only these narrow fields. A ticker-only
         # scan otherwise reads large recommendation payloads in random order,
@@ -106,7 +107,7 @@ def record_run_recommendations(run_dir: Path, db_path: Path, *, run_market: str 
         )
     )
     inserted = 0
-    ingested_at = recorded_at or datetime.now(timezone.utc).isoformat()
+    ingested_at = timestamp(recorded_at or datetime.now(timezone.utc).isoformat()).isoformat()
     with sqlite3.connect(db_path, timeout=30) as conn:
         # Acquire the writer lock before looking for an existing logical row.
         # Two retries of the same run must not both observe an absent row.
@@ -228,12 +229,23 @@ def update_action_outcomes(
                 )
             )
         elif cutoff_date:
+            join = "o.recommendation_id = r.id"
+            join_params = ()
+            if require_verified_price:
+                active_price = latest_revision_sql("r.id", "?")
+                join = f"""o.rowid = (
+                    SELECT z.rowid FROM action_outcomes z
+                    WHERE z.recommendation_id=r.id AND z.calculation_version={calculation_version}
+                      AND z.price_revision_id IS ({active_price}) AND z.updated_at <= ?
+                    ORDER BY z.updated_at DESC,z.rowid DESC LIMIT 1
+                )"""
+                join_params = (known_at, known_at)
             recommendations = list(
                 conn.execute(
                     f"""
                     SELECT DISTINCT r.*
                     FROM action_recommendations r
-                    LEFT JOIN action_outcomes o ON o.recommendation_id = r.id
+                    LEFT JOIN action_outcomes o ON {join}
                     WHERE substr(r.created_at, 1, 10) >= ?
                       AND upper(r.ticker) IN ({placeholders})
                       AND (
@@ -246,6 +258,7 @@ def update_action_outcomes(
                       )
                     """,
                     (
+                        *join_params,
                         cutoff_date,
                         *price_tickers,
                         calculation_version,
@@ -302,6 +315,7 @@ def update_action_outcomes(
                                        reference_price=reference.price if reference else None)
             if not returns:
                 continue
+            event_id = None
             if decision_time is not None:
                 signal_id = stable_signal_id(row["run_id"], row["ticker"], row["action"], row["source"] or "TradingAgents")
                 event_id = f"outcome:{signal_id}:{known_at}:v{calculation_version}"
@@ -332,8 +346,8 @@ def update_action_outcomes(
                   benchmark_return_20d, benchmark_excess_20d, benchmark_return_60d,
                   benchmark_excess_60d, benchmark_key,
                   max_drawdown_20d, max_favorable_excursion_20d, avoided_drawdown_20d,
-                  missed_upside_20d, outcome_label, calculation_version, updated_at, price_revision_id
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                  missed_upside_20d, outcome_label, calculation_version, updated_at, price_revision_id, outcome_event_id
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     row["id"],
@@ -358,6 +372,7 @@ def update_action_outcomes(
                     calculation_version,
                     known_at if require_verified_price else asof_date,
                     revision_id,
+                    event_id,
                 ),
             )
             inserted += 1
@@ -396,26 +411,34 @@ def summarize_action_performance(db_path: Path, *, analysis_as_of: str | None = 
     initialize_action_tracker(db_path)
     with sqlite3.connect(db_path) as conn:
         conn.row_factory = sqlite3.Row
+        safe_cutoff = cutoff.isoformat()
+        latest_price = latest_revision_sql("o.recommendation_id", f"'{safe_cutoff}'")
+        fallback = ""
+        rec_filter = ""
         if require_verified_price:
-            safe_cutoff = cutoff.isoformat()
-            latest_price = latest_revision_sql("o.recommendation_id", f"'{safe_cutoff}'")
             conn.execute(f"""
                 CREATE TEMP VIEW action_recommendations AS
                 SELECT * FROM main.action_recommendations WHERE julianday(created_at) <= julianday('{safe_cutoff}')
             """)
-            conn.execute(f"""
+            rec_filter = "AND EXISTS (SELECT 1 FROM temp.action_recommendations rec WHERE rec.id=o.recommendation_id)"
+        else:
+            fallback = f"""OR (COALESCE(r.calculation_version, 1) < {VERIFIED_PRICE_CALCULATION_VERSION}
+                               AND ({latest_price}) IS NULL)"""
+        conn.execute(f"""
                 CREATE TEMP VIEW action_outcomes AS
                 SELECT * FROM main.action_outcomes o
-                WHERE o.calculation_version = {VERIFIED_PRICE_CALCULATION_VERSION}
-                  AND EXISTS (SELECT 1 FROM temp.action_recommendations rec WHERE rec.id = o.recommendation_id)
-                  AND o.rowid = (
+                WHERE o.rowid = (
                     SELECT r.rowid FROM main.action_outcomes r
                     WHERE r.recommendation_id = o.recommendation_id
-                      AND r.calculation_version = {VERIFIED_PRICE_CALCULATION_VERSION}
-                      AND r.updated_at <= '{cutoff.isoformat()}'
-                      AND r.price_revision_id IS ({latest_price})
-                    ORDER BY r.updated_at DESC, r.rowid DESC LIMIT 1
-                )
+                      AND ((r.calculation_version = {VERIFIED_PRICE_CALCULATION_VERSION}
+                            AND r.price_revision_id IS ({latest_price})
+                            AND EXISTS (
+                              SELECT 1 FROM main.lifecycle_events e WHERE e.event_id=r.outcome_event_id
+                                AND e.kind='OUTCOME' AND e.available_at <= '{safe_cutoff}'
+                                AND e.confirmed_at <= '{safe_cutoff}' AND e.ingested_at <= '{safe_cutoff}'
+                            )) {fallback})
+                    ORDER BY COALESCE(r.calculation_version, 1) DESC, r.updated_at DESC, r.rowid DESC LIMIT 1
+                ) {rec_filter}
             """)
         recommendations = int(conn.execute("SELECT COUNT(*) FROM action_recommendations").fetchone()[0])
         outcomes = int(conn.execute("SELECT COUNT(*) FROM action_outcomes").fetchone()[0])

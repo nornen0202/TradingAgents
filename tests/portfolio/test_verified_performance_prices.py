@@ -1,6 +1,7 @@
 import hashlib
 import json
 import sqlite3
+from datetime import date, timedelta
 
 import pytest
 
@@ -154,3 +155,38 @@ def test_revision_cli_writes_only_a_verified_copy_and_rejects_unmatched_evidence
         assert conn.execute("SELECT COUNT(*) FROM action_price_revisions").fetchone() == (1,)
     with pytest.raises(FileExistsError):
         revision_cli(paths)
+
+
+def test_summary_selects_one_visible_outcome_and_does_not_backdate_ingestion(tmp_path):
+    db = _recommendation(tmp_path, _reference())
+    later = "2026-10-10T20:00:00+00:00"
+    last = "2026-10-11T20:00:00+00:00"
+    assert update_action_outcomes(db, MEASURED, price_history=_prices(), recorded_at=MEASURED) == 1
+    assert update_action_outcomes(db, MEASURED, price_history=_prices(), recorded_at=later, require_verified_price=True) == 1
+    assert summarize_action_performance(db, analysis_as_of=MEASURED, require_verified_price=True).outcomes == 0
+    assert summarize_action_performance(db, analysis_as_of=later, require_verified_price=True).outcomes == 1
+    assert update_action_outcomes(db, last, price_history=_prices(), recorded_at=last, require_verified_price=True) == 1
+    summary = summarize_action_performance(db, analysis_as_of=last)
+    assert summary.recommendations == summary.outcomes == 1
+    assert summary.by_action["ADD_NOW"]["avg_return_5d"] == pytest.approx(.06)
+    with sqlite3.connect(db) as conn:
+        assert conn.execute("SELECT COUNT(*) FROM action_outcomes").fetchone() == (3,)
+
+
+def test_direct_refresh_remeasures_completed_outcome_after_price_revision(tmp_path):
+    db = _recommendation(tmp_path, _reference())
+    original = _prices()["AAPL"][0]
+    series = {"AAPL": [original | {"date": (date(2026, 10, 1) + timedelta(days=i)).isoformat(), "close": 101 + i}
+                       for i in range(62)]}
+    complete = "2026-12-02T20:00:00+00:00"
+    revision_at = "2026-12-03T20:00:00+00:00"
+    kwargs = dict(price_history=series, require_verified_price=True)
+    assert update_action_outcomes(db, complete, recorded_at=complete, **kwargs) == 1
+    with sqlite3.connect(db) as conn:
+        assert conn.execute("SELECT return_60d FROM action_outcomes").fetchone()[0] is not None
+    fixture = {"recommendation_id": 1, "run_id": "fixture", "ticker": "AAPL", "decided_at": KNOWN,
+               "parent_id": None, "reference": _reference() | {"price": 105}, "source_digest": "a" * 64}
+    append_price_revision(db, fixture, clock=lambda: revision_at, apply=True)
+    assert update_action_outcomes(db, revision_at, recorded_at=revision_at, **kwargs) == 1
+    assert update_action_outcomes(db, revision_at, recorded_at=revision_at, **kwargs) == 0
+    assert summarize_action_performance(db, analysis_as_of=revision_at, require_verified_price=True).outcomes == 1
