@@ -201,3 +201,32 @@ def test_native_launch_failure_is_distinct_from_python_failure(tmp_path, failure
                             capture_output=True, text=True, timeout=20)
     assert "LAUNCH_ERROR" in result.stdout
     assert "PYTHON_INVOKED:False" in result.stdout
+
+
+@pytest.mark.skipif(not shutil.which("powershell.exe"), reason="Windows PowerShell required")
+def test_launcher_uses_snapshot_collector_for_native_stderr(tmp_path):
+    source_root = Path(__file__).resolve().parents[1]
+    wrapper = (source_root / "tools/run_local_automation.ps1").read_text()
+    boundary = "if ($DryRun)" + wrapper.split("    if ($DryRun)", 1)[1].split("    # End worker process boundary.", 1)[0]
+    child = tmp_path / "worker.py"
+    child.write_text("import sys\nprint('output')\nprint('warning', file=sys.stderr)\n")
+
+    def quote(value):
+        return "'" + str(value).replace("'", "''") + "'"
+
+    worker_log = tmp_path / "fixture.log"
+    probe = tmp_path / "probe.ps1"
+    probe.write_text(
+        "$ErrorActionPreference='Stop'\n"
+        f"$sourceRoot={quote(source_root)}\n$stateRoot={quote(tmp_path)}\n"
+        f"$pythonPath={quote(sys.executable)}\n$arguments=@('-u',{quote(child)})\n"
+        f"Set-Location -LiteralPath $sourceRoot\n$logPath={quote(worker_log)}\n"
+        "$Command='fixture'\n$DryRun=$false\n" + boundary
+    )
+    result = subprocess.run(
+        ["powershell.exe", "-NoProfile", "-NonInteractive", "-File", str(probe)],
+        capture_output=True, text=True, timeout=20,
+    )
+    assert result.returncode == 0, result.stderr
+    assert worker_log.read_text(encoding="utf-8").splitlines() == ["output", "warning"]
+    assert not list(tmp_path.glob("fixture-launcher-*.log"))
