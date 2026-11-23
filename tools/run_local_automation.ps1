@@ -164,10 +164,13 @@ try {
     if ($DryRun) { $arguments += "--dry-run" }
     if ($Command -eq 'review') { $arguments += @('--review-port', [string]$ReviewPort) }
     $workerLogPath = $logPath
+    $workerStartMarker = $null
     # Launchers may run a rollback revision without the rotating collector.
     # Its old native redirection remains compatible with those snapshots.
     if ($sourceRoot -and (Test-Path -LiteralPath (Join-Path $sourceRoot 'tradingagents\local_worker_logging.py'))) {
-        $arguments = @('-u', '-m', 'tradingagents.local_worker_logging', '--log', $workerLogPath, '--') + $arguments
+        $workerStartMarker = Join-Path $stateRoot ("$Command-worker-$PID-" + [Guid]::NewGuid().ToString('N') + '.started')
+        $arguments = @('-u', '-m', 'tradingagents.local_worker_logging', '--log', $workerLogPath,
+            '--started-marker', $workerStartMarker, '--') + $arguments
         $logPath = Join-Path $stateRoot "$Command-launcher-$PID.log"
     }
     # Windows PowerShell converts redirected native stderr to error records.
@@ -184,6 +187,13 @@ try {
         # Native launch/redirection errors leave LASTEXITCODE unset. A real
         # Python exit, including failure, owns its existing terminal notification.
         $pythonInvoked = $LASTEXITCODE -ne $exitSentinel
+        if ($workerStartMarker) {
+            try {
+                $pythonInvoked = [IO.File]::Exists($workerStartMarker) -and
+                    [IO.File]::ReadAllText($workerStartMarker) -ceq 'STARTED'
+                if ([IO.File]::Exists($workerStartMarker)) { [IO.File]::Delete($workerStartMarker) }
+            } catch { Write-Warning 'Worker start receipt could not be read or removed.' }
+        }
         $ErrorActionPreference = $savedErrorActionPreference
     }
     if (-not $pythonInvoked) { throw "Local Python worker could not start." }
