@@ -34,7 +34,7 @@ from tradingagents.agents.utils.decision_provenance import DecisionProvenanceSes
 from cli.stats_handler import StatsCallbackHandler
 from tradingagents.default_config import DEFAULT_CONFIG
 from tradingagents.dataflows.interface import reset_tool_telemetry, snapshot_tool_telemetry, snapshot_tool_requests
-from tradingagents.dataflows.daily_history_evidence import DailyHistoryEvidenceRecorder
+from tradingagents.dataflows.daily_history_evidence import DailyHistoryCapture, DailyHistoryEvidenceRecorder
 from tradingagents.dataflows.research_evidence import SCHEMA as TOOL_REQUEST_SCHEMA
 from tradingagents.dataflows.institutional import (
     build_public_equity_intelligence_artifacts,
@@ -2106,7 +2106,9 @@ def _run_single_ticker(
     observation_recorder = ResearchObservationRecorder(ticker)
     chart_capture = ChartCapture(ticker)
     chart_token = chart_capture.activate()
-    history_recorder = DailyHistoryEvidenceRecorder(ticker)
+    capture_path = config.storage.daily_history_capture_db
+    history_capture = DailyHistoryCapture(capture_path, run_dir.name) if capture_path is not None else None
+    history_recorder = DailyHistoryEvidenceRecorder(ticker, capture=history_capture)
     history_token = history_recorder.activate()
     decision_trace = DecisionProvenanceSession(ticker)
 

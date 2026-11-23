@@ -2,6 +2,7 @@ from contextvars import copy_context
 from copy import deepcopy
 import hashlib
 import json
+import sqlite3
 from types import SimpleNamespace
 from unittest.mock import Mock
 
@@ -10,7 +11,7 @@ import pytest
 
 from tradingagents.dataflows import interface
 from tradingagents.dataflows.config import run_config
-from tradingagents.dataflows.daily_history_evidence import DailyHistoryEvidenceRecorder
+from tradingagents.dataflows.daily_history_evidence import DailyHistoryCapture, DailyHistoryEvidenceRecorder
 from tradingagents.dataflows.daily_history_selection import select_daily_history
 from tradingagents.dataflows.us_daily_history import SOURCE
 from tradingagents.dataflows.vendor_exceptions import VendorInputError, VendorMalformedResponseError
@@ -77,6 +78,51 @@ def test_receipt_only_contains_allowlisted_provenance_not_prices_or_secret_metad
     assert "private" not in serialized
     assert "Open" not in serialized and "Close" not in serialized
     assert receipt["entries"][0]["status"] == "VERIFIED_RETRIEVED_SERIES"
+
+
+def test_forward_capture_is_bound_to_exact_bytes_and_an_append_only_run(tmp_path):
+    capture = DailyHistoryCapture(tmp_path / "private.sqlite", "run-42")
+    data = frame()
+    for _ in range(2):
+        recorder = DailyHistoryEvidenceRecorder("AAPL", capture=capture)
+        recorder.add("AAPL", DAY, SOURCE, data)
+        recorder.add("AAPL", DAY, "unverified", data)
+    good, unknown = recorder.receipt()["entries"]
+    assert good["forward_capture"] == "STORED" and "forward_capture" not in unknown
+    assert good["historical_vintage_verified"] is False
+    with sqlite3.connect(capture.path) as db:
+        [(run_id, snapshot_id, captured_at, receipt_json, series)] = db.execute("SELECT * FROM daily_history_captures")
+        with pytest.raises(sqlite3.IntegrityError, match="append-only"):
+            db.execute("DELETE FROM daily_history_captures")
+    receipt = json.loads(receipt_json)
+    assert run_id == "run-42" and snapshot_id == good["snapshot_id"]
+    assert receipt["observed_at"] < captured_at and receipt["historical_vintage_verified"] is False
+    assert series == data.to_csv(index=False).encode("utf-8")
+    assert hashlib.sha256(series).hexdigest() == receipt["series_sha256"]
+
+
+def test_capture_failure_retries_only_the_same_original_series(tmp_path, monkeypatch):
+    capture = DailyHistoryCapture(tmp_path / "private.sqlite", "run-42")
+    recorder = DailyHistoryEvidenceRecorder("AAPL", capture=capture)
+    original = frame()
+    with monkeypatch.context() as failure:
+        failure.setattr(capture, "append", Mock(side_effect=OSError("synthetic failure")))
+        recorder.add("AAPL", DAY, SOURCE, original)
+    first = recorder.receipt()["entries"][0]
+    assert first["forward_capture"] == "WRITE_FAILED"
+    changed = frame()
+    changed.attrs["observed_at"] = "2024-01-04T00:01:00+00:00"
+    recorder.add("AAPL", DAY, SOURCE, changed)
+    assert recorder.receipt()["entries"][0] == first
+    recorder.add("AAPL", DAY, SOURCE, original)
+    assert recorder.receipt()["entries"][0] == {**first, "forward_capture": "STORED"}
+
+
+def test_capture_storage_protects_archive_and_publishing_roots(tmp_path):
+    from tradingagents.scheduled.config import StorageSettings
+    for name in ("archive", "site"):
+        with pytest.raises(ValueError, match="outside"):
+            StorageSettings(tmp_path / "archive", tmp_path / "site", tmp_path / name / "prices.sqlite")
 
 
 @pytest.mark.parametrize("end", [None, "bad", "2099-01-01"])
@@ -220,7 +266,8 @@ def test_runner_saves_receipt_after_graph_context_closes_and_always_resets(tmp_p
     from tradingagents.scheduled.config import load_scheduled_config
     path = tmp_path / "config.toml"
     path.write_text('[run]\ntickers=["AAPL"]\nmarket="US"\n[storage]\n'
-                    f'archive_dir="{(tmp_path / "archive").as_posix()}"\nsite_dir="{(tmp_path / "site").as_posix()}"\n')
+                    f'archive_dir="{(tmp_path / "archive").as_posix()}"\nsite_dir="{(tmp_path / "site").as_posix()}"\n'
+                    'daily_history_capture_db="prices.sqlite"\n')
     config = load_scheduled_config(path)
     def propagate(*args, **kwargs):
         with run_config({}):
@@ -247,6 +294,8 @@ def test_runner_saves_receipt_after_graph_context_closes_and_always_resets(tmp_p
         evidence = payload["daily_history_evidence"]
         assert evidence["entries"][0]["status"] == "VERIFIED_RETRIEVED_SERIES"
         assert evidence["entries"][0]["source"] == SOURCE
+        assert evidence["entries"][0]["forward_capture"] == "STORED"
+        assert (tmp_path / "prices.sqlite").is_file()
         assert evidence["historical_vintage_verified"] is False
         assert outer.receipt()["entries"] == []
         with run_config({}):
