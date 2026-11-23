@@ -162,7 +162,8 @@ def test_summary_selects_one_visible_outcome_and_does_not_backdate_ingestion(tmp
     later = "2026-10-10T20:00:00+00:00"
     last = "2026-10-11T20:00:00+00:00"
     assert update_action_outcomes(db, MEASURED, price_history=_prices(), recorded_at=MEASURED) == 1
-    assert update_action_outcomes(db, MEASURED, price_history=_prices(), recorded_at=later, require_verified_price=True) == 1
+    offset_ingestion = "2026-10-08T20:00:00-07:00"
+    assert update_action_outcomes(db, MEASURED, price_history=_prices(), recorded_at=offset_ingestion, require_verified_price=True) == 1
     assert summarize_action_performance(db, analysis_as_of=MEASURED, require_verified_price=True).outcomes == 0
     assert summarize_action_performance(db, analysis_as_of=later, require_verified_price=True).outcomes == 1
     assert update_action_outcomes(db, last, price_history=_prices(), recorded_at=last, require_verified_price=True) == 1
@@ -190,3 +191,14 @@ def test_direct_refresh_remeasures_completed_outcome_after_price_revision(tmp_pa
     assert update_action_outcomes(db, revision_at, recorded_at=revision_at, **kwargs) == 1
     assert update_action_outcomes(db, revision_at, recorded_at=revision_at, **kwargs) == 0
     assert summarize_action_performance(db, analysis_as_of=revision_at, require_verified_price=True).outcomes == 1
+
+
+def test_old_corporate_action_outside_the_reference_window_does_not_block_fresh_outcome(tmp_path):
+    db = _recommendation(tmp_path, _reference())
+    pricing = _prices()
+    historical_split = pricing["AAPL"][0] | {"date": "2026-09-01", "split_ratio": 2}
+    pricing["AAPL"].insert(0, historical_split)
+    assert update_action_outcomes(db, MEASURED, price_history=pricing, recorded_at=MEASURED,
+                                  require_verified_price=True) == 1
+    summary = summarize_action_performance(db, analysis_as_of=MEASURED, require_verified_price=True)
+    assert summary.by_action["ADD_NOW"]["avg_return_5d"] == pytest.approx(.06)

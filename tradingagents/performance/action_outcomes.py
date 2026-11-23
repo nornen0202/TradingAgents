@@ -7,6 +7,7 @@ from dataclasses import asdict
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Mapping, Sequence
+from zoneinfo import ZoneInfo
 
 from tradingagents.external.prism_normalize import normalize_market
 
@@ -188,17 +189,21 @@ def update_action_outcomes(
     cutoff = date.fromisoformat(str(asof_date)[:10])
     known_at = str(asof_date) if "T" in str(asof_date) else cutoff.isoformat() + "T23:59:59.999999+00:00"
     decision_cutoff = timestamp(known_at)
-    ingested_at = recorded_at or datetime.now(timezone.utc).isoformat()
+    ingested_at = timestamp(recorded_at or datetime.now(timezone.utc).isoformat()).isoformat()
     raw_prices = price_history or (_load_json(Path(price_history_path)) if price_history_path else {})
     prices = _normalize_price_history(raw_prices, asof_date=str(asof_date))
-    terms = {}
+    evidence_by_ticker = {}
     if require_verified_price and isinstance(raw_prices, Mapping):
         for key, raw in raw_prices.items():
             ticker = str(key).upper()
             rows = raw.get("prices") if isinstance(raw, Mapping) else raw
             if isinstance(rows, list):
-                retained = [row for row in rows if _normalize_price_history({ticker: [row]}, asof_date=str(asof_date)).get(ticker)]
-                terms[ticker] = series_terms(retained)
+                retained = []
+                for row in rows:
+                    observed = _normalize_price_history({ticker: [row]}, asof_date=str(asof_date)).get(ticker)
+                    if observed:
+                        retained.append((observed[0][0], row))
+                evidence_by_ticker[ticker] = retained
     calculation_version = VERIFIED_PRICE_CALCULATION_VERSION if require_verified_price else OUTCOME_CALCULATION_VERSION
     if require_verified_price:
         known_at = decision_cutoff.isoformat()
@@ -305,11 +310,15 @@ def update_action_outcomes(
                     reference = PriceReference.read(json.loads(payload or "null"))
                 except (TypeError, ValueError):
                     continue
-                if (reference is None or decision_time is None
-                        or timestamp(reference.observed_at) > decision_time
-                        or terms.get(ticker.upper()) != (reference.currency, reference.basis)):
+                if reference is None or decision_time is None or timestamp(reference.observed_at) > decision_time:
                     continue
-                if terms.get(BENCHMARK_KEY) != terms[ticker.upper()]:
+                native_zone = {"US": "America/New_York", "KR": "Asia/Seoul"}.get(row["market"])
+                observed_at = timestamp(reference.observed_at)
+                reference_day = (observed_at.astimezone(ZoneInfo(native_zone)) if native_zone else observed_at).date().isoformat()
+                expected_terms = (reference.currency, reference.basis)
+                if _window_terms(evidence_by_ticker.get(ticker.upper(), ()), reference_day) != expected_terms:
+                    continue
+                if _window_terms(evidence_by_ticker.get(BENCHMARK_KEY, ()), reference_day) != expected_terms:
                     comparable_benchmark = None
             returns = _compute_returns(row, series, horizons=horizons, benchmark_series=comparable_benchmark,
                                        reference_price=reference.price if reference else None)
@@ -378,6 +387,10 @@ def update_action_outcomes(
             inserted += 1
         conn.commit()
     return inserted
+
+
+def _window_terms(history, reference_day):
+    return series_terms([row for day, row in history if day >= reference_day])
 
 
 def _outcome_clock(value: str | None) -> datetime:
