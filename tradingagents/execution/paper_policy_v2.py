@@ -95,7 +95,7 @@ def size_v2_candidate(policy, watchlist, account, signal, quote, *, as_of):
                 return outputs | {"status": "SCOPE_MISMATCH"}
         seconds = policy["max_quote_age_seconds"]
         if (account.get("mode") != "isolated_paper" or account.get("reconciled") is not True
-                or account.get("settlement_verified") is not True
+                or (side == "BUY" and account.get("settlement_verified") is not True)
                 or not _fresh(account.get("observed_at"), now=now, seconds=seconds)
                 or signal.get("execution_ready") is not True or not _fresh(signal.get("observed_at"), now=now, seconds=seconds)
                 or quote.get("ticker") != ticker or not _fresh(quote.get("observed_at"), now=now, seconds=seconds)

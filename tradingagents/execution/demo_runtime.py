@@ -10,6 +10,7 @@ from __future__ import annotations
 from contextlib import contextmanager
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal, ROUND_DOWN, ROUND_UP
+from functools import partial
 import hashlib
 import heapq
 import json
@@ -26,13 +27,14 @@ from .source_diagnostics import diagnose_source
 from .source_handoff import await_completed_source
 from . import demo_strategy_plan
 from .kis_demo import DemoCredentials, KisDemoClient
-from .kis_paper import KisPaperBroker, PaperOrderPolicy, _fresh, _tick
+from .kis_paper import _fresh, _tick
+from .kis_strategy_limits import CAPS, configured_limits, make_strategy_broker, size_with_native_limits
+from .kis_strategy_v2 import authorize_v2_size, configured_v2
 from .paper_runtime import _latest_source, _runtime_session
 from .strategy_evaluation import evaluate_strategy_orders
 
 SCHEMA = "tradingagents.kis-strategy-runtime/v1"
 MODE = "KIS_DEMO_STRATEGY"
-CAPS = {"KR": 100_000, "US": 500}
 ZONES = {"KR": "Asia/Seoul", "US": "America/New_York"}
 TERMINAL = {"FILLED", "CANCELLED", "REJECTED", "NOT_SENT", "BLOCKED"}
 DECISIONS = {"STARTER_NOW": "BUY", "ADD_NOW": "BUY", "BUY_NOW": "BUY",
@@ -65,7 +67,7 @@ def validation_gate(root, market, now):
 
 
 @contextmanager
-def broker_context(market, path, clock, tickers, scope):
+def broker_context(market, path, clock, tickers, scope, *, limits=None):
     from .demo_token_cache import cache_demo_authentication
     client = broker = None
     try:
@@ -77,11 +79,7 @@ def broker_context(market, path, clock, tickers, scope):
         if scope != client.credentials.scope():
             raise ValueError("VALIDATED_ACCOUNT_CHANGED")
         cache_demo_authentication(client, market=market)
-        if market == "KR":
-            broker = KisPaperBroker(path, client, PaperOrderPolicy(tuple(t[:6] for t in tickers)), paper_enabled=True, clock=clock)
-        else:
-            from .kis_paper_us import KisPaperUSBroker, USPaperOrderPolicy
-            broker = KisPaperUSBroker(path, client, USPaperOrderPolicy((), allowed_tickers=tickers), paper_enabled=True, clock=clock)
+        broker = make_strategy_broker(market, path, client, clock, tickers, limits)
         yield broker
     finally:
         if broker:
@@ -426,7 +424,7 @@ def summary(db, now, market, marks=None, *, historical=False):
 
 
 def advance(archive, root, validation_root, market, *, clock, tickers, broker_factory, quote_loader, account_loader, session_resolver, gate,
-            allocation_mode="ARCHIVED_PROPOSALS"):
+            allocation_mode="ARCHIVED_PROPOSALS", limits=None, v2_settings=None):
     now, path = at(clock()), root / f"{market.lower()}-strategy.sqlite"
     result = {"status": "WAITING_VALIDATION", "blockers": [], "gate_passed": False, "orders": [], "order_counts": {}, "performance": None}
     def finish(status, *blockers):
@@ -570,6 +568,7 @@ def advance(archive, root, validation_root, market, *, clock, tickers, broker_fa
                 considered += 1
                 if considered > 3:
                     break
+                v2_evidence = {}
                 try:
                     quote = quote_loader(market, candidate["ticker"], clock)
                     _fresh(quote, now=at(clock()), seconds=120)
@@ -579,10 +578,21 @@ def advance(archive, root, validation_root, market, *, clock, tickers, broker_fa
                         terms["exchange"] = quote["exchange"]
                     account = account_loader(market, broker, terms, clock)
                     terms["quantity"] = quantity(candidate, price, account, market, current["owned"], at(clock()))
+                    terms["quantity"] = size_with_native_limits(market, terms, account, limits)
+                    if not terms["quantity"]:
+                        raise ValueError("NO_STRATEGY_QUANTITY_WITHIN_LIMITS")
                 except Exception as exc:
                     reason = str(exc)
                     issues.append(reason if reason in {"NO_STRATEGY_QUANTITY_WITHIN_LIMITS", "BUDGET_FX_UNVERIFIED", "PROPOSAL_QUANTITY_INVALID"} else "CANDIDATE_EVIDENCE_UNVERIFIED")
                     continue
+                if v2_settings is not None:
+                    try:
+                        terms["quantity"], v2_evidence = authorize_v2_size(
+                            root, market, v2_settings, candidate, terms, quote, account, current, at(clock()),
+                        )
+                    except (OSError, ValueError, TypeError, KeyError, AttributeError, ArithmeticError, sqlite3.Error):
+                        issues.append("KIS_V2_ADMISSION_UNVERIFIED")
+                        continue
                 if (root / "HALT").exists() or (validation_root / "HALT").exists():
                     issues.append("HALTED")
                     break
@@ -594,10 +604,13 @@ def advance(archive, root, validation_root, market, *, clock, tickers, broker_fa
                     issues.append("STRATEGY_SIGNAL_EXPIRED_DURING_PREPARATION")
                     continue
                 signal = {**candidate["signal"], "valid_until": entry_deadline.isoformat()}
+                source_evidence = candidate.get("evidence")
+                if v2_evidence:
+                    source_evidence = {**(source_evidence or {}), "sizing_v2": v2_evidence}
                 broker.db.execute("INSERT INTO strategy_attempts VALUES (?,?,?,?,?,?)", (candidate["id"], candidate["ticker"], candidate["run_id"], at(clock()).isoformat(), json.dumps(terms, sort_keys=True), "PREPARED"))
-                if candidate.get("evidence"):
+                if source_evidence:
                     broker.db.execute("INSERT INTO strategy_source_evidence VALUES (?,?)",
-                                      (candidate["id"], json.dumps(candidate["evidence"], sort_keys=True)))
+                                      (candidate["id"], json.dumps(source_evidence, sort_keys=True)))
                 try:
                     broker.submit(intent_id=candidate["id"], **terms, signal=signal, quote=quote, account=account)
                 except Exception:
@@ -634,6 +647,10 @@ def tick(archive, root, validation_root, *, clock=None, broker_factory=None, quo
             config = {}
         enabled = isinstance(config, dict) and config.get("mode") == MODE and config.get("enabled") is True and config.get("real_orders_enabled") is False
         allocation_mode = config.get("allocation_mode", "ARCHIVED_PROPOSALS") if isinstance(config, dict) else "ARCHIVED_PROPOSALS"
+        market_limits = configured_limits(config) if isinstance(config, dict) else {}
+        v2_settings = configured_v2(config) if isinstance(config, dict) else {}
+        if set(v2_settings) - set(market_limits):
+            raise ValueError("KIS V2 requires explicit native order limits")
         if allocation_mode not in {"ARCHIVED_PROPOSALS", demo_strategy_plan.MODE}:
             raise ValueError("INVALID_STRATEGY_ALLOCATION_MODE")
         markets = {}
@@ -643,9 +660,13 @@ def tick(archive, root, validation_root, *, clock=None, broker_factory=None, quo
                 continue
             try:
                 markets[market] = advance(archive, root, validation_root, market, clock=clock, tickers=(tickers or universe())[market],
-                    broker_factory=broker_factory or broker_context, quote_loader=quote_loader or current_quote,
+                    broker_factory=broker_factory or (
+                        partial(broker_context, limits=market_limits[market]) if market in market_limits else broker_context
+                    ),
+                    quote_loader=quote_loader or current_quote,
                     account_loader=account_loader or validation.current_account, session_resolver=session_resolver or _runtime_session,
-                    gate=gate or validation_gate, allocation_mode=allocation_mode)
+                    gate=gate or validation_gate, allocation_mode=allocation_mode,
+                    limits=market_limits.get(market), v2_settings=v2_settings.get(market))
             except Exception:
                 markets[market] = {"status": "BLOCKED", "checked_at": at(clock()).isoformat(), "gate_passed": False, "blockers": ["RUNTIME_EVIDENCE_UNVERIFIED"]}
         finished = at(clock())

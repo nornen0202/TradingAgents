@@ -143,3 +143,8 @@ python -m tools.kis_paper --output .runtime/kis-paper-status.json status --journ
 - [해외 잔고: VTTS3012R와 모의 거래소 코드](https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/overseas_stock/inquire_balance/inquire_balance.py)
 - [해외 주문체결: VTTS3035R와 모의 조회 제약](https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/overseas_stock/inquire_ccnl/inquire_ccnl.py)
 - [주문일·국내 주문일·당사 주문시각 필드](https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/overseas_stock/inquire_ccnl/chk_inquire_ccnl.py)
+## 네이티브 전략 주문 한도
+
+전략의 로컬 활성화 설정에서 시장별 `native_order_limits`를 지정할 수 있다. 각 시장 항목에는 거래통화 기준 `max_order_native`, `cash_floor_native`, 한 주문의 NAV 한도 `max_order_nav`, 한 주 주문의 선택적 NAV 예외 `one_share_nav_ceiling`을 모두 둔다. 시장별 절대 한도와 브로커의 집중·현금·취소 미확정 주문 유보 조건이 함께 적용된다. 기존 저널에 저장된 정책과 다른 설정으로는 새 주문을 시작할 수 없다.
+
+`paper_policy_v2`는 같은 시장의 네이티브 한도를 지정한 뒤 버전이 고정된 `policy`와 `watchlist`를 받는다. 신규 위험에는 작업 상태의 `kr-v2-evidence.json` 또는 `us-v2-evidence.json`에 검토된 결제현금, 시장 기준, 포트폴리오와 주문 대사 시각이 있어야 한다. 내역 누락은 주문 가능 예수금으로 채우지 않는다. V2 수량은 기존 전략 신호와 KIS 브로커가 승인한 범위 안에서만 줄어든다.

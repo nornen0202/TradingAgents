@@ -6,7 +6,7 @@ settled fills or exact execution timestamps.
 """
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass
+from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal, InvalidOperation
 import json
@@ -20,7 +20,8 @@ from tradingagents.scheduled.market_calendar import market_session_state
 from .kis_demo import DEMO_HOST, DemoError, DemoOrderJournal
 from .kis_demo_us import KisDemoUSClient, EXCHANGES, NEW_YORK, SEOUL
 from .kis_paper import _clock, _number, _integer, _broker_number, _stable, _fresh, execution_notional
-from .paper import stamp
+from .kis_strategy_limits import broker_policy_fields, validate_buy_nav
+from .paper import order_nav_limit, stamp
 
 
 SCHEMA = "tradingagents.kis-us-paper/v1"
@@ -76,6 +77,8 @@ class USPaperOrderPolicy:
     # Strategy universes can resolve the venue from a current dated quote.
     # The ticker allowlist stays immutable; quote and order venue must agree.
     allowed_tickers: tuple[str, ...] = ()
+    max_order_nav: float | None = None
+    one_share_nav_ceiling: float = 0.0
 
     def __post_init__(self):
         if not isinstance(self.allowed_instruments, tuple) or not (self.allowed_instruments or self.allowed_tickers) or len(set(self.allowed_instruments)) != len(self.allowed_instruments):
@@ -97,6 +100,7 @@ class USPaperOrderPolicy:
             raise DemoError("Paper clock/collar policy exceeds hard limits")
         if not 0 < _number(self.max_position_fraction, positive=True) <= 1:
             raise DemoError("Invalid paper position limit")
+        validate_buy_nav(self.max_order_nav, self.one_share_nav_ceiling, self.max_position_fraction)
 
 
 def read_paper_us_account(client: KisDemoUSClient, *, ticker, exchange, limit_price, clock=None):
@@ -313,7 +317,7 @@ class KisPaperUSBroker:
                 BEGIN SELECT RAISE(ABORT,'Paper intent is immutable'); END;
         """)
         initialize_lifecycle(self.db)
-        policy_fields = asdict(policy)
+        policy_fields = broker_policy_fields(policy)
         if not policy.allowed_tickers:
             policy_fields.pop("allowed_tickers")  # Preserve existing journal identities.
         encoded = json.dumps(policy_fields, sort_keys=True)
@@ -401,6 +405,10 @@ class KisPaperUSBroker:
         if count >= self.policy.max_daily_orders:
             raise DemoError("Daily paper order limit exceeded")
         if side == "BUY":
+            if (self.policy.max_order_nav is not None
+                    and notional * (1 + self.policy.reserve_cost_bps / 10000)
+                    > nav * order_nav_limit(self.policy, "BUY", quantity)):
+                raise DemoError("Paper buy exceeds the configured NAV limit")
             if bought + notional > self.policy.max_daily_buy_usd:
                 raise DemoError("Daily paper buy limit exceeded")
             if account.get("capacity_ticker") != ticker or account.get("capacity_exchange") != exchange or account.get("capacity_limit_price") != price:

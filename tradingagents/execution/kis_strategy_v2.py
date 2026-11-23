@@ -1,0 +1,90 @@
+"""Connect optional V2 sizing to the guarded native KIS strategy."""
+
+from decimal import Decimal
+import hashlib
+import json
+
+from .experiments import _stamp
+from .paper_policy_v2 import bind_v2_journal, size_v2_candidate
+
+EVIDENCE_SCHEMA = "tradingagents.kis-v2-evidence/v1"
+_MARKETS = {"KR": ("KRW", "krw"), "US": ("USD", "usd")}
+
+
+def configured_v2(config):
+    rows = config.get("paper_policy_v2", {})
+    if not isinstance(rows, dict) or set(rows) - set(_MARKETS):
+        raise ValueError("KIS V2 settings must specify an explicit market")
+    for market, row in rows.items():
+        if (not isinstance(row, dict) or set(row) != {"policy", "watchlist"}
+                or not isinstance(row["policy"], dict) or row["policy"].get("broker") != "kis_vts"
+                or row["policy"].get("market") != market or row["policy"].get("currency") != _MARKETS[market][0]):
+            raise ValueError("KIS V2 settings require one matching native policy and watchlist")
+    return rows
+
+
+def _buy_observation(path, market, currency, scope, ticker, now, seconds, account_cash):
+    with path.open("rb") as stream:
+        raw = stream.read(128_001)
+    if len(raw) > 128_000:
+        raise ValueError("KIS V2 evidence exceeds its private read bound")
+    evidence = json.loads(raw.decode("utf-8-sig"))
+    if (evidence.get("schema") != EVIDENCE_SCHEMA or evidence.get("market") != market
+            or evidence.get("currency") != currency or evidence.get("account_scope") != scope
+            or evidence.get("cash_basis") != "REVIEWED_SETTLED_CASH"
+            or evidence.get("orders_reconciled") is not True or evidence.get("portfolio_complete") is not True):
+        raise ValueError("KIS V2 requires complete scoped cash, order and portfolio evidence")
+    acquired = _stamp(evidence["observed_at"])
+    for name in ("settlement_observed_at", "benchmark_observed_at", "portfolio_observed_at"):
+        observed = _stamp(evidence[name])
+        if not observed <= acquired <= now or not 0 <= (now - observed).total_seconds() <= seconds:
+            raise ValueError("KIS V2 observation expired or unavailable")
+    cash = Decimal(str(evidence["settled_cash"]))
+    if not cash.is_finite() or not 0 <= cash <= Decimal(str(account_cash)):
+        raise ValueError("KIS V2 settled cash exceeds the native balance")
+    return str(cash), evidence["target_weights"][ticker], hashlib.sha256(raw).hexdigest()
+
+
+def authorize_v2_size(root, market, settings, candidate, terms, quote, account, state, now):
+    """Apply V2 after native sizing, then leave the final authority with the broker."""
+    if settings is None:
+        return terms["quantity"], {}
+    policy, watchlist = settings["policy"], settings["watchlist"]
+    scope = account["account_scope"]
+    currency, suffix = _MARKETS[market]
+    if policy["scope"] != scope or account.get("environment") != "demo" or account.get("complete") is not True:
+        raise ValueError("KIS V2 account scope is unverified")
+    bind_v2_journal(root, policy, watchlist, as_of=now.isoformat())
+    ticker = candidate["ticker"]
+    side, cash, target, evidence_hash = terms["side"], "0", 0, None
+    if side == "BUY":
+        evaluation = state["evaluation"]
+        if evaluation["sample"]["sell_filled_orders"] and not evaluation["settlement_known"]:
+            raise ValueError("Prior KIS strategy sales require settlement proof")
+        cash, target, evidence_hash = _buy_observation(
+            root / f"{market.lower()}-v2-evidence.json", market, currency, scope, ticker, now,
+            policy["max_quote_age_seconds"], account[f"cash_{suffix}"],
+        )
+    position = next((row for row in account["positions"] if row["ticker"] == terms["ticker"]), {})
+    context = {"market": market, "currency": currency, "scope": scope}
+    capacity = {**context, "mode": "isolated_paper", "reconciled": True,
+                "observed_at": account["observed_at"], "nav": account[f"nav_{suffix}"],
+                "settlement_verified": evidence_hash is not None, "portfolio_complete": evidence_hash is not None,
+                "benchmark_fresh": evidence_hash is not None, "settled_cash": cash, "pending_buy_notional": 0,
+                "pending_buys_by_ticker": {}, "positions": {ticker: {
+                    "owned": position.get("quantity", 0), "sellable": position.get("sellable_quantity", 0), "pending_sell": 0}}}
+    signal = candidate["signal"]
+    source = {**context, "ticker": ticker, "action_now": signal["decision_now"],
+              "observed_at": signal["available_at"], "execution_ready": signal["execution_ready"],
+              "target_weight": target, "quantity": terms["quantity"], "verified_risk_reduction": side == "SELL"}
+    price = terms["limit_price"]
+    native_quote = {**context, "ticker": ticker, "observed_at": quote["observed_at"],
+                    "regular_executable": quote.get("execution_ready") is True and quote.get("session") == "regular",
+                    "ask": price, "bid": price}
+    sized = size_v2_candidate(policy, watchlist, capacity, source, native_quote, as_of=now.isoformat())
+    if sized["status"] != "PAPER_CANDIDATE" or sized.get("side") != side:
+        raise ValueError(sized["status"])
+    amount = int(sized["quantity"])
+    return amount, {key: sized[key] for key in ("policy_sha256", "watchlist_sha256", "policy_version", "watchlist_version")} | {
+        "reviewed_evidence_sha256": evidence_hash,
+    }
