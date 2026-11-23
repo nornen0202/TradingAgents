@@ -43,3 +43,56 @@ def test_capture_failure_does_not_relaunch_worker(tmp_path, monkeypatch):
     with pytest.raises(TimeoutError):
         capture_worker(tmp_path / "log", ["-c", "pass"])
     assert calls == ["ran"]
+
+
+def test_legacy_utf16_is_rotated_before_utf8_and_marks_worker_started(tmp_path):
+    path = tmp_path / "lane.log"
+    start = tmp_path / "worker.started"
+    path.write_text("old worker", encoding="utf-16")
+    assert capture_worker(path, ["-c", "print('new worker')"], max_bytes=128, backups=2, started_marker=start) == 0
+    assert path.read_text(encoding="utf-8").strip() == "new worker"
+    assert path.with_name("lane.log.1").read_text(encoding="utf-16") == "old worker"
+    assert start.read_text(encoding="ascii") == "STARTED"
+
+
+def test_rotation_lock_moves_output_to_one_bounded_fallback(tmp_path, monkeypatch, capsys):
+    from tradingagents.local_worker_logging import _Utf8RotatingFileHandler
+    rotate = _Utf8RotatingFileHandler.doRollover
+    path = tmp_path / "lane.log"
+
+    def locked(self):
+        if self.baseFilename == str(path):
+            raise PermissionError("fixture keeps original log open")
+        return rotate(self)
+
+    monkeypatch.setattr(_Utf8RotatingFileHandler, "doRollover", locked)
+    code = "for i in range(10): print('fixture-' + 'x' * 30); print('last-line')"
+    assert capture_worker(path, ["-u", "-c", code], max_bytes=128, backups=2) == 0
+    fallback = tmp_path / "lane-fallback.log"
+    assert "last-line" in fallback.read_text(encoding="utf-8")
+    assert "bounded fallback" in capsys.readouterr().err
+    assert all(item.stat().st_size <= 128 for item in tmp_path.glob("lane*.log*") if item.suffix != ".lock")
+
+
+def test_unopenable_log_does_not_claim_that_worker_started(tmp_path):
+    path = tmp_path / "lane.log"
+    path.mkdir()
+    started = tmp_path / "worker.started"
+    with pytest.raises(OSError):
+        capture_worker(path, ["-c", "pass"], started_marker=started)
+    assert not started.exists()
+
+
+def test_both_sinks_failing_drains_child_and_reports_controlled_failure(tmp_path, monkeypatch, capsys):
+    import sys
+    from tradingagents.local_worker_logging import _Utf8RotatingFileHandler
+
+    def locked(self):
+        raise PermissionError("fixture sinks cannot rotate")
+
+    monkeypatch.setattr(_Utf8RotatingFileHandler, "doRollover", locked)
+    finished = tmp_path / "finished"
+    code = "from pathlib import Path; import sys; [print('x' * 40) for i in range(30)]; Path(sys.argv[1]).touch()"
+    assert capture_worker(tmp_path / "lane.log", ["-u", "-c", code, str(finished)], max_bytes=96, backups=2) == 74
+    assert finished.exists()
+    assert capsys.readouterr().err.count("Worker output sink failed") == 1
