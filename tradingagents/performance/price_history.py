@@ -9,7 +9,7 @@ from pathlib import Path
 from typing import Any, Mapping
 
 from tradingagents.external.prism_normalize import normalize_market
-from tradingagents.performance.models import OUTCOME_CALCULATION_VERSION
+from tradingagents.performance.models import OUTCOME_CALCULATION_VERSION, VERIFIED_PRICE_CALCULATION_VERSION
 from tradingagents.performance.lifecycle import timestamp
 
 
@@ -53,6 +53,7 @@ def load_price_history_for_recommendations(
     market: str | None = None,
     lookback_days: int = 120,
     asof_date: str | None = None,
+    require_verified_price: bool = False,
 ) -> PriceHistoryLoadResult:
     lower, cutoff = _history_window(asof_date, lookback_days)
     provider = str(provider or "none").strip().lower()
@@ -69,6 +70,7 @@ def load_price_history_for_recommendations(
         market=market,
         asof_date=asof_date,
         refresh_window_days=lookback_days,
+        require_verified_price=require_verified_price,
     )
     warnings.extend(market_filter_warnings)
 
@@ -203,6 +205,7 @@ def _recommendations_due_for_refresh(
     market: str | None = None,
     asof_date: str | None = None,
     refresh_window_days: int = 120,
+    require_verified_price: bool = False,
 ) -> tuple[list[str], tuple[int, ...], list[str]]:
     if not Path(db_path).exists():
         return [], (), []
@@ -211,14 +214,25 @@ def _recommendations_due_for_refresh(
     cutoff_date = _refresh_cutoff_date(asof_date, refresh_window_days)
     with sqlite3.connect(db_path) as conn:
         columns = _table_columns(conn, "action_recommendations")
+        if require_verified_price and "price_reference_json" not in columns:
+            return [], (), ["performance_price_reference_evidence_unavailable"]
         if cutoff_date:
             market_column = "r.market" if "market" in columns else "NULL"
+            join = "o.recommendation_id = r.id"
+            restriction = ""
+            if require_verified_price:
+                join = f"""o.rowid = (
+                    SELECT z.rowid FROM action_outcomes z WHERE z.recommendation_id = r.id
+                      AND z.calculation_version = {VERIFIED_PRICE_CALCULATION_VERSION}
+                    ORDER BY z.updated_at DESC, z.rowid DESC LIMIT 1
+                )"""
+                restriction = "AND r.price_reference_json IS NOT NULL"
             rows = conn.execute(
                 f"""
                 SELECT r.id, r.ticker, {market_column}, r.created_at
                 FROM action_recommendations r
-                LEFT JOIN action_outcomes o ON o.recommendation_id = r.id
-                WHERE substr(r.created_at, 1, 10) >= ?
+                LEFT JOIN action_outcomes o ON {join}
+                WHERE substr(r.created_at, 1, 10) >= ? {restriction}
                   AND (
                     o.recommendation_id IS NULL
                     OR COALESCE(o.calculation_version, 1) < ?
@@ -229,7 +243,8 @@ def _recommendations_due_for_refresh(
                   )
                 ORDER BY r.ticker
                 """,
-                (cutoff_date, OUTCOME_CALCULATION_VERSION, str(asof_date)[:10]),
+                (cutoff_date, VERIFIED_PRICE_CALCULATION_VERSION if require_verified_price else OUTCOME_CALCULATION_VERSION,
+                 str(asof_date)[:10]),
             ).fetchall()
     tickers: list[str] = []
     seen_tickers: set[str] = set()
