@@ -44,3 +44,10 @@ def test_api_errors_missing_observation_or_live_mode_make_no_order_eligible():
     assert result["consecutive_api_failures"] == 0
     result = evaluate_micro_paper(POLICY, {**ACCOUNT, "mode": "live"}, ORDER, [], as_of=NOW)
     assert not result["projected_paper_candidate"]
+
+
+def test_outdated_success_does_not_reopen_risk():
+    stale = _api(True)
+    stale[0]["observed_at"] = (NOW - timedelta(seconds=31)).isoformat()
+    result = evaluate_micro_paper(POLICY, ACCOUNT, ORDER, stale, as_of=NOW)
+    assert result["blocking_reasons"] == ["api_observation_stale"]

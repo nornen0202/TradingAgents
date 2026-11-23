@@ -50,6 +50,8 @@ def evaluate_micro_paper(policy, account, intent, api_events, *, as_of):
                 seen.add(identity)
                 previous = stamp
                 failure_count = 0 if event["success"] else failure_count + 1
+            if now - previous > timedelta(seconds=policy["max_account_age_seconds"]):
+                blockers.append("api_observation_stale")
         except (AttributeError, TypeError, ValueError):
             blockers.append("invalid_api_observation")
     if failure_count >= policy["max_api_failures"]:
