@@ -4,9 +4,9 @@
     "kr": {
       "schema": "tradingagents.work-context/v1",
       "surface": "kr",
-      "event_id": "kr:10d8db8c064127818889e7347eda83f4",
-      "source_sha256": "6d27136ba7bdc45918e52aa45e51ee103076317c44dc16b5112c4741a0c4b67e",
-      "packet_sha256": "90d6d8e5d926f7fcb211f1223450469412c3feda7acfe4d81905d77075bcedb0",
+      "event_id": "kr:1fa8a0959d4fc1dc5b7d4955ee94470a",
+      "source_sha256": "008e76db86a93f0a1d5ee7c224bd137212944d6c0d5fd02d932dcc9c7bd1f2c2",
+      "packet_sha256": "7d544fa2f1e77d8d8541733de38d0d24e95c3928966ace326455576c4cf58b08",
       "prompt_contract_version": "market-work-v12-kr",
       "prompt_sha256": "ae80093efe2dcfe7f6131b8b09100f75e77b0ca0242b5340d15eb6ec3fd81274",
       "skill_sha256": "2fef99f1af403675549a13813e0fe5597a241a964affeada56e9f64e9f398fe9",
@@ -14,7 +14,7 @@
       "workflow_contract_sha256": "3d89f852dda405d7c44afdbed158e622d8a748f194d9e44d0aca14a8bbe14de1",
       "status_url": "https://nornen0202.github.io/TradingAgents/work/v1/kr/status.json",
       "latest_url": "https://nornen0202.github.io/TradingAgents/work/v1/kr/latest.json",
-      "event_url": "https://nornen0202.github.io/TradingAgents/work/v1/kr/events/kr-10d8db8c064127818889e7347eda83f4.json",
+      "event_url": "https://nornen0202.github.io/TradingAgents/work/v1/kr/events/kr-1fa8a0959d4fc1dc5b7d4955ee94470a.json",
       "prompt_url": "https://nornen0202.github.io/TradingAgents/work/v1/prompts/market_kr.md",
       "source_health": "STALE",
       "report_mode": "OUTAGE",
@@ -276,9 +276,9 @@
     "us": {
       "schema": "tradingagents.work-context/v1",
       "surface": "us",
-      "event_id": "us:f7bc1c4fc2d524b6d421d86c3f4bca0e",
-      "source_sha256": "b16ece025d74995a842a540130bf31aaf0d476d20df012cef813607a444b2b71",
-      "packet_sha256": "fb188517ccc4fe00c808a00b36292b5d6ede01c89e72e032e15652ba82b073a8",
+      "event_id": "us:4e21e2ecf10526012acb1deffc26b113",
+      "source_sha256": "1ab0d5e070cd4746f17dd68b73aa560ac9abbde47d65db76fc06f7c4a8a4a3b7",
+      "packet_sha256": "389cd6d46f415fb25801c56f9b697d6db5569a4c5482e7a23809f15d1f0a8a56",
       "prompt_contract_version": "market-work-v13-us",
       "prompt_sha256": "a577e06278002eebd491db51786019336a00da570d5c47886bad031cf01cf7fe",
       "skill_sha256": "2fef99f1af403675549a13813e0fe5597a241a964affeada56e9f64e9f398fe9",
@@ -286,22 +286,22 @@
       "workflow_contract_sha256": "c43e03e786420c6d542d346e0a06ae138ac11850adb820262e9f349ae6ce8b9a",
       "status_url": "https://nornen0202.github.io/TradingAgents/work/v1/us/status.json",
       "latest_url": "https://nornen0202.github.io/TradingAgents/work/v1/us/latest.json",
-      "event_url": "https://nornen0202.github.io/TradingAgents/work/v1/us/events/us-f7bc1c4fc2d524b6d421d86c3f4bca0e.json",
+      "event_url": "https://nornen0202.github.io/TradingAgents/work/v1/us/events/us-4e21e2ecf10526012acb1deffc26b113.json",
       "prompt_url": "https://nornen0202.github.io/TradingAgents/work/v1/prompts/market_us.md",
       "source_health": "STALE",
       "report_mode": "OUTAGE",
       "freshness_receipt": {
         "schema": "tradingagents.source-freshness/v1",
-        "producer_run_id": "20261124T000315_local-scheduler-us-overlay_only",
-        "producer_started_at": "2026-11-24T00:03:15.265983+09:00",
-        "producer_finished_at": "2026-11-24T01:16:18.382355+09:00",
+        "producer_run_id": "20261124T030359_local-scheduler-us-overlay_only",
+        "producer_started_at": "2026-11-24T03:03:59.566743+09:00",
+        "producer_finished_at": "2026-11-24T05:25:05.286224+09:00",
         "analysis_run_id": "20261123T175107_local-scheduler-us-full",
         "analysis_lineage_status": "RESOLVED",
         "analysis_completed_at": "2026-11-23T19:42:40.725338+09:00",
         "analysis_trade_date_oldest": "2026-11-20",
         "analysis_trade_date_latest": "2026-11-20",
-        "market_data_oldest_at": "2026-11-23T16:13:44+00:00",
-        "market_data_latest_at": "2026-11-23T16:13:44+00:00",
+        "market_data_oldest_at": "2026-11-23T15:10:00-05:00",
+        "market_data_latest_at": "2026-11-23T20:10:41+00:00",
         "market_data_status": "STALE",
         "publication_does_not_refresh_inputs": true,
         "execution_max_age_seconds": 180.0,
@@ -452,14 +452,6 @@
             "market_data_asof": null
           },
           {
-            "ticker": "GOOGL",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
-            "execution_eligible": false,
-            "basis": "ORIGINAL_RESEARCH_CONTRACT",
-            "market_data_asof": null
-          },
-          {
             "ticker": "MPWR",
             "research_valid": false,
             "category": "UNVERIFIED_RESEARCH_INPUT",
@@ -469,6 +461,14 @@
           },
           {
             "ticker": "TSM",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false,
+            "basis": "ORIGINAL_RESEARCH_CONTRACT",
+            "market_data_asof": null
+          },
+          {
+            "ticker": "GOOGL",
             "research_valid": false,
             "category": "UNVERIFIED_RESEARCH_INPUT",
             "execution_eligible": false,
@@ -500,14 +500,6 @@
             "market_data_asof": null
           },
           {
-            "ticker": "NTAP",
-            "research_valid": false,
-            "category": "UNVERIFIED_RESEARCH_INPUT",
-            "execution_eligible": false,
-            "basis": "ORIGINAL_RESEARCH_CONTRACT",
-            "market_data_asof": null
-          },
-          {
             "ticker": "AES",
             "research_valid": false,
             "category": "UNVERIFIED_RESEARCH_INPUT",
@@ -517,6 +509,14 @@
           },
           {
             "ticker": "KO",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false,
+            "basis": "ORIGINAL_RESEARCH_CONTRACT",
+            "market_data_asof": null
+          },
+          {
+            "ticker": "NTAP",
             "research_valid": false,
             "category": "UNVERIFIED_RESEARCH_INPUT",
             "execution_eligible": false,
