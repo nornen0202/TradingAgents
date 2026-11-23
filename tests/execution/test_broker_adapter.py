@@ -3,7 +3,7 @@ from dataclasses import replace
 
 import pytest
 
-from tradingagents.execution.broker_adapter import Account, BrokerDispatcher, Intent, Order, subscription_budget
+from tradingagents.execution.broker_adapter import Account, BrokerDispatcher, ExecutionFill, Intent, Order, subscription_budget
 
 
 START = datetime(2026, 10, 1, 14, tzinfo=timezone.utc)
@@ -22,6 +22,7 @@ class BrokerFixture:
         self.drop_receipt = False
 
     def account(self):
+        self.calls.append(("account", self.market))
         return Account(self.scope, "USD", self.now.isoformat(), "100", {"ABC": "2"})
 
     def submit(self, intent):
@@ -49,7 +50,7 @@ def test_accept_then_disconnect_is_reconciled_after_failover_without_resubmissio
         intent = broker.intent()
         assert first.dispatch("worker-1", epoch, intent, broker.account()) == "UNKNOWN"
         assert first.dispatch("worker-1", epoch, intent, broker.account()) == "UNKNOWN"
-        assert broker.calls == [("submit", "a")]
+        assert [call for call in broker.calls if call[0] == "submit"] == [("submit", "a")]
         with pytest.raises(RuntimeError, match="Reconcile"):
             first.dispatch("worker-1", epoch, broker.intent("b"), broker.account())
         with BrokerDispatcher(path, broker, clock=lambda: broker.now) as second:
@@ -61,7 +62,7 @@ def test_accept_then_disconnect_is_reconciled_after_failover_without_resubmissio
             with pytest.raises(RuntimeError, match="stale"):
                 first.reconcile("worker-1", epoch, intent.id)
             assert second.reconcile("worker-2", next_epoch, intent.id) == "OPEN"
-            assert broker.calls == [("submit", "a"), ("find", "a")]
+            assert [call for call in broker.calls if call[0] != "account"] == [("submit", "a"), ("find", "a")]
 
 
 def test_pending_sells_and_old_account_proofs_cannot_sell_twice(tmp_path):
@@ -74,7 +75,8 @@ def test_pending_sells_and_old_account_proofs_cannot_sell_twice(tmp_path):
         with pytest.raises(ValueError, match="inventory"):
             dispatcher.dispatch("worker", epoch, broker.intent("b"), broker.account())
         order = broker.orders["a"]
-        partial = replace(order, status="PARTIAL", filled_quantity="1", observed_at=broker.now.isoformat())
+        fill = ExecutionFill("fixture-fill-1", "1", "80", "USD", broker.now.isoformat())
+        partial = replace(order, status="PARTIAL", filled_quantity="1", observed_at=broker.now.isoformat(), fills=(fill,))
         assert dispatcher.notice("worker", epoch, partial) == "PARTIAL"
         assert dispatcher.notice("worker", epoch, order) == "PARTIAL"
         with pytest.raises(ValueError, match="latest fill"):
@@ -110,3 +112,37 @@ def test_subscription_priority_retains_open_order_and_held_names():
     assert planned[:4] == tuple(required) and len(planned) == 41
     with pytest.raises(ValueError, match="cannot cover"):
         subscription_budget(pinned=required, optional=[], limit=3)
+
+
+def test_shared_account_slot_hint_and_fill_identity_survive_restart(tmp_path):
+    broker = BrokerFixture()
+    path = tmp_path / "dispatch.sqlite"
+    hint = dict(scope=broker.scope, market=broker.market, order_id="order-a")
+    with BrokerDispatcher(path, broker, clock=lambda: broker.now) as dispatcher:
+        epoch = dispatcher.claim("writer", seconds=3)
+        account = dispatcher.account_snapshot("writer", epoch)
+        with pytest.raises(RuntimeError, match="REST budget"):
+            dispatcher.dispatch("writer", epoch, broker.intent(qty="2"), account)
+        broker.now += timedelta(seconds=1)
+        assert dispatcher.dispatch("writer", epoch, broker.intent(qty="2"), account) == "OPEN"
+        with pytest.raises(ValueError, match="scope"):
+            dispatcher.reconcile_broker_hint("writer", epoch, **(hint | {"scope": "another"}))
+        with pytest.raises(RuntimeError, match="REST budget"):
+            dispatcher.reconcile_broker_hint("writer", epoch, **hint)
+    broker.now += timedelta(seconds=3)
+    order = broker.orders["a"]
+    first_fill = ExecutionFill("partial-a", "1", "80", "USD", broker.now.isoformat())
+    partial = replace(order, status="PARTIAL", filled_quantity="1", observed_at=broker.now.isoformat())
+    with BrokerDispatcher(path, broker, clock=lambda: broker.now) as dispatcher:
+        epoch = dispatcher.claim("replacement")
+        with pytest.raises(ValueError, match="fill identifiers"):
+            dispatcher.notice("replacement", epoch, partial)
+        broker.orders["a"] = replace(partial, fills=(first_fill,))
+        assert dispatcher.reconcile_broker_hint("replacement", epoch, **hint) == "PARTIAL"
+        broker.now += timedelta(seconds=1)
+        next_fill = replace(first_fill, id="complete-a", occurred_at=broker.now.isoformat())
+        full = replace(partial, status="FILLED", filled_quantity="2", observed_at=broker.now.isoformat())
+        with pytest.raises(ValueError, match="different evidence"):
+            dispatcher.notice("replacement", epoch, replace(full, fills=(replace(first_fill, quantity="2"),)))
+        assert dispatcher.notice("replacement", epoch, replace(full, fills=(next_fill, first_fill))) == "FILLED"
+        assert dispatcher.notice("replacement", epoch, replace(full, fills=(first_fill, next_fill))) == "FILLED"

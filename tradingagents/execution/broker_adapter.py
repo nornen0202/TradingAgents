@@ -75,6 +75,15 @@ class Account:
 
 
 @dataclass(frozen=True)
+class ExecutionFill:
+    id: str
+    quantity: str
+    native_price: str
+    currency: str
+    occurred_at: str
+
+
+@dataclass(frozen=True)
 class Order:
     scope: str
     client_id: str
@@ -82,6 +91,7 @@ class Order:
     status: str
     filled_quantity: str
     observed_at: str
+    fills: tuple[ExecutionFill, ...] = ()
 
 
 class BrokerAdapter(Protocol):
@@ -119,15 +129,21 @@ class BrokerDispatcher:
             );
             CREATE TABLE IF NOT EXISTS dispatch_intents(
                 id TEXT PRIMARY KEY, payload TEXT NOT NULL, status TEXT NOT NULL, order_id TEXT UNIQUE,
-                filled TEXT NOT NULL DEFAULT '0', observed_at TEXT
+                filled TEXT NOT NULL DEFAULT '0', observed_at TEXT, submitted_at TEXT
             );
             CREATE TABLE IF NOT EXISTS dispatch_observations(
                 intent_id TEXT NOT NULL, observed_at TEXT NOT NULL, payload TEXT NOT NULL,
                 PRIMARY KEY(intent_id, observed_at)
             );
+            CREATE TABLE IF NOT EXISTS dispatch_fills(
+                fill_id TEXT PRIMARY KEY, intent_id TEXT NOT NULL, payload TEXT NOT NULL
+            );
         """)
         binding = (adapter.scope, adapter.kind, adapter.mode, adapter.market)
         with self._db:
+            self._db.execute("BEGIN IMMEDIATE")
+            if "submitted_at" not in {row[1] for row in self._db.execute("PRAGMA table_info(dispatch_intents)")}:
+                self._db.execute("ALTER TABLE dispatch_intents ADD COLUMN submitted_at TEXT")
             self._db.execute("INSERT OR IGNORE INTO broker_scope (id,scope,kind,mode,market,epoch) VALUES (1,?,?,?,?,0)",
                              binding)
             if tuple(self._db.execute("SELECT scope,kind,mode,market FROM broker_scope").fetchone()) != binding:
@@ -181,7 +197,8 @@ class BrokerDispatcher:
         quantity, limit = _money(intent.quantity), _money(intent.limit)
         if (not intent.id or not intent.ticker or intent.side not in ("BUY", "SELL") or not quantity or not limit
                 or (quantity % 1 and not self._capability.fractional) or account.scope != self._broker.scope
-                or account.currency != intent.currency or type(max_age_seconds) is not int or not 1 <= max_age_seconds <= 120):
+                or account.currency != intent.currency or intent.currency != self._native_currency()
+                or type(max_age_seconds) is not int or not 1 <= max_age_seconds <= 120):
             raise ValueError("Intent or account cannot be submitted")
         payload = json.dumps(asdict(intent), sort_keys=True)
         with interprocess_file_lock(self._lock):
@@ -214,8 +231,8 @@ class BrokerDispatcher:
                 raise ValueError("Intent exceeds available inventory or settled cash")
             self._reserve_rest(owner, epoch)
             with self._db:
-                self._db.execute("INSERT INTO dispatch_intents (id,payload,status) VALUES (?,?,'DISPATCHING')",
-                                 (intent.id, payload))
+                self._db.execute("INSERT INTO dispatch_intents (id,payload,status,submitted_at) VALUES (?,?,'DISPATCHING',?)",
+                                 (intent.id, payload, self._now().isoformat()))
             try:
                 order = self._broker.submit(intent)
                 return self._accept(intent.id, order)
@@ -226,13 +243,43 @@ class BrokerDispatcher:
 
     def reconcile(self, owner, epoch, intent_id):
         with interprocess_file_lock(self._lock):
-            if self._db.execute("SELECT 1 FROM dispatch_intents WHERE id=?", (intent_id,)).fetchone() is None:
-                raise ValueError("Unknown intent cannot be reconciled")
+            return self._reconcile(owner, epoch, intent_id)
+
+    def _reconcile(self, owner, epoch, intent_id):
+        if self._db.execute("SELECT 1 FROM dispatch_intents WHERE id=?", (intent_id,)).fetchone() is None:
+            raise ValueError("Unknown intent cannot be reconciled")
+        self._reserve_rest(owner, epoch)
+        order = self._broker.find(intent_id)
+        return "UNKNOWN" if order is None else self._accept(intent_id, order)
+
+    def reconcile_broker_hint(self, owner, epoch, *, scope, market, order_id):
+        """Resolve a scoped WS hint through a known order and the shared REST slot."""
+        if scope != self._broker.scope or market != self._broker.market:
+            raise ValueError("Hint has the wrong account or market scope")
+        with interprocess_file_lock(self._lock):
+            self._fence(owner, epoch)
+            row = self._db.execute("SELECT id FROM dispatch_intents WHERE order_id=?", (order_id,)).fetchone()
+            return self._reconcile(owner, epoch, row[0]) if row else "ORDER_NOT_BOUND"
+
+    def account_snapshot(self, owner, epoch):
+        """Read a native-currency account from the same lane used for writes and reconciliation."""
+        with interprocess_file_lock(self._lock):
             self._reserve_rest(owner, epoch)
-            order = self._broker.find(intent_id)
-            return "UNKNOWN" if order is None else self._accept(intent_id, order)
+            snapshot = self._broker.account()
+            now, at = self._now(), _stamp(snapshot.observed_at)
+            if (snapshot.scope != self._broker.scope or snapshot.currency != self._native_currency()
+                    or not timedelta() <= now - at <= timedelta(seconds=30)):
+                raise ValueError("Broker account evidence has invalid scope, currency, or age")
+            _money(snapshot.settled_cash)
+            for quantity in snapshot.sellable.values():
+                _money(quantity)
+            return snapshot
+
+    def _native_currency(self):
+        return "KRW" if self._broker.market == "KR" else "USD"
 
     def notice(self, owner, epoch, order: Order):
+        """Apply order evidence fetched by an authenticated REST reconciliation."""
         with interprocess_file_lock(self._lock):
             self._fence(owner, epoch)
             return self._accept(order.client_id, order)
@@ -248,12 +295,17 @@ class BrokerDispatcher:
         row = self._db.execute("SELECT * FROM dispatch_intents WHERE id=?", (intent_id,)).fetchone()
         if row is None or (row["order_id"] and row["order_id"] != order.order_id):
             raise ValueError("Unbound broker order")
+        submitted = _stamp(row["submitted_at"]) if row["submitted_at"] else None
+        if submitted is not None and observed < submitted:
+            raise ValueError("Broker evidence predates the durable submission clock")
         quantity = _money(json.loads(row["payload"])["quantity"])
         filled = _money(order.filled_quantity)
         if (filled > quantity or (status == "FILLED") != (filled == quantity)
                 or (status == "PARTIAL" and not filled) or (status in {"OPEN", "REJECTED"} and filled)):
             raise ValueError("Order fill is inconsistent with its requested quantity")
-        encoded = json.dumps(asdict(order), sort_keys=True)
+        data = asdict(order)
+        data["fills"] = sorted(data["fills"], key=lambda fill: fill["id"])
+        encoded = json.dumps(data, sort_keys=True)
         if row["observed_at"] and observed <= _stamp(row["observed_at"]):
             old = self._db.execute("SELECT payload FROM dispatch_observations WHERE intent_id=? AND observed_at=?",
                                    (intent_id, observed.isoformat())).fetchone()
@@ -263,8 +315,26 @@ class BrokerDispatcher:
         if filled < _money(row["filled"]) or row["status"] in {"FILLED", "CANCELED", "REJECTED"}:
             raise ValueError("Broker execution state cannot regress")
         with self._db:
+            self._db.execute("BEGIN IMMEDIATE")
+            for fill in order.fills:
+                self._record_fill(intent_id, submitted, observed, fill)
+            evidence = self._db.execute("SELECT payload FROM dispatch_fills WHERE intent_id=?", (intent_id,))
+            cumulative = sum((_money(json.loads(row[0])["quantity"]) for row in evidence), Decimal())
+            if cumulative != filled:
+                raise ValueError("Order cumulative quantity lacks matching durable fill identifiers")
             self._db.execute("INSERT INTO dispatch_observations VALUES (?,?,?)",
                              (intent_id, observed.isoformat(), encoded))
             self._db.execute("UPDATE dispatch_intents SET status=?,order_id=?,filled=?,observed_at=? WHERE id=?",
                              (status, order.order_id, str(filled), observed.isoformat(), intent_id))
         return status
+
+    def _record_fill(self, intent_id, submitted, observed, fill):
+        if (not isinstance(fill.id, str) or not fill.id.strip() or fill.currency != self._native_currency()
+                or not _money(fill.quantity) or not _money(fill.native_price)
+                or submitted is None or not submitted <= _stamp(fill.occurred_at) <= observed):
+            raise ValueError("Broker fill is missing native amount, time, or stable identity")
+        encoded = json.dumps(asdict(fill), sort_keys=True)
+        previous = self._db.execute("SELECT intent_id,payload FROM dispatch_fills WHERE fill_id=?", (fill.id,)).fetchone()
+        if previous is not None and tuple(previous) != (intent_id, encoded):
+            raise ValueError("Broker fill ID is already bound to different evidence")
+        self._db.execute("INSERT OR IGNORE INTO dispatch_fills VALUES (?,?,?)", (fill.id, intent_id, encoded))
