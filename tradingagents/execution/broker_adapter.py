@@ -7,6 +7,7 @@ from datetime import datetime, timedelta, timezone
 from decimal import Decimal, InvalidOperation
 import json
 from pathlib import Path
+import re
 import sqlite3
 from typing import Protocol
 
@@ -52,6 +53,16 @@ def _money(value: str) -> Decimal:
     if not result.is_finite() or result < 0:
         raise ValueError("Expected finite nonnegative decimal amount")
     return result
+
+
+def _clock_floor(local, provider_timestamp):
+    """Compare a local instant at the precision actually reported by the broker."""
+    match = re.search(r"T\d{2}:\d{2}:\d{2}(?:[.,](\d{1,6}))?", provider_timestamp)
+    if not match:
+        return local
+    digits = len(match[1] or "")
+    step = 10 ** (6 - digits)
+    return local.replace(microsecond=local.microsecond // step * step)
 
 
 @dataclass(frozen=True)
@@ -129,7 +140,7 @@ class BrokerDispatcher:
             );
             CREATE TABLE IF NOT EXISTS dispatch_intents(
                 id TEXT PRIMARY KEY, payload TEXT NOT NULL, status TEXT NOT NULL, order_id TEXT UNIQUE,
-                filled TEXT NOT NULL DEFAULT '0', observed_at TEXT, submitted_at TEXT
+                filled TEXT NOT NULL DEFAULT '0', observed_at TEXT, submitted_at TEXT, last_fill_seen_at TEXT
             );
             CREATE TABLE IF NOT EXISTS dispatch_observations(
                 intent_id TEXT NOT NULL, observed_at TEXT NOT NULL, payload TEXT NOT NULL,
@@ -138,12 +149,21 @@ class BrokerDispatcher:
             CREATE TABLE IF NOT EXISTS dispatch_fills(
                 fill_id TEXT PRIMARY KEY, intent_id TEXT NOT NULL, payload TEXT NOT NULL
             );
+            CREATE TABLE IF NOT EXISTS dispatch_observation_events(
+                intent_id TEXT NOT NULL, observed_at TEXT NOT NULL, payload TEXT NOT NULL,
+                PRIMARY KEY(intent_id, observed_at, payload)
+            );
         """)
         binding = (adapter.scope, adapter.kind, adapter.mode, adapter.market)
         with self._db:
             self._db.execute("BEGIN IMMEDIATE")
-            if "submitted_at" not in {row[1] for row in self._db.execute("PRAGMA table_info(dispatch_intents)")}:
+            columns = {row[1] for row in self._db.execute("PRAGMA table_info(dispatch_intents)")}
+            if "submitted_at" not in columns:
                 self._db.execute("ALTER TABLE dispatch_intents ADD COLUMN submitted_at TEXT")
+            if "last_fill_seen_at" not in columns:
+                self._db.execute("ALTER TABLE dispatch_intents ADD COLUMN last_fill_seen_at TEXT")
+                self._db.execute("UPDATE dispatch_intents SET last_fill_seen_at=observed_at WHERE CAST(filled AS REAL)>0")
+            self._db.execute("INSERT OR IGNORE INTO dispatch_observation_events SELECT * FROM dispatch_observations")
             self._db.execute("INSERT OR IGNORE INTO broker_scope (id,scope,kind,mode,market,epoch) VALUES (1,?,?,?,?,0)",
                              binding)
             if tuple(self._db.execute("SELECT scope,kind,mode,market FROM broker_scope").fetchone()) != binding:
@@ -211,9 +231,7 @@ class BrokerDispatcher:
             now, observed = self._now(), _stamp(account.observed_at)
             if not timedelta(0) <= now - observed <= timedelta(seconds=max_age_seconds) or _stamp(intent.expires_at) <= now:
                 raise ValueError("Account proof or intent is stale")
-            last_fill = self._db.execute(
-                "SELECT MAX(observed_at) FROM dispatch_intents WHERE filled NOT IN ('0','0.0')"
-            ).fetchone()[0]
+            last_fill = self._db.execute("SELECT MAX(last_fill_seen_at) FROM dispatch_intents").fetchone()[0]
             if last_fill and observed <= _stamp(last_fill):
                 raise ValueError("Account proof must follow the latest fill")
             rows = self._db.execute("SELECT payload,status,filled FROM dispatch_intents WHERE status NOT IN ('FILLED','CANCELED','REJECTED')").fetchall()
@@ -296,7 +314,7 @@ class BrokerDispatcher:
         if row is None or (row["order_id"] and row["order_id"] != order.order_id):
             raise ValueError("Unbound broker order")
         submitted = _stamp(row["submitted_at"]) if row["submitted_at"] else None
-        if submitted is not None and observed < submitted:
+        if submitted is not None and observed < _clock_floor(submitted, order.observed_at):
             raise ValueError("Broker evidence predates the durable submission clock")
         quantity = _money(json.loads(row["payload"])["quantity"])
         filled = _money(order.filled_quantity)
@@ -304,15 +322,20 @@ class BrokerDispatcher:
                 or (status == "PARTIAL" and not filled) or (status in {"OPEN", "REJECTED"} and filled)):
             raise ValueError("Order fill is inconsistent with its requested quantity")
         data = asdict(order)
+        data["observed_at"] = observed.isoformat()
+        data["filled_quantity"] = str(filled)
         data["fills"] = sorted(data["fills"], key=lambda fill: fill["id"])
         encoded = json.dumps(data, sort_keys=True)
         if row["observed_at"] and observed <= _stamp(row["observed_at"]):
-            old = self._db.execute("SELECT payload FROM dispatch_observations WHERE intent_id=? AND observed_at=?",
-                                   (intent_id, observed.isoformat())).fetchone()
-            if old and old[0] == encoded:
+            old = self._db.execute("SELECT 1 FROM dispatch_observation_events WHERE intent_id=? AND observed_at=? AND payload=?",
+                                   (intent_id, observed.isoformat(), encoded)).fetchone()
+            if old:
                 return row["status"]
-            raise ValueError("Conflicting or out-of-order broker evidence")
-        if filled < _money(row["filled"]) or row["status"] in {"FILLED", "CANCELED", "REJECTED"}:
+            if observed < _stamp(row["observed_at"]):
+                raise ValueError("Conflicting or out-of-order broker evidence")
+        previous_fill = _money(row["filled"])
+        same_execution = (status, filled) == (row["status"], previous_fill)
+        if filled < previous_fill or (row["status"] in {"FILLED", "CANCELED", "REJECTED"} and not same_execution):
             raise ValueError("Broker execution state cannot regress")
         with self._db:
             self._db.execute("BEGIN IMMEDIATE")
@@ -322,16 +345,17 @@ class BrokerDispatcher:
             cumulative = sum((_money(json.loads(row[0])["quantity"]) for row in evidence), Decimal())
             if cumulative != filled:
                 raise ValueError("Order cumulative quantity lacks matching durable fill identifiers")
-            self._db.execute("INSERT INTO dispatch_observations VALUES (?,?,?)",
+            self._db.execute("INSERT INTO dispatch_observation_events VALUES (?,?,?)",
                              (intent_id, observed.isoformat(), encoded))
-            self._db.execute("UPDATE dispatch_intents SET status=?,order_id=?,filled=?,observed_at=? WHERE id=?",
-                             (status, order.order_id, str(filled), observed.isoformat(), intent_id))
+            last_fill = observed.isoformat() if filled > previous_fill else row["last_fill_seen_at"]
+            self._db.execute("UPDATE dispatch_intents SET status=?,order_id=?,filled=?,observed_at=?,last_fill_seen_at=? WHERE id=?",
+                             (status, order.order_id, str(filled), observed.isoformat(), last_fill, intent_id))
         return status
 
     def _record_fill(self, intent_id, submitted, observed, fill):
         if (not isinstance(fill.id, str) or not fill.id.strip() or fill.currency != self._native_currency()
                 or not _money(fill.quantity) or not _money(fill.native_price)
-                or submitted is None or not submitted <= _stamp(fill.occurred_at) <= observed):
+                or submitted is None or not _clock_floor(submitted, fill.occurred_at) <= _stamp(fill.occurred_at) <= observed):
             raise ValueError("Broker fill is missing native amount, time, or stable identity")
         encoded = json.dumps(asdict(fill), sort_keys=True)
         previous = self._db.execute("SELECT intent_id,payload FROM dispatch_fills WHERE fill_id=?", (fill.id,)).fetchone()
