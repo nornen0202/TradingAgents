@@ -9,7 +9,7 @@ from tradingagents.execution import demo_runtime as runtime, demo_token_cache, k
 from tradingagents.execution.kis_demo import DemoCredentials, KisDemoClient, RequestPacer
 from tradingagents.execution.kis_demo_us import KisDemoUSClient
 from tradingagents.execution.kis_strategy_limits import configured_limits, size_with_native_limits
-from tradingagents.execution.kis_strategy_v2 import EVIDENCE_SCHEMA
+from tradingagents.execution.kis_strategy_v2 import EVIDENCE_SCHEMA, SETTLEMENT_SCHEMA, _buy_observation
 from tradingagents.execution.paper_policy_v2 import SCHEMA as POLICY_SCHEMA
 from tests.execution.test_demo_runtime import Harness
 
@@ -32,16 +32,45 @@ def configure_v2(root, *, scope, ticker, now, target=.15, observed_at=None, wron
     atomic_write_json(path, {**original, "paper_policy_v2": {market: {"policy": policy, "watchlist": watchlist}}})
     clock = (observed_at or now).isoformat()
     receipt = root / f"{market.lower()}-v2-evidence.json"
+    settlement = root / f"{market.lower()}-v2-settlement.json"
+    benchmark = root / f"{market.lower()}-v2-benchmark.json"
+    benchmark_row = {"market": market, "unit": "index_points", "level": 3000, "event_at": clock,
+                     "observed_at": clock, "source": f"KIS_{market}_INDEX",
+                     "symbol": "WRONG" if wrong_benchmark else "0001" if market == "KR" else "SPX"}
+    atomic_write_json(settlement, {"schema": SETTLEMENT_SCHEMA, "account_scope": scope, "market": market,
+        "currency": currency, "observed_at": clock, "settled_cash": 9_000_000})
+    atomic_write_json(benchmark, benchmark_row)
     atomic_write_json(receipt, {"schema": EVIDENCE_SCHEMA, "market": market, "currency": currency,
         "account_scope": scope, "cash_basis": "REVIEWED_SETTLED_CASH", "orders_reconciled": True,
         "portfolio_complete": True, "observed_at": clock, "settlement_observed_at": clock,
         "portfolio_observed_at": clock, "settled_cash": 9_000_000,
-        "settlement_source_sha256": hashlib.sha256(b"synthetic reconciled cash receipt").hexdigest(),
-        "benchmark": {"market": market, "unit": "index_points", "level": 3000, "event_at": clock,
-                      "observed_at": clock, "source": f"KIS_{market}_INDEX",
-                      "symbol": "WRONG" if wrong_benchmark else "0001" if market == "KR" else "SPX"},
+        "settlement_source_sha256": hashlib.sha256(settlement.read_bytes()).hexdigest(),
+        "benchmark_source_sha256": hashlib.sha256(benchmark.read_bytes()).hexdigest(), "benchmark": benchmark_row,
         "target_weights": {ticker: target}})
     return receipt
+
+
+def test_reviewed_v2_receipt_requires_both_exact_source_documents(tmp_path):
+    from datetime import datetime
+    now = datetime.fromisoformat("2026-10-22T10:01:00+09:00")
+    scope, ticker = "scoped-fixture", "005930.KS"
+    atomic_write_json(tmp_path / "enabled.json", {})
+    args = (tmp_path, "KR", "KRW", scope, ticker, now, 120, 10_000_000)
+    receipt = configure_v2(tmp_path, scope=scope, ticker=ticker, now=now)
+    assert _buy_observation(*args)[:2] == ("9000000", .15)
+    settlement = tmp_path / "kr-v2-settlement.json"
+    settlement.write_bytes(settlement.read_bytes() + b"\n")
+    with pytest.raises(ValueError, match="bytes differ"):
+        _buy_observation(*args)
+    configure_v2(tmp_path, scope=scope, ticker=ticker, now=now)
+    modified = json.loads(receipt.read_bytes()) | {"settled_cash": 9_100_000}
+    atomic_write_json(receipt, modified)
+    with pytest.raises(ValueError, match="does not match"):
+        _buy_observation(*args)
+    configure_v2(tmp_path, scope=scope, ticker=ticker, now=now)
+    (tmp_path / "kr-v2-benchmark.json").unlink()
+    with pytest.raises(FileNotFoundError):
+        _buy_observation(*args)
 
 
 @pytest.mark.parametrize("market", ["KR", "US"])

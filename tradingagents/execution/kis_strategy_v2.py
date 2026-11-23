@@ -9,6 +9,7 @@ from .experiments import _stamp
 from .paper_policy_v2 import bind_v2_journal, size_v2_candidate
 
 EVIDENCE_SCHEMA = "tradingagents.kis-v2-evidence/v1"
+SETTLEMENT_SCHEMA = "tradingagents.kis-v2-reviewed-settlement/v1"
 _MARKETS = {"KR": ("KRW", "krw"), "US": ("USD", "usd")}
 _BENCHMARKS = {"KR": ("0001", "KIS_KR_INDEX"), "US": ("SPX", "KIS_US_INDEX")}
 
@@ -25,23 +26,39 @@ def configured_v2(config):
     return rows
 
 
-def _buy_observation(path, market, currency, scope, ticker, now, seconds, account_cash):
+def _reviewed_document(path, reference=None):
     with path.open("rb") as stream:
         raw = stream.read(128_001)
     if len(raw) > 128_000:
         raise ValueError("KIS V2 evidence exceeds its private read bound")
-    evidence = json.loads(raw.decode("utf-8-sig"))
+    digest = hashlib.sha256(raw).hexdigest()
+    if reference is not None and reference != digest:
+        raise ValueError("KIS V2 source bytes differ from the reviewed receipt")
+    return json.loads(raw.decode("utf-8-sig")), digest
+
+
+def _buy_observation(root, market, currency, scope, ticker, now, seconds, account_cash):
+    prefix = market.lower() + "-v2-"
+    evidence, evidence_digest = _reviewed_document(root / (prefix + "evidence.json"))
     if (evidence.get("schema") != EVIDENCE_SCHEMA or evidence.get("market") != market
             or evidence.get("currency") != currency or evidence.get("account_scope") != scope
             or evidence.get("cash_basis") != "REVIEWED_SETTLED_CASH"
             or evidence.get("orders_reconciled") is not True or evidence.get("portfolio_complete") is not True):
         raise ValueError("KIS V2 requires complete scoped cash, order and portfolio evidence")
     market_index = evidence["benchmark"]
-    reference = evidence.get("settlement_source_sha256")
+    settlement_reference = evidence.get("settlement_source_sha256")
+    benchmark_reference = evidence.get("benchmark_source_sha256")
     if (market_index["market"] != market or (market_index["symbol"], market_index["source"]) != _BENCHMARKS[market]
-            or market_index["unit"] != "index_points" or not isinstance(reference, str)
-            or re.fullmatch(r"[0-9a-f]{64}", reference) is None):
+            or market_index["unit"] != "index_points" or any(
+                not isinstance(reference, str) or re.fullmatch(r"[0-9a-f]{64}", reference) is None
+                for reference in (settlement_reference, benchmark_reference))):
         raise ValueError("KIS V2 lacks a benchmark identity or settlement source digest")
+    settlement, _ = _reviewed_document(root / (prefix + "settlement.json"), settlement_reference)
+    benchmark, _ = _reviewed_document(root / (prefix + "benchmark.json"), benchmark_reference)
+    expected_settlement = {"schema": SETTLEMENT_SCHEMA, "account_scope": scope, "market": market, "currency": currency,
+                           "observed_at": evidence["settlement_observed_at"], "settled_cash": evidence["settled_cash"]}
+    if settlement != expected_settlement or benchmark != market_index:
+        raise ValueError("KIS V2 review does not match its settlement and benchmark sources")
     level = Decimal(str(market_index["level"]))
     if not level.is_finite() or level <= 0:
         raise ValueError("KIS V2 benchmark level is unverified")
@@ -57,7 +74,7 @@ def _buy_observation(path, market, currency, scope, ticker, now, seconds, accoun
     cash = Decimal(str(evidence["settled_cash"]))
     if not cash.is_finite() or not 0 <= cash <= Decimal(str(account_cash)):
         raise ValueError("KIS V2 settled cash exceeds the native balance")
-    return str(cash), evidence["target_weights"][ticker], hashlib.sha256(raw).hexdigest()
+    return str(cash), evidence["target_weights"][ticker], evidence_digest
 
 
 def authorize_v2_size(root, market, settings, candidate, terms, quote, account, state, now):
@@ -76,10 +93,8 @@ def authorize_v2_size(root, market, settings, candidate, terms, quote, account, 
         evaluation = state["evaluation"]
         if evaluation["sample"]["sell_filled_orders"] and not evaluation["settlement_known"]:
             raise ValueError("Prior KIS strategy sales require settlement proof")
-        cash, target, evidence_hash = _buy_observation(
-            root / f"{market.lower()}-v2-evidence.json", market, currency, scope, ticker, now,
-            policy["max_quote_age_seconds"], account[f"cash_{suffix}"],
-        )
+        cash, target, evidence_hash = _buy_observation(root, market, currency, scope, ticker, now,
+            policy["max_quote_age_seconds"], account[f"cash_{suffix}"])
     position = next((row for row in account["positions"] if row["ticker"] == terms["ticker"]), {})
     context = {"market": market, "currency": currency, "scope": scope}
     capacity = {**context, "mode": "isolated_paper", "reconciled": True,
