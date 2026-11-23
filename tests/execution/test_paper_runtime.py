@@ -158,6 +158,34 @@ def test_completed_incomplete_portfolio_cannot_fall_back_to_prior_trade(tmp_path
         assert result["order_counts"]["CANCELLED"] == (1 if publish_at == "before_pending_fill" else 0)
 
 
+def test_coverage_loss_allows_previously_verified_stop_loss_to_reduce_held_risk(tmp_path):
+    archive, state = tmp_path / "archive", tmp_path / "state"
+    current = [AT]
+
+    def held_account(_):
+        holding = {"canonical_ticker": TICKER, "quantity": 2, "available_qty": 2, "market_price_krw": 20000}
+        return account(current[0]) | {"positions": [holding], "account_value_krw": 10_040_000}
+
+    exit_run = source(archive, action="STOP_LOSS_NOW")
+    (exit_run / "portfolio-private/account_snapshot.json").write_text(json.dumps(held_account("kr")))
+    (exit_run / "portfolio-private/proposed_orders.json").write_text(json.dumps({"orders": [
+        {"canonical_ticker": TICKER, "side": "SELL", "estimated_qty": 2},
+    ]}))
+
+    def advance():
+        return advance_market(archive, state, "kr", now=current[0], clock=lambda: current[0], account_loader=held_account,
+            quote_factory=lambda: Quotes(lambda: current[0]), session_resolver=is_open)
+
+    assert advance()["order_counts"]["PENDING"] == 1
+    current[0] += timedelta(seconds=30)
+    missing = source(archive, current[0], name="zz-partial") / "run.json"
+    payload = json.loads(missing.read_text())
+    missing.write_text(json.dumps(payload | {"status": "partial_failure"}))
+    result = advance()
+    assert result["trading_state"] == "REDUCING"
+    assert result["order_counts"] == {"FILLED": 1, "PENDING": 0, "REJECTED": 0, "CANCELLED": 0}
+
+
 @pytest.mark.parametrize("publication", ["complete", "future", "incomplete"])
 def test_publication_during_account_read_uses_latest_completed_original_evidence(tmp_path, publication):
     archive, state = tmp_path / "archive", tmp_path / "state"
