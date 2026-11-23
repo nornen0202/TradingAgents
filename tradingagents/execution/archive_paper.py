@@ -5,6 +5,7 @@ import math
 from pathlib import Path
 from zoneinfo import ZoneInfo
 from .paper import PaperLimits, stamp
+from .session_confirmation import evaluate_plan
 from .sizing import size_paper_order
 
 
@@ -135,12 +136,19 @@ def build_step(run: Path, now: str, limits: PaperLimits | None = None):
             else bundle["generated_at"]
         )
         contract_path = run / "tickers" / ticker / "execution_contract.json"
+        entry_confirmation = None
         if contract_path.exists():
-            expiry = json.loads(contract_path.read_text(encoding="utf-8-sig")).get(
-                "entry_valid_until"
-            )
+            contract = json.loads(contract_path.read_text(encoding="utf-8-sig"))
+            expiry = contract.get("entry_valid_until")
             if expiry and action == "BUY":
                 valid_until = min(stamp(valid_until), stamp(expiry)).isoformat()
+            if action == "BUY" and "entry_confirmation_v2" in contract:
+                entry_confirmation = _entry_confirmation(
+                    contract["entry_confirmation_v2"], ticker, market, generated, evaluated,
+                )
+                ready = ready and entry_confirmation["paper_candidate_ready"]
+                if entry_confirmation["paper_candidate_ready"]:
+                    valid_until = min(stamp(valid_until), stamp(entry_confirmation["candidate_valid_until"])).isoformat()
         signals.append(
             {
                 "signal_id": f"{bundle.get('analysis_source_run_id')}:{ticker}:{action}",
@@ -155,7 +163,28 @@ def build_step(run: Path, now: str, limits: PaperLimits | None = None):
                 "execution_ready": ready,
                 "available_at": bundle["generated_at"],
                 "valid_until": valid_until,
+                **({"entry_confirmation": entry_confirmation} if entry_confirmation is not None else {}),
             }
         )
     return snapshot, {"now": local_now, "quotes": quotes, "signals": signals}, market
+
+
+def _entry_confirmation(evidence, ticker, market, generated, evaluated):
+    try:
+        plan = evidence["plan"]
+        currency = "KRW" if market == "kr" else "USD"
+        if (plan["ticker"], plan["market"], plan["currency"]) != (ticker, market.upper(), currency):
+            raise ValueError("Confirmation scope mismatch")
+        observations = {name: evidence.get(name) for name in ("regular_close", "official_open", "live_quote")}
+        # A broker observation that arrived after the completed decision may
+        # refresh execution quotes, but cannot change that decision's proof.
+        for name, row in tuple(observations.items()):
+            try:
+                if row is not None and stamp(row["observed_at"]) > generated:
+                    observations[name] = None
+            except (KeyError, TypeError, ValueError, OverflowError):
+                observations[name] = None
+        return evaluate_plan(plan, analysis_as_of=evaluated, **observations)
+    except (AttributeError, IndexError, KeyError, TypeError, ValueError, OverflowError):
+        return {"paper_candidate_ready": False, "reason": "SESSION_CONFIRMATION_UNVERIFIED"}
 
