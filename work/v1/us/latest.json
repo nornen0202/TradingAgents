@@ -1,13 +1,13 @@
 {
   "schema": "tradingagents.work-context/v1",
   "surface": "us",
-  "event_id": "us:4e21e2ecf10526012acb1deffc26b113",
+  "event_id": "us:551a9bc24974eabaed3bcfc40eddb7a4",
   "prompt_contract_version": "market-work-v13-us",
   "prompt_sha256": "a577e06278002eebd491db51786019336a00da570d5c47886bad031cf01cf7fe",
   "skill_sha256": "2fef99f1af403675549a13813e0fe5597a241a964affeada56e9f64e9f398fe9",
   "task_manifest_sha256": "6fbafadc2971d1a908c1bbc1fa29e2adaf0ca6be956768f2f9eb0abf0061428e",
   "workflow_contract_sha256": "c43e03e786420c6d542d346e0a06ae138ac11850adb820262e9f349ae6ce8b9a",
-  "source_sha256": "1ab0d5e070cd4746f17dd68b73aa560ac9abbde47d65db76fc06f7c4a8a4a3b7",
+  "source_sha256": "8f885a5ac0da85c60ce23534530f304dd29d524185c2dca4a2e382731d241744",
   "body": {
     "kind": "market",
     "market": "US",
@@ -258,7 +258,7 @@
           }
         ],
         "research_calendar_verified": true,
-        "latest_regular_close_at": "2026-11-20T21:00:00+00:00",
+        "latest_regular_close_at": "2026-11-23T21:00:00+00:00",
         "research_does_not_enable_execution": true
       },
       "latest_attempt": {
@@ -1680,15 +1680,15 @@
         "source_health": "OK",
         "coverage": {
           "total_unique_events": 932,
-          "window_events": 25,
+          "window_events": 23,
           "transmitted_events": 12,
           "truncated": true,
-          "oldest_occurred_at": "2026-11-20T23:00:38+00:00",
+          "oldest_occurred_at": "2026-11-21T01:00:37+00:00",
           "newest_occurred_at": "2026-11-22T21:46:51+00:00",
-          "available_events_before_context_cap": 25,
+          "available_events_before_context_cap": 23,
           "context_event_cap": 12,
-          "omitted_events": 13,
-          "omitted_due_to_context_cap": 13,
+          "omitted_events": 11,
+          "omitted_due_to_context_cap": 11,
           "omitted_before_context_selection": 0
         },
         "events": [
@@ -1985,122 +1985,6 @@
                 {
                   "ticker": "CRWV",
                   "name": "코어위브",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                }
-              ]
-            }
-          },
-          {
-            "event_key": "1PvkBMtMkyk",
-            "content_sha256": "4c9ab0245182251090f3131d45b5b0dc60f7d9a0880eac78f604e4a97a6b621b",
-            "occurred_at": "2026-11-20T23:00:38+00:00",
-            "relevance": {
-              "tickers": [
-                "9984",
-                "005930",
-                "000660",
-                "NVDA",
-                "ORCL"
-              ],
-              "markets": [
-                "US",
-                "KR"
-              ],
-              "themes": [],
-              "match_basis": "verified_entities",
-              "matched_tickers": [
-                "NVDA"
-              ],
-              "market_match": true,
-              "score": 120
-            },
-            "summary": {
-              "video_id": "1PvkBMtMkyk",
-              "title": "실적은 좋은데 주가는 왜? 삼전닉스에 무슨 일이...  |  김열매 더큐리어스 대표 [주말인터뷰]",
-              "channel": "삼프로TV 3PROTV",
-              "source_url": "https://www.youtube.com/watch?v=1PvkBMtMkyk",
-              "claim_status_summary": {
-                "unverified": 10,
-                "asr_uncertain": 1,
-                "partially_supported": 1
-              },
-              "claims": [
-                {
-                  "claim_id": "C1",
-                  "claim_text": "영상은 앤트로픽이 상장해 공모가 83달러, 첫날 시초가 100달러 이상, 종가 90달러대를 기록했고, 목표 1,000억 달러 중 약 900억 달러를 조달했으며 보호예수가 거의 없었다고 설명한다.",
-                  "status": "unverified",
-                  "confidence": 0.15,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "첫날 수익률, 공모 자금 유입, 보호예수 해제에 따른 매도 압력은 확인 전 투자 판단의 근거로 삼기 어렵다."
-                },
-                {
-                  "claim_id": "C2",
-                  "claim_text": "영상은 2025년 매출 45억 달러, 2026년 약 500억 달러, 2027년 예상 약 1,000억 달러, 2026년 10월 ARR 810억 달러, 연 100만 달러 이상 지출하는 기업 고객 1,900개 초과를 제시한다. 성장률 둔화가 2조 달러 공모 가치에 못 미친 이유였고, IPO가 약 1조 달러에 이르는 데이터센터 약정의 단기 부담을 덜었다는 해석도 제시한다.",
-                  "status": "asr_uncertain",
-                  "confidence": 0.05,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "12개월 내 계약상 지급액과 공모 순유입액을 확인하기 전에는 추가 조달 필요성이 해소됐다고 볼 수 없다."
-                },
-                {
-                  "claim_id": "C3",
-                  "claim_text": "영상은 스페이스X가 6월에 상장해 녹화 시점에도 공모가를 웃돌았으나 나스닥은 상장 후 하락했고, 앤트로픽 상장 당일에도 하락했다고 설명한다. 대형 공모로 다른 종목의 수급이 약해졌다는 것은 별도의 인과 가설이다.",
-                  "status": "unverified",
-                  "confidence": 0.05,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "지수 하락을 IPO 수급 탓으로 돌리기 전에 거래대금·시장 폭·펀드 흐름을 살피고 금리·실적 등 같은 기간의 요인과 비교해야 한다."
-                },
-                {
-                  "claim_id": "C4",
-                  "claim_text": "영상은 다모다란의 2036년 기본 시나리오를 매출 1조 달러·영업이익률 20%대·가치 1.4조~1.5조 달러로 소개한다. 자기자본비용 상향 시 약 1조 달러, 최악은 영업이익률 약 10%와 존속 곤란, 최선은 매출 약 1.5조 달러·영업이익률 40%와 기업가치 4조 달러 이상이라고 전한다. 화이트칼라 임금 40조 달러의 2.5%는 시장 규모 비유다.",
-                  "status": "unverified",
-                  "confidence": 0.08,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "시나리오 수치를 목표가로 읽기보다 경쟁력 유지, 마진, 할인율과 실패 확률에 따라 가치가 얼마나 달라지는지 확인해야 한다."
-                }
-              ],
-              "entities": [
-                {
-                  "ticker": "9984",
-                  "name": "소프트뱅크그룹",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "시장 데이터 조회 실패: no_usable_market_fields"
-                  ]
-                },
-                {
-                  "ticker": "005930",
-                  "name": "삼성전자",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "시장 데이터 조회 실패: no_usable_market_fields"
-                  ]
-                },
-                {
-                  "ticker": "000660",
-                  "name": "SK하이닉스",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "시장 데이터 조회 실패: no_usable_market_fields"
-                  ]
-                },
-                {
-                  "ticker": "NVDA",
-                  "name": "엔비디아",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                },
-                {
-                  "ticker": "ORCL",
-                  "name": "오라클",
                   "status": "unverified",
                   "verification_notes": [
                     "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
@@ -2795,26 +2679,950 @@
                 }
               ]
             }
+          },
+          {
+            "event_key": "vhAlRhO25CA",
+            "content_sha256": "651b4fb9780284f1e4ea3b4f4c8bc4a9348efd3d236ae6a88626544a4c4942b9",
+            "occurred_at": "2026-11-22T11:00:33+00:00",
+            "relevance": {
+              "tickers": [
+                "041510"
+              ],
+              "markets": [
+                "KR"
+              ],
+              "themes": [],
+              "match_basis": "verified_entities",
+              "matched_tickers": [],
+              "market_match": false,
+              "score": 0
+            },
+            "summary": {
+              "video_id": "vhAlRhO25CA",
+              "title": "[#찐시황]  “주가폭락한 엔비디아, 반도체 슈퍼호황 끝났나?” AI 투자 전망 하향 충격… 삼전·하닉 더 어떻게 될까? | 미래에셋자산운용 최창규 이사",
+              "channel": "815Money talk",
+              "source_url": "https://www.youtube.com/watch?v=vhAlRhO25CA",
+              "claim_status_summary": {
+                "unverified": 10,
+                "asr_uncertain": 1,
+                "partially_supported": 1
+              },
+              "claims": [
+                {
+                  "claim_id": "C1",
+                  "claim_text": "11월 20일 미국 주요 지수와 AI 반도체·데이터센터주, EWY가 급락한 반면 월마트·AT&T·버라이즌·코카콜라는 상승했고, 나스닥은 주간 10% 이상 하락했다.",
+                  "status": "unverified",
+                  "confidence": 0.1,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "방어주 상대 강세와 실제 자금 이동은 별개다. 확인되지 않은 종가로 업종 기여도나 옵션 만기의 충격을 단정하지 않는다."
+                },
+                {
+                  "claim_id": "C2",
+                  "claim_text": "영상은 젠슨 황 사임과 CFO의 임시 CEO 취임, NVIDIA 관련 SEC 조사 보도, AMD의 중국 기업 대상 서버 펌웨어 제공 의혹과 부인, Google TPU 발주 축소 전망을 언급했다.",
+                  "status": "unverified",
+                  "confidence": 0.05,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "경영진 교체·규제 위반·주문 취소를 확정 사실로 보도하지 않는다."
+                },
+                {
+                  "claim_id": "C3",
+                  "claim_text": "미 상원이 전력 인프라 인허가 법안을 통과시켜 대형 데이터센터의 전력망 비용 부담이 커졌고, 은행의 데이터센터 대출 매각 추진과 Google CDS 프리미엄 상승이 거론됐다.",
+                  "status": "unverified",
+                  "confidence": 0.05,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "비용 배분 조항과 적용 범위, 대출거래 조건, CDS 변동이 확인되기 전에는 업계 자금조달 악화를 단정할 수 없다."
+                },
+                {
+                  "claim_id": "C4",
+                  "claim_text": "한국 투자자의 ‘지지난 주’ 해외증권 결제에서 일부 AI 종목과 기술주 레버리지 ETF 순매수, 일부 개별주와 SGOV 매도가 관찰됐다고 영상은 설명했다.",
+                  "status": "unverified",
+                  "confidence": 0.08,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "한국 투자자의 결제 순매수는 글로벌 ETF 자금 유입과 다르며, 집계만으로 반등 목적이나 SGOV 매각대금의 이동을 입증할 수 없다."
+                }
+              ],
+              "entities": [
+                {
+                  "ticker": "041510",
+                  "name": "에스엠(SM)",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "시장 데이터 조회 실패: no_usable_market_fields"
+                  ]
+                }
+              ]
+            }
           }
         ],
         "execution_eligible": false
       },
       "prism": {
-        "source_health": "EMPTY",
+        "source_health": "OK",
         "coverage": {
-          "total_unique_events": 470,
-          "window_events": 0,
-          "transmitted_events": 0,
+          "total_unique_events": 487,
+          "window_events": 17,
+          "transmitted_events": 17,
           "truncated": false,
-          "oldest_occurred_at": null,
-          "newest_occurred_at": null,
-          "available_events_before_context_cap": 0,
+          "oldest_occurred_at": "2026-11-23T19:39:19+00:00",
+          "newest_occurred_at": "2026-11-23T20:33:01+00:00",
+          "available_events_before_context_cap": 17,
           "context_event_cap": 20,
           "omitted_events": 0,
           "omitted_due_to_context_cap": 0,
           "omitted_before_context_selection": 0
         },
-        "events": [],
+        "events": [
+          {
+            "event_key": "stock_ai_agent:18010",
+            "content_sha256": "b17270cebfe944254724ea09e8467aba4dd18fb2b1f22b136a855a144b6155f1",
+            "occurred_at": "2026-11-23T20:33:01+00:00",
+            "relevance": {
+              "tickers": [
+                "VRSN",
+                "COST",
+                "AAPL",
+                "CCC",
+                "PANW"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "normalized_prism_signals",
+              "matched_tickers": [
+                "AAPL",
+                "COST"
+              ],
+              "market_match": true,
+              "score": 220
+            },
+            "summary": {
+              "message_id": "18010",
+              "posted_at": "2026-11-23T20:33:01+00:00",
+              "source_url": "https://t.me/stock_ai_agent/18010",
+              "preview": "📊 프리즘 US 시뮬레이터 | 실시간 포트폴리오 (2026-11-24 05:32) 🔸 현재 보유: 5/10개 🔸 사용 비중: 3.70/10 슬롯 (분할 매수·시험매수 반영) ✅ 최고 수익: VeriSign, Inc.(VRSN) +1.30% ⚠️ 최저 수익: Costco Wholesale Corporation(COST) -1.29% 🔸 보유 종목: - Apple Inc.(AAPL) [Te...",
+              "signals": [
+                {
+                  "canonical_ticker": "VRSN",
+                  "display_name": "VeriSign, Inc.",
+                  "market": "US",
+                  "source_asof": "2026-11-23T20:33:01+00:00",
+                  "signal_action": "HOLD",
+                  "trigger_type": "telegram_portfolio_snapshot",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "confidence": 0.45,
+                  "warnings": []
+                },
+                {
+                  "canonical_ticker": "COST",
+                  "display_name": "Costco Wholesale Corporation",
+                  "market": "US",
+                  "source_asof": "2026-11-23T20:33:01+00:00",
+                  "signal_action": "HOLD",
+                  "trigger_type": "telegram_portfolio_snapshot",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "confidence": 0.45,
+                  "warnings": []
+                },
+                {
+                  "canonical_ticker": "AAPL",
+                  "display_name": "Apple Inc.",
+                  "market": "US",
+                  "source_asof": "2026-11-23T20:33:01+00:00",
+                  "signal_action": "HOLD",
+                  "trigger_type": "telegram_portfolio_snapshot",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "stop_loss_price": 334.0,
+                  "target_price": 422.86,
+                  "confidence": 0.45,
+                  "warnings": [
+                    "multi_ticker_prices_scoped_to_mention_block"
+                  ]
+                },
+                {
+                  "canonical_ticker": "CCC",
+                  "display_name": "CCC Intelligent Solutions Holdi",
+                  "market": "US",
+                  "source_asof": "2026-11-23T20:33:01+00:00",
+                  "signal_action": "HOLD",
+                  "trigger_type": "telegram_portfolio_snapshot",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "stop_loss_price": 7.57,
+                  "target_price": 9.25,
+                  "confidence": 0.45,
+                  "warnings": [
+                    "multi_ticker_prices_scoped_to_mention_block"
+                  ]
+                },
+                {
+                  "canonical_ticker": "PANW",
+                  "display_name": "Palo Alto Networks, Inc.",
+                  "market": "US",
+                  "source_asof": "2026-11-23T20:33:01+00:00",
+                  "signal_action": "HOLD",
+                  "trigger_type": "telegram_portfolio_snapshot",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "stop_loss_price": 338.09,
+                  "target_price": 426.67,
+                  "confidence": 0.45,
+                  "warnings": [
+                    "multi_ticker_prices_scoped_to_mention_block"
+                  ]
+                }
+              ],
+              "simulation_only": true,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:18007",
+            "content_sha256": "67503ba00dd054770a9f54435054a1a0d4b67ed84de7d5a0fbbc97ba6f933a7b",
+            "occurred_at": "2026-11-23T19:57:30+00:00",
+            "relevance": {
+              "tickers": [
+                "VRSN",
+                "COST",
+                "AAPL"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "normalized_prism_signals",
+              "matched_tickers": [
+                "AAPL",
+                "COST"
+              ],
+              "market_match": true,
+              "score": 220
+            },
+            "summary": {
+              "message_id": "18007",
+              "posted_at": "2026-11-23T19:57:30+00:00",
+              "source_url": "https://t.me/stock_ai_agent/18007",
+              "preview": "📊 프리즘 US 시뮬레이터 | 실시간 포트폴리오 (2026-11-24 04:57) 🔸 현재 보유: 3/10개 🔸 사용 비중: 2.50/10 슬롯 (분할 매수·시험매수 반영) ✅ 최고 수익: VeriSign, Inc.(VRSN) +1.30% ⚠️ 최저 수익: Costco Wholesale Corporation(COST) -1.29% 🔸 보유 종목: - Apple Inc.(AAPL) [Te...",
+              "signals": [
+                {
+                  "canonical_ticker": "VRSN",
+                  "display_name": "VeriSign, Inc.",
+                  "market": "US",
+                  "source_asof": "2026-11-23T19:57:30+00:00",
+                  "signal_action": "HOLD",
+                  "trigger_type": "telegram_portfolio_snapshot",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "confidence": 0.45,
+                  "warnings": []
+                },
+                {
+                  "canonical_ticker": "COST",
+                  "display_name": "Costco Wholesale Corporation",
+                  "market": "US",
+                  "source_asof": "2026-11-23T19:57:30+00:00",
+                  "signal_action": "HOLD",
+                  "trigger_type": "telegram_portfolio_snapshot",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "confidence": 0.45,
+                  "warnings": []
+                },
+                {
+                  "canonical_ticker": "AAPL",
+                  "display_name": "Apple Inc.",
+                  "market": "US",
+                  "source_asof": "2026-11-23T19:57:30+00:00",
+                  "signal_action": "HOLD",
+                  "trigger_type": "telegram_portfolio_snapshot",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "stop_loss_price": 334.0,
+                  "target_price": 422.86,
+                  "confidence": 0.45,
+                  "warnings": [
+                    "multi_ticker_prices_scoped_to_mention_block"
+                  ]
+                }
+              ],
+              "simulation_only": true,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:18004",
+            "content_sha256": "8990b36fc82691455bbd3d1e09222ed2dff61a8c060f7874ae3f235e76005e72",
+            "occurred_at": "2026-11-23T19:57:22+00:00",
+            "relevance": {
+              "tickers": [
+                "LLY"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "normalized_prism_signals",
+              "matched_tickers": [
+                "LLY"
+              ],
+              "market_match": true,
+              "score": 120
+            },
+            "summary": {
+              "message_id": "18004",
+              "posted_at": "2026-11-23T19:57:22+00:00",
+              "source_url": "https://t.me/stock_ai_agent/18004",
+              "preview": "⚠️ 매수 보류: Eli Lilly and Company(LLY) 현재가: $1,361.37 매수 점수: 2/10 결정: 미진입 시장 상황: 보통 약세장 산업군: Healthcare 보류 사유: AI 판단: 미진입 / 점수 부족 (3/5) — AI 사유: 보통 약세장에서 재무 건전성 기준 미달로 펀더멘털 게이트를 통과하지 못했습니다. 유효 점수 3점은 최소 5점 미만이며, 모멘텀 신호...",
+              "signals": [
+                {
+                  "canonical_ticker": "LLY",
+                  "display_name": "Eli Lilly and Company",
+                  "market": "US",
+                  "source_asof": "2026-11-23T19:57:22+00:00",
+                  "signal_action": "NO_ENTRY",
+                  "trigger_type": "telegram_buy_skip",
+                  "trigger_score": 0.2,
+                  "composite_score": 0.2,
+                  "confidence": 0.2,
+                  "warnings": []
+                }
+              ],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:18001",
+            "content_sha256": "98e82ec4f9bbef1a1a0099849e9081de82029c9beb9f850aaee13ffa665e69ed",
+            "occurred_at": "2026-11-23T19:51:03+00:00",
+            "relevance": {
+              "tickers": [
+                "LLY"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "normalized_prism_signals",
+              "matched_tickers": [
+                "LLY"
+              ],
+              "market_match": true,
+              "score": 120
+            },
+            "summary": {
+              "message_id": "18001",
+              "posted_at": "2026-11-23T19:51:03+00:00",
+              "source_url": "https://t.me/stock_ai_agent/18001",
+              "preview": "📊 Eli Lilly and Company (LLY) O'Neil 인사이트 차트의 베이스/피벗/RS 주석을 함께 참고하세요. ※ 보조 참고용 · 투자 권유 아님",
+              "signals": [
+                {
+                  "canonical_ticker": "LLY",
+                  "display_name": "Eli Lilly and Company",
+                  "market": "US",
+                  "source_asof": "2026-11-23T19:51:03+00:00",
+                  "signal_action": "WATCH",
+                  "trigger_type": "telegram_oneil_insight",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "confidence": 0.45,
+                  "warnings": []
+                }
+              ],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:17998",
+            "content_sha256": "1c13743b0c5770692057825462eaa41e74a2c2e1ddac2efcbc4a1ca33360f48c",
+            "occurred_at": "2026-11-23T19:50:25+00:00",
+            "relevance": {
+              "tickers": [
+                "LLY"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "normalized_prism_signals",
+              "matched_tickers": [
+                "LLY"
+              ],
+              "market_match": true,
+              "score": 120
+            },
+            "summary": {
+              "message_id": "17998",
+              "posted_at": "2026-11-23T19:50:25+00:00",
+              "source_url": "https://t.me/stock_ai_agent/17998",
+              "preview": "",
+              "signals": [
+                {
+                  "canonical_ticker": "LLY",
+                  "display_name": "Eli Lilly and Company",
+                  "market": "US",
+                  "source_asof": "2026-11-23T19:50:25+00:00",
+                  "signal_action": "WATCH",
+                  "trigger_type": "telegram_pdf_report",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "confidence": 0.45,
+                  "warnings": []
+                }
+              ],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:17995",
+            "content_sha256": "524dff412782584781d93f90228d454a19c68fcc1c66104223261a5c36454cc7",
+            "occurred_at": "2026-11-23T19:49:59+00:00",
+            "relevance": {
+              "tickers": [
+                "LLY"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "normalized_prism_signals",
+              "matched_tickers": [
+                "LLY"
+              ],
+              "market_match": true,
+              "score": 120
+            },
+            "summary": {
+              "message_id": "17995",
+              "posted_at": "2026-11-23T19:49:59+00:00",
+              "source_url": "https://t.me/stock_ai_agent/17995",
+              "preview": "📊 Eli Lilly(LLY) — 당뇨·비만 치료제를 비롯한 의약품을 개발·판매하는 글로벌 제약사입니다. 빠른 매출 성장과 높은 수익성이 강점이지만, 높은 밸류에이션과 약해진 단기 주가 흐름이 공존합니다. 💰 거래 현황 (2026.11.23 미 동부시간 오후 2:39 관측치; 확정 종가 아님) - 가격: $1,362.61 - 전일 종가($1,347.11) 대비 +1.15% (관측가 기준...",
+              "signals": [
+                {
+                  "canonical_ticker": "LLY",
+                  "display_name": "Eli Lilly",
+                  "market": "US",
+                  "source_asof": "2026-11-23T19:49:59+00:00",
+                  "signal_action": "UNKNOWN",
+                  "trigger_type": "telegram_message",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "confidence": 0.45,
+                  "warnings": []
+                }
+              ],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:17994",
+            "content_sha256": "d4dc5a2e2597efb07c21aca5fe30b2cd04aa39228732a7c5a7657ef2787b24ba",
+            "occurred_at": "2026-11-23T19:39:19+00:00",
+            "relevance": {
+              "tickers": [
+                "LLY",
+                "MRNA",
+                "TSLA"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "normalized_prism_signals",
+              "matched_tickers": [
+                "LLY"
+              ],
+              "market_match": true,
+              "score": 120
+            },
+            "summary": {
+              "message_id": "17994",
+              "posted_at": "2026-11-23T19:39:19+00:00",
+              "source_url": "https://t.me/stock_ai_agent/17994",
+              "preview": "🔔 미국주식 오후 프리즘 시그널 얼럿 📅 2026.11.23 오후 분석 포착된 관심종목 🤖 프리즘봇의 가상 포트폴리오 운용 과정을 투명하게 공개합니다. 실제 매수 권유가 아닙니다. 🧭 장기추세: 온건 약세 | 스윙: 단기 조정 | 실행기준: 온건 약세 | 선정: 탑다운 1종목 + 바텀업 2종목 🧭 오늘 테마 흐름 미국 1,019종목 · 전일 종가 대비 · 테마별 중앙값 📈 강한 테마 1...",
+              "signals": [
+                {
+                  "canonical_ticker": "LLY",
+                  "display_name": "Eli Lilly and Company",
+                  "market": "US",
+                  "source_asof": "2026-11-23T19:39:19+00:00",
+                  "signal_action": "WATCH",
+                  "trigger_type": "telegram_signal_alert",
+                  "trigger_score": 0.96,
+                  "composite_score": 0.96,
+                  "confidence": 0.96,
+                  "warnings": []
+                },
+                {
+                  "canonical_ticker": "MRNA",
+                  "display_name": "Moderna, Inc.",
+                  "market": "US",
+                  "source_asof": "2026-11-23T19:39:19+00:00",
+                  "signal_action": "WATCH",
+                  "trigger_type": "telegram_signal_alert",
+                  "trigger_score": 0.89,
+                  "composite_score": 0.89,
+                  "confidence": 0.89,
+                  "warnings": []
+                },
+                {
+                  "canonical_ticker": "TSLA",
+                  "display_name": "Tesla, Inc.",
+                  "market": "US",
+                  "source_asof": "2026-11-23T19:39:19+00:00",
+                  "signal_action": "WATCH",
+                  "trigger_type": "telegram_signal_alert",
+                  "trigger_score": 0.87,
+                  "composite_score": 0.87,
+                  "confidence": 0.87,
+                  "warnings": []
+                }
+              ],
+              "simulation_only": true,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:18009",
+            "content_sha256": "969e179750c55352de1a86a5414af0320ffa218b9e0684fec80e07768a99b26f",
+            "occurred_at": "2026-11-23T20:32:58+00:00",
+            "relevance": {
+              "tickers": [
+                "PANW"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "normalized_prism_signals",
+              "matched_tickers": [],
+              "market_match": true,
+              "score": 20
+            },
+            "summary": {
+              "message_id": "18009",
+              "posted_at": "2026-11-23T20:32:58+00:00",
+              "source_url": "https://t.me/stock_ai_agent/18009",
+              "preview": "📈 신규 매수 | Palo Alto Networks, Inc. (PANW) 💵 매수가 $355.54 🎯 목표가 $426.67 (+20.0%) ⛔ 손절가 $338.09 (-4.9%, 장중 이탈 시 즉시 매도) 🏷 업종 미확인 · 중기 🧩 분할 매수: 1슬롯의 40%로 시작 • 증액 조건은 다음 보유 점검에서 정합니다 • 손절 시 전량 매도 🔁 재진입 매수 (20일선 회복 매수, 1/3번째...",
+              "signals": [
+                {
+                  "canonical_ticker": "PANW",
+                  "display_name": "신규 매수 | Palo Alto Networks, Inc.",
+                  "market": "US",
+                  "source_asof": "2026-11-23T20:32:58+00:00",
+                  "signal_action": "BUY",
+                  "trigger_type": "telegram_message",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "stop_loss_price": 338.09,
+                  "target_price": 426.67,
+                  "confidence": 0.45,
+                  "warnings": []
+                }
+              ],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:18008",
+            "content_sha256": "20d1485a06a5645ccd213e6e347823a263460f59cdc283c305d7e2b5df22f7b6",
+            "occurred_at": "2026-11-23T20:32:55+00:00",
+            "relevance": {
+              "tickers": [
+                "CCC"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "normalized_prism_signals",
+              "matched_tickers": [],
+              "market_match": true,
+              "score": 20
+            },
+            "summary": {
+              "message_id": "18008",
+              "posted_at": "2026-11-23T20:32:55+00:00",
+              "source_url": "https://t.me/stock_ai_agent/18008",
+              "preview": "📈 신규 매수 | CCC Intelligent Solutions Holdi (CCC) 💵 매수가 $7.71 🎯 목표가 $9.25 (+20.0%) ⛔ 손절가 $7.57 (-1.7%, 장중 이탈 시 즉시 매도) 🏷 업종 미확인 · 중기 🧩 분할 매수: 1슬롯의 80%로 시작 • 증액 조건은 다음 보유 점검에서 정합니다 • 손절 시 전량 매도 🔁 재진입 매수 (20일선 회복 매수, 1/3번째...",
+              "signals": [
+                {
+                  "canonical_ticker": "CCC",
+                  "display_name": "신규 매수 | CCC Intelligent Solutions Holdi",
+                  "market": "US",
+                  "source_asof": "2026-11-23T20:32:55+00:00",
+                  "signal_action": "BUY",
+                  "trigger_type": "telegram_message",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "stop_loss_price": 7.57,
+                  "target_price": 9.25,
+                  "confidence": 0.45,
+                  "warnings": []
+                }
+              ],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:18006",
+            "content_sha256": "8d44f556a554715639e6b5f736264b26cc916e9f3f272077ae3fc98d83e36e0a",
+            "occurred_at": "2026-11-23T19:57:28+00:00",
+            "relevance": {
+              "tickers": [
+                "TSLA"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "normalized_prism_signals",
+              "matched_tickers": [],
+              "market_match": true,
+              "score": 20
+            },
+            "summary": {
+              "message_id": "18006",
+              "posted_at": "2026-11-23T19:57:28+00:00",
+              "source_url": "https://t.me/stock_ai_agent/18006",
+              "preview": "⚠️ 매수 보류: Tesla, Inc.(TSLA) 현재가: $386.63 매수 점수: 2/10 결정: 미진입 시장 상황: 보통 약세장 산업군: Consumer Cyclical 보류 사유: AI 판단: 미진입 / 점수 부족 (2/5) — AI 사유: 성장성 기준 미달로 보통 약세장의 필수 펀더멘털 게이트를 통과하지 못합니다. 유효점수 2점은 최소 5점 미만이고, 장중 상승 트리거로 인정되...",
+              "signals": [
+                {
+                  "canonical_ticker": "TSLA",
+                  "display_name": "Tesla, Inc.",
+                  "market": "US",
+                  "source_asof": "2026-11-23T19:57:28+00:00",
+                  "signal_action": "NO_ENTRY",
+                  "trigger_type": "telegram_buy_skip",
+                  "trigger_score": 0.2,
+                  "composite_score": 0.2,
+                  "confidence": 0.2,
+                  "warnings": []
+                }
+              ],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:18005",
+            "content_sha256": "a7567be2a5cb38be437040f4518280b95a6d0b797ad9ece6acc7083fb210ea5a",
+            "occurred_at": "2026-11-23T19:57:25+00:00",
+            "relevance": {
+              "tickers": [
+                "MRNA"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "normalized_prism_signals",
+              "matched_tickers": [],
+              "market_match": true,
+              "score": 20
+            },
+            "summary": {
+              "message_id": "18005",
+              "posted_at": "2026-11-23T19:57:25+00:00",
+              "source_url": "https://t.me/stock_ai_agent/18005",
+              "preview": "⚠️ 매수 보류: Moderna, Inc.(MRNA) 현재가: $209.47 매수 점수: 2/10 결정: 미진입 시장 상황: 보통 약세장 산업군: Healthcare 보류 사유: AI 판단: 미진입 / 점수 부족 (2/5) — AI 사유: 성장성 기준 미달로 보통 약세장의 필수 펀더멘털 게이트를 통과하지 못합니다. 현재가가 하락 중인 20일선보다 7.2% 낮아 하락 추세 차단 조건에도...",
+              "signals": [
+                {
+                  "canonical_ticker": "MRNA",
+                  "display_name": "Moderna, Inc.",
+                  "market": "US",
+                  "source_asof": "2026-11-23T19:57:25+00:00",
+                  "signal_action": "NO_ENTRY",
+                  "trigger_type": "telegram_buy_skip",
+                  "trigger_score": 0.2,
+                  "composite_score": 0.2,
+                  "confidence": 0.2,
+                  "warnings": []
+                }
+              ],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:18003",
+            "content_sha256": "ae85f8c70fbec6401f7cd43effbfc30f4c104f8aa6ff1811b1083276cfcd32a0",
+            "occurred_at": "2026-11-23T19:51:33+00:00",
+            "relevance": {
+              "tickers": [
+                "TSLA"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "normalized_prism_signals",
+              "matched_tickers": [],
+              "market_match": true,
+              "score": 20
+            },
+            "summary": {
+              "message_id": "18003",
+              "posted_at": "2026-11-23T19:51:33+00:00",
+              "source_url": "https://t.me/stock_ai_agent/18003",
+              "preview": "📊 Tesla, Inc. (TSLA) O'Neil 인사이트 차트의 베이스/피벗/RS 주석을 함께 참고하세요. ※ 보조 참고용 · 투자 권유 아님",
+              "signals": [
+                {
+                  "canonical_ticker": "TSLA",
+                  "display_name": "Tesla, Inc.",
+                  "market": "US",
+                  "source_asof": "2026-11-23T19:51:33+00:00",
+                  "signal_action": "WATCH",
+                  "trigger_type": "telegram_oneil_insight",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "confidence": 0.45,
+                  "warnings": []
+                }
+              ],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:18002",
+            "content_sha256": "2d16edbb917ba1afc4426c6764dcb77463a9d8084986140a8368371af25d2d73",
+            "occurred_at": "2026-11-23T19:51:21+00:00",
+            "relevance": {
+              "tickers": [
+                "MRNA"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "normalized_prism_signals",
+              "matched_tickers": [],
+              "market_match": true,
+              "score": 20
+            },
+            "summary": {
+              "message_id": "18002",
+              "posted_at": "2026-11-23T19:51:21+00:00",
+              "source_url": "https://t.me/stock_ai_agent/18002",
+              "preview": "📊 Moderna, Inc. (MRNA) O'Neil 인사이트 차트의 베이스/피벗/RS 주석을 함께 참고하세요. ※ 보조 참고용 · 투자 권유 아님",
+              "signals": [
+                {
+                  "canonical_ticker": "MRNA",
+                  "display_name": "Moderna, Inc.",
+                  "market": "US",
+                  "source_asof": "2026-11-23T19:51:21+00:00",
+                  "signal_action": "WATCH",
+                  "trigger_type": "telegram_oneil_insight",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "confidence": 0.45,
+                  "warnings": []
+                }
+              ],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:18000",
+            "content_sha256": "025512384b9a4fbc62f40a2638acb06ecdcbe6a749d04d7d658a34330374eae5",
+            "occurred_at": "2026-11-23T19:50:40+00:00",
+            "relevance": {
+              "tickers": [
+                "TSLA"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "normalized_prism_signals",
+              "matched_tickers": [],
+              "market_match": true,
+              "score": 20
+            },
+            "summary": {
+              "message_id": "18000",
+              "posted_at": "2026-11-23T19:50:40+00:00",
+              "source_url": "https://t.me/stock_ai_agent/18000",
+              "preview": "",
+              "signals": [
+                {
+                  "canonical_ticker": "TSLA",
+                  "display_name": "Tesla,  Inc.",
+                  "market": "US",
+                  "source_asof": "2026-11-23T19:50:40+00:00",
+                  "signal_action": "WATCH",
+                  "trigger_type": "telegram_pdf_report",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "confidence": 0.45,
+                  "warnings": []
+                }
+              ],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:17999",
+            "content_sha256": "7833995f0d5226c7eb6233c1650d901dbcb26468da9684aa3f9c8842e4544f33",
+            "occurred_at": "2026-11-23T19:50:31+00:00",
+            "relevance": {
+              "tickers": [
+                "MRNA",
+                "PFE",
+                "NVAX"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "normalized_prism_signals",
+              "matched_tickers": [],
+              "market_match": true,
+              "score": 20
+            },
+            "summary": {
+              "message_id": "17999",
+              "posted_at": "2026-11-23T19:50:31+00:00",
+              "source_url": "https://t.me/stock_ai_agent/17999",
+              "preview": "",
+              "signals": [
+                {
+                  "canonical_ticker": "MRNA",
+                  "display_name": "Moderna,  Inc.",
+                  "market": "US",
+                  "source_asof": "2026-11-23T19:50:31+00:00",
+                  "signal_action": "WATCH",
+                  "trigger_type": "telegram_pdf_report",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "confidence": 0.45,
+                  "warnings": []
+                },
+                {
+                  "canonical_ticker": "PFE",
+                  "display_name": "경쟁사와 비교하면 — Pﬁzer",
+                  "market": "US",
+                  "source_asof": "2026-11-23T19:50:31+00:00",
+                  "signal_action": "WATCH",
+                  "trigger_type": "telegram_pdf_report",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "confidence": 0.45,
+                  "warnings": []
+                },
+                {
+                  "canonical_ticker": "NVAX",
+                  "display_name": "Novavax",
+                  "market": "US",
+                  "source_asof": "2026-11-23T19:50:31+00:00",
+                  "signal_action": "WATCH",
+                  "trigger_type": "telegram_pdf_report",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "confidence": 0.45,
+                  "warnings": []
+                }
+              ],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:17997",
+            "content_sha256": "0f7aa2bee532ac386c144ff3bfd47708a93fe20b1cb5571bce0d77aba2fe467b",
+            "occurred_at": "2026-11-23T19:50:17+00:00",
+            "relevance": {
+              "tickers": [
+                "TSLA"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "normalized_prism_signals",
+              "matched_tickers": [],
+              "market_match": true,
+              "score": 20
+            },
+            "summary": {
+              "message_id": "17997",
+              "posted_at": "2026-11-23T19:50:17+00:00",
+              "source_url": "https://t.me/stock_ai_agent/17997",
+              "preview": "📊 Tesla, Inc. (TSLA) — 전기차를 중심으로 에너지 저장·발전, 차량 서비스와 자율주행 사업을 운영합니다. 로보택시·Cybercab 기대가 성장 동력이지만, 실제 수익화는 확인이 필요합니다. 💰 현재가: $386.34 (11/23 관측값, 마감 확정 전) 📈 전일 대비: 약 +11.7% (11/20 $345.82 대비; 당일 확정 등락률은 미확인) 🔄 거래량: 약 3,06...",
+              "signals": [
+                {
+                  "canonical_ticker": "TSLA",
+                  "display_name": "Tesla, Inc.",
+                  "market": "US",
+                  "source_asof": "2026-11-23T19:50:17+00:00",
+                  "signal_action": "UNKNOWN",
+                  "trigger_type": "telegram_message",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "confidence": 0.45,
+                  "warnings": []
+                }
+              ],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:17996",
+            "content_sha256": "6ce108aa477c9d12da1c0b2d92574dd2ef503c6f73c7e5dd18019a4c8d8bf647",
+            "occurred_at": "2026-11-23T19:50:12+00:00",
+            "relevance": {
+              "tickers": [
+                "MRNA"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "normalized_prism_signals",
+              "matched_tickers": [],
+              "market_match": true,
+              "score": 20
+            },
+            "summary": {
+              "message_id": "17996",
+              "posted_at": "2026-11-23T19:50:12+00:00",
+              "source_url": "https://t.me/stock_ai_agent/17996",
+              "preview": "📊 Moderna, Inc. (MRNA) mRNA 기반 백신·치료제를 개발·판매하는 바이오 기업입니다. 코로나19 제품 의존도를 낮추고 독감 백신과 암 치료 후보를 성장동력으로 키우는 중입니다. 💰 주가·거래 동향 (11월 23일 관측치) - 주가 $209.47: 최근 확정 종가 $195.00 대비 약 +7.4%. 다만 11월 23일 수치는 마감 확정 전 관측값입니다. - 거래량: 11...",
+              "signals": [
+                {
+                  "canonical_ticker": "MRNA",
+                  "display_name": "Moderna, Inc.",
+                  "market": "US",
+                  "source_asof": "2026-11-23T19:50:12+00:00",
+                  "signal_action": "UNKNOWN",
+                  "trigger_type": "telegram_message",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "confidence": 0.45,
+                  "warnings": []
+                }
+              ],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          }
+        ],
         "execution_eligible": false
       },
       "receipt_contract": {
@@ -2826,7 +3634,6 @@
               "3LipybrcW5U",
               "Zt0LLfeAGEY",
               "OMvVIVMcSWc",
-              "1PvkBMtMkyk",
               "-VmrR-51UUU",
               "nfa_u6gyF-A",
               "KvflYv1CLuQ",
@@ -2834,33 +3641,52 @@
               "W0hUD7o5OuI",
               "J-_r06cQt3Y",
               "cJj2TjoiV10",
-              "JzwpSnwuH1g"
+              "JzwpSnwuH1g",
+              "vhAlRhO25CA"
             ],
             "coverage": {
               "total_unique_events": 932,
-              "window_events": 25,
+              "window_events": 23,
               "transmitted_events": 12,
               "truncated": true,
-              "oldest_occurred_at": "2026-11-20T23:00:38+00:00",
+              "oldest_occurred_at": "2026-11-21T01:00:37+00:00",
               "newest_occurred_at": "2026-11-22T21:46:51+00:00",
-              "available_events_before_context_cap": 25,
+              "available_events_before_context_cap": 23,
               "context_event_cap": 12,
-              "omitted_events": 13,
-              "omitted_due_to_context_cap": 13,
+              "omitted_events": 11,
+              "omitted_due_to_context_cap": 11,
               "omitted_before_context_selection": 0
             }
           },
           "prism": {
-            "source_health": "EMPTY",
-            "event_keys": [],
+            "source_health": "OK",
+            "event_keys": [
+              "stock_ai_agent:18010",
+              "stock_ai_agent:18007",
+              "stock_ai_agent:18004",
+              "stock_ai_agent:18001",
+              "stock_ai_agent:17998",
+              "stock_ai_agent:17995",
+              "stock_ai_agent:17994",
+              "stock_ai_agent:18009",
+              "stock_ai_agent:18008",
+              "stock_ai_agent:18006",
+              "stock_ai_agent:18005",
+              "stock_ai_agent:18003",
+              "stock_ai_agent:18002",
+              "stock_ai_agent:18000",
+              "stock_ai_agent:17999",
+              "stock_ai_agent:17997",
+              "stock_ai_agent:17996"
+            ],
             "coverage": {
-              "total_unique_events": 470,
-              "window_events": 0,
-              "transmitted_events": 0,
+              "total_unique_events": 487,
+              "window_events": 17,
+              "transmitted_events": 17,
               "truncated": false,
-              "oldest_occurred_at": null,
-              "newest_occurred_at": null,
-              "available_events_before_context_cap": 0,
+              "oldest_occurred_at": "2026-11-23T19:39:19+00:00",
+              "newest_occurred_at": "2026-11-23T20:33:01+00:00",
+              "available_events_before_context_cap": 17,
               "context_event_cap": 20,
               "omitted_events": 0,
               "omitted_due_to_context_cap": 0,

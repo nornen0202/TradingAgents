@@ -1,6 +1,6 @@
 {
   "schema": "tradingagents.public-account-snapshot/v1",
-  "generated_at": "2026-11-23T20:32:32.275397+00:00",
+  "generated_at": "2026-11-23T23:50:23.896510+00:00",
   "page_url": "https://nornen0202.github.io/TradingAgents/account/",
   "json_url": "https://nornen0202.github.io/TradingAgents/account/public.json",
   "currency_note": "All monetary values are normalized to KRW by the KIS account adapter.",
@@ -214,11 +214,11 @@
         }
       ],
       "latest_attempt": {
-        "status": "VALID",
-        "account_as_of": "2026-11-23T15:15:46.707648+09:00",
-        "run_started_at": "2026-11-23T14:33:17.027312+09:00",
-        "run_finished_at": "2026-11-23T15:15:51.154089+09:00",
-        "selected_for_public_account": true
+        "status": "PIPELINE_SKIPPED",
+        "account_as_of": null,
+        "run_started_at": "2026-11-24T07:56:24.698654+09:00",
+        "run_finished_at": "2026-11-24T07:57:10.552125+09:00",
+        "selected_for_public_account": false
       }
     },
     "us": {
@@ -226,20 +226,20 @@
       "label_ko": "해외",
       "label_en": "Overseas",
       "status": "available",
-      "as_of": "2026-11-24T01:16:02.083269+09:00",
-      "run_id": "20261124T000315_local-scheduler-us-overlay_only",
+      "as_of": "2026-11-24T05:23:29.814776+09:00",
+      "run_id": "20261124T030359_local-scheduler-us-overlay_only",
       "snapshot_health": "VALID",
       "currency": "KRW",
       "summary": {
         "position_count": 14,
         "total_purchase_amount_krw": 23598843,
-        "total_market_value_krw": 21320858,
-        "total_unrealized_pnl_krw": -2277985,
-        "total_unrealized_return_pct": -9.653,
+        "total_market_value_krw": 21282731,
+        "total_unrealized_pnl_krw": -2316112,
+        "total_unrealized_return_pct": -9.8145,
         "settled_cash_krw": 0,
         "available_cash_krw": 976652,
         "buying_power_krw": 112426,
-        "total_equity_krw": 22411139
+        "total_equity_krw": 22371769
       },
       "positions": [
         {
@@ -249,11 +249,11 @@
           "quantity": 12.0,
           "sellable_quantity": 12.0,
           "average_cost_krw": 545177,
-          "current_price_krw": 493483,
+          "current_price_krw": 488254,
           "purchase_amount_krw": 6542124,
-          "market_value_krw": 5921805,
-          "unrealized_pnl_krw": -620320,
-          "unrealized_return_pct": -9.4819
+          "market_value_krw": 5859058,
+          "unrealized_pnl_krw": -683067,
+          "unrealized_return_pct": -10.4411
         },
         {
           "ticker": "RSP",
@@ -262,11 +262,11 @@
           "quantity": 11.0,
           "sellable_quantity": 11.0,
           "average_cost_krw": 292207,
-          "current_price_krw": 284497,
+          "current_price_krw": 284831,
           "purchase_amount_krw": 3214277,
-          "market_value_krw": 3129469,
-          "unrealized_pnl_krw": -84810,
-          "unrealized_return_pct": -2.6385
+          "market_value_krw": 3133146,
+          "unrealized_pnl_krw": -81133,
+          "unrealized_return_pct": -2.5241
         },
         {
           "ticker": "GOOGL",
@@ -275,11 +275,11 @@
           "quantity": 6.0,
           "sellable_quantity": 6.0,
           "average_cost_krw": 423828,
-          "current_price_krw": 376891,
+          "current_price_krw": 378816,
           "purchase_amount_krw": 2542968,
-          "market_value_krw": 2261347,
-          "unrealized_pnl_krw": -281626,
-          "unrealized_return_pct": -11.0747
+          "market_value_krw": 2272901,
+          "unrealized_pnl_krw": -270072,
+          "unrealized_return_pct": -10.6203
         },
         {
           "ticker": "MPWR",
@@ -288,11 +288,11 @@
           "quantity": 1.0,
           "sellable_quantity": 1.0,
           "average_cost_krw": 1878558,
-          "current_price_krw": 1764995,
+          "current_price_krw": 1772898,
           "purchase_amount_krw": 1878558,
-          "market_value_krw": 1764995,
-          "unrealized_pnl_krw": -113563,
-          "unrealized_return_pct": -6.0452
+          "market_value_krw": 1772898,
+          "unrealized_pnl_krw": -105660,
+          "unrealized_return_pct": -5.6245
         },
         {
           "ticker": "ETN",
@@ -301,11 +301,11 @@
           "quantity": 3.0,
           "sellable_quantity": 3.0,
           "average_cost_krw": 555511,
-          "current_price_krw": 447614,
+          "current_price_krw": 450315,
           "purchase_amount_krw": 1666533,
-          "market_value_krw": 1342843,
-          "unrealized_pnl_krw": -323690,
-          "unrealized_return_pct": -19.423
+          "market_value_krw": 1350947,
+          "unrealized_pnl_krw": -315586,
+          "unrealized_return_pct": -18.9367
         },
         {
           "ticker": "NVDA",
@@ -314,11 +314,11 @@
           "quantity": 6.0,
           "sellable_quantity": 6.0,
           "average_cost_krw": 267040,
-          "current_price_krw": 222994,
+          "current_price_krw": 221804,
           "purchase_amount_krw": 1602240,
-          "market_value_krw": 1337968,
-          "unrealized_pnl_krw": -264277,
-          "unrealized_return_pct": -16.4942
+          "market_value_krw": 1330827,
+          "unrealized_pnl_krw": -271418,
+          "unrealized_return_pct": -16.9399
         },
         {
           "ticker": "SGOV",
@@ -327,11 +327,11 @@
           "quantity": 9.0,
           "sellable_quantity": 9.0,
           "average_cost_krw": 134414,
-          "current_price_krw": 134588,
+          "current_price_krw": 134598,
           "purchase_amount_krw": 1209726,
-          "market_value_krw": 1211300,
-          "unrealized_pnl_krw": 1574,
-          "unrealized_return_pct": 0.1301
+          "market_value_krw": 1211390,
+          "unrealized_pnl_krw": 1664,
+          "unrealized_return_pct": 0.1376
         },
         {
           "ticker": "GEV",
@@ -340,11 +340,11 @@
           "quantity": 1.0,
           "sellable_quantity": 1.0,
           "average_cost_krw": 1471752,
-          "current_price_krw": 1015117,
+          "current_price_krw": 1016949,
           "purchase_amount_krw": 1471752,
-          "market_value_krw": 1015117,
-          "unrealized_pnl_krw": -456635,
-          "unrealized_return_pct": -31.0266
+          "market_value_krw": 1016949,
+          "unrealized_pnl_krw": -454803,
+          "unrealized_return_pct": -30.9021
         },
         {
           "ticker": "AAPL",
@@ -353,11 +353,11 @@
           "quantity": 2.0,
           "sellable_quantity": 2.0,
           "average_cost_krw": 364298,
-          "current_price_krw": 466156,
+          "current_price_krw": 469191,
           "purchase_amount_krw": 728596,
-          "market_value_krw": 932312,
-          "unrealized_pnl_krw": 203715,
-          "unrealized_return_pct": 27.9599
+          "market_value_krw": 938383,
+          "unrealized_pnl_krw": 209786,
+          "unrealized_return_pct": 28.7932
         },
         {
           "ticker": "LLY",
@@ -366,11 +366,11 @@
           "quantity": 0.436065,
           "sellable_quantity": 0.436065,
           "average_cost_krw": 1418889,
-          "current_price_krw": 1842404,
+          "current_price_krw": 1824604,
           "purchase_amount_krw": 618728,
-          "market_value_krw": 803408,
-          "unrealized_pnl_krw": 184680,
-          "unrealized_return_pct": 29.8483
+          "market_value_krw": 795646,
+          "unrealized_pnl_krw": 176918,
+          "unrealized_return_pct": 28.5938
         },
         {
           "ticker": "DELL",
@@ -379,11 +379,11 @@
           "quantity": 1.0,
           "sellable_quantity": 1.0,
           "average_cost_krw": 662237,
-          "current_price_krw": 452324,
+          "current_price_krw": 452997,
           "purchase_amount_krw": 662237,
-          "market_value_krw": 452324,
-          "unrealized_pnl_krw": -209913,
-          "unrealized_return_pct": -31.6976
+          "market_value_krw": 452997,
+          "unrealized_pnl_krw": -209240,
+          "unrealized_return_pct": -31.5959
         },
         {
           "ticker": "AVGO",
@@ -392,11 +392,11 @@
           "quantity": 1.0,
           "sellable_quantity": 1.0,
           "average_cost_krw": 569188,
-          "current_price_krw": 415993,
+          "current_price_krw": 418976,
           "purchase_amount_krw": 569188,
-          "market_value_krw": 415993,
-          "unrealized_pnl_krw": -153195,
-          "unrealized_return_pct": -26.9147
+          "market_value_krw": 418976,
+          "unrealized_pnl_krw": -150212,
+          "unrealized_return_pct": -26.3906
         },
         {
           "ticker": "GLDM",
@@ -405,11 +405,11 @@
           "quantity": 4.0,
           "sellable_quantity": 4.0,
           "average_cost_krw": 136108,
-          "current_price_krw": 97041,
+          "current_price_krw": 96218,
           "purchase_amount_krw": 544432,
-          "market_value_krw": 388164,
-          "unrealized_pnl_krw": -156268,
-          "unrealized_return_pct": -28.7029
+          "market_value_krw": 384874,
+          "unrealized_pnl_krw": -159558,
+          "unrealized_return_pct": -29.3072
         },
         {
           "ticker": "AMZN",
@@ -418,18 +418,18 @@
           "quantity": 1.0,
           "sellable_quantity": 1.0,
           "average_cost_krw": 347484,
-          "current_price_krw": 343813,
+          "current_price_krw": 343739,
           "purchase_amount_krw": 347484,
-          "market_value_krw": 343813,
-          "unrealized_pnl_krw": -3671,
-          "unrealized_return_pct": -1.0565
+          "market_value_krw": 343739,
+          "unrealized_pnl_krw": -3745,
+          "unrealized_return_pct": -1.0777
         }
       ],
       "latest_attempt": {
         "status": "VALID",
-        "account_as_of": "2026-11-24T01:16:02.083269+09:00",
-        "run_started_at": "2026-11-24T00:03:15.265983+09:00",
-        "run_finished_at": "2026-11-24T01:16:18.382355+09:00",
+        "account_as_of": "2026-11-24T05:23:29.814776+09:00",
+        "run_started_at": "2026-11-24T03:03:59.566743+09:00",
+        "run_finished_at": "2026-11-24T05:25:05.286224+09:00",
         "selected_for_public_account": true
       }
     }
