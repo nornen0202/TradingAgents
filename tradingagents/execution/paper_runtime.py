@@ -280,7 +280,7 @@ def advance_market(archive, state, market, *, now=None, clock=None, account_load
                     signals.append(signal)
             local_at = at.astimezone(ZoneInfo("Asia/Seoul" if market == "kr" else "America/New_York")).isoformat()
             receipt = broker.step(now=local_at, quotes=quotes, signals=signals,
-                                  halted=coverage_blocked or (state / "HALT").exists())
+                                  halted=(state / "HALT").exists(), block_new_risk=coverage_blocked)
             valid_clocks = [instant(q["as_of"]) for q in quotes.values() if instant(q.get("as_of"))]
             # Detailed prices/cash are private. Only safe operational status is
             # supplied to the read-only viewer and routine task logs.
