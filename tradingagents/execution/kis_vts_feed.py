@@ -17,6 +17,7 @@ from zoneinfo import ZoneInfo
 
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.primitives.padding import PKCS7
+from websockets.exceptions import ConnectionClosed
 
 from tradingagents.atomic_io import interprocess_file_lock
 
@@ -50,6 +51,7 @@ class QuoteObservation:
     received_at: datetime
     native_price: Decimal
     currency: str
+    cumulative_volume: int | None = None
     tradable: bool = False
 
 
@@ -101,6 +103,10 @@ class VtsFrameDecoder:
             raise ValueError("Invalid quote age policy")
         self._max_age = timedelta(seconds=quote_max_age_seconds)
         self._crypto: dict[str, tuple[bytes, bytes]] = {}
+
+    @property
+    def notices_active(self):
+        return all(_NOTICE[market] in self._crypto for market in self._scopes)
 
     def control(self, raw):
         """Consume an ACK. Return true when the client must mirror a heartbeat."""
@@ -171,8 +177,10 @@ class VtsFrameDecoder:
             return None
         if market == "KR":
             day, clock, price, ticker, currency = parts[33], parts[1], parts[2], feed_key, "KRW"
+            volume = parts[13]
         else:
-            day, clock, price, ticker, currency = parts[5], parts[6], parts[11], parts[1], "USD"
+            day, clock, price, ticker, currency = parts[6], parts[7], parts[11], parts[1], "USD"
+            volume = parts[20]
             if feed_key[4:] != ticker:
                 return None
         if not re.fullmatch(r"[0-9]{14}", day + clock) or len(day) != 8 or len(clock) != 6:
@@ -184,7 +192,8 @@ class VtsFrameDecoder:
             return None
         if not value.is_finite() or value <= 0 or not timedelta() <= received_at - at <= self._max_age:
             return None
-        return QuoteObservation(market, feed_key, ticker, at, received_at, value, currency)
+        cumulative = int(volume) if re.fullmatch(r"[0-9]{1,20}", volume) else None
+        return QuoteObservation(market, feed_key, ticker, at, received_at, value, currency, cumulative)
 
 
 @dataclass(frozen=True)
@@ -221,15 +230,15 @@ async def run_event_feed(
         market = next((m for m, kind in _QUOTES.items() if report_type == kind), None)
         list(_quote_streams(((market, key),), {scope.market for scope in scopes}))
     hints_seen: OrderedDict[str, None] = OrderedDict()
-    last_quote: dict[tuple[str, str], datetime] = {}
+    last_quote: dict[tuple[str, str], QuoteObservation] = {}
     disconnects = hint_count = quote_count = 0
     with interprocess_file_lock(lock_path, timeout=0):
         for attempt in range(attempts):
             if attempt:
                 await sleep(min(30, 2 ** (attempt - 1)))
-            # Snapshot recovery must finish before accepting events after any gap.
-            await resynchronize()
             decoder = VtsFrameDecoder(scopes, plan)
+            recovered = False
+            pending_events = []
             try:
                 token = await approval()
                 if not isinstance(token, str) or not token.strip():
@@ -250,8 +259,21 @@ async def run_event_feed(
                         if raw.startswith("{"):
                             if decoder.control(raw):
                                 await socket.pong(raw.encode())
-                            continue
-                        for event in decoder.events(raw, clock()):
+                            if recovered or not decoder.notices_active:
+                                continue
+                            # Acknowledgement precedes the authoritative REST
+                            # snapshot so no new executions fall in the gap.
+                            await resynchronize()
+                            recovered = True
+                            events, pending_events = pending_events, []
+                        else:
+                            events = decoder.events(raw, clock())
+                            if not recovered:
+                                pending_events.extend(events)
+                                if len(pending_events) > 512:
+                                    raise ValueError("KIS VTS subscription recovery buffer full")
+                                continue
+                        for event in events:
                             if isinstance(event, OrderHint):
                                 if event.content_digest not in hints_seen:
                                     await on_hint(event)
@@ -261,14 +283,24 @@ async def run_event_feed(
                                         hints_seen.popitem(last=False)
                             else:
                                 key = event.market, event.feed_key
-                                if key not in last_quote or event.source_at > last_quote[key]:
-                                    await on_quote(event)
-                                    quote_count += 1
-                                    last_quote[key] = event.source_at
-            except (OSError, ValueError, KeyError, AttributeError, TypeError):
+                                previous = last_quote.get(key)
+                                if previous is not None and not _advances_quote(previous, event):
+                                    continue
+                                await on_quote(event)
+                                quote_count += 1
+                                last_quote[key] = event
+            except (OSError, ConnectionClosed, ValueError, KeyError, AttributeError, TypeError):
                 # Inputs can contain account fields and session key material.
                 # Reconcile again on reconnect without retaining exception details.
                 pass
             disconnects += 1
         await resynchronize()
     return FeedResult(attempts, disconnects, hint_count, quote_count)
+
+
+def _advances_quote(previous, current):
+    if current.source_at != previous.source_at:
+        return current.source_at > previous.source_at
+    if current.cumulative_volume is not None and previous.cumulative_volume is not None:
+        return current.cumulative_volume > previous.cumulative_volume
+    return current.native_price != previous.native_price

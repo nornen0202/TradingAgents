@@ -10,6 +10,7 @@ import json
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.primitives.padding import PKCS7
 import pytest
+from websockets.exceptions import ConnectionClosedError
 
 from tradingagents.atomic_io import interprocess_file_lock
 from tradingagents.execution.kis_vts_feed import (
@@ -46,7 +47,7 @@ def kr_quote(clock="100000", price="21000"):
 
 def us_quote():
     fields = [""] * 26
-    fields[0], fields[1], fields[5], fields[6], fields[11] = "DNASFIX", "FIX", "20260701", "100001", "125.50"
+    fields[0], fields[1], fields[6], fields[7], fields[11] = "DNASFIX", "FIX", "20260701", "100001", "125.50"
     return "0|HDFSCNT0|001|" + "^".join(fields)
 
 
@@ -99,7 +100,7 @@ def test_reconnect_resynchronizes_suppresses_duplicates_and_owns_one_socket(tmp_
     hint = notice(tr, KR, "000000005")
     plan = subscription_plan((KR,), held=[("KR", "009999")])
     attempt = iter([
-        [acknowledgement(tr, KR), hint, kr_quote(clock="100003"),
+        [kr_quote(clock="100003"), acknowledgement(tr, KR), hint, kr_quote(clock="100003", price="21100"),
          json.dumps({"header": {"tr_id": "PINGPONG"}})],
         [acknowledgement(tr, KR), hint, kr_quote(clock="100002"),
          kr_quote(clock="100004"), notice(tr, KR, "000000006")],
@@ -116,7 +117,7 @@ def test_reconnect_resynchronizes_suppresses_duplicates_and_owns_one_socket(tmp_
             async def messages():
                 for item in next(attempt):
                     yield item
-                raise OSError("synthetic disconnect")
+                raise ConnectionClosedError(None, None)
             return messages()
 
     @asynccontextmanager
@@ -133,7 +134,7 @@ def test_reconnect_resynchronizes_suppresses_duplicates_and_owns_one_socket(tmp_
     params = dict(open_vts=open_socket, approval=token,
                   resynchronize=lambda: record(("resync", None)),
                   on_hint=lambda event: record(("hint", event.order_number)),
-                  on_quote=lambda event: record(("quote", event.source_at.second)),
+                  on_quote=lambda event: record(("quote", event.source_at.second, int(event.native_price))),
                   sleep=lambda delay: record(("backoff", delay)),
                   clock=lambda: NOW, attempts=2)
     with interprocess_file_lock(lock, timeout=0):
@@ -142,10 +143,12 @@ def test_reconnect_resynchronizes_suppresses_duplicates_and_owns_one_socket(tmp_
     assert not calls
 
     result = asyncio.run(run_event_feed(lock, (KR,), plan, **params))
-    assert result.disconnects == result.delivered_order_hints == result.delivered_quotes == 2
+    assert result.disconnects == result.delivered_order_hints == 2
+    assert result.delivered_quotes == 3
     assert [item for item in calls if item[0] == "hint"] == [("hint", "000000005"), ("hint", "000000006")]
-    assert [item for item in calls if item[0] == "quote"] == [("quote", 3), ("quote", 4)]
+    assert [item for item in calls if item[0] == "quote"] == [("quote", 3, 21000), ("quote", 3, 21100), ("quote", 4, 21000)]
     assert [item for item in calls if item[0] in {"connect", "resync", "backoff"}] == [
-        ("resync", None), ("connect", None), ("backoff", 1), ("resync", None), ("connect", None), ("resync", None),
+        ("connect", None), ("resync", None), ("backoff", 1), ("connect", None), ("resync", None), ("resync", None),
     ]
+    assert calls.index(("resync", None)) < calls.index(("quote", 3, 21000))
     assert ("heartbeat", "PINGPONG") in calls
