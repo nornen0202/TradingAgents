@@ -163,6 +163,13 @@ try {
     if ($CatchUpMarket) { $arguments += @("--catch-up-market", $CatchUpMarket) }
     if ($DryRun) { $arguments += "--dry-run" }
     if ($Command -eq 'review') { $arguments += @('--review-port', [string]$ReviewPort) }
+    $workerLogPath = $logPath
+    # Launchers may run a rollback revision without the rotating collector.
+    # Its old native redirection remains compatible with those snapshots.
+    if ($sourceRoot -and (Test-Path -LiteralPath (Join-Path $sourceRoot 'tradingagents\local_worker_logging.py'))) {
+        $arguments = @('-u', '-m', 'tradingagents.local_worker_logging', '--log', $workerLogPath, '--') + $arguments
+        $logPath = Join-Path $stateRoot "$Command-launcher-$PID.log"
+    }
     # Windows PowerShell converts redirected native stderr to error records.
     # A recoverable Python warning must not terminate the worker mid-attempt.
     $savedErrorActionPreference = $ErrorActionPreference
@@ -180,7 +187,18 @@ try {
         $ErrorActionPreference = $savedErrorActionPreference
     }
     if (-not $pythonInvoked) { throw "Local Python worker could not start." }
-    if ($workerExitCode -ne 0) { throw "Local $Command failed. See $logPath" }
+    if ($workerExitCode -ne 0) {
+        $failureLogs = if ($workerLogPath -ne $logPath) { "$workerLogPath and $logPath" } else { $logPath }
+        throw "Local $Command failed. See $failureLogs"
+    }
+    if ($workerLogPath -and $logPath -ne $workerLogPath -and (Test-Path -LiteralPath $logPath -PathType Leaf)) {
+        try {
+            $launcherLog = Get-Item -LiteralPath $logPath -Force
+            if ($launcherLog.Length -eq 0 -and -not ($launcherLog.Attributes -band [IO.FileAttributes]::ReparsePoint)) {
+                [IO.File]::Delete($logPath)
+            }
+        } catch { Write-Warning 'Empty launcher log cleanup deferred.' }
+    }
     # End worker process boundary.
 } catch {
     if (-not $pythonInvoked -and -not $DryRun) {
