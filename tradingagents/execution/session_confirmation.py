@@ -21,6 +21,11 @@ _OBSERVATION_FIELDS = ("kind", "event_at", "observed_at", "price", "ticker", "so
 _ENTRY_GROUP = re.compile(r"[A-Za-z0-9_-]{1,32}")
 
 
+def entry_research_deadline(analysis_at, explicit_expiry=None):
+    """Use the existing active research window when no conditional override exists."""
+    return _stamp(explicit_expiry) if explicit_expiry is not None else _stamp(analysis_at) + timedelta(hours=24)
+
+
 def _positive(value):
     try:
         return type(value) in (float, int) and math.isfinite(value) and value > 0

@@ -105,9 +105,22 @@ def test_independent_intraday_group_does_not_wait_for_close_alternative():
     assert result.decision_now.value == "STARTER_NOW", result.reason_codes
 
 
+@pytest.mark.parametrize(("action", "expected"), [("STARTER", "STARTER_NOW"), ("ADD", "ADD_NOW")])
+def test_grouped_active_entries_do_not_require_conditional_wait_expiry(action, expected):
+    original = contract(entry_action=action, conditional_entry_action="NONE", execution_levels={"levels": [
+        {"level_type": "BREAKOUT", "price": 100, "confirmation": "intraday", "confirmation_group": "pilot"},
+        {"level_type": "PULLBACK", "low": 98, "high": 101, "confirmation": "close", "confirmation_group": "overnight"},
+    ]})
+    saved = _ExecutionContractShim(original.to_dict()).to_contract()
+    assert saved.entry_valid_until is None
+    at = datetime.fromisoformat("2026-09-21T11:00:00+09:00")
+    result = evaluate_execution_state(saved, market(at), now=at, max_data_age_seconds=120)
+    assert result.decision_now.value == expected, result.reason_codes
+
+
 @pytest.mark.parametrize("case", [
     "close_and_next_open", "missing_open", "unverified_close", "before_open", "holiday", "expired", "wait",
-    "independent_intraday", "joint_required",
+    "independent_intraday", "joint_required", "active_expiry_after_decision",
 ])
 def test_standard_overlay_producer_archives_confirmed_entry_only(tmp_path, monkeypatch, case):
     from tradingagents.scheduled import runner
@@ -126,16 +139,21 @@ def test_standard_overlay_producer_archives_confirmed_entry_only(tmp_path, monke
     if case == "expired":
         expires = "2026-11-30T09:31:00-05:00"
     conditioned = [{"level_type": "BREAKOUT", "price": 100, "confirmation": "close"}]
-    if case in {"independent_intraday", "joint_required"}:
+    if case in {"independent_intraday", "joint_required", "active_expiry_after_decision"}:
         created, current = "2026-11-27T09:31:00-05:00", "2026-11-27T10:31:00-05:00"
         conditioned = [
             {"level_type": "BREAKOUT", "price": 100, "confirmation": "intraday", "confirmation_group": "pilot"},
             {"level_type": "PULLBACK", "low": 99, "high": 102, "confirmation": "close",
              "confirmation_group": "pilot" if case == "joint_required" else "next-session"},
         ]
+    if case == "active_expiry_after_decision":
+        created, current = "2026-11-30T10:31:00-05:00", "2026-12-01T10:30:55-05:00"
+        expires = "2026-12-01T10:31:00-05:00"
     plan = decision(conditional_entry_valid_until=expires, execution_levels={"levels": conditioned})
     if case == "wait":
         plan.update(conditional_entry_action="NONE", conditional_entry_valid_until=None)
+    if case == "active_expiry_after_decision":
+        plan.update(entry_action="STARTER", conditional_entry_action="NONE", conditional_entry_valid_until=None)
     original = build_execution_contract(ticker=ticker, analysis_payload={"finished_at": created, "decision": json.dumps(plan)})
 
     def observation(kind, clock):
@@ -168,7 +186,7 @@ def test_standard_overlay_producer_archives_confirmed_entry_only(tmp_path, monke
     summaries = [{"ticker": ticker, "status": "success", "artifacts": {"execution_contract_json": artifact}}]
     updates = runner._run_execution_overlay_passes(config=config, run_dir=run, ticker_summaries=summaries, checkpoints=["post_research"])
     update = updates[ticker]
-    ready = case in {"close_and_next_open", "independent_intraday"}
+    ready = case in {"close_and_next_open", "independent_intraday", "active_expiry_after_decision"}
     assert update["decision_now"] == ("STARTER_NOW" if ready else "NONE"), update
     if not ready:
         return
@@ -195,12 +213,19 @@ def test_standard_overlay_producer_archives_confirmed_entry_only(tmp_path, monke
     _, step, _ = build_step(run, generated)
     signal, = step["signals"]
     assert signal["execution_ready"] is True and signal["entry_confirmation"]["paper_candidate_ready"]
+    if case == "active_expiry_after_decision":
+        assert datetime.fromisoformat(signal["valid_until"]) == datetime.fromisoformat(expires)
+        _, expired_step, _ = build_step(run, expires)
+        assert expired_step["signals"][0]["execution_ready"] is False
+        assert expired_step["signals"][0]["entry_confirmation"]["reason"] == "ENTRY_RESEARCH_EXPIRED"
     edited_proof = json.loads(json.dumps(proof))
     edited_proof["plan"]["alternatives"][0][0]["level"] -= 1
     atomic_write_json(run / "tickers/ABC/execution_update.json", {**update, "entry_confirmation_v2": edited_proof})
     _, step, _ = build_step(run, generated)
     assert step["signals"][0]["execution_ready"] is False
-    atomic_write_json(run / "tickers/ABC/execution_update.json", {**update, "execution_asof": expires})
+    atomic_write_json(run / "tickers/ABC/execution_update.json", {
+        **update, "execution_asof": (at + timedelta(minutes=1)).isoformat(),
+    })
     _, step, _ = build_step(run, generated)
     assert step["signals"][0]["execution_ready"] is False
 

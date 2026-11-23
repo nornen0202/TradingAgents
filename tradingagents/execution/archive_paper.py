@@ -5,7 +5,7 @@ import math
 from pathlib import Path
 from zoneinfo import ZoneInfo
 from .paper import PaperLimits, stamp
-from .session_confirmation import evaluate_plan
+from .session_confirmation import entry_research_deadline, evaluate_plan
 from .sizing import size_paper_order
 
 
@@ -145,6 +145,16 @@ def build_step(run: Path, now: str, limits: PaperLimits | None = None):
             proof = _entry_proof(run, ticker, contract, raw, asof, generated)
             if proof is not None:
                 entry_confirmation = _entry_confirmation(proof, ticker, market, generated, evaluated)
+                if not expiry and entry_confirmation["paper_candidate_ready"] and any(
+                    level.get("confirmation_group") is not None for level in _entry_levels(contract)
+                ):
+                    research_expiry = entry_research_deadline(contract["analysis_asof"])
+                    valid_until = min(stamp(valid_until), research_expiry).isoformat()
+                    entry_confirmation["candidate_valid_until"] = min(
+                        stamp(entry_confirmation["candidate_valid_until"]), research_expiry
+                    ).isoformat()
+                    if evaluated >= research_expiry:
+                        entry_confirmation.update(paper_candidate_ready=False, reason="ENTRY_RESEARCH_EXPIRED")
                 ready = ready and entry_confirmation["paper_candidate_ready"]
                 if entry_confirmation["paper_candidate_ready"]:
                     valid_until = min(stamp(valid_until), stamp(entry_confirmation["candidate_valid_until"])).isoformat()
@@ -168,9 +178,13 @@ def build_step(run: Path, now: str, limits: PaperLimits | None = None):
     return snapshot, {"now": local_now, "quotes": quotes, "signals": signals}, market
 
 
+def _entry_levels(contract):
+    return [level for level in contract.get("structured_levels", []) if isinstance(level, dict)
+            and str(level.get("level_type", "")).upper() in {"BREAKOUT", "RESISTANCE", "PULLBACK", "SUPPORT"}]
+
+
 def _entry_proof(run, ticker, contract, raw, market_data_asof, generated):
-    levels = [level for level in contract.get("structured_levels", []) if isinstance(level, dict)
-              and str(level.get("level_type", "")).upper() in {"BREAKOUT", "RESISTANCE", "PULLBACK", "SUPPORT"}]
+    levels = _entry_levels(contract)
     needs_update = any(level.get("confirmation_group") is not None for level in levels) or (
         bool(contract.get("entry_valid_until")) and len(levels) == 1 and levels[0].get("confirmation") in {"close", "next_day"}
     )

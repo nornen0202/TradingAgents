@@ -19,7 +19,7 @@ from tradingagents.schemas import (
     SessionVWAPPreference,
     is_event_guard_active,
 )
-from tradingagents.execution.session_confirmation import evaluate_entry_groups, uses_entry_groups
+from tradingagents.execution.session_confirmation import entry_research_deadline, evaluate_entry_groups, uses_entry_groups
 
 
 def evaluate_execution_state(
@@ -222,9 +222,9 @@ def evaluate_execution_state(
     explicit_groups = any(level.confirmation_group is not None for level in entry_levels)
     if contract.entry_valid_until or explicit_groups:
         try:
-            expires = datetime.fromisoformat(contract.entry_valid_until)
+            expires = entry_research_deadline(contract.analysis_asof, contract.entry_valid_until)
             available = datetime.fromisoformat(contract.analysis_asof)
-            invalid_time = expires.tzinfo is None or available.tzinfo is None or now >= expires or now < available
+            invalid_time = available.tzinfo is None or now >= expires or now < available
         except (TypeError, ValueError):
             invalid_time = True
         if invalid_time:
@@ -263,7 +263,7 @@ def evaluate_execution_state(
         market_code=market.market,
     )
 
-    if grouped_entry and contract.entry_valid_until:
+    if grouped_entry and (contract.entry_valid_until or explicit_groups):
         proof = evaluate_entry_groups(contract, market, entry_levels, now=now, max_age_seconds=max_data_age_seconds,
                                       pilot_open=pilot_window_open, observations=session_observations)
         actionable = _decision_now_from_action(contract.action_if_triggered)
