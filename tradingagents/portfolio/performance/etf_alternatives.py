@@ -319,7 +319,7 @@ def build_etf_alternative_comparison(
     portfolios = _portfolio_configs(settings, snapshot=snapshot)
     actual_pnl = _int_or_none(actual.get("investment_pnl_krw")) if period_match_status == "MATCHED" else None
     actual_return_pct = _float_or_none(actual.get("balance_return_pct")) if period_match_status == "MATCHED" else None
-    start_asset = float(_int_or_none(actual.get("start_asset_krw")) or 0) if period_match_status == "MATCHED" else 0.0
+    start_asset = float(_int_or_none(actual.get("start_asset_krw")) or 0) if period_start == actual_period_start else 0.0
     alternatives = [
         _simulate_portfolio(
             key=key,
