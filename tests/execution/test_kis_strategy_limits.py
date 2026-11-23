@@ -1,4 +1,5 @@
 from datetime import timedelta
+import hashlib
 import json
 
 import pytest
@@ -19,7 +20,7 @@ def configure(root, market, **limits):
     atomic_write_json(path, {**original, "native_order_limits": {market: limits}})
 
 
-def configure_v2(root, *, scope, ticker, now, target=.15, observed_at=None):
+def configure_v2(root, *, scope, ticker, now, target=.15, observed_at=None, wrong_benchmark=False):
     market, currency = ("KR", "KRW") if ticker.endswith((".KS", ".KQ")) else ("US", "USD")
     path = root / "enabled.json"
     original = json.loads(path.read_text(encoding="utf-8"))
@@ -34,7 +35,11 @@ def configure_v2(root, *, scope, ticker, now, target=.15, observed_at=None):
     atomic_write_json(receipt, {"schema": EVIDENCE_SCHEMA, "market": market, "currency": currency,
         "account_scope": scope, "cash_basis": "REVIEWED_SETTLED_CASH", "orders_reconciled": True,
         "portfolio_complete": True, "observed_at": clock, "settlement_observed_at": clock,
-        "portfolio_observed_at": clock, "benchmark_observed_at": clock, "settled_cash": 9_000_000,
+        "portfolio_observed_at": clock, "settled_cash": 9_000_000,
+        "settlement_source_sha256": hashlib.sha256(b"synthetic reconciled cash receipt").hexdigest(),
+        "benchmark": {"market": market, "unit": "index_points", "level": 3000, "event_at": clock,
+                      "observed_at": clock, "source": f"KIS_{market}_INDEX",
+                      "symbol": "WRONG" if wrong_benchmark else "0001" if market == "KR" else "SPX"},
         "target_weights": {ticker: target}})
     return receipt
 
@@ -83,18 +88,19 @@ def test_native_override_rejects_cap_increase_and_keeps_sell_authority(market):
     assert size_with_native_limits(market, {"side": "SELL", "limit_price": runtime.CAPS[market], "quantity": 1}, {}, limits) == 1
 
 
-@pytest.mark.parametrize("case", ["stale", "wait", "within_band", "ready", "cash_unknown_after_buy"])
+@pytest.mark.parametrize("case", ["stale", "wait", "within_band", "wrong_benchmark", "ready", "cash_unknown_after_buy"])
 def test_standard_strategy_uses_v2_only_after_scoped_evidence(tmp_path, case):
     h = Harness(tmp_path, "KR")
     configure(h.root, "KR", max_order_native=runtime.CAPS["KR"], cash_floor_native=2000000,
               max_order_nav=.006, one_share_nav_ceiling=.008)
     receipt = configure_v2(h.root, scope=h.credentials.scope(), ticker=h.ticker, now=h.now,
                            target=.001 if case == "within_band" else .15,
-                           observed_at=h.now - timedelta(minutes=3) if case == "stale" else None)
+                           observed_at=h.now - timedelta(minutes=3) if case == "stale" else None,
+                           wrong_benchmark=case == "wrong_benchmark")
     if case == "wait":
         h.source(action="WAIT")
     result = h.tick()
-    if case in {"stale", "wait", "within_band"}:
+    if case in {"stale", "wait", "within_band", "wrong_benchmark"}:
         assert not result["orders"] and not h.orders
         if case != "wait":
             assert "KIS_V2_ADMISSION_UNVERIFIED" in result["blockers"]

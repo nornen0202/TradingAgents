@@ -8,7 +8,6 @@ not meet this contract. Originals and corrections are append-only revisions.
 from __future__ import annotations
 
 from decimal import Decimal
-from dataclasses import asdict
 from collections.abc import Mapping as ReadOnlyMapping
 import hashlib
 import json
@@ -18,6 +17,7 @@ from tradingagents.atomic_io import interprocess_file_lock
 from .kis_demo import DemoError, KisDemoClient, reconciliation_issue_state
 from .kis_demo_us import KisDemoUSClient
 from .kis_paper import _clock, _integer, _number, _stable, _import_cashflow_checkpoints
+from .kis_strategy_limits import broker_policy_fields
 
 
 SCHEMA = "tradingagents.strategy-settlement/v1"
@@ -242,7 +242,7 @@ def _validated_duplicate(broker, document, encoded, now):
         raise DemoError("Settlement revision ID reused with different evidence")
     # Preserve existing binding bytes. Check the current frozen broker policy
     # against its journal, without inventing a historical policy pin retroactively.
-    policy = asdict(broker.policy)
+    policy = broker_policy_fields(broker.policy)
     if document["market"] == "US" and not broker.policy.allowed_tickers:
         policy.pop("allowed_tickers")
     policies = db.execute("SELECT scope,policy FROM paper_policy").fetchall()

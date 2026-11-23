@@ -3,12 +3,14 @@
 from decimal import Decimal
 import hashlib
 import json
+import re
 
 from .experiments import _stamp
 from .paper_policy_v2 import bind_v2_journal, size_v2_candidate
 
 EVIDENCE_SCHEMA = "tradingagents.kis-v2-evidence/v1"
 _MARKETS = {"KR": ("KRW", "krw"), "US": ("USD", "usd")}
+_BENCHMARKS = {"KR": ("0001", "KIS_KR_INDEX"), "US": ("SPX", "KIS_US_INDEX")}
 
 
 def configured_v2(config):
@@ -34,9 +36,22 @@ def _buy_observation(path, market, currency, scope, ticker, now, seconds, accoun
             or evidence.get("cash_basis") != "REVIEWED_SETTLED_CASH"
             or evidence.get("orders_reconciled") is not True or evidence.get("portfolio_complete") is not True):
         raise ValueError("KIS V2 requires complete scoped cash, order and portfolio evidence")
+    market_index = evidence["benchmark"]
+    reference = evidence.get("settlement_source_sha256")
+    if (market_index["market"] != market or (market_index["symbol"], market_index["source"]) != _BENCHMARKS[market]
+            or market_index["unit"] != "index_points" or not isinstance(reference, str)
+            or re.fullmatch(r"[0-9a-f]{64}", reference) is None):
+        raise ValueError("KIS V2 lacks a benchmark identity or settlement source digest")
+    level = Decimal(str(market_index["level"]))
+    if not level.is_finite() or level <= 0:
+        raise ValueError("KIS V2 benchmark level is unverified")
     acquired = _stamp(evidence["observed_at"])
-    for name in ("settlement_observed_at", "benchmark_observed_at", "portfolio_observed_at"):
-        observed = _stamp(evidence[name])
+    benchmark_event = _stamp(market_index["event_at"])
+    benchmark_at = _stamp(market_index["observed_at"])
+    if benchmark_event > benchmark_at:
+        raise ValueError("KIS benchmark clock cannot precede the index event")
+    for observed in (benchmark_event, benchmark_at, _stamp(evidence["settlement_observed_at"]),
+                     _stamp(evidence["portfolio_observed_at"])):
         if not observed <= acquired <= now or not 0 <= (now - observed).total_seconds() <= seconds:
             raise ValueError("KIS V2 observation expired or unavailable")
     cash = Decimal(str(evidence["settled_cash"]))
