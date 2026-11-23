@@ -62,6 +62,23 @@ def test_independent_intraday_alternative_does_not_require_close():
     assert result["matched_alternatives"] == [1] and result["paper_candidate_ready"]
 
 
+@pytest.mark.parametrize("name,kind,clock", [
+    ("regular_close", "final_regular_close", FRIDAY_CLOSE),
+    ("official_open", "official_regular_open", MONDAY_OPEN),
+    ("live_quote", "quote", NOW),
+])
+@pytest.mark.parametrize("field", ["event_at", "observed_at"])
+@pytest.mark.parametrize("problem", ["missing", "invalid", "naive", "future"])
+def test_unverified_stage_clocks_cannot_activate(name, kind, clock, field, problem):
+    record = _feed(kind, clock)
+    if problem == "missing":
+        record.pop(field)
+    else:
+        record[field] = {"invalid": "invalid-date", "naive": clock.removesuffix("Z"),
+                         "future": "2026-12-01T14:30:00Z"}[problem]
+    assert not _evaluate(**{name: record})["paper_candidate_ready"]
+
+
 @pytest.mark.parametrize("case", ["ready", "future_capture", "missing_open", "wrong_plan_currency", "wait"])
 def test_archive_paper_entry_consumes_explicit_session_proof(tmp_path, case):
     proof = {"plan": PLAN, "regular_close": _feed("final_regular_close", FRIDAY_CLOSE),
