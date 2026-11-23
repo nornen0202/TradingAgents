@@ -81,3 +81,19 @@ def test_real_calendar_uses_early_close_and_holiday():
     start = datetime(2026, 11, 25, 22, tzinfo=timezone.utc)
     current = datetime(2026, 11, 27, 19, tzinfo=timezone.utc)
     assert [(day, close.hour) for day, _, close in _sessions("US", start, current)] == [("2026-11-27", 18)]
+
+
+@pytest.mark.parametrize("day", [None, "", "malformed", "20260902", "2026-09-31"])
+def test_unverified_session_dates_leave_promotion_evidence_empty(tmp_path, day):
+    clock = [START]
+    path = tmp_path / "promotion.sqlite"
+    with PromotionLedger(path, clock=lambda: clock[0], sessions=_calendar) as ledger:
+        ledger.start(POLICY)
+        clock[0] += timedelta(days=1, hours=20)
+        with pytest.raises(ValueError):
+            ledger.record(POLICY["version"], day, _sample(1))
+        result = ledger.status(POLICY["version"])
+        assert result["observed_sessions"] == 0
+        assert result["expected_sessions"] == result["missing_sessions"] == 1
+    with sqlite3.connect(path) as db:
+        assert db.execute("SELECT COUNT(*) FROM promotion_days").fetchone() == (0,)

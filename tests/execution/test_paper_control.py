@@ -191,6 +191,29 @@ def test_partial_flatten_recovery_sells_only_the_proven_remaining_shares(tmp_pat
         assert control.flatten_recovery("standby", standby)["intent_ids"] == [remainder["id"]]
 
 
+def test_recovered_flat_position_can_attach_completion_receipt(tmp_path):
+    at = [START]
+    params = {"scope": "shadow-fixture", "market": "US", "secret": KEY, "rights": RIGHTS, "clock": lambda: at[0]}
+    with PaperControlLedger(tmp_path / "control.sqlite", **params) as control:
+        primary = control.claim("primary", seconds=2)
+        halt = request("halt", "operator", 1)
+        control.execute(halt, sign_paper_control(KEY, halt), actor="operator", writer="primary", epoch=primary)
+        flatten = request("flatten", "risk", 2)
+        plan = control.execute(flatten, sign_paper_control(KEY, flatten), actor="risk", writer="primary", epoch=primary,
+                               snapshot=snapshot(at[0], owned={"ABC": "2"}, sellable={"ABC": "2"}), quotes=quotes(at[0]))
+        prior, = plan["paper_intents"]
+        at[0] += timedelta(seconds=5)
+        standby = control.claim("standby")
+        recovery = request("flatten", "risk", 3, now=at[0])
+        terminal = {prior["id"]: {"status": "FILLED", "filled_quantity": "2", "receipt_id": "fixture-fill"}}
+        result = control.execute(recovery, sign_paper_control(KEY, recovery), actor="risk", writer="standby", epoch=standby,
+                                 snapshot=snapshot(at[0]) | {"terminal_flatten_orders": terminal}, quotes={})
+        assert result["flatten_status"] == "ALREADY_FLAT" and not result["paper_intents"]
+        assert control.finish_flatten("standby", standby, nonce=plan["flatten_nonce"],
+                                      flat_snapshot=snapshot(at[0]), receipt_id="fixture-fill")
+        assert control.flatten_recovery("standby", standby)["state"] == "DONE"
+
+
 @pytest.mark.parametrize("evidence_type", ["positions", "quote"])
 @pytest.mark.parametrize("clock", [None, "not-a-date", "2026-08-04T15:00:00", "2026-08-04T15:00:01Z"])
 def test_invalid_or_future_observations_cannot_admit_flatten(tmp_path, evidence_type, clock):
