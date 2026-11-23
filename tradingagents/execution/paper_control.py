@@ -256,7 +256,7 @@ class PaperControlLedger:
                 raise ValueError("Flatten completion needs fresh flat and settled evidence")
             row = self._db.execute("SELECT state,execution_receipt FROM paper_flatten_batches WHERE nonce=?",
                                    (nonce,)).fetchone()
-            if row is None or row["state"] not in {"READY", "DONE"}:
+            if row is None or row["state"] not in {"READY", "ALREADY_FLAT", "DONE"}:
                 raise ValueError("No eligible flatten handoff exists")
             if row["state"] == "DONE":
                 if row["execution_receipt"] != receipt_id:
