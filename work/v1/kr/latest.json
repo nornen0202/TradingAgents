@@ -1,13 +1,13 @@
 {
   "schema": "tradingagents.work-context/v1",
   "surface": "kr",
-  "event_id": "kr:f62ae86e1571d1c1198694c89ae6c6e5",
+  "event_id": "kr:0442a8cab859ed402602acc63e6be607",
   "prompt_contract_version": "market-work-v12-kr",
   "prompt_sha256": "ae80093efe2dcfe7f6131b8b09100f75e77b0ca0242b5340d15eb6ec3fd81274",
   "skill_sha256": "2fef99f1af403675549a13813e0fe5597a241a964affeada56e9f64e9f398fe9",
   "task_manifest_sha256": "6fbafadc2971d1a908c1bbc1fa29e2adaf0ca6be956768f2f9eb0abf0061428e",
   "workflow_contract_sha256": "3d89f852dda405d7c44afdbed158e622d8a748f194d9e44d0aca14a8bbe14de1",
-  "source_sha256": "fcb2aad4208115cacf4123d39e4234909e7001037c5f74e05ed0ef10dfb1952c",
+  "source_sha256": "28d98173bbceac99ff0ccbe070b1cc81c36d6bb24c792297e5ade814205274dc",
   "body": {
     "kind": "market",
     "market": "KR",
@@ -1682,15 +1682,15 @@
         "source_health": "OK",
         "coverage": {
           "total_unique_events": 932,
-          "window_events": 35,
+          "window_events": 26,
           "transmitted_events": 12,
           "truncated": true,
-          "oldest_occurred_at": "2026-11-20T11:00:06+00:00",
+          "oldest_occurred_at": "2026-11-20T23:00:38+00:00",
           "newest_occurred_at": "2026-11-22T21:46:51+00:00",
-          "available_events_before_context_cap": 35,
+          "available_events_before_context_cap": 26,
           "context_event_cap": 12,
-          "omitted_events": 23,
-          "omitted_due_to_context_cap": 23,
+          "omitted_events": 14,
+          "omitted_due_to_context_cap": 14,
           "omitted_before_context_selection": 0
         },
         "events": [
@@ -1900,123 +1900,6 @@
                 {
                   "ticker": "ORCL",
                   "name": "오라클",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                }
-              ]
-            }
-          },
-          {
-            "event_key": "KopQpHNgc4k",
-            "content_sha256": "e63320e28837b0d4d1b944b0b4cdf6ab93d5ca9ea67d81ee3c71ad7557a2e782",
-            "occurred_at": "2026-11-20T11:00:06+00:00",
-            "relevance": {
-              "tickers": [
-                "^KS11",
-                "005930",
-                "000660",
-                "AMD",
-                "MU"
-              ],
-              "markets": [
-                "US",
-                "KR"
-              ],
-              "themes": [],
-              "match_basis": "verified_entities",
-              "matched_tickers": [
-                "000660",
-                "005930"
-              ],
-              "market_match": true,
-              "score": 220
-            },
-            "summary": {
-              "video_id": "KopQpHNgc4k",
-              "title": "역대급 급락에 개인은 2조 넘게 샀다…유창희 대표가 삼성전자·SK하이닉스 추가 매수를 경계하는 이유ㅣ명민준, 박가영, 유창희 [주린이 구조대]",
-              "channel": "삼프로TV 3PROTV",
-              "source_url": "https://www.youtube.com/watch?v=KopQpHNgc4k",
-              "claim_status_summary": {
-                "partially_supported": 1,
-                "unverified": 8,
-                "asr_uncertain": 1
-              },
-              "claims": [
-                {
-                  "claim_id": "C1",
-                  "claim_text": "방송은 코스피 4,869(-5.2%), 코스닥 645(-5.7%), 연초 대비 각각 약 +15%와 -3%를 언급했다. 개인이 약 2조 2,000억~2조 3,000억 원을 사들였고 장전부터 매수했다고 전했다. 한 달 공매도 금액은 삼성전자 1조 3,500억 원, SK하이닉스 1조 7,500억 원이라고 했다. 외국인 매도만으로 하락을 설명하기 어렵다는 부분은 출연자 해석이다.",
-                  "status": "partially_supported",
-                  "confidence": 0.3,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "개인 2조 원대 매수와 ‘역대급’ 급락은 확인된 사실로 쓰지 않는다. 개인 순매수가 확인되더라도 바닥 확인 신호는 아니다."
-                },
-                {
-                  "claim_id": "C2",
-                  "claim_text": "일본 약 -5%, 대만 -6.2%, 나스닥 -2.2%, 필라델피아 반도체지수 -2.4%를 국내 급락과 비교했다. 인도네시아 9,100→5,100, 상하이 약 4,250→3,500, 금 -40%, 은 -60%, 비트코인 약 -40~-50%도 언급했다.",
-                  "status": "unverified",
-                  "confidence": 0.05,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "기준일과 시장별 세션을 맞추기 전에는 동반 급락의 강도나 자산 간 상대 낙폭을 단정하지 않는다."
-                },
-                {
-                  "claim_id": "C3",
-                  "claim_text": "유창희는 삼성전자의 장기 저평가 여부와 별개로, 삼성전자·SK하이닉스 비중이 이미 높은 투자자의 추가 매수를 경계하고 미보유자의 신규 편입과 구분했다. 방송 언급 가격은 삼성전자 18만 2,000원, SK하이닉스 111만 원이며, 15만 원 미만·80만 원은 하방 가정이다. 애플과 삼성전자의 장기공급계약은 가능성 보도로 소개됐다.",
-                  "status": "unverified",
-                  "confidence": 0.16,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "기존 보유와 추가 집중을 구분한 의견으로 소개한다. 하방 가정이나 LTA 가능성을 확인된 가격 전망·수주로 제시하지 않는다."
-                },
-                {
-                  "claim_id": "C4",
-                  "claim_text": "Hunterbrook 공매도 보고서가 AMD 하락의 계기로 거론됐고 미국 상무부 승인 범위가 언급됐다. 앤트로픽 상장 관련 자금 이동과 AMD·브로드컴의 상대 강세가 AMD를 취약하게 했다는 설명은 가설이다.",
-                  "status": "unverified",
-                  "confidence": 0.12,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "공매도 측 주장, 승인 사실, 주가 반응을 별개로 다룬다. 어느 하나를 시장 전체 급락의 확인된 원인으로 제시하지 않는다."
-                }
-              ],
-              "entities": [
-                {
-                  "ticker": "^KS11",
-                  "name": "코스피·코스닥 및 글로벌 증시",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                },
-                {
-                  "ticker": "005930",
-                  "name": "삼성전자",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "시장 데이터 조회 실패: no_usable_market_fields"
-                  ]
-                },
-                {
-                  "ticker": "000660",
-                  "name": "SK하이닉스",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "시장 데이터 조회 실패: no_usable_market_fields"
-                  ]
-                },
-                {
-                  "ticker": "AMD",
-                  "name": "AMD",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                },
-                {
-                  "ticker": "MU",
-                  "name": "마이크론",
                   "status": "unverified",
                   "verification_notes": [
                     "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
@@ -2700,6 +2583,69 @@
               ],
               "entities": []
             }
+          },
+          {
+            "event_key": "4o_7XUjmZVM",
+            "content_sha256": "b1c831b8d46899886cd131b8406fffa6b1ee056983c1cfb3e30549907756e933",
+            "occurred_at": "2026-11-21T23:30:07+00:00",
+            "relevance": {
+              "tickers": [],
+              "markets": [],
+              "themes": [],
+              "match_basis": "title_and_claim_context",
+              "matched_tickers": [],
+              "market_match": false,
+              "score": 0
+            },
+            "summary": {
+              "video_id": "4o_7XUjmZVM",
+              "title": "“삼성전자·SK하이닉스 지금 팔면 후회할까?” 옵션 만기 끝났다!  다음 주부터 공매도 청산이 부를 대반격… 현대차도 반전 기회?ㅣ오로라투자자문 이지환 대표",
+              "channel": "815Money talk",
+              "source_url": "https://www.youtube.com/watch?v=4o_7XUjmZVM",
+              "claim_status_summary": {
+                "unverified": 10,
+                "asr_uncertain": 1
+              },
+              "claims": [
+                {
+                  "claim_id": "C1",
+                  "claim_text": "출연자는 급락 당시 하방 파생 베팅은 적고 국내 공매도 잔고는 이례적으로 많았으며, 미국 옵션 만기 후 상승 계기가 생기면 숏커버링으로 단기 반등할 수 있다고 봤다. 추세 전환을 단정하지 않았다.",
+                  "status": "unverified",
+                  "confidence": 0.99,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "만기 이후 반등은 출연자가 제시한 조건부 시나리오다. 종목별 수급과 후속 가격 흐름이 확인되기 전에는 추세 전환 근거로 쓰기 어렵다."
+                },
+                {
+                  "claim_id": "C2",
+                  "claim_text": "출연자는 SK하이닉스가 7월 급락 뒤 하루 상한가, 10월 급락 뒤 환매가 들어왔다고 본 날 약 10% 상승했다고 말했다. 코스닥 소부장 일부의 환매 반등은 10~20%에 달해도 하루 이틀에 그칠 수 있다고 봤다.",
+                  "status": "unverified",
+                  "confidence": 0.99,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "사례로 제시된 상승률을 반등 목표치로 쓰거나 환매 수급이 이틀 만에 끝난다고 가정할 근거는 없다."
+                },
+                {
+                  "claim_id": "C3",
+                  "claim_text": "AI 주변 업종 비중을 줄이되 삼성전자·SK하이닉스 보유분을 남기자는 의견이다. SK하이닉스 30%와 인버스 10%를 조합해 주식 비중을 20%로 낮춘 것과 비슷한 하락 완화 효과를 일부 기대한다는 예시이지, 정확한 상쇄나 전량 전환을 뜻하지 않는다.",
+                  "status": "unverified",
+                  "confidence": 0.98,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "핵심 보유분 유지와 헤지는 출연자의 전략 의견이다. 인버스 비중 10%를 개별주 익스포저 10%포인트 감소로 계산하면 안 된다."
+                },
+                {
+                  "claim_id": "C4",
+                  "claim_text": "진행자는 이수페타시스가 금요일에 약 16% 하락했고, 이전의 긍정적인 평가와 달리 목표가 하향 리포트가 나왔다고 말했다.",
+                  "status": "unverified",
+                  "confidence": 0.99,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "약 16% 급락과 목표가 하향을 검증된 재료로 인용하지 않는다. 종가 기준 낙폭과 장중 최대 낙폭도 구분해야 한다."
+                }
+              ],
+              "entities": []
+            }
           }
         ],
         "execution_eligible": false
@@ -2730,7 +2676,6 @@
             "event_keys": [
               "Zt0LLfeAGEY",
               "1PvkBMtMkyk",
-              "KopQpHNgc4k",
               "vhAlRhO25CA",
               "-VmrR-51UUU",
               "OG0IvvfJk5s",
@@ -2739,19 +2684,20 @@
               "nfa_u6gyF-A",
               "KvflYv1CLuQ",
               "BV44qRI0LdE",
-              "u3Ns4rlOYqA"
+              "u3Ns4rlOYqA",
+              "4o_7XUjmZVM"
             ],
             "coverage": {
               "total_unique_events": 932,
-              "window_events": 35,
+              "window_events": 26,
               "transmitted_events": 12,
               "truncated": true,
-              "oldest_occurred_at": "2026-11-20T11:00:06+00:00",
+              "oldest_occurred_at": "2026-11-20T23:00:38+00:00",
               "newest_occurred_at": "2026-11-22T21:46:51+00:00",
-              "available_events_before_context_cap": 35,
+              "available_events_before_context_cap": 26,
               "context_event_cap": 12,
-              "omitted_events": 23,
-              "omitted_due_to_context_cap": 23,
+              "omitted_events": 14,
+              "omitted_due_to_context_cap": 14,
               "omitted_before_context_selection": 0
             }
           },
