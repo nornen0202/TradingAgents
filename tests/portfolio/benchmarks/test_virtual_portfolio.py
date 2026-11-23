@@ -86,3 +86,19 @@ def test_withdrawal_sells_benchmark_pro_rata(tmp_path: Path, etf_fixture_dir: Pa
 
     assert [item["side"] for item in alternative["transactions"]] == ["BUY", "SELL"]
     assert alternative["end_value_krw"] == 750_000
+
+
+def test_shorter_period_keeps_verified_opening_capital(tmp_path, etf_fixture_dir):
+    prices = tmp_path / "prices.json"
+    prices.write_text(json.dumps({"KOSPI200": [{"date": "2026-04-13", "close": 100},
+                                               {"date": "2026-04-20", "close": 110}]}))
+    settings = default_settings(etf_fixture_dir, use_cashflows=False, price_path=prices,
+                                portfolios={"KOSPI200_100": {"KOSPI200": 1.0}})
+    settings.etf_dca_period_start = "2026-04-13"
+    settings.etf_dca_period_end = "2026-04-20"
+    broker = BrokerPerformanceSummary(broker="fixture", account_scope="fixture-scope", period_start="2026-04-13",
+                                      period_end="2026-05-12", start_asset_krw=20_000, balance_return_pct=0.0)
+    result = build_fixture_comparison(etf_fixture_dir, settings=settings, broker_summary=broker)
+    assert result.actual["period_match_status"] == "MISMATCH"
+    alternative = next(item for item in result.alternatives if item.key == "KOSPI200_100")
+    assert alternative.end_value_krw == 22_000 and alternative.excess_return_pct is None
