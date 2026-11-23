@@ -156,7 +156,8 @@ def test_distinct_same_second_fills_and_later_terminal_confirmation_are_reconcil
     broker.coarse_clock = True
     with BrokerDispatcher(tmp_path / "dispatch.sqlite", broker, clock=lambda: broker.now) as dispatcher:
         epoch = dispatcher.claim("writer")
-        assert dispatcher.dispatch("writer", epoch, broker.intent(qty="2"), broker.account()) == "OPEN"
+        before_fill = broker.account()
+        assert dispatcher.dispatch("writer", epoch, broker.intent(qty="2"), before_fill) == "OPEN"
         order = broker.orders["a"]
         fill = ExecutionFill("first-same-second", "1", "80", "USD", START.isoformat())
         early = replace(fill, occurred_at=(START - timedelta(seconds=1)).isoformat())
@@ -168,6 +169,8 @@ def test_distinct_same_second_fills_and_later_terminal_confirmation_are_reconcil
         assert dispatcher.notice("writer", epoch, final) == "FILLED"
         assert dispatcher.notice("writer", epoch, order) == "FILLED"
         broker.now += timedelta(seconds=1)
+        with pytest.raises(ValueError, match="latest fill"):
+            dispatcher.dispatch("writer", epoch, broker.intent("no-oversell", qty="2"), before_fill)
         broker.orders["a"] = replace(final, observed_at=broker.now.isoformat(), fills=())
         assert dispatcher.reconcile("writer", epoch, "a") == "FILLED"
 
