@@ -798,9 +798,12 @@ def complete_handoffs(site, runtime_dir, publication):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("command", choices=("run-due", "publish", "paper", "review", "validate-kis", "strategy-kis", "research-kis"))
-    parser.add_argument("--archive-dir", type=Path, required=True)
-    parser.add_argument("--state-dir", type=Path, required=True)
-    parser.add_argument("--runtime-dir", type=Path, required=True)
+    parser.add_argument("--archive-dir", type=Path)
+    parser.add_argument("--state-dir", type=Path)
+    parser.add_argument("--runtime-dir", type=Path)
+    parser.add_argument("--isolated-replay", type=Path, help="Use a new or initialized offline KIS replay workspace.")
+    parser.add_argument("--replay-action", help="Select the isolated replay action.")
+    parser.add_argument("--fixture-input", type=Path, help="Offline replay payload for this action.")
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--catch-up-market", choices=("kr", "us"),
                         help="Explicit same-day missed research recovery; retain the original slot budget and actual clocks.")
@@ -809,6 +812,23 @@ def main():
     parser.add_argument("--rebuild", action="store_true")
     parser.add_argument("--review-port", type=int, default=8766)
     args = parser.parse_args()
+    if args.isolated_replay is not None:
+        if (args.command != "strategy-kis" or not args.replay_action or any(
+                (args.archive_dir, args.state_dir, args.runtime_dir, args.dry_run, args.catch_up_market,
+                 args.reports_only, args.rebuild))):
+            parser.error("Isolated replay requires strategy-kis and --replay-action, with no operational arguments.")
+        from tradingagents.execution import isolated_replay
+        from tradingagents.execution.kis_demo import DemoError
+        try:
+            result = isolated_replay.command(args.isolated_replay, args.replay_action, args.fixture_input)
+        except TimeoutError:
+            result = {"status": "REPLAY_ALREADY_RUNNING", "network_requests_sent": 0, "real_orders_enabled": False}
+        except (DemoError, OSError, ValueError, TypeError, KeyError):
+            parser.error("Invalid isolated replay workspace, action, or fixture evidence.")
+        print(json.dumps(result, ensure_ascii=True))
+        return 0
+    if args.replay_action or args.fixture_input or not all((args.archive_dir, args.state_dir, args.runtime_dir)):
+        parser.error("Provide --archive-dir, --state-dir, and --runtime-dir for an operational command.")
     if args.catch_up_market and args.command != "research-kis":
         parser.error("--catch-up-market requires research-kis")
     if not 1024 <= args.review_port <= 65535:

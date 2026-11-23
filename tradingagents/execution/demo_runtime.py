@@ -35,6 +35,7 @@ from .strategy_evaluation import evaluate_strategy_orders
 
 SCHEMA = "tradingagents.kis-strategy-runtime/v1"
 MODE = "KIS_DEMO_STRATEGY"
+FIXTURE_SCOPE = "ISOLATED_FIXTURE"
 ZONES = {"KR": "Asia/Seoul", "US": "America/New_York"}
 TERMINAL = {"FILLED", "CANCELLED", "REJECTED", "NOT_SENT", "BLOCKED"}
 DECISIONS = {"STARTER_NOW": "BUY", "ADD_NOW": "BUY", "BUY_NOW": "BUY",
@@ -424,7 +425,7 @@ def summary(db, now, market, marks=None, *, historical=False):
 
 
 def advance(archive, root, validation_root, market, *, clock, tickers, broker_factory, quote_loader, account_loader, session_resolver, gate,
-            allocation_mode="ARCHIVED_PROPOSALS", limits=None, v2_settings=None):
+            allocation_mode="ARCHIVED_PROPOSALS", authorize=None, limits=None, v2_settings=None):
     now, path = at(clock()), root / f"{market.lower()}-strategy.sqlite"
     result = {"status": "WAITING_VALIDATION", "blockers": [], "gate_passed": False, "orders": [], "order_counts": {}, "performance": None}
     def finish(status, *blockers):
@@ -607,6 +608,19 @@ def advance(archive, root, validation_root, market, *, clock, tickers, broker_fa
                 source_evidence = candidate.get("evidence")
                 if v2_evidence:
                     source_evidence = {**(source_evidence or {}), "sizing_v2": v2_evidence}
+                if authorize is not None:
+                    try:
+                        admitted_quantity, admission_evidence = authorize(candidate, terms.copy(), signal, quote, scope, current)
+                        if type(admitted_quantity) is not int or not 0 < admitted_quantity <= terms["quantity"]:
+                            raise ValueError("Invalid approval quantity")
+                    except ValueError:
+                        issues.append("ADDITIONAL_ADMISSION_REQUIRED")
+                        continue
+                    terms["quantity"] = admitted_quantity
+                    source_evidence = {**(source_evidence or {}), "admission": admission_evidence}
+                    if at(clock()) >= entry_deadline or (root / "HALT").exists() or (validation_root / "HALT").exists():
+                        issues.append("STRATEGY_SIGNAL_EXPIRED_OR_HALTED_DURING_ADMISSION")
+                        break
                 broker.db.execute("INSERT INTO strategy_attempts VALUES (?,?,?,?,?,?)", (candidate["id"], candidate["ticker"], candidate["run_id"], at(clock()).isoformat(), json.dumps(terms, sort_keys=True), "PREPARED"))
                 if source_evidence:
                     broker.db.execute("INSERT INTO strategy_source_evidence VALUES (?,?)",
@@ -636,8 +650,12 @@ def advance(archive, root, validation_root, market, *, clock, tickers, broker_fa
     return finish("BLOCKED" if issues and issues != ["NO_FRESH_EXECUTABLE_STRATEGY"] else "WAITING_SIGNAL" if issues else "ACTIVE", *sorted(set(issues)))
 
 
-def tick(archive, root, validation_root, *, clock=None, broker_factory=None, quote_loader=None, account_loader=None, session_resolver=None, gate=None, tickers=None):
+def tick(archive, root, validation_root, *, clock=None, broker_factory=None, quote_loader=None, account_loader=None,
+         session_resolver=None, gate=None, tickers=None, authorize=None, evidence_scope=None):
     archive, root, validation_root = Path(archive), Path(root), Path(validation_root)
+    if evidence_scope is not None and (evidence_scope != FIXTURE_SCOPE or not all(
+            callable(port) for port in (clock, broker_factory, quote_loader, gate, authorize, session_resolver))):
+        raise ValueError("Isolated strategy execution requires isolated ports")
     clock = clock or (lambda: datetime.now(timezone.utc))
     start = at(clock())
     with interprocess_file_lock(root / "strategy.lock", timeout=0), interprocess_file_lock(validation_root / "campaign.lock", timeout=0):
@@ -645,6 +663,8 @@ def tick(archive, root, validation_root, *, clock=None, broker_factory=None, quo
             config = read(root / "enabled.json", {})
         except (ValueError, OSError):
             config = {}
+        if isinstance(config, dict) and config.get("evidence_scope") != evidence_scope:
+            raise ValueError("Strategy configuration belongs to a different evidence scope")
         enabled = isinstance(config, dict) and config.get("mode") == MODE and config.get("enabled") is True and config.get("real_orders_enabled") is False
         allocation_mode = config.get("allocation_mode", "ARCHIVED_PROPOSALS") if isinstance(config, dict) else "ARCHIVED_PROPOSALS"
         market_limits = configured_limits(config) if isinstance(config, dict) else {}
@@ -665,7 +685,7 @@ def tick(archive, root, validation_root, *, clock=None, broker_factory=None, quo
                     ),
                     quote_loader=quote_loader or current_quote,
                     account_loader=account_loader or validation.current_account, session_resolver=session_resolver or _runtime_session,
-                    gate=gate or validation_gate, allocation_mode=allocation_mode,
+                    gate=gate or validation_gate, allocation_mode=allocation_mode, authorize=authorize,
                     limits=market_limits.get(market), v2_settings=v2_settings.get(market))
             except Exception:
                 markets[market] = {"status": "BLOCKED", "checked_at": at(clock()).isoformat(), "gate_passed": False, "blockers": ["RUNTIME_EVIDENCE_UNVERIFIED"]}
@@ -685,5 +705,7 @@ def tick(archive, root, validation_root, *, clock=None, broker_factory=None, quo
         import os
         receipt = {"schema": SCHEMA, "mode": MODE, "enabled": enabled, "real_orders_enabled": False,
                    "checked_at": finished.isoformat(), "source_revision": os.getenv("TRADINGAGENTS_SOURCE_SHA"), "markets": markets}
+        if evidence_scope is not None:
+            receipt["evidence_scope"] = evidence_scope
         atomic_write_json(archive / "paper/kis-strategy-runtime.json", receipt)
         return receipt
