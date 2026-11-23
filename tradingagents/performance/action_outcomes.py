@@ -16,6 +16,7 @@ from .price_history import BENCHMARK_KEY
 from .lifecycle import append_lifecycle_event, initialize_lifecycle, stable_signal_id, timestamp, validate_event
 from .outcome_revisions import read_events, select_retrospectives, visible_events
 from .price_evidence import PriceReference, series_terms
+from .price_revisions import initialize_price_revisions, latest_revision_sql
 
 
 def initialize_action_tracker(db_path: Path) -> None:
@@ -23,6 +24,7 @@ def initialize_action_tracker(db_path: Path) -> None:
     with sqlite3.connect(db_path, timeout=30) as conn:
         conn.execute("BEGIN IMMEDIATE")
         initialize_lifecycle(conn)
+        initialize_price_revisions(conn)
         for statement in ACTION_TRACKER_SCHEMA:
             conn.execute(statement)
         _ensure_columns(conn, "action_recommendations", {
@@ -63,6 +65,7 @@ def initialize_action_tracker(db_path: Path) -> None:
             "avoided_drawdown_20d": "REAL",
             "missed_upside_20d": "REAL",
             "calculation_version": "INTEGER DEFAULT 1",
+            "price_revision_id": "TEXT",
         })
         # Refresh eligibility needs only these narrow fields. A ticker-only
         # scan otherwise reads large recommendation payloads in random order,
@@ -276,10 +279,17 @@ def update_action_outcomes(
             if not series:
                 continue
             reference = None
+            revision_id = None
             comparable_benchmark = benchmark_series
             if require_verified_price:
                 try:
-                    reference = PriceReference.read(json.loads(row["price_reference_json"] or "null"))
+                    revision = conn.execute(
+                        f"SELECT revision_id,reference_json FROM action_price_revisions WHERE revision_id=({latest_revision_sql('?', '?')})",
+                        (row["id"], known_at),
+                    ).fetchone()
+                    payload = revision["reference_json"] if revision else row["price_reference_json"]
+                    revision_id = revision["revision_id"] if revision else None
+                    reference = PriceReference.read(json.loads(payload or "null"))
                 except (TypeError, ValueError):
                     continue
                 if (reference is None or decision_time is None
@@ -294,11 +304,15 @@ def update_action_outcomes(
                 continue
             if decision_time is not None:
                 signal_id = stable_signal_id(row["run_id"], row["ticker"], row["action"], row["source"] or "TradingAgents")
-                written = append_lifecycle_event(conn, event_id=f"outcome:{signal_id}:{known_at}:v{calculation_version}",
+                event_id = f"outcome:{signal_id}:{known_at}:v{calculation_version}"
+                if revision_id:
+                    event_id += f":{revision_id}"
+                written = append_lifecycle_event(conn, event_id=event_id,
                     signal_id=signal_id, kind="OUTCOME", occurred_at=decision_time.isoformat(), available_at=known_at,
                     confirmed_at=known_at, ingested_at=ingested_at,
                     payload={"ticker": row["ticker"], "measurement_scope": "counterfactual_recommendation_price_path",
-                             **({"price_reference": asdict(reference)} if reference else {}), **returns})
+                             **({"price_reference": asdict(reference)} if reference else {}),
+                             **({"price_revision_id": revision_id} if revision_id else {}), **returns})
                 if require_verified_price and not written:
                     continue
             if not require_verified_price:
@@ -318,8 +332,8 @@ def update_action_outcomes(
                   benchmark_return_20d, benchmark_excess_20d, benchmark_return_60d,
                   benchmark_excess_60d, benchmark_key,
                   max_drawdown_20d, max_favorable_excursion_20d, avoided_drawdown_20d,
-                  missed_upside_20d, outcome_label, calculation_version, updated_at
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                  missed_upside_20d, outcome_label, calculation_version, updated_at, price_revision_id
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     row["id"],
@@ -343,6 +357,7 @@ def update_action_outcomes(
                     returns.get("outcome_label"),
                     calculation_version,
                     known_at if require_verified_price else asof_date,
+                    revision_id,
                 ),
             )
             inserted += 1
@@ -382,14 +397,23 @@ def summarize_action_performance(db_path: Path, *, analysis_as_of: str | None = 
     with sqlite3.connect(db_path) as conn:
         conn.row_factory = sqlite3.Row
         if require_verified_price:
+            safe_cutoff = cutoff.isoformat()
+            latest_price = latest_revision_sql("o.recommendation_id", f"'{safe_cutoff}'")
+            conn.execute(f"""
+                CREATE TEMP VIEW action_recommendations AS
+                SELECT * FROM main.action_recommendations WHERE julianday(created_at) <= julianday('{safe_cutoff}')
+            """)
             conn.execute(f"""
                 CREATE TEMP VIEW action_outcomes AS
                 SELECT * FROM main.action_outcomes o
-                WHERE o.calculation_version = {VERIFIED_PRICE_CALCULATION_VERSION} AND o.rowid = (
+                WHERE o.calculation_version = {VERIFIED_PRICE_CALCULATION_VERSION}
+                  AND EXISTS (SELECT 1 FROM temp.action_recommendations rec WHERE rec.id = o.recommendation_id)
+                  AND o.rowid = (
                     SELECT r.rowid FROM main.action_outcomes r
                     WHERE r.recommendation_id = o.recommendation_id
                       AND r.calculation_version = {VERIFIED_PRICE_CALCULATION_VERSION}
                       AND r.updated_at <= '{cutoff.isoformat()}'
+                      AND r.price_revision_id IS ({latest_price})
                     ORDER BY r.updated_at DESC, r.rowid DESC LIMIT 1
                 )
             """)
