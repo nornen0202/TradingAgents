@@ -334,8 +334,10 @@ def test_atomic_writes_and_case_insensitive_action_outcomes(tmp_path: Path, monk
     assert list(state_target.parent.glob("*.tmp*")) == []
 
     report_file = tmp_path / "report.json"
-    report_file.write_text("{}", encoding="utf-8")
     digest = "a" * 64
+    report_file.write_text(json.dumps({"surface": "kr", "event_id": "kr:" + "b" * 32,
+                                      "report_sha256": digest}), encoding="utf-8")
+    monkeypatch.setattr(handoff, "validate_work_report", lambda _report: None)
     runtime = SimpleNamespace(
         root=tmp_path,
         status=lambda _surface: {

@@ -4,23 +4,14 @@ from pathlib import Path
 from unittest.mock import patch
 import unittest
 
+import pandas as pd
+
 from tradingagents.scheduled.config import load_scheduled_config
 from tradingagents.scheduled.runner import resolve_trade_date
 
 
-class _FakeIndexValue:
-    def __init__(self, value: date):
-        self._value = value
-
-    def to_pydatetime(self):
-        return datetime.combine(self._value, datetime.min.time())
-
-
-class _FakeHistory:
-    empty = False
-
-    def __init__(self, value: date):
-        self.index = [_FakeIndexValue(value)]
+def _FakeHistory(value: date):
+    return pd.DataFrame({"Close": [100.0]}, index=pd.to_datetime([value]))
 
 
 class _FixedDatetime(datetime):
@@ -127,7 +118,7 @@ class TradeDateFreshnessGuardTests(unittest.TestCase):
         self.assertEqual(fetch_history.call_count, 3)
         self.assertEqual(wait.call_count, 2)
 
-    def test_latest_available_caps_future_or_partial_vendor_date_to_completed_market_session(self):
+    def test_latest_available_requires_actual_bar_for_completed_market_session(self):
         with (
             patch("tradingagents.scheduled.runner.datetime", _FixedDatetime),
             patch(
@@ -139,7 +130,8 @@ class TradeDateFreshnessGuardTests(unittest.TestCase):
                 return_value=_FakeHistory(date(2026, 6, 30)),
             ),
         ):
-            self.assertEqual(resolve_trade_date("AAPL", _config("US")), "2026-06-29")
+            with self.assertRaisesRegex(RuntimeError, "Refusing stale latest_available trade date"):
+                resolve_trade_date("AAPL", _config("US"))
 
     def test_retryable_lookup_failure_uses_completed_market_session_not_wall_clock_business_day(self):
         with (

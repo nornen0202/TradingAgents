@@ -491,8 +491,9 @@ def test_core_cloud_writers_yield_to_local_authority():
 def test_local_handoff_queues_without_dispatch_and_never_claims_delivery(tmp_path, monkeypatch):
     from tradingagents.work.handoff import dispatch_pages_handoff
     report_path = tmp_path / "report.json"
-    report_path.write_text("{}")
     event, report_sha = "kr:event", "a" * 64
+    report_path.write_text(json.dumps({"surface": "kr", "event_id": event, "report_sha256": report_sha}))
+    monkeypatch.setattr("tradingagents.work.handoff.validate_work_report", lambda _report: None)
     runtime = SimpleNamespace(root=tmp_path / "work", status=lambda _: {"state": {
         "last_acked_event_id": event, "last_acked_report_sha256": report_sha, "last_acked_report_path": str(report_path)}})
     monkeypatch.setenv("TRADINGAGENTS_AUTOMATION_BACKEND", "local")
@@ -511,7 +512,8 @@ def test_only_specific_actions_disabled_error_queues_local_handoff(tmp_path, mon
     monkeypatch.delenv("TRADINGAGENTS_AUTOMATION_BACKEND", raising=False)
     monkeypatch.setattr("tradingagents.work.handoff.shutil.which", lambda _: "gh")
     report_path = tmp_path / "report.json"
-    report_path.write_text("{}")
+    report_path.write_text(json.dumps({"surface": "us", "event_id": "us:event", "report_sha256": "b" * 64}))
+    monkeypatch.setattr("tradingagents.work.handoff.validate_work_report", lambda _report: None)
     runtime = SimpleNamespace(root=tmp_path / "work", status=lambda _: {"state": {
         "last_acked_event_id": "us:event", "last_acked_report_sha256": "b" * 64, "last_acked_report_path": str(report_path)}})
     binding = dict(surface="us", event_id="us:event", report_sha256="b" * 64, repository=local.REPOSITORY)

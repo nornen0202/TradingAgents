@@ -10,6 +10,8 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 
+from tradingagents.dataflows.market_policy import aware_datetime
+
 from .packet import (
     PROMPT_CONTRACTS,
     SURFACES,
@@ -128,7 +130,8 @@ def _publish_latest_report(
     if not latest_source.is_file():
         return {}
     try:
-        report = json.loads(latest_source.read_text(encoding="utf-8"))
+        latest_bytes = latest_source.read_bytes()
+        report = json.loads(latest_bytes)
     except (OSError, json.JSONDecodeError) as exc:
         raise ValueError(f"Invalid latest Work report for {surface}: {exc}") from exc
     if not isinstance(report, dict):
@@ -136,15 +139,18 @@ def _publish_latest_report(
     validate_work_report(report)
     if report.get("schema") != WORK_REPORT_SCHEMA or report.get("surface") != surface:
         raise ValueError(f"Latest Work report binding mismatch: {surface}")
+    published_at = aware_datetime(report["published_at"])
+    if published_at is None or published_at > datetime.now(timezone.utc):
+        raise ValueError(f"Latest Work report publication time is invalid or in the future: {surface}")
     report_sha = str(report["report_sha256"])
     content_source = archive_dir / "work-reports" / surface / "events" / f"{report_sha}.json"
-    if not content_source.is_file() or content_source.read_bytes() != latest_source.read_bytes():
+    if not content_source.is_file() or content_source.read_bytes() != latest_bytes:
         raise ValueError(f"Latest Work report is not backed by its content-addressed event: {surface}")
     target_root = root / surface / "report"
     history = publish_report_history(root=root, archive_dir=archive_dir, surface=surface,
                                      url_prefix=url_prefix)
-    _write_bytes(target_root / "events" / f"{report_sha}.json", content_source.read_bytes())
-    _write_bytes(target_root / "latest.json", latest_source.read_bytes())
+    _write_bytes(target_root / "events" / f"{report_sha}.json", latest_bytes)
+    _write_bytes(target_root / "latest.json", latest_bytes)
     markdown = str(report.get("report_markdown") or "")
     _write_bytes(target_root / "latest.md", markdown.encode("utf-8"))
     structured = report.get("structured_report") or {}

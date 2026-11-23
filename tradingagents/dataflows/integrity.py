@@ -5,6 +5,7 @@ from __future__ import annotations
 from datetime import date, datetime, timedelta, timezone
 import math
 import re
+from zoneinfo import ZoneInfo
 
 import pandas as pd
 
@@ -38,6 +39,17 @@ def is_historical(as_of: str | date | datetime | None) -> bool:
     if stamp.tzinfo is None or stamp.utcoffset() is None:
         raise ValueError("Historical cutoff datetime requires a timezone")
     return stamp.astimezone(timezone.utc).date() < today
+
+
+def parse_analysis_cutoff(requested: date | datetime | str, market_timezone: str) -> datetime:
+    """Resolve a date to the end of its market day or preserve an exact instant."""
+    raw = str(requested).strip()
+    stamp = datetime.fromisoformat(raw.replace("Z", "+00:00"))
+    if len(raw) == 10:
+        return stamp.replace(tzinfo=ZoneInfo(market_timezone)) + timedelta(days=1) - timedelta(microseconds=1)
+    if stamp.tzinfo is None or stamp.utcoffset() is None:
+        raise ValueError("Analysis cutoff requires a timezone")
+    return stamp
 
 
 def utc_window(start: str, end: str) -> tuple[datetime, datetime]:

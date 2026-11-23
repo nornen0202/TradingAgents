@@ -4,6 +4,10 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import Iterable
 
+from .config import get_config
+from .integrity import parse_analysis_cutoff
+from .vendor_exceptions import VendorInputError
+
 
 @dataclass(frozen=True)
 class NewsItem:
@@ -92,17 +96,25 @@ def filter_news_items_by_date(
     *,
     start_date: datetime | None = None,
     end_date: datetime | None = None,
+    market_timezone: str = "UTC",
 ) -> list[NewsItem]:
     start_date = normalize_datetime(start_date)
     end_date = normalize_datetime(end_date)
+    cutoff = datetime.now(timezone.utc)
+    configured_cutoff = get_config().get("analysis_as_of")
+    if configured_cutoff:
+        try:
+            cutoff = min(cutoff, parse_analysis_cutoff(configured_cutoff, market_timezone))
+        except (TypeError, ValueError) as exc:
+            raise VendorInputError("Invalid news analysis_as_of cutoff") from exc
     filtered: list[NewsItem] = []
     for item in items:
         published_at = item.published_at
-        if published_at is None:
-            if start_date is None and end_date is None:
-                filtered.append(item)
+        if published_at is None or published_at.tzinfo is None or published_at.utcoffset() is None:
             continue
-        published = normalize_datetime(published_at).astimezone(timezone.utc)
+        published = published_at.astimezone(timezone.utc)
+        if published > cutoff:
+            continue
         if start_date and published < start_date:
             continue
         if end_date and published >= end_date:
