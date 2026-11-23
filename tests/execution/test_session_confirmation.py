@@ -1,7 +1,9 @@
 from datetime import datetime
+import json
 
 import pytest
 
+from tradingagents.execution.archive_paper import build_step
 from tradingagents.execution.session_confirmation import evaluate_plan
 
 
@@ -58,3 +60,36 @@ def test_independent_intraday_alternative_does_not_require_close():
     stamp = "2026-11-27T17:29:00Z"
     result = _evaluate(plan, analysis_as_of=stamp, live_quote=_feed("quote", stamp))
     assert result["matched_alternatives"] == [1] and result["paper_candidate_ready"]
+
+
+@pytest.mark.parametrize("case", ["ready", "future_capture", "missing_open", "wrong_plan_currency", "wait"])
+def test_archive_paper_entry_consumes_explicit_session_proof(tmp_path, case):
+    proof = {"plan": PLAN, "regular_close": _feed("final_regular_close", FRIDAY_CLOSE),
+             "official_open": _feed("official_regular_open", MONDAY_OPEN), "live_quote": _feed("quote", NOW)}
+    if case == "future_capture":
+        proof["official_open"]["observed_at"] = "2026-11-30T14:35:01Z"
+    if case == "missing_open":
+        proof.pop("official_open")
+    if case == "wrong_plan_currency":
+        proof["plan"] = PLAN | {"currency": "KRW"}
+    docs = {
+        "run.json": {"run_id": "test-session", "status": "success"},
+        "decision_bundle_v2.json": {"market": "US", "generated_at": NOW, "analysis_source_run_id": "test-session",
+                                   "strategy_table": [{"ticker": "ABC", "market_data_asof": NOW,
+                                      "quality": {"execution_ready": True, "generated_in_current_run": True},
+                                      "raw_codes": {"decision_now": "WAIT" if case == "wait" else "ADD_NOW"}}]},
+        "portfolio-private/account_snapshot.json": {"as_of": NOW, "positions": [], "account_value_krw": 10_000_000},
+        "portfolio-private/proposed_orders.json": {"orders": [{"canonical_ticker": "ABC", "side": "BUY", "estimated_qty": 1}]},
+        "tickers/ABC/execution_contract.json": {"entry_confirmation_v2": proof},
+    }
+    for name, data in docs.items():
+        path = tmp_path / name
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps(data))
+    _, result, _ = build_step(tmp_path, "2026-11-30T14:35:15Z")
+    if case == "wait":
+        assert not result["signals"]
+    else:
+        signal, = result["signals"]
+        assert signal["execution_ready"] is (case == "ready")
+        assert signal["entry_confirmation"]["paper_candidate_ready"] is (case == "ready")
