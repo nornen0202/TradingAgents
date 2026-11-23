@@ -1,13 +1,13 @@
 {
   "schema": "tradingagents.work-context/v1",
   "surface": "kr",
-  "event_id": "kr:486bbc7bb6cecedd64f8ca1721656af7",
+  "event_id": "kr:6c5b32d1e31fc8080e0012bd3546cd3f",
   "prompt_contract_version": "market-work-v12-kr",
   "prompt_sha256": "ae80093efe2dcfe7f6131b8b09100f75e77b0ca0242b5340d15eb6ec3fd81274",
   "skill_sha256": "2fef99f1af403675549a13813e0fe5597a241a964affeada56e9f64e9f398fe9",
   "task_manifest_sha256": "6fbafadc2971d1a908c1bbc1fa29e2adaf0ca6be956768f2f9eb0abf0061428e",
   "workflow_contract_sha256": "3d89f852dda405d7c44afdbed158e622d8a748f194d9e44d0aca14a8bbe14de1",
-  "source_sha256": "e27f0940dd3e3069a3dd323059c141f6bd36ea8a531cb81a6efd52d4e98fdd6f",
+  "source_sha256": "b2c08bc0e7e24ef0ea579167cbe57980d1a602844d9912e0ad9af5e1edf2725e",
   "body": {
     "kind": "market",
     "market": "KR",
@@ -1684,15 +1684,15 @@
         "source_health": "OK",
         "coverage": {
           "total_unique_events": 932,
-          "window_events": 52,
+          "window_events": 50,
           "transmitted_events": 12,
           "truncated": true,
-          "oldest_occurred_at": "2026-11-20T01:52:19+00:00",
+          "oldest_occurred_at": "2026-11-20T11:00:06+00:00",
           "newest_occurred_at": "2026-11-22T21:46:51+00:00",
-          "available_events_before_context_cap": 52,
+          "available_events_before_context_cap": 50,
           "context_event_cap": 12,
-          "omitted_events": 40,
-          "omitted_due_to_context_cap": 40,
+          "omitted_events": 38,
+          "omitted_due_to_context_cap": 38,
           "omitted_before_context_selection": 0
         },
         "events": [
@@ -2022,152 +2022,6 @@
                   "status": "unverified",
                   "verification_notes": [
                     "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                }
-              ]
-            }
-          },
-          {
-            "event_key": "TV3diSFaZIU",
-            "content_sha256": "1858130d3476f61328bc885bd7980d57368ddad41a0f6958967909028b09b985",
-            "occurred_at": "2026-11-20T01:52:19+00:00",
-            "relevance": {
-              "tickers": [
-                "^KS11",
-                "005930",
-                "000660",
-                "NVDA",
-                "BTC",
-                "017670",
-                "USD/KRW",
-                "KOSDAQ"
-              ],
-              "markets": [
-                "US",
-                "KR"
-              ],
-              "themes": [],
-              "match_basis": "verified_entities",
-              "matched_tickers": [
-                "000660",
-                "005930"
-              ],
-              "market_match": true,
-              "score": 220
-            },
-            "summary": {
-              "video_id": "TV3diSFaZIU",
-              "title": "이대로 갔다간...4,300까지도 열어 놔야 한다ㅣ이재규 SK증권 차장 [더블 체크]",
-              "channel": "삼프로TV 3PROTV",
-              "source_url": "https://www.youtube.com/watch?v=TV3diSFaZIU",
-              "claim_status_summary": {
-                "partially_supported": 5,
-                "unverified": 6,
-                "asr_uncertain": 1
-              },
-              "claims": [
-                {
-                  "claim_id": "C1",
-                  "claim_text": "출연자는 4,800을 코스피의 1차 지지선, 이탈 시 4,300을 기술적 하단으로 제시했다. 전일 종가를 5,000으로 가정해 14~15% 추가 하락을 설명했고, 과거 9,000에서 5,000으로 40% 넘게 내렸다고 발언했다. 현금 투자자는 투매보다 보유·매수 관점을 유지하되 레버리지와 업종 집중을 줄이자는 의견이다.",
-                  "status": "partially_supported",
-                  "confidence": 0.66,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "14%는 실제 전일 종가가 아닌 5,000을 기준으로 한 값이다. 4,800 이탈 여부를 판단하려면 방송에서 적용한 장중·종가 기준을 먼저 확인해야 한다."
-                },
-                {
-                  "claim_id": "C2",
-                  "claim_text": "장초반 지수는 약 4%, 삼성전자와 SK하이닉스는 각각 약 4.3%와 6% 하락했고, 이후 두 종목의 낙폭은 각각 약 4.5%와 6.2%로 언급됐다. 양 지수 약 3.7%·3.6% 하락, 직전 이틀 SK하이닉스 약 10%·삼성전기로 추정되는 종목 약 15% 상승, 주간 외국인 약 3조3천억 원 매도가 제시됐다. 출연자는 낮은 거래대금·예탁금, 얇은 호가와 레버리지가 낙폭을 키웠고, 소부장·2차전지는 약세인 반면 일부 바이오·소비·금융주는 상대적으로 버텼다고...",
-                  "status": "partially_supported",
-                  "confidence": 0.58,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "반도체 대형주의 동반 약세 보도와 시장 전체의 외국인 이탈·유동성 악화 주장은 구분해야 한다. 업종 이동은 동시각 업종별 수익률과 수급으로 확인할 필요가 있다."
-                },
-                {
-                  "claim_id": "C3",
-                  "claim_text": "방송은 앤트로픽이 공모가를 웃돌았으나 장중 상승폭을 반납했고 스페이스X보다 개인 매수세가 약했다고 전했다. 직전 미국장에서 나스닥·S&P 500·다우가 각각 2% 넘게 하락했고 한국 장중 나스닥 선물은 약 0.3% 하락했다고 언급했다. AMD의 동반 약세와 중국 관련 공매도 논거도 제시했다.",
-                  "status": "partially_supported",
-                  "confidence": 0.44,
-                  "supporting_evidence_ids": [
-                    "E4"
-                  ],
-                  "manual_check_required": true,
-                  "investor_implication": "IPO가 AI주 매도를 촉발했다는 인과 해석이나 개인 매수세 비교는 투자 근거로 쓰기 어렵다. 정규장과 선물 데이터는 거래 세션을 분리해 확인해야 한다."
-                },
-                {
-                  "claim_id": "C4",
-                  "claim_text": "SK텔레콤이 앤트로픽에 약 2천억~3천억 원을 투자해 약 4조 원의 이익을 얻었다는 발언이 나왔다. 평가이익인지 실현이익인지는 불명확하며 상장 이후 모멘텀 약화는 전망이다.",
-                  "status": "partially_supported",
-                  "confidence": 0.43,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "지분 평가액, 회계상 평가이익, 처분대금과 배당 재원은 서로 다르다. 약 4조 원을 실현이익이나 배당 여력으로 간주할 근거는 없다."
-                }
-              ],
-              "entities": [
-                {
-                  "ticker": "^KS11",
-                  "name": "코스피",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                },
-                {
-                  "ticker": "005930",
-                  "name": "삼성전자",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "시장 데이터 조회 실패: no_usable_market_fields"
-                  ]
-                },
-                {
-                  "ticker": "000660",
-                  "name": "SK하이닉스",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "시장 데이터 조회 실패: no_usable_market_fields"
-                  ]
-                },
-                {
-                  "ticker": "NVDA",
-                  "name": "엔비디아",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                },
-                {
-                  "ticker": "BTC",
-                  "name": "비트코인",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                },
-                {
-                  "ticker": "017670",
-                  "name": "SK텔레콤",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "시장 데이터 조회 실패: no_usable_market_fields"
-                  ]
-                },
-                {
-                  "ticker": "USD/KRW",
-                  "name": "원화·엔화·미국 국채",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "시장 데이터 조회 실패: Failed to parse json response from Yahoo Finance: {'code': 'Not Found', 'description': 'HTTP 404 Not Found'}"
-                  ]
-                },
-                {
-                  "ticker": "KOSDAQ",
-                  "name": "코스닥·바이오·방어주",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "시장 데이터 조회 실패: no_usable_market_fields"
                   ]
                 }
               ]
@@ -2786,6 +2640,68 @@
               ],
               "entities": []
             }
+          },
+          {
+            "event_key": "u3Ns4rlOYqA",
+            "content_sha256": "ae3be36993b65a4be04bd4c5f031a93afb37d8bc19c82d9515389bc5027be847",
+            "occurred_at": "2026-11-22T01:00:27+00:00",
+            "relevance": {
+              "tickers": [],
+              "markets": [],
+              "themes": [],
+              "match_basis": "title_and_claim_context",
+              "matched_tickers": [],
+              "market_match": false,
+              "score": 0
+            },
+            "summary": {
+              "video_id": "u3Ns4rlOYqA",
+              "title": "SK 최태원이 말한 '젠슨의 법칙' 진짜 의미",
+              "channel": "경제사냥꾼",
+              "source_url": "https://www.youtube.com/watch?v=u3Ns4rlOYqA",
+              "claim_status_summary": {
+                "unverified": 10
+              },
+              "claims": [
+                {
+                  "claim_id": "C1",
+                  "claim_text": "최태원이 9월 말 뉴욕에서 젠슨 황이 수상한 행사에서 ‘많이 살수록 많이 아낀다’고 건배사를 하고, 엔비디아는 두뇌를 설계하고 SK는 기억을 만든다고 말했다.",
+                  "status": "unverified",
+                  "confidence": 0.0,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "건배사로 소개된 표현만으로 고객의 비용 절감이나 SK하이닉스의 공급 계약을 판단할 수 없다."
+                },
+                {
+                  "claim_id": "C2",
+                  "claim_text": "2023년 시연에서 같은 134억 원을 쓸 때 일반 서버 대비 엔비디아 구성의 산출량은 1 대 44, 단위당 비용은 44분의 1, 전력 사용량은 3분의 1 미만이었다.",
+                  "status": "unverified",
+                  "confidence": 0.0,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "44배 성능이나 44분의 1 비용을 실제 구매자의 투자수익률에 그대로 적용할 수 없다."
+                },
+                {
+                  "claim_id": "C3",
+                  "claim_text": "11월에 젠슨 황이 물러나고 크레스가 엔비디아 임시 CEO로 선임됐다.",
+                  "status": "unverified",
+                  "confidence": 0.0,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "경영진 교체나 그에 따른 자본 배분 변화를 투자 판단의 전제로 삼을 근거가 없다."
+                },
+                {
+                  "claim_id": "C4",
+                  "claim_text": "크레스는 재무 책임자 시절부터 고객 자금 지원에 반대했고 최근 실적 발표에서 향후 투자와 지급보증을 더 엄격히 심사하겠다고 말했다.",
+                  "status": "unverified",
+                  "confidence": 0.0,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "고객 금융이 실제로 축소될 것이라고 가정하기보다 심사 대상과 적용 시점이 공개되는지 확인할 필요가 있다."
+                }
+              ],
+              "entities": []
+            }
           }
         ],
         "execution_eligible": false
@@ -2817,7 +2733,6 @@
               "Zt0LLfeAGEY",
               "1PvkBMtMkyk",
               "KopQpHNgc4k",
-              "TV3diSFaZIU",
               "vhAlRhO25CA",
               "-VmrR-51UUU",
               "OG0IvvfJk5s",
@@ -2825,19 +2740,20 @@
               "b8HjQUH4OSs",
               "nfa_u6gyF-A",
               "KvflYv1CLuQ",
-              "BV44qRI0LdE"
+              "BV44qRI0LdE",
+              "u3Ns4rlOYqA"
             ],
             "coverage": {
               "total_unique_events": 932,
-              "window_events": 52,
+              "window_events": 50,
               "transmitted_events": 12,
               "truncated": true,
-              "oldest_occurred_at": "2026-11-20T01:52:19+00:00",
+              "oldest_occurred_at": "2026-11-20T11:00:06+00:00",
               "newest_occurred_at": "2026-11-22T21:46:51+00:00",
-              "available_events_before_context_cap": 52,
+              "available_events_before_context_cap": 50,
               "context_event_cap": 12,
-              "omitted_events": 40,
-              "omitted_due_to_context_cap": 40,
+              "omitted_events": 38,
+              "omitted_due_to_context_cap": 38,
               "omitted_before_context_selection": 0
             }
           },
