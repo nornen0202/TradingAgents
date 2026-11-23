@@ -1,8 +1,9 @@
 from datetime import datetime, timedelta, timezone
+from copy import deepcopy
 
 import pytest
 
-from tradingagents.execution.paper_approval import PaperApproval
+from tradingagents.execution.paper_approval import PaperApproval, apply_telegram_paper_callback
 
 
 NOW = datetime(2026, 10, 7, 14, tzinfo=timezone.utc)
@@ -77,3 +78,31 @@ def test_rejection_and_single_lot_cannot_turn_into_an_order(tmp_path):
             ledger.consume("paper-1", scope="fixture-scope", quote=_quote())
         with pytest.raises(ValueError, match="isolated"):
             ledger.propose(_proposal(intent="live", mode="real"))
+
+
+def test_telegram_ingress_checks_webhook_actor_chat_message_origin_and_replay(tmp_path):
+    secret = "isolated_fixture_webhook_secret_012345"
+    with PaperApproval(tmp_path / "telegram.sqlite", secret=b"fixture-private-signing-key".ljust(32, b"x"),
+                       authorized=frozenset({"1001"}), clock=lambda: NOW) as ledger:
+        callbacks = ledger.propose(_proposal())
+        update = {"update_id": 10, "callback_query": {"id": "query-1", "data": callbacks["approve"],
+                  "from": {"id": 1001, "is_bot": False},
+                  "message": {"chat": {"id": -1000001}, "from": {"id": 2001, "is_bot": True}}}}
+        args = dict(supplied_secret=secret, webhook_secret=secret, bot_id=2001, allowed_chats={-1000001})
+        with pytest.raises(ValueError, match="webhook"):
+            apply_telegram_paper_callback(ledger, update, **(args | {"supplied_secret": "forged"}))
+        for field, changed in (("chat", {"id": -1000002}), ("from", {"id": 3001, "is_bot": True})):
+            other = deepcopy(update)
+            other["callback_query"]["message"][field] = changed
+            with pytest.raises(ValueError, match="scope"):
+                apply_telegram_paper_callback(ledger, other, **args)
+        other = deepcopy(update)
+        other["callback_query"]["from"]["id"] = 9999
+        with pytest.raises(ValueError, match="Unauthorized"):
+            apply_telegram_paper_callback(ledger, other, **args)
+        assert apply_telegram_paper_callback(ledger, update, **args)["status"] == "RECORDED"
+        assert apply_telegram_paper_callback(ledger, update, **args)["status"] == "REPLAY"
+        other = deepcopy(update)
+        other["callback_query"]["data"] = callbacks["reject"]
+        with pytest.raises(ValueError, match="different decision"):
+            apply_telegram_paper_callback(ledger, other, **args)

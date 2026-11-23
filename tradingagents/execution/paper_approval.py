@@ -34,6 +34,34 @@ def _encode(data):
     return json.dumps(data, sort_keys=True, separators=(",", ":"), allow_nan=False)
 
 
+def apply_telegram_paper_callback(ledger, update, *, supplied_secret, webhook_secret, bot_id, allowed_chats):
+    """Verify one ingress payload and forward only its isolated decision."""
+    secret_pattern = r"[A-Za-z0-9_-]{32,256}"
+    if (not isinstance(webhook_secret, str) or not re.fullmatch(secret_pattern, webhook_secret)
+            or not isinstance(supplied_secret, str) or not re.fullmatch(secret_pattern, supplied_secret)
+            or not hmac.compare_digest(webhook_secret, supplied_secret)
+            or type(bot_id) is not int or bot_id <= 0):
+        raise ValueError("Unauthorized Telegram webhook")
+    try:
+        callback = update["callback_query"]
+        sender = callback["from"]
+        message = callback["message"]
+        actor_id, origin_id, chat_id = sender["id"], message["from"]["id"], message["chat"]["id"]
+        query_id = callback["id"]
+        if (type(update["update_id"]) is not int or update["update_id"] <= 0
+                or type(actor_id) is not int or actor_id <= 0 or sender.get("is_bot") is not False
+                or type(origin_id) is not int or origin_id != bot_id or message["from"].get("is_bot") is not True
+                or type(chat_id) is not int or chat_id not in allowed_chats
+                or not isinstance(query_id, str) or not re.fullmatch(r"[A-Za-z0-9_-]{1,128}", query_id)
+                or "inline_message_id" in callback or "game_short_name" in callback):
+            raise ValueError("Unverified Telegram callback scope")
+        data = callback["data"]
+    except (TypeError, KeyError, AttributeError) as exc:
+        raise ValueError("Unverified Telegram callback scope") from exc
+    recorded = ledger.decide(data, actor_id=str(actor_id), delivery_id=f"telegram:{bot_id}:{query_id}")
+    return {"status": "RECORDED" if recorded else "REPLAY", "live_order_authority": False}
+
+
 class PaperApproval:
     """Keep callback authentication separate from transport and broker execution."""
 
