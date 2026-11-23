@@ -10,7 +10,7 @@ import requests
 
 from .api_keys import get_api_key
 from .config import get_config
-from .integrity import safe_symbol, utc_window
+from .integrity import parse_analysis_cutoff, safe_symbol, utc_window
 from .vendor_exceptions import (
     VendorConfigurationError, VendorInputError, VendorMalformedResponseError,
     VendorUnavailableError,
@@ -39,11 +39,13 @@ def get_company_news_alpaca(ticker: str, start_date: str, end_date: str) -> str:
     context_cutoff = get_config().get("analysis_as_of")
     if context_cutoff:
         try:
-            if len(str(context_cutoff)) == 10:
-                _, context_end = utc_window(str(context_cutoff), str(context_cutoff))
+            scope = str(context_cutoff).strip()
+            if len(scope) == 10:
+                # Alpaca date windows and their receipts use UTC boundaries.
+                _, context_end = utc_window(scope, scope)
                 end = min(end, context_end)
             else:
-                cutoff = min(cutoff, _aware(context_cutoff))
+                cutoff = min(cutoff, parse_analysis_cutoff(context_cutoff, "UTC").astimezone(timezone.utc))
         except (TypeError, ValueError) as exc:
             raise VendorInputError("Invalid news analysis_as_of") from exc
     if start >= end or start > cutoff:

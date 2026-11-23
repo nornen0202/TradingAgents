@@ -5,7 +5,7 @@ import math
 import sqlite3
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
-from typing import Any, Iterable, Mapping, Sequence
+from typing import Any, Mapping, Sequence
 
 from tradingagents.external.prism_normalize import normalize_market
 
@@ -17,7 +17,8 @@ from .outcome_revisions import read_events, select_retrospectives, visible_event
 
 def initialize_action_tracker(db_path: Path) -> None:
     db_path.parent.mkdir(parents=True, exist_ok=True)
-    with sqlite3.connect(db_path) as conn:
+    with sqlite3.connect(db_path, timeout=30) as conn:
+        conn.execute("BEGIN IMMEDIATE")
         initialize_lifecycle(conn)
         for statement in ACTION_TRACKER_SCHEMA:
             conn.execute(statement)
@@ -99,7 +100,10 @@ def record_run_recommendations(run_dir: Path, db_path: Path, *, run_market: str 
     )
     inserted = 0
     ingested_at = recorded_at or datetime.now(timezone.utc).isoformat()
-    with sqlite3.connect(db_path) as conn:
+    with sqlite3.connect(db_path, timeout=30) as conn:
+        # Acquire the writer lock before looking for an existing logical row.
+        # Two retries of the same run must not both observe an absent row.
+        conn.execute("BEGIN IMMEDIATE")
         for row in rows:
             if _recommendation_exists(conn, row):
                 receipt = row.get("execution_receipt")
@@ -171,6 +175,8 @@ def update_action_outcomes(
     initialize_action_tracker(db_path)
     # Validate locally even if the upstream adapter claims to apply end_date.
     cutoff = date.fromisoformat(str(asof_date)[:10])
+    known_at = str(asof_date) if "T" in str(asof_date) else cutoff.isoformat() + "T23:59:59.999999+00:00"
+    decision_cutoff = timestamp(known_at)
     ingested_at = recorded_at or datetime.now(timezone.utc).isoformat()
     prices = _normalize_price_history(price_history or (_load_json(Path(price_history_path)) if price_history_path else {}), asof_date=str(asof_date))
     benchmark_series = prices.get(BENCHMARK_KEY)
@@ -181,7 +187,8 @@ def update_action_outcomes(
     if recommendation_ids is not None and not selected_ids:
         return
     cutoff_date = _outcome_refresh_cutoff_date(asof_date, refresh_window_days)
-    with sqlite3.connect(db_path) as conn:
+    with sqlite3.connect(db_path, timeout=30) as conn:
+        conn.execute("BEGIN IMMEDIATE")
         conn.row_factory = sqlite3.Row
         placeholders = ",".join("?" for _ in price_tickers)
         if recommendation_ids is not None:
@@ -233,12 +240,12 @@ def update_action_outcomes(
         for row in recommendations:
             try:
                 decision_time = timestamp(row["created_at"])
-                decision_cutoff = timestamp(str(asof_date) if "T" in str(asof_date) else cutoff.isoformat() + "T23:59:59.999999+00:00")
                 if decision_time > decision_cutoff:
                     continue
             except ValueError:
                 # Legacy date-only rows retain date-granularity metrics but are
                 # deliberately excluded from the evidence replay below.
+                decision_time = None
                 try:
                     if date.fromisoformat(str(row["created_at"])) > cutoff:
                         continue
@@ -250,6 +257,17 @@ def update_action_outcomes(
                 continue
             returns = _compute_returns(row, series, horizons=horizons, benchmark_series=benchmark_series)
             if not returns:
+                continue
+            if decision_time is not None:
+                signal_id = stable_signal_id(row["run_id"], row["ticker"], row["action"], row["source"] or "TradingAgents")
+                append_lifecycle_event(conn, event_id=f"outcome:{signal_id}:{known_at}:v{OUTCOME_CALCULATION_VERSION}",
+                    signal_id=signal_id, kind="OUTCOME", occurred_at=decision_time.isoformat(), available_at=known_at,
+                    confirmed_at=known_at, ingested_at=ingested_at,
+                    payload={"ticker": row["ticker"], "measurement_scope": "counterfactual_recommendation_price_path", **returns})
+            previous = conn.execute(
+                "SELECT updated_at FROM action_outcomes WHERE recommendation_id = ?", (row["id"],)
+            ).fetchall()
+            if any(_outcome_clock(item["updated_at"]) > decision_cutoff for item in previous):
                 continue
             conn.execute("DELETE FROM action_outcomes WHERE recommendation_id = ?", (row["id"],))
             conn.execute(
@@ -287,19 +305,16 @@ def update_action_outcomes(
                     asof_date,
                 ),
             )
-            try:
-                decision_at = timestamp(row["created_at"]).isoformat()
-            except ValueError:
-                continue
-            known_at = str(asof_date) if "T" in str(asof_date) else cutoff.isoformat() + "T23:59:59.999999+00:00"
-            if timestamp(known_at) < timestamp(decision_at):
-                continue
-            signal_id = stable_signal_id(row["run_id"], row["ticker"], row["action"], row["source"] or "TradingAgents")
-            append_lifecycle_event(conn, event_id=f"outcome:{signal_id}:{known_at}:v{OUTCOME_CALCULATION_VERSION}", signal_id=signal_id,
-                kind="OUTCOME", occurred_at=decision_at, available_at=known_at, confirmed_at=known_at,
-                ingested_at=ingested_at,
-                payload={"ticker": row["ticker"], "measurement_scope": "counterfactual_recommendation_price_path", **returns})
         conn.commit()
+
+
+def _outcome_clock(value: str | None) -> datetime:
+    try:
+        if value and len(value) == 10:
+            value += "T23:59:59.999999+00:00"
+        return timestamp(value)
+    except ValueError:
+        return datetime.min.replace(tzinfo=timezone.utc)
 
 
 def _outcome_refresh_cutoff_date(asof_date: str, refresh_window_days: int) -> str | None:
@@ -933,7 +948,8 @@ def _recommendation_exists(conn: sqlite3.Connection, row: dict[str, Any]) -> boo
     existing = conn.execute(
         """
         SELECT 1 FROM action_recommendations
-        WHERE run_id = ? AND ticker = ? AND action = ? AND source = ?
+        WHERE run_id = ? AND upper(ticker) = upper(?) AND action = ?
+          AND COALESCE(NULLIF(source, ''), 'TradingAgents') = COALESCE(NULLIF(?, ''), 'TradingAgents')
         LIMIT 1
         """,
         (row["run_id"], row["ticker"], row["action"], row.get("source")),

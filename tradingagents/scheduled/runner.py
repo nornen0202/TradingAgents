@@ -18,6 +18,7 @@ from datetime import date, datetime, time, timedelta, timezone
 from pathlib import Path
 from time import perf_counter, sleep
 from typing import Any, Callable
+from uuid import uuid4
 from zoneinfo import ZoneInfo
 
 import yfinance as yf
@@ -296,8 +297,16 @@ def execute_scheduled_run(
     started_at = datetime.now(tz)
     run_timer_start = perf_counter()
     run_id = _build_run_id(started_at, run_label)
-    run_dir = config.storage.archive_dir / "runs" / started_at.strftime("%Y") / run_id
-    run_dir.mkdir(parents=True, exist_ok=True)
+    year_dir = config.storage.archive_dir / "runs" / started_at.strftime("%Y")
+    run_dir = year_dir / run_id
+    try:
+        run_dir.mkdir(parents=True, exist_ok=False)
+    except FileExistsError:
+        # Scheduled and manual invocations can share a label and start second.
+        # Keep the existing identifier format for archive and recovery readers.
+        run_id = f"{run_id}-{uuid4().hex}"
+        run_dir = year_dir / run_id
+        run_dir.mkdir(exist_ok=False)
     from .attempts import RunAttempt
     with RunAttempt(run_dir, market=config.run.market,
                     run_mode=str(config.run.run_mode or "full"), started_at=started_at):
@@ -1031,21 +1040,20 @@ def resolve_trade_date(
     if available_research:
         return _available_research_trade_date(history, ticker=normalized_symbol, config=config,
                                               now=now, completed=expected_completed_date)
-    if history.empty:
+    market = _trade_date_market(ticker=normalized_symbol, config=config)
+    local_day = _market_local_now(now=now, market=market).date()
+    cutoff = min(expected_completed_date, local_day) if expected_completed_date else local_day - timedelta(days=1)
+    earliest = cutoff - timedelta(days=max(1, config.run.latest_market_data_lookback_days))
+    last_date = _latest_observed_daily_bar(history, earliest=earliest, cutoff=cutoff)
+    if last_date is None and expected_completed_date is None:
         symbol_hint = _ticker_hint(normalized_symbol)
         raise RuntimeError(
             f"Could not resolve the latest available trade date for {ticker} ({normalized_symbol}); "
-            f"yfinance returned no rows.{symbol_hint}"
+            f"yfinance returned no valid completed daily bars.{symbol_hint}"
         )
 
-    last_index = history.index[-1]
-    last_value = getattr(last_index, "to_pydatetime", lambda: last_index)()
-    last_date = last_value.date() if hasattr(last_value, "date") else last_value
-    if not isinstance(last_date, date):
-        raise RuntimeError(f"Unexpected trade date index value for {ticker}: {last_index!r}")
     if expected_completed_date is not None:
-        market = _trade_date_market(ticker=normalized_symbol, config=config)
-        if market == "KR" and last_date < expected_completed_date:
+        if market == "KR" and last_date != expected_completed_date:
             # The broker's actual completed bar can resolve a Yahoo outage;
             # the calendar alone is never evidence of an available price.
             from tradingagents.dataflows.kr_daily_history import load_kr_daily_bars, source_note
@@ -1064,12 +1072,12 @@ def resolve_trade_date(
         wait_seconds = max(0.0, config.run.latest_market_data_wait_minutes * 60.0)
         retry_interval = max(1.0, config.run.latest_market_data_retry_interval_seconds)
         waited_seconds = 0.0
-        while last_date < expected_completed_date and waited_seconds < wait_seconds:
+        while last_date != expected_completed_date and waited_seconds < wait_seconds:
             delay = min(retry_interval, wait_seconds - waited_seconds)
             print(
                 "::warning::"
                 f"Vendor daily bar for {ticker} ({normalized_symbol}) is not ready: "
-                f"latest={last_date.isoformat()}, expected={expected_completed_date.isoformat()}. "
+                f"latest={last_date}, expected={expected_completed_date.isoformat()}. "
                 f"Retrying in {delay:g}s."
             )
             sleep(delay)
@@ -1088,22 +1096,16 @@ def resolve_trade_date(
                     f"continuing freshness wait. reason={_summarize_exception(exc)}"
                 )
                 continue
-            if refreshed_history is None or refreshed_history.empty:
+            refreshed_date = _latest_observed_daily_bar(refreshed_history, earliest=earliest, cutoff=cutoff)
+            if refreshed_date is None:
                 print(
                     "::warning::"
                     f"Yahoo Finance retry returned no rows for {ticker} ({normalized_symbol}); "
                     "continuing freshness wait."
                 )
                 continue
-            refreshed_index = refreshed_history.index[-1]
-            refreshed_value = getattr(refreshed_index, "to_pydatetime", lambda: refreshed_index)()
-            refreshed_date = refreshed_value.date() if hasattr(refreshed_value, "date") else refreshed_value
-            if not isinstance(refreshed_date, date):
-                raise RuntimeError(f"Unexpected trade date index value for {ticker}: {refreshed_index!r}")
-            last_date = max(last_date, refreshed_date)
-        if last_date > expected_completed_date:
-            return expected_completed_date.isoformat()
-        if last_date < expected_completed_date:
+            last_date = max(last_date, refreshed_date) if last_date is not None else refreshed_date
+        if last_date != expected_completed_date:
             wait_detail = (
                 f" after waiting {waited_seconds:g}s for vendor catch-up"
                 if waited_seconds
@@ -1111,7 +1113,7 @@ def resolve_trade_date(
             )
             raise RuntimeError(
                 f"Refusing stale latest_available trade date for {ticker} ({normalized_symbol}): "
-                f"vendor latest row is {last_date.isoformat()} but {market} calendar expects "
+                f"vendor latest valid row is {last_date} but {market} calendar expects "
                 f"completed daily bar {expected_completed_date.isoformat()} as of {now.isoformat()}"
                 f"{wait_detail}."
             )
@@ -1120,23 +1122,37 @@ def resolve_trade_date(
 
 def _available_research_trade_date(history, *, ticker, config, now, completed):
     """Use an observed completed bar, without waiting or inventing today's price."""
-    import math
-    import pandas as pd
-
     market = _trade_date_market(ticker=ticker, config=config)
     local_day = _market_local_now(now=now, market=market).date()
     cutoff = min(completed, local_day) if completed is not None else local_day - timedelta(days=1)
     earliest = cutoff - timedelta(days=max(1, config.run.latest_market_data_lookback_days))
+    selected = _latest_observed_daily_bar(history, earliest=earliest, cutoff=cutoff)
+    if selected is None:
+        raise RuntimeError("No valid dated completed daily bar is available for investor research")
+    if selected < cutoff:
+        print(f"::warning::Investor research uses observed {ticker} daily bar {selected.isoformat()}; "
+              f"latest completed session is {cutoff.isoformat()}. Source date is preserved; no freshness wait.")
+    return selected.isoformat()
+
+
+def _latest_observed_daily_bar(history, *, earliest: date, cutoff: date) -> date | None:
+    import math
+    import pandas as pd
+
     dates = []
     if isinstance(history, pd.DataFrame) and "Close" in history.columns:
         for index, row in history.iterrows():
             if not isinstance(index, (str, date, datetime, pd.Timestamp)):
                 continue
             try:
-                stamp = pd.Timestamp(index)
-                if pd.isna(stamp):
+                if pd.isna(index):
                     continue
-                observed = stamp.date()
+                if isinstance(index, str):
+                    observed = date.fromisoformat(index[:10])
+                    if len(index) != 10:
+                        observed = pd.Timestamp(index).date()
+                else:
+                    observed = index.date() if hasattr(index, "date") else index
                 if isinstance(row["Close"], bool):
                     continue
                 close = float(row["Close"])
@@ -1144,13 +1160,7 @@ def _available_research_trade_date(history, *, ticker, config, now, completed):
                     dates.append(observed)
             except (ValueError, TypeError, OverflowError):
                 continue
-    if not dates:
-        raise RuntimeError("No valid dated completed daily bar is available for investor research")
-    selected = max(dates)
-    if selected < cutoff:
-        print(f"::warning::Investor research uses observed {ticker} daily bar {selected.isoformat()}; "
-              f"latest completed session is {cutoff.isoformat()}. Source date is preserved; no freshness wait.")
-    return selected.isoformat()
+    return max(dates, default=None)
 
 
 def _resolve_run_trade_date(

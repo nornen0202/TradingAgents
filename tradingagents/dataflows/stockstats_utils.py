@@ -10,6 +10,7 @@ from yfinance.exceptions import YFRateLimitError
 from stockstats import dft_windows, wrap
 from typing import Annotated
 import os
+from tradingagents.atomic_io import atomic_write_bytes
 from .config import get_config
 from .integrity import safe_symbol, session_date, is_historical
 from .daily_history import fallback_enabled, selected_history, validate_with_fallback
@@ -194,9 +195,9 @@ def load_ohlcv(symbol: str, curr_date: str, *, requested_start: str | None = Non
             raise VendorInputError("Requested history start exceeds the price end date")
         start_date = min(start_date, requested)
     start_str = start_date.strftime("%Y-%m-%d")
-    # yfinance's ``end`` is exclusive. Use tomorrow as the download boundary so
-    # a completed same-day bar is not silently omitted after the market close.
-    end_str = (today_date + pd.DateOffset(days=1)).strftime("%Y-%m-%d")
+    # Yahoo uses an exclusive end. Keep each downloaded cache scoped to its
+    # requested day so a replay does not fetch or persist later market data.
+    end_str = (curr_date_dt + pd.DateOffset(days=1)).strftime("%Y-%m-%d")
     os.makedirs(config["data_cache_dir"], exist_ok=True)
     data_file = os.path.join(
         config["data_cache_dir"],
@@ -205,16 +206,22 @@ def load_ohlcv(symbol: str, curr_date: str, *, requested_start: str | None = Non
 
     # Refresh a morning snapshot after the close, but share recent downloads
     # between indicators to avoid repeated network calls for the same analysis.
-    use_cache = os.path.exists(data_file) and (
-        curr_date_dt < today_date.normalize() - pd.Timedelta(days=1)
-        or time.time() - os.path.getmtime(data_file) <= 300
-    )
+    # The previous cache name used the acquisition day as its end. Existing
+    # complete files are safe to reuse only through the same bounded validator.
+    legacy_end = (today_date + pd.DateOffset(days=1)).strftime("%Y-%m-%d")
+    legacy_file = os.path.join(config["data_cache_dir"], f"{symbol}-YFin-data-{start_str}-{legacy_end}.csv")
+    cache_file = data_file if os.path.exists(data_file) else legacy_file
     pinned = selected_history(symbol, start_str, curr_date)
-    if pinned is not None:
-        data = pinned
-    elif use_cache:
-        data = pd.read_csv(data_file, on_bad_lines="skip", float_precision="round_trip")
-    else:
+    data = pinned
+    use_cache = False
+    if pinned is None and os.path.exists(cache_file):
+        try:
+            if curr_date_dt < today_date.normalize() - pd.Timedelta(days=1) or time.time() - os.path.getmtime(cache_file) <= 300:
+                data = pd.read_csv(cache_file, float_precision="round_trip")
+                use_cache = True
+        except (OSError, UnicodeError, pd.errors.EmptyDataError, pd.errors.ParserError):
+            logger.warning("Unreadable Yahoo daily cache; retrying the source for %s", symbol)
+    if data is None:
         try:
             data = yf_retry(lambda: yf.download(
                 symbol,
@@ -233,7 +240,7 @@ def load_ohlcv(symbol: str, curr_date: str, *, requested_start: str | None = Non
     # Validate before admitting a new Yahoo cache. A KIS replacement must never
     # poison a Yahoo-labelled file or mix vendor adjustment bases.
     if pinned is None and not use_cache and not validated.attrs.get("source"):
-        data.to_csv(data_file, index=False)
+        atomic_write_bytes(data_file, validated.to_csv(index=False).encode("utf-8"))
 
     # Reuse this exact validated input for the private chart, without refetching.
     from tradingagents.charting.capture import capture_daily_frame

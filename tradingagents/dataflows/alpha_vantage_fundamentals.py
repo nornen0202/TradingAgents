@@ -4,11 +4,11 @@ from datetime import date
 
 from .alpha_vantage_common import _make_api_request
 from .config import get_config
-from .integrity import is_historical
+from .integrity import is_historical, requires_historical_snapshot
 from .vendor_exceptions import VendorMalformedResponseError
 
 
-def _filter_reports_by_date(result, curr_date: str):
+def _filter_reports_by_date(result, curr_date: str, *, ticker: str | None = None):
     """Bound fiscal periods and require verified publication dates for past runs."""
     if not curr_date:
         return result
@@ -21,7 +21,8 @@ def _filter_reports_by_date(result, curr_date: str):
     if not isinstance(result, dict):
         raise VendorMalformedResponseError("Financial statement must be an object")
     result = deepcopy(result)
-    strict = get_config().get("point_in_time_strict", False) or is_historical(curr_date)
+    strict = (requires_historical_snapshot(ticker, curr_date) if ticker
+              else get_config().get("point_in_time_strict", False) or is_historical(curr_date))
 
     def available(report):
         if not isinstance(report, dict):
@@ -66,13 +67,13 @@ def get_fundamentals(ticker: str, curr_date: str = None) -> str:
         "symbol": ticker,
     }
 
-    if is_historical(curr_date):
+    if requires_historical_snapshot(ticker, curr_date):
         return "No fundamentals data: Alpha Vantage OVERVIEW is a current snapshot, not a historical vintage."
     return _make_api_request("OVERVIEW", params)
 
 
 def _get_statement(function: str, ticker: str, curr_date: str | None):
-    result = _filter_reports_by_date(_make_api_request(function, {"symbol": ticker}), curr_date)
+    result = _filter_reports_by_date(_make_api_request(function, {"symbol": ticker}), curr_date, ticker=ticker)
     payload = json.loads(result) if isinstance(result, str) else result
     if isinstance(payload, dict) and not any(payload.get(key) for key in ("annualReports", "quarterlyReports")):
         return "No fundamentals data found: Alpha Vantage has no financial reports eligible for the requested publication date."

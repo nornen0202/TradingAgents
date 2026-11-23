@@ -5,9 +5,14 @@ from __future__ import annotations
 import datetime as dt
 import re
 from typing import Any, Mapping
+from zoneinfo import ZoneInfo
 
 from cli.models import AnalystType
 from tradingagents.agents.utils.instrument_resolver import resolve_instrument
+
+
+def exchange_today(timezone_name: str) -> dt.date:
+    return dt.datetime.now(ZoneInfo(timezone_name)).date()
 
 
 def unattended_selections(flags: Mapping[str, Any], defaults: Mapping[str, Any]) -> dict[str, Any]:
@@ -20,7 +25,8 @@ def unattended_selections(flags: Mapping[str, Any], defaults: Mapping[str, Any])
             or re.fullmatch(r"(?:CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])(?:\..*)?", ticker)):
         raise ValueError("--ticker must be a valid symbol, for example NVDA, BRK-B or 005930.KS")
     try:
-        ticker = resolve_instrument(ticker).normalized_symbol
+        instrument = resolve_instrument(ticker)
+        ticker = instrument.normalized_symbol
     except ValueError as exc:
         raise ValueError("--ticker is not supported by the instrument resolver; use a US ticker or Korean stock code") from exc
     date = str(flags.get("date") or "").strip()
@@ -30,7 +36,7 @@ def unattended_selections(flags: Mapping[str, Any], defaults: Mapping[str, Any])
         analysis_date = dt.date.fromisoformat(date)
     except ValueError as exc:
         raise ValueError("--date must be a valid calendar date") from exc
-    if analysis_date > dt.date.today():
+    if analysis_date > exchange_today(instrument.timezone):
         raise ValueError("--date cannot be in the future")
     names = str(flags.get("analysts") or "market,social,news,fundamentals").split(",")
     names = ["social" if name.strip().lower() == "sentiment" else name.strip().lower() for name in names]

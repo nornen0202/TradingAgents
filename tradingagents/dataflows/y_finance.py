@@ -7,7 +7,7 @@ import math
 import pandas as pd
 import yfinance as yf
 from .stockstats_utils import StockstatsUtils, yf_retry, load_ohlcv, filter_financials_by_date, calculate_stockstats_indicator
-from .integrity import safe_symbol, is_historical
+from .integrity import safe_symbol, requires_historical_snapshot
 from .daily_history import fallback_enabled, selected_history, validate_with_fallback, source_note
 from .us_daily_history import fallback_enabled as us_fallback_enabled
 from .kr_daily_history import fallback_enabled as kr_fallback_enabled
@@ -350,7 +350,7 @@ def get_fundamentals(
     curr_date: Annotated[str, "analysis as-of date; historical snapshots are unavailable"] = None
 ):
     """Get company fundamentals overview from yfinance."""
-    if is_historical(curr_date):
+    if requires_historical_snapshot(ticker, curr_date):
         return "No fundamentals data: Yahoo overview is a current snapshot, not a historical vintage."
     try:
         resolved_ticker, info, attempts = _resolve_info_with_symbol_fallback(ticker)
@@ -427,7 +427,7 @@ def get_balance_sheet(
     curr_date: Annotated[str, "current date in YYYY-MM-DD format"] = None
 ):
     """Get balance sheet data from yfinance."""
-    if is_historical(curr_date):
+    if requires_historical_snapshot(ticker, curr_date):
         return "Historical statement unavailable: Yahoo balance sheets have no verified filing dates or historical revisions."
     try:
         ticker_obj = yf.Ticker(ticker.upper())
@@ -461,7 +461,7 @@ def get_cashflow(
     curr_date: Annotated[str, "current date in YYYY-MM-DD format"] = None
 ):
     """Get cash flow data from yfinance."""
-    if is_historical(curr_date):
+    if requires_historical_snapshot(ticker, curr_date):
         return "Historical statement unavailable: Yahoo cash flows have no verified filing dates or historical revisions."
     try:
         ticker_obj = yf.Ticker(ticker.upper())
@@ -495,7 +495,7 @@ def get_income_statement(
     curr_date: Annotated[str, "current date in YYYY-MM-DD format"] = None
 ):
     """Get income statement data from yfinance."""
-    if is_historical(curr_date):
+    if requires_historical_snapshot(ticker, curr_date):
         return "Historical statement unavailable: Yahoo income statements have no verified filing dates or historical revisions."
     try:
         ticker_obj = yf.Ticker(ticker.upper())
