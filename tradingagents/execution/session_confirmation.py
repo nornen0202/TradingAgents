@@ -85,14 +85,14 @@ def evaluate_plan(plan, *, analysis_as_of, regular_close=None, official_open=Non
     if allowed:
         day, market_open, _ = sessions[position]
         quote = _read_market_record(live_quote, plan, day, purpose="quote", earliest=max(market_open, created), latest=now, now=now)
-        if quote and (now - _stamp(live_quote["event_at"])).total_seconds() > plan["quote_max_age_seconds"]:
+        if quote and (now - _stamp(live_quote["event_at"])).total_seconds() >= plan["quote_max_age_seconds"]:
             quote = None
     close = None
     if now >= origin_close and created <= origin_close:
         close = _read_market_record(regular_close, plan, origin, purpose="final_regular_close",
                                     earliest=origin_close, latest=origin_close, now=now)
     opening = None
-    next_window = allowed and position == 1 and now <= market_open + timedelta(seconds=plan["execution_window_seconds"])
+    next_window = allowed and position == 1 and now < market_open + timedelta(seconds=plan["execution_window_seconds"])
     if next_window:
         opening = _read_market_record(official_open, plan, day, purpose="official_regular_open",
                                       earliest=market_open, latest=min(now, market_open + timedelta(seconds=plan["max_open_delay_seconds"])),
@@ -100,6 +100,7 @@ def evaluate_plan(plan, *, analysis_as_of, regular_close=None, official_open=Non
     gap_ok = bool(close and opening and abs(opening[0] / close[0] - 1) * 10000 <= plan["max_gap_bps"] + 1e-9)
     results = {}
     ready_groups = []
+    deadlines = []
     for index, group in enumerate(plan["alternatives"]):
         joined = bool(quote) and allowed
         for rule in group:
@@ -114,12 +115,19 @@ def evaluate_plan(plan, *, analysis_as_of, regular_close=None, official_open=Non
                                    "observation_as_of": measured[1].isoformat() if measured else None}
         if joined:
             ready_groups.append(index)
+            session_deadline = sessions[position][2]
+            if any(rule["stage"] != "intraday" for rule in group):
+                session_deadline = min(session_deadline, market_open + timedelta(seconds=plan["execution_window_seconds"]))
+            deadlines.append(session_deadline)
+    quote_deadline = (_stamp(live_quote["event_at"]) + timedelta(seconds=plan["quote_max_age_seconds"])) if quote else None
     return {
         "paper_candidate_ready": bool(ready_groups), "execution_authority": False,
         "matched_alternatives": ready_groups, "conditions": results,
         "origin_session": origin, "current_session": sessions[position][0] if position is not None else None,
         "quote_fresh": bool(quote), "within_session_ttl": allowed, "verified_next_open": bool(opening),
         "opening_gap_allowed": gap_ok,
+        "quote_expires_at": quote_deadline.isoformat() if quote_deadline else None,
+        "candidate_valid_until": min(max(deadlines), quote_deadline).isoformat() if deadlines else None,
     }
 
 

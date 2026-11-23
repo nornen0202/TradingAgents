@@ -148,7 +148,7 @@ def build_step(run: Path, now: str, limits: PaperLimits | None = None):
                 )
                 ready = ready and entry_confirmation["paper_candidate_ready"]
                 if entry_confirmation["paper_candidate_ready"]:
-                    valid_until = min(stamp(valid_until), stamp(entry_confirmation["quote_expires_at"])).isoformat()
+                    valid_until = min(stamp(valid_until), stamp(entry_confirmation["candidate_valid_until"])).isoformat()
         signals.append(
             {
                 "signal_id": f"{bundle.get('analysis_source_run_id')}:{ticker}:{action}",
@@ -179,14 +179,12 @@ def _entry_confirmation(evidence, ticker, market, generated, evaluated):
         # A broker observation that arrived after the completed decision may
         # refresh execution quotes, but cannot change that decision's proof.
         for name, row in tuple(observations.items()):
-            if row is not None and stamp(row["observed_at"]) > generated:
+            try:
+                if row is not None and stamp(row["observed_at"]) > generated:
+                    observations[name] = None
+            except (KeyError, TypeError, ValueError, OverflowError):
                 observations[name] = None
-        result = evaluate_plan(plan, analysis_as_of=evaluated, **observations)
-        if result["paper_candidate_ready"]:
-            result["quote_expires_at"] = (
-                stamp(observations["live_quote"]["event_at"]) + timedelta(seconds=plan["quote_max_age_seconds"])
-            ).isoformat()
-        return result
+        return evaluate_plan(plan, analysis_as_of=evaluated, **observations)
     except (AttributeError, IndexError, KeyError, TypeError, ValueError, OverflowError):
         return {"paper_candidate_ready": False, "reason": "SESSION_CONFIRMATION_UNVERIFIED"}
 
