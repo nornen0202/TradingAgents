@@ -139,7 +139,10 @@ class PaperControlLedger:
         prior_intents = []
         if action == "flatten" and batch:
             prior_intents = json.loads(batch["payload"])["paper_intents"]
-            if batch["state"] != "READY" or any(now < _stamp(item["expires_at"]) for item in prior_intents):
+            has_terminal_proof = isinstance(snapshot, dict) and "terminal_flatten_orders" in snapshot
+            if batch["state"] != "READY" or (not has_terminal_proof and any(
+                now < _stamp(item["expires_at"]) for item in prior_intents
+            )):
                 raise ValueError("Flatten requires an unused or expired isolated flatten lane")
         positions, sellable = self._positions(snapshot, now)
         if action == "positions":
@@ -148,12 +151,16 @@ class PaperControlLedger:
             raise ValueError("Pending paper orders must be cancelled and reconciled first")
         if positions != sellable:
             raise ValueError("Flatten requires all owned paper shares to be sellable")
-        if batch:
+        recovered_ids = {}
+        if batch and "terminal_flatten_orders" in snapshot:
+            recovered_ids = self._remaining_intents(prior_intents, positions, snapshot["terminal_flatten_orders"], now)
+        elif batch:
             unsubmitted = snapshot.get("unsubmitted_intent_ids")
             if (not isinstance(unsubmitted, list) or not all(isinstance(item, str) for item in unsubmitted)
                     or sorted(unsubmitted) != sorted(item["id"] for item in prior_intents)
                     or positions != {item["ticker"]: item["quantity"] for item in prior_intents}):
                 raise ValueError("Expired flatten requires exact unsubmitted intent and inventory proof")
+            recovered_ids = {item["ticker"]: item["id"] for item in prior_intents}
         if not isinstance(quotes, dict):
             raise ValueError("Fresh paper quotes are required")
         intents = []
@@ -165,18 +172,54 @@ class PaperControlLedger:
                     or quote.get("regular_executable") is not True
                     or not timedelta() <= now - _stamp(quote.get("observed_at")) <= timedelta(seconds=15)):
                 raise ValueError("Flatten quote is not fresh and scoped")
-            identity = hashlib.sha256((batch_nonce + ":" + ticker).encode()).hexdigest()
+            identity = recovered_ids.get(ticker) or hashlib.sha256((batch_nonce + ":" + ticker).encode()).hexdigest()
             intents.append({"id": identity, "ticker": ticker, "side": "SELL", "quantity": quantity,
                             "limit": str(_number(quote.get("bid"))), "currency": quote["currency"],
                             "expires_at": expiry.isoformat()})
         record = result | {"flatten_status": "READY" if intents else "ALREADY_FLAT",
                            "paper_intents": intents, "flatten_nonce": batch_nonce, "requires_broker_revalidation": True}
         if batch:
-            self._db.execute("UPDATE paper_flatten_batches SET payload=? WHERE id=1", (_encoded(record),))
+            self._db.execute("UPDATE paper_flatten_batches SET state=?,payload=? WHERE id=1",
+                             (record["flatten_status"], _encoded(record)))
         else:
             self._db.execute("INSERT INTO paper_flatten_batches(id,nonce,state,payload) VALUES (1,?,?,?)",
                              (batch_nonce, record["flatten_status"], _encoded(record)))
         return record
+
+    def _remaining_intents(self, previous, positions, evidence, now):
+        if not isinstance(evidence, dict) or set(evidence) != {item["id"] for item in previous}:
+            raise ValueError("Partial recovery requires exact terminal broker proof")
+        quantities, identities = {}, {}
+        for item in previous:
+            record = evidence[item["id"]]
+            if not isinstance(record, dict) or set(record) != {"status", "filled_quantity", "receipt_id"}:
+                raise ValueError("Partial recovery requires an accountable terminal receipt")
+            status = record["status"]
+            if (not isinstance(status, str) or status not in {"CANCELED", "FILLED", "REJECTED", "UNSUBMITTED"}
+                    or not isinstance(record["receipt_id"], str) or not record["receipt_id"].strip()):
+                raise ValueError("Partial recovery requires an accountable terminal receipt")
+            if status == "UNSUBMITTED" and now < _stamp(item["expires_at"]):
+                raise ValueError("Unsubmitted flatten intent must expire before renewal")
+            try:
+                if type(record["filled_quantity"]) not in (str, int):
+                    raise ValueError("Explicit terminal quantity required")
+                filled = Decimal(record["filled_quantity"])
+            except (InvalidOperation, TypeError, ValueError) as exc:
+                raise ValueError("Invalid terminal filled quantity") from exc
+            requested = _number(item["quantity"])
+            if (not filled.is_finite() or not 0 <= filled <= requested or filled % 1
+                    or (status == "FILLED") != (filled == requested)
+                    or (status in {"REJECTED", "UNSUBMITTED"} and filled)):
+                raise ValueError("Invalid terminal filled quantity")
+            remaining = requested - filled
+            if remaining:
+                ticker = item["ticker"]
+                quantities[ticker] = str(remaining.quantize(Decimal("1")))
+                source = _encoded([item["id"], record["receipt_id"], quantities[ticker]])
+                identities[ticker] = item["id"] if status == "UNSUBMITTED" else hashlib.sha256(source.encode()).hexdigest()
+        if positions != quantities:
+            raise ValueError("Current inventory does not match the verified unfilled quantity")
+        return identities
 
     def _positions(self, snapshot, now):
         if (not isinstance(snapshot, dict) or snapshot.get("mode") != "isolated_paper"

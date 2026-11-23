@@ -10,6 +10,8 @@ The control ledger binds signed status, positions, halt, and flatten requests to
 4. Apply the halt, cancel pending paper orders, and reconcile cancellation. Recover flatten intent identities from the replacement writer. Treat a replay as the same set of intents. Verify flat positions and the settlement receipt before closing the incident.
 5. Keep both systems halted if the snapshot is incomplete, the broker scope cannot be verified, or writer fencing cannot be demonstrated.
 
+An expired, provably unsubmitted order can retain its intent ID under a new signed request and current quotes. A verified terminal partial fill requires a separate intent for the reconciled remaining shares. Open or uncertain orders must be reconciled before any request for a remainder.
+
 ## Remote prerequisites
 
 Remote failover needs one shared transactional writer authority with monotonic fencing, independent heartbeats, and deterministic account binding. Use infrastructure and a broker adapter that enforce the fence at the write boundary. The local SQLite lease supports same-journal rehearsal and cannot enforce a fence across separate database copies or independently connected brokers. Copy databases only as backup or under a documented cutover with the prior writer fenced out. Keep the standby disabled until those controls are verified.
