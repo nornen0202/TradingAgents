@@ -192,10 +192,12 @@ def purged_folds(labels, folds, *, frozen_at, holdout_start, analysis_as_of):
             raise ValueError("Fold overlaps another evaluation, its embargo, or the holdout")
         training = sorted(key for key, (decision, outcome, known) in rows.items() if decision < embargo and known < embargo)
         purged = sorted(key for key, (decision, outcome, known) in rows.items() if decision < embargo <= known)
-        testing = sorted(key for key, (decision, outcome, known) in rows.items() if start <= decision <= end)
+        testing = sorted(key for key, (decision, _, known) in rows.items() if start <= decision <= end and known < holdout)
+        late_testing = sorted(key for key, (decision, _, known) in rows.items() if start <= decision <= end and known >= holdout)
         if not training or not testing:
             raise ValueError("Empty training or evaluation fold")
-        windows.append({"training": training, "evaluation": testing, "purged": purged, "test_start": start.isoformat()})
+        windows.append({"training": training, "evaluation": testing, "purged": purged,
+                        "purged_evaluation": late_testing, "test_start": start.isoformat()})
         last_end = end
     return {
         "folds": windows,

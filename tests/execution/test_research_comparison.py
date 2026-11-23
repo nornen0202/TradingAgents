@@ -14,6 +14,7 @@ def fixture():
     policy = {"plan_sha256": "a" * 64, "frozen_at": "2026-06-01T00:00:00+00:00", "market": "US",
               "start": DAYS[0], "end": DAYS[-1], "initial_nav": 1000, "minimum_sessions": 3,
               "costs": {"low": "b" * 64, "high": "c" * 64}, "data_class": "synthetic",
+              "external_cashflows": dict(zip(DAYS, (0, 100, 0))),
               "block_length": 2, "resamples": 200, "seed": 7}
     series = {}
     for scenario, digest in policy["costs"].items():
@@ -79,3 +80,14 @@ def test_comparison_cli_uses_scoped_replays_and_enforces_frozen_plan(tmp_path, c
     input_file.write_text(json.dumps({"policy": plan, "series": scenarios}))
     assert main([str(input_file), "--as-of", AS_OF]) == 0
     assert json.loads(capsys.readouterr().out)["results"]["low"]["status"] == "COMPARABLE"
+
+
+def test_cost_sensitivity_keeps_one_cashflow_schedule_and_non_degenerate_blocks():
+    plan, scenarios = fixture()
+    for arm in ARMS:
+        scenarios["high"][arm][1]["external_cashflow"] = 150
+    report = compare_replays(plan, scenarios, analysis_as_of=AS_OF)
+    assert report["results"]["low"]["status"] == "COMPARABLE"
+    assert report["results"]["high"]["cashflow_mismatch_sessions"] == [DAYS[1]]
+    with pytest.raises(ValueError, match="sample policy"):
+        compare_replays(plan | {"block_length": len(DAYS)}, scenarios, analysis_as_of=AS_OF)
