@@ -9,15 +9,18 @@ from unittest.mock import Mock
 import pandas as pd
 import pytest
 
-from tradingagents.dataflows import interface, intraday_market, naver_news
+from tradingagents.dataflows import alpha_vantage_fundamentals, integrity, interface, intraday_market, naver_news
+from tradingagents.dataflows import stockstats_utils, y_finance
 from tradingagents.dataflows.config import run_config
 from tradingagents.dataflows.intraday import kis_quotes, providers as intraday_providers
 from tradingagents.dataflows.vendor_exceptions import VendorInputError, VendorUnavailableError
+from tradingagents.agents.utils.memory import FinancialSituationMemory
 from tradingagents.performance import action_outcomes
 from tradingagents.scheduled import runner
 from tradingagents.scheduled.config import load_scheduled_config
 from tradingagents.schemas import IntradayMarketSnapshot
 from tradingagents.work import handoff, site
+from cli import selections
 
 
 NOW = datetime(2026, 10, 2, 13, 30, tzinfo=timezone.utc)
@@ -222,3 +225,74 @@ def test_pages_dispatch_rejects_contents_different_from_acknowledgement(tmp_path
         handoff.dispatch_pages_handoff(runtime, surface="kr", event_id="kr:event", report_sha256=digest,
                                        repository="example/fixture", runner=dispatch)
     dispatch.assert_not_called()
+
+
+def test_headless_date_is_bounded_by_the_selected_exchange(monkeypatch):
+    # KST is Saturday while the NY session is still Friday.
+    near_midnight = datetime.fromisoformat("2026-10-03T00:30:00+09:00")
+
+    class Clock(datetime):
+        @classmethod
+        def now(cls, tz=None):
+            return near_midnight.astimezone(tz)
+
+    monkeypatch.setattr(selections.dt, "datetime", Clock)
+    assert selections.unattended_selections({"ticker": "005930.KS", "date": "2026-10-03"}, {})["analysis_date"] == "2026-10-03"
+    with pytest.raises(ValueError, match="date cannot be in the future"):
+        selections.unattended_selections({"ticker": "AAPL", "date": "2026-10-03"}, {})
+
+
+def test_current_fundamentals_do_not_fill_an_earlier_exchange_date_or_instant(monkeypatch):
+    now = datetime.fromisoformat("2026-10-03T00:30:00+09:00")
+
+    class Clock(datetime):
+        @classmethod
+        def now(cls, tz=None):
+            return now.astimezone(tz)
+
+    monkeypatch.setattr(integrity, "datetime", Clock)
+    yahoo = Mock(return_value=("005930.KS", {"sector": "fixture"}, []))
+    alpha = Mock(return_value="live snapshot")
+    monkeypatch.setattr(y_finance, "_resolve_info_with_symbol_fallback", yahoo)
+    monkeypatch.setattr(alpha_vantage_fundamentals, "_make_api_request", alpha)
+    for cutoff in ("2026-10-02", "2026-10-03T00:25:00+09:00"):
+        with run_config({"analysis_as_of": cutoff}):
+            assert y_finance.get_fundamentals("005930.KS", "2026-10-02").startswith("No fundamentals")
+            assert alpha_vantage_fundamentals.get_fundamentals("005930.KS").startswith("No fundamentals")
+    yahoo.assert_not_called()
+    alpha.assert_not_called()
+
+
+def test_daily_price_cache_keeps_only_validated_rows_in_requested_window(tmp_path, monkeypatch):
+    download = Mock(return_value=pd.DataFrame({"Close": [100, 200]}, index=pd.DatetimeIndex(
+        ["2026-10-02", "2026-10-05"], name="Date",
+    )))
+    monkeypatch.setattr(stockstats_utils.yf, "download", download)
+    with run_config({"data_cache_dir": str(tmp_path)}):
+        first = stockstats_utils.load_ohlcv("AAPL", "2026-10-02")
+        cached = stockstats_utils.load_ohlcv("AAPL", "2026-10-02")
+    pd.testing.assert_frame_equal(first, cached)
+    download.assert_called_once()
+    assert download.call_args.kwargs["end"] == "2026-10-03"
+    (cache,) = tmp_path.glob("*.csv")
+    assert cache.name.endswith("2026-10-03.csv")
+    assert "2026-10-05" not in cache.read_text(encoding="utf-8")
+
+
+def test_market_day_filters_future_settlement_before_memory_ranking():
+    memory = FinancialSituationMemory("fixture")
+    memory.market_timezone = "Asia/Seoul"
+    memory.as_of = "2026-10-02"
+    known = "2026-10-02T14:59:59+00:00"
+    memory.add_situations([("sample volatility", "eligible", {
+        "trade_date": "2026-09-30", "outcome_known_at": known, "settled_at": known,
+        "available_at": known, "ingested_at": known,
+    })])
+    expected = memory.get_memories("sample volatility")
+    assert [entry["recommendation"] for entry in expected] == ["eligible"]
+    after_midnight = "2026-10-02T15:00:00+00:00"
+    memory.add_situations([("sample volatility future future", "not yet visible", {
+        "trade_date": "2026-09-30", "outcome_known_at": known, "settled_at": after_midnight,
+        "available_at": after_midnight, "ingested_at": after_midnight,
+    })])
+    assert memory.get_memories("sample volatility") == expected

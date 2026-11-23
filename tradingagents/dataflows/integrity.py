@@ -19,26 +19,26 @@ def safe_symbol(symbol: str) -> str:
     return symbol
 
 
-def is_historical(as_of: str | date | datetime | None) -> bool:
-    """Current snapshots cannot stand in for a prior day's information set."""
+def is_historical(as_of: str | date | datetime | None, *, market_timezone: str = "UTC") -> bool:
+    """An exact past instant or completed market day requires historical evidence."""
     if not as_of:
         return False
-    today = datetime.now(timezone.utc).date()
-    if isinstance(as_of, datetime):
-        if as_of.tzinfo is None or as_of.utcoffset() is None:
-            raise ValueError("Historical cutoff datetime requires a timezone")
-        return as_of.astimezone(timezone.utc).date() < today
-    if isinstance(as_of, date):
-        return as_of < today
     raw = str(as_of).strip()
-    if not raw:
+    return bool(raw) and parse_analysis_cutoff(as_of, market_timezone) < datetime.now(timezone.utc)
+
+
+def requires_historical_snapshot(ticker: str, requested: str | date | datetime | None) -> bool:
+    from tradingagents.agents.utils.instrument_resolver import resolve_instrument
+    from .config import get_config
+
+    config = get_config()
+    if config.get("point_in_time_strict"):
+        return True
+    scoped = config.get("analysis_as_of")
+    if not requested and not scoped:
         return False
-    if len(raw) == 10 and "T" not in raw and " " not in raw:
-        return date.fromisoformat(raw) < today
-    stamp = datetime.fromisoformat(raw.replace("Z", "+00:00"))
-    if stamp.tzinfo is None or stamp.utcoffset() is None:
-        raise ValueError("Historical cutoff datetime requires a timezone")
-    return stamp.astimezone(timezone.utc).date() < today
+    zone = resolve_instrument(ticker).timezone
+    return is_historical(requested, market_timezone=zone) or is_historical(scoped, market_timezone=zone)
 
 
 def parse_analysis_cutoff(requested: date | datetime | str, market_timezone: str) -> datetime:

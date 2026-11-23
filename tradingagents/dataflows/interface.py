@@ -314,7 +314,7 @@ def _prioritize_market_specific_vendors(method: str, vendor_chain: list[str], ar
                 else:
                     if method in statements:
                         curr_date = kwargs.get("curr_date") or (args[2] if len(args) > 2 else None) or get_config().get("analysis_as_of")
-                        if is_historical(curr_date):
+                        if is_historical(curr_date, market_timezone=profile.timezone):
                             promote("sec_edgar")
                     if method in {"get_news", "get_company_news", "get_social_sentiment"}:
                         remove("naver")
@@ -536,7 +536,8 @@ def _route_to_vendor(method: str, *args, **kwargs):
         dates = [str(v) for v in (*args, *kwargs.values()) if isinstance(v, str) and len(v) == 10 and v[4:5] == "-" and v[7:8] == "-"]
         if any(value > cutoff_day for value in dates):
             raise VendorInputError("Requested data date exceeds the analysis as-of date")
-        if method == "get_insider_transactions" and (config.get("point_in_time_strict") or is_historical(cutoff)):
+        if method == "get_insider_transactions" and (config.get("point_in_time_strict")
+                or is_historical(cutoff, market_timezone=timezone_name)):
             return "No insider data: historical publication timestamps are not verified."
 
     category = get_category_for_method(method)

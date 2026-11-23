@@ -55,7 +55,7 @@ def require_live_intraday_clock(market_timezone: str, *, provider_name: str = "k
     requested = get_config().get("analysis_as_of")
     if requested:
         stamp = parse_analysis_cutoff(requested, market_timezone)
-        if stamp < now - timedelta(seconds=60):
+        if stamp < now:
             from tradingagents.dataflows.vendor_exceptions import VendorUnavailableError
 
             raise VendorUnavailableError(

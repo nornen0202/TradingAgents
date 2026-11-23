@@ -25,9 +25,11 @@ from rich.align import Align
 from rich.rule import Rule
 
 from tradingagents.graph.trading_graph import TradingAgentsGraph
+from tradingagents.agents.utils.instrument_resolver import resolve_instrument
 from tradingagents.default_config import DEFAULT_CONFIG
 from tradingagents.reporting import save_report_bundle
 from cli.models import AnalystType
+from cli.selections import exchange_today
 from cli.utils import *
 from cli.announcements import fetch_announcements, display_announcements
 from cli.stats_handler import StatsCallbackHandler
@@ -511,7 +513,8 @@ def get_user_selections():
     selected_ticker = get_ticker()
 
     # Step 2: Analysis date
-    default_date = datetime.datetime.now().strftime("%Y-%m-%d")
+    market_timezone = resolve_instrument(selected_ticker).timezone
+    default_date = exchange_today(market_timezone).isoformat()
     console.print(
         create_question_box(
             "Step 2: Analysis Date",
@@ -519,7 +522,7 @@ def get_user_selections():
             default_date,
         )
     )
-    analysis_date = get_analysis_date()
+    analysis_date = get_analysis_date(market_timezone)
 
     # Step 3: Output language
     console.print(
@@ -628,19 +631,19 @@ def get_ticker():
     return typer.prompt("", default="SPY")
 
 
-def get_analysis_date():
+def get_analysis_date(market_timezone: str = "America/New_York"):
     """Get the analysis date from user input."""
     while True:
         date_str = typer.prompt(
-            "", default=datetime.datetime.now().strftime("%Y-%m-%d")
+            "", default=exchange_today(market_timezone).isoformat()
         )
         try:
             # Validate date format and ensure it's not in the future
             analysis_date = datetime.datetime.strptime(date_str, "%Y-%m-%d")
-            if analysis_date.date() > datetime.datetime.now().date():
+            if analysis_date.date() > exchange_today(market_timezone):
                 console.print("[red]Error: Analysis date cannot be in the future[/red]")
                 continue
-            return date_str
+            return analysis_date.date().isoformat()
         except ValueError:
             console.print(
                 "[red]Error: Invalid date format. Please use YYYY-MM-DD[/red]"
