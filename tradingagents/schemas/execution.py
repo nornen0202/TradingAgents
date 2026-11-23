@@ -517,9 +517,10 @@ class ExecutionUpdate:
     data_health: str
     refresh_checkpoint: str | None = None
     execution_timing_state: ExecutionTimingState = ExecutionTimingState.WAITING
+    entry_confirmation_v2: dict[str, Any] | None = None
 
     def to_dict(self) -> dict[str, Any]:
-        return {
+        result = {
             "ticker": self.ticker,
             "analysis_asof": self.analysis_asof,
             "execution_asof": self.execution_asof,
@@ -546,6 +547,9 @@ class ExecutionUpdate:
             "refresh_checkpoint": self.refresh_checkpoint,
             "execution_timing_state": self.execution_timing_state.value,
         }
+        if self.entry_confirmation_v2 is not None:
+            result["entry_confirmation_v2"] = self.entry_confirmation_v2
+        return result
 
     def to_json(self, *, indent: int = 2) -> str:
         return json.dumps(self.to_dict(), indent=indent, ensure_ascii=False)

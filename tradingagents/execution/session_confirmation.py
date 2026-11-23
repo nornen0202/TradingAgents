@@ -7,11 +7,18 @@ from datetime import date, timedelta
 import json
 import math
 from pathlib import Path
+import re
+from zoneinfo import ZoneInfo
 
 from tradingagents.calendar_access import get_exchange_calendar
 from tradingagents.scheduled.market_calendar import default_calendar_name, is_supplemental_market_holiday
 
 from .experiments import _stamp
+
+RECEIPT_SCHEMA = "tradingagents.regular-session-observations/v1"
+_PROVIDERS = {"KR": {"KIS_DOMESTIC_REGULAR_SESSION"}, "US": {"KIS_US_REGULAR_SESSION", "ALPACA_SIP_REGULAR_SESSION"}}
+_OBSERVATION_FIELDS = ("kind", "event_at", "observed_at", "price", "ticker", "source", "market", "currency", "session")
+_ENTRY_GROUP = re.compile(r"[A-Za-z0-9_-]{1,32}")
 
 
 def _positive(value):
@@ -129,6 +136,137 @@ def evaluate_plan(plan, *, analysis_as_of, regular_close=None, official_open=Non
         "quote_expires_at": quote_deadline.isoformat() if quote_deadline else None,
         "candidate_valid_until": min(max(deadlines), quote_deadline).isoformat() if deadlines else None,
     }
+
+
+def load_session_observations(root, ticker, market):
+    """Read independently captured regular-session prices from a private directory."""
+    if root is None or market not in _PROVIDERS or not re.fullmatch(r"[A-Z0-9][A-Z0-9.\-]{0,31}", ticker):
+        return {}
+    try:
+        root = root.resolve()
+        path = (root / f"{ticker}.json").resolve()
+        if path.parent != root or path.stat().st_size > 128_000:
+            return {}
+        receipt = json.loads(path.read_text(encoding="utf-8-sig"))
+    except (OSError, ValueError):
+        return {}
+    if (not isinstance(receipt, dict) or receipt.get("schema") != RECEIPT_SCHEMA
+            or receipt.get("ticker") != ticker or receipt.get("market") != market
+            or receipt.get("price_basis") != "unadjusted"):
+        return {}
+    return _official_observations(receipt, market)
+
+
+def _official_observations(records, market):
+    if not isinstance(records, dict):
+        return {}
+    clean = {}
+    for name in ("regular_close", "official_open"):
+        row = records.get(name)
+        if isinstance(row, dict) and isinstance(row.get("source"), str) and row["source"] in _PROVIDERS[market]:
+            clean[name] = {field: row.get(field) for field in _OBSERVATION_FIELDS}
+    return clean
+
+
+def uses_entry_groups(levels):
+    return any(level.confirmation_group is not None for level in levels) or (
+        len(levels) == 1 and levels[0].confirmation in {"close", "next_day"}
+    )
+
+
+def _entry_field(level, name):
+    return level.get(name) if isinstance(level, dict) else getattr(level, name)
+
+
+def _level_rules(level, identifier):
+    stage = _entry_field(level, "confirmation")
+    if stage not in {"intraday", "close", "next_day"}:
+        raise ValueError("Unverified entry confirmation stage")
+    role = _entry_field(level, "level_type")
+    role = str(getattr(role, "value", role)).upper()
+    if role in {"BREAKOUT", "RESISTANCE"}:
+        price = _entry_field(level, "price")
+        if price is None:
+            price = _entry_field(level, "high")
+        if not _positive(price):
+            raise ValueError("Missing breakout threshold")
+        return [{"id": identifier, "stage": stage, "direction": "above", "level": price}]
+    low, high = _entry_field(level, "low"), _entry_field(level, "high")
+    if not _positive(low) or not _positive(high) or low > high:
+        raise ValueError("A grouped pullback needs an explicit price range")
+    return [
+        {"id": f"{identifier}-low", "stage": stage, "direction": "above", "level": low},
+        {"id": f"{identifier}-high", "stage": stage, "direction": "below", "level": high},
+    ]
+
+
+def _entry_alternatives(levels, currency, pilot_open):
+    grouped = {}
+    for level in levels:
+        name = _entry_field(level, "confirmation_group")
+        if name is None and len(levels) == 1:
+            name = "entry"
+        if not isinstance(name, str) or _ENTRY_GROUP.fullmatch(name) is None:
+            return []  # Mixed implicit and explicit grouping has no defined meaning.
+        grouped.setdefault(name, []).append(level)
+    alternatives = []
+    for name, alternative in grouped.items():
+        if (not pilot_open and any(_entry_field(level, "confirmation") == "intraday" for level in alternative)
+                or any(_entry_field(level, "currency") not in (None, currency) for level in alternative)):
+            continue
+        try:
+            rules = [rule for index, level in enumerate(alternative) for rule in _level_rules(level, f"{name}-{index}")]
+        except ValueError:
+            continue  # Evidence for a different explicit alternative can still qualify.
+        alternatives.append(rules)
+    return alternatives
+
+
+def is_archived_entry_plan(proof, levels, analysis_at):
+    try:
+        plan = proof["plan"]
+        _validate_plan(plan)
+        created = _stamp(analysis_at)
+        zone = ZoneInfo("Asia/Seoul" if plan["market"] == "KR" else "America/New_York")
+        allowed = _entry_alternatives(levels, plan["currency"], pilot_open=True)
+        alternatives = plan["alternatives"]
+        return (
+            _stamp(plan["created_at"]) == created
+            and plan["origin_session"] == created.astimezone(zone).date().isoformat()
+            and (plan["valid_sessions"], plan["max_open_delay_seconds"], plan["execution_window_seconds"],
+                 plan["max_gap_bps"]) == (1, 60, 1800, 200)
+            and all(alternative in allowed for alternative in alternatives)
+        )
+    except (ValueError, TypeError, KeyError, AttributeError):
+        return False
+
+
+def evaluate_entry_groups(contract, market, levels, *, now, max_age_seconds, pilot_open, observations):
+    """Compile archived alternatives and evaluate their dated market evidence."""
+    if (market.market not in _PROVIDERS or market.ticker != contract.ticker or market.market_session != "regular"
+            or not _positive(market.last_price) or not isinstance(market.provider, str) or not market.provider.strip()):
+        return None
+    currency = "KRW" if market.market == "KR" else "USD"
+    alternatives = _entry_alternatives(levels, currency, pilot_open)
+    if not alternatives:
+        return None
+    local_zone = ZoneInfo("Asia/Seoul" if market.market == "KR" else "America/New_York")
+    try:
+        created, event = _stamp(contract.analysis_asof), _stamp(market.asof)
+        plan = {"ticker": market.ticker, "market": market.market, "currency": currency,
+                "origin_session": created.astimezone(local_zone).date().isoformat(), "created_at": created.isoformat(),
+                "valid_sessions": 1, "quote_max_age_seconds": min(max_age_seconds, 120),
+                "max_open_delay_seconds": 60, "execution_window_seconds": 1800, "max_gap_bps": 200,
+                "alternatives": alternatives}
+        proof = {"plan": plan, **_official_observations(observations, market.market),
+                 "live_quote": {"kind": "quote", "source": market.provider, "price": market.last_price,
+                                "ticker": market.ticker, "market": market.market, "currency": currency,
+                                "session": event.astimezone(local_zone).date().isoformat(),
+                                "event_at": event.isoformat(), "observed_at": _stamp(now).isoformat()}}
+        evaluated = evaluate_plan(analysis_as_of=now.isoformat(), **proof)
+    except (ValueError, TypeError, KeyError):
+        return None
+    return {**proof, "evaluation": evaluated}
 
 
 def main(argv=None):

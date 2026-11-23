@@ -19,6 +19,7 @@ from tradingagents.schemas import (
     SessionVWAPPreference,
     is_event_guard_active,
 )
+from tradingagents.execution.session_confirmation import evaluate_entry_groups, uses_entry_groups
 
 
 def evaluate_execution_state(
@@ -28,6 +29,7 @@ def evaluate_execution_state(
     now: datetime,
     max_data_age_seconds: int,
     refresh_checkpoint: str | None = None,
+    session_observations: dict | None = None,
 ) -> ExecutionUpdate:
     reason_codes: list[str] = []
     trigger_status = {
@@ -211,7 +213,14 @@ def evaluate_execution_state(
             execution_timing_state=ExecutionTimingState.WAITING,
         )
 
-    if contract.entry_valid_until:
+    entry_levels = [
+        level for level in contract.structured_levels
+        if str(getattr(level.level_type, "value", level.level_type)).upper()
+        in {"BREAKOUT", "RESISTANCE", "PULLBACK", "SUPPORT"}
+    ]
+    grouped_entry = uses_entry_groups(entry_levels)
+    explicit_groups = any(level.confirmation_group is not None for level in entry_levels)
+    if contract.entry_valid_until or explicit_groups:
         try:
             expires = datetime.fromisoformat(contract.entry_valid_until)
             available = datetime.fromisoformat(contract.analysis_asof)
@@ -226,16 +235,9 @@ def evaluate_execution_state(
                 data_health="OK", refresh_checkpoint=refresh_checkpoint,
                 execution_timing_state=ExecutionTimingState.WAITING,
             )
-        entry_levels = [
-            level for level in contract.structured_levels
-            if str(getattr(level.level_type, "value", level.level_type)).upper()
-            in {"BREAKOUT", "RESISTANCE", "PULLBACK", "SUPPORT"}
-        ]
-        # A single snapshot cannot prove close/two-bar/next-session confirmation.
-        # In particular, an overlapping support zone must not bypass that proof.
-        if market_session != "regular" or not entry_levels or any(
-            level.confirmation != "intraday" for level in entry_levels
-        ):
+        # Legacy levels without explicit alternatives retain their joint restriction.
+        if market_session != "regular" or not entry_levels or (not grouped_entry and any(
+                level.confirmation != "intraday" for level in entry_levels)):
             return _build_update(
                 contract, market, now, staleness_seconds=staleness_seconds,
                 decision_state=DecisionState.WAIT, decision_now=DecisionNow.NONE,
@@ -260,6 +262,39 @@ def evaluate_execution_state(
         ticker=contract.ticker,
         market_code=market.market,
     )
+
+    if grouped_entry and contract.entry_valid_until:
+        proof = evaluate_entry_groups(contract, market, entry_levels, now=now, max_age_seconds=max_data_age_seconds,
+                                      pilot_open=pilot_window_open, observations=session_observations)
+        actionable = _decision_now_from_action(contract.action_if_triggered)
+        if proof is None or not proof["evaluation"]["paper_candidate_ready"]:
+            reason_codes.append("conditional_entry_confirmation_unavailable")
+            execution_timing_state = ExecutionTimingState.CLOSE_CONFIRM_PENDING
+        elif actionable == DecisionNow.NONE:
+            reason_codes.append("entry_not_authorized")
+        elif not rvol_confirmed or not vwap_confirmed or microstructure_block_reasons:
+            decision_state = DecisionState.ARMED
+            execution_timing_state = ExecutionTimingState.PILOT_BLOCKED_VOLUME
+            reason_codes.extend(microstructure_block_reasons)
+            if missing_required_confirmation:
+                reason_codes.append("data_missing_blocked_pilot")
+            if not rvol_confirmed:
+                reason_codes.append("relative_volume_unconfirmed")
+            if not vwap_confirmed:
+                reason_codes.append("vwap_unconfirmed")
+        else:
+            decision_state = DecisionState.ACTIONABLE_NOW
+            decision_now = actionable
+            execution_timing_state = ExecutionTimingState.PILOT_READY
+            reason_codes.append("conditional_entry_group_confirmed")
+        update = _build_update(
+            contract, market, now, staleness_seconds=staleness_seconds,
+            decision_state=decision_state, decision_now=decision_now,
+            reason_codes=tuple(reason_codes), trigger_status=trigger_status,
+            data_health="OK", refresh_checkpoint=refresh_checkpoint,
+            execution_timing_state=execution_timing_state,
+        )
+        return replace(update, entry_confirmation_v2=proof)
 
     if breakout_hit:
         trigger_status["breakout_hit_intraday"] = True

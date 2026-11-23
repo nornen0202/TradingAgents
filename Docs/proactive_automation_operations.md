@@ -836,3 +836,8 @@ verification. The heartbeat's local receipt carries this outstanding check.
 
 Earlier incident details and transport/runner repairs are in
 [the October 7 incident record](actions_incident_20261007.md).
+## Scheduled entry confirmation observations
+
+An explicit `confirmation_group` in each structured entry level identifies one alternative. Levels in a group must all qualify. A conditional close or next-session group requires observed regular-session prices in the order currency. The scheduler can read those from the optional private `[execution].session_confirmation_receipts_dir` directory.
+
+Use one JSON file per canonical ticker. The `tradingagents.regular-session-observations/v1` wrapper carries `ticker`, `market`, `price_basis: "unadjusted"` and independently captured `regular_close` or `official_open` records. Keep their original event and observation instants, currency, session date, and approved native provider label. A closing bar must match the exchange's actual close. An opening record must fall within the next actual session and its configured opening tolerance. The scheduler archives the evaluated proof with its execution update. The paper lanes revalidate the same evidence when they consume the decision.

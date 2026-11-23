@@ -51,6 +51,7 @@ from tradingagents.dataflows.intraday.microstructure import render_microstructur
 from tradingagents.dataflows.stockstats_utils import is_retryable_yfinance_error, yf_retry
 from tradingagents.execution.contract_builder import build_execution_contract, has_legacy_trim_invalidation
 from tradingagents.execution.overlay import evaluate_execution_state
+from tradingagents.execution.session_confirmation import load_session_observations
 from tradingagents.execution.reporting import (
     render_execution_summary_markdown,
     render_execution_update_markdown,
@@ -5671,6 +5672,9 @@ def _run_execution_overlay_passes(
                     now=datetime.now(ZoneInfo(config.run.timezone)),
                     max_data_age_seconds=config.execution.execution_max_data_age_seconds,
                     refresh_checkpoint=checkpoint_label,
+                    session_observations=load_session_observations(
+                        config.execution.session_confirmation_receipts_dir, ticker, market.market,
+                    ),
                 )
                 update_payload = update.to_dict()
                 update_payload["ingested_at"] = datetime.now(timezone.utc).isoformat()
@@ -6708,6 +6712,7 @@ class _ExecutionContractShim:
                 high=_optional_float(item.get("high")),
                 currency=str(item.get("currency") or "") or None,
                 confirmation=str(item.get("confirmation") or "close"),
+                confirmation_group=item.get("confirmation_group"),
                 volume_rule=str(item.get("volume_rule") or ""),
                 source_text=str(item.get("source_text") or ""),
                 reason_code=str(item.get("reason_code") or ""),
