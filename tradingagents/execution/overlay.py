@@ -202,6 +202,38 @@ def evaluate_execution_state(
             execution_timing_state=ExecutionTimingState.INVALIDATED,
         )
 
+    entry_levels = [
+        level for level in contract.structured_levels
+        if str(getattr(level.level_type, "value", level.level_type)).upper()
+        in {"BREAKOUT", "RESISTANCE", "PULLBACK", "SUPPORT"}
+    ]
+    explicit_groups = any(level.confirmation_group is not None for level in entry_levels)
+    grouped_entry = uses_entry_groups(entry_levels) and bool(contract.entry_valid_until or explicit_groups)
+    breakout_hit = contract.breakout_level is not None and intraday_high >= contract.breakout_level
+    failed_breakout = breakout_hit and not market.last_price >= float(contract.breakout_level or 0.0)
+    failed_breakout_timing = (
+        ExecutionTimingState.PILOT_BLOCKED_FAILED_BREAKOUT
+        if contract.action_if_triggered == ActionIfTriggered.STARTER
+        else ExecutionTimingState.FAILED_BREAKOUT
+    )
+    zone = contract.pullback_buy_zone
+    support_failed = zone is not None and market.last_price < zone.low and intraday_low < zone.low
+    if grouped_entry and market_session == "regular" and (failed_breakout or support_failed):
+        # Grouped entry eligibility cannot suppress the held-position downside evidence.
+        grouped_support_fail = support_failed and not (contract.entry_valid_until and failed_breakout)
+        trigger_status.update(breakout_hit_intraday=breakout_hit, failed_breakout=failed_breakout,
+                              support_fail=grouped_support_fail)
+        reasons = [reason for present, reason in (
+            (failed_breakout, "failed_breakout"), (grouped_support_fail, "support_zone_failed")
+        ) if present]
+        return _build_update(
+            contract, market, now, staleness_seconds=staleness_seconds,
+            decision_state=DecisionState.ARMED, decision_now=DecisionNow.NONE,
+            reason_codes=tuple(reasons), trigger_status=trigger_status,
+            data_health="OK", refresh_checkpoint=refresh_checkpoint,
+            execution_timing_state=ExecutionTimingState.SUPPORT_FAIL if grouped_support_fail else failed_breakout_timing,
+        )
+
     if contract.action_if_triggered in {ActionIfTriggered.STARTER, ActionIfTriggered.ADD} and is_event_guard_active(
         contract.event_guard, now, analysis_as_of=contract.analysis_asof
     ):
@@ -213,13 +245,6 @@ def evaluate_execution_state(
             execution_timing_state=ExecutionTimingState.WAITING,
         )
 
-    entry_levels = [
-        level for level in contract.structured_levels
-        if str(getattr(level.level_type, "value", level.level_type)).upper()
-        in {"BREAKOUT", "RESISTANCE", "PULLBACK", "SUPPORT"}
-    ]
-    grouped_entry = uses_entry_groups(entry_levels)
-    explicit_groups = any(level.confirmation_group is not None for level in entry_levels)
     if contract.entry_valid_until or explicit_groups:
         try:
             expires = entry_research_deadline(contract.analysis_asof, contract.entry_valid_until)
@@ -246,7 +271,6 @@ def evaluate_execution_state(
                 execution_timing_state=ExecutionTimingState.CLOSE_CONFIRM_PENDING,
             )
 
-    breakout_hit = contract.breakout_level is not None and intraday_high >= contract.breakout_level
     rvol_confirmed = contract.min_relative_volume is None or (
         market.relative_volume is not None and market.relative_volume >= contract.min_relative_volume
     )
@@ -263,7 +287,7 @@ def evaluate_execution_state(
         market_code=market.market,
     )
 
-    if grouped_entry and (contract.entry_valid_until or explicit_groups):
+    if grouped_entry:
         proof = evaluate_entry_groups(contract, market, entry_levels, now=now, max_age_seconds=max_data_age_seconds,
                                       pilot_open=pilot_window_open, observations=session_observations)
         actionable = _decision_now_from_action(contract.action_if_triggered)
@@ -298,17 +322,11 @@ def evaluate_execution_state(
 
     if breakout_hit:
         trigger_status["breakout_hit_intraday"] = True
-        last_price_above_breakout = market.last_price >= float(contract.breakout_level or 0.0)
-
-        if not last_price_above_breakout:
+        if failed_breakout:
             trigger_status["failed_breakout"] = True
             decision_state = DecisionState.ARMED
             decision_now = DecisionNow.NONE
-            execution_timing_state = (
-                ExecutionTimingState.PILOT_BLOCKED_FAILED_BREAKOUT
-                if contract.action_if_triggered == ActionIfTriggered.STARTER
-                else ExecutionTimingState.FAILED_BREAKOUT
-            )
+            execution_timing_state = failed_breakout_timing
             reason_codes.append("failed_breakout")
         elif contract.breakout_confirmation in {BreakoutConfirmation.CLOSE_ABOVE, BreakoutConfirmation.END_OF_DAY_ONLY}:
             trigger_status["close_confirmation_pending"] = True
@@ -348,7 +366,7 @@ def evaluate_execution_state(
     if contract.pullback_buy_zone is not None and not (
         contract.entry_valid_until and trigger_status["failed_breakout"]
     ):
-        if market.last_price < contract.pullback_buy_zone.low and intraday_low < contract.pullback_buy_zone.low:
+        if support_failed:
             trigger_status["support_fail"] = True
             if decision_state not in {DecisionState.INVALIDATED, DecisionState.ACTIONABLE_NOW}:
                 decision_state = DecisionState.ARMED

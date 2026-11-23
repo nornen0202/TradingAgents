@@ -9,6 +9,7 @@ from tradingagents.execution.archive_paper import build_step
 from tradingagents.execution.contract_builder import build_execution_contract
 from tradingagents.execution.overlay import evaluate_execution_state
 from tradingagents.execution.session_confirmation import RECEIPT_SCHEMA
+from tradingagents.portfolio.candidates import _apply_execution_overlay_risk_action
 from tradingagents.schemas import (
     parse_structured_decision,
     StructuredDecisionValidationError,
@@ -116,6 +117,29 @@ def test_grouped_active_entries_do_not_require_conditional_wait_expiry(action, e
     at = datetime.fromisoformat("2026-09-21T11:00:00+09:00")
     result = evaluate_execution_state(saved, market(at), now=at, max_data_age_seconds=120)
     assert result.decision_now.value == expected, result.reason_codes
+
+
+@pytest.mark.parametrize(("level", "flag", "risk_reason"), [
+    ({"level_type": "BREAKOUT", "price": 100, "confirmation": "intraday"}, "failed_breakout", "FAILED_BREAKOUT"),
+    ({"level_type": "PULLBACK", "low": 100, "high": 101, "confirmation": "intraday"}, "support_fail", "SUPPORT_BROKEN"),
+])
+@pytest.mark.parametrize("grouped", [False, True])
+def test_entry_groups_preserve_the_held_position_downside_signals(level, flag, risk_reason, grouped):
+    if grouped:
+        level = {**level, "confirmation_group": "pilot"}
+    original = contract(entry_action="STARTER", conditional_entry_action="NONE",
+                        execution_levels={"levels": [level]})
+    saved = _ExecutionContractShim(original.to_dict()).to_contract()
+    at = datetime.fromisoformat("2026-09-21T11:00:00+09:00")
+    reduced = replace(market(at), last_price=99, day_low=98)
+    update = evaluate_execution_state(saved, reduced, now=at, max_data_age_seconds=120)
+    assert update.decision_now.value == "NONE"
+    assert update.trigger_status[flag] is True
+    rows = update.to_dict()
+    assert _apply_execution_overlay_risk_action(risk_action="HOLD", risk_action_reason_codes=(),
+        execution_update=rows, is_held=True) == ("REDUCE_RISK", (risk_reason,))
+    assert _apply_execution_overlay_risk_action(risk_action="HOLD", risk_action_reason_codes=(),
+        execution_update=rows, is_held=False) == ("HOLD", ())
 
 
 @pytest.mark.parametrize("case", [
