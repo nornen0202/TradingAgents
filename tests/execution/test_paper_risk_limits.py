@@ -1,5 +1,7 @@
 from datetime import datetime, timedelta, timezone
 
+import pytest
+
 from tradingagents.execution.paper_risk_limits import evaluate_micro_paper
 
 
@@ -51,3 +53,16 @@ def test_outdated_success_does_not_reopen_risk():
     stale[0]["observed_at"] = (NOW - timedelta(seconds=31)).isoformat()
     result = evaluate_micro_paper(POLICY, ACCOUNT, ORDER, stale, as_of=NOW)
     assert result["blocking_reasons"] == ["api_observation_stale"]
+
+
+@pytest.mark.parametrize("target", ["account", "api"])
+@pytest.mark.parametrize("clock", [None, "malformed", "2026-10-02T14:00:00", "2026-10-02T14:00:01Z"])
+def test_invalid_missing_naive_and_future_clocks_block_micro_paper(target, clock):
+    account, events = dict(ACCOUNT), _api(True)
+    proof = account if target == "account" else events[0]
+    if clock is None:
+        proof.pop("observed_at")
+    else:
+        proof["observed_at"] = clock
+    result = evaluate_micro_paper(POLICY, account, ORDER, events, as_of=NOW)
+    assert not result["projected_paper_candidate"]

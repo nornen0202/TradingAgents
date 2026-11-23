@@ -133,3 +133,31 @@ def test_verified_backup_restores_halted_state_and_original_nonce(tmp_path):
                                 writer="verified-standby", epoch=epoch)["halted"]
     with sqlite3.connect(copy) as reader:
         assert reader.execute("SELECT 1 FROM paper_control_commands WHERE nonce=?", (halt["nonce"],)).fetchone()
+
+
+def test_expired_unsubmitted_flatten_can_be_renewed_by_fenced_writer(tmp_path):
+    at = [START]
+    params = {"scope": "shadow-fixture", "market": "US", "secret": KEY, "rights": RIGHTS, "clock": lambda: at[0]}
+    with PaperControlLedger(tmp_path / "control.sqlite", **params) as control:
+        epoch = control.claim("primary", seconds=4)
+        halt = request("halt", "operator", 1)
+        control.execute(halt, sign_paper_control(KEY, halt), actor="operator", writer="primary", epoch=epoch)
+        old = request("flatten", "risk", 2)
+        holding = {"owned": {"ABC": "2"}, "sellable": {"ABC": "2"}}
+        initial = control.execute(old, sign_paper_control(KEY, old), actor="risk", writer="primary", epoch=epoch,
+                                  snapshot=snapshot(at[0], **holding), quotes=quotes(at[0]))
+        intent, = initial["paper_intents"]
+        at[0] += timedelta(seconds=31)
+        replacement = control.claim("standby")
+        latest = request("flatten", "risk", 3, now=at[0])
+        current = snapshot(at[0], **holding)
+        args = dict(actor="risk", writer="standby", epoch=replacement, quotes=quotes(at[0]))
+        with pytest.raises(ValueError, match="expired"):
+            control.execute(old, sign_paper_control(KEY, old), snapshot=current, **args)
+        with pytest.raises(ValueError, match="unsubmitted"):
+            control.execute(latest, sign_paper_control(KEY, latest), snapshot=current, **args)
+        renewed = control.execute(latest, sign_paper_control(KEY, latest),
+                                  snapshot=current | {"unsubmitted_intent_ids": [intent["id"]]}, **args)
+        updated, = renewed["paper_intents"]
+        assert updated["id"] == intent["id"] and updated["expires_at"] != intent["expires_at"]
+        assert renewed["flatten_nonce"] == initial["flatten_nonce"]

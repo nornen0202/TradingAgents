@@ -128,14 +128,19 @@ class PaperControlLedger:
     def _execute(self, action, row, request, snapshot, quotes, now, expiry):
         result = {"mode": "isolated_paper", "action": action, "halted": bool(row["halted"]),
                   "live_order_authority": False}
-        batch = self._db.execute("SELECT nonce,state FROM paper_flatten_batches WHERE id=1").fetchone()
+        batch = self._db.execute("SELECT nonce,state,payload FROM paper_flatten_batches WHERE id=1").fetchone()
         if action == "status":
             return result | {"flatten_status": batch["state"] if batch else "NONE"}
         if action == "halt":
             self._db.execute("UPDATE paper_control_state SET halted=1 WHERE id=1")
             return result | {"halted": True}
-        if action == "flatten" and (batch or not row["halted"]):
+        if action == "flatten" and not row["halted"]:
             raise ValueError("Flatten requires a halt and an unused isolated flatten lane")
+        prior_intents = []
+        if action == "flatten" and batch:
+            prior_intents = json.loads(batch["payload"])["paper_intents"]
+            if batch["state"] != "READY" or any(now < _stamp(item["expires_at"]) for item in prior_intents):
+                raise ValueError("Flatten requires an unused or expired isolated flatten lane")
         positions, sellable = self._positions(snapshot, now)
         if action == "positions":
             return result | {"positions": positions}
@@ -143,9 +148,16 @@ class PaperControlLedger:
             raise ValueError("Pending paper orders must be cancelled and reconciled first")
         if positions != sellable:
             raise ValueError("Flatten requires all owned paper shares to be sellable")
+        if batch:
+            unsubmitted = snapshot.get("unsubmitted_intent_ids")
+            if (not isinstance(unsubmitted, list) or not all(isinstance(item, str) for item in unsubmitted)
+                    or sorted(unsubmitted) != sorted(item["id"] for item in prior_intents)
+                    or positions != {item["ticker"]: item["quantity"] for item in prior_intents}):
+                raise ValueError("Expired flatten requires exact unsubmitted intent and inventory proof")
         if not isinstance(quotes, dict):
             raise ValueError("Fresh paper quotes are required")
         intents = []
+        batch_nonce = batch["nonce"] if batch else request["nonce"]
         for ticker, quantity in sorted(positions.items()):
             quote = quotes.get(ticker, {})
             if (quote.get("scope") != self._scope or quote.get("market") != self._market
@@ -153,14 +165,17 @@ class PaperControlLedger:
                     or quote.get("regular_executable") is not True
                     or not timedelta() <= now - _stamp(quote.get("observed_at")) <= timedelta(seconds=15)):
                 raise ValueError("Flatten quote is not fresh and scoped")
-            identity = hashlib.sha256((request["nonce"] + ":" + ticker).encode()).hexdigest()
+            identity = hashlib.sha256((batch_nonce + ":" + ticker).encode()).hexdigest()
             intents.append({"id": identity, "ticker": ticker, "side": "SELL", "quantity": quantity,
                             "limit": str(_number(quote.get("bid"))), "currency": quote["currency"],
                             "expires_at": expiry.isoformat()})
         record = result | {"flatten_status": "READY" if intents else "ALREADY_FLAT",
-                           "paper_intents": intents, "requires_broker_revalidation": True}
-        self._db.execute("INSERT INTO paper_flatten_batches(id,nonce,state,payload) VALUES (1,?,?,?)",
-                         (request["nonce"], record["flatten_status"], _encoded(record)))
+                           "paper_intents": intents, "flatten_nonce": batch_nonce, "requires_broker_revalidation": True}
+        if batch:
+            self._db.execute("UPDATE paper_flatten_batches SET payload=? WHERE id=1", (_encoded(record),))
+        else:
+            self._db.execute("INSERT INTO paper_flatten_batches(id,nonce,state,payload) VALUES (1,?,?,?)",
+                             (batch_nonce, record["flatten_status"], _encoded(record)))
         return record
 
     def _positions(self, snapshot, now):
