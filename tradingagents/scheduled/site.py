@@ -2279,7 +2279,10 @@ def _etf_alternative_rows(alternatives: list[dict[str, Any]]) -> str:
             )
             continue
         excess = _account_performance_number(item.get("excess_return_pct"))
-        judgment = "실제 우위" if excess is not None and excess >= 0 else "ETF 우위"
+        if excess is None:
+            judgment = "직접 비교 불가"
+        else:
+            judgment = "실제 우위" if excess >= 0 else "ETF 우위"
         rows.append(
             "<tr>"
             f"<td>{_escape(str(item.get('label') or item.get('key') or '-'))}<br><span class='account-period-note'>{_escape(_etf_weights_label(item.get('weights')))}</span></td>"
@@ -2439,6 +2442,12 @@ def _friendly_etf_warning(value: str) -> str:
         return "날짜별 입금 합계와 브로커 총입금액이 일치하지 않습니다."
     if "withdrawal_total_mismatch" in text:
         return "날짜별 출금 합계와 브로커 총출금액이 일치하지 않습니다."
+    if "after_tax_comparability_unverified" in text:
+        return "ETF의 세금·배당 처리와 실제 계좌가 같은 기준인지 확인되지 않았습니다."
+    if "withdrawal_exceeds_portfolio_value" in text:
+        return "가상 ETF 매도대금으로 출금 요청액을 충당할 수 없습니다."
+    if "distributions_embedded_in_adjusted_prices" in text:
+        return "배당이 반영된 수정주가에서 배당 미재투자 결과를 계산할 수 없습니다."
     if "seed_ignored_below_minimum" in text:
         return "기초자산이 최소 seed 기준보다 작아 ETF seed 매수에서 제외했습니다."
     if "period_start_mismatch" in text or "period_end_mismatch" in text:
