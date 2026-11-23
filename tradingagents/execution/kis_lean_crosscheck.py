@@ -15,7 +15,7 @@ import pandas as pd
 from tradingagents.calendar_access import get_exchange_calendar
 from .account_cost_replay import CostScenario, simulate_account
 
-FIXTURE_VERSION = "krw-broad-hold-crosscheck-v1"
+FIXTURE_VERSION = "krw-broad-hold-crosscheck-v2"
 _INITIAL = Decimal("3000000")
 _COMMISSION, _LEVY, _SLIPPAGE = Decimal(".001"), Decimal(".002"), Decimal(".001")
 _DIVIDEND_WITHHOLDING, _GAIN_TAX, _ALLOWANCE = Decimal(".10"), Decimal(".15"), Decimal("75000")
@@ -23,7 +23,7 @@ _PRODUCT = "000001"
 
 
 def _fixture_prices():
-    dates = get_exchange_calendar("XKRX").sessions_in_range("2026-06-01", "2026-06-12")
+    dates = get_exchange_calendar("XKRX").sessions_in_range("2026-06-08", "2026-06-19")
     prices = pd.DataFrame(index=dates)
     prices["Open"] = [99000, *(100000 + 1500 * index for index in range(len(dates) - 1))]
     prices["Close"] = prices["Open"] + 500
@@ -40,7 +40,7 @@ def _convert_and_verify(prices, converter, output_root):
     raw = prices[["Open", "High", "Low", "Close", "Volume"]].rename(columns=str.lower)
     raw = raw.reset_index(names="date")
     source = raw.to_csv(index=False, date_format="%Y-%m-%d").encode("utf-8")
-    target = converter.export({_PRODUCT: raw}, str(output_root), market_type="krx")[_PRODUCT]
+    target = converter.export({_PRODUCT: raw.copy(deep=True)}, str(output_root), market_type="krx")[_PRODUCT]
     converted = pd.read_csv(target, names=["date", "open", "high", "low", "close", "volume"], dtype={"date": str})
     if converted["date"].tolist() != raw["date"].dt.strftime("%Y%m%d").tolist():
         raise ValueError("KIS LEAN conversion changed the exchange session sequence")

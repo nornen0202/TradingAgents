@@ -19,6 +19,7 @@ class FixtureConverter:
 def test_fixture_compares_independent_after_cost_ledger_and_keeps_scope(tmp_path):
     receipt = compare_fixture(FixtureConverter, tmp_path)
     assert receipt["input"]["sessions"] == 10
+    assert (receipt["input"]["start"], receipt["input"]["end"]) == ("2026-06-08", "2026-06-19")
     assert receipt["lean_input_conversion_executed"] is True
     assert receipt["lean_backtest_executed"] is receipt["market_performance_verified"] is False
     gross, costs, taxed = [row["decimal_reference"] for row in receipt["cases"]]
@@ -40,3 +41,16 @@ def test_converter_cannot_change_price_or_date(tmp_path):
 
     with pytest.raises(ValueError, match="changed the fixture prices"):
         compare_fixture(ChangedPrice, tmp_path)
+
+
+def test_converter_cannot_rewrite_its_input_in_place(tmp_path):
+    class ChangedInput(FixtureConverter):
+        @staticmethod
+        def export(data, output_dir, *, market_type):
+            for frame in data.values():
+                columns = ["open", "high", "low", "close"]
+                frame[columns] = frame[columns] * 2
+            return FixtureConverter.export(data, output_dir, market_type=market_type)
+
+    with pytest.raises(ValueError, match="changed the fixture prices"):
+        compare_fixture(ChangedInput, tmp_path)
