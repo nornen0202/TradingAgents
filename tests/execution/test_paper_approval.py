@@ -106,3 +106,18 @@ def test_telegram_ingress_checks_webhook_actor_chat_message_origin_and_replay(tm
         other["callback_query"]["data"] = callbacks["reject"]
         with pytest.raises(ValueError, match="different decision"):
             apply_telegram_paper_callback(ledger, other, **args)
+
+
+@pytest.mark.parametrize("clock", [None, "not-a-date", "2026-10-07T14:00:00", "2026-10-07T14:00:01Z"])
+def test_missing_or_invalid_quote_clocks_cannot_consume_approval(tmp_path, clock):
+    with _ledger(tmp_path / "proposals.sqlite") as ledger:
+        callbacks = ledger.propose(_proposal())
+        ledger.decide(callbacks["approve"], actor_id="first", delivery_id="once")
+        mark = _quote()
+        if clock is None:
+            mark.pop("observed_at")
+        else:
+            mark["observed_at"] = clock
+        with pytest.raises(ValueError):
+            ledger.consume("paper-1", scope="fixture-scope", quote=mark)
+        assert ledger.recover_admission("paper-1", scope="fixture-scope") is None

@@ -161,3 +161,52 @@ def test_expired_unsubmitted_flatten_can_be_renewed_by_fenced_writer(tmp_path):
         updated, = renewed["paper_intents"]
         assert updated["id"] == intent["id"] and updated["expires_at"] != intent["expires_at"]
         assert renewed["flatten_nonce"] == initial["flatten_nonce"]
+
+
+def test_partial_flatten_recovery_sells_only_the_proven_remaining_shares(tmp_path):
+    at = [START]
+    params = {"scope": "shadow-fixture", "market": "US", "secret": KEY, "rights": RIGHTS, "clock": lambda: at[0]}
+    with PaperControlLedger(tmp_path / "control.sqlite", **params) as control:
+        primary = control.claim("primary", seconds=2)
+        halt = request("halt", "operator", 1)
+        control.execute(halt, sign_paper_control(KEY, halt), actor="operator", writer="primary", epoch=primary)
+        request_all = request("flatten", "risk", 2)
+        plan = control.execute(request_all, sign_paper_control(KEY, request_all), actor="risk", writer="primary", epoch=primary,
+                               snapshot=snapshot(at[0], owned={"ABC": "2"}, sellable={"ABC": "2"}), quotes=quotes(at[0]))
+        previous, = plan["paper_intents"]
+        at[0] += timedelta(seconds=5)
+        standby = control.claim("standby")
+        request_remainder = request("flatten", "risk", 3, now=at[0])
+        proof = {previous["id"]: {"status": "CANCELED", "filled_quantity": "1", "receipt_id": "fixture-cancel-1"}}
+        evidence = snapshot(at[0], owned={"ABC": "1"}, sellable={"ABC": "1"}) | {"terminal_flatten_orders": proof}
+        args = dict(actor="risk", writer="standby", epoch=standby, quotes=quotes(at[0]))
+        signature = sign_paper_control(KEY, request_remainder)
+        with pytest.raises(ValueError, match="unfilled quantity"):
+            control.execute(request_remainder, signature, snapshot=evidence | {"owned": {"ABC": "2"},
+                            "sellable": {"ABC": "2"}}, **args)
+        plan = control.execute(request_remainder, signature, snapshot=evidence, **args)
+        remainder, = plan["paper_intents"]
+        assert remainder["id"] != previous["id"] and remainder["quantity"] == "1"
+        assert control.execute(request_remainder, signature, snapshot=evidence, **args) == plan
+        assert control.flatten_recovery("standby", standby)["intent_ids"] == [remainder["id"]]
+
+
+@pytest.mark.parametrize("evidence_type", ["positions", "quote"])
+@pytest.mark.parametrize("clock", [None, "not-a-date", "2026-08-04T15:00:00", "2026-08-04T15:00:01Z"])
+def test_invalid_or_future_observations_cannot_admit_flatten(tmp_path, evidence_type, clock):
+    with PaperControlLedger(tmp_path / "control.sqlite", scope="shadow-fixture", market="US", secret=KEY,
+                            rights=RIGHTS, clock=lambda: START) as control:
+        epoch = control.claim("writer")
+        halt = request("halt", "operator", 1)
+        control.execute(halt, sign_paper_control(KEY, halt), actor="operator", writer="writer", epoch=epoch)
+        command = request("flatten", "risk", 2)
+        holdings, marks = snapshot(START, owned={"ABC": "1"}, sellable={"ABC": "1"}), quotes(START)
+        source = holdings if evidence_type == "positions" else marks["ABC"]
+        if clock is None:
+            source.pop("observed_at")
+        else:
+            source["observed_at"] = clock
+        with pytest.raises(ValueError):
+            control.execute(command, sign_paper_control(KEY, command), actor="risk", writer="writer", epoch=epoch,
+                            snapshot=holdings, quotes=marks)
+        assert control.flatten_recovery("writer", epoch)["state"] == "NONE"
