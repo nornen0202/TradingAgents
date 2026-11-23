@@ -61,10 +61,39 @@ def test_purging_removes_overlap_and_keeps_final_holdout_outside_models():
         return dict(id=key, decision_at=stamp(event), outcome_end=stamp(outcome), outcome_known_at=stamp(known))
 
     rows = [sample("clean", 2, 4, 5), sample("purged", 3, 10, 11),
-            sample("evaluation", 12, 13, 14), sample("holdout", 20, 21, 22)]
+            sample("evaluation", 12, 13, 14), sample("late-evaluation", 12, 22, 23), sample("holdout", 20, 21, 22)]
     result = purged_folds(rows, [{"train_before": stamp(9), "test_start": stamp(12), "test_end": stamp(15)}],
                           frozen_at=stamp(1), holdout_start=stamp(20), analysis_as_of=stamp(30))
     assert result["folds"][0]["training"] == ["clean"]
     assert result["folds"][0]["purged"] == ["purged"]
     assert result["folds"][0]["evaluation"] == ["evaluation"]
+    assert result["folds"][0]["purged_evaluation"] == ["late-evaluation"]
     assert result["holdout"] == ["holdout"]
+
+
+@pytest.mark.parametrize("field", ["effective_at", "known_at"])
+@pytest.mark.parametrize("clock", [None, "not-a-date", "2026-11-01T18:00:00", "2026-11-02T00:00:00Z"])
+def test_quant_rank_excludes_unverified_factor_clocks(field, clock):
+    asset = _asset([100, 101, 102, 103, 104])
+    revision = asset["factors"]["revision"]
+    if clock is None:
+        revision.pop(field)
+    else:
+        revision[field] = clock
+    result = propose_weights(POLICY, {"SAT1": asset}, analysis_as_of=NOW)
+    assert "SAT1" in result["rejected_evidence"] and not result["quant_only"]["weights"]
+
+
+@pytest.mark.parametrize("field", ["decision_at", "outcome_end", "outcome_known_at"])
+@pytest.mark.parametrize("clock", [None, "not-a-date", "2026-10-12T00:00:00", "2026-10-31T00:00:00Z"])
+def test_purging_refuses_unverified_outcome_clock(field, clock):
+    row = {"id": "fixture", "decision_at": "2026-10-12T00:00:00Z", "outcome_end": "2026-10-13T00:00:00Z",
+           "outcome_known_at": "2026-10-14T00:00:00Z"}
+    if clock is None:
+        row.pop(field)
+    else:
+        row[field] = clock
+    with pytest.raises(ValueError):
+        purged_folds([row], [{"train_before": "2026-10-09T00:00:00Z", "test_start": "2026-10-12T00:00:00Z",
+                             "test_end": "2026-10-15T00:00:00Z"}], frozen_at="2026-10-01T00:00:00Z",
+                     holdout_start="2026-10-20T00:00:00Z", analysis_as_of="2026-10-30T00:00:00Z")

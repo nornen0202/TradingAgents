@@ -67,7 +67,7 @@ def _paired_interval(diffs, block, samples, seed):
 def compare_replays(policy, series, *, analysis_as_of):
     """Aggregate cost and paired risk evidence from complete aligned replay outputs."""
     keys = {"plan_sha256", "frozen_at", "market", "start", "end", "initial_nav", "minimum_sessions",
-            "costs", "data_class", "block_length", "resamples", "seed"}
+            "costs", "external_cashflows", "data_class", "block_length", "resamples", "seed"}
     if not isinstance(policy, dict) or set(policy) != keys or policy["market"] not in _CALENDAR:
         raise ValueError("Require a frozen comparison plan with explicit market")
     if policy["data_class"] not in {"synthetic", "caller_attested_replay"}:
@@ -83,7 +83,7 @@ def compare_replays(policy, series, *, analysis_as_of):
     if any(type(policy[name]) is not int for name in counts):
         raise ValueError("Require fixed sample and bootstrap counts")
     minimum, block, n_samples = (policy[name] for name in counts[:3])
-    if not 2 <= minimum <= 2000 or not 1 <= block <= minimum or not 200 <= n_samples <= 5000:
+    if not 2 <= minimum <= 2000 or not 1 <= block < minimum or not 200 <= n_samples <= 5000:
         raise ValueError("Invalid preregistered comparison sample policy")
     if (not isinstance(policy["costs"], dict) or not policy["costs"] or len(policy["costs"]) > 8
             or not all(isinstance(value, str) and re.fullmatch(r"[a-f0-9]{64}", value)
@@ -96,13 +96,17 @@ def compare_replays(policy, series, *, analysis_as_of):
     sessions = _calendar(policy["market"], start, end, cutoff)
     if len(sessions) > 2000:
         raise ValueError("At most 2000 sessions per comparison")
+    cashflows = policy["external_cashflows"]
+    if not isinstance(cashflows, dict) or set(cashflows) != set(sessions):
+        raise ValueError("One frozen cashflow schedule must cover the compared sessions")
+    cashflows = {day: _number(value) for day, value in cashflows.items()}
     scenarios = {}
     for scenario, digest in policy["costs"].items():
         records = series[scenario]
         if not isinstance(records, dict) or set(records) != set(ARMS):
             raise ValueError("All four preregistered comparison arms are required")
         prepared = {arm: _prepare(records[arm], sessions, digest, cutoff, arm) for arm in ARMS}
-        scenarios[scenario] = _paired(prepared, sessions, nav, minimum, block, n_samples, policy["seed"])
+        scenarios[scenario] = _paired(prepared, sessions, cashflows, nav, minimum, block, n_samples, policy["seed"])
     signature = hashlib.sha256(json.dumps(policy, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
     return {"data_class": policy["data_class"], "analysis_as_of": cutoff.isoformat(),
             "comparison_policy_sha256": signature, "plan_sha256": policy["plan_sha256"],
@@ -140,9 +144,9 @@ def _prepare(rows, sessions, digest, cutoff, arm):
     return output
 
 
-def _paired(arms, sessions, initial_nav, minimum, block, samples, seed):
+def _paired(arms, sessions, cashflows, initial_nav, minimum, block, samples, seed):
     missing = [day for day in sessions if any(day not in arms[arm] for arm in ARMS)]
-    mismatch = [day for day in sessions if day not in missing and len({arms[arm][day][1] for arm in ARMS}) != 1]
+    mismatch = [day for day in sessions if day not in missing and any(arms[arm][day][1] != cashflows[day] for arm in ARMS)]
     result = {"eligible_sessions": len(sessions) - len(missing) - len(mismatch),
               "missing_or_unverified_sessions": missing, "cashflow_mismatch_sessions": mismatch}
     if missing or mismatch or len(sessions) < minimum:
