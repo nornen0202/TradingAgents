@@ -3248,7 +3248,8 @@ def _run_performance_tracking(
                 outcome_update["warnings"] = warnings
         else:
             outcome_update["unavailable_reason"] = "outcome_update_disabled"
-        summary = summarize_action_performance(db_path, analysis_as_of=started_at.isoformat(), require_verified_price=True)
+        reporting_as_of = datetime.now(timezone.utc).isoformat()
+        summary = summarize_action_performance(db_path, analysis_as_of=reporting_as_of, require_verified_price=True)
         summary_payload = summary.to_dict() if hasattr(summary, "to_dict") else summary
         if outcome_update.get("up_to_date") and (summary_payload.get("data_quality") or {}).get("recommendations_without_verified_outcome"):
             outcome_update.update(updated=False, up_to_date=False,
@@ -3264,6 +3265,8 @@ def _run_performance_tracking(
         payload = {
             "enabled": True,
             "status": status,
+            "analysis_as_of": started_at.isoformat(),
+            "reporting_as_of": reporting_as_of,
             "store": {"backend": "sqlite", "location": "private_local_archive"},
             "outcome_update": outcome_update,
             "summary": summary_payload,
