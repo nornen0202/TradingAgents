@@ -6,6 +6,8 @@ from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import Mock, patch
 
+import pytest
+
 from tradingagents.portfolio.account_models import AccountConstraints, AccountSnapshot, PortfolioProfile, Position
 from tradingagents.portfolio.performance import build_account_performance_outputs
 from tradingagents.portfolio.performance.broker_kis import (
@@ -1264,6 +1266,55 @@ def test_etf_dca_flags_fx_missing_for_us_etf_without_fx_series(tmp_path: Path):
     sp500 = next(item for item in comparison["alternatives"] if item["key"] == "SP500_US")
     assert sp500["status"] == "fx_missing"
     assert any("etf_alternative_fx_missing:USD" in item for item in sp500["warnings"])
+
+
+@pytest.mark.parametrize(
+    ("case", "expected"),
+    [("account_income", "OK"), ("future_close", "price_missing"), ("future_fx", "fx_missing"),
+     ("trade_date_fx", "OK"), ("short_withdrawal", "withdrawal_unfunded"), ("incomplete_flows", None),
+     ("foreign_cashflow", None), ("mixed_prices", "price_missing")],
+)
+def test_etf_dca_uses_only_comparable_point_in_time_inputs(tmp_path: Path, case, expected):
+    start, middle, end = "2026-01-02", "2026-02-02", "2026-04-01"
+    instrument = "SP500" if case in {"future_fx", "trade_date_fx"} else "KOSPI200"
+    broker = {"period_start": start, "period_end": end, "start_asset_krw": 20_000,
+              "end_asset_krw": 40_000, "deposit_amount_krw": 10_000, "withdrawal_amount_krw": 0}
+    flows = [{"date": middle, "type": "DEPOSIT", "amount_krw": 10_000}]
+    prices = [{"date": start, "close": 100}, {"date": middle, "close": 100}, {"date": end, "close": 100}]
+    if case == "account_income":
+        flows.extend({"date": middle, "type": kind, "amount_krw": 1_000}
+                     for kind in ["dividend", "interest", "fee", "fx_conversion_in"])
+    elif case == "future_close":
+        prices = [prices[0], {"date": "2026-04-02", "close": 50}]
+    elif case == "mixed_prices":
+        prices[1] = {"date": middle, "adj_close": 100}
+    elif case == "short_withdrawal":
+        broker.update(withdrawal_amount_krw=25_000)
+        flows.append({"date": end, "type": "WITHDRAWAL", "amount_krw": 25_000})
+        prices[-1]["close"] = 50
+    elif case == "incomplete_flows":
+        broker.update(deposit_amount_krw=11_000)
+    elif case == "foreign_cashflow":
+        flows = [{"date": middle, "type": "DEPOSIT", "amount_local": 10_000, "currency": "USD"}]
+
+    fx = {"USD/KRW": [{"date": start, "close": 1_200},
+                     {"date": middle if case == "trade_date_fx" else "2026-02-03", "close": 1_200}]}
+    payload = _build_report(
+        tmp_path, market_scope="kr", current_total_equity_krw=40_000,
+        benchmarks={"KOSPI": prices, "KOSDAQ": prices}, broker_baseline=broker,
+        cashflow_baseline=flows, etf_prices={instrument: prices}, etf_fx=fx,
+        etf_portfolios={"FIXTURE": {instrument: 1.0}},
+    )["etf_alternative_comparison"]
+    assert payload["exact_dated_cashflows_available"] is (expected == "OK")
+    if expected is None:
+        assert payload["status"] == "cashflow_dates_required"
+        assert not payload["alternatives"]
+    else:
+        result = next(row for row in payload["alternatives"] if row["key"] == "FIXTURE")
+        assert result["status"] == expected
+        if expected == "OK":
+            assert result["end_value_krw"] == 30_000
+            assert "etf_alternative_after_tax_comparability_unverified" in payload["warnings"]
 
 
 def test_etf_dca_policy_triggers_report_only_decisions(tmp_path: Path):
