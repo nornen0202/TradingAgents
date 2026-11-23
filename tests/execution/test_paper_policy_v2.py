@@ -64,3 +64,28 @@ def test_v2_journal_binds_one_policy_and_watchlist_per_lane(tmp_path, capsys):
     assert main([str(folder), "--journal-root", str(state), "--as-of", AT]) == 0
     saved = json.loads(capsys.readouterr().out)
     assert saved["v2_journal_bound"] is True and saved["live_order_authority"] is False
+
+
+@pytest.mark.parametrize("target", ["account", "signal", "quote", "asset", "policy", "watchlist"])
+@pytest.mark.parametrize("bad_clock", [None, "invalid-date", "2026-09-08T14:06:00+00:00", "2026-09-08T14:05:00"])
+def test_v2_rejects_unavailable_invalid_naive_and_future_evidence(target, bad_clock):
+    inputs = dict(policy=dict(POLICY), watchlist=dict(WATCH), account=dict(ACCOUNT), signal=dict(SIGNAL), quote=dict(QUOTE))
+    field = {"policy": "frozen_at", "watchlist": "known_at", "asset": "asset_observed_at"}.get(target, "observed_at")
+    if target == "asset":
+        inputs["policy"]["broker"] = "alpaca_paper"
+    row = inputs["quote" if target == "asset" else target]
+    if bad_clock is None:
+        row.pop(field)
+    else:
+        row[field] = bad_clock
+    if target in {"policy", "watchlist"}:
+        with pytest.raises(ValueError):
+            size_v2_candidate(**inputs, as_of=AT)
+    else:
+        assert size_v2_candidate(**inputs, as_of=AT)["status"] != "PAPER_CANDIDATE"
+
+
+def test_v2_empty_broker_or_signal_payloads_have_no_order_authority():
+    assert sized(account={})["status"] == "SCOPE_MISMATCH"
+    assert sized(quote={})["status"] == "SCOPE_MISMATCH"
+    assert sized(signal={})["status"] == "NO_CURRENT_STRATEGY_ACTION"
