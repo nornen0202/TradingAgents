@@ -93,6 +93,16 @@ def test_native_quotes_validate_provider_clocks_and_currency():
         decoder.events(kr_quote().replace("|001|", "|999|"), NOW)
 
 
+@pytest.mark.parametrize("quote", [kr_quote(), us_quote()])
+@pytest.mark.parametrize("bad_date", ["", "20260230", "bad-date", "20260702"])
+def test_provider_dates_must_be_present_valid_and_nonfuture(quote, bad_date):
+    plan = subscription_plan((KR, US), held=[("KR", "009999"), ("US", "DNASFIX")])
+    decoder = VtsFrameDecoder((KR, US), plan)
+    assert decoder.events(quote.replace("20260701", bad_date), NOW) == ()
+    with pytest.raises(ValueError):
+        decoder.events("", NOW)
+
+
 def test_reconnect_resynchronizes_suppresses_duplicates_and_owns_one_socket(tmp_path):
     calls = []
     lock = tmp_path / "session.lock"
