@@ -3,16 +3,19 @@ from __future__ import annotations
 import json
 import math
 import sqlite3
+from dataclasses import asdict
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
 from tradingagents.external.prism_normalize import normalize_market
 
-from .models import ACTION_TRACKER_SCHEMA, OUTCOME_CALCULATION_VERSION, ActionPerformanceSummary
+from .models import (ACTION_TRACKER_SCHEMA, OUTCOME_CALCULATION_VERSION,
+                     VERIFIED_PRICE_CALCULATION_VERSION, ActionPerformanceSummary)
 from .price_history import BENCHMARK_KEY
 from .lifecycle import append_lifecycle_event, initialize_lifecycle, stable_signal_id, timestamp, validate_event
 from .outcome_revisions import read_events, select_retrospectives, visible_events
+from .price_evidence import PriceReference, series_terms
 
 
 def initialize_action_tracker(db_path: Path) -> None:
@@ -44,6 +47,7 @@ def initialize_action_tracker(db_path: Path) -> None:
             "pilot_allowed": "INTEGER",
             "full_size_allowed": "INTEGER",
             "execution_evidence": "TEXT",
+            "price_reference_json": "TEXT",
         })
         _ensure_columns(conn, "action_outcomes", {
             "return_5d": "REAL",
@@ -118,8 +122,9 @@ def record_run_recommendations(run_dir: Path, db_path: Path, *, run_market: str 
                   prism_agreement, sell_intent, sell_trigger_status,
                   sell_size_plan, unrealized_return_pct, profit_protection_score,
                   profit_plan_json, lift_status, opportunity_cost_score, opportunity_capture_score,
-                  pilot_allowed, full_size_allowed, was_executed, execution_evidence, skip_reason, created_at
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                  pilot_allowed, full_size_allowed, was_executed, execution_evidence, skip_reason, created_at,
+                  price_reference_json
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     row["run_id"],
@@ -150,6 +155,7 @@ def record_run_recommendations(run_dir: Path, db_path: Path, *, run_market: str 
                     row.get("execution_evidence"),
                     row.get("skip_reason"),
                     row["created_at"],
+                    row.get("price_reference_json"),
                 ),
             )
             inserted += 1
@@ -171,21 +177,35 @@ def update_action_outcomes(
     refresh_window_days: int = 120,
     recommendation_ids: Sequence[int] | None = None,
     recorded_at: str | None = None,
-) -> None:
+    require_verified_price: bool = False,
+) -> int:
     initialize_action_tracker(db_path)
     # Validate locally even if the upstream adapter claims to apply end_date.
     cutoff = date.fromisoformat(str(asof_date)[:10])
     known_at = str(asof_date) if "T" in str(asof_date) else cutoff.isoformat() + "T23:59:59.999999+00:00"
     decision_cutoff = timestamp(known_at)
     ingested_at = recorded_at or datetime.now(timezone.utc).isoformat()
-    prices = _normalize_price_history(price_history or (_load_json(Path(price_history_path)) if price_history_path else {}), asof_date=str(asof_date))
+    raw_prices = price_history or (_load_json(Path(price_history_path)) if price_history_path else {})
+    prices = _normalize_price_history(raw_prices, asof_date=str(asof_date))
+    terms = {}
+    if require_verified_price and isinstance(raw_prices, Mapping):
+        for key, raw in raw_prices.items():
+            ticker = str(key).upper()
+            rows = raw.get("prices") if isinstance(raw, Mapping) else raw
+            if isinstance(rows, list):
+                retained = [row for row in rows if _normalize_price_history({ticker: [row]}, asof_date=str(asof_date)).get(ticker)]
+                terms[ticker] = series_terms(retained)
+    calculation_version = VERIFIED_PRICE_CALCULATION_VERSION if require_verified_price else OUTCOME_CALCULATION_VERSION
+    if require_verified_price:
+        known_at = decision_cutoff.isoformat()
     benchmark_series = prices.get(BENCHMARK_KEY)
     price_tickers = sorted(key for key in prices if key != BENCHMARK_KEY)
     if not price_tickers:
-        return
+        return 0
     selected_ids = tuple(dict.fromkeys(int(item) for item in recommendation_ids or () if int(item) > 0))
     if recommendation_ids is not None and not selected_ids:
-        return
+        return 0
+    inserted = 0
     cutoff_date = _outcome_refresh_cutoff_date(asof_date, refresh_window_days)
     with sqlite3.connect(db_path, timeout=30) as conn:
         conn.execute("BEGIN IMMEDIATE")
@@ -225,7 +245,7 @@ def update_action_outcomes(
                     (
                         cutoff_date,
                         *price_tickers,
-                        OUTCOME_CALCULATION_VERSION,
+                        calculation_version,
                         str(asof_date)[:10],
                     ),
                 )
@@ -255,21 +275,41 @@ def update_action_outcomes(
             series = prices.get(ticker.upper()) or prices.get(ticker)
             if not series:
                 continue
-            returns = _compute_returns(row, series, horizons=horizons, benchmark_series=benchmark_series)
+            reference = None
+            comparable_benchmark = benchmark_series
+            if require_verified_price:
+                try:
+                    reference = PriceReference.read(json.loads(row["price_reference_json"] or "null"))
+                except (TypeError, ValueError):
+                    continue
+                if (reference is None or decision_time is None
+                        or timestamp(reference.observed_at) > decision_time
+                        or terms.get(ticker.upper()) != (reference.currency, reference.basis)):
+                    continue
+                if terms.get(BENCHMARK_KEY) != terms[ticker.upper()]:
+                    comparable_benchmark = None
+            returns = _compute_returns(row, series, horizons=horizons, benchmark_series=comparable_benchmark,
+                                       reference_price=reference.price if reference else None)
             if not returns:
                 continue
             if decision_time is not None:
                 signal_id = stable_signal_id(row["run_id"], row["ticker"], row["action"], row["source"] or "TradingAgents")
-                append_lifecycle_event(conn, event_id=f"outcome:{signal_id}:{known_at}:v{OUTCOME_CALCULATION_VERSION}",
+                written = append_lifecycle_event(conn, event_id=f"outcome:{signal_id}:{known_at}:v{calculation_version}",
                     signal_id=signal_id, kind="OUTCOME", occurred_at=decision_time.isoformat(), available_at=known_at,
                     confirmed_at=known_at, ingested_at=ingested_at,
-                    payload={"ticker": row["ticker"], "measurement_scope": "counterfactual_recommendation_price_path", **returns})
-            previous = conn.execute(
-                "SELECT updated_at FROM action_outcomes WHERE recommendation_id = ?", (row["id"],)
-            ).fetchall()
-            if any(_outcome_clock(item["updated_at"]) > decision_cutoff for item in previous):
-                continue
-            conn.execute("DELETE FROM action_outcomes WHERE recommendation_id = ?", (row["id"],))
+                    payload={"ticker": row["ticker"], "measurement_scope": "counterfactual_recommendation_price_path",
+                             **({"price_reference": asdict(reference)} if reference else {}), **returns})
+                if require_verified_price and not written:
+                    continue
+            if not require_verified_price:
+                previous = conn.execute(
+                    "SELECT updated_at FROM action_outcomes WHERE recommendation_id = ? AND COALESCE(calculation_version,1) <= ?",
+                    (row["id"], OUTCOME_CALCULATION_VERSION),
+                ).fetchall()
+                if any(_outcome_clock(item["updated_at"]) > decision_cutoff for item in previous):
+                    continue
+                conn.execute("DELETE FROM action_outcomes WHERE recommendation_id = ? AND COALESCE(calculation_version,1) <= ?",
+                             (row["id"], OUTCOME_CALCULATION_VERSION))
             conn.execute(
                 """
                 INSERT INTO action_outcomes (
@@ -301,11 +341,13 @@ def update_action_outcomes(
                     returns.get("avoided_drawdown_20d"),
                     returns.get("missed_upside_20d"),
                     returns.get("outcome_label"),
-                    OUTCOME_CALCULATION_VERSION,
-                    asof_date,
+                    calculation_version,
+                    known_at if require_verified_price else asof_date,
                 ),
             )
+            inserted += 1
         conn.commit()
+    return inserted
 
 
 def _outcome_clock(value: str | None) -> datetime:
@@ -328,7 +370,8 @@ def _outcome_refresh_cutoff_date(asof_date: str, refresh_window_days: int) -> st
     return (parsed - timedelta(days=max(1, int(refresh_window_days or 1)))).isoformat()
 
 
-def summarize_action_performance(db_path: Path, *, analysis_as_of: str | None = None) -> ActionPerformanceSummary:
+def summarize_action_performance(db_path: Path, *, analysis_as_of: str | None = None,
+                                 require_verified_price: bool = False) -> ActionPerformanceSummary:
     """Summarize recommendations and the active, dated execution feedback.
 
     The optional cutoff governs lifecycle feedback; the existing recommendation
@@ -338,6 +381,18 @@ def summarize_action_performance(db_path: Path, *, analysis_as_of: str | None = 
     initialize_action_tracker(db_path)
     with sqlite3.connect(db_path) as conn:
         conn.row_factory = sqlite3.Row
+        if require_verified_price:
+            conn.execute(f"""
+                CREATE TEMP VIEW action_outcomes AS
+                SELECT * FROM main.action_outcomes o
+                WHERE o.calculation_version = {VERIFIED_PRICE_CALCULATION_VERSION} AND o.rowid = (
+                    SELECT r.rowid FROM main.action_outcomes r
+                    WHERE r.recommendation_id = o.recommendation_id
+                      AND r.calculation_version = {VERIFIED_PRICE_CALCULATION_VERSION}
+                      AND r.updated_at <= '{cutoff.isoformat()}'
+                    ORDER BY r.updated_at DESC, r.rowid DESC LIMIT 1
+                )
+            """)
         recommendations = int(conn.execute("SELECT COUNT(*) FROM action_recommendations").fetchone()[0])
         outcomes = int(conn.execute("SELECT COUNT(*) FROM action_outcomes").fetchone()[0])
         events = read_events(conn)
@@ -353,6 +408,9 @@ def summarize_action_performance(db_path: Path, *, analysis_as_of: str | None = 
         calibration = _aggregate_calibration(conn)
         data_quality = _performance_data_quality(conn, closed_trades=closed_trades,
                                                 known_events=known_events, active_reviews=active_reviews)
+        if require_verified_price:
+            data_quality["price_evidence_required"] = True
+            data_quality["recommendations_without_verified_outcome"] = recommendations - outcomes
     return ActionPerformanceSummary(
         recommendations=recommendations,
         outcomes=outcomes,
@@ -420,6 +478,7 @@ def _portfolio_action_rows(
         data_health = action.get("data_health") if isinstance(action.get("data_health"), Mapping) else {}
         lift = data_health.get("action_lift") if isinstance(data_health.get("action_lift"), Mapping) else {}
         execution_evidence = _execution_evidence(action)
+        reference = PriceReference.read(data_health.get("price_reference"))
         has_proposed_allocation = bool(int(action.get("delta_krw_now") or 0))
         rows.append(
             {
@@ -429,6 +488,7 @@ def _portfolio_action_rows(
                 "action": preferred_action,
                 "risk_action": action.get("risk_action"),
                 "recommended_price": _recommended_price(action),
+                "price_reference_json": json.dumps(asdict(reference), sort_keys=True) if reference else None,
                 "confidence": action.get("confidence"),
                 "trigger_type": action.get("trigger_type"),
                 "source": "TradingAgents",
@@ -545,12 +605,13 @@ def _compute_returns(
     *,
     horizons: Sequence[int],
     benchmark_series: list[tuple[str, float]] | None = None,
+    reference_price: float | None = None,
 ) -> dict[str, Any]:
     created_date = str(row["created_at"] or "")[:10]
     start_index = _start_index_for_date(series, created_date)
     if start_index is None:
         return {}
-    base_price = _float_or_none(row["recommended_price"]) or series[start_index][1]
+    base_price = reference_price or _float_or_none(row["recommended_price"]) or series[start_index][1]
     if base_price <= 0:
         return {}
     values: dict[str, Any] = {}

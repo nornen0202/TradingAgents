@@ -111,7 +111,7 @@ def test_runner_distinguishes_complete_and_partial_price_updates(tmp_path, monke
     monkeypatch.setattr(runner, 'summarize_action_performance', Mock(return_value={'recommendations': 2}))
     monkeypatch.setattr(runner, 'load_price_history_for_recommendations', Mock(return_value=prices.PriceHistoryLoadResult(
         price_history=history, provider='yfinance', due_recommendation_ids=(1, 2), required_tickers=('AAPL', 'MSFT'))))
-    update = Mock()
+    update = Mock(return_value=2 if complete else 1)
     monkeypatch.setattr(runner, 'update_action_outcomes', update)
     result = runner._run_performance_tracking(config=config, run_dir=run_dir, started_at=datetime(2026, 4, 2, tzinfo=timezone.utc))
     update.assert_called_once()
@@ -152,7 +152,7 @@ def test_runner_prices_and_outcomes_share_market_date_at_midnight(tmp_path, monk
             due_recommendation_ids=(1,), required_tickers=('AAPL',))
 
     monkeypatch.setattr(runner, 'load_price_history_for_recommendations', load)
-    update = Mock()
+    update = Mock(return_value=1)
     monkeypatch.setattr(runner, 'update_action_outcomes', update)
     result = runner._run_performance_tracking(config=config, run_dir=run_dir,
         started_at=datetime.fromisoformat(started))
@@ -162,7 +162,8 @@ def test_runner_prices_and_outcomes_share_market_date_at_midnight(tmp_path, monk
         assert result['status'] == 'recorded_pending_outcomes'
     else:
         assert all(row['date'] <= expected for row in seen['history']['AAPL'])
-        assert update.call_args.kwargs['asof_date'] == expected
+        assert update.call_args.kwargs['asof_date'] == datetime.fromisoformat(started).isoformat()
+        assert update.call_args.kwargs['require_verified_price'] is True
         assert len(seen['history']['AAPL']) == (1 if expected == '2026-10-29' else 2)
 
 
