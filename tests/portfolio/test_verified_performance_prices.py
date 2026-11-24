@@ -48,7 +48,7 @@ def _recommendation(tmp_path, reference, *, legacy=True):
         # Emulate a pre-contract writer for historic revision tests.
         with sqlite3.connect(db) as conn:
             conn.execute("UPDATE action_recommendations SET recommended_price=150000, "
-                         "native_reference_state=NULL, price_reference_json=?", (json.dumps(reference),))
+                         "native_reference_state=NULL, price_reference_json=?", (json.dumps(reference) if reference is not None else None,))
     return db
 
 
