@@ -121,7 +121,7 @@ def _snapshot_with_series(symbol, end_date, source, frame):
                              and verified_yahoo_basis(frame, symbol, attrs.get("requested_start"), end_date, as_of=now) is not None
                              and isinstance(attrs.get("listing_contract"), dict)
                              and attrs["listing_contract"].get("schema") == "tradingagents.verified-kr-first-regular-listing/v1")
-        if source == "yfinance" and not kr_yahoo_metadata:
+        if source == "yfinance" and "listing_contract" not in attrs:
             return _retain_yahoo(entry, frame, end, now)
         if (not (us_metadata or alpaca_metadata or kr_metadata or kr_yahoo_metadata) or attrs.get("source") != source
                 or attrs.get("provider") != ("yfinance" if kr_yahoo_metadata else "alpaca" if alpaca_metadata else "kis")
@@ -189,6 +189,8 @@ def _snapshot_with_series(symbol, end_date, source, frame):
             if kr_metadata or kr_yahoo_metadata:
                 entry["identity_provider"] = "KIS"
                 entry["identity_verified_at"] = verified.isoformat()
+        if alpaca_metadata:
+            entry.update(feed=attrs["feed"], exchange=None)  # SIP is a feed, not a listing venue.
         explicit_price_currency = "USD" if alpaca_metadata and attrs.get("price_currency") == "USD" else None
         _terms(entry, price_currency=explicit_price_currency,
                currency_basis="explicit_provider_request" if explicit_price_currency else None)
