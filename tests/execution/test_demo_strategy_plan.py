@@ -69,6 +69,31 @@ def test_native_strategy_fixture_is_independent_of_operator_calendar(tmp_path, m
     assert first["orders"][0]["status"] == "ACKNOWLEDGED"
 
 
+def test_native_allocation_consumes_the_same_grouped_producer_proof(tmp_path):
+    h = Harness(tmp_path, "KR")
+    run, contract = native_source(h)
+    contract["structured_levels"] = [
+        {"level_type": "BREAKOUT", "price": h.price - 100, "confirmation": "intraday", "confirmation_group": "pilot"},
+    ]
+    directory = run / "tickers" / h.ticker
+    atomic_write_json(directory / "execution_contract.json", contract)
+    plans, diagnostics = planner.plan(run, h.market, h.now, (h.ticker,), {})
+    assert plans == [] and diagnostics["ticker_blockers"][h.ticker] == "ENTRY_SESSION_CONFIRMATION_UNVERIFIED"
+    update = json.loads((directory / "execution_update.json").read_text())
+    quote_at = update["market_data_asof"]
+    update["entry_confirmation_v2"] = {
+        "plan": {"ticker": h.ticker, "market": "KR", "currency": "KRW", "origin_session": quote_at[:10],
+                 "created_at": contract["analysis_asof"], "valid_sessions": 1, "quote_max_age_seconds": 120,
+                 "max_open_delay_seconds": 60, "execution_window_seconds": 1800, "max_gap_bps": 200,
+                 "alternatives": [[{"id": "pilot-0", "stage": "intraday", "direction": "above", "level": h.price - 100}]]},
+        "live_quote": {"source": "kis", "ticker": h.ticker, "market": "KR", "currency": "KRW", "session": quote_at[:10],
+                       "kind": "quote", "price": h.price, "event_at": quote_at, "observed_at": quote_at},
+    }
+    atomic_write_json(directory / "execution_update.json", update)
+    orders, _ = planner.plan(run, h.market, h.now, (h.ticker,), {})
+    assert len(orders) == 1 and h.calls == []
+
+
 @pytest.mark.parametrize("market", ["KR", "US"])
 def test_recovered_core_requests_enable_only_new_original_approved_research(tmp_path, market):
     from tests.test_research_evidence import receipt
