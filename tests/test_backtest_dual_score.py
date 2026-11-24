@@ -247,7 +247,7 @@ def test_upstream_log_path_reads_recorded_outcomes_and_preserves_source_bytes(tm
     tags = [
         "2026-03-02 | AAPL | Hold | +1.0% | -1.0% | 2d | resolved:2026-03-05",
         "2026-03-02 | MSFT | Sell | -10.0% | -12.0% | 2d | resolved:2026-03-05",
-        "2026-03-02 | AMD | Review | pending",
+        "2026-03-02 | AMD | REVIEW | +3.0% | +2.0% | 2d",
         "2026-03-02 | NVDA | Buy | pending",
         "2026-03-02 | AMZN | Buy | +0.0% | n/a | 2d",
         "2026-03-02 | META | Buy | +1.0% | +0.0% | 5d",

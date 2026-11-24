@@ -25,7 +25,8 @@ ANALYSTS = ("market", "social", "news", "fundamentals")
 _UPSTREAM_LOG = "tradingagents.upstream-memory-log/v1"
 _COMPAT_DIRECTIONS = {"Buy": 1, "Overweight": 1, "Underweight": -1, "Sell": -1}
 _COMPAT_DEFAULT_WINDOW = "the configured window"
-_UPSTREAM_RATINGS = {*_COMPAT_DIRECTIONS, "Hold", "Review"}
+_UPSTREAM_REVIEW = "REVIEW"
+_UPSTREAM_RATINGS = {*_COMPAT_DIRECTIONS, "Hold", _UPSTREAM_REVIEW}
 _RATING = {"매수": "BUY", "비중확대": "OVERWEIGHT", "비중 확대": "OVERWEIGHT", "보유": "HOLD",
            "비중축소": "UNDERWEIGHT", "비중 축소": "UNDERWEIGHT", "매도": "SELL", "검토": "REVIEW"}
 _KO = {code: name for name, code in _RATING.items()}
@@ -212,12 +213,12 @@ def _compat_summary(outcomes, data):
     pending = unscored = 0
     windows = set()
     for rating, alpha, holding in outcomes:
-        if rating == "Review":
+        if rating == _UPSTREAM_REVIEW:
             unscored += 1
         elif alpha is None:
             pending += 1
         else:
-            resolved.setdefault(rating, []).append(alpha)
+            resolved.setdefault(rating.title(), []).append(alpha)
             if holding and holding.endswith("d"):
                 windows.add(f"{holding[:-1]} trading days")
     by_rating = {}
@@ -234,10 +235,8 @@ def _summarize_evaluation(data):
     window = f'{data["manifest"]["holding"]}d'
     # Upstream compatibility counts only stored decisions. Grid failures without a
     # judgment still appear in the scorecards' target count and failure reasons.
-    return _compat_summary(
-        ((row["rating"].title(), row["direction"].get("alpha"), window)
-         for row in data["records"] if row["rating"]), data,
-    )
+    outcomes = ((row["rating"], row["direction"].get("alpha"), window) for row in data["records"] if row["rating"])
+    return _compat_summary(outcomes, data)
 
 
 def render_summary(data):
