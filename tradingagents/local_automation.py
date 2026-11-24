@@ -868,7 +868,7 @@ def main():
         observation_root = args.state_dir / "forward-observation"
         if (observation_root / "policy.json").is_file():
             os.environ["TRADINGAGENTS_FORWARD_OBSERVATION_ROOT"] = str(observation_root)
-    if args.command == "run-due" and not args.dry_run:
+    if args.command in {"run-due", "refresh-kis"} and not args.dry_run:
         observation_source = read_json(args.state_dir / "forward-observation-source.json", {})
         if isinstance(observation_source, dict) and isinstance(database := observation_source.get("database"), str):
             if Path(database).is_absolute():
