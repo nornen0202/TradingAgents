@@ -1238,7 +1238,7 @@ def analyze(
 
 @app.command()
 def backtest(
-    tickers: str = typer.Argument(..., help="Comma-separated stocks, e.g. NVDA,AAPL."),
+    tickers: Optional[str] = typer.Argument(None, help="Comma-separated stocks, e.g. NVDA,AAPL."),
     start: str = typer.Option(..., "--start", help="First analysis date, YYYY-MM-DD."),
     end: str = typer.Option(..., "--end", help="Last analysis date, YYYY-MM-DD."),
     every: int = typer.Option(7, "--every", min=1, help="Calendar days between decisions."),
@@ -1250,6 +1250,9 @@ def backtest(
     holding_period: int = typer.Option(5, "--holding-period", min=1, max=100),
     benchmark: Optional[str] = typer.Option(None, "--benchmark"),
     transaction_cost_bps: float = typer.Option(10.0, "--transaction-cost-bps", min=0),
+    archive: Optional[Path] = typer.Option(None, "--archive", exists=True, file_okay=False),
+    as_of: Optional[str] = typer.Option(None, "--as-of", help="Archive settlement cutoff with timezone."),
+    price_snapshot: Optional[Path] = typer.Option(None, "--price-snapshot", exists=True, dir_okay=False),
 ):
     """Evaluate past decisions in a private run and export the two scorecards."""
     from tradingagents.backtest import ANALYSTS, iter_grid, run_backtest, summarize
@@ -1259,6 +1262,19 @@ def backtest(
     if output_dir is not None:
         config["results_dir"] = str(output_dir)
     try:
+        if archive:
+            if tickers or portfolio or analysts or benchmark or every != 7 or asset_type != "stock":
+                raise ValueError("Archive mode uses original tickers, judgments and market benchmarks.")
+            from tradingagents.eval.archive_backtest import run_archive_backtest
+
+            path, data = run_archive_backtest(
+                archive, start, end, config["results_dir"], holding=holding_period,
+                fee_bps=transaction_cost_bps, as_of=as_of, run_id=run_id, price_snapshot=price_snapshot,
+            )
+            print(f'원판단 {len(data["records"]):,}건 · 결과 {path}')
+            return
+        if not tickers or as_of or price_snapshot:
+            raise ValueError("Provide grid tickers or use --archive for archived decisions.")
         selected = [("social" if name.strip() == "sentiment" else name.strip())
                     for name in analysts.split(",")] if analysts else ANALYSTS
         if any(name not in ANALYSTS for name in selected):
@@ -1277,6 +1293,34 @@ def backtest(
     print(f"재개 인수 --run-id {result.run_id}")
     if result.failures or result.settlement_failures:
         raise typer.Exit(code=1)
+
+
+@app.command("quant-research")
+def quant_research(
+    phase: str = typer.Argument(..., help="collect, study, holdout or lean."),
+    output_dir: Path = typer.Option(..., "--output-dir"),
+    as_of: Optional[str] = typer.Option(None, "--as-of", help="Completed-data cutoff with timezone."),
+    lean_root: Optional[Path] = typer.Option(None, "--lean-root", help="Dedicated LEAN source checkout."),
+    dotnet: Optional[Path] = typer.Option(None, "--dotnet", help="Executable for the LEAN checkout SDK."),
+):
+    """Run the archived-source, paired KRW research study without broker orders."""
+    from tradingagents.execution.research_study import run_research
+
+    if phase not in {"collect", "study", "holdout", "lean"}:
+        raise typer.BadParameter("Choose collect, study, holdout or lean.")
+    try:
+        if phase == "lean":
+            from tradingagents.execution.research_lean import run_lean
+
+            if not lean_root or not dotnet:
+                raise ValueError("LEAN needs --lean-root, --dotnet and a completed study or holdout output directory.")
+            path = run_lean(output_dir, lean_root, dotnet)
+        else:
+            path, _ = run_research(output_dir, as_of, phase)
+    except (OSError, ValueError, TimeoutError) as exc:
+        print(f"장기 연구 단계 실패. {exc}")
+        raise typer.Exit(code=2) from None
+    print(f"장기 연구 {phase} · 결과 {path}")
 
 
 @app.command("paper-replay")

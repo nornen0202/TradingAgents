@@ -28,3 +28,13 @@ The graph accepts both `propagate(ticker, trade_date, "stock", portfolio=book)` 
 The compatibility fields `resolved`, `pending`, `unscored`, `by_rating` and `holding` describe the stored judgments. A settled Hold contributes a count and mean alpha with no directional hit rate. Review is unscored. Other stored judgments with missing alpha stay pending. Failed cells without a judgment stay visible in the scorecard target and failure counts. `summarize(path)` also reads preserved upstream Markdown memory logs and uses their recorded alpha and windows without fetching prices. Other prior formats are left unverified.
 
 Backtest exports distinguish newly analyzed and resumed cells and preserve the original judgment clock. Scheduled run and ticker pages show fresh full research, copied full research or an execution overlay. The recommendation ledger captures independently generated judgments and leaves reused decisions with their original run.
+
+## Scheduled archive mode
+
+    tradingagents backtest --archive G:/TradingAgentsData/archive --start 2026-08-25 --end 2026-11-25 --as-of 2026-11-25T04:42:27+09:00 --holding-period 5 --transaction-cost-bps 10 --output-dir G:/TradingAgentsData/quant-research-20261125 --run-id archive-3m-20261125
+
+The archive command reads completed scheduled manifests and uses the market-local date of the original judgment's completion for inclusion. The first regular open must follow that completion. A premarket judgment can use the same market date. The command counts copied retry and overlay records in the source inventory, and evaluates genuinely new retry judgments at their own completion times. The price reference date remains in each output row.
+
+A BUY or OVERWEIGHT judgment needs an original STARTER or ADD instruction to enter the archive exposure denominator. Conditional instructions paired with WAIT remain out of that denominator. The baseline exposure is 100% in SPY or KODEX 200 over the same dates, after the same per-side cost. Each market, judgment month and rating has its own denominators for scored returns, maturity and price exceptions. The holdings clock uses KODEX 200 (069500.KS) as the investable Korean benchmark.
+
+The run writes normalized prices and their digest to `price-inputs.json`, source manifest digests to `archive-inputs.json`, and three report formats under the supplied run ID. A distinct run ID with the same cutoff and `--price-snapshot PATH` reuses those price inputs. Original archive and price retention stay private.

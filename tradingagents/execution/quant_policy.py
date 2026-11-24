@@ -32,13 +32,16 @@ def _known(record, cutoff):
     return event
 
 
-def _policy(value, cutoff):
+def _policy(value, cutoff, *, historical_replay=False):
     required = {"version", "frozen_at", "currency", "core", "satellite", "budget_core", "budget_satellite",
                 "cash_floor", "asset_cap", "trend_window", "momentum_window", "volatility_window",
                 "annual_volatility_target", "maximum_stale_days", "minimum_turnover", "satellite_limit",
                 "factor_weights", "cost_version"}
-    if not isinstance(value, dict) or set(value) != required or _stamp(value["frozen_at"]) >= cutoff:
+    if not isinstance(value, dict) or set(value) != required:
         raise ValueError("Preregistered policy must be frozen before the decision")
+    if not historical_replay and _stamp(value["frozen_at"]) >= cutoff:
+        raise ValueError("Preregistered policy must be frozen before the decision")
+    _stamp(value["frozen_at"])
     for key in ("version", "cost_version", "currency"):
         if not isinstance(value[key], str) or not value[key].strip():
             raise ValueError("Explicit version, cost model, and portfolio currency required")
@@ -120,9 +123,12 @@ def _targets(rows, *, budget, cap, volatility_target, limit):
             for _, ticker, vol in eligible}
 
 
-def propose_weights(policy, market_evidence, *, analysis_as_of, vetoes=None, settled_cash=None, unsettled_cash=None):
+def propose_weights(policy, market_evidence, *, analysis_as_of, vetoes=None, settled_cash=None, unsettled_cash=None,
+                    historical_replay=False):
     cutoff = _stamp(analysis_as_of)
-    _policy(policy, cutoff)
+    _policy(policy, cutoff, historical_replay=historical_replay)
+    if historical_replay and vetoes:
+        raise ValueError("Retrospective policy cannot consume vetoes.")
     if not isinstance(market_evidence, dict) or (vetoes is not None and not isinstance(vetoes, dict)):
         raise ValueError("Expected instrument-keyed evidence")
     vetoes = vetoes or {}

@@ -265,6 +265,30 @@ def render_summary(data):
         alpha = "해당 없음" if score["mean_alpha"] is None else f'{score["mean_alpha"]:+.2%}'
         lines.append(f'| {_KO.get(grade, grade)} ({grade}) | {_fraction(score["direction"])} | '
                      f'{_fraction(score["new_exposure"])} | {alpha} |')
+    if doc.get("source") == "scheduled_archive":
+        inventory = doc["archive_inventory"]
+        lines.extend([
+            "", f'- 판단 완료일 범위 {doc["start"]} ~ {doc["end"]}, 정산 마감 {doc["settlement_cutoff"]}',
+            '- 판단 완료 시각보다 늦은 첫 정규장 시가를 기준으로 세션을 선택합니다. 거래일은 시장 현지 날짜입니다.',
+            '- 신규 노출은 BUY/OVERWEIGHT 등급과 STARTER/ADD 신규 진입 판단이 모두 기록된 행에 적용합니다.',
+            '- 신규 노출 적중은 비용 차감 후 수익이 양수인 비율입니다. 상대수익은 비교 가격이 있는 행에서 산출합니다.',
+            f"- 아카이브 조회 집계 {', '.join(f'{key} {count:,}건' for key, count in sorted(inventory.items()))}",
+            "", "| 시장 / 판단월 / 등급 | 대상 | 방향 적중 / 채점 | 방향 보류·결측 | 신규 노출 적중 / 채점 | 신규 노출 보류·결측 | 방향 상대수익 | 신규 평균 순수익 | 신규 평균 거래비용 | 신규 평균 상대수익 |",
+            "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |",
+        ])
+        for group in data["archive_groups"]:
+            direction, exposure = group["direction"], group["new_exposure"]
+
+            def mean(score, field):
+                value = score["means"].get(field)
+                return "–" if value is None else f'{value:+.2%} (n={score["mean_denominators"][field]})'
+
+            lines.append(
+                f'| {group["market"]} / {group["month"]} / {group["rating"]} | {direction["target"]} | '
+                f'{_fraction(direction)} | {_reasons(direction)} | {_fraction(exposure)} | {_reasons(exposure)} | '
+                f'{mean(direction, "alpha")} | {mean(exposure, "strategy_return")} | '
+                f'{mean(exposure, "transaction_cost")} | {mean(exposure, "excess_return")} |'
+            )
     lines.extend(["", f"- 판단 정산 / 대기 / 보류 (원본 집계): {compat.resolved} / {compat.pending} / {compat.unscored}",
                   f'- 시장 대비 방향은 첫 적격 세션 종가부터 {holding}거래일 후 종가까지 비교합니다. '
                   '상대수익을 0.1%p 단위로 기록해 등급 방향을 평가합니다.',
