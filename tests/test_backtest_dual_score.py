@@ -214,3 +214,92 @@ def test_retry_fetches_only_the_unavailable_benchmark_after_both_outcomes_settle
     assert queried == ["SPY"] and after["direction"] == before["direction"]
     assert after["new_exposure"]["strategy_return"] == before["new_exposure"]["strategy_return"]
     assert after["new_exposure"]["benchmark_status"] == "AVAILABLE"
+
+def test_summary_compatibility_counts_settled_hold_without_a_direction(tmp_path, monkeypatch):
+    graph = graph_with(monkeypatch)
+    original = graph.propagate
+
+    def propagate(self, ticker, day, **kwargs):
+        state, rating = original(self, ticker, day, **kwargs)
+        return state, {"AAPL": "보유", "MSFT": "매도", "AMD": "검토", "NVDA": "매수"}.get(ticker, rating)
+
+    def missing_asset(ticker, first, last):
+        return prices(ticker, first, last).iloc[:0] if ticker == "NVDA" else prices(ticker, first, last)
+
+    monkeypatch.setattr(graph, "propagate", propagate)
+    result = bt.run_backtest(["AAPL", "MSFT", "AMD", "NVDA"], DATES, {"results_dir": str(tmp_path)},
+                             "stock", holding_period=2, as_of=CUTOFF, provider=missing_asset)
+    report = bt.summarize(result)
+    assert (report.resolved, report.pending, report.unscored) == (2, 1, 1)
+    assert report.holding == "2 trading days"
+    assert report.by_rating["Hold"] == bt.RatingScore(1, None, -.01)
+    assert report.by_rating["Sell"] == bt.RatingScore(1, 1., -.12)
+    assert "Review" not in report.by_rating and "Buy" not in report.by_rating
+    assert report.data["direction"]["scored"] == 1
+    assert report.data["new_exposure"]["scored"] == 0
+    assert report.data["metrics"]["hit_rate"] is None
+    assert "2 / 1 / 1" in report.render()
+    assert bt.summarize(result.log_path) == report
+
+
+def test_upstream_log_path_reads_recorded_outcomes_and_preserves_source_bytes(tmp_path):
+    path = tmp_path / "trading_memory.md"
+    tags = [
+        "2026-03-02 | AAPL | Hold | +1.0% | -1.0% | 2d | resolved:2026-03-05",
+        "2026-03-02 | MSFT | Sell | -10.0% | -12.0% | 2d | resolved:2026-03-05",
+        "2026-03-02 | AMD | Review | pending",
+        "2026-03-02 | NVDA | Buy | pending",
+        "2026-03-02 | AMZN | Buy | +0.0% | n/a | 2d",
+        "2026-03-02 | META | Buy | +1.0% | +0.0% | 5d",
+        "2026-03-02 | GOOG | Overweight | +3.0% | +1.0% | 2d",
+        "2026-03-02 | QQQ | Underweight | -1.0% | -0.0% | 2d",
+    ]
+    source = "".join(f"[{tag}]\r\n\r\nDECISION:\r\nFixture\r\n\r\n<!-- ENTRY_END -->\r\n\r\n"
+                     for tag in tags).encode()
+    path.write_bytes(source)
+    report = bt.summarize(path)
+    assert (report.resolved, report.pending, report.unscored) == (5, 2, 1)
+    assert report.holding == "2 trading days, 5 trading days"
+    assert report.by_rating == {
+        "Hold": bt.RatingScore(1, None, -.01),
+        "Sell": bt.RatingScore(1, 1., -.12),
+        "Buy": bt.RatingScore(1, 0., 0.),
+        "Overweight": bt.RatingScore(1, 1., .01),
+        "Underweight": bt.RatingScore(1, 0., 0.),
+    }
+    assert path.read_bytes() == source
+    assert "Hold" in report.render() and "new_exposure" not in report.data
+
+    path.write_text("[2026-03-02 | AAPL | Buy | +3.0% | +2.0% | 2d]\nUnverified report", encoding="utf-8")
+    assert bt.summarize(path).data.get("schema") == "legacy/unverified"
+
+
+def test_run_reuses_full_decision_with_separate_visible_provenance(tmp_path, monkeypatch):
+    graph = graph_with(monkeypatch)
+    args = (["AAPL"], DATES, {"results_dir": str(tmp_path)})
+    opts = dict(run_id="resume-provenance", holding_period=2, as_of=CUTOFF, provider=prices)
+    first = bt.run_backtest(*args, asset_type="stock", **opts)
+    first_report = bt.summarize(first)
+    assert "FULL · 신규 분석" in first_report.render()
+    second = bt.run_backtest(*args, "stock", **opts)
+    second_report = bt.summarize(second)
+    assert len(graph.calls) == second.skipped == second_report.resolved == 1
+    assert second.cells_run == 0
+    assert "FULL · 기존 판단 재사용" in second_report.render()
+    assert "기존 판단 재사용" in (second.log_path.parent / "evaluation.ko.html").read_text(encoding="utf-8")
+    assert second_report.data["records"][0]["executed_at"] == first_report.data["records"][0]["executed_at"]
+
+
+def test_public_api_reports_unsupported_asset_and_date(tmp_path):
+    with pytest.raises(ValueError, match="YYYY-MM-DD"):
+        bt.iter_grid("2026-3-02", DATES[0])
+    assert bt.iter_grid("2026-03-02", "2026-03-05", every_n_days=3) == ["2026-03-02", "2026-03-05"]
+    book = {"cash": 100, "currency": "USD"}
+    with pytest.raises(ValueError, match="stock graph"):
+        bt.run_backtest(["BTC-USD"], DATES, {"results_dir": str(tmp_path)}, "crypto", book)
+    graph = TradingAgentsGraph.__new__(TradingAgentsGraph)
+    graph.config = {}
+    graph._propagate = lambda *a, **kwargs: kwargs
+    assert graph.propagate("AAPL", DATES[0], portfolio=book, asset_type="stock")["portfolio"] == book
+    with pytest.raises(ValueError, match="stock graph"):
+        graph.propagate("BTC-USD", DATES[0], asset_type="crypto")

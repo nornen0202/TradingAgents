@@ -22,6 +22,10 @@ from tradingagents.graph.trading_graph import TradingAgentsGraph
 from tradingagents.portfolio.context import normalize_portfolio
 
 ANALYSTS = ("market", "social", "news", "fundamentals")
+_UPSTREAM_LOG = "tradingagents.upstream-memory-log/v1"
+_COMPAT_DIRECTIONS = {"Buy": 1, "Overweight": 1, "Underweight": -1, "Sell": -1}
+_COMPAT_DEFAULT_WINDOW = "the configured window"
+_UPSTREAM_RATINGS = {*_COMPAT_DIRECTIONS, "Hold", "Review"}
 _RATING = {"매수": "BUY", "비중확대": "OVERWEIGHT", "비중 확대": "OVERWEIGHT", "보유": "HOLD",
            "비중축소": "UNDERWEIGHT", "비중 축소": "UNDERWEIGHT", "매도": "SELL", "검토": "REVIEW"}
 _KO = {code: name for name, code in _RATING.items()}
@@ -62,13 +66,23 @@ class BacktestSummary:
     data: dict = field(default_factory=dict)
 
     def render(self):
+        if self.data.get("schema") == _UPSTREAM_LOG:
+            lines = ["# 보존된 원본 백테스트", f"정산 / 대기 / 보류: {self.resolved} / {self.pending} / {self.unscored}"]
+            for rating, score in self.by_rating.items():
+                hit = "방향 제외" if score.hit_rate is None else f"{score.hit_rate:.1%}"
+                lines.append(f"- {rating}: {score.count}건, 방향 {hit}, 시장 대비 평균 {score.mean_alpha:+.2%}")
+            lines.append(f"정산 기록의 기간: {self.holding}")
+            return "\n".join(lines) + "\n"
         if self.data.get("schema") != SCHEMA:
             return "이전 저장 결과 · 원자료 확인이 필요한 성과입니다."
         return render_summary(self.data)
 
 
 def _day(text):
-    value = date.fromisoformat(text)
+    try:
+        value = date.fromisoformat(text)
+    except (TypeError, ValueError) as exc:
+        raise ValueError("Use YYYY-MM-DD dates.") from exc
     if value.isoformat() != text:
         raise ValueError("Use YYYY-MM-DD dates.")
     return value
@@ -148,10 +162,89 @@ def _reasons(value):
     return ", ".join(items) or "없음"
 
 
+def _upstream_alpha(text):
+    try:
+        value = float(text.strip().rstrip("%")) / 100
+    except ValueError:
+        return None
+    return value if math.isfinite(value) else None
+
+
+def _upstream_log_outcomes(raw):
+    """Read only complete records written in the upstream memory-log format."""
+    try:
+        text = raw.decode("utf-8").replace("\r\n", "\n")
+    except UnicodeDecodeError:
+        return None
+    blocks = text.split("\n\n<!-- ENTRY_END -->\n\n")
+    if len(blocks) < 2 or blocks[-1].strip():
+        return None
+    outcomes = []
+    for block in blocks[:-1]:
+        tag, _, body = block.strip().partition("\n")
+        if not (tag.startswith("[") and tag.endswith("]") and body.lstrip("\n").partition("\n")[0] == "DECISION:"):
+            return None
+        fields = [field.strip() for field in tag[1:-1].split("|")]
+        if len(fields) not in {4, 6, 7}:
+            return None
+        day, ticker, rating, outcome = fields[:4]
+        try:
+            _day(day)
+            if len(fields) == 7:
+                marker, _, known_on = fields[6].partition(":")
+                if marker != "resolved" or _day(known_on) < _day(day):
+                    return None
+        except ValueError:
+            return None
+        if rating not in _UPSTREAM_RATINGS or not re.fullmatch(r"[A-Za-z0-9^][A-Za-z0-9.^=/_-]{0,39}", ticker):
+            return None
+        pending = outcome == "pending"
+        if pending != (len(fields) == 4):
+            return None
+        alpha = None if pending else _upstream_alpha(fields[4])
+        holding = None if pending else fields[5]
+        outcomes.append((rating, alpha, holding))
+    return outcomes
+
+
+def _compat_summary(outcomes, data):
+    resolved = {}
+    pending = unscored = 0
+    windows = set()
+    for rating, alpha, holding in outcomes:
+        if rating == "Review":
+            unscored += 1
+        elif alpha is None:
+            pending += 1
+        else:
+            resolved.setdefault(rating, []).append(alpha)
+            if holding and holding.endswith("d"):
+                windows.add(f"{holding[:-1]} trading days")
+    by_rating = {}
+    for rating, alphas in resolved.items():
+        direction = _COMPAT_DIRECTIONS.get(rating)
+        count = len(alphas)
+        hits = sum(alpha * direction > 0 for alpha in alphas) if direction else None
+        by_rating[rating] = RatingScore(count, hits / count if hits is not None else None, sum(alphas) / count)
+    return BacktestSummary(sum(map(len, resolved.values())), pending, by_rating, unscored,
+                           ", ".join(sorted(windows)) or _COMPAT_DEFAULT_WINDOW, data)
+
+
+def _summarize_evaluation(data):
+    window = f'{data["manifest"]["holding"]}d'
+    # Upstream compatibility counts only stored decisions. Grid failures without a
+    # judgment still appear in the scorecards' target count and failure reasons.
+    return _compat_summary(
+        ((row["rating"].title(), row["direction"].get("alpha"), window)
+         for row in data["records"] if row["rating"]), data,
+    )
+
+
 def render_summary(data):
     doc = data["manifest"]
     holding, fee = doc["holding"], doc["fee_bps"]
     d, n = data["direction"], data["new_exposure"]
+    compat = _summarize_evaluation(data)
     lines = ["# 판단 성과 비교", "", "| 관점 | 적중 / 채점 | 평가 대상 | 보류·제외·비교 결측 |",
              "| --- | --- | --- | --- |", f'| 시장 대비 방향 | {_fraction(d)} | {d["target"]} | {_reasons(d)} |',
              f'| 신규 현금 노출 | {_fraction(n)} | {n["target"]} | {_reasons(n)} |', "",
@@ -161,7 +254,8 @@ def render_summary(data):
         alpha = "해당 없음" if score["mean_alpha"] is None else f'{score["mean_alpha"]:+.2%}'
         lines.append(f'| {_KO.get(grade, grade)} ({grade}) | {_fraction(score["direction"])} | '
                      f'{_fraction(score["new_exposure"])} | {alpha} |')
-    lines.extend(["", f'- 시장 대비 방향은 첫 적격 세션 종가부터 {holding}거래일 후 종가까지 비교합니다. '
+    lines.extend(["", f"- 판단 정산 / 대기 / 보류 (원본 집계): {compat.resolved} / {compat.pending} / {compat.unscored}",
+                  f'- 시장 대비 방향은 첫 적격 세션 종가부터 {holding}거래일 후 종가까지 비교합니다. '
                   '상대수익을 0.1%p 단위로 기록해 등급 방향을 평가합니다.',
                   f'- 신규 현금 노출은 다음 세션 시가부터 제{holding}세션 종가까지 평가합니다. '
                   f'BUY 100%, OVERWEIGHT 50%를 반영하며 편도 비용은 {fee:g}bp입니다.',
@@ -176,8 +270,9 @@ def render_summary(data):
             value = score.get("alpha") if key == "direction" else score.get("strategy_return")
             shown = reason if value is None else f"{value:+.2%}"
             return f'{score.get("entry_session", "–")} → {score.get("exit_session", "–")} ({shown})'
+        provenance = {"ANALYZED": " · 신규 분석", "REUSED": " · 기존 판단 재사용"}.get(row.get("progress_source"), "")
         lines.append(f'| {row["ticker"]} / {row.get("benchmark", "–")} | {row["decision_date"]} / {row["executed_at"] or "–"} | '
-                     f'{row["rating"] or "–"} · {row["source"]} | {period("direction")} | {period("new_exposure")} |')
+                     f'{row["rating"] or "–"} · {row["source"]}{provenance} | {period("direction")} | {period("new_exposure")} |')
     return "\n".join(lines) + "\n"
 
 
@@ -320,20 +415,24 @@ def run_backtest(tickers, dates, config, asset_type="stock", portfolio=None, sel
     return result
 
 
-def summarize(source):
-    path = source.log_path if isinstance(source, BacktestResult) else Path(source)
+def summarize(source: BacktestResult | str | Path) -> BacktestSummary:
+    """Summarize a fork evaluation or a preserved upstream memory log."""
+    is_result = isinstance(source, BacktestResult)
+    path = source.log_path if is_result else Path(source)
     if path.is_dir():
         path = path / "evaluation.json"
     if not path.is_file():
+        if is_result:
+            return _compat_summary((), {"schema": _UPSTREAM_LOG})
         raise FileNotFoundError(path)
+    raw = path.read_bytes()
     try:
-        data = _read(path)
+        data = json.loads(raw)
     except (UnicodeError, json.JSONDecodeError):
+        outcomes = _upstream_log_outcomes(raw)
+        if outcomes is not None:
+            return _compat_summary(outcomes, {"schema": _UPSTREAM_LOG})
         data = {"schema": "legacy/unverified"}
     if not isinstance(data, dict) or data.get("schema") != SCHEMA:
-        return BacktestSummary(0, 0, {}, data=data if isinstance(data, dict) else {})
-    d = data["direction"]
-    return BacktestSummary(d["scored"], d["statuses"].get("PENDING", 0),
-        {grade.title(): RatingScore(score["direction"]["scored"], score["direction"]["hit_rate"], score["mean_alpha"])
-         for grade, score in data["by_rating"].items()}, d["target"] - d["scored"] - d["statuses"].get("PENDING", 0),
-        f'{data["manifest"]["holding"]} trading days', data)
+        return BacktestSummary(0, 0, {}, holding=_COMPAT_DEFAULT_WINDOW, data=data if isinstance(data, dict) else {})
+    return _summarize_evaluation(data)
