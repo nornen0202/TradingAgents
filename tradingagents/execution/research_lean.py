@@ -74,12 +74,17 @@ def run_lean(root, lean_root, dotnet):
     shutil.copyfile(tool, source)
     env = os.environ | {"NUGET_PACKAGES": str(root.parent / "lean-nuget"),
                         "DOTNET_CLI_HOME": str(root.parent / "lean-dotnet-home"),
+                        "DOTNET_NOLOGO": "1", "DOTNET_GENERATE_ASPNET_CERTIFICATE": "false",
+                        "DOTNET_CLI_WORKLOAD_UPDATE_NOTIFY_DISABLE": "true",
                         "DOTNET_CLI_TELEMETRY_OPTOUT": "1", "TA_RESEARCH_LEAN_TAPE": str(root / "lean-tape"),
                         "TA_RESEARCH_LEAN_END": report["periods"]["전체"]["end"],
                         "TA_RESEARCH_LEAN_RESULT": str(root / "lean-nav.jsonl")}
     with (root / "lean-build.log").open("wb") as log:
-        built = subprocess.run([str(dotnet), "build", str(project), "--nologo", "-v", "minimal"],
-                               cwd=lean_root, env=env, stdout=log, stderr=subprocess.STDOUT, timeout=900)
+        try:
+            built = subprocess.run([str(dotnet), "build", str(project), "--nologo", "-v", "minimal"],
+                                   cwd=lean_root, env=env, stdout=log, stderr=subprocess.STDOUT, timeout=1800)
+        except subprocess.TimeoutExpired:
+            raise ValueError(f"LEAN build timed out. See {root / 'lean-build.log'}.") from None
     if built.returncode:
         raise ValueError(f"LEAN build exit {built.returncode}. See {root / 'lean-build.log'}.")
     launch = project.parent / "bin" / "Debug"
@@ -93,8 +98,11 @@ def run_lean(root, lean_root, dotnet):
     path = root / "lean-config.json"
     atomic_write_json(path, config)
     with (root / "lean-engine.log").open("wb") as log:
-        status = subprocess.run([str(dotnet), str(launch / "QuantConnect.Lean.Launcher.dll"), "--config", str(path)],
-                                cwd=launch, env=env, stdout=log, stderr=subprocess.STDOUT, timeout=900)
+        try:
+            status = subprocess.run([str(dotnet), str(launch / "QuantConnect.Lean.Launcher.dll"), "--config", str(path)],
+                                    cwd=launch, env=env, stdout=log, stderr=subprocess.STDOUT, timeout=900)
+        except subprocess.TimeoutExpired:
+            raise ValueError(f"LEAN Launcher timed out. See {root / 'lean-engine.log'}.") from None
     if status.returncode:
         raise ValueError(f"LEAN Launcher exit {status.returncode}. See {root / 'lean-engine.log'}.")
     with (root / "lean-nav.jsonl").open(encoding="utf-8") as file:
