@@ -1,13 +1,16 @@
 from typing import Optional
 import datetime
+import json
+import sys
 import typer
 from pathlib import Path
 from functools import wraps
 from rich.console import Console
 from dotenv import load_dotenv
 
-# Load environment variables from .env file
-load_dotenv()
+# Replay must reach its offline transport without loading settings from .env.
+if sys.argv[1:2] != ["paper-replay"]:
+    load_dotenv()
 from rich.panel import Panel
 from rich.spinner import Spinner
 from rich.live import Live
@@ -18,7 +21,6 @@ from rich.text import Text
 from rich.table import Table
 from collections import deque
 import time
-import sys
 from rich.tree import Tree
 from rich import box
 from rich.align import Align
@@ -1232,6 +1234,24 @@ def analyze(
             raise typer.BadParameter("No interactive terminal. Provide --ticker and --date to run without prompts.")
         selections = None
     run_analysis(checkpoint=checkpoint, selections=selections, save=save, show=show, html=html, output_dir=out)
+
+
+@app.command("paper-replay")
+def paper_replay(
+    action: str = typer.Argument(..., help="init, tick, callback, inspect-orders, settlement, promotion-start, promotion-record or promotion-status."),
+    workspace: Path = typer.Option(..., help="Dedicated local replay workspace."),
+    fixture_input: Optional[Path] = typer.Option(None, help="Offline evidence for this action."),
+):
+    """Run the guarded domestic KIS strategy with a local response transcript."""
+    from tradingagents.execution import isolated_replay
+    from tradingagents.execution.kis_demo import DemoError
+    try:
+        result = isolated_replay.command(workspace, action, fixture_input)
+    except TimeoutError:
+        result = {"status": "REPLAY_ALREADY_RUNNING", "network_requests_sent": 0, "real_orders_enabled": False}
+    except (DemoError, OSError, ValueError, TypeError, KeyError):
+        raise typer.BadParameter("Invalid isolated replay workspace, action, or fixture evidence.") from None
+    typer.echo(json.dumps(result, ensure_ascii=True))
 
 
 if __name__ == "__main__":
