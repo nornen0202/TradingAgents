@@ -259,6 +259,7 @@ class PriceLevel:
     reason_code: str = ""
     level_type_source: str = ""
     confirmation_group: str | None = None
+    entry_condition_role: str | None = None
 
     def to_dict(self) -> dict[str, Any]:
         result = {
@@ -275,6 +276,8 @@ class PriceLevel:
         }
         if self.confirmation_group is not None:
             result["confirmation_group"] = self.confirmation_group
+        if self.entry_condition_role is not None:
+            result["entry_condition_role"] = self.entry_condition_role
         return result
 
 
@@ -458,8 +461,11 @@ def build_decision_output_instructions(context: str) -> str:
         "and next_day_followthrough_rule for the next trading day support or re-breakout check. "
         "For execution_levels.levels, level_type must be one of BREAKOUT, SUPPORT, PULLBACK, INVALIDATION, TRIM, STOP_LOSS, TAKE_PROFIT, RESISTANCE, "
         "and confirmation must be one of intraday, close, two_bar, next_day, volume_confirmed. "
-        "When specifying independent entry alternatives, give every entry level a confirmation_group identifier. "
-        "Levels with the same identifier are all required, and different identifiers are alternatives. "
+        "Only encode entry alternatives the underlying strategy supports. Use confirmation_group on each condition of an explicit alternative. "
+        "All conditions in one group are required together, and different groups are alternatives. "
+        "Use entry_condition_role=required, without a group, for a condition shared by every alternative. "
+        "Use entry_condition_role=reference, without a group, for general support or resistance that does not authorize or gate entry. "
+        "For grouped and required entry conditions explicitly use intraday, close, or next_day only when the strategy calls for that session evidence. "
         "Put extra nuance in label or source_text. "
         "For constructive but unconfirmed setups, prefer HOLD or OVERWEIGHT with portfolio_stance=BULLISH and entry_action=WAIT when the evidence supports watchlist or held exposure. "
         "Reserve NO_TRADE for weak, contradictory, or insufficient theses, no favorable setup to monitor, or data quality gaps that make the view non-investable. "
@@ -612,6 +618,14 @@ def _parse_price_level(raw: Mapping[str, Any]) -> PriceLevel:
     group = raw.get("confirmation_group")
     if group is not None and (not isinstance(group, str) or re.fullmatch(r"[A-Za-z0-9_-]{1,32}", group) is None):
         raise StructuredDecisionValidationError("Invalid confirmation_group identifier.")
+    entry_role = raw.get("entry_condition_role")
+    if entry_role is not None and (
+        entry_role not in ("required", "reference")
+        or group is not None
+        or level_type not in {"BREAKOUT", "RESISTANCE", "PULLBACK", "SUPPORT"}
+        or (entry_role == "required" and raw.get("confirmation") not in ("intraday", "close", "next_day"))
+    ):
+        raise StructuredDecisionValidationError("Invalid entry_condition_role or confirmation.")
 
     label = _optional_string(raw.get("label")) or _optional_string(raw.get("source_text")) or level_type
     low = _optional_float(raw.get("low"))
@@ -652,6 +666,7 @@ def _parse_price_level(raw: Mapping[str, Any]) -> PriceLevel:
         reason_code=_optional_string(raw.get("reason_code")),
         level_type_source=_optional_string(raw.get("level_type")),
         confirmation_group=group,
+        entry_condition_role=entry_role,
     )
 
 

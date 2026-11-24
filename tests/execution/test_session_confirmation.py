@@ -62,6 +62,34 @@ def test_independent_intraday_alternative_does_not_require_close():
     assert result["matched_alternatives"] == [1] and result["paper_candidate_ready"]
 
 
+def test_explicit_alternatives_distinguish_reference_shared_and_ambiguous_levels():
+    from tradingagents.execution.session_confirmation import _entry_alternatives
+
+    def level(price, **fields):
+        return {"level_type": "BREAKOUT", "confirmation": "intraday", "price": price, **fields}
+
+    pilot = level(100, confirmation_group="pilot")
+    follow = level(100, confirmation_group="follow", confirmation="next_day")
+    reference = level(200, entry_condition_role="reference")
+    shared = level(102, entry_condition_role="required")
+    alternatives = _entry_alternatives([pilot, reference, follow, shared], "USD", True)
+    assert len(alternatives) == 2
+    assert [[rule["level"] for rule in group] for group in alternatives] == [[100, 102], [100, 102]]
+    moment = "2026-11-27T17:29:00Z"
+    plan = {**PLAN, "alternatives": alternatives}
+    assert not _evaluate(plan, analysis_as_of=moment, live_quote=_feed("quote", moment))["paper_candidate_ready"]
+    assert _evaluate(plan, analysis_as_of=moment, live_quote=_feed("quote", moment, price=103))["matched_alternatives"] == [0]
+    assert _entry_alternatives([pilot, level(80)], "USD", True) == []
+    assert _entry_alternatives([reference], "USD", True) == []
+
+
+def test_late_receipt_does_not_authorize_an_earlier_quote():
+    result = _evaluate(official_open=_feed("official_regular_open", MONDAY_OPEN, observed_at=NOW),
+                       live_quote=_feed("quote", "2026-11-30T14:34:59Z"))
+    assert not result["paper_candidate_ready"]
+    assert result["next_session_evidence_available_at"] == "2026-11-30T14:35:00+00:00"
+
+
 @pytest.mark.parametrize("name,kind,clock", [
     ("regular_close", "final_regular_close", FRIDAY_CLOSE),
     ("official_open", "official_regular_open", MONDAY_OPEN),

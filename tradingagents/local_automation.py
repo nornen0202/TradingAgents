@@ -451,7 +451,7 @@ def run_due(archive, state, *, now=None, dry_run=False, research_only=False, cat
                 from tradingagents.scheduled.runner import _resolve_latest_full_overlay_baseline_manifest
                 baseline = _resolve_latest_full_overlay_baseline_manifest(
                     archive, market=target.inputs["profile"].upper(), now=now,
-                    write_discovery_index=False)
+                    write_discovery_index=False, partial_required_tickers=())
             except Exception as exc:
                 decisions.append({"target": target.name, "status": "OVERLAY_BASELINE_UNVERIFIED",
                                   "error_type": type(exc).__name__})

@@ -111,6 +111,7 @@ def test_scheduler_roots_flow_into_standard_research_config(tmp_path, monkeypatc
     path.write_text('[run]\nmarket="KR"\ntickers=["069500.KS"]\n[storage]\narchive_dir="archive"\nsite_dir="site"\n')
     config = load_scheduled_config(path)
     assert config.execution.session_confirmation_receipts_dir == tmp_path / "evidence/confirmations"
+    assert config.execution.session_observation_db == tmp_path / "evidence/observations.sqlite"
     assert config.storage.daily_history_capture_db == tmp_path / "evidence/research-prices.sqlite"
 
 
@@ -148,3 +149,44 @@ def test_independent_research_command_inherits_capture_root(tmp_path, monkeypatc
         "--archive-dir", str(tmp_path / "archive"), "--state-dir", str(root.parent),
         "--runtime-dir", str(tmp_path / "runtime")])
     assert local_automation.main() == 0
+
+
+@pytest.mark.parametrize("count", [30, 50, 51])
+def test_watchlist_limit_and_paced_batches_survive_retry(tmp_path, count):
+    tickers = [{"ticker": f"{index:06}.KS", "market": "KR", "venue": "J"} for index in range(count)]
+    atomic_write_json(tmp_path / "policy.json", {"schema": obs.SCHEMA, "instruments": tickers})
+    opened = time(MON + "T09:00:00")
+    requested = []
+
+    def download(item, day):
+        requested.append(item["ticker"])
+        return market_bar(item, day)
+
+    if count == 51:
+        with pytest.raises(ValueError, match="fifty"):
+            obs.capture_due(tmp_path, clock=lambda: opened, download=download)
+        assert not requested
+        return
+    for minute in range((count + 3) // 4):
+        clock = lambda: opened + timedelta(minutes=minute)
+        assert 1 <= len(obs.capture_due(tmp_path, clock=clock, download=download)) <= obs.MAX_REQUESTS_PER_PASS
+    assert len(set(requested)) == len(requested) == count
+    db = tmp_path / "observations.sqlite"
+    first = obs.load_collected_observations(db, tickers[0]["ticker"], "KR", now=opened)
+    assert first["official_open"]["session_id"] == f"KR:J:regular:{MON}"
+    assert obs.load_collected_observations(db, tickers[-1]["ticker"], "KR", now=opened + timedelta(minutes=20)) == {}
+
+
+def test_us_provisional_open_is_stored_with_venue_and_cannot_supply_open_proof(tmp_path):
+    atomic_write_json(tmp_path / "policy.json", {"schema": obs.SCHEMA, "instruments": [
+        {"ticker": "SPY", "market": "US", "venue": "AMS"}]})
+    at = time(MON + "T23:30:12")
+    payload = {"output2": [{"xymd": "20261123", "open": "100", "clos": "103",
+                            "high": "104", "low": "99", "tvol": "143"}]}
+    obs.capture_due(tmp_path, clock=lambda: at, download=lambda *_: payload)
+    db = tmp_path / "observations.sqlite"
+    with sqlite3.connect(db) as connection:
+        record = json.loads(connection.execute("SELECT evidence FROM observations").fetchone()[0])
+    assert record["kind"] == "provisional_regular_open"
+    assert record["session_id"] == f"US:AMS:regular:{MON}" and record["revised_at"] is None
+    assert obs.load_collected_observations(db, "SPY", "US", now=at) == {}

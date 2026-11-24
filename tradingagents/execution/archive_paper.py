@@ -146,7 +146,8 @@ def build_step(run: Path, now: str, limits: PaperLimits | None = None):
             if proof is not None:
                 entry_confirmation = _entry_confirmation(proof, ticker, market, generated, evaluated)
                 if not expiry and entry_confirmation["paper_candidate_ready"] and any(
-                    level.get("confirmation_group") is not None for level in _entry_levels(contract)
+                    level.get("confirmation_group") is not None or level.get("entry_condition_role") is not None
+                    for level in _entry_levels(contract)
                 ):
                     research_expiry = entry_research_deadline(contract["analysis_asof"])
                     valid_until = min(stamp(valid_until), research_expiry).isoformat()
@@ -185,7 +186,8 @@ def _entry_levels(contract):
 
 def _entry_proof(run, ticker, contract, raw, market_data_asof, generated):
     levels = _entry_levels(contract)
-    needs_update = any(level.get("confirmation_group") is not None for level in levels) or (
+    needs_update = any(level.get("confirmation_group") is not None or level.get("entry_condition_role") is not None
+                       for level in levels) or (
         bool(contract.get("entry_valid_until")) and len(levels) == 1 and levels[0].get("confirmation") in {"close", "next_day"}
     )
     if not needs_update:

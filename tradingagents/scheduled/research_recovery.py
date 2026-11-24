@@ -271,6 +271,76 @@ def _load_terminal_source(*, archive_dir: Path, source_run_id: str, now: datetim
     return _load_recovery_lineage(archive_dir=archive_dir, source_run_id=source_run_id, now=now)[0]
 
 
+def verified_candidate_partial(archive_dir, manifest, *, now, required_tickers=()):
+    """Return the ticker-local omissions of a verified Korean production cohort."""
+    try:
+        if (manifest.get("label") != "local-scheduler-kr-full" or manifest.get("status") != "partial_failure"
+                or manifest["settings"]["market"].lower() != "kr"
+                or manifest["settings"]["run_mode"] != "full" or manifest["settings"]["analysis_mode"] != "full"
+                or (manifest.get("circuit_breaker") or {}).get("triggered") is not False):
+            return []
+        source, directory = _load_terminal_source(
+            archive_dir=archive_dir, source_run_id=manifest["run_id"], now=now,
+        )
+        if source != {key: value for key, value in manifest.items() if not key.startswith("_")}:
+            return []
+        active = source["active_universe"]
+        rows = source["tickers"]
+        tickers = _tickers([row["ticker"] for row in rows])
+        if (any(not re.fullmatch(r"[0-9]{6}\.(KS|KQ)", ticker) for ticker in tickers)
+                or len({ticker[:6] for ticker in tickers}) != len(tickers)):
+            return []
+        failed = [row for row in rows if row["status"] != "success"]
+        omitted = _tickers([row["ticker"] for row in failed])
+        summary = source["summary"]
+        if (active["mode"] != "adaptive_required_coverage" or active["market"].lower() != "kr"
+                or active["account_snapshot_status"] != "loaded" or active["account_snapshot_health"] != "VALID"
+                or active["coverage"]["selection_complete"] is not True
+                or active["coverage"]["complete"] is not False
+                or _tickers(active["selected_tickers"]) != tickers
+                or len(tickers) != active["active_count"] or len(tickers) != summary["total_tickers"]
+                or summary["successful_tickers"] != len(tickers) - len(omitted)
+                or summary["failed_tickers"] != len(omitted)
+                or not 1 <= len(omitted) <= min(3, len(tickers) // 10)
+                or any(active.get(name) for name in ("missing_holding_tickers", "missing_watchlist_tickers",
+                       "missing_analysis_tickers", "unexpected_analysis_tickers", "duplicate_analysis_tickers"))):
+            return []
+        holdings = _tickers(active["expected_holding_tickers"])
+        watchlist = _tickers(active["expected_watchlist_tickers"])
+        if (not {item.split(".")[0] for item in holdings + watchlist} <= {item[:6] for item in tickers}
+                or {item[:6] for item in omitted} & {item.split(".")[0] for item in (*holdings, *required_tickers)}):
+            return []
+        for failure in failed:
+            candidates = [row for row in active["candidates"] if row.get("ticker") == failure["ticker"]]
+            if (len(candidates) != 1 or candidates[0].get("selected") is not True
+                    or candidates[0].get("selection_reason") != "fresh_candidate_exploration"
+                    or failure["status"] != "failed"
+                    or (failure.get("failure_diagnostics") or {}).get("failure_category") != "DATA_PROVIDERS_UNAVAILABLE"
+                    or "KR daily history has missing required sessions or non-session bars" not in failure.get("error", "")):
+                return []
+        if _identity_failures(source, directory):
+            return []
+        for row in rows:
+            if row["status"] == "success":
+                artifacts = row["artifacts"]
+                for key, filename in (("analysis_json", "analysis.json"),
+                                      ("execution_contract_json", "execution_contract.json")):
+                    path = directory / artifacts[key]
+                    if (path != directory / "tickers" / row["ticker"] / filename
+                            or not path.resolve().is_relative_to(directory)):
+                        return []
+                analysis = _read(directory / artifacts["analysis_json"])
+                contract = _read(directory / artifacts["execution_contract_json"])
+                if (analysis.get("ticker") != row["ticker"] or analysis.get("status") != "success"
+                        or contract.get("ticker") != row["ticker"]
+                        or any(analysis.get(key) != row.get(key) for key in ("started_at", "finished_at", "trade_date", "decision"))
+                        or not _instant(row["started_at"]) <= _instant(row["finished_at"]) <= _instant(source["finished_at"])):
+                    return []
+        return omitted
+    except (OSError, ValueError, TypeError, KeyError, AttributeError):
+        return []
+
+
 def recovery_preflight_models(*, archive_dir: Path, source_run_id: str, now: datetime,
                               quick_model: str, deep_model: str, output_model: str):
     """Pin only failed-only preflight to the original cohort's model roles.

@@ -43,7 +43,8 @@ def apply_gates(
             reasons.append(evidence_reason)
             review_required = True
         if not candidate.is_held and wait_ratio >= 0.7 and bullish_ratio >= 0.5:
-            reasons.append("wait_heavy_batch_reduce_immediate_entries")
+            confirmed = candidate.trigger_profile.get("confirmed_entry_alternative") is True
+            reasons.append("wait_heavy_batch_review" if confirmed else "wait_heavy_batch_reduce_immediate_entries")
 
         current_weight = candidate.market_value_krw / account_value if account_value else 0.0
         if current_weight >= snapshot.constraints.max_single_name_weight and candidate.suggested_action_now in {"ADD_NOW", "STARTER_NOW"}:

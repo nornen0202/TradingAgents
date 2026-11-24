@@ -1274,6 +1274,11 @@ def _render_strategy_table_section(manifest: dict[str, Any]) -> str:
         return ""
     decision_ready = bundle.get("decision_ready") is True
     status_label = "장중 투자 판단 가능" if decision_ready else str(bundle.get("quality_label_ko") or "데이터 확인 전 대기")
+    omitted = (manifest.get("overlay_universe") or {}).get("missing_candidate_tickers") or []
+    coverage = (
+        "<p><strong>부분 분석</strong><span>매수 후보 제외 · "
+        + _escape(", ".join(omitted)) + "</span></p>"
+    ) if omitted else ""
     table_rows: list[str] = []
     for display_priority, row in enumerate(rows, start=1):
         table_rows.append(
@@ -1297,6 +1302,7 @@ def _render_strategy_table_section(manifest: dict[str, Any]) -> str:
       </div>
       <article class="run-card">
         <p><strong>데이터 상태</strong><span>{_escape(status_label)}</span></p>
+        {coverage}
         <p><strong>현재 세션 핵심 데이터 충족률</strong><span>{float(bundle.get('fresh_row_ratio') or 0) * 100:.1f}%</span></p>
         <p><strong>조건부 전략 가능 비율</strong><span>{float(bundle.get('conditional_row_ratio') or 0) * 100:.1f}%</span></p>
         <div class="table-scroll">

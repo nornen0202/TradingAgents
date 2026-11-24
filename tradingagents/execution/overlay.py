@@ -207,7 +207,8 @@ def evaluate_execution_state(
         if str(getattr(level.level_type, "value", level.level_type)).upper()
         in {"BREAKOUT", "RESISTANCE", "PULLBACK", "SUPPORT"}
     ]
-    explicit_groups = any(level.confirmation_group is not None for level in entry_levels)
+    explicit_groups = any(level.confirmation_group is not None or level.entry_condition_role is not None
+                          for level in entry_levels)
     grouped_entry = uses_entry_groups(entry_levels) and bool(contract.entry_valid_until or explicit_groups)
     breakout_hit = contract.breakout_level is not None and intraday_high >= contract.breakout_level
     failed_breakout = breakout_hit and not market.last_price >= float(contract.breakout_level or 0.0)
@@ -218,22 +219,6 @@ def evaluate_execution_state(
     )
     zone = contract.pullback_buy_zone
     support_failed = zone is not None and market.last_price < zone.low and intraday_low < zone.low
-    if grouped_entry and market_session == "regular" and (failed_breakout or support_failed):
-        # Grouped entry eligibility cannot suppress the held-position downside evidence.
-        grouped_support_fail = support_failed and not (contract.entry_valid_until and failed_breakout)
-        trigger_status.update(breakout_hit_intraday=breakout_hit, failed_breakout=failed_breakout,
-                              support_fail=grouped_support_fail)
-        reasons = [reason for present, reason in (
-            (failed_breakout, "failed_breakout"), (grouped_support_fail, "support_zone_failed")
-        ) if present]
-        return _build_update(
-            contract, market, now, staleness_seconds=staleness_seconds,
-            decision_state=DecisionState.ARMED, decision_now=DecisionNow.NONE,
-            reason_codes=tuple(reasons), trigger_status=trigger_status,
-            data_health="OK", refresh_checkpoint=refresh_checkpoint,
-            execution_timing_state=ExecutionTimingState.SUPPORT_FAIL if grouped_support_fail else failed_breakout_timing,
-        )
-
     if contract.action_if_triggered in {ActionIfTriggered.STARTER, ActionIfTriggered.ADD} and is_event_guard_active(
         contract.event_guard, now, analysis_as_of=contract.analysis_asof
     ):
@@ -294,6 +279,17 @@ def evaluate_execution_state(
         if proof is None or not proof["evaluation"]["paper_candidate_ready"]:
             reason_codes.append("conditional_entry_confirmation_unavailable")
             execution_timing_state = ExecutionTimingState.CLOSE_CONFIRM_PENDING
+            # Retain ordinary downside diagnostics when no alternative qualifies.
+            # The flattened levels can belong to two different alternatives.
+            if market_session == "regular" and (failed_breakout or support_failed):
+                grouped_support_fail = support_failed and not (contract.entry_valid_until and failed_breakout)
+                trigger_status.update(breakout_hit_intraday=breakout_hit, failed_breakout=failed_breakout,
+                                      support_fail=grouped_support_fail)
+                decision_state = DecisionState.ARMED
+                execution_timing_state = ExecutionTimingState.SUPPORT_FAIL if grouped_support_fail else failed_breakout_timing
+                reason_codes[:0] = [reason for present, reason in (
+                    (failed_breakout, "failed_breakout"), (grouped_support_fail, "support_zone_failed")
+                ) if present]
         elif actionable == DecisionNow.NONE:
             reason_codes.append("entry_not_authorized")
         elif not rvol_confirmed or not vwap_confirmed or microstructure_block_reasons:
