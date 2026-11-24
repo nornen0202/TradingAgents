@@ -13,6 +13,7 @@ from tradingagents.agents.utils.instrument_resolver import resolve_instrument
 from tradingagents.charting.bars import instant
 from tradingagents.portfolio.account_models import AccountSnapshot, PortfolioProfile
 from tradingagents.portfolio.benchmarks.dca_engine import build_etf_dca_comparison
+from tradingagents.portfolio.performance.etf_alternatives import ExternalCapitalFlow
 from tradingagents.portfolio.performance.broker_kis import (
     fetch_kis_broker_performance,
     fetch_kis_broker_performance_periods,
@@ -266,6 +267,15 @@ def build_account_performance_outputs(
         warnings=warnings,
         cache_dir=run_dir.parents[2] / "benchmark-series"
         if len(run_dir.parents) > 2 and run_dir.parents[1].name == "runs" else None,
+        scheduled_cashflows=tuple(
+            ExternalCapitalFlow(date=event.date, amount_krw=round(abs(amount)),
+                                flow_type=event.event_type, source=event.source)
+            for event in ledger_events
+            if event.event_type in {"deposit", "withdrawal"}
+            and (event.currency == "KRW" or (event.fx_rate is not None and event.fx_rate > 0))
+            and (amount := _cashflow_amount_krw(event, LedgerEventType(event.event_type))) is not None
+            and math.isfinite(amount) and abs(amount) >= 1
+        ),
     )
 
     payload = {
@@ -346,7 +356,7 @@ def build_account_performance_outputs(
         _write_json(
             cashflows_audit_json,
             {
-                "exact_dated_cashflows_available": etf_public.get("status") == "OK",
+                "exact_dated_cashflows_available": etf_public.get("exact_dated_cashflows_available", False),
                 "cashflow_count": (etf_public.get("cashflows") or {}).get("dated_flow_count", 0),
                 "deposit_count": len([item for item in etf_dca_comparison.raw_cashflows if item.flow_type == "deposit"]),
                 "withdrawal_count": len([item for item in etf_dca_comparison.raw_cashflows if item.flow_type == "withdrawal"]),

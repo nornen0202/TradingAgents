@@ -65,3 +65,23 @@ def test_period_mismatch_suppresses_excess_return(etf_fixture_dir):
     assert public["period_match_status"] == "MISMATCH"
     assert kospi["excess_return_pct"] is None
     assert "etf_alternative_period_end_mismatch" in public["warnings"]
+
+def test_internal_snapshot_does_not_turn_missing_ledger_into_exact_zero_cashflows(etf_fixture_dir):
+    settings = default_settings(etf_fixture_dir, use_cashflows=False)
+    broker_period = default_broker_summary(etf_fixture_dir)
+    result = build_etf_dca_comparison(
+        snapshot=default_snapshot(), settings=settings, summary={"default_period": "ALL"},
+        periods=[{
+            "period": "ALL", "start_date": broker_period.period_start, "end_date": broker_period.period_end,
+            "actual_start_value_krw": 50000, "actual_end_value_krw": 52000, "actual_return": .04,
+        }],
+        broker_performance=None, reconciliation={"reconciliation_status": "OK"},
+    )
+    public = result.to_public_dict()
+    assert public["status"] == "cashflow_evidence_unverified"
+    assert public["exact_dated_cashflows_available"] is False
+    assert public["actual"]["deposit_amount_krw"] is None
+    kospi = next(item for item in public["alternatives"] if item["key"] == "KOSPI200_100")
+    assert kospi["status"] == "research_only_unverified_cashflows"
+    assert kospi["balance_return_pct"] is not None and kospi["excess_return_pct"] is None
+    assert public["best_benchmark_id"] is None

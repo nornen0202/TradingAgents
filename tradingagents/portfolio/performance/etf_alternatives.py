@@ -3,7 +3,7 @@ from __future__ import annotations
 import csv
 import json
 import math
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict, dataclass, field, replace
 from datetime import date, timedelta
 from pathlib import Path
 from typing import Any, Mapping
@@ -120,6 +120,9 @@ class EtfAlternativeComparisonSummary:
         exact_available = self.status == "OK" and str(self.cashflows.get("status") or "").upper() == "OK"
         reason = _comparison_reason(self.status)
         message = _comparison_message(self.status)
+        if self.cashflows.get("missing_reason") == "period_external_cashflow_totals_unverified":
+            reason = "period_external_cashflow_totals_unverified"
+            message = "Research-only ETF results are available where prices exist. Period capital-flow totals are unverified."
         if self.cashflows.get("missing_reason") == "dated_external_capital_totals_do_not_reconcile":
             reason = "dated_external_capital_totals_do_not_reconcile"
             message = "Dated deposits or withdrawals do not reconcile to the broker's matching period totals."
@@ -173,6 +176,7 @@ def build_etf_alternative_comparison(
     reconciliation: Mapping[str, Any],
     warnings: list[str] | None = None,
     cache_dir: Path | None = None,
+    scheduled_cashflows: tuple[ExternalCapitalFlow, ...] = (),
 ) -> EtfAlternativeComparisonSummary | None:
     if not bool(getattr(settings, "etf_alternative_enabled", True)):
         return None
@@ -264,9 +268,10 @@ def build_etf_alternative_comparison(
         return result
 
     flow_load_warnings: list[str] = []
-    all_flows = load_external_capital_flows(
-        getattr(settings, "cashflow_baseline_path", None),
-        warnings=flow_load_warnings,
+    configured_cashflows = getattr(settings, "cashflow_baseline_path", None)
+    all_flows = (
+        load_external_capital_flows(configured_cashflows, warnings=flow_load_warnings)
+        if configured_cashflows else list(scheduled_cashflows)
     )
     local_warnings.extend(flow_load_warnings)
     flows = [
@@ -285,6 +290,9 @@ def build_etf_alternative_comparison(
         broker_withdrawal_krw=broker_withdrawal,
     )
     local_warnings.extend(cashflow_status_warnings)
+    cashflow_verified = broker_matched and broker_deposit is not None and broker_withdrawal is not None
+    if not configured_cashflows and scheduled_cashflows:
+        cashflow_summary["source"] = "scheduled_account_ledger"
     if cashflow_summary["status"] == "cashflow_dates_required":
         policy = _alpha_policy_unavailable(settings=settings, reason="cashflow_dates_required")
         result = EtfAlternativeComparisonSummary(
@@ -301,6 +309,10 @@ def build_etf_alternative_comparison(
         )
         _extend_warnings(warnings, local_warnings)
         return result
+
+    if not cashflow_verified:
+        cashflow_summary.update(status="cashflow_evidence_unverified", missing_reason="period_external_cashflow_totals_unverified")
+        local_warnings.append("etf_alternative_external_cashflow_completeness_unverified")
 
     price_history_path = getattr(settings, "etf_price_history_path", None) or getattr(settings, "price_history_path", None)
     fx_history_path = getattr(settings, "etf_fx_history_path", None)
@@ -346,8 +358,8 @@ def build_etf_alternative_comparison(
     ]
 
     portfolios = _portfolio_configs(settings, snapshot=snapshot)
-    actual_pnl = _int_or_none(actual.get("investment_pnl_krw")) if period_match_status == "MATCHED" else None
-    actual_return_pct = _float_or_none(actual.get("balance_return_pct")) if period_match_status == "MATCHED" else None
+    actual_pnl = _int_or_none(actual.get("investment_pnl_krw")) if cashflow_verified else None
+    actual_return_pct = _float_or_none(actual.get("balance_return_pct")) if cashflow_verified else None
     start_asset = float(_int_or_none(actual.get("start_asset_krw")) or 0) if period_start == actual_period_start else 0.0
     alternatives = [
         _simulate_portfolio(
@@ -387,13 +399,22 @@ def build_etf_alternative_comparison(
         status = "portfolio_config_unavailable"
         local_warnings.append("etf_alternative_portfolio_config_unavailable")
 
-    policy = evaluate_alpha_policy(
-        alternatives=alternatives,
-        settings=settings,
-        period_start=period_start,
-        period_end=period_end,
-        policy_inputs=getattr(settings, "alpha_policy_inputs", None),
-    )
+    if cashflow_verified:
+        policy = evaluate_alpha_policy(
+            alternatives=alternatives,
+            settings=settings,
+            period_start=period_start,
+            period_end=period_end,
+            policy_inputs=getattr(settings, "alpha_policy_inputs", None),
+        )
+    else:
+        if status == "OK":
+            status = "cashflow_evidence_unverified"
+        alternatives = [
+            replace(item, status="research_only_unverified_cashflows") if item.status == "OK" else item
+            for item in alternatives
+        ]
+        policy = _alpha_policy_unavailable(settings=settings, reason="cashflow_evidence_unverified")
     result = EtfAlternativeComparisonSummary(
         status=status,
         period_start=period_start.isoformat(),
@@ -563,8 +584,8 @@ def _actual_performance(
         "balance_return_pct": round(actual_return * 100.0, 6),
         "end_asset_krw": end_value,
         "start_asset_krw": start_value,
-        "deposit_amount_krw": 0,
-        "withdrawal_amount_krw": 0,
+        "deposit_amount_krw": None,
+        "withdrawal_amount_krw": None,
     }
 
 

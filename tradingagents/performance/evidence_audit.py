@@ -33,24 +33,26 @@ def _classification(price, raw, market, decided_at, suspected):
 
 def audit_snapshot(db_path: Path) -> dict:
     with closing(sqlite3.connect(db_path.resolve(strict=True).as_uri() + "?mode=ro", uri=True)) as conn:
+        conn.execute("PRAGMA mmap_size=536870912")
         conn.execute("BEGIN")
         columns = {row[1] for row in conn.execute("PRAGMA table_info(action_recommendations)")}
         if not {"market", "recommended_price", "created_at"} <= columns:
             raise ValueError("Unsupported recommendation schema")
         has_reference = "price_reference_json" in columns
         reference_sql = "r.price_reference_json" if has_reference else "NULL"
+        candidates = {row[0] for row in conn.execute(
+            "SELECT recommendation_id FROM action_outcomes WHERE return_5d BETWEEN -1 AND -0.99"
+        )}
         totals, classes, recent_outcomes, recent_recommendations = {}, Counter(), Counter(), Counter()
-        for market_raw, decided_at, price, raw, candidate, _id in conn.execute(f"""
-            SELECT r.market, r.created_at, r.recommended_price, {reference_sql},
-                   EXISTS(SELECT 1 FROM action_outcomes o WHERE o.recommendation_id=r.id
-                          AND o.return_5d BETWEEN -1 AND -0.99), r.id
+        for market_raw, decided_at, price, raw, recommendation_id in conn.execute(f"""
+            SELECT r.market, r.created_at, r.recommended_price, {reference_sql}, r.id
             FROM action_recommendations r ORDER BY r.id DESC
         """):
             market = _market(market_raw)
             tally = totals.setdefault(market, Counter())
             tally["recommendations"] += 1
             priced = price is not None
-            suspicious = isinstance(price, (int, float)) and price > 0 and bool(candidate)
+            suspicious = isinstance(price, (int, float)) and price > 0 and recommendation_id in candidates
             tally["priced_recommendations"] += priced
             tally["extreme_legacy_return_candidates"] += suspicious
             if priced or raw:
