@@ -219,16 +219,19 @@ def _level_rules(level, identifier):
 
 
 def _entry_alternatives(levels, currency, pilot_open):
+    levels = [level for level in levels if not (
+        _entry_field(level, "entry_condition_role") == "reference"
+        and _entry_field(level, "confirmation_group") is None
+    )]
     grouped = {}
     required = []
     for level in levels:
         name = _entry_field(level, "confirmation_group")
         role = _entry_field(level, "entry_condition_role")
         if role is not None:
-            if name is not None or role not in ("required", "reference"):
+            if name is not None or role != "required":
                 return []
-            if role == "required":
-                required.append(level)
+            required.append(level)
             continue
         if name is None and len(levels) == 1:
             name = "entry"

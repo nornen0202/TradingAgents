@@ -66,4 +66,9 @@ def test_regular_overlay_baseline_requires_a_verified_optional_ticker_failure(tm
         tmp_path, now=NOW, market="KR", partial_required_tickers=required,
     )
     assert (admitted or {}).get("_verified_candidate_omissions") == (None if blocker else broken)
+    if not blocker:
+        assert _resolve_latest_full_overlay_baseline_manifest(
+            tmp_path, now=NOW, market="KR", partial_required_tickers=required,
+            required_holding_tickers=["200000.KS"],
+        ) is None
     assert json.loads((directory / "run.json").read_bytes()) == manifest

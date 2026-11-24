@@ -5007,6 +5007,10 @@ def _resolve_latest_full_overlay_baseline_manifest(
         for candidate in sorted(partial_candidates, key=lambda item: _manifest_started_at_for_sort(item, market=market), reverse=True):
             if _manifest_started_at_for_sort(candidate, market=market) <= complete_start:
                 break
+            if required_holding_tickers and not _manifest_has_bootstrap_ready_ticker(
+                candidate, tickers=required_holding_tickers, require_all_tickers=True,
+            ):
+                continue
             omissions = verified_candidate_partial(
                 archive_dir, candidate, now=now or datetime.now(timezone.utc),
                 required_tickers=[*partial_required_tickers, *(required_holding_tickers or [])],

@@ -80,6 +80,9 @@ def test_explicit_alternatives_distinguish_reference_shared_and_ambiguous_levels
     assert not _evaluate(plan, analysis_as_of=moment, live_quote=_feed("quote", moment))["paper_candidate_ready"]
     assert _evaluate(plan, analysis_as_of=moment, live_quote=_feed("quote", moment, price=103))["matched_alternatives"] == [0]
     assert _entry_alternatives([pilot, level(80)], "USD", True) == []
+    assert _entry_alternatives([level(80), reference], "USD", True) == [[{
+        "id": "entry-0", "stage": "intraday", "direction": "above", "level": 80,
+    }]]
     assert _entry_alternatives([level(100, confirmation_group="ambiguous", confirmation="next_day")], "USD", True) == []
     assert _entry_alternatives([reference], "USD", True) == []
 

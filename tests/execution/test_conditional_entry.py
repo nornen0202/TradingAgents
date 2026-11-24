@@ -142,6 +142,35 @@ def test_entry_groups_preserve_the_held_position_downside_signals(level, flag, r
         execution_update=rows, is_held=False) == ("HOLD", ())
 
 
+@pytest.mark.parametrize("gate", ["expiry", "event"])
+def test_buy_only_gates_preserve_grouped_downside_review(gate):
+    from tradingagents.schemas.execution import EventGuard
+
+    original = contract(execution_levels={"levels": [
+        {"level_type": "PULLBACK", "low": 100, "high": 101, "confirmation": "intraday", "confirmation_group": "pilot"},
+    ]})
+    if gate == "expiry":
+        original = replace(original, entry_valid_until="2026-09-21T10:58:00+09:00")
+    else:
+        original = replace(original, event_guard=EventGuard(earnings_date="2026-09-21", block_new_position_within_days=1))
+    at = datetime.fromisoformat("2026-09-21T11:00:00+09:00")
+    update = evaluate_execution_state(original, replace(market(at), last_price=99, day_low=98),
+                                      now=at, max_data_age_seconds=120)
+    assert update.trigger_status["support_fail"] and update.decision_now.value == "NONE"
+    assert _apply_execution_overlay_risk_action(risk_action="HOLD", risk_action_reason_codes=(),
+        execution_update=update.to_dict(), is_held=True) == ("REDUCE_RISK", ("SUPPORT_BROKEN",))
+
+
+def test_independent_pilot_is_not_vetoed_by_unmet_other_entry_group():
+    original = contract(execution_levels={"levels": [
+        {"level_type": "BREAKOUT", "price": 100, "confirmation": "intraday", "confirmation_group": "pilot"},
+        {"level_type": "PULLBACK", "low": 150, "high": 151, "confirmation": "close", "confirmation_group": "other"},
+    ]})
+    at = datetime.fromisoformat("2026-09-21T11:00:00+09:00")
+    update = evaluate_execution_state(original, market(at), now=at, max_data_age_seconds=120)
+    assert update.decision_now.value == "STARTER_NOW"
+
+
 @pytest.mark.parametrize("case", [
     "close_and_next_open", "missing_open", "unverified_close", "before_open", "holiday", "expired", "wait",
     "independent_intraday", "joint_required", "active_expiry_after_decision",
