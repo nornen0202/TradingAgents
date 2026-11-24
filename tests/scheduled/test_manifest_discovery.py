@@ -1,3 +1,4 @@
+from datetime import date
 import json
 from pathlib import Path
 
@@ -95,6 +96,26 @@ def test_legacy_missing_mode_and_empty_archive(tmp_path):
     path = write(tmp_path, "legacy")
     path.write_text('{"run_id":"legacy"}', encoding="utf-8")
     assert discovery.full_manifests_desc(tmp_path)[0][0]["run_id"] == "legacy"
+
+
+def test_bounded_canonical_discovery_includes_boundary_and_preserves_archive_index(tmp_path, monkeypatch):
+    earlier = write(tmp_path, "20260528T230000_history")
+    boundary = write(tmp_path, "20260529T000000_possible-zone-boundary")
+    latest = write(tmp_path, "20260530T090000_full")
+    legacy = write(tmp_path, "legacy")
+    discovery.full_manifests_desc(tmp_path)
+    index = tmp_path / ".run-mode-discovery.json"
+    before = index.read_bytes()
+    inspect = discovery._signature
+
+    def signature(path):
+        assert path != earlier
+        return inspect(path)
+
+    monkeypatch.setattr(discovery, "_signature", signature)
+    results = discovery.full_manifests_desc(tmp_path, run_date_floor=date(2026, 5, 29))
+    assert {directory for _, directory in results} == {boundary.parent, latest.parent, legacy.parent}
+    assert index.read_bytes() == before
 
 
 @pytest.mark.parametrize("existing_index", [False, True])

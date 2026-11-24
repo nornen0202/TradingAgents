@@ -20,6 +20,31 @@ def write(path, value):
     path.write_text(json.dumps(value), encoding="utf-8")
 
 
+def test_newer_overlay_baseline_recovery_validation_follows_publication_order(tmp_path, monkeypatch):
+    from tradingagents.scheduled import research_refresh, runner
+
+    def full(hour, minute=0, *, finished_hour=None):
+        return {"run_id": f"20260530T{hour:02}{minute:02}00_full", "status": "success",
+                "started_at": f"2026-05-30T{hour:02}:{minute:02}:00+00:00",
+                "finished_at": f"2026-05-30T{(finished_hour or hour):02}:{minute:02}:05+00:00",
+                "settings": {"market": "US", "run_mode": "full"}}
+
+    origin, discarded, lower, selected, incomplete, future = (full(9), full(7), full(9, 30), full(10), full(11), full(11, 30, finished_hour=13))
+    rows = [discarded, origin, lower, selected, incomplete, future]
+    monkeypatch.setattr(runner, "full_manifests_desc", lambda _, **kwargs: [(row, tmp_path) for row in rows])
+    monkeypatch.setattr(research_refresh, "prefer_completed_revision", lambda _, row, **_kwargs: row)
+    verified = []
+
+    def complete(row, **kwargs):
+        verified.append(row["run_id"])
+        return row is selected
+
+    monkeypatch.setattr(runner, "_manifest_is_complete_overlay_baseline", complete)
+    result = runner._prefer_newer_completed_full_source(tmp_path, origin, tickers=["AAPL"], market="US", now=NOW)
+    assert result is selected
+    assert verified == [incomplete["run_id"], selected["run_id"]]
+
+
 @pytest.fixture
 def evidence(tmp_path):
     archive = tmp_path / "archive"

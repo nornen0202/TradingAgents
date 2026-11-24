@@ -6,13 +6,16 @@ It never caches a selected source, decision, quote, or approval.
 """
 from __future__ import annotations
 
+from datetime import date
 import json
 from pathlib import Path
+import re
 
 from tradingagents.atomic_io import atomic_write_json
 
 
 SCHEMA = "tradingagents.run-mode-discovery/v1"
+_RUN_DAY = re.compile(r"([0-9]{8})T[0-9]{6}_")
 
 
 def _signature(path: Path) -> list[int]:
@@ -30,7 +33,21 @@ def _load_index(path: Path) -> dict:
     return {}
 
 
-def full_manifests_desc(archive_dir: Path, *, modes=None, write_index: bool = True) -> list[tuple[dict, Path]]:
+def _outside_run_date_floor(directory, floor):
+    if floor is None:
+        return False
+    match = _RUN_DAY.match(directory.name)
+    if match is None:
+        return False  # Legacy or external directory names still need their manifest.
+    try:
+        day = match.group(1)
+        return date.fromisoformat(f"{day[:4]}-{day[4:6]}-{day[6:]}") < floor
+    except ValueError:
+        return False
+
+
+def full_manifests_desc(archive_dir: Path, *, modes=None, write_index: bool = True,
+                        run_date_floor: date | None = None) -> list[tuple[dict, Path]]:
     """Discover original manifests; read-only callers can suppress cache writes."""
     modes = {"full"} if modes is None else set(modes)
     runs_dir = archive_dir / "runs"
@@ -40,7 +57,7 @@ def full_manifests_desc(archive_dir: Path, *, modes=None, write_index: bool = Tr
     previous = _load_index(index_path)
     current, selected = {}, []
     for year in sorted((p for p in runs_dir.iterdir() if p.is_dir()), reverse=True):
-        for directory in sorted((p for p in year.iterdir() if p.is_dir()), reverse=True):
+        for directory in sorted((p for p in year.iterdir() if not _outside_run_date_floor(p, run_date_floor) and p.is_dir()), reverse=True):
             path = directory / "run.json"
             try:
                 signature = _signature(path)
@@ -66,7 +83,7 @@ def full_manifests_desc(archive_dir: Path, *, modes=None, write_index: bool = Tr
                 current[key] = {"signature": signature, "mode": mode}
             if mode in modes:
                 selected.append((manifest, directory))
-    if write_index and current != previous:
+    if write_index and run_date_floor is None and current != previous:
         try:
             # Concurrent discovery may replace this optional index; each next
             # reader enumerates and re-stats every original file regardless.

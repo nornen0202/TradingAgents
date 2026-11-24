@@ -4875,8 +4875,11 @@ def _prefer_newer_completed_full_source(
         if not isinstance(lineage, dict):
             break
 
-    eligible: list[tuple[tuple[datetime, str], dict[str, Any]]] = []
-    for full, _ in full_manifests_desc(archive_dir):
+    newer: list[tuple[tuple[datetime, str], dict[str, Any]]] = []
+    # Canonical archive IDs encode their start in the run's own time zone.
+    # Include the previous UTC date to cover local offsets at the boundary.
+    date_floor = (lineage_key[0] - timedelta(days=1)).date() if lineage_key is not None else None
+    for full, _ in full_manifests_desc(archive_dir, run_date_floor=date_floor):
         settings = full.get("settings") if isinstance(full.get("settings"), dict) else {}
         actual_market = str(settings.get("market_scope") or settings.get("market") or "").upper()
         if (
@@ -4884,11 +4887,6 @@ def _prefer_newer_completed_full_source(
             or actual_market not in {"KR", "US"}
             or str(full.get("status") or "").lower() not in {"success", "completed", "complete"}
             or _strict_required_coverage_failed(full)
-            or not _manifest_is_complete_overlay_baseline(
-                full, market=market, requested_tickers=tickers, required_holding_tickers=tickers,
-                archive_dir=archive_dir,
-                now=cutoff,
-            )
         ):
             continue
         try:
@@ -4903,8 +4901,15 @@ def _prefer_newer_completed_full_source(
         except (TypeError, ValueError):
             continue
         if lineage_key is None or key > lineage_key:
-            eligible.append((key, full))
-    selected = max(eligible, key=lambda item: item[0])[1] if eligible else candidate
+            newer.append((key, full))
+    # Recovery validation reads original runs and archived ticker artifacts.
+    # Older or future lineages cannot win, and the first complete ranked run wins.
+    selected = candidate
+    for _, full in sorted(newer, key=lambda item: item[0], reverse=True):
+        if _manifest_is_complete_overlay_baseline(full, market=market, requested_tickers=tickers,
+                required_holding_tickers=tickers, archive_dir=archive_dir, now=cutoff):
+            selected = full
+            break
     from .research_refresh import prefer_completed_revision
     return prefer_completed_revision(archive_dir, selected, market=market, tickers=tickers,
                                      now=cutoff)
@@ -4932,8 +4937,11 @@ def _resolve_latest_full_overlay_baseline_manifest(
             source_path = _find_run_manifest_path_by_run_id(archive_dir, source_run_id)
             if source_path is not None:
                 candidates.append(json.loads(source_path.read_text(encoding="utf-8")))
+    date_floor = None
+    if max_age is not None and now is not None and now.utcoffset() is not None:
+        date_floor = (now.astimezone(timezone.utc) - max_age - timedelta(days=1)).date()
     candidates.extend(manifest for manifest, _run_dir in full_manifests_desc(
-        archive_dir, write_index=write_discovery_index))
+        archive_dir, write_index=write_discovery_index, run_date_floor=date_floor))
 
     unique: dict[str, dict[str, Any]] = {}
     for index, candidate in enumerate(candidates):
