@@ -145,7 +145,13 @@ python -m tools.kis_paper --output .runtime/kis-paper-status.json status --journ
 - [주문일·국내 주문일·당사 주문시각 필드](https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/overseas_stock/inquire_ccnl/chk_inquire_ccnl.py)
 ## 네이티브 전략 주문 한도
 
-전략의 로컬 활성화 설정에서 시장별 `native_order_limits`를 지정할 수 있다. 각 시장 항목에는 거래통화 기준 `max_order_native`, `cash_floor_native`, 한 주문의 NAV 한도 `max_order_nav`, 한 주 주문의 선택적 NAV 예외 `one_share_nav_ceiling`을 모두 둔다. 시장별 절대 한도와 브로커의 집중·현금·취소 미확정 주문 유보 조건이 함께 적용된다. 기존 저널에 저장된 정책과 다른 설정으로는 새 주문을 시작할 수 없다.
+전략의 로컬 활성화 설정에서 시장별 `native_order_limits`를 지정할 수 있다. 각 시장 항목에는 거래통화 기준 `max_order_native`, `cash_floor_native`, 한 주문의 NAV 한도 `max_order_nav`, 한 주 주문의 선택적 NAV 예외 `one_share_nav_ceiling`을 모두 둔다. 기존 저널에 저장된 정책과 다른 설정에는 별도의 저널이 필요하다. 아래 승인된 정책 개정은 기존 저널에 원래 정책과 개정판을 각각 기록한다.
+
+`VTS_NATIVE_ORDER_LIMITS_20261125` 개정은 VTS 모드에서 두 시장 설정이 모두 일치할 때 적용된다. KR 절대 상한은 3,000,000원이며 US는 3,000달러다. 매수는 30bp 유보 비용을 포함해 시장별 NAV의 12%까지 허용한다. 수량이 정확히 한 주일 때는 20%까지 허용한다. 1회 상한은 매도에도 적용된다. 보호 매도에는 보유·매도 가능 수량과 미체결 수량을 적용한다.
+
+일일 매수 총액 KR 300,000원·US 1,000달러, 일일 주문 3회, 정규 한 주 전략의 세션당 신규 진입 1회, 35% 종목 집중 한도와 동일 시장·통화의 가용 현금 제약을 함께 적용한다. 기존 일일 한도 때문에 한 주문의 절대 상한 전액을 신규 매수에 쓸 수 없다. 시장별 주문 조회에서 미체결 잔량 또는 검증할 수 없는 주문이 있으면 개정 정책에 따른 신규 주문을 보류한다.
+
+로컬 허용 설정을 바꾸기 전 원본을 백업하고 `strategy.lock`과 검증 캠페인의 `campaign.lock`을 모두 확인한다. 영수증의 `configured_native_limits`는 작업자가 읽은 값이며, 시장별 `native_policy_journal_bound`는 정규 장중 저널에 적용된 버전을 뜻한다. 원복 시 현재 설정에서 개정에 사용한 두 키를 제거하고 저널은 그대로 보존한다.
 
 `paper_policy_v2`는 같은 시장의 네이티브 한도를 지정한 뒤 버전이 고정된 `policy`와 `watchlist`를 받는다. 신규 위험에는 작업 상태의 `kr-v2-evidence.json` 또는 `us-v2-evidence.json`에 검토된 결제현금, 시장 기준, 포트폴리오와 주문 대사 시각이 있어야 한다. 내역 누락은 주문 가능 예수금으로 채우지 않는다. V2 수량은 기존 전략 신호와 KIS 브로커가 승인한 범위 안에서만 줄어든다.
 

@@ -28,7 +28,7 @@ from .archive_paper import build_step
 from .source_diagnostics import diagnose_source
 from .source_handoff import await_completed_source
 from . import demo_strategy_plan
-from .kis_demo import DemoCredentials, KisDemoClient, has_unresolved_demo_requests
+from .kis_demo import DemoCredentials, DemoError, KisDemoClient, has_unresolved_demo_requests
 from .kis_paper import _fresh, _tick
 from .kis_strategy_limits import CAPS, configured_limits, make_strategy_broker, size_with_native_limits
 from .kis_strategy_v2 import authorize_v2_size, configured_v2, current_v2_order_receipt
@@ -634,9 +634,18 @@ def advance(archive, root, validation_root, market, *, clock, tickers, broker_fa
                     reason = str(exc)
                     issues.append(reason if reason in {"NO_STRATEGY_QUANTITY_WITHIN_LIMITS", "BUDGET_FX_UNVERIFIED", "PROPOSAL_QUANTITY_INVALID"} else "CANDIDATE_EVIDENCE_UNVERIFIED")
                     continue
-                if v2_settings is not None:
+                if policy_revision is not None or v2_settings is not None:
                     try:
                         order_receipt = current_v2_order_receipt(market, broker.client, clock=clock)
+                    except (DemoError, OSError, ValueError, TypeError, KeyError, AttributeError):
+                        issues.append("KIS_BROKER_ORDER_INQUIRY_UNVERIFIED" if policy_revision is not None
+                                      else "KIS_V2_ADMISSION_UNVERIFIED")
+                        continue
+                    if policy_revision is not None and (order_receipt["account_scope"] != scope or order_receipt["open_order_count"]):
+                        issues.append("KIS_BROKER_OPEN_OR_UNVERIFIED_ORDERS")
+                        continue
+                if v2_settings is not None:
+                    try:
                         terms["quantity"], v2_evidence = authorize_v2_size(
                             root, market, v2_settings, candidate, terms, quote, account, current, at(clock()), order_receipt=order_receipt,
                         )
@@ -676,11 +685,23 @@ def advance(archive, root, validation_root, market, *, clock, tickers, broker_fa
                                       (candidate["id"], json.dumps(source_evidence, sort_keys=True)))
                 try:
                     broker.submit(intent_id=candidate["id"], **terms, signal=signal, quote=quote, account=account)
-                except Exception:
+                except Exception as exc:
                     # If no broker intent exists, deterministic validation failed.
                     # A persisted intent without a response remains ambiguous.
                     if not broker.db.execute("SELECT 1 FROM paper_intents WHERE id=?", (candidate["id"],)).fetchone():
                         broker.db.execute("UPDATE strategy_attempts SET state='BLOCKED' WHERE id=?", (candidate["id"],))
+                        if policy_revision is not None and isinstance(exc, DemoError):
+                            reason = {
+                                "Per-order paper notional limit exceeded": "KIS_ORDER_NOTIONAL_LIMIT",
+                                "Paper buy exceeds the configured NAV limit": "KIS_ORDER_NAV_LIMIT",
+                                "Daily paper buy limit exceeded": "KIS_DAILY_BUY_RISK_LIMIT",
+                                "Daily paper order limit exceeded": "KIS_DAILY_ORDER_RISK_LIMIT",
+                                "Cash-only capacity or reserved cash floor exceeded": "KIS_CASH_OR_RESERVATION_LIMIT",
+                                "Paper concentration limit exceeded": "KIS_POSITION_CONCENTRATION_LIMIT",
+                                "Sell exceeds unreserved sellable holdings": "KIS_SELLABLE_HOLDING_LIMIT",
+                            }.get(str(exc))
+                            if reason:
+                                issues.append(reason)
                     issues.append("SUBMISSION_BLOCKED_OR_UNRESOLVED")
                 break
         current = summary(broker.db, at(clock()), market)
