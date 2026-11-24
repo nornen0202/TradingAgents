@@ -20,6 +20,7 @@ _PROVIDERS = {"KR": {"KIS_DOMESTIC_REGULAR_SESSION"}, "US": {"KIS_US_REGULAR_SES
 _OBSERVATION_FIELDS = ("kind", "event_at", "observed_at", "price", "ticker", "source", "market", "currency", "session",
                        "venue", "session_id", "price_basis", "scheduled_event_at", "revised_at")
 _ENTRY_GROUP = re.compile(r"[A-Za-z0-9_-]{1,32}")
+ENTRY_CONFIRMATION_STAGES = {"intraday", "close", "next_open", "next_session_quote"}
 
 
 def entry_research_deadline(analysis_at, explicit_expiry=None):
@@ -84,7 +85,7 @@ def _validate_plan(plan):
         for rule in group:
             if (not isinstance(rule, dict) or set(rule) != {"id", "stage", "direction", "level"}
                     or not isinstance(rule["id"], str) or not rule["id"] or rule["id"] in identities
-                    or rule["stage"] not in ("intraday", "close", "next_day")
+                    or rule["stage"] not in ENTRY_CONFIRMATION_STAGES | {"next_day"}
                     or rule["direction"] not in ("above", "below") or not _positive(rule["level"])):
                 raise ValueError("Invalid condition")
             identities.add(rule["id"])
@@ -124,7 +125,8 @@ def evaluate_plan(plan, *, analysis_as_of, regular_close=None, official_open=Non
         joined = bool(quote) and allowed
         for rule in group:
             stage = rule["stage"]
-            measured = {"intraday": quote, "close": close, "next_day": opening}[stage]
+            measured = {"intraday": quote, "close": close, "next_day": opening,
+                        "next_open": opening, "next_session_quote": quote if next_window else None}[stage]
             value = measured[0] if measured else None
             crossed = value is not None and (value >= rule["level"] if rule["direction"] == "above" else value <= rule["level"])
             ready = crossed and (stage == "intraday" or next_session_ready)
@@ -175,7 +177,8 @@ def _official_observations(records, market):
     clean = {}
     for name in ("regular_close", "official_open"):
         row = records.get(name)
-        if isinstance(row, dict) and isinstance(row.get("source"), str) and row["source"] in _PROVIDERS[market]:
+        if (isinstance(row, dict) and isinstance(row.get("source"), str) and row["source"] in _PROVIDERS[market]
+                and (name != "official_open" or row["source"] != "KIS_US_REGULAR_SESSION")):
             clean[name] = {field: row.get(field) for field in _OBSERVATION_FIELDS}
     return clean
 
@@ -183,7 +186,7 @@ def _official_observations(records, market):
 def uses_entry_groups(levels):
     return any(_entry_field(level, "confirmation_group") is not None
                or _entry_field(level, "entry_condition_role") is not None for level in levels) or (
-        len(levels) == 1 and _entry_field(levels[0], "confirmation") in {"close", "next_day"}
+        len(levels) == 1 and _entry_field(levels[0], "confirmation") in {"close", "next_day", "next_open", "next_session_quote"}
     )
 
 
@@ -193,7 +196,7 @@ def _entry_field(level, name):
 
 def _level_rules(level, identifier):
     stage = _entry_field(level, "confirmation")
-    if stage not in {"intraday", "close", "next_day"}:
+    if stage not in ENTRY_CONFIRMATION_STAGES:
         raise ValueError("Unverified entry confirmation stage")
     role = _entry_field(level, "level_type")
     role = str(getattr(role, "value", role)).upper()

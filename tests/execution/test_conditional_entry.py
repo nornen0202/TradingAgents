@@ -183,7 +183,7 @@ def test_standard_overlay_producer_archives_confirmed_entry_only(tmp_path, monke
     def observation(kind, clock):
         return {"kind": kind, "event_at": clock, "observed_at": clock, "price": 101,
                 "ticker": ticker, "market": "US", "currency": "USD", "session": clock[:10],
-                "source": "KIS_US_REGULAR_SESSION"}
+                "source": "ALPACA_SIP_REGULAR_SESSION"}
 
     atomic_write_json(tmp_path / "observations/ABC.json", {
         "schema": RECEIPT_SCHEMA, "ticker": ticker, "market": "US", "price_basis": "unadjusted",

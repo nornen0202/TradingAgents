@@ -41,6 +41,9 @@ def _us_rows(directory):
     candidates = _read(directory / "portfolio-private" / "portfolio_candidates.json")["candidates"]
     candidates = {row["canonical_ticker"]: row for row in candidates}
     snapshot = _read(directory / "portfolio-private" / "account_snapshot.json")
+    portfolio = _read(directory / "portfolio-private" / "portfolio_report.json")
+    final_actions = {row["canonical_ticker"]: row for row in portfolio["actions"]}
+    cash_gap = (portfolio.get("funding_plan") or {}).get("cash_gap_to_strict_buffer_krw")
     held = {row["canonical_ticker"] for row in snapshot["positions"]}
     for row in manifest["tickers"]:
         ticker = row["ticker"]
@@ -75,8 +78,11 @@ def _us_rows(directory):
             "data_quality": market.get("execution_data_quality"), "first_overlay_block": reasons[0] if reasons else None,
             "all_overlay_reasons": " | ".join(reasons), "now_original": update.get("decision_now"),
             "portfolio_now_original": candidate.get("suggested_action_now"),
+            "portfolio_final_action_original": (final_actions.get(ticker) or {}).get("action_now"),
+            "portfolio_gate_reasons": " | ".join(candidate.get("gate_reasons") or []),
             "wait_heavy_marked": "wait_heavy_batch_reduce_immediate_entries" in candidate.get("gate_reasons", []),
             "budget_blocked_actionable": candidate.get("budget_blocked_actionable"),
+            "batch_cash_gap_to_strict_buffer_krw": cash_gap,
             "diagnostic_discard_ungrouped_has_intraday_alternative": original_pilot,
             "diagnostic_discard_ungrouped_intraday_price_crossed": intraday_crossed,
             "diagnostic_remove_wait_heavy_can_release_overlay_block": False if reasons else None,

@@ -188,7 +188,8 @@ def _entry_proof(run, ticker, contract, raw, market_data_asof, generated):
     levels = _entry_levels(contract)
     needs_update = any(level.get("confirmation_group") is not None or level.get("entry_condition_role") is not None
                        for level in levels) or (
-        bool(contract.get("entry_valid_until")) and len(levels) == 1 and levels[0].get("confirmation") in {"close", "next_day"}
+        bool(contract.get("entry_valid_until")) and len(levels) == 1
+        and levels[0].get("confirmation") in {"close", "next_day", "next_open", "next_session_quote"}
     )
     if not needs_update:
         return contract.get("entry_confirmation_v2", {} if "entry_confirmation_v2" in contract else None)

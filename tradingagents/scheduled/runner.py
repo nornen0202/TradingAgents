@@ -4995,7 +4995,12 @@ def _resolve_latest_full_overlay_baseline_manifest(
             eligible.append(candidate)
             continue
         if partial_required_tickers is not None and str(market).upper() == "KR" and candidate.get("status") == "partial_failure":
-            partial_candidates.append(candidate)
+            failure = candidate.get("terminal_failure") or {}
+            # A failed-only retry that produced no new research can neither
+            # replace nor give a later clock to its successful parent research.
+            if not (candidate.get("research_recovery") and failure.get("newly_successful_tickers") == 0
+                    and failure.get("reason") == "no_new_successful_recovery_research"):
+                partial_candidates.append(candidate)
     if partial_candidates:
         from .research_recovery import verified_candidate_partial
         complete_start = max((_manifest_started_at_for_sort(item, market=market) for item in eligible), default=0)

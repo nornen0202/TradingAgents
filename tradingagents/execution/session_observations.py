@@ -137,13 +137,13 @@ def load_collected_observations(path, ticker, market, *, now):
     try:
         with closing_connection(sqlite3.connect(path.resolve().as_uri() + "?mode=ro", uri=True)) as db:
             rows = db.execute("""
-                SELECT session, stage, source_sha256, raw_response, evidence FROM observations
+                SELECT session, stage, observed_at, source_sha256, raw_response, evidence FROM observations
                 WHERE ticker=? AND market=? AND observed_at<=? AND evidence IS NOT NULL AND
                       ((stage='open' AND session=?) OR (stage='close' AND session<=?))
                 ORDER BY session DESC LIMIT 3
                 """, (ticker, market, cutoff.isoformat(), day, day)).fetchall()
         observations = {}
-        for session, stage, digest, raw, evidence in rows:
+        for session, stage, observed_at, digest, raw, evidence in rows:
             key = {"open": "official_open", "close": "regular_close"}[stage]
             if key in observations or hashlib.sha256(raw).hexdigest() != digest:
                 continue
@@ -151,6 +151,7 @@ def load_collected_observations(path, ticker, market, *, now):
             venue = record.get("venue")
             if (venue not in VENUES[market] or record.get("session_id") != f"{market}:{venue}:regular:{session}"
                     or record.get("kind") != KINDS[stage] or record.get("session") != session
+                    or record.get("observed_at") != observed_at
                     or record.get("price_basis") != "unadjusted" or record.get("ticker") != ticker
                     or record.get("market") != market or record.get("currency") != CURRENCIES[market]):
                 continue
@@ -288,7 +289,8 @@ def capture_due(root, *, operations=None, clock=_now, sessions=_schedule, downlo
                 late = stage == "open" and received > opening + timedelta(seconds=30)
                 # The missed opening is still a real observed daily price. It
                 # cannot satisfy the next-open execution proof retroactively.
-                status = "OBSERVED_LATE_OPEN" if late else "OBSERVED"
+                status = ("OBSERVED_LATE_OPEN" if late else "OBSERVED_PROVISIONAL_OPEN"
+                          if stage == "open" and market == "US" else "OBSERVED")
                 # A proved opening print was available by receipt; using that
                 # clock is conservative when the precise exchange tick is absent.
                 evidence = _evidence(item, day, stage, received if stage == "open" else event, received, prices[stage])

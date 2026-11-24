@@ -206,7 +206,7 @@ class PriceLevelType(str, Enum):
     __hash__ = str.__hash__
 
 
-PriceLevelConfirmation = Literal["intraday", "close", "two_bar", "next_day", "volume_confirmed"]
+PriceLevelConfirmation = Literal["intraday", "close", "two_bar", "next_day", "next_open", "next_session_quote", "volume_confirmed"]
 FundingPriority = Literal["low", "medium", "high"]
 
 _SOCIAL_SOURCE_ALIASES = {
@@ -225,7 +225,7 @@ _PRICE_LEVEL_TYPE_ALIASES = {
     "profit": PriceLevelType.TAKE_PROFIT,
     "resistance": PriceLevelType.RESISTANCE,
 }
-_PRICE_LEVEL_CONFIRMATIONS = {"intraday", "close", "two_bar", "next_day", "volume_confirmed"}
+_PRICE_LEVEL_CONFIRMATIONS = {"intraday", "close", "two_bar", "next_day", "next_open", "next_session_quote", "volume_confirmed"}
 _NUMBER_PATTERN = re.compile(r"[-+]?\d*\.?\d+")
 
 
@@ -460,12 +460,14 @@ def build_decision_output_instructions(context: str) -> str:
         "Use intraday_pilot_rule for a small regular-session starter only, close_confirm_rule for full-size add or entry, "
         "and next_day_followthrough_rule for the next trading day support or re-breakout check. "
         "For execution_levels.levels, level_type must be one of BREAKOUT, SUPPORT, PULLBACK, INVALIDATION, TRIM, STOP_LOSS, TAKE_PROFIT, RESISTANCE, "
-        "and confirmation must be one of intraday, close, two_bar, next_day, volume_confirmed. "
+        "and confirmation must be one of intraday, close, two_bar, next_day, next_open, next_session_quote, volume_confirmed. "
         "Only encode entry alternatives the underlying strategy supports. Use confirmation_group on each condition of an explicit alternative. "
         "All conditions in one group are required together, and different groups are alternatives. "
         "Use entry_condition_role=required, without a group, for a condition shared by every alternative. "
         "Use entry_condition_role=reference, without a group, for general support or resistance that does not authorize or gate entry. "
-        "For grouped and required entry conditions explicitly use intraday, close, or next_day only when the strategy calls for that session evidence. "
+        "For machine-actionable grouped or required entry conditions, use intraday for a regular-session price, close for the completed origin-session close, "
+        "next_open only for an official next-session opening price, and next_session_quote only for a fresh regular-session price in the next trading session. "
+        "Use next_day for discretionary or unspecified follow-through. It remains a research condition until the required evidence can be stated. "
         "Put extra nuance in label or source_text. "
         "For constructive but unconfirmed setups, prefer HOLD or OVERWEIGHT with portfolio_stance=BULLISH and entry_action=WAIT when the evidence supports watchlist or held exposure. "
         "Reserve NO_TRADE for weak, contradictory, or insufficient theses, no favorable setup to monitor, or data quality gaps that make the view non-investable. "
@@ -618,12 +620,15 @@ def _parse_price_level(raw: Mapping[str, Any]) -> PriceLevel:
     group = raw.get("confirmation_group")
     if group is not None and (not isinstance(group, str) or re.fullmatch(r"[A-Za-z0-9_-]{1,32}", group) is None):
         raise StructuredDecisionValidationError("Invalid confirmation_group identifier.")
+    if group is not None and (not isinstance(raw.get("confirmation"), str)
+                              or raw["confirmation"] not in _PRICE_LEVEL_CONFIRMATIONS):
+        raise StructuredDecisionValidationError("Grouped execution levels require an explicit confirmation.")
     entry_role = raw.get("entry_condition_role")
     if entry_role is not None and (
         entry_role not in ("required", "reference")
         or group is not None
         or level_type not in {"BREAKOUT", "RESISTANCE", "PULLBACK", "SUPPORT"}
-        or (entry_role == "required" and raw.get("confirmation") not in ("intraday", "close", "next_day"))
+        or (entry_role == "required" and raw.get("confirmation") not in ("intraday", "close", "next_open", "next_session_quote"))
     ):
         raise StructuredDecisionValidationError("Invalid entry_condition_role or confirmation.")
 

@@ -69,7 +69,7 @@ def test_explicit_alternatives_distinguish_reference_shared_and_ambiguous_levels
         return {"level_type": "BREAKOUT", "confirmation": "intraday", "price": price, **fields}
 
     pilot = level(100, confirmation_group="pilot")
-    follow = level(100, confirmation_group="follow", confirmation="next_day")
+    follow = level(100, confirmation_group="follow", confirmation="next_session_quote")
     reference = level(200, entry_condition_role="reference")
     shared = level(102, entry_condition_role="required")
     alternatives = _entry_alternatives([pilot, reference, follow, shared], "USD", True)
@@ -80,6 +80,7 @@ def test_explicit_alternatives_distinguish_reference_shared_and_ambiguous_levels
     assert not _evaluate(plan, analysis_as_of=moment, live_quote=_feed("quote", moment))["paper_candidate_ready"]
     assert _evaluate(plan, analysis_as_of=moment, live_quote=_feed("quote", moment, price=103))["matched_alternatives"] == [0]
     assert _entry_alternatives([pilot, level(80)], "USD", True) == []
+    assert _entry_alternatives([level(100, confirmation_group="ambiguous", confirmation="next_day")], "USD", True) == []
     assert _entry_alternatives([reference], "USD", True) == []
 
 
@@ -88,6 +89,14 @@ def test_late_receipt_does_not_authorize_an_earlier_quote():
                        live_quote=_feed("quote", "2026-11-30T14:34:59Z"))
     assert not result["paper_candidate_ready"]
     assert result["next_session_evidence_available_at"] == "2026-11-30T14:35:00+00:00"
+
+
+def test_next_session_quote_and_open_are_distinct_conditions():
+    open_rule = {"id": "opening", "stage": "next_open", "direction": "above", "level": 102}
+    quote_rule = {"id": "reclaim", "stage": "next_session_quote", "direction": "above", "level": 102}
+    result = _evaluate({**PLAN, "alternatives": [[open_rule], [quote_rule]]},
+                       live_quote=_feed("quote", NOW, price=103))
+    assert result["matched_alternatives"] == [1]
 
 
 @pytest.mark.parametrize("name,kind,clock", [
