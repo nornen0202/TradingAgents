@@ -190,3 +190,62 @@ def test_us_provisional_open_is_stored_with_venue_and_cannot_supply_open_proof(t
     assert record["kind"] == "provisional_regular_open"
     assert record["session_id"] == f"US:AMS:regular:{MON}" and record["revised_at"] is None
     assert obs.load_collected_observations(db, "SPY", "US", now=at) == {}
+
+
+def test_database_reads_legacy_confirmed_close_against_registered_venue(tmp_path, monkeypatch):
+    policy(tmp_path)
+    native = obs._evidence
+
+    def legacy(*args):
+        return {key: value for key, value in native(*args).items()
+                if key not in {"venue", "session_id", "price_basis", "revised_at"}}
+
+    monkeypatch.setattr(obs, "_evidence", legacy)
+    at = time(MON + "T15:36:00")
+    obs.capture_due(tmp_path, clock=lambda: at, download=market_bar)
+    db = tmp_path / "observations.sqlite"
+    receipt = obs.load_collected_observations(db, "069500.KS", "KR", now=at)["regular_close"]
+    assert receipt["session_id"] == f"KR:J:regular:{MON}"
+    assert receipt["price"] == 105
+    atomic_write_json(tmp_path / "policy.json", {"schema": obs.SCHEMA, "instruments": [
+        {"ticker": "000660.KS", "market": "KR", "venue": "J"}]})
+    assert obs.load_collected_observations(db, "069500.KS", "KR", now=at) == {}
+
+
+def test_independent_database_env_does_not_select_daily_history_target(tmp_path, monkeypatch):
+    from tradingagents.scheduled.config import load_scheduled_config
+
+    database = tmp_path / "independent" / "observations.sqlite"
+    monkeypatch.setenv("TRADINGAGENTS_SESSION_OBSERVATION_DB", str(database))
+    monkeypatch.delenv("TRADINGAGENTS_FORWARD_OBSERVATION_ROOT", raising=False)
+    path = tmp_path / "test.toml"
+    path.write_text('[run]\nmarket="KR"\ntickers=["069500.KS"]\n[storage]\narchive_dir="archive"\nsite_dir="site"\n')
+    config = load_scheduled_config(path)
+    assert config.execution.session_observation_db == database
+    assert config.storage.daily_history_capture_db is None
+
+
+def test_run_due_forwards_independent_observation_database(tmp_path, monkeypatch):
+    import os
+    import sys
+    from tradingagents import local_automation
+    from tradingagents.notifications import local
+
+    state = tmp_path / "state"
+    database = tmp_path / "independent" / "observations.sqlite"
+    atomic_write_json(state / "forward-observation-source.json", {"database": str(database)})
+    monkeypatch.delenv("TRADINGAGENTS_SESSION_OBSERVATION_DB", raising=False)
+    monkeypatch.setattr(local_automation, "prepare_environment", lambda: None)
+    monkeypatch.setattr(local_automation, "drain_actions", lambda *a, **k: [])
+    monkeypatch.setattr(obs, "scheduled_capture", lambda *a, **k: [])
+    monkeypatch.setattr(local, "reconcile_safely", lambda *a, **k: None)
+
+    def run(*args, **kwargs):
+        assert os.environ["TRADINGAGENTS_SESSION_OBSERVATION_DB"] == str(database)
+        return []
+
+    monkeypatch.setattr(local_automation, "run_due", run)
+    monkeypatch.setattr(sys, "argv", ["local_automation", "run-due",
+        "--archive-dir", str(tmp_path / "archive"), "--state-dir", str(state),
+        "--runtime-dir", str(tmp_path / "runtime")])
+    assert local_automation.main() == 0

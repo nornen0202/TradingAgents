@@ -868,6 +868,11 @@ def main():
         observation_root = args.state_dir / "forward-observation"
         if (observation_root / "policy.json").is_file():
             os.environ["TRADINGAGENTS_FORWARD_OBSERVATION_ROOT"] = str(observation_root)
+    if args.command == "run-due" and not args.dry_run:
+        observation_source = read_json(args.state_dir / "forward-observation-source.json", {})
+        if isinstance(observation_source, dict) and isinstance(database := observation_source.get("database"), str):
+            if Path(database).is_absolute():
+                os.environ.setdefault("TRADINGAGENTS_SESSION_OBSERVATION_DB", database)
     if args.command in {"run-due", "publish"} and not args.dry_run:
         os.environ["TRADINGAGENTS_LOCAL_PAPER_STATE_DIR"] = str(args.state_dir)
     # Independent lanes never acquire the minute producer lock. Research writes

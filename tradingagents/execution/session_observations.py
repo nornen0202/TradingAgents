@@ -136,6 +136,13 @@ def load_collected_observations(path, ticker, market, *, now):
     day = cutoff.astimezone(ZoneInfo(ZONES[market])).date().isoformat()
     try:
         with closing_connection(sqlite3.connect(path.resolve().as_uri() + "?mode=ro", uri=True)) as db:
+            watchlist = _watchlist(path.parent / "policy.json")
+            registered = db.execute("SELECT watchlist_hash FROM observation_registration WHERE singleton=1").fetchone()
+            if registered != (hashlib.sha256(json.dumps(watchlist, sort_keys=True).encode()).hexdigest(),):
+                return {}
+            instrument = next((item for item in watchlist if item["ticker"] == ticker and item["market"] == market), None)
+            if instrument is None:
+                return {}
             rows = db.execute("""
                 SELECT session, stage, observed_at, source_sha256, raw_response, evidence FROM observations
                 WHERE ticker=? AND market=? AND observed_at<=? AND evidence IS NOT NULL AND
@@ -149,7 +156,11 @@ def load_collected_observations(path, ticker, market, *, now):
                 continue
             record = json.loads(evidence)
             venue = record.get("venue")
-            if (venue not in VENUES[market] or record.get("session_id") != f"{market}:{venue}:regular:{session}"
+            if venue is None and all(key not in record for key in ("venue", "session_id", "price_basis")):
+                # The original collector bound venue to the immutable registered policy.
+                venue = instrument["venue"]
+                record.update(venue=venue, session_id=f"{market}:{venue}:regular:{session}", price_basis="unadjusted")
+            if (venue != instrument["venue"] or record.get("session_id") != f"{market}:{venue}:regular:{session}"
                     or record.get("kind") != KINDS[stage] or record.get("session") != session
                     or record.get("observed_at") != observed_at
                     or record.get("price_basis") != "unadjusted" or record.get("ticker") != ticker

@@ -23,6 +23,8 @@ A verified KR opening price received within 30 seconds can supply the receipt-ti
 
 Scheduled research uses the same root for its private daily-history capture unless explicitly configured otherwise. The regular overlay reads eligible records directly from observations.sqlite. A CLI profile can supply [execution].session_observation_db. An explicitly configured legacy confirmation receipt directory continues to work. Historical adjustments and research captures retain their separate source and basis.
 
+When the existing observer runs independently, place a forward-observation-source.json in the scheduler's private state directory with a database key containing the absolute path to its observations.sqlite. The scheduler opens this database read-only with the registered sibling policy.json. The pointer does not start an observer or route daily-history writes into that store. Legacy receipts retain their registered venue and are rechecked against the source bytes. A KIS US open is excluded from official open proof even if a legacy collector saved it as official.
+
 Coverage uses completed exchange sessions after the watchlist registration. A missing collection stays in the denominator. The session report includes a read-only reason when the mock strategy is disabled or strategy evidence could not be assessed. The market-only observer cannot create a transaction outcome or write into the promotion ledger. Qualified forward evidence still requires the independently reconciled and monitored paper-session records.
 
 ## Private daily history for regular research

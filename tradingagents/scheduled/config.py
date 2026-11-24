@@ -377,6 +377,8 @@ def load_scheduled_config(path: str | Path) -> ScheduledAnalysisConfig:
     session_receipts = _optional_string(execution_raw.get("session_confirmation_receipts_dir"))
     observation_root = os.environ.get("TRADINGAGENTS_FORWARD_OBSERVATION_ROOT")
     session_observation_db = _optional_string(execution_raw.get("session_observation_db"))
+    if session_observation_db is None and session_receipts is None:
+        session_observation_db = _optional_string(os.environ.get("TRADINGAGENTS_SESSION_OBSERVATION_DB"))
     if observation_root and session_receipts is None:
         session_receipts = str(Path(observation_root) / "confirmations")
         if session_observation_db is None:
