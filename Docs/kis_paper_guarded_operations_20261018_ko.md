@@ -153,6 +153,14 @@ python -m tools.kis_paper --output .runtime/kis-paper-status.json status --journ
 
 로컬 허용 설정을 바꾸기 전 원본을 백업하고 `strategy.lock`과 검증 캠페인의 `campaign.lock`을 모두 확인한다. 영수증의 `configured_native_limits`는 작업자가 읽은 값이며, 시장별 `native_policy_journal_bound`는 정규 장중 저널에 적용된 버전을 뜻한다. 원복 시 현재 설정에서 개정에 사용한 두 키를 제거하고 저널은 그대로 보존한다.
 
+독립된 `kis-live-readiness` 디렉터리에서 로컬 계약을 검증할 수 있다.
+
+```powershell
+python -m tools.check_kis_live_readiness --state-dir '.\kis-live-readiness' --fixture '.\readiness-fixture.json'
+```
+
+입력의 `evidence_scope`는 `ISOLATED_FIXTURE`다. `intent`, `account`, `usage`, `quote`, `session`, `now`를 검증한다. 해당 디렉터리의 `approval.json`에 명시된 시장과 계정 범위 외의 입력, 철회된 승인 및 `HALT`는 거부된다. 결과에는 상태, 구성 해시, 준비된 목적지와 TR, 실거래 주문 요청 건수가 표시된다. 로컬 감사 기록은 판정과 TR을 보존한다.
+
 `paper_policy_v2`는 같은 시장의 네이티브 한도를 지정한 뒤 버전이 고정된 `policy`와 `watchlist`를 받는다. 신규 위험에는 작업 상태의 `kr-v2-evidence.json` 또는 `us-v2-evidence.json`에 검토된 결제현금, 시장 기준, 포트폴리오와 주문 대사 시각이 있어야 한다. 내역 누락은 주문 가능 예수금으로 채우지 않는다. V2 수량은 기존 전략 신호와 KIS 브로커가 승인한 범위 안에서만 줄어든다.
 
 시장 접두어가 같은 비공개 `*-v2-settlement.json`과 `*-v2-benchmark.json`을 준비한다. 결제 파일은 `tradingagents.kis-v2-reviewed-settlement/v1` 스키마와 계좌 범위, 시장, 통화, 원천 관측시각, 검토된 결제현금을 담는다. 지수 파일은 영수증의 `benchmark` 객체와 같은 관측 내용을 담는다. 영수증은 두 파일의 원본 SHA-256을 `settlement_source_sha256`와 `benchmark_source_sha256`으로 고정하고 코드가 읽은 파일의 내용과 관측시각을 대조한다. 이 파일들은 운영자가 검토하는 비공개 입력이며 설정으로 모의 주문이 자동 활성화되지는 않는다.
