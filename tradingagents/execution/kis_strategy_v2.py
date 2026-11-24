@@ -4,7 +4,9 @@ from decimal import Decimal
 import hashlib
 import json
 import re
+from zoneinfo import ZoneInfo
 
+from .demo_validation import MARKETS
 from .experiments import _stamp
 from .paper_policy_v2 import bind_v2_journal, size_v2_candidate
 
@@ -77,7 +79,26 @@ def _buy_observation(root, market, currency, scope, ticker, now, seconds, accoun
     return str(cash), evidence["target_weights"][ticker], evidence_digest
 
 
-def authorize_v2_size(root, market, settings, candidate, terms, quote, account, state, now):
+def current_v2_order_receipt(market, client, *, clock):
+    """A complete dated VTS order query must show no remaining orders."""
+    started = _stamp(clock())
+    zone = ZoneInfo(MARKETS[market]["zone"])
+    session_date = started.astimezone(zone).date().isoformat()
+    rows = client.orders(session_date.replace("-", ""))
+    finished = _stamp(clock())
+    if finished < started or finished.astimezone(zone).date().isoformat() != session_date:
+        raise ValueError("KIS V2 order inquiry crossed its observation window")
+    remainder = "rmn_qty" if market == "KR" else "nccs_qty"
+    if (not isinstance(rows, list) or any(not isinstance(row, dict) or not isinstance(row.get(remainder), str)
+            or re.fullmatch(r"[0-9]+", row[remainder]) is None for row in rows)):
+        raise ValueError("KIS V2 order remainder is unverified")
+    return {"mode": "demo", "market": market, "currency": _MARKETS[market][0],
+            "account_scope": client.credentials.scope(), "source": "KIS_DEMO_ORDER_INQUIRY",
+            "session_date": session_date, "observed_at": started.isoformat(), "ingested_at": finished.isoformat(),
+            "open_order_count": sum(int(row[remainder]) != 0 for row in rows)}
+
+
+def authorize_v2_size(root, market, settings, candidate, terms, quote, account, state, now, *, order_receipt):
     """Apply V2 after native sizing, then leave the final authority with the broker."""
     if settings is None:
         return terms["quantity"], {}
@@ -86,6 +107,15 @@ def authorize_v2_size(root, market, settings, candidate, terms, quote, account, 
     currency, suffix = _MARKETS[market]
     if policy["scope"] != scope or account.get("environment") != "demo" or account.get("complete") is not True:
         raise ValueError("KIS V2 account scope is unverified")
+    observed, ingested = (_stamp(order_receipt.get(key)) for key in ("observed_at", "ingested_at"))
+    if (order_receipt.get("source") != "KIS_DEMO_ORDER_INQUIRY" or order_receipt.get("mode") != "demo"
+            or order_receipt.get("market") != market or order_receipt.get("currency") != currency
+            or order_receipt.get("account_scope") != scope or order_receipt.get("session_date")
+            != now.astimezone(ZoneInfo(MARKETS[market]["zone"])).date().isoformat()
+            or type(order_receipt.get("open_order_count")) is not int or order_receipt["open_order_count"] != 0
+            or not _stamp(account["observed_at"]) <= observed <= ingested <= now
+            or (now - observed).total_seconds() >= policy["max_quote_age_seconds"]):
+        raise ValueError("KIS_V2_ACCOUNT_ORDER_STATE_UNVERIFIED")
     bind_v2_journal(root, policy, watchlist, as_of=now.isoformat())
     ticker = candidate["ticker"]
     side, cash, target, evidence_hash = terms["side"], "0", 0, None
@@ -116,5 +146,5 @@ def authorize_v2_size(root, market, settings, candidate, terms, quote, account, 
         raise ValueError(sized["status"])
     amount = int(sized["quantity"])
     return amount, {key: sized[key] for key in ("policy_sha256", "watchlist_sha256", "policy_version", "watchlist_version")} | {
-        "reviewed_evidence_sha256": evidence_hash,
+        "reviewed_evidence_sha256": evidence_hash, "order_inquiry_observed_at": observed.isoformat(),
     }

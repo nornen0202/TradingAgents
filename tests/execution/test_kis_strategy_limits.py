@@ -9,7 +9,7 @@ from tradingagents.execution import demo_runtime as runtime, demo_token_cache, k
 from tradingagents.execution.kis_demo import DemoCredentials, KisDemoClient, RequestPacer
 from tradingagents.execution.kis_demo_us import KisDemoUSClient
 from tradingagents.execution.kis_strategy_limits import configured_limits, size_with_native_limits
-from tradingagents.execution.kis_strategy_v2 import EVIDENCE_SCHEMA, SETTLEMENT_SCHEMA, _buy_observation
+from tradingagents.execution.kis_strategy_v2 import EVIDENCE_SCHEMA, SETTLEMENT_SCHEMA, _buy_observation, current_v2_order_receipt
 from tradingagents.execution.paper_policy_v2 import SCHEMA as POLICY_SCHEMA
 from tests.execution.test_demo_runtime import Harness
 
@@ -71,6 +71,41 @@ def test_reviewed_v2_receipt_requires_both_exact_source_documents(tmp_path):
     (tmp_path / "kr-v2-benchmark.json").unlink()
     with pytest.raises(FileNotFoundError):
         _buy_observation(*args)
+
+
+@pytest.mark.parametrize("market,field", [("KR", "rmn_qty"), ("US", "nccs_qty")])
+def test_broker_order_receipt_uses_native_session_and_explicit_remainder(tmp_path, market, field):
+    h = Harness(tmp_path, market)
+    requests = []
+
+    class Client:
+        credentials = h.credentials
+        rows = [{field: "1"}]
+
+        def orders(self, date):
+            requests.append(date)
+            return self.rows
+
+    client = Client()
+    result = current_v2_order_receipt(market, client, clock=lambda: h.now)
+    assert result["market"] == market and result["open_order_count"] == 1
+    assert requests == [h.now.strftime("%Y%m%d")]
+    client.rows = []
+    assert current_v2_order_receipt(market, client, clock=lambda: h.now)["open_order_count"] == 0
+    client.rows = [{}]
+    with pytest.raises(ValueError, match="remainder"):
+        current_v2_order_receipt(market, client, clock=lambda: h.now)
+
+
+def test_optional_v2_stops_on_broker_open_order_absent_from_strategy_journal(tmp_path, monkeypatch):
+    h = Harness(tmp_path, "KR")
+    configure(h.root, "KR", max_order_native=runtime.CAPS["KR"], cash_floor_native=0,
+              max_order_nav=.1, one_share_nav_ceiling=.2)
+    configure_v2(h.root, scope=h.credentials.scope(), ticker=h.ticker, now=h.now)
+    monkeypatch.setattr(KisDemoClient, "orders", lambda *args: [{"rmn_qty": "1"}])
+    row = h.tick()
+    assert not row["orders"] and not h.orders
+    assert "KIS_V2_ADMISSION_UNVERIFIED" in row["blockers"]
 
 
 @pytest.mark.parametrize("market", ["KR", "US"])

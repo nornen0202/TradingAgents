@@ -29,7 +29,7 @@ from . import demo_strategy_plan
 from .kis_demo import DemoCredentials, KisDemoClient, has_unresolved_demo_requests
 from .kis_paper import _fresh, _tick
 from .kis_strategy_limits import CAPS, configured_limits, make_strategy_broker, size_with_native_limits
-from .kis_strategy_v2 import authorize_v2_size, configured_v2
+from .kis_strategy_v2 import authorize_v2_size, configured_v2, current_v2_order_receipt
 from .paper_runtime import _latest_source, _runtime_session
 from .strategy_evaluation import evaluate_strategy_orders
 
@@ -625,8 +625,9 @@ def advance(archive, root, validation_root, market, *, clock, tickers, broker_fa
                     continue
                 if v2_settings is not None:
                     try:
+                        order_receipt = current_v2_order_receipt(market, broker.client, clock=clock)
                         terms["quantity"], v2_evidence = authorize_v2_size(
-                            root, market, v2_settings, candidate, terms, quote, account, current, at(clock()),
+                            root, market, v2_settings, candidate, terms, quote, account, current, at(clock()), order_receipt=order_receipt,
                         )
                     except (OSError, ValueError, TypeError, KeyError, AttributeError, ArithmeticError, sqlite3.Error):
                         issues.append("KIS_V2_ADMISSION_UNVERIFIED")

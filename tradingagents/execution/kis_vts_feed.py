@@ -203,6 +203,7 @@ class FeedResult:
     delivered_order_hints: int
     delivered_quotes: int
     stopped: str = "RECONNECT_BUDGET_EXHAUSTED"
+    verified_notice_sessions: int = 0
 
 
 class VtsSocket(Protocol):
@@ -231,7 +232,7 @@ async def run_event_feed(
         list(_quote_streams(((market, key),), {scope.market for scope in scopes}))
     hints_seen: OrderedDict[str, None] = OrderedDict()
     last_quote: dict[tuple[str, str], QuoteObservation] = {}
-    disconnects = hint_count = quote_count = 0
+    disconnects = hint_count = quote_count = verified = 0
     with interprocess_file_lock(lock_path, timeout=0):
         for attempt in range(attempts):
             if attempt:
@@ -261,6 +262,7 @@ async def run_event_feed(
                                 await socket.pong(raw.encode())
                             if recovered or not decoder.notices_active:
                                 continue
+                            verified += 1
                             # Acknowledgement precedes the authoritative REST
                             # snapshot so no new executions fall in the gap.
                             await resynchronize()
@@ -295,7 +297,7 @@ async def run_event_feed(
                 pass
             disconnects += 1
         await resynchronize()
-    return FeedResult(attempts, disconnects, hint_count, quote_count)
+    return FeedResult(attempts, disconnects, hint_count, quote_count, verified_notice_sessions=verified)
 
 
 def _advances_quote(previous, current):
