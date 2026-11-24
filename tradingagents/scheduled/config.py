@@ -111,6 +111,14 @@ class TranslationSettings:
 class StorageSettings:
     archive_dir: Path
     site_dir: Path
+    daily_history_capture_db: Path | None = None
+
+    def __post_init__(self):
+        if self.daily_history_capture_db is None:
+            return
+        capture = self.daily_history_capture_db.resolve()
+        if any(capture.is_relative_to(root.resolve()) for root in (self.archive_dir, self.site_dir)):
+            raise ValueError("Daily history capture database must be outside the archive and publishing roots.")
 
 
 @dataclass(frozen=True)
@@ -410,6 +418,7 @@ def load_scheduled_config(path: str | Path) -> ScheduledAnalysisConfig:
     base_dir = config_path.parent
     archive_dir = _resolve_path(storage_raw.get("archive_dir", ".tradingagents-scheduled/archive"), base_dir)
     site_dir = _resolve_path(storage_raw.get("site_dir", "site"), base_dir)
+    daily_history_capture = _optional_string(storage_raw.get("daily_history_capture_db"))
 
     codex_model_override = _optional_string(os.getenv("TRADINGAGENTS_CODEX_MODEL"))
     shared_provider = str(llm_raw.get("provider", "codex")).strip().lower() or "codex"
@@ -558,6 +567,7 @@ def load_scheduled_config(path: str | Path) -> ScheduledAnalysisConfig:
         storage=StorageSettings(
             archive_dir=archive_dir,
             site_dir=site_dir,
+            daily_history_capture_db=_resolve_path(daily_history_capture, base_dir) if daily_history_capture else None,
         ),
         site=SiteSettings(
             title=str(site_raw.get("title", "TradingAgents Daily Reports")).strip() or "TradingAgents Daily Reports",
