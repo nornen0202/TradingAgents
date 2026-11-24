@@ -373,6 +373,9 @@ def load_scheduled_config(path: str | Path) -> ScheduledAnalysisConfig:
     etf_dca_benchmarks_raw = raw.get("etf_dca_benchmarks") or {}
     execution_raw = raw.get("execution") or {}
     session_receipts = _optional_string(execution_raw.get("session_confirmation_receipts_dir"))
+    observation_root = os.environ.get("TRADINGAGENTS_FORWARD_OBSERVATION_ROOT")
+    if observation_root and session_receipts is None:
+        session_receipts = str(Path(observation_root) / "confirmations")
     summary_image_raw = raw.get("summary_image") or {}
     external_raw = raw.get("external") or {}
     external_data_raw = raw.get("external_data") or {}
@@ -421,6 +424,8 @@ def load_scheduled_config(path: str | Path) -> ScheduledAnalysisConfig:
     archive_dir = _resolve_path(storage_raw.get("archive_dir", ".tradingagents-scheduled/archive"), base_dir)
     site_dir = _resolve_path(storage_raw.get("site_dir", "site"), base_dir)
     daily_history_capture = _optional_string(storage_raw.get("daily_history_capture_db"))
+    if observation_root and daily_history_capture is None:
+        daily_history_capture = str(Path(observation_root) / "research-prices.sqlite")
 
     codex_model_override = _optional_string(os.getenv("TRADINGAGENTS_CODEX_MODEL"))
     shared_provider = str(llm_raw.get("provider", "codex")).strip().lower() or "codex"
