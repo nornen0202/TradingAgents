@@ -838,6 +838,10 @@ def main():
     args.runtime_dir = args.runtime_dir.resolve()
     args.state_dir.mkdir(parents=True, exist_ok=True)
     prepare_environment()
+    if args.command in {"run-due", "research-kis"} and not args.dry_run:
+        observation_root = args.state_dir / "forward-observation"
+        if (observation_root / "policy.json").is_file():
+            os.environ["TRADINGAGENTS_FORWARD_OBSERVATION_ROOT"] = str(observation_root)
     if args.command in {"run-due", "publish"} and not args.dry_run:
         os.environ["TRADINGAGENTS_LOCAL_PAPER_STATE_DIR"] = str(args.state_dir)
     # Independent lanes never acquire the minute producer lock. Research writes
@@ -932,9 +936,6 @@ def main():
                     if not args.dry_run:
                         from tradingagents.execution.session_observations import scheduled_capture
                         observation_results = scheduled_capture(args.state_dir)
-                        observation_root = args.state_dir / "forward-observation"
-                        if (observation_root / "policy.json").is_file():
-                            os.environ["TRADINGAGENTS_FORWARD_OBSERVATION_ROOT"] = str(observation_root)
                     else:
                         observation_results = []
                     result = run_due(args.archive_dir, args.state_dir, dry_run=args.dry_run)

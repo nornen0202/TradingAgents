@@ -215,8 +215,10 @@ def capture_due(root, *, operations=None, clock=_now, sessions=_schedule, downlo
                     # A crash after SQLite commit may have preceded the consumer file.
                     confirmation_writer(db, root, item, day, stage, json.loads(existing[0]) if existing[0] else None)
                     continue
+                opening_window = stage == "open" and start <= opening + timedelta(seconds=30)
+                cooldown = timedelta(seconds=4) if opening_window else timedelta(minutes=10)
                 if db.execute("""SELECT 1 FROM observation_failures WHERE ticker=? AND session=? AND stage=?
-                                 AND observed_at>?""", (ticker, day, stage, (start-timedelta(minutes=10)).isoformat())).fetchone():
+                                 AND observed_at>?""", (ticker, day, stage, (start-cooldown).isoformat())).fetchone():
                     continue
                 try:
                     if download is None:

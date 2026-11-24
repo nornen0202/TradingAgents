@@ -57,13 +57,34 @@ def test_late_open_and_missing_bar_do_not_produce_authority(tmp_path):
     assert obs.capture_due(tmp_path, clock=lambda: now, download=market_bar)[0]["status"] == "OBSERVED_LATE_OPEN"
     assert not load_session_observations(tmp_path / "confirmations", "069500.KS", "KR")
     day = time(MON + "T15:36:00")
-    empty = lambda *_: market_bar(None, TUE)
-    assert obs.capture_due(tmp_path, clock=lambda: day, download=empty)[0]["status"] == "SOURCE_UNVERIFIED"
+    future = lambda *_: market_bar(None, TUE)
+    assert obs.capture_due(tmp_path, clock=lambda: day, download=future)[0]["status"] == "SOURCE_UNVERIFIED"
     assert not obs.capture_due(tmp_path, clock=lambda: day + timedelta(seconds=30),
                                download=lambda *_: pytest.fail("failure backoff"))
     assert obs.capture_due(tmp_path, clock=lambda: day + timedelta(minutes=11), download=market_bar)
     receipt = load_session_observations(tmp_path / "confirmations", "069500.KS", "KR")
     assert "official_open" not in receipt and "regular_close" in receipt
+
+
+@pytest.mark.parametrize("rows", [[], [{}], [{"stck_bsop_date": "20260230"}]])
+def test_empty_missing_or_invalid_session_rows_never_publish(tmp_path, rows):
+    policy(tmp_path)
+    opened = time(MON + "T09:00:00")
+    assert obs.capture_due(tmp_path, clock=lambda: opened,
+                           download=lambda *_: {"output2": rows})[0]["status"] == "SOURCE_UNVERIFIED"
+    assert not load_session_observations(tmp_path / "confirmations", "069500.KS", "KR")
+
+
+def test_opening_retry_can_recover_before_proof_deadline(tmp_path):
+    policy(tmp_path)
+    opened = time(MON + "T09:00:00")
+    assert obs.capture_due(tmp_path, clock=lambda: opened, download=lambda *_: {"output2": []})
+    early = opened + timedelta(seconds=2)
+    assert not obs.capture_due(tmp_path, clock=lambda: early, download=lambda *_: pytest.fail("backoff"))
+    retry = opened + timedelta(seconds=10)
+    assert obs.capture_due(tmp_path, clock=lambda: retry, download=market_bar)[0]["status"] == "OBSERVED"
+    proof = load_session_observations(tmp_path / "confirmations", "069500.KS", "KR")
+    assert datetime.fromisoformat(proof["official_open"]["observed_at"]) == retry
 
 
 def test_modifies_neither_orders_nor_scope_and_uses_only_unadjusted_routes():
@@ -106,3 +127,24 @@ def test_observation_transport_paces_only_exact_demo_quotes(monkeypatch):
     with pytest.raises(obs.DemoError):
         client.request("GET", obs.DEMO_HOST + path, headers={"tr_id": "wrong"}, allow_redirects=False)
     assert calls == ["paced", ("GET", obs.DEMO_HOST + path)]
+
+
+def test_independent_research_command_inherits_capture_root(tmp_path, monkeypatch):
+    import os
+    import sys
+    from tradingagents import local_automation
+    from tradingagents.execution import research_runtime
+
+    root = tmp_path / "state" / "forward-observation"
+    policy(root)
+    monkeypatch.delenv("TRADINGAGENTS_FORWARD_OBSERVATION_ROOT", raising=False)
+    monkeypatch.setattr(local_automation, "prepare_environment", lambda: None)
+    monkeypatch.setattr(obs, "capture_due", lambda *a, **k: pytest.fail("Research should not collect broker quotes."))
+    def research(*args, **kwargs):
+        assert os.environ["TRADINGAGENTS_FORWARD_OBSERVATION_ROOT"] == str(root)
+        return []
+    monkeypatch.setattr(research_runtime, "research_due", research)
+    monkeypatch.setattr(sys, "argv", ["local_automation", "research-kis",
+        "--archive-dir", str(tmp_path / "archive"), "--state-dir", str(root.parent),
+        "--runtime-dir", str(tmp_path / "runtime")])
+    assert local_automation.main() == 0
