@@ -63,3 +63,18 @@ def test_korean_supplemental_holiday_does_not_create_a_missing_bar():
                                               as_of="2026-07-20T06:31:00+00:00")
     assert [row["date"] for row in rows] == ["2026-07-16", "2026-07-20"]
     assert evidence["state"] == "available" and evidence["missing_sessions"] == 0
+
+
+def test_transient_yahoo_failure_retries_and_only_the_success_is_cached(tmp_path):
+    from unittest.mock import Mock
+
+    source = Mock()
+    source.history.side_effect = [TimeoutError("timed out"), _data(["2025-11-26"], [100])]
+    source.get_history_metadata.return_value = {"symbol": "SPY", "currency": "USD", "exchangeName": "PCX"}
+    with (patch("yfinance.Ticker", return_value=source),
+          patch("tradingagents.dataflows.stockstats_utils.time.sleep")):
+        options = {"as_of": "2025-11-26T22:00:00+00:00", "cache_dir": tmp_path}
+        result, evidence = load_yahoo_benchmark("SPY", "USD", date(2025, 11, 26), date(2025, 11, 26), **options)
+        later, cached = load_yahoo_benchmark("SPY", "USD", date(2025, 11, 26), date(2025, 11, 26), **options)
+    assert source.history.call_count == 2 and result == later
+    assert evidence["input_origin"] == "fresh" and cached["input_origin"] == "cache"
