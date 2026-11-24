@@ -7,6 +7,7 @@ import pytest
 
 from tradingagents.dataflows import alpha_vantage_fundamentals as av
 from tradingagents.dataflows import interface, sec_edgar_statements as sec, y_finance, yfinance_news as news
+from tradingagents.dataflows.config import run_config
 from tradingagents.dataflows.stockstats_utils import filter_financials_by_date
 from tradingagents.dataflows.vendor_exceptions import VendorInputError, VendorTransientError
 
@@ -95,6 +96,22 @@ def test_sec_uses_latest_revision_known_by_analysis_date(monkeypatch):
     assert "2020-04-01" not in before
     assert "Total Assets (USD millions),2.000" in after
     assert "2020-03-31" not in after  # a 10-Q is not a fiscal year
+
+
+@pytest.mark.parametrize(("as_of", "expected"), [
+    ("2024-11-01T05:59:00-04:00", "1.000"),
+    ("2024-11-02T00:05:00Z", "1.000"),  # still November 1 in New York
+    ("2024-11-02T04:00:00Z", "2.000"),
+    ("2024-11-01", "2.000"),  # the date-only operating contract represents that day's close of evidence
+])
+def test_routed_sec_statement_preserves_intraday_filing_boundary(monkeypatch, as_of, expected):
+    fixture_facts(monkeypatch, {"Assets": {"units": {"USD": [
+        fact(1_000_000, filed="2024-10-30"),
+        fact(2_000_000, filed="2024-11-01"),
+    ]}}})
+    with run_config({"analysis_as_of": as_of, "tool_vendors": {"get_balance_sheet": "sec_edgar"}}):
+        report = interface.route_to_vendor("get_balance_sheet", "AAPL", "annual", "2024-11-01")
+    assert f"Total Assets (USD millions),{expected}" in report
 
 
 def test_sec_ytd_cashflow_and_productive_asset_capex_are_labeled(monkeypatch):
