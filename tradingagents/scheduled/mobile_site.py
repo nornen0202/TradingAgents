@@ -209,6 +209,8 @@ def build_mobile_site(
     site_dir: Path,
     archive_dir: Path,
     public_base_url: str = "",
+    refresh_research_prices: bool = False,
+    as_of: datetime | None = None,
 ) -> dict[str, Any]:
     """Build the public research hub and a plaintext, action-only strategy view.
 
@@ -219,7 +221,8 @@ def build_mobile_site(
     site_root = Path(site_dir)
     mobile_root = site_root / "mobile"
     mobile_root.mkdir(parents=True, exist_ok=True)
-    generated_at = datetime.now().astimezone().isoformat()
+    plan_clock = as_of or datetime.now().astimezone()
+    generated_at = plan_clock.isoformat()
 
     public_payload = {
         "schema": MOBILE_SCHEMA,
@@ -237,9 +240,8 @@ def build_mobile_site(
     for market in MARKETS:
         public_packet = _read_public_work_packet(site_root, market)
         if not public_packet:
-            public_packet = build_surface_packet(market, archive_dir=archive_dir, public=True)
-        private_packet = build_surface_packet(market, archive_dir=archive_dir, public=False)
-        plan_clock = datetime.fromisoformat(generated_at)
+            public_packet = build_surface_packet(market, archive_dir=archive_dir, public=True, now=plan_clock)
+        private_packet = build_surface_packet(market, archive_dir=archive_dir, public=False, now=plan_clock)
         public_payload["markets"][market] = _public_market_payload(public_packet, as_of=plan_clock)
         market_payload = _private_market_payload(private_packet, as_of=plan_clock)
         integrated_report = _load_latest_work_report(
@@ -280,6 +282,9 @@ def build_mobile_site(
             plan_sources.get("account_snapshot"), market_payload["trade_plan"],
             now=plan_clock,
         )
+        from tradingagents.scheduled.strategy_research import attach_research_plans
+
+        attach_research_plans(archive_dir, market_payload, now=plan_clock, refresh_prices=refresh_research_prices)
         strategy_payload["markets"][market] = market_payload
 
     public_payload = _normalize_mobile_machine_values(public_payload)
@@ -1588,6 +1593,10 @@ dd { margin: 0; text-align: right; overflow-wrap: anywhere; font-size: .88rem; }
 .plan-phase { display: block; margin-bottom: 4px; font-size: .72rem; color: var(--accent); }
 .plan-price > .plan-part:only-child > .plan-phase, .plan-amount > .plan-part:only-child > .plan-phase, .plan-check > .plan-part:only-child > .plan-phase { display: none; }
 .plan-status { display: block; color: var(--warn); font-size: .76rem; }
+.research-plan { margin: 12px 0; padding: 12px; border: 1px solid var(--line); border-radius: 10px; overflow-wrap: anywhere; }
+.research-plan h4 { margin: 0 0 8px; }
+.research-plan li { margin: 7px 0; }
+.research-result { color: var(--accent); }
 .plan-condition { display: block; margin-top: 6px; color: var(--text); font-size: .77rem; }
 .plan-details { margin-top: 4px; }
 .plan-details summary { padding: 5px 0; font-size: .74rem; color: var(--accent); }
@@ -2055,6 +2064,12 @@ _PRIVATE_JS = READER_JS + r"""
     return score;
   }
   function analysisDirection(row, strategy) {
+    const plan = row.research_plan;
+    if (plan && plan.status === 'DATED_PLAN') {
+      const thesis = plan.thesis || {};
+      const entry = [thesis.conditional_entry_action, thesis.entry_action].some((value) => ['STARTER', 'ADD'].includes(value));
+      return {text: plan.headline, kind: entry ? 'buy' : actionKind(thesis.stance)};
+    }
     const thesis = strategy.thesis || row.thesis || {};
     const workExecution = strategy.execution || {};
     const action = row.portfolio_action || {};
@@ -2170,6 +2185,53 @@ _PRIVATE_JS = READER_JS + r"""
       humanPlan(action.sell_size_plan),
     ) || '조건 확인 후 전략 방향 재분석';
   }
+  const researchStatus = {MET: '가격 조건 충족', NOT_MET: '가격 조건 미충족', BOUNDARY: '가격 경계값', EVIDENCE_NEEDED: '증빙 필요'};
+  const researchStage = {intraday: '장중', close: '정규장 종가', next_day: '다음 거래일', two_bar: '연속 두 봉'};
+  const zeroPlanReasons = {NO_TRADE_INTENT:'관망·추가 매매 없음', ZERO_ALLOCATION:'추가 배정 없음', CASH_BUFFER_SHORTFALL:'현금 보유 기준 부족', NO_BUYING_POWER:'주문가능금액 없음', ALLOCATION_BELOW_ONE_SHARE:'목표 수량 1주 미만', NO_SELLABLE_WHOLE_SHARE:'매도가능 정수 수량 없음', REMAINING_CASH_BELOW_ONE_SHARE:'잔여 예산 부족'};
+  function researchLevel(level) {
+    const range = level.low != null && level.high != null ? `${fmt(level.low)}~${fmt(level.high)}` : fmt(level.price);
+    return `${level.label || '원분석 가격선'} ${range}${level.currency ? ' ' + level.currency : ''}`;
+  }
+  function researchQuote(quote) {
+    if (!quote) return '';
+    const label = {REGULAR_CLOSE: '정규장 확정 종가', REGULAR_QUOTE: '정규장 관측', DELAYED_REGULAR_QUOTE: '정규장 지연 관측', HISTORICAL_REGULAR_QUOTE: '이전 정규장 관측'}[quote.kind];
+    const delay = quote.kind === 'DELAYED_REGULAR_QUOTE' ? ` · ${Math.floor(quote.age_seconds / 60)}분 지연` : '';
+    return `${label || '관측 가격'} ${planMoney(quote.price, quote.currency)} · ${dateTime(quote.event_at)} · ${quote.source} ${quote.exchange || ''} · ${quote.currency} 비수정${delay}`;
+  }
+  function researchDetails(plan) {
+    if (!plan) return '';
+    const missing = (plan.missing || []).map((line) => `<li>${esc(line)}</li>`).join('');
+    if (plan.status !== 'DATED_PLAN') return `<section class="research-plan"><h4>${esc(plan.headline)}</h4><ul>${missing}</ul></section>`;
+    const thesis = plan.thesis;
+    const lineage = plan.lineage || {};
+    const origin = {FULL: '정규 신규 분석', REUSED_FULL: '정규 분석 재사용', DATED_ARCHIVE_REFERENCE: '날짜가 있는 아카이브 판단'}[lineage.status];
+    const line = (label, value) => value ? `<p><strong>${esc(label)}</strong><br>${esc(value)}</p>` : '';
+    const rules = (plan.ordered_rules || []).map((rule) => `<li><strong>${esc(rule.label)}</strong><br>${esc(rule.text)}</li>`).join('');
+    const checks = (plan.price_checks || []).map((check) => {
+      const level = check.level || {};
+      return `<li><strong>${esc(researchLevel(level))}</strong>`
+        + ` · ${esc(researchStage[level.confirmation] || '확인 방식 확인')}${check.group ? ' · 그룹 ' + esc(check.group) : ''}<br>`
+        + `<span class="research-result">${esc(researchStatus[check.status])}</span> ${esc(researchQuote(check.observation))}`
+        + (check.intraday_reference ? `<br>${esc(researchQuote(check.intraday_reference.observation))} · 장중 가격만 대조 · ${esc(researchStatus[check.intraday_reference.status])}` : '')
+        + (check.needed ? `<br>${esc(check.needed_session ? check.needed_session + ' · ' : '')}${esc(check.needed)}` : '')
+        + (check.preceding_price_session ? `<br>선행 종가의 가격 대조일 ${esc(check.preceding_price_session)} · 원문의 선행 조건도 확인` : '')
+        + (level.source_text ? `<br>${esc(level.source_text)}` : '') + (level.volume_rule ? `<br>거래량 조건 ${esc(level.volume_rule)}` : '') + '</li>';
+    }).join('');
+    const quote = researchQuote(plan.observation || plan.last_observation);
+    const close = researchQuote(plan.completed_close);
+    return `<section class="research-plan" aria-label="수일에서 수주 투자 계획"><h4>수일~수주 투자 계획</h4>
+      <p class="research-lineage">${esc(origin)} · 원등급 ${esc(thesis.rating)} · 판단 ${esc(dateTime(thesis.analysis_asof))} · 가격 기준일 ${esc(thesis.price_reference_date || '-')}</p>
+      ${line(plan.observation ? '보고서 비교 시세' : '마지막 관측', quote)}${close && close !== quote ? line('직전 완료 세션', close) : ''}
+      ${line('신규 편입', plan.headline)}${line('보유자 위험관리', plan.holder_summary)}
+      ${line('원분석 편입 근거', fullConditions(thesis.rationale))}${line('원분석 보유 판단 근거', thesis.risk_action_reason)}
+      ${line('촉매와 관찰 항목', fullConditions(thesis.catalysts, thesis.observation_conditions))}
+      ${line('감축·철회', fullConditions(thesis.invalidation_conditions, thesis.invalidation_action))}
+      <p>편집상 검토일 ${esc(dateTime(plan.review_by))}${plan.review_due ? ' · 검토 기한 도래' : ''}${plan.source_valid_until ? ` · 원 신호 만료 ${esc(dateTime(plan.source_valid_until))}${plan.source_expired ? ' · 만료됨' : ''}${Number.isInteger(plan.remaining_trading_days) ? ' · 남은 정규장 종가 ' + esc(plan.remaining_trading_days) + '회' : ''}` : ''}</p>
+      ${rules ? `<details><summary>원분석 확인 순서·조건</summary><ol>${rules}</ol></details>` : ''}
+      ${checks ? `<details><summary>가격선별 관측 대조 · ${esc(plan.compared_price_count)}건 판정</summary><ol>${checks}</ol></details>` : ''}
+      ${missing ? `<details><summary>추가로 확인할 자료</summary><ul>${missing}</ul></details>` : ''}
+    </section>`;
+  }
   function card(row, market, topTickers, marketId) {
     const strategy = workStrategy(market, row.ticker);
     const hasWork = Object.keys(strategy).length > 0;
@@ -2181,6 +2243,7 @@ _PRIVATE_JS = READER_JS + r"""
     const role = normalizeRole(row.universe_role || row.portfolio_role, row.is_held === true);
     const baseConclusion = valueText(row.strategy_ko) || (action.action_now ? actionLabel(action.action_now) : '');
     const direction = analysisDirection(row, strategy);
+    const hasDatedPlan = (row.research_plan || {}).status === 'DATED_PLAN';
     const sizingBlocked = planBlocked(market) || readinessSeverity(readiness.code) >= readinessSeverity('RECHECK');
     const executionAction = sizingBlocked ? '현재 주문 없음 · 장중 조건 재확인' : currentExecutionAction(row, action);
     const guidance = accountGuidance(row, action);
@@ -2226,18 +2289,19 @@ _PRIVATE_JS = READER_JS + r"""
     return `<article class="action-card" id="strategy-${esc(marketId)}-${esc(encodeURIComponent(tickerIdentity))}" tabindex="-1" data-ticker="${esc(tickerIdentity)}" data-name="${esc(displayName)}" data-direction="${esc(direction.kind)}" data-search="${esc(`${displayName} ${row.ticker || ''} ${row.sector || ''}`.toLocaleLowerCase())}" data-change="${numeric(row.price_change_pct)}" data-readiness="${esc(readiness.code)}" data-group="${esc(role)}" data-top="${topTickers.has(tickerIdentity) ? 'true' : 'false'}">
       <button type="button" class="back-to-overview">↑ 전략 요약표로</button>
       <div class="card-title"><div><strong>${esc(displayName)} <span class="role-badge">${esc(roleLabel(role))}</span></strong><span class="ticker-code">${esc(row.ticker || '-')}</span></div><span class="row-mode mode-${esc(readiness.code.toLowerCase())}">${esc(readiness.label)}</span></div>
-      <div class="price-line"><strong>${fmt(row.last_price)}</strong><span>입력 시세 ${esc(dateTime(row.market_data_asof))}${sizingBlocked ? ' · 분석 참고' : ''}</span></div>
+      <div class="price-line"><strong>${fmt(row.last_price)}</strong><span>${hasDatedPlan ? '주문 상태의 입력 시세' : '입력 시세'} ${esc(dateTime(row.market_data_asof))}${sizingBlocked ? ' · 분석 참고' : ''}</span></div>
       <div class="private-action" data-direction="${esc(direction.kind)}"><strong>분석 시점 전략 방향</strong><span class="strategy-direction">${esc(direction.text)}</span></div>
+      ${researchDetails(row.research_plan)}
       ${axes}
       <div class="execution-status"><div><strong>현재 실행 상태·행동</strong><span class="row-mode mode-${esc(readiness.code.toLowerCase())}">${esc(readiness.label)}</span></div><span class="execution-action">${esc(executionAction)}</span><p class="readiness-note">${esc(readiness.note)}</p></div>
       ${guidance ? `<div class="account-guidance"><strong>계좌 운용 참고 · 현재 매도 지시와 별개</strong><p>${esc(guidance)}</p></div>` : ''}
       ${signalStrip(row, confidence)}
-      <div class="condition-grid">
+      ${hasDatedPlan ? '' : `<div class="condition-grid">
         <div class="condition-block"><strong>전략 발동 조건</strong><p>${esc(entryCondition)}</p></div>
         <div class="condition-block"><strong>발동 조건 충족 시 행동</strong><p>${esc(triggeredAction)}</p></div>
         <div class="condition-block risk"><strong>위험 대응·무효화 조건</strong><p>${esc(invalidation)}</p></div>
         <div class="condition-block risk"><strong>위험 대응 조건 충족 시 행동</strong><p>${esc(riskAction)}</p></div>
-      </div>
+      </div>`}
       <dl>
         <div><dt>VWAP</dt><dd>${esc(row.vwap_position_ko || '-')}</dd></div>
         <div><dt>상대 거래량</dt><dd>${fmt(row.relative_volume)}배</dd></div>
@@ -2453,6 +2517,7 @@ const groups = ['TOP', 'HOLDING', 'WATCHLIST', 'NEW_CANDIDATE', 'ALL'];
     const direction = entry.querySelector('.strategy-direction').textContent;
     const readiness = entry.querySelector('.card-title .row-mode').textContent;
     const inputPrice = entry.querySelector('.price-line strong').textContent;
+    const research = (item.rows || []).find((row) => tickerKeys(row.ticker)[0] === ticker)?.research_plan;
     let plans = tradePlans(item, ticker);
     const hasPlan = plans.length > 0;
     if (!hasPlan) plans = [{phase: 'OBSERVE', action: 'WAIT', quantity: null, currency: panelCurrency(item), reasons: ['수량·가격 계획 자료를 다시 생성해야 합니다.'], conditions: []}];
@@ -2461,20 +2526,23 @@ const groups = ['TOP', 'HOLDING', 'WATCHLIST', 'NEW_CANDIDATE', 'ALL'];
     const planRecheck = (plan) => hasPlan && (rowBlocked || (plan.phase !== 'OBSERVE' && (plan.status === 'RECHECK' || !(sourceTime(plan.valid_until) > Date.now()))));
     const withheld = '<strong class="plan-value">표시 보류</strong>';
     let quantities = planParts(plans, (plan) => {
-      if (planRecheck(plan)) return withheld;
+      if (planRecheck(plan)) {
+        const reason = research && zeroPlanReasons[plan.zero_reason_code];
+        return withheld + (reason ? '<small>입력 계좌 기준 · ' + esc(reason) + '</small>' : '');
+      }
       const qty = numeric(plan.quantity);
       const valid = Number.isInteger(qty) && qty >= 0;
-      const labels = {NO_TRADE_INTENT:'관망·추가 매매 없음', ZERO_ALLOCATION:'추가 배정 없음', CASH_BUFFER_SHORTFALL:'현금 보유 기준 부족', NO_BUYING_POWER:'주문가능금액 없음', ALLOCATION_BELOW_ONE_SHARE:'목표 수량 1주 미만', NO_SELLABLE_WHOLE_SHARE:'매도가능 정수 수량 없음', REMAINING_CASH_BELOW_ONE_SHARE:'잔여 예산 부족'};
       const lot = plan.minimum_lot_review;
       const revision = plan.quantity_revision;
-      return '<strong class="plan-value">' + (valid ? esc(fmt(qty)) + '주' : '산출 보류') + '</strong><small>' + esc(valid && qty === 0 ? labels[plan.zero_reason_code] || plan.status_label || '추가 거래 없음' : '입력 계좌 기준 검토 수량') + '</small>'
+      return '<strong class="plan-value">' + (valid ? esc(fmt(qty)) + '주' : '산출 보류') + '</strong><small>' + esc(valid && qty === 0 ? zeroPlanReasons[plan.zero_reason_code] || plan.status_label || '추가 거래 없음' : '입력 계좌 기준 검토 수량') + '</small>'
         + (revision && revision.revised_quantity > 0 ? '<small>원목표 ' + esc(Number(revision.target_shares).toFixed(3)) + '주 → ' + esc(fmt(revision.revised_quantity)) + '주 · 보유 ' + esc((revision.holding_fraction * 100).toFixed(1)) + '% 감축' + (revision.full_exit ? ' · 전량 매도' : '') + '</small><small>' + (revision.risk_reduction ? '위험 축소 최소 단위' : '익절·조정 정수 배분') + ' · 조건 확인 후 검토</small>' : '')
         + (lot ? '<details class="plan-lot-review"><summary>최소 단위 1주 비교</summary><small>보유량의 ' + esc((Number(lot.holding_fraction) * 100).toFixed(1)) + '% · 거래대금 ' + esc(planMoney(lot.gross_amount, lot.currency)) + '</small><small>배정액 초과 ' + esc(planMoney(lot.allocation_excess_krw, 'KRW')) + (lot.below_min_trade ? ' · 최소 거래금액 미달' : '') + '</small><small>별도 감축 결정 필요 · 주문 수량에 포함되지 않음</small></details>' : '');
     });
     const rotation = item.funded_rebalance || {};
     const rotationLeg = [...(rotation.sell_legs || []), ...(rotation.buy_legs || [])].find((leg) => tickerKeys(leg.ticker).some((key) => tickerKeys(ticker).includes(key)));
     if (rotationLeg && !sizingBlocked) quantities += '<small class="funded-quantity"><a href="#funded-' + esc(String(rotation.market).toLowerCase()) + '">별도 교체안 ' + esc(rotationLeg.side === 'SELL' ? '매도 ' : '매수 ') + esc(rotationLeg.quantity) + '주</a> · 위 계획과 합산 금지</small>';
-    const prices = planParts(plans, (plan) => planRecheck(plan) ? withheld : '<strong class="plan-value">' + esc(planPrice(plan)) + '</strong><small>' + esc(['TRIGGER', 'TRIGGER_RANGE', 'REFERENCE'].includes(plan.price_kind) ? '발동 기준 · 체결 범위 아님' : plan.price_kind === 'NONE' ? '추가 거래 계획 없음' : '분석의 가격 범위') + '</small>' + (plan.price_confirmation ? '<small>확인 방식: ' + esc(({close:'종가 확인', intraday:'장중 확인', two_bar:'2개 봉 확인'})[String(plan.price_confirmation).toLowerCase()] || plan.price_confirmation) + '</small>' : ''));
+    const observation = researchQuote(research?.observation || research?.last_observation);
+    const prices = (observation ? '<small>투자 검토 · ' + esc(observation) + '</small>' : '') + planParts(plans, (plan) => planRecheck(plan) ? withheld : '<strong class="plan-value">' + esc(planPrice(plan)) + '</strong><small>' + esc(['TRIGGER', 'TRIGGER_RANGE', 'REFERENCE'].includes(plan.price_kind) ? '발동 기준 · 체결 범위 아님' : plan.price_kind === 'NONE' ? '추가 거래 계획 없음' : '분석의 가격 범위') + '</small>' + (plan.price_confirmation ? '<small>확인 방식: ' + esc(({close:'종가 확인', intraday:'장중 확인', two_bar:'2개 봉 확인'})[String(plan.price_confirmation).toLowerCase()] || plan.price_confirmation) + '</small>' : ''));
     const amounts = planParts(plans, (plan) => {
       if (planRecheck(plan)) return withheld;
       const amount = plan.estimated_net_cash ?? plan.estimated_gross_high;
@@ -2484,7 +2552,14 @@ const groups = ['TOP', 'HOLDING', 'WATCHLIST', 'NEW_CANDIDATE', 'ALL'];
       const funding = plan.one_share_funding;
       return '<strong class="plan-value">' + esc(planMoney(Number.isFinite(numeric(amount)) ? Math.abs(Number(amount)) : null, plan.currency)) + '</strong><small>' + esc(label) + (Number.isFinite(fee) ? ' · 수수료·거래세 ' + esc(planMoney(fee, plan.currency)) : '') + '</small>' + (funding && plan.quantity === 0 ? '<small>1주 필요자금 ' + esc(planMoney(funding.required_krw, 'KRW')) + '</small><small>매수 예산 부족 ' + esc(planMoney(funding.cash_shortfall_krw, 'KRW')) + ' · 배정 부족 ' + esc(planMoney(funding.allocation_shortfall_krw, 'KRW')) + '</small>' : '');
     });
-    const conditions = planParts(plans, (plan) => {
+    const checks = research?.price_checks || [];
+    const thesis = research?.thesis || {};
+    const wantsEntry = ['STARTER', 'ADD'].includes(thesis.conditional_entry_action);
+    const focus = (wantsEntry ? checks.find((check) => check.level.level_type === 'BREAKOUT' && check.level.confirmation === 'close') :
+      checks.find((check) => ['TRIM', 'STOP_LOSS', 'INVALIDATION'].includes(check.level.level_type) && check.observation))
+      || checks.find((check) => check.observation) || checks[0];
+    const conditions = (research && research.status === 'DATED_PLAN'
+      ? `<small>${esc(research.holder_summary)}${focus ? '<br>' + esc(researchLevel(focus.level)) + ' · ' + esc(researchStatus[focus.status]) : ''}</small>` : '') + planParts(plans, (plan) => {
       const quantity = numeric(plan.quantity);
       const recheck = planRecheck(plan);
       const current = entry.dataset.readiness === 'READY' && plan.phase === 'NOW' && quantity > 0 && plan.status === 'CONDITIONAL' && !recheck;
