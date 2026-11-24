@@ -7,7 +7,10 @@ from datetime import date, datetime, timezone
 import hashlib
 import json
 import math
+import os
+from pathlib import Path
 import re
+import sqlite3
 from threading import Lock
 
 import pandas as pd
@@ -16,6 +19,7 @@ import pandas as pd
 SCHEMA = "tradingagents.daily-history-evidence/v1"
 LIMITATION = "Retrieved adjusted prices are not a verified historical snapshot vintage."
 _ACTIVE = ContextVar("daily_history_evidence", default=None)
+_CAPTURE_APPLICATION = 0x54414843
 
 
 def _day(value):
@@ -25,6 +29,10 @@ def _day(value):
 
 
 def _snapshot(symbol, end_date, source, frame):
+    return _snapshot_with_series(symbol, end_date, source, frame)[0]
+
+
+def _snapshot_with_series(symbol, end_date, source, frame):
     # Source-only routes cannot invent an observation clock or snapshot hash.
     entry = {"symbol": symbol, "source": source, "requested_end": end_date,
              "status": "UNVERIFIED", "historical_vintage_verified": False,
@@ -36,7 +44,7 @@ def _snapshot(symbol, end_date, source, frame):
             raise ValueError("Future requested date")
         if frame is None:
             entry["reason"] = "selected_source_without_snapshot"
-            return entry
+            return entry, None
         if not isinstance(frame, pd.DataFrame) or frame.empty:
             raise ValueError("Missing snapshot rows")
         from .us_daily_history import SOURCE
@@ -82,7 +90,8 @@ def _snapshot(symbol, end_date, source, frame):
                 or (values["High"] < values[["Open", "Low", "Close"]].max(axis=1)).any()
                 or (values["Low"] > values[["Open", "High", "Close"]].min(axis=1)).any()):
             raise ValueError("Unverified snapshot prices")
-        digest = hashlib.sha256(frame.to_csv(index=False).encode("utf-8")).hexdigest()
+        series_bytes = frame.to_csv(index=False).encode("utf-8")
+        digest = hashlib.sha256(series_bytes).hexdigest()
         if attrs.get("series_sha256") != digest:
             raise ValueError("Snapshot content hash mismatch")
         if alpaca_metadata:
@@ -118,7 +127,7 @@ def _snapshot(symbol, end_date, source, frame):
         if unknown_yahoo_clock:
             entry.update(reason="price_observation_clock_unverified", provider="yfinance", identity_provider="KIS",
                          identity_verified_at=verified.isoformat(), listing_contract=listing)
-            return entry  # Local identity verification does not create a vendor price-collection clock.
+            return entry, None  # Local identity verification does not create a vendor price-collection clock.
         entry.update(status="VERIFIED_RETRIEVED_SERIES", provider=attrs["provider"], exchange=attrs["exchange"],
                      adjustment=attrs["adjustment"], observed_at=observed.isoformat(), requested_start=start.isoformat(),
                      first_session=dates.min().date().isoformat(), last_session=dates.max().date().isoformat(),
@@ -131,18 +140,68 @@ def _snapshot(symbol, end_date, source, frame):
                 entry["identity_provider"] = "KIS"
                 entry["identity_verified_at"] = verified.isoformat()
         entry["snapshot_id"] = hashlib.sha256(json.dumps(entry, sort_keys=True).encode()).hexdigest()
+        return entry, series_bytes
     except (ValueError, TypeError, KeyError, AttributeError, OverflowError):
         # Preserve the failed verification without promoting untrusted values
         # to verified evidence, leaking provider payloads, or changing approval.
         entry["reason"] = "snapshot_metadata_or_content_unverified"
-    return entry
+    return entry, None
+
+
+class DailyHistoryCapture:
+    """Retain the exact verified series and its acquisition receipt locally."""
+
+    def __init__(self, path: Path, run_id: str):
+        self.path = Path(path)
+        self.run_id = run_id
+
+    def append(self, entry, series):
+        now = datetime.now(timezone.utc)
+        if (hashlib.sha256(series).hexdigest() != entry["series_sha256"]
+                or datetime.fromisoformat(entry["observed_at"]) > now):
+            raise ValueError("Series and acquisition clock must match the verified receipt")
+        encoded = json.dumps(entry, sort_keys=True, ensure_ascii=False)
+        self.path.parent.mkdir(parents=True, exist_ok=True)
+        try:
+            fd = os.open(self.path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+        except FileExistsError:
+            pass
+        else:
+            os.close(fd)
+        db = sqlite3.connect(self.path, timeout=5)
+        try:
+            with db:
+                db.execute("BEGIN IMMEDIATE")
+                application = db.execute("PRAGMA application_id").fetchone()[0]
+                if application != _CAPTURE_APPLICATION:
+                    if application or db.execute("SELECT 1 FROM sqlite_master LIMIT 1").fetchone():
+                        raise ValueError("Capture database must use a dedicated file")
+                    db.execute(f"PRAGMA application_id = {_CAPTURE_APPLICATION}")
+                db.execute("""CREATE TABLE IF NOT EXISTS daily_history_captures(
+                    run_id TEXT NOT NULL, snapshot_id TEXT NOT NULL, captured_at TEXT NOT NULL,
+                    receipt TEXT NOT NULL, series BLOB NOT NULL, PRIMARY KEY(run_id, snapshot_id)
+                )""")
+                db.execute("""CREATE TRIGGER IF NOT EXISTS daily_history_no_update
+                    BEFORE UPDATE ON daily_history_captures BEGIN SELECT RAISE(ABORT, 'Capture is append-only'); END""")
+                db.execute("""CREATE TRIGGER IF NOT EXISTS daily_history_no_delete
+                    BEFORE DELETE ON daily_history_captures BEGIN SELECT RAISE(ABORT, 'Capture is append-only'); END""")
+                prior = db.execute("SELECT receipt, series FROM daily_history_captures WHERE run_id=? AND snapshot_id=?",
+                                   (self.run_id, entry["snapshot_id"])).fetchone()
+                if prior is None:
+                    db.execute("INSERT INTO daily_history_captures VALUES (?,?,?,?,?)",
+                               (self.run_id, entry["snapshot_id"], now.isoformat(), encoded, series))
+                elif prior != (encoded, series):
+                    raise ValueError("Existing capture differs from the verified snapshot")
+        finally:
+            db.close()
 
 
 class DailyHistoryEvidenceRecorder:
     """One ticker's receipts shared by copied child contexts, retained on error."""
 
-    def __init__(self, ticker):
+    def __init__(self, ticker, *, capture=None):
         self.ticker = ticker
+        self._capture = capture
         self._entries = {}
         self._lock = Lock()
 
@@ -158,8 +217,19 @@ class DailyHistoryEvidenceRecorder:
             return
         with self._lock:
             key = (symbol, end_date, source)
-            if key not in self._entries:
-                self._entries[key] = _snapshot(symbol, end_date, source, frame)
+            prior = self._entries.get(key)
+            if prior is not None and prior.get("forward_capture") != "WRITE_FAILED":
+                return
+            entry, series = _snapshot_with_series(symbol, end_date, source, frame)
+            if prior is not None and entry.get("snapshot_id") != prior["snapshot_id"]:
+                return
+            if self._capture is not None and series is not None:
+                try:
+                    self._capture.append(entry, series)
+                    entry["forward_capture"] = "STORED"
+                except (OSError, sqlite3.Error, ValueError):
+                    entry["forward_capture"] = "WRITE_FAILED"
+            self._entries[key] = entry
 
     def receipt(self):
         with self._lock:
