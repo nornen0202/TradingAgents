@@ -137,7 +137,7 @@ def test_independent_research_command_inherits_capture_root(tmp_path, monkeypatc
 
     root = tmp_path / "state" / "forward-observation"
     policy(root)
-    monkeypatch.delenv("TRADINGAGENTS_FORWARD_OBSERVATION_ROOT", raising=False)
+    monkeypatch.setenv("TRADINGAGENTS_FORWARD_OBSERVATION_ROOT", "")
     monkeypatch.setattr(local_automation, "prepare_environment", lambda: None)
     monkeypatch.setattr(obs, "capture_due", lambda *a, **k: pytest.fail("Research should not collect broker quotes."))
     def research(*args, **kwargs):
