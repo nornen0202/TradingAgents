@@ -197,4 +197,3 @@ def test_latest_partial_research_reuses_true_origin_and_keeps_old_failed_ticker(
     thesis = thesis_for(plans[a][1])
     assert thesis["rating"] == thesis["stance"] == "HOLD"
     assert thesis["conditional_entry_action"] == "STARTER"
-

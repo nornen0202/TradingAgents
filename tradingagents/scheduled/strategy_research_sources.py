@@ -215,4 +215,3 @@ def thesis_for(origin):
         "invalidation_conditions": decision.get("invalidators") or [], "invalidation_action": decision.get("exit_logic"),
         "horizon": decision.get("time_horizon"),
     }
-

@@ -2222,8 +2222,9 @@ _PRIVATE_JS = READER_JS + r"""
     return `<section class="research-plan" aria-label="수일에서 수주 투자 계획"><h4>수일~수주 투자 계획</h4>
       <p class="research-lineage">${esc(origin)} · 원등급 ${esc(thesis.rating)} · 판단 ${esc(dateTime(thesis.analysis_asof))} · 가격 기준일 ${esc(thesis.price_reference_date || '-')}</p>
       ${line(plan.observation ? '보고서 비교 시세' : '마지막 관측', quote)}${close && close !== quote ? line('직전 완료 세션', close) : ''}
-      ${line('신규 편입', plan.headline)}${line('보유자 위험관리', fullConditions(plan.holder_summary, thesis.risk_action_reason))}
-      ${line('판단 근거', fullConditions(thesis.rationale))}${line('촉매와 관찰 항목', fullConditions(thesis.catalysts, thesis.observation_conditions))}
+      ${line('신규 편입', plan.headline)}${line('보유자 위험관리', plan.holder_summary)}
+      ${line('원분석 편입 근거', fullConditions(thesis.rationale))}${line('원분석 보유 판단 근거', thesis.risk_action_reason)}
+      ${line('촉매와 관찰 항목', fullConditions(thesis.catalysts, thesis.observation_conditions))}
       ${line('감축·철회', fullConditions(thesis.invalidation_conditions, thesis.invalidation_action))}
       <p>편집상 검토일 ${esc(dateTime(plan.review_by))}${plan.review_due ? ' · 검토 기한 도래' : ''}${plan.source_valid_until ? ` · 원 신호 만료 ${esc(dateTime(plan.source_valid_until))}${plan.source_expired ? ' · 만료됨' : ''}${Number.isInteger(plan.remaining_trading_days) ? ' · 남은 정규장 종가 ' + esc(plan.remaining_trading_days) + '회' : ''}` : ''}</p>
       ${rules ? `<details><summary>원분석 확인 순서·조건</summary><ol>${rules}</ol></details>` : ''}

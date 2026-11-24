@@ -169,4 +169,3 @@ class KisResearchCloses:
                           "adjustment_check": "FID_ORG_ADJ_PRC=0" if market == "KR" else "MODP=1"}
                     for day in sorted(raw.keys() & completed.keys()) if received >= completed[day] + _SETTLE}
         return {}
-

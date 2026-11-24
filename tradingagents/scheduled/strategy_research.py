@@ -292,4 +292,3 @@ def attach_research_plans(archive_dir, market_payload, *, now, refresh_prices=Fa
                    "attempt_run_id": attempt, "origin_run_id": origin[0] if origin else thesis.get("analysis_run_id")}
         row["research_plan"] = _plan(row, thesis, origin, lineage, archive, quotes.get(key), price_loader, now, days,
                                      observation_clock)
-
