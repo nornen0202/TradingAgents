@@ -12,6 +12,7 @@ const number = value => typeof value === "number" && Number.isFinite(value) ? va
 const display = value => value === null || value === undefined ? "확인 불가" : typeof value === "object" ? JSON.stringify(value) : String(value);
 function paragraph(text) { const element=document.createElement("p");element.textContent=text;return element; }
 function unit(value, suffix) { const element=document.createElement("span");element.className="review-unit";element.textContent=number(value)+suffix;return element; }
+function unitText(value, suffix) { return typeof value==="number"&&Number.isFinite(value)?number(value)+suffix:"미수집"; }
 function priceLevelOptions(level, showLabels) {
   return {price:level.price,title:showLabels?level.label:"",axisLabelVisible:showLabels,
     lineStyle:({DOTTED:LightweightCharts.LineStyle.Dotted,SOLID:LightweightCharts.LineStyle.Solid,DASHED:LightweightCharts.LineStyle.Dashed})[level.style] ?? LightweightCharts.LineStyle.Dashed,color:"#90642f"};
@@ -267,7 +268,7 @@ function renderKisStrategy(payload) {
   const states={ACKNOWLEDGED:"접수",OPEN:"미체결",PARTIAL:"부분체결",FILLED:"체결 완료",CANCELLED:"취소 완료",REJECTED:"거절",NOT_SENT:"미전송",BLOCKED:"조건 차단",UNKNOWN:"응답 미확정",UNRESOLVED:"대조 필요"};
   Object.assign(reasons,{SOURCE_EXECUTION_EXPIRED:"실행 원본 유효시간 만료",SOURCE_SIGNALS_EXPIRED_OR_UNDATED:"개별 신호의 시세 시각 만료·미확인",SOURCE_DATA_NOT_EXECUTION_READY:"실행에 필요한 시세·거래상태 자료 미충족",NO_RECENT_COMPLETED_SOURCE:"최근 완료된 분석 원본 없음"});
   const clock=value=>value?new Date(value).toLocaleString("ko-KR",{timeZone:"Asia/Seoul",hour12:false}):"확인 전";
-  target.replaceChildren(paragraph("최근 점검: "+clock(payload.checked_at)+(payload.stale?" · 3분 이상 경과·운영 확인 필요":"")+" · 실계좌 자동 주문 비활성"));
+  target.replaceChildren(paragraph("최근 점검 "+clock(payload.checked_at)+" · 갱신 지연 "+unitText(payload.refresh_lag_seconds,"초")+(payload.stale?" · 운영 확인 필요":"")+" · 실계좌 자동 주문 비활성"));
   if(overview){
     overview.replaceChildren(paragraph("정상 전략의 모의 체결과 검토된 비용을 기준으로 판단합니다. 최근 점검 "+clock(payload.checked_at)+(payload.stale?" · 3분 경과·다시 확인 필요":"")));
     const cards=document.createElement("div");cards.className="overview-cards";
@@ -299,7 +300,11 @@ function renderKisStrategy(payload) {
     caption.textContent="연구 판단·자료·주문·비용 상세 보기";disclosure.append(caption,body);card.append(disclosure);
     body.append(paragraph("정규장 연결 검증: "+(row.gate_passed?"통과":"대기")+" · "+(row.blockers||[]).map(code=>reasons[code]||"운영 확인 필요").join(" / ")));
     const diagnostic=row.source_diagnostics;
-    if(diagnostic?.strategy_rows!==undefined)body.append(paragraph("분석 "+number(diagnostic.strategy_rows)+"종목 · 신선한 관측자료 "+number(diagnostic.execution_ready_rows)+"종목"+(typeof diagnostic.allocated_orders==="number"?" · 보고서 배정 주문 "+number(diagnostic.allocated_orders)+"건":"")+". 시세 준비는 매수·매도 승인이 아닙니다."));
+    if(diagnostic?.strategy_rows!==undefined)body.append(paragraph("분석 "+number(diagnostic.strategy_rows)+"종목 · 새 관측 "+number(diagnostic.fresh_rows)+"종목 · 실행 자료 충족 "+number(diagnostic.execution_ready_rows)+"종목"+(typeof diagnostic.allocated_orders==="number"?" · 보고서 배정 주문 "+number(diagnostic.allocated_orders)+"건":"")));
+    if(diagnostic?.generated_at)body.append(paragraph("원본 생성 "+clock(diagnostic.generated_at)+" · 최신 관측 "+clock(diagnostic.newest_market_data_at)+" · 평가 시 관측 경과 "+unitText(diagnostic.data_age_seconds_at_check,"초")));
+    if(diagnostic?.source_run_id)body.append(paragraph("평가에 사용한 원본 "+diagnostic.source_run_id));
+    const checks=row.admission_counts;
+    if(checks)body.append(paragraph("전략 신호 "+unitText(checks.strategy_signals,"건")+" · 주문 전 검사 "+unitText(checks.candidates_checked,"건")+" · 최신 호가 확인 "+unitText(checks.priced,"건")+" · 현금·수량 충족 "+unitText(checks.cash_and_size_passed,"건")));
     const allocation=row.allocation_diagnostics;
     if(allocation){
       const planningReasons={NO_AUTHORIZED_EXECUTION_ACTION:"실행 엔진의 매수·매도 행동 없음",OUTSIDE_APPROVED_UNIVERSE:"허용 종목 밖",NO_STRATEGY_OWNED_POSITION:"정상 전략 소유 보유분 없음",STRATEGY_POSITION_ALREADY_OPEN:"이미 보유 중인 전략 종목",STRATEGY_OBSERVATION_NOT_EXECUTABLE:"시세 만료·실행 자료 미충족",STRATEGY_LINEAGE_MISMATCH:"연구·실행 계보 불일치",ENTRY_ORIGINAL_RESEARCH_UNVERIFIED:"원래 연구 확인 필요",ENTRY_RESEARCH_DECISION_MISMATCH:"원래 연구와 파생 판단 불일치",ENTRY_NOT_AUTHORIZED_BY_RESEARCH:"원래 연구의 매수 승인 없음",ENTRY_AUTHORIZATION_MISMATCH:"승인 내용 불일치",ENTRY_RESEARCH_EXPIRED:"원래 연구 유효시간 만료",ENTRY_RESEARCH_REVIEW_REQUIRED:"연구 재검토 필요",ENTRY_RESEARCH_EVIDENCE_INCOMPLETE:"필수 연구 자료 미충족",STRATEGY_AUTHORIZATION_EXPIRED:"조건부 승인 만료",SELL_SIZE_REQUIRES_EXPLICIT_ALLOCATION:"매도 수량의 원래 근거 필요",STRATEGY_EVIDENCE_UNVERIFIED:"전략 근거 확인 필요"};
@@ -309,6 +314,8 @@ function renderKisStrategy(payload) {
     const refresh=row.refresh_health;
     const refreshLabels={RETRY_LIMIT_REACHED:"당일 시세 갱신 재시도 한도 소진",LAST_ATTEMPT_FAILED:"최근 시세 갱신 실패",LAST_ATTEMPT_COMPLETED:"최근 시세 갱신 완료 · 연속 신선도는 별도 검증",COMPLETION_UNVERIFIED:"시세 갱신 시작 기록 · 현재 실행 여부와 완료 미확인",PREVIOUS_SESSION:"이전 거래일의 갱신 기록",UNVERIFIED:"시세 갱신 기록 검증 필요",UNAVAILABLE:"시세 갱신 기록 미수집"};
     body.append(paragraph("시세 생산: "+(refreshLabels[refresh?.status]||refreshLabels.UNAVAILABLE)+(refresh?.session_date?" · 거래일 "+refresh.session_date+" · 연속 실패 "+number(refresh.consecutive_failures)+"/"+number(refresh.max_consecutive_failures):"")));
+    if(refresh?.source_run_id)body.append(paragraph("갱신 원본 "+refresh.source_run_id+" · 완료 "+clock(refresh.finished_at)+" · 완료 시 새 관측 "+unitText(refresh.source_diagnostics?.fresh_rows,"종목")));
+    if(refresh?.latest_completed_source_selected===false)body.append(paragraph("이번 평가는 최근 갱신 완료 원본과 다른 자료를 사용했습니다."));
     if(refresh?.error_type==="LocalStorageHeadroomError")body.append(paragraph("마지막 실패 원인은 저장공간 부족입니다. 현재 여유 공간과 다음 정상 생산을 별도로 확인해야 하며, 공간이 늘어도 소진한 재시도 한도는 초기화되지 않습니다."));
     if(diagnostic?.reason_counts?.limited_halt_status)body.append(paragraph("거래정지 상태를 확인하지 못한 종목이 있어 실행이 제한됩니다."));
     const perf=row.performance;
@@ -316,6 +323,9 @@ function renderKisStrategy(payload) {
     const evaluation=row.evaluation;
     if(evaluation){
       const sample=evaluation.sample||{};
+      const counts=row.order_counts||{};
+      body.append(paragraph("현재 상태 · 접수 "+unitText(counts.ACKNOWLEDGED,"건")+" · 미체결 "+unitText(counts.OPEN,"건")+" · 부분체결 "+unitText(counts.PARTIAL,"건")+" · 전량체결 "+unitText(counts.FILLED,"건")+" · 대사 대기 "+unitText(typeof counts.UNKNOWN==="number"&&typeof counts.UNRESOLVED==="number"?counts.UNKNOWN+counts.UNRESOLVED:null,"건")+" · 정산 근거 미확인 "+unitText(evaluation.orders_without_verified_settlement,"건")));
+      body.append(paragraph("성과 관측 기간 "+clock(sample.first_observed_at)+" ~ "+clock(sample.last_observed_at)+" · 실현 손익(비용 전) "+unitText(evaluation.realized_gross_pnl," "+evaluation.currency)+" · 환율 "+(market==="KR"?"원화 표시":"달러 표시 · 환산 근거 확인 전")));
       if(evaluation.cost_evidence_status==="COMPLETE_REVIEWED_IMPORT"){
         body.append(table("검토한 증권사 원문 비용·정산",["거래 통화의 확인 비용","체결 비용 차감 손익","FIFO 청산 비용 / 순손익"],[[number(evaluation.actual_cost)+" "+evaluation.currency,number(evaluation.net_pnl)+" "+evaluation.currency,evaluation.exact_fifo_available?number(evaluation.realized_actual_cost)+" / "+number(evaluation.realized_net_pnl)+" "+evaluation.currency:"체결 순서 미확인"]]));
         body.append(paragraph("자동 비용 API 조회가 아닌 검토된 주문별 원문 import입니다. 수수료·세금·환전·기타 비용의 명시된 금액만 사용합니다. 보유 평가를 원장으로 재현하지 못하면 전체 순손익은 미확인으로 유지합니다."));

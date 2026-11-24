@@ -7,6 +7,7 @@ An idle production tick may recover the independent advisory collectors.
 from __future__ import annotations
 
 import argparse
+from contextlib import ExitStack
 import hashlib
 import importlib.util
 import json
@@ -349,6 +350,7 @@ def run_due(archive, state, *, now=None, dry_run=False, research_only=False, cat
     from tradingagents.scheduled.automation_calendar import automated_market_session_status
     from tradingagents.scheduled.runner import _iter_run_manifests_desc
     from tradingagents.execution.research_runtime import research_lane_enabled
+    from tradingagents.execution.refresh_runtime import execution_lane_enabled, execution_refresh_enabled
 
     now = datetime.now(ZoneInfo("Asia/Seoul")) if now is None else now
     if not isinstance(now, datetime) or now.tzinfo is None or now.utcoffset() is None:
@@ -482,24 +484,28 @@ def run_due(archive, state, *, now=None, dry_run=False, research_only=False, cat
             admission_error = exc
         recovery_note = ({"recovery": "MISSED_WINDOW_CATCHUP", "original_window_start": target.window_start_kst.isoformat()}
                          if catch_up_market else {})
-        atomic_write_json(receipt_path, {"target": target.name, "attempts": attempts + 1,
-                                        "started_at": now.isoformat(), "status": "STARTED", **recovery_note})
-        mode = "full" if target.workflow_file == "daily-codex-analysis.yml" else "overlay_only"
+        mode = "full" if full_target else "overlay_only"
         args = [sys.executable, "-u", "-m", "tradingagents.scheduled", "--config", str(config),
                 "--archive-dir", str(archive), "--run-mode", mode, "--skip-site-build", "--strict",
                 "--label", f"local-scheduler-{profile}-{mode}"]
         if mode == "full":
             args.append("--disable-execution-refresh")
-        else:
-            from tradingagents.execution.refresh_runtime import execution_refresh_enabled
-            if execution_refresh_enabled(state):
-                # Scheduled overlays share the producer lock with between-slot
-                # refreshes: they must not reintroduce multi-minute news/chart
-                # stalls while the explicitly enabled paper lane is operating.
-                args.append("--lightweight-execution-refresh")
+        elif execution_refresh_enabled(state):
+            args.append("--lightweight-execution-refresh")
         stage = "preflight" if mode == "full" else "analysis"
         exit_code, error_type = 1, "WorkerInterrupted"
+        producer = ExitStack()
+        attempt_started = False
         try:
+            if not full_target and execution_lane_enabled(state):
+                try:
+                    producer.enter_context(interprocess_file_lock(state / "execution-refresh.lock", timeout=0))
+                except TimeoutError:
+                    decisions[-1]["status"] = "EXECUTION_PRODUCER_BUSY"
+                    return decisions
+            atomic_write_json(receipt_path, {"target": target.name, "attempts": attempts + 1,
+                                            "started_at": now.isoformat(), "status": "STARTED", **recovery_note})
+            attempt_started = True
             if admission_error is not None:
                 raise admission_error
             require_storage_headroom(archive, state, workspace)
@@ -523,13 +529,15 @@ def run_due(archive, state, *, now=None, dry_run=False, research_only=False, cat
             exit_code, error_type = 1, type(exc).__name__
             raise
         finally:
-            finished = datetime.now(timezone.utc).isoformat()
-            atomic_write_json(receipt_path, {"target": target.name, "attempts": attempts + 1, "started_at": now.isoformat(),
-                                           "finished_at": finished, "exit_code": exit_code,
-                                           "stage": stage, "error_type": error_type if exit_code else None, **recovery_note})
-            if exit_code:
-                from tradingagents.notifications.local import queue_failure
-                queue_failure(state, stage=stage, source_key=key, error_type=error_type, finished_at=finished)
+            producer.close()
+            if attempt_started:
+                finished = datetime.now(timezone.utc).isoformat()
+                atomic_write_json(receipt_path, {"target": target.name, "attempts": attempts + 1, "started_at": now.isoformat(),
+                                               "finished_at": finished, "exit_code": exit_code,
+                                               "stage": stage, "error_type": error_type if exit_code else None, **recovery_note})
+                if exit_code:
+                    from tradingagents.notifications.local import queue_failure
+                    queue_failure(state, stage=stage, source_key=key, error_type=error_type, finished_at=finished)
         # Re-evaluate calendars and archives on the next tick, after a long run.
         return decisions
     if research_only:
@@ -541,7 +549,7 @@ def run_due(archive, state, *, now=None, dry_run=False, research_only=False, cat
             # repair this dependency; avoid rescanning the archive in this tick.
             return decisions
         from tradingagents.execution.refresh_runtime import refresh_due
-        refreshes = refresh_due(archive, state, now=now, dry_run=dry_run)
+        refreshes = [] if execution_lane_enabled(state) else refresh_due(archive, state, now=now, dry_run=dry_run)
         decisions.extend(refreshes)
         if refreshes:
             return decisions
@@ -807,7 +815,7 @@ def complete_handoffs(site, runtime_dir, publication):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("command", choices=("run-due", "publish", "paper", "review", "validate-kis", "strategy-kis", "research-kis"))
+    parser.add_argument("command", choices=("run-due", "publish", "paper", "review", "validate-kis", "strategy-kis", "research-kis", "refresh-kis"))
     parser.add_argument("--archive-dir", type=Path)
     parser.add_argument("--state-dir", type=Path)
     parser.add_argument("--runtime-dir", type=Path)
@@ -848,7 +856,7 @@ def main():
     args.runtime_dir = args.runtime_dir.resolve()
     args.state_dir.mkdir(parents=True, exist_ok=True)
     prepare_environment()
-    if args.command in {"run-due", "research-kis"} and not args.dry_run:
+    if args.command in {"run-due", "research-kis", "refresh-kis"} and not args.dry_run:
         observation_root = args.state_dir / "forward-observation"
         if (observation_root / "policy.json").is_file():
             os.environ["TRADINGAGENTS_FORWARD_OBSERVATION_ROOT"] = str(observation_root)
@@ -856,6 +864,16 @@ def main():
         os.environ["TRADINGAGENTS_LOCAL_PAPER_STATE_DIR"] = str(args.state_dir)
     # Independent lanes never acquire the minute producer lock. Research writes
     # new analyses; existing consumers retain their own broker/state ownership.
+    if args.command == "refresh-kis":
+        from tradingagents.execution.refresh_runtime import execution_lane_enabled, refresh_due
+        try:
+            with interprocess_file_lock(args.state_dir / "execution-refresh.lock", timeout=0):
+                result = (refresh_due(args.archive_dir, args.state_dir, now=datetime.now(timezone.utc), dry_run=args.dry_run)
+                          if execution_lane_enabled(args.state_dir) else [{"status": "REFRESH_LANE_DISABLED"}])
+        except TimeoutError:
+            result = [{"status": "EXECUTION_PRODUCER_BUSY"}]
+        print(json.dumps(result, ensure_ascii=True))
+        return 0
     if args.command == "research-kis":
         from tradingagents.execution.research_runtime import research_due
         try:

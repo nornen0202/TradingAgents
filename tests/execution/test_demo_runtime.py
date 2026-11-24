@@ -60,7 +60,7 @@ class Harness:
         self.price = 70000 if market == "KR" else 200
         self.credentials = DemoCredentials("fixture-key", "fixture-secret", "12345678", "01")
         self.orders, self.calls, self.gate_open = {}, [], True
-        self.lost = self.raise_before = False
+        self.lost = self.lost_cancel = self.raise_before = False
         atomic_write_json(self.root / "enabled.json", {"mode": runtime.MODE, "enabled": True, "real_orders_enabled": False})
         self.source()
 
@@ -96,6 +96,8 @@ class Harness:
             body = kwargs["json"]
             if "ORGN_ODNO" in body:
                 self.orders[body["ORGN_ODNO"]]["cancelled"] = True
+                if self.lost_cancel:
+                    raise TimeoutError("cancellation response lost")
                 return Response({"rt_cd": "0", "output": {"ODNO": "cancel-1", "KRX_FWDG_ORD_ORGNO": "001"}})
             identity = str(len(self.orders) + 1)
             self.orders[identity] = {"body": body, "time": self.now, "filled": 0, "amount": 0, "cancelled": False,
@@ -224,6 +226,50 @@ def test_unknown_response_never_replayed_or_followed_by_new_order(h):
     assert "AMBIGUOUS_ORDER" in again["blockers"]
     assert len(h.orders) == 1
     assert "PRIVATE_TRANSPORT_MESSAGE" not in json.dumps(again)
+
+
+def test_refresh_after_close_reconciles_original_market_session_without_order_post(h):
+    assert h.tick()["orders"][0]["status"] == "ACKNOWLEDGED"
+    h.fill()
+    h.now += timedelta(hours=8)
+    h.calls.clear()
+    final = h.tick(session_resolver=lambda **_: {"source": "exchange_calendars", "is_open": False, "phase": "closed"})
+    assert final["status"] == "MARKET_CLOSED"
+    assert final["orders"][0]["status"] == "FILLED"
+    assert any(method == "GET" for method, _ in h.calls)
+    assert all(method != "POST" or url.endswith("/oauth2/tokenP") for method, url in h.calls)
+
+
+def test_confirmed_cancel_resolves_missing_cancel_ack_without_retransmit(h):
+    h.tick()
+    h.lost_cancel = True
+    h.now += timedelta(minutes=5)
+    assert h.tick()["orders"][0]["cancel_status"] == "UNKNOWN"
+    h.now += timedelta(minutes=1)
+    h.source("fixture-2")
+    final = h.tick()
+    assert final["orders"][0]["status"] == "CANCELLED"
+    assert final["orders"][1]["status"] == "ACKNOWLEDGED"
+    assert sum(method == "POST" and url.endswith("order-rvsecncl") for method, url in h.calls) == 1
+
+
+def test_restart_closes_paper_intent_that_never_reached_wire_journal(h, monkeypatch):
+    from tradingagents.execution.kis_demo import DemoOrderJournal
+    from tradingagents.execution.kis_paper_us import USOrderJournal
+    journal = DemoOrderJournal if h.market == "KR" else USOrderJournal
+
+    def fail_before_wire(*args, **kwargs):
+        raise OSError("worker exited before durable wire intent")
+
+    with monkeypatch.context() as patch:
+        patch.setattr(journal, "submit", fail_before_wire)
+        assert h.tick()["orders"][0]["status"] == "UNKNOWN"
+    assert not h.orders
+    h.now += timedelta(seconds=20)
+    h.source("fixture-2")
+    final = h.tick()
+    assert [o["status"] for o in final["orders"]] == ["NOT_SENT", "ACKNOWLEDGED"]
+    assert len(h.orders) == 1
 
 
 def test_partial_fill_aggregates_once_and_cancel_remainder(tmp_path):

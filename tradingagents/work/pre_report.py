@@ -20,6 +20,7 @@ from tradingagents.scheduled.market_calendar import market_session_state
 from tradingagents.scheduled.runner import execute_scheduled_run
 from tradingagents.dataflows.market_policy import MAX_EXECUTION_AGE, observation_status
 from tradingagents.execution.delivery import handoff_completed_run
+from tradingagents.execution.refresh_runtime import quote_producer_lock_path
 
 from .freshness import aware_datetime
 from .packet import build_surface_packet, resolve_archive_roots, load_json
@@ -195,7 +196,7 @@ def _prepare_market_report_once(runtime, surface: str, *, producer_state_dir: Pa
         if not session.get("is_open"):
             return finish(status="MARKET_CLOSED" if session.get("phase") == "closed" else "CALENDAR_UNVERIFIED",
                           session=session)
-        with producer_lock(state / "run-due.lock"):
+        with producer_lock(quote_producer_lock_path(state)):
             from tradingagents.local_automation import prepare_environment, require_storage_headroom
             prepare_environment()
             archive = resolve_archive_roots(archive_dir=archive_dir)["market"]

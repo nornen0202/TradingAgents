@@ -17,7 +17,7 @@ from typing import Mapping
 from tradingagents.atomic_io import interprocess_file_lock
 from tradingagents.performance.lifecycle import append_lifecycle_event, initialize_lifecycle
 from tradingagents.scheduled.market_calendar import market_session_state
-from .kis_demo import DEMO_HOST, DemoError, DemoOrderJournal
+from .kis_demo import DEMO_HOST, DemoError, DemoOrderJournal, has_unresolved_demo_requests
 from .kis_demo_us import KisDemoUSClient, EXCHANGES, NEW_YORK, SEOUL
 from .kis_paper import _clock, _number, _integer, _broker_number, _stable, _fresh, execution_notional
 from .kis_strategy_limits import broker_policy_fields, validate_buy_nav
@@ -455,7 +455,7 @@ class KisPaperUSBroker:
                 raise DemoError("Legacy VTS requests require a separately reconciled migration")
             if self.db.execute("SELECT 1 FROM paper_intents p LEFT JOIN requests r ON p.id=r.id WHERE r.id IS NULL OR r.status='UNKNOWN'").fetchone():
                 raise DemoError("Resolve ambiguous paper intent before another submission")
-            if self.db.execute("SELECT 1 FROM requests WHERE status='UNKNOWN'").fetchone() or self.db.execute("SELECT 1 FROM reconciliation_issues").fetchone():
+            if has_unresolved_demo_requests(self.db) or self.db.execute("SELECT 1 FROM reconciliation_issues").fetchone():
                 raise DemoError("Resolve ambiguous US VTS request before another submission")
             if not self.db.execute("SELECT 1 FROM lifecycle_events WHERE kind='ACCOUNT_SEED' AND mode='demo'").fetchone():
                 append_lifecycle_event(self.db, event_id="account:demo:" + self.client.credentials.scope(),
