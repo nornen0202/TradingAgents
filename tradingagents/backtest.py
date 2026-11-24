@@ -17,7 +17,7 @@ from tradingagents.atomic_io import atomic_write_bytes, atomic_write_json, inter
 from tradingagents.dataflows.config import run_config
 from tradingagents.dataflows.integrity import safe_symbol
 from tradingagents.default_config import DEFAULT_CONFIG
-from tradingagents.eval.decision_scores import SCHEMA, aggregate, score_decision, settlement_complete
+from tradingagents.eval.decision_scores import SCHEMA, TERMINAL_SCORES, aggregate, score_decision, settlement_complete
 from tradingagents.graph.trading_graph import TradingAgentsGraph
 from tradingagents.portfolio.context import normalize_portfolio
 
@@ -132,6 +132,18 @@ def _rating(value):
 
 def _not_scored(status):
     return {name: {"status": status} for name in ("direction", "new_exposure")}
+
+
+def _failed_settlement(previous):
+    failed = _not_scored("SETTLEMENT_FAILURE")
+    for name, score in previous.items():
+        if score["status"] not in TERMINAL_SCORES:
+            failed[name] = {**score, "status": "SETTLEMENT_FAILURE"}
+        elif name == "new_exposure" and score["status"] == "SCORED" and score.get("benchmark_status") != "AVAILABLE":
+            failed[name] = {**score, "benchmark_status": "SETTLEMENT_FAILURE"}
+        else:
+            failed[name] = score
+    return failed
 
 
 def _published_data(rows, manifest):
@@ -396,7 +408,7 @@ def run_backtest(tickers, dates, config, asset_type="stock", portfolio=None, sel
                             **({"provider": provider} if provider else {}))
                     except Exception as exc:
                         atomic_write_json(attempt / "settlement-error.json", {"error_type": type(exc).__name__})
-                        measured = _not_scored("SETTLEMENT_FAILURE") | prior
+                        measured = _failed_settlement(prior)
                     atomic_write_json(attempt / "settlement.json", {"cutoff": cutoff.isoformat(), "scores": measured})
                     atomic_write_json(scores, measured)
                 for name, score in measured.items():

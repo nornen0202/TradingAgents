@@ -303,3 +303,36 @@ def test_public_api_reports_unsupported_asset_and_date(tmp_path):
     assert graph.propagate("AAPL", DATES[0], portfolio=book, asset_type="stock")["portfolio"] == book
     with pytest.raises(ValueError, match="stock graph"):
         graph.propagate("BTC-USD", DATES[0], asset_type="crypto")
+
+
+@pytest.mark.parametrize("first_clock, exposure_status", [
+    (datetime(2026, 3, 4, 20, 59, tzinfo=timezone.utc), "PENDING"),
+    (datetime(2026, 3, 5, 15, 0, tzinfo=timezone.utc), "SCORED"),
+])
+def test_resume_reports_provider_rate_limit_and_keeps_completed_scores(tmp_path, monkeypatch,
+                                                                      first_clock, exposure_status):
+    from yfinance.exceptions import YFRateLimitError
+
+    graph = graph_with(monkeypatch)
+    args = (["AAPL"], DATES, {"results_dir": str(tmp_path)})
+    opts = dict(run_id="retry-rate-limit", holding_period=2)
+    before = bt.run_backtest(*args, as_of=first_clock, provider=prices, **opts)
+    prior = bt.summarize(before).data["records"][0]
+    assert prior["direction"]["status"] == "PENDING"
+    assert prior["new_exposure"]["status"] == exposure_status
+
+    def rate_limited(*_):
+        raise YFRateLimitError()
+
+    failed = bt.run_backtest(*args, as_of=CUTOFF, provider=rate_limited, **opts)
+    result = bt.summarize(failed).data["records"][0]
+    assert failed.cells_run == 0 and failed.skipped == 1 and failed.settlement_failures
+    assert result["direction"]["status"] == "SETTLEMENT_FAILURE"
+    if exposure_status == "SCORED":
+        assert result["new_exposure"] == prior["new_exposure"]
+    else:
+        assert result["new_exposure"]["status"] == "SETTLEMENT_FAILURE"
+
+    recovered = bt.run_backtest(*args, as_of=CUTOFF, provider=prices, **opts)
+    assert len(graph.calls) == 1 and not recovered.settlement_failures
+    assert bt.summarize(recovered).data["records"][0]["direction"]["status"] == "SCORED"
