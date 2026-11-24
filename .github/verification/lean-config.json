@@ -1,0 +1,30 @@
+{
+  "algorithm-type-name": "Algorithm",
+  "algorithm-language": "Python",
+  "algorithm-location": "/Algorithm/lean_fixture.py",
+  "data-folder": "/Lean/Data",
+  "results-destination-folder": "/Results",
+  "log-handler": "ConsoleLogHandler",
+  "messaging-handler": "QuantConnect.Messaging.Messaging",
+  "job-queue-handler": "QuantConnect.Queues.JobQueue",
+  "api-handler": "QuantConnect.Api.Api",
+  "map-file-provider": "QuantConnect.Data.Auxiliary.LocalDiskMapFileProvider",
+  "factor-file-provider": "QuantConnect.Data.Auxiliary.LocalDiskFactorFileProvider",
+  "data-provider": "QuantConnect.Lean.Engine.DataFeeds.DefaultDataProvider",
+  "object-store": "QuantConnect.Lean.Engine.Storage.LocalObjectStore",
+  "object-store-root": "/tmp/lean-storage",
+  "data-aggregator": "QuantConnect.Lean.Engine.DataFeeds.AggregationManager",
+  "force-exchange-always-open": true,
+  "environment": "backtesting",
+  "environments": {
+    "backtesting": {
+      "live-mode": false,
+      "setup-handler": "QuantConnect.Lean.Engine.Setup.BacktestingSetupHandler",
+      "result-handler": "QuantConnect.Lean.Engine.Results.BacktestingResultHandler",
+      "data-feed-handler": "QuantConnect.Lean.Engine.DataFeeds.FileSystemDataFeed",
+      "real-time-handler": "QuantConnect.Lean.Engine.RealTime.BacktestingRealTimeHandler",
+      "history-provider": "QuantConnect.Lean.Engine.HistoricalData.SubscriptionDataReaderHistoryProvider",
+      "transaction-handler": "QuantConnect.Lean.Engine.TransactionHandlers.BacktestingTransactionHandler"
+    }
+  }
+}

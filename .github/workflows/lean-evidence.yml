@@ -1,0 +1,27 @@
+name: Pinned KIS LEAN engine evidence
+on:
+  push:
+    branches: [codex/kis-lean-engine-evidence]
+permissions:
+  contents: read
+jobs:
+  crosscheck:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      LEAN: quantconnect/lean@sha256:27e11ba21432b23aa661b2f256c778aba3109656e05633e253bd2321548079c4
+      KIS_COMMIT: 74b0a082fa67a0be5bf53f561719c853890ed2df
+      CONVERTER_SHA: 0ea95bb13df4306be7a1452aad964b1de9a5475d63646d890c8591eee7633b20
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.13'
+      - name: Run official converter and pinned engine
+        run: bash .github/verification/lean-hosted.sh
+      - name: Preserve engine and comparison results
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: pinned-kis-lean-evidence
+          path: engine-evidence
