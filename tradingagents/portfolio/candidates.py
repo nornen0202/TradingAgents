@@ -483,6 +483,8 @@ def _build_single_candidate(
                 "stale_but_triggerable": stale_but_triggerable,
                 "reanalysis_required": bool(reanalysis_reason),
                 "reanalysis_reason": reanalysis_reason,
+                **({"price_reference": execution_update_payload["price_reference"]}
+                   if execution_update_payload and isinstance(execution_update_payload.get("price_reference"), dict) else {}),
                 **execution_health,
             },
         ),

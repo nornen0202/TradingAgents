@@ -116,7 +116,7 @@ def test_refresh_before_prepare_preserves_models_and_does_not_rerun_research(wir
     assert "Broker collection progress" in (tmp_path / "pre-report" / f"{surface}-worker.log").read_text()
     config = configs[0]
     assert config.run.run_mode == "overlay_only"
-    assert config.llm.deep_model == config.llm.judge_model == "gpt-6.1-sol"
+    assert config.llm.deep_model == config.llm.judge_model == "gpt-6.2-sol"
     assert config.llm.codex_deep_reasoning_effort == config.llm.codex_judge_reasoning_effort == "xhigh"
     assert config.execution.execution_session_gate_enabled
     assert config.execution.execution_lightweight_refresh is True

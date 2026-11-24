@@ -11,7 +11,7 @@ SCHEMA = "tradingagents.ai-context/v1"
 MIRROR_BASE = "https://raw.githubusercontent.com/nornen0202/TradingAgents/public-context"
 ROW_FIELDS = (
     "ticker", "display_name", "is_held", "strategy_code", "strategy_ko", "last_price",
-    "market_data_asof", "session_vwap", "relative_volume", "spread_bps", "day_high", "day_low",
+    "market_data_asof", "market_data_clock_status", "session_vwap", "relative_volume", "spread_bps", "day_high", "day_low",
     "execution_condition_ko", "risk_condition_ko", "decision_state_ko",
     "data_status_ko", "reference_strategy",
 )

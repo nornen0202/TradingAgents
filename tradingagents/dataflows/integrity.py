@@ -5,6 +5,7 @@ from __future__ import annotations
 from datetime import date, datetime, timedelta, timezone
 import math
 import re
+from zoneinfo import ZoneInfo
 
 import pandas as pd
 
@@ -18,9 +19,37 @@ def safe_symbol(symbol: str) -> str:
     return symbol
 
 
-def is_historical(as_of: str | None) -> bool:
-    """Current snapshots cannot stand in for a prior day's information set."""
-    return bool(as_of and date.fromisoformat(as_of) < datetime.now(timezone.utc).date())
+def is_historical(as_of: str | date | datetime | None, *, market_timezone: str = "UTC") -> bool:
+    """An exact past instant or completed market day requires historical evidence."""
+    if not as_of:
+        return False
+    raw = str(as_of).strip()
+    return bool(raw) and parse_analysis_cutoff(as_of, market_timezone) < datetime.now(timezone.utc)
+
+
+def requires_historical_snapshot(ticker: str, requested: str | date | datetime | None) -> bool:
+    from tradingagents.agents.utils.instrument_resolver import resolve_instrument
+    from .config import get_config
+
+    config = get_config()
+    if config.get("point_in_time_strict"):
+        return True
+    scoped = config.get("analysis_as_of")
+    if not requested and not scoped:
+        return False
+    zone = resolve_instrument(ticker).timezone
+    return is_historical(requested, market_timezone=zone) or is_historical(scoped, market_timezone=zone)
+
+
+def parse_analysis_cutoff(requested: date | datetime | str, market_timezone: str) -> datetime:
+    """Resolve a date to the end of its market day or preserve an exact instant."""
+    raw = str(requested).strip()
+    stamp = datetime.fromisoformat(raw.replace("Z", "+00:00"))
+    if len(raw) == 10:
+        return stamp.replace(tzinfo=ZoneInfo(market_timezone)) + timedelta(days=1) - timedelta(microseconds=1)
+    if stamp.tzinfo is None or stamp.utcoffset() is None:
+        raise ValueError("Analysis cutoff requires a timezone")
+    return stamp
 
 
 def utc_window(start: str, end: str) -> tuple[datetime, datetime]:

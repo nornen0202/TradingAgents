@@ -71,11 +71,11 @@ class LLMSettings:
     quick_think_backend_url: str | None = None
     deep_think_backend_url: str | None = None
     output_think_backend_url: str | None = None
-    deep_model: str = "gpt-6.1-sol"
-    quick_model: str = "gpt-6.1-sol"
-    output_model: str = "gpt-6.1-sol"
-    writer_model: str = "gpt-6.1-sol"
-    judge_model: str = "gpt-6.1-sol"
+    deep_model: str = "gpt-6.2-sol"
+    quick_model: str = "gpt-6.2-sol"
+    output_model: str = "gpt-6.2-sol"
+    writer_model: str = "gpt-6.2-sol"
+    judge_model: str = "gpt-6.2-sol"
     codex_reasoning_effort: str = "medium"
     codex_quick_reasoning_effort: str = "medium"
     codex_deep_reasoning_effort: str = "xhigh"
@@ -111,6 +111,14 @@ class TranslationSettings:
 class StorageSettings:
     archive_dir: Path
     site_dir: Path
+    daily_history_capture_db: Path | None = None
+
+    def __post_init__(self):
+        if self.daily_history_capture_db is None:
+            return
+        capture = self.daily_history_capture_db.resolve()
+        if any(capture.is_relative_to(root.resolve()) for root in (self.archive_dir, self.site_dir)):
+            raise ValueError("Daily history capture database must be outside the archive and publishing roots.")
 
 
 @dataclass(frozen=True)
@@ -138,6 +146,7 @@ class ExecutionSettings:
     execution_publish_debug: bool = False
     # Internal minute refresh: reuse research, omit slow report enrichment.
     execution_lightweight_refresh: bool = False
+    session_confirmation_receipts_dir: Path | None = None
 
 
 @dataclass(frozen=True)
@@ -363,6 +372,10 @@ def load_scheduled_config(path: str | Path) -> ScheduledAnalysisConfig:
     portfolio_performance_raw = raw.get("portfolio_performance") or {}
     etf_dca_benchmarks_raw = raw.get("etf_dca_benchmarks") or {}
     execution_raw = raw.get("execution") or {}
+    session_receipts = _optional_string(execution_raw.get("session_confirmation_receipts_dir"))
+    observation_root = os.environ.get("TRADINGAGENTS_FORWARD_OBSERVATION_ROOT")
+    if observation_root and session_receipts is None:
+        session_receipts = str(Path(observation_root) / "confirmations")
     summary_image_raw = raw.get("summary_image") or {}
     external_raw = raw.get("external") or {}
     external_data_raw = raw.get("external_data") or {}
@@ -410,6 +423,10 @@ def load_scheduled_config(path: str | Path) -> ScheduledAnalysisConfig:
     base_dir = config_path.parent
     archive_dir = _resolve_path(storage_raw.get("archive_dir", ".tradingagents-scheduled/archive"), base_dir)
     site_dir = _resolve_path(storage_raw.get("site_dir", "site"), base_dir)
+    daily_history_capture = (_optional_string(storage_raw.get("daily_history_capture_db"))
+                             or _optional_string(os.environ.get("TRADINGAGENTS_RESEARCH_PRICE_CAPTURE_DB")))
+    if observation_root and daily_history_capture is None:
+        daily_history_capture = str(Path(observation_root) / "research-prices.sqlite")
 
     codex_model_override = _optional_string(os.getenv("TRADINGAGENTS_CODEX_MODEL"))
     shared_provider = str(llm_raw.get("provider", "codex")).strip().lower() or "codex"
@@ -489,20 +506,20 @@ def load_scheduled_config(path: str | Path) -> ScheduledAnalysisConfig:
             deep_think_backend_url=_optional_string(llm_raw.get("deep_think_backend_url")),
             output_think_backend_url=_optional_string(llm_raw.get("output_think_backend_url")),
             deep_model=deep_model_override
-            or str(llm_raw.get("deep_model", "gpt-6.1-sol")).strip()
-            or "gpt-6.1-sol",
+            or str(llm_raw.get("deep_model", "gpt-6.2-sol")).strip()
+            or "gpt-6.2-sol",
             quick_model=quick_model_override
-            or str(llm_raw.get("quick_model", "gpt-6.1-sol")).strip()
-            or "gpt-6.1-sol",
+            or str(llm_raw.get("quick_model", "gpt-6.2-sol")).strip()
+            or "gpt-6.2-sol",
             output_model=output_model_override
-            or str(llm_raw.get("output_model", "gpt-6.1-sol")).strip()
-            or "gpt-6.1-sol",
+            or str(llm_raw.get("output_model", "gpt-6.2-sol")).strip()
+            or "gpt-6.2-sol",
             writer_model=writer_model_override
-            or str(llm_raw.get("writer_model", "gpt-6.1-sol")).strip()
-            or "gpt-6.1-sol",
+            or str(llm_raw.get("writer_model", "gpt-6.2-sol")).strip()
+            or "gpt-6.2-sol",
             judge_model=judge_model_override
-            or str(llm_raw.get("judge_model", "gpt-6.1-sol")).strip()
-            or "gpt-6.1-sol",
+            or str(llm_raw.get("judge_model", "gpt-6.2-sol")).strip()
+            or "gpt-6.2-sol",
             codex_reasoning_effort=str(llm_raw.get("codex_reasoning_effort", "medium")).strip() or "medium",
             codex_quick_reasoning_effort=str(
                 llm_raw.get("codex_quick_reasoning_effort", "medium")
@@ -558,6 +575,7 @@ def load_scheduled_config(path: str | Path) -> ScheduledAnalysisConfig:
         storage=StorageSettings(
             archive_dir=archive_dir,
             site_dir=site_dir,
+            daily_history_capture_db=_resolve_path(daily_history_capture, base_dir) if daily_history_capture else None,
         ),
         site=SiteSettings(
             title=str(site_raw.get("title", "TradingAgents Daily Reports")).strip() or "TradingAgents Daily Reports",
@@ -614,6 +632,7 @@ def load_scheduled_config(path: str | Path) -> ScheduledAnalysisConfig:
                 else _optional_string(execution_raw.get("llm_summary_model"))
             ),
             execution_publish_debug=bool(execution_raw.get("publish_debug", False)),
+            session_confirmation_receipts_dir=_resolve_path(session_receipts, base_dir) if session_receipts else None,
         ),
         summary_image=SummaryImageSettings(
             enabled=bool(summary_image_raw.get("enabled", True)),

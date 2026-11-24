@@ -5,11 +5,12 @@ import hashlib
 import json
 import re
 from collections.abc import Iterable
-from datetime import datetime
+from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Any
 
 from tradingagents.report_reader import READER_CSS, READER_JS
+from tradingagents.dataflows.market_policy import aware_datetime
 from tradingagents.scheduled.trade_plan import build_trade_plan
 from tradingagents.portfolio.funded_rebalance import build_funded_rebalance
 from tradingagents.portfolio.capital_policy import load_policy
@@ -26,6 +27,11 @@ from tradingagents.work.runtime import WorkRuntimeError, validate_work_report
 MOBILE_SCHEMA = "tradingagents.mobile-dashboard/v1"
 STRATEGY_SCHEMA = "tradingagents.mobile-strategy/v1"
 MARKETS = ("kr", "us")
+_QUOTE_FIELDS = (
+    "last_price", "session_vwap", "vwap_distance_pct", "vwap_position_ko",
+    "relative_volume", "trading_value", "price_change_pct", "spread_bps",
+    "day_high", "day_low", "sync_summary_ko",
+)
 
 _PUBLIC_ROW_FIELDS = (
     "ticker",
@@ -233,8 +239,9 @@ def build_mobile_site(
         if not public_packet:
             public_packet = build_surface_packet(market, archive_dir=archive_dir, public=True)
         private_packet = build_surface_packet(market, archive_dir=archive_dir, public=False)
-        public_payload["markets"][market] = _public_market_payload(public_packet)
-        market_payload = _private_market_payload(private_packet)
+        plan_clock = datetime.fromisoformat(generated_at)
+        public_payload["markets"][market] = _public_market_payload(public_packet, as_of=plan_clock)
+        market_payload = _private_market_payload(private_packet, as_of=plan_clock)
         integrated_report = _load_latest_work_report(
             Path(archive_dir),
             market,
@@ -256,7 +263,6 @@ def build_mobile_site(
             archive_dir=Path(archive_dir),
             integrated_report=current_integrated_report,
         )
-        plan_clock = datetime.fromisoformat(generated_at)
         plan_sources = load_trade_plan_sources(Path(archive_dir), market_payload, analysis_as_of=plan_clock)
         market_payload["trade_plan"] = build_trade_plan(
             {**market_payload, "market": market.upper()},
@@ -520,10 +526,39 @@ def _read_public_work_packet(site_root: Path, market: str) -> dict[str, Any]:
     return payload if isinstance(payload, dict) else {}
 
 
-def _public_market_payload(packet: dict[str, Any]) -> dict[str, Any]:
+def _apply_quote_clock(row: dict[str, Any], as_of: datetime) -> None:
+    raw = row.get("market_data_asof")
+    clock = aware_datetime(raw)
+    quality = row["quality"]
+    if clock is not None and clock <= as_of:
+        return
+    if (raw is None and not any(row.get(key) is not None for key in _QUOTE_FIELDS)
+            and not any(quality.get(key) for key in ("execution_ready", "data_ready", "action_ready", "conditional_strategy_ready"))):
+        return
+    status = "missing" if raw is None else "future" if clock is not None else "invalid"
+    if isinstance(raw, str) and re.fullmatch(r"\d{4}-\d{2}-\d{2}", raw):
+        try:
+            date.fromisoformat(raw)
+        except ValueError:
+            pass
+        else:
+            status = "date_only"
+    row["market_data_asof"] = None
+    row["market_data_clock_status"] = status
+    for field in _QUOTE_FIELDS:
+        row.pop(field, None)
+    quality.update(data_ready=False, execution_ready=False, action_ready=False,
+                   conditional_strategy_ready=False, investor_state="UNAVAILABLE",
+                   investor_label="시세 시각 재확인", current_execution_promotion="BLOCKED",
+                   action_status="DATA_RECHECK_REQUIRED")
+    row["data_status_ko"] = "시세 시각 재확인"
+
+
+def _public_market_payload(packet: dict[str, Any], *, as_of: datetime | None = None) -> dict[str, Any]:
     body = packet.get("body") if isinstance(packet.get("body"), dict) else {}
     current = body.get("current") if isinstance(body.get("current"), dict) else {}
     bundle = current.get("bundle") if isinstance(current.get("bundle"), dict) else {}
+    as_of = as_of or datetime.now(timezone.utc)
     rows = []
     for source in bundle.get("strategy_table") or []:
         if not isinstance(source, dict) or source.get("is_held") is True:
@@ -531,6 +566,7 @@ def _public_market_payload(packet: dict[str, Any]) -> dict[str, Any]:
         row = {key: source.get(key) for key in _PUBLIC_ROW_FIELDS if source.get(key) is not None}
         row["display_name"] = _display_name_for(row.get("ticker"), row.get("display_name"))
         row["quality"] = _public_quality(source.get("quality"))
+        _apply_quote_clock(row, as_of)
         rows.append(row)
     result = {
         "market": str(body.get("market") or packet.get("surface") or "").upper(),
@@ -566,10 +602,11 @@ def _public_market_payload(packet: dict[str, Any]) -> dict[str, Any]:
     return result
 
 
-def _private_market_payload(packet: dict[str, Any]) -> dict[str, Any]:
+def _private_market_payload(packet: dict[str, Any], *, as_of: datetime | None = None) -> dict[str, Any]:
     body = packet.get("body") if isinstance(packet.get("body"), dict) else {}
     current = body.get("current") if isinstance(body.get("current"), dict) else {}
     bundle = current.get("bundle") if isinstance(current.get("bundle"), dict) else {}
+    as_of = as_of or datetime.now(timezone.utc)
     quality = bundle.get("quality") if isinstance(bundle.get("quality"), dict) else {}
     source_metadata = body.get("source") if isinstance(body.get("source"), dict) else {}
     universe_coverage = (
@@ -635,6 +672,7 @@ def _private_market_payload(packet: dict[str, Any]) -> dict[str, Any]:
         }
         row["display_name"] = _display_name_for(row.get("ticker"), row.get("display_name"))
         row["quality"] = _public_quality(row_source.get("quality"))
+        _apply_quote_clock(row, as_of)
         action = next(
             (action_by_ticker[key] for key in _ticker_identity_keys(row.get("ticker")) if key in action_by_ticker),
             None,
@@ -2188,7 +2226,7 @@ _PRIVATE_JS = READER_JS + r"""
     return `<article class="action-card" id="strategy-${esc(marketId)}-${esc(encodeURIComponent(tickerIdentity))}" tabindex="-1" data-ticker="${esc(tickerIdentity)}" data-name="${esc(displayName)}" data-direction="${esc(direction.kind)}" data-search="${esc(`${displayName} ${row.ticker || ''} ${row.sector || ''}`.toLocaleLowerCase())}" data-change="${numeric(row.price_change_pct)}" data-readiness="${esc(readiness.code)}" data-group="${esc(role)}" data-top="${topTickers.has(tickerIdentity) ? 'true' : 'false'}">
       <button type="button" class="back-to-overview">↑ 전략 요약표로</button>
       <div class="card-title"><div><strong>${esc(displayName)} <span class="role-badge">${esc(roleLabel(role))}</span></strong><span class="ticker-code">${esc(row.ticker || '-')}</span></div><span class="row-mode mode-${esc(readiness.code.toLowerCase())}">${esc(readiness.label)}</span></div>
-      <div class="price-line"><strong>${fmt(row.last_price)}</strong><span>입력 시세 ${esc(dateTime(row.market_data_asof || workExecution.as_of))}${sizingBlocked ? ' · 분석 참고' : ''}</span></div>
+      <div class="price-line"><strong>${fmt(row.last_price)}</strong><span>입력 시세 ${esc(dateTime(row.market_data_asof))}${sizingBlocked ? ' · 분석 참고' : ''}</span></div>
       <div class="private-action" data-direction="${esc(direction.kind)}"><strong>분석 시점 전략 방향</strong><span class="strategy-direction">${esc(direction.text)}</span></div>
       ${axes}
       <div class="execution-status"><div><strong>현재 실행 상태·행동</strong><span class="row-mode mode-${esc(readiness.code.toLowerCase())}">${esc(readiness.label)}</span></div><span class="execution-action">${esc(executionAction)}</span><p class="readiness-note">${esc(readiness.note)}</p></div>

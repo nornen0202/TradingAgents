@@ -9,8 +9,8 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Callable, Sequence
 
-from .runtime import WorkRuntime, WorkRuntimeError
-from tradingagents.atomic_io import atomic_write_json
+from .runtime import WorkRuntime, WorkRuntimeError, validate_work_report
+from tradingagents.atomic_io import atomic_write_json, interprocess_file_lock
 
 
 WORK_HANDOFF_SCHEMA = "tradingagents.work-pages-handoff/v1"
@@ -52,6 +52,19 @@ def dispatch_pages_handoff(
     if not re.fullmatch(r"[A-Za-z0-9_.-]+\.ya?ml", workflow_file):
         raise WorkRuntimeError("Pages handoff workflow filename is invalid")
 
+    receipt_path = runtime.root / "handoffs" / key / f"{report_sha}.json"
+    try:
+        with interprocess_file_lock(receipt_path.with_suffix(".lock"), timeout=60):
+            return _dispatch_acknowledged_report(
+                runtime, key=key, event=event, report_sha=report_sha, repo=repo, branch=branch,
+                workflow_file=workflow_file, receipt_path=receipt_path, force=force, runner=runner,
+            )
+    except TimeoutError as exc:
+        raise WorkRuntimeError("Pages handoff is already being processed.") from exc
+
+
+def _dispatch_acknowledged_report(runtime, *, key, event, report_sha, repo, branch,
+                                  workflow_file, receipt_path, force, runner):
     status = runtime.status(key)
     state = status.get("state") if isinstance(status.get("state"), dict) else {}
     if str(state.get("last_acked_event_id") or "") != event:
@@ -59,10 +72,16 @@ def dispatch_pages_handoff(
     if str(state.get("last_acked_report_sha256") or "").lower() != report_sha:
         raise WorkRuntimeError("Pages handoff report is not the latest canonical acknowledged report")
     report_path = Path(str(state.get("last_acked_report_path") or ""))
-    if not report_path.is_file():
-        raise WorkRuntimeError("Pages handoff acknowledged report file is unavailable")
+    try:
+        report = json.loads(report_path.read_bytes())
+    except (OSError, ValueError) as exc:
+        raise WorkRuntimeError("Pages handoff acknowledged report file is unavailable or invalid") from exc
+    if not isinstance(report, dict):
+        raise WorkRuntimeError("Pages handoff acknowledged report must be an object")
+    validate_work_report(report)
+    if (report.get("surface"), report.get("event_id"), report.get("report_sha256")) != (key, event, report_sha):
+        raise WorkRuntimeError("Pages handoff report content does not match the canonical acknowledgement")
 
-    receipt_path = runtime.root / "handoffs" / key / f"{report_sha}.json"
     local_enabled = runtime.root.parent / "local-automation" / "enabled.json"
     local_backend = os.getenv("TRADINGAGENTS_AUTOMATION_BACKEND") == "local" or local_enabled.is_file()
     if receipt_path.is_file() and not force:
@@ -72,6 +91,11 @@ def dispatch_pages_handoff(
             raise WorkRuntimeError(f"Invalid Pages handoff receipt: {receipt_path}: {exc}") from exc
         if not isinstance(previous, dict) or previous.get("schema") != WORK_HANDOFF_SCHEMA:
             raise WorkRuntimeError(f"Unsupported Pages handoff receipt: {receipt_path}")
+        if any(previous.get(field) != value for field, value in {
+            "surface": key, "event_id": event, "report_sha256": report_sha,
+            "repository": repo, "ref": branch,
+        }.items()) or previous.get("workflow") not in {workflow_file, "local-publication"}:
+            raise WorkRuntimeError("Existing Pages handoff receipt does not match the requested report and destination")
         if local_backend and previous.get("external_delivery_verified") is not True and previous.get("workflow") != "local-publication":
             return _queue_local_handoff(receipt_path, key, event, report_sha, repo, branch)
         if previous.get("workflow") == "local-publication":
@@ -134,10 +158,7 @@ def dispatch_pages_handoff(
         "dispatched_at": datetime.now().astimezone().isoformat(),
         "external_delivery_verified": False,
     }
-    receipt_path.parent.mkdir(parents=True, exist_ok=True)
-    temporary = receipt_path.with_suffix(".tmp")
-    temporary.write_text(json.dumps(receipt, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    temporary.replace(receipt_path)
+    atomic_write_json(receipt_path, receipt)
     return receipt
 
 

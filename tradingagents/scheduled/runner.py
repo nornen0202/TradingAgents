@@ -18,10 +18,12 @@ from datetime import date, datetime, time, timedelta, timezone
 from pathlib import Path
 from time import perf_counter, sleep
 from typing import Any, Callable
+from uuid import uuid4
 from zoneinfo import ZoneInfo
 
 import yfinance as yf
 
+from tradingagents.decision_provenance import research_origin
 from tradingagents.atomic_io import atomic_write_json, interprocess_file_lock
 from tradingagents.scheduled.failure_diagnostics import failure_diagnostics, format_failure_diagnostics
 from tradingagents.scheduled.research_observation import ResearchObservationRecorder
@@ -33,7 +35,7 @@ from tradingagents.agents.utils.decision_provenance import DecisionProvenanceSes
 from cli.stats_handler import StatsCallbackHandler
 from tradingagents.default_config import DEFAULT_CONFIG
 from tradingagents.dataflows.interface import reset_tool_telemetry, snapshot_tool_telemetry, snapshot_tool_requests
-from tradingagents.dataflows.daily_history_evidence import DailyHistoryEvidenceRecorder
+from tradingagents.dataflows.daily_history_evidence import DailyHistoryCapture, DailyHistoryEvidenceRecorder
 from tradingagents.dataflows.research_evidence import SCHEMA as TOOL_REQUEST_SCHEMA
 from tradingagents.dataflows.institutional import (
     build_public_equity_intelligence_artifacts,
@@ -50,6 +52,7 @@ from tradingagents.dataflows.intraday.microstructure import render_microstructur
 from tradingagents.dataflows.stockstats_utils import is_retryable_yfinance_error, yf_retry
 from tradingagents.execution.contract_builder import build_execution_contract, has_legacy_trim_invalidation
 from tradingagents.execution.overlay import evaluate_execution_state
+from tradingagents.execution.session_confirmation import load_session_observations
 from tradingagents.execution.reporting import (
     render_execution_summary_markdown,
     render_execution_update_markdown,
@@ -296,8 +299,16 @@ def execute_scheduled_run(
     started_at = datetime.now(tz)
     run_timer_start = perf_counter()
     run_id = _build_run_id(started_at, run_label)
-    run_dir = config.storage.archive_dir / "runs" / started_at.strftime("%Y") / run_id
-    run_dir.mkdir(parents=True, exist_ok=True)
+    year_dir = config.storage.archive_dir / "runs" / started_at.strftime("%Y")
+    run_dir = year_dir / run_id
+    try:
+        run_dir.mkdir(parents=True, exist_ok=False)
+    except FileExistsError:
+        # Scheduled and manual invocations can share a label and start second.
+        # Keep the existing identifier format for archive and recovery readers.
+        run_id = f"{run_id}-{uuid4().hex}"
+        run_dir = year_dir / run_id
+        run_dir.mkdir(exist_ok=False)
     from .attempts import RunAttempt
     with RunAttempt(run_dir, market=config.run.market,
                     run_mode=str(config.run.run_mode or "full"), started_at=started_at):
@@ -900,7 +911,9 @@ def _execute_run_body(config, *, run_label, skip_site_build, tz, started_at,
     else:
         performance_budget_available = False
     if performance_enabled_for_run and performance_budget_available:
-        manifest["performance"] = _run_performance_tracking(config=config, run_dir=run_dir, started_at=started_at)
+        manifest["performance"] = _run_performance_tracking(
+            config=config, run_dir=run_dir, started_at=started_at, manifest=manifest,
+        )
     elif performance_enabled_for_run:
         manifest["performance"] = {"status": "skipped", "reason": "runtime_budget_exhausted"}
     elif config.performance.enabled and not portfolio_only:
@@ -1031,21 +1044,20 @@ def resolve_trade_date(
     if available_research:
         return _available_research_trade_date(history, ticker=normalized_symbol, config=config,
                                               now=now, completed=expected_completed_date)
-    if history.empty:
+    market = _trade_date_market(ticker=normalized_symbol, config=config)
+    local_day = _market_local_now(now=now, market=market).date()
+    cutoff = min(expected_completed_date, local_day) if expected_completed_date else local_day - timedelta(days=1)
+    earliest = cutoff - timedelta(days=max(1, config.run.latest_market_data_lookback_days))
+    last_date = _latest_observed_daily_bar(history, earliest=earliest, cutoff=cutoff)
+    if last_date is None and expected_completed_date is None:
         symbol_hint = _ticker_hint(normalized_symbol)
         raise RuntimeError(
             f"Could not resolve the latest available trade date for {ticker} ({normalized_symbol}); "
-            f"yfinance returned no rows.{symbol_hint}"
+            f"yfinance returned no valid completed daily bars.{symbol_hint}"
         )
 
-    last_index = history.index[-1]
-    last_value = getattr(last_index, "to_pydatetime", lambda: last_index)()
-    last_date = last_value.date() if hasattr(last_value, "date") else last_value
-    if not isinstance(last_date, date):
-        raise RuntimeError(f"Unexpected trade date index value for {ticker}: {last_index!r}")
     if expected_completed_date is not None:
-        market = _trade_date_market(ticker=normalized_symbol, config=config)
-        if market == "KR" and last_date < expected_completed_date:
+        if market == "KR" and last_date != expected_completed_date:
             # The broker's actual completed bar can resolve a Yahoo outage;
             # the calendar alone is never evidence of an available price.
             from tradingagents.dataflows.kr_daily_history import load_kr_daily_bars, source_note
@@ -1064,12 +1076,12 @@ def resolve_trade_date(
         wait_seconds = max(0.0, config.run.latest_market_data_wait_minutes * 60.0)
         retry_interval = max(1.0, config.run.latest_market_data_retry_interval_seconds)
         waited_seconds = 0.0
-        while last_date < expected_completed_date and waited_seconds < wait_seconds:
+        while last_date != expected_completed_date and waited_seconds < wait_seconds:
             delay = min(retry_interval, wait_seconds - waited_seconds)
             print(
                 "::warning::"
                 f"Vendor daily bar for {ticker} ({normalized_symbol}) is not ready: "
-                f"latest={last_date.isoformat()}, expected={expected_completed_date.isoformat()}. "
+                f"latest={last_date}, expected={expected_completed_date.isoformat()}. "
                 f"Retrying in {delay:g}s."
             )
             sleep(delay)
@@ -1088,22 +1100,16 @@ def resolve_trade_date(
                     f"continuing freshness wait. reason={_summarize_exception(exc)}"
                 )
                 continue
-            if refreshed_history is None or refreshed_history.empty:
+            refreshed_date = _latest_observed_daily_bar(refreshed_history, earliest=earliest, cutoff=cutoff)
+            if refreshed_date is None:
                 print(
                     "::warning::"
                     f"Yahoo Finance retry returned no rows for {ticker} ({normalized_symbol}); "
                     "continuing freshness wait."
                 )
                 continue
-            refreshed_index = refreshed_history.index[-1]
-            refreshed_value = getattr(refreshed_index, "to_pydatetime", lambda: refreshed_index)()
-            refreshed_date = refreshed_value.date() if hasattr(refreshed_value, "date") else refreshed_value
-            if not isinstance(refreshed_date, date):
-                raise RuntimeError(f"Unexpected trade date index value for {ticker}: {refreshed_index!r}")
-            last_date = max(last_date, refreshed_date)
-        if last_date > expected_completed_date:
-            return expected_completed_date.isoformat()
-        if last_date < expected_completed_date:
+            last_date = max(last_date, refreshed_date) if last_date is not None else refreshed_date
+        if last_date != expected_completed_date:
             wait_detail = (
                 f" after waiting {waited_seconds:g}s for vendor catch-up"
                 if waited_seconds
@@ -1111,7 +1117,7 @@ def resolve_trade_date(
             )
             raise RuntimeError(
                 f"Refusing stale latest_available trade date for {ticker} ({normalized_symbol}): "
-                f"vendor latest row is {last_date.isoformat()} but {market} calendar expects "
+                f"vendor latest valid row is {last_date} but {market} calendar expects "
                 f"completed daily bar {expected_completed_date.isoformat()} as of {now.isoformat()}"
                 f"{wait_detail}."
             )
@@ -1120,23 +1126,37 @@ def resolve_trade_date(
 
 def _available_research_trade_date(history, *, ticker, config, now, completed):
     """Use an observed completed bar, without waiting or inventing today's price."""
-    import math
-    import pandas as pd
-
     market = _trade_date_market(ticker=ticker, config=config)
     local_day = _market_local_now(now=now, market=market).date()
     cutoff = min(completed, local_day) if completed is not None else local_day - timedelta(days=1)
     earliest = cutoff - timedelta(days=max(1, config.run.latest_market_data_lookback_days))
+    selected = _latest_observed_daily_bar(history, earliest=earliest, cutoff=cutoff)
+    if selected is None:
+        raise RuntimeError("No valid dated completed daily bar is available for investor research")
+    if selected < cutoff:
+        print(f"::warning::Investor research uses observed {ticker} daily bar {selected.isoformat()}; "
+              f"latest completed session is {cutoff.isoformat()}. Source date is preserved; no freshness wait.")
+    return selected.isoformat()
+
+
+def _latest_observed_daily_bar(history, *, earliest: date, cutoff: date) -> date | None:
+    import math
+    import pandas as pd
+
     dates = []
     if isinstance(history, pd.DataFrame) and "Close" in history.columns:
         for index, row in history.iterrows():
             if not isinstance(index, (str, date, datetime, pd.Timestamp)):
                 continue
             try:
-                stamp = pd.Timestamp(index)
-                if pd.isna(stamp):
+                if pd.isna(index):
                     continue
-                observed = stamp.date()
+                if isinstance(index, str):
+                    observed = date.fromisoformat(index[:10])
+                    if len(index) != 10:
+                        observed = pd.Timestamp(index).date()
+                else:
+                    observed = index.date() if hasattr(index, "date") else index
                 if isinstance(row["Close"], bool):
                     continue
                 close = float(row["Close"])
@@ -1144,13 +1164,7 @@ def _available_research_trade_date(history, *, ticker, config, now, completed):
                     dates.append(observed)
             except (ValueError, TypeError, OverflowError):
                 continue
-    if not dates:
-        raise RuntimeError("No valid dated completed daily bar is available for investor research")
-    selected = max(dates)
-    if selected < cutoff:
-        print(f"::warning::Investor research uses observed {ticker} daily bar {selected.isoformat()}; "
-              f"latest completed session is {cutoff.isoformat()}. Source date is preserved; no freshness wait.")
-    return selected.isoformat()
+    return max(dates, default=None)
 
 
 def _resolve_run_trade_date(
@@ -2096,7 +2110,9 @@ def _run_single_ticker(
     observation_recorder = ResearchObservationRecorder(ticker)
     chart_capture = ChartCapture(ticker)
     chart_token = chart_capture.activate()
-    history_recorder = DailyHistoryEvidenceRecorder(ticker)
+    capture_path = config.storage.daily_history_capture_db
+    history_capture = DailyHistoryCapture(capture_path, run_dir.name) if capture_path is not None else None
+    history_recorder = DailyHistoryEvidenceRecorder(ticker, capture=history_capture)
     history_token = history_recorder.activate()
     decision_trace = DecisionProvenanceSession(ticker)
 
@@ -2250,7 +2266,6 @@ def _run_single_ticker(
             for artifact_key, filename, payload in (
                 ("public_equity_intelligence_json", "public_equity_intelligence.json", institutional_outputs["full"]),
                 ("source_quality_json", "source_quality.json", institutional_outputs["source_quality"]),
-                ("evidence_ledger_json", "evidence_ledger.json", institutional_outputs["evidence_ledger"]),
                 ("earnings_event_pack_json", "earnings_event_pack.json", institutional_outputs["earnings_event_pack"]),
                 ("thesis_tracker_json", "thesis_tracker.json", institutional_outputs["thesis_tracker"]),
             ):
@@ -2279,6 +2294,13 @@ def _run_single_ticker(
                 "security_readiness": "watch_only",
                 "warnings": [warning],
             }
+        ledger = institutional_outputs.get("evidence_ledger") or {"ticker": ticker, "asof": analysis_date, "items": []}
+        try:
+            ledger_path = ticker_dir / "evidence_ledger.json"
+            _write_json(ledger_path, {**ledger, "daily_price_history": history_recorder.ledger_reference(run_dir.name)})
+            institutional_artifacts["evidence_ledger_json"] = _relative_to_run(run_dir, ledger_path)
+        except OSError as exc:
+            print(f"::warning::{ticker} research_price_ledger_unavailable:{type(exc).__name__}")
         # Captured public disclosures remain available even if an optional
         # institutional pack cannot be built. Preserve their original clocks.
         from tradingagents.dataflows.event_timeline import build_event_timeline, snapshot_event_records
@@ -2571,7 +2593,7 @@ def _graph_config(config: ScheduledAnalysisConfig, engine_results_dir: Path) -> 
     else:
         graph_config["market_country"] = "US"
         graph_config["tool_vendors"] = {
-            "get_company_news": "alpha_vantage,yfinance",
+            "get_company_news": "alpaca,massive,alpha_vantage,yfinance",
             "get_social_sentiment": "yfinance",
         }
     if config.llm.codex_workspace_dir:
@@ -3162,6 +3184,7 @@ def _run_performance_tracking(
     config: ScheduledAnalysisConfig,
     run_dir: Path,
     started_at: datetime,
+    manifest: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     db_path = config.performance.store_path or (config.storage.archive_dir / "performance.sqlite")
     try:
@@ -3177,6 +3200,7 @@ def _run_performance_tracking(
             run_dir,
             db_path,
             run_market=performance_market,
+            manifest=manifest,
         )
         outcome_update: dict[str, Any] = {
             "enabled": bool(config.performance.update_outcomes_on_run),
@@ -3194,6 +3218,7 @@ def _run_performance_tracking(
                     market=performance_market,
                     lookback_days=config.performance.price_lookback_days,
                     asof_date=analysis_date,
+                    require_verified_price=True,
                 )
                 outcome_update.update(
                     {
@@ -3209,17 +3234,22 @@ def _run_performance_tracking(
                     outcome_update["updated"] = True
                     outcome_update["up_to_date"] = True
                 elif price_result.has_prices:
-                    update_action_outcomes(
+                    verified_updates = update_action_outcomes(
                         db_path,
-                        asof_date=analysis_date,
+                        asof_date=started_at.isoformat(),
                         horizons=config.performance.outcome_horizons,
                         price_history=price_result.price_history,
                         refresh_window_days=config.performance.price_lookback_days,
                         recommendation_ids=price_result.due_recommendation_ids,
+                        require_verified_price=True,
                     )
-                    outcome_update["updated"] = price_result.price_coverage_complete
-                    outcome_update["partially_updated"] = not price_result.price_coverage_complete
-                    if not price_result.price_coverage_complete:
+                    outcome_update["verified_revisions"] = int(verified_updates or 0)
+                    complete = verified_updates == price_result.due_recommendation_count and price_result.price_coverage_complete
+                    outcome_update["updated"] = complete
+                    outcome_update["partially_updated"] = bool(verified_updates) and not complete
+                    if not verified_updates:
+                        outcome_update["unavailable_reason"] = "no_new_outcome_with_verified_price_evidence"
+                    elif not complete:
                         outcome_update["unavailable_reason"] = "incomplete_price_coverage"
                 else:
                     outcome_update["unavailable_reason"] = "price_provider_unavailable_or_no_price_history"
@@ -3232,8 +3262,12 @@ def _run_performance_tracking(
                 outcome_update["warnings"] = warnings
         else:
             outcome_update["unavailable_reason"] = "outcome_update_disabled"
-        summary = summarize_action_performance(db_path)
+        reporting_as_of = datetime.now(timezone.utc).isoformat()
+        summary = summarize_action_performance(db_path, analysis_as_of=reporting_as_of, require_verified_price=True)
         summary_payload = summary.to_dict() if hasattr(summary, "to_dict") else summary
+        if outcome_update.get("up_to_date") and (summary_payload.get("data_quality") or {}).get("recommendations_without_verified_outcome"):
+            outcome_update.update(updated=False, up_to_date=False,
+                                  unavailable_reason="price_reference_evidence_unavailable")
         recommendations = (
             int(summary_payload.get("recommendations") or 0)
             if isinstance(summary_payload, dict)
@@ -3245,6 +3279,8 @@ def _run_performance_tracking(
         payload = {
             "enabled": True,
             "status": status,
+            "analysis_as_of": started_at.isoformat(),
+            "reporting_as_of": reporting_as_of,
             "store": {"backend": "sqlite", "location": "private_local_archive"},
             "outcome_update": outcome_update,
             "summary": summary_payload,
@@ -4405,6 +4441,10 @@ def _bootstrap_overlay_inputs_from_latest_run(
                 "metrics": {"llm_calls": 0, "tool_calls": 0, "tokens_in": 0, "tokens_out": 0},
                 "tool_telemetry": {"total_tool_calls": 0, "vendor_calls": {}, "fallback_count": 0, "events": []},
                 "quality_flags": ("overlay_only_mode",),
+                "overlay_research_source": {
+                    "source_run_id": source_run_id,
+                    "analysis_started_at": research_origin(source_manifest, source)[1],
+                },
                 "report_writer": {"mode": "skipped_overlay_only"},
                 "execution_contract": None,
                 "execution_update": None,
@@ -5649,6 +5689,9 @@ def _run_execution_overlay_passes(
                     now=datetime.now(ZoneInfo(config.run.timezone)),
                     max_data_age_seconds=config.execution.execution_max_data_age_seconds,
                     refresh_checkpoint=checkpoint_label,
+                    session_observations=load_session_observations(
+                        config.execution.session_confirmation_receipts_dir, ticker, market.market,
+                    ),
                 )
                 update_payload = update.to_dict()
                 update_payload["ingested_at"] = datetime.now(timezone.utc).isoformat()
@@ -6359,7 +6402,9 @@ def _build_failed_execution_update_payload(
             or ""
         ),
         "execution_asof": now.isoformat(),
-        "market_data_asof": contract_payload.get("market_data_asof"),
+        # Failed collection has no quote clock. The contract clock belongs to
+        # the analysis reference and can be a completed trading date only.
+        "market_data_asof": None,
         "source": {
             "provider": None,
             "interval": attempt_payload.get("interval"),
@@ -6684,6 +6729,7 @@ class _ExecutionContractShim:
                 high=_optional_float(item.get("high")),
                 currency=str(item.get("currency") or "") or None,
                 confirmation=str(item.get("confirmation") or "close"),
+                confirmation_group=item.get("confirmation_group"),
                 volume_rule=str(item.get("volume_rule") or ""),
                 source_text=str(item.get("source_text") or ""),
                 reason_code=str(item.get("reason_code") or ""),

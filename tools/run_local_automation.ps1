@@ -79,12 +79,41 @@ try {
         try { $sourceOwned = $sourceMutex.WaitOne(60000) } catch [Threading.AbandonedMutexException] { $sourceOwned = $true }
         if (-not $sourceOwned) { throw "Source snapshot preparation is still active." }
         if (-not (Test-Path -LiteralPath (Join-Path $sourceRoot ".source-ready"))) {
-            $zipPath = Join-Path $stateRoot "$revision-$Command.zip"
-            & git archive --format=zip "--output=$zipPath" $revision
-            if ($LASTEXITCODE -ne 0) { throw "Could not export trusted source." }
-            Expand-Archive -LiteralPath $zipPath -DestinationPath $sourceRoot -Force
-            Remove-Item -LiteralPath $zipPath -Force
-            Set-Content -LiteralPath (Join-Path $sourceRoot ".source-ready") -Value $revision
+            $sourceParent = [IO.Path]::GetFullPath((Split-Path -Parent $sourceRoot))
+            [IO.Directory]::CreateDirectory($sourceParent) | Out-Null
+            $sourceRoot = Join-Path $sourceParent $revision
+            $nonce = [Guid]::NewGuid().ToString('N')
+            # Keep the staging path shorter than the final revision path so
+            # extraction stays within the same Windows path-length envelope.
+            $stagedSource = Join-Path $sourceParent ".$nonce"
+            $zipPath = Join-Path $stateRoot "$revision-$nonce.zip"
+            try {
+                & git archive --format=zip "--output=$zipPath" $revision
+                if ($LASTEXITCODE -ne 0) { throw "Could not export trusted source." }
+                # Use the two-argument .NET Framework overload supported by
+                # Windows PowerShell, independently of its Archive module.
+                Add-Type -AssemblyName System.IO.Compression.FileSystem
+                [IO.Compression.ZipFile]::ExtractToDirectory($zipPath, $stagedSource)
+                Set-Content -LiteralPath (Join-Path $stagedSource ".source-ready") -Value $revision
+                if ([IO.Directory]::Exists($sourceRoot)) {
+                    $incompleteSource = Get-Item -LiteralPath $sourceRoot -Force
+                    if ($incompleteSource.Attributes -band [IO.FileAttributes]::ReparsePoint) {
+                        throw 'Incomplete source cache is not an ordinary directory.'
+                    }
+                    [IO.Directory]::Move($sourceRoot, (Join-Path $sourceParent "$revision-incomplete-$nonce"))
+                }
+                [IO.Directory]::Move($stagedSource, $sourceRoot)
+            } finally {
+                [IO.File]::Delete($zipPath)
+                if ([IO.Directory]::Exists($stagedSource)) {
+                    $stagedItem = Get-Item -LiteralPath $stagedSource -Force
+                    if ($stagedItem.FullName -eq $stagedSource -and
+                        $stagedItem.Parent.FullName -eq $sourceParent -and
+                        -not ($stagedItem.Attributes -band [IO.FileAttributes]::ReparsePoint)) {
+                        Remove-Item -LiteralPath $stagedSource -Recurse -Force -ErrorAction SilentlyContinue
+                    }
+                }
+            }
         }
     } finally {
         if ($sourceOwned) { $sourceMutex.ReleaseMutex() }
@@ -107,6 +136,13 @@ try {
     $runtimeSettingsPath = Join-Path $stateRoot 'runtime-settings.json'
     if (Test-Path -LiteralPath $runtimeSettingsPath) {
         $runtimeSettings = Get-Content -LiteralPath $runtimeSettingsPath -Raw | ConvertFrom-Json
+        if ($runtimeSettings.codex_binary) {
+            $binaryPath = [string]$runtimeSettings.codex_binary
+            if (-not [IO.Path]::IsPathRooted($binaryPath) -or -not [IO.File]::Exists($binaryPath)) {
+                throw 'Configured Codex binary is unavailable.'
+            }
+            $env:CODEX_BINARY = $binaryPath
+        }
         if ($runtimeSettings.codex_workspace_dir) {
             $workspacePath = [string]$runtimeSettings.codex_workspace_dir
             if (-not [IO.Path]::IsPathRooted($workspacePath)) { throw 'Codex workspace must be an absolute local path.' }
@@ -127,6 +163,16 @@ try {
     if ($CatchUpMarket) { $arguments += @("--catch-up-market", $CatchUpMarket) }
     if ($DryRun) { $arguments += "--dry-run" }
     if ($Command -eq 'review') { $arguments += @('--review-port', [string]$ReviewPort) }
+    $workerLogPath = $logPath
+    $workerStartMarker = $null
+    # Launchers may run a rollback revision without the rotating collector.
+    # Its old native redirection remains compatible with those snapshots.
+    if ($sourceRoot -and (Test-Path -LiteralPath (Join-Path $sourceRoot 'tradingagents\local_worker_logging.py'))) {
+        $workerStartMarker = Join-Path $stateRoot ("$Command-worker-$PID-" + [Guid]::NewGuid().ToString('N') + '.started')
+        $arguments = @('-u', '-m', 'tradingagents.local_worker_logging', '--log', $workerLogPath,
+            '--started-marker', $workerStartMarker, '--') + $arguments
+        $logPath = Join-Path $stateRoot "$Command-launcher-$PID.log"
+    }
     # Windows PowerShell converts redirected native stderr to error records.
     # A recoverable Python warning must not terminate the worker mid-attempt.
     $savedErrorActionPreference = $ErrorActionPreference
@@ -141,10 +187,28 @@ try {
         # Native launch/redirection errors leave LASTEXITCODE unset. A real
         # Python exit, including failure, owns its existing terminal notification.
         $pythonInvoked = $LASTEXITCODE -ne $exitSentinel
+        if ($workerStartMarker) {
+            try {
+                $pythonInvoked = [IO.File]::Exists($workerStartMarker) -and
+                    [IO.File]::ReadAllText($workerStartMarker) -ceq 'STARTED'
+                if ([IO.File]::Exists($workerStartMarker)) { [IO.File]::Delete($workerStartMarker) }
+            } catch { Write-Warning 'Worker start receipt could not be read or removed.' }
+        }
         $ErrorActionPreference = $savedErrorActionPreference
     }
     if (-not $pythonInvoked) { throw "Local Python worker could not start." }
-    if ($workerExitCode -ne 0) { throw "Local $Command failed. See $logPath" }
+    if ($workerExitCode -ne 0) {
+        $failureLogs = if ($workerLogPath -ne $logPath) { "$workerLogPath and $logPath" } else { $logPath }
+        throw "Local $Command failed. See $failureLogs"
+    }
+    if ($workerLogPath -and $logPath -ne $workerLogPath -and (Test-Path -LiteralPath $logPath -PathType Leaf)) {
+        try {
+            $launcherLog = Get-Item -LiteralPath $logPath -Force
+            if ($launcherLog.Length -eq 0 -and -not ($launcherLog.Attributes -band [IO.FileAttributes]::ReparsePoint)) {
+                [IO.File]::Delete($logPath)
+            }
+        } catch { Write-Warning 'Empty launcher log cleanup deferred.' }
+    }
     # End worker process boundary.
 } catch {
     if (-not $pythonInvoked -and -not $DryRun) {

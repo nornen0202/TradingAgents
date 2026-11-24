@@ -22,8 +22,8 @@ SCRIPTS = [
 
 @pytest.mark.parametrize("script", SCRIPTS, ids=["us", "kr", "youtube"])
 @pytest.mark.parametrize("resolved,fallback", [
-    ("gpt-6-sol", True), ("gpt-6-sol", False), ("gpt-6.1-sol", True),
-    ("gpt-6.1-sol", False), ("gpt-6-astra", False),
+    ("gpt-6-sol", True), ("gpt-6-sol", False), ("gpt-6.2-sol", True),
+    ("gpt-6.2-sol", False), ("gpt-6-astra", False),
 ])
 def test_workflow_enforces_exact_model_before_export(tmp_path, monkeypatch, script, resolved, fallback):
     env_file = tmp_path / "github-env"
@@ -41,7 +41,7 @@ def test_workflow_enforces_exact_model_before_export(tmp_path, monkeypatch, scri
                                fallback_used=fallback, account="test-account", models=[resolved])
 
     monkeypatch.setattr(codex_preflight, "run_codex_preflight", preflight)
-    expected_models = ["gpt-6.1-sol"] * 3
+    expected_models = ["gpt-6.2-sol"] * 3
     exact_match = not fallback and all(model == resolved for model in expected_models)
     if exact_match:
         exec(compile(script, "workflow-preflight", "exec"), {})
@@ -65,14 +65,14 @@ def test_workflow_exports_exact_target_for_each_active_role(tmp_path, monkeypatc
     monkeypatch.setenv("TRADINGAGENTS_CODEX_PREFLIGHT_ALLOW_MODEL_FALLBACK", "0")
     monkeypatch.setattr(codex_preflight, "run_codex_preflight", lambda **kwargs: SimpleNamespace(
         requested_model=kwargs["model"], resolved_model=kwargs["model"], fallback_used=False,
-        account="test-account", models=["gpt-6-astra", "gpt-6.1-sol"],
+        account="test-account", models=["gpt-6-astra", "gpt-6.2-sol"],
     ))
     exec(compile(script, "workflow-preflight", "exec"), {})
     exported = env_file.read_text(encoding="utf-8").splitlines()
     models = [line for line in exported if "_MODEL=" in line]
     assert len(models) in (4, 5)
     for line in models:
-        expected = "gpt-6.1-sol"
+        expected = "gpt-6.2-sol"
         assert line.endswith(f"={expected}")
     assert len([line for line in models if line.endswith("=gpt-6-astra")]) == 0
     assert "TRADINGAGENTS_CODEX_PREFLIGHT_OK=1" in exported
@@ -91,7 +91,7 @@ def test_explicit_recovery_preserves_verified_source_cohort_models(tmp_path, mon
     def recovered_models(**kwargs):
         assert kwargs["source_run_id"] == "20261008T010000_full"
         assert (kwargs["quick_model"], kwargs["deep_model"], kwargs["output_model"]) == (
-            "gpt-6.1-sol", "gpt-6.1-sol", "gpt-6.1-sol",
+            "gpt-6.2-sol", "gpt-6.2-sol", "gpt-6.2-sol",
         )
         return ("gpt-6-sol",) * 3
 

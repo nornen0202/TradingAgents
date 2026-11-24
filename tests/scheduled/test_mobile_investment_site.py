@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from datetime import datetime, timezone
 from pathlib import Path
 
 import pytest
@@ -16,6 +17,7 @@ from tradingagents.scheduled.mobile_site import (
     _load_latest_work_report,
     _normalize_private_action_semantics,
     _private_market_payload,
+    _public_market_payload,
     _public_quality,
     _strip_strategy_identifiers,
 )
@@ -278,6 +280,30 @@ def test_strategy_safety_check_rejects_raw_order_and_kis_identifiers(identifier_
         assert_strategy_payload_safe(
             {"markets": {"kr": {"integrated_report": {identifier_key: "RAW-PRIVATE-1234"}}}}
         )
+
+
+@pytest.mark.parametrize("clock,status", [
+    ("2026-11-17", "date_only"), ("2026-02-30", "invalid"),
+    ("2026-11-18T10:20:30", "invalid"), ("2026-11-19T00:00:01Z", "future"),
+    (None, "missing"), ("2026-11-18T19:00:00-05:00", None),
+])
+def test_mobile_quote_projection_requires_observation_clock(clock, status):
+    packet = _packet("us", public=True)
+    original = packet["body"]["current"]["bundle"]["strategy_table"][0]
+    original.update(market_data_asof=clock, price_change_pct=3)
+    cutoff = datetime(2026, 11, 19, tzinfo=timezone.utc)
+    for projection in (_private_market_payload, _public_market_payload):
+        row = projection(packet, as_of=cutoff)["rows"][0]
+        assert row.get("market_data_clock_status") == status
+        if status:
+            assert row["market_data_asof"] is None
+            assert row.get("last_price") is None and row.get("price_change_pct") is None
+            assert row["quality"]["execution_ready"] is False
+            assert row["quality"]["conditional_strategy_ready"] is False
+        else:
+            assert row["market_data_asof"] == clock
+            assert row["last_price"] == 123.45 and row["price_change_pct"] == 3
+    assert original["market_data_asof"] == clock and original["last_price"] == 123.45
 
 
 def test_private_action_matches_kr_broker_and_canonical_ticker_aliases() -> None:

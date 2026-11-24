@@ -241,7 +241,8 @@ class PaperBroker:
             raise
 
     def step(
-        self, *, now: str, quotes: dict, signals: list[dict], halted: bool = False
+        self, *, now: str, quotes: dict, signals: list[dict], halted: bool = False,
+        block_new_risk: bool = False,
     ):
         """Fill at a strictly later fresh snapshot; then queue explicit signals.
 
@@ -333,6 +334,7 @@ class PaperBroker:
             ).fetchall():
                 if (
                     halted
+                    or (block_new_risk and order["side"] == "BUY")
                     or (drawdown_stop and order["side"] == "BUY")
                     or (
                         risk_stop
@@ -344,20 +346,21 @@ class PaperBroker:
                     or at >= stamp(order["expires_at"])
                     or stamp(order["created_at"]).date() != at.date()
                 ):
+                    reason = "kill_or_daily_stop_or_expired"
+                    if not halted and order["side"] == "BUY":
+                        if block_new_risk:
+                            reason = "portfolio_coverage_incomplete"
+                        elif drawdown_stop:
+                            reason = "max_drawdown_reached"
                     self.db.execute(
                         "UPDATE orders SET status='CANCELLED',reason=? WHERE id=?",
-                        (
-                            "max_drawdown_reached"
-                            if drawdown_stop and order["side"] == "BUY" and not halted
-                            else "kill_or_daily_stop_or_expired",
-                            order["id"],
-                        ),
+                        (reason, order["id"]),
                     )
                     if order["signal_id"]:
                         append_lifecycle_event(self.db, event_id="cancel:paper:" + order["id"],
                             signal_id=order["signal_id"], intent_id=order["id"], kind="CANCEL", mode="paper",
                             occurred_at=now, available_at=now, ingested_at=now,
-                            payload={"ticker": order["ticker"], "reason": "kill_or_daily_stop_or_expired"})
+                            payload={"ticker": order["ticker"], "reason": reason})
                     continue
                 q = valid.get(order["ticker"])
                 book = q.get("execution_quote") if q else None
@@ -469,6 +472,8 @@ class PaperBroker:
                     and (action == "BUY" or not self.limits.daily_loss_reduce_only)
                 ):
                     reason = "kill_or_daily_stop"
+                elif block_new_risk and action == "BUY":
+                    reason = "portfolio_coverage_incomplete"
                 elif drawdown_stop and action == "BUY":
                     reason = "max_drawdown_reached"
                 elif (
@@ -598,7 +603,7 @@ class PaperBroker:
                 "trading_state": "HALTED"
                 if halted or (risk_stop and not self.limits.daily_loss_reduce_only)
                 else "REDUCING"
-                if risk_stop or drawdown_stop
+                if risk_stop or drawdown_stop or block_new_risk
                 else "ACTIVE",
                 "orders": [
                     dict(r)

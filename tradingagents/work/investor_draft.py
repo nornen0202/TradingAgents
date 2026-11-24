@@ -116,6 +116,9 @@ def compose_investor_draft(packet: dict, *, now: datetime) -> tuple[str, dict]:
     confirmations = {"close": "종가 확인", "next_day": "다음 거래일 확인", "two_bar": "원분석의 2개 봉 확인",
                      "intraday": "장중 확인", "volume_confirmed": "거래량 확인"}
     statuses = {"CONDITIONAL_PLAN": "조건부 계획", "REVIEW_REQUIRED": "재검토 필요", "DATA_NEEDED": "자료 확인 필요"}
+    research_labels = {"get_stock_data": "주가", "get_indicators": "기술지표", "get_company_news": "회사 뉴스",
+                       "get_fundamentals": "기업 기초자료", "get_balance_sheet": "재무상태표",
+                       "get_cashflow": "현금흐름표", "get_income_statement": "손익계산서", "get_disclosures": "공시"}
     lines = [f"# {draft['title']}", "", "원분석을 정리한 기본 보고서입니다. 새로운 분석·시세 조회는 수행하지 않았습니다.", "",
              "## 먼저 볼 계획", ""]
     for strategy in strategies[:3]:
@@ -139,6 +142,11 @@ def compose_investor_draft(packet: dict, *, now: datetime) -> tuple[str, dict]:
         plan, thesis = strategy["investment_plan"], strategy["thesis"]
         lines.extend([f"### {strategy['ticker']} · {_text(strategy.get('display_name'))} — {labels.get(plan['stance'], plan['stance'])}", "",
                       f"{statuses[plan['status']]} · 원분석 {_time_label(plan['analysis_as_of'])} · 검토일 {_time_label(plan['review_window']['review_by'])}", ""])
+        research = plan.get("research_verification") or {}
+        if research.get("status") != "COMPLETE":
+            missing = [research_labels.get(method, "필수 자료") for method in research.get("missing_required_methods", [])]
+            lines.extend(["**연구 자료 재확인:** " + (", ".join(missing) if missing else "원본 연구 근거 검증 필요")
+                          + ". 시세 갱신만으로 이 검증이 완료되지 않습니다.", ""])
         if plan["price_zones"]:
             lines.extend(["| 가격 구간 | 용도 | 확인 기준 | 근거 |", "|---|---|---|---|"])
             for zone in plan["price_zones"]:

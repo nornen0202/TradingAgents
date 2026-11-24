@@ -7,21 +7,7 @@ import pytest
 
 from tradingagents.scheduled.config import load_scheduled_config
 from tradingagents.scheduled.runner import resolve_trade_date
-
-
-class _FakeIndexValue:
-    def __init__(self, value: date):
-        self._value = value
-
-    def to_pydatetime(self):
-        return datetime.combine(self._value, datetime.min.time())
-
-
-class _FakeHistory:
-    empty = False
-
-    def __init__(self, value: date):
-        self.index = [_FakeIndexValue(value)]
+from tests.scheduled.test_trade_date_freshness_guard import _FakeHistory
 
 
 class _FixedDatetime(datetime):

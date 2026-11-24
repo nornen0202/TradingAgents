@@ -12,19 +12,22 @@ from tradingagents.dataflows.daily_history_selection import activate_daily_histo
 from tradingagents.dataflows.vendor_exceptions import VendorInputError, VendorMalformedResponseError
 
 
-NOW = datetime(2026, 11, 7, 0, 0, tzinfo=timezone.utc)
+NOW = datetime(2026, 11, 19, 2, 0, 0, tzinfo=timezone.utc)
 START, END = "2021-10-28", "2026-10-28"
 CASES = [("179880.KQ", "2026-10-15", "KR7179880000"),
          ("443670.KQ", "2024-02-15", "KR7443670005"),
          ("419050.KQ", "2023-02-03", "KR7419050000"),
-         ("396470.KQ", "2023-10-26", "KR7396470007")]
+         ("396470.KQ", "2023-10-26", "KR7396470007"),
+         ("402340.KS", "2021-11-29", "KR7402340004"),
+         ("460940.KQ", "2024-07-31", "KR7460940000")]
 
 
 def metadata(symbol, now=NOW):
     issue = listing._REVIEWED[symbol]
+    board = issue["board"]
     return {"schema": listing.METADATA_SCHEMA, "provider": "KIS", "environment": "public",
-            "symbol": symbol, "board": "kosdaq", "url": listing.master_url("kosdaq"),
-            "reader_source_sha256": listing._MASTER["kosdaq"][2],
+            "symbol": symbol, "board": board, "url": listing.master_url(board),
+            "reader_source_sha256": listing._MASTER[board][2],
             "collection_started_at": (now-timedelta(seconds=2)).isoformat(),
             "available_at": (now-timedelta(seconds=1)).isoformat(),
             "zip_sha256": "a"*64, "master_sha256": "b"*64,
@@ -47,7 +50,7 @@ def clock(monkeypatch):
         monkeypatch.setattr(module, "datetime", Clock)
     kr._CACHE.clear()
     token = activate_daily_history_selection()
-    with run_config({"analysis_as_of": "2026-11-07"}):
+    with run_config({"analysis_as_of": "2026-11-19"}):
         yield
     reset_daily_history_selection(token)
     kr._CACHE.clear()

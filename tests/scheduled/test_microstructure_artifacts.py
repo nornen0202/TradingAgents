@@ -12,6 +12,7 @@ from tradingagents.scheduled.runner import (
     FRESHNESS_PRIOR_SESSION_BACKFILL,
     _bootstrap_overlay_inputs_from_latest_run,
     _build_context_gate_payload,
+    _build_failed_execution_update_payload,
     _run_execution_overlay_passes,
     _write_chatgpt_execution_context_from_ticker_artifacts,
 )
@@ -25,6 +26,16 @@ from tradingagents.schemas import (
     PrimarySetup,
     ThesisState,
 )
+
+
+def test_failed_execution_update_has_no_quote_clock():
+    now = datetime(2026, 11, 19, tzinfo=timezone.utc)
+    update = _build_failed_execution_update_payload(
+        ticker="AIQUY", checkpoint_label="post_research", attempt_payload={}, summary={},
+        contract_payload={"market_data_asof": "2026-11-17"}, now=now,
+    )
+    assert update["market_data_asof"] is None and update["last_price"] is None
+    assert update["execution_asof"] == now.isoformat()
 
 
 @pytest.mark.parametrize("lightweight", [False, True])

@@ -818,10 +818,11 @@ def _market_body(surface: str, *, roots: dict[str, Path], now: datetime, public:
             public=public,
         ),
     }
-    if research_readiness:
-        from .market_report_context import research_receipts
-        current_payload["research_readiness"] = research_receipts(
-            roots["market"], analysis_manifest, bundle.get("strategy_table", []), market=surface, now=now)
+    # Coverage and quote freshness cannot establish original research evidence.
+    # Include the existing hash-bound assessor in default investor packets too.
+    from .market_report_context import research_receipts
+    current_payload["research_readiness"] = research_receipts(
+        roots["market"], analysis_manifest, bundle.get("strategy_table", []), market=surface, now=now)
     if analysis_manifest.get("research_recovery"):
         recovery = analysis_manifest["research_recovery"]
         # Public recovery packets must not reveal account-only ticker membership.

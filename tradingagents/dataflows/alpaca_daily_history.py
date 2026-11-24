@@ -101,6 +101,7 @@ def load_us_daily_bars(symbol, start_date, end_date):
         raise VendorMalformedResponseError('Alpaca history is incomplete or exceeded its time limit')
     frame = validate_daily_bars(pd.DataFrame([{'Date':day,**values} for day,values in sorted(records.items())]),end_date)
     frame.attrs.update(source=SOURCE, provider='alpaca', exchange='US_SIP', feed='sip', adjustment='all',
+                       price_currency=params['currency'],
                        observed_at=datetime.now(timezone.utc).isoformat(), requested_start=start.isoformat(),
                        requested_end=end_date, request_end=cutoff.isoformat(), symbol_asof=end_date,
                        complete=True, session_count=len(required), request_count=page+1,

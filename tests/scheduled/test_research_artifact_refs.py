@@ -590,3 +590,28 @@ def test_initial_blob_paths_are_validated_only_after_boundary_exists_and_writer_
     monkeypatch.setattr(module, "_safe", guarded)
     ResearchArtifactStore(archive, now=NOW).make(source, row, "report_markdown")
     assert validations
+
+
+def test_run_and_ticker_reports_show_the_original_full_clock(evidence, monkeypatch):
+    from tradingagents.scheduled.config import SiteSettings
+    from tradingagents.scheduled.site import _render_run_page, _render_ticker_page
+
+    archive, source, full, original = evidence
+    full["_run_dir"] = str(source)
+    destination, row = bootstrap(evidence, monkeypatch, now=NOW)
+    overlay = publish_overlay(destination, row)
+    second, next_row = bootstrap((archive, destination, overlay, row), monkeypatch, label="next_overlay")
+    next_overlay = publish_overlay(second, next_row)
+    reused = {**original, "started_at": "2026-05-30T09:10:00+00:00",
+              "research_reuse": {"source_run_id": full["run_id"], "analysis_started_at": original["started_at"]}}
+    recovered = {**full, "status": "partial_failure", "tickers": [reused]}
+    for report, ticker_row, label in [
+        (full, original, "신규 전체 분석"),
+        (overlay, row, "기존 분석의 실행 조건 갱신"),
+        (next_overlay, next_row, "기존 분석의 실행 조건 갱신"),
+        (recovered, reused, "기존 전체 분석 재사용"),
+    ]:
+        report["active_universe"] = {"expected_watchlist_tickers": ["AAPL"]}
+        for html in (_render_run_page(report, SiteSettings()), _render_ticker_page(report, ticker_row, SiteSettings())):
+            assert f"{label} · 원분석 {original['started_at']}" in html
+    assert (source / original["artifacts"]["report_markdown"]).read_text(encoding="utf-8") == "# Original immutable report\n"

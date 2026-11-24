@@ -1,11 +1,15 @@
 from __future__ import annotations
 
 from datetime import datetime
+import math
 from zoneinfo import ZoneInfo
 
 from tradingagents.portfolio.instrument_identity import resolve_identity
 from tradingagents.portfolio.kis import KisClient
+from tradingagents.scheduled.market_calendar import market_session_state
 from tradingagents.schemas import IntradayMarketSnapshot
+
+from ..vendor_exceptions import VendorUnavailableError
 
 
 class KISQuoteProvider:
@@ -20,6 +24,9 @@ class KISQuoteProvider:
         market_timezone: str = "Asia/Seoul",
         checkpoint_id: str | None = None,
     ) -> IntradayMarketSnapshot:
+        from .providers import require_live_intraday_clock
+
+        require_live_intraday_clock(market_timezone, provider_name=getattr(self, "name", "kis"))
         identity = resolve_identity(ticker)
         code = identity.krx_code or identity.broker_symbol or ticker.split(".")[0]
         if not code or not str(code).isdigit():
@@ -37,8 +44,18 @@ class KISQuoteProvider:
         )
         output = payload.get("output") or {}
         now = datetime.now(ZoneInfo(market_timezone))
+        day = str(output.get("stck_bsop_date") or "").strip()
+        clock = str(output.get("stck_cntg_hour") or "").strip()
+        try:
+            if len(day) != 8 or len(clock) != 6:
+                raise ValueError("Missing date or time")
+            asof = datetime.strptime(day + clock, "%Y%m%d%H%M%S").replace(tzinfo=ZoneInfo("Asia/Seoul"))
+        except ValueError as exc:
+            raise VendorUnavailableError("KIS quote response omitted a verifiable trade date or time.") from exc
+        if asof > now:
+            raise VendorUnavailableError("KIS quote timestamp is after receipt.")
         last_price = _to_float(output.get("stck_prpr"))
-        if last_price is None:
+        if last_price is None or last_price <= 0:
             raise RuntimeError(f"KIS quote response did not include a usable price for {ticker}.")
 
         day_high = _to_float(output.get("stck_hgpr")) or last_price
@@ -47,7 +64,7 @@ class KISQuoteProvider:
 
         return IntradayMarketSnapshot(
             ticker=ticker,
-            asof=now.isoformat(),
+            asof=asof.isoformat(),
             provider=self.name,
             interval=interval,
             last_price=last_price,
@@ -57,11 +74,10 @@ class KISQuoteProvider:
             volume=volume,
             avg20_daily_volume=None,
             relative_volume=None,
-            bar_timestamp=now.isoformat(),
-            provider_timestamp=now.isoformat(),
-            quote_delay_seconds=0,
+            provider_timestamp=asof.isoformat(),
+            quote_delay_seconds=math.ceil((now - asof).total_seconds()),
             provider_realtime_capable=self.realtime_capable,
-            market_session=_kr_market_session(now),
+            market_session=market_session_state(market="KR", now_local=now)["phase"],
             market="KR",
             exchange="KRX",
             checkpoint_id=checkpoint_id,
@@ -73,18 +89,8 @@ def _to_float(value: object) -> float | None:
     if not text:
         return None
     try:
-        return float(text)
+        number = float(text)
+        return number if math.isfinite(number) else None
     except ValueError:
         return None
-
-
-def _kr_market_session(now: datetime) -> str:
-    current = now.astimezone(ZoneInfo("Asia/Seoul")).time()
-    if current.hour < 8:
-        return "overnight"
-    if (current.hour, current.minute) < (9, 0):
-        return "pre_open"
-    if (current.hour, current.minute) <= (15, 30):
-        return "regular"
-    return "post_close"
 

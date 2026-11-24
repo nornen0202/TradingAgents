@@ -11,6 +11,7 @@ requires-python = ">=3.11"
 dependencies = [
     "aiohttp>=3.14.4",
     "certifi>=2026.10.19",
+    "cryptography>=50.0.0",
     "langchain-core>=0.3.81",
     "backtrader>=1.9.78.123",
     "langchain-anthropic>=0.3.15",
@@ -36,6 +37,7 @@ dependencies = [
     "stockstats>=0.6.5",
     "tqdm>=4.67.1",
     "typing-extensions>=4.14.0",
+    "websockets>=15,<17",
     "yfinance>=0.2.63",
     "exchange-calendars>=4.5.6",
     "imageio-ffmpeg>=0.6.0",

@@ -45,7 +45,7 @@ def test_compiled_graph_uses_sol_for_every_investment_decision(monkeypatch, para
     graph = setup.setup_graph(["market"], parallel_analysts=parallel_analysts)
     result = graph.invoke(Propagator().create_initial_state("AAPL", "2026-10-08"))
 
-    assert deep.model == "gpt-6.1-sol"
+    assert deep.model == "gpt-6.2-sol"
     assert deep.invoke.call_count == 3
     research_prompt, trader_messages, portfolio_prompt = [call.args[0] for call in deep.invoke.call_args_list]
     assert "As the research manager" in research_prompt
@@ -55,5 +55,5 @@ def test_compiled_graph_uses_sol_for_every_investment_decision(monkeypatch, para
     assert result["investment_plan"] in trader_messages[1]["content"]
     assert result["trader_investment_plan"] in portfolio_prompt
     assert json.loads(result["final_trade_decision"])["entry_action"] == "WAIT"
-    assert quick.model == "gpt-6.1-sol"
+    assert quick.model == "gpt-6.2-sol"
     assert quick.invoke.call_count == 6  # evidence, two researchers, three risk viewpoints

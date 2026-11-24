@@ -74,7 +74,7 @@ class ReportWriterTests(unittest.TestCase):
             create_client.return_value.get_llm.return_value = object()
             _create_writer_llm(SimpleNamespace(provider="codex", codex_writer_reasoning_effort="high"))
 
-        self.assertEqual(create_client.call_args.kwargs["model"], "gpt-6.1-sol")
+        self.assertEqual(create_client.call_args.kwargs["model"], "gpt-6.2-sol")
         self.assertEqual(create_client.call_args.kwargs["codex_reasoning_effort"], "high")
         self.assertEqual(create_client.call_args.kwargs["model_role"], "writer")
 

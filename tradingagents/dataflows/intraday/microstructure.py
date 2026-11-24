@@ -56,6 +56,13 @@ class KISMicrostructureProvider:
         market_timezone: str | None = None,
         checkpoint_id: str | None = None,
     ) -> IntradayMarketSnapshot:
+        from .providers import require_live_intraday_clock
+
+        normalized = str(ticker or "").strip().upper()
+        resolved_tz = market_timezone or (
+            "Asia/Seoul" if normalized.endswith((".KS", ".KQ")) or (len(normalized) == 6 and normalized.isdigit()) else "America/New_York"
+        )
+        require_live_intraday_clock(resolved_tz, provider_name=self.name)
         identity = resolve_identity(ticker)
         market = "KR" if (identity.country or "").upper() == "KR" or _looks_like_kr_symbol(ticker) else "US"
         if market == "KR":

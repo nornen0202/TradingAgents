@@ -503,7 +503,12 @@ def run_due(archive, state, *, now=None, dry_run=False, research_only=False, cat
             if admission_error is not None:
                 raise admission_error
             require_storage_headroom(archive, state, workspace)
+            capture_path = None
             if mode == "full":
+                capture_path = (read_json(state / "runtime-settings.json", {}) or {}).get("daily_history_capture_db")
+                if capture_path is not None:
+                    if not isinstance(capture_path, str) or not Path(capture_path).is_absolute():
+                        raise ValueError("Local daily_history_capture_db must be an absolute private path")
                 source = partial_target_source(manifests, target, window_start=window_start, now=now)
                 if source:
                     # Never fall back to full research if source compatibility
@@ -511,7 +516,8 @@ def run_due(archive, state, *, now=None, dry_run=False, research_only=False, cat
                     args.extend(["--resume-from-run", source])
                 preflight(config)
             stage = "analysis"
-            result = subprocess.run(args, cwd=ROOT, check=False, timeout=12 * 3600)
+            child_options = {"env": {**os.environ, "TRADINGAGENTS_RESEARCH_PRICE_CAPTURE_DB": capture_path}} if capture_path else {}
+            result = subprocess.run(args, cwd=ROOT, check=False, timeout=12 * 3600, **child_options)
             exit_code, error_type = result.returncode, "WorkerExitError"
         except Exception as exc:
             exit_code, error_type = 1, type(exc).__name__
@@ -798,9 +804,12 @@ def complete_handoffs(site, runtime_dir, publication):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("command", choices=("run-due", "publish", "paper", "review", "validate-kis", "strategy-kis", "research-kis"))
-    parser.add_argument("--archive-dir", type=Path, required=True)
-    parser.add_argument("--state-dir", type=Path, required=True)
-    parser.add_argument("--runtime-dir", type=Path, required=True)
+    parser.add_argument("--archive-dir", type=Path)
+    parser.add_argument("--state-dir", type=Path)
+    parser.add_argument("--runtime-dir", type=Path)
+    parser.add_argument("--isolated-replay", type=Path, help="Use a new or initialized offline KIS replay workspace.")
+    parser.add_argument("--replay-action", help="Select the isolated replay action.")
+    parser.add_argument("--fixture-input", type=Path, help="Offline replay payload for this action.")
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--catch-up-market", choices=("kr", "us"),
                         help="Explicit same-day missed research recovery; retain the original slot budget and actual clocks.")
@@ -809,6 +818,23 @@ def main():
     parser.add_argument("--rebuild", action="store_true")
     parser.add_argument("--review-port", type=int, default=8766)
     args = parser.parse_args()
+    if args.isolated_replay is not None:
+        if (args.command != "strategy-kis" or not args.replay_action or any(
+                (args.archive_dir, args.state_dir, args.runtime_dir, args.dry_run, args.catch_up_market,
+                 args.reports_only, args.rebuild))):
+            parser.error("Isolated replay requires strategy-kis and --replay-action, with no operational arguments.")
+        from tradingagents.execution import isolated_replay
+        from tradingagents.execution.kis_demo import DemoError
+        try:
+            result = isolated_replay.command(args.isolated_replay, args.replay_action, args.fixture_input)
+        except TimeoutError:
+            result = {"status": "REPLAY_ALREADY_RUNNING", "network_requests_sent": 0, "real_orders_enabled": False}
+        except (DemoError, OSError, ValueError, TypeError, KeyError):
+            parser.error("Invalid isolated replay workspace, action, or fixture evidence.")
+        print(json.dumps(result, ensure_ascii=True))
+        return 0
+    if args.replay_action or args.fixture_input or not all((args.archive_dir, args.state_dir, args.runtime_dir)):
+        parser.error("Provide --archive-dir, --state-dir, and --runtime-dir for an operational command.")
     if args.catch_up_market and args.command != "research-kis":
         parser.error("--catch-up-market requires research-kis")
     if not 1024 <= args.review_port <= 65535:
@@ -818,6 +844,10 @@ def main():
     args.runtime_dir = args.runtime_dir.resolve()
     args.state_dir.mkdir(parents=True, exist_ok=True)
     prepare_environment()
+    if args.command in {"run-due", "research-kis"} and not args.dry_run:
+        observation_root = args.state_dir / "forward-observation"
+        if (observation_root / "policy.json").is_file():
+            os.environ["TRADINGAGENTS_FORWARD_OBSERVATION_ROOT"] = str(observation_root)
     if args.command in {"run-due", "publish"} and not args.dry_run:
         os.environ["TRADINGAGENTS_LOCAL_PAPER_STATE_DIR"] = str(args.state_dir)
     # Independent lanes never acquire the minute producer lock. Research writes
@@ -909,7 +939,14 @@ def main():
                 return 0
             if args.command == "run-due":
                 try:
+                    if not args.dry_run:
+                        from tradingagents.execution.session_observations import scheduled_capture
+                        observation_results = scheduled_capture(args.state_dir)
+                    else:
+                        observation_results = []
                     result = run_due(args.archive_dir, args.state_dir, dry_run=args.dry_run)
+                    if observation_results:
+                        result += observation_results
                 finally:
                     if not args.dry_run:
                         from tradingagents.notifications.local import reconcile_safely

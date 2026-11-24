@@ -1380,6 +1380,7 @@ def load_account_snapshot_from_kis(profile: PortfolioProfile) -> AccountSnapshot
     client = KisClient.from_api_keys(environment=profile.broker_environment)
     now = datetime.now().astimezone()
     warnings: list[str] = []
+    pending_orders_verified = True
     market_scope = str(getattr(profile, "market_scope", "kr") or "kr").strip().lower()
     if market_scope in {"us", "overseas"}:
         positions_payload, summary_payload = client.fetch_overseas_present_balance(
@@ -1393,6 +1394,7 @@ def load_account_snapshot_from_kis(profile: PortfolioProfile) -> AccountSnapshot
             )
         except Exception as exc:
             pending_payload = []
+            pending_orders_verified = False
             warnings.append(
                 "KIS overseas pending-order lookup failed; continuing with balance-only account snapshot. "
                 f"reason={_summarize_optional_kis_error(exc)}"
@@ -1411,6 +1413,7 @@ def load_account_snapshot_from_kis(profile: PortfolioProfile) -> AccountSnapshot
             )
         except Exception as exc:
             pending_payload = []
+            pending_orders_verified = False
             warnings.append(
                 "KIS pending-order lookup failed; continuing with balance-only account snapshot. "
                 f"reason={_summarize_optional_kis_error(exc)}"
@@ -1450,6 +1453,13 @@ def load_account_snapshot_from_kis(profile: PortfolioProfile) -> AccountSnapshot
         profile=profile,
     )
     warnings.extend(cash_snapshot["warnings"])
+    # A failed reconciliation is not evidence of zero outstanding orders.
+    # Preserve balances for reporting, but fail the existing account gates.
+    cash_snapshot["cash_diagnostics"]["pending_orders_status"] = (
+        "VERIFIED" if pending_orders_verified else "UNVERIFIED")
+    if not pending_orders_verified:
+        cash_snapshot["cash_diagnostics"]["balance_snapshot_health"] = cash_snapshot["snapshot_health"]
+        cash_snapshot["snapshot_health"] = "INVALID_SNAPSHOT"
 
     return AccountSnapshot(
         snapshot_id=f"{now.strftime('%Y%m%dT%H%M%S')}_kis_{profile.account_no}-{profile.product_code}",

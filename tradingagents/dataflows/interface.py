@@ -9,6 +9,7 @@ import hashlib
 import json
 from uuid import uuid4
 from typing import Any
+from zoneinfo import ZoneInfo
 
 from .alpha_vantage import (
     get_balance_sheet as get_alpha_vantage_balance_sheet,
@@ -22,6 +23,8 @@ from .alpha_vantage import (
     get_stock as get_alpha_vantage_stock,
 )
 from .alpha_vantage_common import AlphaVantageRateLimitError
+from .alpaca_news import get_company_news_alpaca
+from .massive_news import get_company_news_massive
 from .config import get_config
 from .ecos import get_macro_news_ecos
 from .fred import get_macro_data
@@ -33,7 +36,7 @@ from .sec_edgar_statements import (
     get_cashflow as get_sec_cashflow,
     get_income_statement as get_sec_income_statement,
 )
-from .integrity import is_historical
+from .integrity import is_historical, parse_analysis_cutoff
 from .daily_history_selection import get_selected_daily_history, select_daily_history
 from .us_daily_history import SOURCE as _US_KIS_DAILY_SOURCE, fallback_enabled as _us_history_enabled
 from .alpaca_daily_history import SOURCE as _US_ALPACA_DAILY_SOURCE
@@ -99,6 +102,8 @@ TOOLS_CATEGORIES = {
 }
 
 VENDOR_LIST = [
+    "alpaca",
+    "massive",
     "fred",
     "alpha_vantage",
     "yfinance",
@@ -138,11 +143,15 @@ VENDOR_METHODS = {
         "yfinance": get_yfinance_income_statement,
     },
     "get_news": {
+        "alpaca": get_company_news_alpaca,
+        "massive": get_company_news_massive,
         "alpha_vantage": get_company_news_alpha_vantage,
         "yfinance": get_company_news_yfinance,
         "naver": get_company_news_naver,
     },
     "get_company_news": {
+        "alpaca": get_company_news_alpaca,
+        "massive": get_company_news_massive,
         "alpha_vantage": get_company_news_alpha_vantage,
         "yfinance": get_company_news_yfinance,
         "naver": get_company_news_naver,
@@ -293,6 +302,8 @@ def _prioritize_market_specific_vendors(method: str, vendor_chain: list[str], ar
             if isinstance(symbol, str):
                 profile = resolve_instrument(symbol)
                 if profile.country == "KR":
+                    remove("alpaca")
+                    remove("massive")
                     if method in statements:
                         remove("sec_edgar")
                     if method in {"get_news", "get_company_news", "get_social_sentiment"}:
@@ -303,7 +314,7 @@ def _prioritize_market_specific_vendors(method: str, vendor_chain: list[str], ar
                 else:
                     if method in statements:
                         curr_date = kwargs.get("curr_date") or (args[2] if len(args) > 2 else None) or get_config().get("analysis_as_of")
-                        if is_historical(curr_date):
+                        if is_historical(curr_date, market_timezone=profile.timezone):
                             promote("sec_edgar")
                     if method in {"get_news", "get_company_news", "get_social_sentiment"}:
                         remove("naver")
@@ -491,20 +502,42 @@ def _route_to_vendor(method: str, *args, **kwargs):
 
     config = get_config()
     cutoff = config.get("analysis_as_of")
+    cutoff_day = None
+    if cutoff:
+        # Date-based vendor signatures still receive YYYY-MM-DD. Providers
+        # with intraday publication clocks can read the original scoped instant.
+        timezone_name = "UTC"
+        if method not in {"get_global_news", "get_macro_news"}:
+            from tradingagents.agents.utils.instrument_resolver import resolve_instrument
+
+            symbol = kwargs.get("symbol") or kwargs.get("ticker") or (args[0] if args else None)
+            if isinstance(symbol, str) and symbol.strip():
+                timezone_name = resolve_instrument(symbol).timezone
+        else:
+            region = kwargs.get("region") or (args[3] if len(args) > 3 else None)
+            if region == "KR":
+                timezone_name = "Asia/Seoul"
+            elif region == "US":
+                timezone_name = "America/New_York"
+        try:
+            cutoff_day = parse_analysis_cutoff(cutoff, timezone_name).astimezone(ZoneInfo(timezone_name)).date().isoformat()
+        except (TypeError, ValueError) as exc:
+            raise VendorInputError("Invalid analysis_as_of cutoff") from exc
     date_index = {"get_fundamentals": 1, "get_balance_sheet": 2, "get_cashflow": 2, "get_income_statement": 2}.get(method)
-    if cutoff and date_index is not None:
+    if cutoff_day and date_index is not None:
         if len(args) > date_index:
             if not args[date_index]:
-                args = (*args[:date_index], cutoff, *args[date_index + 1:])
+                args = (*args[:date_index], cutoff_day, *args[date_index + 1:])
         elif not kwargs.get("curr_date"):
-            kwargs = {**kwargs, "curr_date": cutoff}
+            kwargs = {**kwargs, "curr_date": cutoff_day}
     _validate_input_for_method(method, args, kwargs)
-    if cutoff:
+    if cutoff_day:
         # Guard tool arguments independently of the model's compliance with prompts.
         dates = [str(v) for v in (*args, *kwargs.values()) if isinstance(v, str) and len(v) == 10 and v[4:5] == "-" and v[7:8] == "-"]
-        if any(value > cutoff for value in dates):
+        if any(value > cutoff_day for value in dates):
             raise VendorInputError("Requested data date exceeds the analysis as-of date")
-        if method == "get_insider_transactions" and (config.get("point_in_time_strict") or is_historical(cutoff)):
+        if method == "get_insider_transactions" and (config.get("point_in_time_strict")
+                or is_historical(cutoff, market_timezone=timezone_name)):
             return "No insider data: historical publication timestamps are not verified."
 
     category = get_category_for_method(method)

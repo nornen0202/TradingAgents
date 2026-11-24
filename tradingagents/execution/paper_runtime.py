@@ -31,6 +31,10 @@ def _read(path, default=None):
 
 
 def _latest_source(archive, market, now, *, required_artifacts=None):
+    return _select_source(archive, market, now, required_artifacts=required_artifacts)[0]
+
+
+def _select_source(archive, market, now, *, required_artifacts=None):
     if required_artifacts is None:
         required_artifacts = ("decision_bundle_v2.json", "portfolio-private/account_snapshot.json", "portfolio-private/proposed_orders.json")
     # Canonical run IDs are validated before becoming a filesystem component.
@@ -43,15 +47,20 @@ def _latest_source(archive, market, now, *, required_artifacts=None):
             started = instant(manifest.get("started_at"))
             if at is None or started is None or not started <= at or not timedelta(0) <= now - at < timedelta(hours=36):
                 continue
-            if manifest.get("status") != "success":
-                continue
             if path.parent.name != manifest.get("run_id"):
                 continue
+            active = manifest.get("active_universe") or {}
+            strict = active.get("mode") in {"full_required_coverage", "adaptive_required_coverage"}
+            incomplete = strict and (active.get("coverage") or {}).get("complete") is not True
+            if manifest.get("status") == "partial_failure" or (manifest.get("status") == "success" and incomplete):
+                return None, True
+            if manifest.get("status") != "success":
+                continue
             if all((path.parent / name).is_file() for name in required_artifacts):
-                return path.parent
+                return path.parent, False
         except (ValueError, TypeError, AttributeError):
             continue
-    return None
+    return None, False
 
 
 def _load_account(market):
@@ -137,8 +146,10 @@ def advance_market(archive, state, market, *, now=None, clock=None, account_load
                 broker.close()
         return finish("MARKET_CLOSED" if session.get("phase") == "closed" else "BLOCKED",
                       () if session.get("phase") == "closed" else ("CALENDAR_UNVERIFIED",), session=session)
-    source = _latest_source(archive, market, now)
+    source, coverage_blocked = _select_source(archive, market, now)
     if source is None and not ledger.exists():
+        if coverage_blocked:
+            return finish("BLOCKED", ("SOURCE_PORTFOLIO_COVERAGE_INCOMPLETE",), session=session)
         return finish("WAITING_SOURCE", ("NO_RECENT_COMPLETED_SOURCE",), session=session)
     account_loader = account_loader or _load_account
     try:
@@ -149,7 +160,7 @@ def advance_market(archive, state, market, *, now=None, clock=None, account_load
         # The producer can publish during the account read. Select against the
         # current clock before building signals, not the pre-network snapshot.
         # This does not renew either source's original evidence timestamps.
-        source = _latest_source(archive, market, observed)
+        source, coverage_blocked = _select_source(archive, market, observed)
         broker = PaperBroker(ledger, limits)
         try:
             scope = hashlib.sha256(str(account.get("account_id", "")).encode()).hexdigest()
@@ -177,7 +188,10 @@ def advance_market(archive, state, market, *, now=None, clock=None, account_load
                     # Positions still get a genuine new valuation; expired proposals
                     # never become new orders merely because quotes were refreshed.
                     step["signals"] = []
-                    result["blockers"].append("SOURCE_EXECUTION_EXPIRED" if source else "NO_RECENT_COMPLETED_SOURCE")
+                    if coverage_blocked:
+                        result["blockers"].append("SOURCE_PORTFOLIO_COVERAGE_INCOMPLETE")
+                    else:
+                        result["blockers"].append("SOURCE_EXECUTION_EXPIRED" if source else "NO_RECENT_COMPLETED_SOURCE")
                 if market == "us":
                     # build_step deliberately sizes only KR. For USD simulation use
                     # the new independently observed reference rate, with the same
@@ -218,12 +232,21 @@ def advance_market(archive, state, market, *, now=None, clock=None, account_load
                     return finish("MARKET_CLOSED", ("SESSION_ENDED_DURING_READ",), **_summary(broker))
                 if not _account_valid(account, at):
                     return finish("BLOCKED", ("ACCOUNT_EXPIRED_DURING_READ",), **_summary(broker))
-                latest = _latest_source(archive, market, at)
+                latest, blocked_during_read = _select_source(archive, market, at)
+                # A completed loss of coverage is terminal for this tick even
+                # if it arrives after the last permitted source reselection.
+                if blocked_during_read:
+                    coverage_blocked = True
+                    source = None
+                    step["signals"] = []
+                    result["blockers"].append("SOURCE_PORTFOLIO_COVERAGE_INCOMPLETE")
+                    break
                 if selection_attempt == 0 and latest is not None and latest != source:
                     # Publication can also happen during quote reads. Rebuild
                     # the whole step and fetch its complete ticker set once;
                     # never attach a new source ID to old signals or prices.
                     source, observed = latest, at
+                    coverage_blocked = False
                     continue
                 break
             result["source_reselections_after_quotes"] = selection_attempt
@@ -256,7 +279,8 @@ def advance_market(archive, state, market, *, now=None, clock=None, account_load
                 if not broker.db.execute("SELECT 1 FROM orders WHERE id=?", (key,)).fetchone():
                     signals.append(signal)
             local_at = at.astimezone(ZoneInfo("Asia/Seoul" if market == "kr" else "America/New_York")).isoformat()
-            receipt = broker.step(now=local_at, quotes=quotes, signals=signals, halted=(state / "HALT").exists())
+            receipt = broker.step(now=local_at, quotes=quotes, signals=signals,
+                                  halted=(state / "HALT").exists(), block_new_risk=coverage_blocked)
             valid_clocks = [instant(q["as_of"]) for q in quotes.values() if instant(q.get("as_of"))]
             # Detailed prices/cash are private. Only safe operational status is
             # supplied to the read-only viewer and routine task logs.
@@ -269,7 +293,7 @@ def advance_market(archive, state, market, *, now=None, clock=None, account_load
             blockers = result["blockers"] + sorted(set(quote_blockers.values()))
             if any(d.get("reason") == "ORDERBOOK_FUTURE" for d in result["quote_diagnostics"].values()):
                 blockers.append("CLOCK_SYNC_REVIEW_REQUIRED")
-            state_label = "BLOCKED" if not receipt["marks_complete"] or quote_blockers else "VALUATION_ONLY" if blockers else "ACTIVE"
+            state_label = "BLOCKED" if coverage_blocked or not receipt["marks_complete"] or quote_blockers else "VALUATION_ONLY" if blockers else "ACTIVE"
             if state_label == "ACTIVE" and not step["signals"] and not pending:
                 state_label = "VALUATION_ONLY"
             return finish(state_label, blockers)

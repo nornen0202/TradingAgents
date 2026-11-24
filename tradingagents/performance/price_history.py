@@ -9,8 +9,9 @@ from pathlib import Path
 from typing import Any, Mapping
 
 from tradingagents.external.prism_normalize import normalize_market
-from tradingagents.performance.models import OUTCOME_CALCULATION_VERSION
+from tradingagents.performance.models import OUTCOME_CALCULATION_VERSION, VERIFIED_PRICE_CALCULATION_VERSION
 from tradingagents.performance.lifecycle import timestamp
+from tradingagents.performance.price_revisions import latest_revision_sql
 
 
 BENCHMARK_KEY = "__BENCHMARK__"
@@ -53,6 +54,7 @@ def load_price_history_for_recommendations(
     market: str | None = None,
     lookback_days: int = 120,
     asof_date: str | None = None,
+    require_verified_price: bool = False,
 ) -> PriceHistoryLoadResult:
     lower, cutoff = _history_window(asof_date, lookback_days)
     provider = str(provider or "none").strip().lower()
@@ -69,6 +71,7 @@ def load_price_history_for_recommendations(
         market=market,
         asof_date=asof_date,
         refresh_window_days=lookback_days,
+        require_verified_price=require_verified_price,
     )
     warnings.extend(market_filter_warnings)
 
@@ -203,22 +206,46 @@ def _recommendations_due_for_refresh(
     market: str | None = None,
     asof_date: str | None = None,
     refresh_window_days: int = 120,
+    require_verified_price: bool = False,
 ) -> tuple[list[str], tuple[int, ...], list[str]]:
     if not Path(db_path).exists():
         return [], (), []
     _, analysis_date = _history_window(asof_date, refresh_window_days)
+    upper = timestamp(analysis_date.isoformat() + "T23:59:59.999999+00:00")
     target_market = _normalize_target_market(market)
     cutoff_date = _refresh_cutoff_date(asof_date, refresh_window_days)
     with sqlite3.connect(db_path) as conn:
         columns = _table_columns(conn, "action_recommendations")
+        if require_verified_price and "price_reference_json" not in columns:
+            return [], (), ["performance_price_reference_evidence_unavailable"]
         if cutoff_date:
             market_column = "r.market" if "market" in columns else "NULL"
+            join = "o.recommendation_id = r.id"
+            restriction = ""
+            revision_join = ""
+            if require_verified_price:
+                revision_filter = ""
+                if _table_columns(conn, "action_price_revisions"):
+                    latest = latest_revision_sql("r.id", f"'{upper.isoformat()}'")
+                    revision_join = f"LEFT JOIN action_price_revisions q ON q.revision_id=({latest})"
+                    if "price_revision_id" in _table_columns(conn, "action_outcomes"):
+                        revision_filter = "AND z.price_revision_id IS q.revision_id"
+                    restriction = "AND CASE WHEN q.revision_id IS NULL THEN r.price_reference_json ELSE q.reference_json END IS NOT NULL"
+                else:
+                    restriction = "AND r.price_reference_json IS NOT NULL"
+                join = f"""o.rowid = (
+                    SELECT z.rowid FROM action_outcomes z WHERE z.recommendation_id = r.id
+                      AND z.calculation_version = {VERIFIED_PRICE_CALCULATION_VERSION}
+                      AND z.updated_at <= '{upper.isoformat()}' {revision_filter}
+                    ORDER BY z.updated_at DESC, z.rowid DESC LIMIT 1
+                )"""
             rows = conn.execute(
                 f"""
                 SELECT r.id, r.ticker, {market_column}, r.created_at
                 FROM action_recommendations r
-                LEFT JOIN action_outcomes o ON o.recommendation_id = r.id
-                WHERE substr(r.created_at, 1, 10) >= ?
+                {revision_join}
+                LEFT JOIN action_outcomes o ON {join}
+                WHERE substr(r.created_at, 1, 10) >= ? {restriction}
                   AND (
                     o.recommendation_id IS NULL
                     OR COALESCE(o.calculation_version, 1) < ?
@@ -229,7 +256,8 @@ def _recommendations_due_for_refresh(
                   )
                 ORDER BY r.ticker
                 """,
-                (cutoff_date, OUTCOME_CALCULATION_VERSION, str(asof_date)[:10]),
+                (cutoff_date, VERIFIED_PRICE_CALCULATION_VERSION if require_verified_price else OUTCOME_CALCULATION_VERSION,
+                 str(asof_date)[:10]),
             ).fetchall()
     tickers: list[str] = []
     seen_tickers: set[str] = set()
@@ -237,7 +265,6 @@ def _recommendations_due_for_refresh(
     seen_recommendation_ids: set[int] = set()
     skipped = 0
     invalid_clock = 0
-    upper = timestamp(analysis_date.isoformat() + "T23:59:59.999999+00:00")
     for row in rows:
         created_at = str(row[3] or "")
         try:

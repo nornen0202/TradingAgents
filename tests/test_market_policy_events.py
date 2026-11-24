@@ -252,13 +252,17 @@ def test_work_receipt_preserves_closed_research_without_revalidating_execution(m
     monkeypatch.setattr("tradingagents.work.freshness.latest_regular_session_context", lambda *args, **kwargs:
         {"session": {"phase": "closed", "is_open": False}, "verified_session": True, "latest_regular_close_at": close})
     bundle = {"market": "US", "strategy_table": [{"ticker": "AAPL", "interval": "1d", "market_data_asof": close}]}
-    receipt = source_freshness_receipt({}, bundle, now=sunday, analysis_manifest={}, public=True)
+    original = {"tickers": [{"ticker": "AAPL", "status": "success", "started_at": "2026-10-18T09:00:00Z",
+        "finished_at": sunday.isoformat(), "execution_contract": {"ticker": "AAPL", "analysis_asof": sunday.isoformat(),
+        "market_data_asof": close, "level_basis": "daily_close"}}]}
+    receipt = source_freshness_receipt({}, bundle, now=sunday, analysis_manifest=original, public=True)
     assert receipt["market_data_status"] == "STALE"
     assert receipt["research_market_data_status"] == "VALID"
     assert receipt["research_market_data_receipts"][0]["category"] == "LATEST_REGULAR_CLOSE_RESEARCH_ONLY"
     assert receipt["research_market_data_receipts"][0]["execution_eligible"] is False
     assert receipt["research_does_not_enable_execution"]
     bundle["strategy_table"][0]["market_data_asof"] = "2026-10-15T20:00:00+00:00"
+    assert source_freshness_receipt({}, bundle, now=sunday, analysis_manifest=original, public=True)["research_market_data_status"] == "VALID"
     assert source_freshness_receipt({}, bundle, now=sunday, analysis_manifest={}, public=True)["research_market_data_status"] == "UNVERIFIED"
 
 

@@ -4,6 +4,7 @@ import html
 import re
 from datetime import datetime, timedelta
 from email.utils import parsedate_to_datetime
+from zoneinfo import ZoneInfo
 
 import requests
 
@@ -17,7 +18,7 @@ _NAVER_NEWS_ENDPOINT = "https://openapi.naver.com/v1/search/news.json"
 
 
 def _strip_html(text: str) -> str:
-    return re.sub(r"<[^>]+>", "", html.unescape(text or "")).strip()
+    return re.sub(r"<[^>]+>", "", html.unescape(text if isinstance(text, str) else "")).strip()
 
 
 def _get_headers() -> dict[str, str]:
@@ -108,18 +109,23 @@ def fetch_company_news_naver(symbol: str, start_date: str, end_date: str, displa
             raise
         except requests.RequestException as exc:
             raise VendorTransientError(f"Naver News request failed: {exc}") from exc
-        payload = response.json()
-        query_items = payload.get("items")
+        try:
+            payload = response.json()
+        except (ValueError, TypeError) as exc:
+            raise VendorMalformedResponseError("Naver News payload was not valid JSON.") from exc
+        query_items = payload.get("items") if isinstance(payload, dict) else None
         if not isinstance(query_items, list):
             raise VendorMalformedResponseError("Naver News payload did not include an items list.")
-        items.extend(query_items)
+        items.extend(item for item in query_items if isinstance(item, dict))
 
-    start_dt = datetime.strptime(start_date, "%Y-%m-%d")
-    end_dt = datetime.strptime(end_date, "%Y-%m-%d") + timedelta(days=1)
-    normalized = dedupe_news_items(
-        [normalize_naver_article(article, fallback_symbol=profile.primary_symbol) for article in items]
+    market_zone = ZoneInfo("Asia/Seoul")
+    start_dt = datetime.strptime(start_date, "%Y-%m-%d").replace(tzinfo=market_zone)
+    end_dt = datetime.strptime(end_date, "%Y-%m-%d").replace(tzinfo=market_zone) + timedelta(days=1)
+    bounded = filter_news_items_by_date(
+        (normalize_naver_article(article, fallback_symbol=profile.primary_symbol) for article in items),
+        start_date=start_dt, end_date=end_dt, market_timezone=market_zone.key,
     )
-    return filter_news_items_by_date(normalized, start_date=start_dt, end_date=end_dt)
+    return dedupe_news_items(bounded)
 
 
 def get_company_news_naver(symbol: str, start_date: str, end_date: str) -> str:

@@ -550,7 +550,7 @@ def test_local_identity_clock_does_not_become_vendor_price_observation(broker):
     del frame.attrs["observed_at"]
     receipt = evidence._snapshot(state.symbol, END, "yfinance", frame)
     assert receipt["status"] == "UNVERIFIED"
-    assert "observed_at" not in receipt
+    assert "observed_at" not in receipt and "snapshot_id" not in receipt
 
 
 @pytest.mark.parametrize("symbol,cutoff", [("064400.KS", "2026-10-25T21:30:00+00:00"),

@@ -24,7 +24,15 @@ POLICY = {
     "review_calendar_days": {"short": 7, "medium": 30, "long": 90},
     "single_price_review_tolerance_pct": 1.0,
     "review_window_is_not_order_validity": True,
+    "may_relax_existing_protection": False,
+    "requires_live_holdings_and_open_orders": True,
+    "coverage_is_not_research_validation": True,
 }
+
+PROTECTION_NOTICE = (
+    "기존의 더 엄격한 손절·축소 조건과 계좌 위험 한도를 우선합니다. "
+    "새 보고서의 가격선·검토일은 기존 보호 기준을 완화하거나 대응을 늦출 근거가 아닙니다."
+)
 
 
 def _number(value):
@@ -186,8 +194,14 @@ def investment_plan(row: dict, *, now: datetime) -> dict:
         "invalidation_action_ref": "/thesis/invalidation_action",
         "sizing_ref": "/thesis/position_sizing",
         "execution_eligible": False,
+        "existing_protection": "PRESERVE_STRICTER_RULES",
+        "research_verification": deepcopy(row.get("research_verification") or {
+            "status": "UNVERIFIED", "reason": "ORIGINAL_EVIDENCE_UNVERIFIED"}),
         "before_acting": (["현재 보유 수량과 매도 가능 여부 확인", "현재 가격과 원래 축소·무효화 조건 확인"] if reducing else
-                          ["현재 가격과 원래 진입·무효화 조건 확인", "가용 현금·집중도·손실 한도 확인"]),
+                          ["현재 가격과 원래 진입·무효화 조건 확인", "가용 현금·집중도·손실 한도 확인",
+                           "원분석 필수 연구 입력 검증 완료 확인", "정규장 호가·스프레드·거래량·진입 확인 조건 재검증"])
+                         + ["실제 보유·미체결·기체결 수량을 대조해 중복 주문과 초과 매도 방지",
+                            "현재 정규장·거래정지 여부와 유효한 매매 호가 확인", PROTECTION_NOTICE],
     }
 
 
@@ -208,7 +222,12 @@ def project_investor_body(body: dict, *, now: datetime) -> dict:
     current = result.get("current") or {}
     current["transport_exclusions"] = transport_exclusions
     rows = (current.get("bundle") or {}).get("strategy_table") or []
+    from .market_report_context import project_market
+    research = ({item["ticker"]: item for item in project_market(
+        result, market=str(result.get("market") or "").lower())}
+        if result.get("kind") == "market" else {})
     for index, row in enumerate(rows):
+        proof = research.get(row.get("ticker"), {})
         thesis = row.get("thesis") or {}
         clock_errors = _research_clock_errors(thesis, market=str(result.get("market") or ""), now=now)
         quote = aware_datetime(row.get("market_data_asof"))
@@ -233,8 +252,15 @@ def project_investor_body(body: dict, *, now: datetime) -> dict:
                 row.pop(field, None)
             row["data_status_ko"] = "시각 미검증 시세 제외; 별도 날짜가 검증된 분석만 사용"
         row["investor_exclusions"] = exclusions
+        row["research_verification"] = {
+            "status": proof.get("research_status", "UNVERIFIED") if not clock_errors else "UNVERIFIED",
+            "reason": proof.get("research_reason", "ORIGINAL_EVIDENCE_UNVERIFIED") if not clock_errors else "FUTURE_SOURCE_CLOCK",
+            "missing_required_methods": list(proof.get("missing_required_methods") or []),
+        }
         _normalize_thesis(row["thesis"], exclusions)
         plan = investment_plan(row, now=now)
+        if plan["status"] == "CONDITIONAL_PLAN" and row["research_verification"]["status"] != "COMPLETE":
+            plan["status"] = "REVIEW_REQUIRED"
         row["investment_plan"] = plan
         execution = row.setdefault("execution", {})
         execution.update(readiness="NEEDS_LIVE_RECHECK", action_now=None, action_if_triggered=None)
@@ -279,5 +305,8 @@ def publication_notice(packet: dict) -> str:
     excluded = sum((row.get("investment_plan") or {}).get("status") == "DATA_NEEDED" for row in rows)
     if excluded:
         coverage_label += f" · 날짜 검증 불가 {excluded}종목 근거 제외"
+    verified = sum((row.get("investment_plan", {}).get("research_verification") or {}).get("status") == "COMPLETE" for row in rows)
     return (f"**원분석 기준 {receipt.get('analysis_trade_date_latest') or '확인 불가'} · {coverage_label}**\n\n"
-            "지연 시세로 읽는 조건부 계획입니다. 거래 전 현재 가격·무효화 조건을 확인하세요.\n\n")
+            f"연구 입력 검증 완료 {verified}/{len(rows)}종목. 종목 수신 완료와 연구 검증은 별개입니다. "
+            "이 보고서는 주문 승인이 아닙니다. 거래 전 실제 보유·미체결·기체결과 정규장 호가를 다시 확인하세요.\n\n"
+            + PROTECTION_NOTICE + "\n\n")
