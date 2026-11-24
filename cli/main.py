@@ -29,7 +29,6 @@ from rich.rule import Rule
 from tradingagents.graph.trading_graph import TradingAgentsGraph
 from tradingagents.agents.utils.instrument_resolver import resolve_instrument
 from tradingagents.default_config import DEFAULT_CONFIG
-from tradingagents.reporting import save_report_bundle
 from cli.models import AnalystType
 from cli.selections import exchange_today
 from cli.utils import *
@@ -654,7 +653,8 @@ def get_analysis_date(market_timezone: str = "America/New_York"):
 
 def save_report_to_disk(final_state, ticker: str, save_path: Path, *, language: str = "English", settings=None, html: bool = True):
     """Save complete analysis report to disk with organized subfolders."""
-    return save_report_bundle(final_state, ticker, save_path, language=language, settings=settings, html=html)
+    from tradingagents.reporting import save_versioned_report_bundle
+    return save_versioned_report_bundle(final_state, ticker, save_path, language=language, settings=settings, html=html)
 
 
 def display_complete_report(final_state):
@@ -1234,6 +1234,49 @@ def analyze(
             raise typer.BadParameter("No interactive terminal. Provide --ticker and --date to run without prompts.")
         selections = None
     run_analysis(checkpoint=checkpoint, selections=selections, save=save, show=show, html=html, output_dir=out)
+
+
+@app.command()
+def backtest(
+    tickers: str = typer.Argument(..., help="Comma-separated stocks, e.g. NVDA,AAPL."),
+    start: str = typer.Option(..., "--start", help="First analysis date, YYYY-MM-DD."),
+    end: str = typer.Option(..., "--end", help="Last analysis date, YYYY-MM-DD."),
+    every: int = typer.Option(7, "--every", min=1, help="Calendar days between decisions."),
+    analysts: Optional[str] = typer.Option(None, "--analysts", help="Comma-separated analyst names."),
+    asset_type: str = typer.Option("stock", "--asset-type"),
+    portfolio: Optional[Path] = typer.Option(None, "--portfolio", exists=True, dir_okay=False),
+    run_id: Optional[str] = typer.Option(None, "--run-id", help="Resume the same run and data assumptions."),
+    output_dir: Optional[Path] = typer.Option(None, "--output-dir"),
+    holding_period: int = typer.Option(5, "--holding-period", min=1, max=100),
+    benchmark: Optional[str] = typer.Option(None, "--benchmark"),
+    transaction_cost_bps: float = typer.Option(10.0, "--transaction-cost-bps", min=0),
+):
+    """Evaluate past decisions in a private run and export the two scorecards."""
+    from tradingagents.backtest import ANALYSTS, iter_grid, run_backtest, summarize
+    import json
+
+    config = {**DEFAULT_CONFIG, "output_language": "Korean"}
+    if output_dir is not None:
+        config["results_dir"] = str(output_dir)
+    try:
+        selected = [("social" if name.strip() == "sentiment" else name.strip())
+                    for name in analysts.split(",")] if analysts else ANALYSTS
+        if any(name not in ANALYSTS for name in selected):
+            raise ValueError("Unknown backtest analyst.")
+        result = run_backtest([ticker.strip() for ticker in tickers.split(",")],
+            iter_grid(start, end, every), config, asset_type=asset_type,
+            portfolio=json.loads(portfolio.read_bytes()) if portfolio else None,
+            selected_analysts=selected, run_id=run_id, holding_period=holding_period,
+            benchmark_symbol=benchmark, transaction_cost_bps=transaction_cost_bps)
+    except (OSError, ValueError, TimeoutError) as exc:
+        print(f"백테스트를 시작할 수 없습니다. {exc}")
+        raise typer.Exit(code=2) from None
+    print(summarize(result).render())
+    print(f"새 판단 {result.cells_run} · 재사용 {result.skipped} · 생성 실패 {len(result.failures)}")
+    print(f"결과 {result.log_path}")
+    print(f"재개 인수 --run-id {result.run_id}")
+    if result.failures or result.settlement_failures:
+        raise typer.Exit(code=1)
 
 
 @app.command("paper-replay")

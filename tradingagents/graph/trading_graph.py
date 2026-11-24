@@ -2,11 +2,13 @@
 
 import os
 from copy import deepcopy
+from datetime import date, datetime, timezone
 from pathlib import Path
 import json
 import re
 import hashlib
 import sqlite3
+from uuid import uuid4
 from typing import Dict, Any, Tuple, List, Optional
 
 from langgraph.prebuilt import ToolNode
@@ -24,6 +26,8 @@ from tradingagents.agents.utils.agent_states import (
     RiskDebateState,
 )
 from tradingagents.dataflows.config import run_config, run_config_context
+from tradingagents.atomic_io import atomic_write_json
+from tradingagents.portfolio.context import normalize_portfolio
 from tradingagents.schemas import StructuredDecisionValidationError, parse_structured_decision
 
 # Import the new abstract tool methods from agent_utils
@@ -179,7 +183,7 @@ class TradingAgentsGraph:
             self.selected_analysts, checkpointer=checkpointer, **setup_options,
         )
 
-    def prepare_run(self, company_name, trade_date, analysis_date=None, callbacks=None):
+    def prepare_run(self, company_name, trade_date, analysis_date=None, callbacks=None, *, portfolio=None):
         """Shared CLI/API lifecycle: resume with None to avoid duplicating messages."""
         self.curr_state = None
         self.log_states_dict = {}
@@ -187,6 +191,8 @@ class TradingAgentsGraph:
         self._prepared_run_config["analysis_as_of"] = analysis_date or trade_date
         with run_config(self._prepared_run_config):
             state = self.propagator.create_initial_state(company_name, trade_date, analysis_date=analysis_date)
+        if portfolio is not None:
+            state["standing_portfolio"] = normalize_portfolio(portfolio)
         from tradingagents.dataflows.integrity import safe_symbol
         safe_symbol(state["company_of_interest"])
         self.ticker = state["company_of_interest"]
@@ -200,6 +206,8 @@ class TradingAgentsGraph:
                 "analysis_date": analysis_date or trade_date, "analysts": self.selected_analysts,
                 "config": {key: value for key, value in self.config.items() if key not in {"api_keys_path", "results_dir", "project_dir", "data_cache_dir", "checkpoint_dir", "memory_dir"}},
             }
+            if portfolio is not None:
+                identity["standing_portfolio"] = state["standing_portfolio"]
             thread_id = hashlib.sha256(json.dumps(identity, sort_keys=True, default=str).encode()).hexdigest()
             args["config"]["configurable"] = {"thread_id": thread_id}
             previous = self.graph.get_state(args["config"])
@@ -247,18 +255,24 @@ class TradingAgentsGraph:
     def __exit__(self, exc_type, exc_value, traceback):
         self.close()
 
-    def save_reports(self, final_state=None, *, save_path=None):
-        from tradingagents.reporting import save_report_bundle
+    def save_reports(self, final_state=None, ticker=None, save_path=None, html=True):
+        from tradingagents.reporting import save_versioned_report_bundle
         state = final_state or self.curr_state
         if not state:
             raise ValueError("Run an analysis before saving reports")
-        ticker = state["company_of_interest"]
+        canonical_ticker = state["company_of_interest"]
         from tradingagents.dataflows.integrity import safe_symbol
-        ticker = safe_symbol(ticker)
-        path = save_path or Path(self.config["results_dir"]) / ticker / state["trade_date"] / "reports"
-        return save_report_bundle(
+        if ticker is not None:
+            with run_config(self.config):
+                from tradingagents.agents.utils.instrument_resolver import resolve_instrument
+                if resolve_instrument(ticker).primary_symbol != canonical_ticker:
+                    raise ValueError("Report ticker differs from the decision's instrument.")
+        ticker = safe_symbol(canonical_ticker)
+        day = date.fromisoformat(state["trade_date"]).isoformat()
+        path = save_path or Path(self.config["results_dir"]) / ticker / day / "reports"
+        return save_versioned_report_bundle(
             state, ticker, path, language=self.config.get("output_language", "English"),
-            settings={**self.config, "analysts": self.selected_analysts},
+            settings={**self.config, "analysts": self.selected_analysts}, html=html,
         )
 
     def _get_provider_kwargs(self, role: str) -> Dict[str, Any]:
@@ -294,16 +308,29 @@ class TradingAgentsGraph:
         from tradingagents.agents.utils.analyst_tools import ANALYST_TOOLS
         return {kind: ToolNode(list(tools)) for kind, tools in ANALYST_TOOLS.items()}
 
-    def propagate(self, company_name, trade_date, analysis_date=None):
-        """Run the trading agents graph for a company on a specific date."""
+    def propagate(self, company_name, trade_date, analysis_date=None, portfolio=None, *, asset_type=None):
+        """Accept a fork analysis date or upstream asset type in position three."""
+        if analysis_date in ("stock", "crypto"):
+            if asset_type is not None and asset_type != analysis_date:
+                raise ValueError("Conflicting positional and keyword asset types.")
+            asset_type, analysis_date = analysis_date, None
+        if asset_type is not None and asset_type != "stock":
+            raise ValueError("This fork has only the stock graph; asset_type must be 'stock'.")
+        if analysis_date is not None:
+            if not isinstance(analysis_date, str) or date.fromisoformat(analysis_date).isoformat() != analysis_date:
+                raise ValueError("The analysis date must use YYYY-MM-DD.")
         with run_config({**self.config, "analysis_as_of": analysis_date or trade_date}):
-            return self._propagate(company_name, trade_date, analysis_date=analysis_date)
+            kwargs = {"analysis_date": analysis_date}
+            if portfolio is not None:
+                kwargs["portfolio"] = portfolio
+            return self._propagate(company_name, trade_date, **kwargs)
 
-    def _propagate(self, company_name, trade_date, analysis_date=None):
+    def _propagate(self, company_name, trade_date, analysis_date=None, *, portfolio=None):
 
         # Initialize state
         init_agent_state, args = self.prepare_run(
-            company_name, trade_date, analysis_date=analysis_date
+            company_name, trade_date, analysis_date=analysis_date,
+            **({"portfolio": portfolio} if portfolio is not None else {}),
         )
 
         if self.debug:
@@ -337,7 +364,14 @@ class TradingAgentsGraph:
         """Log the final state to a JSON file."""
         from tradingagents.report_settings import public_run_settings
 
+        instant = datetime.now(timezone.utc)
+        run_key = instant.strftime("%Y%m%dT%H%M%S") + "-" + uuid4().hex[:12]
+        final_state["decision_artifact_id"] = run_key
+        final_state["executed_at"] = instant.isoformat()
         self.log_states_dict[str(trade_date)] = {
+            "decision_artifact_id": run_key,
+            "executed_at": instant.isoformat(),
+            "research_source": self.config.get("research_source", "full"),
             "run_settings": public_run_settings({**self.config, "analysts": self.selected_analysts}),
             "input_instrument": final_state.get("input_instrument", final_state["company_of_interest"]),
             "company_of_interest": final_state["company_of_interest"],
@@ -376,8 +410,9 @@ class TradingAgentsGraph:
         directory.mkdir(parents=True, exist_ok=True)
 
         log_path = directory / f"full_states_log_{trade_date}.json"
-        with open(log_path, "w", encoding="utf-8") as f:
-            json.dump(self.log_states_dict[str(trade_date)], f, indent=4)
+        payload = self.log_states_dict[str(trade_date)]
+        atomic_write_json(directory / "runs" / run_key / "decision.json", payload)
+        atomic_write_json(log_path, payload)
 
     def reflect_and_remember(self, returns_losses, *, state=None, outcome_known_at=None):
         """Reflect on decisions and update memory based on returns."""
