@@ -174,6 +174,17 @@ def test_independent_pilot_is_not_vetoed_by_unmet_other_entry_group():
     assert blocked.decision_now.value == "NONE" and blocked.trigger_status["support_fail"]
 
 
+def test_reference_level_does_not_supply_a_fallback_volume_requirement():
+    original = contract(entry_action="STARTER", conditional_entry_action="NONE", execution_levels={"levels": [
+        {"level_type": "BREAKOUT", "price": 100, "confirmation": "intraday"},
+        {"level_type": "SUPPORT", "price": 90, "confirmation": "intraday", "entry_condition_role": "reference",
+         "volume_rule": "relative volume 2.0"},
+    ]})
+    at = datetime.fromisoformat("2026-09-21T11:00:00+09:00")
+    update = evaluate_execution_state(original, replace(market(at), relative_volume=1.2), now=at, max_data_age_seconds=120)
+    assert original.min_relative_volume is None and update.decision_now.value == "STARTER_NOW"
+
+
 @pytest.mark.parametrize("confirmation", ["next_open", "next_session_quote"])
 def test_ungrouped_active_next_session_entry_cannot_trigger_intraday(confirmation):
     original = contract(entry_action="STARTER", conditional_entry_action="NONE", execution_levels={"levels": [

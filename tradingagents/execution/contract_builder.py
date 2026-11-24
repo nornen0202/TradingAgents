@@ -100,7 +100,7 @@ def build_execution_contract(*, ticker: str, analysis_payload: dict[str, Any]) -
                     (
                         *decision.watchlist_triggers,
                         *decision.catalysts,
-                        *(level.volume_rule for level in structured_levels if level.volume_rule),
+                        *(level.volume_rule for level in entry_levels if level.volume_rule),
                     )
                 )
                 used_regex_fallback = used_regex_fallback or min_rvol is not None
