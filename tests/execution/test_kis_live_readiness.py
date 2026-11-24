@@ -1,4 +1,4 @@
-from dataclasses import replace
+from dataclasses import asdict, replace
 from datetime import datetime, timedelta, timezone
 import json
 
@@ -47,6 +47,27 @@ def test_official_production_contract_with_fixture_only_account(tmp_path, market
     assert ("ORD_UNPR" if market == "KR" else "OVRS_ORD_UNPR") in request["body"]
     audits = [json.loads(p.read_text()) for p in (state / "audit").glob("*.json")]
     assert len(audits) == 1 and "fixture_request" not in audits[0] and config["account_scope"] not in str(audits)
+
+
+@pytest.mark.parametrize("market", ["KR", "US"])
+def test_operator_command_requires_separate_approval_and_masks_body(tmp_path, capsys, market):
+    from tools.check_kis_live_readiness import main
+
+    state, config, intent, args = fixture(tmp_path, market)
+    record = tmp_path / "fixture.json"
+    atomic_write_json(record, {"evidence_scope": "ISOLATED_FIXTURE", "intent": asdict(intent),
+        "account": asdict(args["account"]), "usage": asdict(args["usage"]), "quote": args["quote"],
+        "session": args["session"], "now": args["now"].isoformat()})
+    command = ["--state-dir", str(state), "--fixture", str(record)]
+    assert main(command) == 2
+    blocked = json.loads(capsys.readouterr().out)
+    assert blocked["status"] == "BLOCKED" and blocked["live_order_requests"] == 0
+    atomic_write_json(state / "approval.json", config)
+    assert main(command) == 0
+    report = json.loads(capsys.readouterr().out)
+    assert report["status"] == "CONTRACT_READY" and report["live_order_requests"] == 0
+    assert report["destination"]["host"] == REAL_BASE_URL
+    assert config["account_scope"] not in str(report) and intent.ticker not in str(report) and "body" not in str(report)
 
 
 @pytest.mark.parametrize("broken", ["no_approval", "mode", "enabled", "host", "scope", "expired", "revoked",
