@@ -139,7 +139,14 @@ def _price_checks(thesis, closes, quote, days, now, *, currency, compatible, act
         observation = (session_quote if stage == "intraday" else
                        last_close if stage == "close" and level.get("level_type") in _RISK_LEVELS else
                        next(reversed(eligible_closes.values()), None) if stage == "close" else None)
-        needed, next_day = None, None
+        needed, next_day, first = None, None, None
+        dependent_exit = (level.get("level_type") in _RISK_LEVELS and (
+            level.get("reason_code") == "FAILED_BREAKOUT" or any(
+                token in f"{level.get('label', '')} {level.get('source_text', '')}"
+                for token in ("돌파 후", "돌파 뒤", "돌파 이후", "돌파 확인 뒤", "돌파가 확인된 뒤")
+            )))
+        if dependent_exit:
+            needed = "대상이 되는 전술 편입과 선행 돌파의 정규장 종가를 확인한 뒤 이후 재마감 가격 확인"
         if stage == "next_day":
             preceding = [item for item in primary if item.get("confirmation_group") == level.get("confirmation_group")]
             # A numbered date and observation establish a possible next session.
@@ -155,7 +162,7 @@ def _price_checks(thesis, closes, quote, days, now, *, currency, compatible, act
                           "먼저 같은 조건의 돌파·회복 종가와 거래량 등 선행 조건 확인")
         checked = _compare(level, observation, currency=currency, compatible=compatible, conflict=conflict, requirement=needed)
         threshold = _threshold(level)
-        if (stage == "close" and not observation and session_quote and threshold and compatible
+        if (stage == "close" and not dependent_exit and not observation and session_quote and threshold and compatible
                 and not conflict and level.get("currency") in (None, currency)):
             checked["intraday_reference"] = {"observation": session_quote,
                                               "status": _price_result(threshold, session_quote["price"])}
@@ -168,6 +175,8 @@ def _price_checks(thesis, closes, quote, days, now, *, currency, compatible, act
                 checked["needed_session"] = next_close.isoformat()
         if next_day:
             checked["needed_session"] = next_day.isoformat()
+        if first:
+            checked["preceding_price_session"] = first.isoformat()
         checked.update(order=index + 1, group=level.get("confirmation_group"))
         results.append(checked)
     return results

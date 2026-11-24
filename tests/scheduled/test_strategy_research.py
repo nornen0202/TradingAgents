@@ -100,6 +100,21 @@ def test_close_sequence_preserves_group_and_waits_for_actual_next_session():
     assert _price_checks(thesis, closes, None, days, after, currency="USD", compatible=True, active=False)[1]["status"] == "EVIDENCE_NEEDED"
 
 
+def test_failed_breakout_trim_requires_prior_breakout_and_tactical_position():
+    now = dt("2026-11-25T23:00:00+00:00")
+    day = date(2026, 11, 25)
+    days = market_days("US", now)
+    thesis = {"analysis_asof": "2026-11-25T17:00:00+00:00", "execution_levels": {"levels": [
+        {"level_type": "TRIM", "price": 110, "confirmation": "close", "reason_code": "FAILED_BREAKOUT",
+         "source_text": "돌파가 확인된 뒤 그 아래로 마감하면 전술분 감축"},
+        {"level_type": "TRIM", "price": 100, "confirmation": "close", "source_text": "100달러 미만 종가에서 감축"},
+    ]}}
+    checks = _price_checks(thesis, {day: _bar(day, days[day], 95)}, None, days, now,
+                           currency="USD", compatible=True, active=True)
+    assert checks[0]["status"] == "EVIDENCE_NEEDED"
+    assert checks[1]["status"] == "MET"
+
+
 def test_kis_fetch_uses_only_exact_completed_kr_sessions_and_explicit_adjustment():
     now = dt("2026-11-25T02:47:48+09:00")
     days = market_days("KR", now)

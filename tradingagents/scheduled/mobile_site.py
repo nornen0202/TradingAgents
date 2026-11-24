@@ -2210,6 +2210,7 @@ _PRIVATE_JS = READER_JS + r"""
         + `<span class="research-result">${esc(researchStatus[check.status])}</span> ${esc(researchQuote(check.observation))}`
         + (check.intraday_reference ? `<br>${esc(researchQuote(check.intraday_reference.observation))} · 장중 가격만 대조 · ${esc(researchStatus[check.intraday_reference.status])}` : '')
         + (check.needed ? `<br>${esc(check.needed_session ? check.needed_session + ' · ' : '')}${esc(check.needed)}` : '')
+        + (check.preceding_price_session ? `<br>선행 종가의 가격 대조일 ${esc(check.preceding_price_session)} · 원문의 선행 조건도 확인` : '')
         + (level.source_text ? `<br>${esc(level.source_text)}` : '') + (level.volume_rule ? `<br>거래량 조건 ${esc(level.volume_rule)}` : '') + '</li>';
     }).join('');
     const quote = researchQuote(plan.observation || plan.last_observation);
@@ -2217,7 +2218,7 @@ _PRIVATE_JS = READER_JS + r"""
     return `<section class="research-plan" aria-label="수일에서 수주 투자 계획"><h4>수일~수주 투자 계획</h4>
       <p class="research-lineage">${esc(origin)} · 원등급 ${esc(thesis.rating)} · 판단 ${esc(dateTime(thesis.analysis_asof))} · 가격 기준일 ${esc(thesis.price_reference_date || '-')}</p>
       ${line(plan.observation ? '보고서 비교 시세' : '마지막 관측', quote)}${close && close !== quote ? line('직전 완료 세션', close) : ''}
-      ${line('신규 편입', plan.headline)}${line('보유자 위험관리', plan.holder_summary)}
+      ${line('신규 편입', plan.headline)}${line('보유자 위험관리', fullConditions(plan.holder_summary, thesis.risk_action_reason))}
       ${line('판단 근거', fullConditions(thesis.rationale))}${line('촉매와 관찰 항목', fullConditions(thesis.catalysts, thesis.observation_conditions))}
       ${line('감축·철회', fullConditions(thesis.invalidation_conditions, thesis.invalidation_action))}
       <p>검토일 ${esc(dateTime(plan.review_by))}${plan.review_due ? ' · 검토 기한 도래' : ''}${plan.source_valid_until ? ` · 원 신호 만료 ${esc(dateTime(plan.source_valid_until))}${plan.source_expired ? ' · 만료됨' : ''}${Number.isInteger(plan.remaining_trading_days) ? ' · 남은 정규장 종가 ' + esc(plan.remaining_trading_days) + '회' : ''}` : ''}</p>
