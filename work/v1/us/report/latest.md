@@ -4,32 +4,30 @@
 
 기존의 더 엄격한 손절·축소 조건과 계좌 위험 한도를 우선합니다. 새 보고서의 가격선·검토일은 기존 보호 기준을 완화하거나 대응을 늦출 근거가 아닙니다.
 
-# 미국 투자 브리핑 — 11월 24일 미국 정규장
+# 미국 투자 계획 · 2026년 11월 24일 ET
 
-작성 11/25 01:15:51 KST · 원분석 기준 거래일 2026-11-23 ET · 이벤트 us:239160424f65c53c24e0927ac98c4f8d
+11월 23일 ET 기준 원분석을 정리한 기본 보고서입니다. 직전 검증판과 원분석·방향·가격 구간은 동일합니다. 이번 시세 관측은 **만료**되어 30종목 모두 거래 전 실시간 재확인이 필요합니다.
 
-시세 관측 11/25 00:22:00 KST (53분 경과, 30/30) · 계좌 관측 11/25 00:23:14 KST (52분 경과) · 원시세 유효시각 11/25 00:25:00 KST.
+- **보고서 작성** 11/25 03:15:44 KST
+- **원분석 완료** 11/24 19:39:21 KST · 최신 전체 분석 완료 11/24 19:58:42 KST · 최신 전체 분석 시도 30종목 성공 11/24 19:58:43 KST
+- **시세 관측** 11/25 01:36:48 KST (98분 전, 30/30) · 유효시각 11/25 01:39:48 KST
+- **계좌 스냅샷** 11/25 01:39:12 KST (96분 전) · 시세 갱신 완료 11/25 01:39:20 KST
+- **커버리지** 보유 14/14 · 필수 관심 27/27 · 전체 분석 30/30 · 누락·실패 0
+- **근거 상태** 원분석의 시세 적격성은 미확인입니다. 아래 시세는 이후 작업에서 관측한 참고값입니다. ANT는 발행사·상장 매핑 확인이 필요합니다.
 
-원분석 완료 11/24 19:39:21 KST · 최근 전체 분석 완료 11/24 19:58:42 KST · 최근 전체 분석 시도 성공 11/24 19:58:43 KST · 시세·계좌 갱신 실행 완료 11/25 00:23:21 KST.
+## 먼저 볼 계획
 
-자료 상태 **시세 만료 · 원연구 시세 적격성 미검증 · 전 종목 주문 전 실시간 재확인**. 원분석을 정리한 기본 브리핑입니다. 정규장 세션은 확인됐으며 발행으로 시세나 계좌 관측이 갱신되지 않습니다.
+- **GLDM · 비중 축소 검토.** 참고가 70.505달러. 71.78달러 미만 정규장 종가는 추가 감축 기준, 69.28달러 미만 거래 지속 또는 종가는 전술분 무효화 기준입니다. 12월 24일까지 재검토하며 신규 배정은 0입니다. 축소 조건은 신선한 정규장 체결과 호가로 확인합니다.
+- **MPWR · 조건부 매수 검토.** 참고가 1,175.895달러. 원분석의 정규장 종가 무효화선 1,278.24달러보다 낮았으므로 종가부터 대조합니다. 미보유자가 1,328.98달러 재지지까지 확인할 때 소액 첫 매수를 검토하며 목표 비중의 3분의 1과 손실 예산 중 더 엄격한 한도를 적용합니다. 검토일은 12월 24일입니다.
+- **GEV · 조건부 매수 검토.** 참고가 711.36달러. 748.98달러 미만 정규장 종가는 신규 계획 취소 기준이며, 691.72달러 미만이면 전술 보유 가설이 무효입니다. 785.33달러 돌파 종가와 다음 정규장 재시험 후 소액 첫 매수를 검토합니다. 검토일은 12월 24일입니다.
 
-보유 **14/14** · 필수 관심 **27/27** · 고유 분석 **30/30**. 누락·실패 0개. 원분석 방향은 조건부 매수 23, 보유·관찰 5, 축소 1, 진입 회피 1입니다.
-
-## 먼저 확인할 보유 위험
-
-- **GLDM · 축소 검토**. 만료 관측 71.015 USD. 정규장 종가가 71.78 USD 아래면 잔여 전술분 3분의 1 추가 감축, 69.28 USD 미만 거래가 지속되거나 종가가 하회하면 전술분 청산을 검토합니다. 76.31 USD 회복과 다음 거래일 지지는 약세 재평가 조건입니다. 신선한 호가와 보유 수량 확인이 필요합니다.
-- **TSM · 핵심 보유, 신규 진입 보류**. 만료 관측 343.5188 USD. 정규장 종가 359.09 USD 하회는 신규 구상 폐기와 기존 단기분 축소, 351.14 USD 하회는 단기 잔량 정리 기준입니다. 원문의 정규장 종가를 확인하고 구조화 원본의 2.00–359.09 USD 구간은 사용에서 제외합니다.
-- **DELL · 보유, 신규 진입 보류**. 만료 관측 292.27 USD. 322.31 USD 아래 정규장 종가가 확인되면 원분석은 기존 수량 약 25% 축소를 검토합니다. 이후 종가 회복 여부와 마진·재고·현금 전환을 확인합니다.
-
-세 종목의 원분석 검토 주기는 30일이며 12월 24일 KST까지입니다. 무효화나 새 공시가 먼저 나오면 앞당겨 확인합니다. 축소 검토에 신규 매수용 현금이나 거래량 조건을 추가하지 않습니다.
+세 참고가는 11/25 01:36:48 KST 관측값입니다. 정규장 종가 확인이 남아 있습니다. 새 실적·공시나 무효화 조건이 확인되면 검토일보다 먼저 재평가합니다.
 
 ## 종목별 조건과 가격 범위
 
 ### GLDM · SPDR Gold MiniShares Trust — 비중 축소
 
-보유 · 주문 전 실시간 재확인 · 원분석 신뢰도 0.79 · 검토 기간 30일  
-연구 자료 한계 · 거시지표 이용 불가·공급자 설정 누락, 감성 이용 불가·뉴스 유래
+보유 · 중기 · 원분석 신뢰도 0.79 · 거래 전 실시간 재확인
 
 재검토 필요 · 원분석 11/24 18:19 KST · 검토일 12/24 18:19 KST
 
@@ -57,8 +55,7 @@
 
 ### MPWR · Monolithic Power Systems — 조건부 매수
 
-보유 · 주문 전 실시간 재확인 · 원분석 신뢰도 0.63 · 검토 기간 30일  
-연구 자료 한계 · 거시지표 이용 불가·공급자 설정 누락, 감성 이용 불가·뉴스 유래
+보유 · 중기 · 원분석 신뢰도 0.63 · 거래 전 실시간 재확인
 
 조건부 계획 · 원분석 11/24 18:34 KST · 검토일 12/24 18:34 KST
 
@@ -88,8 +85,7 @@
 
 ### GEV · GE Vernova — 조건부 매수
 
-보유 · 주문 전 실시간 재확인 · 원분석 신뢰도 0.65 · 검토 기간 30일  
-연구 자료 한계 · 거시지표 이용 불가·공급자 설정 누락, 감성 이용 불가·뉴스 유래
+보유 · 중기 · 원분석 신뢰도 0.65 · 거래 전 실시간 재확인
 
 조건부 계획 · 원분석 11/24 18:21 KST · 검토일 12/24 18:21 KST
 
@@ -116,9 +112,7 @@
 
 ### GOOGL · Alphabet — 조건부 매수
 
-보유 · 주문 전 실시간 재확인 · 원분석 신뢰도 0.65 · 검토 기간 30일  
-후속 근거 검토 우선 · YouTube 1건  
-연구 자료 한계 · 거시지표 이용 불가·공급자 설정 누락, 감성 이용 불가·뉴스 유래
+보유 · 중기 · 원분석 신뢰도 0.65 · 거래 전 실시간 재확인 · 후속 검토 근거 YouTube 1건
 
 조건부 계획 · 원분석 11/24 18:21 KST · 검토일 12/24 18:21 KST
 
@@ -147,9 +141,7 @@
 
 ### NVDA · NVIDIA — 조건부 매수
 
-보유 · 주문 전 실시간 재확인 · 원분석 신뢰도 0.66 · 검토 기간 30일  
-후속 근거 검토 우선 · YouTube 11건  
-연구 자료 한계 · 거시지표 이용 불가·공급자 설정 누락, 감성 이용 불가·뉴스 유래
+보유 · 중기 · 원분석 신뢰도 0.66 · 거래 전 실시간 재확인 · 후속 검토 근거 YouTube 11건
 
 조건부 계획 · 원분석 11/24 18:34 KST · 검토일 12/24 18:34 KST
 
@@ -179,10 +171,9 @@
 
 원래 주문 트리거 유효시각: 2026-12-01T00:00:00-05:00 (검토 기간과 별개이며 자동 연장되지 않음)
 
-### RSP · RSP — 조건부 매수
+### RSP · Invesco S&P 500 Equal Weight ETF — 조건부 매수
 
-보유 · 주문 전 실시간 재확인 · 원분석 신뢰도 0.72 · 검토 기간 30일  
-연구 자료 한계 · 거시지표 이용 불가·공급자 설정 누락, 감성 이용 불가·뉴스 유래
+보유 · 중기 · 원분석 신뢰도 0.72 · 거래 전 실시간 재확인
 
 재검토 필요 · 원분석 11/24 18:34 KST · 검토일 12/24 18:34 KST
 
@@ -213,8 +204,7 @@
 
 ### ETN · Eaton — 조건부 매수
 
-보유 · 주문 전 실시간 재확인 · 원분석 신뢰도 0.64 · 검토 기간 30일  
-연구 자료 한계 · 거시지표 이용 불가·공급자 설정 누락, 감성 이용 불가·뉴스 유래
+보유 · 중기 · 원분석 신뢰도 0.64 · 거래 전 실시간 재확인
 
 조건부 계획 · 원분석 11/24 18:19 KST · 검토일 12/24 18:19 KST
 
@@ -246,9 +236,7 @@
 
 ### AVGO · Broadcom — 조건부 매수
 
-보유 · 주문 전 실시간 재확인 · 원분석 신뢰도 0.62 · 검토 기간 30일  
-후속 근거 검토 우선 · YouTube 2건  
-연구 자료 한계 · 거시지표 이용 불가·공급자 설정 누락, 감성 이용 불가·뉴스 유래
+보유 · 중기 · 원분석 신뢰도 0.62 · 거래 전 실시간 재확인 · 후속 검토 근거 YouTube 2건
 
 조건부 계획 · 원분석 11/24 18:08 KST · 검토일 12/24 18:08 KST
 
@@ -276,8 +264,7 @@
 
 ### AMZN · Amazon — 조건부 매수
 
-보유 · 주문 전 실시간 재확인 · 원분석 신뢰도 0.64 · 검토 기간 30일  
-연구 자료 한계 · 거시지표 이용 불가·공급자 설정 누락, 감성 이용 불가·뉴스 유래
+보유 · 중기 · 원분석 신뢰도 0.64 · 거래 전 실시간 재확인
 
 조건부 계획 · 원분석 11/24 18:08 KST · 검토일 12/24 18:08 KST
 
@@ -307,8 +294,7 @@
 
 ### SGOV · iShares 0-3 Month Treasury Bond ETF — 조건부 매수
 
-보유 · 주문 전 실시간 재확인 · 원분석 신뢰도 0.73 · 검토 기간 7일  
-연구 자료 한계 · 거시지표 이용 불가·공급자 설정 누락, 감성 이용 불가·뉴스 유래
+보유 · 단기 · 원분석 신뢰도 0.73 · 거래 전 실시간 재확인
 
 재검토 필요 · 원분석 11/24 18:45 KST · 검토일 12/01 18:45 KST
 
@@ -336,9 +322,7 @@
 
 ### AAPL · Apple — 조건부 매수
 
-보유 · 주문 전 실시간 재확인 · 원분석 신뢰도 0.61 · 검토 기간 30일  
-후속 근거 검토 우선 · YouTube 1건 · PRISM 2건  
-연구 자료 한계 · 거시지표 이용 불가·공급자 설정 누락, 감성 이용 불가·뉴스 유래
+보유 · 중기 · 원분석 신뢰도 0.61 · 거래 전 실시간 재확인 · 후속 검토 근거 YouTube 1건 · PRISM 2건
 
 조건부 계획 · 원분석 11/24 18:08 KST · 검토일 12/24 18:08 KST
 
@@ -369,9 +353,7 @@
 
 ### LLY · Eli Lilly — 조건부 매수
 
-보유 · 주문 전 실시간 재확인 · 원분석 신뢰도 0.68 · 검토 기간 30일  
-후속 근거 검토 우선 · PRISM 5건  
-연구 자료 한계 · 거시지표 이용 불가·공급자 설정 누락, 감성 이용 불가·뉴스 유래
+보유 · 중기 · 원분석 신뢰도 0.68 · 거래 전 실시간 재확인 · 후속 검토 근거 PRISM 5건
 
 조건부 계획 · 원분석 11/24 18:35 KST · 검토일 12/24 18:35 KST
 
@@ -401,11 +383,9 @@
 
 원래 주문 트리거 유효시각: 2026-12-04T23:59:59-05:00 (검토 기간과 별개이며 자동 연장되지 않음)
 
-### WMT · WMT — 조건부 매수
+### WMT · Walmart — 조건부 매수
 
-관심 · 주문 전 실시간 재확인 · 원분석 신뢰도 0.68 · 검토 기간 30일  
-후속 근거 검토 우선 · YouTube 1건  
-연구 자료 한계 · 거시지표 이용 불가·공급자 설정 누락, 감성 이용 불가·뉴스 유래
+관심 · 중기 · 원분석 신뢰도 0.68 · 거래 전 실시간 재확인 · 후속 검토 근거 YouTube 1건
 
 조건부 계획 · 원분석 11/24 19:26 KST · 검토일 12/24 19:26 KST
 
@@ -434,10 +414,9 @@
 
 원래 주문 트리거 유효시각: 2026-12-01T16:00:00-05:00 (검토 기간과 별개이며 자동 연장되지 않음)
 
-### LIN · LIN — 조건부 매수
+### LIN · Linde — 조건부 매수
 
-관심 · 주문 전 실시간 재확인 · 원분석 신뢰도 0.67 · 검토 기간 30일  
-연구 자료 한계 · 거시지표 이용 불가·공급자 설정 누락, 감성 이용 불가·뉴스 유래
+관심 · 중기 · 원분석 신뢰도 0.67 · 거래 전 실시간 재확인
 
 조건부 계획 · 원분석 11/24 19:00 KST · 검토일 12/24 19:00 KST
 
@@ -465,10 +444,9 @@
 
 원래 주문 트리거 유효시각: 2026-12-04T23:59:59-05:00 (검토 기간과 별개이며 자동 연장되지 않음)
 
-### MA · MA — 조건부 매수
+### MA · Mastercard — 조건부 매수
 
-관심 · 주문 전 실시간 재확인 · 원분석 신뢰도 0.67 · 검토 기간 30일  
-연구 자료 한계 · 거시지표 이용 불가·공급자 설정 누락, 감성 이용 불가·뉴스 유래
+관심 · 중기 · 원분석 신뢰도 0.67 · 거래 전 실시간 재확인
 
 조건부 계획 · 원분석 11/24 19:28 KST · 검토일 12/24 19:28 KST
 
@@ -497,10 +475,9 @@
 
 원래 주문 트리거 유효시각: 2026-12-01T23:59:59-05:00 (검토 기간과 별개이며 자동 연장되지 않음)
 
-### V · V — 조건부 매수
+### V · Visa — 조건부 매수
 
-관심 · 주문 전 실시간 재확인 · 원분석 신뢰도 0.67 · 검토 기간 30일  
-연구 자료 한계 · 거시지표 이용 불가·공급자 설정 누락, 감성 이용 불가·뉴스 유래
+관심 · 중기 · 원분석 신뢰도 0.67 · 거래 전 실시간 재확인
 
 조건부 계획 · 원분석 11/24 19:26 KST · 검토일 12/24 19:26 KST
 
@@ -526,10 +503,9 @@
 
 원래 주문 트리거 유효시각: 2026-12-02T00:00:00-05:00 (검토 기간과 별개이며 자동 연장되지 않음)
 
-### BRK-B · BRK-B — 조건부 매수
+### BRK-B · Berkshire Hathaway Class B — 조건부 매수
 
-관심 · 주문 전 실시간 재확인 · 원분석 신뢰도 0.66 · 검토 기간 30일  
-연구 자료 한계 · 거시지표 이용 불가·공급자 설정 누락, 감성 이용 불가·뉴스 유래
+관심 · 중기 · 원분석 신뢰도 0.66 · 거래 전 실시간 재확인
 
 조건부 계획 · 원분석 11/24 19:13 KST · 검토일 12/24 19:13 KST
 
@@ -559,9 +535,7 @@
 
 ### COST · Costco Wholesale — 조건부 매수
 
-관심 · 주문 전 실시간 재확인 · 원분석 신뢰도 0.65 · 검토 기간 30일  
-후속 근거 검토 우선 · YouTube 1건 · PRISM 2건  
-연구 자료 한계 · 거시지표 이용 불가·공급자 설정 누락, 감성 이용 불가·뉴스 유래
+관심 · 중기 · 원분석 신뢰도 0.65 · 거래 전 실시간 재확인 · 후속 검토 근거 YouTube 1건 · PRISM 2건
 
 조건부 계획 · 원분석 11/24 19:16 KST · 검토일 12/24 19:16 KST
 
@@ -588,10 +562,9 @@
 
 원래 주문 트리거 유효시각: 2026-12-01T23:59:59-05:00 (검토 기간과 별개이며 자동 연장되지 않음)
 
-### PG · PG — 조건부 매수
+### PG · Procter & Gamble — 조건부 매수
 
-관심 · 주문 전 실시간 재확인 · 원분석 신뢰도 0.64 · 검토 기간 30일  
-연구 자료 한계 · 거시지표 이용 불가·공급자 설정 누락, 감성 이용 불가·뉴스 유래
+관심 · 중기 · 원분석 신뢰도 0.64 · 거래 전 실시간 재확인
 
 조건부 계획 · 원분석 11/24 19:01 KST · 검토일 12/24 19:01 KST
 
@@ -616,10 +589,9 @@
 
 원래 주문 트리거 유효시각: 2026-12-01T18:00:00-05:00 (검토 기간과 별개이며 자동 연장되지 않음)
 
-### WELL · WELL — 조건부 매수
+### WELL · Welltower — 조건부 매수
 
-관심 · 주문 전 실시간 재확인 · 원분석 신뢰도 0.64 · 검토 기간 30일  
-연구 자료 한계 · 거시지표 이용 불가·공급자 설정 누락, 감성 이용 불가·뉴스 유래
+관심 · 중기 · 원분석 신뢰도 0.64 · 거래 전 실시간 재확인
 
 조건부 계획 · 원분석 11/24 19:38 KST · 검토일 12/24 19:38 KST
 
@@ -647,10 +619,9 @@
 
 원래 주문 트리거 유효시각: 2026-11-30T17:00:00-05:00 (검토 기간과 별개이며 자동 연장되지 않음)
 
-### IBM · IBM — 조건부 매수
+### IBM · International Business Machines — 조건부 매수
 
-관심 · 주문 전 실시간 재확인 · 원분석 신뢰도 0.62 · 검토 기간 30일  
-연구 자료 한계 · 거시지표 이용 불가·공급자 설정 누락, 감성 이용 불가·뉴스 유래
+관심 · 중기 · 원분석 신뢰도 0.62 · 거래 전 실시간 재확인
 
 조건부 계획 · 원분석 11/24 18:58 KST · 검토일 12/24 18:58 KST
 
@@ -679,10 +650,9 @@
 
 원래 주문 트리거 유효시각: 2026-12-04T23:59:59-05:00 (검토 기간과 별개이며 자동 연장되지 않음)
 
-### JNJ · JNJ — 조건부 매수
+### JNJ · Johnson & Johnson — 조건부 매수
 
-관심 · 주문 전 실시간 재확인 · 원분석 신뢰도 0.65 · 검토 기간 30일  
-연구 자료 한계 · 거시지표 이용 불가·공급자 설정 누락, 감성 이용 불가·뉴스 유래
+관심 · 중기 · 원분석 신뢰도 0.65 · 거래 전 실시간 재확인
 
 조건부 계획 · 원분석 11/24 19:30 KST · 검토일 12/24 19:30 KST
 
@@ -714,8 +684,7 @@
 
 ### TXN · Texas Instruments — 조건부 매수
 
-관심 · 주문 전 실시간 재확인 · 원분석 신뢰도 0.66 · 검토 기간 30일  
-연구 자료 한계 · 거시지표 이용 불가·공급자 설정 누락, 감성 이용 불가·뉴스 유래
+관심 · 중기 · 원분석 신뢰도 0.66 · 거래 전 실시간 재확인
 
 조건부 계획 · 원분석 11/24 18:49 KST · 검토일 12/24 18:49 KST
 
@@ -744,10 +713,9 @@
 
 원래 주문 트리거 유효시각: 2026-12-01T23:59:59-05:00 (검토 기간과 별개이며 자동 연장되지 않음)
 
-### MDT · MDT — 조건부 매수
+### MDT · Medtronic — 조건부 매수
 
-관심 · 주문 전 실시간 재확인 · 원분석 신뢰도 0.68 · 검토 기간 30일  
-연구 자료 한계 · 거시지표 이용 불가·공급자 설정 누락, 감성 이용 불가·뉴스 유래
+관심 · 중기 · 원분석 신뢰도 0.68 · 거래 전 실시간 재확인
 
 조건부 계획 · 원분석 11/24 19:00 KST · 검토일 12/24 19:00 KST
 
@@ -776,9 +744,9 @@
 
 ### TSM · Taiwan Semiconductor Manufacturing — 보유·관찰
 
-보유 · 주문 전 실시간 재확인 · 원분석 신뢰도 0.66 · 검토 기간 30일  
-연구 자료 한계 · 거시지표 이용 불가·공급자 설정 누락, 감성 이용 불가·뉴스 유래  
-구조화 원본의 2.00–359.09 USD 구간은 원문 가격 조건과 충돌해 표시에서 제외했습니다. 원문은 359.09와 351.14 USD를 각각 정규장 종가 기준으로 제시합니다.
+보유 · 중기 · 원분석 신뢰도 0.66 · 거래 전 실시간 재확인
+
+원본의 2.00–359.09달러 구간은 별도 359.09달러 기준과 충돌해 가격표에서 제외했습니다. 원본 구조화 계획은 보존했습니다.
 
 조건부 계획 · 원분석 11/24 18:47 KST · 검토일 12/24 18:47 KST
 
@@ -792,7 +760,6 @@
 | 421.04  | 50일선 후속 저항 | 종가 확인 | 원분석 가격선 |
 | 359.09  | 359.09달러 아래 종가 시 신규 잔량 손절·기존 단기분 축소 | 종가 확인 | 원분석 가격선 |
 | 351.14–353.5  | 2차 지지 관찰 구간 | 종가 확인 | 원분석 구간 |
-| 2–359.09  | 351.14달러 아래 종가 시 기존 단기 잔량 정리 | 종가 확인 | 원분석 구간 |
 | 318.48  | 다음 하방 관찰선 | 종가 확인 | 원분석 가격선 |
 
 **진입·유지 조건:** 11월 10일 보도에 따르면 TSM의 10월 연결 매출은 5,868.9억 대만달러로 전년 동월 대비 59.7% 증가했다. 중기 강세와 핵심 보유를 뒷받침하지만, 원공시가 확인되지 않았고 한 달 매출만으로 마진이나 현금흐름을 판단할 수 없다. 11월 23일 주가는 14.09% 반등했지만 386.90달러에서 밀려 저점 가까운 363.60달러에 마감했다. 거래량은 20일 평균의 1.74배로 직전 급락일의 2.06배보다 낮았고 상대강도지수는 43.06이었다. 공격 측이 지적한 조기 참여의 장점은 인정하지만, 374.33~376.00달러 진입과 359.09달러 위험 기준으로 계산하면 첫 저항까지의 보상은 비용 전 계획 손실의 0.64~0.82배다. 402.33달러까지의 1.56~1.84배는 첫 저항을 넘어야 가능한 시나리오다. 따라서 돌파와 재확인은 관찰 신호로만 쓰고 조건부 주문은 승인하지 않는다. 첫 저항 아래에서 견고한 새 지지가 형성되거나 386.90달러가 지지로 바뀐 뒤, 다음 저항까지 비용과 갭 위험을 반영한 보상이 충분할 때만 소규모 첫 매수를 별도로 검토한다.
@@ -807,9 +774,7 @@
 
 ### DELL · Dell Technologies — 보유·관찰
 
-보유 · 주문 전 실시간 재확인 · 원분석 신뢰도 0.61 · 검토 기간 30일  
-후속 근거 검토 우선 · YouTube 2건  
-연구 자료 한계 · 거시지표 이용 불가·공급자 설정 누락, 감성 이용 불가·뉴스 유래
+보유 · 중기 · 원분석 신뢰도 0.61 · 거래 전 실시간 재확인 · 후속 검토 근거 YouTube 2건
 
 조건부 계획 · 원분석 11/24 18:06 KST · 검토일 12/24 18:06 KST
 
@@ -836,11 +801,9 @@
 
 **거래 전 확인:** 현재 가격과 원래 진입·무효화 조건 확인 / 가용 현금·집중도·손실 한도 확인 / 원분석 필수 연구 입력 검증 완료 확인 / 정규장 호가·스프레드·거래량·진입 확인 조건 재검증 / 실제 보유·미체결·기체결 수량을 대조해 중복 주문과 초과 매도 방지 / 현재 정규장·거래정지 여부와 유효한 매매 호가 확인 / 기존의 더 엄격한 손절·축소 조건과 계좌 위험 한도를 우선합니다. 새 보고서의 가격선·검토일은 기존 보호 기준을 완화하거나 대응을 늦출 근거가 아닙니다.
 
-### KO · KO — 보유·관찰
+### KO · The Coca-Cola Company — 보유·관찰
 
-관심 · 주문 전 실시간 재확인 · 원분석 신뢰도 0.7 · 검토 기간 30일  
-후속 근거 검토 우선 · YouTube 1건  
-연구 자료 한계 · 거시지표 이용 불가·공급자 설정 누락, 감성 이용 불가·뉴스 유래
+관심 · 중기 · 원분석 신뢰도 0.70 · 거래 전 실시간 재확인 · 후속 검토 근거 YouTube 1건
 
 조건부 계획 · 원분석 11/24 19:14 KST · 검토일 12/24 19:14 KST
 
@@ -866,10 +829,9 @@
 
 **거래 전 확인:** 현재 가격과 원래 진입·무효화 조건 확인 / 가용 현금·집중도·손실 한도 확인 / 원분석 필수 연구 입력 검증 완료 확인 / 정규장 호가·스프레드·거래량·진입 확인 조건 재검증 / 실제 보유·미체결·기체결 수량을 대조해 중복 주문과 초과 매도 방지 / 현재 정규장·거래정지 여부와 유효한 매매 호가 확인 / 기존의 더 엄격한 손절·축소 조건과 계좌 위험 한도를 우선합니다. 새 보고서의 가격선·검토일은 기존 보호 기준을 완화하거나 대응을 늦출 근거가 아닙니다.
 
-### ABBV · ABBV — 보유·관찰
+### ABBV · AbbVie — 보유·관찰
 
-관심 · 주문 전 실시간 재확인 · 원분석 신뢰도 0.66 · 검토 기간 30일  
-연구 자료 한계 · 거시지표 이용 불가·공급자 설정 누락, 감성 이용 불가·뉴스 유래
+관심 · 중기 · 원분석 신뢰도 0.66 · 거래 전 실시간 재확인
 
 조건부 계획 · 원분석 11/24 19:13 KST · 검토일 12/24 19:13 KST
 
@@ -894,10 +856,9 @@
 
 **거래 전 확인:** 현재 가격과 원래 진입·무효화 조건 확인 / 가용 현금·집중도·손실 한도 확인 / 원분석 필수 연구 입력 검증 완료 확인 / 정규장 호가·스프레드·거래량·진입 확인 조건 재검증 / 실제 보유·미체결·기체결 수량을 대조해 중복 주문과 초과 매도 방지 / 현재 정규장·거래정지 여부와 유효한 매매 호가 확인 / 기존의 더 엄격한 손절·축소 조건과 계좌 위험 한도를 우선합니다. 새 보고서의 가격선·검토일은 기존 보호 기준을 완화하거나 대응을 늦출 근거가 아닙니다.
 
-### HD · HD — 보유·관찰
+### HD · The Home Depot — 보유·관찰
 
-관심 · 주문 전 실시간 재확인 · 원분석 신뢰도 0.63 · 검토 기간 30일  
-연구 자료 한계 · 거시지표 이용 불가·공급자 설정 누락, 감성 이용 불가·뉴스 유래
+관심 · 중기 · 원분석 신뢰도 0.63 · 거래 전 실시간 재확인
 
 조건부 계획 · 원분석 11/24 19:39 KST · 검토일 12/24 19:39 KST
 
@@ -924,11 +885,11 @@
 
 **거래 전 확인:** 현재 가격과 원래 진입·무효화 조건 확인 / 가용 현금·집중도·손실 한도 확인 / 원분석 필수 연구 입력 검증 완료 확인 / 정규장 호가·스프레드·거래량·진입 확인 조건 재검증 / 실제 보유·미체결·기체결 수량을 대조해 중복 주문과 초과 매도 방지 / 현재 정규장·거래정지 여부와 유효한 매매 호가 확인 / 기존의 더 엄격한 손절·축소 조건과 계좌 위험 한도를 우선합니다. 새 보고서의 가격선·검토일은 기존 보호 기준을 완화하거나 대응을 늦출 근거가 아닙니다.
 
-### ANT · ANT — 신규 진입 회피
+### ANT · 발행사·상장 매핑 미확인 — 신규 진입 회피
 
-관심 · 주문 전 실시간 재확인 · 원분석 신뢰도 0.76 · 검토 기간 30일  
-연구 자료 한계 · 거시지표 이용 불가·공급자 설정 누락, 감성 이용 불가·뉴스 유래  
-발행사·거래소·원공시 연결 미확인. 발행사 식별과 가격 매핑을 검증할 때까지 배분 0을 유지합니다.
+관심 · 중기 · 원분석 신뢰도 0.76 · 거래 전 실시간 재확인
+
+발행사와 상장 종목의 대응 관계가 확인될 때까지 아래 가격과 기업 관련 서술은 검증 대기 자료입니다.
 
 재검토 필요 · 원분석 11/24 18:48 KST · 검토일 12/24 18:48 KST
 
@@ -954,49 +915,49 @@
 
 **거래 전 확인:** 현재 가격과 원래 진입·무효화 조건 확인 / 가용 현금·집중도·손실 한도 확인 / 원분석 필수 연구 입력 검증 완료 확인 / 정규장 호가·스프레드·거래량·진입 확인 조건 재검증 / 실제 보유·미체결·기체결 수량을 대조해 중복 주문과 초과 매도 방지 / 현재 정규장·거래정지 여부와 유효한 매매 호가 확인 / 기존의 더 엄격한 손절·축소 조건과 계좌 위험 한도를 우선합니다. 새 보고서의 가격선·검토일은 기존 보호 기준을 완화하거나 대응을 늦출 근거가 아닙니다.
 
-## 만료 시세와 관측 범위
+## 시세 관측 기록
 
-가격과 VWAP은 USD입니다. 모든 행의 관측 시각은 11/25 00:22:00 KST이고 원래 유효시각은 11/25 00:25:00 KST입니다. RVOL은 상대 거래량입니다.
+11/25 01:36:48 KST 기준 USD · 전 종목 유효시각 01:39:48 KST. 정지 표시는 당시 확인 범위입니다. LULD 실시간 가격 밴드는 제공되지 않았습니다.
 
-| 종목 | 가격 | VWAP | RVOL | 피드·지연 | 스프레드(bp) | LULD / 뉴스 중단 |
-|---|---:|---:|---:|---|---:|---|
-| GLDM | 71.015 | 71.4778387 | 1.60157071 | KIS · 34초 | 1.40815321 | {'source': 'nasdaq.current_trade_halts', 'published_at': '2026-11-24T15:22:28+00:00', 'observed_at': '2026-11-24T15:22:31.093295+00:00', 'as_of': '2026-11-24T15:22:34.520962+00:00', 'basis': 'CURRENT_DAY_HALT_FEED_PLUS_DATED_TRADED_BAR', 'symbol': 'GLDM', 'reason_code': None, 'status': 'clear', 'is_clear': True, 'order_scope': 'LONG_ONLY_LIMIT_ORDERS', 'scope': 'REPORTED_TRADING_PAUSES', 'price_bands_available': False, 'limitation': 'Live LULD bands are not supplied; execution venue enforces price bands.'} / {'source': 'nasdaq.current_trade_halts', 'published_at': '2026-11-24T15:22:28+00:00', 'observed_at': '2026-11-24T15:22:31.093295+00:00', 'as_of': '2026-11-24T15:22:34.520962+00:00', 'basis': 'CURRENT_DAY_HALT_FEED_PLUS_DATED_TRADED_BAR', 'symbol': 'GLDM', 'reason_code': None, 'status': 'clear', 'is_clear': True, 'order_scope': 'LONG_ONLY_LIMIT_ORDERS', 'scope': 'REPORTED_NEWS_AND_OTHER_TRADING_HALTS'} |
-| MPWR | 1,199.38 | 1,253.88958733 | 0.77075882 | KIS · 33초 | 11.75837784 | {'source': 'nasdaq.current_trade_halts', 'published_at': '2026-11-24T15:22:28+00:00', 'observed_at': '2026-11-24T15:22:31.093295+00:00', 'as_of': '2026-11-24T15:22:33.366639+00:00', 'basis': 'CURRENT_DAY_HALT_FEED_PLUS_DATED_TRADED_BAR', 'symbol': 'MPWR', 'reason_code': None, 'status': 'clear', 'is_clear': True, 'order_scope': 'LONG_ONLY_LIMIT_ORDERS', 'scope': 'REPORTED_TRADING_PAUSES', 'price_bands_available': False, 'limitation': 'Live LULD bands are not supplied; execution venue enforces price bands.'} / {'source': 'nasdaq.current_trade_halts', 'published_at': '2026-11-24T15:22:28+00:00', 'observed_at': '2026-11-24T15:22:31.093295+00:00', 'as_of': '2026-11-24T15:22:33.366639+00:00', 'basis': 'CURRENT_DAY_HALT_FEED_PLUS_DATED_TRADED_BAR', 'symbol': 'MPWR', 'reason_code': None, 'status': 'clear', 'is_clear': True, 'order_scope': 'LONG_ONLY_LIMIT_ORDERS', 'scope': 'REPORTED_NEWS_AND_OTHER_TRADING_HALTS'} |
-| GEV | 721.015 | 728.47333615 | 0.62952625 | KIS · 36초 | 18.86556895 | {'source': 'nasdaq.current_trade_halts', 'published_at': '2026-11-24T15:22:28+00:00', 'observed_at': '2026-11-24T15:22:31.093295+00:00', 'as_of': '2026-11-24T15:22:36.077399+00:00', 'basis': 'CURRENT_DAY_HALT_FEED_PLUS_DATED_TRADED_BAR', 'symbol': 'GEV', 'reason_code': None, 'status': 'clear', 'is_clear': True, 'order_scope': 'LONG_ONLY_LIMIT_ORDERS', 'scope': 'REPORTED_TRADING_PAUSES', 'price_bands_available': False, 'limitation': 'Live LULD bands are not supplied; execution venue enforces price bands.'} / {'source': 'nasdaq.current_trade_halts', 'published_at': '2026-11-24T15:22:28+00:00', 'observed_at': '2026-11-24T15:22:31.093295+00:00', 'as_of': '2026-11-24T15:22:36.077399+00:00', 'basis': 'CURRENT_DAY_HALT_FEED_PLUS_DATED_TRADED_BAR', 'symbol': 'GEV', 'reason_code': None, 'status': 'clear', 'is_clear': True, 'order_scope': 'LONG_ONLY_LIMIT_ORDERS', 'scope': 'REPORTED_NEWS_AND_OTHER_TRADING_HALTS'} |
-| GOOGL | 279.95 | 279.98667157 | 0.78443514 | KIS · 32초 | 1.42928607 | {'source': 'nasdaq.current_trade_halts', 'published_at': '2026-11-24T15:22:28+00:00', 'observed_at': '2026-11-24T15:22:31.093295+00:00', 'as_of': '2026-11-24T15:22:32.002359+00:00', 'basis': 'CURRENT_DAY_HALT_FEED_PLUS_DATED_TRADED_BAR', 'symbol': 'GOOGL', 'reason_code': None, 'status': 'clear', 'is_clear': True, 'order_scope': 'LONG_ONLY_LIMIT_ORDERS', 'scope': 'REPORTED_TRADING_PAUSES', 'price_bands_available': False, 'limitation': 'Live LULD bands are not supplied; execution venue enforces price bands.'} / {'source': 'nasdaq.current_trade_halts', 'published_at': '2026-11-24T15:22:28+00:00', 'observed_at': '2026-11-24T15:22:31.093295+00:00', 'as_of': '2026-11-24T15:22:32.002359+00:00', 'basis': 'CURRENT_DAY_HALT_FEED_PLUS_DATED_TRADED_BAR', 'symbol': 'GOOGL', 'reason_code': None, 'status': 'clear', 'is_clear': True, 'order_scope': 'LONG_ONLY_LIMIT_ORDERS', 'scope': 'REPORTED_NEWS_AND_OTHER_TRADING_HALTS'} |
-| NVDA | 152.94 | 155.97009101 | 1.73168889 | KIS · 33초 | 0.65365886 | {'source': 'nasdaq.current_trade_halts', 'published_at': '2026-11-24T15:22:28+00:00', 'observed_at': '2026-11-24T15:22:31.093295+00:00', 'as_of': '2026-11-24T15:22:33.682836+00:00', 'basis': 'CURRENT_DAY_HALT_FEED_PLUS_DATED_TRADED_BAR', 'symbol': 'NVDA', 'reason_code': None, 'status': 'clear', 'is_clear': True, 'order_scope': 'LONG_ONLY_LIMIT_ORDERS', 'scope': 'REPORTED_TRADING_PAUSES', 'price_bands_available': False, 'limitation': 'Live LULD bands are not supplied; execution venue enforces price bands.'} / {'source': 'nasdaq.current_trade_halts', 'published_at': '2026-11-24T15:22:28+00:00', 'observed_at': '2026-11-24T15:22:31.093295+00:00', 'as_of': '2026-11-24T15:22:33.682836+00:00', 'basis': 'CURRENT_DAY_HALT_FEED_PLUS_DATED_TRADED_BAR', 'symbol': 'NVDA', 'reason_code': None, 'status': 'clear', 'is_clear': True, 'order_scope': 'LONG_ONLY_LIMIT_ORDERS', 'scope': 'REPORTED_NEWS_AND_OTHER_TRADING_HALTS'} |
-| RSP | 213.14 | 213.17888784 | 0.83751102 | KIS · 34초 | 0.46916418 | {'source': 'nasdaq.current_trade_halts', 'published_at': '2026-11-24T15:22:28+00:00', 'observed_at': '2026-11-24T15:22:31.093295+00:00', 'as_of': '2026-11-24T15:22:34.133750+00:00', 'basis': 'CURRENT_DAY_HALT_FEED_PLUS_DATED_TRADED_BAR', 'symbol': 'RSP', 'reason_code': None, 'status': 'clear', 'is_clear': True, 'order_scope': 'LONG_ONLY_LIMIT_ORDERS', 'scope': 'REPORTED_TRADING_PAUSES', 'price_bands_available': False, 'limitation': 'Live LULD bands are not supplied; execution venue enforces price bands.'} / {'source': 'nasdaq.current_trade_halts', 'published_at': '2026-11-24T15:22:28+00:00', 'observed_at': '2026-11-24T15:22:31.093295+00:00', 'as_of': '2026-11-24T15:22:34.133750+00:00', 'basis': 'CURRENT_DAY_HALT_FEED_PLUS_DATED_TRADED_BAR', 'symbol': 'RSP', 'reason_code': None, 'status': 'clear', 'is_clear': True, 'order_scope': 'LONG_ONLY_LIMIT_ORDERS', 'scope': 'REPORTED_NEWS_AND_OTHER_TRADING_HALTS'} |
-| ETN | 322 | 325.01171897 | 0.69324155 | KIS · 33초 | 35.39932928 | {'source': 'nasdaq.current_trade_halts', 'published_at': '2026-11-24T15:22:28+00:00', 'observed_at': '2026-11-24T15:22:31.093295+00:00', 'as_of': '2026-11-24T15:22:33.057995+00:00', 'basis': 'CURRENT_DAY_HALT_FEED_PLUS_DATED_TRADED_BAR', 'symbol': 'ETN', 'reason_code': None, 'status': 'clear', 'is_clear': True, 'order_scope': 'LONG_ONLY_LIMIT_ORDERS', 'scope': 'REPORTED_TRADING_PAUSES', 'price_bands_available': False, 'limitation': 'Live LULD bands are not supplied; execution venue enforces price bands.'} / {'source': 'nasdaq.current_trade_halts', 'published_at': '2026-11-24T15:22:28+00:00', 'observed_at': '2026-11-24T15:22:31.093295+00:00', 'as_of': '2026-11-24T15:22:33.057995+00:00', 'basis': 'CURRENT_DAY_HALT_FEED_PLUS_DATED_TRADED_BAR', 'symbol': 'ETN', 'reason_code': None, 'status': 'clear', 'is_clear': True, 'order_scope': 'LONG_ONLY_LIMIT_ORDERS', 'scope': 'REPORTED_NEWS_AND_OTHER_TRADING_HALTS'} |
-| AVGO | 301.4 | 302.7136082 | 0.85603978 | KIS · 31초 | 6.96783184 | {'source': 'nasdaq.current_trade_halts', 'published_at': '2026-11-24T15:22:28+00:00', 'observed_at': '2026-11-24T15:22:31.093295+00:00', 'as_of': '2026-11-24T15:22:31.181549+00:00', 'basis': 'CURRENT_DAY_HALT_FEED_PLUS_DATED_TRADED_BAR', 'symbol': 'AVGO', 'reason_code': None, 'status': 'clear', 'is_clear': True, 'order_scope': 'LONG_ONLY_LIMIT_ORDERS', 'scope': 'REPORTED_TRADING_PAUSES', 'price_bands_available': False, 'limitation': 'Live LULD bands are not supplied; execution venue enforces price bands.'} / {'source': 'nasdaq.current_trade_halts', 'published_at': '2026-11-24T15:22:28+00:00', 'observed_at': '2026-11-24T15:22:31.093295+00:00', 'as_of': '2026-11-24T15:22:31.181549+00:00', 'basis': 'CURRENT_DAY_HALT_FEED_PLUS_DATED_TRADED_BAR', 'symbol': 'AVGO', 'reason_code': None, 'status': 'clear', 'is_clear': True, 'order_scope': 'LONG_ONLY_LIMIT_ORDERS', 'scope': 'REPORTED_NEWS_AND_OTHER_TRADING_HALTS'} |
-| AMZN | 254.69 | 253.30440521 | 0.62499149 | KIS · 31초 | 1.96336363 | {'source': 'nasdaq.current_trade_halts', 'published_at': '2026-11-24T15:22:28+00:00', 'observed_at': '2026-11-24T15:22:31.093295+00:00', 'as_of': '2026-11-24T15:22:31.097180+00:00', 'basis': 'CURRENT_DAY_HALT_FEED_PLUS_DATED_TRADED_BAR', 'symbol': 'AMZN', 'reason_code': None, 'status': 'clear', 'is_clear': True, 'order_scope': 'LONG_ONLY_LIMIT_ORDERS', 'scope': 'REPORTED_TRADING_PAUSES', 'price_bands_available': False, 'limitation': 'Live LULD bands are not supplied; execution venue enforces price bands.'} / {'source': 'nasdaq.current_trade_halts', 'published_at': '2026-11-24T15:22:28+00:00', 'observed_at': '2026-11-24T15:22:31.093295+00:00', 'as_of': '2026-11-24T15:22:31.097180+00:00', 'basis': 'CURRENT_DAY_HALT_FEED_PLUS_DATED_TRADED_BAR', 'symbol': 'AMZN', 'reason_code': None, 'status': 'clear', 'is_clear': True, 'order_scope': 'LONG_ONLY_LIMIT_ORDERS', 'scope': 'REPORTED_NEWS_AND_OTHER_TRADING_HALTS'} |
-| SGOV | 100.65 | 100.65553203 | 1.05158512 | KIS · 36초 | 0.99349262 | {'source': 'nasdaq.current_trade_halts', 'published_at': '2026-11-24T15:22:28+00:00', 'observed_at': '2026-11-24T15:22:31.093295+00:00', 'as_of': '2026-11-24T15:22:36.794954+00:00', 'basis': 'CURRENT_DAY_HALT_FEED_PLUS_DATED_TRADED_BAR', 'symbol': 'SGOV', 'reason_code': None, 'status': 'clear', 'is_clear': True, 'order_scope': 'LONG_ONLY_LIMIT_ORDERS', 'scope': 'REPORTED_TRADING_PAUSES', 'price_bands_available': False, 'limitation': 'Live LULD bands are not supplied; execution venue enforces price bands.'} / {'source': 'nasdaq.current_trade_halts', 'published_at': '2026-11-24T15:22:28+00:00', 'observed_at': '2026-11-24T15:22:31.093295+00:00', 'as_of': '2026-11-24T15:22:36.794954+00:00', 'basis': 'CURRENT_DAY_HALT_FEED_PLUS_DATED_TRADED_BAR', 'symbol': 'SGOV', 'reason_code': None, 'status': 'clear', 'is_clear': True, 'order_scope': 'LONG_ONLY_LIMIT_ORDERS', 'scope': 'REPORTED_NEWS_AND_OTHER_TRADING_HALTS'} |
-| AAPL | 352.28 | 350.58734684 | 0.83275732 | KIS · 31초 | 2.2708564 | {'source': 'nasdaq.current_trade_halts', 'published_at': '2026-11-24T15:22:28+00:00', 'observed_at': '2026-11-24T15:22:31.093295+00:00', 'as_of': '2026-11-24T15:22:31.165093+00:00', 'basis': 'CURRENT_DAY_HALT_FEED_PLUS_DATED_TRADED_BAR', 'symbol': 'AAPL', 'reason_code': None, 'status': 'clear', 'is_clear': True, 'order_scope': 'LONG_ONLY_LIMIT_ORDERS', 'scope': 'REPORTED_TRADING_PAUSES', 'price_bands_available': False, 'limitation': 'Live LULD bands are not supplied; execution venue enforces price bands.'} / {'source': 'nasdaq.current_trade_halts', 'published_at': '2026-11-24T15:22:28+00:00', 'observed_at': '2026-11-24T15:22:31.093295+00:00', 'as_of': '2026-11-24T15:22:31.165093+00:00', 'basis': 'CURRENT_DAY_HALT_FEED_PLUS_DATED_TRADED_BAR', 'symbol': 'AAPL', 'reason_code': None, 'status': 'clear', 'is_clear': True, 'order_scope': 'LONG_ONLY_LIMIT_ORDERS', 'scope': 'REPORTED_NEWS_AND_OTHER_TRADING_HALTS'} |
-| LLY | 1,406.77 | 1,399.85638953 | 0.68826654 | KIS · 32초 | 3.62544207 | {'source': 'nasdaq.current_trade_halts', 'published_at': '2026-11-24T15:22:28+00:00', 'observed_at': '2026-11-24T15:22:31.093295+00:00', 'as_of': '2026-11-24T15:22:32.570502+00:00', 'basis': 'CURRENT_DAY_HALT_FEED_PLUS_DATED_TRADED_BAR', 'symbol': 'LLY', 'reason_code': None, 'status': 'clear', 'is_clear': True, 'order_scope': 'LONG_ONLY_LIMIT_ORDERS', 'scope': 'REPORTED_TRADING_PAUSES', 'price_bands_available': False, 'limitation': 'Live LULD bands are not supplied; execution venue enforces price bands.'} / {'source': 'nasdaq.current_trade_halts', 'published_at': '2026-11-24T15:22:28+00:00', 'observed_at': '2026-11-24T15:22:31.093295+00:00', 'as_of': '2026-11-24T15:22:32.570502+00:00', 'basis': 'CURRENT_DAY_HALT_FEED_PLUS_DATED_TRADED_BAR', 'symbol': 'LLY', 'reason_code': None, 'status': 'clear', 'is_clear': True, 'order_scope': 'LONG_ONLY_LIMIT_ORDERS', 'scope': 'REPORTED_NEWS_AND_OTHER_TRADING_HALTS'} |
-| WMT | 132.15 | 131.20361845 | 0.88428189 | KIS · 40초 | 2.27006167 | {'source': 'nasdaq.current_trade_halts', 'published_at': '2026-11-24T15:22:28+00:00', 'observed_at': '2026-11-24T15:22:31.093295+00:00', 'as_of': '2026-11-24T15:22:40.912284+00:00', 'basis': 'CURRENT_DAY_HALT_FEED_PLUS_DATED_TRADED_BAR', 'symbol': 'WMT', 'reason_code': None, 'status': 'clear', 'is_clear': True, 'order_scope': 'LONG_ONLY_LIMIT_ORDERS', 'scope': 'REPORTED_TRADING_PAUSES', 'price_bands_available': False, 'limitation': 'Live LULD bands are not supplied; execution venue enforces price bands.'} / {'source': 'nasdaq.current_trade_halts', 'published_at': '2026-11-24T15:22:28+00:00', 'observed_at': '2026-11-24T15:22:31.093295+00:00', 'as_of': '2026-11-24T15:22:40.912284+00:00', 'basis': 'CURRENT_DAY_HALT_FEED_PLUS_DATED_TRADED_BAR', 'symbol': 'WMT', 'reason_code': None, 'status': 'clear', 'is_clear': True, 'order_scope': 'LONG_ONLY_LIMIT_ORDERS', 'scope': 'REPORTED_NEWS_AND_OTHER_TRADING_HALTS'} |
-| LIN | 518.17 | 516.16581083 | 0.65034091 | KIS · 40초 | 8.10669961 | {'source': 'nasdaq.current_trade_halts', 'published_at': '2026-11-24T15:22:28+00:00', 'observed_at': '2026-11-24T15:22:31.093295+00:00', 'as_of': '2026-11-24T15:22:40.408935+00:00', 'basis': 'CURRENT_DAY_HALT_FEED_PLUS_DATED_TRADED_BAR', 'symbol': 'LIN', 'reason_code': None, 'status': 'clear', 'is_clear': True, 'order_scope': 'LONG_ONLY_LIMIT_ORDERS', 'scope': 'REPORTED_TRADING_PAUSES', 'price_bands_available': False, 'limitation': 'Live LULD bands are not supplied; execution venue enforces price bands.'} / {'source': 'nasdaq.current_trade_halts', 'published_at': '2026-11-24T15:22:28+00:00', 'observed_at': '2026-11-24T15:22:31.093295+00:00', 'as_of': '2026-11-24T15:22:40.408935+00:00', 'basis': 'CURRENT_DAY_HALT_FEED_PLUS_DATED_TRADED_BAR', 'symbol': 'LIN', 'reason_code': None, 'status': 'clear', 'is_clear': True, 'order_scope': 'LONG_ONLY_LIMIT_ORDERS', 'scope': 'REPORTED_NEWS_AND_OTHER_TRADING_HALTS'} |
-| MA | 644.99 | 643.68486349 | 0.340608 | KIS · 41초 | 10.23017903 | {'source': 'nasdaq.current_trade_halts', 'published_at': '2026-11-24T15:22:28+00:00', 'observed_at': '2026-11-24T15:22:31.093295+00:00', 'as_of': '2026-11-24T15:22:41.313890+00:00', 'basis': 'CURRENT_DAY_HALT_FEED_PLUS_DATED_TRADED_BAR', 'symbol': 'MA', 'reason_code': None, 'status': 'clear', 'is_clear': True, 'order_scope': 'LONG_ONLY_LIMIT_ORDERS', 'scope': 'REPORTED_TRADING_PAUSES', 'price_bands_available': False, 'limitation': 'Live LULD bands are not supplied; execution venue enforces price bands.'} / {'source': 'nasdaq.current_trade_halts', 'published_at': '2026-11-24T15:22:28+00:00', 'observed_at': '2026-11-24T15:22:31.093295+00:00', 'as_of': '2026-11-24T15:22:41.313890+00:00', 'basis': 'CURRENT_DAY_HALT_FEED_PLUS_DATED_TRADED_BAR', 'symbol': 'MA', 'reason_code': None, 'status': 'clear', 'is_clear': True, 'order_scope': 'LONG_ONLY_LIMIT_ORDERS', 'scope': 'REPORTED_NEWS_AND_OTHER_TRADING_HALTS'} |
-| V | 414.675 | 413.40155172 | 0.54439113 | KIS · 42초 | 5.06481761 | {'source': 'nasdaq.current_trade_halts', 'published_at': '2026-11-24T15:22:28+00:00', 'observed_at': '2026-11-24T15:22:31.093295+00:00', 'as_of': '2026-11-24T15:22:42.326883+00:00', 'basis': 'CURRENT_DAY_HALT_FEED_PLUS_DATED_TRADED_BAR', 'symbol': 'V', 'reason_code': None, 'status': 'clear', 'is_clear': True, 'order_scope': 'LONG_ONLY_LIMIT_ORDERS', 'scope': 'REPORTED_TRADING_PAUSES', 'price_bands_available': False, 'limitation': 'Live LULD bands are not supplied; execution venue enforces price bands.'} / {'source': 'nasdaq.current_trade_halts', 'published_at': '2026-11-24T15:22:28+00:00', 'observed_at': '2026-11-24T15:22:31.093295+00:00', 'as_of': '2026-11-24T15:22:42.326883+00:00', 'basis': 'CURRENT_DAY_HALT_FEED_PLUS_DATED_TRADED_BAR', 'symbol': 'V', 'reason_code': None, 'status': 'clear', 'is_clear': True, 'order_scope': 'LONG_ONLY_LIMIT_ORDERS', 'scope': 'REPORTED_NEWS_AND_OTHER_TRADING_HALTS'} |
-| BRK-B | 579.46 | 576.9921227 | 0.539797 | KIS · 39초 | 4.14142983 | {'source': 'nasdaq.current_trade_halts', 'published_at': '2026-11-24T15:22:28+00:00', 'observed_at': '2026-11-24T15:22:31.093295+00:00', 'as_of': '2026-11-24T15:22:39.064473+00:00', 'basis': 'CURRENT_DAY_HALT_FEED_PLUS_DATED_TRADED_BAR', 'symbol': 'BRK-B', 'reason_code': None, 'status': 'clear', 'is_clear': True, 'order_scope': 'LONG_ONLY_LIMIT_ORDERS', 'scope': 'REPORTED_TRADING_PAUSES', 'price_bands_available': False, 'limitation': 'Live LULD bands are not supplied; execution venue enforces price bands.'} / {'source': 'nasdaq.current_trade_halts', 'published_at': '2026-11-24T15:22:28+00:00', 'observed_at': '2026-11-24T15:22:31.093295+00:00', 'as_of': '2026-11-24T15:22:39.064473+00:00', 'basis': 'CURRENT_DAY_HALT_FEED_PLUS_DATED_TRADED_BAR', 'symbol': 'BRK-B', 'reason_code': None, 'status': 'clear', 'is_clear': True, 'order_scope': 'LONG_ONLY_LIMIT_ORDERS', 'scope': 'REPORTED_NEWS_AND_OTHER_TRADING_HALTS'} |
-| COST | 1,093.03 | 1,082.71367836 | 1.02642487 | KIS · 38초 | 2.37875225 | {'source': 'nasdaq.current_trade_halts', 'published_at': '2026-11-24T15:22:28+00:00', 'observed_at': '2026-11-24T15:22:31.093295+00:00', 'as_of': '2026-11-24T15:22:38.370660+00:00', 'basis': 'CURRENT_DAY_HALT_FEED_PLUS_DATED_TRADED_BAR', 'symbol': 'COST', 'reason_code': None, 'status': 'clear', 'is_clear': True, 'order_scope': 'LONG_ONLY_LIMIT_ORDERS', 'scope': 'REPORTED_TRADING_PAUSES', 'price_bands_available': False, 'limitation': 'Live LULD bands are not supplied; execution venue enforces price bands.'} / {'source': 'nasdaq.current_trade_halts', 'published_at': '2026-11-24T15:22:28+00:00', 'observed_at': '2026-11-24T15:22:31.093295+00:00', 'as_of': '2026-11-24T15:22:38.370660+00:00', 'basis': 'CURRENT_DAY_HALT_FEED_PLUS_DATED_TRADED_BAR', 'symbol': 'COST', 'reason_code': None, 'status': 'clear', 'is_clear': True, 'order_scope': 'LONG_ONLY_LIMIT_ORDERS', 'scope': 'REPORTED_NEWS_AND_OTHER_TRADING_HALTS'} |
-| PG | 172.2199 | 171.34140994 | 0.75897856 | KIS · 37초 | 1.74241324 | {'source': 'nasdaq.current_trade_halts', 'published_at': '2026-11-24T15:22:28+00:00', 'observed_at': '2026-11-24T15:22:31.093295+00:00', 'as_of': '2026-11-24T15:22:37.764567+00:00', 'basis': 'CURRENT_DAY_HALT_FEED_PLUS_DATED_TRADED_BAR', 'symbol': 'PG', 'reason_code': None, 'status': 'clear', 'is_clear': True, 'order_scope': 'LONG_ONLY_LIMIT_ORDERS', 'scope': 'REPORTED_TRADING_PAUSES', 'price_bands_available': False, 'limitation': 'Live LULD bands are not supplied; execution venue enforces price bands.'} / {'source': 'nasdaq.current_trade_halts', 'published_at': '2026-11-24T15:22:28+00:00', 'observed_at': '2026-11-24T15:22:31.093295+00:00', 'as_of': '2026-11-24T15:22:37.764567+00:00', 'basis': 'CURRENT_DAY_HALT_FEED_PLUS_DATED_TRADED_BAR', 'symbol': 'PG', 'reason_code': None, 'status': 'clear', 'is_clear': True, 'order_scope': 'LONG_ONLY_LIMIT_ORDERS', 'scope': 'REPORTED_NEWS_AND_OTHER_TRADING_HALTS'} |
-| WELL | 243.88 | 241.85230663 | 0.39830173 | KIS · 41초 | 10.65617443 | {'source': 'nasdaq.current_trade_halts', 'published_at': '2026-11-24T15:22:28+00:00', 'observed_at': '2026-11-24T15:22:31.093295+00:00', 'as_of': '2026-11-24T15:22:41.827759+00:00', 'basis': 'CURRENT_DAY_HALT_FEED_PLUS_DATED_TRADED_BAR', 'symbol': 'WELL', 'reason_code': None, 'status': 'clear', 'is_clear': True, 'order_scope': 'LONG_ONLY_LIMIT_ORDERS', 'scope': 'REPORTED_TRADING_PAUSES', 'price_bands_available': False, 'limitation': 'Live LULD bands are not supplied; execution venue enforces price bands.'} / {'source': 'nasdaq.current_trade_halts', 'published_at': '2026-11-24T15:22:28+00:00', 'observed_at': '2026-11-24T15:22:31.093295+00:00', 'as_of': '2026-11-24T15:22:41.827759+00:00', 'basis': 'CURRENT_DAY_HALT_FEED_PLUS_DATED_TRADED_BAR', 'symbol': 'WELL', 'reason_code': None, 'status': 'clear', 'is_clear': True, 'order_scope': 'LONG_ONLY_LIMIT_ORDERS', 'scope': 'REPORTED_NEWS_AND_OTHER_TRADING_HALTS'} |
-| IBM | 233.1 | 233.68028861 | 0.60184134 | KIS · 36초 | 10.29512697 | {'source': 'nasdaq.current_trade_halts', 'published_at': '2026-11-24T15:22:28+00:00', 'observed_at': '2026-11-24T15:22:31.093295+00:00', 'as_of': '2026-11-24T15:22:36.855120+00:00', 'basis': 'CURRENT_DAY_HALT_FEED_PLUS_DATED_TRADED_BAR', 'symbol': 'IBM', 'reason_code': None, 'status': 'clear', 'is_clear': True, 'order_scope': 'LONG_ONLY_LIMIT_ORDERS', 'scope': 'REPORTED_TRADING_PAUSES', 'price_bands_available': False, 'limitation': 'Live LULD bands are not supplied; execution venue enforces price bands.'} / {'source': 'nasdaq.current_trade_halts', 'published_at': '2026-11-24T15:22:28+00:00', 'observed_at': '2026-11-24T15:22:31.093295+00:00', 'as_of': '2026-11-24T15:22:36.855120+00:00', 'basis': 'CURRENT_DAY_HALT_FEED_PLUS_DATED_TRADED_BAR', 'symbol': 'IBM', 'reason_code': None, 'status': 'clear', 'is_clear': True, 'order_scope': 'LONG_ONLY_LIMIT_ORDERS', 'scope': 'REPORTED_NEWS_AND_OTHER_TRADING_HALTS'} |
-| JNJ | 274.195 | 271.99090129 | 0.52182632 | KIS · 43초 | 5.10594843 | {'source': 'nasdaq.current_trade_halts', 'published_at': '2026-11-24T15:22:28+00:00', 'observed_at': '2026-11-24T15:22:31.093295+00:00', 'as_of': '2026-11-24T15:22:43.355387+00:00', 'basis': 'CURRENT_DAY_HALT_FEED_PLUS_DATED_TRADED_BAR', 'symbol': 'JNJ', 'reason_code': None, 'status': 'clear', 'is_clear': True, 'order_scope': 'LONG_ONLY_LIMIT_ORDERS', 'scope': 'REPORTED_TRADING_PAUSES', 'price_bands_available': False, 'limitation': 'Live LULD bands are not supplied; execution venue enforces price bands.'} / {'source': 'nasdaq.current_trade_halts', 'published_at': '2026-11-24T15:22:28+00:00', 'observed_at': '2026-11-24T15:22:31.093295+00:00', 'as_of': '2026-11-24T15:22:43.355387+00:00', 'basis': 'CURRENT_DAY_HALT_FEED_PLUS_DATED_TRADED_BAR', 'symbol': 'JNJ', 'reason_code': None, 'status': 'clear', 'is_clear': True, 'order_scope': 'LONG_ONLY_LIMIT_ORDERS', 'scope': 'REPORTED_NEWS_AND_OTHER_TRADING_HALTS'} |
-| TXN | 265.31 | 272.17579089 | 1.1224435 | KIS · 35초 | 9.4185017 | {'source': 'nasdaq.current_trade_halts', 'published_at': '2026-11-24T15:22:28+00:00', 'observed_at': '2026-11-24T15:22:31.093295+00:00', 'as_of': '2026-11-24T15:22:35.085672+00:00', 'basis': 'CURRENT_DAY_HALT_FEED_PLUS_DATED_TRADED_BAR', 'symbol': 'TXN', 'reason_code': None, 'status': 'clear', 'is_clear': True, 'order_scope': 'LONG_ONLY_LIMIT_ORDERS', 'scope': 'REPORTED_TRADING_PAUSES', 'price_bands_available': False, 'limitation': 'Live LULD bands are not supplied; execution venue enforces price bands.'} / {'source': 'nasdaq.current_trade_halts', 'published_at': '2026-11-24T15:22:28+00:00', 'observed_at': '2026-11-24T15:22:31.093295+00:00', 'as_of': '2026-11-24T15:22:35.085672+00:00', 'basis': 'CURRENT_DAY_HALT_FEED_PLUS_DATED_TRADED_BAR', 'symbol': 'TXN', 'reason_code': None, 'status': 'clear', 'is_clear': True, 'order_scope': 'LONG_ONLY_LIMIT_ORDERS', 'scope': 'REPORTED_NEWS_AND_OTHER_TRADING_HALTS'} |
-| MDT | 98.875 | 98.3454273 | 2.53789382 | KIS · 40초 | 9.10332271 | {'source': 'nasdaq.current_trade_halts', 'published_at': '2026-11-24T15:22:28+00:00', 'observed_at': '2026-11-24T15:22:31.093295+00:00', 'as_of': '2026-11-24T15:22:40.466629+00:00', 'basis': 'CURRENT_DAY_HALT_FEED_PLUS_DATED_TRADED_BAR', 'symbol': 'MDT', 'reason_code': None, 'status': 'clear', 'is_clear': True, 'order_scope': 'LONG_ONLY_LIMIT_ORDERS', 'scope': 'REPORTED_TRADING_PAUSES', 'price_bands_available': False, 'limitation': 'Live LULD bands are not supplied; execution venue enforces price bands.'} / {'source': 'nasdaq.current_trade_halts', 'published_at': '2026-11-24T15:22:28+00:00', 'observed_at': '2026-11-24T15:22:31.093295+00:00', 'as_of': '2026-11-24T15:22:40.466629+00:00', 'basis': 'CURRENT_DAY_HALT_FEED_PLUS_DATED_TRADED_BAR', 'symbol': 'MDT', 'reason_code': None, 'status': 'clear', 'is_clear': True, 'order_scope': 'LONG_ONLY_LIMIT_ORDERS', 'scope': 'REPORTED_NEWS_AND_OTHER_TRADING_HALTS'} |
-| TSM | 343.5188 | 351.54902915 | 0.97017404 | KIS · 37초 | 11.05776226 | {'source': 'nasdaq.current_trade_halts', 'published_at': '2026-11-24T15:22:28+00:00', 'observed_at': '2026-11-24T15:22:31.093295+00:00', 'as_of': '2026-11-24T15:22:37.126745+00:00', 'basis': 'CURRENT_DAY_HALT_FEED_PLUS_DATED_TRADED_BAR', 'symbol': 'TSM', 'reason_code': None, 'status': 'clear', 'is_clear': True, 'order_scope': 'LONG_ONLY_LIMIT_ORDERS', 'scope': 'REPORTED_TRADING_PAUSES', 'price_bands_available': False, 'limitation': 'Live LULD bands are not supplied; execution venue enforces price bands.'} / {'source': 'nasdaq.current_trade_halts', 'published_at': '2026-11-24T15:22:28+00:00', 'observed_at': '2026-11-24T15:22:31.093295+00:00', 'as_of': '2026-11-24T15:22:37.126745+00:00', 'basis': 'CURRENT_DAY_HALT_FEED_PLUS_DATED_TRADED_BAR', 'symbol': 'TSM', 'reason_code': None, 'status': 'clear', 'is_clear': True, 'order_scope': 'LONG_ONLY_LIMIT_ORDERS', 'scope': 'REPORTED_NEWS_AND_OTHER_TRADING_HALTS'} |
-| DELL | 292.27 | 302.70952118 | 2.22104049 | KIS · 31초 | 20.86861326 | {'source': 'nasdaq.current_trade_halts', 'published_at': '2026-11-24T15:22:28+00:00', 'observed_at': '2026-11-24T15:22:31.093295+00:00', 'as_of': '2026-11-24T15:22:31.171582+00:00', 'basis': 'CURRENT_DAY_HALT_FEED_PLUS_DATED_TRADED_BAR', 'symbol': 'DELL', 'reason_code': None, 'status': 'clear', 'is_clear': True, 'order_scope': 'LONG_ONLY_LIMIT_ORDERS', 'scope': 'REPORTED_TRADING_PAUSES', 'price_bands_available': False, 'limitation': 'Live LULD bands are not supplied; execution venue enforces price bands.'} / {'source': 'nasdaq.current_trade_halts', 'published_at': '2026-11-24T15:22:28+00:00', 'observed_at': '2026-11-24T15:22:31.093295+00:00', 'as_of': '2026-11-24T15:22:31.171582+00:00', 'basis': 'CURRENT_DAY_HALT_FEED_PLUS_DATED_TRADED_BAR', 'symbol': 'DELL', 'reason_code': None, 'status': 'clear', 'is_clear': True, 'order_scope': 'LONG_ONLY_LIMIT_ORDERS', 'scope': 'REPORTED_NEWS_AND_OTHER_TRADING_HALTS'} |
-| KO | 97.525 | 96.87287417 | 0.49711062 | KIS · 40초 | 2.05065108 | {'source': 'nasdaq.current_trade_halts', 'published_at': '2026-11-24T15:22:28+00:00', 'observed_at': '2026-11-24T15:22:31.093295+00:00', 'as_of': '2026-11-24T15:22:40.147417+00:00', 'basis': 'CURRENT_DAY_HALT_FEED_PLUS_DATED_TRADED_BAR', 'symbol': 'KO', 'reason_code': None, 'status': 'clear', 'is_clear': True, 'order_scope': 'LONG_ONLY_LIMIT_ORDERS', 'scope': 'REPORTED_TRADING_PAUSES', 'price_bands_available': False, 'limitation': 'Live LULD bands are not supplied; execution venue enforces price bands.'} / {'source': 'nasdaq.current_trade_halts', 'published_at': '2026-11-24T15:22:28+00:00', 'observed_at': '2026-11-24T15:22:31.093295+00:00', 'as_of': '2026-11-24T15:22:40.147417+00:00', 'basis': 'CURRENT_DAY_HALT_FEED_PLUS_DATED_TRADED_BAR', 'symbol': 'KO', 'reason_code': None, 'status': 'clear', 'is_clear': True, 'order_scope': 'LONG_ONLY_LIMIT_ORDERS', 'scope': 'REPORTED_NEWS_AND_OTHER_TRADING_HALTS'} |
-| ABBV | 296.02 | 293.79014153 | 0.80791507 | KIS · 39초 | 4.72829207 | {'source': 'nasdaq.current_trade_halts', 'published_at': '2026-11-24T15:22:28+00:00', 'observed_at': '2026-11-24T15:22:31.093295+00:00', 'as_of': '2026-11-24T15:22:39.542469+00:00', 'basis': 'CURRENT_DAY_HALT_FEED_PLUS_DATED_TRADED_BAR', 'symbol': 'ABBV', 'reason_code': None, 'status': 'clear', 'is_clear': True, 'order_scope': 'LONG_ONLY_LIMIT_ORDERS', 'scope': 'REPORTED_TRADING_PAUSES', 'price_bands_available': False, 'limitation': 'Live LULD bands are not supplied; execution venue enforces price bands.'} / {'source': 'nasdaq.current_trade_halts', 'published_at': '2026-11-24T15:22:28+00:00', 'observed_at': '2026-11-24T15:22:31.093295+00:00', 'as_of': '2026-11-24T15:22:39.542469+00:00', 'basis': 'CURRENT_DAY_HALT_FEED_PLUS_DATED_TRADED_BAR', 'symbol': 'ABBV', 'reason_code': None, 'status': 'clear', 'is_clear': True, 'order_scope': 'LONG_ONLY_LIMIT_ORDERS', 'scope': 'REPORTED_NEWS_AND_OTHER_TRADING_HALTS'} |
-| HD | 348.39 | 348.09517371 | 0.27297264 | KIS · 42초 | 6.02764104 | {'source': 'nasdaq.current_trade_halts', 'published_at': '2026-11-24T15:22:28+00:00', 'observed_at': '2026-11-24T15:22:31.093295+00:00', 'as_of': '2026-11-24T15:22:42.593068+00:00', 'basis': 'CURRENT_DAY_HALT_FEED_PLUS_DATED_TRADED_BAR', 'symbol': 'HD', 'reason_code': None, 'status': 'clear', 'is_clear': True, 'order_scope': 'LONG_ONLY_LIMIT_ORDERS', 'scope': 'REPORTED_TRADING_PAUSES', 'price_bands_available': False, 'limitation': 'Live LULD bands are not supplied; execution venue enforces price bands.'} / {'source': 'nasdaq.current_trade_halts', 'published_at': '2026-11-24T15:22:28+00:00', 'observed_at': '2026-11-24T15:22:31.093295+00:00', 'as_of': '2026-11-24T15:22:42.593068+00:00', 'basis': 'CURRENT_DAY_HALT_FEED_PLUS_DATED_TRADED_BAR', 'symbol': 'HD', 'reason_code': None, 'status': 'clear', 'is_clear': True, 'order_scope': 'LONG_ONLY_LIMIT_ORDERS', 'scope': 'REPORTED_NEWS_AND_OTHER_TRADING_HALTS'} |
-| ANT | 79.695 | 81.33365659 | 0.85159421 | KIS · 40초 · 제한 | 2.50972519 | {'source': 'nasdaq.current_trade_halts', 'published_at': '2026-11-24T15:22:28+00:00', 'observed_at': '2026-11-24T15:22:31.093295+00:00', 'as_of': '2026-11-24T15:22:40.505211+00:00', 'basis': 'CURRENT_DAY_HALT_FEED_PLUS_DATED_TRADED_BAR', 'symbol': 'ANT', 'reason_code': None, 'status': 'clear', 'is_clear': True, 'order_scope': 'LONG_ONLY_LIMIT_ORDERS', 'scope': 'REPORTED_TRADING_PAUSES', 'price_bands_available': False, 'limitation': 'Live LULD bands are not supplied; execution venue enforces price bands.'} / {'source': 'nasdaq.current_trade_halts', 'published_at': '2026-11-24T15:22:28+00:00', 'observed_at': '2026-11-24T15:22:31.093295+00:00', 'as_of': '2026-11-24T15:22:40.505211+00:00', 'basis': 'CURRENT_DAY_HALT_FEED_PLUS_DATED_TRADED_BAR', 'symbol': 'ANT', 'reason_code': None, 'status': 'clear', 'is_clear': True, 'order_scope': 'LONG_ONLY_LIMIT_ORDERS', 'scope': 'REPORTED_NEWS_AND_OTHER_TRADING_HALTS'} |
+| 종목 | 가격 | VWAP | RVOL | 피드 · 스프레드(bp) | LULD · 뉴스 정지 |
+|---|---:|---:|---:|---|---|
+| GLDM | 70.505 | 71.15 | 1.11 | KIS · 1.42 | 보고 없음 · 보고 없음 |
+| MPWR | 1,175.895 | 1,227.55 | 0.54 | KIS · 9.44 | 보고 없음 · 보고 없음 |
+| GEV | 711.36 | 721.06 | 0.60 | KIS · 15.33 | 보고 없음 · 보고 없음 |
+| GOOGL | 277.19 | 279.04 | 0.55 | KIS · 1.08 | 보고 없음 · 보고 없음 |
+| NVDA | 150.55 | 154.42 | 1.18 | KIS · 0.66 | 보고 없음 · 보고 없음 |
+| RSP | 213.025 | 213.13 | 0.60 | KIS · 1.41 | 보고 없음 · 보고 없음 |
+| ETN | 318.075 | 322.38 | 0.54 | KIS · 21.70 | 보고 없음 · 보고 없음 |
+| AVGO | 299.785 | 301.78 | 0.68 | KIS · 8.34 | 보고 없음 · 보고 없음 |
+| AMZN | 251.26 | 252.97 | 0.46 | KIS · 1.99 | 보고 없음 · 보고 없음 |
+| SGOV | 100.6588 | 100.66 | 0.81 | KIS · 0.99 | 보고 없음 · 보고 없음 |
+| AAPL | 351.64 | 350.89 | 0.54 | KIS · 1.14 | 보고 없음 · 보고 없음 |
+| LLY | 1,403.755 | 1,402.91 | 0.51 | KIS · 3.49 | 보고 없음 · 보고 없음 |
+| WMT | 131.86 | 131.55 | 0.63 | KIS · 2.28 | 보고 없음 · 보고 없음 |
+| LIN | 516.045 | 516.56 | 0.44 | KIS · 4.46 | 보고 없음 · 보고 없음 |
+| MA | 643.8401 | 643.98 | 0.29 | KIS · 5.59 | 보고 없음 · 보고 없음 |
+| V | 414.955 | 413.90 | 0.46 | KIS · 1.93 | 보고 없음 · 보고 없음 |
+| BRK-B | 578.1799 | 578.02 | 0.48 | KIS · 2.42 | 보고 없음 · 보고 없음 |
+| COST | 1,091.701 | 1,087.47 | 0.83 | KIS · 7.42 | 보고 없음 · 보고 없음 |
+| PG | 172.845 | 171.88 | 0.54 | KIS · 1.16 | 보고 없음 · 보고 없음 |
+| WELL | 244.71 | 243.14 | 0.32 | KIS · 9.81 | 보고 없음 · 보고 없음 |
+| IBM | 233.245 | 233.26 | 0.43 | KIS · 10.72 | 보고 없음 · 보고 없음 |
+| JNJ | 275.69 | 273.35 | 0.37 | KIS · 3.63 | 보고 없음 · 보고 없음 |
+| TXN | 260.16 | 268.05 | 0.82 | KIS · 8.07 | 보고 없음 · 보고 없음 |
+| MDT | 98.84 | 98.64 | 1.53 | KIS · 6.07 | 보고 없음 · 보고 없음 |
+| TSM | 342.86 | 347.65 | 0.71 | KIS · 4.08 | 보고 없음 · 보고 없음 |
+| DELL | 294.2 | 299.08 | 1.61 | KIS · 17.34 | 보고 없음 · 보고 없음 |
+| KO | 98.09 | 97.36 | 0.41 | KIS · 1.02 | 보고 없음 · 보고 없음 |
+| ABBV | 299.04 | 295.49 | 0.55 | KIS · 4.68 | 보고 없음 · 보고 없음 |
+| HD | 350.98 | 348.89 | 0.27 | KIS · 5.42 | 보고 없음 · 보고 없음 |
+| ANT | 매핑 확인 대기 | 미표시 | 미표시 | 미표시 | 미표시 |
 
 ## 다음 확인
 
-GLDM·TSM·DELL은 원분석의 정규장 종가 조건을 우선 확인합니다. 보유 위험 축소는 신규 매수 재원과 독립적으로 검토합니다. 새 실적·공시나 무효화 조건 발생 시 해당 계획을 재평가합니다.
+YouTube 12건과 PRISM 7건을 연결된 종목의 후속 검토에 반영했습니다. SGOV, RSP, GLDM, ANT의 원분석은 추가 검증이 필요합니다. 원공시·실적과 종목별 가격 조건을 각각 대조합니다.
 
-제공된 YouTube 12건과 PRISM 7건이 종목에 연결됐습니다. NVDA·LLY를 비롯한 해당 종목의 후속 자료 검토에 반영했으며 원분석 방향·신뢰도·비중은 그대로 유지했습니다. 관측 시세만으로 종가 조건이나 공시의 사실관계를 확정할 수 없습니다.
+종목별 검토일 또는 새 실적·공시·무효화 발생 시 재평가. 주문 검증은 실제 거래 시 별도 수행.
 
-COVERAGE_RECEIPT {"event_id":"us:239160424f65c53c24e0927ac98c4f8d","status":"COMPLETE","holdings":{"expected":14,"missing_count":0,"missing":[]},"watchlist":{"expected":27,"missing_count":0,"missing":[],"all_rendered":true},"analysis":{"total":30,"successful":30,"failed":0,"failed_tickers":[]},"response_scanner_limit":10}
+COVERAGE_RECEIPT {"event_id":"us:9811ef69f10ca5da991444c500b78f8b","status":"COMPLETE","holdings":{"expected":14,"missing_count":0,"missing":[]},"watchlist":{"expected":27,"missing_count":0,"missing":[],"all_rendered":true},"analysis":{"total":30,"successful":30,"failed":0,"failed_tickers":[]},"response_scanner_limit":10}
 
 MOBILE_HANDOFF {"owner":"external_github_notification_pipeline","status":"PENDING_EXTERNAL_VERIFICATION","work_sent_notification":false}
