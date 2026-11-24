@@ -77,6 +77,10 @@ def test_approved_policy_preserves_existing_guarded_journal(tmp_path, monkeypatc
             out[f"cash_only_buying_power_{suffix}"] = price
         if case == "concentration":
             out["positions"][0][f"market_value_{suffix}"] = out[f"nav_{suffix}"] * .35
+        if terms.get("side") == "SELL":
+            out[f"cash_{suffix}"] = 0
+            out[f"cash_only_buying_power_{suffix}"] = 0
+            out["cash_only_buying_quantity"] = 0
         return out
 
     def tick():
@@ -92,6 +96,11 @@ def test_approved_policy_preserves_existing_guarded_journal(tmp_path, monkeypatc
         assert row["order_counts"]["ACKNOWLEDGED"] == 1 and len(h.orders) == 1
         tick()
         assert len(h.orders) == 1  # Restarted worker plus outstanding original cannot issue another write.
+        h.fill()
+        h.now += timedelta(seconds=10)
+        h.source(name="fixture-2", action="EXIT_NOW")
+        result = tick()["markets"][market]
+        assert result["order_counts"]["FILLED"] == 1 and [item["side"] for item in h.orders.values()] == ["BUY", "SELL"]
     else:
         assert not h.orders
         expected = {"nav": "NO_STRATEGY_QUANTITY_WITHIN_LIMITS", "cash": "NO_STRATEGY_QUANTITY_WITHIN_LIMITS",
