@@ -929,7 +929,17 @@ def main():
                 return 0
             if args.command == "run-due":
                 try:
+                    if not args.dry_run:
+                        from tradingagents.execution.session_observations import scheduled_capture
+                        observation_results = scheduled_capture(args.state_dir)
+                        observation_root = args.state_dir / "forward-observation"
+                        if (observation_root / "policy.json").is_file():
+                            os.environ["TRADINGAGENTS_FORWARD_OBSERVATION_ROOT"] = str(observation_root)
+                    else:
+                        observation_results = []
                     result = run_due(args.archive_dir, args.state_dir, dry_run=args.dry_run)
+                    if observation_results:
+                        result += observation_results
                 finally:
                     if not args.dry_run:
                         from tradingagents.notifications.local import reconcile_safely
