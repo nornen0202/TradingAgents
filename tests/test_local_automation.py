@@ -721,3 +721,47 @@ def test_interrupted_build_invalidates_local_verification_and_rebuilds_same_inpu
     repaired=local.publish(archive,state,runtime,publication_locked=True)
     assert repaired["status"]=="DELIVERY_VERIFIED" and repaired["commit"]!=first["commit"]
     assert len(calls["build"])==2
+
+
+@pytest.mark.parametrize("profile", ["kr", "us"])
+@pytest.mark.parametrize("mode", ["full", "overlay"])
+def test_private_capture_setting_reaches_only_full_scheduler_child(tmp_path, monkeypatch, profile, mode):
+    from tradingagents.scheduled import runner
+    from tradingagents.scheduled.config import load_scheduled_config
+
+    item = target()
+    item.inputs["profile"] = profile
+    if mode == "overlay":
+        item.workflow_file = "intraday-overlay-refresh.yml"
+    state = tmp_path / "runtime"
+    state.mkdir()
+    private_path = tmp_path / "private" / "series.sqlite"
+    settings = state / "runtime-settings.json"
+    settings.write_text(json.dumps({"daily_history_capture_db": str(private_path)}))
+    monkeypatch.delenv("TRADINGAGENTS_FORWARD_OBSERVATION_ROOT", raising=False)
+    monkeypatch.delenv("TRADINGAGENTS_RESEARCH_PRICE_CAPTURE_DB", raising=False)
+    monkeypatch.setattr(local, "script", lambda _: SimpleNamespace(due_targets=lambda *a, **k: [item]))
+    monkeypatch.setattr(runner, "_iter_run_manifests_desc", lambda *a, **kw: [])
+    monkeypatch.setattr(local, "full_research_session_hold", lambda *a, **k: None)
+    monkeypatch.setattr(local, "local_target_window_start", lambda *a, **k: item.window_start_kst)
+    monkeypatch.setattr(local, "preflight", lambda *a: None)
+    calls = []
+
+    def launch(args, **kwargs):
+        calls.append(args)
+        with monkeypatch.context() as child:
+            if mode == "full":
+                child.setenv("TRADINGAGENTS_RESEARCH_PRICE_CAPTURE_DB", kwargs["env"]["TRADINGAGENTS_RESEARCH_PRICE_CAPTURE_DB"])
+                assert "--disable-execution-refresh" in args
+            else:
+                assert "env" not in kwargs
+            config = load_scheduled_config(args[args.index("--config") + 1])
+            assert config.storage.daily_history_capture_db == (private_path if mode == "full" else None)
+            assert config.execution.session_confirmation_receipts_dir is None
+        return SimpleNamespace(returncode=0)
+
+    monkeypatch.setattr(local.subprocess, "run", launch)
+    assert local.run_due(tmp_path / "archive", state, now=datetime(2026, 10, 9, 12, tzinfo=timezone.utc)) == [
+        {"target": item.name, "status": "DUE"}
+    ]
+    assert len(calls) == 1 and not private_path.exists()

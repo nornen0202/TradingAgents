@@ -2266,7 +2266,6 @@ def _run_single_ticker(
             for artifact_key, filename, payload in (
                 ("public_equity_intelligence_json", "public_equity_intelligence.json", institutional_outputs["full"]),
                 ("source_quality_json", "source_quality.json", institutional_outputs["source_quality"]),
-                ("evidence_ledger_json", "evidence_ledger.json", institutional_outputs["evidence_ledger"]),
                 ("earnings_event_pack_json", "earnings_event_pack.json", institutional_outputs["earnings_event_pack"]),
                 ("thesis_tracker_json", "thesis_tracker.json", institutional_outputs["thesis_tracker"]),
             ):
@@ -2295,6 +2294,13 @@ def _run_single_ticker(
                 "security_readiness": "watch_only",
                 "warnings": [warning],
             }
+        ledger = institutional_outputs.get("evidence_ledger") or {"ticker": ticker, "asof": analysis_date, "items": []}
+        try:
+            ledger_path = ticker_dir / "evidence_ledger.json"
+            _write_json(ledger_path, {**ledger, "daily_price_history": history_recorder.ledger_reference(run_dir.name)})
+            institutional_artifacts["evidence_ledger_json"] = _relative_to_run(run_dir, ledger_path)
+        except OSError as exc:
+            print(f"::warning::{ticker} research_price_ledger_unavailable:{type(exc).__name__}")
         # Captured public disclosures remain available even if an optional
         # institutional pack cannot be built. Preserve their original clocks.
         from tradingagents.dataflows.event_timeline import build_event_timeline, snapshot_event_records

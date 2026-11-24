@@ -423,7 +423,8 @@ def load_scheduled_config(path: str | Path) -> ScheduledAnalysisConfig:
     base_dir = config_path.parent
     archive_dir = _resolve_path(storage_raw.get("archive_dir", ".tradingagents-scheduled/archive"), base_dir)
     site_dir = _resolve_path(storage_raw.get("site_dir", "site"), base_dir)
-    daily_history_capture = _optional_string(storage_raw.get("daily_history_capture_db"))
+    daily_history_capture = (_optional_string(storage_raw.get("daily_history_capture_db"))
+                             or _optional_string(os.environ.get("TRADINGAGENTS_RESEARCH_PRICE_CAPTURE_DB")))
     if observation_root and daily_history_capture is None:
         daily_history_capture = str(Path(observation_root) / "research-prices.sqlite")
 
