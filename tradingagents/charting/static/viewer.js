@@ -325,9 +325,12 @@ function renderKisStrategy(payload) {
       const sample=evaluation.sample||{};
       const counts=row.order_counts||{};
       body.append(paragraph("현재 상태 · 접수 "+unitText(counts.ACKNOWLEDGED,"건")+" · 미체결 "+unitText(counts.OPEN,"건")+" · 부분체결 "+unitText(counts.PARTIAL,"건")+" · 전량체결 "+unitText(counts.FILLED,"건")+" · 대사 대기 "+unitText(typeof counts.UNKNOWN==="number"&&typeof counts.UNRESOLVED==="number"?counts.UNKNOWN+counts.UNRESOLVED:null,"건")+" · 정산 근거 미확인 "+unitText(evaluation.orders_without_verified_settlement,"건")));
-      body.append(paragraph("성과 관측 기간 "+clock(sample.first_observed_at)+" ~ "+clock(sample.last_observed_at)+" · 실현 손익(비용 전) "+unitText(evaluation.realized_gross_pnl," "+evaluation.currency)+" · 환율 "+(market==="KR"?"원화 표시":"달러 표시 · 환산 근거 확인 전")));
+      body.append(paragraph("성과 관측 기간 "+clock(sample.first_observed_at)+" ~ "+clock(sample.last_observed_at)+" · 실현 손익(비용 전) "+unitText(evaluation.realized_gross_pnl," "+evaluation.currency)+" · 미실현 평가 손익(비용 전) "+unitText(evaluation.unrealized_gross_pnl," "+evaluation.currency)));
+      body.append(paragraph(market==="KR"?"원화 기준":"달러 기준 · 원화 환산율 미수집"));
       if(evaluation.cost_evidence_status==="COMPLETE_REVIEWED_IMPORT"){
         body.append(table("검토한 증권사 원문 비용·정산",["거래 통화의 확인 비용","체결 비용 차감 손익","FIFO 청산 비용 / 순손익"],[[number(evaluation.actual_cost)+" "+evaluation.currency,number(evaluation.net_pnl)+" "+evaluation.currency,evaluation.exact_fifo_available?number(evaluation.realized_actual_cost)+" / "+number(evaluation.realized_net_pnl)+" "+evaluation.currency:"체결 순서 미확인"]]));
+        const costs=evaluation.actual_cost_components;
+        if(costs)body.append(paragraph("비용 내역 · 수수료 "+unitText(costs.commission," "+evaluation.currency)+" · 세금 "+unitText(costs.tax," "+evaluation.currency)+" · 환전 "+unitText(costs.fx_cost," "+evaluation.currency)+" · 기타 "+unitText(costs.other_cost," "+evaluation.currency)));
         body.append(paragraph("자동 비용 API 조회가 아닌 검토된 주문별 원문 import입니다. 수수료·세금·환전·기타 비용의 명시된 금액만 사용합니다. 보유 평가를 원장으로 재현하지 못하면 전체 순손익은 미확인으로 유지합니다."));
       }
       body.append(paragraph("정상 전략 체결 표본: 매수 "+number(sample.buy_filled_orders)+"건 · 매도 "+number(sample.sell_filled_orders)+"건 · 보유분 청산 왕복 "+number(sample.closed_inventory_episodes)+"회 · 주문 거래일 "+number(sample.order_session_count)+"일"));

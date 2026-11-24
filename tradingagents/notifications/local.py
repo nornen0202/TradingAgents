@@ -211,13 +211,22 @@ def _reconcile_event(state, path, *, now, runner, completions_allowed):
     result = read(root / "results" / f"{key}.json")
     receipt_path = root / "dispatches" / f"{key}.json"
     receipt = read(receipt_path)
+    if result.get("status") == "DELIVERY_UNKNOWN" and result.get("local_event_id") == key:
+        if receipt.get("status") != "DELIVERY_UNKNOWN":
+            atomic_write_json(receipt_path, {**receipt, "status": "DELIVERY_UNKNOWN", "result": result})
+        return
     if result.get("status") in {"SENT", "NOOP"} and result.get("local_event_id") == key:
         status = ("POLICY_SKIPPED" if result.get("reason") in {
             "INCIDENT_COOLDOWN", "SUPERSEDED_BY_VERIFIED_PUBLICATION"} else "DELIVERY_VERIFIED")
         if receipt.get("status") != status:
             atomic_write_json(receipt_path, {**receipt, "status": status, "result": result})
         return
-    if read(path).get("kind") in {"success", "advisory_success", "work_report"} and (not completions_allowed or read(
+    kind = read(path).get("kind")
+    if kind == "kis_strategy":
+        from .strategy import enabled_at
+        if enabled_at(state) is None:
+            return
+    if kind in {"success", "advisory_success", "work_report"} and (not completions_allowed or read(
             state / "publication.json").get("status") != "DELIVERY_VERIFIED"):
         # Preserve attempts while the known prerequisite is pending.
         # Failure notifications remain independent of Pages health.
@@ -300,6 +309,9 @@ def reconcile_safely(archive, state, *, publication_locked=False, discover_compl
 
 
 def compose(event, archive, state):
+    if event.get("kind") == "kis_strategy":
+        from .strategy import compose as compose_strategy
+        return compose_strategy(event)
     if event.get("kind") == "work_report":
         from .work_reports import compose as compose_work_report
         return compose_work_report(event, archive, state)
@@ -412,6 +424,12 @@ def notify(key, archive, state, *, dry_run=False):
     text, buttons, metadata = compose(event, archive, state)
     if dry_run:
         return {"status": "DRY_RUN", "local_event_id": key, "characters": len(text), **metadata}
+    strategy_event = event["kind"] == "kis_strategy"
+    if strategy_event:
+        from .strategy import enabled_at
+        enabled = enabled_at(state)
+        if enabled is None or enabled > datetime.now(timezone.utc):
+            return {"status": "NOOP", "reason": "STRATEGY_NOTIFICATIONS_DISABLED", "local_event_id": key}
     if metadata.get("reason") == "SUPERSEDED_BY_VERIFIED_PUBLICATION":
         previous = read(state / "notifications" / "results" / f"{key}.json")
         if previous.get("status") in {"SENT", "NOOP"} and previous.get("local_event_id") == key:
@@ -428,11 +446,13 @@ def notify(key, archive, state, *, dry_run=False):
     incident = None
     if event["kind"] == "failure":
         incident = hashlib.sha256(f"{event['stage']}:{event['source_key']}:{event['error_type']}:{recipient}".encode()).hexdigest()
+    send_options = {"conservative": True} if strategy_event else {}
     result = AtomicNotificationLedger(state / "notifications" / "telegram-ledger.json").deliver(
         event_key=f"local:{key}:{recipient}", chunks=[text], buttons=buttons,
-        sender=lambda message, keyboard: client.send_message(message, buttons=keyboard),
+        sender=lambda message, keyboard: client.send_message(message, buttons=keyboard, **send_options),
         receipt_metadata={"repository": REPOSITORY, "workflow_name": "Local Automation", **metadata},
         incident_key=incident, incident_cooldown_seconds=6 * 3600,
+        prevent_ambiguous_retries=strategy_event,
     )
     result.update(local_event_id=key, workflow_run_id=os.getenv("GITHUB_RUN_ID"), verified_at=datetime.now(timezone.utc).isoformat())
     if event["kind"] == "work_report":

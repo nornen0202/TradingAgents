@@ -1,10 +1,13 @@
 from __future__ import annotations
 
+import errno
 import hashlib
+import http.client
 import io
 import json
 import os
 import re
+import socket
 import time
 import urllib.error
 import urllib.parse
@@ -27,6 +30,21 @@ _MAX_ACTION_DATA_AGE = MAX_EXECUTION_AGE
 
 class NotificationError(RuntimeError):
     """A safe-to-display notification failure without secret-bearing details."""
+
+
+class TelegramNotSent(NotificationError):
+    """The request failed before delivery or was explicitly rejected."""
+
+
+class TelegramDeliveryUnknown(NotificationError):
+    """Telegram may have accepted the request before its receipt was lost."""
+
+
+def _definite_connection_failure(exc):
+    reason = exc.reason if isinstance(exc, urllib.error.URLError) else exc
+    return isinstance(reason, (ConnectionRefusedError, socket.gaierror)) or (
+        isinstance(reason, OSError) and reason.errno in {errno.ENETUNREACH, errno.EHOSTUNREACH, errno.ENETDOWN}
+    )
 
 
 @dataclass(frozen=True)
@@ -585,6 +603,7 @@ class TelegramBotClient:
         text: str,
         *,
         buttons: Sequence[Sequence[dict[str, str]]] | None = None,
+        conservative: bool = False,
     ) -> int:
         if not text or len(text) > 4_096:
             raise NotificationError("Telegram message text is empty or exceeds 4096 characters.")
@@ -613,10 +632,18 @@ class TelegramBotClient:
                 status = int(exc.code)
                 try:
                     raw = exc.read(16_384)
+                except (OSError, http.client.HTTPException):
+                    if conservative:
+                        raise TelegramDeliveryUnknown("Telegram response was interrupted.") from None
+                    raise
                 finally:
                     exc.close()
-            except (urllib.error.URLError, TimeoutError, OSError):
+            except (urllib.error.URLError, TimeoutError, OSError, http.client.HTTPException) as exc:
+                if conservative and not _definite_connection_failure(exc):
+                    raise TelegramDeliveryUnknown("Telegram receipt was lost.") from None
                 if attempt >= self.max_attempts:
+                    if conservative:
+                        raise TelegramNotSent("Telegram connection is offline.") from None
                     raise NotificationError("Telegram delivery failed after retryable network errors.") from None
                 self._sleep(min(2 ** (attempt - 1), 8))
                 continue
@@ -627,12 +654,19 @@ class TelegramBotClient:
             if status == 200 and response_payload.get("ok") is True:
                 result = response_payload.get("result") if isinstance(response_payload.get("result"), dict) else {}
                 message_id = result.get("message_id")
-                if isinstance(message_id, int):
+                if isinstance(message_id, int) and (not conservative or type(message_id) is int and message_id > 0):
                     return message_id
+                if conservative:
+                    raise TelegramDeliveryUnknown("Telegram receipt did not include a message identity.")
                 raise NotificationError("Telegram accepted the request without a message receipt.")
 
             retry_after = _telegram_retry_after(response_payload)
             retryable = status == 429 or 500 <= status <= 599
+            if conservative:
+                if not (400 <= status < 500 and response_payload.get("ok") is False):
+                    raise TelegramDeliveryUnknown("Telegram response could not prove delivery or rejection.")
+                if status != 429 or attempt == self.max_attempts:
+                    raise TelegramNotSent(f"Telegram rejected the notification (HTTP {status}).")
             if retryable and attempt < self.max_attempts:
                 delay = retry_after if retry_after is not None else min(2 ** (attempt - 1), 8)
                 self._sleep(max(0.0, min(float(delay), 60.0)))
@@ -667,6 +701,7 @@ class AtomicNotificationLedger:
         receipt_metadata: dict[str, Any],
         incident_key: str | None = None,
         incident_cooldown_seconds: float = 0.0,
+        prevent_ambiguous_retries: bool = False,
     ) -> dict[str, Any]:
         if not event_key or not chunks:
             raise NotificationError("Notification event key and chunks are required.")
@@ -686,6 +721,9 @@ class AtomicNotificationLedger:
                         "event_key": event_key,
                         "message_ids": list(current.get("message_ids") or []),
                     }
+                if current.get("status") in {"sending", "delivery_unknown"}:
+                    return {"status": "DELIVERY_UNKNOWN", "event_key": event_key,
+                            "message_ids": list(current.get("message_ids") or [])}
             else:
                 normalized_incident_key = str(incident_key or "").strip()
                 if normalized_incident_key and incident_cooldown_seconds > 0:
@@ -753,7 +791,20 @@ class AtomicNotificationLedger:
                 raise NotificationError("Notification ledger contains an invalid chunk cursor.")
             message_ids = list(current.get("message_ids") or [])
             for index in range(sent_chunks, len(chunks)):
-                message_id = sender(chunks[index], buttons if index == 0 else None)
+                if prevent_ambiguous_retries:
+                    current["status"] = "sending"
+                    self._write(ledger)
+                try:
+                    message_id = sender(chunks[index], buttons if index == 0 else None)
+                except TelegramNotSent:
+                    if prevent_ambiguous_retries:
+                        current["status"] = "pending"
+                        self._write(ledger)
+                    raise
+                except TelegramDeliveryUnknown:
+                    current["status"] = "delivery_unknown"
+                    self._write(ledger)
+                    return {"status": "DELIVERY_UNKNOWN", "event_key": event_key, "message_ids": message_ids}
                 message_ids.append(int(message_id))
                 current.update(
                     {

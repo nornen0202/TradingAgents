@@ -41,6 +41,16 @@
 
 실제 운영 결과는 `archive/paper/kis-strategy-runtime.json`, 시장별 `kis-strategy/*-strategy.sqlite`, 예약 작업 완료 기록과 화면을 대조한다. 로그에는 상태·시각·횟수만 기록한다. 기존 이 채팅 후속 점검이 정규장 검증 이후 지속 전략 매매의 신호 연결, 차단 이유, 실제 주문·체결·취소, 성과 근거를 확인해 보고한다. PC 전원과 Windows 로그인이 필요하고 채팅 후속 보고에는 Codex 앱 실행이 필요하다.
 
+## 2026-11-25 운영 경로와 관측
+
+`LocalAutomation-refresh-kis`는 기존 경량 갱신으로 새 시세를 수집한다. Windows 설치 도구 `tools/install_kis_execution_refresh_task.ps1 -EnableExecutionRefresh`는 기존 및 신규 생산자 락을 확보한 뒤 활성화한다. 예약 오버레이와 Work 직전 갱신도 같은 시세 생산자 락을 사용한다. 일반 연구나 알림이 생산 중이어도 경량 갱신을 진행한다. 원복할 때는 새 작업을 먼저 비활성화하고 기존·신규 락에 실행이 없을 때 `execution-refresh-enabled.json`의 `enabled`를 `false`로 설정한다.
+
+로컬 조회 화면 `http://127.0.0.1:8766/`은 갱신 원본의 거래일과 완료 시각, 정상 전략이 실제 선택한 원본, 관측 자료의 경과 시간과 신선도, 전략 신호와 현금·수량 검사를 표시한다. 실현·미실현 손익과 수수료·세금·환전 비용은 정산 근거가 확인된 범위에서 거래 통화로 표시한다.
+
+정상 모의 전략 알림은 기존 개인 Telegram 수신 설정을 사용한다. 로컬 `notifications/kis-strategy-enabled.json`에 `mode=KIS_DEMO_STRATEGY`, `enabled=true`, `real_orders_enabled=false`, 오프셋이 있는 `enabled_at`이 필요하다. 확인된 체결 진행, 대사 오류와 정산을 확인한 실현 순손익을 알린다. 전송 전 거절이나 연결 실패는 재시도할 수 있다. Telegram 요청 이후 영수증을 잃은 경우 `DELIVERY_UNKNOWN`으로 기록하고 원래 이벤트를 보류한다. [Telegram Bot API](https://core.telegram.org/bots/api#sendmessage)
+
+실전 준비 검사는 별도 `kis-live-readiness` 폴더의 승인 문서, 계좌 범위, 거래일, 호가, 현금과 수량 한도를 검사하고 구성 해시와 결과를 기록한다. `kis_live_readiness.preview`는 가상 계좌 값으로 KR·US 실전 API 요청 양식을 검증하는 오프라인 계약이다. 현재 운용의 실계좌 호스트 주문 요청 수는 0이다. [KIS API 규격](https://apiportal.koreainvestment.com/apiservice)
+
 2026-10-18은 휴장이므로 실제 장중 체결·취소·성과는 이후 정규장 관측으로 확인해야 한다. 오프라인 검증은 두 시장의 실제 전송 계층을 모의 HTTP 응답으로 실행하고, 승인 전 무통신, 실제 조건 충족 후 주문, 재시작/중복/응답 유실, 부분체결/취소, 미래·누락·잘못된 시각, 계좌 불일치, 모의 자금·보유 한도, 금액 누락·역행, 화면의 과거 시점 필터링을 확인한다.
 
 체결 금액 필드는 KIS 공식 [국내 주문체결 조회](https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/domestic_stock/inquire_daily_ccld/chk_inquire_daily_ccld.py)의 `tot_ccld_amt`, [미국 주문체결 조회](https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/overseas_stock/inquire_ccnl/chk_inquire_ccnl.py)의 `ft_ccld_amt3`를 사용한다. 해당 값과 체결 수량·원주문 조건이 검증되는 경우에만 금액 성과에 반영한다.
