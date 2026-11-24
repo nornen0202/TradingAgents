@@ -13,6 +13,7 @@ from tradingagents.dataflows.intraday.us_microstructure_sources import (
 from tradingagents.portfolio.instrument_identity import resolve_identity
 from tradingagents.portfolio.kis import KisClient
 from tradingagents.schemas import IntradayMarketSnapshot
+from tradingagents.charting.bars import finite, instant
 from tradingagents.charting.capture import normalize_kis_bars
 from .us_symbols import canonical_symbol, kis_symbol
 
@@ -750,12 +751,14 @@ def _native_bar_reference(bars, now: datetime, currency: str, source: str) -> di
     if not bars:
         return None
     bar = bars[-1]
-    available = datetime.fromisoformat(bar["available_at"])
-    observed = datetime.fromisoformat(bar["observed_at"])
-    if (available.date() != now.date() or not available <= observed <= now
-            or now - available > timedelta(minutes=15)):
+    available = instant(bar.get("available_at"))
+    observed = instant(bar.get("observed_at"))
+    close = finite(bar.get("close"))
+    if (available is None or observed is None or close is None or close <= 0
+            or available.astimezone(now.tzinfo).date() != now.date()
+            or not available <= observed <= now or now - available > timedelta(minutes=15)):
         return None
-    return {"price": bar["close"], "currency": currency, "basis": "unadjusted",
+    return {"price": close, "currency": currency, "basis": "unadjusted",
             "source": source, "observed_at": observed.isoformat()}
 
 

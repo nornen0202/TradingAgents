@@ -4,12 +4,16 @@ from hashlib import sha256
 import json
 import math
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 from tradingagents.atomic_io import atomic_write_json
 from tradingagents.calendar_access import get_exchange_calendar
 from tradingagents.charting.bars import instant
 from tradingagents.dataflows.stockstats_utils import yf_retry
 from tradingagents.scheduled.market_calendar import is_supplemental_market_holiday
+
+
+_YAHOO_FX_ZONE = ZoneInfo("Europe/London")
 
 
 def _checksum(rows):
@@ -48,8 +52,9 @@ def load_yahoo_benchmark(symbol, currency, start, end, *, as_of, cache_dir: Path
                 return [], {"state": "no_completed_rows"}
     except (ValueError, TypeError, KeyError, OverflowError):
         return [], {"state": "session_calendar_unavailable"}
-    eligible_through = cutoff.date() if fx else required[-1]
-    request = [symbol, currency, start.isoformat(), end.isoformat(), fx, eligible_through.isoformat()]
+    eligible_through = cutoff.astimezone(_YAHOO_FX_ZONE).date() if fx else required[-1]
+    request = [symbol, currency, start.isoformat(), end.isoformat(),
+               _YAHOO_FX_ZONE.key if fx else None, eligible_through.isoformat()]
     path = cache_dir / (sha256(json.dumps(request).encode()).hexdigest() + ".json") if cache_dir else None
     fetched = None
     input_origin = "fresh"
@@ -83,6 +88,9 @@ def load_yahoo_benchmark(symbol, currency, start, end, *, as_of, cache_dir: Path
                             or min(row["dividend"], row["split"]) < 0):
                         return [], {"state": "adjustment_evidence_invalid"}
                 records.append(row)
+            if fx and (meta.get("exchangeTimezoneName") != _YAHOO_FX_ZONE.key
+                       or str(getattr(data.index, "tz", None)) != _YAHOO_FX_ZONE.key):
+                return [], {"state": "fx_source_timezone_unverified"}
             fetched = {"request": request, "observed_at": datetime.now(timezone.utc).isoformat(),
                        "exchange": meta.get("exchangeName"), "rows": records, "payload_sha256": _checksum(records)}
         except Exception as exc:
@@ -100,7 +108,7 @@ def load_yahoo_benchmark(symbol, currency, start, end, *, as_of, cache_dir: Path
             # Yahoo's daily FX label is insufficient to time same-day settlement.
             # Use only past daily marks and document that this is a proxy.
             rows = [row | {"source": "yfinance", "fx_method": "prior_daily_mark"}
-                    for day, row in sorted(selected.items()) if day < cutoff.date() and day.weekday() < 5]
+                    for day, row in sorted(selected.items()) if day < eligible_through and day.weekday() < 5]
             missing = 0
         else:
             missing = sum(day not in selected for day in required)
@@ -123,7 +131,8 @@ def load_yahoo_benchmark(symbol, currency, start, end, *, as_of, cache_dir: Path
         "series_sha256": _checksum(rows),
     }
     if fx:
-        receipt.update(pair="USD/KRW", units="KRW per USD", method="prior_daily_mark")
+        receipt.update(pair="USD/KRW", units="KRW per USD", method="prior_daily_mark",
+                       source_timezone=_YAHOO_FX_ZONE.key)
     else:
         receipt.update(dividend_event_count=sum(row["dividend"] > 0 for row in rows),
                        split_event_count=sum(row["split"] > 0 for row in rows),

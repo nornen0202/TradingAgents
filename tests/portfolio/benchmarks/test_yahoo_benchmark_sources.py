@@ -47,7 +47,9 @@ def test_yahoo_missing_session_and_currency_cannot_be_filled_by_adjacent_bar():
 
 def test_yahoo_fx_prior_completed_daily_mark_labels_actual_rate_date():
     data = _data(["2025-11-26", "2025-11-27", "2025-11-28"], [1400, 1410, 1499])
-    meta = {"symbol": "KRW=X", "currency": "KRW", "instrumentType": "CURRENCY"}
+    data = data.tz_localize("Europe/London")
+    meta = {"symbol": "KRW=X", "currency": "KRW", "instrumentType": "CURRENCY",
+            "exchangeTimezoneName": "Europe/London"}
     with patch("tradingagents.portfolio.performance.benchmark_sources._download", return_value=(data, meta)):
         rows, evidence = load_yahoo_benchmark("KRW=X", "KRW", date(2025, 11, 26), date(2025, 11, 28),
                                               as_of="2025-11-28T18:00:00+00:00", fx=True)
@@ -104,4 +106,34 @@ def test_yahoo_missing_malformed_or_naive_as_of_skips_vendor_and_cache(tmp_path,
                                                as_of=as_of, cache_dir=tmp_path, fx=fx)
     fetch.assert_not_called()
     assert rows == [] and evidence["state"] == "as_of_unverified"
+    assert not list(tmp_path.iterdir())
+
+
+def test_fx_source_day_completion_and_cache_are_instant_equivalent(tmp_path):
+    data = _data(["2025-11-25", "2025-11-26"], [1400, 1410]).tz_localize("Europe/London")
+    meta = {"symbol": "KRW=X", "currency": "KRW", "instrumentType": "CURRENCY",
+            "exchangeTimezoneName": "Europe/London"}
+    with patch("tradingagents.portfolio.performance.benchmark_sources._download", return_value=(data, meta)) as fetch:
+        options = {"fx": True, "cache_dir": tmp_path}
+        def load(cutoff):
+            return load_yahoo_benchmark("KRW=X", "KRW", date(2025, 11, 25), date(2025, 11, 26),
+                                         as_of=cutoff, **options)
+
+        utc_rows, utc = load("2025-11-26T15:00:00+00:00")
+        korean_rows, korean = load("2025-11-27T00:00:00+09:00")
+        completed, receipt = load("2025-11-27T00:00:00+00:00")
+    assert utc_rows == korean_rows and [row["date"] for row in utc_rows] == ["2025-11-25"]
+    assert utc["series_sha256"] == korean["series_sha256"] and korean["input_origin"] == "cache"
+    assert [row["date"] for row in completed] == ["2025-11-25", "2025-11-26"]
+    assert receipt["source_timezone"] == "Europe/London" and fetch.call_count == 2
+
+
+def test_fx_rejects_unverified_source_timezone(tmp_path):
+    data = _data(["2025-11-26"], [1410]).tz_localize("America/New_York")
+    meta = {"symbol": "KRW=X", "currency": "KRW", "instrumentType": "CURRENCY",
+            "exchangeTimezoneName": "Europe/London"}
+    with patch("tradingagents.portfolio.performance.benchmark_sources._download", return_value=(data, meta)):
+        rows, evidence = load_yahoo_benchmark("KRW=X", "KRW", date(2025, 11, 26), date(2025, 11, 26),
+                                               as_of="2025-11-27T00:30:00+00:00", cache_dir=tmp_path, fx=True)
+    assert rows == [] and evidence["state"] == "fx_source_timezone_unverified"
     assert not list(tmp_path.iterdir())
