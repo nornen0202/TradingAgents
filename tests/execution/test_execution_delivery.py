@@ -83,9 +83,10 @@ def test_handoff_never_retries_a_timed_out_consumer_callback(tmp_path, monkeypat
 
 
 @pytest.mark.parametrize("outcome", ["success", "failed", "timeout"])
-def test_lightweight_handoff_wakes_existing_workers_without_claiming_consumption(tmp_path, monkeypatch, outcome):
+@pytest.mark.parametrize("lightweight", [False, True])
+def test_scheduled_handoff_wakes_existing_workers_without_claiming_consumption(tmp_path, monkeypatch, outcome, lightweight):
     manifest = setup_handoff(tmp_path, monkeypatch)
-    manifest["settings"]["execution_lightweight_refresh"] = True
+    manifest["settings"]["execution_lightweight_refresh"] = lightweight
     monkeypatch.setattr(delivery, "_scheduled_worker_root_matches", lambda root: root == tmp_path)
     monkeypatch.setattr(paper_runtime, "tick", lambda *a, **k: pytest.fail("inline consumer would delay producer"))
     monkeypatch.setattr(demo_runtime, "tick", lambda *a: pytest.fail("inline broker must not run"))
