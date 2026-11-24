@@ -1,4 +1,4 @@
-"""Refresh actual execution inputs between research slots, under run-due.lock.
+"""Refresh actual execution inputs between research slots under one producer lock.
 
 This producer never renews a saved signal. It reuses the existing research
 baseline, fetches new observations and runs the existing execution engine.
@@ -6,16 +6,19 @@ baseline, fetches new observations and runs the existing execution engine.
 from dataclasses import replace
 from datetime import datetime, timezone
 from pathlib import Path
+import re
 from zoneinfo import ZoneInfo
 
 from tradingagents.atomic_io import atomic_write_json
 from tradingagents.charting.bars import instant
 from tradingagents.execution.paper_runtime import _latest_source, _read, _runtime_session
 from tradingagents.execution.refresh_policy import MAX_CONSECUTIVE_FAILURES
+from tradingagents.execution.source_diagnostics import diagnose_source
 
 
 ATTEMPT_INTERVAL_SECONDS = 60
 FAILURE_RETRY_SECONDS = 300
+EXECUTION_LANE_MODE = "KIS_EXECUTION_REFRESH_V1"
 
 
 def execution_refresh_enabled(state):
@@ -26,6 +29,36 @@ def execution_refresh_enabled(state):
                 and settings.get("mode") == mode and settings.get("real_orders_enabled") is False):
             return True
     return False
+
+
+def execution_lane_enabled(state):
+    """Choose the producer lock independently of the current order switches."""
+    try:
+        settings = _read(Path(state) / "execution-refresh-enabled.json", {})
+    except (OSError, ValueError):
+        return False
+    return (isinstance(settings, dict) and settings.get("mode") == EXECUTION_LANE_MODE
+            and settings.get("enabled") is True and settings.get("real_orders_enabled") is False)
+
+
+def quote_producer_lock_path(state):
+    return Path(state) / ("execution-refresh.lock" if execution_lane_enabled(state) else "run-due.lock")
+
+
+def _produced_source_health(archive, market, run_id, finished_at):
+    if not isinstance(run_id, str) or not re.fullmatch(r"\d{8}T\d{6}_[A-Za-z0-9_-]{1,120}", run_id):
+        return None
+    source = archive / "runs" / run_id[:4] / run_id
+    try:
+        manifest = _read(source / "run.json", {})
+        completed = instant(manifest.get("finished_at"))
+        if (manifest.get("run_id") != run_id or manifest.get("status") != "success"
+                or str((manifest.get("settings") or {}).get("market", "")).lower() != market
+                or completed is None or completed > finished_at):
+            return None
+        return diagnose_source(source, finished_at, include_proposals=False)
+    except (AttributeError, OSError, TypeError, ValueError):
+        return None
 
 
 def refresh_due(archive, state, *, now, dry_run=False, clock=None, executor=None,
@@ -115,7 +148,10 @@ def refresh_due(archive, state, *, now, dry_run=False, clock=None, executor=None
                 receipt["consecutive_failures"] = 0
         except Exception as exc:
             receipt.update(status="FAILED", error_type=type(exc).__name__)
-        receipt["finished_at"] = clock().isoformat()
+        finished = clock()
+        receipt["finished_at"] = finished.isoformat()
+        if receipt["status"] == "COMPLETED":
+            receipt["source_diagnostics"] = _produced_source_health(archive, market, receipt["source_run_id"], finished)
         atomic_write_json(path, receipt)
         results.append({"target": target, "status": receipt["status"]})
     return results

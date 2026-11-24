@@ -21,22 +21,20 @@ import tomllib
 from zoneinfo import ZoneInfo
 
 from tradingagents.atomic_io import atomic_write_json, interprocess_file_lock
+from tradingagents.kis_strategy_contract import MODE, SCHEMA, ZONES
 from . import demo_validation as validation
 from .archive_paper import build_step
 from .source_diagnostics import diagnose_source
 from .source_handoff import await_completed_source
 from . import demo_strategy_plan
-from .kis_demo import DemoCredentials, KisDemoClient
+from .kis_demo import DemoCredentials, KisDemoClient, has_unresolved_demo_requests
 from .kis_paper import _fresh, _tick
 from .kis_strategy_limits import CAPS, configured_limits, make_strategy_broker, size_with_native_limits
-from .kis_strategy_v2 import authorize_v2_size, configured_v2
+from .kis_strategy_v2 import authorize_v2_size, configured_v2, current_v2_order_receipt
 from .paper_runtime import _latest_source, _runtime_session
 from .strategy_evaluation import evaluate_strategy_orders
 
-SCHEMA = "tradingagents.kis-strategy-runtime/v1"
-MODE = "KIS_DEMO_STRATEGY"
 FIXTURE_SCOPE = "ISOLATED_FIXTURE"
-ZONES = {"KR": "Asia/Seoul", "US": "America/New_York"}
 TERMINAL = {"FILLED", "CANCELLED", "REJECTED", "NOT_SENT", "BLOCKED"}
 DECISIONS = {"STARTER_NOW": "BUY", "ADD_NOW": "BUY", "BUY_NOW": "BUY",
              "REDUCE_NOW": "SELL", "EXIT_NOW": "SELL", "TAKE_PROFIT_NOW": "SELL",
@@ -259,7 +257,7 @@ def _performance_history(db, now):
             for _, key in sorted(selected)]
 
 
-def summary(db, now, market, marks=None, *, historical=False):
+def summary(db, now, market, marks=None, *, historical=False, order_limit=100):
     """Read cumulative observations once per intent; partial fills never double count.
 
     Latest report clocks remain freshness evidence. Availability refers to one
@@ -302,6 +300,7 @@ def summary(db, now, market, marks=None, *, historical=False):
         status = "UNKNOWN" if historical else request[0] if request else row["state"]
         evidence, observed, last_qty, last_amount, last_amount_qty = {}, None, 0, 0, 0
         economic_state, available_pair, first_fill = None, None, None
+        fill_progress, progress_available = None, None
         observations = []
         for item in db.execute("SELECT observed_at,evidence FROM paper_observations WHERE id=?", (row["id"],)):
             if not historical:
@@ -363,6 +362,11 @@ def summary(db, now, market, marks=None, *, historical=False):
             economic_state = state
             if qty and first_fill is None:
                 first_fill = observed_at
+            progress = (qty, fill_status)
+            if progress != fill_progress:
+                fill_progress, progress_available = progress, ingested_at
+            elif ingested_at < progress_available:
+                progress_available = ingested_at
             last_qty = qty
             evidence, observed = current, observed_at
         filled, amount = evidence.get("filled_qty", 0), evidence.get("fill_notional", 0 if not evidence else None)
@@ -386,6 +390,7 @@ def summary(db, now, market, marks=None, *, historical=False):
             "prepared_at": row["prepared_at"], "observed_at": observed.isoformat() if observed else None,
             "ingested_at": evidence.get("ingested_at"),
             "first_fill_observed_at": first_fill.isoformat() if first_fill else None,
+            "fill_progress_available_at": progress_available.isoformat() if filled and progress_available else None,
             "fill_availability": {"source": "KIS_DEMO_BROKER_REPORT", "filled_quantity": filled,
                                   "fill_notional": amount, "observed_at": available_pair[0].isoformat(),
                                   "ingested_at": available_pair[1].isoformat()} if available_pair else None})
@@ -414,7 +419,7 @@ def summary(db, now, market, marks=None, *, historical=False):
     settlements = strategy_settlement_evidence(db, orders, market=market, as_of=now.isoformat(), historical=historical)
     evaluation = evaluate_strategy_orders(orders, market=market, as_of=now.isoformat(), gross_pnl=gross_pnl,
                                           valuation_complete=complete, settlement_evidence=settlements)
-    return {"orders": orders[-100:], "order_counts": counts, "owned": owned, "performance_history": history,
+    return {"orders": orders if order_limit is None else orders[-order_limit:], "order_counts": counts, "owned": owned, "performance_history": history,
             "evaluation": evaluation,
             "performance": {"currency": "KRW" if market == "KR" else "USD", "basis": "STRATEGY_GROSS_CASHFLOWS_PLUS_MARKED_HOLDINGS",
                 "status": "NO_FILLS" if not any(o["filled_quantity"] for o in orders) else "AVAILABLE" if complete else "INCOMPLETE",
@@ -422,6 +427,42 @@ def summary(db, now, market, marks=None, *, historical=False):
                 "net_pnl": evaluation["net_pnl"], "actual_cost": evaluation["actual_cost"],
                 "fees_known": evaluation["fees_known"], "settlement_known": evaluation["settlement_known"],
                 "observed_at": now.isoformat(), "mark_times": mark_times}}
+
+
+def _reconcile_existing(broker, *, market, now, regular, allow_cancel, clock):
+    """Recover persisted attempts and reconcile against the original order date."""
+    # The journal commits both wire intent and UNKNOWN before any broker call.
+    # An interruption before that commit consumed the strategy ID but sent nothing.
+    with interprocess_file_lock(broker.path.with_suffix(broker.path.suffix + ".paper.lock")):
+        broker.db.execute("""INSERT INTO requests (id,fingerprint,status,response,created_at)
+            SELECT attempt.id,'LOCAL_RECOVERY_NO_WIRE_INTENT','NOT_SENT','{}',paper.created_at
+            FROM strategy_attempts AS attempt JOIN paper_intents AS paper ON paper.id=attempt.id
+            WHERE attempt.state='PREPARED' AND attempt.terms=paper.terms
+            AND NOT EXISTS (SELECT 1 FROM requests WHERE id=attempt.id)
+            AND NOT EXISTS (SELECT 1 FROM intents WHERE id=attempt.id)""")
+        broker.db.execute("""UPDATE strategy_attempts SET state='NOT_SENT'
+        WHERE state='PREPARED' AND NOT EXISTS (SELECT 1 FROM requests WHERE id=strategy_attempts.id)
+        AND NOT EXISTS (SELECT 1 FROM intents WHERE id=strategy_attempts.id)
+        AND NOT EXISTS (SELECT 1 FROM paper_intents WHERE id=strategy_attempts.id)""")
+    issues = []
+    for order in summary(broker.db, at(clock()), market, order_limit=None)["orders"]:
+        if order["status"] in TERMINAL and not (order["filled_quantity"] and order["average_fill_price"] is None):
+            continue
+        if order["status"] == "UNKNOWN":
+            issues.append("AMBIGUOUS_ORDER")
+            continue
+        try:
+            report = broker.reconcile(intent_id=order["id"])
+            if report.get("status") in {"OPEN", "PARTIAL"}:
+                if at(order["prepared_at"]).astimezone(ZoneInfo(ZONES[market])).date() != now.astimezone(ZoneInfo(ZONES[market])).date():
+                    issues.append("PREVIOUS_SESSION_ORDER_UNRESOLVED")
+                elif regular and (allow_cancel or at(clock()) - at(order["prepared_at"]) >= timedelta(minutes=5)):
+                    broker.cancel(intent_id=order["id"])
+            elif report.get("status") in {"UNKNOWN", "UNRESOLVED"}:
+                issues.append("AMBIGUOUS_ORDER")
+        except Exception:
+            issues.append("ORDER_REPORT_UNVERIFIED")
+    return issues
 
 
 def advance(archive, root, validation_root, market, *, clock, tickers, broker_factory, quote_loader, account_loader, session_resolver, gate,
@@ -438,10 +479,14 @@ def advance(archive, root, validation_root, market, *, clock, tickers, broker_fa
         result["gate_passed"] = True
     except Exception:
         scope = None
+    needs_reconciliation = False
     if path.exists():
         with sqlite3.connect(path.resolve().as_uri() + "?mode=ro", uri=True) as db:
             db.row_factory = sqlite3.Row
-            result.update(summary(db, now, market))
+            existing = summary(db, now, market, order_limit=None)
+            needs_reconciliation = any(order["status"] not in TERMINAL
+                or (order["filled_quantity"] and order["average_fill_price"] is None) for order in existing["orders"])
+            result.update({**existing, "orders": existing["orders"][-100:]})
             if scope is None:
                 scope = db.execute("SELECT scope FROM owner").fetchone()[0]
     if not result["gate_passed"] and not path.exists():
@@ -451,35 +496,26 @@ def advance(archive, root, validation_root, market, *, clock, tickers, broker_fa
         return finish("BLOCKED", "CALENDAR_UNVERIFIED")
     if session.get("phase") in {None, "unknown"}:
         return finish("BLOCKED", "CALENDAR_UNVERIFIED")
-    if session.get("is_open") is not True or session.get("phase") != "regular":
-        return finish("MARKET_CLOSED", "MARKET_CLOSED")
-    if not at(session["session_open"]) <= now < at(session["session_close"]):
+    regular = session.get("is_open") is True and session.get("phase") == "regular"
+    if regular and not at(session["session_open"]) <= now < at(session["session_close"]):
         return finish("BLOCKED", "CALENDAR_UNVERIFIED")
+    if not regular:
+        issues = []
+        if needs_reconciliation:
+            with broker_factory(market, path, clock, tickers, scope) as broker:
+                initialize(broker.db)
+                issues = _reconcile_existing(broker, market=market, now=now, regular=False, allow_cancel=False, clock=clock)
+                result.update(summary(broker.db, at(clock()), market))
+        return finish("MARKET_CLOSED", "MARKET_CLOSED", *sorted(set(issues)))
     halted = (root / "HALT").exists() or (validation_root / "HALT").exists()
     near_close = at(session["session_close"]) - now <= timedelta(minutes=10)
-    issues, marks = [], {}
+    marks = {}
     with broker_factory(market, path, clock, tickers, scope) as broker:
         initialize(broker.db)
-        # Always reconcile/clean up outstanding requests before considering buys.
-        for order in summary(broker.db, at(clock()), market)["orders"]:
-            if order["status"] in TERMINAL and not (order["filled_quantity"] and order["average_fill_price"] is None):
-                continue
-            if order["status"] == "UNKNOWN":
-                issues.append("AMBIGUOUS_ORDER")
-                continue
-            try:
-                report = broker.reconcile(intent_id=order["id"])
-                if report.get("status") in {"OPEN", "PARTIAL"} and (halted or near_close or not result["gate_passed"] or at(clock()) - at(order["prepared_at"]) >= timedelta(minutes=5)):
-                    if at(clock()).astimezone(ZoneInfo(ZONES[market])).date() != at(order["prepared_at"]).astimezone(ZoneInfo(ZONES[market])).date():
-                        issues.append("PREVIOUS_SESSION_ORDER_UNRESOLVED")
-                    else:
-                        broker.cancel(intent_id=order["id"])
-                if report.get("status") in {"UNKNOWN", "UNRESOLVED"}:
-                    issues.append("AMBIGUOUS_ORDER")
-            except Exception:
-                issues.append("ORDER_REPORT_UNVERIFIED")
+        issues = _reconcile_existing(broker, market=market, now=now, regular=True,
+                                     allow_cancel=halted or near_close or not result["gate_passed"], clock=clock)
         current = summary(broker.db, at(clock()), market)
-        pending = any(o["status"] not in TERMINAL for o in current["orders"])
+        pending = any(count for status, count in current["order_counts"].items() if status not in TERMINAL)
         holdings_verified = True
         held = next((ticker for ticker, qty in current["owned"].items() if qty), None)
         if held:
@@ -494,7 +530,7 @@ def advance(archive, root, validation_root, market, *, clock, tickers, broker_fa
             except Exception:
                 holdings_verified = False
                 issues.append("STRATEGY_ACCOUNT_POSITION_UNVERIFIED")
-        if broker.db.execute("SELECT 1 FROM requests WHERE status='UNKNOWN'").fetchone() or broker.db.execute("SELECT 1 FROM reconciliation_issues").fetchone():
+        if has_unresolved_demo_requests(broker.db) or broker.db.execute("SELECT 1 FROM reconciliation_issues").fetchone():
             issues.append("AMBIGUOUS_ORDER")
         source = (_latest_source(archive, market.lower(), at(clock()),
                   required_artifacts=("decision_bundle_v2.json", "portfolio-private/portfolio_candidates.json"))
@@ -538,6 +574,9 @@ def advance(archive, root, validation_root, market, *, clock, tickers, broker_fa
             signals = []
             issues.append("SOURCE_EVIDENCE_UNVERIFIED")
         result["source_run_id"] = source.name if source else None
+        checks = {"strategy_signals": len(signals), "candidates_checked": 0, "priced": 0, "cash_and_size_passed": 0}
+        if source and "SOURCE_EVIDENCE_UNVERIFIED" not in issues:
+            result["admission_counts"] = checks
         if not result["gate_passed"]:
             issues.append("VALIDATION_REQUIRED")
         if halted:
@@ -569,11 +608,13 @@ def advance(archive, root, validation_root, market, *, clock, tickers, broker_fa
                 considered += 1
                 if considered > 3:
                     break
+                checks["candidates_checked"] += 1
                 v2_evidence = {}
                 try:
                     quote = quote_loader(market, candidate["ticker"], clock)
                     _fresh(quote, now=at(clock()), seconds=120)
                     price = limit_price(quote, candidate["side"], market)
+                    checks["priced"] += 1
                     terms = {"ticker": candidate["signal"]["ticker"], "side": candidate["side"], "limit_price": price}
                     if market == "US":
                         terms["exchange"] = quote["exchange"]
@@ -582,14 +623,16 @@ def advance(archive, root, validation_root, market, *, clock, tickers, broker_fa
                     terms["quantity"] = size_with_native_limits(market, terms, account, limits)
                     if not terms["quantity"]:
                         raise ValueError("NO_STRATEGY_QUANTITY_WITHIN_LIMITS")
+                    checks["cash_and_size_passed"] += 1
                 except Exception as exc:
                     reason = str(exc)
                     issues.append(reason if reason in {"NO_STRATEGY_QUANTITY_WITHIN_LIMITS", "BUDGET_FX_UNVERIFIED", "PROPOSAL_QUANTITY_INVALID"} else "CANDIDATE_EVIDENCE_UNVERIFIED")
                     continue
                 if v2_settings is not None:
                     try:
+                        order_receipt = current_v2_order_receipt(market, broker.client, clock=clock)
                         terms["quantity"], v2_evidence = authorize_v2_size(
-                            root, market, v2_settings, candidate, terms, quote, account, current, at(clock()),
+                            root, market, v2_settings, candidate, terms, quote, account, current, at(clock()), order_receipt=order_receipt,
                         )
                     except (OSError, ValueError, TypeError, KeyError, AttributeError, ArithmeticError, sqlite3.Error):
                         issues.append("KIS_V2_ADMISSION_UNVERIFIED")

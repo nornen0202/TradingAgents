@@ -159,6 +159,21 @@ def test_cost_cannot_be_displayed_against_a_different_cached_order(tmp_path, fie
     assert view["actual_cost"] is view["net_pnl"] is None
 
 
+def test_buy_only_mark_has_unrealized_pnl_without_a_realized_trade(tmp_path):
+    from tests.execution.test_demo_runtime import Harness
+
+    h = Harness(tmp_path, "US")
+    h.tick()
+    h.now += timedelta(seconds=20)
+    h.fill(amount=200)
+    h.price = 210
+    archive = tmp_path / "ui"
+    runtime(archive, h, h.tick())
+    view = read(archive, h)
+    assert view["realized_gross_pnl"] is None
+    assert view["unrealized_gross_pnl"] == 10
+
+
 def test_partial_sell_projects_settled_fifo_without_borrowing_cached_open_inventory_mark(tmp_path):
     from tradingagents.execution import demo_runtime
     from tradingagents.execution.strategy_settlement import import_strategy_settlement
@@ -199,6 +214,9 @@ def test_partial_sell_projects_settled_fifo_without_borrowing_cached_open_invent
     assert view["actual_cost"] == 3
     assert view["realized_actual_cost"] == 2
     assert view["realized_net_pnl"] == -1
+    assert view["realized_gross_pnl"] == 1
+    assert view["unrealized_gross_pnl"] == 11
+    assert sum(view["actual_cost_components"].values()) == 3
     assert view["exact_fifo_available"] is True
     assert view["net_pnl"] is None
     assert view["status"] == "AVAILABLE_GROSS_ONLY"

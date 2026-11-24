@@ -32,6 +32,36 @@ def test_degraded_preflight_distinct_from_shared_failure(monkeypatch):
     assert policy.domain_policy(configuration(), apply=False, preflight_only=True) == 2
 
 
+@pytest.mark.parametrize("query_failed", [False, True])
+def test_domain_reports_volume_failure_without_auditing_wrong_mount(monkeypatch, tmp_path, query_failed):
+    import json
+
+    def volume_serial(path):
+        if query_failed:
+            error = OSError("device not ready")
+            error.winerror = 21
+            raise error
+        return "WRONG"
+
+    monkeypatch.setattr(policy.storage, "volume_serial", volume_serial)
+    audit = Mock(return_value=True)
+    monkeypatch.setattr(policy, "audit_relocations", audit)
+    domain = {"id": "repair", "enabled": True, "observe_only": True, "volumes": {"D:\\": "EXPECTED"}}
+    receipt = tmp_path / "health.json"
+    cfg = {"domains": [domain], "health_receipt": str(receipt)}
+
+    assert policy.domain_policy(cfg, apply=False, preflight_only=True) == 3
+    assert not receipt.exists()
+    assert policy.domain_policy(cfg, apply=True, health_only=True) == 2
+    assert [call.args[0] for call in audit.call_args_list] == [cfg, cfg]
+    row, = json.loads(receipt.read_text())["domains"]
+    assert row["status"] == "BLOCKED"
+    assert row["volume_root"] == "D:\\"
+    assert row["reason"] == ("volume-query-failed" if query_failed else "volume-serial-mismatch")
+    assert row.get("winerror") == (21 if query_failed else None)
+    assert "EXPECTED" not in receipt.read_text() and "WRONG" not in receipt.read_text()
+
+
 def test_shared_failure_blocks_all_mutations(monkeypatch):
     def fail(x): raise OSError("backup missing")
     monkeypatch.setattr(policy.storage, "validate_volumes", fail)

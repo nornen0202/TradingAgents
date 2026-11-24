@@ -145,6 +145,7 @@ class KisDemoClient:
     def _http(self, method, path, *, deadline=None, not_before=None, **kwargs):
         allowed = {
             ("POST", "/oauth2/tokenP"),
+            ("POST", "/oauth2/Approval"),
             ("GET", PREFIX + "inquire-balance"),
             ("GET", PREFIX + "inquire-daily-ccld"),
             ("GET", PREFIX + "inquire-psbl-order"),
@@ -187,6 +188,16 @@ class KisDemoClient:
             return payload, response.headers
         except (requests.RequestException, ValueError):
             raise DemoError("VTS response unavailable or invalid") from None
+
+    def websocket_approval(self):
+        payload, _ = self._http("POST", "/oauth2/Approval", json={
+            "grant_type": "client_credentials", "appkey": self.credentials.app_key,
+            "secretkey": self.credentials.app_secret,
+        })
+        token = payload.get("approval_key")
+        if not isinstance(token, str) or not token.strip():
+            raise DemoError("VTS WebSocket approval unavailable")
+        return token
 
     def authenticate(self):
         now = self._now()
@@ -430,6 +441,17 @@ def reconciliation_issue_state(db, intent_id, *, as_of):
         return unknown
 
 
+def has_unresolved_demo_requests(db):
+    """An unknown cancel can no longer affect inventory after broker closure."""
+    return db.execute("""
+        SELECT 1 FROM requests AS request
+        LEFT JOIN order_state AS original ON request.id='cancel:' || original.id
+        WHERE request.status='UNKNOWN'
+        AND NOT coalesce(original.status IN ('CANCELLED','FILLED') AND original.remaining=0, 0)
+        LIMIT 1
+    """).fetchone() is not None
+
+
 class DemoOrderJournal:
     def __init__(self, path: Path, client: KisDemoClient, *, issue_clock=None):
         path.parent.mkdir(parents=True, exist_ok=True)
@@ -563,9 +585,7 @@ class DemoOrderJournal:
                 self.db.execute("COMMIT")
                 return {"status": row["status"], **json.loads(row["response"])}
             if endpoint in {"order-cash", "order"} and (
-                self.db.execute(
-                    "SELECT 1 FROM requests WHERE status='UNKNOWN'"
-                ).fetchone()
+                has_unresolved_demo_requests(self.db)
                 or self.db.execute("SELECT 1 FROM reconciliation_issues").fetchone()
             ):
                 raise DemoError(

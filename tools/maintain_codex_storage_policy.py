@@ -159,9 +159,8 @@ def run_policy(config: dict, *, apply: bool, preflight_only: bool = False) -> in
     if not config.get("enabled", False):
         storage.emit("policy-disabled")
         return 0
-    aliases_ok = audit_relocations(config)
     storage.validate_volumes(config)
-    if not aliases_ok:
+    if not audit_relocations(config):
         storage.emit("policy-blocked", reason="relocation-mismatch")
         return 2
     if preflight_only or config.get("observe_only", False):
@@ -204,6 +203,16 @@ def run_policy(config: dict, *, apply: bool, preflight_only: bool = False) -> in
     return 2 if critical else 0
 
 
+def failure_details(error: Exception) -> dict:
+    details = {"error_type": type(error).__name__}
+    if isinstance(error, storage.VolumeValidationError):
+        details.update(volume_root=error.root, reason=error.reason)
+    winerror = getattr(error, "winerror", None)
+    if winerror is not None:
+        details["winerror"] = winerror
+    return details
+
+
 def domain_policy(config: dict, *, apply: bool, preflight_only: bool = False, health_only: bool = False) -> int:
     """Fail closed within each domain while retaining a failed overall result.
 
@@ -220,7 +229,7 @@ def domain_policy(config: dict, *, apply: bool, preflight_only: bool = False, he
             shared_ok = False
     except (OSError, RuntimeError, ValueError) as exc:
         shared_ok = False
-        storage.emit("shared-preflight-failed", error_type=type(exc).__name__)
+        storage.emit("shared-preflight-failed", **failure_details(exc))
     for item in config.get("capacity_checks", []):
         row = {"id": item["id"], "path": item["path"], "observed_at": observed}
         try:
@@ -243,7 +252,7 @@ def domain_policy(config: dict, *, apply: bool, preflight_only: bool = False, he
             if row["critical"] and item.get("required_for_shared", False):
                 shared_ok = False
         except OSError as exc:
-            row.update(available=False, free_bytes=None, error_type=type(exc).__name__)
+            row.update(available=False, free_bytes=None, **failure_details(exc))
             if item.get("required_for_shared", False):
                 shared_ok = False
         headroom.append(row)
@@ -264,7 +273,7 @@ def domain_policy(config: dict, *, apply: bool, preflight_only: bool = False, he
             code = run_policy(domain, apply=apply and shared_ok, preflight_only=preflight_only or not shared_ok or health_only)
             row.update(status="HEALTHY" if code == 0 else "BLOCKED", exit_code=code)
         except (OSError, RuntimeError, ValueError, subprocess.SubprocessError) as exc:
-            row.update(status="BLOCKED", exit_code=2, error_type=type(exc).__name__)
+            row.update(status="BLOCKED", exit_code=2, **failure_details(exc))
         results.append(row)
         storage.emit("domain-health", **row)
     failed = not shared_ok or any(x["exit_code"] for x in results)
