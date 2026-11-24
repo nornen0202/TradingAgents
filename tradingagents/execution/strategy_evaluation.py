@@ -186,6 +186,7 @@ def evaluate_strategy_orders(orders, *, market, as_of, gross_pnl, valuation_comp
             "realized_gross_pnl": round(float(sell - buy), 4) if has_fills and flat and money_known and sequence_known else None,
             "realized_basis": "FULLY_CLOSED_STRATEGY_CASHFLOWS" if has_fills and flat and money_known and sequence_known else "UNAVAILABLE",
             "exact_fifo_available": costs["exact_fifo_available"], "actual_cost": float(actual_cost) if actual_cost is not None else None,
+            "actual_cost_components": costs.get("actual_cost_components"),
             "settlement_verified_order_count": 0 if not has_fills else len(settlement_evidence["orders"])
             if costs["status"] in {"COMPLETE_REVIEWED_IMPORT", "PARTIAL_REVIEWED_IMPORT"} else None,
             "net_pnl": round(float(net), 4) if net is not None else None,

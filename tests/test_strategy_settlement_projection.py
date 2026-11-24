@@ -199,6 +199,9 @@ def test_partial_sell_projects_settled_fifo_without_borrowing_cached_open_invent
     assert view["actual_cost"] == 3
     assert view["realized_actual_cost"] == 2
     assert view["realized_net_pnl"] == -1
+    assert view["realized_gross_pnl"] == 1
+    assert view["unrealized_gross_pnl"] == 11
+    assert sum(view["actual_cost_components"].values()) == 3
     assert view["exact_fifo_available"] is True
     assert view["net_pnl"] is None
     assert view["status"] == "AVAILABLE_GROSS_ONLY"

@@ -890,6 +890,11 @@ def main():
         from tradingagents.execution.demo_runtime import tick
         try:
             receipt = tick(args.archive_dir, args.state_dir / "kis-strategy", args.state_dir / "kis-validation")
+            from tradingagents.notifications.strategy import queue_receipt
+            try:
+                queue_receipt(args.state_dir, receipt)
+            except (OSError, TypeError, ValueError):
+                print(json.dumps({"notification_status": "OUTBOX_UNVERIFIED", "mode": "KIS_DEMO_STRATEGY"}))
             # Detailed orders/performance belong only in the local read-only UI.
             result = {"mode": receipt["mode"], "checked_at": receipt["checked_at"], "real_orders_enabled": False,
                       "markets": {key: {field: row.get(field) for field in ("status", "blockers", "order_counts", "checked_at")}
