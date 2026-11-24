@@ -6,7 +6,7 @@ import pytest
 
 from tradingagents.execution.research_ledger import Ledger, actual_shares
 from tradingagents.execution.research_sources import dart_vintages, sec_vintages
-from tradingagents.execution.research_study import _filing_events, _profit_at
+from tradingagents.execution.research_study import _filing_events, _profit_at, _without_unverified_revisions
 
 
 def test_sec_requires_exact_accession_date_period_and_clock():
@@ -52,6 +52,12 @@ def test_dart_original_consolidated_and_date_only_amendment():
     assert _profit_at(events, "2020-03-30") is None
     assert _profit_at(events, "2020-04-01")[1]["roa"] == .1
     assert _profit_at(events, "2020-04-02")[1]["roa"] == .08
+    revisions = _without_unverified_revisions([original], [
+        {**filing, "rcept_no": "20200401000001", "rcept_dt": "20200401", "report_nm": "[기재정정]사업보고서 (2019.12)"}
+    ], "KR")
+    events = _filing_events(revisions, "KR", ["2020-03-30", "2020-03-31", "2020-04-01", "2020-04-02"])
+    assert _profit_at(events, "2020-04-01")[1]["roa"] == .1
+    assert _profit_at(events, "2020-04-02") is None
 
 
 def test_share_reconstruction_and_costed_new_entry():

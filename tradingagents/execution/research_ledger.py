@@ -172,12 +172,13 @@ def market_events(sessions, start, end):
     return events, last_marks
 
 
-def replay(sessions, bars, fx, schedule, asset_markets, start, end, *, discontinuities=None):
+def replay(sessions, bars, fx, schedule, asset_markets, start, end):
     """Value all arms on the same union of local closing-session dates."""
     accounts = {arm: Ledger(mapping) for arm, mapping in asset_markets.items()}
     curves = {arm: [] for arm in accounts}
     events, last_marks = market_events(sessions, start, end)
     gaps = defaultdict(set)
+    last_prices = {symbol: max(panel, default="") for symbol, panel in bars.items()}
     for instant, day, market, opening in events:
         exchange_rate = fx.at(instant)
         for arm, account in accounts.items():
@@ -188,9 +189,9 @@ def replay(sessions, bars, fx, schedule, asset_markets, start, end, *, discontin
                 bar = bars[symbol].get(day)
                 if bar is None:
                     if position.units:
+                        if day > last_prices[symbol]:
+                            raise ValueError(f"{symbol} has no verified terminal price or delisting settlement on {day}.")
                         gaps[arm].add(f"{symbol}:{day}")
-                        if discontinuities and (symbol, day) in discontinuities:
-                            raise ValueError(f"{symbol} has an unpriced terminal event on {day}.")
                     continue
                 if opening:
                     account.corporate_action(symbol, bar, instant, exchange_rate)

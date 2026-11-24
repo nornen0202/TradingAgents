@@ -1,15 +1,19 @@
 """Feed portfolio weights and market events into a dedicated local LEAN Launcher."""
 from collections import defaultdict
+import hashlib
 import json
 import math
 import os
 from pathlib import Path
+import re
 import shutil
 import subprocess
 
 from tradingagents.atomic_io import atomic_write_bytes, atomic_write_json
 
 from .research_ledger import market_events
+
+_JSON_COMMENTS = re.compile(r'("(?:[^"\\]|\\.)*")|//[^\r\n]*|/\*.*?\*/', re.DOTALL)
 
 
 def export_tape(root, sessions, bars, fx, targets, holdings, start, end):
@@ -80,7 +84,8 @@ def run_lean(root, lean_root, dotnet):
         raise ValueError(f"LEAN build exit {built.returncode}. See {root / 'lean-build.log'}.")
     launch = project.parent / "bin" / "Debug"
     algorithm = launch / "QuantConnect.Algorithm.CSharp.dll"
-    config = json.loads((project.parent / "config.json").read_bytes())
+    base_config = (project.parent / "config.json").read_text(encoding="utf-8-sig")
+    config = json.loads(_JSON_COMMENTS.sub(lambda match: match[1] or "", base_config))
     config.update({"algorithm-type-name": "ResearchReplay", "algorithm-language": "CSharp",
                    "algorithm-location": str(algorithm), "environment": "backtesting",
                    "data-folder": str(lean_root / "Data"), "live-mode": False,
@@ -94,6 +99,12 @@ def run_lean(root, lean_root, dotnet):
         raise ValueError(f"LEAN Launcher exit {status.returncode}. See {root / 'lean-engine.log'}.")
     with (root / "lean-nav.jsonl").open(encoding="utf-8") as file:
         result = compare_reference(curves, map(json.loads, file))
+    checksum = hashlib.sha256()
+    for month in sorted((root / "lean-tape").glob("*.csv")):
+        checksum.update(month.name.encode())
+        checksum.update(month.read_bytes())
+    result.update(plan_sha256=report["plan_sha256"], tape_sha256=checksum.hexdigest(),
+                  algorithm_sha256=hashlib.sha256(tool.read_bytes()).hexdigest())
     output = root / "lean-reconciliation.json"
     atomic_write_json(output, result)
     return output

@@ -259,7 +259,7 @@ def _write_report(root, result):
 
 def run_research(root: Path, as_of, phase):
     cutoff = aware_datetime(as_of)
-    if cutoff is None or cutoff > datetime.now(timezone.utc) or cutoff.date() < date(2026, 1, 1):
+    if cutoff is None or cutoff > datetime.now(timezone.utc) or cutoff.date().year != 2026:
         raise ValueError("Use a completed, timezone-aware 2026 cutoff.")
     root.mkdir(parents=True, exist_ok=True)
     with interprocess_file_lock(root / "research.lock", timeout=0):
@@ -288,9 +288,13 @@ def run_research(root: Path, as_of, phase):
             if prior["plan_sha256"] != _digest(plan) or prior["phase"] != "study":
                 raise ValueError("Complete the pre-holdout run with this plan first.")
         bars = {symbol: actual_shares(rows) for symbol, rows in data["prices"].items()}
-        ends = {market: max(day for day in bars[benchmark] if day <= expected_end[market] and day in all_sessions[market])
-                for market, benchmark in BENCHMARKS.items()}
-        ends = {market: min(day, "2025-12-31") if phase == "study" else day for market, day in ends.items()}
+        ends = {}
+        for market, benchmark in BENCHMARKS.items():
+            bound = min(expected_end[market], "2025-12-31") if phase == "study" else expected_end[market]
+            available = [day for day in bars[benchmark] if day <= bound and day in all_sessions[market]]
+            if not available:
+                raise ValueError(f"Benchmark {benchmark} lacks verified prices at the study boundary.")
+            ends[market] = max(available)
         end = max(ends.values())
         sessions = {market: {day: clocks for day, clocks in schedule.items() if day <= ends[market]}
                     for market, schedule in all_sessions.items()}
@@ -333,7 +337,8 @@ def run_research(root: Path, as_of, phase):
                   "weights_sha256": _digest(decisions), "kr_benchmark_source": data.get("kr_benchmark_source", {}),
                   "decision_exclusions": dict(Counter(reason for decision in decisions
                                                       for reason in decision["rejected_evidence"].values())),
-                  "veto_count": 0, "veto_evidence": "absent", "no_order_authority": True}
+                  "veto_count": 0, "veto_evidence": "absent_for_replay", "veto_eligible_decision_clocks": len(decisions),
+                  "no_order_authority": True}
         output = root / phase
         output.mkdir(exist_ok=True)
         atomic_write_json(output / "weights.json", decisions)

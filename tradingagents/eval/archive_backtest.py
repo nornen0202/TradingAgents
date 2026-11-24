@@ -162,8 +162,13 @@ def _price_panel(symbol, first, last, fetch):
     return {"bars": rows}
 
 
-def _groups(rows):
+def _groups(rows, start, end):
     groups = defaultdict(list)
+    month = start.replace(day=1)
+    while month <= end:
+        for market in ("전체", *MARKETS):
+            groups[market, month.isoformat()[:7], "전체"] = []
+        month = (month + timedelta(days=32)).replace(day=1)
     for row in rows:
         for market in ("전체", row["market"]):
             for month in ("전체", row["decision_date"][:7]):
@@ -226,7 +231,7 @@ def run_archive_backtest(archive, start, end, output, *, holding, fee_bps, as_of
                 "settlement_cutoff": cutoff.isoformat(), "holding": holding, "fee_bps": fee_bps,
                 "archive_inventory": inventory, "exchange_calendar_version": version("exchange-calendars"),
                 "price_panels_sha256": _digest(panels), "archive_manifests_sha256": _digest(sources)}
-    data = _published_data(rows, manifest) | {"archive_groups": _groups(rows)}
+    data = _published_data(rows, manifest) | {"archive_groups": _groups(rows, start, end)}
     root = Path(output) / "backtest" / run_id
     root.mkdir(parents=True, exist_ok=False)
     atomic_write_json(root / "archive-inputs.json", sources)

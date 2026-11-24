@@ -176,9 +176,8 @@ namespace QuantConnect.Algorithm.CSharp
             if (string.IsNullOrWhiteSpace(line)) return null;
             var comma = line.IndexOf(',');
             var time = DateTime.ParseExact(line.Substring(0, comma), "yyyyMMdd HHmmss", CultureInfo.InvariantCulture);
-            return time.Date == date.Date
-                ? new ResearchFrame { Symbol = config.Symbol, Time = time, Value = 1, Payload = line[(comma + 1)..] }
-                : null;
+            // LEAN keeps the same enumerator across dates while the monthly source is unchanged.
+            return new ResearchFrame { Symbol = config.Symbol, Time = time, Value = 1, Payload = line[(comma + 1)..] };
         }
     }
 }
