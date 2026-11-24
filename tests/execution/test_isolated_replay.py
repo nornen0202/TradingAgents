@@ -17,7 +17,7 @@ from tradingagents.execution.overlay import evaluate_execution_state
 from tradingagents.execution.strategy_settlement import SCHEMA as SETTLEMENT_SCHEMA
 from tradingagents.schemas import IntradayMarketSnapshot
 from tests.execution.test_conditional_entry import decision
-from tests.execution.test_kis_strategy_limits import configure, configure_v2
+from tests.execution.test_kis_strategy_limits import approved_config, configure, configure_v2
 
 SYMBOL = "005930.KS"
 BUY = "2026-10-19T09:03:00+09:00"
@@ -148,6 +148,20 @@ def _wire(workspace):
         return []
     rows = map(json.loads, path.read_text(encoding="utf-8").splitlines())
     return [row["tr_id"] for row in rows if row["method"] == "POST"]
+
+
+def test_approved_limits_use_the_same_versioned_journal_in_isolated_replay(tmp_path):
+    workspace = tmp_path / "workspace"
+    assert isolated_replay.command(workspace, "init")["status"] == "INITIALIZED"
+    _source(workspace, "fixture-buy", stamp(BUY, -5))
+    preview = _fixture(tmp_path, "buy-preview", _tape(BUY))
+    first = isolated_replay.command(workspace, "tick", preview)
+    assert first["approval_previews"] and not _wire(workspace)
+    enabled = workspace / "state" / "enabled.json"
+    atomic_write_json(enabled, approved_config(json.loads(enabled.read_bytes())))
+    result = isolated_replay.command(workspace, "tick", preview)
+    assert result["strategy"]["native_policy_journal_bound"] is True
+    assert result["approval_previews"] and not _wire(workspace)
 
 
 def _settlement(order, broker_id):
