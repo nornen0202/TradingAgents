@@ -20,8 +20,8 @@ from tradingagents.scheduled.market_calendar import market_session_state
 from .kis_demo import DEMO_HOST, DemoError, DemoOrderJournal, has_unresolved_demo_requests
 from .kis_demo_us import KisDemoUSClient, EXCHANGES, NEW_YORK, SEOUL
 from .kis_paper import _clock, _number, _integer, _broker_number, _stable, _fresh, execution_notional
-from .kis_strategy_limits import broker_policy_fields, validate_buy_nav
-from .paper import order_nav_limit, stamp
+from .kis_strategy_limits import bind_broker_policy, broker_policy_fields, reserved_cost, validate_buy_nav, within_buy_nav
+from .paper import stamp
 
 
 SCHEMA = "tradingagents.kis-us-paper/v1"
@@ -298,7 +298,7 @@ class KisPaperUSBroker:
     has no caller-supplied historical ``now`` and cannot backdate a live request.
     """
     def __init__(self, path: Path | str, client: KisDemoUSClient, policy: USPaperOrderPolicy,
-                 *, paper_enabled: bool = False, clock=None):
+                 *, paper_enabled: bool = False, clock=None, strategy_policy_revision=None):
         if type(client) is not KisDemoUSClient or client.credentials.product_code != "01" or type(paper_enabled) is not bool or not isinstance(policy, USPaperOrderPolicy):
             raise DemoError("Dedicated VTS client, explicit policy and boolean opt-in required")
         self.path, self.client, self.policy = Path(path), client, policy
@@ -320,13 +320,12 @@ class KisPaperUSBroker:
         policy_fields = broker_policy_fields(policy)
         if not policy.allowed_tickers:
             policy_fields.pop("allowed_tickers")  # Preserve existing journal identities.
-        encoded = json.dumps(policy_fields, sort_keys=True)
-        with interprocess_file_lock(self.path.with_suffix(self.path.suffix + ".paper.lock")):
-            previous = self.db.execute("SELECT policy FROM paper_policy WHERE scope=?", (client.credentials.scope(),)).fetchone()
-            if previous and previous[0] != encoded:
-                self.close()
-                raise DemoError("Policy changed; use a separately named paper journal")
-            self.db.execute("INSERT OR IGNORE INTO paper_policy VALUES (?,?)", (client.credentials.scope(), encoded))
+        try:
+            with interprocess_file_lock(self.path.with_suffix(self.path.suffix + ".paper.lock")):
+                bind_broker_policy(self.db, client.credentials.scope(), "US", policy_fields, strategy_policy_revision)
+        except Exception:
+            self.close()
+            raise
 
     def close(self):
         self.journal.close()
@@ -377,7 +376,7 @@ class KisPaperUSBroker:
                 raise DemoError("US held symbol exchange conflicts with order exchange")
             _number(row.get("market_value_usd"))
             positions[row["ticker"]] = row
-        notional = quantity * price
+        notional = Decimal(str(price)) * quantity
         if notional > self.policy.max_order_usd:
             raise DemoError("Per-order paper notional limit exceeded")
         requests = self.db.execute("""SELECT p.*,r.status,i.body,s.filled,s.remaining,s.status AS order_status
@@ -392,22 +391,20 @@ class KisPaperUSBroker:
             if _clock(row["created_at"]).astimezone(NEW_YORK).date() == now.astimezone(NEW_YORK).date():
                 count += 1
                 if original["side"] == "BUY":
-                    bought += original["quantity"] * original["limit_price"]
+                    bought += original["quantity"] * Decimal(str(original["limit_price"]))
             remainder = row["remaining"] if row["remaining"] is not None else original["quantity"]
             if row["order_status"] in {"FILLED", "CANCELLED"}:
                 remainder = 0
             if original["side"] == "BUY":
-                reserved_buy += remainder * original["limit_price"]
+                reserved_buy += remainder * Decimal(str(original["limit_price"]))
                 if original["ticker"] == ticker:
-                    held_symbol_reserve += remainder * original["limit_price"]
+                    held_symbol_reserve += remainder * Decimal(str(original["limit_price"]))
             elif original["ticker"] == ticker:
                 reserved_sell += remainder
         if count >= self.policy.max_daily_orders:
             raise DemoError("Daily paper order limit exceeded")
         if side == "BUY":
-            if (self.policy.max_order_nav is not None
-                    and notional * (1 + self.policy.reserve_cost_bps / 10000)
-                    > nav * order_nav_limit(self.policy, "BUY", quantity)):
+            if not within_buy_nav(notional, quantity, nav, self.policy):
                 raise DemoError("Paper buy exceeds the configured NAV limit")
             if bought + notional > self.policy.max_daily_buy_usd:
                 raise DemoError("Daily paper buy limit exceeded")
@@ -415,11 +412,11 @@ class KisPaperUSBroker:
                 raise DemoError("Cash-only capacity must match ticker and limit")
             capacity = _number(account.get("cash_only_buying_power_usd"))
             capacity_qty = _integer(account.get("cash_only_buying_quantity"))
-            reserve = (reserved_buy + notional) * (1 + self.policy.reserve_cost_bps / 10000)
-            if quantity > capacity_qty or reserve > min(cash - self.policy.cash_floor_usd, capacity):
+            reserve = reserved_cost(reserved_buy + notional, self.policy.reserve_cost_bps)
+            if quantity > capacity_qty or reserve > Decimal(str(min(cash - self.policy.cash_floor_usd, capacity))):
                 raise DemoError("Cash-only capacity or reserved cash floor exceeded")
-            position_value = _number(positions.get(ticker, {}).get("market_value_usd", 0))
-            if position_value + held_symbol_reserve + notional > nav * self.policy.max_position_fraction:
+            position_value = Decimal(str(_number(positions.get(ticker, {}).get("market_value_usd", 0))))
+            if position_value + held_symbol_reserve + notional > Decimal(str(nav)) * Decimal(str(self.policy.max_position_fraction)):
                 raise DemoError("Paper concentration limit exceeded")
         elif quantity + reserved_sell > positions.get(ticker, {}).get("sellable_quantity", 0):
             # Protective reductions ignore buy cash/concentration caps but never
