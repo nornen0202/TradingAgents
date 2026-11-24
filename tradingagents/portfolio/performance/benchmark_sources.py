@@ -9,6 +9,7 @@ from tradingagents.atomic_io import atomic_write_json
 from tradingagents.calendar_access import get_exchange_calendar
 from tradingagents.charting.bars import instant
 from tradingagents.dataflows.stockstats_utils import yf_retry
+from tradingagents.scheduled.market_calendar import is_supplemental_market_holiday
 
 
 def _checksum(rows):
@@ -38,10 +39,11 @@ def load_yahoo_benchmark(symbol, currency, start, end, *, as_of, cache_dir: Path
     required = []
     try:
         if not fx:
-            calendar_code = "XKRX" if symbol.endswith((".KS", ".KQ")) else "XNYS"
-            calendar = get_exchange_calendar(calendar_code)
+            market = "KR" if symbol.endswith((".KS", ".KQ")) else "US"
+            calendar = get_exchange_calendar("XKRX" if market == "KR" else "XNYS")
             required = [session.date() for session in calendar.sessions_in_range(start.isoformat(), end.isoformat())
-                        if calendar.session_close(session).to_pydatetime() <= cutoff]
+                        if not is_supplemental_market_holiday(market=market, session_date=session.date())
+                        and calendar.session_close(session).to_pydatetime() <= cutoff]
             if not required:
                 return [], {"state": "no_completed_rows"}
     except (ValueError, TypeError, KeyError, OverflowError):

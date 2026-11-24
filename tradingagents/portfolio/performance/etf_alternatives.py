@@ -271,7 +271,7 @@ def build_etf_alternative_comparison(
     configured_cashflows = getattr(settings, "cashflow_baseline_path", None)
     all_flows = (
         load_external_capital_flows(configured_cashflows, warnings=flow_load_warnings)
-        if configured_cashflows else list(scheduled_cashflows)
+        if configured_cashflows else sorted(scheduled_cashflows, key=lambda item: item.date)
     )
     local_warnings.extend(flow_load_warnings)
     flows = [

@@ -53,3 +53,13 @@ def test_yahoo_fx_prior_completed_daily_mark_labels_actual_rate_date():
     assert evidence["units"] == "KRW per USD"
     assert _fx_rate_and_date("USD", {"USDKRW": rows}, date(2025, 11, 28), lookup="on_trade_date") == (1410, "2025-11-27")
     assert _fx_rate_and_date("USD", {"USDKRW": rows}, date(2025, 12, 5), lookup="on_trade_date") == (None, None)
+
+
+def test_korean_supplemental_holiday_does_not_create_a_missing_bar():
+    data = _data(["2026-07-16", "2026-07-20"], [100, 110])
+    meta = {"symbol": "069500.KS", "currency": "KRW", "instrumentType": "ETF", "exchangeName": "KSC"}
+    with patch("tradingagents.portfolio.performance.benchmark_sources._download", return_value=(data, meta)):
+        rows, evidence = load_yahoo_benchmark("069500.KS", "KRW", date(2026, 7, 16), date(2026, 7, 20),
+                                              as_of="2026-07-20T06:31:00+00:00")
+    assert [row["date"] for row in rows] == ["2026-07-16", "2026-07-20"]
+    assert evidence["state"] == "available" and evidence["missing_sessions"] == 0
