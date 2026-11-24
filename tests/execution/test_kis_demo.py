@@ -73,6 +73,16 @@ def ack():
     )
 
 
+def test_websocket_approval_stays_on_fixed_vts_non_order_endpoint():
+    session = Session(Response({"approval_key": "fixture-approval"}))
+    demo = KisDemoClient(credentials(), session=session, pacer=RequestPacer(interval=0))
+    assert demo.websocket_approval() == "fixture-approval"
+    method, url, options = session.calls[0]
+    assert (method, url) == ("POST", "https://openapivts.koreainvestment.com:29443/oauth2/Approval")
+    assert options["allow_redirects"] is False
+    assert set(options["json"]) == {"grant_type", "appkey", "secretkey"}
+
+
 def test_only_dedicated_demo_credentials_are_loaded(monkeypatch, tmp_path):
     from tradingagents.dataflows import api_keys
 
