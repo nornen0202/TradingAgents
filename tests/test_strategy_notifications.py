@@ -16,7 +16,8 @@ def test_strategy_outbox_deduplicates_lifecycle_and_excludes_identifiers(tmp_pat
     now = datetime.now(timezone.utc)
     filled_at = (now - timedelta(seconds=30)).isoformat()
     row = {"orders": [{"id": "PRIVATE_INTENT", "broker_id": "PRIVATE_BROKER_ID", "status": "FILLED",
-                       "filled_quantity": 1, "first_fill_observed_at": filled_at, "ingested_at": now.isoformat(),
+                       "filled_quantity": 2, "first_fill_observed_at": (now - timedelta(days=2)).isoformat(),
+                       "fill_progress_available_at": filled_at, "ingested_at": now.isoformat(),
                        "source": "KIS_DEMO_BROKER_REPORT", "strategy_performance": True, "mode": "demo"}],
            "blockers": ["AMBIGUOUS_ORDER", "SOURCE_EXECUTION_EXPIRED"],
            "evaluation": {"sample": {"first_observed_at": (now - timedelta(days=2)).isoformat()},
@@ -50,7 +51,7 @@ def test_no_event_for_missing_invalid_or_future_broker_evidence(tmp_path, bad_ti
         "enabled": True, "real_orders_enabled": False, "enabled_at": (now - timedelta(minutes=1)).isoformat()})
     row = {"orders": [{"id": "fixture", "status": "FILLED", "mode": "demo", "filled_quantity": 1,
                        "source": "KIS_DEMO_BROKER_REPORT", "strategy_performance": True,
-                       "first_fill_observed_at": bad_time, "ingested_at": now.isoformat()}],
+                       "fill_progress_available_at": bad_time, "ingested_at": now.isoformat()}],
            "evaluation": {"settlement_available_at": bad_time, "cost_evidence_status": "COMPLETE_REVIEWED_IMPORT",
                           "exact_fifo_available": True, "realized_net_pnl": 0}}
     assert not strategy.queue_receipt(tmp_path, {"mode": MODE, "schema": SCHEMA, "enabled": True,

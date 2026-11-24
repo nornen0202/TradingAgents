@@ -300,6 +300,7 @@ def summary(db, now, market, marks=None, *, historical=False, order_limit=100):
         status = "UNKNOWN" if historical else request[0] if request else row["state"]
         evidence, observed, last_qty, last_amount, last_amount_qty = {}, None, 0, 0, 0
         economic_state, available_pair, first_fill = None, None, None
+        fill_progress, progress_available = None, None
         observations = []
         for item in db.execute("SELECT observed_at,evidence FROM paper_observations WHERE id=?", (row["id"],)):
             if not historical:
@@ -361,6 +362,11 @@ def summary(db, now, market, marks=None, *, historical=False, order_limit=100):
             economic_state = state
             if qty and first_fill is None:
                 first_fill = observed_at
+            progress = (qty, fill_status)
+            if progress != fill_progress:
+                fill_progress, progress_available = progress, ingested_at
+            elif ingested_at < progress_available:
+                progress_available = ingested_at
             last_qty = qty
             evidence, observed = current, observed_at
         filled, amount = evidence.get("filled_qty", 0), evidence.get("fill_notional", 0 if not evidence else None)
@@ -384,6 +390,7 @@ def summary(db, now, market, marks=None, *, historical=False, order_limit=100):
             "prepared_at": row["prepared_at"], "observed_at": observed.isoformat() if observed else None,
             "ingested_at": evidence.get("ingested_at"),
             "first_fill_observed_at": first_fill.isoformat() if first_fill else None,
+            "fill_progress_available_at": progress_available.isoformat() if filled and progress_available else None,
             "fill_availability": {"source": "KIS_DEMO_BROKER_REPORT", "filled_quantity": filled,
                                   "fill_notional": amount, "observed_at": available_pair[0].isoformat(),
                                   "ingested_at": available_pair[1].isoformat()} if available_pair else None})

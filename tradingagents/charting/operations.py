@@ -442,7 +442,8 @@ def _strategy_evaluation_view(raw, market, observed, *, verified_costs=None):
     if not required <= set(unmet):
         return None
     status = "AVAILABLE_NET_OF_REVIEWED_COSTS" if net is not None else "AVAILABLE_GROSS_ONLY" if gross is not None else raw["status"]
-    unrealized = round(gross - realized, 4) if gross is not None and realized is not None else None
+    unrealized = (round(gross - (realized if realized is not None else 0), 4)
+                  if gross is not None and (realized is not None or counts["sell_filled_orders"] == 0) else None)
     return {"status": status, "currency": currency, "analysis_as_of": known.isoformat(),
             "sample": {**counts, "closed_inventory_episodes": closed,
                        "first_observed_at": first.isoformat() if first else None,

@@ -45,18 +45,18 @@ def queue_receipt(state, receipt):
             continue
         base = {"kind": KIND, "market": market, "mode": MODE}
         for order in row.get("orders", []):
-            first = instant(order.get("first_fill_observed_at"))
+            progress = instant(order.get("fill_progress_available_at"))
             observed = instant(order.get("ingested_at"))
             quantity = order.get("filled_quantity")
             status = order.get("status")
             if (order.get("source") != "KIS_DEMO_BROKER_REPORT" or order.get("strategy_performance") is not True
                     or order.get("mode") != "demo" or type(quantity) is not int or quantity <= 0
-                    or status not in {"PARTIAL", "FILLED", "CANCELLED"} or first is None or observed is None
-                    or not enabled <= first <= observed <= checked or not isinstance(order.get("id"), str)):
+                    or status not in {"PARTIAL", "FILLED", "CANCELLED"} or progress is None or observed is None
+                    or not enabled <= progress <= observed <= checked or not isinstance(order.get("id"), str)):
                 continue
             key = hashlib.sha256(f"{market}:{order['id']}:{quantity}:{status}".encode()).hexdigest()
             keys.append(queue(state, {**base, "event": "FILL", "state": status, "progress_key": key,
-                                      "finished_at": first.isoformat()}))
+                                      "finished_at": progress.isoformat()}))
 
         day = checked.astimezone(ZoneInfo(ZONES[market])).replace(hour=0, minute=0, second=0, microsecond=0)
         for reason in sorted(set(row.get("blockers", ())) & _ALERTS.keys()):
@@ -79,7 +79,7 @@ def compose(event):
     title = f"TradingAgents {market} KIS 정상 모의 전략"
     if kind == "FILL" and event.get("state") in {"PARTIAL", "FILLED", "CANCELLED"}:
         status = {"PARTIAL": "부분체결 확인", "FILLED": "전량체결 확인", "CANCELLED": "부분체결 후 잔량 취소 확인"}[event["state"]]
-        detail = f"{status}\n첫 체결 관측 {event['finished_at']}"
+        detail = f"{status}\n상태 확인 {event['finished_at']}"
     elif kind == "ISSUE" and event.get("reason") in _ALERTS:
         detail = f"{_ALERTS[event['reason']]}\n거래일 {event['finished_at'][:10]}"
     elif kind == "REALIZED_PNL" and type(event.get("amount")) in {int, float} and math.isfinite(event["amount"]):
