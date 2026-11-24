@@ -17,6 +17,14 @@ import zipfile
 REPARSE = 0x400
 
 
+class VolumeValidationError(RuntimeError):
+    def __init__(self, root: str, reason: str, *, winerror: int | None = None):
+        super().__init__(f"Expected storage volume not mounted: {root} ({reason})")
+        self.root = root
+        self.reason = reason
+        self.winerror = winerror
+
+
 class ForwardOnlyArchive:
     """Avoid a header rewrite/seek for every file on external backup drives."""
 
@@ -386,8 +394,14 @@ def volume_serial(path: Path) -> str:
 
 def validate_volumes(config: dict) -> None:
     for root, serial in config.get("volumes", {}).items():
-        if volume_serial(Path(root)) != serial:
-            raise RuntimeError(f"Expected storage volume not mounted: {root}")
+        try:
+            observed = volume_serial(Path(root))
+        except OSError as exc:
+            raise VolumeValidationError(
+                root, "volume-query-failed", winerror=getattr(exc, "winerror", None)
+            ) from exc
+        if observed != serial:
+            raise VolumeValidationError(root, "volume-serial-mismatch")
 
 
 def main() -> int:
