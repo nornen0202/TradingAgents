@@ -58,12 +58,25 @@ def compare_reference(curves, receipts):
             "max_nav_difference_krw": difference, "scope": "LEAN data clock and independent custom fills and account ledger"}
 
 
+def _final_market_timezone(tape, end):
+    lines = tape.read_text(encoding="utf-8").splitlines()
+    event = json.loads(lines[-1].partition(",")[2]) if lines else None
+    markets = {"KR": "Asia/Seoul", "US": "America/New_York"}
+    if (not isinstance(event, dict) or event.get("day") != end or event.get("mark") is not True
+            or event.get("market") not in markets):
+        raise ValueError("The final tape event differs from the portfolio closing date.")
+    return markets[event["market"]]
+
+
 def run_lean(root, lean_root, dotnet):
     root, lean_root, dotnet = Path(root).resolve(), Path(lean_root).resolve(), Path(dotnet).resolve()
     report = json.loads((root / "study.json").read_bytes())
     curves = json.loads((root / "independent-ledger.json").read_bytes())["curves"]
-    if not (root / "lean-tape").is_dir():
+    tapes = sorted((root / "lean-tape").glob("*.csv"))
+    if not tapes:
         raise ValueError("Run the research phase to produce the LEAN event tape.")
+    end = report["periods"]["전체"]["end"]
+    final_timezone = _final_market_timezone(tapes[-1], end)
     tool = Path(__file__).with_name("ResearchReplay.cs")
     source = lean_root / "Algorithm.CSharp" / tool.name
     project = lean_root / "Launcher" / "QuantConnect.Lean.Launcher.csproj"
@@ -82,7 +95,9 @@ def run_lean(root, lean_root, dotnet):
                         "DOTNET_NOLOGO": "1", "DOTNET_GENERATE_ASPNET_CERTIFICATE": "false",
                         "DOTNET_CLI_WORKLOAD_UPDATE_NOTIFY_DISABLE": "true",
                         "DOTNET_CLI_TELEMETRY_OPTOUT": "1", "TA_RESEARCH_LEAN_TAPE": str(root / "lean-tape"),
-                        "TA_RESEARCH_LEAN_END": report["periods"]["전체"]["end"],
+                        # LEAN clamps the end date to yesterday in the algorithm
+                        # timezone; the marked local closing session sets that clock.
+                        "TA_RESEARCH_LEAN_END": end, "TA_RESEARCH_LEAN_TIMEZONE": final_timezone,
                         "TA_RESEARCH_LEAN_RESULT": str(nav_path)}
     with (root / "lean-build.log").open("wb") as log:
         try:
@@ -116,7 +131,7 @@ def run_lean(root, lean_root, dotnet):
     with nav_path.open(encoding="utf-8") as file:
         result = compare_reference(curves, map(json.loads, file))
     checksum = hashlib.sha256()
-    for month in sorted((root / "lean-tape").glob("*.csv")):
+    for month in tapes:
         checksum.update(month.name.encode())
         checksum.update(month.read_bytes())
     result.update(plan_sha256=report["plan_sha256"], tape_sha256=checksum.hexdigest(),

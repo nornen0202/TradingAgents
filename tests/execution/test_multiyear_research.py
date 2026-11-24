@@ -5,6 +5,7 @@ from zipfile import ZipFile
 import pytest
 
 from tradingagents.execution.research_ledger import Ledger, actual_shares
+from tradingagents.execution.research_lean import _final_market_timezone
 from tradingagents.execution.research_sources import dart_vintages, sec_vintages
 from tradingagents.execution.research_study import _filing_events, _profit_at, _without_unverified_revisions
 
@@ -77,3 +78,15 @@ def test_share_reconstruction_and_costed_new_entry():
     assert ledger.positions["AAPL"].units == 2000
     assert ledger.receivables["US"] == 425
     assert ledger.cash == cash_before
+
+
+@pytest.mark.parametrize(("market", "zone"), [("KR", "Asia/Seoul"), ("US", "America/New_York")])
+def test_lean_closing_cutoff_uses_last_mark_market(tmp_path, market, zone):
+    tape = tmp_path / "202611.csv"
+    tape.write_text(
+        '20261124 063000,{"market":"%s","day":"2026-11-24","mark":true}\n' % market,
+        encoding="utf-8",
+    )
+    assert _final_market_timezone(tape, "2026-11-24") == zone
+    with pytest.raises(ValueError, match="final tape event"):
+        _final_market_timezone(tape, "2026-11-23")

@@ -21,7 +21,7 @@ namespace QuantConnect.Algorithm.CSharp
 
         public override void Initialize()
         {
-            SetTimeZone(TimeZones.Utc);
+            SetTimeZone(Environment.GetEnvironmentVariable("TA_RESEARCH_LEAN_TIMEZONE") ?? "UTC");
             SetStartDate(2020, 1, 1);
             SetEndDate(DateTime.ParseExact(
                 Environment.GetEnvironmentVariable("TA_RESEARCH_LEAN_END"), "yyyy-MM-dd", CultureInfo.InvariantCulture));
