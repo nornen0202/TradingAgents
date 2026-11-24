@@ -9,6 +9,7 @@ from pathlib import Path
 from zoneinfo import ZoneInfo
 
 from websockets.asyncio.client import connect
+from websockets.exceptions import InvalidHandshake
 
 from tradingagents.atomic_io import atomic_write_json, interprocess_file_lock
 from tradingagents.dataflows.api_keys import get_api_key
@@ -22,6 +23,7 @@ _MARKETS = {"KR": ("Asia/Seoul", "H0STCNI9"), "US": ("America/New_York", "H0GSCN
 _LOG = logging.getLogger("tradingagents.private_vts_websocket")
 _LOG.addHandler(logging.NullHandler())
 _LOG.propagate = False
+_ATTEMPT_SECONDS = 20
 
 
 class _FixedHostConnection(connect):
@@ -38,7 +40,9 @@ async def _read_feed(kr, us, credentials, hts_ids, *, state, approval, attempts)
         now = datetime.now(timezone.utc)
         for market, client in (("KR", kr), ("US", us)):
             date = now.astimezone(ZoneInfo(_MARKETS[market][0])).strftime("%Y%m%d")
-            await asyncio.to_thread(client.orders, date)
+            # Keep the shared broker locks through completion of the bounded
+            # HTTP call, including when the WebSocket observation is cancelled.
+            client.orders(date)
             calls[market] += 1
 
     async def ignore(_event):
@@ -47,10 +51,14 @@ async def _read_feed(kr, us, credentials, hts_ids, *, state, approval, attempts)
     async def key():
         return approval
 
-    result = await run_event_feed(state / "vts-notice-feed.lock", scopes, subscription_plan(scopes),
-        open_vts=lambda: _FixedHostConnection(DEMO_WEBSOCKET, proxy=None, open_timeout=8, logger=_LOG),
-        approval=key, resynchronize=resynchronize, on_hint=ignore, on_quote=ignore,
-        sleep=asyncio.sleep, attempts=attempts, idle_seconds=5)
+    try:
+        async with asyncio.timeout(attempts * _ATTEMPT_SECONDS):
+            result = await run_event_feed(state / "vts-notice-feed.lock", scopes, subscription_plan(scopes),
+                open_vts=lambda: _FixedHostConnection(DEMO_WEBSOCKET, proxy=None, open_timeout=8, close_timeout=3, logger=_LOG),
+                approval=key, resynchronize=resynchronize, on_hint=ignore, on_quote=ignore,
+                sleep=asyncio.sleep, attempts=attempts, idle_seconds=5, stop_after_recovery=True)
+    except TimeoutError:
+        raise ValueError("VTS notice observation did not complete before the deadline") from None
     return asdict(result) | {"rest_order_inquiries": calls}
 
 
@@ -87,7 +95,7 @@ def check(state, *, connect_to_broker=False, attempts=1):
             result["status"] = "SUBSCRIPTIONS_VERIFIED" if result["feed"]["verified_notice_sessions"] else "SUBSCRIPTIONS_UNVERIFIED"
     except TimeoutError:
         result["status"] = "BROKER_LANE_BUSY"
-    except (DemoError, OSError, ValueError):
+    except (DemoError, InvalidHandshake, OSError, ValueError):
         result["status"] = "VTS_FEED_UNVERIFIED"
     finally:
         for client in clients:

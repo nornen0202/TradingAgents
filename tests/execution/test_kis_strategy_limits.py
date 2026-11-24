@@ -80,7 +80,7 @@ def test_broker_order_receipt_uses_native_session_and_explicit_remainder(tmp_pat
 
     class Client:
         credentials = h.credentials
-        rows = [{field: "1"}]
+        rows = [{field: "1", "ord_dt": h.now.strftime("%Y%m%d"), "ord_tmd": h.now.strftime("%H%M%S")}]
 
         def orders(self, date):
             requests.append(date)
@@ -97,12 +97,28 @@ def test_broker_order_receipt_uses_native_session_and_explicit_remainder(tmp_pat
         current_v2_order_receipt(market, client, clock=lambda: h.now)
 
 
+@pytest.mark.parametrize("change", [{"ord_dt": None}, {"ord_dt": "20990101"}, {"ord_dt": "20260230"},
+                                    {"ord_tmd": None}, {"ord_tmd": "09000"}, {"ord_tmd": "240001"},
+                                    {"ord_tmd": "151500"}])
+def test_korean_receipt_rejects_unverifiable_order_times(tmp_path, change):
+    h = Harness(tmp_path, "KR")
+
+    class Client:
+        credentials = h.credentials
+
+        def orders(self, date):
+            return [{"ord_dt": date, "ord_tmd": "090000", "rmn_qty": "0"} | change]
+
+    with pytest.raises(ValueError, match="time"):
+        current_v2_order_receipt("KR", Client(), clock=lambda: h.now)
+
+
 def test_optional_v2_stops_on_broker_open_order_absent_from_strategy_journal(tmp_path, monkeypatch):
     h = Harness(tmp_path, "KR")
     configure(h.root, "KR", max_order_native=runtime.CAPS["KR"], cash_floor_native=0,
               max_order_nav=.1, one_share_nav_ceiling=.2)
     configure_v2(h.root, scope=h.credentials.scope(), ticker=h.ticker, now=h.now)
-    monkeypatch.setattr(KisDemoClient, "orders", lambda *args: [{"rmn_qty": "1"}])
+    monkeypatch.setattr(KisDemoClient, "orders", lambda _, date: [{"rmn_qty": "1", "ord_dt": date, "ord_tmd": "090000"}])
     row = h.tick()
     assert not row["orders"] and not h.orders
     assert "KIS_V2_ADMISSION_UNVERIFIED" in row["blockers"]

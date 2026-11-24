@@ -179,3 +179,34 @@ def test_local_probe_reports_approval_separately_from_missing_hts(tmp_path, monk
     assert result["status"] == "MISSING_DEMO_HTS_ID" and result["approval_verified"] is True
     assert result["orders_submitted"] == 0 and result["real_orders_enabled"] is False
     assert "fixture-token" not in str(result) and "12345678" not in str(result)
+
+
+@pytest.mark.parametrize("failure", ["handshake", "no_ack_before_deadline"])
+def test_local_probe_writes_masked_failure_without_holding_broker_lane(tmp_path, monkeypatch, failure):
+    from tools import check_kis_vts_feed as probe
+    from tradingagents.execution.kis_demo import DemoCredentials
+    from websockets.exceptions import InvalidHandshake
+
+    creds = DemoCredentials("fixture-key", "fixture-secret", "12345678", "01")
+    monkeypatch.setattr(probe, "get_api_key", lambda name: "fixture-hts")
+    monkeypatch.setattr(DemoCredentials, "from_local_settings", classmethod(lambda cls: creds))
+    monkeypatch.setattr(probe, "credentials_from_settings", lambda: creds)
+    monkeypatch.setattr(probe.KisDemoClient, "websocket_approval", lambda client: "fixture-token")
+    monkeypatch.setattr(probe, "_ATTEMPT_SECONDS", .01)
+
+    @asynccontextmanager
+    async def socket(*args, **kwargs):
+        if failure == "handshake":
+            raise InvalidHandshake("private error material")
+        await asyncio.sleep(100)
+        yield
+
+    monkeypatch.setattr(probe, "_FixedHostConnection", socket)
+    state, output = tmp_path / "strategy", tmp_path / "result.json"
+    monkeypatch.setattr("sys.argv", ["probe", "--state-dir", str(state), "--output", str(output), "--connect"])
+    assert probe.main() == 2
+    result = json.loads(output.read_bytes())
+    assert result["status"] == "VTS_FEED_UNVERIFIED" and result["approval_verified"] is True
+    assert "private error material" not in str(result)
+    with interprocess_file_lock(state / "strategy.lock", timeout=0):
+        pass

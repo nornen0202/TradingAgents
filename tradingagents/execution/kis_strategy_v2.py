@@ -1,5 +1,6 @@
 """Connect optional V2 sizing to the guarded native KIS strategy."""
 
+from datetime import datetime
 from decimal import Decimal
 import hashlib
 import json
@@ -83,15 +84,28 @@ def current_v2_order_receipt(market, client, *, clock):
     """A complete dated VTS order query must show no remaining orders."""
     started = _stamp(clock())
     zone = ZoneInfo(MARKETS[market]["zone"])
-    session_date = started.astimezone(zone).date().isoformat()
-    rows = client.orders(session_date.replace("-", ""))
+    local_date = started.astimezone(zone).date()
+    session_date = local_date.isoformat()
+    rows = client.orders(local_date.strftime("%Y%m%d"))
     finished = _stamp(clock())
-    if finished < started or finished.astimezone(zone).date().isoformat() != session_date:
+    if finished < started or finished.astimezone(zone).date() != local_date:
         raise ValueError("KIS V2 order inquiry crossed its observation window")
     remainder = "rmn_qty" if market == "KR" else "nccs_qty"
     if (not isinstance(rows, list) or any(not isinstance(row, dict) or not isinstance(row.get(remainder), str)
             or re.fullmatch(r"[0-9]+", row[remainder]) is None for row in rows)):
         raise ValueError("KIS V2 order remainder is unverified")
+    # The overseas client already verifies the venue date and Korean wire time.
+    if market == "KR":
+        for row in rows:
+            day, moment = row.get("ord_dt"), row.get("ord_tmd")
+            if day != local_date.strftime("%Y%m%d") or not isinstance(moment, str) or not re.fullmatch(r"[0-9]{6}", moment):
+                raise ValueError("KIS V2 order time is unverified")
+            try:
+                placed = datetime.strptime(day + moment, "%Y%m%d%H%M%S").replace(tzinfo=zone)
+            except ValueError:
+                raise ValueError("KIS V2 order time is unverified") from None
+            if placed > finished:
+                raise ValueError("KIS V2 order time is unverified")
     return {"mode": "demo", "market": market, "currency": _MARKETS[market][0],
             "account_scope": client.credentials.scope(), "source": "KIS_DEMO_ORDER_INQUIRY",
             "session_date": session_date, "observed_at": started.isoformat(), "ingested_at": finished.isoformat(),

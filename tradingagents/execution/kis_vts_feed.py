@@ -217,6 +217,7 @@ async def run_event_feed(
     approval: Callable[[], Awaitable[str]], resynchronize: Callable[[], Awaitable[None]],
     on_hint: Callable[[OrderHint], Awaitable[None]], on_quote: Callable[[QuoteObservation], Awaitable[None]],
     sleep: Callable[[float], Awaitable[None]], attempts: int = 3, idle_seconds: int = 40,
+    stop_after_recovery: bool = False,
     clock=lambda: datetime.now(timezone.utc),
 ):
     """Consume a VTS stream. REST callbacks share the account's request limiter."""
@@ -267,6 +268,8 @@ async def run_event_feed(
                             # snapshot so no new executions fall in the gap.
                             await resynchronize()
                             recovered = True
+                            if stop_after_recovery:
+                                break
                             events, pending_events = pending_events, []
                         else:
                             events = decoder.events(raw, clock())
