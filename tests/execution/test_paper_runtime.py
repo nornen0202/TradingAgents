@@ -47,6 +47,21 @@ def is_open(**_):
     return {"is_open": True, "phase": "regular"}
 
 
+def test_recent_source_stops_discovery_before_visiting_older_years(tmp_path, monkeypatch):
+    latest = source(tmp_path, name="newest-eligible")
+    (tmp_path / "runs/2025/archive").mkdir(parents=True)
+    inspect = paper_runtime._directories_desc
+    queries = []
+
+    def record(root):
+        queries.append(root.name)
+        return inspect(root)
+
+    monkeypatch.setattr(paper_runtime, "_directories_desc", record)
+    assert paper_runtime._latest_source(tmp_path, "kr", AT) == latest
+    assert queries == ["runs", "2026"]
+
+
 class Quotes:
     def __init__(self, clock):
         self.clock = clock
