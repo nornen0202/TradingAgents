@@ -4,7 +4,8 @@ import os
 from datetime import datetime, timedelta
 from decimal import Decimal
 from pathlib import Path
-from AlgorithmImports import (PythonData, QCAlgorithm, Resolution, TimeZones, SubscriptionDataSource,
+from NodaTime import DateTimeZoneProviders
+from AlgorithmImports import (PythonData, QCAlgorithm, Resolution, SubscriptionDataSource,
     SubscriptionTransportMedium, FileFormat, FeeModel, OrderFee, CashAmount, ConstantSlippageModel,
     ImmediateFillModel, OrderStatus)
 
@@ -34,12 +35,12 @@ class Algorithm(QCAlgorithm):
     def initialize(self):
         self.set_start_date(2026, 6, 8)
         self.set_end_date(2026, 6, 19)
-        self.set_time_zone(TimeZones.SEOUL)
+        self.set_time_zone("Asia/Seoul")
         self.set_account_currency("KRW", 3000000)
         self.scenario = os.environ["SCENARIO"]
         self.costs = self.scenario != "gross_fixture"
         self.tax = self.scenario == "transaction_costs_and_tax_reserve"
-        security = self.add_data(NativePrice, "FIXTURE", Resolution.MINUTE, TimeZones.SEOUL, False)
+        security = self.add_data(NativePrice, "FIXTURE", Resolution.MINUTE, DateTimeZoneProviders.Tzdb["Asia/Seoul"], False)
         self.fixture = security.symbol
         self.set_benchmark(lambda _: 1.)
         security.set_fill_model(ImmediateFillModel())
