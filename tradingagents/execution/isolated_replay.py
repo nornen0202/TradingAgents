@@ -140,7 +140,9 @@ class _Replay:
         self.root, self.document, self.secret = root, document, marker["secret"]
         self.now = demo_runtime.at(document.get("as_of"))
         self.state, self.validation, self.archive = root / "state", root / "validation", root / "archive"
-        self.limits = configured_limits(demo_runtime.read(self.state / "enabled.json", {}))
+        config = demo_runtime.read(self.state / "enabled.json", {})
+        self.limits = configured_limits(config)
+        self.policy_revision = config.get("native_limit_revision")
         self.tickers = tuple(document.get("tickers", ()))
         if any(not isinstance(ticker, str) or not re.fullmatch(r"[0-9]{6}\.(KS|KQ)", ticker) for ticker in self.tickers):
             raise ValueError("Domestic fixture ticker identities are required")
@@ -165,7 +167,8 @@ class _Replay:
         if (market, scope) != ("KR", self.scope):
             raise ValueError("The isolated broker scope cannot change")
         client = KisDemoClient(self.credentials, session=self.requests, pacer=RequestPacer(interval=0), utcnow=clock)
-        broker = make_strategy_broker(market, path, client, clock, tickers, self.limits.get(market))
+        broker = make_strategy_broker(market, path, client, clock, tickers, self.limits.get(market),
+                                      revision=self.policy_revision)
         try:
             yield broker
         finally:

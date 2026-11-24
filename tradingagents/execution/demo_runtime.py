@@ -8,6 +8,7 @@ are never strategy fills.
 from __future__ import annotations
 
 from contextlib import contextmanager
+from dataclasses import asdict
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal, ROUND_DOWN, ROUND_UP
 from functools import partial
@@ -27,7 +28,7 @@ from .archive_paper import build_step
 from .source_diagnostics import diagnose_source
 from .source_handoff import await_completed_source
 from . import demo_strategy_plan
-from .kis_demo import DemoCredentials, KisDemoClient, has_unresolved_demo_requests
+from .kis_demo import DemoCredentials, DemoError, KisDemoClient, has_unresolved_demo_requests
 from .kis_paper import _fresh, _tick
 from .kis_strategy_limits import CAPS, configured_limits, make_strategy_broker, size_with_native_limits
 from .kis_strategy_v2 import authorize_v2_size, configured_v2, current_v2_order_receipt
@@ -66,7 +67,7 @@ def validation_gate(root, market, now):
 
 
 @contextmanager
-def broker_context(market, path, clock, tickers, scope, *, limits=None):
+def broker_context(market, path, clock, tickers, scope, *, limits=None, policy_revision=None):
     from .demo_token_cache import cache_demo_authentication
     client = broker = None
     try:
@@ -78,7 +79,7 @@ def broker_context(market, path, clock, tickers, scope, *, limits=None):
         if scope != client.credentials.scope():
             raise ValueError("VALIDATED_ACCOUNT_CHANGED")
         cache_demo_authentication(client, market=market)
-        broker = make_strategy_broker(market, path, client, clock, tickers, limits)
+        broker = make_strategy_broker(market, path, client, clock, tickers, limits, revision=policy_revision)
         yield broker
     finally:
         if broker:
@@ -154,8 +155,9 @@ def limit_price(quote, side, market):
     return int(value) if market == "KR" else float(value)
 
 
-def quantity(candidate, price, account, market, owned, now):
+def quantity(candidate, price, account, market, owned, now, *, limits=None):
     """Apply the selected allocation policy using verified demo capacity."""
+    native_cap = limits.max_order_native if limits is not None else CAPS[market]
     if candidate.get("allocation_mode") == demo_strategy_plan.MODE:
         _fresh(account, now=now, seconds=120)
         if account.get("complete") is not True or account.get("environment") != "demo":
@@ -168,7 +170,7 @@ def quantity(candidate, price, account, market, owned, now):
         else:
             position = next((p for p in account["positions"] if p["ticker"] == candidate["signal"]["ticker"]), {})
             permitted = owned.get(candidate["ticker"], 0) >= 1 and position.get("sellable_quantity", 0) >= 1
-        if not permitted or price > CAPS[market]:
+        if not permitted or price > native_cap:
             raise ValueError("NO_STRATEGY_QUANTITY_WITHIN_LIMITS")
         return 1
     proposal = candidate["proposal"]
@@ -186,7 +188,7 @@ def quantity(candidate, price, account, market, owned, now):
     planned = int(qty) if qty is not None else math.floor(budget / price)
     if market == "KR":
         planned = min(planned, math.floor(budget / price))
-    result = min(planned, math.floor(CAPS[market] / price))
+    result = min(planned, math.floor(native_cap / price))
     if candidate["side"] == "BUY":
         suffix = "krw" if market == "KR" else "usd"
         result = min(result, account["cash_only_buying_quantity"], math.floor(account[f"cash_only_buying_power_{suffix}"] / (price * 1.003)))
@@ -466,7 +468,7 @@ def _reconcile_existing(broker, *, market, now, regular, allow_cancel, clock):
 
 
 def advance(archive, root, validation_root, market, *, clock, tickers, broker_factory, quote_loader, account_loader, session_resolver, gate,
-            allocation_mode="ARCHIVED_PROPOSALS", authorize=None, limits=None, v2_settings=None):
+            allocation_mode="ARCHIVED_PROPOSALS", authorize=None, limits=None, v2_settings=None, policy_revision=None):
     now, path = at(clock()), root / f"{market.lower()}-strategy.sqlite"
     result = {"status": "WAITING_VALIDATION", "blockers": [], "gate_passed": False, "orders": [], "order_counts": {}, "performance": None}
     def finish(status, *blockers):
@@ -512,6 +514,10 @@ def advance(archive, root, validation_root, market, *, clock, tickers, broker_fa
     marks = {}
     with broker_factory(market, path, clock, tickers, scope) as broker:
         initialize(broker.db)
+        if policy_revision is not None:
+            result["native_policy_journal_bound"] = broker.db.execute(
+                "SELECT 1 FROM paper_policy_revisions WHERE scope=? AND revision=?", (scope, policy_revision),
+            ).fetchone() is not None
         issues = _reconcile_existing(broker, market=market, now=now, regular=True,
                                      allow_cancel=halted or near_close or not result["gate_passed"], clock=clock)
         current = summary(broker.db, at(clock()), market)
@@ -619,18 +625,31 @@ def advance(archive, root, validation_root, market, *, clock, tickers, broker_fa
                     if market == "US":
                         terms["exchange"] = quote["exchange"]
                     account = account_loader(market, broker, terms, clock)
-                    terms["quantity"] = quantity(candidate, price, account, market, current["owned"], at(clock()))
+                    if policy_revision is not None and (account.get("market"), account.get("currency")) != (
+                            market, "KRW" if market == "KR" else "USD"):
+                        raise ValueError("KIS_ACCOUNT_MARKET_OR_CURRENCY_UNVERIFIED")
+                    terms["quantity"] = quantity(candidate, price, account, market, current["owned"], at(clock()), limits=limits)
                     terms["quantity"] = size_with_native_limits(market, terms, account, limits)
                     if not terms["quantity"]:
                         raise ValueError("NO_STRATEGY_QUANTITY_WITHIN_LIMITS")
                     checks["cash_and_size_passed"] += 1
                 except Exception as exc:
                     reason = str(exc)
-                    issues.append(reason if reason in {"NO_STRATEGY_QUANTITY_WITHIN_LIMITS", "BUDGET_FX_UNVERIFIED", "PROPOSAL_QUANTITY_INVALID"} else "CANDIDATE_EVIDENCE_UNVERIFIED")
+                    issues.append(reason if reason in {"NO_STRATEGY_QUANTITY_WITHIN_LIMITS", "BUDGET_FX_UNVERIFIED",
+                        "PROPOSAL_QUANTITY_INVALID", "KIS_ACCOUNT_MARKET_OR_CURRENCY_UNVERIFIED"} else "CANDIDATE_EVIDENCE_UNVERIFIED")
                     continue
-                if v2_settings is not None:
+                if policy_revision is not None or v2_settings is not None:
                     try:
                         order_receipt = current_v2_order_receipt(market, broker.client, clock=clock)
+                    except (DemoError, OSError, ValueError, TypeError, KeyError, AttributeError):
+                        issues.append("KIS_BROKER_ORDER_INQUIRY_UNVERIFIED" if policy_revision is not None
+                                      else "KIS_V2_ADMISSION_UNVERIFIED")
+                        continue
+                    if policy_revision is not None and (order_receipt["account_scope"] != scope or order_receipt["open_order_count"]):
+                        issues.append("KIS_BROKER_OPEN_OR_UNVERIFIED_ORDERS")
+                        continue
+                if v2_settings is not None:
+                    try:
                         terms["quantity"], v2_evidence = authorize_v2_size(
                             root, market, v2_settings, candidate, terms, quote, account, current, at(clock()), order_receipt=order_receipt,
                         )
@@ -670,11 +689,23 @@ def advance(archive, root, validation_root, market, *, clock, tickers, broker_fa
                                       (candidate["id"], json.dumps(source_evidence, sort_keys=True)))
                 try:
                     broker.submit(intent_id=candidate["id"], **terms, signal=signal, quote=quote, account=account)
-                except Exception:
+                except Exception as exc:
                     # If no broker intent exists, deterministic validation failed.
                     # A persisted intent without a response remains ambiguous.
                     if not broker.db.execute("SELECT 1 FROM paper_intents WHERE id=?", (candidate["id"],)).fetchone():
                         broker.db.execute("UPDATE strategy_attempts SET state='BLOCKED' WHERE id=?", (candidate["id"],))
+                        if policy_revision is not None and isinstance(exc, DemoError):
+                            reason = {
+                                "Per-order paper notional limit exceeded": "KIS_ORDER_NOTIONAL_LIMIT",
+                                "Paper buy exceeds the configured NAV limit": "KIS_ORDER_NAV_LIMIT",
+                                "Daily paper buy limit exceeded": "KIS_DAILY_BUY_RISK_LIMIT",
+                                "Daily paper order limit exceeded": "KIS_DAILY_ORDER_RISK_LIMIT",
+                                "Cash-only capacity or reserved cash floor exceeded": "KIS_CASH_OR_RESERVATION_LIMIT",
+                                "Paper concentration limit exceeded": "KIS_POSITION_CONCENTRATION_LIMIT",
+                                "Sell exceeds unreserved sellable holdings": "KIS_SELLABLE_HOLDING_LIMIT",
+                            }.get(str(exc))
+                            if reason:
+                                issues.append(reason)
                     issues.append("SUBMISSION_BLOCKED_OR_UNRESOLVED")
                 break
         current = summary(broker.db, at(clock()), market)
@@ -711,6 +742,7 @@ def tick(archive, root, validation_root, *, clock=None, broker_factory=None, quo
         enabled = isinstance(config, dict) and config.get("mode") == MODE and config.get("enabled") is True and config.get("real_orders_enabled") is False
         allocation_mode = config.get("allocation_mode", "ARCHIVED_PROPOSALS") if isinstance(config, dict) else "ARCHIVED_PROPOSALS"
         market_limits = configured_limits(config) if isinstance(config, dict) else {}
+        policy_revision = config.get("native_limit_revision") if enabled else None
         v2_settings = configured_v2(config) if isinstance(config, dict) else {}
         if set(v2_settings) - set(market_limits):
             raise ValueError("KIS V2 requires explicit native order limits")
@@ -724,12 +756,13 @@ def tick(archive, root, validation_root, *, clock=None, broker_factory=None, quo
             try:
                 markets[market] = advance(archive, root, validation_root, market, clock=clock, tickers=(tickers or universe())[market],
                     broker_factory=broker_factory or (
-                        partial(broker_context, limits=market_limits[market]) if market in market_limits else broker_context
+                        partial(broker_context, limits=market_limits[market], policy_revision=policy_revision)
+                        if market in market_limits else broker_context
                     ),
                     quote_loader=quote_loader or current_quote,
                     account_loader=account_loader or validation.current_account, session_resolver=session_resolver or _runtime_session,
                     gate=gate or validation_gate, allocation_mode=allocation_mode, authorize=authorize,
-                    limits=market_limits.get(market), v2_settings=v2_settings.get(market))
+                    limits=market_limits.get(market), v2_settings=v2_settings.get(market), policy_revision=policy_revision)
             except Exception:
                 markets[market] = {"status": "BLOCKED", "checked_at": at(clock()).isoformat(), "gate_passed": False, "blockers": ["RUNTIME_EVIDENCE_UNVERIFIED"]}
         finished = at(clock())
@@ -748,6 +781,11 @@ def tick(archive, root, validation_root, *, clock=None, broker_factory=None, quo
         import os
         receipt = {"schema": SCHEMA, "mode": MODE, "enabled": enabled, "real_orders_enabled": False,
                    "checked_at": finished.isoformat(), "source_revision": os.getenv("TRADINGAGENTS_SOURCE_SHA"), "markets": markets}
+        if enabled and market_limits:
+            receipt["configured_native_limits"] = {
+                "revision": policy_revision,
+                "markets": {market: asdict(limits) for market, limits in market_limits.items()},
+            }
         if evidence_scope is not None:
             receipt["evidence_scope"] = evidence_scope
         atomic_write_json(archive / "paper/kis-strategy-runtime.json", receipt)

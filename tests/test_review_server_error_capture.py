@@ -1,5 +1,7 @@
 import ast
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
+import socket
 import sys
 from types import SimpleNamespace
 
@@ -24,3 +26,13 @@ def test_regression_records_handler_error_with_python310_exception_api(error, ex
     except type(error):
         server.handle_error(None, None)
     assert server.unhandled_errors == expected
+
+
+@pytest.mark.skipif(not hasattr(socket, "SO_EXCLUSIVEADDRUSE"), reason="Windows Winsock listener behavior")
+def test_review_exclusively_owns_its_loopback_listener():
+    from tradingagents.charting.server import _ReviewServer
+
+    with _ReviewServer(("127.0.0.1", 0), BaseHTTPRequestHandler) as current:
+        assert current.socket.getsockopt(socket.SOL_SOCKET, socket.SO_EXCLUSIVEADDRUSE) == 1
+        with pytest.raises(OSError):
+            ThreadingHTTPServer(current.server_address, BaseHTTPRequestHandler)

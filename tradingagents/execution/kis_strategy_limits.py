@@ -1,11 +1,16 @@
 """Shared native-currency limits for the KIS strategy and its offline replay."""
 
 from dataclasses import asdict, dataclass
+from decimal import Decimal
+import json
 import math
 
+from .kis_demo import DemoError
 from .paper import order_nav_limit
 
 CAPS = {"KR": 100_000, "US": 500}
+APPROVED_LIMIT_REVISION = "VTS_NATIVE_ORDER_LIMITS_20261125"
+APPROVED_CAPS = {"KR": 3_000_000, "US": 3_000}
 _SUFFIX = {"KR": "krw", "US": "usd"}
 
 
@@ -17,10 +22,21 @@ class KisStrategyLimits:
     one_share_nav_ceiling: float
 
 
+def approved_limits():
+    return {market: KisStrategyLimits(cap, 0, .12, .20) for market, cap in APPROVED_CAPS.items()}
+
+
 def configured_limits(config):
     raw = config.get("native_order_limits", {})
     if not isinstance(raw, dict) or set(raw) - set(CAPS):
         raise ValueError("Native strategy limits must identify each market explicitly")
+    if "native_limit_revision" in config:
+        expected = approved_limits()
+        if (config.get("native_limit_revision") != APPROVED_LIMIT_REVISION or config.get("mode") != "KIS_DEMO_STRATEGY"
+                or config.get("real_orders_enabled") is not False
+                or json.dumps(raw, sort_keys=True) != json.dumps({market: asdict(limits) for market, limits in expected.items()}, sort_keys=True)):
+            raise ValueError("Approved VTS sizing requires the exact scoped native policy")
+        return expected
     limits = {}
     for market, row in raw.items():
         if not isinstance(row, dict) or set(row) != set(KisStrategyLimits.__dataclass_fields__):
@@ -51,26 +67,69 @@ def broker_policy_fields(policy):
     return fields
 
 
+def bind_broker_policy(db, scope, market, fields, revision):
+    """Preserve the original policy and order history under a recorded VTS amendment."""
+    encoded = json.dumps(fields, sort_keys=True)
+    previous = db.execute("SELECT policy FROM paper_policy WHERE scope=?", (scope,)).fetchone()
+    if revision is None:
+        if previous and previous[0] != encoded:
+            raise DemoError("Policy changed; use a separately named paper journal")
+        db.execute("INSERT OR IGNORE INTO paper_policy VALUES (?,?)", (scope, encoded))
+        return
+    limit = approved_limits()[market]
+    amount_key = f"max_order_{_SUFFIX[market]}"
+    baseline = {key: value for key, value in fields.items() if key not in {"max_order_nav", "one_share_nav_ceiling"}}
+    baseline[amount_key] = CAPS[market]
+    baseline_encoded = json.dumps(baseline, sort_keys=True)
+    if (revision != APPROVED_LIMIT_REVISION or fields != baseline | {amount_key: limit.max_order_native,
+            "max_order_nav": limit.max_order_nav, "one_share_nav_ceiling": limit.one_share_nav_ceiling}
+            or fields.get(f"cash_floor_{_SUFFIX[market]}") != limit.cash_floor_native
+            or (previous and previous[0] != baseline_encoded)):
+        raise DemoError("Approved VTS revision does not match the original risk policy")
+    db.execute("""CREATE TABLE IF NOT EXISTS paper_policy_revisions(
+        scope TEXT NOT NULL, revision TEXT NOT NULL, baseline TEXT NOT NULL, policy TEXT NOT NULL,
+        PRIMARY KEY(scope, revision))""")
+    db.execute("""CREATE TRIGGER IF NOT EXISTS paper_policy_revisions_no_update BEFORE UPDATE ON paper_policy_revisions
+        BEGIN SELECT RAISE(ABORT,'VTS policy revisions are immutable'); END""")
+    db.execute("""CREATE TRIGGER IF NOT EXISTS paper_policy_revisions_no_delete BEFORE DELETE ON paper_policy_revisions
+        BEGIN SELECT RAISE(ABORT,'VTS policy revisions are immutable'); END""")
+    saved = db.execute("SELECT baseline,policy FROM paper_policy_revisions WHERE scope=? AND revision=?", (scope, revision)).fetchone()
+    if saved and tuple(saved) != (baseline_encoded, encoded):
+        raise DemoError("Approved VTS revision conflicts with its journal evidence")
+    db.execute("INSERT OR IGNORE INTO paper_policy VALUES (?,?)", (scope, baseline_encoded))
+    db.execute("INSERT OR IGNORE INTO paper_policy_revisions VALUES (?,?,?,?)", (scope, revision, baseline_encoded, encoded))
+
+
 def size_with_native_limits(market, terms, account, limits):
     """Reduce an already authorized integer quantity to the configured native bounds."""
     if limits is None:
         return terms["quantity"]
-    price = terms["limit_price"]
-    quantity = min(terms["quantity"], math.floor(limits.max_order_native / price))
+    price = Decimal(str(terms["limit_price"]))
+    quantity = min(terms["quantity"], int(limits.max_order_native // price))
     if terms["side"] == "SELL":
         return quantity
     suffix = _SUFFIX[market]
-    unit_cost = price * 1.003
-    nav = account[f"nav_{suffix}"]
-    qty_cash = math.floor((account[f"cash_{suffix}"] - limits.cash_floor_native) / unit_cost)
+    unit_cost = reserved_cost(price, 30)
+    nav = Decimal(str(account[f"nav_{suffix}"]))
+    cash = Decimal(str(account[f"cash_{suffix}"])) - limits.cash_floor_native
+    qty_cash = math.floor(cash / unit_cost)
     affordable = max(0, min(quantity, qty_cash))
-    qty_nav = math.floor(nav * order_nav_limit(limits, "BUY", affordable) / unit_cost)
-    if affordable > 1 and qty_nav == 0 and unit_cost <= nav * limits.one_share_nav_ceiling:
+    qty_nav = math.floor(nav * Decimal(str(order_nav_limit(limits, "BUY", affordable))) / unit_cost)
+    if affordable > 1 and qty_nav == 0 and unit_cost <= nav * Decimal(str(limits.one_share_nav_ceiling)):
         return 1
     return max(0, min(affordable, qty_nav))
 
 
-def make_strategy_broker(market, path, client, clock, tickers, limits):
+def reserved_cost(notional, reserve_bps):
+    return Decimal(str(notional)) * (1 + Decimal(reserve_bps) / 10_000)
+
+
+def within_buy_nav(notional, quantity, nav, policy):
+    return (policy.max_order_nav is None or reserved_cost(notional, policy.reserve_cost_bps)
+            <= Decimal(str(nav)) * Decimal(str(order_nav_limit(policy, "BUY", quantity))))
+
+
+def make_strategy_broker(market, path, client, clock, tickers, limits, *, revision=None):
     options = {}
     if limits is not None:
         suffix = _SUFFIX[market]
@@ -79,7 +138,7 @@ def make_strategy_broker(market, path, client, clock, tickers, limits):
     if market == "KR":
         from .kis_paper import KisPaperBroker, PaperOrderPolicy
         policy = PaperOrderPolicy(tuple(ticker[:6] for ticker in tickers), **options)
-        return KisPaperBroker(path, client, policy, paper_enabled=True, clock=clock)
+        return KisPaperBroker(path, client, policy, paper_enabled=True, clock=clock, strategy_policy_revision=revision)
     from .kis_paper_us import KisPaperUSBroker, USPaperOrderPolicy
     policy = USPaperOrderPolicy((), allowed_tickers=tickers, **options)
-    return KisPaperUSBroker(path, client, policy, paper_enabled=True, clock=clock)
+    return KisPaperUSBroker(path, client, policy, paper_enabled=True, clock=clock, strategy_policy_revision=revision)

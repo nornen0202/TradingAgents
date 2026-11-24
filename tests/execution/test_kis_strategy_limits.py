@@ -1,4 +1,6 @@
+from dataclasses import asdict
 from datetime import timedelta
+from decimal import Decimal
 import hashlib
 import json
 
@@ -8,16 +10,134 @@ from tradingagents.atomic_io import atomic_write_json
 from tradingagents.execution import demo_runtime as runtime, demo_token_cache, kis_demo_us
 from tradingagents.execution.kis_demo import DemoCredentials, KisDemoClient, RequestPacer
 from tradingagents.execution.kis_demo_us import KisDemoUSClient
-from tradingagents.execution.kis_strategy_limits import configured_limits, size_with_native_limits
+from tradingagents.execution.kis_strategy_limits import (APPROVED_LIMIT_REVISION, approved_limits, configured_limits,
+                                                         size_with_native_limits)
 from tradingagents.execution.kis_strategy_v2 import EVIDENCE_SCHEMA, SETTLEMENT_SCHEMA, _buy_observation, current_v2_order_receipt
 from tradingagents.execution.paper_policy_v2 import SCHEMA as POLICY_SCHEMA
 from tests.execution.test_demo_runtime import Harness
+from tests.execution.test_demo_strategy_plan import native_source
 
 
 def configure(root, market, **limits):
     path = root / "enabled.json"
     original = json.loads(path.read_text(encoding="utf-8"))
     atomic_write_json(path, {**original, "native_order_limits": {market: limits}})
+
+
+def approved_config(config):
+    return {**config, "native_limit_revision": APPROVED_LIMIT_REVISION,
+            "native_order_limits": {market: asdict(limits) for market, limits in approved_limits().items()}}
+
+
+@pytest.mark.parametrize("change", [{"mode": "KIS_LIVE"}, {"real_orders_enabled": True},
+                                    {"native_limit_revision": None}, {"native_order_limits": {}}])
+def test_rejects_out_of_scope_approved_configuration(change):
+    config = approved_config({"mode": runtime.MODE, "real_orders_enabled": False})
+    assert configured_limits(config) == approved_limits()
+    with pytest.raises(ValueError, match="exact scoped native policy"):
+        configured_limits(config | change)
+
+
+@pytest.mark.parametrize("market,price", [("KR", 150_000), ("US", 650)])
+@pytest.mark.parametrize("case", ["ready", "normal", "nav", "cash", "currency", "concentration", "daily", "external_open"])
+def test_approved_policy_preserves_existing_guarded_journal(tmp_path, monkeypatch, market, price, case):
+    monkeypatch.setenv("TRADINGAGENTS_KIS_MARKET_CALENDAR_ENABLED", "false")
+    h = Harness(tmp_path, market)
+    # First establish the ordinary policy using the same local journal later read by the approved tick.
+    state_path = h.root / f"{market.lower()}-strategy.sqlite"
+    with h.factory(market, state_path, lambda: h.now, (h.ticker,), h.credentials.scope()) as broker:
+        runtime.initialize(broker.db)
+        baseline = broker.db.execute("SELECT policy FROM paper_policy").fetchone()[0]
+    h.price = price
+    if case == "normal":
+        native_source(h)
+    else:
+        h.source(qty=3 if case == "daily" else 1)
+    config_path = h.root / "enabled.json"
+    original = json.loads(config_path.read_bytes())
+    native_client = KisDemoClient if market == "KR" else KisDemoUSClient
+
+    def client(credentials, utcnow):
+        return native_client(credentials, session=h, pacer=RequestPacer(interval=0), utcnow=utcnow)
+
+    if market == "KR":
+        monkeypatch.setattr(runtime, "KisDemoClient", client)
+        monkeypatch.setattr(DemoCredentials, "from_local_settings", classmethod(lambda cls: h.credentials))
+    else:
+        monkeypatch.setattr(kis_demo_us, "KisDemoUSClient", client)
+        monkeypatch.setattr(kis_demo_us, "credentials_from_settings", lambda: h.credentials)
+    monkeypatch.setattr(demo_token_cache, "cache_demo_authentication", lambda *_args, **_kwargs: None)
+    if case == "external_open":
+        field = "rmn_qty" if market == "KR" else "nccs_qty"
+        monkeypatch.setattr(native_client, "orders", lambda _, date: [{field: "1", "ord_dt": date, "ord_tmd": "093000"}])
+
+    def account(market, broker, terms, clock):
+        out = h.account(market, broker, terms, clock)
+        suffix = "krw" if market == "KR" else "usd"
+        if case == "nav":
+            out[f"nav_{suffix}"] = price * 5
+        if case == "cash":
+            out[f"cash_only_buying_power_{suffix}"] = price
+        if case == "concentration":
+            out["positions"][0][f"market_value_{suffix}"] = out[f"nav_{suffix}"] * .35
+        if case == "currency":
+            out["currency"] = "USD" if market == "KR" else "KRW"
+        if terms.get("side") == "SELL":
+            out[f"cash_{suffix}"] = 0
+            out[f"cash_only_buying_power_{suffix}"] = 0
+            out["cash_only_buying_quantity"] = 0
+        return out
+
+    def tick():
+        return runtime.tick(h.archive, h.root, h.validation, clock=lambda: h.now, quote_loader=h.quote,
+                            account_loader=account, gate=h.gate, tickers={market: (h.ticker,),
+                            "KR" if market == "US" else "US": ()})
+
+    if case == "normal":
+        first = tick()["markets"][market]
+        assert "NO_STRATEGY_QUANTITY_WITHIN_LIMITS" in first["blockers"] and not h.orders
+    atomic_write_json(config_path, approved_config(original))
+    receipt = tick()
+    row = receipt["markets"][market]
+    assert receipt["configured_native_limits"]["markets"][market] == asdict(approved_limits()[market])
+    assert row.get("native_policy_journal_bound") is True, row
+    if case in {"ready", "normal"}:
+        assert row["order_counts"]["ACKNOWLEDGED"] == 1 and row["orders"][0]["quantity"] == 1 and len(h.orders) == 1
+        tick()
+        assert len(h.orders) == 1  # Restarted worker plus outstanding original cannot issue another write.
+        if case == "ready":
+            h.fill()
+            h.now += timedelta(seconds=10)
+            h.source(name="fixture-2", action="EXIT_NOW")
+            result = tick()["markets"][market]
+            assert result["order_counts"]["FILLED"] == 1 and [item["side"] for item in h.orders.values()] == ["BUY", "SELL"]
+    else:
+        assert not h.orders
+        expected = {"nav": "NO_STRATEGY_QUANTITY_WITHIN_LIMITS", "cash": "NO_STRATEGY_QUANTITY_WITHIN_LIMITS",
+                    "currency": "KIS_ACCOUNT_MARKET_OR_CURRENCY_UNVERIFIED",
+                    "concentration": "KIS_POSITION_CONCENTRATION_LIMIT", "daily": "KIS_DAILY_BUY_RISK_LIMIT",
+                    "external_open": "KIS_BROKER_OPEN_OR_UNVERIFIED_ORDERS"}
+        assert expected[case] in row["blockers"]
+    # Restoring the prior configuration retains the amendment and request evidence.
+    atomic_write_json(config_path, original)
+    with h.factory(market, state_path, lambda: h.now, (h.ticker,), h.credentials.scope()) as broker:
+        assert broker.db.execute("SELECT policy FROM paper_policy").fetchone()[0] == baseline
+        assert broker.db.execute("SELECT revision FROM paper_policy_revisions").fetchone()[0] == APPROVED_LIMIT_REVISION
+
+
+@pytest.mark.parametrize("market,price", [("KR", 100_000), ("US", 100)])
+def test_approved_nav_sizing_allows_exact_threshold_without_exceeding_it(market, price):
+    suffix = "krw" if market == "KR" else "usd"
+    unit_cost = price * Decimal("1.003")
+    policy = approved_limits()[market]
+    terms = {"side": "BUY", "quantity": 2, "limit_price": price}
+    cash = {f"cash_{suffix}": 10_000_000}
+    # 20% one-share boundary uses the fee-inclusive order value.
+    assert size_with_native_limits(market, terms, cash | {f"nav_{suffix}": unit_cost * 5}, policy) == 1
+    assert size_with_native_limits(market, terms, cash | {f"nav_{suffix}": unit_cost * 5 - 1}, policy) == 0
+    at_two = {f"nav_{suffix}": price * Decimal("20.06")}
+    assert size_with_native_limits(market, terms, cash | at_two, policy) == 2
+    assert size_with_native_limits(market, {**terms, "side": "SELL", "quantity": 100}, {}, policy) == policy.max_order_native // price
 
 
 def configure_v2(root, *, scope, ticker, now, target=.15, observed_at=None, wrong_benchmark=False):
