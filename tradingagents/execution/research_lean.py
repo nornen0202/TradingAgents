@@ -69,16 +69,21 @@ def run_lean(root, lean_root, dotnet):
     project = lean_root / "Launcher" / "QuantConnect.Lean.Launcher.csproj"
     if not dotnet.is_file() or not project.is_file() or not (lean_root / "Launcher" / "config.json").is_file():
         raise ValueError("Expected a dedicated LEAN checkout and a compatible dotnet SDK.")
-    if source.exists() and source.read_bytes() != tool.read_bytes():
-        raise ValueError("The dedicated LEAN checkout already has a different replay algorithm.")
-    shutil.copyfile(tool, source)
+    if source.exists():
+        if source.read_bytes() != tool.read_bytes():
+            raise ValueError("The dedicated LEAN checkout already has a different replay algorithm.")
+    else:
+        shutil.copyfile(tool, source)
+    nav_path = root / "lean-nav.jsonl"
+    previous_mark = nav_path.stat().st_mtime_ns if nav_path.exists() else None
     env = os.environ | {"NUGET_PACKAGES": str(root.parent / "lean-nuget"),
                         "DOTNET_CLI_HOME": str(root.parent / "lean-dotnet-home"),
+                        "DOTNET_ROOT": str(dotnet.parent),
                         "DOTNET_NOLOGO": "1", "DOTNET_GENERATE_ASPNET_CERTIFICATE": "false",
                         "DOTNET_CLI_WORKLOAD_UPDATE_NOTIFY_DISABLE": "true",
                         "DOTNET_CLI_TELEMETRY_OPTOUT": "1", "TA_RESEARCH_LEAN_TAPE": str(root / "lean-tape"),
                         "TA_RESEARCH_LEAN_END": report["periods"]["전체"]["end"],
-                        "TA_RESEARCH_LEAN_RESULT": str(root / "lean-nav.jsonl")}
+                        "TA_RESEARCH_LEAN_RESULT": str(nav_path)}
     with (root / "lean-build.log").open("wb") as log:
         try:
             built = subprocess.run([str(dotnet), "build", str(project), "--nologo", "-v", "minimal"],
@@ -89,6 +94,7 @@ def run_lean(root, lean_root, dotnet):
         raise ValueError(f"LEAN build exit {built.returncode}. See {root / 'lean-build.log'}.")
     launch = project.parent / "bin" / "Debug"
     algorithm = launch / "QuantConnect.Algorithm.CSharp.dll"
+    launcher = launch / "QuantConnect.Lean.Launcher.dll"
     base_config = (project.parent / "config.json").read_text(encoding="utf-8-sig")
     config = json.loads(_JSON_COMMENTS.sub(lambda match: match[1] or "", base_config))
     config.update({"algorithm-type-name": "ResearchReplay", "algorithm-language": "CSharp",
@@ -99,20 +105,23 @@ def run_lean(root, lean_root, dotnet):
     atomic_write_json(path, config)
     with (root / "lean-engine.log").open("wb") as log:
         try:
-            status = subprocess.run([str(dotnet), str(launch / "QuantConnect.Lean.Launcher.dll"), "--config", str(path)],
+            status = subprocess.run([str(dotnet), str(launcher), "--config", str(path)],
                                     cwd=launch, env=env, stdout=log, stderr=subprocess.STDOUT, timeout=900)
         except subprocess.TimeoutExpired:
             raise ValueError(f"LEAN Launcher timed out. See {root / 'lean-engine.log'}.") from None
     if status.returncode:
         raise ValueError(f"LEAN Launcher exit {status.returncode}. See {root / 'lean-engine.log'}.")
-    with (root / "lean-nav.jsonl").open(encoding="utf-8") as file:
+    if not nav_path.is_file() or nav_path.stat().st_mtime_ns == previous_mark:
+        raise ValueError("LEAN did not produce a new portfolio valuation file.")
+    with nav_path.open(encoding="utf-8") as file:
         result = compare_reference(curves, map(json.loads, file))
     checksum = hashlib.sha256()
     for month in sorted((root / "lean-tape").glob("*.csv")):
         checksum.update(month.name.encode())
         checksum.update(month.read_bytes())
     result.update(plan_sha256=report["plan_sha256"], tape_sha256=checksum.hexdigest(),
-                  algorithm_sha256=hashlib.sha256(tool.read_bytes()).hexdigest())
+                  algorithm_sha256=hashlib.sha256(tool.read_bytes()).hexdigest(),
+                  launcher_sha256=hashlib.sha256(launcher.read_bytes()).hexdigest())
     output = root / "lean-reconciliation.json"
     atomic_write_json(output, result)
     return output
