@@ -34,11 +34,26 @@ def _latest_source(archive, market, now, *, required_artifacts=None):
     return _select_source(archive, market, now, required_artifacts=required_artifacts)[0]
 
 
+def _directories_desc(root):
+    try:
+        with os.scandir(root) as entries:
+            return sorted((Path(entry.path) for entry in entries if entry.is_dir()), reverse=True)
+    except (FileNotFoundError, NotADirectoryError):
+        return []
+
+
+def _recent_manifest_paths(archive):
+    for year in _directories_desc(archive / "runs"):
+        for run in _directories_desc(year):
+            yield run / "run.json"
+
+
 def _select_source(archive, market, now, *, required_artifacts=None):
     if required_artifacts is None:
         required_artifacts = ("decision_bundle_v2.json", "portfolio-private/account_snapshot.json", "portfolio-private/proposed_orders.json")
-    # Canonical run IDs are validated before becoming a filesystem component.
-    for path in sorted((archive / "runs").glob("*/*/run.json"), reverse=True):
+    # Avoid probing every archived manifest before reading the newest run.
+    # A recent eligible run often appears in the first few directory entries.
+    for path in _recent_manifest_paths(archive):
         try:
             manifest = _read(path)
             if str((manifest.get("settings") or {}).get("market", "")).lower() != market:

@@ -63,8 +63,9 @@ def handoff_completed_run(archive, manifest, *, state_root=None):
             return {"status": "ERROR", "error_type": type(exc).__name__}
 
     started = datetime.now(timezone.utc)
-    scheduled = (_scheduled_worker_root_matches(root)
-                 and (manifest.get("settings") or {}).get("execution_lightweight_refresh") is True)
+    # A Windows overlay already has dedicated reservation and broker owners.
+    # Waiting inline here holds the producer's locks through another tick.
+    scheduled = _scheduled_worker_root_matches(root)
     with ThreadPoolExecutor(max_workers=2) as pool:
         if scheduled:
             paper = pool.submit(wake, "paper", "LOCAL_PAPER_ONLY", "LocalAutomation-paper")
