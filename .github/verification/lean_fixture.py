@@ -6,7 +6,7 @@ from decimal import Decimal
 from pathlib import Path
 from NodaTime import DateTimeZoneProviders
 from AlgorithmImports import (PythonData, QCAlgorithm, Resolution, SubscriptionDataSource,
-    SubscriptionTransportMedium, FileFormat, FeeModel, OrderFee, CashAmount, ConstantSlippageModel,
+    SubscriptionTransportMedium, FileFormat, FeeModel, ConstantFeeModel, ConstantSlippageModel,
     ImmediateFillModel, OrderStatus)
 
 D = Decimal
@@ -23,13 +23,6 @@ class NativePrice(PythonData):
         row.value = float(price)
         return row
 
-class CommissionAndLevy(FeeModel):
-    def get_order_fee(self, security, order):
-        mark = D(str(security.price))
-        execution = mark * (D("1.001") if order.quantity > 0 else D(".999"))
-        fee = execution * D(str(abs(order.quantity))) * (D(".001") if order.quantity > 0 else D(".003"))
-        return OrderFee(CashAmount(float(fee), "KRW"))
-
 class Algorithm(QCAlgorithm):
     def initialize(self):
         self.set_start_date(2026, 6, 8)
@@ -41,11 +34,11 @@ class Algorithm(QCAlgorithm):
         self.tax = self.scenario == "transaction_costs_and_tax_reserve"
         security = self.add_data(NativePrice, "FIXTURE", Resolution.MINUTE, DateTimeZoneProviders.Tzdb["Asia/Seoul"], False)
         self.fixture = security.symbol
+        self.security = security
         self.set_benchmark(lambda _: 1.)
         security.set_fill_model(ImmediateFillModel())
         if self.costs:
             security.set_slippage_model(ConstantSlippageModel(.001))
-            security.set_fee_model(CommissionAndLevy())
         else:
             security.set_slippage_model(ConstantSlippageModel(0))
             security.set_fee_model(FeeModel())
@@ -59,13 +52,20 @@ class Algorithm(QCAlgorithm):
         at = row.end_time
         if (at.month, at.day, at.hour) == (6, 9, 9):
             cost = D(str(row.value)) * (D("1.002001") if self.costs else D(1))
-            self.market_order(self.fixture, int(D(3000000) // cost), tag="fixture buy at official opening input")
+            self.order_at(row.value, int(D(3000000) // cost), "fixture buy at official opening input")
         elif (at.month, at.day, at.hour) == (6, 11, 15):
             self.dividend = D(str(self.portfolio[self.fixture].quantity)) * 500
             if self.costs:
                 self.dividend *= D(".9")
         elif (at.month, at.day, at.hour) == (6, 19, 15):
-            self.market_order(self.fixture, -self.portfolio[self.fixture].quantity, tag="fixture terminal close")
+            self.order_at(row.value, -self.portfolio[self.fixture].quantity, "fixture terminal close")
+
+    def order_at(self, mark, quantity, tag):
+        if self.costs:
+            execution = D(str(mark)) * (D("1.001") if quantity > 0 else D(".999"))
+            fee = execution * D(str(abs(quantity))) * (D(".001") if quantity > 0 else D(".003"))
+            self.security.set_fee_model(ConstantFeeModel(float(fee), "KRW"))
+        self.market_order(self.fixture, quantity, tag=tag)
 
     def on_order_event(self, event):
         if event.status == OrderStatus.FILLED:
