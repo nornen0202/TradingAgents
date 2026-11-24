@@ -8,6 +8,7 @@ from tradingagents.atomic_io import atomic_write_json
 from tradingagents.execution.broker_adapter import Account, Intent
 from tradingagents.execution.kis_live_readiness import MODE, SCHEMA, MarketUsage, preview
 from tradingagents.portfolio.kis import REAL_BASE_URL
+from tradingagents.scheduled.market_calendar import market_session_state
 
 
 NOW = datetime(2026, 11, 24, 15, tzinfo=timezone.utc)
@@ -29,9 +30,7 @@ def fixture(tmp_path, market):
     return state, config, intent, {"account": account, "usage": MarketUsage("2026-11-24", 0, "0", False),
         "quote": {"observed_at": now.isoformat(), "ticker": ticker, "exchange": venue, "currency": currency,
                   "execution_ready": True, "ask": limit, "bid": limit},
-        "session": {"source": "exchange_calendars", "session_date": "2026-11-24", "phase": "regular", "is_open": True,
-                    "session_open": (now - timedelta(minutes=30)).isoformat(),
-                    "session_close": (now + timedelta(hours=2)).isoformat()}, "now": now}
+        "session": market_session_state(market=market, now_local=now), "now": now}
 
 
 @pytest.mark.parametrize("market,side,tr_id", [("KR", "BUY", "TTTC0012U"), ("KR", "SELL", "TTTC0011U"),

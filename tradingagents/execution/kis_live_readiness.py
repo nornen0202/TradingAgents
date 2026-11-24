@@ -61,12 +61,13 @@ def _admit(state, config, intent, account, usage, quote, session, now):
         raise ValueError("LIVE_INSTRUMENT_NOT_APPROVED")
 
     opening, closing = instant(session.get("session_open")), instant(session.get("session_close"))
-    exchange_date = now.astimezone(ZoneInfo("Asia/Seoul" if market == "KR" else "America/New_York")).date().isoformat()
+    market_zone = ZoneInfo("Asia/Seoul" if market == "KR" else "America/New_York")
+    exchange_date = now.astimezone(market_zone).date().isoformat()
     if (session.get("source") != "exchange_calendars" or session.get("is_open") is not True
             or session.get("phase") != "regular" or opening is None or closing is None
             or not opening + timedelta(minutes=2) <= now < closing - timedelta(minutes=10)
             or not isinstance(usage, MarketUsage) or usage.session_date != exchange_date
-            or session.get("session_date") != exchange_date
+            or opening.astimezone(market_zone).date().isoformat() != exchange_date
             or usage.unresolved is not False):
         raise ValueError("LIVE_SESSION_OR_RECONCILIATION_UNVERIFIED")
 
@@ -117,14 +118,15 @@ def preview(state, intent, *, account, usage, quote, session, now):
         raise ValueError("LIVE_FIXTURE_ROOT_REQUIRED")
     with interprocess_file_lock(state / "readiness.lock"):
         config_path = state / "approval.json"
-        config = json.loads(config_path.read_text(encoding="utf-8-sig")) if config_path.is_file() else {}
-        config_hash = hashlib.sha256(json.dumps(config, sort_keys=True).encode()).hexdigest()
         report = {"mode": MODE, "evidence_scope": "ISOLATED_FIXTURE", "recorded_at": instant(now).isoformat(),
-                  "configuration_sha256": config_hash, "live_order_requests": 0, "status": "BLOCKED"}
+                  "configuration_sha256": None, "live_order_requests": 0, "status": "BLOCKED"}
         try:
+            raw = config_path.read_bytes() if config_path.is_file() else b"{}"
+            report["configuration_sha256"] = hashlib.sha256(raw).hexdigest()
+            config = json.loads(raw.decode("utf-8-sig"))
             request = _admit(state, config, intent, account, usage, quote, session, instant(now))
             report.update(status="CONTRACT_READY", tr_id=request["tr_id"])
-        except (ArithmeticError, AttributeError, TypeError, ValueError) as exc:
+        except (ArithmeticError, AttributeError, OSError, TypeError, ValueError) as exc:
             report["error_code"] = str(exc) if re.fullmatch(r"LIVE_[A-Z_]+", str(exc)) else "LIVE_INPUT_INVALID"
             raise ValueError(report["error_code"]) from None
         finally:
