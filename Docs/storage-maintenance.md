@@ -80,6 +80,12 @@ The shared wrapper runs once. A degraded preflight returns 3 only when the share
 volumes/capacity passed; the wrapper then continues and the final aggregate returns
 failure if any domain is blocked. Shared failures block every mutation.
 
+Preflight verifies configured volume identities before checking a domain's
+aliases. A missing or replaced volume is reported as `volume-query-failed` or
+`volume-serial-mismatch`, with the affected `volume_root` and the Windows error
+number when available. Restore the expected volume before its next scheduled
+check. A different mount with the same drive letter leaves the domain blocked.
+
 `capacity_checks` records the actual resolved path, bytes and measurement time;
 unavailable measurements are null. `health_receipt` is written only with `--apply`
 and includes deltas, consecutive failures and a changed alert signature. Delivery

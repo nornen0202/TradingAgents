@@ -145,6 +145,7 @@ class KisDemoClient:
     def _http(self, method, path, *, deadline=None, not_before=None, **kwargs):
         allowed = {
             ("POST", "/oauth2/tokenP"),
+            ("POST", "/oauth2/Approval"),
             ("GET", PREFIX + "inquire-balance"),
             ("GET", PREFIX + "inquire-daily-ccld"),
             ("GET", PREFIX + "inquire-psbl-order"),
@@ -187,6 +188,16 @@ class KisDemoClient:
             return payload, response.headers
         except (requests.RequestException, ValueError):
             raise DemoError("VTS response unavailable or invalid") from None
+
+    def websocket_approval(self):
+        payload, _ = self._http("POST", "/oauth2/Approval", json={
+            "grant_type": "client_credentials", "appkey": self.credentials.app_key,
+            "secretkey": self.credentials.app_secret,
+        })
+        token = payload.get("approval_key")
+        if not isinstance(token, str) or not token.strip():
+            raise DemoError("VTS WebSocket approval unavailable")
+        return token
 
     def authenticate(self):
         now = self._now()
