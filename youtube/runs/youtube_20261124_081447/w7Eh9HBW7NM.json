@@ -1,0 +1,347 @@
+{
+  "version": 4,
+  "video_id": "w7Eh9HBW7NM",
+  "title": "'코스피 날개 없는 추락' 공포의 끝단에 온 걸까ㅣ이재규 SK증권 차장 [더블 체크]",
+  "url": "https://www.youtube.com/watch?v=w7Eh9HBW7NM",
+  "channel": "삼프로TV 3PROTV",
+  "channel_id": "UChlv4GSd7OQl3js-jkLOnFA",
+  "source_url": "https://www.youtube.com/@3protv/videos",
+  "thumbnail_url": "https://i.ytimg.com/vi/w7Eh9HBW7NM/maxresdefault.jpg",
+  "published_at": "2026-11-23T01:54:52+00:00",
+  "status": "asr_uncertain",
+  "strategy_source_tier": "STANDARD",
+  "strategy_evidence_weight": "STANDARD",
+  "strategy_validation_policy": "STANDARD_REVIEW",
+  "transcript_status": "available",
+  "transcript_source": "automatic",
+  "transcript_chars": 19603,
+  "transcript_quality": {
+    "status": "good",
+    "score": 1.0,
+    "warnings": [],
+    "source": "automatic",
+    "language": "Korean",
+    "model_or_format": "json3",
+    "chars": 19603,
+    "segments": 1160,
+    "duration_seconds": 2161,
+    "repeated_ngram_ratio": 0.0
+  },
+  "generated_at": "2026-11-24T08:14:47.674338+09:00",
+  "llm_status": "success",
+  "research_status": "success",
+  "claim_verification_status": "success",
+  "research_pipeline_version": 4,
+  "evidence_count": 5,
+  "claim_status_summary": {
+    "partially_supported": 1,
+    "unverified": 10,
+    "asr_uncertain": 1
+  },
+  "claims": [
+    {
+      "claim_id": "C1",
+      "claim_text": "방송은 코스피가 2026년 6월 이후 약 5개월간 46% 하락해 역대 5위권이라고 설명했다. 9,000선과 4,500~4,800선을 언급하고, 종전 지지 기대치는 4,800선, 120주 이동평균선에 가까운 극단적 하단 후보는 4,300선으로 제시했다. 밸류에이션이 낮아졌고 과거 급락 14건 중 12건이 1~3년 내 수익으로 전환됐다고도 했다.",
+      "status": "partially_supported",
+      "confidence": 0.2,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:06:05",
+      "source_confidence": 0.91,
+      "asr_confidence": 0.0,
+      "numeric_parse": {
+        "claimed": "약 5개월간 −46%, 역대 5위권, 9,000선, 4,500~4,800선, 지지 기대 4,800선, 120주선 인근 4,300선, 14건 중 12건이 1~3년 내 수익 전환",
+        "observed": "yfinance 스냅샷 지수 4,708.54, 52주 고점 9,385.59. 방송 시각에 맞춘 지수·이동평균·역사 표본은 미제공."
+      },
+      "investor_implication": "4,300선을 검증된 지지선이나 손실의 하한으로, 12/14를 이번 반등의 확률로 해석할 수 없다."
+    },
+    {
+      "claim_id": "C2",
+      "claim_text": "방송은 2026년 5~11월 외국인 순매도가 약 170조원으로 시가총액 대비 4.3%였으며, 2008년의 4.4%에 근접했다고 말했다. 개장 초 순매수는 수급이 완화될 가능성을 보여주는 신호로 해석했다.",
+      "status": "unverified",
+      "confidence": 0.0,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.91,
+      "asr_confidence": 0.0,
+      "numeric_parse": {
+        "claimed": "2026년 5~11월 약 170조원 순매도, 시총 대비 4.3%, 2008년 비교치 4.4%",
+        "observed": "대응하는 순매도액·시총 분모·장중 수급 자료 미제공"
+      },
+      "investor_implication": "금융위기 수준의 매도였다는 비교나 개장 초 순매수를 근거로 매도 압력이 끝났다고 판단하기 어렵다."
+    },
+    {
+      "claim_id": "C3",
+      "claim_text": "방송은 직전 금요일 필라델피아 반도체 지수(SOX)가 약 10% 또는 10% 넘게 하락했고, 월요일 방송 초반 미국 주가지수 선물이 2% 넘게 올랐으며, 비트코인은 직전 저점을 이탈한 뒤 주말 저점에서 약 10% 반등했다고 전했다. 최근 코스피와 SOX의 동행성도 높게 봤다.",
+      "status": "unverified",
+      "confidence": 0.0,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.9,
+      "asr_confidence": 0.0,
+      "numeric_parse": {
+        "claimed": "SOX 하루 약 −10% 또는 낙폭 10% 초과, 미국 주가지수 선물 +2% 초과, 비트코인 주말 저점 대비 약 +10%",
+        "observed": "해당 세션의 가격 자료 미제공"
+      },
+      "investor_implication": "시장이 다른 세 자산의 가격 변동을 같은 시점의 위험선호 회복 신호로 볼 근거가 없다."
+    },
+    {
+      "claim_id": "C4",
+      "claim_text": "발표 자료는 SOX 유사 급락 6건 중 3건에서 1년 뒤 상승했고 약 106% 오른 사례도 있다고 했다. 별도 닷컴버블 차트에서는 지수가 약 5,000에서 1,500으로 내려가는 동안 19%, 35%, 16%, 13%의 중간 반등이 제시됐다.",
+      "status": "unverified",
+      "confidence": 0.0,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:29:23",
+      "source_confidence": 0.9,
+      "asr_confidence": 0.0,
+      "numeric_parse": {
+        "claimed": "6건 중 3건이 1년 뒤 상승, 약 +106% 사례, 별도 지수 약 5,000→1,500 및 중간 반등 +19%, +35%, +16%, +13%",
+        "observed": "차트·표본·수익률 시계열 미제공"
+      },
+      "investor_implication": "3/6을 반등 확률로 사용하거나, 닷컴버블 차트를 SOX 사례로 인용하면 안 된다."
+    },
+    {
+      "claim_id": "C5",
+      "claim_text": "방송은 한국의 증안펀드 가동 준비와 불법 공매도 3개월 집중 감시, 대만의 세 차례 정책 조치를 소개했다. 대만 1차 조치 직후 대만은 오르고 한국은 하락했지만 직전 금요일까지 누적 낙폭은 대만이 더 컸다고 했으며, 대만 지방선거는 28일로 언급했다.",
+      "status": "unverified",
+      "confidence": 0.0,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.92,
+      "asr_confidence": 0.0,
+      "numeric_parse": {
+        "claimed": "한국 집중 감시 3개월, 대만 정책 변화 3차례, 11월 28일 지방선거",
+        "observed": "공식 발표·발효일·선거 일정·양국 비교 수익률 미제공"
+      },
+      "investor_implication": "펀드 가동 준비를 실제 자금 투입으로, 불법 공매도 감시를 공매도 금지로 보아서는 안 된다. 조치 직후 지수 움직임만으로 정책 효과를 판정할 수도 없다."
+    },
+    {
+      "claim_id": "C6",
+      "claim_text": "방송은 지급준비금·미 재무부 계좌 잔고·SOFR–IORB를 근거로 미국 자금시장에 심각한 유동성 부족이 보이지 않는다고 판단했다. 일부 CDS 상승과 자금조달 우려, 직전 금요일 미국 10년물 국채금리의 큰 폭 하락도 언급했다.",
+      "status": "unverified",
+      "confidence": 0.0,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:06:05",
+      "source_confidence": 0.91,
+      "asr_confidence": 0.0,
+      "numeric_parse": {
+        "claimed": "직전 금요일 미국 10년물 금리 큰 폭 하락, SOFR–IORB 및 CDS 구체 수치는 미제시",
+        "observed": "금리 변화폭·스프레드·CDS 관측값 미제공"
+      },
+      "investor_implication": "유동성 위기가 아니라는 방송의 판단을 확인된 사실로 쓰기 어렵다. 국채금리 방향만으로 자금조달 여건을 판단할 수도 없다."
+    },
+    {
+      "claim_id": "C7",
+      "claim_text": "방송은 삼성전자 10년 평균 PER 약 13.5배와 선행 PER 2.9배를 제시했으며 SK하이닉스의 10년 평균 PER은 제시하지 않았다. 두 종목 모두 PBR로 보면 역사적으로 압도적으로 저렴하다고 보기 어렵다고 평가했다.",
+      "status": "unverified",
+      "confidence": 0.0,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:12:03",
+      "source_confidence": 0.9,
+      "asr_confidence": 0.0,
+      "numeric_parse": {
+        "claimed": "삼성전자 10년 평균 PER 약 13.5배·선행 PER 2.9배, SK하이닉스 10년 평균 PER은 방송 자료에서 미제시",
+        "observed": "시점별 주가·추정 EPS·역사적 배수 자료 미제공"
+      },
+      "investor_implication": "2.9배를 확정된 선행 배수로 쓰거나 13.5배와의 차이를 그대로 할인율로 해석할 수 없다."
+    },
+    {
+      "claim_id": "C8",
+      "claim_text": "방송은 장 초반 삼성전자와 SK하이닉스의 하락, 이후 삼성전자의 17만7,000원 반등을 전했다. 코스닥 지수 회복에도 하락 종목이 많았고 일부 소부장이 반등했으며 외국인·기관 순매수와 시총 상위주 ETF 효과가 거론됐다. 현대차 시총은 약 49조원으로 9위, 바로 아래 셀트리온은 약 47조원이라고 했다.",
+      "status": "unverified",
+      "confidence": 0.0,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:17:46",
+      "source_confidence": 0.9,
+      "asr_confidence": 0.0,
+      "numeric_parse": {
+        "claimed": "삼성전자 약 −3%, SK하이닉스 약 −2.8%, 삼성전자 이후 177,000원, 코스닥 상승·하락 약 190·1,400개 및 140·1,000개, 현대차 약 49조원·9위, 셀트리온 약 47조원",
+        "observed": "동일 시각으로 대조할 장중 가격·수급·순위 자료 미제공"
+      },
+      "investor_implication": "지수 반등을 종목 전반의 회복이나 ETF 유입의 결과로 단정할 수 없다. 시장의 상승 폭이 얼마나 넓었는지 별도로 확인해야 한다."
+    },
+    {
+      "claim_id": "C9",
+      "claim_text": "방송은 현대차 본업이 약해져 로봇 사업 가치를 반영해야 저평가 논리가 성립할 수 있다고 평가했다. 바이오시밀러·CDMO 기업 가운데 영업이익률 20% 초과 사례가 있다고 했으나 대상 기업과 기간은 특정하지 않았다.",
+      "status": "unverified",
+      "confidence": 0.0,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:17:46",
+      "source_confidence": 0.88,
+      "asr_confidence": 0.0,
+      "numeric_parse": {
+        "claimed": "일부 바이오시밀러·CDMO 기업의 영업이익률 20% 초과",
+        "observed": "해당 기업·기간·연결 또는 부문 실적 미제공"
+      },
+      "investor_implication": "현대차 본업 수익성과 로봇 사업 가치를 분리해서 평가하고, 바이오 업체의 수익성은 회사별로 같은 회계 기간과 범위에서 비교해야 한다."
+    },
+    {
+      "claim_id": "C10",
+      "claim_text": "방송은 미국 하이퍼스케일러의 절대 CAPEX가 아니라 미국 GDP 대비 연간 CAPEX 증분이 2026년에 정점을 찍고 2027년에 둔화할 수 있다고 제시했다.",
+      "status": "unverified",
+      "confidence": 0.0,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:23:36",
+      "source_confidence": 0.94,
+      "asr_confidence": 0.0,
+      "numeric_parse": {
+        "claimed": "GDP 대비 연간 CAPEX 증분 2026년 정점, 2027년 둔화 가능성",
+        "observed": "원차트·기업별 CAPEX·GDP 및 연도별 전망치 미제공"
+      },
+      "investor_implication": "GDP 대비 투자 증분의 둔화 전망을 절대 CAPEX 감소나 AI 투자 축소로 바꾸어 인용할 수 없다."
+    },
+    {
+      "claim_id": "C11",
+      "claim_text": "방송은 11월 1~20일 한국 전체 수출 774억 달러, 반도체 수출 385억 달러, 전년 동기 대비 294%를 언급했다. 반도체 수출이 기록적이고 예상을 웃돌았으며, 한국과 대만의 수출 구성이 다르다고 평가했다.",
+      "status": "asr_uncertain",
+      "confidence": 0.0,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:29:23",
+      "source_confidence": 0.74,
+      "asr_confidence": 0.0,
+      "numeric_parse": {
+        "claimed": "11월 1~20일 전체 774억 달러, 반도체 385억 달러, 전년 동기 대비 294%",
+        "observed": "원음·공식 잠정치 미제공. 소수점·단위·증가율 적용 항목 미확정."
+      },
+      "investor_implication": "수출액과 증가율은 공식 원표를 확인하기 전 인용을 보류한다. ‘기록적’과 ‘기대 상회’는 각각 별도의 비교 자료가 필요하다."
+    },
+    {
+      "claim_id": "C12",
+      "claim_text": "방송은 외국인 수급 개선 시 반도체·소부장 중심의 단기 반등 가능성을 제시했다. 개장 후 15~20분으로 당일 방향이나 V자 추세 전환을 단정할 수 없고 레버리지가 추가 하락 시 손실과 회복 부담을 키운다고 지적했다. 시청자 원금 손실 40~50%는 추정, 60~70%는 예시였다.",
+      "status": "unverified",
+      "confidence": 0.0,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:12:03",
+      "source_confidence": 0.9,
+      "asr_confidence": 0.0,
+      "numeric_parse": {
+        "claimed": "개장 후 15~20분, 원금 손실 40~50% 추정·60~70% 예시",
+        "observed": "후속 1·5·20거래일 수급·수익률 및 대표 계좌 자료 미제공"
+      },
+      "investor_implication": "반등 시나리오와 계좌 손실 추정을 실제 관측으로 취급하지 않는다. 신용 손실은 차입 비중, 담보유지율, 반대매매와 비용을 반영한 별도 시나리오로 따져야 한다."
+    }
+  ],
+  "entities": [
+    {
+      "ticker": "^KS11",
+      "name": "코스피",
+      "status": "unverified",
+      "claims": [
+        "이재규 차장은 급락으로 밸류에이션이 낮아졌으며, 주봉 120선과 맞닿는 4,300선은 극단적 하락 시 지지 후보라고 봤다.",
+        "누적 외국인 순매도가 금융위기 당시의 시가총액 대비 비중에 근접해 매도 강도가 완화되면 기술적 반등이 가능하다고 봤다."
+      ],
+      "numeric_claims": [
+        "2026년 6월부터 5개월간 약 46% 하락해 역대 5위권 낙폭이라고 설명했다.",
+        "장중 자료에서 연중 고점으로 해석되는 9,000선과 당시 4,500~4,800선이 언급됐다. 직전 지지 기대치는 4,800선, 극단적 하단은 4,300선이었다.",
+        "5~11월 외국인 순매도 약 170조원, 시가총액 대비 4.3%로 제시됐다. 2008년 금융위기 당시 비교치는 4.4%였다."
+      ],
+      "verification_notes": [
+        "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+      ],
+      "market_snapshot": {
+        "ticker": "^KS11",
+        "as_of": "2026-11-24T00:14:25.118803+00:00",
+        "current_price": 4708.54,
+        "market_cap": null,
+        "forward_pe": null,
+        "trailing_pe": null,
+        "fifty_two_week_high": 9385.59,
+        "fifty_two_week_low": 0.0,
+        "average_target_price": null,
+        "source": "yfinance",
+        "status": "verified"
+      },
+      "external_context_status": "verified"
+    },
+    {
+      "ticker": "^KS11",
+      "name": "한국 증시안정 정책·대만 공매도 규제",
+      "status": "unverified",
+      "claims": [
+        "증권시장안정펀드나 공매도 규제는 하방 방어에 도움이 될 수 있지만, 기존 보유 주식 매도나 AI 생태계에 대한 의구심까지 막기는 어렵다고 봤다."
+      ],
+      "numeric_claims": [
+        "한국은 증안펀드 가동 준비 착수와 불법 공매도 3개월 집중 감시가 거론됐다.",
+        "대만은 세 차례 정책 변화가 있었다고 소개됐다. 1차 조치 직후 대만은 상승하고 한국은 하락했으나, 1차 조치부터 직전 금요일까지의 누적 낙폭은 대만이 더 컸다는 비교가 제시됐다."
+      ],
+      "verification_notes": [
+        "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+      ],
+      "market_snapshot": {
+        "ticker": "^KS11",
+        "as_of": "2026-11-24T00:14:25.621382+00:00",
+        "current_price": 4708.54,
+        "market_cap": null,
+        "forward_pe": null,
+        "trailing_pe": null,
+        "fifty_two_week_high": 9385.59,
+        "fifty_two_week_low": 0.0,
+        "average_target_price": null,
+        "source": "yfinance",
+        "status": "verified"
+      },
+      "external_context_status": "verified"
+    }
+  ],
+  "evidence": [
+    {
+      "evidence_id": "E1",
+      "claim_id": "C1",
+      "title": "Sugar Prices Rebound Higher",
+      "source_url": "https://finance.yahoo.com/markets/commodities/articles/sugar-prices-rebound-higher-180114238.html",
+      "publisher": "Barchart",
+      "published_at": "2026-11-23T18:01:14+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "Sugar Prices Rebound Higher Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 2026 Elections Weather Newsletters Finance My portfolio News Mark..."
+    },
+    {
+      "evidence_id": "E2",
+      "claim_id": "C1",
+      "title": "Canada and Ontario back Ford Oakville revamp with C$928.5m",
+      "source_url": "https://finance.yahoo.com/economy/policy/articles/canada-ontario-back-ford-oakville-163934313.html",
+      "publisher": "Just Auto",
+      "published_at": "2026-11-23T16:39:34+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "Canada and Ontario back Ford Oakville revamp with C$928.5m Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 2026 Elections Weather Newsletters..."
+    },
+    {
+      "evidence_id": "E4",
+      "claim_id": "C3",
+      "title": "Central Garden & Pet Q4 Earnings Call Highlights",
+      "source_url": "https://finance.yahoo.com/markets/stocks/articles/central-garden-pet-q4-earnings-001237837.html",
+      "publisher": "MarketBeat",
+      "published_at": "2026-11-24T00:12:37+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "Central Garden & Pet Q4 Earnings Call Highlights Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 2026 Elections Weather Newsletters Finance M..."
+    },
+    {
+      "evidence_id": "E5",
+      "claim_id": "C6",
+      "title": "Global Aerospace and Defense Material Market Report 2026-2035 | Market to Reach $37 Billion at 5.6% CAGR as Lightweight Composites and Advanced Alloys Gain T...",
+      "source_url": "https://finance.yahoo.com/markets/articles/global-aerospace-defense-material-market-142100393.html",
+      "publisher": "GlobeNewswire",
+      "published_at": "2026-11-23T14:21:00+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    }
+  ],
+  "source_policy": {
+    "raw_transcript_published": false,
+    "raw_transcript_in_evidence": false,
+    "research_pipeline_version": 4,
+    "closed_source_claims": "unverified_external_source",
+    "auto_caption_warning": true,
+    "local_asr_warning": false
+  }
+}

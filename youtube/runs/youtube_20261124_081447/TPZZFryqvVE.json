@@ -1,0 +1,330 @@
+{
+  "version": 4,
+  "video_id": "TPZZFryqvVE",
+  "title": "국민연금 추납, 무조건 11월 30일까지 신청해야 되는 이유",
+  "url": "https://www.youtube.com/watch?v=TPZZFryqvVE",
+  "channel": "경제사냥꾼",
+  "channel_id": "UC7usMJDHmtbs_oegmzQKKMA",
+  "source_url": "https://www.youtube.com/@%EA%B2%BD%EC%A0%9C%EC%82%AC%EB%83%A5%EA%BE%BC/shorts",
+  "thumbnail_url": "https://i.ytimg.com/vi/TPZZFryqvVE/maxresdefault.jpg",
+  "published_at": "2026-11-23T14:10:34+00:00",
+  "status": "unverified",
+  "strategy_source_tier": "STANDARD",
+  "strategy_evidence_weight": "STANDARD",
+  "strategy_validation_policy": "STANDARD_REVIEW",
+  "transcript_status": "available",
+  "transcript_source": "automatic",
+  "transcript_chars": 1650,
+  "transcript_quality": {
+    "status": "good",
+    "score": 1.0,
+    "warnings": [],
+    "source": "automatic",
+    "language": "Korean (Original)",
+    "model_or_format": "json3",
+    "chars": 1650,
+    "segments": 86,
+    "duration_seconds": 131,
+    "repeated_ngram_ratio": 0.0
+  },
+  "generated_at": "2026-11-24T08:14:47.674338+09:00",
+  "llm_status": "success",
+  "research_status": "success",
+  "claim_verification_status": "success",
+  "research_pipeline_version": 4,
+  "evidence_count": 14,
+  "claim_status_summary": {
+    "partially_supported": 5,
+    "supported": 1,
+    "unverified": 3
+  },
+  "claims": [
+    {
+      "claim_id": "C1",
+      "claim_text": "국민연금 보험료율은 2026년 9.5%에서 2027년 1월 10%로 오른다.",
+      "status": "partially_supported",
+      "confidence": 0.68,
+      "supporting_evidence_ids": [
+        "E4",
+        "E11"
+      ],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.62,
+      "asr_confidence": 0.86,
+      "numeric_parse": {
+        "claimed": "2026년 9.5%, 2027년 1월 10%",
+        "observed": "2026년 9.5% 보도 확인, 2027년 1월 10% 미확인"
+      },
+      "investor_implication": "2027년 10%를 확정된 수치로 사용해 추납 비용이나 연내 신청의 절감액을 제시하지 않는다."
+    },
+    {
+      "claim_id": "C2",
+      "claim_text": "추납 보험료율은 원칙적으로 납부기한이 속하는 달을 기준으로 적용되며, 일반 기한은 신청 다음 달 말이다.",
+      "status": "supported",
+      "confidence": 0.85,
+      "supporting_evidence_ids": [
+        "E4",
+        "E5",
+        "E6",
+        "E8"
+      ],
+      "manual_check_required": false,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.78,
+      "asr_confidence": 0.77,
+      "numeric_parse": {
+        "claimed": "2026년 11월 신청 → 12월 말, 12월 신청 → 2027년 1월 말",
+        "observed": "보도된 일반 규칙을 적용하면 일치. 해당 신청 건의 실제 고지는 미확인"
+      },
+      "investor_implication": "신청월에 정해지는 기준소득월액과 납부기한을 기준으로 적용되는 보험료율을 구분하고, 실제 기한은 고지서에서 확인한다."
+    },
+    {
+      "claim_id": "C3",
+      "claim_text": "납부기한 기준은 2025년 11월 국민연금법 개정으로 도입됐다.",
+      "status": "partially_supported",
+      "confidence": 0.77,
+      "supporting_evidence_ids": [
+        "E4",
+        "E5",
+        "E6"
+      ],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.71,
+      "asr_confidence": 0.86,
+      "numeric_parse": {
+        "claimed": "작년 11월 = 2025년 11월",
+        "observed": "2025년 11월 25일 개정 보도, 국민연금법 제92조 언급. 공식 개정 이력 미확인"
+      },
+      "investor_implication": "2025년 11월 개정으로 보도됐다고 표현할 수 있으나, 정확한 법정 시행일이나 적용례는 원문 확인 전 단정하지 않는다."
+    },
+    {
+      "claim_id": "C4",
+      "claim_text": "2026년 요율을 적용받으려면 11월 30일까지 신청하는 것이 가장 확실하지만, 12월에 신청해 그달 안에 납부해도 2026년 요율을 적용받을 수 있다.",
+      "status": "unverified",
+      "confidence": 0.31,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.2,
+      "asr_confidence": 0.86,
+      "numeric_parse": {
+        "claimed": "2026년 11월 30일까지 신청 권고, 12월 당월 납부 시 2026년 요율 적용",
+        "observed": "일반 규칙상 11월 신청의 기본 기한은 12월 말. 11월 30일 신청의 요율 보장 및 12월 예외는 미확인"
+      },
+      "investor_implication": "11월 30일을 필수 마감으로 안내하거나 12월 신청의 연내 납부를 보장하지 않는다. 본인 건의 고지 가능일, 적용 요율, 실제 납부 마감을 국민연금공단에 확인한다."
+    },
+    {
+      "claim_id": "C5",
+      "claim_text": "산정 기준 월 100만 원과 추납 60개월을 가정하면, 신청 다음 달 일시납 기준으로 11월 30일 신청은 570만 원, 12월 1일 신청은 600만 원으로 30만 원 차이가 난다.",
+      "status": "partially_supported",
+      "confidence": 0.82,
+      "supporting_evidence_ids": [
+        "E4",
+        "E8"
+      ],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.75,
+      "asr_confidence": 0.46,
+      "numeric_parse": {
+        "claimed": "100만 원 × 9.5% 또는 10% × 60개월 = 570만 원 또는 600만 원, 차액 30만 원",
+        "observed": "가정하의 산술 일치: 월 9만 5,000원·10만 원, 월 차액 5,000원. E8 보도상 2026년 최저액은 월 9만 6,230원"
+      },
+      "investor_implication": "30만 원은 두 가정 요율을 적용한 계산 예시로만 제시하고, 실제 절감액은 기준소득월액과 하한, 개월 수, 고지 요율을 확인한 뒤 판단한다."
+    },
+    {
+      "claim_id": "C6",
+      "claim_text": "퇴직·육아 등으로 보험료를 내지 못한 기간 중 요건을 충족한 기간은 추납으로 가입기간에 산입할 수 있다.",
+      "status": "unverified",
+      "confidence": 0.4,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.27,
+      "asr_confidence": 0.86,
+      "numeric_parse": {
+        "claimed": "",
+        "observed": ""
+      },
+      "investor_implication": "퇴직·육아로 생긴 공백을 모두 추납할 수 있다고 보지 말고, 공단에서 해당 기간의 기록과 추납 가능 개월 수를 확인한다."
+    },
+    {
+      "claim_id": "C7",
+      "claim_text": "현재 국민연금 가입자만 추납을 신청할 수 있으며, 과거 납부 이력만 있는 미가입자는 먼저 가입 자격을 갖춰야 한다.",
+      "status": "unverified",
+      "confidence": 0.21,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.79,
+      "numeric_parse": {
+        "claimed": "",
+        "observed": ""
+      },
+      "investor_implication": "과거 납부 이력만으로 신청 가능 여부를 판단하지 말고, 본인의 현재 가입·납부 상태와 필요한 절차를 확인한다."
+    },
+    {
+      "claim_id": "C8",
+      "claim_text": "월별 노령연금을 받으려면 가입기간이 최소 10년이어야 하며, 다른 조건이 같으면 가입기간이 길수록 연금액이 늘어난다.",
+      "status": "partially_supported",
+      "confidence": 0.66,
+      "supporting_evidence_ids": [
+        "E12",
+        "E10"
+      ],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.55,
+      "asr_confidence": 0.86,
+      "numeric_parse": {
+        "claimed": "최소 가입기간 10년",
+        "observed": "보도에서 10년 이상 확인. 지급개시연령 및 추가 가입기간에 따른 증가액 미확인"
+      },
+      "investor_implication": "추납으로 10년 요건을 충족하는지와 실제 지급 개시 시점 및 예상 월 연금액을 따로 확인한다."
+    },
+    {
+      "claim_id": "C9",
+      "claim_text": "공단 홈페이지나 ‘내 곁에 국민연금’ 앱에서 추납 가능기간을 확인하고 납부 개월 수와 일시납·분할납을 선택한 뒤 담당자 확인을 거치며, 상세 혼인관계증명서가 필요하고 1355에서 안내받을 수 있다.",
+      "status": "partially_supported",
+      "confidence": 0.47,
+      "supporting_evidence_ids": [
+        "E4",
+        "E8",
+        "E11"
+      ],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.38,
+      "asr_confidence": 0.63,
+      "numeric_parse": {
+        "claimed": "상담번호 1355",
+        "observed": "제공 자료에 공식 번호 확인 근거 없음"
+      },
+      "investor_implication": "증명서를 모든 신청자의 필수 서류로 안내하지 말고, 공단의 공식 민원 안내에서 이용 채널과 본인에게 필요한 서류, 처리 일정을 확인한다."
+    }
+  ],
+  "entities": [],
+  "evidence": [
+    {
+      "evidence_id": "E1",
+      "claim_id": "C1",
+      "title": "Canada and Ontario back Ford Oakville revamp with C$928.5m",
+      "source_url": "https://finance.yahoo.com/economy/policy/articles/canada-ontario-back-ford-oakville-163934313.html",
+      "publisher": "Just Auto",
+      "published_at": "2026-11-23T16:39:34+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "Canada and Ontario back Ford Oakville revamp with C$928.5m Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 2026 Elections Weather Newsletters..."
+    },
+    {
+      "evidence_id": "E2",
+      "claim_id": "C1",
+      "title": "Global Aerospace and Defense Material Market Report 2026-2035 | Market to Reach $37 Billion at 5.6% CAGR as Lightweight Composites and Advanced Alloys Gain T...",
+      "source_url": "https://finance.yahoo.com/markets/articles/global-aerospace-defense-material-market-142100393.html",
+      "publisher": "GlobeNewswire",
+      "published_at": "2026-11-23T14:21:00+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "Global Aerospace and Defense Material Market Report 2026-2035 | Market to Reach $37 Billion at 5.6% CAGR as Lightweight Composites and Advanced Alloys Gain Traction Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home..."
+    },
+    {
+      "evidence_id": "E4",
+      "claim_id": "C2",
+      "title": "국민연금 추후 납부 산정방식 변경…‘납부 기한이 속하는 달’ 기준",
+      "source_url": "https://zdnet.co.kr/view/?no=20251125163435",
+      "publisher": "Naver News",
+      "published_at": "2025-11-25T16:35:00+09:00",
+      "source_tier": "web",
+      "excerpt": "인상되고, 소득대체율은 2025년 기준 41.5%에서 2026년 43%로 인상된다. (출처=국민연금공단) 추납보험료 산정기준을 변경하지 않을 경우 올해 12월에 추납을 신청해 내년 1월(납부기한은 신청월의 다음 달 말일인 2026년... 국민연금 추후 납부 산정방식 변경…‘납부 기한이 속하는 달’ 기준 - ZDNet korea ZDNet Korea 뉴스레터 구독신청 구독신청 닫기 ZDNet USA ZDNet China ZDNet Japan English 지..."
+    },
+    {
+      "evidence_id": "E5",
+      "claim_id": "C2",
+      "title": "국민연금 추납보험료 산정기준, 납부기한 속하는 달로 바뀐다",
+      "source_url": "https://www.viva100.com/article/20251125501152",
+      "publisher": "Naver News",
+      "published_at": "2025-11-25T15:22:00+09:00",
+      "source_tier": "news",
+      "excerpt": "국민연금 추후 납부 시 보험료율을 적용 기준월이 ‘신청한 날이 속하는 달’에서 ‘납부기한이 속하는 달’로 바뀌게 된다. 보건복지부와 국민연금공단은 이같은 내용의 ‘국민연금법’ 일부개정법률안이 25일부터..."
+    },
+    {
+      "evidence_id": "E7",
+      "claim_id": "C3",
+      "title": "Notice - JACK MARKS and CNSX MARKETS INC. and ONTARIO SECURITIES COMMISSION, File No. 2025-11",
+      "source_url": "https://finance.yahoo.com/markets/articles/notice-jack-marks-cnsx-markets-170500947.html",
+      "publisher": "CNW Group",
+      "published_at": "2026-08-31T17:05:00+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    },
+    {
+      "evidence_id": "E8",
+      "claim_id": "C5",
+      "title": "[비바100] 국민연금 수령액 가르는 ‘가입기간’…숨은 공백 메우는 5가...",
+      "source_url": "https://www.viva100.com/article/20261031500290",
+      "publisher": "Naver News",
+      "published_at": "2026-11-05T07:02:00+09:00",
+      "source_tier": "news",
+      "excerpt": "신청일이 속한 달의 기준소득월액에 납부기한이 속한 달의 보험료율을 적용한 뒤 추납 개월수를 곱하는 방식이다. 2026년 최저 보험료인 월 9만6230원을 기준으로 60개월을 추납하면 약 577만원이 필요하다. 일시납 또는..."
+    },
+    {
+      "evidence_id": "E9",
+      "claim_id": "C5",
+      "title": "Invesco NASDAQ 100 ETF (QQQM) Buys $340.9 Million More Honeywell on Nov. 19",
+      "source_url": "https://finance.yahoo.com/markets/stocks/articles/invesco-nasdaq-100-etf-qqqm-110458362.html",
+      "publisher": "GuruFocus.com",
+      "published_at": "2026-11-23T11:04:58+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    },
+    {
+      "evidence_id": "E10",
+      "claim_id": "C6",
+      "title": "육아휴직 국민연금 예외와 유예 차이, 추납 방법 | 정부지원사업",
+      "source_url": "//duckduckgo.com/l/?uddg=https%3A%2F%2Fgov.jjyu.co.kr%2Fpolicy%2Fparental%2Dleave%2Dpay%2F%25EA%25B5%25AD%25EB%25AF%25BC%25EC%2597%25B0%25EA%25B8%2588%2F&rut=db5f98b4a8fe77de0848c9b3a0a92fde9ff8869ef18c9cbb5ad9953a7eedd918",
+      "publisher": "duckduckgo.com",
+      "published_at": null,
+      "source_tier": "web",
+      "excerpt": "국민연금 보험료는 육아휴직 동안 납부 예외로 내지 않을 수 있어요. 다만 쉰 달은 가입기간에서 빠지는데, 노령연금은 가입기간이 10년 이상이어야 받을 수 있어 그 빈칸이 나중에 걸릴 수 있습니다."
+    },
+    {
+      "evidence_id": "E11",
+      "claim_id": "C6",
+      "title": "국민연금 추후납부(추납)제도 총정리 (대상기간, 최대 119개월 ...",
+      "source_url": "//duckduckgo.com/l/?uddg=https%3A%2F%2Fwww.policyalarm.kr%2F2026%2F09%2Fgukmin%2Dyeongeum%2Dchunap%2Dguide.html&rut=1abe36f8bc41ae30b35c1a6b4866f77a6c280ce4f1d043a4627f897e56dc57f7",
+      "publisher": "duckduckgo.com",
+      "published_at": null,
+      "source_tier": "web",
+      "excerpt": "국민연금 추후납부 (추납)제도 대상기간, 최대 119개월 한도, 2026년 보험료율 9.5% 기준 보험료 계산법, 분할납부 방법을 실제 숫자로 정리하고 가상 사례로 계산해봤습니다."
+    },
+    {
+      "evidence_id": "E12",
+      "claim_id": "C8",
+      "title": "[차호중의 재테크 칼럼]퇴직자가 알아야 할 국민연금",
+      "source_url": "http://www.kookje.co.kr/news2011/asp/newsbody.asp?code=1700&key=20250314.99099004270",
+      "publisher": "Naver News",
+      "published_at": "2025-03-14T17:53:00+09:00",
+      "source_tier": "news",
+      "excerpt": "국민연금공단으로부터 그동안 납부한 보험료에 이자를 더해 지급받는다. ‘조기노령연금’은 노령연금과 마찬가지로 국민연금 가입기간이 10년 이상인 경우 청구할 수 있다. 조기노령연금은 소득이 있는 업무에..."
+    },
+    {
+      "evidence_id": "E13",
+      "claim_id": "C8",
+      "title": "Mitek to Report Fiscal 2026 Fourth Quarter and Full Year Financial Results on December 10, 2026",
+      "source_url": "https://finance.yahoo.com/markets/stocks/articles/mitek-report-fiscal-2026-fourth-220000733.html",
+      "publisher": "Business Wire",
+      "published_at": "2026-11-23T22:00:00+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    }
+  ],
+  "source_policy": {
+    "raw_transcript_published": false,
+    "raw_transcript_in_evidence": false,
+    "research_pipeline_version": 4,
+    "closed_source_claims": "unverified_external_source",
+    "auto_caption_warning": true,
+    "local_asr_warning": false
+  }
+}

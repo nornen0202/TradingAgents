@@ -1,0 +1,295 @@
+{
+  "version": 4,
+  "video_id": "DPnHLSoKESk",
+  "title": "폭락장에도 한국은행이 금리를 못 내리는 이유",
+  "url": "https://www.youtube.com/watch?v=DPnHLSoKESk",
+  "channel": "경제사냥꾼",
+  "channel_id": "UC7usMJDHmtbs_oegmzQKKMA",
+  "source_url": "https://www.youtube.com/@%EA%B2%BD%EC%A0%9C%EC%82%AC%EB%83%A5%EA%BE%BC/videos",
+  "thumbnail_url": "https://i.ytimg.com/vi/DPnHLSoKESk/maxresdefault.jpg",
+  "published_at": "2026-11-23T11:00:36+00:00",
+  "status": "asr_uncertain",
+  "strategy_source_tier": "STANDARD",
+  "strategy_evidence_weight": "STANDARD",
+  "strategy_validation_policy": "STANDARD_REVIEW",
+  "transcript_status": "available",
+  "transcript_source": "automatic",
+  "transcript_chars": 9462,
+  "transcript_quality": {
+    "status": "good",
+    "score": 1.0,
+    "warnings": [],
+    "source": "automatic",
+    "language": "Korean (Original)",
+    "model_or_format": "json3",
+    "chars": 9462,
+    "segments": 492,
+    "duration_seconds": 951,
+    "repeated_ngram_ratio": 0.0
+  },
+  "generated_at": "2026-11-24T08:14:47.674338+09:00",
+  "llm_status": "success",
+  "research_status": "success",
+  "claim_verification_status": "success",
+  "research_pipeline_version": 4,
+  "evidence_count": 6,
+  "claim_status_summary": {
+    "partially_supported": 1,
+    "unverified": 8,
+    "asr_uncertain": 1
+  },
+  "claims": [
+    {
+      "claim_id": "C1",
+      "claim_text": "영상은 코스피가 6월 22일 종가 9,114에서 11월 21일 4,869로 46% 넘게 하락했지만 2025년 말 대비로는 15% 넘게 올랐다고 한다. 삼성전자는 6월 고점 대비 49% 넘게, SK하이닉스는 6월 종가 고점 대비 약 62%, 코스닥은 4월 종가 고점 대비 47% 넘게 하락했다고 한다. 11월 20일 약세에는 외국인·기관 매도, AI 투자 우려, 높은 금리가 부담이었다고 해석한다.",
+      "status": "partially_supported",
+      "confidence": 0.35,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.91,
+      "asr_confidence": 0.91,
+      "numeric_parse": {
+        "claimed": "코스피 9,114→4,869, 고점 대비 46% 초과 하락·2025년 말 대비 15% 초과 상승. 삼성전자 49% 초과, SK하이닉스 약 62%, 코스닥 47% 초과 하락.",
+        "observed": "yfinance 조회값 4,708.54, 52주 고가 9,385.59. 둘의 차이는 약 −49.83%. 영상 입력값 간 차이 −46.58%는 산술상 일치하지만 해당 종가는 미확인."
+      },
+      "investor_implication": "고점 대비 낙폭과 연초 이후 수익률은 별도로 판단하고, 수급이 확인되더라도 AI 투자 우려나 금리가 당일 하락을 일으켰다고 단정하지 않는다."
+    },
+    {
+      "claim_id": "C2",
+      "claim_text": "영상은 한국은행이 주가 자체보다 물가 안정을 우선하고 주가 하락이 소비·성장·금융 안정에 미치는 영향을 살핀다고 해석한다. 코스피가 고점보다 24~25% 낮았던 7월 16일과 8월 27일에 기준금리를 인상했고, 10월 22일에는 동결하면서 물가가 목표에 안정적으로 수렴한다는 확신을 강조했다고 한다.",
+      "status": "unverified",
+      "confidence": 0.0,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.89,
+      "asr_confidence": 0.85,
+      "numeric_parse": {
+        "claimed": "7월 16일·8월 27일 코스피 고점 대비 −24~−25% 및 기준금리 인상, 10월 22일 동결.",
+        "observed": "해당 일자 종가와 공식 금리 결정 기록 미제공."
+      },
+      "investor_implication": "주가 급락만으로 금리 인하를 예상하지 말고, 금통위 결정문에서 물가·성장·금융안정에 대한 판단이 어떻게 바뀌는지 확인한다."
+    },
+    {
+      "claim_id": "C3",
+      "claim_text": "영상은 아시아경제의 11월 16~19일 조사에서 14명 모두 11월 26일 3.00%→3.25% 인상, 10명은 만장일치 인상을 예상했다고 한다. 별도의 11월 22일 보도에서는 11명 중 1명이 동결을 전망했다고 한다.",
+      "status": "unverified",
+      "confidence": 0.0,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.89,
+      "asr_confidence": 0.72,
+      "numeric_parse": {
+        "claimed": "11월 16~19일 조사: 14명 전원 3.00%→3.25% 전망, 10명 만장일치 예상. 11월 22일 별도 보도: 11명 중 1명 동결 예상.",
+        "observed": "원기사, 조사 기간과 문항, 응답 집계 미제공."
+      },
+      "investor_implication": "설문 응답을 금리 결정이나 시장 확률로 해석하지 말고, 11월 26일 결정과 실제 표결을 별도로 확인한다."
+    },
+    {
+      "claim_id": "C4",
+      "claim_text": "영상은 10월 소비자물가와 식료품·에너지 제외 근원물가가 각각 전년 대비 2.8%로 2% 목표를 웃돌았고, 1월에는 2%, 5월과 8월에는 3%를 넘었다고 한다. 한국은행은 11월 이후에도 2%대 후반을 전망했고, 3분기 실질 GDP 속보치는 전분기 대비 1%였다고 한다. 10월 생활물가는 2.6%, 신선식품은 6% 넘게 하락, 석유류·교통·즉석식품은 각각 약 15%·약 7%·12% 넘게 상승했다고 한다.",
+      "status": "unverified",
+      "confidence": 0.0,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.89,
+      "asr_confidence": 0.9,
+      "numeric_parse": {
+        "claimed": "10월 CPI·근원 CPI 각각 +2.8%, 목표 2%; 1월 CPI +2%, 5·8월 +3% 초과; 11월 이후 +2%대 후반 전망; 3분기 실질 GDP 전기비 +1%; 10월 생활물가 +2.6%, 신선식품 −6% 초과, 석유류 약 +15%, 교통 약 +7%, 즉석식품 +12% 초과.",
+        "observed": "국가데이터처·KOSIS 물가 원표, 한국은행 물가 자료와 GDP 속보 미제공."
+      },
+      "investor_implication": "총지수와 근원지수의 전년비를 각각 확인하고, 생활물가의 일부 품목 변동을 전체 물가 압력의 변화로 해석하지 않는다."
+    },
+    {
+      "claim_id": "C5",
+      "claim_text": "영상은 한국은행이 2008년 8월 인상 후 10월 9일부터 2009년 2월까지 6회 인하(5.25%→2.00%), 2020년 3~5월 2회 인하(1.25%→0.50%)했지만, 2022년에는 7회 인상(1.00%→3.25%)했다고 한다. 코스피 낙폭은 각각 54% 초과·약 36%·34% 초과로, 정책 차이는 낙폭 자체보다 물가·경기·금융불안 및 미국 정책 방향에 있었다고 해석한다.",
+      "status": "unverified",
+      "confidence": 0.0,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:05:24",
+      "source_confidence": 0.89,
+      "asr_confidence": 0.78,
+      "numeric_parse": {
+        "claimed": "2008~09년 6회 인하, 5.25%→2.00%, 코스피 54% 초과 하락; 2020년 2회 인하, 1.25%→0.50%, 약 36% 하락; 2022년 7회 인상, 1.00%→3.25%, 34% 초과 하락.",
+        "observed": "영상 입력값 2,064→939와 2,267→1,457의 낙폭은 각각 약 54.51%, 35.73%. 이는 산술 확인이며 지수값, 정책 결정 횟수 및 2022년 낙폭은 미확인."
+      },
+      "investor_implication": "과거 낙폭을 정책 전환의 기준선으로 삼지 말고, 각 시기의 물가·경기·금융시장 충격과 미국 정책 방향을 비교한다."
+    },
+    {
+      "claim_id": "C6",
+      "claim_text": "영상은 원·달러 환율이 10월 22일 주간 1,324원에서 11월 20일 주간 1,336원, 11월 21일 오전 7시 야간 1,346원으로 올랐으며 여름 고점은 1,550원대였다고 한다. 9월·10월 월평균은 1,359원·1,337원대, 10월 수입물가는 전월비 −1.8%·전년비 +13.5%라고 한다. 한국의 선제 인하가 원화 약세와 수입물가 상승 압력을 더할 수 있지만, 환율은 금리차로만 결정되지 않고 소비자물가 전가에는 시차가 있다는 해석이다.",
+      "status": "unverified",
+      "confidence": 0.0,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:05:24",
+      "source_confidence": 0.91,
+      "asr_confidence": 0.91,
+      "numeric_parse": {
+        "claimed": "주간 1,324원→1,336원, 야간 1,346원; 여름 1,550원대; 9·10월 평균 1,359원·1,337원대; 10월 수입물가 전월비 −1.8%, 전년비 +13.5%; 환율 1% 상승 시 CPI 약 +0.03% 추정.",
+        "observed": "세션별 환율·월평균·수입물가 및 소비자물가 전가 추정 원자료 미제공."
+      },
+      "investor_implication": "같은 거래 세션끼리 환율을 비교하고, 원화 약세가 지속되는지와 원화 기준 수입물가·소비자물가가 실제로 어떻게 움직이는지 별도로 추적한다."
+    },
+    {
+      "claim_id": "C7",
+      "claim_text": "영상은 연준이 9월 16일 3.75~4.00%로 인상하고 10월 28일 10대 2로 동결했으며 반대 2명은 인상을 선호했다고 한다. 11월 20일 연설은 지속되는 물가 압력을 강조했고, 연합인포맥스 11월 21일 보도상 12월 25bp 인상 확률은 91%였다. 한국만 25bp 인상하면 미국 금리 상단 기준 격차가 1.00%p에서 0.75%p로 좁혀지고 미국도 25bp 인상하면 1.00%p가 된다는 조건부 계산을 제시한다.",
+      "status": "unverified",
+      "confidence": 0.0,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:05:24",
+      "source_confidence": 0.9,
+      "asr_confidence": 0.78,
+      "numeric_parse": {
+        "claimed": "미국 3.75~4.00%, 동결 표결 10대 2, 12월 25bp 인상 확률 91%; 한미 금리차 1.00→0.75→1.00%p.",
+        "observed": "영상의 가정대로라면 4.00−3.00=1.00, 4.00−3.25=0.75, 4.25−3.25=1.00%p. 출발 금리·표결·확률은 외부 자료로 미확인."
+      },
+      "investor_implication": "한미 금리차 시나리오는 공식 정책금리로 갱신하고, 12월 인상 기대는 관측 시각이 명시된 자료로 확인한다."
+    },
+    {
+      "claim_id": "C8",
+      "claim_text": "영상은 발표 전 10월 미국 PCE 물가 전망이 헤드라인 3.8%, 근원 3.2%였으며, 8월에서 9월에 이어 10월에도 상승할 것으로 예상됐다고 한다. 발표 예정 시각은 한국시간 11월 25일 22시 30분으로 소개했다.",
+      "status": "unverified",
+      "confidence": 0.0,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:05:24",
+      "source_confidence": 0.9,
+      "asr_confidence": 0.82,
+      "numeric_parse": {
+        "claimed": "10월 PCE 전망 헤드라인 3.8%, 근원 3.2%; 11월 25일 22:30 KST 발표 예정.",
+        "observed": "BEA 공식 발표 일정, 8·9월 당시 공표치, 10월 실적·컨센서스 미제공."
+      },
+      "investor_implication": "BEA 최초 공표치를 같은 기준의 9월 수치 및 발표 직전 컨센서스와 각각 비교한다. 예상 하회와 전월 대비 둔화는 서로 다른 판단이다."
+    },
+    {
+      "claim_id": "C9",
+      "claim_text": "영상은 9월 은행 신규 주택담보대출 평균금리가 전월 대비 0.2%p 상승하고 3분기 말 가계신용이 2,030조 원으로 사상 최대였다고 한다. 한국은행 분석을 인용해 특정 인상 가정에서 가계 이자 부담이 약 3조 3,000억 원 늘고 대출금리 반응이 약 5개월 뒤 가장 크다고 설명한다. 원화 가치가 10% 오르면 연간 가계 생활비가 평균 16만 5,000원 감소한다는 추정도 인용한다.",
+      "status": "asr_uncertain",
+      "confidence": 0.0,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:10:47",
+      "source_confidence": 0.83,
+      "asr_confidence": 0.58,
+      "numeric_parse": {
+        "claimed": "9월 신규 주담대 평균금리 +0.2%p; 3분기 말 가계신용 2,030조 원; 가계 이자 약 +3조 3,000억 원, 최대 반응 약 5개월; 원화 10% 강세 시 연간 평균 생활비 −16만 5,000원.",
+        "observed": "공식 잔액·증감·대출금리 및 추정 원자료 미제공. 인상 가정과 분기 증가액은 자막으로 확정 불가."
+      },
+      "investor_implication": "이자 부담 추정은 인상 폭·대출금리 전가율·산정 기간을 확인하기 전에는 차주별 비용이나 12월~다음 해 1월의 확정 효과로 사용하지 않는다."
+    },
+    {
+      "claim_id": "C10",
+      "claim_text": "영상은 DS투자증권이 1997년 3월 연준 인상 뒤 S&P 500과 나스닥이 저점에서 각각 24일·51일 만에 이전 고점을 되찾았으며, 2027년 1~2월 미국 물가와 소비 증가세가 함께 둔화하면 추가 인상 우려가 줄어 한국 증시에도 반등 여건이 생길 수 있다고 봤다고 전한다. 블룸버그 집계상 미국 물가의 2027년 1분기 둔화 전망을 재인용하고, AI 자금조달 불안과 국내 수요발 물가 압력을 반등 제약 요인으로 제시한다.",
+      "status": "unverified",
+      "confidence": 0.0,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:10:47",
+      "source_confidence": 0.9,
+      "asr_confidence": 0.85,
+      "numeric_parse": {
+        "claimed": "1997년 저점 이후 S&P 500 24일·나스닥 51일 만에 회복; 2027년 1~2월 미국 물가·소비 증가세 동반 둔화 가능성, 1분기 미국 물가 둔화 전망.",
+        "observed": "회복 일수 재현에 필요한 공식 지수 종가, 보고서 및 당시 전망 원자료 미제공."
+      },
+      "investor_implication": "2027년 1~2월은 반등 시한이 아니라 조건을 점검할 구간이다. 미국 물가와 소비 증가세, 추가 인상 기대, 원·달러 환율, AI 기업의 자금조달 여건을 각각 확인한다."
+    }
+  ],
+  "entities": [
+    {
+      "ticker": "^KS11",
+      "name": "국내 증시(코스피·코스닥·삼성전자·SK하이닉스)",
+      "status": "unverified",
+      "claims": [
+        "국내 증시는 고점 대비 크게 하락했고, 삼성전자와 SK하이닉스도 큰 폭으로 밀렸다. 다만 코스피는 전년 말 수준을 웃돌았다고 영상은 설명한다.",
+        "영상은 11월 20일 주가 약세의 배경으로 AI 투자 우려와 외국인·기관 매도를 들고, 높은 금리도 기업의 차입 비용과 주식 매수 여력에 부담을 준다고 해석한다."
+      ],
+      "numeric_claims": [
+        "코스피 종가: 6월 22일 사상 최고치 9,114 → 11월 21일 4,869(고점 대비 46% 초과 하락). 전년 말 대비로는 15% 초과 상승.",
+        "삼성전자: 6월 고점 대비 49% 초과 하락. SK하이닉스: 6월 종가 고점 대비 약 62% 하락. 코스닥: 4월 종가 고점 대비 47% 초과 하락."
+      ],
+      "verification_notes": [
+        "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+      ],
+      "market_snapshot": {
+        "ticker": "^KS11",
+        "as_of": "2026-11-23T23:16:48.994884+00:00",
+        "current_price": 4708.54,
+        "market_cap": null,
+        "forward_pe": null,
+        "trailing_pe": null,
+        "fifty_two_week_high": 9385.59,
+        "fifty_two_week_low": 0.0,
+        "average_target_price": null,
+        "source": "yfinance",
+        "status": "verified"
+      },
+      "external_context_status": "verified"
+    }
+  ],
+  "evidence": [
+    {
+      "evidence_id": "E1",
+      "claim_id": "C1",
+      "title": "Canada and Ontario back Ford Oakville revamp with C$928.5m",
+      "source_url": "https://finance.yahoo.com/economy/policy/articles/canada-ontario-back-ford-oakville-163934313.html",
+      "publisher": "Just Auto",
+      "published_at": "2026-11-23T16:39:34+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "Canada and Ontario back Ford Oakville revamp with C$928.5m Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 2026 Elections Weather Newsletters..."
+    },
+    {
+      "evidence_id": "E2",
+      "claim_id": "C1",
+      "title": "BC-Sugar Futures",
+      "source_url": "https://finance.yahoo.com/markets/commodities/articles/bc-sugar-futures-150032009.html",
+      "publisher": "Associated Press",
+      "published_at": "2026-11-23T15:00:32+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "BC-Sugar Futures Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 2026 Elections Weather Newsletters Finance My portfolio News Markets Researc..."
+    },
+    {
+      "evidence_id": "E4",
+      "claim_id": "C2",
+      "title": "i-80 Gold Announces the Start of Production Mining at Archimedes Underground",
+      "source_url": "https://finance.yahoo.com/markets/commodities/articles/80-gold-announces-start-production-231200201.html",
+      "publisher": "PR Newswire",
+      "published_at": "2026-11-23T23:12:00+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "i-80 Gold Announces the Start of Production Mining at Archimedes Underground Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 2026 Elections W..."
+    },
+    {
+      "evidence_id": "E5",
+      "claim_id": "C2",
+      "title": "Cerrado Gold Inc (CRDOF) (Q3 2026) Earnings Call Highlights: Record EBITDA, Transformational ...",
+      "source_url": "https://finance.yahoo.com/markets/commodities/articles/cerrado-gold-inc-crdof-q3-230027046.html",
+      "publisher": "GuruFocus.com",
+      "published_at": "2026-11-23T23:00:27+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    },
+    {
+      "evidence_id": "E6",
+      "claim_id": "C4",
+      "title": "Energy & Utilities Roundup: Market Talk",
+      "source_url": "https://finance.yahoo.com/m/6996a574-6f84-3008-828f-b4c828bfc8c2/energy-%26-utilities-roundup%3A.html",
+      "publisher": "The Wall Street Journal",
+      "published_at": "2026-11-23T21:55:00+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    }
+  ],
+  "source_policy": {
+    "raw_transcript_published": false,
+    "raw_transcript_in_evidence": false,
+    "research_pipeline_version": 4,
+    "closed_source_claims": "unverified_external_source",
+    "auto_caption_warning": true,
+    "local_asr_warning": false
+  }
+}

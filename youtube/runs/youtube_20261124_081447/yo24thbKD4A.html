@@ -1,0 +1,769 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YouTube 투자자용 검증 리포트 - 젠슨 황 전격 복귀! 트럼프까지 직접 나섰다…엔비디아 30%대 급등 | 여도은, 박명석 큐레이터 [월가 뉴스레터]</title>
+  <style>
+:root {
+  color-scheme: light;
+  --bg: #f7f8fb;
+  --panel: #ffffff;
+  --text: #172033;
+  --muted: #667085;
+  --line: #d9dee8;
+  --accent: #0f766e;
+  --accent-2: #2563eb;
+  --warn: #b45309;
+  --bad: #b42318;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0 56px; }
+a { color: var(--accent-2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.hero { padding: 28px 0 22px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+.hero.compact { padding-top: 12px; }
+.hero h1 { margin: 0; font-size: clamp(28px, 4vw, 44px); line-height: 1.15; letter-spacing: 0; }
+.hero p { max-width: 760px; color: var(--muted); margin: 12px 0 0; }
+.eyebrow { color: var(--accent); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0; margin: 0 0 8px; }
+section { margin: 28px 0; }
+h2, h3, h4, h5 { letter-spacing: 0; line-height: 1.25; }
+.synthesis-callout { padding: clamp(20px, 4vw, 34px); border: 1px solid #6ee7d8; border-radius: 18px; background: linear-gradient(135deg, #ecfdf9 0%, #eff6ff 100%); box-shadow: 0 18px 44px rgba(15, 118, 110, .12); }
+.synthesis-callout.unavailable { border-color: var(--line); background: var(--panel); box-shadow: none; }
+.synthesis-callout h2 { margin: 0; font-size: clamp(24px, 3.2vw, 36px); }
+.synthesis-callout .lead { max-width: 900px; font-size: 17px; color: #334155; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.primary-link, .secondary-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border-radius: 999px; font-weight: 800; }
+.primary-link { color: white; background: var(--accent); }
+.secondary-link { color: var(--accent-2); border: 1px solid #93c5fd; background: white; }
+.primary-link:hover, .secondary-link:hover { text-decoration: none; filter: brightness(.97); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.card, .run { display: flex; flex-direction: column; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; color: var(--text); min-height: 128px; }
+.run { padding: 16px; }
+.card:hover, .run:hover { border-color: var(--accent-2); text-decoration: none; }
+.thumb { display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #e9edf5; border-radius: 8px 8px 0 0; color: var(--muted); font-size: 13px; font-weight: 700; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb-empty span { padding: 0 14px; text-align: center; }
+.card-body { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 16px; }
+.card strong { line-height: 1.35; }
+.source-line { color: #3f4a5f; font-weight: 600; }
+.runs { display: grid; gap: 10px; }
+.badge { display: inline-flex; width: fit-content; border-radius: 999px; padding: 2px 9px; background: #e6f4f1; color: var(--accent); font-size: 12px; font-weight: 700; }
+.status-contradicted, .status-llm_failed { background: #fee4e2; color: var(--bad); }
+.status-unverified, .status-stale { background: #fff4d6; color: var(--warn); }
+small, .muted { color: var(--muted); }
+.topnav { display: flex; gap: 14px; margin-bottom: 16px; font-size: 14px; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px; }
+.stats span { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
+.report { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: min(5vw, 36px); }
+.report-head { border-bottom: 1px solid var(--line); margin-bottom: 24px; padding-bottom: 20px; }
+.report-head h1 { margin: 0; font-size: clamp(24px, 3.5vw, 38px); line-height: 1.2; }
+.meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+.scope-note { padding: 12px 14px; border-left: 4px solid var(--warn); border-radius: 6px; background: #fff7ed; color: #7c2d12; }
+.synthesis-report h2 { margin-top: 34px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.synthesis-report h3 { margin: 24px 0 8px; color: #0f4c5c; }
+.synthesis-report p, .synthesis-report li { overflow-wrap: anywhere; }
+pre { overflow: auto; background: #111827; color: #f9fafb; border-radius: 8px; padding: 14px; }
+code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+details { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 18px; }
+@media (max-width: 640px) {
+  main { width: min(100% - 20px, 1120px); padding-top: 18px; }
+  .report { padding: 18px; }
+  .synthesis-callout { border-radius: 14px; padding: 18px; }
+  .cta-row a { width: 100%; }
+  .mobile-report { border-radius: 12px; }
+}
+</style>
+</head>
+<body>
+  <main>
+<nav class="topnav"><a href="index.html">실행 목록</a><a href="../../index.html">YouTube 홈</a></nav>
+<article class="report">
+  <header class="report-head">
+    <p class="eyebrow">youtube_20261124_081447</p>
+    <h1>젠슨 황 전격 복귀! 트럼프까지 직접 나섰다…엔비디아 30%대 급등 | 여도은, 박명석 큐레이터 [월가 뉴스레터]</h1>
+    <div class="meta">
+      <span class="badge status-asr_uncertain">asr_uncertain</span>
+      <a href="https://www.youtube.com/watch?v=yo24thbKD4A">원본 영상</a>
+    </div>
+  </header>
+  <h2>엔비디아 ‘젠슨 황 복귀·32~33% 급등’ 검증 리포트</h2>
+<p><a href="https://www.youtube.com/watch?v=yo24thbKD4A">삼프로TV 월가 뉴스레터</a> · 2026년 11월 24일 공개(한국시간) · 43분 48초</p>
+<p><strong>핵심 결론:</strong> 제공된 시장 자료에서 영상과 맞아떨어지는 것은 엔비디아(NVDA)의 <strong>시가총액이 약 4조 달러였다는 한 시점의 수치</strong>뿐이다. 젠슨 황의 퇴임·복귀, 이사회 만장일치, 트럼프의 관여, 하루 32~33% 상승과 역대 3위 기록, 숏커버의 기여는 확인되지 않았다. 약 4조 달러라는 시총 수준이 맞더라도, 저점에서 그 수준까지 회복했다는 경로나 상승 원인이 입증되는 것은 아니다.</p>
+<h3>영상 주장과 확인된 사실·근거</h3>
+<p>| 쟁점·영상 구간 | 영상 주장 | 확인된 사실·근거 |</p>
+<p>| --- | --- | --- |</p>
+<p>| <strong>엔비디아 경영진·정치 개입</strong> <a href="https://www.youtube.com/watch?v=yo24thbKD4A&amp;t=0s">00:00:00</a> | 젠슨 황이 퇴임 약 2주 만에 이사회 만장일치로 복귀했고, 트럼프가 이사회에 접촉해 복귀를 지지했다고 밝혔다고 전했다. Arm CEO의 2033년까지 재계약과 칼시의 후임 후보 확률 변화도 언급했다. | 미확인. 퇴임·복귀 효력일, 표결, 발언 원문을 뒷받침하는 자료가 없다. 트럼프가 접촉했다고 <strong>발언했는지</strong>, 접촉이 <strong>실제로 있었는지</strong>, 접촉이 <strong>이사회 결정에 영향을 줬는지</strong>는 별개다. 칼시 확률은 이사회 결정의 증거가 아니다. |</p>
+<p>| <strong>NVDA 주가·수급</strong> <a href="https://www.youtube.com/watch?v=yo24thbKD4A&amp;t=0s">00:00:00</a>~00:32:21 | NVDA가 하루 32~33% 올라 역대 3위를 기록하고, 시총이 3조 달러 초반에서 약 4조 달러로 회복했다고 전했다. AI주·주요 지수 반등, 공매도 손실 122억 달러, 개인의 기술 ETF 순매도 2억 달러 초과, 미국 증시 주간 시총 감소 6조 달러도 소개했다. | <strong>일부 부합.</strong> 호스트가 제공한 yfinance 단일 조회값(11월 23일 23:53 UTC)은 <strong>165.05달러, 시총 약 3조 9,855억 달러</strong>다. 거래 세션과 비교 종가가 없어 일간 수익률·역대 순위·시총 회복 경로는 검산할 수 없다. 지수·수급 수치도 미확인이다. 122억 달러의 집계 범위는 불명확하며 NVDA나 오라클(ORCL)에 귀속할 수 없다. 오라클은 영상에서 AI 관련주 중 하나로 언급됐다. |</p>
+<p>| <strong>규제·통상</strong> <a href="https://www.youtube.com/watch?v=yo24thbKD4A&amp;t=765s">00:12:45</a>~00:25:45 | 12월 3일 미 상원 은행위원회 청문회, ‘메가스피드’로 식별된 업체의 수출통제 명단 등재, 중국·EU·일본·대만 등을 포함한 16개 대상의 무역법 301조 조사를 언급했다. | 모두 미확인. 청문회 일정·증인, 업체의 정확한 법인명·등재 효력일, 조사 대상 목록이 없다. 청문회 개최, 조사 개시, 명단 등재, 관세 발효는 각각 다른 사건이다. |</p>
+<p>| <strong>물가·금리·유동성</strong> <a href="https://www.youtube.com/watch?v=yo24thbKD4A&amp;t=1155s">00:19:15</a>~00:32:21 | 미국 물가가 9월 전년 대비 3.6%에서 다음 발표 때 3.8%로 오를 것이라는 전망, BofA의 2027년 미 10년물 금리 약 4.75% 전망, 빌 애크먼의 발행 증가·추가 금리 인상·침체 경고와 트럼프의 이란 관련 발언을 소개했다. 원유 배럴당 80달러, 비트코인 5만 달러, 대만의 역대 최대 신용거래 강제청산도 언급했다(일부 00:00:00 구간). | 물가 지표는 PCE로 추정되나 확정할 수 없고, 헤드라인·근원 구분도 불명확하다. 3.8%는 영상이 소개한 <strong>전망</strong>이지 확인된 실측이 아니며, 4.75% 역시 <strong>전망 인용</strong>이지 현재 금리가 아니다. 유종·계약월과 BTC 거래소·시각, 대만 청산의 정의와 비교 이력이 없어 동시 유동성 충격을 단정할 수 없다. |</p>
+<p>| <strong>월가 전망</strong> <a href="https://www.youtube.com/watch?v=yo24thbKD4A&amp;t=765s">00:12:45</a>~00:38:30 | 댄 아이브스의 NVDA 목표가 225달러 유지, 멜리우스의 투자의견 상향과 220달러 목표가(요약서 200달러), RBC의 S&amp;P 500 12개월 상승 여력 약 16%와 국채수익률 6% 초과 위험을 전했다. 모건스탠리·야데니의 낙관론과 JP모건·골드만삭스·시타델의 신중론도 대조했다. | 원노트나 검증 가능한 직접 인용이 없다. 멜리우스의 220달러와 200달러는 불일치 상태이며, 도이치뱅크 지수 목표치는 잘린 자막으로 복원할 수 없다. 평균 목표가 스냅샷은 개별 애널리스트 의견을 뒷받침하지 않으며, 전략가 의견은 실제 자금 흐름과 다르다. |</p>
+<h3>후반부 기업 뉴스: 가격과 사건은 별개</h3>
+<p><a href="https://www.youtube.com/watch?v=yo24thbKD4A&amp;t=1543s">00:25:43</a>~00:38:30, 주요 기업 뉴스는 <a href="https://www.youtube.com/watch?v=yo24thbKD4A&amp;t=1938s">00:32:18</a>부터다. 아래 가격은 위와 같은 시각대의 yfinance 단일 조회값으로, 발표 전후 수익률이나 사건의 존재를 입증하지 않는다.</p>
+<p>| 영상 주장 | 확인된 범위와 관찰 항목 |</p>
+<p>| --- | --- |</p>
+<p>| <strong>앤트로픽·스페이스X:</strong> 앤트로픽 상장 초기 가격·옵션 개시·주가 하락, 스페이스X의 컴퓨팅 임대 수익성, 구글 관련 거래, 제프리스 목표가 210달러 | 앤트로픽의 법인·티커·상장·옵션 공지를 먼저 확인해야 한다. 83달러를 공모가로 볼 근거도, 하락을 젠슨 황 복귀나 오픈소스 경쟁에 귀속할 근거도 없다. 스페이스X 관련 거래 당사자·계약 구조와 제프리스 목표가 대상 증권도 미확인이다. |</p>
+<p>| <strong>어플라이드 디지털·퍼미 추정 업체:</strong> APLD가 하이퍼스케일러 계약 후 19% 상승했고, 별도 업체는 아마존의 계약 이행과 자금 수령 후 반등 | APLD 표시 가격은 <strong>13.82달러</strong>. 계약과 19% 상승은 미확인이다. 상대방·계약 구속력·지급 조건을 확인하고, 별도 업체는 법인과 티커부터 식별해 지급 약정과 실제 수령을 구분해야 한다. |</p>
+<p>| <strong>크라우드스트라이크·지스케일러:</strong> 439억 달러 전액 주식 인수, ZS 1주당 CRWD 1.135주, 인수자 하락·피인수자 상승 | CRWD 표시 가격은 <strong>208.97달러</strong>. 합병계약·양사 공시·ZS 시세가 없어 거래 자체와 조건, 주가 반응 모두 미확인이다. 마벨·루멘텀 비교도 확인되지 않았다. |</p>
+<p>| <strong>딥마인드·클로드:</strong> 양자 관련 비용 290배 절감, 별도로 160년 미해결 문제 해결 | 연구 원문과 비교 기준이 없다. 290배를 금전 비용 절감이나 상용화 성과로 해석할 수 없다. 클로드가 풀었다는 문제명·증명·독립 검증이 없으며, 리만 가설 해결로 볼 근거는 없다. |</p>
+<p>| <strong>테슬라·유나이티드헬스:</strong> FSD V15 개선과 JP모건 중립 유지, 트럼프의 재게시를 계기로 제기된 국가 운영 건강보험 전환 관측 | 표시 가격은 TSLA <strong>385.46달러</strong>, UNH <strong>336.08달러</strong>. FSD 버전·배포 범위·변경 사항과 JP모건 의견은 미확인이다. UNH 급락도 단일 가격으로는 확인할 수 없고, 재게시가 정책 채택이나 주가 하락의 증거는 아니다. |</p>
+<p>| <strong>AMC·한미 장세:</strong> 헝거 게임 개봉과 AMC 10% 반등, 추수감사절 주간 휴장·단축 거래, 한국장 반등 기대 | AMC 표시 가격은 <strong>2.86달러</strong>. 10% 수익률과 개봉 효과, 미 증시 공식 거래 일정, 11월 24일 한국장 결과는 제공 자료로 확인되지 않았다. 한국장 반등은 방송 당시 기대였다. |</p>
+<h3>상승 논리와 무효화 조건</h3>
+<ul>
+<li><strong>경영 불확실성 완화:</strong> 복귀가 공식 확인되고 직책·권한·효력일이 명확해지면 경영 공백 우려가 줄어들 수 있다. 그러나 복귀가 확인되지 않거나 실제 권한이 영상 설명과 다르면 이 논리의 전제가 성립하지 않는다. 복귀가 사실이어도 수출통제로 고객·제품 접근이 제한되면 경영 안정이 매출 개선으로 이어진다고 볼 수 없다.</li>
+<li><strong>AI주 전반의 반등:</strong> NVDA뿐 아니라 여러 AI 관련주가 후속 정규장에서도 상승분을 유지하고, 공시된 인프라 계약이 구속력 있는 주문과 현금 유입으로 이어진다면 단기 수급 이상의 설명이 가능하다. 반대로 종가 재계산에서 급등 수치가 맞지 않으면 헤드라인의 수치 주장은 무효다. 상승이 한 세션에 그치고 동반 강세가 사라지면 지속적 재평가 논리도 약해진다. 공매도 손실만으로 환매수를 확인할 수는 없다.</li>
+<li><strong>금리·유동성의 반론:</strong> 물가가 예상보다 높고 장기금리와 달러가 함께 오르면 AI 성장주의 밸류에이션에 부담이 될 수 있다. 반대로 물가와 금리가 안정되고 반등 참여 종목이 늘면 단기 숏커버만으로 반등을 설명하기 어려워진다. 어느 쪽도 현재 자료로 확정할 수 없다.</li>
+</ul>
+<h3>단기 체크포인트</h3>
+<p>1. <strong>복귀·가격부터:</strong> <a href="https://investor.nvidia.com/">엔비디아 IR</a>과 <a href="https://www.sec.gov/edgar/search/">SEC EDGAR</a>에서 퇴임·복귀 효력일, 직책, 표결 공개 여부를 확인하고 <a href="https://www.whitehouse.gov/">백악관 공개 기록</a>에서 트럼프 발언을 별도로 대조한다. <a href="https://finance.yahoo.com/quote/NVDA/history/">NVDA 과거 시세 조회</a>에서 11월 20일과 23일의 분할 조정 정규장 종가를 비교하고, 장중·시간외 움직임은 따로 본다. 이후 2~3개 정규장의 상승분 유지 여부, AI주 동반 강세, 공매도 포지션 변화를 살핀다.</p>
+<p>2. <strong>11월 26~27일·12월 3일 일정:</strong> <a href="https://www.nyse.com/markets/hours-calendars">NYSE 거래 일정</a>에서 휴장·단축 여부와 종료 시각을, <a href="https://data.krx.co.kr/">KRX 정보데이터시스템</a>에서 11월 24일 한국장 시가·종가와 12월 만기 관련 외국인 포지션을 확인한다. 영상에서 언급한 12월 3일 청문회는 <a href="https://www.banking.senate.gov/hearings/">상원 은행위원회</a>의 의제·증인 명단이 기준이다. <a href="https://www.federalregister.gov/">미 연방관보</a>와 <a href="https://ustr.gov/">USTR</a>에서는 법인명, 조사 대상과 실제 발효일을 구분한다.</p>
+<p>3. <strong>물가·금리와 비공개 자료:</strong> <a href="https://www.bea.gov/data/personal-consumption-expenditures-price-index">BEA</a>·<a href="https://www.bls.gov/cpi/">BLS</a> 발표에서 지표명과 실측을 확인하고, 발표 전 예상치 및 <a href="https://fred.stlouisfed.org/series/DGS10">미 10년물 금리 실측</a>과 구분한다. <strong>블룸버그의 이사회 압박 보도, 모닝스타 등 원문이 제공되지 않은 출처, 증권사 고객 전용 노트, 비공개 이사회·직원 발언, 공급업체의 수급·청산 추정치는 미검증·수동 확인 필요</strong>다. 위 링크는 원자료 확인 경로이며, 해당 주장이 확인됐다는 인용이 아니다.</p>
+<h3>자료 신뢰도와 해석 한계</h3>
+<p>한국어 자동자막의 전체 품질(<code>transcript_quality</code>)은 <strong>양호(1.00)</strong>였지만, 이는 고유명사·수치의 정확도나 사실 여부를 보증하지 않는다. 타임스탬프는 발언의 정확한 초가 아니라 해당 자막 구간의 시작점이다. 주장 검증의 <code>source_confidence</code>는 관련 외부 근거의 강도, <code>asr_confidence</code>는 자막에서 발언을 식별한 확신이다. 각각 <strong>복귀·개입 0.00/0.88</strong>, <strong>NVDA 가격·수급 0.63/0.80</strong>, <strong>규제·통상 0.00/0.71</strong>, <strong>물가·금리 0.00/0.56</strong>이다. 가격·수급의 외부 근거는 시총 한 시점에만 해당하며, 두 점수 모두 주장이 참일 확률은 아니다.</p>
+<p>수집된 웹 결과 5건은 광산·파키스탄 무역수지·방산 소재 등으로, 연결된 주장을 지지하거나 반박하지 않는다. 관련 뉴스·공시 조회 장애 역시 사건이 없었다는 증거가 아니다. 따라서 이 영상의 핵심 투자 논리는 <strong>공식 인사 공시, 비교 가능한 종가 이력, 반등의 지속성</strong>이 각각 확인되기 전까지 조건부 시나리오로 남는다.</p>
+  <details>
+    <summary>공개 요약 JSON</summary>
+    <pre>{
+  &quot;version&quot;: 4,
+  &quot;video_id&quot;: &quot;yo24thbKD4A&quot;,
+  &quot;title&quot;: &quot;젠슨 황 전격 복귀! 트럼프까지 직접 나섰다…엔비디아 30%대 급등 | 여도은, 박명석 큐레이터 [월가 뉴스레터]&quot;,
+  &quot;url&quot;: &quot;https://www.youtube.com/watch?v=yo24thbKD4A&quot;,
+  &quot;channel&quot;: &quot;삼프로TV 3PROTV&quot;,
+  &quot;channel_id&quot;: &quot;UChlv4GSd7OQl3js-jkLOnFA&quot;,
+  &quot;source_url&quot;: &quot;https://www.youtube.com/@3protv/videos&quot;,
+  &quot;thumbnail_url&quot;: &quot;https://i.ytimg.com/vi/yo24thbKD4A/maxresdefault.jpg&quot;,
+  &quot;published_at&quot;: &quot;2026-11-23T22:17:21+00:00&quot;,
+  &quot;status&quot;: &quot;asr_uncertain&quot;,
+  &quot;strategy_source_tier&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_evidence_weight&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_validation_policy&quot;: &quot;STANDARD_REVIEW&quot;,
+  &quot;transcript_status&quot;: &quot;available&quot;,
+  &quot;transcript_source&quot;: &quot;automatic&quot;,
+  &quot;transcript_chars&quot;: 21950,
+  &quot;transcript_quality&quot;: {
+    &quot;status&quot;: &quot;good&quot;,
+    &quot;score&quot;: 1.0,
+    &quot;warnings&quot;: [],
+    &quot;source&quot;: &quot;automatic&quot;,
+    &quot;language&quot;: &quot;Korean&quot;,
+    &quot;model_or_format&quot;: &quot;json3&quot;,
+    &quot;chars&quot;: 21950,
+    &quot;segments&quot;: 1262,
+    &quot;duration_seconds&quot;: 2628,
+    &quot;repeated_ngram_ratio&quot;: 0.001
+  },
+  &quot;generated_at&quot;: &quot;2026-11-24T08:14:47.674338+09:00&quot;,
+  &quot;llm_status&quot;: &quot;success&quot;,
+  &quot;research_status&quot;: &quot;success&quot;,
+  &quot;claim_verification_status&quot;: &quot;success&quot;,
+  &quot;research_pipeline_version&quot;: 4,
+  &quot;evidence_count&quot;: 5,
+  &quot;claim_status_summary&quot;: {
+    &quot;unverified&quot;: 9,
+    &quot;partially_supported&quot;: 1,
+    &quot;asr_uncertain&quot;: 2
+  },
+  &quot;claims&quot;: [
+    {
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;claim_text&quot;: &quot;영상은 젠슨 황이 퇴임 약 2주 뒤 이사회 만장일치로 복귀했고, 트럼프가 이사회와 접촉해 복귀를 지지했다고 밝혔다고 전한다. Arm CEO의 2033년까지 재계약, 칼시의 후임 후보 확률 변화, 블룸버그의 이사회 압박 보도도 언급한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.88,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;퇴임 후 약 2주; Arm CEO 재계약 2033년까지&quot;,
+        &quot;observed&quot;: &quot;퇴임·복귀 효력일, Arm 계약 원문, 칼시 체결 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;복귀나 경영 공백 해소를 투자 전제에 넣기 전에 엔비디아 공시에서 직책과 효력일을 확인한다. 칼시 거래는 이사회 판단의 증거가 아니다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;claim_text&quot;: &quot;영상은 NVDA가 하루 32~33% 올라 역대 3위 상승률을 기록했고, 시총이 3조 달러 초반에서 약 4조 달러로 회복했다고 전한다. AI주와 주요 지수 반등, 공매도 손실 122억 달러, 개인의 기술 ETF 순매도 2억 달러 초과, 미국 증시 주간 시총 감소 6조 달러도 언급한다. 숏커버의 기여는 가설이다.&quot;,
+      &quot;status&quot;: &quot;partially_supported&quot;,
+      &quot;confidence&quot;: 0.98,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.63,
+      &quot;asr_confidence&quot;: 0.8,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;NVDA +32~33%, 역대 3위; 시총 3조 달러 초반→약 4조 달러; 공매도 손실 122억 달러; 기술 ETF 순매도 2억 달러 초과; 주간 시총 감소 6조 달러&quot;,
+        &quot;observed&quot;: &quot;NVDA 165.05달러, 시총 3.9855조 달러(단일 스냅샷); 수익률·순위·수급 미확인&quot;
+      },
+      &quot;investor_implication&quot;: &quot;확인 가능한 수치는 스냅샷의 시총 수준뿐이다. 가격 이력과 포지션 자료를 대조하기 전에는 급등률이나 숏커버를 매매 근거로 쓰지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;claim_text&quot;: &quot;영상은 12월 3일 미 상원 은행위원회 청문회, ‘메가스피드’로 들리는 업체의 수출통제 명단 등재, 중국·유럽·일본·대만 등을 포함한 16개 대상의 무역법 301조 조사를 언급한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:12:45&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.71,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;12월 3일 청문회; 301조 조사 대상 16개&quot;,
+        &quot;observed&quot;: &quot;위원회 공식 일정, BIS 등재 문서, USTR 대상 목록 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;공식 공고에서 대상 법인·관할권·효력일을 확인하기 전에는 수출 제한이나 추가 관세를 확정된 비용으로 반영할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;claim_text&quot;: &quot;영상은 ‘PC’로 들리는 미국 물가 지표가 9월 전년 대비 3.6%에서 다음 발표 때 3.8%로 오를 전망이며, BofA가 2027년 미 10년물 금리를 약 4.75%로 봤다고 전한다. 애크먼의 발행 증가·추가 금리 인상·침체 경고와 트럼프의 이란 관련 발언도 소개한다.&quot;,
+      &quot;status&quot;: &quot;asr_uncertain&quot;,
+      &quot;confidence&quot;: 0.98,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:19:15&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.56,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;9월 전년 대비 3.6%→다음 발표 전망 3.8%; 2027년 미 10년물 약 4.75%; 별도 ‘4.5 5’&quot;,
+        &quot;observed&quot;: &quot;지표명·실측·컨센서스·금리 전망의 기준 시점 및 시나리오 미확인&quot;
+      },
+      &quot;investor_implication&quot;: &quot;3.8%를 발표 실측으로, 4.75%를 현재 금리로, 침체 경고를 확정된 결과로 인용하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;claim_text&quot;: &quot;영상은 유가가 배럴당 80달러까지 하락했고, 비트코인이 주말 청산 국면에서 5만 달러까지 밀렸으며, 대만에서 사상 최대 규모의 마진 청산이 있었다고 전한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.82,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;원유 80달러/배럴; BTC 50,000달러; 대만 마진 청산 역대 최대&quot;,
+        &quot;observed&quot;: &quot;비교 가능한 원유·BTC 가격 이력 및 대만 청산 통계 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;자산별 가격 하락과 강제청산을 별도로 확인하기 전에는 여러 시장에서 동시에 유동성 충격이 발생했다고 단정할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;claim_text&quot;: &quot;영상은 댄 아이브스의 NVDA 목표가 225달러 유지, 멜리우스의 보유→매수 상향 및 220달러 목표가(요약서 200달러), 모건스탠리·야데니의 매수 기회 해석, JP모건·골드만삭스·시타델의 신중론, RBC의 S&amp;P 500 12개월 약 16% 상승 여력과 국채수익률 6% 초과 위험을 전한다. 도이치뱅크 목표치는 잘려 있으며, JP모건의 TSLA 중립 유지도 별도로 언급한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:12:45&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.77,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;아이브스 225달러; 멜리우스 220달러 또는 요약서 200달러; RBC 12개월 약 +16%, 금리 6% 초과 위험; 도이치뱅크 ‘9,’&quot;,
+        &quot;observed&quot;: &quot;개별 원노트와 직접 인용 없음; 멜리우스 불일치 미해결, 도이치뱅크 수치 복원 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;개별 목표가와 지수 전망은 발행일·투자 시계·기준가가 확인되기 전에는 직접 비교하지 않는다. 매수 기회라는 의견은 실제 매수와 다르다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;claim_text&quot;: &quot;영상은 앤트로픽의 상장 초기 83달러 공모가로 들리는 가격, 80달러 후반~90달러 거래, 옵션 거래 개시와 당일 하락을 언급한다. 별도로 머스크의 AI 개발 속도 불만, 스페이스X 컴퓨팅 임대 수익성 전망, 구글 관련 거래, 제프리스 210달러 목표가를 소개한다.&quot;,
+      &quot;status&quot;: &quot;asr_uncertain&quot;,
+      &quot;confidence&quot;: 0.97,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:25:43&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.61,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;83달러(공모가 추정); 80달러 후반~90달러; 제프리스 210달러&quot;,
+        &quot;observed&quot;: &quot;공모가·체결가·옵션 개시일·목표가 대상 미확인&quot;
+      },
+      &quot;investor_implication&quot;: &quot;법인과 티커가 확인되기 전에는 가격을 인용하지 않는다. 임대 수익성 전망을 계약 실적과 구분하고, 앤트로픽 주가 움직임을 젠슨 황 복귀에 귀속하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;claim_text&quot;: &quot;영상은 어플라이드 디지털이 하이퍼스케일러 계약 발표 후 19% 올랐고, ‘펌미’로 들리는 업체가 아마존의 계약 의무 이행과 자금 수령 후 저점에서 반등했다고 전한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:32:18&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.72,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;APLD +19%; ‘펌미’ 저점 대비 반등률 미제시&quot;,
+        &quot;observed&quot;: &quot;APLD 13.82달러(단일 스냅샷); 비교 가격·지급액 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;계약 발표와 현금 수령은 구분한다. 상대방, 구속력, 지급 조건, 실제 수령 여부를 확인하기 전에는 수주나 유동성 개선 효과를 산정하기 어렵다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;claim_text&quot;: &quot;영상은 크라우드스트라이크가 지스케일러를 439억 달러 규모의 전액 주식 거래로 인수하기로 했고, ZS 1주당 CRWD 1.135주를 지급한다고 전한다. 인수자 하락·피인수자 상승을 마벨·루멘텀 사례와 비교한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:32:18&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.85,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;439억 달러 전액 주식교환; ZS 1주당 CRWD 1.135주&quot;,
+        &quot;observed&quot;: &quot;CRWD 208.97달러(단일 스냅샷); 거래 문서·교환비율·가치 산정 근거 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;합병계약과 양사 공시를 확보하기 전에는 교환비율로 인수가격·합병 스프레드를 계산하거나 거래를 확정된 사건으로 보도하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C10&quot;,
+      &quot;claim_text&quot;: &quot;영상은 딥마인드가 AI로 양자 관련 비용을 290배 줄였다고 전하고, 별도로 클로드가 160년간 풀리지 않은 문제를 해결했다고 언급한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:32:18&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.72,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;양자 관련 비용 290배 절감; 160년 미해결 문제&quot;,
+        &quot;observed&quot;: &quot;연구 원문·측정 단위·비교 기준·문제명·증명 미확인&quot;
+      },
+      &quot;investor_implication&quot;: &quot;연구 지표의 개선을 실제 금전 비용 절감, 상용화 진척 또는 기업 실적 개선으로 환산할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C11&quot;,
+      &quot;claim_text&quot;: &quot;영상은 테슬라 FSD V15의 비전·시각화·내비게이션·주행 아키텍처 개선을 전한다. 별도로 UNH 급락과 트럼프의 재게시를 언급하며 국가 운영 건강보험으로 전환될 수 있다는 관측을 소개한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:32:18&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.85,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;FSD V15; UNH 급락폭 미제시&quot;,
+        &quot;observed&quot;: &quot;TSLA 385.46달러, UNH 336.08달러(단일 스냅샷); 버전 배포·UNH 수익률 미확인&quot;
+      },
+      &quot;investor_implication&quot;: &quot;FSD 변경은 실제 배포 범위와 검증된 기능으로 평가하고, UNH 정책 리스크는 입법·행정 조치가 확인되기 전까지 시나리오로 구분한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C12&quot;,
+      &quot;claim_text&quot;: &quot;영상은 헝거 게임 개봉과 함께 AMC가 간밤 10% 반등했고, 추수감사절 주간 미국장이 목요일 휴장·금요일 단축 거래라고 전한다. 한국장 반등은 방송 시점의 기대였다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:32:18&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.84,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;AMC +10%; 추수감사절 주간 ‘3.5일’ 거래&quot;,
+        &quot;observed&quot;: &quot;AMC 2.86달러(단일 스냅샷); 수익률·11월 26~27일 공식 일정·11월 24일 KRX 시세 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;거래 일정은 공식 휴장표의 종료시각에 맞춰 확인한다. AMC의 가격 반응과 개봉 효과, 한국장의 기대와 실적은 각각 구분한다.&quot;
+    }
+  ],
+  &quot;entities&quot;: [
+    {
+      &quot;ticker&quot;: &quot;NVDA&quot;,
+      &quot;name&quot;: &quot;엔비디아&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;젠슨 황이 퇴임 약 2주 만에 이사회 만장일치로 복귀했으며, 트럼프 대통령은 자신이 이사회와 접촉해 복귀를 지지했다고 밝혔다고 영상은 전한다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;주가가 32~33% 올라 역대 일간 상승률 3위를 기록했고, 시가총액은 저점 3조 달러 초반에서 약 4조 달러로 회복했다고 설명했다.&quot;,
+        &quot;댄 아이브스는 목표가 225달러를 유지했고, 멜리우스는 보유에서 매수로 상향하며 목표가 220달러를 제시했다고 전했다. 요약서에는 200달러로 기재됐다는 언급도 있다.&quot;,
+        &quot;관련 반등에서 공매도 손실이 122억 달러였다고 전했다. 손실 집계 범위는 자막에 명시되지 않았다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;NVDA&quot;,
+        &quot;as_of&quot;: &quot;2026-11-23T23:53:22.482366+00:00&quot;,
+        &quot;current_price&quot;: 165.0500030517578,
+        &quot;market_cap&quot;: 3985462423690.796,
+        &quot;forward_pe&quot;: 9.93961,
+        &quot;trailing_pe&quot;: 17.728249,
+        &quot;fifty_two_week_high&quot;: 243.37,
+        &quot;fifty_two_week_low&quot;: 124.5,
+        &quot;average_target_price&quot;: 244.54807,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;APLD&quot;,
+      &quot;name&quot;: &quot;어플라이드 디지털&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;하이퍼스케일러 계약 발표 후 급등했으며, 진행진은 시장이 네오클라우드 업체의 대형 계약에 다시 반응하기 시작한 사례로 봤다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;주가 19% 상승.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;APLD&quot;,
+        &quot;as_of&quot;: &quot;2026-11-23T23:53:25.043361+00:00&quot;,
+        &quot;current_price&quot;: 13.819999694824219,
+        &quot;market_cap&quot;: 4178990182.5187683,
+        &quot;forward_pe&quot;: -17.617664,
+        &quot;trailing_pe&quot;: null,
+        &quot;fifty_two_week_high&quot;: 50.725,
+        &quot;fifty_two_week_low&quot;: 11.31,
+        &quot;average_target_price&quot;: 59.9375,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;TSLA&quot;,
+      &quot;name&quot;: &quot;테슬라&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;JP모건은 FSD 업데이트의 비전·시각화·내비게이션·주행 아키텍처 개선을 긍정적으로 평가했으나 투자의견은 중립을 유지했다고 전했다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;FSD V15 업데이트.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;TSLA&quot;,
+        &quot;as_of&quot;: &quot;2026-11-23T23:53:27.210419+00:00&quot;,
+        &quot;current_price&quot;: 385.4599914550781,
+        &quot;market_cap&quot;: 1523630044089.152,
+        &quot;forward_pe&quot;: 178.51817,
+        &quot;trailing_pe&quot;: 423.5824,
+        &quot;fifty_two_week_high&quot;: 498.83,
+        &quot;fifty_two_week_low&quot;: 297.38,
+        &quot;average_target_price&quot;: 417.52625,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;CRWD&quot;,
+      &quot;name&quot;: &quot;크라우드스트라이크·지스케일러&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;크라우드스트라이크(CRWD)의 지스케일러(ZS) 인수 발표 후 인수자 주가는 급락하고 피인수자 주가는 급등했다고 전했다. 영상은 마벨·루멘텀 발표 직후에도 같은 방향의 반응이 있었다고 비교했다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;439억 달러 규모의 전액 주식교환으로, 지스케일러 1주당 크라우드스트라이크 1.135주를 지급하는 조건이라고 전했다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;CRWD&quot;,
+        &quot;as_of&quot;: &quot;2026-11-23T23:53:29.796925+00:00&quot;,
+        &quot;current_price&quot;: 208.97000122070312,
+        &quot;market_cap&quot;: 213971665182.66046,
+        &quot;forward_pe&quot;: 128.62067,
+        &quot;trailing_pe&quot;: 3482.8335,
+        &quot;fifty_two_week_high&quot;: 286.99,
+        &quot;fifty_two_week_low&quot;: 85.68,
+        &quot;average_target_price&quot;: 250.51427,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;GOOGL&quot;,
+      &quot;name&quot;: &quot;알파벳·구글 딥마인드&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;구글 딥마인드가 AI를 활용해 양자 관련 비용을 줄이는 결과를 검증했다고 소개했다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;진행자가 후속 발언에서 비용을 290배 절감했다고 반복했다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;GOOGL&quot;,
+        &quot;as_of&quot;: &quot;2026-11-23T23:53:31.622988+00:00&quot;,
+        &quot;current_price&quot;: 282.1000061035156,
+        &quot;market_cap&quot;: 3468137475036.621,
+        &quot;forward_pe&quot;: 18.438969,
+        &quot;trailing_pe&quot;: 14.731071,
+        &quot;fifty_two_week_high&quot;: 408.61,
+        &quot;fifty_two_week_low&quot;: 264.22,
+        &quot;average_target_price&quot;: 395.7702,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;UNH&quot;,
+      &quot;name&quot;: &quot;유나이티드헬스&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;최근 주가가 급락한 가운데, 트럼프의 소셜미디어 재게시를 계기로 미국 건강보험 체계가 국가 운영 방식으로 바뀔 수 있다는 관측을 소개했다. 진행진은 재게시만으로 실제 전환을 예상할 수 있을지 의문을 제기했다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;UNH&quot;,
+        &quot;as_of&quot;: &quot;2026-11-23T23:53:33.495838+00:00&quot;,
+        &quot;current_price&quot;: 336.0799865722656,
+        &quot;market_cap&quot;: 301135267073.3264,
+        &quot;forward_pe&quot;: 14.317324,
+        &quot;trailing_pe&quot;: 19.182648,
+        &quot;fifty_two_week_high&quot;: 461.62,
+        &quot;fifty_two_week_low&quot;: 255.97,
+        &quot;average_target_price&quot;: 478.48,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;AMC&quot;,
+      &quot;name&quot;: &quot;AMC 엔터테인먼트&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;헝거 게임 개봉으로 연말 극장 시즌이 시작됐다는 소식과 함께, 급락하던 AMC 주가가 반등했다고 전했다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;간밤 주가 10% 상승.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;AMC&quot;,
+        &quot;as_of&quot;: &quot;2026-11-23T23:53:35.975609+00:00&quot;,
+        &quot;current_price&quot;: 2.859999895095825,
+        &quot;market_cap&quot;: 2552849171.042047,
+        &quot;forward_pe&quot;: 31.777775,
+        &quot;trailing_pe&quot;: null,
+        &quot;fifty_two_week_high&quot;: 3.77,
+        &quot;fifty_two_week_low&quot;: 0.93,
+        &quot;average_target_price&quot;: 3.975,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    }
+  ],
+  &quot;evidence&quot;: [
+    {
+      &quot;evidence_id&quot;: &quot;E1&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;Open Pit Drill Results Might Change The Case For Investing In First Majestic Silver (TSX:AG)&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/open-pit-drill-results-might-232321785.html&quot;,
+      &quot;publisher&quot;: &quot;Simply Wall St.&quot;,
+      &quot;published_at&quot;: &quot;2026-11-23T23:23:21+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Open Pit Drill Results Might Change The Case For Investing In First Majestic Silver (TSX:AG) Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E2&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;Pakistan&#x27;s trade gap widens 20% m/m to $4.1bn on oil, steel imports&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/economy/policy/articles/pakistans-trade-gap-widens-20-232122810.html&quot;,
+      &quot;publisher&quot;: &quot;IntelliNews&quot;,
+      &quot;published_at&quot;: &quot;2026-11-23T23:21:22+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Pakistan&#x27;s trade gap widens 20% m/m to $4.1bn on oil, steel imports Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 2026 Elections Weather Ne...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E4&quot;,
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;title&quot;: &quot;Pan American Silver Stock What High Grade Vein Discovery Means At La Colorada&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/pan-american-silver-stock-high-231706807.html&quot;,
+      &quot;publisher&quot;: &quot;Simply Wall St.&quot;,
+      &quot;published_at&quot;: &quot;2026-11-23T23:17:06+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Pan American Silver Stock What High Grade Vein Discovery Means At La Colorada Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 2026 Elections...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E5&quot;,
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;title&quot;: &quot;Global Aerospace and Defense Material Market Report 2026-2035 | Market to Reach $37 Billion at 5.6% CAGR as Lightweight Composites and Advanced Alloys Gain T...&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/articles/global-aerospace-defense-material-market-142100393.html&quot;,
+      &quot;publisher&quot;: &quot;GlobeNewswire&quot;,
+      &quot;published_at&quot;: &quot;2026-11-23T14:21:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    }
+  ],
+  &quot;source_policy&quot;: {
+    &quot;raw_transcript_published&quot;: false,
+    &quot;raw_transcript_in_evidence&quot;: false,
+    &quot;research_pipeline_version&quot;: 4,
+    &quot;closed_source_claims&quot;: &quot;unverified_external_source&quot;,
+    &quot;auto_caption_warning&quot;: true,
+    &quot;local_asr_warning&quot;: false
+  }
+}</pre>
+  </details>
+</article>
+</main>
+  <style>
+.reader-contents { margin: 16px 0; padding: 12px 16px; border: 1px solid var(--line, #64748b); border-radius: 12px; }
+.reader-contents > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-weight: 750; }
+.reader-contents nav { display: grid; gap: 4px; max-height: 45vh; overflow: auto; margin: 8px 0; }
+.reader-contents a { display: block; min-height: 44px; padding: 10px; border-radius: 6px; color: inherit; overflow-wrap: anywhere; }
+.reader-contents a:hover { background: #80808020; }
+.reader-contents .reader-subsection { padding-inline-start: 24px; font-size: .92em; }
+.reader-prose, .report { overflow-wrap: anywhere; line-height: 1.8; }
+.reader-prose p, .reader-prose li { max-width: 85ch; }
+.reader-prose h2, .reader-prose h3, .reader-prose h4, [data-reader-heading] { scroll-margin-top: 100px; line-height: 1.45; }
+.reader-prose h2 { margin-top: 1.8em; padding-bottom: 8px; border-bottom: 1px solid var(--line, #64748b); }
+.reader-prose h3 { margin-top: 1.5em; }
+.reader-prose li { margin: .5em 0; }
+.reader-prose pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.reader-prose blockquote { margin: 16px 0; padding: 4px 16px; border-left: 3px solid var(--accent, #64748b); }
+.reader-table { overflow: auto; max-width: 100%; margin: 16px 0; border: 1px solid var(--line, #64748b); border-radius: 10px; }
+.reader-table table { border-collapse: collapse; width: 100%; margin: 0; font-size: .92rem; }
+.reader-table th, .reader-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line, #64748b); min-width: 110px; max-width: 400px; overflow-wrap: anywhere; white-space: normal; }
+.reader-table th { background: #80808018; }
+.reader-table tr:nth-child(even) { background: #80808008; }
+.reader-search { display: grid; gap: 8px; margin: 16px 0; }
+.reader-search label { font-weight: 700; }
+.reader-search input { box-sizing: border-box; width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line, #64748b); border-radius: 10px; background: var(--panel, #fff); color: var(--text, #132238); font: inherit; }
+.reader-search p { margin: 0; font-size: .86rem; }
+.reader-back { position: fixed; bottom: max(14px, env(safe-area-inset-bottom)); right: 14px; z-index: 30; min-height: 44px; border: 1px solid #778899; border-radius: 99px; padding: 10px 16px; background: #18344a; color: #fff; font: 700 14px system-ui; cursor: pointer; box-shadow: 0 3px 12px #0003; }
+[data-reader-source] { margin-top: 20px; }
+[data-reader-source] > summary { min-height: 44px; cursor: pointer; }
+[data-reader-source] pre { font-size: .85rem; }
+[data-reader-source] pre, .reader-prose { min-width: 0; }
+.reader-contents :focus-visible, .reader-search :focus-visible, .reader-back:focus-visible, .reader-table:focus-visible { outline: 3px solid var(--accent, #008c95); outline-offset: 3px; }
+.reader-search + .grid > [hidden] { display: none !important; }
+@media (max-width: 600px) { .reader-prose { font-size: 1rem; } .reader-contents { padding: 8px 12px; } }
+@media print { .reader-back, .reader-search, .reader-contents, [data-reader-source] { display: none !important; } .reader-table { overflow: visible; } .reader-prose { color: #000; background: #fff; } }
+</style><script>
+(() => {
+  'use strict';
+  let serial = 0;
+  const rendered = new WeakMap();
+  const node = (tag, text) => { const el = document.createElement(tag); if (text != null) el.textContent = text; return el; };
+  function inline(parent, text) {
+    const pattern = /(`[^`]+`|\*\*[^*]+\*\*|\[[^\]]+\]\(https?:\/\/[^\s)]+\))/g;
+    let start = 0;
+    for (const match of String(text).matchAll(pattern)) {
+      parent.append(document.createTextNode(text.slice(start, match.index)));
+      const value = match[0];
+      if (value.startsWith('`')) parent.append(node('code', value.slice(1, -1)));
+      else if (value.startsWith('**')) parent.append(node('strong', value.slice(2, -2)));
+      else {
+        const link = value.match(/^\[([^\]]+)\]\((.+)\)$/);
+        const a = node('a', link[1]); a.href = link[2]; a.rel = 'noopener noreferrer'; parent.append(a);
+      }
+      start = match.index + value.length;
+    }
+    parent.append(document.createTextNode(text.slice(start)));
+  }
+  const cells = line => line.trim().replace(/^\|/, '').replace(/\|$/, '').split(/(?<!\\)\|/).map(v => v.trim().replace(/\\\|/g, '|'));
+  function markdown(source) {
+    const article = node('article'); article.className = 'reader-prose';
+    const lines = source.split(/\r?\n/); let list = null;
+    for (let i = 0; i < lines.length; i += 1) {
+      const line = lines[i], value = line.trim();
+      if (!value) { list = null; continue; }
+      if (/^```/.test(value)) {
+        const code = []; i += 1;
+        while (i < lines.length && !/^```/.test(lines[i].trim())) code.push(lines[i++]);
+        const pre = node('pre'); pre.append(node('code', code.join('\n'))); article.append(pre); list = null; continue;
+      }
+      if (i + 1 < lines.length && value.includes('|') && cells(lines[i + 1]).every(v => /^:?-{3,}:?$/.test(v))) {
+        const table = node('table'), head = node('thead'), body = node('tbody');
+        const row = (values, tag) => { const tr = node('tr'); values.forEach(v => { const cell = node(tag); if (tag === 'th') cell.scope = 'col'; inline(cell, v); tr.append(cell); }); return tr; };
+        head.append(row(cells(line), 'th')); i += 2;
+        while (i < lines.length && lines[i].trim() && lines[i].includes('|')) body.append(row(cells(lines[i++]), 'td'));
+        i -= 1; table.append(head, body); article.append(table); list = null; continue;
+      }
+      const heading = value.match(/^(#{1,6})\s+(.+)$/);
+      if (heading) { const h = node('h' + Math.min(4, heading[1].length + 1)); inline(h, heading[2]); article.append(h); list = null; continue; }
+      const bullet = value.match(/^(?:[-*+] |\d+\. )(.+)$/);
+      if (bullet) {
+        const tag = /^\d/.test(value) ? 'ol' : 'ul';
+        if (!list || list.tagName.toLowerCase() !== tag) { list = node(tag); if (tag === 'ol') list.start = parseInt(value, 10); article.append(list); }
+        const li = node('li'); inline(li, bullet[1]); list.append(li); continue;
+      }
+      list = null;
+      if (/^(---+|\*\*\*+)$/.test(value)) { article.append(node('hr')); continue; }
+      const p = node(value.startsWith('> ') ? 'blockquote' : 'p'); inline(p, value.startsWith('> ') ? value.slice(2) : line); article.append(p);
+    }
+    return article;
+  }
+  function contents(root) {
+    root.querySelectorAll(':scope > .reader-contents').forEach(el => el.remove());
+    const headings = [...root.querySelectorAll('h2,h3,h4')].filter(h => !h.closest('.card,.run-card,.reader-contents,[data-reader-source],[hidden]'));
+    if (headings.length < 2) return;
+    const details = node('details'); details.className = 'reader-contents';
+    details.append(node('summary', '이 리포트 목차 · ' + headings.length + '개 항목'));
+    const nav = node('nav'); nav.setAttribute('aria-label', '리포트 목차');
+    headings.forEach(h => {
+      if (!h.id) h.id = 'reader-section-' + (++serial);
+      h.dataset.readerHeading = ''; h.tabIndex = -1;
+      const a = node('a', h.textContent); a.href = '#' + h.id;
+      if (h.tagName !== 'H2') a.className = 'reader-subsection';
+      a.addEventListener('click', event => {
+        event.preventDefault();
+        for (let ancestor = h.parentElement; ancestor; ancestor = ancestor.parentElement) if (ancestor.tagName === 'DETAILS') ancestor.open = true;
+        h.scrollIntoView({block: 'start'}); h.focus({preventScroll: true});
+      }); nav.append(a);
+    });
+    details.append(nav); root.prepend(details);
+  }
+  function enhance(root) {
+    if (!root) return;
+    root.querySelectorAll('pre[data-report-markdown]').forEach(pre => {
+      const previous = rendered.get(pre);
+      if (previous && previous.source === pre.textContent) return;
+      const article = markdown(pre.textContent);
+      if (previous) previous.article.replaceWith(article);
+      else {
+        const details = node('details'); details.dataset.readerSource = '';
+        details.append(node('summary', 'Markdown 원문 보기'));
+        pre.before(article, details); details.append(pre);
+      }
+      rendered.set(pre, {source: pre.textContent, article});
+    });
+    root.querySelectorAll('table').forEach(table => {
+      if (table.closest('.reader-table,.account-table-wrap,.summary-scroll')) return;
+      const wrap = node('div'); wrap.className = 'reader-table'; wrap.tabIndex = 0;
+      wrap.setAttribute('role', 'region'); wrap.setAttribute('aria-label', '리포트 표 · 가로로 스크롤하여 전체 보기');
+      table.before(wrap); wrap.append(table);
+    });
+    root.querySelectorAll('.grid').forEach(grid => {
+      const cards = [...grid.querySelectorAll(':scope > a.card')];
+      if (cards.length < 2 || grid.dataset.readerSearch) return;
+      grid.dataset.readerSearch = 'true';
+      const box = node('div'); box.className = 'reader-search';
+      const input = node('input'); input.type = 'search'; input.placeholder = '제목 · 종목 · 채널 · 키워드'; input.id = 'report-search-' + (++serial);
+      const label = node('label', '리포트 찾기'); label.htmlFor = input.id;
+      const status = node('p'); status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
+      const update = () => {
+        const terms = input.value.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean); let count = 0;
+        cards.forEach(card => { card.hidden = !terms.every(t => card.textContent.toLocaleLowerCase().includes(t)); if (!card.hidden) count += 1; });
+        status.textContent = cards.length + '개 중 ' + count + '개 표시' + (count ? '' : ' · 검색어를 지우거나 다른 키워드를 입력하세요.');
+      };
+      input.addEventListener('input', update); box.append(label, input, status); grid.before(box); update();
+    });
+    contents(root);
+  }
+  window.TradingAgentsReader = {enhance};
+  const main = document.querySelector('main');
+  if (main && !main.hasAttribute('data-reader-dynamic')) enhance(main);
+  if (main) {
+    const top = node('button', '↑ 맨 위'); top.type = 'button'; top.className = 'reader-back'; top.setAttribute('aria-label', '리포트 맨 위로 이동');
+    top.addEventListener('click', () => { const target = document.querySelector('h1') || main; target.tabIndex = -1; target.scrollIntoView({block: 'start'}); target.focus({preventScroll: true}); });
+    document.body.append(top);
+  }
+})();
+</script>
+</body>
+</html>

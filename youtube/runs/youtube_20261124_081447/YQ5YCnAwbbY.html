@@ -1,0 +1,619 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YouTube 투자자용 검증 리포트 - 흔들리는 AI 신화…블랙 먼데이 전망에 개미들 패닉 | 18년 만에 증안펀드 투입 준비…&quot;폭락장 대비하라&quot; | 권순우 삼프로TV 취재팀장 [뉴스3]</title>
+  <style>
+:root {
+  color-scheme: light;
+  --bg: #f7f8fb;
+  --panel: #ffffff;
+  --text: #172033;
+  --muted: #667085;
+  --line: #d9dee8;
+  --accent: #0f766e;
+  --accent-2: #2563eb;
+  --warn: #b45309;
+  --bad: #b42318;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0 56px; }
+a { color: var(--accent-2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.hero { padding: 28px 0 22px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+.hero.compact { padding-top: 12px; }
+.hero h1 { margin: 0; font-size: clamp(28px, 4vw, 44px); line-height: 1.15; letter-spacing: 0; }
+.hero p { max-width: 760px; color: var(--muted); margin: 12px 0 0; }
+.eyebrow { color: var(--accent); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0; margin: 0 0 8px; }
+section { margin: 28px 0; }
+h2, h3, h4, h5 { letter-spacing: 0; line-height: 1.25; }
+.synthesis-callout { padding: clamp(20px, 4vw, 34px); border: 1px solid #6ee7d8; border-radius: 18px; background: linear-gradient(135deg, #ecfdf9 0%, #eff6ff 100%); box-shadow: 0 18px 44px rgba(15, 118, 110, .12); }
+.synthesis-callout.unavailable { border-color: var(--line); background: var(--panel); box-shadow: none; }
+.synthesis-callout h2 { margin: 0; font-size: clamp(24px, 3.2vw, 36px); }
+.synthesis-callout .lead { max-width: 900px; font-size: 17px; color: #334155; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.primary-link, .secondary-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border-radius: 999px; font-weight: 800; }
+.primary-link { color: white; background: var(--accent); }
+.secondary-link { color: var(--accent-2); border: 1px solid #93c5fd; background: white; }
+.primary-link:hover, .secondary-link:hover { text-decoration: none; filter: brightness(.97); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.card, .run { display: flex; flex-direction: column; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; color: var(--text); min-height: 128px; }
+.run { padding: 16px; }
+.card:hover, .run:hover { border-color: var(--accent-2); text-decoration: none; }
+.thumb { display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #e9edf5; border-radius: 8px 8px 0 0; color: var(--muted); font-size: 13px; font-weight: 700; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb-empty span { padding: 0 14px; text-align: center; }
+.card-body { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 16px; }
+.card strong { line-height: 1.35; }
+.source-line { color: #3f4a5f; font-weight: 600; }
+.runs { display: grid; gap: 10px; }
+.badge { display: inline-flex; width: fit-content; border-radius: 999px; padding: 2px 9px; background: #e6f4f1; color: var(--accent); font-size: 12px; font-weight: 700; }
+.status-contradicted, .status-llm_failed { background: #fee4e2; color: var(--bad); }
+.status-unverified, .status-stale { background: #fff4d6; color: var(--warn); }
+small, .muted { color: var(--muted); }
+.topnav { display: flex; gap: 14px; margin-bottom: 16px; font-size: 14px; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px; }
+.stats span { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
+.report { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: min(5vw, 36px); }
+.report-head { border-bottom: 1px solid var(--line); margin-bottom: 24px; padding-bottom: 20px; }
+.report-head h1 { margin: 0; font-size: clamp(24px, 3.5vw, 38px); line-height: 1.2; }
+.meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+.scope-note { padding: 12px 14px; border-left: 4px solid var(--warn); border-radius: 6px; background: #fff7ed; color: #7c2d12; }
+.synthesis-report h2 { margin-top: 34px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.synthesis-report h3 { margin: 24px 0 8px; color: #0f4c5c; }
+.synthesis-report p, .synthesis-report li { overflow-wrap: anywhere; }
+pre { overflow: auto; background: #111827; color: #f9fafb; border-radius: 8px; padding: 14px; }
+code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+details { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 18px; }
+@media (max-width: 640px) {
+  main { width: min(100% - 20px, 1120px); padding-top: 18px; }
+  .report { padding: 18px; }
+  .synthesis-callout { border-radius: 14px; padding: 18px; }
+  .cta-row a { width: 100%; }
+  .mobile-report { border-radius: 12px; }
+}
+</style>
+</head>
+<body>
+  <main>
+<nav class="topnav"><a href="index.html">실행 목록</a><a href="../../index.html">YouTube 홈</a></nav>
+<article class="report">
+  <header class="report-head">
+    <p class="eyebrow">youtube_20261124_081447</p>
+    <h1>흔들리는 AI 신화…블랙 먼데이 전망에 개미들 패닉 | 18년 만에 증안펀드 투입 준비…&quot;폭락장 대비하라&quot; | 권순우 삼프로TV 취재팀장 [뉴스3]</h1>
+    <div class="meta">
+      <span class="badge status-unverified">unverified</span>
+      <a href="https://www.youtube.com/watch?v=YQ5YCnAwbbY">원본 영상</a>
+    </div>
+  </header>
+  <h2>AI 투자 둔화와 ‘블랙 먼데이’ 우려: 확인된 근거와 관찰 지표</h2>
+<p><a href="https://www.youtube.com/watch?v=YQ5YCnAwbbY">삼프로TV 영상</a> 분석 | 2026년 11월 24일 기준, 제공 자료 한정</p>
+<p><strong>핵심 판단:</strong> 12개 주장 중 외부 자료가 일부 뒷받침하는 것은 한국 전기차 시장의 중국산 비중 상승뿐이다. 나머지 11개는 미검증이며, 직접 반증도 제공되지 않았다. 특히 11월 23일 ‘블랙 먼데이’는 <strong>한국장 개장 전 전망</strong>이지 확인된 급락 결과가 아니다. 증시안정펀드도 영상이 전한 것은 <strong>가동 준비</strong>로, 가동 결정이나 실제 매수와 다르다.</p>
+<h3>영상 주장과 확인된 사실·근거</h3>
+<p>| 쟁점·영상 시각 | 영상 주장 | 확인된 사실·근거 |</p>
+<p>|---|---|---|</p>
+<p>| <strong>미국 기술주·변동성</strong> <a href="https://www.youtube.com/watch?v=YQ5YCnAwbbY&amp;t=0s">00:00</a> | 나스닥 −5.28%, S&amp;P 계열로 추정되는 지수 −3.7%, 다우로 추정되는 지수 −1.9%, 필라델피아 반도체지수 약 −10%, 엔비디아 −14%를 언급했다. 나스닥 주간 낙폭이 10%를 넘어 팬데믹 이후 최대였고, 엔비디아는 전월 고점의 절반 가까이 하락했으며, VIX는 40을 넘고 코스트코·월마트는 상대적으로 선방했다고 전했다. | <strong>미검증.</strong> 11월 20일 미국장은 대조 후보일 뿐이다. 수집 기사에는 해당 세션의 시세가 없다. VIX 40이 장중인지 종가인지, 엔비디아의 전월 고점이 장중가인지 종가인지도 불명확하다. |</p>
+<p>| <strong>AI 투자·메모리</strong> <a href="https://www.youtube.com/watch?v=YQ5YCnAwbbY&amp;t=0s">00:00</a> | 미국 빅테크의 AI 투자가 한국·대만 수출을 늘리고, 그 대금이 미국 AI주로 돌아가는 이른바 ‘테크노 달러’ 순환을 제시했다. 장기 메모리 계약의 해지 위약금과 공급 부족이 공급사를 방어할 수 있다고 봤고, SK하이닉스의 2023년 적자를 약 7조 7천억 원으로 언급했다. | <strong>미검증.</strong> 한국경제 원문과 투자·수출·자금 흐름 자료, 계약 조항, 실적 공시가 없다. 수출과 해외주식 순매수가 함께 늘어도 같은 자금의 환류를 입증하지 못한다. 적자 수치의 회계 항목과 주문 삭감의 영향은 별개다. |</p>
+<p>| <strong>엔비디아·미중 통상</strong> <a href="https://www.youtube.com/watch?v=YQ5YCnAwbbY&amp;t=414s">06:54</a> | FT를 인용해 프린스그룹 관련 중국 우회 유통 의혹을 소개했다. 엔비디아의 지역별 매출 귀속 기준 변경과 SEC로 추정되는 기관의 회계 검토설을 전했다. 미국의 반도체 수출통제 강화안에 대한 중국의 반발과 희토류 조치의 두 달 유예를 언급했고, 12월 마이애미 G20 계기 정상회동과 2027년 1~2월 재쟁점화 가능성을 제시했다. | <strong>미검증.</strong> FT 원문·당사자 답변, 변경 전후 공시, 규제기관 자료와 통상 공고가 없다. 청구지·주문지·고객 본사·최종사용지는 서로 다르다. 우회 물량이나 중국 최종수요는 추산할 수 없고, 기준 변경 동기나 정식 조사도 확인되지 않았다. G20 일정, 양자회담, 합의는 각각 별도 확인 대상이다. |</p>
+<p>| <strong>한국·대만 시장 안정책</strong> <a href="https://www.youtube.com/watch?v=YQ5YCnAwbbY&amp;t=825s">13:45</a> | 한국 F4의 펀드 가동 준비, 가동 시 2008년 이후 18년 만이라는 설명, 11월 24일 자사주 일일 매수 주문한도 완화와 불법 공매도 집중감시를 전했다. 대만은 11월 23일 개장부터 전일 종가 미만 공매도 제한 등 5개 조치를 적용했으며 역대 열 번째라고 소개했다. | <strong>미검증.</strong> 양국 당국·거래소 공고와 과거 집행 기록이 없다. yfinance 코스피 <strong>4,708.54</strong>는 11월 24일 09:15 KST <strong>조회 시점의 단일 값</strong>이다. 11월 23일의 시가·고가·저가·종가와 직전 종가가 없어 당시 낙폭이나 장중 반전을 판정할 수 없다. |</p>
+<p>| <strong>한국 전기차 시장</strong> <a href="https://www.youtube.com/watch?v=YQ5YCnAwbbY&amp;t=1222s">20:22</a> | 중국산 비중이 2021년 1.1%에서 2025년 33.9%로 상승했고, 생산 상위 10개국 비교에서 한국이 3위이며, 신규등록은 국산 48.7%·외산 51.3%라고 전했다. | <strong>부분 뒷받침.</strong> <a href="https://www.mt.co.kr/industry/2026/11/23/2026112213473033295">머니투데이의 KAMA 등 인용 보도</a>는 <strong>1.1% → 33.9%, +32.8%포인트</strong>를 뒷받침한다. 다만 협회 원표는 없고, 국가 순위·국산과 외산 비중·중국 생산 테슬라 포함 기준·차종과 등록 분모는 미확인이다. 기사 제목의 순위 표현도 비교 기준을 알 수 없어 방송 순위의 반증이 아니다. |</p>
+<p>| <strong>전기차 관세·수급·세액공제</strong> <a href="https://www.youtube.com/watch?v=YQ5YCnAwbbY&amp;t=1222s">20:22</a>~<a href="https://www.youtube.com/watch?v=YQ5YCnAwbbY&amp;t=1632s">27:12</a> | 미국 127%·유럽 35.3% 관세, 중국 내수 판매 −2%·수출 관련 지표 100% 초과 성장을 언급했다. 한국으로 수출 물량이 더 몰릴 수 있으며 국내 생산 전기차 세액공제 편입이 논의 중이라고 전했다. | <strong>미검증.</strong> 관세의 적용 시점, 기본·추가관세 합산 여부와 업체별 범위가 불명확하다. 중국 수출 지표는 대수·금액·비중 중 무엇인지, 비교 기간은 언제인지 확인되지 않았다. 한국 내 점유율 상승은 관세로 인한 물량 전환을 입증하지 않는다. 세액공제의 입법 단계·시행·통상 적합성도 확인되지 않았다. |</p>
+<h3>투자 시나리오와 무효화 조건</h3>
+<p>| 쟁점 | 상승·완충 논리와 반론 | 무엇을 보면 판단이 바뀌나 |</p>
+<p>|---|---|---|</p>
+<p>| <strong>AI·메모리</strong> | 빅테크 투자와 구매약정이 유지되고 공급이 빠듯하다면, 일부 주문이 취소돼도 대체 고객이 공급사 충격을 줄일 수 있다. 반대로 위약금이 있더라도 재판매 가격 하락이나 대체 고객 확보 지연까지 막지는 못한다. | <strong>투자 유지·약정 이행·수출 견조</strong>가 함께 확인되면 단기 투자 위축론은 약해진다. 반대로 <strong>투자 가이던스 하향·주문 취소·메모리 가격 하락 또는 재고 증가</strong>가 겹치면 공급사 방어 논리가 약해진다. 데이터센터 일정 지연과 주문 취소는 구분하고, 수출과 주식 자금 흐름의 동행만으로 자금 환류를 확정하지 않는다. |</p>
+<p>| <strong>한·대만 증시</strong> | 안정조치가 실제 시행되고 매수 수급이 확인되면 단기 변동성을 완충할 수 있다. 준비 발표나 자사주 주문한도 완화만으로는 실제 매수 자금이 들어왔다는 뜻이 아니다. | 11월 23일 코스피·코스닥의 시가와 종가를 직전 종가와 비교한다. 장중 낙폭이 종가에 대부분 회복됐다면 지속적인 급락 해석은 약해진다. 펀드 집행이 확인되지 않으면 반등이 있더라도 펀드 매수의 효과로 귀속하지 않는다. |</p>
+<p>| <strong>국내 전기차 업체</strong> | 중국 생산 차량의 등록 대수 증가가 할인 확대와 함께 나타나면 국내 업체의 가격·마진 압박 가능성이 커진다. 반대로 비중 상승이 일부 차종이나 브랜드에 집중됐거나 전체 등록 대수 감소의 영향이라면 시장 전반의 경쟁 심화로 일반화하기 어렵다. | 같은 차종·원산지 기준으로 <strong>등록 대수와 점유율, 실판매가·할인, 국내 업체 마진</strong>을 함께 본다. 중국산 점유율이 올라도 등록 대수나 가격 압박이 동반되지 않으면 광범위한 마진 악화 가설은 약해진다. |</p>
+<h3>가까운 확인 일정과 관찰 항목</h3>
+<p>1. <strong>11월 23일 장세와 24일 정책부터 대조:</strong> KRX에서 코스피·코스닥의 직전 종가와 23일 시가·고가·저가·종가, 외국인·기관 순매매를 확인한다. 미국은 동일 세션의 지수·종목 종가, 나스닥 주간 수익률, VIX 장중 고가와 종가, 엔비디아의 분할조정 전월 고점을 각각 대조한다. F4·금융당국·KRX 자료에서는 펀드의 준비·가동 결정·실제 매수, 자사주 한도와 감시 일정을 구분한다. 대만은 공매도 제한의 적용 종목·기간·예외를 확인한다.</p>
+<p>2. <strong>다음 기업 공시와 월간 수출:</strong> 빅테크 설비투자 가이던스와 구매약정, 데이터센터 인허가·착공 일정, 한국·대만 품목별 수출, 메모리 가격·재고, 해외주식 순매수를 별도로 추적한다. 마이크론·SK하이닉스·삼성전자의 공개 계약 주석과 SK하이닉스 2023년 연결 영업손실·순손실도 대조한다. 연준 발언, 앤트로픽 상장, 인허가 지연은 공식 자료 확인 전 보조 가설로 둔다.</p>
+<p>3. <strong>엔비디아 공시와 미중 통상:</strong> 엔비디아 변경 전후 공시에서 지역 매출의 귀속 기준·최초 적용 분기·비교기간 재작성 여부를 확인한다. 미중 규제는 제안과 확정 규정을 구분하고, 적용 품목·발효일·희토류 유예 만료일을 추적한다. 영상이 언급한 12월 G20과 2027년 1~2월은 공식 일정과 공고가 확인되기 전까지 점검 후보일이다.</p>
+<p>4. <strong>다음 전기차 등록·통관 통계와 입법 단계:</strong> KAMA·국토교통부 원표의 차종·기간·분모를 맞춘 뒤 중국 생산 테슬라와 BYD·지커의 등록 대수, 샤오펑·체리의 진출 계획과 실제 판매를 구분한다. 중국의 목적지별 수출과 한국 통관·등록을 대조하고, 생산 과잉은 가동률과 재고로 별도 확인한다. 미국·EU의 적용 관세는 동일 기준으로 비교하고, 국내 세액공제는 제안·발의·통과·공포·시행을 구분한다.</p>
+<h3>데이터 품질과 수동 확인 항목</h3>
+<ul>
+<li><strong>전사 품질(<code>transcript_quality</code>):</strong> 한국어 자동자막 969개 구간, 품질 평가 <code>good</code>(1.00). 원음 일치나 사실 확인을 보장하지 않는다. 표의 시각은 개별 발언이 아니라 자막 구간 시작점이다. <code>asr_confidence</code>는 전기차 비중·한국 안정책 0.94, 미국 시황 0.83, 엔비디아 우회 유통 0.79·회계 검토설 0.80, 중국 내수·수출 수치 0.60이다. 지수명·당국명·업체명과 수출 지표의 단위는 특히 원음 대조가 필요하다.</li>
+<li><strong>외부 근거 적합성(<code>source_confidence</code>):</strong> 주장 검증 단계에서 전기차 비중 항목은 0.68, 나머지 11개는 0.00이다. 0.00은 직접 근거가 없다는 뜻이지 주장이 틀렸다는 뜻이 아니다. 자막 추출 단계의 동명 점수는 발언 식별 확신도로, 외부 검증 점수와 다르다. 수집된 6개 자료 중 5개는 무관하거나 메뉴·제목만 있어 주장 근거로 쓰지 않았다. 코스피 스냅샷의 52주 고저도 이상치 가능성이 있어 범위 분석에서 제외했다.</li>
+<li><strong>미검증 — 수동 확인 필요:</strong> Bloomberg·Morningstar 원문이나 직접 근거는 제공되지 않았다. FT 원보도와 당사자 답변, 개별 메모리 계약의 해지권·위약금, 최종사용자·선적 기록, 비공개 규제기관 접촉과 회계 기준 변경 동기, 펀드의 비공개 발동선·집행 내역, 동일 수출 대금의 미국 AI주 환류는 직접 자료가 확보되기 전까지 미검증으로 남는다.</li>
+</ul>
+  <details>
+    <summary>공개 요약 JSON</summary>
+    <pre>{
+  &quot;version&quot;: 4,
+  &quot;video_id&quot;: &quot;YQ5YCnAwbbY&quot;,
+  &quot;title&quot;: &quot;흔들리는 AI 신화…블랙 먼데이 전망에 개미들 패닉 | 18년 만에 증안펀드 투입 준비…\&quot;폭락장 대비하라\&quot; | 권순우 삼프로TV 취재팀장 [뉴스3]&quot;,
+  &quot;url&quot;: &quot;https://www.youtube.com/watch?v=YQ5YCnAwbbY&quot;,
+  &quot;channel&quot;: &quot;삼프로TV 3PROTV&quot;,
+  &quot;channel_id&quot;: &quot;UChlv4GSd7OQl3js-jkLOnFA&quot;,
+  &quot;source_url&quot;: &quot;https://www.youtube.com/@3protv/videos&quot;,
+  &quot;thumbnail_url&quot;: &quot;https://i.ytimg.com/vi/YQ5YCnAwbbY/maxresdefault.jpg&quot;,
+  &quot;published_at&quot;: &quot;2026-11-22T23:26:37+00:00&quot;,
+  &quot;status&quot;: &quot;unverified&quot;,
+  &quot;strategy_source_tier&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_evidence_weight&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_validation_policy&quot;: &quot;STANDARD_REVIEW&quot;,
+  &quot;transcript_status&quot;: &quot;available&quot;,
+  &quot;transcript_source&quot;: &quot;automatic&quot;,
+  &quot;transcript_chars&quot;: 16677,
+  &quot;transcript_quality&quot;: {
+    &quot;status&quot;: &quot;good&quot;,
+    &quot;score&quot;: 1.0,
+    &quot;warnings&quot;: [],
+    &quot;source&quot;: &quot;automatic&quot;,
+    &quot;language&quot;: &quot;Korean&quot;,
+    &quot;model_or_format&quot;: &quot;json3&quot;,
+    &quot;chars&quot;: 16677,
+    &quot;segments&quot;: 969,
+    &quot;duration_seconds&quot;: 2107,
+    &quot;repeated_ngram_ratio&quot;: 0.001
+  },
+  &quot;generated_at&quot;: &quot;2026-11-24T08:14:47.674338+09:00&quot;,
+  &quot;llm_status&quot;: &quot;success&quot;,
+  &quot;research_status&quot;: &quot;success&quot;,
+  &quot;claim_verification_status&quot;: &quot;success&quot;,
+  &quot;research_pipeline_version&quot;: 4,
+  &quot;evidence_count&quot;: 6,
+  &quot;claim_status_summary&quot;: {
+    &quot;unverified&quot;: 11,
+    &quot;partially_supported&quot;: 1
+  },
+  &quot;claims&quot;: [
+    {
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;claim_text&quot;: &quot;방송은 나스닥 종합 −5.28%, S&amp;P 계열로 추정되는 지수 −3.7%, 다우로 추정되는 지수 −1.9%, 필라델피아 반도체지수 약 −10%, 엔비디아 −14% 및 전월 고점 대비 거의 반토막, 나스닥 주간 −10% 초과 및 팬데믹 이후 최대 낙폭, VIX 40 돌파, 코스트코·월마트의 상대적 선방을 언급했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.83,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;나스닥 일간 −5.28%, S&amp;P 계열 추정 −3.7%, 다우 추정 −1.9%, 반도체지수 약 −10%, 엔비디아 −14% 및 전월 고점의 약 절반, 나스닥 주간 −10% 초과, VIX 40 돌파&quot;,
+        &quot;observed&quot;: &quot;동일 거래일 시세, 주간 시계열, 전월 고점 및 VIX 장중·종가 자료 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;거래일과 비교 기준이 확인될 때까지 방송 수치를 실제 낙폭이나 방어주 상대수익률로 인용하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;claim_text&quot;: &quot;방송은 한국경제의 ‘테크노 달러’를 인용해 미국 빅테크의 AI 투자가 한국·대만 수출을 늘렸고 그 수익이 미국 AI주 투자로 돌아갔다고 설명했다. 데이터센터 지연이나 주문 취소가 이 순환을 약화시킨다는 것은 가설이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.94,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;정량 주장 없음&quot;,
+        &quot;observed&quot;: &quot;관련 원문 및 비교 시계열 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;AI 설비투자, 품목별 수출, 해외주식 자금 흐름을 별도로 추적하고 환류 경로는 시나리오로만 다룬다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;claim_text&quot;: &quot;방송은 장기 메모리 공급계약에 해지 페널티가 있고 공급 부족기에는 해지한 구매사의 손실이 공급사보다 클 수 있다고 설명했다. 2023년 주문 삭감과 함께 SK하이닉스의 약 7조 7천억 원 적자를 언급했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.89,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;2023년 SK하이닉스 적자 약 7조 7천억 원&quot;,
+        &quot;observed&quot;: &quot;연결 영업손실·순손실 및 회계 기간을 대조할 공시 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;계약별 해지 조건과 수급이 확인되지 않는 한 공급사의 실적이 주문 취소로부터 보호된다고 단정하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;claim_text&quot;: &quot;방송은 파이낸셜타임스를 인용해 프린스그룹이 엔비디아 칩의 중국 우회 유통에 관여했다는 의혹을 소개했다. 전체 우회 물량이나 실질 중국 최종수요 규모는 제시하지 않았다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:06:54&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.79,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;전체 우회 물량 및 중국 최종수요 수치 미제시&quot;,
+        &quot;observed&quot;: &quot;선적·최종사용자 자료 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;우회 유통을 확정 사실로 보도하거나 이를 근거로 중국 매출 노출을 추산하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;claim_text&quot;: &quot;방송은 엔비디아의 지역별 매출 귀속 기준이 주문지에서 고객 본사 소재지로 바뀌었다고 설명하고 SEC로 추정되는 기관의 회계 검토설을 전했다. 싱가포르 비중을 낮추려 했다는 동기는 추정이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:06:54&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.8,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;변경 전후 싱가포르 비중 수치 미제시&quot;,
+        &quot;observed&quot;: &quot;비교 공시 및 지역별 매출표 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;지역별 매출 추세는 동일 기준으로 비교하고, 공식 자료 확인 전 회계 검토설을 조사나 위반으로 표현하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;claim_text&quot;: &quot;방송은 미국의 반도체 수출통제 강화안에 중국이 반발했고 희토류 관련 조치가 두 달 유예됐다고 전했다. 2027년 1~2월 재쟁점화 및 12월 마이애미 G20 계기 미중 정상 회동은 전망이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:06:54&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.88,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;희토류 관련 조치 2개월 유예, 2027년 1~2월 재쟁점화 전망, 2026년 12월 G20 계기 회동 전망&quot;,
+        &quot;observed&quot;: &quot;유예 시작·종료일 및 공식 회의 일정 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;공급망 영향은 규정의 대상과 발효·만료일을 확인한 뒤 판단하고, 정상 간 합의는 확인 전 시나리오로 둔다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;claim_text&quot;: &quot;방송은 F4가 증시안정펀드 즉시 가동을 준비하고, 11월 24일부터 자사주 일일 매수 주문 수량 한도를 완화하며, 불법 공매도 특별 집중감시를 운영한다고 전했다. 실제 가동 시 2008년 이후 18년 만이라는 설명과 11월 23일 ‘블랙 먼데이’ 우려도 제시했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:13:45&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.94,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;가동 시 2008년 이후 18년 만, 2026년 11월 24일 자사주 한도 완화, 11월 23일 급락 우려&quot;,
+        &quot;observed&quot;: &quot;yfinance 코스피 스냅샷 4,708.54(2026-11-24 00:15 UTC 조회 기준); 해당 거래일 OHLC·비교 종가와 정책 자료 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;안정펀드 매수 자금이 이미 유입됐다고 해석하지 말고, 실제 집행과 국내 지수 낙폭을 각각 확인한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;claim_text&quot;: &quot;방송은 대만이 11월 23일 개장부터 전 거래일 종가 미만 공매도 제한을 포함한 5대 안정조치를 적용했으며 이번이 열 번째 조치라고 전했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:13:45&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.91,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;2026년 11월 23일 개장부터 5대 조치, 역대 열 번째&quot;,
+        &quot;observed&quot;: &quot;공고, 조치 항목 및 이력 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;공매도 제한의 적용 종목·거래 유형·예외와 시행 기간을 확인하기 전 시장 전반에 적용된다고 보지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;claim_text&quot;: &quot;방송은 한국 전기차 시장의 중국 생산 차량 비중이 2021년 1.1%에서 2025년 33.9%로 올랐고, 자동차 생산 상위 10개국 비교에서 한국이 멕시코·브라질 다음이었다고 전했다. 신규등록 원산지 비중은 국산 48.7%, 외산 51.3%로 제시했다.&quot;,
+      &quot;status&quot;: &quot;partially_supported&quot;,
+      &quot;confidence&quot;: 0.7,
+      &quot;supporting_evidence_ids&quot;: [
+        &quot;E6&quot;
+      ],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:20:22&quot;,
+      &quot;source_confidence&quot;: 0.68,
+      &quot;asr_confidence&quot;: 0.94,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;2021년 1.1%→2025년 33.9%; 상위 10개 생산국 중 한국 3위; 신규등록 국산 48.7%·외산 51.3%&quot;,
+        &quot;observed&quot;: &quot;E6: 1.1%→33.9%(+32.8%p); 순위와 국산·외산 비중 미확인&quot;
+      },
+      &quot;investor_implication&quot;: &quot;중국산 비중 상승은 기사에 귀속해 보도할 수 있다. 브랜드별 경쟁 강도나 국가 순위를 비교하려면 생산 원산지와 브랜드 국적, 등록 분모를 먼저 확인한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C10&quot;,
+      &quot;claim_text&quot;: &quot;방송은 중국산 전기차 관세를 미국 127%, 유럽 35.3%로 언급했다. 이 무역장벽으로 수출 물량이 한국에 더 유입될 수 있다는 것은 전망이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:20:22&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.94,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;미국 127%, 유럽 35.3%&quot;,
+        &quot;observed&quot;: &quot;방송 시점의 적용 세율 및 목적지별 물량 자료 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;두 관세율을 동일 기준으로 비교하거나 한국향 물량 증가를 확정 전망으로 반영하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C11&quot;,
+      &quot;claim_text&quot;: &quot;방송은 중국 내수 판매가 최근 −2%, 수출 관련 지표가 100% 넘게 성장했다고 언급하며 생산 과잉을 우려했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:20:22&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.6,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;내수 판매 −2%, 수출 관련 지표 성장률 100% 초과&quot;,
+        &quot;observed&quot;: &quot;지표 정의·분모·비교 기간과 대조 통계 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;정의와 비교 기간이 확인되기 전 두 수치를 시장 수급이나 실적 추정의 입력값으로 사용하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C12&quot;,
+      &quot;claim_text&quot;: &quot;방송은 국내 생산 전기차를 생산 세액공제 지원 대상에 넣는 방안이 논의 중이라고 전했다. 시행이나 WTO 적합성이 확정됐다는 뜻은 아니다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:20:22&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.94,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;공제율 및 시행일 미제시&quot;,
+        &quot;observed&quot;: &quot;법안·공식 세제 자료 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;대상 차종, 공제 요건, 적용 시기가 확정되기 전에는 지원금을 제조사의 실적 전망에 반영하지 않는다.&quot;
+    }
+  ],
+  &quot;entities&quot;: [
+    {
+      &quot;ticker&quot;: &quot;^KS11&quot;,
+      &quot;name&quot;: &quot;한국 증시 안정책&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;F4 회의에서 시장 상황에 따라 증시안정펀드를 즉시 가동할 수 있게 준비하기로 했다. 방송은 실제 투입이 결정됐다고 전하지는 않았다.&quot;,
+        &quot;상장기업의 1일 자기주식 매수 주문 수량 한도를 완화하고 불법 공매도 특별 집중감시 기간을 운영한다는 설명.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;실제 가동 시 2008년 글로벌 금융위기 이후 18년 만이라는 설명. 팬데믹 때도 펀드를 준비했으나 매수 대기 수준에 닿기 전에 시장이 반등했다고 언급했다.&quot;,
+        &quot;자기주식 매수 주문 한도 완화 시행일은 11월 24일로 언급됐다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;^KS11&quot;,
+        &quot;as_of&quot;: &quot;2026-11-24T00:15:17.776695+00:00&quot;,
+        &quot;current_price&quot;: 4708.54,
+        &quot;market_cap&quot;: null,
+        &quot;forward_pe&quot;: null,
+        &quot;trailing_pe&quot;: null,
+        &quot;fifty_two_week_high&quot;: 9385.59,
+        &quot;fifty_two_week_low&quot;: 0.0,
+        &quot;average_target_price&quot;: null,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    }
+  ],
+  &quot;evidence&quot;: [
+    {
+      &quot;evidence_id&quot;: &quot;E1&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;Central Garden &amp; Pet Q4 Earnings Call Highlights&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/central-garden-pet-q4-earnings-001237837.html&quot;,
+      &quot;publisher&quot;: &quot;MarketBeat&quot;,
+      &quot;published_at&quot;: &quot;2026-11-24T00:12:37+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Central Garden &amp; Pet Q4 Earnings Call Highlights Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 2026 Elections Weather Newsletters Finance M...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E2&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;Why Nvidia Still Has a Problem Even After Jensen Huang&#x27;s Return: Dan Niles&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/technology/ai/articles/why-nvidia-still-problem-even-000700598.html&quot;,
+      &quot;publisher&quot;: &quot;Coinage Coop&quot;,
+      &quot;published_at&quot;: &quot;2026-11-24T00:07:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Why Nvidia Still Has a Problem Even After Jensen Huang&#x27;s Return: Dan Niles Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 2026 Elections Wea...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E3&quot;,
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;title&quot;: &quot;Canada and Ontario back Ford Oakville revamp with C$928.5m&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/economy/policy/articles/canada-ontario-back-ford-oakville-163934313.html&quot;,
+      &quot;publisher&quot;: &quot;Just Auto&quot;,
+      &quot;published_at&quot;: &quot;2026-11-23T16:39:34+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Canada and Ontario back Ford Oakville revamp with C$928.5m Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 2026 Elections Weather Newsletters...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E4&quot;,
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;title&quot;: &quot;Global Aerospace and Defense Material Market Report 2026-2035 | Market to Reach $37 Billion at 5.6% CAGR as Lightweight Composites and Advanced Alloys Gain T...&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/articles/global-aerospace-defense-material-market-142100393.html&quot;,
+      &quot;publisher&quot;: &quot;GlobeNewswire&quot;,
+      &quot;published_at&quot;: &quot;2026-11-23T14:21:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Global Aerospace and Defense Material Market Report 2026-2035 | Market to Reach $37 Billion at 5.6% CAGR as Lightweight Composites and Advanced Alloys Gain Traction Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E5&quot;,
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;title&quot;: &quot;Micron Stock Jumps 19%. Why the Rally Has Legs.&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/m/3f1f89c7-5433-3bc0-990f-eab9250e8983/micron-stock-jumps-19%25.-why.html&quot;,
+      &quot;publisher&quot;: &quot;Barrons.com&quot;,
+      &quot;published_at&quot;: &quot;2026-11-23T22:17:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E6&quot;,
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;title&quot;: &quot;中전기차 침투 속도, 한국이 사실상 1위...\&quot;생태계 고사 위기\&quot;&quot;,
+      &quot;source_url&quot;: &quot;https://www.mt.co.kr/industry/2026/11/23/2026112213473033295&quot;,
+      &quot;publisher&quot;: &quot;Naver News&quot;,
+      &quot;published_at&quot;: &quot;2026-11-22T13:56:00+09:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;22일 한국자동차모빌리티산업협회(KAMA)와 글로벌 주요 조사업체 등의 통계에 따르면 한국 전기차 시장에서 중국산 전기차가 차지하는 비중은 2021년 1.1%에서 2025년 33.9%로 불과 4년 사이 32.8%포인트(p) 급증했다. 이는...&quot;
+    }
+  ],
+  &quot;source_policy&quot;: {
+    &quot;raw_transcript_published&quot;: false,
+    &quot;raw_transcript_in_evidence&quot;: false,
+    &quot;research_pipeline_version&quot;: 4,
+    &quot;closed_source_claims&quot;: &quot;unverified_external_source&quot;,
+    &quot;auto_caption_warning&quot;: true,
+    &quot;local_asr_warning&quot;: false
+  }
+}</pre>
+  </details>
+</article>
+</main>
+  <style>
+.reader-contents { margin: 16px 0; padding: 12px 16px; border: 1px solid var(--line, #64748b); border-radius: 12px; }
+.reader-contents > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-weight: 750; }
+.reader-contents nav { display: grid; gap: 4px; max-height: 45vh; overflow: auto; margin: 8px 0; }
+.reader-contents a { display: block; min-height: 44px; padding: 10px; border-radius: 6px; color: inherit; overflow-wrap: anywhere; }
+.reader-contents a:hover { background: #80808020; }
+.reader-contents .reader-subsection { padding-inline-start: 24px; font-size: .92em; }
+.reader-prose, .report { overflow-wrap: anywhere; line-height: 1.8; }
+.reader-prose p, .reader-prose li { max-width: 85ch; }
+.reader-prose h2, .reader-prose h3, .reader-prose h4, [data-reader-heading] { scroll-margin-top: 100px; line-height: 1.45; }
+.reader-prose h2 { margin-top: 1.8em; padding-bottom: 8px; border-bottom: 1px solid var(--line, #64748b); }
+.reader-prose h3 { margin-top: 1.5em; }
+.reader-prose li { margin: .5em 0; }
+.reader-prose pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.reader-prose blockquote { margin: 16px 0; padding: 4px 16px; border-left: 3px solid var(--accent, #64748b); }
+.reader-table { overflow: auto; max-width: 100%; margin: 16px 0; border: 1px solid var(--line, #64748b); border-radius: 10px; }
+.reader-table table { border-collapse: collapse; width: 100%; margin: 0; font-size: .92rem; }
+.reader-table th, .reader-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line, #64748b); min-width: 110px; max-width: 400px; overflow-wrap: anywhere; white-space: normal; }
+.reader-table th { background: #80808018; }
+.reader-table tr:nth-child(even) { background: #80808008; }
+.reader-search { display: grid; gap: 8px; margin: 16px 0; }
+.reader-search label { font-weight: 700; }
+.reader-search input { box-sizing: border-box; width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line, #64748b); border-radius: 10px; background: var(--panel, #fff); color: var(--text, #132238); font: inherit; }
+.reader-search p { margin: 0; font-size: .86rem; }
+.reader-back { position: fixed; bottom: max(14px, env(safe-area-inset-bottom)); right: 14px; z-index: 30; min-height: 44px; border: 1px solid #778899; border-radius: 99px; padding: 10px 16px; background: #18344a; color: #fff; font: 700 14px system-ui; cursor: pointer; box-shadow: 0 3px 12px #0003; }
+[data-reader-source] { margin-top: 20px; }
+[data-reader-source] > summary { min-height: 44px; cursor: pointer; }
+[data-reader-source] pre { font-size: .85rem; }
+[data-reader-source] pre, .reader-prose { min-width: 0; }
+.reader-contents :focus-visible, .reader-search :focus-visible, .reader-back:focus-visible, .reader-table:focus-visible { outline: 3px solid var(--accent, #008c95); outline-offset: 3px; }
+.reader-search + .grid > [hidden] { display: none !important; }
+@media (max-width: 600px) { .reader-prose { font-size: 1rem; } .reader-contents { padding: 8px 12px; } }
+@media print { .reader-back, .reader-search, .reader-contents, [data-reader-source] { display: none !important; } .reader-table { overflow: visible; } .reader-prose { color: #000; background: #fff; } }
+</style><script>
+(() => {
+  'use strict';
+  let serial = 0;
+  const rendered = new WeakMap();
+  const node = (tag, text) => { const el = document.createElement(tag); if (text != null) el.textContent = text; return el; };
+  function inline(parent, text) {
+    const pattern = /(`[^`]+`|\*\*[^*]+\*\*|\[[^\]]+\]\(https?:\/\/[^\s)]+\))/g;
+    let start = 0;
+    for (const match of String(text).matchAll(pattern)) {
+      parent.append(document.createTextNode(text.slice(start, match.index)));
+      const value = match[0];
+      if (value.startsWith('`')) parent.append(node('code', value.slice(1, -1)));
+      else if (value.startsWith('**')) parent.append(node('strong', value.slice(2, -2)));
+      else {
+        const link = value.match(/^\[([^\]]+)\]\((.+)\)$/);
+        const a = node('a', link[1]); a.href = link[2]; a.rel = 'noopener noreferrer'; parent.append(a);
+      }
+      start = match.index + value.length;
+    }
+    parent.append(document.createTextNode(text.slice(start)));
+  }
+  const cells = line => line.trim().replace(/^\|/, '').replace(/\|$/, '').split(/(?<!\\)\|/).map(v => v.trim().replace(/\\\|/g, '|'));
+  function markdown(source) {
+    const article = node('article'); article.className = 'reader-prose';
+    const lines = source.split(/\r?\n/); let list = null;
+    for (let i = 0; i < lines.length; i += 1) {
+      const line = lines[i], value = line.trim();
+      if (!value) { list = null; continue; }
+      if (/^```/.test(value)) {
+        const code = []; i += 1;
+        while (i < lines.length && !/^```/.test(lines[i].trim())) code.push(lines[i++]);
+        const pre = node('pre'); pre.append(node('code', code.join('\n'))); article.append(pre); list = null; continue;
+      }
+      if (i + 1 < lines.length && value.includes('|') && cells(lines[i + 1]).every(v => /^:?-{3,}:?$/.test(v))) {
+        const table = node('table'), head = node('thead'), body = node('tbody');
+        const row = (values, tag) => { const tr = node('tr'); values.forEach(v => { const cell = node(tag); if (tag === 'th') cell.scope = 'col'; inline(cell, v); tr.append(cell); }); return tr; };
+        head.append(row(cells(line), 'th')); i += 2;
+        while (i < lines.length && lines[i].trim() && lines[i].includes('|')) body.append(row(cells(lines[i++]), 'td'));
+        i -= 1; table.append(head, body); article.append(table); list = null; continue;
+      }
+      const heading = value.match(/^(#{1,6})\s+(.+)$/);
+      if (heading) { const h = node('h' + Math.min(4, heading[1].length + 1)); inline(h, heading[2]); article.append(h); list = null; continue; }
+      const bullet = value.match(/^(?:[-*+] |\d+\. )(.+)$/);
+      if (bullet) {
+        const tag = /^\d/.test(value) ? 'ol' : 'ul';
+        if (!list || list.tagName.toLowerCase() !== tag) { list = node(tag); if (tag === 'ol') list.start = parseInt(value, 10); article.append(list); }
+        const li = node('li'); inline(li, bullet[1]); list.append(li); continue;
+      }
+      list = null;
+      if (/^(---+|\*\*\*+)$/.test(value)) { article.append(node('hr')); continue; }
+      const p = node(value.startsWith('> ') ? 'blockquote' : 'p'); inline(p, value.startsWith('> ') ? value.slice(2) : line); article.append(p);
+    }
+    return article;
+  }
+  function contents(root) {
+    root.querySelectorAll(':scope > .reader-contents').forEach(el => el.remove());
+    const headings = [...root.querySelectorAll('h2,h3,h4')].filter(h => !h.closest('.card,.run-card,.reader-contents,[data-reader-source],[hidden]'));
+    if (headings.length < 2) return;
+    const details = node('details'); details.className = 'reader-contents';
+    details.append(node('summary', '이 리포트 목차 · ' + headings.length + '개 항목'));
+    const nav = node('nav'); nav.setAttribute('aria-label', '리포트 목차');
+    headings.forEach(h => {
+      if (!h.id) h.id = 'reader-section-' + (++serial);
+      h.dataset.readerHeading = ''; h.tabIndex = -1;
+      const a = node('a', h.textContent); a.href = '#' + h.id;
+      if (h.tagName !== 'H2') a.className = 'reader-subsection';
+      a.addEventListener('click', event => {
+        event.preventDefault();
+        for (let ancestor = h.parentElement; ancestor; ancestor = ancestor.parentElement) if (ancestor.tagName === 'DETAILS') ancestor.open = true;
+        h.scrollIntoView({block: 'start'}); h.focus({preventScroll: true});
+      }); nav.append(a);
+    });
+    details.append(nav); root.prepend(details);
+  }
+  function enhance(root) {
+    if (!root) return;
+    root.querySelectorAll('pre[data-report-markdown]').forEach(pre => {
+      const previous = rendered.get(pre);
+      if (previous && previous.source === pre.textContent) return;
+      const article = markdown(pre.textContent);
+      if (previous) previous.article.replaceWith(article);
+      else {
+        const details = node('details'); details.dataset.readerSource = '';
+        details.append(node('summary', 'Markdown 원문 보기'));
+        pre.before(article, details); details.append(pre);
+      }
+      rendered.set(pre, {source: pre.textContent, article});
+    });
+    root.querySelectorAll('table').forEach(table => {
+      if (table.closest('.reader-table,.account-table-wrap,.summary-scroll')) return;
+      const wrap = node('div'); wrap.className = 'reader-table'; wrap.tabIndex = 0;
+      wrap.setAttribute('role', 'region'); wrap.setAttribute('aria-label', '리포트 표 · 가로로 스크롤하여 전체 보기');
+      table.before(wrap); wrap.append(table);
+    });
+    root.querySelectorAll('.grid').forEach(grid => {
+      const cards = [...grid.querySelectorAll(':scope > a.card')];
+      if (cards.length < 2 || grid.dataset.readerSearch) return;
+      grid.dataset.readerSearch = 'true';
+      const box = node('div'); box.className = 'reader-search';
+      const input = node('input'); input.type = 'search'; input.placeholder = '제목 · 종목 · 채널 · 키워드'; input.id = 'report-search-' + (++serial);
+      const label = node('label', '리포트 찾기'); label.htmlFor = input.id;
+      const status = node('p'); status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
+      const update = () => {
+        const terms = input.value.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean); let count = 0;
+        cards.forEach(card => { card.hidden = !terms.every(t => card.textContent.toLocaleLowerCase().includes(t)); if (!card.hidden) count += 1; });
+        status.textContent = cards.length + '개 중 ' + count + '개 표시' + (count ? '' : ' · 검색어를 지우거나 다른 키워드를 입력하세요.');
+      };
+      input.addEventListener('input', update); box.append(label, input, status); grid.before(box); update();
+    });
+    contents(root);
+  }
+  window.TradingAgentsReader = {enhance};
+  const main = document.querySelector('main');
+  if (main && !main.hasAttribute('data-reader-dynamic')) enhance(main);
+  if (main) {
+    const top = node('button', '↑ 맨 위'); top.type = 'button'; top.className = 'reader-back'; top.setAttribute('aria-label', '리포트 맨 위로 이동');
+    top.addEventListener('click', () => { const target = document.querySelector('h1') || main; target.tabIndex = -1; target.scrollIntoView({block: 'start'}); target.focus({preventScroll: true}); });
+    document.body.append(top);
+  }
+})();
+</script>
+</body>
+</html>
