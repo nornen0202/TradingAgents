@@ -145,6 +145,9 @@ def test_independent_refresh_runs_while_daily_producer_is_busy(tmp_path, monkeyp
     with interprocess_file_lock(refresh.quote_producer_lock_path(tmp_path), timeout=0):
         assert local.main() == 0
     assert calls == [str(forward)]
+    (tmp_path / "paper/enabled.json").write_text(json.dumps({"enabled": False}))
+    assert refresh.execution_refresh_enabled(tmp_path) is False
+    assert refresh.quote_producer_lock_path(tmp_path) == tmp_path / "execution-refresh.lock"
 
 
 @pytest.mark.parametrize("status,seconds,expected", [

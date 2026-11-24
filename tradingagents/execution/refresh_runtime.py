@@ -32,13 +32,13 @@ def execution_refresh_enabled(state):
 
 
 def execution_lane_enabled(state):
+    """Choose the producer lock independently of the current order switches."""
     try:
         settings = _read(Path(state) / "execution-refresh-enabled.json", {})
     except (OSError, ValueError):
         return False
     return (isinstance(settings, dict) and settings.get("mode") == EXECUTION_LANE_MODE
-            and settings.get("enabled") is True and settings.get("real_orders_enabled") is False
-            and execution_refresh_enabled(state))
+            and settings.get("enabled") is True and settings.get("real_orders_enabled") is False)
 
 
 def quote_producer_lock_path(state):
