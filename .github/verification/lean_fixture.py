@@ -24,11 +24,10 @@ class NativePrice(PythonData):
         return row
 
 class CommissionAndLevy(FeeModel):
-    def get_order_fee(self, parameters):
-        order = parameters.order
-        mark = D(str(parameters.security.price))
+    def get_order_fee(self, security, order):
+        mark = D(str(security.price))
         execution = mark * (D("1.001") if order.quantity > 0 else D(".999"))
-        fee = execution * abs(order.quantity) * (D(".001") if order.quantity > 0 else D(".003"))
+        fee = execution * D(str(abs(order.quantity))) * (D(".001") if order.quantity > 0 else D(".003"))
         return OrderFee(CashAmount(float(fee), "KRW"))
 
 class Algorithm(QCAlgorithm):
