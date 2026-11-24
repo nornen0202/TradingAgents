@@ -694,6 +694,8 @@ def _parse_execution_levels(data: Mapping[str, Any]) -> ExecutionLevels:
             try:
                 level_items.append(_parse_price_level(item))
             except StructuredDecisionValidationError:
+                if item.get("confirmation_group") is not None or item.get("entry_condition_role") is not None:
+                    raise
                 continue
 
     return ExecutionLevels(

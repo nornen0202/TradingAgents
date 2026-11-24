@@ -169,6 +169,30 @@ def test_independent_pilot_is_not_vetoed_by_unmet_other_entry_group():
     at = datetime.fromisoformat("2026-09-21T11:00:00+09:00")
     update = evaluate_execution_state(original, market(at), now=at, max_data_age_seconds=120)
     assert update.decision_now.value == "STARTER_NOW"
+    blocked = evaluate_execution_state(replace(original, min_relative_volume=1.1),
+                                      replace(market(at), relative_volume=0.7), now=at, max_data_age_seconds=120)
+    assert blocked.decision_now.value == "NONE" and blocked.trigger_status["support_fail"]
+
+
+@pytest.mark.parametrize("confirmation", ["next_open", "next_session_quote"])
+def test_ungrouped_active_next_session_entry_cannot_trigger_intraday(confirmation):
+    original = contract(entry_action="STARTER", conditional_entry_action="NONE", execution_levels={"levels": [
+        {"level_type": "PULLBACK", "low": 100, "high": 102, "confirmation": confirmation},
+    ]})
+    at = datetime.fromisoformat("2026-09-21T11:00:00+09:00")
+    update = evaluate_execution_state(original, market(at), now=at, max_data_age_seconds=120)
+    assert update.decision_now.value == "NONE"
+    assert update.reason_codes == ("conditional_entry_confirmation_unavailable",)
+
+
+@pytest.mark.parametrize("metadata", [{"confirmation_group": "pilot"}, {"entry_condition_role": "required"}])
+def test_invalid_grouped_or_required_clause_cannot_be_silently_dropped(metadata):
+    thesis = decision(execution_levels={"levels": [
+        {"level_type": "BREAKOUT", "price": 100, "confirmation": "intraday", "confirmation_group": "pilot"},
+        {"level_type": "SUPPORT", "price": 102, **metadata},
+    ]})
+    with pytest.raises(StructuredDecisionValidationError, match="(explicit confirmation|entry_condition_role)"):
+        parse_structured_decision(json.dumps(thesis))
 
 
 @pytest.mark.parametrize("case", [

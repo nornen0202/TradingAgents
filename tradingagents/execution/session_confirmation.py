@@ -21,6 +21,7 @@ _OBSERVATION_FIELDS = ("kind", "event_at", "observed_at", "price", "ticker", "so
                        "venue", "session_id", "price_basis", "scheduled_event_at", "revised_at")
 _ENTRY_GROUP = re.compile(r"[A-Za-z0-9_-]{1,32}")
 ENTRY_CONFIRMATION_STAGES = {"intraday", "close", "next_open", "next_session_quote"}
+EXPLICIT_NEXT_SESSION_STAGES = {"next_open", "next_session_quote"}
 
 
 def entry_research_deadline(analysis_at, explicit_expiry=None):
@@ -184,10 +185,15 @@ def _official_observations(records, market):
 
 
 def uses_entry_groups(levels):
-    return any(_entry_field(level, "confirmation_group") is not None
-               or _entry_field(level, "entry_condition_role") is not None for level in levels) or (
+    return has_explicit_entry_plan(levels) or (
         len(levels) == 1 and _entry_field(levels[0], "confirmation") in {"close", "next_day", "next_open", "next_session_quote"}
     )
+
+
+def has_explicit_entry_plan(levels):
+    return any(_entry_field(level, "confirmation_group") is not None
+               or _entry_field(level, "entry_condition_role") is not None
+               or _entry_field(level, "confirmation") in EXPLICIT_NEXT_SESSION_STAGES for level in levels)
 
 
 def _entry_field(level, name):

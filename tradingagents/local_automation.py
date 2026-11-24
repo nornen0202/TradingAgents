@@ -200,12 +200,13 @@ def _scheduler_manifest_view(manifest):
 
     if not isinstance(manifest, dict):
         return manifest
-    view = fields(manifest, ("run_id", "label", "started_at", "finished_at", "status"))
+    view = fields(manifest, ("run_id", "label", "started_at", "finished_at", "status", "overlay_source_run_id"))
     for name, keys in (
         ("settings", ("market", "market_scope", "run_mode", "analysis_mode")),
-        ("summary", ("successful_tickers", "failed_tickers", "configured_ticker_count")),
-        ("active_universe", ("coverage",)),
+        ("summary", ("total_tickers", "successful_tickers", "failed_tickers", "configured_ticker_count")),
+        ("active_universe", ("coverage", "missing_holding_tickers")),
         ("execution", ("execution_asof", "refresh_checkpoint", "overlay_phase")),
+        ("overlay_universe", ("status", "baseline_run_id", "missing_candidate_tickers")),
     ):
         if name in manifest:
             view[name] = fields(manifest[name], keys)
@@ -220,11 +221,14 @@ def _scheduler_manifest_view(manifest):
         execution["overlay_phase"] = fields(execution["overlay_phase"], ("selected_checkpoints",))
     if "tickers" in manifest:
         rows = manifest["tickers"]
-        view["tickers"] = [fields(row, ("ticker", "status", "artifacts")) for row in rows] if isinstance(rows, list) else rows
+        view["tickers"] = [fields(row, ("ticker", "status", "artifacts", "candidate_research_omitted",
+                                      "intraday_snapshot_attempt")) for row in rows] if isinstance(rows, list) else rows
         if isinstance(view["tickers"], list):
             for row in view["tickers"]:
                 if isinstance(row, dict) and "artifacts" in row:
                     row["artifacts"] = fields(row["artifacts"], ("analysis_json",))
+                if isinstance(row, dict) and "intraday_snapshot_attempt" in row:
+                    row["intraday_snapshot_attempt"] = fields(row["intraday_snapshot_attempt"], ("success", "checkpoint"))
     return view
 
 
@@ -234,7 +238,9 @@ def completed_target(manifest, target, *, window_start=None, now=None, archive=N
     Scheduled callers supply their original tick clock. Direct callers default
     to the actual current UTC instant, never an unbounded future cutoff.
     """
-    from tradingagents.scheduled.runner import _manifest_is_complete_overlay_baseline, _manifest_production_priority
+    from tradingagents.scheduled.runner import (
+        _manifest_is_complete_overlay_baseline, _manifest_production_priority, _verified_completed_partial_overlay,
+    )
 
     now = datetime.now(timezone.utc) if now is None else now
     if not isinstance(now, datetime) or now.tzinfo is None or now.utcoffset() is None:
@@ -287,7 +293,9 @@ def completed_target(manifest, target, *, window_start=None, now=None, archive=N
             return False
     elif started < boundary:
         return False  # Older manifests have no execution observation receipt.
-    return manifest.get("status") == "success" and int((manifest.get("summary") or {}).get("failed_tickers", 0)) == 0
+    return _verified_completed_partial_overlay(manifest) or (
+        manifest.get("status") == "success" and int((manifest.get("summary") or {}).get("failed_tickers", 0)) == 0
+    )
 
 
 def partial_target_source(manifests, target, *, window_start, now):

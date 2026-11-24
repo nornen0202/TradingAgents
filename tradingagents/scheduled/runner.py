@@ -219,7 +219,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "--strict",
         action="store_true",
-        help="Return non-zero when a ticker fails or required full-universe coverage is incomplete.",
+        help="Return non-zero for current ticker failures or incomplete required coverage.",
     )
     parser.add_argument("--label", default="github-actions", help="Run label for archived metadata.")
     parser.add_argument("--resume-from-run", help="Recover failed or proven wrong-company ticker research into a new cohort, preserving valid research provenance.")
@@ -274,7 +274,9 @@ def main(argv: list[str] | None = None) -> int:
         f"({manifest['summary']['successful_tickers']} success / {manifest['summary']['failed_tickers']} failed)."
     )
     strict_failed = manifest["status"] == "failed" or bool(manifest["summary"]["failed_tickers"])
-    if args.strict and _strict_required_coverage_failed(manifest):
+    if _verified_completed_partial_overlay(manifest):
+        strict_failed = False  # The overlay checkpoint completed. Research coverage stays partial.
+    elif args.strict and _strict_required_coverage_failed(manifest):
         strict_failed = True
         print(
             "::error::Required ticker-universe coverage is incomplete; "
@@ -3792,6 +3794,47 @@ def _strict_required_coverage_failed(manifest: dict[str, Any]) -> bool:
         return False
     coverage = active.get("coverage")
     return not isinstance(coverage, dict) or coverage.get("complete") is not True
+
+
+def _verified_completed_partial_overlay(manifest: dict[str, Any]) -> bool:
+    """An optional research omission does not spend the current checkpoint's retry budget."""
+    if manifest.get("status") != "partial_failure":
+        return False
+    settings = manifest.get("settings") or {}
+    if settings.get("run_mode") != "overlay_only" or str(settings.get("market")).upper() != "KR":
+        return False
+    baseline = manifest.get("overlay_universe") or {}
+    omitted = baseline.get("missing_candidate_tickers")
+    if (baseline.get("status") != "VERIFIED_PARTIAL" or not baseline.get("baseline_run_id")
+            or baseline["baseline_run_id"] != manifest.get("overlay_source_run_id")
+            or not isinstance(omitted, list) or not 1 <= len(omitted) <= 3
+            or not all(isinstance(ticker, str) for ticker in omitted)
+            or (manifest.get("active_universe") or {}).get("missing_holding_tickers")):
+        return False
+    summary = manifest.get("summary") or {}
+    execution = manifest.get("execution") or {}
+    checkpoint = execution.get("refresh_checkpoint")
+    if not checkpoint or checkpoint not in (execution.get("overlay_phase") or {}).get("selected_checkpoints", []):
+        return False
+    failed, succeeded = [], []
+    for row in manifest.get("tickers") or []:
+        if row.get("status") == "failed" and row.get("candidate_research_omitted") is True:
+            failed.append(row.get("ticker"))
+        elif row.get("status") == "success":
+            attempt = row.get("intraday_snapshot_attempt") or {}
+            if attempt.get("success") is not True or attempt.get("checkpoint") != checkpoint:
+                return False
+            succeeded.append(row.get("ticker"))
+        else:
+            return False
+    scope = failed + succeeded
+    return bool(succeeded and failed == omitted
+                and all(isinstance(ticker, str) and ticker for ticker in scope)
+                and len({_ticker_identity_key(ticker) for ticker in scope}) == len(scope)
+                and 1 <= len(failed) <= len(scope) // 10
+                and summary.get("total_tickers") == len(scope)
+                and summary.get("successful_tickers") == len(succeeded)
+                and summary.get("failed_tickers") == len(failed))
 
 
 def _github_actions_source_receipt() -> dict[str, Any]:
