@@ -5,7 +5,9 @@ from dataclasses import asdict
 from datetime import datetime, timezone
 import json
 import logging
+import os
 from pathlib import Path
+import re
 from zoneinfo import ZoneInfo
 
 from websockets.asyncio.client import connect
@@ -59,7 +61,9 @@ async def _read_feed(clients, hts_ids, *, state, approval, attempts):
                 sleep=asyncio.sleep, attempts=attempts, idle_seconds=5, stop_after_recovery=True)
     except TimeoutError:
         raise ValueError("VTS notice observation did not complete before the deadline") from None
-    return asdict(result) | {"rest_order_inquiries": calls}
+    acknowledgements = [{"tr_id": _MARKETS[market][1], "rt_cd": "0"} for market in clients
+                        if result.verified_notice_sessions]
+    return asdict(result) | {"rest_order_inquiries": calls, "notice_acknowledgements": acknowledgements}
 
 
 def check(state, *, connect_to_broker=False, attempts=1):
@@ -67,6 +71,9 @@ def check(state, *, connect_to_broker=False, attempts=1):
               "order_notice_tr": {market: terms[1] for market, terms in _MARKETS.items()},
               "checked_at": datetime.now(timezone.utc).isoformat(), "real_orders_enabled": False,
               "orders_submitted": 0, "status": "READY_TO_PROBE"}
+    revision = os.getenv("TRADINGAGENTS_SOURCE_SHA", "")
+    if re.fullmatch(r"[0-9a-f]{40}", revision):
+        result["source_revision"] = revision
     common = get_api_key("KIS_DEMO_HTS_ID")
     hts_ids = {"KR": common, "US": get_api_key("KIS_DEMO_US_HTS_ID") or common}
     result["hts_configured"] = {market: bool(value) for market, value in hts_ids.items()}

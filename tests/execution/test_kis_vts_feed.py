@@ -213,6 +213,40 @@ def test_local_probe_keeps_independent_app_approvals_and_subscriptions_scoped(tm
     assert all(secret not in str(result) for secret in (kr.app_key, us.app_key, kr.account_no, "fixture-token"))
 
 
+def test_probe_records_only_subscription_tr_and_result_code(tmp_path, monkeypatch):
+    from tools import check_kis_vts_feed as probe
+
+    class Socket:
+        async def send(self, _payload):
+            pass
+
+        def __aiter__(self):
+            async def messages():
+                yield acknowledgement("H0STCNI9", KR)
+                yield acknowledgement("H0GSCNI9", US)
+            return messages()
+
+    @asynccontextmanager
+    async def socket(*args, **kwargs):
+        yield Socket()
+
+    class Client:
+        def __init__(self, scope):
+            from tradingagents.execution.kis_demo import DemoCredentials
+            self.credentials = DemoCredentials("test", "test", scope.account[:8], scope.account[8:])
+
+        def orders(self, _date):
+            return []
+
+    monkeypatch.setattr(probe, "_FixedHostConnection", socket)
+    result = asyncio.run(probe._read_feed({"KR": Client(KR), "US": Client(US)},
+                         {scope.market: scope.hts_id for scope in (KR, US)}, state=tmp_path,
+                         approval="fixture-approval-only", attempts=1))
+    assert result["notice_acknowledgements"] == [{"tr_id": "H0STCNI9", "rt_cd": "0"}, {"tr_id": "H0GSCNI9", "rt_cd": "0"}]
+    assert result["rest_order_inquiries"] == {"KR": 2, "US": 2}
+    assert all(value not in str(result) for value in (KR.hts_id, US.account, KEY.decode(), IV.decode(), "fixture-approval-only"))
+
+
 @pytest.mark.parametrize("failure", ["handshake", "no_ack_before_deadline"])
 def test_local_probe_writes_masked_failure_without_holding_broker_lane(tmp_path, monkeypatch, failure):
     from tools import check_kis_vts_feed as probe
