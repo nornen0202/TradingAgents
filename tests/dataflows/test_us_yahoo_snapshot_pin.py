@@ -54,10 +54,18 @@ def test_independent_cache_read_preserves_exact_floats(native):
     _, download, config, _ = native
     with run_config(config):
         first = stats.load_ohlcv('AAPL', END)
-    with run_config(config):
-        again = stats.load_ohlcv('AAPL', END)
-        # CSV dates may use a different datetime resolution; values stay exact.
-        pd.testing.assert_frame_equal(first, again, check_exact=True, check_dtype=False)
+    recorder = DailyHistoryEvidenceRecorder('AAPL')
+    token = recorder.activate()
+    try:
+        with run_config(config):
+            again = stats.load_ohlcv('AAPL', END)
+            # CSV dates may use a different datetime resolution; values stay exact.
+            pd.testing.assert_frame_equal(first, again, check_exact=True, check_dtype=False)
+        entry, = recorder.receipt()["entries"]
+        assert entry["input_origin"] == "local_csv_cache"
+        assert entry["observed_at"] is None and entry["adjustment"] is None
+    finally:
+        recorder.reset(token)
     download.assert_called_once()
 
 
@@ -79,7 +87,9 @@ def test_pin_isolated_windows_and_unverified_provenance(native):
             with pytest.raises(VendorMalformedResponseError, match='exceeds the pinned'):
                 us.selected_history('AAPL', '2020-01-01', END)
         receipt = recorder.receipt()
-        assert receipt['entries'][0]['status'] != 'VERIFIED_RETRIEVED_SERIES'
+        entry, = receipt["entries"]
+        assert entry["status"] == "UNVERIFIED" and entry["input_origin"] == "fresh_download"
+        assert entry["observed_at"] and entry["adjustment"] == "yfinance.download(auto_adjust=True)"
         assert receipt['historical_vintage_verified'] is False
     finally:
         recorder.reset(token)

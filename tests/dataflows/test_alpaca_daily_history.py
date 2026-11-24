@@ -81,6 +81,8 @@ def test_sip_evidence_is_verified_only_with_matching_cutoff(provider):
     receipt=_snapshot('CVX','2026-10-28',sip.SOURCE,frame)
     assert receipt['status']=='VERIFIED_RETRIEVED_SERIES'
     assert receipt['provider']=='alpaca' and receipt['historical_vintage_verified'] is False
+    assert receipt['price_currency'] == 'USD' and receipt['native_currency'] is None
+    assert receipt['currency_basis'] == 'explicit_provider_request'
     frame.attrs['request_end']='2026-10-29T00:00:00+00:00'
     assert _snapshot('CVX','2026-10-28',sip.SOURCE,frame)['status']=='UNVERIFIED'
 

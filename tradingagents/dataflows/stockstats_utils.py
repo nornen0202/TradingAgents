@@ -2,7 +2,7 @@ import time
 import logging
 import math
 import re
-from datetime import datetime
+from datetime import datetime, timezone
 
 import pandas as pd
 import yfinance as yf
@@ -218,6 +218,7 @@ def load_ohlcv(symbol: str, curr_date: str, *, requested_start: str | None = Non
         try:
             if curr_date_dt < today_date.normalize() - pd.Timedelta(days=1) or time.time() - os.path.getmtime(cache_file) <= 300:
                 data = pd.read_csv(cache_file, float_precision="round_trip")
+                data.attrs["research_yahoo_cache_read"] = True
                 use_cache = True
         except (OSError, UnicodeError, pd.errors.EmptyDataError, pd.errors.ParserError):
             logger.warning("Unreadable Yahoo daily cache; retrying the source for %s", symbol)
@@ -231,6 +232,7 @@ def load_ohlcv(symbol: str, curr_date: str, *, requested_start: str | None = Non
                 progress=False,
                 auto_adjust=True,
             ))
+            data.attrs["research_yahoo_download_observed_at"] = datetime.now(timezone.utc).isoformat()
         except Exception:
             if not fallback_enabled(symbol):
                 raise

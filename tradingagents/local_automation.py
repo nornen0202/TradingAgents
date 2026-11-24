@@ -503,7 +503,12 @@ def run_due(archive, state, *, now=None, dry_run=False, research_only=False, cat
             if admission_error is not None:
                 raise admission_error
             require_storage_headroom(archive, state, workspace)
+            capture_path = None
             if mode == "full":
+                capture_path = (read_json(state / "runtime-settings.json", {}) or {}).get("daily_history_capture_db")
+                if capture_path is not None:
+                    if not isinstance(capture_path, str) or not Path(capture_path).is_absolute():
+                        raise ValueError("Local daily_history_capture_db must be an absolute private path")
                 source = partial_target_source(manifests, target, window_start=window_start, now=now)
                 if source:
                     # Never fall back to full research if source compatibility
@@ -511,7 +516,8 @@ def run_due(archive, state, *, now=None, dry_run=False, research_only=False, cat
                     args.extend(["--resume-from-run", source])
                 preflight(config)
             stage = "analysis"
-            result = subprocess.run(args, cwd=ROOT, check=False, timeout=12 * 3600)
+            child_options = {"env": {**os.environ, "TRADINGAGENTS_RESEARCH_PRICE_CAPTURE_DB": capture_path}} if capture_path else {}
+            result = subprocess.run(args, cwd=ROOT, check=False, timeout=12 * 3600, **child_options)
             exit_code, error_type = result.returncode, "WorkerExitError"
         except Exception as exc:
             exit_code, error_type = 1, type(exc).__name__
