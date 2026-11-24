@@ -4,6 +4,7 @@ from __future__ import annotations
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from tradingagents.dataflows.integrity import safe_symbol
+from tradingagents.agents.utils.instrument_resolver import resolve_instrument
 
 
 class Position(BaseModel):
@@ -16,7 +17,7 @@ class Position(BaseModel):
     @field_validator("ticker")
     @classmethod
     def check_ticker(cls, value):
-        return safe_symbol(value)
+        return safe_symbol(resolve_instrument(safe_symbol(value)).primary_symbol)
 
 
 class PortfolioContext(BaseModel):

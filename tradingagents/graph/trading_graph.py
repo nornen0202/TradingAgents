@@ -191,8 +191,8 @@ class TradingAgentsGraph:
         self._prepared_run_config["analysis_as_of"] = analysis_date or trade_date
         with run_config(self._prepared_run_config):
             state = self.propagator.create_initial_state(company_name, trade_date, analysis_date=analysis_date)
-        if portfolio is not None:
-            state["standing_portfolio"] = normalize_portfolio(portfolio)
+            if portfolio is not None:
+                state["standing_portfolio"] = normalize_portfolio(portfolio)
         from tradingagents.dataflows.integrity import safe_symbol
         safe_symbol(state["company_of_interest"])
         self.ticker = state["company_of_interest"]

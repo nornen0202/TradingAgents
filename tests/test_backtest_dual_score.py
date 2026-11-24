@@ -95,7 +95,8 @@ def test_backtest_resumes_decisions_and_score_failures_once_and_exports(tmp_path
     assert [ticker for ticker, _, _ in graph.calls] == ["AAPL", "MSFT", "MSFT"]
     assert graph.calls[0][-1]["portfolio"]["cash"] == 100
     assert data["records"][0]["executed_at"] == initial["records"][0]["executed_at"]
-    assert data["records"][0]["new_exposure"] == initial["records"][0]["new_exposure"]
+    assert data["records"][0]["new_exposure"]["strategy_return"] == initial["records"][0]["new_exposure"]["strategy_return"]
+    assert data["records"][0]["new_exposure"]["benchmark_status"] == "AVAILABLE"
     assert data["direction"]["scored"] == 2 and data["direction"]["hits"] == 1
     root = first.log_path.parent
     assert len(list(root.rglob("settlement.json"))) == 3
@@ -169,3 +170,47 @@ def test_cli_report_reader_path_keeps_two_distinct_saves(tmp_path):
     archived = list((tmp_path / "runs").glob("*/complete_report.md"))
     assert len(archived) == 2
     assert sum("first decision evidence" in path.read_text(encoding="utf-8") for path in archived) == 1
+
+
+def test_qualified_kr_benchmark_and_holdings_use_same_market_identity(tmp_path, monkeypatch):
+    from tradingagents.portfolio.context import render_portfolio, normalize_portfolio
+
+    graph_with(monkeypatch)
+    queried = []
+    def price(symbol, first, last):
+        queried.append(symbol)
+        return prices(symbol, first, last)
+    result = bt.run_backtest(["005930"], DATES, {"results_dir": str(tmp_path)}, benchmark_symbol="069500",
+                             holding_period=2, as_of=CUTOFF, provider=price)
+    assert "069500.KS" in queried and "069500" not in queried
+    book = normalize_portfolio({"positions": [{"ticker": "005930", "quantity": 10}]})
+    rendered = render_portfolio({"company_of_interest": "005930.KS", "standing_portfolio": book})
+    assert "005930.KS: 10 units" in rendered and "No position" not in rendered
+    assert bt.summarize(result).data["records"][0]["benchmark"] == "069500.KS"
+
+
+def test_calendar_range_accepts_actual_long_horizon_and_historical_dates():
+    from tradingagents.eval.decision_scores import evaluation_sessions
+
+    future = evaluation_sessions("US", "2026-11-24", 101)
+    assert len(future) == 101 and future[0][0] == "2026-11-25"
+    assert evaluation_sessions("US", "2001-01-02", 2)[0][0] == "2001-01-03"
+
+
+def test_retry_fetches_only_the_unavailable_benchmark_after_both_outcomes_settled():
+    def only_close_benchmark(symbol, first, last):
+        if symbol == "SPY" and last == "2026-03-04":
+            raise OSError("isolated exception")
+        return prices(symbol, first, last)
+    opts = dict(ticker="AAPL", market="US", decision_date=DATES[0], rating="BUY",
+                benchmark="SPY", holding=2, fee_bps=10, as_of=CUTOFF)
+    before = score_decision(provider=only_close_benchmark, **opts)
+    assert before["direction"]["status"] == before["new_exposure"]["status"] == "SCORED"
+    queried = []
+    def changed(symbol, first, last):
+        queried.append(symbol)
+        return prices(symbol, first, last)
+    after = score_decision(provider=changed, previous=before, **opts)
+    assert queried == ["SPY"] and after["direction"] == before["direction"]
+    assert after["new_exposure"]["strategy_return"] == before["new_exposure"]["strategy_return"]
+    assert after["new_exposure"]["benchmark_status"] == "AVAILABLE"

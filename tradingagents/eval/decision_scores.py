@@ -16,12 +16,16 @@ DIRECTION = {"BUY": 1, "OVERWEIGHT": 1, "SELL": -1, "UNDERWEIGHT": -1}
 EXPOSURE = {"BUY": 1.0, "OVERWEIGHT": .5, "HOLD": 0.0, "SELL": 0.0, "UNDERWEIGHT": 0.0, "NO_TRADE": 0.0}
 SCHEMA = "tradingagents.dual-decision-scores/v1"
 _ZONES = {"KR": "Asia/Seoul", "US": "America/New_York"}
+TERMINAL_SCORES = {"SCORED", "NO_DIRECTION", "NO_NEW_EXPOSURE", "REVIEW"}
 
 
 def evaluation_sessions(market, day, count):
     start = date.fromisoformat(day) + timedelta(days=1)
     end = start + timedelta(days=max(14, count * 4))
-    calendar = get_exchange_calendar(default_calendar_name(market))
+    name = default_calendar_name(market)
+    calendar = get_exchange_calendar(name)
+    if start < calendar.first_session.date() or end > calendar.last_session.date():
+        calendar = get_exchange_calendar(name, start=f"{start.year - 1}-12-01", end=f"{end.year + 1}-01-31")
     sessions = [
         (label.date().isoformat(), calendar.session_open(label).to_pydatetime(),
          calendar.session_close(label).to_pydatetime())
@@ -64,8 +68,31 @@ def _asset_return(frame, first, last, column):
     return None if initial is None or final is None else (final - initial) / initial
 
 
+def settlement_complete(scores):
+    if not scores or not all(value["status"] in TERMINAL_SCORES for value in scores.values()):
+        return False
+    fork = scores["new_exposure"]
+    return fork["status"] != "SCORED" or fork.get("benchmark_status") == "AVAILABLE"
+
+
+def _fork_benchmark(fork, benchmark, fee_bps, provider):
+    if fork["status"] != "SCORED" or fork.get("benchmark_status") == "AVAILABLE":
+        return fork
+    first, last = fork["entry_session"], fork["exit_session"]
+    result = {key: value for key, value in fork.items() if key != "benchmark_error_type"}
+    try:
+        base = _asset_return(provider(benchmark, first, last), first, last, "Open")
+    except (OSError, RuntimeError, ValueError, TypeError, KeyError) as exc:
+        return {**result, "benchmark_status": "BENCHMARK_PROVIDER_FAILURE", "benchmark_error_type": type(exc).__name__}
+    if base is None:
+        return {**result, "benchmark_status": "BENCHMARK_PRICE_MISSING"}
+    net = base - 2 * fee_bps / 10_000
+    return {**result, "benchmark_status": "AVAILABLE", "benchmark_return": net,
+            "excess_return": fork["strategy_return"] - net}
+
+
 def score_decision(*, ticker, market, decision_date, rating, benchmark, holding, fee_bps, as_of,
-                   provider=yahoo_bars, sessions=evaluation_sessions):
+                   provider=yahoo_bars, sessions=evaluation_sessions, previous=None):
     if rating == "REVIEW" or rating not in EXPOSURE:
         return {"direction": {"status": "REVIEW"}, "new_exposure": {"status": "REVIEW"}}
     if as_of.tzinfo is None or as_of.utcoffset() is None:
@@ -89,10 +116,15 @@ def score_decision(*, ticker, market, decision_date, rating, benchmark, holding,
     if not exposure:
         fork["status"] = "NO_NEW_EXPOSURE"
 
+    previous = previous or {}
+    if previous.get("direction", {}).get("status") in TERMINAL_SCORES:
+        direction = previous["direction"]
+    if previous.get("new_exposure", {}).get("status") in TERMINAL_SCORES:
+        fork = previous["new_exposure"]
     settle_direction = direction["status"] == "PENDING" and as_of >= original_available
     settle_fork = fork["status"] == "PENDING" and as_of >= fork_available
     if not (settle_direction or settle_fork):
-        return {"direction": direction, "new_exposure": fork}
+        return {"direction": direction, "new_exposure": _fork_benchmark(fork, benchmark, fee_bps, provider)}
     end = original_exit if settle_direction else fork_exit
 
     try:
@@ -101,7 +133,7 @@ def score_decision(*, ticker, market, decision_date, rating, benchmark, holding,
         for active, result in ((settle_direction, direction), (settle_fork, fork)):
             if active:
                 result.update(status="ASSET_PROVIDER_FAILURE", error_type=type(exc).__name__)
-        return {"direction": direction, "new_exposure": fork}
+        return {"direction": direction, "new_exposure": _fork_benchmark(fork, benchmark, fee_bps, provider)}
 
     if settle_fork:
         raw = _asset_return(asset, entry, fork_exit, "Open")
@@ -113,17 +145,6 @@ def score_decision(*, ticker, market, decision_date, rating, benchmark, holding,
             net = exposure * raw - cost
             fork.update(status="SCORED", asset_return=raw, strategy_return=net,
                         transaction_cost=cost, hit=net > 0, benchmark_status="PENDING")
-            try:
-                base = _asset_return(provider(benchmark, entry, fork_exit), entry, fork_exit, "Open")
-            except (OSError, RuntimeError, ValueError, TypeError, KeyError) as exc:
-                fork.update(benchmark_status="BENCHMARK_PROVIDER_FAILURE", benchmark_error_type=type(exc).__name__)
-            else:
-                if base is None:
-                    fork["benchmark_status"] = "BENCHMARK_PRICE_MISSING"
-                else:
-                    benchmark_net = base - 2 * fee_bps / 10_000
-                    fork.update(benchmark_status="AVAILABLE", benchmark_return=benchmark_net,
-                                excess_return=net - benchmark_net)
 
     if settle_direction:
         raw = _asset_return(asset, entry, original_exit, "Close")
@@ -145,7 +166,7 @@ def score_decision(*, ticker, market, decision_date, rating, benchmark, holding,
                     direction.update(status="SCORED" if sign else "NO_DIRECTION",
                                      asset_return=raw, benchmark_return=base, alpha=alpha,
                                      alpha_logged=logged, hit=alpha * sign > 0 if sign else None)
-    return {"direction": direction, "new_exposure": fork}
+    return {"direction": direction, "new_exposure": _fork_benchmark(fork, benchmark, fee_bps, provider)}
 
 
 def aggregate(rows, key):

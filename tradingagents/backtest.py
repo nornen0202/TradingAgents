@@ -17,7 +17,7 @@ from tradingagents.atomic_io import atomic_write_bytes, atomic_write_json, inter
 from tradingagents.dataflows.config import run_config
 from tradingagents.dataflows.integrity import safe_symbol
 from tradingagents.default_config import DEFAULT_CONFIG
-from tradingagents.eval.decision_scores import SCHEMA, aggregate, score_decision
+from tradingagents.eval.decision_scores import SCHEMA, aggregate, score_decision, settlement_complete
 from tradingagents.graph.trading_graph import TradingAgentsGraph
 from tradingagents.portfolio.context import normalize_portfolio
 
@@ -25,7 +25,6 @@ ANALYSTS = ("market", "social", "news", "fundamentals")
 _RATING = {"매수": "BUY", "비중확대": "OVERWEIGHT", "비중 확대": "OVERWEIGHT", "보유": "HOLD",
            "비중축소": "UNDERWEIGHT", "비중 축소": "UNDERWEIGHT", "매도": "SELL", "검토": "REVIEW"}
 _KO = {code: name for name, code in _RATING.items()}
-_DONE = {"SCORED", "NO_DIRECTION", "NO_NEW_EXPOSURE", "REVIEW"}
 _REPORT_KEYS = {"company_of_interest", "instrument_profile", "input_instrument", "trade_date", "analysis_date",
     "market_report", "sentiment_report", "news_report", "fundamentals_report", "investment_debate_state",
     "trader_investment_plan", "risk_debate_state", "investment_plan", "final_trade_decision", "decision_artifact_id"}
@@ -211,11 +210,16 @@ def run_backtest(tickers, dates, config, asset_type="stock", portfolio=None, sel
         raise ValueError("Backtest cannot analyze a future exchange-local date.")
     benchmark = config.get("benchmark_ticker") if benchmark_symbol is None else benchmark_symbol
     bench = {}
-    for ticker, profile in profiles.items():
-        if benchmark is not None and resolve_instrument(benchmark).country != profile.country:
-            raise ValueError("An explicit benchmark must belong to the stock's exchange market.")
-        bench[ticker] = safe_symbol(benchmark or ("069500.KS" if profile.country == "KR" else "SPY"))
-    scope = normalize_portfolio(portfolio)
+    with run_config(config):
+        benchmark_profile = resolve_instrument(benchmark) if benchmark is not None else None
+        for ticker, profile in profiles.items():
+            if benchmark_profile and benchmark_profile.country != profile.country:
+                raise ValueError("An explicit benchmark must belong to the stock's exchange market.")
+            if benchmark_profile:
+                bench[ticker] = safe_symbol(benchmark_profile.yahoo_symbol or benchmark_profile.primary_symbol)
+            else:
+                bench[ticker] = "069500.KS" if profile.country == "KR" else "SPY"
+        scope = normalize_portfolio(portfolio)
     identity = {"schema": SCHEMA, "inputs": sorted(profiles), "dates": days, "holding": holding,
                 "benchmark": bench, "fee_bps": transaction_cost_bps, "asset_type": asset_type,
                 "exchange_calendar_version": version("exchange-calendars"),
@@ -288,24 +292,24 @@ def run_backtest(tickers, dates, config, asset_type="stock", portfolio=None, sel
                         atomic_write_json(attempt / "report-error.json", {"error_type": type(exc).__name__})
                         result.settlement_failures.append((ticker, f"{day}: report {type(exc).__name__}"))
                 prior = _read(scores) if scores.exists() else {}
-                if prior and all(item["status"] in _DONE for item in prior.values()):
+                if settlement_complete(prior):
                     measured = prior
                 else:
                     try:
                         measured = score_decision(ticker=profile.yahoo_symbol or ticker, market=profile.country,
                             decision_date=day, rating=recorded["rating"], benchmark=bench[ticker], holding=holding,
-                            fee_bps=transaction_cost_bps, as_of=cutoff, **({"provider": provider} if provider else {}))
+                            fee_bps=transaction_cost_bps, as_of=cutoff, previous=prior,
+                            **({"provider": provider} if provider else {}))
                     except Exception as exc:
                         atomic_write_json(attempt / "settlement-error.json", {"error_type": type(exc).__name__})
-                        measured = _not_scored("SETTLEMENT_FAILURE")
-                    for name, value in prior.items():
-                        if value["status"] in _DONE:
-                            measured[name] = value
+                        measured = _not_scored("SETTLEMENT_FAILURE") | prior
                     atomic_write_json(attempt / "settlement.json", {"cutoff": cutoff.isoformat(), "scores": measured})
                     atomic_write_json(scores, measured)
                 for name, score in measured.items():
-                    if score["status"].endswith("FAILURE"):
-                        result.settlement_failures.append((ticker, f'{day}: {name} {score["status"]}'))
+                    for key in ("status", "benchmark_status"):
+                        status = score.get(key, "")
+                        if status.endswith("FAILURE"):
+                            result.settlement_failures.append((ticker, f"{day}: {name} {status}"))
                 rows.append({"ticker": ticker, "decision_date": day, "executed_at": recorded["executed_at"],
                              "rating": recorded["rating"], "source": "FULL", "progress_source": progress_source,
                              "benchmark": bench[ticker], **measured})
