@@ -14,7 +14,7 @@ PLAN_REASONS = frozenset({
     "STRATEGY_AUTHORIZATION_EXPIRED", "SELL_SIZE_REQUIRES_EXPLICIT_ALLOCATION", "STRATEGY_EVIDENCE_UNVERIFIED",
 })
 REFRESH_FIELDS = ("market", "session_date", "started_at", "finished_at", "status",
-                  "consecutive_failures", "real_orders_enabled", "error_type")
+                  "consecutive_failures", "real_orders_enabled", "error_type", "source_run_id", "source_diagnostics")
 
 
 def allocation_view(raw):

@@ -63,6 +63,29 @@ def test_planning_rejections_and_producer_limits_are_visible_without_secrets(tmp
     assert kis_strategy_health(tmp_path, analysis_as_of=NOW)["markets"]["KR"]["refresh_health"] == {"status": "UNVERIFIED"}
 
 
+def test_older_completed_production_and_current_expired_consumer_have_distinct_evidence(tmp_path):
+    raw = receipt()
+    row = raw["markets"]["KR"]
+    row.update(source_run_id="20261019T095000_current", source_diagnostics={
+        "status": "BLOCKED", "strategy_rows": 30, "fresh_rows": 0, "execution_ready_rows": 0,
+        "generated_at": "2026-10-19T00:53:00Z", "newest_market_data_at": "2026-10-19T00:52:40Z",
+    }, admission_counts={"strategy_signals": 0, "candidates_checked": 0, "priced": 0, "cash_and_size_passed": 0})
+    row["refresh_attempt"] = {"market": "kr", "session_date": "2026-10-16", "status": "COMPLETED",
+        "started_at": "2026-10-16T00:10:00Z", "finished_at": "2026-10-16T00:11:00Z",
+        "source_run_id": "20261016T091000_old", "consecutive_failures": 0, "real_orders_enabled": False,
+        "source_diagnostics": {"status": "EXECUTION_OBSERVATIONS_AVAILABLE", "fresh_rows": 28}}
+    write(tmp_path, raw)
+    projected = kis_strategy_health(tmp_path, analysis_as_of=NOW)["markets"]["KR"]
+    assert projected["refresh_health"]["status"] == "PREVIOUS_SESSION"
+    assert projected["refresh_health"]["source_run_id"] == "20261016T091000_old"
+    assert projected["refresh_health"]["source_diagnostics"]["fresh_rows"] == 28
+    assert "latest_completed_source_selected" not in projected["refresh_health"]
+    assert projected["source_diagnostics"]["source_run_id"] == "20261019T095000_current"
+    assert projected["source_diagnostics"]["data_age_seconds_at_check"] == 440
+    assert projected["source_diagnostics"]["fresh_rows"] == 0
+    assert projected["admission_counts"]["cash_and_size_passed"] == 0
+
+
 @pytest.mark.parametrize("changes", [{"checked_at": None}, {"checked_at": "bad"}, {"checked_at": "2026-10-20T01:00:00Z"},
     {"mode": "real"}, {"real_orders_enabled": True}, {"markets": []}])
 def test_invalid_root_cannot_show_trading(tmp_path, changes):

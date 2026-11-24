@@ -139,7 +139,7 @@ def archive_catalog(archive_dir, *, analysis_as_of, only_ticker=None, include_co
 _CODE = re.compile(r"^[A-Za-z0-9_.:-]{1,160}$")
 
 
-def _source_health(raw):
+def _source_health(raw, *, as_of=None):
     if not isinstance(raw, dict):
         return {}
     statuses = {"NO_SOURCE", "BLOCKED", "NO_ALLOCATED_ORDERS", "PROPOSALS_AVAILABLE", "EXECUTION_OBSERVATIONS_AVAILABLE"}
@@ -148,6 +148,13 @@ def _source_health(raw):
         value = raw.get(key)
         if type(value) is int and value >= 0:
             result[key] = value
+    if as_of is not None:
+        generated, observed = instant(raw.get("generated_at")), instant(raw.get("newest_market_data_at"))
+        if generated is not None and generated <= as_of:
+            result["generated_at"] = generated.isoformat()
+            if observed is not None and observed <= generated:
+                result["newest_market_data_at"] = observed.isoformat()
+                result["data_age_seconds_at_check"] = int((as_of - observed).total_seconds())
     counts = raw.get("reason_counts")
     result["reason_counts"] = {k: v for k, v in (counts.items() if isinstance(counts, dict) else [])
                                if isinstance(k, str) and re.fullmatch(r"[A-Za-z0-9_:.-]{1,100}", k)
@@ -427,7 +434,9 @@ def _strategy_evaluation_view(raw, market, observed, *, verified_costs=None):
         return None
     status = "AVAILABLE_NET_OF_REVIEWED_COSTS" if net is not None else "AVAILABLE_GROSS_ONLY" if gross is not None else raw["status"]
     return {"status": status, "currency": currency, "analysis_as_of": known.isoformat(),
-            "sample": {**counts, "closed_inventory_episodes": closed}, "turnover": turnover,
+            "sample": {**counts, "closed_inventory_episodes": closed,
+                       "first_observed_at": first.isoformat() if first else None,
+                       "last_observed_at": last.isoformat() if last else None}, "turnover": turnover,
             "gross_pnl": gross, "realized_gross_pnl": realized,
             "net_pnl": net, "actual_cost": actual, "fees_known": costs_known, "settlement_known": costs_known,
             "realized_net_pnl": realized_net, "realized_actual_cost": realized_cost, "exact_fifo_available": exact_fifo,
@@ -533,7 +542,9 @@ def kis_strategy_health(archive_dir, *, analysis_as_of, strategy_ledger_dir=None
             or raw.get("real_orders_enabled") is not False or checked is None or checked > cutoff
             or not isinstance(raw.get("markets"), dict)):
         return result
-    result.update(status="AVAILABLE", checked_at=checked.isoformat(), stale=(cutoff-checked).total_seconds() > 180, enabled=raw.get("enabled") is True)
+    lag = (cutoff - checked).total_seconds()
+    result.update(status="AVAILABLE", checked_at=checked.isoformat(), refresh_lag_seconds=int(lag),
+                  stale=lag > 180, enabled=raw.get("enabled") is True)
     def number(value):
         return value if not isinstance(value, bool) and isinstance(value, (int, float)) and math.isfinite(value) else None
     statuses = {"DISABLED", "WAITING_VALIDATION", "WAITING_SIGNAL", "MARKET_CLOSED", "BLOCKED", "ACTIVE"}
@@ -548,10 +559,28 @@ def kis_strategy_health(archive_dir, *, analysis_as_of, strategy_ledger_dir=None
         view = {"status": row["status"], "checked_at": observed.isoformat(), "gate_passed": row.get("gate_passed") is True,
                 "blockers": [b for b in (row.get("blockers") if isinstance(row.get("blockers"), list) else []) if isinstance(b, str) and re.fullmatch(r"[A-Z_]{1,80}", b)],
                 "order_counts": {}, "orders": [], "performance": None, "performance_history": []}
-        view["source_diagnostics"] = _source_health(row.get("source_diagnostics"))
+        view["source_diagnostics"] = _source_health(row.get("source_diagnostics"), as_of=observed)
+        checks = row.get("admission_counts")
+        steps = ("strategy_signals", "candidates_checked", "priced", "cash_and_size_passed")
+        if isinstance(checks, dict) and all(type(checks.get(key)) is int for key in steps):
+            counts = [checks[key] for key in steps]
+            if counts == sorted(counts, reverse=True) and counts[-1] >= 0:
+                view["admission_counts"] = dict(zip(steps, counts))
         from tradingagents.execution.strategy_diagnostics import allocation_view, refresh_attempt_health
         view["allocation_diagnostics"] = allocation_view(row.get("allocation_diagnostics"))
         view["refresh_health"] = refresh_attempt_health(row.get("refresh_attempt"), market=market, now=observed)
+        attempt = row.get("refresh_attempt")
+        selected = row.get("source_run_id")
+        if isinstance(selected, str) and _CODE.fullmatch(selected):
+            view["source_diagnostics"]["source_run_id"] = selected
+        if view["refresh_health"].get("attempt_status") == "COMPLETED" and isinstance(attempt, dict):
+            produced = attempt.get("source_run_id")
+            if isinstance(produced, str) and _CODE.fullmatch(produced):
+                view["refresh_health"]["source_run_id"] = produced
+                end = instant(view["refresh_health"].get("finished_at"))
+                view["refresh_health"]["source_diagnostics"] = _source_health(attempt.get("source_diagnostics"), as_of=end)
+                if view["refresh_health"]["current_session"] and "source_run_id" in view["source_diagnostics"]:
+                    view["refresh_health"]["latest_completed_source_selected"] = produced == selected
         for key, value in (row.get("order_counts") if isinstance(row.get("order_counts"), dict) else {}).items():
             if key in order_states and type(value) is int and value >= 0:
                 view["order_counts"][key] = value
@@ -597,6 +626,11 @@ def kis_strategy_health(archive_dir, *, analysis_as_of, strategy_ledger_dir=None
             if isinstance(validated, dict) and _same_cost_order_bindings(row.get("orders"), validated.get("orders")):
                 proof = validated.get("evaluation")
         view["evaluation"] = _strategy_evaluation_view(evaluation, market, observed, verified_costs=proof)
+        if view["evaluation"] is not None:
+            verified = proof.get("settlement_verified_order_count") if proof else None
+            filled = view["evaluation"]["sample"]["filled_order_count"]
+            view["evaluation"]["orders_without_verified_settlement"] = (
+                filled - verified if type(verified) is int and 0 <= verified <= filled else 0 if filled == 0 else None)
         if (view["performance"] and view["evaluation"]
                 and instant(view["performance"]["observed_at"]) == instant(view["evaluation"]["analysis_as_of"])):
             # Latest aggregate only; historical marks keep their original gross

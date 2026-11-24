@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 import json
 from pathlib import Path
+import sys
 
 import pytest
 
@@ -119,6 +120,26 @@ def test_existing_producer_calls_refresh_before_advisory_recovery(tmp_path, monk
     monkeypatch.setattr(refresh, 'refresh_due', lambda *a, **k: [{'target': 'execution-freshness-kr', 'status': 'COMPLETED'}])
     monkeypatch.setattr(local_advisory_recovery, 'recover_due', lambda *a, **k: pytest.fail('freshness gets priority'))
     assert local.run_due(tmp_path, tmp_path, now=AT)[0]['status'] == 'COMPLETED'
+
+
+def test_independent_refresh_runs_while_daily_producer_is_busy(tmp_path, monkeypatch):
+    from tradingagents import local_automation as local
+    from tradingagents.atomic_io import interprocess_file_lock
+
+    enable(tmp_path)
+    (tmp_path / "execution-refresh-enabled.json").write_text(json.dumps({
+        "mode": refresh.EXECUTION_LANE_MODE, "enabled": True, "real_orders_enabled": False,
+    }))
+    calls = []
+    monkeypatch.setattr(local, "prepare_environment", lambda: None)
+    monkeypatch.setattr(refresh, "refresh_due", lambda *args, **kw: calls.append((args, kw)) or [])
+    monkeypatch.setattr(sys, "argv", ["local_automation", "refresh-kis", "--archive-dir", str(tmp_path),
+                                    "--state-dir", str(tmp_path), "--runtime-dir", str(tmp_path)])
+    with interprocess_file_lock(tmp_path / "run-due.lock", timeout=0):
+        assert local.main() == 0
+    with interprocess_file_lock(refresh.quote_producer_lock_path(tmp_path), timeout=0):
+        assert local.main() == 0
+    assert len(calls) == 1
 
 
 @pytest.mark.parametrize("status,seconds,expected", [
