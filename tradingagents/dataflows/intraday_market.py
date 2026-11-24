@@ -22,32 +22,58 @@ def fetch_intraday_market_snapshot(
     provider: str | None = None,
     checkpoint_id: str | None = None,
 ) -> IntradayMarketSnapshot:
-    """Fetch an execution-grade intraday snapshot through the configured provider.
+    """Fetch a classified intraday snapshot through the configured provider chain.
 
-    KR symbols prefer KIS quotes when credentials and provider configuration are
-    available, then fall back to yfinance so scheduled runs still produce an
-    explicit degraded/freshness signal instead of failing silently.
+    Default US and KR chains prefer KIS and allow a delayed Yahoo reference.
+    Fallback provenance is retained; obtaining a price does not make delayed
+    data execution-ready. An explicit provider selection remains authoritative.
     """
 
+    from datetime import datetime, timezone
+    from .config import get_config
+    from .integrity import parse_analysis_cutoff
+    from .intraday.providers import require_live_intraday_clock
+    from .market_policy import aware_datetime
+    from .vendor_exceptions import VendorUnavailableError
+
     market_tz = market_timezone or _default_market_timezone(ticker)
+    requested_as_of = get_config().get("analysis_as_of")
+    requested_cutoff = parse_analysis_cutoff(requested_as_of, market_tz) if requested_as_of else None
+    live_only_providers = {"kis", "kis_quote", "kis_microstructure", "kis_us_microstructure"}
     provider_chain = _provider_chain(ticker=ticker, provider=provider)
     last_exc: Exception | None = None
+    failures: dict[str, str] = {}
     for provider_name in provider_chain:
         try:
+            if requested_as_of and provider_name.strip().lower() in live_only_providers:
+                require_live_intraday_clock(market_tz, provider_name=provider_name)
             snapshot = get_intraday_provider(provider_name).fetch(
                 ticker,
                 interval=interval,
                 market_timezone=market_tz,
                 checkpoint_id=checkpoint_id,
             )
+            # A live event may occur during the request. Its receipt time bounds
+            # it unless the caller supplied an earlier analysis cutoff.
+            received_at = datetime.now(timezone.utc)
+            cutoff = min(received_at, requested_cutoff) if requested_cutoff is not None else received_at
+            snapshot_asof = aware_datetime(snapshot.asof)
+            if snapshot_asof is None:
+                raise VendorUnavailableError(f"Intraday provider '{provider_name}' omitted snapshot asof or supplied an invalid clock.")
+            if snapshot_asof > cutoff:
+                raise VendorUnavailableError(f"Intraday provider '{provider_name}' snapshot asof exceeds analysis_as_of.")
             return replace(
                 snapshot,
+                missing_reason={**snapshot.missing_reason, **failures},
                 execution_data_quality=classify_execution_market_data(
                     snapshot,
                 ),
             )
         except Exception as exc:
             last_exc = exc
+            # Retain degraded-path provenance without logging provider messages
+            # that may contain credentials, account identifiers or request URLs.
+            failures[f"provider:{provider_name}"] = f"unavailable:{type(exc).__name__}"
             if provider_name == provider_chain[-1]:
                 break
             continue
@@ -113,15 +139,13 @@ def classify_execution_market_data(
     realtime = bool(provider_realtime_capable)
     max_delay = max(int(max_quote_delay_seconds or 0), 0)
 
-    if regular_session and realtime and delay is not None and delay <= max_delay:
-        return REALTIME_EXECUTION_READY
     if not realtime:
         return DELAYED_ANALYSIS_ONLY
-    if delay is None:
-        return DELAYED_ANALYSIS_ONLY
-    if delay > max_delay:
+    if delay is not None and (delay < 0 or delay > max_delay):
         return STALE_INVALID_FOR_EXECUTION
-    return REALTIME_EXECUTION_READY
+    if regular_session and delay is not None:
+        return REALTIME_EXECUTION_READY
+    return DELAYED_ANALYSIS_ONLY
 
 
 def _coerce_bool(value: Any) -> bool | None:

@@ -61,9 +61,11 @@ Adhere strictly to these instructions, and ensure your output is detailed, accur
     @staticmethod
     def _outcome_metadata(state):
         now = datetime.now(timezone.utc)
+        market_timezone = (state.get("instrument_profile") or {}).get("timezone") or "UTC"
         known_at = state.get("outcome_known_at", now.isoformat())
-        known = _clock(known_at, allow_date=True)
-        decision, date_only = _query_cutoff(state.get("analysis_date") or state["trade_date"])
+        known = _clock(known_at, allow_date=True, market_timezone=market_timezone)
+        decision, date_only = _query_cutoff(state.get("analysis_date") or state["trade_date"],
+                                            market_timezone=market_timezone)
         if decision is None:
             raise ValueError("Decision as-of date is required")
         if (known < decision if date_only else known <= decision):
@@ -78,7 +80,7 @@ Adhere strictly to these instructions, and ensure your output is detailed, accur
         for field in ("settlement_date", "settled_at"):
             if field not in state:
                 continue
-            settlement = _clock(state[field], allow_date=True)
+            settlement = _clock(state[field], allow_date=True, market_timezone=market_timezone)
             if (settlement < decision if date_only else settlement <= decision):
                 raise ValueError("Settlement must occur after the decision as-of date")
             if settlement > now:

@@ -756,7 +756,8 @@ class PortfolioKisTests(unittest.TestCase):
 
         snapshot = load_account_snapshot_from_kis(profile)
 
-        self.assertEqual(snapshot.snapshot_health, "VALID")
+        self.assertEqual(snapshot.snapshot_health, "INVALID_SNAPSHOT")
+        self.assertEqual(snapshot.cash_diagnostics["pending_orders_status"], "UNVERIFIED")
         self.assertEqual(snapshot.pending_orders, tuple())
         self.assertTrue(any("pending-order lookup failed" in warning for warning in snapshot.warnings))
         self.assertFalse(any("12345678" in warning for warning in snapshot.warnings))
@@ -821,6 +822,14 @@ class PortfolioKisTests(unittest.TestCase):
         self.assertEqual(snapshot.positions[0].market_value_krw, 390000)
         self.assertEqual(snapshot.total_equity_krw, 490000)
         self.assertEqual(snapshot.cash_diagnostics["fx_quote"]["rate"], 1300)
+        self.assertEqual(snapshot.cash_diagnostics["pending_orders_status"], "VERIFIED")
+
+        client.fetch_overseas_pending_orders.side_effect = RuntimeError("unavailable")
+        incomplete = load_account_snapshot_from_kis(profile)
+        self.assertEqual(incomplete.snapshot_health, "INVALID_SNAPSHOT")
+        self.assertEqual(incomplete.cash_diagnostics["pending_orders_status"], "UNVERIFIED")
+        self.assertEqual(incomplete.positions, snapshot.positions)
+        self.assertEqual(incomplete.total_equity_krw, snapshot.total_equity_krw)
 
 
 if __name__ == "__main__":

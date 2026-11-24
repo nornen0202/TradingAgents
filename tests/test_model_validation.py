@@ -75,7 +75,7 @@ class ModelValidationTests(unittest.TestCase):
                 self.assertTrue(validate_model(provider, "gpt-6-sol"))
 
     def test_codex_prefers_sol_for_decisions_and_sol_for_routine_analysis(self):
-        for mode, model in (("quick", "gpt-6.1-sol"), ("deep", "gpt-6.1-sol")):
+        for mode, model in (("quick", "gpt-6.2-sol"), ("deep", "gpt-6.2-sol")):
             with self.subTest(mode=mode):
                 self.assertTrue(validate_model("codex", model))
                 self.assertEqual(get_model_options("codex", mode)[0][1], model)

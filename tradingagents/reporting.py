@@ -5,9 +5,24 @@ import re
 import json
 from pathlib import Path
 from typing import Any, Mapping
+from uuid import uuid4
+
+from tradingagents.atomic_io import interprocess_file_lock
 
 from tradingagents.presentation import present_decision, sanitize_investor_text
 from tradingagents.schemas import parse_structured_decision
+
+
+def save_versioned_report_bundle(final_state, ticker, save_path, **options):
+    """Preserve each saved report alongside the existing latest-reader path."""
+    root = Path(save_path)
+    history = root / "runs" / uuid4().hex[:16]
+    options.setdefault("generated_at", dt.datetime.now(dt.timezone.utc))
+    artifact_id = final_state.get("decision_artifact_id") or history.name
+    state = {**final_state, "decision_artifact_id": artifact_id}
+    with interprocess_file_lock(root / ".reports.lock", timeout=20):
+        save_report_bundle(state, ticker, history, **options)
+        return save_report_bundle(state, ticker, root, **options)
 
 
 def save_report_bundle(
@@ -135,6 +150,8 @@ def save_report_bundle(
         metadata_lines.append(f"{labels['analysis_date']}: {analysis_date}")
     if trade_date:
         metadata_lines.append(f"{labels['trade_date']}: {trade_date}")
+    if final_state.get("decision_artifact_id"):
+        metadata_lines.append(f"Decision ID: {final_state['decision_artifact_id']}")
 
     header = f"# {labels['report_title']}: {ticker}\n\n" + "\n".join(metadata_lines) + "\n\n"
     if (type(presentation_diagnostics) is dict

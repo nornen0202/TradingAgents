@@ -229,13 +229,15 @@ def validate_admission(admission):
         if (admission["schema"] != "tradingagents.local-advisory-admission/v1"
                 or admission["workflow"] not in WORKFLOWS
                 or admission["target"] != WORKFLOWS[admission["workflow"]] + "-daily"
-                or admission["status"] not in {"DISPATCH_REQUESTED", "DISPATCH_ACCEPTED", "DISPATCH_UNRESOLVED", "ACTIVE", "TERMINAL"}
+                or admission["status"] not in {"DISPATCH_REQUESTED", "DISPATCH_ACCEPTED", "DISPATCH_UNRESOLVED", "DISPATCH_REJECTED", "ACTIVE", "TERMINAL"}
                 or not isinstance(admission["prior_run_ids"], list)
                 or any(type(run_id) is not int or run_id <= 0 for run_id in admission["prior_run_ids"])
                 or admission["inputs"]["recovery_source"] != "local_watchdog"):
             raise ValueError("Invalid admission")
         timestamp(admission["requested_at"])
         timestamp(admission["window_start"])
+        if admission["status"] == "DISPATCH_REJECTED" and admission.get("http_status") not in {401, 403, 404, 422}:
+            raise ValueError("Missing definitive dispatch rejection")
         if admission["status"] in {"ACTIVE", "TERMINAL"}:
             if type(admission["run_id"]) is not int or admission["run_id"] <= 0 or type(admission["run_attempt"]) is not int or admission["run_attempt"] <= 0:
                 raise ValueError("Invalid admitted run")
@@ -246,7 +248,7 @@ def validate_admission(admission):
 def resolve_admission(client, admission):
     """Do not retry an accepted/unknown request merely because a timer expired."""
     validate_admission(admission)
-    if admission["status"] == "TERMINAL":
+    if admission["status"] in {"TERMINAL", "DISPATCH_REJECTED"}:
         return admission
     workflow = admission["workflow"]
     if workflow not in WORKFLOWS:
@@ -286,7 +288,7 @@ def recover_due(archive, state, *, watchdog, targets, now, dry_run=False, client
             resolved = resolve_admission(client, admission)
             if not dry_run and resolved != admission:
                 atomic_write_json(admission_path, resolved)
-            if resolved["status"] != "TERMINAL":
+            if resolved["status"] not in {"TERMINAL", "DISPATCH_REJECTED"}:
                 return [{"target": resolved["target"], "status": "ADVISORY_" + resolved["status"],
                          "run_id": resolved.get("run_id")}]
         # Queued native collectors may not have jobs yet. Protect both advisory
@@ -361,9 +363,14 @@ def recover_due(archive, state, *, watchdog, targets, now, dry_run=False, client
             try:
                 client.client.dispatch(workflow, inputs)
             except Exception as exc:
-                atomic_write_json(admission_path, {**admission, "status": "DISPATCH_UNRESOLVED",
+                # A definitive HTTP rejection created no owner. Preserve the
+                # attempt budget/cooldown, but do not block every future day.
+                rejected = isinstance(exc, urllib.error.HTTPError) and exc.code in {401, 403, 404, 422}
+                status = "DISPATCH_REJECTED" if rejected else "DISPATCH_UNRESOLVED"
+                atomic_write_json(admission_path, {**admission, "status": status,
+                                                   **({"http_status": exc.code} if rejected else {}),
                                                    "error_type": type(exc).__name__})
-                decisions.append({"target": target.name, "status": "ADVISORY_DISPATCH_UNRESOLVED",
+                decisions.append({"target": target.name, "status": "ADVISORY_" + status,
                                   "error_type": type(exc).__name__})
             else:
                 atomic_write_json(admission_path, {**admission, "status": "DISPATCH_ACCEPTED"})

@@ -1,11 +1,12 @@
 from __future__ import annotations
 
-import json
 import math
 from decimal import Decimal, ROUND_FLOOR
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
+
+from tradingagents.atomic_io import atomic_write_json
 
 from .account_models import AccountSnapshot, PortfolioCandidate, PortfolioRecommendation
 from .account_review import review_market_views, render_account_review
@@ -217,5 +218,4 @@ def _build_proposed_orders(snapshot: AccountSnapshot, recommendation: PortfolioR
 
 
 def _write_json(path: Path, payload: Any) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8")
+    atomic_write_json(path, payload)

@@ -5,6 +5,7 @@ from typing import Any
 
 
 OUTCOME_CALCULATION_VERSION = 3
+VERIFIED_PRICE_CALCULATION_VERSION = 4
 
 
 ACTION_TRACKER_SCHEMA: tuple[str, ...] = (

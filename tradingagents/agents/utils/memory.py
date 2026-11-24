@@ -10,18 +10,19 @@ import sqlite3
 from pathlib import Path
 from copy import deepcopy
 from datetime import date, datetime, time, timedelta, timezone
+from zoneinfo import ZoneInfo
 
 
-def _clock(value: Any, *, allow_date: bool = False) -> datetime:
+def _clock(value: Any, *, allow_date: bool = False, market_timezone: str = "UTC") -> datetime:
     if isinstance(value, datetime):
         stamp = value
     elif isinstance(value, date) and allow_date:
-        return datetime.combine(value, time.min, timezone.utc)
+        return datetime.combine(value, time.min, ZoneInfo(market_timezone)).astimezone(timezone.utc)
     elif isinstance(value, str):
         if re.fullmatch(r"\d{4}-\d{2}-\d{2}", value):
             if not allow_date:
                 raise ValueError("A timezone-aware memory clock is required")
-            return datetime.combine(date.fromisoformat(value), time.min, timezone.utc)
+            return _clock(date.fromisoformat(value), allow_date=True, market_timezone=market_timezone)
         stamp = datetime.fromisoformat(value.replace("Z", "+00:00"))
     else:
         raise ValueError("A verified memory clock is required")
@@ -30,13 +31,15 @@ def _clock(value: Any, *, allow_date: bool = False) -> datetime:
     return stamp.astimezone(timezone.utc)
 
 
-def _query_cutoff(value: Any) -> tuple[datetime | None, bool]:
+def _query_cutoff(value: Any, *, market_timezone: str = "UTC") -> tuple[datetime | None, bool]:
     if value is None:
         return None, False
     date_only = ((isinstance(value, date) and not isinstance(value, datetime))
                  or (isinstance(value, str) and re.fullmatch(r"\d{4}-\d{2}-\d{2}", value) is not None))
-    cutoff = _clock(value, allow_date=date_only)
-    return (cutoff + timedelta(days=1), True) if date_only else (cutoff, False)
+    if date_only:
+        day = date.fromisoformat(value) if isinstance(value, str) else value
+        return _clock(day + timedelta(days=1), allow_date=True, market_timezone=market_timezone), True
+    return _clock(value), False
 
 
 def _utc_now() -> datetime:
@@ -44,7 +47,7 @@ def _utc_now() -> datetime:
 
 
 def _eligible_clocks(metadata: dict, cutoff: datetime, *, date_only: bool,
-                     knowledge_cutoff: datetime) -> bool:
+                     knowledge_cutoff: datetime, market_timezone: str) -> bool:
     try:
         # Availability and local ingestion are always actual instants. A legacy
         # outcome date cannot manufacture either clock for an archived memory.
@@ -53,11 +56,11 @@ def _eligible_clocks(metadata: dict, cutoff: datetime, *, date_only: bool,
         known_value = metadata.get("outcome_known_at")
         if date_only and "outcome_known_at" not in metadata:
             known_value = metadata.get("settlement_date")
-        known = _clock(known_value, allow_date=date_only)
+        known = _clock(known_value, allow_date=date_only, market_timezone=market_timezone)
         clocks = [known, available, ingested]
         for field in ("settlement_date", "settled_at"):
             if field in metadata:
-                clocks.append(_clock(metadata[field], allow_date=date_only))
+                clocks.append(_clock(metadata[field], allow_date=date_only, market_timezone=market_timezone))
         if available < max([clocks[0], *clocks[3:]]) or ingested < available:
             return False
         # A current/future date query must not expose evidence that has not yet
@@ -69,7 +72,7 @@ def _eligible_clocks(metadata: dict, cutoff: datetime, *, date_only: bool,
         if "trade_date" in metadata:
             # A trade-date label remains a calendar date, even for an instant
             # query. Its outcome/availability/ingestion must still be verified.
-            trade = _clock(metadata["trade_date"], allow_date=True)
+            trade = _clock(metadata["trade_date"], allow_date=True, market_timezone=market_timezone)
             if (trade >= cutoff if date_only else trade > cutoff) or trade > known:
                 return False
     except (TypeError, ValueError, OverflowError):
@@ -90,6 +93,7 @@ class FinancialSituationMemory:
         self.default_n_matches = int(self.config.get("memory_n_matches", 2))
         self.max_entries = max(1, int(self.config.get("memory_max_entries", 500)))
         self.as_of: str | date | datetime | None = None
+        self.market_timezone = "UTC"
         self.store_path = None
         if self.config.get("memory_dir"):
             if not re.fullmatch(r"[A-Za-z0-9_-]+", name):
@@ -166,16 +170,17 @@ class FinancialSituationMemory:
 
         An aware timestamp is an exact, inclusive cutoff: outcome, availability,
         ingestion and any settlement clock must be timezone-aware. A YYYY-MM-DD
-        cutoff means the entire UTC calendar day (exclusive next midnight), and
+        cutoff means the entire configured market day (exclusive next midnight), and
         permits legacy outcome/settlement dates. Both paths require actual aware
         availability and ingestion; missing or invalid clocks are excluded.
         Both cutoff modes are additionally bounded by actual UTC now, inclusive,
         so today's or a future as_of cannot admit future knowledge. Historical
-        date boundaries remain exclusive at the following UTC midnight.
+        date boundaries remain exclusive at the following market midnight.
         Without as_of or self.as_of this remains an unbounded-time diagnostic
         search, not point-in-time investment evidence.
         """
-        cutoff, date_only = _query_cutoff(self.as_of if as_of is None else as_of)
+        cutoff, date_only = _query_cutoff(self.as_of if as_of is None else as_of,
+                                          market_timezone=self.market_timezone)
         knowledge_cutoff = _utc_now() if cutoff is not None else None
         if not self.documents:
             return []
@@ -187,7 +192,8 @@ class FinancialSituationMemory:
         for idx in range(len(self.documents)):
             metadata = self.metadata[idx] if idx < len(self.metadata) else {}
             if cutoff is not None and not _eligible_clocks(
-                    metadata, cutoff, date_only=date_only, knowledge_cutoff=knowledge_cutoff):
+                    metadata, cutoff, date_only=date_only, knowledge_cutoff=knowledge_cutoff,
+                    market_timezone=self.market_timezone):
                 continue
             if metadata_filters and any(metadata.get(key) != value for key, value in metadata_filters.items()):
                 continue

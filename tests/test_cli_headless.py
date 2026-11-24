@@ -127,3 +127,27 @@ def test_graph_context_closes_on_success_stream_error_and_save_error(tmp_path, f
         else:
             run_analysis(selections=selections)
     assert closed == [True]
+
+
+def test_ask_output_language_handles_cancellation_without_attribute_error():
+    from cli import utils as cli_utils
+
+    with patch("cli.utils.questionary.select", return_value=SimpleNamespace(ask=lambda: None)), patch("cli.utils.console.print"):
+        with pytest.raises(SystemExit) as exc:
+            cli_utils.ask_output_language()
+        assert exc.value.code == 1
+
+    with (
+        patch("cli.utils.questionary.select", return_value=SimpleNamespace(ask=lambda: "custom")),
+        patch("cli.utils.questionary.text", return_value=SimpleNamespace(ask=lambda: None)),
+        patch("cli.utils.console.print"),
+    ):
+        with pytest.raises(SystemExit) as exc:
+            cli_utils.ask_output_language()
+        assert exc.value.code == 1
+
+    with (
+        patch("cli.utils.questionary.select", return_value=SimpleNamespace(ask=lambda: "custom")),
+        patch("cli.utils.questionary.text", return_value=SimpleNamespace(ask=lambda: "  Vietnamese  ")),
+    ):
+        assert cli_utils.ask_output_language() == "Vietnamese"

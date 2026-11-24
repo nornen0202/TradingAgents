@@ -56,6 +56,11 @@ persistent denial still fails without deleting or changing the destination.
     if mode not in (None, 0o600):
         raise ValueError("Shared producer JSON must use owner-only permissions.")
     content = (json.dumps(payload, ensure_ascii=False, indent=indent) + "\n").encode("utf-8")
+    atomic_write_bytes(path, content)
+
+
+def atomic_write_bytes(path: str | Path, content: bytes) -> None:
+    """Replace a file with complete bytes using an owner-only temporary sibling."""
     destination = Path(path)
     destination.parent.mkdir(parents=True, exist_ok=True)
     fd, temporary = _temporary_sibling(destination)

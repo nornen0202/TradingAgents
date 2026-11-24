@@ -1,0 +1,29 @@
+name: Research model compatibility
+on: workflow_dispatch
+permissions:
+  contents: read
+jobs:
+  verify:
+    if: github.ref == 'refs/heads/main'
+    runs-on: [self-hosted, Windows, codex]
+    timeout-minutes: 10
+    env:
+      CODEX_BINARY: ${{ vars.CODEX_BINARY }}
+      CODEX_HOME: ${{ vars.CODEX_HOME }}
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10
+        with:
+          path: model-probe-${{ github.run_id }}
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.13'
+      - name: Verify exact research model and cutoff
+        shell: powershell
+        working-directory: model-probe-${{ github.run_id }}
+        run: |
+          $env:PYTHONPATH = (Get-Location).Path
+          $receipt = Join-Path $env:RUNNER_TEMP "model-probe-${{ github.run_id }}.json"
+          & python .github/scripts/probe_research_models.py $env:CODEX_BINARY $receipt
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          Get-Content -LiteralPath $receipt

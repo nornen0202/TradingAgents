@@ -60,7 +60,7 @@ def test_action_judge_without_configured_models_uses_current_codex_default():
         create_client.return_value.get_llm.return_value = object()
         _create_action_llm(SimpleNamespace(provider="codex", codex_judge_reasoning_effort="xhigh"))
 
-    assert create_client.call_args.kwargs["model"] == "gpt-6.1-sol"
+    assert create_client.call_args.kwargs["model"] == "gpt-6.2-sol"
     assert create_client.call_args.kwargs["codex_reasoning_effort"] == "xhigh"
     assert create_client.call_args.kwargs["model_role"] == "judge"
 
@@ -84,7 +84,7 @@ def test_default_portfolio_judges_use_sol_xhigh():
             create_client.return_value.get_llm.return_value = object()
             factory(LLMSettings())
 
-        assert create_client.call_args.kwargs["model"] == "gpt-6.1-sol"
+        assert create_client.call_args.kwargs["model"] == "gpt-6.2-sol"
         assert create_client.call_args.kwargs["codex_reasoning_effort"] == "xhigh"
         assert create_client.call_args.kwargs["model_role"] == "judge"
 

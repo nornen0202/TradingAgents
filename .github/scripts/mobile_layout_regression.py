@@ -30,10 +30,22 @@ def _strategy_fixture() -> dict[str, Any]:
     markets = {}
     for market, ticker in (("kr", "005930.KS"), ("us", "NVDA")):
         run_id = f"layout-{market}"
+        full_run_id = f"{run_id}-full"
         markets[market] = {
             "market": market.upper(),
             "run_id": run_id,
             "source_health": "OK",
+            "latest_attempt": {"run_id": full_run_id, "status": "SUCCESS", "started_at": now.isoformat()},
+            "latest_completed_analysis": {"run_id": full_run_id, "status": "success", "finished_at": now.isoformat()},
+            "freshness_receipt": {
+                "analysis_run_id": full_run_id,
+                "market_data_status": "FRESH",
+                "market_data_oldest_at": now.isoformat(),
+                "market_data_latest_at": now.isoformat(),
+                "execution_max_age_seconds": 120,
+                "account_as_of": now.isoformat(),
+                "account_snapshot_health": "VALID",
+            },
             "manifest_status": "success",
             "decision_ready": False,
             "conditional_strategy_ready": True,
@@ -87,6 +99,7 @@ def _strategy_fixture() -> dict[str, Any]:
                     "risk_condition_ko": "무효화 가격 이탈 또는 거래량 동반 추세 훼손",
                     "quality": {
                         "row_mode": "CONDITIONAL",
+                        "investor_state": "CONDITIONAL",
                         "conditional_strategy_ready": True,
                         "row_valid_until": valid_until,
                     },

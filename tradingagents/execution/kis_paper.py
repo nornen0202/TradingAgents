@@ -6,7 +6,7 @@ settled fills. Explicit settlement evidence has a separate demo-only import path
 """
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass
+from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 import hashlib
@@ -22,7 +22,8 @@ from tradingagents.dataflows.market_policy import aware_datetime, observation_st
 from tradingagents.performance.lifecycle import append_lifecycle_event, initialize_lifecycle
 from tradingagents.scheduled.market_calendar import market_session_state
 from .kis_demo import DEMO_HOST, DemoError, DemoOrderJournal, KisDemoClient
-from .paper import kis_demo_order_preview
+from .kis_strategy_limits import broker_policy_fields, validate_buy_nav
+from .paper import kis_demo_order_preview, order_nav_limit
 
 
 KST = ZoneInfo("Asia/Seoul")
@@ -110,6 +111,8 @@ class PaperOrderPolicy:
     max_account_age_seconds: int = 120
     max_limit_distance_bps: int = 100
     reserve_cost_bps: int = 30
+    max_order_nav: float | None = None
+    one_share_nav_ceiling: float = 0.0
 
     def __post_init__(self):
         if not isinstance(self.allowed_tickers, tuple) or not self.allowed_tickers or len(set(self.allowed_tickers)) != len(self.allowed_tickers) or any(not isinstance(t, str) or re.fullmatch(r"[0-9]{6}", t) is None for t in self.allowed_tickers):
@@ -121,6 +124,7 @@ class PaperOrderPolicy:
             raise DemoError("Paper clock/collar policy exceeds hard limits")
         if not 0 < _number(self.max_position_fraction, positive=True) <= 1:
             raise DemoError("Invalid paper position limit")
+        validate_buy_nav(self.max_order_nav, self.one_share_nav_ceiling, self.max_position_fraction)
 
 
 def read_paper_account(client: KisDemoClient, *, ticker: str, limit_price: int, clock=None) -> dict:
@@ -184,7 +188,7 @@ class KisPaperBroker:
                 BEGIN SELECT RAISE(ABORT,'Paper intent is immutable'); END;
         """)
         initialize_lifecycle(self.db)
-        encoded = json.dumps(asdict(policy), sort_keys=True)
+        encoded = json.dumps(broker_policy_fields(policy), sort_keys=True)
         with interprocess_file_lock(self.path.with_suffix(self.path.suffix + ".paper.lock")):
             previous = self.db.execute("SELECT policy FROM paper_policy WHERE scope=?", (client.credentials.scope(),)).fetchone()
             if previous and previous[0] != encoded:
@@ -267,6 +271,10 @@ class KisPaperBroker:
         if count >= self.policy.max_daily_orders:
             raise DemoError("Daily paper order limit exceeded")
         if side == "BUY":
+            if (self.policy.max_order_nav is not None
+                    and notional * (1 + self.policy.reserve_cost_bps / 10000)
+                    > nav * order_nav_limit(self.policy, "BUY", quantity)):
+                raise DemoError("Paper buy exceeds the configured NAV limit")
             if bought + notional > self.policy.max_daily_buy_krw:
                 raise DemoError("Daily paper buy limit exceeded")
             if account.get("capacity_ticker") != ticker or account.get("capacity_limit_price") != price:

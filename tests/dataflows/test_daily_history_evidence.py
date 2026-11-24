@@ -1,7 +1,9 @@
+from concurrent.futures import ThreadPoolExecutor
 from contextvars import copy_context
 from copy import deepcopy
 import hashlib
 import json
+import sqlite3
 from types import SimpleNamespace
 from unittest.mock import Mock
 
@@ -10,7 +12,7 @@ import pytest
 
 from tradingagents.dataflows import interface
 from tradingagents.dataflows.config import run_config
-from tradingagents.dataflows.daily_history_evidence import DailyHistoryEvidenceRecorder
+from tradingagents.dataflows.daily_history_evidence import DailyHistoryCapture, DailyHistoryEvidenceRecorder
 from tradingagents.dataflows.daily_history_selection import select_daily_history
 from tradingagents.dataflows.us_daily_history import SOURCE
 from tradingagents.dataflows.vendor_exceptions import VendorInputError, VendorMalformedResponseError
@@ -77,6 +79,54 @@ def test_receipt_only_contains_allowlisted_provenance_not_prices_or_secret_metad
     assert "private" not in serialized
     assert "Open" not in serialized and "Close" not in serialized
     assert receipt["entries"][0]["status"] == "VERIFIED_RETRIEVED_SERIES"
+
+
+def test_forward_capture_is_bound_to_exact_bytes_and_an_append_only_run(tmp_path):
+    capture = DailyHistoryCapture(tmp_path / "private.sqlite", "run-42")
+    data = frame()
+    for _ in range(2):
+        recorder = DailyHistoryEvidenceRecorder("AAPL", capture=capture)
+        recorder.add("AAPL", DAY, SOURCE, data)
+        recorder.add("AAPL", DAY, "unverified", data)
+    good, unknown = recorder.receipt()["entries"]
+    assert good["forward_capture"] == "STORED" and "forward_capture" not in unknown
+    assert good["historical_vintage_verified"] is False
+    with sqlite3.connect(capture.path) as db:
+        [(run_id, snapshot_id, captured_at, receipt_json, series)] = db.execute("SELECT * FROM daily_history_captures")
+        with pytest.raises(sqlite3.IntegrityError, match="append-only"):
+            db.execute("DELETE FROM daily_history_captures")
+    receipt = json.loads(receipt_json)
+    assert run_id == "run-42" and snapshot_id == good["snapshot_id"]
+    assert receipt["observed_at"] < captured_at and receipt["historical_vintage_verified"] is False
+    assert series == data.to_csv(index=False).encode("utf-8")
+    assert hashlib.sha256(series).hexdigest() == receipt["series_sha256"]
+    assert capture.read_snapshot(snapshot_id) == (receipt, series)
+    assert DailyHistoryCapture(capture.path, "another-run").read_snapshot(snapshot_id) is None
+    assert receipt["native_currency"] is None and "source_event_at" in receipt["unverified_fields"]
+
+
+def test_capture_failure_retries_only_the_same_original_series(tmp_path, monkeypatch):
+    capture = DailyHistoryCapture(tmp_path / "private.sqlite", "run-42")
+    recorder = DailyHistoryEvidenceRecorder("AAPL", capture=capture)
+    original = frame()
+    with monkeypatch.context() as failure:
+        failure.setattr(capture, "append", Mock(side_effect=OSError("synthetic failure")))
+        recorder.add("AAPL", DAY, SOURCE, original)
+    first = recorder.receipt()["entries"][0]
+    assert first["forward_capture"] == "WRITE_FAILED"
+    changed = frame()
+    changed.attrs["observed_at"] = "2024-01-04T00:01:00+00:00"
+    recorder.add("AAPL", DAY, SOURCE, changed)
+    assert recorder.receipt()["entries"][0] == first
+    recorder.add("AAPL", DAY, SOURCE, original)
+    assert recorder.receipt()["entries"][0] == {**first, "forward_capture": "STORED"}
+
+
+def test_capture_storage_protects_archive_and_publishing_roots(tmp_path):
+    from tradingagents.scheduled.config import StorageSettings
+    for name in ("archive", "site"):
+        with pytest.raises(ValueError, match="outside"):
+            StorageSettings(tmp_path / "archive", tmp_path / "site", tmp_path / name / "prices.sqlite")
 
 
 @pytest.mark.parametrize("end", [None, "bad", "2099-01-01"])
@@ -214,14 +264,17 @@ def test_selected_source_remains_visible_after_empty_or_failed_wrapper(
     interface.reset_tool_telemetry()
 
 
-@pytest.mark.parametrize("fail", [False, True])
-def test_runner_saves_receipt_after_graph_context_closes_and_always_resets(tmp_path, monkeypatch, fail):
+@pytest.mark.parametrize("fail,failed_storage", [(False, False), (True, False), (False, True)])
+def test_runner_saves_receipt_after_graph_context_closes_and_always_resets(tmp_path, monkeypatch, fail, failed_storage):
     from tradingagents.scheduled import runner
     from tradingagents.scheduled.config import load_scheduled_config
     path = tmp_path / "config.toml"
     path.write_text('[run]\ntickers=["AAPL"]\nmarket="US"\n[storage]\n'
-                    f'archive_dir="{(tmp_path / "archive").as_posix()}"\nsite_dir="{(tmp_path / "site").as_posix()}"\n')
+                    f'archive_dir="{(tmp_path / "archive").as_posix()}"\nsite_dir="{(tmp_path / "site").as_posix()}"\n'
+                    'daily_history_capture_db="prices.sqlite"\n')
     config = load_scheduled_config(path)
+    if failed_storage:
+        monkeypatch.setattr(DailyHistoryCapture, "append", Mock(side_effect=OSError("synthetic private location")))
     def propagate(*args, **kwargs):
         with run_config({}):
             copy_context().run(select_daily_history, "AAPL", DAY, SOURCE, frame())
@@ -247,6 +300,13 @@ def test_runner_saves_receipt_after_graph_context_closes_and_always_resets(tmp_p
         evidence = payload["daily_history_evidence"]
         assert evidence["entries"][0]["status"] == "VERIFIED_RETRIEVED_SERIES"
         assert evidence["entries"][0]["source"] == SOURCE
+        expected = "WRITE_FAILED" if failed_storage else "STORED"
+        assert evidence["entries"][0]["forward_capture"] == expected
+        assert (tmp_path / "prices.sqlite").is_file() is not failed_storage
+        if not fail:
+            ledger = json.loads((tmp_path / "run/tickers/AAPL/evidence_ledger.json").read_text())
+            assert ledger["daily_price_history"] == {**evidence, "run_id": "run", "scope": "RESEARCH_ONLY"}
+            assert "prices.sqlite" not in json.dumps(ledger) and "synthetic private location" not in json.dumps(ledger)
         assert evidence["historical_vintage_verified"] is False
         assert outer.receipt()["entries"] == []
         with run_config({}):
@@ -255,3 +315,31 @@ def test_runner_saves_receipt_after_graph_context_closes_and_always_resets(tmp_p
     finally:
         outer.reset(token)
     graph.close.assert_called_once()
+
+
+@pytest.mark.parametrize("fresh", [False, True])
+def test_selected_yahoo_bytes_have_separate_retention_and_provenance(tmp_path, fresh):
+    capture = DailyHistoryCapture(tmp_path / "private.sqlite", "same-run")
+    data = frame()
+    data.attrs = {"requested_start": "2024-01-02", "requested_end": DAY,
+                  "price_currency": "USD", "exchange": "NAS", "observed_at": "2024-01-04T00:00:00+00:00"}
+    if fresh:
+        data.attrs["research_yahoo_download_observed_at"] = "2024-01-04T00:00:00+00:00"
+    # Independent recorder lifetimes model the same selected input during concurrent retries.
+    def record(_):
+        recorder = DailyHistoryEvidenceRecorder("AAPL", capture=capture)
+        recorder.add("AAPL", DAY, "yfinance", data.copy())
+        return recorder.ledger_reference("same-run")
+    with ThreadPoolExecutor(max_workers=4) as pool:
+        ledgers = list(pool.map(record, range(8)))
+    assert ledgers == [ledgers[0]] * 8
+    entry, = ledgers[0]["entries"]
+    assert entry["forward_capture"] == "STORED" and entry["status"] == "UNVERIFIED"
+    assert entry["native_currency"] is None and entry["price_currency"] is None and entry["exchange"] is None
+    assert entry["observed_at"] == (data.attrs["observed_at"] if fresh else None)
+    assert entry["adjustment"] == ("yfinance.download(auto_adjust=True)" if fresh else None)
+    assert ("observed_at" in entry["unverified_fields"]) is not fresh
+    receipt, raw = capture.read_snapshot(entry["snapshot_id"])
+    assert raw == data.to_csv(index=False).encode() and hashlib.sha256(raw).hexdigest() == receipt["series_sha256"]
+    with sqlite3.connect(capture.path) as db:
+        assert db.execute("SELECT COUNT(*) FROM daily_history_captures").fetchone()[0] == 1

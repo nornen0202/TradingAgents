@@ -135,17 +135,22 @@
   const sourceRun = active().querySelector('.source-meta').textContent;
   window.__auditOffset = 3 * 60 * 60 * 1000;
   window.dispatchEvent(new Event('pageshow'));
-  check(active().querySelector('.market-health').textContent === '주문 전 실시간 확인', 'Expiry clock and health badge');
+  check(active().querySelector('.market-health').textContent === '장중 적용 보류', 'Expiry clock and health badge');
   check(active().dataset.market === 'us' && active().querySelector('input').value === 'NVDA', 'Expiry keeps market and search');
   check(visible()[0].querySelector('details').open, 'Expiry keeps disclosure state');
   check(document.activeElement.tagName === 'SUMMARY', 'Expiry keeps keyboard focus');
   check(visible()[0].dataset.readiness !== 'READY', 'Expired data cannot remain executable');
   check(new URL(location.href).searchParams.get('market') === 'us', 'Market URL sync');
   search('ALPHA');
-  check(/\b2\s*주/.test(planRow('ALPHA').querySelector('.plan-quantity').textContent), 'Expiry preserves the two-share reference proposal');
-  check(planRow('ALPHA').querySelector('.plan-quantity').textContent.includes('입력 계좌 기준 검토 수량'), 'Expired quantity is explicitly a reference estimate');
+  check(!active().querySelector('.execution-warning').hidden, 'Expiry shows the market warning');
+  for (const column of ['quantity', 'price', 'amount']) {
+    check(planRow('ALPHA').querySelector('.plan-' + column + ' .plan-value').textContent === '표시 보류', 'Expiry withholds ' + column);
+  }
+  check(!active().querySelector('.funded-rebalance, .funded-quantity, .plan-overview'), 'Expiry also withholds rotation and cash totals');
   check(planRow('ALPHA').querySelector('.plan-status').textContent.includes('현재 주문 없음'), 'Expired conditional plan cannot imply a current order');
   check(planRow('ALPHA').querySelector('.plan-status').textContent.includes('재확인'), 'Expired price and account data require rechecking');
+  window.__auditOffset = 0;
+  window.dispatchEvent(new Event('pageshow'));
   search('NVDA');
   const originalFetch = window.fetch;
   window.fetch = async () => { throw new Error('테스트 연결 실패'); };
@@ -176,6 +181,33 @@
   document.getElementById('strategy-refresh').click();
   await tick();
   check(visible()[0].dataset.readiness === 'READY', 'Complete ready contract remains supported');
+  const successfulAttempt = market.latest_attempt;
+  market.latest_attempt = {...successfulAttempt, run_id: 'newer-partial', status: 'PARTIAL_FAILURE'};
+  document.getElementById('strategy-refresh').click();
+  await tick();
+  check(active().querySelector('.analysis-attempt').innerText.includes('일부 실패'), 'Latest partial full attempt is visible without expanding a disclosure');
+  check(!active().querySelector('.execution-warning').hidden && visible()[0].dataset.readiness === 'RECHECK', 'A newer partial attempt blocks fresh overlay prices and a ready row');
+  check(planRow('NVDA').querySelector('.plan-quantity .plan-value').textContent === '표시 보류', 'Partial attempt withholds quantities');
+  check(!active().querySelector('.funded-rebalance, .funded-quantity'), 'Partial attempt withholds funded rotation');
+  market.latest_attempt = successfulAttempt;
+  const sourceReceipt = market.freshness_receipt;
+  for (const clock of [null, 'invalid', '2026-02-30T00:00:00Z', new Date(Date.now() + 60000).toISOString()]) {
+    market.freshness_receipt = {...sourceReceipt, market_data_oldest_at: clock, market_data_latest_at: clock};
+    document.getElementById('strategy-refresh').click();
+    await tick();
+    check(!active().querySelector('.execution-warning').hidden, 'Unusable quote clocks withhold prices');
+  }
+  market.freshness_receipt = sourceReceipt;
+  const sourceAccount = market.trade_plan.account_asof;
+  const expiredAccount = new Date(Date.now() - 25 * 3600000).toISOString();
+  market.trade_plan.account_asof = expiredAccount;
+  market.freshness_receipt = {...sourceReceipt, account_as_of: expiredAccount};
+  document.getElementById('strategy-refresh').click();
+  await tick();
+  check(!active().querySelector('.execution-warning').hidden && visible()[0].dataset.readiness === 'READY', 'Account expiry blocks sizing without changing verified analysis');
+  check(!active().querySelector('.funded-rebalance, .funded-quantity'), 'Expired account withholds funded rotation');
+  market.trade_plan.account_asof = sourceAccount;
+  market.freshness_receipt = sourceReceipt;
   const stalePlan = market.trade_plan.rows.find((row) => row.ticker === 'NVDA');
   const savedPlan = structuredClone(stalePlan);
   Object.assign(stalePlan, {quantity: 2, phase: 'NOW', status: 'RECHECK', valid_until: future});
@@ -184,7 +216,8 @@
   check(visible()[0].dataset.readiness === 'READY', 'Plan age does not change the independent analysis readiness');
   check(planRow('NVDA').querySelector('.plan-status').textContent.includes('현재 주문 없음'), 'Ready analysis cannot make a stale account plan current');
   check(planRow('NVDA').querySelector('.plan-status').textContent.includes('재확인'), 'Stale plan has its own recheck state');
-  Object.assign(stalePlan, {status: 'CONDITIONAL', valid_until: savedPlan.valid_until});
+  check(planRow('NVDA').querySelector('.plan-price .plan-value').textContent === '표시 보류', 'Stale plan price stays hidden even if the analysis row is ready');
+  Object.assign(stalePlan, {status: 'CONDITIONAL', valid_until: new Date(Date.now() - 60000).toISOString()});
   document.getElementById('strategy-refresh').click();
   await tick();
   check(visible()[0].dataset.readiness === 'READY', 'Analysis stays independently ready when only the plan expires');

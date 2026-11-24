@@ -535,9 +535,9 @@ jobs:
           workspace_dir = Path(os.environ["GITHUB_WORKSPACE"]) / ".codex-preflight"
           summary_path = os.getenv("GITHUB_STEP_SUMMARY")
           github_env = os.getenv("GITHUB_ENV")
-          preferred_deep_model = "gpt-6.1-sol"
-          preferred_quick_model = "gpt-6.1-sol"
-          preferred_output_model = "gpt-6.1-sol"
+          preferred_deep_model = "gpt-6.2-sol"
+          preferred_quick_model = "gpt-6.2-sol"
+          preferred_output_model = "gpt-6.2-sol"
           from datetime import datetime, timezone
           from tradingagents.scheduled.research_recovery import recovery_preflight_models
 
@@ -1177,9 +1177,9 @@ jobs:
           workspace_dir = Path(os.environ["GITHUB_WORKSPACE"]) / ".codex-preflight"
           summary_path = os.getenv("GITHUB_STEP_SUMMARY")
           github_env = os.getenv("GITHUB_ENV")
-          preferred_deep_model = "gpt-6.1-sol"
-          preferred_quick_model = "gpt-6.1-sol"
-          preferred_output_model = "gpt-6.1-sol"
+          preferred_deep_model = "gpt-6.2-sol"
+          preferred_quick_model = "gpt-6.2-sol"
+          preferred_output_model = "gpt-6.2-sol"
           from datetime import datetime, timezone
           from tradingagents.scheduled.research_recovery import recovery_preflight_models
 

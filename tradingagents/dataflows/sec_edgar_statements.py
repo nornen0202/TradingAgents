@@ -10,9 +10,12 @@ import csv
 import io
 import math
 import re
-from datetime import date, datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 from functools import lru_cache
+from zoneinfo import ZoneInfo
 
+from .config import get_config
+from .integrity import parse_analysis_cutoff
 from .sec_edgar import _get_json, _ticker_map
 from .vendor_exceptions import VendorInputError, VendorTransientError
 
@@ -115,10 +118,20 @@ def _statement(kind: str, ticker: str, freq: str, curr_date: str | None) -> str:
         raise VendorInputError("Statement frequency must be annual or quarterly")
     now = datetime.now(timezone.utc)
     cutoff = curr_date or now.date().isoformat()
+    intraday_bound = False
     try:
-        date.fromisoformat(cutoff)
-    except (TypeError, ValueError) as exc:
-        raise VendorInputError("Statement date must be YYYY-MM-DD") from exc
+        requested = date.fromisoformat(cutoff)
+        scoped = get_config().get("analysis_as_of")
+        if scoped:
+            zone = "America/New_York"
+            filing_day = parse_analysis_cutoff(scoped, zone).astimezone(ZoneInfo(zone)).date()
+            # Company Facts dates do not identify when a filing became public.
+            if len(str(scoped).strip()) != 10:
+                filing_day -= timedelta(days=1)
+                intraday_bound = requested > filing_day
+            cutoff = min(requested, filing_day).isoformat()
+    except (TypeError, ValueError, OverflowError) as exc:
+        raise VendorInputError("Statement date or analysis as-of cutoff is invalid") from exc
     canonical = ticker.strip().upper().replace(".", "-")
     cik = _ticker_map(now.date().isoformat()).get(canonical)
     if not cik:
@@ -149,9 +162,11 @@ def _statement(kind: str, ticker: str, freq: str, curr_date: str | None) -> str:
                 filed_dates.add(fact["filed"])
                 cells.append(f"{fact['val'] / 1e6:.3f}" if monetary else f"{fact['val']:.4f}")
         writer.writerow([f"{label} ({unit}{' millions' if monetary else ''})"] + cells)
+    cutoff_note = "# Same-day filings lack a verified publication time for this intraday cutoff.\n" if intraday_bound else ""
     return (
         f"# {kind.replace('_', ' ').title()} for {ticker.upper()} ({freq})\n"
         f"# SEC EDGAR facts filed on or before {cutoff}; latest revision available by that date.\n"
+        f"{cutoff_note}"
         f"# Filing dates represented: {', '.join(sorted(filed_dates))}.\n"
         "# Missing cells are unavailable, not zero. YTD spans are labeled; no quarters are derived.\n"
         "# Bounded US GAAP extract; foreign-taxonomy and untagged lines are not covered.\n"

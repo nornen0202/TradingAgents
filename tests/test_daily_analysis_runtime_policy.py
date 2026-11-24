@@ -20,9 +20,9 @@ def test_daily_configs_keep_sol_xhigh_and_production_universe_coverage():
         llm = payload["llm"]
         assert llm["provider"] == "codex", path
         for role in ("quick", "output", "writer"):
-            assert llm[f"{role}_model"] == "gpt-6.1-sol", path
+            assert llm[f"{role}_model"] == "gpt-6.2-sol", path
         for role in ("deep", "judge"):
-            assert llm[f"{role}_model"] == "gpt-6.1-sol", path
+            assert llm[f"{role}_model"] == "gpt-6.2-sol", path
             assert llm[f"codex_{role}_reasoning_effort"] == "xhigh", path
         assert llm["codex_fallback_on_app_server_error"] is False, path
         performance = payload["portfolio_performance"]

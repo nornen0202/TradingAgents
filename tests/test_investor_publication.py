@@ -291,6 +291,8 @@ def test_incomplete_source_is_reported_without_blocking_other_rows(tmp_path, fie
     assert result["status"] == "PUBLISHED"
     by_ticker = {r["ticker"]: r for r in draft["strategies"]}
     assert by_ticker["NVDA"]["investment_plan"]["status"] == "REVIEW_REQUIRED"
-    assert by_ticker["AMD"]["investment_plan"]["status"] == "CONDITIONAL_PLAN"
+    # The other row's conditions are intact, but it has no original research proof.
+    assert by_ticker["AMD"]["investment_plan"]["status"] == "REVIEW_REQUIRED"
+    assert by_ticker["AMD"]["investment_plan"]["source_exclusions"] == []
     if isinstance(value, list):
         assert by_ticker["NVDA"]["thesis"][field] == []

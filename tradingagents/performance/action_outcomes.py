@@ -3,22 +3,30 @@ from __future__ import annotations
 import json
 import math
 import sqlite3
+from dataclasses import asdict
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
-from typing import Any, Iterable, Mapping, Sequence
+from typing import Any, Mapping, Sequence
+from zoneinfo import ZoneInfo
 
+from tradingagents.decision_provenance import research_origin
 from tradingagents.external.prism_normalize import normalize_market
 
-from .models import ACTION_TRACKER_SCHEMA, OUTCOME_CALCULATION_VERSION, ActionPerformanceSummary
+from .models import (ACTION_TRACKER_SCHEMA, OUTCOME_CALCULATION_VERSION,
+                     VERIFIED_PRICE_CALCULATION_VERSION, ActionPerformanceSummary)
 from .price_history import BENCHMARK_KEY
 from .lifecycle import append_lifecycle_event, initialize_lifecycle, stable_signal_id, timestamp, validate_event
 from .outcome_revisions import read_events, select_retrospectives, visible_events
+from .price_evidence import PriceReference, series_terms
+from .price_revisions import initialize_price_revisions, latest_revision_sql
 
 
 def initialize_action_tracker(db_path: Path) -> None:
     db_path.parent.mkdir(parents=True, exist_ok=True)
-    with sqlite3.connect(db_path) as conn:
+    with sqlite3.connect(db_path, timeout=30) as conn:
+        conn.execute("BEGIN IMMEDIATE")
         initialize_lifecycle(conn)
+        initialize_price_revisions(conn)
         for statement in ACTION_TRACKER_SCHEMA:
             conn.execute(statement)
         _ensure_columns(conn, "action_recommendations", {
@@ -43,6 +51,7 @@ def initialize_action_tracker(db_path: Path) -> None:
             "pilot_allowed": "INTEGER",
             "full_size_allowed": "INTEGER",
             "execution_evidence": "TEXT",
+            "price_reference_json": "TEXT",
         })
         _ensure_columns(conn, "action_outcomes", {
             "return_5d": "REAL",
@@ -58,6 +67,8 @@ def initialize_action_tracker(db_path: Path) -> None:
             "avoided_drawdown_20d": "REAL",
             "missed_upside_20d": "REAL",
             "calculation_version": "INTEGER DEFAULT 1",
+            "price_revision_id": "TEXT",
+            "outcome_event_id": "TEXT",
         })
         # Refresh eligibility needs only these narrow fields. A ticker-only
         # scan otherwise reads large recommendation payloads in random order,
@@ -79,10 +90,21 @@ def initialize_action_tracker(db_path: Path) -> None:
         conn.commit()
 
 
-def record_run_recommendations(run_dir: Path, db_path: Path, *, run_market: str | None = None, recorded_at: str | None = None) -> int:
+def record_run_recommendations(
+    run_dir: Path, db_path: Path, *, run_market: str | None = None, recorded_at: str | None = None,
+    manifest: dict[str, Any] | None = None,
+) -> int:
     initialize_action_tracker(db_path)
     run_dir = Path(run_dir)
-    manifest = _load_json(run_dir / "run.json")
+    if manifest is None:
+        manifest = _load_json(run_dir / "run.json")
+    recovery = manifest.get("research_recovery")
+    if (research_origin(manifest, {})[0] == "overlay_only"
+            or isinstance(recovery, dict) and recovery.get("finalization_only") is True):
+        return 0
+    reused = {_research_identity(row.get("ticker")) for row in manifest.get("tickers") or []
+              if isinstance(row, dict) and research_origin(manifest, row)[0] == "reused_full"}
+    reused.discard("")
     run_id = str(manifest.get("run_id") or run_dir.name)
     market = _normalize_target_market(run_market) or _manifest_run_market(manifest)
     created_at = str(manifest.get("finished_at") or manifest.get("started_at") or datetime.now().astimezone().isoformat())
@@ -97,9 +119,13 @@ def record_run_recommendations(run_dir: Path, db_path: Path, *, run_market: str 
             run_market=market,
         )
     )
+    rows = [row for row in rows if _research_identity(row["ticker"]) not in reused]
     inserted = 0
-    ingested_at = recorded_at or datetime.now(timezone.utc).isoformat()
-    with sqlite3.connect(db_path) as conn:
+    ingested_at = timestamp(recorded_at or datetime.now(timezone.utc).isoformat()).isoformat()
+    with sqlite3.connect(db_path, timeout=30) as conn:
+        # Acquire the writer lock before looking for an existing logical row.
+        # Two retries of the same run must not both observe an absent row.
+        conn.execute("BEGIN IMMEDIATE")
         for row in rows:
             if _recommendation_exists(conn, row):
                 receipt = row.get("execution_receipt")
@@ -114,8 +140,9 @@ def record_run_recommendations(run_dir: Path, db_path: Path, *, run_market: str 
                   prism_agreement, sell_intent, sell_trigger_status,
                   sell_size_plan, unrealized_return_pct, profit_protection_score,
                   profit_plan_json, lift_status, opportunity_cost_score, opportunity_capture_score,
-                  pilot_allowed, full_size_allowed, was_executed, execution_evidence, skip_reason, created_at
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                  pilot_allowed, full_size_allowed, was_executed, execution_evidence, skip_reason, created_at,
+                  price_reference_json
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     row["run_id"],
@@ -146,6 +173,7 @@ def record_run_recommendations(run_dir: Path, db_path: Path, *, run_market: str 
                     row.get("execution_evidence"),
                     row.get("skip_reason"),
                     row["created_at"],
+                    row.get("price_reference_json"),
                 ),
             )
             inserted += 1
@@ -167,21 +195,42 @@ def update_action_outcomes(
     refresh_window_days: int = 120,
     recommendation_ids: Sequence[int] | None = None,
     recorded_at: str | None = None,
-) -> None:
+    require_verified_price: bool = False,
+) -> int:
     initialize_action_tracker(db_path)
     # Validate locally even if the upstream adapter claims to apply end_date.
     cutoff = date.fromisoformat(str(asof_date)[:10])
-    ingested_at = recorded_at or datetime.now(timezone.utc).isoformat()
-    prices = _normalize_price_history(price_history or (_load_json(Path(price_history_path)) if price_history_path else {}), asof_date=str(asof_date))
+    known_at = str(asof_date) if "T" in str(asof_date) else cutoff.isoformat() + "T23:59:59.999999+00:00"
+    decision_cutoff = timestamp(known_at)
+    ingested_at = timestamp(recorded_at or datetime.now(timezone.utc).isoformat()).isoformat()
+    raw_prices = price_history or (_load_json(Path(price_history_path)) if price_history_path else {})
+    prices = _normalize_price_history(raw_prices, asof_date=str(asof_date))
+    evidence_by_ticker = {}
+    if require_verified_price and isinstance(raw_prices, Mapping):
+        for key, raw in raw_prices.items():
+            ticker = str(key).upper()
+            rows = raw.get("prices") if isinstance(raw, Mapping) else raw
+            if isinstance(rows, list):
+                retained = []
+                for row in rows:
+                    observed = _normalize_price_history({ticker: [row]}, asof_date=str(asof_date)).get(ticker)
+                    if observed:
+                        retained.append((observed[0][0], row))
+                evidence_by_ticker[ticker] = retained
+    calculation_version = VERIFIED_PRICE_CALCULATION_VERSION if require_verified_price else OUTCOME_CALCULATION_VERSION
+    if require_verified_price:
+        known_at = decision_cutoff.isoformat()
     benchmark_series = prices.get(BENCHMARK_KEY)
     price_tickers = sorted(key for key in prices if key != BENCHMARK_KEY)
     if not price_tickers:
-        return
+        return 0
     selected_ids = tuple(dict.fromkeys(int(item) for item in recommendation_ids or () if int(item) > 0))
     if recommendation_ids is not None and not selected_ids:
-        return
+        return 0
+    inserted = 0
     cutoff_date = _outcome_refresh_cutoff_date(asof_date, refresh_window_days)
-    with sqlite3.connect(db_path) as conn:
+    with sqlite3.connect(db_path, timeout=30) as conn:
+        conn.execute("BEGIN IMMEDIATE")
         conn.row_factory = sqlite3.Row
         placeholders = ",".join("?" for _ in price_tickers)
         if recommendation_ids is not None:
@@ -198,12 +247,23 @@ def update_action_outcomes(
                 )
             )
         elif cutoff_date:
+            join = "o.recommendation_id = r.id"
+            join_params = ()
+            if require_verified_price:
+                active_price = latest_revision_sql("r.id", "?")
+                join = f"""o.rowid = (
+                    SELECT z.rowid FROM action_outcomes z
+                    WHERE z.recommendation_id=r.id AND z.calculation_version={calculation_version}
+                      AND z.price_revision_id IS ({active_price}) AND z.updated_at <= ?
+                    ORDER BY z.updated_at DESC,z.rowid DESC LIMIT 1
+                )"""
+                join_params = (known_at, known_at)
             recommendations = list(
                 conn.execute(
                     f"""
                     SELECT DISTINCT r.*
                     FROM action_recommendations r
-                    LEFT JOIN action_outcomes o ON o.recommendation_id = r.id
+                    LEFT JOIN action_outcomes o ON {join}
                     WHERE substr(r.created_at, 1, 10) >= ?
                       AND upper(r.ticker) IN ({placeholders})
                       AND (
@@ -216,9 +276,10 @@ def update_action_outcomes(
                       )
                     """,
                     (
+                        *join_params,
                         cutoff_date,
                         *price_tickers,
-                        OUTCOME_CALCULATION_VERSION,
+                        calculation_version,
                         str(asof_date)[:10],
                     ),
                 )
@@ -233,25 +294,72 @@ def update_action_outcomes(
         for row in recommendations:
             try:
                 decision_time = timestamp(row["created_at"])
-                decision_cutoff = timestamp(str(asof_date) if "T" in str(asof_date) else cutoff.isoformat() + "T23:59:59.999999+00:00")
                 if decision_time > decision_cutoff:
                     continue
             except ValueError:
                 # Legacy date-only rows retain date-granularity metrics but are
                 # deliberately excluded from the evidence replay below.
+                decision_time = None
                 try:
                     if date.fromisoformat(str(row["created_at"])) > cutoff:
                         continue
                 except ValueError:
                     continue
             ticker = str(row["ticker"])
-            series = prices.get(ticker)
+            series = prices.get(ticker.upper()) or prices.get(ticker)
             if not series:
                 continue
-            returns = _compute_returns(row, series, horizons=horizons, benchmark_series=benchmark_series)
+            reference = None
+            revision_id = None
+            comparable_benchmark = benchmark_series
+            if require_verified_price:
+                try:
+                    revision = conn.execute(
+                        f"SELECT revision_id,reference_json FROM action_price_revisions WHERE revision_id=({latest_revision_sql('?', '?')})",
+                        (row["id"], known_at),
+                    ).fetchone()
+                    payload = revision["reference_json"] if revision else row["price_reference_json"]
+                    revision_id = revision["revision_id"] if revision else None
+                    reference = PriceReference.read(json.loads(payload or "null"))
+                except (TypeError, ValueError):
+                    continue
+                if reference is None or decision_time is None or timestamp(reference.observed_at) > decision_time:
+                    continue
+                native_zone = {"US": "America/New_York", "KR": "Asia/Seoul"}.get(row["market"])
+                observed_at = timestamp(reference.observed_at)
+                reference_day = (observed_at.astimezone(ZoneInfo(native_zone)) if native_zone else observed_at).date().isoformat()
+                expected_terms = (reference.currency, reference.basis)
+                if _window_terms(evidence_by_ticker.get(ticker.upper(), ()), reference_day) != expected_terms:
+                    continue
+                if _window_terms(evidence_by_ticker.get(BENCHMARK_KEY, ()), reference_day) != expected_terms:
+                    comparable_benchmark = None
+            returns = _compute_returns(row, series, horizons=horizons, benchmark_series=comparable_benchmark,
+                                       reference_price=reference.price if reference else None)
             if not returns:
                 continue
-            conn.execute("DELETE FROM action_outcomes WHERE recommendation_id = ?", (row["id"],))
+            event_id = None
+            if decision_time is not None:
+                signal_id = stable_signal_id(row["run_id"], row["ticker"], row["action"], row["source"] or "TradingAgents")
+                event_id = f"outcome:{signal_id}:{known_at}:v{calculation_version}"
+                if revision_id:
+                    event_id += f":{revision_id}"
+                written = append_lifecycle_event(conn, event_id=event_id,
+                    signal_id=signal_id, kind="OUTCOME", occurred_at=decision_time.isoformat(), available_at=known_at,
+                    confirmed_at=known_at, ingested_at=ingested_at,
+                    payload={"ticker": row["ticker"], "measurement_scope": "counterfactual_recommendation_price_path",
+                             **({"price_reference": asdict(reference)} if reference else {}),
+                             **({"price_revision_id": revision_id} if revision_id else {}), **returns})
+                if require_verified_price and not written:
+                    continue
+            if not require_verified_price:
+                previous = conn.execute(
+                    "SELECT updated_at FROM action_outcomes WHERE recommendation_id = ? AND COALESCE(calculation_version,1) <= ?",
+                    (row["id"], OUTCOME_CALCULATION_VERSION),
+                ).fetchall()
+                if any(_outcome_clock(item["updated_at"]) > decision_cutoff for item in previous):
+                    continue
+                conn.execute("DELETE FROM action_outcomes WHERE recommendation_id = ? AND COALESCE(calculation_version,1) <= ?",
+                             (row["id"], OUTCOME_CALCULATION_VERSION))
             conn.execute(
                 """
                 INSERT INTO action_outcomes (
@@ -260,8 +368,8 @@ def update_action_outcomes(
                   benchmark_return_20d, benchmark_excess_20d, benchmark_return_60d,
                   benchmark_excess_60d, benchmark_key,
                   max_drawdown_20d, max_favorable_excursion_20d, avoided_drawdown_20d,
-                  missed_upside_20d, outcome_label, calculation_version, updated_at
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                  missed_upside_20d, outcome_label, calculation_version, updated_at, price_revision_id, outcome_event_id
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     row["id"],
@@ -283,23 +391,28 @@ def update_action_outcomes(
                     returns.get("avoided_drawdown_20d"),
                     returns.get("missed_upside_20d"),
                     returns.get("outcome_label"),
-                    OUTCOME_CALCULATION_VERSION,
-                    asof_date,
+                    calculation_version,
+                    known_at if require_verified_price else asof_date,
+                    revision_id,
+                    event_id,
                 ),
             )
-            try:
-                decision_at = timestamp(row["created_at"]).isoformat()
-            except ValueError:
-                continue
-            known_at = str(asof_date) if "T" in str(asof_date) else cutoff.isoformat() + "T23:59:59.999999+00:00"
-            if timestamp(known_at) < timestamp(decision_at):
-                continue
-            signal_id = stable_signal_id(row["run_id"], row["ticker"], row["action"], row["source"] or "TradingAgents")
-            append_lifecycle_event(conn, event_id=f"outcome:{signal_id}:{known_at}:v{OUTCOME_CALCULATION_VERSION}", signal_id=signal_id,
-                kind="OUTCOME", occurred_at=decision_at, available_at=known_at, confirmed_at=known_at,
-                ingested_at=ingested_at,
-                payload={"ticker": row["ticker"], "measurement_scope": "counterfactual_recommendation_price_path", **returns})
+            inserted += 1
         conn.commit()
+    return inserted
+
+
+def _window_terms(history, reference_day):
+    return series_terms([row for day, row in history if day >= reference_day])
+
+
+def _outcome_clock(value: str | None) -> datetime:
+    try:
+        if value and len(value) == 10:
+            value += "T23:59:59.999999+00:00"
+        return timestamp(value)
+    except ValueError:
+        return datetime.min.replace(tzinfo=timezone.utc)
 
 
 def _outcome_refresh_cutoff_date(asof_date: str, refresh_window_days: int) -> str | None:
@@ -313,7 +426,8 @@ def _outcome_refresh_cutoff_date(asof_date: str, refresh_window_days: int) -> st
     return (parsed - timedelta(days=max(1, int(refresh_window_days or 1)))).isoformat()
 
 
-def summarize_action_performance(db_path: Path, *, analysis_as_of: str | None = None) -> ActionPerformanceSummary:
+def summarize_action_performance(db_path: Path, *, analysis_as_of: str | None = None,
+                                 require_verified_price: bool = False) -> ActionPerformanceSummary:
     """Summarize recommendations and the active, dated execution feedback.
 
     The optional cutoff governs lifecycle feedback; the existing recommendation
@@ -323,6 +437,35 @@ def summarize_action_performance(db_path: Path, *, analysis_as_of: str | None = 
     initialize_action_tracker(db_path)
     with sqlite3.connect(db_path) as conn:
         conn.row_factory = sqlite3.Row
+        safe_cutoff = cutoff.isoformat()
+        latest_price = latest_revision_sql("o.recommendation_id", f"'{safe_cutoff}'")
+        fallback = ""
+        rec_filter = ""
+        if require_verified_price:
+            conn.execute(f"""
+                CREATE TEMP VIEW action_recommendations AS
+                SELECT * FROM main.action_recommendations WHERE julianday(created_at) <= julianday('{safe_cutoff}')
+            """)
+            rec_filter = "AND EXISTS (SELECT 1 FROM temp.action_recommendations rec WHERE rec.id=o.recommendation_id)"
+        else:
+            fallback = f"""OR (COALESCE(r.calculation_version, 1) < {VERIFIED_PRICE_CALCULATION_VERSION}
+                               AND ({latest_price}) IS NULL)"""
+        conn.execute(f"""
+                CREATE TEMP VIEW action_outcomes AS
+                SELECT * FROM main.action_outcomes o
+                WHERE o.rowid = (
+                    SELECT r.rowid FROM main.action_outcomes r
+                    WHERE r.recommendation_id = o.recommendation_id
+                      AND ((r.calculation_version = {VERIFIED_PRICE_CALCULATION_VERSION}
+                            AND r.price_revision_id IS ({latest_price})
+                            AND EXISTS (
+                              SELECT 1 FROM main.lifecycle_events e WHERE e.event_id=r.outcome_event_id
+                                AND e.kind='OUTCOME' AND e.available_at <= '{safe_cutoff}'
+                                AND e.confirmed_at <= '{safe_cutoff}' AND e.ingested_at <= '{safe_cutoff}'
+                            )) {fallback})
+                    ORDER BY COALESCE(r.calculation_version, 1) DESC, r.updated_at DESC, r.rowid DESC LIMIT 1
+                ) {rec_filter}
+            """)
         recommendations = int(conn.execute("SELECT COUNT(*) FROM action_recommendations").fetchone()[0])
         outcomes = int(conn.execute("SELECT COUNT(*) FROM action_outcomes").fetchone()[0])
         events = read_events(conn)
@@ -338,6 +481,9 @@ def summarize_action_performance(db_path: Path, *, analysis_as_of: str | None = 
         calibration = _aggregate_calibration(conn)
         data_quality = _performance_data_quality(conn, closed_trades=closed_trades,
                                                 known_events=known_events, active_reviews=active_reviews)
+        if require_verified_price:
+            data_quality["price_evidence_required"] = True
+            data_quality["recommendations_without_verified_outcome"] = recommendations - outcomes
     return ActionPerformanceSummary(
         recommendations=recommendations,
         outcomes=outcomes,
@@ -405,6 +551,7 @@ def _portfolio_action_rows(
         data_health = action.get("data_health") if isinstance(action.get("data_health"), Mapping) else {}
         lift = data_health.get("action_lift") if isinstance(data_health.get("action_lift"), Mapping) else {}
         execution_evidence = _execution_evidence(action)
+        reference = PriceReference.read(data_health.get("price_reference"))
         has_proposed_allocation = bool(int(action.get("delta_krw_now") or 0))
         rows.append(
             {
@@ -414,6 +561,7 @@ def _portfolio_action_rows(
                 "action": preferred_action,
                 "risk_action": action.get("risk_action"),
                 "recommended_price": _recommended_price(action),
+                "price_reference_json": json.dumps(asdict(reference), sort_keys=True) if reference else None,
                 "confidence": action.get("confidence"),
                 "trigger_type": action.get("trigger_type"),
                 "source": "TradingAgents",
@@ -530,12 +678,13 @@ def _compute_returns(
     *,
     horizons: Sequence[int],
     benchmark_series: list[tuple[str, float]] | None = None,
+    reference_price: float | None = None,
 ) -> dict[str, Any]:
     created_date = str(row["created_at"] or "")[:10]
     start_index = _start_index_for_date(series, created_date)
     if start_index is None:
         return {}
-    base_price = _float_or_none(row["recommended_price"]) or series[start_index][1]
+    base_price = reference_price or _float_or_none(row["recommended_price"]) or series[start_index][1]
     if base_price <= 0:
         return {}
     values: dict[str, Any] = {}
@@ -933,7 +1082,8 @@ def _recommendation_exists(conn: sqlite3.Connection, row: dict[str, Any]) -> boo
     existing = conn.execute(
         """
         SELECT 1 FROM action_recommendations
-        WHERE run_id = ? AND ticker = ? AND action = ? AND source = ?
+        WHERE run_id = ? AND upper(ticker) = upper(?) AND action = ?
+          AND COALESCE(NULLIF(source, ''), 'TradingAgents') = COALESCE(NULLIF(?, ''), 'TradingAgents')
         LIMIT 1
         """,
         (row["run_id"], row["ticker"], row["action"], row.get("source")),
@@ -1031,6 +1181,12 @@ def _manifest_run_market(manifest: Mapping[str, Any]) -> str | None:
 def _normalize_target_market(value: Any) -> str | None:
     normalized = normalize_market(value)
     return normalized if normalized in {"KR", "US"} else None
+
+
+def _research_identity(ticker: Any) -> str:
+    name = str(ticker or "").strip().upper()
+    base = name.removesuffix(".KS").removesuffix(".KQ")
+    return base if len(base) == 6 and base.isascii() and base.isdigit() else name
 
 
 def _ticker_market(ticker: Any, explicit_market: Any) -> str:

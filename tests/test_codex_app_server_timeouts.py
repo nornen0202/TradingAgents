@@ -138,3 +138,15 @@ def test_overlapping_rpc_requests_are_serialized_without_losing_replies():
         assert first.result(timeout=2) == {"owner": "first"}
         assert second.result(timeout=2) == {"owner": "second"}
     assert not client._pending
+
+def test_retired_model_cannot_start_a_new_research_turn():
+    with pytest.raises(CodexAppServerError, match="Retired"):
+        session().invoke(prompt="test", model="gpt-6.1-sol", output_schema={},
+                         reasoning_effort="low", summary=None, personality=None)
+
+
+def test_model_reroute_cannot_produce_an_accepted_research_result():
+    client = session()
+    client._stdout_queue.put({"method": "model/rerouted", "params": {"turnId": "turn-1"}})
+    with pytest.raises(CodexAppServerError, match="rerouted"):
+        client._collect_turn("turn-1")
