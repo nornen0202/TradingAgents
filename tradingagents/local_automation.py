@@ -852,7 +852,7 @@ def main():
     args.runtime_dir = args.runtime_dir.resolve()
     args.state_dir.mkdir(parents=True, exist_ok=True)
     prepare_environment()
-    if args.command in {"run-due", "research-kis"} and not args.dry_run:
+    if args.command in {"run-due", "research-kis", "refresh-kis"} and not args.dry_run:
         observation_root = args.state_dir / "forward-observation"
         if (observation_root / "policy.json").is_file():
             os.environ["TRADINGAGENTS_FORWARD_OBSERVATION_ROOT"] = str(observation_root)

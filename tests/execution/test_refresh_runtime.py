@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 import json
 from pathlib import Path
+import os
 import sys
 
 import pytest
@@ -130,16 +131,20 @@ def test_independent_refresh_runs_while_daily_producer_is_busy(tmp_path, monkeyp
     (tmp_path / "execution-refresh-enabled.json").write_text(json.dumps({
         "mode": refresh.EXECUTION_LANE_MODE, "enabled": True, "real_orders_enabled": False,
     }))
+    forward = tmp_path / "forward-observation"
+    forward.mkdir()
+    (forward / "policy.json").write_text("{}")
+    monkeypatch.delenv("TRADINGAGENTS_FORWARD_OBSERVATION_ROOT", raising=False)
     calls = []
     monkeypatch.setattr(local, "prepare_environment", lambda: None)
-    monkeypatch.setattr(refresh, "refresh_due", lambda *args, **kw: calls.append((args, kw)) or [])
+    monkeypatch.setattr(refresh, "refresh_due", lambda *args, **kw: calls.append(os.environ["TRADINGAGENTS_FORWARD_OBSERVATION_ROOT"]) or [])
     monkeypatch.setattr(sys, "argv", ["local_automation", "refresh-kis", "--archive-dir", str(tmp_path),
                                     "--state-dir", str(tmp_path), "--runtime-dir", str(tmp_path)])
     with interprocess_file_lock(tmp_path / "run-due.lock", timeout=0):
         assert local.main() == 0
     with interprocess_file_lock(refresh.quote_producer_lock_path(tmp_path), timeout=0):
         assert local.main() == 0
-    assert len(calls) == 1
+    assert calls == [str(forward)]
 
 
 @pytest.mark.parametrize("status,seconds,expected", [
