@@ -1,7 +1,8 @@
 from datetime import date
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 import pandas as pd
+import pytest
 
 from tradingagents.portfolio.performance.benchmark_sources import load_yahoo_benchmark
 from tradingagents.portfolio.performance.etf_alternatives import _fx_rate_and_date
@@ -66,8 +67,6 @@ def test_korean_supplemental_holiday_does_not_create_a_missing_bar():
 
 
 def test_transient_yahoo_failure_retries_and_only_the_success_is_cached(tmp_path):
-    from unittest.mock import Mock
-
     source = Mock()
     source.history.side_effect = [TimeoutError("timed out"), _data(["2025-11-26"], [100])]
     source.get_history_metadata.return_value = {"symbol": "SPY", "currency": "USD", "exchangeName": "PCX"}
@@ -78,3 +77,31 @@ def test_transient_yahoo_failure_retries_and_only_the_success_is_cached(tmp_path
         later, cached = load_yahoo_benchmark("SPY", "USD", date(2025, 11, 26), date(2025, 11, 26), **options)
     assert source.history.call_count == 2 and result == later
     assert evidence["input_origin"] == "fresh" and cached["input_origin"] == "cache"
+
+
+@pytest.mark.parametrize("fx", [False, True])
+@pytest.mark.parametrize("vendor_dates", [[], [None], ["not-a-date"]])
+def test_yahoo_empty_missing_or_malformed_vendor_dates_are_not_cached(tmp_path, fx, vendor_dates):
+    source = Mock()
+    symbol, currency, kind = ("KRW=X", "KRW", "CURRENCY") if fx else ("SPY", "USD", "ETF")
+    data = pd.DataFrame({"Close": [100.0] * len(vendor_dates), "Dividends": [0] * len(vendor_dates),
+                         "Stock Splits": [0] * len(vendor_dates)}, index=vendor_dates)
+    source.history.return_value = data
+    source.get_history_metadata.return_value = {"symbol": symbol, "currency": currency, "instrumentType": kind}
+    with patch("yfinance.Ticker", return_value=source):
+        rows, evidence = load_yahoo_benchmark(symbol, currency, date(2025, 11, 25), date(2025, 11, 26),
+                                               as_of="2025-11-26T22:00:00+00:00", cache_dir=tmp_path, fx=fx)
+    assert rows == [] and evidence["state"] == "provider_unavailable"
+    assert not list(tmp_path.iterdir())
+
+
+@pytest.mark.parametrize("fx", [False, True])
+@pytest.mark.parametrize("as_of", [None, "", "broken-date", "2025-11-26T22:00:00"])
+def test_yahoo_missing_malformed_or_naive_as_of_skips_vendor_and_cache(tmp_path, fx, as_of):
+    symbol, currency = ("KRW=X", "KRW") if fx else ("SPY", "USD")
+    with patch("tradingagents.portfolio.performance.benchmark_sources._download") as fetch:
+        rows, evidence = load_yahoo_benchmark(symbol, currency, date(2025, 11, 25), date(2025, 11, 26),
+                                               as_of=as_of, cache_dir=tmp_path, fx=fx)
+    fetch.assert_not_called()
+    assert rows == [] and evidence["state"] == "as_of_unverified"
+    assert not list(tmp_path.iterdir())
