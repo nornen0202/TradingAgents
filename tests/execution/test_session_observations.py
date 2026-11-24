@@ -239,6 +239,7 @@ def test_independent_database_env_does_not_select_daily_history_target(tmp_path,
 def test_run_due_forwards_independent_observation_database(tmp_path, monkeypatch):
     import os
     import sys
+    from unittest.mock import patch
     from tradingagents import local_automation
     from tradingagents.notifications import local
 
@@ -259,4 +260,5 @@ def test_run_due_forwards_independent_observation_database(tmp_path, monkeypatch
     monkeypatch.setattr(sys, "argv", ["local_automation", "run-due",
         "--archive-dir", str(tmp_path / "archive"), "--state-dir", str(state),
         "--runtime-dir", str(tmp_path / "runtime")])
-    assert local_automation.main() == 0
+    with patch.dict(os.environ):
+        assert local_automation.main() == 0
