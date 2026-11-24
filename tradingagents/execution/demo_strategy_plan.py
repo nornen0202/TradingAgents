@@ -9,6 +9,7 @@ from datetime import timedelta
 import hashlib
 import json
 
+from .archive_paper import _entry_confirmation, _entry_proof
 from .demo_validation import _at
 from tradingagents.dataflows.research_evidence import assess_tool_evidence, evidence_review_reason
 from tradingagents.schemas import parse_structured_decision
@@ -117,6 +118,12 @@ def plan(source, market, now, tickers, owned):
                         expiry = min(expiry, research_expiry)
                     elif now - _at(contract["analysis_asof"]) >= timedelta(hours=24):
                         raise ValueError("ENTRY_RESEARCH_EXPIRED")
+                    proof = _entry_proof(source, ticker, contract, row["raw_codes"], row["market_data_asof"], generated)
+                    if proof is not None:
+                        confirmed = _entry_confirmation(proof, ticker, market.lower(), generated, now)
+                        if confirmed.get("paper_candidate_ready") is not True:
+                            raise ValueError("ENTRY_SESSION_CONFIRMATION_UNVERIFIED")
+                        expiry = min(expiry, _at(confirmed["candidate_valid_until"]))
                     health = research_row.get("data_health") or {}
                     if (research_row.get("review_required") is True or health.get("reanalysis_required") is True
                             or set(research_row.get("gate_reasons") or []) & HARD_BUY_GATES
@@ -156,6 +163,7 @@ def plan(source, market, now, tickers, owned):
                                    "maximum_shares": 1, "real_account_allocation_used": False}})
             except (ValueError, TypeError, KeyError, OSError) as exc:
                 reason = str(exc) if str(exc) in {
+                    "ENTRY_SESSION_CONFIRMATION_UNVERIFIED",
                     "STRATEGY_OBSERVATION_NOT_EXECUTABLE", "STRATEGY_LINEAGE_MISMATCH",
                     "ENTRY_ORIGINAL_RESEARCH_UNVERIFIED", "ENTRY_RESEARCH_DECISION_MISMATCH",
                     "ENTRY_NOT_AUTHORIZED_BY_RESEARCH", "ENTRY_AUTHORIZATION_MISMATCH", "ENTRY_RESEARCH_EXPIRED",

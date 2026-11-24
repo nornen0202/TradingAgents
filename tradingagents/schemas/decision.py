@@ -258,9 +258,10 @@ class PriceLevel:
     source_text: str = ""
     reason_code: str = ""
     level_type_source: str = ""
+    confirmation_group: str | None = None
 
     def to_dict(self) -> dict[str, Any]:
-        return {
+        result = {
             "label": self.label,
             "level_type": self.level_type_source or _price_level_type_value(self.level_type),
             "price": self.price,
@@ -272,6 +273,9 @@ class PriceLevel:
             "source_text": self.source_text,
             "reason_code": self.reason_code,
         }
+        if self.confirmation_group is not None:
+            result["confirmation_group"] = self.confirmation_group
+        return result
 
 
 @dataclass(frozen=True)
@@ -453,7 +457,10 @@ def build_decision_output_instructions(context: str) -> str:
         "Use intraday_pilot_rule for a small regular-session starter only, close_confirm_rule for full-size add or entry, "
         "and next_day_followthrough_rule for the next trading day support or re-breakout check. "
         "For execution_levels.levels, level_type must be one of BREAKOUT, SUPPORT, PULLBACK, INVALIDATION, TRIM, STOP_LOSS, TAKE_PROFIT, RESISTANCE, "
-        "and confirmation must be one of intraday, close, two_bar, next_day, volume_confirmed; put extra nuance in label or source_text. "
+        "and confirmation must be one of intraday, close, two_bar, next_day, volume_confirmed. "
+        "When specifying independent entry alternatives, give every entry level a confirmation_group identifier. "
+        "Levels with the same identifier are all required, and different identifiers are alternatives. "
+        "Put extra nuance in label or source_text. "
         "For constructive but unconfirmed setups, prefer HOLD or OVERWEIGHT with portfolio_stance=BULLISH and entry_action=WAIT when the evidence supports watchlist or held exposure. "
         "Reserve NO_TRADE for weak, contradictory, or insufficient theses, no favorable setup to monitor, or data quality gaps that make the view non-investable. "
         "Use BUY or OVERWEIGHT when the thesis is strong and the entry setup is actionable today; do not default to NO_TRADE just because it is available. "
@@ -602,6 +609,9 @@ def _parse_price_level(raw: Mapping[str, Any]) -> PriceLevel:
         raise StructuredDecisionValidationError(f"Unsupported execution level_type: {raw.get('level_type')!r}.")
 
     confirmation = _normalize_price_level_confirmation(raw.get("confirmation"))
+    group = raw.get("confirmation_group")
+    if group is not None and (not isinstance(group, str) or re.fullmatch(r"[A-Za-z0-9_-]{1,32}", group) is None):
+        raise StructuredDecisionValidationError("Invalid confirmation_group identifier.")
 
     label = _optional_string(raw.get("label")) or _optional_string(raw.get("source_text")) or level_type
     low = _optional_float(raw.get("low"))
@@ -641,6 +651,7 @@ def _parse_price_level(raw: Mapping[str, Any]) -> PriceLevel:
         source_text=_optional_string(raw.get("source_text")),
         reason_code=_optional_string(raw.get("reason_code")),
         level_type_source=_optional_string(raw.get("level_type")),
+        confirmation_group=group,
     )
 
 

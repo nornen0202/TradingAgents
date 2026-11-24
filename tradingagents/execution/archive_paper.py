@@ -5,7 +5,7 @@ import math
 from pathlib import Path
 from zoneinfo import ZoneInfo
 from .paper import PaperLimits, stamp
-from .session_confirmation import evaluate_plan
+from .session_confirmation import entry_research_deadline, evaluate_plan
 from .sizing import size_paper_order
 
 
@@ -137,15 +137,24 @@ def build_step(run: Path, now: str, limits: PaperLimits | None = None):
         )
         contract_path = run / "tickers" / ticker / "execution_contract.json"
         entry_confirmation = None
-        if contract_path.exists():
+        if action == "BUY" and contract_path.exists():
             contract = json.loads(contract_path.read_text(encoding="utf-8-sig"))
             expiry = contract.get("entry_valid_until")
-            if expiry and action == "BUY":
+            if expiry:
                 valid_until = min(stamp(valid_until), stamp(expiry)).isoformat()
-            if action == "BUY" and "entry_confirmation_v2" in contract:
-                entry_confirmation = _entry_confirmation(
-                    contract["entry_confirmation_v2"], ticker, market, generated, evaluated,
-                )
+            proof = _entry_proof(run, ticker, contract, raw, asof, generated)
+            if proof is not None:
+                entry_confirmation = _entry_confirmation(proof, ticker, market, generated, evaluated)
+                if not expiry and entry_confirmation["paper_candidate_ready"] and any(
+                    level.get("confirmation_group") is not None for level in _entry_levels(contract)
+                ):
+                    research_expiry = entry_research_deadline(contract["analysis_asof"])
+                    valid_until = min(stamp(valid_until), research_expiry).isoformat()
+                    entry_confirmation["candidate_valid_until"] = min(
+                        stamp(entry_confirmation["candidate_valid_until"]), research_expiry
+                    ).isoformat()
+                    if evaluated >= research_expiry:
+                        entry_confirmation.update(paper_candidate_ready=False, reason="ENTRY_RESEARCH_EXPIRED")
                 ready = ready and entry_confirmation["paper_candidate_ready"]
                 if entry_confirmation["paper_candidate_ready"]:
                     valid_until = min(stamp(valid_until), stamp(entry_confirmation["candidate_valid_until"])).isoformat()
@@ -167,6 +176,33 @@ def build_step(run: Path, now: str, limits: PaperLimits | None = None):
             }
         )
     return snapshot, {"now": local_now, "quotes": quotes, "signals": signals}, market
+
+
+def _entry_levels(contract):
+    return [level for level in contract.get("structured_levels", []) if isinstance(level, dict)
+            and str(level.get("level_type", "")).upper() in {"BREAKOUT", "RESISTANCE", "PULLBACK", "SUPPORT"}]
+
+
+def _entry_proof(run, ticker, contract, raw, market_data_asof, generated):
+    levels = _entry_levels(contract)
+    needs_update = any(level.get("confirmation_group") is not None for level in levels) or (
+        bool(contract.get("entry_valid_until")) and len(levels) == 1 and levels[0].get("confirmation") in {"close", "next_day"}
+    )
+    if not needs_update:
+        return contract.get("entry_confirmation_v2", {} if "entry_confirmation_v2" in contract else None)
+    try:
+        path = run / "tickers" / ticker / "execution_update.json"
+        update = json.loads(path.read_text(encoding="utf-8-sig"))
+        event = stamp(update["market_data_asof"])
+        execution = stamp(update["execution_asof"])
+        if (update["ticker"] != ticker or update["decision_now"] != raw.get("decision_now")
+                or event != stamp(market_data_asof) or not event <= execution <= generated):
+            return {}
+        proof = update["entry_confirmation_v2"]
+        from .session_confirmation import is_archived_entry_plan
+        return proof if is_archived_entry_plan(proof, levels, contract.get("analysis_asof")) else {}
+    except (KeyError, OSError, TypeError, ValueError):
+        return {}
 
 
 def _entry_confirmation(evidence, ticker, market, generated, evaluated):

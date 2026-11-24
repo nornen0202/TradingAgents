@@ -146,6 +146,7 @@ class ExecutionSettings:
     execution_publish_debug: bool = False
     # Internal minute refresh: reuse research, omit slow report enrichment.
     execution_lightweight_refresh: bool = False
+    session_confirmation_receipts_dir: Path | None = None
 
 
 @dataclass(frozen=True)
@@ -371,6 +372,7 @@ def load_scheduled_config(path: str | Path) -> ScheduledAnalysisConfig:
     portfolio_performance_raw = raw.get("portfolio_performance") or {}
     etf_dca_benchmarks_raw = raw.get("etf_dca_benchmarks") or {}
     execution_raw = raw.get("execution") or {}
+    session_receipts = _optional_string(execution_raw.get("session_confirmation_receipts_dir"))
     summary_image_raw = raw.get("summary_image") or {}
     external_raw = raw.get("external") or {}
     external_data_raw = raw.get("external_data") or {}
@@ -624,6 +626,7 @@ def load_scheduled_config(path: str | Path) -> ScheduledAnalysisConfig:
                 else _optional_string(execution_raw.get("llm_summary_model"))
             ),
             execution_publish_debug=bool(execution_raw.get("publish_debug", False)),
+            session_confirmation_receipts_dir=_resolve_path(session_receipts, base_dir) if session_receipts else None,
         ),
         summary_image=SummaryImageSettings(
             enabled=bool(summary_image_raw.get("enabled", True)),
