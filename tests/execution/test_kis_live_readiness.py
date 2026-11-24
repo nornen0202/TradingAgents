@@ -29,7 +29,7 @@ def fixture(tmp_path, market):
     intent = Intent("fixture-intent", ticker, "BUY", "1", limit, currency, (now + timedelta(minutes=1)).isoformat())
     return state, config, intent, {"account": account, "usage": MarketUsage("2026-11-24", 0, "0", False),
         "quote": {"observed_at": now.isoformat(), "ticker": ticker, "exchange": venue, "currency": currency,
-                  "execution_ready": True, "ask": limit, "bid": limit},
+                  "execution_ready": True, "ask": limit, "bid": limit, "instrument_type": "STOCK"},
         "session": market_session_state(market=market, now_local=now), "now": now}
 
 
@@ -77,3 +77,27 @@ def test_refuses_invalid_approval_and_pretrade_evidence(tmp_path, broken):
         preview(state, intent, **args)
     audits = [json.loads(p.read_text()) for p in (state / "audit").glob("*.json")]
     assert len(audits) == 1 and audits[0]["status"] == "BLOCKED" and audits[0]["live_order_requests"] == 0
+
+
+def test_korean_fixture_rejects_price_outside_exchange_increment(tmp_path):
+    state, config, intent, args = fixture(tmp_path, "KR")
+    atomic_write_json(state / "approval.json", config)
+    with pytest.raises(ValueError, match="LIVE_ORDER_LIMITS_EXCEEDED"):
+        preview(state, replace(intent, limit="70001"), **args)
+
+
+@pytest.mark.parametrize("field", ["approved_at", "account", "quote", "session_open"])
+@pytest.mark.parametrize("bad", [None, "invalid", (NOW + timedelta(seconds=1)).isoformat()])
+def test_readiness_rejects_missing_invalid_and_future_evidence(tmp_path, field, bad):
+    state, config, intent, args = fixture(tmp_path, "US")
+    if field == "approved_at":
+        config["approved_at"] = bad
+    elif field == "account":
+        args["account"] = replace(args["account"], observed_at=bad)
+    elif field == "quote":
+        args["quote"]["observed_at"] = bad
+    else:
+        args["session"]["session_open"] = bad
+    atomic_write_json(state / "approval.json", config)
+    with pytest.raises(ValueError, match="LIVE_"):
+        preview(state, intent, **args)

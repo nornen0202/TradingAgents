@@ -1,5 +1,7 @@
 from datetime import datetime, timedelta, timezone
 import json
+import subprocess
+import sys
 import urllib.error
 
 import pytest
@@ -17,7 +19,8 @@ def test_strategy_outbox_deduplicates_lifecycle_and_excludes_identifiers(tmp_pat
                        "filled_quantity": 1, "first_fill_observed_at": filled_at, "ingested_at": now.isoformat(),
                        "source": "KIS_DEMO_BROKER_REPORT", "strategy_performance": True, "mode": "demo"}],
            "blockers": ["AMBIGUOUS_ORDER", "SOURCE_EXECUTION_EXPIRED"],
-           "evaluation": {"sample": {"first_observed_at": filled_at},
+           "evaluation": {"sample": {"first_observed_at": (now - timedelta(days=2)).isoformat()},
+                          "settlement_available_at": filled_at,
                           "cost_evidence_status": "COMPLETE_REVIEWED_IMPORT", "exact_fifo_available": True,
                           "realized_net_pnl": 0}}
     receipt = {"mode": MODE, "schema": SCHEMA, "enabled": True, "real_orders_enabled": False,
@@ -34,6 +37,24 @@ def test_strategy_outbox_deduplicates_lifecycle_and_excludes_identifiers(tmp_pat
     assert {json.loads(p.read_text(encoding="utf-8"))["event"] for p in files} == {"FILL", "ISSUE", "REALIZED_PNL"}
     assert all("PRIVATE" not in p.read_text(encoding="utf-8") for p in files)
     assert all(local.notify(key, tmp_path, tmp_path, dry_run=True)["status"] == "DRY_RUN" for key in keys)
+
+
+def test_strategy_composition_loads_without_project_dependencies():
+    subprocess.run([sys.executable, "-S", "-c", "from tradingagents.notifications.strategy import compose"], check=True)
+
+
+@pytest.mark.parametrize("bad_time", [None, "bad", "2099-01-01T00:00:00Z"])
+def test_no_event_for_missing_invalid_or_future_broker_evidence(tmp_path, bad_time):
+    now = datetime.now(timezone.utc)
+    atomic_write_json(tmp_path / "notifications/kis-strategy-enabled.json", {"mode": MODE,
+        "enabled": True, "real_orders_enabled": False, "enabled_at": (now - timedelta(minutes=1)).isoformat()})
+    row = {"orders": [{"id": "fixture", "status": "FILLED", "mode": "demo", "filled_quantity": 1,
+                       "source": "KIS_DEMO_BROKER_REPORT", "strategy_performance": True,
+                       "first_fill_observed_at": bad_time, "ingested_at": now.isoformat()}],
+           "evaluation": {"settlement_available_at": bad_time, "cost_evidence_status": "COMPLETE_REVIEWED_IMPORT",
+                          "exact_fifo_available": True, "realized_net_pnl": 0}}
+    assert not strategy.queue_receipt(tmp_path, {"mode": MODE, "schema": SCHEMA, "enabled": True,
+        "real_orders_enabled": False, "checked_at": now.isoformat(), "markets": {"US": row}})
 
 
 @pytest.mark.parametrize("failure, calls, status", [

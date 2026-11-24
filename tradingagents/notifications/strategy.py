@@ -4,7 +4,7 @@ import math
 from zoneinfo import ZoneInfo
 
 from tradingagents.charting.bars import instant
-from tradingagents.execution.demo_runtime import MODE, SCHEMA, ZONES
+from tradingagents.kis_strategy_contract import MODE, SCHEMA, ZONES
 from .telegram import NotificationError
 
 
@@ -63,12 +63,12 @@ def queue_receipt(state, receipt):
             keys.append(queue(state, {**base, "event": "ISSUE", "reason": reason, "finished_at": day.isoformat()}))
 
         performance = row.get("evaluation") or {}
-        first = instant((performance.get("sample") or {}).get("first_observed_at"))
+        available = instant(performance.get("settlement_available_at"))
         net = performance.get("realized_net_pnl")
         if (performance.get("cost_evidence_status") == "COMPLETE_REVIEWED_IMPORT"
-                and performance.get("exact_fifo_available") is True and first is not None
-                and enabled <= first <= checked and type(net) in {int, float} and math.isfinite(net)):
-            keys.append(queue(state, {**base, "event": "REALIZED_PNL", "amount": net, "finished_at": first.isoformat()}))
+                and performance.get("exact_fifo_available") is True and available is not None
+                and enabled <= available <= checked and type(net) in {int, float} and math.isfinite(net)):
+            keys.append(queue(state, {**base, "event": "REALIZED_PNL", "amount": net, "finished_at": available.isoformat()}))
     return keys
 
 

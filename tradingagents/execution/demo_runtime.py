@@ -21,6 +21,7 @@ import tomllib
 from zoneinfo import ZoneInfo
 
 from tradingagents.atomic_io import atomic_write_json, interprocess_file_lock
+from tradingagents.kis_strategy_contract import MODE, SCHEMA, ZONES
 from . import demo_validation as validation
 from .archive_paper import build_step
 from .source_diagnostics import diagnose_source
@@ -33,10 +34,7 @@ from .kis_strategy_v2 import authorize_v2_size, configured_v2
 from .paper_runtime import _latest_source, _runtime_session
 from .strategy_evaluation import evaluate_strategy_orders
 
-SCHEMA = "tradingagents.kis-strategy-runtime/v1"
-MODE = "KIS_DEMO_STRATEGY"
 FIXTURE_SCOPE = "ISOLATED_FIXTURE"
-ZONES = {"KR": "Asia/Seoul", "US": "America/New_York"}
 TERMINAL = {"FILLED", "CANCELLED", "REJECTED", "NOT_SENT", "BLOCKED"}
 DECISIONS = {"STARTER_NOW": "BUY", "ADD_NOW": "BUY", "BUY_NOW": "BUY",
              "REDUCE_NOW": "SELL", "EXIT_NOW": "SELL", "TAKE_PROFIT_NOW": "SELL",

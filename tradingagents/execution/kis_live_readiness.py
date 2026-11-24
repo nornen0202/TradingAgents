@@ -16,6 +16,7 @@ from tradingagents.atomic_io import atomic_write_json, interprocess_file_lock
 from tradingagents.charting.bars import instant
 from tradingagents.portfolio.kis import REAL_BASE_URL
 from .broker_adapter import Account, Intent, _money
+from .kis_paper import _tick
 from .kis_strategy_limits import CAPS
 
 
@@ -85,7 +86,9 @@ def _admit(state, config, intent, account, usage, quote, session, now):
     price = _money(quote.get("ask" if intent.side == "BUY" else "bid"))
     cap, daily = _money(config.get("max_order_native")), _money(config.get("max_daily_buy_native"))
     maximum = config.get("max_daily_orders")
-    precision = Decimal("1") if market == "KR" else Decimal("0.01")
+    if market == "KR" and quote.get("instrument_type") not in {"STOCK", "ETF"}:
+        raise ValueError("LIVE_INSTRUMENT_TYPE_UNVERIFIED")
+    precision = Decimal(_tick(int(limit), quote["instrument_type"])) if market == "KR" else Decimal("0.01")
     if (quantity != quantity.to_integral_value() or not 0 < amount <= cap <= CAPS[market]
             or limit % precision or not 0 < cap <= daily <= CAPS[market] * 3
             or type(maximum) is not int or not 1 <= maximum <= 3

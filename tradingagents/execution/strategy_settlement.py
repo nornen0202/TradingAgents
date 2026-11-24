@@ -462,12 +462,14 @@ def settled_cost_totals(evidence, orders, *, currency, as_of):
         if seen != set(original) or not seen or len({e[1] for e in entries}) != len(entries):
             raise ValueError()
         observed_cost = _number(float(sum((entry[6] for entry in entries), Decimal(0))))
+        availability = max(_clock(proof["known_at"]) for proof in evidence["orders"]).isoformat()
         clocks = [(entry[0], entry[3]["ticker"]) for entry in entries]
         if len(clocks) != len(set(clocks)):
             # Equal timestamp precision does not establish a broker execution
             # sequence. Do not invent FIFO from lexical execution IDs.
             return {"status": "COMPLETE_REVIEWED_IMPORT", "actual_cost": observed_cost,
                     "actual_cost_components": {key: float(value) for key, value in components.items()},
+                    "settlement_available_at": availability,
                     "realized_net_pnl": None, "realized_actual_cost": None, "exact_fifo_available": False}
         lots, total, realized_cost, realized = {}, Decimal(0), Decimal(0), Decimal(0)
         sold = False
@@ -493,6 +495,7 @@ def settled_cost_totals(evidence, orders, *, currency, as_of):
                     symbol_lots.pop(0)
         return {"status": "COMPLETE_REVIEWED_IMPORT", "actual_cost": float(total),
                 "actual_cost_components": {key: float(value) for key, value in components.items()},
+                "settlement_available_at": availability,
                 "realized_net_pnl": float(realized) if sold else None,
                 "realized_actual_cost": float(realized_cost) if sold else None, "exact_fifo_available": True}
     except (DemoError, ValueError, TypeError, KeyError):
