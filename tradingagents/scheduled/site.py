@@ -2163,6 +2163,24 @@ def _render_etf_alternative_comparison(value: Any) -> str:
     actual = value.get("actual") if isinstance(value.get("actual"), dict) else {}
     cashflows = value.get("cashflows") if isinstance(value.get("cashflows"), dict) else {}
     alternatives = [item for item in value.get("alternatives", []) if isinstance(item, dict)]
+    if cashflows.get("status") == "cashflow_evidence_unverified":
+        rows = "".join(
+            "<tr>"
+            f"<td>{_escape(str(item.get('label') or item.get('key') or '-'))}</td>"
+            f"<td>{_escape(_format_pct_points_value(item.get('balance_return_pct')))}</td>"
+            f"<td>{_escape(_etf_status_label(item.get('status')))}</td></tr>"
+            for item in alternatives
+        )
+        return f"""
+      <div class="account-etf-alternatives">
+        <h3>ETF 연구 수익률</h3>
+        <p class="empty">기간 입출금 합계의 증빙이 필요합니다. 가격이 있는 ETF의 연구 결과만 표시합니다.</p>
+        <div class="account-table-wrap"><table>
+          <thead><tr><th>대체 포트폴리오</th><th>연구 수익률</th><th>상태</th></tr></thead>
+          <tbody>{rows}</tbody>
+        </table></div>
+      </div>
+        """
     ok_alternatives = [item for item in alternatives if str(item.get("status") or "").upper() == "OK"]
     best = (
         max(
@@ -2485,6 +2503,8 @@ def _etf_status_label(value: Any) -> str:
         return "비교 데이터 없음"
     if normalized == "cashflow_dates_required":
         return "입금일 원장 필요"
+    if normalized in {"cashflow_evidence_unverified", "research_only_unverified_cashflows"}:
+        return "입출금 미검증 · 연구용"
     if normalized == "no_alternatives":
         return "대체 포트폴리오 없음"
     return _friendly_etf_warning(status) if status else "-"

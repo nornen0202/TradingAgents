@@ -556,6 +556,14 @@ def render_account_performance_markdown(payload: Mapping[str, Any]) -> str:
             f"- 혼합 벤치마크: `{_pct_points(blended.get('balance_return_pct'))}` / "
             f"실제 대비 `{_pct_points(blended.get('excess_return_pct'))}`",
         ]
+        if etf_cashflows.get("status") == "cashflow_evidence_unverified":
+            etf_lines = ["", "### ETF 연구 수익률", "",
+                         "- 기간 입출금 합계의 증빙이 필요합니다. 가격이 있는 ETF의 연구 결과만 표시합니다."]
+            etf_lines.extend(
+                f"- {item.get('label') or item.get('key')}: {_pct_points(item.get('balance_return_pct'))} "
+                f"({_etf_status_label(item.get('status'))})"
+                for item in etf_comparison.get("alternatives", []) if isinstance(item, Mapping)
+            )
         if etf_status == "actual_performance_unavailable":
             etf_lines.extend(
                 [
@@ -2393,6 +2401,8 @@ def _etf_status_label(value: Any) -> str:
         return "실제 성과 검증 전"
     if status == "cashflow_dates_required":
         return "입금일 원장 필요"
+    if status in {"cashflow_evidence_unverified", "research_only_unverified_cashflows"}:
+        return "입출금 미검증 · 연구용"
     if status == "no_alternatives":
         return "대체 포트폴리오 없음"
     return str(value or "-")
