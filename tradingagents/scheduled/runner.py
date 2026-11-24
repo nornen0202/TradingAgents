@@ -4876,10 +4876,7 @@ def _prefer_newer_completed_full_source(
             break
 
     newer: list[tuple[tuple[datetime, str], dict[str, Any]]] = []
-    # Canonical archive IDs encode their start in the run's own time zone.
-    # Include the previous UTC date to cover local offsets at the boundary.
-    date_floor = (lineage_key[0] - timedelta(days=1)).date() if lineage_key is not None else None
-    for full, _ in full_manifests_desc(archive_dir, run_date_floor=date_floor):
+    for full, _ in full_manifests_desc(archive_dir):
         settings = full.get("settings") if isinstance(full.get("settings"), dict) else {}
         actual_market = str(settings.get("market_scope") or settings.get("market") or "").upper()
         if (
@@ -4937,11 +4934,8 @@ def _resolve_latest_full_overlay_baseline_manifest(
             source_path = _find_run_manifest_path_by_run_id(archive_dir, source_run_id)
             if source_path is not None:
                 candidates.append(json.loads(source_path.read_text(encoding="utf-8")))
-    date_floor = None
-    if max_age is not None and now is not None and now.utcoffset() is not None:
-        date_floor = (now.astimezone(timezone.utc) - max_age - timedelta(days=1)).date()
     candidates.extend(manifest for manifest, _run_dir in full_manifests_desc(
-        archive_dir, write_index=write_discovery_index, run_date_floor=date_floor))
+        archive_dir, write_index=write_discovery_index))
 
     unique: dict[str, dict[str, Any]] = {}
     for index, candidate in enumerate(candidates):
@@ -4949,6 +4943,8 @@ def _resolve_latest_full_overlay_baseline_manifest(
         unique.setdefault(identity, candidate)
     eligible: list[dict[str, Any]] = []
     for candidate in unique.values():
+        if not _manifest_market_matches(candidate, market=market):
+            continue
         if max_age is not None:
             age_seconds = _manifest_age_seconds(candidate, now=now, market=market)
             if age_seconds is None:
@@ -4994,7 +4990,8 @@ def _manifest_is_complete_overlay_baseline(
     now: datetime | None = None,
 ) -> bool:
     settings = manifest.get("settings") if isinstance(manifest.get("settings"), dict) else {}
-    if str(settings.get("run_mode") or "full").strip().lower() != "full":
+    if (str(settings.get("run_mode") or "full").strip().lower() != "full"
+            or not _manifest_market_matches(manifest, market=market)):
         return False
     try:
         started = datetime.fromisoformat(str(manifest["started_at"]).replace("Z", "+00:00"))
@@ -5009,8 +5006,6 @@ def _manifest_is_complete_overlay_baseline(
         if (archive_dir is None
                 or not verified_completed_recovery(archive_dir, manifest, now=now or datetime.now(timezone.utc))):
             return False
-    if not _manifest_market_matches(manifest, market=market):
-        return False
     status = str(manifest.get("status") or "").strip().lower()
     if status not in {"success", "completed", "complete"}:
         return False
