@@ -22,8 +22,8 @@ from tradingagents.dataflows.market_policy import aware_datetime, observation_st
 from tradingagents.performance.lifecycle import append_lifecycle_event, initialize_lifecycle
 from tradingagents.scheduled.market_calendar import market_session_state
 from .kis_demo import DEMO_HOST, DemoError, DemoOrderJournal, KisDemoClient, has_unresolved_demo_requests
-from .kis_strategy_limits import broker_policy_fields, validate_buy_nav
-from .paper import kis_demo_order_preview, order_nav_limit
+from .kis_strategy_limits import bind_broker_policy, broker_policy_fields, validate_buy_nav, within_buy_nav
+from .paper import kis_demo_order_preview
 
 
 KST = ZoneInfo("Asia/Seoul")
@@ -169,7 +169,7 @@ class KisPaperBroker:
     has no caller-supplied historical ``now`` and cannot backdate a live request.
     """
     def __init__(self, path: Path | str, client: KisDemoClient, policy: PaperOrderPolicy,
-                 *, paper_enabled: bool = False, clock=None):
+                 *, paper_enabled: bool = False, clock=None, strategy_policy_revision=None):
         if type(client) is not KisDemoClient or client.credentials.product_code != "01" or type(paper_enabled) is not bool or not isinstance(policy, PaperOrderPolicy):
             raise DemoError("Dedicated VTS client, explicit policy and boolean opt-in required")
         self.path, self.client, self.policy = Path(path), client, policy
@@ -188,13 +188,12 @@ class KisPaperBroker:
                 BEGIN SELECT RAISE(ABORT,'Paper intent is immutable'); END;
         """)
         initialize_lifecycle(self.db)
-        encoded = json.dumps(broker_policy_fields(policy), sort_keys=True)
-        with interprocess_file_lock(self.path.with_suffix(self.path.suffix + ".paper.lock")):
-            previous = self.db.execute("SELECT policy FROM paper_policy WHERE scope=?", (client.credentials.scope(),)).fetchone()
-            if previous and previous[0] != encoded:
-                self.close()
-                raise DemoError("Policy changed; use a separately named paper journal")
-            self.db.execute("INSERT OR IGNORE INTO paper_policy VALUES (?,?)", (client.credentials.scope(), encoded))
+        try:
+            with interprocess_file_lock(self.path.with_suffix(self.path.suffix + ".paper.lock")):
+                bind_broker_policy(self.db, client.credentials.scope(), "KR", broker_policy_fields(policy), strategy_policy_revision)
+        except Exception:
+            self.close()
+            raise
 
     def close(self):
         self.journal.close()
@@ -271,9 +270,7 @@ class KisPaperBroker:
         if count >= self.policy.max_daily_orders:
             raise DemoError("Daily paper order limit exceeded")
         if side == "BUY":
-            if (self.policy.max_order_nav is not None
-                    and notional * (1 + self.policy.reserve_cost_bps / 10000)
-                    > nav * order_nav_limit(self.policy, "BUY", quantity)):
+            if not within_buy_nav(notional, quantity, nav, self.policy):
                 raise DemoError("Paper buy exceeds the configured NAV limit")
             if bought + notional > self.policy.max_daily_buy_krw:
                 raise DemoError("Daily paper buy limit exceeded")

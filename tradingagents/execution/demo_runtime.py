@@ -8,6 +8,7 @@ are never strategy fills.
 from __future__ import annotations
 
 from contextlib import contextmanager
+from dataclasses import asdict
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal, ROUND_DOWN, ROUND_UP
 from functools import partial
@@ -66,7 +67,7 @@ def validation_gate(root, market, now):
 
 
 @contextmanager
-def broker_context(market, path, clock, tickers, scope, *, limits=None):
+def broker_context(market, path, clock, tickers, scope, *, limits=None, policy_revision=None):
     from .demo_token_cache import cache_demo_authentication
     client = broker = None
     try:
@@ -78,7 +79,7 @@ def broker_context(market, path, clock, tickers, scope, *, limits=None):
         if scope != client.credentials.scope():
             raise ValueError("VALIDATED_ACCOUNT_CHANGED")
         cache_demo_authentication(client, market=market)
-        broker = make_strategy_broker(market, path, client, clock, tickers, limits)
+        broker = make_strategy_broker(market, path, client, clock, tickers, limits, revision=policy_revision)
         yield broker
     finally:
         if broker:
@@ -154,8 +155,9 @@ def limit_price(quote, side, market):
     return int(value) if market == "KR" else float(value)
 
 
-def quantity(candidate, price, account, market, owned, now):
+def quantity(candidate, price, account, market, owned, now, *, limits=None):
     """Apply the selected allocation policy using verified demo capacity."""
+    native_cap = limits.max_order_native if limits is not None else CAPS[market]
     if candidate.get("allocation_mode") == demo_strategy_plan.MODE:
         _fresh(account, now=now, seconds=120)
         if account.get("complete") is not True or account.get("environment") != "demo":
@@ -168,7 +170,7 @@ def quantity(candidate, price, account, market, owned, now):
         else:
             position = next((p for p in account["positions"] if p["ticker"] == candidate["signal"]["ticker"]), {})
             permitted = owned.get(candidate["ticker"], 0) >= 1 and position.get("sellable_quantity", 0) >= 1
-        if not permitted or price > CAPS[market]:
+        if not permitted or price > native_cap:
             raise ValueError("NO_STRATEGY_QUANTITY_WITHIN_LIMITS")
         return 1
     proposal = candidate["proposal"]
@@ -186,7 +188,7 @@ def quantity(candidate, price, account, market, owned, now):
     planned = int(qty) if qty is not None else math.floor(budget / price)
     if market == "KR":
         planned = min(planned, math.floor(budget / price))
-    result = min(planned, math.floor(CAPS[market] / price))
+    result = min(planned, math.floor(native_cap / price))
     if candidate["side"] == "BUY":
         suffix = "krw" if market == "KR" else "usd"
         result = min(result, account["cash_only_buying_quantity"], math.floor(account[f"cash_only_buying_power_{suffix}"] / (price * 1.003)))
@@ -466,7 +468,7 @@ def _reconcile_existing(broker, *, market, now, regular, allow_cancel, clock):
 
 
 def advance(archive, root, validation_root, market, *, clock, tickers, broker_factory, quote_loader, account_loader, session_resolver, gate,
-            allocation_mode="ARCHIVED_PROPOSALS", authorize=None, limits=None, v2_settings=None):
+            allocation_mode="ARCHIVED_PROPOSALS", authorize=None, limits=None, v2_settings=None, policy_revision=None):
     now, path = at(clock()), root / f"{market.lower()}-strategy.sqlite"
     result = {"status": "WAITING_VALIDATION", "blockers": [], "gate_passed": False, "orders": [], "order_counts": {}, "performance": None}
     def finish(status, *blockers):
@@ -512,6 +514,10 @@ def advance(archive, root, validation_root, market, *, clock, tickers, broker_fa
     marks = {}
     with broker_factory(market, path, clock, tickers, scope) as broker:
         initialize(broker.db)
+        if policy_revision is not None:
+            result["native_policy_journal_bound"] = broker.db.execute(
+                "SELECT 1 FROM paper_policy_revisions WHERE scope=? AND revision=?", (scope, policy_revision),
+            ).fetchone() is not None
         issues = _reconcile_existing(broker, market=market, now=now, regular=True,
                                      allow_cancel=halted or near_close or not result["gate_passed"], clock=clock)
         current = summary(broker.db, at(clock()), market)
@@ -619,7 +625,7 @@ def advance(archive, root, validation_root, market, *, clock, tickers, broker_fa
                     if market == "US":
                         terms["exchange"] = quote["exchange"]
                     account = account_loader(market, broker, terms, clock)
-                    terms["quantity"] = quantity(candidate, price, account, market, current["owned"], at(clock()))
+                    terms["quantity"] = quantity(candidate, price, account, market, current["owned"], at(clock()), limits=limits)
                     terms["quantity"] = size_with_native_limits(market, terms, account, limits)
                     if not terms["quantity"]:
                         raise ValueError("NO_STRATEGY_QUANTITY_WITHIN_LIMITS")
@@ -711,6 +717,7 @@ def tick(archive, root, validation_root, *, clock=None, broker_factory=None, quo
         enabled = isinstance(config, dict) and config.get("mode") == MODE and config.get("enabled") is True and config.get("real_orders_enabled") is False
         allocation_mode = config.get("allocation_mode", "ARCHIVED_PROPOSALS") if isinstance(config, dict) else "ARCHIVED_PROPOSALS"
         market_limits = configured_limits(config) if isinstance(config, dict) else {}
+        policy_revision = config.get("native_limit_revision") if enabled else None
         v2_settings = configured_v2(config) if isinstance(config, dict) else {}
         if set(v2_settings) - set(market_limits):
             raise ValueError("KIS V2 requires explicit native order limits")
@@ -724,12 +731,13 @@ def tick(archive, root, validation_root, *, clock=None, broker_factory=None, quo
             try:
                 markets[market] = advance(archive, root, validation_root, market, clock=clock, tickers=(tickers or universe())[market],
                     broker_factory=broker_factory or (
-                        partial(broker_context, limits=market_limits[market]) if market in market_limits else broker_context
+                        partial(broker_context, limits=market_limits[market], policy_revision=policy_revision)
+                        if market in market_limits else broker_context
                     ),
                     quote_loader=quote_loader or current_quote,
                     account_loader=account_loader or validation.current_account, session_resolver=session_resolver or _runtime_session,
                     gate=gate or validation_gate, allocation_mode=allocation_mode, authorize=authorize,
-                    limits=market_limits.get(market), v2_settings=v2_settings.get(market))
+                    limits=market_limits.get(market), v2_settings=v2_settings.get(market), policy_revision=policy_revision)
             except Exception:
                 markets[market] = {"status": "BLOCKED", "checked_at": at(clock()).isoformat(), "gate_passed": False, "blockers": ["RUNTIME_EVIDENCE_UNVERIFIED"]}
         finished = at(clock())
@@ -748,6 +756,11 @@ def tick(archive, root, validation_root, *, clock=None, broker_factory=None, quo
         import os
         receipt = {"schema": SCHEMA, "mode": MODE, "enabled": enabled, "real_orders_enabled": False,
                    "checked_at": finished.isoformat(), "source_revision": os.getenv("TRADINGAGENTS_SOURCE_SHA"), "markets": markets}
+        if enabled and market_limits:
+            receipt["configured_native_limits"] = {
+                "revision": policy_revision,
+                "markets": {market: asdict(limits) for market, limits in market_limits.items()},
+            }
         if evidence_scope is not None:
             receipt["evidence_scope"] = evidence_scope
         atomic_write_json(archive / "paper/kis-strategy-runtime.json", receipt)
