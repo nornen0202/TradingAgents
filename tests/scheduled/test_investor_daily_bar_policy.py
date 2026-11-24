@@ -69,3 +69,23 @@ def test_execution_overlay_keeps_strict_daily_date_policy():
     ), patch("tradingagents.scheduled.runner._fetch_recent_trade_date_history", return_value=_FakeHistory(date(2026, 6, 26))):
         with pytest.raises(RuntimeError, match="Refusing stale"):
             resolve_trade_date("AAPL", config)
+
+
+@pytest.mark.parametrize("yahoo_raises", [False, True])
+@pytest.mark.parametrize("broker_date", ["2026-06-29", "2026-06-30"])
+def test_kr_available_policy_can_use_verified_broker_close(yahoo_raises, broker_date):
+    history = pd.DataFrame({"Close": [102]}, index=pd.to_datetime(["2026-06-26"]))
+    broker = pd.DataFrame({"Date": pd.to_datetime([broker_date]), "Close": [105]})
+    with patch("tradingagents.scheduled.runner.datetime", _FixedDatetime), patch(
+        "tradingagents.scheduled.runner._expected_completed_daily_trade_date", return_value=date(2026, 6, 29)
+    ), patch("tradingagents.scheduled.runner._fetch_recent_trade_date_history", return_value=history,
+             side_effect=TimeoutError() if yahoo_raises else None), patch(
+        "tradingagents.dataflows.kr_daily_history.load_kr_daily_bars", return_value=broker
+    ) as reads:
+        if yahoo_raises and broker_date != "2026-06-29":
+            with pytest.raises(RuntimeError, match="No observed daily bar"):
+                resolve_trade_date("005930.KS", available("KR"))
+        else:
+            assert resolve_trade_date("005930.KS", available("KR")) == (
+                "2026-06-29" if broker_date == "2026-06-29" else "2026-06-26")
+        reads.assert_called_once_with("005930.KS", "2026-06-29", "2026-06-29", require_end=True)

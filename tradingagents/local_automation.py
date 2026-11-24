@@ -568,7 +568,10 @@ def preflight(config_path):
 
 
 def archive_fingerprint(archive):
+    from tradingagents.scheduled.strategy_research_prices import price_epoch
+
     digest = hashlib.sha256()
+    digest.update(json.dumps(price_epoch(datetime.now(timezone.utc))).encode())
     # Finished manifests and final Work publications are the durable outbox.
     # Incomplete ticker output never makes an unchanged report look delivered.
     roots = {"research": archive,
@@ -683,6 +686,7 @@ def ensure_branch_pages(state):
 
 def publish(archive, state, runtime_dir, *, rebuild=False, publication_locked=False, reports_only=False):
     from tradingagents.notifications.local import reconcile_safely
+
     reconcile_safely(archive, state, publication_locked=publication_locked)
     fingerprint = archive_fingerprint(archive)
     receipt_path = state / "publication.json"

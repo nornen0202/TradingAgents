@@ -1023,6 +1023,9 @@ def resolve_trade_date(
         )
     except Exception as exc:
         if available_research:
+            if expected_completed_date and _trade_date_market(ticker=normalized_symbol, config=config) == "KR":
+                if _kr_completed_daily_bar(normalized_symbol, expected_completed_date):
+                    return expected_completed_date.isoformat()
             raise RuntimeError("No observed daily bar is available; retain the previous dated investor report") from exc
         if not is_retryable_yfinance_error(exc):
             raise
@@ -1060,18 +1063,7 @@ def resolve_trade_date(
         if market == "KR" and last_date != expected_completed_date:
             # The broker's actual completed bar can resolve a Yahoo outage;
             # the calendar alone is never evidence of an available price.
-            from tradingagents.dataflows.kr_daily_history import load_kr_daily_bars, source_note
-
-            try:
-                broker_history = load_kr_daily_bars(
-                    normalized_symbol, expected_completed_date.isoformat(),
-                    expected_completed_date.isoformat(), require_end=True,
-                )
-            except Exception as exc:
-                broker_history = None
-                print(f"::warning::KR daily history fallback unavailable: {type(exc).__name__}")
-            if broker_history is not None:
-                print("::warning::" + source_note(broker_history).strip())
+            if _kr_completed_daily_bar(normalized_symbol, expected_completed_date):
                 return expected_completed_date.isoformat()
         wait_seconds = max(0.0, config.run.latest_market_data_wait_minutes * 60.0)
         retry_interval = max(1.0, config.run.latest_market_data_retry_interval_seconds)
@@ -1131,12 +1123,31 @@ def _available_research_trade_date(history, *, ticker, config, now, completed):
     cutoff = min(completed, local_day) if completed is not None else local_day - timedelta(days=1)
     earliest = cutoff - timedelta(days=max(1, config.run.latest_market_data_lookback_days))
     selected = _latest_observed_daily_bar(history, earliest=earliest, cutoff=cutoff)
+    if market == "KR" and completed == cutoff and selected != cutoff and _kr_completed_daily_bar(ticker, cutoff):
+        return cutoff.isoformat()
     if selected is None:
         raise RuntimeError("No valid dated completed daily bar is available for investor research")
     if selected < cutoff:
         print(f"::warning::Investor research uses observed {ticker} daily bar {selected.isoformat()}; "
               f"latest completed session is {cutoff.isoformat()}. Source date is preserved; no freshness wait.")
     return selected.isoformat()
+
+
+def _kr_completed_daily_bar(ticker: str, session: date) -> bool:
+    """Use the existing analysis provider to prove the calendar's exact session."""
+    from tradingagents.dataflows.kr_daily_history import load_kr_daily_bars, source_note
+
+    day = session.isoformat()
+    try:
+        broker = load_kr_daily_bars(ticker, day, day, require_end=True)
+        if broker is not None and "Date" in broker:
+            matched = _latest_observed_daily_bar(broker.set_index("Date"), earliest=session, cutoff=session)
+            if matched == session:
+                print("::warning::" + source_note(broker).strip())
+                return True
+    except Exception as exc:
+        print(f"::warning::KR daily history fallback unavailable: {type(exc).__name__}")
+    return False
 
 
 def _latest_observed_daily_bar(history, *, earliest: date, cutoff: date) -> date | None:
