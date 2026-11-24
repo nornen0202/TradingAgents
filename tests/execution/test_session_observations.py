@@ -91,3 +91,18 @@ def test_scheduler_roots_flow_into_standard_research_config(tmp_path, monkeypatc
     config = load_scheduled_config(path)
     assert config.execution.session_confirmation_receipts_dir == tmp_path / "evidence/confirmations"
     assert config.storage.daily_history_capture_db == tmp_path / "evidence/research-prices.sqlite"
+
+
+def test_observation_transport_paces_only_exact_demo_quotes(monkeypatch):
+    from types import SimpleNamespace
+
+    calls = []
+    monkeypatch.setattr(obs.requests.Session, "request", lambda _, *args, **kwargs: calls.append(args))
+    client = obs._QuotationSession(SimpleNamespace(wait=lambda: calls.append("paced")))
+    path = "/uapi/domestic-stock/v1/quotations/inquire-daily-itemchartprice"
+    client.request("GET", obs.DEMO_HOST + path, headers={"tr_id": "FHKST03010100"}, allow_redirects=False)
+    with pytest.raises(obs.DemoError):
+        client.request("GET", obs.DEMO_HOST + "/uapi/domestic-stock/v1/trading/inquire-balance", allow_redirects=False)
+    with pytest.raises(obs.DemoError):
+        client.request("GET", obs.DEMO_HOST + path, headers={"tr_id": "wrong"}, allow_redirects=False)
+    assert calls == ["paced", ("GET", obs.DEMO_HOST + path)]

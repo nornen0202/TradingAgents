@@ -10,18 +10,43 @@ import math
 from pathlib import Path
 import re
 import sqlite3
+from urllib.parse import urlsplit
 from zoneinfo import ZoneInfo
+
+import requests
 
 from tradingagents.atomic_io import atomic_write_json, interprocess_file_lock
 from tradingagents.charting.bars import instant
 from .promotion import _sessions
 from .session_confirmation import RECEIPT_SCHEMA, _schedule
+from .kis_demo import DEMO_HOST, DemoError, _pacer
 
 SCHEMA = "tradingagents.forward-market-observation/v1"
 ZONES = {"KR": "Asia/Seoul", "US": "America/New_York"}
 CURRENCIES = {"KR": "KRW", "US": "USD"}
 KINDS = {"open": "official_regular_open", "close": "final_regular_close"}
 VENUES = {"KR": {"J"}, "US": {"NAS", "NYS", "AMS"}}
+_QUOTATION_TRANSPORT = {
+    ("POST", "/oauth2/tokenP", None),
+    ("GET", "/uapi/domestic-stock/v1/quotations/inquire-daily-itemchartprice", "FHKST03010100"),
+    ("GET", "/uapi/overseas-price/v1/quotations/dailyprice", "HHDFS76240000"),
+}
+
+
+class _QuotationSession(requests.Session):
+    def __init__(self, pacer):
+        super().__init__()
+        self.trust_env = False
+        self._pacer = pacer
+
+    def request(self, method, url, **kwargs):
+        target = urlsplit(url)
+        key = (method, target.path, (kwargs.get("headers") or {}).get("tr_id"))
+        if (f"{target.scheme}://{target.netloc}" != DEMO_HOST or target.query or target.fragment
+                or key not in _QUOTATION_TRANSPORT or kwargs.get("allow_redirects") is not False):
+            raise DemoError("Outside the dedicated quote route.")
+        self._pacer.wait()
+        return super().request(method, url, **kwargs)
 
 
 def _now():
@@ -61,7 +86,8 @@ def _new_client(market):
         from .kis_demo import DemoCredentials
         credentials = DemoCredentials.from_local_settings()
     return KisClient(app_key=credentials.app_key, app_secret=credentials.app_secret,
-                     environment="demo", timeout_seconds=5, token_file_cache_enabled=False)
+                     environment="demo", timeout_seconds=5, token_file_cache_enabled=False,
+                     session=_QuotationSession(_pacer(credentials)))
 
 
 def _download(item, session, client):
