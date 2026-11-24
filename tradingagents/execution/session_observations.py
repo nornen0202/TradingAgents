@@ -133,7 +133,8 @@ def load_collected_observations(path, ticker, market, *, now):
     """Read verified market evidence directly from the collector's append-only store."""
     if path is None or market not in ZONES or (cutoff := instant(now)) is None:
         return {}
-    day = cutoff.astimezone(ZoneInfo(ZONES[market])).date().isoformat()
+    local_day = cutoff.astimezone(ZoneInfo(ZONES[market])).date()
+    day = local_day.isoformat()
     try:
         with closing_connection(sqlite3.connect(path.resolve().as_uri() + "?mode=ro", uri=True)) as db:
             watchlist = _watchlist(path.parent / "policy.json")
@@ -145,16 +146,25 @@ def load_collected_observations(path, ticker, market, *, now):
                 return {}
             rows = db.execute("""
                 SELECT session, stage, observed_at, source_sha256, raw_response, evidence FROM observations
-                WHERE ticker=? AND market=? AND observed_at<=? AND evidence IS NOT NULL AND
-                      ((stage='open' AND session=?) OR (stage='close' AND session<=?))
-                ORDER BY session DESC LIMIT 3
-                """, (ticker, market, cutoff.isoformat(), day, day)).fetchall()
+                WHERE ticker=? AND market=? AND evidence IS NOT NULL AND
+                      ((stage='open' AND session=?) OR (stage='close' AND session BETWEEN ? AND ?))
+                ORDER BY session DESC
+                """, (ticker, market, day, (local_day - timedelta(days=30)).isoformat(), day)).fetchall()
         observations = {}
         for session, stage, observed_at, digest, raw, evidence in rows:
             key = {"open": "official_open", "close": "regular_close"}[stage]
             if key in observations or hashlib.sha256(raw).hexdigest() != digest:
                 continue
             record = json.loads(evidence)
+            received = instant(observed_at)
+            event = instant(record.get("event_at"))
+            if (received is None or event is None or not event <= received <= cutoff
+                    or instant(record.get("observed_at")) != received):
+                continue
+            if record.get("revised_at") is not None:
+                revision = instant(record["revised_at"])
+                if revision is None or not event <= revision <= received:
+                    continue
             venue = record.get("venue")
             if venue is None and all(key not in record for key in ("venue", "session_id", "price_basis")):
                 # The original collector bound venue to the immutable registered policy.
@@ -162,7 +172,6 @@ def load_collected_observations(path, ticker, market, *, now):
                 record.update(venue=venue, session_id=f"{market}:{venue}:regular:{session}", price_basis="unadjusted")
             if (venue != instrument["venue"] or record.get("session_id") != f"{market}:{venue}:regular:{session}"
                     or record.get("kind") != KINDS[stage] or record.get("session") != session
-                    or record.get("observed_at") != observed_at
                     or record.get("price_basis") != "unadjusted" or record.get("ticker") != ticker
                     or record.get("market") != market or record.get("currency") != CURRENCIES[market]):
                 continue

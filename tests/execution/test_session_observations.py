@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import hashlib
 import json
 import sqlite3
@@ -210,6 +210,17 @@ def test_database_reads_legacy_confirmed_close_against_registered_venue(tmp_path
     atomic_write_json(tmp_path / "policy.json", {"schema": obs.SCHEMA, "instruments": [
         {"ticker": "000660.KS", "market": "KR", "venue": "J"}]})
     assert obs.load_collected_observations(db, "069500.KS", "KR", now=at) == {}
+
+
+def test_database_cutoff_uses_instants_across_timezone_offsets(tmp_path):
+    policy(tmp_path)
+    at = time(MON + "T09:00:10")
+    obs.capture_due(tmp_path, clock=lambda: at, download=market_bar)
+    database = tmp_path / "observations.sqlite"
+    for cutoff in (at, at.astimezone(timezone.utc)):
+        result = obs.load_collected_observations(database, "069500.KS", "KR", now=cutoff)
+        assert result["official_open"]["price"] == 100
+        assert obs.load_collected_observations(database, "069500.KS", "KR", now=cutoff - timedelta(seconds=1)) == {}
 
 
 def test_independent_database_env_does_not_select_daily_history_target(tmp_path, monkeypatch):

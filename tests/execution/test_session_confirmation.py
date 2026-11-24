@@ -102,6 +102,12 @@ def test_next_session_quote_and_open_are_distinct_conditions():
     assert result["matched_alternatives"] == [1]
 
 
+def test_future_price_revision_does_not_confirm_archived_open():
+    result = _evaluate(official_open=_feed("official_regular_open", MONDAY_OPEN,
+                                           revised_at="2026-11-30T15:00:00Z"))
+    assert not result["verified_next_open"] and not result["paper_candidate_ready"]
+
+
 @pytest.mark.parametrize("name,kind,clock", [
     ("regular_close", "final_regular_close", FRIDAY_CLOSE),
     ("official_open", "official_regular_open", MONDAY_OPEN),

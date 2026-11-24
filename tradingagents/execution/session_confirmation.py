@@ -55,6 +55,9 @@ def _read_market_record(record, plan, session, *, purpose, earliest, latest, now
         event, observed = _stamp(record["event_at"]), _stamp(record["observed_at"])
         if not earliest <= event <= latest or not event <= observed <= now:
             return None
+        revision = record.get("revised_at")
+        if revision is not None and not event <= _stamp(revision) <= observed:
+            return None
         if record.get("session_id") is not None:
             venue = record.get("venue")
             if (not isinstance(venue, str) or record["session_id"] != f"{plan['market']}:{venue}:regular:{session}"
