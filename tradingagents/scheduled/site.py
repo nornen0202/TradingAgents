@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from tradingagents.decision_provenance import research_origin
 from tradingagents.report_reader import reader_assets
 
 import html
@@ -1071,6 +1072,22 @@ def _is_default_runtime_youtube_archive(path: Path) -> bool:
     return normalized.endswith(".runtime/youtube-archive")
 
 
+def _research_origin_html(manifest: dict[str, Any], row: dict[str, Any]) -> str:
+    origin, started_at = research_origin(manifest, row)
+    label = {"full": "신규 전체 분석", "reused_full": "기존 전체 분석 재사용",
+             "overlay_only": "기존 분석의 실행 조건 갱신"}.get(origin)
+    if label is None:
+        return ""
+    if isinstance(started_at, str):
+        try:
+            clock = datetime.fromisoformat(started_at)
+            if clock.utcoffset() is not None:
+                label += f" · 원분석 {clock.isoformat()}"
+        except ValueError:
+            pass
+    return f"<p><strong>판단 출처</strong><span>{_escape(label)}</span></p>"
+
+
 def _render_run_page(
     manifest: dict[str, Any],
     settings: SiteSettings,
@@ -1112,6 +1129,7 @@ def _render_run_page(
               <p class="long-field"><strong>위험 요약</strong><span>{_escape(investor_summary['risk_summary'])}</span></p>
               <p><strong>리서치 기준</strong><span>{_escape(investor_summary['research_basis'])}</span></p>
               <p><strong>실행 기준</strong><span>{_escape(investor_summary['execution_basis'])}</span></p>
+              {_research_origin_html(manifest, ticker_summary)}
               {_advanced_diagnostics_html(ticker_summary, manifest, stale_after_seconds=stale_after_seconds, compact=True)}
             </article>
             """
@@ -3354,6 +3372,7 @@ def _render_ticker_page(
         <p><strong>내일 follow-through</strong><span>{_escape(investor_summary['next_day_action'])}</span></p>
         <p><strong>리서치 기준</strong><span>{_escape(investor_summary['research_basis'])}</span></p>
         <p><strong>실행 기준</strong><span>{_escape(investor_summary['execution_basis'])}</span></p>
+        {_research_origin_html(manifest, ticker_summary)}
         <p><strong>핵심 가격대</strong><span>{_escape(investor_summary['key_levels'])}</span></p>
         <p><strong>위험 요약</strong><span>{_escape(investor_summary['risk_summary'])}</span></p>
         <p><strong>왜 이 종목인가</strong><span>{_escape(investor_summary['why_this_ticker'])}</span></p>

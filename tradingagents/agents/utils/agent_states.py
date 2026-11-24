@@ -49,6 +49,7 @@ class AgentState(MessagesState):
     instrument_profile: Annotated[dict, "Normalized instrument metadata"]
     trade_date: Annotated[str, "What date we are trading at"]
     analysis_date: Annotated[str, "What date the full analysis is being generated on"]
+    standing_portfolio: Annotated[dict, "User-supplied analysis portfolio"]
 
     sender: Annotated[str, "Agent that sent this message"]
 

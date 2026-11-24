@@ -6,6 +6,7 @@ from tradingagents.agents.utils.agent_utils import (
 from tradingagents.agents.utils.decision_retry import invoke_structured_decision_with_retry
 from tradingagents.agents.utils.decision_clock import build_decision_clock_context
 from tradingagents.schemas import build_decision_output_instructions
+from tradingagents.portfolio.context import render_portfolio
 
 
 def create_portfolio_manager(llm, memory):
@@ -36,6 +37,7 @@ def create_portfolio_manager(llm, memory):
 {instrument_context}
 
 {build_decision_clock_context(state)}
+{render_portfolio(state)}
 
 Use the common decision schema and be explicit about rating (legacy), portfolio_stance, entry_action, risk_action, risk_action_reason, risk_action_reason_codes, risk_action_level, setup_quality, confidence, time horizon, entry logic, exit logic, position sizing, risk limits, catalysts, invalidators, watchlist_triggers, data_coverage, and execution_levels.
 NO_TRADE is allowed as a legacy rating, but do not collapse all outcomes into NO_TRADE.

@@ -878,3 +878,49 @@ def test_take_profit_if_triggered_is_tracked_as_profit_like(tmp_path):
     assert row[1] == 20.0
     assert row[2] == "avoided_loss"
     assert row[3] > 0
+
+
+def test_normal_tracker_counts_fresh_research_only_when_a_full_report_recovers(tmp_path):
+    import json
+
+    config_path = tmp_path / "scheduled.toml"
+    config_path.write_text("""
+[run]
+tickers = ["AAPL", "MSFT"]
+
+[performance]
+enabled = true
+store_path = "./performance.sqlite"
+update_outcomes_on_run = false
+""", encoding="utf-8")
+    config = load_scheduled_config(config_path)
+
+    def track(name, mode, tickers, *, archive_manifest=False, finalization_only=False):
+        run_dir = tmp_path / name
+        private = run_dir / "portfolio-private"
+        private.mkdir(parents=True, exist_ok=True)
+        manifest = {"run_id": name, "settings": {"run_mode": mode}, "tickers": tickers}
+        if finalization_only:
+            manifest["research_recovery"] = {"finalization_only": True}
+        if archive_manifest:
+            (run_dir / "run.json").write_text(json.dumps(manifest), encoding="utf-8")
+        (private / "portfolio_report.json").write_text(json.dumps({"actions": [
+            {"canonical_ticker": row["ticker"], "action_now": "WATCH"} for row in tickers
+        ]}), encoding="utf-8")
+        if archive_manifest:
+            return record_run_recommendations(run_dir, config.performance.store_path)
+        # The ordinary scheduler records recommendations before the run manifest is published.
+        return _run_performance_tracking(config=config, run_dir=run_dir, manifest=manifest,
+                                         started_at=datetime(2026, 4, 1, tzinfo=timezone.utc))["recorded_recommendations"]
+
+    aapl = {"ticker": "AAPL", "status": "success"}
+    msft = {"ticker": "MSFT", "status": "success"}
+    reused = {**aapl, "research_reuse": {"source_run_id": "first-full"}}
+    assert track("first-full", "full", [aapl]) == 1
+    assert track("overlay", "overlay_only", [aapl], archive_manifest=True) == 0
+    assert track("finalize", "full", [reused, msft], finalization_only=True) == 0
+    assert track("recovered", "full", [reused, msft]) == 1
+    assert track("recovered", "full", [reused, msft], archive_manifest=True) == 0
+    with sqlite3.connect(config.performance.store_path) as conn:
+        assert conn.execute("SELECT run_id, ticker FROM action_recommendations ORDER BY id").fetchall() == [
+            ("first-full", "AAPL"), ("recovered", "MSFT")]
