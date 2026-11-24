@@ -134,6 +134,25 @@ def test_kis_fetch_uses_only_exact_completed_kr_sessions_and_explicit_adjustment
     assert records[date(2026, 11, 24)]["price"] == 152700
 
 
+def test_malformed_us_response_does_not_block_another_symbol():
+    now = dt("2026-11-25T02:47:48+09:00")
+    days = market_days("US", now)
+    close_day = date(2026, 11, 23)
+
+    class Client:
+        def request_json(self, *, params, **kwargs):
+            if params["SYMB"] == "COST":
+                return {"output1": ["ambiguous"], "output2": []}, {}
+            return {"output1": {"rsym": "DNASAAPL"}, "output2": [
+                {"xymd": "20261123", "open": "348", "clos": "349.08", "high": "351",
+                 "low": "345", "tvol": "58000000"},
+            ]}, {}
+
+    load = KisResearchCloses(Client(), clock=lambda: now)
+    assert load("US", "COST", days, close_day, now, "NAS") == {}
+    assert load("US", "AAPL", days, close_day, now, "NAS")[close_day]["price"] == 349.08
+
+
 def test_latest_partial_research_reuses_true_origin_and_keeps_old_failed_ticker(tmp_path):
     def manifest(run_id, rows, *, finish, receipt=None, copies=None):
         directory = tmp_path / "runs" / "2026" / run_id

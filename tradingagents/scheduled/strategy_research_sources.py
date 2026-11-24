@@ -126,7 +126,7 @@ class ResearchArchive:
                     or reuse.get("analysis_finished_at") != row.get("finished_at")
                     or (reuse.get("artifact_sha256") or {}).get("analysis_json") != hashlib.sha256(raw).hexdigest()):
                 return None
-            matches = [item for item in parent.get("tickers", []) if item.get("ticker") == ticker]
+            matches = [item for item in parent.get("tickers", []) if isinstance(item, dict) and item.get("ticker") == ticker]
             if len(matches) != 1:
                 return None
             _, parent_raw = _artifact(parent_dir, matches[0], "analysis_json")
@@ -146,6 +146,8 @@ class ResearchArchive:
             manifest, _, _ = self.run(run_id)
             summaries = {}
             for row in manifest.get("tickers", []):
+                if not isinstance(row, dict):
+                    continue
                 identity = _identity(row.get("ticker"))
                 if identity in wanted:
                     summaries.setdefault(identity, []).append(row)
@@ -167,12 +169,16 @@ class ResearchArchive:
         """Read the archived provider envelope for the exact published price."""
         run_id = market_payload.get("run_id")
         manifest, _, _ = self.run(run_id)
-        by_ticker = {_identity(row.get("ticker")): row for row in manifest.get("tickers", [])}
+        by_ticker = {_identity(row.get("ticker")): row for row in manifest.get("tickers", []) if isinstance(row, dict)}
         quotes = {}
         for row in market_payload["rows"]:
             ticker = _identity(row.get("ticker"))
             update = by_ticker.get(ticker, {}).get("execution_update") or {}
+            if not isinstance(update, dict):
+                continue
             raw = update.get("source") or {}
+            if not isinstance(raw, dict):
+                continue
             if (aware_datetime(update.get("market_data_asof")) == aware_datetime(row.get("market_data_asof"))
                     and update.get("ticker") == by_ticker.get(ticker, {}).get("ticker")
                     and update.get("last_price") == row.get("last_price")):

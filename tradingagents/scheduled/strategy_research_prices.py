@@ -79,7 +79,7 @@ def validated_quote(raw, market, days, now):
 def _rows(payload, market, start, end):
     names = (("stck_bsop_date", "stck_oprc", "stck_clpr", "stck_hgpr", "stck_lwpr", "acml_vol") if market == "KR"
              else ("xymd", "open", "clos", "high", "low", "tvol"))
-    rows = payload.get("output2")
+    rows = payload.get("output2") if isinstance(payload, dict) else None
     if not isinstance(rows, list):
         return {}
     result, ambiguous = {}, set()
@@ -132,7 +132,8 @@ class KisResearchCloses:
         payload, _ = self.client.request_json(method="GET", path="/uapi/overseas-price/v1/quotations/dailyprice",
             tr_id="HHDFS76240000", params={"AUTH": "", "EXCD": venue, "SYMB": symbol, "GUBN": "0",
                 "BYMD": end.strftime("%Y%m%d"), "MODP": "1" if adjusted else "0"})
-        identity = (payload.get("output1") or {}).get("rsym")
+        header = payload.get("output1") if isinstance(payload, dict) else None
+        identity = header.get("rsym") if isinstance(header, dict) else None
         return payload if identity == f"D{venue}{symbol}" else {}
 
     def __call__(self, market, ticker, days, start, now, exchange=None):
