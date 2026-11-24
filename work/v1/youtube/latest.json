@@ -1,13 +1,13 @@
 {
   "schema": "tradingagents.work-context/v1",
   "surface": "youtube",
-  "event_id": "youtube:2f3c5e70eba0aa6ec6af728920629c4e",
+  "event_id": "youtube:baa712408706191f12e28302eee46cb8",
   "prompt_contract_version": "youtube-work-v5",
   "prompt_sha256": "82a87727ec636b928ccb90cfe8cd823d86347e254ed0b204903699e34e35ef0b",
   "skill_sha256": "2fef99f1af403675549a13813e0fe5597a241a964affeada56e9f64e9f398fe9",
   "task_manifest_sha256": "6fbafadc2971d1a908c1bbc1fa29e2adaf0ca6be956768f2f9eb0abf0061428e",
   "workflow_contract_sha256": "6d7501fa20481c66d549b49f6892da6cf0afbc406ab35215a8c726e520d46db5",
-  "source_sha256": "7945acddad4be3492f240ff0b12474b0aec23b9a58c9314e265c2290b65565db",
+  "source_sha256": "ab02769b9b2c6ca3bce92e2881c14e45dab1655690d0a44410da1bcf3c13e081",
   "body": {
     "kind": "youtube",
     "source_health": "OK",
@@ -44,12 +44,12 @@
     },
     "coverage": {
       "total_unique_events": 971,
-      "window_events": 57,
-      "transmitted_events": 23,
+      "window_events": 50,
+      "transmitted_events": 24,
       "truncated": true,
-      "oldest_occurred_at": "2026-11-21T06:00:09+00:00",
+      "oldest_occurred_at": "2026-11-21T23:00:38+00:00",
       "newest_occurred_at": "2026-11-23T23:03:30+00:00",
-      "omitted_due_to_packet_budget": 34
+      "omitted_due_to_packet_budget": 26
     },
     "events": [
       {
@@ -240,150 +240,6 @@
               "source_url": "https://finance.yahoo.com/markets/commodities/articles/cerrado-gold-inc-crdof-q3-230027046.html",
               "publisher": "GuruFocus.com",
               "published_at": "2026-11-23T23:00:27+00:00",
-              "source_tier": "news"
-            }
-          ]
-        }
-      },
-      {
-        "event_key": "Q0bSxAG_pTI",
-        "content_sha256": "e3ad84928a4dc2870bc56adff407389de3941f56e20e2bd7e04d109114bf4758",
-        "occurred_at": "2026-11-21T06:45:30+00:00",
-        "relevance": {
-          "tickers": [],
-          "markets": [],
-          "themes": [],
-          "match_basis": "title_and_claim_context"
-        },
-        "strategy_source_tier": "USER_PRIMARY",
-        "strategy_evidence_weight": "HIGH",
-        "summary": {
-          "video_id": "Q0bSxAG_pTI",
-          "title": "다들 바닥이라더니 주가는 왜 또 폭락했나? (박종훈의 지식한방)",
-          "channel": "박종훈의 지식한방",
-          "source_url": "https://www.youtube.com/watch?v=Q0bSxAG_pTI",
-          "published_at": "2026-11-21T06:45:30+00:00",
-          "status": "asr_uncertain",
-          "strategy_source_tier": "USER_PRIMARY",
-          "strategy_evidence_weight": "HIGH",
-          "strategy_validation_policy": "USER_ACCEPTED",
-          "transcript_quality": {
-            "status": "good",
-            "score": 1.0,
-            "warnings": [],
-            "source": "automatic",
-            "language": "Korean",
-            "model_or_format": "json3",
-            "chars": 9233,
-            "segments": 482,
-            "duration_seconds": 1202,
-            "repeated_ngram_ratio": 0.001
-          },
-          "claim_status_summary": {
-            "unverified": 8,
-            "asr_uncertain": 2
-          },
-          "claims": [
-            {
-              "claim_id": "C1",
-              "claim_text": "2026년 11월 20일 나스닥은 하루 5.2% 넘게, 한 주간 약 10% 하락했다. 앤트로픽은 공모가 83달러, 첫날 시초가 111달러·종가 97달러, 둘째 날 장중 저가 83달러·종가 88달러대였고, 스페이스X는 첫날 공모가 대비 19% 올랐다.",
-              "status": "unverified",
-              "confidence": 0.15,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "공식 종가로 지수별 낙폭을 확인하고, 공모가 대비 첫날 수익률과 첫날 종가 대비 둘째 날 수익률을 구분한다."
-            },
-            {
-              "claim_id": "C2",
-              "claim_text": "앤트로픽의 공모액은 813억 달러, 스페이스X는 750억 달러였고, 두 공모의 기록과 63억 달러가 언급됐다. 앤트로픽의 공모 주식 수·신주 및 구주 비중·유통분·보호예수 일정, 스페이스X 상장 시총·보호예수 기간, SK하이닉스 ADR의 기록도 제시됐다.",
-              "status": "unverified",
-              "confidence": 0.04,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "기업으로 실제 유입된 자금과 주주에게 귀속된 구주 매출을 분리하고, 희석과 회차별 매도 가능 물량을 따로 평가한다."
-            },
-            {
-              "claim_id": "C3",
-              "claim_text": "앤트로픽의 상장 과정에서 확보한 현금은 2,324억 달러였지만 데이터센터 약정은 더 컸고, 2분기까지의 성장세가 3분기에 둔화해 약정 이행 부담이 커졌다는 주장이다.",
-              "status": "asr_uncertain",
-              "confidence": 0.03,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "장부 현금과 실제 가용 현금을 구분하고, 확정 최소 지급액의 만기별 일정과 영업현금흐름을 맞춰 본다."
-            },
-            {
-              "claim_id": "C4",
-              "claim_text": "앤트로픽·스페이스X·오픈AI가 문맥상 2026년 6월에 상장을 신청했고 오픈AI는 중도에 포기했다는 주장이다.",
-              "status": "unverified",
-              "confidence": 0.04,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "회사별 절차와 공식 확인일을 확정하기 전에는 세 회사를 확정 IPO 일정에 포함하지 않는다."
-            },
-            {
-              "claim_id": "C5",
-              "claim_text": "빅테크 설비투자는 과거 이익의 약 40%에서 최근 100% 가까이 늘었고 다음 해에는 이를 넘을 전망이다. 빅테크 5곳의 회사채 발행과 매그니피센트 7의 주식 발행이 늘었으며, 동시 차입이 금리를 밀어 올렸다는 주장이다.",
-              "status": "unverified",
-              "confidence": 0.03,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "현금 설비투자, 순이익, 영업현금흐름을 같은 기간에 비교한다. 발행사의 조달 부담을 볼 때는 차환을 구분하고, 국채 금리와 회사채 스프레드를 따로 확인한다."
-            },
-            {
-              "claim_id": "C6",
-              "claim_text": "초대형 IPO가 여러 건 몰리면 신주 공급이 늘어 시장에 부담을 주며, IPO와 유상증자가 코스피 2,000~3,000 박스권의 주요 원인이었다는 주장이다. 향후 2년 안에 투자 기회가 온다는 전망도 제시됐다.",
-              "status": "unverified",
-              "confidence": 0.04,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "초대형 IPO 건수보다 시장 규모 대비 순신주 조달액과 발행 집중도를 관찰하되, 이를 단독 매매 신호로 해석하지 않는다."
-            }
-          ],
-          "entities": [],
-          "evidence": [
-            {
-              "evidence_id": "E1",
-              "claim_id": "C1",
-              "title": "Cathie Wood Just Bought $154 Million of Anthropic in Its First 2 Days of Trading",
-              "source_url": "https://finance.yahoo.com/markets/stocks/articles/cathie-wood-just-bought-154-213819556.html",
-              "publisher": "TIKR",
-              "published_at": "2026-11-21T21:38:19+00:00",
-              "source_tier": "market_or_news"
-            },
-            {
-              "evidence_id": "E2",
-              "claim_id": "C1",
-              "title": "Worried About Black Monday? What Wall Street Says Could Happen.",
-              "source_url": "https://finance.yahoo.com/m/32305bc8-6a1c-3b7f-af69-650d80df753a/worried-about-black-monday%3F.html",
-              "publisher": "Barrons.com",
-              "published_at": "2026-11-21T21:22:00+00:00",
-              "source_tier": "market_or_news"
-            },
-            {
-              "evidence_id": "E4",
-              "claim_id": "C5",
-              "title": "S&P affirms Bahrain’s ‘B/B’ rating as Gulf backing offsets war-driven slump",
-              "source_url": "https://finance.yahoo.com/economy/policy/articles/p-affirms-bahrain-b-b-230026981.html",
-              "publisher": "Investing.com",
-              "published_at": "2026-11-20T23:00:26+00:00",
-              "source_tier": "market_or_news"
-            },
-            {
-              "evidence_id": "E5",
-              "claim_id": "C5",
-              "title": "Constellium: 3 Key Takeaways for Long-Term Investors",
-              "source_url": "https://finance.yahoo.com/markets/stocks/articles/constellium-3-key-takeaways-long-185002654.html",
-              "publisher": "Motley Fool",
-              "published_at": "2026-11-20T18:50:02+00:00",
-              "source_tier": "news"
-            },
-            {
-              "evidence_id": "E6",
-              "claim_id": "C6",
-              "title": "Stock Market Today: Nasdaq Tanks 5% With AI Trade Thrashed; Nvidia, Anthropic Dive",
-              "source_url": "https://finance.yahoo.com/m/4b546235-124e-3fa4-b951-41a067ff7bf2/stock-market-today%3A-nasdaq.html",
-              "publisher": "Investor's Business Daily",
-              "published_at": "2026-11-20T21:55:21+00:00",
               "source_tier": "news"
             }
           ]
@@ -3930,6 +3786,311 @@
               "publisher": "Motley Fool",
               "published_at": "2026-11-24T00:00:02+00:00",
               "source_tier": "news"
+            }
+          ]
+        }
+      },
+      {
+        "event_key": "bi1rdQK23eU",
+        "content_sha256": "39331948e9b6658e20cc4ae44f76cfb08eb419e8a1dfdf0a775560ce59457d87",
+        "occurred_at": "2026-11-23T06:30:34+00:00",
+        "relevance": {
+          "tickers": [
+            "SPLV",
+            "USMV"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "verified_entities"
+        },
+        "strategy_source_tier": "STANDARD",
+        "strategy_evidence_weight": "STANDARD",
+        "summary": {
+          "video_id": "bi1rdQK23eU",
+          "title": "증권사에서 말 안 하는, 방어형 ETF가 하락장에서 더 떨어진 이유",
+          "channel": "경제사냥꾼",
+          "source_url": "https://www.youtube.com/watch?v=bi1rdQK23eU",
+          "published_at": "2026-11-23T06:30:34+00:00",
+          "status": "asr_uncertain",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "strategy_validation_policy": "STANDARD_REVIEW",
+          "transcript_quality": {
+            "status": "good",
+            "score": 1.0,
+            "warnings": [],
+            "source": "automatic",
+            "language": "Korean (Original)",
+            "model_or_format": "json3",
+            "chars": 10005,
+            "segments": 522,
+            "duration_seconds": 1003,
+            "repeated_ngram_ratio": 0.003
+          },
+          "claim_status_summary": {
+            "unverified": 11,
+            "asr_uncertain": 1
+          },
+          "claims": [
+            {
+              "claim_id": "C1",
+              "claim_text": "2026년 10월 20일~11월 20일 KODEX 최소변동성은 -12.97%, 코스피는 -12.30%, 코스피200은 -12.04%였고 나머지 저변동 ETF 6개는 두 지수보다 덜 하락했다. 영상의 하락폭 순서는 KODEX 최소변동성, KODEX 200 가치저변동, PLUS 중형주 저변동 계열, 파워 고배당저변동성, TIGER 로우볼, PLUS 고배당저변동50, HK S&P 코리아 로우볼이다. 영상은 -12.97%를 매일경제의 한국거래소·코스콤 자료 인용...",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "매일경제 원문과 양 끝 거래일의 공식 가격 자료를 대조하기 전에는 7개 ETF의 순위나 ‘6개가 두 지수보다 선방했다’는 주장을 확정 사실로 쓰지 않는다."
+            },
+            {
+              "claim_id": "C2",
+              "claim_text": "10월 20~28일에는 코스피가 8% 넘게, ETF가 약 1% 올랐다. 삼성전자와 SK하이닉스는 각각 14% 초과, 약 22% 상승했고 삼성SDI는 약 4% 하락했다. 10월 28일~11월 20일에는 코스피 약 -19%, ETF 약 -14%, 삼성전자·SK하이닉스·삼성SDI 각각 약 -25%, 삼성전기 약 -41%였다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "월간 상대수익률과 10월 28일 이후 낙폭을 별도로 본다. 하락 구간의 상대 방어는 같은 날짜와 가격 기준으로 재계산한 뒤 판단한다."
+            },
+            {
+              "claim_id": "C3",
+              "claim_text": "11월 20일 KODEX 최소변동성과 KODEX 200의 삼성전자·SK하이닉스 합산 비중은 약 19% 대 58%, 삼성SDI는 7% 초과 대 1% 미만이었고 삼성전기 비중은 최소변동성이 약 3배였다. 최소변동성의 S-OIL·LG이노텍 비중은 약 3%·2%로 두 종목은 KODEX 200 상위 30개에 없었다. 최소변동성은 130종목 초과, 상위 10개 약 49%, 최대 종목 삼성전자 11%대였고 KODEX 200 상위 10개는 약 70%였다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "같은 기준시각의 실보유 비중으로 종목별 집중도를 비교하고, KODEX 200 ETF의 편입 비중을 코스피200 지수의 구성 비중과 혼용하지 않는다."
+            },
+            {
+              "claim_id": "C4",
+              "claim_text": "월간 삼성SDI는 약 28%, 삼성전기·S-OIL·LG이노텍은 각각 32% 초과, 삼성전자는 13% 초과, SK하이닉스는 약 9% 하락했다. 추정 하락 기여는 삼성SDI·삼성전기 약 4.7%p, S-OIL·LG이노텍 포함 약 6.7%p, 삼성전자·SK하이닉스 약 2.2%p였다. 영상은 두 반도체주 저비중이 상승 참여를 제한하고 하락 구간에 방어에 기여했으나 삼성SDI·삼성전기 약세가 방어 폭을 줄였다고 해석했다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "반도체 저비중과 다른 종목의 급락은 검증할 가설로 남긴다. 기간 초 또는 일별 전일 비중과 종목 총수익률을 사용하고, 현금·비용·매매에 따른 잔차를 별도로 표시한다."
+            },
+            {
+              "claim_id": "C5",
+              "claim_text": "KODEX 최소변동성은 포트폴리오 변동성을 낮추도록 설계되며 6·12월 정기변경 때 비교 기준 대비 업종 비중 ±5%p, 종목당 상한 10%, 별도 교체 한도 10%를 적용하고 위험등급은 2등급이라고 했다. KODEX 200 가치저변동은 코스피200의 저변동 종목을 누적 시가총액 70%까지 선별해 장부가치·예상 이익을 반영하며, 2016년 9월 기초지수 개명에 따라 상품명이 내재가치에서 바뀌었다고 했다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "정기변경 시 적용되는 상한이라면 이후 가격 변동으로 비중이 넘을 수 있으므로, 삼성전자 11%대라는 주장만으로 규칙 위반을 단정하지 않는다. 변동성 관리 목표도 하락 방어를 보장하지 않는다."
+            },
+            {
+              "claim_id": "C6",
+              "claim_text": "11월 20일 기준 KODEX 최소변동성의 NAV와 기초지수 월간 하락폭 차이는 0.2%p 미만이었다고 했다. 최소변동성과 KODEX 200의 NAV 수익률은 3개월 약 -22% 대 -30%, 6개월 각각 27%·32% 초과 하락, 1년 각각 11%·36% 초과 상승이었다고 했다.",
+              "status": "unverified",
+              "confidence": 0.99,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "0.2%p 미만이 확인되더라도 한 달간 NAV와 기초지수의 수익률 차이가 작았다는 뜻이다. 장기 추적오차가 작거나 월간 상대 열세의 원인이 지수 구성뿐이었다는 결론은 아니다."
+            }
+          ],
+          "entities": [
+            {
+              "ticker": "SPLV",
+              "name": "미국 저변동 ETF",
+              "status": "unverified",
+              "verification_notes": [
+                "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+              ]
+            },
+            {
+              "ticker": "USMV",
+              "name": "미국 최소변동성 ETF",
+              "status": "unverified",
+              "verification_notes": [
+                "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+              ]
+            }
+          ],
+          "evidence": [
+            {
+              "evidence_id": "E1",
+              "claim_id": "C1",
+              "title": "Canada and Ontario back Ford Oakville revamp with C$928.5m",
+              "source_url": "https://finance.yahoo.com/economy/policy/articles/canada-ontario-back-ford-oakville-163934313.html",
+              "publisher": "Just Auto",
+              "published_at": "2026-11-23T16:39:34+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E2",
+              "claim_id": "C1",
+              "title": "BC-Sugar Futures",
+              "source_url": "https://finance.yahoo.com/markets/commodities/articles/bc-sugar-futures-150032009.html",
+              "publisher": "Associated Press",
+              "published_at": "2026-11-23T15:00:32+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E4",
+              "claim_id": "C2",
+              "title": "i-80 Gold Announces the Start of Production Mining at Archimedes Underground",
+              "source_url": "https://finance.yahoo.com/markets/commodities/articles/80-gold-announces-start-production-231200801.html",
+              "publisher": "CNW Group",
+              "published_at": "2026-11-23T23:12:00+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E5",
+              "claim_id": "C6",
+              "title": "Can Matador Pay Its $3.1 Billion Spending Bill?",
+              "source_url": "https://finance.yahoo.com/energy/articles/matador-pay-3-1-billion-205504241.html",
+              "publisher": "Trefis",
+              "published_at": "2026-11-23T20:55:04+00:00",
+              "source_tier": "news"
+            },
+            {
+              "evidence_id": "E6",
+              "claim_id": "C12",
+              "title": "Nvidia’s Rally Ripples Across Markets",
+              "source_url": "https://finance.yahoo.com/m/c77ab3fa-caef-3002-9be8-27c0df30ff88/nvidia%E2%80%99s-rally-ripples-across.html",
+              "publisher": "The Wall Street Journal",
+              "published_at": "2026-11-23T19:45:00+00:00",
+              "source_tier": "news"
+            }
+          ]
+        }
+      },
+      {
+        "event_key": "MzYP-A-MNaI",
+        "content_sha256": "5f09fd728a413a58adb0292eecce48bd64e2c434f4133aaa0a505755dc83dd52",
+        "occurred_at": "2026-11-23T06:30:33+00:00",
+        "relevance": {
+          "tickers": [
+            "^KS11"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "verified_entities"
+        },
+        "strategy_source_tier": "STANDARD",
+        "strategy_evidence_weight": "STANDARD",
+        "summary": {
+          "video_id": "MzYP-A-MNaI",
+          "title": "[#긴급시황]  “미국 헤지펀드 공매도 역대급” 코스피 폭락장에 정부 대응은 언제… 4,600선이 마지막 방어선?ㅣ IBK투자증권 박근형 부장",
+          "channel": "815Money talk",
+          "source_url": "https://www.youtube.com/watch?v=MzYP-A-MNaI",
+          "published_at": "2026-11-23T06:30:33+00:00",
+          "status": "asr_uncertain",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "strategy_validation_policy": "STANDARD_REVIEW",
+          "transcript_quality": {
+            "status": "good",
+            "score": 1.0,
+            "warnings": [],
+            "source": "automatic",
+            "language": "Korean (Original)",
+            "model_or_format": "json3",
+            "chars": 10601,
+            "segments": 559,
+            "duration_seconds": 1213,
+            "repeated_ngram_ratio": 0.0
+          },
+          "claim_status_summary": {
+            "unverified": 11,
+            "asr_uncertain": 1
+          },
+          "claims": [
+            {
+              "claim_id": "C1",
+              "claim_text": "외국인 코스피 현물 수급이 오전 매수 구간 대비 장중 약 6,000억 원 악화했고, 주식선물 약 566억 원 매도와 연기금의 약 4조 원 누적 매수 후 약 3,000억 원 매도가 있었다. 금융투자 매수가 개인 ETF 수요를 반영해 시장을 지탱했다는 것은 출연자의 해석이다.",
+              "status": "unverified",
+              "confidence": 0.0,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "외국인·연기금의 현물 순매매가 종가 기준으로 전환되는지 확인하기 전에는 수급 바닥을 판단하기 어렵다."
+            },
+            {
+              "claim_id": "C2",
+              "claim_text": "삼성전자우 등 종목별 외국계 창구 순매매와 스튜디오드래곤·CJ ENM·APR·파마리서치·아비코 장중 상승률이 제시됐다. APR의 아마존 프라임데이 상위 100위 진입 사례가 늘고 실리콘투의 11월 1~20일 수출이 양호했다는 설명도 나왔다.",
+              "status": "unverified",
+              "confidence": 0.0,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "장중 강세를 종가 기준 상대 강도, 외국인 전체 매수, 기업 실적 개선으로 확대 해석하지 않는다."
+            },
+            {
+              "claim_id": "C3",
+              "claim_text": "코스피 4,600선 등락, PBR 0.8배에 해당하는 4,300선, 피보나치 4,100선이 별도 시나리오로 제시됐다. 직전 금요일 낙폭이 역대 5위급이고 고점 대비 40% 하락까지 4.5개월이 걸렸으며, 과거 저점 이후 수익률은 대체로 개선됐다는 주장이다.",
+              "status": "unverified",
+              "confidence": 0.0,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "4,600선은 확정된 방어선이 아니다. 4,300선과 4,100선도 산식을 확인하기 전에는 하락 위험을 가늠하는 시나리오로만 본다."
+            },
+            {
+              "claim_id": "C4",
+              "claim_text": "증시안정기금이 1990~1992년 약 4조 8,500억 원을 매입했고, 유관기관 공동펀드는 2003년 4,000억 원과 2008년 5,150억 원을 집행했다. 2025년 4월과 2026년 3월·8월에는 가동이 시장에서 거론됐으며, 가동 언급이나 집행이 투자심리를 개선할 수 있다는 해석이 제시됐다.",
+              "status": "unverified",
+              "confidence": 0.0,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "펀드 가동 가능성과 실제 집행을 구분하고, 규모와 시행 시점이 확인되기 전에는 정책 효과를 전제하지 않는다."
+            },
+            {
+              "claim_id": "C5",
+              "claim_text": "골드만삭스 프라임브로커리지 자료를 근거로 헤지펀드 개별주 매도 속도가 약 2년 만에 가장 빠르고, 주간 개별주 공매도 규모는 2022년 6월 이후 최대이며, 미국 공매도 수준은 최근 10년 중 세 번째였다고 전했다. AI 바스켓 비교 연도와 일부 대형 투자자의 숏 전량 청산 전언도 나왔다.",
+              "status": "unverified",
+              "confidence": 0.0,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "프라임브로커 고객 표본의 숏 포지션을 미국 시장 전체에 일반화하거나 숏커버만으로 반등 지속성을 판단하지 않는다."
+            },
+            {
+              "claim_id": "C6",
+              "claim_text": "S&P 500이 3월 이후 처음 과매도에 진입했고 야데니 인용 나스닥 변동성 지표 45.25는 2020년 팬데믹 초기 이후 최고라고 했다. 별도 VIX가 35를 넘었으며 30 안팎은 기술적 반등 가능성을 살펴볼 구간이라는 해석이다.",
+              "status": "unverified",
+              "confidence": 0.0,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "관측 지표와 기준을 확인한 뒤에도 변동성은 반등 가능성과 하락 위험을 함께 살피는 자료로 본다."
+            }
+          ],
+          "entities": [
+            {
+              "ticker": "^KS11",
+              "name": "코스피·국내 증시안정펀드",
+              "status": "unverified",
+              "verification_notes": [
+                "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+              ]
+            }
+          ],
+          "evidence": [
+            {
+              "evidence_id": "E1",
+              "claim_id": "C1",
+              "title": "Canada and Ontario back Ford Oakville revamp with C$928.5m",
+              "source_url": "https://finance.yahoo.com/economy/policy/articles/canada-ontario-back-ford-oakville-163934313.html",
+              "publisher": "Just Auto",
+              "published_at": "2026-11-23T16:39:34+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E2",
+              "claim_id": "C1",
+              "title": "BC-Sugar Futures",
+              "source_url": "https://finance.yahoo.com/markets/commodities/articles/bc-sugar-futures-150032009.html",
+              "publisher": "Associated Press",
+              "published_at": "2026-11-23T15:00:32+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E4",
+              "claim_id": "C5",
+              "title": "Transitioning to PE packaging alternatives can increase emissions: Study",
+              "source_url": "https://finance.yahoo.com/news/transitioning-pe-packaging-alternatives-increase-135357930.html",
+              "publisher": "Packaging Gateway",
+              "published_at": "2026-11-23T13:53:57+00:00",
+              "source_tier": "market_or_news"
             }
           ]
         }
