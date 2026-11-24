@@ -6,6 +6,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import hashlib
 import json
 from pathlib import Path
+import socket
 import sqlite3
 from urllib.parse import parse_qs, urlparse
 
@@ -305,9 +306,19 @@ def make_handler(run_dir=None, *, db_paths=(), archive_dir=None, experiment_regi
     return Handler
 
 
+class _ReviewServer(ThreadingHTTPServer):
+    # On Windows, SO_REUSEADDR permits two active listeners on the same port.
+    allow_reuse_address = not hasattr(socket, "SO_EXCLUSIVEADDRUSE")
+
+    def server_bind(self):
+        if hasattr(socket, "SO_EXCLUSIVEADDRUSE"):
+            self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_EXCLUSIVEADDRUSE, 1)
+        super().server_bind()
+
+
 def serve(run_dir=None, *, port=8765, db_paths=(), archive_dir=None, experiment_registry=None, paper_status_path=None,
           strategy_ledger_dir=None, market_journals=None):
-    server = ThreadingHTTPServer(("127.0.0.1", port), make_handler(run_dir, db_paths=db_paths, archive_dir=archive_dir,
+    server = _ReviewServer(("127.0.0.1", port), make_handler(run_dir, db_paths=db_paths, archive_dir=archive_dir,
                                  experiment_registry=experiment_registry, paper_status_path=paper_status_path,
                                  strategy_ledger_dir=strategy_ledger_dir, market_journals=market_journals))
     print(f"TradingAgents local read-only review: http://127.0.0.1:{server.server_port}", flush=True)
