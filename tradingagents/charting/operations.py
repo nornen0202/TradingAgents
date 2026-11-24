@@ -387,6 +387,7 @@ def _strategy_evaluation_view(raw, market, observed, *, verified_costs=None):
     # Cached JSON cannot attest to charged costs. Only the separately configured
     # ledger reader below may supply this value; no HTTP parameter controls it.
     actual, net, realized_net, realized_cost, exact_fifo = None, None, None, None, False
+    actual_components = None
     costs_known = False
     if isinstance(verified_costs, dict) and verified_costs.get("cost_evidence_status") == "COMPLETE_REVIEWED_IMPORT":
         proof_sample = verified_costs.get("sample") or {}
@@ -401,6 +402,12 @@ def _strategy_evaluation_view(raw, market, observed, *, verified_costs=None):
         cost = number(verified_costs.get("actual_cost"))
         if matches and counts["filled_order_count"] and cost is not None and cost >= 0:
             actual, costs_known = cost, True
+            from tradingagents.execution.strategy_settlement import COMPONENTS
+            charges = verified_costs.get("actual_cost_components")
+            if isinstance(charges, dict) and set(charges) == set(COMPONENTS):
+                values = {key: number(charges[key]) for key in COMPONENTS}
+                if all(value is not None and value >= 0 for value in values.values()) and abs(sum(values.values()) - cost) <= .00011:
+                    actual_components = values
             # No mark price is reconstructed from a cached timestamp alone.
             # With open inventory the readonly reader proves costs and FIFO
             # realization, while marked net waits for reproducible mark proof.
@@ -412,6 +419,8 @@ def _strategy_evaluation_view(raw, market, observed, *, verified_costs=None):
             exact_fifo = verified_costs.get("exact_fifo_available") is True
             if exact_fifo:
                 realized_net, realized_cost = (number(verified_costs.get(k)) for k in ("realized_net_pnl", "realized_actual_cost"))
+                if realized_net is not None and realized_cost is not None:
+                    realized = round(realized_net + realized_cost, 4)
     required = {"STATISTICAL_AND_OUT_OF_SAMPLE_VALIDATION_REQUIRED"}
     cost_missing = {"ACTUAL_FEES_TAXES_FX_UNVERIFIED", "SETTLEMENT_UNVERIFIED", "BROKER_CORRECTIONS_UNVERIFIED"}
     if not costs_known:
@@ -433,12 +442,15 @@ def _strategy_evaluation_view(raw, market, observed, *, verified_costs=None):
     if not required <= set(unmet):
         return None
     status = "AVAILABLE_NET_OF_REVIEWED_COSTS" if net is not None else "AVAILABLE_GROSS_ONLY" if gross is not None else raw["status"]
+    unrealized = (round(gross - (realized if realized is not None else 0), 4)
+                  if gross is not None and (realized is not None or counts["sell_filled_orders"] == 0) else None)
     return {"status": status, "currency": currency, "analysis_as_of": known.isoformat(),
             "sample": {**counts, "closed_inventory_episodes": closed,
                        "first_observed_at": first.isoformat() if first else None,
                        "last_observed_at": last.isoformat() if last else None}, "turnover": turnover,
-            "gross_pnl": gross, "realized_gross_pnl": realized,
+            "gross_pnl": gross, "realized_gross_pnl": realized, "unrealized_gross_pnl": unrealized,
             "net_pnl": net, "actual_cost": actual, "fees_known": costs_known, "settlement_known": costs_known,
+            "actual_cost_components": actual_components,
             "realized_net_pnl": realized_net, "realized_actual_cost": realized_cost, "exact_fifo_available": exact_fifo,
             "cost_evidence_status": "COMPLETE_REVIEWED_IMPORT" if costs_known else "UNVERIFIED",
             "actual_cost_basis": "OPERATOR_REVIEWED_EXECUTION_SETTLEMENT_IMPORT" if costs_known else "UNVERIFIED",

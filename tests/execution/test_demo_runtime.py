@@ -278,6 +278,7 @@ def test_partial_fill_aggregates_once_and_cancel_remainder(tmp_path):
     h.tick()
     h.now += timedelta(seconds=20)
     h.fill(qty=1, amount=199)
+    first_fill = h.now
     assert h.tick()["owned"]["AAPL"] == 1
     h.now += timedelta(minutes=5)
     h.tick()
@@ -286,6 +287,10 @@ def test_partial_fill_aggregates_once_and_cancel_remainder(tmp_path):
     assert row["owned"]["AAPL"] == 1
     assert row["performance"]["gross_pnl"] == 1
     assert row["orders"][0]["status"] == "CANCELLED"
+    assert runtime.at(row["orders"][0]["first_fill_observed_at"]) == first_fill
+    assert runtime.at(row["orders"][0]["fill_progress_available_at"]) == h.now
+    h.now += timedelta(seconds=20)
+    assert h.tick()["orders"][0]["fill_progress_available_at"] == row["orders"][0]["fill_progress_available_at"]
 
 
 @pytest.mark.parametrize("change", [
