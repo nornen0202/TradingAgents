@@ -20,6 +20,7 @@ from tradingagents.execution.paper import PaperBroker, PaperLimits
 from tradingagents.execution.paper_quotes import ReadOnlyPaperQuotes
 from tradingagents.execution.source_diagnostics import diagnose_source
 from tradingagents.execution.source_handoff import await_completed_source
+from tradingagents.scheduled.manifest_discovery import _directories_desc
 
 SCHEMA = "tradingagents.paper-runtime/v1"
 
@@ -32,14 +33,6 @@ def _read(path, default=None):
 
 def _latest_source(archive, market, now, *, required_artifacts=None):
     return _select_source(archive, market, now, required_artifacts=required_artifacts)[0]
-
-
-def _directories_desc(root):
-    try:
-        with os.scandir(root) as entries:
-            return sorted((Path(entry.path) for entry in entries if entry.is_dir()), reverse=True)
-    except (FileNotFoundError, NotADirectoryError):
-        return []
 
 
 def _recent_manifest_paths(archive):

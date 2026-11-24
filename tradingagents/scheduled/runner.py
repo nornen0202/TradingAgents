@@ -4875,7 +4875,7 @@ def _prefer_newer_completed_full_source(
         if not isinstance(lineage, dict):
             break
 
-    eligible: list[tuple[tuple[datetime, str], dict[str, Any]]] = []
+    newer: list[tuple[tuple[datetime, str], dict[str, Any]]] = []
     for full, _ in full_manifests_desc(archive_dir):
         settings = full.get("settings") if isinstance(full.get("settings"), dict) else {}
         actual_market = str(settings.get("market_scope") or settings.get("market") or "").upper()
@@ -4884,11 +4884,6 @@ def _prefer_newer_completed_full_source(
             or actual_market not in {"KR", "US"}
             or str(full.get("status") or "").lower() not in {"success", "completed", "complete"}
             or _strict_required_coverage_failed(full)
-            or not _manifest_is_complete_overlay_baseline(
-                full, market=market, requested_tickers=tickers, required_holding_tickers=tickers,
-                archive_dir=archive_dir,
-                now=cutoff,
-            )
         ):
             continue
         try:
@@ -4903,8 +4898,15 @@ def _prefer_newer_completed_full_source(
         except (TypeError, ValueError):
             continue
         if lineage_key is None or key > lineage_key:
-            eligible.append((key, full))
-    selected = max(eligible, key=lambda item: item[0])[1] if eligible else candidate
+            newer.append((key, full))
+    # Recovery validation reads original runs and archived ticker artifacts.
+    # Older or future lineages cannot win, and the first complete ranked run wins.
+    selected = candidate
+    for _, full in sorted(newer, key=lambda item: item[0], reverse=True):
+        if _manifest_is_complete_overlay_baseline(full, market=market, requested_tickers=tickers,
+                required_holding_tickers=tickers, archive_dir=archive_dir, now=cutoff):
+            selected = full
+            break
     from .research_refresh import prefer_completed_revision
     return prefer_completed_revision(archive_dir, selected, market=market, tickers=tickers,
                                      now=cutoff)
@@ -4941,6 +4943,8 @@ def _resolve_latest_full_overlay_baseline_manifest(
         unique.setdefault(identity, candidate)
     eligible: list[dict[str, Any]] = []
     for candidate in unique.values():
+        if not _manifest_market_matches(candidate, market=market):
+            continue
         if max_age is not None:
             age_seconds = _manifest_age_seconds(candidate, now=now, market=market)
             if age_seconds is None:
@@ -4986,7 +4990,8 @@ def _manifest_is_complete_overlay_baseline(
     now: datetime | None = None,
 ) -> bool:
     settings = manifest.get("settings") if isinstance(manifest.get("settings"), dict) else {}
-    if str(settings.get("run_mode") or "full").strip().lower() != "full":
+    if (str(settings.get("run_mode") or "full").strip().lower() != "full"
+            or not _manifest_market_matches(manifest, market=market)):
         return False
     try:
         started = datetime.fromisoformat(str(manifest["started_at"]).replace("Z", "+00:00"))
@@ -5001,8 +5006,6 @@ def _manifest_is_complete_overlay_baseline(
         if (archive_dir is None
                 or not verified_completed_recovery(archive_dir, manifest, now=now or datetime.now(timezone.utc))):
             return False
-    if not _manifest_market_matches(manifest, market=market):
-        return False
     status = str(manifest.get("status") or "").strip().lower()
     if status not in {"success", "completed", "complete"}:
         return False

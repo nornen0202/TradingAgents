@@ -7,6 +7,7 @@ It never caches a selected source, decision, quote, or approval.
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 
 from tradingagents.atomic_io import atomic_write_json
@@ -30,6 +31,14 @@ def _load_index(path: Path) -> dict:
     return {}
 
 
+def _directories_desc(root):
+    try:
+        with os.scandir(root) as entries:
+            return sorted((Path(entry.path) for entry in entries if entry.is_dir()), reverse=True)
+    except (FileNotFoundError, NotADirectoryError):
+        return []
+
+
 def full_manifests_desc(archive_dir: Path, *, modes=None, write_index: bool = True) -> list[tuple[dict, Path]]:
     """Discover original manifests; read-only callers can suppress cache writes."""
     modes = {"full"} if modes is None else set(modes)
@@ -39,8 +48,8 @@ def full_manifests_desc(archive_dir: Path, *, modes=None, write_index: bool = Tr
     index_path = archive_dir / ".run-mode-discovery.json"
     previous = _load_index(index_path)
     current, selected = {}, []
-    for year in sorted((p for p in runs_dir.iterdir() if p.is_dir()), reverse=True):
-        for directory in sorted((p for p in year.iterdir() if p.is_dir()), reverse=True):
+    for year in _directories_desc(runs_dir):
+        for directory in _directories_desc(year):
             path = directory / "run.json"
             try:
                 signature = _signature(path)
