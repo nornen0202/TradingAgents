@@ -41,7 +41,8 @@ _MARKDOWN = (
 )
 
 
-def build_site(archive_dir: Path, site_dir: Path, settings: SiteSettings) -> list[dict[str, Any]]:
+def build_site(archive_dir: Path, site_dir: Path, settings: SiteSettings, *,
+               strategy_as_of: datetime | None = None) -> list[dict[str, Any]]:
     build_started = time.monotonic()
     archive_dir = Path(archive_dir)
     site_dir = Path(site_dir)
@@ -103,6 +104,8 @@ def build_site(archive_dir: Path, site_dir: Path, settings: SiteSettings) -> lis
         site_dir=site_dir,
         archive_dir=archive_dir,
         public_base_url=getattr(settings, "public_base_url", ""),
+        refresh_research_prices=getattr(settings, "refresh_research_prices", False),
+        as_of=strategy_as_of,
     )
     from tradingagents.scheduled.ai_context import build_ai_context
 
