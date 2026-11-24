@@ -15,6 +15,7 @@ from tradingagents.execution.kis_strategy_limits import (APPROVED_LIMIT_REVISION
 from tradingagents.execution.kis_strategy_v2 import EVIDENCE_SCHEMA, SETTLEMENT_SCHEMA, _buy_observation, current_v2_order_receipt
 from tradingagents.execution.paper_policy_v2 import SCHEMA as POLICY_SCHEMA
 from tests.execution.test_demo_runtime import Harness
+from tests.execution.test_demo_strategy_plan import native_source
 
 
 def configure(root, market, **limits):
@@ -38,7 +39,7 @@ def test_rejects_out_of_scope_approved_configuration(change):
 
 
 @pytest.mark.parametrize("market,price", [("KR", 150_000), ("US", 650)])
-@pytest.mark.parametrize("case", ["ready", "nav", "cash", "concentration", "daily", "external_open"])
+@pytest.mark.parametrize("case", ["ready", "normal", "nav", "cash", "currency", "concentration", "daily", "external_open"])
 def test_approved_policy_preserves_existing_guarded_journal(tmp_path, monkeypatch, market, price, case):
     monkeypatch.setenv("TRADINGAGENTS_KIS_MARKET_CALENDAR_ENABLED", "false")
     h = Harness(tmp_path, market)
@@ -48,10 +49,12 @@ def test_approved_policy_preserves_existing_guarded_journal(tmp_path, monkeypatc
         runtime.initialize(broker.db)
         baseline = broker.db.execute("SELECT policy FROM paper_policy").fetchone()[0]
     h.price = price
-    h.source(qty=3 if case == "daily" else 1)
+    if case == "normal":
+        native_source(h)
+    else:
+        h.source(qty=3 if case == "daily" else 1)
     config_path = h.root / "enabled.json"
     original = json.loads(config_path.read_bytes())
-    atomic_write_json(config_path, approved_config(original))
     native_client = KisDemoClient if market == "KR" else KisDemoUSClient
 
     def client(credentials, utcnow):
@@ -77,6 +80,8 @@ def test_approved_policy_preserves_existing_guarded_journal(tmp_path, monkeypatc
             out[f"cash_only_buying_power_{suffix}"] = price
         if case == "concentration":
             out["positions"][0][f"market_value_{suffix}"] = out[f"nav_{suffix}"] * .35
+        if case == "currency":
+            out["currency"] = "USD" if market == "KR" else "KRW"
         if terms.get("side") == "SELL":
             out[f"cash_{suffix}"] = 0
             out[f"cash_only_buying_power_{suffix}"] = 0
@@ -88,22 +93,28 @@ def test_approved_policy_preserves_existing_guarded_journal(tmp_path, monkeypatc
                             account_loader=account, gate=h.gate, tickers={market: (h.ticker,),
                             "KR" if market == "US" else "US": ()})
 
+    if case == "normal":
+        first = tick()["markets"][market]
+        assert "NO_STRATEGY_QUANTITY_WITHIN_LIMITS" in first["blockers"] and not h.orders
+    atomic_write_json(config_path, approved_config(original))
     receipt = tick()
     row = receipt["markets"][market]
     assert receipt["configured_native_limits"]["markets"][market] == asdict(approved_limits()[market])
     assert row.get("native_policy_journal_bound") is True, row
-    if case == "ready":
-        assert row["order_counts"]["ACKNOWLEDGED"] == 1 and len(h.orders) == 1
+    if case in {"ready", "normal"}:
+        assert row["order_counts"]["ACKNOWLEDGED"] == 1 and row["orders"][0]["quantity"] == 1 and len(h.orders) == 1
         tick()
         assert len(h.orders) == 1  # Restarted worker plus outstanding original cannot issue another write.
-        h.fill()
-        h.now += timedelta(seconds=10)
-        h.source(name="fixture-2", action="EXIT_NOW")
-        result = tick()["markets"][market]
-        assert result["order_counts"]["FILLED"] == 1 and [item["side"] for item in h.orders.values()] == ["BUY", "SELL"]
+        if case == "ready":
+            h.fill()
+            h.now += timedelta(seconds=10)
+            h.source(name="fixture-2", action="EXIT_NOW")
+            result = tick()["markets"][market]
+            assert result["order_counts"]["FILLED"] == 1 and [item["side"] for item in h.orders.values()] == ["BUY", "SELL"]
     else:
         assert not h.orders
         expected = {"nav": "NO_STRATEGY_QUANTITY_WITHIN_LIMITS", "cash": "NO_STRATEGY_QUANTITY_WITHIN_LIMITS",
+                    "currency": "KIS_ACCOUNT_MARKET_OR_CURRENCY_UNVERIFIED",
                     "concentration": "KIS_POSITION_CONCENTRATION_LIMIT", "daily": "KIS_DAILY_BUY_RISK_LIMIT",
                     "external_open": "KIS_BROKER_OPEN_OR_UNVERIFIED_ORDERS"}
         assert expected[case] in row["blockers"]

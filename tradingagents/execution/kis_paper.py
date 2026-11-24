@@ -153,7 +153,8 @@ def read_paper_account(client: KisDemoClient, *, ticker: str, limit_price: int, 
                           "market_value_krw": _broker_number(row.get("evlu_amt"))})
     capacity = client.buying_power(ticker=ticker, limit_price=limit_price)
     ingested = _clock(now_fn())
-    return {"environment": "demo", "account_scope": client.credentials.scope(), "complete": True,
+    return {"environment": "demo", "market": "KR", "currency": "KRW",
+            "account_scope": client.credentials.scope(), "complete": True,
             "observed_at": started.isoformat(), "ingested_at": ingested.isoformat(),
             "cash_krw": _broker_number(totals.get("dnca_tot_amt")),
             "nav_krw": _broker_number(totals.get("tot_evlu_amt")), "positions": positions,
@@ -173,6 +174,7 @@ class KisPaperBroker:
         if type(client) is not KisDemoClient or client.credentials.product_code != "01" or type(paper_enabled) is not bool or not isinstance(policy, PaperOrderPolicy):
             raise DemoError("Dedicated VTS client, explicit policy and boolean opt-in required")
         self.path, self.client, self.policy = Path(path), client, policy
+        self.policy_revision = strategy_policy_revision
         self.enabled, self.clock = paper_enabled, clock or (lambda: datetime.now(timezone.utc))
         self.journal = DemoOrderJournal(self.path, client, issue_clock=self.clock)
         self.db = self.journal.db
@@ -227,6 +229,8 @@ class KisPaperBroker:
             raise DemoError("Limit violates quote collar or KRX tick unit")
         if account.get("environment") != "demo" or account.get("account_scope") != self.client.credentials.scope() or account.get("complete") is not True:
             raise DemoError("Complete account from the same VTS scope required")
+        if self.policy_revision is not None and (account.get("market"), account.get("currency")) != ("KR", "KRW"):
+            raise DemoError("Complete KRW account from the same VTS market required")
         _fresh(account, now=now, seconds=self.policy.max_account_age_seconds)
         nav = _number(account.get("nav_krw"), positive=True)
         cash = _number(account.get("cash_krw"))

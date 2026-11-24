@@ -625,6 +625,9 @@ def advance(archive, root, validation_root, market, *, clock, tickers, broker_fa
                     if market == "US":
                         terms["exchange"] = quote["exchange"]
                     account = account_loader(market, broker, terms, clock)
+                    if policy_revision is not None and (account.get("market"), account.get("currency")) != (
+                            market, "KRW" if market == "KR" else "USD"):
+                        raise ValueError("KIS_ACCOUNT_MARKET_OR_CURRENCY_UNVERIFIED")
                     terms["quantity"] = quantity(candidate, price, account, market, current["owned"], at(clock()), limits=limits)
                     terms["quantity"] = size_with_native_limits(market, terms, account, limits)
                     if not terms["quantity"]:
@@ -632,7 +635,8 @@ def advance(archive, root, validation_root, market, *, clock, tickers, broker_fa
                     checks["cash_and_size_passed"] += 1
                 except Exception as exc:
                     reason = str(exc)
-                    issues.append(reason if reason in {"NO_STRATEGY_QUANTITY_WITHIN_LIMITS", "BUDGET_FX_UNVERIFIED", "PROPOSAL_QUANTITY_INVALID"} else "CANDIDATE_EVIDENCE_UNVERIFIED")
+                    issues.append(reason if reason in {"NO_STRATEGY_QUANTITY_WITHIN_LIMITS", "BUDGET_FX_UNVERIFIED",
+                        "PROPOSAL_QUANTITY_INVALID", "KIS_ACCOUNT_MARKET_OR_CURRENCY_UNVERIFIED"} else "CANDIDATE_EVIDENCE_UNVERIFIED")
                     continue
                 if policy_revision is not None or v2_settings is not None:
                     try:
