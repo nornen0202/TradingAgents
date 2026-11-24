@@ -1,6 +1,4 @@
 from datetime import datetime, timezone
-from pathlib import Path
-
 import pandas as pd
 import pytest
 from typer.testing import CliRunner
@@ -58,6 +56,10 @@ def test_two_scorecards_follow_the_upstream_rounding_and_fork_cost():
     assert buy["new_exposure"]["strategy_return"] == pytest.approx(.008)
     assert buy["new_exposure"]["exit_session"] == "2026-03-04"
     assert buy["direction"]["exit_session"] == "2026-03-05"
+    hold = score_decision(ticker="AAPL", market="US", decision_date=DATES[0], rating="HOLD",
+                          benchmark="SPY", holding=2, fee_bps=10, as_of=CUTOFF, provider=prices)
+    assert hold["direction"]["alpha_logged"] == "-1.0%"
+    assert hold["direction"]["status"] == "NO_DIRECTION" and hold["direction"]["hit"] is None
 
 
 def test_missing_first_bars_do_not_shift_and_maturity_is_local():
@@ -137,3 +139,33 @@ def test_legacy_metrics_are_preserved_without_reclassification(tmp_path):
     report = bt.summarize(path)
     assert report.data["metrics"]["hit_rate"] == .8
     assert not report.by_rating and "원자료" in report.render()
+
+
+def test_close_bars_require_next_market_day_and_exact_benchmark():
+    args = dict(ticker="AAPL", market="US", decision_date=DATES[0], rating="BUY",
+                benchmark="SPY", holding=2, fee_bps=10)
+    pending = score_decision(as_of=datetime(2026, 3, 5, 1, tzinfo=timezone.utc), provider=prices, **args)
+    assert pending["new_exposure"]["status"] == "PENDING"
+    assert pending["new_exposure"]["exit_close_at"] == "2026-03-04T21:00:00+00:00"
+    assert pending["new_exposure"]["matures_at"] == "2026-03-05T00:00:00-05:00"
+
+    def missing(symbol, first, last):
+        return prices(symbol, first, last).iloc[1:] if symbol == "SPY" else prices(symbol, first, last)
+
+    mature = score_decision(as_of=CUTOFF, provider=missing, **args)
+    assert mature["direction"]["status"] == "BENCHMARK_PRICE_MISSING"
+    assert mature["new_exposure"]["benchmark_status"] == "BENCHMARK_PRICE_MISSING"
+    assert mature["new_exposure"]["hit"] is True
+
+
+def test_cli_report_reader_path_keeps_two_distinct_saves(tmp_path):
+    from cli.main import save_report_to_disk
+
+    state = {"company_of_interest": "AAPL", "analysis_date": DATES[0], "trade_date": DATES[0]}
+    first = save_report_to_disk({**state, "market_report": "first decision evidence"}, "AAPL", tmp_path)
+    saved = save_report_to_disk({**state, "market_report": "second decision evidence"}, "AAPL", tmp_path)
+    assert saved == first == tmp_path / "complete_report.md"
+    assert "second decision evidence" in saved.read_text(encoding="utf-8")
+    archived = list((tmp_path / "runs").glob("*/complete_report.md"))
+    assert len(archived) == 2
+    assert sum("first decision evidence" in path.read_text(encoding="utf-8") for path in archived) == 1

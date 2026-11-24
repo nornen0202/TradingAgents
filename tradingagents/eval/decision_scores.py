@@ -84,7 +84,7 @@ def score_decision(*, ticker, market, decision_date, rating, benchmark, holding,
     fork = {"status": "PENDING", "entry_session": entry, "exit_session": fork_exit,
             "entry_at": entry_open.isoformat(), "exit_close_at": fork_close.isoformat(),
             "matures_at": fork_available.isoformat(), "weight": exposure}
-    if not DIRECTION.get(rating):
+    if not DIRECTION.get(rating) and rating != "HOLD":
         direction["status"] = "NO_DIRECTION"
     if not exposure:
         fork["status"] = "NO_NEW_EXPOSURE"
@@ -141,8 +141,10 @@ def score_decision(*, ticker, market, decision_date, rating, benchmark, holding,
                     # Tauric memory persists one decimal percentage before scoring.
                     logged = f"{raw-base:+.1%}"
                     alpha = float(logged.rstrip("%")) / 100
-                    direction.update(status="SCORED", asset_return=raw, benchmark_return=base,
-                                     alpha=alpha, alpha_logged=logged, hit=alpha * DIRECTION[rating] > 0)
+                    sign = DIRECTION.get(rating)
+                    direction.update(status="SCORED" if sign else "NO_DIRECTION",
+                                     asset_return=raw, benchmark_return=base, alpha=alpha,
+                                     alpha_logged=logged, hit=alpha * sign > 0 if sign else None)
     return {"direction": direction, "new_exposure": fork}
 
 

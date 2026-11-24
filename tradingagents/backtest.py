@@ -126,7 +126,7 @@ def _published_data(rows, manifest):
     by_rating = {}
     for grade in sorted({row["rating"] for row in rows if row["rating"]}):
         same = [row for row in rows if row["rating"] == grade]
-        recorded = [row["direction"]["alpha"] for row in same if row["direction"]["status"] == "SCORED"]
+        recorded = [row["direction"]["alpha"] for row in same if "alpha" in row["direction"]]
         by_rating[grade] = {"direction": aggregate(same, "direction"),
                             "new_exposure": aggregate(same, "new_exposure"),
                             "mean_alpha": sum(recorded) / len(recorded) if recorded else None}

@@ -7,6 +7,7 @@ from copy import deepcopy
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 from typing import Iterable
+from uuid import uuid4
 
 import pandas as pd
 import yfinance as yf
@@ -74,7 +75,9 @@ def run_walk_forward_evaluation(
     for value in dates:
         date.fromisoformat(value)
     config = deepcopy(graph_config or DEFAULT_CONFIG)
-    config.update(point_in_time_strict=True, memory_dir=None, checkpoint_enabled=False)
+    results = Path(config.get("results_dir") or DEFAULT_CONFIG["results_dir"]) / "walk-forward" / uuid4().hex[:16]
+    config.update(point_in_time_strict=True, memory_dir=None, checkpoint_enabled=False,
+                  results_dir=str(results), data_cache_dir=str(results / "cache"))
     graph = TradingAgentsGraph(config=config, selected_analysts=selected_analysts or ["market", "social", "news", "fundamentals"])
     records, excluded, pending = [], [], []
     previous_exposure = {}
@@ -82,8 +85,8 @@ def run_walk_forward_evaluation(
     try:
         for trade_date in dates:
             if enable_reflection:
-                ready = [item for item in pending if item[0] <= trade_date]
-                pending = [item for item in pending if item[0] > trade_date]
+                ready = [item for item in pending if item[0][:10] <= trade_date]
+                pending = [item for item in pending if item[0][:10] > trade_date]
                 for known, state, outcome in ready:
                     graph.reflect_and_remember(outcome, state=state, outcome_known_at=known)
             for symbol in dict.fromkeys(symbols):
@@ -128,7 +131,8 @@ def run_walk_forward_evaluation(
                     "excess_return": net - benchmark_return if benchmark_return is not None else None,
                     "turnover": 2 * exposure, "exposure_change": exposure_change})
                 if enable_reflection and exposure:
-                    pending.append((window["exit_date"], deepcopy(final_state), net))
+                    known = window.get("matures_at", window["exit_date"])
+                    pending.append((known, deepcopy(final_state), net))
     finally:
         graph.close()
     assumptions = {"evaluation_type": "long_only_signal_study", "entry": "next_session_open",
