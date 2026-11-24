@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Any, Mapping, Sequence
 from zoneinfo import ZoneInfo
 
+from tradingagents.decision_provenance import research_origin
 from tradingagents.external.prism_normalize import normalize_market
 
 from .models import (ACTION_TRACKER_SCHEMA, OUTCOME_CALCULATION_VERSION,
@@ -89,10 +90,21 @@ def initialize_action_tracker(db_path: Path) -> None:
         conn.commit()
 
 
-def record_run_recommendations(run_dir: Path, db_path: Path, *, run_market: str | None = None, recorded_at: str | None = None) -> int:
+def record_run_recommendations(
+    run_dir: Path, db_path: Path, *, run_market: str | None = None, recorded_at: str | None = None,
+    manifest: dict[str, Any] | None = None,
+) -> int:
     initialize_action_tracker(db_path)
     run_dir = Path(run_dir)
-    manifest = _load_json(run_dir / "run.json")
+    if manifest is None:
+        manifest = _load_json(run_dir / "run.json")
+    recovery = manifest.get("research_recovery")
+    if (research_origin(manifest, {})[0] == "overlay_only"
+            or isinstance(recovery, dict) and recovery.get("finalization_only") is True):
+        return 0
+    reused = {_research_identity(row.get("ticker")) for row in manifest.get("tickers") or []
+              if isinstance(row, dict) and research_origin(manifest, row)[0] == "reused_full"}
+    reused.discard("")
     run_id = str(manifest.get("run_id") or run_dir.name)
     market = _normalize_target_market(run_market) or _manifest_run_market(manifest)
     created_at = str(manifest.get("finished_at") or manifest.get("started_at") or datetime.now().astimezone().isoformat())
@@ -107,6 +119,7 @@ def record_run_recommendations(run_dir: Path, db_path: Path, *, run_market: str 
             run_market=market,
         )
     )
+    rows = [row for row in rows if _research_identity(row["ticker"]) not in reused]
     inserted = 0
     ingested_at = timestamp(recorded_at or datetime.now(timezone.utc).isoformat()).isoformat()
     with sqlite3.connect(db_path, timeout=30) as conn:
@@ -1168,6 +1181,12 @@ def _manifest_run_market(manifest: Mapping[str, Any]) -> str | None:
 def _normalize_target_market(value: Any) -> str | None:
     normalized = normalize_market(value)
     return normalized if normalized in {"KR", "US"} else None
+
+
+def _research_identity(ticker: Any) -> str:
+    name = str(ticker or "").strip().upper()
+    base = name.removesuffix(".KS").removesuffix(".KQ")
+    return base if len(base) == 6 and base.isascii() and base.isdigit() else name
 
 
 def _ticker_market(ticker: Any, explicit_market: Any) -> str:

@@ -23,6 +23,7 @@ from zoneinfo import ZoneInfo
 
 import yfinance as yf
 
+from tradingagents.decision_provenance import research_origin
 from tradingagents.atomic_io import atomic_write_json, interprocess_file_lock
 from tradingagents.scheduled.failure_diagnostics import failure_diagnostics, format_failure_diagnostics
 from tradingagents.scheduled.research_observation import ResearchObservationRecorder
@@ -910,7 +911,9 @@ def _execute_run_body(config, *, run_label, skip_site_build, tz, started_at,
     else:
         performance_budget_available = False
     if performance_enabled_for_run and performance_budget_available:
-        manifest["performance"] = _run_performance_tracking(config=config, run_dir=run_dir, started_at=started_at)
+        manifest["performance"] = _run_performance_tracking(
+            config=config, run_dir=run_dir, started_at=started_at, manifest=manifest,
+        )
     elif performance_enabled_for_run:
         manifest["performance"] = {"status": "skipped", "reason": "runtime_budget_exhausted"}
     elif config.performance.enabled and not portfolio_only:
@@ -3175,6 +3178,7 @@ def _run_performance_tracking(
     config: ScheduledAnalysisConfig,
     run_dir: Path,
     started_at: datetime,
+    manifest: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     db_path = config.performance.store_path or (config.storage.archive_dir / "performance.sqlite")
     try:
@@ -3190,6 +3194,7 @@ def _run_performance_tracking(
             run_dir,
             db_path,
             run_market=performance_market,
+            manifest=manifest,
         )
         outcome_update: dict[str, Any] = {
             "enabled": bool(config.performance.update_outcomes_on_run),
@@ -4430,6 +4435,10 @@ def _bootstrap_overlay_inputs_from_latest_run(
                 "metrics": {"llm_calls": 0, "tool_calls": 0, "tokens_in": 0, "tokens_out": 0},
                 "tool_telemetry": {"total_tool_calls": 0, "vendor_calls": {}, "fallback_count": 0, "events": []},
                 "quality_flags": ("overlay_only_mode",),
+                "overlay_research_source": {
+                    "source_run_id": source_run_id,
+                    "analysis_started_at": research_origin(source_manifest, source)[1],
+                },
                 "report_writer": {"mode": "skipped_overlay_only"},
                 "execution_contract": None,
                 "execution_update": None,
