@@ -35,6 +35,29 @@ class PriceReference:
         return cls(price, currency, basis, source, observed)
 
 
+_NATIVE_CURRENCY_BY_MARKET = {"KR": "KRW", "US": "USD"}
+
+
+def native_reference(value: Any, market: str | None, decided_at: str) -> tuple[PriceReference | None, str]:
+    """Validate the supplied unit; the listing market never supplies evidence of it."""
+    if value is None:
+        return None, "missing_reference"
+    reference = PriceReference.read(value)
+    if reference is None:
+        return None, "invalid_reference"
+    expected = _NATIVE_CURRENCY_BY_MARKET.get(market)
+    if expected is None:
+        return None, "unclassified_market"
+    try:
+        if timestamp(reference.observed_at) > timestamp(decided_at):
+            return None, "future_reference"
+    except ValueError:
+        return None, "decision_clock_unverified"
+    if reference.currency != expected:
+        return None, "currency_mismatch"
+    return reference, "verified_native_reference"
+
+
 def series_terms(payload: Any) -> tuple[str, str] | None:
     """Require proof carried by each retained bar, never a ticker convention."""
     rows = payload.get("prices") if isinstance(payload, Mapping) else payload

@@ -264,6 +264,8 @@ def build_account_performance_outputs(
         broker_performance=broker_performance,
         reconciliation=reconciliation,
         warnings=warnings,
+        cache_dir=run_dir.parents[2] / "benchmark-series"
+        if len(run_dir.parents) > 2 and run_dir.parents[1].name == "runs" else None,
     )
 
     payload = {

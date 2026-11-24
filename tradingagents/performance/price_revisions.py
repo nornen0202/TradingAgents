@@ -13,7 +13,7 @@ import re
 import sqlite3
 
 from .lifecycle import timestamp
-from .price_evidence import PriceReference
+from .price_evidence import PriceReference, native_reference
 
 
 def initialize_price_revisions(connection):
@@ -77,6 +77,11 @@ def append_price_revision(path: Path, attestation, *, clock=None, apply=False):
         if (rec is None or rec["run_id"] != attestation["run_id"] or rec["ticker"] != attestation["ticker"]
                 or timestamp(rec["created_at"]) != decided):
             raise ValueError("Attestation does not match an immutable recommendation")
+        if price is not None:
+            market = str(rec["market"] or "").strip().upper() if "market" in rec.keys() else None
+            admitted, reason = native_reference(payload["reference"], market, rec["created_at"])
+            if admitted is None:
+                raise ValueError(f"Attested reference could not be verified: {reason}")
         exists = connection.execute(
             "SELECT 1 FROM sqlite_master WHERE type='table' AND name='action_price_revisions'"
         ).fetchone()

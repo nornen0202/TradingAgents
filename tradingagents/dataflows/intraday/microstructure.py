@@ -231,9 +231,11 @@ class KISMicrostructureProvider:
         )
 
         asof = _bar_asof(bars, fallback=now_local, timezone_name=market_timezone)
+        chart_bars = tuple(normalize_kis_bars(bars, observed_at=now_local, timezone_name=market_timezone))
         return IntradayMarketSnapshot(
             ticker=ticker,
-            chart_bars=tuple(normalize_kis_bars(bars, observed_at=now_local, timezone_name=market_timezone)),
+            chart_bars=chart_bars,
+            research_price_reference=_native_bar_reference(chart_bars, now_local, "KRW", "kis.domestic_time_itemchartprice"),
             asof=asof.isoformat(),
             provider=self.name,
             interval=interval,
@@ -533,9 +535,14 @@ class KISMicrostructureProvider:
         trade_tape_summary = tape_summary or _trade_tape_summary(tape_rows)
         if not tape_rows and supplement is not None and getattr(supplement, "trade_tape_summary", None):
             trade_tape_summary = supplement.trade_tape_summary
+        chart_bars = tuple(normalize_kis_bars(session_bars, observed_at=now_local, timezone_name=market_timezone))
         return IntradayMarketSnapshot(
             ticker=ticker,
-            chart_bars=tuple(normalize_kis_bars(session_bars, observed_at=now_local, timezone_name=market_timezone)),
+            chart_bars=chart_bars,
+            research_price_reference=(
+                _native_bar_reference(chart_bars, now_local, "USD", "kis.overseas_time_itemchartprice")
+                if exchange in {"NAS", "NYS", "AMS"} else None
+            ),
             asof=asof.isoformat(),
             provider=self.name,
             interval=interval,
@@ -736,6 +743,20 @@ def _to_float(value: Any) -> float | None:
         return float(text)
     except ValueError:
         return None
+
+
+def _native_bar_reference(bars, now: datetime, currency: str, source: str) -> dict[str, Any] | None:
+    # The time-item chart contract supplies trading-currency prices.
+    if not bars:
+        return None
+    bar = bars[-1]
+    available = datetime.fromisoformat(bar["available_at"])
+    observed = datetime.fromisoformat(bar["observed_at"])
+    if (available.date() != now.date() or not available <= observed <= now
+            or now - available > timedelta(minutes=15)):
+        return None
+    return {"price": bar["close"], "currency": currency, "basis": "unadjusted",
+            "source": source, "observed_at": observed.isoformat()}
 
 
 def _find_float(mapping: dict[str, Any], *keys: str, default: float | None = None) -> float | None:

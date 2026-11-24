@@ -136,3 +136,15 @@ KR contribution rows are aggregated by canonical ticker. For example, realized P
 ## Chart Consistency
 
 The chart uses the same return method and actual window as the summary. Chart metadata includes `final_return`, `peak_return`, `max_drawdown`, and `consistency_status`. The investor view labels peak return as "period high" so intermediate chart highs are not confused with the final headline return.
+
+## 추천 가격의 단위와 기존 데이터
+
+정규 writer는 시간·원천·조정 기준이 있는 원통화 가격을 `recommended_price`와 `price_reference_json`에 저장합니다. KRW 환산 단가와 총 평가액은 각각 `display_unit_price_krw`와 `valuation_amount_krw`로 분리됩니다. 근거가 없는 가격, 통화가 맞지 않는 가격과 판단 이후 취득된 가격은 새 추천의 성과 기준가를 비워 두고 이유를 남깁니다. KIS 장중 분봉은 완료된 봉의 응답을 근거로 사용합니다. [KIS 해외 분봉 예제](https://github.com/koreainvestment/open-trading-api/tree/main/examples_llm/overseas_stock/inquire_time_itemchartprice)
+
+기존 행과 수익률은 보존합니다. 정상 보고서는 활성 검증 결과만 집계하고 가격 미확정·제외 건수를 보여 줍니다. 범위가 `-100% ~ -99%`인 행을 골라내는 것은 점검이며 통화 오염 확정에는 당시 출처와 단위 증거가 필요합니다. 아래 읽기 전용 명령은 전체, 최근 40,000개 결과와 최근 40,000개 추천을 구분합니다. SQLite 온라인 백업 API로 일관된 사본을 만든 뒤 실행합니다.
+
+```console
+python -m tradingagents.performance.evidence_audit /private/performance-snapshot.sqlite
+```
+
+정정에 사용할 명시 근거를 검토한 뒤 `python -m tradingagents.performance.price_revisions`로 미리 봅니다. 검증 사본에는 `--revised-copy`를 사용합니다. 실제 실행기의 스키마 확장은 첫 writer에서 트랜잭션으로 진행되며 가격 정정은 별도의 append-only 영수증입니다. 원본 DB 승인 시에는 유휴 상태에서 백업·복원 검증을 먼저 하고 이후 발생한 쓰기를 보존합니다. 오래된 DB 백업 전체를 덮어쓰면 백업 이후 결과가 사라질 수 있으므로 일반적인 표시 원복에는 후속 정정이나 기존 읽기 모드를 사용합니다.

@@ -3098,11 +3098,16 @@ def _render_performance_tracking_section(manifest: dict[str, Any]) -> str:
         )
         if table
     )
-    if not calibration_html and not tables_html:
+    if not calibration_html and not tables_html and not data_quality.get("price_evidence_required"):
         return ""
     actual_feedback = bool(data_quality.get("actual_trade_effectiveness_available"))
     feedback_label = "체결·종료거래 연계됨" if actual_feedback else "미연계 — 추천 후 가격 경로만 평가"
-    matured_5d = int(data_quality.get("matured_5d_rows") or summary.get("outcomes") or 0)
+    matured_5d = int(data_quality.get("matured_5d_rows", summary.get("outcomes")) or 0)
+    excluded = data_quality.get("recommendations_without_verified_outcome")
+    exclusion_row = (
+        f"<p><strong>검증된 가격 성과 미확정·제외</strong><span>{int(excluded)}</span></p>"
+        if excluded is not None else ""
+    )
     distinct_runs = int(data_quality.get("distinct_runs") or 0)
     execution_warning = "" if actual_feedback else (
         "<div class='warning-banner account-performance-note'>"
@@ -3119,6 +3124,7 @@ def _render_performance_tracking_section(manifest: dict[str, Any]) -> str:
       <article class="run-card">
         <p><strong>추천 행 / 분석 실행</strong><span>{int(summary.get('recommendations') or 0)} / {distinct_runs or '-'}</span></p>
         <p><strong>5거래일 평가 표본</strong><span>{matured_5d}</span></p>
+        {exclusion_row}
         <p><strong>실제 체결 피드백</strong><span>{_escape(feedback_label)}</span></p>
         <p><strong>연결된 종료 거래</strong><span>{int(data_quality.get('closed_trade_journal_rows') or summary.get('closed_trades') or 0)}</span></p>
         <div class="pill-row">{artifact_link}</div>
