@@ -31,14 +31,14 @@ class _FixedHostConnection(connect):
         return exc
 
 
-async def _read_feed(kr, us, credentials, hts_ids, *, state, approval, attempts):
-    scopes = tuple(VtsScope(market, hts_ids[market], credentials.account_no + credentials.product_code)
-                   for market in _MARKETS)
-    calls = {"KR": 0, "US": 0}
+async def _read_feed(clients, hts_ids, *, state, approval, attempts):
+    scopes = tuple(VtsScope(market, hts_ids[market], client.credentials.account_no + client.credentials.product_code)
+                   for market, client in clients.items())
+    calls = {market: 0 for market in clients}
 
     async def resynchronize():
         now = datetime.now(timezone.utc)
-        for market, client in (("KR", kr), ("US", us)):
+        for market, client in clients.items():
             date = now.astimezone(ZoneInfo(_MARKETS[market][0])).strftime("%Y%m%d")
             # Keep the shared broker locks through completion of the bounded
             # HTTP call, including when the WebSocket observation is cancelled.
@@ -78,21 +78,34 @@ def check(state, *, connect_to_broker=False, attempts=1):
     try:
         with (interprocess_file_lock(state / "strategy.lock", timeout=0),
               interprocess_file_lock(state.parent / "kis-validation/campaign.lock", timeout=0)):
-            creds = DemoCredentials.from_local_settings()
-            us_credentials = credentials_from_settings()
-            if creds != us_credentials:
-                raise DemoError("Separate subscriptions require explicitly matched VTS scopes")
-            kr = KisDemoClient(creds)
+            credentials = {"KR": DemoCredentials.from_local_settings(), "US": credentials_from_settings()}
+            shared = credentials["KR"] == credentials["US"]
+            kr = KisDemoClient(credentials["KR"])
             clients.append(kr)
-            approval = kr.websocket_approval()
+            approvals = {"KR": kr.websocket_approval()}
+            result["approval_verified_by_market"] = {"KR": True, "US": False}
+            if shared:
+                approvals["US"] = approvals["KR"]
+            else:
+                us_auth = KisDemoClient(credentials["US"])
+                clients.append(us_auth)
+                approvals["US"] = us_auth.websocket_approval()
+            result["approval_verified_by_market"]["US"] = True
             result["approval_verified"] = True
             if not all(hts_ids.values()):
                 result["status"] = "MISSING_DEMO_HTS_ID"
                 return result
-            us = KisDemoUSReadClient(us_credentials)
+            us = KisDemoUSReadClient(credentials["US"])
             clients.append(us)
-            result["feed"] = asyncio.run(_read_feed(kr, us, creds, hts_ids, state=state, approval=approval, attempts=attempts))
-            result["status"] = "SUBSCRIPTIONS_VERIFIED" if result["feed"]["verified_notice_sessions"] else "SUBSCRIPTIONS_UNVERIFIED"
+            read_clients = {"KR": kr, "US": us}
+            if shared:
+                result["feed"] = asyncio.run(_read_feed(read_clients, hts_ids, state=state, approval=approvals["KR"], attempts=attempts))
+                verified = result["feed"]["verified_notice_sessions"] > 0
+            else:
+                result["feed_by_market"] = {market: asyncio.run(_read_feed({market: client}, hts_ids, state=state,
+                    approval=approvals[market], attempts=attempts)) for market, client in read_clients.items()}
+                verified = all(row["verified_notice_sessions"] > 0 for row in result["feed_by_market"].values())
+            result["status"] = "SUBSCRIPTIONS_VERIFIED" if verified else "SUBSCRIPTIONS_UNVERIFIED"
     except TimeoutError:
         result["status"] = "BROKER_LANE_BUSY"
     except (DemoError, InvalidHandshake, OSError, ValueError):

@@ -181,6 +181,38 @@ def test_local_probe_reports_approval_separately_from_missing_hts(tmp_path, monk
     assert "fixture-token" not in str(result) and "12345678" not in str(result)
 
 
+def test_local_probe_keeps_independent_app_approvals_and_subscriptions_scoped(tmp_path, monkeypatch):
+    from tools import check_kis_vts_feed as probe
+    from tradingagents.execution.kis_demo import DemoCredentials
+
+    kr = DemoCredentials("fixture-kr-key", "fixture-kr-secret", "12345678", "01")
+    us = DemoCredentials("fixture-us-key", "fixture-us-secret", "12345678", "01")
+    approval_attempts, subscriptions = [], []
+    monkeypatch.setattr(probe, "get_api_key", lambda name: "fixture-hts")
+    monkeypatch.setattr(DemoCredentials, "from_local_settings", classmethod(lambda cls: kr))
+    monkeypatch.setattr(probe, "credentials_from_settings", lambda: us)
+
+    def broker_approval(client):
+        approval_attempts.append(client.credentials)
+        return "fixture-token-" + client.credentials.app_key
+
+    async def read_feed(clients, hts_ids, *, approval, **_):
+        assert len(clients) == 1
+        market, client = next(iter(clients.items()))
+        assert approval == "fixture-token-" + client.credentials.app_key
+        assert hts_ids[market] == "fixture-hts"
+        subscriptions.append((market, client.credentials))
+        return {"verified_notice_sessions": 1, "rest_order_inquiries": {market: 2}}
+
+    monkeypatch.setattr(probe.KisDemoClient, "websocket_approval", broker_approval)
+    monkeypatch.setattr(probe, "_read_feed", read_feed)
+    result = probe.check(tmp_path / "strategy", connect_to_broker=True)
+    assert result["status"] == "SUBSCRIPTIONS_VERIFIED"
+    assert result["approval_verified_by_market"] == {"KR": True, "US": True}
+    assert approval_attempts == [kr, us] and subscriptions == [("KR", kr), ("US", us)]
+    assert all(secret not in str(result) for secret in (kr.app_key, us.app_key, kr.account_no, "fixture-token"))
+
+
 @pytest.mark.parametrize("failure", ["handshake", "no_ack_before_deadline"])
 def test_local_probe_writes_masked_failure_without_holding_broker_lane(tmp_path, monkeypatch, failure):
     from tools import check_kis_vts_feed as probe
