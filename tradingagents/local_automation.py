@@ -646,6 +646,25 @@ def push_site(site, state):
     # autocrlf must not rewrite their bytes when staging the publication tree.
     git_run(["-c", "core.autocrlf=false", "-C", str(site), *prefix, f"--work-tree={site}", "add", "--all", "."], env=env)
     tree = git_run([*prefix, "write-tree"], env=env)
+    def read_staged_blob(path):
+        return subprocess.check_output(["git", *prefix, "cat-file", "blob", f"{tree}:{path}"], timeout=30)
+
+    dashboard_paths = git_run([*prefix, "ls-tree", "-r", "--name-only", tree, "--", "autotrader"]).splitlines()
+    from tradingagents.execution.public_autotrader_dashboard import verify_public_autotrader_files
+
+    autotrader_artifacts = verify_public_autotrader_files(dashboard_paths, read_staged_blob)
+    staged_snapshot = json.loads(read_staged_blob("pages-snapshot.json"))
+    if autotrader_artifacts or "autotrader_artifacts" in staged_snapshot:
+        if autotrader_artifacts:
+            staged_snapshot["autotrader_artifacts"] = autotrader_artifacts
+        else:
+            staged_snapshot.pop("autotrader_artifacts")
+        atomic_write_json(site / "pages-snapshot.json", staged_snapshot)
+        git_run(["-c", "core.autocrlf=false", "-C", str(site), *prefix, f"--work-tree={site}",
+                 "add", "--", "pages-snapshot.json"], env=env)
+        tree = git_run([*prefix, "write-tree"], env=env)
+        if json.loads(read_staged_blob("pages-snapshot.json")) != staged_snapshot:
+            raise ValueError("Staged Pages snapshot changed during autotrader binding")
     commit = git_run([*prefix, "commit-tree", tree, *(["-p", head] if head else [])], input="Local public report snapshot\n", env=env)
     git_run([*prefix, "push", "fork", f"{commit}:refs/heads/gh-pages"])
     return commit
@@ -653,7 +672,7 @@ def push_site(site, state):
 
 def verify_live(site):
     snapshot = script("pages_snapshot").fetch_live_snapshot(PUBLIC_BASE)
-    if snapshot != read_json(site / "pages-snapshot.json"):
+    if not isinstance(snapshot, dict) or snapshot != read_json(site / "pages-snapshot.json"):
         return False
     # Check exact report and strategy bytes; a successful push is not delivery.
     relatives = ["mobile/strategy.json", "work/v1/kr/report/latest.json", "work/v1/us/report/latest.json",
@@ -669,6 +688,27 @@ def verify_live(site):
             with urlopen(request, timeout=30) as response:
                 if response.read(path.stat().st_size + 1) != path.read_bytes():
                     return False
+    artifacts = snapshot.get("autotrader_artifacts")
+    if artifacts is not None:
+        from urllib.request import Request, urlopen
+        from uuid import uuid4
+
+        from tradingagents.execution.public_autotrader_dashboard import verify_public_autotrader_files
+
+        def read_public_artifact(path):
+            size = artifacts[path]["size"]
+            if type(size) is not int or not 0 < size <= 1_000_000:
+                raise ValueError("Invalid autotrader artifact size")
+            request = Request(f"{PUBLIC_BASE}/{path}?verify={uuid4().hex}", headers={"Cache-Control": "no-cache"})
+            with urlopen(request, timeout=30) as response:
+                return response.read(size + 1)
+
+        try:
+            if not isinstance(artifacts, dict) or not artifacts:
+                return False
+            return verify_public_autotrader_files(list(artifacts), read_public_artifact) == artifacts
+        except (ValueError, TypeError, KeyError):
+            return False
     return True
 
 
@@ -737,16 +777,14 @@ def publish(archive, state, runtime_dir, *, rebuild=False, publication_locked=Fa
             refresh_report_history(archive, state, receipt)
         else:
             build_site(archive, site, config.site)
+            from tradingagents.execution.prism_autotrader import load_autotrader_policy
+            from tradingagents.execution.public_autotrader_dashboard import build_public_autotrader_dashboard
+
             try:
-                from tradingagents.execution.autotrader_dashboard import publish_autotrader_dashboard
-                from tradingagents.execution.prism_autotrader import load_autotrader_policy
-                publish_autotrader_dashboard(
-                    archive,
-                    site_dir=site,
-                    policy=load_autotrader_policy(state / "autotrader"),
-                )
-            except Exception:
-                pass
+                dashboard_mode = load_autotrader_policy(state / "autotrader").mode
+            except (OSError, TypeError, ValueError):
+                dashboard_mode = None
+            build_public_autotrader_dashboard(archive, site, mode=dashboard_mode)
         # Preserve exact Work hashes and existing reference-only lineage rules.
         verifier = script("verify_work_pages_handoff")
         for market in ("kr", "us"):
@@ -975,8 +1013,9 @@ def main():
             return 0
         try:
             result = run_autotrader_tick(args.archive_dir, args.state_dir / "autotrader")
-            if policy.mode == "shadow" and policy.enabled is True and not policy.kill_switch and not (args.state_dir / "autotrader" / "HALT").exists():
-                publish_autotrader_dashboard(args.archive_dir, site_dir=args.state_dir / "site", policy=policy)
+            if (policy.mode == "shadow" and policy.enabled is True and not policy.kill_switch
+                    and not (args.state_dir / "autotrader" / "HALT").exists()):
+                publish_autotrader_dashboard(args.archive_dir, policy=policy)
         except TimeoutError:
             result = {"status": "AUTOTRADER_ALREADY_RUNNING", "mode": policy.mode}
         print(json.dumps(result, ensure_ascii=False))
