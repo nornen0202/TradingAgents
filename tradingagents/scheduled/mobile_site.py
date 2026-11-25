@@ -287,7 +287,7 @@ def build_mobile_site(
         from tradingagents.scheduled.strategy_research import attach_research_plans
 
         attach_research_plans(archive_dir, market_payload, now=plan_clock, refresh_prices=refresh_research_prices,
-                              previous_closes=previous_closes if market.upper() == "US" else None)
+                              previous_closes=(previous_closes or {}).get(market.upper()))
         strategy_payload["markets"][market] = market_payload
 
     public_payload = _normalize_mobile_machine_values(public_payload)
@@ -2204,8 +2204,30 @@ _PRIVATE_JS = READER_JS + r"""
   function kisUsDaily(quote) {
     return quote?.kind === 'KIS_DAILY_CLOSE' || (quote?.kind === 'REGULAR_CLOSE' && quote.source === 'KIS' && quote.currency === 'USD');
   }
+  function kisKrDaily(quote) {
+    return quote?.kind === 'KIS_KR_DAILY_CLOSE'
+      || (quote?.kind === 'REGULAR_CLOSE' && quote.source === 'KIS' && quote.currency === 'KRW');
+  }
+  function confirmedKrClose(quote) {
+    return quote.kind === 'REGULAR_CLOSE' && quote.verification === 'MATCHED' && quote.official_close?.source === 'KRX_OPEN_API';
+  }
   function researchQuote(quote) {
     if (!quote) return '';
+    const received = (item) => `수신 ${dateTime(item.observed_at)}${item.provider_response_at ? ' · HTTP 응답 ' + dateTime(item.provider_response_at) : ''}`;
+    if (kisKrDaily(quote)) {
+      const price = (value) => researchPrice(value, quote.currency);
+      const official = quote.official_close;
+      const status = confirmedKrClose(quote) ? 'KRX 정규장 확정 종가'
+        : quote.verification === 'CONFLICT' ? '종가 후보 불일치' : 'KRX 공식 종가 미확인';
+      const requested = quote.requested_market === 'J' ? 'KRX 요청 J' : '저장 관측';
+      const primary = `KIS 비수정 일봉 ${price(quote.price)} (${requested} · ${received(quote)})`;
+      const independent = official ? ` · KRX ${official.board} 공표 종가 ${price(official.price)} (${received(official)})` : '';
+      const previous = (quote.previous_observations || []).map((item) =>
+        `${item.source === 'KRX_OPEN_API' ? '이전 KRX 공표' : '이전 KIS 관측'} ${price(item.price)} (${received(item)})`);
+      const [low, high] = quote.price_range || [];
+      const range = low < high ? ` · 가격 후보 범위 ${price(low)}~${price(high)}` : '';
+      return `${quote.session} · ${status} · 정규장 달력 마감 ${dateTime(quote.event_at)} · ${primary}${independent}${previous.length ? ' · ' + previous.join(' · ') : ''}${range}`;
+    }
     if (kisUsDaily(quote)) {
       const reread = quote.recheck;
       const received = (item) => `조회 ${dateTime(item.observed_at)}${item.provider_response_at ? ' · HTTP 응답 ' + dateTime(item.provider_response_at) : ''}`;
@@ -2229,12 +2251,15 @@ _PRIVATE_JS = READER_JS + r"""
     const rules = (plan.ordered_rules || []).map((rule) => `<li><strong>${esc(rule.label)}</strong><br>${esc(rule.text)}</li>`).join('');
     const checks = (plan.price_checks || []).map((check) => {
       const level = check.level || {};
+      const observation = check.observation;
+      const researchOnly = kisUsDaily(observation) || (kisKrDaily(observation) && !confirmedKrClose(observation));
       return `<li><strong>${esc(researchLevel(level))}</strong>`
         + ` · ${esc(researchStage[level.confirmation] || '확인 방식 확인')}${check.group ? ' · 그룹 ' + esc(check.group) : ''}<br>`
-        + `<span class="research-result">${kisUsDaily(check.observation) && check.status !== 'EVIDENCE_NEEDED' ? 'KIS 관측 기준 · ' : ''}${esc(researchStatus[check.status])}</span> ${esc(researchQuote(check.observation))}`
+        + `<span class="research-result">${researchOnly && check.status !== 'EVIDENCE_NEEDED' ? (kisUsDaily(observation) ? 'KIS 관측 기준 · ' : '종가 후보 기준 · ') : ''}${esc(researchStatus[check.status])}</span> ${esc(researchQuote(observation))}`
         + (check.intraday_reference ? `<br>${esc(researchQuote(check.intraday_reference.observation))} · 장중 가격만 대조 · ${esc(researchStatus[check.intraday_reference.status])}` : '')
         + (check.needed ? `<br>${esc(check.needed_session ? check.needed_session + ' · ' : '')}${esc(check.needed)}` : '')
-        + (check.preceding_price_session ? `<br>선행 가격 대조일 ${esc(check.preceding_price_session)} · ${check.preceding_close_source === 'KIS_DAILY_CLOSE' ? 'KIS 일봉 기준 · 거래소 공식 종가와 ' : ''}원문의 선행 조건 확인` : '')
+        + (check.preceding_observation ? `<br>선행 가격 대조 · ${esc(researchQuote(check.preceding_observation))}` : '')
+        + (check.preceding_price_session ? `<br>선행 가격 대조일 ${esc(check.preceding_price_session)} · ${check.preceding_close_source ? 'KIS 일봉 기준 · 거래소 공식 종가와 ' : ''}원문의 선행 조건 확인` : '')
         + (level.source_text ? `<br>${esc(level.source_text)}` : '') + (level.volume_rule ? `<br>거래량 조건 ${esc(level.volume_rule)}` : '') + '</li>';
     }).join('');
     const quote = researchQuote(plan.observation || plan.last_observation);

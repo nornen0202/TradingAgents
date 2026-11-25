@@ -5,9 +5,12 @@ from datetime import date, datetime, timedelta
 import pytest
 
 from tradingagents.scheduled.strategy_research import (
-    _basis_compatible, _close_records, _compare, _price_checks, _retain_previous_close, previous_us_closes,
+    _basis_compatible, _close_records, _compare, _price_checks, _retain_previous_close, _retain_previous_kr_close,
+    previous_market_closes,
 )
-from tradingagents.scheduled.strategy_research_prices import KisResearchCloses, market_days, price_epoch, validated_quote
+from tradingagents.portfolio.kis import KisClient
+from tradingagents.scheduled.strategy_krx_close import KrxResearchCloses
+from tradingagents.scheduled.strategy_research_prices import KR_DAILY, KisResearchCloses, market_days, price_epoch, validated_quote
 from tradingagents.scheduled.strategy_research_sources import ResearchArchive, thesis_for
 
 
@@ -117,23 +120,128 @@ def test_failed_breakout_trim_requires_prior_breakout_and_tactical_position():
     assert checks[1]["status"] == "MET"
 
 
-def test_kis_fetch_uses_only_exact_completed_kr_sessions_and_explicit_adjustment():
-    now = dt("2026-11-25T02:47:48+09:00")
+def test_kis_fetch_uses_only_exact_completed_kr_sessions_and_explicit_adjustment(monkeypatch):
+    now = dt("2026-11-25T04:04:05+09:00")
     days = market_days("KR", now)
+    day = date(2026, 11, 24)
     requests = []
 
-    class Client:
-        def domestic_daily_itemchartprice(self, ticker, **kwargs):
-            requests.append((ticker, kwargs))
-            return {"output2": [
-                {"stck_bsop_date": day, "stck_oprc": "152000", "stck_clpr": "152700", "stck_hgpr": "153000",
-                 "stck_lwpr": "150000", "acml_vol": "1000000"} for day in ("20261124", "20261125")]}
+    def request_json(self, **kwargs):
+        requests.append(kwargs)
+        return {"output1": {"stck_shrn_iscd": "035420"}, "output2": [
+            {"stck_bsop_date": token, "stck_oprc": "156000", "stck_clpr": "152700", "stck_hgpr": "157000",
+             "stck_lwpr": "152000", "acml_vol": "17079045"} for token in ("20261124", "20261125")
+        ]}, {"Date": "Tue, 24 Nov 2026 19:04:03 GMT"}
 
-    records = KisResearchCloses(Client(), clock=lambda: now)("KR", "035420.KS", days, date(2026, 11, 24), now)
-    assert set(records) == {date(2026, 11, 24)}
-    assert [call[1]["adjusted_price"] for call in requests] == ["1", "0"]
-    assert all(call[1]["end_date"] == date(2026, 11, 24) for call in requests)
-    assert records[date(2026, 11, 24)]["price"] == 152700
+    monkeypatch.setattr(KisClient, "request_json", request_json)
+    load = KisResearchCloses(KisClient.__new__(KisClient), clock=lambda: now)
+    records = load("KR", "035420.KS", days, day, now)
+    assert set(records) == {day}
+    assert [call["params"]["FID_ORG_ADJ_PRC"] for call in requests] == ["1", "0"]
+    assert all(call["params"]["FID_INPUT_DATE_2"] == "20261124"
+               and call["params"]["FID_COND_MRKT_DIV_CODE"] == "J"
+               and call["params"]["FID_PERIOD_DIV_CODE"] == "D" for call in requests)
+    bar = records[day]
+    assert (bar["price"], bar["volume"], bar["kind"], bar["verification"]) == (152700, 17079045, KR_DAILY, "UNVERIFIED")
+    assert bar["exchange"] is None and bar["requested_market"] == "J"
+    assert bar["provider_response_at"] == "2026-11-24T19:04:03+00:00"
+    assert bar["event_time_source"] == "exchange_calendar"
+
+
+def test_krx_verifies_by_session_board_and_symbol_with_bulk_requests(monkeypatch):
+    now = dt("2026-11-25T08:38:31+09:00")
+    day = date(2026, 11, 24)
+    requests = []
+
+    def get(path, params, *, timeout):
+        requests.append((path, params, timeout))
+        if "ksq_" in path:
+            raise RuntimeError("unavailable")
+        def row(ticker, price, session="20261124", board="KOSPI"):
+            return {"BAS_DD": session, "MKT_NM": board, "ISU_CD": ticker, "TDD_CLSPRC": price}
+        return {"OutBlock_1": [
+            row("005930", "189,400"), row("035420", "156,100"),
+            row("000660", "1158000", session="20261123"), row("111111", "100", board="KOSDAQ"),
+            row("222222", "100"), row("222222", "101"),
+        ]}
+
+    monkeypatch.setattr("tradingagents.scheduled.strategy_krx_close.call_krx_open_api", get)
+    official = KrxResearchCloses(lambda: now)
+    anch = official("005930.KS", day)
+    assert (anch["price"], anch["observed_at"], anch["adjustment"]) == (189400, now.isoformat(), "unadjusted")
+    assert official("035420.KS", day)["price"] == 156100
+    assert all(official(ticker, day) is None for ticker in ("000660.KS", "111111.KS", "222222.KS", "123456.KQ", "654321.KQ"))
+    assert requests == [(f"/svc/apis/sto/{dataset}", {"basDd": "20261124"}, 4.0)
+                        for dataset in ("stk_bydd_trd", "ksq_bydd_trd")]
+
+
+@pytest.mark.parametrize("date_fields", [None, {}, {"BAS_DD": "20261125"}, {"BAS_DD": "20261131"},
+                                         {"BAS_DD": "2026-11-24"}, {"BAS_DD": None}])
+def test_krx_rejects_missing_invalid_and_future_trade_dates(monkeypatch, date_fields):
+    now = dt("2026-11-25T08:38:31+09:00")
+    day = date(2026, 11, 24)
+    days = market_days("KR", now)
+    rows = [] if date_fields is None else [
+        {"MKT_NM": "KOSPI", "ISU_CD": "005930", "TDD_CLSPRC": "182900"} | date_fields,
+    ]
+    monkeypatch.setattr("tradingagents.scheduled.strategy_krx_close.call_krx_open_api",
+                        lambda *args, **kwargs: {"OutBlock_1": rows})
+    official = KrxResearchCloses(lambda: now)("005930.KS", day)
+    assert official is None
+    bar = _bar(day, days[day], 189400, currency="KRW", observed=now) | {
+        "ticker": "005930.KS", "exchange": "KRX", "official_close": official,
+    }
+    assessed = _close_records({day: bar}, "KR", days, now)[day]
+    assert assessed["verification"] == "UNVERIFIED"
+    assert assessed["price_range"] == [189400, 189400]
+
+
+@pytest.mark.parametrize("timestamp", [None, "bogus", "2026-11-25T08:38:31", "2026-11-25T08:38:32+09:00",
+                                       "2026-11-24T15:34:59+09:00"])
+def test_krx_rejects_invalid_evidence_receive_times(timestamp):
+    now = dt("2026-11-25T08:38:31+09:00")
+    day = date(2026, 11, 24)
+    days = market_days("KR", now)
+    official = {"source": "KRX_OPEN_API", "session": str(day), "price": 182900, "currency": "KRW",
+                "adjustment": "unadjusted", "ticker": "005930", "board": "KOSPI", "dataset": "stk_bydd_trd"}
+    if timestamp is not None:
+        official["observed_at"] = timestamp
+    bar = _bar(day, days[day], 189400, currency="KRW", observed=now) | {
+        "ticker": "005930.KS", "exchange": "KRX", "official_close": official,
+    }
+    assessed = _close_records({day: bar}, "KR", days, now)[day]
+    assert assessed["verification"] == "UNVERIFIED" and assessed["official_close"] is None
+    level = {"level_type": "PULLBACK", "confirmation": "close", "low": 189300, "high": 190100}
+    assert _compare(level, assessed, currency="KRW", compatible=True, conflict=False)["status"] == "MET"
+
+
+@pytest.mark.parametrize(("use_exchange", "early_price", "expected"), [
+    (False, None, "UNVERIFIED"), (True, None, "MATCHED"), (True, 182900, "CONFLICT"),
+    (False, 182900, "CONFLICT"),
+])
+def test_kr_close_assessment_uses_actual_candidate_prices(use_exchange, early_price, expected):
+    now = dt("2026-11-25T08:38:31+09:00")
+    days = market_days("KR", now)
+    day = date(2026, 11, 24)
+    receipt = {"source": "KRX_OPEN_API", "session": str(day), "price": 189400, "currency": "KRW",
+               "adjustment": "unadjusted", "observed_at": now.isoformat(), "ticker": "005930",
+               "board": "KOSPI", "dataset": "stk_bydd_trd"}
+    fresh = _bar(day, days[day], 189400, currency="KRW", observed=now) | {
+        "kind": KR_DAILY, "requested_market": "J", "ticker": "005930.KS",
+        "official_close": receipt if use_exchange else None,
+    }
+    closes = _close_records({day: fresh}, "KR", days, now)
+    if early_price:
+        old = _bar(day, days[day], early_price, currency="KRW") | {"exchange": "KRX"}
+        _retain_previous_kr_close(closes, old, days, now)
+    assert closes[day]["verification"] == expected
+    assert closes[day]["kind"] == ("REGULAR_CLOSE" if expected == "MATCHED" else KR_DAILY)
+    assert closes[day]["price_range"] == [early_price or 189400, 189400]
+    level = {"level_type": "PULLBACK", "confirmation": "close"}
+    for low, high, stable in [(189300, 190100, "MET"), (180000, 190100, "MET"),
+                              (184000, 185000, "NOT_MET"), (190000, 191000, "NOT_MET")]:
+        check = _compare(level | {"low": low, "high": high}, closes[day], currency="KRW", compatible=True, conflict=False)
+        assert check["status"] == ("EVIDENCE_NEEDED" if early_price and low == 189300 else stable)
 
 
 def test_malformed_us_response_does_not_block_another_symbol():
@@ -230,7 +338,7 @@ def test_next_day_requery_retains_the_us_range_from_the_previous_build(tmp_path)
         {"ticker": "AAPL", "research_plan": {"completed_close": early}},
         {"ticker": "MSFT", "research_plan": None}, None,
     ]}}}), encoding="utf-8")
-    old = previous_us_closes(previous_path)
+    old = previous_market_closes(previous_path)["US"]
     assert old == {"AAPL": early}
     closes = {day: latest}
     _retain_previous_close(closes, old["AAPL"], days, now)
@@ -248,7 +356,7 @@ def test_next_day_requery_retains_the_us_range_from_the_previous_build(tmp_path)
         _retain_previous_close(fresh, early | wrong, days, now)
         assert fresh[day] == latest
     previous_path.write_text("invalid", encoding="utf-8")
-    assert previous_us_closes(previous_path) == {}
+    assert previous_market_closes(previous_path) == {}
 
 
 def test_disagreement_does_not_shift_first_breakout_to_a_later_session():
