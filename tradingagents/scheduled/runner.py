@@ -24,7 +24,7 @@ from zoneinfo import ZoneInfo
 import yfinance as yf
 
 from tradingagents.decision_provenance import research_origin
-from tradingagents.atomic_io import atomic_write_json, interprocess_file_lock
+from tradingagents.atomic_io import atomic_write_bytes, atomic_write_json, interprocess_file_lock
 from tradingagents.scheduled.failure_diagnostics import failure_diagnostics, format_failure_diagnostics
 from tradingagents.scheduled.research_observation import ResearchObservationRecorder
 from tradingagents.scheduled.manifest_discovery import _directories_desc, full_manifests_desc
@@ -588,6 +588,17 @@ def _execute_run_body(config, *, run_label, skip_site_build, tz, started_at,
         run_dir=run_dir, ticker_summaries=ticker_summaries,
         analysis_as_of=news_as_of, news_context=news_context,
     )
+    run_settings = _settings_snapshot(config)
+    prior_overlay_manifest = None
+    if lightweight_refresh:
+        # Resolve the reporting comparison against the completed archive visible
+        # before the new quote window opens.
+        prior_overlay_manifest = _find_previous_comparable_manifest(
+            archive_dir=config.storage.archive_dir,
+            current_manifest={"run_id": run_id, "settings": run_settings,
+                              "portfolio": {"profile": config.portfolio.profile_name if config.portfolio.enabled else None}},
+            available_at=datetime.now(tz),
+        )
     execution_updates: dict[str, dict[str, Any]] = {}
     execution_refresh_budget_available = True
     if config.execution.execution_refresh_enabled and not portfolio_only and not skip_research_postprocessing:
@@ -705,7 +716,7 @@ def _execute_run_body(config, *, run_label, skip_site_build, tz, started_at,
         "finished_at": finished_at.isoformat(),
         "ticker_phase_finished_at": finished_at.isoformat(),
         "timezone": config.run.timezone,
-        "settings": _settings_snapshot(config),
+        "settings": run_settings,
         "summary": {
             "total_tickers": total_tickers,
             "successful_tickers": successes,
@@ -969,9 +980,8 @@ def _execute_run_body(config, *, run_label, skip_site_build, tz, started_at,
     manifest["run_quality"] = _compute_run_quality(manifest=manifest)
     manifest["usefulness_rank"] = manifest["run_quality"]["usefulness_rank"]
 
-    previous_manifest = _find_previous_comparable_manifest(
-        archive_dir=config.storage.archive_dir,
-        current_manifest=manifest,
+    previous_manifest = prior_overlay_manifest if lightweight_refresh else _find_previous_comparable_manifest(
+        archive_dir=config.storage.archive_dir, current_manifest=manifest,
     )
     portfolio_delta = compute_portfolio_delta(previous_manifest=previous_manifest, current_manifest=manifest)
     delta_json_path = run_dir / "portfolio_delta.json"
@@ -5301,6 +5311,7 @@ def _find_previous_comparable_manifest(
     *,
     archive_dir: Path,
     current_manifest: dict[str, Any],
+    available_at: datetime | None = None,
 ) -> dict[str, Any] | None:
     runs_dir = archive_dir / "runs"
     if not runs_dir.exists():
@@ -5309,14 +5320,18 @@ def _find_previous_comparable_manifest(
     current_settings = current_manifest.get("settings") or {}
     current_scope = str(current_settings.get("market_scope") or current_settings.get("market") or "").strip().lower()
     current_profile = str(((current_manifest.get("portfolio") or {}).get("profile")) or "").strip().lower()
-    for year_dir in sorted((path for path in runs_dir.iterdir() if path.is_dir()), reverse=True):
-        for run_dir in sorted((path for path in year_dir.iterdir() if path.is_dir()), reverse=True):
+    for year_dir in _directories_desc(runs_dir):
+        for run_dir in _directories_desc(year_dir):
             manifest_path = run_dir / "run.json"
             if not manifest_path.exists():
                 continue
             candidate = json.loads(manifest_path.read_text(encoding="utf-8"))
             if str(candidate.get("run_id") or "") == current_run_id:
                 continue
+            if available_at is not None:
+                finished_at = _parse_datetime(candidate.get("finished_at"))
+                if finished_at is None or finished_at.tzinfo is None or finished_at > available_at:
+                    continue
             candidate_settings = candidate.get("settings") or {}
             scope = str(candidate_settings.get("market_scope") or candidate_settings.get("market") or "").strip().lower()
             if current_scope and scope and current_scope != scope:
@@ -5758,6 +5773,9 @@ def _run_execution_overlay_passes(
         parallel_archive = (config.execution.execution_lightweight_refresh
                             and config.run.run_mode == "overlay_only"
                             and not str(config.execution.execution_llm_summary_model or "").strip())
+        immutable_single_checkpoint = parallel_archive and len(checkpoints) == 1
+        if immutable_single_checkpoint and (run_dir / "run.json").exists():
+            raise FileExistsError("A completed lightweight overlay cannot be rewritten")
         prepared_analysis = {
             ticker: _load_ticker_analysis_payload(run_dir=run_dir, ticker_summary=summary)
             for ticker, summary in by_ticker.items()
@@ -5843,9 +5861,9 @@ def _run_execution_overlay_passes(
                 ticker_dir = run_dir / "tickers" / ticker
                 checkpoint_dir = ticker_dir / "execution" / "checkpoints"
                 writing_artifacts = True
-                _write_json(checkpoint_dir / _checkpoint_update_filename(checkpoint_label), update_payload)
                 update_path = ticker_dir / "execution_update.json"
-                _write_json(update_path, update_payload)
+                _save_overlay_artifact_pair(update_path, checkpoint_dir / _checkpoint_update_filename(checkpoint_label),
+                                            update_payload, _write_json, share=immutable_single_checkpoint)
                 summary["artifacts"]["execution_update_json"] = _relative_to_run(run_dir, update_path)
                 micro_snapshot_payload = market.to_dict()
                 micro_checkpoint_json = checkpoint_dir / _checkpoint_microstructure_snapshot_filename(checkpoint_label)
@@ -5853,10 +5871,15 @@ def _run_execution_overlay_passes(
                 micro_latest_json = ticker_dir / "microstructure_snapshot.json"
                 micro_latest_md = ticker_dir / "microstructure_report.md"
                 micro_report = render_microstructure_report(market)
-                _write_json(micro_checkpoint_json, micro_snapshot_payload)
-                micro_checkpoint_md.write_text(micro_report, encoding="utf-8")
-                _write_json(micro_latest_json, micro_snapshot_payload)
-                micro_latest_md.write_text(micro_report, encoding="utf-8")
+                _save_overlay_artifact_pair(micro_latest_json, micro_checkpoint_json, micro_snapshot_payload,
+                                            _write_json, share=immutable_single_checkpoint)
+                if immutable_single_checkpoint:
+                    report_bytes = micro_report.replace("\n", os.linesep).encode("utf-8")
+                    _save_overlay_artifact_pair(micro_latest_md, micro_checkpoint_md, report_bytes,
+                                                atomic_write_bytes, share=True)
+                else:
+                    micro_checkpoint_md.write_text(micro_report, encoding="utf-8")
+                    micro_latest_md.write_text(micro_report, encoding="utf-8")
                 summary["artifacts"]["microstructure_snapshot_json"] = _relative_to_run(run_dir, micro_latest_json)
                 summary["artifacts"]["microstructure_report_md"] = _relative_to_run(run_dir, micro_latest_md)
                 summary["artifacts"]["microstructure_checkpoint_snapshot_json"] = _relative_to_run(run_dir, micro_checkpoint_json)
@@ -5901,9 +5924,10 @@ def _run_execution_overlay_passes(
                     _refresh_integrated_review(ticker_dir, summary, run_dir=run_dir,
                         db_paths=[config.performance.store_path or (config.storage.archive_dir / "performance.sqlite")])
                 summary["intraday_snapshot_attempt"] = attempt_payload
-                if not preserve_analysis_bytes:
-                    _append_analysis_intraday_attempt(run_dir=run_dir, ticker_summary=summary, attempt_payload=attempt_payload,
-                                                      analysis_payload=analysis_payload if parallel_archive else None)
+                # The same attempt is already in the overlay update and the
+                # manifest. Keep the inherited analysis itself byte-stable.
+                if not (preserve_analysis_bytes or immutable_single_checkpoint):
+                    _append_analysis_intraday_attempt(run_dir=run_dir, ticker_summary=summary, attempt_payload=attempt_payload)
             except Exception as exc:
                 # An incomplete write cannot be published as a successful
                 # cohort even if a second, degraded report could be written.
@@ -5928,9 +5952,9 @@ def _run_execution_overlay_passes(
                 )
                 update_payload["ingested_at"] = datetime.now(timezone.utc).isoformat()
                 update_payload["evaluated_at"] = update_payload.get("execution_asof")
-                _write_json(checkpoint_dir / _checkpoint_update_filename(checkpoint_label), update_payload)
                 update_path = ticker_dir / "execution_update.json"
-                _write_json(update_path, update_payload)
+                _save_overlay_artifact_pair(update_path, checkpoint_dir / _checkpoint_update_filename(checkpoint_label),
+                                            update_payload, _write_json, share=immutable_single_checkpoint)
                 summary["artifacts"]["execution_update_json"] = _relative_to_run(run_dir, update_path)
                 analysis_payload = (prepared_analysis[ticker] if prepared_analysis is not None
                                     else _load_ticker_analysis_payload(run_dir=run_dir, ticker_summary=summary))
@@ -5969,9 +5993,8 @@ def _run_execution_overlay_passes(
                     _refresh_integrated_review(ticker_dir, summary, run_dir=run_dir,
                         db_paths=[config.performance.store_path or (config.storage.archive_dir / "performance.sqlite")])
                 summary["intraday_snapshot_attempt"] = attempt_payload
-                if not preserve_analysis_bytes:
-                    _append_analysis_intraday_attempt(run_dir=run_dir, ticker_summary=summary, attempt_payload=attempt_payload,
-                                                      analysis_payload=analysis_payload if parallel_archive else None)
+                if not (preserve_analysis_bytes or immutable_single_checkpoint):
+                    _append_analysis_intraday_attempt(run_dir=run_dir, ticker_summary=summary, attempt_payload=attempt_payload)
                 print(f"::warning::Execution overlay checkpoint '{checkpoint_label}' failed for {ticker}: {exc}")
             if archive_clock is not None:
                 archive_clock["artifacts_saved_at"] = datetime.now(timezone.utc).isoformat()
@@ -6018,6 +6041,24 @@ def _run_execution_overlay_passes(
             "chatgpt_execution_context_json": _relative_to_run(run_dir, context_path),
         }
     return updates_by_ticker
+
+
+def _save_overlay_artifact_pair(latest, checkpoint, payload, write, *, share):
+    if not share:
+        write(checkpoint, payload)
+        write(latest, payload)
+        return
+
+    # A single-checkpoint overlay has two immutable names for identical bytes.
+    # The canonical writer replaces atomically before the checkpoint can link.
+    write(latest, payload)
+    try:
+        checkpoint.parent.mkdir(parents=True, exist_ok=True)
+        os.link(latest, checkpoint)
+    except OSError:
+        # Archive copies and filesystems without link support use the same
+        # atomic writer. An existing checkpoint is never modified in place.
+        write(checkpoint, payload)
 
 
 def _fetch_overlay_market_snapshots(
@@ -6645,7 +6686,6 @@ def _append_analysis_intraday_attempt(
     run_dir: Path,
     ticker_summary: dict[str, Any],
     attempt_payload: dict[str, Any],
-    analysis_payload: dict[str, Any] | None = None,
 ) -> None:
     artifacts = ticker_summary.get("artifacts") or {}
     analysis_rel = artifacts.get("analysis_json")
@@ -6654,13 +6694,10 @@ def _append_analysis_intraday_attempt(
     analysis_path = run_dir / analysis_rel
     if not analysis_path.exists():
         return
-    if analysis_payload is None:
-        try:
-            payload = json.loads(analysis_path.read_text(encoding="utf-8"))
-        except Exception:
-            return
-    else:
-        payload = dict(analysis_payload)
+    try:
+        payload = json.loads(analysis_path.read_text(encoding="utf-8"))
+    except Exception:
+        return
     attempts = payload.get("intraday_snapshot_attempts")
     if not isinstance(attempts, list):
         attempts = []

@@ -379,6 +379,49 @@ def test_native_does_not_require_reporting_account_allocation_artifact(tmp_path)
     assert row["source_diagnostics"]["allocated_orders"] is None
 
 
+def test_interrupted_overlay_checkpoint_retry_is_invisible_until_one_complete_source(tmp_path):
+    from tradingagents.execution.paper_runtime import _latest_source
+    from tradingagents.scheduled import runner
+
+    h = Harness(tmp_path, "US")
+    older, _ = native_source(h, "20261019T100000_baseline")
+    retry, _ = native_source(h, "20261019T100001_retry")
+    manifest = json.loads((retry / "run.json").read_bytes())
+    (retry / "run.json").unlink()
+    required = ("decision_bundle_v2.json", "portfolio-private/portfolio_candidates.json")
+    update = retry / "tickers" / h.ticker / "execution_update.json"
+    alias = update.parent / "execution/checkpoints/current.json"
+    complete = json.loads(update.read_bytes())
+    incomplete = {**complete, "decision_now": "NONE"}
+    atomic_write_json(alias, incomplete)
+
+    def fail_destination(path, payload):
+        if path == alias:
+            raise OSError("interrupted checkpoint")
+        atomic_write_json(path, payload)
+
+    # The existing checkpoint forces the atomic-copy fallback after the latest
+    # name has been replaced. This run never acquired a terminal manifest.
+    with pytest.raises(OSError, match="interrupted checkpoint"):
+        runner._save_overlay_artifact_pair(update, alias, complete, fail_destination, share=True)
+    assert json.loads(update.read_bytes()) == complete
+    assert json.loads(alias.read_bytes()) == incomplete
+    assert _latest_source(h.archive, "us", h.now, required_artifacts=required) == older
+
+    runner._save_overlay_artifact_pair(update, alias, complete, atomic_write_json, share=True)
+    assert alias.read_bytes() == update.read_bytes()
+    assert _latest_source(h.archive, "us", h.now, required_artifacts=required) == older
+    atomic_write_json(retry / "run.json", manifest)
+    assert _latest_source(h.archive, "us", h.now, required_artifacts=required) == retry
+    first = h.tick()
+    assert first["source_run_id"] == retry.name
+    assert [order["quantity"] for order in first["orders"]] == [1]
+    h.now += timedelta(seconds=15)
+    second = h.tick()
+    assert second["source_run_id"] == retry.name
+    assert len(h.orders) == 1  # Replaying the finished source reuses the committed intent.
+
+
 @pytest.mark.parametrize("case", ["empty", "duplicate", "future_run", "undated_run"])
 def test_source_manifest_and_cardinality_are_verified(tmp_path, case):
     h = Harness(tmp_path, "US")

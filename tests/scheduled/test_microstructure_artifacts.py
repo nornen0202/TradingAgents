@@ -65,8 +65,11 @@ def test_lightweight_writes_ready_snapshot_before_other_provider_finishes(tmp_pa
             primary_setup=PrimarySetup.BREAKOUT_CONFIRMATION, portfolio_stance="BULLISH", entry_action_base="WAIT",
             setup_quality="COMPELLING", confidence=.8, action_if_triggered=ActionIfTriggered.STARTER)
         path.write_text(json.dumps(contract.to_dict()), encoding="utf-8")
+        analysis = path.parent / "analysis.json"
+        analysis.write_text(json.dumps({"ticker": ticker}), encoding="utf-8")
         summaries.append({"status": "success", "ticker": ticker,
-                          "artifacts": {"execution_contract_json": path.relative_to(run).as_posix()}})
+                          "artifacts": {"execution_contract_json": path.relative_to(run).as_posix(),
+                                        "analysis_json": analysis.relative_to(run).as_posix()}})
     original_write = runner._write_json
     first_saved = Event()
     slow_returned = Event()
@@ -118,9 +121,50 @@ def test_lightweight_writes_ready_snapshot_before_other_provider_finishes(tmp_pa
             processing = next(row["execution_archive_clock"] for row in summaries if row["ticker"] == ticker)
             assert processing["started_at"] <= processing["observations_loaded_at"]
             assert processing["observations_loaded_at"] <= processing["decision_calculated_at"] <= processing["artifacts_saved_at"]
+            directory = run / "tickers" / ticker
+            assert json.loads((directory / "analysis.json").read_bytes()) == {"ticker": ticker}
+            alias = directory / "execution/checkpoints" / runner._checkpoint_update_filename("10:00")
+            assert alias.read_bytes() == (directory / "execution_update.json").read_bytes()
         else:
             assert clocks is None
     assert not (run / "run.json").exists()  # Per-ticker archival is not source publication.
+    if lightweight:
+        (run / "run.json").write_text('{"status":"success"}', encoding="utf-8")
+        with pytest.raises(FileExistsError, match="cannot be rewritten"):
+            _run_execution_overlay_passes(config=config, run_dir=run, ticker_summaries=summaries, checkpoints=["10:00"])
+
+
+def test_same_checkpoint_artifacts_fall_back_to_atomic_copies(tmp_path, monkeypatch):
+    from tradingagents.scheduled import runner
+
+    latest = tmp_path / "latest.json"
+    checkpoint = tmp_path / "checkpoints/now.json"
+
+    def unsupported(*_):
+        raise OSError("link unavailable")
+
+    monkeypatch.setattr(runner.os, "link", unsupported)
+    runner._save_overlay_artifact_pair(latest, checkpoint, {"fresh": True}, runner._write_json, share=True)
+    assert latest.read_bytes() == checkpoint.read_bytes()
+    runner._write_json(latest, {"fresh": False})
+    assert json.loads(checkpoint.read_bytes()) == {"fresh": True}
+
+
+def test_lightweight_prior_reporting_run_is_complete_before_quote_window(tmp_path):
+    from tradingagents.scheduled.runner import _find_previous_comparable_manifest
+
+    older = "20261125T130000_previous"
+    newer = "20261125T131400_concurrent"
+    for run, finished in ((older, "13:05:00"), (newer, "13:22:00")):
+        folder = tmp_path / "runs/2026" / run
+        folder.mkdir(parents=True)
+        (folder / "run.json").write_text(json.dumps({"run_id": run, "settings": {"market": "US"},
+            "finished_at": f"2026-11-25T{finished}+00:00"}), encoding="utf-8")
+    current = {"run_id": "20261125T132000_current", "settings": {"market": "US"}}
+    result = _find_previous_comparable_manifest(archive_dir=tmp_path, current_manifest=current,
+                                                 available_at=datetime.fromisoformat("2026-11-25T13:20:00+00:00"))
+    assert result["run_id"] == older
+    assert _find_previous_comparable_manifest(archive_dir=tmp_path, current_manifest=current)["run_id"] == newer
 
 
 def test_portfolio_reads_same_current_overlay_values_without_opening_update_again(tmp_path, monkeypatch):
