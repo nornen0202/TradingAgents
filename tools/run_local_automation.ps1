@@ -1,5 +1,5 @@
 param(
-    [ValidateSet("run-due", "publish", "paper", "review", "validate-kis", "strategy-kis", "research-kis", "refresh-kis")][string] $Command,
+    [ValidateSet("run-due", "publish", "paper", "autotrader", "review", "validate-kis", "strategy-kis", "research-kis", "refresh-kis")][string] $Command,
     [string] $RepositoryRoot = "C:\Projects\TradingAgents",
     [string] $ArchiveRoot = "C:\TradingAgentsData\archive",
     [string] $RuntimeRoot = "",

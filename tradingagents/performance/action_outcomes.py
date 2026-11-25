@@ -459,7 +459,8 @@ def summarize_action_performance(db_path: Path, *, analysis_as_of: str | None = 
         conn.execute(f"""
                 CREATE TEMP VIEW action_outcomes AS
                 SELECT * FROM main.action_outcomes o
-                WHERE o.rowid = (
+                WHERE COALESCE(o.outcome_label, '') != 'invalidated_currency_mismatch'
+                  AND o.rowid = (
                     SELECT r.rowid FROM main.action_outcomes r
                     WHERE r.recommendation_id = o.recommendation_id
                       AND ((r.calculation_version = {VERIFIED_PRICE_CALCULATION_VERSION}
@@ -1051,6 +1052,15 @@ def _performance_data_quality(
     missing_market = int(row["missing_market_rows"] or 0) if row else 0
     if missing_market:
         warnings.append(f"recommendation_market_unclassified:{missing_market}")
+    invalidated_currency_rows = int(
+        conn.execute(
+            "SELECT COUNT(DISTINCT recommendation_id) FROM main.action_outcomes "
+            "WHERE COALESCE(outcome_label, '') = 'invalidated_currency_mismatch'"
+        ).fetchone()[0]
+        or 0
+    )
+    if invalidated_currency_rows:
+        warnings.append(f"invalidated_currency_mismatch_excluded:{invalidated_currency_rows}")
     return {
         "measurement_scope": "counterfactual_recommendation_price_path",
         "actual_trade_effectiveness_available": actual_feedback_available,
@@ -1062,6 +1072,7 @@ def _performance_data_quality(
         "advisory_rows": int(row["advisory_rows"] or 0) if row else 0,
         "market_rows": market_rows,
         "missing_market_rows": missing_market,
+        "invalidated_currency_mismatch_rows": invalidated_currency_rows,
         "matured_5d_rows": matured_5d,
         "matured_20d_rows": int(row["matured_20d_rows"] or 0) if row else 0,
         "matured_60d_rows": int(row["matured_60d_rows"] or 0) if row else 0,

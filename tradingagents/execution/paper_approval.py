@@ -224,3 +224,29 @@ class PaperApproval:
             return None
         admission = json.loads(row["payload"])
         return admission if admission["scope"] == scope else None
+
+
+def render_telegram_approval_card(proposal: dict, callbacks: dict[str, str]) -> dict:
+    """Format an isolated paper proposal with HMAC-signed inline keyboard buttons."""
+    text = (
+        f"🧾 모의매매 승인 요청 [{proposal['market']}]\n"
+        f"• 종목: {proposal['ticker']} ({proposal['side']})\n"
+        f"• 수량: {proposal['quantity']} (단위 {proposal['quantity_step']})\n"
+        f"• 지정가 한도: {proposal['limit']} {proposal['currency']}\n"
+        f"• 만료 시각: {proposal['expires_at']}"
+    )
+    return {
+        "text": text,
+        "reply_markup": {
+            "inline_keyboard": [
+                [
+                    {"text": "✅ 승인", "callback_data": callbacks["approve"]},
+                    {"text": "½ 축소 승인", "callback_data": callbacks["reduce"]},
+                ],
+                [
+                    {"text": "❌ 거절", "callback_data": callbacks["reject"]},
+                    {"text": "↩️ 승인 철회", "callback_data": callbacks["revoke"]},
+                ],
+            ]
+        },
+    }

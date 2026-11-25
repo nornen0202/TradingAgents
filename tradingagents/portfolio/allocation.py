@@ -94,7 +94,18 @@ def build_recommendation(
     wait_ratio = _ratio(batch_metrics.get("entry_action_distribution"), "WAIT")
     bullish_ratio = _ratio(batch_metrics.get("stance_distribution"), "BULLISH")
     if wait_ratio >= 0.7 and bullish_ratio >= 0.4:
-        investable_cash_now = int(investable_cash_now * 0.25)
+        has_overlay_confirmed_now = any(
+            not c.is_held
+            and str((c.data_health or {}).get("execution_decision_state") or "").upper() == "ACTIONABLE_NOW"
+            and (
+                str((c.data_health or {}).get("execution_decision_now") or "").upper() in {"STARTER_NOW", "ADD_NOW"}
+                or str((c.data_health or {}).get("execution_timing_state") or "").upper() == "PILOT_READY"
+                or c.trigger_profile.get("confirmed_entry_alternative") is True
+            )
+            for c in scored
+        )
+        cash_scale = 0.50 if has_overlay_confirmed_now else 0.25
+        investable_cash_now = int(investable_cash_now * cash_scale)
         trigger_budget_krw = max(
             trigger_budget_krw,
             int(base_cash_budget * 0.50),

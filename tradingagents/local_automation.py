@@ -737,6 +737,16 @@ def publish(archive, state, runtime_dir, *, rebuild=False, publication_locked=Fa
             refresh_report_history(archive, state, receipt)
         else:
             build_site(archive, site, config.site)
+            try:
+                from tradingagents.execution.autotrader_dashboard import publish_autotrader_dashboard
+                from tradingagents.execution.prism_autotrader import load_autotrader_policy
+                publish_autotrader_dashboard(
+                    archive,
+                    site_dir=site,
+                    policy=load_autotrader_policy(state / "autotrader"),
+                )
+            except Exception:
+                pass
         # Preserve exact Work hashes and existing reference-only lineage rules.
         verifier = script("verify_work_pages_handoff")
         for market in ("kr", "us"):
@@ -823,7 +833,7 @@ def complete_handoffs(site, runtime_dir, publication):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("command", choices=("run-due", "publish", "paper", "review", "validate-kis", "strategy-kis", "research-kis", "refresh-kis"))
+    parser.add_argument("command", choices=("run-due", "publish", "paper", "autotrader", "review", "validate-kis", "strategy-kis", "research-kis", "refresh-kis"))
     parser.add_argument("--archive-dir", type=Path)
     parser.add_argument("--state-dir", type=Path)
     parser.add_argument("--runtime-dir", type=Path)
@@ -949,6 +959,26 @@ def main():
         except TimeoutError:
             result = {"status": "PAPER_ALREADY_RUNNING", "broker_orders_sent": 0}
         print(json.dumps(result, ensure_ascii=True))
+        return 0
+    if args.command == "autotrader":
+        from tradingagents.execution.autotrader_dashboard import publish_autotrader_dashboard
+        from tradingagents.execution.prism_autotrader import load_autotrader_policy, run_autotrader_tick
+
+        policy = load_autotrader_policy(args.state_dir / "autotrader")
+        if args.dry_run:
+            print(json.dumps({
+                "status": "DRY_RUN",
+                "mode": policy.mode,
+                "enabled": policy.enabled,
+                "live_orders_confirmed": policy.live_orders_confirmed,
+            }))
+            return 0
+        try:
+            result = run_autotrader_tick(args.archive_dir, args.state_dir / "autotrader")
+            publish_autotrader_dashboard(args.archive_dir, site_dir=args.state_dir / "site", policy=policy)
+        except TimeoutError:
+            result = {"status": "AUTOTRADER_ALREADY_RUNNING", "mode": policy.mode}
+        print(json.dumps(result, ensure_ascii=False))
         return 0
     if args.command == "review":
         if args.dry_run:
