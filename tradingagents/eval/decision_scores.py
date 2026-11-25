@@ -19,8 +19,8 @@ _ZONES = {"KR": "Asia/Seoul", "US": "America/New_York"}
 TERMINAL_SCORES = {"SCORED", "NO_DIRECTION", "NO_NEW_EXPOSURE", "REVIEW"}
 
 
-def evaluation_sessions(market, day, count):
-    start = date.fromisoformat(day) + timedelta(days=1)
+def evaluation_sessions(market, day, count, *, published_at=None):
+    start = date.fromisoformat(day) + timedelta(days=0 if published_at else 1)
     end = start + timedelta(days=max(14, count * 4))
     name = default_calendar_name(market)
     calendar = get_exchange_calendar(name)
@@ -31,6 +31,7 @@ def evaluation_sessions(market, day, count):
          calendar.session_close(label).to_pydatetime())
         for label in calendar.sessions_in_range(start.isoformat(), end.isoformat())
         if not is_supplemental_market_holiday(market=market, session_date=label.date())
+        and (published_at is None or calendar.session_open(label).to_pydatetime() > published_at)
     ]
     if len(sessions) < count:
         raise ValueError("Insufficient verified exchange sessions")
@@ -39,8 +40,13 @@ def evaluation_sessions(market, day, count):
 
 def yahoo_bars(symbol, first, last):
     import yfinance as yf
+    from yfinance.exceptions import YFException
+
     end = (date.fromisoformat(last) + timedelta(days=1)).isoformat()
-    return yf.Ticker(symbol).history(start=first, end=end, auto_adjust=True, raise_errors=True)
+    try:
+        return yf.Ticker(symbol).history(start=first, end=end, auto_adjust=True, raise_errors=True)
+    except YFException as exc:
+        raise RuntimeError(type(exc).__name__) from None
 
 
 def daily_bar_available_at(market, last_session, exchange_close):
@@ -92,7 +98,7 @@ def _fork_benchmark(fork, benchmark, fee_bps, provider):
 
 
 def score_decision(*, ticker, market, decision_date, rating, benchmark, holding, fee_bps, as_of,
-                   provider=yahoo_bars, sessions=evaluation_sessions, previous=None):
+                   provider=yahoo_bars, sessions=evaluation_sessions, previous=None, exposure_allowed=True):
     if rating == "REVIEW" or rating not in EXPOSURE:
         return {"direction": {"status": "REVIEW"}, "new_exposure": {"status": "REVIEW"}}
     if as_of.tzinfo is None or as_of.utcoffset() is None:
@@ -107,7 +113,7 @@ def score_decision(*, ticker, market, decision_date, rating, benchmark, holding,
     direction = {"status": "PENDING", "entry_session": entry, "exit_session": original_exit,
                  "entry_at": entry_close.isoformat(), "exit_close_at": original_close.isoformat(),
                  "matures_at": original_available.isoformat()}
-    exposure = EXPOSURE[rating]
+    exposure = EXPOSURE[rating] if exposure_allowed else 0.0
     fork = {"status": "PENDING", "entry_session": entry, "exit_session": fork_exit,
             "entry_at": entry_open.isoformat(), "exit_close_at": fork_close.isoformat(),
             "matures_at": fork_available.isoformat(), "weight": exposure}
@@ -174,6 +180,15 @@ def aggregate(rows, key):
     scored = [row for row in rows if row[key]["status"] == "SCORED"]
     hits = sum(row[key]["hit"] for row in scored)
     miss_benchmark = Counter(row[key]["benchmark_status"] for row in scored if "benchmark_status" in row[key])
+    means = {}
+    denominators = {}
+    for field in ("alpha", "asset_return", "strategy_return", "transaction_cost",
+                  "benchmark_return", "excess_return"):
+        values = [row[key][field] for row in rows if field in row[key]]
+        if values:
+            means[field] = sum(values) / len(values)
+            denominators[field] = len(values)
     return {"target": len(rows), "hits": hits, "scored": len(scored),
             "hit_rate": hits / len(scored) if scored else None, "statuses": dict(statuses),
-            "benchmark_statuses_for_scored": dict(miss_benchmark)}
+            "benchmark_statuses_for_scored": dict(miss_benchmark), "means": means,
+            "mean_denominators": denominators}

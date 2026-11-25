@@ -64,6 +64,37 @@ def _paired_interval(diffs, block, samples, seed):
     return [means[int(.025 * (samples - 1))], means[int(.975 * (samples - 1))]]
 
 
+def compare_market_benchmarks(curves, initial_nav, start, end, *, uncertainty=False):
+    """Compare a fixed, zero-flow KRW ledger with aligned investable benchmarks."""
+    days = [row["day"] for row in curves["quant_only"] if start <= row["day"] <= end]
+    if not days or set(curves) != {"quant_only", "spy_hold", "kospi200_hold", "monthly_80_20"}:
+        raise ValueError("Four benchmark-aligned account series required.")
+    strategies, returns = {}, {}
+    for arm, curve in curves.items():
+        previous = next((row for row in reversed(curve) if row["day"] < start), None)
+        rows = [row for row in curve if start <= row["day"] <= end]
+        if days != [row["day"] for row in rows] or any(row["external_cashflow"] != 0 for row in rows):
+            raise ValueError("Portfolio comparison has mismatched sessions or cashflows.")
+        navs = [previous["nav"] if previous else initial_nav, *(row["nav"] for row in rows)]
+        values = [right / left - 1 for left, right in zip(navs, navs[1:])]
+        returns[arm] = values
+        metrics = _stats(values)
+        costs = {key: rows[-1][key] - (previous[key] if previous else 0)
+                 for key in ("commission", "slippage", "fx_cost", "sell_levy", "dividend_tax", "fill_count",
+                             "capital_gains_reserve")}
+        strategies[arm] = metrics | {"costs_krw": costs, "closing_nav_krw": navs[-1],
+                                     "mean_exposure": fmean(row["invested"] / row["nav"] for row in rows)}
+    pairs = {}
+    for name in curves.keys() - {"quant_only"}:
+        excess = [q - b for q, b in zip(returns["quant_only"], returns[name])]
+        q = strategies["quant_only"]["net_time_weighted_return"]
+        b = strategies[name]["net_time_weighted_return"]
+        pairs[name] = {"compound_net_excess": q - b, "mean_paired_daily_excess": fmean(excess),
+                       "paired_block_bootstrap_daily_95pct": (
+                           _paired_interval(excess, 20, 1000, 20261125) if uncertainty and len(excess) > 20 else None)}
+    return {"start": days[0], "end": days[-1], "sessions": len(days), "arms": strategies, "paired": pairs}
+
+
 def compare_replays(policy, series, *, analysis_as_of):
     """Aggregate cost and paired risk evidence from complete aligned replay outputs."""
     keys = {"plan_sha256", "frozen_at", "market", "start", "end", "initial_nav", "minimum_sessions",
