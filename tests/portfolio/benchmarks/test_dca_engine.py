@@ -66,6 +66,35 @@ def test_period_mismatch_suppresses_excess_return(etf_fixture_dir):
     assert kospi["excess_return_pct"] is None
     assert "etf_alternative_period_end_mismatch" in public["warnings"]
 
+
+def test_public_etf_requires_native_currency_and_fx_direction_for_usd(etf_fixture_dir):
+    from tradingagents.portfolio.performance.etf_alternatives import public_etf_comparison
+
+    payload = build_fixture_comparison(etf_fixture_dir).to_public_dict()
+    payload["instruments"].append({
+        "key": "FX_TEST_USD", "currency": "USD", "price_series_status": "ok",
+        "source_evidence": {"state": "available", "currency": "USD", "rows": 10},
+    })
+    payload["alternatives"].append({
+        "key": "FX_TEST", "weights": {"FX_TEST_USD": 1.0}, "status": "OK",
+        "balance_return_pct": 0.0, "excess_return_pct": 5.0, "equity_curve": [{"value": 100}],
+    })
+    payload["actual_vs_benchmark"]["FX_TEST"] = {"actual_excess_return_pct": 5.0, "winner": "actual"}
+    payload["fx_evidence"] = {"state": "available", "pair": "USD/KRW", "units": "USD per KRW", "rows": 10}
+    result = public_etf_comparison(payload)
+    spy = next(row for row in result["alternatives"] if row["key"] == "FX_TEST")
+    assert result["exact_dated_cashflows_available"] is True
+    assert spy["status"] == "price_or_fx_evidence_unverified" and spy["balance_return_pct"] is None
+    assert spy["equity_curve"] == []
+    assert "FX_TEST" not in result["actual_vs_benchmark"]
+    assert "KOSPI200_100" in result["actual_vs_benchmark"]
+
+    payload["fx_evidence"]["units"] = "KRW per USD"
+    result = public_etf_comparison(payload)
+    spy = next(row for row in result["alternatives"] if row["key"] == "FX_TEST")
+    assert spy["balance_return_pct"] == 0.0
+    assert "FX_TEST" in result["actual_vs_benchmark"]
+
 def test_internal_snapshot_does_not_turn_missing_ledger_into_exact_zero_cashflows(etf_fixture_dir):
     settings = default_settings(etf_fixture_dir, use_cashflows=False)
     broker_period = default_broker_summary(etf_fixture_dir)
@@ -80,6 +109,13 @@ def test_internal_snapshot_does_not_turn_missing_ledger_into_exact_zero_cashflow
     public = result.to_public_dict()
     assert public["status"] == "cashflow_evidence_unverified"
     assert public["exact_dated_cashflows_available"] is False
+    assert public["actual_return_pct"] is None
+    assert public["actual_pnl_krw"] is None
+    assert public["actual"]["balance_return_pct"] is None
+    assert public["actual"]["investment_pnl_krw"] is None
+    assert public["cashflows"]["deposit_amount_krw"] is None
+    assert "winner" not in public["actual_vs_benchmark"].get("KOSPI200_100", {})
+    assert result.to_raw_dict()["actual"]["balance_return_pct"] == 4.0
     assert public["actual"]["deposit_amount_krw"] is None
     kospi = next(item for item in public["alternatives"] if item["key"] == "KOSPI200_100")
     assert kospi["status"] == "research_only_unverified_cashflows"

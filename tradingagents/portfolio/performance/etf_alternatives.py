@@ -111,13 +111,8 @@ class EtfAlternativeComparisonSummary:
 
     def to_public_dict(self) -> dict[str, Any]:
         alternatives = [item.to_public_dict() for item in self.alternatives]
-        actual_return_pct = _float_or_none(self.actual.get("balance_return_pct"))
-        actual_pnl_krw = _int_or_none(self.actual.get("investment_pnl_krw"))
-        actual_final_value_krw = _int_or_none(self.actual.get("end_asset_krw"))
-        actual_vs_benchmark = _actual_vs_benchmark_payload(self.alternatives)
         best = _best_result(self.alternatives)
         blended = _result_by_key(self.alternatives, "BLENDED")
-        exact_available = self.status == "OK" and str(self.cashflows.get("status") or "").upper() == "OK"
         reason = _comparison_reason(self.status)
         message = _comparison_message(self.status)
         if self.cashflows.get("missing_reason") == "period_external_cashflow_totals_unverified":
@@ -126,18 +121,14 @@ class EtfAlternativeComparisonSummary:
         if self.cashflows.get("missing_reason") == "dated_external_capital_totals_do_not_reconcile":
             reason = "dated_external_capital_totals_do_not_reconcile"
             message = "Dated deposits or withdrawals do not reconcile to the broker's matching period totals."
-        return {
+        return public_etf_comparison({
             "status": self.status,
             "reason": reason,
             "message": message,
-            "exact_dated_cashflows_available": exact_available,
             "period_start": self.period_start,
             "period_end": self.period_end,
             "actual_source": self.actual_source,
             "period_match_status": self.actual.get("period_match_status"),
-            "actual_final_value_krw": actual_final_value_krw,
-            "actual_return_pct": actual_return_pct,
-            "actual_pnl_krw": actual_pnl_krw,
             "actual": self.actual,
             "cashflows": self.cashflows,
             "cashflow_markers": [
@@ -153,17 +144,150 @@ class EtfAlternativeComparisonSummary:
             "benchmarks": alternatives,
             "best_benchmark_id": best.key if best else None,
             "blended_benchmark_id": blended.key if blended else None,
-            "actual_vs_benchmark": actual_vs_benchmark,
             "policy": self.policy,
             "warnings": list(self.warnings),
-        }
+        })
 
     def to_raw_dict(self) -> dict[str, Any]:
         payload = self.to_public_dict()
+        payload["actual"] = dict(self.actual)
+        payload["actual_return_pct"] = _float_or_none(self.actual.get("balance_return_pct"))
+        payload["actual_pnl_krw"] = _int_or_none(self.actual.get("investment_pnl_krw"))
+        payload["actual_final_value_krw"] = _int_or_none(self.actual.get("end_asset_krw"))
+        payload["cashflows"] = dict(self.cashflows)
         payload["alternatives"] = [item.to_dict() for item in self.alternatives]
         payload["raw_cashflows"] = [item.to_dict(include_raw=True) for item in self.raw_cashflows]
         payload["price_diagnostics"] = self.price_diagnostics
         return payload
+
+
+_ACTUAL_ETF_AMOUNTS = (
+    "balance_return_pct", "investment_pnl_krw", "start_asset_krw", "end_asset_krw",
+    "deposit_amount_krw", "withdrawal_amount_krw",
+)
+_ACTUAL_ETF_METADATA = (
+    "source", "period_start", "period_end", "benchmark_period_start", "benchmark_period_end", "period_match_status",
+)
+_ETF_RESULT_VALUES = (
+    "balance_return_pct", "total_deposit_return_pct", "investment_pnl_krw",
+    "end_value_krw", "mdd_pct", "excess_return_pct", "excess_pnl_krw",
+)
+_ETF_PUBLIC_METADATA = (
+    "period_start", "period_end", "actual_source", "period_match_status", "cashflow_markers",
+    "instruments", "fx_evidence", "comparison_basis", "warnings",
+)
+
+
+def public_etf_comparison(value: Mapping[str, Any]) -> dict[str, Any]:
+    """Apply the current public ETF evidence contract to new and archived results."""
+    raw_actual = _etf_public_mapping(value.get("actual"))
+    actual = {field: raw_actual.get(field) for field in (*_ACTUAL_ETF_METADATA, *_ACTUAL_ETF_AMOUNTS)}
+    flows = _etf_public_mapping(value.get("cashflows"))
+    account_verified = (
+        actual.get("source") == "broker_reported"
+        and actual.get("period_match_status") == "MATCHED"
+        and all(value.get(field) and value[field] == actual[field] for field in ("period_start", "period_end"))
+        and str(flows.get("status") or "").upper() == "OK"
+        and all(_reconciled_etf_total(flows, field) for field in ("deposit_amount_krw", "withdrawal_amount_krw"))
+    )
+    if not account_verified:
+        actual.update(dict.fromkeys(_ACTUAL_ETF_AMOUNTS))
+        flows.update(dict.fromkeys(("deposit_amount_krw", "withdrawal_amount_krw",
+                                    "broker_deposit_amount_krw", "broker_withdrawal_amount_krw")))
+        if str(flows.get("status") or "").upper() == "OK":
+            flows.update(status="cashflow_evidence_unverified",
+                         missing_reason="period_external_cashflow_totals_unverified")
+
+    instruments = {item["key"]: item for item in _etf_public_rows(value.get("instruments"))
+                   if isinstance(item.get("key"), str)}
+    fx = _etf_public_mapping(value.get("fx_evidence"))
+    alternatives = []
+    for item in _etf_public_rows(value.get("alternatives") or value.get("benchmarks")):
+        row = {key: item[key] for key in ("key", "status", "label", "weights", "equity_curve", "warnings", *_ETF_RESULT_VALUES)
+               if key in item}
+        shows_result = str(row.get("status") or "").upper() in {"OK", "RESEARCH_ONLY_UNVERIFIED_CASHFLOWS"}
+        weights = _etf_public_mapping(row.get("weights"))
+        price_verified = bool(weights) and all(_public_etf_price_available(instruments.get(key, {}), fx) for key in weights)
+        if not shows_result or not price_verified:
+            row.update(dict.fromkeys(_ETF_RESULT_VALUES), equity_curve=[])
+            if shows_result:
+                row["status"] = "price_or_fx_evidence_unverified"
+        elif not account_verified:
+            row["status"] = "research_only_unverified_cashflows"
+        if not account_verified:
+            row.update(excess_return_pct=None, excess_pnl_krw=None)
+        alternatives.append(row)
+
+    comparisons = _etf_public_comparison_rows(alternatives) if account_verified else {}
+    comparable = set(comparisons)
+    status = value.get("status")
+    if str(status or "").upper() == "OK" and not account_verified:
+        status = "cashflow_evidence_unverified"
+    elif str(status or "").upper() == "OK" and not comparable:
+        status = "comparison_unavailable"
+    meaning_changed = status != value.get("status")
+    return dict(
+        {key: value[key] for key in _ETF_PUBLIC_METADATA if key in value},
+        status=status, actual=actual, cashflows=flows,
+        reason=_comparison_reason(status) if meaning_changed else value.get("reason"),
+        message=_comparison_message(status) if meaning_changed else value.get("message"),
+        actual_evidence_status="verified" if account_verified else "unverified",
+        actual_final_value_krw=_int_or_none(actual.get("end_asset_krw")),
+        actual_return_pct=_float_or_none(actual.get("balance_return_pct")),
+        actual_pnl_krw=_int_or_none(actual.get("investment_pnl_krw")),
+        exact_dated_cashflows_available=bool(account_verified and comparable),
+        alternatives=alternatives, benchmarks=alternatives,
+        actual_vs_benchmark=comparisons,
+        best_benchmark_id=value.get("best_benchmark_id") if value.get("best_benchmark_id") in comparable else None,
+        blended_benchmark_id=value.get("blended_benchmark_id") if value.get("blended_benchmark_id") in comparable else None,
+        policy=value.get("policy") if comparable else {"status": "INSUFFICIENT_DATA", "decisions": []},
+    )
+
+
+def _etf_public_mapping(value: Any) -> dict[str, Any]:
+    return dict(value) if isinstance(value, Mapping) else {}
+
+
+def _etf_public_rows(value: Any) -> list[Mapping[str, Any]]:
+    return [row for row in value if isinstance(row, Mapping)] if isinstance(value, list) else []
+
+
+def _etf_public_comparison_rows(alternatives: list[dict[str, Any]]) -> dict[str, Any]:
+    comparisons = {}
+    for row in alternatives:
+        key = row.get("key")
+        excess = _float_or_none(row.get("excess_return_pct"))
+        pnl = _int_or_none(row.get("excess_pnl_krw"))
+        if row.get("status") != "OK" or not isinstance(key, str) or (excess is None and pnl is None):
+            continue
+        comparisons[key] = {
+            "status": "OK",
+            "benchmark_final_value_krw": row.get("end_value_krw"),
+            "benchmark_return_pct": row.get("balance_return_pct"),
+            "actual_excess_return_pct": excess,
+            "actual_excess_pnl_krw": pnl,
+            "winner": None if excess is None else ("actual" if excess >= 0 else "benchmark"),
+        }
+    return comparisons
+
+
+def _reconciled_etf_total(flows: Mapping[str, Any], field: str) -> bool:
+    reported, normalized = flows.get(f"broker_{field}"), flows.get(field)
+    return (type(reported) is int and type(normalized) is int
+            and min(reported, normalized) >= 0 and abs(reported - normalized) <= 1)
+
+
+def _public_etf_price_available(instrument: Mapping[str, Any], fx: Mapping[str, Any]) -> bool:
+    evidence = _etf_public_mapping(instrument.get("source_evidence"))
+    currency = instrument.get("currency")
+    if (currency not in {"KRW", "USD"} or evidence.get("currency") != currency
+            or instrument.get("price_series_status") != "ok" or evidence.get("state") != "available"
+            or type(evidence.get("rows")) is not int or evidence["rows"] <= 0):
+        return False
+    return currency == "KRW" or (
+        fx.get("state") == "available" and fx.get("pair") == "USD/KRW" and fx.get("units") == "KRW per USD"
+        and type(fx.get("rows")) is int and fx["rows"] > 0
+    )
 
 
 def build_etf_alternative_comparison(
@@ -829,24 +953,6 @@ def _cashflow_id(flow: ExternalCapitalFlow) -> str:
     return f"{flow.date}:{flow.flow_type}:{flow.amount_krw}:{flow.source}"
 
 
-def _actual_vs_benchmark_payload(alternatives: list[EtfAlternativePortfolioResult]) -> dict[str, dict[str, Any]]:
-    payload: dict[str, dict[str, Any]] = {}
-    for item in alternatives:
-        if item.status != "OK":
-            payload[item.key] = {"status": item.status, "warnings": list(item.warnings)}
-            continue
-        excess = _float_or_none(item.excess_return_pct)
-        payload[item.key] = {
-            "status": item.status,
-            "benchmark_final_value_krw": item.end_value_krw,
-            "benchmark_return_pct": item.balance_return_pct,
-            "actual_excess_return_pct": item.excess_return_pct,
-            "actual_excess_pnl_krw": item.excess_pnl_krw,
-            "winner": "actual" if excess is not None and excess >= 0 else "benchmark",
-        }
-    return payload
-
-
 def _best_result(alternatives: list[EtfAlternativePortfolioResult]) -> EtfAlternativePortfolioResult | None:
     ok_items = [item for item in alternatives if item.status == "OK" and item.balance_return_pct is not None]
     if not ok_items:
@@ -1289,7 +1395,10 @@ def _load_price_series_for_instruments(
         rows, basis = _price_rows_from_payload(local, instrument, start_date=start_date, end_date=end_date)
         if rows:
             result[instrument.key] = rows
-            diagnostics[instrument.key] = {"provider": "local_json", "price_basis": basis, "rows": len(rows)}
+            diagnostics[instrument.key] = {
+                "state": "available", "provider": "local_json", "currency": instrument.currency,
+                "price_basis": basis, "rows": len(rows),
+            }
     missing = [item for item in instruments if item.key not in result and item.symbol]
     if provider == "yfinance":
         for item in missing:

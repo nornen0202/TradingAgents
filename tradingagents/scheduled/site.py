@@ -537,11 +537,16 @@ def _should_publish_portfolio_artifact(source: Path) -> bool:
 def _normalize_account_performance_payload(value: Any) -> Any:
     if not isinstance(value, dict):
         return value
+    normalized = dict(value)
+    comparison = normalized.get("etf_alternative_comparison")
+    if isinstance(comparison, dict) and comparison:
+        from tradingagents.portfolio.performance.etf_alternatives import public_etf_comparison
+
+        normalized["etf_alternative_comparison"] = public_etf_comparison(comparison)
     periods = value.get("periods")
     if not isinstance(periods, list):
-        return value
+        return normalized
 
-    normalized = dict(value)
     normalized_periods: list[Any] = [dict(period) if isinstance(period, dict) else period for period in periods]
     converted_warnings: list[str] = []
     all_period = _account_performance_all_period(normalized_periods)
@@ -2518,6 +2523,8 @@ def _etf_status_label(value: Any) -> str:
         return "입금일 원장 필요"
     if normalized in {"cashflow_evidence_unverified", "research_only_unverified_cashflows"}:
         return "입출금 미검증 · 연구용"
+    if normalized in {"price_or_fx_evidence_unverified", "fx_missing"}:
+        return "가격·환율 근거 미확인"
     if normalized == "no_alternatives":
         return "대체 포트폴리오 없음"
     return _friendly_etf_warning(status) if status else "-"

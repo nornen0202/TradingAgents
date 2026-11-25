@@ -1240,3 +1240,53 @@ def test_etf_research_preview_keeps_values_and_omits_same_cashflow_claim():
     })
     assert "ETF 연구 수익률" in html and "4.25%" in html and "입출금 미검증" in html
     assert "동일 입금일" not in html and "ETF 대체 최고 수익률" not in html
+
+
+def test_legacy_etf_unverified_numbers_are_not_published(tmp_path):
+    from tradingagents.portfolio.performance.engine import render_account_performance_markdown
+    from tradingagents.scheduled.site import _load_portfolio_summary
+
+    archive = tmp_path / "archive"
+    site = tmp_path / "site"
+    run_id = "20260507T090000_test"
+    run = archive / "runs" / "2026" / run_id
+    private = run / "portfolio-private"
+    private.mkdir(parents=True)
+    (run / "run.json").write_text(json.dumps({
+        "run_id": run_id, "label": "test", "status": "success",
+        "started_at": "2026-05-07T09:00:00+09:00", "finished_at": "2026-05-07T09:05:00+09:00",
+        "settings": {"market": "KR"}, "tickers": [], "portfolio": {"status": "success"},
+    }), encoding="utf-8")
+    (private / "status.json").write_text('{"status":"success"}', encoding="utf-8")
+    leaked = {
+        "status": "cashflow_evidence_unverified", "exact_dated_cashflows_available": False,
+        "actual_return_pct": 912.375, "actual_pnl_krw": 918237546,
+        "actual": {"balance_return_pct": 912.375, "investment_pnl_krw": 918237546},
+        "cashflows": {"status": "cashflow_evidence_unverified", "deposit_amount_krw": 0, "dated_flow_count": 0},
+        "instruments": [{
+            "key": "KOSPI200", "currency": "KRW", "price_series_status": "ok",
+            "source_evidence": {"state": "available", "currency": "KRW", "rows": 2},
+        }],
+        "alternatives": [{"key": "KOSPI200_100", "label": "KOSPI", "weights": {"KOSPI200": 1},
+                          "status": "research_only_unverified_cashflows", "balance_return_pct": 4.25,
+                          "excess_return_pct": 908.125}],
+        "actual_vs_benchmark": {"KOSPI200_100": {"actual_excess_return_pct": 908.125, "winner": "actual"}},
+    }
+    (private / "etf_dca_comparison.json").write_text(json.dumps(leaked), encoding="utf-8")
+    public_input = private / "account_performance_public.json"
+    public_input.write_text(json.dumps({"periods": [], "etf_alternative_comparison": leaked}), encoding="utf-8")
+    archived_bytes = public_input.read_bytes()
+
+    summary = _load_portfolio_summary(run)["account_performance"]
+    filtered = summary["etf_alternative_comparison"]
+    assert filtered["actual_return_pct"] is None and filtered["actual_pnl_krw"] is None
+    assert filtered["alternatives"][0]["balance_return_pct"] == 4.25
+    assert filtered["alternatives"][0]["excess_return_pct"] is None
+    markdown = render_account_performance_markdown(summary)
+    assert "4.25%" in markdown and "912.38%" not in markdown
+
+    build_site(archive, site, SiteSettings())
+    assert not (site / "downloads" / run_id / "portfolio" / "etf_dca_comparison.json").exists()
+    mobile = (site / "mobile" / "public.json").read_text(encoding="utf-8")
+    assert "912.375" not in mobile and "918237546" not in mobile
+    assert public_input.read_bytes() == archived_bytes
