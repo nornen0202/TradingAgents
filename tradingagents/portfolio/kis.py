@@ -24,6 +24,16 @@ DEMO_BASE_URL = "https://openapivts.koreainvestment.com:29443"
 _TRANSIENT_HTTP_STATUS_CODES = {429, 500, 502, 503, 504}
 _SECURITY_INFO_READ = ("/uapi/overseas-price/v1/quotations/search-info", "CTPF1702R")
 _SECURITY_INFO_MARKETS = {"NAS": "512", "NYS": "513", "AMS": "529"}
+_INDEX_MINUTES = {
+    "KR": ("/uapi/domestic-stock/v1/quotations/inquire-time-indexchartprice", "FHKUP03500200", {
+        "FID_COND_MRKT_DIV_CODE": "U", "FID_ETC_CLS_CODE": "1", "FID_INPUT_ISCD": "0001",
+        "FID_INPUT_HOUR_1": "60", "FID_PW_DATA_INCU_YN": "N",
+    }),
+    "US": ("/uapi/overseas-price/v1/quotations/inquire-time-indexchartprice", "FHKST03030200", {
+        "FID_COND_MRKT_DIV_CODE": "N", "FID_INPUT_ISCD": "SPX", "FID_HOUR_CLS_CODE": "0",
+        "FID_PW_DATA_INCU_YN": "N",
+    }),
+}
 
 
 def resolve_identity(broker_symbol: str, display_name: str | None = None) -> InstrumentIdentity:
@@ -54,7 +64,7 @@ _MARKET_READS = frozenset({
     ("/uapi/overseas-stock/v1/ranking/volume-power", "HHDFS76280000"),
     ("/uapi/overseas-stock/v1/ranking/trade-vol", "HHDFS76310010"),
     ("/uapi/overseas-stock/v1/quotations/countries-holiday", "CTOS5011R"),
-})
+}) | frozenset((path, tr) for path, tr, _ in _INDEX_MINUTES.values())
 _ACCOUNT_READS = {
     "real": frozenset({
         ("/uapi/domestic-stock/v1/trading/inquire-balance", "TTTC8434R"),
@@ -399,6 +409,14 @@ class KisClient:
                 "FID_INPUT_HOUR_1": input_hour,
             },
         )
+        return payload
+
+    def regular_index_minutes(self, market: str) -> dict[str, Any]:
+        """Read the fixed regular-session KOSPI or S&P 500 benchmark."""
+        if self.environment != "real" or market not in _INDEX_MINUTES:
+            raise PortfolioConfigurationError("KIS index charts require the production market data service.")
+        path, transaction, params = _INDEX_MINUTES[market]
+        payload, _headers = self.request_json(method="GET", path=path, tr_id=transaction, params=dict(params))
         return payload
 
     def domestic_asking_price(self, code: str, *, market_division: str = "J") -> dict[str, Any]:

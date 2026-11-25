@@ -31,7 +31,7 @@ from . import demo_strategy_plan
 from .kis_demo import DemoCredentials, DemoError, KisDemoClient, has_unresolved_demo_requests
 from .kis_paper import _fresh, _tick
 from .kis_strategy_limits import CAPS, configured_limits, make_strategy_broker, size_with_native_limits
-from .kis_strategy_v2 import authorize_v2_size, configured_v2, current_v2_order_receipt
+from .kis_strategy_v2 import REGULAR_BENCHMARK, authorize_v2_size, configured_v2, current_v2_benchmark, current_v2_order_receipt
 from .paper_runtime import _latest_source, _runtime_session
 from .strategy_evaluation import evaluate_strategy_orders
 
@@ -468,7 +468,7 @@ def _reconcile_existing(broker, *, market, now, regular, allow_cancel, clock):
 
 
 def advance(archive, root, validation_root, market, *, clock, tickers, broker_factory, quote_loader, account_loader, session_resolver, gate,
-            allocation_mode="ARCHIVED_PROPOSALS", authorize=None, limits=None, v2_settings=None, policy_revision=None):
+            allocation_mode="ARCHIVED_PROPOSALS", authorize=None, limits=None, v2_settings=None, policy_revision=None, benchmark_loader=None):
     now, path = at(clock()), root / f"{market.lower()}-strategy.sqlite"
     result = {"status": "WAITING_VALIDATION", "blockers": [], "gate_passed": False, "orders": [], "order_counts": {}, "performance": None}
     def finish(status, *blockers):
@@ -600,6 +600,7 @@ def advance(archive, root, validation_root, market, *, clock, tickers, broker_fa
         # cannot silently consume the same cash or holdings across symbols.
         if not pending and not issues:
             considered = 0
+            benchmark = None
             for candidate in signals:
                 if broker.db.execute("SELECT 1 FROM strategy_attempts WHERE id=?", (candidate["id"],)).fetchone():
                     continue
@@ -650,11 +651,18 @@ def advance(archive, root, validation_root, market, *, clock, tickers, broker_fa
                         continue
                 if v2_settings is not None:
                     try:
+                        uses_current_index = terms["side"] == "BUY" and v2_settings.get("benchmark_basis") == REGULAR_BENCHMARK
+                        if uses_current_index and benchmark is None:
+                            if benchmark_loader is None:
+                                raise ValueError("KIS_V2_BENCHMARK_UNVERIFIED")
+                            benchmark = benchmark_loader(market, clock=clock, session=session)
                         terms["quantity"], v2_evidence = authorize_v2_size(
                             root, market, v2_settings, candidate, terms, quote, account, current, at(clock()), order_receipt=order_receipt,
+                            benchmark=benchmark if uses_current_index else None,
                         )
-                    except (OSError, ValueError, TypeError, KeyError, AttributeError, ArithmeticError, sqlite3.Error):
-                        issues.append("KIS_V2_ADMISSION_UNVERIFIED")
+                    except (OSError, ValueError, TypeError, KeyError, AttributeError, ArithmeticError, sqlite3.Error) as exc:
+                        issues.append("KIS_V2_BENCHMARK_UNVERIFIED" if str(exc) == "KIS_V2_BENCHMARK_UNVERIFIED"
+                                      else "KIS_V2_ADMISSION_UNVERIFIED")
                         continue
                 if (root / "HALT").exists() or (validation_root / "HALT").exists():
                     issues.append("HALTED")
@@ -725,7 +733,7 @@ def advance(archive, root, validation_root, market, *, clock, tickers, broker_fa
 
 
 def tick(archive, root, validation_root, *, clock=None, broker_factory=None, quote_loader=None, account_loader=None,
-         session_resolver=None, gate=None, tickers=None, authorize=None, evidence_scope=None):
+         session_resolver=None, gate=None, tickers=None, authorize=None, evidence_scope=None, benchmark_loader=None):
     archive, root, validation_root = Path(archive), Path(root), Path(validation_root)
     if evidence_scope is not None and (evidence_scope != FIXTURE_SCOPE or not all(
             callable(port) for port in (clock, broker_factory, quote_loader, gate, authorize, session_resolver))):
@@ -762,7 +770,8 @@ def tick(archive, root, validation_root, *, clock=None, broker_factory=None, quo
                     quote_loader=quote_loader or current_quote,
                     account_loader=account_loader or validation.current_account, session_resolver=session_resolver or _runtime_session,
                     gate=gate or validation_gate, allocation_mode=allocation_mode, authorize=authorize,
-                    limits=market_limits.get(market), v2_settings=v2_settings.get(market), policy_revision=policy_revision)
+                    limits=market_limits.get(market), v2_settings=v2_settings.get(market), policy_revision=policy_revision,
+                    benchmark_loader=(benchmark_loader or current_v2_benchmark) if evidence_scope is None else benchmark_loader)
             except Exception:
                 markets[market] = {"status": "BLOCKED", "checked_at": at(clock()).isoformat(), "gate_passed": False, "blockers": ["RUNTIME_EVIDENCE_UNVERIFIED"]}
         finished = at(clock())

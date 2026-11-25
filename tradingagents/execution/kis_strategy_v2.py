@@ -1,17 +1,20 @@
 """Connect optional V2 sizing to the guarded native KIS strategy."""
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from decimal import Decimal
 import hashlib
 import json
 import re
 from zoneinfo import ZoneInfo
 
+from tradingagents.portfolio.kis import KisApiError, KisClient
 from .demo_validation import MARKETS
 from .experiments import _stamp
 from .paper_policy_v2 import bind_v2_journal, size_v2_candidate
 
 EVIDENCE_SCHEMA = "tradingagents.kis-v2-evidence/v1"
+REGULAR_BENCHMARK_EVIDENCE_SCHEMA = "tradingagents.kis-v2-evidence/v2"
+REGULAR_BENCHMARK = "KIS_REGULAR_MINUTE"
 SETTLEMENT_SCHEMA = "tradingagents.kis-v2-reviewed-settlement/v1"
 _MARKETS = {"KR": ("KRW", "krw"), "US": ("USD", "usd")}
 _BENCHMARKS = {"KR": ("0001", "KIS_KR_INDEX"), "US": ("SPX", "KIS_US_INDEX")}
@@ -22,7 +25,8 @@ def configured_v2(config):
     if not isinstance(rows, dict) or set(rows) - set(_MARKETS):
         raise ValueError("KIS V2 settings must specify an explicit market")
     for market, row in rows.items():
-        if (not isinstance(row, dict) or set(row) != {"policy", "watchlist"}
+        if (not isinstance(row, dict) or set(row) not in ({"policy", "watchlist"}, {"policy", "watchlist", "benchmark_basis"})
+                or ("benchmark_basis" in row and row["benchmark_basis"] != REGULAR_BENCHMARK)
                 or not isinstance(row["policy"], dict) or row["policy"].get("broker") != "kis_vts"
                 or row["policy"].get("market") != market or row["policy"].get("currency") != _MARKETS[market][0]):
             raise ValueError("KIS V2 settings require one matching native policy and watchlist")
@@ -40,38 +44,89 @@ def _reviewed_document(path, reference=None):
     return json.loads(raw.decode("utf-8-sig")), digest
 
 
-def _buy_observation(root, market, currency, scope, ticker, now, seconds, account_cash):
+def current_v2_benchmark(market, *, clock, session):
+    """Use a completed index minute from the same regular exchange session."""
+    opened, closed = (_stamp(session.get(key)) for key in ("session_open", "session_close"))
+    started = _stamp(clock())
+    if (session.get("source") != "exchange_calendars" or session.get("phase") != "regular"
+            or session.get("is_open") is not True or not opened <= started < closed):
+        raise ValueError("KIS_V2_BENCHMARK_UNVERIFIED")
+    client = KisClient.from_api_keys(environment="real")
+    try:
+        payload = client.regular_index_minutes(market)
+        observed = _stamp(clock())
+    except KisApiError:
+        raise ValueError("KIS_V2_BENCHMARK_UNVERIFIED") from None
+    finally:
+        client.session.close()
+    symbol, source = _BENCHMARKS[market]
+    identity, price = ("bstp_cls_code", "bstp_nmix_prpr") if market == "KR" else ("stck_shrn_iscd", "optn_prpr")
+    header, rows = payload.get("output1"), payload.get("output2")
+    if (str(payload.get("rt_cd")) != "0" or not started <= observed < closed
+            or not isinstance(header, dict) or header.get(identity) != symbol or not isinstance(rows, list)):
+        raise ValueError("KIS_V2_BENCHMARK_UNVERIFIED")
+    zone = ZoneInfo(MARKETS[market]["zone"])
+    recent = {}
+    for row in rows:
+        if not isinstance(row, dict) or row.get("stck_bsop_date") != opened.astimezone(zone).strftime("%Y%m%d"):
+            continue
+        wire = row["stck_bsop_date"] + str(row.get("stck_cntg_hour", ""))
+        if not re.fullmatch(r"[0-9]{14}", wire):
+            raise ValueError("KIS_V2_BENCHMARK_UNVERIFIED")
+        event = datetime.strptime(wire, "%Y%m%d%H%M%S").replace(tzinfo=zone)
+        age = observed - event
+        if event < opened or not timedelta(minutes=1) <= age < timedelta(seconds=120):
+            continue
+        level = Decimal(str(row.get(price)))
+        if not level.is_finite() or level <= 0 or (event in recent and recent[event] != level):
+            raise ValueError("KIS_V2_BENCHMARK_UNVERIFIED")
+        recent[event] = level
+    if not recent:
+        raise ValueError("KIS_V2_BENCHMARK_UNVERIFIED")
+    event = max(recent)
+    return {"market": market, "symbol": symbol, "source": source, "unit": "index_points",
+            "level": str(recent[event]), "event_at": event.isoformat(), "observed_at": observed.isoformat()}
+
+
+def _buy_observation(root, market, currency, scope, ticker, now, seconds, account_cash, *, benchmark=None):
     prefix = market.lower() + "-v2-"
     evidence, evidence_digest = _reviewed_document(root / (prefix + "evidence.json"))
-    if (evidence.get("schema") != EVIDENCE_SCHEMA or evidence.get("market") != market
+    schema = REGULAR_BENCHMARK_EVIDENCE_SCHEMA if benchmark is not None else EVIDENCE_SCHEMA
+    if (evidence.get("schema") != schema or evidence.get("market") != market
             or evidence.get("currency") != currency or evidence.get("account_scope") != scope
             or evidence.get("cash_basis") != "REVIEWED_SETTLED_CASH"
             or evidence.get("orders_reconciled") is not True or evidence.get("portfolio_complete") is not True):
         raise ValueError("KIS V2 requires complete scoped cash, order and portfolio evidence")
-    market_index = evidence["benchmark"]
     settlement_reference = evidence.get("settlement_source_sha256")
-    benchmark_reference = evidence.get("benchmark_source_sha256")
+    market_index = evidence["benchmark"] if benchmark is None else benchmark
     if (market_index["market"] != market or (market_index["symbol"], market_index["source"]) != _BENCHMARKS[market]
-            or market_index["unit"] != "index_points" or any(
-                not isinstance(reference, str) or re.fullmatch(r"[0-9a-f]{64}", reference) is None
-                for reference in (settlement_reference, benchmark_reference))):
+            or market_index["unit"] != "index_points" or not isinstance(settlement_reference, str)
+            or re.fullmatch(r"[0-9a-f]{64}", settlement_reference) is None):
         raise ValueError("KIS V2 lacks a benchmark identity or settlement source digest")
     settlement, _ = _reviewed_document(root / (prefix + "settlement.json"), settlement_reference)
-    benchmark, _ = _reviewed_document(root / (prefix + "benchmark.json"), benchmark_reference)
     expected_settlement = {"schema": SETTLEMENT_SCHEMA, "account_scope": scope, "market": market, "currency": currency,
                            "observed_at": evidence["settlement_observed_at"], "settled_cash": evidence["settled_cash"]}
-    if settlement != expected_settlement or benchmark != market_index:
+    if settlement != expected_settlement:
         raise ValueError("KIS V2 review does not match its settlement and benchmark sources")
+    if benchmark is None:
+        benchmark_reference = evidence.get("benchmark_source_sha256")
+        if not isinstance(benchmark_reference, str) or re.fullmatch(r"[0-9a-f]{64}", benchmark_reference) is None:
+            raise ValueError("KIS V2 lacks a benchmark source digest")
+        reviewed_benchmark, _ = _reviewed_document(root / (prefix + "benchmark.json"), benchmark_reference)
+        if reviewed_benchmark != market_index:
+            raise ValueError("KIS V2 review does not match its settlement and benchmark sources")
     level = Decimal(str(market_index["level"]))
     if not level.is_finite() or level <= 0:
         raise ValueError("KIS V2 benchmark level is unverified")
     acquired = _stamp(evidence["observed_at"])
     benchmark_event = _stamp(market_index["event_at"])
     benchmark_at = _stamp(market_index["observed_at"])
-    if benchmark_event > benchmark_at:
-        raise ValueError("KIS benchmark clock cannot precede the index event")
-    for observed in (benchmark_event, benchmark_at, _stamp(evidence["settlement_observed_at"]),
-                     _stamp(evidence["portfolio_observed_at"])):
+    if (not benchmark_event <= benchmark_at <= now or (now - benchmark_event).total_seconds() > seconds
+            or (benchmark is None and benchmark_at > acquired)
+            or (benchmark is not None and benchmark_at - benchmark_event < timedelta(minutes=1))):
+        raise ValueError("KIS V2 reviewed benchmark clock is unverified" if benchmark is None
+                         else "KIS_V2_BENCHMARK_UNVERIFIED")
+    for observed in (_stamp(evidence["settlement_observed_at"]), _stamp(evidence["portfolio_observed_at"])):
         if not observed <= acquired <= now or not 0 <= (now - observed).total_seconds() <= seconds:
             raise ValueError("KIS V2 observation expired or unavailable")
     cash = Decimal(str(evidence["settled_cash"]))
@@ -112,33 +167,38 @@ def current_v2_order_receipt(market, client, *, clock):
             "open_order_count": sum(int(row[remainder]) != 0 for row in rows)}
 
 
-def authorize_v2_size(root, market, settings, candidate, terms, quote, account, state, now, *, order_receipt):
+def authorize_v2_size(root, market, settings, candidate, terms, quote, account, state, now, *, order_receipt, benchmark=None):
     """Apply V2 after native sizing, then leave the final authority with the broker."""
     if settings is None:
         return terms["quantity"], {}
     policy, watchlist = settings["policy"], settings["watchlist"]
     scope = account["account_scope"]
     currency, suffix = _MARKETS[market]
-    if policy["scope"] != scope or account.get("environment") != "demo" or account.get("complete") is not True:
+    if (policy["scope"] != scope or account.get("environment") != "demo" or account.get("complete") is not True
+            or (account.get("market"), account.get("currency")) != (market, currency)
+            or quote.get("currency") != currency):
         raise ValueError("KIS V2 account scope is unverified")
+    account_at, account_ingested = (_stamp(account.get(key)) for key in ("observed_at", "ingested_at"))
     observed, ingested = (_stamp(order_receipt.get(key)) for key in ("observed_at", "ingested_at"))
     if (order_receipt.get("source") != "KIS_DEMO_ORDER_INQUIRY" or order_receipt.get("mode") != "demo"
             or order_receipt.get("market") != market or order_receipt.get("currency") != currency
             or order_receipt.get("account_scope") != scope or order_receipt.get("session_date")
             != now.astimezone(ZoneInfo(MARKETS[market]["zone"])).date().isoformat()
             or type(order_receipt.get("open_order_count")) is not int or order_receipt["open_order_count"] != 0
-            or not _stamp(account["observed_at"]) <= observed <= ingested <= now
-            or (now - observed).total_seconds() >= policy["max_quote_age_seconds"]):
+            or not account_at <= account_ingested <= observed <= ingested <= now
+            or (now - account_at).total_seconds() >= policy["max_quote_age_seconds"]):
         raise ValueError("KIS_V2_ACCOUNT_ORDER_STATE_UNVERIFIED")
     bind_v2_journal(root, policy, watchlist, as_of=now.isoformat())
     ticker = candidate["ticker"]
     side, cash, target, evidence_hash = terms["side"], "0", 0, None
     if side == "BUY":
+        if (settings.get("benchmark_basis") == REGULAR_BENCHMARK) != (benchmark is not None):
+            raise ValueError("KIS_V2_BENCHMARK_UNVERIFIED")
         evaluation = state["evaluation"]
         if evaluation["sample"]["sell_filled_orders"] and not evaluation["settlement_known"]:
             raise ValueError("Prior KIS strategy sales require settlement proof")
         cash, target, evidence_hash = _buy_observation(root, market, currency, scope, ticker, now,
-            policy["max_quote_age_seconds"], account[f"cash_{suffix}"])
+            policy["max_quote_age_seconds"], account[f"cash_{suffix}"], benchmark=benchmark)
     position = next((row for row in account["positions"] if row["ticker"] == terms["ticker"]), {})
     context = {"market": market, "currency": currency, "scope": scope}
     capacity = {**context, "mode": "isolated_paper", "reconciled": True,
@@ -159,6 +219,9 @@ def authorize_v2_size(root, market, settings, candidate, terms, quote, account, 
     if sized["status"] != "PAPER_CANDIDATE" or sized.get("side") != side:
         raise ValueError(sized["status"])
     amount = int(sized["quantity"])
-    return amount, {key: sized[key] for key in ("policy_sha256", "watchlist_sha256", "policy_version", "watchlist_version")} | {
+    evidence = {key: sized[key] for key in ("policy_sha256", "watchlist_sha256", "policy_version", "watchlist_version")} | {
         "reviewed_evidence_sha256": evidence_hash, "order_inquiry_observed_at": observed.isoformat(),
     }
+    if benchmark is not None:
+        evidence["benchmark"] = benchmark
+    return amount, evidence
