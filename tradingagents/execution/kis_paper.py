@@ -22,7 +22,7 @@ from tradingagents.dataflows.market_policy import aware_datetime, observation_st
 from tradingagents.performance.lifecycle import append_lifecycle_event, initialize_lifecycle
 from tradingagents.scheduled.market_calendar import market_session_state
 from .kis_demo import DEMO_HOST, DemoError, DemoOrderJournal, KisDemoClient, has_unresolved_demo_requests
-from .kis_strategy_limits import bind_broker_policy, broker_policy_fields, validate_buy_nav, within_buy_nav
+from .kis_strategy_limits import bind_broker_policy, broker_policy_fields, daily_buy_commitment, validate_buy_nav, within_buy_nav, within_daily_buy_limit
 from .paper import kis_demo_order_preview
 
 
@@ -164,6 +164,7 @@ def read_paper_account(client: KisDemoClient, *, ticker: str, limit_price: int, 
 
 
 class KisPaperBroker:
+    day_universe = None
     """Explicit opt-in paper bridge, serialized across local cooperating runners.
 
     ``clock`` is a test seam. Production callers leave it unset; order submission
@@ -211,7 +212,10 @@ class KisPaperBroker:
             raise DemoError("Paper trading requires explicit VTS opt-in")
         session = self._session(now)
         ticker, side, quantity, price = (terms[k] for k in ("ticker", "side", "quantity", "limit_price"))
-        if ticker not in self.policy.allowed_tickers:
+        if self.day_universe is not None:
+            if not self.day_universe.permits(ticker, side, now, self.client.credentials.scope()):
+                raise DemoError("Ticker is outside the verified daily VTS universe")
+        elif ticker not in self.policy.allowed_tickers:
             raise DemoError("Ticker is outside paper allowlist")
         if not all(isinstance(item, Mapping) for item in (signal, quote, account)):
             raise DemoError("Explicit signal, quote and account evidence required")
@@ -261,7 +265,7 @@ class KisPaperBroker:
             if _clock(row["created_at"]).astimezone(KST).date() == now.astimezone(KST).date():
                 count += 1
                 if original["side"] == "BUY":
-                    bought += original["quantity"] * original["limit_price"]
+                    bought += daily_buy_commitment(original, row, self.policy_revision)
             remainder = row["remaining"] if row["remaining"] is not None else original["quantity"]
             if row["order_status"] in {"FILLED", "CANCELLED"}:
                 remainder = 0
@@ -276,7 +280,8 @@ class KisPaperBroker:
         if side == "BUY":
             if not within_buy_nav(notional, quantity, nav, self.policy):
                 raise DemoError("Paper buy exceeds the configured NAV limit")
-            if bought + notional > self.policy.max_daily_buy_krw:
+            if not within_daily_buy_limit(bought, notional, cap=self.policy.max_daily_buy_krw,
+                    reserve_bps=self.policy.reserve_cost_bps, revision=self.policy_revision):
                 raise DemoError("Daily paper buy limit exceeded")
             if account.get("capacity_ticker") != ticker or account.get("capacity_limit_price") != price:
                 raise DemoError("Cash-only capacity must match ticker and limit")

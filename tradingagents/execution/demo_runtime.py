@@ -30,7 +30,7 @@ from .source_handoff import await_completed_source
 from . import demo_strategy_plan
 from .kis_demo import DemoCredentials, DemoError, KisDemoClient, has_unresolved_demo_requests
 from .kis_paper import _fresh, _tick
-from .kis_strategy_limits import CAPS, configured_limits, make_strategy_broker, size_with_native_limits
+from .kis_strategy_limits import APPROVED_CAPS, CAPS, DAILY_LIMIT_REVISION, configured_limits, make_strategy_broker, size_with_native_limits
 from .kis_strategy_v2 import REGULAR_BENCHMARK, authorize_v2_size, configured_v2, current_v2_benchmark, current_v2_order_receipt
 from .paper_runtime import _latest_source, _runtime_session
 from .strategy_evaluation import evaluate_strategy_orders
@@ -88,7 +88,7 @@ def broker_context(market, path, clock, tickers, scope, *, limits=None, policy_r
             client.close()
 
 
-def current_quote(market, ticker, clock):
+def current_quote(market, ticker, clock, *, require_top_of_book=False):
     """Dated native-currency observations; a venue is resolved by its endpoint."""
     from tradingagents.portfolio.kis import KisClient
     client = KisClient.from_api_keys(environment="real")  # This class exposes reads only.
@@ -97,7 +97,8 @@ def current_quote(market, ticker, clock):
     try:
         if market == "KR":
             chart = client.domestic_time_itemchartprice(code, input_hour=clock().astimezone(ZoneInfo(ZONES[market])).strftime("%H%M%S"), include_past_data="N")
-            return validation.normalize_validation_quote(market=market, chart=chart, orderbook=None, observed_at=clock(), instrument=config)
+            book = client.domestic_asking_price(code) if require_top_of_book else None
+            return validation.normalize_validation_quote(market=market, chart=chart, orderbook=book, observed_at=clock(), instrument=config)
         for venue, exchange in (("NAS", "NASD"), ("NYS", "NYSE"), ("AMS", "AMEX")):
             payload = client.overseas_time_itemchartprice(code, exchange=venue, nmin="1", include_previous="0")
             chart = payload[0] if isinstance(payload, tuple) else payload
@@ -153,6 +154,20 @@ def limit_price(quote, side, market):
     tick = Decimal(str(_tick(int(price), quote["instrument_type"]))) if market == "KR" else Decimal(".01")
     value = (Decimal(str(price)) / tick).to_integral_value(rounding=ROUND_UP if side == "BUY" else ROUND_DOWN) * tick
     return int(value) if market == "KR" else float(value)
+
+
+def require_dated_top_of_book(quote, session, now):
+    try:
+        opened, observed, received, book = (at(value) for value in (
+            session["session_open"], quote["observed_at"], quote["ingested_at"], quote["orderbook_at"]))
+        bid, ask = validation._number(quote["bid"]), validation._number(quote["ask"])
+        if (quote.get("quote_basis") == "DATED_BOOK" and quote.get("orderbook_date_basis") == "EXPLICIT"
+                and opened <= observed <= book <= received <= now < observed + timedelta(seconds=120)
+                and bid <= ask and (ask - bid) / ((ask + bid) / 2) <= .01):
+            return
+    except (ValueError, TypeError, KeyError, AttributeError):
+        pass
+    raise ValueError("KIS_TOP_OF_BOOK_UNVERIFIED")
 
 
 def quantity(candidate, price, account, market, owned, now, *, limits=None):
@@ -487,9 +502,24 @@ def _reconcile_existing(broker, *, market, now, regular, allow_cancel, clock, ca
     return issues
 
 
+def _plan_native(archive, source, market, now, tickers, owned, session, scope, broker, native_active_universe):
+    if source is None:
+        return [], {}
+    if native_active_universe:
+        from .kis_strategy_universe import select
+        broker.day_universe, tickers = select(archive, source, market, session, now, scope, owned)
+    signals, diagnostics = demo_strategy_plan.plan(source, market, now, tickers, owned)
+    if native_active_universe:
+        diagnostics["daily_universe"] = {"entry_names": len(broker.day_universe.buys),
+                                         "sell_only_strategy_holdings": len(broker.day_universe.owned),
+                                         "session_date": broker.day_universe.session_date.isoformat(),
+                                         "source_verified": broker.day_universe.source_digest is not None}
+    return signals, diagnostics
+
+
 def advance(archive, root, validation_root, market, *, clock, tickers, broker_factory, quote_loader, account_loader, session_resolver, gate,
             allocation_mode="ARCHIVED_PROPOSALS", authorize=None, limits=None, v2_settings=None, policy_revision=None, benchmark_loader=None,
-            prism_candidate_gate=False):
+            prism_candidate_gate=False, native_active_universe=False):
     now, path = at(clock()), root / f"{market.lower()}-strategy.sqlite"
     result = {"status": "WAITING_VALIDATION", "blockers": [], "gate_passed": False, "orders": [], "order_counts": {}, "performance": None}
     def finish(status, *blockers):
@@ -574,7 +604,8 @@ def advance(archive, root, validation_root, market, *, clock, tickers, broker_fa
             result["source_diagnostics"] = diagnose_source(source, at(clock()),
                 include_proposals=allocation_mode != demo_strategy_plan.MODE)
             if allocation_mode == demo_strategy_plan.MODE and source:
-                signals, plan_diagnostics = demo_strategy_plan.plan(source, market, at(clock()), tickers, current["owned"])
+                signals, plan_diagnostics = _plan_native(archive, source, market, at(clock()), tickers, current["owned"],
+                                                        session, scope, broker, native_active_universe)
                 result["allocation_diagnostics"] = plan_diagnostics
             else:
                 signals = candidates(source, market, at(clock()), tickers) if source else []
@@ -599,7 +630,8 @@ def advance(archive, root, validation_root, market, *, clock, tickers, broker_fa
                     result["source_diagnostics"] = diagnose_source(source, at(clock()),
                         include_proposals=allocation_mode != demo_strategy_plan.MODE)
                     if allocation_mode == demo_strategy_plan.MODE:
-                        signals, plan_diagnostics = demo_strategy_plan.plan(source, market, at(clock()), tickers, current["owned"])
+                        signals, plan_diagnostics = _plan_native(archive, source, market, at(clock()), tickers, current["owned"],
+                                                                session, scope, broker, native_active_universe)
                         result["allocation_diagnostics"] = plan_diagnostics
                     else:
                         signals = candidates(source, market, at(clock()), tickers)
@@ -644,9 +676,14 @@ def advance(archive, root, validation_root, market, *, clock, tickers, broker_fa
                     break
                 checks["candidates_checked"] += 1
                 v2_evidence = {}
+                refreshed_entry_deadline = None
                 try:
                     quote = quote_loader(market, candidate["ticker"], clock)
                     _fresh(quote, now=at(clock()), seconds=120)
+                    if prism_candidate_gate or native_active_universe:
+                        require_dated_top_of_book(quote, session, at(clock()))
+                        if candidate["side"] == "BUY":
+                            refreshed_entry_deadline = demo_strategy_plan.recheck_entry(source, candidate, market, quote, at(clock()))
                     price = limit_price(quote, candidate["side"], market)
                     checks["priced"] += 1
                     terms = {"ticker": candidate["signal"]["ticker"], "side": candidate["side"], "limit_price": price}
@@ -664,7 +701,9 @@ def advance(archive, root, validation_root, market, *, clock, tickers, broker_fa
                 except Exception as exc:
                     reason = str(exc)
                     issues.append(reason if reason in {"NO_STRATEGY_QUANTITY_WITHIN_LIMITS", "BUDGET_FX_UNVERIFIED",
-                        "PROPOSAL_QUANTITY_INVALID", "KIS_ACCOUNT_MARKET_OR_CURRENCY_UNVERIFIED"} else "CANDIDATE_EVIDENCE_UNVERIFIED")
+                        "PROPOSAL_QUANTITY_INVALID", "KIS_ACCOUNT_MARKET_OR_CURRENCY_UNVERIFIED",
+                        "KIS_TOP_OF_BOOK_UNVERIFIED", "ENTRY_CURRENT_INVALIDATION", "ENTRY_CURRENT_PRICE_NOT_CONFIRMED",
+                        "ENTRY_CURRENT_CONDITIONS_NOT_CONFIRMED", "STRATEGY_LINEAGE_MISMATCH"} else "CANDIDATE_EVIDENCE_UNVERIFIED")
                     continue
                 if policy_revision is not None or v2_settings is not None:
                     try:
@@ -695,6 +734,8 @@ def advance(archive, root, validation_root, market, *, clock, tickers, broker_fa
                     issues.append("HALTED")
                     break
                 entry_deadline = min(at(candidate["signal"]["valid_until"]), at(session["session_close"]) - timedelta(minutes=10))
+                if refreshed_entry_deadline is not None:
+                    entry_deadline = min(entry_deadline, refreshed_entry_deadline)
                 if at(clock()) >= at(session["session_close"]) - timedelta(minutes=10):
                     issues.append("SESSION_EDGE")
                     break
@@ -703,8 +744,18 @@ def advance(archive, root, validation_root, market, *, clock, tickers, broker_fa
                     continue
                 signal = {**candidate["signal"], "valid_until": entry_deadline.isoformat()}
                 source_evidence = candidate.get("evidence")
+                if prism_candidate_gate or native_active_universe:
+                    source_evidence = {**(source_evidence or {}), "admission_quote": {
+                        key: quote[key] for key in ("provider", "currency", "quote_basis", "orderbook_at", "observed_at", "ingested_at")
+                    }}
                 if v2_evidence:
                     source_evidence = {**(source_evidence or {}), "sizing_v2": v2_evidence}
+                if native_active_universe:
+                    source_evidence = {**(source_evidence or {}), "native_active_universe": {
+                        "source_sha256": broker.day_universe.source_digest,
+                        "session_date": broker.day_universe.session_date.isoformat(),
+                        "side": terms["side"],
+                    }}
                 if authorize is not None:
                     try:
                         admitted_quantity, admission_evidence = authorize(candidate, terms.copy(), signal, quote, scope, current)
@@ -762,6 +813,7 @@ def advance(archive, root, validation_root, market, *, clock, tickers, broker_fa
                                 "Cash-only capacity or reserved cash floor exceeded": "KIS_CASH_OR_RESERVATION_LIMIT",
                                 "Paper concentration limit exceeded": "KIS_POSITION_CONCENTRATION_LIMIT",
                                 "Sell exceeds unreserved sellable holdings": "KIS_SELLABLE_HOLDING_LIMIT",
+                                "Ticker is outside the verified daily VTS universe": "KIS_DAILY_UNIVERSE_BLOCKED",
                             }.get(str(exc))
                             if reason:
                                 issues.append(reason)
@@ -811,6 +863,10 @@ def tick(archive, root, validation_root, *, clock=None, broker_factory=None, quo
         if (type(prism_candidate_gate) is not bool or prism_candidate_gate and (
                 allocation_mode != demo_strategy_plan.MODE or set(market_limits) != set(ZONES) or policy_revision is None)):
             raise ValueError("Five-minute candidates require normal VTS allocation and bound native limits")
+        native_active_universe = config.get("native_active_universe", False) if enabled else False
+        if (type(native_active_universe) is not bool or native_active_universe and (
+                allocation_mode != demo_strategy_plan.MODE or policy_revision != DAILY_LIMIT_REVISION)):
+            raise ValueError("Daily active universes require the native VTS daily limit revision")
         markets = {}
         for market in ZONES:
             if not enabled:
@@ -822,12 +878,13 @@ def tick(archive, root, validation_root, *, clock=None, broker_factory=None, quo
                         partial(broker_context, limits=market_limits[market], policy_revision=policy_revision)
                         if market in market_limits else broker_context
                     ),
-                    quote_loader=quote_loader or current_quote,
+                    quote_loader=quote_loader or (partial(current_quote, require_top_of_book=True)
+                                                 if prism_candidate_gate or native_active_universe else current_quote),
                     account_loader=account_loader or validation.current_account, session_resolver=session_resolver or _runtime_session,
                     gate=gate or validation_gate, allocation_mode=allocation_mode, authorize=authorize,
                     limits=market_limits.get(market), v2_settings=v2_settings.get(market), policy_revision=policy_revision,
                     benchmark_loader=(benchmark_loader or current_v2_benchmark) if evidence_scope is None else benchmark_loader,
-                    prism_candidate_gate=prism_candidate_gate)
+                    prism_candidate_gate=prism_candidate_gate, native_active_universe=native_active_universe)
             except Exception:
                 markets[market] = {"status": "BLOCKED", "checked_at": at(clock()).isoformat(), "gate_passed": False, "blockers": ["RUNTIME_EVIDENCE_UNVERIFIED"]}
         finished = at(clock())
@@ -851,6 +908,8 @@ def tick(archive, root, validation_root, *, clock=None, broker_factory=None, quo
                 "revision": policy_revision,
                 "markets": {market: asdict(limits) for market, limits in market_limits.items()},
             }
+            if policy_revision == DAILY_LIMIT_REVISION:
+                receipt["configured_native_limits"]["daily_buy_limits"] = APPROVED_CAPS.copy()
         if evidence_scope is not None:
             receipt["evidence_scope"] = evidence_scope
         atomic_write_json(archive / "paper/kis-strategy-runtime.json", receipt)

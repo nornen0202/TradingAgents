@@ -10,6 +10,7 @@ from tradingagents.atomic_io import atomic_write_json
 from tradingagents.execution import demo_runtime, kis_paper, kis_paper_us, paper_runtime, prism_autotrader
 from tradingagents.execution.kis_demo import KisDemoClient, RequestPacer
 from tradingagents.execution.kis_demo_us import KisDemoUSClient
+from tradingagents.execution.kis_strategy_limits import APPROVED_CAPS, DAILY_LIMIT_REVISION
 from tradingagents import local_automation
 from tests.execution.test_demo_strategy_plan import Harness, native_source, regular_session
 from tests.execution.test_kis_strategy_limits import approved_config
@@ -30,6 +31,7 @@ class NormalCli:
         self.journal = h.root / f"{market.lower()}-strategy.sqlite"
         self.monkeypatch = monkeypatch
         self.open = True
+        self.bar_only = False
         self.account_cash = None
         self.other_holdings = []
         self.prepared_at_wire = []
@@ -48,7 +50,7 @@ class NormalCli:
         monkeypatch.setattr(kis_paper, "market_session_state", session)
         monkeypatch.setattr(kis_paper_us, "market_session_state", session)
         monkeypatch.setattr(demo_runtime, "broker_context", self.broker)
-        monkeypatch.setattr(demo_runtime, "current_quote", h.quote)
+        monkeypatch.setattr(demo_runtime, "current_quote", self.quote)
         monkeypatch.setattr(demo_runtime.validation, "current_account", self.account)
         monkeypatch.setattr(demo_runtime, "validation_gate", h.gate)
         monkeypatch.setattr(prism_autotrader, "run_autotrader_tick", lambda *args: candidate_tick(*args, clock=lambda: h.now))
@@ -117,10 +119,21 @@ class NormalCli:
             result[f"cash_only_buying_power_{native}"] = result[f"cash_{native}"] = self.account_cash
         return result
 
-    def source(self, suffix, *, action="STARTER_NOW", parent=None, complete=True, reference=None):
+    def quote(self, market, ticker, clock, *, require_top_of_book=False):
+        quote = self.h.quote(market, ticker, clock)
+        if self.bar_only:
+            return {**quote, "quote_basis": "BAR_ONLY"}
+        return {**quote, "quote_basis": "DATED_BOOK", "orderbook_date_basis": "EXPLICIT",
+                "orderbook_at": self.h.now.isoformat(), "bid": self.h.price, "ask": self.h.price}
+
+    def source(self, suffix, *, action="STARTER_NOW", parent=None, complete=True, reference=None, cohort=False):
         h = self.h
         identity = f"{h.now:%Y%m%dT%H%M%S}_{suffix}"
-        path, _ = native_source(h, identity, action=action)
+        contract = {"ticker": h.ticker, "analysis_asof": (h.now - timedelta(hours=1)).isoformat(),
+                    "action_if_triggered": "STARTER", "entry_valid_until": (h.now + timedelta(hours=4)).isoformat(),
+                    "entry_action_base": "WAIT", "risk_action": "HOLD", "invalid_if_intraday_below": h.price * .95,
+                    "breakout_level": h.price * .99}
+        path, _ = native_source(h, identity, action=action, contract=contract)
         manifest = read(path / "run.json")
         manifest["settings"]["run_mode"] = "overlay_only" if parent else "full"
         if parent:
@@ -137,20 +150,47 @@ class NormalCli:
         item = document["candidates"][0]
         item.update(stance="BULLISH", confidence=.9, thesis_strength=.9, setup_quality="COMPELLING",
                     suggested_action_if_triggered="STARTER_IF_TRIGGERED", sector="Tech")
-        item["data_health"]["price_reference"] = {
+        item["instrument"].update(country=h.market, currency="KRW" if h.market == "KR" else "USD")
+        if reference is not False:
+            item["data_health"]["price_reference"] = {
             "currency": "KRW" if h.market == "KR" else "USD", "basis": "unadjusted", "source": "kis.fixture",
             "price": h.price if reference is None else reference, "observed_at": manifest["finished_at"],
-        }
+            }
+            item["data_health"]["price_reference"]["source"] = ("kis.domestic_time_itemchartprice" if h.market == "KR"
+                                                               else "kis.overseas_time_itemchartprice")
+            update_path = path / "tickers" / h.ticker / "execution_update.json"
+            update = read(update_path)
+            update["price_reference"] = item["data_health"]["price_reference"]
+            atomic_write_json(update_path, update)
+        if cohort:
+            extra = [f"{100_000+i}.KS" if h.market == "KR" else f"X{i:02d}" for i in range(29)]
+            selected = [h.ticker, *extra]
+            active = manifest["active_universe"]
+            active.update(selected_tickers=selected, market=h.market, asof=manifest["started_at"])
+            active["coverage"].update(selection_complete=True, analysis_complete=complete,
+                                      analysis_expected_count=30, analysis_successful_count=30)
+            for ticker in extra:
+                path_rel = f"tickers/{ticker}/analysis.json"
+                atomic_write_json(path / path_rel, {"status": "success", "ticker": ticker})
+                manifest["tickers"].append({"ticker": ticker, "status": "success", "artifacts": {"analysis_json": path_rel}})
+                document["candidates"].append({"instrument": {**item["instrument"], "canonical_ticker": ticker}})
+                bundle["strategy_table"].append({"ticker": ticker, "raw_codes": {"decision_now": "WAIT"}})
+            atomic_write_json(path / "run.json", manifest)
+            atomic_write_json(path / "decision_bundle_v2.json", bundle)
         atomic_write_json(candidate_file, document)
         self.configure()
         return path
 
-    def configure(self, *, native=True, candidate=True):
+    def configure(self, *, native=True, candidate=True, daily=False, universe=False):
         config = approved_config({"mode": demo_runtime.MODE, "enabled": True, "real_orders_enabled": False})
         if native:
             config["allocation_mode"] = demo_runtime.demo_strategy_plan.MODE
         if candidate:
             config["prism_candidate_gate"] = True
+        if daily:
+            config.update(native_limit_revision=DAILY_LIMIT_REVISION, native_daily_buy_limits=APPROVED_CAPS)
+        if universe:
+            config["native_active_universe"] = True
         atomic_write_json(self.h.root / "enabled.json", config)
 
     def run(self, command):
@@ -275,6 +315,19 @@ def test_candidate_halt_cancels_outstanding_candidate_order_before_the_timeout(c
     assert final["owned"][h.ticker] == 0 and cli.fill_events() == []
 
 
+def test_preexisting_hold_on_5m_transport_keeps_candidate_forward_observations(cli):
+    h = cli.h
+    cli.source("production-full")
+    (cli.lane / "HALT").touch()
+    producer = cli.run("autotrader")
+    assert producer["transmission_halted"] and producer["broker_orders_sent"] == 0
+    assert producer["entries_queued"] == [h.ticker] and producer["forward_observations"] == 1
+    observations = list((cli.lane / "forward-observations" / h.market.lower()).glob("*.json"))
+    assert len(observations) == 1 and read(observations[0])["mode"] == "observe_only"
+    assert cli.run("strategy-kis")["blockers"] == ["PRISM_CANDIDATE_HALTED"]
+    assert not h.orders and not cli.fill_events()
+
+
 @pytest.mark.parametrize("stop", ["halt", "expiry"])
 def test_candidate_still_has_to_be_valid_after_transport_pacing(cli, monkeypatch, stop):
     h = cli.h
@@ -352,6 +405,94 @@ def test_verified_exit_recovers_after_entry_expiry_or_a_long_journal(cli, condit
     assert sell["owned"][h.ticker] == 1 and cli.fill_events() == ["FILLED"]
 
 
+def test_offhours_conditional_without_native_reference_waits_for_a_verified_overlay(cli):
+    h = cli.h
+    regular = h.now
+    h.now -= timedelta(hours=2)
+    cli.open = False
+    baseline = cli.source("offhours-full", action="WAIT", reference=False)
+    path = baseline / "portfolio-private/portfolio_candidates.json"
+    document = read(path)
+    document["candidates"][0]["position_metrics"] = {"current_price": h.price * 1400}
+    atomic_write_json(path, document)
+    status = cli.run("autotrader")
+    assert status["entries_waiting_for_native_price"] == 1
+    assert read(cli.receipt)["entries"][h.ticker]["reference_price"] is None
+    assert cli.run("strategy-kis")["status"] == "MARKET_CLOSED" and not h.calls
+    cli.open, h.now = True, regular
+    cli.source("first-overlay", parent=baseline, reference=False)
+    assert "PRISM_CANDIDATE_NOT_ADMITTED" in cli.run("strategy-kis")["blockers"]
+    assert not h.orders
+    h.now += timedelta(seconds=30)
+    cli.source("priced-overlay", parent=baseline)
+    assert cli.run("strategy-kis")["orders"][0]["status"] == "ACKNOWLEDGED"
+    assert len(h.orders) == 1
+
+
+@pytest.mark.parametrize("block", ["previous_session", "wrong_currency", "bar_only", "price_reversal", "none"])
+def test_native_cohort_admission_rechecks_official_book_and_current_selection(cli, block, monkeypatch):
+    h = cli.h
+    regular = h.now
+    if block == "previous_session":
+        h.now -= timedelta(days=1)
+    root = cli.source("cohort-full", cohort=True)
+    if block == "previous_session":
+        h.now = regular
+        cli.source("current-overlay", parent=root, cohort=True)
+    if block == "wrong_currency":
+        path = root / "portfolio-private/portfolio_candidates.json"
+        document = read(path)
+        document["candidates"][-1]["instrument"]["currency"] = "JPY"
+        atomic_write_json(path, document)
+    cli.configure(candidate=False, daily=True, universe=True)
+    # The regulatory source has the approved name but the static policy does not.
+    monkeypatch.setattr(demo_runtime, "universe", lambda: {"KR": ("000660.KS",), "US": ("MSFT",)})
+    if block == "bar_only":
+        cli.bar_only = True
+    if block == "price_reversal":
+        h.price *= .98  # Still above invalidation, below the actual breakout.
+    result = cli.run("strategy-kis")
+    scope = result["allocation_diagnostics"]["daily_universe"]
+    assert scope["entry_names"] == (0 if block in {"previous_session", "wrong_currency"} else 30)
+    if block == "none":
+        assert result["orders"][0]["status"] == "ACKNOWLEDGED" and len(h.orders) == 1, result
+        assert cli.prepared_at_wire[0]["native_active_universe"]["side"] == "BUY"
+    else:
+        if block in {"price_reversal", "bar_only"}:
+            why = "ENTRY_CURRENT_PRICE_NOT_CONFIRMED" if block == "price_reversal" else "KIS_TOP_OF_BOOK_UNVERIFIED"
+            assert why in result["blockers"], result
+        assert h.orders == {}
+
+
+def test_daily_buy_revision_binds_existing_journal_and_caps_cost_after_restart(cli):
+    h = cli.h
+    h.price = APPROVED_CAPS[h.market] // 2
+
+    def propose(source_id, *, action="STARTER_NOW"):
+        run = h.source(source_id, action=action)
+        path = run / "portfolio-private/proposed_orders.json"
+        proposals = read(path)
+        proposals["orders"][0]["delta_krw_now"] = h.price * (2 if action == "STARTER_NOW" else -2)
+        atomic_write_json(path, proposals)
+
+    propose("fixture-1")
+    cli.configure(native=False, candidate=False)
+    assert "KIS_DAILY_BUY_RISK_LIMIT" in cli.run("strategy-kis")["blockers"]
+    assert not h.orders
+    h.now += timedelta(seconds=10)
+    propose("fixture-2")
+    cli.configure(native=False, candidate=False, daily=True)
+    assert cli.run("strategy-kis")["orders"][-1]["status"] == "ACKNOWLEDGED"
+    h.fill()
+    h.now += timedelta(seconds=10)
+    propose("fixture-3")
+    result = cli.run("strategy-kis")
+    assert "KIS_DAILY_BUY_RISK_LIMIT" in result["blockers"] and len(h.orders) == 1
+    assert result["orders"][-1]["status"] == "BLOCKED"
+    assert cli.run("strategy-kis")["orders"][-1]["status"] == "BLOCKED" and len(h.orders) == 1
+    assert read(h.archive / "paper/kis-strategy-runtime.json")["configured_native_limits"]["daily_buy_limits"] == APPROVED_CAPS
+
+
 @pytest.mark.parametrize("against", ["shadow", "incomplete", "stale", "foreign", "cash", "halt", "live", "slots"])
 def test_normal_entrypoints_preserve_the_separate_admission_boundaries(cli, against, monkeypatch):
     h = cli.h
@@ -372,11 +513,11 @@ def test_normal_entrypoints_preserve_the_separate_admission_boundaries(cli, agai
         else:
             prior = read(cli.receipt)
     if against == "stale":
-        def stale(market, ticker, clock):
-            return {**h.quote(market, ticker, clock), "observed_at": (h.now - timedelta(seconds=120)).isoformat()}
+        def stale(market, ticker, clock, **options):
+            return {**cli.quote(market, ticker, clock, **options), "observed_at": (h.now - timedelta(seconds=120)).isoformat()}
         monkeypatch.setattr(demo_runtime, "current_quote", stale)
     elif against == "foreign":
-        monkeypatch.setattr(demo_runtime, "current_quote", lambda *args: {**h.quote(*args), "session": "post_market"})
+        monkeypatch.setattr(demo_runtime, "current_quote", lambda *args, **options: {**cli.quote(*args, **options), "session": "post_market"})
     elif against == "cash":
         cli.account_cash = 0
     elif against == "slots":
@@ -386,8 +527,9 @@ def test_normal_entrypoints_preserve_the_separate_admission_boundaries(cli, agai
                                f"market_value_{suffix}": h.price} for i in range(10)]
     elif against == "halt":
         (cli.lane / "HALT").touch()
-        assert cli.run("autotrader")["blockers"] == ["KILL_SWITCH_ACTIVE"]
-        assert read(cli.receipt) == prior
+        status = cli.run("autotrader")
+        assert status["blockers"] == ["KILL_SWITCH_ACTIVE"] and status["entries_queued"] == [h.ticker]
+        assert read(cli.receipt) == {**prior, "transmission_halted": True}
     result = cli.run("strategy-kis")
     expected = {"incomplete": "NO_RECENT_COMPLETED_SOURCE", "cash": "NO_STRATEGY_QUANTITY_WITHIN_LIMITS",
                 "halt": "PRISM_CANDIDATE_HALTED", "stale": "CANDIDATE_EVIDENCE_UNVERIFIED"}
