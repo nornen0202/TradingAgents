@@ -101,6 +101,23 @@ def test_source_diagnostics_keep_kis_receipt_separate_from_stale_and_legacy_even
     assert diagnose_source(tmp_path, AT)["newest_snapshot_received_at"] is None
 
 
+def test_source_diagnostics_count_fresh_engine_actions_from_the_nested_quality_status(tmp_path):
+    archive(tmp_path)
+    path = tmp_path / "decision_bundle_v2.json"
+    bundle = json.loads(path.read_text())
+    row = bundle["strategy_table"][0]
+    row["decision_now"] = "NONE"
+    row["raw_codes"] = {"decision_now": "REDUCE_NOW"}
+    write(path, bundle)
+    assert diagnose_source(tmp_path, AT)["fresh_engine_action_rows"] is None
+    row["quality"]["action_status"] = "ACTION_SIGNAL_PRESENT"
+    write(path, bundle)
+    assert diagnose_source(tmp_path, AT)["fresh_engine_action_rows"] == 1
+    row["quality"]["action_status"] = "WAITING_TRIGGER"
+    write(path, bundle)
+    assert diagnose_source(tmp_path, AT)["fresh_engine_action_rows"] == 0
+
+
 def test_source_degraded_exposes_provider_reason_not_normal_wait(tmp_path):
     archive(tmp_path)
     path = tmp_path / "decision_bundle_v2.json"

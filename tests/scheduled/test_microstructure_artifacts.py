@@ -8,7 +8,10 @@ from types import SimpleNamespace
 
 import pytest
 
+from tradingagents.charting.operations import _source_health
+from tradingagents.execution.source_diagnostics import diagnose_source
 from tradingagents.scheduled.config import load_scheduled_config
+from tradingagents.scheduled.decision_bundle import build_and_write_decision_bundle
 from tradingagents.scheduled.runner import (
     FRESHNESS_PRIOR_SESSION_BACKFILL,
     _bootstrap_overlay_inputs_from_latest_run,
@@ -156,13 +159,23 @@ checkpoint_timezone = "America/New_York"
     assert ticker_context["execution_eligibility"] == "LIVE_EXECUTION_READY"
     assert ticker_context["asof_execution_gate"]["core_fields_present"] is True
     assert ticker_context["asof_execution_gate"]["asof_execution_possible"] is True
+    assert ticker_context["source"]["snapshot_received_at"] == received
 
     manifest = {
         "run_id": "run",
+        "settings": {"market": "US"},
         "execution": {"artifacts": updates["_artifacts"]},
         "tickers": [summary],
         "portfolio": {"status": "disabled"},
     }
+    if lightweight:
+        _write_chatgpt_execution_context_from_ticker_artifacts(
+            config=config, run_dir=run_dir, ticker_summaries=[summary], overlay_phase={},
+        )
+    build_and_write_decision_bundle(run_dir=run_dir, manifest=manifest)
+    checked_at = datetime.now(timezone.utc)
+    diagnostic = diagnose_source(run_dir, checked_at, include_proposals=False)
+    assert _source_health(diagnostic, as_of=checked_at)["newest_snapshot_received_at"] == received
     site_dir = tmp_path / "site"
     _copy_artifacts(site_dir, run_dir, manifest, {})
 

@@ -6317,6 +6317,7 @@ def _build_chatgpt_execution_context(
                 "asof_execution_gate": gate_payload,
                 "source": {
                     "provider": source.get("provider"),
+                    "snapshot_received_at": source.get("snapshot_received_at"),
                     "market": source.get("market"),
                     "exchange": source.get("exchange"),
                     "market_session": source.get("market_session"),
@@ -6435,6 +6436,7 @@ def _write_chatgpt_execution_context_from_ticker_artifacts(
                     "execution_data_quality": source.get("execution_data_quality") or source.get("data_quality") or micro.get("data_quality"),
                     "quote_delay_seconds": source.get("quote_delay_seconds"),
                     "source_latency_seconds": source.get("source_latency_seconds") or micro.get("source_latency_seconds"),
+                    "snapshot_received_at": source.get("snapshot_received_at"),
                 },
             }
         )

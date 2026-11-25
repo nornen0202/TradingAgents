@@ -144,7 +144,7 @@ def _source_health(raw, *, as_of=None):
         return {}
     statuses = {"NO_SOURCE", "BLOCKED", "NO_ALLOCATED_ORDERS", "PROPOSALS_AVAILABLE", "EXECUTION_OBSERVATIONS_AVAILABLE"}
     result = {"status": raw.get("status") if raw.get("status") in statuses else "BLOCKED"}
-    for key in ("strategy_rows", "fresh_rows", "execution_ready_rows", "allocated_orders"):
+    for key in ("strategy_rows", "fresh_rows", "execution_ready_rows", "fresh_engine_action_rows", "allocated_orders"):
         value = raw.get(key)
         if type(value) is int and value >= 0:
             result[key] = value
