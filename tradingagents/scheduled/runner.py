@@ -893,6 +893,7 @@ def _execute_run_body(config, *, run_label, skip_site_build, tz, started_at,
     else:
         portfolio_budget_available = False
     if config.portfolio.enabled and config.portfolio.profile_path and portfolio_budget_available:
+        portfolio_started_at = datetime.now(timezone.utc)
         portfolio_status = run_portfolio_pipeline(
             run_dir=run_dir,
             manifest=manifest,
@@ -902,6 +903,9 @@ def _execute_run_body(config, *, run_label, skip_site_build, tz, started_at,
             summary_image_settings=config.summary_image,
             external_data_settings=None if portfolio_only else config.external_data,
         )
+        if lightweight_refresh:
+            portfolio_status["pipeline_clock"] = {"started_at": portfolio_started_at.isoformat(),
+                                                  "returned_at": datetime.now(timezone.utc).isoformat()}
         manifest["portfolio"] = portfolio_status
         for warning in portfolio_status.get("sell_side_calibration_warnings") or []:
             if warning not in manifest["warnings"]:
@@ -5749,26 +5753,24 @@ def _run_execution_overlay_passes(
     run_id = run_dir.name
     for checkpoint in checkpoints:
         checkpoint_label = str(checkpoint).strip() or "post_research"
-        market_results = _fetch_overlay_market_snapshots(
-            config=config,
-            ticker_summaries=ticker_summaries,
-            run_dir=run_dir,
-            checkpoint_label=checkpoint_label,
-        )
-        for summary in ticker_summaries:
+        by_ticker = {str(row.get("ticker") or "").strip().upper(): row for row in ticker_summaries if row.get("status") == "success"}
+        processed = set()
+
+        def archive_snapshot(ticker, market_result, acquisition=None):
+            summary = by_ticker[ticker]
             if summary.get("status") != "success":
-                continue
-            ticker = str(summary.get("ticker") or "").strip().upper()
+                return
             if not ticker:
-                continue
+                return
             artifacts = summary.get("artifacts") or {}
             summary["artifacts"] = artifacts
             contract_rel = artifacts.get("execution_contract_json")
             if not contract_rel:
-                continue
+                return
             contract_path = run_dir / contract_rel
             if not contract_path.exists():
-                continue
+                return
+            processed.add(ticker)
             contract_dict: dict[str, Any] = {}
             attempt_payload = _build_intraday_attempt_payload(
                 ticker=ticker,
@@ -5777,10 +5779,11 @@ def _run_execution_overlay_passes(
                 success=False,
                 attempted_at=datetime.now(ZoneInfo(config.run.timezone)).isoformat(),
             )
+            if acquisition:
+                attempt_payload["snapshot_acquisition"] = acquisition
             try:
                 contract_dict = json.loads(contract_path.read_text(encoding="utf-8"))
                 contract = _ExecutionContractShim(contract_dict).to_contract()
-                market_result = market_results.get(ticker)
                 if isinstance(market_result, Exception):
                     raise market_result
                 if not isinstance(market_result, IntradayMarketSnapshot):
@@ -5951,8 +5954,21 @@ def _run_execution_overlay_passes(
                     _append_analysis_intraday_attempt(run_dir=run_dir, ticker_summary=summary, attempt_payload=attempt_payload)
                 updates_by_ticker[ticker] = update_payload
                 print(f"::warning::Execution overlay checkpoint '{checkpoint_label}' failed for {ticker}: {exc}")
+        market_results = _fetch_overlay_market_snapshots(
+            config=config,
+            ticker_summaries=ticker_summaries,
+            run_dir=run_dir,
+            checkpoint_label=checkpoint_label,
+            **({"on_snapshot": archive_snapshot} if config.execution.execution_lightweight_refresh else {}),
+        )
+        for ticker in by_ticker:
+            if ticker not in processed:
+                archive_snapshot(ticker, market_results.get(ticker))
         updates_by_ticker["_latest_checkpoint"] = {"value": checkpoint_label}
     if _has_ticker_execution_updates(updates_by_ticker):
+        ticker_order = [str(row.get("ticker") or "").strip().upper() for row in ticker_summaries]
+        updates_by_ticker = {**{ticker: updates_by_ticker[ticker] for ticker in ticker_order if ticker in updates_by_ticker},
+                             **{key: value for key, value in updates_by_ticker.items() if key.startswith("_")}}
         context_path = run_dir / "chatgpt_execution_context.json"
         context_payload = _build_chatgpt_execution_context(
             config=config,
@@ -5971,6 +5987,7 @@ def _fetch_overlay_market_snapshots(
     ticker_summaries: list[dict[str, Any]],
     run_dir: Path,
     checkpoint_label: str,
+    on_snapshot=None,
 ) -> dict[str, IntradayMarketSnapshot | Exception]:
     eligible_tickers: list[str] = []
     for summary in ticker_summaries:
@@ -5994,7 +6011,7 @@ def _fetch_overlay_market_snapshots(
     timezone_name = _execution_checkpoint_timezone(config)
     deadline = perf_counter() + batch_timeout
     work_queue: Queue[str] = Queue()
-    result_queue: Queue[tuple[str, IntradayMarketSnapshot | Exception]] = Queue()
+    result_queue: Queue[tuple[str, IntradayMarketSnapshot | Exception, float, dict[str, str]]] = Queue()
     for ticker in eligible_tickers:
         work_queue.put(ticker)
 
@@ -6007,6 +6024,7 @@ def _fetch_overlay_market_snapshots(
                 ticker = work_queue.get_nowait()
             except Empty:
                 return
+            started_at = datetime.now(timezone.utc)
             try:
                 with ranking_batch_context(ranking_batch):
                     result: IntradayMarketSnapshot | Exception = fetch_intraday_market_snapshot(
@@ -6017,7 +6035,11 @@ def _fetch_overlay_market_snapshots(
                     )
             except Exception as exc:
                 result = exc
-            result_queue.put((ticker, result))
+            returned_at = datetime.now(timezone.utc)
+            result_queue.put((ticker, result, perf_counter(), {
+                "fetch_started_at": started_at.isoformat(), "fetch_returned_at": returned_at.isoformat(),
+                "clock_role": "LOCAL_SNAPSHOT_FETCH_WINDOW",
+            }))
 
     workers = [
         Thread(target=worker, name=f"overlay-snapshot-{index + 1}", daemon=True)
@@ -6029,13 +6051,18 @@ def _fetch_overlay_market_snapshots(
             worker_thread.start()
         while len(results) < len(eligible_tickers):
             remaining = deadline - perf_counter()
-            if remaining <= 0:
-                break
             try:
-                ticker, result = result_queue.get(timeout=min(1.0, remaining))
+                ticker, result, returned, acquisition = (result_queue.get(timeout=min(1.0, remaining))
+                    if remaining > 0 else result_queue.get_nowait())
             except Empty:
+                if remaining <= 0:
+                    break
+                continue
+            if returned > deadline:
                 continue
             results[ticker] = result
+            if on_snapshot is not None:
+                on_snapshot(ticker, result, acquisition)
     finally:
         ranking_batch.close()
 

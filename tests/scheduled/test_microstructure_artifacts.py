@@ -4,6 +4,7 @@ from dataclasses import replace
 import json
 from datetime import datetime, timezone
 from pathlib import Path
+from threading import Event
 from types import SimpleNamespace
 
 import pytest
@@ -40,6 +41,65 @@ def test_failed_execution_update_has_no_quote_clock():
     )
     assert update["market_data_asof"] is None and update["last_price"] is None
     assert update["execution_asof"] == now.isoformat()
+
+
+@pytest.mark.parametrize("lightweight", [False, True])
+def test_lightweight_writes_ready_snapshot_before_other_provider_finishes(tmp_path, monkeypatch, lightweight):
+    from tradingagents.scheduled import runner
+
+    config_path = tmp_path / "scheduled.toml"
+    config_path.write_text('[run]\nmarket="US"\ntickers=["AAPL","NVDA"]\n', encoding="utf-8")
+    config = load_scheduled_config(config_path)
+    config = replace(config, execution=replace(config.execution, execution_lightweight_refresh=lightweight))
+    monkeypatch.setenv("TRADINGAGENTS_OVERLAY_MAX_WORKERS", "2")
+    monkeypatch.setattr(runner, "_refresh_integrated_review", lambda *args, **kwargs: None)
+    monkeypatch.setattr(runner, "render_execution_update_markdown", lambda *args, **kwargs: "# update\n")
+    summaries = []
+    run = tmp_path / "run"
+    original = datetime.now(timezone.utc).isoformat()
+    for ticker in ("AAPL", "NVDA"):
+        path = run / "tickers" / ticker / "execution_contract.json"
+        path.parent.mkdir(parents=True)
+        contract = ExecutionContract(ticker=ticker, analysis_asof=original, market_data_asof=original,
+            level_basis=LevelBasis.DAILY_CLOSE, thesis_state=ThesisState.CONSTRUCTIVE,
+            primary_setup=PrimarySetup.BREAKOUT_CONFIRMATION, portfolio_stance="BULLISH", entry_action_base="WAIT",
+            setup_quality="COMPELLING", confidence=.8, action_if_triggered=ActionIfTriggered.STARTER)
+        path.write_text(json.dumps(contract.to_dict()), encoding="utf-8")
+        summaries.append({"status": "success", "ticker": ticker,
+                          "artifacts": {"execution_contract_json": path.relative_to(run).as_posix()}})
+    original_write = runner._write_json
+    first_saved = Event()
+    slow_returned = Event()
+    slow_saw_first = []
+
+    def write(path, value):
+        original_write(path, value)
+        if path == run / "tickers/AAPL/execution_update.json":
+            first_saved.set()
+
+    def fetch(ticker, **_):
+        if ticker == "NVDA":
+            slow_saw_first.append(first_saved.wait(timeout=3))
+            slow_returned.set()
+        return IntradayMarketSnapshot(ticker=ticker, asof=original, provider="kis_microstructure", interval="1m",
+            last_price=102, session_vwap=101, day_high=103, day_low=100, volume=1000, avg20_daily_volume=1000, relative_volume=1.2,
+            market_session="regular", market="US", exchange="NAS", snapshot_received_at=datetime.now(timezone.utc).isoformat())
+
+    monkeypatch.setattr(runner, "_write_json", write)
+    monkeypatch.setattr(runner, "fetch_intraday_market_snapshot", fetch)
+    updates = _run_execution_overlay_passes(config=config, run_dir=run, ticker_summaries=summaries, checkpoints=["10:00"])
+    assert slow_returned.is_set() and slow_saw_first == [lightweight]
+    for ticker in ("AAPL", "NVDA"):
+        update = updates[ticker]
+        assert update["market_data_asof"] == original
+        assert update["intraday_snapshot_attempt"]["success"] is True
+        clocks = update["intraday_snapshot_attempt"].get("snapshot_acquisition")
+        if lightweight:
+            assert datetime.fromisoformat(clocks["fetch_started_at"]) <= datetime.fromisoformat(clocks["fetch_returned_at"])
+            assert clocks["clock_role"] == "LOCAL_SNAPSHOT_FETCH_WINDOW"
+        else:
+            assert clocks is None
+    assert not (run / "run.json").exists()  # Per-ticker archival is not source publication.
 
 
 @pytest.mark.parametrize("lightweight", [False, True])
