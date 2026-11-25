@@ -65,3 +65,42 @@ def test_period_mismatch_suppresses_excess_return(etf_fixture_dir):
     assert public["period_match_status"] == "MISMATCH"
     assert kospi["excess_return_pct"] is None
     assert "etf_alternative_period_end_mismatch" in public["warnings"]
+
+def test_internal_snapshot_does_not_turn_missing_ledger_into_exact_zero_cashflows(etf_fixture_dir):
+    settings = default_settings(etf_fixture_dir, use_cashflows=False)
+    broker_period = default_broker_summary(etf_fixture_dir)
+    result = build_etf_dca_comparison(
+        snapshot=default_snapshot(), settings=settings, summary={"default_period": "ALL"},
+        periods=[{
+            "period": "ALL", "start_date": broker_period.period_start, "end_date": broker_period.period_end,
+            "actual_start_value_krw": 50000, "actual_end_value_krw": 52000, "actual_return": .04,
+        }],
+        broker_performance=None, reconciliation={"reconciliation_status": "OK"},
+    )
+    public = result.to_public_dict()
+    assert public["status"] == "cashflow_evidence_unverified"
+    assert public["exact_dated_cashflows_available"] is False
+    assert public["actual"]["deposit_amount_krw"] is None
+    kospi = next(item for item in public["alternatives"] if item["key"] == "KOSPI200_100")
+    assert kospi["status"] == "research_only_unverified_cashflows"
+    assert kospi["balance_return_pct"] is not None and kospi["excess_return_pct"] is None
+    assert public["best_benchmark_id"] is None
+
+
+def test_scheduled_ledger_uses_dates_before_applying_withdrawals(etf_fixture_dir):
+    from dataclasses import replace
+    from tradingagents.portfolio.performance.etf_alternatives import ExternalCapitalFlow
+
+    deposit = ExternalCapitalFlow("2026-04-13", 20_000_000, "deposit")
+    withdrawal = ExternalCapitalFlow("2026-04-20", 5_000_000, "withdrawal")
+    broker = replace(default_broker_summary(etf_fixture_dir), start_asset_krw=0,
+                     deposit_amount_krw=deposit.amount_krw, withdrawal_amount_krw=withdrawal.amount_krw)
+    result = build_etf_dca_comparison(
+        snapshot=default_snapshot(), settings=default_settings(etf_fixture_dir, use_cashflows=False),
+        summary={}, periods=[], broker_performance=broker,
+        reconciliation={"reconciliation_status": "FAILED"}, scheduled_cashflows=(withdrawal, deposit),
+    )
+    assert result.cashflows["source"] == "scheduled_account_ledger"
+    kospi = next(item for item in result.alternatives if item.key == "KOSPI200_100")
+    assert kospi.status == "OK"
+    assert [transaction["source_flow_type"] for transaction in kospi.transactions] == ["deposit", "withdrawal"]

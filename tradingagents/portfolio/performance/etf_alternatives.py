@@ -3,13 +3,14 @@ from __future__ import annotations
 import csv
 import json
 import math
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict, dataclass, field, replace
 from datetime import date, timedelta
 from pathlib import Path
 from typing import Any, Mapping
 
 from tradingagents.portfolio.account_models import AccountSnapshot, Position
 from tradingagents.portfolio.performance.broker_models import BrokerPerformanceSummary
+from tradingagents.portfolio.performance.benchmark_sources import load_yahoo_benchmark
 
 
 _DEFAULT_INSTRUMENTS: dict[str, dict[str, str]] = {
@@ -25,6 +26,8 @@ _DEFAULT_PORTFOLIOS: dict[str, dict[str, float]] = {
     "KOSDAQ150_100": {"KOSDAQ150": 1.0},
     "SP500_100": {"SP500_KRW": 1.0},
     "NASDAQ100_100": {"NASDAQ100_KRW": 1.0},
+    "SPY_100": {"SP500": 1.0},
+    "QQQ_100": {"NASDAQ100": 1.0},
     "BLENDED": {"KOSPI200": 0.35, "KOSDAQ150": 0.15, "SP500_KRW": 0.30, "NASDAQ100_KRW": 0.20},
 }
 _BUY_ACTIONS = {"ADD_NOW", "ADD_IF_TRIGGERED", "STARTER_NOW", "STARTER_IF_TRIGGERED"}
@@ -117,6 +120,9 @@ class EtfAlternativeComparisonSummary:
         exact_available = self.status == "OK" and str(self.cashflows.get("status") or "").upper() == "OK"
         reason = _comparison_reason(self.status)
         message = _comparison_message(self.status)
+        if self.cashflows.get("missing_reason") == "period_external_cashflow_totals_unverified":
+            reason = "period_external_cashflow_totals_unverified"
+            message = "Research-only ETF results are available where prices exist. Period capital-flow totals are unverified."
         if self.cashflows.get("missing_reason") == "dated_external_capital_totals_do_not_reconcile":
             reason = "dated_external_capital_totals_do_not_reconcile"
             message = "Dated deposits or withdrawals do not reconcile to the broker's matching period totals."
@@ -138,7 +144,11 @@ class EtfAlternativeComparisonSummary:
                 {"date": item.date, "flow_type": item.flow_type, "source": item.source}
                 for item in self.raw_cashflows
             ],
-            "instruments": [item.to_dict() for item in self.instruments],
+            "instruments": [item.to_dict() | {
+                "source_evidence": self.price_diagnostics.get(item.key, {"state": self.status})
+            } for item in self.instruments],
+            "fx_evidence": self.price_diagnostics.get("USD/KRW", {"state": self.status}),
+            "comparison_basis": "retrospective_research_benchmark_after_tax_unverified",
             "alternatives": alternatives,
             "benchmarks": alternatives,
             "best_benchmark_id": best.key if best else None,
@@ -165,11 +175,14 @@ def build_etf_alternative_comparison(
     broker_performance: BrokerPerformanceSummary | None,
     reconciliation: Mapping[str, Any],
     warnings: list[str] | None = None,
+    cache_dir: Path | None = None,
+    scheduled_cashflows: tuple[ExternalCapitalFlow, ...] = (),
 ) -> EtfAlternativeComparisonSummary | None:
     if not bool(getattr(settings, "etf_alternative_enabled", True)):
         return None
 
     local_warnings: list[str] = []
+    instruments = _instrument_config(settings)
     actual = _actual_performance(
         summary=summary,
         periods=periods,
@@ -209,6 +222,7 @@ def build_etf_alternative_comparison(
             actual_source="unavailable",
             actual={},
             cashflows=cashflow_summary,
+            instruments=instruments,
             warnings=list(dict.fromkeys(local_warnings)),
             raw_cashflows=all_flows,
             policy=_alpha_policy_unavailable(settings=settings, reason="actual_performance_unavailable"),
@@ -246,6 +260,7 @@ def build_etf_alternative_comparison(
             actual_source=str(actual.get("source") or "unavailable"),
             actual=actual,
             cashflows=_empty_cashflow_summary(source="unavailable"),
+            instruments=instruments,
             warnings=local_warnings,
             policy=_alpha_policy_unavailable(settings=settings, reason="invalid_period"),
         )
@@ -253,9 +268,10 @@ def build_etf_alternative_comparison(
         return result
 
     flow_load_warnings: list[str] = []
-    all_flows = load_external_capital_flows(
-        getattr(settings, "cashflow_baseline_path", None),
-        warnings=flow_load_warnings,
+    configured_cashflows = getattr(settings, "cashflow_baseline_path", None)
+    all_flows = (
+        load_external_capital_flows(configured_cashflows, warnings=flow_load_warnings)
+        if configured_cashflows else sorted(scheduled_cashflows, key=lambda item: item.date)
     )
     local_warnings.extend(flow_load_warnings)
     flows = [
@@ -274,6 +290,9 @@ def build_etf_alternative_comparison(
         broker_withdrawal_krw=broker_withdrawal,
     )
     local_warnings.extend(cashflow_status_warnings)
+    cashflow_verified = broker_matched and broker_deposit is not None and broker_withdrawal is not None
+    if not configured_cashflows and scheduled_cashflows:
+        cashflow_summary["source"] = "scheduled_account_ledger"
     if cashflow_summary["status"] == "cashflow_dates_required":
         policy = _alpha_policy_unavailable(settings=settings, reason="cashflow_dates_required")
         result = EtfAlternativeComparisonSummary(
@@ -283,6 +302,7 @@ def build_etf_alternative_comparison(
             actual_source=str(actual.get("source") or "unavailable"),
             actual=actual,
             cashflows=cashflow_summary,
+            instruments=instruments,
             warnings=list(dict.fromkeys(local_warnings)),
             raw_cashflows=flows,
             policy=policy,
@@ -290,7 +310,10 @@ def build_etf_alternative_comparison(
         _extend_warnings(warnings, local_warnings)
         return result
 
-    instruments = _instrument_config(settings)
+    if not cashflow_verified:
+        cashflow_summary.update(status="cashflow_evidence_unverified", missing_reason="period_external_cashflow_totals_unverified")
+        local_warnings.append("etf_alternative_external_cashflow_completeness_unverified")
+
     price_history_path = getattr(settings, "etf_price_history_path", None) or getattr(settings, "price_history_path", None)
     fx_history_path = getattr(settings, "etf_fx_history_path", None)
     price_provider = str(getattr(settings, "price_provider", "yfinance") or "yfinance").strip().lower()
@@ -300,8 +323,26 @@ def build_etf_alternative_comparison(
         provider=price_provider,
         start_date=period_start,
         end_date=period_end,
+        as_of=snapshot.as_of,
+        cache_dir=cache_dir,
     )
     fx_map, fx_warnings = _load_fx_series(fx_history_path, end_date=period_end)
+    if price_provider == "yfinance" and not fx_history_path:
+        fx_rows, fx_evidence = load_yahoo_benchmark(
+            "KRW=X", "KRW", period_start - timedelta(days=7), period_end,
+            as_of=snapshot.as_of, cache_dir=cache_dir, fx=True,
+        )
+        if fx_rows:
+            fx_map["USDKRW"] = fx_rows
+        else:
+            fx_warnings.append("etf_alternative_auto_usdkrw_unavailable")
+        price_diagnostics["USD/KRW"] = fx_evidence
+    elif fx_history_path:
+        rows = fx_map.get("USDKRW") or fx_map.get("USD/KRW") or []
+        price_diagnostics["USD/KRW"] = {
+            "state": "available" if rows else "missing", "provider": "local_json",
+            "pair": "USD/KRW", "units": "KRW per USD", "rows": len(rows),
+        }
     local_warnings.extend(price_warnings)
     local_warnings.extend(fx_warnings)
     instruments_with_status = [
@@ -317,8 +358,8 @@ def build_etf_alternative_comparison(
     ]
 
     portfolios = _portfolio_configs(settings, snapshot=snapshot)
-    actual_pnl = _int_or_none(actual.get("investment_pnl_krw")) if period_match_status == "MATCHED" else None
-    actual_return_pct = _float_or_none(actual.get("balance_return_pct")) if period_match_status == "MATCHED" else None
+    actual_pnl = _int_or_none(actual.get("investment_pnl_krw")) if cashflow_verified else None
+    actual_return_pct = _float_or_none(actual.get("balance_return_pct")) if cashflow_verified else None
     start_asset = float(_int_or_none(actual.get("start_asset_krw")) or 0) if period_start == actual_period_start else 0.0
     alternatives = [
         _simulate_portfolio(
@@ -358,13 +399,22 @@ def build_etf_alternative_comparison(
         status = "portfolio_config_unavailable"
         local_warnings.append("etf_alternative_portfolio_config_unavailable")
 
-    policy = evaluate_alpha_policy(
-        alternatives=alternatives,
-        settings=settings,
-        period_start=period_start,
-        period_end=period_end,
-        policy_inputs=getattr(settings, "alpha_policy_inputs", None),
-    )
+    if cashflow_verified:
+        policy = evaluate_alpha_policy(
+            alternatives=alternatives,
+            settings=settings,
+            period_start=period_start,
+            period_end=period_end,
+            policy_inputs=getattr(settings, "alpha_policy_inputs", None),
+        )
+    else:
+        if status == "OK":
+            status = "cashflow_evidence_unverified"
+        alternatives = [
+            replace(item, status="research_only_unverified_cashflows") if item.status == "OK" else item
+            for item in alternatives
+        ]
+        policy = _alpha_policy_unavailable(settings=settings, reason="cashflow_evidence_unverified")
     result = EtfAlternativeComparisonSummary(
         status=status,
         period_start=period_start.isoformat(),
@@ -534,8 +584,8 @@ def _actual_performance(
         "balance_return_pct": round(actual_return * 100.0, 6),
         "end_asset_krw": end_value,
         "start_asset_krw": start_value,
-        "deposit_amount_krw": 0,
-        "withdrawal_amount_krw": 0,
+        "deposit_amount_krw": None,
+        "withdrawal_amount_krw": None,
     }
 
 
@@ -1022,7 +1072,7 @@ def _buy_weighted(
         price_row = _price_row_on_or_after(rows, trade_date)
         actual_trade_date = _parse_date(str(price_row.get("date") or "")) if price_row else None
         price = _float_or_none(price_row.get("close")) if price_row else None
-        fx = _fx_rate_for_currency(instrument.currency, fx_map, actual_trade_date or trade_date, lookup="on_trade_date")
+        fx, fx_date = _fx_rate_and_date(instrument.currency, fx_map, actual_trade_date or trade_date, lookup="on_trade_date")
         if price is None or price <= 0:
             warnings.append(f"etf_alternative_trade_price_missing:{key}:{trade_date.isoformat()}")
             return False
@@ -1048,7 +1098,7 @@ def _buy_weighted(
                     "price_currency": instrument.currency,
                     "price_basis": instrument.price_basis,
                     "fx_pair": f"{instrument.currency}/KRW",
-                    "fx_observed_date": (actual_trade_date or trade_date).isoformat(),
+                    "fx_observed_date": fx_date,
                     "shares": round(float(shares), 12),
                     "source_cashflow_id": source_cashflow_id,
                     "source_flow_type": source_flow_type,
@@ -1103,7 +1153,7 @@ def _sell_pro_rata(
             price_row = _price_row_on_or_after(rows, trade_date)
             actual_trade_date = _parse_date(str(price_row.get("date") or "")) if price_row else None
             price = _float_or_none(price_row.get("close")) if price_row else None
-            fx = _fx_rate_for_currency(
+            fx, fx_date = _fx_rate_and_date(
                 instrument.currency if instrument else "KRW",
                 fx_map,
                 actual_trade_date or trade_date,
@@ -1124,7 +1174,7 @@ def _sell_pro_rata(
                         "price_currency": instrument.currency,
                         "price_basis": instrument.price_basis,
                         "fx_pair": f"{instrument.currency}/KRW",
-                        "fx_observed_date": (actual_trade_date or trade_date).isoformat(),
+                        "fx_observed_date": fx_date,
                         "shares": round(float(shares_sold), 12),
                         "source_cashflow_id": source_cashflow_id,
                         "source_flow_type": source_flow_type,
@@ -1228,6 +1278,8 @@ def _load_price_series_for_instruments(
     provider: str,
     start_date: date,
     end_date: date,
+    as_of: str,
+    cache_dir: Path | None,
 ) -> tuple[dict[str, list[dict[str, Any]]], dict[str, Any], list[str]]:
     warnings: list[str] = []
     local = _load_local_price_payload(path, warnings=warnings)
@@ -1239,13 +1291,16 @@ def _load_price_series_for_instruments(
             result[instrument.key] = rows
             diagnostics[instrument.key] = {"provider": "local_json", "price_basis": basis, "rows": len(rows)}
     missing = [item for item in instruments if item.key not in result and item.symbol]
-    if str(provider or "").lower() == "yfinance" and missing:
-        fetched = _fetch_yfinance_prices(missing, start_date=start_date, end_date=end_date, warnings=warnings)
-        for key, rows in fetched.items():
-            rows = [row for row in rows if start_date <= date.fromisoformat(row["date"]) <= end_date]
+    if provider == "yfinance":
+        for item in missing:
+            rows, evidence = load_yahoo_benchmark(
+                item.symbol, item.currency, start_date, end_date, as_of=as_of, cache_dir=cache_dir,
+            )
+            diagnostics[item.key] = evidence
             if rows:
-                result[key] = rows
-                diagnostics[key] = {"provider": "yfinance", "price_basis": "adjusted_close", "rows": len(rows)}
+                result[item.key] = rows
+            else:
+                warnings.append(f"etf_alternative_yfinance_unavailable:{item.key}:{evidence['state']}")
     return result, diagnostics, warnings
 
 
@@ -1254,12 +1309,12 @@ def _load_local_price_payload(path: Any, *, warnings: list[str]) -> Mapping[str,
         return {}
     candidate = Path(path)
     if not candidate.exists():
-        warnings.append(f"etf_alternative_price_history_missing:{candidate}")
+        warnings.append("etf_alternative_price_history_missing")
         return {}
     try:
         payload = json.loads(candidate.read_text(encoding="utf-8"))
     except Exception as exc:
-        warnings.append(f"etf_alternative_price_history_invalid:{_short_error(exc)}")
+        warnings.append(f"etf_alternative_price_history_invalid:{type(exc).__name__}")
         return {}
     if not isinstance(payload, Mapping):
         warnings.append("etf_alternative_price_history_not_object")
@@ -1283,57 +1338,6 @@ def _price_rows_from_payload(
     return [], "unknown"
 
 
-def _fetch_yfinance_prices(
-    instruments: list[EtfAlternativeInstrument],
-    *,
-    start_date: date,
-    end_date: date,
-    warnings: list[str],
-) -> dict[str, list[dict[str, Any]]]:
-    try:
-        import yfinance as yf
-    except Exception as exc:
-        warnings.append(f"etf_alternative_yfinance_unavailable:{_short_error(exc)}")
-        return {}
-    result: dict[str, list[dict[str, Any]]] = {}
-    for instrument in instruments:
-        try:
-            data = yf.download(
-                instrument.symbol,
-                start=start_date.isoformat(),
-                end=(end_date + timedelta(days=1)).isoformat(),
-                progress=False,
-                auto_adjust=True,
-                threads=False,
-            )
-        except Exception as exc:
-            warnings.append(f"etf_alternative_yfinance_failed:{instrument.key}:{_short_error(exc)}")
-            continue
-        rows: list[dict[str, Any]] = []
-        try:
-            close = data["Close"]
-        except Exception:
-            close = None
-        if close is None:
-            warnings.append(f"etf_alternative_yfinance_no_close:{instrument.key}")
-            continue
-        for index, value in close.dropna().items():
-            if hasattr(value, "iloc"):
-                try:
-                    value = value.iloc[0]
-                except Exception:
-                    pass
-            parsed = _parse_date(str(index)[:10])
-            number = _float_or_none(value)
-            if parsed and number is not None:
-                rows.append({"date": parsed.isoformat(), "close": number})
-        if rows:
-            result[instrument.key] = sorted(rows, key=lambda item: item["date"])
-        else:
-            warnings.append(f"etf_alternative_yfinance_empty:{instrument.key}")
-    return result
-
-
 def _load_fx_series(path: Any, *, end_date: date) -> tuple[dict[str, list[dict[str, Any]]], list[str]]:
     warnings: list[str] = []
     if not path:
@@ -1347,23 +1351,35 @@ def _load_fx_series(path: Any, *, end_date: date) -> tuple[dict[str, list[dict[s
     return result, warnings
 
 
-def _fx_rate_for_currency(
+def _fx_rate_for_currency(currency, fx_map, target, *, lookup):
+    return _fx_rate_and_date(currency, fx_map, target, lookup=lookup)[0]
+
+
+def _fx_rate_and_date(
     currency: str,
     fx_map: Mapping[str, list[dict[str, Any]]],
     target: date,
     *,
     lookup: str,
-) -> float | None:
+) -> tuple[float | None, str | None]:
     normalized = str(currency or "KRW").strip().upper()
     if normalized in {"", "KRW"}:
-        return 1.0
+        return 1.0, target.isoformat()
     rows = fx_map.get(f"{normalized}KRW") or fx_map.get(f"{normalized}/KRW")
     if not rows:
-        return None
-    if lookup == "on_trade_date":
-        row = _price_row_on_or_after(rows, target)
-        return _float_or_none(row.get("close")) if row and row["date"] == target.isoformat() else None
-    return _price_on_or_before(rows, target)
+        return None, None
+    iso = target.isoformat()
+    if rows[0].get("fx_method") == "prior_daily_mark":
+        candidates = [row for row in rows if row["date"] < iso
+                      and (target - date.fromisoformat(row["date"])).days <= 7]
+    elif lookup == "on_trade_date":
+        candidates = [row for row in rows if row["date"] == iso]
+    else:
+        candidates = [row for row in rows if row["date"] <= iso]
+    if not candidates:
+        return None, None
+    row = candidates[-1]
+    return _float_or_none(row.get("close")), row["date"]
 
 
 def _normalize_price_rows(raw: Any, *, start_date: date | None = None, end_date: date | None = None) -> tuple[list[dict[str, Any]], str]:

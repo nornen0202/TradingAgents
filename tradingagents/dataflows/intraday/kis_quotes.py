@@ -80,6 +80,10 @@ class KISQuoteProvider:
             market_session=market_session_state(market="KR", now_local=now)["phase"],
             market="KR",
             exchange="KRX",
+            research_price_reference={
+                "price": last_price, "currency": "KRW", "basis": "unadjusted",
+                "source": "kis.FHKST01010100.stck_prpr", "observed_at": now.isoformat(),
+            } if asof.date() == now.date() and (now - asof).total_seconds() <= 900 else None,
             checkpoint_id=checkpoint_id,
         )
 

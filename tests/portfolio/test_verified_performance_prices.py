@@ -33,7 +33,7 @@ def _prices(currency="USD", **changes):
     ]}
 
 
-def _recommendation(tmp_path, reference):
+def _recommendation(tmp_path, reference, *, legacy=True):
     db = tmp_path / "performance.sqlite"
     run = tmp_path / "run"
     portfolio = run / "portfolio-private"
@@ -44,6 +44,11 @@ def _recommendation(tmp_path, reference):
         "data_health": {"price_reference": reference},
     }]}))
     assert record_run_recommendations(run, db, recorded_at=KNOWN) == 1
+    if legacy:
+        # Emulate a pre-contract writer for historic revision tests.
+        with sqlite3.connect(db) as conn:
+            conn.execute("UPDATE action_recommendations SET recommended_price=150000, "
+                         "native_reference_state=NULL, price_reference_json=?", (json.dumps(reference) if reference is not None else None,))
     return db
 
 
@@ -202,3 +207,39 @@ def test_old_corporate_action_outside_the_reference_window_does_not_block_fresh_
                                   require_verified_price=True) == 1
     summary = summarize_action_performance(db, analysis_as_of=MEASURED, require_verified_price=True)
     assert summary.by_action["ADD_NOW"]["avg_return_5d"] == pytest.approx(.06)
+
+@pytest.mark.parametrize("reference,price,status", [
+    (_reference(), 100, "verified_native_reference"),
+    (_reference("KRW"), None, "currency_mismatch"),
+    (None, None, "missing_reference"),
+    (_reference() | {"observed_at": MEASURED}, None, "future_reference"),
+    ({key: value for key, value in _reference().items() if key != "observed_at"}, None, "invalid_reference"),
+    (_reference() | {"observed_at": "2026-invalid"}, None, "invalid_reference"),
+])
+def test_standard_writer_never_uses_krw_display_as_native(tmp_path, reference, price, status):
+    from concurrent.futures import ThreadPoolExecutor
+
+    db = _recommendation(tmp_path, reference, legacy=False)
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        retries = list(pool.map(lambda _: record_run_recommendations(tmp_path / "run", db, recorded_at=KNOWN), range(2)))
+    assert retries == [0, 0]
+    with sqlite3.connect(db) as conn:
+        row, = conn.execute("SELECT recommended_price, native_reference_state, display_unit_price_krw, "
+                            "price_reference_json FROM action_recommendations").fetchall()
+    assert row[:3] == (price, status, 150000)
+    assert (row[3] is None) == (price is None)
+
+
+@pytest.mark.parametrize("decision_clock", ["broken-date", "2026-10-01", "2026-10-01T16:00:00"])
+def test_malformed_decision_clock_preserves_action_without_a_price(tmp_path, decision_clock):
+    db = _recommendation(tmp_path, _reference(), legacy=False)
+    assert record_run_recommendations(
+        tmp_path / "run", db, recorded_at=KNOWN,
+        manifest={"run_id": "malformed", "finished_at": decision_clock},
+    ) == 1
+    with sqlite3.connect(db) as conn:
+        row = conn.execute(
+            "SELECT recommended_price, price_reference_json, native_reference_state "
+            "FROM action_recommendations WHERE run_id='malformed'"
+        ).fetchone()
+        assert row == (None, None, "decision_clock_unverified")

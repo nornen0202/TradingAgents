@@ -17,7 +17,7 @@ from .models import (ACTION_TRACKER_SCHEMA, OUTCOME_CALCULATION_VERSION,
 from .price_history import BENCHMARK_KEY
 from .lifecycle import append_lifecycle_event, initialize_lifecycle, stable_signal_id, timestamp, validate_event
 from .outcome_revisions import read_events, select_retrospectives, visible_events
-from .price_evidence import PriceReference, series_terms
+from .price_evidence import PriceReference, native_reference, series_terms
 from .price_revisions import initialize_price_revisions, latest_revision_sql
 
 
@@ -52,6 +52,9 @@ def initialize_action_tracker(db_path: Path) -> None:
             "full_size_allowed": "INTEGER",
             "execution_evidence": "TEXT",
             "price_reference_json": "TEXT",
+            "native_reference_state": "TEXT",
+            "display_unit_price_krw": "REAL",
+            "valuation_amount_krw": "INTEGER",
         })
         _ensure_columns(conn, "action_outcomes", {
             "return_5d": "REAL",
@@ -141,8 +144,8 @@ def record_run_recommendations(
                   sell_size_plan, unrealized_return_pct, profit_protection_score,
                   profit_plan_json, lift_status, opportunity_cost_score, opportunity_capture_score,
                   pilot_allowed, full_size_allowed, was_executed, execution_evidence, skip_reason, created_at,
-                  price_reference_json
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                  price_reference_json, native_reference_state, display_unit_price_krw, valuation_amount_krw
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     row["run_id"],
@@ -174,6 +177,9 @@ def record_run_recommendations(
                     row.get("skip_reason"),
                     row["created_at"],
                     row.get("price_reference_json"),
+                    row.get("native_reference_state"),
+                    row.get("display_unit_price_krw"),
+                    row.get("valuation_amount_krw"),
                 ),
             )
             inserted += 1
@@ -481,6 +487,12 @@ def summarize_action_performance(db_path: Path, *, analysis_as_of: str | None = 
         calibration = _aggregate_calibration(conn)
         data_quality = _performance_data_quality(conn, closed_trades=closed_trades,
                                                 known_events=known_events, active_reviews=active_reviews)
+        currency_rows = dict(conn.execute("""
+            SELECT coalesce(native_reference_state, 'legacy_or_no_reference_contract'), count(*)
+            FROM action_recommendations GROUP BY 1
+        """))
+        data_quality["native_reference_states"] = currency_rows
+        data_quality["priced_outcome_count"] = outcomes
         if require_verified_price:
             data_quality["price_evidence_required"] = True
             data_quality["recommendations_without_verified_outcome"] = recommendations - outcomes
@@ -551,7 +563,7 @@ def _portfolio_action_rows(
         data_health = action.get("data_health") if isinstance(action.get("data_health"), Mapping) else {}
         lift = data_health.get("action_lift") if isinstance(data_health.get("action_lift"), Mapping) else {}
         execution_evidence = _execution_evidence(action)
-        reference = PriceReference.read(data_health.get("price_reference"))
+        reference, reference_state = native_reference(data_health.get("price_reference"), ticker_market, created_at)
         has_proposed_allocation = bool(int(action.get("delta_krw_now") or 0))
         rows.append(
             {
@@ -560,7 +572,10 @@ def _portfolio_action_rows(
                 "market": ticker_market,
                 "action": preferred_action,
                 "risk_action": action.get("risk_action"),
-                "recommended_price": _recommended_price(action),
+                "recommended_price": reference.price if reference else None,
+                "native_reference_state": reference_state,
+                "display_unit_price_krw": _positive_number(position_metrics.get("market_price_krw")),
+                "valuation_amount_krw": _int_krw(position_metrics.get("market_value_krw")),
                 "price_reference_json": json.dumps(asdict(reference), sort_keys=True) if reference else None,
                 "confidence": action.get("confidence"),
                 "trigger_type": action.get("trigger_type"),
@@ -651,6 +666,7 @@ def _prism_skipped_rows(
         ticker_market = _ticker_market(ticker, signal.get("market"))
         if not _market_matches(ticker_market, run_market):
             continue
+        reference, reference_state = native_reference(signal.get("price_reference"), ticker_market, created_at)
         rows.append(
             {
                 "run_id": run_id,
@@ -658,7 +674,9 @@ def _prism_skipped_rows(
                 "market": ticker_market,
                 "action": "prism_candidate_skipped",
                 "risk_action": signal.get("signal_action"),
-                "recommended_price": signal.get("current_price"),
+                "recommended_price": reference.price if reference else None,
+                "native_reference_state": reference_state,
+                "price_reference_json": json.dumps(asdict(reference), sort_keys=True) if reference else None,
                 "confidence": signal.get("confidence"),
                 "trigger_type": signal.get("trigger_type"),
                 "source": "PRISM",
@@ -1211,19 +1229,14 @@ def _preferred_action(action: Mapping[str, Any]) -> str:
     return relative or now or "UNKNOWN"
 
 
-def _recommended_price(action: Mapping[str, Any]) -> float | None:
-    data = action.get("data_health") if isinstance(action.get("data_health"), Mapping) else {}
-    metrics = action.get("position_metrics") if isinstance(action.get("position_metrics"), Mapping) else {}
-    for key in ("current_price", "market_price_krw"):
-        number = _float_or_none(metrics.get(key))
-        if number is not None and number > 0:
-            return number
-    for key in ("current_price", "last_price", "estimated_market_price_krw"):
-        value = data.get(key)
-        number = _float_or_none(value)
-        if number is not None and number > 0:
-            return number
-    return None
+def _positive_number(value: Any) -> float | None:
+    number = _float_or_none(value)
+    return number if number is not None and math.isfinite(number) and number > 0 else None
+
+
+def _int_krw(value: Any) -> int | None:
+    number = _float_or_none(value)
+    return int(number) if number is not None and math.isfinite(number) and number >= 0 and number.is_integer() else None
 
 
 def _skip_reason(action: Mapping[str, Any]) -> str | None:

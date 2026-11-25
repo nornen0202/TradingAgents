@@ -13,6 +13,7 @@ from tradingagents.dataflows.intraday.us_microstructure_sources import (
 from tradingagents.portfolio.instrument_identity import resolve_identity
 from tradingagents.portfolio.kis import KisClient
 from tradingagents.schemas import IntradayMarketSnapshot
+from tradingagents.charting.bars import finite, instant
 from tradingagents.charting.capture import normalize_kis_bars
 from .us_symbols import canonical_symbol, kis_symbol
 
@@ -231,9 +232,11 @@ class KISMicrostructureProvider:
         )
 
         asof = _bar_asof(bars, fallback=now_local, timezone_name=market_timezone)
+        chart_bars = tuple(normalize_kis_bars(bars, observed_at=now_local, timezone_name=market_timezone))
         return IntradayMarketSnapshot(
             ticker=ticker,
-            chart_bars=tuple(normalize_kis_bars(bars, observed_at=now_local, timezone_name=market_timezone)),
+            chart_bars=chart_bars,
+            research_price_reference=_native_bar_reference(chart_bars, now_local, "KRW", "kis.domestic_time_itemchartprice"),
             asof=asof.isoformat(),
             provider=self.name,
             interval=interval,
@@ -533,9 +536,14 @@ class KISMicrostructureProvider:
         trade_tape_summary = tape_summary or _trade_tape_summary(tape_rows)
         if not tape_rows and supplement is not None and getattr(supplement, "trade_tape_summary", None):
             trade_tape_summary = supplement.trade_tape_summary
+        chart_bars = tuple(normalize_kis_bars(session_bars, observed_at=now_local, timezone_name=market_timezone))
         return IntradayMarketSnapshot(
             ticker=ticker,
-            chart_bars=tuple(normalize_kis_bars(session_bars, observed_at=now_local, timezone_name=market_timezone)),
+            chart_bars=chart_bars,
+            research_price_reference=(
+                _native_bar_reference(chart_bars, now_local, "USD", "kis.overseas_time_itemchartprice")
+                if exchange in {"NAS", "NYS", "AMS"} else None
+            ),
             asof=asof.isoformat(),
             provider=self.name,
             interval=interval,
@@ -736,6 +744,22 @@ def _to_float(value: Any) -> float | None:
         return float(text)
     except ValueError:
         return None
+
+
+def _native_bar_reference(bars, now: datetime, currency: str, source: str) -> dict[str, Any] | None:
+    # The time-item chart contract supplies trading-currency prices.
+    if not bars:
+        return None
+    bar = bars[-1]
+    available = instant(bar.get("available_at"))
+    observed = instant(bar.get("observed_at"))
+    close = finite(bar.get("close"))
+    if (available is None or observed is None or close is None or close <= 0
+            or available.astimezone(now.tzinfo).date() != now.date()
+            or not available <= observed <= now or now - available > timedelta(minutes=15)):
+        return None
+    return {"price": close, "currency": currency, "basis": "unadjusted",
+            "source": source, "observed_at": observed.isoformat()}
 
 
 def _find_float(mapping: dict[str, Any], *keys: str, default: float | None = None) -> float | None:

@@ -701,4 +701,5 @@ def _build_update(
         data_health=data_health,
         refresh_checkpoint=refresh_checkpoint,
         execution_timing_state=execution_timing_state,
+        price_reference=getattr(market, "research_price_reference", None),
     )

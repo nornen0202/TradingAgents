@@ -2170,6 +2170,24 @@ def _render_etf_alternative_comparison(value: Any) -> str:
     actual = value.get("actual") if isinstance(value.get("actual"), dict) else {}
     cashflows = value.get("cashflows") if isinstance(value.get("cashflows"), dict) else {}
     alternatives = [item for item in value.get("alternatives", []) if isinstance(item, dict)]
+    if cashflows.get("status") == "cashflow_evidence_unverified":
+        rows = "".join(
+            "<tr>"
+            f"<td>{_escape(str(item.get('label') or item.get('key') or '-'))}</td>"
+            f"<td>{_escape(_format_pct_points_value(item.get('balance_return_pct')))}</td>"
+            f"<td>{_escape(_etf_status_label(item.get('status')))}</td></tr>"
+            for item in alternatives
+        )
+        return f"""
+      <div class="account-etf-alternatives">
+        <h3>ETF 연구 수익률</h3>
+        <p class="empty">기간 입출금 합계의 증빙이 필요합니다. 가격이 있는 ETF의 연구 결과만 표시합니다.</p>
+        <div class="account-table-wrap"><table>
+          <thead><tr><th>대체 포트폴리오</th><th>연구 수익률</th><th>상태</th></tr></thead>
+          <tbody>{rows}</tbody>
+        </table></div>
+      </div>
+        """
     ok_alternatives = [item for item in alternatives if str(item.get("status") or "").upper() == "OK"]
     best = (
         max(
@@ -2492,6 +2510,8 @@ def _etf_status_label(value: Any) -> str:
         return "비교 데이터 없음"
     if normalized == "cashflow_dates_required":
         return "입금일 원장 필요"
+    if normalized in {"cashflow_evidence_unverified", "research_only_unverified_cashflows"}:
+        return "입출금 미검증 · 연구용"
     if normalized == "no_alternatives":
         return "대체 포트폴리오 없음"
     return _friendly_etf_warning(status) if status else "-"
@@ -3105,11 +3125,16 @@ def _render_performance_tracking_section(manifest: dict[str, Any]) -> str:
         )
         if table
     )
-    if not calibration_html and not tables_html:
+    if not calibration_html and not tables_html and not data_quality.get("price_evidence_required"):
         return ""
     actual_feedback = bool(data_quality.get("actual_trade_effectiveness_available"))
     feedback_label = "체결·종료거래 연계됨" if actual_feedback else "미연계 — 추천 후 가격 경로만 평가"
-    matured_5d = int(data_quality.get("matured_5d_rows") or summary.get("outcomes") or 0)
+    matured_5d = int(data_quality.get("matured_5d_rows", summary.get("outcomes")) or 0)
+    excluded = data_quality.get("recommendations_without_verified_outcome")
+    exclusion_row = (
+        f"<p><strong>검증된 가격 성과 미확정·제외</strong><span>{int(excluded)}</span></p>"
+        if excluded is not None else ""
+    )
     distinct_runs = int(data_quality.get("distinct_runs") or 0)
     execution_warning = "" if actual_feedback else (
         "<div class='warning-banner account-performance-note'>"
@@ -3126,6 +3151,7 @@ def _render_performance_tracking_section(manifest: dict[str, Any]) -> str:
       <article class="run-card">
         <p><strong>추천 행 / 분석 실행</strong><span>{int(summary.get('recommendations') or 0)} / {distinct_runs or '-'}</span></p>
         <p><strong>5거래일 평가 표본</strong><span>{matured_5d}</span></p>
+        {exclusion_row}
         <p><strong>실제 체결 피드백</strong><span>{_escape(feedback_label)}</span></p>
         <p><strong>연결된 종료 거래</strong><span>{int(data_quality.get('closed_trade_journal_rows') or summary.get('closed_trades') or 0)}</span></p>
         <div class="pill-row">{artifact_link}</div>

@@ -388,6 +388,7 @@ class IntradayMarketSnapshot:
     reg_sho_status: dict[str, Any] | None = None
     news_halt_status: dict[str, Any] | None = None
     chart_bars: tuple[dict[str, Any], ...] = ()
+    research_price_reference: dict[str, Any] | None = None
 
     def to_dict(self) -> dict[str, Any]:
         microstructure = MicrostructureSnapshot(
@@ -518,6 +519,7 @@ class ExecutionUpdate:
     refresh_checkpoint: str | None = None
     execution_timing_state: ExecutionTimingState = ExecutionTimingState.WAITING
     entry_confirmation_v2: dict[str, Any] | None = None
+    price_reference: dict[str, Any] | None = None
 
     def to_dict(self) -> dict[str, Any]:
         result = {
@@ -546,6 +548,7 @@ class ExecutionUpdate:
             "data_health": self.data_health,
             "refresh_checkpoint": self.refresh_checkpoint,
             "execution_timing_state": self.execution_timing_state.value,
+            **({"price_reference": self.price_reference} if self.price_reference is not None else {}),
         }
         if self.entry_confirmation_v2 is not None:
             result["entry_confirmation_v2"] = self.entry_confirmation_v2

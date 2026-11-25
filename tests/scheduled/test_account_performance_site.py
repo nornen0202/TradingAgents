@@ -1227,3 +1227,16 @@ def test_benchmark_provider_label_uses_actual_provider_status():
 
     assert label == "KOSPI/KOSDAQ=kis"
     assert "yfinance" not in label
+
+
+def test_etf_research_preview_keeps_values_and_omits_same_cashflow_claim():
+    from tradingagents.scheduled.site import _render_etf_alternative_comparison
+
+    html = _render_etf_alternative_comparison({
+        "status": "cashflow_evidence_unverified",
+        "cashflows": {"status": "cashflow_evidence_unverified"},
+        "alternatives": [{"key": "SPY_100", "label": "SPY", "status": "research_only_unverified_cashflows",
+                          "balance_return_pct": 4.25}],
+    })
+    assert "ETF 연구 수익률" in html and "4.25%" in html and "입출금 미검증" in html
+    assert "동일 입금일" not in html and "ETF 대체 최고 수익률" not in html
