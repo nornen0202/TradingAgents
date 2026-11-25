@@ -554,3 +554,49 @@ def test_prism_autotrader_pit_filter_unknown_quarantine_and_sell_during_circuit_
     r_unk2 = flaky_trader.tick_market("KR")
     assert "UNRESOLVED_UNKNOWN_ORDER" in r_unk2["blockers"]
     assert r_unk2["entries_executed"] == []
+
+
+def test_kis_vts_default_broker_executor_and_one_share_ceiling(monkeypatch):
+    from tradingagents.execution import kis_demo, kis_demo_us, prism_autotrader
+
+    calls = []
+
+    class FakeKrClient:
+        def __init__(self, creds):
+            pass
+
+        def _account(self):
+            return {"CANO": "50123456", "ACNT_PRDT_CD": "01"}
+
+        def request(self, method, endpoint, tr_id, *, body=None, **kw):
+            calls.append((method, endpoint, tr_id, body))
+            return {"rt_cd": "0", "output": {"ODNO": "0000123456"}}, {}
+
+        def close(self):
+            pass
+
+    class FakeUsClient:
+        def __init__(self, creds):
+            self.session = SimpleNamespace(close=lambda: None)
+
+        def _account(self):
+            return {"CANO": "50123456", "ACNT_PRDT_CD": "01"}
+
+        def request(self, method, endpoint, tr_id, *, body=None, **kw):
+            calls.append((method, endpoint, tr_id, body["OVRS_EXCG_CD"]))
+            if body["OVRS_EXCG_CD"] == "NASD":
+                return {"rt_cd": "1", "msg1": "wrong exchange"}, {}
+            return {"rt_cd": "0", "output": {"ODNO": "0000654321"}}, {}
+
+    monkeypatch.setattr(kis_demo.DemoCredentials, "from_local_settings", staticmethod(lambda: SimpleNamespace()))
+    monkeypatch.setattr(kis_demo, "KisDemoClient", FakeKrClient)
+    monkeypatch.setattr(kis_demo_us, "credentials_from_settings", lambda: SimpleNamespace())
+    monkeypatch.setattr(kis_demo_us, "KisDemoUSClient", FakeUsClient)
+
+    res_kr = prism_autotrader._default_broker_executor("kis_vts", "KR", "BUY", "003230.KS", 1, 1_302_000.0, NOW)
+    assert res_kr["accepted"] is True and res_kr["order_no"] == "0000123456"
+    assert calls[0][:3] == ("POST", "order-cash", "VTTC0012U")
+
+    res_us = prism_autotrader._default_broker_executor("kis_vts", "US", "BUY", "IBM", 2, 210.0, NOW)
+    assert res_us["accepted"] is True and res_us["order_no"] == "0000654321"
+    assert ("POST", "order", "VTTT1002U", "NYSE") in calls

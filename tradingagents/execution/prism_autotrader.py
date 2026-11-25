@@ -60,6 +60,7 @@ class AutotraderPolicy:
     kr_initial_capital: float = 10_000_000.0
     us_initial_capital: float = 10_000.0
     micro_split_enabled: bool = True
+    one_share_nav_ceiling: float = 0.16
     session_entry_ttl_hours: int = 18
     buy_max_premium_pct: float = 3.0
     default_stop_loss_pct: float = 6.0
@@ -618,6 +619,7 @@ def _default_broker_executor(mode: str, market: str, side: str, ticker: str, qua
     if mode == "shadow":
         return {"accepted": True, "order_no": f"SHADOW-{market}-{int(now.timestamp())}", "fill_price": price}
     if mode == "kis_vts":
+        from .kis_demo import DemoNotSentError
         if market == "KR":
             from .kis_demo import DemoCredentials, KisDemoClient
             from .kis_paper import _tick
@@ -633,34 +635,50 @@ def _default_broker_executor(mode: str, market: str, side: str, ticker: str, qua
                     "ORD_QTY": str(int(quantity)),
                     "ORD_UNPR": str(max(tick, limit)),
                 }
-                resp, _ = client._post("/uapi/domestic-stock/v1/trading/order-cash", tr_id, body)
+                try:
+                    resp, _ = client.request("POST", "order-cash", tr_id, body=body)
+                except DemoNotSentError as exc:
+                    return {"accepted": False, "reason": str(exc)}
+                if str(resp.get("rt_cd")) != "0":
+                    return {"accepted": False, "reason": str(resp.get("msg1") or "VTS_ORDER_REJECTED")}
                 out = resp.get("output") or {}
                 return {"accepted": True, "order_no": str(out.get("ODNO") or out.get("odno") or "VTS-KR"), "fill_price": price}
             finally:
                 client.close()
         else:
+            from tradingagents.dataflows.intraday.us_symbols import kis_symbol
             from .kis_demo_us import KisDemoUSClient, credentials_from_settings
             client = KisDemoUSClient(credentials_from_settings())
             try:
                 tr_id = "VTTT1002U" if side == "BUY" else "VTTT1001U"
-                limit_str = f"{round(price * (1.002 if side == 'BUY' else 0.998), 2):.2f}"
-                body = {
-                    **client._account(),
-                    "OVRS_EXCG_CD": "NASD",
-                    "PDNO": ticker,
-                    "ORD_QTY": str(int(quantity)),
-                    "OVRS_ORD_UNPR": limit_str,
-                    "CTAC_TLNO": "",
-                    "MGCO_APTM_ODNO": "",
-                    "ORD_SVR_DVSN_CD": "0",
-                    "SLL_TYPE": "00" if side == "SELL" else "",
-                    "ORD_DVSN": "00",
-                }
-                resp, _ = client._post("/uapi/overseas-stock/v1/trading/order", tr_id, body)
-                out = resp.get("output") or {}
-                return {"accepted": True, "order_no": str(out.get("ODNO") or out.get("odno") or "VTS-US"), "fill_price": price}
+                limit_str = f"{max(1.0, round(price * (1.002 if side == 'BUY' else 0.998), 2)):.2f}"
+                pdno = kis_symbol(ticker)
+                for exch in ("NASD", "NYSE", "AMEX"):
+                    body = {
+                        **client._account(),
+                        "OVRS_EXCG_CD": exch,
+                        "PDNO": pdno,
+                        "ORD_QTY": str(int(quantity)),
+                        "OVRS_ORD_UNPR": limit_str,
+                        "CTAC_TLNO": "",
+                        "MGCO_APTM_ODNO": "",
+                        "ORD_SVR_DVSN_CD": "0",
+                        "SLL_TYPE": "00" if side == "SELL" else "",
+                        "ORD_DVSN": "00",
+                    }
+                    try:
+                        resp, _ = client.request("POST", "order", tr_id, body=body)
+                    except DemoNotSentError as exc:
+                        return {"accepted": False, "reason": str(exc)}
+                    if str(resp.get("rt_cd")) == "0":
+                        out = resp.get("output") or {}
+                        return {"accepted": True, "order_no": str(out.get("ODNO") or out.get("odno") or "VTS-US"), "fill_price": price}
+                return {"accepted": False, "reason": str(resp.get("msg1") or "US_VTS_ORDER_REJECTED")}
             finally:
-                client.close()
+                if hasattr(client, "close"):
+                    client.close()
+                elif hasattr(client, "session"):
+                    client.session.close()
     if mode == "kis_live":
         from tradingagents.portfolio.kis import KisClient
         client = KisClient.from_api_keys(environment="real")
@@ -1093,7 +1111,10 @@ class PrismAutoTrader:
                     order_budget = min(acct_cash * 0.98, slot_unit * float(item["slot_fraction"]))
                     slip = (self.policy.slippage_bps / 10_000.0) if self.policy.mode == "shadow" else 0.0
                     eff_buy = live_price * (1.0 + slip)
-                    qty = whole_share_quantity(order_budget, eff_buy * (1.0 + self.policy.fee_bps / 10_000.0))
+                    unit_cost = eff_buy * (1.0 + self.policy.fee_bps / 10_000.0)
+                    qty = whole_share_quantity(order_budget, unit_cost)
+                    if qty <= 0 and unit_cost <= min(acct_cash * 0.95, nav_now * float(self.policy.one_share_nav_ceiling)):
+                        qty = 1
                     if qty <= 0:
                         conn.execute(
                             "UPDATE autotrader_pending_entries SET status='SKIPPED_BUDGET', updated_at=? WHERE intent_id=?",
