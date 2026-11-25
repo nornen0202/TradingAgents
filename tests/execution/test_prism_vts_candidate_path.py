@@ -65,7 +65,15 @@ class NormalCli:
                     for table in ("intents", "paper_intents"):
                         assert reader.execute(f"SELECT 1 FROM {table} WHERE id=?", (attempt,)).fetchone()
                     self.prepared_at_wire.append(json.loads(evidence[0]) if evidence else {})
-            return original_request(method, url, **kwargs)
+            response = original_request(method, url, **kwargs)
+            if method == "GET":
+                params = kwargs["params"]
+                date = params.get("INQR_STRT_DT") or params.get("ORD_STRT_DT")
+                field = "output1" if h.market == "KR" else "output"
+                if date:
+                    payload = response.json()
+                    payload[field] = [row for row in payload[field] if row["ord_dt"] == date]
+            return response
 
         monkeypatch.setattr(h, "request", request)
         client_type = KisDemoClient if market == "KR" else KisDemoUSClient
@@ -290,10 +298,40 @@ def test_offhours_repeated_publication_does_not_renew_entry_expiry(cli):
     h.now += timedelta(minutes=1)
     cli.run("autotrader")
     next_receipt = read(cli.receipt)
-    assert next_receipt["produced_at"] != receipt["produced_at"] and next_receipt["expires_at"] == receipt["expires_at"]
+    assert next_receipt["produced_at"] != receipt["produced_at"]
+    assert next_receipt["entry_expires_at"] == receipt["entry_expires_at"]
     h.now += timedelta(hours=18)
-    assert "VTS_CANDIDATE_SOURCE_UNVERIFIED" in cli.run("autotrader")["blockers"]
-    assert read(cli.receipt) == next_receipt and not h.calls
+    expired = cli.run("autotrader")
+    assert expired["entry_research_expired"] and expired["entries_queued"] == []
+    assert read(cli.receipt)["entry_expires_at"] == receipt["entry_expires_at"] and not h.calls
+
+
+@pytest.mark.parametrize("condition", ["expired_entry", "older_lot"])
+def test_verified_exit_recovers_after_entry_expiry_or_a_long_journal(cli, condition):
+    h = cli.h
+    full = cli.source("production-full")
+    assert cli.run("autotrader")["entries_queued"] == [h.ticker]
+    assert cli.run("strategy-kis")["orders"][0]["status"] == "ACKNOWLEDGED"
+    h.fill()
+    h.now += timedelta(seconds=5)
+    assert cli.run("strategy-kis")["owned"][h.ticker] == 1
+    if condition == "older_lot":
+        with sqlite3.connect(cli.journal) as db:
+            ticker, run_id, terms = db.execute("SELECT ticker,run_id,terms FROM strategy_attempts").fetchone()
+            db.executemany("INSERT INTO strategy_attempts VALUES (?,?,?,?,?,?)", [
+                (f"interrupted-{i}", ticker, run_id, (h.now + timedelta(seconds=i + 1)).isoformat(), terms, "NOT_SENT")
+                for i in range(101)
+            ])
+    h.now += timedelta(days=1)
+    h.price *= .9
+    cli.source("exit-source", action="EXIT_NOW", parent=full if condition == "expired_entry" else None)
+    producer = cli.run("autotrader")
+    assert producer["entry_research_expired"] is (condition == "expired_entry")
+    assert producer["risk_exit_candidates"] == 1
+    sell = cli.run("strategy-kis")
+    assert sell["orders"][-1]["status"] == "ACKNOWLEDGED", sell
+    assert [item["side"] for item in h.orders.values()] == ["BUY", "SELL"]
+    assert sell["owned"][h.ticker] == 1 and cli.fill_events() == ["FILLED"]
 
 
 @pytest.mark.parametrize("against", ["shadow", "incomplete", "stale", "foreign", "cash", "halt", "live", "slots"])

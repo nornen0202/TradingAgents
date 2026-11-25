@@ -199,12 +199,10 @@ def produce(archive, lane, market, now, session, policy):
             if source is None:
                 raise ValueError("No completed execution source")
             root, finished = baseline(archive, source, market, now)
-            expires = finished + timedelta(hours=policy.session_entry_ttl_hours)
-            if not finished <= now < expires:
-                raise ValueError("Candidate research expired")
+            entry_expires = finished + timedelta(hours=policy.session_entry_ttl_hours)
             research, regime = _research(root)
             owned, orders = _journal(lane, market, now)
-            entries = _entries(research, regime, owned, policy, market, finished)
+            entries = _entries(research, regime, owned, policy, market, finished) if now < entry_expires else {}
             exits, marks = _exits(source, market, now, session, research, owned, orders,
                                   _receipt(lane, market).get("marks", {}), policy)
             if not active(lane, policy):
@@ -214,13 +212,13 @@ def produce(archive, lane, market, now, session, policy):
                 "baseline_id": root.parent.name, "baseline_sha256": digest(root),
                 "research_sha256": digest(root.parent / SOURCE_ARTIFACTS[1]),
                 "execution_id": source.name, "execution_sha256": digest(source / SOURCE_ARTIFACTS[0]),
-                "produced_at": now.isoformat(), "expires_at": expires.isoformat(),
+                "produced_at": now.isoformat(), "entry_expires_at": entry_expires.isoformat(),
                 "entries": entries, "exits": exits, "marks": marks,
             })
         except (OSError, ValueError, TypeError, KeyError, AttributeError, ArithmeticError, sqlite3.Error):
             return {"blockers": ["VTS_CANDIDATE_SOURCE_UNVERIFIED"]}
     return {"source_run_id": source.name, "entries_queued": sorted(entries),
-            "risk_exit_candidates": len(exits), "blockers": []}
+            "entry_research_expired": now >= entry_expires, "risk_exit_candidates": len(exits), "blockers": []}
 
 
 def authorize(archive, lane, market, source, candidate, terms, quote, account, current, now, session):
@@ -229,10 +227,9 @@ def authorize(archive, lane, market, source, candidate, terms, quote, account, c
     if not active(lane, policy) or not _regular(session, now):
         raise ValueError("Five-minute lane halted or market closed")
     receipt = _receipt(lane, market)
-    produced, expires = instant(receipt.get("produced_at")), instant(receipt.get("expires_at"))
+    produced = instant(receipt.get("produced_at"))
     root, finished = baseline(archive, source, market, now)
-    if (produced is None or expires is None or not finished <= produced <= now < expires
-            or expires != finished + timedelta(hours=policy.session_entry_ttl_hours)
+    if (produced is None or not finished <= produced <= now
             or receipt.get("baseline_id") != root.parent.name or receipt.get("baseline_sha256") != digest(root)
             or receipt.get("research_sha256") != digest(root.parent / SOURCE_ARTIFACTS[1])):
         raise ValueError("No current five-minute candidate for the selected full lineage")
@@ -244,8 +241,13 @@ def authorize(archive, lane, market, source, candidate, terms, quote, account, c
             or quote.get("ticker") != terms["ticker"] or quote.get("execution_ready") is not True):
         raise ValueError("Five-minute gate requires a current native quote")
     ticker, side = candidate["ticker"], terms["side"]
-    deadline = min(expires, observed + timedelta(seconds=120))
+    deadline = observed + timedelta(seconds=120)
     if side == "BUY":
+        expires = instant(receipt.get("entry_expires_at"))
+        if (expires is None or expires != finished + timedelta(hours=policy.session_entry_ttl_hours)
+                or not produced <= now < expires):
+            raise ValueError("Five-minute entry research has expired")
+        deadline = min(deadline, expires)
         entry = receipt["entries"][ticker]
         research, regime = _research(root)
         price = _reference(research[ticker], market, finished)

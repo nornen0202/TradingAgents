@@ -540,7 +540,8 @@ def advance(archive, root, validation_root, market, *, clock, tickers, broker_fa
                                      allow_cancel=halted or near_close or not result["gate_passed"], clock=clock)
         if prism_halted:
             issues.append("PRISM_CANDIDATE_HALTED")
-        current = summary(broker.db, at(clock()), market)
+        # Exit admission needs original lots even after many newer journal attempts.
+        current = summary(broker.db, at(clock()), market, order_limit=None if prism_candidate_gate else 100)
         pending = any(count for status, count in current["order_counts"].items() if status not in TERMINAL)
         holdings_verified = True
         held = next((ticker for ticker, qty in current["owned"].items() if qty), None)
@@ -579,7 +580,7 @@ def advance(archive, root, validation_root, market, *, clock, tickers, broker_fa
                     if (session.get("source") != "exchange_calendars" or session.get("is_open") is not True
                             or session.get("phase") != "regular"
                             or not at(session["session_open"]) <= after_wait < at(session["session_close"])):
-                        result.update(current)
+                        result.update({**current, "orders": current["orders"][-100:]})
                         return finish("BLOCKED", "SESSION_ENDED_DURING_SOURCE_WAIT")
                     near_close = at(session["session_close"]) - after_wait <= timedelta(minutes=10)
                     try:
