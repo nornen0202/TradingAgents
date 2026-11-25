@@ -16,7 +16,7 @@ from .models import (ACTION_TRACKER_SCHEMA, OUTCOME_CALCULATION_VERSION,
                      VERIFIED_PRICE_CALCULATION_VERSION, ActionPerformanceSummary)
 from .price_history import BENCHMARK_KEY
 from .lifecycle import append_lifecycle_event, initialize_lifecycle, stable_signal_id, timestamp, validate_event
-from .outcome_revisions import read_events, select_retrospectives, visible_events
+from .outcome_revisions import REVISION_KIND, read_events, select_retrospectives, visible_events
 from .price_evidence import PriceReference, native_reference, series_terms
 from .price_revisions import initialize_price_revisions, latest_revision_sql
 
@@ -474,7 +474,9 @@ def summarize_action_performance(db_path: Path, *, analysis_as_of: str | None = 
             """)
         recommendations = int(conn.execute("SELECT COUNT(*) FROM action_recommendations").fetchone()[0])
         outcomes = int(conn.execute("SELECT COUNT(*) FROM action_outcomes").fetchone()[0])
-        events = read_events(conn)
+        # Economic reviews need their allocations, fills, intents and opening
+        # seeds. Price outcome events are verified by the SQL view above.
+        events = read_events(conn, kinds=("ACCOUNT_SEED", "INTENT", "FILL", "RETROSPECTIVE", REVISION_KIND))
         known_events = visible_events(events, cutoff.isoformat())
         active_reviews = select_retrospectives(events, analysis_as_of=cutoff.isoformat())
         closed_trades = len(active_reviews)

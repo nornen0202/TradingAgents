@@ -106,17 +106,19 @@ def test_due_recommendations_preserve_ticker_order_after_sequential_archive_read
             [
                 (1, "MSFT", "US", "2026-04-01T00:00:00Z", "{}"),
                 (2, "AAPL", "US", "2026-04-01T00:00:00Z", "{}"),
-                (3, "AAPL", "US", "2026-04-02T00:00:00Z", "{}"),
+                (3, "AAPL", "US", "2026-04-01T00:00:00Z", "{}"),
                 (4, "GOOG", "US", "2026-04-03T00:00:00Z", "{}"),
                 (5, "005930.KS", "KR", "2026-04-01T00:00:00Z", "{}"),
                 (6, "IBM", "US", "2026-04-01T00:00:00Z", None),
+                (7, "AT_CUTOFF", "US", "2026-04-02T23:59:59.999999Z", "{}"),
+                (8, "TOO_OLD", "US", "2026-03-27T23:59:59Z", "{}"),
             ],
         )
     tickers, records, _ = prices._recommendations_due_for_refresh(
         db, market="US", asof_date="2026-04-02", refresh_window_days=5, require_verified_price=True,
     )
-    assert tickers == ["AAPL", "MSFT"]
-    assert records == (2, 3, 1)
+    assert tickers == ["AAPL", "AT_CUTOFF", "MSFT"]
+    assert records == (2, 3, 7, 1)
 
 
 @pytest.mark.parametrize('complete', [True, False])

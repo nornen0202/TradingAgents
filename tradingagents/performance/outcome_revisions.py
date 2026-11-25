@@ -29,12 +29,15 @@ def allocation_hash(reviews, input_event_ids):
                          "members": sorted(members, key=lambda row: row["entry_fill_id"])})
 
 
-def read_events(conn):
+def read_events(conn, *, kinds=()):
     columns = [row[1] for row in conn.execute("PRAGMA table_info(lifecycle_events)")]
     if not columns:
         return []
+    query = "SELECT * FROM lifecycle_events"
+    if kinds:
+        query += " WHERE kind IN (" + ", ".join("?" for _ in kinds) + ")"
     result = []
-    for row in conn.execute("SELECT * FROM lifecycle_events"):
+    for row in conn.execute(query, kinds):
         event = dict(zip(columns, row))
         try:
             event["payload"] = json.loads(event.pop("payload_json"))
