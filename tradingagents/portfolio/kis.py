@@ -484,7 +484,23 @@ class KisClient:
         period_division: str = "D",
         adjusted_price: str = "1",
     ) -> dict[str, Any]:
-        payload, _headers = self.request_json(
+        payload, _headers = self.domestic_daily_itemchartprice_with_headers(
+            code, start_date=start_date, end_date=end_date, market_division=market_division,
+            period_division=period_division, adjusted_price=adjusted_price,
+        )
+        return payload
+
+    def domestic_daily_itemchartprice_with_headers(
+        self,
+        code: str,
+        *,
+        start_date: date | datetime | str | None = None,
+        end_date: date | datetime | str,
+        market_division: str = "J",
+        period_division: str = "D",
+        adjusted_price: str = "1",
+    ) -> tuple[dict[str, Any], requests.structures.CaseInsensitiveDict[str]]:
+        return self.request_json(
             method="GET",
             path="/uapi/domestic-stock/v1/quotations/inquire-daily-itemchartprice",
             tr_id="FHKST03010100",
@@ -497,8 +513,6 @@ class KisClient:
                 "FID_ORG_ADJ_PRC": adjusted_price,
             },
         )
-        return payload
-
     def overseas_product_info_raw(self, symbol: str, *, exchange: str) -> dict[str, Any]:
         """Current public metadata; never historical identity or listing authorization."""
         if exchange not in _SECURITY_INFO_MARKETS:

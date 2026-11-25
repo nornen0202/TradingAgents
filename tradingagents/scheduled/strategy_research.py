@@ -8,7 +8,10 @@ from tradingagents.dataflows.market_policy import aware_datetime
 from tradingagents.schemas.decision import explicit_price_range_conflicts
 from tradingagents.work.investor_policy import POLICY, _research_clock_errors
 
-from .strategy_research_prices import CURRENCIES, ZONES, KisResearchCloses, market_days, positive, price_equal, validated_quote
+from .strategy_research_prices import (
+    CURRENCIES, KR_DAILY, ZONES, KisResearchCloses, kr_close_with_evidence, market_days, positive, price_equal,
+    validated_quote,
+)
 from .strategy_research_sources import ResearchArchive, _identity, thesis_for
 
 _STAGE_NAMES = (
@@ -24,7 +27,7 @@ _NO_VOLUME_RULE = {"", "불필요", "필수 아님", "해당 없음", "없음"}
 
 def _close_records(raw, market, days, now):
     records = {}
-    kinds = {"REGULAR_CLOSE", "KIS_DAILY_CLOSE"} if market == "US" else {"REGULAR_CLOSE"}
+    kinds = {"REGULAR_CLOSE", "KIS_DAILY_CLOSE" if market == "US" else KR_DAILY}
     for day, bar in sorted((raw or {}).items()):
         window = days.get(day)
         event = aware_datetime(bar.get("event_at"))
@@ -38,26 +41,64 @@ def _close_records(raw, market, days, now):
                 repeated = aware_datetime(recheck.get("observed_at")) if isinstance(recheck, dict) else None
                 if market != "US" or not repeated or not observed <= repeated <= now or not positive(recheck.get("price")):
                     bar = {key: value for key, value in bar.items() if key != "recheck"}
+            if market == "KR":
+                official = bar.get("official_close")
+                if not _valid_krx_close(official, bar.get("ticker"), day, event + timedelta(minutes=5), now):
+                    official = None
+                carried = bar.get("previous_observations")
+                previous = [item for item in carried if _valid_sample(item, event + timedelta(minutes=5), observed)
+                            and item.get("source") in {"KIS", "KRX_OPEN_API"}] if isinstance(carried, list) else []
+                bar = kr_close_with_evidence(bar, official, previous)
             records[day] = bar
     return records
 
 
-def previous_us_closes(path):
-    """Read only the completed US observations from the prior local strategy build."""
+def _valid_sample(item, after, before):
+    return (isinstance(item, dict) and positive(item.get("price"))
+            and (received := aware_datetime(item.get("observed_at"))) is not None
+            and after <= received <= before)
+
+
+def _valid_krx_close(receipt, ticker, day, after, before):
+    if not isinstance(ticker, str) or not _valid_sample(receipt, after, before):
+        return False
+    code, _, suffix = ticker.partition(".")
+    board = {"KOSPI": ("KS", "stk_bydd_trd"), "KOSDAQ": ("KQ", "ksq_bydd_trd")}.get(receipt.get("board"))
+    return (board is not None and suffix in ("", board[0]) and receipt.get("dataset") == board[1]
+            and receipt.get("ticker") == code and receipt.get("source") == "KRX_OPEN_API"
+            and receipt.get("session") == str(day) and receipt.get("currency") == "KRW"
+            and receipt.get("adjustment") == "unadjusted")
+
+
+def previous_market_closes(path):
+    """Read the last completed-session observations from the prior local build."""
     try:
-        rows = json.loads(path.read_text(encoding="utf-8"))["markets"]["us"]["rows"]
+        markets = json.loads(path.read_text(encoding="utf-8"))["markets"]
     except (KeyError, OSError, TypeError, ValueError):
         return {}
-    if not isinstance(rows, list):
+    if not isinstance(markets, dict):
         return {}
-    closes = {}
-    for row in rows:
-        if not isinstance(row, dict) or not isinstance(row.get("ticker"), str):
+    closes = {"KR": {}, "US": {}}
+    for market, by_ticker in closes.items():
+        data = markets.get(market.lower())
+        rows = data.get("rows") if isinstance(data, dict) else None
+        if not isinstance(rows, list):
             continue
-        plan = row.get("research_plan")
-        close = plan.get("completed_close") if isinstance(plan, dict) else None
-        if isinstance(close, dict):
-            closes[_identity(row["ticker"])] = close
+        for row in rows:
+            if not isinstance(row, dict) or not isinstance(row.get("ticker"), str):
+                continue
+            plan = row.get("research_plan")
+            close = plan.get("completed_close") if isinstance(plan, dict) else None
+            if market == "US":
+                if isinstance(close, dict):
+                    by_ticker[_identity(row["ticker"])] = close
+            elif isinstance(plan, dict):
+                history = plan.get("retained_close_evidence")
+                saved = [bar for bar in history if isinstance(bar, dict)] if isinstance(history, list) else []
+                if isinstance(close, dict):
+                    saved.append(close)
+                if saved:
+                    by_ticker[_identity(row["ticker"])] = saved
     return closes
 
 
@@ -88,6 +129,38 @@ def _retain_previous_close(closes, previous, days, now):
         closes[day] = {**current, "previous_range": bounds}
 
 
+def _retain_previous_kr_close(closes, previous, days, now):
+    if not previous:
+        return
+    try:
+        day = date.fromisoformat(previous["session"])
+    except (KeyError, TypeError, ValueError):
+        return
+    current = closes.get(day)
+    if not current:
+        return
+    if previous.get("ticker") and previous["ticker"] != current.get("ticker"):
+        return
+    before = min(now, aware_datetime(current["observed_at"]))
+    checked = _close_records({day: previous}, "KR", days, before).get(day)
+    if not checked:
+        return
+    official = current["official_close"] or checked["official_close"]
+    current_prices = {current["price"]}
+    if official:
+        current_prices.add(official["price"])
+    samples = {item["price"]: item for item in current["previous_observations"]}
+    earlier = [*checked["previous_observations"], checked]
+    if checked["official_close"]:
+        earlier.append(checked["official_close"])
+    for item in earlier:
+        if item["price"] not in current_prices:
+            samples[item["price"]] = {key: item[key] for key in (
+                "price", "source", "observed_at", "provider_response_at", "requested_market"
+            ) if key in item}
+    closes[day] = kr_close_with_evidence(current, official, samples.values())
+
+
 def _basis_compatible(origin, closes, days, through, now):
     """Bridge adjusted analysis levels to raw observations via the original close."""
     if not origin:
@@ -101,16 +174,20 @@ def _basis_compatible(origin, closes, days, through, now):
         return False
     anchor = anchor_bars[0]
     ingested = aware_datetime(anchor.get("observed_at"))
+    anchor_prices = (price_equal(anchor.get("close"), price) for price in _close_prices(closes[ref]))
+    # A separate KRX candidate can corroborate the base without hiding a disputed close.
+    anchor_matches = any(anchor_prices) if closes[ref]["currency"] == "KRW" else all(anchor_prices)
     if (aware_datetime(anchor.get("timestamp")) != days[ref][1] or ingested is None
             or not days[ref][1] <= ingested <= analysis_at
-            or not all(price_equal(anchor.get("close"), price) for price in _close_prices(closes[ref]))):
+            or not anchor_matches):
         return False
     for day, (_, close) in days.items():
         if ref <= day <= through and close + timedelta(minutes=5) <= now:
             bar = closes.get(day) or {}
             checked = aware_datetime(bar.get("adjustment_checked_at"))
+            prices = (bar.get("price"),) if bar.get("currency") == "KRW" else _close_prices(bar)
             if not (checked and close <= checked <= now
-                    and any(price_equal(price, bar.get("adjusted_close")) for price in _close_prices(bar))):
+                    and any(price_equal(price, bar.get("adjusted_close")) for price in prices)):
                 return False
     return True
 
@@ -146,11 +223,18 @@ def _price_result(condition, value):
 
 
 def _close_prices(observation):
+    if observation.get("kind") == KR_DAILY:
+        official = observation.get("official_close")
+        return (observation["price"], *(item["price"] for item in observation.get("previous_observations") or ()),
+                *((official["price"],) if official else ()))
     recheck = observation.get("recheck")
     return (observation["price"], recheck["price"]) if recheck else (observation.get("price"),)
 
 
 def _observed_price_result(condition, observation):
+    if observation.get("kind") == KR_DAILY:
+        results = {_price_result(condition, price) for price in _close_prices(observation)}
+        return results.pop() if len(results) == 1 else "EVIDENCE_NEEDED"
     prices = (*_close_prices(observation), *(item["price"] for item in observation.get("previous_range") or ()))
     lower, upper = min(prices), max(prices)
     result = _price_result(condition, lower)
@@ -165,6 +249,7 @@ def _observed_price_result(condition, observation):
 
 
 _CLOSE_DISAGREEMENT = "같은 거래일 KIS 조회 값이 가격 조건 경계를 지나므로 거래소 공식 종가 확인"
+_KR_CLOSE_DISAGREEMENT = "같은 거래일의 종가 후보에 따라 이 가격 조건의 판정이 달라짐 · KRX 정규장 종가 대조 필요"
 
 
 def _compare(level, observation, *, currency, compatible, conflict, requirement=None):
@@ -194,7 +279,7 @@ def _compare(level, observation, *, currency, compatible, conflict, requirement=
         if result["status"] == "BOUNDARY":
             result["needed"] = "기준값과 같음 · 원문에서 등호 포함 여부 확인"
         elif result["status"] == "EVIDENCE_NEEDED":
-            result["needed"] = _CLOSE_DISAGREEMENT
+            result["needed"] = _KR_CLOSE_DISAGREEMENT if observation.get("kind") == KR_DAILY else _CLOSE_DISAGREEMENT
     return result
 
 
@@ -219,7 +304,7 @@ def _price_checks(thesis, closes, quote, days, now, *, currency, compatible, act
         observation = (session_quote if stage == "intraday" else
                        last_close if stage == "close" and level.get("level_type") in _RISK_LEVELS else
                        next(reversed(eligible_closes.values()), None) if stage == "close" else None)
-        needed, next_day, first = None, None, None
+        needed, next_day, first, disputed_predecessor = None, None, None, None
         dependent_exit = (level.get("level_type") in _RISK_LEVELS and (
             level.get("reason_code") == "FAILED_BREAKOUT" or any(
                 token in f"{level.get('label', '')} {level.get('source_text', '')}"
@@ -239,6 +324,8 @@ def _price_checks(thesis, closes, quote, days, now, *, currency, compatible, act
                         break
                     if prerequisite == "EVIDENCE_NEEDED":
                         needed = f"{day.isoformat()} 선행 종가의 가격 경계 확인"
+                        if bar.get("kind") == KR_DAILY:
+                            disputed_predecessor = bar
                         break
                 if first is not None:
                     next_day = next((day for day in sorted(days) if day > first), None)
@@ -267,14 +354,17 @@ def _price_checks(thesis, closes, quote, days, now, *, currency, compatible, act
             next_close = next((day for day, (_, close) in days.items() if close >= max(now, start)), None)
             if next_close:
                 checked["needed_session"] = next_close.isoformat()
-        if checked.get("needed") == _CLOSE_DISAGREEMENT:
+        if checked.get("needed") in {_CLOSE_DISAGREEMENT, _KR_CLOSE_DISAGREEMENT}:
             checked["needed_session"] = observation["session"]
         if next_day:
             checked["needed_session"] = next_day.isoformat()
+        if disputed_predecessor:
+            checked["preceding_observation"] = disputed_predecessor
         if first:
             checked["preceding_price_session"] = first.isoformat()
-            if eligible_closes[first]["kind"] == "KIS_DAILY_CLOSE":
-                checked["preceding_close_source"] = "KIS_DAILY_CLOSE"
+            kind = eligible_closes[first]["kind"]
+            if kind in {"KIS_DAILY_CLOSE", KR_DAILY}:
+                checked["preceding_close_source"] = kind
         checked.update(order=index + 1, group=level.get("confirmation_group"))
         results.append(checked)
     return results
@@ -320,6 +410,9 @@ def _plan(row, thesis, origin, lineage, archive, quote, loader, now, base_days, 
     closes = _close_records(raw, market, days, observed_by)
     if market == "US":
         _retain_previous_close(closes, previous, days, now)
+    else:
+        for prior_bar in previous or ():
+            _retain_previous_kr_close(closes, prior_bar, days, observed_by)
     latest_close = next(reversed(closes.values()), None)
     expected_close = max((day for day, (_, close) in days.items() if close + timedelta(minutes=5) <= now), default=None)
     latest_is_current = bool(latest_close and expected_close and latest_close["session"] == expected_close.isoformat())
@@ -331,6 +424,9 @@ def _plan(row, thesis, origin, lineage, archive, quote, loader, now, base_days, 
         view_close = {key: value for key, value in latest_close.items() if key != "adjusted_close"}
     else:
         view_close = None
+    retained = [{key: value for key, value in bar.items() if key != "adjusted_close"} for bar in closes.values()
+                if market == "KR" and (bar is not latest_close or not latest_is_current)
+                and (bar.get("official_close") or bar.get("verification") == "CONFLICT")]
     basis = bool(current and _basis_compatible(origin, closes, days, date.fromisoformat(current["session"]), observed_by))
     review = start + timedelta(days=POLICY["review_calendar_days"].get(thesis.get("horizon"), 7))
     expired = until is not None and now >= until
@@ -363,6 +459,7 @@ def _plan(row, thesis, origin, lineage, archive, quote, loader, now, base_days, 
                            else "보유 논지 유지 여부와 하방 기준 확인") if held else "현재 보고서에 보유 확인 없음 · 보유분 대응은 해당 보유자 기준",
         "ordered_rules": ordered_rules, "price_checks": checks, "observation": current, "completed_close": view_close,
         "last_observation": historical, "compared_price_count": comparison_count, "price_basis_verified": basis,
+        **({"retained_close_evidence": retained} if retained else {}),
         "missing": missing, "review_by": review.isoformat(), "review_due": now >= review,
         "source_valid_until": thesis.get("conditional_entry_valid_until"), "source_expired": expired,
         "remaining_trading_days": (sum(now < close <= until for _, close in days.values())

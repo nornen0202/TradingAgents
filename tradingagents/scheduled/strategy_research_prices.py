@@ -13,9 +13,12 @@ from tradingagents.dataflows.intraday.us_symbols import kis_symbol
 from tradingagents.dataflows.market_policy import aware_datetime, source_use_policy
 from tradingagents.scheduled.market_calendar import default_calendar_name, is_supplemental_market_holiday
 
+from .strategy_krx_close import KrxResearchCloses
+
 ZONES = {"KR": ZoneInfo("Asia/Seoul"), "US": ZoneInfo("America/New_York")}
 CURRENCIES = {"KR": "KRW", "US": "USD"}
 _SETTLE = timedelta(minutes=5)
+KR_DAILY = "KIS_KR_DAILY_CLOSE"
 
 
 def market_days(market, now, start=None, through=None):
@@ -114,14 +117,29 @@ def _response_at(headers, received):
     return stamp.isoformat() if stamp.tzinfo and stamp <= received else None
 
 
+def kr_close_with_evidence(bar, official, previous=()):
+    prices = [bar["price"], *(item["price"] for item in previous)]
+    if official:
+        prices.append(official["price"])
+    low, high = min(prices), max(prices)
+    status = "CONFLICT" if low != high else "MATCHED" if official else "UNVERIFIED"
+    return {
+        **bar, "kind": "REGULAR_CLOSE" if status == "MATCHED" else KR_DAILY,
+        "exchange": "KRX" if status == "MATCHED" else None,
+        "verification": status, "official_close": official,
+        "previous_observations": list(previous), "price_range": [low, high],
+    }
+
+
 class KisResearchCloses:
     """Use the existing approved KIS read-only quotation endpoints with explicit price basis."""
 
-    def __init__(self, client, *, clock=lambda: datetime.now(timezone.utc), budget_seconds=100):
+    def __init__(self, client, *, clock=lambda: datetime.now(timezone.utc), budget_seconds=100, krx=None):
         self.client = client
         self.clock = clock
         self.deadline = monotonic() + budget_seconds
         self.next_request = 0.0
+        self.krx = krx
 
     @classmethod
     def configured(cls):
@@ -131,7 +149,9 @@ class KisResearchCloses:
             client = KisClient.from_api_keys(environment="real")
         except (PortfolioConfigurationError, ValueError):
             return None
-        return cls(client)
+        reader = cls(client)
+        reader.krx = KrxResearchCloses(reader.clock)
+        return reader
 
     def _download(self, market, ticker, venue, start, end, adjusted):
         if monotonic() >= self.deadline:
@@ -139,8 +159,13 @@ class KisResearchCloses:
         sleep(max(0, self.next_request - monotonic()))
         self.next_request = monotonic() + 0.25
         if market == "KR":
-            return self.client.domestic_daily_itemchartprice(ticker[:6], start_date=start, end_date=end,
-                market_division="J", period_division="D", adjusted_price="0" if adjusted else "1"), {}
+            payload, headers = self.client.domestic_daily_itemchartprice_with_headers(
+                ticker[:6], start_date=start, end_date=end, market_division="J",
+                period_division="D", adjusted_price="0" if adjusted else "1",
+            )
+            header = payload.get("output1") if isinstance(payload, dict) else None
+            identity = header.get("stck_shrn_iscd") if isinstance(header, dict) else None
+            return (payload, headers) if identity == ticker[:6] else ({}, {})
         symbol = kis_symbol(ticker)
         payload, headers = self.client.request_json(method="GET", path="/uapi/overseas-price/v1/quotations/dailyprice",
             tr_id="HHDFS76240000", params={"AUTH": "", "EXCD": venue, "SYMB": symbol, "GUBN": "0",
@@ -173,20 +198,27 @@ class KisResearchCloses:
             raw, received, response_at = self._read(market, ticker, venue, start, end)
             if not raw.keys() & completed.keys():
                 continue
-            adjusted, basis_observed, _ = self._read(market, ticker, venue, start, end, adjusted=True)
+            adjusted, basis_observed, basis_response_at = self._read(market, ticker, venue, start, end, adjusted=True)
             repeat, repeated, repeat_response_at = self._read(market, ticker, venue, start, end) if market == "US" else ({}, None, None)
             records = {}
             for day in sorted(raw.keys() & completed.keys()):
                 if received < completed[day] + _SETTLE:
                     continue
-                record = {**raw[day], "kind": "REGULAR_CLOSE" if market == "KR" else "KIS_DAILY_CLOSE", "source": "KIS",
+                record = {**raw[day], "kind": "KIS_DAILY_CLOSE", "source": "KIS",
                           "session": day.isoformat(), "event_at": completed[day].isoformat(),
                           "observed_at": received.isoformat(), "currency": CURRENCIES[market], "exchange": venue,
+                          "provider_response_at": response_at,
                           "adjustment": "unadjusted", "adjusted_close": adjusted[day]["price"] if day in adjusted else None,
                           "adjustment_checked_at": basis_observed.isoformat() if day in adjusted else None,
                           "adjustment_check": "FID_ORG_ADJ_PRC=0" if market == "KR" else "MODP=1"}
-                if market == "US":
-                    record["provider_response_at"] = response_at
+                if market == "KR":
+                    record.update(ticker=ticker, requested_market="J", requested_period="D", price_request="FID_ORG_ADJ_PRC=1",
+                                  event_time_source="exchange_calendar",
+                                  adjustment_response_at=basis_response_at if day in adjusted else None)
+                    # One recent session per board per build. Older dates remain KIS observations.
+                    official = self.krx(ticker, day) if self.krx and day == end and monotonic() < self.deadline else None
+                    record = kr_close_with_evidence(record, official)
+                else:
                     if day in repeat and repeated >= received:
                         record["recheck"] = {"price": repeat[day]["price"], "observed_at": repeated.isoformat(),
                                              "provider_response_at": repeat_response_at}

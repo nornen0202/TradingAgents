@@ -55,9 +55,9 @@ def build_site(archive_dir: Path, site_dir: Path, settings: SiteSettings, *,
     refresh_research_prices = getattr(settings, "refresh_research_prices", False)
     previous_closes = {}
     if refresh_research_prices:
-        from tradingagents.scheduled.strategy_research import previous_us_closes
+        from tradingagents.scheduled.strategy_research import previous_market_closes
 
-        previous_closes = previous_us_closes(site_dir / "mobile" / "strategy.json")
+        previous_closes = previous_market_closes(site_dir / "mobile" / "strategy.json")
     if site_dir.exists():
         shutil.rmtree(site_dir)
     (site_dir / "assets").mkdir(parents=True, exist_ok=True)
