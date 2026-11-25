@@ -1216,7 +1216,10 @@ class PrismAutoTrader:
 
 
 def load_autotrader_policy(state_dir: Path) -> AutotraderPolicy:
-    config_path = Path(state_dir) / "autotrader" / "enabled.json"
+    base = Path(state_dir)
+    direct = base / "enabled.json"
+    nested = base / "autotrader" / "enabled.json"
+    config_path = direct if (base.name == "autotrader" or (direct.is_file() and not nested.is_file())) else nested
     if not config_path.is_file():
         return AutotraderPolicy(enabled=False)
     raw = json.loads(config_path.read_text(encoding="utf-8-sig"))
@@ -1225,3 +1228,13 @@ def load_autotrader_policy(state_dir: Path) -> AutotraderPolicy:
     allowed = set(AutotraderPolicy.__dataclass_fields__.keys())
     filtered = {k: v for k, v in raw.items() if k in allowed}
     return AutotraderPolicy(**filtered)
+
+
+def run_autotrader_tick(archive_dir: Path, state_dir: Path, **kwargs: Any) -> dict[str, Any]:
+    """Load policy from state_dir and execute a full KR+US PrismAutoTrader tick."""
+    base = Path(state_dir)
+    lane_dir = base if base.name == "autotrader" else (base / "autotrader")
+    lane_dir.mkdir(parents=True, exist_ok=True)
+    policy = kwargs.pop("policy", None) or load_autotrader_policy(lane_dir)
+    trader = PrismAutoTrader(Path(archive_dir), lane_dir, policy=policy, **kwargs)
+    return trader.tick_all()

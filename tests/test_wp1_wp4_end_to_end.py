@@ -20,6 +20,8 @@ from tradingagents.execution.paper_approval import PaperApproval, render_telegra
 from tradingagents.execution.prism_autotrader import (
     AutotraderPolicy,
     PrismAutoTrader,
+    load_autotrader_policy,
+    run_autotrader_tick,
 )
 from tradingagents.execution.quant_data_bridge import (
     evaluate_hybrid_portfolio_proposal,
@@ -413,10 +415,23 @@ def test_prism_autotrader_end_to_end_queue_fill_runner_hardstop_and_live_gate(tm
     assert "LIVE_PROMOTION_GATE_BLOCKED" in live_res["blockers"]
     assert live_res["live_orders_enabled"] is False
 
-    # 5. Export dashboard JSON & HTML
+    # 5. Export dashboard JSON & HTML and verify load_autotrader_policy / run_autotrader_tick CLI wiring
     paths = publish_autotrader_dashboard(archive, site_dir=site, policy=policy)
     assert paths["kr_json"].is_file() and paths["site_html"].is_file()
     assert "삼성전자" in paths["site_html"].read_text(encoding="utf-8")
+
+    atomic_write_json(state / "autotrader" / "enabled.json", {"mode": "shadow", "enabled": True, "live_orders_confirmed": False})
+    assert load_autotrader_policy(state).enabled is True
+    assert load_autotrader_policy(state / "autotrader").enabled is True
+    tick_summary = run_autotrader_tick(
+        archive,
+        state / "autotrader",
+        clock=lambda: clock_holder[0],
+        session_resolver=lambda market, now_local: {"is_open": False, "phase": "closed"},
+        quote_loader=lambda market, ticker, now: quotes.get(ticker),
+    )
+    assert set(tick_summary["markets"]) == {"KR", "US"}
+    assert (archive / "paper" / "autotrader-status.json").is_file()
 
 
 # ── WP4 Tests: PIT Quant Data Bridge & After-Tax Walk-Forward Simulation ──
