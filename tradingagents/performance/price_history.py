@@ -239,6 +239,9 @@ def _recommendations_due_for_refresh(
                       AND z.updated_at <= '{upper.isoformat()}' {revision_filter}
                     ORDER BY z.updated_at DESC, z.rowid DESC LIMIT 1
                 )"""
+            # Verified references require the wide row. The legacy check can
+            # use the existing ticker-ordered covering index.
+            ordering = "r.id" if require_verified_price else "r.ticker"
             rows = conn.execute(
                 f"""
                 SELECT r.id, r.ticker, {market_column}, r.created_at
@@ -254,7 +257,7 @@ def _recommendations_due_for_refresh(
                       AND substr(COALESCE(o.updated_at, ''), 1, 10) < ?
                     )
                   )
-                ORDER BY r.id
+                ORDER BY {ordering}
                 """,
                 (cutoff_date, VERIFIED_PRICE_CALCULATION_VERSION if require_verified_price else OUTCOME_CALCULATION_VERSION,
                  str(asof_date)[:10]),
@@ -265,9 +268,10 @@ def _recommendations_due_for_refresh(
     seen_recommendation_ids: set[int] = set()
     skipped = 0
     invalid_clock = 0
-    # Read the wide recommendation records in row order on the archive disk.
-    # Preserve the previous ticker order once only the narrow result is in memory.
-    for row in sorted(rows, key=lambda item: (item[1] is not None, str(item[1]))):
+    if require_verified_price:
+        # Restore ticker order once only the narrow result is in memory.
+        rows.sort(key=lambda row: (row[1] is not None, str(row[1])))
+    for row in rows:
         created_at = str(row[3] or "")
         try:
             known = timestamp(created_at if "T" in created_at else created_at + "T23:59:59.999999+00:00")
