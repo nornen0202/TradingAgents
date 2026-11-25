@@ -431,7 +431,12 @@ def summary(db, now, market, marks=None, *, historical=False, order_limit=100):
                 "observed_at": now.isoformat(), "mark_times": mark_times}}
 
 
-def _reconcile_existing(broker, *, market, now, regular, allow_cancel, clock):
+def _has_prism_admission(db, intent_id):
+    return db.execute("""SELECT 1 FROM strategy_source_evidence
+        WHERE id=? AND json_type(evidence,'$.prism_candidate')='object'""", (intent_id,)).fetchone() is not None
+
+
+def _reconcile_existing(broker, *, market, now, regular, allow_cancel, clock, candidate_halt=None):
     """Recover persisted attempts and reconcile against the original order date."""
     # The journal commits both wire intent and UNKNOWN before any broker call.
     # An interruption before that commit consumed the strategy ID but sent nothing.
@@ -454,9 +459,9 @@ def _reconcile_existing(broker, *, market, now, regular, allow_cancel, clock):
             issues.append("AMBIGUOUS_ORDER")
             # An order listing cannot bind a missing ACK to a local intent.
             # Inspect the original date once per tick and keep quarantine.
-            if broker.db.execute(
-                    """SELECT 1 FROM requests r JOIN intents i ON i.id=r.id JOIN strategy_source_evidence s ON s.id=r.id
-                    WHERE r.id=? AND r.status='UNKNOWN' AND json_type(s.evidence,'$.prism_candidate')='object'""",
+            if _has_prism_admission(broker.db, order["id"]) and broker.db.execute(
+                    """SELECT 1 FROM requests r JOIN intents i ON i.id=r.id
+                    WHERE r.id=? AND r.status='UNKNOWN'""",
                     (order["id"],)).fetchone():
                 day = at(order["prepared_at"]).astimezone(ZoneInfo(ZONES[market])).strftime("%Y%m%d")
                 if day not in queried_dates:
@@ -469,9 +474,11 @@ def _reconcile_existing(broker, *, market, now, regular, allow_cancel, clock):
         try:
             report = broker.reconcile(intent_id=order["id"])
             if report.get("status") in {"OPEN", "PARTIAL"}:
+                halted_candidate = (candidate_halt is not None and candidate_halt.exists()
+                                    and _has_prism_admission(broker.db, order["id"]))
                 if at(order["prepared_at"]).astimezone(ZoneInfo(ZONES[market])).date() != now.astimezone(ZoneInfo(ZONES[market])).date():
                     issues.append("PREVIOUS_SESSION_ORDER_UNRESOLVED")
-                elif regular and (allow_cancel or at(clock()) - at(order["prepared_at"]) >= timedelta(minutes=5)):
+                elif regular and (allow_cancel or halted_candidate or at(clock()) - at(order["prepared_at"]) >= timedelta(minutes=5)):
                     broker.cancel(intent_id=order["id"])
             elif report.get("status") in {"UNKNOWN", "UNRESOLVED"}:
                 issues.append("AMBIGUOUS_ORDER")
@@ -537,7 +544,8 @@ def advance(archive, root, validation_root, market, *, clock, tickers, broker_fa
                 "SELECT 1 FROM paper_policy_revisions WHERE scope=? AND revision=?", (scope, policy_revision),
             ).fetchone() is not None
         issues = _reconcile_existing(broker, market=market, now=now, regular=True,
-                                     allow_cancel=halted or near_close or not result["gate_passed"], clock=clock)
+                                     allow_cancel=halted or near_close or not result["gate_passed"], clock=clock,
+                                     candidate_halt=lane / "HALT")
         if prism_halted:
             issues.append("PRISM_CANDIDATE_HALTED")
         # Exit admission needs original lots even after many newer journal attempts.

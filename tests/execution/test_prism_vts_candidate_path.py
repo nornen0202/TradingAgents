@@ -252,9 +252,27 @@ def test_restart_reconciles_preexisting_partial_and_never_resends(cli):
     first_restart = cli.run("strategy-kis")
     assert first_restart["orders"][0]["status"] == "PARTIAL" and first_restart["owned"][h.ticker] == 1
     assert cli.fill_events() == ["PARTIAL"] and len(h.orders) == 1
+    assert h.orders["1"]["cancelled"] is False  # The five-minute HALT does not cancel a native-only order.
     h.now += timedelta(seconds=20)
     assert cli.run("strategy-kis")["orders"][0]["status"] == "PARTIAL"
     assert cli.fill_events() == ["PARTIAL"] and len(h.orders) == 1
+
+
+def test_candidate_halt_cancels_outstanding_candidate_order_before_the_timeout(cli):
+    h = cli.h
+    cli.source("production-full")
+    assert cli.run("autotrader")["entries_queued"] == [h.ticker]
+    assert cli.run("strategy-kis")["orders"][0]["status"] == "ACKNOWLEDGED"
+    (cli.lane / "HALT").touch()
+    h.now += timedelta(seconds=10)
+    halted = cli.run("strategy-kis")
+    assert "PRISM_CANDIDATE_HALTED" in halted["blockers"]
+    assert halted["orders"][0]["status"] == "OPEN" and halted["orders"][0]["cancel_status"] == "ACKNOWLEDGED"
+    assert h.orders["1"]["cancelled"] is True
+    h.now += timedelta(seconds=10)
+    final = cli.run("strategy-kis")
+    assert final["orders"][0]["status"] == "CANCELLED" and final["orders"][0]["cancel_status"] == "CONFIRMED"
+    assert final["owned"][h.ticker] == 0 and cli.fill_events() == []
 
 
 @pytest.mark.parametrize("stop", ["halt", "expiry"])
