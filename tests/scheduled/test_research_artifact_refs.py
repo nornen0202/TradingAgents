@@ -389,8 +389,11 @@ def test_site_and_semantic_reject_different_market(evidence, monkeypatch):
             action()
 
 
-def test_prepared_semantic_context_rechecks_changed_original_and_replays_matching_error(evidence, monkeypatch):
-    from tradingagents.portfolio.semantic_judge import build_semantic_verdicts, prepare_rule_only_context
+def test_prepared_semantic_context_rechecks_bytes_and_recovers_transient_reads(evidence, monkeypatch):
+    from tradingagents.portfolio import semantic_judge
+
+    build_semantic_verdicts = semantic_judge.build_semantic_verdicts
+    prepare_rule_only_context = semantic_judge.prepare_rule_only_context
 
     destination, row = bootstrap(evidence, monkeypatch)
     manifest = publish_overlay(destination, row)
@@ -399,14 +402,14 @@ def test_prepared_semantic_context_rechecks_changed_original_and_replays_matchin
     params = {"candidates": [], "run_dir": destination, "manifest": manifest, "llm_settings": None,
               "portfolio_settings": SimpleNamespace(semantic_judge_enabled=False)}
     prepared = prepare_rule_only_context(destination, manifest)
-    assert prepared.error is None
+    assert prepared is not None
 
     write(original, {**json.loads(valid), "fixture_modified_thesis": True})
     # The earlier valid proof cannot suppress validation of changed bytes.
     with pytest.raises(ValueError, match="consuming original thesis"):
         build_semantic_verdicts(**params, prepared_rule_only_context=prepared)
     failed = prepare_rule_only_context(destination, manifest)
-    assert isinstance(failed.error, ValueError)
+    assert failed is None
     with pytest.raises(ValueError, match="consuming original thesis"):
         build_semantic_verdicts(**params, prepared_rule_only_context=failed)
 
@@ -416,9 +419,29 @@ def test_prepared_semantic_context_rechecks_changed_original_and_replays_matchin
     checked = prepare_rule_only_context(destination, manifest)
     digest = row["artifacts"]["final_state_json"]["artifact_sha256"]
     blob = destination.parents[2] / "research-snapshots" / "sha256" / digest[:2] / digest
-    blob.write_bytes(blob.read_bytes() + b"fixture corruption")
+    valid_blob = blob.read_bytes()
+    stamp = blob.stat()
+    modified = valid_blob.replace(b"WAIT", b"EXIT", 1)
+    assert modified != valid_blob and len(modified) == len(valid_blob)
+    blob.write_bytes(modified)
+    os.utime(blob, ns=(stamp.st_atime_ns, stamp.st_mtime_ns))
     with pytest.raises(ValueError, match="Immutable research blob changed"):
         build_semantic_verdicts(**params, prepared_rule_only_context=checked)
+
+    blob.write_bytes(valid_blob)
+    read_context = semantic_judge._load_context_by_ticker
+    attempts = []
+
+    def transient(*args, **kwargs):
+        attempts.append(True)
+        if len(attempts) == 1:
+            raise OSError("transient read")
+        return read_context(*args, **kwargs)
+
+    monkeypatch.setattr(semantic_judge, "_load_context_by_ticker", transient)
+    assert prepare_rule_only_context(destination, manifest) is None
+    assert build_semantic_verdicts(**params) == ([], [], [])
+    assert len(attempts) == 2
 
 
 def test_source_selection_cannot_replace_archived_artifact(evidence):

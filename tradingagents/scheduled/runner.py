@@ -941,7 +941,7 @@ def _execute_run_body(config, *, run_label, skip_site_build, tz, started_at,
             portfolio_status["pre_quote_research_context"] = {
                 "started_at": prepared_rule_only_context.started_at,
                 "finished_at": prepared_rule_only_context.finished_at,
-                "status": "failed" if prepared_rule_only_context.error is not None else "checked",
+                "status": "prepared",
             }
         manifest["portfolio"] = portfolio_status
         for warning in portfolio_status.get("sell_side_calibration_warnings") or []:

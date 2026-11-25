@@ -425,7 +425,7 @@ def test_parallel_reports_join_and_surface_a_failed_artifact(tmp_path, monkeypat
 def test_preverified_rule_only_context_preserves_nonempty_verdicts(tmp_path, monkeypatch):
     calls = []
 
-    def read_context(*args):
+    def read_context(*args, **kwargs):
         calls.append(args)
         return {}
 
