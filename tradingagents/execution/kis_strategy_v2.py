@@ -73,7 +73,10 @@ def current_v2_benchmark(market, *, clock, session):
         wire = row["stck_bsop_date"] + str(row.get("stck_cntg_hour", ""))
         if not re.fullmatch(r"[0-9]{14}", wire):
             raise ValueError("KIS_V2_BENCHMARK_UNVERIFIED")
-        event = datetime.strptime(wire, "%Y%m%d%H%M%S").replace(tzinfo=zone)
+        try:
+            event = datetime.strptime(wire, "%Y%m%d%H%M%S").replace(tzinfo=zone)
+        except ValueError:
+            raise ValueError("KIS_V2_BENCHMARK_UNVERIFIED") from None
         age = observed - event
         if event < opened or not timedelta(minutes=1) <= age < timedelta(seconds=120):
             continue

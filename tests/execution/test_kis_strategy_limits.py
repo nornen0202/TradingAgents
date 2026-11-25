@@ -198,7 +198,8 @@ def test_reviewed_v2_receipt_requires_both_exact_source_documents(tmp_path):
 
 
 @pytest.mark.parametrize("market", ["KR", "US"])
-@pytest.mark.parametrize("case", ["ready", "old", "unfinished", "identity", "unreviewed", "currency", "closed", "sell"])
+@pytest.mark.parametrize("case", ["ready", "old", "unfinished", "identity", "unreviewed", "currency", "closed", "sell",
+                                  "empty", "future", "missing_date", "missing_time", "invalid_date", "invalid_time"])
 def test_standard_vts_tick_uses_broker_index_only_for_new_risk(tmp_path, monkeypatch, market, case):
     monkeypatch.setenv("TRADINGAGENTS_KIS_MARKET_CALENDAR_ENABLED", "false")
     h = Harness(tmp_path, market)
@@ -230,16 +231,26 @@ def test_standard_vts_tick_uses_broker_index_only_for_new_risk(tmp_path, monkeyp
         assert (request["method"], request["tr_id"], request["path"], request["params"]["FID_INPUT_ISCD"]) == (
             "GET", tr, f"/uapi/{prefix}/v1/quotations/inquire-time-indexchartprice", index,
         )
-        offset = {"old": 121, "unfinished": 30}.get(case, 60)
+        offset = {"old": 121, "unfinished": 30, "future": -60}.get(case, 60)
         event = h.now - timedelta(seconds=offset)
+        row = {"stck_bsop_date": event.strftime("%Y%m%d"), "stck_cntg_hour": event.strftime("%H%M%S"),
+               price: "3500.24"}
+        if case == "missing_date":
+            row.pop("stck_bsop_date")
+        if case == "missing_time":
+            row.pop("stck_cntg_hour")
+        if case == "invalid_date":
+            row["stck_bsop_date"] = "20260230"
+        if case == "invalid_time":
+            row["stck_cntg_hour"] = "269960"
         return {"rt_cd": "0", "output1": {identity: "OTHER" if case == "identity" else index},
-                "output2": [{"stck_bsop_date": event.strftime("%Y%m%d"), "stck_cntg_hour": event.strftime("%H%M%S"),
-                             price: "3500.24"}]}, {}
+                "output2": [] if case == "empty" else [row]}, {}
 
     monkeypatch.setattr(client, "request_json", quote_index)
     monkeypatch.setattr(KisClient, "from_api_keys", classmethod(lambda cls, *, environment: client))
     if case == "closed":
         h.now = h.now.replace(hour=8)
+
     def account(*args):
         row = h.account(*args)
         return row | {"currency": "USD" if market == "KR" else "KRW"} if case == "currency" else row
