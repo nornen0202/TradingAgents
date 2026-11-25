@@ -10,8 +10,8 @@ from tradingagents.atomic_io import atomic_write_json
 from tradingagents.execution import demo_runtime as runtime, demo_token_cache, kis_demo_us
 from tradingagents.execution.kis_demo import DemoCredentials, KisDemoClient, RequestPacer
 from tradingagents.execution.kis_demo_us import KisDemoUSClient
-from tradingagents.execution.kis_strategy_limits import (APPROVED_LIMIT_REVISION, approved_limits, configured_limits,
-                                                         size_with_native_limits)
+from tradingagents.execution.kis_strategy_limits import (APPROVED_CAPS, APPROVED_LIMIT_REVISION, DAILY_LIMIT_REVISION,
+    approved_limits, configured_limits, daily_buy_commitment, size_with_native_limits, within_daily_buy_limit)
 from tradingagents.execution.kis_strategy_v2 import (
     EVIDENCE_SCHEMA, REGULAR_BENCHMARK, REGULAR_BENCHMARK_EVIDENCE_SCHEMA, SETTLEMENT_SCHEMA,
     _buy_observation, current_v2_order_receipt,
@@ -31,6 +31,30 @@ def configure(root, market, **limits):
 def approved_config(config):
     return {**config, "native_limit_revision": APPROVED_LIMIT_REVISION,
             "native_order_limits": {market: asdict(limits) for market, limits in approved_limits().items()}}
+
+
+@pytest.mark.parametrize("market", ["KR", "US"])
+def test_daily_native_buy_keeps_unknown_reservation_and_releases_confirmed_cancelled_remainder(market):
+    cap = APPROVED_CAPS[market]
+    order = {"quantity": 2, "limit_price": cap // 3}
+    commitment = lambda status, filled: daily_buy_commitment(order, {"order_status": status, "filled": filled}, DAILY_LIMIT_REVISION)
+    assert commitment("OPEN", None) == commitment("PARTIAL", 1) == commitment("CANCELLED", None) == 2 * (cap // 3)
+    assert commitment("CANCELLED", 1) == cap // 3
+    assert commitment("CANCELLED", 0) == 0
+    admits = lambda committed: within_daily_buy_limit(committed, cap // 3, cap=cap, reserve_bps=30, revision=DAILY_LIMIT_REVISION)
+    assert not admits(commitment("PARTIAL", 1))
+    assert admits(commitment("CANCELLED", 1))
+
+
+def test_daily_native_revision_requires_both_exact_amounts_and_vts():
+    config = approved_config({"mode": runtime.MODE, "real_orders_enabled": False})
+    assert configured_limits(config | {"native_limit_revision": DAILY_LIMIT_REVISION,
+                                      "native_daily_buy_limits": APPROVED_CAPS}) == approved_limits()
+    for changes in ({"mode": "KIS_LIVE"}, {"native_daily_buy_limits": {"US": 3000}},
+                    {"native_daily_buy_limits": {"KR": 3_000_000, "US": 3_001}}, {"real_orders_enabled": True}):
+        with pytest.raises(ValueError, match="exact scoped native policy"):
+            configured_limits(config | {"native_limit_revision": DAILY_LIMIT_REVISION,
+                                        "native_daily_buy_limits": APPROVED_CAPS} | changes)
 
 
 @pytest.mark.parametrize("change", [{"mode": "KIS_LIVE"}, {"real_orders_enabled": True},

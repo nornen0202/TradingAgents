@@ -116,7 +116,7 @@ def _reference(item, market, finished, source):
             if (update.get("ticker") == ticker and update.get("price_reference") == value
                     and observed is not None and observed <= available <= finished):
                 return reference
-        except (OSError, TypeError, ValueError):
+        except (OSError, TypeError, ValueError, AttributeError):
             pass
     return None
 
@@ -187,15 +187,32 @@ def _execution_rows(source, market, now):
     return quotes, generated
 
 
+def _single_share_lots(orders):
+    # A prior closed trade or an earlier buy in a multi-lot cycle cannot supply
+    # the entry price for the currently held one-share strategy lot.
+    quantities, lots = Counter(), {}
+    for order in orders:
+        filled = order["filled_quantity"]
+        if order["source"] != "KIS_DEMO_BROKER_REPORT" or not filled:
+            continue
+        ticker = order["ticker"]
+        if order["side"] == "BUY":
+            if quantities[ticker] == 0 and filled == 1:
+                lots[ticker] = order
+            else:
+                lots.pop(ticker, None)
+            quantities[ticker] += filled
+        else:
+            quantities[ticker] -= filled
+    return {ticker: order for ticker, order in lots.items() if quantities[ticker] == 1}
+
+
 def _exits(quotes, generated, market, now, session, research, owned, orders, previous, policy):
     if not _regular(session, now):
         return {}, previous
     exits, marks = {}, {}
-    for order in reversed(orders):
-        ticker = order["ticker"]
-        qty = owned.get(ticker, 0)
-        if (ticker in marks or qty != 1 or order["side"] != "BUY" or order["filled_quantity"] != qty
-                or order["source"] != "KIS_DEMO_BROKER_REPORT" or ticker not in research):
+    for ticker, order in _single_share_lots(orders).items():
+        if owned.get(ticker) != 1 or ticker not in research:
             continue
         entry, acquired = _num(order["average_fill_price"]), instant(order["first_fill_observed_at"])
         if entry is None or entry <= 0 or acquired is None or acquired > now:
@@ -305,7 +322,7 @@ def authorize(archive, lane, market, source, candidate, terms, quote, account, c
     receipt = _receipt(lane, market)
     produced = instant(receipt.get("produced_at"))
     root, finished = baseline(archive, source, market, now)
-    if (produced is None or not finished <= produced <= now
+    if (receipt.get("transmission_halted") is not False or produced is None or not finished <= produced <= now
             or receipt.get("baseline_id") != root.parent.name or receipt.get("baseline_sha256") != digest(root)
             or receipt.get("research_sha256") != digest(root.parent / SOURCE_ARTIFACTS[1])):
         raise ValueError("No current five-minute candidate for the selected full lineage")
@@ -331,7 +348,8 @@ def authorize(archive, lane, market, source, candidate, terms, quote, account, c
             current_research, _ = _research(source / "run.json")
             reference = _reference(current_research[ticker], market, instant(_read(source / "run.json")["finished_at"]), source)
             reference_at = instant(reference.observed_at) if reference else None
-            if reference_at is None or not opened <= reference_at <= now < reference_at + timedelta(seconds=120):
+            if (reference_at is None or not opened <= reference_at < received <= now
+                    or now >= reference_at + timedelta(seconds=120)):
                 raise ValueError("Five-minute entry requires a current native research reference")
             deadline = min(deadline, reference_at + timedelta(seconds=120))
         elif reference is None or reference.price != entry["reference_price"]:
@@ -349,9 +367,7 @@ def authorize(archive, lane, market, source, candidate, terms, quote, account, c
         exit_hint = receipt["exits"][ticker]
         evidence = {key: exit_hint[key] for key in ("entry", "stop", "target", "peak", "runner", "days", "risk")}
         hint_clock = instant(exit_hint["observation"])
-        lot = next((order for order in reversed(current["orders"]) if order["ticker"] == ticker
-                    and order["side"] == "BUY" and order["source"] == "KIS_DEMO_BROKER_REPORT"
-                    and order["filled_quantity"] == 1), {})
+        lot = _single_share_lots(current["orders"]).get(ticker, {})
         matches_lot = lot.get("id") == exit_hint["lot"] and lot.get("average_fill_price") == evidence["entry"]
         if (receipt["execution_id"] != source.name or receipt["execution_sha256"] != digest(source / SOURCE_ARTIFACTS[0])
                 or hint_clock is None or not opened <= hint_clock <= now < hint_clock + timedelta(seconds=120)

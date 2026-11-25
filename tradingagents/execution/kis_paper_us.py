@@ -292,12 +292,13 @@ class USOrderJournal(DemoOrderJournal):
 
 
 class KisPaperUSBroker:
-    day_universe = None
     """Explicit opt-in paper bridge, serialized across local cooperating runners.
 
     ``clock`` is a test seam. Production callers leave it unset; order submission
     has no caller-supplied historical ``now`` and cannot backdate a live request.
     """
+    day_universe = None
+
     def __init__(self, path: Path | str, client: KisDemoUSClient, policy: USPaperOrderPolicy,
                  *, paper_enabled: bool = False, clock=None, strategy_policy_revision=None):
         if type(client) is not KisDemoUSClient or client.credentials.product_code != "01" or type(paper_enabled) is not bool or not isinstance(policy, USPaperOrderPolicy):

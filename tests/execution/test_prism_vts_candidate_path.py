@@ -1,5 +1,5 @@
 from contextlib import contextmanager
-from datetime import timedelta
+from datetime import datetime, timedelta
 import json
 import sqlite3
 import sys
@@ -326,6 +326,9 @@ def test_preexisting_hold_on_5m_transport_keeps_candidate_forward_observations(c
     assert len(observations) == 1 and read(observations[0])["mode"] == "observe_only"
     assert cli.run("strategy-kis")["blockers"] == ["PRISM_CANDIDATE_HALTED"]
     assert not h.orders and not cli.fill_events()
+    (cli.lane / "HALT").unlink()  # Separate, simulated activation cannot reuse the paused receipt.
+    assert "PRISM_CANDIDATE_NOT_ADMITTED" in cli.run("strategy-kis")["blockers"]
+    assert not h.orders
 
 
 @pytest.mark.parametrize("stop", ["halt", "expiry"])
@@ -405,7 +408,8 @@ def test_verified_exit_recovers_after_entry_expiry_or_a_long_journal(cli, condit
     assert sell["owned"][h.ticker] == 1 and cli.fill_events() == ["FILLED"]
 
 
-def test_offhours_conditional_without_native_reference_waits_for_a_verified_overlay(cli):
+@pytest.mark.parametrize("bad_reference", ["missing", "other_day", "daily_proxy", "same_order_quote"])
+def test_offhours_conditional_without_native_reference_waits_for_a_verified_overlay(cli, bad_reference):
     h = cli.h
     regular = h.now
     h.now -= timedelta(hours=2)
@@ -420,7 +424,22 @@ def test_offhours_conditional_without_native_reference_waits_for_a_verified_over
     assert read(cli.receipt)["entries"][h.ticker]["reference_price"] is None
     assert cli.run("strategy-kis")["status"] == "MARKET_CLOSED" and not h.calls
     cli.open, h.now = True, regular
-    cli.source("first-overlay", parent=baseline, reference=False)
+    candidate_source = cli.source("first-overlay", parent=baseline, reference=False if bad_reference == "missing" else None)
+    if bad_reference != "missing":
+        path = candidate_source / "portfolio-private/portfolio_candidates.json"
+        current = read(path)
+        reference = current["candidates"][0]["data_health"]["price_reference"]
+        if bad_reference == "other_day":
+            reference["observed_at"] = (h.now - timedelta(days=1)).isoformat()
+        elif bad_reference == "daily_proxy":
+            reference["source"] = "yahoo.daily"
+        else:
+            reference["observed_at"] = h.now.isoformat()  # Exact timestamp of the order quote.
+        atomic_write_json(path, current)
+        update_path = candidate_source / "tickers" / h.ticker / "execution_update.json"
+        update = read(update_path)
+        update["price_reference"] = reference
+        atomic_write_json(update_path, update)
     assert "PRISM_CANDIDATE_NOT_ADMITTED" in cli.run("strategy-kis")["blockers"]
     assert not h.orders
     h.now += timedelta(seconds=30)
@@ -479,7 +498,7 @@ def test_daily_buy_revision_binds_existing_journal_and_caps_cost_after_restart(c
     cli.configure(native=False, candidate=False)
     assert "KIS_DAILY_BUY_RISK_LIMIT" in cli.run("strategy-kis")["blockers"]
     assert not h.orders
-    h.now += timedelta(seconds=10)
+    h.now += timedelta(days=1)
     propose("fixture-2")
     cli.configure(native=False, candidate=False, daily=True)
     assert cli.run("strategy-kis")["orders"][-1]["status"] == "ACKNOWLEDGED"
@@ -491,6 +510,64 @@ def test_daily_buy_revision_binds_existing_journal_and_caps_cost_after_restart(c
     assert result["orders"][-1]["status"] == "BLOCKED"
     assert cli.run("strategy-kis")["orders"][-1]["status"] == "BLOCKED" and len(h.orders) == 1
     assert read(h.archive / "paper/kis-strategy-runtime.json")["configured_native_limits"]["daily_buy_limits"] == APPROVED_CAPS
+    h.now += timedelta(seconds=10)
+    propose("fixture-4", action="EXIT_NOW")
+    cli.account_cash = 0
+    assert cli.run("strategy-kis")["orders"][-1]["status"] == "ACKNOWLEDGED"
+    assert [row["side"] for row in h.orders.values()] == ["BUY", "SELL"]
+
+
+@pytest.mark.parametrize("reversed_price", [False, True])
+def test_native_cli_rechecks_named_next_day_and_close_group_with_live_book(cli, monkeypatch, reversed_price):
+    from tradingagents.execution import session_confirmation
+
+    h = cli.h
+    h.now = h.now.replace(hour=9, minute=18 if h.market == "KR" else 48)
+    source = cli.source("cohort-full", cohort=True)
+    cli.configure(candidate=False, daily=True, universe=True)
+    prev = h.now - timedelta(days=3)
+    past = regular_session(market=h.market, now_local=prev)
+    current = regular_session(market=h.market, now_local=h.now)
+    sessions = [(when.date().isoformat(), datetime.fromisoformat(d["session_open"]), datetime.fromisoformat(d["session_close"]))
+                for when, d in ((prev, past), (h.now, current))]
+    monkeypatch.setattr(session_confirmation, "_schedule", lambda market, origin: sessions)
+    origin_at = sessions[0][2] - timedelta(hours=1)
+    paths = source / "tickers" / h.ticker
+    contract = read(paths / "execution_contract.json")
+    contract["analysis_asof"] = origin_at.isoformat()
+    stages = ("close", "next_day", "next_session_quote")
+    trigger = h.price * .995
+    contract["structured_levels"] = [{"level_type": "BREAKOUT", "price": trigger, "confirmation": stage,
+                                      "confirmation_group": "confirmed"} for stage in stages]
+    atomic_write_json(paths / "execution_contract.json", contract)
+    analysis = read(paths / "analysis.json")
+    analysis.update(started_at=(origin_at - timedelta(minutes=5)).isoformat(), finished_at=origin_at.isoformat())
+    atomic_write_json(paths / "analysis.json", analysis)
+    update = read(paths / "execution_update.json")
+    update["analysis_asof"] = origin_at.isoformat()
+    currency = "KRW" if h.market == "KR" else "USD"
+    references = {"source": "kis", "ticker": h.ticker, "market": h.market, "currency": currency, "price": h.price}
+    open_at = sessions[1][1].isoformat()
+    close_at = sessions[0][2].isoformat()
+    archived_quote = update["market_data_asof"]
+    update["entry_confirmation_v2"] = {
+        "plan": {"ticker": h.ticker, "market": h.market, "currency": currency, "origin_session": sessions[0][0],
+                 "created_at": origin_at.isoformat(), "valid_sessions": 1, "quote_max_age_seconds": 120,
+                 "max_open_delay_seconds": 60, "execution_window_seconds": 1800, "max_gap_bps": 200,
+                 "alternatives": [[{"id": f"confirmed-{i}", "stage": stage, "direction": "above", "level": trigger}
+                                   for i, stage in enumerate(stages)]]},
+        "regular_close": {**references, "session": sessions[0][0], "kind": "final_regular_close", "event_at": close_at, "observed_at": close_at},
+        "official_open": {**references, "session": sessions[1][0], "kind": "official_regular_open", "event_at": open_at, "observed_at": open_at},
+        "live_quote": {**references, "session": sessions[1][0], "kind": "quote", "event_at": archived_quote, "observed_at": archived_quote},
+    }
+    atomic_write_json(paths / "execution_update.json", update)
+    if reversed_price:
+        h.price *= .99
+    result = cli.run("strategy-kis")
+    if reversed_price:
+        assert result["blockers"] == ["ENTRY_CURRENT_CONDITIONS_NOT_CONFIRMED"] and not h.orders
+    else:
+        assert result["orders"][0]["status"] == "ACKNOWLEDGED" and len(h.orders) == 1, result
 
 
 @pytest.mark.parametrize("against", ["shadow", "incomplete", "stale", "foreign", "cash", "halt", "live", "slots"])
