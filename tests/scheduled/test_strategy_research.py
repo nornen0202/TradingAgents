@@ -4,7 +4,9 @@ from datetime import date, datetime, timedelta
 
 import pytest
 
-from tradingagents.scheduled.strategy_research import _basis_compatible, _close_records, _price_checks
+from tradingagents.scheduled.strategy_research import (
+    _basis_compatible, _close_records, _compare, _price_checks, _retain_previous_close, previous_us_closes,
+)
 from tradingagents.scheduled.strategy_research_prices import KisResearchCloses, market_days, price_epoch, validated_quote
 from tradingagents.scheduled.strategy_research_sources import ResearchArchive, thesis_for
 
@@ -151,6 +153,117 @@ def test_malformed_us_response_does_not_block_another_symbol():
     load = KisResearchCloses(Client(), clock=lambda: now)
     assert load("US", "COST", days, close_day, now, "NAS") == {}
     assert load("US", "AAPL", days, close_day, now, "NAS")[close_day]["price"] == 349.08
+
+
+@pytest.mark.parametrize("at", ["2026-11-24T16:15:03-05:00", "2026-11-25T07:00:03-05:00"])
+@pytest.mark.parametrize("repeat_close", ["110.0275", "110.0001", None])
+def test_us_daily_price_rechecks_the_same_completed_session_with_separate_receipts(at, repeat_close, monkeypatch):
+    now = dt(at)
+    day = date(2026, 11, 24)
+    days = market_days("US", now)
+    received = iter([now + timedelta(seconds=i) for i in range(3)])
+    requests = []
+    monkeypatch.setattr("tradingagents.scheduled.strategy_research_prices.sleep", lambda _: None)
+
+    class Client:
+        def request_json(self, **kwargs):
+            requests.append(kwargs)
+            close = repeat_close if len(requests) == 3 else "110.0001"
+            rows = [{"xymd": token, "open": "108", "clos": close, "high": "112", "low": "107", "tvol": "1000"}
+                    for token in (None, "2026114", "20261131", "20261125", "20261124")]
+            return {"output1": {"rsym": "DNASAAPL"}, "output2": rows if close else []}, {
+                "Date": "Tue, 24 Nov 2026 21:15:00 GMT" if len(requests) == 1 else "invalid",
+            }
+
+    load = KisResearchCloses(Client(), clock=lambda: next(received))
+    records = load("US", "AAPL", days, date(2026, 11, 4), now, "NAS")
+    assert set(records) == {day}
+    assert [request["params"]["MODP"] for request in requests] == ["0", "1", "0"]
+    assert all(request["method"] == "GET" and request["params"]["BYMD"] == "20261124" for request in requests)
+    observation = records[day]
+    assert observation["kind"] == "KIS_DAILY_CLOSE"
+    assert observation["event_at"] == "2026-11-24T21:00:00+00:00"
+    assert observation["provider_response_at"] == "2026-11-24T21:15:00+00:00"
+    assert observation["observed_at"] == now.isoformat()
+    assert observation["price"] == observation["adjusted_close"] == 110.0001
+    if repeat_close:
+        assert observation["recheck"] == {"price": float(repeat_close), "observed_at": (now + timedelta(seconds=2)).isoformat(),
+                                          "provider_response_at": None}
+        assert "recheck" not in _close_records(records, "US", days, now)[day]
+    else:
+        assert "recheck" not in observation
+
+
+@pytest.mark.parametrize(("level", "expected"), [
+    ({"level_type": "BREAKOUT", "price": 110, "source_text": "110 이상"}, "MET"),
+    ({"level_type": "BREAKOUT", "price": 110.005, "source_text": "110.005 이상"}, "EVIDENCE_NEEDED"),
+    ({"level_type": "BREAKOUT", "price": 110.0001}, "EVIDENCE_NEEDED"),
+    ({"level_type": "STOP_LOSS", "price": 110.0275, "source_text": "110.0275 미만"}, "EVIDENCE_NEEDED"),
+    ({"level_type": "PULLBACK", "low": 110.005, "high": 110.015}, "EVIDENCE_NEEDED"),
+    ({"level_type": "PULLBACK", "low": 110.0001, "high": 110.0275}, "MET"),
+    ({"level_type": "SUPPORT", "low": 108, "high": 109}, "NOT_MET"),
+])
+def test_divergent_us_closes_hold_only_unstable_price_comparisons(level, expected):
+    observation = {"price": 110.0001, "recheck": {"price": 110.0275}}
+    result = _compare(level | {"confirmation": "close"}, observation, currency="USD", compatible=True, conflict=False)
+    assert result["status"] == expected
+    assert result["observation"] == observation
+    if expected == "EVIDENCE_NEEDED":
+        assert "거래소 공식 종가" in result["needed"]
+
+
+def test_single_us_observation_keeps_a_research_comparison_available():
+    level = {"level_type": "BREAKOUT", "price": 110, "source_text": "110 이상", "confirmation": "close"}
+    observation = {"price": 111, "kind": "KIS_DAILY_CLOSE"}
+    assert _compare(level, observation, currency="USD", compatible=True, conflict=False)["status"] == "MET"
+    assert _compare(level, observation, currency="USD", compatible=False, conflict=False)["status"] == "EVIDENCE_NEEDED"
+
+
+def test_next_day_requery_retains_the_us_range_from_the_previous_build(tmp_path):
+    now = dt("2026-11-25T14:00:00+00:00")
+    day = date(2026, 11, 24)
+    days = market_days("US", now)
+    early = _bar(day, days[day], 108, observed=now - timedelta(hours=15))
+    latest = _bar(day, days[day], 111, observed=now) | {"kind": "KIS_DAILY_CLOSE"}
+    previous_path = tmp_path / "strategy.json"
+    previous_path.write_text(json.dumps({"markets": {"us": {"rows": [
+        {"ticker": "AAPL", "research_plan": {"completed_close": early}},
+        {"ticker": "MSFT", "research_plan": None}, None,
+    ]}}}), encoding="utf-8")
+    old = previous_us_closes(previous_path)
+    assert old == {"AAPL": early}
+    closes = {day: latest}
+    _retain_previous_close(closes, old["AAPL"], days, now)
+    assert closes[day]["previous_range"] == [{"price": 108, "observed_at": early["observed_at"]}]
+    level = {"level_type": "BREAKOUT", "price": 110, "source_text": "110 이상", "confirmation": "close"}
+    assert _compare(level, closes[day], currency="USD", compatible=True, conflict=False)["status"] == "EVIDENCE_NEEDED"
+
+    newer = {day: latest | {"observed_at": (now + timedelta(minutes=1)).isoformat()}}
+    _retain_previous_close(newer, closes[day], days, now + timedelta(minutes=1))
+    assert newer[day]["previous_range"] == closes[day]["previous_range"]
+
+    for wrong in ({"exchange": "NYS"}, {"session": "2026-11-23"},
+                  {"observed_at": (now + timedelta(seconds=1)).isoformat()}, {"currency": "KRW"}):
+        fresh = {day: latest}
+        _retain_previous_close(fresh, early | wrong, days, now)
+        assert fresh[day] == latest
+    previous_path.write_text("invalid", encoding="utf-8")
+    assert previous_us_closes(previous_path) == {}
+
+
+def test_disagreement_does_not_shift_first_breakout_to_a_later_session():
+    now = dt("2026-11-27T19:00:00+00:00")
+    days = market_days("US", now)
+    first, following = date(2026, 11, 25), date(2026, 11, 27)
+    breakout = {"level_type": "BREAKOUT", "price": 110, "source_text": "110 이상", "confirmation": "close",
+                "confirmation_group": "reclaim"}
+    follow = {"level_type": "PULLBACK", "low": 110, "high": 113, "confirmation": "next_day", "confirmation_group": "reclaim"}
+    thesis = {"analysis_asof": "2026-11-25T17:00:00+00:00", "execution_levels": {"levels": [breakout, follow]}}
+    closes = {first: _bar(first, days[first], 109) | {"recheck": {"price": 111}}, following: _bar(following, days[following], 112)}
+    result = _price_checks(thesis, closes, None, days, now, currency="USD", compatible=True, active=True)
+    assert [check["status"] for check in result] == ["MET", "EVIDENCE_NEEDED"]
+    assert result[1]["needed"] == "2026-11-25 선행 종가의 가격 경계 확인"
+    assert "preceding_price_session" not in result[1]
 
 
 def test_latest_partial_research_reuses_true_origin_and_keeps_old_failed_ticker(tmp_path):

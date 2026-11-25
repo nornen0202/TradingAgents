@@ -211,6 +211,7 @@ def build_mobile_site(
     public_base_url: str = "",
     refresh_research_prices: bool = False,
     as_of: datetime | None = None,
+    previous_closes: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Build the public research hub and a plaintext, action-only strategy view.
 
@@ -284,7 +285,8 @@ def build_mobile_site(
         )
         from tradingagents.scheduled.strategy_research import attach_research_plans
 
-        attach_research_plans(archive_dir, market_payload, now=plan_clock, refresh_prices=refresh_research_prices)
+        attach_research_plans(archive_dir, market_payload, now=plan_clock, refresh_prices=refresh_research_prices,
+                              previous_closes=previous_closes if market.upper() == "US" else None)
         strategy_payload["markets"][market] = market_payload
 
     public_payload = _normalize_mobile_machine_values(public_payload)
@@ -2188,12 +2190,29 @@ _PRIVATE_JS = READER_JS + r"""
   const researchStatus = {MET: '가격 조건 충족', NOT_MET: '가격 조건 미충족', BOUNDARY: '가격 경계값', EVIDENCE_NEEDED: '증빙 필요'};
   const researchStage = {intraday: '장중', close: '정규장 종가', next_day: '다음 거래일', two_bar: '연속 두 봉'};
   const zeroPlanReasons = {NO_TRADE_INTENT:'관망·추가 매매 없음', ZERO_ALLOCATION:'추가 배정 없음', CASH_BUFFER_SHORTFALL:'현금 보유 기준 부족', NO_BUYING_POWER:'주문가능금액 없음', ALLOCATION_BELOW_ONE_SHARE:'목표 수량 1주 미만', NO_SELLABLE_WHOLE_SHARE:'매도가능 정수 수량 없음', REMAINING_CASH_BELOW_ONE_SHARE:'잔여 예산 부족'};
+  function researchPrice(value, currency) {
+    return currency === 'USD' && Number.isFinite(numeric(value))
+      ? '$' + Number(value).toLocaleString('ko-KR', {minimumFractionDigits: 2, maximumFractionDigits: 4})
+      : planMoney(value, currency);
+  }
   function researchLevel(level) {
-    const range = level.low != null && level.high != null ? `${fmt(level.low)}~${fmt(level.high)}` : fmt(level.price);
-    return `${level.label || '원분석 가격선'} ${range}${level.currency ? ' ' + level.currency : ''}`;
+    const format = (value) => level.currency === 'USD' ? researchPrice(value, level.currency) : fmt(value);
+    const range = level.low != null && level.high != null ? `${format(level.low)}~${format(level.high)}` : format(level.price);
+    return `${level.label || '원분석 가격선'} ${range}${level.currency && level.currency !== 'USD' ? ' ' + level.currency : ''}`;
+  }
+  function kisUsDaily(quote) {
+    return quote?.kind === 'KIS_DAILY_CLOSE' || (quote?.kind === 'REGULAR_CLOSE' && quote.source === 'KIS' && quote.currency === 'USD');
   }
   function researchQuote(quote) {
     if (!quote) return '';
+    if (kisUsDaily(quote)) {
+      const reread = quote.recheck;
+      const received = (item) => `조회 ${dateTime(item.observed_at)}${item.provider_response_at ? ' · HTTP 응답 ' + dateTime(item.provider_response_at) : ''}`;
+      const initial = `${quote.session} KIS ${quote.exchange || ''} 비수정 일봉 ${researchPrice(quote.price, quote.currency)} (${received(quote)})`;
+      const comparison = reread ? ` · 재조회 ${researchPrice(reread.price, quote.currency)} (${received(reread)})${reread.price !== quote.price ? ' · 값 차이' : ' · 값 일치'}` : ' · 재조회 근거 없음';
+      const earlier = (quote.previous_range || []).map((item) => `${researchPrice(item.price, quote.currency)} (${received(item)})`).join(', ');
+      return `${initial}${comparison}${earlier ? ' · 이전 생성본 ' + earlier : ''} · 거래소 공식 종가 확인 필요`;
+    }
     const label = {REGULAR_CLOSE: '정규장 확정 종가', REGULAR_QUOTE: '정규장 관측', DELAYED_REGULAR_QUOTE: '정규장 지연 관측', HISTORICAL_REGULAR_QUOTE: '이전 정규장 관측'}[quote.kind];
     const delay = quote.kind === 'DELAYED_REGULAR_QUOTE' ? ` · ${Math.floor(quote.age_seconds / 60)}분 지연` : '';
     return `${label || '관측 가격'} ${planMoney(quote.price, quote.currency)} · ${dateTime(quote.event_at)} · ${quote.source} ${quote.exchange || ''} · ${quote.currency} 비수정${delay}`;
@@ -2211,10 +2230,10 @@ _PRIVATE_JS = READER_JS + r"""
       const level = check.level || {};
       return `<li><strong>${esc(researchLevel(level))}</strong>`
         + ` · ${esc(researchStage[level.confirmation] || '확인 방식 확인')}${check.group ? ' · 그룹 ' + esc(check.group) : ''}<br>`
-        + `<span class="research-result">${esc(researchStatus[check.status])}</span> ${esc(researchQuote(check.observation))}`
+        + `<span class="research-result">${kisUsDaily(check.observation) && check.status !== 'EVIDENCE_NEEDED' ? 'KIS 관측 기준 · ' : ''}${esc(researchStatus[check.status])}</span> ${esc(researchQuote(check.observation))}`
         + (check.intraday_reference ? `<br>${esc(researchQuote(check.intraday_reference.observation))} · 장중 가격만 대조 · ${esc(researchStatus[check.intraday_reference.status])}` : '')
         + (check.needed ? `<br>${esc(check.needed_session ? check.needed_session + ' · ' : '')}${esc(check.needed)}` : '')
-        + (check.preceding_price_session ? `<br>선행 종가의 가격 대조일 ${esc(check.preceding_price_session)} · 원문의 선행 조건도 확인` : '')
+        + (check.preceding_price_session ? `<br>선행 가격 대조일 ${esc(check.preceding_price_session)} · ${check.preceding_close_source === 'KIS_DAILY_CLOSE' ? 'KIS 일봉 기준 · 거래소 공식 종가와 ' : ''}원문의 선행 조건 확인` : '')
         + (level.source_text ? `<br>${esc(level.source_text)}` : '') + (level.volume_rule ? `<br>거래량 조건 ${esc(level.volume_rule)}` : '') + '</li>';
     }).join('');
     const quote = researchQuote(plan.observation || plan.last_observation);
