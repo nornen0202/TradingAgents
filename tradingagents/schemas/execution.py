@@ -389,6 +389,7 @@ class IntradayMarketSnapshot:
     news_halt_status: dict[str, Any] | None = None
     chart_bars: tuple[dict[str, Any], ...] = ()
     research_price_reference: dict[str, Any] | None = None
+    snapshot_received_at: str | None = None
 
     def to_dict(self) -> dict[str, Any]:
         microstructure = MicrostructureSnapshot(
@@ -439,6 +440,7 @@ class IntradayMarketSnapshot:
             "bar_timestamp": self.bar_timestamp or self.asof,
             "provider": self.provider,
             "provider_timestamp": self.provider_timestamp or self.asof,
+            "snapshot_received_at": self.snapshot_received_at,
             "quote_delay_seconds": self.quote_delay_seconds,
             "provider_realtime_capable": self.provider_realtime_capable,
             "market_session": self.market_session,

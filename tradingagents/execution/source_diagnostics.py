@@ -16,12 +16,15 @@ def diagnose_source(source, now, *, include_proposals=True):
     rows = bundle.get("strategy_table", [])
     reasons = Counter()
     ready = fresh = 0
-    observation_times = []
+    observation_times, receipt_times = [], []
     for row in rows:
         quality = row.get("quality") or {}
         clock = instant(row.get("market_data_asof"))
         if clock is not None and generated is not None and clock <= generated <= now:
             observation_times.append(clock)
+            received = instant(row.get("snapshot_received_at"))
+            if quality.get("generated_in_current_run") is True and received is not None and clock <= received <= generated:
+                receipt_times.append(received)
             if (now - clock).total_seconds() < 120:
                 fresh += 1
                 ready += quality.get("execution_ready") is True and quality.get("generated_in_current_run") is True
@@ -40,4 +43,5 @@ def diagnose_source(source, now, *, include_proposals=True):
             "execution_ready_rows": ready, "allocated_orders": len(proposals) if proposals is not None else None,
             "generated_at": generated.isoformat() if generated and generated <= now else None,
             "newest_market_data_at": max(observation_times).isoformat() if observation_times else None,
+            "newest_snapshot_received_at": max(receipt_times).isoformat() if receipt_times else None,
             "reason_counts": dict(sorted(reasons.items()))}

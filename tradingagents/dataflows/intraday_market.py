@@ -64,6 +64,7 @@ def fetch_intraday_market_snapshot(
                 raise VendorUnavailableError(f"Intraday provider '{provider_name}' snapshot asof exceeds analysis_as_of.")
             return replace(
                 snapshot,
+                snapshot_received_at=received_at.isoformat() if provider_name in live_only_providers else None,
                 missing_reason={**snapshot.missing_reason, **failures},
                 execution_data_quality=classify_execution_market_data(
                     snapshot,

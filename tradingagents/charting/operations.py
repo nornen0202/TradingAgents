@@ -155,6 +155,9 @@ def _source_health(raw, *, as_of=None):
             if observed is not None and observed <= generated:
                 result["newest_market_data_at"] = observed.isoformat()
                 result["data_age_seconds_at_check"] = int((as_of - observed).total_seconds())
+            received = instant(raw.get("newest_snapshot_received_at"))
+            if received is not None and received <= generated:
+                result["newest_snapshot_received_at"] = received.isoformat()
     counts = raw.get("reason_counts")
     result["reason_counts"] = {k: v for k, v in (counts.items() if isinstance(counts, dict) else [])
                                if isinstance(k, str) and re.fullmatch(r"[A-Za-z0-9_:.-]{1,100}", k)

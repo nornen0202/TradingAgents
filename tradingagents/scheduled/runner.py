@@ -5752,20 +5752,20 @@ def _run_execution_overlay_passes(
             run_dir=run_dir,
             checkpoint_label=checkpoint_label,
         )
-        for summary in ticker_summaries:
+        def archive_observation(summary: dict[str, Any]) -> tuple[str, dict[str, Any]] | None:
             if summary.get("status") != "success":
-                continue
+                return None
             ticker = str(summary.get("ticker") or "").strip().upper()
             if not ticker:
-                continue
+                return None
             artifacts = summary.get("artifacts") or {}
             summary["artifacts"] = artifacts
             contract_rel = artifacts.get("execution_contract_json")
             if not contract_rel:
-                continue
+                return None
             contract_path = run_dir / contract_rel
             if not contract_path.exists():
-                continue
+                return None
             contract_dict: dict[str, Any] = {}
             attempt_payload = _build_intraday_attempt_payload(
                 ticker=ticker,
@@ -5818,6 +5818,7 @@ def _run_execution_overlay_passes(
                     session_observations=observations,
                 )
                 update_payload = update.to_dict()
+                update_payload["source"]["snapshot_received_at"] = market.snapshot_received_at
                 update_payload["ingested_at"] = datetime.now(timezone.utc).isoformat()
                 update_payload["evaluated_at"] = update_payload.get("execution_asof")
                 update_payload["intraday_snapshot_attempt"] = attempt_payload
@@ -5832,10 +5833,11 @@ def _run_execution_overlay_passes(
                 micro_checkpoint_md = checkpoint_dir / _checkpoint_microstructure_report_filename(checkpoint_label)
                 micro_latest_json = ticker_dir / "microstructure_snapshot.json"
                 micro_latest_md = ticker_dir / "microstructure_report.md"
+                micro_report = render_microstructure_report(market)
                 _write_json(micro_checkpoint_json, micro_snapshot_payload)
-                micro_checkpoint_md.write_text(render_microstructure_report(market), encoding="utf-8")
+                micro_checkpoint_md.write_text(micro_report, encoding="utf-8")
                 _write_json(micro_latest_json, micro_snapshot_payload)
-                micro_latest_md.write_text(render_microstructure_report(market), encoding="utf-8")
+                micro_latest_md.write_text(micro_report, encoding="utf-8")
                 summary["artifacts"]["microstructure_snapshot_json"] = _relative_to_run(run_dir, micro_latest_json)
                 summary["artifacts"]["microstructure_report_md"] = _relative_to_run(run_dir, micro_latest_md)
                 summary["artifacts"]["microstructure_checkpoint_snapshot_json"] = _relative_to_run(run_dir, micro_checkpoint_json)
@@ -5881,7 +5883,6 @@ def _run_execution_overlay_passes(
                 summary["intraday_snapshot_attempt"] = attempt_payload
                 if not preserve_analysis_bytes:
                     _append_analysis_intraday_attempt(run_dir=run_dir, ticker_summary=summary, attempt_payload=attempt_payload)
-                updates_by_ticker[ticker] = update_payload
             except Exception as exc:
                 attempt_payload.update(
                     {
@@ -5944,8 +5945,20 @@ def _run_execution_overlay_passes(
                 summary["intraday_snapshot_attempt"] = attempt_payload
                 if not preserve_analysis_bytes:
                     _append_analysis_intraday_attempt(run_dir=run_dir, ticker_summary=summary, attempt_payload=attempt_payload)
-                updates_by_ticker[ticker] = update_payload
                 print(f"::warning::Execution overlay checkpoint '{checkpoint_label}' failed for {ticker}: {exc}")
+            return ticker, update_payload
+
+        # Lightweight observations write independent ticker directories. Keep
+        # manifest order and wait for every receipt before publishing the batch.
+        targets = {_ticker_identity_key(str(row.get("ticker") or "")) for row in ticker_summaries}
+        distinct_tickers = len(targets) == len(ticker_summaries) > 1
+        if config.execution.execution_lightweight_refresh and config.run.run_mode == "overlay_only" and distinct_tickers:
+            with ThreadPoolExecutor(max_workers=4) as pool:
+                results = pool.map(archive_observation, ticker_summaries)
+                updates_by_ticker.update(result for result in results if result is not None)
+        else:
+            updates_by_ticker.update(result for result in map(archive_observation, ticker_summaries)
+                                     if result is not None)
         updates_by_ticker["_latest_checkpoint"] = {"value": checkpoint_label}
     if _has_ticker_execution_updates(updates_by_ticker):
         context_path = run_dir / "chatgpt_execution_context.json"

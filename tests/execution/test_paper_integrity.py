@@ -80,6 +80,27 @@ def test_source_diagnostics_invalid_clocks_never_report_ready(tmp_path, clock):
     assert result["status"] == "BLOCKED"
 
 
+def test_source_diagnostics_keep_kis_receipt_separate_from_stale_and_legacy_event_clocks(tmp_path):
+    archive(tmp_path)
+    path = tmp_path / "decision_bundle_v2.json"
+    bundle = json.loads(path.read_text())
+    row = bundle["strategy_table"][0]
+    generated = (AT - timedelta(seconds=5)).isoformat()
+    received = (AT - timedelta(seconds=20)).isoformat()
+    row["market_data_asof"] = (AT - timedelta(seconds=130)).isoformat()
+    bundle["generated_at"] = generated
+    write(path, bundle)
+    assert diagnose_source(tmp_path, AT)["newest_snapshot_received_at"] is None
+    row["snapshot_received_at"] = received
+    write(path, bundle)
+    result = diagnose_source(tmp_path, AT)
+    assert result["newest_snapshot_received_at"] == received
+    assert result["fresh_rows"] == 0
+    row["snapshot_received_at"] = AT.isoformat()
+    write(path, bundle)
+    assert diagnose_source(tmp_path, AT)["newest_snapshot_received_at"] is None
+
+
 def test_source_degraded_exposes_provider_reason_not_normal_wait(tmp_path):
     archive(tmp_path)
     path = tmp_path / "decision_bundle_v2.json"
