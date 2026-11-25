@@ -2403,6 +2403,8 @@ def _etf_status_label(value: Any) -> str:
         return "입금일 원장 필요"
     if status in {"cashflow_evidence_unverified", "research_only_unverified_cashflows"}:
         return "입출금 미검증 · 연구용"
+    if status in {"price_or_fx_evidence_unverified", "fx_missing"}:
+        return "가격·환율 근거 미확인"
     if status == "no_alternatives":
         return "대체 포트폴리오 없음"
     return str(value or "-")

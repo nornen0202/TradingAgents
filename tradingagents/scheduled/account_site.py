@@ -188,7 +188,8 @@ def _public_market_snapshot(
     market: str,
 ) -> dict[str, Any]:
     positions: list[dict[str, Any]] = []
-    source_positions = snapshot.get("positions") if isinstance(snapshot.get("positions"), list) else []
+    has_position_evidence = isinstance(snapshot.get("positions"), list)
+    source_positions = snapshot["positions"] if has_position_evidence else []
     for raw in source_positions:
         if not isinstance(raw, dict):
             continue
@@ -201,10 +202,13 @@ def _public_market_snapshot(
         current_price = _integer(raw.get("market_price_krw"))
         market_value = _integer(raw.get("market_value_krw"))
         purchase_amount = int(round(average_cost * quantity))
-        unrealized_pnl = _integer(raw.get("unrealized_pnl_krw"))
-        if not unrealized_pnl and market_value and purchase_amount:
-            unrealized_pnl = market_value - purchase_amount
-        unrealized_return = (unrealized_pnl / purchase_amount * 100.0) if purchase_amount > 0 else None
+        unrealized_pnl = None
+        if market_value > 0 and purchase_amount > 0:
+            # Archived broker adapters used zero for absent values. A complete
+            # normalized mark and cost basis distinguish zero profit from no evidence.
+            unrealized_pnl = _optional_integer(raw.get("unrealized_pnl_krw")) or (market_value - purchase_amount)
+        unrealized_return = (unrealized_pnl / purchase_amount * 100.0
+                             if unrealized_pnl is not None else None)
         positions.append(
             {
                 "ticker": ticker,
@@ -224,10 +228,11 @@ def _public_market_snapshot(
 
     total_purchase = sum(int(item["purchase_amount_krw"]) for item in positions)
     total_market_value = sum(int(item["market_value_krw"]) for item in positions)
-    total_pnl = sum(int(item["unrealized_pnl_krw"]) for item in positions)
-    if positions and total_market_value - total_purchase != total_pnl:
-        total_pnl = total_market_value - total_purchase
-    total_return = (total_pnl / total_purchase * 100.0) if total_purchase > 0 else None
+    complete_marks = (has_position_evidence and len(positions) == len(source_positions)
+                      and all(item["unrealized_pnl_krw"] is not None for item in positions))
+    total_pnl = total_market_value - total_purchase if complete_marks else None
+    total_return = (total_pnl / total_purchase * 100.0
+                    if total_pnl is not None and total_purchase > 0 else None)
     equity = snapshot.get("account_value_krw")
     account_value = _optional_integer(equity if equity is not None else snapshot.get("total_equity_krw"))
     meta = _MARKET_META[market]
@@ -258,7 +263,7 @@ def _empty_summary() -> dict[str, Any]:
         "position_count": 0,
         "total_purchase_amount_krw": 0,
         "total_market_value_krw": 0,
-        "total_unrealized_pnl_krw": 0,
+        "total_unrealized_pnl_krw": None,
         "total_unrealized_return_pct": None,
         "settled_cash_krw": None,
         "available_cash_krw": None,
@@ -393,7 +398,7 @@ def _render_market_panel(market: str, value: dict[str, Any], *, initial: str) ->
 
 
 def _render_summary(summary: dict[str, Any]) -> str:
-    pnl = int(summary["total_unrealized_pnl_krw"])
+    pnl = summary.get("total_unrealized_pnl_krw")
     return_pct = summary.get("total_unrealized_return_pct")
     return f"""
       <div class="account-kpis">
@@ -416,7 +421,7 @@ def _render_positions(positions: list[dict[str, Any]]) -> str:
         return "<div class='account-empty'>보유 종목이 없습니다.</div>"
     rows = []
     for position in positions:
-        pnl = int(position["unrealized_pnl_krw"])
+        pnl = position.get("unrealized_pnl_krw")
         rows.append(
             f"""
             <tr>
@@ -474,6 +479,8 @@ def _won(value: Any) -> str:
 
 
 def _signed_won(value: Any) -> str:
+    if value is None:
+        return "미확인"
     number = _integer(value)
     sign = "+" if number > 0 else ""
     return f"{sign}₩{number:,}"

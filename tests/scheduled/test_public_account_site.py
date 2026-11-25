@@ -113,6 +113,38 @@ def test_public_account_site_falls_back_to_older_valid_snapshot(tmp_path: Path) 
     assert result["markets"]["us"]["status"] == "unavailable"
 
 
+def test_public_account_site_distinguishes_missing_profit_from_verified_zero(tmp_path):
+    run = _manifest(tmp_path, market="KR", run_id="positions", account_id="fixture")
+    snapshot_file = Path(run["_run_dir"]) / "portfolio-private" / "account_snapshot.json"
+    snapshot = json.loads(snapshot_file.read_text(encoding="utf-8"))
+    position = snapshot["positions"][0]
+    position.pop("market_value_krw")
+    position.pop("unrealized_pnl_krw")
+    snapshot_file.write_text(json.dumps(snapshot), encoding="utf-8")
+    site = tmp_path / "site"
+    missing = build_public_account_site(site_dir=site, manifests=[run])
+    kr = missing["markets"]["kr"]
+    assert kr["positions"][0]["unrealized_pnl_krw"] is None
+    assert kr["positions"][0]["unrealized_return_pct"] is None
+    assert kr["summary"]["total_unrealized_pnl_krw"] is None
+    assert missing["markets"]["us"]["summary"]["total_unrealized_pnl_krw"] is None
+    assert "미확인" in (site / "account" / "index.html").read_text(encoding="utf-8")
+
+    position["market_value_krw"] = 0
+    position["unrealized_pnl_krw"] = 0
+    snapshot_file.write_text(json.dumps(snapshot), encoding="utf-8")
+    legacy = build_public_account_site(site_dir=site, manifests=[run])["markets"]["kr"]
+    assert legacy["positions"][0]["unrealized_pnl_krw"] is None
+    assert legacy["summary"]["total_unrealized_pnl_krw"] is None
+
+    position["market_value_krw"] = position["quantity"] * position["avg_cost_krw"]
+    snapshot_file.write_text(json.dumps(snapshot), encoding="utf-8")
+    verified = build_public_account_site(site_dir=site, manifests=[run])["markets"]["kr"]
+    assert verified["positions"][0]["unrealized_pnl_krw"] == 0
+    assert verified["positions"][0]["unrealized_return_pct"] == 0.0
+    assert verified["summary"]["total_unrealized_pnl_krw"] == 0
+
+
 def test_repository_daily_configs_explicitly_enable_public_account_snapshot() -> None:
     for path in (Path("config/scheduled_analysis.toml"), Path("config/scheduled_analysis_korea.toml")):
         config = load_scheduled_config(path)

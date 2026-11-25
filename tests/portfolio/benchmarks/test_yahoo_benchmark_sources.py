@@ -137,3 +137,22 @@ def test_fx_rejects_unverified_source_timezone(tmp_path):
                                                as_of="2025-11-27T00:30:00+00:00", cache_dir=tmp_path, fx=True)
     assert rows == [] and evidence["state"] == "fx_source_timezone_unverified"
     assert not list(tmp_path.iterdir())
+
+
+def test_fx_identity_retry_caches_only_verified_korean_won_mark(tmp_path):
+    good = _data(["2025-11-26"], [1410]).tz_localize("Europe/London")
+    wrong = _data(["2025-11-26"], [9999]).tz_localize("Europe/London")
+    meta = {"symbol": "KRW=X", "currency": "KRW", "instrumentType": "CURRENCY",
+            "exchangeTimezoneName": "Europe/London"}
+    wrong_meta = meta | {"currency": "USD"}
+    with patch("tradingagents.portfolio.performance.benchmark_sources._download",
+               side_effect=[(wrong, wrong_meta), (wrong, wrong_meta), (wrong, wrong_meta), (good, meta)]) as fetch:
+        args = ("KRW=X", "KRW", date(2025, 11, 26), date(2025, 11, 26))
+        options = {"as_of": "2025-11-27T00:30:00+00:00", "cache_dir": tmp_path, "fx": True}
+        rejected, rejection = load_yahoo_benchmark(*args, **options)
+        assert not rejected and rejection["attempts"] == 2 and not list(tmp_path.iterdir())
+        rows, evidence = load_yahoo_benchmark(*args, **options)
+        cached, receipt = load_yahoo_benchmark(*args, **options)
+    assert rows == cached and [row["close"] for row in rows] == [1410]
+    assert evidence["units"] == "KRW per USD" and receipt["input_origin"] == "cache"
+    assert fetch.call_count == 4

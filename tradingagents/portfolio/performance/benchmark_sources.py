@@ -70,10 +70,14 @@ def load_yahoo_benchmark(symbol, currency, start, end, *, as_of, cache_dir: Path
             pass
     if fetched is None:
         try:
-            data, meta = _download(symbol, start, end, fx=fx)
-            if (meta.get("symbol") != symbol or meta.get("currency") != currency
-                    or (fx and meta.get("instrumentType") != "CURRENCY")):
-                return [], {"state": "provider_instrument_or_currency_unverified"}
+            metadata_attempts = 2 if fx else 1
+            for _ in range(metadata_attempts):
+                data, meta = _download(symbol, start, end, fx=fx)
+                if (isinstance(meta, dict) and meta.get("symbol") == symbol and meta.get("currency") == currency
+                        and (not fx or meta.get("instrumentType") == "CURRENCY")):
+                    break
+            else:
+                return [], {"state": "provider_instrument_or_currency_unverified", "attempts": metadata_attempts}
             if not fx and not {"Dividends", "Stock Splits", "Close"} <= set(data.columns):
                 return [], {"state": "adjustment_evidence_missing"}
             records = []
