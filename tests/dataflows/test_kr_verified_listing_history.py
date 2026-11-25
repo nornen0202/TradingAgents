@@ -79,6 +79,28 @@ def test_exact_original_event_and_current_master_keep_original_window(symbol, fi
         end_date=END, observed_at=NOW) == contract
 
 
+@pytest.mark.parametrize("symbol,first,isin", [
+    ("439090.KQ", "2023-06-08", "KR7439090002"),
+    ("125490.KQ", "2025-08-20", "KR7125490003"),
+])
+def test_today_research_accepts_verified_first_session_without_backdating(clock, monkeypatch, symbol, first, isin):
+    start, end = "2021-11-24", "2026-11-24"
+    issue = listing.reviewed_issue(symbol)
+    verified = datetime.fromisoformat(issue["evidence_available_at"])
+    current_master = Mock(side_effect=lambda symbol, **_: metadata(symbol))
+    monkeypatch.setattr(listing, "collect_master_identity", current_master)
+    with run_config({"analysis_as_of": "2026-11-25"}):
+        clock.now = verified - timedelta(microseconds=1)
+        assert listing.collect_listing_contract(symbol, requested_start=start, end_date=end) is None
+        current_master.assert_not_called()
+        clock.now = verified + timedelta(seconds=10)
+        contract = listing.collect_listing_contract(symbol, requested_start=start, end_date=end)
+    assert contract["original_requested_start"] == start and contract["requested_end"] == end
+    assert contract["required_start"] == first and contract["reviewed_event"]["isin"] == isin
+    assert contract["historical_vintage_verified"] is False
+    current_master.assert_called_once_with(symbol, board="kosdaq", short_code=symbol[:6])
+
+
 def test_396300_original_issuer_matches_retained_master_row_by_stable_identity():
     # Exact public row retained at 2026-10-25T21:12:42.022291Z; not a fresh clock.
     raw = bytes.fromhex(

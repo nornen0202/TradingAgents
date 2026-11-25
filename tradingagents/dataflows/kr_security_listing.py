@@ -26,6 +26,41 @@ _MASTER = {
 }
 _TAIL_FIELDS = {"kospi": (105, 113, 67), "kosdaq": (100, 108, 62)}
 _REVIEWED = {
+    "439090.KQ": {
+        "symbol": "439090.KQ", "short_code": "439090", "board": "kosdaq",
+        "exchange": "KRX", "currency": "KRW", "isin": "KR7439090002",
+        "issuer": "주식회사 마녀공장", "provider_name": "마녀공장",
+        "security_class": "COMMON_STOCK", "event_kind": "IPO_FIRST_REGULAR_COMMON_STOCK",
+        "first_regular_session": "2023-06-08",
+        "evidence_available_at": "2026-11-25T00:23:53.743224+00:00",
+        "sources": [
+            {"url": "https://kind.krx.co.kr/external/2023/08/14/001008/20230814003110/11012.htm",
+             "sha256": "a2468c94643c22b8681d9a442c1f67b28563b7ebc3549f5ad91076745f7353f8",
+             "role": "ISSUER_FILED_KOSDAQ_FIRST_LISTING_DATE"},
+            {"url": "https://kind.krx.co.kr/external/2024/11/11/000391/20241111001009/11013.htm",
+             "sha256": "b82402c5892a8561b0c52c182a43dcac039407b6bb765b69a1ff40b0b0e1d907",
+             "role": "FILED_COMMON_SHARE_LISTING_EVENT_CORROBORATION"},
+            {"url": "https://new.real.download.dws.co.kr/common/master/kosdaq_code.mst.zip",
+             "sha256": "1ea0f63422e790c699484121e0506e29faf3c464e4c61d90b3a37c147392b0d3",
+             "role": "REVIEWED_CURRENT_MASTER_IDENTITY_NOT_HISTORICAL_LISTING"},
+        ],
+    },
+    "125490.KQ": {
+        "symbol": "125490.KQ", "short_code": "125490", "board": "kosdaq",
+        "exchange": "KRX", "currency": "KRW", "isin": "KR7125490003",
+        "issuer": "주식회사 한라캐스트", "provider_name": "한라캐스트",
+        "security_class": "COMMON_STOCK", "event_kind": "IPO_FIRST_REGULAR_COMMON_STOCK",
+        "first_regular_session": "2025-08-20",
+        "evidence_available_at": "2026-11-25T00:23:53.806039+00:00",
+        "sources": [
+            {"url": "https://kind.krx.co.kr/external/2025/08/19/000473/20250819000931/72100.htm",
+             "sha256": "af41a9bed8a6cebc5838eba16be554e8b1e203e927231bafd3c83846eb4fe3b6",
+             "role": "EXCHANGE_NEW_COMMON_FIRST_TRADING_REFERENCE"},
+            {"url": "https://new.real.download.dws.co.kr/common/master/kosdaq_code.mst.zip",
+             "sha256": "1ea0f63422e790c699484121e0506e29faf3c464e4c61d90b3a37c147392b0d3",
+             "role": "REVIEWED_CURRENT_MASTER_IDENTITY_NOT_HISTORICAL_LISTING"},
+        ],
+    },
     "460940.KQ": {
         "symbol": "460940.KQ", "short_code": "460940", "board": "kosdaq",
         "exchange": "KRX", "currency": "KRW", "isin": "KR7460940000",
