@@ -20,8 +20,8 @@ _PROVIDERS = {"KR": {"KIS_DOMESTIC_REGULAR_SESSION"}, "US": {"KIS_US_REGULAR_SES
 _OBSERVATION_FIELDS = ("kind", "event_at", "observed_at", "price", "ticker", "source", "market", "currency", "session",
                        "venue", "session_id", "price_basis", "scheduled_event_at", "revised_at")
 _ENTRY_GROUP = re.compile(r"[A-Za-z0-9_-]{1,32}")
-ENTRY_CONFIRMATION_STAGES = {"intraday", "close", "next_day", "next_open", "next_session_quote"}
-EXPLICIT_NEXT_SESSION_STAGES = {"next_day", "next_open", "next_session_quote"}
+ENTRY_CONFIRMATION_STAGES = {"intraday", "close", "next_open", "next_session_quote"}
+EXPLICIT_NEXT_SESSION_STAGES = {"next_open", "next_session_quote"}
 
 
 def entry_research_deadline(analysis_at, explicit_expiry=None):
@@ -89,7 +89,7 @@ def _validate_plan(plan):
         for rule in group:
             if (not isinstance(rule, dict) or set(rule) != {"id", "stage", "direction", "level"}
                     or not isinstance(rule["id"], str) or not rule["id"] or rule["id"] in identities
-                    or rule["stage"] not in ENTRY_CONFIRMATION_STAGES
+                    or rule["stage"] not in ENTRY_CONFIRMATION_STAGES | {"next_day"}
                     or rule["direction"] not in ("above", "below") or not _positive(rule["level"])):
                 raise ValueError("Invalid condition")
             identities.add(rule["id"])

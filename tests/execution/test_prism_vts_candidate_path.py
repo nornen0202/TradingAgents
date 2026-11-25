@@ -518,7 +518,7 @@ def test_daily_buy_revision_binds_existing_journal_and_caps_cost_after_restart(c
 
 
 @pytest.mark.parametrize("reversed_price", [False, True])
-def test_native_cli_rechecks_named_next_day_and_close_group_with_live_book(cli, monkeypatch, reversed_price):
+def test_native_cli_rechecks_named_next_open_and_close_group_with_live_book(cli, monkeypatch, reversed_price):
     from tradingagents.execution import session_confirmation
 
     h = cli.h
@@ -535,7 +535,7 @@ def test_native_cli_rechecks_named_next_day_and_close_group_with_live_book(cli, 
     paths = source / "tickers" / h.ticker
     contract = read(paths / "execution_contract.json")
     contract["analysis_asof"] = origin_at.isoformat()
-    stages = ("close", "next_day", "next_session_quote")
+    stages = ("close", "next_open", "next_session_quote")
     trigger = h.price * .995
     contract["structured_levels"] = [{"level_type": "BREAKOUT", "price": trigger, "confirmation": stage,
                                       "confirmation_group": "confirmed"} for stage in stages]
