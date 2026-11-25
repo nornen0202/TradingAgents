@@ -10,7 +10,9 @@ from .paper import order_nav_limit
 
 CAPS = {"KR": 100_000, "US": 500}
 APPROVED_LIMIT_REVISION = "VTS_NATIVE_ORDER_LIMITS_20261125"
+DAILY_LIMIT_REVISION = "VTS_NATIVE_DAILY_BUY_LIMITS_V1"
 APPROVED_CAPS = {"KR": 3_000_000, "US": 3_000}
+LEGACY_DAILY_BUY = {"KR": 300_000, "US": 1_000}
 _SUFFIX = {"KR": "krw", "US": "usd"}
 
 
@@ -31,12 +33,19 @@ def configured_limits(config):
     if not isinstance(raw, dict) or set(raw) - set(CAPS):
         raise ValueError("Native strategy limits must identify each market explicitly")
     if "native_limit_revision" in config:
+        revision = config["native_limit_revision"]
         expected = approved_limits()
-        if (config.get("native_limit_revision") != APPROVED_LIMIT_REVISION or config.get("mode") != "KIS_DEMO_STRATEGY"
+        daily = config.get("native_daily_buy_limits")
+        valid_daily = (json.dumps(daily, sort_keys=True) == json.dumps(APPROVED_CAPS, sort_keys=True)
+                       if revision == DAILY_LIMIT_REVISION else "native_daily_buy_limits" not in config)
+        if (not isinstance(revision, str) or revision not in {APPROVED_LIMIT_REVISION, DAILY_LIMIT_REVISION} or not valid_daily
+                or config.get("mode") != "KIS_DEMO_STRATEGY"
                 or config.get("real_orders_enabled") is not False
                 or json.dumps(raw, sort_keys=True) != json.dumps({market: asdict(limits) for market, limits in expected.items()}, sort_keys=True)):
             raise ValueError("Approved VTS sizing requires the exact scoped native policy")
         return expected
+    if "native_daily_buy_limits" in config:
+        raise ValueError("Daily VTS limits require an approved native policy revision")
     limits = {}
     for market, row in raw.items():
         if not isinstance(row, dict) or set(row) != set(KisStrategyLimits.__dataclass_fields__):
@@ -78,11 +87,17 @@ def bind_broker_policy(db, scope, market, fields, revision):
         return
     limit = approved_limits()[market]
     amount_key = f"max_order_{_SUFFIX[market]}"
+    daily_key = f"max_daily_buy_{_SUFFIX[market]}"
     baseline = {key: value for key, value in fields.items() if key not in {"max_order_nav", "one_share_nav_ceiling"}}
     baseline[amount_key] = CAPS[market]
+    if revision == DAILY_LIMIT_REVISION:
+        baseline[daily_key] = LEGACY_DAILY_BUY[market]
     baseline_encoded = json.dumps(baseline, sort_keys=True)
-    if (revision != APPROVED_LIMIT_REVISION or fields != baseline | {amount_key: limit.max_order_native,
-            "max_order_nav": limit.max_order_nav, "one_share_nav_ceiling": limit.one_share_nav_ceiling}
+    amended = {amount_key: limit.max_order_native, "max_order_nav": limit.max_order_nav,
+               "one_share_nav_ceiling": limit.one_share_nav_ceiling}
+    if revision == DAILY_LIMIT_REVISION:
+        amended[daily_key] = APPROVED_CAPS[market]
+    if (revision not in {APPROVED_LIMIT_REVISION, DAILY_LIMIT_REVISION} or fields != baseline | amended
             or fields.get(f"cash_floor_{_SUFFIX[market]}") != limit.cash_floor_native
             or (previous and previous[0] != baseline_encoded)):
         raise DemoError("Approved VTS revision does not match the original risk policy")
@@ -129,12 +144,31 @@ def within_buy_nav(notional, quantity, nav, policy):
             <= Decimal(str(nav)) * Decimal(str(order_nav_limit(policy, "BUY", quantity))))
 
 
+def within_daily_buy_limit(committed, requested, *, cap, reserve_bps, revision):
+    total = Decimal(str(committed)) + Decimal(str(requested))
+    if revision == DAILY_LIMIT_REVISION:
+        total = reserved_cost(total, reserve_bps)
+    return total <= cap
+
+
+def daily_buy_commitment(original, observed, revision):
+    """Release only a broker-confirmed cancelled remainder from the daily budget."""
+    quantity = original["quantity"]
+    if revision == DAILY_LIMIT_REVISION and observed["order_status"] == "CANCELLED":
+        filled = observed["filled"]
+        if type(filled) is int and 0 <= filled <= quantity:
+            quantity = filled
+    return quantity * Decimal(str(original["limit_price"]))
+
+
 def make_strategy_broker(market, path, client, clock, tickers, limits, *, revision=None):
     options = {}
     if limits is not None:
         suffix = _SUFFIX[market]
         options = {f"max_order_{suffix}": limits.max_order_native, f"cash_floor_{suffix}": limits.cash_floor_native,
                    "max_order_nav": limits.max_order_nav, "one_share_nav_ceiling": limits.one_share_nav_ceiling}
+        if revision == DAILY_LIMIT_REVISION:
+            options[f"max_daily_buy_{suffix}"] = APPROVED_CAPS[market]
     if market == "KR":
         from .kis_paper import KisPaperBroker, PaperOrderPolicy
         policy = PaperOrderPolicy(tuple(ticker[:6] for ticker in tickers), **options)

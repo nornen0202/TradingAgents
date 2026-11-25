@@ -20,7 +20,7 @@ from tradingagents.scheduled.market_calendar import market_session_state
 from .kis_demo import DEMO_HOST, DemoError, DemoOrderJournal, has_unresolved_demo_requests
 from .kis_demo_us import KisDemoUSClient, EXCHANGES, NEW_YORK, SEOUL
 from .kis_paper import _clock, _number, _integer, _broker_number, _stable, _fresh, execution_notional
-from .kis_strategy_limits import bind_broker_policy, broker_policy_fields, reserved_cost, validate_buy_nav, within_buy_nav
+from .kis_strategy_limits import bind_broker_policy, broker_policy_fields, daily_buy_commitment, reserved_cost, validate_buy_nav, within_buy_nav, within_daily_buy_limit
 from .paper import stamp
 
 
@@ -297,11 +297,14 @@ class KisPaperUSBroker:
     ``clock`` is a test seam. Production callers leave it unset; order submission
     has no caller-supplied historical ``now`` and cannot backdate a live request.
     """
+    day_universe = None
+
     def __init__(self, path: Path | str, client: KisDemoUSClient, policy: USPaperOrderPolicy,
                  *, paper_enabled: bool = False, clock=None, strategy_policy_revision=None):
         if type(client) is not KisDemoUSClient or client.credentials.product_code != "01" or type(paper_enabled) is not bool or not isinstance(policy, USPaperOrderPolicy):
             raise DemoError("Dedicated VTS client, explicit policy and boolean opt-in required")
         self.path, self.client, self.policy = Path(path), client, policy
+        self.policy_revision = strategy_policy_revision
         self.enabled, self.clock = paper_enabled, clock or (lambda: datetime.now(timezone.utc))
         self.journal = USOrderJournal(self.path, client, issue_clock=self.clock)
         self.db = self.journal.db
@@ -341,7 +344,10 @@ class KisPaperUSBroker:
             raise DemoError("Paper trading requires explicit VTS opt-in")
         session = self._session(now)
         ticker, exchange, side, quantity, price = (terms[k] for k in ("ticker", "exchange", "side", "quantity", "limit_price"))
-        if (ticker, exchange) not in self.policy.allowed_instruments and ticker not in self.policy.allowed_tickers:
+        if self.day_universe is not None:
+            if not self.day_universe.permits(ticker, side, now, self.client.credentials.scope()):
+                raise DemoError("Ticker is outside the verified daily VTS universe")
+        elif (ticker, exchange) not in self.policy.allowed_instruments and ticker not in self.policy.allowed_tickers:
             raise DemoError("Ticker is outside paper allowlist")
         if not all(isinstance(item, Mapping) for item in (signal, quote, account)):
             raise DemoError("Explicit signal, quote and account evidence required")
@@ -391,7 +397,7 @@ class KisPaperUSBroker:
             if _clock(row["created_at"]).astimezone(NEW_YORK).date() == now.astimezone(NEW_YORK).date():
                 count += 1
                 if original["side"] == "BUY":
-                    bought += original["quantity"] * Decimal(str(original["limit_price"]))
+                    bought += daily_buy_commitment(original, row, self.policy_revision)
             remainder = row["remaining"] if row["remaining"] is not None else original["quantity"]
             if row["order_status"] in {"FILLED", "CANCELLED"}:
                 remainder = 0
@@ -406,7 +412,8 @@ class KisPaperUSBroker:
         if side == "BUY":
             if not within_buy_nav(notional, quantity, nav, self.policy):
                 raise DemoError("Paper buy exceeds the configured NAV limit")
-            if bought + notional > self.policy.max_daily_buy_usd:
+            if not within_daily_buy_limit(bought, notional, cap=self.policy.max_daily_buy_usd,
+                    reserve_bps=self.policy.reserve_cost_bps, revision=self.policy_revision):
                 raise DemoError("Daily paper buy limit exceeded")
             if account.get("capacity_ticker") != ticker or account.get("capacity_exchange") != exchange or account.get("capacity_limit_price") != price:
                 raise DemoError("Cash-only capacity must match ticker and limit")

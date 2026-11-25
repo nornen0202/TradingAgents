@@ -167,7 +167,7 @@ def normalize_validation_quote(*, market, chart, orderbook, observed_at, instrum
     """Use dated completed bars and dated books; USD validation needs no FX."""
     config, now = instrument or MARKETS[market], _at(observed_at)
     zone = ZoneInfo(config["zone"])
-    for payload in (chart,) if market == "KR" else (chart, orderbook):
+    for payload in (chart,) if market == "KR" and orderbook is None else (chart, orderbook):
         if not isinstance(payload, dict) or str(payload.get("rt_cd")) != "0":
             raise ValueError("Invalid broker response")
     rows = chart.get("output2")
@@ -212,7 +212,7 @@ def normalize_validation_quote(*, market, chart, orderbook, observed_at, instrum
     if not 0 <= (now - book_at).total_seconds() <= 120:
         raise ValueError("Book future or stale")
     result.update(bid=bid, ask=ask, observed_at=min(price_at, book_at).isoformat(),
-                  quote_basis="DATED_BOOK", orderbook_date_basis="EXPLICIT")
+                  quote_basis="DATED_BOOK", orderbook_date_basis="EXPLICIT", orderbook_at=book_at.isoformat())
     if market == "US":
         result["exchange"] = config["exchange"]
     return result

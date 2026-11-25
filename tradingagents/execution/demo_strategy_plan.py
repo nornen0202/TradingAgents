@@ -8,6 +8,8 @@ from collections import Counter
 from datetime import timedelta
 import hashlib
 import json
+import math
+from zoneinfo import ZoneInfo
 
 from .archive_paper import _entry_confirmation, _entry_proof
 from .demo_validation import _at
@@ -19,6 +21,53 @@ BUY = {"STARTER_NOW", "ADD_NOW", "BUY_NOW"}
 SELL = {"REDUCE_NOW", "EXIT_NOW", "STOP_LOSS_NOW"}
 HARD_BUY_GATES = {"blocked_new_entries_no_tool_calls", "blocked_new_entries_company_news_zero",
                   "high_fallback_count", "required_research_evidence_missing", "prism_conflict_review_required", "BUY_MATRIX_FAIL"}
+
+
+def _contract_digest(contract):
+    thesis = {key: value for key, value in contract.items() if key not in {"event_time", "ingested_at", "evaluated_at"}}
+    return hashlib.sha256(json.dumps(thesis, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
+
+
+def recheck_entry(source, candidate, market, quote, now):
+    """Keep the archived decision and close/open facts, then recheck its live price conditions."""
+    from .session_confirmation import evaluate_plan
+    from tradingagents.kis_strategy_contract import ZONES
+
+    ticker, evidence = candidate["ticker"], candidate["evidence"]
+    with (source / "tickers" / ticker / "execution_contract.json").open(encoding="utf-8-sig") as stream:
+        contract = json.load(stream)
+    if _contract_digest(contract) != evidence["contract_sha256"]:
+        raise ValueError("STRATEGY_LINEAGE_MISMATCH")
+    generated = _at(evidence["generated_at"])
+    bid, ask = float(quote["bid"]), float(quote["ask"])
+    invalid = contract.get("invalid_if_intraday_below")
+    if invalid is not None and (type(invalid) not in {float, int} or not math.isfinite(invalid) or bid < invalid):
+        raise ValueError("ENTRY_CURRENT_INVALIDATION")
+    proof = _entry_proof(source, ticker, contract, {"decision_now": evidence["decision_now"]}, evidence["market_data_asof"], generated)
+    if proof is None:
+        breakout = contract.get("breakout_level")
+        zone = contract.get("pullback_buy_zone")
+        declared = breakout is not None or zone is not None
+        intraday_breakout = (breakout is not None and bid >= breakout
+                            and contract.get("breakout_confirmation") in {None, "intraday_above"})
+        in_zone = isinstance(zone, dict) and zone.get("low") is not None and zone.get("high") is not None and zone["low"] <= bid <= ask <= zone["high"]
+        if declared and not (intraday_breakout or in_zone):
+            raise ValueError("ENTRY_CURRENT_PRICE_NOT_CONFIRMED")
+        if not declared and contract.get("entry_action_base") == "WAIT":
+            raise ValueError("ENTRY_CURRENT_PRICE_NOT_CONFIRMED")
+        return _at(candidate["signal"]["valid_until"])
+    observations = {key: row for key in ("regular_close", "official_open")
+                    if (row := proof.get(key)) is not None and _at(row["observed_at"]) <= generated}
+    venue = quote.get("exchange") if market == "US" else "KRX"
+    day = now.astimezone(ZoneInfo(ZONES[market])).date().isoformat()
+    live = {"kind": "quote", "ticker": ticker, "market": market, "currency": quote["currency"],
+            "source": quote["provider"], "session": day, "session_id": f"{market}:{venue}:regular:{day}",
+            "venue": venue, "price_basis": "unadjusted", "event_at": quote["orderbook_at"], "observed_at": quote["ingested_at"]}
+    results = [evaluate_plan(proof["plan"], analysis_as_of=now, **observations, live_quote={**live, "price": price})
+               for price in (bid, ask)]
+    if not set(results[0]["matched_alternatives"]).intersection(results[1]["matched_alternatives"]):
+        raise ValueError("ENTRY_CURRENT_CONDITIONS_NOT_CONFIRMED")
+    return min(_at(result["candidate_valid_until"]) for result in results)
 
 
 def _original_entry_research(read, ticker, contract, generated, candidate):
@@ -148,9 +197,7 @@ def plan(source, market, now, tickers, owned):
                         raise ValueError("ENTRY_RESEARCH_EVIDENCE_INCOMPLETE")
                 if now >= expiry:
                     raise ValueError("STRATEGY_AUTHORIZATION_EXPIRED")
-                thesis = {key: value for key, value in contract.items()
-                          if key not in {"event_time", "ingested_at", "evaluated_at"}}
-                digest = hashlib.sha256(json.dumps(thesis, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
+                digest = _contract_digest(contract)
                 identity = f"strategy-native-v1:{market}:{ticker}:{side}:{digest}"
                 signal = {"signal_id": identity, "ticker": ticker[:6] if market == "KR" else ticker,
                           "decision_now": "STARTER_NOW" if side == "BUY" else "EXIT_NOW" if decision in {"EXIT_NOW", "STOP_LOSS_NOW"} else "REDUCE_NOW",

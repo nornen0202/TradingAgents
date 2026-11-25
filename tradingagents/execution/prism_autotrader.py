@@ -15,6 +15,7 @@ from decimal import Decimal, ROUND_FLOOR
 import hashlib
 import json
 import math
+import os
 from pathlib import Path
 import sqlite3
 from typing import Any, Callable, Mapping
@@ -200,13 +201,15 @@ def evaluate_prism_buy_gate(
     same_sector_count: int = 0,
     max_same_sector: int = 3,
     policy: AutotraderPolicy | None = None,
+    defer_price: bool = False,
 ) -> PrismBuyGateResult:
     policy = policy or AutotraderPolicy()
     normalized_regime = str(regime or "constructive_but_selective").strip().lower()
     rule = REGIME_BUY_RULES.get(normalized_regime, REGIME_BUY_RULES["constructive_but_selective"])
     reasons: list[str] = []
 
-    if current_price is None or not math.isfinite(current_price) or current_price <= 0:
+    valid_price = current_price is not None and math.isfinite(current_price) and current_price > 0
+    if not valid_price and not defer_price:
         return PrismBuyGateResult(False, 0.0, rule["min_score"], normalized_regime, 0.0, 0.0, 0.0, 0.0, 0.0, ("invalid_price",))
 
     stance = str(candidate.get("stance") or "").strip().upper()
@@ -230,6 +233,10 @@ def evaluate_prism_buy_gate(
     score = _derive_candidate_score(candidate)
     if score < rule["min_score"]:
         reasons.append(f"score_below_floor:{score:.2f}<{rule['min_score']:.2f}")
+
+    if not valid_price:
+        return PrismBuyGateResult(not reasons, score, rule["min_score"], normalized_regime,
+                                  0.0, 0.0, 0.0, 0.0, 0.0, tuple(reasons))
 
     stop_loss, target_price = _derive_stop_and_target(
         candidate,
@@ -680,19 +687,25 @@ class PrismAutoTrader:
         zone = ZoneInfo(MARKET_ZONES[market])
         local_now = now.astimezone(zone)
         safe, blockers = self._check_mode_safety(market)
-        session = self.session_resolver(market=market, now_local=now) if safe else {}
+        candidate_runtime = None
+        if self.policy.mode == "kis_vts":
+            from . import prism_candidate_runtime
+            if prism_candidate_runtime.observes(self.policy):
+                candidate_runtime = prism_candidate_runtime
+        session = self.session_resolver(market=market, now_local=now) if safe or candidate_runtime else {}
         is_open = bool(session.get("is_open") and session.get("phase") == "regular")
 
         if not safe or self.policy.mode != "shadow":
             receipt = {
                 "schema": AUTOTRADER_SCHEMA, "market": market, "mode": self.policy.mode,
                 "live_orders_enabled": False, "checked_at": now.isoformat(), "session_open": is_open,
+                "source_revision": os.getenv("TRADINGAGENTS_SOURCE_SHA"),
                 "source_run_id": None, "blockers": blockers, "entries_queued": [],
                 "entries_executed": [], "exits_executed": [],
             }
-            if safe and self.policy.mode == "kis_vts":
-                from .prism_candidate_runtime import produce
-                receipt.update(produce(self.archive_dir, self.state_dir, market, now, session, self.policy))
+            if candidate_runtime:
+                observed = candidate_runtime.produce(self.archive_dir, self.state_dir, market, now, session, self.policy)
+                receipt.update(observed, blockers=list(dict.fromkeys([*blockers, *observed["blockers"]])))
             atomic_write_json(self.state_dir / f"autotrader-{market.lower()}-status.json", receipt)
             return receipt
 
@@ -1049,6 +1062,7 @@ class PrismAutoTrader:
             "schema": AUTOTRADER_SCHEMA,
             "market": market,
             "mode": self.policy.mode,
+            "source_revision": os.getenv("TRADINGAGENTS_SOURCE_SHA"),
             "live_orders_enabled": False,
             "checked_at": now.isoformat(),
             "session_open": is_open,
