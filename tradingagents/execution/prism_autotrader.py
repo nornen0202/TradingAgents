@@ -562,14 +562,6 @@ def _default_quote_loader(market: str, ticker: str, now: datetime) -> float | No
         if snap and snap.last_price and snap.last_price > 0:
             return float(snap.last_price)
     except Exception:
-        pass
-    try:
-        import yfinance as yf
-        hist = yf.Ticker(ticker).history(period="5d")
-        if hist is not None and not hist.empty:
-            val = float(hist["Close"].dropna().iloc[-1])
-            return val if val > 0 else None
-    except Exception:
         return None
     return None
 
@@ -788,6 +780,8 @@ class PrismAutoTrader:
                         "INSERT OR REPLACE INTO autotrader_order_intents VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
                         (sell_intent_id, market, ticker, "SELL", self.policy.mode, int(pos["quantity"]), curr, None, "SUBMITTING", exit_reason, now.isoformat(), now.isoformat()),
                     )
+                    conn.commit()
+                    conn.execute("BEGIN IMMEDIATE")
                     try:
                         exec_res = self.broker_executor(self.policy.mode, market, "SELL", ticker, int(pos["quantity"]), curr, now)
                     except Exception as exc:
@@ -887,11 +881,19 @@ class PrismAutoTrader:
                     ticker = str(cand.get("canonical_ticker") or "").strip().upper()
                     if not ticker or ticker in held_tickers:
                         continue
-                    ref_price = (
-                        _num((cand.get("data_health") or {}).get("last_price"))
-                        or _num((cand.get("position_metrics") or {}).get("current_price"))
-                        or _num((cand.get("data_health") or {}).get("current_price"))
-                    )
+                    from tradingagents.performance.price_evidence import native_reference
+                    dh = cand.get("data_health") if isinstance(cand.get("data_health"), Mapping) else {}
+                    pm = cand.get("position_metrics") if isinstance(cand.get("position_metrics"), Mapping) else {}
+                    verified_ref, _ = native_reference(dh.get("price_reference"), market, now.isoformat())
+                    dh_curr = str(dh.get("currency") or dh.get("price_currency") or "").strip().upper()
+                    pm_curr = str(pm.get("currency") or pm.get("price_currency") or "").strip().upper()
+                    expected_curr = MARKET_CURRENCIES[market]
+                    ref_price = verified_ref.price if verified_ref else None
+                    if ref_price is None or ref_price <= 0:
+                        if not dh_curr or dh_curr == expected_curr:
+                            ref_price = _num(dh.get("last_price")) or _num(dh.get("current_price"))
+                    if (ref_price is None or ref_price <= 0) and market == "KR" and (not pm_curr or pm_curr == "KRW"):
+                        ref_price = _num(pm.get("current_price"))
                     if (ref_price is None or ref_price <= 0) and is_open:
                         ref_price = self.quote_loader(market, ticker, now)
                     if ref_price is None or ref_price <= 0:
@@ -980,6 +982,8 @@ class PrismAutoTrader:
                         "INSERT OR REPLACE INTO autotrader_order_intents VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
                         (item["intent_id"], market, ticker, "BUY", self.policy.mode, qty, eff_buy, None, "SUBMITTING", "PRISM_BUY_GATE_PASS", now.isoformat(), now.isoformat()),
                     )
+                    conn.commit()
+                    conn.execute("BEGIN IMMEDIATE")
                     try:
                         exec_res = self.broker_executor(self.policy.mode, market, "BUY", ticker, qty, live_price, now)
                     except Exception as exc:

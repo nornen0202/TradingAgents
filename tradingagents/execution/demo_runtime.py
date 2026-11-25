@@ -502,13 +502,21 @@ def _reconcile_existing(broker, *, market, now, regular, allow_cancel, clock, ca
     return issues
 
 
-def _plan_native(archive, source, market, now, tickers, owned, session, scope, broker, native_active_universe):
+def _plan_native(archive, source, market, now, tickers, owned, session, scope, broker, native_active_universe, *,
+                 lane=None, prism_candidate_gate=False):
     if source is None:
         return [], {}
     if native_active_universe:
         from .kis_strategy_universe import select
         broker.day_universe, tickers = select(archive, source, market, session, now, scope, owned)
     signals, diagnostics = demo_strategy_plan.plan(source, market, now, tickers, owned)
+    if prism_candidate_gate and lane is not None:
+        from . import prism_candidate_runtime
+        signals, bridged = prism_candidate_runtime.supplement_native_signals(
+            archive, lane, source, market, now, tickers, owned, signals
+        )
+        diagnostics["prism_bridged_candidates"] = bridged
+        diagnostics["eligible_candidates"] = len(signals)
     if native_active_universe:
         diagnostics["daily_universe"] = {"entry_names": len(broker.day_universe.buys),
                                          "sell_only_strategy_holdings": len(broker.day_universe.owned),
@@ -605,7 +613,8 @@ def advance(archive, root, validation_root, market, *, clock, tickers, broker_fa
                 include_proposals=allocation_mode != demo_strategy_plan.MODE)
             if allocation_mode == demo_strategy_plan.MODE and source:
                 signals, plan_diagnostics = _plan_native(archive, source, market, at(clock()), tickers, current["owned"],
-                                                        session, scope, broker, native_active_universe)
+                                                        session, scope, broker, native_active_universe,
+                                                        lane=lane, prism_candidate_gate=prism_candidate_gate)
                 result["allocation_diagnostics"] = plan_diagnostics
             else:
                 signals = candidates(source, market, at(clock()), tickers) if source else []
@@ -631,7 +640,8 @@ def advance(archive, root, validation_root, market, *, clock, tickers, broker_fa
                         include_proposals=allocation_mode != demo_strategy_plan.MODE)
                     if allocation_mode == demo_strategy_plan.MODE:
                         signals, plan_diagnostics = _plan_native(archive, source, market, at(clock()), tickers, current["owned"],
-                                                                session, scope, broker, native_active_universe)
+                                                                session, scope, broker, native_active_universe,
+                                                                lane=lane, prism_candidate_gate=prism_candidate_gate)
                         result["allocation_diagnostics"] = plan_diagnostics
                     else:
                         signals = candidates(source, market, at(clock()), tickers)
@@ -683,7 +693,13 @@ def advance(archive, root, validation_root, market, *, clock, tickers, broker_fa
                     if prism_candidate_gate or native_active_universe:
                         require_dated_top_of_book(quote, session, at(clock()))
                         if candidate["side"] == "BUY":
-                            refreshed_entry_deadline = demo_strategy_plan.recheck_entry(source, candidate, market, quote, at(clock()))
+                            if candidate.get("prism_bridged_entry"):
+                                from . import prism_candidate_runtime
+                                refreshed_entry_deadline = prism_candidate_runtime.recheck_bridged_entry(
+                                    source, candidate, market, quote, at(clock())
+                                )
+                            else:
+                                refreshed_entry_deadline = demo_strategy_plan.recheck_entry(source, candidate, market, quote, at(clock()))
                     price = limit_price(quote, candidate["side"], market)
                     checks["priced"] += 1
                     terms = {"ticker": candidate["signal"]["ticker"], "side": candidate["side"], "limit_price": price}
