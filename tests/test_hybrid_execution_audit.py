@@ -55,3 +55,17 @@ def test_next_observed_open_uses_prior_target_and_never_fills_a_missing_quote(mo
     assert stats["net_time_weighted_return"] == pytest.approx(opening["nav"][3] / 10000 - 1)
     assert stats["fills"] == stats["marks"] == stats["returns"] == 1
     assert stats["sharpe_rf_zero"] is None
+
+
+def test_last_close_signal_is_audited_without_an_out_of_window_fill(monkeypatch):
+    monkeypatch.setattr("tools.run_hybrid_quant_backtest.evaluate_hybrid_portfolio_proposal",
+                        lambda *args, **kwargs: {"after_veto": {"weights": {"ETF": .8}}})
+    bars = [{"date": (date(2025, 4, 1) + timedelta(days=i)).isoformat(), "open": 10, "close": 10,
+             "volume": 10} for i in range(92)]  # 70 warmup + two signal dates, 21 sessions apart.
+    traces = {}
+    simulate_after_tax_walk_forward({"ETF": bars}, market="US", core_tickers=["ETF"], satellite_tickers=[],
+                                    benchmark_ticker="ETF", fill_timing="next_open", audit_traces=traces)
+    static = traces["static_80_20"]
+    assert static["signals"] == {bars[70]["date"]: {"ETF": .8}, bars[-1]["date"]: {"ETF": .8}}
+    assert static["pending_at_end"] == ["ETF"]
+    assert static["cumulative_fills"][-1] == 1

@@ -107,7 +107,35 @@ def simulate_after_tax_walk_forward(
         trades_count = 0
         daily_fills, fills, signals, unavailable = [], [], {}, []
         pending = {}
+        order_signal_day = None
         superseded = 0
+
+        def queue_close_signal(index):
+            nonlocal pending, order_signal_day, superseded
+            if index % rebalance_every_days:
+                return
+            signal_day = eval_dates[index]
+            if mode == "buy_and_hold":
+                if index:
+                    return
+                targets = {benchmark_ticker.upper(): 0.99}
+            elif mode == "static_80_20":
+                targets = {benchmark_ticker.upper(): 0.80}
+            else:
+                policy = policy_base
+                decisions = {}
+                if mode == "core_taa_only":
+                    policy = {**policy_base, "budget_core": 0.95, "budget_satellite": 0.0}
+                else:
+                    decisions = (decisions_by_date or {}).get(signal_day, {})
+                proposal = evaluate_hybrid_portfolio_proposal(
+                    policy, bars_by_ticker, analysis_as_of=f"{signal_day}T22:00:00+00:00", decisions=decisions)
+                targets = proposal["after_veto"]["weights"]
+            superseded += len(pending)
+            pending = {sym: targets.get(sym, 0.0) for sym in set(shares) | set(targets)}
+            order_signal_day = signal_day
+            if audit_traces is not None:
+                signals[signal_day] = dict(targets)
 
         for step_idx, day in enumerate(eval_dates):
             year = day[:4]
@@ -119,31 +147,8 @@ def simulate_after_tax_walk_forward(
                 annual_realized_gain = 0.0
                 current_year = year
 
-            signal_index = step_idx - int(fill_timing == "next_open")
-            if signal_index >= 0 and signal_index % rebalance_every_days == 0:
-                signal_day = eval_dates[signal_index]
-                cutoff = f"{signal_day}T22:00:00+00:00"
-                if mode == "buy_and_hold":
-                    targets = {benchmark_ticker.upper(): 0.99} if signal_index == 0 else None
-                elif mode == "static_80_20":
-                    targets = {benchmark_ticker.upper(): 0.80}
-                elif mode == "core_taa_only":
-                    p = {**policy_base, "budget_core": 0.95, "budget_satellite": 0.0}
-                    prop = evaluate_hybrid_portfolio_proposal(p, bars_by_ticker, analysis_as_of=cutoff)
-                    targets = prop["after_veto"]["weights"]
-                else:
-                    decs = (decisions_by_date or {}).get(signal_day, {})
-                    prop = evaluate_hybrid_portfolio_proposal(
-                        policy_base, bars_by_ticker, analysis_as_of=cutoff, decisions=decs
-                    )
-                    targets = prop["after_veto"]["weights"]
-
-                if targets is not None:
-                    order_signal_day = signal_day
-                    superseded += len(pending)
-                    pending = {sym: targets.get(sym, 0.0) for sym in set(shares) | set(targets)}
-                    if audit_traces is not None:
-                        signals[signal_day] = dict(targets)
+            if fill_timing != "next_open":
+                queue_close_signal(step_idx)
             if pending:
                 all_syms = sorted(pending)
                 prices = {}
@@ -215,6 +220,8 @@ def simulate_after_tax_walk_forward(
 
             nav_eod = cash + sum(shares.get(t, 0.0) * price_lookup[t][day] for t in shares if day in price_lookup.get(t, {}))
             nav_curve.append(nav_eod)
+            if fill_timing == "next_open":
+                queue_close_signal(step_idx)
             if audit_traces is not None:
                 daily_fills.append(trades_count)
 

@@ -68,8 +68,10 @@ def parse_chart(payload, ticker, market, start, end):
 
 def collect(root):
     plan = json.loads(PLAN.read_bytes())
-    root.mkdir(exist_ok=False, parents=True)
+    if root.exists():
+        raise FileExistsError(f"Choose a new snapshot directory: {root}")
     manifest = {}
+    responses = {}
     for market, spec in plan["markets"].items():
         zone = ZoneInfo(ZONES[market])
         start = datetime.fromisoformat(plan["input_start"]).replace(tzinfo=zone)
@@ -83,10 +85,15 @@ def collect(root):
             response.raise_for_status()
             receipt = datetime.now(timezone.utc).isoformat()
             rows, gaps = parse_chart(response.content, ticker, market, plan["input_start"], plan["end"])
-            (root / f"{ticker}.json").write_bytes(response.content)
+            responses[ticker] = response.content
             manifest[ticker] = {"sha256": digest(response.content), "url": response.url,
                                 "retrieved_at": receipt, "rows": len(rows), "first": rows[0]["date"],
                                 "last": rows[-1]["date"], "diagnostics": gaps}
+    # Publish the receipt last. A network failure leaves the destination
+    # available for a fresh attempt with a consistent acquisition window.
+    root.mkdir(exist_ok=False, parents=True)
+    for ticker, payload in responses.items():
+        (root / f"{ticker}.json").write_bytes(payload)
     (root / "receipts.json").write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
 
 

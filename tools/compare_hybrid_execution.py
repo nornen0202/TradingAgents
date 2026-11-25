@@ -110,6 +110,8 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("input_dir", type=Path)
     parser.add_argument("new_output_dir", type=Path)
+    parser.add_argument("--verify-published", action="store_true",
+                        help="Require the pinned input receipts and every published aggregate to match.")
     args = parser.parse_args()
     plan = json.loads(PLAN.read_bytes())
     calendar = research_sessions(datetime.fromisoformat(plan["end"] + "T23:59:59+00:00"))
@@ -123,6 +125,11 @@ def main():
         summary["569"][market], traces = hybrid_results(args.input_dir / "yahoo", plan, market, calendar[market])
         (out / f"{market}-traces.json").write_text(json.dumps(traces, sort_keys=True), encoding="utf-8")
     (out / "comparison.json").write_text(json.dumps(summary, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    if args.verify_published:
+        published = json.loads((PLAN.parent / "hybrid_execution_audit_results.json").read_bytes())
+        if canonical_hash(published) != canonical_hash(summary):
+            raise SystemExit("Frozen reproduction differs from the published receipts or metrics")
+        print("Verified the pinned inputs and published comparison")
 
 
 if __name__ == "__main__":

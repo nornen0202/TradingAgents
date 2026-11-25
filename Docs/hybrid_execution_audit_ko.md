@@ -76,7 +76,7 @@
 
 ```powershell
 $audit = 'G:\TradingAgentsData\execution-audit-553-569-20261125'
-python -m tools.compare_hybrid_execution $audit "$audit\repeat-01"
+python -m tools.compare_hybrid_execution $audit "$audit\repeat-01" --verify-published
 python -m pytest -q tests/test_hybrid_execution_audit.py tests/execution/test_multiyear_research.py
 ```
 
