@@ -59,7 +59,7 @@ def test_regular_publication_stages_only_read_only_aggregate_dashboard(tmp_path,
     archive = tmp_path / "archive"
     db = _seed_ledger(archive, "kis_vts")
     original_db = sha256(db.read_bytes()).hexdigest()
-    state, remote = fake_pages
+    state, _ = fake_pages
     local.atomic_write_json(state / "autotrader" / "enabled.json", {"mode": "kis_vts"})
     # The real publisher's build should discard staging artifacts from older versions.
     local.atomic_write_json(state / "site" / "autotrader" / "raw.json", {"intent_id": "PRIVATE-STALE"})
@@ -92,11 +92,25 @@ def test_regular_publication_stages_only_read_only_aggregate_dashboard(tmp_path,
 
     original_script = local.script
     monkeypatch.setattr(local, "script", offline_script)
+    git_run = local.git_run
+    outbound_commits = []
+
+    def capture_push(args, **kwargs):
+        if len(args) > 1 and args[1] == "push":
+            assert args[2] == "fork"
+            commit, destination = args[3].split(":", 1)
+            assert destination == "refs/heads/gh-pages"
+            outbound_commits.append(commit)
+            return ""
+        return git_run(args, **kwargs)
+
+    monkeypatch.setattr(local, "git_run", capture_push)
     result = local.publish(archive, state, tmp_path / "runtime", publication_locked=True)
 
-    gitdir = f"--git-dir={remote}"
-    tip = "refs/heads/gh-pages"
-    assert _git(gitdir, "rev-parse", tip).decode().strip() == result["commit"]
+    gitdir = f"--git-dir={state / 'pages.git'}"
+    assert outbound_commits == [result["commit"]]
+    tip = outbound_commits[0]
+    _git(gitdir, "cat-file", "-e", f"{tip}^{{commit}}")
     assert result["status"] == "DELIVERY_VERIFIED"
     assert set(_git(gitdir, "ls-tree", "-r", "--name-only", tip, "--", "autotrader").decode().splitlines()) == {
         "autotrader/dashboard_data.json", "autotrader/us_dashboard_data.json", "autotrader/index.html",
