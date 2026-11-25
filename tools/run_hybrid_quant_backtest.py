@@ -135,8 +135,9 @@ def simulate_after_tax_walk_forward(
                 proposal = evaluate_hybrid_portfolio_proposal(
                     policy, bars_by_ticker, analysis_as_of=f"{signal_day}T22:00:00+00:00", decisions=decisions)
                 targets = proposal["after_veto"]["weights"]
-                if mode in {"quant_breakout", "quant_breakout_veto"}:
-                    targets = entry_study.targets(signal_day, targets)
+                if mode.startswith("quant_breakout"):
+                    sizing_policy = policy_base if mode.startswith("quant_breakout_matched") else None
+                    targets = entry_study.targets(signal_day, targets, sizing_policy=sizing_policy)
             superseded += len(pending)
             pending = {sym: targets.get(sym, 0.0) for sym in set(shares) | set(targets)}
             order_signal_day = signal_day
@@ -216,8 +217,9 @@ def simulate_after_tax_walk_forward(
                     if diff > nav * 0.01 and cash > 0:
                         if entry_study is not None:
                             observation = entry_study.risk_at(order_signal_day, sym)
-                            blocked = mode == "quant_breakout_veto" and observation in {"STOP_LOSS", "EXIT"}
-                            opportunities.append((order_signal_day, day, sym, observation, blocked))
+                            blocked = mode.endswith("_veto") and observation in {"STOP_LOSS", "EXIT"}
+                            kind = "add" if shares.get(sym, 0.0) > 0 else "new"
+                            opportunities.append((order_signal_day, day, sym, observation, blocked, kind))
                             if blocked:
                                 continue
                         spend = min(cash * 0.995, diff)
@@ -294,7 +296,8 @@ def simulate_after_tax_walk_forward(
         "sessions": len(eval_dates),
         "strategies": {
             name: _run_variant(name)
-            for name in (("buy_and_hold", "static_80_20", "hybrid_core_satellite", "quant_breakout", "quant_breakout_veto")
+            for name in (("buy_and_hold", "static_80_20", "hybrid_core_satellite", "quant_breakout", "quant_breakout_veto",
+                          "quant_breakout_matched", "quant_breakout_matched_veto")
                          if entry_study is not None else
                          ("buy_and_hold", "static_80_20", "core_taa_only", "hybrid_core_satellite"))
         },

@@ -6,14 +6,16 @@ from bisect import bisect_right
 from collections import Counter
 from datetime import datetime
 import json
+import math
 from pathlib import Path
-from statistics import fmean
+from statistics import fmean, stdev
 
 from tools.compare_hybrid_execution import canonical_hash, period_stats, read_market_panel
 from tools.hybrid_audit_inputs import PLAN
 from tools.hybrid_entry_evidence import NO_OBSERVATION, cohort_coverage, load_observations
 from tools.run_hybrid_quant_backtest import simulate_after_tax_walk_forward
 from tradingagents.execution.research_study import research_sessions
+from tradingagents.execution.quant_policy import _targets
 
 
 class EntryStudy:
@@ -21,11 +23,13 @@ class EntryStudy:
         self.core = spec["core"]
         self.observations = observations
         self.history = {}
+        self.mark_history = {}
         for ticker in spec["satellite"]:
             rows = [r for r in bars[ticker] if r["executable_volume"] > 0]
             self.history[ticker] = ([r["date"] for r in rows], [r["close"] for r in rows])
+            self.mark_history[ticker] = ([r["date"] for r in bars[ticker]], [r["close"] for r in bars[ticker]])
 
-    def targets(self, day, original):
+    def targets(self, day, original, *, sizing_policy=None):
         ranks = []
         for ticker, (days, closes) in self.history.items():
             end = bisect_right(days, day)
@@ -36,7 +40,19 @@ class EntryStudy:
             if current > max(closes[end - 21:end - 1]) and current > fmean(closes[end - 60:end]) and momentum > 0:
                 ranks.append((-momentum, ticker))
         targets = {t: original[t] for t in self.core if t in original}
-        targets.update({ticker: .10 for _, ticker in sorted(ranks)[:3]})
+        if sizing_policy is None:
+            targets.update({ticker: .10 for _, ticker in sorted(ranks)[:3]})
+        else:
+            admitted = {}
+            for negative_score, ticker in ranks:
+                dates, prices = self.mark_history[ticker]
+                end = bisect_right(dates, day)
+                recent = prices[end - sizing_policy["volatility_window"] - 1:end]
+                vol = stdev(b / a - 1 for a, b in zip(recent, recent[1:])) * math.sqrt(252)
+                admitted[ticker] = (-negative_score, vol, True)
+            targets.update(_targets(admitted, budget=sizing_policy["budget_satellite"], cap=sizing_policy["asset_cap"],
+                                    volatility_target=sizing_policy["annual_volatility_target"],
+                                    limit=sizing_policy["satellite_limit"]))
         return targets
 
     def risk_at(self, day, ticker):
@@ -89,6 +105,10 @@ def period_diagnostics(trace, window, marks, benchmark):
             "idle_sessions": idle, "longest_idle_sessions": longest, "turnover": turnover,
             "traded_notional": notional, "fees_and_tax": cost_paid,
             "buy_opportunities": len(opportunities), "observed": observed,
+            "new_positions": sum(r[5] == "new" for r in opportunities),
+            "adds": sum(r[5] == "add" for r in opportunities),
+            "observed_new_positions": sum(r[5] == "new" and r[3] != NO_OBSERVATION for r in opportunities),
+            "observed_adds": sum(r[5] == "add" and r[3] != NO_OBSERVATION for r in opportunities),
             "observed_hard_vetoes": hard_vetoes, "observed_hard_veto_rate": hard_vetoes / observed if observed else None,
             "risk_actions": dict(actions), "blocked": sum(r[4] for r in opportunities),
             "benchmark_return": benchmark_growth - 1, "linked_return_contributions": effects}
@@ -121,8 +141,9 @@ def compare_market(root, archive, market, plan, frozen, sessions):
         bars, market=market, core_tickers=spec["core"], satellite_tickers=spec["satellite"],
         benchmark_ticker=spec["benchmark"], fill_timing="next_open", audit_traces=traces,
         entry_study=EntryStudy(bars, spec, observations))
-    if traces["quant_breakout"]["signals"] != traces["quant_breakout_veto"]["signals"]:
-        raise ValueError("Veto changed the quantitative targets")
+    for arm in ("quant_breakout", "quant_breakout_matched"):
+        if traces[arm]["signals"] != traces[arm + "_veto"]["signals"]:
+            raise ValueError("Veto changed the quantitative targets")
     summaries = {}
     for arm, trace in traces.items():
         windows = {w: period_diagnostics(trace, dates, seconds, returns) for w, dates in plan["periods"].items()}
@@ -148,6 +169,7 @@ def main():
     frozen = json.loads((PLAN.parent / "hybrid_execution_audit_results.json").read_bytes())
     schedules = research_sessions(datetime.fromisoformat(plan["end"] + "T23:59:59+00:00"))
     summary = {"plan_sha256": canonical_hash(json.loads((PLAN.parent / "hybrid_entry_ablation_plan.json").read_bytes())),
+               "sizing_control_sha256": canonical_hash(json.loads((PLAN.parent / "hybrid_entry_sizing_control.json").read_bytes())),
                "baseline_result_sha256": canonical_hash(frozen), "admitted_forward_marks": 0, "markets": {}}
     args.new_output.mkdir(parents=True, exist_ok=False)
     for market in plan["markets"]:
