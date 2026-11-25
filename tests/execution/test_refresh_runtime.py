@@ -372,6 +372,7 @@ def test_verified_kr_partial_refresh_keeps_cadence_and_order_source_blocked(tmp_
 
     def baseline(*args, **kwargs):
         assert kwargs["partial_required_tickers"] == ()
+        kwargs["discovery_evidence"]["unique_manifest_candidates"] = 3
         return {"run_id": baseline_id}
 
     monkeypatch.setattr(runner, "_resolve_latest_full_overlay_baseline_manifest", baseline)
@@ -380,6 +381,9 @@ def test_verified_kr_partial_refresh_keeps_cadence_and_order_source_blocked(tmp_
     assert result == [{"target": "execution-freshness-kr", "status": "COMPLETED_PARTIAL"}]
     receipt = json.loads((state / "execution-refresh/kr.json").read_text(encoding="utf-8"))
     assert receipt["consecutive_failures"] == 0 and receipt["missing_candidate_count"] == 1
+    assert receipt["baseline_lookup"]["selected_run_id"] == baseline_id
+    assert receipt["baseline_lookup"]["unique_manifest_candidates"] == 3
+    assert receipt["baseline_lookup"]["elapsed_seconds"] >= 0
     assert refresh_attempt_health(receipt, market="KR", now=AT)["status"] == "LAST_ATTEMPT_COMPLETED_PARTIAL"
     assert _select_source(archive, "kr", AT) == (None, True)
     assert refresh.refresh_due(archive, state, now=AT + timedelta(minutes=1), dry_run=True, session_resolver=open_kr) == [

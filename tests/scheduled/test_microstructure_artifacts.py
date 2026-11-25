@@ -1,11 +1,9 @@
 from __future__ import annotations
 
 from dataclasses import replace
-from collections import Counter
 import json
 from datetime import datetime, timezone
 from pathlib import Path
-from threading import Barrier
 from types import SimpleNamespace
 
 import pytest
@@ -63,8 +61,7 @@ checkpoint_timezone = "America/New_York"
         encoding="utf-8",
     )
     config = load_scheduled_config(config_path)
-    config = replace(config, run=replace(config.run, run_mode="overlay_only" if lightweight else "full"),
-                     execution=replace(config.execution, execution_lightweight_refresh=lightweight))
+    config = replace(config, execution=replace(config.execution, execution_lightweight_refresh=lightweight))
     if lightweight:
         monkeypatch.setattr("tradingagents.scheduled.runner._refresh_integrated_review",
                             lambda *a, **k: pytest.fail("chart rendering must not delay lightweight publication"))
@@ -125,65 +122,29 @@ checkpoint_timezone = "America/New_York"
         microstructure_required=True,
     )
 
-    summaries = [summary]
-    if lightweight:
-        for ticker in ("MSFT", "TSLA"):
-            other = run_dir / "tickers" / ticker
-            other.mkdir()
-            (other / "execution_contract.json").write_text(
-                json.dumps(replace(contract, ticker=ticker).to_dict()), encoding="utf-8",
-            )
-            (other / "analysis.json").write_text(json.dumps({"ticker": ticker}), encoding="utf-8")
-            summaries.append({"status": "success", "ticker": ticker, "artifacts": {
-                "execution_contract_json": f"tickers/{ticker}/execution_contract.json",
-                "analysis_json": f"tickers/{ticker}/analysis.json",
-            }})
-    publishing = Barrier(2 if lightweight else 1)
-    requests = []
-
-    def fetch(ticker, **kwargs):
-        requests.append(ticker)
-        if ticker == "TSLA":
-            raise TimeoutError("fixture unavailable")
-        return replace(snapshot, ticker=ticker)
-
-    def render_update(*args, **kwargs):
-        publishing.wait(timeout=5)
-        return "# update\n"
-
     monkeypatch.setenv("TRADINGAGENTS_INTRADAY_PROVIDER", "kis_microstructure")
     monkeypatch.setattr("tradingagents.dataflows.intraday_market.get_intraday_provider",
-                        lambda _: SimpleNamespace(fetch=fetch))
+                        lambda _: SimpleNamespace(fetch=lambda *args, **kwargs: snapshot))
     monkeypatch.setattr(
         "tradingagents.scheduled.runner.render_execution_update_markdown",
-        render_update,
+        lambda *a, **k: "# update\n",
     )
 
     updates = _run_execution_overlay_passes(
         config=config,
         run_dir=run_dir,
-        ticker_summaries=summaries,
+        ticker_summaries=[summary],
         checkpoints=["10:00"],
     )
 
-    assert list(updates)[:len(summaries)] == [item["ticker"] for item in summaries]
-    assert Counter(requests) == Counter(item["ticker"] for item in summaries)
-    for item in summaries:
-        ticker = item["ticker"]
-        update = updates[ticker]
-        if ticker == "TSLA":
-            assert update["intraday_snapshot_attempt"]["success"] is False
-            assert update["market_data_asof"] is None
-            assert not (run_dir / "tickers" / ticker / "microstructure_snapshot.json").exists()
-            continue
-        micro = json.loads((run_dir / "tickers" / ticker / "microstructure_snapshot.json").read_text(encoding="utf-8"))
-        assert update["intraday_snapshot_attempt"]["success"] is True
-        assert update["market_data_asof"] == snapshot.asof
-        received = micro["snapshot_received_at"]
-        assert received == update["source"]["snapshot_received_at"]
-        assert (datetime.fromisoformat(snapshot.asof) <= datetime.fromisoformat(received)
-                <= datetime.fromisoformat(update["evaluated_at"]) <= datetime.fromisoformat(update["ingested_at"]))
     assert (ticker_dir / "microstructure_snapshot.json").exists()
+    source = json.loads((ticker_dir / "microstructure_snapshot.json").read_text(encoding="utf-8"))
+    update = updates["AAPL"]
+    received = source["snapshot_received_at"]
+    assert received == update["source"]["snapshot_received_at"]
+    assert update["market_data_asof"] == snapshot.asof
+    assert (datetime.fromisoformat(snapshot.asof) <= datetime.fromisoformat(received)
+            <= datetime.fromisoformat(update["evaluated_at"]) <= datetime.fromisoformat(update["ingested_at"]))
     assert (ticker_dir / "microstructure_report.md").exists()
     assert (ticker_dir / "execution" / "checkpoints" / "microstructure_snapshot_10_00.json").exists()
     assert (run_dir / "chatgpt_execution_context.json").exists()

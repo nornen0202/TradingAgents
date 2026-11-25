@@ -5000,6 +5000,7 @@ def _resolve_latest_full_overlay_baseline_manifest(
     max_age: timedelta | None = _OVERLAY_BASELINE_MAX_AGE,
     write_discovery_index: bool = True,
     partial_required_tickers: tuple[str, ...] | None = None,
+    discovery_evidence: dict[str, Any] | None = None,
 ) -> dict[str, Any] | None:
     """Resolve the newest complete, same-market and sufficiently recent full baseline."""
 
@@ -5020,6 +5021,8 @@ def _resolve_latest_full_overlay_baseline_manifest(
     for index, candidate in enumerate(candidates):
         identity = str(candidate.get("run_id") or f"anonymous-{index}").strip()
         unique.setdefault(identity, candidate)
+    if discovery_evidence is not None:
+        discovery_evidence["unique_manifest_candidates"] = len(unique)
     eligible: list[dict[str, Any]] = []
     partial_candidates: list[dict[str, Any]] = []
     for candidate in unique.values():
@@ -5752,20 +5755,20 @@ def _run_execution_overlay_passes(
             run_dir=run_dir,
             checkpoint_label=checkpoint_label,
         )
-        def archive_observation(summary: dict[str, Any]) -> tuple[str, dict[str, Any]] | None:
+        for summary in ticker_summaries:
             if summary.get("status") != "success":
-                return None
+                continue
             ticker = str(summary.get("ticker") or "").strip().upper()
             if not ticker:
-                return None
+                continue
             artifacts = summary.get("artifacts") or {}
             summary["artifacts"] = artifacts
             contract_rel = artifacts.get("execution_contract_json")
             if not contract_rel:
-                return None
+                continue
             contract_path = run_dir / contract_rel
             if not contract_path.exists():
-                return None
+                continue
             contract_dict: dict[str, Any] = {}
             attempt_payload = _build_intraday_attempt_payload(
                 ticker=ticker,
@@ -5883,6 +5886,7 @@ def _run_execution_overlay_passes(
                 summary["intraday_snapshot_attempt"] = attempt_payload
                 if not preserve_analysis_bytes:
                     _append_analysis_intraday_attempt(run_dir=run_dir, ticker_summary=summary, attempt_payload=attempt_payload)
+                updates_by_ticker[ticker] = update_payload
             except Exception as exc:
                 attempt_payload.update(
                     {
@@ -5945,20 +5949,8 @@ def _run_execution_overlay_passes(
                 summary["intraday_snapshot_attempt"] = attempt_payload
                 if not preserve_analysis_bytes:
                     _append_analysis_intraday_attempt(run_dir=run_dir, ticker_summary=summary, attempt_payload=attempt_payload)
+                updates_by_ticker[ticker] = update_payload
                 print(f"::warning::Execution overlay checkpoint '{checkpoint_label}' failed for {ticker}: {exc}")
-            return ticker, update_payload
-
-        # Lightweight observations write independent ticker directories. Keep
-        # manifest order and wait for every receipt before publishing the batch.
-        targets = {_ticker_identity_key(str(row.get("ticker") or "")) for row in ticker_summaries}
-        distinct_tickers = len(targets) == len(ticker_summaries) > 1
-        if config.execution.execution_lightweight_refresh and config.run.run_mode == "overlay_only" and distinct_tickers:
-            with ThreadPoolExecutor(max_workers=4) as pool:
-                results = pool.map(archive_observation, ticker_summaries)
-                updates_by_ticker.update(result for result in results if result is not None)
-        else:
-            updates_by_ticker.update(result for result in map(archive_observation, ticker_summaries)
-                                     if result is not None)
         updates_by_ticker["_latest_checkpoint"] = {"value": checkpoint_label}
     if _has_ticker_execution_updates(updates_by_ticker):
         context_path = run_dir / "chatgpt_execution_context.json"

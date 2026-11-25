@@ -7,6 +7,7 @@ from dataclasses import replace
 from datetime import datetime, timezone
 from pathlib import Path
 import re
+from time import perf_counter
 from zoneinfo import ZoneInfo
 
 from tradingagents.atomic_io import atomic_write_json
@@ -109,9 +110,13 @@ def refresh_due(archive, state, *, now, dry_run=False, clock=None, executor=None
         # Never pass the observed manifest through as a pinned authorization.
         try:
             from tradingagents.scheduled.runner import _resolve_latest_full_overlay_baseline_manifest
+            discovery_evidence = {}
+            lookup_started = perf_counter()
             baseline = _resolve_latest_full_overlay_baseline_manifest(
                 archive, market=market.upper(), now=now, write_discovery_index=False,
-                partial_required_tickers=() if market == "kr" else None)
+                partial_required_tickers=() if market == "kr" else None,
+                discovery_evidence=discovery_evidence)
+            discovery_evidence["elapsed_seconds"] = round(perf_counter() - lookup_started, 3)
         except Exception as exc:
             results.append({"target": target, "status": "REFRESH_BASELINE_UNVERIFIED",
                             "error_type": type(exc).__name__})
@@ -124,6 +129,7 @@ def refresh_due(archive, state, *, now, dry_run=False, clock=None, executor=None
             continue
         receipt = {"market": market, "session_date": day, "started_at": now.isoformat(),
                    "previous_source_run_id": source.name if source else None,
+                   "baseline_lookup": {**discovery_evidence, "selected_run_id": baseline.get("run_id")},
                    "status": "STARTED", "consecutive_failures": failures + 1,
                    "real_orders_enabled": False}
         atomic_write_json(path, receipt)
@@ -149,7 +155,9 @@ def refresh_due(archive, state, *, now, dry_run=False, clock=None, executor=None
             if status == "FAILED" and _verified_completed_partial_overlay(result):
                 status = "COMPLETED_PARTIAL"
                 receipt["missing_candidate_count"] = len(result["overlay_universe"]["missing_candidate_tickers"])
-            receipt.update(status=status, source_run_id=result.get("run_id"))
+            receipt.update(status=status, source_run_id=result.get("run_id"),
+                           producer_revision=result.get("source_revision"),
+                           actual_baseline_run_id=result.get("overlay_source_run_id"))
             if status in _COMPLETED_ATTEMPTS:
                 receipt["consecutive_failures"] = 0
         except Exception as exc:
