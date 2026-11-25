@@ -1,0 +1,587 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YouTube 투자자용 검증 리포트 - SK최태원도 &#x27;이혼 소송&#x27; 조용히 마무리 지은 진짜 이유</title>
+  <style>
+:root {
+  color-scheme: light;
+  --bg: #f7f8fb;
+  --panel: #ffffff;
+  --text: #172033;
+  --muted: #667085;
+  --line: #d9dee8;
+  --accent: #0f766e;
+  --accent-2: #2563eb;
+  --warn: #b45309;
+  --bad: #b42318;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0 56px; }
+a { color: var(--accent-2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.hero { padding: 28px 0 22px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+.hero.compact { padding-top: 12px; }
+.hero h1 { margin: 0; font-size: clamp(28px, 4vw, 44px); line-height: 1.15; letter-spacing: 0; }
+.hero p { max-width: 760px; color: var(--muted); margin: 12px 0 0; }
+.eyebrow { color: var(--accent); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0; margin: 0 0 8px; }
+section { margin: 28px 0; }
+h2, h3, h4, h5 { letter-spacing: 0; line-height: 1.25; }
+.synthesis-callout { padding: clamp(20px, 4vw, 34px); border: 1px solid #6ee7d8; border-radius: 18px; background: linear-gradient(135deg, #ecfdf9 0%, #eff6ff 100%); box-shadow: 0 18px 44px rgba(15, 118, 110, .12); }
+.synthesis-callout.unavailable { border-color: var(--line); background: var(--panel); box-shadow: none; }
+.synthesis-callout h2 { margin: 0; font-size: clamp(24px, 3.2vw, 36px); }
+.synthesis-callout .lead { max-width: 900px; font-size: 17px; color: #334155; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.primary-link, .secondary-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border-radius: 999px; font-weight: 800; }
+.primary-link { color: white; background: var(--accent); }
+.secondary-link { color: var(--accent-2); border: 1px solid #93c5fd; background: white; }
+.primary-link:hover, .secondary-link:hover { text-decoration: none; filter: brightness(.97); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.card, .run { display: flex; flex-direction: column; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; color: var(--text); min-height: 128px; }
+.run { padding: 16px; }
+.card:hover, .run:hover { border-color: var(--accent-2); text-decoration: none; }
+.thumb { display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #e9edf5; border-radius: 8px 8px 0 0; color: var(--muted); font-size: 13px; font-weight: 700; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb-empty span { padding: 0 14px; text-align: center; }
+.card-body { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 16px; }
+.card strong { line-height: 1.35; }
+.source-line { color: #3f4a5f; font-weight: 600; }
+.runs { display: grid; gap: 10px; }
+.badge { display: inline-flex; width: fit-content; border-radius: 999px; padding: 2px 9px; background: #e6f4f1; color: var(--accent); font-size: 12px; font-weight: 700; }
+.status-contradicted, .status-llm_failed { background: #fee4e2; color: var(--bad); }
+.status-unverified, .status-stale { background: #fff4d6; color: var(--warn); }
+small, .muted { color: var(--muted); }
+.topnav { display: flex; gap: 14px; margin-bottom: 16px; font-size: 14px; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px; }
+.stats span { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
+.report { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: min(5vw, 36px); }
+.report-head { border-bottom: 1px solid var(--line); margin-bottom: 24px; padding-bottom: 20px; }
+.report-head h1 { margin: 0; font-size: clamp(24px, 3.5vw, 38px); line-height: 1.2; }
+.meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+.scope-note { padding: 12px 14px; border-left: 4px solid var(--warn); border-radius: 6px; background: #fff7ed; color: #7c2d12; }
+.synthesis-report h2 { margin-top: 34px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.synthesis-report h3 { margin: 24px 0 8px; color: #0f4c5c; }
+.synthesis-report p, .synthesis-report li { overflow-wrap: anywhere; }
+pre { overflow: auto; background: #111827; color: #f9fafb; border-radius: 8px; padding: 14px; }
+code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+details { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 18px; }
+@media (max-width: 640px) {
+  main { width: min(100% - 20px, 1120px); padding-top: 18px; }
+  .report { padding: 18px; }
+  .synthesis-callout { border-radius: 14px; padding: 18px; }
+  .cta-row a { width: 100%; }
+  .mobile-report { border-radius: 12px; }
+}
+</style>
+</head>
+<body>
+  <main>
+<nav class="topnav"><a href="index.html">실행 목록</a><a href="../../index.html">YouTube 홈</a></nav>
+<article class="report">
+  <header class="report-head">
+    <p class="eyebrow">youtube_20261125_065131</p>
+    <h1>SK최태원도 &#x27;이혼 소송&#x27; 조용히 마무리 지은 진짜 이유</h1>
+    <div class="meta">
+      <span class="badge status-unverified">unverified</span>
+      <a href="https://www.youtube.com/watch?v=_EV_KhHWb64">원본 영상</a>
+    </div>
+  </header>
+  <h2>SK㈜ 투자 리포트 | 재산분할에 따른 매도 부담은 줄었나, AI 협업은 실적으로 이어지나</h2>
+<p>대상: 경제사냥꾼의 <a href="https://www.youtube.com/watch?v=_EV_KhHWb64">2026년 11월 24일 영상</a></p>
+<p><strong>핵심 판단: ‘추가 지분 매도 부담이 해소됐다’는 영상의 결론은 확인되지 않았다.</strong> 재산분할 절차의 확정과 실제 지급, 지분 매각의 결제와 순수취액은 각각 별개의 확인 사항이다. SK그룹의 AI 협업도 계약·가동·현금흐름이 확인되기 전까지는 SK㈜의 실적이나 기업가치에 반영할 근거가 부족하다. 11개 주장 중 10개는 미검증이고, 시장 관련 주장 1개만 코스피 스냅샷에 한해 부분 확인됐다.</p>
+<h3>영상 주장과 확인된 사실·근거</h3>
+<p>아래 주장은 모두 단일 자막 청크 <strong>00:00–02:27</strong>에 속한다. 검증 결과에 표시된 <code>00:00:00</code>은 청크 시작점이며, 개별 발화 시각은 아니다.</p>
+<p>| 쟁점 | 영상 주장 | 확인된 사실·근거 |</p>
+<p>|---|---|---|</p>
+<p>| 재산분할·절차 (C1–C2) | 23일 대법원에 9,440억 원 전액을 지급하겠다는 취지의 서류를 냈고, 종전에는 2,440억 원을 다퉜다. 결정문 송달 후 2주 내 이의가 없으면 약 9년간의 분쟁이 끝날 수 있다고 설명한다. | <strong>미검증.</strong> 사건번호, 접수일·문서명, 금액, 결정 종류와 적용 절차, 송달·이의·확정·지급 기록이 없다. 종전 수용액은 자막에서 판독할 수 없다. 9,440억 원과 2,440억 원의 차이가 7,000억 원이라는 계산은 수용액의 증빙이 아니다. |</p>
+<p>| 지분 매각·자금 확보 (C3–C5) | 10월 SK㈜ 지분 2.3%를 9,440억 원에 매각하겠다고 발표했고, 일부 지분에는 주당 58만7,000원을 기준으로 3년간 상승 시 차액을 받고 하락 시 지급하는 약정이 붙었다고 한다. 이 매각으로 재산분할 자금을 마련해 추가 매도 부담이 사라졌다고 해석한다. | <strong>미검증.</strong> 원공시, 거래 결제, 순수취액, 실제 자금 사용처 및 약정 원문이 없다. 두 금액이 같아도 자금 확보나 지급이 입증되지는 않는다. 약정 대상 금액은 판독할 수 없으며, 대상 금액이 확인되더라도 그 자체가 손실액은 아니다. |</p>
+<p>| AI 협업·경영 일정 (C6·C10–C11) | 최태원이 사장단에 SK하이닉스 AI 칩, SK텔레콤 데이터센터, 에너지 계열사 전력 공급을 연결하는 구상을 제시했다. 약 6년간 맡은 대한상공회의소 회장직에서 이듬해 3월 물러나 그룹 경영에 집중하면 SK㈜ 주가의 상승 계기가 될 것으로 본다. | <strong>미검증.</strong> 사장단 발표문·발언록, 공급 계약·투자 규모, 재임 기간·퇴임 일정의 공식 자료가 없다. 퇴임과 경영 일정 변화는 별개이며, 구상 발표도 실적 기여를 뜻하지 않는다. |</p>
+<p>| 젠슨 황 방문·엔비디아 구매 (C7–C8) | 젠슨 황이 서류 제출 다음 날, 직전 방문 후 11일 만에 다시 방문했고, 엔비디아가 SK하이닉스 AI 메모리의 대량 구매처라고 한다. | <strong>미검증.</strong> 수집 기사에는 두 방문의 날짜·장소와 공급 관계·구매 규모를 확인할 본문이 없다. 공급 관계가 확인되더라도 구매량·구매액·매출 비중은 별도 확인이 필요하다. |</p>
+<p>| 주가·코스피·잔여 지분 (C9) | SK㈜가 478,500원으로 34,500원(+7.8%) 올랐고, SK하이닉스가 6.7% 상승했으며, 코스피가 하루 만에 5,000선을 재돌파했다고 한다. 최태원의 잔여 지분 가치가 약 3,900억 원 늘었다고 추산하며, 젠슨 황 방문을 주가 상승 배경으로 제시한다. | <strong>부분 확인.</strong> 제공된 yfinance 코스피(<code>^KS11</code>) 스냅샷은 <strong>5,006.03</strong>이다. 11월 24일 22:09 UTC는 조회 시각이지 거래일이나 종가 시각이 아니다. 전일·장중 자료가 없어 재돌파 여부를 확인할 수 없고, 두 종목의 실제 수익률과 방문 효과도 미확인이다. SK㈜ 등락률은 영상 수치끼리 산술상 일치하며, 3,900억 원을 34,500원으로 나눈 약 1,130만 주는 역산치일 뿐 실제 보유량이 아니다. |</p>
+<h3>근거의 한계</h3>
+<ul>
+<li><strong>외부 검증:</strong> 수집된 웹·뉴스 6건 중 어느 것도 해당 주장을 직접 뒷받침하거나 반박하지 않는다. 사건·지분 거래에 연결된 결과는 무관했고, 엔비디아 관련 결과에는 방문·구매를 확인할 본문이 없었다. 유일한 시장 관측치인 코스피 스냅샷의 직접 링크는 제공되지 않았다. C9의 검증 신뢰도는 0.25, 나머지 10건은 0.0이다. 이는 외부 근거의 강도이며, 주장이 거짓이라는 뜻은 아니다.</li>
+<li><strong>자막 품질:</strong> 한국어 자동자막의 <code>transcript_quality</code>는 <code>good</code>(1.00)이지만, 종전 수용액·약정 대상 금액·잔여 주식 수는 판독할 수 없다. <code>source_confidence</code>는 영상에서 주장을 추출한 신뢰도, <code>asr_confidence</code>는 자막 판독 신뢰도이며 외부 사실 검증과 다르다. 예를 들어 AI 구상(C6)은 두 점수가 0.90/0.90이지만 외부 근거는 없다. 재산분할 제출(C1)은 0.83/0.74, 차액 약정(C4)과 시장 수치(C9)는 각각 0.83/0.72다. 2026년 10월·11월 23~24일과 2027년 3월은 게시일과 영상의 상대 날짜를 대조한 해석이며, 실제 사건·거래·퇴임 날짜로 확인된 것은 아니다.</li>
+<li><strong>비공개 자료 — 미검증·수동 확인 필요:</strong> Bloomberg·Morningstar 원문은 제공되지 않아 근거로 사용하지 않았다. 비공개 법원 서류·송달 기록, 차액정산 계약과 개인 자금 사용처, 비공개 사장단 발언·공급 계약, 엔비디아 구매 규모도 원자료나 당사자 확인이 필요하다.</li>
+</ul>
+<h3>상승 논리와 무효화 조건</h3>
+<ul>
+<li><strong>지분 매도 부담 완화:</strong> 분쟁 확정과 실제 지급이 확인되고, 결제된 순수취액으로 지급을 충당했다면 재산분할에 따른 추가 매도 우려가 줄 수 있다. 이는 수급 불확실성 완화이지 SK㈜ 영업실적 개선은 아니다. 후속 공시에서 추가 처분이 확인되면 ‘매도 부담 해소’ 주장은 약해진다. 영상이 설명한 하방 차액 약정이 실제로 존재하고 지급 의무가 발생한다면 추가 자금 수요가 생길 수 있다. 기준가를 밑돌았다는 사실만으로 지급액이나 지급 시점을 계산할 수는 없다.</li>
+<li><strong>AI 협업의 가치:</strong> 칩·데이터센터·전력 조달이 실제 계약과 가동으로 이어지고, 외부 고객 매출이나 비용 절감이 투자비를 상쇄한다면 계열사 현금흐름이 개선될 수 있다. SK㈜ 가치에 반영하려면 배당 등 지주회사에 귀속되는 경제적 효과도 확인돼야 한다. 계약 취소나 가동 지연은 단기 상승 논리를 약화시키고, 내부거래만 늘거나 투자비를 회수할 수익이 나오지 않으면 현금흐름 개선 논리는 성립하기 어렵다. 회장직 퇴임 자체는 이를 입증하지 않는다.</li>
+<li><strong>방문과 주가의 인과:</strong> 방문이 확인돼도 시장이나 반도체 동종주가 함께 올랐다면 종목 고유의 호재로 단정하기 어렵다. 주가 상승이 최초 보도보다 앞섰다면, 적어도 해당 보도가 상승을 촉발했다는 설명은 약해진다.</li>
+</ul>
+<h3>투자자가 확인할 다음 일정과 자료</h3>
+<p>1. <strong>우선 — 법원과 지분 공시:</strong> <a href="https://www.scourt.go.kr/">대한민국 법원</a> 공개자료와 당사자 입장에서 사건번호·문서명·접수일·송달일 및 이의·확정 여부를 확인하고, 실제 지급은 따로 대조한다. <a href="https://dart.fss.or.kr/">DART</a>·<a href="https://kind.krx.co.kr/">KIND</a>에서는 원공시와 정정공시의 처분 주식 수, 지분율 산정 기준, 단가·결제일, 결제 후 보유량과 후속 처분을 본다. 순수취액과 약정 평가일·정산식은 공개된 범위에서만 확인한다.</p>
+<p>2. <strong>우선 — 11월 24일 전후 시세와 방문:</strong> <a href="https://data.krx.co.kr/">KRX 정보데이터시스템</a>에서 2026년 11월 24일을 우선으로 두 종목과 코스피의 당일·전일 종가 및 장중 흐름을 비교한다. 확인된 잔여 주식 수로 평가액 변화를 다시 계산하고, 공식 방문 일정·최초 보도 시각을 코스피 및 반도체 동종주 흐름과 대조한다. 엔비디아와 SK하이닉스의 공급 관계 및 구매 규모는 양사 발표·공시에서 별도로 확인한다.</p>
+<p>3. <strong>다음 실적 발표와 2027년 3월 전후 — 사업 실행·경영 일정:</strong> SK그룹과 계열사의 IR·공시에서 계약 상대방과 규모, 데이터센터 가동 일정, 전력 조달 조건, 외부 고객 수요, 투자비 및 SK㈜에 귀속되는 현금흐름을 추적한다. <a href="https://www.korcham.net/">대한상공회의소</a>의 임기·후임 공지와 SK그룹의 실제 경영 일정은 따로 확인한다.</p>
+<p>현 단계에서 가장 판단을 크게 바꿀 자료는 <strong>재산분할의 실제 지급과 지분 매각 결제를 연결할 증빙</strong>, 그리고 <strong>AI 투자가 SK㈜의 현금흐름에 어떻게 기여하는지 보여주는 계약·실적 자료</strong>다.</p>
+  <details>
+    <summary>공개 요약 JSON</summary>
+    <pre>{
+  &quot;version&quot;: 4,
+  &quot;video_id&quot;: &quot;_EV_KhHWb64&quot;,
+  &quot;title&quot;: &quot;SK최태원도 &#x27;이혼 소송&#x27; 조용히 마무리 지은 진짜 이유&quot;,
+  &quot;url&quot;: &quot;https://www.youtube.com/watch?v=_EV_KhHWb64&quot;,
+  &quot;channel&quot;: &quot;경제사냥꾼&quot;,
+  &quot;channel_id&quot;: &quot;UC7usMJDHmtbs_oegmzQKKMA&quot;,
+  &quot;source_url&quot;: &quot;https://www.youtube.com/@%EA%B2%BD%EC%A0%9C%EC%82%AC%EB%83%A5%EA%BE%BC/shorts&quot;,
+  &quot;thumbnail_url&quot;: &quot;https://i.ytimg.com/vi/_EV_KhHWb64/maxresdefault.jpg&quot;,
+  &quot;published_at&quot;: &quot;2026-11-24T10:05:04+00:00&quot;,
+  &quot;status&quot;: &quot;unverified&quot;,
+  &quot;strategy_source_tier&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_evidence_weight&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_validation_policy&quot;: &quot;STANDARD_REVIEW&quot;,
+  &quot;transcript_status&quot;: &quot;available&quot;,
+  &quot;transcript_source&quot;: &quot;automatic&quot;,
+  &quot;transcript_chars&quot;: 1643,
+  &quot;transcript_quality&quot;: {
+    &quot;status&quot;: &quot;good&quot;,
+    &quot;score&quot;: 1.0,
+    &quot;warnings&quot;: [],
+    &quot;source&quot;: &quot;automatic&quot;,
+    &quot;language&quot;: &quot;Korean (Original)&quot;,
+    &quot;model_or_format&quot;: &quot;json3&quot;,
+    &quot;chars&quot;: 1643,
+    &quot;segments&quot;: 85,
+    &quot;duration_seconds&quot;: 146,
+    &quot;repeated_ngram_ratio&quot;: 0.0
+  },
+  &quot;generated_at&quot;: &quot;2026-11-25T06:51:31.971136+09:00&quot;,
+  &quot;llm_status&quot;: &quot;success&quot;,
+  &quot;research_status&quot;: &quot;success&quot;,
+  &quot;claim_verification_status&quot;: &quot;success&quot;,
+  &quot;research_pipeline_version&quot;: 4,
+  &quot;evidence_count&quot;: 6,
+  &quot;claim_status_summary&quot;: {
+    &quot;unverified&quot;: 10,
+    &quot;partially_supported&quot;: 1
+  },
+  &quot;claims&quot;: [
+    {
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;claim_text&quot;: &quot;영상은 최태원이 23일 대법원에 재산분할금 9,440억 원 전액을 지급하겠다는 취지의 서류를 제출했으며, 종전에는 그중 2,440억 원을 다퉜다고 주장한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.83,
+      &quot;asr_confidence&quot;: 0.74,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;23일 제출, 총 9,440억 원, 종전 다툼 2,440억 원, 종전 수용액 ‘7,억 원’&quot;,
+        &quot;observed&quot;: &quot;접수일·금액을 확인할 외부 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;지급 의사를 담은 서류가 제출됐더라도 실제 지급이나 분쟁 확정과는 별개다. 세 단계를 구분해야 SK㈜ 지분 관련 불확실성을 평가할 수 있다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;claim_text&quot;: &quot;영상은 대법원 결정문 송달 후 상대방이 2주 안에 이의하지 않으면 약 9년간 이어진 분쟁이 종결될 수 있다고 설명한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.83,
+      &quot;asr_confidence&quot;: 0.78,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;송달 후 이의 기간 2주, 분쟁 기간 약 9년&quot;,
+        &quot;observed&quot;: &quot;적용 기간과 실제 사건 경과를 확인할 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;2주라는 설명만으로 분쟁 종결일을 계산하거나 관련 불확실성이 해소됐다고 판단할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;claim_text&quot;: &quot;영상은 최태원이 10월 SK㈜ 지분 2.3% 매각을 발표했고 매각대금이 9,440억 원이라고 주장한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.83,
+      &quot;asr_confidence&quot;: 0.83,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;10월, 지분 2.3%, 매각대금 9,440억 원&quot;,
+        &quot;observed&quot;: &quot;발표 및 거래 조건을 확인할 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;매각 발표와 결제가 확인되기 전에는 자금 유입액과 잔여 지분을 확정할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;claim_text&quot;: &quot;영상은 매각 지분 일부에 향후 3년간 주당 58만7,000원을 기준으로 주가 상승 시 최태원이 차액을 받고 하락 시 지급하는 약정이 붙었다고 주장한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.83,
+      &quot;asr_confidence&quot;: 0.72,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;3년, 기준가 주당 587,000원, 대상 금액 ‘4,억 원치’&quot;,
+        &quot;observed&quot;: &quot;약정 조건을 확인할 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;영상 설명대로 하방 차액을 지급하는 약정이 있다면 추가 자금 수요가 생길 수 있으나, 현재 자료로는 발생 조건이나 규모를 산정할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;claim_text&quot;: &quot;영상은 매각으로 재산분할 자금 전액을 이미 마련해 SK㈜ 주식의 추가 매도 부담이 사라졌다고 해석한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.83,
+      &quot;asr_confidence&quot;: 0.83,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;재산분할·매각대금 각 9,440억 원, 자금 전액 확보&quot;,
+        &quot;observed&quot;: &quot;순수취액·지급액·추가 처분 여부 미확인&quot;
+      },
+      &quot;investor_implication&quot;: &quot;추가 매도 부담 해소를 SK㈜의 호재로 확정할 근거가 없다. 결제·지급 증빙과 후속 보유 공시를 따로 확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;claim_text&quot;: &quot;영상은 최태원 측이 AI 경쟁에 대응해 회사 일에 집중하겠다고 밝혔고, 이달 SK 사장단에 AI 칩·데이터센터·전력 공급을 연결하는 구상을 제시했다고 전한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.9,
+      &quot;asr_confidence&quot;: 0.9,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;이달 사장단 회의, 계약·실적 수치 제시 없음&quot;,
+        &quot;observed&quot;: &quot;회의일·계약 금액·투자 규모 미확인&quot;
+      },
+      &quot;investor_implication&quot;: &quot;구상이 확인되더라도 사업 실행이나 실적 기여와는 다르다. 계약 규모, 투자비, 가동 시점과 수익 구조를 확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;claim_text&quot;: &quot;영상은 젠슨 황이 서류 제출 바로 다음 날 11일 만에 다시 방문했다고 주장한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.8,
+      &quot;asr_confidence&quot;: 0.73,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;서류 제출 다음 날, 직전 방문 후 11일&quot;,
+        &quot;observed&quot;: &quot;두 방문일과 접수일을 확인할 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;방문과 관련 뉴스 시각이 확인되기 전에는 해당 방문을 SK하이닉스 주가의 재료로 확정할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;claim_text&quot;: &quot;영상은 엔비디아가 SK하이닉스 AI 메모리의 대량 구매처라고 묘사한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.8,
+      &quot;asr_confidence&quot;: 0.8,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;대량 구매, 정량 수치 없음&quot;,
+        &quot;observed&quot;: &quot;공급 관계·구매량·구매액·구매 비중 미확인&quot;
+      },
+      &quot;investor_implication&quot;: &quot;공급 관계가 확인되더라도 구매량·구매액·매출 비중 없이는 고객 집중도나 실적 민감도를 판단할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;claim_text&quot;: &quot;영상은 당일 SK㈜가 7.8%(34,500원) 오른 478,500원, SK하이닉스가 6.7% 상승, 코스피가 하루 만에 5,000선 재돌파했다고 주장한다. 최태원 잔여 지분 가치는 약 3,900억 원 늘었다고 추산하며 젠슨 황 방문을 상승 배경으로 제시한다.&quot;,
+      &quot;status&quot;: &quot;partially_supported&quot;,
+      &quot;confidence&quot;: 0.25,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.83,
+      &quot;asr_confidence&quot;: 0.72,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;SK㈜ 478,500원, +34,500원(+7.8%); SK하이닉스 +6.7%; 코스피 하루 만에 5,000선 재돌파; 잔여 지분 평가액 약 +3,900억 원, 주식 수 ‘약 1,30만 주’&quot;,
+        &quot;observed&quot;: &quot;코스피 스냅샷 5,006.03. 전일 기준값·개별 종목 시세·잔여 주식 수 미확인.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;코스피가 스냅샷에서 5,000을 웃돈 사실만 사용할 수 있다. 개별 종목 수익률, 지분 평가액과 방문 효과는 별도 확인이 필요하다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C10&quot;,
+      &quot;claim_text&quot;: &quot;영상은 최태원이 약 6년간 맡아온 대한상공회의소 회장직에서 이듬해 3월 물러날 예정이라고 주장한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.83,
+      &quot;asr_confidence&quot;: 0.83,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;재임 약 6년, 이듬해 3월 퇴임 예정&quot;,
+        &quot;observed&quot;: &quot;재임 기간과 퇴임 일정 확인 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;임기 만료 예정, 실제 퇴임, SK그룹 경영 일정 변화는 각각 별도로 확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C11&quot;,
+      &quot;claim_text&quot;: &quot;영상은 2027년 3월부터 최태원이 그룹 경영에 더 집중하고 계열사 AI 협업이 SK㈜ 주가의 상승 계기가 될 것으로 전망한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.83,
+      &quot;asr_confidence&quot;: 0.78,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;2027년 3월 이후 주가 상승 계기, 상승폭 제시 없음&quot;,
+        &quot;observed&quot;: &quot;경영 일정·실적 효과·주가 반응 미확인&quot;
+      },
+      &quot;investor_implication&quot;: &quot;검증된 주가 상승 재료가 아니라 조건부 전망이다. 계약·가동·현금흐름과 SK㈜로 돌아오는 경제적 효과를 확인한 뒤 시장 및 동종주 대비 주가 반응을 평가할 수 있다.&quot;
+    }
+  ],
+  &quot;entities&quot;: [
+    {
+      &quot;ticker&quot;: &quot;^KS11&quot;,
+      &quot;name&quot;: &quot;코스피&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [],
+      &quot;numeric_claims&quot;: [
+        &quot;영상은 코스피가 하루 만에 5,000선을 다시 넘었다고 한다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;^KS11&quot;,
+        &quot;as_of&quot;: &quot;2026-11-24T22:09:35.167226+00:00&quot;,
+        &quot;current_price&quot;: 5006.03,
+        &quot;market_cap&quot;: null,
+        &quot;forward_pe&quot;: null,
+        &quot;trailing_pe&quot;: null,
+        &quot;fifty_two_week_high&quot;: 9385.59,
+        &quot;fifty_two_week_low&quot;: 0.0,
+        &quot;average_target_price&quot;: null,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    }
+  ],
+  &quot;evidence&quot;: [
+    {
+      &quot;evidence_id&quot;: &quot;E1&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;PETA, PepsiCo shareholders call out animal abuse across its supply chain&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/peta-pepsico-shareholders-call-animal-173841189.html&quot;,
+      &quot;publisher&quot;: &quot;ESG Dive&quot;,
+      &quot;published_at&quot;: &quot;2026-11-24T17:38:41+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;PETA, PepsiCo shareholders call out animal abuse across its supply chain Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 2026 Elections Weath...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E2&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;ASTARTA Holding NV (FRA:Z6J) (Q3 2026) Earnings Call Highlights: Cash Flow Surges Despite ...&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/astarta-holding-nv-fra-z6j-162311794.html&quot;,
+      &quot;publisher&quot;: &quot;GuruFocus.com&quot;,
+      &quot;published_at&quot;: &quot;2026-11-24T16:23:11+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;ASTARTA Holding NV (FRA:Z6J) (Q3 2026) Earnings Call Highlights: Cash Flow Surges Despite ... Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E4&quot;,
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;title&quot;: &quot;Calcined Anthracite - Global Strategic Business Report 2026-2032 Featuring Asbury Carbons, Elkem ASA, Carbograf Industrial, Rheinfelden Carbon and More&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/energy/articles/calcined-anthracite-global-strategic-business-150200088.html&quot;,
+      &quot;publisher&quot;: &quot;GlobeNewswire&quot;,
+      &quot;published_at&quot;: &quot;2026-11-24T15:02:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E5&quot;,
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;title&quot;: &quot;Nvidia&#x27;s Huang says he is in therapy as comeback rally fades&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/huangs-return-fails-dispel-doubts-164158462.html&quot;,
+      &quot;publisher&quot;: &quot;AFP&quot;,
+      &quot;published_at&quot;: &quot;2026-11-24T22:01:01+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E6&quot;,
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;title&quot;: &quot;Dow Jones Futures: Nvidia, Anthropic Lead AI Retreat But Many Sectors Strong; Fed Inflation Data Due&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/m/d96603c1-fe7f-3bf3-8158-0728b464d469/dow-jones-futures%3A-nvidia%2C.html&quot;,
+      &quot;publisher&quot;: &quot;Investor&#x27;s Business Daily&quot;,
+      &quot;published_at&quot;: &quot;2026-11-24T22:05:24+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    }
+  ],
+  &quot;source_policy&quot;: {
+    &quot;raw_transcript_published&quot;: false,
+    &quot;raw_transcript_in_evidence&quot;: false,
+    &quot;research_pipeline_version&quot;: 4,
+    &quot;closed_source_claims&quot;: &quot;unverified_external_source&quot;,
+    &quot;auto_caption_warning&quot;: true,
+    &quot;local_asr_warning&quot;: false
+  }
+}</pre>
+  </details>
+</article>
+</main>
+  <style>
+.reader-contents { margin: 16px 0; padding: 12px 16px; border: 1px solid var(--line, #64748b); border-radius: 12px; }
+.reader-contents > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-weight: 750; }
+.reader-contents nav { display: grid; gap: 4px; max-height: 45vh; overflow: auto; margin: 8px 0; }
+.reader-contents a { display: block; min-height: 44px; padding: 10px; border-radius: 6px; color: inherit; overflow-wrap: anywhere; }
+.reader-contents a:hover { background: #80808020; }
+.reader-contents .reader-subsection { padding-inline-start: 24px; font-size: .92em; }
+.reader-prose, .report { overflow-wrap: anywhere; line-height: 1.8; }
+.reader-prose p, .reader-prose li { max-width: 85ch; }
+.reader-prose h2, .reader-prose h3, .reader-prose h4, [data-reader-heading] { scroll-margin-top: 100px; line-height: 1.45; }
+.reader-prose h2 { margin-top: 1.8em; padding-bottom: 8px; border-bottom: 1px solid var(--line, #64748b); }
+.reader-prose h3 { margin-top: 1.5em; }
+.reader-prose li { margin: .5em 0; }
+.reader-prose pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.reader-prose blockquote { margin: 16px 0; padding: 4px 16px; border-left: 3px solid var(--accent, #64748b); }
+.reader-table { overflow: auto; max-width: 100%; margin: 16px 0; border: 1px solid var(--line, #64748b); border-radius: 10px; }
+.reader-table table { border-collapse: collapse; width: 100%; margin: 0; font-size: .92rem; }
+.reader-table th, .reader-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line, #64748b); min-width: 110px; max-width: 400px; overflow-wrap: anywhere; white-space: normal; }
+.reader-table th { background: #80808018; }
+.reader-table tr:nth-child(even) { background: #80808008; }
+.reader-search { display: grid; gap: 8px; margin: 16px 0; }
+.reader-search label { font-weight: 700; }
+.reader-search input { box-sizing: border-box; width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line, #64748b); border-radius: 10px; background: var(--panel, #fff); color: var(--text, #132238); font: inherit; }
+.reader-search p { margin: 0; font-size: .86rem; }
+.reader-back { position: fixed; bottom: max(14px, env(safe-area-inset-bottom)); right: 14px; z-index: 30; min-height: 44px; border: 1px solid #778899; border-radius: 99px; padding: 10px 16px; background: #18344a; color: #fff; font: 700 14px system-ui; cursor: pointer; box-shadow: 0 3px 12px #0003; }
+[data-reader-source] { margin-top: 20px; }
+[data-reader-source] > summary { min-height: 44px; cursor: pointer; }
+[data-reader-source] pre { font-size: .85rem; }
+[data-reader-source] pre, .reader-prose { min-width: 0; }
+.reader-contents :focus-visible, .reader-search :focus-visible, .reader-back:focus-visible, .reader-table:focus-visible { outline: 3px solid var(--accent, #008c95); outline-offset: 3px; }
+.reader-search + .grid > [hidden] { display: none !important; }
+@media (max-width: 600px) { .reader-prose { font-size: 1rem; } .reader-contents { padding: 8px 12px; } }
+@media print { .reader-back, .reader-search, .reader-contents, [data-reader-source] { display: none !important; } .reader-table { overflow: visible; } .reader-prose { color: #000; background: #fff; } }
+</style><script>
+(() => {
+  'use strict';
+  let serial = 0;
+  const rendered = new WeakMap();
+  const node = (tag, text) => { const el = document.createElement(tag); if (text != null) el.textContent = text; return el; };
+  function inline(parent, text) {
+    const pattern = /(`[^`]+`|\*\*[^*]+\*\*|\[[^\]]+\]\(https?:\/\/[^\s)]+\))/g;
+    let start = 0;
+    for (const match of String(text).matchAll(pattern)) {
+      parent.append(document.createTextNode(text.slice(start, match.index)));
+      const value = match[0];
+      if (value.startsWith('`')) parent.append(node('code', value.slice(1, -1)));
+      else if (value.startsWith('**')) parent.append(node('strong', value.slice(2, -2)));
+      else {
+        const link = value.match(/^\[([^\]]+)\]\((.+)\)$/);
+        const a = node('a', link[1]); a.href = link[2]; a.rel = 'noopener noreferrer'; parent.append(a);
+      }
+      start = match.index + value.length;
+    }
+    parent.append(document.createTextNode(text.slice(start)));
+  }
+  const cells = line => line.trim().replace(/^\|/, '').replace(/\|$/, '').split(/(?<!\\)\|/).map(v => v.trim().replace(/\\\|/g, '|'));
+  function markdown(source) {
+    const article = node('article'); article.className = 'reader-prose';
+    const lines = source.split(/\r?\n/); let list = null;
+    for (let i = 0; i < lines.length; i += 1) {
+      const line = lines[i], value = line.trim();
+      if (!value) { list = null; continue; }
+      if (/^```/.test(value)) {
+        const code = []; i += 1;
+        while (i < lines.length && !/^```/.test(lines[i].trim())) code.push(lines[i++]);
+        const pre = node('pre'); pre.append(node('code', code.join('\n'))); article.append(pre); list = null; continue;
+      }
+      if (i + 1 < lines.length && value.includes('|') && cells(lines[i + 1]).every(v => /^:?-{3,}:?$/.test(v))) {
+        const table = node('table'), head = node('thead'), body = node('tbody');
+        const row = (values, tag) => { const tr = node('tr'); values.forEach(v => { const cell = node(tag); if (tag === 'th') cell.scope = 'col'; inline(cell, v); tr.append(cell); }); return tr; };
+        head.append(row(cells(line), 'th')); i += 2;
+        while (i < lines.length && lines[i].trim() && lines[i].includes('|')) body.append(row(cells(lines[i++]), 'td'));
+        i -= 1; table.append(head, body); article.append(table); list = null; continue;
+      }
+      const heading = value.match(/^(#{1,6})\s+(.+)$/);
+      if (heading) { const h = node('h' + Math.min(4, heading[1].length + 1)); inline(h, heading[2]); article.append(h); list = null; continue; }
+      const bullet = value.match(/^(?:[-*+] |\d+\. )(.+)$/);
+      if (bullet) {
+        const tag = /^\d/.test(value) ? 'ol' : 'ul';
+        if (!list || list.tagName.toLowerCase() !== tag) { list = node(tag); if (tag === 'ol') list.start = parseInt(value, 10); article.append(list); }
+        const li = node('li'); inline(li, bullet[1]); list.append(li); continue;
+      }
+      list = null;
+      if (/^(---+|\*\*\*+)$/.test(value)) { article.append(node('hr')); continue; }
+      const p = node(value.startsWith('> ') ? 'blockquote' : 'p'); inline(p, value.startsWith('> ') ? value.slice(2) : line); article.append(p);
+    }
+    return article;
+  }
+  function contents(root) {
+    root.querySelectorAll(':scope > .reader-contents').forEach(el => el.remove());
+    const headings = [...root.querySelectorAll('h2,h3,h4')].filter(h => !h.closest('.card,.run-card,.reader-contents,[data-reader-source],[hidden]'));
+    if (headings.length < 2) return;
+    const details = node('details'); details.className = 'reader-contents';
+    details.append(node('summary', '이 리포트 목차 · ' + headings.length + '개 항목'));
+    const nav = node('nav'); nav.setAttribute('aria-label', '리포트 목차');
+    headings.forEach(h => {
+      if (!h.id) h.id = 'reader-section-' + (++serial);
+      h.dataset.readerHeading = ''; h.tabIndex = -1;
+      const a = node('a', h.textContent); a.href = '#' + h.id;
+      if (h.tagName !== 'H2') a.className = 'reader-subsection';
+      a.addEventListener('click', event => {
+        event.preventDefault();
+        for (let ancestor = h.parentElement; ancestor; ancestor = ancestor.parentElement) if (ancestor.tagName === 'DETAILS') ancestor.open = true;
+        h.scrollIntoView({block: 'start'}); h.focus({preventScroll: true});
+      }); nav.append(a);
+    });
+    details.append(nav); root.prepend(details);
+  }
+  function enhance(root) {
+    if (!root) return;
+    root.querySelectorAll('pre[data-report-markdown]').forEach(pre => {
+      const previous = rendered.get(pre);
+      if (previous && previous.source === pre.textContent) return;
+      const article = markdown(pre.textContent);
+      if (previous) previous.article.replaceWith(article);
+      else {
+        const details = node('details'); details.dataset.readerSource = '';
+        details.append(node('summary', 'Markdown 원문 보기'));
+        pre.before(article, details); details.append(pre);
+      }
+      rendered.set(pre, {source: pre.textContent, article});
+    });
+    root.querySelectorAll('table').forEach(table => {
+      if (table.closest('.reader-table,.account-table-wrap,.summary-scroll')) return;
+      const wrap = node('div'); wrap.className = 'reader-table'; wrap.tabIndex = 0;
+      wrap.setAttribute('role', 'region'); wrap.setAttribute('aria-label', '리포트 표 · 가로로 스크롤하여 전체 보기');
+      table.before(wrap); wrap.append(table);
+    });
+    root.querySelectorAll('.grid').forEach(grid => {
+      const cards = [...grid.querySelectorAll(':scope > a.card')];
+      if (cards.length < 2 || grid.dataset.readerSearch) return;
+      grid.dataset.readerSearch = 'true';
+      const box = node('div'); box.className = 'reader-search';
+      const input = node('input'); input.type = 'search'; input.placeholder = '제목 · 종목 · 채널 · 키워드'; input.id = 'report-search-' + (++serial);
+      const label = node('label', '리포트 찾기'); label.htmlFor = input.id;
+      const status = node('p'); status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
+      const update = () => {
+        const terms = input.value.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean); let count = 0;
+        cards.forEach(card => { card.hidden = !terms.every(t => card.textContent.toLocaleLowerCase().includes(t)); if (!card.hidden) count += 1; });
+        status.textContent = cards.length + '개 중 ' + count + '개 표시' + (count ? '' : ' · 검색어를 지우거나 다른 키워드를 입력하세요.');
+      };
+      input.addEventListener('input', update); box.append(label, input, status); grid.before(box); update();
+    });
+    contents(root);
+  }
+  window.TradingAgentsReader = {enhance};
+  const main = document.querySelector('main');
+  if (main && !main.hasAttribute('data-reader-dynamic')) enhance(main);
+  if (main) {
+    const top = node('button', '↑ 맨 위'); top.type = 'button'; top.className = 'reader-back'; top.setAttribute('aria-label', '리포트 맨 위로 이동');
+    top.addEventListener('click', () => { const target = document.querySelector('h1') || main; target.tabIndex = -1; target.scrollIntoView({block: 'start'}); target.focus({preventScroll: true}); });
+    document.body.append(top);
+  }
+})();
+</script>
+</body>
+</html>

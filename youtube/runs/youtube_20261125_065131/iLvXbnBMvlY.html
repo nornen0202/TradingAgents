@@ -1,0 +1,470 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YouTube 투자자용 검증 리포트 - 주식 투자자라면 꼭 설정해 둬야 할 &#x27;GPT 자동 알림 기능&#x27;</title>
+  <style>
+:root {
+  color-scheme: light;
+  --bg: #f7f8fb;
+  --panel: #ffffff;
+  --text: #172033;
+  --muted: #667085;
+  --line: #d9dee8;
+  --accent: #0f766e;
+  --accent-2: #2563eb;
+  --warn: #b45309;
+  --bad: #b42318;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0 56px; }
+a { color: var(--accent-2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.hero { padding: 28px 0 22px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+.hero.compact { padding-top: 12px; }
+.hero h1 { margin: 0; font-size: clamp(28px, 4vw, 44px); line-height: 1.15; letter-spacing: 0; }
+.hero p { max-width: 760px; color: var(--muted); margin: 12px 0 0; }
+.eyebrow { color: var(--accent); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0; margin: 0 0 8px; }
+section { margin: 28px 0; }
+h2, h3, h4, h5 { letter-spacing: 0; line-height: 1.25; }
+.synthesis-callout { padding: clamp(20px, 4vw, 34px); border: 1px solid #6ee7d8; border-radius: 18px; background: linear-gradient(135deg, #ecfdf9 0%, #eff6ff 100%); box-shadow: 0 18px 44px rgba(15, 118, 110, .12); }
+.synthesis-callout.unavailable { border-color: var(--line); background: var(--panel); box-shadow: none; }
+.synthesis-callout h2 { margin: 0; font-size: clamp(24px, 3.2vw, 36px); }
+.synthesis-callout .lead { max-width: 900px; font-size: 17px; color: #334155; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.primary-link, .secondary-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border-radius: 999px; font-weight: 800; }
+.primary-link { color: white; background: var(--accent); }
+.secondary-link { color: var(--accent-2); border: 1px solid #93c5fd; background: white; }
+.primary-link:hover, .secondary-link:hover { text-decoration: none; filter: brightness(.97); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.card, .run { display: flex; flex-direction: column; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; color: var(--text); min-height: 128px; }
+.run { padding: 16px; }
+.card:hover, .run:hover { border-color: var(--accent-2); text-decoration: none; }
+.thumb { display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #e9edf5; border-radius: 8px 8px 0 0; color: var(--muted); font-size: 13px; font-weight: 700; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb-empty span { padding: 0 14px; text-align: center; }
+.card-body { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 16px; }
+.card strong { line-height: 1.35; }
+.source-line { color: #3f4a5f; font-weight: 600; }
+.runs { display: grid; gap: 10px; }
+.badge { display: inline-flex; width: fit-content; border-radius: 999px; padding: 2px 9px; background: #e6f4f1; color: var(--accent); font-size: 12px; font-weight: 700; }
+.status-contradicted, .status-llm_failed { background: #fee4e2; color: var(--bad); }
+.status-unverified, .status-stale { background: #fff4d6; color: var(--warn); }
+small, .muted { color: var(--muted); }
+.topnav { display: flex; gap: 14px; margin-bottom: 16px; font-size: 14px; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px; }
+.stats span { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
+.report { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: min(5vw, 36px); }
+.report-head { border-bottom: 1px solid var(--line); margin-bottom: 24px; padding-bottom: 20px; }
+.report-head h1 { margin: 0; font-size: clamp(24px, 3.5vw, 38px); line-height: 1.2; }
+.meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+.scope-note { padding: 12px 14px; border-left: 4px solid var(--warn); border-radius: 6px; background: #fff7ed; color: #7c2d12; }
+.synthesis-report h2 { margin-top: 34px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.synthesis-report h3 { margin: 24px 0 8px; color: #0f4c5c; }
+.synthesis-report p, .synthesis-report li { overflow-wrap: anywhere; }
+pre { overflow: auto; background: #111827; color: #f9fafb; border-radius: 8px; padding: 14px; }
+code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+details { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 18px; }
+@media (max-width: 640px) {
+  main { width: min(100% - 20px, 1120px); padding-top: 18px; }
+  .report { padding: 18px; }
+  .synthesis-callout { border-radius: 14px; padding: 18px; }
+  .cta-row a { width: 100%; }
+  .mobile-report { border-radius: 12px; }
+}
+</style>
+</head>
+<body>
+  <main>
+<nav class="topnav"><a href="index.html">실행 목록</a><a href="../../index.html">YouTube 홈</a></nav>
+<article class="report">
+  <header class="report-head">
+    <p class="eyebrow">youtube_20261125_065131</p>
+    <h1>주식 투자자라면 꼭 설정해 둬야 할 &#x27;GPT 자동 알림 기능&#x27;</h1>
+    <div class="meta">
+      <span class="badge status-asr_uncertain">asr_uncertain</span>
+      <a href="https://www.youtube.com/watch?v=iLvXbnBMvlY">원본 영상</a>
+    </div>
+  </header>
+  <h2>GPT 주가 하락 알림: 투자자가 확인해야 할 것</h2>
+<p><a href="https://www.youtube.com/watch?v=iLvXbnBMvlY">경제사냥꾼 원영상</a> · 2026년 11월 24일 공개 · 검증 기준: 2026년 11월 25일(한국시간)</p>
+<p><strong>확인된 것은 ChatGPT 작업 알림의 수신 설정뿐이다.</strong> 무료 계정에서 예약 작업을 만들 수 있는지, 설정한 하락률에 도달할 때만 알림이 오는지, 하락 원인과 가격대가 신뢰할 만한지는 확인되지 않았다. 이 영상은 특정 종목이나 시장 방향에 대한 분석이 아니라, 보유 종목을 점검하는 방법에 대한 제안이다.</p>
+<h3>영상 주장과 확인된 사실·근거</h3>
+<p>아래 주장은 모두 자동자막 청크 <code>00:00–00:57</code>에 들어 있다. 검증표의 <code>00:00</code>은 개별 발화 시각이 아니라 청크 시작점이다. 프롬프트 공유 예고는 영상 후반부로 파악되지만 정확한 시각은 확인되지 않았다.</p>
+<p>| 영상 주장 | 확인된 사실·근거 | 외부 근거 / 자막 해석 신뢰도 |</p>
+<p>|---|---|---:|</p>
+<p>| <strong>C1. 증권사 알림은 하락폭을 알려주지만 원인이나 매도 판단은 알려주지 않는다.</strong> | <strong>미확인.</strong> 특정 증권사의 공식 안내나 실제 메시지가 없다. 가격 조건 알림과 별도로 제공되는 뉴스·리서치 알림을 구분해야 한다. | 0.00 / 0.90 |</p>
+<p>| <strong>C2. 무료 ChatGPT 계정에서도 보유 종목과 평균 매수가를 입력해 자동 알림을 설정할 수 있다.</strong> | <strong>부분 확인.</strong> <a href="https://help.openai.com/ko-kr/articles/10291617-scheduled-tasks-in-chatgpt">OpenAI 예약 작업 도움말(E1)</a> 발췌는 설정에서 푸시·이메일 수신을 선택할 수 있고 브라우저 알림 권한이 필요할 수 있다고 안내한다. 무료 계정의 작업 생성, 사용 한도, 실제 수신은 확인되지 않았다. | 0.65 / 0.90 |</p>
+<p>| <strong>C3. GPT가 정기적으로 시세를 확인하고 설정한 하락률에 도달하면 알린다.</strong> | <strong>미확인.</strong> 일반 작업 완료 알림과 하락 조건을 충족할 때만 보내는 알림은 다르다. 시세·실행·수신 기록이 없어 둘을 구분할 수 없다. | 0.00 / 0.90 |</p>
+<p>| <strong>C4. GPT가 시장 전반의 하락과 기업 자체의 문제를 구분한다.</strong> | <strong>미확인.</strong> 실제 응답과 같은 시점의 시장·업종·종목 수익률, 공시, 보도가 없다. 두 요인이 동시에 작용할 수도 있다. | 0.00 / 0.90 |</p>
+<p>| <strong>C5. GPT가 추가 매수·관망·매도를 검토할 가격대와 각각의 근거, 판단을 바꿀 악재를 제시한다.</strong> | <strong>미확인.</strong> 자막 요약은 영상이 가격대를 참고용으로 한정했다고 해석한다. 실제 응답과 산출 근거가 없어 가격대를 제시하는지, 계산이 재현되는지, 예측력이 있는지 확인할 수 없다. | 0.00 / 0.78 |</p>
+<p>| <strong>C6. 채널이 프롬프트를 커뮤니티에 무료로 공유할 예정이다.</strong> | <strong>발화 해석 불확실·게시 미확인.</strong> 공유 예고로 해석되지만 명령어와 게시 위치에 관한 표현이 불명확하다. 게시 링크·날짜·원문·무료 접근 여부가 확인되지 않았으며, 자료가 없다고 미게시를 뜻하지는 않는다. | 0.00 / 0.58 |</p>
+<h3>활용 가치와 반론</h3>
+<p>이 방식의 장점은 가격 알림을 받은 뒤 <strong>무엇부터 확인할지</strong> 정리해 줄 수 있다는 점이다. 시세와 공시의 출처 및 시각이 정확하다면, 종목 하락이 업종 전반과 비슷한지 아니면 실적 전망 변경 같은 기업 고유 이슈가 겹쳤는지 살피는 시간을 줄일 수 있다. 투자 판단을 바꿀 사건을 미리 정리해 두면 가격 움직임만으로 결론을 내리는 것도 피할 수 있다. 다만 이 자료는 탐색 시간 단축이나 투자 성과 개선을 입증하지 않는다.</p>
+<p>반대로 정기 점검은 실시간 감시가 아니다. 점검 사이에만 임계치를 넘은 급락은 놓칠 수 있고, 지연 시세나 사후 보도를 사용하면 당시에는 알 수 없었던 원인을 그럴듯하게 붙일 수 있다. 또 <strong>평균 매수가 대비 손실률</strong>과 <strong>전일 종가 대비 등락률</strong>은 다른 지표다. 평균 매수가는 개인의 손익 기준이지 기업가치나 향후 수익률의 근거가 아니다.</p>
+<h3>단기 체크포인트와 무효화 조건</h3>
+<p>| 확인할 항목 | 기록할 내용과 판단 기준 |</p>
+<p>|---|---|</p>
+<p>| <strong>무료 계정에서 실제 작동하는가</strong> | 공개일·검증일 기준 공식 요금제 자료와 대상 계정의 예약 작업 생성, 사용 한도, 알림 권한, 푸시·이메일 수신을 각각 확인한다. 알림 메뉴만 있고 예약 작업을 만들 수 없거나 실제로 수신되지 않으면 그 계정에서는 영상의 방식을 사용할 수 없다. |</p>
+<p>| <strong>하락 조건에서만 알리는가</strong> | 테스트 종목·거래소, 하락률 기준가, 점검 주기·시간대, 장외 포함 여부를 먼저 정한다. 미달·정확히 도달·초과·점검 사이 일시 도달 사례에서 거래소 시세 시각, 작업 실행 시각, 알림 수신 시각을 나란히 기록한다. 미달에도 같은 알림이 오거나 점검 시점에 도달했는데 누락되면 조건부 알림으로 신뢰할 근거가 없다. 점검 사이 일시 도달 누락은 실시간 감시가 아님을 보여준다. |</p>
+<p>| <strong>하락 원인과 가격대를 재현할 수 있는가</strong> | 같은 시각의 시장·업종·종목 수익률과 거래소·규제기관 공시, 기업 IR, 뉴스 게시 시각을 대조한다. 실적 전망 변경 등 판단을 바꿀 사건은 공시 원문과 대조하고, 가격대는 기준 시세·산식·가정으로 재계산한다. 사후 정보에 의존한 원인 설명이나 재현할 수 없는 가격대는 판단 근거에서 제외한다. |</p>
+<p>| <strong>프롬프트가 실제로 공개됐는가</strong> | 원영상 음성으로 공유 예고와 참고용 단서를 확인하고, 채널이 직접 제공한 게시 링크·게시일·원문·무료 접근 여부를 확인한다. 독립 테스트가 성공해도 제작자 계정에서 실제로 같은 방식이 작동했다는 증거는 아니다. |</p>
+<h3>데이터 품질과 미확인 범위</h3>
+<p>한국어 자동자막의 품질 지표(<code>transcript_quality</code>)는 <code>good</code>, <strong>1.0</strong>이지만 개별 표현의 정확성을 보증하지 않는다. 영상 길이 메타데이터는 56초이고 자막 청크 끝은 57초로 표시된다. 영상에서 주장을 식별한 신뢰도 <strong>0.95</strong>는 외부 검증 점수가 아니다. 표의 <code>source_confidence</code>는 주장별 외부 근거의 강도, <code>asr_confidence</code>는 자막을 바탕으로 발화를 해석한 신뢰도다. 외부 근거 <strong>0.00</strong>은 해당 주장이 틀렸다는 뜻이 아니라 이를 검증할 자료가 없다는 뜻이다.</p>
+<p>E1은 게시일이 없는 검색 결과 발췌다. 나머지 수집 기사(E2–E6)는 관련성이 없어 판단에 쓰지 않았다. 영상에 특정 티커, 하락률 수치, 가격대, 점검 주기가 제시됐다는 근거가 없으며, 관련 시세·공시나 실제 실행 기록도 제공되지 않았다. Bloomberg·Morningstar 인용은 제공 자료에 없다. 제작자 계정의 비공개 설정·프롬프트·실행 및 발송 기록과 비공개 게시물은 <strong>미검증·수동 확인 필요</strong>다.</p>
+  <details>
+    <summary>공개 요약 JSON</summary>
+    <pre>{
+  &quot;version&quot;: 4,
+  &quot;video_id&quot;: &quot;iLvXbnBMvlY&quot;,
+  &quot;title&quot;: &quot;주식 투자자라면 꼭 설정해 둬야 할 &#x27;GPT 자동 알림 기능&#x27;&quot;,
+  &quot;url&quot;: &quot;https://www.youtube.com/watch?v=iLvXbnBMvlY&quot;,
+  &quot;channel&quot;: &quot;경제사냥꾼&quot;,
+  &quot;channel_id&quot;: &quot;UC7usMJDHmtbs_oegmzQKKMA&quot;,
+  &quot;source_url&quot;: &quot;https://www.youtube.com/@%EA%B2%BD%EC%A0%9C%EC%82%AC%EB%83%A5%EA%BE%BC/shorts&quot;,
+  &quot;thumbnail_url&quot;: &quot;https://i.ytimg.com/vi/iLvXbnBMvlY/maxresdefault.jpg&quot;,
+  &quot;published_at&quot;: &quot;2026-11-24T13:10:31+00:00&quot;,
+  &quot;status&quot;: &quot;asr_uncertain&quot;,
+  &quot;strategy_source_tier&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_evidence_weight&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_validation_policy&quot;: &quot;STANDARD_REVIEW&quot;,
+  &quot;transcript_status&quot;: &quot;available&quot;,
+  &quot;transcript_source&quot;: &quot;automatic&quot;,
+  &quot;transcript_chars&quot;: 655,
+  &quot;transcript_quality&quot;: {
+    &quot;status&quot;: &quot;good&quot;,
+    &quot;score&quot;: 1.0,
+    &quot;warnings&quot;: [],
+    &quot;source&quot;: &quot;automatic&quot;,
+    &quot;language&quot;: &quot;Korean (Original)&quot;,
+    &quot;model_or_format&quot;: &quot;json3&quot;,
+    &quot;chars&quot;: 655,
+    &quot;segments&quot;: 34,
+    &quot;duration_seconds&quot;: 56,
+    &quot;repeated_ngram_ratio&quot;: 0.0
+  },
+  &quot;generated_at&quot;: &quot;2026-11-25T06:51:31.971136+09:00&quot;,
+  &quot;llm_status&quot;: &quot;success&quot;,
+  &quot;research_status&quot;: &quot;success&quot;,
+  &quot;claim_verification_status&quot;: &quot;success&quot;,
+  &quot;research_pipeline_version&quot;: 4,
+  &quot;evidence_count&quot;: 6,
+  &quot;claim_status_summary&quot;: {
+    &quot;unverified&quot;: 4,
+    &quot;partially_supported&quot;: 1,
+    &quot;asr_uncertain&quot;: 1
+  },
+  &quot;claims&quot;: [
+    {
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;claim_text&quot;: &quot;증권사 주가 알림은 하락폭을 알려주지만 하락 원인이나 매도 판단은 알려주지 않는다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.98,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.9,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;해당 없음&quot;,
+        &quot;observed&quot;: &quot;해당 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;기존 증권사 알림에 어떤 정보가 빠져 있는지는 실제 사용하는 서비스의 알림 유형과 메시지 예시를 기준으로 판단해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;claim_text&quot;: &quot;무료 ChatGPT 계정에서도 알림을 켜고 보유 종목과 평균 매수가를 입력해 자동 알림을 설정할 수 있다.&quot;,
+      &quot;status&quot;: &quot;partially_supported&quot;,
+      &quot;confidence&quot;: 0.98,
+      &quot;supporting_evidence_ids&quot;: [
+        &quot;E1&quot;
+      ],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.65,
+      &quot;asr_confidence&quot;: 0.9,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;무료 계정 이용 가능, 작업 한도 미제시&quot;,
+        &quot;observed&quot;: &quot;무료 플랜 지원 여부와 한도 미확인&quot;
+      },
+      &quot;investor_implication&quot;: &quot;무료 계정으로 이용할 수 있다고 안내하기 전에 해당 계정에서 작업 생성과 알림 수신이 모두 되는지 확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;claim_text&quot;: &quot;GPT가 정해진 시간마다 보유 종목을 확인하고 설정한 하락률에 도달하면 알림을 보낸다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.98,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.9,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;구체적 하락률, 기준 가격, 점검 간격 미제시&quot;,
+        &quot;observed&quot;: &quot;시세·실행 시각·알림 기록 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;정기 점검은 실시간 감시와 다르다. 점검 사이에만 발생한 급락도 포착한다고 가정할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;claim_text&quot;: &quot;GPT가 하락 원인을 시장 전반의 움직임과 개별 기업 문제로 구분해 설명한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.98,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.9,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;수익률 또는 하락 사례 미제시&quot;,
+        &quot;observed&quot;: &quot;대조 가능한 수익률 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;하락 원인 설명은 추정으로 다루고, 같은 시각의 시장·업종·종목 수익률과 공시·뉴스를 대조해야 한다. 시장과 기업 요인이 함께 작용할 수 있다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;claim_text&quot;: &quot;GPT가 추가 매수·관망·매도 검토 가격과 각각의 근거, 투자 판단을 바꿀 악재를 제시하며, 영상은 가격을 참고용으로 한정한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.97,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.78,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;세 가지 가격 범주, 구체적 가격 미제시&quot;,
+        &quot;observed&quot;: &quot;응답과 산출 근거 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;AI가 제시한 가격을 주문 기준으로 바로 사용하지 말고, 기준 시세와 계산 근거, 판단을 바꿀 조건을 직접 확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;claim_text&quot;: &quot;경제사냥꾼 채널은 사용한 프롬프트를 커뮤니티에 무료 공개하겠다고 밝혔다.&quot;,
+      &quot;status&quot;: &quot;asr_uncertain&quot;,
+      &quot;confidence&quot;: 0.95,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.58,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;무료 공개 예고&quot;,
+        &quot;observed&quot;: &quot;실제 게시 및 무료 접근 여부 미확인&quot;
+      },
+      &quot;investor_implication&quot;: &quot;공유 예고와 실제 게시를 구분해야 한다. 채널이 직접 제공한 게시물이나 링크를 찾기 전에는 프롬프트가 공개됐다고 안내할 수 없다.&quot;
+    }
+  ],
+  &quot;entities&quot;: [],
+  &quot;evidence&quot;: [
+    {
+      &quot;evidence_id&quot;: &quot;E1&quot;,
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;title&quot;: &quot;ChatGPT의 예약 작업 - OpenAI Help Center&quot;,
+      &quot;source_url&quot;: &quot;//duckduckgo.com/l/?uddg=https%3A%2F%2Fhelp.openai.com%2Fko%2Dkr%2Farticles%2F10291617%2Dscheduled%2Dtasks%2Din%2Dchatgpt&amp;rut=acbd2f603993940d5bf64d822b56c3f45f6cd658e88c84510b557a9323b8811d&quot;,
+      &quot;publisher&quot;: &quot;duckduckgo.com&quot;,
+      &quot;published_at&quot;: null,
+      &quot;source_tier&quot;: &quot;web&quot;,
+      &quot;excerpt&quot;: &quot;작업 알림을 관리하려면 설정 &gt; 알림 으로 이동하여 푸시, 이메일 또는 둘 다 선택하세요. 브라우저 알림 권한이 꺼져 있으면 ChatGPT 에 다음 안내가 표시됩니다. 허용 을 선택하세요. 브라우저에서 알림 권한 허용을 요청할 수 있습니다.&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E2&quot;,
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;title&quot;: &quot;Platinum Group Metals Ltd. Reports 2026 Annual Results&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/commodities/articles/platinum-group-metals-ltd-reports-213000382.html&quot;,
+      &quot;publisher&quot;: &quot;TMX Newsfile&quot;,
+      &quot;published_at&quot;: &quot;2026-11-24T21:30:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E4&quot;,
+      &quot;claim_id&quot;: &quot;GLOBAL&quot;,
+      &quot;title&quot;: &quot;Wall Street Analysts See a 61.88% Upside in First Watch Restaurant Group (FWRG): Can the Stock Really Move This High?&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/wall-street-analysts-see-61-135503486.html&quot;,
+      &quot;publisher&quot;: &quot;Zacks&quot;,
+      &quot;published_at&quot;: &quot;2026-11-23T13:55:03+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E5&quot;,
+      &quot;claim_id&quot;: &quot;GLOBAL&quot;,
+      &quot;title&quot;: &quot;First Watch Restaurant Group Insider Sold Shares Worth $473,680, According to a Recent SEC Filing&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/first-watch-restaurant-group-insider-210915434.html&quot;,
+      &quot;publisher&quot;: &quot;MT Newswires&quot;,
+      &quot;published_at&quot;: &quot;2026-11-19T21:09:15+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    }
+  ],
+  &quot;source_policy&quot;: {
+    &quot;raw_transcript_published&quot;: false,
+    &quot;raw_transcript_in_evidence&quot;: false,
+    &quot;research_pipeline_version&quot;: 4,
+    &quot;closed_source_claims&quot;: &quot;unverified_external_source&quot;,
+    &quot;auto_caption_warning&quot;: true,
+    &quot;local_asr_warning&quot;: false
+  }
+}</pre>
+  </details>
+</article>
+</main>
+  <style>
+.reader-contents { margin: 16px 0; padding: 12px 16px; border: 1px solid var(--line, #64748b); border-radius: 12px; }
+.reader-contents > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-weight: 750; }
+.reader-contents nav { display: grid; gap: 4px; max-height: 45vh; overflow: auto; margin: 8px 0; }
+.reader-contents a { display: block; min-height: 44px; padding: 10px; border-radius: 6px; color: inherit; overflow-wrap: anywhere; }
+.reader-contents a:hover { background: #80808020; }
+.reader-contents .reader-subsection { padding-inline-start: 24px; font-size: .92em; }
+.reader-prose, .report { overflow-wrap: anywhere; line-height: 1.8; }
+.reader-prose p, .reader-prose li { max-width: 85ch; }
+.reader-prose h2, .reader-prose h3, .reader-prose h4, [data-reader-heading] { scroll-margin-top: 100px; line-height: 1.45; }
+.reader-prose h2 { margin-top: 1.8em; padding-bottom: 8px; border-bottom: 1px solid var(--line, #64748b); }
+.reader-prose h3 { margin-top: 1.5em; }
+.reader-prose li { margin: .5em 0; }
+.reader-prose pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.reader-prose blockquote { margin: 16px 0; padding: 4px 16px; border-left: 3px solid var(--accent, #64748b); }
+.reader-table { overflow: auto; max-width: 100%; margin: 16px 0; border: 1px solid var(--line, #64748b); border-radius: 10px; }
+.reader-table table { border-collapse: collapse; width: 100%; margin: 0; font-size: .92rem; }
+.reader-table th, .reader-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line, #64748b); min-width: 110px; max-width: 400px; overflow-wrap: anywhere; white-space: normal; }
+.reader-table th { background: #80808018; }
+.reader-table tr:nth-child(even) { background: #80808008; }
+.reader-search { display: grid; gap: 8px; margin: 16px 0; }
+.reader-search label { font-weight: 700; }
+.reader-search input { box-sizing: border-box; width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line, #64748b); border-radius: 10px; background: var(--panel, #fff); color: var(--text, #132238); font: inherit; }
+.reader-search p { margin: 0; font-size: .86rem; }
+.reader-back { position: fixed; bottom: max(14px, env(safe-area-inset-bottom)); right: 14px; z-index: 30; min-height: 44px; border: 1px solid #778899; border-radius: 99px; padding: 10px 16px; background: #18344a; color: #fff; font: 700 14px system-ui; cursor: pointer; box-shadow: 0 3px 12px #0003; }
+[data-reader-source] { margin-top: 20px; }
+[data-reader-source] > summary { min-height: 44px; cursor: pointer; }
+[data-reader-source] pre { font-size: .85rem; }
+[data-reader-source] pre, .reader-prose { min-width: 0; }
+.reader-contents :focus-visible, .reader-search :focus-visible, .reader-back:focus-visible, .reader-table:focus-visible { outline: 3px solid var(--accent, #008c95); outline-offset: 3px; }
+.reader-search + .grid > [hidden] { display: none !important; }
+@media (max-width: 600px) { .reader-prose { font-size: 1rem; } .reader-contents { padding: 8px 12px; } }
+@media print { .reader-back, .reader-search, .reader-contents, [data-reader-source] { display: none !important; } .reader-table { overflow: visible; } .reader-prose { color: #000; background: #fff; } }
+</style><script>
+(() => {
+  'use strict';
+  let serial = 0;
+  const rendered = new WeakMap();
+  const node = (tag, text) => { const el = document.createElement(tag); if (text != null) el.textContent = text; return el; };
+  function inline(parent, text) {
+    const pattern = /(`[^`]+`|\*\*[^*]+\*\*|\[[^\]]+\]\(https?:\/\/[^\s)]+\))/g;
+    let start = 0;
+    for (const match of String(text).matchAll(pattern)) {
+      parent.append(document.createTextNode(text.slice(start, match.index)));
+      const value = match[0];
+      if (value.startsWith('`')) parent.append(node('code', value.slice(1, -1)));
+      else if (value.startsWith('**')) parent.append(node('strong', value.slice(2, -2)));
+      else {
+        const link = value.match(/^\[([^\]]+)\]\((.+)\)$/);
+        const a = node('a', link[1]); a.href = link[2]; a.rel = 'noopener noreferrer'; parent.append(a);
+      }
+      start = match.index + value.length;
+    }
+    parent.append(document.createTextNode(text.slice(start)));
+  }
+  const cells = line => line.trim().replace(/^\|/, '').replace(/\|$/, '').split(/(?<!\\)\|/).map(v => v.trim().replace(/\\\|/g, '|'));
+  function markdown(source) {
+    const article = node('article'); article.className = 'reader-prose';
+    const lines = source.split(/\r?\n/); let list = null;
+    for (let i = 0; i < lines.length; i += 1) {
+      const line = lines[i], value = line.trim();
+      if (!value) { list = null; continue; }
+      if (/^```/.test(value)) {
+        const code = []; i += 1;
+        while (i < lines.length && !/^```/.test(lines[i].trim())) code.push(lines[i++]);
+        const pre = node('pre'); pre.append(node('code', code.join('\n'))); article.append(pre); list = null; continue;
+      }
+      if (i + 1 < lines.length && value.includes('|') && cells(lines[i + 1]).every(v => /^:?-{3,}:?$/.test(v))) {
+        const table = node('table'), head = node('thead'), body = node('tbody');
+        const row = (values, tag) => { const tr = node('tr'); values.forEach(v => { const cell = node(tag); if (tag === 'th') cell.scope = 'col'; inline(cell, v); tr.append(cell); }); return tr; };
+        head.append(row(cells(line), 'th')); i += 2;
+        while (i < lines.length && lines[i].trim() && lines[i].includes('|')) body.append(row(cells(lines[i++]), 'td'));
+        i -= 1; table.append(head, body); article.append(table); list = null; continue;
+      }
+      const heading = value.match(/^(#{1,6})\s+(.+)$/);
+      if (heading) { const h = node('h' + Math.min(4, heading[1].length + 1)); inline(h, heading[2]); article.append(h); list = null; continue; }
+      const bullet = value.match(/^(?:[-*+] |\d+\. )(.+)$/);
+      if (bullet) {
+        const tag = /^\d/.test(value) ? 'ol' : 'ul';
+        if (!list || list.tagName.toLowerCase() !== tag) { list = node(tag); if (tag === 'ol') list.start = parseInt(value, 10); article.append(list); }
+        const li = node('li'); inline(li, bullet[1]); list.append(li); continue;
+      }
+      list = null;
+      if (/^(---+|\*\*\*+)$/.test(value)) { article.append(node('hr')); continue; }
+      const p = node(value.startsWith('> ') ? 'blockquote' : 'p'); inline(p, value.startsWith('> ') ? value.slice(2) : line); article.append(p);
+    }
+    return article;
+  }
+  function contents(root) {
+    root.querySelectorAll(':scope > .reader-contents').forEach(el => el.remove());
+    const headings = [...root.querySelectorAll('h2,h3,h4')].filter(h => !h.closest('.card,.run-card,.reader-contents,[data-reader-source],[hidden]'));
+    if (headings.length < 2) return;
+    const details = node('details'); details.className = 'reader-contents';
+    details.append(node('summary', '이 리포트 목차 · ' + headings.length + '개 항목'));
+    const nav = node('nav'); nav.setAttribute('aria-label', '리포트 목차');
+    headings.forEach(h => {
+      if (!h.id) h.id = 'reader-section-' + (++serial);
+      h.dataset.readerHeading = ''; h.tabIndex = -1;
+      const a = node('a', h.textContent); a.href = '#' + h.id;
+      if (h.tagName !== 'H2') a.className = 'reader-subsection';
+      a.addEventListener('click', event => {
+        event.preventDefault();
+        for (let ancestor = h.parentElement; ancestor; ancestor = ancestor.parentElement) if (ancestor.tagName === 'DETAILS') ancestor.open = true;
+        h.scrollIntoView({block: 'start'}); h.focus({preventScroll: true});
+      }); nav.append(a);
+    });
+    details.append(nav); root.prepend(details);
+  }
+  function enhance(root) {
+    if (!root) return;
+    root.querySelectorAll('pre[data-report-markdown]').forEach(pre => {
+      const previous = rendered.get(pre);
+      if (previous && previous.source === pre.textContent) return;
+      const article = markdown(pre.textContent);
+      if (previous) previous.article.replaceWith(article);
+      else {
+        const details = node('details'); details.dataset.readerSource = '';
+        details.append(node('summary', 'Markdown 원문 보기'));
+        pre.before(article, details); details.append(pre);
+      }
+      rendered.set(pre, {source: pre.textContent, article});
+    });
+    root.querySelectorAll('table').forEach(table => {
+      if (table.closest('.reader-table,.account-table-wrap,.summary-scroll')) return;
+      const wrap = node('div'); wrap.className = 'reader-table'; wrap.tabIndex = 0;
+      wrap.setAttribute('role', 'region'); wrap.setAttribute('aria-label', '리포트 표 · 가로로 스크롤하여 전체 보기');
+      table.before(wrap); wrap.append(table);
+    });
+    root.querySelectorAll('.grid').forEach(grid => {
+      const cards = [...grid.querySelectorAll(':scope > a.card')];
+      if (cards.length < 2 || grid.dataset.readerSearch) return;
+      grid.dataset.readerSearch = 'true';
+      const box = node('div'); box.className = 'reader-search';
+      const input = node('input'); input.type = 'search'; input.placeholder = '제목 · 종목 · 채널 · 키워드'; input.id = 'report-search-' + (++serial);
+      const label = node('label', '리포트 찾기'); label.htmlFor = input.id;
+      const status = node('p'); status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
+      const update = () => {
+        const terms = input.value.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean); let count = 0;
+        cards.forEach(card => { card.hidden = !terms.every(t => card.textContent.toLocaleLowerCase().includes(t)); if (!card.hidden) count += 1; });
+        status.textContent = cards.length + '개 중 ' + count + '개 표시' + (count ? '' : ' · 검색어를 지우거나 다른 키워드를 입력하세요.');
+      };
+      input.addEventListener('input', update); box.append(label, input, status); grid.before(box); update();
+    });
+    contents(root);
+  }
+  window.TradingAgentsReader = {enhance};
+  const main = document.querySelector('main');
+  if (main && !main.hasAttribute('data-reader-dynamic')) enhance(main);
+  if (main) {
+    const top = node('button', '↑ 맨 위'); top.type = 'button'; top.className = 'reader-back'; top.setAttribute('aria-label', '리포트 맨 위로 이동');
+    top.addEventListener('click', () => { const target = document.querySelector('h1') || main; target.tabIndex = -1; target.scrollIntoView({block: 'start'}); target.focus({preventScroll: true}); });
+    document.body.append(top);
+  }
+})();
+</script>
+</body>
+</html>
