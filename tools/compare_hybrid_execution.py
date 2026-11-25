@@ -45,7 +45,7 @@ def compare_fills(close_trace, open_trace):
             "median_open_minus_close_bps": median(gaps) if gaps else None}
 
 
-def hybrid_results(root, plan, market, calendar):
+def read_market_panel(root, plan, market, calendar):
     spec = plan["markets"][market]
     receipts = json.loads((root / "receipts.json").read_bytes())
     bars, coverage = {}, {}
@@ -61,11 +61,17 @@ def hybrid_results(root, plan, market, calendar):
         bars[ticker] = rows
         coverage[ticker] = {**receipts[ticker], "missing_sessions": sorted(expected - days),
                             "diagnostics": diagnostics}
-    original = json.loads((PLAN.parent / "HYBRID_QUANT_BACKTEST_20261125.json").read_bytes())[market]
     observed = sorted({row["date"] for rows in bars.values() for row in rows})
     if (observed[70], len(observed) - 70, observed[-1]) != (spec["first_mark"], spec["sessions"], plan["end"]):
         raise ValueError(f"Reconstructed {market} sample differs from the frozen evaluation dates")
-    summary = {"coverage": coverage, "missing_all_symbols": sorted(expected - set(observed)), "executions": {}}
+    return bars, coverage, sorted(expected - set(observed))
+
+
+def hybrid_results(root, plan, market, calendar):
+    spec = plan["markets"][market]
+    bars, coverage, missing = read_market_panel(root, plan, market, calendar)
+    original = json.loads((PLAN.parent / "HYBRID_QUANT_BACKTEST_20261125.json").read_bytes())[market]
+    summary = {"coverage": coverage, "missing_all_symbols": missing, "executions": {}}
     all_traces = {}
     for timing in ("legacy_close", "same_close", "next_open"):
         traces = {}

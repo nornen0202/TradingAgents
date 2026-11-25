@@ -1,0 +1,17 @@
+{
+  "baseline_head": "ea2f10d8cbdbeb9e0c96bf9de6ea5b9206fa6b97",
+  "baseline_report": "Docs/hybrid_execution_audit_results.json",
+  "baseline_plan": "Docs/hybrid_execution_audit_plan.json",
+  "baseline_arm": "next_open.hybrid_core_satellite",
+  "model": "retrospective, fixed before computing challenger performance, no parameter search",
+  "controls": "Use the #570 pinned Yahoo receipts, original 70-observation warmup, 21-observation signal grid, 22:00 UTC cutoff, next positive-volume observed open per symbol, original thresholds, sizing, cash, costs, tax and marking conventions.",
+  "challenger": {
+    "core": "Use the original hybrid policy's ETF targets on the same signal day.",
+    "satellite": "On T require a positive-volume adjusted close, strict breakout above the prior 20 observed positive-volume closes, price above its 60-close mean and positive 40-close momentum. Rank by descending 40-close momentum, then ticker. Do not forward-fill signal bars.",
+    "capital": "Use at most three satellites with 10% target each, subject to the original 30% sleeve budget. Unused slots remain in cash. Sell or trim at the normal rebalance when the target falls."
+  },
+  "veto": "Block only eligible incremental buys with an explicit STOP_LOSS or EXIT in validated original LLM evidence available by that signal cutoff on the same market-local decision date as T. Never carry a veto between decision dates. Other explicit risk actions are observed non-veto. Missing or conflicting evidence is NO_OBSERVATION. Unobserved opportunities follow the paired quant policy and must not enter the observed-effect denominator.",
+  "evidence": "Bind eligible judgments to the frozen #553 evaluation digest, original per-run manifest receipt and per-decision digest. Require completed row and run by cutoff. Treat #569 conditional candidate artifacts as a separate coverage audit; conditional/scanner status alone cannot establish a triggered fill or an original LLM veto.",
+  "metrics": "Carry NAV and positions into every original window. Report close-mark session means and calendar-time-weighted cash/equity from last completed mark until the next mark (prior close at window start), fully idle sessions and longest idle streak, positive executable buy opportunities before veto, observed and missing counts, turnover (sum gross buy and sell notional divided by opening valuation NAV), net performance and an additive daily benchmark/cash/selection-and-timing/cost attribution. No forecast or approved trade.",
+  "prospective": "Carry forward 2026-12-01 through 2027-11-30 candidate-only. Admitted forward observations: 0."
+}

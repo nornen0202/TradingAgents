@@ -1,0 +1,6 @@
+{
+  "fixed_slot_result_commit": "af1a12746e2bd6b6c3ecf901a92fdae99592c259",
+  "purpose": "Separate entry selection from satellite sleeve sizing; specified after viewing fixed-slot results, before calculating these supplemental returns.",
+  "controls": "Keep fixed-slot core, breakout rules, admitted tickers and ranking, dates, ledger, benchmark and veto semantics. Use #569 satellite sizing for both supplemental arms: 30% / active count, original asset cap and 22% annual volatility target divided by 20-return sample volatility measured on the original adjusted-close history. No redistribution of volatility-capped capital. No parameter search or change of evaluation window.",
+  "opportunities": "Report executable incremental buys before veto split by zero versus positive pre-buy holdings."
+}
