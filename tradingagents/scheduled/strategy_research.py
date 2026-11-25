@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from datetime import date, datetime, timedelta, timezone
+import json
 
 from tradingagents.dataflows.market_policy import aware_datetime
 from tradingagents.schemas.decision import explicit_price_range_conflicts
@@ -23,16 +24,68 @@ _NO_VOLUME_RULE = {"", "불필요", "필수 아님", "해당 없음", "없음"}
 
 def _close_records(raw, market, days, now):
     records = {}
+    kinds = {"REGULAR_CLOSE", "KIS_DAILY_CLOSE"} if market == "US" else {"REGULAR_CLOSE"}
     for day, bar in sorted((raw or {}).items()):
         window = days.get(day)
         event = aware_datetime(bar.get("event_at"))
         observed = aware_datetime(bar.get("observed_at"))
-        if (window and bar.get("kind") == "REGULAR_CLOSE" and bar.get("source") == "KIS"
+        if (window and bar.get("kind") in kinds and bar.get("source") == "KIS"
                 and bar.get("currency") == CURRENCIES[market] and bar.get("adjustment") == "unadjusted"
                 and bar.get("session") == day.isoformat() and positive(bar.get("price"))
                 and event == window[1] and observed is not None and event + timedelta(minutes=5) <= observed <= now):
+            recheck = bar.get("recheck")
+            if recheck is not None:
+                repeated = aware_datetime(recheck.get("observed_at")) if isinstance(recheck, dict) else None
+                if market != "US" or not repeated or not observed <= repeated <= now or not positive(recheck.get("price")):
+                    bar = {key: value for key, value in bar.items() if key != "recheck"}
             records[day] = bar
     return records
+
+
+def previous_us_closes(path):
+    """Read only the completed US observations from the prior local strategy build."""
+    try:
+        rows = json.loads(path.read_text(encoding="utf-8"))["markets"]["us"]["rows"]
+    except (KeyError, OSError, TypeError, ValueError):
+        return {}
+    if not isinstance(rows, list):
+        return {}
+    closes = {}
+    for row in rows:
+        if not isinstance(row, dict) or not isinstance(row.get("ticker"), str):
+            continue
+        plan = row.get("research_plan")
+        close = plan.get("completed_close") if isinstance(plan, dict) else None
+        if isinstance(close, dict):
+            closes[_identity(row["ticker"])] = close
+    return closes
+
+
+def _retain_previous_close(closes, previous, days, now):
+    if not previous:
+        return
+    try:
+        day = date.fromisoformat(previous["session"])
+    except (KeyError, TypeError, ValueError):
+        return
+    current = closes.get(day)
+    if not current or previous.get("exchange") != current.get("exchange"):
+        return
+    before = min(now, aware_datetime(current["observed_at"]))
+    checked = _close_records({day: previous}, "US", days, before).get(day)
+    if not checked:
+        return
+    carried = checked.get("previous_range")
+    samples = [checked] + ([checked["recheck"]] if checked.get("recheck") else [])
+    if isinstance(carried, list):
+        samples.extend(item for item in carried if isinstance(item, dict) and positive(item.get("price"))
+                       and (received := aware_datetime(item.get("observed_at"))) and days[day][1] <= received <= before)
+    fresh = _close_prices(current)
+    low, high = min(samples, key=lambda item: item["price"]), max(samples, key=lambda item: item["price"])
+    bounds = [{"price": item["price"], "observed_at": item["observed_at"]}
+              for keep, item in ((low["price"] < min(fresh), low), (high["price"] > max(fresh), high)) if keep]
+    if bounds:
+        closes[day] = {**current, "previous_range": bounds}
 
 
 def _basis_compatible(origin, closes, days, through, now):
@@ -49,13 +102,15 @@ def _basis_compatible(origin, closes, days, through, now):
     anchor = anchor_bars[0]
     ingested = aware_datetime(anchor.get("observed_at"))
     if (aware_datetime(anchor.get("timestamp")) != days[ref][1] or ingested is None
-            or not days[ref][1] <= ingested <= analysis_at or not price_equal(anchor.get("close"), closes[ref]["price"])):
+            or not days[ref][1] <= ingested <= analysis_at
+            or not all(price_equal(anchor.get("close"), price) for price in _close_prices(closes[ref]))):
         return False
     for day, (_, close) in days.items():
         if ref <= day <= through and close + timedelta(minutes=5) <= now:
             bar = closes.get(day) or {}
             checked = aware_datetime(bar.get("adjustment_checked_at"))
-            if not (checked and close <= checked <= now and price_equal(bar.get("price"), bar.get("adjusted_close"))):
+            if not (checked and close <= checked <= now
+                    and any(price_equal(price, bar.get("adjusted_close")) for price in _close_prices(bar))):
                 return False
     return True
 
@@ -90,6 +145,28 @@ def _price_result(condition, value):
     return "MET" if (value > low if "ABOVE" in op else value < low) else "NOT_MET"
 
 
+def _close_prices(observation):
+    recheck = observation.get("recheck")
+    return (observation["price"], recheck["price"]) if recheck else (observation.get("price"),)
+
+
+def _observed_price_result(condition, observation):
+    prices = (*_close_prices(observation), *(item["price"] for item in observation.get("previous_range") or ()))
+    lower, upper = min(prices), max(prices)
+    result = _price_result(condition, lower)
+    if lower == upper:
+        return result
+    if result != _price_result(condition, upper):
+        return "EVIDENCE_NEEDED"
+    op, target_low, target_high = condition
+    if op == "IN_RANGE" and lower < target_low <= target_high < upper:
+        return "EVIDENCE_NEEDED"
+    return result
+
+
+_CLOSE_DISAGREEMENT = "같은 거래일 KIS 조회 값이 가격 조건 경계를 지나므로 거래소 공식 종가 확인"
+
+
 def _compare(level, observation, *, currency, compatible, conflict, requirement=None):
     result = {"level": level, "status": "EVIDENCE_NEEDED"}
     confirmation = level.get("confirmation")
@@ -112,10 +189,12 @@ def _compare(level, observation, *, currency, compatible, conflict, requirement=
         result["needed"] = "가격선의 비교 방향·범위 또는 주어진 정성 확인 기준"
     else:
         threshold = _threshold(level)
-        result.update(status=_price_result(threshold, observation["price"]), observation=observation,
+        result.update(status=_observed_price_result(threshold, observation), observation=observation,
                       operator=threshold[0])
         if result["status"] == "BOUNDARY":
             result["needed"] = "기준값과 같음 · 원문에서 등호 포함 여부 확인"
+        elif result["status"] == "EVIDENCE_NEEDED":
+            result["needed"] = _CLOSE_DISAGREEMENT
     return result
 
 
@@ -152,12 +231,18 @@ def _price_checks(thesis, closes, quote, days, now, *, currency, compatible, act
             # A numbered date and observation establish a possible next session.
             # Other clauses (e.g. volume, holding above support) retain original wording.
             if len(preceding) == 1 and compatible and active and preceding[0].get("currency") in (None, currency):
-                first = next((day for day, bar in eligible_closes.items()
-                              if _price_result(_threshold(preceding[0]), bar["price"]) == "MET"), None)
+                for day, bar in eligible_closes.items():
+                    prerequisite = _observed_price_result(_threshold(preceding[0]), bar)
+                    if prerequisite == "MET":
+                        first = day
+                        break
+                    if prerequisite == "EVIDENCE_NEEDED":
+                        needed = f"{day.isoformat()} 선행 종가의 가격 경계 확인"
+                        break
                 if first is not None:
                     next_day = next((day for day in sorted(days) if day > first), None)
                     observation = eligible_closes.get(next_day)
-            if not observation:
+            if not observation and not needed:
                 needed = (f"{next_day.isoformat()} 정규장 확정 종가와 선행 조건 확인" if next_day else
                           "먼저 같은 조건의 돌파·회복 종가와 거래량 등 선행 조건 확인")
         checked = _compare(level, observation, currency=currency, compatible=compatible, conflict=conflict, requirement=needed)
@@ -173,10 +258,14 @@ def _price_checks(thesis, closes, quote, days, now, *, currency, compatible, act
             next_close = next((day for day, (_, close) in days.items() if close >= max(now, start)), None)
             if next_close:
                 checked["needed_session"] = next_close.isoformat()
+        if checked.get("needed") == _CLOSE_DISAGREEMENT:
+            checked["needed_session"] = observation["session"]
         if next_day:
             checked["needed_session"] = next_day.isoformat()
         if first:
             checked["preceding_price_session"] = first.isoformat()
+            if eligible_closes[first]["kind"] == "KIS_DAILY_CLOSE":
+                checked["preceding_close_source"] = "KIS_DAILY_CLOSE"
         checked.update(order=index + 1, group=level.get("confirmation_group"))
         results.append(checked)
     return results
@@ -197,7 +286,7 @@ def _entry_summary(thesis):
     }.get(stance, "가격·공시 자료 확보 후 재분석")
 
 
-def _plan(row, thesis, origin, lineage, archive, quote, loader, now, base_days, observation_clock):
+def _plan(row, thesis, origin, lineage, archive, quote, loader, now, base_days, observation_clock, previous):
     market = archive.market
     start = aware_datetime(thesis.get("analysis_asof"))
     if _research_clock_errors(thesis, market=market, now=now):
@@ -220,6 +309,8 @@ def _plan(row, thesis, origin, lineage, archive, quote, loader, now, base_days, 
             pass
     observed_by = observation_clock() if observation_clock else now
     closes = _close_records(raw, market, days, observed_by)
+    if market == "US":
+        _retain_previous_close(closes, previous, days, now)
     latest_close = next(reversed(closes.values()), None)
     expected_close = max((day for day, (_, close) in days.items() if close + timedelta(minutes=5) <= now), default=None)
     latest_is_current = bool(latest_close and expected_close and latest_close["session"] == expected_close.isoformat())
@@ -271,7 +362,7 @@ def _plan(row, thesis, origin, lineage, archive, quote, loader, now, base_days, 
     }
 
 
-def attach_research_plans(archive_dir, market_payload, *, now, refresh_prices=False, price_loader=None):
+def attach_research_plans(archive_dir, market_payload, *, now, refresh_prices=False, price_loader=None, previous_closes=None):
     market = market_payload["market"]
     if market not in ZONES or not market_payload["rows"]:
         return
@@ -291,4 +382,4 @@ def attach_research_plans(archive_dir, market_payload, *, now, refresh_prices=Fa
                               "FULL" if origin else "DATED_ARCHIVE_REFERENCE"),
                    "attempt_run_id": attempt, "origin_run_id": origin[0] if origin else thesis.get("analysis_run_id")}
         row["research_plan"] = _plan(row, thesis, origin, lineage, archive, quotes.get(key), price_loader, now, days,
-                                     observation_clock)
+                                     observation_clock, (previous_closes or {}).get(key))

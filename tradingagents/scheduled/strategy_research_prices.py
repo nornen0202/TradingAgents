@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from datetime import date, datetime, timedelta, timezone
+from email.utils import parsedate_to_datetime
 import math
 import re
 from time import monotonic, sleep
@@ -87,7 +88,10 @@ def _rows(payload, market, start, end):
         if not isinstance(row, dict):
             continue
         try:
-            day = datetime.strptime(row[names[0]], "%Y%m%d").date()
+            token = row[names[0]]
+            if not isinstance(token, str) or not re.fullmatch(r"[0-9]{8}", token):
+                continue
+            day = datetime.strptime(token, "%Y%m%d").date()
             if not start <= day <= end:
                 continue
             opening, close, high, low, volume = (float(row[key]) for key in names[1:])
@@ -99,6 +103,15 @@ def _rows(payload, market, start, end):
             ambiguous.add(day)
         result[day] = {"price": close, "open": opening, "high": high, "low": low, "volume": volume}
     return {day: item for day, item in result.items() if day not in ambiguous}
+
+
+def _response_at(headers, received):
+    """HTTP Date is transport metadata. The daily bar has no source event timestamp."""
+    try:
+        stamp = parsedate_to_datetime(headers.get("Date", ""))
+    except (TypeError, ValueError, OverflowError):
+        return None
+    return stamp.isoformat() if stamp.tzinfo and stamp <= received else None
 
 
 class KisResearchCloses:
@@ -122,19 +135,29 @@ class KisResearchCloses:
 
     def _download(self, market, ticker, venue, start, end, adjusted):
         if monotonic() >= self.deadline:
-            return {}
+            return {}, {}
         sleep(max(0, self.next_request - monotonic()))
         self.next_request = monotonic() + 0.25
         if market == "KR":
             return self.client.domestic_daily_itemchartprice(ticker[:6], start_date=start, end_date=end,
-                market_division="J", period_division="D", adjusted_price="0" if adjusted else "1")
+                market_division="J", period_division="D", adjusted_price="0" if adjusted else "1"), {}
         symbol = kis_symbol(ticker)
-        payload, _ = self.client.request_json(method="GET", path="/uapi/overseas-price/v1/quotations/dailyprice",
+        payload, headers = self.client.request_json(method="GET", path="/uapi/overseas-price/v1/quotations/dailyprice",
             tr_id="HHDFS76240000", params={"AUTH": "", "EXCD": venue, "SYMB": symbol, "GUBN": "0",
                 "BYMD": end.strftime("%Y%m%d"), "MODP": "1" if adjusted else "0"})
         header = payload.get("output1") if isinstance(payload, dict) else None
         identity = header.get("rsym") if isinstance(header, dict) else None
-        return payload if identity == f"D{venue}{symbol}" else {}
+        return (payload, headers) if identity == f"D{venue}{symbol}" else ({}, {})
+
+    def _read(self, market, ticker, venue, start, end, *, adjusted=False):
+        from tradingagents.portfolio.kis import KisApiError
+
+        try:
+            payload, headers = self._download(market, ticker, venue, start, end, adjusted)
+        except (OSError, RuntimeError, ValueError, TypeError, KisApiError):
+            return {}, None, None
+        received = self.clock()
+        return _rows(payload, market, start, end), received, _response_at(headers or {}, received)
 
     def __call__(self, market, ticker, days, start, now, exchange=None):
         ticker_pattern = r"\d{6}(?:\.(?:KS|KQ))?" if market == "KR" else r"[A-Z][A-Z0-9.-]{0,14}"
@@ -144,28 +167,29 @@ class KisResearchCloses:
         if not completed:
             return {}
         end = max(completed)
-        from tradingagents.portfolio.kis import KisApiError
         venues = ("KRX",) if market == "KR" else tuple(dict.fromkeys(
             ([exchange] if exchange in {"NAS", "NYS", "AMS"} else []) + ["NAS", "NYS", "AMS"]))
         for venue in venues:
-            try:
-                raw = _rows(self._download(market, ticker, venue, start, end, False), market, start, end)
-            except (OSError, RuntimeError, ValueError, TypeError, KisApiError):
+            raw, received, response_at = self._read(market, ticker, venue, start, end)
+            if not raw.keys() & completed.keys():
                 continue
-            if not raw:
-                continue
-            received = self.clock()
-            try:
-                adjusted = _rows(self._download(market, ticker, venue, start, end, True), market, start, end)
-            except (OSError, RuntimeError, ValueError, TypeError, KisApiError):
-                adjusted = {}
-            basis_observed = self.clock() if adjusted else None
-            return {day: {**raw[day], "kind": "REGULAR_CLOSE", "source": "KIS",
+            adjusted, basis_observed, _ = self._read(market, ticker, venue, start, end, adjusted=True)
+            repeat, repeated, repeat_response_at = self._read(market, ticker, venue, start, end) if market == "US" else ({}, None, None)
+            records = {}
+            for day in sorted(raw.keys() & completed.keys()):
+                if received < completed[day] + _SETTLE:
+                    continue
+                record = {**raw[day], "kind": "REGULAR_CLOSE" if market == "KR" else "KIS_DAILY_CLOSE", "source": "KIS",
                           "session": day.isoformat(), "event_at": completed[day].isoformat(),
                           "observed_at": received.isoformat(), "currency": CURRENCIES[market], "exchange": venue,
-                          "adjustment": "unadjusted",
-                          "adjusted_close": (adjusted.get(day) or {}).get("price"),
-                          "adjustment_checked_at": basis_observed.isoformat() if basis_observed else None,
+                          "adjustment": "unadjusted", "adjusted_close": adjusted[day]["price"] if day in adjusted else None,
+                          "adjustment_checked_at": basis_observed.isoformat() if day in adjusted else None,
                           "adjustment_check": "FID_ORG_ADJ_PRC=0" if market == "KR" else "MODP=1"}
-                    for day in sorted(raw.keys() & completed.keys()) if received >= completed[day] + _SETTLE}
+                if market == "US":
+                    record["provider_response_at"] = response_at
+                    if day in repeat and repeated >= received:
+                        record["recheck"] = {"price": repeat[day]["price"], "observed_at": repeated.isoformat(),
+                                             "provider_response_at": repeat_response_at}
+                records[day] = record
+            return records
         return {}

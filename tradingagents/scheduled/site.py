@@ -52,6 +52,12 @@ def build_site(archive_dir: Path, site_dir: Path, settings: SiteSettings, *,
     print(f"Pages build: publishing {len(published_manifests)} of {len(manifests)} archived runs", flush=True)
     published_run_ids = {str(manifest.get("run_id") or "") for manifest in published_manifests}
 
+    refresh_research_prices = getattr(settings, "refresh_research_prices", False)
+    previous_closes = {}
+    if refresh_research_prices:
+        from tradingagents.scheduled.strategy_research import previous_us_closes
+
+        previous_closes = previous_us_closes(site_dir / "mobile" / "strategy.json")
     if site_dir.exists():
         shutil.rmtree(site_dir)
     (site_dir / "assets").mkdir(parents=True, exist_ok=True)
@@ -104,8 +110,9 @@ def build_site(archive_dir: Path, site_dir: Path, settings: SiteSettings, *,
         site_dir=site_dir,
         archive_dir=archive_dir,
         public_base_url=getattr(settings, "public_base_url", ""),
-        refresh_research_prices=getattr(settings, "refresh_research_prices", False),
+        refresh_research_prices=refresh_research_prices,
         as_of=strategy_as_of,
+        previous_closes=previous_closes,
     )
     from tradingagents.scheduled.ai_context import build_ai_context
 
