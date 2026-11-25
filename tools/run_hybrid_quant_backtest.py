@@ -40,9 +40,12 @@ def simulate_after_tax_walk_forward(
     decisions_by_date: Mapping[str, Mapping[str, Mapping[str, Any]]] | None = None,
     fill_timing: str = "legacy_close",
     audit_traces: dict | None = None,
+    entry_study=None,
 ) -> dict[str, Any]:
     if fill_timing not in {"legacy_close", "same_close", "next_open"}:
         raise ValueError("Unknown fill timing")
+    if entry_study is not None and (fill_timing != "next_open" or audit_traces is None or decisions_by_date):
+        raise ValueError("Entry comparison requires next-open traces with its own bound evidence")
     market = market.upper()
     currency = "KRW" if market == "KR" else "USD"
     initial_capital = 10_000_000.0 if market == "KR" else 10_000.0
@@ -109,6 +112,7 @@ def simulate_after_tax_walk_forward(
         pending = {}
         order_signal_day = None
         superseded = 0
+        account_marks, opportunities = [], []
 
         def queue_close_signal(index):
             nonlocal pending, order_signal_day, superseded
@@ -131,6 +135,8 @@ def simulate_after_tax_walk_forward(
                 proposal = evaluate_hybrid_portfolio_proposal(
                     policy, bars_by_ticker, analysis_as_of=f"{signal_day}T22:00:00+00:00", decisions=decisions)
                 targets = proposal["after_veto"]["weights"]
+                if mode in {"quant_breakout", "quant_breakout_veto"}:
+                    targets = entry_study.targets(signal_day, targets)
             superseded += len(pending)
             pending = {sym: targets.get(sym, 0.0) for sym in set(shares) | set(targets)}
             order_signal_day = signal_day
@@ -138,6 +144,9 @@ def simulate_after_tax_walk_forward(
                 signals[signal_day] = dict(targets)
 
         for step_idx, day in enumerate(eval_dates):
+            cost_before = total_fees_and_taxes
+            traded_notional = 0.0
+            turnover = 0.0
             year = day[:4]
             if year != current_year:
                 if market == "US" and annual_realized_gain > us_annual_deduction_usd:
@@ -181,6 +190,7 @@ def simulate_after_tax_walk_forward(
                     if diff < -nav * 0.01 and shares.get(sym, 0.0) > 0:
                         sell_qty = min(shares[sym], abs(diff) / px)
                         gross = sell_qty * px
+                        traded_notional += gross
                         is_kr_stock = market == "KR" and sym in {s.upper() for s in satellite_tickers}
                         sell_bps = fee_bps + (kr_stock_sell_tax_bps if is_kr_stock else 0.0)
                         cost = gross * (sell_bps / 10_000.0)
@@ -204,6 +214,12 @@ def simulate_after_tax_walk_forward(
                     tgt_val = nav * float(targets.get(sym, 0.0))
                     diff = tgt_val - cur_val
                     if diff > nav * 0.01 and cash > 0:
+                        if entry_study is not None:
+                            observation = entry_study.risk_at(order_signal_day, sym)
+                            blocked = mode == "quant_breakout_veto" and observation in {"STOP_LOSS", "EXIT"}
+                            opportunities.append((order_signal_day, day, sym, observation, blocked))
+                            if blocked:
+                                continue
                         spend = min(cash * 0.995, diff)
                         cost = spend * (fee_bps / 10_000.0)
                         buy_qty = max(0.0, (spend - cost) / px)
@@ -213,10 +229,13 @@ def simulate_after_tax_walk_forward(
                             shares[sym] = prev_qty + buy_qty
                             avg_cost[sym] = (prev_qty * prev_cost + buy_qty * px) / shares[sym]
                             cash -= spend
+                            traded_notional += buy_qty * px
                             total_fees_and_taxes += cost
                             trades_count += 1
                             if audit_traces is not None:
                                 fills.append((order_signal_day, day, sym, "buy", px))
+                if entry_study is not None:
+                    turnover = traded_notional / nav
 
             nav_eod = cash + sum(shares.get(t, 0.0) * price_lookup[t][day] for t in shares if day in price_lookup.get(t, {}))
             nav_curve.append(nav_eod)
@@ -224,17 +243,27 @@ def simulate_after_tax_walk_forward(
                 queue_close_signal(step_idx)
             if audit_traces is not None:
                 daily_fills.append(trades_count)
+            if entry_study is not None:
+                etfs = sum(shares.get(t, 0.0) * price_lookup[t][day] for t in policy_base["core"] if t in shares)
+                account_marks.append({"cash": cash, "etfs": etfs, "stocks": nav_eod - cash - etfs,
+                                      "turnover": turnover, "notional": traded_notional,
+                                      "cost": total_fees_and_taxes - cost_before})
 
         if market == "US" and annual_realized_gain > us_annual_deduction_usd:
             tax = (annual_realized_gain - us_annual_deduction_usd) * us_cap_gains_tax_rate
             nav_curve[-1] -= tax
             total_fees_and_taxes += tax
+            if entry_study is not None:
+                account_marks[-1]["cash"] -= tax
+                account_marks[-1]["cost"] += tax
 
         if audit_traces is not None:
             audit_traces[mode] = {"days": eval_dates, "nav": nav_curve, "cumulative_fills": daily_fills,
                                   "signals": signals, "fills": fills, "initial_nav": initial_capital,
                                   "missing_quotes": unavailable, "superseded": superseded,
                                   "pending_at_end": sorted(pending)}
+            if entry_study is not None:
+                audit_traces[mode].update(account_marks=account_marks, opportunities=opportunities)
         daily_rets = [right / left - 1.0 for left, right in zip(nav_curve[:-1], nav_curve[1:]) if left > 0]
         total_ret = (nav_curve[-1] / initial_capital - 1.0) * 100.0
         years = max(len(eval_dates) / 252.0, 1e-6)
@@ -265,7 +294,9 @@ def simulate_after_tax_walk_forward(
         "sessions": len(eval_dates),
         "strategies": {
             name: _run_variant(name)
-            for name in ("buy_and_hold", "static_80_20", "core_taa_only", "hybrid_core_satellite")
+            for name in (("buy_and_hold", "static_80_20", "hybrid_core_satellite", "quant_breakout", "quant_breakout_veto")
+                         if entry_study is not None else
+                         ("buy_and_hold", "static_80_20", "core_taa_only", "hybrid_core_satellite"))
         },
     }
 
