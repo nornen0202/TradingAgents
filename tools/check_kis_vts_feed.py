@@ -3,6 +3,7 @@ import argparse
 import asyncio
 from dataclasses import asdict
 from datetime import datetime, timezone
+from functools import partial
 import json
 import logging
 import os
@@ -61,12 +62,12 @@ async def _read_feed(clients, hts_ids, *, state, approval, attempts):
                 sleep=asyncio.sleep, attempts=attempts, idle_seconds=5, stop_after_recovery=True)
     except TimeoutError:
         raise ValueError("VTS notice observation did not complete before the deadline") from None
-    acknowledgements = [{"tr_id": _MARKETS[market][1], "rt_cd": "0"} for market in clients
-                        if result.verified_notice_sessions]
-    return asdict(result) | {"rest_order_inquiries": calls, "notice_acknowledgements": acknowledgements}
+    report = asdict(result)
+    controls = report.pop("notice_controls")
+    return report | {"rest_order_inquiries": calls, "notice_acknowledgements": list(controls)}
 
 
-def check(state, *, connect_to_broker=False, attempts=1):
+def check(state, *, connect_to_broker=False, attempts=1, verify_reconnect=False):
     result = {"mode": "KIS_DEMO", "rest_host": DEMO_HOST, "websocket_host": DEMO_WEBSOCKET,
               "order_notice_tr": {market: terms[1] for market, terms in _MARKETS.items()},
               "checked_at": datetime.now(timezone.utc).isoformat(), "real_orders_enabled": False,
@@ -75,7 +76,8 @@ def check(state, *, connect_to_broker=False, attempts=1):
     if re.fullmatch(r"[0-9a-f]{40}", revision):
         result["source_revision"] = revision
     common = get_api_key("KIS_DEMO_HTS_ID")
-    hts_ids = {"KR": common, "US": get_api_key("KIS_DEMO_US_HTS_ID") or common}
+    overseas = get_api_key("KIS_DEMO_US_HTS_ID")
+    hts_ids = {"KR": common, "US": overseas or common}
     result["hts_configured"] = {market: bool(value) for market, value in hts_ids.items()}
     if not connect_to_broker:
         if not all(hts_ids.values()):
@@ -86,6 +88,9 @@ def check(state, *, connect_to_broker=False, attempts=1):
         with (interprocess_file_lock(state / "strategy.lock", timeout=0),
               interprocess_file_lock(state.parent / "kis-validation/campaign.lock", timeout=0)):
             credentials = {"KR": DemoCredentials.from_local_settings(), "US": credentials_from_settings()}
+            if common and not overseas and credentials["KR"].scope() != credentials["US"].scope():
+                result["status"] = "US_DEMO_HTS_ID_REQUIRED_FOR_SEPARATE_ACCOUNT"
+                return result
             shared = credentials["KR"] == credentials["US"]
             kr = KisDemoClient(credentials["KR"])
             clients.append(kr)
@@ -105,13 +110,33 @@ def check(state, *, connect_to_broker=False, attempts=1):
             us = KisDemoUSReadClient(credentials["US"])
             clients.append(us)
             read_clients = {"KR": kr, "US": us}
+
+            def observe(scoped_clients, approval):
+                read = partial(_read_feed, scoped_clients, hts_ids, state=state, approval=approval, attempts=attempts)
+                first = asyncio.run(read())
+                if verify_reconnect and first["verified_notice_sessions"] > 0:
+                    try:
+                        first["reconnect"] = asyncio.run(read())
+                    except (DemoError, InvalidHandshake, OSError, ValueError):
+                        first["reconnect"] = {"status": "VTS_FEED_UNVERIFIED", "verified_notice_sessions": 0}
+                return first
+
+            def complete(row):
+                return row["verified_notice_sessions"] > 0 and (
+                    not verify_reconnect or row.get("reconnect", {}).get("verified_notice_sessions", 0) > 0)
+
             if shared:
-                result["feed"] = asyncio.run(_read_feed(read_clients, hts_ids, state=state, approval=approvals["KR"], attempts=attempts))
-                verified = result["feed"]["verified_notice_sessions"] > 0
+                result["feed"] = observe(read_clients, approvals["KR"])
+                verified = complete(result["feed"])
             else:
-                result["feed_by_market"] = {market: asyncio.run(_read_feed({market: client}, hts_ids, state=state,
-                    approval=approvals[market], attempts=attempts)) for market, client in read_clients.items()}
-                verified = all(row["verified_notice_sessions"] > 0 for row in result["feed_by_market"].values())
+                feeds = result["feed_by_market"] = {}
+                for market, client in read_clients.items():
+                    try:
+                        feeds[market] = observe({market: client}, approvals[market])
+                    except (DemoError, InvalidHandshake, OSError, ValueError):
+                        feeds[market] = {"verified_notice_sessions": 0, "notice_acknowledgements": [],
+                                         "status": "VTS_FEED_UNVERIFIED"}
+                verified = all(complete(row) for row in feeds.values())
             result["status"] = "SUBSCRIPTIONS_VERIFIED" if verified else "SUBSCRIPTIONS_UNVERIFIED"
     except TimeoutError:
         result["status"] = "BROKER_LANE_BUSY"
@@ -129,9 +154,13 @@ def main():
     parser.add_argument("--state-dir", type=Path, required=True, help="Existing strategy state directory")
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--connect", action="store_true")
+    parser.add_argument("--verify-reconnect", action="store_true",
+                        help="Close this probe's successful session and verify a new subscription plus REST lookup")
     parser.add_argument("--attempts", type=int, choices=range(1, 4), default=1)
     args = parser.parse_args()
-    result = check(args.state_dir, connect_to_broker=args.connect, attempts=args.attempts)
+    if args.verify_reconnect and not args.connect:
+        parser.error("--verify-reconnect requires --connect")
+    result = check(args.state_dir, connect_to_broker=args.connect, attempts=args.attempts, verify_reconnect=args.verify_reconnect)
     atomic_write_json(args.output, result)
     print(json.dumps(result, ensure_ascii=True))
     return 0 if result["status"] in {"READY_TO_PROBE", "SUBSCRIPTIONS_VERIFIED"} else 2

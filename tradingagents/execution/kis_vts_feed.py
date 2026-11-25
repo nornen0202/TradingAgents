@@ -36,7 +36,8 @@ class VtsScope:
     account: str = field(repr=False)
 
     def __post_init__(self):
-        if self.market not in _NOTICE or not re.fullmatch(r"[A-Za-z0-9_-]{1,32}", self.hts_id):
+        if (self.market not in _NOTICE or not isinstance(self.hts_id, str)
+                or len(self.hts_id) > 32 or not re.fullmatch(r"\$?[A-Za-z0-9_-]+", self.hts_id)):
             raise ValueError("Unsupported KIS VTS scope")
         if not re.fullmatch(r"[0-9]{8,10}", self.account):
             raise ValueError("Exact KIS VTS account field required")
@@ -62,6 +63,14 @@ class OrderHint:
     original_order_number: str | None = field(repr=False)
     received_at: datetime
     content_digest: str = field(repr=False)
+
+
+@dataclass(frozen=True)
+class NoticeControl:
+    tr_id: str
+    rt_cd: str
+    received_at: str
+    accepted: bool
 
 
 def subscription_plan(scopes, *, active_orders=(), held=(), watchlist=()):
@@ -103,12 +112,13 @@ class VtsFrameDecoder:
             raise ValueError("Invalid quote age policy")
         self._max_age = timedelta(seconds=quote_max_age_seconds)
         self._crypto: dict[str, tuple[bytes, bytes]] = {}
+        self.notice_controls: dict[tuple[str, str], NoticeControl] = {}
 
     @property
     def notices_active(self):
         return all(_NOTICE[market] in self._crypto for market in self._scopes)
 
-    def control(self, raw):
+    def control(self, raw, *, received_at=None):
         """Consume an ACK. Return true when the client must mirror a heartbeat."""
         if len(raw) > 32_768:
             raise ValueError("Oversized KIS VTS control frame")
@@ -119,14 +129,23 @@ class VtsFrameDecoder:
             return True
         if (report_type, header.get("tr_key")) not in self._plan:
             raise ValueError("Unexpected KIS VTS subscription acknowledgement")
-        if data["body"].get("rt_cd") != "0":
-            raise ValueError("KIS VTS subscription was not acknowledged")
+        code = data["body"].get("rt_cd")
         if report_type in _NOTICE.values():
+            if received_at is not None and (received_at.tzinfo is None or received_at.utcoffset() is None):
+                raise ValueError("Aware receive clock required")
+            if code != "0":
+                if code == "1" and received_at is not None:
+                    self.notice_controls.setdefault((report_type, code), NoticeControl(report_type, code, received_at.isoformat(), False))
+                raise ValueError("KIS VTS subscription was not acknowledged")
             output = data["body"]["output"]
             key, iv = output["key"].encode(), output["iv"].encode()
             if len(key) != 32 or len(iv) != 16:
                 raise ValueError("KIS VTS notice session key is invalid")
             self._crypto[report_type] = key, iv
+            if received_at is not None:
+                self.notice_controls.setdefault((report_type, code), NoticeControl(report_type, code, received_at.isoformat(), True))
+        elif code != "0":
+            raise ValueError("KIS VTS subscription was not acknowledged")
         return False
 
     def events(self, raw, received_at):
@@ -204,6 +223,8 @@ class FeedResult:
     delivered_quotes: int
     stopped: str = "RECONNECT_BUDGET_EXHAUSTED"
     verified_notice_sessions: int = 0
+    sockets_connected: int = 0
+    notice_controls: tuple[NoticeControl, ...] = ()
 
 
 class VtsSocket(Protocol):
@@ -233,7 +254,8 @@ async def run_event_feed(
         list(_quote_streams(((market, key),), {scope.market for scope in scopes}))
     hints_seen: OrderedDict[str, None] = OrderedDict()
     last_quote: dict[tuple[str, str], QuoteObservation] = {}
-    disconnects = hint_count = quote_count = verified = 0
+    disconnects = hint_count = quote_count = verified = connected = 0
+    notice_controls = []
     with interprocess_file_lock(lock_path, timeout=0):
         for attempt in range(attempts):
             if attempt:
@@ -246,6 +268,7 @@ async def run_event_feed(
                 if not isinstance(token, str) or not token.strip():
                     raise ValueError("Missing KIS VTS approval")
                 async with open_vts() as socket:
+                    connected += 1
                     for report_type, key in plan:
                         await socket.send(json.dumps({
                             "header": {"approval_key": token, "custtype": "P", "tr_type": "1",
@@ -259,7 +282,7 @@ async def run_event_feed(
                         except StopAsyncIteration:
                             break
                         if raw.startswith("{"):
-                            if decoder.control(raw):
+                            if decoder.control(raw, received_at=clock()):
                                 await socket.pong(raw.encode())
                             if recovered or not decoder.notices_active:
                                 continue
@@ -269,7 +292,10 @@ async def run_event_feed(
                             await resynchronize()
                             recovered = True
                             if stop_after_recovery:
-                                break
+                                notice_controls.extend(decoder.notice_controls.values())
+                                return FeedResult(attempt + 1, disconnects, hint_count, quote_count,
+                                                  stopped="PROBE_COMPLETED", verified_notice_sessions=verified,
+                                                  sockets_connected=connected, notice_controls=tuple(notice_controls))
                             events, pending_events = pending_events, []
                         else:
                             events = decoder.events(raw, clock())
@@ -298,9 +324,11 @@ async def run_event_feed(
                 # Inputs can contain account fields and session key material.
                 # Reconcile again on reconnect without retaining exception details.
                 pass
+            notice_controls.extend(decoder.notice_controls.values())
             disconnects += 1
         await resynchronize()
-    return FeedResult(attempts, disconnects, hint_count, quote_count, verified_notice_sessions=verified)
+    return FeedResult(attempts, disconnects, hint_count, quote_count, verified_notice_sessions=verified,
+                      sockets_connected=connected, notice_controls=tuple(notice_controls))
 
 
 def _advances_quote(previous, current):
