@@ -167,6 +167,32 @@ def test_lightweight_prior_reporting_run_is_complete_before_quote_window(tmp_pat
     assert _find_previous_comparable_manifest(archive_dir=tmp_path, current_manifest=current)["run_id"] == newer
 
 
+@pytest.mark.parametrize("finished_at", [None, "invalid", "2026-11-25T13:10:00", "2026-11-25T13:22:00+00:00"])
+def test_lightweight_prior_reporting_run_skips_unverifiable_completion(tmp_path, finished_at):
+    from tradingagents.scheduled.runner import _find_previous_comparable_manifest
+
+    current = {"run_id": "20261125T132000_current", "settings": {"market": "US"}}
+    as_of = datetime.fromisoformat("2026-11-25T13:20:00+00:00")
+
+    def find():
+        return _find_previous_comparable_manifest(archive_dir=tmp_path, current_manifest=current, available_at=as_of)
+
+    def store(run_id, completed):
+        run = tmp_path / "runs/2026" / run_id
+        run.mkdir(parents=True)
+        candidate = {"run_id": run_id, "settings": {"market": "US"}}
+        if completed is not None:
+            candidate["finished_at"] = completed
+        (run / "run.json").write_text(json.dumps(candidate), encoding="utf-8")
+
+    assert find() is None
+    store("20261125T131400_unverifiable", finished_at)
+    assert find() is None
+    valid = "20261125T130000_previous"
+    store(valid, "2026-11-25T13:05:00+00:00")
+    assert find()["run_id"] == valid
+
+
 def test_portfolio_reads_same_current_overlay_values_without_opening_update_again(tmp_path, monkeypatch):
     from tradingagents.portfolio.candidates import _load_analysis_by_ticker
 
