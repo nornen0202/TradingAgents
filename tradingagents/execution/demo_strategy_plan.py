@@ -46,10 +46,12 @@ def recheck_entry(source, candidate, market, quote, now):
     proof = _entry_proof(source, ticker, contract, {"decision_now": evidence["decision_now"]}, evidence["market_data_asof"], generated)
     if proof is None:
         breakout = contract.get("breakout_level")
-        low, high = contract.get("pullback_zone_low"), contract.get("pullback_zone_high")
-        declared = any(value is not None for value in (breakout, low, high))
-        if (declared and not ((breakout is not None and bid >= breakout)
-                or (low is not None and high is not None and low <= bid <= ask <= high))):
+        zone = contract.get("pullback_buy_zone")
+        declared = breakout is not None or zone is not None
+        intraday_breakout = (breakout is not None and bid >= breakout
+                            and contract.get("breakout_confirmation") in {None, "intraday_above"})
+        in_zone = isinstance(zone, dict) and zone.get("low") is not None and zone.get("high") is not None and zone["low"] <= bid <= ask <= zone["high"]
+        if declared and not (intraday_breakout or in_zone):
             raise ValueError("ENTRY_CURRENT_PRICE_NOT_CONFIRMED")
         if not declared and contract.get("entry_action_base") == "WAIT":
             raise ValueError("ENTRY_CURRENT_PRICE_NOT_CONFIRMED")

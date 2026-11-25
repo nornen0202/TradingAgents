@@ -483,6 +483,25 @@ def test_native_cohort_admission_rechecks_official_book_and_current_selection(cl
         assert h.orders == {}
 
 
+@pytest.mark.parametrize("outside", [False, True])
+def test_native_cli_reads_serialized_pullback_zone(cli, outside):
+    h = cli.h
+    source = cli.source("cohort-full", cohort=True)
+    cli.configure(candidate=False, daily=True, universe=True)
+    path = source / "tickers" / h.ticker / "execution_contract.json"
+    contract = read(path)
+    contract["breakout_level"] = None
+    contract["pullback_buy_zone"] = {"low": h.price * .99, "high": h.price * 1.01}
+    atomic_write_json(path, contract)
+    if outside:
+        h.price *= 1.02
+    result = cli.run("strategy-kis")
+    if outside:
+        assert result["blockers"] == ["ENTRY_CURRENT_PRICE_NOT_CONFIRMED"] and not h.orders
+    else:
+        assert result["orders"][0]["status"] == "ACKNOWLEDGED" and len(h.orders) == 1, result
+
+
 def test_daily_buy_revision_binds_existing_journal_and_caps_cost_after_restart(cli):
     h = cli.h
     h.price = APPROVED_CAPS[h.market] // 2

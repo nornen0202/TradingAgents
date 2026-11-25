@@ -38,7 +38,7 @@ def configured_limits(config):
         daily = config.get("native_daily_buy_limits")
         valid_daily = (json.dumps(daily, sort_keys=True) == json.dumps(APPROVED_CAPS, sort_keys=True)
                        if revision == DAILY_LIMIT_REVISION else "native_daily_buy_limits" not in config)
-        if (revision not in {APPROVED_LIMIT_REVISION, DAILY_LIMIT_REVISION} or not valid_daily
+        if (not isinstance(revision, str) or revision not in {APPROVED_LIMIT_REVISION, DAILY_LIMIT_REVISION} or not valid_daily
                 or config.get("mode") != "KIS_DEMO_STRATEGY"
                 or config.get("real_orders_enabled") is not False
                 or json.dumps(raw, sort_keys=True) != json.dumps({market: asdict(limits) for market, limits in expected.items()}, sort_keys=True)):
