@@ -96,6 +96,29 @@ def test_future_and_unverifiable_recommendations_do_not_request_prices(tmp_path,
     assert not result.price_coverage_complete
 
 
+def test_due_recommendations_preserve_ticker_order_after_sequential_archive_read(tmp_path):
+    db = tmp_path / "perf.sqlite"
+    initialize_action_tracker(db)
+    with sqlite3.connect(db) as conn:
+        conn.executemany(
+            "INSERT INTO action_recommendations(id,run_id,ticker,market,action,created_at,price_reference_json) "
+            "VALUES (?,'run',?,?,'WATCH',?,?)",
+            [
+                (1, "MSFT", "US", "2026-04-01T00:00:00Z", "{}"),
+                (2, "AAPL", "US", "2026-04-01T00:00:00Z", "{}"),
+                (3, "AAPL", "US", "2026-04-02T00:00:00Z", "{}"),
+                (4, "GOOG", "US", "2026-04-03T00:00:00Z", "{}"),
+                (5, "005930.KS", "KR", "2026-04-01T00:00:00Z", "{}"),
+                (6, "IBM", "US", "2026-04-01T00:00:00Z", None),
+            ],
+        )
+    tickers, records, _ = prices._recommendations_due_for_refresh(
+        db, market="US", asof_date="2026-04-02", refresh_window_days=5, require_verified_price=True,
+    )
+    assert tickers == ["AAPL", "MSFT"]
+    assert records == (2, 3, 1)
+
+
 @pytest.mark.parametrize('complete', [True, False])
 def test_runner_distinguishes_complete_and_partial_price_updates(tmp_path, monkeypatch, complete):
     config_path = tmp_path / 'config.toml'

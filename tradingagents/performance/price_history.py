@@ -254,7 +254,7 @@ def _recommendations_due_for_refresh(
                       AND substr(COALESCE(o.updated_at, ''), 1, 10) < ?
                     )
                   )
-                ORDER BY r.ticker
+                ORDER BY r.id
                 """,
                 (cutoff_date, VERIFIED_PRICE_CALCULATION_VERSION if require_verified_price else OUTCOME_CALCULATION_VERSION,
                  str(asof_date)[:10]),
@@ -265,7 +265,9 @@ def _recommendations_due_for_refresh(
     seen_recommendation_ids: set[int] = set()
     skipped = 0
     invalid_clock = 0
-    for row in rows:
+    # Read the wide recommendation records in row order on the archive disk.
+    # Preserve the previous ticker order once only the narrow result is in memory.
+    for row in sorted(rows, key=lambda item: (item[1] is not None, str(item[1]))):
         created_at = str(row[3] or "")
         try:
             known = timestamp(created_at if "T" in created_at else created_at + "T23:59:59.999999+00:00")
