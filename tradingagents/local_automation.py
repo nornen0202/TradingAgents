@@ -975,7 +975,8 @@ def main():
             return 0
         try:
             result = run_autotrader_tick(args.archive_dir, args.state_dir / "autotrader")
-            publish_autotrader_dashboard(args.archive_dir, site_dir=args.state_dir / "site", policy=policy)
+            if policy.mode == "shadow" and policy.enabled is True and not policy.kill_switch and not (args.state_dir / "autotrader" / "HALT").exists():
+                publish_autotrader_dashboard(args.archive_dir, site_dir=args.state_dir / "site", policy=policy)
         except TimeoutError:
             result = {"status": "AUTOTRADER_ALREADY_RUNNING", "mode": policy.mode}
         print(json.dumps(result, ensure_ascii=False))
