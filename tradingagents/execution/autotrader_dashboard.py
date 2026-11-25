@@ -16,11 +16,77 @@ from .prism_autotrader import (
 )
 
 
-def build_market_dashboard_payload(db_path: Path, market: str, policy: AutotraderPolicy) -> dict[str, Any]:
+def _overlay_vts_state(payload: dict[str, Any], state_dir: Path | None, market: str) -> dict[str, Any]:
+    if state_dir is None or payload.get("mode") != "kis_vts":
+        return payload
+    from contextlib import closing
+    import json
+    import sqlite3
+
+    market_lower = market.lower()
+    cand_path = Path(state_dir) / "autotrader" / f"{market_lower}-vts-candidates.json"
+    if not cand_path.is_file():
+        cand_path = Path(state_dir) / f"{market_lower}-vts-candidates.json"
+    if cand_path.is_file():
+        try:
+            receipt = json.loads(cand_path.read_text(encoding="utf-8-sig"))
+            entries = receipt.get("entries") or {}
+            queued = []
+            for ticker, row in sorted(entries.items(), key=lambda kv: -float((kv[1] or {}).get("score") or 0.0)):
+                ref = float(row.get("reference_price") or 0.0)
+                queued.append({
+                    "ticker": ticker,
+                    "display_name": ticker,
+                    "buy_score": float(row.get("score") or 0.0),
+                    "reference_price": ref,
+                    "max_entry_price": round(ref * 1.03, 4) if ref > 0 else 0.0,
+                    "stop_loss": float(row.get("stop_loss") or 0.0),
+                    "target_price": float(row.get("target_price") or 0.0),
+                })
+            payload["pending_entries"] = queued
+        except (OSError, ValueError, TypeError):
+            pass
+
+    journal_path = Path(state_dir) / "kis-strategy" / f"{market_lower}-strategy.sqlite"
+    if journal_path.is_file():
+        try:
+            from datetime import timezone
+            from .demo_runtime import summary as vts_summary
+            with closing(sqlite3.connect(journal_path.resolve().as_uri() + "?mode=ro", uri=True, timeout=2)) as db:
+                db.row_factory = sqlite3.Row
+                state = vts_summary(db, datetime.now(timezone.utc), market.upper(), order_limit=50)
+            owned = {t: q for t, q in (state.get("owned") or {}).items() if q > 0}
+            if owned and not payload["holdings"]:
+                payload["holdings"] = [
+                    {
+                        "ticker": t,
+                        "display_name": t,
+                        "quantity": int(q),
+                        "buy_price": 0.0,
+                        "current_price": 0.0,
+                        "target_price": 0.0,
+                        "stop_loss": 0.0,
+                        "runner_active": 0,
+                    }
+                    for t, q in sorted(owned.items())
+                ]
+                payload["account_summary"]["open_slots"] = len(owned)
+        except Exception:
+            pass
+    return payload
+
+
+def build_market_dashboard_payload(
+    db_path: Path,
+    market: str,
+    policy: AutotraderPolicy,
+    *,
+    state_dir: Path | None = None,
+) -> dict[str, Any]:
     initialize_autotrader_db(db_path, policy)
     metrics = compute_performance_metrics(db_path, market, policy.mode)
     promotion = evaluate_live_promotion_gate(db_path, market, min_vts_trades=policy.min_vts_trades_for_live)
-    return {
+    payload = {
         "schema": "tradingagents.autotrader-dashboard/v1",
         "updated_at": datetime.now(ZoneInfo("Asia/Seoul")).isoformat(),
         "market": market.upper(),
@@ -53,6 +119,7 @@ def build_market_dashboard_payload(db_path: Path, market: str, policy: Autotrade
         "trading_history": metrics["recent_trades"],
         "equity_curve": metrics["equity_curve"],
     }
+    return _overlay_vts_state(payload, state_dir, market)
 
 
 def render_autotrader_dashboard_html(kr: dict[str, Any], us: dict[str, Any]) -> str:
@@ -175,12 +242,13 @@ def publish_autotrader_dashboard(
     *,
     site_dir: Path | None = None,
     policy: AutotraderPolicy | None = None,
+    state_dir: Path | None = None,
 ) -> dict[str, Path]:
     archive_dir = Path(archive_dir)
     policy = policy or AutotraderPolicy()
     db_path = archive_dir / "paper" / "autotrader.sqlite"
-    kr = build_market_dashboard_payload(db_path, "KR", policy)
-    us = build_market_dashboard_payload(db_path, "US", policy)
+    kr = build_market_dashboard_payload(db_path, "KR", policy, state_dir=state_dir)
+    us = build_market_dashboard_payload(db_path, "US", policy, state_dir=state_dir)
     html_doc = render_autotrader_dashboard_html(kr, us)
 
     out_dir = archive_dir / "paper" / "dashboard"

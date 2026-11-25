@@ -2,7 +2,6 @@
 from contextlib import closing
 from collections import Counter
 from datetime import timedelta
-from pathlib import Path
 import sqlite3
 from zoneinfo import ZoneInfo
 
@@ -21,6 +20,8 @@ SOURCE_ARTIFACTS = ("decision_bundle_v2.json", "portfolio-private/portfolio_cand
 KIS_QUOTE_PROVIDERS = {"kis", "kis_quote", "kis_microstructure"}
 REFERENCE_SOURCES = {"KR": {"kis.domestic_time_itemchartprice", "kis.FHKST01010100.stck_prpr"},
                      "US": {"kis.overseas_time_itemchartprice"}}
+SOURCE_OBSERVATION_MAX_AGE = timedelta(seconds=360)
+MAX_OVERLAY_LINEAGE = max(MAX_LINEAGE, 512)
 
 
 def active(lane, policy):
@@ -40,23 +41,24 @@ def baseline(archive, source, market, now):
     cutoff = now
     expected = source.name
     current = source / "run.json"
-    for _ in range(MAX_LINEAGE):
+    for _ in range(MAX_OVERLAY_LINEAGE):
         if expected in seen:
             break
         seen.add(expected)
         manifest = _read(current)
         settings = manifest["settings"]
+        mode = settings.get("run_mode", "full")
         started, finished = instant(manifest["started_at"]), instant(manifest["finished_at"])
         if (manifest["run_id"] != expected or manifest["status"] != "success" or settings["market"].upper() != market
-                or started is None or finished is None or not started <= finished <= cutoff
-                or (manifest.get("active_universe") or {}).get("coverage", {}).get("complete") is not True):
+                or started is None or finished is None or not started <= finished <= cutoff):
+            break
+        if mode in {"full", "overlay_only"} and (manifest.get("active_universe") or {}).get("coverage", {}).get("complete") is not True:
             break
         rows = rows_by_ticker(manifest)
         tickers = rows.keys()
         if cohort is not None and cohort != tickers:
             break
         cohort = tickers
-        mode = settings.get("run_mode", "full")
         if mode == "full":
             if (_manifest_is_complete_overlay_baseline(manifest, market=market, requested_tickers=None,
                     required_holding_tickers=None, archive_dir=archive, now=now)
@@ -150,6 +152,8 @@ def _entries(research, regime, owned, policy, market, finished, now, source):
         if gate.allowed:
             entries[ticker] = {"reference_price": price, "score": gate.effective_score,
                                "slot_fraction": gate.slot_fraction if reference else None,
+                               "stop_loss": gate.stop_loss if reference else None,
+                               "target_price": gate.target_price if reference else None,
                                "requires_native_price": deferred}
         else:
             reasons[gate.reasons[0].split(":", 1)[0]] += 1
@@ -166,7 +170,7 @@ def _exit_price(row, opened, now):
     clock = instant(row.get("market_data_asof"))
     quality = row.get("quality") or {}
     price = _num(row.get("last_price"))
-    if (clock is not None and opened <= clock <= now < clock + timedelta(seconds=120)
+    if (clock is not None and opened <= clock <= now < clock + SOURCE_OBSERVATION_MAX_AGE
             and row.get("market_session") == "regular" and row.get("provider") in KIS_QUOTE_PROVIDERS
             and row.get("market_data_basis") == "EXECUTION_CONTEXT"
             and quality.get("generated_in_current_run") is True and quality.get("execution_ready") is True
@@ -349,9 +353,9 @@ def authorize(archive, lane, market, source, candidate, terms, quote, account, c
             reference = _reference(current_research[ticker], market, instant(_read(source / "run.json")["finished_at"]), source)
             reference_at = instant(reference.observed_at) if reference else None
             if (reference_at is None or not opened <= reference_at < received <= now
-                    or now >= reference_at + timedelta(seconds=120)):
+                    or now >= reference_at + SOURCE_OBSERVATION_MAX_AGE):
                 raise ValueError("Five-minute entry requires a current native research reference")
-            deadline = min(deadline, reference_at + timedelta(seconds=120))
+            deadline = min(deadline, reference_at + SOURCE_OBSERVATION_MAX_AGE)
         elif reference is None or reference.price != entry["reference_price"]:
             raise ValueError("Five-minute entry reference proof changed")
         held = [position for position in account["positions"] if position["quantity"] > 0]
@@ -370,10 +374,204 @@ def authorize(archive, lane, market, source, candidate, terms, quote, account, c
         lot = _single_share_lots(current["orders"]).get(ticker, {})
         matches_lot = lot.get("id") == exit_hint["lot"] and lot.get("average_fill_price") == evidence["entry"]
         if (receipt["execution_id"] != source.name or receipt["execution_sha256"] != digest(source / SOURCE_ARTIFACTS[0])
-                or hint_clock is None or not opened <= hint_clock <= now < hint_clock + timedelta(seconds=120)
+                or hint_clock is None or not opened <= hint_clock <= now < hint_clock + SOURCE_OBSERVATION_MAX_AGE
                 or current["owned"].get(ticker) != 1 or not matches_lot
                 or not risk_exit_reason(price=quote["bid"], policy=policy, **evidence)):
             raise ValueError("Five-minute exit lacks current native holdings or risk evidence")
-        deadline = min(deadline, hint_clock + timedelta(seconds=120))
+        deadline = min(deadline, hint_clock + SOURCE_OBSERVATION_MAX_AGE)
     return {"schema": SCHEMA, "baseline_id": root.parent.name, "produced_at": produced.isoformat(),
             "valid_until": deadline.isoformat(), "side": side}
+
+
+def recheck_bridged_entry(source, candidate, market, quote, now):
+    """Verify live top-of-book breakout or pullback support for a PRISM-queued conditional entry."""
+    import json
+    import math
+    from .demo_strategy_plan import _contract_digest
+    from .demo_validation import _at
+
+    ticker, evidence = candidate["ticker"], candidate["evidence"]
+    with (source / "tickers" / ticker / "execution_contract.json").open(encoding="utf-8-sig") as stream:
+        contract = json.load(stream)
+    if _contract_digest(contract) != evidence["contract_sha256"]:
+        raise ValueError("STRATEGY_LINEAGE_MISMATCH")
+    bid, ask = float(quote["bid"]), float(quote["ask"])
+    invalid = contract.get("invalid_if_intraday_below")
+    if invalid is not None and (type(invalid) not in {float, int} or not math.isfinite(invalid) or bid < invalid):
+        raise ValueError("ENTRY_CURRENT_INVALIDATION")
+    stop_loss = candidate.get("prism_stop_loss")
+    if stop_loss is not None and math.isfinite(float(stop_loss)) and bid <= float(stop_loss):
+        raise ValueError("ENTRY_CURRENT_INVALIDATION")
+    breakout = contract.get("breakout_level")
+    zone = contract.get("pullback_buy_zone")
+    declared = breakout is not None or zone is not None
+    intraday_breakout = breakout is not None and math.isfinite(float(breakout)) and bid >= float(breakout)
+    in_zone = (
+        isinstance(zone, dict)
+        and zone.get("low") is not None
+        and zone.get("high") is not None
+        and float(zone["low"]) <= bid <= ask <= float(zone["high"])
+    )
+    if declared and not (intraday_breakout or in_zone):
+        raise ValueError("ENTRY_CURRENT_PRICE_NOT_CONFIRMED")
+    if not declared and contract.get("entry_action_base") == "WAIT":
+        raise ValueError("ENTRY_CURRENT_PRICE_NOT_CONFIRMED")
+    return _at(candidate["signal"]["valid_until"])
+
+
+def supplement_native_signals(archive, lane, source, market, now, tickers, owned, existing_signals):
+    """Bridge verified 5-minute PRISM risk exits and conditional entries into the VTS native planner."""
+    import hashlib
+    import json
+    from .demo_strategy_plan import HARD_BUY_GATES, MODE, _contract_digest, _original_entry_research
+    from .demo_validation import _at
+    from tradingagents.dataflows.research_evidence import assess_tool_evidence, evidence_review_reason
+
+    info = {"bridged_exits": 0, "bridged_entries": 0}
+    policy = load_autotrader_policy(lane)
+    if not active(lane, policy):
+        return existing_signals, info
+    receipt = _receipt(lane, market)
+    produced = instant(receipt.get("produced_at"))
+    try:
+        root, finished = baseline(archive, source, market, now)
+    except Exception:
+        return existing_signals, info
+    if (receipt.get("transmission_halted") is not False or produced is None or not finished <= produced <= now
+            or receipt.get("baseline_id") != root.parent.name or receipt.get("baseline_sha256") != digest(root)
+            or receipt.get("research_sha256") != digest(root.parent / SOURCE_ARTIFACTS[1])):
+        return existing_signals, info
+
+    def read_src(rel):
+        return json.loads((source / rel).read_text(encoding="utf-8-sig"))
+
+    try:
+        manifest, bundle = read_src("run.json"), read_src("decision_bundle_v2.json")
+        generated = _at(bundle["generated_at"])
+        if (manifest.get("status") != "success" or str(bundle.get("market")).upper() != market
+                or not generated <= _at(manifest["finished_at"]) <= now
+                or (now - generated) >= timedelta(seconds=600)):
+            return existing_signals, info
+        research_list = read_src("portfolio-private/portfolio_candidates.json")["candidates"]
+        by_ticker = {c["instrument"]["canonical_ticker"]: c for c in research_list}
+        rows_by_sym = {r["ticker"]: r for r in bundle.get("strategy_table") or []}
+    except Exception:
+        return existing_signals, info
+
+    existing_pairs = {(s["ticker"], s["side"]) for s in existing_signals}
+    added = []
+
+    # 1. Protective Loop A/B Exits when decision_bundle_v2 kept HOLD/NONE
+    if receipt.get("execution_id") == source.name and receipt.get("execution_sha256") == digest(source / SOURCE_ARTIFACTS[0]):
+        for ticker, exit_hint in sorted((receipt.get("exits") or {}).items()):
+            if ticker not in tickers or owned.get(ticker, 0) != 1 or (ticker, "SELL") in existing_pairs:
+                continue
+            row = rows_by_sym.get(ticker) or {}
+            hint_clock = instant(exit_hint.get("observation"))
+            if hint_clock is None or not hint_clock <= generated <= now < hint_clock + SOURCE_OBSERVATION_MAX_AGE:
+                continue
+            try:
+                contract = read_src(f"tickers/{ticker}/execution_contract.json")
+                cdigest = _contract_digest(contract)
+                expiry = min(hint_clock + SOURCE_OBSERVATION_MAX_AGE, now + timedelta(seconds=120))
+                if now >= expiry:
+                    continue
+                exit_digest = hashlib.sha256(f"{exit_hint['lot']}|{cdigest}".encode()).hexdigest()
+                ident = f"strategy-prism-exit-v1:{market}:{ticker}:{exit_digest}"
+                sig = {"signal_id": ident, "ticker": ticker[:6] if market == "KR" else ticker,
+                       "decision_now": "EXIT_NOW", "execution_ready": True,
+                       "available_at": now.isoformat(), "valid_until": expiry.isoformat()}
+                added.append({"id": ident, "ticker": ticker, "side": "SELL", "signal": sig,
+                              "run_id": source.name, "allocation_mode": MODE, "prism_bridged_exit": True,
+                              "evidence": {"source_run_id": source.name, "contract_sha256": cdigest,
+                                           "decision_now": "EXIT_NOW", "market_data_asof": hint_clock.isoformat(),
+                                           "generated_at": generated.isoformat(), "allocation_mode": MODE,
+                                           "maximum_shares": 1, "real_account_allocation_used": False}})
+                existing_pairs.add((ticker, "SELL"))
+                info["bridged_exits"] += 1
+            except Exception:
+                continue
+
+    # 2. Queued Conditional Entries vetted by PRISM buy gate + research evidence
+    entry_expires = instant(receipt.get("entry_expires_at"))
+    if entry_expires is not None and produced <= now < entry_expires:
+        ordered_entries = sorted(
+            (receipt.get("entries") or {}).items(),
+            key=lambda kv: (-float((kv[1] or {}).get("score") or 0.0), kv[0]),
+        )
+        for ticker, entry_row in ordered_entries:
+            if ticker not in tickers or owned.get(ticker, 0) > 0 or (ticker, "BUY") in existing_pairs:
+                continue
+            row = rows_by_sym.get(ticker) or {}
+            quality = row.get("quality") or {}
+            try:
+                observed = _at(row.get("market_data_asof"))
+                if not (observed <= generated <= now < observed + SOURCE_OBSERVATION_MAX_AGE
+                        and quality.get("execution_ready") is True
+                        and quality.get("generated_in_current_run") is True
+                        and row.get("market_session") == "regular"):
+                    continue
+                contract = read_src(f"tickers/{ticker}/execution_contract.json")
+                update = read_src(f"tickers/{ticker}/execution_update.json")
+                if (contract.get("ticker") != ticker or update.get("ticker") != ticker
+                        or update.get("analysis_asof") != contract.get("analysis_asof")
+                        or _at(contract.get("analysis_asof")) > generated
+                        or _at(update.get("execution_asof")) > generated
+                        or _at(update.get("market_data_asof")) != observed):
+                    continue
+                research_row = by_ticker.get(ticker) or {}
+                analysis, structured = _original_entry_research(read_src, ticker, contract, generated, research_row)
+                conditional = structured["conditional_entry_action"]
+                expiry = min(observed + SOURCE_OBSERVATION_MAX_AGE, entry_expires)
+                if conditional in {"STARTER", "ADD"}:
+                    research_expiry = _at(structured.get("conditional_entry_valid_until"))
+                    if _at(contract.get("entry_valid_until")) != research_expiry:
+                        continue
+                    expiry = min(expiry, research_expiry)
+                elif now - _at(contract["analysis_asof"]) >= timedelta(hours=24):
+                    continue
+                health = research_row.get("data_health") or {}
+                if (research_row.get("review_required") is True or health.get("reanalysis_required") is True
+                        or set(research_row.get("gate_reasons") or []) & HARD_BUY_GATES
+                        or (research_row.get("buy_matrix") or {}).get("fail_reasons")):
+                    continue
+                coverage, vendor = research_row.get("data_coverage") or {}, research_row.get("vendor_health") or {}
+                original_telemetry = analysis.get("tool_telemetry") or {}
+                original_evidence = assess_tool_evidence(original_telemetry,
+                    started_at=analysis.get("started_at"), finished_at=analysis.get("finished_at"))
+                original_health = {"fallback_count": original_telemetry.get("fallback_count", 0)}
+                if original_evidence is not None or "request_evidence" in vendor:
+                    if original_evidence is None or original_evidence != vendor.get("request_evidence"):
+                        continue
+                    original_health["request_evidence"] = original_evidence
+                if (coverage.get("company_news_count", 0) < 1 or evidence_review_reason(vendor)
+                        or structured["data_coverage"]["company_news_count"] < 1
+                        or evidence_review_reason(original_health)
+                        or "no_tool_calls_detected" in (analysis.get("quality_flags") or [])
+                        or "no_tool_calls_detected" in (research_row.get("quality_flags") or [])):
+                    continue
+                if now >= expiry:
+                    continue
+                cdigest = _contract_digest(contract)
+                ident = f"strategy-prism-buy-v1:{market}:{ticker}:{cdigest}"
+                sig = {"signal_id": ident, "ticker": ticker[:6] if market == "KR" else ticker,
+                       "decision_now": "STARTER_NOW", "execution_ready": True,
+                       "available_at": now.isoformat(), "valid_until": expiry.isoformat()}
+                added.append({"id": ident, "ticker": ticker, "side": "BUY", "signal": sig,
+                              "run_id": source.name, "allocation_mode": MODE, "prism_bridged_entry": True,
+                              "prism_score": float(entry_row.get("score") or 0.0),
+                              "prism_stop_loss": entry_row.get("stop_loss"),
+                              "evidence": {"source_run_id": source.name, "contract_sha256": cdigest,
+                                           "decision_now": "STARTER_NOW", "market_data_asof": observed.isoformat(),
+                                           "generated_at": generated.isoformat(), "allocation_mode": MODE,
+                                           "maximum_shares": 1, "real_account_allocation_used": False}})
+                existing_pairs.add((ticker, "BUY"))
+                info["bridged_entries"] += 1
+            except Exception:
+                continue
+
+    combined = sorted(
+        [*existing_signals, *added],
+        key=lambda item: (item["side"] == "BUY", -float(item.get("prism_score") or 0.0), item["ticker"]),
+    )
+    return combined, info
