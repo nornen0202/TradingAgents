@@ -431,7 +431,12 @@ def summary(db, now, market, marks=None, *, historical=False, order_limit=100):
                 "observed_at": now.isoformat(), "mark_times": mark_times}}
 
 
-def _reconcile_existing(broker, *, market, now, regular, allow_cancel, clock):
+def _has_prism_admission(db, intent_id):
+    return db.execute("""SELECT 1 FROM strategy_source_evidence
+        WHERE id=? AND json_type(evidence,'$.prism_candidate')='object'""", (intent_id,)).fetchone() is not None
+
+
+def _reconcile_existing(broker, *, market, now, regular, allow_cancel, clock, candidate_halt=None):
     """Recover persisted attempts and reconcile against the original order date."""
     # The journal commits both wire intent and UNKNOWN before any broker call.
     # An interruption before that commit consumed the strategy ID but sent nothing.
@@ -446,19 +451,34 @@ def _reconcile_existing(broker, *, market, now, regular, allow_cancel, clock):
         WHERE state='PREPARED' AND NOT EXISTS (SELECT 1 FROM requests WHERE id=strategy_attempts.id)
         AND NOT EXISTS (SELECT 1 FROM intents WHERE id=strategy_attempts.id)
         AND NOT EXISTS (SELECT 1 FROM paper_intents WHERE id=strategy_attempts.id)""")
-    issues = []
+    issues, queried_dates = [], set()
     for order in summary(broker.db, at(clock()), market, order_limit=None)["orders"]:
         if order["status"] in TERMINAL and not (order["filled_quantity"] and order["average_fill_price"] is None):
             continue
         if order["status"] == "UNKNOWN":
             issues.append("AMBIGUOUS_ORDER")
+            # An order listing cannot bind a missing ACK to a local intent.
+            # Inspect the original date once per tick and keep quarantine.
+            if _has_prism_admission(broker.db, order["id"]) and broker.db.execute(
+                    """SELECT 1 FROM requests r JOIN intents i ON i.id=r.id
+                    WHERE r.id=? AND r.status='UNKNOWN'""",
+                    (order["id"],)).fetchone():
+                day = at(order["prepared_at"]).astimezone(ZoneInfo(ZONES[market])).strftime("%Y%m%d")
+                if day not in queried_dates:
+                    queried_dates.add(day)
+                    try:
+                        broker.client.orders(day)
+                    except Exception:
+                        issues.append("ORDER_REPORT_UNVERIFIED")
             continue
         try:
             report = broker.reconcile(intent_id=order["id"])
             if report.get("status") in {"OPEN", "PARTIAL"}:
+                halted_candidate = (candidate_halt is not None and candidate_halt.exists()
+                                    and _has_prism_admission(broker.db, order["id"]))
                 if at(order["prepared_at"]).astimezone(ZoneInfo(ZONES[market])).date() != now.astimezone(ZoneInfo(ZONES[market])).date():
                     issues.append("PREVIOUS_SESSION_ORDER_UNRESOLVED")
-                elif regular and (allow_cancel or at(clock()) - at(order["prepared_at"]) >= timedelta(minutes=5)):
+                elif regular and (allow_cancel or halted_candidate or at(clock()) - at(order["prepared_at"]) >= timedelta(minutes=5)):
                     broker.cancel(intent_id=order["id"])
             elif report.get("status") in {"UNKNOWN", "UNRESOLVED"}:
                 issues.append("AMBIGUOUS_ORDER")
@@ -468,7 +488,8 @@ def _reconcile_existing(broker, *, market, now, regular, allow_cancel, clock):
 
 
 def advance(archive, root, validation_root, market, *, clock, tickers, broker_factory, quote_loader, account_loader, session_resolver, gate,
-            allocation_mode="ARCHIVED_PROPOSALS", authorize=None, limits=None, v2_settings=None, policy_revision=None, benchmark_loader=None):
+            allocation_mode="ARCHIVED_PROPOSALS", authorize=None, limits=None, v2_settings=None, policy_revision=None, benchmark_loader=None,
+            prism_candidate_gate=False):
     now, path = at(clock()), root / f"{market.lower()}-strategy.sqlite"
     result = {"status": "WAITING_VALIDATION", "blockers": [], "gate_passed": False, "orders": [], "order_counts": {}, "performance": None}
     def finish(status, *blockers):
@@ -509,18 +530,26 @@ def advance(archive, root, validation_root, market, *, clock, tickers, broker_fa
                 issues = _reconcile_existing(broker, market=market, now=now, regular=False, allow_cancel=False, clock=clock)
                 result.update(summary(broker.db, at(clock()), market))
         return finish("MARKET_CLOSED", "MARKET_CLOSED", *sorted(set(issues)))
+    lane = root.parent / "autotrader"
     halted = (root / "HALT").exists() or (validation_root / "HALT").exists()
+    prism_halted = prism_candidate_gate and (lane / "HALT").exists()
     near_close = at(session["session_close"]) - now <= timedelta(minutes=10)
     marks = {}
     with broker_factory(market, path, clock, tickers, scope) as broker:
         initialize(broker.db)
+        if prism_candidate_gate:
+            broker.client.order_halt_paths = tuple(p / "HALT" for p in (root, validation_root, lane))
         if policy_revision is not None:
             result["native_policy_journal_bound"] = broker.db.execute(
                 "SELECT 1 FROM paper_policy_revisions WHERE scope=? AND revision=?", (scope, policy_revision),
             ).fetchone() is not None
         issues = _reconcile_existing(broker, market=market, now=now, regular=True,
-                                     allow_cancel=halted or near_close or not result["gate_passed"], clock=clock)
-        current = summary(broker.db, at(clock()), market)
+                                     allow_cancel=halted or near_close or not result["gate_passed"], clock=clock,
+                                     candidate_halt=lane / "HALT")
+        if prism_halted:
+            issues.append("PRISM_CANDIDATE_HALTED")
+        # Exit admission needs original lots even after many newer journal attempts.
+        current = summary(broker.db, at(clock()), market, order_limit=None if prism_candidate_gate else 100)
         pending = any(count for status, count in current["order_counts"].items() if status not in TERMINAL)
         holdings_verified = True
         held = next((ticker for ticker, qty in current["owned"].items() if qty), None)
@@ -538,9 +567,9 @@ def advance(archive, root, validation_root, market, *, clock, tickers, broker_fa
                 issues.append("STRATEGY_ACCOUNT_POSITION_UNVERIFIED")
         if has_unresolved_demo_requests(broker.db) or broker.db.execute("SELECT 1 FROM reconciliation_issues").fetchone():
             issues.append("AMBIGUOUS_ORDER")
-        source = (_latest_source(archive, market.lower(), at(clock()),
-                  required_artifacts=("decision_bundle_v2.json", "portfolio-private/portfolio_candidates.json"))
-                  if allocation_mode == demo_strategy_plan.MODE else _latest_source(archive, market.lower(), at(clock())))
+        required = (("decision_bundle_v2.json", "portfolio-private/portfolio_candidates.json")
+                    if allocation_mode == demo_strategy_plan.MODE else None)
+        source = None if prism_halted else _latest_source(archive, market.lower(), at(clock()), required_artifacts=required)
         try:
             result["source_diagnostics"] = diagnose_source(source, at(clock()),
                 include_proposals=allocation_mode != demo_strategy_plan.MODE)
@@ -550,8 +579,6 @@ def advance(archive, root, validation_root, market, *, clock, tickers, broker_fa
             else:
                 signals = candidates(source, market, at(clock()), tickers) if source else []
             if not signals and not pending and not issues and not halted and not near_close and result["gate_passed"]:
-                required = (("decision_bundle_v2.json", "portfolio-private/portfolio_candidates.json")
-                            if allocation_mode == demo_strategy_plan.MODE else None)
                 selected, handoff = await_completed_source(archive, root.parent, market, source, clock=clock,
                     selector=lambda archive, market, now: _latest_source(archive, market, now, required_artifacts=required))
                 if handoff is not None:
@@ -561,7 +588,7 @@ def advance(archive, root, validation_root, market, *, clock, tickers, broker_fa
                     if (session.get("source") != "exchange_calendars" or session.get("is_open") is not True
                             or session.get("phase") != "regular"
                             or not at(session["session_open"]) <= after_wait < at(session["session_close"])):
-                        result.update(current)
+                        result.update({**current, "orders": current["orders"][-100:]})
                         return finish("BLOCKED", "SESSION_ENDED_DURING_SOURCE_WAIT")
                     near_close = at(session["session_close"]) - after_wait <= timedelta(minutes=10)
                     try:
@@ -589,7 +616,7 @@ def advance(archive, root, validation_root, market, *, clock, tickers, broker_fa
             issues.append("HALTED")
         if near_close or at(clock()) - at(session["session_open"]) < timedelta(minutes=2):
             issues.append("SESSION_EDGE")
-        if not signals:
+        if not signals and not prism_halted:
             issues.extend(result.get("source_diagnostics", {}).get("blockers") or ["NO_FRESH_EXECUTABLE_STRATEGY"])
         today = at(clock()).astimezone(ZoneInfo(ZONES[market])).date()
         attempts_today = sum(at(row[0]).astimezone(ZoneInfo(ZONES[market])).date() == today
@@ -691,10 +718,34 @@ def advance(archive, root, validation_root, market, *, clock, tickers, broker_fa
                     if at(clock()) >= entry_deadline or (root / "HALT").exists() or (validation_root / "HALT").exists():
                         issues.append("STRATEGY_SIGNAL_EXPIRED_OR_HALTED_DURING_ADMISSION")
                         break
-                broker.db.execute("INSERT INTO strategy_attempts VALUES (?,?,?,?,?,?)", (candidate["id"], candidate["ticker"], candidate["run_id"], at(clock()).isoformat(), json.dumps(terms, sort_keys=True), "PREPARED"))
-                if source_evidence:
-                    broker.db.execute("INSERT INTO strategy_source_evidence VALUES (?,?)",
-                                      (candidate["id"], json.dumps(source_evidence, sort_keys=True)))
+                if prism_candidate_gate:
+                    from . import prism_candidate_runtime
+                    try:
+                        hint = prism_candidate_runtime.authorize(
+                            archive, lane, market, source, candidate, terms, quote, account, current, at(clock()), session,
+                        )
+                    except (OSError, ValueError, TypeError, KeyError, AttributeError, ArithmeticError, sqlite3.Error):
+                        issues.append("PRISM_CANDIDATE_NOT_ADMITTED")
+                        continue
+                    source_evidence = {**(source_evidence or {}), "prism_candidate": hint}
+                    entry_deadline = min(entry_deadline, at(hint["valid_until"]))
+                    if at(clock()) >= entry_deadline or any((p / "HALT").exists() for p in (root, validation_root, lane)):
+                        issues.append("STRATEGY_SIGNAL_EXPIRED_OR_HALTED_DURING_ADMISSION")
+                        break
+                    signal["valid_until"] = entry_deadline.isoformat()
+                broker.db.execute("SAVEPOINT strategy_prepare")
+                try:
+                    broker.db.execute("INSERT INTO strategy_attempts VALUES (?,?,?,?,?,?)", (
+                        candidate["id"], candidate["ticker"], candidate["run_id"], at(clock()).isoformat(),
+                        json.dumps(terms, sort_keys=True), "PREPARED"))
+                    if source_evidence:
+                        broker.db.execute("INSERT INTO strategy_source_evidence VALUES (?,?)",
+                                          (candidate["id"], json.dumps(source_evidence, sort_keys=True)))
+                    broker.db.execute("RELEASE SAVEPOINT strategy_prepare")
+                except BaseException:
+                    broker.db.execute("ROLLBACK TO SAVEPOINT strategy_prepare")
+                    broker.db.execute("RELEASE SAVEPOINT strategy_prepare")
+                    raise
                 try:
                     broker.submit(intent_id=candidate["id"], **terms, signal=signal, quote=quote, account=account)
                 except Exception as exc:
@@ -756,6 +807,10 @@ def tick(archive, root, validation_root, *, clock=None, broker_factory=None, quo
             raise ValueError("KIS V2 requires explicit native order limits")
         if allocation_mode not in {"ARCHIVED_PROPOSALS", demo_strategy_plan.MODE}:
             raise ValueError("INVALID_STRATEGY_ALLOCATION_MODE")
+        prism_candidate_gate = config.get("prism_candidate_gate", False) if enabled else False
+        if (type(prism_candidate_gate) is not bool or prism_candidate_gate and (
+                allocation_mode != demo_strategy_plan.MODE or set(market_limits) != set(ZONES) or policy_revision is None)):
+            raise ValueError("Five-minute candidates require normal VTS allocation and bound native limits")
         markets = {}
         for market in ZONES:
             if not enabled:
@@ -771,7 +826,8 @@ def tick(archive, root, validation_root, *, clock=None, broker_factory=None, quo
                     account_loader=account_loader or validation.current_account, session_resolver=session_resolver or _runtime_session,
                     gate=gate or validation_gate, allocation_mode=allocation_mode, authorize=authorize,
                     limits=market_limits.get(market), v2_settings=v2_settings.get(market), policy_revision=policy_revision,
-                    benchmark_loader=(benchmark_loader or current_v2_benchmark) if evidence_scope is None else benchmark_loader)
+                    benchmark_loader=(benchmark_loader or current_v2_benchmark) if evidence_scope is None else benchmark_loader,
+                    prism_candidate_gate=prism_candidate_gate)
             except Exception:
                 markets[market] = {"status": "BLOCKED", "checked_at": at(clock()).isoformat(), "gate_passed": False, "blockers": ["RUNTIME_EVIDENCE_UNVERIFIED"]}
         finished = at(clock())

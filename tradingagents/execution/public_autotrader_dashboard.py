@@ -2,6 +2,7 @@
 
 from contextlib import closing
 from datetime import datetime, timezone
+from hashlib import sha256
 import json
 from pathlib import Path
 import sqlite3
@@ -158,16 +159,19 @@ def _validated_public_json(raw: bytes, expected_market: str) -> dict:
     return data
 
 
-def verify_public_autotrader_files(paths: list[str], read_bytes: Callable[[str], bytes]) -> None:
-    """Verify the exact staged Git artifacts. Absence is an allowed publication."""
+def verify_public_autotrader_files(paths: list[str], read_bytes: Callable[[str], bytes]) -> dict[str, dict[str, str | int]]:
+    """Verify and fingerprint the exact artifacts. An absent dashboard is allowed."""
     if not paths:
-        return
+        return {}
     expected = [f"autotrader/{name}" for name in PUBLIC_FILES]
     if sorted(paths) != sorted(expected):
         raise ValueError("Unexpected autotrader publication paths")
     try:
-        kr, us = (_validated_public_json(read_bytes(path), market) for path, market in zip(expected[:2], MARKETS, strict=True))
-        if kr["generated_at"] != us["generated_at"] or read_bytes(expected[-1]) != _render_public_dashboard(kr, us):
+        contents = {path: read_bytes(path) for path in expected}
+        kr, us = (_validated_public_json(contents[path], market)
+                  for path, market in zip(expected[:2], MARKETS, strict=True))
+        if kr["generated_at"] != us["generated_at"] or contents[expected[-1]] != _render_public_dashboard(kr, us):
             raise ValueError("Unexpected autotrader publication HTML or generation")
     except (ValueError, TypeError):
         raise ValueError("Unsafe autotrader publication artifacts") from None
+    return {path: {"sha256": sha256(data).hexdigest(), "size": len(data)} for path, data in contents.items()}

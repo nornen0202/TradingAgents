@@ -535,69 +535,21 @@ def test_prism_autotrader_pit_filter_unknown_quarantine_and_sell_during_circuit_
     assert len(r_cb["exits_executed"]) == 1 and r_cb["exits_executed"][0]["ticker"] == "005930.KS"
     assert r_cb["entries_executed"] == []
 
-    # 3. Clear daily loss and simulate broker timeout -> OrderOutcomeUnknown quarantines further new BUYS
-    with sqlite3.connect(trader.db_path) as conn:
-        conn.execute("DELETE FROM autotrader_trades")
-
-    def flaky_broker(*args):
-        raise TimeoutError("simulated KIS network timeout")
-
-    flaky_trader = PrismAutoTrader(
-        archive, state,
-        policy=AutotraderPolicy(mode="kis_vts", enabled=True),
+    # Shadow positions never become native candidates or reach a broker callback.
+    trader = PrismAutoTrader(
+        archive, state, policy=AutotraderPolicy(mode="kis_vts", enabled=True),
         clock=lambda: now_kst,
-        session_resolver=lambda market, now_local: {"is_open": True, "phase": "regular"},
-        quote_loader=lambda market, ticker, now: quotes.get(ticker),
-        broker_executor=flaky_broker,
+        session_resolver=lambda **_: {"source": "exchange_calendars", "is_open": False, "phase": "closed"},
+        broker_executor=lambda *_: pytest.fail("VTS candidate producer must not submit"),
     )
-    r_unk1 = flaky_trader.tick_market("KR")
-    assert any(b.startswith("ORDER_OUTCOME_UNKNOWN:") for b in r_unk1["blockers"])
-    r_unk2 = flaky_trader.tick_market("KR")
-    assert "UNRESOLVED_UNKNOWN_ORDER" in r_unk2["blockers"]
-    assert r_unk2["entries_executed"] == []
+    result = trader.tick_market("KR")
+    assert result["blockers"] == ["VTS_CANDIDATE_SOURCE_UNVERIFIED"]
+    assert result["entries_executed"] == result["exits_executed"] == []
 
 
-def test_kis_vts_default_broker_executor_and_one_share_ceiling(monkeypatch):
-    from tradingagents.execution import kis_demo, kis_demo_us, prism_autotrader
+@pytest.mark.parametrize("mode", ["kis_vts", "kis_live"])
+def test_legacy_simulator_rejects_broker_modes(mode):
+    from tradingagents.execution.prism_autotrader import _default_broker_executor
 
-    calls = []
-
-    class FakeKrClient:
-        def __init__(self, creds):
-            pass
-
-        def _account(self):
-            return {"CANO": "50123456", "ACNT_PRDT_CD": "01"}
-
-        def request(self, method, endpoint, tr_id, *, body=None, **kw):
-            calls.append((method, endpoint, tr_id, body))
-            return {"rt_cd": "0", "output": {"ODNO": "0000123456"}}, {}
-
-        def close(self):
-            pass
-
-    class FakeUsClient:
-        def __init__(self, creds):
-            self.session = SimpleNamespace(close=lambda: None)
-
-        def _account(self):
-            return {"CANO": "50123456", "ACNT_PRDT_CD": "01"}
-
-        def request(self, method, endpoint, tr_id, *, body=None, **kw):
-            calls.append((method, endpoint, tr_id, body["OVRS_EXCG_CD"]))
-            if body["OVRS_EXCG_CD"] == "NASD":
-                return {"rt_cd": "1", "msg1": "wrong exchange"}, {}
-            return {"rt_cd": "0", "output": {"ODNO": "0000654321"}}, {}
-
-    monkeypatch.setattr(kis_demo.DemoCredentials, "from_local_settings", staticmethod(lambda: SimpleNamespace()))
-    monkeypatch.setattr(kis_demo, "KisDemoClient", FakeKrClient)
-    monkeypatch.setattr(kis_demo_us, "credentials_from_settings", lambda: SimpleNamespace())
-    monkeypatch.setattr(kis_demo_us, "KisDemoUSClient", FakeUsClient)
-
-    res_kr = prism_autotrader._default_broker_executor("kis_vts", "KR", "BUY", "003230.KS", 1, 1_302_000.0, NOW)
-    assert res_kr["accepted"] is True and res_kr["order_no"] == "0000123456"
-    assert calls[0][:3] == ("POST", "order-cash", "VTTC0012U")
-
-    res_us = prism_autotrader._default_broker_executor("kis_vts", "US", "BUY", "IBM", 2, 210.0, NOW)
-    assert res_us["accepted"] is True and res_us["order_no"] == "0000654321"
-    assert ("POST", "order", "VTTT1002U", "NYSE") in calls
+    with pytest.raises(ValueError, match="shadow lane"):
+        _default_broker_executor(mode, "KR", "BUY", "005930.KS", 1, 70_000, NOW)

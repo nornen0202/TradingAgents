@@ -14,6 +14,7 @@ import requests
 from .demo_secrets import DEMO_KEYS, load_demo_settings, storage_path
 from .kis_demo import (
     DEMO_HOST, DemoCredentials, DemoError, DemoNotSentError, _assert_no_http_retries, _pacer,
+    assert_order_not_halted,
 )
 
 PREFIX = "/uapi/overseas-stock/v1/trading/"
@@ -221,6 +222,8 @@ class KisDemoUSClient(KisDemoUSReadClient):
     Explicit US sell VTS ID follows the official API description/legacy example,
     not the newer sample's generic leading-character replacement (1006 != 1001).
     """
+    order_halt_paths = ()
+
     def _http(self, method, path, *, deadline=None, not_before=None, **kwargs):
         allowed = {("POST", "/oauth2/tokenP"),
                    *( ("GET", PREFIX + endpoint) for endpoint in
@@ -240,6 +243,8 @@ class KisDemoUSClient(KisDemoUSReadClient):
             from .paper import stamp
             if sent_at >= stamp(deadline):
                 raise DemoNotSentError("US VTS request deadline elapsed before sending")
+        if method == "POST" and path == PREFIX + "order":
+            assert_order_not_halted(self.order_halt_paths)
         try:
             response = self.session.request(method, DEMO_HOST + path, timeout=self.timeout,
                                            allow_redirects=False, **kwargs)

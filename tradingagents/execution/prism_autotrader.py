@@ -1,19 +1,11 @@
-"""PRISM-inspired 10-slot Paper / KIS VTS / KIS Live Auto-Trading Engine.
+"""PRISM-inspired shadow simulation and VTS candidate production.
 
 Implements the end-to-end execution architecture benchmarked from dragon1086/prism-insight:
 1. 10-slot account sizing with volatility/score micro-split (35%~85% of 1 slot) and sector cap (max 3).
 2. Deterministic regime-aware Buy Gate (effective score, reward:risk floor, max stop distance).
-3. Off-hours pending entry queue so EOD / pre-open analyses execute cleanly at the next regular session
-   instead of expiring after 120 seconds.
-4. LLM-free intraday protection loops:
-   - Loop A: Tier-1 Hard Stop (scenario stop_loss or -max_loss_pct)
-   - Loop B: Runner Hold (+20% winners trail -10% from peak / breakeven) + Target Profit + 30d Time Stop
-   - Loop C: Open-order reconciliation & bounded slippage guard (max +3% above trigger price)
-5. Three execution modes on one auditable SQLite ledger:
-   - 'shadow': local paper simulation with realistic fees, slippage, and KR sell tax
-   - 'kis_vts': real KIS VTS demo orders (openapivts.koreainvestment.com:29443)
-   - 'kis_live': KIS real-account orders, strictly gated by explicit opt-in, kill-switch,
-     daily loss circuit breaker, and VTS->LIVE promotion gate.
+3. Off-hours pending entries and deterministic stop/target/trailing exit suggestions.
+4. Only the existing normal strategy can submit and reconcile an order. This
+   module's shadow ledger is simulation evidence only.
 """
 from __future__ import annotations
 
@@ -23,11 +15,9 @@ from decimal import Decimal, ROUND_FLOOR
 import hashlib
 import json
 import math
-import os
 from pathlib import Path
 import sqlite3
 from typing import Any, Callable, Mapping
-import urllib.request
 from zoneinfo import ZoneInfo
 
 from tradingagents.atomic_io import atomic_write_json, interprocess_file_lock
@@ -407,51 +397,13 @@ def evaluate_live_promotion_gate(
     *,
     min_vts_trades: int = 20,
 ) -> dict[str, Any]:
-    """Verify whether KIS VTS burn-in metrics qualify for KIS Live promotion."""
-    market = market.upper()
-    if not db_path.is_file():
-        return {"eligible": False, "reason": "LEDGER_MISSING", "closed_vts_trades": 0}
-    with sqlite3.connect(db_path, timeout=20) as conn:
-        conn.row_factory = sqlite3.Row
-        trades = list(
-            conn.execute(
-                "SELECT return_pct, net_pnl FROM autotrader_trades WHERE market=? AND mode IN ('kis_vts', 'shadow')",
-                (market,),
-            )
-        )
-        unresolved = int(
-            conn.execute(
-                "SELECT COUNT(*) FROM autotrader_order_intents WHERE market=? AND status IN ('SUBMITTING', 'UNKNOWN')",
-                (market,),
-            ).fetchone()[0]
-            or 0
-        )
-    wins = [float(r["return_pct"]) for r in trades if float(r["return_pct"]) > 0]
-    losses = [float(r["return_pct"]) for r in trades if float(r["return_pct"]) <= 0]
-    avg_win = sum(wins) / len(wins) if wins else 0.0
-    avg_loss = sum(losses) / len(losses) if losses else 0.0
-    payoff = (avg_win / abs(avg_loss)) if avg_loss < 0 else (2.0 if wins else 0.0)
-    total_pnl = sum(float(r["net_pnl"]) for r in trades)
-    reasons: list[str] = []
-    if len(trades) < min_vts_trades:
-        reasons.append(f"insufficient_burn_in_trades:{len(trades)}<{min_vts_trades}")
-    if unresolved > 0:
-        reasons.append(f"unresolved_order_intents:{unresolved}")
-    if total_pnl <= 0:
-        reasons.append("non_positive_cumulative_net_pnl")
-    if payoff < 1.0:
-        reasons.append(f"payoff_ratio_below_1:{payoff:.2f}")
+    """Legacy simulator rows do not constitute reconciled VTS promotion evidence."""
     return {
-        "eligible": len(reasons) == 0,
-        "closed_burn_in_trades": len(trades),
+        "eligible": False,
+        "closed_vts_trades": 0,
+        "closed_burn_in_trades": 0,
         "required_trades": min_vts_trades,
-        "win_rate_pct": round((len(wins) / len(trades) * 100.0), 2) if trades else 0.0,
-        "avg_win_pct": round(avg_win, 2),
-        "avg_loss_pct": round(avg_loss, 2),
-        "payoff_ratio": round(payoff, 2),
-        "unresolved_orders": unresolved,
-        "cumulative_net_pnl": round(total_pnl, 2),
-        "blockers": reasons,
+        "blockers": ["LIVE_PROMOTION_GATE_BLOCKED", "NATIVE_VTS_SETTLEMENT_REVIEW_REQUIRED"],
     }
 
 
@@ -616,139 +568,34 @@ def _default_quote_loader(market: str, ticker: str, now: datetime) -> float | No
 
 
 def _default_broker_executor(mode: str, market: str, side: str, ticker: str, quantity: int, price: float, now: datetime) -> dict[str, Any]:
-    if mode == "shadow":
-        return {"accepted": True, "order_no": f"SHADOW-{market}-{int(now.timestamp())}", "fill_price": price}
-    if mode == "kis_vts":
-        from .kis_demo import DemoNotSentError
-        if market == "KR":
-            from .kis_demo import DemoCredentials, KisDemoClient
-            from .kis_paper import _tick
-            client = KisDemoClient(DemoCredentials.from_local_settings())
-            try:
-                tick = _tick(int(round(price)), "STOCK")
-                limit = int(math.ceil(price / tick) * tick) if side == "BUY" else int(math.floor(price / tick) * tick)
-                tr_id = "VTTC0012U" if side == "BUY" else "VTTC0011U"
-                body = {
-                    **client._account(),
-                    "PDNO": ticker[:6],
-                    "ORD_DVSN": "00",
-                    "ORD_QTY": str(int(quantity)),
-                    "ORD_UNPR": str(max(tick, limit)),
-                }
-                try:
-                    resp, _ = client.request("POST", "order-cash", tr_id, body=body)
-                except DemoNotSentError as exc:
-                    return {"accepted": False, "reason": str(exc)}
-                if str(resp.get("rt_cd")) != "0":
-                    return {"accepted": False, "reason": str(resp.get("msg1") or "VTS_ORDER_REJECTED")}
-                out = resp.get("output") or {}
-                return {"accepted": True, "order_no": str(out.get("ODNO") or out.get("odno") or "VTS-KR"), "fill_price": price}
-            finally:
-                client.close()
-        else:
-            from tradingagents.dataflows.intraday.us_symbols import kis_symbol
-            from .kis_demo_us import KisDemoUSClient, credentials_from_settings
-            client = KisDemoUSClient(credentials_from_settings())
-            try:
-                tr_id = "VTTT1002U" if side == "BUY" else "VTTT1001U"
-                limit_str = f"{max(1.0, round(price * (1.002 if side == 'BUY' else 0.998), 2)):.2f}"
-                pdno = kis_symbol(ticker)
-                for exch in ("NASD", "NYSE", "AMEX"):
-                    body = {
-                        **client._account(),
-                        "OVRS_EXCG_CD": exch,
-                        "PDNO": pdno,
-                        "ORD_QTY": str(int(quantity)),
-                        "OVRS_ORD_UNPR": limit_str,
-                        "CTAC_TLNO": "",
-                        "MGCO_APTM_ODNO": "",
-                        "ORD_SVR_DVSN_CD": "0",
-                        "SLL_TYPE": "00" if side == "SELL" else "",
-                        "ORD_DVSN": "00",
-                    }
-                    try:
-                        resp, _ = client.request("POST", "order", tr_id, body=body)
-                    except DemoNotSentError as exc:
-                        return {"accepted": False, "reason": str(exc)}
-                    if str(resp.get("rt_cd")) == "0":
-                        out = resp.get("output") or {}
-                        return {"accepted": True, "order_no": str(out.get("ODNO") or out.get("odno") or "VTS-US"), "fill_price": price}
-                return {"accepted": False, "reason": str(resp.get("msg1") or "US_VTS_ORDER_REJECTED")}
-            finally:
-                if hasattr(client, "close"):
-                    client.close()
-                elif hasattr(client, "session"):
-                    client.session.close()
-    if mode == "kis_live":
-        from tradingagents.portfolio.kis import KisClient
-        client = KisClient.from_api_keys(environment="real")
-        try:
-            acct_no = os.getenv("KIS_CANO", "").strip()
-            prdt_cd = os.getenv("KIS_ACNT_PRDT_CD", "01").strip()
-            if not acct_no:
-                raise RuntimeError("KIS_CANO is required for kis_live mode")
-            if market == "KR":
-                tr_id = "TTTC0012U" if side == "BUY" else "TTTC0011U"
-                body, _ = client.request_json(
-                    method="POST",
-                    path="/uapi/domestic-stock/v1/trading/order-cash",
-                    tr_id=tr_id,
-                    json_body={
-                        "CANO": acct_no,
-                        "ACNT_PRDT_CD": prdt_cd,
-                        "PDNO": ticker[:6],
-                        "ORD_DVSN": "01",
-                        "ORD_QTY": str(int(quantity)),
-                        "ORD_UNPR": "0",
-                    },
-                )
-            else:
-                tr_id = "TTTT1002U" if side == "BUY" else "TTTT1001U"
-                limit_str = f"{round(price * (1.003 if side == 'BUY' else 0.997), 2):.2f}"
-                body, _ = client.request_json(
-                    method="POST",
-                    path="/uapi/overseas-stock/v1/trading/order",
-                    tr_id=tr_id,
-                    json_body={
-                        "CANO": acct_no,
-                        "ACNT_PRDT_CD": prdt_cd,
-                        "OVRS_EXCG_CD": "NASD",
-                        "PDNO": ticker,
-                        "ORD_QTY": str(int(quantity)),
-                        "OVRS_ORD_UNPR": limit_str,
-                        "ORD_SVR_DVSN_CD": "0",
-                        "SLL_TYPE": "00" if side == "SELL" else "",
-                        "ORD_DVSN": "00",
-                    },
-                )
-            out = (body or {}).get("output") or {}
-            return {"accepted": True, "order_no": str(out.get("ODNO") or out.get("odno") or "LIVE"), "fill_price": price}
-        finally:
-            client.session.close()
-    raise ValueError(f"Unsupported execution mode: {mode}")
+    if mode != "shadow":
+        raise ValueError("Only the shadow lane can use the local fill simulator")
+    return {"accepted": True, "order_no": f"SHADOW-{market}-{int(now.timestamp())}", "fill_price": price}
 
 
-def _send_telegram_text(text: str) -> bool:
-    token = os.getenv("TELEGRAM_BOT_TOKEN", "").strip()
-    chat_id = os.getenv("TELEGRAM_CHAT_ID", "").strip() or os.getenv("TELEGRAM_CHANNEL_ID", "").strip()
-    if not token or not chat_id or os.getenv("PYTEST_CURRENT_TEST"):
-        return False
-    payload = json.dumps({"chat_id": chat_id, "text": text}).encode("utf-8")
-    req = urllib.request.Request(
-        f"https://api.telegram.org/bot{token}/sendMessage",
-        data=payload,
-        headers={"Content-Type": "application/json"},
-        method="POST",
-    )
-    try:
-        with urllib.request.urlopen(req, timeout=8) as resp:
-            return 200 <= resp.status < 300
-    except Exception:
-        return False
+def risk_exit_reason(*, price, entry, stop, target, peak, runner, days, risk, policy):
+    ret = (price - entry) / entry * 100.0
+    if price <= stop:
+        return f"손절가 도달 ({stop:,.2f})"
+    if ret <= -7.0:
+        return f"절대 손절 한도 도달 ({ret:.2f}%)"
+    if risk in {"STOP_LOSS", "EXIT"}:
+        return f"AI 리스크 청산 ({risk})"
+    if runner:
+        drawdown = (peak - price) / peak * 100.0
+        if price <= entry * 1.005:
+            return "주도주 본전 보호선 이탈"
+        if drawdown >= policy.runner_trail_drawdown_pct:
+            return f"주도주 고점 대비 -{drawdown:.1f}% 트레일링 청산"
+    elif price >= target:
+        return f"목표가 달성 ({target:,.2f})"
+    elif days >= policy.losing_time_stop_days and ret < 0:
+        return f"{days}일 보유 손실 시간청산 ({ret:.2f}%)"
+    return None
 
 
 class PrismAutoTrader:
-    """Unified PRISM-style Paper -> KIS VTS -> KIS Live Automated Trading Engine."""
+    """Local simulation or independent candidate generation."""
 
     def __init__(
         self,
@@ -769,9 +616,10 @@ class PrismAutoTrader:
         self.session_resolver = session_resolver or _default_session_resolver
         self.quote_loader = quote_loader or _default_quote_loader
         self.broker_executor = broker_executor or _default_broker_executor
-        self.telegram_sender = telegram_sender or _send_telegram_text
+        self.telegram_sender = telegram_sender
         self.db_path = self.archive_dir / "paper" / "autotrader.sqlite"
-        initialize_autotrader_db(self.db_path, self.policy)
+        if self.policy.mode == "shadow" and self.policy.enabled is True and not self.policy.kill_switch and not (self.state_dir / "HALT").exists():
+            initialize_autotrader_db(self.db_path, self.policy)
 
     def _now(self) -> datetime:
         at = instant(self.clock())
@@ -810,24 +658,18 @@ class PrismAutoTrader:
             "VALUES (?, ?, ?, ?, 0, ?)",
             (key, market, kind, message, now.isoformat()),
         )
-        if cur.rowcount and self.policy.telegram_enabled:
+        if cur.rowcount and self.policy.telegram_enabled and self.telegram_sender is not None:
             if self.telegram_sender(message):
                 conn.execute("UPDATE autotrader_notifications SET sent=1 WHERE delivery_key=?", (key,))
 
     def _check_mode_safety(self, market: str) -> tuple[bool, list[str]]:
         blockers: list[str] = []
-        if not self.policy.enabled:
+        if self.policy.enabled is not True:
             blockers.append("AUTOTRADER_DISABLED")
         if self.policy.kill_switch or (self.state_dir / "HALT").exists():
             blockers.append("KILL_SWITCH_ACTIVE")
         if self.policy.mode == "kis_live":
-            if not self.policy.live_orders_confirmed:
-                blockers.append("LIVE_ORDERS_NOT_CONFIRMED")
-            promo = evaluate_live_promotion_gate(
-                self.db_path, market, min_vts_trades=self.policy.min_vts_trades_for_live
-            )
-            if not promo["eligible"] and self.policy.live_promotion_override != "OPERATOR_CONFIRMED_LIVE":
-                blockers.append("LIVE_PROMOTION_GATE_BLOCKED")
+            blockers.append("LIVE_PROMOTION_GATE_BLOCKED")
         return len(blockers) == 0, blockers
 
     def tick_market(self, market: str) -> dict[str, Any]:
@@ -837,9 +679,22 @@ class PrismAutoTrader:
         now = self._now()
         zone = ZoneInfo(MARKET_ZONES[market])
         local_now = now.astimezone(zone)
-        session = self.session_resolver(market=market, now_local=now)
-        is_open = bool(session.get("is_open") and session.get("phase") == "regular")
         safe, blockers = self._check_mode_safety(market)
+        session = self.session_resolver(market=market, now_local=now) if safe else {}
+        is_open = bool(session.get("is_open") and session.get("phase") == "regular")
+
+        if not safe or self.policy.mode != "shadow":
+            receipt = {
+                "schema": AUTOTRADER_SCHEMA, "market": market, "mode": self.policy.mode,
+                "live_orders_enabled": False, "checked_at": now.isoformat(), "session_open": is_open,
+                "source_run_id": None, "blockers": blockers, "entries_queued": [],
+                "entries_executed": [], "exits_executed": [],
+            }
+            if safe and self.policy.mode == "kis_vts":
+                from .prism_candidate_runtime import produce
+                receipt.update(produce(self.archive_dir, self.state_dir, market, now, session, self.policy))
+            atomic_write_json(self.state_dir / f"autotrader-{market.lower()}-status.json", receipt)
+            return receipt
 
         exits_executed: list[dict[str, Any]] = []
         entries_executed: list[dict[str, Any]] = []
@@ -898,27 +753,14 @@ class PrismAutoTrader:
 
                 curr = float(pos["current_price"])
                 buy_p = float(pos["buy_price"])
-                ret_pct = (curr - buy_p) / buy_p * 100.0
                 opened_dt = instant(pos["opened_at"]) or now
                 holding_days = max(0, (local_now.date() - opened_dt.astimezone(zone).date()).days)
 
-                exit_reason: str | None = None
-                if curr <= float(pos["stop_loss"]):
-                    exit_reason = f"손절가 도달 ({pos['stop_loss']:,.2f})"
-                elif ret_pct <= -7.0:
-                    exit_reason = f"절대 손절 한도 도달 ({ret_pct:.2f}%)"
-                elif risk_veto_map.get(ticker.upper()) in {"STOP_LOSS", "EXIT"}:
-                    exit_reason = f"AI 리스크 청산 ({risk_veto_map[ticker.upper()]})"
-                elif int(pos["runner_active"]):
-                    drawdown_from_peak = (float(pos["peak_price"]) - curr) / float(pos["peak_price"]) * 100.0
-                    if curr <= buy_p * 1.005:
-                        exit_reason = "주도주 본전 보호선 이탈"
-                    elif drawdown_from_peak >= self.policy.runner_trail_drawdown_pct:
-                        exit_reason = f"주도주 고점 대비 -{drawdown_from_peak:.1f}% 트레일링 청산"
-                elif curr >= float(pos["target_price"]):
-                    exit_reason = f"목표가 달성 ({pos['target_price']:,.2f})"
-                elif holding_days >= self.policy.losing_time_stop_days and ret_pct < 0:
-                    exit_reason = f"{holding_days}일 보유 손실 시간청산 ({ret_pct:.2f}%)"
+                exit_reason = risk_exit_reason(
+                    price=curr, entry=buy_p, stop=float(pos["stop_loss"]), target=float(pos["target_price"]),
+                    peak=float(pos["peak_price"]), runner=bool(pos["runner_active"]), days=holding_days,
+                    risk=risk_veto_map.get(ticker.upper()), policy=self.policy,
+                )
 
                 if exit_reason:
                     sell_intent_id = hashlib.sha256(
@@ -1207,7 +1049,7 @@ class PrismAutoTrader:
             "schema": AUTOTRADER_SCHEMA,
             "market": market,
             "mode": self.policy.mode,
-            "live_orders_enabled": self.policy.mode == "kis_live" and safe,
+            "live_orders_enabled": False,
             "checked_at": now.isoformat(),
             "session_open": is_open,
             "source_run_id": source_run_id or None,
