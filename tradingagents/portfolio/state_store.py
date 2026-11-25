@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import math
+from concurrent.futures import ThreadPoolExecutor
 from decimal import Decimal, ROUND_FLOOR
 from datetime import datetime, timezone
 from pathlib import Path
@@ -29,6 +30,7 @@ def save_portfolio_outputs(
     summary_image_artifacts: dict[str, str] | None = None,
     external_signal_artifacts: dict[str, str] | None = None,
     external_reconciliation: dict[str, Any] | None = None,
+    parallel_report_writes: bool = False,
 ) -> dict[str, str]:
     private_dir.mkdir(parents=True, exist_ok=True)
 
@@ -51,57 +53,66 @@ def save_portfolio_outputs(
     live_downgrade_path = private_dir / "live_downgrade_candidates.json"
     risk_action_delta_path = private_dir / "risk_action_delta.md"
 
-    _write_json(account_snapshot_path, snapshot.to_dict())
-    account_review = review_market_views(
-        {"현재 조회 범위": snapshot.to_dict()}, now=datetime.now(timezone.utc)
-    )
-    _write_json(account_review_path, account_review)
-    account_review_markdown_path.write_text(render_account_review(account_review), encoding="utf-8")
-    _write_json(candidates_path, {"candidates": [candidate.to_dict() for candidate in candidates]})
-    _write_json(semantic_verdicts_path, {"verdicts": semantic_verdicts})
+    snapshot_payload = snapshot.to_dict()
+    candidate_payloads = [candidate.to_dict() for candidate in candidates]
+    _write_json(account_snapshot_path, snapshot_payload)
+    _write_json(candidates_path, {"candidates": candidate_payloads})
     _write_json(report_path, recommendation.to_dict())
-    report_markdown_path.write_text(portfolio_report_markdown, encoding="utf-8")
-    _write_json(action_judge_path, action_judge_payload)
-    _write_json(report_writer_path, report_writer_payload)
     _write_json(proposed_orders_path, {"orders": _build_proposed_orders(snapshot, recommendation)})
-    _write_json(action_lift_path, recommendation.action_lift_audit or {})
-    _write_json(portfolio_action_lift_path, recommendation.action_lift_audit or {})
-    _write_json(funding_plan_path, recommendation.funding_plan or {})
-    _write_json(would_buy_path, {"candidates": (recommendation.funding_plan or {}).get("would_buy_if_funded") or []})
-    _write_json(would_trim_path, {"candidates": (recommendation.funding_plan or {}).get("trim_first_candidates") or []})
-    _write_json(live_downgrade_path, {"candidates": live_sell_side_delta or []})
-    risk_action_delta_path.write_text(risk_action_delta_markdown or "# Risk Action Delta\n\n- Not available.", encoding="utf-8")
-    _write_json(
-        audit_path,
-        {
-            "snapshot_id": snapshot.snapshot_id,
-            "snapshot_health": snapshot.snapshot_health,
-            "account_value_krw": snapshot.account_value_krw,
-            "cash_diagnostics": snapshot.cash_diagnostics,
-            "decision_distribution": batch_metrics.get("decision_distribution") or {},
-            "legacy_rating_distribution": batch_metrics.get("legacy_rating_distribution")
-            or batch_metrics.get("decision_distribution")
-            or {},
-            "stance_distribution": batch_metrics.get("stance_distribution") or {},
-            "entry_action_distribution": batch_metrics.get("entry_action_distribution") or {},
-            "translated_action_distribution": batch_metrics.get("translated_action_distribution")
-            or _translated_action_distribution(recommendation),
-            "sell_side_distribution": _sell_side_distribution(recommendation),
-            "sell_side_calibration_warnings": _sell_side_calibration_warnings(
-                recommendation=recommendation,
-                batch_metrics=batch_metrics,
-                warnings=warnings,
-            ),
-            "portfolio_summary_counts": recommendation.data_health_summary,
-            "action_lift_audit": recommendation.action_lift_audit or {},
-            "warnings": list(warnings),
-            "semantic_verdicts": semantic_verdicts,
-            "action_judge": action_judge_payload,
-            "report_writer": report_writer_payload,
-            "external_reconciliation": external_reconciliation,
-            "candidates": [candidate.to_dict() for candidate in candidates],
-            "actions": [action.to_dict() for action in recommendation.actions],
+
+    account_review = review_market_views(
+        {"현재 조회 범위": snapshot_payload}, now=datetime.now(timezone.utc)
+    )
+    funding_plan = recommendation.funding_plan or {}
+    audit = {
+        "snapshot_id": snapshot.snapshot_id,
+        "snapshot_health": snapshot.snapshot_health,
+        "account_value_krw": snapshot.account_value_krw,
+        "cash_diagnostics": snapshot.cash_diagnostics,
+        "decision_distribution": batch_metrics.get("decision_distribution") or {},
+        "legacy_rating_distribution": batch_metrics.get("legacy_rating_distribution")
+        or batch_metrics.get("decision_distribution")
+        or {},
+        "stance_distribution": batch_metrics.get("stance_distribution") or {},
+        "entry_action_distribution": batch_metrics.get("entry_action_distribution") or {},
+        "translated_action_distribution": batch_metrics.get("translated_action_distribution")
+        or _translated_action_distribution(recommendation),
+        "sell_side_distribution": _sell_side_distribution(recommendation),
+        "sell_side_calibration_warnings": _sell_side_calibration_warnings(
+            recommendation=recommendation,
+            batch_metrics=batch_metrics,
+            warnings=warnings,
+        ),
+        "portfolio_summary_counts": recommendation.data_health_summary,
+        "action_lift_audit": recommendation.action_lift_audit or {},
+        "warnings": list(warnings),
+        "semantic_verdicts": semantic_verdicts,
+        "action_judge": action_judge_payload,
+        "report_writer": report_writer_payload,
+        "external_reconciliation": external_reconciliation,
+        "candidates": candidate_payloads,
+        "actions": [action.to_dict() for action in recommendation.actions],
+    }
+    _save_report_artifacts(
+        json_outputs={
+            account_review_path: account_review,
+            semantic_verdicts_path: {"verdicts": semantic_verdicts},
+            action_judge_path: action_judge_payload,
+            report_writer_path: report_writer_payload,
+            action_lift_path: recommendation.action_lift_audit or {},
+            portfolio_action_lift_path: recommendation.action_lift_audit or {},
+            funding_plan_path: funding_plan,
+            would_buy_path: {"candidates": funding_plan.get("would_buy_if_funded") or []},
+            would_trim_path: {"candidates": funding_plan.get("trim_first_candidates") or []},
+            live_downgrade_path: {"candidates": live_sell_side_delta or []},
+            audit_path: audit,
         },
+        text_outputs={
+            account_review_markdown_path: render_account_review(account_review),
+            report_markdown_path: portfolio_report_markdown,
+            risk_action_delta_path: risk_action_delta_markdown or "# Risk Action Delta\n\n- Not available.",
+        },
+        parallel=parallel_report_writes,
     )
     artifacts = {
         "account_snapshot_json": account_snapshot_path.as_posix(),
@@ -126,6 +137,24 @@ def save_portfolio_outputs(
     artifacts.update(summary_image_artifacts or {})
     artifacts.update(external_signal_artifacts or {})
     return artifacts
+
+
+def _save_report_artifacts(*, json_outputs, text_outputs, parallel):
+    if not parallel:
+        for path, payload in json_outputs.items():
+            _write_json(path, payload)
+        for path, markdown in text_outputs.items():
+            path.write_text(markdown, encoding="utf-8")
+        return
+
+    # Every report owns a distinct path. Wait for all writes before the caller
+    # publishes the portfolio status and coherent run manifest.
+    with ThreadPoolExecutor(max_workers=3, thread_name_prefix="portfolio-report") as writer:
+        writes = [writer.submit(_write_json, path, payload) for path, payload in json_outputs.items()]
+        writes.extend(writer.submit(path.write_text, markdown, encoding="utf-8")
+                      for path, markdown in text_outputs.items())
+        for write in writes:
+            write.result()
 
 
 def _translated_action_distribution(recommendation: PortfolioRecommendation) -> dict[str, int]:

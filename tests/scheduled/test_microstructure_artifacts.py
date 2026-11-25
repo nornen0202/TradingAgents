@@ -105,14 +105,16 @@ def test_lightweight_writes_ready_snapshot_before_other_provider_finishes(tmp_pa
 def test_portfolio_reads_same_current_overlay_values_without_opening_update_again(tmp_path, monkeypatch):
     from tradingagents.portfolio.candidates import _load_analysis_by_ticker
 
-    analysis = tmp_path / "analysis.json"
-    update = tmp_path / "execution_update.json"
+    ticker_dir = tmp_path / "tickers" / "AAPL"
+    ticker_dir.mkdir(parents=True)
+    analysis = ticker_dir / "analysis.json"
+    update = ticker_dir / "execution_update.json"
     current = {"ticker": "AAPL", "market_data_asof": "2026-10-19T14:00:00Z",
                "source": {"published_in_run_id": "full-overlay", "generated_in_current_run": True}}
     analysis.write_text(json.dumps({"ticker": "AAPL"}), encoding="utf-8")
     update.write_text(json.dumps(current), encoding="utf-8")
     manifest = {"run_id": "full-overlay", "tickers": [{"status": "success", "ticker": "AAPL",
-        "artifacts": {"analysis_json": "analysis.json", "execution_update_json": "execution_update.json"},
+        "artifacts": {"analysis_json": "tickers/AAPL/analysis.json", "execution_update_json": "tickers/AAPL/execution_update.json"},
         "execution_update": current}]}
     expected = _load_analysis_by_ticker(tmp_path, manifest)
     reads = []
@@ -130,6 +132,13 @@ def test_portfolio_reads_same_current_overlay_values_without_opening_update_agai
     reads.clear()
     assert _load_analysis_by_ticker(tmp_path, manifest, current_execution_updates={"AAPL": dict(current)}) == expected
     assert reads == [analysis, update]
+
+    archive = ticker_dir / "archived_execution_update.json"
+    archive.write_text(json.dumps({**current, "market_data_asof": "2026-10-19T13:59:00Z"}), encoding="utf-8")
+    manifest["tickers"][0]["artifacts"]["execution_update_json"] = "tickers/AAPL/archived_execution_update.json"
+    assert _load_analysis_by_ticker(tmp_path, manifest, current_execution_updates={"AAPL": current})["AAPL"][
+        "execution_update"
+    ]["market_data_asof"] == "2026-10-19T13:59:00Z"
 
 
 @pytest.mark.parametrize("lightweight", [False, True])

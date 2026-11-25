@@ -72,11 +72,12 @@ def run_portfolio_pipeline(
 
     try:
         mark("snapshot_fetch_started_at")
-        snapshot = load_snapshot_for_profile(profile, parallel_read=True) if phase_clock is not None else load_snapshot_for_profile(profile)
+        snapshot = load_snapshot_for_profile(profile)
         mark("snapshot_fetch_returned_at")
         if profile.capital_policy_enabled:
             from .capital_policy import apply_snapshot_policy
             snapshot = apply_snapshot_policy(snapshot, now=datetime.fromisoformat(str(manifest["started_at"]).replace("Z", "+00:00")))
+        mark("snapshot_policy_returned_at")
         candidates, candidate_warnings = build_portfolio_candidates(
             snapshot=snapshot,
             run_dir=run_dir,
@@ -85,6 +86,7 @@ def run_portfolio_pipeline(
             profile=profile,
             **({"current_execution_updates": current_execution_updates} if current_execution_updates is not None else {}),
         )
+        mark("candidate_inputs_returned_at")
         prism_ingestion = _load_prism_ingestion(external_data_settings)
         candidates = enrich_candidates_with_prism(
             candidates,
@@ -100,6 +102,7 @@ def run_portfolio_pipeline(
             llm_settings=llm_settings,
             portfolio_settings=portfolio_settings,
         )
+        mark("semantic_verdicts_returned_at")
         all_warnings = (
             list(manifest.get("warnings") or [])
             + list(candidate_warnings)
@@ -179,6 +182,7 @@ def run_portfolio_pipeline(
             llm_settings=llm_settings,
             enabled=bool(getattr(portfolio_settings, "report_polisher_enabled", True)),
         )
+        mark("report_writer_returned_at")
         summary_image_artifacts = generate_summary_image_artifacts(
             private_dir=private_dir,
             snapshot=snapshot,
@@ -206,7 +210,9 @@ def run_portfolio_pipeline(
             summary_image_artifacts=summary_image_artifacts,
             external_signal_artifacts=external_signal_context.get("artifacts") or {},
             external_reconciliation=external_signal_context.get("reconciliation"),
+            **({"parallel_report_writes": True} if phase_clock is not None else {}),
         )
+        mark("portfolio_artifacts_saved_at")
         account_performance_status = _build_account_performance_status(
             private_dir=private_dir,
             run_dir=run_dir,
@@ -335,7 +341,7 @@ def _build_account_performance_status(
         }
 
 
-def load_snapshot_for_profile(profile, *, parallel_read=False) -> Any:
+def load_snapshot_for_profile(profile) -> Any:
     if profile.broker == "manual":
         if not profile.manual_snapshot_path:
             raise PortfolioConfigurationError("manual broker profile requires manual_snapshot_path.")
@@ -346,8 +352,7 @@ def load_snapshot_for_profile(profile, *, parallel_read=False) -> Any:
         return _load_watchlist_only_snapshot(profile)
     if profile.broker == "kis":
         try:
-            return (load_account_snapshot_from_kis(profile, parallel_read=True) if parallel_read
-                    else load_account_snapshot_from_kis(profile))
+            return load_account_snapshot_from_kis(profile)
         except PortfolioConfigurationError:
             if profile.manual_snapshot_path and profile.manual_snapshot_path.exists():
                 return load_manual_snapshot(profile.manual_snapshot_path)
