@@ -190,8 +190,6 @@ def _public_market_snapshot(
     positions: list[dict[str, Any]] = []
     has_position_evidence = isinstance(snapshot.get("positions"), list)
     source_positions = snapshot["positions"] if has_position_evidence else []
-    complete_cost_basis = True
-    complete_valuations = True
     for raw in source_positions:
         if not isinstance(raw, dict):
             continue
@@ -202,16 +200,15 @@ def _public_market_snapshot(
         sellable_quantity = _number(raw.get("available_qty"))
         average_cost = _integer(raw.get("avg_cost_krw"))
         current_price = _integer(raw.get("market_price_krw"))
-        observed_value = _optional_integer(raw.get("market_value_krw"))
-        market_value = observed_value if observed_value is not None else 0
+        market_value = _integer(raw.get("market_value_krw"))
         purchase_amount = int(round(average_cost * quantity))
-        complete_cost_basis &= purchase_amount > 0
-        complete_valuations &= observed_value is not None
-        unrealized_pnl = _optional_integer(raw.get("unrealized_pnl_krw"))
-        if unrealized_pnl is None and observed_value is not None and purchase_amount > 0:
-            unrealized_pnl = observed_value - purchase_amount
+        unrealized_pnl = None
+        if market_value > 0 and purchase_amount > 0:
+            # Archived broker adapters used zero for absent values. A complete
+            # normalized mark and cost basis distinguish zero profit from no evidence.
+            unrealized_pnl = _optional_integer(raw.get("unrealized_pnl_krw")) or (market_value - purchase_amount)
         unrealized_return = (unrealized_pnl / purchase_amount * 100.0
-                             if unrealized_pnl is not None and purchase_amount > 0 else None)
+                             if unrealized_pnl is not None else None)
         positions.append(
             {
                 "ticker": ticker,
@@ -231,13 +228,11 @@ def _public_market_snapshot(
 
     total_purchase = sum(int(item["purchase_amount_krw"]) for item in positions)
     total_market_value = sum(int(item["market_value_krw"]) for item in positions)
-    pnl_values = [item["unrealized_pnl_krw"] for item in positions]
-    total_pnl = (sum(pnl_values) if has_position_evidence and len(positions) == len(source_positions)
-                 and all(value is not None for value in pnl_values) else None)
-    if total_pnl is not None and complete_cost_basis and complete_valuations:
-        total_pnl = total_market_value - total_purchase
+    complete_marks = (has_position_evidence and len(positions) == len(source_positions)
+                      and all(item["unrealized_pnl_krw"] is not None for item in positions))
+    total_pnl = total_market_value - total_purchase if complete_marks else None
     total_return = (total_pnl / total_purchase * 100.0
-                    if total_pnl is not None and complete_cost_basis and total_purchase > 0 else None)
+                    if total_pnl is not None and total_purchase > 0 else None)
     equity = snapshot.get("account_value_krw")
     account_value = _optional_integer(equity if equity is not None else snapshot.get("total_equity_krw"))
     meta = _MARKET_META[market]

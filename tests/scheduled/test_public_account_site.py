@@ -130,7 +130,14 @@ def test_public_account_site_distinguishes_missing_profit_from_verified_zero(tmp
     assert missing["markets"]["us"]["summary"]["total_unrealized_pnl_krw"] is None
     assert "미확인" in (site / "account" / "index.html").read_text(encoding="utf-8")
 
+    position["market_value_krw"] = 0
     position["unrealized_pnl_krw"] = 0
+    snapshot_file.write_text(json.dumps(snapshot), encoding="utf-8")
+    legacy = build_public_account_site(site_dir=site, manifests=[run])["markets"]["kr"]
+    assert legacy["positions"][0]["unrealized_pnl_krw"] is None
+    assert legacy["summary"]["total_unrealized_pnl_krw"] is None
+
+    position["market_value_krw"] = position["quantity"] * position["avg_cost_krw"]
     snapshot_file.write_text(json.dumps(snapshot), encoding="utf-8")
     verified = build_public_account_site(site_dir=site, manifests=[run])["markets"]["kr"]
     assert verified["positions"][0]["unrealized_pnl_krw"] == 0
