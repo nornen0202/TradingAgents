@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from copy import deepcopy
 from pathlib import Path
 from typing import Any
 
@@ -27,8 +28,11 @@ def build_portfolio_candidates(
     manifest: dict[str, Any],
     watch_tickers: tuple[str, ...],
     profile: PortfolioProfile | None = None,
+    current_execution_updates: dict[str, dict[str, Any]] | None = None,
 ) -> tuple[list[PortfolioCandidate], list[str]]:
-    analysis_by_ticker = _load_analysis_by_ticker(run_dir, manifest)
+    analysis_by_ticker = _load_analysis_by_ticker(
+        run_dir, manifest, current_execution_updates=current_execution_updates,
+    )
     failed_by_ticker = _failed_tickers_by_canonical(manifest)
     target_tickers = set(watch_tickers)
     target_tickers.update(position.canonical_ticker for position in snapshot.positions)
@@ -57,7 +61,10 @@ def build_portfolio_candidates(
     return candidates, warnings
 
 
-def _load_analysis_by_ticker(run_dir: Path, manifest: dict[str, Any]) -> dict[str, dict[str, Any]]:
+def _load_analysis_by_ticker(
+    run_dir: Path, manifest: dict[str, Any], *,
+    current_execution_updates: dict[str, dict[str, Any]] | None = None,
+) -> dict[str, dict[str, Any]]:
     loaded: dict[str, dict[str, Any]] = {}
     for ticker_summary in manifest.get("tickers", []):
         if ticker_summary.get("status") != "success":
@@ -74,7 +81,15 @@ def _load_analysis_by_ticker(run_dir: Path, manifest: dict[str, Any]) -> dict[st
         if execution_update_path:
             execution_path = run_dir / execution_update_path
             if execution_path.exists():
-                payload["execution_update"] = json.loads(execution_path.read_text(encoding="utf-8"))
+                ticker = str(ticker_summary.get("ticker") or "").strip().upper()
+                current = (current_execution_updates or {}).get(ticker)
+                if (execution_path == run_dir / "tickers" / ticker / "execution_update.json"
+                        and current and current is ticker_summary.get("execution_update") and current.get("ticker") == ticker
+                        and (current.get("source") or {}).get("published_in_run_id") == manifest.get("run_id")
+                        and (current.get("source") or {}).get("generated_in_current_run") is True):
+                    payload["execution_update"] = deepcopy(current)
+                else:
+                    payload["execution_update"] = json.loads(execution_path.read_text(encoding="utf-8"))
         try:
             identity = resolve_identity(
                 str(payload.get("ticker") or ticker_summary.get("ticker") or ""),

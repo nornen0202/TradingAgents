@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 from dataclasses import replace
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -30,7 +30,7 @@ from .manual_snapshot import load_manual_snapshot
 from .performance import build_account_performance_outputs
 from .profiles import load_portfolio_profile
 from .reporting import render_portfolio_report_markdown
-from .semantic_judge import build_semantic_verdicts
+from .semantic_judge import PreparedRuleOnlyContext, build_semantic_verdicts
 from .state_store import save_portfolio_outputs
 
 
@@ -43,6 +43,8 @@ def run_portfolio_pipeline(
     summary_image_settings: Any | None = None,
     external_data_settings: Any | None = None,
     portfolio_performance_settings: Any | None = None,
+    current_execution_updates: dict[str, dict[str, Any]] | None = None,
+    prepared_rule_only_context: PreparedRuleOnlyContext | None = None,
 ) -> dict[str, Any]:
     if not getattr(portfolio_settings, "enabled", False):
         return {"status": "disabled"}
@@ -63,18 +65,29 @@ def run_portfolio_pipeline(
 
     private_dir = run_dir / profile.private_output_dirname
     status_path = private_dir / "status.json"
+    phase_clock = {} if current_execution_updates is not None else None
+
+    def mark(phase):
+        if phase_clock is not None:
+            phase_clock[phase] = datetime.now(timezone.utc).isoformat()
+
     try:
+        mark("snapshot_fetch_started_at")
         snapshot = load_snapshot_for_profile(profile)
+        mark("snapshot_fetch_returned_at")
         if profile.capital_policy_enabled:
             from .capital_policy import apply_snapshot_policy
             snapshot = apply_snapshot_policy(snapshot, now=datetime.fromisoformat(str(manifest["started_at"]).replace("Z", "+00:00")))
+        mark("snapshot_policy_returned_at")
         candidates, candidate_warnings = build_portfolio_candidates(
             snapshot=snapshot,
             run_dir=run_dir,
             manifest=manifest,
             watch_tickers=profile.watch_tickers,
             profile=profile,
+            **({"current_execution_updates": current_execution_updates} if current_execution_updates is not None else {}),
         )
+        mark("candidate_inputs_returned_at")
         prism_ingestion = _load_prism_ingestion(external_data_settings)
         candidates = enrich_candidates_with_prism(
             candidates,
@@ -89,7 +102,10 @@ def run_portfolio_pipeline(
             manifest=manifest,
             llm_settings=llm_settings,
             portfolio_settings=portfolio_settings,
+            **({"prepared_rule_only_context": prepared_rule_only_context}
+               if prepared_rule_only_context is not None and run_mode == "overlay_only" else {}),
         )
+        mark("semantic_verdicts_returned_at")
         all_warnings = (
             list(manifest.get("warnings") or [])
             + list(candidate_warnings)
@@ -145,6 +161,7 @@ def run_portfolio_pipeline(
             profile=profile,
         )
         all_warnings.extend(action_judge_warnings)
+        mark("candidate_decisions_returned_at")
         external_signal_context = _build_external_signal_context(
             run_dir=run_dir,
             manifest=manifest,
@@ -168,6 +185,7 @@ def run_portfolio_pipeline(
             llm_settings=llm_settings,
             enabled=bool(getattr(portfolio_settings, "report_polisher_enabled", True)),
         )
+        mark("report_writer_returned_at")
         summary_image_artifacts = generate_summary_image_artifacts(
             private_dir=private_dir,
             snapshot=snapshot,
@@ -178,6 +196,7 @@ def run_portfolio_pipeline(
             report_writer_payload=report_writer_payload,
             settings=summary_image_settings,
         )
+        mark("report_render_returned_at")
         artifact_paths = save_portfolio_outputs(
             private_dir=private_dir,
             snapshot=snapshot,
@@ -194,7 +213,9 @@ def run_portfolio_pipeline(
             summary_image_artifacts=summary_image_artifacts,
             external_signal_artifacts=external_signal_context.get("artifacts") or {},
             external_reconciliation=external_signal_context.get("reconciliation"),
+            **({"parallel_report_writes": True} if phase_clock is not None else {}),
         )
+        mark("portfolio_artifacts_saved_at")
         account_performance_status = _build_account_performance_status(
             private_dir=private_dir,
             run_dir=run_dir,
@@ -204,6 +225,7 @@ def run_portfolio_pipeline(
             artifact_paths=artifact_paths,
             warnings=all_warnings,
         )
+        mark("products_saved_at")
         status_value = _derive_pipeline_status(snapshot)
         semantic_health = _build_semantic_health(scored_candidates)
         if semantic_health["judge_unavailable"]:
@@ -212,6 +234,7 @@ def run_portfolio_pipeline(
             status_value = "degraded"
         status = {
             "status": status_value,
+            **({"phase_clock": phase_clock} if phase_clock is not None else {}),
             "profile": profile.name,
             "snapshot_health": snapshot.snapshot_health,
             "private_coverage_snapshot": {

@@ -4,6 +4,7 @@ from dataclasses import replace
 import json
 from datetime import datetime, timezone
 from pathlib import Path
+from threading import Event
 from types import SimpleNamespace
 
 import pytest
@@ -40,6 +41,195 @@ def test_failed_execution_update_has_no_quote_clock():
     )
     assert update["market_data_asof"] is None and update["last_price"] is None
     assert update["execution_asof"] == now.isoformat()
+
+
+@pytest.mark.parametrize(("lightweight", "fail_artifact"), [(False, False), (True, False), (True, True)])
+def test_lightweight_writes_ready_snapshot_before_other_provider_finishes(tmp_path, monkeypatch, lightweight, fail_artifact):
+    from tradingagents.scheduled import runner
+
+    config_path = tmp_path / "scheduled.toml"
+    config_path.write_text('[run]\nmarket="US"\nrun_mode="overlay_only"\ntickers=["AAPL","NVDA"]\n', encoding="utf-8")
+    config = load_scheduled_config(config_path)
+    config = replace(config, execution=replace(config.execution, execution_lightweight_refresh=lightweight))
+    monkeypatch.setenv("TRADINGAGENTS_OVERLAY_MAX_WORKERS", "2")
+    monkeypatch.setattr(runner, "_refresh_integrated_review", lambda *args, **kwargs: None)
+    monkeypatch.setattr(runner, "render_execution_update_markdown", lambda *args, **kwargs: "# update\n")
+    summaries = []
+    run = tmp_path / "run"
+    original = datetime.now(timezone.utc).isoformat()
+    for ticker in ("AAPL", "NVDA"):
+        path = run / "tickers" / ticker / "execution_contract.json"
+        path.parent.mkdir(parents=True)
+        contract = ExecutionContract(ticker=ticker, analysis_asof=original, market_data_asof=original,
+            level_basis=LevelBasis.DAILY_CLOSE, thesis_state=ThesisState.CONSTRUCTIVE,
+            primary_setup=PrimarySetup.BREAKOUT_CONFIRMATION, portfolio_stance="BULLISH", entry_action_base="WAIT",
+            setup_quality="COMPELLING", confidence=.8, action_if_triggered=ActionIfTriggered.STARTER)
+        path.write_text(json.dumps(contract.to_dict()), encoding="utf-8")
+        analysis = path.parent / "analysis.json"
+        analysis.write_text(json.dumps({"ticker": ticker}), encoding="utf-8")
+        summaries.append({"status": "success", "ticker": ticker,
+                          "artifacts": {"execution_contract_json": path.relative_to(run).as_posix(),
+                                        "analysis_json": analysis.relative_to(run).as_posix()}})
+    original_write = runner._write_json
+    first_saved = Event()
+    slow_returned = Event()
+    slow_saw_first = []
+    prepared = set()
+    read_analysis = runner._load_ticker_analysis_payload
+
+    def load_analysis(**kwargs):
+        prepared.add(kwargs["ticker_summary"]["ticker"])
+        return read_analysis(**kwargs)
+
+    def write(path, value):
+        if fail_artifact and path == run / "tickers/NVDA/execution_update.json":
+            raise OSError("fixture artifact unavailable")
+        original_write(path, value)
+        if path == run / "tickers/AAPL/execution_update.json":
+            first_saved.set()
+
+    def fetch(ticker, **_):
+        if lightweight:
+            assert prepared == {"AAPL", "NVDA"}
+        if ticker == "NVDA":
+            slow_saw_first.append(first_saved.wait(timeout=3))
+            slow_returned.set()
+        return IntradayMarketSnapshot(ticker=ticker, asof=original, provider="kis_microstructure", interval="1m",
+            last_price=102, session_vwap=101, day_high=103, day_low=100, volume=1000, avg20_daily_volume=1000, relative_volume=1.2,
+            market_session="regular", market="US", exchange="NAS", snapshot_received_at=datetime.now(timezone.utc).isoformat())
+
+    monkeypatch.setattr(runner, "_write_json", write)
+    monkeypatch.setattr(runner, "_load_ticker_analysis_payload", load_analysis)
+    monkeypatch.setattr(runner, "fetch_intraday_market_snapshot", fetch)
+    if fail_artifact:
+        with pytest.raises(OSError, match="fixture artifact unavailable"):
+            _run_execution_overlay_passes(config=config, run_dir=run, ticker_summaries=summaries, checkpoints=["10:00"])
+        assert first_saved.is_set() and not (run / "run.json").exists()
+        assert not (run / "chatgpt_execution_context.json").exists()
+        assert not (run / "tickers/NVDA/execution_update.json").exists()
+        return
+    updates = _run_execution_overlay_passes(config=config, run_dir=run, ticker_summaries=summaries, checkpoints=["10:00"])
+    assert slow_returned.is_set() and slow_saw_first == [lightweight]
+    for ticker in ("AAPL", "NVDA"):
+        update = updates[ticker]
+        assert update["market_data_asof"] == original
+        assert update["intraday_snapshot_attempt"]["success"] is True
+        clocks = update["intraday_snapshot_attempt"].get("snapshot_acquisition")
+        if lightweight:
+            assert datetime.fromisoformat(clocks["fetch_started_at"]) <= datetime.fromisoformat(clocks["fetch_returned_at"])
+            assert clocks["clock_role"] == "LOCAL_SNAPSHOT_FETCH_WINDOW"
+            processing = next(row["execution_archive_clock"] for row in summaries if row["ticker"] == ticker)
+            assert processing["started_at"] <= processing["observations_loaded_at"]
+            assert processing["observations_loaded_at"] <= processing["decision_calculated_at"] <= processing["artifacts_saved_at"]
+            directory = run / "tickers" / ticker
+            assert json.loads((directory / "analysis.json").read_bytes()) == {"ticker": ticker}
+            alias = directory / "execution/checkpoints" / runner._checkpoint_update_filename("10:00")
+            assert alias.read_bytes() == (directory / "execution_update.json").read_bytes()
+        else:
+            assert clocks is None
+    assert not (run / "run.json").exists()  # Per-ticker archival is not source publication.
+    if lightweight:
+        (run / "run.json").write_text('{"status":"success"}', encoding="utf-8")
+        with pytest.raises(FileExistsError, match="cannot be rewritten"):
+            _run_execution_overlay_passes(config=config, run_dir=run, ticker_summaries=summaries, checkpoints=["10:00"])
+
+
+def test_same_checkpoint_artifacts_fall_back_to_atomic_copies(tmp_path, monkeypatch):
+    from tradingagents.scheduled import runner
+
+    latest = tmp_path / "latest.json"
+    checkpoint = tmp_path / "checkpoints/now.json"
+
+    def unsupported(*_):
+        raise OSError("link unavailable")
+
+    monkeypatch.setattr(runner.os, "link", unsupported)
+    runner._save_overlay_artifact_pair(latest, checkpoint, {"fresh": True}, runner._write_json, share=True)
+    assert latest.read_bytes() == checkpoint.read_bytes()
+    runner._write_json(latest, {"fresh": False})
+    assert json.loads(checkpoint.read_bytes()) == {"fresh": True}
+
+
+def test_lightweight_prior_reporting_run_is_complete_before_quote_window(tmp_path):
+    from tradingagents.scheduled.runner import _find_previous_comparable_manifest
+
+    older = "20261125T130000_previous"
+    newer = "20261125T131400_concurrent"
+    for run, finished in ((older, "13:05:00"), (newer, "13:22:00")):
+        folder = tmp_path / "runs/2026" / run
+        folder.mkdir(parents=True)
+        (folder / "run.json").write_text(json.dumps({"run_id": run, "settings": {"market": "US"},
+            "finished_at": f"2026-11-25T{finished}+00:00"}), encoding="utf-8")
+    current = {"run_id": "20261125T132000_current", "settings": {"market": "US"}}
+    result = _find_previous_comparable_manifest(archive_dir=tmp_path, current_manifest=current,
+                                                 available_at=datetime.fromisoformat("2026-11-25T13:20:00+00:00"))
+    assert result["run_id"] == older
+    assert _find_previous_comparable_manifest(archive_dir=tmp_path, current_manifest=current)["run_id"] == newer
+
+
+@pytest.mark.parametrize("finished_at", [None, "invalid", "2026-11-25T13:10:00", "2026-11-25T13:22:00+00:00"])
+def test_lightweight_prior_reporting_run_skips_unverifiable_completion(tmp_path, finished_at):
+    from tradingagents.scheduled.runner import _find_previous_comparable_manifest
+
+    current = {"run_id": "20261125T132000_current", "settings": {"market": "US"}}
+    as_of = datetime.fromisoformat("2026-11-25T13:20:00+00:00")
+
+    def find():
+        return _find_previous_comparable_manifest(archive_dir=tmp_path, current_manifest=current, available_at=as_of)
+
+    def store(run_id, completed):
+        run = tmp_path / "runs/2026" / run_id
+        run.mkdir(parents=True)
+        candidate = {"run_id": run_id, "settings": {"market": "US"}}
+        if completed is not None:
+            candidate["finished_at"] = completed
+        (run / "run.json").write_text(json.dumps(candidate), encoding="utf-8")
+
+    assert find() is None
+    store("20261125T131400_unverifiable", finished_at)
+    assert find() is None
+    valid = "20261125T130000_previous"
+    store(valid, "2026-11-25T13:05:00+00:00")
+    assert find()["run_id"] == valid
+
+
+def test_portfolio_reads_same_current_overlay_values_without_opening_update_again(tmp_path, monkeypatch):
+    from tradingagents.portfolio.candidates import _load_analysis_by_ticker
+
+    ticker_dir = tmp_path / "tickers" / "AAPL"
+    ticker_dir.mkdir(parents=True)
+    analysis = ticker_dir / "analysis.json"
+    update = ticker_dir / "execution_update.json"
+    current = {"ticker": "AAPL", "market_data_asof": "2026-10-19T14:00:00Z",
+               "source": {"published_in_run_id": "full-overlay", "generated_in_current_run": True}}
+    analysis.write_text(json.dumps({"ticker": "AAPL"}), encoding="utf-8")
+    update.write_text(json.dumps(current), encoding="utf-8")
+    manifest = {"run_id": "full-overlay", "tickers": [{"status": "success", "ticker": "AAPL",
+        "artifacts": {"analysis_json": "tickers/AAPL/analysis.json", "execution_update_json": "tickers/AAPL/execution_update.json"},
+        "execution_update": current}]}
+    expected = _load_analysis_by_ticker(tmp_path, manifest)
+    reads = []
+    original = Path.read_text
+
+    def count(path, *args, **kwargs):
+        reads.append(path)
+        return original(path, *args, **kwargs)
+
+    monkeypatch.setattr(Path, "read_text", count)
+    reused = _load_analysis_by_ticker(tmp_path, manifest, current_execution_updates={"AAPL": current})
+    assert reused == expected and reads == [analysis]
+    reused["AAPL"]["execution_update"]["source"]["generated_in_current_run"] = False
+    assert current["source"]["generated_in_current_run"] is True
+    reads.clear()
+    assert _load_analysis_by_ticker(tmp_path, manifest, current_execution_updates={"AAPL": dict(current)}) == expected
+    assert reads == [analysis, update]
+
+    archive = ticker_dir / "archived_execution_update.json"
+    archive.write_text(json.dumps({**current, "market_data_asof": "2026-10-19T13:59:00Z"}), encoding="utf-8")
+    manifest["tickers"][0]["artifacts"]["execution_update_json"] = "tickers/AAPL/archived_execution_update.json"
+    assert _load_analysis_by_ticker(tmp_path, manifest, current_execution_updates={"AAPL": current})["AAPL"][
+        "execution_update"
+    ]["market_data_asof"] == "2026-10-19T13:59:00Z"
 
 
 @pytest.mark.parametrize("lightweight", [False, True])

@@ -1,4 +1,7 @@
 from types import SimpleNamespace
+from threading import Barrier
+
+import pytest
 
 from tradingagents.portfolio.account_models import (
     AccountConstraints,
@@ -13,6 +16,8 @@ from tradingagents.portfolio.account_models import (
 from tradingagents.portfolio.action_judge import _build_prompt, arbitrate_portfolio_actions
 from tradingagents.portfolio.action_lift import attach_action_lift_audit
 from tradingagents.portfolio.reporting import render_portfolio_report_markdown
+from tradingagents.portfolio import state_store
+from tradingagents.portfolio import semantic_judge
 from tradingagents.portfolio.state_store import save_portfolio_outputs
 
 
@@ -366,7 +371,8 @@ def test_action_judge_expands_eligible_set_for_wait_heavy_batch(monkeypatch):
     assert "wait_heavy_constructive_batch" in prompts[0]
 
 
-def test_action_lift_artifact_is_saved_with_report_and_audit(tmp_path):
+@pytest.mark.parametrize("parallel_report_writes", [False, True])
+def test_action_lift_artifact_is_saved_with_report_and_audit(tmp_path, parallel_report_writes):
     snapshot = _snapshot()
     recommendation = attach_action_lift_audit(
         recommendation=_recommendation(_action()),
@@ -385,6 +391,7 @@ def test_action_lift_artifact_is_saved_with_report_and_audit(tmp_path):
         report_writer_payload={},
         batch_metrics={},
         warnings=[],
+        parallel_report_writes=parallel_report_writes,
     )
 
     assert "action_lift_audit_json" in artifacts
@@ -392,3 +399,45 @@ def test_action_lift_artifact_is_saved_with_report_and_audit(tmp_path):
     assert (tmp_path / "portfolio-private" / "action_lift_audit.json").exists()
     assert (tmp_path / "portfolio-private" / "portfolio_action_lift_audit.json").exists()
     assert (tmp_path / "portfolio-private" / "decision_audit.json").read_text(encoding="utf-8").find("action_lift_audit") >= 0
+    for artifact in artifacts.values():
+        assert (tmp_path / "portfolio-private" / artifact.rsplit("/", 1)[-1]).is_file()
+
+
+def test_parallel_reports_join_and_surface_a_failed_artifact(tmp_path, monkeypatch):
+    overlap = Barrier(2, timeout=5)
+    original = state_store._write_json
+
+    def write(path, payload):
+        overlap.wait()
+        if path.name == "failed.json":
+            raise OSError("fixture write failure")
+        original(path, payload)
+
+    monkeypatch.setattr(state_store, "_write_json", write)
+    succeeded = tmp_path / "succeeded.json"
+    with pytest.raises(OSError, match="fixture write failure"):
+        state_store._save_report_artifacts(
+            json_outputs={tmp_path / "failed.json": {}, succeeded: {"valid": True}}, text_outputs={}, parallel=True,
+        )
+    assert succeeded.is_file()
+
+
+def test_preverified_rule_only_context_preserves_nonempty_verdicts(tmp_path, monkeypatch):
+    calls = []
+
+    def read_context(*args, **kwargs):
+        calls.append(args)
+        return {}
+
+    monkeypatch.setattr(semantic_judge, "_load_context_by_ticker", read_context)
+    params = {"candidates": [_candidate()], "run_dir": tmp_path, "manifest": {"run_id": tmp_path.name}, "llm_settings": None,
+              "portfolio_settings": SimpleNamespace(semantic_judge_enabled=False)}
+    prepared = semantic_judge.prepare_rule_only_context(tmp_path, params["manifest"])
+    expected = semantic_judge.build_semantic_verdicts(**params)
+    assert semantic_judge.build_semantic_verdicts(**params, prepared_rule_only_context=prepared) == expected
+    assert len(calls) == 2 and len(expected[1]) == 1
+
+    params["portfolio_settings"].semantic_judge_enabled = True
+    monkeypatch.setattr(semantic_judge, "_create_semantic_llm", lambda _: None)
+    semantic_judge.build_semantic_verdicts(**params, prepared_rule_only_context=prepared)
+    assert len(calls) == 3

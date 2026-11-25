@@ -1,17 +1,101 @@
 from __future__ import annotations
 
+import hashlib
 import json
+from dataclasses import dataclass
+from datetime import datetime, timezone
 from json import JSONDecodeError
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import Any, Mapping
 
 from tradingagents.llm_clients import create_llm_client
 from tradingagents.llm_clients.role_config import codex_client_kwargs
 from tradingagents.dataflows.research_evidence import evidence_review_reason, evidence_risk_count
-from tradingagents.scheduled.research_artifact_refs import ResearchArtifactStore
+from tradingagents.scheduled.research_artifact_refs import ResearchArtifactStore, _safe
 
 from .account_models import PortfolioCandidate
 from .instrument_identity import resolve_identity
+
+
+@dataclass(frozen=True)
+class PreparedRuleOnlyContext:
+    inputs: tuple
+    files: tuple[tuple[str, str | None], ...]
+    blobs: tuple[str, ...]
+    started_at: str
+    finished_at: str
+
+
+def _context_inputs(run_dir, manifest):
+    settings = manifest.get("settings") or {}
+    run_id = manifest.get("run_id")
+    if run_id != run_dir.name:
+        return None
+    rows = []
+    for row in manifest.get("tickers", []):
+        if row.get("status") != "success":
+            continue
+        ticker = row.get("ticker")
+        artifacts = row.get("artifacts") or {}
+        analysis = artifacts.get("analysis_json")
+        final_state = artifacts.get("final_state_json")
+        for relative in (analysis, final_state):
+            if not isinstance(relative, str):
+                continue
+            path = PurePosixPath(relative)
+            if (not isinstance(ticker, str) or not path.is_relative_to(PurePosixPath("tickers") / ticker)
+                    or ".." in path.parts or "\\" in relative or ":" in relative):
+                return None
+        owner = tuple(row.get(key) for key in ("ticker", "ticker_name", "analysis_date", "trade_date", "decision"))
+        try:
+            metadata = json.dumps((owner, analysis, final_state), sort_keys=True)
+        except (TypeError, ValueError):
+            return None
+        rows.append(metadata)
+    return (run_dir.absolute(), run_id, manifest.get("started_at"),
+            settings.get("market_scope") or settings.get("market"), tuple(rows))
+
+
+def prepare_rule_only_context(run_dir, manifest):
+    started_at = datetime.now(timezone.utc).isoformat()
+    inputs = _context_inputs(run_dir, manifest)
+    if inputs is None:
+        return None
+    files = {}
+    blobs = set()
+    try:
+        _load_context_by_ticker(run_dir, manifest, files=files, blobs=blobs)
+    except Exception:
+        # A transient early read may recover before the ordinary portfolio
+        # stage. Let that stage read again and handle any remaining error.
+        return None
+    return PreparedRuleOnlyContext(inputs, tuple(files.items()), tuple(sorted(blobs)),
+                                   started_at, datetime.now(timezone.utc).isoformat())
+
+
+def _unchanged_prepared_context(prepared, run_dir, manifest):
+    if prepared.inputs != _context_inputs(run_dir, manifest):
+        return False
+    try:
+        archive = run_dir.parent.parent.parent.resolve()
+        run_relative = run_dir.relative_to(run_dir.parent.parent.parent)
+        for relative, digest in prepared.files:
+            path = _safe(archive, (run_relative / relative).as_posix(), must_exist=digest is not None)
+            if digest is None:
+                if path.exists():
+                    return False
+                continue
+            with path.open("rb") as source:
+                if hashlib.file_digest(source, "sha256").hexdigest() != digest:
+                    return False
+        for digest in prepared.blobs:
+            path = _safe(archive, f"research-snapshots/sha256/{digest[:2]}/{digest}")
+            with path.open("rb") as source:
+                if hashlib.file_digest(source, "sha256").hexdigest() != digest:
+                    return False
+    except (OSError, ValueError):
+        return False
+    return True
 
 
 def build_semantic_verdicts(
@@ -21,12 +105,17 @@ def build_semantic_verdicts(
     manifest: dict[str, Any],
     llm_settings: Any | None,
     portfolio_settings: Any,
+    prepared_rule_only_context: PreparedRuleOnlyContext | None = None,
 ) -> tuple[list[PortfolioCandidate], list[dict[str, Any]], list[str]]:
-    contexts = _load_context_by_ticker(run_dir, manifest)
     warnings: list[str] = []
 
     llm = None
     semantic_llm_enabled = bool(getattr(portfolio_settings, "semantic_judge_enabled", False))
+    if (not semantic_llm_enabled and isinstance(prepared_rule_only_context, PreparedRuleOnlyContext)
+            and _unchanged_prepared_context(prepared_rule_only_context, run_dir, manifest)):
+        contexts = {}
+    else:
+        contexts = _load_context_by_ticker(run_dir, manifest)
     if semantic_llm_enabled:
         try:
             llm = _create_semantic_llm(llm_settings)
@@ -117,7 +206,9 @@ def _friendly_semantic_warning(code: str, exc: Exception | None = None) -> str:
     return f"{code}: {detail}"
 
 
-def _load_context_by_ticker(run_dir: Path, manifest: dict[str, Any]) -> dict[str, dict[str, Any]]:
+def _load_context_by_ticker(run_dir: Path, manifest: dict[str, Any], *,
+                            files: dict[str, str | None] | None = None,
+                            blobs: set[str] | None = None) -> dict[str, dict[str, Any]]:
     loaded: dict[str, dict[str, Any]] = {}
     reference_store = None
     for ticker_summary in manifest.get("tickers", []):
@@ -137,20 +228,26 @@ def _load_context_by_ticker(run_dir: Path, manifest: dict[str, Any]) -> dict[str
             analysis_path = run_dir / analysis_json
         final_state_path = (run_dir / final_state_json) if final_state_json and not isinstance(final_state_json, dict) else None
         if not analysis_path.exists():
+            if files is not None:
+                files[analysis_json] = None
             continue
 
-        analysis_payload = json.loads(analysis_path.read_text(encoding="utf-8"))
+        analysis_payload = _read_context_json(analysis_path, analysis_json, files)
         if isinstance(final_state_json, dict):
             settings = manifest.get("settings") or {}
             final_state_payload = json.loads(reference_store.read_owned(
                 final_state_json, key="final_state_json", run_dir=run_dir, row=ticker_summary, analysis=analysis_payload,
                 market=settings.get("market_scope") or settings.get("market")))
+            if blobs is not None:
+                blobs.update(final_state_json[key] for key in
+                             ("analysis_sha256", "artifact_sha256", "source_manifest_sha256", "snapshot_sha256"))
         else:
-            final_state_payload = (
-                json.loads(final_state_path.read_text(encoding="utf-8"))
-                if final_state_path and final_state_path.exists()
-                else {}
-            )
+            if final_state_path and final_state_path.exists():
+                final_state_payload = _read_context_json(final_state_path, final_state_json, files)
+            else:
+                final_state_payload = {}
+                if final_state_path and files is not None:
+                    files[final_state_json] = None
         try:
             identity = resolve_identity(
                 str(analysis_payload.get("ticker") or ticker_summary.get("ticker") or ""),
@@ -163,6 +260,14 @@ def _load_context_by_ticker(run_dir: Path, manifest: dict[str, Any]) -> dict[str
             "final_state": final_state_payload,
         }
     return loaded
+
+
+def _read_context_json(path, relative, files):
+    if files is None:
+        return json.loads(path.read_text(encoding="utf-8"))
+    raw = path.read_bytes()
+    files[relative] = hashlib.sha256(raw).hexdigest()
+    return json.loads(raw.decode("utf-8"))
 
 
 def _should_call_semantic_llm(candidate: PortfolioCandidate) -> bool:
