@@ -43,8 +43,8 @@ def test_failed_execution_update_has_no_quote_clock():
     assert update["execution_asof"] == now.isoformat()
 
 
-@pytest.mark.parametrize("lightweight", [False, True])
-def test_lightweight_writes_ready_snapshot_before_other_provider_finishes(tmp_path, monkeypatch, lightweight):
+@pytest.mark.parametrize(("lightweight", "fail_artifact"), [(False, False), (True, False), (True, True)])
+def test_lightweight_writes_ready_snapshot_before_other_provider_finishes(tmp_path, monkeypatch, lightweight, fail_artifact):
     from tradingagents.scheduled import runner
 
     config_path = tmp_path / "scheduled.toml"
@@ -71,13 +71,23 @@ def test_lightweight_writes_ready_snapshot_before_other_provider_finishes(tmp_pa
     first_saved = Event()
     slow_returned = Event()
     slow_saw_first = []
+    prepared = set()
+    read_analysis = runner._load_ticker_analysis_payload
+
+    def load_analysis(**kwargs):
+        prepared.add(kwargs["ticker_summary"]["ticker"])
+        return read_analysis(**kwargs)
 
     def write(path, value):
+        if fail_artifact and path == run / "tickers/NVDA/execution_update.json":
+            raise OSError("fixture artifact unavailable")
         original_write(path, value)
         if path == run / "tickers/AAPL/execution_update.json":
             first_saved.set()
 
     def fetch(ticker, **_):
+        if lightweight:
+            assert prepared == {"AAPL", "NVDA"}
         if ticker == "NVDA":
             slow_saw_first.append(first_saved.wait(timeout=3))
             slow_returned.set()
@@ -86,7 +96,15 @@ def test_lightweight_writes_ready_snapshot_before_other_provider_finishes(tmp_pa
             market_session="regular", market="US", exchange="NAS", snapshot_received_at=datetime.now(timezone.utc).isoformat())
 
     monkeypatch.setattr(runner, "_write_json", write)
+    monkeypatch.setattr(runner, "_load_ticker_analysis_payload", load_analysis)
     monkeypatch.setattr(runner, "fetch_intraday_market_snapshot", fetch)
+    if fail_artifact:
+        with pytest.raises(OSError, match="fixture artifact unavailable"):
+            _run_execution_overlay_passes(config=config, run_dir=run, ticker_summaries=summaries, checkpoints=["10:00"])
+        assert first_saved.is_set() and not (run / "run.json").exists()
+        assert not (run / "chatgpt_execution_context.json").exists()
+        assert not (run / "tickers/NVDA/execution_update.json").exists()
+        return
     updates = _run_execution_overlay_passes(config=config, run_dir=run, ticker_summaries=summaries, checkpoints=["10:00"])
     assert slow_returned.is_set() and slow_saw_first == [lightweight]
     for ticker in ("AAPL", "NVDA"):

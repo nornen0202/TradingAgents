@@ -5779,6 +5779,7 @@ def _run_execution_overlay_passes(
                 return
             contract_dict: dict[str, Any] = {}
             archive_clock = {"started_at": datetime.now(timezone.utc).isoformat()} if parallel_archive else None
+            writing_artifacts = False
             attempt_payload = _build_intraday_attempt_payload(
                 ticker=ticker,
                 checkpoint_label=checkpoint_label,
@@ -5841,6 +5842,7 @@ def _run_execution_overlay_passes(
                 update_payload["intraday_snapshot_attempt"] = attempt_payload
                 ticker_dir = run_dir / "tickers" / ticker
                 checkpoint_dir = ticker_dir / "execution" / "checkpoints"
+                writing_artifacts = True
                 _write_json(checkpoint_dir / _checkpoint_update_filename(checkpoint_label), update_payload)
                 update_path = ticker_dir / "execution_update.json"
                 _write_json(update_path, update_payload)
@@ -5903,6 +5905,10 @@ def _run_execution_overlay_passes(
                     _append_analysis_intraday_attempt(run_dir=run_dir, ticker_summary=summary, attempt_payload=attempt_payload,
                                                       analysis_payload=analysis_payload if parallel_archive else None)
             except Exception as exc:
+                # An incomplete write cannot be published as a successful
+                # cohort even if a second, degraded report could be written.
+                if parallel_archive and writing_artifacts:
+                    raise
                 attempt_payload.update(
                     {
                         "success": False,
