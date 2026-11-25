@@ -48,7 +48,7 @@ def test_lightweight_writes_ready_snapshot_before_other_provider_finishes(tmp_pa
     from tradingagents.scheduled import runner
 
     config_path = tmp_path / "scheduled.toml"
-    config_path.write_text('[run]\nmarket="US"\ntickers=["AAPL","NVDA"]\n', encoding="utf-8")
+    config_path.write_text('[run]\nmarket="US"\nrun_mode="overlay_only"\ntickers=["AAPL","NVDA"]\n', encoding="utf-8")
     config = load_scheduled_config(config_path)
     config = replace(config, execution=replace(config.execution, execution_lightweight_refresh=lightweight))
     monkeypatch.setenv("TRADINGAGENTS_OVERLAY_MAX_WORKERS", "2")
@@ -97,6 +97,9 @@ def test_lightweight_writes_ready_snapshot_before_other_provider_finishes(tmp_pa
         if lightweight:
             assert datetime.fromisoformat(clocks["fetch_started_at"]) <= datetime.fromisoformat(clocks["fetch_returned_at"])
             assert clocks["clock_role"] == "LOCAL_SNAPSHOT_FETCH_WINDOW"
+            processing = next(row["execution_archive_clock"] for row in summaries if row["ticker"] == ticker)
+            assert processing["started_at"] <= processing["observations_loaded_at"]
+            assert processing["observations_loaded_at"] <= processing["decision_calculated_at"] <= processing["artifacts_saved_at"]
         else:
             assert clocks is None
     assert not (run / "run.json").exists()  # Per-ticker archival is not source publication.

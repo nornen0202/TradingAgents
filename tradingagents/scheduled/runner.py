@@ -5755,7 +5755,13 @@ def _run_execution_overlay_passes(
     for checkpoint in checkpoints:
         checkpoint_label = str(checkpoint).strip() or "post_research"
         by_ticker = {str(row.get("ticker") or "").strip().upper(): row for row in ticker_summaries if row.get("status") == "success"}
-        processed = set()
+        parallel_archive = (config.execution.execution_lightweight_refresh
+                            and config.run.run_mode == "overlay_only"
+                            and not str(config.execution.execution_llm_summary_model or "").strip())
+        prepared_analysis = {
+            ticker: _load_ticker_analysis_payload(run_dir=run_dir, ticker_summary=summary)
+            for ticker, summary in by_ticker.items()
+        } if parallel_archive else None
 
         def archive_snapshot(ticker, market_result, acquisition=None):
             summary = by_ticker[ticker]
@@ -5771,8 +5777,8 @@ def _run_execution_overlay_passes(
             contract_path = run_dir / contract_rel
             if not contract_path.exists():
                 return
-            processed.add(ticker)
             contract_dict: dict[str, Any] = {}
+            archive_clock = {"started_at": datetime.now(timezone.utc).isoformat()} if parallel_archive else None
             attempt_payload = _build_intraday_attempt_payload(
                 ticker=ticker,
                 checkpoint_label=checkpoint_label,
@@ -5816,6 +5822,8 @@ def _run_execution_overlay_passes(
                         config.execution.session_confirmation_receipts_dir, ticker, market.market,
                     )
                 )
+                if archive_clock is not None:
+                    archive_clock["observations_loaded_at"] = datetime.now(timezone.utc).isoformat()
                 update = evaluate_execution_state(
                     contract,
                     market,
@@ -5828,6 +5836,8 @@ def _run_execution_overlay_passes(
                 update_payload["source"]["snapshot_received_at"] = market.snapshot_received_at
                 update_payload["ingested_at"] = datetime.now(timezone.utc).isoformat()
                 update_payload["evaluated_at"] = update_payload.get("execution_asof")
+                if archive_clock is not None:
+                    archive_clock["decision_calculated_at"] = update_payload["ingested_at"]
                 update_payload["intraday_snapshot_attempt"] = attempt_payload
                 ticker_dir = run_dir / "tickers" / ticker
                 checkpoint_dir = ticker_dir / "execution" / "checkpoints"
@@ -5849,7 +5859,8 @@ def _run_execution_overlay_passes(
                 summary["artifacts"]["microstructure_report_md"] = _relative_to_run(run_dir, micro_latest_md)
                 summary["artifacts"]["microstructure_checkpoint_snapshot_json"] = _relative_to_run(run_dir, micro_checkpoint_json)
                 summary["artifacts"]["microstructure_checkpoint_report_md"] = _relative_to_run(run_dir, micro_checkpoint_md)
-                analysis_payload = _load_ticker_analysis_payload(run_dir=run_dir, ticker_summary=summary)
+                analysis_payload = (prepared_analysis[ticker] if prepared_analysis is not None
+                                    else _load_ticker_analysis_payload(run_dir=run_dir, ticker_summary=summary))
                 if analysis_payload:
                     intraday_execution_path = ticker_dir / "intraday_execution.json"
                     _write_json(
@@ -5889,8 +5900,8 @@ def _run_execution_overlay_passes(
                         db_paths=[config.performance.store_path or (config.storage.archive_dir / "performance.sqlite")])
                 summary["intraday_snapshot_attempt"] = attempt_payload
                 if not preserve_analysis_bytes:
-                    _append_analysis_intraday_attempt(run_dir=run_dir, ticker_summary=summary, attempt_payload=attempt_payload)
-                updates_by_ticker[ticker] = update_payload
+                    _append_analysis_intraday_attempt(run_dir=run_dir, ticker_summary=summary, attempt_payload=attempt_payload,
+                                                      analysis_payload=analysis_payload if parallel_archive else None)
             except Exception as exc:
                 attempt_payload.update(
                     {
@@ -5915,7 +5926,8 @@ def _run_execution_overlay_passes(
                 update_path = ticker_dir / "execution_update.json"
                 _write_json(update_path, update_payload)
                 summary["artifacts"]["execution_update_json"] = _relative_to_run(run_dir, update_path)
-                analysis_payload = _load_ticker_analysis_payload(run_dir=run_dir, ticker_summary=summary)
+                analysis_payload = (prepared_analysis[ticker] if prepared_analysis is not None
+                                    else _load_ticker_analysis_payload(run_dir=run_dir, ticker_summary=summary))
                 if analysis_payload:
                     intraday_execution_path = ticker_dir / "intraday_execution.json"
                     _write_json(
@@ -5952,19 +5964,39 @@ def _run_execution_overlay_passes(
                         db_paths=[config.performance.store_path or (config.storage.archive_dir / "performance.sqlite")])
                 summary["intraday_snapshot_attempt"] = attempt_payload
                 if not preserve_analysis_bytes:
-                    _append_analysis_intraday_attempt(run_dir=run_dir, ticker_summary=summary, attempt_payload=attempt_payload)
-                updates_by_ticker[ticker] = update_payload
+                    _append_analysis_intraday_attempt(run_dir=run_dir, ticker_summary=summary, attempt_payload=attempt_payload,
+                                                      analysis_payload=analysis_payload if parallel_archive else None)
                 print(f"::warning::Execution overlay checkpoint '{checkpoint_label}' failed for {ticker}: {exc}")
-        market_results = _fetch_overlay_market_snapshots(
-            config=config,
-            ticker_summaries=ticker_summaries,
-            run_dir=run_dir,
-            checkpoint_label=checkpoint_label,
-            **({"on_snapshot": archive_snapshot} if config.execution.execution_lightweight_refresh else {}),
-        )
-        for ticker in by_ticker:
-            if ticker not in processed:
-                archive_snapshot(ticker, market_results.get(ticker))
+            if archive_clock is not None:
+                archive_clock["artifacts_saved_at"] = datetime.now(timezone.utc).isoformat()
+                summary["execution_archive_clock"] = archive_clock
+            return update_payload
+
+        def fetch_market_results(**kwargs):
+            return _fetch_overlay_market_snapshots(config=config, ticker_summaries=ticker_summaries,
+                                                   run_dir=run_dir, checkpoint_label=checkpoint_label, **kwargs)
+
+        if parallel_archive:
+            # Only local contract evaluation and independently named artifacts
+            # run here. The market workers retain their existing request budget.
+            with ThreadPoolExecutor(max_workers=3, thread_name_prefix="overlay-artifact") as writers:
+                pending = {}
+
+                def queue_snapshot(ticker, result, acquisition=None):
+                    if ticker not in pending:
+                        pending[ticker] = writers.submit(archive_snapshot, ticker, result, acquisition)
+
+                market_results = fetch_market_results(on_snapshot=queue_snapshot)
+                for ticker in by_ticker:
+                    queue_snapshot(ticker, market_results.get(ticker))
+                for ticker in by_ticker:
+                    if (update := pending[ticker].result()) is not None:
+                        updates_by_ticker[ticker] = update
+        else:
+            market_results = fetch_market_results()
+            for ticker in by_ticker:
+                if (update := archive_snapshot(ticker, market_results.get(ticker))) is not None:
+                    updates_by_ticker[ticker] = update
         updates_by_ticker["_latest_checkpoint"] = {"value": checkpoint_label}
     if _has_ticker_execution_updates(updates_by_ticker):
         ticker_order = [str(row.get("ticker") or "").strip().upper() for row in ticker_summaries]
@@ -6607,6 +6639,7 @@ def _append_analysis_intraday_attempt(
     run_dir: Path,
     ticker_summary: dict[str, Any],
     attempt_payload: dict[str, Any],
+    analysis_payload: dict[str, Any] | None = None,
 ) -> None:
     artifacts = ticker_summary.get("artifacts") or {}
     analysis_rel = artifacts.get("analysis_json")
@@ -6615,15 +6648,17 @@ def _append_analysis_intraday_attempt(
     analysis_path = run_dir / analysis_rel
     if not analysis_path.exists():
         return
-    try:
-        payload = json.loads(analysis_path.read_text(encoding="utf-8"))
-    except Exception:
-        return
+    if analysis_payload is None:
+        try:
+            payload = json.loads(analysis_path.read_text(encoding="utf-8"))
+        except Exception:
+            return
+    else:
+        payload = dict(analysis_payload)
     attempts = payload.get("intraday_snapshot_attempts")
     if not isinstance(attempts, list):
         attempts = []
-    attempts.append(attempt_payload)
-    payload["intraday_snapshot_attempts"] = attempts
+    payload["intraday_snapshot_attempts"] = [*attempts, attempt_payload]
     payload["latest_intraday_snapshot_attempt"] = attempt_payload
     payload["intraday_snapshot_latest_attempt"] = attempt_payload
     _write_json(analysis_path, payload)
