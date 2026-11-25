@@ -112,6 +112,8 @@ def _assert_no_http_retries(session):
 
 
 class KisDemoClient:
+    order_halt_paths = ()
+
     def __init__(
         self,
         credentials: DemoCredentials,
@@ -164,6 +166,8 @@ class KisDemoClient:
             raise DemoNotSentError("VTS clock regressed during pacing")
         if deadline is not None and sent_at >= stamp(deadline):
             raise DemoNotSentError("VTS request deadline elapsed before sending")
+        if method == "POST" and path == PREFIX + "order-cash":
+            assert_order_not_halted(self.order_halt_paths)
         try:
             response = self.session.request(
                 method,
@@ -439,6 +443,18 @@ def reconciliation_issue_state(db, intent_id, *, as_of):
         return {"status": "ACTIVE" if selected[4] else "CLEAR", "known_at": selected[6]}
     except (DemoError, TypeError, ValueError):
         return unknown
+
+
+def assert_order_not_halted(paths):
+    """Check the scoped entry kill switches after pacing, before the order POST."""
+    for path in paths:
+        try:
+            path.stat()
+        except FileNotFoundError:
+            continue
+        except OSError:
+            raise DemoNotSentError("VTS order interlock could not be verified") from None
+        raise DemoNotSentError("VTS order interlock is halted")
 
 
 def has_unresolved_demo_requests(db):
