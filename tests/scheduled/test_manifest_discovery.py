@@ -111,3 +111,22 @@ def test_read_only_discovery_preserves_index_and_finds_new_full(tmp_path, monkey
     assert [m["run_id"] for m, _ in results] == ["02-changing", "01-full"]
     assert results[0][0]["revision"] == "completed"
     assert before == {p: p.read_bytes() for p in tmp_path.rglob("*") if p.is_file()}
+
+
+def test_multi_batch_reads_keep_logical_paths_and_rediscover_an_older_correction(tmp_path):
+    archive = tmp_path / "archive"
+    bridge = tmp_path / "bridge"
+    bridge.mkdir()
+    logical_archive = bridge / ".." / "archive"
+    old = write(archive, "01-old", "overlay_only")
+    for number in range(2, 37):
+        write(archive, f"{number:02}-full")
+    before = discovery.full_manifests_desc(logical_archive)
+    assert [row["run_id"] for row, _ in before] == [f"{number:02}-full" for number in range(36, 1, -1)]
+    corrected = old.with_name("replacement.json")
+    corrected.write_text(json.dumps({"run_id": "01-old", "settings": {"run_mode": "full"}}), encoding="utf-8")
+    corrected.replace(old)
+    after = discovery.full_manifests_desc(logical_archive, write_index=False)
+    assert after[:-1] == before
+    assert after[-1][0]["run_id"] == "01-old"
+    assert after[-1][1] == logical_archive / "runs/2026/01-old"
