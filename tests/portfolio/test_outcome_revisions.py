@@ -104,6 +104,21 @@ def test_same_entry_exit_pair_can_change_quantity_in_a_new_revision(ledger):
     assert summary.closed_trades == summary.learned_intuitions == 2
 
 
+def test_summary_reads_only_needed_lifecycle_kinds_without_changing_point_in_time_results(ledger, monkeypatch):
+    conn, path = ledger
+    late_buy(conn, mode="actual")
+    for kind in ("SIGNAL", "OUTCOME"):
+        append_lifecycle_event(conn, event_id=kind, signal_id="standalone-report", kind=kind,
+                               occurred_at=T[1], available_at=T[1], confirmed_at=T[1], ingested_at=T[1],
+                               payload={"ticker": "A"})
+    selected = [summarize_action_performance(path, analysis_as_of=T[at]).to_dict() for at in (3, 4)]
+    monkeypatch.setattr("tradingagents.performance.action_outcomes.read_events",
+                        lambda connection, **_: read_events(connection))
+    baseline = [summarize_action_performance(path, analysis_as_of=T[at]).to_dict() for at in (3, 4)]
+    assert selected == baseline
+    assert selected[0]["closed_trades"] == selected[1]["closed_trades"] == 1
+
+
 def test_partial_multiple_sells_reallocate_without_consuming_lots_twice(ledger):
     conn, _ = ledger
     fill(conn, "B", quantity=3, cost=3)
