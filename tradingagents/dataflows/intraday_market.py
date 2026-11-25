@@ -44,8 +44,9 @@ def fetch_intraday_market_snapshot(
     last_exc: Exception | None = None
     failures: dict[str, str] = {}
     for provider_name in provider_chain:
+        is_kis = provider_name.strip().lower() in live_only_providers
         try:
-            if requested_as_of and provider_name.strip().lower() in live_only_providers:
+            if requested_as_of and is_kis:
                 require_live_intraday_clock(market_tz, provider_name=provider_name)
             snapshot = get_intraday_provider(provider_name).fetch(
                 ticker,
@@ -64,6 +65,7 @@ def fetch_intraday_market_snapshot(
                 raise VendorUnavailableError(f"Intraday provider '{provider_name}' snapshot asof exceeds analysis_as_of.")
             return replace(
                 snapshot,
+                snapshot_received_at=received_at.isoformat() if is_kis else None,
                 missing_reason={**snapshot.missing_reason, **failures},
                 execution_data_quality=classify_execution_market_data(
                     snapshot,

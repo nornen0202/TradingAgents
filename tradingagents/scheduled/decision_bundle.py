@@ -373,6 +373,8 @@ def _build_strategy_row(
     action_status = ("ACTION_SIGNAL_PRESENT" if execution_ready and has_action
                      else "DATA_RECHECK_REQUIRED" if has_action
                      else "WAITING_TRIGGER" if conditional_action else "NO_EXECUTION_ACTION")
+    source = context.get("source")
+    source = source if isinstance(source, dict) else {}
     return {
         "table_priority": 0,
         "portfolio_priority": action.get("priority"),
@@ -384,6 +386,7 @@ def _build_strategy_row(
         "strategy_ko": present_strategy_category(strategy_code),
         "last_price": last_price,
         "market_data_asof": context.get("market_data_asof"),
+        "snapshot_received_at": source.get("snapshot_received_at") if generated_current else None,
         "market_data_basis": "RESEARCH_OBSERVATION" if research_quote else "EXECUTION_CONTEXT" if context else "MISSING",
         "research_status": summary.get("status"),
         **({"candidate_research_omitted": True} if candidate_research_omitted else {}),
@@ -411,8 +414,8 @@ def _build_strategy_row(
         "luld_status": context.get("luld_status"),
         "reg_sho_status": context.get("reg_sho_status"),
         "news_halt_status": context.get("news_halt_status"),
-        "provider": (context.get("source") or {}).get("provider") if isinstance(context.get("source"), dict) else None,
-        "market_session": (context.get("source") or {}).get("market_session") if isinstance(context.get("source"), dict) else None,
+        "provider": source.get("provider"),
+        "market_session": source.get("market_session"),
         "quote_delay_seconds": _float_or_none((context.get("source") or {}).get("quote_delay_seconds")) if isinstance(context.get("source"), dict) else None,
         "source_latency_seconds": _float_or_none((context.get("source") or {}).get("source_latency_seconds")) if isinstance(context.get("source"), dict) else None,
         "confidence": _float_or_none(action.get("confidence") if action.get("confidence") is not None else candidate.get("confidence")),

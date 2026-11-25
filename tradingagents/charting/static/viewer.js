@@ -302,6 +302,8 @@ function renderKisStrategy(payload) {
     const diagnostic=row.source_diagnostics;
     if(diagnostic?.strategy_rows!==undefined)body.append(paragraph("분석 "+number(diagnostic.strategy_rows)+"종목 · 새 관측 "+number(diagnostic.fresh_rows)+"종목 · 실행 자료 충족 "+number(diagnostic.execution_ready_rows)+"종목"+(typeof diagnostic.allocated_orders==="number"?" · 보고서 배정 주문 "+number(diagnostic.allocated_orders)+"건":"")));
     if(diagnostic?.generated_at)body.append(paragraph("원본 생성 "+clock(diagnostic.generated_at)+" · 최신 관측 "+clock(diagnostic.newest_market_data_at)+" · 평가 시 관측 경과 "+unitText(diagnostic.data_age_seconds_at_check,"초")));
+    if(diagnostic?.generated_at)body.append(paragraph("최근 KIS 스냅샷 수신 완료 "+clock(diagnostic.newest_snapshot_received_at)));
+    if(diagnostic?.fresh_engine_action_rows!==undefined)body.append(paragraph("시세 기준 내 즉시 판단 "+unitText(diagnostic.fresh_engine_action_rows,"건")));
     if(diagnostic?.source_run_id)body.append(paragraph("평가에 사용한 원본 "+diagnostic.source_run_id));
     const checks=row.admission_counts;
     if(checks)body.append(paragraph("전략 신호 "+unitText(checks.strategy_signals,"건")+" · 주문 전 검사 "+unitText(checks.candidates_checked,"건")+" · 최신 호가 확인 "+unitText(checks.priced,"건")+" · 현금·수량 충족 "+unitText(checks.cash_and_size_passed,"건")));

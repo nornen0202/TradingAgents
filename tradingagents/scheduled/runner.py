@@ -5000,6 +5000,7 @@ def _resolve_latest_full_overlay_baseline_manifest(
     max_age: timedelta | None = _OVERLAY_BASELINE_MAX_AGE,
     write_discovery_index: bool = True,
     partial_required_tickers: tuple[str, ...] | None = None,
+    discovery_evidence: dict[str, Any] | None = None,
 ) -> dict[str, Any] | None:
     """Resolve the newest complete, same-market and sufficiently recent full baseline."""
 
@@ -5020,6 +5021,8 @@ def _resolve_latest_full_overlay_baseline_manifest(
     for index, candidate in enumerate(candidates):
         identity = str(candidate.get("run_id") or f"anonymous-{index}").strip()
         unique.setdefault(identity, candidate)
+    if discovery_evidence is not None:
+        discovery_evidence["unique_manifest_candidates"] = len(unique)
     eligible: list[dict[str, Any]] = []
     partial_candidates: list[dict[str, Any]] = []
     for candidate in unique.values():
@@ -5818,6 +5821,7 @@ def _run_execution_overlay_passes(
                     session_observations=observations,
                 )
                 update_payload = update.to_dict()
+                update_payload["source"]["snapshot_received_at"] = market.snapshot_received_at
                 update_payload["ingested_at"] = datetime.now(timezone.utc).isoformat()
                 update_payload["evaluated_at"] = update_payload.get("execution_asof")
                 update_payload["intraday_snapshot_attempt"] = attempt_payload
@@ -5832,10 +5836,11 @@ def _run_execution_overlay_passes(
                 micro_checkpoint_md = checkpoint_dir / _checkpoint_microstructure_report_filename(checkpoint_label)
                 micro_latest_json = ticker_dir / "microstructure_snapshot.json"
                 micro_latest_md = ticker_dir / "microstructure_report.md"
+                micro_report = render_microstructure_report(market)
                 _write_json(micro_checkpoint_json, micro_snapshot_payload)
-                micro_checkpoint_md.write_text(render_microstructure_report(market), encoding="utf-8")
+                micro_checkpoint_md.write_text(micro_report, encoding="utf-8")
                 _write_json(micro_latest_json, micro_snapshot_payload)
-                micro_latest_md.write_text(render_microstructure_report(market), encoding="utf-8")
+                micro_latest_md.write_text(micro_report, encoding="utf-8")
                 summary["artifacts"]["microstructure_snapshot_json"] = _relative_to_run(run_dir, micro_latest_json)
                 summary["artifacts"]["microstructure_report_md"] = _relative_to_run(run_dir, micro_latest_md)
                 summary["artifacts"]["microstructure_checkpoint_snapshot_json"] = _relative_to_run(run_dir, micro_checkpoint_json)
@@ -6312,6 +6317,7 @@ def _build_chatgpt_execution_context(
                 "asof_execution_gate": gate_payload,
                 "source": {
                     "provider": source.get("provider"),
+                    "snapshot_received_at": source.get("snapshot_received_at"),
                     "market": source.get("market"),
                     "exchange": source.get("exchange"),
                     "market_session": source.get("market_session"),
@@ -6430,6 +6436,7 @@ def _write_chatgpt_execution_context_from_ticker_artifacts(
                     "execution_data_quality": source.get("execution_data_quality") or source.get("data_quality") or micro.get("data_quality"),
                     "quote_delay_seconds": source.get("quote_delay_seconds"),
                     "source_latency_seconds": source.get("source_latency_seconds") or micro.get("source_latency_seconds"),
+                    "snapshot_received_at": source.get("snapshot_received_at"),
                 },
             }
         )

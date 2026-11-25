@@ -4,10 +4,14 @@ from dataclasses import replace
 import json
 from datetime import datetime, timezone
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
+from tradingagents.charting.operations import _source_health
+from tradingagents.execution.source_diagnostics import diagnose_source
 from tradingagents.scheduled.config import load_scheduled_config
+from tradingagents.scheduled.decision_bundle import build_and_write_decision_bundle
 from tradingagents.scheduled.runner import (
     FRESHNESS_PRIOR_SESSION_BACKFILL,
     _bootstrap_overlay_inputs_from_latest_run,
@@ -121,7 +125,9 @@ checkpoint_timezone = "America/New_York"
         microstructure_required=True,
     )
 
-    monkeypatch.setattr("tradingagents.scheduled.runner.fetch_intraday_market_snapshot", lambda *a, **k: snapshot)
+    monkeypatch.setenv("TRADINGAGENTS_INTRADAY_PROVIDER", "kis_microstructure")
+    monkeypatch.setattr("tradingagents.dataflows.intraday_market.get_intraday_provider",
+                        lambda _: SimpleNamespace(fetch=lambda *args, **kwargs: snapshot))
     monkeypatch.setattr(
         "tradingagents.scheduled.runner.render_execution_update_markdown",
         lambda *a, **k: "# update\n",
@@ -135,6 +141,13 @@ checkpoint_timezone = "America/New_York"
     )
 
     assert (ticker_dir / "microstructure_snapshot.json").exists()
+    source = json.loads((ticker_dir / "microstructure_snapshot.json").read_text(encoding="utf-8"))
+    update = updates["AAPL"]
+    received = source["snapshot_received_at"]
+    assert received == update["source"]["snapshot_received_at"]
+    assert update["market_data_asof"] == snapshot.asof
+    assert (datetime.fromisoformat(snapshot.asof) <= datetime.fromisoformat(received)
+            <= datetime.fromisoformat(update["evaluated_at"]) <= datetime.fromisoformat(update["ingested_at"]))
     assert (ticker_dir / "microstructure_report.md").exists()
     assert (ticker_dir / "execution" / "checkpoints" / "microstructure_snapshot_10_00.json").exists()
     assert (run_dir / "chatgpt_execution_context.json").exists()
@@ -146,13 +159,23 @@ checkpoint_timezone = "America/New_York"
     assert ticker_context["execution_eligibility"] == "LIVE_EXECUTION_READY"
     assert ticker_context["asof_execution_gate"]["core_fields_present"] is True
     assert ticker_context["asof_execution_gate"]["asof_execution_possible"] is True
+    assert ticker_context["source"]["snapshot_received_at"] == received
 
     manifest = {
         "run_id": "run",
+        "settings": {"market": "US"},
         "execution": {"artifacts": updates["_artifacts"]},
         "tickers": [summary],
         "portfolio": {"status": "disabled"},
     }
+    if lightweight:
+        _write_chatgpt_execution_context_from_ticker_artifacts(
+            config=config, run_dir=run_dir, ticker_summaries=[summary], overlay_phase={},
+        )
+    build_and_write_decision_bundle(run_dir=run_dir, manifest=manifest)
+    checked_at = datetime.now(timezone.utc)
+    diagnostic = diagnose_source(run_dir, checked_at, include_proposals=False)
+    assert _source_health(diagnostic, as_of=checked_at)["newest_snapshot_received_at"] == received
     site_dir = tmp_path / "site"
     _copy_artifacts(site_dir, run_dir, manifest, {})
 
