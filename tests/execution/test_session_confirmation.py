@@ -62,6 +62,52 @@ def test_independent_intraday_alternative_does_not_require_close():
     assert result["matched_alternatives"] == [1] and result["paper_candidate_ready"]
 
 
+def test_explicit_alternatives_distinguish_reference_shared_and_ambiguous_levels():
+    from tradingagents.execution.session_confirmation import _entry_alternatives
+
+    def level(price, **fields):
+        return {"level_type": "BREAKOUT", "confirmation": "intraday", "price": price, **fields}
+
+    pilot = level(100, confirmation_group="pilot")
+    follow = level(100, confirmation_group="follow", confirmation="next_session_quote")
+    reference = level(200, entry_condition_role="reference")
+    shared = level(102, entry_condition_role="required")
+    alternatives = _entry_alternatives([pilot, reference, follow, shared], "USD", True)
+    assert len(alternatives) == 2
+    assert [[rule["level"] for rule in group] for group in alternatives] == [[100, 102], [100, 102]]
+    moment = "2026-11-27T17:29:00Z"
+    plan = {**PLAN, "alternatives": alternatives}
+    assert not _evaluate(plan, analysis_as_of=moment, live_quote=_feed("quote", moment))["paper_candidate_ready"]
+    assert _evaluate(plan, analysis_as_of=moment, live_quote=_feed("quote", moment, price=103))["matched_alternatives"] == [0]
+    assert _entry_alternatives([pilot, level(80)], "USD", True) == []
+    assert _entry_alternatives([level(80), reference], "USD", True) == [[{
+        "id": "entry-0", "stage": "intraday", "direction": "above", "level": 80,
+    }]]
+    assert _entry_alternatives([level(100, confirmation_group="ambiguous", confirmation="next_day")], "USD", True) == []
+    assert _entry_alternatives([reference], "USD", True) == []
+
+
+def test_late_receipt_does_not_authorize_an_earlier_quote():
+    result = _evaluate(official_open=_feed("official_regular_open", MONDAY_OPEN, observed_at=NOW),
+                       live_quote=_feed("quote", "2026-11-30T14:34:59Z"))
+    assert not result["paper_candidate_ready"]
+    assert result["next_session_evidence_available_at"] == "2026-11-30T14:35:00+00:00"
+
+
+def test_next_session_quote_and_open_are_distinct_conditions():
+    open_rule = {"id": "opening", "stage": "next_open", "direction": "above", "level": 102}
+    quote_rule = {"id": "reclaim", "stage": "next_session_quote", "direction": "above", "level": 102}
+    result = _evaluate({**PLAN, "alternatives": [[open_rule], [quote_rule]]},
+                       live_quote=_feed("quote", NOW, price=103))
+    assert result["matched_alternatives"] == [1]
+
+
+def test_future_price_revision_does_not_confirm_archived_open():
+    result = _evaluate(official_open=_feed("official_regular_open", MONDAY_OPEN,
+                                           revised_at="2026-11-30T15:00:00Z"))
+    assert not result["verified_next_open"] and not result["paper_candidate_ready"]
+
+
 @pytest.mark.parametrize("name,kind,clock", [
     ("regular_close", "final_regular_close", FRIDAY_CLOSE),
     ("official_open", "official_regular_open", MONDAY_OPEN),

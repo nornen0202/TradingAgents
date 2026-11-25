@@ -14,7 +14,8 @@ PLAN_REASONS = frozenset({
     "STRATEGY_AUTHORIZATION_EXPIRED", "SELL_SIZE_REQUIRES_EXPLICIT_ALLOCATION", "STRATEGY_EVIDENCE_UNVERIFIED",
 })
 REFRESH_FIELDS = ("market", "session_date", "started_at", "finished_at", "status",
-                  "consecutive_failures", "real_orders_enabled", "error_type", "source_run_id", "source_diagnostics")
+                  "consecutive_failures", "real_orders_enabled", "error_type", "source_run_id", "source_diagnostics",
+                  "missing_candidate_count")
 
 
 def allocation_view(raw):
@@ -61,10 +62,13 @@ def refresh_attempt_health(raw, *, market, now):
     except (KeyError, TypeError, ValueError):
         return invalid
     if (raw.get("market") != market.lower() or raw.get("real_orders_enabled") is not False
-            or not isinstance(status, str) or status not in {"STARTED", "COMPLETED", "FAILED"}
+            or not isinstance(status, str) or status not in {"STARTED", "COMPLETED", "COMPLETED_PARTIAL", "FAILED"}
             or start is None or not start <= now or start.astimezone(zone).date() != session
             or type(failures) is not int or failures < 0
-            or (status == "COMPLETED" and failures != 0)
+            or (status in {"COMPLETED", "COMPLETED_PARTIAL"} and failures != 0)
+            or (status == "COMPLETED_PARTIAL" and (
+                market != "KR" or type(raw.get("missing_candidate_count")) is not int
+                or not 1 <= raw["missing_candidate_count"] <= 3))
             or (status in {"STARTED", "FAILED"} and failures < 1)
             or (status != "STARTED" and (end is None or not start <= end <= now))
             or (status == "STARTED" and raw.get("finished_at") is not None)):
@@ -73,7 +77,8 @@ def refresh_attempt_health(raw, *, market, now):
     # A durable STARTED record is not proof that its process is still alive.
     state = ("PREVIOUS_SESSION" if not current else "COMPLETION_UNVERIFIED" if status == "STARTED"
              else "RETRY_LIMIT_REACHED" if failures >= MAX_CONSECUTIVE_FAILURES
-             else "LAST_ATTEMPT_FAILED" if status == "FAILED" else "LAST_ATTEMPT_COMPLETED")
+             else "LAST_ATTEMPT_FAILED" if status == "FAILED"
+             else "LAST_ATTEMPT_COMPLETED_PARTIAL" if status == "COMPLETED_PARTIAL" else "LAST_ATTEMPT_COMPLETED")
     error = raw.get("error_type")
     return {"status": state, "attempt_status": status, "session_date": session.isoformat(),
             "started_at": start.isoformat(), "finished_at": end.isoformat() if end else None,

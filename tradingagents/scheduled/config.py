@@ -148,6 +148,7 @@ class ExecutionSettings:
     # Internal minute refresh: reuse research, omit slow report enrichment.
     execution_lightweight_refresh: bool = False
     session_confirmation_receipts_dir: Path | None = None
+    session_observation_db: Path | None = None
 
 
 @dataclass(frozen=True)
@@ -375,8 +376,13 @@ def load_scheduled_config(path: str | Path) -> ScheduledAnalysisConfig:
     execution_raw = raw.get("execution") or {}
     session_receipts = _optional_string(execution_raw.get("session_confirmation_receipts_dir"))
     observation_root = os.environ.get("TRADINGAGENTS_FORWARD_OBSERVATION_ROOT")
+    session_observation_db = _optional_string(execution_raw.get("session_observation_db"))
+    if session_observation_db is None and session_receipts is None:
+        session_observation_db = _optional_string(os.environ.get("TRADINGAGENTS_SESSION_OBSERVATION_DB"))
     if observation_root and session_receipts is None:
         session_receipts = str(Path(observation_root) / "confirmations")
+        if session_observation_db is None:
+            session_observation_db = str(Path(observation_root) / "observations.sqlite")
     summary_image_raw = raw.get("summary_image") or {}
     external_raw = raw.get("external") or {}
     external_data_raw = raw.get("external_data") or {}
@@ -635,6 +641,7 @@ def load_scheduled_config(path: str | Path) -> ScheduledAnalysisConfig:
             ),
             execution_publish_debug=bool(execution_raw.get("publish_debug", False)),
             session_confirmation_receipts_dir=_resolve_path(session_receipts, base_dir) if session_receipts else None,
+            session_observation_db=_resolve_path(session_observation_db, base_dir) if session_observation_db else None,
         ),
         summary_image=SummaryImageSettings(
             enabled=bool(summary_image_raw.get("enabled", True)),

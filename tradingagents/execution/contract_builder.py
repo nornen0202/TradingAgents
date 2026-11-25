@@ -53,8 +53,9 @@ def build_execution_contract(*, ticker: str, analysis_payload: dict[str, Any]) -
             execution_levels = decision.execution_levels
             structured_levels, synthesized_level_fallback = _structured_levels_for_contract(decision)
 
-            breakout_structured = _find_level(structured_levels, "breakout", "resistance")
-            pullback_structured = _find_level(structured_levels, "pullback", "support")
+            entry_levels = tuple(level for level in structured_levels if level.entry_condition_role != "reference")
+            breakout_structured = _find_level(entry_levels, "breakout", "resistance")
+            pullback_structured = _find_level(entry_levels, "pullback", "support")
             invalid_close_structured = _find_invalidation_level(structured_levels, confirmation="close")
             invalid_intraday_structured = _find_invalidation_level(structured_levels, confirmation="intraday")
 
@@ -99,7 +100,7 @@ def build_execution_contract(*, ticker: str, analysis_payload: dict[str, Any]) -
                     (
                         *decision.watchlist_triggers,
                         *decision.catalysts,
-                        *(level.volume_rule for level in structured_levels if level.volume_rule),
+                        *(level.volume_rule for level in entry_levels if level.volume_rule),
                     )
                 )
                 used_regex_fallback = used_regex_fallback or min_rvol is not None

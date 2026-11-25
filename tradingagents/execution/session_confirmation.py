@@ -17,8 +17,11 @@ from .experiments import _stamp
 
 RECEIPT_SCHEMA = "tradingagents.regular-session-observations/v1"
 _PROVIDERS = {"KR": {"KIS_DOMESTIC_REGULAR_SESSION"}, "US": {"KIS_US_REGULAR_SESSION", "ALPACA_SIP_REGULAR_SESSION"}}
-_OBSERVATION_FIELDS = ("kind", "event_at", "observed_at", "price", "ticker", "source", "market", "currency", "session")
+_OBSERVATION_FIELDS = ("kind", "event_at", "observed_at", "price", "ticker", "source", "market", "currency", "session",
+                       "venue", "session_id", "price_basis", "scheduled_event_at", "revised_at")
 _ENTRY_GROUP = re.compile(r"[A-Za-z0-9_-]{1,32}")
+ENTRY_CONFIRMATION_STAGES = {"intraday", "close", "next_open", "next_session_quote"}
+EXPLICIT_NEXT_SESSION_STAGES = {"next_open", "next_session_quote"}
 
 
 def entry_research_deadline(analysis_at, explicit_expiry=None):
@@ -52,6 +55,14 @@ def _read_market_record(record, plan, session, *, purpose, earliest, latest, now
         event, observed = _stamp(record["event_at"]), _stamp(record["observed_at"])
         if not earliest <= event <= latest or not event <= observed <= now:
             return None
+        revision = record.get("revised_at")
+        if revision is not None and not event <= _stamp(revision) <= observed:
+            return None
+        if record.get("session_id") is not None:
+            venue = record.get("venue")
+            if (not isinstance(venue, str) or record["session_id"] != f"{plan['market']}:{venue}:regular:{session}"
+                    or record.get("price_basis") != "unadjusted"):
+                return None
     except (KeyError, TypeError, ValueError):
         return None
     return record["price"], observed
@@ -78,7 +89,7 @@ def _validate_plan(plan):
         for rule in group:
             if (not isinstance(rule, dict) or set(rule) != {"id", "stage", "direction", "level"}
                     or not isinstance(rule["id"], str) or not rule["id"] or rule["id"] in identities
-                    or rule["stage"] not in ("intraday", "close", "next_day")
+                    or rule["stage"] not in ENTRY_CONFIRMATION_STAGES | {"next_day"}
                     or rule["direction"] not in ("above", "below") or not _positive(rule["level"])):
                 raise ValueError("Invalid condition")
             identities.add(rule["id"])
@@ -110,6 +121,7 @@ def evaluate_plan(plan, *, analysis_as_of, regular_close=None, official_open=Non
                                       earliest=market_open, latest=min(now, market_open + timedelta(seconds=plan["max_open_delay_seconds"])),
                                       now=now)
     gap_ok = bool(close and opening and abs(opening[0] / close[0] - 1) * 10000 <= plan["max_gap_bps"] + 1e-9)
+    next_session_ready = bool(next_window and gap_ok and quote and quote[1] >= max(close[1], opening[1]))
     results = {}
     ready_groups = []
     deadlines = []
@@ -117,10 +129,10 @@ def evaluate_plan(plan, *, analysis_as_of, regular_close=None, official_open=Non
         joined = bool(quote) and allowed
         for rule in group:
             stage = rule["stage"]
-            measured = {"intraday": quote, "close": close, "next_day": opening}[stage]
+            measured = {"intraday": quote, "close": close, "next_day": opening,
+                        "next_open": opening, "next_session_quote": quote if next_window else None}[stage]
             value = measured[0] if measured else None
             crossed = value is not None and (value >= rule["level"] if rule["direction"] == "above" else value <= rule["level"])
-            next_session_ready = next_window and gap_ok
             ready = crossed and (stage == "intraday" or next_session_ready)
             joined = joined and ready
             results[rule["id"]] = {"stage": stage, "crossed": crossed, "ready": ready,
@@ -138,6 +150,7 @@ def evaluate_plan(plan, *, analysis_as_of, regular_close=None, official_open=Non
         "origin_session": origin, "current_session": sessions[position][0] if position is not None else None,
         "quote_fresh": bool(quote), "within_session_ttl": allowed, "verified_next_open": bool(opening),
         "opening_gap_allowed": gap_ok,
+        "next_session_evidence_available_at": max(close[1], opening[1]).isoformat() if close and opening else None,
         "quote_expires_at": quote_deadline.isoformat() if quote_deadline else None,
         "candidate_valid_until": min(max(deadlines), quote_deadline).isoformat() if deadlines else None,
     }
@@ -168,24 +181,31 @@ def _official_observations(records, market):
     clean = {}
     for name in ("regular_close", "official_open"):
         row = records.get(name)
-        if isinstance(row, dict) and isinstance(row.get("source"), str) and row["source"] in _PROVIDERS[market]:
+        if (isinstance(row, dict) and isinstance(row.get("source"), str) and row["source"] in _PROVIDERS[market]
+                and (name != "official_open" or row["source"] != "KIS_US_REGULAR_SESSION")):
             clean[name] = {field: row.get(field) for field in _OBSERVATION_FIELDS}
     return clean
 
 
 def uses_entry_groups(levels):
-    return any(level.confirmation_group is not None for level in levels) or (
-        len(levels) == 1 and levels[0].confirmation in {"close", "next_day"}
+    return has_explicit_entry_plan(levels) or (
+        len(levels) == 1 and _entry_field(levels[0], "confirmation") in {"close", "next_day", "next_open", "next_session_quote"}
     )
 
 
+def has_explicit_entry_plan(levels):
+    return any(_entry_field(level, "confirmation_group") is not None
+               or _entry_field(level, "entry_condition_role") is not None
+               or _entry_field(level, "confirmation") in EXPLICIT_NEXT_SESSION_STAGES for level in levels)
+
+
 def _entry_field(level, name):
-    return level.get(name) if isinstance(level, dict) else getattr(level, name)
+    return level.get(name) if isinstance(level, dict) else getattr(level, name, None)
 
 
 def _level_rules(level, identifier):
     stage = _entry_field(level, "confirmation")
-    if stage not in {"intraday", "close", "next_day"}:
+    if stage not in ENTRY_CONFIRMATION_STAGES:
         raise ValueError("Unverified entry confirmation stage")
     role = _entry_field(level, "level_type")
     role = str(getattr(role, "value", role)).upper()
@@ -197,6 +217,8 @@ def _level_rules(level, identifier):
             raise ValueError("Missing breakout threshold")
         return [{"id": identifier, "stage": stage, "direction": "above", "level": price}]
     low, high = _entry_field(level, "low"), _entry_field(level, "high")
+    if role == "SUPPORT" and low is None and high is None and _positive(price := _entry_field(level, "price")):
+        return [{"id": identifier, "stage": stage, "direction": "above", "level": price}]
     if not _positive(low) or not _positive(high) or low > high:
         raise ValueError("A grouped pullback needs an explicit price range")
     return [
@@ -206,21 +228,35 @@ def _level_rules(level, identifier):
 
 
 def _entry_alternatives(levels, currency, pilot_open):
+    levels = [level for level in levels if not (
+        _entry_field(level, "entry_condition_role") == "reference"
+        and _entry_field(level, "confirmation_group") is None
+    )]
     grouped = {}
+    required = []
     for level in levels:
         name = _entry_field(level, "confirmation_group")
+        role = _entry_field(level, "entry_condition_role")
+        if role is not None:
+            if name is not None or role != "required":
+                return []
+            required.append(level)
+            continue
         if name is None and len(levels) == 1:
             name = "entry"
         if not isinstance(name, str) or _ENTRY_GROUP.fullmatch(name) is None:
-            return []  # Mixed implicit and explicit grouping has no defined meaning.
+            return []  # A legacy unclassified level may be a required condition.
         grouped.setdefault(name, []).append(level)
     alternatives = []
+    if required and not grouped:
+        grouped["entry"] = []
     for name, alternative in grouped.items():
-        if (not pilot_open and any(_entry_field(level, "confirmation") == "intraday" for level in alternative)
-                or any(_entry_field(level, "currency") not in (None, currency) for level in alternative)):
+        conditions = [*alternative, *required]
+        if (not pilot_open and any(_entry_field(level, "confirmation") == "intraday" for level in conditions)
+                or any(_entry_field(level, "currency") not in (None, currency) for level in conditions)):
             continue
         try:
-            rules = [rule for index, level in enumerate(alternative) for rule in _level_rules(level, f"{name}-{index}")]
+            rules = [rule for index, level in enumerate(conditions) for rule in _level_rules(level, f"{name}-{index}")]
         except ValueError:
             continue  # Evidence for a different explicit alternative can still qualify.
         alternatives.append(rules)

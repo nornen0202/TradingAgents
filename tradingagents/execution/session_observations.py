@@ -18,7 +18,7 @@ import requests
 from tradingagents.atomic_io import atomic_write_json, interprocess_file_lock
 from tradingagents.charting.bars import instant
 from .promotion import _sessions
-from .session_confirmation import RECEIPT_SCHEMA, _schedule
+from .session_confirmation import RECEIPT_SCHEMA, _official_observations, _schedule
 from .kis_demo import DEMO_HOST, DemoError, _pacer
 
 SCHEMA = "tradingagents.forward-market-observation/v1"
@@ -26,6 +26,8 @@ ZONES = {"KR": "Asia/Seoul", "US": "America/New_York"}
 CURRENCIES = {"KR": "KRW", "US": "USD"}
 KINDS = {"open": "official_regular_open", "close": "final_regular_close"}
 VENUES = {"KR": {"J"}, "US": {"NAS", "NYS", "AMS"}}
+MAX_WATCHLIST_SIZE = 50
+MAX_REQUESTS_PER_PASS = 4
 _QUOTATION_TRANSPORT = {
     ("POST", "/oauth2/tokenP", None),
     ("GET", "/uapi/domestic-stock/v1/quotations/inquire-daily-itemchartprice", "FHKST03010100"),
@@ -58,8 +60,8 @@ def _watchlist(path):
         data = json.load(stream)
     if (not isinstance(data, dict) or set(data) != {"schema", "instruments"}
             or data["schema"] != SCHEMA or not isinstance(data["instruments"], list)
-            or not 1 <= len(data["instruments"]) <= 4):
-        raise ValueError("Provide a versioned watchlist of up to four read-only symbols.")
+            or not 1 <= len(data["instruments"]) <= MAX_WATCHLIST_SIZE):
+        raise ValueError("Provide a versioned watchlist of up to fifty read-only symbols.")
     symbols = set()
     for item in data["instruments"]:
         if not isinstance(item, dict) or set(item) != {"ticker", "market", "venue"}:
@@ -119,9 +121,67 @@ def _prices(payload, item, day):
 
 
 def _evidence(item, day, kind, event, observed, price):
+    market, venue = item["market"], item["venue"]
     return {"kind": KINDS[kind], "event_at": event.isoformat(), "observed_at": observed.isoformat(),
             "price": price, "ticker": item["ticker"], "market": item["market"], "currency": CURRENCIES[item["market"]],
-            "session": day, "source": "KIS_DOMESTIC_REGULAR_SESSION" if item["market"] == "KR" else "KIS_US_REGULAR_SESSION"}
+            "session": day, "venue": venue, "session_id": f"{market}:{venue}:regular:{day}",
+            "price_basis": "unadjusted", "revised_at": None,
+            "source": "KIS_DOMESTIC_REGULAR_SESSION" if market == "KR" else "KIS_US_REGULAR_SESSION"}
+
+
+def load_collected_observations(path, ticker, market, *, now):
+    """Read verified market evidence directly from the collector's append-only store."""
+    if path is None or market not in ZONES or (cutoff := instant(now)) is None:
+        return {}
+    local_day = cutoff.astimezone(ZoneInfo(ZONES[market])).date()
+    day = local_day.isoformat()
+    try:
+        with closing_connection(sqlite3.connect(path.resolve().as_uri() + "?mode=ro", uri=True)) as db:
+            watchlist = _watchlist(path.parent / "policy.json")
+            registered = db.execute("SELECT watchlist_hash FROM observation_registration WHERE singleton=1").fetchone()
+            if registered != (hashlib.sha256(json.dumps(watchlist, sort_keys=True).encode()).hexdigest(),):
+                return {}
+            instrument = next((item for item in watchlist if item["ticker"] == ticker and item["market"] == market), None)
+            if instrument is None:
+                return {}
+            rows = db.execute("""
+                SELECT session, stage, observed_at, source_sha256, raw_response, evidence FROM observations
+                WHERE ticker=? AND market=? AND evidence IS NOT NULL AND
+                      ((stage='open' AND session=?) OR (stage='close' AND session BETWEEN ? AND ?))
+                ORDER BY session DESC
+                """, (ticker, market, day, (local_day - timedelta(days=30)).isoformat(), day)).fetchall()
+        observations = {}
+        for session, stage, observed_at, digest, raw, evidence in rows:
+            key = {"open": "official_open", "close": "regular_close"}[stage]
+            if key in observations or hashlib.sha256(raw).hexdigest() != digest:
+                continue
+            record = json.loads(evidence)
+            received = instant(observed_at)
+            event = instant(record.get("event_at"))
+            if (received is None or event is None or not event <= received <= cutoff
+                    or instant(record.get("observed_at")) != received):
+                continue
+            if record.get("revised_at") is not None:
+                revision = instant(record["revised_at"])
+                if revision is None or not event <= revision <= received:
+                    continue
+            venue = record.get("venue")
+            if venue is None and all(key not in record for key in ("venue", "session_id", "price_basis")):
+                # The original collector bound venue to the immutable registered policy.
+                venue = instrument["venue"]
+                record.update(venue=venue, session_id=f"{market}:{venue}:regular:{session}", price_basis="unadjusted")
+            if (venue != instrument["venue"] or record.get("session_id") != f"{market}:{venue}:regular:{session}"
+                    or record.get("kind") != KINDS[stage] or record.get("session") != session
+                    or record.get("price_basis") != "unadjusted" or record.get("ticker") != ticker
+                    or record.get("market") != market or record.get("currency") != CURRENCIES[market]):
+                continue
+            if stage == "open" and market == "US":
+                continue  # KIS US opening values are provisional and may be corrected the next day.
+            if _prices(json.loads(raw), {"market": market}, session)[stage] == record.get("price"):
+                observations[key] = record
+        return _official_observations(observations, market)
+    except (OSError, sqlite3.Error, AttributeError, KeyError, TypeError, ValueError):
+        return {}
 
 
 def _latest_confirmation(db, ticker, stage, before_session):
@@ -134,7 +194,7 @@ def _latest_confirmation(db, ticker, stage, before_session):
 def _confirmation(db, root, item, day, stage, evidence):
     if stage == "open":
         closing = _latest_confirmation(db, item["ticker"], "close", day)
-        opening = evidence
+        opening = evidence if evidence and evidence.get("kind") == KINDS["open"] else None
     else:
         closing = evidence
         opening = None
@@ -171,6 +231,7 @@ def capture_due(root, *, operations=None, clock=_now, sessions=_schedule, downlo
         raise ValueError("Collector requires an aware clock.")
     clients = {}
     out = []
+    requests_used = 0
     try:
         with interprocess_file_lock(root / "capture.lock", timeout=0), closing_connection(sqlite3.connect(root / "observations.sqlite")) as db:
             db.executescript("""
@@ -220,6 +281,9 @@ def capture_due(root, *, operations=None, clock=_now, sessions=_schedule, downlo
                 if db.execute("""SELECT 1 FROM observation_failures WHERE ticker=? AND session=? AND stage=?
                                  AND observed_at>?""", (ticker, day, stage, (start-cooldown).isoformat())).fetchone():
                     continue
+                if requests_used >= MAX_REQUESTS_PER_PASS:
+                    continue
+                requests_used += 1
                 try:
                     if download is None:
                         if market not in clients:
@@ -230,6 +294,10 @@ def capture_due(root, *, operations=None, clock=_now, sessions=_schedule, downlo
                     received = instant(clock())
                     if received is None or received < start:
                         raise ValueError("Provider reception clock regressed.")
+                    if received.astimezone(ZoneInfo(ZONES[market])).date().isoformat() != day or (
+                        stage == "open" and received >= closing
+                    ):
+                        raise ValueError("Provider response outside the requested capture session.")
                     prices = _prices(payload, item, day)
                     raw = json.dumps(payload, sort_keys=True, ensure_ascii=False, allow_nan=False).encode("utf-8")
                 except (OSError, RuntimeError, TypeError, ValueError, KeyError):
@@ -241,10 +309,15 @@ def capture_due(root, *, operations=None, clock=_now, sessions=_schedule, downlo
                 late = stage == "open" and received > opening + timedelta(seconds=30)
                 # The missed opening is still a real observed daily price. It
                 # cannot satisfy the next-open execution proof retroactively.
-                status = "OBSERVED_LATE_OPEN" if late else "OBSERVED"
+                status = ("OBSERVED_LATE_OPEN" if late else "OBSERVED_PROVISIONAL_OPEN"
+                          if stage == "open" and market == "US" else "OBSERVED")
                 # A proved opening print was available by receipt; using that
                 # clock is conservative when the precise exchange tick is absent.
-                evidence = None if late else _evidence(item, day, stage, received if stage == "open" else event, received, prices[stage])
+                evidence = _evidence(item, day, stage, received if stage == "open" else event, received, prices[stage])
+                evidence["scheduled_event_at"] = event.isoformat()
+                if stage == "open":
+                    evidence["kind"] = ("provisional_regular_open" if market == "US"
+                                        else "late_regular_open" if late else KINDS[stage])
                 if stage == "close":
                     status = "OBSERVED_MARKET_ONLY"
                 with db:

@@ -164,3 +164,36 @@ def test_missing_invalid_or_future_completion_never_becomes_a_baseline(admission
     baseline(archive,**change)
     assert local.run_due(archive,state,now=AT)==[{"target":item.name,"status":"WAITING_RESEARCH_BASELINE"}]
     assert not state.exists()
+
+
+@pytest.mark.parametrize("blocker", [None, "quote_failure", "holding_gap", "unexpected_failure", "wrong_checkpoint"])
+def test_verified_candidate_omission_can_finish_only_a_completed_overlay(admission, blocker):
+    _, _, target = admission
+    target.inputs["profile"] = "kr"
+    source = "20261028T100000_local-scheduler-kr-full"
+    tickers = [{"ticker": f"{idx:06d}.KS", "status": "success",
+                "intraday_snapshot_attempt": {"success": True, "checkpoint": "10:00"}} for idx in range(29)]
+    tickers.append({"ticker": "439090.KQ", "status": "failed", "candidate_research_omitted": True})
+    manifest = {
+        "label": "local-scheduler-kr-overlay_only", "started_at": (AT - timedelta(minutes=2)).isoformat(),
+        "finished_at": AT.isoformat(), "status": "partial_failure",
+        "settings": {"market": "KR", "run_mode": "overlay_only"},
+        "summary": {"total_tickers": 30, "successful_tickers": 29, "failed_tickers": 1},
+        "overlay_source_run_id": source,
+        "overlay_universe": {"status": "VERIFIED_PARTIAL", "baseline_run_id": source,
+                             "missing_candidate_tickers": ["439090.KQ"]},
+        "execution": {"refresh_checkpoint": "10:00", "execution_asof": AT.isoformat(),
+                      "overlay_phase": {"selected_checkpoints": ["10:00"]}},
+        "tickers": tickers,
+    }
+    if blocker == "quote_failure":
+        tickers[0]["intraday_snapshot_attempt"]["success"] = False
+    if blocker == "holding_gap":
+        manifest["active_universe"] = {"missing_holding_tickers": ["555555.KS"]}
+    if blocker == "unexpected_failure":
+        tickers[0]["status"] = "failed"
+    if blocker == "wrong_checkpoint":
+        tickers[0]["intraday_snapshot_attempt"]["checkpoint"] = "09:00"
+    assert runner._verified_completed_partial_overlay(manifest) is (blocker is None)
+    assert local.completed_target(local._scheduler_manifest_view(manifest), target, now=AT) is (blocker is None)
+    assert manifest["status"] == "partial_failure"

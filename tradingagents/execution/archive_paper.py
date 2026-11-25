@@ -5,7 +5,7 @@ import math
 from pathlib import Path
 from zoneinfo import ZoneInfo
 from .paper import PaperLimits, stamp
-from .session_confirmation import entry_research_deadline, evaluate_plan
+from .session_confirmation import entry_research_deadline, evaluate_plan, has_explicit_entry_plan, uses_entry_groups
 from .sizing import size_paper_order
 
 
@@ -145,9 +145,7 @@ def build_step(run: Path, now: str, limits: PaperLimits | None = None):
             proof = _entry_proof(run, ticker, contract, raw, asof, generated)
             if proof is not None:
                 entry_confirmation = _entry_confirmation(proof, ticker, market, generated, evaluated)
-                if not expiry and entry_confirmation["paper_candidate_ready"] and any(
-                    level.get("confirmation_group") is not None for level in _entry_levels(contract)
-                ):
+                if not expiry and entry_confirmation["paper_candidate_ready"] and has_explicit_entry_plan(_entry_levels(contract)):
                     research_expiry = entry_research_deadline(contract["analysis_asof"])
                     valid_until = min(stamp(valid_until), research_expiry).isoformat()
                     entry_confirmation["candidate_valid_until"] = min(
@@ -185,9 +183,7 @@ def _entry_levels(contract):
 
 def _entry_proof(run, ticker, contract, raw, market_data_asof, generated):
     levels = _entry_levels(contract)
-    needs_update = any(level.get("confirmation_group") is not None for level in levels) or (
-        bool(contract.get("entry_valid_until")) and len(levels) == 1 and levels[0].get("confirmation") in {"close", "next_day"}
-    )
+    needs_update = has_explicit_entry_plan(levels) or (bool(contract.get("entry_valid_until")) and uses_entry_groups(levels))
     if not needs_update:
         return contract.get("entry_confirmation_v2", {} if "entry_confirmation_v2" in contract else None)
     try:

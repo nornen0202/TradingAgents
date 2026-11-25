@@ -210,6 +210,7 @@ def _price_checks(thesis, closes, quote, days, now, *, currency, compatible, act
                        if deadline is None or aware_datetime(bar["event_at"]) <= deadline}
     primary = [level for level in levels if level.get("level_type") == "BREAKOUT"
                and level.get("confirmation") == "close" and _threshold(level)
+               and level.get("entry_condition_role") != "reference"
                and not explicit_price_range_conflicts({"execution_levels": {"levels": [level]}})]
     results = []
     for index, level in enumerate(levels):
@@ -245,6 +246,14 @@ def _price_checks(thesis, closes, quote, days, now, *, currency, compatible, act
             if not observation and not needed:
                 needed = (f"{next_day.isoformat()} 정규장 확정 종가와 선행 조건 확인" if next_day else
                           "먼저 같은 조건의 돌파·회복 종가와 거래량 등 선행 조건 확인")
+        if stage in {"next_open", "next_session_quote"}:
+            origin = start.astimezone(ZONES["KR" if currency == "KRW" else "US"]).date()
+            next_day = next((day for day in sorted(days) if day > origin), None)
+            if stage == "next_session_quote" and next_day and session_quote and session_quote["session"] == next_day.isoformat():
+                observation = session_quote
+            if not observation:
+                needed = ("다음 정규장 개장가의 거래소·수신 시각 확인" if stage == "next_open"
+                          else "다음 정규장 최신 가격과 선행 조건 확인")
         checked = _compare(level, observation, currency=currency, compatible=compatible, conflict=conflict, requirement=needed)
         threshold = _threshold(level)
         if (stage == "close" and not dependent_exit and not observation and session_quote and threshold and compatible

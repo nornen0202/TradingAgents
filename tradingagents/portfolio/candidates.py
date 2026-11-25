@@ -34,13 +34,15 @@ def build_portfolio_candidates(
     target_tickers.update(position.canonical_ticker for position in snapshot.positions)
     target_tickers.update(analysis_by_ticker.keys())
     target_tickers.update(failed_by_ticker.keys())
+    baseline = manifest.get("overlay_universe") or {}
+    omitted = {resolve_identity(ticker).canonical_ticker for ticker in baseline.get("missing_candidate_tickers", [])}
 
     candidates: list[PortfolioCandidate] = []
     warnings: list[str] = []
     for canonical_ticker in sorted(target_tickers):
         analysis = analysis_by_ticker.get(canonical_ticker)
         position = snapshot.find_position(canonical_ticker)
-        if analysis is None and position is None:
+        if analysis is None and position is None and canonical_ticker not in omitted:
             continue
         candidate, candidate_warnings = _build_single_candidate(
             snapshot=snapshot,
@@ -749,8 +751,14 @@ def _apply_execution_overlay_actions(
 ) -> tuple[str, str]:
     decision_state = str(execution_update.get("decision_state") or "").upper()
     decision_now = str(execution_update.get("decision_now") or "").upper()
+    decision_if_triggered = str(execution_update.get("decision_if_triggered") or "").upper()
     timing_state = _normalize_timing_state(str(execution_update.get("execution_timing_state") or "").upper())
 
+    if decision_if_triggered == "NONE" and decision_now not in {"EXIT_NOW", "REDUCE_NOW"} and decision_state != "INVALIDATED":
+        if timing_state in {"PILOT_READY", "PILOT_BLOCKED_VOLUME", "PILOT_BLOCKED_FAILED_BREAKOUT",
+                            "CLOSE_CONFIRM_PENDING", "CLOSE_CONFIRMED", "NEXT_DAY_FOLLOWTHROUGH_PENDING",
+                            "LATE_SESSION_CONFIRM", "CLOSE_CONFIRM"}:
+            return ("HOLD", "NONE") if is_held else ("WATCH", "WATCH_TRIGGER")
     if timing_state == "FAILED_BREAKOUT":
         if is_held:
             return ("HOLD", "REDUCE_IF_TRIGGERED")
@@ -875,6 +883,16 @@ def _execution_health(
     payload["execution_decision_state"] = str(execution_update.get("decision_state") or "").strip().upper()
     payload["execution_decision_now"] = str(execution_update.get("decision_now") or "").strip().upper()
     payload["execution_decision_if_triggered"] = str(execution_update.get("decision_if_triggered") or "").strip().upper()
+    proof = execution_update.get("entry_confirmation_v2")
+    evaluation = proof.get("evaluation") if isinstance(proof, dict) else None
+    payload["confirmed_entry_alternative"] = (
+        isinstance(evaluation, dict)
+        and evaluation.get("paper_candidate_ready") is True
+        and bool(evaluation.get("matched_alternatives"))
+        and "conditional_entry_group_confirmed" in (execution_update.get("reason_codes") or ())
+        and payload["execution_decision_state"] == "ACTIONABLE_NOW"
+        and payload["execution_decision_now"] in {"STARTER_NOW", "ADD_NOW"}
+    )
     payload["market_session"] = source.get("market_session")
     payload["quote_delay_seconds"] = source.get("quote_delay_seconds")
     payload["provider_realtime_capable"] = source.get("provider_realtime_capable")

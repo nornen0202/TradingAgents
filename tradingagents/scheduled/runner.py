@@ -53,6 +53,7 @@ from tradingagents.dataflows.stockstats_utils import is_retryable_yfinance_error
 from tradingagents.execution.contract_builder import build_execution_contract, has_legacy_trim_invalidation
 from tradingagents.execution.overlay import evaluate_execution_state
 from tradingagents.execution.session_confirmation import load_session_observations
+from tradingagents.execution.session_observations import load_collected_observations
 from tradingagents.execution.reporting import (
     render_execution_summary_markdown,
     render_execution_update_markdown,
@@ -218,7 +219,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "--strict",
         action="store_true",
-        help="Return non-zero when a ticker fails or required full-universe coverage is incomplete.",
+        help="Return non-zero for current ticker failures or incomplete required coverage.",
     )
     parser.add_argument("--label", default="github-actions", help="Run label for archived metadata.")
     parser.add_argument("--resume-from-run", help="Recover failed or proven wrong-company ticker research into a new cohort, preserving valid research provenance.")
@@ -273,7 +274,9 @@ def main(argv: list[str] | None = None) -> int:
         f"({manifest['summary']['successful_tickers']} success / {manifest['summary']['failed_tickers']} failed)."
     )
     strict_failed = manifest["status"] == "failed" or bool(manifest["summary"]["failed_tickers"])
-    if args.strict and _strict_required_coverage_failed(manifest):
+    if _verified_completed_partial_overlay(manifest):
+        strict_failed = False  # The overlay checkpoint completed. Research coverage stays partial.
+    elif args.strict and _strict_required_coverage_failed(manifest):
         strict_failed = True
         print(
             "::error::Required ticker-universe coverage is incomplete; "
@@ -412,6 +415,7 @@ def _execute_run_body(config, *, run_label, skip_site_build, tz, started_at,
                 now=started_at,
             )
     source_run_id: str | None = None
+    partial_source = None
     run_warnings: list[str] = list(resolved_universe.warnings) if resolved_universe else []
     run_warnings.extend(overlay_universe_warnings)
     configured_ticker_count = len(run_tickers)
@@ -525,13 +529,38 @@ def _execute_run_body(config, *, run_label, skip_site_build, tz, started_at,
         # run the account portfolio pipeline below.
         pass
     else:
+        if overlay_universe_metadata and overlay_universe_metadata.get("status") == "VERIFIED_PARTIAL":
+            partial_source = _load_json_artifact(
+                config.storage.archive_dir,
+                f"runs/{overlay_universe_metadata['baseline_run_id'][:4]}/{overlay_universe_metadata['baseline_run_id']}/run.json",
+            )
+            from .research_recovery import verified_candidate_partial
+            omissions = overlay_universe_metadata["missing_candidate_tickers"]
+            if verified_candidate_partial(
+                config.storage.archive_dir, partial_source, now=started_at,
+                required_tickers=[*resolved_universe.holding_tickers, *resolved_universe.configured_tickers,
+                                  *resolved_universe.profile_watch_tickers],
+            ) != omissions:
+                raise RuntimeError("OVERLAY_PARTIAL_BASELINE_CHANGED")
         ticker_summaries, source_run_id = _bootstrap_overlay_inputs_from_latest_run(
             config=config,
             run_dir=run_dir,
             tickers=run_tickers,
             now=started_at,
-            **({"source_manifest": refresh_source, "preserve_thesis_bytes": True} if refresh_source is not None else {}),
+            **({"source_manifest": refresh_source, "preserve_thesis_bytes": True} if refresh_source is not None
+               else {"source_manifest": partial_source, "preserve_thesis_bytes": True} if partial_source is not None else {}),
         )
+        if partial_source is not None:
+            ticker_summaries.extend({
+                "ticker": ticker, "status": "failed", "artifacts": {},
+                "candidate_research_omitted": True,
+                "error": "Optional candidate has no verified research in the selected full run.",
+            } for ticker in omissions)
+            run_tickers = [*run_tickers, *omissions]
+            configured_ticker_count = len(run_tickers)
+            active_universe_metadata["expected_watchlist_tickers"] = _unique_tickers((
+                *active_universe_metadata.get("expected_watchlist_tickers", []), *omissions,
+            ))
         if refresh_source is not None:
             _run_selective_rerun(config=config, run_dir=run_dir, engine_results_dir=engine_results_dir,
                 ticker_summaries=ticker_summaries,
@@ -599,6 +628,7 @@ def _execute_run_body(config, *, run_label, skip_site_build, tz, started_at,
             ticker_summaries=ticker_summaries,
             checkpoints=selected_checkpoints,
             analysis_source_run_id=source_run_id or run_id,
+            **({"preserve_analysis_bytes": True} if partial_source is not None else {}),
         )
         if run_mode in {"overlay_only", "selective_rerun_only"} and selected_checkpoints and not _has_ticker_execution_updates(
             execution_updates
@@ -2956,6 +2986,9 @@ def _freeze_overlay_universe_to_latest_full_baseline(
         requested_tickers=requested_base_tickers,
         required_holding_tickers=list(resolved_universe.holding_tickers),
         now=now,
+        partial_required_tickers=(*resolved_universe.configured_tickers, *resolved_universe.profile_watch_tickers)
+        if resolved_universe.account_snapshot_status == "loaded" and resolved_universe.account_snapshot_health == "VALID"
+        else None,
     )
     if baseline is None:
         # Keep the established explicit holding-gap error when otherwise valid
@@ -2990,6 +3023,7 @@ def _freeze_overlay_universe_to_latest_full_baseline(
         )
 
     baseline_tickers = _successful_manifest_tickers(baseline)
+    candidate_omissions = baseline.get("_verified_candidate_omissions", [])
     if not baseline_tickers:
         raise RuntimeError(
             "OVERLAY_BASELINE_MISSING: latest full run has no successful analysis artifacts."
@@ -3071,7 +3105,7 @@ def _freeze_overlay_universe_to_latest_full_baseline(
         required_watchlist = _unique_tickers(raw_watchlist)
         missing_watchlist = [
             ticker for ticker in required_watchlist
-            if _ticker_identity_key(ticker) not in baseline_identity
+            if _ticker_identity_key(ticker) not in baseline_identity and ticker not in candidate_omissions
         ]
         if missing_watchlist:
             raise RuntimeError(
@@ -3080,7 +3114,7 @@ def _freeze_overlay_universe_to_latest_full_baseline(
                 f"baseline_run_id={baseline.get('run_id')}; "
                 f"missing_watchlist_tickers={','.join(missing_watchlist)}"
             )
-        configured, profile_watch = tuple(required_watchlist), ()
+        configured, profile_watch = tuple(ticker for ticker in required_watchlist if ticker not in candidate_omissions), ()
         watchlist_source = "full_baseline_contract"
 
     selection_universe = replace(
@@ -3104,7 +3138,7 @@ def _freeze_overlay_universe_to_latest_full_baseline(
         )
 
     metadata = {
-        "status": "FROZEN",
+        "status": "VERIFIED_PARTIAL" if candidate_omissions else "FROZEN",
         "policy": "latest_complete_same_market_full_baseline_within_age_window",
         "baseline_max_age_hours": int(_OVERLAY_BASELINE_MAX_AGE.total_seconds() // 3600),
         "baseline_max_newer_sessions": _OVERLAY_BASELINE_MAX_NEWER_SESSIONS,
@@ -3121,6 +3155,9 @@ def _freeze_overlay_universe_to_latest_full_baseline(
         "deferred_tickers": deferred_all,
         "holding_coverage_gap": [],
     }
+    if candidate_omissions:
+        metadata["missing_candidate_tickers"] = candidate_omissions
+        warnings.append(f"overlay_verified_partial:missing_candidate_research={','.join(candidate_omissions)}")
     return baseline_tickers, selection_universe, scanner_receipt, metadata, warnings
 
 
@@ -3757,6 +3794,47 @@ def _strict_required_coverage_failed(manifest: dict[str, Any]) -> bool:
         return False
     coverage = active.get("coverage")
     return not isinstance(coverage, dict) or coverage.get("complete") is not True
+
+
+def _verified_completed_partial_overlay(manifest: dict[str, Any]) -> bool:
+    """An optional research omission does not spend the current checkpoint's retry budget."""
+    if manifest.get("status") != "partial_failure":
+        return False
+    settings = manifest.get("settings") or {}
+    if settings.get("run_mode") != "overlay_only" or str(settings.get("market")).upper() != "KR":
+        return False
+    baseline = manifest.get("overlay_universe") or {}
+    omitted = baseline.get("missing_candidate_tickers")
+    if (baseline.get("status") != "VERIFIED_PARTIAL" or not baseline.get("baseline_run_id")
+            or baseline["baseline_run_id"] != manifest.get("overlay_source_run_id")
+            or not isinstance(omitted, list) or not 1 <= len(omitted) <= 3
+            or not all(isinstance(ticker, str) for ticker in omitted)
+            or (manifest.get("active_universe") or {}).get("missing_holding_tickers")):
+        return False
+    summary = manifest.get("summary") or {}
+    execution = manifest.get("execution") or {}
+    checkpoint = execution.get("refresh_checkpoint")
+    if not checkpoint or checkpoint not in (execution.get("overlay_phase") or {}).get("selected_checkpoints", []):
+        return False
+    failed, succeeded = [], []
+    for row in manifest.get("tickers") or []:
+        if row.get("status") == "failed" and row.get("candidate_research_omitted") is True:
+            failed.append(row.get("ticker"))
+        elif row.get("status") == "success":
+            attempt = row.get("intraday_snapshot_attempt") or {}
+            if attempt.get("success") is not True or attempt.get("checkpoint") != checkpoint:
+                return False
+            succeeded.append(row.get("ticker"))
+        else:
+            return False
+    scope = failed + succeeded
+    return bool(succeeded and failed == omitted
+                and all(isinstance(ticker, str) and ticker for ticker in scope)
+                and len({_ticker_identity_key(ticker) for ticker in scope}) == len(scope)
+                and 1 <= len(failed) <= len(scope) // 10
+                and summary.get("total_tickers") == len(scope)
+                and summary.get("successful_tickers") == len(succeeded)
+                and summary.get("failed_tickers") == len(failed))
 
 
 def _github_actions_source_receipt() -> dict[str, Any]:
@@ -4921,6 +4999,7 @@ def _resolve_latest_full_overlay_baseline_manifest(
     now: datetime | None = None,
     max_age: timedelta | None = _OVERLAY_BASELINE_MAX_AGE,
     write_discovery_index: bool = True,
+    partial_required_tickers: tuple[str, ...] | None = None,
 ) -> dict[str, Any] | None:
     """Resolve the newest complete, same-market and sufficiently recent full baseline."""
 
@@ -4942,6 +5021,7 @@ def _resolve_latest_full_overlay_baseline_manifest(
         identity = str(candidate.get("run_id") or f"anonymous-{index}").strip()
         unique.setdefault(identity, candidate)
     eligible: list[dict[str, Any]] = []
+    partial_candidates: list[dict[str, Any]] = []
     for candidate in unique.values():
         if not _manifest_market_matches(candidate, market=market):
             continue
@@ -4955,12 +5035,36 @@ def _resolve_latest_full_overlay_baseline_manifest(
                 continue
             if _overlay_newer_session_count(candidate, now=now, market=market) > _OVERLAY_BASELINE_MAX_NEWER_SESSIONS:
                 continue
-        if not _manifest_is_complete_overlay_baseline(
+        if _manifest_is_complete_overlay_baseline(
             candidate, market=market, requested_tickers=requested_tickers,
             required_holding_tickers=required_holding_tickers, archive_dir=archive_dir, now=now,
         ):
+            eligible.append(candidate)
             continue
-        eligible.append(candidate)
+        if partial_required_tickers is not None and str(market).upper() == "KR" and candidate.get("status") == "partial_failure":
+            failure = candidate.get("terminal_failure") or {}
+            # A failed-only retry that produced no new research can neither
+            # replace nor give a later clock to its successful parent research.
+            if not (candidate.get("research_recovery") and failure.get("newly_successful_tickers") == 0
+                    and failure.get("reason") == "no_new_successful_recovery_research"):
+                partial_candidates.append(candidate)
+    if partial_candidates:
+        from .research_recovery import verified_candidate_partial
+        complete_start = max((_manifest_started_at_for_sort(item, market=market) for item in eligible), default=0)
+        for candidate in sorted(partial_candidates, key=lambda item: _manifest_started_at_for_sort(item, market=market), reverse=True):
+            if _manifest_started_at_for_sort(candidate, market=market) <= complete_start:
+                break
+            if required_holding_tickers and not _manifest_has_bootstrap_ready_ticker(
+                candidate, tickers=required_holding_tickers, require_all_tickers=True,
+            ):
+                continue
+            omissions = verified_candidate_partial(
+                archive_dir, candidate, now=now or datetime.now(timezone.utc),
+                required_tickers=[*partial_required_tickers, *(required_holding_tickers or [])],
+            )
+            if omissions:
+                eligible.append({**candidate, "_verified_candidate_omissions": omissions})
+                break
     if not eligible:
         return None
     if any((item.get("active_universe") or {}).get("mode") == "adaptive_required_coverage" for item in eligible):
@@ -5630,6 +5734,7 @@ def _run_execution_overlay_passes(
     ticker_summaries: list[dict[str, Any]],
     checkpoints: list[str],
     analysis_source_run_id: str | None = None,
+    preserve_analysis_bytes: bool = False,
 ) -> dict[str, dict[str, Any]]:
     # Failed-only/finalization recovery copies immutable research artifacts.
     # Current overlays may update newly researched rows, but must not append to
@@ -5697,15 +5802,21 @@ def _run_execution_overlay_passes(
                         "execution_data_quality": market.execution_data_quality,
                     }
                 )
+                evaluation_at = datetime.now(ZoneInfo(config.run.timezone))
+                observation_db = config.execution.session_observation_db
+                observations = (
+                    load_collected_observations(observation_db, ticker, market.market, now=evaluation_at)
+                    if observation_db is not None else load_session_observations(
+                        config.execution.session_confirmation_receipts_dir, ticker, market.market,
+                    )
+                )
                 update = evaluate_execution_state(
                     contract,
                     market,
-                    now=datetime.now(ZoneInfo(config.run.timezone)),
+                    now=evaluation_at,
                     max_data_age_seconds=config.execution.execution_max_data_age_seconds,
                     refresh_checkpoint=checkpoint_label,
-                    session_observations=load_session_observations(
-                        config.execution.session_confirmation_receipts_dir, ticker, market.market,
-                    ),
+                    session_observations=observations,
                 )
                 update_payload = update.to_dict()
                 update_payload["ingested_at"] = datetime.now(timezone.utc).isoformat()
@@ -5769,7 +5880,8 @@ def _run_execution_overlay_passes(
                     _refresh_integrated_review(ticker_dir, summary, run_dir=run_dir,
                         db_paths=[config.performance.store_path or (config.storage.archive_dir / "performance.sqlite")])
                 summary["intraday_snapshot_attempt"] = attempt_payload
-                _append_analysis_intraday_attempt(run_dir=run_dir, ticker_summary=summary, attempt_payload=attempt_payload)
+                if not preserve_analysis_bytes:
+                    _append_analysis_intraday_attempt(run_dir=run_dir, ticker_summary=summary, attempt_payload=attempt_payload)
                 updates_by_ticker[ticker] = update_payload
             except Exception as exc:
                 attempt_payload.update(
@@ -5831,7 +5943,8 @@ def _run_execution_overlay_passes(
                     _refresh_integrated_review(ticker_dir, summary, run_dir=run_dir,
                         db_paths=[config.performance.store_path or (config.storage.archive_dir / "performance.sqlite")])
                 summary["intraday_snapshot_attempt"] = attempt_payload
-                _append_analysis_intraday_attempt(run_dir=run_dir, ticker_summary=summary, attempt_payload=attempt_payload)
+                if not preserve_analysis_bytes:
+                    _append_analysis_intraday_attempt(run_dir=run_dir, ticker_summary=summary, attempt_payload=attempt_payload)
                 updates_by_ticker[ticker] = update_payload
                 print(f"::warning::Execution overlay checkpoint '{checkpoint_label}' failed for {ticker}: {exc}")
         updates_by_ticker["_latest_checkpoint"] = {"value": checkpoint_label}
@@ -6744,6 +6857,7 @@ class _ExecutionContractShim:
                 currency=str(item.get("currency") or "") or None,
                 confirmation=str(item.get("confirmation") or "close"),
                 confirmation_group=item.get("confirmation_group"),
+                entry_condition_role=item.get("entry_condition_role"),
                 volume_rule=str(item.get("volume_rule") or ""),
                 source_text=str(item.get("source_text") or ""),
                 reason_code=str(item.get("reason_code") or ""),

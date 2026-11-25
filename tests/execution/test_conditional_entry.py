@@ -142,6 +142,70 @@ def test_entry_groups_preserve_the_held_position_downside_signals(level, flag, r
         execution_update=rows, is_held=False) == ("HOLD", ())
 
 
+@pytest.mark.parametrize("gate", ["expiry", "event"])
+def test_buy_only_gates_preserve_grouped_downside_review(gate):
+    from tradingagents.schemas.execution import EventGuard
+
+    original = contract(execution_levels={"levels": [
+        {"level_type": "PULLBACK", "low": 100, "high": 101, "confirmation": "intraday", "confirmation_group": "pilot"},
+    ]})
+    if gate == "expiry":
+        original = replace(original, entry_valid_until="2026-09-21T10:58:00+09:00")
+    else:
+        original = replace(original, event_guard=EventGuard(earnings_date="2026-09-21", block_new_position_within_days=1))
+    at = datetime.fromisoformat("2026-09-21T11:00:00+09:00")
+    update = evaluate_execution_state(original, replace(market(at), last_price=99, day_low=98),
+                                      now=at, max_data_age_seconds=120)
+    assert update.trigger_status["support_fail"] and update.decision_now.value == "NONE"
+    assert _apply_execution_overlay_risk_action(risk_action="HOLD", risk_action_reason_codes=(),
+        execution_update=update.to_dict(), is_held=True) == ("REDUCE_RISK", ("SUPPORT_BROKEN",))
+
+
+def test_independent_pilot_is_not_vetoed_by_unmet_other_entry_group():
+    original = contract(execution_levels={"levels": [
+        {"level_type": "BREAKOUT", "price": 100, "confirmation": "intraday", "confirmation_group": "pilot"},
+        {"level_type": "PULLBACK", "low": 150, "high": 151, "confirmation": "close", "confirmation_group": "other"},
+    ]})
+    at = datetime.fromisoformat("2026-09-21T11:00:00+09:00")
+    update = evaluate_execution_state(original, market(at), now=at, max_data_age_seconds=120)
+    assert update.decision_now.value == "STARTER_NOW"
+    blocked = evaluate_execution_state(replace(original, min_relative_volume=1.1),
+                                      replace(market(at), relative_volume=0.7), now=at, max_data_age_seconds=120)
+    assert blocked.decision_now.value == "NONE" and blocked.trigger_status["support_fail"]
+
+
+def test_reference_level_does_not_supply_a_fallback_volume_requirement():
+    original = contract(entry_action="STARTER", conditional_entry_action="NONE", execution_levels={"levels": [
+        {"level_type": "BREAKOUT", "price": 100, "confirmation": "intraday"},
+        {"level_type": "SUPPORT", "price": 90, "confirmation": "intraday", "entry_condition_role": "reference",
+         "volume_rule": "relative volume 2.0"},
+    ]})
+    at = datetime.fromisoformat("2026-09-21T11:00:00+09:00")
+    update = evaluate_execution_state(original, replace(market(at), relative_volume=1.2), now=at, max_data_age_seconds=120)
+    assert original.min_relative_volume is None and update.decision_now.value == "STARTER_NOW"
+
+
+@pytest.mark.parametrize("confirmation", ["next_open", "next_session_quote"])
+def test_ungrouped_active_next_session_entry_cannot_trigger_intraday(confirmation):
+    original = contract(entry_action="STARTER", conditional_entry_action="NONE", execution_levels={"levels": [
+        {"level_type": "PULLBACK", "low": 100, "high": 102, "confirmation": confirmation},
+    ]})
+    at = datetime.fromisoformat("2026-09-21T11:00:00+09:00")
+    update = evaluate_execution_state(original, market(at), now=at, max_data_age_seconds=120)
+    assert update.decision_now.value == "NONE"
+    assert update.reason_codes == ("conditional_entry_confirmation_unavailable",)
+
+
+@pytest.mark.parametrize("metadata", [{"confirmation_group": "pilot"}, {"entry_condition_role": "required"}])
+def test_invalid_grouped_or_required_clause_cannot_be_silently_dropped(metadata):
+    thesis = decision(execution_levels={"levels": [
+        {"level_type": "BREAKOUT", "price": 100, "confirmation": "intraday", "confirmation_group": "pilot"},
+        {"level_type": "SUPPORT", "price": 102, **metadata},
+    ]})
+    with pytest.raises(StructuredDecisionValidationError, match="(explicit confirmation|entry_condition_role)"):
+        parse_structured_decision(json.dumps(thesis))
+
+
 @pytest.mark.parametrize("case", [
     "close_and_next_open", "missing_open", "unverified_close", "before_open", "holiday", "expired", "wait",
     "independent_intraday", "joint_required", "active_expiry_after_decision",
@@ -183,7 +247,7 @@ def test_standard_overlay_producer_archives_confirmed_entry_only(tmp_path, monke
     def observation(kind, clock):
         return {"kind": kind, "event_at": clock, "observed_at": clock, "price": 101,
                 "ticker": ticker, "market": "US", "currency": "USD", "session": clock[:10],
-                "source": "KIS_US_REGULAR_SESSION"}
+                "source": "ALPACA_SIP_REGULAR_SESSION"}
 
     atomic_write_json(tmp_path / "observations/ABC.json", {
         "schema": RECEIPT_SCHEMA, "ticker": ticker, "market": "US", "price_basis": "unadjusted",

@@ -340,6 +340,53 @@ def test_completed_baseline_naturally_admits_first_attempt_after_wait(tmp_path, 
     assert json.loads((state / "execution-refresh/kr.json").read_text())["consecutive_failures"] == 0
 
 
+def test_verified_kr_partial_refresh_keeps_cadence_and_order_source_blocked(tmp_path, monkeypatch):
+    from tradingagents import local_automation
+    from tradingagents.execution.paper_runtime import _select_source
+    from tradingagents.execution.strategy_diagnostics import refresh_attempt_health
+    from tradingagents.scheduled import runner
+
+    archive, state = tmp_path / "archive", tmp_path / "state"
+    enable(state)
+    monkeypatch.setattr(local_automation, "require_storage_headroom", lambda *a: None)
+    baseline_id = "20261019T090000_local-scheduler-kr-full"
+    run_id = "20261019T100000_local-freshness-kr-overlay"
+    omitted = ["439090.KQ"]
+    manifest = {
+        "run_id": run_id, "status": "partial_failure", "started_at": AT.isoformat(), "finished_at": AT.isoformat(),
+        "settings": {"market": "KR", "run_mode": "overlay_only"},
+        "summary": {"total_tickers": 30, "successful_tickers": 29, "failed_tickers": 1},
+        "overlay_source_run_id": baseline_id,
+        "overlay_universe": {"status": "VERIFIED_PARTIAL", "baseline_run_id": baseline_id,
+                             "missing_candidate_tickers": omitted},
+        "execution": {"refresh_checkpoint": "10:00", "overlay_phase": {"selected_checkpoints": ["10:00"]}},
+        "tickers": [
+            *({"ticker": f"{index:06d}.KS", "status": "success",
+               "intraday_snapshot_attempt": {"success": True, "checkpoint": "10:00"}} for index in range(29)),
+            {"ticker": omitted[0], "status": "failed", "candidate_research_omitted": True},
+        ],
+    }
+    output = archive / "runs" / "2026" / run_id / "run.json"
+    output.parent.mkdir(parents=True)
+    output.write_text(json.dumps(manifest), encoding="utf-8")
+
+    def baseline(*args, **kwargs):
+        assert kwargs["partial_required_tickers"] == ()
+        return {"run_id": baseline_id}
+
+    monkeypatch.setattr(runner, "_resolve_latest_full_overlay_baseline_manifest", baseline)
+    executor = lambda *a, **k: manifest
+    result = refresh.refresh_due(archive, state, now=AT, clock=lambda: AT, session_resolver=open_kr, executor=executor)
+    assert result == [{"target": "execution-freshness-kr", "status": "COMPLETED_PARTIAL"}]
+    receipt = json.loads((state / "execution-refresh/kr.json").read_text(encoding="utf-8"))
+    assert receipt["consecutive_failures"] == 0 and receipt["missing_candidate_count"] == 1
+    assert refresh_attempt_health(receipt, market="KR", now=AT)["status"] == "LAST_ATTEMPT_COMPLETED_PARTIAL"
+    assert _select_source(archive, "kr", AT) == (None, True)
+    assert refresh.refresh_due(archive, state, now=AT + timedelta(minutes=1), dry_run=True, session_resolver=open_kr) == [
+        {"target": "execution-freshness-kr", "status": "DUE"}
+    ]
+
+
 @pytest.mark.parametrize("failures,seconds,expected", [
     (2, 299, "REFRESH_COOLDOWN"), (3, 300, "REFRESH_RETRY_LIMIT"),
 ])

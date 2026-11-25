@@ -19,6 +19,7 @@ from tradingagents.execution.source_diagnostics import diagnose_source
 ATTEMPT_INTERVAL_SECONDS = 60
 FAILURE_RETRY_SECONDS = 300
 EXECUTION_LANE_MODE = "KIS_EXECUTION_REFRESH_V1"
+_COMPLETED_ATTEMPTS = {"COMPLETED", "COMPLETED_PARTIAL"}
 
 
 def execution_refresh_enabled(state):
@@ -90,10 +91,11 @@ def refresh_due(archive, state, *, now, dry_run=False, clock=None, executor=None
         # Windows launches drift by fractions of a second. Allow one successful
         # refresh per minute UTC slot; failed/in-flight attempts retain the
         # full elapsed cooldown.
-        next_success_slot = (started is not None and prior.get("status") == "COMPLETED"
+        completed = prior.get("status") in _COMPLETED_ATTEMPTS
+        next_success_slot = (started is not None and completed
             and int(now.timestamp()) // ATTEMPT_INTERVAL_SECONDS
             > int(started.timestamp()) // ATTEMPT_INTERVAL_SECONDS)
-        cooldown = ATTEMPT_INTERVAL_SECONDS if prior.get("status") == "COMPLETED" else FAILURE_RETRY_SECONDS
+        cooldown = ATTEMPT_INTERVAL_SECONDS if completed else FAILURE_RETRY_SECONDS
         if started and (now - started).total_seconds() < cooldown and not next_success_slot:
             results.append({"target": target, "status": "REFRESH_COOLDOWN"})
             continue
@@ -108,7 +110,8 @@ def refresh_due(archive, state, *, now, dry_run=False, clock=None, executor=None
         try:
             from tradingagents.scheduled.runner import _resolve_latest_full_overlay_baseline_manifest
             baseline = _resolve_latest_full_overlay_baseline_manifest(
-                archive, market=market.upper(), now=now, write_discovery_index=False)
+                archive, market=market.upper(), now=now, write_discovery_index=False,
+                partial_required_tickers=() if market == "kr" else None)
         except Exception as exc:
             results.append({"target": target, "status": "REFRESH_BASELINE_UNVERIFIED",
                             "error_type": type(exc).__name__})
@@ -126,7 +129,7 @@ def refresh_due(archive, state, *, now, dry_run=False, clock=None, executor=None
         atomic_write_json(path, receipt)
         try:
             from tradingagents.scheduled.config import load_scheduled_config
-            from tradingagents.scheduled.runner import execute_scheduled_run
+            from tradingagents.scheduled.runner import execute_scheduled_run, _verified_completed_partial_overlay
             from tradingagents.local_automation import require_storage_headroom
             root = Path(__file__).resolve().parents[2]
             config = load_scheduled_config(root / "config" / (
@@ -142,9 +145,12 @@ def refresh_due(archive, state, *, now, dry_run=False, clock=None, executor=None
                     execution_session_gate_enabled=True, execution_selective_rerun_enabled=False))
             result = (executor or execute_scheduled_run)(config, run_label=f"local-freshness-{market}-overlay",
                 skip_site_build=True, paper_state_dir=state)
-            receipt.update(status="COMPLETED" if result.get("status") == "success" else "FAILED",
-                           source_run_id=result.get("run_id"))
-            if receipt["status"] == "COMPLETED":
+            status = "COMPLETED" if result.get("status") == "success" else "FAILED"
+            if status == "FAILED" and _verified_completed_partial_overlay(result):
+                status = "COMPLETED_PARTIAL"
+                receipt["missing_candidate_count"] = len(result["overlay_universe"]["missing_candidate_tickers"])
+            receipt.update(status=status, source_run_id=result.get("run_id"))
+            if status in _COMPLETED_ATTEMPTS:
                 receipt["consecutive_failures"] = 0
         except Exception as exc:
             receipt.update(status="FAILED", error_type=type(exc).__name__)

@@ -362,6 +362,9 @@ def _build_strategy_row(
         execution_ready=execution_ready,
         conditional_ready=conditional_ready,
     )
+    candidate_research_omitted = summary.get("candidate_research_omitted") is True
+    if candidate_research_omitted:
+        data_status = "원분석 누락 · 매수 후보 제외"
     # Fresh observations are not an execution decision or broker permission.
     # Keep the legacy data-readiness contract for consumers; expose the distinct
     # engine action so readers cannot infer a buy from an IMMEDIATE data row.
@@ -383,6 +386,7 @@ def _build_strategy_row(
         "market_data_asof": context.get("market_data_asof"),
         "market_data_basis": "RESEARCH_OBSERVATION" if research_quote else "EXECUTION_CONTEXT" if context else "MISSING",
         "research_status": summary.get("status"),
+        **({"candidate_research_omitted": True} if candidate_research_omitted else {}),
         "failure_diagnostics": (sanitize_failure_diagnostics(summary.get("failure_diagnostics"))
                                 if summary.get("status") == "failed" else None),
         "session_vwap": session_vwap,

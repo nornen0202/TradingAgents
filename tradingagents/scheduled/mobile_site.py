@@ -55,6 +55,7 @@ _PUBLIC_ROW_FIELDS = (
 
 _PRIVATE_ROW_FIELDS = (
     "reference_strategy",
+    "candidate_research_omitted",
     "thesis",
     "execution",
     "portfolio_role",
@@ -2308,6 +2309,7 @@ _PRIVATE_JS = READER_JS + r"""
     return `<article class="action-card" id="strategy-${esc(marketId)}-${esc(encodeURIComponent(tickerIdentity))}" tabindex="-1" data-ticker="${esc(tickerIdentity)}" data-name="${esc(displayName)}" data-direction="${esc(direction.kind)}" data-search="${esc(`${displayName} ${row.ticker || ''} ${row.sector || ''}`.toLocaleLowerCase())}" data-change="${numeric(row.price_change_pct)}" data-readiness="${esc(readiness.code)}" data-group="${esc(role)}" data-top="${topTickers.has(tickerIdentity) ? 'true' : 'false'}">
       <button type="button" class="back-to-overview">↑ 전략 요약표로</button>
       <div class="card-title"><div><strong>${esc(displayName)} <span class="role-badge">${esc(roleLabel(role))}</span></strong><span class="ticker-code">${esc(row.ticker || '-')}</span></div><span class="row-mode mode-${esc(readiness.code.toLowerCase())}">${esc(readiness.label)}</span></div>
+      ${row.candidate_research_omitted === true ? '<p class="readiness-note">원분석 누락 · 매수 후보 제외</p>' : ''}
       <div class="price-line"><strong>${fmt(row.last_price)}</strong><span>${hasDatedPlan ? '주문 상태의 입력 시세' : '입력 시세'} ${esc(dateTime(row.market_data_asof))}${sizingBlocked ? ' · 분석 참고' : ''}</span></div>
       <div class="private-action" data-direction="${esc(direction.kind)}"><strong>분석 시점 전략 방향</strong><span class="strategy-direction">${esc(direction.text)}</span></div>
       ${researchDetails(row.research_plan)}
