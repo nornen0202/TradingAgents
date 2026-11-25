@@ -1,0 +1,2152 @@
+{
+  "553": {
+    "corrected": {
+      "hashes": {
+        "long-inputs/market-inputs.json": "3d377614885115990ca8085b5cbafeb73f28cfc623a29abeface81d1dccf678c",
+        "reference/independent-ledger.json": "dcc6343b8bc505328e045ec1268efe177c7a2be0ad9b98eb648f018a3d3fd4a9",
+        "reference/lean-reconciliation.json": "526165ce017c818fc3f0cba3389dfd959e0542be06bb5c8d4e3e065e0a4d10ce",
+        "reference/study.json": "a271260861bc03f9b5e0cdb7a60600192ccdeab4371bebb818b30f56c43eb771",
+        "reference/weights.json": "59939c01031eb63087cacf783040f79ef52f89713af25e262c8b5d2b8febb67a",
+        "research-plan.json": "0a2a79f9cff376270f1d504ced5f3df8c3179e887c3b349bc9b55461a7e062a8"
+      },
+      "periods": {
+        "full": {
+          "arms": {
+            "kospi200_hold": {
+              "closing_nav_krw": 278633545.05286,
+              "costs_krw": {
+                "capital_gains_reserve": 0,
+                "commission": 0.0,
+                "dividend_tax": 2036588.4,
+                "fill_count": 0,
+                "fx_cost": 0.0,
+                "sell_levy": 0.0,
+                "slippage": 0.0
+              },
+              "max_drawdown": -0.4868366241065998,
+              "mean_exposure": 0.9389269523715004,
+              "net_time_weighted_return": 1.0252973093303543,
+              "sharpe_rf_zero": 0.6058648155324678
+            },
+            "monthly_80_20": {
+              "closing_nav_krw": 286696697.1836393,
+              "costs_krw": {
+                "capital_gains_reserve": 256848.85895221776,
+                "commission": 124942.72511339131,
+                "dividend_tax": 1902025.8460475097,
+                "fill_count": 35,
+                "fx_cost": 55014.0633423003,
+                "sell_levy": 0.0,
+                "slippage": 124942.2080608878
+              },
+              "max_drawdown": -0.25207692367049017,
+              "mean_exposure": 0.955392488094512,
+              "net_time_weighted_return": 0.8964428163207134,
+              "sharpe_rf_zero": 0.8215705365025888
+            },
+            "quant_only": {
+              "closing_nav_krw": 201528589.19527727,
+              "costs_krw": {
+                "capital_gains_reserve": 14485017.756275572,
+                "commission": 1913375.7403861769,
+                "dividend_tax": 949309.8929164126,
+                "fill_count": 254,
+                "fx_cost": 1589762.8713599904,
+                "sell_levy": 78116.61518999995,
+                "slippage": 1913408.1847126496
+              },
+              "max_drawdown": -0.19468590940542918,
+              "mean_exposure": 0.656211707573225,
+              "net_time_weighted_return": 0.3897136341240903,
+              "sharpe_rf_zero": 0.6117644820771809
+            },
+            "spy_hold": {
+              "closing_nav_krw": 270004182.606324,
+              "costs_krw": {
+                "capital_gains_reserve": 0,
+                "commission": 0.0,
+                "dividend_tax": 1795626.3233512938,
+                "fill_count": 0,
+                "fx_cost": 0.0,
+                "sell_levy": 0.0,
+                "slippage": 0.0
+              },
+              "max_drawdown": -0.20121451045093508,
+              "mean_exposure": 0.9593911853444431,
+              "net_time_weighted_return": 0.7610578283299052,
+              "sharpe_rf_zero": 0.6805013427710933
+            }
+          },
+          "end": "2026-11-24",
+          "sessions": 1268,
+          "start": "2022-01-03"
+        },
+        "prior": {
+          "arms": {
+            "kospi200_hold": {
+              "closing_nav_krw": 216762940.29286003,
+              "costs_krw": {
+                "capital_gains_reserve": 0,
+                "commission": 0.0,
+                "dividend_tax": 1600913.1599999997,
+                "fill_count": 0,
+                "fx_cost": 0.0,
+                "sell_levy": 0.0,
+                "slippage": 0.0
+              },
+              "max_drawdown": -0.2723235827730318,
+              "mean_exposure": 0.9346661644328431,
+              "net_time_weighted_return": 0.5755798522190856,
+              "sharpe_rf_zero": 0.7088072333783881
+            },
+            "monthly_80_20": {
+              "closing_nav_krw": 268718064.9342055,
+              "costs_krw": {
+                "capital_gains_reserve": 256848.85895221776,
+                "commission": 34384.81679612871,
+                "dividend_tax": 1534299.8300720274,
+                "fill_count": 22,
+                "fx_cost": 16423.404057860447,
+                "sell_levy": 0.0,
+                "slippage": 34384.05447721518
+              },
+              "max_drawdown": -0.1666584087149635,
+              "mean_exposure": 0.9568350189201783,
+              "net_time_weighted_return": 0.7775176654150808,
+              "sharpe_rf_zero": 0.9141387696457116
+            },
+            "quant_only": {
+              "closing_nav_krw": 202030891.42258215,
+              "costs_krw": {
+                "capital_gains_reserve": 11168162.107299348,
+                "commission": 1460879.647045072,
+                "dividend_tax": 755275.2412410828,
+                "fill_count": 206,
+                "fx_cost": 1191607.0689236054,
+                "sell_levy": 77604.12818999996,
+                "slippage": 1460884.9275593485
+              },
+              "max_drawdown": -0.19468590940542918,
+              "mean_exposure": 0.63516153885244,
+              "net_time_weighted_return": 0.39317744169860847,
+              "sharpe_rf_zero": 0.75935169536294
+            },
+            "spy_hold": {
+              "closing_nav_krw": 274241336.524297,
+              "costs_krw": {
+                "capital_gains_reserve": 0,
+                "commission": 0.0,
+                "dividend_tax": 1471421.372634302,
+                "fill_count": 0,
+                "fx_cost": 0.0,
+                "sell_levy": 0.0,
+                "slippage": 0.0
+              },
+              "max_drawdown": -0.17698031556725302,
+              "mean_exposure": 0.9607620376470084,
+              "net_time_weighted_return": 0.7886939671669271,
+              "sharpe_rf_zero": 0.8149495691415322
+            }
+          },
+          "end": "2025-12-31",
+          "sessions": 1037,
+          "start": "2022-01-03"
+        },
+        "validation_already_seen": {
+          "arms": {
+            "kospi200_hold": {
+              "closing_nav_krw": 278633545.05286,
+              "costs_krw": {
+                "capital_gains_reserve": 0,
+                "commission": 0.0,
+                "dividend_tax": 435675.2400000002,
+                "fill_count": 0,
+                "fx_cost": 0.0,
+                "sell_levy": 0.0,
+                "slippage": 0.0
+              },
+              "max_drawdown": -0.4868366241066002,
+              "mean_exposure": 0.9580543856718795,
+              "net_time_weighted_return": 0.2854298095256005,
+              "sharpe_rf_zero": 0.7475629202545471
+            },
+            "monthly_80_20": {
+              "closing_nav_krw": 286696697.1836393,
+              "costs_krw": {
+                "capital_gains_reserve": 0.0,
+                "commission": 90557.9083172626,
+                "dividend_tax": 367726.0159754823,
+                "fill_count": 13,
+                "fx_cost": 38590.659284439855,
+                "sell_levy": 0.0,
+                "slippage": 90558.15358367263
+              },
+              "max_drawdown": -0.25207692367048995,
+              "mean_exposure": 0.9489167111844865,
+              "net_time_weighted_return": 0.06690518649662103,
+              "sharpe_rf_zero": 0.46270346649168326
+            },
+            "quant_only": {
+              "closing_nav_krw": 201528589.19527727,
+              "costs_krw": {
+                "capital_gains_reserve": 3316855.6489762235,
+                "commission": 452496.0933411049,
+                "dividend_tax": 194034.65167532978,
+                "fill_count": 48,
+                "fx_cost": 398155.8024363851,
+                "sell_levy": 512.4869999999937,
+                "slippage": 452523.25715330103
+              },
+              "max_drawdown": -0.15422573956903196,
+              "mean_exposure": 0.7507096511379612,
+              "net_time_weighted_return": -0.0024862644705884174,
+              "sharpe_rf_zero": 0.046142502899367346
+            },
+            "spy_hold": {
+              "closing_nav_krw": 270004182.606324,
+              "costs_krw": {
+                "capital_gains_reserve": 0,
+                "commission": 0.0,
+                "dividend_tax": 324204.9507169919,
+                "fill_count": 0,
+                "fx_cost": 0.0,
+                "sell_levy": 0.0,
+                "slippage": 0.0
+              },
+              "max_drawdown": -0.2012145104509343,
+              "mean_exposure": 0.9532371860467802,
+              "net_time_weighted_return": -0.01545045678260526,
+              "sharpe_rf_zero": -0.015982962322277087
+            }
+          },
+          "end": "2026-11-24",
+          "sessions": 231,
+          "start": "2026-01-02"
+        }
+      }
+    },
+    "original": {
+      "hashes": {
+        "long-inputs/market-inputs.json": "f4a8dfb106e05cbd9163d07df5b0ea5ec01cfcee3e521b12d34253b418660622",
+        "reference/independent-ledger.json": "ff84b730bf21843ef045972321026fc0f1b576950eb6119152525ef572987b20",
+        "reference/lean-reconciliation.json": "e4468cd6e92937556025ce83e23a269db5ebe1a5b1bbe570e03b92fc93e57bb9",
+        "reference/study.json": "6e2185407be940d5c25a12dae6a563ec771a87aca1b05820e7e3b263b37badc1",
+        "reference/weights.json": "59939c01031eb63087cacf783040f79ef52f89713af25e262c8b5d2b8febb67a",
+        "research-plan.json": "0a2a79f9cff376270f1d504ced5f3df8c3179e887c3b349bc9b55461a7e062a8"
+      },
+      "periods": {
+        "full": {
+          "arms": {
+            "kospi200_hold": {
+              "closing_nav_krw": 278633545.05286,
+              "costs_krw": {
+                "capital_gains_reserve": 0,
+                "commission": 0.0,
+                "dividend_tax": 2036588.4,
+                "fill_count": 0,
+                "fx_cost": 0.0,
+                "sell_levy": 0.0,
+                "slippage": 0.0
+              },
+              "max_drawdown": -0.4868366241065998,
+              "mean_exposure": 0.9389269523715004,
+              "net_time_weighted_return": 1.0252973093303543,
+              "sharpe_rf_zero": 0.6058648155324678
+            },
+            "monthly_80_20": {
+              "closing_nav_krw": 286696697.1836393,
+              "costs_krw": {
+                "capital_gains_reserve": 256848.85895221776,
+                "commission": 124942.72511339131,
+                "dividend_tax": 1902025.8460475097,
+                "fill_count": 35,
+                "fx_cost": 55014.0633423003,
+                "sell_levy": 0.0,
+                "slippage": 124942.2080608878
+              },
+              "max_drawdown": -0.25207692367049017,
+              "mean_exposure": 0.955392488094512,
+              "net_time_weighted_return": 0.8964428163207134,
+              "sharpe_rf_zero": 0.8215705365025888
+            },
+            "quant_only": {
+              "closing_nav_krw": 201156489.19527727,
+              "costs_krw": {
+                "capital_gains_reserve": 14485017.756275572,
+                "commission": 1913375.7403861769,
+                "dividend_tax": 949309.8929164126,
+                "fill_count": 254,
+                "fx_cost": 1589762.8713599904,
+                "sell_levy": 78116.61518999995,
+                "slippage": 1913408.1847126496
+              },
+              "max_drawdown": -0.19468590940542918,
+              "mean_exposure": 0.6562113250152324,
+              "net_time_weighted_return": 0.3871476833310914,
+              "sharpe_rf_zero": 0.608669501618662
+            },
+            "spy_hold": {
+              "closing_nav_krw": 270004182.606324,
+              "costs_krw": {
+                "capital_gains_reserve": 0,
+                "commission": 0.0,
+                "dividend_tax": 1795626.3233512938,
+                "fill_count": 0,
+                "fx_cost": 0.0,
+                "sell_levy": 0.0,
+                "slippage": 0.0
+              },
+              "max_drawdown": -0.20121451045093508,
+              "mean_exposure": 0.9593911853444431,
+              "net_time_weighted_return": 0.7610578283299052,
+              "sharpe_rf_zero": 0.6805013427710933
+            }
+          },
+          "end": "2026-11-24",
+          "sessions": 1268,
+          "start": "2022-01-03"
+        },
+        "prior": {
+          "arms": {
+            "kospi200_hold": {
+              "closing_nav_krw": 216762940.29286003,
+              "costs_krw": {
+                "capital_gains_reserve": 0,
+                "commission": 0.0,
+                "dividend_tax": 1600913.1599999997,
+                "fill_count": 0,
+                "fx_cost": 0.0,
+                "sell_levy": 0.0,
+                "slippage": 0.0
+              },
+              "max_drawdown": -0.2723235827730318,
+              "mean_exposure": 0.9346661644328431,
+              "net_time_weighted_return": 0.5755798522190856,
+              "sharpe_rf_zero": 0.7088072333783881
+            },
+            "monthly_80_20": {
+              "closing_nav_krw": 268718064.9342055,
+              "costs_krw": {
+                "capital_gains_reserve": 256848.85895221776,
+                "commission": 34384.81679612871,
+                "dividend_tax": 1534299.8300720274,
+                "fill_count": 22,
+                "fx_cost": 16423.404057860447,
+                "sell_levy": 0.0,
+                "slippage": 34384.05447721518
+              },
+              "max_drawdown": -0.1666584087149635,
+              "mean_exposure": 0.9568350189201783,
+              "net_time_weighted_return": 0.7775176654150808,
+              "sharpe_rf_zero": 0.9141387696457116
+            },
+            "quant_only": {
+              "closing_nav_krw": 202030891.42258215,
+              "costs_krw": {
+                "capital_gains_reserve": 11168162.107299348,
+                "commission": 1460879.647045072,
+                "dividend_tax": 755275.2412410828,
+                "fill_count": 206,
+                "fx_cost": 1191607.0689236054,
+                "sell_levy": 77604.12818999996,
+                "slippage": 1460884.9275593485
+              },
+              "max_drawdown": -0.19468590940542918,
+              "mean_exposure": 0.63516153885244,
+              "net_time_weighted_return": 0.39317744169860847,
+              "sharpe_rf_zero": 0.75935169536294
+            },
+            "spy_hold": {
+              "closing_nav_krw": 274241336.524297,
+              "costs_krw": {
+                "capital_gains_reserve": 0,
+                "commission": 0.0,
+                "dividend_tax": 1471421.372634302,
+                "fill_count": 0,
+                "fx_cost": 0.0,
+                "sell_levy": 0.0,
+                "slippage": 0.0
+              },
+              "max_drawdown": -0.17698031556725302,
+              "mean_exposure": 0.9607620376470084,
+              "net_time_weighted_return": 0.7886939671669271,
+              "sharpe_rf_zero": 0.8149495691415322
+            }
+          },
+          "end": "2025-12-31",
+          "sessions": 1037,
+          "start": "2022-01-03"
+        },
+        "validation_already_seen": {
+          "arms": {
+            "kospi200_hold": {
+              "closing_nav_krw": 278633545.05286,
+              "costs_krw": {
+                "capital_gains_reserve": 0,
+                "commission": 0.0,
+                "dividend_tax": 435675.2400000002,
+                "fill_count": 0,
+                "fx_cost": 0.0,
+                "sell_levy": 0.0,
+                "slippage": 0.0
+              },
+              "max_drawdown": -0.4868366241066002,
+              "mean_exposure": 0.9580543856718795,
+              "net_time_weighted_return": 0.2854298095256005,
+              "sharpe_rf_zero": 0.7475629202545471
+            },
+            "monthly_80_20": {
+              "closing_nav_krw": 286696697.1836393,
+              "costs_krw": {
+                "capital_gains_reserve": 0.0,
+                "commission": 90557.9083172626,
+                "dividend_tax": 367726.0159754823,
+                "fill_count": 13,
+                "fx_cost": 38590.659284439855,
+                "sell_levy": 0.0,
+                "slippage": 90558.15358367263
+              },
+              "max_drawdown": -0.25207692367048995,
+              "mean_exposure": 0.9489167111844865,
+              "net_time_weighted_return": 0.06690518649662103,
+              "sharpe_rf_zero": 0.46270346649168326
+            },
+            "quant_only": {
+              "closing_nav_krw": 201156489.19527727,
+              "costs_krw": {
+                "capital_gains_reserve": 3316855.6489762235,
+                "commission": 452496.0933411049,
+                "dividend_tax": 194034.65167532978,
+                "fill_count": 48,
+                "fx_cost": 398155.8024363851,
+                "sell_levy": 512.4869999999937,
+                "slippage": 452523.25715330103
+              },
+              "max_drawdown": -0.15422573956903196,
+              "mean_exposure": 0.7507075512092402,
+              "net_time_weighted_return": -0.004328062016398793,
+              "sharpe_rf_zero": 0.03102300300808873
+            },
+            "spy_hold": {
+              "closing_nav_krw": 270004182.606324,
+              "costs_krw": {
+                "capital_gains_reserve": 0,
+                "commission": 0.0,
+                "dividend_tax": 324204.9507169919,
+                "fill_count": 0,
+                "fx_cost": 0.0,
+                "sell_levy": 0.0,
+                "slippage": 0.0
+              },
+              "max_drawdown": -0.2012145104509343,
+              "mean_exposure": 0.9532371860467802,
+              "net_time_weighted_return": -0.01545045678260526,
+              "sharpe_rf_zero": -0.015982962322277087
+            }
+          },
+          "end": "2026-11-24",
+          "sessions": 231,
+          "start": "2026-01-02"
+        }
+      }
+    }
+  },
+  "569": {
+    "KR": {
+      "coverage": {
+        "000660.KS": {
+          "diagnostics": {
+            "invalid_close": 1,
+            "zero_volume": 14
+          },
+          "first": "2022-01-04",
+          "last": "2026-11-24",
+          "missing_sessions": [
+            "2022-01-03",
+            "2022-05-09",
+            "2025-09-19"
+          ],
+          "retrieved_at": "2026-11-25T13:12:11.562563+00:00",
+          "rows": 1193,
+          "sha256": "13ddb7b5f6575e6f888647d6340d2df1b10188dbf5336b34dde1f0d677ea39aa",
+          "url": "https://query1.finance.yahoo.com/v8/finance/chart/000660.KS?period1=1641135600&period2=1795532400&interval=1d&events=div%2Csplits%2CcapitalGains&includeAdjustedClose=true"
+        },
+        "005930.KS": {
+          "diagnostics": {
+            "invalid_close": 1,
+            "zero_volume": 11
+          },
+          "first": "2022-01-04",
+          "last": "2026-11-24",
+          "missing_sessions": [
+            "2022-01-03",
+            "2022-05-09",
+            "2025-09-19"
+          ],
+          "retrieved_at": "2026-11-25T13:12:05.711650+00:00",
+          "rows": 1193,
+          "sha256": "9cfcce3b5e5ffc125a618e16d915191a9b55183071a686b5f42c0b09f6b04547",
+          "url": "https://query1.finance.yahoo.com/v8/finance/chart/005930.KS?period1=1641135600&period2=1795532400&interval=1d&events=div%2Csplits%2CcapitalGains&includeAdjustedClose=true"
+        },
+        "012450.KS": {
+          "diagnostics": {
+            "invalid_close": 1,
+            "zero_volume": 32
+          },
+          "first": "2022-01-04",
+          "last": "2026-11-24",
+          "missing_sessions": [
+            "2022-01-03",
+            "2022-05-09",
+            "2025-09-19"
+          ],
+          "retrieved_at": "2026-11-25T13:12:24.794284+00:00",
+          "rows": 1193,
+          "sha256": "ce3da2a0b6ace0fcd9864c33a02861ff73a03b2683e436a0ae66f2c3d10c238b",
+          "url": "https://query1.finance.yahoo.com/v8/finance/chart/012450.KS?period1=1641135600&period2=1795532400&interval=1d&events=div%2Csplits%2CcapitalGains&includeAdjustedClose=true"
+        },
+        "035420.KS": {
+          "diagnostics": {
+            "invalid_close": 1,
+            "zero_volume": 14
+          },
+          "first": "2022-01-04",
+          "last": "2026-11-24",
+          "missing_sessions": [
+            "2022-01-03",
+            "2022-05-09",
+            "2025-09-19"
+          ],
+          "retrieved_at": "2026-11-25T13:12:18.679775+00:00",
+          "rows": 1193,
+          "sha256": "208dd91dc3925a348c04d7295458661d2a9abac8cea581f9732041ab3c586aef",
+          "url": "https://query1.finance.yahoo.com/v8/finance/chart/035420.KS?period1=1641135600&period2=1795532400&interval=1d&events=div%2Csplits%2CcapitalGains&includeAdjustedClose=true"
+        },
+        "069500.KS": {
+          "diagnostics": {
+            "invalid_close": 21
+          },
+          "first": "2022-01-04",
+          "last": "2026-11-24",
+          "missing_sessions": [
+            "2022-01-03",
+            "2022-02-14",
+            "2022-05-02",
+            "2022-05-09",
+            "2023-05-18",
+            "2023-05-24",
+            "2023-07-03",
+            "2023-07-04",
+            "2023-07-05",
+            "2023-07-06",
+            "2023-07-11",
+            "2023-07-12",
+            "2023-07-13",
+            "2023-07-18",
+            "2023-07-25",
+            "2023-07-27",
+            "2023-07-31",
+            "2023-08-01",
+            "2023-08-02",
+            "2024-01-18",
+            "2024-08-27",
+            "2024-10-30",
+            "2024-11-05"
+          ],
+          "retrieved_at": "2026-11-25T13:11:53.473429+00:00",
+          "rows": 1173,
+          "sha256": "8b919905bdb6d13a741ae4a3315b8d72b9d934c932cfd0bcb012081408afb4ce",
+          "url": "https://query1.finance.yahoo.com/v8/finance/chart/069500.KS?period1=1641135600&period2=1795532400&interval=1d&events=div%2Csplits%2CcapitalGains&includeAdjustedClose=true"
+        },
+        "229200.KS": {
+          "diagnostics": {
+            "invalid_close": 21
+          },
+          "first": "2022-01-04",
+          "last": "2026-11-24",
+          "missing_sessions": [
+            "2022-01-03",
+            "2022-02-14",
+            "2022-05-02",
+            "2022-05-09",
+            "2023-05-18",
+            "2023-05-24",
+            "2023-07-03",
+            "2023-07-04",
+            "2023-07-05",
+            "2023-07-06",
+            "2023-07-11",
+            "2023-07-12",
+            "2023-07-13",
+            "2023-07-18",
+            "2023-07-25",
+            "2023-07-27",
+            "2023-07-31",
+            "2023-08-01",
+            "2023-08-02",
+            "2024-01-18",
+            "2024-08-27",
+            "2024-10-30",
+            "2024-11-05"
+          ],
+          "retrieved_at": "2026-11-25T13:11:57.758045+00:00",
+          "rows": 1173,
+          "sha256": "2df10d6d4b5e252d4071745ff79ecc36fb7bb06f2be659d7a0028f150098fae3",
+          "url": "https://query1.finance.yahoo.com/v8/finance/chart/229200.KS?period1=1641135600&period2=1795532400&interval=1d&events=div%2Csplits%2CcapitalGains&includeAdjustedClose=true"
+        }
+      },
+      "executions": {
+        "legacy_close": {
+          "buy_and_hold": {
+            "missing_quotes": [],
+            "original_metric_convention": {
+              "annual_volatility_pct": 34.25,
+              "cagr_pct": 21.3,
+              "cumulative_return_pct": 136.59,
+              "final_nav": 23658657.19,
+              "max_drawdown_pct": -49.99,
+              "sharpe": 0.735,
+              "total_fees_and_taxes": 9900.0,
+              "trades_count": 1
+            },
+            "pending_at_end": [],
+            "periods": {
+              "full": {
+                "fills": 1,
+                "first": "2022-04-19",
+                "last": "2026-11-24",
+                "marks": 1124,
+                "max_drawdown": -0.49989070385455703,
+                "net_time_weighted_return": 1.3658657187206487,
+                "returns": 1124,
+                "sharpe_rf_zero": 0.734144518737213
+              },
+              "prior": {
+                "fills": 1,
+                "first": "2022-04-19",
+                "last": "2025-12-30",
+                "marks": 905,
+                "max_drawdown": -0.21419599910949394,
+                "net_time_weighted_return": 0.8175416509207931,
+                "returns": 905,
+                "sharpe_rf_zero": 0.9446963297648081
+              },
+              "validation_already_seen": {
+                "fills": 0,
+                "first": "2026-01-02",
+                "last": "2026-11-24",
+                "marks": 219,
+                "max_drawdown": -0.49989070385455747,
+                "net_time_weighted_return": 0.3016844579721547,
+                "returns": 219,
+                "sharpe_rf_zero": 0.784486442228707
+              }
+            },
+            "superseded": 0,
+            "target_sha256": "1664e9a437e444781b827ed0fd4651aee2a1134506366ea65c41f7e8cee9d619"
+          },
+          "core_taa_only": {
+            "missing_quotes": [],
+            "original_metric_convention": {
+              "annual_volatility_pct": 15.73,
+              "cagr_pct": 7.04,
+              "cumulative_return_pct": 35.43,
+              "final_nav": 13543197.36,
+              "max_drawdown_pct": -33.93,
+              "sharpe": 0.513,
+              "total_fees_and_taxes": 230392.81,
+              "trades_count": 46
+            },
+            "pending_at_end": [],
+            "periods": {
+              "full": {
+                "fills": 46,
+                "first": "2022-04-19",
+                "last": "2026-11-24",
+                "marks": 1124,
+                "max_drawdown": -0.33932140533418276,
+                "net_time_weighted_return": 0.3543197356339163,
+                "returns": 1124,
+                "sharpe_rf_zero": 0.5114413937167598
+              },
+              "prior": {
+                "fills": 39,
+                "first": "2022-04-19",
+                "last": "2025-12-30",
+                "marks": 905,
+                "max_drawdown": -0.33932140533418276,
+                "net_time_weighted_return": -0.00747865030029804,
+                "returns": 905,
+                "sharpe_rf_zero": 0.045820261788340505
+              },
+              "validation_already_seen": {
+                "fills": 7,
+                "first": "2026-01-02",
+                "last": "2026-11-24",
+                "marks": 219,
+                "max_drawdown": -0.159034791661116,
+                "net_time_weighted_return": 0.3645245374758732,
+                "returns": 219,
+                "sharpe_rf_zero": 1.5603232307673482
+              }
+            },
+            "superseded": 0,
+            "target_sha256": "a764cc5a76dd7c554dd108ebe28dc12cd81f784763285bc7f2d83b0804890d8c"
+          },
+          "hybrid_core_satellite": {
+            "missing_quotes": [],
+            "original_metric_convention": {
+              "annual_volatility_pct": 25.05,
+              "cagr_pct": 18.79,
+              "cumulative_return_pct": 115.54,
+              "final_nav": 21553617.71,
+              "max_drawdown_pct": -31.58,
+              "sharpe": 0.815,
+              "total_fees_and_taxes": 441625.38,
+              "trades_count": 152
+            },
+            "pending_at_end": [],
+            "periods": {
+              "full": {
+                "fills": 152,
+                "first": "2022-04-19",
+                "last": "2026-11-24",
+                "marks": 1124,
+                "max_drawdown": -0.31582255046303775,
+                "net_time_weighted_return": 1.1553617707301704,
+                "returns": 1124,
+                "sharpe_rf_zero": 0.8132961915696068
+              },
+              "prior": {
+                "fills": 125,
+                "first": "2022-04-19",
+                "last": "2025-12-30",
+                "marks": 905,
+                "max_drawdown": -0.22580747078764296,
+                "net_time_weighted_return": 0.5078903495932543,
+                "returns": 905,
+                "sharpe_rf_zero": 0.7032918528528138
+              },
+              "validation_already_seen": {
+                "fills": 27,
+                "first": "2026-01-02",
+                "last": "2026-11-24",
+                "marks": 219,
+                "max_drawdown": -0.3158225504630382,
+                "net_time_weighted_return": 0.42938892825434194,
+                "returns": 219,
+                "sharpe_rf_zero": 1.1893562258869181
+              }
+            },
+            "superseded": 0,
+            "target_sha256": "9ad95e6925f6014dea500860e8f6a9234a66de35bc3d5af4c7d6bd881c211319"
+          },
+          "static_80_20": {
+            "missing_quotes": [],
+            "original_metric_convention": {
+              "annual_volatility_pct": 27.38,
+              "cagr_pct": 17.82,
+              "cumulative_return_pct": 107.84,
+              "final_nav": 20784233.03,
+              "max_drawdown_pct": -42.35,
+              "sharpe": 0.737,
+              "total_fees_and_taxes": 15592.43,
+              "trades_count": 20
+            },
+            "pending_at_end": [],
+            "periods": {
+              "full": {
+                "fills": 20,
+                "first": "2022-04-19",
+                "last": "2026-11-24",
+                "marks": 1124,
+                "max_drawdown": -0.4234823581671182,
+                "net_time_weighted_return": 1.0784233033460997,
+                "returns": 1124,
+                "sharpe_rf_zero": 0.7358358766175999
+              },
+              "prior": {
+                "fills": 12,
+                "first": "2022-04-19",
+                "last": "2025-12-30",
+                "marks": 905,
+                "max_drawdown": -0.17437533232227154,
+                "net_time_weighted_return": 0.6413956834226151,
+                "returns": 905,
+                "sharpe_rf_zero": 0.9476400669506365
+              },
+              "validation_already_seen": {
+                "fills": 8,
+                "first": "2026-01-02",
+                "last": "2026-11-24",
+                "marks": 219,
+                "max_drawdown": -0.42348235816711843,
+                "net_time_weighted_return": 0.26625366713052356,
+                "returns": 219,
+                "sharpe_rf_zero": 0.7755110291704546
+              }
+            },
+            "superseded": 0,
+            "target_sha256": "0f5d889b93e151f8c5a70bf0f1b6012e9cd3194fb895f6c587f62a3264a5db1f"
+          }
+        },
+        "next_open": {
+          "buy_and_hold": {
+            "missing_quotes": [],
+            "original_metric_convention": {
+              "annual_volatility_pct": 34.25,
+              "cagr_pct": 21.29,
+              "cumulative_return_pct": 136.52,
+              "final_nav": 23652160.5,
+              "max_drawdown_pct": -49.99,
+              "sharpe": 0.734,
+              "total_fees_and_taxes": 9900.0,
+              "trades_count": 1
+            },
+            "pending_at_end": [],
+            "periods": {
+              "full": {
+                "fills": 1,
+                "first": "2022-04-19",
+                "last": "2026-11-24",
+                "marks": 1124,
+                "max_drawdown": -0.4998903931387886,
+                "net_time_weighted_return": 1.365216050047552,
+                "returns": 1124,
+                "sharpe_rf_zero": 0.7339638435599566
+              },
+              "prior": {
+                "fills": 1,
+                "first": "2022-04-19",
+                "last": "2025-12-30",
+                "marks": 905,
+                "max_drawdown": -0.21419549061643084,
+                "net_time_weighted_return": 0.8170431916170262,
+                "returns": 905,
+                "sharpe_rf_zero": 0.9443014278681855
+              },
+              "validation_already_seen": {
+                "fills": 0,
+                "first": "2026-01-02",
+                "last": "2026-11-24",
+                "marks": 219,
+                "max_drawdown": -0.4998903931387886,
+                "net_time_weighted_return": 0.30168400011597774,
+                "returns": 219,
+                "sharpe_rf_zero": 0.7844859597945032
+              }
+            },
+            "superseded": 0,
+            "target_sha256": "1664e9a437e444781b827ed0fd4651aee2a1134506366ea65c41f7e8cee9d619"
+          },
+          "core_taa_only": {
+            "missing_quotes": [
+              [
+                "2024-09-09",
+                "012450.KS"
+              ],
+              [
+                "2024-09-10",
+                "012450.KS"
+              ],
+              [
+                "2024-09-11",
+                "012450.KS"
+              ],
+              [
+                "2024-09-12",
+                "012450.KS"
+              ],
+              [
+                "2024-09-13",
+                "012450.KS"
+              ],
+              [
+                "2024-09-19",
+                "012450.KS"
+              ],
+              [
+                "2024-09-20",
+                "012450.KS"
+              ],
+              [
+                "2024-09-23",
+                "012450.KS"
+              ],
+              [
+                "2024-09-24",
+                "012450.KS"
+              ],
+              [
+                "2024-09-25",
+                "012450.KS"
+              ],
+              [
+                "2024-09-26",
+                "012450.KS"
+              ]
+            ],
+            "original_metric_convention": {
+              "annual_volatility_pct": 15.85,
+              "cagr_pct": 7.61,
+              "cumulative_return_pct": 38.71,
+              "final_nav": 13871240.19,
+              "max_drawdown_pct": -31.8,
+              "sharpe": 0.543,
+              "total_fees_and_taxes": 235285.73,
+              "trades_count": 46
+            },
+            "pending_at_end": [],
+            "periods": {
+              "full": {
+                "fills": 46,
+                "first": "2022-04-19",
+                "last": "2026-11-24",
+                "marks": 1124,
+                "max_drawdown": -0.31800885096142706,
+                "net_time_weighted_return": 0.3871240187817151,
+                "returns": 1124,
+                "sharpe_rf_zero": 0.5425335096247708
+              },
+              "prior": {
+                "fills": 39,
+                "first": "2022-04-19",
+                "last": "2025-12-30",
+                "marks": 905,
+                "max_drawdown": -0.31800885096142706,
+                "net_time_weighted_return": 0.020349669445797636,
+                "returns": 905,
+                "sharpe_rf_zero": 0.10761627175786682
+              },
+              "validation_already_seen": {
+                "fills": 7,
+                "first": "2026-01-02",
+                "last": "2026-11-24",
+                "marks": 219,
+                "max_drawdown": -0.1533658150791275,
+                "net_time_weighted_return": 0.359459467983295,
+                "returns": 219,
+                "sharpe_rf_zero": 1.5343375226100462
+              }
+            },
+            "superseded": 0,
+            "target_sha256": "a764cc5a76dd7c554dd108ebe28dc12cd81f784763285bc7f2d83b0804890d8c"
+          },
+          "hybrid_core_satellite": {
+            "missing_quotes": [
+              [
+                "2024-09-09",
+                "012450.KS"
+              ],
+              [
+                "2024-09-10",
+                "012450.KS"
+              ],
+              [
+                "2024-09-11",
+                "012450.KS"
+              ],
+              [
+                "2024-09-12",
+                "012450.KS"
+              ],
+              [
+                "2024-09-13",
+                "012450.KS"
+              ],
+              [
+                "2024-09-19",
+                "012450.KS"
+              ],
+              [
+                "2024-09-20",
+                "012450.KS"
+              ],
+              [
+                "2024-09-23",
+                "012450.KS"
+              ],
+              [
+                "2024-09-24",
+                "012450.KS"
+              ],
+              [
+                "2024-09-25",
+                "012450.KS"
+              ],
+              [
+                "2024-09-26",
+                "012450.KS"
+              ]
+            ],
+            "original_metric_convention": {
+              "annual_volatility_pct": 25.22,
+              "cagr_pct": 19.81,
+              "cumulative_return_pct": 123.9,
+              "final_nav": 22389997.11,
+              "max_drawdown_pct": -31.05,
+              "sharpe": 0.844,
+              "total_fees_and_taxes": 454049.28,
+              "trades_count": 151
+            },
+            "pending_at_end": [],
+            "periods": {
+              "full": {
+                "fills": 151,
+                "first": "2022-04-19",
+                "last": "2026-11-24",
+                "marks": 1124,
+                "max_drawdown": -0.31053753163423725,
+                "net_time_weighted_return": 1.2389997113684426,
+                "returns": 1124,
+                "sharpe_rf_zero": 0.8433019093962085
+              },
+              "prior": {
+                "fills": 126,
+                "first": "2022-04-19",
+                "last": "2025-12-30",
+                "marks": 905,
+                "max_drawdown": -0.22619715864857892,
+                "net_time_weighted_return": 0.5723795948078056,
+                "returns": 905,
+                "sharpe_rf_zero": 0.7637667332068077
+              },
+              "validation_already_seen": {
+                "fills": 25,
+                "first": "2026-01-02",
+                "last": "2026-11-24",
+                "marks": 219,
+                "max_drawdown": -0.31053753163423725,
+                "net_time_weighted_return": 0.42395622454138837,
+                "returns": 219,
+                "sharpe_rf_zero": 1.171044415650181
+              }
+            },
+            "superseded": 0,
+            "target_sha256": "9ad95e6925f6014dea500860e8f6a9234a66de35bc3d5af4c7d6bd881c211319"
+          },
+          "static_80_20": {
+            "missing_quotes": [],
+            "original_metric_convention": {
+              "annual_volatility_pct": 27.35,
+              "cagr_pct": 17.84,
+              "cumulative_return_pct": 107.95,
+              "final_nav": 20794844.41,
+              "max_drawdown_pct": -42.22,
+              "sharpe": 0.737,
+              "total_fees_and_taxes": 15670.74,
+              "trades_count": 20
+            },
+            "pending_at_end": [],
+            "periods": {
+              "full": {
+                "fills": 20,
+                "first": "2022-04-19",
+                "last": "2026-11-24",
+                "marks": 1124,
+                "max_drawdown": -0.4221627629806286,
+                "net_time_weighted_return": 1.0794844409764375,
+                "returns": 1124,
+                "sharpe_rf_zero": 0.7368440021444459
+              },
+              "prior": {
+                "fills": 12,
+                "first": "2022-04-19",
+                "last": "2025-12-30",
+                "marks": 905,
+                "max_drawdown": -0.17467980856524556,
+                "net_time_weighted_return": 0.64116032568729,
+                "returns": 905,
+                "sharpe_rf_zero": 0.9470055905967304
+              },
+              "validation_already_seen": {
+                "fills": 8,
+                "first": "2026-01-02",
+                "last": "2026-11-24",
+                "marks": 219,
+                "max_drawdown": -0.4221627629806287,
+                "net_time_weighted_return": 0.26708183742230407,
+                "returns": 219,
+                "sharpe_rf_zero": 0.7774068388940376
+              }
+            },
+            "superseded": 0,
+            "target_sha256": "0f5d889b93e151f8c5a70bf0f1b6012e9cd3194fb895f6c587f62a3264a5db1f"
+          }
+        },
+        "same_close": {
+          "buy_and_hold": {
+            "missing_quotes": [],
+            "original_metric_convention": {
+              "annual_volatility_pct": 34.25,
+              "cagr_pct": 21.3,
+              "cumulative_return_pct": 136.59,
+              "final_nav": 23658657.19,
+              "max_drawdown_pct": -49.99,
+              "sharpe": 0.735,
+              "total_fees_and_taxes": 9900.0,
+              "trades_count": 1
+            },
+            "pending_at_end": [],
+            "periods": {
+              "full": {
+                "fills": 1,
+                "first": "2022-04-19",
+                "last": "2026-11-24",
+                "marks": 1124,
+                "max_drawdown": -0.49989070385455703,
+                "net_time_weighted_return": 1.3658657187206487,
+                "returns": 1124,
+                "sharpe_rf_zero": 0.734144518737213
+              },
+              "prior": {
+                "fills": 1,
+                "first": "2022-04-19",
+                "last": "2025-12-30",
+                "marks": 905,
+                "max_drawdown": -0.21419599910949394,
+                "net_time_weighted_return": 0.8175416509207931,
+                "returns": 905,
+                "sharpe_rf_zero": 0.9446963297648081
+              },
+              "validation_already_seen": {
+                "fills": 0,
+                "first": "2026-01-02",
+                "last": "2026-11-24",
+                "marks": 219,
+                "max_drawdown": -0.49989070385455747,
+                "net_time_weighted_return": 0.3016844579721547,
+                "returns": 219,
+                "sharpe_rf_zero": 0.784486442228707
+              }
+            },
+            "superseded": 0,
+            "target_sha256": "1664e9a437e444781b827ed0fd4651aee2a1134506366ea65c41f7e8cee9d619"
+          },
+          "core_taa_only": {
+            "missing_quotes": [
+              [
+                "2023-07-27",
+                "069500.KS"
+              ],
+              [
+                "2023-07-27",
+                "229200.KS"
+              ],
+              [
+                "2024-09-06",
+                "012450.KS"
+              ]
+            ],
+            "original_metric_convention": {
+              "annual_volatility_pct": 15.58,
+              "cagr_pct": 6.97,
+              "cumulative_return_pct": 35.03,
+              "final_nav": 13502938.3,
+              "max_drawdown_pct": -34.13,
+              "sharpe": 0.512,
+              "total_fees_and_taxes": 229629.49,
+              "trades_count": 46
+            },
+            "pending_at_end": [],
+            "periods": {
+              "full": {
+                "fills": 46,
+                "first": "2022-04-19",
+                "last": "2026-11-24",
+                "marks": 1124,
+                "max_drawdown": -0.3412853650449734,
+                "net_time_weighted_return": 0.35029383042404794,
+                "returns": 1124,
+                "sharpe_rf_zero": 0.5104279784439391
+              },
+              "prior": {
+                "fills": 39,
+                "first": "2022-04-19",
+                "last": "2025-12-30",
+                "marks": 905,
+                "max_drawdown": -0.3412853650449734,
+                "net_time_weighted_return": -0.010429059105196314,
+                "returns": 905,
+                "sharpe_rf_zero": 0.03761521609576983
+              },
+              "validation_already_seen": {
+                "fills": 7,
+                "first": "2026-01-02",
+                "last": "2026-11-24",
+                "marks": 219,
+                "max_drawdown": -0.15903479166111645,
+                "net_time_weighted_return": 0.3645245374758743,
+                "returns": 219,
+                "sharpe_rf_zero": 1.5603232307673434
+              }
+            },
+            "superseded": 0,
+            "target_sha256": "a764cc5a76dd7c554dd108ebe28dc12cd81f784763285bc7f2d83b0804890d8c"
+          },
+          "hybrid_core_satellite": {
+            "missing_quotes": [
+              [
+                "2023-07-27",
+                "069500.KS"
+              ],
+              [
+                "2023-07-27",
+                "229200.KS"
+              ],
+              [
+                "2024-09-06",
+                "012450.KS"
+              ]
+            ],
+            "original_metric_convention": {
+              "annual_volatility_pct": 24.98,
+              "cagr_pct": 18.75,
+              "cumulative_return_pct": 115.18,
+              "final_nav": 21518394.28,
+              "max_drawdown_pct": -31.58,
+              "sharpe": 0.815,
+              "total_fees_and_taxes": 440581.08,
+              "trades_count": 152
+            },
+            "pending_at_end": [],
+            "periods": {
+              "full": {
+                "fills": 152,
+                "first": "2022-04-19",
+                "last": "2026-11-24",
+                "marks": 1124,
+                "max_drawdown": -0.3158225504630394,
+                "net_time_weighted_return": 1.1518394282999127,
+                "returns": 1124,
+                "sharpe_rf_zero": 0.8134773769994972
+              },
+              "prior": {
+                "fills": 125,
+                "first": "2022-04-19",
+                "last": "2025-12-30",
+                "marks": 905,
+                "max_drawdown": -0.22580768204709933,
+                "net_time_weighted_return": 0.5054261200468881,
+                "returns": 905,
+                "sharpe_rf_zero": 0.7042104848513515
+              },
+              "validation_already_seen": {
+                "fills": 27,
+                "first": "2026-01-02",
+                "last": "2026-11-24",
+                "marks": 219,
+                "max_drawdown": -0.31582255046303853,
+                "net_time_weighted_return": 0.4293889282543426,
+                "returns": 219,
+                "sharpe_rf_zero": 1.1893562258869166
+              }
+            },
+            "superseded": 0,
+            "target_sha256": "9ad95e6925f6014dea500860e8f6a9234a66de35bc3d5af4c7d6bd881c211319"
+          },
+          "static_80_20": {
+            "missing_quotes": [
+              [
+                "2023-07-27",
+                "069500.KS"
+              ]
+            ],
+            "original_metric_convention": {
+              "annual_volatility_pct": 27.38,
+              "cagr_pct": 17.82,
+              "cumulative_return_pct": 107.84,
+              "final_nav": 20784233.03,
+              "max_drawdown_pct": -42.35,
+              "sharpe": 0.737,
+              "total_fees_and_taxes": 15592.43,
+              "trades_count": 20
+            },
+            "pending_at_end": [],
+            "periods": {
+              "full": {
+                "fills": 20,
+                "first": "2022-04-19",
+                "last": "2026-11-24",
+                "marks": 1124,
+                "max_drawdown": -0.4234823581671182,
+                "net_time_weighted_return": 1.0784233033460997,
+                "returns": 1124,
+                "sharpe_rf_zero": 0.7358358766175999
+              },
+              "prior": {
+                "fills": 12,
+                "first": "2022-04-19",
+                "last": "2025-12-30",
+                "marks": 905,
+                "max_drawdown": -0.17437533232227154,
+                "net_time_weighted_return": 0.6413956834226151,
+                "returns": 905,
+                "sharpe_rf_zero": 0.9476400669506365
+              },
+              "validation_already_seen": {
+                "fills": 8,
+                "first": "2026-01-02",
+                "last": "2026-11-24",
+                "marks": 219,
+                "max_drawdown": -0.42348235816711843,
+                "net_time_weighted_return": 0.26625366713052356,
+                "returns": 219,
+                "sharpe_rf_zero": 0.7755110291704546
+              }
+            },
+            "superseded": 0,
+            "target_sha256": "0f5d889b93e151f8c5a70bf0f1b6012e9cd3194fb895f6c587f62a3264a5db1f"
+          }
+        }
+      },
+      "fill_price_comparison": {
+        "buy_and_hold": {
+          "close_only": 0,
+          "matched_signal_symbol_side": 1,
+          "mean_open_minus_close_bps": 2.758424956776917,
+          "median_open_minus_close_bps": 2.758424956776917,
+          "open_only": 0
+        },
+        "core_taa_only": {
+          "close_only": 2,
+          "matched_signal_symbol_side": 44,
+          "mean_open_minus_close_bps": 8.591292421252659,
+          "median_open_minus_close_bps": 2.2176641462312574,
+          "open_only": 2
+        },
+        "hybrid_core_satellite": {
+          "close_only": 9,
+          "matched_signal_symbol_side": 143,
+          "mean_open_minus_close_bps": 17.821808819045703,
+          "median_open_minus_close_bps": 0.0008209537805115019,
+          "open_only": 8
+        },
+        "static_80_20": {
+          "close_only": 1,
+          "matched_signal_symbol_side": 19,
+          "mean_open_minus_close_bps": -29.72274080829136,
+          "median_open_minus_close_bps": -7.592863470272659,
+          "open_only": 1
+        }
+      },
+      "missing_all_symbols": [
+        "2022-01-03",
+        "2022-05-09"
+      ],
+      "published_vs_retrieved": {
+        "buy_and_hold": {
+          "final_nav": {
+            "published": 23658659.97,
+            "replayed": 23658657.19
+          }
+        },
+        "core_taa_only": {
+          "final_nav": {
+            "published": 13543192.3,
+            "replayed": 13543197.36
+          },
+          "total_fees_and_taxes": {
+            "published": 230392.74,
+            "replayed": 230392.81
+          }
+        },
+        "hybrid_core_satellite": {
+          "final_nav": {
+            "published": 21553609.09,
+            "replayed": 21553617.71
+          },
+          "total_fees_and_taxes": {
+            "published": 441625.24,
+            "replayed": 441625.38
+          }
+        },
+        "static_80_20": {
+          "final_nav": {
+            "published": 20784234.83,
+            "replayed": 20784233.03
+          }
+        }
+      }
+    },
+    "US": {
+      "coverage": {
+        "AAPL": {
+          "diagnostics": {},
+          "first": "2022-01-03",
+          "last": "2026-11-24",
+          "missing_sessions": [],
+          "retrieved_at": "2026-11-25T13:11:35.015718+00:00",
+          "rows": 1229,
+          "sha256": "5cd10a097cc90fcfb513251a139979bd7e957fd2ab84254cf25a0c459ed31e37",
+          "url": "https://query1.finance.yahoo.com/v8/finance/chart/AAPL?period1=1641186000&period2=1795582800&interval=1d&events=div%2Csplits%2CcapitalGains&includeAdjustedClose=true"
+        },
+        "AMZN": {
+          "diagnostics": {},
+          "first": "2022-01-03",
+          "last": "2026-11-24",
+          "missing_sessions": [],
+          "retrieved_at": "2026-11-25T13:11:41.488931+00:00",
+          "rows": 1229,
+          "sha256": "b3b9f6479e6c83cad9f7a8a387c196bb8cbec2317c893342f62abc05847ab191",
+          "url": "https://query1.finance.yahoo.com/v8/finance/chart/AMZN?period1=1641186000&period2=1795582800&interval=1d&events=div%2Csplits%2CcapitalGains&includeAdjustedClose=true"
+        },
+        "LLY": {
+          "diagnostics": {},
+          "first": "2022-01-03",
+          "last": "2026-11-24",
+          "missing_sessions": [],
+          "retrieved_at": "2026-11-25T13:11:47.520237+00:00",
+          "rows": 1229,
+          "sha256": "4965368162220c1edc89982c1af35379ab67c6c0dd1122864fd1bb26113876d4",
+          "url": "https://query1.finance.yahoo.com/v8/finance/chart/LLY?period1=1641186000&period2=1795582800&interval=1d&events=div%2Csplits%2CcapitalGains&includeAdjustedClose=true"
+        },
+        "META": {
+          "diagnostics": {},
+          "first": "2022-01-03",
+          "last": "2026-11-24",
+          "missing_sessions": [],
+          "retrieved_at": "2026-11-25T13:11:44.194904+00:00",
+          "rows": 1229,
+          "sha256": "635255a19da0a85c5156b3477227c22bbaeb2170ea0779046a9db2c242214001",
+          "url": "https://query1.finance.yahoo.com/v8/finance/chart/META?period1=1641186000&period2=1795582800&interval=1d&events=div%2Csplits%2CcapitalGains&includeAdjustedClose=true"
+        },
+        "MSFT": {
+          "diagnostics": {},
+          "first": "2022-01-03",
+          "last": "2026-11-24",
+          "missing_sessions": [],
+          "retrieved_at": "2026-11-25T13:11:36.747644+00:00",
+          "rows": 1229,
+          "sha256": "e205bb0ed0ef9c4f6b520b80b2aea92d2776f1f847108c6e8cc11ba45b126c6d",
+          "url": "https://query1.finance.yahoo.com/v8/finance/chart/MSFT?period1=1641186000&period2=1795582800&interval=1d&events=div%2Csplits%2CcapitalGains&includeAdjustedClose=true"
+        },
+        "NVDA": {
+          "diagnostics": {},
+          "first": "2022-01-03",
+          "last": "2026-11-24",
+          "missing_sessions": [],
+          "retrieved_at": "2026-11-25T13:11:39.122330+00:00",
+          "rows": 1229,
+          "sha256": "ca2496fa86191bafc56eac1194ecf26ad2fbbe79436367a7bf0f05bca086940d",
+          "url": "https://query1.finance.yahoo.com/v8/finance/chart/NVDA?period1=1641186000&period2=1795582800&interval=1d&events=div%2Csplits%2CcapitalGains&includeAdjustedClose=true"
+        },
+        "QQQ": {
+          "diagnostics": {},
+          "first": "2022-01-03",
+          "last": "2026-11-24",
+          "missing_sessions": [],
+          "retrieved_at": "2026-11-25T13:11:30.927534+00:00",
+          "rows": 1229,
+          "sha256": "51d2dd817a06eec653de36116fe566dd8ed10747af484252f6727c2506d29338",
+          "url": "https://query1.finance.yahoo.com/v8/finance/chart/QQQ?period1=1641186000&period2=1795582800&interval=1d&events=div%2Csplits%2CcapitalGains&includeAdjustedClose=true"
+        },
+        "SPY": {
+          "diagnostics": {},
+          "first": "2022-01-03",
+          "last": "2026-11-24",
+          "missing_sessions": [],
+          "retrieved_at": "2026-11-25T13:11:28.397413+00:00",
+          "rows": 1229,
+          "sha256": "3ae85dce317a4a357587cd139e0da4d6405062090c8a82a69df7f3956e98a11b",
+          "url": "https://query1.finance.yahoo.com/v8/finance/chart/SPY?period1=1641186000&period2=1795582800&interval=1d&events=div%2Csplits%2CcapitalGains&includeAdjustedClose=true"
+        }
+      },
+      "executions": {
+        "legacy_close": {
+          "buy_and_hold": {
+            "missing_quotes": [],
+            "original_metric_convention": {
+              "annual_volatility_pct": 17.19,
+              "cagr_pct": 12.42,
+              "cumulative_return_pct": 71.32,
+              "final_nav": 17132.05,
+              "max_drawdown_pct": -19.01,
+              "sharpe": 0.768,
+              "total_fees_and_taxes": 9.9,
+              "trades_count": 1
+            },
+            "pending_at_end": [],
+            "periods": {
+              "full": {
+                "fills": 1,
+                "first": "2022-04-13",
+                "last": "2026-11-24",
+                "marks": 1159,
+                "max_drawdown": -0.19013240529109587,
+                "net_time_weighted_return": 0.7132047323456674,
+                "returns": 1159,
+                "sharpe_rf_zero": 0.7668955840576581
+              },
+              "prior": {
+                "fills": 1,
+                "first": "2022-04-13",
+                "last": "2025-12-31",
+                "marks": 933,
+                "max_drawdown": -0.19013240529109587,
+                "net_time_weighted_return": 0.6133388571339631,
+                "returns": 933,
+                "sharpe_rf_zero": 0.8218421900347901
+              },
+              "validation_already_seen": {
+                "fills": 0,
+                "first": "2026-01-02",
+                "last": "2026-11-24",
+                "marks": 226,
+                "max_drawdown": -0.11397787305733509,
+                "net_time_weighted_return": 0.06190012393869604,
+                "returns": 226,
+                "sharpe_rf_zero": 0.511800308910148
+              }
+            },
+            "superseded": 0,
+            "target_sha256": "e65e138f75531dde0fec7551be12792c6c615d089e8618a3fa5726c0004a2055"
+          },
+          "core_taa_only": {
+            "missing_quotes": [],
+            "original_metric_convention": {
+              "annual_volatility_pct": 10.11,
+              "cagr_pct": 5.09,
+              "cumulative_return_pct": 25.63,
+              "final_nav": 12562.67,
+              "max_drawdown_pct": -12.79,
+              "sharpe": 0.542,
+              "total_fees_and_taxes": 323.55,
+              "trades_count": 43
+            },
+            "pending_at_end": [],
+            "periods": {
+              "full": {
+                "fills": 43,
+                "first": "2022-04-13",
+                "last": "2026-11-24",
+                "marks": 1159,
+                "max_drawdown": -0.12788861502612592,
+                "net_time_weighted_return": 0.25626682743986673,
+                "returns": 1159,
+                "sharpe_rf_zero": 0.5414738998018936
+              },
+              "prior": {
+                "fills": 35,
+                "first": "2022-04-13",
+                "last": "2025-12-31",
+                "marks": 933,
+                "max_drawdown": -0.10440274820380502,
+                "net_time_weighted_return": 0.3561132449813251,
+                "returns": 933,
+                "sharpe_rf_zero": 0.9101247289292411
+              },
+              "validation_already_seen": {
+                "fills": 8,
+                "first": "2026-01-02",
+                "last": "2026-11-24",
+                "marks": 226,
+                "max_drawdown": -0.12788861502612558,
+                "net_time_weighted_return": -0.0736269024072781,
+                "returns": 226,
+                "sharpe_rf_zero": -0.6407756559277215
+              }
+            },
+            "superseded": 0,
+            "target_sha256": "381bd512f72b1409ed66ff683d33552c5df8f8b15684cb72be513f53a386f60f"
+          },
+          "hybrid_core_satellite": {
+            "missing_quotes": [],
+            "original_metric_convention": {
+              "annual_volatility_pct": 16.86,
+              "cagr_pct": 11.75,
+              "cumulative_return_pct": 66.66,
+              "final_nav": 16665.56,
+              "max_drawdown_pct": -16.77,
+              "sharpe": 0.744,
+              "total_fees_and_taxes": 1532.19,
+              "trades_count": 199
+            },
+            "pending_at_end": [],
+            "periods": {
+              "full": {
+                "fills": 199,
+                "first": "2022-04-13",
+                "last": "2026-11-24",
+                "marks": 1159,
+                "max_drawdown": -0.16774545546613273,
+                "net_time_weighted_return": 0.6665559366190243,
+                "returns": 1159,
+                "sharpe_rf_zero": 0.7433351329044425
+              },
+              "prior": {
+                "fills": 153,
+                "first": "2022-04-13",
+                "last": "2025-12-31",
+                "marks": 933,
+                "max_drawdown": -0.16774545546613273,
+                "net_time_weighted_return": 0.8376553657924073,
+                "returns": 933,
+                "sharpe_rf_zero": 1.0568495255097552
+              },
+              "validation_already_seen": {
+                "fills": 46,
+                "first": "2026-01-02",
+                "last": "2026-11-24",
+                "marks": 226,
+                "max_drawdown": -0.14872725858397295,
+                "net_time_weighted_return": -0.09310746310672158,
+                "returns": 226,
+                "sharpe_rf_zero": -0.5731143165234127
+              }
+            },
+            "superseded": 0,
+            "target_sha256": "2307ffe64df87f8d46e57120954c58effffab45b68080ba2260ba539be1bdbe2"
+          },
+          "static_80_20": {
+            "missing_quotes": [],
+            "original_metric_convention": {
+              "annual_volatility_pct": 13.84,
+              "cagr_pct": 10.16,
+              "cumulative_return_pct": 56.08,
+              "final_nav": 15607.6,
+              "max_drawdown_pct": -15.34,
+              "sharpe": 0.771,
+              "total_fees_and_taxes": 10.61,
+              "trades_count": 17
+            },
+            "pending_at_end": [],
+            "periods": {
+              "full": {
+                "fills": 17,
+                "first": "2022-04-13",
+                "last": "2026-11-24",
+                "marks": 1159,
+                "max_drawdown": -0.1534171432041136,
+                "net_time_weighted_return": 0.5607600179773655,
+                "returns": 1159,
+                "sharpe_rf_zero": 0.7689525460766028
+              },
+              "prior": {
+                "fills": 15,
+                "first": "2022-04-13",
+                "last": "2025-12-31",
+                "marks": 933,
+                "max_drawdown": -0.1534171432041136,
+                "net_time_weighted_return": 0.48615897686626774,
+                "returns": 933,
+                "sharpe_rf_zero": 0.8262344067309471
+              },
+              "validation_already_seen": {
+                "fills": 2,
+                "first": "2026-01-02",
+                "last": "2026-11-24",
+                "marks": 226,
+                "max_drawdown": -0.0926312270010452,
+                "net_time_weighted_return": 0.05019721461320592,
+                "returns": 226,
+                "sharpe_rf_zero": 0.5027773006405065
+              }
+            },
+            "superseded": 0,
+            "target_sha256": "6303290f2c47518b2b47868129cc9e9a7633bd76ce662e8420a44a2a591b3a05"
+          }
+        },
+        "next_open": {
+          "buy_and_hold": {
+            "missing_quotes": [],
+            "original_metric_convention": {
+              "annual_volatility_pct": 17.2,
+              "cagr_pct": 12.41,
+              "cumulative_return_pct": 71.23,
+              "final_nav": 17122.83,
+              "max_drawdown_pct": -19.01,
+              "sharpe": 0.766,
+              "total_fees_and_taxes": 9.9,
+              "trades_count": 1
+            },
+            "pending_at_end": [],
+            "periods": {
+              "full": {
+                "fills": 1,
+                "first": "2022-04-13",
+                "last": "2026-11-24",
+                "marks": 1159,
+                "max_drawdown": -0.19013137903189758,
+                "net_time_weighted_return": 0.712283265888439,
+                "returns": 1159,
+                "sharpe_rf_zero": 0.7661325402586252
+              },
+              "prior": {
+                "fills": 1,
+                "first": "2022-04-13",
+                "last": "2025-12-31",
+                "marks": 933,
+                "max_drawdown": -0.19013137903189758,
+                "net_time_weighted_return": 0.6124714200323864,
+                "returns": 933,
+                "sharpe_rf_zero": 0.8209103377159668
+              },
+              "validation_already_seen": {
+                "fills": 0,
+                "first": "2026-01-02",
+                "last": "2026-11-24",
+                "marks": 226,
+                "max_drawdown": -0.11397754065631072,
+                "net_time_weighted_return": 0.061899916250327536,
+                "returns": 226,
+                "sharpe_rf_zero": 0.5118000311974216
+              }
+            },
+            "superseded": 0,
+            "target_sha256": "e65e138f75531dde0fec7551be12792c6c615d089e8618a3fa5726c0004a2055"
+          },
+          "core_taa_only": {
+            "missing_quotes": [],
+            "original_metric_convention": {
+              "annual_volatility_pct": 10.11,
+              "cagr_pct": 5.06,
+              "cumulative_return_pct": 25.46,
+              "final_nav": 12545.98,
+              "max_drawdown_pct": -13.46,
+              "sharpe": 0.539,
+              "total_fees_and_taxes": 332.36,
+              "trades_count": 45
+            },
+            "pending_at_end": [],
+            "periods": {
+              "full": {
+                "fills": 45,
+                "first": "2022-04-13",
+                "last": "2026-11-24",
+                "marks": 1159,
+                "max_drawdown": -0.134627587806316,
+                "net_time_weighted_return": 0.25459776926288424,
+                "returns": 1159,
+                "sharpe_rf_zero": 0.5384631737874769
+              },
+              "prior": {
+                "fills": 36,
+                "first": "2022-04-13",
+                "last": "2025-12-31",
+                "marks": 933,
+                "max_drawdown": -0.103767082963371,
+                "net_time_weighted_return": 0.36801956265804314,
+                "returns": 933,
+                "sharpe_rf_zero": 0.9366783286905197
+              },
+              "validation_already_seen": {
+                "fills": 9,
+                "first": "2026-01-02",
+                "last": "2026-11-24",
+                "marks": 226,
+                "max_drawdown": -0.134627587806317,
+                "net_time_weighted_return": -0.08290948206528836,
+                "returns": 226,
+                "sharpe_rf_zero": -0.7278882276712212
+              }
+            },
+            "superseded": 0,
+            "target_sha256": "381bd512f72b1409ed66ff683d33552c5df8f8b15684cb72be513f53a386f60f"
+          },
+          "hybrid_core_satellite": {
+            "missing_quotes": [],
+            "original_metric_convention": {
+              "annual_volatility_pct": 16.88,
+              "cagr_pct": 11.52,
+              "cumulative_return_pct": 65.09,
+              "final_nav": 16508.9,
+              "max_drawdown_pct": -16.92,
+              "sharpe": 0.731,
+              "total_fees_and_taxes": 1566.7,
+              "trades_count": 199
+            },
+            "pending_at_end": [],
+            "periods": {
+              "full": {
+                "fills": 199,
+                "first": "2022-04-13",
+                "last": "2026-11-24",
+                "marks": 1159,
+                "max_drawdown": -0.16915024283922897,
+                "net_time_weighted_return": 0.6508898773573932,
+                "returns": 1159,
+                "sharpe_rf_zero": 0.7304907357579554
+              },
+              "prior": {
+                "fills": 153,
+                "first": "2022-04-13",
+                "last": "2025-12-31",
+                "marks": 933,
+                "max_drawdown": -0.16915024283922897,
+                "net_time_weighted_return": 0.8437312560468189,
+                "returns": 933,
+                "sharpe_rf_zero": 1.0623327424539695
+              },
+              "validation_already_seen": {
+                "fills": 46,
+                "first": "2026-01-02",
+                "last": "2026-11-24",
+                "marks": 226,
+                "max_drawdown": -0.1615702519244201,
+                "net_time_weighted_return": -0.10459299751900974,
+                "returns": 226,
+                "sharpe_rf_zero": -0.6531769079588903
+              }
+            },
+            "superseded": 0,
+            "target_sha256": "2307ffe64df87f8d46e57120954c58effffab45b68080ba2260ba539be1bdbe2"
+          },
+          "static_80_20": {
+            "missing_quotes": [],
+            "original_metric_convention": {
+              "annual_volatility_pct": 13.81,
+              "cagr_pct": 10.08,
+              "cumulative_return_pct": 55.56,
+              "final_nav": 15555.57,
+              "max_drawdown_pct": -15.47,
+              "sharpe": 0.765,
+              "total_fees_and_taxes": 10.21,
+              "trades_count": 15
+            },
+            "pending_at_end": [],
+            "periods": {
+              "full": {
+                "fills": 15,
+                "first": "2022-04-13",
+                "last": "2026-11-24",
+                "marks": 1159,
+                "max_drawdown": -0.15469835247614305,
+                "net_time_weighted_return": 0.555556946405906,
+                "returns": 1159,
+                "sharpe_rf_zero": 0.7647985115846109
+              },
+              "prior": {
+                "fills": 14,
+                "first": "2022-04-13",
+                "last": "2025-12-31",
+                "marks": 933,
+                "max_drawdown": -0.15469835247614305,
+                "net_time_weighted_return": 0.4806560358026344,
+                "returns": 933,
+                "sharpe_rf_zero": 0.8206235176045645
+              },
+              "validation_already_seen": {
+                "fills": 1,
+                "first": "2026-01-02",
+                "last": "2026-11-24",
+                "marks": 226,
+                "max_drawdown": -0.09254753824021666,
+                "net_time_weighted_return": 0.05058630012112819,
+                "returns": 226,
+                "sharpe_rf_zero": 0.5059340740853577
+              }
+            },
+            "superseded": 0,
+            "target_sha256": "6303290f2c47518b2b47868129cc9e9a7633bd76ce662e8420a44a2a591b3a05"
+          }
+        },
+        "same_close": {
+          "buy_and_hold": {
+            "missing_quotes": [],
+            "original_metric_convention": {
+              "annual_volatility_pct": 17.19,
+              "cagr_pct": 12.42,
+              "cumulative_return_pct": 71.32,
+              "final_nav": 17132.05,
+              "max_drawdown_pct": -19.01,
+              "sharpe": 0.768,
+              "total_fees_and_taxes": 9.9,
+              "trades_count": 1
+            },
+            "pending_at_end": [],
+            "periods": {
+              "full": {
+                "fills": 1,
+                "first": "2022-04-13",
+                "last": "2026-11-24",
+                "marks": 1159,
+                "max_drawdown": -0.19013240529109587,
+                "net_time_weighted_return": 0.7132047323456674,
+                "returns": 1159,
+                "sharpe_rf_zero": 0.7668955840576581
+              },
+              "prior": {
+                "fills": 1,
+                "first": "2022-04-13",
+                "last": "2025-12-31",
+                "marks": 933,
+                "max_drawdown": -0.19013240529109587,
+                "net_time_weighted_return": 0.6133388571339631,
+                "returns": 933,
+                "sharpe_rf_zero": 0.8218421900347901
+              },
+              "validation_already_seen": {
+                "fills": 0,
+                "first": "2026-01-02",
+                "last": "2026-11-24",
+                "marks": 226,
+                "max_drawdown": -0.11397787305733509,
+                "net_time_weighted_return": 0.06190012393869604,
+                "returns": 226,
+                "sharpe_rf_zero": 0.511800308910148
+              }
+            },
+            "superseded": 0,
+            "target_sha256": "e65e138f75531dde0fec7551be12792c6c615d089e8618a3fa5726c0004a2055"
+          },
+          "core_taa_only": {
+            "missing_quotes": [],
+            "original_metric_convention": {
+              "annual_volatility_pct": 10.11,
+              "cagr_pct": 5.09,
+              "cumulative_return_pct": 25.63,
+              "final_nav": 12562.67,
+              "max_drawdown_pct": -12.79,
+              "sharpe": 0.542,
+              "total_fees_and_taxes": 323.55,
+              "trades_count": 43
+            },
+            "pending_at_end": [],
+            "periods": {
+              "full": {
+                "fills": 43,
+                "first": "2022-04-13",
+                "last": "2026-11-24",
+                "marks": 1159,
+                "max_drawdown": -0.12788861502612592,
+                "net_time_weighted_return": 0.25626682743986673,
+                "returns": 1159,
+                "sharpe_rf_zero": 0.5414738998018936
+              },
+              "prior": {
+                "fills": 35,
+                "first": "2022-04-13",
+                "last": "2025-12-31",
+                "marks": 933,
+                "max_drawdown": -0.10440274820380502,
+                "net_time_weighted_return": 0.3561132449813251,
+                "returns": 933,
+                "sharpe_rf_zero": 0.9101247289292411
+              },
+              "validation_already_seen": {
+                "fills": 8,
+                "first": "2026-01-02",
+                "last": "2026-11-24",
+                "marks": 226,
+                "max_drawdown": -0.12788861502612558,
+                "net_time_weighted_return": -0.0736269024072781,
+                "returns": 226,
+                "sharpe_rf_zero": -0.6407756559277215
+              }
+            },
+            "superseded": 0,
+            "target_sha256": "381bd512f72b1409ed66ff683d33552c5df8f8b15684cb72be513f53a386f60f"
+          },
+          "hybrid_core_satellite": {
+            "missing_quotes": [],
+            "original_metric_convention": {
+              "annual_volatility_pct": 16.86,
+              "cagr_pct": 11.75,
+              "cumulative_return_pct": 66.66,
+              "final_nav": 16665.56,
+              "max_drawdown_pct": -16.77,
+              "sharpe": 0.744,
+              "total_fees_and_taxes": 1532.19,
+              "trades_count": 199
+            },
+            "pending_at_end": [],
+            "periods": {
+              "full": {
+                "fills": 199,
+                "first": "2022-04-13",
+                "last": "2026-11-24",
+                "marks": 1159,
+                "max_drawdown": -0.16774545546613273,
+                "net_time_weighted_return": 0.6665559366190243,
+                "returns": 1159,
+                "sharpe_rf_zero": 0.7433351329044425
+              },
+              "prior": {
+                "fills": 153,
+                "first": "2022-04-13",
+                "last": "2025-12-31",
+                "marks": 933,
+                "max_drawdown": -0.16774545546613273,
+                "net_time_weighted_return": 0.8376553657924073,
+                "returns": 933,
+                "sharpe_rf_zero": 1.0568495255097552
+              },
+              "validation_already_seen": {
+                "fills": 46,
+                "first": "2026-01-02",
+                "last": "2026-11-24",
+                "marks": 226,
+                "max_drawdown": -0.14872725858397295,
+                "net_time_weighted_return": -0.09310746310672158,
+                "returns": 226,
+                "sharpe_rf_zero": -0.5731143165234127
+              }
+            },
+            "superseded": 0,
+            "target_sha256": "2307ffe64df87f8d46e57120954c58effffab45b68080ba2260ba539be1bdbe2"
+          },
+          "static_80_20": {
+            "missing_quotes": [],
+            "original_metric_convention": {
+              "annual_volatility_pct": 13.84,
+              "cagr_pct": 10.16,
+              "cumulative_return_pct": 56.08,
+              "final_nav": 15607.6,
+              "max_drawdown_pct": -15.34,
+              "sharpe": 0.771,
+              "total_fees_and_taxes": 10.61,
+              "trades_count": 17
+            },
+            "pending_at_end": [],
+            "periods": {
+              "full": {
+                "fills": 17,
+                "first": "2022-04-13",
+                "last": "2026-11-24",
+                "marks": 1159,
+                "max_drawdown": -0.1534171432041136,
+                "net_time_weighted_return": 0.5607600179773655,
+                "returns": 1159,
+                "sharpe_rf_zero": 0.7689525460766028
+              },
+              "prior": {
+                "fills": 15,
+                "first": "2022-04-13",
+                "last": "2025-12-31",
+                "marks": 933,
+                "max_drawdown": -0.1534171432041136,
+                "net_time_weighted_return": 0.48615897686626774,
+                "returns": 933,
+                "sharpe_rf_zero": 0.8262344067309471
+              },
+              "validation_already_seen": {
+                "fills": 2,
+                "first": "2026-01-02",
+                "last": "2026-11-24",
+                "marks": 226,
+                "max_drawdown": -0.0926312270010452,
+                "net_time_weighted_return": 0.05019721461320592,
+                "returns": 226,
+                "sharpe_rf_zero": 0.5027773006405065
+              }
+            },
+            "superseded": 0,
+            "target_sha256": "6303290f2c47518b2b47868129cc9e9a7633bd76ce662e8420a44a2a591b3a05"
+          }
+        }
+      },
+      "fill_price_comparison": {
+        "buy_and_hold": {
+          "close_only": 0,
+          "matched_signal_symbol_side": 1,
+          "mean_open_minus_close_bps": 5.413120575701313,
+          "median_open_minus_close_bps": 5.413120575701313,
+          "open_only": 0
+        },
+        "core_taa_only": {
+          "close_only": 2,
+          "matched_signal_symbol_side": 41,
+          "mean_open_minus_close_bps": -19.146966461917373,
+          "median_open_minus_close_bps": -15.299628169893609,
+          "open_only": 4
+        },
+        "hybrid_core_satellite": {
+          "close_only": 4,
+          "matched_signal_symbol_side": 195,
+          "mean_open_minus_close_bps": 0.21261382395741654,
+          "median_open_minus_close_bps": 0.0005318532170228707,
+          "open_only": 4
+        },
+        "static_80_20": {
+          "close_only": 5,
+          "matched_signal_symbol_side": 12,
+          "mean_open_minus_close_bps": 6.628205855392089,
+          "median_open_minus_close_bps": -2.538174950116878,
+          "open_only": 3
+        }
+      },
+      "missing_all_symbols": [],
+      "published_vs_retrieved": {
+        "buy_and_hold": {},
+        "core_taa_only": {},
+        "hybrid_core_satellite": {},
+        "static_80_20": {}
+      }
+    }
+  },
+  "admitted_prospective_marks": 0,
+  "plan": {
+    "comparison": "Use original #569 weights and rebalance dates in both executions. Same currency, fractions, fees, tax approximation and NAV dates per market. Same-close diagnostic vs following local session observed adjusted open. No stale fills. Buy-and-hold is the original 99% local ETF; 80/20 is 80% ETF plus cash. #553 is a separate KRW account with 80% SPY plus 20% KODEX 200, evaluated on its own aligned union calendar.",
+    "end": "2026-11-24",
+    "future_admission": "Require contemporaneously archived eligible universe, prices, actions, timestamps, signal versions and no intervening use or tuning. No future observations admitted here.",
+    "future_candidate_only": [
+      "2026-12-01",
+      "2027-11-30"
+    ],
+    "input_start": "2022-01-03",
+    "markets": {
+      "KR": {
+        "benchmark": "069500.KS",
+        "core": [
+          "069500.KS",
+          "229200.KS"
+        ],
+        "first_mark": "2022-04-19",
+        "satellite": [
+          "005930.KS",
+          "000660.KS",
+          "035420.KS",
+          "012450.KS"
+        ],
+        "sessions": 1124
+      },
+      "US": {
+        "benchmark": "SPY",
+        "core": [
+          "SPY",
+          "QQQ"
+        ],
+        "first_mark": "2022-04-13",
+        "satellite": [
+          "AAPL",
+          "MSFT",
+          "NVDA",
+          "AMZN",
+          "META",
+          "LLY"
+        ],
+        "sessions": 1159
+      }
+    },
+    "parameter_search": false,
+    "period_metrics": "Carry positions; use the prior close as opening NAV for subperiods, initial capital at inception. Report return, drawdown, zero-rate annualized sample Sharpe, return/mark counts and fills; keep original Sharpe convention separately.",
+    "periods": {
+      "full": [
+        "2022-01-03",
+        "2026-11-24"
+      ],
+      "prior": [
+        "2022-01-03",
+        "2025-12-31"
+      ],
+      "validation_already_seen": [
+        "2026-01-01",
+        "2026-11-24"
+      ]
+    },
+    "research_type": "retrospective execution timing sensitivity",
+    "sources": {
+      "553_correction": "merge-553-validation/corrected-run",
+      "553_merge": "ae40962858f21c9629381ed91e38d2e113765636",
+      "553_original_inputs": "long-inputs/market-inputs.json",
+      "553_root": "quant-research-20261125",
+      "569_merge": "152734806a219c012c2e78c5f0d239c94e72d415",
+      "569_published_report_git_blob": "be1a82e300258d25decdf79efd3d46ec9b82d285",
+      "569_reconstruction": "Yahoo chart daily OHLCV and adjusted close, retained responses; never substitute partial tickers or truncate the final session",
+      "569_runner_git_blob": "623786fae4a1c62c4dbb449706c3025e57a00fc9"
+    },
+    "version": 1
+  },
+  "plan_object_sha256": "3d6b39ddb4ac9dc21e9276e782b9a575992d028d6240143b39aa3a3bda49fa0c"
+}

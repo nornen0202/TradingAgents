@@ -17,6 +17,14 @@ if str(ROOT) not in sys.path:
 from tradingagents.execution.quant_data_bridge import evaluate_hybrid_portfolio_proposal  # noqa: E402
 
 
+def _observed_quote(row, field):
+    price = row.get(field)
+    volume = row.get("executable_volume", row.get("volume"))
+    if all(type(x) in (int, float) and math.isfinite(x) and x > 0 for x in (price, volume)):
+        return price
+    return None
+
+
 def simulate_after_tax_walk_forward(
     bars_by_ticker: Mapping[str, Sequence[Mapping[str, Any]]],
     *,
@@ -30,7 +38,11 @@ def simulate_after_tax_walk_forward(
     us_cap_gains_tax_rate: float = 0.22,
     us_annual_deduction_usd: float = 1800.0,
     decisions_by_date: Mapping[str, Mapping[str, Mapping[str, Any]]] | None = None,
+    fill_timing: str = "legacy_close",
+    audit_traces: dict | None = None,
 ) -> dict[str, Any]:
+    if fill_timing not in {"legacy_close", "same_close", "next_open"}:
+        raise ValueError("Unknown fill timing")
     market = market.upper()
     currency = "KRW" if market == "KR" else "USD"
     initial_capital = 10_000_000.0 if market == "KR" else 10_000.0
@@ -46,11 +58,15 @@ def simulate_after_tax_walk_forward(
         raise ValueError("At least 90 trading sessions are required for walk-forward simulation")
 
     price_lookup: dict[str, dict[str, float]] = {}
+    observed_prices = {}
     for ticker, rows in bars_by_ticker.items():
         series: dict[str, float] = {}
+        # Preserve the original first observation on duplicate dates.
+        observed = {str(r.get("date"))[:10]: r for r in reversed(rows)}
+        observed_prices[ticker.upper()] = observed
         last = None
         for d in all_dates:
-            match = next((r for r in rows if str(r.get("date"))[:10] == d), None)
+            match = observed.get(d)
             if match is not None and float(match["close"]) > 0:
                 last = float(match["close"])
             if last is not None:
@@ -89,6 +105,9 @@ def simulate_after_tax_walk_forward(
         nav_curve: list[float] = []
         total_fees_and_taxes = 0.0
         trades_count = 0
+        daily_fills, fills, signals, unavailable = [], [], {}, []
+        pending = {}
+        superseded = 0
 
         for step_idx, day in enumerate(eval_dates):
             year = day[:4]
@@ -100,10 +119,12 @@ def simulate_after_tax_walk_forward(
                 annual_realized_gain = 0.0
                 current_year = year
 
-            if step_idx % rebalance_every_days == 0:
-                cutoff = f"{day}T22:00:00+00:00"
+            signal_index = step_idx - int(fill_timing == "next_open")
+            if signal_index >= 0 and signal_index % rebalance_every_days == 0:
+                signal_day = eval_dates[signal_index]
+                cutoff = f"{signal_day}T22:00:00+00:00"
                 if mode == "buy_and_hold":
-                    targets = {benchmark_ticker.upper(): 0.99} if step_idx == 0 else None
+                    targets = {benchmark_ticker.upper(): 0.99} if signal_index == 0 else None
                 elif mode == "static_80_20":
                     targets = {benchmark_ticker.upper(): 0.80}
                 elif mode == "core_taa_only":
@@ -111,67 +132,102 @@ def simulate_after_tax_walk_forward(
                     prop = evaluate_hybrid_portfolio_proposal(p, bars_by_ticker, analysis_as_of=cutoff)
                     targets = prop["after_veto"]["weights"]
                 else:
-                    decs = (decisions_by_date or {}).get(day, {})
+                    decs = (decisions_by_date or {}).get(signal_day, {})
                     prop = evaluate_hybrid_portfolio_proposal(
                         policy_base, bars_by_ticker, analysis_as_of=cutoff, decisions=decs
                     )
                     targets = prop["after_veto"]["weights"]
 
                 if targets is not None:
-                    nav = cash + sum(shares.get(t, 0.0) * price_lookup[t][day] for t in shares if day in price_lookup.get(t, {}))
-                    all_syms = sorted(set(shares) | set(targets))
-                    # Execute sells first
-                    for sym in all_syms:
-                        px = price_lookup.get(sym, {}).get(day)
-                        if not px or px <= 0:
-                            continue
-                        cur_val = shares.get(sym, 0.0) * px
-                        tgt_val = nav * float(targets.get(sym, 0.0))
-                        diff = tgt_val - cur_val
-                        if diff < -nav * 0.01 and shares.get(sym, 0.0) > 0:
-                            sell_qty = min(shares[sym], abs(diff) / px)
-                            gross = sell_qty * px
-                            is_kr_stock = market == "KR" and sym in {s.upper() for s in satellite_tickers}
-                            sell_bps = fee_bps + (kr_stock_sell_tax_bps if is_kr_stock else 0.0)
-                            cost = gross * (sell_bps / 10_000.0)
-                            realized = (px - avg_cost.get(sym, px)) * sell_qty - cost
-                            annual_realized_gain += realized
-                            shares[sym] -= sell_qty
-                            if shares[sym] <= 1e-9:
-                                shares.pop(sym, None)
-                                avg_cost.pop(sym, None)
-                            cash += gross - cost
+                    order_signal_day = signal_day
+                    superseded += len(pending)
+                    pending = {sym: targets.get(sym, 0.0) for sym in set(shares) | set(targets)}
+                    if audit_traces is not None:
+                        signals[signal_day] = dict(targets)
+            if pending:
+                all_syms = sorted(pending)
+                prices = {}
+                for sym in set(pending) | set(shares):
+                    if fill_timing == "legacy_close":
+                        prices[sym] = price_lookup.get(sym, {}).get(day)
+                    else:
+                        row = observed_prices.get(sym, {}).get(day, {})
+                        field = "open" if fill_timing == "next_open" else "close"
+                        prices[sym] = _observed_quote(row, field)
+                # A missing auction may carry a prior mark for sizing. It
+                # cannot generate a fill or borrow the close of that day.
+                previous = all_dates[warmup + step_idx - 1]
+                nav = cash + sum(shares[t] * (prices[t] or price_lookup[t][previous]) for t in shares)
+                targets = pending.copy()
+                pending = {}
+                for sym in all_syms:
+                    if prices[sym] is None:
+                        unavailable.append((day, sym))
+                        if fill_timing == "next_open":
+                            pending[sym] = targets[sym]
+                # Execute sells first
+                for sym in all_syms:
+                    px = prices[sym]
+                    if not px or px <= 0:
+                        continue
+                    cur_val = shares.get(sym, 0.0) * px
+                    tgt_val = nav * float(targets.get(sym, 0.0))
+                    diff = tgt_val - cur_val
+                    if diff < -nav * 0.01 and shares.get(sym, 0.0) > 0:
+                        sell_qty = min(shares[sym], abs(diff) / px)
+                        gross = sell_qty * px
+                        is_kr_stock = market == "KR" and sym in {s.upper() for s in satellite_tickers}
+                        sell_bps = fee_bps + (kr_stock_sell_tax_bps if is_kr_stock else 0.0)
+                        cost = gross * (sell_bps / 10_000.0)
+                        realized = (px - avg_cost.get(sym, px)) * sell_qty - cost
+                        annual_realized_gain += realized
+                        shares[sym] -= sell_qty
+                        if shares[sym] <= 1e-9:
+                            shares.pop(sym, None)
+                            avg_cost.pop(sym, None)
+                        cash += gross - cost
+                        total_fees_and_taxes += cost
+                        trades_count += 1
+                        if audit_traces is not None:
+                            fills.append((order_signal_day, day, sym, "sell", px))
+                # Execute buys second
+                for sym in all_syms:
+                    px = prices[sym]
+                    if not px or px <= 0:
+                        continue
+                    cur_val = shares.get(sym, 0.0) * px
+                    tgt_val = nav * float(targets.get(sym, 0.0))
+                    diff = tgt_val - cur_val
+                    if diff > nav * 0.01 and cash > 0:
+                        spend = min(cash * 0.995, diff)
+                        cost = spend * (fee_bps / 10_000.0)
+                        buy_qty = max(0.0, (spend - cost) / px)
+                        if buy_qty > 0:
+                            prev_qty = shares.get(sym, 0.0)
+                            prev_cost = avg_cost.get(sym, px)
+                            shares[sym] = prev_qty + buy_qty
+                            avg_cost[sym] = (prev_qty * prev_cost + buy_qty * px) / shares[sym]
+                            cash -= spend
                             total_fees_and_taxes += cost
                             trades_count += 1
-                    # Execute buys second
-                    for sym in all_syms:
-                        px = price_lookup.get(sym, {}).get(day)
-                        if not px or px <= 0:
-                            continue
-                        cur_val = shares.get(sym, 0.0) * px
-                        tgt_val = nav * float(targets.get(sym, 0.0))
-                        diff = tgt_val - cur_val
-                        if diff > nav * 0.01 and cash > 0:
-                            spend = min(cash * 0.995, diff)
-                            cost = spend * (fee_bps / 10_000.0)
-                            buy_qty = max(0.0, (spend - cost) / px)
-                            if buy_qty > 0:
-                                prev_qty = shares.get(sym, 0.0)
-                                prev_cost = avg_cost.get(sym, px)
-                                shares[sym] = prev_qty + buy_qty
-                                avg_cost[sym] = (prev_qty * prev_cost + buy_qty * px) / shares[sym]
-                                cash -= spend
-                                total_fees_and_taxes += cost
-                                trades_count += 1
+                            if audit_traces is not None:
+                                fills.append((order_signal_day, day, sym, "buy", px))
 
             nav_eod = cash + sum(shares.get(t, 0.0) * price_lookup[t][day] for t in shares if day in price_lookup.get(t, {}))
             nav_curve.append(nav_eod)
+            if audit_traces is not None:
+                daily_fills.append(trades_count)
 
         if market == "US" and annual_realized_gain > us_annual_deduction_usd:
             tax = (annual_realized_gain - us_annual_deduction_usd) * us_cap_gains_tax_rate
             nav_curve[-1] -= tax
             total_fees_and_taxes += tax
 
+        if audit_traces is not None:
+            audit_traces[mode] = {"days": eval_dates, "nav": nav_curve, "cumulative_fills": daily_fills,
+                                  "signals": signals, "fills": fills, "initial_nav": initial_capital,
+                                  "missing_quotes": unavailable, "superseded": superseded,
+                                  "pending_at_end": sorted(pending)}
         daily_rets = [right / left - 1.0 for left, right in zip(nav_curve[:-1], nav_curve[1:]) if left > 0]
         total_ret = (nav_curve[-1] / initial_capital - 1.0) * 100.0
         years = max(len(eval_dates) / 252.0, 1e-6)
