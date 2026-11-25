@@ -27,7 +27,7 @@ from tradingagents.decision_provenance import research_origin
 from tradingagents.atomic_io import atomic_write_json, interprocess_file_lock
 from tradingagents.scheduled.failure_diagnostics import failure_diagnostics, format_failure_diagnostics
 from tradingagents.scheduled.research_observation import ResearchObservationRecorder
-from tradingagents.scheduled.manifest_discovery import full_manifests_desc
+from tradingagents.scheduled.manifest_discovery import _directories_desc, full_manifests_desc
 from tradingagents.scheduled.research_artifact_refs import KEYS as RESEARCH_REFERENCE_KEYS, ResearchArtifactStore
 from tradingagents.charting.capture import ChartCapture
 from tradingagents.agents.utils.instrument_resolver import resolve_instrument
@@ -5593,29 +5593,28 @@ def _iter_run_manifests_desc(
     runs_dir = archive_dir / "runs"
     if not runs_dir.exists():
         return []
+    physical_runs = runs_dir.resolve()
 
     def paths():
-        year_dirs = sorted((path for path in runs_dir.iterdir() if path.is_dir()), reverse=True)
-        for year_dir in year_dirs:
-            run_dirs = sorted((path for path in year_dir.iterdir() if path.is_dir()), reverse=True)
-            for run_dir in run_dirs:
-                manifest_path = run_dir / "run.json"
-                if manifest_path.exists():
-                    yield manifest_path
+        for year_dir in _directories_desc(physical_runs):
+            for run_dir in _directories_desc(year_dir):
+                yield run_dir / "run.json"
 
     def read_manifest(path):
+        if not path.exists():
+            return None
         manifest = json.loads(path.read_text(encoding="utf-8"))
-        return (project(manifest) if project is not None else manifest, path.parent)
+        return project(manifest) if project is not None else manifest, runs_dir / path.parent.relative_to(physical_runs)
 
     if read_workers == 1:
-        return [read_manifest(path) for path in paths()]
+        return [item for path in paths() if (item := read_manifest(path)) is not None]
     items: list[tuple[dict[str, Any], Path]] = []
     remaining = paths()
     with ThreadPoolExecutor(max_workers=read_workers) as pool:
         while batch := list(islice(remaining, read_workers)):
             # executor.map over the complete archive would queue and retain an
             # unbounded number of results behind one slow file. Bound submission.
-            items.extend(pool.map(read_manifest, batch))
+            items.extend(item for item in pool.map(read_manifest, batch) if item is not None)
     return items
 
 
