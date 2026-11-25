@@ -44,6 +44,7 @@ def run_portfolio_pipeline(
     external_data_settings: Any | None = None,
     portfolio_performance_settings: Any | None = None,
     current_execution_updates: dict[str, dict[str, Any]] | None = None,
+    rule_only_context_verified: bool = False,
 ) -> dict[str, Any]:
     if not getattr(portfolio_settings, "enabled", False):
         return {"status": "disabled"}
@@ -101,6 +102,8 @@ def run_portfolio_pipeline(
             manifest=manifest,
             llm_settings=llm_settings,
             portfolio_settings=portfolio_settings,
+            **({"rule_only_context_verified": True}
+               if rule_only_context_verified and run_mode == "overlay_only" else {}),
         )
         mark("semantic_verdicts_returned_at")
         all_warnings = (

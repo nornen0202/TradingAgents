@@ -17,6 +17,7 @@ from tradingagents.portfolio.action_judge import _build_prompt, arbitrate_portfo
 from tradingagents.portfolio.action_lift import attach_action_lift_audit
 from tradingagents.portfolio.reporting import render_portfolio_report_markdown
 from tradingagents.portfolio import state_store
+from tradingagents.portfolio import semantic_judge
 from tradingagents.portfolio.state_store import save_portfolio_outputs
 
 
@@ -419,3 +420,23 @@ def test_parallel_reports_join_and_surface_a_failed_artifact(tmp_path, monkeypat
             json_outputs={tmp_path / "failed.json": {}, succeeded: {"valid": True}}, text_outputs={}, parallel=True,
         )
     assert succeeded.is_file()
+
+
+def test_preverified_rule_only_context_preserves_nonempty_verdicts(tmp_path, monkeypatch):
+    calls = []
+
+    def read_context(*args):
+        calls.append(args)
+        return {}
+
+    monkeypatch.setattr(semantic_judge, "_load_context_by_ticker", read_context)
+    params = {"candidates": [_candidate()], "run_dir": tmp_path, "manifest": {}, "llm_settings": None,
+              "portfolio_settings": SimpleNamespace(semantic_judge_enabled=False)}
+    expected = semantic_judge.build_semantic_verdicts(**params)
+    assert semantic_judge.build_semantic_verdicts(**params, rule_only_context_verified=True) == expected
+    assert len(calls) == 1 and len(expected[1]) == 1
+
+    params["portfolio_settings"].semantic_judge_enabled = True
+    monkeypatch.setattr(semantic_judge, "_create_semantic_llm", lambda _: None)
+    semantic_judge.build_semantic_verdicts(**params, rule_only_context_verified=True)
+    assert len(calls) == 2

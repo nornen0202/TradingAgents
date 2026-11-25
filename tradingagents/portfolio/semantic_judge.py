@@ -21,12 +21,14 @@ def build_semantic_verdicts(
     manifest: dict[str, Any],
     llm_settings: Any | None,
     portfolio_settings: Any,
+    rule_only_context_verified: bool = False,
 ) -> tuple[list[PortfolioCandidate], list[dict[str, Any]], list[str]]:
-    contexts = _load_context_by_ticker(run_dir, manifest)
     warnings: list[str] = []
 
     llm = None
     semantic_llm_enabled = bool(getattr(portfolio_settings, "semantic_judge_enabled", False))
+    contexts = ({} if rule_only_context_verified and not semantic_llm_enabled
+                else _load_context_by_ticker(run_dir, manifest))
     if semantic_llm_enabled:
         try:
             llm = _create_semantic_llm(llm_settings)
