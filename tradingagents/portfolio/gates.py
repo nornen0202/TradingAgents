@@ -43,7 +43,15 @@ def apply_gates(
             reasons.append(evidence_reason)
             review_required = True
         if not candidate.is_held and wait_ratio >= 0.7 and bullish_ratio >= 0.5:
-            confirmed = candidate.trigger_profile.get("confirmed_entry_alternative") is True
+            dh = candidate.data_health or {}
+            overlay_confirmed = (
+                str(dh.get("execution_decision_state") or "").upper() == "ACTIONABLE_NOW"
+                and (
+                    str(dh.get("execution_decision_now") or "").upper() in {"STARTER_NOW", "ADD_NOW"}
+                    or str(dh.get("execution_timing_state") or "").upper() == "PILOT_READY"
+                )
+            )
+            confirmed = candidate.trigger_profile.get("confirmed_entry_alternative") is True or overlay_confirmed
             reasons.append("wait_heavy_batch_review" if confirmed else "wait_heavy_batch_reduce_immediate_entries")
 
         current_weight = candidate.market_value_krw / account_value if account_value else 0.0

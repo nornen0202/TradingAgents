@@ -232,6 +232,16 @@ def _entry_alternatives(levels, currency, pilot_open):
         _entry_field(level, "entry_condition_role") == "reference"
         and _entry_field(level, "confirmation_group") is None
     )]
+    has_named_group = any(_entry_field(level, "confirmation_group") is not None for level in levels)
+    if has_named_group:
+        levels = [
+            level
+            for level in levels
+            if _entry_field(level, "confirmation_group") is not None
+            or _entry_field(level, "entry_condition_role") is not None
+            or str(getattr(_entry_field(level, "level_type"), "value", _entry_field(level, "level_type")) or "").upper()
+            not in {"SUPPORT", "RESISTANCE"}
+        ]
     grouped = {}
     required = []
     for level in levels:

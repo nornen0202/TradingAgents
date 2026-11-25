@@ -337,3 +337,45 @@ def _advances_quote(previous, current):
     if current.cumulative_volume is not None and previous.cumulative_volume is not None:
         return current.cumulative_volume > previous.cumulative_volume
     return current.native_price != previous.native_price
+
+
+VTS_WS_URL = "ws://ops.koreainvestment.com:31000"
+
+
+def request_vts_approval_key(credentials, *, session=None, timeout=10) -> str:
+    """Issue a dedicated KIS VTS WebSocket approval_key against openapivts:29443."""
+    import requests as _requests
+    from .kis_demo import DEMO_HOST, DemoError
+
+    own_session = session is None
+    http = session or _requests.Session()
+    try:
+        resp = http.post(
+            f"{DEMO_HOST}/oauth2/Approval",
+            json={
+                "grant_type": "client_credentials",
+                "appkey": credentials.app_key,
+                "secretkey": credentials.app_secret,
+            },
+            timeout=timeout,
+            allow_redirects=False,
+        )
+        if resp.status_code != 200:
+            raise DemoError(f"KIS VTS WebSocket approval failed: status={resp.status_code}")
+        body = resp.json()
+        key = body.get("approval_key") if isinstance(body, dict) else None
+        if not isinstance(key, str) or not key.strip():
+            raise DemoError("KIS VTS WebSocket approval_key missing")
+        return key.strip()
+    finally:
+        if own_session and hasattr(http, "close"):
+            http.close()
+
+
+def open_vts_websocket(*, ws_url: str = VTS_WS_URL, open_timeout: float = 10.0, ping_interval: float | None = None):
+    """Return an async context manager strictly locked to the KIS VTS :31000 endpoint."""
+    if ws_url != VTS_WS_URL:
+        raise ValueError("KIS VTS WebSocket must connect exclusively to ws://ops.koreainvestment.com:31000")
+    import websockets
+
+    return websockets.connect(ws_url, open_timeout=open_timeout, ping_interval=ping_interval, max_size=65_536)

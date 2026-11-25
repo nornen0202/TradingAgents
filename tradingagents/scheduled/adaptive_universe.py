@@ -263,6 +263,10 @@ def evaluate_candidate(ticker, quote, history, *, asof, settings, market, incumb
     if change is not None and abs(change) > 20:
         row["reasons"] = ["extreme_daily_move_requires_separate_review"]
         return row
+    fifty_day_avg = number(quote.get("fiftyDayAverage"))
+    if fifty_day_avg is None or fifty_day_avg <= 0:
+        row["reasons"] = ["insufficient_daily_history"]
+        return row
     reasons = ["liquidity_verified"]
     score = min(15, 5 * math.log10(max(1, daily_value / minimum)) + 5)
     for field, points in (("fiftyDayAverage", 10), ("twoHundredDayAverage", 10)):
