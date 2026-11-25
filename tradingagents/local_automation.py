@@ -646,6 +646,14 @@ def push_site(site, state):
     # autocrlf must not rewrite their bytes when staging the publication tree.
     git_run(["-c", "core.autocrlf=false", "-C", str(site), *prefix, f"--work-tree={site}", "add", "--all", "."], env=env)
     tree = git_run([*prefix, "write-tree"], env=env)
+    dashboard_paths = git_run([*prefix, "ls-tree", "-r", "--name-only", tree, "--", "autotrader"]).splitlines()
+    if dashboard_paths:
+        from tradingagents.execution.public_autotrader_dashboard import verify_public_autotrader_files
+
+        def read_dashboard_blob(path):
+            return subprocess.check_output(["git", *prefix, "cat-file", "blob", f"{tree}:{path}"], timeout=30)
+
+        verify_public_autotrader_files(dashboard_paths, read_dashboard_blob)
     commit = git_run([*prefix, "commit-tree", tree, *(["-p", head] if head else [])], input="Local public report snapshot\n", env=env)
     git_run([*prefix, "push", "fork", f"{commit}:refs/heads/gh-pages"])
     return commit
@@ -737,16 +745,14 @@ def publish(archive, state, runtime_dir, *, rebuild=False, publication_locked=Fa
             refresh_report_history(archive, state, receipt)
         else:
             build_site(archive, site, config.site)
+            from tradingagents.execution.prism_autotrader import load_autotrader_policy
+            from tradingagents.execution.public_autotrader_dashboard import build_public_autotrader_dashboard
+
             try:
-                from tradingagents.execution.autotrader_dashboard import publish_autotrader_dashboard
-                from tradingagents.execution.prism_autotrader import load_autotrader_policy
-                publish_autotrader_dashboard(
-                    archive,
-                    site_dir=site,
-                    policy=load_autotrader_policy(state / "autotrader"),
-                )
-            except Exception:
-                pass
+                dashboard_mode = load_autotrader_policy(state / "autotrader").mode
+            except (OSError, TypeError, ValueError):
+                dashboard_mode = None
+            build_public_autotrader_dashboard(archive, site, mode=dashboard_mode)
         # Preserve exact Work hashes and existing reference-only lineage rules.
         verifier = script("verify_work_pages_handoff")
         for market in ("kr", "us"):
@@ -975,7 +981,7 @@ def main():
             return 0
         try:
             result = run_autotrader_tick(args.archive_dir, args.state_dir / "autotrader")
-            publish_autotrader_dashboard(args.archive_dir, site_dir=args.state_dir / "site", policy=policy)
+            publish_autotrader_dashboard(args.archive_dir, policy=policy)
         except TimeoutError:
             result = {"status": "AUTOTRADER_ALREADY_RUNNING", "mode": policy.mode}
         print(json.dumps(result, ensure_ascii=False))

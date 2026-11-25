@@ -194,10 +194,7 @@ def publish_autotrader_dashboard(
 
     paths = {"kr_json": kr_json, "us_json": us_json, "html": index_html}
     if site_dir is not None:
-        target = Path(site_dir) / "autotrader"
-        target.mkdir(parents=True, exist_ok=True)
-        atomic_write_json(target / "dashboard_data.json", kr)
-        atomic_write_json(target / "us_dashboard_data.json", us)
-        atomic_write_bytes(target / "index.html", html_doc.encode("utf-8"))
-        paths["site_html"] = target / "index.html"
+        from .public_autotrader_dashboard import build_public_autotrader_dashboard
+
+        paths["site_html"] = build_public_autotrader_dashboard(archive_dir, site_dir, mode=policy.mode)
     return paths

@@ -418,7 +418,8 @@ def test_prism_autotrader_end_to_end_queue_fill_runner_hardstop_and_live_gate(tm
     # 5. Export dashboard JSON & HTML and verify load_autotrader_policy / run_autotrader_tick CLI wiring
     paths = publish_autotrader_dashboard(archive, site_dir=site, policy=policy)
     assert paths["kr_json"].is_file() and paths["site_html"].is_file()
-    assert "삼성전자" in paths["site_html"].read_text(encoding="utf-8")
+    assert "삼성전자" in paths["html"].read_text(encoding="utf-8")
+    assert "삼성전자" not in paths["site_html"].read_text(encoding="utf-8")
 
     atomic_write_json(state / "autotrader" / "enabled.json", {"mode": "shadow", "enabled": True, "live_orders_confirmed": False})
     assert load_autotrader_policy(state).enabled is True
