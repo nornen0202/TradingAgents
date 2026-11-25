@@ -175,6 +175,46 @@ def test_krx_verifies_by_session_board_and_symbol_with_bulk_requests(monkeypatch
                         for dataset in ("stk_bydd_trd", "ksq_bydd_trd")]
 
 
+@pytest.mark.parametrize("date_fields", [None, {}, {"BAS_DD": "20261125"}, {"BAS_DD": "20261131"},
+                                         {"BAS_DD": "2026-11-24"}, {"BAS_DD": None}])
+def test_krx_rejects_missing_invalid_and_future_trade_dates(monkeypatch, date_fields):
+    now = dt("2026-11-25T08:38:31+09:00")
+    day = date(2026, 11, 24)
+    days = market_days("KR", now)
+    rows = [] if date_fields is None else [
+        {"MKT_NM": "KOSPI", "ISU_CD": "005930", "TDD_CLSPRC": "182900"} | date_fields,
+    ]
+    monkeypatch.setattr("tradingagents.scheduled.strategy_krx_close.call_krx_open_api",
+                        lambda *args, **kwargs: {"OutBlock_1": rows})
+    official = KrxResearchCloses(lambda: now)("005930.KS", day)
+    assert official is None
+    bar = _bar(day, days[day], 189400, currency="KRW", observed=now) | {
+        "ticker": "005930.KS", "exchange": "KRX", "official_close": official,
+    }
+    assessed = _close_records({day: bar}, "KR", days, now)[day]
+    assert assessed["verification"] == "UNVERIFIED"
+    assert assessed["price_range"] == [189400, 189400]
+
+
+@pytest.mark.parametrize("timestamp", [None, "bogus", "2026-11-25T08:38:31", "2026-11-25T08:38:32+09:00",
+                                       "2026-11-24T15:34:59+09:00"])
+def test_krx_rejects_invalid_evidence_receive_times(timestamp):
+    now = dt("2026-11-25T08:38:31+09:00")
+    day = date(2026, 11, 24)
+    days = market_days("KR", now)
+    official = {"source": "KRX_OPEN_API", "session": str(day), "price": 182900, "currency": "KRW",
+                "adjustment": "unadjusted", "ticker": "005930", "board": "KOSPI", "dataset": "stk_bydd_trd"}
+    if timestamp is not None:
+        official["observed_at"] = timestamp
+    bar = _bar(day, days[day], 189400, currency="KRW", observed=now) | {
+        "ticker": "005930.KS", "exchange": "KRX", "official_close": official,
+    }
+    assessed = _close_records({day: bar}, "KR", days, now)[day]
+    assert assessed["verification"] == "UNVERIFIED" and assessed["official_close"] is None
+    level = {"level_type": "PULLBACK", "confirmation": "close", "low": 189300, "high": 190100}
+    assert _compare(level, assessed, currency="KRW", compatible=True, conflict=False)["status"] == "MET"
+
+
 @pytest.mark.parametrize(("use_exchange", "early_price", "expected"), [
     (False, None, "UNVERIFIED"), (True, None, "MATCHED"), (True, 182900, "CONFLICT"),
     (False, 182900, "CONFLICT"),

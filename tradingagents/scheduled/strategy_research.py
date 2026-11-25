@@ -34,6 +34,8 @@ def _close_records(raw, market, days, now):
         observed = aware_datetime(bar.get("observed_at"))
         if (window and bar.get("kind") in kinds and bar.get("source") == "KIS"
                 and bar.get("currency") == CURRENCIES[market] and bar.get("adjustment") == "unadjusted"
+                and (market != "KR" or (bar.get("requested_market") == "J" if bar["kind"] == KR_DAILY
+                                        else bar.get("exchange") in ("KRX", "J")))
                 and bar.get("session") == day.isoformat() and positive(bar.get("price"))
                 and event == window[1] and observed is not None and event + timedelta(minutes=5) <= observed <= now):
             recheck = bar.get("recheck")
@@ -63,7 +65,10 @@ def _valid_krx_close(receipt, ticker, day, after, before):
     if not isinstance(ticker, str) or not _valid_sample(receipt, after, before):
         return False
     code, _, suffix = ticker.partition(".")
-    board = {"KOSPI": ("KS", "stk_bydd_trd"), "KOSDAQ": ("KQ", "ksq_bydd_trd")}.get(receipt.get("board"))
+    market = receipt.get("board")
+    if not isinstance(market, str):
+        return False
+    board = {"KOSPI": ("KS", "stk_bydd_trd"), "KOSDAQ": ("KQ", "ksq_bydd_trd")}.get(market)
     return (board is not None and suffix in ("", board[0]) and receipt.get("dataset") == board[1]
             and receipt.get("ticker") == code and receipt.get("source") == "KRX_OPEN_API"
             and receipt.get("session") == str(day) and receipt.get("currency") == "KRW"
