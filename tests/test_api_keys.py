@@ -39,6 +39,15 @@ class ApiKeysTests(unittest.TestCase):
             with patch.dict("os.environ", {"TRADINGAGENTS_API_KEYS_PATH": path}, clear=True):
                 self.assertEqual(api_keys.get_api_key("KIS_APP_KEY"), "kis-key")
 
+    def test_reads_exact_private_demo_notice_values_from_scheduler_config(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            path = f"{temp_dir}/api_keys.json"
+            with open(path, "w", encoding="utf-8-sig") as handle:
+                json.dump({"KIS_DEMO_HTS_ID": "$fixture_kr", "KIS_DEMO_US_HTS_ID": "$fixture_us"}, handle)
+            with patch.dict("os.environ", {"TRADINGAGENTS_API_KEYS_PATH": path}, clear=True):
+                self.assertEqual(api_keys.get_api_key("KIS_DEMO_HTS_ID"), "$fixture_kr")
+                self.assertEqual(api_keys.get_api_key("KIS_DEMO_US_HTS_ID"), "$fixture_us")
+
     def test_legacy_markdown_fallback_still_works(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             path = f"{temp_dir}/list_api_keys.md"

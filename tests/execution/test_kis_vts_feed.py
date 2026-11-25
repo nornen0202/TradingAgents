@@ -62,6 +62,29 @@ def test_shared_subscription_budget_prioritizes_notices_orders_and_holdings():
         subscription_plan((KR, US), held=[("KR", f"{i:06}") for i in range(40)])
 
 
+@pytest.mark.parametrize(("market", "tr"), [("KR", "H0STCNI9"), ("US", "H0GSCNI9")])
+def test_exact_notice_id_prefix_and_separate_rejected_and_accepted_receipts(market, tr):
+    scope = VtsScope(market, "$fixture", "0000000001")
+    assert subscription_plan((scope,)) == ((tr, "$fixture"),)
+    with pytest.raises(ValueError, match="scope"):
+        VtsScope(market, "fix$ture", scope.account)
+    decoder = VtsFrameDecoder((scope,), subscription_plan((scope,)))
+    denied = json.loads(acknowledgement(tr, scope))
+    denied["body"] = {"rt_cd": "1", "msg1": "private broker data"}
+    with pytest.raises(ValueError, match="not acknowledged"):
+        decoder.control(json.dumps(denied), received_at=NOW)
+    assert not decoder.notices_active
+    denied_receipt = decoder.notice_controls[(tr, "1")]
+    assert not denied_receipt.accepted
+    assert denied_receipt.rt_cd == "1" and denied_receipt.received_at == NOW.isoformat()
+    with pytest.raises(ValueError, match="Unexpected"):
+        decoder.control(acknowledgement(tr, VtsScope(market, "fixture", scope.account)), received_at=NOW)
+    assert len(decoder.notice_controls) == 1
+    assert decoder.control(acknowledgement(tr, scope), received_at=NOW) is False
+    assert decoder.notices_active and decoder.notice_controls[(tr, "0")].accepted
+    assert all(value not in repr(decoder.notice_controls) for value in (scope.hts_id, scope.account, "private broker data"))
+
+
 @pytest.mark.parametrize(("scope", "tr"), [(KR, "H0STCNI9"), (US, "H0GSCNI9")])
 def test_acknowledged_notice_is_scoped_and_never_claims_a_fill(scope, tr):
     decoder = VtsFrameDecoder((scope,), subscription_plan((scope,)))
@@ -181,7 +204,8 @@ def test_local_probe_reports_approval_separately_from_missing_hts(tmp_path, monk
     assert "fixture-token" not in str(result) and "12345678" not in str(result)
 
 
-def test_local_probe_keeps_independent_app_approvals_and_subscriptions_scoped(tmp_path, monkeypatch):
+@pytest.mark.parametrize("reconnect", [False, True])
+def test_local_probe_keeps_independent_app_approvals_and_subscriptions_scoped(tmp_path, monkeypatch, reconnect):
     from tools import check_kis_vts_feed as probe
     from tradingagents.execution.kis_demo import DemoCredentials
 
@@ -206,11 +230,26 @@ def test_local_probe_keeps_independent_app_approvals_and_subscriptions_scoped(tm
 
     monkeypatch.setattr(probe.KisDemoClient, "websocket_approval", broker_approval)
     monkeypatch.setattr(probe, "_read_feed", read_feed)
-    result = probe.check(tmp_path / "strategy", connect_to_broker=True)
+    result = probe.check(tmp_path / "strategy", connect_to_broker=True, verify_reconnect=reconnect)
     assert result["status"] == "SUBSCRIPTIONS_VERIFIED"
     assert result["approval_verified_by_market"] == {"KR": True, "US": True}
-    assert approval_attempts == [kr, us] and subscriptions == [("KR", kr), ("US", us)]
+    count = 2 if reconnect else 1
+    assert approval_attempts == [kr, us] and subscriptions == [("KR", kr)] * count + [("US", us)] * count
     assert all(secret not in str(result) for secret in (kr.app_key, us.app_key, kr.account_no, "fixture-token"))
+
+
+def test_rejects_common_notice_value_for_a_different_overseas_account(tmp_path, monkeypatch):
+    from tools import check_kis_vts_feed as probe
+    from tradingagents.execution.kis_demo import DemoCredentials
+
+    kr = DemoCredentials("fixture-kr-key", "fixture-kr-secret", "12345678", "01")
+    us = DemoCredentials("fixture-us-key", "fixture-us-secret", "12345679", "01")
+    monkeypatch.setattr(DemoCredentials, "from_local_settings", classmethod(lambda cls: kr))
+    monkeypatch.setattr(probe, "credentials_from_settings", lambda: us)
+    monkeypatch.setattr(probe, "get_api_key", lambda name: "$fixture" if name == "KIS_DEMO_HTS_ID" else None)
+    result = probe.check(tmp_path / "strategy", connect_to_broker=True)
+    assert result["status"] == "US_DEMO_HTS_ID_REQUIRED_FOR_SEPARATE_ACCOUNT"
+    assert "approval_verified_by_market" not in result
 
 
 def test_probe_records_only_subscription_tr_and_result_code(tmp_path, monkeypatch):
@@ -242,8 +281,13 @@ def test_probe_records_only_subscription_tr_and_result_code(tmp_path, monkeypatc
     result = asyncio.run(probe._read_feed({"KR": Client(KR), "US": Client(US)},
                          {scope.market: scope.hts_id for scope in (KR, US)}, state=tmp_path,
                          approval="fixture-approval-only", attempts=1))
-    assert result["notice_acknowledgements"] == [{"tr_id": "H0STCNI9", "rt_cd": "0"}, {"tr_id": "H0GSCNI9", "rt_cd": "0"}]
-    assert result["rest_order_inquiries"] == {"KR": 2, "US": 2}
+    assert [(receipt["tr_id"], receipt["rt_cd"]) for receipt in result["notice_acknowledgements"]] == [
+        ("H0STCNI9", "0"), ("H0GSCNI9", "0"),
+    ]
+    assert all(receipt["accepted"] and datetime.fromisoformat(receipt["received_at"]).utcoffset() is not None
+               for receipt in result["notice_acknowledgements"])
+    assert result["sockets_connected"] == 1 and result["stopped"] == "PROBE_COMPLETED"
+    assert result["disconnects"] == 0 and result["rest_order_inquiries"] == {"KR": 1, "US": 1}
     assert all(value not in str(result) for value in (KR.hts_id, US.account, KEY.decode(), IV.decode(), "fixture-approval-only"))
 
 
