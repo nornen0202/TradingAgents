@@ -244,6 +244,7 @@ def authorize(archive, lane, market, source, candidate, terms, quote, account, c
             or quote.get("ticker") != terms["ticker"] or quote.get("execution_ready") is not True):
         raise ValueError("Five-minute gate requires a current native quote")
     ticker, side = candidate["ticker"], terms["side"]
+    deadline = min(expires, observed + timedelta(seconds=120))
     if side == "BUY":
         entry = receipt["entries"][ticker]
         research, regime = _research(root)
@@ -271,4 +272,6 @@ def authorize(archive, lane, market, source, candidate, terms, quote, account, c
                 or current["owned"].get(ticker) != 1 or not matches_lot
                 or not risk_exit_reason(price=quote["last_price"], policy=policy, **evidence)):
             raise ValueError("Five-minute exit lacks current native holdings or risk evidence")
-    return {"schema": SCHEMA, "baseline_id": root.parent.name, "produced_at": produced.isoformat(), "side": side}
+        deadline = min(deadline, hint_clock + timedelta(seconds=120))
+    return {"schema": SCHEMA, "baseline_id": root.parent.name, "produced_at": produced.isoformat(),
+            "valid_until": deadline.isoformat(), "side": side}

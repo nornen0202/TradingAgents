@@ -719,9 +719,11 @@ def advance(archive, root, validation_root, market, *, clock, tickers, broker_fa
                         issues.append("PRISM_CANDIDATE_NOT_ADMITTED")
                         continue
                     source_evidence = {**(source_evidence or {}), "prism_candidate": hint}
+                    entry_deadline = min(entry_deadline, at(hint["valid_until"]))
                     if at(clock()) >= entry_deadline or any((p / "HALT").exists() for p in (root, validation_root, lane)):
                         issues.append("STRATEGY_SIGNAL_EXPIRED_OR_HALTED_DURING_ADMISSION")
                         break
+                    signal["valid_until"] = entry_deadline.isoformat()
                 broker.db.execute("SAVEPOINT strategy_prepare")
                 try:
                     broker.db.execute("INSERT INTO strategy_attempts VALUES (?,?,?,?,?,?)", (

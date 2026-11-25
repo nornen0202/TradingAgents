@@ -111,7 +111,7 @@ class NormalCli:
 
     def source(self, suffix, *, action="STARTER_NOW", parent=None, complete=True, reference=None):
         h = self.h
-        identity = f"20261019T{h.now:%H%M%S}_{suffix}"
+        identity = f"{h.now:%Y%m%dT%H%M%S}_{suffix}"
         path, _ = native_source(h, identity, action=action)
         manifest = read(path / "run.json")
         manifest["settings"]["run_mode"] = "overlay_only" if parent else "full"
@@ -232,7 +232,7 @@ def test_indeterminate_wire_response_is_queried_on_restart_without_economic_effe
 
 def test_restart_reconciles_preexisting_partial_and_never_resends(cli):
     h = cli.h
-    h.source("20261019T095900_preexisting", qty=2)
+    h.source(qty=2)
     cli.configure(native=False, candidate=False)
     first = cli.run("strategy-kis")
     assert first["orders"][0]["status"] == "ACKNOWLEDGED" and first["orders"][0]["quantity"] == 2, first
@@ -249,22 +249,36 @@ def test_restart_reconciles_preexisting_partial_and_never_resends(cli):
     assert cli.fill_events() == ["PARTIAL"] and len(h.orders) == 1
 
 
-def test_five_minute_halt_arriving_during_transport_pacing_stops_the_post(cli, monkeypatch):
+@pytest.mark.parametrize("stop", ["halt", "expiry"])
+def test_candidate_still_has_to_be_valid_after_transport_pacing(cli, monkeypatch, stop):
     h = cli.h
-    cli.source("production-full")
-    cli.run("autotrader")
+    if stop == "expiry":
+        regular = h.now
+        h.now -= timedelta(hours=18) - timedelta(seconds=50)
+        cli.open = False
+        baseline = cli.source("offhours-full")
+        assert cli.run("autotrader")["entries_queued"] == [h.ticker]
+        h.now, cli.open = regular, True
+        cli.source("production-overlay", parent=baseline)
+    else:
+        cli.source("production-full")
+        assert cli.run("autotrader")["entries_queued"] == [h.ticker]
     original_wait = RequestPacer.wait
 
     def wait(pacer):
         original_wait(pacer)
         with sqlite3.connect(cli.journal) as reader:
             if reader.execute("SELECT 1 FROM requests WHERE status='UNKNOWN'").fetchone():
-                (cli.lane / "HALT").touch()
+                if stop == "halt":
+                    (cli.lane / "HALT").touch()
+                else:
+                    h.now += timedelta(seconds=46)
 
     monkeypatch.setattr(RequestPacer, "wait", wait)
     result = cli.run("strategy-kis")
     assert result["orders"][0]["status"] == "NOT_SENT", result
-    assert (cli.lane / "HALT").exists() and not cli.h.orders and not cli.fill_events()
+    assert (cli.lane / "HALT").exists() == (stop == "halt")
+    assert not h.orders and not cli.fill_events()
 
 
 def test_offhours_repeated_publication_does_not_renew_entry_expiry(cli):
@@ -320,6 +334,6 @@ def test_normal_entrypoints_preserve_the_separate_admission_boundaries(cli, agai
         assert read(cli.receipt) == prior
     result = cli.run("strategy-kis")
     expected = {"incomplete": "NO_RECENT_COMPLETED_SOURCE", "cash": "NO_STRATEGY_QUANTITY_WITHIN_LIMITS",
-                "halt": "PRISM_CANDIDATE_HALTED"}
+                "halt": "PRISM_CANDIDATE_HALTED", "stale": "CANDIDATE_EVIDENCE_UNVERIFIED"}
     assert expected.get(against, "PRISM_CANDIDATE_NOT_ADMITTED") in result["blockers"], result
     assert h.orders == {} and cli.prepared_at_wire == [] and cli.fill_events() == []

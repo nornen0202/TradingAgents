@@ -449,7 +449,7 @@ def assert_order_not_halted(paths):
     """Check the scoped entry kill switches after pacing, before the order POST."""
     for path in paths:
         try:
-            path.stat()
+            path.lstat()
         except FileNotFoundError:
             continue
         except OSError:
