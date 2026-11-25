@@ -1,8 +1,11 @@
 from __future__ import annotations
 
 import json
+import re
+from dataclasses import dataclass
+from datetime import datetime, timezone
 from json import JSONDecodeError
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import Any, Mapping
 
 from tradingagents.llm_clients import create_llm_client
@@ -14,6 +17,86 @@ from .account_models import PortfolioCandidate
 from .instrument_identity import resolve_identity
 
 
+@dataclass(frozen=True)
+class PreparedRuleOnlyContext:
+    inputs: tuple
+    started_at: str
+    finished_at: str
+    error: Exception | None
+
+
+def _context_file_stamp(path):
+    try:
+        stamp = path.stat()
+    except FileNotFoundError:
+        return None
+    return (stamp.st_ino, stamp.st_size, stamp.st_mtime_ns)
+
+
+def _context_inputs(run_dir, manifest):
+    settings = manifest.get("settings") or {}
+    run_id = manifest.get("run_id")
+    if run_id != run_dir.name:
+        return None
+    rows = []
+    digests = set()
+    for row in manifest.get("tickers", []):
+        if row.get("status") != "success":
+            continue
+        ticker = row.get("ticker")
+        artifacts = row.get("artifacts") or {}
+        analysis = artifacts.get("analysis_json")
+        final_state = artifacts.get("final_state_json")
+        if isinstance(final_state, dict):
+            for key in ("analysis_sha256", "artifact_sha256", "source_manifest_sha256", "snapshot_sha256"):
+                digest = final_state.get(key)
+                if not isinstance(digest, str) or not re.fullmatch(r"[a-f0-9]{64}", digest):
+                    return None
+                digests.add(digest)
+        paths = []
+        for relative in (analysis, final_state):
+            if not isinstance(relative, str):
+                continue
+            path = PurePosixPath(relative)
+            if (not isinstance(ticker, str) or not path.is_relative_to(PurePosixPath("tickers") / ticker)
+                    or ".." in path.parts or "\\" in relative or ":" in relative):
+                return None
+            try:
+                paths.append((relative, _context_file_stamp(run_dir / relative)))
+            except OSError:
+                return None
+        owner = tuple(row.get(key) for key in ("ticker", "ticker_name", "analysis_date", "trade_date", "decision"))
+        try:
+            metadata = json.dumps((owner, analysis, final_state), sort_keys=True)
+        except (TypeError, ValueError):
+            return None
+        rows.append((metadata, tuple(paths)))
+    blob_root = run_dir.parent.parent.parent / "research-snapshots" / "sha256"
+    try:
+        blobs = tuple((digest, _context_file_stamp(blob_root / digest[:2] / digest)) for digest in sorted(digests))
+    except OSError:
+        return None
+    return (run_dir.absolute(), run_id, manifest.get("started_at"),
+            settings.get("market_scope") or settings.get("market"), tuple(rows), blobs)
+
+
+def prepare_rule_only_context(run_dir, manifest):
+    started_at = datetime.now(timezone.utc).isoformat()
+    inputs = _context_inputs(run_dir, manifest)
+    if inputs is None:
+        return None
+    error = None
+    try:
+        _load_context_by_ticker(run_dir, manifest)
+    except Exception as exc:
+        # Report this through the original portfolio error handler at the point
+        # where it would have read the context.
+        error = exc.with_traceback(None)
+    if inputs != _context_inputs(run_dir, manifest):
+        return None
+    return PreparedRuleOnlyContext(inputs, started_at, datetime.now(timezone.utc).isoformat(), error)
+
+
 def build_semantic_verdicts(
     *,
     candidates: list[PortfolioCandidate],
@@ -21,14 +104,19 @@ def build_semantic_verdicts(
     manifest: dict[str, Any],
     llm_settings: Any | None,
     portfolio_settings: Any,
-    rule_only_context_verified: bool = False,
+    prepared_rule_only_context: PreparedRuleOnlyContext | None = None,
 ) -> tuple[list[PortfolioCandidate], list[dict[str, Any]], list[str]]:
     warnings: list[str] = []
 
     llm = None
     semantic_llm_enabled = bool(getattr(portfolio_settings, "semantic_judge_enabled", False))
-    contexts = ({} if rule_only_context_verified and not semantic_llm_enabled
-                else _load_context_by_ticker(run_dir, manifest))
+    if (not semantic_llm_enabled and isinstance(prepared_rule_only_context, PreparedRuleOnlyContext)
+            and prepared_rule_only_context.inputs == _context_inputs(run_dir, manifest)):
+        if prepared_rule_only_context.error is not None:
+            raise prepared_rule_only_context.error
+        contexts = {}
+    else:
+        contexts = _load_context_by_ticker(run_dir, manifest)
     if semantic_llm_enabled:
         try:
             llm = _create_semantic_llm(llm_settings)

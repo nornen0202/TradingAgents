@@ -75,7 +75,7 @@ from tradingagents.performance.price_history import load_price_history_for_recom
 from tradingagents.portfolio import load_snapshot_for_profile, run_portfolio_pipeline
 from tradingagents.portfolio.delta import compute_portfolio_delta, render_portfolio_delta_markdown
 from tradingagents.portfolio.profiles import load_portfolio_profile
-from tradingagents.portfolio.semantic_judge import _load_context_by_ticker
+from tradingagents.portfolio.semantic_judge import prepare_rule_only_context
 from tradingagents.report_writer import polish_ticker_report
 from tradingagents.schemas import (
     ActionIfTriggered,
@@ -601,7 +601,7 @@ def _execute_run_body(config, *, run_label, skip_site_build, tz, started_at,
             available_at=datetime.now(tz),
         )
     execution_updates: dict[str, dict[str, Any]] = {}
-    research_context_clock = None
+    prepared_rule_only_context = None
     execution_refresh_budget_available = True
     if config.execution.execution_refresh_enabled and not portfolio_only and not skip_research_postprocessing:
         execution_refresh_budget_available = _post_processing_budget_available(
@@ -616,13 +616,17 @@ def _execute_run_body(config, *, run_label, skip_site_build, tz, started_at,
         if (lightweight_refresh and len(checkpoints) == 1 and max_runtime_seconds is None
                 and not str(config.execution.execution_llm_summary_model or "").strip()
                 and config.portfolio.enabled and config.portfolio.profile_path):
-            profile = load_portfolio_profile(config.portfolio.profile_path, config.portfolio.profile_name)
-            if profile.enabled:
-                validation_started = datetime.now(timezone.utc)
-                _load_context_by_ticker(run_dir, {"started_at": started_at.isoformat(),
-                    "settings": run_settings, "tickers": ticker_summaries})
-                research_context_clock = {"started_at": validation_started.isoformat(),
-                                          "verified_at": datetime.now(timezone.utc).isoformat()}
+            try:
+                profile = load_portfolio_profile(config.portfolio.profile_path, config.portfolio.profile_name)
+            except Exception:
+                # The ordinary portfolio loader handles the same configuration
+                # at its existing stage.
+                profile = None
+            if profile is not None and profile.enabled:
+                prepared_rule_only_context = prepare_rule_only_context(run_dir, {
+                    "run_id": run_id, "started_at": started_at.isoformat(),
+                    "settings": run_settings, "tickers": ticker_summaries,
+                })
         checkpoint_timezone = _execution_checkpoint_timezone(config)
         now_local = datetime.now(ZoneInfo(checkpoint_timezone))
         now_kst = now_local.astimezone(ZoneInfo("Asia/Seoul"))
@@ -927,13 +931,18 @@ def _execute_run_body(config, *, run_label, skip_site_build, tz, started_at,
             summary_image_settings=config.summary_image,
             external_data_settings=None if portfolio_only else config.external_data,
             **({"current_execution_updates": execution_updates} if lightweight_refresh else {}),
-            **({"rule_only_context_verified": True} if research_context_clock is not None else {}),
+            **({"prepared_rule_only_context": prepared_rule_only_context}
+               if prepared_rule_only_context is not None else {}),
         )
         if lightweight_refresh:
             portfolio_status["pipeline_clock"] = {"started_at": portfolio_started_at.isoformat(),
                                                   "returned_at": datetime.now(timezone.utc).isoformat()}
-        if research_context_clock is not None:
-            portfolio_status["pre_quote_research_context"] = research_context_clock
+        if prepared_rule_only_context is not None:
+            portfolio_status["pre_quote_research_context"] = {
+                "started_at": prepared_rule_only_context.started_at,
+                "finished_at": prepared_rule_only_context.finished_at,
+                "status": "failed" if prepared_rule_only_context.error is not None else "checked",
+            }
         manifest["portfolio"] = portfolio_status
         for warning in portfolio_status.get("sell_side_calibration_warnings") or []:
             if warning not in manifest["warnings"]:

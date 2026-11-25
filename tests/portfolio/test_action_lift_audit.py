@@ -430,13 +430,14 @@ def test_preverified_rule_only_context_preserves_nonempty_verdicts(tmp_path, mon
         return {}
 
     monkeypatch.setattr(semantic_judge, "_load_context_by_ticker", read_context)
-    params = {"candidates": [_candidate()], "run_dir": tmp_path, "manifest": {}, "llm_settings": None,
+    params = {"candidates": [_candidate()], "run_dir": tmp_path, "manifest": {"run_id": tmp_path.name}, "llm_settings": None,
               "portfolio_settings": SimpleNamespace(semantic_judge_enabled=False)}
+    prepared = semantic_judge.prepare_rule_only_context(tmp_path, params["manifest"])
     expected = semantic_judge.build_semantic_verdicts(**params)
-    assert semantic_judge.build_semantic_verdicts(**params, rule_only_context_verified=True) == expected
-    assert len(calls) == 1 and len(expected[1]) == 1
+    assert semantic_judge.build_semantic_verdicts(**params, prepared_rule_only_context=prepared) == expected
+    assert len(calls) == 2 and len(expected[1]) == 1
 
     params["portfolio_settings"].semantic_judge_enabled = True
     monkeypatch.setattr(semantic_judge, "_create_semantic_llm", lambda _: None)
-    semantic_judge.build_semantic_verdicts(**params, rule_only_context_verified=True)
-    assert len(calls) == 2
+    semantic_judge.build_semantic_verdicts(**params, prepared_rule_only_context=prepared)
+    assert len(calls) == 3

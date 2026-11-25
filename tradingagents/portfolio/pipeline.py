@@ -30,7 +30,7 @@ from .manual_snapshot import load_manual_snapshot
 from .performance import build_account_performance_outputs
 from .profiles import load_portfolio_profile
 from .reporting import render_portfolio_report_markdown
-from .semantic_judge import build_semantic_verdicts
+from .semantic_judge import PreparedRuleOnlyContext, build_semantic_verdicts
 from .state_store import save_portfolio_outputs
 
 
@@ -44,7 +44,7 @@ def run_portfolio_pipeline(
     external_data_settings: Any | None = None,
     portfolio_performance_settings: Any | None = None,
     current_execution_updates: dict[str, dict[str, Any]] | None = None,
-    rule_only_context_verified: bool = False,
+    prepared_rule_only_context: PreparedRuleOnlyContext | None = None,
 ) -> dict[str, Any]:
     if not getattr(portfolio_settings, "enabled", False):
         return {"status": "disabled"}
@@ -102,8 +102,8 @@ def run_portfolio_pipeline(
             manifest=manifest,
             llm_settings=llm_settings,
             portfolio_settings=portfolio_settings,
-            **({"rule_only_context_verified": True}
-               if rule_only_context_verified and run_mode == "overlay_only" else {}),
+            **({"prepared_rule_only_context": prepared_rule_only_context}
+               if prepared_rule_only_context is not None and run_mode == "overlay_only" else {}),
         )
         mark("semantic_verdicts_returned_at")
         all_warnings = (

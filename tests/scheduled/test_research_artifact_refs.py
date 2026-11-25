@@ -389,6 +389,38 @@ def test_site_and_semantic_reject_different_market(evidence, monkeypatch):
             action()
 
 
+def test_prepared_semantic_context_rechecks_changed_original_and_replays_matching_error(evidence, monkeypatch):
+    from tradingagents.portfolio.semantic_judge import build_semantic_verdicts, prepare_rule_only_context
+
+    destination, row = bootstrap(evidence, monkeypatch)
+    manifest = publish_overlay(destination, row)
+    original = destination / row["artifacts"]["analysis_json"]
+    valid = original.read_bytes()
+    params = {"candidates": [], "run_dir": destination, "manifest": manifest, "llm_settings": None,
+              "portfolio_settings": SimpleNamespace(semantic_judge_enabled=False)}
+    prepared = prepare_rule_only_context(destination, manifest)
+    assert prepared.error is None
+
+    write(original, {**json.loads(valid), "fixture_modified_thesis": True})
+    # The earlier valid proof cannot suppress validation of changed bytes.
+    with pytest.raises(ValueError, match="consuming original thesis"):
+        build_semantic_verdicts(**params, prepared_rule_only_context=prepared)
+    failed = prepare_rule_only_context(destination, manifest)
+    assert isinstance(failed.error, ValueError)
+    with pytest.raises(ValueError, match="consuming original thesis"):
+        build_semantic_verdicts(**params, prepared_rule_only_context=failed)
+
+    original.write_bytes(valid)
+    assert build_semantic_verdicts(**params, prepared_rule_only_context=failed) == ([], [], [])
+
+    checked = prepare_rule_only_context(destination, manifest)
+    digest = row["artifacts"]["final_state_json"]["artifact_sha256"]
+    blob = destination.parents[2] / "research-snapshots" / "sha256" / digest[:2] / digest
+    blob.write_bytes(blob.read_bytes() + b"fixture corruption")
+    with pytest.raises(ValueError, match="Immutable research blob changed"):
+        build_semantic_verdicts(**params, prepared_rule_only_context=checked)
+
+
 def test_source_selection_cannot_replace_archived_artifact(evidence):
     archive, source, _, row = evidence
     selected = deepcopy(row)
