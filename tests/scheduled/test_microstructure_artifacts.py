@@ -102,6 +102,36 @@ def test_lightweight_writes_ready_snapshot_before_other_provider_finishes(tmp_pa
     assert not (run / "run.json").exists()  # Per-ticker archival is not source publication.
 
 
+def test_portfolio_reads_same_current_overlay_values_without_opening_update_again(tmp_path, monkeypatch):
+    from tradingagents.portfolio.candidates import _load_analysis_by_ticker
+
+    analysis = tmp_path / "analysis.json"
+    update = tmp_path / "execution_update.json"
+    current = {"ticker": "AAPL", "market_data_asof": "2026-10-19T14:00:00Z",
+               "source": {"published_in_run_id": "full-overlay", "generated_in_current_run": True}}
+    analysis.write_text(json.dumps({"ticker": "AAPL"}), encoding="utf-8")
+    update.write_text(json.dumps(current), encoding="utf-8")
+    manifest = {"run_id": "full-overlay", "tickers": [{"status": "success", "ticker": "AAPL",
+        "artifacts": {"analysis_json": "analysis.json", "execution_update_json": "execution_update.json"},
+        "execution_update": current}]}
+    expected = _load_analysis_by_ticker(tmp_path, manifest)
+    reads = []
+    original = Path.read_text
+
+    def count(path, *args, **kwargs):
+        reads.append(path)
+        return original(path, *args, **kwargs)
+
+    monkeypatch.setattr(Path, "read_text", count)
+    reused = _load_analysis_by_ticker(tmp_path, manifest, current_execution_updates={"AAPL": current})
+    assert reused == expected and reads == [analysis]
+    reused["AAPL"]["execution_update"]["source"]["generated_in_current_run"] = False
+    assert current["source"]["generated_in_current_run"] is True
+    reads.clear()
+    assert _load_analysis_by_ticker(tmp_path, manifest, current_execution_updates={"AAPL": dict(current)}) == expected
+    assert reads == [analysis, update]
+
+
 @pytest.mark.parametrize("lightweight", [False, True])
 def test_overlay_writes_microstructure_and_chatgpt_context_artifacts(tmp_path: Path, monkeypatch, lightweight):
     config_path = tmp_path / "scheduled.toml"

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 from dataclasses import replace
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -43,6 +43,7 @@ def run_portfolio_pipeline(
     summary_image_settings: Any | None = None,
     external_data_settings: Any | None = None,
     portfolio_performance_settings: Any | None = None,
+    current_execution_updates: dict[str, dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     if not getattr(portfolio_settings, "enabled", False):
         return {"status": "disabled"}
@@ -63,8 +64,16 @@ def run_portfolio_pipeline(
 
     private_dir = run_dir / profile.private_output_dirname
     status_path = private_dir / "status.json"
+    phase_clock = {} if current_execution_updates is not None else None
+
+    def mark(phase):
+        if phase_clock is not None:
+            phase_clock[phase] = datetime.now(timezone.utc).isoformat()
+
     try:
-        snapshot = load_snapshot_for_profile(profile)
+        mark("snapshot_fetch_started_at")
+        snapshot = load_snapshot_for_profile(profile, parallel_read=True) if phase_clock is not None else load_snapshot_for_profile(profile)
+        mark("snapshot_fetch_returned_at")
         if profile.capital_policy_enabled:
             from .capital_policy import apply_snapshot_policy
             snapshot = apply_snapshot_policy(snapshot, now=datetime.fromisoformat(str(manifest["started_at"]).replace("Z", "+00:00")))
@@ -74,6 +83,7 @@ def run_portfolio_pipeline(
             manifest=manifest,
             watch_tickers=profile.watch_tickers,
             profile=profile,
+            **({"current_execution_updates": current_execution_updates} if current_execution_updates is not None else {}),
         )
         prism_ingestion = _load_prism_ingestion(external_data_settings)
         candidates = enrich_candidates_with_prism(
@@ -145,6 +155,7 @@ def run_portfolio_pipeline(
             profile=profile,
         )
         all_warnings.extend(action_judge_warnings)
+        mark("candidate_decisions_returned_at")
         external_signal_context = _build_external_signal_context(
             run_dir=run_dir,
             manifest=manifest,
@@ -178,6 +189,7 @@ def run_portfolio_pipeline(
             report_writer_payload=report_writer_payload,
             settings=summary_image_settings,
         )
+        mark("report_render_returned_at")
         artifact_paths = save_portfolio_outputs(
             private_dir=private_dir,
             snapshot=snapshot,
@@ -204,6 +216,7 @@ def run_portfolio_pipeline(
             artifact_paths=artifact_paths,
             warnings=all_warnings,
         )
+        mark("products_saved_at")
         status_value = _derive_pipeline_status(snapshot)
         semantic_health = _build_semantic_health(scored_candidates)
         if semantic_health["judge_unavailable"]:
@@ -212,6 +225,7 @@ def run_portfolio_pipeline(
             status_value = "degraded"
         status = {
             "status": status_value,
+            **({"phase_clock": phase_clock} if phase_clock is not None else {}),
             "profile": profile.name,
             "snapshot_health": snapshot.snapshot_health,
             "private_coverage_snapshot": {
@@ -321,7 +335,7 @@ def _build_account_performance_status(
         }
 
 
-def load_snapshot_for_profile(profile) -> Any:
+def load_snapshot_for_profile(profile, *, parallel_read=False) -> Any:
     if profile.broker == "manual":
         if not profile.manual_snapshot_path:
             raise PortfolioConfigurationError("manual broker profile requires manual_snapshot_path.")
@@ -332,7 +346,8 @@ def load_snapshot_for_profile(profile) -> Any:
         return _load_watchlist_only_snapshot(profile)
     if profile.broker == "kis":
         try:
-            return load_account_snapshot_from_kis(profile)
+            return (load_account_snapshot_from_kis(profile, parallel_read=True) if parallel_read
+                    else load_account_snapshot_from_kis(profile))
         except PortfolioConfigurationError:
             if profile.manual_snapshot_path and profile.manual_snapshot_path.exists():
                 return load_manual_snapshot(profile.manual_snapshot_path)

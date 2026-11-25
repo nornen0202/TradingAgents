@@ -4,6 +4,7 @@ import json
 import math
 import os
 import re
+from concurrent.futures import ThreadPoolExecutor
 from contextlib import ExitStack
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
@@ -238,6 +239,13 @@ class KisClient:
                 return self._access_token or self.issue_access_token(force=True)
 
             return self.issue_access_token(force=bool(self._invalidated_access_token))
+
+    def _fork_read_session(self) -> "KisClient":
+        return KisClient(app_key=self.app_key, app_secret=self.app_secret, environment=self.environment,
+                         timeout_seconds=self.timeout_seconds, token_cache_path=self._token_cache_path,
+                         token_file_cache_enabled=self._token_file_cache_enabled,
+                         token_ttl_seconds_default=self._token_ttl_seconds_default,
+                         token_refresh_skew_seconds=self._token_refresh_skew_seconds)
 
     def invalidate_access_token(self) -> None:
         with self._token_thread_lock:
@@ -1400,7 +1408,32 @@ def validate_kis_credentials(
     return result
 
 
-def load_account_snapshot_from_kis(profile: PortfolioProfile) -> AccountSnapshot:
+def _overseas_account_reads(client, profile, parallel):
+    account = {"account_no": profile.account_no, "product_code": profile.product_code}
+
+    def pending(reader):
+        try:
+            return reader.fetch_overseas_pending_orders(**account), None
+        except Exception as exc:
+            return [], exc
+
+    if not parallel:
+        balance = client.fetch_overseas_present_balance(**account)
+        return balance, pending(client)
+
+    # The read endpoints are independent. Give each its own HTTP session while
+    # retaining the same account, token-cache coordination and request limits.
+    alternate = client._fork_read_session()
+    try:
+        with ThreadPoolExecutor(max_workers=1, thread_name_prefix="overseas-reporting-pending") as pool:
+            pending_result = pool.submit(pending, alternate)
+            balance = client.fetch_overseas_present_balance(**account)
+            return balance, pending_result.result()
+    finally:
+        alternate.session.close()
+
+
+def load_account_snapshot_from_kis(profile: PortfolioProfile, *, parallel_read: bool = False) -> AccountSnapshot:
     if not profile.account_no:
         raise PortfolioConfigurationError(
             "Portfolio profile is missing account_no. Add it to config/portfolio_profiles.toml "
@@ -1415,21 +1448,14 @@ def load_account_snapshot_from_kis(profile: PortfolioProfile) -> AccountSnapshot
     pending_orders_verified = True
     market_scope = str(getattr(profile, "market_scope", "kr") or "kr").strip().lower()
     if market_scope in {"us", "overseas"}:
-        positions_payload, summary_payload = client.fetch_overseas_present_balance(
-            account_no=profile.account_no,
-            product_code=profile.product_code,
+        (positions_payload, summary_payload), (pending_payload, pending_error) = _overseas_account_reads(
+            client, profile, parallel_read and profile.read_only and client._token_file_cache_enabled is True,
         )
-        try:
-            pending_payload = client.fetch_overseas_pending_orders(
-                account_no=profile.account_no,
-                product_code=profile.product_code,
-            )
-        except Exception as exc:
-            pending_payload = []
+        if pending_error is not None:
             pending_orders_verified = False
             warnings.append(
                 "KIS overseas pending-order lookup failed; continuing with balance-only account snapshot. "
-                f"reason={_summarize_optional_kis_error(exc)}"
+                f"reason={_summarize_optional_kis_error(pending_error)}"
             )
         positions = _build_overseas_positions(positions_payload, warnings=warnings)
     else:

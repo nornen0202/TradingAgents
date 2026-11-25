@@ -902,6 +902,7 @@ def _execute_run_body(config, *, run_label, skip_site_build, tz, started_at,
             llm_settings=config.llm,
             summary_image_settings=config.summary_image,
             external_data_settings=None if portfolio_only else config.external_data,
+            **({"current_execution_updates": execution_updates} if lightweight_refresh else {}),
         )
         if lightweight_refresh:
             portfolio_status["pipeline_clock"] = {"started_at": portfolio_started_at.isoformat(),

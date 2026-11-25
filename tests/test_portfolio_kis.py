@@ -2,6 +2,7 @@ import json
 import os
 import unittest
 from datetime import date, datetime
+from threading import Barrier
 from types import SimpleNamespace
 from unittest.mock import Mock, patch
 
@@ -830,6 +831,49 @@ class PortfolioKisTests(unittest.TestCase):
         self.assertEqual(incomplete.cash_diagnostics["pending_orders_status"], "UNVERIFIED")
         self.assertEqual(incomplete.positions, snapshot.positions)
         self.assertEqual(incomplete.total_equity_krw, snapshot.total_equity_krw)
+
+    @patch("tradingagents.portfolio.kis.KisClient.from_api_keys")
+    def test_lightweight_overseas_snapshot_overlaps_only_its_two_read_endpoints(self, from_api_keys):
+        profile = PortfolioProfile(name="us-overlap", enabled=True, broker="kis", broker_environment="real",
+            read_only=True, account_no="fixture", product_code="01", manual_snapshot_path=None, csv_positions_path=None,
+            private_output_dirname="portfolio-private", watch_tickers=(), trigger_budget_krw=0,
+            constraints=AccountConstraints(), market_scope="us")
+        client, child = Mock(), Mock()
+        client._token_file_cache_enabled = True
+        client._fork_read_session.return_value = child
+        from_api_keys.return_value = client
+        amounts = {"dncl_amt": "100000", "wdrw_psbl_tot_amt": "100000", "tot_asst_amt": "100000"}
+        client.fetch_overseas_present_balance.return_value = ([], amounts)
+        client.fetch_overseas_pending_orders.return_value = []
+        expected = load_account_snapshot_from_kis(profile)
+        client.reset_mock()
+        barrier = Barrier(2, timeout=3)
+
+        def balance(**_):
+            barrier.wait()
+            return [], amounts
+
+        def pending(**_):
+            barrier.wait()
+            return []
+
+        client.fetch_overseas_present_balance.side_effect = balance
+        child.fetch_overseas_pending_orders.side_effect = pending
+        overlapping = load_account_snapshot_from_kis(profile, parallel_read=True)
+        assert overlapping.to_dict() | {"snapshot_id": expected.snapshot_id, "as_of": expected.as_of} == expected.to_dict()
+        client.fetch_overseas_present_balance.assert_called_once_with(account_no="fixture", product_code="01")
+        child.fetch_overseas_pending_orders.assert_called_once_with(account_no="fixture", product_code="01")
+        client.fetch_overseas_pending_orders.assert_not_called()
+        child.session.close.assert_called_once()
+
+        def unavailable(**_):
+            barrier.wait()
+            raise RuntimeError("fixture pending endpoint unavailable")
+
+        child.fetch_overseas_pending_orders.side_effect = unavailable
+        incomplete = load_account_snapshot_from_kis(profile, parallel_read=True)
+        assert incomplete.snapshot_health == "INVALID_SNAPSHOT"
+        assert incomplete.cash_diagnostics["pending_orders_status"] == "UNVERIFIED"
 
 
 if __name__ == "__main__":
