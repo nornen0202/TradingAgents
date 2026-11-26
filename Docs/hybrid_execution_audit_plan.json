@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "research_type": "retrospective execution timing sensitivity",
+  "sources": {
+    "553_merge": "ae40962858f21c9629381ed91e38d2e113765636",
+    "569_merge": "152734806a219c012c2e78c5f0d239c94e72d415",
+    "569_runner_git_blob": "623786fae4a1c62c4dbb449706c3025e57a00fc9",
+    "569_published_report_git_blob": "be1a82e300258d25decdf79efd3d46ec9b82d285",
+    "553_root": "quant-research-20261125",
+    "553_original_inputs": "long-inputs/market-inputs.json",
+    "553_correction": "merge-553-validation/corrected-run",
+    "569_reconstruction": "Yahoo chart daily OHLCV and adjusted close, retained responses; never substitute partial tickers or truncate the final session"
+  },
+  "input_start": "2022-01-03",
+  "end": "2026-11-24",
+  "markets": {
+    "US": {"first_mark": "2022-04-13", "sessions": 1159, "benchmark": "SPY", "core": ["SPY", "QQQ"], "satellite": ["AAPL", "MSFT", "NVDA", "AMZN", "META", "LLY"]},
+    "KR": {"first_mark": "2022-04-19", "sessions": 1124, "benchmark": "069500.KS", "core": ["069500.KS", "229200.KS"], "satellite": ["005930.KS", "000660.KS", "035420.KS", "012450.KS"]}
+  },
+  "periods": {
+    "full": ["2022-01-03", "2026-11-24"],
+    "prior": ["2022-01-03", "2025-12-31"],
+    "validation_already_seen": ["2026-01-01", "2026-11-24"]
+  },
+  "future_candidate_only": ["2026-12-01", "2027-11-30"],
+  "future_admission": "Require contemporaneously archived eligible universe, prices, actions, timestamps, signal versions and no intervening use or tuning. No future observations admitted here.",
+  "comparison": "Use original #569 weights and rebalance dates in both executions. Same currency, fractions, fees, tax approximation and NAV dates per market. Same-close diagnostic vs following local session observed adjusted open. No stale fills. Buy-and-hold is the original 99% local ETF; 80/20 is 80% ETF plus cash. #553 is a separate KRW account with 80% SPY plus 20% KODEX 200, evaluated on its own aligned union calendar.",
+  "period_metrics": "Carry positions; use the prior close as opening NAV for subperiods, initial capital at inception. Report return, drawdown, zero-rate annualized sample Sharpe, return/mark counts and fills; keep original Sharpe convention separately.",
+  "parameter_search": false
+}
