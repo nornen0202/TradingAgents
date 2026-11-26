@@ -26,6 +26,28 @@ _MASTER = {
 }
 _TAIL_FIELDS = {"kospi": (105, 113, 67), "kosdaq": (100, 108, 62)}
 _REVIEWED = {
+    "356680.KQ": {
+        "symbol": "356680.KQ", "short_code": "356680", "board": "kosdaq",
+        "exchange": "KRX", "currency": "KRW", "isin": "KR7356680009",
+        "issuer": "주식회사 엑스게이트", "provider_name": "엑스게이트",
+        "security_class": "COMMON_STOCK", "event_kind": "SPAC_DISSOLUTION_NEW_COMMON_ISSUE",
+        "first_regular_session": "2023-03-16",
+        "predecessor_name": "대신밸런스제10호스팩",
+        "predecessor_history_allowed": False,
+        "new_security": True,
+        "evidence_available_at": "2026-11-26T01:26:40.770994+00:00",
+        "sources": [
+            {"url": "https://kind.krx.co.kr/external/2023/03/14/001962/20230314004474/70980.htm",
+             "sha256": "b60bcd35f134eea5729ec20cd03f062cffbd32546d3c7ed702c1b282a1085ebb",
+             "role": "EXCHANGE_SPAC_DISSOLUTION_NEW_COMMON_DATE_AND_ISIN"},
+            {"url": "https://kind.krx.co.kr/external/2023/03/15/001710/20230315002998/70718.htm",
+             "sha256": "133583d9e1a80b6feefad42844411f0ac23313b827e4e8bcbb8c376c9d0e9d82",
+             "role": "EXCHANGE_SPAC_DISSOLUTION_TRADING_REFERENCE_CORROBORATION"},
+            {"url": "https://new.real.download.dws.co.kr/common/master/kosdaq_code.mst.zip",
+             "sha256": "8625c0ebc120822ba147f46e0da8fb5772a91b0bda059d15d27d48e8ba184146",
+             "role": "REVIEWED_CURRENT_MASTER_IDENTITY_NOT_HISTORICAL_LISTING"},
+        ],
+    },
     "439090.KQ": {
         "symbol": "439090.KQ", "short_code": "439090", "board": "kosdaq",
         "exchange": "KRX", "currency": "KRW", "isin": "KR7439090002",
