@@ -1,13 +1,13 @@
 {
   "schema": "tradingagents.work-context/v1",
   "surface": "youtube",
-  "event_id": "youtube:8be1acf9a9e0bda0254de2076d7de114",
+  "event_id": "youtube:55b379dec24d8616efb7dfb0b06e26f8",
   "prompt_contract_version": "youtube-work-v5",
   "prompt_sha256": "82a87727ec636b928ccb90cfe8cd823d86347e254ed0b204903699e34e35ef0b",
   "skill_sha256": "2fef99f1af403675549a13813e0fe5597a241a964affeada56e9f64e9f398fe9",
   "task_manifest_sha256": "6fbafadc2971d1a908c1bbc1fa29e2adaf0ca6be956768f2f9eb0abf0061428e",
   "workflow_contract_sha256": "6d7501fa20481c66d549b49f6892da6cf0afbc406ab35215a8c726e520d46db5",
-  "source_sha256": "04c32fe14c388603608e4564a3fa7f6508bbfbab2126c2cc8bc56edd6b52d626",
+  "source_sha256": "1124db08425406e3f4454ea64b5efd0ecf4071152dbdf7c4eb5fb92251ac712d",
   "body": {
     "kind": "youtube",
     "source_health": "OK",
@@ -44,10 +44,10 @@
     },
     "coverage": {
       "total_unique_events": 1050,
-      "window_events": 116,
+      "window_events": 84,
       "transmitted_events": 24,
       "truncated": true,
-      "oldest_occurred_at": "2026-11-23T13:02:23+00:00",
+      "oldest_occurred_at": "2026-11-24T07:59:03+00:00",
       "newest_occurred_at": "2026-11-25T14:40:26+00:00",
       "omitted_due_to_packet_budget": 36
     },
@@ -330,199 +330,6 @@
               "source_url": "https://finance.yahoo.com/markets/stocks/articles/ibc-advanced-alloys-swings-fiscal-214734011.html",
               "publisher": "MT Newswires",
               "published_at": "2026-11-24T21:47:34+00:00",
-              "source_tier": "news"
-            }
-          ]
-        }
-      },
-      {
-        "event_key": "6amgLtc9IgU",
-        "content_sha256": "0dd387ba0fc1c5a338e455822681fc651aea7f092eed9e8a4d4eaa9afc53aa6e",
-        "occurred_at": "2026-11-23T13:02:23+00:00",
-        "relevance": {
-          "tickers": [
-            "NVDA",
-            "AMD",
-            "AVGO",
-            "VIX"
-          ],
-          "markets": [
-            "US"
-          ],
-          "themes": [],
-          "match_basis": "verified_entities"
-        },
-        "strategy_source_tier": "USER_PRIMARY",
-        "strategy_evidence_weight": "HIGH",
-        "summary": {
-          "video_id": "6amgLtc9IgU",
-          "title": "나스닥-20%, 엔비디아 -48% 극단적 공포 구간에 진입한 증시, 기회일까",
-          "channel": "소수몽키",
-          "source_url": "https://www.youtube.com/watch?v=6amgLtc9IgU",
-          "published_at": "2026-11-23T13:02:23+00:00",
-          "status": "unverified",
-          "strategy_source_tier": "USER_PRIMARY",
-          "strategy_evidence_weight": "HIGH",
-          "strategy_validation_policy": "USER_ACCEPTED",
-          "transcript_quality": {
-            "status": "good",
-            "score": 1.0,
-            "warnings": [],
-            "source": "automatic",
-            "language": "Korean",
-            "model_or_format": "json3",
-            "chars": 18607,
-            "segments": 965,
-            "duration_seconds": 1958,
-            "repeated_ngram_ratio": 0.0
-          },
-          "claim_status_summary": {
-            "unverified": 11,
-            "partially_supported": 1
-          },
-          "claims": [
-            {
-              "claim_id": "C1",
-              "claim_text": "영상은 나스닥 약 -20% 및 연초 대비 음전, S&P 500 약 -12%, 반도체 약 -44%를 주장했다. S&P 500은 코로나 이후 최악의 주, 반도체는 25년 만의 최대 주간 낙폭이라고 설명했다. 반도체 ETF의 연중 한때 +100%, 장기 추세선 이탈, 나스닥 약세장의 약 2년 빈도도 검증 대상이다.",
-              "status": "unverified",
-              "confidence": 0.12,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "지수 코드와 고점·기준일을 확인하기 전에는 영상의 낙폭이나 주간 기록을 시장 진입의 근거로 쓰기 어렵다."
-            },
-            {
-              "claim_id": "C2",
-              "claim_text": "영상은 엔비디아가 고점 대비 48% 하락해 시가총액 4위로 밀렸고, 금융위기 이후 최장 하락 국면에서 200주 이동평균선 부근을 시험한다고 주장했다. 2018·2022·2026년의 급락도 비교했다.",
-              "status": "unverified",
-              "confidence": 0.24,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "낙폭과 이동평균은 영상 기준일까지의 분할조정 시계열로 재계산하고, 세 차례의 급락을 반복 가능한 4년 주기로 해석하지 않는다."
-            },
-            {
-              "claim_id": "C3",
-              "claim_text": "영상은 엔비디아가 싱가포르 관련 매출 분류를 바꿨고 중국 우회 비중은 불명확하다고 전했다. SEC 조사, 캘리포니아 당국 소환장, 주주 소송, 머디 워터스의 공매도 발표도 각각 언급했다.",
-              "status": "unverified",
-              "confidence": 0.12,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "규제 노출을 평가할 때는 지역별 매출 각주와 당국·법원 기록을 구분해 확인하고, 공매도 측 의혹을 확정된 위반으로 취급하지 않는다."
-            },
-            {
-              "claim_id": "C4",
-              "claim_text": "영상은 젠슨 황의 복귀 계획이 없다는 이사회 입장, 12월 초 청문회 가능성, 트럼프의 주중 두 차례 복귀 지지, 머스크와 베선트의 상반된 입장을 전했다. V자 반등이나 L자·U자 회복은 진행자의 시나리오였다.",
-              "status": "unverified",
-              "confidence": 0.3,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "현재 CEO 상태와 청문 일정은 각각 회사 공식 발표와 위원회 일정으로 확인해야 한다. 두 사안과 주가 회복 경로를 하나의 확정 사건으로 묶지 않는다."
-            },
-            {
-              "claim_id": "C5",
-              "claim_text": "영상은 AMD의 중국 우회 매출 의혹을 담은 공매도 보고서, 브로드컴의 구글 맞춤형 칩 물량이 2027년 줄 수 있다는 보도, 트렌드포스의 기대 이하 메모리 가격 상승률 전망을 반도체 매도 재료로 제시했다.",
-              "status": "unverified",
-              "confidence": 0.1,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "보고서 발행처, 회사 응답, 주문 또는 가이던스, 메모리 제품·가격 기준을 확인하기 전에는 세 내용을 실적 추정의 확정 입력으로 쓰지 않는다."
-            },
-            {
-              "claim_id": "C6",
-              "claim_text": "영상은 해외 데이터센터 고율 관세 경고와 구글의 핀란드 사업을 언급하고, 중국 고객의 동남아 원격 이용·구매·임대·위탁생산 제한과 TSMC·삼성전자 허가를 거론했다. 인도네시아 계약 취소 가능성과 TSMC의 2002년 이후 최대 낙폭도 언급했다.",
-              "status": "unverified",
-              "confidence": 0.1,
-              "supporting_evidence_ids": [],
-              "manual_check_required": true,
-              "investor_implication": "AI 인프라 수요 추정에는 실제 발효된 규정의 거래 범위와 확인된 계약 변경을 반영한다. 관세 발언만으로 수요 감소를 전제할 수 없다."
-            }
-          ],
-          "entities": [
-            {
-              "ticker": "NVDA",
-              "name": "엔비디아",
-              "status": "unverified",
-              "verification_notes": [
-                "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-              ]
-            },
-            {
-              "ticker": "AMD",
-              "name": "AMD",
-              "status": "unverified",
-              "verification_notes": [
-                "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-              ]
-            },
-            {
-              "ticker": "AVGO",
-              "name": "브로드컴",
-              "status": "unverified",
-              "verification_notes": [
-                "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-              ]
-            },
-            {
-              "ticker": "VIX",
-              "name": "변동성지수·공포탐욕지수",
-              "status": "unverified",
-              "verification_notes": [
-                "시장 데이터 조회 실패: no_usable_market_fields"
-              ]
-            }
-          ],
-          "evidence": [
-            {
-              "evidence_id": "E1",
-              "claim_id": "C1",
-              "title": "Basic Materials Roundup: Market Talk",
-              "source_url": "https://finance.yahoo.com/m/1e836a22-b0a8-3da5-81fe-1af9a9dfb205/basic-materials-roundup%3A.html",
-              "publisher": "The Wall Street Journal",
-              "published_at": "2026-11-23T21:58:00+00:00",
-              "source_tier": "market_or_news"
-            },
-            {
-              "evidence_id": "E2",
-              "claim_id": "C1",
-              "title": "BC-Gold-Silver",
-              "source_url": "https://finance.yahoo.com/markets/commodities/articles/bc-gold-silver-200016560.html",
-              "publisher": "Associated Press",
-              "published_at": "2026-11-23T20:00:16+00:00",
-              "source_tier": "market_or_news"
-            },
-            {
-              "evidence_id": "E4",
-              "claim_id": "C3",
-              "title": "Nasdaq gains 6.5% after Huang reinstated as Nvidia CEO",
-              "source_url": "https://finance.yahoo.com/markets/stocks/articles/stock-futures-rise-erasing-losses-135609253.html",
-              "publisher": "CBS News",
-              "published_at": "2026-11-23T23:15:33+00:00",
-              "source_tier": "market_or_news"
-            },
-            {
-              "evidence_id": "E5",
-              "claim_id": "C4",
-              "title": "Nvidia live updates: Nvidia stock climbs more than 31% as board reinstates Jensen Huang as CEO",
-              "source_url": "https://finance.yahoo.com/markets/stocks/live/nvidia-live-updates-jensen-huang-reinstated-as-ceo-trump-says-he-convinced-board-165423793.html",
-              "publisher": "Yahoo Finance",
-              "published_at": "2026-11-23T23:00:40+00:00",
-              "source_tier": "news"
-            },
-            {
-              "evidence_id": "E6",
-              "claim_id": "C5",
-              "title": "Global Aerospace and Defense Material Market Report 2026-2035 | Market to Reach $37 Billion at 5.6% CAGR as Lightweight Composites and Advanced Alloys Gain T...",
-              "source_url": "https://finance.yahoo.com/markets/articles/global-aerospace-defense-material-market-142100393.html",
-              "publisher": "GlobeNewswire",
-              "published_at": "2026-11-23T14:21:00+00:00",
-              "source_tier": "news"
-            },
-            {
-              "evidence_id": "E7",
-              "claim_id": "C10",
-              "title": "Cerrado Gold Inc (CRDOF) (Q3 2026) Earnings Call Highlights: Record EBITDA, Transformational ...",
-              "source_url": "https://finance.yahoo.com/markets/commodities/articles/cerrado-gold-inc-crdof-q3-230027046.html",
-              "publisher": "GuruFocus.com",
-              "published_at": "2026-11-23T23:00:27+00:00",
               "source_tier": "news"
             }
           ]
@@ -3979,6 +3786,197 @@
               "source_url": "https://finance.yahoo.com/markets/commodities/articles/impact-silver-announces-q3-2026-214800265.html",
               "publisher": "TMX Newsfile",
               "published_at": "2026-11-25T21:48:00+00:00",
+              "source_tier": "news"
+            }
+          ]
+        }
+      },
+      {
+        "event_key": "aoNPLI-O9QY",
+        "content_sha256": "eed30e771ac2462393a9265aa5ddf5e34c4089314776a1c1dd72e52615f5b81c",
+        "occurred_at": "2026-11-25T05:57:18+00:00",
+        "relevance": {
+          "tickers": [
+            "^KS11",
+            "미제공"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "verified_entities"
+        },
+        "strategy_source_tier": "STANDARD",
+        "strategy_evidence_weight": "STANDARD",
+        "summary": {
+          "video_id": "aoNPLI-O9QY",
+          "title": "삼전닉스는 지키고 경기소비재로 수익 보완…급락장에서 살아남기 위한 비중 조절 전략ㅣ권다영, 이지환 오로라투자자문 대표 [2시 마켓워치]",
+          "channel": "삼프로TV 3PROTV",
+          "source_url": "https://www.youtube.com/watch?v=aoNPLI-O9QY",
+          "published_at": "2026-11-25T05:57:18+00:00",
+          "status": "asr_uncertain",
+          "strategy_source_tier": "STANDARD",
+          "strategy_evidence_weight": "STANDARD",
+          "strategy_validation_policy": "STANDARD_REVIEW",
+          "transcript_quality": {
+            "status": "good",
+            "score": 1.0,
+            "warnings": [],
+            "source": "automatic",
+            "language": "Korean",
+            "model_or_format": "json3",
+            "chars": 19758,
+            "segments": 1052,
+            "duration_seconds": 2301,
+            "repeated_ngram_ratio": 0.0
+          },
+          "claim_status_summary": {
+            "unverified": 10,
+            "asr_uncertain": 1,
+            "partially_supported": 1
+          },
+          "claims": [
+            {
+              "claim_id": "C1",
+              "claim_text": "방송 초반 코스피는 약 5% 하락해 4,700선, 코스닥은 1.8%대 하락했다. 상승 종목은 각각 약 280개·470개, 외국인 매도는 2조 원대로 소개됐다. 후반 수치는 코스피 4,684(-6.42%), 코스닥 645(약 -3%)였다. 초반 삼성전자·SK하이닉스는 약 9%, 삼성전자 우선주·SK스퀘어는 약 10%, 주성엔지니어링은 10%대 하락으로 소개됐다.",
+              "status": "unverified",
+              "confidence": 0.2,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "두 장중 수치를 확정 시세로 인용하지 말고, 외국인 매도액은 시장 범위와 현물·선물 구분을 확인한 뒤 사용한다."
+            },
+            {
+              "claim_id": "C2",
+              "claim_text": "나스닥 선물은 초반 1.2%대 하락, 대만 가권지수는 약 4.89%로 마감, 닛케이는 3%대 약세로 소개됐다. 미국은 11월 26일 추수감사절 휴장에 들어간다고 언급됐다.",
+              "status": "unverified",
+              "confidence": 0.08,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "아시아 증시 동반 급락이나 미국 현물·선물의 동시 휴장을 전제로 거래 일정을 해석하지 않는다."
+            },
+            {
+              "claim_id": "C3",
+              "claim_text": "얕은 거래량과 매수 기반 부족이 외국인 패시브·헤지펀드·프로그램 매도의 충격을 키웠고, 반등은 공매도 환매에 의존했다는 진단이다. 코스피 주봉 거래량은 2,600선 당시의 약 절반이라고 했다. 5,000선 과매도와 CEO 충격 시 4,500선은 출연자의 판단이다.",
+              "status": "unverified",
+              "confidence": 0.12,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "4,500을 검증된 지지선으로 보지 말고, 거래량과 수급을 동반한 반등인지 확인한다."
+            },
+            {
+              "claim_id": "C4",
+              "claim_text": "엔비디아가 월요일 33% 오른 뒤 다음 거래일 7% 미만 하락했고, 엔비디아와 기타 기술주가 앞선 상승분의 약 30%와 50%를 각각 되돌렸다고 했다. 급등 당일 공매도 손실이 122억 달러였다는 보도도 인용했다.",
+              "status": "unverified",
+              "confidence": 0.09,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "등락률과 상승분 되돌림을 구분하고, 122억 달러를 확인된 실현손실이나 숏 청산 규모로 인용하지 않는다."
+            },
+            {
+              "claim_id": "C5",
+              "claim_text": "젠슨 황의 CEO 복귀 소식이 기술주 급등을 촉발했고 중국 관련 규제안과 청문회 참석 관련 법적 문제가 남았다는 발언으로 요약됐다.",
+              "status": "asr_uncertain",
+              "confidence": 0.05,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "CEO 직책 변경이나 법적 의무를 사실로 보도하지 말고, 이를 전제로 반도체 하방을 추정하지 않는다."
+            },
+            {
+              "claim_id": "C6",
+              "claim_text": "기술주 하락을 신규 악재보다 연휴 전 차익 실현과 파생 숏 청산의 영향으로 해석했다. 엔비디아가 직전 저점을 지키면 한국 증시는 갭 하락 뒤 목~금요일, 미국 증시는 연휴 다음 주에 반등할 수 있다고 전망했다.",
+              "status": "unverified",
+              "confidence": 0.06,
+              "supporting_evidence_ids": [],
+              "manual_check_required": true,
+              "investor_implication": "연휴 후 반등은 조건부 전망으로만 다룬다. 저점 유지와 반등의 기준을 미리 정하고 실제 시가·저가·종가를 대조한다."
+            }
+          ],
+          "entities": [
+            {
+              "ticker": "^KS11",
+              "name": "한국 증시(코스피·코스닥)",
+              "status": "unverified",
+              "verification_notes": [
+                "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+              ]
+            },
+            {
+              "ticker": "미제공",
+              "name": "엔비디아·미국 기술주",
+              "status": "unverified",
+              "verification_notes": [
+                "시장 데이터 조회 실패: no_usable_market_fields"
+              ]
+            },
+            {
+              "ticker": "미제공",
+              "name": "대형 반도체(삼성전자·SK하이닉스·마이크론)",
+              "status": "unverified",
+              "verification_notes": [
+                "시장 데이터 조회 실패: no_usable_market_fields"
+              ]
+            },
+            {
+              "ticker": "미제공",
+              "name": "포트폴리오·인버스 헤지",
+              "status": "unverified",
+              "verification_notes": [
+                "시장 데이터 조회 실패: no_usable_market_fields"
+              ]
+            },
+            {
+              "ticker": "미제공",
+              "name": "경기소비재(현대백화점·아모레퍼시픽 등)",
+              "status": "unverified",
+              "verification_notes": [
+                "시장 데이터 조회 실패: no_usable_market_fields"
+              ]
+            }
+          ],
+          "evidence": [
+            {
+              "evidence_id": "E1",
+              "claim_id": "C1",
+              "title": "US proposes surprise new tariffs on Brazil imports, including 10% duty on aircraft",
+              "source_url": "https://finance.yahoo.com/news/us-proposes-higher-tariffs-brazil-131543830.html",
+              "publisher": "Reuters",
+              "published_at": "2026-11-25T22:31:14+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E2",
+              "claim_id": "C1",
+              "title": "US airlines face higher costs from proposed Embraer duty",
+              "source_url": "https://finance.yahoo.com/economy/policy/articles/us-airlines-face-higher-costs-222235730.html",
+              "publisher": "Reuters",
+              "published_at": "2026-11-25T22:22:35+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E4",
+              "claim_id": "C2",
+              "title": "LS Power Completes Acquisition of 4.4 GW Natural Gas Generation Assets from Constellation",
+              "source_url": "https://finance.yahoo.com/energy/articles/ls-power-completes-acquisition-4-213800844.html",
+              "publisher": "PR Newswire",
+              "published_at": "2026-11-25T21:38:00+00:00",
+              "source_tier": "market_or_news"
+            },
+            {
+              "evidence_id": "E5",
+              "claim_id": "C4",
+              "title": "Dow Jones Futures: Market Goes On Wild Ride. Nasdaq, Nvidia Slash Losses While Anthropic Reverses Higher.",
+              "source_url": "https://finance.yahoo.com/m/158e82fc-b889-34b6-8704-99a49e9a83ae/dow-jones-futures%3A-market.html",
+              "publisher": "Investor's Business Daily",
+              "published_at": "2026-11-25T22:35:25+00:00",
+              "source_tier": "news"
+            },
+            {
+              "evidence_id": "E6",
+              "claim_id": "C4",
+              "title": "Anthropic Stock Is Down 33% From Its All-Time High. Here's What a $5,000 Investment Could Be Worth in 1 Year.",
+              "source_url": "https://finance.yahoo.com/markets/stocks/articles/anthropic-stock-down-33-time-223502469.html",
+              "publisher": "Motley Fool",
+              "published_at": "2026-11-25T22:35:02+00:00",
               "source_tier": "news"
             }
           ]

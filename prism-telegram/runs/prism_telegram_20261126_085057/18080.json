@@ -1,0 +1,86 @@
+{
+  "version": 1,
+  "run_id": "prism_telegram_20261126_085057",
+  "channel": "stock_ai_agent",
+  "message_id": "18080",
+  "posted_at": "2026-11-25T19:58:04+00:00",
+  "source_url": "https://t.me/stock_ai_agent/18080",
+  "preview": "📊 프리즘 US 시뮬레이터 | 실시간 포트폴리오 (2026-11-26 04:57) 🔸 현재 보유: 5/10개 🔸 사용 비중: 3.80/10 슬롯 (분할 매수·시험매수 반영) ✅ 최고 수익: Infosys Limited(INFY) +4.60% ⚠️ 최저 수익: Costco Wholesale Corporation(COST) -2.02% 🔸 보유 종목: - Apple Inc.(AAPL) [T...",
+  "signals": [
+    {
+      "canonical_ticker": "INFY",
+      "display_name": "Infosys Limited",
+      "market": "US",
+      "source_asof": "2026-11-25T19:58:04+00:00",
+      "signal_action": "HOLD",
+      "trigger_type": "telegram_portfolio_snapshot",
+      "trigger_score": 0.45,
+      "composite_score": 0.45,
+      "confidence": 0.45,
+      "warnings": []
+    },
+    {
+      "canonical_ticker": "COST",
+      "display_name": "Costco Wholesale Corporation",
+      "market": "US",
+      "source_asof": "2026-11-25T19:58:04+00:00",
+      "signal_action": "HOLD",
+      "trigger_type": "telegram_portfolio_snapshot",
+      "trigger_score": 0.45,
+      "composite_score": 0.45,
+      "confidence": 0.45,
+      "warnings": []
+    },
+    {
+      "canonical_ticker": "AAPL",
+      "display_name": "Apple Inc.",
+      "market": "US",
+      "source_asof": "2026-11-25T19:58:04+00:00",
+      "signal_action": "HOLD",
+      "trigger_type": "telegram_portfolio_snapshot",
+      "trigger_score": 0.45,
+      "composite_score": 0.45,
+      "stop_loss_price": 334.0,
+      "target_price": 422.86,
+      "confidence": 0.45,
+      "warnings": [
+        "multi_ticker_prices_scoped_to_mention_block"
+      ]
+    },
+    {
+      "canonical_ticker": "VRSN",
+      "display_name": "VeriSign, Inc.",
+      "market": "US",
+      "source_asof": "2026-11-25T19:58:04+00:00",
+      "signal_action": "HOLD",
+      "trigger_type": "telegram_portfolio_snapshot",
+      "trigger_score": 0.45,
+      "composite_score": 0.45,
+      "stop_loss_price": 296.01,
+      "target_price": 370.93,
+      "confidence": 0.45,
+      "warnings": [
+        "multi_ticker_prices_scoped_to_mention_block"
+      ]
+    },
+    {
+      "canonical_ticker": "PANW",
+      "display_name": "Palo Alto Networks, Inc.",
+      "market": "US",
+      "source_asof": "2026-11-25T19:58:04+00:00",
+      "signal_action": "HOLD",
+      "trigger_type": "telegram_portfolio_snapshot",
+      "trigger_score": 0.45,
+      "composite_score": 0.45,
+      "stop_loss_price": 338.09,
+      "target_price": 426.67,
+      "confidence": 0.45,
+      "warnings": [
+        "multi_ticker_prices_scoped_to_mention_block"
+      ]
+    }
+  ],
+  "simulation_only": true,
+  "actionability": "research_only",
+  "execution_eligible": false
+}

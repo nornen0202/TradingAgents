@@ -1,13 +1,13 @@
 {
   "schema": "tradingagents.work-context/v1",
   "surface": "us",
-  "event_id": "us:5a6b8c1b9840fa18665c40e7b5c3d223",
+  "event_id": "us:3db02019ff168943a5524cca604528d6",
   "prompt_contract_version": "market-work-v13-us",
   "prompt_sha256": "a577e06278002eebd491db51786019336a00da570d5c47886bad031cf01cf7fe",
   "skill_sha256": "2fef99f1af403675549a13813e0fe5597a241a964affeada56e9f64e9f398fe9",
   "task_manifest_sha256": "6fbafadc2971d1a908c1bbc1fa29e2adaf0ca6be956768f2f9eb0abf0061428e",
   "workflow_contract_sha256": "c43e03e786420c6d542d346e0a06ae138ac11850adb820262e9f349ae6ce8b9a",
-  "source_sha256": "c9967741cab92dd6401f87a2fc872774b27a0825dd61345ab2d4769f783a1d55",
+  "source_sha256": "b205a5586b95f9ac49d40fcfc17eb74d926b17ff49a366dd3fdf6ad6f5264f63",
   "body": {
     "kind": "market",
     "market": "US",
@@ -1279,16 +1279,16 @@
         "source_health": "OK",
         "coverage": {
           "total_unique_events": 1050,
-          "window_events": 116,
+          "window_events": 84,
           "transmitted_events": 12,
           "truncated": true,
-          "oldest_occurred_at": "2026-11-23T13:02:23+00:00",
+          "oldest_occurred_at": "2026-11-24T08:00:23+00:00",
           "newest_occurred_at": "2026-11-25T11:00:19+00:00",
           "available_events_before_context_cap": 60,
           "context_event_cap": 12,
-          "omitted_events": 104,
+          "omitted_events": 72,
           "omitted_due_to_context_cap": 48,
-          "omitted_before_context_selection": 56
+          "omitted_before_context_selection": 24
         },
         "events": [
           {
@@ -1525,112 +1525,6 @@
                 {
                   "ticker": "005380",
                   "name": "현대차",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "시장 데이터 조회 실패: no_usable_market_fields"
-                  ]
-                }
-              ]
-            }
-          },
-          {
-            "event_key": "6amgLtc9IgU",
-            "content_sha256": "0dd387ba0fc1c5a338e455822681fc651aea7f092eed9e8a4d4eaa9afc53aa6e",
-            "occurred_at": "2026-11-23T13:02:23+00:00",
-            "relevance": {
-              "tickers": [
-                "NVDA",
-                "AMD",
-                "AVGO",
-                "VIX"
-              ],
-              "markets": [
-                "US"
-              ],
-              "themes": [],
-              "match_basis": "verified_entities",
-              "matched_tickers": [
-                "AVGO",
-                "NVDA"
-              ],
-              "market_match": true,
-              "score": 220
-            },
-            "summary": {
-              "video_id": "6amgLtc9IgU",
-              "title": "나스닥-20%, 엔비디아 -48% 극단적 공포 구간에 진입한 증시, 기회일까",
-              "channel": "소수몽키",
-              "source_url": "https://www.youtube.com/watch?v=6amgLtc9IgU",
-              "claim_status_summary": {
-                "unverified": 11,
-                "partially_supported": 1
-              },
-              "claims": [
-                {
-                  "claim_id": "C1",
-                  "claim_text": "영상은 나스닥 약 -20% 및 연초 대비 음전, S&P 500 약 -12%, 반도체 약 -44%를 주장했다. S&P 500은 코로나 이후 최악의 주, 반도체는 25년 만의 최대 주간 낙폭이라고 설명했다. 반도체 ETF의 연중 한때 +100%, 장기 추세선 이탈, 나스닥 약세장의 약 2년 빈도도 검증 대상이다.",
-                  "status": "unverified",
-                  "confidence": 0.12,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "지수 코드와 고점·기준일을 확인하기 전에는 영상의 낙폭이나 주간 기록을 시장 진입의 근거로 쓰기 어렵다."
-                },
-                {
-                  "claim_id": "C2",
-                  "claim_text": "영상은 엔비디아가 고점 대비 48% 하락해 시가총액 4위로 밀렸고, 금융위기 이후 최장 하락 국면에서 200주 이동평균선 부근을 시험한다고 주장했다. 2018·2022·2026년의 급락도 비교했다.",
-                  "status": "unverified",
-                  "confidence": 0.24,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "낙폭과 이동평균은 영상 기준일까지의 분할조정 시계열로 재계산하고, 세 차례의 급락을 반복 가능한 4년 주기로 해석하지 않는다."
-                },
-                {
-                  "claim_id": "C3",
-                  "claim_text": "영상은 엔비디아가 싱가포르 관련 매출 분류를 바꿨고 중국 우회 비중은 불명확하다고 전했다. SEC 조사, 캘리포니아 당국 소환장, 주주 소송, 머디 워터스의 공매도 발표도 각각 언급했다.",
-                  "status": "unverified",
-                  "confidence": 0.12,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "규제 노출을 평가할 때는 지역별 매출 각주와 당국·법원 기록을 구분해 확인하고, 공매도 측 의혹을 확정된 위반으로 취급하지 않는다."
-                },
-                {
-                  "claim_id": "C4",
-                  "claim_text": "영상은 젠슨 황의 복귀 계획이 없다는 이사회 입장, 12월 초 청문회 가능성, 트럼프의 주중 두 차례 복귀 지지, 머스크와 베선트의 상반된 입장을 전했다. V자 반등이나 L자·U자 회복은 진행자의 시나리오였다.",
-                  "status": "unverified",
-                  "confidence": 0.3,
-                  "supporting_evidence_ids": [],
-                  "manual_check_required": true,
-                  "investor_implication": "현재 CEO 상태와 청문 일정은 각각 회사 공식 발표와 위원회 일정으로 확인해야 한다. 두 사안과 주가 회복 경로를 하나의 확정 사건으로 묶지 않는다."
-                }
-              ],
-              "entities": [
-                {
-                  "ticker": "NVDA",
-                  "name": "엔비디아",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                },
-                {
-                  "ticker": "AMD",
-                  "name": "AMD",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                },
-                {
-                  "ticker": "AVGO",
-                  "name": "브로드컴",
-                  "status": "unverified",
-                  "verification_notes": [
-                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
-                  ]
-                },
-                {
-                  "ticker": "VIX",
-                  "name": "변동성지수·공포탐욕지수",
                   "status": "unverified",
                   "verification_notes": [
                     "시장 데이터 조회 실패: no_usable_market_fields"
@@ -2531,6 +2425,102 @@
                 }
               ]
             }
+          },
+          {
+            "event_key": "LsGgVLAjDVw",
+            "content_sha256": "bcf90e1e10e84da1b5caa1c12b76e3172328f2da0f520c99c8062fe2d27b9eff",
+            "occurred_at": "2026-11-24T08:00:23+00:00",
+            "relevance": {
+              "tickers": [
+                "NVDA",
+                "SPX",
+                "SOXX"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "verified_entities",
+              "matched_tickers": [
+                "NVDA"
+              ],
+              "market_match": true,
+              "score": 120
+            },
+            "summary": {
+              "video_id": "LsGgVLAjDVw",
+              "title": "젠슨 황이 돌아왔는데도 월가가 '추가 하락' 후 상승 말하는 이유",
+              "channel": "경제사냥꾼",
+              "source_url": "https://www.youtube.com/watch?v=LsGgVLAjDVw",
+              "claim_status_summary": {
+                "unverified": 10,
+                "asr_uncertain": 1
+              },
+              "claims": [
+                {
+                  "claim_id": "C1",
+                  "claim_text": "영상은 젠슨 황이 11월 12일 사장·CEO·이사직에서 즉시 물러나 콜레트 크레스가 임시 CEO, 하비 존스가 첫 이사회 의장이 됐고, 11월 23일 황이 세 직책에 즉시 복귀했다고 전한다. 11월 17일에는 의장이 복귀 계획을 부인했고 후임 물색 업체가 선정됐다는 보도도 있었다.",
+                  "status": "unverified",
+                  "confidence": 0.18,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "이사회 공시의 발효일과 복귀 직책을 확인하기 전에는 경영 공백이 해소됐다고 단정할 수 없다."
+                },
+                {
+                  "claim_id": "C2",
+                  "claim_text": "영상 수치는 NVDA 11월 23일 +31.48%, 직전 종가 126달러 미만, 시가 약 167달러(+33%), 고가 약 172달러, 종가 약 165달러, 거래량 7.7억 주 초과다. 10월 6일 최고 종가 약 239달러 대비 약 74달러·31% 낮아 회복에 약 45%가 필요하며, 11월 11일 약 174달러에서 12일 4% 초과, 이후 20일까지 6거래일간 24% 초과 하락했다고 한다. 시총은 하루 약 1,300조 원 늘어 약 4조 달러, 10월 초 고점...",
+                  "status": "unverified",
+                  "confidence": 0.12,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "이벤트일 수익률을 확인한 뒤 NVDA와 업종·지수 움직임을 비교해야 기업 고유 요인과 시장 동반 반등을 구분할 수 있다."
+                },
+                {
+                  "claim_id": "C3",
+                  "claim_text": "영상은 웨드부시 애널리스트가 젠슨 황 개인의 기업가치 기여분을 약 1조 달러로 추정했다고 전한다. 영상은 복귀일 급등을 핵심인물 리스크 완화로 해석하되, 사임 전부터 하락했고 회계·수출·AI 투자 수익성·금리 부담은 남았다고 본다.",
+                  "status": "unverified",
+                  "confidence": 0.08,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "1조 달러를 검증된 기업가치 구성요소로 사용하지 말고, 핵심인물 의존도는 별도 위험 요인으로 평가해야 한다."
+                },
+                {
+                  "claim_id": "C4",
+                  "claim_text": "영상은 독립위원회가 외부 변호인과 11월 8일 조사를 시작했고 복귀 발표에도 자체 조사 및 정부 조사·문의 협조가 계속된다고 전한다. 11월 17일 WSJ는 공시의 투자자 오도 여부에 대한 SEC 조사를 익명 소식통에 근거해 보도했고, 캘리포니아주 법무장관실의 조치 검토도 보도됐다. 포천이 언급한 싱가포르 매출 별도 표시 중단과 2022년 암호화폐 채굴 관련 550만 달러 SEC 합의는 각각 별도 사안이다.",
+                  "status": "unverified",
+                  "confidence": 0.06,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "이사회 조사, 당국 조사 보도, 공식 집행 조치, 과거 합의를 구분해 공시 위험을 평가해야 한다."
+                }
+              ],
+              "entities": [
+                {
+                  "ticker": "NVDA",
+                  "name": "엔비디아",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "Bloomberg/Morningstar 등 폐쇄형 출처 주장은 자동 검증하지 못했습니다."
+                  ]
+                },
+                {
+                  "ticker": "SPX",
+                  "name": "S&P 500 및 미국 주식시장",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "시장 데이터 조회 실패: no_usable_market_fields"
+                  ]
+                },
+                {
+                  "ticker": "SOXX",
+                  "name": "아이셰어즈 반도체 ETF",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                }
+              ]
+            }
           }
         ],
         "execution_eligible": false
@@ -3354,7 +3344,6 @@
             "event_keys": [
               "7vmVkQ6U4yA",
               "-zCxk8cTefE",
-              "6amgLtc9IgU",
               "xY0FR3VjO98",
               "Dt4mIitXwtA",
               "jjvLEdN6op4",
@@ -3363,20 +3352,21 @@
               "2O2Zf9m0Pw8",
               "TmsRsVabats",
               "to92-hoE7Zs",
-              "7pDDUZ7dQ-g"
+              "7pDDUZ7dQ-g",
+              "LsGgVLAjDVw"
             ],
             "coverage": {
               "total_unique_events": 1050,
-              "window_events": 116,
+              "window_events": 84,
               "transmitted_events": 12,
               "truncated": true,
-              "oldest_occurred_at": "2026-11-23T13:02:23+00:00",
+              "oldest_occurred_at": "2026-11-24T08:00:23+00:00",
               "newest_occurred_at": "2026-11-25T11:00:19+00:00",
               "available_events_before_context_cap": 60,
               "context_event_cap": 12,
-              "omitted_events": 104,
+              "omitted_events": 72,
               "omitted_due_to_context_cap": 48,
-              "omitted_before_context_selection": 56
+              "omitted_before_context_selection": 24
             }
           },
           "prism": {

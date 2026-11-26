@@ -1,0 +1,498 @@
+{
+  "version": 4,
+  "video_id": "gdep8CyIxvk",
+  "title": "머리로는 아는데… 반토막 난 AI주 앞에서 우리가 망설이는 이유",
+  "url": "https://www.youtube.com/watch?v=gdep8CyIxvk",
+  "channel": "PLUS TV (플러스 TV)",
+  "channel_id": "UCuHUaZo43N9PgOCjs3Hg2Uw",
+  "source_url": "https://www.youtube.com/@plus_tv_official/videos",
+  "thumbnail_url": "https://i.ytimg.com/vi/gdep8CyIxvk/maxresdefault.jpg",
+  "published_at": "2026-11-25T08:00:04+00:00",
+  "status": "asr_uncertain",
+  "strategy_source_tier": "STANDARD",
+  "strategy_evidence_weight": "STANDARD",
+  "strategy_validation_policy": "STANDARD_REVIEW",
+  "transcript_status": "available",
+  "transcript_source": "automatic",
+  "transcript_chars": 21614,
+  "transcript_quality": {
+    "status": "good",
+    "score": 1.0,
+    "warnings": [],
+    "source": "automatic",
+    "language": "Korean",
+    "model_or_format": "json3",
+    "chars": 21614,
+    "segments": 1163,
+    "duration_seconds": 2348,
+    "repeated_ngram_ratio": 0.009
+  },
+  "generated_at": "2026-11-26T06:52:22.990016+09:00",
+  "llm_status": "success",
+  "research_status": "success",
+  "claim_verification_status": "success",
+  "research_pipeline_version": 4,
+  "evidence_count": 8,
+  "claim_status_summary": {
+    "partially_supported": 1,
+    "unverified": 10,
+    "asr_uncertain": 1
+  },
+  "claims": [
+    {
+      "claim_id": "C1",
+      "claim_text": "방송은 코스피 고점 9,400과 당시 4,700대를 비교했다. 국내 일부 종목이 펀더멘털 대비 과도하게 하락했고 반등에 외국인 자금 유입이 필요하다는 평가는 출연진의 견해다.",
+      "status": "partially_supported",
+      "confidence": 0.95,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.58,
+      "asr_confidence": 0.82,
+      "numeric_parse": {
+        "claimed": "고점 9,400; 당시 4,700대",
+        "observed": "^KS11 52주 고점 9,385.59; 가격 4,697.51. 녹화 시점과 시세 기준은 미확인."
+      },
+      "investor_implication": "낙폭을 저평가의 근거로 삼기 전에 종목별 이익·장부가 추정치를 확인하고, 외국인 순매수와 지수 반등의 동행을 필수조건으로 해석하지 않는다."
+    },
+    {
+      "claim_id": "C2",
+      "claim_text": "미국 시장 5% 초과 하락, 반도체 지수 10% 초과 하락, 실러 10년 CAPE 36과 비교 기준 약 25가 언급됐다.",
+      "status": "unverified",
+      "confidence": 0.98,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:05:52",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.85,
+      "numeric_parse": {
+        "claimed": "미국 시장 −5% 초과, 반도체 지수 −10% 초과의 낙폭; CAPE 36 대 약 25",
+        "observed": "비교 가능한 지수 시계열과 CAPE 원자료 미제공."
+      },
+      "investor_implication": "지수명과 기준일을 고정해 일간·주간·고점 대비 낙폭을 구분하고, 같은 시점에 이용 가능했던 CAPE로 밸류에이션을 비교한다."
+    },
+    {
+      "claim_id": "C3",
+      "claim_text": "앤트로픽의 첫 체결가가 공모가를 웃돈 뒤 주가가 약세였고 소프트뱅크그룹은 다음 거래일에 급락했다는 발언이다. 오픈AI의 2027년 상장 가능성과 양사의 합산 약정 1조 달러 초과도 거론됐다.",
+      "status": "unverified",
+      "confidence": 0.98,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.06,
+      "asr_confidence": 0.9,
+      "numeric_parse": {
+        "claimed": "합산 약정 1조 달러 초과; 오픈AI 상장 가능 시점 2027년; 소프트뱅크그룹 다음 거래일 급락",
+        "observed": "공모가·첫 체결가·후속 시세와 다음 도쿄 거래일 수익률, 상장 일정·약정액 확인 불가."
+      },
+      "investor_implication": "상장 관측을 확정 일정으로 쓰지 않는다. 약정은 투자와 서비스 구매를 나눈 뒤 확정·조건부 금액을 구분하고 중복을 제거해 평가한다."
+    },
+    {
+      "claim_id": "C4",
+      "claim_text": "최근 2~3개월 앤트로픽 매출 성장률이 급격히 둔화하고 토큰 사용량 증가에도 지출 지표가 약해졌다는 발언이다. 쉬운 요청을 저가 모델로 보내는 사례가 가격 압력의 근거로 제시됐으며 현금·연간 지출·매출 관련 발화는 불명확하다.",
+      "status": "asr_uncertain",
+      "confidence": 0.97,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.5,
+      "numeric_parse": {
+        "claimed": "최근 2~3개월; 자동자막상 ‘2,억 달러’, ‘1억 달러 좀 넘게’, ‘AR 7, 800억’",
+        "observed": "월별 매출·지출 계열 미제공. 금액 자릿수·통화 및 ARR 여부 미확정."
+      },
+      "investor_implication": "불명확한 금액은 인용하지 않는다. 가격 압력은 실현 단가, 추론 원가, 동일 고객군의 사용량·지출을 함께 봐야 판단할 수 있다."
+    },
+    {
+      "claim_id": "C5",
+      "claim_text": "미국 데이터센터 가동 약 50GW, 진행 중 20~50GW, 계획·신청 400~500GW, 건설비 1GW당 50조 원, 일부 가동 시설의 1~1.5년 투자비 회수설이 언급됐다. 계획이 줄어도 실제 건설이 이어지면 반도체 수요가 유지될 수 있다는 가설이다.",
+      "status": "unverified",
+      "confidence": 0.98,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:05:52",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.83,
+      "numeric_parse": {
+        "claimed": "50GW 가동; 20~50GW 진행; 400~500GW 계획·신청; 50조 원/GW; 1~1.5년 회수",
+        "observed": "단가 가정의 단순 환산만 일치. 용량·실제 건설비·회수기간 원자료 없음."
+      },
+      "investor_implication": "신청 용량을 장비 수요로 환산하지 말고 자금조달이 확정된 착공, 전력 인입, 실제 GPU·메모리 발주를 추적한다."
+    },
+    {
+      "claim_id": "C6",
+      "claim_text": "신규 데이터센터 금융이 막히면 프로젝트와 장비 발주가 지연·취소될 수 있고, 대규모 은행 익스포저가 있다면 충격이 확산될 수 있다는 시나리오다. 공급 지연이 기존 GPU 임대료를 지지할 가능성도 제시됐다.",
+      "status": "unverified",
+      "confidence": 0.98,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:05:52",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.91,
+      "numeric_parse": {
+        "claimed": "금액이나 임대료 변동률을 확정하지 않은 조건부 시나리오",
+        "observed": "프로젝트별 약정·은행 익스포저·비교 가능한 임대료 미제공."
+      },
+      "investor_implication": "오라클 부실로 해석하지 않는다. 프로젝트별 대주단, 인출액, 보증, 미집행 약정과 실제 취소 여부를 먼저 확인한다."
+    },
+    {
+      "claim_id": "C7",
+      "claim_text": "2025년 트럼프 행정부의 데이터센터 규제 완화, 2026년 중간선거 이후 규제 강화·사업 지연 가능성, 미국의 대중 GPU 제한이 거론됐다.",
+      "status": "unverified",
+      "confidence": 0.98,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.82,
+      "numeric_parse": {
+        "claimed": "2025년 규제 완화; 2026년 중간선거 이후 규제 강화 가능성",
+        "observed": "조치명·발효일·대상 칩과 허가 범위 확인 불가."
+      },
+      "investor_implication": "정책 영향은 관할, 발효일, 적용 대상과 예외를 확인한 뒤 해당 프로젝트나 칩에 연결한다."
+    },
+    {
+      "claim_id": "C8",
+      "claim_text": "엔비디아 중국 매출 비중 20% 이상이라는 인용, 메모리 현물가 하락 가능성, 2027년 HBM 증설 제한과 2028년 이후 공급 증가 전망이 제시됐다. HBM 마진, 2029년 공급 증가와 조건부 적자, 삼성전자·SK하이닉스의 BPS/PBR과 추가 하락 추정도 포함됐다.",
+      "status": "unverified",
+      "confidence": 0.98,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:17:18",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.82,
+      "numeric_parse": {
+        "claimed": "중국 매출 비중 20% 이상; 현물 확인 2주~1개월·재고발 하락 1~2개월; HBM 마진 79% 및 40~50% 시나리오; 2029년 공급 약 50% 증가; 2027년 BPS SK하이닉스 100만 원·삼성전자 15만 원; PBR 1.05~1.1배에서 0.7~0.8배로 약 20% 추가 하락",
+        "observed": "외부 시세·공시 확인 불가. PBR 기계적 환산 약 −23.8~−36.4%; 별도 이익 예시 합계 1,350조 원."
+      },
+      "investor_implication": "현물가와 계약가, 실제 주문과 유통 재고를 나눠 추적한다. 2028년 적자 반영은 주가에 대한 해석, 2029년 적자는 수요 정체를 전제로 한 시나리오로 구분한다."
+    },
+    {
+      "claim_id": "C9",
+      "claim_text": "중국 AI 모델 업체의 영업이익률 약 −250%가 언급됐다. YMTC 상장 연기, CXMT 상장, 정부 지분 투자 등을 근거로 중국의 장기 자금조달 여력이 약하다는 해석이 나왔다.",
+      "status": "unverified",
+      "confidence": 0.98,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:29:00",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.76,
+      "numeric_parse": {
+        "claimed": "매출 100 대비 영업손실 250; 영업이익률 약 −250%",
+        "observed": "계산만 맞으며 대상 회사·기간·손익 정의 미확인."
+      },
+      "investor_implication": "업체별 현금·현금 소진·조달 조건과 GPU 비용을 같은 기준으로 비교하기 전에는 미국 업체의 장기 우위를 결론으로 제시하지 않는다."
+    },
+    {
+      "claim_id": "C10",
+      "claim_text": "스트라이프의 에이전트 경유 활동 약 80배 증가와 우버·도어대시의 낮은 에이전트 유입이 비교됐다. 고객응대 비용 절감과 유니티·앱러빈의 광고 효율 사례가 거론됐고, 신약 개발과 자율주행은 유료 수요 후보로 제시됐다.",
+      "status": "unverified",
+      "confidence": 0.98,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:11:37",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.85,
+      "numeric_parse": {
+        "claimed": "스트라이프 에이전트 경유 활동 약 80배",
+        "observed": "측정 항목·비교 기간·절대 규모·결제 완료 여부 미확인."
+      },
+      "investor_implication": "배수보다 실제 결제 건수·유료 전환율·반복 사용을 보고, 비용 절감이나 광고 개선은 품질과 대조군을 포함한 지표로 판단한다."
+    },
+    {
+      "claim_id": "C11",
+      "claim_text": "머스크 인터뷰와 테슬라·스페이스X 합병 가능성, 데이터센터 부지로 돼지 농장에 약 300억 원을 제안했다는 사례가 언급됐다. 인허가와 머스크의 정치적 태도·합병 동기를 연결한 설명은 출연진의 추측이다.",
+      "status": "unverified",
+      "confidence": 0.98,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:05:52",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.8,
+      "numeric_parse": {
+        "claimed": "돼지 농장 부지 제안가 약 300억 원",
+        "observed": "지역·사업자·원통화·제안가·거래 성사 여부 미확인."
+      },
+      "investor_implication": "합병이나 토지 거래를 확정된 사업 진척으로 반영하지 말고, 공식 거래 단계와 당사자 자료를 확인한다."
+    },
+    {
+      "claim_id": "C12",
+      "claim_text": "출연진이 현장에서 본 투자자 10명 중 7~9명가량이 급락 때 매도한 뒤 바닥에서 재매수하지 못했다는 개인적 관찰이다.",
+      "status": "unverified",
+      "confidence": 0.98,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:29:00",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.92,
+      "numeric_parse": {
+        "claimed": "10명 중 약 7~9명",
+        "observed": "비율로 환산하면 70~90%이나 독립적으로 관측된 비율은 아님."
+      },
+      "investor_implication": "재진입이 어려울 수 있다는 경험담으로만 인용하고, 개인 투자자 전체의 행동 통계로 쓰지 않는다."
+    }
+  ],
+  "entities": [
+    {
+      "ticker": "^KS11",
+      "name": "코스피·미국 증시",
+      "status": "unverified",
+      "claims": [
+        "출연진은 나스닥과 반도체주 급락 속에서 국내 일부 종목은 펀더멘털 대비 과도하게 하락했지만, 미국 전체 시장의 밸류에이션은 여전히 높다고 평가했다.",
+        "코스피 반등에는 외국인 자금 유입이 필요하다는 견해와, 개인 투자자는 급락장에서 손절한 뒤 반등 초기에 재진입하기 어렵다는 경험담이 나왔다."
+      ],
+      "numeric_claims": [
+        "방송에서 코스피 고점 9,400과 당시 4,700대를 비교했다.",
+        "미국 시장 5% 초과, 반도체 지수 10% 초과 하락이 언급됐다. 대상 지수의 정확한 명칭과 집계 기간은 불명확하다.",
+        "미국 10년 실러 P/E 36, 비교 기준 약 25가 언급됐다."
+      ],
+      "verification_notes": [
+        "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+      ],
+      "market_snapshot": {
+        "ticker": "^KS11",
+        "as_of": "2026-11-25T23:05:28.110867+00:00",
+        "current_price": 4697.51,
+        "market_cap": null,
+        "forward_pe": null,
+        "trailing_pe": null,
+        "fifty_two_week_high": 9385.59,
+        "fifty_two_week_low": 0.0,
+        "average_target_price": null,
+        "source": "yfinance",
+        "status": "verified"
+      },
+      "external_context_status": "verified"
+    },
+    {
+      "ticker": "확인 불가",
+      "name": "앤트로픽·오픈AI·소프트뱅크",
+      "status": "unverified",
+      "claims": [
+        "출연진은 앤트로픽이 공모가를 웃도는 첫 가격을 기록한 뒤 약세를 보였고 이튿날 소프트뱅크가 급락했다고 말했다. 앤트로픽의 약세가 오픈AI의 상장 밸류에이션과 양사의 대규모 약정에 대한 신뢰를 흔들 수 있다는 해석이다.",
+        "저가 중국 모델로 쉬운 요청을 보내고 어려운 요청만 클로드에 보내는 라우팅 사례가 소개됐다. 출연진은 토큰 사용량 증가에도 지출 지표가 둔화하는 현상을 앤트로픽 성장률과 가격 결정력에 대한 압박으로 해석했다."
+      ],
+      "numeric_claims": [
+        "앤트로픽과 오픈AI의 합산 약정액이 1조 달러를 넘는다는 발언이 나왔다.",
+        "오픈AI 상장 시점으로 방송 기준 내년이 거론됐으나 확정 일정으로 제시되지는 않았다.",
+        "앤트로픽의 최근 2~3개월 매출 성장률이 급격히 둔화했다는 발언이 나왔다."
+      ],
+      "verification_notes": [
+        "시장 데이터 조회 실패: no_usable_market_fields"
+      ],
+      "market_snapshot": {
+        "ticker": "확인 불가",
+        "as_of": "2026-11-25T23:05:29.176414+00:00",
+        "current_price": null,
+        "market_cap": null,
+        "forward_pe": null,
+        "trailing_pe": null,
+        "fifty_two_week_high": null,
+        "fifty_two_week_low": null,
+        "average_target_price": null,
+        "source": "yfinance",
+        "status": "unverified"
+      },
+      "external_context_status": "unverified"
+    },
+    {
+      "ticker": "ORCL",
+      "name": "오라클·네오클라우드·데이터센터 금융",
+      "status": "unverified",
+      "claims": [
+        "출연진은 기존 데이터센터의 수익성 문제와 신규 프로젝트의 자금조달 문제를 구분했다. 자금줄이 끊기면 네오클라우드와 오라클을 포함한 업체의 프로젝트 지연 및 발주 취소가 연쇄적으로 일어날 수 있지만, 실제 공급 지연은 기존 GPU 임대료를 떠받칠 수 있다는 시나리오도 제시했다."
+      ],
+      "numeric_claims": [
+        "미국 데이터센터 용량은 기존 약 50GW, 진행 중 약 20~50GW, 계획·신청 약 400~500GW로 언급됐다.",
+        "출연진 추산 건설비는 1GW당 약 50조 원, 20GW에 약 1,000조 원, 50GW에 약 2,500조 원이다.",
+        "이미 지어진 시설은 투자비를 약 1~1.5년 만에 회수할 수 있다는 업계 이야기가 소개됐다."
+      ],
+      "verification_notes": [
+        "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+      ],
+      "market_snapshot": {
+        "ticker": "ORCL",
+        "as_of": "2026-11-25T23:05:31.075528+00:00",
+        "current_price": 103.87999725341797,
+        "market_cap": 323867503255.4391,
+        "forward_pe": 9.393415,
+        "trailing_pe": 16.282131,
+        "fifty_two_week_high": 250.25,
+        "fifty_two_week_low": 99.34,
+        "average_target_price": 236.184,
+        "source": "yfinance",
+        "status": "verified"
+      },
+      "external_context_status": "verified"
+    },
+    {
+      "ticker": "확인 불가",
+      "name": "삼성전자·SK하이닉스·마이크론·키옥시아·엔비디아",
+      "status": "unverified",
+      "claims": [
+        "과도한 데이터센터 계획을 빼도 실제 건설이 이어지면 반도체 수요가 유지될 수 있다는 견해가 나왔다. 반면 중국 관련 가수요가 꺾이고 유통 재고가 풀리면 현물가와 주문이 단기에 하락할 수 있다고 봤다.",
+        "출연진은 2027년 HBM 증설이 제한적이지만 2028년부터 공급이 늘어난다고 전망했다. 2028년 적자를 미리 반영한 듯한 주가라는 해석과, 2029년 수요자가 늘지 않으면 공급 증가로 실제 적자가 날 수 있다는 조건부 전망을 구분했다."
+      ],
+      "numeric_claims": [
+        "엔비디아 전 임원 발언으로 중국 매출 비중 20% 이상이 인용됐다. 기준 시점과 분모는 제시되지 않았다.",
+        "현물가 확인 기간으로 보름~한 달, 유통 재고가 풀릴 경우 하락 시점으로 한두 달이 거론됐다.",
+        "HBM 관련 마진으로 79%가 거론됐고, 50% 또는 40%까지 낮아질 수 있다는 견해가 나왔다."
+      ],
+      "verification_notes": [
+        "시장 데이터 조회 실패: no_usable_market_fields"
+      ],
+      "market_snapshot": {
+        "ticker": "확인 불가",
+        "as_of": "2026-11-25T23:05:36.131828+00:00",
+        "current_price": null,
+        "market_cap": null,
+        "forward_pe": null,
+        "trailing_pe": null,
+        "fifty_two_week_high": null,
+        "fifty_two_week_low": null,
+        "average_target_price": null,
+        "source": "yfinance",
+        "status": "unverified"
+      },
+      "external_context_status": "unverified"
+    },
+    {
+      "ticker": "확인 불가",
+      "name": "중국 AI 모델·메모리 업체",
+      "status": "unverified",
+      "claims": [
+        "중국 모델의 저가 공세는 단기적으로 미국 모델의 가격을 압박하지만, 출연진은 중국 모델 업체의 손실과 고가 GPU 비용, 중국 자본시장의 자금 흡수 여력을 근거로 장기 가격 경쟁에서는 미국이 유리할 수 있다고 봤다."
+      ],
+      "numeric_claims": [
+        "GLM 개발사와 미니맥스를 거론하며 매출 100 대비 영업손실 250, 즉 영업이익률 약 -250%에 해당하는 수치를 제시했다. 어느 회사와 기간에 해당하는지는 불분명하다."
+      ],
+      "verification_notes": [
+        "시장 데이터 조회 실패: no_usable_market_fields"
+      ],
+      "market_snapshot": {
+        "ticker": "확인 불가",
+        "as_of": "2026-11-25T23:05:37.592960+00:00",
+        "current_price": null,
+        "market_cap": null,
+        "forward_pe": null,
+        "trailing_pe": null,
+        "fifty_two_week_high": null,
+        "fifty_two_week_low": null,
+        "average_target_price": null,
+        "source": "yfinance",
+        "status": "unverified"
+      },
+      "external_context_status": "unverified"
+    },
+    {
+      "ticker": "확인 불가",
+      "name": "스트라이프·우버·도어대시·AI 활용 기업",
+      "status": "unverified",
+      "claims": [
+        "스트라이프가 소개했다는 에이전트 거래 증가와 달리 우버·도어대시 쪽에서는 에이전트 유입이 적다는 설명이 소개돼, 출연진은 에이전트가 AI 업계의 실적 반전 카드가 될지에 중립적이었다.",
+        "유료 수요가 커질 후보로 신약 개발과 자율주행이 언급됐지만, 피지컬 AI는 기술 장벽이 높고 자율주행은 규제에 영향을 받는다고 봤다.",
+        "후반부에는 AI 인프라주에만 집중하기보다 AI를 적용해 고객응대 비용을 낮추거나 광고 타기팅 효율을 개선하는 기업을 보자는 견해가 나왔다. 유니티와 앱러빈이 광고 사례로 거론됐다."
+      ],
+      "numeric_claims": [
+        "스트라이프 발표 인용: 항공권·음식 배달 등을 포함한 에이전트 경유 활동이 약 80배 늘었다는 발언이 나왔다. 측정 항목과 비교 기간은 제시되지 않았다."
+      ],
+      "verification_notes": [
+        "시장 데이터 조회 실패: no_usable_market_fields"
+      ],
+      "market_snapshot": {
+        "ticker": "확인 불가",
+        "as_of": "2026-11-25T23:05:39.043819+00:00",
+        "current_price": null,
+        "market_cap": null,
+        "forward_pe": null,
+        "trailing_pe": null,
+        "fifty_two_week_high": null,
+        "fifty_two_week_low": null,
+        "average_target_price": null,
+        "source": "yfinance",
+        "status": "unverified"
+      },
+      "external_context_status": "unverified"
+    }
+  ],
+  "evidence": [
+    {
+      "evidence_id": "E1",
+      "claim_id": "C1",
+      "title": "US proposes surprise new tariffs on Brazil imports, including 10% duty on aircraft",
+      "source_url": "https://finance.yahoo.com/news/us-proposes-higher-tariffs-brazil-131543830.html",
+      "publisher": "Reuters",
+      "published_at": "2026-11-25T22:31:14+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "US proposes surprise new tariffs on Brazil imports, including 10% duty on aircraft Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 2026 Elect..."
+    },
+    {
+      "evidence_id": "E2",
+      "claim_id": "C1",
+      "title": "US airlines face higher costs from proposed Embraer duty",
+      "source_url": "https://finance.yahoo.com/economy/policy/articles/us-airlines-face-higher-costs-222235730.html",
+      "publisher": "Reuters",
+      "published_at": "2026-11-25T22:22:35+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "US airlines face higher costs from proposed Embraer duty Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 2026 Elections Weather Newsletters F..."
+    },
+    {
+      "evidence_id": "E4",
+      "claim_id": "C2",
+      "title": "Monteoro Minerals Commences High-Resolution Drone Magnetic, Radiometric and LiDAR Survey at the Nudillales Copper-Gold-Molybdenum-Silver Project in Colombia",
+      "source_url": "https://finance.yahoo.com/markets/commodities/articles/monteoro-minerals-commences-high-resolution-220500902.html",
+      "publisher": "TMX Newsfile",
+      "published_at": "2026-11-25T22:05:00+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "Monteoro Minerals Commences High-Resolution Drone Magnetic, Radiometric and LiDAR Survey at the Nudillales Copper-Gold-Molybdenum-Silver Project in Colombia Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Fi..."
+    },
+    {
+      "evidence_id": "E5",
+      "claim_id": "C2",
+      "title": "Impact Silver Announces Q3 2026 Results with Revenue up 73% on Silver Prices and Grade",
+      "source_url": "https://finance.yahoo.com/markets/commodities/articles/impact-silver-announces-q3-2026-214800265.html",
+      "publisher": "TMX Newsfile",
+      "published_at": "2026-11-25T21:48:00+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    },
+    {
+      "evidence_id": "E6",
+      "claim_id": "C3",
+      "title": "Stock Market Today, Nov. 25: Dow Erases 1,100-Point Loss as Wall Street Stages Dramatic Late-Day Comeback",
+      "source_url": "https://finance.yahoo.com/markets/stocks/articles/stock-market-today-nov-25-221745503.html",
+      "publisher": "Motley Fool",
+      "published_at": "2026-11-25T22:17:45+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    },
+    {
+      "evidence_id": "E7",
+      "claim_id": "C3",
+      "title": "Crude Posts Back-to-Back Gains on Middle East Tension",
+      "source_url": "https://finance.yahoo.com/m/0205a820-8bf4-3021-b041-620ef11e50b2/crude-posts-back-to-back.html",
+      "publisher": "The Wall Street Journal",
+      "published_at": "2026-11-25T22:09:00+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    },
+    {
+      "evidence_id": "E8",
+      "claim_id": "C4",
+      "title": "Dow Jones Futures: Market Goes On Wild Ride. Nasdaq, Nvidia Slash Losses While Anthropic Reverses Higher.",
+      "source_url": "https://finance.yahoo.com/m/158e82fc-b889-34b6-8704-99a49e9a83ae/dow-jones-futures%3A-market.html",
+      "publisher": "Investor's Business Daily",
+      "published_at": "2026-11-25T23:02:53+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    }
+  ],
+  "source_policy": {
+    "raw_transcript_published": false,
+    "raw_transcript_in_evidence": false,
+    "research_pipeline_version": 4,
+    "closed_source_claims": "unverified_external_source",
+    "auto_caption_warning": true,
+    "local_asr_warning": false
+  }
+}
