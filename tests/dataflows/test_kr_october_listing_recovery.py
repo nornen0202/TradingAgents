@@ -12,14 +12,15 @@ from tradingagents.dataflows.daily_history_selection import activate_daily_histo
 from tradingagents.dataflows.vendor_exceptions import VendorInputError, VendorMalformedResponseError
 
 
-NOW = datetime(2026, 11, 19, 2, 0, 0, tzinfo=timezone.utc)
+NOW = datetime(2026, 11, 26, 2, 0, 0, tzinfo=timezone.utc)
 START, END = "2021-10-28", "2026-10-28"
 CASES = [("179880.KQ", "2026-10-15", "KR7179880000"),
          ("443670.KQ", "2024-02-15", "KR7443670005"),
          ("419050.KQ", "2023-02-03", "KR7419050000"),
          ("396470.KQ", "2023-10-26", "KR7396470007"),
          ("402340.KS", "2021-11-29", "KR7402340004"),
-         ("460940.KQ", "2024-07-31", "KR7460940000")]
+         ("460940.KQ", "2024-07-31", "KR7460940000"),
+         ("356680.KQ", "2023-03-16", "KR7356680009")]
 
 
 def metadata(symbol, now=NOW):
@@ -50,7 +51,7 @@ def clock(monkeypatch):
         monkeypatch.setattr(module, "datetime", Clock)
     kr._CACHE.clear()
     token = activate_daily_history_selection()
-    with run_config({"analysis_as_of": "2026-11-19"}):
+    with run_config({"analysis_as_of": NOW.date().isoformat()}):
         yield
     reset_daily_history_selection(token)
     kr._CACHE.clear()
@@ -131,7 +132,7 @@ def broker(monkeypatch):
 def test_full_single_provider_replacement_preserves_all_real_sessions(broker, symbol, first, isin):
     state, client = broker
     state.symbol = symbol
-    # Reproduce Yahoo's missing first Melcon session / interior SPSoft session.
+    # Exercise both a missing first session and the observed interior gap.
     days = pd.bdate_range(first, END)
     missing = first if symbol == "179880.KQ" else "2025-09-19"
     yahoo = pd.DataFrame({"Date": days, "Open": 10., "High": 11., "Low": 9., "Close": 10., "Volume": 20.})
@@ -154,9 +155,10 @@ def test_bad_or_predecessor_bars_never_become_analysis_evidence(broker, bad):
         kr.load_kr_daily_bars(state.symbol, START, END, require_complete=True)
 
 
-def test_missing_regular_day_is_still_rejected_and_future_rows_are_excluded(broker):
+@pytest.mark.parametrize("symbol", ["443670.KQ", "356680.KQ"])
+def test_missing_regular_day_is_still_rejected_and_future_rows_are_excluded(broker, symbol):
     state, _ = broker
-    state.symbol, state.future = "443670.KQ", True
+    state.symbol, state.future = symbol, True
     valid = kr.load_kr_daily_bars(state.symbol, START, END, require_complete=True)
     assert valid.Date.max() == pd.Timestamp(END)
     kr._CACHE.clear()
