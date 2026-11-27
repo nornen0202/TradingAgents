@@ -1,10 +1,10 @@
 {
   "schema": "tradingagents.ai-context/v1",
   "market": "us",
-  "generated_at": "2026-11-27T14:40:52.262474+00:00",
+  "generated_at": "2026-11-27T16:57:07.483182+00:00",
   "freshness_receipt": {
-    "producer_run_id": "20261127T233520_local-freshness-us-overlay",
-    "producer_finished_at": "2026-11-27T23:36:29.343692+09:00",
+    "producer_run_id": "20261128T014924_local-freshness-us-overlay",
+    "producer_finished_at": "2026-11-28T01:51:02.957405+09:00",
     "analysis_run_id": "20261127T202606_local-scheduler-us-full",
     "analysis_completed_at": "2026-11-27T20:44:51.760504+09:00",
     "analysis_trade_date_oldest": "2026-11-25",
@@ -16,25 +16,25 @@
   },
   "account": {
     "status": "available",
-    "as_of": "2026-11-27T20:45:34.002369+09:00",
+    "as_of": "2026-11-28T00:24:10.749778+09:00",
     "snapshot_health": "VALID",
     "currency": "KRW",
     "latest_attempt": {
       "status": "VALID",
-      "account_as_of": "2026-11-27T20:45:34.002369+09:00",
-      "run_started_at": "2026-11-27T20:26:06.849901+09:00",
-      "run_finished_at": "2026-11-27T21:23:19.762840+09:00",
+      "account_as_of": "2026-11-28T00:24:10.749778+09:00",
+      "run_started_at": "2026-11-28T00:23:23.469595+09:00",
+      "run_finished_at": "2026-11-28T00:24:22.674543+09:00",
       "selected_for_public_account": true
     },
     "summary": {
       "position_count": 14,
       "total_purchase_amount_krw": 23694129,
-      "total_market_value_krw": 20911824,
-      "total_unrealized_pnl_krw": -2782305,
+      "total_market_value_krw": 20675028,
+      "total_unrealized_pnl_krw": -3019101,
       "settled_cash_krw": 0,
       "available_cash_krw": 1016882,
       "buying_power_krw": 113458,
-      "total_equity_krw": 22041842
+      "total_equity_krw": 21805107
     },
     "positions": [
       {
@@ -43,9 +43,9 @@
         "quantity": 12.0,
         "sellable_quantity": 12.0,
         "average_cost_krw": 547378,
-        "current_price_krw": 471959,
-        "market_value_krw": 5663508,
-        "unrealized_pnl_krw": -905034
+        "current_price_krw": 468186,
+        "market_value_krw": 5618232,
+        "unrealized_pnl_krw": -950310
       },
       {
         "ticker": "RSP",
@@ -53,9 +53,9 @@
         "quantity": 11.0,
         "sellable_quantity": 11.0,
         "average_cost_krw": 293387,
-        "current_price_krw": 292722,
-        "market_value_krw": 3219942,
-        "unrealized_pnl_krw": -7316
+        "current_price_krw": 291962,
+        "market_value_krw": 3211588,
+        "unrealized_pnl_krw": -15670
       },
       {
         "ticker": "GOOGL",
@@ -63,9 +63,9 @@
         "quantity": 6.0,
         "sellable_quantity": 6.0,
         "average_cost_krw": 425540,
-        "current_price_krw": 375835,
-        "market_value_krw": 2255010,
-        "unrealized_pnl_krw": -298231
+        "current_price_krw": 365590,
+        "market_value_krw": 2193542,
+        "unrealized_pnl_krw": -359699
       },
       {
         "ticker": "MPWR",
@@ -73,9 +73,9 @@
         "quantity": 1.0,
         "sellable_quantity": 1.0,
         "average_cost_krw": 1886144,
-        "current_price_krw": 1675367,
-        "market_value_krw": 1675367,
-        "unrealized_pnl_krw": -210777
+        "current_price_krw": 1643411,
+        "market_value_krw": 1643411,
+        "unrealized_pnl_krw": -242733
       },
       {
         "ticker": "ETN",
@@ -83,19 +83,9 @@
         "quantity": 3.0,
         "sellable_quantity": 3.0,
         "average_cost_krw": 557754,
-        "current_price_krw": 441748,
-        "market_value_krw": 1325244,
-        "unrealized_pnl_krw": -348018
-      },
-      {
-        "ticker": "NVDA",
-        "name": "엔비디아",
-        "quantity": 6.0,
-        "sellable_quantity": 6.0,
-        "average_cost_krw": 268119,
-        "current_price_krw": 204305,
-        "market_value_krw": 1225831,
-        "unrealized_pnl_krw": -382884
+        "current_price_krw": 432476,
+        "market_value_krw": 1297430,
+        "unrealized_pnl_krw": -375832
       },
       {
         "ticker": "SGOV",
@@ -103,9 +93,19 @@
         "quantity": 9.0,
         "sellable_quantity": 9.0,
         "average_cost_krw": 134956,
-        "current_price_krw": 135223,
-        "market_value_krw": 1217007,
-        "unrealized_pnl_krw": 2396
+        "current_price_krw": 135221,
+        "market_value_krw": 1216997,
+        "unrealized_pnl_krw": 2386
+      },
+      {
+        "ticker": "NVDA",
+        "name": "엔비디아",
+        "quantity": 6.0,
+        "sellable_quantity": 6.0,
+        "average_cost_krw": 268119,
+        "current_price_krw": 197269,
+        "market_value_krw": 1183616,
+        "unrealized_pnl_krw": -425099
       },
       {
         "ticker": "GEV",
@@ -113,9 +113,9 @@
         "quantity": 1.0,
         "sellable_quantity": 1.0,
         "average_cost_krw": 1477695,
-        "current_price_krw": 993598,
-        "market_value_krw": 993598,
-        "unrealized_pnl_krw": -484097
+        "current_price_krw": 974081,
+        "market_value_krw": 974081,
+        "unrealized_pnl_krw": -503614
       },
       {
         "ticker": "AAPL",
@@ -123,9 +123,9 @@
         "quantity": 2.0,
         "sellable_quantity": 2.0,
         "average_cost_krw": 365769,
-        "current_price_krw": 480418,
-        "market_value_krw": 960836,
-        "unrealized_pnl_krw": 229297
+        "current_price_krw": 480981,
+        "market_value_krw": 961963,
+        "unrealized_pnl_krw": 230424
       },
       {
         "ticker": "LLY",
@@ -133,19 +133,9 @@
         "quantity": 0.436065,
         "sellable_quantity": 0.436065,
         "average_cost_krw": 1424620,
-        "current_price_krw": 1872019,
-        "market_value_krw": 816322,
-        "unrealized_pnl_krw": 195095
-      },
-      {
-        "ticker": "AVGO",
-        "name": "브로드컴",
-        "quantity": 1.0,
-        "sellable_quantity": 1.0,
-        "average_cost_krw": 571486,
-        "current_price_krw": 416522,
-        "market_value_krw": 416522,
-        "unrealized_pnl_krw": -154964
+        "current_price_krw": 1868346,
+        "market_value_krw": 814720,
+        "unrealized_pnl_krw": 193493
       },
       {
         "ticker": "DELL",
@@ -153,9 +143,19 @@
         "quantity": 1.0,
         "sellable_quantity": 1.0,
         "average_cost_krw": 664911,
-        "current_price_krw": 416237,
-        "market_value_krw": 416237,
-        "unrealized_pnl_krw": -248674
+        "current_price_krw": 420782,
+        "market_value_krw": 420782,
+        "unrealized_pnl_krw": -244129
+      },
+      {
+        "ticker": "AVGO",
+        "name": "브로드컴",
+        "quantity": 1.0,
+        "sellable_quantity": 1.0,
+        "average_cost_krw": 571486,
+        "current_price_krw": 415167,
+        "market_value_krw": 415167,
+        "unrealized_pnl_krw": -156319
       },
       {
         "ticker": "GLDM",
@@ -163,9 +163,9 @@
         "quantity": 4.0,
         "sellable_quantity": 4.0,
         "average_cost_krw": 136657,
-        "current_price_krw": 97480,
-        "market_value_krw": 389920,
-        "unrealized_pnl_krw": -156711
+        "current_price_krw": 96305,
+        "market_value_krw": 385220,
+        "unrealized_pnl_krw": -161411
       },
       {
         "ticker": "AMZN",
@@ -173,9 +173,9 @@
         "quantity": 1.0,
         "sellable_quantity": 1.0,
         "average_cost_krw": 348887,
-        "current_price_krw": 336480,
-        "market_value_krw": 336480,
-        "unrealized_pnl_krw": -12407
+        "current_price_krw": 338279,
+        "market_value_krw": 338279,
+        "unrealized_pnl_krw": -10608
       }
     ]
   },
@@ -202,7 +202,7 @@
         "strategy_code": "REDUCE",
         "strategy_ko": "비중 축소 검토",
         "decision_state_ko": "실행 조건 감시 중",
-        "market_data_asof": "2026-11-27T14:35:57+00:00"
+        "market_data_asof": "2026-11-27T16:49:15+00:00"
       },
       "quality_at_build": {
         "execution_ready": false,
@@ -211,7 +211,7 @@
         "action_status": "DATA_RECHECK_REQUIRED",
         "current_execution_promotion": "BLOCKED",
         "generated_in_current_run": true,
-        "row_valid_until": "2026-11-27T14:37:57+00:00",
+        "row_valid_until": "2026-11-27T16:51:15+00:00",
         "expired_at_build": false,
         "provider_limitations": [],
         "provider_blockers": [
@@ -241,7 +241,7 @@
         "strategy_code": "REDUCE",
         "strategy_ko": "비중 축소 검토",
         "decision_state_ko": "실행 조건 감시 중",
-        "market_data_asof": "2026-11-27T14:35:57+00:00"
+        "market_data_asof": "2026-11-27T16:49:15+00:00"
       },
       "quality_at_build": {
         "execution_ready": false,
@@ -250,7 +250,7 @@
         "action_status": "DATA_RECHECK_REQUIRED",
         "current_execution_promotion": "BLOCKED",
         "generated_in_current_run": true,
-        "row_valid_until": "2026-11-27T14:37:57+00:00",
+        "row_valid_until": "2026-11-27T16:51:15+00:00",
         "expired_at_build": false,
         "provider_limitations": [],
         "provider_blockers": [
@@ -280,7 +280,7 @@
         "strategy_code": "REDUCE",
         "strategy_ko": "비중 축소 검토",
         "decision_state_ko": "실행 조건 감시 중",
-        "market_data_asof": "2026-11-27T14:35:57+00:00"
+        "market_data_asof": "2026-11-27T16:49:15+00:00"
       },
       "quality_at_build": {
         "execution_ready": false,
@@ -289,46 +289,7 @@
         "action_status": "DATA_RECHECK_REQUIRED",
         "current_execution_promotion": "BLOCKED",
         "generated_in_current_run": true,
-        "row_valid_until": "2026-11-27T14:37:57+00:00",
-        "expired_at_build": false,
-        "provider_limitations": [],
-        "provider_blockers": [
-          "work_packet_row_invalid_timestamp"
-        ]
-      }
-    },
-    {
-      "ticker": "AVGO",
-      "display_name": "Broadcom",
-      "is_held": true,
-      "strategy_code": "DATA_CHECK",
-      "strategy_ko": "데이터 확인 전 대기",
-      "last_price": null,
-      "market_data_asof": null,
-      "market_data_clock_status": "future",
-      "session_vwap": null,
-      "relative_volume": null,
-      "spread_bps": null,
-      "day_high": null,
-      "day_low": null,
-      "execution_condition_ko": "위험 대응 조건: 297.8 이하 하락, 종가 확인 후 리스크 축소 (매수 돌파·거래량 조건과 별도 판정)",
-      "risk_condition_ko": "297.8 이하 하락, 종가 확인 후 리스크 축소",
-      "decision_state_ko": "데이터 확인 전 대기",
-      "data_status_ko": "시세 시각 재확인",
-      "reference_strategy": {
-        "strategy_code": "REDUCE",
-        "strategy_ko": "비중 축소 검토",
-        "decision_state_ko": "실행 조건 감시 중",
-        "market_data_asof": "2026-11-27T14:35:57+00:00"
-      },
-      "quality_at_build": {
-        "execution_ready": false,
-        "data_ready": false,
-        "action_ready": false,
-        "action_status": "DATA_RECHECK_REQUIRED",
-        "current_execution_promotion": "BLOCKED",
-        "generated_in_current_run": true,
-        "row_valid_until": "2026-11-27T14:37:57+00:00",
+        "row_valid_until": "2026-11-27T16:51:15+00:00",
         "expired_at_build": false,
         "provider_limitations": [],
         "provider_blockers": [
@@ -358,7 +319,7 @@
         "strategy_code": "REDUCE",
         "strategy_ko": "비중 축소 검토",
         "decision_state_ko": "실행 조건 감시 중",
-        "market_data_asof": "2026-11-27T14:35:57+00:00"
+        "market_data_asof": "2026-11-27T16:49:15+00:00"
       },
       "quality_at_build": {
         "execution_ready": false,
@@ -367,7 +328,46 @@
         "action_status": "DATA_RECHECK_REQUIRED",
         "current_execution_promotion": "BLOCKED",
         "generated_in_current_run": true,
-        "row_valid_until": "2026-11-27T14:37:57+00:00",
+        "row_valid_until": "2026-11-27T16:51:15+00:00",
+        "expired_at_build": false,
+        "provider_limitations": [],
+        "provider_blockers": [
+          "work_packet_row_invalid_timestamp"
+        ]
+      }
+    },
+    {
+      "ticker": "AVGO",
+      "display_name": "Broadcom",
+      "is_held": true,
+      "strategy_code": "DATA_CHECK",
+      "strategy_ko": "데이터 확인 전 대기",
+      "last_price": null,
+      "market_data_asof": null,
+      "market_data_clock_status": "future",
+      "session_vwap": null,
+      "relative_volume": null,
+      "spread_bps": null,
+      "day_high": null,
+      "day_low": null,
+      "execution_condition_ko": "위험 대응 조건: 297.8 이하 하락, 종가 확인 후 리스크 축소 (매수 돌파·거래량 조건과 별도 판정)",
+      "risk_condition_ko": "297.8 이하 하락, 종가 확인 후 리스크 축소",
+      "decision_state_ko": "데이터 확인 전 대기",
+      "data_status_ko": "시세 시각 재확인",
+      "reference_strategy": {
+        "strategy_code": "REDUCE",
+        "strategy_ko": "비중 축소 검토",
+        "decision_state_ko": "실행 조건 감시 중",
+        "market_data_asof": "2026-11-27T16:49:15+00:00"
+      },
+      "quality_at_build": {
+        "execution_ready": false,
+        "data_ready": false,
+        "action_ready": false,
+        "action_status": "DATA_RECHECK_REQUIRED",
+        "current_execution_promotion": "BLOCKED",
+        "generated_in_current_run": true,
+        "row_valid_until": "2026-11-27T16:51:15+00:00",
         "expired_at_build": false,
         "provider_limitations": [],
         "provider_blockers": [
@@ -397,7 +397,7 @@
         "strategy_code": "REDUCE",
         "strategy_ko": "비중 축소 검토",
         "decision_state_ko": "실행 조건 감시 중",
-        "market_data_asof": "2026-11-27T14:35:57+00:00"
+        "market_data_asof": "2026-11-27T16:49:15+00:00"
       },
       "quality_at_build": {
         "execution_ready": false,
@@ -406,7 +406,7 @@
         "action_status": "DATA_RECHECK_REQUIRED",
         "current_execution_promotion": "BLOCKED",
         "generated_in_current_run": true,
-        "row_valid_until": "2026-11-27T14:37:57+00:00",
+        "row_valid_until": "2026-11-27T16:51:15+00:00",
         "expired_at_build": false,
         "provider_limitations": [],
         "provider_blockers": [
@@ -436,7 +436,7 @@
         "strategy_code": "BUY_ON_CONFIRMATION",
         "strategy_ko": "조건 확인 후 분할매수 검토",
         "decision_state_ko": "조건 충족 전 대기",
-        "market_data_asof": "2026-11-27T14:35:57+00:00"
+        "market_data_asof": "2026-11-27T16:49:15+00:00"
       },
       "quality_at_build": {
         "execution_ready": false,
@@ -445,7 +445,7 @@
         "action_status": "DATA_RECHECK_REQUIRED",
         "current_execution_promotion": "BLOCKED",
         "generated_in_current_run": true,
-        "row_valid_until": "2026-11-27T14:37:57+00:00",
+        "row_valid_until": "2026-11-27T16:51:15+00:00",
         "expired_at_build": false,
         "provider_limitations": [],
         "provider_blockers": [
@@ -475,7 +475,7 @@
         "strategy_code": "BUY_ON_CONFIRMATION",
         "strategy_ko": "조건 확인 후 분할매수 검토",
         "decision_state_ko": "조건 충족 전 대기",
-        "market_data_asof": "2026-11-27T14:35:57+00:00"
+        "market_data_asof": "2026-11-27T16:49:15+00:00"
       },
       "quality_at_build": {
         "execution_ready": false,
@@ -484,7 +484,7 @@
         "action_status": "DATA_RECHECK_REQUIRED",
         "current_execution_promotion": "BLOCKED",
         "generated_in_current_run": true,
-        "row_valid_until": "2026-11-27T14:37:57+00:00",
+        "row_valid_until": "2026-11-27T16:51:15+00:00",
         "expired_at_build": false,
         "provider_limitations": [],
         "provider_blockers": [
@@ -514,7 +514,7 @@
         "strategy_code": "BUY_ON_CONFIRMATION",
         "strategy_ko": "조건 확인 후 분할매수 검토",
         "decision_state_ko": "조건 충족 전 대기",
-        "market_data_asof": "2026-11-27T14:35:57+00:00"
+        "market_data_asof": "2026-11-27T16:49:15+00:00"
       },
       "quality_at_build": {
         "execution_ready": false,
@@ -523,7 +523,7 @@
         "action_status": "DATA_RECHECK_REQUIRED",
         "current_execution_promotion": "BLOCKED",
         "generated_in_current_run": true,
-        "row_valid_until": "2026-11-27T14:37:57+00:00",
+        "row_valid_until": "2026-11-27T16:51:15+00:00",
         "expired_at_build": false,
         "provider_limitations": [],
         "provider_blockers": [
@@ -553,7 +553,7 @@
         "strategy_code": "BUY_ON_CONFIRMATION",
         "strategy_ko": "조건 확인 후 분할매수 검토",
         "decision_state_ko": "조건 충족 전 대기",
-        "market_data_asof": "2026-11-27T14:35:57+00:00"
+        "market_data_asof": "2026-11-27T16:49:15+00:00"
       },
       "quality_at_build": {
         "execution_ready": false,
@@ -562,7 +562,7 @@
         "action_status": "DATA_RECHECK_REQUIRED",
         "current_execution_promotion": "BLOCKED",
         "generated_in_current_run": true,
-        "row_valid_until": "2026-11-27T14:37:57+00:00",
+        "row_valid_until": "2026-11-27T16:51:15+00:00",
         "expired_at_build": false,
         "provider_limitations": [],
         "provider_blockers": [
@@ -592,7 +592,7 @@
         "strategy_code": "HOLD",
         "strategy_ko": "보유 유지",
         "decision_state_ko": "조건 충족 전 대기",
-        "market_data_asof": "2026-11-27T14:35:57+00:00"
+        "market_data_asof": "2026-11-27T16:49:15+00:00"
       },
       "quality_at_build": {
         "execution_ready": false,
@@ -601,7 +601,7 @@
         "action_status": "DATA_RECHECK_REQUIRED",
         "current_execution_promotion": "BLOCKED",
         "generated_in_current_run": true,
-        "row_valid_until": "2026-11-27T14:37:57+00:00",
+        "row_valid_until": "2026-11-27T16:51:15+00:00",
         "expired_at_build": false,
         "provider_limitations": [],
         "provider_blockers": [
@@ -631,7 +631,7 @@
         "strategy_code": "HOLD",
         "strategy_ko": "보유 유지",
         "decision_state_ko": "조건 충족 전 대기",
-        "market_data_asof": "2026-11-27T14:35:57+00:00"
+        "market_data_asof": "2026-11-27T16:49:15+00:00"
       },
       "quality_at_build": {
         "execution_ready": false,
@@ -640,7 +640,7 @@
         "action_status": "DATA_RECHECK_REQUIRED",
         "current_execution_promotion": "BLOCKED",
         "generated_in_current_run": true,
-        "row_valid_until": "2026-11-27T14:37:57+00:00",
+        "row_valid_until": "2026-11-27T16:51:15+00:00",
         "expired_at_build": false,
         "provider_limitations": [],
         "provider_blockers": [
@@ -670,7 +670,7 @@
         "strategy_code": "HOLD",
         "strategy_ko": "보유 유지",
         "decision_state_ko": "조건 충족 전 대기",
-        "market_data_asof": "2026-11-27T14:35:57+00:00"
+        "market_data_asof": "2026-11-27T16:49:15+00:00"
       },
       "quality_at_build": {
         "execution_ready": false,
@@ -679,7 +679,7 @@
         "action_status": "DATA_RECHECK_REQUIRED",
         "current_execution_promotion": "BLOCKED",
         "generated_in_current_run": true,
-        "row_valid_until": "2026-11-27T14:37:57+00:00",
+        "row_valid_until": "2026-11-27T16:51:15+00:00",
         "expired_at_build": false,
         "provider_limitations": [],
         "provider_blockers": [
@@ -709,7 +709,7 @@
         "strategy_code": "HOLD",
         "strategy_ko": "보유 유지",
         "decision_state_ko": "조건 충족 전 대기",
-        "market_data_asof": "2026-11-27T14:35:57+00:00"
+        "market_data_asof": "2026-11-27T16:49:15+00:00"
       },
       "quality_at_build": {
         "execution_ready": false,
@@ -718,7 +718,46 @@
         "action_status": "DATA_RECHECK_REQUIRED",
         "current_execution_promotion": "BLOCKED",
         "generated_in_current_run": true,
-        "row_valid_until": "2026-11-27T14:37:57+00:00",
+        "row_valid_until": "2026-11-27T16:51:15+00:00",
+        "expired_at_build": false,
+        "provider_limitations": [],
+        "provider_blockers": [
+          "work_packet_row_invalid_timestamp"
+        ]
+      }
+    },
+    {
+      "ticker": "ABBV",
+      "display_name": "ABBV",
+      "is_held": false,
+      "strategy_code": "DATA_CHECK",
+      "strategy_ko": "데이터 확인 전 대기",
+      "last_price": null,
+      "market_data_asof": null,
+      "market_data_clock_status": "future",
+      "session_vwap": null,
+      "relative_volume": null,
+      "spread_bps": null,
+      "day_high": null,
+      "day_low": null,
+      "execution_condition_ko": "291.65~291.84달러 시험 후 291.84달러 이상 정규장 종가 회복과 바로 다음 실제 정규장의 지지 여부를 확인한다. / 거래량이 비교 가능한 정규장보다 늘면서 302.98달러를 초과해 마감하고, 바로 다음 실제 정규장에서도 그 위에 안착하는지 확인한다.",
+      "risk_condition_ko": "291.65 이하 하락, 종가 확인 후 신규 진입 보류·보유 위험 대응 계획 재확인",
+      "decision_state_ko": "데이터 확인 전 대기",
+      "data_status_ko": "시세 시각 재확인",
+      "reference_strategy": {
+        "strategy_code": "BUY_ON_CONFIRMATION",
+        "strategy_ko": "조건 확인 후 분할매수 검토",
+        "decision_state_ko": "조건 충족 전 대기",
+        "market_data_asof": "2026-11-27T16:49:15+00:00"
+      },
+      "quality_at_build": {
+        "execution_ready": false,
+        "data_ready": false,
+        "action_ready": false,
+        "action_status": "DATA_RECHECK_REQUIRED",
+        "current_execution_promotion": "BLOCKED",
+        "generated_in_current_run": true,
+        "row_valid_until": "2026-11-27T16:51:15+00:00",
         "expired_at_build": false,
         "provider_limitations": [],
         "provider_blockers": [
@@ -748,7 +787,7 @@
         "strategy_code": "BUY_ON_CONFIRMATION",
         "strategy_ko": "조건 확인 후 분할매수 검토",
         "decision_state_ko": "조건 충족 전 대기",
-        "market_data_asof": "2026-11-27T14:35:57+00:00"
+        "market_data_asof": "2026-11-27T16:49:15+00:00"
       },
       "quality_at_build": {
         "execution_ready": false,
@@ -757,7 +796,7 @@
         "action_status": "DATA_RECHECK_REQUIRED",
         "current_execution_promotion": "BLOCKED",
         "generated_in_current_run": true,
-        "row_valid_until": "2026-11-27T14:37:57+00:00",
+        "row_valid_until": "2026-11-27T16:51:15+00:00",
         "expired_at_build": false,
         "provider_limitations": [],
         "provider_blockers": [
@@ -787,7 +826,7 @@
         "strategy_code": "BUY_ON_CONFIRMATION",
         "strategy_ko": "조건 확인 후 분할매수 검토",
         "decision_state_ko": "조건 충족 전 대기",
-        "market_data_asof": "2026-11-27T14:35:57+00:00"
+        "market_data_asof": "2026-11-27T16:49:15+00:00"
       },
       "quality_at_build": {
         "execution_ready": false,
@@ -796,7 +835,7 @@
         "action_status": "DATA_RECHECK_REQUIRED",
         "current_execution_promotion": "BLOCKED",
         "generated_in_current_run": true,
-        "row_valid_until": "2026-11-27T14:37:57+00:00",
+        "row_valid_until": "2026-11-27T16:51:15+00:00",
         "expired_at_build": false,
         "provider_limitations": [],
         "provider_blockers": [
@@ -826,7 +865,7 @@
         "strategy_code": "BUY_ON_CONFIRMATION",
         "strategy_ko": "조건 확인 후 분할매수 검토",
         "decision_state_ko": "조건 충족 전 대기",
-        "market_data_asof": "2026-11-27T14:35:57+00:00"
+        "market_data_asof": "2026-11-27T16:49:15+00:00"
       },
       "quality_at_build": {
         "execution_ready": false,
@@ -835,7 +874,46 @@
         "action_status": "DATA_RECHECK_REQUIRED",
         "current_execution_promotion": "BLOCKED",
         "generated_in_current_run": true,
-        "row_valid_until": "2026-11-27T14:37:57+00:00",
+        "row_valid_until": "2026-11-27T16:51:15+00:00",
+        "expired_at_build": false,
+        "provider_limitations": [],
+        "provider_blockers": [
+          "work_packet_row_invalid_timestamp"
+        ]
+      }
+    },
+    {
+      "ticker": "KO",
+      "display_name": "KO",
+      "is_held": false,
+      "strategy_code": "DATA_CHECK",
+      "strategy_ko": "데이터 확인 전 대기",
+      "last_price": null,
+      "market_data_asof": null,
+      "market_data_clock_status": "future",
+      "session_vwap": null,
+      "relative_volume": null,
+      "spread_bps": null,
+      "day_high": null,
+      "day_low": null,
+      "execution_condition_ko": "97.17달러 이상 정규장 종가와 바로 다음 실제 거래 세션의 97.17~97.59달러 지지 재시험을 순서대로 확인한다. 거래일·단축장 여부, 거래정지 여부, 시세 최신성은 별도로 확인한다. / 98.78달러 돌파만으로 추격하지 않는다. 그 가격에서 100.56달러까지의 여지 1.78달러는 11월 25일 평균진폭 1.85달러보다 작고, 중간에 99.61달러 저항이 있다.",
+      "risk_condition_ko": "94.6 이하 하락, 종가 확인 후 신규 진입 보류·보유 위험 대응 계획 재확인",
+      "decision_state_ko": "데이터 확인 전 대기",
+      "data_status_ko": "시세 시각 재확인",
+      "reference_strategy": {
+        "strategy_code": "BUY_ON_CONFIRMATION",
+        "strategy_ko": "조건 확인 후 분할매수 검토",
+        "decision_state_ko": "조건 충족 전 대기",
+        "market_data_asof": "2026-11-27T16:49:15+00:00"
+      },
+      "quality_at_build": {
+        "execution_ready": false,
+        "data_ready": false,
+        "action_ready": false,
+        "action_status": "DATA_RECHECK_REQUIRED",
+        "current_execution_promotion": "BLOCKED",
+        "generated_in_current_run": true,
+        "row_valid_until": "2026-11-27T16:51:15+00:00",
         "expired_at_build": false,
         "provider_limitations": [],
         "provider_blockers": [
@@ -865,7 +943,7 @@
         "strategy_code": "BUY_ON_CONFIRMATION",
         "strategy_ko": "조건 확인 후 분할매수 검토",
         "decision_state_ko": "조건 충족 전 대기",
-        "market_data_asof": "2026-11-27T14:35:57+00:00"
+        "market_data_asof": "2026-11-27T16:49:15+00:00"
       },
       "quality_at_build": {
         "execution_ready": false,
@@ -874,7 +952,7 @@
         "action_status": "DATA_RECHECK_REQUIRED",
         "current_execution_promotion": "BLOCKED",
         "generated_in_current_run": true,
-        "row_valid_until": "2026-11-27T14:37:57+00:00",
+        "row_valid_until": "2026-11-27T16:51:15+00:00",
         "expired_at_build": false,
         "provider_limitations": [],
         "provider_blockers": [
@@ -904,7 +982,7 @@
         "strategy_code": "BUY_ON_CONFIRMATION",
         "strategy_ko": "조건 확인 후 분할매수 검토",
         "decision_state_ko": "조건 충족 전 대기",
-        "market_data_asof": "2026-11-27T14:35:57+00:00"
+        "market_data_asof": "2026-11-27T16:49:15+00:00"
       },
       "quality_at_build": {
         "execution_ready": false,
@@ -913,7 +991,7 @@
         "action_status": "DATA_RECHECK_REQUIRED",
         "current_execution_promotion": "BLOCKED",
         "generated_in_current_run": true,
-        "row_valid_until": "2026-11-27T14:37:57+00:00",
+        "row_valid_until": "2026-11-27T16:51:15+00:00",
         "expired_at_build": false,
         "provider_limitations": [],
         "provider_blockers": [
@@ -943,7 +1021,7 @@
         "strategy_code": "BUY_ON_CONFIRMATION",
         "strategy_ko": "조건 확인 후 분할매수 검토",
         "decision_state_ko": "조건 충족 전 대기",
-        "market_data_asof": "2026-11-27T14:35:57+00:00"
+        "market_data_asof": "2026-11-27T16:49:15+00:00"
       },
       "quality_at_build": {
         "execution_ready": false,
@@ -952,7 +1030,7 @@
         "action_status": "DATA_RECHECK_REQUIRED",
         "current_execution_promotion": "BLOCKED",
         "generated_in_current_run": true,
-        "row_valid_until": "2026-11-27T14:37:57+00:00",
+        "row_valid_until": "2026-11-27T16:51:15+00:00",
         "expired_at_build": false,
         "provider_limitations": [],
         "provider_blockers": [
@@ -981,8 +1059,8 @@
       "reference_strategy": {
         "strategy_code": "BUY_ON_CONFIRMATION",
         "strategy_ko": "조건 확인 후 분할매수 검토",
-        "decision_state_ko": "조건 충족 전 대기",
-        "market_data_asof": "2026-11-27T14:35:57+00:00"
+        "decision_state_ko": "실행 조건 감시 중",
+        "market_data_asof": "2026-11-27T16:49:15+00:00"
       },
       "quality_at_build": {
         "execution_ready": false,
@@ -991,7 +1069,7 @@
         "action_status": "DATA_RECHECK_REQUIRED",
         "current_execution_promotion": "BLOCKED",
         "generated_in_current_run": true,
-        "row_valid_until": "2026-11-27T14:37:57+00:00",
+        "row_valid_until": "2026-11-27T16:51:15+00:00",
         "expired_at_build": false,
         "provider_limitations": [],
         "provider_blockers": [
@@ -1021,7 +1099,7 @@
         "strategy_code": "BUY_ON_CONFIRMATION",
         "strategy_ko": "조건 확인 후 분할매수 검토",
         "decision_state_ko": "조건 충족 전 대기",
-        "market_data_asof": "2026-11-27T14:35:57+00:00"
+        "market_data_asof": "2026-11-27T16:49:15+00:00"
       },
       "quality_at_build": {
         "execution_ready": false,
@@ -1030,46 +1108,7 @@
         "action_status": "DATA_RECHECK_REQUIRED",
         "current_execution_promotion": "BLOCKED",
         "generated_in_current_run": true,
-        "row_valid_until": "2026-11-27T14:37:57+00:00",
-        "expired_at_build": false,
-        "provider_limitations": [],
-        "provider_blockers": [
-          "work_packet_row_invalid_timestamp"
-        ]
-      }
-    },
-    {
-      "ticker": "ABBV",
-      "display_name": "ABBV",
-      "is_held": false,
-      "strategy_code": "DATA_CHECK",
-      "strategy_ko": "데이터 확인 전 대기",
-      "last_price": null,
-      "market_data_asof": null,
-      "market_data_clock_status": "future",
-      "session_vwap": null,
-      "relative_volume": null,
-      "spread_bps": null,
-      "day_high": null,
-      "day_low": null,
-      "execution_condition_ko": "위험 대응 조건: 291.65 이하 하락, 종가 확인 후 신규 진입 보류·보유 위험 대응 계획 재확인 (매수 돌파·거래량 조건과 별도 판정)",
-      "risk_condition_ko": "291.65 이하 하락, 종가 확인 후 신규 진입 보류·보유 위험 대응 계획 재확인",
-      "decision_state_ko": "데이터 확인 전 대기",
-      "data_status_ko": "시세 시각 재확인",
-      "reference_strategy": {
-        "strategy_code": "AVOID",
-        "strategy_ko": "신규 매수 회피",
-        "decision_state_ko": "실행 조건 감시 중",
-        "market_data_asof": "2026-11-27T14:35:57+00:00"
-      },
-      "quality_at_build": {
-        "execution_ready": false,
-        "data_ready": false,
-        "action_ready": false,
-        "action_status": "DATA_RECHECK_REQUIRED",
-        "current_execution_promotion": "BLOCKED",
-        "generated_in_current_run": true,
-        "row_valid_until": "2026-11-27T14:37:57+00:00",
+        "row_valid_until": "2026-11-27T16:51:15+00:00",
         "expired_at_build": false,
         "provider_limitations": [],
         "provider_blockers": [
@@ -1099,7 +1138,7 @@
         "strategy_code": "AVOID",
         "strategy_ko": "신규 매수 회피",
         "decision_state_ko": "실행 조건 감시 중",
-        "market_data_asof": "2026-11-27T14:35:57+00:00"
+        "market_data_asof": "2026-11-27T16:49:15+00:00"
       },
       "quality_at_build": {
         "execution_ready": false,
@@ -1108,7 +1147,7 @@
         "action_status": "DATA_RECHECK_REQUIRED",
         "current_execution_promotion": "BLOCKED",
         "generated_in_current_run": true,
-        "row_valid_until": "2026-11-27T14:37:57+00:00",
+        "row_valid_until": "2026-11-27T16:51:15+00:00",
         "expired_at_build": false,
         "provider_limitations": [],
         "provider_blockers": [
@@ -1138,7 +1177,7 @@
         "strategy_code": "AVOID",
         "strategy_ko": "신규 매수 회피",
         "decision_state_ko": "실행 조건 감시 중",
-        "market_data_asof": "2026-11-27T14:35:57+00:00"
+        "market_data_asof": "2026-11-27T16:49:15+00:00"
       },
       "quality_at_build": {
         "execution_ready": false,
@@ -1147,46 +1186,7 @@
         "action_status": "DATA_RECHECK_REQUIRED",
         "current_execution_promotion": "BLOCKED",
         "generated_in_current_run": true,
-        "row_valid_until": "2026-11-27T14:37:57+00:00",
-        "expired_at_build": false,
-        "provider_limitations": [],
-        "provider_blockers": [
-          "work_packet_row_invalid_timestamp"
-        ]
-      }
-    },
-    {
-      "ticker": "KO",
-      "display_name": "KO",
-      "is_held": false,
-      "strategy_code": "DATA_CHECK",
-      "strategy_ko": "데이터 확인 전 대기",
-      "last_price": null,
-      "market_data_asof": null,
-      "market_data_clock_status": "future",
-      "session_vwap": null,
-      "relative_volume": null,
-      "spread_bps": null,
-      "day_high": null,
-      "day_low": null,
-      "execution_condition_ko": "위험 대응 조건: 94.6 이하 하락, 종가 확인 후 신규 진입 보류·보유 위험 대응 계획 재확인 (매수 돌파·거래량 조건과 별도 판정)",
-      "risk_condition_ko": "94.6 이하 하락, 종가 확인 후 신규 진입 보류·보유 위험 대응 계획 재확인",
-      "decision_state_ko": "데이터 확인 전 대기",
-      "data_status_ko": "시세 시각 재확인",
-      "reference_strategy": {
-        "strategy_code": "AVOID",
-        "strategy_ko": "신규 매수 회피",
-        "decision_state_ko": "실행 조건 감시 중",
-        "market_data_asof": "2026-11-27T14:35:57+00:00"
-      },
-      "quality_at_build": {
-        "execution_ready": false,
-        "data_ready": false,
-        "action_ready": false,
-        "action_status": "DATA_RECHECK_REQUIRED",
-        "current_execution_promotion": "BLOCKED",
-        "generated_in_current_run": true,
-        "row_valid_until": "2026-11-27T14:37:57+00:00",
+        "row_valid_until": "2026-11-27T16:51:15+00:00",
         "expired_at_build": false,
         "provider_limitations": [],
         "provider_blockers": [
@@ -1216,7 +1216,7 @@
         "strategy_code": "AVOID",
         "strategy_ko": "신규 매수 회피",
         "decision_state_ko": "실행 조건 감시 중",
-        "market_data_asof": "2026-11-27T14:35:57+00:00"
+        "market_data_asof": "2026-11-27T16:49:15+00:00"
       },
       "quality_at_build": {
         "execution_ready": false,
@@ -1225,7 +1225,7 @@
         "action_status": "DATA_RECHECK_REQUIRED",
         "current_execution_promotion": "BLOCKED",
         "generated_in_current_run": true,
-        "row_valid_until": "2026-11-27T14:37:57+00:00",
+        "row_valid_until": "2026-11-27T16:51:15+00:00",
         "expired_at_build": false,
         "provider_limitations": [],
         "provider_blockers": [
@@ -1255,7 +1255,7 @@
         "strategy_code": "AVOID",
         "strategy_ko": "신규 매수 회피",
         "decision_state_ko": "실행 조건 감시 중",
-        "market_data_asof": "2026-11-27T14:35:57+00:00"
+        "market_data_asof": "2026-11-27T16:49:15+00:00"
       },
       "quality_at_build": {
         "execution_ready": false,
@@ -1264,7 +1264,7 @@
         "action_status": "DATA_RECHECK_REQUIRED",
         "current_execution_promotion": "BLOCKED",
         "generated_in_current_run": true,
-        "row_valid_until": "2026-11-27T14:37:57+00:00",
+        "row_valid_until": "2026-11-27T16:51:15+00:00",
         "expired_at_build": false,
         "provider_limitations": [],
         "provider_blockers": [
@@ -1294,7 +1294,7 @@
         "strategy_code": "AVOID",
         "strategy_ko": "신규 매수 회피",
         "decision_state_ko": "실행 조건 감시 중",
-        "market_data_asof": "2026-11-27T14:35:57+00:00"
+        "market_data_asof": "2026-11-27T16:49:15+00:00"
       },
       "quality_at_build": {
         "execution_ready": false,
@@ -1303,7 +1303,7 @@
         "action_status": "DATA_RECHECK_REQUIRED",
         "current_execution_promotion": "BLOCKED",
         "generated_in_current_run": true,
-        "row_valid_until": "2026-11-27T14:37:57+00:00",
+        "row_valid_until": "2026-11-27T16:51:15+00:00",
         "expired_at_build": false,
         "provider_limitations": [],
         "provider_blockers": [
@@ -1333,7 +1333,7 @@
         "strategy_code": "AVOID",
         "strategy_ko": "신규 매수 회피",
         "decision_state_ko": "조건 충족 전 대기",
-        "market_data_asof": "2026-11-27T14:35:57+00:00"
+        "market_data_asof": "2026-11-27T16:49:15+00:00"
       },
       "quality_at_build": {
         "execution_ready": false,
@@ -1342,7 +1342,7 @@
         "action_status": "DATA_RECHECK_REQUIRED",
         "current_execution_promotion": "BLOCKED",
         "generated_in_current_run": true,
-        "row_valid_until": "2026-11-27T14:37:57+00:00",
+        "row_valid_until": "2026-11-27T16:51:15+00:00",
         "expired_at_build": false,
         "provider_limitations": [],
         "provider_blockers": [
@@ -1352,8 +1352,8 @@
     }
   ],
   "report": {
-    "published_at": "2026-11-27T23:10:38.651184+09:00",
-    "as_of": "2026-11-27T04:00:00-05:00",
+    "published_at": "2026-11-28T01:24:49.062950+09:00",
+    "as_of": "2026-11-27T11:06:00-05:00",
     "markdown_url": "https://nornen0202.github.io/TradingAgents/work/v1/us/report/latest.md",
     "readable_url": "https://nornen0202.github.io/TradingAgents/work/v1/us/report/latest.html"
   }
