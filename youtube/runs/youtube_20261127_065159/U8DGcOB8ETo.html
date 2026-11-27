@@ -1,0 +1,629 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YouTube 투자자용 검증 리포트 - &quot;200빌렸는데 이자 연 80,000%&quot; 요즘 한국에서 벌어지는 최악의 사채 수법</title>
+  <style>
+:root {
+  color-scheme: light;
+  --bg: #f7f8fb;
+  --panel: #ffffff;
+  --text: #172033;
+  --muted: #667085;
+  --line: #d9dee8;
+  --accent: #0f766e;
+  --accent-2: #2563eb;
+  --warn: #b45309;
+  --bad: #b42318;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0 56px; }
+a { color: var(--accent-2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.hero { padding: 28px 0 22px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+.hero.compact { padding-top: 12px; }
+.hero h1 { margin: 0; font-size: clamp(28px, 4vw, 44px); line-height: 1.15; letter-spacing: 0; }
+.hero p { max-width: 760px; color: var(--muted); margin: 12px 0 0; }
+.eyebrow { color: var(--accent); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0; margin: 0 0 8px; }
+section { margin: 28px 0; }
+h2, h3, h4, h5 { letter-spacing: 0; line-height: 1.25; }
+.synthesis-callout { padding: clamp(20px, 4vw, 34px); border: 1px solid #6ee7d8; border-radius: 18px; background: linear-gradient(135deg, #ecfdf9 0%, #eff6ff 100%); box-shadow: 0 18px 44px rgba(15, 118, 110, .12); }
+.synthesis-callout.unavailable { border-color: var(--line); background: var(--panel); box-shadow: none; }
+.synthesis-callout h2 { margin: 0; font-size: clamp(24px, 3.2vw, 36px); }
+.synthesis-callout .lead { max-width: 900px; font-size: 17px; color: #334155; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.primary-link, .secondary-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border-radius: 999px; font-weight: 800; }
+.primary-link { color: white; background: var(--accent); }
+.secondary-link { color: var(--accent-2); border: 1px solid #93c5fd; background: white; }
+.primary-link:hover, .secondary-link:hover { text-decoration: none; filter: brightness(.97); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.card, .run { display: flex; flex-direction: column; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; color: var(--text); min-height: 128px; }
+.run { padding: 16px; }
+.card:hover, .run:hover { border-color: var(--accent-2); text-decoration: none; }
+.thumb { display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #e9edf5; border-radius: 8px 8px 0 0; color: var(--muted); font-size: 13px; font-weight: 700; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb-empty span { padding: 0 14px; text-align: center; }
+.card-body { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 16px; }
+.card strong { line-height: 1.35; }
+.source-line { color: #3f4a5f; font-weight: 600; }
+.runs { display: grid; gap: 10px; }
+.badge { display: inline-flex; width: fit-content; border-radius: 999px; padding: 2px 9px; background: #e6f4f1; color: var(--accent); font-size: 12px; font-weight: 700; }
+.status-contradicted, .status-llm_failed { background: #fee4e2; color: var(--bad); }
+.status-unverified, .status-stale { background: #fff4d6; color: var(--warn); }
+small, .muted { color: var(--muted); }
+.topnav { display: flex; gap: 14px; margin-bottom: 16px; font-size: 14px; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px; }
+.stats span { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
+.report { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: min(5vw, 36px); }
+.report-head { border-bottom: 1px solid var(--line); margin-bottom: 24px; padding-bottom: 20px; }
+.report-head h1 { margin: 0; font-size: clamp(24px, 3.5vw, 38px); line-height: 1.2; }
+.meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+.scope-note { padding: 12px 14px; border-left: 4px solid var(--warn); border-radius: 6px; background: #fff7ed; color: #7c2d12; }
+.synthesis-report h2 { margin-top: 34px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.synthesis-report h3 { margin: 24px 0 8px; color: #0f4c5c; }
+.synthesis-report p, .synthesis-report li { overflow-wrap: anywhere; }
+pre { overflow: auto; background: #111827; color: #f9fafb; border-radius: 8px; padding: 14px; }
+code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+details { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 18px; }
+@media (max-width: 640px) {
+  main { width: min(100% - 20px, 1120px); padding-top: 18px; }
+  .report { padding: 18px; }
+  .synthesis-callout { border-radius: 14px; padding: 18px; }
+  .cta-row a { width: 100%; }
+  .mobile-report { border-radius: 12px; }
+}
+</style>
+</head>
+<body>
+  <main>
+<nav class="topnav"><a href="index.html">실행 목록</a><a href="../../index.html">YouTube 홈</a></nav>
+<article class="report">
+  <header class="report-head">
+    <p class="eyebrow">youtube_20261127_065159</p>
+    <h1>&quot;200빌렸는데 이자 연 80,000%&quot; 요즘 한국에서 벌어지는 최악의 사채 수법</h1>
+    <div class="meta">
+      <span class="badge status-unverified">unverified</span>
+      <a href="https://www.youtube.com/watch?v=U8DGcOB8ETo">원본 영상</a>
+    </div>
+  </header>
+  <h2>불법 사금융 수사로 본 취약차주 신용위험</h2>
+<p><strong>2026년 11월 27일 기준 | <a href="https://www.youtube.com/watch?v=U8DGcOB8ETo">경제사냥꾼 영상</a> | 종합 검증: 부분 뒷받침</strong></p>
+<p>서울경찰청을 인용한 보도는 불법 대부 일당 22명의 검거·송치를 뒷받침한다. 여러 매체가 원금 110만 원이 약 두 달 만에 2,200만 원으로 불어난 개별 사례도 보도했다. 다만 정확한 연이율 80,138%, 대출·회수 총액, 저신용자의 불법 사금융 유입 규모는 제공 자료로 확인되지 않는다. 이 사건은 취약차주의 자금 접근성이 악화될 때 나타날 수 있는 위험을 보여주지만, 업권 전체의 부실이나 특정 종목의 실적을 판단할 근거는 아니다.</p>
+<h3>영상 주장과 확인된 사실·근거</h3>
+<p>| 쟁점 | 영상 주장 | 확인된 사실·근거 및 한계 |</p>
+<p>|---|---|---|</p>
+<p>| 검거와 사건 규모 | 서울경찰청이 24일 22명 검거를 발표했고, 일당은 약 470명에게 26억 원을 빌려주고 49억 원을 회수했다. | <a href="https://www.chosun.com/national/national_general/2026/11/24/S2GM34KFSBB5PDACKSJGJEPBI4/">서울경찰청을 인용한 조선일보 보도</a>에 따르면 2026년 11월 24일 발표 내용은 22명 검거·송치, 그중 2명 구속이다. 24일은 발표일이며 실제 검거일은 미확인이다. 470명·26억 원·49억 원은 발췌에 없고, 49억 원이 총회수액인지 이자 또는 범죄수익인지도 확인되지 않는다. |</p>
+<p>| 연이율과 가정 계산 | 사건 이율은 연 80,138%였다. 별도 예시로, 100만 원에 연 80,000%를 1년 적용하면 이자가 8억 원이다. | <a href="https://www.donga.com/news/Society/article/all/20261125/135084427/2">동아일보</a>와 <a href="https://www.joongang.co.kr/article/25481469">중앙일보</a> 제목은 약 연 8만%를 보도했다. 정확한 값, 해당 거래, 최고치 여부, 연환산 기간과 비용 포함 범위는 미확인이다. 100만 원 × 800 = 8억 원은 <strong>단리 가정에서 이자만</strong> 계산한 값으로, 사건 평균금리나 실제 1년 납부액이 아니다. |</p>
+<p>| 개별 피해 사례 | 30만 원과 80만 원을 빌린 뒤 하루 150만 원의 연체료가 붙어 약 두 달 만에 상환 요구액이 2,200만 원이 됐다. | <a href="https://www.donga.com/news/Society/article/all/20261124/135081821/1">동아일보</a>와 <a href="https://www.joongang.co.kr/article/25481469">중앙일보</a>는 원금 합계 110만 원, <strong>하루 최고</strong> 연체료 150만 원, 약 두 달 뒤 2,200만 원을 보도했다. 150만 원이 매일 부과됐는지, 2,200만 원이 요구액인지 실제 납부액인지는 발췌만으로 확정할 수 없다. 제목의 ‘200’은 단위와 대상 거래가 미확인으로, 이 사례나 100만 원 가정과 연결할 근거가 없다. |</p>
+<p>| 차환과 가족 대상 추심 | 다른 업체 대출로 기존 빚을 갚게 했고, 가족·지인 정보를 수집해 계약서를 단체대화방에 공개하거나 가족을 협박했다. | <a href="https://www.donga.com/news/Society/article/all/20261124/135081821/1">동아일보 보도</a>는 가족을 대상으로 한 협박 정황을 전한다. 업체 간 차환·공모, 개인정보 수집·계약서 공개의 구체적 수법, 가족의 건강 관련 일화와 그 인과관계는 미확인이다. 보도된 혐의는 유죄 확정과 다르다. |</p>
+<p>| 불법 사금융 유입과 피해자 연령 | 서민금융연구원 추산으로 ‘작년’ 저신용자 유입이 최대 11만 9천 명으로 전년의 약 두 배였고, 경찰 집계 피해자의 56%가 20~30대였다. | 두 수치 모두 미확인이다. 게시 시점상 추산 대상은 2025년, 비교 대상은 2024년으로 읽히지만 원자료로 확정되지 않았다. 추산 상한을 실제 피해자 수나 시장 규모로 볼 수 없으며, 56%는 분모와 집계 범위가 확인되기 전까지 전국 피해자에 적용할 수 없다. |</p>
+<p>| 계약 효력과 금감원 지원 | 영상은 ‘작년 7월 22일 이후’ 연 60% 초과 계약의 원금·이자 무효, 미등록 업자의 60% 이하 계약에서 이자 무효 및 기납부 이자 반환 가능성을 설명한다. 금감원 1332, 무효 관련 문서 발송과 채무자대리인 지원도 안내한다. | 2025년 7월 22일은 영상 게시 시점에서 역산한 후보일이다. 법령·시행령·부칙 및 기관 원문이 없어 시행일과 적용 대상, 이율 산정 기준, 반환 요건, 연락처와 문서의 명칭·효력, 대리 지원 범위는 <strong>미검증·수동 확인 필요</strong>다. 대화·이체 기록 보존은 영상의 안내이며, 기관이 인정하는 증빙 요건이 확인된 것은 아니다. |</p>
+<p>| 온라인 신청과 경찰 연계 | ‘지난 16일’부터 앱으로 24시간 신청이 가능하고, ‘다음 달’부터 경찰이 상담 현장에 파견된다. | <a href="https://m.skyedaily.com/news_view.html?ID=314685">11월 16일 보도</a>는 2026년 11월 16일부터 신용회복위원회 웹·앱에서 피해 원스톱 지원을 24시간 <strong>접수</strong>한다고 전한다. 24시간 상담·처리를 뜻하지 않는다. <a href="https://www.sedaily.com/article/20117697?ref=naver">서울경제</a>와 <a href="http://www.dailypop.kr/news/articleView.html?idxno=104621">데일리팝</a>은 12월 경찰 파견 및 상담 단계 수사 의뢰 계획을 보도했으나, 실제 개시일과 대상 센터는 미확인이다. |</p>
+<h3>투자 관점: 긍정 시나리오와 반론</h3>
+<ul>
+<li><strong>긍정 시나리오:</strong> 온라인 접수와 경찰 연계가 실제 처리 시간을 줄이고, 취약차주가 합법적인 대체 자금이나 채무조정에 접근할 수 있다면 피해가 장기화되기 전에 개입할 여지가 커진다. 시장에 긍정적인 신호는 제도 발표 자체가 아니라, 구제 처리 속도가 빨라지는 동시에 취약차주 대출 접근성과 건전성 지표가 개선되는 것이다.</li>
+<li><strong>반론:</strong> 접수 건수 증가는 피해 증가가 아니라 신고 장벽이 낮아진 결과일 수 있다. 반대로 단속이 강화돼도 대체 자금 접근성이 나아지지 않으면 불법 대출 수요가 남을 수 있다. 단일 사건의 극단적 이율이나 미확인 유입 추산으로 금융사 연체율·충당금·이익 변화를 추정할 수 없다. 영상에 개별 종목·가격 주장이 없고, 관련 시세·공시도 제공되지 않았다.</li>
+</ul>
+<h3>단기 체크포인트와 무효화 조건</h3>
+<p>1. <strong>12월 정책 집행:</strong> 신복위·경찰 공지에서 실제 파견 개시일, 대상 센터, 시범 운영 여부를 확인한다. 접수 건수만 보지 말고 처리 소요 기간, 미처리 건수, 수사 의뢰 및 지원 완료 건수를 함께 본다. 파견이 지연되거나 접수 증가에도 적체가 커지고 처리 시간이 줄지 않으면 조기 개입 개선 가설은 약해진다.</p>
+<p>2. <strong>다음 통계·공시:</strong> 공개되는 범위에서 저신용자 대출 신청 대비 승인율, 정책서민금융 공급, 취약차주 연체율과 금융사 충당금 추이를 같은 기간·정의로 비교한다. 승인율이 낮아지고 연체율이 오르면 구제 창구 확대만으로 신용위험이 개선된다는 해석은 지지되기 어렵다. 연구원 원자료에서 동일 기준으로 비교했을 때 약 두 배 증가가 재현되지 않으면 해당 증가 주장을 투자 논거에서 제외한다.</p>
+<p>3. <strong>경찰·법령 원문:</strong> 경찰 원발표에서 대출·회수액의 집계 기간과 정의, 연환산 산식, 연체료 적용 일수, 연령 비중의 분모를 확인한다. 공개 수사자료나 판결에 근거가 없으면 차환·공모를 확인된 사실로 취급하지 않는다. 계약 무효·반환 및 지원 범위는 법령의 적용례와 기관 공식 안내를 대조하기 전까지 개별 계약에 적용하지 않는다.</p>
+<h3>데이터 품질과 미검증 범위</h3>
+<p>자동 한국어 자막의 <code>transcript_quality</code>는 <strong>good(1.00)</strong>이지만 추출 품질 지표이지 사실성 점수가 아니다. 주장 타임스탬프 <code>00:00:00</code>은 <strong>00:00–02:06 전체 청크의 시작</strong>이며 정확한 발화 위치가 아니다. 제목에는 발화 시각이 적용되지 않는다. 예를 들어 80,138%는 <code>asr_confidence</code> <strong>0.88</strong>에도 외부 근거를 나타내는 <code>source_confidence</code>가 <strong>0.57</strong>이며, 11만 9천 명은 각각 <strong>0.86 / 0.00</strong>이다. 반면 개별 피해 사례는 <strong>0.88 / 0.86</strong>이지만 실제 납부액까지 확인된 것은 아니다. 정확한 이율·연체료 단위·문서 명칭은 원음과 원자료 대조가 필요하다.</p>
+<p>경찰·연구원·법령·지원기관 원문은 제공되지 않았고, 같은 매체의 반복 보도는 독립 검증으로 세지 않았다. 무관한 금융 뉴스는 근거에서 제외했다. Bloomberg·Morningstar 자료는 제공되지 않았고 이들에 귀속된 주장도 확인되지 않았다. 비공개 계약·송금·연체 원장, 대화방 원본, 제목 속 ‘200’의 비공개 취재 근거에 의존하는 내용은 <strong>미검증·수동 확인 필요</strong>다.</p>
+  <details>
+    <summary>공개 요약 JSON</summary>
+    <pre>{
+  &quot;version&quot;: 4,
+  &quot;video_id&quot;: &quot;U8DGcOB8ETo&quot;,
+  &quot;title&quot;: &quot;\&quot;200빌렸는데 이자 연 80,000%\&quot; 요즘 한국에서 벌어지는 최악의 사채 수법&quot;,
+  &quot;url&quot;: &quot;https://www.youtube.com/watch?v=U8DGcOB8ETo&quot;,
+  &quot;channel&quot;: &quot;경제사냥꾼&quot;,
+  &quot;channel_id&quot;: &quot;UC7usMJDHmtbs_oegmzQKKMA&quot;,
+  &quot;source_url&quot;: &quot;https://www.youtube.com/@%EA%B2%BD%EC%A0%9C%EC%82%AC%EB%83%A5%EA%BE%BC/shorts&quot;,
+  &quot;thumbnail_url&quot;: &quot;https://i.ytimg.com/vi/U8DGcOB8ETo/maxresdefault.jpg&quot;,
+  &quot;published_at&quot;: &quot;2026-11-26T14:00:16+00:00&quot;,
+  &quot;status&quot;: &quot;unverified&quot;,
+  &quot;strategy_source_tier&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_evidence_weight&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_validation_policy&quot;: &quot;STANDARD_REVIEW&quot;,
+  &quot;transcript_status&quot;: &quot;available&quot;,
+  &quot;transcript_source&quot;: &quot;automatic&quot;,
+  &quot;transcript_chars&quot;: 1565,
+  &quot;transcript_quality&quot;: {
+    &quot;status&quot;: &quot;good&quot;,
+    &quot;score&quot;: 1.0,
+    &quot;warnings&quot;: [],
+    &quot;source&quot;: &quot;automatic&quot;,
+    &quot;language&quot;: &quot;Korean (Original)&quot;,
+    &quot;model_or_format&quot;: &quot;json3&quot;,
+    &quot;chars&quot;: 1565,
+    &quot;segments&quot;: 81,
+    &quot;duration_seconds&quot;: 126,
+    &quot;repeated_ngram_ratio&quot;: 0.0
+  },
+  &quot;generated_at&quot;: &quot;2026-11-27T06:51:59.173176+09:00&quot;,
+  &quot;llm_status&quot;: &quot;success&quot;,
+  &quot;research_status&quot;: &quot;success&quot;,
+  &quot;claim_verification_status&quot;: &quot;success&quot;,
+  &quot;research_pipeline_version&quot;: 4,
+  &quot;evidence_count&quot;: 12,
+  &quot;claim_status_summary&quot;: {
+    &quot;partially_supported&quot;: 5,
+    &quot;supported&quot;: 1,
+    &quot;unverified&quot;: 6
+  },
+  &quot;claims&quot;: [
+    {
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;claim_text&quot;: &quot;서울경찰청이 11월 24일 불법 대부 일당 22명의 검거를 발표했고, 일당은 약 470명에게 26억 원을 빌려주고 49억 원을 회수했다.&quot;,
+      &quot;status&quot;: &quot;partially_supported&quot;,
+      &quot;confidence&quot;: 0.72,
+      &quot;supporting_evidence_ids&quot;: [
+        &quot;E1&quot;
+      ],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.74,
+      &quot;asr_confidence&quot;: 0.88,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;지난 24일; 22명; 약 470명; 26억 원 대출; 49억 원 회수&quot;,
+        &quot;observed&quot;: &quot;2026-11-24 발표 보도; 22명 검거·송치, 그중 2명 구속; 나머지 수치 미확인&quot;
+      },
+      &quot;investor_implication&quot;: &quot;검거 인원은 경찰을 인용한 보도로 전하되, 미확인 금액으로 사건 규모나 수익률을 계산하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;claim_text&quot;: &quot;이 사건의 연이율이 80,138%에 달했다.&quot;,
+      &quot;status&quot;: &quot;partially_supported&quot;,
+      &quot;confidence&quot;: 0.57,
+      &quot;supporting_evidence_ids&quot;: [
+        &quot;E2&quot;,
+        &quot;E4&quot;
+      ],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.57,
+      &quot;asr_confidence&quot;: 0.88,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;연 80,138%&quot;,
+        &quot;observed&quot;: &quot;보도 제목상 약 연 80,000%; 정확한 수치와 산식 미확인&quot;
+      },
+      &quot;investor_implication&quot;: &quot;약 8만%라는 보도와 80,138%라는 미확인 수치를 구분하고, 이를 사건 전체의 평균금리나 실제 1년 납부 이율로 해석하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;claim_text&quot;: &quot;100만 원을 연 80,000% 단리로 1년 빌린다고 가정하면 이자는 8억 원이다.&quot;,
+      &quot;status&quot;: &quot;supported&quot;,
+      &quot;confidence&quot;: 1.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: false,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 1.0,
+      &quot;asr_confidence&quot;: 0.88,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;100만 원 × 연 80,000% 단리 × 1년 = 이자 8억 원&quot;,
+        &quot;observed&quot;: &quot;1,000,000원 × 800 = 800,000,000원; 원금 제외&quot;
+      },
+      &quot;investor_implication&quot;: &quot;고율의 크기를 설명하는 예시로만 사용하고 사건의 실제 금액과 분리한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;claim_text&quot;: &quot;한 피해자가 30만 원과 80만 원을 빌린 뒤 하루 150만 원의 연체료가 부과돼 약 두 달 만에 상환 요구액이 2,200만 원에 달했다.&quot;,
+      &quot;status&quot;: &quot;partially_supported&quot;,
+      &quot;confidence&quot;: 0.86,
+      &quot;supporting_evidence_ids&quot;: [
+        &quot;E2&quot;,
+        &quot;E3&quot;,
+        &quot;E4&quot;
+      ],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.86,
+      &quot;asr_confidence&quot;: 0.88,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;30만 원 + 80만 원; 하루 연체료 150만 원; 약 두 달 뒤 상환 요구액 2,200만 원&quot;,
+        &quot;observed&quot;: &quot;원금 합계 110만 원; 하루 최고 150만 원; 약 두 달 뒤 2,200만 원(요구·납부 구분 미확인)&quot;
+      },
+      &quot;investor_implication&quot;: &quot;‘하루 최고 150만 원’으로 표기하고, 2,200만 원을 실제 납부액이나 일반적인 피해 규모로 인용하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;claim_text&quot;: &quot;일당이 채무자에게 다른 업체를 소개해 새 대출로 기존 빚을 갚게 했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.15,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.88,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;&quot;,
+        &quot;observed&quot;: &quot;&quot;
+      },
+      &quot;investor_implication&quot;: &quot;차환을 통한 채무 누적은 영상이 제시한 설명으로만 다루고, 이 사건에서 확인된 업체 간 공모로 묘사하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;claim_text&quot;: &quot;일당은 가족·지인의 주소와 연락처, 가족관계증명서를 수집하고 단체대화방에 계약서를 공개하거나 가족을 협박했다. 피해자의 아버지가 쓰러졌다는 일화도 있다.&quot;,
+      &quot;status&quot;: &quot;partially_supported&quot;,
+      &quot;confidence&quot;: 0.59,
+      &quot;supporting_evidence_ids&quot;: [
+        &quot;E2&quot;,
+        &quot;E3&quot;
+      ],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.62,
+      &quot;asr_confidence&quot;: 0.88,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;&quot;,
+        &quot;observed&quot;: &quot;&quot;
+      },
+      &quot;investor_implication&quot;: &quot;위협이 가족에게까지 향했다는 보도와 구체적인 정보 수집·공개 수법 및 건강 관련 일화를 구분한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;claim_text&quot;: &quot;서민금융연구원 추산에 따르면 등록 대부업에서도 빌리지 못해 불법 사금융으로 넘어간 저신용자는 작년 최대 11만 9천 명으로, 전년의 약 두 배였다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.16,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.86,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;작년 최대 119,000명; 전년의 약 2배&quot;,
+        &quot;observed&quot;: &quot;게시일 기준 2025년과 2024년은 후보일 뿐이며, 수치와 비교 기준 미확인&quot;
+      },
+      &quot;investor_implication&quot;: &quot;11만 9천 명을 실제 피해자 수나 시장 규모로 사용하지 않고, 대출 거절이 불법 사금융 유입을 일으켰다는 인과 근거로도 쓰지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;claim_text&quot;: &quot;경찰이 집계한 피해자의 56%가 20~30대였다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.15,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.86,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;피해자 가운데 20~30대 56%&quot;,
+        &quot;observed&quot;: &quot;비율·분자·분모 모두 미확인&quot;
+      },
+      &quot;investor_implication&quot;: &quot;해당 사건의 비율인지도 확인되지 않은 수치를 전국 피해자의 연령 분포로 확대하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;claim_text&quot;: &quot;작년 7월 22일 이후 체결한 연 60% 초과 계약은 원금과 이자가 무효이고, 미등록 불법 대부업자의 연 60% 이하 계약도 이자가 무효이며 이미 낸 무효 이자는 반환을 요구할 수 있다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.28,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.2,
+      &quot;asr_confidence&quot;: 0.86,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;작년 7월 22일 이후; 연 60% 초과와 60% 이하 구분&quot;,
+        &quot;observed&quot;: &quot;게시일 기준 2025-07-22는 후보; 기사 제목에 60% 초과 언급; 법적 적용례 미확인&quot;
+      },
+      &quot;investor_implication&quot;: &quot;계약 무효나 반환 가능 여부를 영상만으로 단정하지 않는다. 계약일과 등록 여부에 따라 달라지는 법적 요건은 조문·시행령·부칙 확인 후 보도한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C10&quot;,
+      &quot;claim_text&quot;: &quot;금감원 1332로 상담하면 연 60% 초과 계약의 무효 확인서를 금감원이 업체에 직접 보내고 채무자대리인이 추심에 대응할 수 있다. 영상은 대화·이체 기록 보존도 안내한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.17,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.86,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;1332; 연 60% 초과&quot;,
+        &quot;observed&quot;: &quot;금감원 연락처와 해당 제도의 적용 기준을 확인할 원문 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;신청하면 확인서가 자동으로 발송되거나 추심 대응을 보장받는다고 안내하지 않는다. 기록 보존은 영상의 조언과 공식 증빙 요건을 구분해 전달한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C11&quot;,
+      &quot;claim_text&quot;: &quot;지난 16일부터 신용회복위원회 앱으로 24시간 신청할 수 있고, 다음 달부터 경찰관이 상담 현장에 파견돼 수사를 의뢰할 수 있다.&quot;,
+      &quot;status&quot;: &quot;partially_supported&quot;,
+      &quot;confidence&quot;: 0.85,
+      &quot;supporting_evidence_ids&quot;: [
+        &quot;E7&quot;,
+        &quot;E8&quot;,
+        &quot;E9&quot;
+      ],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.82,
+      &quot;asr_confidence&quot;: 0.86,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;지난 16일; 24시간 신청; 다음 달 경찰 파견&quot;,
+        &quot;observed&quot;: &quot;2026-11-16 앱·웹 24시간 신청 개시 보도; 2026-12 경찰 파견 계획 보도, 실제 시행 미확인&quot;
+      },
+      &quot;investor_implication&quot;: &quot;온라인 접수 개시와 경찰 파견 계획을 나눠 보도하고, 파견이 이미 시행됐거나 모든 센터에 적용된다고 말하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C12&quot;,
+      &quot;claim_text&quot;: &quot;제목의 ‘200빌렸는데’가 가리키는 금액의 단위와 거래는 확인되지 않으며, 110만 원 피해 사례나 100만 원 가정 예시와 연결할 근거가 없다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.16,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.0,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;제목의 ‘200’(단위 미표기)&quot;,
+        &quot;observed&quot;: &quot;단위·대상 거래 미확인; 110만 원 피해 사례와 100만 원 산술 예시는 별개&quot;
+      },
+      &quot;investor_implication&quot;: &quot;‘200’을 200만 원으로 보완하거나 특정 피해자의 대출액으로 소개하지 않는다.&quot;
+    }
+  ],
+  &quot;entities&quot;: [],
+  &quot;evidence&quot;: [
+    {
+      &quot;evidence_id&quot;: &quot;E1&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;\&quot;110만원 빌렸는데 두 달 만에 2200만원\&quot;…가족까지 협박한 불법 ...&quot;,
+      &quot;source_url&quot;: &quot;//duckduckgo.com/l/?uddg=https%3A%2F%2Fwww.chosun.com%2Fnational%2Fnational_general%2F2026%2F11%2F24%2FS2GM34KFSBB5PDACKSJGJEPBI4%2F&amp;rut=00e2db5c0033f904be14d5d06d8edf785c2ed7bb441e622ba6531223c709f662&quot;,
+      &quot;publisher&quot;: &quot;duckduckgo.com&quot;,
+      &quot;published_at&quot;: null,
+      &quot;source_tier&quot;: &quot;web&quot;,
+      &quot;excerpt&quot;: &quot;서울경찰청 광역수사단 광역범죄수사대는 대부업법 위반과 불법 채권 추심 혐의로 무등록 대부업체 총책 A씨 등 22 명을 검거해 서울중앙지방공소청에 송치했다고 24일 밝혔다. 경찰은 이 중 형제 관계인 총책 A씨와 총판 B씨 등 2명을 구속했다.&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E2&quot;,
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;title&quot;: &quot;취약층 상대 年8만% 살인적 금리… “못 갚으면 딸 납치하겠다” 협박도&quot;,
+      &quot;source_url&quot;: &quot;https://www.donga.com/news/Society/article/all/20261125/135084427/2&quot;,
+      &quot;publisher&quot;: &quot;Naver News&quot;,
+      &quot;published_at&quot;: &quot;2026-11-25T04:35:00+09:00&quot;,
+      &quot;source_tier&quot;: &quot;web&quot;,
+      &quot;excerpt&quot;: &quot;이 같은 불법 소액 대출로 시작된 빚은 걷잡을 수 없이 커졌다. 한 피해자는 30만 원과 80만 원을 빌렸다가 제때 갚지 못하자 두 달 동안 하루 최고 150만 원의 연체료를 물었다. 원금 110만 원이 2200만 원으로 20배가 됐다.... 취약층 상대 年8만% 살인적 금리… “못 갚으면 딸 납치하겠다” 협박도｜동아일보 본문으로 바로가기 검색창 닫기 궁금하신 [ 조희대 탄핵 재초환 부담금 이지영 종부세 80대 회식 이재명 대통령 탄핵 조작기소 특검 엔비디...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E3&quot;,
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;title&quot;: &quot;50만원 빌려준 다음날 160만원 뜯고…“안 갚으면 딸 납치” 협박도&quot;,
+      &quot;source_url&quot;: &quot;https://www.donga.com/news/Society/article/all/20261124/135081821/1&quot;,
+      &quot;publisher&quot;: &quot;Naver News&quot;,
+      &quot;published_at&quot;: &quot;2026-11-24T19:58:00+09:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;이같은 불법 소액 대출로 시작된 빚은 걷잡을 수 없이 커졌다. 한 피해자는 30만 원과 80만 원을 빌렸다가 제때 갚지 못하자 두 달 동안 하루 최고 150만 원의 연체료를 물었다. 원금 110만 원이 2200만 원으로 20배가 됐다....&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E5&quot;,
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;title&quot;: &quot;Mayo Lake Minerals Extends Final Closing of $700,000 Private Placement to December 22, 2026&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/mayo-lake-minerals-extends-final-141200639.html&quot;,
+      &quot;publisher&quot;: &quot;TMX Newsfile&quot;,
+      &quot;published_at&quot;: &quot;2026-11-26T14:12:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E6&quot;,
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;title&quot;: &quot;SoftBank Group Stocks Jump 7.32% as AI Rebound Lifts Tokyo After a 14.83% Rout&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/softbank-group-stocks-jump-7-184827003.html&quot;,
+      &quot;publisher&quot;: &quot;GuruFocus.com&quot;,
+      &quot;published_at&quot;: &quot;2026-11-26T18:48:27+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E7&quot;,
+      &quot;claim_id&quot;: &quot;C11&quot;,
+      &quot;title&quot;: &quot;정형돈 “100만 원 정도 필요한데...” 대부업체 전화 걸었다가 한 달 이...&quot;,
+      &quot;source_url&quot;: &quot;https://www.sedaily.com/article/20117697?ref=naver&quot;,
+      &quot;publisher&quot;: &quot;Naver News&quot;,
+      &quot;published_at&quot;: &quot;2026-11-23T12:17:00+09:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;24시간 불법사금융 피해 지원을 신청할 수 있게 했다. 올해 2~10월 신용회복위원회를 통한 피해 상담은 1239명, 경찰 수사 의뢰는 1178명으로 집계됐다. 경찰, 특별자수·신고기간 운영…12월 신복위에 경찰관 파견...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E8&quot;,
+      &quot;claim_id&quot;: &quot;C11&quot;,
+      &quot;title&quot;: &quot;불법사금융 피해 &#x27;원스톱 지원&#x27;, 이제 온라인으로 야간·주말에도 신청&quot;,
+      &quot;source_url&quot;: &quot;http://www.dailypop.kr/news/articleView.html?idxno=104621&quot;,
+      &quot;publisher&quot;: &quot;Naver News&quot;,
+      &quot;published_at&quot;: &quot;2026-11-17T11:56:00+09:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;정부는 온라인 창구를 연 초기에 신청이 몰릴 수 있다고 보고 처리 현황을 점검하기로 했다. 다음 달에는 신용회복위원회에 경찰관을 파견해 상담 단계에서도 수사의뢰가 가능하도록 절차를 바꿀 예정이다.&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E10&quot;,
+      &quot;claim_id&quot;: &quot;GLOBAL&quot;,
+      &quot;title&quot;: &quot;Why Are Crypto Traders Still Betting on a Chip Fund That Fell 78%?&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/crypto/articles/why-crypto-traders-still-betting-150000341.html&quot;,
+      &quot;publisher&quot;: &quot;BeInCrypto&quot;,
+      &quot;published_at&quot;: &quot;2026-11-25T15:00:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E11&quot;,
+      &quot;claim_id&quot;: &quot;GLOBAL&quot;,
+      &quot;title&quot;: &quot;Dow, S&amp;P 500, Nasdaq Futures Edge Lower Amid Tech Selloff Ahead Of Key Inflation Data: DELL, AMBA, SOXL, MSTR In Focus&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/dow-p-500-nasdaq-futures-032010769.html&quot;,
+      &quot;publisher&quot;: &quot;Stocktwits&quot;,
+      &quot;published_at&quot;: &quot;2026-11-25T03:20:10+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    }
+  ],
+  &quot;source_policy&quot;: {
+    &quot;raw_transcript_published&quot;: false,
+    &quot;raw_transcript_in_evidence&quot;: false,
+    &quot;research_pipeline_version&quot;: 4,
+    &quot;closed_source_claims&quot;: &quot;unverified_external_source&quot;,
+    &quot;auto_caption_warning&quot;: true,
+    &quot;local_asr_warning&quot;: false
+  }
+}</pre>
+  </details>
+</article>
+</main>
+  <style>
+.reader-contents { margin: 16px 0; padding: 12px 16px; border: 1px solid var(--line, #64748b); border-radius: 12px; }
+.reader-contents > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-weight: 750; }
+.reader-contents nav { display: grid; gap: 4px; max-height: 45vh; overflow: auto; margin: 8px 0; }
+.reader-contents a { display: block; min-height: 44px; padding: 10px; border-radius: 6px; color: inherit; overflow-wrap: anywhere; }
+.reader-contents a:hover { background: #80808020; }
+.reader-contents .reader-subsection { padding-inline-start: 24px; font-size: .92em; }
+.reader-prose, .report { overflow-wrap: anywhere; line-height: 1.8; }
+.reader-prose p, .reader-prose li { max-width: 85ch; }
+.reader-prose h2, .reader-prose h3, .reader-prose h4, [data-reader-heading] { scroll-margin-top: 100px; line-height: 1.45; }
+.reader-prose h2 { margin-top: 1.8em; padding-bottom: 8px; border-bottom: 1px solid var(--line, #64748b); }
+.reader-prose h3 { margin-top: 1.5em; }
+.reader-prose li { margin: .5em 0; }
+.reader-prose pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.reader-prose blockquote { margin: 16px 0; padding: 4px 16px; border-left: 3px solid var(--accent, #64748b); }
+.reader-table { overflow: auto; max-width: 100%; margin: 16px 0; border: 1px solid var(--line, #64748b); border-radius: 10px; }
+.reader-table table { border-collapse: collapse; width: 100%; margin: 0; font-size: .92rem; }
+.reader-table th, .reader-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line, #64748b); min-width: 110px; max-width: 400px; overflow-wrap: anywhere; white-space: normal; }
+.reader-table th { background: #80808018; }
+.reader-table tr:nth-child(even) { background: #80808008; }
+.reader-search { display: grid; gap: 8px; margin: 16px 0; }
+.reader-search label { font-weight: 700; }
+.reader-search input { box-sizing: border-box; width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line, #64748b); border-radius: 10px; background: var(--panel, #fff); color: var(--text, #132238); font: inherit; }
+.reader-search p { margin: 0; font-size: .86rem; }
+.reader-back { position: fixed; bottom: max(14px, env(safe-area-inset-bottom)); right: 14px; z-index: 30; min-height: 44px; border: 1px solid #778899; border-radius: 99px; padding: 10px 16px; background: #18344a; color: #fff; font: 700 14px system-ui; cursor: pointer; box-shadow: 0 3px 12px #0003; }
+[data-reader-source] { margin-top: 20px; }
+[data-reader-source] > summary { min-height: 44px; cursor: pointer; }
+[data-reader-source] pre { font-size: .85rem; }
+[data-reader-source] pre, .reader-prose { min-width: 0; }
+.reader-contents :focus-visible, .reader-search :focus-visible, .reader-back:focus-visible, .reader-table:focus-visible { outline: 3px solid var(--accent, #008c95); outline-offset: 3px; }
+.reader-search + .grid > [hidden] { display: none !important; }
+@media (max-width: 600px) { .reader-prose { font-size: 1rem; } .reader-contents { padding: 8px 12px; } }
+@media print { .reader-back, .reader-search, .reader-contents, [data-reader-source] { display: none !important; } .reader-table { overflow: visible; } .reader-prose { color: #000; background: #fff; } }
+</style><script>
+(() => {
+  'use strict';
+  let serial = 0;
+  const rendered = new WeakMap();
+  const node = (tag, text) => { const el = document.createElement(tag); if (text != null) el.textContent = text; return el; };
+  function inline(parent, text) {
+    const pattern = /(`[^`]+`|\*\*[^*]+\*\*|\[[^\]]+\]\(https?:\/\/[^\s)]+\))/g;
+    let start = 0;
+    for (const match of String(text).matchAll(pattern)) {
+      parent.append(document.createTextNode(text.slice(start, match.index)));
+      const value = match[0];
+      if (value.startsWith('`')) parent.append(node('code', value.slice(1, -1)));
+      else if (value.startsWith('**')) parent.append(node('strong', value.slice(2, -2)));
+      else {
+        const link = value.match(/^\[([^\]]+)\]\((.+)\)$/);
+        const a = node('a', link[1]); a.href = link[2]; a.rel = 'noopener noreferrer'; parent.append(a);
+      }
+      start = match.index + value.length;
+    }
+    parent.append(document.createTextNode(text.slice(start)));
+  }
+  const cells = line => line.trim().replace(/^\|/, '').replace(/\|$/, '').split(/(?<!\\)\|/).map(v => v.trim().replace(/\\\|/g, '|'));
+  function markdown(source) {
+    const article = node('article'); article.className = 'reader-prose';
+    const lines = source.split(/\r?\n/); let list = null;
+    for (let i = 0; i < lines.length; i += 1) {
+      const line = lines[i], value = line.trim();
+      if (!value) { list = null; continue; }
+      if (/^```/.test(value)) {
+        const code = []; i += 1;
+        while (i < lines.length && !/^```/.test(lines[i].trim())) code.push(lines[i++]);
+        const pre = node('pre'); pre.append(node('code', code.join('\n'))); article.append(pre); list = null; continue;
+      }
+      if (i + 1 < lines.length && value.includes('|') && cells(lines[i + 1]).every(v => /^:?-{3,}:?$/.test(v))) {
+        const table = node('table'), head = node('thead'), body = node('tbody');
+        const row = (values, tag) => { const tr = node('tr'); values.forEach(v => { const cell = node(tag); if (tag === 'th') cell.scope = 'col'; inline(cell, v); tr.append(cell); }); return tr; };
+        head.append(row(cells(line), 'th')); i += 2;
+        while (i < lines.length && lines[i].trim() && lines[i].includes('|')) body.append(row(cells(lines[i++]), 'td'));
+        i -= 1; table.append(head, body); article.append(table); list = null; continue;
+      }
+      const heading = value.match(/^(#{1,6})\s+(.+)$/);
+      if (heading) { const h = node('h' + Math.min(4, heading[1].length + 1)); inline(h, heading[2]); article.append(h); list = null; continue; }
+      const bullet = value.match(/^(?:[-*+] |\d+\. )(.+)$/);
+      if (bullet) {
+        const tag = /^\d/.test(value) ? 'ol' : 'ul';
+        if (!list || list.tagName.toLowerCase() !== tag) { list = node(tag); if (tag === 'ol') list.start = parseInt(value, 10); article.append(list); }
+        const li = node('li'); inline(li, bullet[1]); list.append(li); continue;
+      }
+      list = null;
+      if (/^(---+|\*\*\*+)$/.test(value)) { article.append(node('hr')); continue; }
+      const p = node(value.startsWith('> ') ? 'blockquote' : 'p'); inline(p, value.startsWith('> ') ? value.slice(2) : line); article.append(p);
+    }
+    return article;
+  }
+  function contents(root) {
+    root.querySelectorAll(':scope > .reader-contents').forEach(el => el.remove());
+    const headings = [...root.querySelectorAll('h2,h3,h4')].filter(h => !h.closest('.card,.run-card,.reader-contents,[data-reader-source],[hidden]'));
+    if (headings.length < 2) return;
+    const details = node('details'); details.className = 'reader-contents';
+    details.append(node('summary', '이 리포트 목차 · ' + headings.length + '개 항목'));
+    const nav = node('nav'); nav.setAttribute('aria-label', '리포트 목차');
+    headings.forEach(h => {
+      if (!h.id) h.id = 'reader-section-' + (++serial);
+      h.dataset.readerHeading = ''; h.tabIndex = -1;
+      const a = node('a', h.textContent); a.href = '#' + h.id;
+      if (h.tagName !== 'H2') a.className = 'reader-subsection';
+      a.addEventListener('click', event => {
+        event.preventDefault();
+        for (let ancestor = h.parentElement; ancestor; ancestor = ancestor.parentElement) if (ancestor.tagName === 'DETAILS') ancestor.open = true;
+        h.scrollIntoView({block: 'start'}); h.focus({preventScroll: true});
+      }); nav.append(a);
+    });
+    details.append(nav); root.prepend(details);
+  }
+  function enhance(root) {
+    if (!root) return;
+    root.querySelectorAll('pre[data-report-markdown]').forEach(pre => {
+      const previous = rendered.get(pre);
+      if (previous && previous.source === pre.textContent) return;
+      const article = markdown(pre.textContent);
+      if (previous) previous.article.replaceWith(article);
+      else {
+        const details = node('details'); details.dataset.readerSource = '';
+        details.append(node('summary', 'Markdown 원문 보기'));
+        pre.before(article, details); details.append(pre);
+      }
+      rendered.set(pre, {source: pre.textContent, article});
+    });
+    root.querySelectorAll('table').forEach(table => {
+      if (table.closest('.reader-table,.account-table-wrap,.summary-scroll')) return;
+      const wrap = node('div'); wrap.className = 'reader-table'; wrap.tabIndex = 0;
+      wrap.setAttribute('role', 'region'); wrap.setAttribute('aria-label', '리포트 표 · 가로로 스크롤하여 전체 보기');
+      table.before(wrap); wrap.append(table);
+    });
+    root.querySelectorAll('.grid').forEach(grid => {
+      const cards = [...grid.querySelectorAll(':scope > a.card')];
+      if (cards.length < 2 || grid.dataset.readerSearch) return;
+      grid.dataset.readerSearch = 'true';
+      const box = node('div'); box.className = 'reader-search';
+      const input = node('input'); input.type = 'search'; input.placeholder = '제목 · 종목 · 채널 · 키워드'; input.id = 'report-search-' + (++serial);
+      const label = node('label', '리포트 찾기'); label.htmlFor = input.id;
+      const status = node('p'); status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
+      const update = () => {
+        const terms = input.value.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean); let count = 0;
+        cards.forEach(card => { card.hidden = !terms.every(t => card.textContent.toLocaleLowerCase().includes(t)); if (!card.hidden) count += 1; });
+        status.textContent = cards.length + '개 중 ' + count + '개 표시' + (count ? '' : ' · 검색어를 지우거나 다른 키워드를 입력하세요.');
+      };
+      input.addEventListener('input', update); box.append(label, input, status); grid.before(box); update();
+    });
+    contents(root);
+  }
+  window.TradingAgentsReader = {enhance};
+  const main = document.querySelector('main');
+  if (main && !main.hasAttribute('data-reader-dynamic')) enhance(main);
+  if (main) {
+    const top = node('button', '↑ 맨 위'); top.type = 'button'; top.className = 'reader-back'; top.setAttribute('aria-label', '리포트 맨 위로 이동');
+    top.addEventListener('click', () => { const target = document.querySelector('h1') || main; target.tabIndex = -1; target.scrollIntoView({block: 'start'}); target.focus({preventScroll: true}); });
+    document.body.append(top);
+  }
+})();
+</script>
+</body>
+</html>

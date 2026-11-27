@@ -1,0 +1,806 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YouTube 투자자용 검증 리포트 - 나스닥, 급락 출발 이후 낙폭 축소…엔비디아, 코어위브 등 변동성 지속 | 여도은, 박명석 큐레이터 [월가 뉴스레터]</title>
+  <style>
+:root {
+  color-scheme: light;
+  --bg: #f7f8fb;
+  --panel: #ffffff;
+  --text: #172033;
+  --muted: #667085;
+  --line: #d9dee8;
+  --accent: #0f766e;
+  --accent-2: #2563eb;
+  --warn: #b45309;
+  --bad: #b42318;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0 56px; }
+a { color: var(--accent-2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.hero { padding: 28px 0 22px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+.hero.compact { padding-top: 12px; }
+.hero h1 { margin: 0; font-size: clamp(28px, 4vw, 44px); line-height: 1.15; letter-spacing: 0; }
+.hero p { max-width: 760px; color: var(--muted); margin: 12px 0 0; }
+.eyebrow { color: var(--accent); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0; margin: 0 0 8px; }
+section { margin: 28px 0; }
+h2, h3, h4, h5 { letter-spacing: 0; line-height: 1.25; }
+.synthesis-callout { padding: clamp(20px, 4vw, 34px); border: 1px solid #6ee7d8; border-radius: 18px; background: linear-gradient(135deg, #ecfdf9 0%, #eff6ff 100%); box-shadow: 0 18px 44px rgba(15, 118, 110, .12); }
+.synthesis-callout.unavailable { border-color: var(--line); background: var(--panel); box-shadow: none; }
+.synthesis-callout h2 { margin: 0; font-size: clamp(24px, 3.2vw, 36px); }
+.synthesis-callout .lead { max-width: 900px; font-size: 17px; color: #334155; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.primary-link, .secondary-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border-radius: 999px; font-weight: 800; }
+.primary-link { color: white; background: var(--accent); }
+.secondary-link { color: var(--accent-2); border: 1px solid #93c5fd; background: white; }
+.primary-link:hover, .secondary-link:hover { text-decoration: none; filter: brightness(.97); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.card, .run { display: flex; flex-direction: column; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; color: var(--text); min-height: 128px; }
+.run { padding: 16px; }
+.card:hover, .run:hover { border-color: var(--accent-2); text-decoration: none; }
+.thumb { display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #e9edf5; border-radius: 8px 8px 0 0; color: var(--muted); font-size: 13px; font-weight: 700; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb-empty span { padding: 0 14px; text-align: center; }
+.card-body { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 16px; }
+.card strong { line-height: 1.35; }
+.source-line { color: #3f4a5f; font-weight: 600; }
+.runs { display: grid; gap: 10px; }
+.badge { display: inline-flex; width: fit-content; border-radius: 999px; padding: 2px 9px; background: #e6f4f1; color: var(--accent); font-size: 12px; font-weight: 700; }
+.status-contradicted, .status-llm_failed { background: #fee4e2; color: var(--bad); }
+.status-unverified, .status-stale { background: #fff4d6; color: var(--warn); }
+small, .muted { color: var(--muted); }
+.topnav { display: flex; gap: 14px; margin-bottom: 16px; font-size: 14px; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px; }
+.stats span { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
+.report { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: min(5vw, 36px); }
+.report-head { border-bottom: 1px solid var(--line); margin-bottom: 24px; padding-bottom: 20px; }
+.report-head h1 { margin: 0; font-size: clamp(24px, 3.5vw, 38px); line-height: 1.2; }
+.meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+.scope-note { padding: 12px 14px; border-left: 4px solid var(--warn); border-radius: 6px; background: #fff7ed; color: #7c2d12; }
+.synthesis-report h2 { margin-top: 34px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.synthesis-report h3 { margin: 24px 0 8px; color: #0f4c5c; }
+.synthesis-report p, .synthesis-report li { overflow-wrap: anywhere; }
+pre { overflow: auto; background: #111827; color: #f9fafb; border-radius: 8px; padding: 14px; }
+code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+details { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 18px; }
+@media (max-width: 640px) {
+  main { width: min(100% - 20px, 1120px); padding-top: 18px; }
+  .report { padding: 18px; }
+  .synthesis-callout { border-radius: 14px; padding: 18px; }
+  .cta-row a { width: 100%; }
+  .mobile-report { border-radius: 12px; }
+}
+</style>
+</head>
+<body>
+  <main>
+<nav class="topnav"><a href="index.html">실행 목록</a><a href="../../index.html">YouTube 홈</a></nav>
+<article class="report">
+  <header class="report-head">
+    <p class="eyebrow">youtube_20261127_065159</p>
+    <h1>나스닥, 급락 출발 이후 낙폭 축소…엔비디아, 코어위브 등 변동성 지속 | 여도은, 박명석 큐레이터 [월가 뉴스레터]</h1>
+    <div class="meta">
+      <span class="badge status-asr_uncertain">asr_uncertain</span>
+      <a href="https://www.youtube.com/watch?v=XoqCYEsrgro">원본 영상</a>
+    </div>
+  </header>
+  <h2>나스닥 낙폭 축소와 AI 인프라 신용위험: 반등을 확인하려면 무엇을 봐야 하나</h2>
+<p><a href="https://www.youtube.com/watch?v=XoqCYEsrgro">삼프로TV 〈월가 뉴스레터〉</a> · 게시: 2026년 11월 25일 22:17 UTC(한국시간 11월 26일 목요일 07:17)</p>
+<p><strong>핵심 판단:</strong> 영상은 나스닥이 장 초반 급락에서 벗어났지만 AI 인프라의 조달 부담, 반도체 공급 제약, 물가 압력이 남아 있다고 해석한다. 다만 <strong>미국 거래일이 특정되지 않았고, 검증 대상 12건 중 독립적으로 확인된 주장은 없다.</strong> 낙폭 축소가 확인되더라도 그 자체로 위험선호 회복이나 AI 투자 수익성 개선을 뜻하지 않는다. 반등의 지속성, 조달비용, 주문의 출하·현금 전환을 따로 확인하는 것이 핵심이다.</p>
+<h3>확인된 사실과 근거의 한계</h3>
+<ul>
+<li><strong>게시일은 확인되지만 거래일은 미확정이다.</strong> 한국시간 게시일은 목요일이고, 자막이 가리키는 방송 시점은 수요일 오전이다. 게시 시각만으로 어느 미국 거래 세션을 다뤘는지 확정할 수 없다.</li>
+<li><strong>확인 가능한 시장 자료는 단일 주가 조회값이다.</strong> 11월 26일 UTC 기준 호스트의 yfinance 조회값은 NVDA $149.30, CRWV $42.57, ORCL $103.88, AMBA $35.68, DELL $297.06, META $609.89, WDAY $180.44다. 이는 영상 속 세션의 종가나 장중 저점으로 확인된 값이 아니다. 등락률, 채권 수익률, CDS, 기업 실적을 뒷받침하거나 반박하지 못한다.</li>
+<li><strong>수집 기사 9건은 직접 근거가 아니다.</strong> 모두 영상 게시 후 발행됐고, 7건에는 본문 발췌가 없으며 나머지 2건도 제목과 오류·탐색 문구 수준이다. 예를 들어 <a href="https://finance.yahoo.com/m/e000f3e0-24db-3012-bf3e-8148de8b8a54/gold-rises-but-big-moves-seen.html">WSJ 금 시장 기사</a>는 지수 반등을, <a href="https://finance.yahoo.com/markets/stocks/articles/amd-stocks-slip-1-75-182928246.html">AMD 주식 재매각 등록 기사</a>는 UBS 목표가 변경이나 메타 광고 성과를 입증하지 않는다. 기업 뉴스와 공시 조회는 제공처 오류로 실패했으므로, 공시가 없었다고 볼 수도 없다.</li>
+</ul>
+<h3>영상 주장과 검증 결과</h3>
+<p>아래 수치는 <strong>영상에서 제시된 미검증 수치</strong>다. 링크 시각은 개별 발화가 아니라 자막 구간의 시작점이다. 전체 한국어 자동자막 7개 구간의 품질은 <code>good</code>(1.00)이지만, 이는 날짜·숫자·고유명사의 정확성을 보증하지 않는다. 표의 <code>asr_confidence</code>는 자막에서 발화와 귀속을 얼마나 명확히 읽을 수 있는지 나타낸다. 독립 근거의 강도를 나타내는 주장별 <code>source_confidence</code>는 전부 <strong>0.00</strong>이다. 이는 근거 부족이지, 주장이 틀렸다는 판정이 아니다.</p>
+<p>| 주제 · 영상 구간 | 영상 주장 | 확인된 근거 또는 남은 쟁점 |</p>
+<p>|---|---|---|</p>
+<p>| 미국 증시 · <a href="https://www.youtube.com/watch?v=XoqCYEsrgro&amp;t=0s">00:00:00</a> · 0.86 | 나스닥 장중 약 −5%, 저점 대비 약 +4%, 마감 −0.6%. S&amp;P 500 −0.25%, 다우 +0.3%, 러셀 2000 +0.6%. 비트코인 6만 달러 회복, 공포·탐욕 지수 9. | 세션·분봉·위험선호 지표 기록 미확인. 나스닥 종합·나스닥100·선물, 전일 종가 대비 등락과 저점 대비 반등을 구분해야 한다. 숏커버와 매도세 약화는 둘 다 가설이다. |</p>
+<p>| 엔비디아 · <a href="https://www.youtube.com/watch?v=XoqCYEsrgro&amp;t=411s">00:06:51</a> · 0.60 | 주가가 장중 140달러 초반을 시험했고, 미국이 메가스피드와 알리바바 자회사 등 약 7개사를 제재 명단에 올리면서 대체 구매처 확보가 변수로 떠올랐다고 전했다. | 장중 시세와 규제 원문이 없다. $75→$82 반등을 NVDA에 귀속할 수 없으며, 경영진 거취·정치권 발언 및 AI 모델 업체 관련 발언도 원음과 원문 대조 전에는 보류한다. |</p>
+<p>| 코어위브·오라클 · <a href="https://www.youtube.com/watch?v=XoqCYEsrgro&amp;t=411s">00:06:51</a>, <a href="https://www.youtube.com/watch?v=XoqCYEsrgro&amp;t=803s">00:13:23</a> · 0.86 | 코어위브 2031년물 수익률 17.9%, 주가 장중 약 −10%, 메타 프로젝트 관련분을 포함한 약 45억 달러 대출의 매각 준비. 양사 CDS는 사상 최고치라고 전했다. | 주가 조회값은 채권·CDS·대출을 검증하지 못한다. 17.9%와 45억 달러는 코어위브 주장이지 오라클 수치가 아니다. 매각 검토·착수·종결은 구분해야 하며, 매각 준비만으로 채무불이행을 뜻하지 않는다. |</p>
+<p>| 암바렐라·델 · <a href="https://www.youtube.com/watch?v=XoqCYEsrgro&amp;t=803s">00:13:23</a>, <a href="https://www.youtube.com/watch?v=XoqCYEsrgro&amp;t=1968s">00:32:48</a> · 0.90/0.88 | 암바렐라로 지목된 업체는 DRAM 가격·공급 문제로 비AI IoT 주문이 밀려 매출 전망을 1억 달러 초과에서 7,000만 달러로 낮췄다고 전했다. 델은 4분기 AI 서버 매출 전망 235억 달러, 금융채권 전분기 대비 5억 달러 증가와 공급 부족 가능성이 언급됐다. | 암바렐라의 발행사·회계분기·가이던스와 주가·기관 목표가 모두 미확인. 비AI 주문 지연을 AI 수요 위축으로 일반화할 수 없다. 델의 235억 달러가 매출·출하·수주 중 무엇인지 불명확하고, AI 주문 축소가 확인되지 않았다는 말도 주문이 유지됐다는 증거는 아니다. |</p>
+<p>| 미국 물가·소비·관세 · <a href="https://www.youtube.com/watch?v=XoqCYEsrgro&amp;t=803s">00:13:23</a>, <a href="https://www.youtube.com/watch?v=XoqCYEsrgro&amp;t=1203s">00:20:03</a> · 0.80/0.83 | 10월 근원 PCE 3.3%(예상 3.2%), 주거비 제외 근원 서비스 물가 4% 초과, 소득 증가와 소비 부진을 제시했다. 12월 25bp 인상은 진행자 시나리오였고, 50bp 인상 확률 2.5%와 비상지출 설문도 인용했다. 14개 교역 상대에 대한 신규 관세 추진을 언급했다. | 물가 발표 연도·비교 기준, 사전 예상치, 금리 방향과 당시 선물가격, 설문 문항이 미확인이다. 25bp는 연준 결정이나 시장 합의가 아니다. 관세는 공식 문서의 대상 품목·세율·예외·발효일·징수 여부가 확인되기 전까지 시행으로 볼 수 없다. |</p>
+<p>| 월가 전망·반도체 목표가 · <a href="https://www.youtube.com/watch?v=XoqCYEsrgro&amp;t=1596s">00:26:36</a> · 0.84 | BTIG·골드만삭스는 반등 지속성에 신중했고, BofA는 조정 이후의 기회, JPMorgan은 AI 수요 지속, HSBC는 일부 부담의 완화 가능성을 제시했다고 전했다. UBS의 AMD·브로드컴·마이크론 목표가 하향과 마이클 버리의 포지션 청산도 언급됐다. | 기관 원문과 기준일이 없다. 7,800과 8,200은 대상 지수조차 미확정이다. 목표가의 통화·주식분할 기준을 맞춰야 하며, 13F만으로 버리의 청산 시점이나 나스닥100 숏 청산을 입증할 수 없다. |</p>
+<p>| 메타·워크데이 · <a href="https://www.youtube.com/watch?v=XoqCYEsrgro&amp;t=1968s">00:32:48</a>, <a href="https://www.youtube.com/watch?v=XoqCYEsrgro&amp;t=2343s">00:39:03</a> · 0.81/0.91 | 메타는 AI 에이전트가 인스타그램 광고 성과를 개선했고 주가가 3.4% 올랐다고 전했다. 워크데이는 실적 직후 하락했다가 상승 전환했고, 진행자는 AI 도입 효과가 일부 드러났다고 해석했다. | 메타 제품명·비교군·개선 폭과 워크데이의 유료 고객·사용량·매출 지표가 없다. 두 종목 모두 해당 세션 수익률이 미확인이다. 주가 움직임이 확인되더라도 AI 성과의 증거는 별도로 필요하다. |</p>
+<p><strong>귀속 보류 및 수동 확인:</strong> <a href="https://www.youtube.com/watch?v=XoqCYEsrgro&amp;t=1968s">후반부</a>의 IPO 공모가·개인 순매수·시가총액과 우주 데이터센터 승인·계좌 기부 주장은 발행사 또는 사업자부터 불명확하다(<code>asr_confidence</code> 0.25). 특정 회사의 투자 정보로 인용할 수 없다. 연휴 중고품 구매 관심, 휘발유 저점, 크라우드스트라이크 장중 반전, 스타벅스 일본 사업 매각, PIF 관련 사건과 유가의 인과도 미검증이다(<a href="https://www.youtube.com/watch?v=XoqCYEsrgro&amp;t=1203s">00:20:03</a>, <a href="https://www.youtube.com/watch?v=XoqCYEsrgro&amp;t=2343s">00:39:03</a>, 0.50). <strong>Bloomberg 방송 및 Morningstar 자료, 증권사 고객 전용 노트, 라이선스 CDS 이력, 비공개 대출·임대 계약과 광고 실험 원자료는 미검증이며 수동 확인이 필요하다.</strong> 공개 자료 부족은 해당 주장에 대한 반증이 아니다.</p>
+<h3>상승 논리와 반론</h3>
+<p><strong>상승 논리:</strong> 정규 거래에서 반등이 이어지고 상승 종목의 범위도 넓어진다면, 영상이 묘사한 낙폭 축소는 일시적인 포지션 정리 이상의 신호일 수 있다. AI 서버의 공급 제약이 주문 취소가 아니라 납기 지연에 그치고, 수주잔고가 출하·매출·현금 회수로 이어진다면 수요 지속 논리가 강해진다. 메타의 광고 전환 개선이나 워크데이의 유료 AI 계약 증가가 비교 가능한 지표로 확인되면, AI 수익화 논리도 주가 반등과 별개로 뒷받침된다.</p>
+<p><strong>반론과 무효화 조건:</strong> 정규 거래 재개 후 상승 종목이 줄고 지수가 확인된 저점을 다시 하회하면 추세 반전 해석은 약해진다. 동일 조건의 채권·CDS에서 조달 스트레스가 지속되고, 차환 조건이 악화되거나 주문 취소·출하 지연·현금 회수 둔화가 함께 나타나면 수요와 실적의 연결을 전제로 한 낙관론도 힘을 잃는다. AI 사용량만 늘고 광고 효율이나 유료 전환이 개선되지 않으면 수익화 주장은 입증되지 않는다. 반대로 신용 스프레드가 안정되고 출하와 현금 회수가 개선되면 영상의 신용위험 확대 해석은 약해진다.</p>
+<h3>가까운 시점에 볼 지표</h3>
+<p>1. <strong>거래일 확정과 반등 확인:</strong> NYSE·Nasdaq 공식 휴장 및 단축장 일정과 주요 지수 종가를 맞춘 뒤 분봉을 대조한다. 다음 정상 거래 세션의 거래량, 상승·하락 종목 수, 확인된 저점의 유지 여부를 본다. 가격 반전만으로 숏커버를 단정하지 않는다.</p>
+<p>2. <strong>신용과 출하:</strong> 코어위브 2031년물의 채권 식별자와 FINRA TRACE 체결 자료, 코어위브·오라클의 동일 만기·통화 CDS를 비교한다. 대출 매각은 검토·착수·종결 단계와 메타 관련분을 구분한다. 델과 관련 반도체 업체는 수주잔고뿐 아니라 취소율, 납기, 출하, 금융채권과 현금 회수를 함께 확인한다.</p>
+<p>3. <strong>물가와 정책:</strong> BEA 최초 발표치의 전월비·전년비와 실질 소비를 사전 컨센서스 및 당시 금리선물과 대조한다. 엔비디아 수출통제는 BIS 규칙의 대상 법인·허가 요건·효력일을 확인한 뒤 실제 판매 영향을 살핀다. 관세는 관보와 세관 지침에서 검토와 징수를 구분한다.</p>
+<p>4. <strong>AI 수익화:</strong> 메타는 비교군과 측정 기간이 명시된 광고 전환율·광고비 대비 수익률을, 워크데이는 AI 기능의 유료 고객·계약·매출을 확인한다. 실적 발표 전후 주가는 시간외와 정규장으로 나눠 보되, 사업 지표의 대용으로 쓰지 않는다.</p>
+  <details>
+    <summary>공개 요약 JSON</summary>
+    <pre>{
+  &quot;version&quot;: 4,
+  &quot;video_id&quot;: &quot;XoqCYEsrgro&quot;,
+  &quot;title&quot;: &quot;나스닥, 급락 출발 이후 낙폭 축소…엔비디아, 코어위브 등 변동성 지속 | 여도은, 박명석 큐레이터 [월가 뉴스레터]&quot;,
+  &quot;url&quot;: &quot;https://www.youtube.com/watch?v=XoqCYEsrgro&quot;,
+  &quot;channel&quot;: &quot;삼프로TV 3PROTV&quot;,
+  &quot;channel_id&quot;: &quot;UChlv4GSd7OQl3js-jkLOnFA&quot;,
+  &quot;source_url&quot;: &quot;https://www.youtube.com/@3protv/videos&quot;,
+  &quot;thumbnail_url&quot;: &quot;https://i.ytimg.com/vi/XoqCYEsrgro/maxresdefault.jpg&quot;,
+  &quot;published_at&quot;: &quot;2026-11-25T22:17:18+00:00&quot;,
+  &quot;status&quot;: &quot;asr_uncertain&quot;,
+  &quot;strategy_source_tier&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_evidence_weight&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_validation_policy&quot;: &quot;STANDARD_REVIEW&quot;,
+  &quot;transcript_status&quot;: &quot;available&quot;,
+  &quot;transcript_source&quot;: &quot;automatic&quot;,
+  &quot;transcript_chars&quot;: 22170,
+  &quot;transcript_quality&quot;: {
+    &quot;status&quot;: &quot;good&quot;,
+    &quot;score&quot;: 1.0,
+    &quot;warnings&quot;: [],
+    &quot;source&quot;: &quot;automatic&quot;,
+    &quot;language&quot;: &quot;Korean&quot;,
+    &quot;model_or_format&quot;: &quot;json3&quot;,
+    &quot;chars&quot;: 22170,
+    &quot;segments&quot;: 1303,
+    &quot;duration_seconds&quot;: 2696,
+    &quot;repeated_ngram_ratio&quot;: 0.0
+  },
+  &quot;generated_at&quot;: &quot;2026-11-27T06:51:59.173176+09:00&quot;,
+  &quot;llm_status&quot;: &quot;success&quot;,
+  &quot;research_status&quot;: &quot;success&quot;,
+  &quot;claim_verification_status&quot;: &quot;success&quot;,
+  &quot;research_pipeline_version&quot;: 4,
+  &quot;evidence_count&quot;: 9,
+  &quot;claim_status_summary&quot;: {
+    &quot;unverified&quot;: 11,
+    &quot;asr_uncertain&quot;: 1
+  },
+  &quot;claims&quot;: [
+    {
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;claim_text&quot;: &quot;나스닥은 장중 약 5% 하락한 뒤 저점 대비 약 4% 반등해 0.6% 하락 마감했고, S&amp;P 500은 0.25% 하락, 다우는 0.3% 상승, 러셀 2000은 0.6% 상승했다고 한다. 비트코인은 6만 달러를 회복했고 공포·탐욕 지수는 장중 9로 3월 이후 최저였다고 한다. 숏커버와 매도세 약화는 반등 원인에 대한 가설이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.86,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;나스닥 장중 약 -5%, 저점 대비 약 +4%, 종가 -0.6%; S&amp;P 500 -0.25%; 다우 +0.3%; 러셀 2000 +0.6%; BTC 6만 달러; 공포·탐욕 9&quot;,
+        &quot;observed&quot;: &quot;해당 세션의 지수 종가·분봉, BTC 분봉 및 공포·탐욕 지수 기록 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;거래일과 가격 기준이 확인되기 전에는 반등 폭이나 원인을 근거로 위험선호가 회복됐다고 판단할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;claim_text&quot;: &quot;엔비디아가 장중 140달러 초반의 최근 저점을 시험했고, 미국이 Megaspeed와 알리바바 자회사 등 약 7개사를 제재 명단에 올리자 칩 유통업체가 대체 구매처를 찾았다고 한다. 경영진 사임·복귀, 중국 개입 관련 당국 입장과 트럼프·밴스 발언, OpenAI·Anthropic의 증류 추적 및 DeepSeek 기술 격차 발언의 귀속도 확인 대상이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.6,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;장중 140달러 초반; 약 7개 법인; 기술 격차 3~6개월→9개월; 별도 확인 대상 장중 -8% 및 월요일 +31%&quot;,
+        &quot;observed&quot;: &quot;2026-11-26 UTC yfinance 조회값 NVDA 149.30달러; 비교 가능한 분봉, 법인 수, 격차 수치 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;수출 규정의 대상·효력과 실제 주문·판매 영향은 별개다. 명단 규모나 대체 구매처 관련 발언을 매출 추정에 반영할 근거는 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;claim_text&quot;: &quot;코어위브 2031년물 수익률이 17.9%에 이르고 주가가 장중 약 10% 하락했으며, 코어위브와 오라클 CDS가 사상 최고치를 기록했다고 한다. 주관 은행들이 메타 프로젝트 관련분을 포함한 약 45억 달러 규모 대출의 매각을 준비했다는 주장도 나왔다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:06:51&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.86,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;CRWV 2031년물 17.9%; 장중 약 -10%; 대출 약 45억 달러; 양사 CDS 사상 최고&quot;,
+        &quot;observed&quot;: &quot;2026-11-26 UTC yfinance 조회값 CRWV 42.57달러, ORCL 103.88달러; 채권·CDS·대출 수치 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;조달비용 상승과 대주단의 익스포저 축소는 검증할 위험이다. 매각 준비를 거래 종결이나 채무불이행 신호로 해석할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;claim_text&quot;: &quot;암바렐라로 들리는 발행사에서 DRAM 가격·공급 문제로 비AI IoT 고객이 주문을 미뤄 매출 전망이 1억 달러 초과에서 7,000만 달러로 낮아졌고, 주가는 약 35% 하락한 뒤 낙폭을 약 19%로 줄였다고 한다. BofA와 Rosenblatt도 목표가를 낮췄다고 한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:13:23&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.9,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;가이던스 1억 달러 초과→7,000만 달러; 주가 약 -35%→-19%; BofA 70→30달러; Rosenblatt 120→55달러&quot;,
+        &quot;observed&quot;: &quot;2026-11-26 UTC yfinance 조회값 AMBA 35.68달러, 평균 목표가 54.36달러; 해당 분기 가이던스·분봉·기관별 목표가 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;발행사와 회계분기를 확인하기 전에는 가이던스 수치를 인용하지 않는다. 비AI IoT 주문 지연이 확인되더라도 AI 주문 취소나 수요 위축으로 일반화할 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;claim_text&quot;: &quot;10월 근원 PCE가 3.3%로 예상 3.2%를 웃돌고 주거비 제외 근원 서비스 물가가 4%를 넘었으며, 소득은 늘고 소비는 부진했다고 한다. 진행자는 12월 25bp 인상을 기본 시나리오로, 50bp 인상 확률을 2.5%로 제시했다. 소비자 41%가 250달러 비상지출을 감당하기 어렵다는 조사도 인용됐다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:13:23&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.8,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;근원 PCE 3.3% 대 예상 3.2%; 주거비 제외 근원 서비스 4% 초과; 12월 +25bp 기본, +50bp 확률 2.5%; 소비자 41%, 비상지출 250달러&quot;,
+        &quot;observed&quot;: &quot;당시 지표·컨센서스·금리선물·설문 수치 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;물가 서프라이즈와 금리 인상 확률을 전제로 투자 판단을 내리기 전에 발표 연도, 비교 기준과 당시 시장 가격을 확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;claim_text&quot;: &quot;미국이 구조적 산업 과잉설비를 근거로 14개 교역 상대에 신규 관세를 추진하고 중국 20%, 합의 불발 시 최대 40%, 베트남 35%를 거론했다고 한다. 유럽·일본·한국·인도는 검토 대상, 멕시코·노르웨이는 제외 대상으로 언급됐다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:20:03&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.83,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;14개 교역 상대; 중국 20%, 합의 불발 시 최대 40%; 베트남 35%&quot;,
+        &quot;observed&quot;: &quot;공식 대상 목록과 세율표 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;기업 원가나 물가에 미칠 영향을 추정하려면 품목, 예외, 발효일과 실제 징수 상태를 먼저 확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;claim_text&quot;: &quot;BTIG·골드만삭스는 반등 추격에 신중하고, BofA는 조정 후 매수와 내년 말 7,800, JPMorgan은 AI 수요 지속과 8,200, HSBC는 AI 수익화 우려와 금리·에너지 가격의 정점 통과 가능성을 제시했다고 한다. UBS는 AMD·브로드컴·마이크론 목표가를 낮췄고, 마이클 버리는 NVDA 풋과 나스닥100 숏을 청산했다고 한다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:26:36&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.84,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;BofA 7,800; JPMorgan 8,200; UBS AMD 700→625달러, 브로드컴 425달러로 하향, 마이크론 1,625→1,100달러&quot;,
+        &quot;observed&quot;: &quot;지수명·기관별 원문·기존 및 신규 목표가·청산 기록 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;기관 전망은 확인되더라도 서로 다른 시점·전제의 의견이다. 대상 지수와 기준일이 빠진 숫자나 확인되지 않은 청산 보도를 매매 신호로 볼 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;claim_text&quot;: &quot;델의 4분기 AI 서버 매출 전망이 사상 최대 235억 달러였고 금융채권은 전분기 대비 5억 달러 늘었다고 한다. 베라 루빈 관련 주문과 수주잔고는 강하나 2027년 공급 부족이 악화할 수 있으며, 당시 AI 주문 축소는 확인되지 않았다고 설명했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:32:48&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.88,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;4분기 AI 서버 매출 전망 235억 달러; 금융채권 전분기 대비 +5억 달러; 2027년 공급 부족 악화 가능성&quot;,
+        &quot;observed&quot;: &quot;2026-11-26 UTC yfinance 조회값 DELL 297.06달러; 비교 가능한 회계·주문 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;235억 달러가 무엇을 측정하는지 확정하기 전에는 분기 매출로 사용할 수 없다. 수주잔고, 공급 능력, 매출 인식과 현금 회수는 각각 확인할 지표다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;claim_text&quot;: &quot;‘뮤즈’로 들리는 AI 에이전트가 인스타그램 광고 성과를 개선하기 시작했고 메타 주가가 3.4% 올랐다고 한다. 광고 개선이 주가 상승의 원인이었는지는 별도 주장이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:32:48&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.81,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;META +3.4%; 광고 효과 개선 폭 미제시&quot;,
+        &quot;observed&quot;: &quot;2026-11-26 UTC yfinance 조회값 META 609.89달러; 세션 수익률과 광고 성과 지표 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;광고 성과의 개선 폭이나 AI의 매출 기여를 추정할 근거가 없다. 3.4% 상승이 확인되더라도 광고 개선이 주가 상승을 일으켰다고 볼 수 없다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C10&quot;,
+      &quot;claim_text&quot;: &quot;워크데이 주가가 실적 발표 직후 하락했다가 상승 전환했고, 진행자는 기업 고객의 AI 도입 효과가 일부 확인됐다고 해석했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:39:03&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.91,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;실적 직후 하락 후 상승 전환; 변동률 및 AI 정량 효과 미제시&quot;,
+        &quot;observed&quot;: &quot;2026-11-26 UTC yfinance 조회값 WDAY 180.44달러; 발표 전후 분봉과 AI 지표 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;AI 도입 지표와 유료 전환·매출 효과를 구분해야 한다. 주가 반전이 확인되더라도 AI가 원인이었다는 근거는 별도로 필요하다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C11&quot;,
+      &quot;claim_text&quot;: &quot;‘앤트로픽’으로 들리는 IPO 종목의 공모가가 83달러이고 주가가 70달러대에서 82달러 부근으로 반등했으며, 개인 순매수가 1억 달러를 넘고 첫날 개인 매수 역대 3위, 시총은 1.5조 달러에서 1조 달러로 감소했으며 BCA가 긍정 평가했다고 한다. ‘스페이스엑스’의 우주 데이터센터 100만 기 승인과 회사·머스크의 트럼프 계좌 주식 각 1주 제공도 확인 대상이다.&quot;,
+      &quot;status&quot;: &quot;asr_uncertain&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:32:48&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.25,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;공모가 83달러; 70달러대→약 82달러; 개인 순매수 1억 달러 초과; 첫날 역대 3위; 시총 1.5조→1조 달러; 100만 기; 각 1주&quot;,
+        &quot;observed&quot;: &quot;발행사·사업자와 비교 가능한 수치 미확인&quot;
+      },
+      &quot;investor_implication&quot;: &quot;발행사와 사업자가 확인되기 전에는 IPO 수치, 승인, 기부를 특정 회사의 투자 정보로 인용하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C12&quot;,
+      &quot;claim_text&quot;: &quot;연휴 중고품 구매 관심이 증가하고 미국 휘발유 가격이 3월 이후 최저였으며, 크라우드스트라이크는 양봉 전환했고 스타벅스는 일본 사업을 매각한다고 전했다. 후티의 PIF 사옥 공격과 유가 관련성도 언급됐다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:20:03&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.5,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;미국 휘발유 3월 이후 최저; 다른 항목에는 대조할 정량 수치 미제시&quot;,
+        &quot;observed&quot;: &quot;휘발유 시계열, CRWD 시가·종가·분봉 및 기업·사건 확인 자료 미제공&quot;
+      },
+      &quot;investor_implication&quot;: &quot;소비 트렌드, 기업 거래, 지정학적 사건을 독립적으로 확인한다. 미확인 사건을 원유 가격 설명이나 관련주 투자 판단에 사용하지 않는다.&quot;
+    }
+  ],
+  &quot;entities&quot;: [
+    {
+      &quot;ticker&quot;: &quot;NVDA&quot;,
+      &quot;name&quot;: &quot;엔비디아&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;주가가 최근 저점을 다시 시험한 가운데, 미국의 대중국 수출 통제 강화가 칩 유통과 대체 구매처 확보에 변수로 지목됐다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;장중 140달러 초반까지 하락했다고 언급&quot;,
+        &quot;메가스피드와 알리바바 자회사를 포함해 약 7개 기업이 블랙리스트에 올랐다고 언급&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;NVDA&quot;,
+        &quot;as_of&quot;: &quot;2026-11-26T22:50:48.011653+00:00&quot;,
+        &quot;current_price&quot;: 149.3000030517578,
+        &quot;market_cap&quot;: 3605147173690.796,
+        &quot;forward_pe&quot;: 8.991117,
+        &quot;trailing_pe&quot;: 16.03652,
+        &quot;fifty_two_week_high&quot;: 243.37,
+        &quot;fifty_two_week_low&quot;: 124.5,
+        &quot;average_target_price&quot;: 242.4278,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;CRWV&quot;,
+      &quot;name&quot;: &quot;코어위브&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;채권과 주가가 하락하고 CDS 프리미엄이 뛰는 가운데, 주관 은행들이 대출 매각을 준비 중이라고 전했다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;2031년 만기 채권 수익률 17.9%&quot;,
+        &quot;주가 장중 약 10% 하락&quot;,
+        &quot;매각 준비 중인 대출 약 45억 달러&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;CRWV&quot;,
+        &quot;as_of&quot;: &quot;2026-11-26T22:50:50.159361+00:00&quot;,
+        &quot;current_price&quot;: 42.56999969482422,
+        &quot;market_cap&quot;: 23674271900.963898,
+        &quot;forward_pe&quot;: -23.90888,
+        &quot;trailing_pe&quot;: null,
+        &quot;fifty_two_week_high&quot;: 138.25,
+        &quot;fifty_two_week_low&quot;: 37.4,
+        &quot;average_target_price&quot;: 114.44737,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;ORCL&quot;,
+      &quot;name&quot;: &quot;오라클&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;코어위브와 함께 CDS 프리미엄이 사상 최고치를 경신했다고 전했다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;ORCL&quot;,
+        &quot;as_of&quot;: &quot;2026-11-26T22:50:52.353162+00:00&quot;,
+        &quot;current_price&quot;: 103.87999725341797,
+        &quot;market_cap&quot;: 323867503255.4391,
+        &quot;forward_pe&quot;: 9.393415,
+        &quot;trailing_pe&quot;: 16.282131,
+        &quot;fifty_two_week_high&quot;: 250.25,
+        &quot;fifty_two_week_low&quot;: 99.34,
+        &quot;average_target_price&quot;: 236.184,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;AMBA&quot;,
+      &quot;name&quot;: &quot;암바렐라&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;DRAM 가격 상승과 공급 부족으로 IoT 고객이 주문을 미루면서 매출 가이던스가 하향됐다고 전했다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;주가 약 35% 하락 후 낙폭 약 19%로 축소&quot;,
+        &quot;매출 가이던스 1억 달러 초과에서 7,000만 달러로 하향&quot;,
+        &quot;뱅크오브아메리카 목표가 70달러→30달러, 로젠블랫 120달러→55달러&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;AMBA&quot;,
+        &quot;as_of&quot;: &quot;2026-11-26T22:50:54.377861+00:00&quot;,
+        &quot;current_price&quot;: 35.68000030517578,
+        &quot;market_cap&quot;: 1574949858.7507553,
+        &quot;forward_pe&quot;: 320.11484,
+        &quot;trailing_pe&quot;: null,
+        &quot;fifty_two_week_high&quot;: 96.36,
+        &quot;fifty_two_week_low&quot;: 30.5,
+        &quot;average_target_price&quot;: 54.36364,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;DELL&quot;,
+      &quot;name&quot;: &quot;델 테크놀로지스&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;수주잔고와 AI 서버 매출 전망은 강하지만, 공급 부족이 실적 개선에도 주가를 압박했다고 설명했다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;4분기 AI 서버 매출 전망 235억 달러로 사상 최대 예상&quot;,
+        &quot;금융채권 전분기 대비 5억 달러 증가&quot;,
+        &quot;2027년 공급 부족 악화 가능성 언급&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;DELL&quot;,
+        &quot;as_of&quot;: &quot;2026-11-26T22:50:56.271529+00:00&quot;,
+        &quot;current_price&quot;: 297.05999755859375,
+        &quot;market_cap&quot;: 188874533962.72278,
+        &quot;forward_pe&quot;: 8.597069,
+        &quot;trailing_pe&quot;: 12.523609,
+        &quot;fifty_two_week_high&quot;: 595.51,
+        &quot;fifty_two_week_low&quot;: 110.22,
+        &quot;average_target_price&quot;: 498.36,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;META&quot;,
+      &quot;name&quot;: &quot;메타 플랫폼스&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;AI 에이전트를 활용한 인스타그램 광고 효과가 개선되기 시작했다는 이야기를 AI 수익화 사례로 제시했다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;주가 3.4% 상승으로 언급&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;META&quot;,
+        &quot;as_of&quot;: &quot;2026-11-26T22:50:57.975199+00:00&quot;,
+        &quot;current_price&quot;: 609.8900146484375,
+        &quot;market_cap&quot;: 1559026015237.1104,
+        &quot;forward_pe&quot;: 17.151987,
+        &quot;trailing_pe&quot;: 20.808258,
+        &quot;fifty_two_week_high&quot;: 779.82,
+        &quot;fifty_two_week_low&quot;: 520.26,
+        &quot;average_target_price&quot;: 842.53656,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;WDAY&quot;,
+      &quot;name&quot;: &quot;워크데이&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;실적 발표 직후 하락했지만, AI 도입 효과가 일부 확인됐다는 해석과 함께 상승 전환했다고 전했다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;WDAY&quot;,
+        &quot;as_of&quot;: &quot;2026-11-26T22:51:00.130413+00:00&quot;,
+        &quot;current_price&quot;: 180.44000244140625,
+        &quot;market_cap&quot;: 42944720581.05469,
+        &quot;forward_pe&quot;: 13.732063,
+        &quot;trailing_pe&quot;: 36.526318,
+        &quot;fifty_two_week_high&quot;: 227.49,
+        &quot;fifty_two_week_low&quot;: 110.36,
+        &quot;average_target_price&quot;: 201.65865,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    }
+  ],
+  &quot;evidence&quot;: [
+    {
+      &quot;evidence_id&quot;: &quot;E1&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;Gold Rises But Big Moves Seen as Unlikely for Now&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/m/e000f3e0-24db-3012-bf3e-8148de8b8a54/gold-rises-but-big-moves-seen.html&quot;,
+      &quot;publisher&quot;: &quot;The Wall Street Journal&quot;,
+      &quot;published_at&quot;: &quot;2026-11-26T17:23:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Gold Rises But Big Moves Seen as Unlikely for Now Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 2026 Elections Weather Newsletters Finance...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E2&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;Copper Road Grab Samples Return 20.3 g/t Au, 45.3 g/t Ag and 1,520 ppm Pb; 2.35 g/t Au and 27.9 g/t Ag; and 1.58% Cu and 92 g/t Ag&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/commodities/articles/copper-road-grab-samples-return-154900311.html&quot;,
+      &quot;publisher&quot;: &quot;GlobeNewswire&quot;,
+      &quot;published_at&quot;: &quot;2026-11-26T15:49:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Copper Road Grab Samples Return 20.3 g/t Au, 45.3 g/t Ag and 1,520 ppm Pb; 2.35 g/t Au and 27.9 g/t Ag; and 1.58% Cu and 92 g/t Ag Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E3&quot;,
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;title&quot;: &quot;Dow Jones Futures Rise On Holiday; Look For This Bullish Market Signal&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/m/158e82fc-b889-34b6-8704-99a49e9a83ae/dow-jones-futures-rise-on.html&quot;,
+      &quot;publisher&quot;: &quot;Investor&#x27;s Business Daily&quot;,
+      &quot;published_at&quot;: &quot;2026-11-26T22:26:09+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E4&quot;,
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;title&quot;: &quot;Jim Lebenthal Says This Is “a Correction, Not Something Worse.” Why He’s Buying More Alphabet&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/jim-lebenthal-says-correction-not-220755815.html&quot;,
+      &quot;publisher&quot;: &quot;24/7 Wall St.&quot;,
+      &quot;published_at&quot;: &quot;2026-11-26T22:07:55+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E5&quot;,
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;title&quot;: &quot;$2,000,000 In QQQ At The 2000 Peak Ran Out&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/2-000-000-qqq-2000-151526518.html&quot;,
+      &quot;publisher&quot;: &quot;Trefis&quot;,
+      &quot;published_at&quot;: &quot;2026-11-26T15:15:26+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E7&quot;,
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;title&quot;: &quot;AMD Stocks Slip 1.75% After Filing Registers 337 Million Shares for Resale&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/amd-stocks-slip-1-75-182928246.html&quot;,
+      &quot;publisher&quot;: &quot;GuruFocus.com&quot;,
+      &quot;published_at&quot;: &quot;2026-11-26T18:29:28+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E8&quot;,
+      &quot;claim_id&quot;: &quot;GLOBAL&quot;,
+      &quot;title&quot;: &quot;Abcourt Announces its Results for the First Quarter Ended September 30, 2026&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/abcourt-announces-results-first-quarter-211500445.html&quot;,
+      &quot;publisher&quot;: &quot;GlobeNewswire&quot;,
+      &quot;published_at&quot;: &quot;2026-11-26T21:15:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E9&quot;,
+      &quot;claim_id&quot;: &quot;GLOBAL&quot;,
+      &quot;title&quot;: &quot;3 Australian Defensive Stocks To Own In November 2026&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/3-australian-defensive-stocks-own-191255261.html&quot;,
+      &quot;publisher&quot;: &quot;Simply Wall St.&quot;,
+      &quot;published_at&quot;: &quot;2026-11-26T19:12:55+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    }
+  ],
+  &quot;source_policy&quot;: {
+    &quot;raw_transcript_published&quot;: false,
+    &quot;raw_transcript_in_evidence&quot;: false,
+    &quot;research_pipeline_version&quot;: 4,
+    &quot;closed_source_claims&quot;: &quot;unverified_external_source&quot;,
+    &quot;auto_caption_warning&quot;: true,
+    &quot;local_asr_warning&quot;: false
+  }
+}</pre>
+  </details>
+</article>
+</main>
+  <style>
+.reader-contents { margin: 16px 0; padding: 12px 16px; border: 1px solid var(--line, #64748b); border-radius: 12px; }
+.reader-contents > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-weight: 750; }
+.reader-contents nav { display: grid; gap: 4px; max-height: 45vh; overflow: auto; margin: 8px 0; }
+.reader-contents a { display: block; min-height: 44px; padding: 10px; border-radius: 6px; color: inherit; overflow-wrap: anywhere; }
+.reader-contents a:hover { background: #80808020; }
+.reader-contents .reader-subsection { padding-inline-start: 24px; font-size: .92em; }
+.reader-prose, .report { overflow-wrap: anywhere; line-height: 1.8; }
+.reader-prose p, .reader-prose li { max-width: 85ch; }
+.reader-prose h2, .reader-prose h3, .reader-prose h4, [data-reader-heading] { scroll-margin-top: 100px; line-height: 1.45; }
+.reader-prose h2 { margin-top: 1.8em; padding-bottom: 8px; border-bottom: 1px solid var(--line, #64748b); }
+.reader-prose h3 { margin-top: 1.5em; }
+.reader-prose li { margin: .5em 0; }
+.reader-prose pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.reader-prose blockquote { margin: 16px 0; padding: 4px 16px; border-left: 3px solid var(--accent, #64748b); }
+.reader-table { overflow: auto; max-width: 100%; margin: 16px 0; border: 1px solid var(--line, #64748b); border-radius: 10px; }
+.reader-table table { border-collapse: collapse; width: 100%; margin: 0; font-size: .92rem; }
+.reader-table th, .reader-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line, #64748b); min-width: 110px; max-width: 400px; overflow-wrap: anywhere; white-space: normal; }
+.reader-table th { background: #80808018; }
+.reader-table tr:nth-child(even) { background: #80808008; }
+.reader-search { display: grid; gap: 8px; margin: 16px 0; }
+.reader-search label { font-weight: 700; }
+.reader-search input { box-sizing: border-box; width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line, #64748b); border-radius: 10px; background: var(--panel, #fff); color: var(--text, #132238); font: inherit; }
+.reader-search p { margin: 0; font-size: .86rem; }
+.reader-back { position: fixed; bottom: max(14px, env(safe-area-inset-bottom)); right: 14px; z-index: 30; min-height: 44px; border: 1px solid #778899; border-radius: 99px; padding: 10px 16px; background: #18344a; color: #fff; font: 700 14px system-ui; cursor: pointer; box-shadow: 0 3px 12px #0003; }
+[data-reader-source] { margin-top: 20px; }
+[data-reader-source] > summary { min-height: 44px; cursor: pointer; }
+[data-reader-source] pre { font-size: .85rem; }
+[data-reader-source] pre, .reader-prose { min-width: 0; }
+.reader-contents :focus-visible, .reader-search :focus-visible, .reader-back:focus-visible, .reader-table:focus-visible { outline: 3px solid var(--accent, #008c95); outline-offset: 3px; }
+.reader-search + .grid > [hidden] { display: none !important; }
+@media (max-width: 600px) { .reader-prose { font-size: 1rem; } .reader-contents { padding: 8px 12px; } }
+@media print { .reader-back, .reader-search, .reader-contents, [data-reader-source] { display: none !important; } .reader-table { overflow: visible; } .reader-prose { color: #000; background: #fff; } }
+</style><script>
+(() => {
+  'use strict';
+  let serial = 0;
+  const rendered = new WeakMap();
+  const node = (tag, text) => { const el = document.createElement(tag); if (text != null) el.textContent = text; return el; };
+  function inline(parent, text) {
+    const pattern = /(`[^`]+`|\*\*[^*]+\*\*|\[[^\]]+\]\(https?:\/\/[^\s)]+\))/g;
+    let start = 0;
+    for (const match of String(text).matchAll(pattern)) {
+      parent.append(document.createTextNode(text.slice(start, match.index)));
+      const value = match[0];
+      if (value.startsWith('`')) parent.append(node('code', value.slice(1, -1)));
+      else if (value.startsWith('**')) parent.append(node('strong', value.slice(2, -2)));
+      else {
+        const link = value.match(/^\[([^\]]+)\]\((.+)\)$/);
+        const a = node('a', link[1]); a.href = link[2]; a.rel = 'noopener noreferrer'; parent.append(a);
+      }
+      start = match.index + value.length;
+    }
+    parent.append(document.createTextNode(text.slice(start)));
+  }
+  const cells = line => line.trim().replace(/^\|/, '').replace(/\|$/, '').split(/(?<!\\)\|/).map(v => v.trim().replace(/\\\|/g, '|'));
+  function markdown(source) {
+    const article = node('article'); article.className = 'reader-prose';
+    const lines = source.split(/\r?\n/); let list = null;
+    for (let i = 0; i < lines.length; i += 1) {
+      const line = lines[i], value = line.trim();
+      if (!value) { list = null; continue; }
+      if (/^```/.test(value)) {
+        const code = []; i += 1;
+        while (i < lines.length && !/^```/.test(lines[i].trim())) code.push(lines[i++]);
+        const pre = node('pre'); pre.append(node('code', code.join('\n'))); article.append(pre); list = null; continue;
+      }
+      if (i + 1 < lines.length && value.includes('|') && cells(lines[i + 1]).every(v => /^:?-{3,}:?$/.test(v))) {
+        const table = node('table'), head = node('thead'), body = node('tbody');
+        const row = (values, tag) => { const tr = node('tr'); values.forEach(v => { const cell = node(tag); if (tag === 'th') cell.scope = 'col'; inline(cell, v); tr.append(cell); }); return tr; };
+        head.append(row(cells(line), 'th')); i += 2;
+        while (i < lines.length && lines[i].trim() && lines[i].includes('|')) body.append(row(cells(lines[i++]), 'td'));
+        i -= 1; table.append(head, body); article.append(table); list = null; continue;
+      }
+      const heading = value.match(/^(#{1,6})\s+(.+)$/);
+      if (heading) { const h = node('h' + Math.min(4, heading[1].length + 1)); inline(h, heading[2]); article.append(h); list = null; continue; }
+      const bullet = value.match(/^(?:[-*+] |\d+\. )(.+)$/);
+      if (bullet) {
+        const tag = /^\d/.test(value) ? 'ol' : 'ul';
+        if (!list || list.tagName.toLowerCase() !== tag) { list = node(tag); if (tag === 'ol') list.start = parseInt(value, 10); article.append(list); }
+        const li = node('li'); inline(li, bullet[1]); list.append(li); continue;
+      }
+      list = null;
+      if (/^(---+|\*\*\*+)$/.test(value)) { article.append(node('hr')); continue; }
+      const p = node(value.startsWith('> ') ? 'blockquote' : 'p'); inline(p, value.startsWith('> ') ? value.slice(2) : line); article.append(p);
+    }
+    return article;
+  }
+  function contents(root) {
+    root.querySelectorAll(':scope > .reader-contents').forEach(el => el.remove());
+    const headings = [...root.querySelectorAll('h2,h3,h4')].filter(h => !h.closest('.card,.run-card,.reader-contents,[data-reader-source],[hidden]'));
+    if (headings.length < 2) return;
+    const details = node('details'); details.className = 'reader-contents';
+    details.append(node('summary', '이 리포트 목차 · ' + headings.length + '개 항목'));
+    const nav = node('nav'); nav.setAttribute('aria-label', '리포트 목차');
+    headings.forEach(h => {
+      if (!h.id) h.id = 'reader-section-' + (++serial);
+      h.dataset.readerHeading = ''; h.tabIndex = -1;
+      const a = node('a', h.textContent); a.href = '#' + h.id;
+      if (h.tagName !== 'H2') a.className = 'reader-subsection';
+      a.addEventListener('click', event => {
+        event.preventDefault();
+        for (let ancestor = h.parentElement; ancestor; ancestor = ancestor.parentElement) if (ancestor.tagName === 'DETAILS') ancestor.open = true;
+        h.scrollIntoView({block: 'start'}); h.focus({preventScroll: true});
+      }); nav.append(a);
+    });
+    details.append(nav); root.prepend(details);
+  }
+  function enhance(root) {
+    if (!root) return;
+    root.querySelectorAll('pre[data-report-markdown]').forEach(pre => {
+      const previous = rendered.get(pre);
+      if (previous && previous.source === pre.textContent) return;
+      const article = markdown(pre.textContent);
+      if (previous) previous.article.replaceWith(article);
+      else {
+        const details = node('details'); details.dataset.readerSource = '';
+        details.append(node('summary', 'Markdown 원문 보기'));
+        pre.before(article, details); details.append(pre);
+      }
+      rendered.set(pre, {source: pre.textContent, article});
+    });
+    root.querySelectorAll('table').forEach(table => {
+      if (table.closest('.reader-table,.account-table-wrap,.summary-scroll')) return;
+      const wrap = node('div'); wrap.className = 'reader-table'; wrap.tabIndex = 0;
+      wrap.setAttribute('role', 'region'); wrap.setAttribute('aria-label', '리포트 표 · 가로로 스크롤하여 전체 보기');
+      table.before(wrap); wrap.append(table);
+    });
+    root.querySelectorAll('.grid').forEach(grid => {
+      const cards = [...grid.querySelectorAll(':scope > a.card')];
+      if (cards.length < 2 || grid.dataset.readerSearch) return;
+      grid.dataset.readerSearch = 'true';
+      const box = node('div'); box.className = 'reader-search';
+      const input = node('input'); input.type = 'search'; input.placeholder = '제목 · 종목 · 채널 · 키워드'; input.id = 'report-search-' + (++serial);
+      const label = node('label', '리포트 찾기'); label.htmlFor = input.id;
+      const status = node('p'); status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
+      const update = () => {
+        const terms = input.value.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean); let count = 0;
+        cards.forEach(card => { card.hidden = !terms.every(t => card.textContent.toLocaleLowerCase().includes(t)); if (!card.hidden) count += 1; });
+        status.textContent = cards.length + '개 중 ' + count + '개 표시' + (count ? '' : ' · 검색어를 지우거나 다른 키워드를 입력하세요.');
+      };
+      input.addEventListener('input', update); box.append(label, input, status); grid.before(box); update();
+    });
+    contents(root);
+  }
+  window.TradingAgentsReader = {enhance};
+  const main = document.querySelector('main');
+  if (main && !main.hasAttribute('data-reader-dynamic')) enhance(main);
+  if (main) {
+    const top = node('button', '↑ 맨 위'); top.type = 'button'; top.className = 'reader-back'; top.setAttribute('aria-label', '리포트 맨 위로 이동');
+    top.addEventListener('click', () => { const target = document.querySelector('h1') || main; target.tabIndex = -1; target.scrollIntoView({block: 'start'}); target.focus({preventScroll: true}); });
+    document.body.append(top);
+  }
+})();
+</script>
+</body>
+</html>

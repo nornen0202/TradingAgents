@@ -1,0 +1,352 @@
+{
+  "version": 4,
+  "video_id": "U8DGcOB8ETo",
+  "title": "\"200빌렸는데 이자 연 80,000%\" 요즘 한국에서 벌어지는 최악의 사채 수법",
+  "url": "https://www.youtube.com/watch?v=U8DGcOB8ETo",
+  "channel": "경제사냥꾼",
+  "channel_id": "UC7usMJDHmtbs_oegmzQKKMA",
+  "source_url": "https://www.youtube.com/@%EA%B2%BD%EC%A0%9C%EC%82%AC%EB%83%A5%EA%BE%BC/shorts",
+  "thumbnail_url": "https://i.ytimg.com/vi/U8DGcOB8ETo/maxresdefault.jpg",
+  "published_at": "2026-11-26T14:00:16+00:00",
+  "status": "unverified",
+  "strategy_source_tier": "STANDARD",
+  "strategy_evidence_weight": "STANDARD",
+  "strategy_validation_policy": "STANDARD_REVIEW",
+  "transcript_status": "available",
+  "transcript_source": "automatic",
+  "transcript_chars": 1565,
+  "transcript_quality": {
+    "status": "good",
+    "score": 1.0,
+    "warnings": [],
+    "source": "automatic",
+    "language": "Korean (Original)",
+    "model_or_format": "json3",
+    "chars": 1565,
+    "segments": 81,
+    "duration_seconds": 126,
+    "repeated_ngram_ratio": 0.0
+  },
+  "generated_at": "2026-11-27T06:51:59.173176+09:00",
+  "llm_status": "success",
+  "research_status": "success",
+  "claim_verification_status": "success",
+  "research_pipeline_version": 4,
+  "evidence_count": 12,
+  "claim_status_summary": {
+    "partially_supported": 5,
+    "supported": 1,
+    "unverified": 6
+  },
+  "claims": [
+    {
+      "claim_id": "C1",
+      "claim_text": "서울경찰청이 11월 24일 불법 대부 일당 22명의 검거를 발표했고, 일당은 약 470명에게 26억 원을 빌려주고 49억 원을 회수했다.",
+      "status": "partially_supported",
+      "confidence": 0.72,
+      "supporting_evidence_ids": [
+        "E1"
+      ],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.74,
+      "asr_confidence": 0.88,
+      "numeric_parse": {
+        "claimed": "지난 24일; 22명; 약 470명; 26억 원 대출; 49억 원 회수",
+        "observed": "2026-11-24 발표 보도; 22명 검거·송치, 그중 2명 구속; 나머지 수치 미확인"
+      },
+      "investor_implication": "검거 인원은 경찰을 인용한 보도로 전하되, 미확인 금액으로 사건 규모나 수익률을 계산하지 않는다."
+    },
+    {
+      "claim_id": "C2",
+      "claim_text": "이 사건의 연이율이 80,138%에 달했다.",
+      "status": "partially_supported",
+      "confidence": 0.57,
+      "supporting_evidence_ids": [
+        "E2",
+        "E4"
+      ],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.57,
+      "asr_confidence": 0.88,
+      "numeric_parse": {
+        "claimed": "연 80,138%",
+        "observed": "보도 제목상 약 연 80,000%; 정확한 수치와 산식 미확인"
+      },
+      "investor_implication": "약 8만%라는 보도와 80,138%라는 미확인 수치를 구분하고, 이를 사건 전체의 평균금리나 실제 1년 납부 이율로 해석하지 않는다."
+    },
+    {
+      "claim_id": "C3",
+      "claim_text": "100만 원을 연 80,000% 단리로 1년 빌린다고 가정하면 이자는 8억 원이다.",
+      "status": "supported",
+      "confidence": 1.0,
+      "supporting_evidence_ids": [],
+      "manual_check_required": false,
+      "timestamp": "00:00:00",
+      "source_confidence": 1.0,
+      "asr_confidence": 0.88,
+      "numeric_parse": {
+        "claimed": "100만 원 × 연 80,000% 단리 × 1년 = 이자 8억 원",
+        "observed": "1,000,000원 × 800 = 800,000,000원; 원금 제외"
+      },
+      "investor_implication": "고율의 크기를 설명하는 예시로만 사용하고 사건의 실제 금액과 분리한다."
+    },
+    {
+      "claim_id": "C4",
+      "claim_text": "한 피해자가 30만 원과 80만 원을 빌린 뒤 하루 150만 원의 연체료가 부과돼 약 두 달 만에 상환 요구액이 2,200만 원에 달했다.",
+      "status": "partially_supported",
+      "confidence": 0.86,
+      "supporting_evidence_ids": [
+        "E2",
+        "E3",
+        "E4"
+      ],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.86,
+      "asr_confidence": 0.88,
+      "numeric_parse": {
+        "claimed": "30만 원 + 80만 원; 하루 연체료 150만 원; 약 두 달 뒤 상환 요구액 2,200만 원",
+        "observed": "원금 합계 110만 원; 하루 최고 150만 원; 약 두 달 뒤 2,200만 원(요구·납부 구분 미확인)"
+      },
+      "investor_implication": "‘하루 최고 150만 원’으로 표기하고, 2,200만 원을 실제 납부액이나 일반적인 피해 규모로 인용하지 않는다."
+    },
+    {
+      "claim_id": "C5",
+      "claim_text": "일당이 채무자에게 다른 업체를 소개해 새 대출로 기존 빚을 갚게 했다.",
+      "status": "unverified",
+      "confidence": 0.15,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.88,
+      "numeric_parse": {
+        "claimed": "",
+        "observed": ""
+      },
+      "investor_implication": "차환을 통한 채무 누적은 영상이 제시한 설명으로만 다루고, 이 사건에서 확인된 업체 간 공모로 묘사하지 않는다."
+    },
+    {
+      "claim_id": "C6",
+      "claim_text": "일당은 가족·지인의 주소와 연락처, 가족관계증명서를 수집하고 단체대화방에 계약서를 공개하거나 가족을 협박했다. 피해자의 아버지가 쓰러졌다는 일화도 있다.",
+      "status": "partially_supported",
+      "confidence": 0.59,
+      "supporting_evidence_ids": [
+        "E2",
+        "E3"
+      ],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.62,
+      "asr_confidence": 0.88,
+      "numeric_parse": {
+        "claimed": "",
+        "observed": ""
+      },
+      "investor_implication": "위협이 가족에게까지 향했다는 보도와 구체적인 정보 수집·공개 수법 및 건강 관련 일화를 구분한다."
+    },
+    {
+      "claim_id": "C7",
+      "claim_text": "서민금융연구원 추산에 따르면 등록 대부업에서도 빌리지 못해 불법 사금융으로 넘어간 저신용자는 작년 최대 11만 9천 명으로, 전년의 약 두 배였다.",
+      "status": "unverified",
+      "confidence": 0.16,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.86,
+      "numeric_parse": {
+        "claimed": "작년 최대 119,000명; 전년의 약 2배",
+        "observed": "게시일 기준 2025년과 2024년은 후보일 뿐이며, 수치와 비교 기준 미확인"
+      },
+      "investor_implication": "11만 9천 명을 실제 피해자 수나 시장 규모로 사용하지 않고, 대출 거절이 불법 사금융 유입을 일으켰다는 인과 근거로도 쓰지 않는다."
+    },
+    {
+      "claim_id": "C8",
+      "claim_text": "경찰이 집계한 피해자의 56%가 20~30대였다.",
+      "status": "unverified",
+      "confidence": 0.15,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.86,
+      "numeric_parse": {
+        "claimed": "피해자 가운데 20~30대 56%",
+        "observed": "비율·분자·분모 모두 미확인"
+      },
+      "investor_implication": "해당 사건의 비율인지도 확인되지 않은 수치를 전국 피해자의 연령 분포로 확대하지 않는다."
+    },
+    {
+      "claim_id": "C9",
+      "claim_text": "작년 7월 22일 이후 체결한 연 60% 초과 계약은 원금과 이자가 무효이고, 미등록 불법 대부업자의 연 60% 이하 계약도 이자가 무효이며 이미 낸 무효 이자는 반환을 요구할 수 있다.",
+      "status": "unverified",
+      "confidence": 0.28,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.2,
+      "asr_confidence": 0.86,
+      "numeric_parse": {
+        "claimed": "작년 7월 22일 이후; 연 60% 초과와 60% 이하 구분",
+        "observed": "게시일 기준 2025-07-22는 후보; 기사 제목에 60% 초과 언급; 법적 적용례 미확인"
+      },
+      "investor_implication": "계약 무효나 반환 가능 여부를 영상만으로 단정하지 않는다. 계약일과 등록 여부에 따라 달라지는 법적 요건은 조문·시행령·부칙 확인 후 보도한다."
+    },
+    {
+      "claim_id": "C10",
+      "claim_text": "금감원 1332로 상담하면 연 60% 초과 계약의 무효 확인서를 금감원이 업체에 직접 보내고 채무자대리인이 추심에 대응할 수 있다. 영상은 대화·이체 기록 보존도 안내한다.",
+      "status": "unverified",
+      "confidence": 0.17,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.86,
+      "numeric_parse": {
+        "claimed": "1332; 연 60% 초과",
+        "observed": "금감원 연락처와 해당 제도의 적용 기준을 확인할 원문 없음"
+      },
+      "investor_implication": "신청하면 확인서가 자동으로 발송되거나 추심 대응을 보장받는다고 안내하지 않는다. 기록 보존은 영상의 조언과 공식 증빙 요건을 구분해 전달한다."
+    },
+    {
+      "claim_id": "C11",
+      "claim_text": "지난 16일부터 신용회복위원회 앱으로 24시간 신청할 수 있고, 다음 달부터 경찰관이 상담 현장에 파견돼 수사를 의뢰할 수 있다.",
+      "status": "partially_supported",
+      "confidence": 0.85,
+      "supporting_evidence_ids": [
+        "E7",
+        "E8",
+        "E9"
+      ],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.82,
+      "asr_confidence": 0.86,
+      "numeric_parse": {
+        "claimed": "지난 16일; 24시간 신청; 다음 달 경찰 파견",
+        "observed": "2026-11-16 앱·웹 24시간 신청 개시 보도; 2026-12 경찰 파견 계획 보도, 실제 시행 미확인"
+      },
+      "investor_implication": "온라인 접수 개시와 경찰 파견 계획을 나눠 보도하고, 파견이 이미 시행됐거나 모든 센터에 적용된다고 말하지 않는다."
+    },
+    {
+      "claim_id": "C12",
+      "claim_text": "제목의 ‘200빌렸는데’가 가리키는 금액의 단위와 거래는 확인되지 않으며, 110만 원 피해 사례나 100만 원 가정 예시와 연결할 근거가 없다.",
+      "status": "unverified",
+      "confidence": 0.16,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.0,
+      "numeric_parse": {
+        "claimed": "제목의 ‘200’(단위 미표기)",
+        "observed": "단위·대상 거래 미확인; 110만 원 피해 사례와 100만 원 산술 예시는 별개"
+      },
+      "investor_implication": "‘200’을 200만 원으로 보완하거나 특정 피해자의 대출액으로 소개하지 않는다."
+    }
+  ],
+  "entities": [],
+  "evidence": [
+    {
+      "evidence_id": "E1",
+      "claim_id": "C1",
+      "title": "\"110만원 빌렸는데 두 달 만에 2200만원\"…가족까지 협박한 불법 ...",
+      "source_url": "//duckduckgo.com/l/?uddg=https%3A%2F%2Fwww.chosun.com%2Fnational%2Fnational_general%2F2026%2F11%2F24%2FS2GM34KFSBB5PDACKSJGJEPBI4%2F&rut=00e2db5c0033f904be14d5d06d8edf785c2ed7bb441e622ba6531223c709f662",
+      "publisher": "duckduckgo.com",
+      "published_at": null,
+      "source_tier": "web",
+      "excerpt": "서울경찰청 광역수사단 광역범죄수사대는 대부업법 위반과 불법 채권 추심 혐의로 무등록 대부업체 총책 A씨 등 22 명을 검거해 서울중앙지방공소청에 송치했다고 24일 밝혔다. 경찰은 이 중 형제 관계인 총책 A씨와 총판 B씨 등 2명을 구속했다."
+    },
+    {
+      "evidence_id": "E2",
+      "claim_id": "C4",
+      "title": "취약층 상대 年8만% 살인적 금리… “못 갚으면 딸 납치하겠다” 협박도",
+      "source_url": "https://www.donga.com/news/Society/article/all/20261125/135084427/2",
+      "publisher": "Naver News",
+      "published_at": "2026-11-25T04:35:00+09:00",
+      "source_tier": "web",
+      "excerpt": "이 같은 불법 소액 대출로 시작된 빚은 걷잡을 수 없이 커졌다. 한 피해자는 30만 원과 80만 원을 빌렸다가 제때 갚지 못하자 두 달 동안 하루 최고 150만 원의 연체료를 물었다. 원금 110만 원이 2200만 원으로 20배가 됐다.... 취약층 상대 年8만% 살인적 금리… “못 갚으면 딸 납치하겠다” 협박도｜동아일보 본문으로 바로가기 검색창 닫기 궁금하신 [ 조희대 탄핵 재초환 부담금 이지영 종부세 80대 회식 이재명 대통령 탄핵 조작기소 특검 엔비디..."
+    },
+    {
+      "evidence_id": "E3",
+      "claim_id": "C4",
+      "title": "50만원 빌려준 다음날 160만원 뜯고…“안 갚으면 딸 납치” 협박도",
+      "source_url": "https://www.donga.com/news/Society/article/all/20261124/135081821/1",
+      "publisher": "Naver News",
+      "published_at": "2026-11-24T19:58:00+09:00",
+      "source_tier": "news",
+      "excerpt": "이같은 불법 소액 대출로 시작된 빚은 걷잡을 수 없이 커졌다. 한 피해자는 30만 원과 80만 원을 빌렸다가 제때 갚지 못하자 두 달 동안 하루 최고 150만 원의 연체료를 물었다. 원금 110만 원이 2200만 원으로 20배가 됐다...."
+    },
+    {
+      "evidence_id": "E5",
+      "claim_id": "C5",
+      "title": "Mayo Lake Minerals Extends Final Closing of $700,000 Private Placement to December 22, 2026",
+      "source_url": "https://finance.yahoo.com/markets/stocks/articles/mayo-lake-minerals-extends-final-141200639.html",
+      "publisher": "TMX Newsfile",
+      "published_at": "2026-11-26T14:12:00+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    },
+    {
+      "evidence_id": "E6",
+      "claim_id": "C9",
+      "title": "SoftBank Group Stocks Jump 7.32% as AI Rebound Lifts Tokyo After a 14.83% Rout",
+      "source_url": "https://finance.yahoo.com/markets/stocks/articles/softbank-group-stocks-jump-7-184827003.html",
+      "publisher": "GuruFocus.com",
+      "published_at": "2026-11-26T18:48:27+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    },
+    {
+      "evidence_id": "E7",
+      "claim_id": "C11",
+      "title": "정형돈 “100만 원 정도 필요한데...” 대부업체 전화 걸었다가 한 달 이...",
+      "source_url": "https://www.sedaily.com/article/20117697?ref=naver",
+      "publisher": "Naver News",
+      "published_at": "2026-11-23T12:17:00+09:00",
+      "source_tier": "news",
+      "excerpt": "24시간 불법사금융 피해 지원을 신청할 수 있게 했다. 올해 2~10월 신용회복위원회를 통한 피해 상담은 1239명, 경찰 수사 의뢰는 1178명으로 집계됐다. 경찰, 특별자수·신고기간 운영…12월 신복위에 경찰관 파견..."
+    },
+    {
+      "evidence_id": "E8",
+      "claim_id": "C11",
+      "title": "불법사금융 피해 '원스톱 지원', 이제 온라인으로 야간·주말에도 신청",
+      "source_url": "http://www.dailypop.kr/news/articleView.html?idxno=104621",
+      "publisher": "Naver News",
+      "published_at": "2026-11-17T11:56:00+09:00",
+      "source_tier": "news",
+      "excerpt": "정부는 온라인 창구를 연 초기에 신청이 몰릴 수 있다고 보고 처리 현황을 점검하기로 했다. 다음 달에는 신용회복위원회에 경찰관을 파견해 상담 단계에서도 수사의뢰가 가능하도록 절차를 바꿀 예정이다."
+    },
+    {
+      "evidence_id": "E10",
+      "claim_id": "GLOBAL",
+      "title": "Why Are Crypto Traders Still Betting on a Chip Fund That Fell 78%?",
+      "source_url": "https://finance.yahoo.com/markets/crypto/articles/why-crypto-traders-still-betting-150000341.html",
+      "publisher": "BeInCrypto",
+      "published_at": "2026-11-25T15:00:00+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    },
+    {
+      "evidence_id": "E11",
+      "claim_id": "GLOBAL",
+      "title": "Dow, S&P 500, Nasdaq Futures Edge Lower Amid Tech Selloff Ahead Of Key Inflation Data: DELL, AMBA, SOXL, MSTR In Focus",
+      "source_url": "https://finance.yahoo.com/markets/stocks/articles/dow-p-500-nasdaq-futures-032010769.html",
+      "publisher": "Stocktwits",
+      "published_at": "2026-11-25T03:20:10+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    }
+  ],
+  "source_policy": {
+    "raw_transcript_published": false,
+    "raw_transcript_in_evidence": false,
+    "research_pipeline_version": 4,
+    "closed_source_claims": "unverified_external_source",
+    "auto_caption_warning": true,
+    "local_asr_warning": false
+  }
+}

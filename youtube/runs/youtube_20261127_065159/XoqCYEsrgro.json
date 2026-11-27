@@ -1,0 +1,525 @@
+{
+  "version": 4,
+  "video_id": "XoqCYEsrgro",
+  "title": "나스닥, 급락 출발 이후 낙폭 축소…엔비디아, 코어위브 등 변동성 지속 | 여도은, 박명석 큐레이터 [월가 뉴스레터]",
+  "url": "https://www.youtube.com/watch?v=XoqCYEsrgro",
+  "channel": "삼프로TV 3PROTV",
+  "channel_id": "UChlv4GSd7OQl3js-jkLOnFA",
+  "source_url": "https://www.youtube.com/@3protv/videos",
+  "thumbnail_url": "https://i.ytimg.com/vi/XoqCYEsrgro/maxresdefault.jpg",
+  "published_at": "2026-11-25T22:17:18+00:00",
+  "status": "asr_uncertain",
+  "strategy_source_tier": "STANDARD",
+  "strategy_evidence_weight": "STANDARD",
+  "strategy_validation_policy": "STANDARD_REVIEW",
+  "transcript_status": "available",
+  "transcript_source": "automatic",
+  "transcript_chars": 22170,
+  "transcript_quality": {
+    "status": "good",
+    "score": 1.0,
+    "warnings": [],
+    "source": "automatic",
+    "language": "Korean",
+    "model_or_format": "json3",
+    "chars": 22170,
+    "segments": 1303,
+    "duration_seconds": 2696,
+    "repeated_ngram_ratio": 0.0
+  },
+  "generated_at": "2026-11-27T06:51:59.173176+09:00",
+  "llm_status": "success",
+  "research_status": "success",
+  "claim_verification_status": "success",
+  "research_pipeline_version": 4,
+  "evidence_count": 9,
+  "claim_status_summary": {
+    "unverified": 11,
+    "asr_uncertain": 1
+  },
+  "claims": [
+    {
+      "claim_id": "C1",
+      "claim_text": "나스닥은 장중 약 5% 하락한 뒤 저점 대비 약 4% 반등해 0.6% 하락 마감했고, S&P 500은 0.25% 하락, 다우는 0.3% 상승, 러셀 2000은 0.6% 상승했다고 한다. 비트코인은 6만 달러를 회복했고 공포·탐욕 지수는 장중 9로 3월 이후 최저였다고 한다. 숏커버와 매도세 약화는 반등 원인에 대한 가설이다.",
+      "status": "unverified",
+      "confidence": 0.0,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.86,
+      "numeric_parse": {
+        "claimed": "나스닥 장중 약 -5%, 저점 대비 약 +4%, 종가 -0.6%; S&P 500 -0.25%; 다우 +0.3%; 러셀 2000 +0.6%; BTC 6만 달러; 공포·탐욕 9",
+        "observed": "해당 세션의 지수 종가·분봉, BTC 분봉 및 공포·탐욕 지수 기록 미제공"
+      },
+      "investor_implication": "거래일과 가격 기준이 확인되기 전에는 반등 폭이나 원인을 근거로 위험선호가 회복됐다고 판단할 수 없다."
+    },
+    {
+      "claim_id": "C2",
+      "claim_text": "엔비디아가 장중 140달러 초반의 최근 저점을 시험했고, 미국이 Megaspeed와 알리바바 자회사 등 약 7개사를 제재 명단에 올리자 칩 유통업체가 대체 구매처를 찾았다고 한다. 경영진 사임·복귀, 중국 개입 관련 당국 입장과 트럼프·밴스 발언, OpenAI·Anthropic의 증류 추적 및 DeepSeek 기술 격차 발언의 귀속도 확인 대상이다.",
+      "status": "unverified",
+      "confidence": 0.0,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:00:00",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.6,
+      "numeric_parse": {
+        "claimed": "장중 140달러 초반; 약 7개 법인; 기술 격차 3~6개월→9개월; 별도 확인 대상 장중 -8% 및 월요일 +31%",
+        "observed": "2026-11-26 UTC yfinance 조회값 NVDA 149.30달러; 비교 가능한 분봉, 법인 수, 격차 수치 없음"
+      },
+      "investor_implication": "수출 규정의 대상·효력과 실제 주문·판매 영향은 별개다. 명단 규모나 대체 구매처 관련 발언을 매출 추정에 반영할 근거는 없다."
+    },
+    {
+      "claim_id": "C3",
+      "claim_text": "코어위브 2031년물 수익률이 17.9%에 이르고 주가가 장중 약 10% 하락했으며, 코어위브와 오라클 CDS가 사상 최고치를 기록했다고 한다. 주관 은행들이 메타 프로젝트 관련분을 포함한 약 45억 달러 규모 대출의 매각을 준비했다는 주장도 나왔다.",
+      "status": "unverified",
+      "confidence": 0.0,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:06:51",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.86,
+      "numeric_parse": {
+        "claimed": "CRWV 2031년물 17.9%; 장중 약 -10%; 대출 약 45억 달러; 양사 CDS 사상 최고",
+        "observed": "2026-11-26 UTC yfinance 조회값 CRWV 42.57달러, ORCL 103.88달러; 채권·CDS·대출 수치 없음"
+      },
+      "investor_implication": "조달비용 상승과 대주단의 익스포저 축소는 검증할 위험이다. 매각 준비를 거래 종결이나 채무불이행 신호로 해석할 수 없다."
+    },
+    {
+      "claim_id": "C4",
+      "claim_text": "암바렐라로 들리는 발행사에서 DRAM 가격·공급 문제로 비AI IoT 고객이 주문을 미뤄 매출 전망이 1억 달러 초과에서 7,000만 달러로 낮아졌고, 주가는 약 35% 하락한 뒤 낙폭을 약 19%로 줄였다고 한다. BofA와 Rosenblatt도 목표가를 낮췄다고 한다.",
+      "status": "unverified",
+      "confidence": 0.0,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:13:23",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.9,
+      "numeric_parse": {
+        "claimed": "가이던스 1억 달러 초과→7,000만 달러; 주가 약 -35%→-19%; BofA 70→30달러; Rosenblatt 120→55달러",
+        "observed": "2026-11-26 UTC yfinance 조회값 AMBA 35.68달러, 평균 목표가 54.36달러; 해당 분기 가이던스·분봉·기관별 목표가 없음"
+      },
+      "investor_implication": "발행사와 회계분기를 확인하기 전에는 가이던스 수치를 인용하지 않는다. 비AI IoT 주문 지연이 확인되더라도 AI 주문 취소나 수요 위축으로 일반화할 수 없다."
+    },
+    {
+      "claim_id": "C5",
+      "claim_text": "10월 근원 PCE가 3.3%로 예상 3.2%를 웃돌고 주거비 제외 근원 서비스 물가가 4%를 넘었으며, 소득은 늘고 소비는 부진했다고 한다. 진행자는 12월 25bp 인상을 기본 시나리오로, 50bp 인상 확률을 2.5%로 제시했다. 소비자 41%가 250달러 비상지출을 감당하기 어렵다는 조사도 인용됐다.",
+      "status": "unverified",
+      "confidence": 0.0,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:13:23",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.8,
+      "numeric_parse": {
+        "claimed": "근원 PCE 3.3% 대 예상 3.2%; 주거비 제외 근원 서비스 4% 초과; 12월 +25bp 기본, +50bp 확률 2.5%; 소비자 41%, 비상지출 250달러",
+        "observed": "당시 지표·컨센서스·금리선물·설문 수치 미제공"
+      },
+      "investor_implication": "물가 서프라이즈와 금리 인상 확률을 전제로 투자 판단을 내리기 전에 발표 연도, 비교 기준과 당시 시장 가격을 확인해야 한다."
+    },
+    {
+      "claim_id": "C6",
+      "claim_text": "미국이 구조적 산업 과잉설비를 근거로 14개 교역 상대에 신규 관세를 추진하고 중국 20%, 합의 불발 시 최대 40%, 베트남 35%를 거론했다고 한다. 유럽·일본·한국·인도는 검토 대상, 멕시코·노르웨이는 제외 대상으로 언급됐다.",
+      "status": "unverified",
+      "confidence": 0.0,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:20:03",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.83,
+      "numeric_parse": {
+        "claimed": "14개 교역 상대; 중국 20%, 합의 불발 시 최대 40%; 베트남 35%",
+        "observed": "공식 대상 목록과 세율표 미제공"
+      },
+      "investor_implication": "기업 원가나 물가에 미칠 영향을 추정하려면 품목, 예외, 발효일과 실제 징수 상태를 먼저 확인해야 한다."
+    },
+    {
+      "claim_id": "C7",
+      "claim_text": "BTIG·골드만삭스는 반등 추격에 신중하고, BofA는 조정 후 매수와 내년 말 7,800, JPMorgan은 AI 수요 지속과 8,200, HSBC는 AI 수익화 우려와 금리·에너지 가격의 정점 통과 가능성을 제시했다고 한다. UBS는 AMD·브로드컴·마이크론 목표가를 낮췄고, 마이클 버리는 NVDA 풋과 나스닥100 숏을 청산했다고 한다.",
+      "status": "unverified",
+      "confidence": 0.0,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:26:36",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.84,
+      "numeric_parse": {
+        "claimed": "BofA 7,800; JPMorgan 8,200; UBS AMD 700→625달러, 브로드컴 425달러로 하향, 마이크론 1,625→1,100달러",
+        "observed": "지수명·기관별 원문·기존 및 신규 목표가·청산 기록 미제공"
+      },
+      "investor_implication": "기관 전망은 확인되더라도 서로 다른 시점·전제의 의견이다. 대상 지수와 기준일이 빠진 숫자나 확인되지 않은 청산 보도를 매매 신호로 볼 수 없다."
+    },
+    {
+      "claim_id": "C8",
+      "claim_text": "델의 4분기 AI 서버 매출 전망이 사상 최대 235억 달러였고 금융채권은 전분기 대비 5억 달러 늘었다고 한다. 베라 루빈 관련 주문과 수주잔고는 강하나 2027년 공급 부족이 악화할 수 있으며, 당시 AI 주문 축소는 확인되지 않았다고 설명했다.",
+      "status": "unverified",
+      "confidence": 0.0,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:32:48",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.88,
+      "numeric_parse": {
+        "claimed": "4분기 AI 서버 매출 전망 235억 달러; 금융채권 전분기 대비 +5억 달러; 2027년 공급 부족 악화 가능성",
+        "observed": "2026-11-26 UTC yfinance 조회값 DELL 297.06달러; 비교 가능한 회계·주문 자료 없음"
+      },
+      "investor_implication": "235억 달러가 무엇을 측정하는지 확정하기 전에는 분기 매출로 사용할 수 없다. 수주잔고, 공급 능력, 매출 인식과 현금 회수는 각각 확인할 지표다."
+    },
+    {
+      "claim_id": "C9",
+      "claim_text": "‘뮤즈’로 들리는 AI 에이전트가 인스타그램 광고 성과를 개선하기 시작했고 메타 주가가 3.4% 올랐다고 한다. 광고 개선이 주가 상승의 원인이었는지는 별도 주장이다.",
+      "status": "unverified",
+      "confidence": 0.0,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:32:48",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.81,
+      "numeric_parse": {
+        "claimed": "META +3.4%; 광고 효과 개선 폭 미제시",
+        "observed": "2026-11-26 UTC yfinance 조회값 META 609.89달러; 세션 수익률과 광고 성과 지표 없음"
+      },
+      "investor_implication": "광고 성과의 개선 폭이나 AI의 매출 기여를 추정할 근거가 없다. 3.4% 상승이 확인되더라도 광고 개선이 주가 상승을 일으켰다고 볼 수 없다."
+    },
+    {
+      "claim_id": "C10",
+      "claim_text": "워크데이 주가가 실적 발표 직후 하락했다가 상승 전환했고, 진행자는 기업 고객의 AI 도입 효과가 일부 확인됐다고 해석했다.",
+      "status": "unverified",
+      "confidence": 0.0,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:39:03",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.91,
+      "numeric_parse": {
+        "claimed": "실적 직후 하락 후 상승 전환; 변동률 및 AI 정량 효과 미제시",
+        "observed": "2026-11-26 UTC yfinance 조회값 WDAY 180.44달러; 발표 전후 분봉과 AI 지표 없음"
+      },
+      "investor_implication": "AI 도입 지표와 유료 전환·매출 효과를 구분해야 한다. 주가 반전이 확인되더라도 AI가 원인이었다는 근거는 별도로 필요하다."
+    },
+    {
+      "claim_id": "C11",
+      "claim_text": "‘앤트로픽’으로 들리는 IPO 종목의 공모가가 83달러이고 주가가 70달러대에서 82달러 부근으로 반등했으며, 개인 순매수가 1억 달러를 넘고 첫날 개인 매수 역대 3위, 시총은 1.5조 달러에서 1조 달러로 감소했으며 BCA가 긍정 평가했다고 한다. ‘스페이스엑스’의 우주 데이터센터 100만 기 승인과 회사·머스크의 트럼프 계좌 주식 각 1주 제공도 확인 대상이다.",
+      "status": "asr_uncertain",
+      "confidence": 0.0,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:32:48",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.25,
+      "numeric_parse": {
+        "claimed": "공모가 83달러; 70달러대→약 82달러; 개인 순매수 1억 달러 초과; 첫날 역대 3위; 시총 1.5조→1조 달러; 100만 기; 각 1주",
+        "observed": "발행사·사업자와 비교 가능한 수치 미확인"
+      },
+      "investor_implication": "발행사와 사업자가 확인되기 전에는 IPO 수치, 승인, 기부를 특정 회사의 투자 정보로 인용하지 않는다."
+    },
+    {
+      "claim_id": "C12",
+      "claim_text": "연휴 중고품 구매 관심이 증가하고 미국 휘발유 가격이 3월 이후 최저였으며, 크라우드스트라이크는 양봉 전환했고 스타벅스는 일본 사업을 매각한다고 전했다. 후티의 PIF 사옥 공격과 유가 관련성도 언급됐다.",
+      "status": "unverified",
+      "confidence": 0.0,
+      "supporting_evidence_ids": [],
+      "manual_check_required": true,
+      "timestamp": "00:20:03",
+      "source_confidence": 0.0,
+      "asr_confidence": 0.5,
+      "numeric_parse": {
+        "claimed": "미국 휘발유 3월 이후 최저; 다른 항목에는 대조할 정량 수치 미제시",
+        "observed": "휘발유 시계열, CRWD 시가·종가·분봉 및 기업·사건 확인 자료 미제공"
+      },
+      "investor_implication": "소비 트렌드, 기업 거래, 지정학적 사건을 독립적으로 확인한다. 미확인 사건을 원유 가격 설명이나 관련주 투자 판단에 사용하지 않는다."
+    }
+  ],
+  "entities": [
+    {
+      "ticker": "NVDA",
+      "name": "엔비디아",
+      "status": "unverified",
+      "claims": [
+        "주가가 최근 저점을 다시 시험한 가운데, 미국의 대중국 수출 통제 강화가 칩 유통과 대체 구매처 확보에 변수로 지목됐다."
+      ],
+      "numeric_claims": [
+        "장중 140달러 초반까지 하락했다고 언급",
+        "메가스피드와 알리바바 자회사를 포함해 약 7개 기업이 블랙리스트에 올랐다고 언급"
+      ],
+      "verification_notes": [
+        "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+      ],
+      "market_snapshot": {
+        "ticker": "NVDA",
+        "as_of": "2026-11-26T22:50:48.011653+00:00",
+        "current_price": 149.3000030517578,
+        "market_cap": 3605147173690.796,
+        "forward_pe": 8.991117,
+        "trailing_pe": 16.03652,
+        "fifty_two_week_high": 243.37,
+        "fifty_two_week_low": 124.5,
+        "average_target_price": 242.4278,
+        "source": "yfinance",
+        "status": "verified"
+      },
+      "external_context_status": "verified"
+    },
+    {
+      "ticker": "CRWV",
+      "name": "코어위브",
+      "status": "unverified",
+      "claims": [
+        "채권과 주가가 하락하고 CDS 프리미엄이 뛰는 가운데, 주관 은행들이 대출 매각을 준비 중이라고 전했다."
+      ],
+      "numeric_claims": [
+        "2031년 만기 채권 수익률 17.9%",
+        "주가 장중 약 10% 하락",
+        "매각 준비 중인 대출 약 45억 달러"
+      ],
+      "verification_notes": [
+        "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+      ],
+      "market_snapshot": {
+        "ticker": "CRWV",
+        "as_of": "2026-11-26T22:50:50.159361+00:00",
+        "current_price": 42.56999969482422,
+        "market_cap": 23674271900.963898,
+        "forward_pe": -23.90888,
+        "trailing_pe": null,
+        "fifty_two_week_high": 138.25,
+        "fifty_two_week_low": 37.4,
+        "average_target_price": 114.44737,
+        "source": "yfinance",
+        "status": "verified"
+      },
+      "external_context_status": "verified"
+    },
+    {
+      "ticker": "ORCL",
+      "name": "오라클",
+      "status": "unverified",
+      "claims": [
+        "코어위브와 함께 CDS 프리미엄이 사상 최고치를 경신했다고 전했다."
+      ],
+      "numeric_claims": [],
+      "verification_notes": [
+        "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+      ],
+      "market_snapshot": {
+        "ticker": "ORCL",
+        "as_of": "2026-11-26T22:50:52.353162+00:00",
+        "current_price": 103.87999725341797,
+        "market_cap": 323867503255.4391,
+        "forward_pe": 9.393415,
+        "trailing_pe": 16.282131,
+        "fifty_two_week_high": 250.25,
+        "fifty_two_week_low": 99.34,
+        "average_target_price": 236.184,
+        "source": "yfinance",
+        "status": "verified"
+      },
+      "external_context_status": "verified"
+    },
+    {
+      "ticker": "AMBA",
+      "name": "암바렐라",
+      "status": "unverified",
+      "claims": [
+        "DRAM 가격 상승과 공급 부족으로 IoT 고객이 주문을 미루면서 매출 가이던스가 하향됐다고 전했다."
+      ],
+      "numeric_claims": [
+        "주가 약 35% 하락 후 낙폭 약 19%로 축소",
+        "매출 가이던스 1억 달러 초과에서 7,000만 달러로 하향",
+        "뱅크오브아메리카 목표가 70달러→30달러, 로젠블랫 120달러→55달러"
+      ],
+      "verification_notes": [
+        "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+      ],
+      "market_snapshot": {
+        "ticker": "AMBA",
+        "as_of": "2026-11-26T22:50:54.377861+00:00",
+        "current_price": 35.68000030517578,
+        "market_cap": 1574949858.7507553,
+        "forward_pe": 320.11484,
+        "trailing_pe": null,
+        "fifty_two_week_high": 96.36,
+        "fifty_two_week_low": 30.5,
+        "average_target_price": 54.36364,
+        "source": "yfinance",
+        "status": "verified"
+      },
+      "external_context_status": "verified"
+    },
+    {
+      "ticker": "DELL",
+      "name": "델 테크놀로지스",
+      "status": "unverified",
+      "claims": [
+        "수주잔고와 AI 서버 매출 전망은 강하지만, 공급 부족이 실적 개선에도 주가를 압박했다고 설명했다."
+      ],
+      "numeric_claims": [
+        "4분기 AI 서버 매출 전망 235억 달러로 사상 최대 예상",
+        "금융채권 전분기 대비 5억 달러 증가",
+        "2027년 공급 부족 악화 가능성 언급"
+      ],
+      "verification_notes": [
+        "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+      ],
+      "market_snapshot": {
+        "ticker": "DELL",
+        "as_of": "2026-11-26T22:50:56.271529+00:00",
+        "current_price": 297.05999755859375,
+        "market_cap": 188874533962.72278,
+        "forward_pe": 8.597069,
+        "trailing_pe": 12.523609,
+        "fifty_two_week_high": 595.51,
+        "fifty_two_week_low": 110.22,
+        "average_target_price": 498.36,
+        "source": "yfinance",
+        "status": "verified"
+      },
+      "external_context_status": "verified"
+    },
+    {
+      "ticker": "META",
+      "name": "메타 플랫폼스",
+      "status": "unverified",
+      "claims": [
+        "AI 에이전트를 활용한 인스타그램 광고 효과가 개선되기 시작했다는 이야기를 AI 수익화 사례로 제시했다."
+      ],
+      "numeric_claims": [
+        "주가 3.4% 상승으로 언급"
+      ],
+      "verification_notes": [
+        "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+      ],
+      "market_snapshot": {
+        "ticker": "META",
+        "as_of": "2026-11-26T22:50:57.975199+00:00",
+        "current_price": 609.8900146484375,
+        "market_cap": 1559026015237.1104,
+        "forward_pe": 17.151987,
+        "trailing_pe": 20.808258,
+        "fifty_two_week_high": 779.82,
+        "fifty_two_week_low": 520.26,
+        "average_target_price": 842.53656,
+        "source": "yfinance",
+        "status": "verified"
+      },
+      "external_context_status": "verified"
+    },
+    {
+      "ticker": "WDAY",
+      "name": "워크데이",
+      "status": "unverified",
+      "claims": [
+        "실적 발표 직후 하락했지만, AI 도입 효과가 일부 확인됐다는 해석과 함께 상승 전환했다고 전했다."
+      ],
+      "numeric_claims": [],
+      "verification_notes": [
+        "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+      ],
+      "market_snapshot": {
+        "ticker": "WDAY",
+        "as_of": "2026-11-26T22:51:00.130413+00:00",
+        "current_price": 180.44000244140625,
+        "market_cap": 42944720581.05469,
+        "forward_pe": 13.732063,
+        "trailing_pe": 36.526318,
+        "fifty_two_week_high": 227.49,
+        "fifty_two_week_low": 110.36,
+        "average_target_price": 201.65865,
+        "source": "yfinance",
+        "status": "verified"
+      },
+      "external_context_status": "verified"
+    }
+  ],
+  "evidence": [
+    {
+      "evidence_id": "E1",
+      "claim_id": "C1",
+      "title": "Gold Rises But Big Moves Seen as Unlikely for Now",
+      "source_url": "https://finance.yahoo.com/m/e000f3e0-24db-3012-bf3e-8148de8b8a54/gold-rises-but-big-moves-seen.html",
+      "publisher": "The Wall Street Journal",
+      "published_at": "2026-11-26T17:23:00+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "Gold Rises But Big Moves Seen as Unlikely for Now Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 2026 Elections Weather Newsletters Finance..."
+    },
+    {
+      "evidence_id": "E2",
+      "claim_id": "C1",
+      "title": "Copper Road Grab Samples Return 20.3 g/t Au, 45.3 g/t Ag and 1,520 ppm Pb; 2.35 g/t Au and 27.9 g/t Ag; and 1.58% Cu and 92 g/t Ag",
+      "source_url": "https://finance.yahoo.com/markets/commodities/articles/copper-road-grab-samples-return-154900311.html",
+      "publisher": "GlobeNewswire",
+      "published_at": "2026-11-26T15:49:00+00:00",
+      "source_tier": "market_or_news",
+      "excerpt": "Copper Road Grab Samples Return 20.3 g/t Au, 45.3 g/t Ag and 1,520 ppm Pb; 2.35 g/t Au and 27.9 g/t Ag; and 1.58% Cu and 92 g/t Ag Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US..."
+    },
+    {
+      "evidence_id": "E3",
+      "claim_id": "C2",
+      "title": "Dow Jones Futures Rise On Holiday; Look For This Bullish Market Signal",
+      "source_url": "https://finance.yahoo.com/m/158e82fc-b889-34b6-8704-99a49e9a83ae/dow-jones-futures-rise-on.html",
+      "publisher": "Investor's Business Daily",
+      "published_at": "2026-11-26T22:26:09+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    },
+    {
+      "evidence_id": "E4",
+      "claim_id": "C4",
+      "title": "Jim Lebenthal Says This Is “a Correction, Not Something Worse.” Why He’s Buying More Alphabet",
+      "source_url": "https://finance.yahoo.com/markets/stocks/articles/jim-lebenthal-says-correction-not-220755815.html",
+      "publisher": "24/7 Wall St.",
+      "published_at": "2026-11-26T22:07:55+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    },
+    {
+      "evidence_id": "E5",
+      "claim_id": "C4",
+      "title": "$2,000,000 In QQQ At The 2000 Peak Ran Out",
+      "source_url": "https://finance.yahoo.com/markets/stocks/articles/2-000-000-qqq-2000-151526518.html",
+      "publisher": "Trefis",
+      "published_at": "2026-11-26T15:15:26+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    },
+    {
+      "evidence_id": "E7",
+      "claim_id": "C9",
+      "title": "AMD Stocks Slip 1.75% After Filing Registers 337 Million Shares for Resale",
+      "source_url": "https://finance.yahoo.com/markets/stocks/articles/amd-stocks-slip-1-75-182928246.html",
+      "publisher": "GuruFocus.com",
+      "published_at": "2026-11-26T18:29:28+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    },
+    {
+      "evidence_id": "E8",
+      "claim_id": "GLOBAL",
+      "title": "Abcourt Announces its Results for the First Quarter Ended September 30, 2026",
+      "source_url": "https://finance.yahoo.com/markets/stocks/articles/abcourt-announces-results-first-quarter-211500445.html",
+      "publisher": "GlobeNewswire",
+      "published_at": "2026-11-26T21:15:00+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    },
+    {
+      "evidence_id": "E9",
+      "claim_id": "GLOBAL",
+      "title": "3 Australian Defensive Stocks To Own In November 2026",
+      "source_url": "https://finance.yahoo.com/markets/stocks/articles/3-australian-defensive-stocks-own-191255261.html",
+      "publisher": "Simply Wall St.",
+      "published_at": "2026-11-26T19:12:55+00:00",
+      "source_tier": "news",
+      "excerpt": ""
+    }
+  ],
+  "source_policy": {
+    "raw_transcript_published": false,
+    "raw_transcript_in_evidence": false,
+    "research_pipeline_version": 4,
+    "closed_source_claims": "unverified_external_source",
+    "auto_caption_warning": true,
+    "local_asr_warning": false
+  }
+}
