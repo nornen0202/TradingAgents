@@ -1,0 +1,662 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YouTube 투자자용 검증 리포트 - 나스닥, 4년차 강세장을 지켜낼 수 있을까?...금리인상기 뉴욕증시 투자 전략 | 여도은, 박명석 큐레이터 [월가 뉴스레터]</title>
+  <style>
+:root {
+  color-scheme: light;
+  --bg: #f7f8fb;
+  --panel: #ffffff;
+  --text: #172033;
+  --muted: #667085;
+  --line: #d9dee8;
+  --accent: #0f766e;
+  --accent-2: #2563eb;
+  --warn: #b45309;
+  --bad: #b42318;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0 56px; }
+a { color: var(--accent-2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.hero { padding: 28px 0 22px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+.hero.compact { padding-top: 12px; }
+.hero h1 { margin: 0; font-size: clamp(28px, 4vw, 44px); line-height: 1.15; letter-spacing: 0; }
+.hero p { max-width: 760px; color: var(--muted); margin: 12px 0 0; }
+.eyebrow { color: var(--accent); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0; margin: 0 0 8px; }
+section { margin: 28px 0; }
+h2, h3, h4, h5 { letter-spacing: 0; line-height: 1.25; }
+.synthesis-callout { padding: clamp(20px, 4vw, 34px); border: 1px solid #6ee7d8; border-radius: 18px; background: linear-gradient(135deg, #ecfdf9 0%, #eff6ff 100%); box-shadow: 0 18px 44px rgba(15, 118, 110, .12); }
+.synthesis-callout.unavailable { border-color: var(--line); background: var(--panel); box-shadow: none; }
+.synthesis-callout h2 { margin: 0; font-size: clamp(24px, 3.2vw, 36px); }
+.synthesis-callout .lead { max-width: 900px; font-size: 17px; color: #334155; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.primary-link, .secondary-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border-radius: 999px; font-weight: 800; }
+.primary-link { color: white; background: var(--accent); }
+.secondary-link { color: var(--accent-2); border: 1px solid #93c5fd; background: white; }
+.primary-link:hover, .secondary-link:hover { text-decoration: none; filter: brightness(.97); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.card, .run { display: flex; flex-direction: column; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; color: var(--text); min-height: 128px; }
+.run { padding: 16px; }
+.card:hover, .run:hover { border-color: var(--accent-2); text-decoration: none; }
+.thumb { display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #e9edf5; border-radius: 8px 8px 0 0; color: var(--muted); font-size: 13px; font-weight: 700; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb-empty span { padding: 0 14px; text-align: center; }
+.card-body { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 16px; }
+.card strong { line-height: 1.35; }
+.source-line { color: #3f4a5f; font-weight: 600; }
+.runs { display: grid; gap: 10px; }
+.badge { display: inline-flex; width: fit-content; border-radius: 999px; padding: 2px 9px; background: #e6f4f1; color: var(--accent); font-size: 12px; font-weight: 700; }
+.status-contradicted, .status-llm_failed { background: #fee4e2; color: var(--bad); }
+.status-unverified, .status-stale { background: #fff4d6; color: var(--warn); }
+small, .muted { color: var(--muted); }
+.topnav { display: flex; gap: 14px; margin-bottom: 16px; font-size: 14px; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px; }
+.stats span { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
+.report { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: min(5vw, 36px); }
+.report-head { border-bottom: 1px solid var(--line); margin-bottom: 24px; padding-bottom: 20px; }
+.report-head h1 { margin: 0; font-size: clamp(24px, 3.5vw, 38px); line-height: 1.2; }
+.meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+.scope-note { padding: 12px 14px; border-left: 4px solid var(--warn); border-radius: 6px; background: #fff7ed; color: #7c2d12; }
+.synthesis-report h2 { margin-top: 34px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.synthesis-report h3 { margin: 24px 0 8px; color: #0f4c5c; }
+.synthesis-report p, .synthesis-report li { overflow-wrap: anywhere; }
+pre { overflow: auto; background: #111827; color: #f9fafb; border-radius: 8px; padding: 14px; }
+code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+details { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 18px; }
+@media (max-width: 640px) {
+  main { width: min(100% - 20px, 1120px); padding-top: 18px; }
+  .report { padding: 18px; }
+  .synthesis-callout { border-radius: 14px; padding: 18px; }
+  .cta-row a { width: 100%; }
+  .mobile-report { border-radius: 12px; }
+}
+</style>
+</head>
+<body>
+  <main>
+<nav class="topnav"><a href="index.html">실행 목록</a><a href="../../index.html">YouTube 홈</a></nav>
+<article class="report">
+  <header class="report-head">
+    <p class="eyebrow">youtube_20261128_065117</p>
+    <h1>나스닥, 4년차 강세장을 지켜낼 수 있을까?...금리인상기 뉴욕증시 투자 전략 | 여도은, 박명석 큐레이터 [월가 뉴스레터]</h1>
+    <div class="meta">
+      <span class="badge status-asr_uncertain">asr_uncertain</span>
+      <a href="https://www.youtube.com/watch?v=9KEKhFUKnAM">원본 영상</a>
+    </div>
+  </header>
+  <h2>나스닥 강세장 4년차인가: 금리·이익·AI 자금조달 점검</h2>
+<p><a href="https://www.youtube.com/watch?v=9KEKhFUKnAM">삼프로TV 3PROTV 영상</a> · 분석 기준 2026년 11월 28일</p>
+<p><strong>핵심 판단: 2027년 초 반등은 검증된 전망이 아니라 조건부 시나리오다.</strong> 영상은 나스닥 조정을 실적 붕괴보다 금리 상승과 자금조달 병목으로 설명한다. 이 설명이 설득력을 얻으려면 물가와 금리 압력이 완화되는 동안 이익 기대가 유지되고, AI 인프라 고객이 실제로 자금을 조달해 프로젝트를 진행해야 한다. 제공 자료로는 조정의 주원인도, 나스닥이 4년차 강세장이라는 전제도 확인되지 않았다.</p>
+<h3>영상 주장과 확인된 사실·근거</h3>
+<p>아래 시각은 개별 발화가 아닌 자막 구간 시작점이다. 괄호의 두 값은 각각 <strong>출처 신뢰도(<code>source_confidence</code>) / 개별 주장 판독 신뢰도(<code>asr_confidence</code>)</strong>이며, 주장이 사실일 확률은 아니다.</p>
+<p>| 주제·시각 | 영상 주장 | 확인된 사실·근거와 한계 |</p>
+<p>| --- | --- | --- |</p>
+<p>| <strong>지수·수급</strong> · 00:00:00, 00:06:42 (0.92 / 0.77, 0.92 / 0.90) | 나스닥은 10월 고점 이후 연초 대비 소폭 상승에 그쳤고, S&amp;P 500은 연초 수준과 200일선 부근을 오갔다. 자사주 매입의 완충력이 약해지고 신규 발행·대형 IPO 2건이 공급을 늘렸으며, 10월 7일 이후 3배 레버리지 상품의 순유입은 늘었지만 순자산은 줄었다는 해석이다. | <strong>미검증.</strong> <a href="https://finance.yahoo.com/markets/commodities/articles/silver-prices-exploded-8-overnight-162731372.html">추수감사절 휴장 관련 기사</a>는 제목의 휴장 맥락만 참고할 수 있다. 지수 수익률과 200일선, 11월 낙폭 5.5%, 앤트로픽 상장과 결부된 장중 +2.5%→−2% 반전, 유럽 지수·비트코인 수치는 확인할 자료가 없다. 정규장과 휴장 중 무기한선물은 별개다. 순유입과 순자산 변동은 평가손익을 분리해야 하며, 특정 시간대 낙폭만으로 자사주 매입 감소를 추론할 수 없다. |</p>
+<p>| <strong>연준·반등 시나리오</strong> · 00:06:42, 00:19:34 (0.92 / 0.80, 0.92 / 0.75) | 12월 9일 인상 확률 99.4%, 50bp 인상 확률 0%와 1·3월 추가 인상 가능성을 언급했다. 2022년 인상기와 1997년 조정을 비교하며 DS투자증권은 2027년 1~2월, BofA는 2~3월 반등 가능성을 제시했다고 소개했다. | <strong>미검증.</strong> 방송 당시 FedWatch 표가 없어 확률의 방향·목표금리 구간·기준 시각을 확인할 수 없다. 선물 내재 확률은 연준 결정과 다르다. 2022년 인상과 증시 저점의 관계, 기관별 전망의 원문, 댈러스 연은으로 추정되는 물가 자료도 확보되지 않았다. 4.5%가 정책금리인지 국채수익률인지, 유가 70달러와 약 77달러가 무엇을 각각 가리키는지 불명확하다. |</p>
+<p>| <strong>경기·제조업</strong> · 00:13:12 (0.94 / 0.87) | 금융업 지수에 뚜렷한 위기 신호가 없고 미국 핵심 자본재 수주·한국 수출·ISM 제조업 PMI가 버텨 침체로 단정하기 어렵다고 봤다. ISM 지불가격 둔화와 가계 비상지출 설문을 인용했다. | <strong>미검증.</strong> ISM 원발표와 수주·수출 통계, 금융 스트레스 자료, 250달러 지출이 어렵다는 응답 41%의 설문 원문이 없다. 서비스업 74→73이 어느 하위지수인지도 재확인이 필요하다. 지불가격은 헤드라인 PMI와 다르고, 금융주 흐름만으로 시스템 위험을 배제할 수 없다. |</p>
+<p>| <strong>이익·클라우드·오라클</strong> · 00:06:42 (0.94 / 0.93) | 2027년 EPS 성장 전망은 아직 양호하지만 하반기 둔화 우려가 있으며, 조정은 금리와 자금 부족의 영향이 더 크다는 판단이다. 아마존 FCF는 2027년 4분기 플러스 전환, 하이퍼스케일러 FCF는 2028년 4분기~2029년 개선을 예상했다. 오라클은 조달비용과 신용 우려에 더 민감하다고 봤다. | <strong>핵심 미검증.</strong> 게시 이후인 11월 27일 yfinance 스냅샷에서 오라클 주가는 <strong>107.13달러</strong>였다. 이 가격만으로 투자자 이탈이나 신용 악화를 입증할 수 없다. 당시 EPS·FCF 컨센서스, 기업 가이던스 및 채권 스프레드는 확보되지 않았다. |</p>
+<p>| <strong>코스트코·기술주 밸류에이션</strong> · 00:19:34 (0.98 / 0.73) | 매출 성장률 11%와 50배 초과 밸류에이션은 오라클이 아니라 코스트코에 대한 언급이다. 영상은 이를 기술주·지수 배수와 비교했다. | <strong>부분 지지.</strong> 11월 27일 yfinance 스냅샷의 후행/선행 P/E는 코스트코 <strong>52.88배/43.81배</strong>, 엔비디아 <strong>16.16배/9.06배</strong>다. 코스트코 50배 초과는 이 스냅샷의 후행 기준에서만 성립한다. 엔비디아 선행 9.06배가 영상의 약 9배와 가깝더라도 방송의 분모는 모른다. 코스트코 매출 11%의 기간·정의와 지수·TSMC 비교 배수는 미확인이다. |</p>
+<p>| <strong>유가·비축유</strong> · 00:00:00, 00:26:01 (0.91 / 0.88) | 브렌트 상승률과 원유 84달러 도달 후 반등을 언급했다. OPEC 공급 회복과 비축유 방출이 유가를 눌렀고, 2027년 1월로 제시한 방출 종료 뒤에도 공급 차질이 이어지면 다시 오를 수 있다고 봤다. | <strong>부분 지지.</strong> <a href="https://finance.yahoo.com/markets/article/gas-prices-drop-to-the-lowest-level-since-march-ahead-of-thanksgiving-holiday-170804061.html">11월 24일 Yahoo Finance 기사</a>의 제목은 미국 휘발유가 3월 이후 최저라고 보도했다. 본문이 없어 가격·등급·지역은 확인되지 않는다. 11월 27일 yfinance의 <strong>83.08달러는 WTI 선물</strong>로, 브렌트나 방송의 가격 경로를 확인하거나 반박하지 않는다. OPEC 실생산, 공동 방출 종료일, 유가 하락 원인은 미확인이다. |</p>
+<p>| <strong>네오클라우드·엔비디아 계약</strong> · 00:32:15 (0.87 / 0.63) | 스페이스X의 블랙웰 임대료 인하와 앤트로픽의 H200 계약 미갱신설을 소개했다. 담보대출 7%대를 다음 실적의 점검 기준으로 제시했고, 최소 이용약정과 한도 있는 임차료 보증으로 엔비디아의 직접 부담이 제한적이라고 해석했다. | <strong>미검증.</strong> 임대료 변경, 계약 갱신 여부, 두 사건의 인과관계는 각각 미확인이다. 자동자막에서 갱신·미갱신이 엇갈린다. 7%대는 성사된 대출의 금리가 아니며, 은행 대출 노출 축소와 약정·보증의 한도·발동 조건·기간을 확인할 자료도 없다. |</p>
+<p>| <strong>엔비디아 수출·텍사스 준공</strong> · 00:38:29 (0.87 / 0.42) | 동남아 4개국 서버 공급 중단이 중국 우회 공급과 추가 성장 여력을 제약할 수 있다고 봤다. 데이터센터 준공 지연, 성장률 75%, 별도의 ‘두 배’ 조건과 텍사스 자체 발전 일정을 언급했다. | <strong>판독 불확실·외부 미검증.</strong> 0.9GW와 9GW는 열 배 차이가 나고, 75%의 대상·기간과 ‘두 배’의 분모도 불명확해 투자 판단 기준으로 쓸 수 없다. 정부 규제인지 허가 요건인지 업체 자체 출하 중단인지, 텍사스의 11월 16일·12월 10일·1월 19일 일정이 실제로 무엇을 가리키는지도 공식 문서가 없다. |</p>
+<h3>반등 논리와 무효화 조건</h3>
+<ul>
+<li><strong>물가가 식되 이익은 버티는 경우:</strong> CPI와 소비가 완만히 둔화하고 시장이 예상하는 금리 경로가 낮아지는 가운데 2027년 EPS 추정치가 유지된다면, 금리에 눌렸던 밸류에이션이 회복될 여지가 있다. 반대로 금리 기대가 내려가도 신규주문·자본재 수주·EPS가 함께 하향되고 신용스프레드가 벌어지면, 조정이 주로 금리와 자금 부족 때문이라는 설명은 약해진다. 공급 차질로 유가와 인상 기대가 함께 오르는 경우도 반등 전제를 훼손한다.</li>
+<li><strong>AI 수요가 실제 가동과 현금흐름으로 이어지는 경우:</strong> 네오클라우드가 감당 가능한 비용으로 대출을 실행하고, 고객 계약이 실제 장비 인도와 데이터센터 가동으로 이어지면 자금 병목 완화의 근거가 된다. 반대로 대출 실행이 지연되거나 수수료 포함 비용이 상승하고, 주문 축소·준공 지연·채권 회수 장기화·보증 부담 확대가 겹치면 이 논리는 약해진다. 대형 클라우드의 설비투자 축소는 자체 FCF를 방어할 수 있지만 공급업체에는 주문 감소로 돌아올 수 있다.</li>
+<li><strong>지수 회복에 수급 개선이 동반되는 경우:</strong> 동일 지수의 공식 종가로 200일선 회복과 상승 종목의 확산이 확인되고 실제 자사주 매입이 신규 공급을 흡수한다면 시장 회복의 근거가 강해진다. 반대로 반등이 일부 대형주에 그치고 지수가 다시 200일선 아래에서 머무르면 회복 확인을 유보할 근거가 된다. 200일선 자체가 경기나 이익을 검증하는 것은 아니다.</li>
+</ul>
+<h3>가까운 시점에 확인할 항목</h3>
+<p>1. <strong>12월 연준 회의 전후:</strong> FOMC 공식 일정·성명과 시각이 찍힌 FedWatch 표로 12월·1월·3월의 목표금리 구간별 확률 변화를 기록한다. CPI·소매판매 발표 때는 정책금리 기대, 국채수익률, 달러인덱스와 2027년 EPS 추정치가 어떻게 함께 움직이는지 본다. 제조업은 ISM 신규주문·재고·지불가격을 나눠 보고 핵심 자본재 수주·한국 수출·신용스프레드와 대조한다.</p>
+<p>2. <strong>다음 정규장부터:</strong> 나스닥 종합지수와 나스닥100을 구분하고 전년 마지막 종가와 최근 200거래일 공식 종가로 연초 대비 수익률·200일선을 재계산한다. 수급은 공시상 실제 자사주 매입과 신규 발행·IPO 공모액, 레버리지 상품별 순유입과 평가손익을 나눠 확인한다.</p>
+<p>3. <strong>연말~2027년 1월:</strong> 브렌트·WTI 결제값과 미국 소매 휘발유를 별도로 추적한다. OPEC 실생산, IEA·미 에너지부의 비축유 인도 일정, 호르무즈 통항·운임을 비교해 유가 하락이 공급 정상화인지 수요 약화인지 가른다. 텍사스 일정은 영상에서 거론한 날짜가 아니라 사업명·허가번호·공식 문서로 확인한다.</p>
+<p>4. <strong>다음 기업 실적:</strong> 아마존 등은 현금·리스 설비투자와 FCF 정의, 오라클은 차입 만기와 채권 스프레드를 본다. 네비우스·코어위브는 담보·기준금리·스프레드·수수료를 합친 실행 조달비용과 고객 계약·가동 일정을, 엔비디아는 다음 분기 가이던스·매출채권 회수·보증 한도와 발동 조건을 확인한다. 코스트코와 기술주 비교는 동일 기준일과 동일한 후행 또는 선행 EPS 기준으로 맞춘다.</p>
+<h3>자료의 한계</h3>
+<p>한국어 자동자막의 전체 품질(<code>transcript_quality</code>)은 <strong>양호, 1.0</strong>이지만, 개별 숫자·고유명사·계약 방향의 정확도를 보장하지 않는다. 수집된 검색 결과 6건 중 여러 건은 본문 대신 오류·탐색 문구만 있거나 주제와 무관했다. 지수 시계열이나 핵심 공시 원문은 확보되지 않았으며, 종목 뉴스·공시 공급자 오류는 자료가 존재하지 않는다는 뜻이 아니다. 사후 스냅샷은 방송 당시 시장 기대를 재현하지 못한다.</p>
+<p><strong>블룸버그·모닝스타의 미제공 데이터, 고객 전용 증권사 자료와 당시 유료 EPS·FCF 컨센서스, 비공개 거래·대출·보증 조건은 미검증 / 수동 확인 필요</strong>다. 현재 제한적으로 부합하는 것은 휘발유 기사 제목과 일부 사후 밸류에이션 수치다. 반등 시기를 판단할 때는 1~3월이라는 달력보다 <strong>금리 기대 완화, 이익 추정치 유지, AI 프로젝트의 실제 자금 집행</strong>이 함께 확인되는지를 우선할 필요가 있다.</p>
+  <details>
+    <summary>공개 요약 JSON</summary>
+    <pre>{
+  &quot;version&quot;: 4,
+  &quot;video_id&quot;: &quot;9KEKhFUKnAM&quot;,
+  &quot;title&quot;: &quot;나스닥, 4년차 강세장을 지켜낼 수 있을까?...금리인상기 뉴욕증시 투자 전략 | 여도은, 박명석 큐레이터 [월가 뉴스레터]&quot;,
+  &quot;url&quot;: &quot;https://www.youtube.com/watch?v=9KEKhFUKnAM&quot;,
+  &quot;channel&quot;: &quot;삼프로TV 3PROTV&quot;,
+  &quot;channel_id&quot;: &quot;UChlv4GSd7OQl3js-jkLOnFA&quot;,
+  &quot;source_url&quot;: &quot;https://www.youtube.com/@3protv/videos&quot;,
+  &quot;thumbnail_url&quot;: &quot;https://i.ytimg.com/vi/9KEKhFUKnAM/maxresdefault.jpg&quot;,
+  &quot;published_at&quot;: &quot;2026-11-26T22:07:41+00:00&quot;,
+  &quot;status&quot;: &quot;asr_uncertain&quot;,
+  &quot;strategy_source_tier&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_evidence_weight&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_validation_policy&quot;: &quot;STANDARD_REVIEW&quot;,
+  &quot;transcript_status&quot;: &quot;available&quot;,
+  &quot;transcript_source&quot;: &quot;automatic&quot;,
+  &quot;transcript_chars&quot;: 24221,
+  &quot;transcript_quality&quot;: {
+    &quot;status&quot;: &quot;good&quot;,
+    &quot;score&quot;: 1.0,
+    &quot;warnings&quot;: [],
+    &quot;source&quot;: &quot;automatic&quot;,
+    &quot;language&quot;: &quot;Korean&quot;,
+    &quot;model_or_format&quot;: &quot;json3&quot;,
+    &quot;chars&quot;: 24221,
+    &quot;segments&quot;: 1366,
+    &quot;duration_seconds&quot;: 2927,
+    &quot;repeated_ngram_ratio&quot;: 0.0
+  },
+  &quot;generated_at&quot;: &quot;2026-11-28T06:51:17.829465+09:00&quot;,
+  &quot;llm_status&quot;: &quot;success&quot;,
+  &quot;research_status&quot;: &quot;success&quot;,
+  &quot;claim_verification_status&quot;: &quot;success&quot;,
+  &quot;research_pipeline_version&quot;: 4,
+  &quot;evidence_count&quot;: 6,
+  &quot;claim_status_summary&quot;: {
+    &quot;unverified&quot;: 7,
+    &quot;partially_supported&quot;: 2,
+    &quot;asr_uncertain&quot;: 1
+  },
+  &quot;claims&quot;: [
+    {
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;claim_text&quot;: &quot;나스닥은 10월 고점 이후 연초 대비 소폭 상승에 그쳤고, S&amp;P 500은 연초 수준과 200일 이동평균선 부근을 오갔다. 11월 차트의 5.5% 하락, 앤트로픽 상장 관련 +2.5%에서 -2%로의 반전, 미국 휴장 중 유럽 증시 상승과 비트코인 약 6만 달러도 언급됐다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.98,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.92,
+      &quot;asr_confidence&quot;: 0.77,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;10월 고점; 연초 대비 나스닥 소폭 상승·S&amp;P 500 0% 부근; 200일선; 11월 5.5% 하락; +2.5%→-2%; 비트코인 약 6만 달러&quot;,
+        &quot;observed&quot;: &quot;일치하는 거래일·종가·장중 수치 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;나스닥 종합지수와 나스닥100을 구분하고, 동일 지수의 공식 종가로 연초 대비 수익률과 200일선을 재계산하기 전에는 강세장 지속 여부를 판단하기 어렵다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;claim_text&quot;: &quot;빅테크 자사주 매입·소각의 완충력이 낮아진 가운데 신규 발행과 대형 IPO 2건이 주식 공급을 늘렸다. 10월 7일 이후 3배 레버리지 상품의 누적 순유입은 늘었지만 순자산은 줄었고, 미국 시간 10~15시 낙폭이 컸다는 분석이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:06:42&quot;,
+      &quot;source_confidence&quot;: 0.92,
+      &quot;asr_confidence&quot;: 0.9,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;대형 IPO 2건; 10월 7일 이후 3배 상품의 순유입 증가·순자산 감소; 미국 시간 10~15시 낙폭 확대&quot;,
+        &quot;observed&quot;: &quot;기업·상품 표본, IPO 명단 및 장중 수치 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;신규 발행과 실제 자사주 매입을 비교하고, 레버리지 상품의 순유입과 평가손익을 분리해야 수급 악화 가설을 평가할 수 있다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;claim_text&quot;: &quot;12월 9일 금리 인상 확률은 99.4%, 50bp 인상 확률은 0%라고 소개하고 1·3월 추가 인상 가능성을 언급했다. 2022년에는 75bp 인상이 네 차례 연속 이어졌고, 세 번째~네 번째 인상 전후에 증시가 저점을 형성한 뒤 50bp 인상 국면에 반등했다고 비교했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:06:42&quot;,
+      &quot;source_confidence&quot;: 0.92,
+      &quot;asr_confidence&quot;: 0.8,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;12월 9일 인상 확률 99.4%; 50bp 인상 확률 0%; 1·3월 추가 인상 가능성; 2022년 75bp 인상 4회 연속 및 50bp 전환&quot;,
+        &quot;observed&quot;: &quot;방송 당시 확률표, 2022년 정책 결정 및 지수 시계열 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;시장에 반영된 확률과 연준의 실제 결정을 구분하고, 2022년 사례를 이번 반등의 시점 예측으로 사용하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;claim_text&quot;: &quot;1997년 조정을 비교 사례로 들며 DS투자증권은 2027년 1~2월, 뱅크오브아메리카는 2~3월 강세장 복귀 가능성을 제시했다고 소개했다. 물가·소비 둔화와 금리 고점 가시화가 전제이며, 뱅크오브아메리카 조건으로 금리 4.5%, 유가 70달러 또는 약 77달러, 달러인덱스 하락이 언급됐다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.98,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:19:34&quot;,
+      &quot;source_confidence&quot;: 0.92,
+      &quot;asr_confidence&quot;: 0.75,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;1997년 비교; DS 2027년 1~2월; BofA 2~3월; 금리 4.5%; 유가 70달러 또는 약 77달러&quot;,
+        &quot;observed&quot;: &quot;원문 수치 없음; 금리 지표와 유종·가격 기준 미확인&quot;
+      },
+      &quot;investor_implication&quot;: &quot;1~3월을 확정 반등 시점으로 보지 말고, 기관별 원문을 확인한 뒤 CPI·소매판매·해당 금리·유가·달러인덱스로 전제 충족 여부를 점검한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;claim_text&quot;: &quot;금융업 지수에 뚜렷한 시스템 위기 신호가 없고 미국 핵심 자본재 수주·한국 수출·ISM 제조업 PMI가 버텨 침체로 단정하기 어렵다고 봤다. 제조업 지불가격지수의 9→10월 하락, 서비스업 지불가격지수로 소개된 74→73, 250달러 비상지출이 어렵다는 미국인 41%, ISM과 SK하이닉스 영업이익률의 유사성을 인용했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:13:12&quot;,
+      &quot;source_confidence&quot;: 0.94,
+      &quot;asr_confidence&quot;: 0.87,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;9→10월 제조업 가격지수 하락; 서비스업 74→73; 비상지출 250달러가 어려운 응답자 41%&quot;,
+        &quot;observed&quot;: &quot;공식 월별 수치·설문 질문·표본 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;경기 진단은 PMI와 가격 하위지수를 분리하고, 핵심 자본재 수주·한국 수출·신용스프레드가 같은 방향을 가리키는지 살펴야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;claim_text&quot;: &quot;2027년 EPS 성장 전망은 아직 양호하지만 하반기 둔화 우려가 있고, 조정의 원인은 실적 붕괴보다 금리와 자금 병목에 가깝다는 해석이다. 아마존은 2027년 4분기 FCF 흑자 전환, 하이퍼스케일러는 2028년 4분기~2029년 FCF 개선이 예상됐고, 대형 클라우드는 설비투자 조절 여력이 있지만 오라클은 차입비용과 신용 우려에 더 민감하다고 봤다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:06:42&quot;,
+      &quot;source_confidence&quot;: 0.94,
+      &quot;asr_confidence&quot;: 0.93,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;2027년 EPS 및 하반기 둔화; 아마존 2027년 4분기 FCF 흑자 전환; 하이퍼스케일러 2028년 4분기~2029년 FCF 개선&quot;,
+        &quot;observed&quot;: &quot;ORCL 107.13달러만 관측; EPS·FCF·조달비용 비교 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;EPS 추정치 변경과 기업별 FCF·조달비용을 함께 추적해야 금리·자금 병목이 실적 악화보다 더 큰 요인인지 평가할 수 있다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;claim_text&quot;: &quot;코스트코 매출 성장률 11%와 50배 초과 밸류에이션을 기술주와 비교했다. S&amp;P 500 16.5배, 나스닥 약 18배, 엔비디아 7.95~9배, TSMC 15배로 들리는 수치도 확인 대상이다.&quot;,
+      &quot;status&quot;: &quot;partially_supported&quot;,
+      &quot;confidence&quot;: 0.95,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:19:34&quot;,
+      &quot;source_confidence&quot;: 0.98,
+      &quot;asr_confidence&quot;: 0.73,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;COST 매출 +11%·50배 초과; S&amp;P 500 16.5배; 나스닥 약 18배; NVDA 7.95~9배; TSMC 15배&quot;,
+        &quot;observed&quot;: &quot;11월 27일 COST 후행 52.88배·선행 43.81배; NVDA 후행 16.16배·선행 9.06배; 나머지 확인 불가&quot;
+      },
+      &quot;investor_implication&quot;: &quot;동일 기준일과 동일 분모로 배수를 다시 계산하기 전에는 해당 숫자로 코스트코와 기술주의 상대적 고평가를 판단하기 어렵다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;claim_text&quot;: &quot;브렌트유 +1.18%, 원유 84달러 도달 후 일부 반등, 미국 휘발유 3월 이후 최저치가 언급됐다. 사우디 중심의 OPEC 공급 회복과 공동 비축유 방출이 유가를 눌렀고, 방출이 2027년 1월 끝난 뒤에도 전쟁·대치가 이어지면 유가가 다시 오를 수 있다는 견해다.&quot;,
+      &quot;status&quot;: &quot;partially_supported&quot;,
+      &quot;confidence&quot;: 0.94,
+      &quot;supporting_evidence_ids&quot;: [
+        &quot;E5&quot;
+      ],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.91,
+      &quot;asr_confidence&quot;: 0.88,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;브렌트 +1.18%; 원유 84달러 후 반등; 휘발유 3월 이후 최저; 2027년 1월 방출 종료&quot;,
+        &quot;observed&quot;: &quot;E5 제목에서 휘발유 최저치 보도 확인; 11월 27일 WTI 83.08달러; 브렌트·방출 종료일 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;브렌트·WTI·소매 휘발유를 따로 보고, 비축유의 실제 인도 일정과 호르무즈 통항 상황을 확인해 조건부 유가 반등 시나리오를 평가한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;claim_text&quot;: &quot;스페이스X의 블랙웰 임대료 인하와 앤트로픽의 H200 임대 계약 미갱신, 두 사건의 인과는 미확인이다. 은행 대출 노출 축소가 언급됐고, 다음 분기 담보대출 7%대는 확인할 기준이다. 엔비디아의 인프라 검수 후 최소 이용약정과 한도 있는 임차료 보증이 직접 부담을 제한한다는 해석도 제시됐다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:32:15&quot;,
+      &quot;source_confidence&quot;: 0.87,
+      &quot;asr_confidence&quot;: 0.63,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;다음 분기 담보대출 7%대가 점검 기준; 최소 이용약정 및 보증 한도 금액 미제시&quot;,
+        &quot;observed&quot;: &quot;실행 대출 금리·수수료·보증 금액·계약 조건 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;갱신설을 AI 수요 둔화의 증거로 쓰지 말고, 실제 대출의 수수료 포함 조달비용과 엔비디아의 조건부 부담을 별개로 추적한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C10&quot;,
+      &quot;claim_text&quot;: &quot;동남아 4개국 대상 서버 공급 중단이 중국 우회 공급을 제약한다는 보도가 인용됐다. 엔비디아 하방 점검 기준으로 1년 내 추가 준공 지연 0.9GW 또는 9GW, 성장률 전망 75%, 지표가 불명확한 ‘두 배’가 언급됐다. 텍사스 자체 가스발전 관련 11월 16일 허가, 12월 10일 감사보고, 1월 19일 주지사 취임도 확인 대상이다.&quot;,
+      &quot;status&quot;: &quot;asr_uncertain&quot;,
+      &quot;confidence&quot;: 0.99,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:38:29&quot;,
+      &quot;source_confidence&quot;: 0.87,
+      &quot;asr_confidence&quot;: 0.42,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;동남아 4개국; 1년 내 0.9GW 또는 9GW; 75%; 두 배; 11월 16일·12월 10일·1월 19일&quot;,
+        &quot;observed&quot;: &quot;자막에 0.9GW·9GW 병존; 비교 가능한 공식 수치·일정 자료 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;준공 지연 기준치는 원음과 원문이 일치할 때만 수치화하고, 정부 규제·허가 요건·업체 자체 출하 중단을 구분한 뒤 매출 영향을 평가한다.&quot;
+    }
+  ],
+  &quot;entities&quot;: [
+    {
+      &quot;ticker&quot;: &quot;ORCL&quot;,
+      &quot;name&quot;: &quot;오라클&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;영상은 고금리 환경에서 오라클과 네오클라우드 기업의 신용도와 수익성에 대한 의구심으로 투자자들이 물러나고 있다고 설명했다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;ORCL&quot;,
+        &quot;as_of&quot;: &quot;2026-11-27T22:48:10.800717+00:00&quot;,
+        &quot;current_price&quot;: 107.12999725341797,
+        &quot;market_cap&quot;: 334000054404.9391,
+        &quot;forward_pe&quot;: 9.687299,
+        &quot;trailing_pe&quot;: 16.791534,
+        &quot;fifty_two_week_high&quot;: 250.25,
+        &quot;fifty_two_week_low&quot;: 99.34,
+        &quot;average_target_price&quot;: 236.184,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;COST&quot;,
+      &quot;name&quot;: &quot;코스트코&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;기술주와 소비재의 밸류에이션을 비교하면서 코스트코의 매출 성장률 대비 높은 밸류에이션에 의문을 제기했다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;코스트코: 매출 성장률 11%, 밸류에이션 50배 초과로 언급됐다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;COST&quot;,
+        &quot;as_of&quot;: &quot;2026-11-27T22:48:12.961706+00:00&quot;,
+        &quot;current_price&quot;: 1097.81005859375,
+        &quot;market_cap&quot;: 486471856590.3003,
+        &quot;forward_pe&quot;: 43.807266,
+        &quot;trailing_pe&quot;: 52.881023,
+        &quot;fifty_two_week_high&quot;: 1123.67,
+        &quot;fifty_two_week_low&quot;: 844.06,
+        &quot;average_target_price&quot;: 1083.6945,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;CL=F&quot;,
+      &quot;name&quot;: &quot;원유·전략비축유&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;사우디 중심의 OPEC 생산 회복과 전략비축유 방출이 유가를 억누르고 있으나, 방출 기한 이후까지 전쟁과 대치가 지속되면 유가가 다시 오를 수 있다는 견해를 소개했다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;유가가 84달러까지 내려온 뒤 일부 반등했고, 휘발유 가격은 3월 이후 최저치였다고 설명했다.&quot;,
+        &quot;전략비축유 방출 기한으로 2027년 1월을 언급했다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;CL=F&quot;,
+        &quot;as_of&quot;: &quot;2026-11-27T22:48:14.933495+00:00&quot;,
+        &quot;current_price&quot;: 83.08000183105469,
+        &quot;market_cap&quot;: null,
+        &quot;forward_pe&quot;: null,
+        &quot;trailing_pe&quot;: null,
+        &quot;fifty_two_week_high&quot;: 119.48,
+        &quot;fifty_two_week_low&quot;: 54.98,
+        &quot;average_target_price&quot;: null,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    },
+    {
+      &quot;ticker&quot;: &quot;NVDA&quot;,
+      &quot;name&quot;: &quot;엔비디아&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;네오클라우드가 자체 자금으로 인프라를 구매·가동하고 엔비디아가 인수를 확인한 뒤 최소 이용금액을 약정하는 구조와, 한도가 있는 데이터센터 임차료 보증을 들어 엔비디아의 직접 부담이 제한적이라고 해석했다.&quot;,
+        &quot;중국 우회 공급을 막기 위한 서버 규제는 당장 매출을 꺾기보다 추가 성장 여력을 제약할 수 있으며, 관련 주가 하락은 과도했다는 분석을 소개했다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;동남아시아 4개국 대상 서버 공급 중단 보도를 인용했다.&quot;,
+        &quot;추가 데이터센터 준공 지연의 1년 기준치로 0.9GW를 반복 언급했으나, 일부 자막에는 9GW도 나온다.&quot;,
+        &quot;성장률 전망 75%와 별도의 ‘두 배’ 조건을 언급했다. ‘두 배’가 가리키는 지표는 자막에서 불명확하다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;NVDA&quot;,
+        &quot;as_of&quot;: &quot;2026-11-27T22:48:15.703242+00:00&quot;,
+        &quot;current_price&quot;: 150.49000549316406,
+        &quot;market_cap&quot;: 3633882162643.4326,
+        &quot;forward_pe&quot;: 9.06278,
+        &quot;trailing_pe&quot;: 16.16434,
+        &quot;fifty_two_week_high&quot;: 243.37,
+        &quot;fifty_two_week_low&quot;: 124.5,
+        &quot;average_target_price&quot;: 242.4278,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    }
+  ],
+  &quot;evidence&quot;: [
+    {
+      &quot;evidence_id&quot;: &quot;E1&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;Precious Metals Rally as AI Trade Revives Risk Appetite&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/m/713c049b-780a-3e4b-b84e-162b4e7d87df/precious-metals-rally-as-ai.html&quot;,
+      &quot;publisher&quot;: &quot;The Wall Street Journal&quot;,
+      &quot;published_at&quot;: &quot;2026-11-27T20:20:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Precious Metals Rally as AI Trade Revives Risk Appetite Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 2026 Elections Weather Newsletters Fi...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E2&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;Basic Materials Roundup: Market Talk&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/m/431eeac2-4b84-305a-bb4a-ee793380c1c4/basic-materials-roundup%3A.html&quot;,
+      &quot;publisher&quot;: &quot;The Wall Street Journal&quot;,
+      &quot;published_at&quot;: &quot;2026-11-27T17:58:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Basic Materials Roundup: Market Talk Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 2026 Elections Weather Newsletters Finance My portfolio...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E4&quot;,
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;title&quot;: &quot;BC-Sugar Futures&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/commodities/articles/bc-sugar-futures-150028453.html&quot;,
+      &quot;publisher&quot;: &quot;Associated Press&quot;,
+      &quot;published_at&quot;: &quot;2026-11-27T15:00:28+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;BC-Sugar Futures Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 2026 Elections Weather Newsletters Finance My portfolio News Markets Researc...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E5&quot;,
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;title&quot;: &quot;Gas prices drop to the lowest level since March ahead of Thanksgiving holiday&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/article/gas-prices-drop-to-the-lowest-level-since-march-ahead-of-thanksgiving-holiday-170804061.html&quot;,
+      &quot;publisher&quot;: &quot;Yahoo Finance&quot;,
+      &quot;published_at&quot;: &quot;2026-11-24T17:08:04+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E6&quot;,
+      &quot;claim_id&quot;: &quot;C10&quot;,
+      &quot;title&quot;: &quot;Energy &amp; Utilities Roundup: Market Talk&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/m/c4ef457d-6681-31eb-b684-0c2b71e80e4d/energy-%26-utilities-roundup%3A.html&quot;,
+      &quot;publisher&quot;: &quot;The Wall Street Journal&quot;,
+      &quot;published_at&quot;: &quot;2026-11-27T18:15:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    }
+  ],
+  &quot;source_policy&quot;: {
+    &quot;raw_transcript_published&quot;: false,
+    &quot;raw_transcript_in_evidence&quot;: false,
+    &quot;research_pipeline_version&quot;: 4,
+    &quot;closed_source_claims&quot;: &quot;unverified_external_source&quot;,
+    &quot;auto_caption_warning&quot;: true,
+    &quot;local_asr_warning&quot;: false
+  }
+}</pre>
+  </details>
+</article>
+</main>
+  <style>
+.reader-contents { margin: 16px 0; padding: 12px 16px; border: 1px solid var(--line, #64748b); border-radius: 12px; }
+.reader-contents > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-weight: 750; }
+.reader-contents nav { display: grid; gap: 4px; max-height: 45vh; overflow: auto; margin: 8px 0; }
+.reader-contents a { display: block; min-height: 44px; padding: 10px; border-radius: 6px; color: inherit; overflow-wrap: anywhere; }
+.reader-contents a:hover { background: #80808020; }
+.reader-contents .reader-subsection { padding-inline-start: 24px; font-size: .92em; }
+.reader-prose, .report { overflow-wrap: anywhere; line-height: 1.8; }
+.reader-prose p, .reader-prose li { max-width: 85ch; }
+.reader-prose h2, .reader-prose h3, .reader-prose h4, [data-reader-heading] { scroll-margin-top: 100px; line-height: 1.45; }
+.reader-prose h2 { margin-top: 1.8em; padding-bottom: 8px; border-bottom: 1px solid var(--line, #64748b); }
+.reader-prose h3 { margin-top: 1.5em; }
+.reader-prose li { margin: .5em 0; }
+.reader-prose pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.reader-prose blockquote { margin: 16px 0; padding: 4px 16px; border-left: 3px solid var(--accent, #64748b); }
+.reader-table { overflow: auto; max-width: 100%; margin: 16px 0; border: 1px solid var(--line, #64748b); border-radius: 10px; }
+.reader-table table { border-collapse: collapse; width: 100%; margin: 0; font-size: .92rem; }
+.reader-table th, .reader-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line, #64748b); min-width: 110px; max-width: 400px; overflow-wrap: anywhere; white-space: normal; }
+.reader-table th { background: #80808018; }
+.reader-table tr:nth-child(even) { background: #80808008; }
+.reader-search { display: grid; gap: 8px; margin: 16px 0; }
+.reader-search label { font-weight: 700; }
+.reader-search input { box-sizing: border-box; width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line, #64748b); border-radius: 10px; background: var(--panel, #fff); color: var(--text, #132238); font: inherit; }
+.reader-search p { margin: 0; font-size: .86rem; }
+.reader-back { position: fixed; bottom: max(14px, env(safe-area-inset-bottom)); right: 14px; z-index: 30; min-height: 44px; border: 1px solid #778899; border-radius: 99px; padding: 10px 16px; background: #18344a; color: #fff; font: 700 14px system-ui; cursor: pointer; box-shadow: 0 3px 12px #0003; }
+[data-reader-source] { margin-top: 20px; }
+[data-reader-source] > summary { min-height: 44px; cursor: pointer; }
+[data-reader-source] pre { font-size: .85rem; }
+[data-reader-source] pre, .reader-prose { min-width: 0; }
+.reader-contents :focus-visible, .reader-search :focus-visible, .reader-back:focus-visible, .reader-table:focus-visible { outline: 3px solid var(--accent, #008c95); outline-offset: 3px; }
+.reader-search + .grid > [hidden] { display: none !important; }
+@media (max-width: 600px) { .reader-prose { font-size: 1rem; } .reader-contents { padding: 8px 12px; } }
+@media print { .reader-back, .reader-search, .reader-contents, [data-reader-source] { display: none !important; } .reader-table { overflow: visible; } .reader-prose { color: #000; background: #fff; } }
+</style><script>
+(() => {
+  'use strict';
+  let serial = 0;
+  const rendered = new WeakMap();
+  const node = (tag, text) => { const el = document.createElement(tag); if (text != null) el.textContent = text; return el; };
+  function inline(parent, text) {
+    const pattern = /(`[^`]+`|\*\*[^*]+\*\*|\[[^\]]+\]\(https?:\/\/[^\s)]+\))/g;
+    let start = 0;
+    for (const match of String(text).matchAll(pattern)) {
+      parent.append(document.createTextNode(text.slice(start, match.index)));
+      const value = match[0];
+      if (value.startsWith('`')) parent.append(node('code', value.slice(1, -1)));
+      else if (value.startsWith('**')) parent.append(node('strong', value.slice(2, -2)));
+      else {
+        const link = value.match(/^\[([^\]]+)\]\((.+)\)$/);
+        const a = node('a', link[1]); a.href = link[2]; a.rel = 'noopener noreferrer'; parent.append(a);
+      }
+      start = match.index + value.length;
+    }
+    parent.append(document.createTextNode(text.slice(start)));
+  }
+  const cells = line => line.trim().replace(/^\|/, '').replace(/\|$/, '').split(/(?<!\\)\|/).map(v => v.trim().replace(/\\\|/g, '|'));
+  function markdown(source) {
+    const article = node('article'); article.className = 'reader-prose';
+    const lines = source.split(/\r?\n/); let list = null;
+    for (let i = 0; i < lines.length; i += 1) {
+      const line = lines[i], value = line.trim();
+      if (!value) { list = null; continue; }
+      if (/^```/.test(value)) {
+        const code = []; i += 1;
+        while (i < lines.length && !/^```/.test(lines[i].trim())) code.push(lines[i++]);
+        const pre = node('pre'); pre.append(node('code', code.join('\n'))); article.append(pre); list = null; continue;
+      }
+      if (i + 1 < lines.length && value.includes('|') && cells(lines[i + 1]).every(v => /^:?-{3,}:?$/.test(v))) {
+        const table = node('table'), head = node('thead'), body = node('tbody');
+        const row = (values, tag) => { const tr = node('tr'); values.forEach(v => { const cell = node(tag); if (tag === 'th') cell.scope = 'col'; inline(cell, v); tr.append(cell); }); return tr; };
+        head.append(row(cells(line), 'th')); i += 2;
+        while (i < lines.length && lines[i].trim() && lines[i].includes('|')) body.append(row(cells(lines[i++]), 'td'));
+        i -= 1; table.append(head, body); article.append(table); list = null; continue;
+      }
+      const heading = value.match(/^(#{1,6})\s+(.+)$/);
+      if (heading) { const h = node('h' + Math.min(4, heading[1].length + 1)); inline(h, heading[2]); article.append(h); list = null; continue; }
+      const bullet = value.match(/^(?:[-*+] |\d+\. )(.+)$/);
+      if (bullet) {
+        const tag = /^\d/.test(value) ? 'ol' : 'ul';
+        if (!list || list.tagName.toLowerCase() !== tag) { list = node(tag); if (tag === 'ol') list.start = parseInt(value, 10); article.append(list); }
+        const li = node('li'); inline(li, bullet[1]); list.append(li); continue;
+      }
+      list = null;
+      if (/^(---+|\*\*\*+)$/.test(value)) { article.append(node('hr')); continue; }
+      const p = node(value.startsWith('> ') ? 'blockquote' : 'p'); inline(p, value.startsWith('> ') ? value.slice(2) : line); article.append(p);
+    }
+    return article;
+  }
+  function contents(root) {
+    root.querySelectorAll(':scope > .reader-contents').forEach(el => el.remove());
+    const headings = [...root.querySelectorAll('h2,h3,h4')].filter(h => !h.closest('.card,.run-card,.reader-contents,[data-reader-source],[hidden]'));
+    if (headings.length < 2) return;
+    const details = node('details'); details.className = 'reader-contents';
+    details.append(node('summary', '이 리포트 목차 · ' + headings.length + '개 항목'));
+    const nav = node('nav'); nav.setAttribute('aria-label', '리포트 목차');
+    headings.forEach(h => {
+      if (!h.id) h.id = 'reader-section-' + (++serial);
+      h.dataset.readerHeading = ''; h.tabIndex = -1;
+      const a = node('a', h.textContent); a.href = '#' + h.id;
+      if (h.tagName !== 'H2') a.className = 'reader-subsection';
+      a.addEventListener('click', event => {
+        event.preventDefault();
+        for (let ancestor = h.parentElement; ancestor; ancestor = ancestor.parentElement) if (ancestor.tagName === 'DETAILS') ancestor.open = true;
+        h.scrollIntoView({block: 'start'}); h.focus({preventScroll: true});
+      }); nav.append(a);
+    });
+    details.append(nav); root.prepend(details);
+  }
+  function enhance(root) {
+    if (!root) return;
+    root.querySelectorAll('pre[data-report-markdown]').forEach(pre => {
+      const previous = rendered.get(pre);
+      if (previous && previous.source === pre.textContent) return;
+      const article = markdown(pre.textContent);
+      if (previous) previous.article.replaceWith(article);
+      else {
+        const details = node('details'); details.dataset.readerSource = '';
+        details.append(node('summary', 'Markdown 원문 보기'));
+        pre.before(article, details); details.append(pre);
+      }
+      rendered.set(pre, {source: pre.textContent, article});
+    });
+    root.querySelectorAll('table').forEach(table => {
+      if (table.closest('.reader-table,.account-table-wrap,.summary-scroll')) return;
+      const wrap = node('div'); wrap.className = 'reader-table'; wrap.tabIndex = 0;
+      wrap.setAttribute('role', 'region'); wrap.setAttribute('aria-label', '리포트 표 · 가로로 스크롤하여 전체 보기');
+      table.before(wrap); wrap.append(table);
+    });
+    root.querySelectorAll('.grid').forEach(grid => {
+      const cards = [...grid.querySelectorAll(':scope > a.card')];
+      if (cards.length < 2 || grid.dataset.readerSearch) return;
+      grid.dataset.readerSearch = 'true';
+      const box = node('div'); box.className = 'reader-search';
+      const input = node('input'); input.type = 'search'; input.placeholder = '제목 · 종목 · 채널 · 키워드'; input.id = 'report-search-' + (++serial);
+      const label = node('label', '리포트 찾기'); label.htmlFor = input.id;
+      const status = node('p'); status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
+      const update = () => {
+        const terms = input.value.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean); let count = 0;
+        cards.forEach(card => { card.hidden = !terms.every(t => card.textContent.toLocaleLowerCase().includes(t)); if (!card.hidden) count += 1; });
+        status.textContent = cards.length + '개 중 ' + count + '개 표시' + (count ? '' : ' · 검색어를 지우거나 다른 키워드를 입력하세요.');
+      };
+      input.addEventListener('input', update); box.append(label, input, status); grid.before(box); update();
+    });
+    contents(root);
+  }
+  window.TradingAgentsReader = {enhance};
+  const main = document.querySelector('main');
+  if (main && !main.hasAttribute('data-reader-dynamic')) enhance(main);
+  if (main) {
+    const top = node('button', '↑ 맨 위'); top.type = 'button'; top.className = 'reader-back'; top.setAttribute('aria-label', '리포트 맨 위로 이동');
+    top.addEventListener('click', () => { const target = document.querySelector('h1') || main; target.tabIndex = -1; target.scrollIntoView({block: 'start'}); target.focus({preventScroll: true}); });
+    document.body.append(top);
+  }
+})();
+</script>
+</body>
+</html>

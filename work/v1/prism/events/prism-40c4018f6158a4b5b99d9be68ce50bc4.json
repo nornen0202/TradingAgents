@@ -1,0 +1,1027 @@
+{
+  "schema": "tradingagents.work-context/v1",
+  "surface": "prism",
+  "event_id": "prism:40c4018f6158a4b5b99d9be68ce50bc4",
+  "prompt_contract_version": "prism-work-v5",
+  "prompt_sha256": "2d6e6a207021f5126507994f77ca7850fa9bf42701a32286227ca874c1f535df",
+  "skill_sha256": "2fef99f1af403675549a13813e0fe5597a241a964affeada56e9f64e9f398fe9",
+  "task_manifest_sha256": "6fbafadc2971d1a908c1bbc1fa29e2adaf0ca6be956768f2f9eb0abf0061428e",
+  "workflow_contract_sha256": "46750ba4d87c3e127db704d362c736134d7df73054a6cc449472af03a14095af",
+  "source_sha256": "47c5089d833101eaa308c74cd0f28dbec64b41b679865f6557aeb45eca8f3d86",
+  "body": {
+    "kind": "prism",
+    "source_health": "OK",
+    "source": {
+      "health": "OK",
+      "run_id": "prism_telegram_20261128_080800",
+      "last_run_at": "2026-11-28T08:08:12.341262+09:00",
+      "status": "success",
+      "stale_after_hours": 30
+    },
+    "window_hours": 24,
+    "execution_eligible": false,
+    "evidence_policy": {
+      "profile": "balanced_external",
+      "material_thesis_effects": [
+        "ranking",
+        "confidence",
+        "position_size_within_existing_risk_limits",
+        "research_priority"
+      ],
+      "supported_evidence_weight": "MEDIUM",
+      "partially_supported_evidence_weight": "LOW_TO_MEDIUM",
+      "unverified_evidence_weight": "LOW_LABELED",
+      "user_primary_channels": [
+        "@kpunch",
+        "@sosumonkey"
+      ],
+      "user_primary_source_tier": "USER_PRIMARY",
+      "user_primary_evidence_weight": "HIGH",
+      "user_primary_validation_policy": "USER_ACCEPTED",
+      "matching_multi_source_signal_may_raise_thesis_priority": true,
+      "conflicting_signal_must_be_visible": true,
+      "may_bypass_market_or_portfolio_execution_gate": false
+    },
+    "coverage": {
+      "total_unique_events": 536,
+      "window_events": 15,
+      "transmitted_events": 15,
+      "truncated": false,
+      "oldest_occurred_at": "2026-11-27T17:46:32+00:00",
+      "newest_occurred_at": "2026-11-27T19:56:04+00:00"
+    },
+    "events": [
+      {
+        "event_key": "stock_ai_agent:18135",
+        "content_sha256": "09b79a6a0f8a786972e4de5b425ba72bef9ad8336232cbd32df80179ba20400e",
+        "occurred_at": "2026-11-27T19:56:04+00:00",
+        "relevance": {
+          "tickers": [
+            "INFY",
+            "COST",
+            "AAPL",
+            "VRSN",
+            "PANW",
+            "AS"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "18135",
+          "posted_at": "2026-11-27T19:56:04+00:00",
+          "source_url": "https://t.me/stock_ai_agent/18135",
+          "preview": "📊 프리즘 US 시뮬레이터 | 실시간 포트폴리오 (2026-11-28 04:55) 🔸 현재 보유: 6/10개 🔸 사용 비중: 4.30/10 슬롯 (분할 매수·시험매수 반영) ✅ 최고 수익: Infosys Limited(INFY) +4.24% ⚠️ 최저 수익: Costco Wholesale Corporation(COST) -1.12% 🔸 보유 종목: - Apple Inc.(AAPL) [T...",
+          "signals": [
+            {
+              "canonical_ticker": "INFY",
+              "display_name": "Infosys Limited",
+              "market": "US",
+              "source_asof": "2026-11-27T19:56:04+00:00",
+              "signal_action": "HOLD",
+              "trigger_type": "telegram_portfolio_snapshot",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            },
+            {
+              "canonical_ticker": "COST",
+              "display_name": "Costco Wholesale Corporation",
+              "market": "US",
+              "source_asof": "2026-11-27T19:56:04+00:00",
+              "signal_action": "HOLD",
+              "trigger_type": "telegram_portfolio_snapshot",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            },
+            {
+              "canonical_ticker": "AAPL",
+              "display_name": "Apple Inc.",
+              "market": "US",
+              "source_asof": "2026-11-27T19:56:04+00:00",
+              "signal_action": "HOLD",
+              "trigger_type": "telegram_portfolio_snapshot",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "stop_loss_price": 334.0,
+              "target_price": 422.86,
+              "confidence": 0.45,
+              "warnings": [
+                "multi_ticker_prices_scoped_to_mention_block"
+              ]
+            },
+            {
+              "canonical_ticker": "VRSN",
+              "display_name": "VeriSign, Inc.",
+              "market": "US",
+              "source_asof": "2026-11-27T19:56:04+00:00",
+              "signal_action": "HOLD",
+              "trigger_type": "telegram_portfolio_snapshot",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "stop_loss_price": 296.01,
+              "target_price": 370.93,
+              "confidence": 0.45,
+              "warnings": [
+                "multi_ticker_prices_scoped_to_mention_block"
+              ]
+            },
+            {
+              "canonical_ticker": "PANW",
+              "display_name": "Palo Alto Networks, Inc.",
+              "market": "US",
+              "source_asof": "2026-11-27T19:56:04+00:00",
+              "signal_action": "HOLD",
+              "trigger_type": "telegram_portfolio_snapshot",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "stop_loss_price": 338.09,
+              "target_price": 426.67,
+              "confidence": 0.45,
+              "warnings": [
+                "multi_ticker_prices_scoped_to_mention_block"
+              ]
+            },
+            {
+              "canonical_ticker": "AS",
+              "display_name": "Amer Sports, Inc.",
+              "market": "US",
+              "source_asof": "2026-11-27T19:56:04+00:00",
+              "signal_action": "HOLD",
+              "trigger_type": "telegram_portfolio_snapshot",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "stop_loss_price": 28.98,
+              "target_price": 36.61,
+              "confidence": 0.45,
+              "warnings": [
+                "multi_ticker_prices_scoped_to_mention_block"
+              ]
+            }
+          ],
+          "signals_total": 6,
+          "signals_transmitted": 6,
+          "signals_truncated": false,
+          "simulation_only": true,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 1200,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:18134",
+        "content_sha256": "ecd13b9ea1a1b9caf4bb1d259e2aadfb7ae960507c8ceabb20c8b1275230ba79",
+        "occurred_at": "2026-11-27T19:56:02+00:00",
+        "relevance": {
+          "tickers": [
+            "AMD"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "18134",
+          "posted_at": "2026-11-27T19:56:02+00:00",
+          "source_url": "https://t.me/stock_ai_agent/18134",
+          "preview": "⚠️ 매수 보류: Advanced Micro Devices, Inc.(AMD) 현재가: $421.65 매수 점수: 3/10 결정: 미진입 시장 상황: 보통 약세장 산업군: Technology 보류 사유: AI 판단: 미진입 / 점수 부족 (2/5) / 섹터 집중 (Technology 2/4종목(50%) 보유, 한 업종 30% 한도) — AI 사유: 현재가 424.54달러가 하락 중인 5...",
+          "signals": [
+            {
+              "canonical_ticker": "AMD",
+              "display_name": "Advanced Micro Devices, Inc.",
+              "market": "US",
+              "source_asof": "2026-11-27T19:56:02+00:00",
+              "signal_action": "NO_ENTRY",
+              "trigger_type": "telegram_buy_skip",
+              "trigger_score": 0.3,
+              "composite_score": 0.3,
+              "confidence": 0.3,
+              "warnings": []
+            }
+          ],
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 655,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:18133",
+        "content_sha256": "36f1ea27a83d946b31df9591b827fad87f79188a0a2da39990d5c2dc67181179",
+        "occurred_at": "2026-11-27T19:55:59+00:00",
+        "relevance": {
+          "tickers": [
+            "DV"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "18133",
+          "posted_at": "2026-11-27T19:55:59+00:00",
+          "source_url": "https://t.me/stock_ai_agent/18133",
+          "preview": "⚠️ 매수 보류: DoubleVerify Holdings, Inc.(DV) 현재가: $13.62 매수 점수: 7/10 결정: 미진입 시장 상황: 보통 약세장 산업군: Communication Services 보류 사유: AI 판단: 미진입 — AI 사유: 보통 약세장의 필수 추가 확인 요건이 0개로 최소 1개에 미달합니다. 주도 섹터 지정과 PER 30% 이상 할인에 해당하지 않고, 뉴...",
+          "signals": [
+            {
+              "canonical_ticker": "DV",
+              "display_name": "DoubleVerify Holdings, Inc.",
+              "market": "US",
+              "source_asof": "2026-11-27T19:55:59+00:00",
+              "signal_action": "NO_ENTRY",
+              "trigger_type": "telegram_buy_skip",
+              "trigger_score": 0.7,
+              "composite_score": 0.7,
+              "confidence": 0.7,
+              "warnings": []
+            }
+          ],
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 826,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:18132",
+        "content_sha256": "35831f76bd2dcfbf18313cf5ec75cc8d2fe9707a0c87c95841c2bdd4d4c6443a",
+        "occurred_at": "2026-11-27T19:55:55+00:00",
+        "relevance": {
+          "tickers": [
+            "ANT"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "18132",
+          "posted_at": "2026-11-27T19:55:55+00:00",
+          "source_url": "https://t.me/stock_ai_agent/18132",
+          "preview": "⚠️ 매수 보류: Anthropic, PBC(ANT) 현재가: $91.29 매수 점수: 2/10 결정: 미진입 시장 상황: 보통 약세장 산업군: Technology 보류 사유: AI 판단: 미진입 / 점수 부족 (1/5) / 섹터 집중 (Technology 2/4종목(50%) 보유, 한 업종 30% 한도) — AI 사유: 보통 약세장에서 필수 수익성·재무 건전성 기준이 미달합니다. 유효...",
+          "signals": [
+            {
+              "canonical_ticker": "ANT",
+              "display_name": "Anthropic, PBC",
+              "market": "US",
+              "source_asof": "2026-11-27T19:55:55+00:00",
+              "signal_action": "NO_ENTRY",
+              "trigger_type": "telegram_buy_skip",
+              "trigger_score": 0.2,
+              "composite_score": 0.2,
+              "confidence": 0.2,
+              "warnings": []
+            }
+          ],
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 660,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:18131",
+        "content_sha256": "960d34ceb3794d567fc574c78afb8a72927effc5ff2558e1b7d3ebecebcb6b58",
+        "occurred_at": "2026-11-27T19:47:58+00:00",
+        "relevance": {
+          "tickers": [
+            "AMD"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "18131",
+          "posted_at": "2026-11-27T19:47:58+00:00",
+          "source_url": "https://t.me/stock_ai_agent/18131",
+          "preview": "📊 Advanced Micro Devices, Inc. (AMD) O'Neil 인사이트 차트의 베이스/피벗/RS 주석을 함께 참고하세요. ※ 보조 참고용 · 투자 권유 아님",
+          "signals": [
+            {
+              "canonical_ticker": "AMD",
+              "display_name": "Advanced Micro Devices, Inc.",
+              "market": "US",
+              "source_asof": "2026-11-27T19:47:58+00:00",
+              "signal_action": "WATCH",
+              "trigger_type": "telegram_oneil_insight",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            }
+          ],
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 96,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:18130",
+        "content_sha256": "1384b34f7f008eae193be2bf71b9be21a3f9d1317d25d9b94d79eebedda10582",
+        "occurred_at": "2026-11-27T19:47:41+00:00",
+        "relevance": {
+          "tickers": [
+            "DV"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "18130",
+          "posted_at": "2026-11-27T19:47:41+00:00",
+          "source_url": "https://t.me/stock_ai_agent/18130",
+          "preview": "📊 DoubleVerify Holdings, Inc. (DV) O'Neil 인사이트 차트의 베이스/피벗/RS 주석을 함께 참고하세요. ※ 보조 참고용 · 투자 권유 아님",
+          "signals": [
+            {
+              "canonical_ticker": "DV",
+              "display_name": "DoubleVerify Holdings, Inc.",
+              "market": "US",
+              "source_asof": "2026-11-27T19:47:41+00:00",
+              "signal_action": "WATCH",
+              "trigger_type": "telegram_oneil_insight",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            }
+          ],
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 94,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:18129",
+        "content_sha256": "56d104d1bf76bbd423fc3c63e8d6147db24ce5e6130e51bf35e67ce1f2e77e00",
+        "occurred_at": "2026-11-27T19:47:17+00:00",
+        "relevance": {
+          "tickers": [
+            "AMD",
+            "NVDA",
+            "AVGO"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "18129",
+          "posted_at": "2026-11-27T19:47:17+00:00",
+          "source_url": "https://t.me/stock_ai_agent/18129",
+          "preview": "",
+          "signals": [
+            {
+              "canonical_ticker": "AMD",
+              "display_name": "Advanced Micro Devices,  Inc",
+              "market": "US",
+              "source_asof": "2026-11-27T19:47:17+00:00",
+              "signal_action": "WATCH",
+              "trigger_type": "telegram_pdf_report",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            },
+            {
+              "canonical_ticker": "NVDA",
+              "display_name": "경쟁사와 비교하면 — 비교 대상인 엔비디아",
+              "market": "US",
+              "source_asof": "2026-11-27T19:47:17+00:00",
+              "signal_action": "WATCH",
+              "trigger_type": "telegram_pdf_report",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            },
+            {
+              "canonical_ticker": "AVGO",
+              "display_name": "브로드컴",
+              "market": "US",
+              "source_asof": "2026-11-27T19:47:17+00:00",
+              "signal_action": "WATCH",
+              "trigger_type": "telegram_pdf_report",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            }
+          ],
+          "signals_total": 3,
+          "signals_transmitted": 3,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "NO_ARCHIVED_TEXT"
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:18128",
+        "content_sha256": "6835567fff2dcf8dcf9a283d3dbb83b113c7a828b4f10b100bbf52942d19fc54",
+        "occurred_at": "2026-11-27T19:47:13+00:00",
+        "relevance": {
+          "tickers": [
+            "DV"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "18128",
+          "posted_at": "2026-11-27T19:47:13+00:00",
+          "source_url": "https://t.me/stock_ai_agent/18128",
+          "preview": "",
+          "signals": [
+            {
+              "canonical_ticker": "DV",
+              "display_name": "DoubleVerify Holdings,  Inc.",
+              "market": "US",
+              "source_asof": "2026-11-27T19:47:13+00:00",
+              "signal_action": "WATCH",
+              "trigger_type": "telegram_pdf_report",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            }
+          ],
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "NO_ARCHIVED_TEXT"
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:18127",
+        "content_sha256": "40a488459b55fc6db2520c8fb1f07f0d7c3bd5ae71f4394844fb6e63d6dca3d2",
+        "occurred_at": "2026-11-27T19:47:09+00:00",
+        "relevance": {
+          "tickers": [
+            "ANT",
+            "USD"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "18127",
+          "posted_at": "2026-11-27T19:47:09+00:00",
+          "source_url": "https://t.me/stock_ai_agent/18127",
+          "preview": "",
+          "signals": [
+            {
+              "canonical_ticker": "ANT",
+              "display_name": "Anthropic,  PBC",
+              "market": "US",
+              "source_asof": "2026-11-27T19:47:09+00:00",
+              "signal_action": "WATCH",
+              "trigger_type": "telegram_pdf_report",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            },
+            {
+              "canonical_ticker": "USD",
+              "display_name": "날짜 관측 종가",
+              "market": "US",
+              "source_asof": "2026-11-27T19:47:09+00:00",
+              "signal_action": "WATCH",
+              "trigger_type": "telegram_pdf_report",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            }
+          ],
+          "signals_total": 2,
+          "signals_transmitted": 2,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "NO_ARCHIVED_TEXT"
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:18126",
+        "content_sha256": "e6be747616998b6e414179987b61e4ffcd66c95107a7461b04d8d5b424995bf6",
+        "occurred_at": "2026-11-27T19:47:00+00:00",
+        "relevance": {
+          "tickers": [
+            "AMD"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "18126",
+          "posted_at": "2026-11-27T19:47:00+00:00",
+          "source_url": "https://t.me/stock_ai_agent/18126",
+          "preview": "📊 Advanced Micro Devices (AMD) 미국 반도체 설계 기업으로, 데이터센터·AI 가속기와 서버용 프로세서, PC·게임 및 임베디드 제품을 판매합니다. 💵 거래 현황 (11월 27일 관측치, 최종 종가 미확인) - 주가: $424.54 - 전일 대비: +4.6% (전일 $406.03 기준) - 거래량: 약 2,215만 주. 최근 급락일인 11월 5일·19~20일에는 약...",
+          "signals": [
+            {
+              "canonical_ticker": "AMD",
+              "display_name": "Advanced Micro Devices",
+              "market": "US",
+              "source_asof": "2026-11-27T19:47:00+00:00",
+              "signal_action": "UNKNOWN",
+              "trigger_type": "telegram_message",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            }
+          ],
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 900,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:18125",
+        "content_sha256": "0a34f2cb6f717948e1a72798d04c61f549ec51cbde7234364639743f35bd6a9b",
+        "occurred_at": "2026-11-27T19:46:55+00:00",
+        "relevance": {
+          "tickers": [
+            "DV"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "18125",
+          "posted_at": "2026-11-27T19:46:55+00:00",
+          "source_url": "https://t.me/stock_ai_agent/18125",
+          "preview": "📊 DoubleVerify Holdings (DV) 디지털 광고의 노출 품질을 검증하고 캠페인 성과를 측정·최적화하는 기업입니다. 광고주와 매체사에 광고 측정·검증 서비스를 제공합니다. 💰 거래 정보 (2026.11.27 오후 1시 ET 관측값; 확정 종가 아님) - 주가: $13.62 - 전일 종가 $13.60 대비 +$0.02 (+0.15%) - 거래량: 21,140,373주. 다만...",
+          "signals": [
+            {
+              "canonical_ticker": "DV",
+              "display_name": "DoubleVerify Holdings",
+              "market": "US",
+              "source_asof": "2026-11-27T19:46:55+00:00",
+              "signal_action": "UNKNOWN",
+              "trigger_type": "telegram_message",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "target_price": 13.64,
+              "confidence": 0.45,
+              "warnings": []
+            }
+          ],
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 880,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:18124",
+        "content_sha256": "ea6d05958633f8517667adf73451d1098497bd3fc48e81fe33d4824234b33dfb",
+        "occurred_at": "2026-11-27T19:46:51+00:00",
+        "relevance": {
+          "tickers": [
+            "ANT"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "18124",
+          "posted_at": "2026-11-27T19:46:51+00:00",
+          "source_url": "https://t.me/stock_ai_agent/18124",
+          "preview": "📊 Anthropic, PBC (ANT) Claude AI 모델과 Claude Code 등 업무용 AI 제품을 개발·제공하는 기업입니다. 빠른 매출 성장 기대가 크지만, 아직 적자이며 투자 부담도 상당합니다. 💰 가격: $91.88 — 11월 27일 관측값이며 확정 종가는 아님 📈 등락: 전일 대비 약 +11%(장중 보도 기준) 📉 거래량: 약 1억 4,306만 주 관측. 당일 거래량은...",
+          "signals": [
+            {
+              "canonical_ticker": "ANT",
+              "display_name": "Anthropic, PBC",
+              "market": "US",
+              "source_asof": "2026-11-27T19:46:51+00:00",
+              "signal_action": "UNKNOWN",
+              "trigger_type": "telegram_message",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            }
+          ],
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 768,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:18123",
+        "content_sha256": "2ca1d1f249a803790af28f848ac5f91bb27712459ce3b63c1da82043e53cb979",
+        "occurred_at": "2026-11-27T19:38:18+00:00",
+        "relevance": {
+          "tickers": [
+            "ANT",
+            "DV",
+            "AMD"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "18123",
+          "posted_at": "2026-11-27T19:38:18+00:00",
+          "source_url": "https://t.me/stock_ai_agent/18123",
+          "preview": "🔔 미국주식 오후 프리즘 시그널 얼럿 📅 2026.11.27 오후 분석 포착된 관심종목 🤖 프리즘봇의 가상 포트폴리오 운용 과정을 투명하게 공개합니다. 실제 매수 권유가 아닙니다. 🧭 장기추세: 온건 약세 | 스윙: 단기 조정 | 실행기준: 온건 약세 | 선정: 탑다운 0종목 + 바텀업 3종목 🧭 오늘 테마 흐름 미국 1,019종목 · 전일 종가 대비 · 테마별 중앙값 📈 강한 테마 1...",
+          "signals": [
+            {
+              "canonical_ticker": "ANT",
+              "display_name": "Anthropic, PBC",
+              "market": "US",
+              "source_asof": "2026-11-27T19:38:18+00:00",
+              "signal_action": "WATCH",
+              "trigger_type": "telegram_signal_alert",
+              "trigger_score": 0.82,
+              "composite_score": 0.82,
+              "confidence": 0.82,
+              "warnings": []
+            },
+            {
+              "canonical_ticker": "DV",
+              "display_name": "DoubleVerify Holdings, Inc.",
+              "market": "US",
+              "source_asof": "2026-11-27T19:38:18+00:00",
+              "signal_action": "WATCH",
+              "trigger_type": "telegram_signal_alert",
+              "trigger_score": 0.67,
+              "composite_score": 0.67,
+              "confidence": 0.67,
+              "warnings": []
+            },
+            {
+              "canonical_ticker": "AMD",
+              "display_name": "Advanced Micro Devices, Inc.",
+              "market": "US",
+              "source_asof": "2026-11-27T19:38:18+00:00",
+              "signal_action": "WATCH",
+              "trigger_type": "telegram_signal_alert",
+              "trigger_score": 0.95,
+              "composite_score": 0.95,
+              "confidence": 0.95,
+              "warnings": []
+            }
+          ],
+          "signals_total": 3,
+          "signals_transmitted": 3,
+          "signals_truncated": false,
+          "simulation_only": true,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 1009,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:18122",
+        "content_sha256": "df75fae984fd673000ae3ac0e348832477a47a99a23a74370f868d4d19c0f254",
+        "occurred_at": "2026-11-27T17:46:38+00:00",
+        "relevance": {
+          "tickers": [
+            "INFY",
+            "COST",
+            "AAPL",
+            "VRSN",
+            "PANW",
+            "AS"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "18122",
+          "posted_at": "2026-11-27T17:46:38+00:00",
+          "source_url": "https://t.me/stock_ai_agent/18122",
+          "preview": "📊 프리즘 US 시뮬레이터 | 실시간 포트폴리오 (2026-11-28 02:46) 🔸 현재 보유: 6/10개 🔸 사용 비중: 4.30/10 슬롯 (분할 매수·시험매수 반영) ✅ 최고 수익: Infosys Limited(INFY) +4.60% ⚠️ 최저 수익: Costco Wholesale Corporation(COST) -2.02% 🔸 보유 종목: - Apple Inc.(AAPL) [T...",
+          "signals": [
+            {
+              "canonical_ticker": "INFY",
+              "display_name": "Infosys Limited",
+              "market": "US",
+              "source_asof": "2026-11-27T17:46:38+00:00",
+              "signal_action": "HOLD",
+              "trigger_type": "telegram_portfolio_snapshot",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            },
+            {
+              "canonical_ticker": "COST",
+              "display_name": "Costco Wholesale Corporation",
+              "market": "US",
+              "source_asof": "2026-11-27T17:46:38+00:00",
+              "signal_action": "HOLD",
+              "trigger_type": "telegram_portfolio_snapshot",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "confidence": 0.45,
+              "warnings": []
+            },
+            {
+              "canonical_ticker": "AAPL",
+              "display_name": "Apple Inc.",
+              "market": "US",
+              "source_asof": "2026-11-27T17:46:38+00:00",
+              "signal_action": "HOLD",
+              "trigger_type": "telegram_portfolio_snapshot",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "stop_loss_price": 334.0,
+              "target_price": 422.86,
+              "confidence": 0.45,
+              "warnings": [
+                "multi_ticker_prices_scoped_to_mention_block"
+              ]
+            },
+            {
+              "canonical_ticker": "VRSN",
+              "display_name": "VeriSign, Inc.",
+              "market": "US",
+              "source_asof": "2026-11-27T17:46:38+00:00",
+              "signal_action": "HOLD",
+              "trigger_type": "telegram_portfolio_snapshot",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "stop_loss_price": 296.01,
+              "target_price": 370.93,
+              "confidence": 0.45,
+              "warnings": [
+                "multi_ticker_prices_scoped_to_mention_block"
+              ]
+            },
+            {
+              "canonical_ticker": "PANW",
+              "display_name": "Palo Alto Networks, Inc.",
+              "market": "US",
+              "source_asof": "2026-11-27T17:46:38+00:00",
+              "signal_action": "HOLD",
+              "trigger_type": "telegram_portfolio_snapshot",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "stop_loss_price": 338.09,
+              "target_price": 426.67,
+              "confidence": 0.45,
+              "warnings": [
+                "multi_ticker_prices_scoped_to_mention_block"
+              ]
+            },
+            {
+              "canonical_ticker": "AS",
+              "display_name": "Amer Sports, Inc.",
+              "market": "US",
+              "source_asof": "2026-11-27T17:46:38+00:00",
+              "signal_action": "HOLD",
+              "trigger_type": "telegram_portfolio_snapshot",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "stop_loss_price": 28.98,
+              "target_price": 36.61,
+              "confidence": 0.45,
+              "warnings": [
+                "multi_ticker_prices_scoped_to_mention_block"
+              ]
+            }
+          ],
+          "signals_total": 6,
+          "signals_transmitted": 6,
+          "signals_truncated": false,
+          "simulation_only": true,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 1200,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      },
+      {
+        "event_key": "stock_ai_agent:18121",
+        "content_sha256": "4012c21e6ca689b3354222301873dd5e46751cd0979138a610cb096584279861",
+        "occurred_at": "2026-11-27T17:46:32+00:00",
+        "relevance": {
+          "tickers": [
+            "INFY"
+          ],
+          "markets": [
+            "US"
+          ],
+          "themes": [],
+          "match_basis": "normalized_prism_signals"
+        },
+        "summary": {
+          "channel": "stock_ai_agent",
+          "message_id": "18121",
+          "posted_at": "2026-11-27T17:46:32+00:00",
+          "source_url": "https://t.me/stock_ai_agent/18121",
+          "preview": "📈 추가 매수(비중 확대): Infosys Limited(INFY) 비중: 80% → 85% (1슬롯 기준) 추가 매수가: $13.02 평균 매수가: $12.54 손절가: $11.89 (손절 시 전량 매도) 근거: 눌림 회복 조건 확인 — 11월 24일 고가 $12.64와 11월 5일 종가 $12.80을 지지 구간으로 봅니다. 해당 구간 돌파 후 눌림이 실제로 발생하고, 구간 하단 주문...",
+          "signals": [
+            {
+              "canonical_ticker": "INFY",
+              "display_name": "Infosys Limited",
+              "market": "US",
+              "source_asof": "2026-11-27T17:46:32+00:00",
+              "signal_action": "UNKNOWN",
+              "trigger_type": "telegram_message",
+              "trigger_score": 0.45,
+              "composite_score": 0.45,
+              "stop_loss_price": 11.89,
+              "confidence": 0.45,
+              "warnings": []
+            }
+          ],
+          "signals_total": 1,
+          "signals_transmitted": 1,
+          "signals_truncated": false,
+          "simulation_only": false,
+          "actionability": "research_only",
+          "normalization": {
+            "version": "prism-telegram/v3",
+            "status": "ARCHIVED_TEXT_RECHECKED",
+            "text_chars": 235,
+            "text_source": "public_metadata",
+            "action_changes": [],
+            "recovered_tickers": []
+          }
+        }
+      }
+    ],
+    "guardrails": {
+      "untrusted_content": true,
+      "advisory_only": true,
+      "may_promote_market_execution": false,
+      "multi_ticker_message_prices_require_recheck": true
+    },
+    "model_provenance": {
+      "schema": "tradingagents.model-provenance/v1",
+      "work_synthesis": {
+        "execution_mode": "local",
+        "requested_model": "gpt-6.2-sol",
+        "requested_reasoning_effort": "medium",
+        "task_id": "tradingagents-work-prism",
+        "verification_status": "CONFIGURED_NOT_RUNTIME_VERIFIED",
+        "observed_model": null,
+        "observed_reasoning_effort": null,
+        "note": "The local task contract is verified; the Work host does not expose a signed per-response model receipt."
+      }
+    }
+  }
+}

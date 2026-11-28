@@ -1,0 +1,551 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YouTube 투자자용 검증 리포트 - 오늘 코스피보다 &#x27;코스닥&#x27;이 더 많이 올랐던 진짜 이유</title>
+  <style>
+:root {
+  color-scheme: light;
+  --bg: #f7f8fb;
+  --panel: #ffffff;
+  --text: #172033;
+  --muted: #667085;
+  --line: #d9dee8;
+  --accent: #0f766e;
+  --accent-2: #2563eb;
+  --warn: #b45309;
+  --bad: #b42318;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0 56px; }
+a { color: var(--accent-2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.hero { padding: 28px 0 22px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+.hero.compact { padding-top: 12px; }
+.hero h1 { margin: 0; font-size: clamp(28px, 4vw, 44px); line-height: 1.15; letter-spacing: 0; }
+.hero p { max-width: 760px; color: var(--muted); margin: 12px 0 0; }
+.eyebrow { color: var(--accent); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0; margin: 0 0 8px; }
+section { margin: 28px 0; }
+h2, h3, h4, h5 { letter-spacing: 0; line-height: 1.25; }
+.synthesis-callout { padding: clamp(20px, 4vw, 34px); border: 1px solid #6ee7d8; border-radius: 18px; background: linear-gradient(135deg, #ecfdf9 0%, #eff6ff 100%); box-shadow: 0 18px 44px rgba(15, 118, 110, .12); }
+.synthesis-callout.unavailable { border-color: var(--line); background: var(--panel); box-shadow: none; }
+.synthesis-callout h2 { margin: 0; font-size: clamp(24px, 3.2vw, 36px); }
+.synthesis-callout .lead { max-width: 900px; font-size: 17px; color: #334155; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.primary-link, .secondary-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border-radius: 999px; font-weight: 800; }
+.primary-link { color: white; background: var(--accent); }
+.secondary-link { color: var(--accent-2); border: 1px solid #93c5fd; background: white; }
+.primary-link:hover, .secondary-link:hover { text-decoration: none; filter: brightness(.97); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.card, .run { display: flex; flex-direction: column; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; color: var(--text); min-height: 128px; }
+.run { padding: 16px; }
+.card:hover, .run:hover { border-color: var(--accent-2); text-decoration: none; }
+.thumb { display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #e9edf5; border-radius: 8px 8px 0 0; color: var(--muted); font-size: 13px; font-weight: 700; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb-empty span { padding: 0 14px; text-align: center; }
+.card-body { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 16px; }
+.card strong { line-height: 1.35; }
+.source-line { color: #3f4a5f; font-weight: 600; }
+.runs { display: grid; gap: 10px; }
+.badge { display: inline-flex; width: fit-content; border-radius: 999px; padding: 2px 9px; background: #e6f4f1; color: var(--accent); font-size: 12px; font-weight: 700; }
+.status-contradicted, .status-llm_failed { background: #fee4e2; color: var(--bad); }
+.status-unverified, .status-stale { background: #fff4d6; color: var(--warn); }
+small, .muted { color: var(--muted); }
+.topnav { display: flex; gap: 14px; margin-bottom: 16px; font-size: 14px; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px; }
+.stats span { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
+.report { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: min(5vw, 36px); }
+.report-head { border-bottom: 1px solid var(--line); margin-bottom: 24px; padding-bottom: 20px; }
+.report-head h1 { margin: 0; font-size: clamp(24px, 3.5vw, 38px); line-height: 1.2; }
+.meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+.scope-note { padding: 12px 14px; border-left: 4px solid var(--warn); border-radius: 6px; background: #fff7ed; color: #7c2d12; }
+.synthesis-report h2 { margin-top: 34px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.synthesis-report h3 { margin: 24px 0 8px; color: #0f4c5c; }
+.synthesis-report p, .synthesis-report li { overflow-wrap: anywhere; }
+pre { overflow: auto; background: #111827; color: #f9fafb; border-radius: 8px; padding: 14px; }
+code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+details { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 18px; }
+@media (max-width: 640px) {
+  main { width: min(100% - 20px, 1120px); padding-top: 18px; }
+  .report { padding: 18px; }
+  .synthesis-callout { border-radius: 14px; padding: 18px; }
+  .cta-row a { width: 100%; }
+  .mobile-report { border-radius: 12px; }
+}
+</style>
+</head>
+<body>
+  <main>
+<nav class="topnav"><a href="index.html">실행 목록</a><a href="../../index.html">YouTube 홈</a></nav>
+<article class="report">
+  <header class="report-head">
+    <p class="eyebrow">youtube_20261128_065117</p>
+    <h1>오늘 코스피보다 &#x27;코스닥&#x27;이 더 많이 올랐던 진짜 이유</h1>
+    <div class="meta">
+      <span class="badge status-unverified">unverified</span>
+      <a href="https://www.youtube.com/watch?v=JAgzr_2cfcs">원본 영상</a>
+    </div>
+  </header>
+  <h2>코스닥은 왜 코스피보다 더 올랐나</h2>
+<p><strong>코스닥이 더 크게 반등했다는 보도는 확인되지만, 무엇이 상승폭 차이를 만들었는지는 확인되지 않았다.</strong> 2026년 11월 27일이 영상이 가리키는 유력한 거래일이다. 이날 보도는 코스닥의 8%대 반등과 외국인·기관의 동반 매수를 뒷받침하지만, 영상이 제시한 낙폭 과대주 매수, 강제매도 부담 완화, 삼성전자 로봇 기대의 기여도는 입증하지 못한다.</p>
+<p>분석 대상: 경제사냥꾼 <a href="https://www.youtube.com/watch?v=JAgzr_2cfcs&amp;t=0s">영상 00:00–02:10</a> · 2026년 11월 27일 게시</p>
+<h3>영상 주장과 확인된 사실·근거</h3>
+<p>| 항목 | 영상 주장 | 확인된 사실·근거 |</p>
+<p>|---|---|---|</p>
+<p>| 지수와 수급 (C1·C9) | 당일 오후 코스피는 4%대, 코스닥은 8% 넘게 상승했다. 장 마감 기준 코스닥 외국인·기관 합산 순매수는 9,000억 원에 가까웠고, 기관은 5,871억 원으로 외국인의 약 두 배였다. | <strong>부분 확인.</strong> <a href="https://www.kfenews.co.kr/news/articleView.html?idxno=668971">한국금융경제신문</a>은 11월 27일 코스피 4% 초과·코스닥 8% 초과 상승을 보도했다. <a href="https://www.hani.co.kr/arti/economy/finance/1289465.html">한겨레</a>가 보도한 코스닥 <strong>708.99(+8.13%)는 종가</strong>다. <a href="https://news.bizwatch.co.kr/article/market/2026/11/27/0026">비즈워치</a>는 외국인·기관의 동반 매수를 보도했으나, 제공된 발췌로는 마감 순매수액이나 배율을 확인할 수 없다. 두 지수의 같은 시각 오후 수치도 없다. |</p>
+<p>| 낙폭 과대주 반등 (C2·C4) | ‘지난 23일’ 코스닥이 장중 618선까지 내려 연중 고점 대비 거의 반토막이 났고, 불안이 누그러지자 바이오·이차전지 등 낙폭이 컸던 종목으로 자금이 돌아왔다. | <strong>미검증.</strong> 23일의 정확한 날짜, 장중 저가, 당시 연중 장중 고가가 없다. 코스닥 전체의 매수세 보도는 바이오·이차전지 종목의 선행 낙폭이나 당일 순매수, 불안 완화와 매수의 인과를 보여주지 않는다. |</p>
+<p>| 신용거래와 강제매도 (C3) | 코스닥 신용투자 금액이 ‘지난 1월’보다 40% 넘게 줄어 강제매도 부담이 완화됐다. | <strong>미검증.</strong> 신용융자 잔고인지 신규 융자액인지, 어느 시점끼리 비교했는지 확인되지 않았다. 잔고가 감소했더라도 신용융자 반대매매가 줄었다는 뜻은 아니다. 미수금 반대매매도 별도 지표다. |</p>
+<p>| 증안펀드 (C5) | 증안펀드 기대는 두 시장의 공통 재료이므로 코스닥의 상대 강세를 단독으로 설명하기 어렵다. 영상은 실제 집행을 주장하지 않았다. | <strong>보도 내용만 확인.</strong> <a href="https://www.kfenews.co.kr/news/articleView.html?idxno=668971">한국금융경제신문</a>은 가동 기대를, <a href="https://news.bizwatch.co.kr/article/market/2026/11/27/0026">비즈워치</a>는 확대 기대를 반등 배경으로 언급했다. 공식 결정·집행·시장별 지원 범위는 미확인이다. 공통 뉴스라도 시장별 반응은 다를 수 있어 상대 강세에 미친 영향을 배제할 수 없다. |</p>
+<p>| 삼성전자 로봇과 업종 기여도 (C6–C8) | ‘내년 1월’ 사람처럼 움직이는 로봇 공개 기대와 반도체 공장 대규모 도입 전망이 레인보우로보틱스 등 코스닥 로봇주를 끌어올렸고, 바이오·이차전지주도 지수 상승폭을 키웠다. | <strong>미검증.</strong> 공개 일정과 공장 배치 계획을 뒷받침할 회사 발표·공시가 없다. 공개 대상 로봇과 공장 도입 대상이 같은지도 불명확하다. 주요 로봇사의 코스닥 상장 비중, 종목별 등락률, 업종별 지수 기여도, 뉴스와 주가 움직임의 선후관계도 확인되지 않았다. |</p>
+<h3>강세 논리와 반론</h3>
+<p>영상의 강세 논리가 설득력을 얻으려면 외국인·기관 매수가 반등 당일에 그치지 않고, 이전 낙폭이 컸던 종목군으로 실제로 확산됐는지가 중요하다. 같은 기간 신용융자 반대매매까지 줄었다면 강제매도 압력이 완화됐다는 설명에 힘이 실린다. 로봇의 경우 공식 공개는 기대를 뒷받침할 수 있지만, 공급사 수주나 실적을 평가하려면 실제 구매·배치 계획이 별도로 필요하다.</p>
+<p>반대로 반등이 소수 대형주에 집중됐거나 동반 매수가 곧 순매도로 바뀐다면, 시장 전반으로 매수가 확산됐다는 해석은 약해진다. 신용잔고만 줄고 실제 반대매매가 줄지 않았다면 강제매도 완화 설명의 근거도 약하다. 로봇 관련 주가 상승이 뉴스보다 앞섰거나 해당 종목군의 지수 기여도가 작았다면, 로봇 기대가 코스닥 상대 강세를 주도했다는 설명은 힘을 잃는다. 증안펀드가 실제 집행되더라도 기업 실적 개선이나 하락장 종료를 뜻하지는 않는다.</p>
+<h3>단기 체크포인트</h3>
+<p>1. <strong>거래일과 장중 격차 확인:</strong> <a href="https://data.krx.co.kr/contents/MDC/MAIN/main.jspx">KRX 정보데이터시스템</a>에서 후보일의 마감 수급을 확인해 영상 속 금액·배율과 대조한다. 이어 두 지수의 전일 종가 대비 같은 시각 오후 등락률을 비교한다. ‘지난 23일’이 특정되면 코스닥 장중 저가와 당시까지의 연중 장중 고가로 하락률을 계산한다.</p>
+<p>2. <strong>수급의 지속성과 범위:</strong> 기준 거래일 확정 후 영상이 말한 ‘다음 주’의 외국인·기관 순매수를 같은 분류로 일별·주간 집계한다. 코스피 대비 코스닥 수익률, 상승 종목 비중, 로봇·바이오·이차전지 종목별 순매수와 시가총액 가중 지수 기여도를 함께 본다. 거래대금 증가만으로 순매수를 판단하지 않는다.</p>
+<p>3. <strong>신용과 정책의 실제 변화:</strong> 금융투자협회 통계에서 동일한 정의·시점으로 신용융자 금액을 비교하고, 확인 가능한 실제 신용융자 반대매매는 별도로 본다. 금융위원회 공식 자료가 나오면 증안펀드 검토·가동 결정·집행을 구분하고, 발표 전후 두 지수의 반응을 비교한다.</p>
+<p>4. <strong>로봇 기대의 실체:</strong> 삼성전자 뉴스룸·IR·공시에서 공개 주체와 일정을 확인하고, 공장 도입은 시범 운영인지 실제 구매·배치인지 구분한다. 레인보우로보틱스 등 관련주의 가격·수급 움직임과 뉴스 공개 시각을 대조한다.</p>
+<h3>검증 범위와 데이터 한계</h3>
+<ul>
+<li><strong>타임스탬프·자막:</strong> 모든 주장은 한국어 자동자막 단일 청크 <strong>00:00:00–00:02:10</strong>에 속한다. <code>00:00:00</code>은 개별 발화 시각이 아니라 청크 시작점이다. <code>transcript_quality</code>는 <strong>good(1.0)</strong>, 주장별 <code>asr_confidence</code>는 <strong>0.92–0.95</strong>였으나, 핵심 숫자를 원음과 대조하지 않았으며 높은 자막 점수가 사실의 정확성을 보장하지 않는다.</li>
+<li><strong>근거 신뢰도:</strong> 주장 검증 단계의 <code>source_confidence</code>는 지수 <strong>0.79</strong>, 증안펀드 <strong>0.76</strong>, 수급 <strong>0.52</strong>, 나머지 <strong>0.00</strong>이다. 자막에서 주장을 식별한 확신과는 별개이며, 0.00은 제공 자료에 직접 뒷받침할 근거가 없다는 뜻이지 반증이 있다는 뜻이 아니다. 자료는 기사 발췌·조회 안내·코스피 스냅샷에 그쳐 거래소 원자료나 공시를 대체하지 못한다. 게시일은 거래일 확정 근거가 아니므로 영상의 상대 날짜는 절대 날짜로 환산하지 않았다.</li>
+<li><strong>폐쇄형 자료 — 미검증·수동 확인 필요:</strong> Bloomberg·Morningstar 원문은 제공되지 않았다. 비공개 반대매매 집행 내역, 삼성전자 내부 일정·배치 계획, 개별 매수자의 실제 동기도 확인되지 않았다. 공개 거래자료에서 관찰되는 가격과 수급은 이런 주장의 정황일 뿐 직접 증거가 아니다.</li>
+</ul>
+  <details>
+    <summary>공개 요약 JSON</summary>
+    <pre>{
+  &quot;version&quot;: 4,
+  &quot;video_id&quot;: &quot;JAgzr_2cfcs&quot;,
+  &quot;title&quot;: &quot;오늘 코스피보다 &#x27;코스닥&#x27;이 더 많이 올랐던 진짜 이유&quot;,
+  &quot;url&quot;: &quot;https://www.youtube.com/watch?v=JAgzr_2cfcs&quot;,
+  &quot;channel&quot;: &quot;경제사냥꾼&quot;,
+  &quot;channel_id&quot;: &quot;UC7usMJDHmtbs_oegmzQKKMA&quot;,
+  &quot;source_url&quot;: &quot;https://www.youtube.com/@%EA%B2%BD%EC%A0%9C%EC%82%AC%EB%83%A5%EA%BE%BC/shorts&quot;,
+  &quot;thumbnail_url&quot;: &quot;https://i.ytimg.com/vi/JAgzr_2cfcs/maxresdefault.jpg&quot;,
+  &quot;published_at&quot;: &quot;2026-11-27T10:40:03+00:00&quot;,
+  &quot;status&quot;: &quot;unverified&quot;,
+  &quot;strategy_source_tier&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_evidence_weight&quot;: &quot;STANDARD&quot;,
+  &quot;strategy_validation_policy&quot;: &quot;STANDARD_REVIEW&quot;,
+  &quot;transcript_status&quot;: &quot;available&quot;,
+  &quot;transcript_source&quot;: &quot;automatic&quot;,
+  &quot;transcript_chars&quot;: 1511,
+  &quot;transcript_quality&quot;: {
+    &quot;status&quot;: &quot;good&quot;,
+    &quot;score&quot;: 1.0,
+    &quot;warnings&quot;: [],
+    &quot;source&quot;: &quot;automatic&quot;,
+    &quot;language&quot;: &quot;Korean (Original)&quot;,
+    &quot;model_or_format&quot;: &quot;json3&quot;,
+    &quot;chars&quot;: 1511,
+    &quot;segments&quot;: 79,
+    &quot;duration_seconds&quot;: 130,
+    &quot;repeated_ngram_ratio&quot;: 0.0
+  },
+  &quot;generated_at&quot;: &quot;2026-11-28T06:51:17.829465+09:00&quot;,
+  &quot;llm_status&quot;: &quot;success&quot;,
+  &quot;research_status&quot;: &quot;success&quot;,
+  &quot;claim_verification_status&quot;: &quot;success&quot;,
+  &quot;research_pipeline_version&quot;: 4,
+  &quot;evidence_count&quot;: 5,
+  &quot;claim_status_summary&quot;: {
+    &quot;partially_supported&quot;: 3,
+    &quot;unverified&quot;: 6
+  },
+  &quot;claims&quot;: [
+    {
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;claim_text&quot;: &quot;영상이 가리키는 거래일 오후에 코스피는 4%대, 코스닥은 8% 넘게 상승했다.&quot;,
+      &quot;status&quot;: &quot;partially_supported&quot;,
+      &quot;confidence&quot;: 0.72,
+      &quot;supporting_evidence_ids&quot;: [
+        &quot;E3&quot;,
+        &quot;E4&quot;,
+        &quot;E5&quot;
+      ],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.79,
+      &quot;asr_confidence&quot;: 0.95,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;같은 날 오후 코스피 4%대, 코스닥 8% 초과 상승&quot;,
+        &quot;observed&quot;: &quot;보도상 코스피 4% 초과, 코스닥 종가 708.99 및 +8.13%. 같은 시각의 장중 등락률은 미확인.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;보도는 코스닥의 상대 강세를 뒷받침하지만, 장중 격차의 크기와 시점은 거래소 시세로 확인해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;claim_text&quot;: &quot;‘지난 23일’ 코스닥이 장중 618선까지 내려가 당해 연중 고점 대비 거의 반토막이 났다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.08,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.95,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;지난 23일 장중 618선, 연중 고점 대비 거의 50% 하락&quot;,
+        &quot;observed&quot;: &quot;해당일 장중 저가·연중 장중 고가·고점 대비 하락률 미확인&quot;
+      },
+      &quot;investor_implication&quot;: &quot;낙폭이 얼마나 컸는지 확인되기 전에는 ‘반토막’을 전제로 반등 여력을 판단하기 어렵다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;claim_text&quot;: &quot;‘이번 달’ 코스닥 신용투자 금액이 ‘지난 1월’보다 40% 넘게 줄어 강제매도 부담이 완화됐다는 해석이다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.06,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.95,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;‘이번 달’ 코스닥 신용투자 금액이 ‘지난 1월’ 대비 40% 초과 감소&quot;,
+        &quot;observed&quot;: &quot;지표 정의, 기준월·비교월 수치, 코스닥 신용융자 반대매매 금액 모두 미확인&quot;
+      },
+      &quot;investor_implication&quot;: &quot;신용 규모 변화와 실제 강제매도 압력을 구분해야 반등이 이어질 가능성을 평가할 수 있다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;claim_text&quot;: &quot;시장 불안이 누그러지자 이전 낙폭이 컸던 바이오·이차전지주 등에 매수 자금이 돌아왔다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.16,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.95,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;구체적 수치 없음&quot;,
+        &quot;observed&quot;: &quot;업종별 선행 하락폭·당일 수익률·투자자별 순매수 미확인&quot;
+      },
+      &quot;investor_implication&quot;: &quot;지수 반등만으로 특정 업종에 자금이 돌아왔다고 판단하기보다 종목별 순매수와 상승 종목의 범위를 확인할 필요가 있다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;claim_text&quot;: &quot;언론은 증안펀드 기대를 상승 재료로 보도했지만, 영상은 두 시장에 공통인 재료만으로 코스닥의 상대 강세를 설명하기 어렵다고 본다. 영상은 실제 집행을 주장하지 않는다.&quot;,
+      &quot;status&quot;: &quot;partially_supported&quot;,
+      &quot;confidence&quot;: 0.68,
+      &quot;supporting_evidence_ids&quot;: [
+        &quot;E3&quot;,
+        &quot;E4&quot;,
+        &quot;E5&quot;
+      ],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.76,
+      &quot;asr_confidence&quot;: 0.92,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;집행액 주장 없음&quot;,
+        &quot;observed&quot;: &quot;공식 집행액과 시장별 투입 내역 미확인&quot;
+      },
+      &quot;investor_implication&quot;: &quot;정책 기대에 따른 가격 반응을 실제 자금 집행이나 기업 실적 개선으로 해석하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;claim_text&quot;: &quot;삼성전자가 ‘내년 1월’ 사람처럼 움직이는 로봇을 공개할 것이라는 기대가 있었다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.06,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.94,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;‘내년 1월’ 공개 기대&quot;,
+        &quot;observed&quot;: &quot;기준 연도와 공개 일정 미확인&quot;
+      },
+      &quot;investor_implication&quot;: &quot;공식 일정이나 출처가 명시된 당시 보도가 나오기 전에는 1월 공개를 확정된 일정으로 보지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;claim_text&quot;: &quot;삼성전자가 반도체 공장에 로봇을 대규모로 도입할 것이라는 전망이 나왔다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.06,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.94,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;대규모 도입 전망, 수량·시점 미제시&quot;,
+        &quot;observed&quot;: &quot;배치 규모·일정·대상 공장 미확인&quot;
+      },
+      &quot;investor_implication&quot;: &quot;공급사 매출이나 수주에 반영하기 전에 시범 사업과 실제 구매·배치 계획을 구분해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;claim_text&quot;: &quot;국내 주요 로봇사 상당수가 코스닥에 상장돼 있고, 삼성전자 로봇 기대에 레인보우로보틱스 등 로봇주가 크게 올랐으며 바이오·이차전지주도 코스닥 상승폭을 키웠다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.12,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.94,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;주요 로봇사 상당수 코스닥 상장 및 관련주 급등, 구체 수치 없음&quot;,
+        &quot;observed&quot;: &quot;상장 비중·종목별 등락률·업종별 지수 기여도 미확인&quot;
+      },
+      &quot;investor_implication&quot;: &quot;특정 종목 급등과 시가총액 가중 지수에 대한 업종 기여도, 그리고 급등 원인은 각각 구분해 판단해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;claim_text&quot;: &quot;코스닥 장 마감 기준 외국인·기관 합산 순매수는 9,000억 원에 가깝고 기관은 5,871억 원으로 외국인의 약 두 배였다. 다음 주 순매수 지속 여부는 관찰 과제다.&quot;,
+      &quot;status&quot;: &quot;partially_supported&quot;,
+      &quot;confidence&quot;: 0.4,
+      &quot;supporting_evidence_ids&quot;: [
+        &quot;E5&quot;
+      ],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:00&quot;,
+      &quot;source_confidence&quot;: 0.52,
+      &quot;asr_confidence&quot;: 0.95,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;합산 약 9,000억 원, 기관 5,871억 원, 기관이 외국인의 약 2배&quot;,
+        &quot;observed&quot;: &quot;동반 매수세 보도만 있음. 장 마감 순매수액·합산액·배율 미확인.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;마감 확정치와 이후 수급의 지속 여부를 확인하되, 동반 매수나 하루 급등만으로 하락장이 끝났다고 판단하지 않는다.&quot;
+    }
+  ],
+  &quot;entities&quot;: [
+    {
+      &quot;ticker&quot;: &quot;^KS11&quot;,
+      &quot;name&quot;: &quot;코스피&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [],
+      &quot;numeric_claims&quot;: [
+        &quot;영상에서 언급한 당일 오후 코스피는 4%대 상승했다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다.&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;^KS11&quot;,
+        &quot;as_of&quot;: &quot;2026-11-27T21:59:40.738545+00:00&quot;,
+        &quot;current_price&quot;: 4915.68,
+        &quot;market_cap&quot;: null,
+        &quot;forward_pe&quot;: null,
+        &quot;trailing_pe&quot;: null,
+        &quot;fifty_two_week_high&quot;: 9385.59,
+        &quot;fifty_two_week_low&quot;: 3892.08,
+        &quot;average_target_price&quot;: null,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;verified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;verified&quot;
+    }
+  ],
+  &quot;evidence&quot;: [
+    {
+      &quot;evidence_id&quot;: &quot;E1&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;KOSPI 과거 금리 - Investing.com&quot;,
+      &quot;source_url&quot;: &quot;//duckduckgo.com/l/?uddg=https%3A%2F%2Fkr.investing.com%2Findices%2Fkospi%2Dhistorical%2Ddata&amp;rut=6a7ff392dbb28d57fe889ce3d57cb62ecd14ec1725d5a4c089953816021738f7&quot;,
+      &quot;publisher&quot;: &quot;duckduckgo.com&quot;,
+      &quot;published_at&quot;: null,
+      &quot;source_tier&quot;: &quot;web&quot;,
+      &quot;excerpt&quot;: &quot;무료로 KOSPI의 과거 데이터를 받으세요. 선택한 범위 날짜의 종가, 시작가, 고가, 저가, 변동 및 % 변동을 찾을 수 있습니다. 이 데이터는 일일, 주간, 월간 간격으로 볼 수 있습니다. 표의 아래쪽에서 선택한 범위의 날짜에 대한 데이터 요약을 찾을 수 있습니다.&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E2&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;data.krx.co.kr&quot;,
+      &quot;source_url&quot;: &quot;//duckduckgo.com/l/?uddg=https%3A%2F%2Fdata.krx.co.kr%2Fcontents%2FMDC%2FMAIN%2Fmain.jspx&amp;rut=d1aa203ac058a554e5ed5d5a5915d1885856c65fe47022020b2e7dab0fd15788&quot;,
+      &quot;publisher&quot;: &quot;duckduckgo.com&quot;,
+      &quot;published_at&quot;: null,
+      &quot;source_tier&quot;: &quot;official&quot;,
+      &quot;excerpt&quot;: &quot;상장종목 현황 직전영업일 ... *신규상장 기업수 : 당일 기준 연누적 데이터 발간자료 증권 시장지 통계월보 KRX MARKET KRX ETF·ETN MONTHLY Quick Menu 데이터 종합사전 순위 통계 공매도 통계 기업분석 보고서 데이터 구입&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E3&quot;,
+      &quot;claim_id&quot;: &quot;GLOBAL&quot;,
+      &quot;title&quot;: &quot;코스피, 증안펀드 기대에 4910선 상승 마감&quot;,
+      &quot;source_url&quot;: &quot;https://www.kfenews.co.kr/news/articleView.html?idxno=668971&quot;,
+      &quot;publisher&quot;: &quot;Naver News&quot;,
+      &quot;published_at&quot;: &quot;2026-11-27T16:44:00+09:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;사진=연합뉴스 한국금융경제신문=박상민 기자 | 코스피가 27일 증안펀드 가동 기대감에 4% 넘게 오르며 4910선으로 올라섰다. 코스닥은 매수 사이드카가 발동되는 등 8% 넘게 급등하며 12거래일 만에 700선을...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E4&quot;,
+      &quot;claim_id&quot;: &quot;GLOBAL&quot;,
+      &quot;title&quot;: &quot;코스피 4%·코스닥 8% 급등…증안펀드 기대감 반영됐나 - 한겨레&quot;,
+      &quot;source_url&quot;: &quot;//duckduckgo.com/l/?uddg=https%3A%2F%2Fwww.hani.co.kr%2Farti%2Feconomy%2Ffinance%2F1289465.html&amp;rut=ed236a76ed41de3a03e32ebc8fca930c22d42a237f1d48db3d5079bd8c3b4f94&quot;,
+      &quot;publisher&quot;: &quot;duckduckgo.com&quot;,
+      &quot;published_at&quot;: null,
+      &quot;source_tier&quot;: &quot;web&quot;,
+      &quot;excerpt&quot;: &quot;코스닥 지수는 전날보다 8.13% 급등한 708.99에 마쳤다. 지수가 700선을 넘은 것은 지난 11일 (705.10) 이후 12거래일 만이다. 이날 코스닥 지수는 1.34% 오른 ...&quot;
+    }
+  ],
+  &quot;source_policy&quot;: {
+    &quot;raw_transcript_published&quot;: false,
+    &quot;raw_transcript_in_evidence&quot;: false,
+    &quot;research_pipeline_version&quot;: 4,
+    &quot;closed_source_claims&quot;: &quot;unverified_external_source&quot;,
+    &quot;auto_caption_warning&quot;: true,
+    &quot;local_asr_warning&quot;: false
+  }
+}</pre>
+  </details>
+</article>
+</main>
+  <style>
+.reader-contents { margin: 16px 0; padding: 12px 16px; border: 1px solid var(--line, #64748b); border-radius: 12px; }
+.reader-contents > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-weight: 750; }
+.reader-contents nav { display: grid; gap: 4px; max-height: 45vh; overflow: auto; margin: 8px 0; }
+.reader-contents a { display: block; min-height: 44px; padding: 10px; border-radius: 6px; color: inherit; overflow-wrap: anywhere; }
+.reader-contents a:hover { background: #80808020; }
+.reader-contents .reader-subsection { padding-inline-start: 24px; font-size: .92em; }
+.reader-prose, .report { overflow-wrap: anywhere; line-height: 1.8; }
+.reader-prose p, .reader-prose li { max-width: 85ch; }
+.reader-prose h2, .reader-prose h3, .reader-prose h4, [data-reader-heading] { scroll-margin-top: 100px; line-height: 1.45; }
+.reader-prose h2 { margin-top: 1.8em; padding-bottom: 8px; border-bottom: 1px solid var(--line, #64748b); }
+.reader-prose h3 { margin-top: 1.5em; }
+.reader-prose li { margin: .5em 0; }
+.reader-prose pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.reader-prose blockquote { margin: 16px 0; padding: 4px 16px; border-left: 3px solid var(--accent, #64748b); }
+.reader-table { overflow: auto; max-width: 100%; margin: 16px 0; border: 1px solid var(--line, #64748b); border-radius: 10px; }
+.reader-table table { border-collapse: collapse; width: 100%; margin: 0; font-size: .92rem; }
+.reader-table th, .reader-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line, #64748b); min-width: 110px; max-width: 400px; overflow-wrap: anywhere; white-space: normal; }
+.reader-table th { background: #80808018; }
+.reader-table tr:nth-child(even) { background: #80808008; }
+.reader-search { display: grid; gap: 8px; margin: 16px 0; }
+.reader-search label { font-weight: 700; }
+.reader-search input { box-sizing: border-box; width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line, #64748b); border-radius: 10px; background: var(--panel, #fff); color: var(--text, #132238); font: inherit; }
+.reader-search p { margin: 0; font-size: .86rem; }
+.reader-back { position: fixed; bottom: max(14px, env(safe-area-inset-bottom)); right: 14px; z-index: 30; min-height: 44px; border: 1px solid #778899; border-radius: 99px; padding: 10px 16px; background: #18344a; color: #fff; font: 700 14px system-ui; cursor: pointer; box-shadow: 0 3px 12px #0003; }
+[data-reader-source] { margin-top: 20px; }
+[data-reader-source] > summary { min-height: 44px; cursor: pointer; }
+[data-reader-source] pre { font-size: .85rem; }
+[data-reader-source] pre, .reader-prose { min-width: 0; }
+.reader-contents :focus-visible, .reader-search :focus-visible, .reader-back:focus-visible, .reader-table:focus-visible { outline: 3px solid var(--accent, #008c95); outline-offset: 3px; }
+.reader-search + .grid > [hidden] { display: none !important; }
+@media (max-width: 600px) { .reader-prose { font-size: 1rem; } .reader-contents { padding: 8px 12px; } }
+@media print { .reader-back, .reader-search, .reader-contents, [data-reader-source] { display: none !important; } .reader-table { overflow: visible; } .reader-prose { color: #000; background: #fff; } }
+</style><script>
+(() => {
+  'use strict';
+  let serial = 0;
+  const rendered = new WeakMap();
+  const node = (tag, text) => { const el = document.createElement(tag); if (text != null) el.textContent = text; return el; };
+  function inline(parent, text) {
+    const pattern = /(`[^`]+`|\*\*[^*]+\*\*|\[[^\]]+\]\(https?:\/\/[^\s)]+\))/g;
+    let start = 0;
+    for (const match of String(text).matchAll(pattern)) {
+      parent.append(document.createTextNode(text.slice(start, match.index)));
+      const value = match[0];
+      if (value.startsWith('`')) parent.append(node('code', value.slice(1, -1)));
+      else if (value.startsWith('**')) parent.append(node('strong', value.slice(2, -2)));
+      else {
+        const link = value.match(/^\[([^\]]+)\]\((.+)\)$/);
+        const a = node('a', link[1]); a.href = link[2]; a.rel = 'noopener noreferrer'; parent.append(a);
+      }
+      start = match.index + value.length;
+    }
+    parent.append(document.createTextNode(text.slice(start)));
+  }
+  const cells = line => line.trim().replace(/^\|/, '').replace(/\|$/, '').split(/(?<!\\)\|/).map(v => v.trim().replace(/\\\|/g, '|'));
+  function markdown(source) {
+    const article = node('article'); article.className = 'reader-prose';
+    const lines = source.split(/\r?\n/); let list = null;
+    for (let i = 0; i < lines.length; i += 1) {
+      const line = lines[i], value = line.trim();
+      if (!value) { list = null; continue; }
+      if (/^```/.test(value)) {
+        const code = []; i += 1;
+        while (i < lines.length && !/^```/.test(lines[i].trim())) code.push(lines[i++]);
+        const pre = node('pre'); pre.append(node('code', code.join('\n'))); article.append(pre); list = null; continue;
+      }
+      if (i + 1 < lines.length && value.includes('|') && cells(lines[i + 1]).every(v => /^:?-{3,}:?$/.test(v))) {
+        const table = node('table'), head = node('thead'), body = node('tbody');
+        const row = (values, tag) => { const tr = node('tr'); values.forEach(v => { const cell = node(tag); if (tag === 'th') cell.scope = 'col'; inline(cell, v); tr.append(cell); }); return tr; };
+        head.append(row(cells(line), 'th')); i += 2;
+        while (i < lines.length && lines[i].trim() && lines[i].includes('|')) body.append(row(cells(lines[i++]), 'td'));
+        i -= 1; table.append(head, body); article.append(table); list = null; continue;
+      }
+      const heading = value.match(/^(#{1,6})\s+(.+)$/);
+      if (heading) { const h = node('h' + Math.min(4, heading[1].length + 1)); inline(h, heading[2]); article.append(h); list = null; continue; }
+      const bullet = value.match(/^(?:[-*+] |\d+\. )(.+)$/);
+      if (bullet) {
+        const tag = /^\d/.test(value) ? 'ol' : 'ul';
+        if (!list || list.tagName.toLowerCase() !== tag) { list = node(tag); if (tag === 'ol') list.start = parseInt(value, 10); article.append(list); }
+        const li = node('li'); inline(li, bullet[1]); list.append(li); continue;
+      }
+      list = null;
+      if (/^(---+|\*\*\*+)$/.test(value)) { article.append(node('hr')); continue; }
+      const p = node(value.startsWith('> ') ? 'blockquote' : 'p'); inline(p, value.startsWith('> ') ? value.slice(2) : line); article.append(p);
+    }
+    return article;
+  }
+  function contents(root) {
+    root.querySelectorAll(':scope > .reader-contents').forEach(el => el.remove());
+    const headings = [...root.querySelectorAll('h2,h3,h4')].filter(h => !h.closest('.card,.run-card,.reader-contents,[data-reader-source],[hidden]'));
+    if (headings.length < 2) return;
+    const details = node('details'); details.className = 'reader-contents';
+    details.append(node('summary', '이 리포트 목차 · ' + headings.length + '개 항목'));
+    const nav = node('nav'); nav.setAttribute('aria-label', '리포트 목차');
+    headings.forEach(h => {
+      if (!h.id) h.id = 'reader-section-' + (++serial);
+      h.dataset.readerHeading = ''; h.tabIndex = -1;
+      const a = node('a', h.textContent); a.href = '#' + h.id;
+      if (h.tagName !== 'H2') a.className = 'reader-subsection';
+      a.addEventListener('click', event => {
+        event.preventDefault();
+        for (let ancestor = h.parentElement; ancestor; ancestor = ancestor.parentElement) if (ancestor.tagName === 'DETAILS') ancestor.open = true;
+        h.scrollIntoView({block: 'start'}); h.focus({preventScroll: true});
+      }); nav.append(a);
+    });
+    details.append(nav); root.prepend(details);
+  }
+  function enhance(root) {
+    if (!root) return;
+    root.querySelectorAll('pre[data-report-markdown]').forEach(pre => {
+      const previous = rendered.get(pre);
+      if (previous && previous.source === pre.textContent) return;
+      const article = markdown(pre.textContent);
+      if (previous) previous.article.replaceWith(article);
+      else {
+        const details = node('details'); details.dataset.readerSource = '';
+        details.append(node('summary', 'Markdown 원문 보기'));
+        pre.before(article, details); details.append(pre);
+      }
+      rendered.set(pre, {source: pre.textContent, article});
+    });
+    root.querySelectorAll('table').forEach(table => {
+      if (table.closest('.reader-table,.account-table-wrap,.summary-scroll')) return;
+      const wrap = node('div'); wrap.className = 'reader-table'; wrap.tabIndex = 0;
+      wrap.setAttribute('role', 'region'); wrap.setAttribute('aria-label', '리포트 표 · 가로로 스크롤하여 전체 보기');
+      table.before(wrap); wrap.append(table);
+    });
+    root.querySelectorAll('.grid').forEach(grid => {
+      const cards = [...grid.querySelectorAll(':scope > a.card')];
+      if (cards.length < 2 || grid.dataset.readerSearch) return;
+      grid.dataset.readerSearch = 'true';
+      const box = node('div'); box.className = 'reader-search';
+      const input = node('input'); input.type = 'search'; input.placeholder = '제목 · 종목 · 채널 · 키워드'; input.id = 'report-search-' + (++serial);
+      const label = node('label', '리포트 찾기'); label.htmlFor = input.id;
+      const status = node('p'); status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
+      const update = () => {
+        const terms = input.value.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean); let count = 0;
+        cards.forEach(card => { card.hidden = !terms.every(t => card.textContent.toLocaleLowerCase().includes(t)); if (!card.hidden) count += 1; });
+        status.textContent = cards.length + '개 중 ' + count + '개 표시' + (count ? '' : ' · 검색어를 지우거나 다른 키워드를 입력하세요.');
+      };
+      input.addEventListener('input', update); box.append(label, input, status); grid.before(box); update();
+    });
+    contents(root);
+  }
+  window.TradingAgentsReader = {enhance};
+  const main = document.querySelector('main');
+  if (main && !main.hasAttribute('data-reader-dynamic')) enhance(main);
+  if (main) {
+    const top = node('button', '↑ 맨 위'); top.type = 'button'; top.className = 'reader-back'; top.setAttribute('aria-label', '리포트 맨 위로 이동');
+    top.addEventListener('click', () => { const target = document.querySelector('h1') || main; target.tabIndex = -1; target.scrollIntoView({block: 'start'}); target.focus({preventScroll: true}); });
+    document.body.append(top);
+  }
+})();
+</script>
+</body>
+</html>

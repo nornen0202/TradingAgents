@@ -1,0 +1,601 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YouTube 투자자용 검증 리포트 - 미국주식 적립식 투자 이걸로 고민 끝? 미국 주요 지수 한번에 투자하는 법</title>
+  <style>
+:root {
+  color-scheme: light;
+  --bg: #f7f8fb;
+  --panel: #ffffff;
+  --text: #172033;
+  --muted: #667085;
+  --line: #d9dee8;
+  --accent: #0f766e;
+  --accent-2: #2563eb;
+  --warn: #b45309;
+  --bad: #b42318;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0 56px; }
+a { color: var(--accent-2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.hero { padding: 28px 0 22px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+.hero.compact { padding-top: 12px; }
+.hero h1 { margin: 0; font-size: clamp(28px, 4vw, 44px); line-height: 1.15; letter-spacing: 0; }
+.hero p { max-width: 760px; color: var(--muted); margin: 12px 0 0; }
+.eyebrow { color: var(--accent); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0; margin: 0 0 8px; }
+section { margin: 28px 0; }
+h2, h3, h4, h5 { letter-spacing: 0; line-height: 1.25; }
+.synthesis-callout { padding: clamp(20px, 4vw, 34px); border: 1px solid #6ee7d8; border-radius: 18px; background: linear-gradient(135deg, #ecfdf9 0%, #eff6ff 100%); box-shadow: 0 18px 44px rgba(15, 118, 110, .12); }
+.synthesis-callout.unavailable { border-color: var(--line); background: var(--panel); box-shadow: none; }
+.synthesis-callout h2 { margin: 0; font-size: clamp(24px, 3.2vw, 36px); }
+.synthesis-callout .lead { max-width: 900px; font-size: 17px; color: #334155; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.primary-link, .secondary-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border-radius: 999px; font-weight: 800; }
+.primary-link { color: white; background: var(--accent); }
+.secondary-link { color: var(--accent-2); border: 1px solid #93c5fd; background: white; }
+.primary-link:hover, .secondary-link:hover { text-decoration: none; filter: brightness(.97); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.card, .run { display: flex; flex-direction: column; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; color: var(--text); min-height: 128px; }
+.run { padding: 16px; }
+.card:hover, .run:hover { border-color: var(--accent-2); text-decoration: none; }
+.thumb { display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #e9edf5; border-radius: 8px 8px 0 0; color: var(--muted); font-size: 13px; font-weight: 700; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb-empty span { padding: 0 14px; text-align: center; }
+.card-body { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 16px; }
+.card strong { line-height: 1.35; }
+.source-line { color: #3f4a5f; font-weight: 600; }
+.runs { display: grid; gap: 10px; }
+.badge { display: inline-flex; width: fit-content; border-radius: 999px; padding: 2px 9px; background: #e6f4f1; color: var(--accent); font-size: 12px; font-weight: 700; }
+.status-contradicted, .status-llm_failed { background: #fee4e2; color: var(--bad); }
+.status-unverified, .status-stale { background: #fff4d6; color: var(--warn); }
+small, .muted { color: var(--muted); }
+.topnav { display: flex; gap: 14px; margin-bottom: 16px; font-size: 14px; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px; }
+.stats span { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
+.report { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: min(5vw, 36px); }
+.report-head { border-bottom: 1px solid var(--line); margin-bottom: 24px; padding-bottom: 20px; }
+.report-head h1 { margin: 0; font-size: clamp(24px, 3.5vw, 38px); line-height: 1.2; }
+.meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+.scope-note { padding: 12px 14px; border-left: 4px solid var(--warn); border-radius: 6px; background: #fff7ed; color: #7c2d12; }
+.synthesis-report h2 { margin-top: 34px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.synthesis-report h3 { margin: 24px 0 8px; color: #0f4c5c; }
+.synthesis-report p, .synthesis-report li { overflow-wrap: anywhere; }
+pre { overflow: auto; background: #111827; color: #f9fafb; border-radius: 8px; padding: 14px; }
+code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+details { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 18px; }
+@media (max-width: 640px) {
+  main { width: min(100% - 20px, 1120px); padding-top: 18px; }
+  .report { padding: 18px; }
+  .synthesis-callout { border-radius: 14px; padding: 18px; }
+  .cta-row a { width: 100%; }
+  .mobile-report { border-radius: 12px; }
+}
+</style>
+</head>
+<body>
+  <main>
+<nav class="topnav"><a href="index.html">실행 목록</a><a href="../../index.html">YouTube 홈</a></nav>
+<article class="report">
+  <header class="report-head">
+    <p class="eyebrow">youtube_20261128_065117</p>
+    <h1>미국주식 적립식 투자 이걸로 고민 끝? 미국 주요 지수 한번에 투자하는 법</h1>
+    <div class="meta">
+      <span class="badge status-asr_uncertain">asr_uncertain</span>
+      <a href="https://www.youtube.com/watch?v=8WXUg04sqKg">원본 영상</a>
+    </div>
+  </header>
+  <h2>미국 3대 지수 ETF로 소액 적립: 편의성과 초과성과는 별개다</h2>
+<p><a href="https://www.youtube.com/watch?v=8WXUg04sqKg">소수몽키 영상</a> · 2026년 11월 27일 공개 · 2026년 11월 28일 검토 기준</p>
+<p><strong>핵심 판단:</strong> 영상은 S&amp;P 500·나스닥 100·미국 배당 다우존스를 한 ETF에 담아 소액 적립과 비중 관리를 단순화하는 구상을 소개한다. 실제 주문 단위가 작고 이용 계좌에서 자동매수가 지원된다면 편의성은 있다. 그러나 제공 자료로는 정식 상품명·종목코드, 상장 일정·기준가, 공식 운용 규칙을 확인할 수 없다. 샤프지수 1위, 세제상 우위, S&amp;P 500 대비 초과성과도 검증되지 않았다.</p>
+<h3>영상 주장과 확인된 사실·근거</h3>
+<p>영상에서 소개한 명칭은 <strong>TIGER 미국 3대 지수 액티브 ETF</strong>다. 아래 시각은 개별 발화가 아니라 관련 자막 구간의 시작점이다. <code>asr_confidence</code>는 발언을 자막에서 읽어낸 신뢰도이며, 외부 근거에 대한 <code>source_confidence</code>는 아래 9개 주장 모두 <strong>0.00</strong>이다. 이는 주장이 틀렸다는 뜻이 아니라, 제공 자료에 직접 뒷받침하거나 반박하는 근거가 없다는 뜻이다.</p>
+<p>| 영상 주장·시각 | 확인된 사실·근거와 남은 확인 사항 | 자막 신뢰도 |</p>
+<p>|---|---|---:|</p>
+<p>| <strong>상장·가격 (C1)</strong> · <a href="https://www.youtube.com/watch?v=8WXUg04sqKg&amp;t=2s">00:00:02</a>, <a href="https://www.youtube.com/watch?v=8WXUg04sqKg&amp;t=1322s">22:02</a>: 12월 1일 상장, 주당 기준가 1만 원. | 12월 1일이 반복되지만 말미 자동자막 한 곳에는 10월 1일로 나온다. 원음·화면과 거래소 공지 확인이 필요하다. <strong>1만 원에 체결되고 비용이 없다면 5만 원으로 5주</strong>라는 산술만 맞다. 기준가는 실제 체결가가 아니다. | 0.40 |</p>
+<p>| <strong>운용 방식 (C2)</strong> · <a href="https://www.youtube.com/watch?v=8WXUg04sqKg&amp;t=318s">05:18</a>: 세 지수에 40:40:20, 연 1회 비중 복원이 기본이며 이탈이 크면 분기·반기 조정 가능. S&amp;P 500 대비 초과성과 추구. | 1만 원에 해당 비율을 곱하면 4,000원·4,000원·2,000원이지만 실제 편입액은 아니다. 인터뷰에서 설명한 운용 방식과 문서상 의무는 구분해야 한다. 허용 편차, 조정 조건, 공식 비교지수·산식은 미확인이다. 초과성과는 영상에서 밝힌 목표이지 보장이 아니다. | 0.80 |</p>
+<p>| <strong>기존 ETF와 가격 비교 (C3)</strong> · 00:00:02: 10월 30일 종가로 기존 TIGER 3종을 1주씩 사면 21만 원 초과, 기존 나스닥 ETF는 2010년 상장. | 비교 연도, 종목별 비수정 종가, 합계, 최초 상장일이 모두 미확인이다. <a href="http://www.sisaon.co.kr/news/articleView.html?idxno=176550">수집된 증권사 행사 기사</a>는 다른 브랜드인 ACE를 다뤄 증거에서 제외했다. 30만 원 예시의 8만9,000원이 잔액이라는 해석도 확인되지 않았다. | 0.65 |</p>
+<p>| <strong>분산 효과 (C4)</strong> · 05:18: 미국 대형주·기술 및 혁신주·배당주에 함께 노출되지만 상위 종목이 겹칠 수 있음. | 배당지수의 정식 명칭과 동일 기준일 구성 자료가 없어 중복 종목·섹터의 합산 비중은 미확인이다. 지수 세 개가 곧 독립적인 위험 노출 세 개를 뜻하지 않으며, 배당주 편입만으로 변동성이 낮아지는 것은 아니다. | 0.80 |</p>
+<p>| <strong>당시 시장 흐름 (C5)</strong> · 00:00:02: 미국 증시가 약세 또는 혼조였고 그해 배당주가 상대적으로 강했던 구간이 있었음. | 촬영일·비교 기간과 지수 수익률이 없다. <a href="https://finance.yahoo.com/markets/stocks/articles/exchange-traded-funds-higher-us-172712881.html">11월 27일 미국 주식 상승을 언급한 기사</a>는 영상 공개 후 게시됐고 제공 자료에는 제목만 있어, 영상이 가리킨 기간의 약세나 혼조를 반박하지 못한다. | 0.85 |</p>
+<p>| <strong>운용사 백테스트 (C6)</strong> · 05:18: 수백 건 중 40:40:20을 연 1회 조정한 조합이 샤프지수 1위였고, 매일 또는 2~3년마다 조정한 경우는 상대적으로 낮았음. | <strong>미검증·수동 확인 필요.</strong> 전체 후보·순위표, 표본 기간, 비용·배당·환율 가정, 무위험금리와 연율화 방식이 없어 재현할 수 없다. 영상의 자산 증가 사례는 변동성 설명용 가정이지 성과 자료가 아니다. | 0.80 |</p>
+<p>| <strong>해외 상장 ETF 과세 (C7)</strong> · <a href="https://www.youtube.com/watch?v=8WXUg04sqKg&amp;t=655s">10:55</a>: 직접 리밸런싱 사례에 250만 원과 22%를 언급. | 2026년 귀속 공식 자료가 없어 공제 범위와 세율 적용 요건을 확인하지 못했다. 매도대금에 세율을 바로 적용하거나, 매년 매도하면 매년 세금이 발생한다고 해석할 수 없다. | 0.80 |</p>
+<p>| <strong>국내 상장 ETF 과세 (C8)</strong> · 10:55: 15.4%를 언급하고, 펀드 내부 조정은 투자자 본인의 매도가 아니어서 직접 조정보다 매매차익 과세를 늦출 수 있다고 설명. | 적용 세율·과세표준·계좌별 이연 범위는 미확인이다. 투자자 본인의 매도 시점을 미루는 것과 분배·인출 과세나 펀드 내부 거래비용이 없어지는 것은 별개다. | 0.70 |</p>
+<p>| <strong>소액·자동 적립 (C9)</strong> · <a href="https://www.youtube.com/watch?v=8WXUg04sqKg&amp;t=999s">16:39</a>: 한 주로 세 지수에 노출되고 앱에서 일·주·월 단위 적립이 가능하다는 설명. | 해당 종목의 계좌별 편입, 자동매수, 소수점 주문 지원은 미확인이다. 제시 금액과 주기는 예산 예시다. 주기별 성과가 비슷했다는 진행자 개인 백테스트도 <strong>미검증·수동 확인 필요</strong>다. | 0.80 |</p>
+<h3>긍정 논리와 반론</h3>
+<ul>
+<li><strong>소액 적립의 장점은 필요한 주문 금액이 줄어드는 데 있다.</strong> 같은 예산에서 기존 ETF 3종을 정수 단위로 각각 사기 어렵다면, 한 종목으로 목표 노출에 접근하고 비중 복원에 드는 수고를 줄일 수 있다. 반대로 실제 1주 가격과 거래비용이 예산에 맞지 않거나 해당 계좌가 자동매수를 지원하지 않으면 편의성은 약해진다. 적립식 주문은 타이밍 판단을 줄이는 방식이지 손실을 막는 장치는 아니다.</li>
+<li><strong>비중 복원은 초과성과와 다르다.</strong> 목표 비중을 복원하면 특정 지수가 상승으로 차지하는 비중을 줄일 수 있지만, 그 지수의 강세가 이어지면 조정이 상대성과에 불리할 수 있다. S&amp;P 500과 나스닥 100의 중복 종목이 크다면 배당주를 섞어도 대형 기술주 하락에 함께 노출될 수 있다. 총보수와 내부 거래비용을 반영하고도 성과상 이점이 있는지는 실운용으로 따로 봐야 한다.</li>
+<li><strong>과세 시점의 차이가 세후 우위를 보장하지 않는다.</strong> 직접 보유에서도 신규 납입금으로 비중을 맞춰 매도를 피할 수 있다면 이연 효과의 차이는 줄어든다. 비교 기준은 영상에 나온 명목 세율이 아니라 같은 계좌 조건에서의 매도·분배·인출 과세와 비용이다.</li>
+</ul>
+<h3>확인 일정과 판단을 바꿀 조건</h3>
+<p>1. <strong>첫 체크포인트 — 영상에서 예고한 12월 1일 전후:</strong> 원영상의 날짜·가격 화면과 KRX 신규상장 공지, 운용사 투자설명서·신탁계약을 대조한다. 정식 명칭·코드·기준가, 목표 비중과 허용 편차, 조정 재량, 공식 비교지수와 산식이 확인 대상이다. 공식 문서가 영상과 다르면 영상에서 소개한 설계를 전제로 한 분석은 수정해야 한다.</p>
+<p>2. <strong>거래 개시 후 — 주문 가능성과 비용:</strong> 실제 1주 가격, 거래량, 매수·매도 호가 차이, NAV 대비 괴리율을 관찰한다. 기존 3종의 21만 원 주장은 연도와 종목을 확정한 뒤 같은 거래일의 비수정 종가로 재계산하고, 현재 주문 비용과는 분리한다. 증권사별로 일반·ISA·연금저축·IRP·자녀 계좌에서 지원하는 주문 단위·주기·최소금액과 잔액 부족 시 처리를 확인한다. 주문 단위나 지원 조건이 예산과 맞지 않으면 소액 적립 논리는 약해진다.</p>
+<p>3. <strong>편입내역과 운용보고서가 나온 뒤 — 분산과 성과:</strong> 같은 기준일의 지수 구성과 실제 편입내역을 대조해 중복 상위 종목의 합산 비중, 기술 섹터 비중, 목표 비중 이탈과 실제 조정 내역을 확인한다. 성과는 분배금과 통화 기준을 맞춘 NAV 총수익률로 공식 비교지수와 비교한다. 중복 집중이 예상보다 크거나, 충분한 관찰 기간에도 비용 차감 후 비교지수 대비 열위가 이어지고 위험 완화도 확인되지 않으면 분산·초과성과 논리를 재평가할 근거가 된다. 첫날 가격이나 짧은 수익률만으로 판단할 수는 없다.</p>
+<p>4. <strong>세제·시장·백테스트는 별도로 대조:</strong> 세제는 2026년 공식 자료로 해외 상장 ETF의 연간 실현손익·공제와 국내 상장 ETF의 과표기준가·계좌별 과세를 확인한다. 시장 발언은 공개 전 완료 거래일 기준 1주·1개월 수익률과 고점 대비 낙폭, 동일 통화·배당 포함 기준의 월별 및 연초 이후 배당지수 상대수익률로 검토한다. 백테스트는 원자료가 공개되더라도 비용을 반영하고 다른 기간에서 결과가 유지되는지 확인해야 한다.</p>
+<h3>자료의 한계</h3>
+<p>한국어 자동자막 752개 구간의 검토 요약을 사용했다. 전체 자막 품질(<code>transcript_quality</code>)은 <strong>양호(1.00)</strong>, 영상 내 상품 설명의 출처 신뢰도는 <strong>0.90</strong>으로 평가됐지만, 두 값 모두 외부 검증 점수가 아니다. 특히 상장일처럼 자막 표기가 충돌하는 항목은 원음과 화면 확인이 필요하다. 수집된 11건에는 무관한 기사, 본문이 없는 기사, 오류 화면의 발췌가 섞여 있었으며 핵심 주장을 직접 확인하거나 반박하는 자료는 없었다. 종목코드가 미확인이라 유효한 시세가 없고 공시 제공자도 이용할 수 없었다. 조회 실패는 상품이나 공시가 없다는 증거가 아니다. <strong>Bloomberg·Morningstar 등 비공개 원문과 운용사·진행자의 비공개 백테스트에 의존하는 주장은 미검증·수동 확인 필요</strong>로 남긴다.</p>
+  <details>
+    <summary>공개 요약 JSON</summary>
+    <pre>{
+  &quot;version&quot;: 4,
+  &quot;video_id&quot;: &quot;8WXUg04sqKg&quot;,
+  &quot;title&quot;: &quot;미국주식 적립식 투자 이걸로 고민 끝? 미국 주요 지수 한번에 투자하는 법&quot;,
+  &quot;url&quot;: &quot;https://www.youtube.com/watch?v=8WXUg04sqKg&quot;,
+  &quot;channel&quot;: &quot;소수몽키&quot;,
+  &quot;channel_id&quot;: &quot;UCC3yfxS5qC6PCwDzetUuEWg&quot;,
+  &quot;source_url&quot;: &quot;https://www.youtube.com/@sosumonkey/videos&quot;,
+  &quot;thumbnail_url&quot;: &quot;https://i.ytimg.com/vi/8WXUg04sqKg/maxresdefault.jpg&quot;,
+  &quot;published_at&quot;: &quot;2026-11-27T10:06:52+00:00&quot;,
+  &quot;status&quot;: &quot;asr_uncertain&quot;,
+  &quot;strategy_source_tier&quot;: &quot;USER_PRIMARY&quot;,
+  &quot;strategy_evidence_weight&quot;: &quot;HIGH&quot;,
+  &quot;strategy_validation_policy&quot;: &quot;USER_ACCEPTED&quot;,
+  &quot;transcript_status&quot;: &quot;available&quot;,
+  &quot;transcript_source&quot;: &quot;automatic&quot;,
+  &quot;transcript_chars&quot;: 13934,
+  &quot;transcript_quality&quot;: {
+    &quot;status&quot;: &quot;good&quot;,
+    &quot;score&quot;: 1.0,
+    &quot;warnings&quot;: [],
+    &quot;source&quot;: &quot;automatic&quot;,
+    &quot;language&quot;: &quot;Korean&quot;,
+    &quot;model_or_format&quot;: &quot;json3&quot;,
+    &quot;chars&quot;: 13934,
+    &quot;segments&quot;: 752,
+    &quot;duration_seconds&quot;: 1446,
+    &quot;repeated_ngram_ratio&quot;: 0.0
+  },
+  &quot;generated_at&quot;: &quot;2026-11-28T06:51:17.829465+09:00&quot;,
+  &quot;llm_status&quot;: &quot;success&quot;,
+  &quot;research_status&quot;: &quot;success&quot;,
+  &quot;claim_verification_status&quot;: &quot;success&quot;,
+  &quot;research_pipeline_version&quot;: 4,
+  &quot;evidence_count&quot;: 11,
+  &quot;claim_status_summary&quot;: {
+    &quot;asr_uncertain&quot;: 1,
+    &quot;unverified&quot;: 8
+  },
+  &quot;claims&quot;: [
+    {
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;claim_text&quot;: &quot;영상은 TIGER 미국 3대 지수 액티브 ETF가 12월 1일에 주당 기준가 1만 원으로 상장한다고 안내한다. 말미 자동자막 한 곳은 10월 1일로 표기한다. 5만 원으로 5주를 산다는 설명은 기준가로 계산한 예시다.&quot;,
+      &quot;status&quot;: &quot;asr_uncertain&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:02&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.4,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;12월 1일 상장, 1주 10,000원, 50,000원으로 5주. 말미 자막은 10월 1일.&quot;,
+        &quot;observed&quot;: &quot;제공된 자막 요약에는 두 날짜가 모두 나온다. 공식 상장일·기준가·실제 체결가는 확인할 수 없다.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;거래소 공지에서 종목코드와 상장일을 확인하고, 매수 가능 수량은 기준가가 아닌 실제 주문가격과 비용으로 계산해야 한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;claim_text&quot;: &quot;세 지수의 목표 비중은 S&amp;P 500·나스닥 100·미국 배당 다우존스 순으로 40%·40%·20%다. 이탈한 비중을 복원하는 연 1회 조정이 기본이며, 이탈이 크면 분기 또는 반기에 조정할 수 있다고 했다. S&amp;P 500 대비 초과성과는 목표이지 보장이 아니다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:05:18&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.8,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;40%·40%·20%, 연 1회 기본, 이탈이 크면 분기·반기 조정 가능&quot;,
+        &quot;observed&quot;: &quot;공식 목표 비중·허용 편차·조정 조건·비교지수명·성과 산식 미확인&quot;
+      },
+      &quot;investor_implication&quot;: &quot;목표 비중을 항상 유지되는 비중으로, 초과성과 목표를 수익 보장으로 해석하지 않는다. 상장 후에는 실제 편입 비중과 공식 비교지수 대비 성과를 따로 확인한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;claim_text&quot;: &quot;영상은 10월 30일 종가로 기존 TIGER ETF 3종을 1주씩 사면 21만 원을 넘으며, 기존 나스닥 ETF는 2010년에 상장했다고 설명했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:02&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.65,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;10월 30일 종가 합계 210,000원 초과, 나스닥 ETF 2010년 상장. 300,000원 예시에서 89,000원 언급.&quot;,
+        &quot;observed&quot;: &quot;비교 연도·3종의 KRX 비수정 종가와 합계·최초 상장일 미확인. 89,000원의 의미도 미확인.&quot;
+      },
+      &quot;investor_implication&quot;: &quot;21만 원을 현재 매수 비용으로 인용하지 않는다. 정수 단위 매수 비용은 동일한 기준일의 동일한 종목 가격으로 비교한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C4&quot;,
+      &quot;claim_text&quot;: &quot;세 지수는 각각 미국 대형주, 기술·혁신주 비중이 큰 종목군, 배당주에 노출을 제공한다. S&amp;P 500과 나스닥 100은 상위 종목이 겹쳐 세 지수를 함께 담아도 기술주 집중이 남을 수 있다고 설명했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:05:18&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.8,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;S&amp;P 500과 나스닥 100의 상위 종목 중복 및 기술주 집중 가능성. 중복 비중 수치는 제시되지 않음.&quot;,
+        &quot;observed&quot;: &quot;중복 종목 목록과 40:40:20 적용 후 종목·섹터 합산 비중 미확인&quot;
+      },
+      &quot;investor_implication&quot;: &quot;지수 개수만으로 분산 정도를 판단하지 않는다. 동일 기준일 자료로 중복 종목의 합산 비중과 기술 섹터 비중을 계산하고 실제 편입내역과 비교한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C5&quot;,
+      &quot;claim_text&quot;: &quot;진행자는 당시 미국 증시가 약세 또는 혼조였고, 그해 배당주가 상대적으로 강했던 구간이 있었다고 말했다. 구체적인 비교 기간과 수익률은 제시하지 않았다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:00:02&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.85,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;당시 약세·혼조 및 2026년 중 배당주 상대 강세 구간. 기간·수익률 수치 없음.&quot;,
+        &quot;observed&quot;: &quot;공개 전 지수 수익률·고점 대비 낙폭·배당지수 상대수익률 시계열 없음&quot;
+      },
+      &quot;investor_implication&quot;: &quot;시장 분위기나 특정 구간의 배당주 강세를 상품의 장기 성과 근거로 사용하지 않는다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;claim_text&quot;: &quot;운용사는 수백 건의 시뮬레이션에서 40:40:20을 연 1회 리밸런싱한 조합이 시험한 경우 중 샤프지수 1위였으며, 매일 또는 2~3년마다 조정한 경우는 상대적으로 낮았다고 밝혔다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:05:18&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.8,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;수백 건, 40:40:20 연 1회 조정이 샤프지수 1위, 매일 또는 2~3년마다 조정한 경우는 상대적으로 낮음&quot;,
+        &quot;observed&quot;: &quot;테스트 건수·샤프지수 값·순위표·표본 기간 미확인&quot;
+      },
+      &quot;investor_implication&quot;: &quot;샤프지수 1위를 역사적 사실이나 실운용 성과로 제시하지 않는다. 재현되더라도 순위는 시험한 후보와 가정에 한정된다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C7&quot;,
+      &quot;claim_text&quot;: &quot;영상은 해외 상장 ETF를 직접 매도해 리밸런싱하는 사례에 250만 원과 22%를 언급했다. 매년 매도하더라도 매년 세금이 발생한다고 단정할 수는 없다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:10:55&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.8,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;250만 원, 22%, 10년간 직접 리밸런싱 예시&quot;,
+        &quot;observed&quot;: &quot;2026년 적용 공제액·세율·손익통산 범위·원화 환산 및 귀속 기준 미확인&quot;
+      },
+      &quot;investor_implication&quot;: &quot;영상 숫자를 매도대금에 바로 적용하거나 10년간 해마다 납부하는 것으로 가정하지 않는다. 연도별 실현손익을 토대로 공식 규정을 확인한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C8&quot;,
+      &quot;claim_text&quot;: &quot;영상은 국내 상장 해외주식형 ETF 매도에 15.4%를 언급했다. 단일 ETF의 내부 리밸런싱은 투자자 본인의 매도가 아니므로, 직접 리밸런싱과 비교해 매매차익 과세를 이연할 수 있다고 설명했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:10:55&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.7,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;15.4%, 직접 조정과 10년 뒤 단일 ETF 매도 비교&quot;,
+        &quot;observed&quot;: &quot;2026년 적용 세율·실제 차익과 과표기준가 증분의 적용 방식·계좌별 과세이연 범위 미확인&quot;
+      },
+      &quot;investor_implication&quot;: &quot;일반계좌·ISA·연금저축·IRP를 나누어 매도·분배·인출 시점의 과세와 비용을 확인한 뒤 직접 보유 방식과 비교한다.&quot;
+    },
+    {
+      &quot;claim_id&quot;: &quot;C9&quot;,
+      &quot;claim_text&quot;: &quot;영상은 연금·ISA에서 소수점 매수가 어렵다는 전제에서, 단일 ETF를 한 주씩 사면 기존 3종을 각각 사는 것보다 소액 적립이 쉽고 증권사 앱에서 일·주·월 자동매수를 설정할 수 있다고 설명했다.&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;confidence&quot;: 0.0,
+      &quot;supporting_evidence_ids&quot;: [],
+      &quot;manual_check_required&quot;: true,
+      &quot;timestamp&quot;: &quot;00:16:39&quot;,
+      &quot;source_confidence&quot;: 0.0,
+      &quot;asr_confidence&quot;: 0.8,
+      &quot;numeric_parse&quot;: {
+        &quot;claimed&quot;: &quot;일·주·월 주기, 거래일마다 1만 원, 월급일 다음 1~2일, 자녀 계좌 월 5만·10만·20만 원 등의 예시&quot;,
+        &quot;observed&quot;: &quot;지원 계좌·주기·실제 필요 주문금액·최소 주문 조건 미확인&quot;
+      },
+      &quot;investor_implication&quot;: &quot;이용할 증권사에서 정수·소수점 주문, 지원 주기, 최소 주문금액, 잔액 부족이나 가격 변동 때의 미체결 처리를 확인한다. 자녀 계좌는 별도로 확인한다.&quot;
+    }
+  ],
+  &quot;entities&quot;: [
+    {
+      &quot;ticker&quot;: &quot;미확인&quot;,
+      &quot;name&quot;: &quot;TIGER 미국 3대 지수 액티브 ETF&quot;,
+      &quot;status&quot;: &quot;unverified&quot;,
+      &quot;claims&quot;: [
+        &quot;S&amp;P 500은 미국 대형주 시장, 나스닥 100은 혁신·기술주, 미국 배당 다우존스는 우량 배당주 노출을 제공한다는 설명이다.&quot;,
+        &quot;‘액티브’는 시장 전망에 따라 목표 비중을 바꾸는 것이 아니라, 가격 변동으로 흐트러진 비중을 원래대로 되돌리는 운용을 뜻한다. 연간 조정이 기본이지만 비중이 크게 벌어지면 분기 또는 반기 조정도 가능하다고 했다.&quot;,
+        &quot;연금·ISA 등에서 소수점 매수가 어렵다는 전제에서, 한 주로 세 지수에 투자하면 개별 ETF를 한 주씩 사는 것보다 소액 적립과 잔돈 활용이 쉽다고 설명했다.&quot;
+      ],
+      &quot;numeric_claims&quot;: [
+        &quot;영상은 상장일을 12월 1일로 여러 차례, 상장 기준가를 1주당 1만 원으로 안내했다. 기준가라면 5만 원으로 5주를 살 수 있다는 예시를 들었다. 다만 말미 한 대목의 자동자막은 상장일을 10월 1일로 표기한다.&quot;,
+        &quot;S&amp;P 500·나스닥 100·미국 배당 다우존스의 목표 비중은 각각 40%·40%·20%다. 1만 원 기준으로는 4,000원·4,000원·2,000원에 해당한다.&quot;,
+        &quot;영상은 10월 30일 종가 기준 기존 TIGER ETF 3종을 한 주씩 사면 21만 원을 넘는다고 했다. 기존 나스닥 ETF의 상장 연도는 2010년으로 언급했다.&quot;
+      ],
+      &quot;verification_notes&quot;: [
+        &quot;시장 데이터 조회 실패: no_usable_market_fields&quot;
+      ],
+      &quot;market_snapshot&quot;: {
+        &quot;ticker&quot;: &quot;미확인&quot;,
+        &quot;as_of&quot;: &quot;2026-11-27T21:52:23.836278+00:00&quot;,
+        &quot;current_price&quot;: null,
+        &quot;market_cap&quot;: null,
+        &quot;forward_pe&quot;: null,
+        &quot;trailing_pe&quot;: null,
+        &quot;fifty_two_week_high&quot;: null,
+        &quot;fifty_two_week_low&quot;: null,
+        &quot;average_target_price&quot;: null,
+        &quot;source&quot;: &quot;yfinance&quot;,
+        &quot;status&quot;: &quot;unverified&quot;
+      },
+      &quot;external_context_status&quot;: &quot;unverified&quot;
+    }
+  ],
+  &quot;evidence&quot;: [
+    {
+      &quot;evidence_id&quot;: &quot;E1&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;BC-Sugar Futures&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/commodities/articles/bc-sugar-futures-150028453.html&quot;,
+      &quot;publisher&quot;: &quot;Associated Press&quot;,
+      &quot;published_at&quot;: &quot;2026-11-27T15:00:28+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;BC-Sugar Futures Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 2026 Elections Weather Newsletters Finance My portfolio News Markets Researc...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E2&quot;,
+      &quot;claim_id&quot;: &quot;C1&quot;,
+      &quot;title&quot;: &quot;Exclusive-French sugar groups offer drought-hit farmers aid to secure plantings&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/commodities/articles/exclusive-french-sugar-groups-offer-135036386.html&quot;,
+      &quot;publisher&quot;: &quot;Reuters&quot;,
+      &quot;published_at&quot;: &quot;2026-11-27T13:50:36+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Exclusive-French sugar groups offer drought-hit farmers aid to secure plantings Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 2026 Election...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E4&quot;,
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;title&quot;: &quot;Precious Metals Rally as AI Trade Revives Risk Appetite&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/m/713c049b-780a-3e4b-b84e-162b4e7d87df/precious-metals-rally-as-ai.html&quot;,
+      &quot;publisher&quot;: &quot;The Wall Street Journal&quot;,
+      &quot;published_at&quot;: &quot;2026-11-27T20:20:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;market_or_news&quot;,
+      &quot;excerpt&quot;: &quot;Precious Metals Rally as AI Trade Revives Risk Appetite Oops, something went wrong Skip to navigation Skip to main content Skip to right column Home News Finance Sports More News US Politics World Tech Science Originals 2026 Elections Weather Newsletters Fi...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E5&quot;,
+      &quot;claim_id&quot;: &quot;C2&quot;,
+      &quot;title&quot;: &quot;Basic Materials Roundup: Market Talk&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/m/431eeac2-4b84-305a-bb4a-ee793380c1c4/basic-materials-roundup%3A.html&quot;,
+      &quot;publisher&quot;: &quot;The Wall Street Journal&quot;,
+      &quot;published_at&quot;: &quot;2026-11-27T17:58:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E6&quot;,
+      &quot;claim_id&quot;: &quot;C3&quot;,
+      &quot;title&quot;: &quot;삼성증권, 중개형 ISA 잔고 6조 원 돌파…KB증권 &#x27;프라임 투자 콘서트&#x27; ...&quot;,
+      &quot;source_url&quot;: &quot;http://www.sisaon.co.kr/news/articleView.html?idxno=176550&quot;,
+      &quot;publisher&quot;: &quot;Naver News&quot;,
+      &quot;published_at&quot;: &quot;2025-10-21T16:12:00+09:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;한 달마다 지급되는 경품은 △닌텐도 스위치2(10월) △마샬 블루투스 스피커(11월) △크레마 이북 리더기(12월)이다. 해당 경품은 이벤트 기간 내 ACE 미국S&amp;P500 ETF와 ACE 미국나스닥100 ETF 누적 매수액이 상위 20%인 고객...&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E7&quot;,
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;title&quot;: &quot;Treasury Yields Gain As U.S. Equities Rally&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/m/16548d8f-c0e1-3f33-ba6c-11c2e0ddb8e8/treasury-yields-gain-as-u.s..html&quot;,
+      &quot;publisher&quot;: &quot;The Wall Street Journal&quot;,
+      &quot;published_at&quot;: &quot;2026-11-27T21:10:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E8&quot;,
+      &quot;claim_id&quot;: &quot;C6&quot;,
+      &quot;title&quot;: &quot;Oil Futures Settle Lower Ahead of OPEC+ Policy Meeting&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/m/56fae783-b0c5-3ee1-8a03-9bb9a00bfa03/oil-futures-settle-lower.html&quot;,
+      &quot;publisher&quot;: &quot;The Wall Street Journal&quot;,
+      &quot;published_at&quot;: &quot;2026-11-27T20:47:00+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E9&quot;,
+      &quot;claim_id&quot;: &quot;GLOBAL&quot;,
+      &quot;title&quot;: &quot;Exchange-Traded Funds Higher as US Equities Advance in Friday Trading&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/stocks/articles/exchange-traded-funds-higher-us-172712881.html&quot;,
+      &quot;publisher&quot;: &quot;MT Newswires&quot;,
+      &quot;published_at&quot;: &quot;2026-11-27T17:27:12+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    },
+    {
+      &quot;evidence_id&quot;: &quot;E10&quot;,
+      &quot;claim_id&quot;: &quot;GLOBAL&quot;,
+      &quot;title&quot;: &quot;I Tested More Than 100 Trading Strategies With AI. Most Of Them Failed, And The Reasons Why Were More Interesting Than The Winners&quot;,
+      &quot;source_url&quot;: &quot;https://finance.yahoo.com/markets/options/articles/tested-more-100-trading-strategies-171507159.html&quot;,
+      &quot;publisher&quot;: &quot;Benzinga&quot;,
+      &quot;published_at&quot;: &quot;2026-11-27T17:15:07+00:00&quot;,
+      &quot;source_tier&quot;: &quot;news&quot;,
+      &quot;excerpt&quot;: &quot;&quot;
+    }
+  ],
+  &quot;source_policy&quot;: {
+    &quot;raw_transcript_published&quot;: false,
+    &quot;raw_transcript_in_evidence&quot;: false,
+    &quot;research_pipeline_version&quot;: 4,
+    &quot;closed_source_claims&quot;: &quot;unverified_external_source&quot;,
+    &quot;auto_caption_warning&quot;: true,
+    &quot;local_asr_warning&quot;: false
+  }
+}</pre>
+  </details>
+</article>
+</main>
+  <style>
+.reader-contents { margin: 16px 0; padding: 12px 16px; border: 1px solid var(--line, #64748b); border-radius: 12px; }
+.reader-contents > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-weight: 750; }
+.reader-contents nav { display: grid; gap: 4px; max-height: 45vh; overflow: auto; margin: 8px 0; }
+.reader-contents a { display: block; min-height: 44px; padding: 10px; border-radius: 6px; color: inherit; overflow-wrap: anywhere; }
+.reader-contents a:hover { background: #80808020; }
+.reader-contents .reader-subsection { padding-inline-start: 24px; font-size: .92em; }
+.reader-prose, .report { overflow-wrap: anywhere; line-height: 1.8; }
+.reader-prose p, .reader-prose li { max-width: 85ch; }
+.reader-prose h2, .reader-prose h3, .reader-prose h4, [data-reader-heading] { scroll-margin-top: 100px; line-height: 1.45; }
+.reader-prose h2 { margin-top: 1.8em; padding-bottom: 8px; border-bottom: 1px solid var(--line, #64748b); }
+.reader-prose h3 { margin-top: 1.5em; }
+.reader-prose li { margin: .5em 0; }
+.reader-prose pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.reader-prose blockquote { margin: 16px 0; padding: 4px 16px; border-left: 3px solid var(--accent, #64748b); }
+.reader-table { overflow: auto; max-width: 100%; margin: 16px 0; border: 1px solid var(--line, #64748b); border-radius: 10px; }
+.reader-table table { border-collapse: collapse; width: 100%; margin: 0; font-size: .92rem; }
+.reader-table th, .reader-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line, #64748b); min-width: 110px; max-width: 400px; overflow-wrap: anywhere; white-space: normal; }
+.reader-table th { background: #80808018; }
+.reader-table tr:nth-child(even) { background: #80808008; }
+.reader-search { display: grid; gap: 8px; margin: 16px 0; }
+.reader-search label { font-weight: 700; }
+.reader-search input { box-sizing: border-box; width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line, #64748b); border-radius: 10px; background: var(--panel, #fff); color: var(--text, #132238); font: inherit; }
+.reader-search p { margin: 0; font-size: .86rem; }
+.reader-back { position: fixed; bottom: max(14px, env(safe-area-inset-bottom)); right: 14px; z-index: 30; min-height: 44px; border: 1px solid #778899; border-radius: 99px; padding: 10px 16px; background: #18344a; color: #fff; font: 700 14px system-ui; cursor: pointer; box-shadow: 0 3px 12px #0003; }
+[data-reader-source] { margin-top: 20px; }
+[data-reader-source] > summary { min-height: 44px; cursor: pointer; }
+[data-reader-source] pre { font-size: .85rem; }
+[data-reader-source] pre, .reader-prose { min-width: 0; }
+.reader-contents :focus-visible, .reader-search :focus-visible, .reader-back:focus-visible, .reader-table:focus-visible { outline: 3px solid var(--accent, #008c95); outline-offset: 3px; }
+.reader-search + .grid > [hidden] { display: none !important; }
+@media (max-width: 600px) { .reader-prose { font-size: 1rem; } .reader-contents { padding: 8px 12px; } }
+@media print { .reader-back, .reader-search, .reader-contents, [data-reader-source] { display: none !important; } .reader-table { overflow: visible; } .reader-prose { color: #000; background: #fff; } }
+</style><script>
+(() => {
+  'use strict';
+  let serial = 0;
+  const rendered = new WeakMap();
+  const node = (tag, text) => { const el = document.createElement(tag); if (text != null) el.textContent = text; return el; };
+  function inline(parent, text) {
+    const pattern = /(`[^`]+`|\*\*[^*]+\*\*|\[[^\]]+\]\(https?:\/\/[^\s)]+\))/g;
+    let start = 0;
+    for (const match of String(text).matchAll(pattern)) {
+      parent.append(document.createTextNode(text.slice(start, match.index)));
+      const value = match[0];
+      if (value.startsWith('`')) parent.append(node('code', value.slice(1, -1)));
+      else if (value.startsWith('**')) parent.append(node('strong', value.slice(2, -2)));
+      else {
+        const link = value.match(/^\[([^\]]+)\]\((.+)\)$/);
+        const a = node('a', link[1]); a.href = link[2]; a.rel = 'noopener noreferrer'; parent.append(a);
+      }
+      start = match.index + value.length;
+    }
+    parent.append(document.createTextNode(text.slice(start)));
+  }
+  const cells = line => line.trim().replace(/^\|/, '').replace(/\|$/, '').split(/(?<!\\)\|/).map(v => v.trim().replace(/\\\|/g, '|'));
+  function markdown(source) {
+    const article = node('article'); article.className = 'reader-prose';
+    const lines = source.split(/\r?\n/); let list = null;
+    for (let i = 0; i < lines.length; i += 1) {
+      const line = lines[i], value = line.trim();
+      if (!value) { list = null; continue; }
+      if (/^```/.test(value)) {
+        const code = []; i += 1;
+        while (i < lines.length && !/^```/.test(lines[i].trim())) code.push(lines[i++]);
+        const pre = node('pre'); pre.append(node('code', code.join('\n'))); article.append(pre); list = null; continue;
+      }
+      if (i + 1 < lines.length && value.includes('|') && cells(lines[i + 1]).every(v => /^:?-{3,}:?$/.test(v))) {
+        const table = node('table'), head = node('thead'), body = node('tbody');
+        const row = (values, tag) => { const tr = node('tr'); values.forEach(v => { const cell = node(tag); if (tag === 'th') cell.scope = 'col'; inline(cell, v); tr.append(cell); }); return tr; };
+        head.append(row(cells(line), 'th')); i += 2;
+        while (i < lines.length && lines[i].trim() && lines[i].includes('|')) body.append(row(cells(lines[i++]), 'td'));
+        i -= 1; table.append(head, body); article.append(table); list = null; continue;
+      }
+      const heading = value.match(/^(#{1,6})\s+(.+)$/);
+      if (heading) { const h = node('h' + Math.min(4, heading[1].length + 1)); inline(h, heading[2]); article.append(h); list = null; continue; }
+      const bullet = value.match(/^(?:[-*+] |\d+\. )(.+)$/);
+      if (bullet) {
+        const tag = /^\d/.test(value) ? 'ol' : 'ul';
+        if (!list || list.tagName.toLowerCase() !== tag) { list = node(tag); if (tag === 'ol') list.start = parseInt(value, 10); article.append(list); }
+        const li = node('li'); inline(li, bullet[1]); list.append(li); continue;
+      }
+      list = null;
+      if (/^(---+|\*\*\*+)$/.test(value)) { article.append(node('hr')); continue; }
+      const p = node(value.startsWith('> ') ? 'blockquote' : 'p'); inline(p, value.startsWith('> ') ? value.slice(2) : line); article.append(p);
+    }
+    return article;
+  }
+  function contents(root) {
+    root.querySelectorAll(':scope > .reader-contents').forEach(el => el.remove());
+    const headings = [...root.querySelectorAll('h2,h3,h4')].filter(h => !h.closest('.card,.run-card,.reader-contents,[data-reader-source],[hidden]'));
+    if (headings.length < 2) return;
+    const details = node('details'); details.className = 'reader-contents';
+    details.append(node('summary', '이 리포트 목차 · ' + headings.length + '개 항목'));
+    const nav = node('nav'); nav.setAttribute('aria-label', '리포트 목차');
+    headings.forEach(h => {
+      if (!h.id) h.id = 'reader-section-' + (++serial);
+      h.dataset.readerHeading = ''; h.tabIndex = -1;
+      const a = node('a', h.textContent); a.href = '#' + h.id;
+      if (h.tagName !== 'H2') a.className = 'reader-subsection';
+      a.addEventListener('click', event => {
+        event.preventDefault();
+        for (let ancestor = h.parentElement; ancestor; ancestor = ancestor.parentElement) if (ancestor.tagName === 'DETAILS') ancestor.open = true;
+        h.scrollIntoView({block: 'start'}); h.focus({preventScroll: true});
+      }); nav.append(a);
+    });
+    details.append(nav); root.prepend(details);
+  }
+  function enhance(root) {
+    if (!root) return;
+    root.querySelectorAll('pre[data-report-markdown]').forEach(pre => {
+      const previous = rendered.get(pre);
+      if (previous && previous.source === pre.textContent) return;
+      const article = markdown(pre.textContent);
+      if (previous) previous.article.replaceWith(article);
+      else {
+        const details = node('details'); details.dataset.readerSource = '';
+        details.append(node('summary', 'Markdown 원문 보기'));
+        pre.before(article, details); details.append(pre);
+      }
+      rendered.set(pre, {source: pre.textContent, article});
+    });
+    root.querySelectorAll('table').forEach(table => {
+      if (table.closest('.reader-table,.account-table-wrap,.summary-scroll')) return;
+      const wrap = node('div'); wrap.className = 'reader-table'; wrap.tabIndex = 0;
+      wrap.setAttribute('role', 'region'); wrap.setAttribute('aria-label', '리포트 표 · 가로로 스크롤하여 전체 보기');
+      table.before(wrap); wrap.append(table);
+    });
+    root.querySelectorAll('.grid').forEach(grid => {
+      const cards = [...grid.querySelectorAll(':scope > a.card')];
+      if (cards.length < 2 || grid.dataset.readerSearch) return;
+      grid.dataset.readerSearch = 'true';
+      const box = node('div'); box.className = 'reader-search';
+      const input = node('input'); input.type = 'search'; input.placeholder = '제목 · 종목 · 채널 · 키워드'; input.id = 'report-search-' + (++serial);
+      const label = node('label', '리포트 찾기'); label.htmlFor = input.id;
+      const status = node('p'); status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
+      const update = () => {
+        const terms = input.value.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean); let count = 0;
+        cards.forEach(card => { card.hidden = !terms.every(t => card.textContent.toLocaleLowerCase().includes(t)); if (!card.hidden) count += 1; });
+        status.textContent = cards.length + '개 중 ' + count + '개 표시' + (count ? '' : ' · 검색어를 지우거나 다른 키워드를 입력하세요.');
+      };
+      input.addEventListener('input', update); box.append(label, input, status); grid.before(box); update();
+    });
+    contents(root);
+  }
+  window.TradingAgentsReader = {enhance};
+  const main = document.querySelector('main');
+  if (main && !main.hasAttribute('data-reader-dynamic')) enhance(main);
+  if (main) {
+    const top = node('button', '↑ 맨 위'); top.type = 'button'; top.className = 'reader-back'; top.setAttribute('aria-label', '리포트 맨 위로 이동');
+    top.addEventListener('click', () => { const target = document.querySelector('h1') || main; target.tabIndex = -1; target.scrollIntoView({block: 'start'}); target.focus({preventScroll: true}); });
+    document.body.append(top);
+  }
+})();
+</script>
+</body>
+</html>
