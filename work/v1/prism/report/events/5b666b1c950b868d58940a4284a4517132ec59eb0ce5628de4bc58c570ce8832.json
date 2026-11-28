@@ -1,0 +1,227 @@
+{
+  "schema": "tradingagents.work-report/v1",
+  "surface": "prism",
+  "event_id": "prism:2227c300fb17501fc264905df35a2a16",
+  "source_sha256": "e5cba5c799cd8f71dc14be18e420c79d51517d272d474080a4fff16576d93873",
+  "prompt_contract_version": "prism-work-v5",
+  "workflow_contract_sha256": "46750ba4d87c3e127db704d362c736134d7df73054a6cc449472af03a14095af",
+  "policy": {
+    "visibility": "investor_safe_no_credentials",
+    "external_evidence_profile": "balanced_external",
+    "external_evidence_may_affect": [
+      "ranking",
+      "confidence",
+      "position_size_within_existing_risk_limits",
+      "research_priority"
+    ],
+    "external_evidence_may_bypass_execution_gate": false,
+    "thesis_is_independent_from_execution_readiness": true
+  },
+  "report_markdown": "# PRISM 리서치 델타 · 11월 28일\n\n원천 정상. 최근 24시간 신규 15건, 정정 0건. INFY·AMD·DV 공식 데이터 대조를 우선합니다. 실행 가능한 변화 없음.\n\n- **INFY** · 눌림 후 회복을 근거로 비중을 늘렸다는 원천 기록이 있습니다. 당시 가격 구간과 거래량을 거래소 기준 ADR 조정 일봉에서 먼저 확인합니다. `stock_ai_agent:18121`\n- **AMD** · 관심 신호 뒤 진입을 보류했습니다. 원천의 관측 가격이 서로 달라 확정 종가와 5일 추세 확인을 우선합니다. `stock_ai_agent:18123`, `stock_ai_agent:18126`, `stock_ai_agent:18131`, `stock_ai_agent:18134`\n- **DV** · 관심 신호 뒤 진입을 보류했습니다. 확정 거래량과 공시 기반 상대 밸류에이션으로 보류 근거를 점검합니다. `stock_ai_agent:18123`, `stock_ai_agent:18125`, `stock_ai_agent:18130`, `stock_ai_agent:18133`\n\n### 범위와 근거\n\n- 수집 성공 11월 28일 08:08:12 KST. 이벤트 범위 11월 28일 02:46:32–04:56:04 KST, 원천 분석일 11월 27일 미국 현지. 최근 24시간 전송 15/15, 동일 해시 제외 0건, 생략 0건, 잘림 없음.\n- **주식 리서치** · AMD·DV의 관심에서 미진입으로 이어진 기록은 같은 채널의 순차 관측입니다. 독립 확인 전 `balanced_external`의 `LOW_LABELED`를 적용해 공식 근거 확인 순서에만 반영합니다. ANT는 거래소의 종목 식별과 상장 여부 확인 전 종목 판단에서 보류합니다. `stock_ai_agent:18124`, `stock_ai_agent:18132`\n- **시뮬레이션** · INFY 비중 확대와 INFY·COST·AAPL·VRSN·PANW·AS 가상 보유는 시뮬레이터 기록입니다. 다종목 스냅샷의 목표가·손절가와 가상 손익은 후속 전략에 반영하지 않았습니다. `stock_ai_agent:18122`, `stock_ai_agent:18135`\n- **기타 자료** · PDF 3건은 패킷에서 본문을 확인할 수 없어 근거 가중에서 제외했습니다. `stock_ai_agent:18127`–`stock_ai_agent:18129`\n- **KR·US 인계** · KR 연구 우선순위를 조정할 근거가 없습니다. US에는 INFY·AMD·DV 검증을 넘깁니다. 투자 논지 순위·신뢰도·비중과 실행 적격성은 이번 연구 근거로 조정하지 않았습니다.\n- **과거 미처리** · 현재 24시간 범위 밖의 미처리 130건과 변경 45건은 정본 과거 패킷을 기다립니다. 11월 25일 미처리 19건은 미처리 130건에 포함됩니다.\n\n다음 US 브리핑 전에 거래소 기준 조정 일봉·확정 거래량과 필요 시 SEC·기업 IR을 확인합니다. 첫 이벤트는 11월 29일 02:46:32 KST부터 24시간 범위를 벗어납니다.\n\nCOVERAGE_RECEIPT {\"event_id\":\"prism:2227c300fb17501fc264905df35a2a16\",\"status\":\"COMPLETE\",\"window_events\":15,\"transmitted_events\":15,\"truncated\":false,\"new_events\":15,\"revised_events\":0}\n\nMOBILE_HANDOFF {\"owner\":\"external_github_notification_pipeline\",\"status\":\"PENDING_EXTERNAL_VERIFICATION\",\"work_sent_notification\":false}",
+  "structured_report": {
+    "binding": {
+      "surface": "prism",
+      "event_id": "prism:2227c300fb17501fc264905df35a2a16",
+      "source_sha256": "e5cba5c799cd8f71dc14be18e420c79d51517d272d474080a4fff16576d93873"
+    },
+    "title": "PRISM 리서치 델타 · 11월 28일",
+    "source_health": "OK",
+    "report_mode": "research_only",
+    "summary": "원천 정상. 최근 24시간 신규 15건, 정정 0건. INFY·AMD·DV 공식 데이터 대조를 우선합니다. 실행 가능한 변화 없음.",
+    "top_actions": [],
+    "strategies": [
+      {
+        "ticker": "INFY",
+        "display_name": "Infosys",
+        "research_priority": "ADR 조정 일봉과 거래량으로 11월 24일 고가 및 11월 5일 종가 기준 구간의 돌파·눌림 회복을 우선 검증합니다. 추가 비중은 원문상 시뮬레이터 맥락이고 정규화 분류는 UNKNOWN입니다.",
+        "execution": {
+          "readiness": "RESEARCH_ONLY"
+        },
+        "source_contributions": [
+          {
+            "surface": "prism",
+            "event_key": "stock_ai_agent:18121",
+            "affected_field": "research_priority",
+            "evidence_weight": "LOW_LABELED",
+            "note": "ADR 조정 일봉과 거래량으로 11월 24일 고가 및 11월 5일 종가 기준 구간의 돌파·눌림 회복을 우선 검증합니다. 추가 비중은 원문상 시뮬레이터 맥락이고 정규화 분류는 UNKNOWN입니다."
+          }
+        ]
+      },
+      {
+        "ticker": "AMD",
+        "display_name": "Advanced Micro Devices",
+        "research_priority": "동일 채널 WATCH 이후 미진입을 기록했습니다. 서로 다른 관측 가격을 확정 종가·거래량과 대조하고 5일 추세와 섹터 집중 판단에 쓰인 기준을 검증합니다.",
+        "execution": {
+          "readiness": "RESEARCH_ONLY"
+        },
+        "source_contributions": [
+          {
+            "surface": "prism",
+            "event_key": "stock_ai_agent:18123",
+            "affected_field": "research_priority",
+            "evidence_weight": "LOW_LABELED",
+            "note": "동일 채널 WATCH 이후 미진입을 기록했습니다. 서로 다른 관측 가격을 확정 종가·거래량과 대조하고 5일 추세와 섹터 집중 판단에 쓰인 기준을 검증합니다."
+          },
+          {
+            "surface": "prism",
+            "event_key": "stock_ai_agent:18131",
+            "affected_field": "research_priority",
+            "evidence_weight": "LOW_LABELED",
+            "note": "동일 채널 WATCH 이후 미진입을 기록했습니다. 서로 다른 관측 가격을 확정 종가·거래량과 대조하고 5일 추세와 섹터 집중 판단에 쓰인 기준을 검증합니다."
+          },
+          {
+            "surface": "prism",
+            "event_key": "stock_ai_agent:18134",
+            "affected_field": "research_priority",
+            "evidence_weight": "LOW_LABELED",
+            "note": "동일 채널 WATCH 이후 미진입을 기록했습니다. 서로 다른 관측 가격을 확정 종가·거래량과 대조하고 5일 추세와 섹터 집중 판단에 쓰인 기준을 검증합니다."
+          },
+          {
+            "surface": "prism",
+            "event_key": "stock_ai_agent:18126",
+            "affected_field": "research_priority",
+            "evidence_weight": "LOW_LABELED",
+            "note": "동일 채널 WATCH 이후 미진입을 기록했습니다. 서로 다른 관측 가격을 확정 종가·거래량과 대조하고 5일 추세와 섹터 집중 판단에 쓰인 기준을 검증합니다."
+          }
+        ]
+      },
+      {
+        "ticker": "DV",
+        "display_name": "DoubleVerify",
+        "research_priority": "동일 채널 WATCH 이후 미진입을 기록했습니다. 데이터 공급자의 확정 종가·거래량과 공시 기반 상대 밸류에이션으로 추가 확인 요건을 검증합니다.",
+        "execution": {
+          "readiness": "RESEARCH_ONLY"
+        },
+        "source_contributions": [
+          {
+            "surface": "prism",
+            "event_key": "stock_ai_agent:18123",
+            "affected_field": "research_priority",
+            "evidence_weight": "LOW_LABELED",
+            "note": "동일 채널 WATCH 이후 미진입을 기록했습니다. 데이터 공급자의 확정 종가·거래량과 공시 기반 상대 밸류에이션으로 추가 확인 요건을 검증합니다."
+          },
+          {
+            "surface": "prism",
+            "event_key": "stock_ai_agent:18130",
+            "affected_field": "research_priority",
+            "evidence_weight": "LOW_LABELED",
+            "note": "동일 채널 WATCH 이후 미진입을 기록했습니다. 데이터 공급자의 확정 종가·거래량과 공시 기반 상대 밸류에이션으로 추가 확인 요건을 검증합니다."
+          },
+          {
+            "surface": "prism",
+            "event_key": "stock_ai_agent:18133",
+            "affected_field": "research_priority",
+            "evidence_weight": "LOW_LABELED",
+            "note": "동일 채널 WATCH 이후 미진입을 기록했습니다. 데이터 공급자의 확정 종가·거래량과 공시 기반 상대 밸류에이션으로 추가 확인 요건을 검증합니다."
+          },
+          {
+            "surface": "prism",
+            "event_key": "stock_ai_agent:18125",
+            "affected_field": "research_priority",
+            "evidence_weight": "LOW_LABELED",
+            "note": "동일 채널 WATCH 이후 미진입을 기록했습니다. 데이터 공급자의 확정 종가·거래량과 공시 기반 상대 밸류에이션으로 추가 확인 요건을 검증합니다."
+          }
+        ]
+      }
+    ],
+    "coverage_receipt": {
+      "event_id": "prism:2227c300fb17501fc264905df35a2a16",
+      "status": "COMPLETE",
+      "window_events": 15,
+      "transmitted_events": 15,
+      "truncated": false,
+      "new_events": 15,
+      "revised_events": 0
+    },
+    "next_checkpoint": "다음 US 브리핑 전에 거래소 기준 조정 일봉·확정 거래량과 필요 시 SEC·기업 IR을 확인합니다. 첫 이벤트는 11월 29일 02:46:32 KST부터 24시간 범위를 벗어납니다.",
+    "generated_at": "2026-11-28T10:40:30.1810726+09:00",
+    "as_of": "2026-11-28T10:40:30.1810726+09:00",
+    "model_receipt": {
+      "schema": "tradingagents.model-provenance/v1",
+      "work_synthesis": {
+        "execution_mode": "local",
+        "requested_model": "gpt-6.2-sol",
+        "requested_reasoning_effort": "medium",
+        "task_id": "tradingagents-work-prism",
+        "verification_status": "CONFIGURED_NOT_RUNTIME_VERIFIED",
+        "observed_model": null,
+        "observed_reasoning_effort": null,
+        "note": "The local task contract is verified; the Work host does not expose a signed per-response model receipt."
+      }
+    },
+    "source_summary": {
+      "mobile_handoff": {
+        "owner": "external_github_notification_pipeline",
+        "status": "PENDING_EXTERNAL_VERIFICATION",
+        "work_sent_notification": false
+      },
+      "delta": {
+        "new_events": 15,
+        "revised_events": 0,
+        "unchanged_events": 0,
+        "delivered_event_keys": [
+          "stock_ai_agent:18135",
+          "stock_ai_agent:18134",
+          "stock_ai_agent:18133",
+          "stock_ai_agent:18132",
+          "stock_ai_agent:18131",
+          "stock_ai_agent:18130",
+          "stock_ai_agent:18129",
+          "stock_ai_agent:18128",
+          "stock_ai_agent:18127",
+          "stock_ai_agent:18126",
+          "stock_ai_agent:18125",
+          "stock_ai_agent:18124",
+          "stock_ai_agent:18123",
+          "stock_ai_agent:18122",
+          "stock_ai_agent:18121"
+        ]
+      },
+      "historical_backlog": {
+        "unseen": 130,
+        "revised": 45,
+        "status": "PENDING_CANONICAL_BACKLOG_PACKET"
+      },
+      "source": {
+        "health": "OK",
+        "run_id": "prism_telegram_20261128_080800",
+        "last_run_at": "2026-11-28T08:08:12.341262+09:00",
+        "status": "success",
+        "stale_after_hours": 30
+      },
+      "coverage": {
+        "total_unique_events": 536,
+        "window_events": 15,
+        "transmitted_events": 15,
+        "truncated": false,
+        "oldest_occurred_at": "2026-11-28T02:46:32+09:00",
+        "newest_occurred_at": "2026-11-28T04:56:04+09:00"
+      },
+      "evidence_policy": {
+        "profile": "balanced_external",
+        "material_thesis_effects": [
+          "ranking",
+          "confidence",
+          "position_size_within_existing_risk_limits",
+          "research_priority"
+        ],
+        "supported_evidence_weight": "MEDIUM",
+        "partially_supported_evidence_weight": "LOW_TO_MEDIUM",
+        "unverified_evidence_weight": "LOW_LABELED",
+        "user_primary_channels": [
+          "@kpunch",
+          "@sosumonkey"
+        ],
+        "user_primary_source_tier": "USER_PRIMARY",
+        "user_primary_evidence_weight": "HIGH",
+        "user_primary_validation_policy": "USER_ACCEPTED",
+        "matching_multi_source_signal_may_raise_thesis_priority": true,
+        "conflicting_signal_must_be_visible": true,
+        "may_bypass_market_or_portfolio_execution_gate": false
+      }
+    }
+  },
+  "report_id": "prism:5b666b1c950b868d58940a4284a45171",
+  "report_sha256": "5b666b1c950b868d58940a4284a4517132ec59eb0ce5628de4bc58c570ce8832",
+  "published_at": "2026-11-28T10:40:30.414206+09:00"
+}

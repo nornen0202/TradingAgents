@@ -1,0 +1,3762 @@
+{
+  "schema": "tradingagents.work-context/v1",
+  "surface": "kr",
+  "event_id": "kr:26b868a6fe1e8e134d8ca6efab088cff",
+  "prompt_contract_version": "market-work-v12-kr",
+  "prompt_sha256": "ae80093efe2dcfe7f6131b8b09100f75e77b0ca0242b5340d15eb6ec3fd81274",
+  "skill_sha256": "2fef99f1af403675549a13813e0fe5597a241a964affeada56e9f64e9f398fe9",
+  "task_manifest_sha256": "6fbafadc2971d1a908c1bbc1fa29e2adaf0ca6be956768f2f9eb0abf0061428e",
+  "workflow_contract_sha256": "3d89f852dda405d7c44afdbed158e622d8a748f194d9e44d0aca14a8bbe14de1",
+  "source_sha256": "332d4b8cce78157a50e6de3aae4a95c78f63eb9cb21e85a95b8bba9839c8516d",
+  "body": {
+    "kind": "market",
+    "market": "KR",
+    "session_id": "KR:2026-11-27",
+    "source_health": "STALE",
+    "source": {
+      "run_id": "20261127T152819_local-freshness-kr-overlay",
+      "last_run_at": "2026-11-27T15:29:33.994162+09:00",
+      "status": "success"
+    },
+    "report_mode": "OUTAGE",
+    "current": {
+      "run_id": "20261127T152819_local-freshness-kr-overlay",
+      "started_at": "2026-11-27T15:28:19.507535+09:00",
+      "run_mode": "overlay_only",
+      "freshness_receipt": {
+        "schema": "tradingagents.source-freshness/v1",
+        "producer_run_id": "20261127T152819_local-freshness-kr-overlay",
+        "producer_started_at": "2026-11-27T15:28:19.507535+09:00",
+        "producer_finished_at": "2026-11-27T15:29:33.994162+09:00",
+        "analysis_run_id": "20261127T045657_local-scheduler-kr-full",
+        "analysis_lineage_status": "RESOLVED",
+        "analysis_completed_at": "2026-11-27T06:56:32.868662+09:00",
+        "analysis_trade_date_oldest": "2026-11-26",
+        "analysis_trade_date_latest": "2026-11-26",
+        "market_data_oldest_at": "2026-11-27T15:29:00+09:00",
+        "market_data_latest_at": "2026-11-27T15:29:00+09:00",
+        "market_data_status": "STALE",
+        "publication_does_not_refresh_inputs": true,
+        "execution_max_age_seconds": 120.0,
+        "research_market_data_status": "UNVERIFIED",
+        "research_market_data_receipts": [
+          {
+            "ticker": "005930.KS",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false,
+            "basis": "ORIGINAL_RESEARCH_CONTRACT",
+            "market_data_asof": null
+          },
+          {
+            "ticker": "278470.KS",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false,
+            "basis": "ORIGINAL_RESEARCH_CONTRACT",
+            "market_data_asof": null
+          },
+          {
+            "ticker": "353200.KS",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false,
+            "basis": "ORIGINAL_RESEARCH_CONTRACT",
+            "market_data_asof": null
+          },
+          {
+            "ticker": "180640.KS",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false,
+            "basis": "ORIGINAL_RESEARCH_CONTRACT",
+            "market_data_asof": null
+          },
+          {
+            "ticker": "000660.KS",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false,
+            "basis": "ORIGINAL_RESEARCH_CONTRACT",
+            "market_data_asof": null
+          },
+          {
+            "ticker": "034230.KS",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false,
+            "basis": "ORIGINAL_RESEARCH_CONTRACT",
+            "market_data_asof": null
+          },
+          {
+            "ticker": "204620.KQ",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false,
+            "basis": "ORIGINAL_RESEARCH_CONTRACT",
+            "market_data_asof": null
+          },
+          {
+            "ticker": "028050.KS",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false,
+            "basis": "ORIGINAL_RESEARCH_CONTRACT",
+            "market_data_asof": null
+          },
+          {
+            "ticker": "068270.KS",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false,
+            "basis": "ORIGINAL_RESEARCH_CONTRACT",
+            "market_data_asof": null
+          },
+          {
+            "ticker": "128940.KS",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false,
+            "basis": "ORIGINAL_RESEARCH_CONTRACT",
+            "market_data_asof": null
+          },
+          {
+            "ticker": "003350.KS",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false,
+            "basis": "ORIGINAL_RESEARCH_CONTRACT",
+            "market_data_asof": null
+          },
+          {
+            "ticker": "267260.KS",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false,
+            "basis": "ORIGINAL_RESEARCH_CONTRACT",
+            "market_data_asof": null
+          },
+          {
+            "ticker": "035420.KS",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false,
+            "basis": "ORIGINAL_RESEARCH_CONTRACT",
+            "market_data_asof": null
+          },
+          {
+            "ticker": "042700.KS",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false,
+            "basis": "ORIGINAL_RESEARCH_CONTRACT",
+            "market_data_asof": null
+          },
+          {
+            "ticker": "034020.KS",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false,
+            "basis": "ORIGINAL_RESEARCH_CONTRACT",
+            "market_data_asof": null
+          },
+          {
+            "ticker": "010120.KS",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false,
+            "basis": "ORIGINAL_RESEARCH_CONTRACT",
+            "market_data_asof": null
+          },
+          {
+            "ticker": "058470.KQ",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false,
+            "basis": "ORIGINAL_RESEARCH_CONTRACT",
+            "market_data_asof": null
+          },
+          {
+            "ticker": "048770.KQ",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false,
+            "basis": "ORIGINAL_RESEARCH_CONTRACT",
+            "market_data_asof": null
+          },
+          {
+            "ticker": "003230.KS",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false,
+            "basis": "ORIGINAL_RESEARCH_CONTRACT",
+            "market_data_asof": null
+          },
+          {
+            "ticker": "058610.KQ",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false,
+            "basis": "ORIGINAL_RESEARCH_CONTRACT",
+            "market_data_asof": null
+          },
+          {
+            "ticker": "012030.KS",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false,
+            "basis": "ORIGINAL_RESEARCH_CONTRACT",
+            "market_data_asof": null
+          },
+          {
+            "ticker": "011200.KS",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false,
+            "basis": "ORIGINAL_RESEARCH_CONTRACT",
+            "market_data_asof": null
+          },
+          {
+            "ticker": "033780.KS",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false,
+            "basis": "ORIGINAL_RESEARCH_CONTRACT",
+            "market_data_asof": null
+          },
+          {
+            "ticker": "090430.KS",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false,
+            "basis": "ORIGINAL_RESEARCH_CONTRACT",
+            "market_data_asof": null
+          },
+          {
+            "ticker": "003490.KS",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false,
+            "basis": "ORIGINAL_RESEARCH_CONTRACT",
+            "market_data_asof": null
+          },
+          {
+            "ticker": "356680.KQ",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false,
+            "basis": "ORIGINAL_RESEARCH_CONTRACT",
+            "market_data_asof": null
+          },
+          {
+            "ticker": "007810.KS",
+            "research_valid": false,
+            "category": "UNVERIFIED_RESEARCH_INPUT",
+            "execution_eligible": false,
+            "basis": "ORIGINAL_RESEARCH_CONTRACT",
+            "market_data_asof": null
+          }
+        ],
+        "research_calendar_verified": true,
+        "latest_regular_close_at": "2026-11-27T06:30:00+00:00",
+        "research_does_not_enable_execution": true
+      },
+      "latest_attempt": {
+        "schema": "tradingagents.analysis-attempt/v1",
+        "run_id": "20261127T045657_local-scheduler-kr-full",
+        "market": "KR",
+        "run_mode": "full",
+        "started_at": "2026-11-27T04:56:57.460545+09:00",
+        "status": "SUCCESS",
+        "heartbeat_at": "2026-11-26T22:17:57.458392+00:00",
+        "finished_at": "2026-11-26T22:17:57.458378+00:00",
+        "completed_tickers": 30,
+        "error_type": null
+      },
+      "latest_completed_analysis": {
+        "run_id": "20261127T045657_local-scheduler-kr-full",
+        "status": "success",
+        "finished_at": "2026-11-27T07:17:57.075372+09:00"
+      },
+      "analysis_receipt": {
+        "analysis_run_id": "20261127T045657_local-scheduler-kr-full",
+        "decisions": {}
+      },
+      "bundle": {
+        "artifact_type": "decision_bundle",
+        "version": 2,
+        "run_id": "20261127T152819_local-freshness-kr-overlay",
+        "market": "KR",
+        "generated_at": "2026-11-27T15:29:33.151792+09:00",
+        "analysis_source_run_id": "20261127T152623_local-freshness-kr-overlay",
+        "execution_source_run_id": "20261127T152819_local-freshness-kr-overlay",
+        "checkpoint": "15:28",
+        "checkpoint_timezone": "Asia/Seoul",
+        "quality": {
+          "report_mode": "OUTAGE",
+          "decision_ready": false,
+          "conditional_strategy_ready": false,
+          "quality_label_ko": "장중 투자 판단 가능",
+          "fresh_row_ratio": 1.0,
+          "conditional_row_ratio": 1.0,
+          "portfolio_membership_omitted": true
+        },
+        "strategy_table": [
+          {
+            "ticker": "005930.KS",
+            "display_name": "삼성전자",
+            "last_price": 178800.0,
+            "market_data_asof": "2026-11-27T15:29:00+09:00",
+            "session_vwap": 175630.2809248452,
+            "vwap_distance_pct": 1.8047679810471617,
+            "vwap_position_ko": "VWAP 위 +1.80%",
+            "relative_volume": 0.6693988975116935,
+            "trading_value": 2112147145800.0,
+            "price_change_pct": 4.38,
+            "spread_bps": 5.594405594405594,
+            "day_high": 179900.0,
+            "day_low": 169000.0,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
+            "data_status_ko": "시세 유효기간 만료",
+            "reason_codes_ko": [
+              "돌파 후 안착 실패",
+              "support zone failed"
+            ],
+            "quality": {
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "data_ready": false,
+              "action_ready": false,
+              "action_status": "DATA_RECHECK_REQUIRED",
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
+              "generated_in_current_run": true,
+              "freshness_class": "LIVE_CHECKPOINT",
+              "execution_eligibility": "LIVE_EXECUTION_READY",
+              "row_valid_until": "2026-11-27T15:31:00+09:00",
+              "expired_at_build": true
+            },
+            "display_priority": 1
+          },
+          {
+            "ticker": "278470.KS",
+            "display_name": "에이피알",
+            "last_price": 300500.0,
+            "market_data_asof": "2026-11-27T15:29:00+09:00",
+            "session_vwap": 301632.37601760146,
+            "vwap_distance_pct": -0.37541593928079875,
+            "vwap_position_ko": "VWAP 아래 -0.38%",
+            "relative_volume": 1.7849052877308613,
+            "trading_value": 218939558500.0,
+            "price_change_pct": 0.67,
+            "spread_bps": 16.764459346186086,
+            "day_high": 322000.0,
+            "day_low": 294500.0,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
+            "data_status_ko": "시세 유효기간 만료",
+            "reason_codes_ko": [
+              "support zone failed"
+            ],
+            "quality": {
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "data_ready": false,
+              "action_ready": false,
+              "action_status": "DATA_RECHECK_REQUIRED",
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
+              "generated_in_current_run": true,
+              "freshness_class": "LIVE_CHECKPOINT",
+              "execution_eligibility": "LIVE_EXECUTION_READY",
+              "row_valid_until": "2026-11-27T15:31:00+09:00",
+              "expired_at_build": true
+            },
+            "display_priority": 2
+          },
+          {
+            "ticker": "353200.KS",
+            "display_name": "대덕전자",
+            "last_price": 72800.0,
+            "market_data_asof": "2026-11-27T15:29:00+09:00",
+            "session_vwap": 71271.48636614645,
+            "vwap_distance_pct": 2.1446355503252024,
+            "vwap_position_ko": "VWAP 위 +2.14%",
+            "relative_volume": 0.5933359128015724,
+            "trading_value": 71630338300.0,
+            "price_change_pct": 4.15,
+            "spread_bps": 13.764624913971094,
+            "day_high": 73200.0,
+            "day_low": 67300.0,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
+            "data_status_ko": "시세 유효기간 만료",
+            "reason_codes_ko": [
+              "support zone failed"
+            ],
+            "quality": {
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "data_ready": false,
+              "action_ready": false,
+              "action_status": "DATA_RECHECK_REQUIRED",
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
+              "generated_in_current_run": true,
+              "freshness_class": "LIVE_CHECKPOINT",
+              "execution_eligibility": "LIVE_EXECUTION_READY",
+              "row_valid_until": "2026-11-27T15:31:00+09:00",
+              "expired_at_build": true
+            },
+            "display_priority": 3
+          },
+          {
+            "ticker": "180640.KS",
+            "display_name": "180640",
+            "last_price": 252500.0,
+            "market_data_asof": "2026-11-27T15:29:00+09:00",
+            "session_vwap": 251643.56580457167,
+            "vwap_distance_pct": 0.34033621828957195,
+            "vwap_position_ko": "VWAP 위 +0.34%",
+            "relative_volume": 0.35488913962642465,
+            "trading_value": 66669439750.0,
+            "price_change_pct": 4.55,
+            "spread_bps": 19.782393669634025,
+            "day_high": 260000.0,
+            "day_low": 239000.0,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
+            "data_status_ko": "시세 유효기간 만료",
+            "reason_codes_ko": [
+              "risk action level triggered"
+            ],
+            "quality": {
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "data_ready": false,
+              "action_ready": false,
+              "action_status": "DATA_RECHECK_REQUIRED",
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
+              "generated_in_current_run": true,
+              "freshness_class": "LIVE_CHECKPOINT",
+              "execution_eligibility": "LIVE_EXECUTION_READY",
+              "row_valid_until": "2026-11-27T15:31:00+09:00",
+              "expired_at_build": true
+            },
+            "display_priority": 4
+          },
+          {
+            "ticker": "000660.KS",
+            "display_name": "SK하이닉스",
+            "last_price": 1107000.0,
+            "market_data_asof": "2026-11-27T15:29:00+09:00",
+            "session_vwap": 1075707.5505824694,
+            "vwap_distance_pct": 2.909010855281857,
+            "vwap_position_ko": "VWAP 위 +2.91%",
+            "relative_volume": 0.6926485395156887,
+            "trading_value": 2804188865500.0,
+            "price_change_pct": 5.13,
+            "spread_bps": 8.98876404494382,
+            "day_high": 1110000.0,
+            "day_low": 1022000.0,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
+            "data_status_ko": "시세 유효기간 만료",
+            "reason_codes_ko": [
+              "conditional entry confirmation unavailable"
+            ],
+            "quality": {
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "data_ready": false,
+              "action_ready": false,
+              "action_status": "DATA_RECHECK_REQUIRED",
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
+              "generated_in_current_run": true,
+              "freshness_class": "LIVE_CHECKPOINT",
+              "execution_eligibility": "LIVE_EXECUTION_READY",
+              "row_valid_until": "2026-11-27T15:31:00+09:00",
+              "expired_at_build": true
+            },
+            "display_priority": 5
+          },
+          {
+            "ticker": "034230.KS",
+            "display_name": "034230",
+            "last_price": 11780.0,
+            "market_data_asof": "2026-11-27T15:29:00+09:00",
+            "session_vwap": 11694.206773433987,
+            "vwap_distance_pct": 0.7336387001546152,
+            "vwap_position_ko": "VWAP 위 +0.73%",
+            "relative_volume": 1.0949315903660677,
+            "trading_value": 11859890295.0,
+            "price_change_pct": 1.12,
+            "spread_bps": 8.499787505312367,
+            "day_high": 11980.0,
+            "day_low": 11410.0,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
+            "data_status_ko": "시세 유효기간 만료",
+            "reason_codes_ko": [
+              "conditional entry confirmation unavailable"
+            ],
+            "quality": {
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "data_ready": false,
+              "action_ready": false,
+              "action_status": "DATA_RECHECK_REQUIRED",
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
+              "generated_in_current_run": true,
+              "freshness_class": "LIVE_CHECKPOINT",
+              "execution_eligibility": "LIVE_EXECUTION_READY",
+              "row_valid_until": "2026-11-27T15:31:00+09:00",
+              "expired_at_build": true
+            },
+            "display_priority": 6
+          },
+          {
+            "ticker": "204620.KQ",
+            "display_name": "204620",
+            "last_price": 6580.0,
+            "market_data_asof": "2026-11-27T15:29:00+09:00",
+            "session_vwap": 6577.2927549427595,
+            "vwap_distance_pct": 0.04116047678135448,
+            "vwap_position_ko": "VWAP 위 +0.04%",
+            "relative_volume": 1.2429355235885267,
+            "trading_value": 10142205160.0,
+            "price_change_pct": 1.86,
+            "spread_bps": 15.186028853454822,
+            "day_high": 6740.0,
+            "day_low": 6400.0,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
+            "data_status_ko": "시세 유효기간 만료",
+            "reason_codes_ko": [
+              "돌파 후 안착 실패"
+            ],
+            "quality": {
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "data_ready": false,
+              "action_ready": false,
+              "action_status": "DATA_RECHECK_REQUIRED",
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
+              "generated_in_current_run": true,
+              "freshness_class": "LIVE_CHECKPOINT",
+              "execution_eligibility": "LIVE_EXECUTION_READY",
+              "row_valid_until": "2026-11-27T15:31:00+09:00",
+              "expired_at_build": true
+            },
+            "display_priority": 7
+          },
+          {
+            "ticker": "028050.KS",
+            "display_name": "028050",
+            "last_price": 58400.0,
+            "market_data_asof": "2026-11-27T15:29:00+09:00",
+            "session_vwap": 57980.294543449665,
+            "vwap_distance_pct": 0.7238760338407868,
+            "vwap_position_ko": "VWAP 위 +0.72%",
+            "relative_volume": 0.5487161600989179,
+            "trading_value": 79817934700.0,
+            "price_change_pct": 2.82,
+            "spread_bps": 17.02127659574468,
+            "day_high": 58800.0,
+            "day_low": 56600.0,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
+            "data_status_ko": "시세 유효기간 만료",
+            "reason_codes_ko": [
+              "conditional entry confirmation unavailable"
+            ],
+            "quality": {
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "data_ready": false,
+              "action_ready": false,
+              "action_status": "DATA_RECHECK_REQUIRED",
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
+              "generated_in_current_run": true,
+              "freshness_class": "LIVE_CHECKPOINT",
+              "execution_eligibility": "LIVE_EXECUTION_READY",
+              "row_valid_until": "2026-11-27T15:31:00+09:00",
+              "expired_at_build": true
+            },
+            "display_priority": 8
+          },
+          {
+            "ticker": "068270.KS",
+            "display_name": "068270",
+            "last_price": 221000.0,
+            "market_data_asof": "2026-11-27T15:29:00+09:00",
+            "session_vwap": 221020.87661571515,
+            "vwap_distance_pct": -0.009445540183727896,
+            "vwap_position_ko": "VWAP 아래 -0.01%",
+            "relative_volume": 0.9547385320101008,
+            "trading_value": 133938872250.0,
+            "price_change_pct": 2.55,
+            "spread_bps": 22.650056625141563,
+            "day_high": 223000.0,
+            "day_low": 218000.0,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
+            "data_status_ko": "시세 유효기간 만료",
+            "reason_codes_ko": [
+              "conditional entry confirmation unavailable"
+            ],
+            "quality": {
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "data_ready": false,
+              "action_ready": false,
+              "action_status": "DATA_RECHECK_REQUIRED",
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
+              "generated_in_current_run": true,
+              "freshness_class": "LIVE_CHECKPOINT",
+              "execution_eligibility": "LIVE_EXECUTION_READY",
+              "row_valid_until": "2026-11-27T15:31:00+09:00",
+              "expired_at_build": true
+            },
+            "display_priority": 9
+          },
+          {
+            "ticker": "128940.KS",
+            "display_name": "128940",
+            "last_price": 488500.0,
+            "market_data_asof": "2026-11-27T15:29:00+09:00",
+            "session_vwap": 494933.9405654983,
+            "vwap_distance_pct": -1.2999594568412598,
+            "vwap_position_ko": "VWAP 아래 -1.30%",
+            "relative_volume": 0.8771353674111989,
+            "trading_value": 57991904750.0,
+            "price_change_pct": 4.72,
+            "spread_bps": 10.147133434804667,
+            "day_high": 506000.0,
+            "day_low": 477000.0,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
+            "data_status_ko": "시세 유효기간 만료",
+            "reason_codes_ko": [
+              "conditional entry confirmation unavailable"
+            ],
+            "quality": {
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "data_ready": false,
+              "action_ready": false,
+              "action_status": "DATA_RECHECK_REQUIRED",
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
+              "generated_in_current_run": true,
+              "freshness_class": "LIVE_CHECKPOINT",
+              "execution_eligibility": "LIVE_EXECUTION_READY",
+              "row_valid_until": "2026-11-27T15:31:00+09:00",
+              "expired_at_build": true
+            },
+            "display_priority": 10
+          },
+          {
+            "ticker": "003350.KS",
+            "display_name": "003350",
+            "last_price": 14390.0,
+            "market_data_asof": "2026-11-27T15:29:00+09:00",
+            "session_vwap": 14242.702086326974,
+            "vwap_distance_pct": 1.0341992185207038,
+            "vwap_position_ko": "VWAP 위 +1.03%",
+            "relative_volume": 0.6044444624910076,
+            "trading_value": 8534041935.0,
+            "price_change_pct": -1.24,
+            "spread_bps": 6.942034015966678,
+            "day_high": 14980.0,
+            "day_low": 13920.0,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
+            "data_status_ko": "시세 유효기간 만료",
+            "reason_codes_ko": [
+              "conditional entry confirmation unavailable"
+            ],
+            "quality": {
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "data_ready": false,
+              "action_ready": false,
+              "action_status": "DATA_RECHECK_REQUIRED",
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
+              "generated_in_current_run": true,
+              "freshness_class": "LIVE_CHECKPOINT",
+              "execution_eligibility": "LIVE_EXECUTION_READY",
+              "row_valid_until": "2026-11-27T15:31:00+09:00",
+              "expired_at_build": true
+            },
+            "display_priority": 11
+          },
+          {
+            "ticker": "267260.KS",
+            "display_name": "HD현대일렉트릭",
+            "last_price": 418000.0,
+            "market_data_asof": "2026-11-27T15:29:00+09:00",
+            "session_vwap": 412264.0143438651,
+            "vwap_distance_pct": 1.3913379428141415,
+            "vwap_position_ko": "VWAP 위 +1.39%",
+            "relative_volume": 0.7751020869246524,
+            "trading_value": 53171751250.0,
+            "price_change_pct": 7.87,
+            "spread_bps": 11.883541295306001,
+            "day_high": 421000.0,
+            "day_low": 391500.0,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
+            "data_status_ko": "시세 유효기간 만료",
+            "reason_codes_ko": [
+              "conditional entry confirmation unavailable"
+            ],
+            "quality": {
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "data_ready": false,
+              "action_ready": false,
+              "action_status": "DATA_RECHECK_REQUIRED",
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
+              "generated_in_current_run": true,
+              "freshness_class": "LIVE_CHECKPOINT",
+              "execution_eligibility": "LIVE_EXECUTION_READY",
+              "row_valid_until": "2026-11-27T15:31:00+09:00",
+              "expired_at_build": true
+            },
+            "display_priority": 12
+          },
+          {
+            "ticker": "035420.KS",
+            "display_name": "NAVER",
+            "last_price": 163300.0,
+            "market_data_asof": "2026-11-27T15:29:00+09:00",
+            "session_vwap": 162638.12998526817,
+            "vwap_distance_pct": 0.4069586970729233,
+            "vwap_position_ko": "VWAP 위 +0.41%",
+            "relative_volume": 0.4003665702145097,
+            "trading_value": 61271475900.0,
+            "price_change_pct": 1.94,
+            "spread_bps": 6.103143118706134,
+            "day_high": 164300.0,
+            "day_low": 159900.0,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
+            "data_status_ko": "시세 유효기간 만료",
+            "reason_codes_ko": [
+              "conditional entry confirmation unavailable"
+            ],
+            "quality": {
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "data_ready": false,
+              "action_ready": false,
+              "action_status": "DATA_RECHECK_REQUIRED",
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
+              "generated_in_current_run": true,
+              "freshness_class": "LIVE_CHECKPOINT",
+              "execution_eligibility": "LIVE_EXECUTION_READY",
+              "row_valid_until": "2026-11-27T15:31:00+09:00",
+              "expired_at_build": true
+            },
+            "display_priority": 13
+          },
+          {
+            "ticker": "042700.KS",
+            "display_name": "한미반도체",
+            "last_price": 160500.0,
+            "market_data_asof": "2026-11-27T15:29:00+09:00",
+            "session_vwap": 156123.69093667678,
+            "vwap_distance_pct": 2.8031037679593584,
+            "vwap_position_ko": "VWAP 위 +2.80%",
+            "relative_volume": 0.8968146967823527,
+            "trading_value": 93639867350.0,
+            "price_change_pct": 8.67,
+            "spread_bps": 6.17093489663684,
+            "day_high": 161500.0,
+            "day_low": 145900.0,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
+            "data_status_ko": "시세 유효기간 만료",
+            "reason_codes_ko": [
+              "conditional entry confirmation unavailable"
+            ],
+            "quality": {
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "data_ready": false,
+              "action_ready": false,
+              "action_status": "DATA_RECHECK_REQUIRED",
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
+              "generated_in_current_run": true,
+              "freshness_class": "LIVE_CHECKPOINT",
+              "execution_eligibility": "LIVE_EXECUTION_READY",
+              "row_valid_until": "2026-11-27T15:31:00+09:00",
+              "expired_at_build": true
+            },
+            "display_priority": 14
+          },
+          {
+            "ticker": "034020.KS",
+            "display_name": "두산에너빌리티",
+            "last_price": 43750.0,
+            "market_data_asof": "2026-11-27T15:29:00+09:00",
+            "session_vwap": 42857.876166929396,
+            "vwap_distance_pct": 2.081586660047785,
+            "vwap_position_ko": "VWAP 위 +2.08%",
+            "relative_volume": 0.7177683443540452,
+            "trading_value": 79495703050.0,
+            "price_change_pct": 8.02,
+            "spread_bps": 11.42204454597373,
+            "day_high": 44100.0,
+            "day_low": 40550.0,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
+            "data_status_ko": "시세 유효기간 만료",
+            "reason_codes_ko": [
+              "conditional entry confirmation unavailable"
+            ],
+            "quality": {
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "data_ready": false,
+              "action_ready": false,
+              "action_status": "DATA_RECHECK_REQUIRED",
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
+              "generated_in_current_run": true,
+              "freshness_class": "LIVE_CHECKPOINT",
+              "execution_eligibility": "LIVE_EXECUTION_READY",
+              "row_valid_until": "2026-11-27T15:31:00+09:00",
+              "expired_at_build": true
+            },
+            "display_priority": 15
+          },
+          {
+            "ticker": "010120.KS",
+            "display_name": "LS ELECTRIC",
+            "last_price": 121500.0,
+            "market_data_asof": "2026-11-27T15:29:00+09:00",
+            "session_vwap": 118901.90204357372,
+            "vwap_distance_pct": 2.1850768673777443,
+            "vwap_position_ko": "VWAP 위 +2.19%",
+            "relative_volume": 0.6433351290184013,
+            "trading_value": 52801362150.0,
+            "price_change_pct": 7.14,
+            "spread_bps": 16.366612111292962,
+            "day_high": 122000.0,
+            "day_low": 112000.0,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
+            "data_status_ko": "시세 유효기간 만료",
+            "reason_codes_ko": [
+              "conditional entry confirmation unavailable"
+            ],
+            "quality": {
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "data_ready": false,
+              "action_ready": false,
+              "action_status": "DATA_RECHECK_REQUIRED",
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
+              "generated_in_current_run": true,
+              "freshness_class": "LIVE_CHECKPOINT",
+              "execution_eligibility": "LIVE_EXECUTION_READY",
+              "row_valid_until": "2026-11-27T15:31:00+09:00",
+              "expired_at_build": true
+            },
+            "display_priority": 16
+          },
+          {
+            "ticker": "058470.KQ",
+            "display_name": "리노공업",
+            "last_price": 52000.0,
+            "market_data_asof": "2026-11-27T15:29:00+09:00",
+            "session_vwap": 50765.29513778737,
+            "vwap_distance_pct": 2.432182968426333,
+            "vwap_position_ko": "VWAP 위 +2.43%",
+            "relative_volume": 1.152751330147725,
+            "trading_value": 36005031750.0,
+            "price_change_pct": 11.23,
+            "spread_bps": 19.029495718363464,
+            "day_high": 52600.0,
+            "day_low": 46700.0,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
+            "data_status_ko": "시세 유효기간 만료",
+            "reason_codes_ko": [
+              "conditional entry confirmation unavailable"
+            ],
+            "quality": {
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "data_ready": false,
+              "action_ready": false,
+              "action_status": "DATA_RECHECK_REQUIRED",
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
+              "generated_in_current_run": true,
+              "freshness_class": "LIVE_CHECKPOINT",
+              "execution_eligibility": "LIVE_EXECUTION_READY",
+              "row_valid_until": "2026-11-27T15:31:00+09:00",
+              "expired_at_build": true
+            },
+            "display_priority": 17
+          },
+          {
+            "ticker": "048770.KQ",
+            "display_name": "048770",
+            "last_price": 4360.0,
+            "market_data_asof": "2026-11-27T15:29:00+09:00",
+            "session_vwap": 4412.267180976819,
+            "vwap_distance_pct": -1.1845878509389784,
+            "vwap_position_ko": "VWAP 아래 -1.18%",
+            "relative_volume": 5.9713250946453496,
+            "trading_value": 16029576941.0,
+            "price_change_pct": 2.59,
+            "spread_bps": 11.474469305794607,
+            "day_high": 4665.0,
+            "day_low": 4105.0,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
+            "data_status_ko": "시세 유효기간 만료",
+            "reason_codes_ko": [
+              "risk action close confirmation required"
+            ],
+            "quality": {
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "data_ready": false,
+              "action_ready": false,
+              "action_status": "DATA_RECHECK_REQUIRED",
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
+              "generated_in_current_run": true,
+              "freshness_class": "LIVE_CHECKPOINT",
+              "execution_eligibility": "LIVE_EXECUTION_READY",
+              "row_valid_until": "2026-11-27T15:31:00+09:00",
+              "expired_at_build": true
+            },
+            "display_priority": 18
+          },
+          {
+            "ticker": "003230.KS",
+            "display_name": "003230",
+            "last_price": 1300000.0,
+            "market_data_asof": "2026-11-27T15:29:00+09:00",
+            "session_vwap": 1293045.7241471752,
+            "vwap_distance_pct": 0.5378213409592769,
+            "vwap_position_ko": "VWAP 위 +0.54%",
+            "relative_volume": 0.6181336709709212,
+            "trading_value": 38587070500.0,
+            "price_change_pct": -1.14,
+            "spread_bps": 7.6190476190476195,
+            "day_high": 1330000.0,
+            "day_low": 1272000.0,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
+            "data_status_ko": "시세 유효기간 만료",
+            "reason_codes_ko": [
+              "conditional entry confirmation unavailable"
+            ],
+            "quality": {
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "data_ready": false,
+              "action_ready": false,
+              "action_status": "DATA_RECHECK_REQUIRED",
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
+              "generated_in_current_run": true,
+              "freshness_class": "LIVE_CHECKPOINT",
+              "execution_eligibility": "LIVE_EXECUTION_READY",
+              "row_valid_until": "2026-11-27T15:31:00+09:00",
+              "expired_at_build": true
+            },
+            "display_priority": 19
+          },
+          {
+            "ticker": "058610.KQ",
+            "display_name": "에스피지",
+            "last_price": 92700.0,
+            "market_data_asof": "2026-11-27T15:29:00+09:00",
+            "session_vwap": 92397.90379899679,
+            "vwap_distance_pct": 0.3269513577498273,
+            "vwap_position_ko": "VWAP 위 +0.33%",
+            "relative_volume": 1.4727909783538649,
+            "trading_value": 47137807000.0,
+            "price_change_pct": 3.46,
+            "spread_bps": 10.758472296933835,
+            "day_high": 94600.0,
+            "day_low": 89600.0,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
+            "data_status_ko": "시세 유효기간 만료",
+            "reason_codes_ko": [
+              "conditional entry confirmation unavailable"
+            ],
+            "quality": {
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "data_ready": false,
+              "action_ready": false,
+              "action_status": "DATA_RECHECK_REQUIRED",
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
+              "generated_in_current_run": true,
+              "freshness_class": "LIVE_CHECKPOINT",
+              "execution_eligibility": "LIVE_EXECUTION_READY",
+              "row_valid_until": "2026-11-27T15:31:00+09:00",
+              "expired_at_build": true
+            },
+            "display_priority": 20
+          },
+          {
+            "ticker": "012030.KS",
+            "display_name": "012030",
+            "last_price": 2330.0,
+            "market_data_asof": "2026-11-27T15:29:00+09:00",
+            "session_vwap": 2304.6780111030653,
+            "vwap_distance_pct": 1.0987213300488463,
+            "vwap_position_ko": "VWAP 위 +1.10%",
+            "relative_volume": 0.5256609952128352,
+            "trading_value": 1308114497.0,
+            "price_change_pct": 3.56,
+            "spread_bps": 21.436227224008576,
+            "day_high": 2350.0,
+            "day_low": 2240.0,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
+            "data_status_ko": "시세 유효기간 만료",
+            "reason_codes_ko": [
+              "conditional entry confirmation unavailable"
+            ],
+            "quality": {
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "data_ready": false,
+              "action_ready": false,
+              "action_status": "DATA_RECHECK_REQUIRED",
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
+              "generated_in_current_run": true,
+              "freshness_class": "LIVE_CHECKPOINT",
+              "execution_eligibility": "LIVE_EXECUTION_READY",
+              "row_valid_until": "2026-11-27T15:31:00+09:00",
+              "expired_at_build": true
+            },
+            "display_priority": 21
+          },
+          {
+            "ticker": "011200.KS",
+            "display_name": "011200",
+            "last_price": 22400.0,
+            "market_data_asof": "2026-11-27T15:29:00+09:00",
+            "session_vwap": 22241.44681777808,
+            "vwap_distance_pct": 0.7128726090569915,
+            "vwap_position_ko": "VWAP 위 +0.71%",
+            "relative_volume": 0.508904866003897,
+            "trading_value": 13021032625.0,
+            "price_change_pct": 1.13,
+            "spread_bps": 22.396416573348265,
+            "day_high": 22450.0,
+            "day_low": 22000.0,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
+            "data_status_ko": "시세 유효기간 만료",
+            "reason_codes_ko": [
+              "support zone failed"
+            ],
+            "quality": {
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "data_ready": false,
+              "action_ready": false,
+              "action_status": "DATA_RECHECK_REQUIRED",
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
+              "generated_in_current_run": true,
+              "freshness_class": "LIVE_CHECKPOINT",
+              "execution_eligibility": "LIVE_EXECUTION_READY",
+              "row_valid_until": "2026-11-27T15:31:00+09:00",
+              "expired_at_build": true
+            },
+            "display_priority": 22
+          },
+          {
+            "ticker": "033780.KS",
+            "display_name": "033780",
+            "last_price": 176100.0,
+            "market_data_asof": "2026-11-27T15:29:00+09:00",
+            "session_vwap": 176814.51865993274,
+            "vwap_distance_pct": -0.40410632868163043,
+            "vwap_position_ko": "VWAP 아래 -0.40%",
+            "relative_volume": 0.9499423079859919,
+            "trading_value": 58256140350.0,
+            "price_change_pct": -1.89,
+            "spread_bps": 5.676979846721544,
+            "day_high": 180500.0,
+            "day_low": 175800.0,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
+            "data_status_ko": "시세 유효기간 만료",
+            "reason_codes_ko": [
+              "support zone failed"
+            ],
+            "quality": {
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "data_ready": false,
+              "action_ready": false,
+              "action_status": "DATA_RECHECK_REQUIRED",
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
+              "generated_in_current_run": true,
+              "freshness_class": "LIVE_CHECKPOINT",
+              "execution_eligibility": "LIVE_EXECUTION_READY",
+              "row_valid_until": "2026-11-27T15:31:00+09:00",
+              "expired_at_build": true
+            },
+            "display_priority": 23
+          },
+          {
+            "ticker": "090430.KS",
+            "display_name": "090430",
+            "last_price": 142500.0,
+            "market_data_asof": "2026-11-27T15:29:00+09:00",
+            "session_vwap": 142134.52599189797,
+            "vwap_distance_pct": 0.2571324634542682,
+            "vwap_position_ko": "VWAP 위 +0.26%",
+            "relative_volume": 1.0675894011938225,
+            "trading_value": 28454905700.0,
+            "price_change_pct": -2.46,
+            "spread_bps": 6.975933031042902,
+            "day_high": 147400.0,
+            "day_low": 139600.0,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 비동조",
+            "data_status_ko": "시세 유효기간 만료",
+            "reason_codes_ko": [
+              "support zone failed"
+            ],
+            "quality": {
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "data_ready": false,
+              "action_ready": false,
+              "action_status": "DATA_RECHECK_REQUIRED",
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
+              "generated_in_current_run": true,
+              "freshness_class": "LIVE_CHECKPOINT",
+              "execution_eligibility": "LIVE_EXECUTION_READY",
+              "row_valid_until": "2026-11-27T15:31:00+09:00",
+              "expired_at_build": true
+            },
+            "display_priority": 24
+          },
+          {
+            "ticker": "003490.KS",
+            "display_name": "003490",
+            "last_price": 30050.0,
+            "market_data_asof": "2026-11-27T15:29:00+09:00",
+            "session_vwap": 29937.07993335115,
+            "vwap_distance_pct": 0.3771913189270393,
+            "vwap_position_ko": "VWAP 위 +0.38%",
+            "relative_volume": 0.5324007068240143,
+            "trading_value": 48277463150.0,
+            "price_change_pct": 1.18,
+            "spread_bps": 16.65278934221482,
+            "day_high": 30300.0,
+            "day_low": 29150.0,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
+            "data_status_ko": "시세 유효기간 만료",
+            "reason_codes_ko": [
+              "conditional entry confirmation unavailable"
+            ],
+            "quality": {
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "data_ready": false,
+              "action_ready": false,
+              "action_status": "DATA_RECHECK_REQUIRED",
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
+              "generated_in_current_run": true,
+              "freshness_class": "LIVE_CHECKPOINT",
+              "execution_eligibility": "LIVE_EXECUTION_READY",
+              "row_valid_until": "2026-11-27T15:31:00+09:00",
+              "expired_at_build": true
+            },
+            "display_priority": 25
+          },
+          {
+            "ticker": "356680.KQ",
+            "display_name": "356680",
+            "last_price": 14250.0,
+            "market_data_asof": "2026-11-27T15:29:00+09:00",
+            "session_vwap": 14316.489555145004,
+            "vwap_distance_pct": -0.4644263867123022,
+            "vwap_position_ko": "VWAP 아래 -0.46%",
+            "relative_volume": 1.647161937002056,
+            "trading_value": 29013053275.0,
+            "price_change_pct": 5.32,
+            "spread_bps": 7.01508242721852,
+            "day_high": 14990.0,
+            "day_low": 13540.0,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
+            "data_status_ko": "시세 유효기간 만료",
+            "reason_codes_ko": [
+              "conditional entry confirmation unavailable"
+            ],
+            "quality": {
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "data_ready": false,
+              "action_ready": false,
+              "action_status": "DATA_RECHECK_REQUIRED",
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
+              "generated_in_current_run": true,
+              "freshness_class": "LIVE_CHECKPOINT",
+              "execution_eligibility": "LIVE_EXECUTION_READY",
+              "row_valid_until": "2026-11-27T15:31:00+09:00",
+              "expired_at_build": true
+            },
+            "display_priority": 26
+          },
+          {
+            "ticker": "007810.KS",
+            "display_name": "코리아써키트",
+            "last_price": 76000.0,
+            "market_data_asof": "2026-11-27T15:29:00+09:00",
+            "session_vwap": 74856.96049521117,
+            "vwap_distance_pct": 1.5269648904084887,
+            "vwap_position_ko": "VWAP 위 +1.53%",
+            "relative_volume": 0.8664527904851684,
+            "trading_value": 61432113200.0,
+            "price_change_pct": 2.56,
+            "spread_bps": 13.166556945358789,
+            "day_high": 77100.0,
+            "day_low": 70800.0,
+            "sync_summary_ko": "섹터 비교 없음 / 지수 동반 상승",
+            "data_status_ko": "시세 유효기간 만료",
+            "reason_codes_ko": [
+              "conditional entry confirmation unavailable"
+            ],
+            "quality": {
+              "row_mode": "MISSING",
+              "execution_ready": false,
+              "data_ready": false,
+              "action_ready": false,
+              "action_status": "DATA_RECHECK_REQUIRED",
+              "conditional_strategy_ready": false,
+              "current_execution_promotion": "BLOCKED",
+              "generated_in_current_run": true,
+              "freshness_class": "LIVE_CHECKPOINT",
+              "execution_eligibility": "LIVE_EXECUTION_READY",
+              "row_valid_until": "2026-11-27T15:31:00+09:00",
+              "expired_at_build": true
+            },
+            "display_priority": 27
+          }
+        ],
+        "benchmark_context": {},
+        "transmission_scope": {
+          "public_recovery_only": true,
+          "portfolio_membership_omitted": true,
+          "transmitted_research_candidate_count": 27,
+          "raw_codes_omitted": true
+        }
+      },
+      "universe_coverage": {
+        "status": "COMPLETE",
+        "complete": true,
+        "source_run_id": "20261127T152819_local-freshness-kr-overlay",
+        "ticker_universe_mode": "config_plus_account",
+        "expected_watchlist_count": 27,
+        "missing_watchlist_count": 0,
+        "portfolio_coverage_details_omitted": true
+      },
+      "research_readiness": [
+        {
+          "ticker": "005930.KS",
+          "status": "COMPLETE",
+          "decision_parse": "VALIDATED",
+          "reason": "VERIFIED",
+          "analysis_sha256": "2fead1d2210c8a663e323299868444a000d310edc3bc0b4674322edb977b206c",
+          "manifest_sha256": "d3c794a0a63e5a3080cd31551021f1965db7d584ff9637b5d1cc602b0338ec40",
+          "started_at": "2026-11-27T04:58:11.384987+09:00",
+          "finished_at": "2026-11-27T05:11:54.501449+09:00",
+          "decision_sha256": "2d9c26262e74e418e51fdcc22cf95ea2b9d8e540fe2368bee5a56110f24d48d9",
+          "entry_action": "WAIT",
+          "risk_action": "HOLD",
+          "missing_required_methods": []
+        },
+        {
+          "ticker": "278470.KS",
+          "status": "COMPLETE",
+          "decision_parse": "VALIDATED",
+          "reason": "VERIFIED",
+          "analysis_sha256": "e990d77d5d98950a48c80b3f6c542ff815534a83c1d84cf984accd9c35f2200b",
+          "manifest_sha256": "d3c794a0a63e5a3080cd31551021f1965db7d584ff9637b5d1cc602b0338ec40",
+          "started_at": "2026-11-27T05:26:10.241370+09:00",
+          "finished_at": "2026-11-27T05:42:34.100986+09:00",
+          "decision_sha256": "3991fb68c9c9dbdc91f0940cb52c647330b67f4705cc08fa53bb99cc96af1ce2",
+          "entry_action": "WAIT",
+          "risk_action": "HOLD",
+          "missing_required_methods": []
+        },
+        {
+          "ticker": "353200.KS",
+          "status": "COMPLETE",
+          "decision_parse": "VALIDATED",
+          "reason": "VERIFIED",
+          "analysis_sha256": "77ea73d392b9393829705f850d4987411d6a881b8808a410b671589c86db7d42",
+          "manifest_sha256": "d3c794a0a63e5a3080cd31551021f1965db7d584ff9637b5d1cc602b0338ec40",
+          "started_at": "2026-11-27T05:28:14.161976+09:00",
+          "finished_at": "2026-11-27T05:43:05.990755+09:00",
+          "decision_sha256": "1df5327ae6e3c183d8b99c6835afc5ca5f9cfd3d5381e78f3c2f00e0fdd9f13a",
+          "entry_action": "WAIT",
+          "risk_action": "HOLD",
+          "missing_required_methods": []
+        },
+        {
+          "ticker": "180640.KS",
+          "status": "COMPLETE",
+          "decision_parse": "VALIDATED",
+          "reason": "VERIFIED",
+          "analysis_sha256": "900766a0c72a563e12a4aeef2adbb064712654eaecd3406725e4a57bd8d80dce",
+          "manifest_sha256": "d3c794a0a63e5a3080cd31551021f1965db7d584ff9637b5d1cc602b0338ec40",
+          "started_at": "2026-11-27T06:26:11.569175+09:00",
+          "finished_at": "2026-11-27T06:39:20.874739+09:00",
+          "decision_sha256": "dbbad98770b02691468098f0b6693f543d40432eec1cd4a51b21f4986ac41719",
+          "entry_action": "WAIT",
+          "risk_action": "TAKE_PROFIT",
+          "missing_required_methods": []
+        },
+        {
+          "ticker": "000660.KS",
+          "status": "COMPLETE",
+          "decision_parse": "VALIDATED",
+          "reason": "VERIFIED",
+          "analysis_sha256": "e1613564bb27a5ab930d8e1efb0a7418bdae1b478150c1e259929977496d3849",
+          "manifest_sha256": "d3c794a0a63e5a3080cd31551021f1965db7d584ff9637b5d1cc602b0338ec40",
+          "started_at": "2026-11-27T04:58:11.369098+09:00",
+          "finished_at": "2026-11-27T05:12:39.710903+09:00",
+          "decision_sha256": "a63383e194bafaaaa95097f5c5bc02871a3fc7107585fdd8dbb67dd853d5c366",
+          "entry_action": "WAIT",
+          "risk_action": "HOLD",
+          "missing_required_methods": []
+        },
+        {
+          "ticker": "034230.KS",
+          "status": "COMPLETE",
+          "decision_parse": "VALIDATED",
+          "reason": "VERIFIED",
+          "analysis_sha256": "04d6adbd6fbb0487933a4b7ab9dbc6e805c015f3d95bc09d2fc20ac3c98c79ae",
+          "manifest_sha256": "d3c794a0a63e5a3080cd31551021f1965db7d584ff9637b5d1cc602b0338ec40",
+          "started_at": "2026-11-27T06:30:43.436698+09:00",
+          "finished_at": "2026-11-27T06:46:54.340220+09:00",
+          "decision_sha256": "07d691c4187d9c6dd5536e64fbc8f4b298852f9442f746f2386c4eec5357a4ab",
+          "entry_action": "WAIT",
+          "risk_action": "HOLD",
+          "missing_required_methods": []
+        },
+        {
+          "ticker": "204620.KQ",
+          "status": "COMPLETE",
+          "decision_parse": "VALIDATED",
+          "reason": "VERIFIED",
+          "analysis_sha256": "d285bce1dd73ed1339833287775a2e159bff55f022745b61b7adbfb7afe6e0d5",
+          "manifest_sha256": "d3c794a0a63e5a3080cd31551021f1965db7d584ff9637b5d1cc602b0338ec40",
+          "started_at": "2026-11-27T06:20:14.168515+09:00",
+          "finished_at": "2026-11-27T06:34:51.712433+09:00",
+          "decision_sha256": "da7ca6aa7e69f34db39c2feb5bd8ab418df615a0700b78bfe286fe4bd2fbfcbb",
+          "entry_action": "WAIT",
+          "risk_action": "HOLD",
+          "missing_required_methods": []
+        },
+        {
+          "ticker": "028050.KS",
+          "status": "COMPLETE",
+          "decision_parse": "VALIDATED",
+          "reason": "VERIFIED",
+          "analysis_sha256": "76938e5fa6a7a3ed1b592fab4c73076d1a15f31c542193a90d09308386eb373c",
+          "manifest_sha256": "d3c794a0a63e5a3080cd31551021f1965db7d584ff9637b5d1cc602b0338ec40",
+          "started_at": "2026-11-27T05:50:58.935654+09:00",
+          "finished_at": "2026-11-27T06:03:58.953154+09:00",
+          "decision_sha256": "0fdf6898e5ba3e35372bdc44a5b40a7ac4675f3b67562bfaf1651dc424ae90a4",
+          "entry_action": "WAIT",
+          "risk_action": "HOLD",
+          "missing_required_methods": []
+        },
+        {
+          "ticker": "068270.KS",
+          "status": "COMPLETE",
+          "decision_parse": "VALIDATED",
+          "reason": "VERIFIED",
+          "analysis_sha256": "0103e58829b8517b3932147fceb2b6c05ce1dd2b6e122555975c116f9e293a4d",
+          "manifest_sha256": "d3c794a0a63e5a3080cd31551021f1965db7d584ff9637b5d1cc602b0338ec40",
+          "started_at": "2026-11-27T05:55:30.214414+09:00",
+          "finished_at": "2026-11-27T06:12:28.172074+09:00",
+          "decision_sha256": "58c8c742fcae7658f64c16087233f6e0ca73504c45ac592d47d97a7e41162326",
+          "entry_action": "WAIT",
+          "risk_action": "HOLD",
+          "missing_required_methods": []
+        },
+        {
+          "ticker": "128940.KS",
+          "status": "COMPLETE",
+          "decision_parse": "VALIDATED",
+          "reason": "VERIFIED",
+          "analysis_sha256": "9af955334742d1bb9f195d840c216029cdc71d88d0e28f64f6f61cd5e12003db",
+          "manifest_sha256": "d3c794a0a63e5a3080cd31551021f1965db7d584ff9637b5d1cc602b0338ec40",
+          "started_at": "2026-11-27T06:13:31.504722+09:00",
+          "finished_at": "2026-11-27T06:30:33.151265+09:00",
+          "decision_sha256": "b4c0fa872c9a39128691be2a73a41570307610cb416b45d2835d655f627313a4",
+          "entry_action": "WAIT",
+          "risk_action": "HOLD",
+          "missing_required_methods": []
+        },
+        {
+          "ticker": "003350.KS",
+          "status": "COMPLETE",
+          "decision_parse": "VALIDATED",
+          "reason": "VERIFIED",
+          "analysis_sha256": "410bb5990ac402ffd05a71e5f832c4b5582cab43425baf90f0b5493b2eaf45a2",
+          "manifest_sha256": "d3c794a0a63e5a3080cd31551021f1965db7d584ff9637b5d1cc602b0338ec40",
+          "started_at": "2026-11-27T06:39:26.589665+09:00",
+          "finished_at": "2026-11-27T06:56:32.868662+09:00",
+          "decision_sha256": "ea50731e4fd708fe78fb816d048f9d3597d725e9125892f8c0b92b432e93a48e",
+          "entry_action": "WAIT",
+          "risk_action": "HOLD",
+          "missing_required_methods": []
+        },
+        {
+          "ticker": "267260.KS",
+          "status": "COMPLETE",
+          "decision_parse": "VALIDATED",
+          "reason": "VERIFIED",
+          "analysis_sha256": "cd83ca995a464e973ce1bd53a71668a4e63b451db4219aa76468388f4e8f5ef5",
+          "manifest_sha256": "d3c794a0a63e5a3080cd31551021f1965db7d584ff9637b5d1cc602b0338ec40",
+          "started_at": "2026-11-27T05:25:48.753510+09:00",
+          "finished_at": "2026-11-27T05:38:37.009574+09:00",
+          "decision_sha256": "a8a90b38dad945295d3adcd57f7e915092e832d18d488a02110ac9796d1f3abf",
+          "entry_action": "WAIT",
+          "risk_action": "REDUCE_RISK",
+          "missing_required_methods": []
+        },
+        {
+          "ticker": "035420.KS",
+          "status": "REQUIRED_EVIDENCE_MISSING",
+          "decision_parse": "VALIDATED",
+          "reason": "REQUIRED_TOOLS_MISSING",
+          "analysis_sha256": "e82ef9203b0bba439ba246c77e39dc4d5abd99dfca1da88c923c74e642393aae",
+          "manifest_sha256": "d3c794a0a63e5a3080cd31551021f1965db7d584ff9637b5d1cc602b0338ec40",
+          "started_at": "2026-11-27T05:12:01.871279+09:00",
+          "finished_at": "2026-11-27T05:28:09.629407+09:00",
+          "decision_sha256": "2e89f9741f4fcb16d9cdfa146196495614060eb38cc89230296d3d7b0dd48dca",
+          "entry_action": "WAIT",
+          "risk_action": "REDUCE_RISK",
+          "missing_required_methods": [
+            "get_company_news"
+          ]
+        },
+        {
+          "ticker": "042700.KS",
+          "status": "COMPLETE",
+          "decision_parse": "VALIDATED",
+          "reason": "VERIFIED",
+          "analysis_sha256": "83c08899443602facc5e9d1b8d00f56f6544cda4b14b00b8e33814cdc9bba819",
+          "manifest_sha256": "d3c794a0a63e5a3080cd31551021f1965db7d584ff9637b5d1cc602b0338ec40",
+          "started_at": "2026-11-27T05:12:41.623867+09:00",
+          "finished_at": "2026-11-27T05:25:44.578704+09:00",
+          "decision_sha256": "33b53bf803b644e60b654999cc6776390bb8c50956ee6612a710e0f9914b9f31",
+          "entry_action": "WAIT",
+          "risk_action": "REDUCE_RISK",
+          "missing_required_methods": []
+        },
+        {
+          "ticker": "034020.KS",
+          "status": "COMPLETE",
+          "decision_parse": "VALIDATED",
+          "reason": "VERIFIED",
+          "analysis_sha256": "7f1bff6a2dd75a5b3a3b8b7cc55be4ff6157bb976ebf93f109b4459b64dfbee3",
+          "manifest_sha256": "d3c794a0a63e5a3080cd31551021f1965db7d584ff9637b5d1cc602b0338ec40",
+          "started_at": "2026-11-27T05:11:59.306916+09:00",
+          "finished_at": "2026-11-27T05:23:54.034885+09:00",
+          "decision_sha256": "f53e7f2481c6d30507a5a42ae8a8112d786e96564cde59d53a199fbe9f70f4b9",
+          "entry_action": "WAIT",
+          "risk_action": "REDUCE_RISK",
+          "missing_required_methods": []
+        },
+        {
+          "ticker": "010120.KS",
+          "status": "COMPLETE",
+          "decision_parse": "VALIDATED",
+          "reason": "VERIFIED",
+          "analysis_sha256": "b13e4140d9f4afbe16f71c57af505511c6182080e1b396a58bc3054f80def2c9",
+          "manifest_sha256": "d3c794a0a63e5a3080cd31551021f1965db7d584ff9637b5d1cc602b0338ec40",
+          "started_at": "2026-11-27T04:58:11.369833+09:00",
+          "finished_at": "2026-11-27T05:11:46.455701+09:00",
+          "decision_sha256": "728b106a4d0624ec325210c315bc30f5bc90dffed684ac200b3623c69c4a928f",
+          "entry_action": "WAIT",
+          "risk_action": "HOLD",
+          "missing_required_methods": []
+        },
+        {
+          "ticker": "058470.KQ",
+          "status": "REQUIRED_EVIDENCE_MISSING",
+          "decision_parse": "VALIDATED",
+          "reason": "REQUIRED_TOOLS_MISSING",
+          "analysis_sha256": "dc23d70532a81f8efd81ce39f109c55f63e4a98d14a5fca1f4d4c59167e1598d",
+          "manifest_sha256": "d3c794a0a63e5a3080cd31551021f1965db7d584ff9637b5d1cc602b0338ec40",
+          "started_at": "2026-11-27T05:12:43.594826+09:00",
+          "finished_at": "2026-11-27T05:26:04.386868+09:00",
+          "decision_sha256": "ca22e1f523b26ed372f188e3cb97cb95ba657bcc1183ef29c90870698a69c2d5",
+          "entry_action": "WAIT",
+          "risk_action": "HOLD",
+          "missing_required_methods": [
+            "get_company_news"
+          ]
+        },
+        {
+          "ticker": "048770.KQ",
+          "status": "COMPLETE",
+          "decision_parse": "VALIDATED",
+          "reason": "VERIFIED",
+          "analysis_sha256": "9704a6282d5155f085683c6e98cdaeff760842c4ce01c34d658b68bef5f45d4b",
+          "manifest_sha256": "d3c794a0a63e5a3080cd31551021f1965db7d584ff9637b5d1cc602b0338ec40",
+          "started_at": "2026-11-27T05:38:42.978323+09:00",
+          "finished_at": "2026-11-27T05:50:47.519354+09:00",
+          "decision_sha256": "b2fac7309e945a9e1bf72c3a0aa5cb6c66f6b70554ea6d5ea48300be62a554cb",
+          "entry_action": "WAIT",
+          "risk_action": "REDUCE_RISK",
+          "missing_required_methods": []
+        },
+        {
+          "ticker": "003230.KS",
+          "status": "COMPLETE",
+          "decision_parse": "VALIDATED",
+          "reason": "VERIFIED",
+          "analysis_sha256": "06524026c272df5ab20ecf6dca4b738b3f63137b77280a28d40cfd7bc46a92ae",
+          "manifest_sha256": "d3c794a0a63e5a3080cd31551021f1965db7d584ff9637b5d1cc602b0338ec40",
+          "started_at": "2026-11-27T05:55:54.257924+09:00",
+          "finished_at": "2026-11-27T06:13:10.443252+09:00",
+          "decision_sha256": "6fd4c8d0f186132d8f56fbdb1df3cfbfd3809bf34aaceb943d3d8ba919a8631d",
+          "entry_action": "WAIT",
+          "risk_action": "HOLD",
+          "missing_required_methods": []
+        },
+        {
+          "ticker": "058610.KQ",
+          "status": "COMPLETE",
+          "decision_parse": "VALIDATED",
+          "reason": "VERIFIED",
+          "analysis_sha256": "f4438b39024cbf7fef3ac11232cac4c69546e01a47be0b438588328d0386c34c",
+          "manifest_sha256": "d3c794a0a63e5a3080cd31551021f1965db7d584ff9637b5d1cc602b0338ec40",
+          "started_at": "2026-11-27T05:43:09.868009+09:00",
+          "finished_at": "2026-11-27T05:55:34.181688+09:00",
+          "decision_sha256": "a8fdf836c57e84b007ba6e204b85623585e1ad644fb9d502b1d32c681b92b0cf",
+          "entry_action": "WAIT",
+          "risk_action": "HOLD",
+          "missing_required_methods": []
+        },
+        {
+          "ticker": "012030.KS",
+          "status": "COMPLETE",
+          "decision_parse": "VALIDATED",
+          "reason": "VERIFIED",
+          "analysis_sha256": "1c1373c9f685493ffdb709a22eec0d7daeb3f35b3f36172f94d2fc98d974fd7b",
+          "manifest_sha256": "d3c794a0a63e5a3080cd31551021f1965db7d584ff9637b5d1cc602b0338ec40",
+          "started_at": "2026-11-27T06:12:32.015470+09:00",
+          "finished_at": "2026-11-27T06:26:04.382148+09:00",
+          "decision_sha256": "3a2d1a97ba4baab6027a67ead51e003776a1aa8fe52307384310fcc965fc1a15",
+          "entry_action": "WAIT",
+          "risk_action": "HOLD",
+          "missing_required_methods": []
+        },
+        {
+          "ticker": "011200.KS",
+          "status": "COMPLETE",
+          "decision_parse": "VALIDATED",
+          "reason": "VERIFIED",
+          "analysis_sha256": "c56abd9b3df29cc5449d045b3a6b0d07235f1d3f52797a26ce866209c1fb6636",
+          "manifest_sha256": "d3c794a0a63e5a3080cd31551021f1965db7d584ff9637b5d1cc602b0338ec40",
+          "started_at": "2026-11-27T06:04:03.844636+09:00",
+          "finished_at": "2026-11-27T06:20:10.267442+09:00",
+          "decision_sha256": "c0cbc20c74b6d6d3617e3cfd6916859db28bee2d8fc9ff1ba3b89f1b17b45de0",
+          "entry_action": "WAIT",
+          "risk_action": "HOLD",
+          "missing_required_methods": []
+        },
+        {
+          "ticker": "033780.KS",
+          "status": "COMPLETE",
+          "decision_parse": "VALIDATED",
+          "reason": "VERIFIED",
+          "analysis_sha256": "4907bdeef92eeab0750f70c211dfe77422aaf1cdb4b27598d9d82053d945252b",
+          "manifest_sha256": "d3c794a0a63e5a3080cd31551021f1965db7d584ff9637b5d1cc602b0338ec40",
+          "started_at": "2026-11-27T06:13:19.866711+09:00",
+          "finished_at": "2026-11-27T06:29:53.632501+09:00",
+          "decision_sha256": "91a07d44ce482350d62b9fa5f1e548ade09cb44274d6b515f0b5851c431ddc25",
+          "entry_action": "WAIT",
+          "risk_action": "HOLD",
+          "missing_required_methods": []
+        },
+        {
+          "ticker": "090430.KS",
+          "status": "COMPLETE",
+          "decision_parse": "VALIDATED",
+          "reason": "VERIFIED",
+          "analysis_sha256": "55c0892103bc3e80815725049bb83bd049acbf07b6ff1c3a9d2b85006d6ad882",
+          "manifest_sha256": "d3c794a0a63e5a3080cd31551021f1965db7d584ff9637b5d1cc602b0338ec40",
+          "started_at": "2026-11-27T05:57:04.163191+09:00",
+          "finished_at": "2026-11-27T06:13:22.069086+09:00",
+          "decision_sha256": "a18bfc68ead955caf64a933523cbbaa3aa221a7ea4cd5ed2416bf81dc9bd47be",
+          "entry_action": "WAIT",
+          "risk_action": "HOLD",
+          "missing_required_methods": []
+        },
+        {
+          "ticker": "003490.KS",
+          "status": "COMPLETE",
+          "decision_parse": "VALIDATED",
+          "reason": "VERIFIED",
+          "analysis_sha256": "4fa5c8262ad33ed5c86883a4f310d3d56922121f087bd7e7fbb6717e4abec20a",
+          "manifest_sha256": "d3c794a0a63e5a3080cd31551021f1965db7d584ff9637b5d1cc602b0338ec40",
+          "started_at": "2026-11-27T06:34:59.440613+09:00",
+          "finished_at": "2026-11-27T06:48:04.461735+09:00",
+          "decision_sha256": "fe930b999ff9443e658090de908d219c4714a0f9ae1d36c430272c84691350da",
+          "entry_action": "WAIT",
+          "risk_action": "REDUCE_RISK",
+          "missing_required_methods": []
+        },
+        {
+          "ticker": "356680.KQ",
+          "status": "COMPLETE",
+          "decision_parse": "VALIDATED",
+          "reason": "VERIFIED",
+          "analysis_sha256": "8c7ca77e7443b355df51c39a47da3e5ac27812da97ffe4dbd6fac18e94bbcb0a",
+          "manifest_sha256": "d3c794a0a63e5a3080cd31551021f1965db7d584ff9637b5d1cc602b0338ec40",
+          "started_at": "2026-11-27T05:42:38.233374+09:00",
+          "finished_at": "2026-11-27T05:56:37.803347+09:00",
+          "decision_sha256": "84abcd209beaada8b3a34e134a44ce23946333e7adab8a60e72c9b0e68d71576",
+          "entry_action": "WAIT",
+          "risk_action": "REDUCE_RISK",
+          "missing_required_methods": []
+        },
+        {
+          "ticker": "007810.KS",
+          "status": "COMPLETE",
+          "decision_parse": "VALIDATED",
+          "reason": "VERIFIED",
+          "analysis_sha256": "166ac3f29abc51d569123e5dd65b8551d9b7fdc2becbeff4e7b49a4f09fa3085",
+          "manifest_sha256": "d3c794a0a63e5a3080cd31551021f1965db7d584ff9637b5d1cc602b0338ec40",
+          "started_at": "2026-11-27T06:30:03.329238+09:00",
+          "finished_at": "2026-11-27T06:43:09.756975+09:00",
+          "decision_sha256": "7e524e33e64955011130b6f0bfc888d965e490ed63a543b9e030754389920ee2",
+          "entry_action": "WAIT",
+          "risk_action": "REDUCE_RISK",
+          "missing_required_methods": []
+        }
+      ]
+    },
+    "last_ready": {
+      "run_id": "20261127T152819_local-freshness-kr-overlay",
+      "started_at": "2026-11-27T15:28:19.507535+09:00",
+      "same_as_current": true,
+      "same_session": true,
+      "reference_only": false
+    },
+    "supporting_context": {
+      "policy": {
+        "profile": "balanced_external",
+        "material_thesis_effects": [
+          "ranking",
+          "confidence",
+          "position_size_within_existing_risk_limits",
+          "research_priority"
+        ],
+        "supported_evidence_weight": "MEDIUM",
+        "partially_supported_evidence_weight": "LOW_TO_MEDIUM",
+        "unverified_evidence_weight": "LOW_LABELED",
+        "user_primary_channels": [
+          "@kpunch",
+          "@sosumonkey"
+        ],
+        "user_primary_source_tier": "USER_PRIMARY",
+        "user_primary_evidence_weight": "HIGH",
+        "user_primary_validation_policy": "USER_ACCEPTED",
+        "matching_multi_source_signal_may_raise_thesis_priority": true,
+        "conflicting_signal_must_be_visible": true,
+        "may_bypass_market_or_portfolio_execution_gate": false
+      },
+      "youtube": {
+        "source_health": "OK",
+        "coverage": {
+          "total_unique_events": 1123,
+          "window_events": 106,
+          "transmitted_events": 12,
+          "truncated": true,
+          "oldest_occurred_at": "2026-11-26T08:00:31+00:00",
+          "newest_occurred_at": "2026-11-27T12:00:19+00:00",
+          "available_events_before_context_cap": 60,
+          "context_event_cap": 12,
+          "omitted_events": 94,
+          "omitted_due_to_context_cap": 48,
+          "omitted_before_context_selection": 46
+        },
+        "events": [
+          {
+            "event_key": "MoV5BIAHwMw",
+            "content_sha256": "9da8239915d1430532ae39f2dafef6847765841d3f2e0a9d16354b86d8dd5240",
+            "occurred_at": "2026-11-26T09:30:33+00:00",
+            "relevance": {
+              "tickers": [
+                "^KS11",
+                "005930",
+                "000660",
+                "MU"
+              ],
+              "markets": [
+                "US",
+                "KR"
+              ],
+              "themes": [],
+              "match_basis": "verified_entities",
+              "matched_tickers": [
+                "000660",
+                "005930"
+              ],
+              "market_match": true,
+              "score": 220
+            },
+            "summary": {
+              "video_id": "MoV5BIAHwMw",
+              "title": "[#긴급시황] 삼성전자·SK하이닉스 폭락시킨 LTA 파기설, 사실 아니었다. 반도체 진짜 대반전 시작될까?ㅣ이주연 대표",
+              "channel": "815Money talk",
+              "source_url": "https://www.youtube.com/watch?v=MoV5BIAHwMw",
+              "claim_status_summary": {
+                "unverified": 11,
+                "partially_supported": 1
+              },
+              "claims": [
+                {
+                  "claim_id": "C1",
+                  "claim_text": "삼성전자·SK하이닉스의 D램·HBM 장기공급계약 파기나 주문 축소를 뒷받침할 현장 신호가 없고, NAND에서는 별도 파기설이 나왔다. SK하이닉스는 고객사 14곳과 계약해 2027~2028년 생산능력의 50% 이상에 해당하는 물량을 확보했다고 한다.",
+                  "status": "unverified",
+                  "confidence": 0.1,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "영상 제목의 ‘파기설이 사실이 아니었다’는 결론은 확인되지 않았다. 제품별 주문과 계약 조건이 확인되기 전에는 계약 유지나 루머의 주가 영향을 확정할 수 없다."
+                },
+                {
+                  "claim_id": "C2",
+                  "claim_text": "메모리 공급계약은 과거 약 1년, 최근 3~5년이었으나 일부 고객이 최대 10년을 요청했고, 증설 부담을 나눌 지분 참여나 합작법인도 논의됐다고 한다.",
+                  "status": "unverified",
+                  "confidence": 0.1,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "물량 선점, 계약 협상, 실제 체결은 구분해야 한다. 확인되지 않은 10년 계약이나 공동투자를 장기 매출 또는 투자비 분담에 반영할 근거는 없다."
+                },
+                {
+                  "claim_id": "C3",
+                  "claim_text": "메모리 PCB 판가 인상에 합의했고 인상률이 4월보다 높아 공급자 우위가 지속된다고 해석했다.",
+                  "status": "unverified",
+                  "confidence": 0.0,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "판가가 실적에 미치는 영향을 보려면 같은 업체·품목의 실제 적용 가격과 발주량을 함께 확인해야 한다."
+                },
+                {
+                  "claim_id": "C4",
+                  "claim_text": "BNP로 언급된 증권사가 마이크론 목표가를 1,700달러에서 775달러로 약 54% 낮추고 메모리 수급 균형 전망을 2028년 중반에서 2027년 중반으로 앞당겼다. 발표자는 이 보고서를 주가가 10% 이상 하락한 요인 중 하나로 봤다.",
+                  "status": "unverified",
+                  "confidence": 0.0,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "특정 증권사의 전망인지 확인하기 전에는 목표가 하향을 시장 컨센서스 변화로 해석하지 않는 편이 타당하다."
+                }
+              ],
+              "entities": [
+                {
+                  "ticker": "^KS11",
+                  "name": "코스피·코스피 선물",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                },
+                {
+                  "ticker": "005930",
+                  "name": "삼성전자",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "시장 데이터 조회 실패: no_usable_market_fields"
+                  ]
+                },
+                {
+                  "ticker": "000660",
+                  "name": "SK하이닉스",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "시장 데이터 조회 실패: no_usable_market_fields"
+                  ]
+                },
+                {
+                  "ticker": "MU",
+                  "name": "마이크론",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "event_key": "QmtcQdKeDe4",
+            "content_sha256": "02474319f68c9a908cc091d4554da87855f1bef6e90f2cd12450c13ac7a9b184",
+            "occurred_at": "2026-11-26T08:00:39+00:00",
+            "relevance": {
+              "tickers": [
+                "NVDA",
+                "ADBE",
+                "PYPL",
+                "005930",
+                "000660",
+                "AVGO"
+              ],
+              "markets": [
+                "US",
+                "KR"
+              ],
+              "themes": [],
+              "match_basis": "verified_entities",
+              "matched_tickers": [
+                "000660",
+                "005930"
+              ],
+              "market_match": true,
+              "score": 220
+            },
+            "summary": {
+              "video_id": "QmtcQdKeDe4",
+              "title": "고점 정확히 맞췄던 '마이클 버리'가 '상승 베팅'한 진짜 이유",
+              "channel": "경제사냥꾼",
+              "source_url": "https://www.youtube.com/watch?v=QmtcQdKeDe4",
+              "claim_status_summary": {
+                "unverified": 12
+              },
+              "claims": [
+                {
+                  "claim_id": "C1",
+                  "claim_text": "버리가 미국 시간 11월 10일 나스닥100 하락 연계 상품의 보유 규모를 두 배로 늘렸다.",
+                  "status": "unverified",
+                  "confidence": 0.0,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "상품과 규모 단위가 확인되기 전에는 ‘두 배’를 위험 노출이 두 배가 됐다는 뜻으로 해석할 수 없다."
+                },
+                {
+                  "claim_id": "C2",
+                  "claim_text": "나스닥100은 10월 고점에서 ‘지난 20일’까지 20% 가까이 하락했다.",
+                  "status": "unverified",
+                  "confidence": 0.0,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "공식 나스닥100 시세로 재계산하기 전에는 약 20% 하락을 시장 판단의 전제로 삼기 어렵다."
+                },
+                {
+                  "claim_id": "C3",
+                  "claim_text": "버리가 25일 공개한 자료에서 나스닥100 하락 연계 상품을 전량 매도했다고 밝혔다.",
+                  "status": "unverified",
+                  "confidence": 0.0,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "전량 매도가 확인되지 않았으므로 버리가 나스닥100 하락 노출을 모두 없앴다고 단정할 수 없다."
+                },
+                {
+                  "claim_id": "C4",
+                  "claim_text": "미국 증시 공포지수가 열흘도 안 돼 두 배 넘게 올랐고, 버리도 하락 베팅 상품이 비싸졌다고 말했다.",
+                  "status": "unverified",
+                  "confidence": 0.0,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "지수 상승률과 실제 헤지 비용은 별도로 확인해야 한다. 둘을 동일시하면 비용 변화를 과장할 수 있다."
+                }
+              ],
+              "entities": [
+                {
+                  "ticker": "NVDA",
+                  "name": "엔비디아",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                },
+                {
+                  "ticker": "ADBE",
+                  "name": "어도비",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                },
+                {
+                  "ticker": "PYPL",
+                  "name": "페이팔",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                },
+                {
+                  "ticker": "005930",
+                  "name": "삼성전자",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "시장 데이터 조회 실패: no_usable_market_fields"
+                  ]
+                },
+                {
+                  "ticker": "000660",
+                  "name": "SK하이닉스",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "시장 데이터 조회 실패: no_usable_market_fields"
+                  ]
+                },
+                {
+                  "ticker": "AVGO",
+                  "name": "브로드컴",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "event_key": "Wz8_pZ8lpWg",
+            "content_sha256": "09023afe46a94f108f9d1e4fec0ebb789be087d1d0827b6c2b8c49ef6b8d86ff",
+            "occurred_at": "2026-11-26T08:00:31+00:00",
+            "relevance": {
+              "tickers": [
+                "^KS11",
+                "000660",
+                "005930"
+              ],
+              "markets": [
+                "US",
+                "KR"
+              ],
+              "themes": [],
+              "match_basis": "verified_entities",
+              "matched_tickers": [
+                "000660",
+                "005930"
+              ],
+              "market_match": true,
+              "score": 220
+            },
+            "summary": {
+              "video_id": "Wz8_pZ8lpWg",
+              "title": "[#긴급인터뷰]  “삼성전자·SK하이닉스 50% 넘게 폭락!” 서울 아파트 전체 가치보다 큰 3,900조 시총 증발… 무너진 투자심리, 되살릴 방법은 없을까? | 유창희 대표",
+              "channel": "815Money talk",
+              "source_url": "https://www.youtube.com/watch?v=Wz8_pZ8lpWg",
+              "claim_status_summary": {
+                "unverified": 9,
+                "asr_uncertain": 1,
+                "partially_supported": 2
+              },
+              "claims": [
+                {
+                  "claim_id": "C1",
+                  "claim_text": "직전 금요일 나스닥이 5% 넘게 하락한 뒤 월요일 반등으로 낙폭을 만회했고, 이후 나스닥 선물이 발표 직후 저점을 깨지 않고 상승했다는 주장. 저가 매수는 발언자의 해석이며, 11월 26일 휴장과 27일 단축 거래도 확인 대상이다.",
+                  "status": "unverified",
+                  "confidence": 0.1,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "금요일 낙폭과 월요일 회복 여부를 재계산하기 전에는 미국 반등을 국내 증시의 확인된 반등 근거로 쓰기 어렵다."
+                },
+                {
+                  "claim_id": "C2",
+                  "claim_text": "영상 도표의 미국 시장 누적 순매도가 10월 중순 900억 달러, 11월 중순 1,200억 달러, 11월 25일 2,000억 달러였고, 12월 초 2,800억 달러 순매도와 완만한 상승 시 1,000억 달러 매수가 전망됐다는 주장이다.",
+                  "status": "unverified",
+                  "confidence": 0.08,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "특정 거래 집단의 모델 수치일 수 있으므로 미국 시장 전체 순매도나 확정된 숏커버링 수요로 인용하지 않는다."
+                },
+                {
+                  "claim_id": "C3",
+                  "claim_text": "마이클 버리와 자동자막에 ‘미빈이’로 표기된 인물이 숏 포지션을 청산했다는 발언이다. 발언자도 버리의 청산이 반등을 일으켰는지는 판단하지 않았다.",
+                  "status": "asr_uncertain",
+                  "confidence": 0.08,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "두 투자자의 청산 여부나 청산에 따른 반등을 확인된 촉매로 쓰지 않는다."
+                },
+                {
+                  "claim_id": "C4",
+                  "claim_text": "야간선물이 688까지 약 7% 하락한 뒤 상승 마감했고 현물 환산치를 4,300에서 4,450으로 정정했다는 주장이다. 코스피는 6월 19일 고점 9,385 대비 전일 약 51%, 인터뷰 중 약 49% 하락했으며, 10월 하락 이후 20거래일 이동평균선을 넘지 못했다고 설명했다.",
+                  "status": "partially_supported",
+                  "confidence": 0.64,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "낙폭 규모는 일부 확인되지만 그 자체로 바닥이나 추세 전환을 뜻하지 않는다. 정규장 종가의 20일선 돌파 여부는 별도 확인해야 한다."
+                }
+              ],
+              "entities": [
+                {
+                  "ticker": "^KS11",
+                  "name": "코스피·한국 증시",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                },
+                {
+                  "ticker": "000660",
+                  "name": "SK하이닉스",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "시장 데이터 조회 실패: no_usable_market_fields"
+                  ]
+                },
+                {
+                  "ticker": "005930",
+                  "name": "삼성전자",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "시장 데이터 조회 실패: no_usable_market_fields"
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "event_key": "IKlg03x1dMw",
+            "content_sha256": "67cea4d070afc80aa5f257ab0ef9628988bf50f5cd95131ba7b2ca0f61759fc1",
+            "occurred_at": "2026-11-27T12:00:19+00:00",
+            "relevance": {
+              "tickers": [
+                "^KS11"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "verified_entities",
+              "matched_tickers": [],
+              "market_match": false,
+              "score": 0
+            },
+            "summary": {
+              "video_id": "IKlg03x1dMw",
+              "title": "\"오늘 급등, 절대 따라가지 마세요\" 숏커버링 대응법부터 삼성전자·AI 거품론까지 완벽 정리ㅣ명민준, 박가영, 차영주 [주린이 구조대]",
+              "channel": "삼프로TV 3PROTV",
+              "source_url": "https://www.youtube.com/watch?v=IKlg03x1dMw",
+              "claim_status_summary": {
+                "unverified": 7,
+                "asr_uncertain": 4,
+                "partially_supported": 1
+              },
+              "claims": [
+                {
+                  "claim_id": "C1",
+                  "claim_text": "코스닥이 코스피보다 더 오르고 방산·2차전지 소재·제약바이오 일부가 뚜렷한 새 호재 없이 급등했다. 방송은 코스닥의 높은 공매도 비중과 화요일 매수·수요일 매도 사이드카를 근거로 숏커버링 가능성을 제기했다.",
+                  "status": "unverified",
+                  "confidence": 0.1,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "숏커버링을 확정 원인으로 보지 말고, 반등 이후에도 거래량과 순매수세가 이어지는지 확인한다."
+                },
+                {
+                  "claim_id": "C2",
+                  "claim_text": "방송은 미국 시장이 휴장했다고 언급했다. 자동자막은 국내 화요일 반등 배경으로 엔비디아가 31% 급등했다고 적었으나 수치와 거래일은 불명확하다.",
+                  "status": "asr_uncertain",
+                  "confidence": 0.1,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "31%를 실제 수익률이나 국내 반등 원인으로 인용하지 않는다."
+                },
+                {
+                  "claim_id": "C3",
+                  "claim_text": "방송은 증안펀드로 추정되는 정책의 규모로 10조·100조 원을 거론하고, 실제 매수보다 공매도 측을 압박하는 구두 개입에 가깝다고 해석했다.",
+                  "status": "unverified",
+                  "confidence": 0.1,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "거론된 규모를 실제 시장에 유입된 매수자금으로 계산하지 않는다."
+                },
+                {
+                  "claim_id": "C4",
+                  "claim_text": "출연자는 저점 상승을 바닥 형성의 단서로 보고 5,000선 바닥과 6,000선 반등을 전망했다. 4,000·3,000선은 다른 견해, 숏커버링 2~3일은 출연자 견해, 10%·20%·30%는 설명용 예시다.",
+                  "status": "unverified",
+                  "confidence": 0.2,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "5,000선을 보장된 지지선으로, 2~3일을 매매 규칙으로 사용하지 않는다."
+                }
+              ],
+              "entities": [
+                {
+                  "ticker": "^KS11",
+                  "name": "국내 증시·코스피·코스닥",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "event_key": "tx-pbWaIoTc",
+            "content_sha256": "872f1dcc867103b3307eb1746b1eafa3adb9bb0c70989b6a5d6b2c2be4d40430",
+            "occurred_at": "2026-11-27T11:00:22+00:00",
+            "relevance": {
+              "tickers": [
+                "^KS11"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "verified_entities",
+              "matched_tickers": [],
+              "market_match": false,
+              "score": 0
+            },
+            "summary": {
+              "video_id": "tx-pbWaIoTc",
+              "title": "순환매 장세에도 삼성전자·SK하이닉스를 급하게 팔고 갈아탈 필요 없는 이유ㅣ명민준, 박가영, 황유현 [주린이 구조대]",
+              "channel": "삼프로TV 3PROTV",
+              "source_url": "https://www.youtube.com/watch?v=tx-pbWaIoTc",
+              "claim_status_summary": {
+                "unverified": 9,
+                "asr_uncertain": 1
+              },
+              "claims": [
+                {
+                  "claim_id": "C1",
+                  "claim_text": "방송은 한국 증시 4.3, 코스닥 8.1%, 닛케이 +2%, 상하이 3.7, 대만 0.4를 비교했다. 코스닥은 거래량을 동반해 20일선을 넘고 코스피는 넘지 못했으며, 개인 약 2조원 순매도·외국인과 기관 1조원 초과 매수·프로그램 약 1조3천억원 매수를 언급했다.",
+                  "status": "unverified",
+                  "confidence": 0.0,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "같은 거래일과 비교 시점에서 코스닥의 상대 강세와 거래량이 확인되기 전에는 시장 주도권이 바뀌었다고 볼 근거가 부족하다."
+                },
+                {
+                  "claim_id": "C2",
+                  "claim_text": "외국인 지수선물 누계가 직전 거래일 4만 계약 초과에서 방송 당일 약 3만6천 계약으로 줄었고, 직전 거래일 금액은 8조원 초과였으며 지수 5,000 위부터 매수가 이어졌다고 했다. 만기까지 당일 포함 약 10거래일이라는 발언과 ±2만·3만 계약 경험칙도 나왔다.",
+                  "status": "unverified",
+                  "confidence": 0.0,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "외국인 선물 누계만으로 현물 강세를 판단하기보다 월물별 수급과 미결제약정이 현물 수급과 함께 어떻게 변하는지 구분해 볼 필요가 있다."
+                },
+                {
+                  "claim_id": "C3",
+                  "claim_text": "낙폭이 컸던 코스닥의 약 8% 급등은 주로 숏커버링 때문이라는 패널의 해석이다.",
+                  "status": "unverified",
+                  "confidence": 0.0,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "숏커버링 가설을 추세 전환 신호로 받아들이기보다 이후 거래량과 상승 종목의 폭이 유지되는지 구분해 봐야 한다."
+                },
+                {
+                  "claim_id": "C4",
+                  "claim_text": "네이버 협업 AI 브리핑과 ‘한국 경제’로 언급된 매체가 펀드 증액·투입 기대를 상승 배경으로 설명했다는 인용이 나왔고, 패널은 이에 이견을 보이거나 숏커버링 등 다른 설명을 제시했다.",
+                  "status": "unverified",
+                  "confidence": 0.0,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "공식 발표와 실제 집행이 확인되기 전에는 정책 자금 유입을 상승의 확인된 동력으로 볼 수 없다."
+                }
+              ],
+              "entities": [
+                {
+                  "ticker": "^KS11",
+                  "name": "코스피",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "event_key": "K6T7JRN3o58",
+            "content_sha256": "985788b186f6e31a228859cdf378d2aab56eec826785feb2795234fdfe5c6c14",
+            "occurred_at": "2026-11-27T11:00:02+00:00",
+            "relevance": {
+              "tickers": [
+                "^KS11",
+                "CRM"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "verified_entities",
+              "matched_tickers": [],
+              "market_match": false,
+              "score": 0
+            },
+            "summary": {
+              "video_id": "K6T7JRN3o58",
+              "title": "투자자들이 꼭 알아야 하는 다음 주 투자 포인트 (11.30~12.04)",
+              "channel": "경제사냥꾼",
+              "source_url": "https://www.youtube.com/watch?v=K6T7JRN3o58",
+              "claim_status_summary": {
+                "unverified": 12
+              },
+              "claims": [
+                {
+                  "claim_id": "C1",
+                  "claim_text": "영상은 젠슨 황이 11월 12일 CEO·이사직에서 사임하고 CFO 콜레트 크레스가 임시 CEO를 맡은 뒤 11월 23일 이사회가 황을 만장일치로 CEO에 재임명했다고 전한다. 독립 특별위원회 조사는 계속되고 별도의 국가안보·수출통제 감독위원회가 신설됐으며, 같은 날 미 상무부가 메가스피드와 계열사를 무역 제한 목록에 추가했다고 한다. 앨리스 황에 관한 FBI 판단, 2025년 8월 이메일 이후 조사 중단·법무부 이관, 동남아 4개국 출하 중단 지시는 각각...",
+                  "status": "unverified",
+                  "confidence": 0.0,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "경영진 교체나 수출 제한을 확정된 투자 전제로 삼지 말고, 인사는 SEC·엔비디아 공시에서, 규제는 BIS 고시에서 각각 확인해야 한다."
+                },
+                {
+                  "claim_id": "C2",
+                  "claim_text": "영상은 12월 1일 23:35 UBS 기술 콘퍼런스, 미국시간 12월 1~2일 비공개 하원 면담, 12월 3일 오전 10시 젠슨 황 단독 증인의 상원 수출통제 공개 청문회, 12월 10일 루트닉 출석 요청을 제시한다. 새 제한 또는 조사 확대 언급이 AI 반도체에 부담이 될 수 있다는 해석을 덧붙인다.",
+                  "status": "unverified",
+                  "confidence": 0.0,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "공식 의회 일정과 증인 명단을 먼저 확인하고, 청문회 발언과 실제 BIS 규정 변경을 구분해야 한다. 반도체 주가 부담은 가능한 시나리오이지 확인된 결과가 아니다."
+                },
+                {
+                  "claim_id": "C3",
+                  "claim_text": "영상은 연방기금금리 목표 범위를 3.75~4.00%, 9월 16일 인상을 25bp, 10월 28일 결정을 동결(인상 선호 2명)로 제시한다. 11월 26일 선물 기준 12월 25bp 인상 확률 98.1%, 1월까지 추가 인상 확률 59.7%를 인용하며 12월 8~9일 FOMC, 12월 10일 04:00 KST 결과, 미국시간 11월 28일~12월 10일 발언 제한을 제시한다.",
+                  "status": "unverified",
+                  "confidence": 0.0,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "‘12월 인상은 이미 반영됐다’는 판단은 시점과 정의가 확인된 선물 가격을 보기 전에는 보류해야 한다. 고용 발표 전후에는 같은 산식으로 계산한 1월 확률을 비교하는 편이 유용하다."
+                },
+                {
+                  "claim_id": "C4",
+                  "claim_text": "영상은 11월 25일 발표 10월 PCE 전년비 3.8%·근원 3.3%(근원은 2023년 이후 최고), 3분기 잠정 GDP 연율 4.3%(예상 3.4%)를 제시한다. 11월 6일 발표 10월 고용은 +16.5만(팩트셋 예상 +6.5만), 실업률 4.2→4.1%, 8~9월 수정 합계 +8.4만, 시급 전년비 +3.1%였으며 11월 15~21일 신규 청구는 18.9만(예상 20만)이라고 한다. 11월 고용은 12월 4일 22:30 KST, 예상 +9만·4.1%...",
+                  "status": "unverified",
+                  "confidence": 0.0,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "공식 발표가 나오면 고용과 실업률을 발표 직전 컨센서스와 대조하고, 임금·이전 달 수정치와 금리선물 반응을 함께 봐야 한다. 영상의 시각이 맞다면 12월 4일 한국 정규장 움직임을 그날 밤 고용 결과에 귀속할 수 없다."
+                }
+              ],
+              "entities": [
+                {
+                  "ticker": "^KS11",
+                  "name": "코스피·증시안정기금",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                },
+                {
+                  "ticker": "CRM",
+                  "name": "세일즈포스·스노우플레이크",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "event_key": "gbV6JrXviQ4",
+            "content_sha256": "491be973ff74b8de7f1fe15bbac25e318985e84dba495d8b227cd1c53b944c68",
+            "occurred_at": "2026-11-27T11:00:02+00:00",
+            "relevance": {
+              "tickers": [
+                "^KS11"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "verified_entities",
+              "matched_tickers": [],
+              "market_match": false,
+              "score": 0
+            },
+            "summary": {
+              "video_id": "gbV6JrXviQ4",
+              "title": "[#찐시황] 꼬리 아홉 달린 여우 같은 외국인... 현물 1.9조 매수·선물 1.1조 매도, 도대체 무슨 속셈인가? 다음 주 상승장 믿어도 될까? (낙폭과대주) 김동엽 대표",
+              "channel": "815Money talk",
+              "source_url": "https://www.youtube.com/watch?v=gbV6JrXviQ4",
+              "claim_status_summary": {
+                "unverified": 8,
+                "asr_uncertain": 2
+              },
+              "claims": [
+                {
+                  "claim_id": "C1",
+                  "claim_text": "영상은 11월 27일 코스피 약 4%, 코스닥 약 8% 반등을 외국인 현물 매수와 낙폭과대주 순환매에 연결했다. 본문은 외국인 현물 매수 약 1.5조원과 오후 1시 이후 선물 매도 1조원 이상을, 제목은 각각 1.9조원과 1.1조원을 제시했다. 주간 강한 외국인 순매수 약 두 차례, 약 2조원 순매도 하루에도 5거래일 누적 소폭 순매수, 약 1.1조원 매수일의 지수 약 300포인트 상승과 다음 날 약 310포인트 하락, 개인 3거래일 연속 순매도와 일부 반...",
+                  "status": "unverified",
+                  "confidence": 0.0,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "4,500~5,000은 다음 주 전망 범위다. 스냅샷이 그 안에 있다는 사실은 전망 적중이나 추세 전환의 증거가 아니다. 후속 현물 순매수와 상승 종목의 확산을 별도로 확인할 필요가 있다."
+                },
+                {
+                  "claim_id": "C2",
+                  "claim_text": "영상은 국내 증시안정기금 10조원에서 20조원으로의 확대 가능성, 다음 주 관련 회의 약 두 건, 코스피200·코스닥150 중심 운용, 신임 위원장과 거버넌스포럼 논평, 대만의 기금 약 두 배 확대를 언급했다. 준비 기간 약 한 달과 코스피 종가 4,500선 하회 시 집행은 출연자 예상이다.",
+                  "status": "unverified",
+                  "confidence": 0.0,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "코스피 4,500선을 공식 방어선으로 보거나 발표 전 증액분을 실제 매수 여력으로 계산할 근거가 없다."
+                },
+                {
+                  "claim_id": "C3",
+                  "claim_text": "영상은 한국은행의 최근 인상과 추가 1~2회 가능성, 노무라의 인상 사이클 종료 또는 한 차례 추가 인상 뒤 인하 전망을 언급했다. 12월 1일 또는 2일로 들리는 11월 수출 발표와 반도체 수출 증가율을 확인 변수로 꼽았다.",
+                  "status": "unverified",
+                  "confidence": 0.0,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "추가 인상 횟수나 수출 개선을 전제로 삼기보다 금통위 결정과 공식 수출 발표를 각각 확인할 필요가 있다."
+                },
+                {
+                  "claim_id": "C4",
+                  "claim_text": "영상은 추수감사절 휴장·단축장과 유럽 증시 반등이 국내 반등에 우호적이었다고 해석했다. 유럽 약 +2%, 나스닥 선물 약 +2.5%, 엔비디아·마이크론 약 +4~5%, 다우·나스닥 1,000포인트대 변동과 나스닥 낙폭 축소를 언급했다. 한미 증시 두 달 연속 하락과 2010년 이후 12월 16회 중 10회 상승을 근거로 계절성과 윈도드레싱 가능성을 제시했다. 캐시 우드 측의 엔비디아 125달러 매도와 후속 매수, 마이클 버리 측의 숏 정리 및 두 종목을 제...",
+                  "status": "unverified",
+                  "confidence": 0.0,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "해외시장 동조, 계절성, 유명 투자자의 거래를 국내 증시 추세 전환의 독립 근거로 쓰기 어렵다."
+                }
+              ],
+              "entities": [
+                {
+                  "ticker": "^KS11",
+                  "name": "코스피·코스닥 및 투자자 수급",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "event_key": "JAgzr_2cfcs",
+            "content_sha256": "2d92485b7dd8849b68b0ed8e0892e4d3d020ef129c21ca86d00300ea32c4f4eb",
+            "occurred_at": "2026-11-27T10:40:03+00:00",
+            "relevance": {
+              "tickers": [
+                "^KS11"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "verified_entities",
+              "matched_tickers": [],
+              "market_match": false,
+              "score": 0
+            },
+            "summary": {
+              "video_id": "JAgzr_2cfcs",
+              "title": "오늘 코스피보다 '코스닥'이 더 많이 올랐던 진짜 이유",
+              "channel": "경제사냥꾼",
+              "source_url": "https://www.youtube.com/watch?v=JAgzr_2cfcs",
+              "claim_status_summary": {
+                "partially_supported": 3,
+                "unverified": 6
+              },
+              "claims": [
+                {
+                  "claim_id": "C1",
+                  "claim_text": "영상이 가리키는 거래일 오후에 코스피는 4%대, 코스닥은 8% 넘게 상승했다.",
+                  "status": "partially_supported",
+                  "confidence": 0.72,
+                  "supporting_evidence_ids": [
+                    "E3",
+                    "E4",
+                    "E5"
+                  ],
+                  "manual_check_required": true,
+                  "investor_implication": "보도는 코스닥의 상대 강세를 뒷받침하지만, 장중 격차의 크기와 시점은 거래소 시세로 확인해야 한다."
+                },
+                {
+                  "claim_id": "C2",
+                  "claim_text": "‘지난 23일’ 코스닥이 장중 618선까지 내려가 당해 연중 고점 대비 거의 반토막이 났다.",
+                  "status": "unverified",
+                  "confidence": 0.08,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "낙폭이 얼마나 컸는지 확인되기 전에는 ‘반토막’을 전제로 반등 여력을 판단하기 어렵다."
+                },
+                {
+                  "claim_id": "C3",
+                  "claim_text": "‘이번 달’ 코스닥 신용투자 금액이 ‘지난 1월’보다 40% 넘게 줄어 강제매도 부담이 완화됐다는 해석이다.",
+                  "status": "unverified",
+                  "confidence": 0.06,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "신용 규모 변화와 실제 강제매도 압력을 구분해야 반등이 이어질 가능성을 평가할 수 있다."
+                },
+                {
+                  "claim_id": "C4",
+                  "claim_text": "시장 불안이 누그러지자 이전 낙폭이 컸던 바이오·이차전지주 등에 매수 자금이 돌아왔다.",
+                  "status": "unverified",
+                  "confidence": 0.16,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "지수 반등만으로 특정 업종에 자금이 돌아왔다고 판단하기보다 종목별 순매수와 상승 종목의 범위를 확인할 필요가 있다."
+                }
+              ],
+              "entities": [
+                {
+                  "ticker": "^KS11",
+                  "name": "코스피",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "event_key": "8WXUg04sqKg",
+            "content_sha256": "4eed4f366a89d6744e9e82a03b236b2419ae48080a9893c64e982c4887a144e8",
+            "occurred_at": "2026-11-27T10:06:52+00:00",
+            "relevance": {
+              "tickers": [
+                "미확인"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "verified_entities",
+              "matched_tickers": [],
+              "market_match": false,
+              "score": 0
+            },
+            "summary": {
+              "video_id": "8WXUg04sqKg",
+              "title": "미국주식 적립식 투자 이걸로 고민 끝? 미국 주요 지수 한번에 투자하는 법",
+              "channel": "소수몽키",
+              "source_url": "https://www.youtube.com/watch?v=8WXUg04sqKg",
+              "claim_status_summary": {
+                "asr_uncertain": 1,
+                "unverified": 8
+              },
+              "claims": [
+                {
+                  "claim_id": "C1",
+                  "claim_text": "영상은 TIGER 미국 3대 지수 액티브 ETF가 12월 1일에 주당 기준가 1만 원으로 상장한다고 안내한다. 말미 자동자막 한 곳은 10월 1일로 표기한다. 5만 원으로 5주를 산다는 설명은 기준가로 계산한 예시다.",
+                  "status": "asr_uncertain",
+                  "confidence": 0.0,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "거래소 공지에서 종목코드와 상장일을 확인하고, 매수 가능 수량은 기준가가 아닌 실제 주문가격과 비용으로 계산해야 한다."
+                },
+                {
+                  "claim_id": "C2",
+                  "claim_text": "세 지수의 목표 비중은 S&P 500·나스닥 100·미국 배당 다우존스 순으로 40%·40%·20%다. 이탈한 비중을 복원하는 연 1회 조정이 기본이며, 이탈이 크면 분기 또는 반기에 조정할 수 있다고 했다. S&P 500 대비 초과성과는 목표이지 보장이 아니다.",
+                  "status": "unverified",
+                  "confidence": 0.0,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "목표 비중을 항상 유지되는 비중으로, 초과성과 목표를 수익 보장으로 해석하지 않는다. 상장 후에는 실제 편입 비중과 공식 비교지수 대비 성과를 따로 확인한다."
+                },
+                {
+                  "claim_id": "C3",
+                  "claim_text": "영상은 10월 30일 종가로 기존 TIGER ETF 3종을 1주씩 사면 21만 원을 넘으며, 기존 나스닥 ETF는 2010년에 상장했다고 설명했다.",
+                  "status": "unverified",
+                  "confidence": 0.0,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "21만 원을 현재 매수 비용으로 인용하지 않는다. 정수 단위 매수 비용은 동일한 기준일의 동일한 종목 가격으로 비교한다."
+                },
+                {
+                  "claim_id": "C4",
+                  "claim_text": "세 지수는 각각 미국 대형주, 기술·혁신주 비중이 큰 종목군, 배당주에 노출을 제공한다. S&P 500과 나스닥 100은 상위 종목이 겹쳐 세 지수를 함께 담아도 기술주 집중이 남을 수 있다고 설명했다.",
+                  "status": "unverified",
+                  "confidence": 0.0,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "지수 개수만으로 분산 정도를 판단하지 않는다. 동일 기준일 자료로 중복 종목의 합산 비중과 기술 섹터 비중을 계산하고 실제 편입내역과 비교한다."
+                }
+              ],
+              "entities": [
+                {
+                  "ticker": "미확인",
+                  "name": "TIGER 미국 3대 지수 액티브 ETF",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "시장 데이터 조회 실패: no_usable_market_fields"
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "event_key": "vzzM6xLK8B8",
+            "content_sha256": "a7b8f5e949390c77ce5f044ea130982cb945ac7d301f085bc694bdaf10fd433c",
+            "occurred_at": "2026-11-27T09:22:58+00:00",
+            "relevance": {
+              "tickers": [
+                "^KS11",
+                "ORCL"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "verified_entities",
+              "matched_tickers": [],
+              "market_match": false,
+              "score": 0
+            },
+            "summary": {
+              "video_id": "vzzM6xLK8B8",
+              "title": "추가 반등 기대에도 방심할 수 없는 증시…AI 신용 리스크와 12월 투자전략ㅣ홍선애, 장우진 금시공 대표 [여의도 인사이트]",
+              "channel": "삼프로TV 3PROTV",
+              "source_url": "https://www.youtube.com/watch?v=vzzM6xLK8B8",
+              "claim_status_summary": {
+                "unverified": 10
+              },
+              "claims": [
+                {
+                  "claim_id": "C1",
+                  "claim_text": "기존 증안펀드 약정은 10조 7천억 원이고 11월 30일 확대 논의가 예정됐으며, 시티는 최대 3배 확대 가능성을 제시했다고 소개했다. 캐피털콜·ETF 매입 방식, 자사주 매입 한도의 한시 완화, 김용범 메리츠 부회장 내정도 언급했다.",
+                  "status": "unverified",
+                  "confidence": 0.0,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "펀드 확대 기대와 실제 매수 수급을 구분해야 한다. 약정과 집행을 확인하기 전에는 정책을 근거로 외국인 매도 압력이 줄었다고 판단할 수 없다."
+                },
+                {
+                  "claim_id": "C2",
+                  "claim_text": "11월 27일 반등을 증안펀드 실제 매수보다 공매도 환매·프로그램 바스켓 매수·정책 기대의 영향으로 해석했다. 코스닥 장 초반 약 +4%, 에이비엘바이오 약 +24%를 언급했다. 코스피 20일선으로 제시한 5,200을 1차 저항, 돌파 시 5,500을 다음 관찰선으로 보고, 5,200 부근과 12월 9일 또는 10일 전에 비중을 줄이는 전략을 제시했다.",
+                  "status": "unverified",
+                  "confidence": 0.0,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "5,200을 확인된 기술적 기준으로 사용하기 전에 코스피 20거래일 종가로 재계산할 필요가 있다. 장중 급등이나 정책 기대는 매수 주체와 반등 지속성을 입증하지 않는다."
+                },
+                {
+                  "claim_id": "C3",
+                  "claim_text": "대만 지수가 11월 24일 약 9% 상승 후 25일 8.57% 하락했고 한국 시장은 약 6% 상승 후 6.16% 하락했다고 말했다. 대만 종목의 10% 가격제한폭과 11월 23일부터 전일 종가를 기준으로 한 공매도 제한도 언급했다.",
+                  "status": "unverified",
+                  "confidence": 0.0,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "두 시장의 변동성을 비교하려면 먼저 지수명과 현지 거래일을 맞춰야 한다. 공매도 조치의 적용 범위를 확인하기 전에는 이를 시장 방어의 근거로 삼기 어렵다."
+                },
+                {
+                  "claim_id": "C4",
+                  "claim_text": "FCC가 우주 데이터센터용 위성 100만 기를 승인했고 스타십 2단 회수가 성공했다고 소개했다. 첫 발사는 2033년과 2027년 3분기로 서로 다르게 언급됐다.",
+                  "status": "unverified",
+                  "confidence": 0.15,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "허가 범위, 발사 목표, 회수 실적이 확인되기 전에는 위성 수를 실제 배치 규모나 발사 수요로 환산하기 어렵다."
+                }
+              ],
+              "entities": [
+                {
+                  "ticker": "^KS11",
+                  "name": "코스피·한국 증시 정책",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                },
+                {
+                  "ticker": "ORCL",
+                  "name": "오라클",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "event_key": "SJpL7ljeLoo",
+            "content_sha256": "b80bbb6ca290279472652ce06f560312f9a97123fd6cd78127e6a13d23a39b01",
+            "occurred_at": "2026-11-27T09:00:29+00:00",
+            "relevance": {
+              "tickers": [
+                "ORCL"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "verified_entities",
+              "matched_tickers": [],
+              "market_match": false,
+              "score": 0
+            },
+            "summary": {
+              "video_id": "SJpL7ljeLoo",
+              "title": "[#긴급인터뷰] 12월 증시 대반전의 두 가지 열쇠! FOMC가 AI 반도체를 살리고, 증시안정펀드가 코스닥 상승장을 이끌까?ㅣ기업공시연구소 변영인 대표",
+              "channel": "815Money talk",
+              "source_url": "https://www.youtube.com/watch?v=SJpL7ljeLoo",
+              "claim_status_summary": {
+                "unverified": 10,
+                "asr_uncertain": 2
+              },
+              "claims": [
+                {
+                  "claim_id": "C1",
+                  "claim_text": "발언자는 12월 25bp 인상이 시장 예상 범위이고 50bp는 우려 시나리오이며, AI 인프라 조달에는 2027년 금리 경로가 더 중요하다고 봤다. 2027년 세 차례 추가 인상은 가정이다. 현물 유가는 높고 선물은 하락했으며, 에너지·운송비가 물가를 밀어 올린 반면 식품 가격은 안정됐다고 설명했다.",
+                  "status": "unverified",
+                  "confidence": 0.1,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "발언 당시 시장이 반영한 인상 확률과 이후의 FOMC 결정·전망을 분리해 해석해야 한다. 2027년 세 차례 인상은 확정 경로가 아니다."
+                },
+                {
+                  "claim_id": "C2",
+                  "claim_text": "팬데믹 당시 증시안정펀드가 10조 7천억 원 규모였으며, 2026년 재가동 기대와 김용범 메리츠지주 부회장 임명 관련 발표가 연말·연초 코스닥 수급에 우호적일 수 있다는 견해다.",
+                  "status": "unverified",
+                  "confidence": 0.0,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "공식 가동 결정과 집행액을 확인하고 시장 규모 및 실제 수급과 비교하기 전에는 연말·연초 상승을 정책 효과로 볼 수 없다."
+                },
+                {
+                  "claim_id": "C3",
+                  "claim_text": "반도체가 쉬는 동안 로봇·바이오·우주항공에 매수세가 유입됐고, 엔터는 선별적으로 움직였으며 화장품 강세가 이어졌다는 관찰이다. 미국 바이오·헬스케어 약 8%, 나스닥 바이오 약 5%, 5월 로봇주 평균 고점 대비 약 70% 하락, APR 당일 30만 원대 회복과 함께 국내 바이오의 비동조 및 반도체 반등 부재 시 양대 지수의 상승 제약을 언급했다.",
+                  "status": "unverified",
+                  "confidence": 0.0,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "업종 순매수·거래대금과 반도체의 지수 기여도를 함께 보고, 국내외 바이오의 동조 여부는 같은 기간 수익률로 비교해야 한다."
+                },
+                {
+                  "claim_id": "C4",
+                  "claim_text": "한중 FTA 서비스·투자 협상이 약 8년 만에 타결됐고 게임·영화 규제 완화와 최혜국 대우가 언급됐다는 주장이다. 중국 현지 여행상품 개발·관광객 직접 모집과 K팝 공연은 별도 규정과 허가에 달린 전망이다.",
+                  "status": "unverified",
+                  "confidence": 0.0,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "여행·콘텐츠 기업의 수혜는 적용 업종과 예외, 시행 규정, 관할 당국의 개별 허가를 확인한 뒤 평가해야 한다."
+                }
+              ],
+              "entities": [
+                {
+                  "ticker": "ORCL",
+                  "name": "오라클·반도체 실적 일정",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "event_key": "Kc6Nssp8c88",
+            "content_sha256": "fbab74a5f7d45be6c2f779aa65d5df2dc18b97c94e6ee8b52051e9ce4a8faa02",
+            "occurred_at": "2026-11-27T08:18:56+00:00",
+            "relevance": {
+              "tickers": [
+                "^KS11"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "verified_entities",
+              "matched_tickers": [],
+              "market_match": false,
+              "score": 0
+            },
+            "summary": {
+              "video_id": "Kc6Nssp8c88",
+              "title": "[11월 27일 마감시황] 외국인 숏커버링이 불러온 반등? 단기 바닥 신호에도 추세 반등을 확신할 수 없는 이유ㅣ홍선애, 이권희, 김장열 [클로징벨 라이브]",
+              "channel": "삼프로TV 3PROTV",
+              "source_url": "https://www.youtube.com/watch?v=Kc6Nssp8c88",
+              "claim_status_summary": {
+                "partially_supported": 1,
+                "unverified": 9
+              },
+              "claims": [
+                {
+                  "claim_id": "C1",
+                  "claim_text": "11월 27일 코스닥 매수 사이드카가 발동했고 코스피는 4,915선(+4.34%), 코스닥은 708선(+8.13%, 약 53포인트 상승)에 마감했으며 코스닥 상승 종목은 1,500개 이상이었다는 주장이다. 외국인과 기관이 양 시장에서 순매수했고, 외국인은 장 막판 선물을 팔았으며 종가 베이시스는 음수였다고 전했다. 로봇·바이오 반등과 SK하이닉스 외국인 매수를 위험선호 회복의 단서로 본 것은 해석이며, 숏커버링·선물 차익실현과 코스피 5,100~5,200선...",
+                  "status": "partially_supported",
+                  "confidence": 0.35,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "코스피 지수 수준의 일치만으로 반등 폭, 매수 주체 또는 추세 전환을 판단할 수 없다. 최종 현물 수급과 공매도 잔고, 만기 전후 베이시스의 지속성을 함께 확인할 필요가 있다."
+                },
+                {
+                  "claim_id": "C2",
+                  "claim_text": "11월 30일 금융권 시장안정 긴급점검 회의와 자본시장 개혁 TF 출범이 언급됐다. 주당 가치 동등 원칙, 증안펀드와 공매도 제한 가능성이 거론됐으나 펀드가 코스닥 반등을 직접 일으켰다는 근거는 제시되지 않았다. 20조 원과 100조 원은 출연자의 시장 반응 가정이며, 양 시장 합산 시총 약 4,000조 원은 별도 확인 대상이다.",
+                  "status": "unverified",
+                  "confidence": 0.0,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "정책 기대와 실제 매수 가능 규모를 구분해야 한다. 집행액·시점·대상 자산이 확인되기 전에는 코스닥에 대한 직접적인 수급 효과를 전제로 삼기 어렵다."
+                },
+                {
+                  "claim_id": "C3",
+                  "claim_text": "삼성전자가 장 초반 16만 9,000원, 종가 17만 9,000원대(+4%대)였고, 방송은 ROE 53.75%와 2026년·2027년 이익 컨센서스 약 380조·616조 원을 언급했다. 반도체 가격과 이익이 크게 하락할 때 16만 원대가 설명된다는 것은 조건부 역산이지 목표가나 저평가 판단이 아니다.",
+                  "status": "unverified",
+                  "confidence": 0.0,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "16만 원대를 목표가나 하방 지지선으로 인용하기보다, 확인된 이익과 주당순자산을 기준으로 가정 변화에 따른 민감도를 살펴봐야 한다."
+                },
+                {
+                  "claim_id": "C4",
+                  "claim_text": "D램 현물가가 2~4주 하락했고 과거에는 약 3개월 뒤 고정거래가가 뒤따랐다는 설명이다. 이번에는 HBM·장기구매계약 때문에 미국 데이터센터 가격으로 전이되지 않을 수 있다는 가설을 제시했다. 중국 고객의 주문 축소율과 공급사 재고 추정, 2027년 2~3분기 가격 둔화는 별도 검증이 필요하다.",
+                  "status": "unverified",
+                  "confidence": 0.0,
+                  "supporting_evidence_ids": [],
+                  "manual_check_required": true,
+                  "investor_implication": "범용 D램 현물 약세를 서버 D램·HBM 계약가 하락으로 곧바로 해석하지 말고, 제품별 고정거래가와 주문 축소의 반복 여부를 따로 봐야 한다."
+                }
+              ],
+              "entities": [
+                {
+                  "ticker": "^KS11",
+                  "name": "코스피·코스닥",
+                  "status": "unverified",
+                  "verification_notes": [
+                    "공개 시장 스냅샷은 조회됐지만 영상 주장을 직접 대조할 수 있는 검증 규칙이 없어 미검증으로 분류했습니다."
+                  ]
+                }
+              ]
+            }
+          }
+        ],
+        "execution_eligible": false
+      },
+      "prism": {
+        "source_health": "OK",
+        "coverage": {
+          "total_unique_events": 536,
+          "window_events": 15,
+          "transmitted_events": 15,
+          "truncated": false,
+          "oldest_occurred_at": "2026-11-27T17:46:32+00:00",
+          "newest_occurred_at": "2026-11-27T19:56:04+00:00",
+          "available_events_before_context_cap": 15,
+          "context_event_cap": 20,
+          "omitted_events": 0,
+          "omitted_due_to_context_cap": 0,
+          "omitted_before_context_selection": 0
+        },
+        "events": [
+          {
+            "event_key": "stock_ai_agent:18135",
+            "content_sha256": "09b79a6a0f8a786972e4de5b425ba72bef9ad8336232cbd32df80179ba20400e",
+            "occurred_at": "2026-11-27T19:56:04+00:00",
+            "relevance": {
+              "tickers": [
+                "INFY",
+                "COST",
+                "AAPL",
+                "VRSN",
+                "PANW",
+                "AS"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "normalized_prism_signals",
+              "matched_tickers": [],
+              "market_match": false,
+              "score": 0
+            },
+            "summary": {
+              "message_id": "18135",
+              "posted_at": "2026-11-27T19:56:04+00:00",
+              "source_url": "https://t.me/stock_ai_agent/18135",
+              "preview": "📊 프리즘 US 시뮬레이터 | 실시간 포트폴리오 (2026-11-28 04:55) 🔸 현재 보유: 6/10개 🔸 사용 비중: 4.30/10 슬롯 (분할 매수·시험매수 반영) ✅ 최고 수익: Infosys Limited(INFY) +4.24% ⚠️ 최저 수익: Costco Wholesale Corporation(COST) -1.12% 🔸 보유 종목: - Apple Inc.(AAPL) [T...",
+              "signals": [
+                {
+                  "canonical_ticker": "INFY",
+                  "display_name": "Infosys Limited",
+                  "market": "US",
+                  "source_asof": "2026-11-27T19:56:04+00:00",
+                  "signal_action": "HOLD",
+                  "trigger_type": "telegram_portfolio_snapshot",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "confidence": 0.45,
+                  "warnings": []
+                },
+                {
+                  "canonical_ticker": "COST",
+                  "display_name": "Costco Wholesale Corporation",
+                  "market": "US",
+                  "source_asof": "2026-11-27T19:56:04+00:00",
+                  "signal_action": "HOLD",
+                  "trigger_type": "telegram_portfolio_snapshot",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "confidence": 0.45,
+                  "warnings": []
+                },
+                {
+                  "canonical_ticker": "AAPL",
+                  "display_name": "Apple Inc.",
+                  "market": "US",
+                  "source_asof": "2026-11-27T19:56:04+00:00",
+                  "signal_action": "HOLD",
+                  "trigger_type": "telegram_portfolio_snapshot",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "stop_loss_price": 334.0,
+                  "target_price": 422.86,
+                  "confidence": 0.45,
+                  "warnings": [
+                    "multi_ticker_prices_scoped_to_mention_block"
+                  ]
+                },
+                {
+                  "canonical_ticker": "VRSN",
+                  "display_name": "VeriSign, Inc.",
+                  "market": "US",
+                  "source_asof": "2026-11-27T19:56:04+00:00",
+                  "signal_action": "HOLD",
+                  "trigger_type": "telegram_portfolio_snapshot",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "stop_loss_price": 296.01,
+                  "target_price": 370.93,
+                  "confidence": 0.45,
+                  "warnings": [
+                    "multi_ticker_prices_scoped_to_mention_block"
+                  ]
+                },
+                {
+                  "canonical_ticker": "PANW",
+                  "display_name": "Palo Alto Networks, Inc.",
+                  "market": "US",
+                  "source_asof": "2026-11-27T19:56:04+00:00",
+                  "signal_action": "HOLD",
+                  "trigger_type": "telegram_portfolio_snapshot",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "stop_loss_price": 338.09,
+                  "target_price": 426.67,
+                  "confidence": 0.45,
+                  "warnings": [
+                    "multi_ticker_prices_scoped_to_mention_block"
+                  ]
+                },
+                {
+                  "canonical_ticker": "AS",
+                  "display_name": "Amer Sports, Inc.",
+                  "market": "US",
+                  "source_asof": "2026-11-27T19:56:04+00:00",
+                  "signal_action": "HOLD",
+                  "trigger_type": "telegram_portfolio_snapshot",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "stop_loss_price": 28.98,
+                  "target_price": 36.61,
+                  "confidence": 0.45,
+                  "warnings": [
+                    "multi_ticker_prices_scoped_to_mention_block"
+                  ]
+                }
+              ],
+              "simulation_only": true,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:18134",
+            "content_sha256": "ecd13b9ea1a1b9caf4bb1d259e2aadfb7ae960507c8ceabb20c8b1275230ba79",
+            "occurred_at": "2026-11-27T19:56:02+00:00",
+            "relevance": {
+              "tickers": [
+                "AMD"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "normalized_prism_signals",
+              "matched_tickers": [],
+              "market_match": false,
+              "score": 0
+            },
+            "summary": {
+              "message_id": "18134",
+              "posted_at": "2026-11-27T19:56:02+00:00",
+              "source_url": "https://t.me/stock_ai_agent/18134",
+              "preview": "⚠️ 매수 보류: Advanced Micro Devices, Inc.(AMD) 현재가: $421.65 매수 점수: 3/10 결정: 미진입 시장 상황: 보통 약세장 산업군: Technology 보류 사유: AI 판단: 미진입 / 점수 부족 (2/5) / 섹터 집중 (Technology 2/4종목(50%) 보유, 한 업종 30% 한도) — AI 사유: 현재가 424.54달러가 하락 중인 5...",
+              "signals": [
+                {
+                  "canonical_ticker": "AMD",
+                  "display_name": "Advanced Micro Devices, Inc.",
+                  "market": "US",
+                  "source_asof": "2026-11-27T19:56:02+00:00",
+                  "signal_action": "NO_ENTRY",
+                  "trigger_type": "telegram_buy_skip",
+                  "trigger_score": 0.3,
+                  "composite_score": 0.3,
+                  "confidence": 0.3,
+                  "warnings": []
+                }
+              ],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:18133",
+            "content_sha256": "36f1ea27a83d946b31df9591b827fad87f79188a0a2da39990d5c2dc67181179",
+            "occurred_at": "2026-11-27T19:55:59+00:00",
+            "relevance": {
+              "tickers": [
+                "DV"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "normalized_prism_signals",
+              "matched_tickers": [],
+              "market_match": false,
+              "score": 0
+            },
+            "summary": {
+              "message_id": "18133",
+              "posted_at": "2026-11-27T19:55:59+00:00",
+              "source_url": "https://t.me/stock_ai_agent/18133",
+              "preview": "⚠️ 매수 보류: DoubleVerify Holdings, Inc.(DV) 현재가: $13.62 매수 점수: 7/10 결정: 미진입 시장 상황: 보통 약세장 산업군: Communication Services 보류 사유: AI 판단: 미진입 — AI 사유: 보통 약세장의 필수 추가 확인 요건이 0개로 최소 1개에 미달합니다. 주도 섹터 지정과 PER 30% 이상 할인에 해당하지 않고, 뉴...",
+              "signals": [
+                {
+                  "canonical_ticker": "DV",
+                  "display_name": "DoubleVerify Holdings, Inc.",
+                  "market": "US",
+                  "source_asof": "2026-11-27T19:55:59+00:00",
+                  "signal_action": "NO_ENTRY",
+                  "trigger_type": "telegram_buy_skip",
+                  "trigger_score": 0.7,
+                  "composite_score": 0.7,
+                  "confidence": 0.7,
+                  "warnings": []
+                }
+              ],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:18132",
+            "content_sha256": "35831f76bd2dcfbf18313cf5ec75cc8d2fe9707a0c87c95841c2bdd4d4c6443a",
+            "occurred_at": "2026-11-27T19:55:55+00:00",
+            "relevance": {
+              "tickers": [
+                "ANT"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "normalized_prism_signals",
+              "matched_tickers": [],
+              "market_match": false,
+              "score": 0
+            },
+            "summary": {
+              "message_id": "18132",
+              "posted_at": "2026-11-27T19:55:55+00:00",
+              "source_url": "https://t.me/stock_ai_agent/18132",
+              "preview": "⚠️ 매수 보류: Anthropic, PBC(ANT) 현재가: $91.29 매수 점수: 2/10 결정: 미진입 시장 상황: 보통 약세장 산업군: Technology 보류 사유: AI 판단: 미진입 / 점수 부족 (1/5) / 섹터 집중 (Technology 2/4종목(50%) 보유, 한 업종 30% 한도) — AI 사유: 보통 약세장에서 필수 수익성·재무 건전성 기준이 미달합니다. 유효...",
+              "signals": [
+                {
+                  "canonical_ticker": "ANT",
+                  "display_name": "Anthropic, PBC",
+                  "market": "US",
+                  "source_asof": "2026-11-27T19:55:55+00:00",
+                  "signal_action": "NO_ENTRY",
+                  "trigger_type": "telegram_buy_skip",
+                  "trigger_score": 0.2,
+                  "composite_score": 0.2,
+                  "confidence": 0.2,
+                  "warnings": []
+                }
+              ],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:18131",
+            "content_sha256": "960d34ceb3794d567fc574c78afb8a72927effc5ff2558e1b7d3ebecebcb6b58",
+            "occurred_at": "2026-11-27T19:47:58+00:00",
+            "relevance": {
+              "tickers": [
+                "AMD"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "normalized_prism_signals",
+              "matched_tickers": [],
+              "market_match": false,
+              "score": 0
+            },
+            "summary": {
+              "message_id": "18131",
+              "posted_at": "2026-11-27T19:47:58+00:00",
+              "source_url": "https://t.me/stock_ai_agent/18131",
+              "preview": "📊 Advanced Micro Devices, Inc. (AMD) O'Neil 인사이트 차트의 베이스/피벗/RS 주석을 함께 참고하세요. ※ 보조 참고용 · 투자 권유 아님",
+              "signals": [
+                {
+                  "canonical_ticker": "AMD",
+                  "display_name": "Advanced Micro Devices, Inc.",
+                  "market": "US",
+                  "source_asof": "2026-11-27T19:47:58+00:00",
+                  "signal_action": "WATCH",
+                  "trigger_type": "telegram_oneil_insight",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "confidence": 0.45,
+                  "warnings": []
+                }
+              ],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:18130",
+            "content_sha256": "1384b34f7f008eae193be2bf71b9be21a3f9d1317d25d9b94d79eebedda10582",
+            "occurred_at": "2026-11-27T19:47:41+00:00",
+            "relevance": {
+              "tickers": [
+                "DV"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "normalized_prism_signals",
+              "matched_tickers": [],
+              "market_match": false,
+              "score": 0
+            },
+            "summary": {
+              "message_id": "18130",
+              "posted_at": "2026-11-27T19:47:41+00:00",
+              "source_url": "https://t.me/stock_ai_agent/18130",
+              "preview": "📊 DoubleVerify Holdings, Inc. (DV) O'Neil 인사이트 차트의 베이스/피벗/RS 주석을 함께 참고하세요. ※ 보조 참고용 · 투자 권유 아님",
+              "signals": [
+                {
+                  "canonical_ticker": "DV",
+                  "display_name": "DoubleVerify Holdings, Inc.",
+                  "market": "US",
+                  "source_asof": "2026-11-27T19:47:41+00:00",
+                  "signal_action": "WATCH",
+                  "trigger_type": "telegram_oneil_insight",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "confidence": 0.45,
+                  "warnings": []
+                }
+              ],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:18129",
+            "content_sha256": "56d104d1bf76bbd423fc3c63e8d6147db24ce5e6130e51bf35e67ce1f2e77e00",
+            "occurred_at": "2026-11-27T19:47:17+00:00",
+            "relevance": {
+              "tickers": [
+                "AMD",
+                "NVDA",
+                "AVGO"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "normalized_prism_signals",
+              "matched_tickers": [],
+              "market_match": false,
+              "score": 0
+            },
+            "summary": {
+              "message_id": "18129",
+              "posted_at": "2026-11-27T19:47:17+00:00",
+              "source_url": "https://t.me/stock_ai_agent/18129",
+              "preview": "",
+              "signals": [
+                {
+                  "canonical_ticker": "AMD",
+                  "display_name": "Advanced Micro Devices,  Inc",
+                  "market": "US",
+                  "source_asof": "2026-11-27T19:47:17+00:00",
+                  "signal_action": "WATCH",
+                  "trigger_type": "telegram_pdf_report",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "confidence": 0.45,
+                  "warnings": []
+                },
+                {
+                  "canonical_ticker": "NVDA",
+                  "display_name": "경쟁사와 비교하면 — 비교 대상인 엔비디아",
+                  "market": "US",
+                  "source_asof": "2026-11-27T19:47:17+00:00",
+                  "signal_action": "WATCH",
+                  "trigger_type": "telegram_pdf_report",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "confidence": 0.45,
+                  "warnings": []
+                },
+                {
+                  "canonical_ticker": "AVGO",
+                  "display_name": "브로드컴",
+                  "market": "US",
+                  "source_asof": "2026-11-27T19:47:17+00:00",
+                  "signal_action": "WATCH",
+                  "trigger_type": "telegram_pdf_report",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "confidence": 0.45,
+                  "warnings": []
+                }
+              ],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:18128",
+            "content_sha256": "6835567fff2dcf8dcf9a283d3dbb83b113c7a828b4f10b100bbf52942d19fc54",
+            "occurred_at": "2026-11-27T19:47:13+00:00",
+            "relevance": {
+              "tickers": [
+                "DV"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "normalized_prism_signals",
+              "matched_tickers": [],
+              "market_match": false,
+              "score": 0
+            },
+            "summary": {
+              "message_id": "18128",
+              "posted_at": "2026-11-27T19:47:13+00:00",
+              "source_url": "https://t.me/stock_ai_agent/18128",
+              "preview": "",
+              "signals": [
+                {
+                  "canonical_ticker": "DV",
+                  "display_name": "DoubleVerify Holdings,  Inc.",
+                  "market": "US",
+                  "source_asof": "2026-11-27T19:47:13+00:00",
+                  "signal_action": "WATCH",
+                  "trigger_type": "telegram_pdf_report",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "confidence": 0.45,
+                  "warnings": []
+                }
+              ],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:18127",
+            "content_sha256": "40a488459b55fc6db2520c8fb1f07f0d7c3bd5ae71f4394844fb6e63d6dca3d2",
+            "occurred_at": "2026-11-27T19:47:09+00:00",
+            "relevance": {
+              "tickers": [
+                "ANT",
+                "USD"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "normalized_prism_signals",
+              "matched_tickers": [],
+              "market_match": false,
+              "score": 0
+            },
+            "summary": {
+              "message_id": "18127",
+              "posted_at": "2026-11-27T19:47:09+00:00",
+              "source_url": "https://t.me/stock_ai_agent/18127",
+              "preview": "",
+              "signals": [
+                {
+                  "canonical_ticker": "ANT",
+                  "display_name": "Anthropic,  PBC",
+                  "market": "US",
+                  "source_asof": "2026-11-27T19:47:09+00:00",
+                  "signal_action": "WATCH",
+                  "trigger_type": "telegram_pdf_report",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "confidence": 0.45,
+                  "warnings": []
+                },
+                {
+                  "canonical_ticker": "USD",
+                  "display_name": "날짜 관측 종가",
+                  "market": "US",
+                  "source_asof": "2026-11-27T19:47:09+00:00",
+                  "signal_action": "WATCH",
+                  "trigger_type": "telegram_pdf_report",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "confidence": 0.45,
+                  "warnings": []
+                }
+              ],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:18126",
+            "content_sha256": "e6be747616998b6e414179987b61e4ffcd66c95107a7461b04d8d5b424995bf6",
+            "occurred_at": "2026-11-27T19:47:00+00:00",
+            "relevance": {
+              "tickers": [
+                "AMD"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "normalized_prism_signals",
+              "matched_tickers": [],
+              "market_match": false,
+              "score": 0
+            },
+            "summary": {
+              "message_id": "18126",
+              "posted_at": "2026-11-27T19:47:00+00:00",
+              "source_url": "https://t.me/stock_ai_agent/18126",
+              "preview": "📊 Advanced Micro Devices (AMD) 미국 반도체 설계 기업으로, 데이터센터·AI 가속기와 서버용 프로세서, PC·게임 및 임베디드 제품을 판매합니다. 💵 거래 현황 (11월 27일 관측치, 최종 종가 미확인) - 주가: $424.54 - 전일 대비: +4.6% (전일 $406.03 기준) - 거래량: 약 2,215만 주. 최근 급락일인 11월 5일·19~20일에는 약...",
+              "signals": [
+                {
+                  "canonical_ticker": "AMD",
+                  "display_name": "Advanced Micro Devices",
+                  "market": "US",
+                  "source_asof": "2026-11-27T19:47:00+00:00",
+                  "signal_action": "UNKNOWN",
+                  "trigger_type": "telegram_message",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "confidence": 0.45,
+                  "warnings": []
+                }
+              ],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:18125",
+            "content_sha256": "0a34f2cb6f717948e1a72798d04c61f549ec51cbde7234364639743f35bd6a9b",
+            "occurred_at": "2026-11-27T19:46:55+00:00",
+            "relevance": {
+              "tickers": [
+                "DV"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "normalized_prism_signals",
+              "matched_tickers": [],
+              "market_match": false,
+              "score": 0
+            },
+            "summary": {
+              "message_id": "18125",
+              "posted_at": "2026-11-27T19:46:55+00:00",
+              "source_url": "https://t.me/stock_ai_agent/18125",
+              "preview": "📊 DoubleVerify Holdings (DV) 디지털 광고의 노출 품질을 검증하고 캠페인 성과를 측정·최적화하는 기업입니다. 광고주와 매체사에 광고 측정·검증 서비스를 제공합니다. 💰 거래 정보 (2026.11.27 오후 1시 ET 관측값; 확정 종가 아님) - 주가: $13.62 - 전일 종가 $13.60 대비 +$0.02 (+0.15%) - 거래량: 21,140,373주. 다만...",
+              "signals": [
+                {
+                  "canonical_ticker": "DV",
+                  "display_name": "DoubleVerify Holdings",
+                  "market": "US",
+                  "source_asof": "2026-11-27T19:46:55+00:00",
+                  "signal_action": "UNKNOWN",
+                  "trigger_type": "telegram_message",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "target_price": 13.64,
+                  "confidence": 0.45,
+                  "warnings": []
+                }
+              ],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:18124",
+            "content_sha256": "ea6d05958633f8517667adf73451d1098497bd3fc48e81fe33d4824234b33dfb",
+            "occurred_at": "2026-11-27T19:46:51+00:00",
+            "relevance": {
+              "tickers": [
+                "ANT"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "normalized_prism_signals",
+              "matched_tickers": [],
+              "market_match": false,
+              "score": 0
+            },
+            "summary": {
+              "message_id": "18124",
+              "posted_at": "2026-11-27T19:46:51+00:00",
+              "source_url": "https://t.me/stock_ai_agent/18124",
+              "preview": "📊 Anthropic, PBC (ANT) Claude AI 모델과 Claude Code 등 업무용 AI 제품을 개발·제공하는 기업입니다. 빠른 매출 성장 기대가 크지만, 아직 적자이며 투자 부담도 상당합니다. 💰 가격: $91.88 — 11월 27일 관측값이며 확정 종가는 아님 📈 등락: 전일 대비 약 +11%(장중 보도 기준) 📉 거래량: 약 1억 4,306만 주 관측. 당일 거래량은...",
+              "signals": [
+                {
+                  "canonical_ticker": "ANT",
+                  "display_name": "Anthropic, PBC",
+                  "market": "US",
+                  "source_asof": "2026-11-27T19:46:51+00:00",
+                  "signal_action": "UNKNOWN",
+                  "trigger_type": "telegram_message",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "confidence": 0.45,
+                  "warnings": []
+                }
+              ],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:18123",
+            "content_sha256": "2ca1d1f249a803790af28f848ac5f91bb27712459ce3b63c1da82043e53cb979",
+            "occurred_at": "2026-11-27T19:38:18+00:00",
+            "relevance": {
+              "tickers": [
+                "ANT",
+                "DV",
+                "AMD"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "normalized_prism_signals",
+              "matched_tickers": [],
+              "market_match": false,
+              "score": 0
+            },
+            "summary": {
+              "message_id": "18123",
+              "posted_at": "2026-11-27T19:38:18+00:00",
+              "source_url": "https://t.me/stock_ai_agent/18123",
+              "preview": "🔔 미국주식 오후 프리즘 시그널 얼럿 📅 2026.11.27 오후 분석 포착된 관심종목 🤖 프리즘봇의 가상 포트폴리오 운용 과정을 투명하게 공개합니다. 실제 매수 권유가 아닙니다. 🧭 장기추세: 온건 약세 | 스윙: 단기 조정 | 실행기준: 온건 약세 | 선정: 탑다운 0종목 + 바텀업 3종목 🧭 오늘 테마 흐름 미국 1,019종목 · 전일 종가 대비 · 테마별 중앙값 📈 강한 테마 1...",
+              "signals": [
+                {
+                  "canonical_ticker": "ANT",
+                  "display_name": "Anthropic, PBC",
+                  "market": "US",
+                  "source_asof": "2026-11-27T19:38:18+00:00",
+                  "signal_action": "WATCH",
+                  "trigger_type": "telegram_signal_alert",
+                  "trigger_score": 0.82,
+                  "composite_score": 0.82,
+                  "confidence": 0.82,
+                  "warnings": []
+                },
+                {
+                  "canonical_ticker": "DV",
+                  "display_name": "DoubleVerify Holdings, Inc.",
+                  "market": "US",
+                  "source_asof": "2026-11-27T19:38:18+00:00",
+                  "signal_action": "WATCH",
+                  "trigger_type": "telegram_signal_alert",
+                  "trigger_score": 0.67,
+                  "composite_score": 0.67,
+                  "confidence": 0.67,
+                  "warnings": []
+                },
+                {
+                  "canonical_ticker": "AMD",
+                  "display_name": "Advanced Micro Devices, Inc.",
+                  "market": "US",
+                  "source_asof": "2026-11-27T19:38:18+00:00",
+                  "signal_action": "WATCH",
+                  "trigger_type": "telegram_signal_alert",
+                  "trigger_score": 0.95,
+                  "composite_score": 0.95,
+                  "confidence": 0.95,
+                  "warnings": []
+                }
+              ],
+              "simulation_only": true,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:18122",
+            "content_sha256": "df75fae984fd673000ae3ac0e348832477a47a99a23a74370f868d4d19c0f254",
+            "occurred_at": "2026-11-27T17:46:38+00:00",
+            "relevance": {
+              "tickers": [
+                "INFY",
+                "COST",
+                "AAPL",
+                "VRSN",
+                "PANW",
+                "AS"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "normalized_prism_signals",
+              "matched_tickers": [],
+              "market_match": false,
+              "score": 0
+            },
+            "summary": {
+              "message_id": "18122",
+              "posted_at": "2026-11-27T17:46:38+00:00",
+              "source_url": "https://t.me/stock_ai_agent/18122",
+              "preview": "📊 프리즘 US 시뮬레이터 | 실시간 포트폴리오 (2026-11-28 02:46) 🔸 현재 보유: 6/10개 🔸 사용 비중: 4.30/10 슬롯 (분할 매수·시험매수 반영) ✅ 최고 수익: Infosys Limited(INFY) +4.60% ⚠️ 최저 수익: Costco Wholesale Corporation(COST) -2.02% 🔸 보유 종목: - Apple Inc.(AAPL) [T...",
+              "signals": [
+                {
+                  "canonical_ticker": "INFY",
+                  "display_name": "Infosys Limited",
+                  "market": "US",
+                  "source_asof": "2026-11-27T17:46:38+00:00",
+                  "signal_action": "HOLD",
+                  "trigger_type": "telegram_portfolio_snapshot",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "confidence": 0.45,
+                  "warnings": []
+                },
+                {
+                  "canonical_ticker": "COST",
+                  "display_name": "Costco Wholesale Corporation",
+                  "market": "US",
+                  "source_asof": "2026-11-27T17:46:38+00:00",
+                  "signal_action": "HOLD",
+                  "trigger_type": "telegram_portfolio_snapshot",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "confidence": 0.45,
+                  "warnings": []
+                },
+                {
+                  "canonical_ticker": "AAPL",
+                  "display_name": "Apple Inc.",
+                  "market": "US",
+                  "source_asof": "2026-11-27T17:46:38+00:00",
+                  "signal_action": "HOLD",
+                  "trigger_type": "telegram_portfolio_snapshot",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "stop_loss_price": 334.0,
+                  "target_price": 422.86,
+                  "confidence": 0.45,
+                  "warnings": [
+                    "multi_ticker_prices_scoped_to_mention_block"
+                  ]
+                },
+                {
+                  "canonical_ticker": "VRSN",
+                  "display_name": "VeriSign, Inc.",
+                  "market": "US",
+                  "source_asof": "2026-11-27T17:46:38+00:00",
+                  "signal_action": "HOLD",
+                  "trigger_type": "telegram_portfolio_snapshot",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "stop_loss_price": 296.01,
+                  "target_price": 370.93,
+                  "confidence": 0.45,
+                  "warnings": [
+                    "multi_ticker_prices_scoped_to_mention_block"
+                  ]
+                },
+                {
+                  "canonical_ticker": "PANW",
+                  "display_name": "Palo Alto Networks, Inc.",
+                  "market": "US",
+                  "source_asof": "2026-11-27T17:46:38+00:00",
+                  "signal_action": "HOLD",
+                  "trigger_type": "telegram_portfolio_snapshot",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "stop_loss_price": 338.09,
+                  "target_price": 426.67,
+                  "confidence": 0.45,
+                  "warnings": [
+                    "multi_ticker_prices_scoped_to_mention_block"
+                  ]
+                },
+                {
+                  "canonical_ticker": "AS",
+                  "display_name": "Amer Sports, Inc.",
+                  "market": "US",
+                  "source_asof": "2026-11-27T17:46:38+00:00",
+                  "signal_action": "HOLD",
+                  "trigger_type": "telegram_portfolio_snapshot",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "stop_loss_price": 28.98,
+                  "target_price": 36.61,
+                  "confidence": 0.45,
+                  "warnings": [
+                    "multi_ticker_prices_scoped_to_mention_block"
+                  ]
+                }
+              ],
+              "simulation_only": true,
+              "actionability": "research_only"
+            }
+          },
+          {
+            "event_key": "stock_ai_agent:18121",
+            "content_sha256": "4012c21e6ca689b3354222301873dd5e46751cd0979138a610cb096584279861",
+            "occurred_at": "2026-11-27T17:46:32+00:00",
+            "relevance": {
+              "tickers": [
+                "INFY"
+              ],
+              "markets": [
+                "US"
+              ],
+              "themes": [],
+              "match_basis": "normalized_prism_signals",
+              "matched_tickers": [],
+              "market_match": false,
+              "score": 0
+            },
+            "summary": {
+              "message_id": "18121",
+              "posted_at": "2026-11-27T17:46:32+00:00",
+              "source_url": "https://t.me/stock_ai_agent/18121",
+              "preview": "📈 추가 매수(비중 확대): Infosys Limited(INFY) 비중: 80% → 85% (1슬롯 기준) 추가 매수가: $13.02 평균 매수가: $12.54 손절가: $11.89 (손절 시 전량 매도) 근거: 눌림 회복 조건 확인 — 11월 24일 고가 $12.64와 11월 5일 종가 $12.80을 지지 구간으로 봅니다. 해당 구간 돌파 후 눌림이 실제로 발생하고, 구간 하단 주문...",
+              "signals": [
+                {
+                  "canonical_ticker": "INFY",
+                  "display_name": "Infosys Limited",
+                  "market": "US",
+                  "source_asof": "2026-11-27T17:46:32+00:00",
+                  "signal_action": "UNKNOWN",
+                  "trigger_type": "telegram_message",
+                  "trigger_score": 0.45,
+                  "composite_score": 0.45,
+                  "stop_loss_price": 11.89,
+                  "confidence": 0.45,
+                  "warnings": []
+                }
+              ],
+              "simulation_only": false,
+              "actionability": "research_only"
+            }
+          }
+        ],
+        "execution_eligible": false
+      },
+      "receipt_contract": {
+        "schema": "tradingagents.external-evidence-receipt/v1",
+        "sources": {
+          "youtube": {
+            "source_health": "OK",
+            "event_keys": [
+              "MoV5BIAHwMw",
+              "QmtcQdKeDe4",
+              "Wz8_pZ8lpWg",
+              "IKlg03x1dMw",
+              "tx-pbWaIoTc",
+              "K6T7JRN3o58",
+              "gbV6JrXviQ4",
+              "JAgzr_2cfcs",
+              "8WXUg04sqKg",
+              "vzzM6xLK8B8",
+              "SJpL7ljeLoo",
+              "Kc6Nssp8c88"
+            ],
+            "coverage": {
+              "total_unique_events": 1123,
+              "window_events": 106,
+              "transmitted_events": 12,
+              "truncated": true,
+              "oldest_occurred_at": "2026-11-26T08:00:31+00:00",
+              "newest_occurred_at": "2026-11-27T12:00:19+00:00",
+              "available_events_before_context_cap": 60,
+              "context_event_cap": 12,
+              "omitted_events": 94,
+              "omitted_due_to_context_cap": 48,
+              "omitted_before_context_selection": 46
+            }
+          },
+          "prism": {
+            "source_health": "OK",
+            "event_keys": [
+              "stock_ai_agent:18135",
+              "stock_ai_agent:18134",
+              "stock_ai_agent:18133",
+              "stock_ai_agent:18132",
+              "stock_ai_agent:18131",
+              "stock_ai_agent:18130",
+              "stock_ai_agent:18129",
+              "stock_ai_agent:18128",
+              "stock_ai_agent:18127",
+              "stock_ai_agent:18126",
+              "stock_ai_agent:18125",
+              "stock_ai_agent:18124",
+              "stock_ai_agent:18123",
+              "stock_ai_agent:18122",
+              "stock_ai_agent:18121"
+            ],
+            "coverage": {
+              "total_unique_events": 536,
+              "window_events": 15,
+              "transmitted_events": 15,
+              "truncated": false,
+              "oldest_occurred_at": "2026-11-27T17:46:32+00:00",
+              "newest_occurred_at": "2026-11-27T19:56:04+00:00",
+              "available_events_before_context_cap": 15,
+              "context_event_cap": 20,
+              "omitted_events": 0,
+              "omitted_due_to_context_cap": 0,
+              "omitted_before_context_selection": 0
+            }
+          }
+        }
+      }
+    },
+    "guardrails": {
+      "untrusted_external_context": true,
+      "global_mode_cannot_promote_a_row": true,
+      "immediate_requires_row_mode": "IMMEDIATE",
+      "market_data_asof": "2026-11-27T15:29:00+09:00",
+      "valid_until": "2026-11-27T15:31:00+09:00",
+      "expired_at_build": true,
+      "decision_ready": false,
+      "conditional_strategy_ready": false,
+      "report_mode": "OUTAGE",
+      "required_rechecks": [
+        "실시간 호가와 주문 가능 상태 재확인",
+        "계좌 현금·미체결 주문 재확인",
+        "VI·시장경보·거래정지·투자자/프로그램 수급 상태 재확인"
+      ],
+      "stale_buy_sell_reduce_is_reference_only": true,
+      "supporting_context_may_promote_execution": false,
+      "external_evidence_policy": {
+        "profile": "balanced_external",
+        "material_thesis_effects": [
+          "ranking",
+          "confidence",
+          "position_size_within_existing_risk_limits",
+          "research_priority"
+        ],
+        "supported_evidence_weight": "MEDIUM",
+        "partially_supported_evidence_weight": "LOW_TO_MEDIUM",
+        "unverified_evidence_weight": "LOW_LABELED",
+        "user_primary_channels": [
+          "@kpunch",
+          "@sosumonkey"
+        ],
+        "user_primary_source_tier": "USER_PRIMARY",
+        "user_primary_evidence_weight": "HIGH",
+        "user_primary_validation_policy": "USER_ACCEPTED",
+        "matching_multi_source_signal_may_raise_thesis_priority": true,
+        "conflicting_signal_must_be_visible": true,
+        "may_bypass_market_or_portfolio_execution_gate": false
+      }
+    },
+    "model_provenance": {
+      "schema": "tradingagents.model-provenance/v1",
+      "work_synthesis": {
+        "execution_mode": "local",
+        "requested_model": "gpt-6.2-sol",
+        "requested_reasoning_effort": "high",
+        "task_id": "tradingagents-work-kr",
+        "verification_status": "CONFIGURED_NOT_RUNTIME_VERIFIED",
+        "observed_model": null,
+        "observed_reasoning_effort": null,
+        "note": "The local task contract is verified; the Work host does not expose a signed per-response model receipt."
+      },
+      "market_analysis": {
+        "source_run_id": "20261127T045657_local-scheduler-kr-full",
+        "provider": "codex",
+        "requested_models": {
+          "quick": "gpt-6.2-sol",
+          "deep": "gpt-6.2-sol",
+          "output": "gpt-6.2-sol",
+          "writer": "gpt-6.2-sol",
+          "judge": "gpt-6.2-sol"
+        },
+        "requested_reasoning_effort": {
+          "default": "medium",
+          "quick": "medium",
+          "deep": "xhigh",
+          "output": "medium",
+          "writer": "medium",
+          "judge": "xhigh"
+        },
+        "verification_status": "RUNTIME_USAGE_OBSERVED",
+        "observed_calls": 580,
+        "observed_models": {
+          "gpt-6.2-sol": {
+            "calls": 580,
+            "input_tokens": 17830721,
+            "output_tokens": 1194073,
+            "total_tokens": 19024794
+          }
+        },
+        "usage_available": true
+      },
+      "overlay": {
+        "source_run_id": "20261127T152819_local-freshness-kr-overlay",
+        "provider": "codex",
+        "requested_models": {
+          "quick": "gpt-6.2-sol",
+          "deep": "gpt-6.2-sol",
+          "output": "gpt-6.2-sol",
+          "writer": "gpt-6.2-sol",
+          "judge": "gpt-6.2-sol"
+        },
+        "requested_reasoning_effort": {
+          "default": "medium",
+          "quick": "medium",
+          "deep": "xhigh",
+          "output": "medium",
+          "writer": "medium",
+          "judge": "xhigh"
+        },
+        "verification_status": "CONFIGURED_ONLY",
+        "observed_calls": 0,
+        "observed_models": {},
+        "usage_available": false
+      }
+    }
+  }
+}
